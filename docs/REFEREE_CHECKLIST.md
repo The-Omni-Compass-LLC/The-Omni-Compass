@@ -49,8 +49,8 @@ checklists for experimental computer science (code, data, seeds, environment, st
 | Every run reported, including the ones that went wrong | earlier sets and the first GPU law kept in `results/`; the fault test's first two runs and their fixes recorded | met |
 | A control arm that measures the cost of being there | the watch arm (Omni-Compass decides, writes nothing) on the GPU | met |
 | The native comparator includes its own autoscaling of machines | on kind native has no node autoscaler; the bill run on Azure (`aks-metered`, Azure's own autoscaler) | **open: built, waiting to run** |
-| Behaviour under heavy load, not only light load | the capacity test (`docs/K8S_BOWL_PREREGISTRATION.md`) | **running** |
-| Many tenants on one cluster: one surging must not starve its neighbour | the fairness test (`TWO_APP=1`, `docs/K8S_BOWL_PREREGISTRATION.md`) | **running** |
+| Behaviour under heavy load, not only light load | the capacity test: bowl law +34.1% served on the same machines, pods started worse (`results/live/CAPACITY.md`); amended and re-run | **re-run under the amendment** |
+| Many tenants on one cluster: one surging must not starve its neighbour | the fairness test: neighbour unharmed, bowl failures worse (`results/live/FAIRNESS.md`); amended and re-run | **re-run under the amendment** |
 | Workloads beyond the synthetic one | real AI serving (vLLM) on the card; public data-center traces | vLLM in the card run; **traces open** |
 
 ## 5. Statistics
@@ -81,7 +81,8 @@ checklists for experimental computer science (code, data, seeds, environment, st
 
 ## 8. What this repository does not yet claim
 
-Energy savings in watts on real hardware beyond the first card run; the bill on a real cloud; capacity under heavy load;
+Energy savings in watts on real hardware beyond the first card run; the bill on a real cloud; capacity under heavy load
+within the one rule;
 results reproduced by an outside party. Each has its test built and written down before it runs, and each result will
 be published as it comes, whatever it says.
 

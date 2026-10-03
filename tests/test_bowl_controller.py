@@ -8,6 +8,9 @@
   hot       p95 past the 0.95 wall: fail up, the HPA target goes to the bottom of its cover (60% of the operator's) at
             once and the node pool asks for one machine more
   blind     no live probe samples: read as past the wall, same as hot
+  demand    calm again while the demand still grows: the extra pods stay; the operator's target returns once the
+            demand has stopped growing for one autoscaler window (no remove-then-restart)
+  sensed    two services, the probe measuring one: only its HPA moves; the neighbour's stays the operator's
   restore   the kill switch returns every HPA target to the operator's and removes every record
   engine    the six-state engine still runs every decision (E and U in the audit) and the decision names the bowl law
 """
@@ -90,6 +93,36 @@ def main():
             break
     assert target_now(st) == 50, f"fault over: target {target_now(st)}, expected the operator's 50 back at once"
     print(f"fault over: target back to 50 after {k} decision(s), inside the autoscaler's window")
+
+    # demand still growing: a breach called the extra pods and the CPU the service uses keeps rising (the next load
+    # step). Calm again, but the pods stay: handing the operator's target back now would remove them and start them
+    # again on the next rise. Once the demand has stopped growing for one autoscaler window, the target returns
+    t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 600.0)
+    c, marker = controller(t, lat); c.step()
+    assert target_now(st) == 30
+    S = json.loads(st.read_text()); S["used_per_node"] = "600m"; st.write_text(json.dumps(S))
+    lat = probe(t, 50.0)
+    for _ in range(3):
+        c.step()
+    assert target_now(st) == 30, f"rising demand: target {target_now(st)}, expected the pods held at 30"
+    c.demand = [(tt - 400.0, u) for tt, u in c.demand]      # one window (300 s) on, the demand flat since
+    c.target_at = {k: v - 400.0 for k, v in c.target_at.items()}
+    c.step()
+    assert target_now(st) == 50, f"demand flat: target {target_now(st)}, expected the operator's 50 back"
+    print("rising demand: pods held at 30 while the demand grew; back to 50 once it stopped growing for one window")
+
+    # two services on the same machines, the probe measuring one (--sensed default/web): a breach moves only the HPA
+    # of the service the probe measures; the neighbour's HPA stays at the operator's own target
+    t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 600.0)
+    S = json.loads(st.read_text()); S["hpas"][0]["spec"]["scaleTargetRef"] = {"kind": "Deployment", "name": "web"}
+    nb = json.loads(json.dumps(S["hpas"][0])); nb["metadata"]["name"] = "noisy"; nb["spec"]["scaleTargetRef"]["name"] = "noisy"
+    S["hpas"].append(nb); st.write_text(json.dumps(S))
+    c, marker = controller(t, lat, "--sensed", "default/web")
+    for _ in range(3):
+        c.step()
+    H = {h["metadata"]["name"]: h["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"] for h in json.loads(st.read_text())["hpas"]}
+    assert H == {"web": 30, "noisy": 50}, f"two services: targets {H}, expected web 30 (sensed), noisy 50 (the operator's)"
+    print(f"two services: the sensed one failed up to {H['web']}, the neighbour stayed at the operator's {H['noisy']}")
 
     # blind: a probe file older than twice its window reads as past the wall: fail up, but more pods cannot answer a
     # blind sense, so the HPA target stays the operator's own (as on the card, fail up is native's own settings)

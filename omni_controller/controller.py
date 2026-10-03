@@ -46,6 +46,7 @@ from omni_controller.muscles import Muscles, add_args as add_muscle_args
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
 BOWL_UP, BOWL_DOWN, BOWL_RELEASE = 0.10, 0.02, -0.2   # the bowl's gains, the same on every muscle (realms/bowl_arm.py)
+DEMAND_RISE = 0.05     # demand still growing: CPU used more than 5% above its least in the last HPA window
 RANGE_ANN = "omnicompass.io/original-replica-range"
 
 
@@ -272,6 +273,22 @@ class Controller:
         self.n_native = None           # the machines the cluster ran on its own when Omni started (the verdict's step 0)
         self.lat_t = None              # elapsed_seconds of the last request the verdict has seen
         self.bowl_x = {}               # (ns, name) -> the bowl's continuous HPA target, before rounding
+        self.demand = []               # (time, CPU used m): the demand that calls pods, kept one HPA window back
+
+    def _sensed(self, h):
+        """Whether the probe senses the service this HPA scales (--sensed ns/deployment,...; empty: every HPA, the
+        single-service case). A muscle whose service I cannot sense stays at the operator's own target: the probe's
+        response time says nothing about it, and more pods for it compete for the machines of the service I do sense."""
+        sel = [t.strip() for t in getattr(self.a, "sensed", "").split(",") if t.strip()]
+        ref = (h.get("spec", {}).get("scaleTargetRef", {}) or {}).get("name", "")
+        return not sel or f'{h["metadata"]["namespace"]}/{ref}' in sel
+
+    def _rising(self, win):
+        """Whether the demand is still growing: CPU used now above (1 + DEMAND_RISE) times its least over the last
+        window. While it grows, the pods a breach called are still owed to it; handing the operator's target back
+        would remove them and start them again on the next rise."""
+        now = time.time(); past = [u for t, u in self.demand if now - t <= win]
+        return bool(past) and self.demand[-1][1] > (1.0 + DEMAND_RISE) * min(past)
 
     def _new_latencies(self):
         """Response times (ms) of the requests served since the last decision (the probe's latency file)."""
@@ -571,6 +588,7 @@ class Controller:
             if blind.get("latency", False) or s["pending"] > 0 or (p95 is not None and slo > 0 and p95 >= slo):
                 pos = 1.0
             F = self.bowl.force(pos)
+            self.demand = [(t, u) for t, u in self.demand if time.time() - t <= 900.0] + [(time.time(), float(s["used_m"]))]
             # the verdict: the response times of the requests served since the last decision, at the machines the pool
             # stood at; then how many machines may be given back at all (or the count a trial needs)
             if self.n_native is None:
@@ -637,7 +655,11 @@ class Controller:
                 if cur is None:
                     continue
                 ns, name = h["metadata"]["namespace"], h["metadata"]["name"]
+                if not self._sensed(h):
+                    continue     # a service the probe does not sense: its HPA stays at the operator's own target
                 orig = int(h["metadata"].get("annotations", {}).get(ANNOTATION, cur))
+                # the muscle's own clock: the autoscaler's scale-down window (300 s unless the operator set one)
+                win = float(((h["spec"].get("behavior") or {}).get("scaleDown") or {}).get("stabilizationWindowSeconds", 300))
                 # more headroom is always allowed; less never: at a given load fewer pods always means a longer M/M/c wait
                 # (no target above the operator's keeps the wait), so a raise only spends latency.
                 # Omni on top earns its keep on machines, not by packing the operator's pods tighter
@@ -659,9 +681,12 @@ class Controller:
                         # the card's own settings
                         x = hi_t; back = x != self.bowl_x.get((ns, name), hi_t)
                     elif x < hi_t and self.bowl.p < self.bowl.band.center and obs["slo_clean"] and s["pending"] == 0:
-                        # the fault is over: responses back inside the band, nothing waiting. The extra pods were for
-                        # the fault only, so the operator's own target returns at once, not step by step
-                        x = hi_t; back = True
+                        # responses back inside the band, nothing waiting. If the demand that called the extra pods has
+                        # stopped growing (a fault, a spike that passed), they were for it only: the operator's own
+                        # target returns at once. While the demand still grows they stay, so the autoscaler does not
+                        # remove them and start them again on the next rise
+                        if not self._rising(win):
+                            x = hi_t; back = True
                     else:
                         F_ = bowl_rec["force"]
                         x = x - (BOWL_UP if F_ > 0 else BOWL_DOWN) * F_ * (hi_t - lo_t)
@@ -672,11 +697,9 @@ class Controller:
                     continue
                 if cur == want_h:
                     continue
-                # the muscle's own clock: the autoscaler takes its scale-down window (300 s unless the operator set one)
-                # to answer a target. A new target inside that window moves the muscle mid-movement and starts pods it
-                # then removes, so I hold each target for one window. A response-time breach returns the operator's
-                # target at once
-                win = float(((h["spec"].get("behavior") or {}).get("scaleDown") or {}).get("stabilizationWindowSeconds", 300))
+                # the autoscaler takes its window to answer a target. A new target inside that window moves the muscle
+                # mid-movement and starts pods it then removes, so I hold each target for one window. A response-time
+                # breach returns the operator's target at once
                 last = self.target_at.get((ns, name))
                 # handing the operator's own target back is never held: it is where native stands
                 if obs["slo_clean"] and last is not None and time.time() - last < win and not back:
@@ -732,6 +755,9 @@ def parser():
     ap.add_argument("--bowl-tau", type=float, default=60.0, help="seconds the service takes to follow a lever (the bowl's damping)")
     ap.add_argument("--bowl-center", type=float, default=0.4,
                     help="where the bowl holds the service (0 the bare service time, 1 the SLO); 0.4, as the GPU governor")
+    ap.add_argument("--sensed", default="",
+                    help="ns/deployment,... whose response time the --latency-file measures; only their HPAs are moved "
+                         "(empty: every HPA, the single-service case)")
     ap.add_argument("--closure", default="", help="JSON with the closure-law setting (e.g. tuning/GLOBAL_LEAGUE_PREREGISTRATION.json): the benchmarked law decides the node count")
     ap.add_argument("--strict-replicas", action="store_true", help="strict C: Omni-Compass sets replica counts; the HPA is pinned")
     ap.add_argument("--pod-reflex-writes", action="store_true",

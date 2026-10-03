@@ -227,6 +227,54 @@ both HPAs (`deploy/kind/rbac-omni-noisy.yaml`: the second HPA and nothing else m
 php-apache, and the neighbour's p95, p99, time over the line and failed requests, each paired against native over 10
 repetitions with its 95% interval. The label is the one rule, applied to both applications: nothing more than 2% worse
 for either.
+
+## The capacity and fairness results, and the amendment they call for (2026-10-03 evening, before either is run again)
+
+**Capacity** (`results/live/CAPACITY.md`, run 37150909816): the bowl law served 33.0 requests a second within the line
+against native's 24.6, **+34.1% (95% interval of the paired difference +6.2 to +10.6 requests a second)**, with
+response times about half of native's and fewer failures. One measure significantly worse: pods started 7.3 against
+5.6 (+30.4%) while the mean HPA replicas were 26.9% lower: churn, not more pods. **Fairness**
+(`results/live/FAIRNESS.md`, run 37154210570): the neighbour unharmed under both laws; with the bowl law php-apache's
+failed requests 3.89% to 4.90% (+0.12 to +1.90 points), pending pods and pod start wait worse, no machine saved. By the
+one rule neither result is labelled better. Both causes are read from the controller's code; both corrections are
+stated here, as law, before the tests run again.
+
+**1. Only a sensed muscle moves (the fairness cause).** Let the probe measure the response time of the services in a
+set $\mathcal{S}$ (`--sensed ns/deployment,...`; empty means every HPA, the single-service case). For each HPA $h$
+scaling a deployment $d(h)$ with the operator's target $x^{op}_h$, the target written is
+
+$$x_h(t) = \begin{cases} \text{the bowl's (or the allocation law's) target} & d(h) \in \mathcal{S} \\ x^{op}_h & d(h) \notin \mathcal{S} \end{cases}$$
+
+The probe's position $p$ is a statement about $\mathcal{S}$ alone. A push on a muscle outside $\mathcal{S}$ answers no
+sensed error and adds pods that compete with $\mathcal{S}$ for the same machines (the run's pending pods and failures).
+It is the GPU law's own rule, applied to Kubernetes: where Omni-Compass cannot sense, it stands at native's own setting.
+
+**2. Pods owed to a growing demand stay (the churn cause).** Let $u(t)$ be the CPU the workers use and $W$ the HPA's
+scale-down window ($W = 300$ s unless the operator set one). The demand is *still growing* when
+
+$$G(t) = \Big[\, u(t) > (1 + \epsilon)\, \min_{t - W \le s \le t} u(s) \,\Big], \qquad \epsilon = 0.05 .$$
+
+After a breach the bowl lowers the target to the bottom of its cover, $x = x_{lo} = 0.6\,x^{op}$ (more pods, at once).
+Before this amendment, the first decision with the position back under the centre, $p < c = 0.4$, no breach and no
+pod waiting, returned $x = x^{op}$ at once. Under a rising load the autoscaler then removed the extra pods one window
+later and started them again at the next step: the run's churn. The return is now
+
+$$x \leftarrow x^{op} \quad \text{only if} \quad p < c,\ \ \text{no breach},\ \ \text{no pod waiting},\ \ \neg G(t),$$
+
+and while $G(t)$ holds the target stays where the breach put it. A fault or a spike that has passed has a flat or
+falling $u$, so $G$ is false and the operator's target returns at once, as the fault test requires (set 31 F:
+HPA replicas under faults −1.1%); only a demand still climbing keeps its pods. $\epsilon = 0.05$ is set above the
+decision-to-decision noise of the node CPU reading. A rise too small to clear it leaves the rule as it was before this
+amendment (the target returns at once), so the correction can remove churn but cannot add any.
+
+Nothing else changes: the bowl's band, gains and centre, the verdict, the fail-up rules, the release gate and the
+node-pool law are as registered. Tests: `tests/test_bowl_controller.py`, cases *demand* and *sensed*, beside the
+existing *fault over*, *blind* and kill-switch cases.
+
+**The re-runs**, on the commit that carries this amendment, unchanged in design: the capacity test (`load_steps` 1 to
+8, 1,600 s), the fairness test (`two_app` 1, 900 s) and the fault test (`faults` 1, 900 s), 10 paired repetitions
+each, arms native / omni / bowl. The second application is now probed and reported as before, and its HPA is held at
+the operator's target. Labelled by the one rule. Every number, whatever it says, is published beside the runs above.
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
