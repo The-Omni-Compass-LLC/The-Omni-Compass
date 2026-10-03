@@ -9,6 +9,7 @@
 # Usage: REP=n ARMS="native omni" bash scripts/kind_paired.sh   (Omni governs the muscles it is given: native vs Omni on top)
 set -euo pipefail
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native omni}"
+[ -z "${LOAD_STEPS_IN:-}" ] || export LOAD_STEPS="$LOAD_STEPS_IN"   # the capacity test's rising steps (benchmark-reps input)
 k=${#arms[@]}; off=$(( (REP - 1) % k ))
 order=( "${arms[@]:off}" "${arms[@]:0:off}" )
 echo "repetition $REP, order: ${order[*]}"

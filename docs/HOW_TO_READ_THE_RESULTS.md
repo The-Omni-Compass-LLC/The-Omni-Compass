@@ -112,3 +112,10 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 2. `docs/DOSSIER.md`: every result with its chart.
 3. This chapter, next to the table in front of you.
 4. `DISCLOSURES.md`: what a result is and is not.
+
+## Reading the benefit: more work, or the same work for less
+
+With the work held equal in both arms, the gain from Omni-Compass on top is *G = C_native / C_omni − 1*, where *C* is a
+resource (machine-hours, CPU core-hours, joules). The same work then needs *1 / (1 + G)* of the resources, a saving of
+*G / (1 + G)*: a third more work is a quarter off the bill. The full explanation, the three rules for reading a receipt
+and where every number stands today are in the manual, section 3 (`docs/OMNI_COMPASS_MANUAL.md`).

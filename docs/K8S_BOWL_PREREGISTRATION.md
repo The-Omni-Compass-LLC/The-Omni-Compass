@@ -201,3 +201,15 @@ back saves only a declared model's energy. On a real cloud the machine is delete
 - **Housekeeping.** One repetition at a time; each cluster deleted when its arm ends, before the next is made; the
   resource group deleted at the end of every repetition whatever happens. It needs the repository secret
   `AZURE_CREDENTIALS`.
+
+## The capacity test (written before its run)
+
+The question behind "more work for the same cost": on the same machines, how much more work does Kubernetes serve
+with Omni-Compass on top before its answers break the line? Each repetition runs native, native with Omni-Compass on
+top (the allocation law) and with the bowl law and the verdict, in rotated order, on the same six workers, the
+open-loop load rising in eight equal steps of one load generator each (6 requests a second per generator, 1 to 8
+generators, 200 s a step, 1,600 measured seconds; `load_steps` in `benchmark-reps`). A run's capacity is the highest
+step at which no more than 5% of the response samples (every 5 s, through the Service) are over the line (500 ms) or
+failed, every lower step holding too, the first 30 s of each step left to settle (`tools/live_reps.py`, `capacity`).
+Reported: each arm's mean capacity in requests a second, its change against native and the 95% interval of the paired
+difference over 10 repetitions; every usual gauge beside it. Labelled by the one rule: nothing more than 2% worse.

@@ -166,19 +166,100 @@ same load and the same clock, and each produces its own receipt.
 
 ## 3. Where the Value Comes From
 
-Every system runs with room it does not use: GPUs boost to the top of their clock range and are knocked back by their
-own power limiter many times a second; Kubernetes keeps replicas and machines sized for the worst minute; cooling runs
-colder than the heat requires; batteries hold more reserve than the hour needs. That room is paid for in energy and
-in machines.
+### 3.1 The problem we are attacking
 
-Omni-Compass holds each service in the middle of its band instead of far below its limit. The room that was spent on
-nothing becomes one of two things, and the receipt shows which:
+Computing has run into a wall that is not made of silicon. Data centers cannot get the power they need, cannot get it
+fast enough, and are running out of room to put more machines. AI made it worse: every new model needs more chips, and
+every chip needs more electricity and more cooling. The answers on the table are expensive and slow: new chips that do
+more work per watt (a new generation, new hardware to buy), new power plants and power contracts (billions, and years),
+and point fixes at a single layer (an AI serving trick, a scheduler, a power cap on one chip).
 
-- **More work for the same energy** (work per energy rises), or
-- **The same work for less** (fewer machines in service, fewer watts).
+We attack it from the other side. Every system already running wastes room it paid for:
 
-They are the same gain read from two sides. The receipt reports one number, work per energy, and beside it the
-machines, the response times and the failures, so nothing is hidden.
+- GPUs boost to the top of their clock range and are knocked back by their own power limiter many times a second;
+- Kubernetes keeps replicas and machines sized for the worst minute of the day;
+- cooling runs colder than the heat requires; batteries hold more reserve than the hour needs.
+
+That room is paid for in energy, in machines and in floor space, and it produces nothing.
+
+### 3.2 What Omni-Compass is, in one paragraph
+
+Omni-Compass is software that sits **on top of** the controllers a system already has (the GPU's firmware, the
+Kubernetes autoscaler, the building's thermostats) and governs every layer under one law: a bounded push and pull that
+keeps each service in the middle of its band instead of far below its limit. It never replaces the native controller,
+never asks for more than the native settings allow, hands every knob back the moment it is switched off or loses a
+sense, and refuses any step that measures more than 2% worse on anything. No new hardware. It stacks on top of every
+other fix a data center makes.
+
+### 3.3 The benefit: more work from what is already paid for
+
+The room that was spent on nothing becomes one of two things, and a company chooses which:
+
+- **More work for the same cost:** the same machines and the same watts carry more work; or
+- **The same work for less:** fewer machines in service, fewer watts, a smaller bill.
+
+They are the same gain read from two sides (3.4). The health side comes with it: faster answers, faster recovery from
+failures, nothing waiting, every knob returned, no human babysitting the stack.
+
+### 3.4 How to read the benefit: the arithmetic
+
+Every comparison is paired: the same system, the same work, the same moments, native alone against native with
+Omni-Compass on top. Let
+
+- *W* be the work served (requests answered, tokens generated), held equal in both arms;
+- *C* be a resource it used: machine-hours, CPU core-hours, or joules.
+
+**Productivity** is work per resource, *P = W / C*. With the work held equal, the gain from Omni-Compass on top is
+
+  *G = P_omni / P_native − 1 = C_native / C_omni − 1.*
+
+A gain *G* means the same resources can carry *G* more work. Read from the other side, the same work needs only
+
+  *C_omni / C_native = 1 / (1 + G)*
+
+of the resources, a saving of *S = G / (1 + G)*. So **a third more work (G = 33%) is a quarter off the bill
+(S = 25%)**; 20% more work is 16.7% off; 50% more work is a third off. Both columns are the same measurement.
+
+Three rules for reading any receipt:
+
+1. **The work must be equal.** Every receipt states that the load was fixed-rate (open loop): the same requests at the
+   same moments in every arm. Without that, a lower resource count could just mean less work was done.
+2. **Nothing may be worse.** Beside every gain the receipt prints response times, failures, waiting and the controller's
+   own CPU, each with its 95% interval. Our one rule (`DISCLOSURES.md`, section 3): no measure more than 2% worse, and
+   only where energy or the bill is saved. A gain paid for with worse service is not a gain.
+3. **Know the class and the comparator.** A machine-hour gain on kind (where idle machines stay powered and native has
+   no node autoscaler) is not yet a bill; a modelled energy line is not a meter. Section 14 lists the classes; section 15
+   says, for every result, what it is measured against.
+
+### 3.5 Where the evidence stands today, read honestly
+
+| What | Measured gain *G* (same work) | Class | What a referee will ask |
+|---|---|---|---|
+| Kubernetes machine-hours, the allocation law | +45% to +61% (sets 29 to 31, cost to match) | L | native here has no node autoscaler and the cluster is ~4% busy: the AKS bill run and the capacity test answer this |
+| Kubernetes machine-hours, the bowl law with the verdict | +5% to +12% | L | the same |
+| Kubernetes CPU, Omni-Compass's own included | +5% to +8% | L | measured on real software |
+| Kubernetes response time, 95th percentile | 57% to 66% faster; no native setting tried reached it (cost to match) | L | measured |
+| Recovery from faults (machine lost, spike, runaway pod, blind probe) | faster than native from every fault, up to 49% | L | measured |
+| Energy per work, kind standby model | +8% (bowl) to +30% (allocation) | L, modelled | not a meter |
+| Energy per work, six organisms, 1x to 1,000x | +0.08% to +0.19% | S | well-tuned native controllers in models leave little room |
+| Energy per work on a real GPU | the corrected law is measuring now on a real NVIDIA A10 and next on 8 cards | P | the decisive measurement |
+
+The upside the data points toward is large, on the order of a third more work from what is already installed on the
+Kubernetes side. It becomes a claim, not a direction, when three tests land: the bill on a real cloud against Azure's
+own autoscaler (`docs/AZURE_SETUP.md`), the capacity test on fixed machines under rising load, and the real-card runs
+for watts. We publish each of them as it comes, whatever it says.
+
+### 3.6 Two modes, both measured
+
+On Kubernetes, Omni-Compass offers two laws, and a buyer chooses by what matters most:
+
+- **Efficiency mode** (the allocation law): the most machines given back (about a third fewer in service in sets 29 to
+  31) with answers still about 60% faster than native;
+- **Service mode** (the bowl law with the verdict): the fastest answers (95th percentile about two thirds faster) and
+  fewer machines (about 10%).
+
+Both pass the one rule in every set since the fixes; neither is tuned to a benchmark after the fact. The laws are frozen
+for every test that follows, so each new result describes exactly the code that produced the old ones.
 
 ---
 
@@ -630,8 +711,27 @@ receipt's energy line is modelled, the receipt says so.
 
 ## 15. Results to Date
 
+Every result below is Omni-Compass **on top of** a native system against the same native system alone, with the same
+work in both arms. "Nothing worse" means no measure significantly worse than native beyond the one 2% rule.
+
 | Result | Class | Source |
 |---|---|---|
+| **Real Kubernetes, set 31** (10 paired runs, fixed-rate load): the bowl law with the verdict, machines −10.4%, p95 −66.0%, p99 −73.0%, time over the line −99.4%, HPA replicas −44.5%, pods started 0 against native's 4.3, total CPU including Omni-Compass's own −6.1%, failed requests 0; the allocation law, machines −32.2%, p95 −61.4%, total CPU −6.6%. Nothing worse in either arm | L | `results/live/LIVE_REPS_31.md` |
+| **Real Kubernetes, the fault test, set 31 F** (a machine lost, traffic tripled, a runaway pod, the probe blind, at the same moments in every arm): recovery faster than native from every fault (bowl law: machine down −49%, runaway pod −18%, spike −8%), p95 −62.6%, failed requests −16.4%, HPA replicas −1.1% (not significant). Nothing significantly worse; the p99 under faults reads higher with intervals far across zero | L | `results/live/FAULTS_31.md` (earlier runs: `FAULTS.md`, `FAULTS_30.md`, and the two fixes between them in `docs/K8S_BOWL_PREREGISTRATION.md`) |
+| **The cost to match**: native tuned harder by its operator (HPA target 40, 30, 20: more pods) never reached Omni-Compass's p95 (best native 346.6 ms against 123.5 ms bowl, 149.4 ms allocation law), with fewer pods and fewer machines on top | L | `results/live/COST_TO_MATCH.md` |
+| Real Kubernetes, sets 29 and 30: the controller reading through one proxy (Omni-Compass's own CPU 0.063 → 0.011 cores), the bowl law's total CPU −4.7% and −6.5%, nothing worse | L | `results/live/LIVE_REPS_29.md`, `LIVE_REPS_30.md` |
+| **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | L | `results/scale/` (kwok-scale) |
+| **Six organisms, 1x to 1,000x clusters** (up to 1.2 million plants on one clock), 84 of 90 cells: energy lower in every cell (−0.08% to −0.19%), time over the service line lower in 83 of 84 (the one exception a single run at +0.001 points, lower over 10, 100 and 1,000 runs), work cost at most 0.007%, every knob handed back; every cell of 10 runs or more labelled SUPERIOR WITHIN GUARDRAILS. The 100-run cells at 1,000 copies are running on one rented machine | S | `results/scale/GRID.md`, `results/scale/receipts/` |
+| Modelled GPU card, the firmware alone against the firmware with Omni-Compass on top (the verdict, 2% allowance): compute-bound energy −0.70% / −0.48%, AI token generation energy −3.25% / −3.72%, both wires restored every run | S | `results/sim/gpu_two_wire/` |
+| **Real GPU (NVIDIA A10), the corrected law** (the verdict, steady under the limit): the preregistered confirmations (compute and AI token generation), the operator's power cap at usual and full load, the fault drill, the six organisms with the card inside and real AI serving, running now; the 8-card server run is built (`scripts/gpu_8card.sh`) | P | `docs/GPU_PREREGISTRATION.md` (amendments 8 to 10) |
+| Real GPU (NVIDIA A10), the first law (history): work per energy +3.6% (proven), energy −3.5%, but p95 +58.5% worse, so the label by rule was energy improvement with service tradeoff. That law was replaced; the cause and the fix are in amendments 6 to 8 | P | `results/gpu/run-20261002T082232Z/GPU_REPS.md` |
+| Earlier Kubernetes sets 23 to 28 (before the verdict, the proxy and the fault fixes) stay as they ran | L | `results/live/LIVE_REPS_23.md` to `LIVE_REPS_28.md` |
+
+Still to come, each built and preregistered: the bill on a real cloud (`.github/workflows/aks-metered.yml`,
+`docs/AZURE_SETUP.md`), the capacity test (`docs/K8S_BOWL_PREREGISTRATION.md`), the real-card results above and the
+8-card run.
+
+---|---|---|
 | Real Kubernetes, set 27 (10 paired runs, the bowl law aligned with the GPU governor): machines -15.9%, p95 -65.5%, failed requests 0, better on machines within the band; set 26 (10 paired runs, three arms): the allocation law machines -35.8%, p95 -55.4%; the bowl law machines -17.2%, p95 -64.8%, failed requests 0, better on machines within the band by its preregistered rule; set 25: machines -32.3%, p95 -57.3% | L | `results/live/LIVE_REPS_25.md`, `results/live/LIVE_REPS_26.md`, `results/live/LIVE_REPS_27.md` |
 | Real Kubernetes, set 24 (10 paired runs): machines in service -31.6%, p95 response -60.1%, p99 -64.1%, HPA replicas -38.6%, failed requests 0 on both, total CPU including Omni-Compass's own -1.8% (not significant) | L | `results/live/LIVE_REPS_24.md` (GitHub run 36983865216) |
 | Real Kubernetes, set 23 (10 paired runs): p95 -62.2%, replicas -36.6%, machines in service -28.7%, failed requests 0 | L | `results/live/LIVE_REPS_23.md` |

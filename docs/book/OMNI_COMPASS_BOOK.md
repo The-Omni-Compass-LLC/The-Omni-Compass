@@ -2730,7 +2730,7 @@ pip install -r requirements.txt
 nvidia-smi                 # should show your GPU
 ```
 
-### 4. The whole test, one command (about 40 hours)
+### 4. The whole test, one command (about 45 hours)
 
 ```bash
 sudo nohup bash scripts/gpu_rented_run.sh > run.log 2>&1 &
@@ -2746,10 +2746,18 @@ It runs, in order, and stops at the first failure:
 5. the second preregistered confirmation on AI token generation (memory-bound), the same design, about 6 hours
    (`SKIP_DECODE=1` skips it); each is its own result, never pooled. Both are packed into one file as soon as they
    finish: `results/gpu/omni-gpu-<stamp>-confirmations.tar.gz`;
-6. the six organisms with this card inside, each as **1, 10, 100 and 1,000 copies** on one clock (3, 3, 2 and 1
+6. **an operator's power cap underneath** (70% of the card's default limit): the cap alone vs the cap with
+   Omni-Compass on top, at the usual load and fully loaded (more work from the same watts), about 3 hours
+   (`SKIP_CAP=1` skips it);
+7. **the GPU fault drill**, about 10 minutes: the governor killed outright, the master switch pulled, the response
+   feed blind; every check must pass (`SKIP_DRILL=1` skips it). Everything so far is then packed into
+   `results/gpu/omni-gpu-<stamp>-partial.tar.gz`;
+8. the six organisms with this card inside, each as **1, 10, 100 and 1,000 copies** on one clock (3, 3, 2 and 1
    repetitions), about 25 hours; the 1,000-copy stacks need a longer step than 2 s, measured on the machine and stated
    in the receipt (`SKIP_HIL=1` skips this stage);
-7. one packed file: `== send this one file back: results/gpu/omni-gpu-<stamp>.tar.gz`, with the label each table chose
+9. **real AI serving** last: a small open language model served by vLLM, about 2 hours (`SKIP_LLM=1` skips it); if
+   vLLM cannot install on the machine, the stage says so and nothing before it changes;
+10. one packed file: `== send this one file back: results/gpu/omni-gpu-<stamp>.tar.gz`, with the label each table chose
    by rule.
 
 To stop everything at any moment: `sudo python3 tools/omni_switch.py off` turns every Omni-Compass governor off and
@@ -2769,6 +2777,60 @@ Open `results/gpu/run-<stamp>/GPU_REPS.md` and check the rows of the manual's se
 wrong*): watch equal to native, requests equal, the card's busy clock under Omni at or above its own, the lid while busy
 at or above its own busy draw, fail-up rare in the credit-per-write table. If a row reads wired wrong, the run says
 nothing about Omni-Compass until the wiring is fixed (`DISCLOSURES.md`, section 3).
+
+### D. The 8-GPU result: every card of one server at once
+
+The same test as section C, on a machine with several cards (Lambda "8x A100" or "8x H100", a VM, the Lambda Stack
+image). Every card runs its own paired test at the same moment, sharing the server's power supply, cooling and
+neighbours' heat, as in a real data center. Each card starts its arm rotation one step later than the card before it,
+so at any moment some cards run native and some run Omni-Compass.
+
+Get the code as in step 3, then:
+
+```bash
+sudo nohup bash scripts/gpu_8card.sh > run8.log 2>&1 &
+tail -f run8.log
+```
+
+Each card: wire check, envelope, smoke, the compute confirmation, the AI token generation confirmation, the operator's
+power cap underneath (about 15 to 16 hours, all cards together). Then the fault drill once on card 0, with every other
+card idle. Then one pooled table per workload (every repetition of every card, each paired within its own card: 80
+repetitions per workload on 8 cards) and each card's own table. `SKIP_DECODE=1 SKIP_CAP=1` runs the compute
+confirmation alone, about 6.5 hours. **Every 8-GPU run has a hard time budget** (`MAX_HOURS`; by default 10.5 hours with `POOLED=1`, 4 with `FAST=1`, 26
+for the whole design): at the budget the master switch hands every card back, the stages still running stop, and what
+finished is packed and printed as the file to send back. Lambda bills until the instance is terminated, so terminate it
+when that line appears. **`sudo POOLED=1 nohup bash scripts/gpu_8card.sh &` runs every stage with the repetitions pooled across the cards
+(3 per card per confirmation, 24 per test on 8 cards; 2 per power cap load; 1 per organism size), about 9 to 10 hours.**
+`sudo FAST=1 nohup bash scripts/gpu_8card.sh > run8.log 2>&1 &` is a short
+look, about 3.5 hours: 3 repetitions per card (24 on 8 cards), then one model across every card; it leaves AI token
+generation, the power cap and the whole stacks out, so it is never the result to show. Last, the whole server as one: a language model (Qwen2.5-7B-Instruct, open)
+served across every card at once by vLLM, one Omni-Compass governor per card, the server's total GPU energy, about
+2 hours (`SKIP_LLM=1` skips it). Before it, **the whole stacks with a real card inside**: the six organisms at 1, 10,
+100 and 1,000 copies, native and Omni, the full repetitions (3, 3, 2, 1 by size), each organism on its own card at
+the same time, so the stage that takes about 25 hours on one card takes the time of its longest organism (the four
+stacked, 1,226 muscles, at 1,000 copies), about 4 to 6 hours (`SKIP_HIL=1` skips it). The whole design, every stage:
+about 22 to 24 hours. Progress: `tail -f results/gpu/8card-<stamp>/card-*.log`. At the end: `== send this one file back:
+results/gpu/omni-8card-<stamp>.tar.gz`. The master switch (`sudo python3 tools/omni_switch.py off`) stops every card's
+governor at once.
+
+### E. Your own serving engine
+
+own vLLM? Start it as you always do, then:
+
+```bash
+sudo LLM_URL=http://127.0.0.1:8000 LLM_MODEL=<your model name> GPU=0 ENVELOPE=<envelope.json> OUT=results/gpu/mine \
+  bash scripts/gpu_vllm.sh
+```
+
+The same paired test (your engine alone against your engine with Omni-Compass on top) runs against it; nothing is
+installed or started. `GPU=0,1,2,3,4,5,6,7` when your engine spans several cards. Make the envelope once with
+`python3 tools/declare_envelope.py envelope.json --gpu 0`.
+
+### F. Whole-server power from the server itself
+
+The bench records the whole machine's watts beside the cards' own when you give it a meter: `WALL_METER=redfish:<BMC
+address>` (with `REDFISH_USER` and `REDFISH_PASSWORD`, read only), `WALL_METER=ipmi:local` (the server's management
+controller, read on the machine), or a smart plug (`tools/wall_meter.py` lists them). Omni-Compass never reads it.
 
 ### Before any machine: the simulated card
 
@@ -3291,6 +3353,13 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 3. This chapter, next to the table in front of you.
 4. `DISCLOSURES.md`: what a result is and is not.
 
+### Reading the benefit: more work, or the same work for less
+
+With the work held equal in both arms, the gain from Omni-Compass on top is *G = C_native / C_omni − 1*, where *C* is a
+resource (machine-hours, CPU core-hours, joules). The same work then needs *1 / (1 + G)* of the resources, a saving of
+*G / (1 + G)*: a third more work is a quarter off the bill. The full explanation, the three rules for reading a receipt
+and where every number stands today are in the manual, section 3 (`docs/OMNI_COMPASS_MANUAL.md`).
+
 ## 38. The Dossier: Every Result in One Place
 
 
@@ -3454,8 +3523,27 @@ receipt's energy line is modelled, the receipt says so.
 ## 41. Results to Date
 
 
+Every result below is Omni-Compass **on top of** a native system against the same native system alone, with the same
+work in both arms. "Nothing worse" means no measure significantly worse than native beyond the one 2% rule.
+
 | Result | Class | Source |
 |---|---|---|
+| **Real Kubernetes, set 31** (10 paired runs, fixed-rate load): the bowl law with the verdict, machines −10.4%, p95 −66.0%, p99 −73.0%, time over the line −99.4%, HPA replicas −44.5%, pods started 0 against native's 4.3, total CPU including Omni-Compass's own −6.1%, failed requests 0; the allocation law, machines −32.2%, p95 −61.4%, total CPU −6.6%. Nothing worse in either arm | L | `results/live/LIVE_REPS_31.md` |
+| **Real Kubernetes, the fault test, set 31 F** (a machine lost, traffic tripled, a runaway pod, the probe blind, at the same moments in every arm): recovery faster than native from every fault (bowl law: machine down −49%, runaway pod −18%, spike −8%), p95 −62.6%, failed requests −16.4%, HPA replicas −1.1% (not significant). Nothing significantly worse; the p99 under faults reads higher with intervals far across zero | L | `results/live/FAULTS_31.md` (earlier runs: `FAULTS.md`, `FAULTS_30.md`, and the two fixes between them in `docs/K8S_BOWL_PREREGISTRATION.md`) |
+| **The cost to match**: native tuned harder by its operator (HPA target 40, 30, 20: more pods) never reached Omni-Compass's p95 (best native 346.6 ms against 123.5 ms bowl, 149.4 ms allocation law), with fewer pods and fewer machines on top | L | `results/live/COST_TO_MATCH.md` |
+| Real Kubernetes, sets 29 and 30: the controller reading through one proxy (Omni-Compass's own CPU 0.063 → 0.011 cores), the bowl law's total CPU −4.7% and −6.5%, nothing worse | L | `results/live/LIVE_REPS_29.md`, `LIVE_REPS_30.md` |
+| **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | L | `results/scale/` (kwok-scale) |
+| **Six organisms, 1x to 1,000x clusters** (up to 1.2 million plants on one clock), 84 of 90 cells: energy lower in every cell (−0.08% to −0.19%), time over the service line lower in 83 of 84 (the one exception a single run at +0.001 points, lower over 10, 100 and 1,000 runs), work cost at most 0.007%, every knob handed back; every cell of 10 runs or more labelled SUPERIOR WITHIN GUARDRAILS. The 100-run cells at 1,000 copies are running on one rented machine | S | `results/scale/GRID.md`, `results/scale/receipts/` |
+| Modelled GPU card, the firmware alone against the firmware with Omni-Compass on top (the verdict, 2% allowance): compute-bound energy −0.70% / −0.48%, AI token generation energy −3.25% / −3.72%, both wires restored every run | S | `results/sim/gpu_two_wire/` |
+| **Real GPU (NVIDIA A10), the corrected law** (the verdict, steady under the limit): the preregistered confirmations (compute and AI token generation), the operator's power cap at usual and full load, the fault drill, the six organisms with the card inside and real AI serving, running now; the 8-card server run is built (`scripts/gpu_8card.sh`) | P | `docs/GPU_PREREGISTRATION.md` (amendments 8 to 10) |
+| Real GPU (NVIDIA A10), the first law (history): work per energy +3.6% (proven), energy −3.5%, but p95 +58.5% worse, so the label by rule was energy improvement with service tradeoff. That law was replaced; the cause and the fix are in amendments 6 to 8 | P | `results/gpu/run-20261002T082232Z/GPU_REPS.md` |
+| Earlier Kubernetes sets 23 to 28 (before the verdict, the proxy and the fault fixes) stay as they ran | L | `results/live/LIVE_REPS_23.md` to `LIVE_REPS_28.md` |
+
+Still to come, each built and preregistered: the bill on a real cloud (`.github/workflows/aks-metered.yml`,
+`docs/AZURE_SETUP.md`), the capacity test (`docs/K8S_BOWL_PREREGISTRATION.md`), the real-card results above and the
+8-card run.
+
+---|---|---|
 | Real Kubernetes, set 27 (10 paired runs, the bowl law aligned with the GPU governor): machines -15.9%, p95 -65.5%, failed requests 0, better on machines within the band; set 26 (10 paired runs, three arms): the allocation law machines -35.8%, p95 -55.4%; the bowl law machines -17.2%, p95 -64.8%, failed requests 0, better on machines within the band by its preregistered rule; set 25: machines -32.3%, p95 -57.3% | L | `results/live/LIVE_REPS_25.md`, `results/live/LIVE_REPS_26.md`, `results/live/LIVE_REPS_27.md` |
 | Real Kubernetes, set 24 (10 paired runs): machines in service -31.6%, p95 response -60.1%, p99 -64.1%, HPA replicas -38.6%, failed requests 0 on both, total CPU including Omni-Compass's own -1.8% (not significant) | L | `results/live/LIVE_REPS_24.md` (GitHub run 36983865216) |
 | Real Kubernetes, set 23 (10 paired runs): p95 -62.2%, replicas -36.6%, machines in service -28.7%, failed requests 0 | L | `results/live/LIVE_REPS_23.md` |
@@ -3993,6 +4081,72 @@ The outcomes, arms, guardrails, analysis and validity rules are unchanged, excep
 
   That is a model; the next trial is the card's own meter.
 
+### Amendment 9 (2026-10-03, before any trial on this code)
+
+Everything in amendment 8 stands. Four additions, each run by `scripts/gpu_rented_run.sh` after the two confirmations
+and each reported as its own result:
+
+1. **Steady under the limit** (`omni_controller/gpu_bowl.py`, the same in `realms/gpu_card.py`). While the card is
+   saturated against its own power limit (work waiting, the draw at 97% of the limit or more), the firmware boosts a
+   step, hits the limit and is knocked back. The ceiling is then held at the card's own busy clock under that limit,
+   so the same watts serve the work without the knock-backs. It is never held under that clock, the lid stays at the
+   start limit, and a blind feed still fails up. In the card model, fully loaded under a fixed cap, this gives about
+   +0.6% requests served from the same watts, with p95 about 2% faster.
+2. **An operator's power cap underneath.** The card's limit is set to the envelope's lowest watts (70% of its default)
+   before the run, and the paired bench runs native (the cap alone), watch and Omni-Compass on top of the cap (the lid
+   never above the cap). It runs twice, 5 repetitions × 3 arms × 300 s each time:
+   - at the usual load;
+   - fully loaded (arrivals at 130% of the card's capacity under the cap), so the result is requests served from the same watts.
+
+   The card is returned to its default limit afterwards.
+3. **The GPU fault drill** (`scripts/gpu_fault_drill.sh`). With the request stream running:
+   - the governor is killed outright, and the watchdog must hand the card back;
+   - the master switch is pulled, and the governor must hand back, exit and refuse to restart while OFF;
+   - the response feed is paused, and the governor must fail up.
+
+   Every check must pass, and the card must end at its start limit.
+4. **Real AI serving** (`scripts/gpu_vllm.sh`, `tools/llm_workload.py`). An open language model
+   (Qwen/Qwen2.5-0.5B-Instruct) is served by vLLM, installed in its own environment. It is asked the same seeded stream
+   of prompts in every arm, each for exactly 128 new tokens; 5 repetitions × 3 arms × 300 s. Tokens per second and
+   tokens per kilojoule follow from requests served. If vLLM cannot be installed or started on the machine, the stage
+   says so and nothing measured before it changes.
+
+### Amendment 10 (2026-10-03, before any trial on several cards)
+
+Everything in amendments 8 and 9 stands. **Several cards in one server** (`scripts/gpu_8card.sh`): every card runs
+`scripts/gpu_rented_run.sh` at the same time, each on its own card with its own wire check, envelope, smoke, the two
+confirmations and the power cap underneath, on the same committed code. Card i starts its arm rotation i steps later
+(`ROT_OFFSET`), so no arm always meets the same neighbours. Each repetition stays paired within its own card (its three
+arms on one card); the pooled table per workload holds every card's repetitions (card c, repetition r is pooled as
+repetition 100(c+1)+r) and is labelled by the same rule. Each card's own table is reported beside it; a card whose
+table is invalid is reported, never dropped. The fault drill runs once, on the first card, after every card has
+finished. Last, **one model across every card** (`scripts/gpu_vllm.sh` with GPU = every card): vLLM tensor parallel,
+Qwen/Qwen2.5-7B-Instruct, one governor per card on its own card's two wires, all reading the same response times;
+the energy is every card's summed; 5 repetitions × 3 arms × 300 s, labelled by the same rule. Each card's energy is read from that card alone (the bench's sampling filtered to the card in each
+repetition's own receipt).
+
+**The short design** (`FAST=1`, written before any trial on several cards): each card runs one smoke round and 3
+repetitions of the compute confirmation (24 paired repetitions on 8 cards, pooled and labelled by the same rule, each
+card's own table reported beside it), then one model across every card with 3 repetitions. AI token generation and the
+power cap underneath are measured on the one-card machine (amendment 9) and are not repeated here.
+
+**The whole stacks with a real card inside, on several cards** (written before any trial): `tools/run_hil.py` as on the
+one-card machine (amendment 9, the six organisms at 1x, 10x, 100x and 1,000x, repetitions 3, 3, 2, 1 by size, the
+adaptive step), each organism on its own card at the same time (organism i on card i; with fewer cards than
+organisms, the next organism waits for a card). Each organism's receipt is its own; nothing is pooled across organisms.
+
+**The pooled design** (`POOLED=1`, written before any trial on several cards): every stage of the whole design, with
+the repetitions pooled across the cards. Each card runs one smoke round; 3 repetitions of the compute confirmation and
+3 of the AI token generation confirmation (24 paired repetitions per test on 8 cards, pooled and labelled by the same
+rule, each card's own table beside it); 2 repetitions of each power cap load (16 per load); the six organisms with the
+card inside, one repetition per size, each organism on its own card; then one model across every card, 3 repetitions;
+the fault drill once. Arm durations are those of the whole design.
+
+**The time budget** (`MAX_HOURS`, written before any trial on several cards): a run on several cards ends by its
+budget whatever happens. At the budget the master switch is pulled (every governor hands its card back), every stage
+still measuring stops and is reported as incomplete (an arm cut short is never counted: its repetition has no complete
+pair), the stages not started are skipped and named, and the finished ones are packed.
+
 ## 45. The Realms Preregistration
 
 
@@ -4263,6 +4417,43 @@ card is one muscle among hundreds of thousands, so its watts are a small share o
 arithmetic of one card in a large stack, and the card's own meter is reported apart from the stacks. Everything else is
 as round 5. The two GPU confirmations now run before this stage, so the most important results are in hand first.
 
+### Round 6 receipts and the one rule (2026-10-03)
+
+At 1x and 10x (1,000 paired runs each) every organism is labelled superior within guardrails, with band first held and
+every knob handed back (`results/scale/receipts/`, `results/scale/GRID.md`). At 1,000 runs the intervals are narrow
+enough to show one cost: work done is lower by 0.0001% to 0.001%, wholly below zero in several organisms. Its cause was
+measured on the Physics organism, muscle by muscle. It is the thermal zones: a room held warmer keeps a little less
+margin, so a sudden heat spike puts it over its limit for a few extra seconds inside a step that already counts as
+over the line.
+
+Limiting how far a room may drift (half, a quarter, none of the way toward its warm end; 40 paired seeds) does not
+remove it until the setpoint is held native, and then the Physics organism uses more energy than native. The cost is
+therefore disclosed and judged by the one rule now written for every muscle (`DISCLOSURES.md`, section 3): at most 2% in
+any measure, only where energy is saved. The largest work cost in the grid is 0.007% in a single run and 0.001% over
+1,000 runs, far inside it.
+
+#### The 1,000-copy size: memory and sharding (2026-10-03, before its re-run)
+
+The first 1,000-copy run (six run 37090435347) stopped twice at the same point: every organism larger than physics
+and robotics ran out of memory about 3 minutes in (the four stacked at 1,000 copies is 1.2 million plants; at 33 KB a
+plant, and with the calibration organism built while the result organism was still held, it needed over 40 GB on a
+16 GB runner). Three changes, none of which changes a number:
+- the calibration run is made before the organism, so one organism is in memory at a time (`realms/harness.py`, `Body`);
+- each plant is packed as it is made: its exogenous series as machine arrays, its random source dropped (every plant
+  draws its series when it is made, never while it runs), plants with the same parameters sharing one table
+  (`realms/plants.py`, `pack`, `_shared`);
+- the six workflow sizes its shards by organism (`per_shard`, `workers` by organism), because one run of the four
+  stacked at 1,000 copies takes 2 to 3 hours and a runner's job ends at 6.
+
+Same outputs: four organisms, two seeds each, at 1x to 3x, byte-identical before and after. A plant now takes 6.7 KB;
+the four stacked at 1,000 copies needs about 9 GB. The re-run: 10 runs per organism at 1,000 copies (the 1-run and
+10-run cells); 100 runs at 1,000 copies follows when the runners allow it (about 650 runner-hours).
+
+The 100-run cells at 1,000 copies run on one rented machine (`scripts/grid_one_machine.sh`): every organism in turn,
+as many processes as the machine's cores and memory allow, the same seeds (7000 on), each finished organism saved at
+once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/receipts/round6-1000x.md` in place of the
+1-run and 10-run receipt it contains.
+
 ## 46. The Bowl Law on Real Kubernetes: Preregistration
 
 
@@ -4348,6 +4539,136 @@ it are set against 200 served just before and against the cluster as it first ra
 Where no machine passes, the pool stays as the cluster runs it alone. The HPA target's cover is unchanged: from 60% of
 the operator's target up to the operator's own, never looser than native. Every trial is in the audit. The next set
 runs with this verdict; sets 26 and 27 ran before it and stay as they ran.
+
+### Set 28 and set 29 (2026-10-03, set 29 written before its run)
+
+Set 28 (run 37087620193, commit `24666d7`) ran the bowl law with the verdict. With Omni-Compass on top against native:
+- machines in service −4.7%;
+- p95 −65.3%, p99 −68.6%;
+- pods waiting 0;
+- failed requests 0.
+
+Total CPU including Omni-Compass's own came out **+2.2%** (+0.003 to +0.042 cores), more than the 2% the one rule
+allows (`DISCLOSURES.md`, section 3). The cause is the controller's own cost: 0.063 cores, mostly a new kubectl process
+for every read, about 20 a minute. The bowl law with the verdict freed only 0.040 cores of work. The allocation law in
+the same set: machines −29.6%, p95 −58.0%, total CPU including its own −1.2% (not significant). Set 28's receipt is
+`results/live/LIVE_REPS_28.md`, published with this section.
+
+**Set 29** runs the same arms, load, duration, outcomes and rule as set 28. One thing changes: the controller reads
+through one `kubectl proxy` started once, under the same least-privilege identity, so a read is a local HTTP request
+instead of a new kubectl process (`omni_controller/controller.py`, `Kube`; writes are unchanged; `tests/test_api_proxy.py`).
+The label also requires total CPU including Omni-Compass's own to be no more than 2% above native.
+
+Set 29 result (run 37094338955, commit `a3721cc`): the bowl law with the verdict, total CPU including its own **−4.7%**
+(−0.071 to −0.017 cores), passes; Omni-Compass's own CPU 0.011 cores (set 28: 0.063). Machines −5.1%, p95 −64.4%,
+p99 −71.1%, HPA replicas −7.6%, failed requests 0. No measure significantly worse than native in either arm. Receipt:
+`results/live/LIVE_REPS_29.md`.
+
+### The cost to match (written before its run)
+
+The question a buyer asks: what would native Kubernetes have to spend to answer as fast as it does with Omni-Compass on
+top? Each repetition runs, on the same runner and the same work, in rotated order:
+- native (the operator's HPA target 50);
+- native tuned harder by its operator, HPA target 40, 30 and 20 (more pods, faster answers), no Omni-Compass (`ARM=native40`, `native30`, `native20` in `scripts/kind_bench.sh`);
+- native with Omni-Compass on top, the allocation law (`omni`);
+- native with Omni-Compass on top, the bowl law with the verdict (`bowl`).
+
+The report (`tools/live_reps.py`, "The cost to match") lists every arm's p95, p99, HPA replicas, CPU including
+Omni-Compass's own, and machines in service. For each Omni-Compass arm it names the cheapest native setting (by CPU)
+whose p95 is at or under Omni-Compass's, and that setting's extra replicas, CPU and machines over Omni-Compass. If no
+native setting tried reaches it, the report says so and gives the lowest native p95. 10 repetitions, 900 measured
+seconds per arm, fixed-rate load.
+
+### The fault test (written before its run)
+
+Health, security and the babysitting a cluster needs, measured. Every arm (native; native with Omni-Compass on top,
+the allocation law; native with Omni-Compass on top, the bowl law with the verdict) meets the same four faults at the
+same moments (`scripts/kind_faults.sh`, `FAULTS=1`):
+1. at 15% of the run, a worker machine dies (its kind container is stopped) and comes back two minutes later;
+2. at 35%, traffic triples for two minutes;
+3. at 55%, a pod with no CPU limit burns CPU for two minutes;
+4. at 75%, the response-time probe goes blind for one minute.
+
+For each fault the report (`tools/live_reps.py`, "The fault test") gives the time to recover (from the fault's start
+until responses stay under the line for 30 s straight, at most 300 s) and the share of samples over the line or failed
+in the 300 s after it, paired against native over 10 repetitions. All the usual gauges are reported as well, now
+including the share of response samples over the line (`pilot/bench_report.py`). Lower is better in each.
+
+**The fault test, first run** (run 37094604580, commit `a149d4e`; `results/live/FAULTS.md`). Omni-Compass on top
+recovered faster than native from every fault (allocation law: machine down −29%, runaway pod −35%, spike −7%; bowl
+law: −14%, −17%, −6%), p95 −53% and −55%, p99 −27% (not significant) and −57%. One measure was worse: with the bowl law,
+**HPA replicas +8.2%** (+0.41 to +0.99, significant), with CPU and machines unchanged and no energy saved, so outside
+the one rule (`DISCLOSURES.md`, section 3). The cause: past the wall the bowl lowers the HPA target at once (more pods,
+the faster recovery), then handed the operator's target back step by step and held each step for the autoscaler's
+window, so the extra pods outlived the fault.
+
+**The change, written before the re-run** (`omni_controller/controller.py`, the bowl's push and pull on the HPA target;
+`tests/test_bowl_controller.py`, "fault over"): once the responses are back inside the band (the bowl's position under
+its center), the response line is clean and no pod is waiting, the operator's own target returns at once and is not
+held by the window. More pods only while the fault lasts. The re-run is the same fault test, arms, load, duration and
+rule (set 30 F); set 30 runs the same code without faults, to show nothing else moved.
+
+**Set 30 and set 30 F** (runs 37105047258 and 37105046042, commit `acc1c4e`; `results/live/LIVE_REPS_30.md`,
+`results/live/FAULTS_30.md`). Set 30, no faults: nothing significantly worse in either arm; the bowl law's machines
+−9.9%, p95 −64.9%, time over the line −98.7%, HPA replicas −32.2%, total CPU −6.5%. Set 30 F: recovery faster than native
+from every fault in both arms; the bowl law's HPA replicas **+5.6%** (first run +8.2%), still significant, with CPU and
+machines unchanged. The allocation law, which recovers as fast or faster, held no extra pods (+2.0%, not significant).
+
+**The second change, written before set 31 F** (`omni_controller/controller.py`; `tests/test_bowl_controller.py`,
+"blind"). Past the wall, the bowl lowers the HPA target (more pods) only when the cause is load: the response line
+breached with every sense live and no pod waiting. Past the wall from a blind sense, or from pods waiting for a machine
+that is gone, more pods answer neither, so the target is the operator's own: fail up is native's own setting, as on the
+card, where fail up is the card's own clock and limit. The machine reflex (one machine more past the wall) is unchanged.
+Set 31 F is the same fault test, arms, load, duration and rule; set 31 the same without faults.
+
+**Set 31 and set 31 F** (runs 37110007121 and 37110005322, commit `0a38e76`; `results/live/LIVE_REPS_31.md`,
+`results/live/FAULTS_31.md`). Set 31 F: the bowl law's HPA replicas under faults **−1.1%** (not significant): the extra
+pods are gone. Nothing significantly worse in either arm; recovery faster than native from every fault (bowl law,
+machine down −49%). Set 31: nothing significantly worse; the bowl law's machines −10.4%, p95 −66.0%, p99 −73.0%, time over
+the line −99.4%, HPA replicas −44.5%, pods started 0 against native's 4.3, total CPU −6.1%.
+
+### The bill on a real cloud (written before its run)
+
+The question a buyer pays for: the same work, a smaller bill? On kind every machine stays powered, so a machine given
+back saves only a declared model's energy. On a real cloud the machine is deleted and stops being billed. The run
+(`.github/workflows/aks-metered.yml`, `scripts/aks_paired.sh`, `scripts/kind_bench.sh` with `PLATFORM=aks`):
+
+- **The cluster.** Azure Kubernetes Service, a fresh cluster for every arm, built the same way:
+  - a system pool of one machine, tainted so no workload lands on it (AKS's add-ons and the load generator: kind's
+    control plane);
+  - a work pool starting at 4 machines (Standard_D2s_v5) under **Azure's own cluster autoscaler** (min 1, max 4; scale
+    down after 2 minutes unneeded), which deletes a machine once it is empty.
+- **The arms**, rotated in each repetition:
+  - native: Kubernetes with Azure's autoscaler alone;
+  - native with Omni-Compass on top, the bowl law with the verdict (`bowl`);
+  - native with Omni-Compass on top, the allocation law (`omni`).
+
+  With Omni-Compass on top, the machines it gives back are idled (new pods go elsewhere, their pods leave first), and
+  Azure's autoscaler then deletes them. Omni-Compass never deletes a machine itself.
+- **The same work** in every arm: the fixed-rate load of sets 22 onward, 900 measured seconds after 120 s of warm-up.
+- **The bill.** Every 15 s, the number of work machines that exist (in service or idle, every one is billed),
+  integrated over the measured window: billed machine-hours, priced at Azure's list price for the machine
+  (USD 0.096 an hour for Standard_D2s_v5, Linux, pay as you go, set in the workflow's input). Omni-Compass never reads
+  this count.
+- **Outcomes.** Billed machine-hours and the bill (lower is better), and every gauge of sets 28 and 29 (response time,
+  failures, pods waiting, CPU including Omni-Compass's own), paired against native with 95% intervals over 5
+  repetitions. Labelled by the one rule (`DISCLOSURES.md`, section 3): nothing more than 2% worse, and only where the
+  bill or energy is saved.
+- **Housekeeping.** One repetition at a time; each cluster deleted when its arm ends, before the next is made; the
+  resource group deleted at the end of every repetition whatever happens. It needs the repository secret
+  `AZURE_CREDENTIALS`.
+
+### The capacity test (written before its run)
+
+The question behind "more work for the same cost": on the same machines, how much more work does Kubernetes serve
+with Omni-Compass on top before its answers break the line? Each repetition runs native, native with Omni-Compass on
+top (the allocation law) and with the bowl law and the verdict, in rotated order, on the same six workers, the
+open-loop load rising in eight equal steps of one load generator each (6 requests a second per generator, 1 to 8
+generators, 200 s a step, 1,600 measured seconds; `load_steps` in `benchmark-reps`). A run's capacity is the highest
+step at which no more than 5% of the response samples (every 5 s, through the Service) are over the line (500 ms) or
+failed, every lower step holding too, the first 30 s of each step left to settle (`tools/live_reps.py`, `capacity`).
+Reported: each arm's mean capacity in requests a second, its change against native and the 95% interval of the paired
+difference over 10 repetitions; every usual gauge beside it. Labelled by the one rule: nothing more than 2% worse.
 
 ## 47. The Evidence Ledger
 
@@ -5674,19 +5995,100 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 ## 53. Where the Value Comes From
 
 
-Every system runs with room it does not use: GPUs boost to the top of their clock range and are knocked back by their
-own power limiter many times a second; Kubernetes keeps replicas and machines sized for the worst minute; cooling runs
-colder than the heat requires; batteries hold more reserve than the hour needs. That room is paid for in energy and
-in machines.
+### 3.1 The problem we are attacking
 
-Omni-Compass holds each service in the middle of its band instead of far below its limit. The room that was spent on
-nothing becomes one of two things, and the receipt shows which:
+Computing has run into a wall that is not made of silicon. Data centers cannot get the power they need, cannot get it
+fast enough, and are running out of room to put more machines. AI made it worse: every new model needs more chips, and
+every chip needs more electricity and more cooling. The answers on the table are expensive and slow: new chips that do
+more work per watt (a new generation, new hardware to buy), new power plants and power contracts (billions, and years),
+and point fixes at a single layer (an AI serving trick, a scheduler, a power cap on one chip).
 
-- **More work for the same energy** (work per energy rises), or
-- **The same work for less** (fewer machines in service, fewer watts).
+We attack it from the other side. Every system already running wastes room it paid for:
 
-They are the same gain read from two sides. The receipt reports one number, work per energy, and beside it the
-machines, the response times and the failures, so nothing is hidden.
+- GPUs boost to the top of their clock range and are knocked back by their own power limiter many times a second;
+- Kubernetes keeps replicas and machines sized for the worst minute of the day;
+- cooling runs colder than the heat requires; batteries hold more reserve than the hour needs.
+
+That room is paid for in energy, in machines and in floor space, and it produces nothing.
+
+### 3.2 What Omni-Compass is, in one paragraph
+
+Omni-Compass is software that sits **on top of** the controllers a system already has (the GPU's firmware, the
+Kubernetes autoscaler, the building's thermostats) and governs every layer under one law: a bounded push and pull that
+keeps each service in the middle of its band instead of far below its limit. It never replaces the native controller,
+never asks for more than the native settings allow, hands every knob back the moment it is switched off or loses a
+sense, and refuses any step that measures more than 2% worse on anything. No new hardware. It stacks on top of every
+other fix a data center makes.
+
+### 3.3 The benefit: more work from what is already paid for
+
+The room that was spent on nothing becomes one of two things, and a company chooses which:
+
+- **More work for the same cost:** the same machines and the same watts carry more work; or
+- **The same work for less:** fewer machines in service, fewer watts, a smaller bill.
+
+They are the same gain read from two sides (3.4). The health side comes with it: faster answers, faster recovery from
+failures, nothing waiting, every knob returned, no human babysitting the stack.
+
+### 3.4 How to read the benefit: the arithmetic
+
+Every comparison is paired: the same system, the same work, the same moments, native alone against native with
+Omni-Compass on top. Let
+
+- *W* be the work served (requests answered, tokens generated), held equal in both arms;
+- *C* be a resource it used: machine-hours, CPU core-hours, or joules.
+
+**Productivity** is work per resource, *P = W / C*. With the work held equal, the gain from Omni-Compass on top is
+
+  *G = P_omni / P_native − 1 = C_native / C_omni − 1.*
+
+A gain *G* means the same resources can carry *G* more work. Read from the other side, the same work needs only
+
+  *C_omni / C_native = 1 / (1 + G)*
+
+of the resources, a saving of *S = G / (1 + G)*. So **a third more work (G = 33%) is a quarter off the bill
+(S = 25%)**; 20% more work is 16.7% off; 50% more work is a third off. Both columns are the same measurement.
+
+Three rules for reading any receipt:
+
+1. **The work must be equal.** Every receipt states that the load was fixed-rate (open loop): the same requests at the
+   same moments in every arm. Without that, a lower resource count could just mean less work was done.
+2. **Nothing may be worse.** Beside every gain the receipt prints response times, failures, waiting and the controller's
+   own CPU, each with its 95% interval. Our one rule (`DISCLOSURES.md`, section 3): no measure more than 2% worse, and
+   only where energy or the bill is saved. A gain paid for with worse service is not a gain.
+3. **Know the class and the comparator.** A machine-hour gain on kind (where idle machines stay powered and native has
+   no node autoscaler) is not yet a bill; a modelled energy line is not a meter. Section 14 lists the classes; section 15
+   says, for every result, what it is measured against.
+
+### 3.5 Where the evidence stands today, read honestly
+
+| What | Measured gain *G* (same work) | Class | What a referee will ask |
+|---|---|---|---|
+| Kubernetes machine-hours, the allocation law | +45% to +61% (sets 29 to 31, cost to match) | L | native here has no node autoscaler and the cluster is ~4% busy: the AKS bill run and the capacity test answer this |
+| Kubernetes machine-hours, the bowl law with the verdict | +5% to +12% | L | the same |
+| Kubernetes CPU, Omni-Compass's own included | +5% to +8% | L | measured on real software |
+| Kubernetes response time, 95th percentile | 57% to 66% faster; no native setting tried reached it (cost to match) | L | measured |
+| Recovery from faults (machine lost, spike, runaway pod, blind probe) | faster than native from every fault, up to 49% | L | measured |
+| Energy per work, kind standby model | +8% (bowl) to +30% (allocation) | L, modelled | not a meter |
+| Energy per work, six organisms, 1x to 1,000x | +0.08% to +0.19% | S | well-tuned native controllers in models leave little room |
+| Energy per work on a real GPU | the corrected law is measuring now on a real NVIDIA A10 and next on 8 cards | P | the decisive measurement |
+
+The upside the data points toward is large, on the order of a third more work from what is already installed on the
+Kubernetes side. It becomes a claim, not a direction, when three tests land: the bill on a real cloud against Azure's
+own autoscaler (`docs/AZURE_SETUP.md`), the capacity test on fixed machines under rising load, and the real-card runs
+for watts. We publish each of them as it comes, whatever it says.
+
+### 3.6 Two modes, both measured
+
+On Kubernetes, Omni-Compass offers two laws, and a buyer chooses by what matters most:
+
+- **Efficiency mode** (the allocation law): the most machines given back (about a third fewer in service in sets 29 to
+  31) with answers still about 60% faster than native;
+- **Service mode** (the bowl law with the verdict): the fastest answers (95th percentile about two thirds faster) and
+  fewer machines (about 10%).
+
+Both pass the one rule in every set since the fixes; neither is tuned to a benchmark after the fact. The laws are frozen
+for every test that follows, so each new result describes exactly the code that produced the old ones.
 
 ---
 

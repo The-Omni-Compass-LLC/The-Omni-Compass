@@ -136,6 +136,78 @@ def fault_table(root, cols):
     return L + [""]
 
 
+def capacity(d, slo, over_max=5.0):
+    """The capacity test (load_schedule.log rising in steps, open-loop load): for each load step, the share of response
+    samples over the line or failed; the run's capacity is the highest step at which that share stays at or under
+    over_max percent (and every lower step did too). Returns (capacity in load-generator replicas, per-step shares)."""
+    import datetime as _dt
+    try:
+        t0 = float(open(d / "window_start.txt").read().split()[0])
+        rows = list(csv.DictReader(open(d / "latency.csv")))
+        steps = []
+        day = _dt.datetime.fromtimestamp(t0, _dt.timezone.utc).date()
+        for line in open(d / "load_schedule.log"):
+            m = re.match(r"(\d\d):(\d\d):(\d\d) load-generator replicas -> (\d+)", line.strip())
+            if m:
+                t = _dt.datetime(day.year, day.month, day.day, int(m[1]), int(m[2]), int(m[3]), tzinfo=_dt.timezone.utc).timestamp()
+                if t < t0 - 3600:
+                    t += 86400                                  # the run crossed midnight (UTC)
+                steps.append((t, int(m[4])))
+    except (OSError, ValueError):
+        return None, []
+    if len(steps) < 3 or any(b[1] <= a[1] for a, b in zip(steps, steps[1:])):
+        return None, []                                        # not a rising load: not a capacity run
+    smp = [(t0 + float(r["elapsed_seconds"]), r.get("ok") == "1" and float(r["latency_ms"]) <= slo) for r in rows]
+    shares, cap = [], 0
+    for i, (ts, r) in enumerate(steps):
+        te = steps[i + 1][0] if i + 1 < len(steps) else float("inf")
+        w = [g for t, g in smp if ts + 30 <= t < te]            # 30 s for the step to settle
+        sh = 100.0 * sum(1 for g in w if not g) / len(w) if w else float("nan")
+        shares.append((r, sh))
+    for r, sh in shares:
+        if sh == sh and sh <= over_max:
+            cap = r
+        else:
+            break
+    return cap, shares
+
+
+def capacity_table(root, cols):
+    import os
+    slo = float(os.environ.get("SLO_MS", 500)); rate = float(os.environ.get("LOAD_RATE", 6))
+    per = {}
+    for d in sorted(root.glob("bench-*-*")):
+        _, arm, rep = d.name.split("-", 2)
+        c, sh = capacity(d, slo)
+        if c is not None:
+            per.setdefault(arm, {})[rep] = c
+    if "native" not in per:
+        return [], {}
+    L = ["## The capacity test: the same machines, the load rising step by step", "",
+         f"Each step adds one load generator ({rate:g} requests a second each). A run's capacity is the highest step at which "
+         "no more than 5% of response samples are over the line or failed (and every lower step held too), the first 30 s "
+         "of each step left to settle. Paired over the repetitions; higher is more work from the same machines.", "",
+         "| Arm | Capacity (requests a second), mean | Change against native | 95% interval of the difference (requests a second) | Repetitions |",
+         "|---|---:|---:|---:|---:|"]
+    out = {}
+    nat = per["native"]
+    for a in cols:
+        if a not in per:
+            continue
+        reps = sorted(set(per[a]) & set(nat))
+        if not reps:
+            continue
+        v = np.array([per[a][r] * rate for r in reps], float); n0 = np.array([nat[r] * rate for r in reps], float)
+        m, mn = float(v.mean()), float(n0.mean())
+        if a == "native":
+            L.append(f"| native | {mn:.1f} |  |  | {len(reps)} |"); out[a] = {"capacity_rps": mn}; continue
+        dd = v - n0; half = T95.get(len(dd) - 1, 1.96) * (dd.std(ddof=1) / math.sqrt(len(dd))) if len(dd) > 1 else float("nan")
+        ch = (m - mn) / mn * 100 if mn > 0 else float("nan")
+        L.append(f"| {a} | {m:.1f} | {ch:+.1f}% | {dd.mean() - half:+.1f} to {dd.mean() + half:+.1f} | {len(reps)} |")
+        out[a] = {"capacity_rps": m, "change_pct": ch, "ci95": [float(dd.mean() - half), float(dd.mean() + half)]}
+    return L + [""], out
+
+
 def main(root):
     root = Path(root); runs = {}
     for d in sorted(root.glob("bench-*-*")):
@@ -222,6 +294,9 @@ def main(root):
     faults = fault_table(root, cols)
     if faults:
         L += faults
+    cap_l, cap_o = capacity_table(root, cols)
+    if cap_l:
+        L += cap_l; out["capacity"] = cap_o
     (root / "LIVE_REPS.json").write_text(json.dumps(out, indent=1)); (root / "LIVE_REPS.md").write_text("\n".join(L))
     print("\n".join(L))
 

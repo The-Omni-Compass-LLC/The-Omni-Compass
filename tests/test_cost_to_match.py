@@ -64,6 +64,22 @@ def main():
     bl = LR.bill(b)
     assert abs(bl["machines billed, machine-hours"] - 6.0) < 0.02 and abs(bl["compute bill at list price ($)"] - 6.0 * 0.096) < 0.01, bl
     assert LR.bill(f / "bench-native-1") == {}                         # kind: no bill rows
+    # the capacity test: load steps 1..8 every 100 s; native breaks the line from step 4, Omni from step 7
+    import datetime as _dt
+    cdir = Path(tempfile.mkdtemp()); t0 = 1_800_000_000
+    for arm, brk in (("native", 4), ("bowl", 7)):
+        for rep in (1, 2):
+            d = cdir / f"bench-{arm}-{rep}"; d.mkdir()
+            (d / "window_start.txt").write_text(f"{t0}\n")
+            (d / "load_schedule.log").write_text("".join(
+                f"{_dt.datetime.fromtimestamp(t0 + 100 * (r - 1), _dt.timezone.utc):%H:%M:%S} load-generator replicas -> {r}\n" for r in range(1, 9)))
+            (d / "latency.csv").write_text("elapsed_seconds,latency_ms,ok\n" + "".join(
+                f"{t},{900 if t // 100 + 1 >= brk else 100},1\n" for t in range(0, 800, 5)))
+    cap, sh = LR.capacity(cdir / "bench-native-1", 500)
+    assert cap == 3 and len(sh) == 8, (cap, sh)
+    tab, co = LR.capacity_table(cdir, ["native", "bowl"])
+    assert co["native"]["capacity_rps"] == 18 and co["bowl"]["capacity_rps"] == 36 and abs(co["bowl"]["change_pct"] - 100) < 1e-6, co
+    assert LR.capacity(f / "bench-native-1", 500)[0] is None        # a run without rising load is not a capacity run
     print("PASS cost to match: every arm listed, the cheapest native setting that reaches Omni-Compass's p95 and its extra "
           "pods, CPU and machines, and a plain statement when none reaches it; fault recovery times paired against native")
 
