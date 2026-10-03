@@ -1,6 +1,3 @@
-# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
 """Omni-Compass on one GPU box, no Kubernetes: the engine reads each GPU's own meter and may lower its power limit.
 
 Every decision (--interval seconds), for each GPU in --gpus:

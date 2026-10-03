@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-// Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-// Omni-Compass Enterprise License. See LICENSE.
 // Conveyance law (C++ twin of omnicompass/conveyance.py): a conserved budget moved between organs by need.
 // Same arithmetic, same order of operations: replicator_step (the exact closed form of the replicator flow), project
 // (water-filling onto floors, ceilings and the budget), and Conveyance::step (living band, reserve, flow, projection,

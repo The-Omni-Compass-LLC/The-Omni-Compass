@@ -1,6 +1,3 @@
-# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
 """The supervisory nervous system: one evolving engine state grants authority to every organ family.
 
 Omni-Compass does not replace the specialist controllers. Each keeps its own mechanism:

@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-// Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-// Omni-Compass Enterprise License. See LICENSE.
 // Nervous system (C++ twin of omnicompass/nervous_system.py): one engine state grants authority to every organ.
 // Same arithmetic, same order of operations. The living band [0.05, 0.95] is applied last to every envelope.
 #pragma once

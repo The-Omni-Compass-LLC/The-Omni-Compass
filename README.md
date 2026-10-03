@@ -87,6 +87,10 @@ requires a written **Omni-Compass Enterprise License** signed by The Omni-Compas
 protected by copyright, patents and trademarks (Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.); no patent or trademark
 license is granted for any other use. Full terms: [`LICENSE`](LICENSE) (`SPDX-License-Identifier:
 LicenseRef-OmniCompass-Evaluation-1.0`), [`NOTICE`](NOTICE).
+Every source file carries this license in its header, except those whose exact bytes are pinned by a preregistration
+SHA-256 or by the seal that proves each Python law equal to its C++ twin (the engine core and its twins, the
+reference engine, the controllers, the GPU mechanism's muscles); `REUSE.toml` and `LICENSE` cover those, and every
+other file, all the same.
 
 ## Legal
 
