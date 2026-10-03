@@ -30,3 +30,10 @@ that gates every machine release.
 - The difference is whether the regulation is applied to the state or only read from it.
 - The pre-registered, frozen results were measured with u = 0. I keep that setting, and I report the difference here
   rather than change a frozen law mid-measurement.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

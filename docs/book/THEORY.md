@@ -337,3 +337,10 @@ The value a customer sees comes in three forms, each on its own line of the rece
 
 The babysitting tax - the people and tools kept on the clock to set caps, answer pages and turn knobs back after a run
 or a crash - is the cost Omni-Compass removes by holding the knobs and returning them itself.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

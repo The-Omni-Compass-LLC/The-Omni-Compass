@@ -105,3 +105,10 @@ Nothing here is deleted when a later result looks better.
 | S | The compass-stroke GPU variant was tried and not adopted. | same |
 | S | Right-sizing against VPA: p95 +15%, memory (OOM) kills +531%. | `docs/BENCHMARK_REPORT.md` |
 | — | Reported in the external master-build report (not reproducible from this repository): on fresh scenarios Karpenter+VPA sometimes used less modelled energy than Omni, while Omni had lower churn and fewer request-induced evictions. Kept here so it is not lost; to be re-run here before it is cited. | external |
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

@@ -1,0 +1,32 @@
+name: XPASS21 640-Muscle Organism Matrix
+on:
+  workflow_dispatch:
+    inputs:
+      steps:
+        description: Shared-clock steps
+        required: true
+        default: '24'
+      chunk:
+        description: Streaming Monte Carlo chunk
+        required: true
+        default: '256'
+jobs:
+  matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        breadth: [1, 10, 100, 500, 640]
+        trials: [1000, 10000, 100000, 1000000]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install numpy pytest
+      - run: python -m pytest -q tests/test_xpass21_organism.py tests/test_xpass19_batch_claim1.py tests/test_core_parity.py
+      - name: Run paired organism cell
+        run: python organism/xpass21_organism_lab.py --breadth ${{ matrix.breadth }} --trials ${{ matrix.trials }} --steps ${{ inputs.steps }} --chunk ${{ inputs.chunk }} --out results/xpass21/m${{ matrix.breadth }}_n${{ matrix.trials }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xpass21-m${{ matrix.breadth }}-n${{ matrix.trials }}
+          path: results/xpass21/m${{ matrix.breadth }}_n${{ matrix.trials }}

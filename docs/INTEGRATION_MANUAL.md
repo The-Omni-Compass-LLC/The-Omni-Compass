@@ -272,3 +272,10 @@ simulation harnesses; every decision they take goes through the twinned laws. Th
 
 Keep this manual with the code. When Omni-Compass changes, this manual, the C++ twin and the seal change in the same
 commit.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

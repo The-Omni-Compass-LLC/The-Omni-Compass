@@ -1,0 +1,66 @@
+# Two apps on one Kind cluster. Victim is lightly loaded. Noisy is hammered.
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: php-victim}
+spec:
+  selector: {matchLabels: {run: php-victim}}
+  template:
+    metadata: {labels: {run: php-victim}}
+    spec:
+      containers:
+        - name: php-apache
+          image: registry.k8s.io/hpa-example
+          ports: [{containerPort: 80}]
+          resources: {limits: {cpu: 500m}, requests: {cpu: 200m}}
+          readinessProbe: {tcpSocket: {port: 80}, periodSeconds: 2}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: php-victim, labels: {run: php-victim}}
+spec:
+  ports: [{port: 80}]
+  selector: {run: php-victim}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: {name: php-victim}
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: php-victim}
+  minReplicas: 1
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 50}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: php-noisy}
+spec:
+  selector: {matchLabels: {run: php-noisy}}
+  template:
+    metadata: {labels: {run: php-noisy}}
+    spec:
+      containers:
+        - name: php-apache
+          image: registry.k8s.io/hpa-example
+          ports: [{containerPort: 80}]
+          resources: {limits: {cpu: 500m}, requests: {cpu: 200m}}
+          readinessProbe: {tcpSocket: {port: 80}, periodSeconds: 2}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: php-noisy, labels: {run: php-noisy}}
+spec:
+  ports: [{port: 80}]
+  selector: {run: php-noisy}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: {name: php-noisy}
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: php-noisy}
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 50}}

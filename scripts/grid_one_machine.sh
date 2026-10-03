@@ -14,6 +14,7 @@
 # restart skips the organisms already done. At the end: one receipt, SIX-<size>x.md, the file to send back.
 # SCALE (default 1000), RUNS (default 100), ORGS (default "5 6 1 3 4 2", largest first), MEM_FRACTION (default 0.85).
 set -uo pipefail
+echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 cd "$(dirname "$0")/.."
 SCALE="${SCALE:-1000}"; RUNS="${RUNS:-100}"; ORGS="${ORGS:-5 6 1 3 4 2}"; FRAC="${MEM_FRACTION:-0.85}"
 OUT="results/scale/one-machine-${SCALE}x"; mkdir -p "$OUT/parts"

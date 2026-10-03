@@ -289,6 +289,11 @@ def main():
     test_cost_to_match.main(); check("cost to match: the cheapest native setting that reaches Omni-Compass's p95, its extra pods, CPU and machines", True)
     from tests import test_server_power
     test_server_power.main(); check("server power: Redfish and IPMI give the whole-server watts, read only", True)
+    from tests import test_disruption_budget, test_muscle_sdk, test_causal_evidence_gate, test_gpu_watchdog
+    test_disruption_budget.main(); check("disruption budget: node moves capped per period, the score charges every disruption", True)
+    test_muscle_sdk.main(); check("universal muscle SDK: a customer's knob plugs in with bounds, authority and a restore point", True)
+    test_causal_evidence_gate.main(); check("causal evidence gate: a claim is held to the evidence level its authority supports", True)
+    test_gpu_watchdog.main(); check("independent GPU watchdog: a governor killed outright, the card's start limit restored", True)
     from tests import test_api_proxy
     test_api_proxy.main(); check("controller reads through one kubectl proxy: kubectl's own output shape, missing objects are errors, anything else goes to kubectl", True)
     from tests import test_master_switch

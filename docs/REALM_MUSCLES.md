@@ -154,3 +154,9 @@ workflow_admission [admission], workflow_worker_rate [capacity], task_queue_rate
 
 ## Organism 5: the whole tower, all 656 muscles once
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

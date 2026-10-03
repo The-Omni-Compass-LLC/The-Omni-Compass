@@ -119,3 +119,10 @@ With the work held equal in both arms, the gain from Omni-Compass on top is *G =
 resource (machine-hours, CPU core-hours, joules). The same work then needs *1 / (1 + G)* of the resources, a saving of
 *G / (1 + G)*: a third more work is a quarter off the bill. The full explanation, the three rules for reading a receipt
 and where every number stands today are in the manual, section 3 (`docs/OMNI_COMPASS_MANUAL.md`).
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

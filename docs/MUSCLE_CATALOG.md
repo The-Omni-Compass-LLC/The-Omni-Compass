@@ -1061,3 +1061,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 430 | sla escalation | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 431 | compensation action | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

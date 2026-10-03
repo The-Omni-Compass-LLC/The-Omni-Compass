@@ -93,3 +93,10 @@ A PodDisruptionBudget on each service is required, because drains go through the
 | Least-privilege identity receipts | `rbac_omni.txt` in every live run |
 | Native vs Omni on top vs Omni alone, paired on one machine, real Kubernetes | `results/live/LIVE_PAIRED.md` |
 | The full wiring manual | `docs/OPERATOR_MANUAL.md` |
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

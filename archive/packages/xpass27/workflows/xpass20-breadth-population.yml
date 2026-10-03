@@ -1,0 +1,36 @@
+name: XPASS20 breadth x population qualification
+on:
+  workflow_dispatch:
+    inputs:
+      muscle_ladder:
+        description: "Simultaneously active muscle counts"
+        required: true
+        default: "1,10,100,500,640"
+      population_ladder:
+        description: "Concurrent governed trajectory counts"
+        required: true
+        default: "1000,10000,100000,1000000"
+      steps:
+        description: "Shared simulation-clock steps"
+        required: true
+        default: "24"
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install -r requirements.txt pytest
+      - name: Paired native vs Omni-over-native matrix
+        env:
+          OMNI_MUSCLE_LADDER: ${{ inputs.muscle_ladder }}
+          OMNI_POPULATION_LADDER: ${{ inputs.population_ladder }}
+          OMNI_SCALE_STEPS: ${{ inputs.steps }}
+        run: ./RUN_XPASS20_GITHUB.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: xpass20-breadth-population-receipts
+          path: results/xpass20_matrix/

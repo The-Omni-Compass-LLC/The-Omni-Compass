@@ -24,6 +24,7 @@
 # repetitions, each organism on its own card at the same time (SKIP_HIL=1 skips it; HIL_ARGS passes options through).
 # CARDS (default: every card nvidia-smi lists), SKIP_DECODE=1, SKIP_CAP=1, SKIP_DRILL=1 as in gpu_rented_run.sh.
 set -uo pipefail
+echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 cd "$(dirname "$0")/.."
 SMI="${NVIDIA_SMI:-nvidia-smi}"; PY="${PYTHON:-python3}"
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)

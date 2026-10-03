@@ -191,3 +191,10 @@ written license. The instrument is a license, not a sale and not a transfer of o
 introductory benchmark is 10% of independently verified and contractually accepted value captured; the base and the
 amount are specific to each company, the terms are expected to rise as validation and adoption grow, and only a
 signed agreement creates any obligation.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

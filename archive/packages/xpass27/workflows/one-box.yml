@@ -1,0 +1,42 @@
+name: one-box
+# Cluster and card on the same runner, one clock, one receipt.
+# Start: push a commit whose message contains [onebox], on a branch that has this file.
+# Runner: the gpu-t4 larger runner. Kind is installed on that machine. If the card is missing, the job fails.
+on:
+  workflow_dispatch:
+  push:
+permissions:
+  contents: write
+jobs:
+  onebox:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[onebox]')
+    runs-on:
+      group: Default
+      labels: gpu-t4
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Card must answer
+        run: nvidia-smi
+      - name: One clock, cluster and card
+        run: bash scripts/one_box_receipt.sh
+        env:
+          OUT: one-box-out
+          SECONDS_N: "60"
+          INTERVAL: "5"
+      - name: Publish the receipt
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: one-box-receipt
+          path: one-box-out
+      - name: Commit the receipt
+        if: always()
+        run: |
+          mkdir -p "results/onebox/github-${{ github.run_id }}"
+          cp -a one-box-out/. "results/onebox/github-${{ github.run_id }}/" || true
+          git config user.name "one-box"
+          git config user.email "one-box@users.noreply.github.com"
+          git add results/onebox || true
+          git commit -m "one-box receipt ${{ github.run_id }}" || exit 0
+          git push origin "HEAD:${{ github.ref_name }}" || true

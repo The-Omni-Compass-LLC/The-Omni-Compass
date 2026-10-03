@@ -213,3 +213,10 @@ step at which no more than 5% of the response samples (every 5 s, through the Se
 failed, every lower step holding too, the first 30 s of each step left to settle (`tools/live_reps.py`, `capacity`).
 Reported: each arm's mean capacity in requests a second, its change against native and the 95% interval of the paired
 difference over 10 repetitions; every usual gauge beside it. Labelled by the one rule: nothing more than 2% worse.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

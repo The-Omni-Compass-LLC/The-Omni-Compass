@@ -119,3 +119,10 @@ Seed 515151, 24 scenarios. Results: `results/hardware/NODE_EXCHANGE_*.json`. XC 
 - The live levers that would carry it are GPU power limits (`nvidia-smi -pl`, DCGM), RAPL package limits, and pod CPU
   limits under a namespace budget. They exist in `omni_controller/muscles.py`, but the exchange between them has not
   run on hardware.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

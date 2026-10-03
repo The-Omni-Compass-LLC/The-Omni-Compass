@@ -134,3 +134,10 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | `omni_controller/` | the Kubernetes controller, the GPU governor, the muscles |
 | `results/live/` | every live run, including failed and withdrawn ones |
 | `docs/HISTORY.md` | earlier states of play |
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

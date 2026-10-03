@@ -119,3 +119,10 @@ the power budget are designed (`docs/DOMAIN_MAP.md`, "on-site batteries") and no
 | Site power exchange (GPU groups) | `python3 hardware/site_exchange.py` | `results/hardware/SITE_EXCHANGE_*.json` |
 | CPU + GPU on one budget | `python3 hardware/node_exchange.py` | `results/hardware/NODE_EXCHANGE_*.json` |
 | Full stack benchmark and every check | `python3 verify.py` | `results/`, `VERIFICATION: PASS` |
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

@@ -29,3 +29,10 @@ The files the leading repositories carry, the open ones such as Kubernetes and t
 | A one-file archive of the repository | `release/The-Omni-Compass.zip` |
 
 Files present at the commit this page describes; `python3 verify.py` checks the ones the results depend on.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

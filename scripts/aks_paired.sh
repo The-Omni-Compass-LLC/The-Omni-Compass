@@ -14,6 +14,7 @@
 # deleted when its arm ends, before the next is made, so nothing keeps billing and the subscription's core quota holds.
 # Usage: REP=n ARMS="native bowl omni" AZ_RG=... bash scripts/aks_paired.sh
 set -euo pipefail
+echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native bowl omni}"
 RG="${AZ_RG:?set AZ_RG}"; LOC="${AZ_LOCATION:-eastus}"; SIZE="${AKS_VM_SIZE:-Standard_D2s_v5}"
 MAX="${AKS_MAX_NODES:-4}"; export AKS_MAX_NODES="$MAX"

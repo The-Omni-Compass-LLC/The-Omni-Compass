@@ -32,3 +32,10 @@ and a new mechanism id.
 
 One engine, one twin, two frozen originals. A new version **replaces** the old one in place, with a new seal; it is never
 added beside it. Older states are in git history and `docs/HISTORY.md`, not in extra files.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

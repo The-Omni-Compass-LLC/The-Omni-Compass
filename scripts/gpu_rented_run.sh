@@ -28,6 +28,7 @@
 #    300 s; if it cannot install or start, the stage says so and nothing before it is affected (SKIP_LLM=1);
 # 10. packs every result folder into one file to send back, and prints the label each table chose by rule.
 set -euo pipefail
+echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 cd "$(dirname "$0")/.."
 SMI="${NVIDIA_SMI:-nvidia-smi}"; PY="${PYTHON:-python3}"; GPU="${GPU:-0}"
 STAMP="${STAMP:-$(date -u +%Y%m%dT%H%M%SZ)}${CARD_TAG:+-$CARD_TAG}"   # CARD_TAG: one folder per card (scripts/gpu_8card.sh)

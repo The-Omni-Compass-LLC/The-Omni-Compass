@@ -118,3 +118,10 @@ Admissible set for a fixture with parameters p and initial state x0:
   representation fidelity), not yet measured on a real card.
 - The printed configuration (`printed_eight_line`) is not covered by this page: its U drift is logistic, not the
   double well, and needs its own bound (`docs/CANONICAL_ENGINE.md`).
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

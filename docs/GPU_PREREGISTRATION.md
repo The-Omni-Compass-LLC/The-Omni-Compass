@@ -410,3 +410,10 @@ the fault drill once. Arm durations are those of the whole design.
 budget whatever happens. At the budget the master switch is pulled (every governor hands its card back), every stage
 still measuring stops and is reported as incomplete (an arm cut short is never counted: its repetition has no complete
 pair), the stages not started are skipped and named, and the finished ones are packed.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

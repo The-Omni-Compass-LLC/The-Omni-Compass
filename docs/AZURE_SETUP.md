@@ -60,3 +60,10 @@ The result is the job `aggregate`'s receipt: billed machine-hours and the bill a
 with Omni-Compass on top, beside response time, failures and CPU, each with its 95% interval. To remove GitHub's
 access when you are done: in the Azure portal search **App registrations**, open **omni-compass-github**, **Delete**;
 and delete the `AZURE_CREDENTIALS` secret in GitHub.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

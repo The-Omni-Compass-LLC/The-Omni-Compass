@@ -92,3 +92,10 @@ Which form a patent or copyright filing claims as the principal embodiment is a 
 its counsel. Whatever that decision, the software described by this repository runs the canonical engine of section 1,
 and a filing that claims the printed form should name `symmetric_verified` as the embodiment that has been implemented
 and tested, or the printed form should be benchmarked first (section 3).
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

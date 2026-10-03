@@ -21,3 +21,10 @@ specific nodes.
 
 Not yet run: this workflow was written and syntax-checked in an environment with no container runtime or network.
 Its first run on GitHub is its first real execution.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

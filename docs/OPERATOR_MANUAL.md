@@ -318,3 +318,10 @@ Add `--strict-replicas`:
 | `pod_reflex_reading` | what the queue needs now; the autoscaler decides the pods |
 | `convey: <machine> idle CPU to its k serving pod(s), limit c` | that machine's idle CPU now reaches the work on it |
 | `Ω: machine_fill below the floor, returning` | the machines are underfilled and my move is bringing them back into the band |
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

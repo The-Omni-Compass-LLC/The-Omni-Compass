@@ -13,6 +13,7 @@
 # CPU) and checks that its counts are right and its commands land; then the master switch turns the whole harness off,
 # and every HPA target and every node must be back as the operator had them. Writes $OUT/KWOK.json.
 set -euo pipefail
+echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 cd "$(dirname "$0")/.."
 NODES="${NODES:-50}"; ITER="${ITER:-12}"; INTERVAL="${INTERVAL:-10}"; OUT="${OUT:-kwok-$NODES}"
 KWOK_VERSION="${KWOK_VERSION:-v0.6.1}"

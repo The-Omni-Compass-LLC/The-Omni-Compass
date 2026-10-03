@@ -56,3 +56,10 @@ and 1,000 runs. Examples used: 1,000 runs at 1x = runs_per_shard 100, 10 shards;
 2. 1,000 runs at 1,000x and the two largest organisms at 1,000x need a bigger machine than GitHub's.
 3. Kubernetes and the GPU together on one Lambda box (k3s), one set of receipts.
 4. The C++ twin of the bowl (the frozen engine already has one, `cpp/`).
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

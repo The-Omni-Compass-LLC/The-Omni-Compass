@@ -2,6 +2,8 @@
 
 > **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Protected by copyright, patents and trademarks: Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](LICENSE).
 
+**New here? Read [`START_HERE.md`](START_HERE.md) first:** the reading order, the receipts, and how to run everything yourself.
+
 A six-state control engine that supervises Kubernetes and hardware from above: Kubernetes and its autoscalers stay the
 execution layer.
 
@@ -286,4 +288,9 @@ python fleet/capture_replay.py capture.csv --idle-w 200 --dyn-w 350 --out replay
 python -m fleet.planetlab --dir fleet/traces/planetlab --scenarios 30 --out planetlab_out/
 ``` 
 
+---
 
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

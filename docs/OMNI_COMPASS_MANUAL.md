@@ -854,12 +854,36 @@ test passes. `verify.py` fails, naming the file, if any sealed file changes afte
         p >= 0.95  =>  full up force; down side held
         knob <- clip(knob + g_side F span, cover)
 
-    The GPU governor (two wires, omni_controller/gpu_bowl.py):
+    The GPU governor (two wires, omni_controller/gpu_bowl.py; one law, amendments 8 to 10):
         p = (mean response of the last 5 s - S) / (SLO - S),  S = SLO / 10;  p95 >= SLO, a failure, blind  =>  fail up
-        utilization >= 0.95  =>  race: ceiling = top clock, lid = start limit
-        ceiling <- clip(ceiling + round(g_side F f_top / 15 MHz) 15 MHz, floor x f_busy_own, f_top)
-        lid = clip(1.10 P_busy_own, envelope floor, start limit)
-        service: g_down 0.0125, center 0.4, floor 1.03;  batch: g_down 0.015, center 0.5, floor 1.00;  g_up 0.10
+        fail up / race (utilization >= 0.95)  =>  ceiling = top clock, lid = start limit (the card's own settings)
+        steady under the limit (saturated and drawing >= 0.97 of the limit)  =>  ceiling = the card's own busy clock,
+            lid = start limit (the same watts, no knock-backs)
+        otherwise:
+            ceiling <- clip(ceiling + round(g_side F f_top / 15 MHz) 15 MHz, c_floor, f_top)
+            c_floor = max(f_busy_own x floor, f_top - k* 15 MHz)       (never under the card's own busy clock,
+                                                                         never past the verdict's deepest step k*)
+            lid = clip(ceil(1.10 P_busy_own), envelope floor, start limit)
+        g_up 0.10, g_down 0.0125, center 0.4, floor 1.00
+
+    The verdict (omnicompass/verdict.py; every slow knob, the GPU ceiling and the Kubernetes machine count):
+        reference r = the median cost per request at the deepest allowed step, measured fresh, n >= 30 requests
+        trial t     = the median cost at one step past it, n >= 30 requests, under the same traffic
+        allow the step  iff  t <= r (1 + a)  and  t <= c_native (1 + a),   a = 0.02
+        a refused step is not tried again for R decisions (GPU R = 900; Kubernetes 120); the knob never goes past the
+        deepest allowed step, so steps cannot add up beyond the allowance
+
+    Kubernetes, the bowl on the HPA target (omni_controller/controller.py; sets 30 and 31):
+        target x in [0.6 x_op, x_op] (times the conveyed gain); the up force lowers x (more pods)
+        p >= 0.95 from load (line breached, every sense live, nothing pending)  =>  x = 0.6 x_op at once
+        p >= 0.95 from a blind sense or pods waiting for a lost machine           =>  x = x_op (native's own)
+        fault over (p < center, line clean, nothing pending)                      =>  x = x_op at once, never held
+        machines: one more at once past the wall; one back only when the verdict and the release gate agree
+        g_up 0.10, g_down 0.02, release force < -0.2
+
+    The productivity arithmetic (every receipt; manual section 3.4):
+        work W equal in both arms;  G = C_native / C_omni - 1;  the same work needs 1/(1 + G) of the resources;
+        saving S = G / (1 + G):  G = 1/3  <=>  S = 1/4
 
 Parameter ranges, defaults and the proof of convergence: `omnicompass/core.py`, `docs/TRACKING_THEOREM.md`,
 `docs/CANONICAL_ENGINE.md`.
@@ -896,3 +920,10 @@ Every gauge, where it comes from, and whether it is measured or modelled: `docs/
 Licensing, pilots and the Omni-Compass Enterprise License: **The Omni-Compass LLC.**
 
 *Copyright (c) 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only.*
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

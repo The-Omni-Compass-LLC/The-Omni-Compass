@@ -43,3 +43,10 @@
 7. Then connectors in the domain-map order: GPUs, cooling, energy supply, job queues.
 
 Rules carried forward: development seeds only for tuning; freeze and fingerprint before held-out runs; amendments recorded; no claim beyond what the verifier reproduces.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

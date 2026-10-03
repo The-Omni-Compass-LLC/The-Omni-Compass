@@ -304,3 +304,10 @@ The 100-run cells at 1,000 copies run on one rented machine (`scripts/grid_one_m
 as many processes as the machine's cores and memory allow, the same seeds (7000 on), each finished organism saved at
 once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/receipts/round6-1000x.md` in place of the
 1-run and 10-run receipt it contains.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

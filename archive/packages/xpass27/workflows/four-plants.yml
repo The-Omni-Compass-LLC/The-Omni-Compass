@@ -1,0 +1,39 @@
+name: four-plants
+# Compute is the only plant this runner can host.
+# Facility, machine, and grid write a NOT_HOSTED receipt and do not claim a number.
+on:
+  workflow_dispatch:
+  push:
+permissions:
+  contents: write
+jobs:
+  compute:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[onebox]')
+    runs-on:
+      group: Default
+      labels: gpu-t4
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute plant, card and cluster, one clock
+        run: PLANT=compute OUT=plant-out/compute bash scripts/plant_receipt.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: compute-receipt
+          path: plant-out/compute
+  other-plants:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[onebox]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Facility, machine, grid are not on this host
+        run: |
+          PLANT=facility OUT=plant-out/facility bash scripts/plant_receipt.sh || true
+          PLANT=machine OUT=plant-out/machine bash scripts/plant_receipt.sh || true
+          PLANT=grid OUT=plant-out/grid bash scripts/plant_receipt.sh || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: other-plant-receipts
+          path: plant-out

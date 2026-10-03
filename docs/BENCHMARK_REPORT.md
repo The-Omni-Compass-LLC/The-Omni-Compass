@@ -508,3 +508,10 @@ python tools/full_report.py ... && python pilot/bench_pdf.py docs/BENCHMARK_REPO
 - **Invariant**: a safety rule the shield enforces before any action.
 - **Paired bootstrap CI**: resampling the per-scenario differences to get a 95% interval for the mean difference.
 - **Pre-registration**: freezing code and parameters, with hashes, before running the test data.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*

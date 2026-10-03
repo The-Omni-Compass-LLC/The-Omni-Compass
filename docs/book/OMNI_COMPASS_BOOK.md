@@ -566,6 +566,13 @@ introductory benchmark is 10% of independently verified and contractually accept
 amount are specific to each company, the terms are expected to rise as validation and adoption grow, and only a
 signed agreement creates any obligation.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 7. The Engine: Eight Equations and One Control Law
 
 
@@ -691,6 +698,13 @@ Which form a patent or copyright filing claims as the principal embodiment is a 
 its counsel. Whatever that decision, the software described by this repository runs the canonical engine of section 1,
 and a filing that claims the printed form should name `symmetric_verified` as the embodiment that has been implemented
 and tested, or the printed form should be benchmarked first (section 3).
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 9. The Closed Circle: Why It Cannot Leave Its Bowl
 
@@ -869,6 +883,13 @@ Admissible set for a fixture with parameters p and initial state x0:
 - The printed configuration (`printed_eight_line`) is not covered by this page: its U drift is logistic, not the
   double well, and needs its own bound (`docs/CANONICAL_ENGINE.md`).
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 12. The Conveyance Law
 
 
@@ -991,6 +1012,13 @@ Seed 515151, 24 scenarios. Results: `results/hardware/NODE_EXCHANGE_*.json`. XC 
   limits under a namespace budget. They exist in `omni_controller/muscles.py`, but the exchange between them has not
   run on hardware.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 13. Formal Status of the Mathematics
 
 
@@ -1017,6 +1045,13 @@ Open:
 - A tracking bound for printed_eight_line (logistic U drift).
 
 Default core remains symmetric_verified (mechanism id in `results/MECHANISM_IDENTITY.json`).
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 14. The Mechanism of Action
 
@@ -1161,6 +1196,13 @@ Three wiring experiments follow directly. None changes a single equation:
 Each is testable in the existing harness against every platform in the league (tuning/league.py), and will be tested
 there.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 15. The Engines and Their Audit
 
 ### Which engine is which
@@ -1197,6 +1239,13 @@ and a new mechanism id.
 
 One engine, one twin, two frozen originals. A new version **replaces** the old one in place, with a new seal; it is never
 added beside it. Older states are in git history and `docs/HISTORY.md`, not in extra files.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 ### My engine, line by line: the source against what runs in your cluster
 
 
@@ -1229,6 +1278,13 @@ that gates every machine release.
 - The difference is whether the regulation is applied to the state or only read from it.
 - The pre-registered, frozen results were measured with u = 0. I keep that setting, and I report the difference here
   rather than change a frozen law mid-measurement.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 # Part Three. The Physics: the Bowl and the Nervous System
 
@@ -1390,6 +1446,13 @@ commanded`.
 
 Every live decision records the senses, their ages, the proprioceptive drift and the gate's reason in the audit, and
 the benchmark prints them in the job log.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 ### Nervous system
 
 
@@ -1420,6 +1483,13 @@ Never a muscle: value alignment.
 ```bash
 python k8s_controlplane/test_nervous.py
 ```
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 # Part Four. The Body: Muscles, Realms and Organisms
 
@@ -1487,6 +1557,13 @@ contrast), `RUN.json` and `SHA256SUMS.txt` (commit and fingerprints).
 A realm result that looks good is a reason to test that knob on a real machine, not a substitute for it. The realms
 whose knobs can be tested for real first are the compute realm's (the GPU bench, kind), because the tools already
 exist.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 22. The Realm Muscles
 
@@ -1644,6 +1721,12 @@ workflow_admission [admission], workflow_worker_rate [capacity], task_queue_rate
 
 ### Organism 5: the whole tower, all 656 muscles once
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 23. The Domain Map
 
@@ -1795,6 +1878,13 @@ Omni-Compass can be the boundary layer AI runs inside. It cannot be the thing th
 
 Each connector follows the same path as compute: wired, benchmarked against today's controls, verified, pre-registered, tested on held-out scenarios, then released.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 24. The Problem Map
 
 
@@ -1874,6 +1964,13 @@ equation alone setting the draw) cut ramps 63% but did not hold the grid limit: 
 - [The Llama 3 Herd of Models](https://arxiv.org/pdf/2407.21783); [Tom's Hardware on Llama 3 failures](https://www.tomshardware.com/tech-industry/artificial-intelligence/faulty-nvidia-h100-gpus-and-hbm3-memory-caused-half-of-the-failures-during-llama-3-training-one-failure-every-three-hours-for-metas-16384-gpu-training-cluster); [Lablup 504-GPU report](https://arxiv.org/html/2605.09370v1)
 - [vLLM anatomy](https://vllm.ai/blog/2025-09-05-anatomy-of-vllm); [llm-d 0.5](https://llm-d.ai/blog/llm-d-v0.5-sustaining-performance-at-scale)
 - [Dark Reading: AI agents and runaway costs](https://www.darkreading.com/application-security/how-ai-agents-can-trigger-runaway-costs)
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 25. The Six Organisms and the Benchmark Grid
 
@@ -2018,6 +2115,13 @@ the power budget are designed (`docs/DOMAIN_MAP.md`, "on-site batteries") and no
 | CPU + GPU on one budget | `python3 hardware/node_exchange.py` | `results/hardware/NODE_EXCHANGE_*.json` |
 | Full stack benchmark and every check | `python3 verify.py` | `results/`, `VERIFICATION: PASS` |
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 # Part Five. The Harness and the Wiring
 
 *The universal plug, the adapters, the wire check, and the step-by-step work of wiring Omni-Compass onto a running stack.*
@@ -2155,6 +2259,13 @@ Live kube-controller-manager, kind CI, GPU MIG scheduler, facility cooling plant
 
 See `LIMITS.md`.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 29. The Wiring Guide
 
 
@@ -2250,6 +2361,13 @@ A PodDisruptionBudget on each service is required, because drains go through the
 | Least-privilege identity receipts | `rbac_omni.txt` in every live run |
 | Native vs Omni on top vs Omni alone, paired on one machine, real Kubernetes | `results/live/LIVE_PAIRED.md` |
 | The full wiring manual | `docs/OPERATOR_MANUAL.md` |
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 30. Before You Start, and the Eight Levels
 
@@ -2647,6 +2765,13 @@ simulation harnesses; every decision they take goes through the twinned laws. Th
 Keep this manual with the code. When Omni-Compass changes, this manual, the C++ twin and the seal change in the same
 commit.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 33. Running the GPU Benchmark
 
 
@@ -2853,6 +2978,13 @@ It ends with one verdict line, one of:
 
 Whatever it says is the answer, and it is the first number in this project that Omni-Compass's own code did not
 compute.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 # Part Six. Operating It
 
@@ -3233,6 +3365,13 @@ Add `--strict-replicas`:
 | `convey: <machine> idle CPU to its k serving pod(s), limit c` | that machine's idle CPU now reaches the work on it |
 | `Ω: machine_fill below the floor, returning` | the machines are underfilled and my move is bringing them back into the band |
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 # Part Seven. Proving It
 
 *Paired runs, receipts, rules written before the runs, and every result to date with its evidence class.*
@@ -3360,6 +3499,13 @@ resource (machine-hours, CPU core-hours, joules). The same work then needs *1 / 
 *G / (1 + G)*: a third more work is a quarter off the bill. The full explanation, the three rules for reading a receipt
 and where every number stands today are in the manual, section 3 (`docs/OMNI_COMPASS_MANUAL.md`).
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 38. The Dossier: Every Result in One Place
 
 
@@ -3484,6 +3630,12 @@ Every raw result folder carries its `SHA256SUMS.txt`; the rules for each run wer
 - A net CPU saving on Kubernetes once the controller's own cost is counted on a small runner.
 - 1,000 runs at 1,000× (needs a larger machine).
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 39. Paired Runs and Receipts on Your Own System
 
@@ -3593,6 +3745,13 @@ A decision component is retired only after its loop has passed Phase 2 and a one
 
 #### Reporting
 All pilot metrics, including failures, are reported in the same format as the benchmark results.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 ### Omni-Compass shadow pilot kit
 
 
@@ -3613,6 +3772,13 @@ decides what it would do, using the same closure law that was benchmarked. It ne
 Guarded control follows `docs/PILOT_PROTOCOL.md`: one loop at a time, the kill switch tested at each handover.
 
 The kit is exercised end to end on kind by the `live-shadow` workflow.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 43. The GPU Bench
 
@@ -3733,6 +3899,13 @@ undone. The card's own energy counter (NVML) and its ECC and retired-page counte
 `python tests/test_gpu_bench.py` runs the whole script against a stand-in `nvidia-smi` (`tests/fake_gpu/`), with the
 workload's `--sim` mode. The stand-in has no real power physics, so its numbers mean nothing; it proves the script,
 the controls and the validity checks work.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 44. The GPU Preregistration
 
@@ -4147,6 +4320,13 @@ budget whatever happens. At the budget the master switch is pulled (every govern
 still measuring stops and is reported as incomplete (an arm cut short is never counted: its repetition has no complete
 pair), the stages not started are skipped and named, and the finished ones are packed.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 45. The Realms Preregistration
 
 
@@ -4454,6 +4634,13 @@ as many processes as the machine's cores and memory allow, the same seeds (7000 
 once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/receipts/round6-1000x.md` in place of the
 1-run and 10-run receipt it contains.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 46. The Bowl Law on Real Kubernetes: Preregistration
 
 
@@ -4670,6 +4857,13 @@ failed, every lower step holding too, the first 30 s of each step left to settle
 Reported: each arm's mean capacity in requests a second, its change against native and the 95% interval of the paired
 difference over 10 repetitions; every usual gauge beside it. Labelled by the one rule: nothing more than 2% worse.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 47. The Evidence Ledger
 
 
@@ -4778,6 +4972,13 @@ Nothing here is deleted when a later result looks better.
 | S | Right-sizing against VPA: p95 +15%, memory (OOM) kills +531%. | `docs/BENCHMARK_REPORT.md` |
 | — | Reported in the external master-build report (not reproducible from this repository): on fresh scenarios Karpenter+VPA sometimes used less modelled energy than Omni, while Omni had lower churn and fewer request-induced evictions. Kept here so it is not lost; to be re-run here before it is cited. | external |
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 48. The Claims Register
 
 
@@ -4816,6 +5017,13 @@ Every claim, its evidence status and the command that reproduces it. Simulation 
 | C20 | pilot/score.py scores a user's own captures (node-hours and energy per used core-hour, utilisation, pending-pod and HPA-shortfall minutes, bootstrap intervals); tested to detect a real gain, report no difference for identical clusters and detect a service regression. | Tested tool; no pilot result | `python tests/test_pilot_score.py` |
 | C13 | Decision components (autoscalers, power agents, paging, Terraform as controller) consume about 0.02% of fleet CPU; idle capacity is 92% of fleet CPU at 8% utilization. | Modeled from published figures and stated assumptions | `python benchmarks/fleet_overhead.py` |
 | C14 | Behaviour on production systems. | Not established; requires the pilot protocol | `docs/PILOT_PROTOCOL.md` |
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 49. The Benchmark Report
 
@@ -5328,6 +5536,13 @@ python tools/full_report.py ... && python pilot/bench_pdf.py docs/BENCHMARK_REPO
 - **Paired bootstrap CI**: resampling the per-scenario differences to get a 95% interval for the mean difference.
 - **Pre-registration**: freezing code and parameters, with hashes, before running the test data.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 50. The Referee Report
 
 
@@ -5767,6 +5982,13 @@ GitHub Actions workflow 'benchmark' (commit message tag [bench]): live A vs B on
 python tools/abc_report.py && python pilot/bench_pdf.py docs/OMNICOMPASS_ABC_REPORT.md docs/OMNICOMPASS_ABC_REPORT.pdf
 ```
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 51. Comparison with Existing Controllers
 
 
@@ -5849,6 +6071,13 @@ the customer's own system, with the same paired method.
 - NVIDIA DCGM and Dynamic Boost; AMD SmartShift; Intel GEOPM: the vendors' documentation.
 
 Where a row above is wrong or out of date, correct it from the maker's own publication.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 52. The State of Play
 
@@ -5987,6 +6216,13 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | `results/live/` | every live run, including failed and withdrawn ones |
 | `docs/HISTORY.md` | earlier states of play |
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 # Part Eight. Value, License and History
 
 *What a receipt is worth, how the license is priced against it, how the code is sealed, and how Omni-Compass came to be.*
@@ -6112,6 +6348,13 @@ The value a customer sees comes in three forms, each on its own line of the rece
 
 The babysitting tax - the people and tools kept on the clock to set caps, answer pages and turn knobs back after a run
 or a crash - is the cost Omni-Compass removes by holding the knobs and returning them itself.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 55. The Buyer Edition
 
@@ -6359,6 +6602,13 @@ python tools/protocol_bench.py 100
 live: push a commit whose message contains [reps], [levers] or [shadow]
 ```
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 56. Due Diligence
 
 
@@ -6391,6 +6641,13 @@ Answers reference the Claims Register (C-numbers) and the Technical Manual.
 ### Referees
 **Was it tuned on the test data?** No. Law, shield and baselines were frozen and fingerprinted before the held-out seeds 346410161 and 360555127 (results/PREREGISTRATION.json).
 **Where does it fail?** Backlog violations against current autoscaling (C11); the engine-dynamics ablation (Manual Chapter 8); open obligations (Manual Chapter 10).
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 57. License and Commercial Terms
 
@@ -6447,6 +6704,13 @@ time; a signed Enterprise License governs its own term (`DISCLOSURES.md`, sectio
 
 **Who do I contact?** The Omni-Compass LLC, www.omni-compass.com.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 59. Third-Party Notices
 
 
@@ -6467,6 +6731,13 @@ Omni-Compass Evaluation License changes those terms. Installed versions are thos
 
 Kubernetes, kind, `kubectl`, the NVIDIA driver and `nvidia-smi` are not distributed with Omni-Compass; it calls them
 where an operator has installed them. Their names are the property of their owners (`DISCLOSURES.md`, section 1).
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 60. Repository Standards
 
@@ -6499,6 +6770,13 @@ The files the leading repositories carry, the open ones such as Kubernetes and t
 | A one-file archive of the repository | `release/The-Omni-Compass.zip` |
 
 Files present at the commit this page describes; `python3 verify.py` checks the ones the results depend on.
+
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## 61. Python, C++ and the Seal
 
@@ -6718,6 +6996,13 @@ are sourced.
 4. **Aim the chip at about 5% more finished work on the same bill**, cap unchanged and temperature no worse, or at
    fewer joules for the same work. The buyer chooses, and the receipt prints which.
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 ## 63. History
 
 
@@ -6826,6 +7111,13 @@ locally at this commit.
 | `results/live/` | every live run, including the failed and withdrawn ones |
 | `docs/OMNICOMPASS_BUYER_EDITION.md` | the buyer-facing report |
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
+
 # Back Matter
 
 
@@ -6913,12 +7205,36 @@ locally at this commit.
         p >= 0.95  =>  full up force; down side held
         knob <- clip(knob + g_side F span, cover)
 
-    The GPU governor (two wires, omni_controller/gpu_bowl.py):
+    The GPU governor (two wires, omni_controller/gpu_bowl.py; one law, amendments 8 to 10):
         p = (mean response of the last 5 s - S) / (SLO - S),  S = SLO / 10;  p95 >= SLO, a failure, blind  =>  fail up
-        utilization >= 0.95  =>  race: ceiling = top clock, lid = start limit
-        ceiling <- clip(ceiling + round(g_side F f_top / 15 MHz) 15 MHz, floor x f_busy_own, f_top)
-        lid = clip(1.10 P_busy_own, envelope floor, start limit)
-        service: g_down 0.0125, center 0.4, floor 1.03;  batch: g_down 0.015, center 0.5, floor 1.00;  g_up 0.10
+        fail up / race (utilization >= 0.95)  =>  ceiling = top clock, lid = start limit (the card's own settings)
+        steady under the limit (saturated and drawing >= 0.97 of the limit)  =>  ceiling = the card's own busy clock,
+            lid = start limit (the same watts, no knock-backs)
+        otherwise:
+            ceiling <- clip(ceiling + round(g_side F f_top / 15 MHz) 15 MHz, c_floor, f_top)
+            c_floor = max(f_busy_own x floor, f_top - k* 15 MHz)       (never under the card's own busy clock,
+                                                                         never past the verdict's deepest step k*)
+            lid = clip(ceil(1.10 P_busy_own), envelope floor, start limit)
+        g_up 0.10, g_down 0.0125, center 0.4, floor 1.00
+
+    The verdict (omnicompass/verdict.py; every slow knob, the GPU ceiling and the Kubernetes machine count):
+        reference r = the median cost per request at the deepest allowed step, measured fresh, n >= 30 requests
+        trial t     = the median cost at one step past it, n >= 30 requests, under the same traffic
+        allow the step  iff  t <= r (1 + a)  and  t <= c_native (1 + a),   a = 0.02
+        a refused step is not tried again for R decisions (GPU R = 900; Kubernetes 120); the knob never goes past the
+        deepest allowed step, so steps cannot add up beyond the allowance
+
+    Kubernetes, the bowl on the HPA target (omni_controller/controller.py; sets 30 and 31):
+        target x in [0.6 x_op, x_op] (times the conveyed gain); the up force lowers x (more pods)
+        p >= 0.95 from load (line breached, every sense live, nothing pending)  =>  x = 0.6 x_op at once
+        p >= 0.95 from a blind sense or pods waiting for a lost machine           =>  x = x_op (native's own)
+        fault over (p < center, line clean, nothing pending)                      =>  x = x_op at once, never held
+        machines: one more at once past the wall; one back only when the verdict and the release gate agree
+        g_up 0.10, g_down 0.02, release force < -0.2
+
+    The productivity arithmetic (every receipt; manual section 3.4):
+        work W equal in both arms;  G = C_native / C_omni - 1;  the same work needs 1/(1 + G) of the resources;
+        saving S = G / (1 + G):  G = 1/3  <=>  S = 1/4
 
 Parameter ranges, defaults and the proof of convergence: `omnicompass/core.py`, `docs/TRACKING_THEOREM.md`,
 `docs/CANONICAL_ENGINE.md`.
@@ -8020,6 +8336,12 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 430 | sla escalation | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 431 | compensation action | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 
+---
+
+*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
+Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+`NOTICE` at the root of this repository.*
 
 ## Appendix H. Source of the Engine
 
