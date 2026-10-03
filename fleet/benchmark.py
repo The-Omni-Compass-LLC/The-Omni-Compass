@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
 """Fleet benchmark: held-out scenarios for every vessel and arm, paired comparisons against HPA+CA and Karpenter-lite.
 
 python -m fleet.benchmark --seeds 30 --seed-base 500000 --out results/fleet

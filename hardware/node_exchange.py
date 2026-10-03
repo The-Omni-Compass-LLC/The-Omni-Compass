@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
 """CPU and GPU on one conserved power budget: the conveyance law (omnicompass/conveyance.py) with CPU organs beside
 GPU organs, so watts a CPU holds and does not need flow to the GPUs that need them. THEORETICAL SIMULATION on the
 device physics of hardware/plant.py (GPU gamma fitted to MLPerf v4.0 DGX-H100 MaxQ vs MaxP; CPU first-order DVFS).

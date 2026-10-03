@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+// Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+// Omni-Compass Enterprise License. See LICENSE.
 // C++ twin of the GPU governor's rules (omni_controller/gpu_governor.py: shield_limit, busy_gate, lock_decide,
 // baseline_at, window_stats). Every line here has its Python line.
 #include "omnicompass/gpu_rules.hpp"

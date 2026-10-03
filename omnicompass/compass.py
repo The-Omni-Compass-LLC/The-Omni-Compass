@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
 """The Omni-Compass, computed.
 
 I read my own state on the compass every decision and say where I am, in the compass's own terms.

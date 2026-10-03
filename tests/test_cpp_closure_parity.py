@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
 """C++ closure law (cpp/src/closure.cpp) vs Python closure law (omnicompass/closure.py ClosureNodes) on input sequences
 recorded from the fleet plant (every workload type, the frozen settings of tuning/CLOSURE_FINAL_DEV.json, several
 scenarios): identical machine targets and warm-reserve sizes at every tick.

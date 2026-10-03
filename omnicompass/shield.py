@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
 """Safety shield: every governor action set is checked against declared invariants before execution.
 
 Invariants (each enforced by construction; every intervention is counted):

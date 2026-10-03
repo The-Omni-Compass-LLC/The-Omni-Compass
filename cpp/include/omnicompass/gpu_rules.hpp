@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+// Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+// Omni-Compass Enterprise License. See LICENSE.
 // GPU governor decision rules (C++ twin of the pure functions in omni_controller/gpu_governor.py): the shield's
 // limit, the busy gate, the speed lock's step, the baseline lookup and the response-time window. The parts that talk to
 // the device (nvidia-smi) stay in the Python controller; every decision it takes goes through these rules.

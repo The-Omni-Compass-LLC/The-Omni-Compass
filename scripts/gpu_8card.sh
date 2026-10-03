@@ -54,6 +54,27 @@ mkdir -p results/gpu
 OUT="results/gpu/8card-$STAMP"; mkdir -p "$OUT"
 echo "$CARDS" > "$OUT/cards.txt"
 
+# The time budget: the run can never go past MAX_HOURS (default by design: POOLED 10.5, FAST 4, the whole design 26).
+# At the budget the master switch is pulled (every governor hands its card back to the card's own settings), every
+# stage still measuring is stopped, the stages not yet started are skipped, and what finished is packed as usual.
+# Lambda bills until the instance is terminated: terminate it when the file to send back is printed.
+if [ -n "${POOLED:-}" ]; then DEF_H=10.5; elif [ -n "${FAST:-}" ]; then DEF_H=4; else DEF_H=26; fi
+MAX_HOURS="${MAX_HOURS:-$DEF_H}"
+T_END=$(( $(date +%s) + $(python3 -c "print(int(float('$MAX_HOURS') * 3600))") ))
+echo "== time budget: ${MAX_HOURS} hours; this run stops by $(date -u -d @"$T_END" +%H:%M) UTC whatever happens" | tee "$OUT/BUDGET.txt"
+( while [ "$(date +%s)" -lt "$T_END" ]; do sleep 30; [ -f "$OUT/FINISHED" ] && exit 0; done
+  echo "== TIME BUDGET REACHED ($MAX_HOURS h): handing every card back and stopping" | tee -a "$OUT/BUDGET.txt"
+  touch "$OUT/TIME_UP"
+  python3 tools/omni_switch.py off --reason "time budget reached" --wait 60 >> "$OUT/BUDGET.txt" 2>&1
+  for pat in "scripts/gpu_rented_run.sh" "scripts/gpu_paired.sh" "tools/gpu_workload.py" "tools/run_hil.py" \
+             "scripts/gpu_vllm.sh" "tools/llm_workload.py" "vllm.entrypoints" "scripts/gpu_fault_drill.sh" \
+             "query-gpu=timestamp"; do
+    pkill -f "$pat" 2>/dev/null || true
+  done
+  for g in "${C[@]}"; do $SMI -i "$g" -rgc >/dev/null 2>&1 || true; done
+) &
+budget_pid=$!
+timeup() { [ -f "$OUT/TIME_UP" ]; }
 pids=()
 for i in "${!C[@]}"; do
   g="${C[$i]}"
@@ -70,12 +91,12 @@ for i in "${!pids[@]}"; do
 done
 echo "== every card finished"
 
-if [ -z "${SKIP_DRILL:-}" ]; then
+if [ -z "${SKIP_DRILL:-}" ] && ! timeup; then
   echo "== the GPU fault drill on card ${C[0]}, every other card idle"
   GPU="${C[0]}" OUT="results/gpu/drill-$STAMP-8card" bash scripts/gpu_fault_drill.sh || rc=1
 fi
 
-if [ -z "${SKIP_HIL:-}" ]; then
+if [ -z "${SKIP_HIL:-}" ] && ! timeup; then
   # the whole stacks with a real card inside (tools/run_hil.py), every organism at 1x, 10x, 100x and 1,000x copies,
   # native and Omni, the full repetitions (3, 3, 2, 1 by size): each organism on its own card, all at once, so the
   # stage that takes about 25 hours on one card takes the time of its longest organism
@@ -98,7 +119,7 @@ if [ -z "${SKIP_HIL:-}" ]; then
   done
 fi
 
-if [ -z "${SKIP_LLM:-}" ]; then
+if [ -z "${SKIP_LLM:-}" ] && ! timeup; then
   echo "== one model served across all ${#C[@]} cards (vLLM tensor parallel), one Omni-Compass governor per card"
   ENVELOPE="results/gpu/envelope-$STAMP-card${C[0]}.json" GPU="$CARDS" OUT="results/gpu/run-$STAMP-8card-llm" \
     bash scripts/gpu_vllm.sh || rc=1
@@ -122,6 +143,15 @@ for kind in "" -decode -cap -cap-full; do
     "$P/GPU_REPS.json" 2>/dev/null || echo "no pooled table (see $P/table.log)"
 done
 
+touch "$OUT/FINISHED"; kill "$budget_pid" 2>/dev/null || true
+if timeup; then
+  python3 tools/omni_switch.py on >/dev/null 2>&1 || true
+  for g in "${C[@]}"; do
+    d=$($SMI -i "$g" --query-gpu=power.default_limit --format=csv,noheader,nounits | tr -d ' ' | cut -d. -f1)
+    [ -n "${SIM:-}" ] || $SMI -i "$g" -pl "$d" >/dev/null 2>&1 || true
+  done
+  echo "== stopped at the time budget: the stages that finished are in the file below; the rest did not run" | tee -a "$OUT/BUDGET.txt"
+fi
 PACK=("$OUT")
 for d in results/gpu/*-"$STAMP"-card* results/gpu/drill-"$STAMP"-8card results/gpu/run-"$STAMP"-8card-llm results/hil/run-"$STAMP"-8card; do [ -e "$d" ] && PACK+=("$d"); done
 tar czf "results/gpu/omni-8card-$STAMP.tar.gz" "${PACK[@]}"

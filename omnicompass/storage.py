@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
 """The engine's composite storage: the ledger that closes the circle.
 
 Ported exactly from the engine source (composite_practical_lyapunov_value and its bath matrix, weights and S rest point,

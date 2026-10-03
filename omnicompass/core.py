@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
 """Omni-Compass core: six-state ODE, RK4 integrator, bounded feedforward-plus-proportional controller.
 
 State x = (E, U, I_U, S, B, B_dot).

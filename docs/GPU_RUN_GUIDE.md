@@ -147,7 +147,10 @@ Each card: wire check, envelope, smoke, the compute confirmation, the AI token g
 power cap underneath (about 15 to 16 hours, all cards together). Then the fault drill once on card 0, with every other
 card idle. Then one pooled table per workload (every repetition of every card, each paired within its own card: 80
 repetitions per workload on 8 cards) and each card's own table. `SKIP_DECODE=1 SKIP_CAP=1` runs the compute
-confirmation alone, about 6.5 hours. **`sudo POOLED=1 nohup bash scripts/gpu_8card.sh &` runs every stage with the repetitions pooled across the cards
+confirmation alone, about 6.5 hours. **Every 8-GPU run has a hard time budget** (`MAX_HOURS`; by default 10.5 hours with `POOLED=1`, 4 with `FAST=1`, 26
+for the whole design): at the budget the master switch hands every card back, the stages still running stop, and what
+finished is packed and printed as the file to send back. Lambda bills until the instance is terminated, so terminate it
+when that line appears. **`sudo POOLED=1 nohup bash scripts/gpu_8card.sh &` runs every stage with the repetitions pooled across the cards
 (3 per card per confirmation, 24 per test on 8 cards; 2 per power cap load; 1 per organism size), about 9 to 10 hours.**
 `sudo FAST=1 nohup bash scripts/gpu_8card.sh > run8.log 2>&1 &` is a short
 look, about 3.5 hours: 3 repetitions per card (24 on 8 cards), then one model across every card; it leaves AI token

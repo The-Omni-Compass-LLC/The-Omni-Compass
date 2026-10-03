@@ -405,3 +405,8 @@ the repetitions pooled across the cards. Each card runs one smoke round; 3 repet
 rule, each card's own table beside it); 2 repetitions of each power cap load (16 per load); the six organisms with the
 card inside, one repetition per size, each organism on its own card; then one model across every card, 3 repetitions;
 the fault drill once. Arm durations are those of the whole design.
+
+**The time budget** (`MAX_HOURS`, written before any trial on several cards): a run on several cards ends by its
+budget whatever happens. At the budget the master switch is pulled (every governor hands its card back), every stage
+still measuring stops and is reported as incomplete (an arm cut short is never counted: its repetition has no complete
+pair), the stages not started are skipped and named, and the finished ones are packed.

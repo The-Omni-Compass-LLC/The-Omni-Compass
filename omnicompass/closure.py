@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
 """Closure governor: machines governed by the Omni-Compass closure law, preemptive coherence and the dual-bath tracker.
 
 Sources (the owner's manuscript): Section 5 (5c preemptive coherence: forward projection tau_fwd = Phi_dt(x) and

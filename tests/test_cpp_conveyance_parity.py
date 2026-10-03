@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
 """C++ conveyance law (cpp/src/conveyance.cpp) vs Python conveyance law (omnicompass/conveyance.py Conveyance) on random
 systems (2 to 12 organs, random budgets, needs, floors and ceilings, needs that rise and fall over 40 steps) and on the
 CPU+GPU organ layout of hardware/node_exchange.py: the same allocations at every step, to 1e-9 of the budget.
