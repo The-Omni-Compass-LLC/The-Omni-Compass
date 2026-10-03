@@ -214,6 +214,19 @@ failed, every lower step holding too, the first 30 s of each step left to settle
 Reported: each arm's mean capacity in requests a second, its change against native and the 95% interval of the paired
 difference over 10 repetitions; every usual gauge beside it. Labelled by the one rule: nothing more than 2% worse.
 
+
+## The fairness test (written before its run)
+
+The question a buyer with many tenants asks: when one application surges, does Omni-Compass on top protect its
+neighbour, or starve it? Each repetition runs native, native with Omni-Compass on top (the allocation law) and with the
+bowl law and the verdict, in rotated order, on the same six workers, with two applications on them (`TWO_APP=1`,
+`deploy/kind/noisy.yaml`): php-apache under its usual fixed-rate load, and a noisy neighbour, the same image and the
+same HPA rule, whose own fixed-rate load surges in steps (0, 0, 6, 0, 6, 0 load generators of 6 requests a second, the
+same moments in every arm). Each application's response time is probed through its own Service. Omni-Compass governs
+both HPAs (`deploy/kind/rbac-omni-noisy.yaml`: the second HPA and nothing else more). Reported: every usual gauge for
+php-apache, and the neighbour's p95, p99, time over the line and failed requests, each paired against native over 10
+repetitions with its 95% interval. The label is the one rule, applied to both applications: nothing more than 2% worse
+for either.
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

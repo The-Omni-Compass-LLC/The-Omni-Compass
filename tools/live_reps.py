@@ -17,8 +17,11 @@ KEYS = ["worker nodes in service, mean", "node-hours", "energy, parked workers s
         "CPU used (cores), mean", "Omni's own CPU (cores), mean", "CPU used with Omni's own (cores), mean",
         "energy per core-hour (Wh)", "HPA replicas, mean",
         "pods started", "pod start wait, total (s)", "pod start wait, mean (s)",
-        "machines billed, machine-hours", "compute bill at list price ($)"]
+        "machines billed, machine-hours", "compute bill at list price ($)",
+        "second app: response time (ms), 95th percentile", "second app: response time (ms), 99th percentile",
+        "second app: time over the response line (% of samples)", "second app: failed requests (%)"]
 BILL = {"machines billed, machine-hours", "compute bill at list price ($)"}   # a real cloud only (PLATFORM=aks)
+SECOND = {k for k in KEYS if k.startswith("second app: ")}                     # the fairness test only (TWO_APP=1)
 
 
 LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked workers still on at idle power (Wh, declared model)",
@@ -29,6 +32,15 @@ NEUTRAL = {"CPU used (cores), mean", "utilisation (used / allocatable)", "Omni's
 NOTE = ["**Energy on kind is a declared model, not a meter.** Every worker stays powered and Ready in every arm; the first",
         "energy row counts a parked worker at its full idle power, which is what kind does. The second counts it at the",
         "declared standby power, which needs a node autoscaler that really removes the machine; this run has none.", ""]
+
+
+def second_app(d):
+    """The fairness test (TWO_APP=1): the noisy neighbour's own response time, from its own probe."""
+    if not (d / "latency_noisy.csv").exists():
+        return {}
+    v = latency(str(d / "latency_noisy.csv"))
+    return {f"second app: {k}": v[k] for k in ("response time (ms), 95th percentile", "response time (ms), 99th percentile",
+                                               "time over the response line (% of samples)", "failed requests (%)") if k in v}
 
 
 def bill(d):
@@ -67,7 +79,7 @@ def arm_gauges(d):
         own = float("nan")
     g["Omni's own CPU (cores), mean"] = own
     g["CPU used with Omni's own (cores), mean"] = g.get("CPU used (cores), mean", float("nan")) + own
-    g.update(bill(d))
+    g.update(bill(d)); g.update(second_app(d))
     return g
 
 
@@ -218,7 +230,8 @@ def main(root):
     for a, r in runs.items():
         out["means"][a] = {k: float(np.nanmean([g.get(k, np.nan) for g in r.values()])) for k in KEYS}
     cloud = any(not math.isnan(m.get("machines billed, machine-hours", float("nan"))) for m in out["means"].values())
-    keys = [k for k in KEYS if k not in BILL or cloud]
+    two = any(not math.isnan(m.get("second app: failed requests (%)", float("nan"))) for m in out["means"].values())
+    keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two)]
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native vs Omni watching only vs Omni on top vs Omni alone)", ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
@@ -249,7 +262,7 @@ def main(root):
             nb = float(np.nanmean([runs["native"][r].get(k, np.nan) for r in reps])); ob = nb + float(d.mean())
             half = T95.get(len(d) - 1, 1.96) * (d.std(ddof=1) / math.sqrt(len(d))) if len(d) > 1 else float("nan")
             sig = len(d) > 1 and (d.mean() - half > 0 or d.mean() + half < 0)
-            better = (d.mean() < 0) == (k in LOWER_BETTER or k in BILL)
+            better = (d.mean() < 0) == (k in LOWER_BETTER or k in BILL or k in SECOND)
             ch = (ob - nb) / abs(nb) * 100 if abs(nb) > 1e-12 else None
             out["paired"][a][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
             ch_s = f"{ch:+.1f}%" if ch is not None else f"{ob - nb:+.3g} (native is 0)"

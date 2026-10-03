@@ -21,7 +21,8 @@ system alone, with the same work in both.
 | 5 | [`DISCLOSURES.md`](DISCLOSURES.md) | the one rule (nothing more than 2% worse, only where energy or the bill is saved), the limits, what is modelled and what is metered |
 | 6 | [`docs/K8S_BOWL_PREREGISTRATION.md`](docs/K8S_BOWL_PREREGISTRATION.md), [`docs/GPU_PREREGISTRATION.md`](docs/GPU_PREREGISTRATION.md), [`docs/REALMS_PREREGISTRATION.md`](docs/REALMS_PREREGISTRATION.md) | every test written down before it ran, every change and why |
 | 7 | [`docs/book/THEORY.md`](docs/book/THEORY.md), [`docs/book/DECLARATION.md`](docs/book/DECLARATION.md) | the Unified Circle Principle, the four-piece engine, the physics |
-| 8 | [`docs/specs/`](docs/specs/) | the contracts: causal authority, GPU physical evidence, RAPL, the universal muscle SDK, the proof map |
+| 8 | [`docs/REFEREE_CHECKLIST.md`](docs/REFEREE_CHECKLIST.md) | every standard a reviewer applies, where it is met, and what is still open |
+| 9 | [`docs/specs/`](docs/specs/) | the contracts: causal authority, GPU physical evidence, RAPL, the universal muscle SDK, the proof map |
 
 ## The receipts
 

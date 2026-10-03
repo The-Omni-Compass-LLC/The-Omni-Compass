@@ -84,6 +84,12 @@ if [ -n "$TUNE" ]; then
 fi
 kubectl apply -f deploy/kind/bench-serving.yaml
 kubectl rollout status deployment/php-apache --timeout=300s
+if [ -n "${TWO_APP:-}" ]; then
+  # the fairness test: a noisy neighbour on the same workers, its own HPA, its own surging load (deploy/kind/noisy.yaml)
+  kubectl apply -f deploy/kind/noisy.yaml
+  kubectl rollout status deployment/php-noisy --timeout=300s
+  echo "two_app=1 (php-apache and the noisy neighbour php-noisy)" | tee -a "$OUT_DIR/preflight.txt"
+fi
 if [ "$PLATFORM" = aks ]; then
   # the runner is outside Azure's network: the probe reaches the Service through Azure's load balancer, still
   # load-balanced across every ready endpoint, as a client outside the cluster sees it
@@ -108,11 +114,13 @@ echo "loadgen=$LOADGEN" | tee -a "$OUT_DIR/preflight.txt"
 kubectl rollout status deployment/load-generator --timeout=300s
 for i in $(seq 1 30); do kubectl top nodes >/dev/null 2>&1 && break; sleep 10; done
 hpa_count=$(kubectl get hpa -A -o json | jq '.items | length')
-[ "$hpa_count" = "1" ] || { echo "expected exactly one HPA, found $hpa_count"; exit 1; }
+want_hpa=1; [ -z "${TWO_APP:-}" ] || want_hpa=2
+[ "$hpa_count" = "$want_hpa" ] || { echo "expected exactly $want_hpa HPA, found $hpa_count"; exit 1; }
 foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") | not)] | length')
 [ "$foreign" = "0" ] || { echo "cluster contains non-harness pods"; exit 1; }
 if [ -z "$NATIVE" ]; then
   kubectl apply -f deploy/kind/rbac-omni.yaml
+  [ -z "${TWO_APP:-}" ] || kubectl apply -f deploy/kind/rbac-omni-noisy.yaml
   SA="system:serviceaccount:omni-compass:omni-compass"
   can() { kubectl auth can-i "$@" --as="$SA"; }
   {
@@ -156,6 +164,18 @@ load_pid=$!
 # drain that moves a pod is seen exactly as a client sees it: kube-proxy sends the request to another ready endpoint.
 INTERVAL=5 DURATION="$DURATION" python scripts/latency_probe.py "$PROBE_URL" "$OUT_DIR/latency.csv" &
 probe_pid=$!
+probe2_pid=""
+if [ -n "${TWO_APP:-}" ]; then
+  # the noisy neighbour's own response time, and its load surging in steps (the same steps in every arm)
+  INTERVAL=5 DURATION="$DURATION" python scripts/latency_probe.py "${PROBE_URL%:30080/}:30081/" "$OUT_DIR/latency_noisy.csv" &
+  probe2_pid=$!
+  read -r -a nsteps <<< "${NOISY_STEPS:-0 0 6 0 6 0}"
+  ( for r in "${nsteps[@]}"; do
+      echo "$(date -u +%H:%M:%S) load-noisy replicas -> $r"
+      kubectl scale deployment/load-noisy --replicas="$r" >/dev/null
+      sleep $(( DURATION / ${#nsteps[@]} ))
+    done ) > "$OUT_DIR/noisy_schedule.log" 2>&1 &
+fi
 fault_pid=""
 if [ -n "${FAULTS:-}" ]; then
   # the fault test: the same faults at the same moments in every arm (scripts/kind_faults.sh)
@@ -193,6 +213,7 @@ ACTIVE_ONLY=1 INTERVAL=15 DURATION="$DURATION" POWER_CMD="bash scripts/kind_powe
   bash fleet/capture/kube_capture.sh
 wait "$load_pid" || true
 wait "$probe_pid" || true
+[ -n "$probe2_pid" ] && { wait "$probe2_pid" || true; }
 [ -n "$fault_pid" ] && { wait "$fault_pid" || true; }
 date -u +%s > "$OUT_DIR/window_end.txt"
 [ -n "$meter_pid" ] && { kill "$meter_pid" 2>/dev/null || true; }
@@ -233,6 +254,10 @@ elif [ -z "$NATIVE" ]; then
   { echo "restored target: $restored"; echo "workers in service: $back of $WORKERS"; } | tee "$OUT_DIR/kill_switch.txt"
   leftover=$(kubectl get hpa php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))'; kubectl get deployment php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')
   echo "Omni records left after kill: ${leftover:-none}" | tee -a "$OUT_DIR/kill_switch.txt"
+  if [ -n "${TWO_APP:-}" ]; then   # the fairness test: the neighbour's HPA handed back too
+    n_restored=$(kubectl get hpa php-noisy -o jsonpath='{.spec.metrics[0].resource.target.averageUtilization}')
+    echo "noisy neighbour's restored target: $n_restored" | tee -a "$OUT_DIR/kill_switch.txt"; test "$n_restored" = "50"
+  fi
   exist=$(kubectl get nodes -l "$WORKER_SEL" --no-headers | wc -l); [ "$PLATFORM" = aks ] || exist="$WORKERS"
   test "$restored" = "50" && test "$back" = "$exist" && test "$cpu_limit" = "500m" && test -z "$leftover"
 fi

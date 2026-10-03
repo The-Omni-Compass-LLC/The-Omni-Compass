@@ -80,6 +80,12 @@ def main():
     tab, co = LR.capacity_table(cdir, ["native", "bowl"])
     assert co["native"]["capacity_rps"] == 18 and co["bowl"]["capacity_rps"] == 36 and abs(co["bowl"]["change_pct"] - 100) < 1e-6, co
     assert LR.capacity(f / "bench-native-1", 500)[0] is None        # a run without rising load is not a capacity run
+    # the fairness test: the noisy neighbour's own gauges, from its own probe
+    nd = Path(tempfile.mkdtemp()) / "bench-bowl-1"; nd.mkdir()
+    (nd / "latency_noisy.csv").write_text("elapsed_seconds,latency_ms,ok\n" + "".join(f"{i},{100 + i},1\n" for i in range(100)) + "100,0,0\n")
+    sa = LR.second_app(nd)
+    assert abs(sa["second app: failed requests (%)"] - 100 / 101) < 1e-9 and sa["second app: response time (ms), 95th percentile"] > 190, sa
+    assert LR.second_app(f / "bench-native-1") == {}
     print("PASS cost to match: every arm listed, the cheapest native setting that reaches Omni-Compass's p95 and its extra "
           "pods, CPU and machines, and a plain statement when none reaches it; fault recovery times paired against native")
 
