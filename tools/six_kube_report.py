@@ -46,6 +46,16 @@ LOWER = set(LOWER_BETTER) | {"organism energy (J)", "organism time over the line
                              "machines billed, machine-hours", "compute bill at list price ($)"}
 
 
+def scale_of(key):
+    return int(key.split("@")[1]) if "@" in key else 1
+
+
+def name_of(key):
+    """An organism's name, with its size when it runs as more than one copy on one clock."""
+    o = key.split("@")[0]
+    return NAMES[o] + (f", {scale_of(key):,} copies" if scale_of(key) > 1 else "")
+
+
 def organism_gauges(rec):
     pl = rec["plants"]
     work = sum(p["work"] for p in pl)
@@ -66,7 +76,8 @@ def collect(root):
         g = arm_gauges(d)
         g.update(organism_gauges(rec))
         g["_restore_ok"] = rec.get("sim_restore_ok", True)
-        runs.setdefault(rec["organism"], {}).setdefault(arm, {})[rep] = g
+        sc = int(rec.get("scale", 1))
+        runs.setdefault(rec["organism"] if sc == 1 else f"{rec['organism']}@{sc}", {}).setdefault(arm, {})[rep] = g
     return runs
 
 
@@ -93,7 +104,7 @@ def paired(runs_o, a, k):
 def main(root):
     root = Path(root)
     runs = collect(root)
-    orgs = [o for o in ORDER if o in runs]
+    orgs = sorted(runs, key=lambda o: (scale_of(o), ORDER.index(o.split("@")[0])))
     keys = [k for k in CLUSTER + ORG if any(not math.isnan(g.get(k, math.nan)) for o in orgs for arms in runs[o].values()
                                              for g in arms.values())]
     out = {"organisms": {}}
@@ -112,7 +123,7 @@ def main(root):
     for o in orgs:
         arm = next((a for a in OMNI if a in runs[o]), None)
         cols += [(o, "native")] + ([(o, arm)] if arm else [])
-    L.append("| Gauge | " + " | ".join(f"{NAMES[o]}: {'native' if a == 'native' else 'native + Omni'}" for o, a in cols) + " |")
+    L.append("| Gauge | " + " | ".join(f"{name_of(o)}: {'native' if a == 'native' else 'native + Omni'}" for o, a in cols) + " |")
     L.append("|---|" + "---:|" * len(cols))
     for k in keys:
         cells = []
@@ -125,7 +136,7 @@ def main(root):
     for o in orgs:
         arm = next((a for a in OMNI if a in runs[o]), None)
         if not arm or "native" not in runs[o]:
-            L += [f"### {NAMES[o]}", "", "No paired arms.", ""]
+            L += [f"### {name_of(o)}", "", "No paired arms.", ""]
             continue
         rows = {k: paired(runs[o], arm, k) for k in keys}
         rows = {k: v for k, v in rows.items() if v}
@@ -141,7 +152,7 @@ def main(root):
         if not restored:
             verdict += "; INVALID: a simulated knob was not handed back"
         out["organisms"][o] = {"arm": arm, "repetitions": n, "verdict": verdict, "rows": rows}
-        L += [f"### {NAMES[o]}: {verdict}", "", f"{n} paired repetitions.", "",
+        L += [f"### {name_of(o)}: {verdict}", "", f"{n} paired repetitions.", "",
               "| Gauge | Native | Native + Omni | Change | 95% interval of the difference | Reading |", "|---|---:|---:|---:|---:|---|"]
         for k, v in rows.items():
             ch = f"{v['pct']:+.1f}%" if not math.isnan(v["pct"]) else f"{v['diff']:+.3g}"
@@ -155,9 +166,9 @@ def main(root):
                 rd = ("better" if v["better"] else "WORSE") + ("" if sure else " (inside the noise)")
             L.append(f"| {LABEL.get(k, k)} | {v['native']:.4g} | {v['omni']:.4g} | {ch} | {ci} | {rd} |")
         L.append("")
-    missing = [o for o in ORDER if o not in runs]
+    missing = [o for o in ORDER if not any(k.split("@")[0] == o for k in runs)]
     if missing:
-        L += ["## Not in this run", ""] + [f"- {NAMES[o]}" for o in missing] + [""]
+        L += ["## Not in this run", ""] + [f"- {name_of(o)}" for o in missing] + [""]
     (root / "SIX_KUBE.md").write_text("\n".join(L) + "\n")
     (root / "SIX_KUBE.json").write_text(json.dumps(out, indent=1) + "\n")
     print("\n".join(L))

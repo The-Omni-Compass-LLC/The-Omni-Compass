@@ -25,7 +25,12 @@ Arms, the same organism, the same seed, the same demand:
 Writes organism.json (every plant's receipt, the steps, the replica trace, the cluster's watts as the organism saw
 them) and appends each replica change to load_schedule.log in the format scripts/kind_bench.sh writes.
 
-  python3 tools/run_kil.py --organism organism_656 --arm bowl --duration 960 --out DIR [--start-at EPOCH]
+Sizes (--scale): 1, 10, 100 or 1,000 copies of the organism governed together on one clock (as tools/run_hil.py), the
+one real cluster inside. A large organism is built before the window opens: this file writes organism.ready when it is
+built and starts on the epoch written to the go file (--go-file), so the cluster's window and the organism's clock open
+together however long the build takes.
+
+  python3 tools/run_kil.py --organism organism_656 --arm bowl --duration 960 --out DIR [--scale 10] [--go-file F]
 """
 from __future__ import annotations
 
@@ -85,6 +90,9 @@ def main(argv=None):
     ap.add_argument("--duration", type=float, required=True, help="the measured window (s); one step is duration / steps")
     ap.add_argument("--out", required=True)
     ap.add_argument("--start-at", type=float, default=0.0, help="epoch second the window opens (built before, run after)")
+    ap.add_argument("--go-file", default="", help="wait for this file (the window's start epoch inside) after organism.ready")
+    ap.add_argument("--scale", type=int, default=int(os.environ.get("ORGANISM_SCALE", 1)),
+                    help="copies of the organism on one clock (1, 10, 100, 1000)")
     ap.add_argument("--seed", type=int, default=int(os.environ.get("ORGANISM_SEED", SEED0)))
     ap.add_argument("--load-max", type=int, default=int(os.environ.get("LOAD_MAX", 6)),
                     help="load-generator replicas at the organism's peak demand (the operator's load, declared before the run)")
@@ -92,14 +100,20 @@ def main(argv=None):
     ap.add_argument("--dry", action="store_true", help="do not call kubectl (tests)")
     a = ap.parse_args(argv)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
-    rows = groups(1)[a.organism]
+    rows = groups(a.scale)[a.organism]
     body = Body(rows, a.seed)
     trace = demand_trace(body)
     reps = replicas_of(trace, a.load_max)
     omni = a.arm in OMNI_ARMS
     step_s = a.duration / ORGANISM_STEPS
     kill_at = int(KILL_AT * ORGANISM_STEPS)
-    if a.start_at:
+    (out / "organism.ready").write_text(f"{time.time():.0f}\n")
+    if a.go_file:
+        while not Path(a.go_file).exists():
+            time.sleep(1)
+        start = float(Path(a.go_file).read_text().split()[0])
+        time.sleep(max(0.0, start - time.time()))
+    elif a.start_at:
         time.sleep(max(0.0, a.start_at - time.time()))
     t0 = time.time()
     nominal_cluster = None
@@ -136,11 +150,14 @@ def main(argv=None):
         p.finalize()
         restore_ok = restore_ok and (not omni or p.override == {})
     rec = {"organism": a.organism, "name": NAMES[a.organism], "arm": a.arm, "omni": omni, "seed": a.seed,
-           "muscles": len(rows), "steps": ORGANISM_STEPS, "step_s": step_s, "load_max": a.load_max,
+           "muscles": len(rows), "scale": a.scale, "steps": ORGANISM_STEPS, "step_s": step_s, "load_max": a.load_max,
            "demand": trace, "replicas": reps, "cluster_w": seen_w, "sim_writes": writes, "sim_restore_ok": restore_ok,
            "plants": [dict(p.m) for p in body.plants], "wall_s": round(time.time() - t0, 1)}
     (out / "organism.json").write_text(json.dumps(rec) + "\n")
-    print(f"{NAMES[a.organism]}, arm {a.arm}: {len(rows)} muscles, {ORGANISM_STEPS} steps of {step_s:.2f} s, "
+    behind = max(0.0, time.time() - t0 - a.duration)
+    rec["behind_s"] = round(behind, 1)
+    (out / "organism.json").write_text(json.dumps(rec) + "\n")
+    print(f"{NAMES[a.organism]} x{a.scale}, arm {a.arm}: behind the window by {behind:.0f} s; {len(rows)} muscles, {ORGANISM_STEPS} steps of {step_s:.2f} s, "
           f"replicas {min(reps)}..{max(reps)}, simulated writes {writes}, handed back {restore_ok}")
     return 0 if restore_ok else 2
 

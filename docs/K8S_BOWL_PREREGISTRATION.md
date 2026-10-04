@@ -565,6 +565,32 @@ for quiet times. The protection against running into the wall is the band inside
 under the engine's utilisation target. An operator who wants whole machines held back can set `NODE_CUSHION` (off by
 default). The wandering run under way (37235231963) uses every machine, as every run after it does.
 
+
+## The six organisms at every size, the real cluster inside (written before its run, 2026-10-04)
+
+The same six organisms, each native against native with Omni-Compass on top, at the sizes of the model grid: 10, 100
+and 1,000 copies of the organism governed together on one clock, the one real cluster inside as one more muscle
+(`tools/run_kil.py --scale`; size 1 is the run already recorded, `results/live/SIX_KUBE.md`). Workflow `six-kube`, one
+job per organism, size and repetition, both arms on one runner, order rotated, fresh six-worker kind cluster per arm.
+
+- Repetitions: 5 at 10 and 100 copies, 3 at 1,000. Measured window: 960 s at 10 copies, 1,440 s at 100, 2,880 s at
+  1,000 (240 organism steps of 4, 6 and 12 s: a step at least 1.5 times what the organism takes to compute on this
+  runner, measured: 0.18 s at 10 copies of the four stacked, 2.4 s at 100).
+- The organism is built before the window opens (`organism.ready`); the window opens the moment it is built
+  (`organism.go`), so the cluster and the organism start on one clock however long the build takes. If the organism
+  falls behind its own clock, `organism.json` records by how much (`behind_s`).
+- Machine floor two, every machine usable (the founder's rules above), open-loop load, peak six generators.
+- Declared before the run: 1,000 copies of the whole tower (656,000 modelled muscles) and of the four stacked (1.2
+  million) need about 6 and 11 GB of memory beside the cluster, past what one GitHub runner holds. They are run; if a
+  runner cannot hold them, the job's failure is reported as that, never as a result.
+
+Reported in `SIX_KUBE.md` by organism and size, every gauge paired against native with its 95% interval and read in
+words.
+
+The run dimension of the model grid (1, 10, 100, 1,000 runs) is a count of seeds; on the real cluster each repetition
+is a real paired run of an hour or more, so the real cluster carries the repetitions above, and the model grid carries
+1 to 1,000 runs.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

@@ -166,10 +166,17 @@ if [ -n "${ORGANISM:-}" ]; then
   # back as its heat and load. Built during the warm-up, it starts with the window; the same seed and demand in every arm
   echo "organism=$ORGANISM load_max=${LOAD_MAX:-6}" | tee -a "$OUT_DIR/preflight.txt"
   python tools/run_kil.py --organism "$ORGANISM" --arm "$ARM" --duration "$DURATION" --out "$OUT_DIR" \
-    --start-at $(( $(date -u +%s) + WARMUP )) > "$OUT_DIR/organism.log" 2>&1 &
+    --scale "${ORGANISM_SCALE:-1}" --go-file "$OUT_DIR/organism.go" > "$OUT_DIR/organism.log" 2>&1 &
   kil_pid=$!
 fi
 echo "== warm-up ${WARMUP}s (both arms)"; sleep "$WARMUP"
+if [ -n "$kil_pid" ]; then
+  # a large organism (100 or 1,000 copies) may take longer to build than the warm-up: the window opens when it is built
+  until [ -f "$OUT_DIR/organism.ready" ] || ! kill -0 "$kil_pid" 2>/dev/null; do sleep 5; done
+  [ -f "$OUT_DIR/organism.ready" ] || { echo "INVALID RUN: the organism stopped before it was built"; tail -20 "$OUT_DIR/organism.log"; exit 1; }
+  echo "organism built at epoch $(cat "$OUT_DIR/organism.ready"), scale ${ORGANISM_SCALE:-1}; window opens $(date -u +%s)" | tee -a "$OUT_DIR/preflight.txt"
+  date -u +%s > "$OUT_DIR/organism.go"
+fi
 
 if [ -n "$kil_pid" ]; then
   load_pid=$kil_pid

@@ -9,28 +9,39 @@ name: six-kube
 on:
   workflow_dispatch:
     inputs:
-      reps: {description: "Paired repetitions per organism", default: "5"}
+      reps: {description: "Paired repetitions per organism at each size, in the order of sizes", default: "5,5,3"}
+      sizes: {description: "Copies of each organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "10,100,1000"}
+      durations_s: {description: "Measured seconds per arm at each size (240 organism steps; a bigger organism needs a longer step)", default: "960,1440,2880"}
       arms: {description: "Arms, in rotation order", default: "native bowl"}
-      duration_s: {description: "Measured seconds per arm (240 organism steps)", default: "960"}
       load_max: {description: "Load-generator replicas at each organism's peak demand", default: "6"}
       loadgen: {description: "closed (waits for answers) or open (fixed rate, equal work)", default: "open"}
 jobs:
   plan:
     runs-on: ubuntu-latest
-    outputs: {reps: "${{ steps.r.outputs.reps }}"}
+    outputs: {cells: "${{ steps.r.outputs.cells }}"}
     steps:
       - id: r
-        run: echo "reps=$(python3 -c "import json; print(json.dumps(list(range(1, ${{ github.event.inputs.reps || '5' }} + 1))))")" >> "$GITHUB_OUTPUT"
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          sizes = [int(x) for x in "${{ github.event.inputs.sizes || '10,100,1000' }}".split(",")]
+          reps = [int(x) for x in "${{ github.event.inputs.reps || '5,5,3' }}".split(",")]
+          durs = [int(x) for x in "${{ github.event.inputs.durations_s || '960,1440,2880' }}".split(",")]
+          orgs = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
+                  "organism_656", "stack_1226"]
+          cells = [{"organism": o, "size": sz, "rep": r, "duration": durs[min(i, len(durs) - 1)]}
+                   for i, sz in enumerate(sizes) for o in orgs for r in range(1, reps[min(i, len(reps) - 1)] + 1)]
+          print("cells=" + json.dumps(cells))
+          PY
   run:
     needs: plan
     strategy:
       fail-fast: false
       max-parallel: 20
       matrix:
-        organism: [compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack_1226, organism_656]
-        rep: "${{ fromJSON(needs.plan.outputs.reps) }}"
+        cell: "${{ fromJSON(needs.plan.outputs.cells) }}"
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,16 +51,17 @@ jobs:
         with: {install_only: true}
       - run: bash scripts/kind_paired.sh
         env:
-          REP: ${{ matrix.rep }}
+          REP: ${{ matrix.cell.rep }}
           ARMS: ${{ github.event.inputs.arms || 'native bowl' }}
-          DURATION: ${{ github.event.inputs.duration_s || '960' }}
-          ORGANISM: ${{ matrix.organism }}
+          DURATION: ${{ matrix.cell.duration }}
+          ORGANISM: ${{ matrix.cell.organism }}
+          ORGANISM_SCALE: ${{ matrix.cell.size }}
           LOAD_MAX: ${{ github.event.inputs.load_max || '6' }}
           LOADGEN: ${{ github.event.inputs.loadgen || 'open' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: "six-${{ matrix.organism }}-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}"}
+        with: {name: "six-${{ matrix.cell.organism }}-x${{ matrix.cell.size }}-${{ matrix.cell.rep }}", path: "bench-*-${{ matrix.cell.rep }}"}
   report:
     needs: run
     if: always() && needs.run.result != 'skipped'
