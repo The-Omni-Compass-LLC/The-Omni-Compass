@@ -420,6 +420,18 @@ not carry to a cloud with one at this load; that is the reading of record. The p
 not allowed in the subscription's region; `Standard_D2s_v4` (same 2 vCPU, 8 GiB and list price) was used. Three
 earlier attempts stopped at the load generator's placement before any measurement and are not results.
 
+
+## The burst bill test (written before its run, 2026-10-04)
+
+The steady bill run left Azure's autoscaler nothing to do and Omni-Compass no machine to give back. The question a
+buyer asks is the bill under load that moves: on a real cloud, with Azure's own cluster autoscaler underneath, does
+native with Omni-Compass on top bill fewer machine-hours than native alone when demand rises and falls? Same design as
+"The bill on a real cloud" (fresh AKS cluster per arm, work pool 1 to 4 `Standard_D2s_v4` under Azure's autoscaler, the
+bill metered every 15 s, arms native / bowl / omni rotated, five repetitions), with the open-loop load in bursts
+(`load_steps` 1 6 1 8 1 6, six steps over 1,800 measured seconds, the same steps in every arm). Reported: machine-hours
+and the bill at list price, paired against native with their 95% intervals, beside every service gauge. Labelled by the
+one rule: a lower bill counts only if nothing is more than 2% worse.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

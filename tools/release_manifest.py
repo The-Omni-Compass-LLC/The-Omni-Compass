@@ -135,6 +135,13 @@ def main(argv=None):
     r = subprocess.run([sys.executable, str(ROOT / "verify.py"), "--quick"], capture_output=True, text=True, cwd=ROOT)
     RECEIPT.write_text(f"verify.py --quick at commit {m['written_at_commit']}, {m['written_at']}\n\n" + r.stdout)
     ok = r.returncode == 0 and "VERIFICATION: PASS" in r.stdout
+    if not ok:
+        # a run that stops part way keeps its reason: the exit code and the last lines it wrote to stderr
+        err = "\n".join(r.stderr.strip().splitlines()[-40:])
+        (ROOT / "results" / "VERIFY_FAILURE.txt").write_text(f"exit code {r.returncode}\n\n{err}\n")
+        print(f"verify.py stopped (exit {r.returncode}); its last stderr lines are in results/VERIFY_FAILURE.txt")
+    elif (ROOT / "results" / "VERIFY_FAILURE.txt").exists():
+        (ROOT / "results" / "VERIFY_FAILURE.txt").unlink()
     m["verification_receipt"] = {"file": "results/VERIFY_RECEIPT.txt", "sha256": sha("results/VERIFY_RECEIPT.txt"), "passed": ok}
     MANIFEST.write_text(json.dumps(m, indent=1) + "\n")
     print(f"RELEASE_MANIFEST.json written at {m['written_at_commit'][:12]}; verification {'PASS' if ok else 'FAILED'}")
