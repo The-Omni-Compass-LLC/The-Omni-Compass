@@ -188,11 +188,18 @@ def capacity(d, slo, over_max=5.0):
                 steps.append((t, int(m[4])))
     except (OSError, ValueError):
         return None, []
-    if len(steps) < 3 or any(b[1] <= a[1] for a, b in zip(steps, steps[1:])):
+    rise = steps
+    if steps:                                                  # a load that rises and then only falls: capacity is read
+        top = max(r for _, r in steps)                         # on the way up, the fall is where machines are handed back
+        k = next(i for i, (_, r) in enumerate(steps) if r == top)
+        fall = steps[k:]
+        if len(fall) > 1 and all(b[1] < a[1] for a, b in zip(fall, fall[1:])):
+            rise, steps = steps[:k + 1], steps[:k + 2]
+    if len(rise) < 3 or any(b[1] <= a[1] for a, b in zip(rise, rise[1:])):
         return None, []                                        # not a rising load: not a capacity run
     smp = [(t0 + float(r["elapsed_seconds"]), r.get("ok") == "1" and float(r["latency_ms"]) <= slo) for r in rows]
     shares, cap = [], 0
-    for i, (ts, r) in enumerate(steps):
+    for i, (ts, r) in enumerate(rise):
         te = steps[i + 1][0] if i + 1 < len(steps) else float("inf")
         w = [g for t, g in smp if ts + 30 <= t < te]            # 30 s for the step to settle
         sh = 100.0 * sum(1 for g in w if not g) / len(w) if w else float("nan")

@@ -485,6 +485,38 @@ both arms (native late 22-56% of the time, 4-32% of requests failed; host 65-91%
 load, same seed, same runner per pair); the absolute levels are an overloaded cluster, and a lower `load_max` is the
 setting for a cluster inside its capacity.
 
+
+## More work, faster, on fewer machines, with less energy: all four in one run (written before its run, 2026-10-04)
+
+The four gains so far come from different tests: more work on the same machines (the capacity test, +48.1%), the same
+work faster on fewer machines (sets 22-27), energy equal or lower in each. This test measures all four in one run.
+
+Design: `benchmark-reps`, ten paired repetitions, arms native and bowl (rule 4), order rotated, fresh six-worker kind
+cluster per arm, open-loop load rising and then falling, `load_steps` 1 2 3 4 5 6 7 8 7 6 5 4 3 2 1, 180 s a step
+(2,700 measured seconds). The rise is the capacity test (`tools/live_reps.py capacity`, read on the way up to the
+peak: the highest load step at which no more than 5% of response samples are over the 500 ms line or failed, every
+lower step too). The fall is where machines are no longer needed and can be handed back. Over the whole window:
+p95 response time, worker machines in service, energy (declared model; on kind it is not a meter), CPU with Omni's own.
+
+Reported for each, native + Omni against native, paired, with the 95% interval and read in words (better or worse):
+work (capacity, requests a second inside the line), speed (p95), machines (worker machines in service, mean), energy.
+
+## The Omni index: one number for more for the same, or the same for less (written before its first use, 2026-10-04)
+
+Each measure is turned into a ratio oriented so that above 1 is better for Omni-Compass:
+
+- work: work with Omni / work native (capacity, requests served, work done)
+- speed: p95 native / p95 with Omni (a lower response time is faster)
+- machines: machines native / machines with Omni (in service, or billed machine-hours)
+- energy: energy native / energy with Omni (or the bill)
+
+The index of one test is the geometric mean of its oriented ratios, minus one, in percent: +30% reads "30% more for
+the same, or the same for 30% less", across work, speed, machines and energy together. A measure a test did not take is
+left out of that test, never filled in. A measure inside the noise is counted at its mean and flagged. A category
+(real Kubernetes on GitHub, Azure, the card, the eight cards, the modelled muscles) is the geometric mean of its tests;
+the headline is the geometric mean of the real categories, each weighted the same; the modelled muscles are shown
+beside it, never inside it. Computed by `tools/omni_index.py` from each test's own paired results; nothing is typed in.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
