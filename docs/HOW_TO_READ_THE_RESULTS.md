@@ -108,7 +108,7 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 
 ## Where to start
 
-1. `STATE_OF_PLAY.md`: one page, every result and how strong it is.
+1. `docs/STATE_OF_PLAY.md`: one page, every result and how strong it is.
 2. `docs/DOSSIER.md`: every result with its chart.
 3. This chapter, next to the table in front of you.
 4. `DISCLOSURES.md`: what a result is and is not.

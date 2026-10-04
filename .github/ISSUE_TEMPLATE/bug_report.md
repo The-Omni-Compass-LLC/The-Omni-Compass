@@ -11,4 +11,4 @@ labels: bug
 
 **Your system** (Kubernetes version / GPU model and driver / OS)
 
-By opening this issue you agree to `CLA.md` for anything you submit.
+By opening this issue you agree to `.github/CLA.md` for anything you submit.

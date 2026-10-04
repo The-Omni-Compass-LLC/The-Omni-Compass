@@ -19,7 +19,7 @@ Fingerprints of the running engine, its parts and its twin: `results/MECHANISM_I
 
 Copies of this repository passed around as zips (the XPASS packages) carry changes that are **not** in the engine here:
 
-- `omnicompass/batch_claim1.py`: a vectorised variant that applies u during the RK4 step (CLAIM1). No C++ twin; not
+- `batch_claim1.py` (in those zips, not in this tree): a vectorised variant that applies u during the RK4 step (CLAIM1). No C++ twin; not
   verified against the 500 fixtures.
 - an adapter that defaults to CLAIM1, takes the target sign from the starting state and adds a disruption budget. Its
   C++ governor was only partly ported, which is where the reported Python/C++ mismatches came from.

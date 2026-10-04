@@ -11,10 +11,10 @@ The files the leading repositories carry, the open ones such as Kubernetes and t
 | Notices and third-party components | `NOTICE`, `THIRD_PARTY_NOTICES.md` |
 | Disclosures and disclaimers in one place | `DISCLOSURES.md` |
 | Patents and trademarks | `PATENTS.md`, `TRADEMARKS.md` |
-| Contributor license agreement | `CLA.md` |
-| Contributing, code of conduct, governance, ownership | `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `GOVERNANCE.md`, `OWNERS`, `.github/CODEOWNERS` |
-| Security policy and contacts | `SECURITY.md`, `SECURITY_CONTACTS` |
-| Support | `SUPPORT.md` |
+| Contributor license agreement | `.github/CLA.md` |
+| Contributing, code of conduct, governance, ownership | `.github/CONTRIBUTING.md`, `.github/CODE_OF_CONDUCT.md`, `.github/GOVERNANCE.md`, `.github/OWNERS`, `.github/CODEOWNERS` |
+| Security policy and contacts | `SECURITY.md`, `.github/SECURITY_CONTACTS` |
+| Support | `.github/SUPPORT.md` |
 | Changes and roadmap | `CHANGELOG.md`, `ROADMAP.md` |
 | Citation and software metadata for archives and crawlers | `CITATION.cff`, `codemeta.json`, `pyproject.toml` (keywords, URLs) |
 | Software bill of materials (SPDX and CycloneDX) | `sbom/omni-compass.spdx.json`, `sbom/omni-compass.cdx.json` |

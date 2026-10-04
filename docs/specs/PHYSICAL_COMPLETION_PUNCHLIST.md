@@ -34,7 +34,7 @@ Run preflight, then smoke, then confirmation. Keep failures. Confirmation must p
 The run is invalid if Watch writes, restoration fails, required authority readback is unavailable, frozen code changes, a foreign compute process occupies the selected GPU, or the experiment violates its preregistered conditions. Thermal or hardware-power-brake evidence must not be credited as an Omni efficiency mechanism.
 
 ## Kind completion
-Create a new live repetition series with `scripts/kind_claim1_paired.sh`. Never overwrite or silently upgrade Set-22. Report p95/p99, pending work, replica/node behavior, Omni CPU overhead, Watch zero writes, restoration and an honest energy label. Kind's modeled power is not a physical energy meter.
+Create a new live repetition series with a new paired script (as `scripts/kind_paired.sh`). Never overwrite or silently upgrade Set-22. Report p95/p99, pending work, replica/node behavior, Omni CPU overhead, Watch zero writes, restoration and an honest energy label. Kind's modeled power is not a physical energy meter.
 
 ## Allocator holdout
 Tune only declared allocator parameters such as `down_dwell`, `down_band`, `push_release`, `U_gate`, and `cap_min`. Development sweeps may identify candidates, but no small-seed winner becomes a universal law. Preserve work, health, backlog, power/thermal violations, reversals and unsafe-action gates. Held-out evaluation stays held out.

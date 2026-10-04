@@ -28,7 +28,7 @@ Omni-Compass engine, its mathematics and its software have been filed in the Uni
 
 **May I use the name or the compass rose?** Only to refer to Omni-Compass accurately (`TRADEMARKS.md`).
 
-**May I contribute?** Contributions require the contributor license agreement (`CLA.md`).
+**May I contribute?** Contributions require the contributor license agreement (`.github/CLA.md`).
 
 **Does Omni-Compass send data anywhere?** No. The software contains no telemetry and makes no network connection of
 its own except to the systems an operator points it at (a Kubernetes API, `nvidia-smi`, a meter command).

@@ -750,7 +750,7 @@ simulation use only. Everything else - commercial use, production use, operating
 redistribution, a hosted or managed service, incorporation into a product or service, or using the software or its
 results to build a competing product - requires a written Omni-Compass Enterprise License signed by The Omni-Compass
 LLC and paid for. Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. No patent or trademark license is granted for any other use. Contributions are accepted only on the
-terms in `CONTRIBUTING.md`, which assign their rights to The Omni-Compass LLC.
+terms in `.github/CONTRIBUTING.md`, which assign their rights to The Omni-Compass LLC.
 
 ## 17. Python, C++ and the Seal
 
@@ -913,7 +913,7 @@ Every gauge, where it comes from, and whether it is measured or modelled: `docs/
 
 `docs/EVIDENCE_LEDGER.md` (every claim and its class), `docs/CLAIMS_REGISTER.md` (what is claimed and what is not),
 `docs/GPU_PREREGISTRATION.md` and `docs/REALMS_PREREGISTRATION.md` (the rules written before each run),
-`STATE_OF_PLAY.md` (where everything stands), `HANDOFF.md` (every command in one page).
+`docs/STATE_OF_PLAY.md` (where everything stands), `docs/HANDOFF.md` (every command in one page).
 
 ## Contact
 

@@ -317,6 +317,11 @@ def main():
     test_fleet_realdata_paths.main(); check("capture replay and PlanetLab vessel on inputs in the real formats", True)
     r = subprocess.run(["bash", "-n", str(ROOT / "fleet" / "capture" / "kube_capture.sh")], capture_output=True)
     check("cluster capture script parses", r.returncode == 0)
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "layout_check.py")], capture_output=True, text=True)
+    check("the repository is lined up: the declared root, every link and every named path present (tools/layout_check.py)",
+          r.returncode == 0, r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr[-300:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_index.py")], capture_output=True, text=True)
+    check("the Omni index rebuilds from every test's own result file (tools/omni_index.py)", r.returncode == 0, r.stderr[-300:])
     import benchmarks.multiplicity as MP
     mp_tmp = tmp / "mult.json"; MP.main(mp_tmp)
     check("multiplicity analysis reproduces results/MULTIPLICITY.json",

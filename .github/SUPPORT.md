@@ -1,4 +1,4 @@
-# Changelog
+# Support
 
 > **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
 > commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
@@ -7,21 +7,15 @@
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
-## 2026-10-02
-- The bowl law (`omnicompass/bowl.py`) and the plug contract: one smooth law for every muscle, one restore point,
-  read-back, the one-writer rule.
-- Two-wire GPU governor (`omni_controller/gpu_bowl.py`): clock ceiling and power limit; the wire check
-  (`tools/gpu_wire_check.py`) runs before anything else.
-- The six organisms (four realms, the four stacked with duplicates, the whole tower) as one benchmark set, with the
-  real card inside on a GPU machine (`tools/run_hil.py`) and the 1 / 10 / 100 / 1,000 runs-and-size grid
-  (`tools/run_scale.py`, workflow `six`).
-- Robot-joint simulation compiled (identical results, about 30 times faster).
-- Real Kubernetes set 24 reproduces set 23.
-- License: evaluation and simulation use only; Omni-Compass Enterprise License for everything else; US filings notice.
-- The Omni-Compass Manual, edition 1.0.
+| You need | Where |
+|---|---|
+| To understand and wire Omni-Compass | the book `docs/OMNI_COMPASS_MANUAL.pdf` and the short manual `docs/OMNI_COMPASS_MANUAL.md`; every command on one page: `docs/HANDOFF.md` |
+| A bug in an evaluation run | open an issue with the "Bug report" template |
+| A pilot, a commercial license, production use | open an issue with the "Licensing and pilots" template, or contact The Omni-Compass LLC |
+| A security issue | follow `SECURITY.md`; do not open a public issue |
 
-## Earlier
-See `docs/HISTORY.md` and `docs/STATE_OF_PLAY.md`.
+Evaluation users receive community support only. Support with response times comes with an Omni-Compass Enterprise
+License.
 
 ---
 

@@ -397,7 +397,7 @@ OUTLINE = [
     ("The Bowl: Push, Pull and the Two Forces", ("M", "The Bowl: Push, Pull and the Two Forces")),
     ("The Physics of a Processor", ("T", "The Physics of a Processor")),
     ("The Two-Way Nervous System", ("M", "The Two-Way Nervous System")),
-    ("The Nervous System in Detail", ("FS", ["docs/TWO_WAY_NERVOUS_SYSTEM.md", "NERVOUS.md"])),
+    ("The Nervous System in Detail", ("FS", ["docs/TWO_WAY_NERVOUS_SYSTEM.md", "docs/NERVOUS.md"])),
     ("PART", "The Body: Muscles, Realms and Organisms",
      "Six hundred and fifty-six muscles in four realms, stacked into six organisms, and every gauge used to judge "
      "them."),
@@ -412,7 +412,7 @@ OUTLINE = [
      "The universal plug, the adapters, the wire check, and the step-by-step work of wiring Omni-Compass onto a "
      "running stack."),
     ("The Plug, the Adapters and the Wire Check", ("M", "The Plug, the Adapters and the Wire Check")),
-    ("The Harness", ("F", "HARNESS.md")),
+    ("The Harness", ("F", "docs/HARNESS.md")),
     ("The Wiring Guide", ("F", "docs/WIRING_GUIDE.md")),
     ("Before You Start, and the Eight Levels", ("M", "Before You Start, and the Eight Levels")),
     ("Stack by Stack", ("M", "Stack by Stack")),
@@ -441,7 +441,7 @@ OUTLINE = [
     ("The Benchmark Report", ("F", "docs/BENCHMARK_REPORT.md")),
     ("The Referee Report", ("F", "docs/OMNICOMPASS_ABC_REPORT.md")),
     ("Comparison with Existing Controllers", ("F", "docs/COMPARISON.md")),
-    ("The State of Play", ("F", "STATE_OF_PLAY.md")),
+    ("The State of Play", ("F", "docs/STATE_OF_PLAY.md")),
     ("PART", "Value, License and History",
      "What a receipt is worth, how the license is priced against it, how the code is sealed, and how Omni-Compass came "
      "to be."),

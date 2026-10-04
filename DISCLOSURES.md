@@ -87,7 +87,7 @@ Therefore:
    change at any time, without notice. The version in the repository's `main` branch at a given commit is the version
    that commit describes; `RELEASE_MANIFEST.json` and `python3 verify.py` identify it.
 2. Statements about work in progress, planned features, expected results and future runs are expectations, not
-   promises. Where a result has not yet been measured, the documents say so (`STATE_OF_PLAY.md`,
+   promises. Where a result has not yet been measured, the documents say so (`docs/STATE_OF_PLAY.md`,
    `docs/DOSSIER.md`, section 8).
 3. A signed Omni-Compass Enterprise License governs its own terms for its own term.
 
@@ -101,7 +101,7 @@ machines.
 
 | Question | Page |
 |---|---|
-| What has been measured, and how strongly | `STATE_OF_PLAY.md`, `docs/DOSSIER.md`, `docs/EVIDENCE_LEDGER.md` |
+| What has been measured, and how strongly | `docs/STATE_OF_PLAY.md`, `docs/DOSSIER.md`, `docs/EVIDENCE_LEDGER.md` |
 | The rules written before each run | `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_BOWL_PREREGISTRATION.md` |
 | How to wire it, level by level, and how to confirm it is wired right | `docs/OMNI_COMPASS_MANUAL.md` (chapters 8 and 9), the book `docs/OMNI_COMPASS_MANUAL.pdf` |
 | The license, in plain answers, and third-party components | `LICENSE`, `LICENSING_FAQ.md`, `NOTICE`, `THIRD_PARTY_NOTICES.md`, `PATENTS.md`, `TRADEMARKS.md` |
