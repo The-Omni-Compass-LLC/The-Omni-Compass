@@ -108,9 +108,12 @@ kubectl create configmap omni-security --from-literal=hold=false --dry-run=clien
 LOADGEN="${LOADGEN:-closed}"
 if [ "$LOADGEN" = "open" ]; then kubectl apply -f deploy/kind/loadgen-open.yaml; else kubectl apply -f deploy/kind/loadgen.yaml; fi
 if [ "$PLATFORM" = aks ]; then   # the load generator lives where kind keeps it, off the measured workers: the system pool
-  # (agentpool=system, the label AKS gives every machine of the pool named system), replaced in place (Recreate), so
-  # the first pod, which may have landed on a worker, never waits beside its replacement
-  kubectl patch deployment load-generator --type=merge -p '{"spec":{"strategy":{"type":"Recreate","rollingUpdate":null},"template":{"spec":{"nodeSelector":{"agentpool":"system"},"tolerations":[{"key":"CriticalAddonsOnly","operator":"Exists","effect":"NoSchedule"}]}}}}'
+  # machine, found by the taint aks_paired.sh gives it (CriticalAddonsOnly) and pinned by its host name (no pool label
+  # guessed), replaced in place (Recreate), so the first pod, which may have landed on a worker, never waits beside it
+  sysnode=$(kubectl get nodes -o json | jq -r '[.items[] | select(any(.spec.taints[]?; .key == "CriticalAddonsOnly")) | .metadata.labels["kubernetes.io/hostname"]][0] // empty')
+  [ -n "$sysnode" ] || { echo "no system-pool machine (taint CriticalAddonsOnly) found"; kubectl get nodes -o wide; exit 1; }
+  echo "loadgen_node=$sysnode" | tee -a "$OUT_DIR/preflight.txt"
+  kubectl patch deployment load-generator --type=merge -p "{\"spec\":{\"strategy\":{\"type\":\"Recreate\",\"rollingUpdate\":null},\"template\":{\"spec\":{\"nodeSelector\":{\"kubernetes.io/hostname\":\"$sysnode\"},\"tolerations\":[{\"key\":\"CriticalAddonsOnly\",\"operator\":\"Exists\",\"effect\":\"NoSchedule\"}]}}}}"
 fi
 echo "loadgen=$LOADGEN" | tee -a "$OUT_DIR/preflight.txt"
 if ! kubectl rollout status deployment/load-generator --timeout=300s; then
