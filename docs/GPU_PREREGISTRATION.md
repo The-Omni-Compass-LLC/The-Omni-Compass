@@ -433,8 +433,16 @@ From this amendment every row of the card harness is judged by the one rule, the
 - at one copy, each organism runs 5 paired repetitions (was 3), so an energy change of 1-3% on the card's own meter
   can be told from noise; 3, 2 and 1 at 10, 100 and 1,000 copies as before.
 
-The single card and the eight cards run this code. A card run started before this amendment is re-scored by this rule
-from its own raw files before any figure is quoted.
+The single card and the eight cards run this code. A card run started before this amendment is reported in full from
+its own raw files (its response times included) before any figure is quoted.
+
+Why the stacks were late more often in the first run (+0.25 points) and are not now (-0.03): two knobs moved in commit
+`2a9285d`. Omni could loosen the operator's HPA target to 0.95 (fewer pods, bursts wait); it is now held at the
+operator's. A machine went back with no headroom (the next burst waits for a boot); it now goes back only when the rest
+covers the recent peak at 0.6 of the release level. Each alone leaves the stacks late more often; together they are late
+less often. The headroom is the least that keeps every seed un-late (`results/realms/RELEASE_MARGIN_SWEEP.md`).
+
+Every report reads each change in words (better or WORSE, and what it means), so a sign is never read alone.
 
 ---
 

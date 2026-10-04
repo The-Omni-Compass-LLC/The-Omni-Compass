@@ -221,6 +221,22 @@ def contrast(o, n):
             "all": {"primary": w_all / e_all - 1, "work": w_all - 1, "energy": e_all - 1, "viol_pp": 100 * v_all, "p95": p95}}
 
 
+# which way is better for each measure, in words, so a sign is never read on its own: more work per energy and more
+# work are better; less energy (less spent, a lower bill), less time over the line and a lower p95 (faster) are better
+BETTER_UP = {"primary": "more work per energy", "work": "more work"}
+BETTER_DOWN = {"energy": "less energy spent", "viol_pp": "late less often", "p95": "faster"}
+WORSE = {"primary": "less work per energy", "work": "less work", "energy": "more energy spent", "viol_pp": "late more often",
+         "p95": "slower"}
+
+
+def reading(k, v, eps=1e-9):
+    """A measure's change against native, read in words: better, worse or the same, and what that means."""
+    if abs(v) <= eps:
+        return "(same)"
+    good = v > 0 if k in BETTER_UP else v < 0
+    return f"(better: {BETTER_UP.get(k) or BETTER_DOWN.get(k)})" if good else f"(WORSE: {WORSE[k]})"
+
+
 def one_rule(xs):
     """The one rule on one part's paired repetitions (means): what is more than 2% worse than native. The band comes
     first: time over the line may not be higher than native's at all."""
@@ -344,6 +360,10 @@ def main(argv=None):
          "## Omni against native, by organism (mean over repetitions, 95% interval when there are two or more)", "",
          "The one rule labels every row: nothing more than 2% worse than native (work, energy, the card's 95th percentile) and "
          "the time over the line no higher than native's; a row that breaks it is NOT LABELLED and names what broke it.", "",
+         "How to read a row: each change is Omni against native on the same organism, seed and requests, and says in words "
+         "whether it is better or worse. More work per energy and more work are better. Less energy is better (less spent: "
+         "a lower power bill, or longer on the same supply). Less time over the line and a lower p95 are better (faster "
+         "answers). A minus sign is good on energy, lateness and p95, and bad on work.", "",
          "| Size | Organism | Part | Label | Work per energy | Work | Energy | Time over the line (pp) | p95 |", "|---:|---|---|---|---:|---:|---:|---:|---:|"]
     out = {}
     for (sc, name) in res:
@@ -356,7 +376,8 @@ def main(argv=None):
             bad = one_rule(xs)
             lab = ("NOT LABELLED: " + ", ".join(bad)) if bad else (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)")
             out[key][part] = {"label": lab, "worse": bad, **{k: list(v) for k, v in m.items()}}
-            f = lambda k, s=100.0, u="%": f"{s * m[k][0]:+.2f}{u}" + (f" ({s * m[k][1]:+.2f} to {s * m[k][2]:+.2f})" if len(xs) > 1 else "")
+            f = lambda k, s=100.0, u="%": (f"{s * m[k][0]:+.2f}{u}" + (f" ({s * m[k][1]:+.2f} to {s * m[k][2]:+.2f})" if len(xs) > 1 else "")
+                                            + f" {reading(k, m[k][0])}")
             L.append(f"| {sc}x | {NAMES[name]} | {pname} | {lab} | {f('primary')} | {f('work')} | {f('energy')} | {f('viol_pp', 1.0, '')} | {f('p95')} |")
     L += ["", "## The card's receipts, by arm", "", "| Size | Organism | Rep | Arm | Card energy (J) | Requests served | Not served | p95 (ms) | Over the line (%) | Limit start → end (W) | Governor exit |",
           "|---:|---|---:|---|---:|---:|---:|---:|---:|---|---|"]

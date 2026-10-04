@@ -107,6 +107,10 @@ def main(root):
          "controllers and Kubernetes alone. Omni: the bowl law on every simulated muscle and the live controller on the "
          "cluster, handed back at 90% of the window. Cluster rows are measured on the real cluster (energy is the declared "
          "power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).", "",
+         "How to read it: every change is native + Omni against native, and the Reading column says in words whether it is "
+         "better or worse. Lower is better for response times, time over the line, failed requests, pods started, "
+         "replicas, machines, energy and the bill (less spent). Higher is better for the organism's work and work per "
+         "energy. A change whose interval crosses zero is marked inside the noise.", "",
          "## Twelve columns, mean over repetitions", ""]
     cols = []
     for o in orgs:
@@ -145,11 +149,18 @@ def main(root):
             verdict += "; INVALID: a simulated knob was not handed back"
         out["organisms"][o] = {"arm": arm, "repetitions": n, "verdict": verdict, "rows": rows}
         L += [f"### {NAMES[o]}: {verdict}", "", f"{n} paired repetitions.", "",
-              "| Gauge | Native | Native + Omni | Change | 95% interval of the difference |", "|---|---:|---:|---:|---:|"]
+              "| Gauge | Native | Native + Omni | Change | 95% interval of the difference | Reading |", "|---|---:|---:|---:|---:|---|"]
         for k, v in rows.items():
             ch = f"{v['pct']:+.1f}%" if not math.isnan(v["pct"]) else f"{v['diff']:+.3g}"
             ci = f"{v['lo']:+.4g} to {v['hi']:+.4g}" if v["n"] > 1 else ""
-            L.append(f"| {LABEL.get(k, k)} | {v['native']:.4g} | {v['omni']:.4g} | {ch} | {ci} |")
+            if v["neutral"] or k == "host CPU busy, the real machine under kind (%)":
+                rd = "shown, not judged (more or less is not better by itself)"
+            elif abs(v["diff"]) < 1e-12:
+                rd = "same"
+            else:
+                sure = v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
+                rd = ("better" if v["better"] else "WORSE") + ("" if sure else " (inside the noise)")
+            L.append(f"| {LABEL.get(k, k)} | {v['native']:.4g} | {v['omni']:.4g} | {ch} | {ci} | {rd} |")
         L.append("")
     missing = [o for o in ORDER if o not in runs]
     if missing:

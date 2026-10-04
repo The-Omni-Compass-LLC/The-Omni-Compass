@@ -25,6 +25,8 @@ from omnicompass.bowl import Band, Bowl, clamp
 
 UP, DOWN, RELEASE = 0.10, 0.02, -0.2
 RELEASE_MARGIN = 0.6     # a machine goes back only when the rest covers the recent peak at 0.6 of the plant's own release level
+# 0.6: the least energy with no seed late more often than native (results/realms/RELEASE_MARGIN_SWEEP.md: 0.7 and up
+# leave a seed late more often)
 
 
 def position(plant) -> float:
