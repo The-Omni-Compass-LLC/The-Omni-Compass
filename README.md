@@ -22,7 +22,7 @@ does not replace your autoscaler or your firmware; it sits on top, in watch mode
 
 | Measured | Result | Class |
 |---|---|---|
-| Real Kubernetes, sets 22-26, 10 paired runs each, same work | machines in service −29% to −36%, p95 −55% to −65%, 0 failed requests, every set proven; total CPU including Omni's own: no difference | L |
+| Real Kubernetes, sets 22-27, 10 paired runs each, same work | machines in service −29% to −36%, p95 −55% to −65%, 0 failed requests, every set proven; total CPU including Omni's own: no difference | L |
 | Real NVIDIA A10, 10 paired runs, the card's own meter | work per energy **+3.6%** (proven), energy −3.5%, same requests; p95 **+58.5% worse**, a wiring fault in the governor, found in the card's own samples and corrected (`docs/GPU_PREREGISTRATION.md`, amendments 6-7) | P |
 | The card's firmware alone vs with Omni on top, modelled card (tuning / fresh seeds) | AI token generation: energy −3.3% / −3.7%, median +0.6% / +0.7%; compute-bound: energy −0.7% / −0.5%, median +1.6% / +1.5%; no step more than 2% slower per request | S |
 | Six organisms (656 muscles), 1-1,000 runs, 1× and 10× size, round 3 law | work per energy +0.20% to +0.31% in every cell; time over the service line +0.2 points (band first not held) | S |
