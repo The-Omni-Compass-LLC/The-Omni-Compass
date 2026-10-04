@@ -376,6 +376,27 @@ commit `5d2e238` (rule 3 alone), so each rule's effect stays separable.
 **Standing after rule 3: the bowl law is clean in all three tests** (no measure significantly worse, capacity +41.4%).
 Rule 4 (a lower target never held) runs next on commit `583c97f`, beside these, to see whether it adds capacity without
 costing a row.
+
+## The fourth amendment: the replica cap as a lever the operator grants (2026-10-04, before its run)
+
+The founder's instruction: no number in the harness is hard-wired; every one moves where the system lets it. The cap
+of 10 in `deploy/kind/demo.yaml` is the value of Kubernetes' own php-apache example, not a choice of any operator, and
+an earlier session read it as an operator's bound. It becomes a lever, under the operator's grant.
+
+**5. Replica room.** With `--replica-ceiling` $N_{\max}$ granted (0, the default, leaves the cap untouched), for a
+sensed HPA under the bowl law, with $r$ the pods running, $c$ the cap, $\bar{u}$ the pods' mean utilisation and $x$
+the target, the autoscaler's own arithmetic asks for $n = \lceil r\,\bar{u}/x \rceil$ replicas, and
+
+$$c \leftarrow \min(N_{\max},\, n) \quad \text{if } r \ge c,\ n > c,\ p \ge \text{centre or the line is breached};$$
+$$c \leftarrow c^{op} \quad \text{if } n \le c^{op},\ p < \text{centre},\ \text{no breach},\ S(t).$$
+
+The cap is raised only while it binds and the line is threatened, to what the autoscaler asks and never past the grant,
+and returns to the operator's once the demand has held still for a window. The operator's range is recorded before
+the first change; the kill switch restores it. Tests: `tests/test_bowl_controller.py`, case *room*.
+
+**Its run** (a setting of its own, labelled as such): the capacity test unchanged, `replica_ceiling` 30, beside the
+runs without it. Native keeps its cap of 10, as an operator who has not raised it would; the extra pods the bowl uses
+are counted in the HPA replicas row, so the receipt shows what the capacity cost in pods, not the gain alone.
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

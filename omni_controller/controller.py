@@ -309,6 +309,38 @@ class Controller:
         now = time.time(); h = [(t, d) for t, d in self.demand.get(key, []) if now - t <= win]
         return bool(h) and now - h[0][0] >= 0.9 * win and max(d for _, d in h) <= (1.0 + DEMAND_RISE) * min(d for _, d in h)
 
+    def _replica_room(self, h, ns, name, win, obs, s):
+        """The HPA's replica cap as a lever, up to the ceiling the operator grants (--replica-ceiling; 0, the default:
+        the cap is the operator's and never moved). Only for a sensed service under the bowl law. While the autoscaler
+        stands at its cap and the bowl is at or past its centre (or the line is breached), the cap is raised to the
+        replicas the autoscaler's own arithmetic asks for, ceil(r x u / x), never past the ceiling; once the demand has
+        held still for one window, the bowl is under its centre, nothing breaches and that arithmetic fits the
+        operator's own cap again, the cap returns to it. The operator's range is recorded before the first change, and
+        the kill switch restores it."""
+        ceil_ = int(getattr(self.a, "replica_ceiling", 0) or 0)
+        if ceil_ <= 0 or self.bowl is None:
+            return
+        spec = h.get("spec", {}); st = h.get("status", {}) or {}
+        ann = h["metadata"].get("annotations", {}) or {}
+        lo0, hi0 = (int(x) for x in ann.get(RANGE_ANN, f"{spec.get('minReplicas', 1)},{spec.get('maxReplicas', 1)}").split(","))
+        cap = int(spec.get("maxReplicas", hi0)); cur = int(st.get("currentReplicas", 0) or 0)
+        _, tgt = cpu_target(h); dem = self._app_demand(h)
+        if not tgt or dem is None:
+            return
+        need = int(math.ceil(100.0 * dem / float(tgt) - 1e-9))      # the replicas the autoscaler's arithmetic asks for
+        pressed = self.bowl.p >= self.bowl.band.center or not obs["slo_clean"]
+        if cur >= cap and pressed and need > cap and cap < ceil_:
+            new = min(ceil_, need)
+            if RANGE_ANN not in ann:
+                self.k.write(["annotate", "hpa", name, "-n", ns, "--overwrite", f"{RANGE_ANN}={lo0},{hi0}"], "replica room: record the operator's range")
+            self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"maxReplicas": new}})],
+                         f"replica room: cap {cap} -> {new} (at the cap, {need} asked, ceiling {ceil_})")
+        elif cap > hi0 and need <= hi0 and self.bowl.p < self.bowl.band.center and obs["slo_clean"] and self._steady((ns, name), win):
+            self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"maxReplicas": hi0}})],
+                         f"replica room: cap {cap} -> {hi0}, the operator's own (demand steady, {need} asked)")
+            if int(spec.get("minReplicas", lo0)) == lo0:
+                self.k.write(["annotate", "hpa", name, "-n", ns, f"{RANGE_ANN}-"], "replica room: operator's range back, record removed")
+
     def _new_latencies(self):
         """Response times (ms) of the requests served since the last decision (the probe's latency file)."""
         lf = getattr(self.a, "latency_file", "")
@@ -713,6 +745,7 @@ class Controller:
                         F_ = bowl_rec["force"]
                         x = x - (BOWL_UP if F_ > 0 else BOWL_DOWN) * F_ * (hi_t - lo_t)
                     x = max(lo_t, min(hi_t, x)); self.bowl_x[(ns, name)] = x
+                    self._replica_room(h, ns, name, win, obs, s)
                     want = int(round(x))
                 want_h = want if obs["slo_clean"] else min(want, orig)
                 if abs(cur - want_h) < self.a.min_target_change and not (not obs["slo_clean"] and cur > orig):
@@ -780,6 +813,9 @@ def parser():
     ap.add_argument("--bowl-tau", type=float, default=60.0, help="seconds the service takes to follow a lever (the bowl's damping)")
     ap.add_argument("--bowl-center", type=float, default=0.4,
                     help="where the bowl holds the service (0 the bare service time, 1 the SLO); 0.4, as the GPU governor")
+    ap.add_argument("--replica-ceiling", type=int, default=0,
+                    help="the most replicas the operator lets Omni-Compass raise a sensed HPA's cap to while it binds "
+                         "(bowl law; 0, the default: the operator's cap is never moved)")
     ap.add_argument("--sensed", default="",
                     help="ns/deployment,... whose response time the --latency-file measures; only their HPAs are moved "
                          "(empty: every HPA, the single-service case)")

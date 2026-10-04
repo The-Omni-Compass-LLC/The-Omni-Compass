@@ -11,6 +11,8 @@
   demand    calm again while the demand still grows: the extra pods stay; the operator's target returns once the
             demand has stopped growing for one autoscaler window (no remove-then-restart)
   steady    a raise of the target (fewer pods) waits for a demand steady for one autoscaler window
+  room      the replica cap raised only while it binds and the line is threatened, up to the operator's ceiling;
+            returned when calm and steady; the kill switch restores it
   sensed    two services, the probe measuring one: only its HPA moves; the neighbour's stays the operator's
   restore   the kill switch returns every HPA target to the operator's and removes every record
   engine    the six-state engine still runs every decision (E and U in the audit) and the decision names the bowl law
@@ -124,6 +126,42 @@ def main():
     c.demand[k] = [(now - 295 + 59 * i, 1.2 + 0.2 * i) for i in range(6)]
     assert not c._steady(k, 300) and c._rising(k, 300), "a climbing demand read as steady"
     print("consolidation: a raise waits for one steady window; a climbing demand never consolidates")
+
+    # the replica cap as a lever, up to the operator's ceiling: at the cap (10 of 10), the line breached, the autoscaler's
+    # own arithmetic asking for 18 (10 pods at 90% of a 50% target), the cap is raised to 18 (ceiling 30); calm and
+    # steady again, the operator's 10 returns; the kill switch restores the range and leaves no record. Without a
+    # ceiling the cap is never touched
+    def capped(ceiling):
+        t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 600.0)
+        S = json.loads(st.read_text()); hh = S["hpas"][0]
+        hh["status"].update({"currentReplicas": 10, "desiredReplicas": 10}); hh["status"]["currentMetrics"][0]["resource"]["current"]["averageUtilization"] = 90
+        st.write_text(json.dumps(S))
+        extra = ("--replica-ceiling", str(ceiling)) if ceiling else ()
+        c, _ = controller(t, lat, *extra); c.step()
+        return t, st, c
+    cap = lambda st: json.loads(st.read_text())["hpas"][0]["spec"]["maxReplicas"]
+    t, st, c = capped(0)
+    assert cap(st) == 10, "no ceiling granted, yet the cap moved"
+    t, st, c = capped(30)
+    S = json.loads(st.read_text())
+    assert cap(st) == 18, f"at the cap and breached: cap {cap(st)}, expected the 18 the autoscaler's arithmetic asks for"
+    raised = cap(st)
+    assert raised <= 30 and S["hpas"][0]["metadata"]["annotations"].get("omnicompass.io/original-replica-range") == "1,10"
+    lat = probe(t, 50.0); S = json.loads(st.read_text()); hh = S["hpas"][0]
+    hh["status"].update({"currentReplicas": 4, "desiredReplicas": 4}); hh["status"]["currentMetrics"][0]["resource"]["current"]["averageUtilization"] = 40
+    st.write_text(json.dumps(S))
+    for _ in range(4):
+        c.step()
+    k = ("default", "web"); now = time.time(); c.demand[k] = [(now - 280.0 + 56 * i, 1.6) for i in range(5)]   # a steady window
+    for _ in range(4):
+        c.step()
+        if cap(st) == 10:
+            break
+    assert cap(st) == 10, f"calm and steady: cap {cap(st)}, expected the operator's 10 back"
+    t, st, c = capped(30); (Path(t) / "kill").write_text("1"); c.step()
+    S = json.loads(st.read_text())
+    assert cap(st) == 10 and "omnicompass.io/original-replica-range" not in S["hpas"][0]["metadata"].get("annotations", {})
+    print(f"replica room: at the cap and breached, 10 -> {raised} (ceiling 30); calm and steady, back to 10; kill restores 10; no ceiling, never moved")
 
     # two services on the same machines, the probe measuring one (--sensed default/web): a breach moves only the HPA
     # of the service the probe measures; the neighbour's HPA stays at the operator's own target
