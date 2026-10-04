@@ -458,6 +458,33 @@ against native with its 95% interval. Cluster rows are measured; organism rows a
 labelled by the one rule: no measure more than 2% worse (CPU and host load shown, not judged), and a gain counts only
 where energy or the bill is lower with an interval wholly below zero.
 
+
+### Result: the six organisms with the real cluster inside (run 37217362568, commit `d81d5ee`)
+
+Thirty jobs, six organisms times five paired repetitions, native against native with Omni-Compass on top (bowl law),
+every arm valid, every simulated knob handed back. Full report `results/live/SIX_KUBE.md`; raw files
+`results/live/raw/run-37217362568/`.
+
+On the real cluster, in every organism, native + Omni was late less often and answered faster:
+
+| Organism | Time over the line, native → Omni | p95, native → Omni (ms) | Failed requests, native → Omni |
+|---|---|---|---|
+| Compute / AI / Cloud | 41.0% → 26.7% (better, -35%) | 3,967 → 2,653 (better, -33%, inside the noise) | 14.9% → 13.3% |
+| Physics / Robotics / Autonomous | 28.4% → 15.5% (better, -45%) | 2,440 → 1,767 (better, -28%) | 5.7% → 5.0% |
+| Energy / Facility / Industrial | 21.6% → 10.4% (better, -52%) | 1,951 → 1,482 (better, -24%) | 3.8% → 3.2% |
+| Distribution / Specialized | 40.7% → 21.1% (better, -48%) | 2,830 → 1,943 (better, -31%) | 11.1% → 9.3% |
+| The whole tower (656) | 25.8% → 14.7% (better, -43%, inside the noise) | 2,085 → 1,247 (better, -40%, inside the noise) | 12.8% → 9.1% |
+| The four stacked (1,226) | 55.6% → 43.0% (better, -23%) | 3,703 → 2,803 (better, -24%) | 31.7% → 27.6% |
+
+No measure came out worse beyond the noise in any organism. Energy (declared model) and CPU moved by under 3%, lower
+with Omni in every organism. The modelled organisms around the cluster: work the same, energy 0.1-0.2% lower, time over
+the line 0.5-2% lower, in every organism (evidence S).
+
+Read with it: at a peak of six open-loop load generators the 4-core runner is past what the six workers can serve in
+both arms (native late 22-56% of the time, 4-32% of requests failed; host 65-91% busy). The comparison is fair (same
+load, same seed, same runner per pair); the absolute levels are an overloaded cluster, and a lower `load_max` is the
+setting for a cluster inside its capacity.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

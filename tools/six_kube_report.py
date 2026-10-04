@@ -84,6 +84,8 @@ def paired(runs_o, a, k):
         h = math.nan
     pct = 100.0 * m / abs(nb) if abs(nb) > 1e-12 else math.nan
     better = (m > 0) if k in HIGHER_BETTER else (m < 0)
+    if abs(m) <= 1e-9 * max(abs(nb), 1e-12):          # a change below a billionth of the value is rounding: the same
+        m = 0.0
     return {"n": len(d), "native": nb, "omni": nb + m, "diff": m, "lo": m - h, "hi": m + h, "pct": pct,
             "better": bool(better), "neutral": k in NEUTRAL}
 
@@ -130,7 +132,7 @@ def main(root):
         n = max((v["n"] for v in rows.values()), default=0)
         restored = all(g["_restore_ok"] for g in runs[o][arm].values())
         sure = lambda v: v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
-        judged = {k: v for k, v in rows.items() if not v["neutral"] and k != "host CPU busy, the real machine under kind (%)" and abs(v["diff"]) > 1e-12}
+        judged = {k: v for k, v in rows.items() if not v["neutral"] and k != "host CPU busy, the real machine under kind (%)" and abs(v["diff"]) > 0.0}
         better = [LABEL.get(k, k) for k, v in judged.items() if v["better"] and sure(v)]
         worse = [LABEL.get(k, k) for k, v in judged.items() if not v["better"] and sure(v)]
         noise = [LABEL.get(k, k) for k, v in judged.items() if not sure(v)]
@@ -146,7 +148,7 @@ def main(root):
             ci = f"{v['lo']:+.4g} to {v['hi']:+.4g}" if v["n"] > 1 else ""
             if v["neutral"] or k == "host CPU busy, the real machine under kind (%)":
                 rd = "shown, not judged (more or less is not better by itself)"
-            elif abs(v["diff"]) < 1e-12:
+            elif v["diff"] == 0.0:
                 rd = "same"
             else:
                 sure = v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
