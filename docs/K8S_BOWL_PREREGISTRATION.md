@@ -322,6 +322,42 @@ not the node's CPU. Tests: `tests/test_bowl_controller.py`, case *steady*.
 The capacity, fairness and fault tests are run again on the commit that carries this amendment, unchanged in design,
 and published beside the runs above whatever they show. The bill run on Azure (`aks-metered`, run 37171672509)
 started on commit `199f350`, before this amendment, and is reported as of that commit.
+
+## The third amendment, and a change considered and declined (2026-10-04, before the next runs)
+
+**4. A lower target is never held.** Until now every new HPA target, in either direction, was held for one autoscaler
+window $W$ while the line was clean, so on a step up the bowl's push (a lower target, more pods) could wait up to $W$
+and the pods arrive after the line is missed. The hold exists because a raise inside the window removes pods the
+autoscaler then starts again; a lower target asks for pods and removes none. The hold now applies to raises only:
+
+$$\text{write } x_h(t) \iff x_h(t) < x_h^{\text{now}}\ \vee\ \text{no write in } [t-W,\,t)\ \vee\ \text{the operator's own target returns},$$
+
+with rule 3 still requiring a steady demand before any raise. Tests: `tests/test_convey.py` (a lower target written at
+once inside the window).
+
+**Declined: raising the replica cap above the operator's.** `deploy/kind/demo.yaml` sets `maxReplicas: 10`, and at
+the top of the capacity test both arms meet it. Lifting it would let Omni-Compass run more pods than the operator
+authorised, which is more resources, not the same resources used better, and it would break the shield's standing
+rule that Omni-Compass never moves past an operator's bound. Native would need the same cap for the comparison to
+stay fair. It stays at the operator's value in every arm; a higher cap is the operator's decision, tested as its own
+setting if ever asked for. Already in place and unchanged: a pod waiting for a place reads as past the wall and asks
+for one machine more at once.
+
+A narrower form was proposed the same day (`docs/proposals/AMENDMENT_RISING_STEP_CAP.md`): while the demand rises and a
+pod of the sensed service is pending, raise `maxReplicas` by the pending count and lower the target to match. It is
+declined for a mechanical reason as well as the one above. The replica cap does not make pods pending: at the cap the
+autoscaler simply asks for no more pods, so the pending count there is zero and the write would never fire where it is
+aimed. A pod is pending only when the scheduler finds no machine with room for it, and more places under the cap give
+such a pod nowhere more to go; the answer to that is a machine, which the bowl already asks for. The part of the
+proposal that holds, asking for pods at once on a step up instead of after a window, is rule 4 above.
+
+On the CPU fill (used over allocatable about 0.10 in every arm): on kind every worker reports all of the host's cores
+as its own, so the allocatable counts the same cores once per worker and the fill reads far lower than the machine
+doing the work. Every receipt from the next runs on carries the host's own busy share and core count
+(`host_cpu.csv`, `tools/live_reps.py`), so the room left on the real machine is measured, not inferred.
+
+The capacity, fairness and fault tests are run again on the commit that carries this amendment, beside the runs of
+commit `5d2e238` (rule 3 alone), so each rule's effect stays separable.
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

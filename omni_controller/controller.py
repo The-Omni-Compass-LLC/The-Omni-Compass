@@ -721,12 +721,13 @@ class Controller:
                     continue
                 if want_h > cur and not back and not self._steady((ns, name), win):
                     continue     # a raise (fewer pods) waits for a demand that has held still for one window
-                # the autoscaler takes its window to answer a target. A new target inside that window moves the muscle
-                # mid-movement and starts pods it then removes, so I hold each target for one window. A response-time
-                # breach returns the operator's target at once
+                # the autoscaler takes its window to answer a target. A raise inside that window moves the muscle
+                # mid-movement and removes pods it then starts again, so a raise is held for one window. A lower target
+                # (more pods, the safe direction) is never held: on a step up the pods are asked for at once, before the
+                # line is missed. A response-time breach returns the operator's target at once
                 last = self.target_at.get((ns, name))
                 # handing the operator's own target back is never held: it is where native stands
-                if obs["slo_clean"] and last is not None and time.time() - last < win and not back:
+                if obs["slo_clean"] and last is not None and time.time() - last < win and not back and want_h > cur:
                     continue
                 self.target_at[(ns, name)] = time.time()
                 self.changed.setdefault((ns, name), int(h["metadata"].get("annotations", {}).get(ANNOTATION, cur)))
