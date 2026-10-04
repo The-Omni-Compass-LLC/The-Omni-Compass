@@ -313,6 +313,8 @@ def main():
     test_bowl.main(); check("bowl law and plug: smooth bounded push and pull to the center, fail up, cover, one restore point, foreign writer, two-wire card", True)
     from tests import test_failsafe
     test_failsafe.main(); check("no automated fallback: failed decisions are skipped; only the human switch turns the whole harness off and on", True)
+    from tests import test_staging_order
+    test_staging_order.main(); check("staging order through the real actuator: the emptiest idles first, the warmest wakes first, one always in service, no pod moved", True)
     from tests import test_fleet_realdata_paths
     test_fleet_realdata_paths.main(); check("capture replay and PlanetLab vessel on inputs in the real formats", True)
     r = subprocess.run(["bash", "-n", str(ROOT / "fleet" / "capture" / "kube_capture.sh")], capture_output=True)

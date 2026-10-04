@@ -141,6 +141,75 @@ Three wiring experiments follow directly. None changes a single equation:
 Each is testable in the existing harness against every platform in the league (tuning/league.py), and will be tested
 there.
 
+
+## 8. The staging law: machines on and off in order, with demand that moves
+
+Demand climbs, spikes, eases part way, climbs again and settles to idle. The staging law decides how many machines are
+in service at every decision, and which ones, so that capacity follows demand up at once and comes back down only as
+far as it safely can. It is the bowl law (`omnicompass/bowl.py`) applied to the machine pool
+(`omni_controller/controller.py`), the release gate (`omnicompass/nervous_system.py node_release_gate`), the verdict
+(`omnicompass/verdict.py`) and the actuator (`scripts/kind_nodepool.sh`). Every symbol below is a line of that code.
+
+**Position and force.** The service reading r (the 95th-percentile response time, or the pressure that stands for it)
+is placed in its band [lo, hi], where hi is the response line:
+
+    p = (r - lo) / (hi - lo),      v = s v + (1 - s) (p - p_prev) / dt                       (8.1)
+    F = A                                       if p >= 1 - c        (fail up, past the wall)
+    F = A tanh( (kp (p - p0) + kd v) / A )      otherwise; F = 0 if F < 0 while v > 0 and p > p0   (8.2)
+
+with the band's center p0 = 0.5, cushion c = 0.05, authority A = 1, kp = 1 and kd = max(0, 2 sqrt(kp tau / dt) - 1) dt
+(critical damping for a muscle that answers in tau seconds). F > 0 asks for capacity, F < 0 offers it back.
+
+**How many machines.** With n machines in service now, n_nat the count native ran, and m the floor (at least one):
+
+    up      n' = max(m, n + 1)                                      if p >= 1 - c                     (8.3)
+    down    n' = max(m, n - 1)                                      if F < R and p < p0 and the verdict
+                                                                    allows n_nat - (n - 1) and the gate G holds  (8.4)
+    hold    n' = n                                                  otherwise
+
+with the release threshold R = -0.2. Up is immediate and is never gated. Down is one machine per decision, and only
+when every term of the release gate holds:
+
+    G = [n > 1] and [nothing pending] and [pods not scaling up] and [no breach now] and
+        [ used / ((n - 1) x per_node) <= rho ] and [contraction authority] and [every sense live] and
+        [the last machine command landed]                                                          (8.5)
+
+rho is the engine's utilisation target: after a machine goes back, what remains runs at or under rho. The verdict
+(section 7 of the GPU preregistration, `omnicompass/verdict.py`) allows a machine count below native only after a
+paired trial showed the service at that count at most 2% worse than at the count before; that 2% is where the trigger
+sits, inside the engine.
+
+**This is hysteresis by construction.** The up condition (p >= 0.95) and the down condition (p < 0.5 with F < -0.2)
+are far apart, so a demand that hovers never makes machines flap; a spike crosses the wall and adds a machine at once;
+a dip has to be deep, calm and sustained before one goes back, and then only one per decision. Between the two, the
+count holds.
+
+**Which machines.** The actuator orders the pool:
+
+    idle   the open machine with the fewest serving pods, then the fewest pods, goes first;
+           it is marked prefer-not (PreferNoSchedule) and its pods first to go (pod-deletion-cost), so the
+           autoscaler's own scale-down empties whole machines; no pod is moved, evicted or restarted   (8.6)
+    wake   the idle machine still carrying the most work goes first (it is warm); the mark comes off and it is in
+           service at once, with no boot                                                          (8.7)
+    floor  one machine always in service, ready for the first request of the next burst            (8.8)
+
+An idled machine stays powered and Ready at its floor (park_frac x idle power), never off: a pod that finds the open
+machines full lands on it at once, so no request ever waits on a machine Omni-Compass idled. Where a node autoscaler
+underneath really removes an empty machine (Azure's cluster autoscaler, Karpenter), that same order hands it the
+emptiest machine first, and the bill falls with the machine.
+
+**The same law on every discrete unit.** Machines are one case. In the muscle models (`realms/bowl_arm.py
+release_safe`), a cooling plant's chillers and a compute pool's machines follow the same law: one unit back only when
+the units left cover the recent peak with headroom (RELEASE_MARGIN 0.6 for machines, 0.8 of a unit's capacity for
+chillers), one at a time, and back at once when the wall is reached.
+
+**What is proved, measured and open.** The order (8.6)-(8.8) is checked through the real actuator by
+`tests/test_staging_order.py` (the emptiest idles first, the warmest wakes first, one always in service, no pod moved).
+The gate (8.5) is checked by `tests/test_node_release_gate.py`. On real Kubernetes the law gave the same work 55-65%
+faster on 29-36% fewer machines (sets 22-27) and 48% more work on the same machines (the capacity test); its run under
+demand that wanders (up, spike, part way down, back up, idle) is in progress. Open: an order across different kinds of
+unit (a battery before a generator, a CPU before a GPU) is not wired; each pool is ordered within itself.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
