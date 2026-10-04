@@ -358,6 +358,24 @@ doing the work. Every receipt from the next runs on carries the host's own busy 
 
 The capacity, fairness and fault tests are run again on the commit that carries this amendment, beside the runs of
 commit `5d2e238` (rule 3 alone), so each rule's effect stays separable.
+
+## The second amendment's runs: results (2026-10-04)
+
+`results/live/AMENDMENT_2_RUNS.md`, commit `5d2e238` (rule 3 alone), 10 paired repetitions each.
+
+- **Capacity: no measure significantly worse under either law.** Bowl law 24.6 against native's 17.4 requests a
+  second, +41.4% (+5.4 to +9.0); allocation law 25.2, +44.8% (+4.9 to +10.7). The bowl law's pods started 5.7 against
+  4.1, interval −0.64 to +3.84: no longer significant. Rule 3 removed the significant pod-start excess and lifted the
+  allocation law's capacity from +0.0% to +44.8%.
+- **Faults: no measure significantly worse under either law.**
+- **Fairness: the bowl law, no measure significantly worse for either application.** The allocation law: php-apache
+  much better, and the neighbour's failed requests **+0.74 points (+0.19 to +1.28), significant**. The allocation law
+  conveys idle CPU to the service it senses; on machines shared with a surging neighbour that CPU is the neighbour's
+  headroom. The allocation law is not labelled better in this test.
+
+**Standing after rule 3: the bowl law is clean in all three tests** (no measure significantly worse, capacity +41.4%).
+Rule 4 (a lower target never held) runs next on commit `583c97f`, beside these, to see whether it adds capacity without
+costing a row.
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

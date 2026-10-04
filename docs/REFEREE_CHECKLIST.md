@@ -49,8 +49,8 @@ checklists for experimental computer science (code, data, seeds, environment, st
 | Every run reported, including the ones that went wrong | earlier sets and the first GPU law kept in `results/`; the fault test's first two runs and their fixes recorded | met |
 | A control arm that measures the cost of being there | the watch arm (Omni-Compass decides, writes nothing) on the GPU | met |
 | The native comparator includes its own autoscaling of machines | on kind native has no node autoscaler; the bill run on Azure (`aks-metered`, Azure's own autoscaler) | **open: built, waiting to run** |
-| Behaviour under heavy load, not only light load | the capacity test: bowl law +34.1% and, re-run under the amendment, +51.9% served on the same machines; pods started still worse (`results/live/CAPACITY.md`, `CAPACITY_2.md`) | **measured; one row worse, open** |
-| Many tenants on one cluster: one surging must not starve its neighbour | the fairness test: neighbour unharmed; bowl failures worse, fixed by the amendment; pod start wait still worse (`results/live/FAIRNESS.md`, `FAIRNESS_2.md`) | **measured; one row worse, open** |
+| Behaviour under heavy load, not only light load | the capacity test: bowl law +34.1% and, +51.9% after the first amendment; after the second, +41.4% (bowl) and +44.8% (allocation law) with no measure significantly worse (`results/live/CAPACITY.md`, `CAPACITY_2.md`, `AMENDMENT_2_RUNS.md`) | **met (bowl law and allocation law)** |
+| Many tenants on one cluster: one surging must not starve its neighbour | the fairness test: neighbour unharmed; bowl failures worse, fixed by the amendment; after the second amendment the bowl law has no measure worse for either application; the allocation law raises the neighbour's failures (`results/live/FAIRNESS.md`, `FAIRNESS_2.md`, `AMENDMENT_2_RUNS.md`) | **met (bowl law); open (allocation law)** |
 | Workloads beyond the synthetic one | real AI serving (vLLM) on the card; public data-center traces | vLLM in the card run; **traces open** |
 
 ## 5. Statistics
