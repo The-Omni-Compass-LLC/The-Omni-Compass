@@ -10,6 +10,8 @@ Checks:
   links     every relative link in every Markdown file points at a file or folder that exists.
   paths     every repository path a Markdown file names in backticks (`results/...`, `docs/...`, `tools/...`, ...)
             exists, so no page cites a file that has gone.
+  orphans   every top-level entry of results/ is named by some page or program outside results/, so a result nothing
+            uses falls off instead of piling up.
 
   python3 tools/layout_check.py        (exit 0: lined up; exit 1: what is out of line, one line each)
 """
@@ -84,6 +86,16 @@ def main():
             if t.startswith(PATH_PREFIXES) and "*" not in t and "<" not in t and "STAMP" not in t:
                 if t not in present and t not in dirs:
                     problems.append(f"path: {p} names `{t}` (no such file)")
+    corpus = "\n".join((ROOT / p).read_text(errors="ignore") for p in files
+                       if not p.startswith(("results/", "release/")) and p != "RELEASE_MANIFEST.json"
+                       and p != "docs/book/OMNI_COMPASS_BOOK.md" and p.endswith((".md", ".py", ".sh", ".yml", ".yaml", ".toml", ".json", ".txt")))
+    for top in sorted({p.split("/")[1] for p in files if p.startswith("results/") and p.count("/") >= 1}):
+        stem = top.rsplit(".", 1)[0] if "." in top else top
+        if top.startswith("VERIFY_") or (f"results/{top}" not in corpus and f"results/{stem}" not in corpus and f'"{top}"' not in corpus
+                                         and f"'{top}'" not in corpus and top not in corpus
+                                         and not (re.sub(r"\d+$", "", top) != top and re.sub(r"\d+$", "", top) in corpus)):
+            if not top.startswith("VERIFY_"):
+                problems.append(f"orphan: results/{top} is named by no page or program (remove it, or cite it)")
     for x in problems:
         print(x)
     print(f"layout: {len(problems)} out of line" if problems else "layout: lined up")

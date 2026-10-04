@@ -15,7 +15,7 @@ checklists for experimental computer science (code, data, seeds, environment, st
 
 | Requirement | Where it is met | Status |
 |---|---|---|
-| Source code available to the reviewer | the repository and its zip (`release/The-Omni-Compass.zip`) | met (evaluation license) |
+| Source code available to the reviewer | the repository (GitHub's Download ZIP gives the whole tree at any commit) | met (evaluation license) |
 | License terms stated plainly, at entry and at exit | `LICENSE`, `NOTICE`, `REUSE.toml`; the notice at the start and end of every document and printed by every run command | met |
 | A single starting point | `START_HERE.md` | met |
 

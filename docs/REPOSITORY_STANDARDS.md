@@ -26,7 +26,7 @@ The files the leading repositories carry, the open ones such as Kubernetes and t
 | Rules written before every benchmark run | `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_BOWL_PREREGISTRATION.md` |
 | A manual and a printable book | `docs/OMNI_COMPASS_MANUAL.md`, `docs/OMNI_COMPASS_MANUAL.pdf` |
 | Every result in one place, with charts | `docs/DOSSIER.md` |
-| A one-file archive of the repository | `release/The-Omni-Compass.zip` |
+| A one-file archive of the repository | GitHub's Download ZIP, at any commit (the copyright deposit is `release/copyright/`) |
 
 Files present at the commit this page describes; `python3 verify.py` checks the ones the results depend on.
 
