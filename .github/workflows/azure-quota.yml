@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+# The vCPU quota the bill run on Azure needs (docs/AZURE_SETUP.md): reads the region's usage and limits, and asks Azure
+# for the regional and the machine family's vCPU limits the aks-metered design needs (one system machine and up to four
+# workers of 2 vCPUs, with room for a surge machine). Uses the same AZURE_CREDENTIALS secret; creates no machine.
+name: azure-quota
+on:
+  workflow_dispatch:
+    inputs:
+      location: {description: "Azure region", default: "eastus"}
+      family: {description: "Machine family quota name", default: "standardDSv4Family"}
+      limit: {description: "vCPUs to ask for", default: "16"}
+permissions: {contents: read}
+jobs:
+  quota:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/login@v2
+        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+      - name: Usage and limits before
+        run: az vm list-usage -l "${{ inputs.location }}" -o table | grep -Ei "Name|Total Regional|DSv4|---" || true
+      - name: Ask for the limits
+        run: |
+          az config set extension.dynamic_install_allow_preview=true --only-show-errors
+          az extension add -n quota -y --only-show-errors
+          S="/subscriptions/$(az account show --query id -o tsv)/providers/Microsoft.Compute/locations/${{ inputs.location }}"
+          for q in cores "${{ inputs.family }}"; do
+            echo "== $q -> ${{ inputs.limit }}"
+            az quota update --resource-name "$q" --scope "$S" --limit-object value=${{ inputs.limit }} --resource-type dedicated -o json \
+              || az quota create --resource-name "$q" --scope "$S" --limit-object value=${{ inputs.limit }} --resource-type dedicated -o json \
+              || echo "REQUEST FAILED for $q"
+          done
+      - name: Usage and limits after
+        if: always()
+        run: az vm list-usage -l "${{ inputs.location }}" -o table | grep -Ei "Name|Total Regional|DSv4|---" || true
