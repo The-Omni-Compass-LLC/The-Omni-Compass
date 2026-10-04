@@ -3,7 +3,7 @@
 # Omni-Compass Enterprise License. See LICENSE.
 """The staging law's order, run through the real actuator (scripts/kind_nodepool.sh) against a stand-in kubectl:
 on the way down the emptiest machine idles first (fewest serving pods, then fewest pods), on the way up the warmest
-idle machine wakes first (most work still on it), two machines always stay in service (the floor), no pod is ever moved, and an
+idle machine wakes first (most work still on it), two machines always stay in service (the floor), every machine is usable (an operator may hold some back), no pod is ever moved, and an
 idled machine is marked prefer-not (PreferNoSchedule), never closed, so a pod that needs it lands at once."""
 import json
 import os
@@ -72,11 +72,13 @@ def pod(name, on, serving=True):
 
 
 class StagingOrder(unittest.TestCase):
-    def run_pool(self, d, want, floor=None):
+    def run_pool(self, d, want, floor=None, cushion=None):
         env = dict(os.environ, KUBECTL=str(d / "kubectl"), STAGE_STATE=str(d / "state.json"), WORKER_SEL="x")
-        env.pop("MIN_NODES", None)
+        env.pop("MIN_NODES", None); env.pop("NODE_CUSHION", None)
         if floor is not None:
             env["MIN_NODES"] = str(floor)
+        if cushion is not None:
+            env["NODE_CUSHION"] = str(cushion)
         r = subprocess.run(["bash", str(ROOT / "scripts" / "kind_nodepool.sh"), str(want)], env=env, capture_output=True, text=True)
         self.assertEqual(r.returncode, 0, r.stderr)
         return json.loads((d / "state.json").read_text())
@@ -105,16 +107,19 @@ class StagingOrder(unittest.TestCase):
             # with the floor set to three by the operator, three stay
             s = self.run_pool(d, 0, floor=3)
             self.assertEqual(len(idle(s)), 1)
-            # back up to 4: every machine open, no boot
+            # back up to 4: every machine usable, all 4 open, no boot
             s = self.run_pool(d, 4)
             self.assertEqual(idle(s), [])
+            # an operator who holds one machine back (NODE_CUSHION=1): 3 open, 1 held
+            s = self.run_pool(d, 4, cushion=1)
+            self.assertEqual(len(idle(s)), 1)
 
 
 def main():
     r = unittest.TextTestRunner(verbosity=0).run(unittest.defaultTestLoader.loadTestsFromTestCase(StagingOrder))
     if not r.wasSuccessful():
         raise SystemExit(1)
-    print("PASS staging order: the emptiest idles first, the warmest wakes first, two always in service (the floor), no pod moved")
+    print("PASS staging order: the emptiest idles first, the warmest wakes first, two always in service (the floor), every machine usable, no pod moved")
 
 
 if __name__ == "__main__":

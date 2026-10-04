@@ -160,10 +160,14 @@ is placed in its band [lo, hi], where hi is the response line:
 with the band's center p0 = 0.5, cushion c = 0.05, authority A = 1, kp = 1 and kd = max(0, 2 sqrt(kp tau / dt) - 1) dt
 (critical damping for a muscle that answers in tau seconds). F > 0 asks for capacity, F < 0 offers it back.
 
-**How many machines.** With n machines in service now, n_nat the count native ran, and m the floor (two by default, `MIN_NODES`; there is
-no ceiling but the machines the cluster has):
+**How many machines.** With n machines in service now, n_nat the count native ran, m the floor (two by default, `MIN_NODES`) and M the
+machines that exist (every machine usable; an operator may hold whole machines back with `NODE_CUSHION`, off by
+default), every count stays in m <= n' <= M. The protection is not a machine sitting out: it is the band inside every
+machine. Capacity is added at 95% of the response line, before the line is reached (8.2-8.3), and a machine goes back
+only if the ones left still run at or under the engine's utilisation target rho (8.5): a margin spread over all of
+them.
 
-    up      n' = max(m, n + 1)                                      if p >= 1 - c                     (8.3)
+    up      n' = min(M, max(m, n + 1))                              if p >= 1 - c                     (8.3)
     down    n' = max(m, n - 1)                                      if F < R and p < p0 and the verdict
                                                                     allows n_nat - (n - 1) and the gate G holds  (8.4)
     hold    n' = n                                                  otherwise
@@ -193,6 +197,8 @@ count holds.
     wake   the idle machine still carrying the most work goes first (it is warm); the mark comes off and it is in
            service at once, with no boot                                                          (8.7)
     floor  two machines always in service (MIN_NODES, the operator may set more), ready for a spike  (8.8)
+    margin  every machine usable; the cushion is the band inside each one (the 5% before the line, and rho), not a
+            whole machine held out                                                                 (8.9)
 
 An idled machine stays powered and Ready at its floor (park_frac x idle power), never off: a pod that finds the open
 machines full lands on it at once, so no request ever waits on a machine Omni-Compass idled. Where a node autoscaler
@@ -205,7 +211,7 @@ the units left cover the recent peak with headroom (RELEASE_MARGIN 0.6 for machi
 chillers), one at a time, and back at once when the wall is reached.
 
 **What is proved, measured and open.** The order (8.6)-(8.8) is checked through the real actuator by
-`tests/test_staging_order.py` (the emptiest idles first, the warmest wakes first, two always in service, no pod moved).
+`tests/test_staging_order.py` (the emptiest idles first, the warmest wakes first, two always in service, every machine usable, no pod moved).
 The gate (8.5) is checked by `tests/test_node_release_gate.py`. On real Kubernetes the law gave the same work 55-65%
 faster on 29-36% fewer machines (sets 22-27) and 48% more work on the same machines (the capacity test); its run under
 demand that wanders (up, spike, part way down, back up, idle) is in progress. Open: an order across different kinds of

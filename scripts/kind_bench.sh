@@ -232,7 +232,7 @@ omni_pid=""
 if [ -z "$NATIVE" ]; then
   echo "== ARM $ARM: Omni-Compass driving HPA target + node pool + power sensing${DRY:+ (dry run: watches only, writes nothing)}"
   nice -n 19 python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval 60 --floor-interval 5 --reflex-window-s 15 \
-    --iterations $(( DURATION / 60 )) --min-nodes "${MIN_NODES:-2}" --max-nodes "$WORKERS" --max-node-step 1 \
+    --iterations $(( DURATION / 60 )) --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
     --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
     --power-cmd "bash scripts/kind_power.sh" --site-limit-w "$SITE_LIMIT_W" \
     --cap-deployments default/php-apache --thermal-model --security-configmap default/omni-security \

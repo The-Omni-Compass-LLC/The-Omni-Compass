@@ -314,7 +314,7 @@ def main():
     from tests import test_failsafe
     test_failsafe.main(); check("no automated fallback: failed decisions are skipped; only the human switch turns the whole harness off and on", True)
     from tests import test_staging_order
-    test_staging_order.main(); check("staging order through the real actuator: the emptiest idles first, the warmest wakes first, two always in service (the floor), no pod moved", True)
+    test_staging_order.main(); check("staging order through the real actuator: the emptiest idles first, the warmest wakes first, two always in service (the floor), every machine usable, no pod moved", True)
     from tests import test_fleet_realdata_paths
     test_fleet_realdata_paths.main(); check("capture replay and PlanetLab vessel on inputs in the real formats", True)
     r = subprocess.run(["bash", "-n", str(ROOT / "fleet" / "capture" / "kube_capture.sh")], capture_output=True)

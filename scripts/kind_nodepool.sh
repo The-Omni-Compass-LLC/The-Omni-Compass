@@ -21,6 +21,10 @@ mapfile -t active < <(echo "$workers" | jq -r ".items[] | select($CLOSED_Q | not
 mapfile -t parked < <(echo "$workers" | jq -r ".items[] | select($CLOSED_Q) | .metadata.name")
 total=$(( ${#active[@]} + ${#parked[@]} ))
 floor="${MIN_NODES:-2}"   # machines always in service, ready for the next burst (the founder's floor: two)
+ceiling=$(( total - ${NODE_CUSHION:-0} ))   # every machine usable; the protection is the band inside each machine.
+                                           # An operator may hold whole machines back (NODE_CUSHION), off by default
+(( ceiling < floor )) && ceiling=$floor
+(( want > ceiling )) && want=$ceiling
 (( want < floor )) && want=$floor
 (( want > total )) && want=$total
 n=${#active[@]}

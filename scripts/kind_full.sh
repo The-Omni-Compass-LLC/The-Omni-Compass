@@ -44,7 +44,7 @@ wait
 
 echo "== Phase B: full engine (HPA target + node pool + power sensing)"
 python -m omni_controller.controller --mode nodepool --active-nodes-only --interval 60 --floor-interval 15 \
-  --iterations $((PHASE_S / 60)) --min-nodes "${MIN_NODES:-2}" --max-nodes "$WORKERS" --max-node-step 1 \
+  --iterations $((PHASE_S / 60)) --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
   --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
   --power-cmd "bash scripts/kind_power.sh" --site-limit-w "$SITE_LIMIT_W" \
   --audit "$OUT_DIR/audit_full.jsonl" --kill-file "$OUT_DIR/kill" &

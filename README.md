@@ -17,9 +17,10 @@ Omni-Compass on top of native Kubernetes, real clusters, paired runs, the same w
 | **Machines in service** (sets 22-27) | 6 | 3.8-4.3 | **29-36% fewer machines** |
 | **Energy** (every test) | | | **equal or lower** in every test |
 | **Failed requests** (sets 22-27) | 0 | 0 | none lost |
+| **All four in one run** (load up 1 to 8 and down, one step at a time, 10 pairs) | | | **+29% more work, 62% faster, 3.6% fewer machines, 0.3% less energy: each proven** |
 
-**The Omni index, every real test together: +15.0%** more for the same, or the same for less, across work, speed,
-machines and energy (real Kubernetes +23.1%, Azure +7.5%). Every number is read from each test's own result file by
+**The Omni index, every real test together: +15.4%** more for the same, or the same for less, across work, speed,
+machines and energy (real Kubernetes +23.9%, Azure +7.5%). Every number is read from each test's own result file by
 [`tools/omni_index.py`](tools/omni_index.py): [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md).
 
 Six organisms with the real cluster inside (the four realms, the whole tower of 656 muscles, the four stacked, 1,226):

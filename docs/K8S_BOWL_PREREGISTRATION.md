@@ -545,6 +545,26 @@ the cluster's: kind keeps all six workers. The wandering steps are 1 2 3 2 3 4 5
 (twenty-five steps of 108 s, 2,700 measured seconds), every change one step, the same in every arm. Everything else
 is as written above.
 
+
+### Result: all four in one run (run 37226863122)
+
+Ten paired repetitions, every arm valid. **Work +29.3%** (capacity 24.6 to 31.8 requests a second inside the line,
+interval +5.4 to +9.0), **p95 -62.3%** (685.8 to 258.3 ms), time over the line -40.9%, failed requests -12.1%,
+**machines in service -3.6%**, **energy -0.3%** (declared model), CPU with Omni's own -1.9%: each proven. No measure
+worse beyond the noise (pending pod-minutes +19.6% and pods started +4.0%, both inside the noise). This run's machine
+floor was one; the floor of two was adopted after it started. Report `results/live/ALL_FOUR.md`; raw files
+`results/live/raw/run-37226863122/`; the Omni index updated (`results/OMNI_INDEX.md`).
+
+
+### The boundary is the band, not a machine held out (written 2026-10-04, for every run started after it)
+
+Holding one whole machine back as a ceiling was considered and set aside the same day: it takes one of the machines
+away from the work. Every machine is usable (Omni-Compass's most is every machine that exists); the floor of two stays
+for quiet times. The protection against running into the wall is the band inside every machine: capacity is added at
+95% of the response line, before the line is reached, and a machine goes back only if the ones left still run at or
+under the engine's utilisation target. An operator who wants whole machines held back can set `NODE_CUSHION` (off by
+default). The wandering run under way (37235231963) uses every machine, as every run after it does.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

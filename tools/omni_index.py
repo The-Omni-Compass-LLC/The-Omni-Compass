@@ -46,6 +46,8 @@ SOURCES = [
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
     ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs", "AMENDMENT_3_RUNS.md",
      r"### Faults, B with the bowl law", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+    ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs", "ALL_FOUR.md",
+     r"^## B with the bowl law", {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
     ("Real cloud (Azure AKS, billed)", "Steady load, Azure's autoscaler underneath, five pairs", "AKS_BILL.md",
      r"## B with the bowl law", {"speed": P95, "machines": BILLED}, "equal"),
 ]
@@ -90,7 +92,7 @@ def pick(table, rx):
 
 
 def capacity(path):
-    for label, cells in rows(path, r"^## Capacity"):
+    for label, cells in rows(path, r"^## (Capacity|The capacity test)"):
         if label == "native":
             n = num(cells[0])
         if label == "bowl":
