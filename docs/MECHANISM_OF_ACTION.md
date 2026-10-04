@@ -160,14 +160,15 @@ is placed in its band [lo, hi], where hi is the response line:
 with the band's center p0 = 0.5, cushion c = 0.05, authority A = 1, kp = 1 and kd = max(0, 2 sqrt(kp tau / dt) - 1) dt
 (critical damping for a muscle that answers in tau seconds). F > 0 asks for capacity, F < 0 offers it back.
 
-**How many machines.** With n machines in service now, n_nat the count native ran, and m the floor (at least one):
+**How many machines.** With n machines in service now, n_nat the count native ran, and m the floor (two by default, `MIN_NODES`; there is
+no ceiling but the machines the cluster has):
 
     up      n' = max(m, n + 1)                                      if p >= 1 - c                     (8.3)
     down    n' = max(m, n - 1)                                      if F < R and p < p0 and the verdict
                                                                     allows n_nat - (n - 1) and the gate G holds  (8.4)
     hold    n' = n                                                  otherwise
 
-with the release threshold R = -0.2. Up is immediate and is never gated. Down is one machine per decision, and only
+with the release threshold R = -0.2. Up is immediate and is never gated. Down is one machine per decision, never below the floor, and only
 when every term of the release gate holds:
 
     G = [n > 1] and [nothing pending] and [pods not scaling up] and [no breach now] and
@@ -191,7 +192,7 @@ count holds.
            autoscaler's own scale-down empties whole machines; no pod is moved, evicted or restarted   (8.6)
     wake   the idle machine still carrying the most work goes first (it is warm); the mark comes off and it is in
            service at once, with no boot                                                          (8.7)
-    floor  one machine always in service, ready for the first request of the next burst            (8.8)
+    floor  two machines always in service (MIN_NODES, the operator may set more), ready for a spike  (8.8)
 
 An idled machine stays powered and Ready at its floor (park_frac x idle power), never off: a pod that finds the open
 machines full lands on it at once, so no request ever waits on a machine Omni-Compass idled. Where a node autoscaler
@@ -204,7 +205,7 @@ the units left cover the recent peak with headroom (RELEASE_MARGIN 0.6 for machi
 chillers), one at a time, and back at once when the wall is reached.
 
 **What is proved, measured and open.** The order (8.6)-(8.8) is checked through the real actuator by
-`tests/test_staging_order.py` (the emptiest idles first, the warmest wakes first, one always in service, no pod moved).
+`tests/test_staging_order.py` (the emptiest idles first, the warmest wakes first, two always in service, no pod moved).
 The gate (8.5) is checked by `tests/test_node_release_gate.py`. On real Kubernetes the law gave the same work 55-65%
 faster on 29-36% fewer machines (sets 22-27) and 48% more work on the same machines (the capacity test); its run under
 demand that wanders (up, spike, part way down, back up, idle) is in progress. Open: an order across different kinds of

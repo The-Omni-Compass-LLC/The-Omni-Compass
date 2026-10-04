@@ -20,7 +20,8 @@ CLOSED_Q='(.spec.unschedulable == true or any(.spec.taints[]?; .key == "omnicomp
 mapfile -t active < <(echo "$workers" | jq -r ".items[] | select($CLOSED_Q | not) | .metadata.name")
 mapfile -t parked < <(echo "$workers" | jq -r ".items[] | select($CLOSED_Q) | .metadata.name")
 total=$(( ${#active[@]} + ${#parked[@]} ))
-(( want < 1 )) && want=1
+floor="${MIN_NODES:-2}"   # machines always in service, ready for the next burst (the founder's floor: two)
+(( want < floor )) && want=$floor
 (( want > total )) && want=$total
 n=${#active[@]}
 

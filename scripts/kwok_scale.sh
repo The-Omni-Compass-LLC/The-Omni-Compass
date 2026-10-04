@@ -84,7 +84,7 @@ feed=$!
 export OMNI_MASTER_OFF="$PWD/$OUT/switch/OFF"
 set +e
 /usr/bin/time -v python3 -m omni_controller.controller --kubectl deploy/kwok/kubectl_kwok.sh --mode nodepool --active-nodes-only --law bowl --interval "$INTERVAL" \
-  --iterations "$ITER" --min-nodes 1 --max-nodes "$NODES" --max-node-step 1 \
+  --iterations "$ITER" --min-nodes "${MIN_NODES:-2}" --max-nodes "$NODES" --max-node-step 1 \
   --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $NODES" \
   --latency-file "$OUT/latency.csv" --slo-ms 500 --latency-window-s 20 --audit "$OUT/audit.jsonl" --kill-file "$OUT/kill" \
   > "$OUT/controller.log" 2> "$OUT/time.txt" &

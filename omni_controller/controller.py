@@ -800,7 +800,8 @@ def parser():
     ap.add_argument("--no-api-proxy", action="store_true", help="read through a new kubectl process every time instead of one kubectl proxy (the controller's own cost is higher)")
     ap.add_argument("--restore-only", action="store_true", help="put every setting back from the records on the objects and exit (the watchdog's way back)")
     ap.add_argument("--node-scale-cmd", default="")
-    ap.add_argument("--min-nodes", type=int, default=1)
+    ap.add_argument("--min-nodes", type=int, default=int(os.environ.get("MIN_NODES", 2)),
+                    help="machines always in service, ready for the next burst (the founder's floor: two)")
     ap.add_argument("--max-nodes", type=int, default=1000)
     ap.add_argument("--max-node-step", type=int, default=2)
     ap.add_argument("--min-target-change", type=int, default=3)

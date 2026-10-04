@@ -531,6 +531,20 @@ every arm. Reported, native + Omni against native, paired with the 95% interval 
 line, failed requests, p95, worker machines in service (and its trace step by step), energy (declared model), CPU with
 Omni's own, pods started. No capacity is read (the load does not only rise).
 
+
+### Amendment to the wandering test, written before its run (2026-10-04)
+
+The founder's two rules for real traffic, adopted before any result of the wandering test: traffic moves one step at a
+time, up or down, never skipping (it may go 1 2 1 2 1 2 if it never needs 3); and machines never go below two, so two
+are always in service, ready for a spike, with no ceiling but the machines the cluster has. The run started with the
+earlier steps (which jumped 5 to 3 and 3 to 5) was cancelled before it finished; none of it is reported.
+
+From this amendment: the machine floor is two in every arm Omni-Compass governs (`MIN_NODES`, default 2: the
+controller's `--min-nodes`, the actuator `scripts/kind_nodepool.sh`, and every benchmark script). Native's own floor is
+the cluster's: kind keeps all six workers. The wandering steps are 1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1
+(twenty-five steps of 108 s, 2,700 measured seconds), every change one step, the same in every arm. Everything else
+is as written above.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
