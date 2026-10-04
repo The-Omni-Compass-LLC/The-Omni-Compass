@@ -432,6 +432,32 @@ bill metered every 15 s, arms native / bowl / omni rotated, five repetitions), w
 and the bill at list price, paired against native with their 95% intervals, beside every service gauge. Labelled by the
 one rule: a lower bill counts only if nothing is more than 2% worse.
 
+
+## The six organisms with the real cluster inside (written before its run, 2026-10-04)
+
+Every benchmark runs the same six organisms, native against native with Omni-Compass on top: the four realms, the whole
+tower of 656 muscles, and the four stacked with every duplicate kept (1,226). Six organisms, two arms, twelve columns.
+The model grid (`six`) and the card in the loop (`tools/run_hil.py`, single card and eight cards) already do. The
+Kubernetes runs now do too (`tools/run_kil.py`, workflow `six-kube` on kind, input `organism` on `aks-metered`).
+
+Each organism runs on the measured window's clock, 240 steps, with the real cluster as one more muscle:
+
+- efferent: the organism's offered compute work at step k, D(k) = sum over its compute pools of lam_i(k) / sum of
+  lam0_i, the seeded trace, identical in both arms. The load generator runs
+  r(k) = 1 + round((LOAD_MAX - 1) (D(k) - min D) / (max D - min D)) replicas, LOAD_MAX = 6 declared here, open-loop load.
+- afferent: the cluster's watts (capture.csv, the declared power model, every 15 s, identical accounting in both arms)
+  are added to the organism's source, zone and site power, as the card's watts are in the card harness.
+
+Arms: native (the stacks' own controllers, Kubernetes alone, Omni-Compass not started) and bowl (the bowl law on every
+simulated muscle, rule 4 on the cluster, handed back at 90% of the window; the run is invalid if any knob is not handed
+back). Five paired repetitions per organism, order rotated, each arm on a fresh six-worker kind cluster, 960 measured
+seconds. Seed 6000 for every organism and arm.
+
+Reported in `SIX_KUBE.md` (`tools/six_kube_report.py`): twelve columns of means, then per organism every gauge paired
+against native with its 95% interval. Cluster rows are measured; organism rows are models (evidence S). Each organism is
+labelled by the one rule: no measure more than 2% worse (CPU and host load shown, not judged), and a gain counts only
+where energy or the bill is lower with an interval wholly below zero.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

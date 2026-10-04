@@ -17,6 +17,8 @@ on:
       vm_size: {description: "Worker machine size", default: "Standard_D2s_v5"}
       price_per_node_hour: {description: "List price of one worker machine-hour in USD (Standard_D2s_v5, Linux, pay as you go)", default: "0.096"}
       load_steps: {description: "Load-generator replicas per step, in order (the burst bill test: e.g. 1 6 1 8 1 6); empty: steady load", default: ""}
+      organism: {description: "One of the six organisms with this cluster inside it (tools/run_kil.py): compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack_1226, organism_656; empty: the service alone", default: ""}
+      load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
 concurrency: {group: aks-metered, cancel-in-progress: false}
 jobs:
   plan:
@@ -53,6 +55,8 @@ jobs:
           DURATION: ${{ github.event.inputs.duration_s || '900' }}
           LOADGEN: open
           LOAD_STEPS: ${{ github.event.inputs.load_steps || '' }}
+          ORGANISM: ${{ github.event.inputs.organism || '' }}
+          LOAD_MAX: ${{ github.event.inputs.load_max || '6' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - if: always()
         run: az group delete -n "$AZ_RG" --yes --no-wait || true

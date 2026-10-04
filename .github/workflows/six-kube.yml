@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: six-kube
+# The six organisms with the real Kubernetes cluster inside (tools/run_kil.py): the four realms, the whole tower of 656
+# muscles and the four stacked (1,226), each native against native with Omni-Compass on top (bowl law), paired on one
+# runner per repetition, each arm on a fresh six-worker kind cluster (scripts/kind_paired.sh). Six organisms times two
+# arms: twelve columns, one report (tools/six_kube_report.py -> SIX_KUBE.md).
+on:
+  workflow_dispatch:
+    inputs:
+      reps: {description: "Paired repetitions per organism", default: "5"}
+      arms: {description: "Arms, in rotation order", default: "native bowl"}
+      duration_s: {description: "Measured seconds per arm (240 organism steps)", default: "960"}
+      load_max: {description: "Load-generator replicas at each organism's peak demand", default: "6"}
+      loadgen: {description: "closed (waits for answers) or open (fixed rate, equal work)", default: "open"}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {reps: "${{ steps.r.outputs.reps }}"}
+    steps:
+      - id: r
+        run: echo "reps=$(python3 -c "import json; print(json.dumps(list(range(1, ${{ github.event.inputs.reps || '5' }} + 1))))")" >> "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        organism: [compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack_1226, organism_656]
+        rep: "${{ fromJSON(needs.plan.outputs.reps) }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: helm/kind-action@v1
+        with: {install_only: true}
+      - run: bash scripts/kind_paired.sh
+        env:
+          REP: ${{ matrix.rep }}
+          ARMS: ${{ github.event.inputs.arms || 'native bowl' }}
+          DURATION: ${{ github.event.inputs.duration_s || '960' }}
+          ORGANISM: ${{ matrix.organism }}
+          LOAD_MAX: ${{ github.event.inputs.load_max || '6' }}
+          LOADGEN: ${{ github.event.inputs.loadgen || 'open' }}
+          CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "six-${{ matrix.organism }}-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}"}
+  report:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: {pattern: "six-*", path: six}
+      - run: python tools/six_kube_report.py six
+      - run: cat six/SIX_KUBE.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: six-kube, path: "six/SIX_KUBE.*"}

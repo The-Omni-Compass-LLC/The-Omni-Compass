@@ -159,8 +159,21 @@ if [ -z "$NATIVE" ]; then
   ! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_omni.txt" | grep -q ": yes$" || { echo "Omni identity has a permission it must not have"; exit 1; }
   export KUBECTL="$(pwd)/scripts/kubectl_omni.sh"
 fi
+kil_pid=""
+if [ -n "${ORGANISM:-}" ]; then
+  # the organism test: one of the six organisms (tools/run_kil.py) runs on the measured window's clock with this cluster
+  # inside as one more muscle; its own compute demand sets the load generator (peak LOAD_MAX), the cluster's watts come
+  # back as its heat and load. Built during the warm-up, it starts with the window; the same seed and demand in every arm
+  echo "organism=$ORGANISM load_max=${LOAD_MAX:-6}" | tee -a "$OUT_DIR/preflight.txt"
+  python tools/run_kil.py --organism "$ORGANISM" --arm "$ARM" --duration "$DURATION" --out "$OUT_DIR" \
+    --start-at $(( $(date -u +%s) + WARMUP )) > "$OUT_DIR/organism.log" 2>&1 &
+  kil_pid=$!
+fi
 echo "== warm-up ${WARMUP}s (both arms)"; sleep "$WARMUP"
 
+if [ -n "$kil_pid" ]; then
+  load_pid=$kil_pid
+else
 read -r -a steps <<< "$LOAD_STEPS"
 step_s=$(( DURATION / ${#steps[@]} ))
 ( for r in "${steps[@]}"; do
@@ -169,6 +182,7 @@ step_s=$(( DURATION / ${#steps[@]} ))
     sleep "$step_s"
   done ) > "$OUT_DIR/load_schedule.log" 2>&1 &
 load_pid=$!
+fi
 
 # The probe reaches the app through the Service (NodePort on the control plane, deploy/kind/bench-serving.yaml), so a
 # drain that moves a pod is seen exactly as a client sees it: kube-proxy sends the request to another ready endpoint.
@@ -231,7 +245,12 @@ fi
 
 ACTIVE_ONLY=1 INTERVAL=15 DURATION="$DURATION" POWER_CMD="bash scripts/kind_power.sh" OUT="$OUT_DIR/capture.csv" \
   bash fleet/capture/kube_capture.sh
-wait "$load_pid" || true
+if [ -n "$kil_pid" ]; then
+  wait "$kil_pid" || { echo "INVALID RUN: the organism did not hand every simulated knob back (organism.log)"; tail -5 "$OUT_DIR/organism.log"; exit 1; }
+  tail -1 "$OUT_DIR/organism.log"
+else
+  wait "$load_pid" || true
+fi
 wait "$probe_pid" || true
 [ -n "$probe2_pid" ] && { wait "$probe2_pid" || true; }
 [ -n "$fault_pid" ] && { wait "$fault_pid" || true; }
