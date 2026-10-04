@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+# The pod record of a finished benchmark-reps run (tools/pod_report.py): every serving pod of every arm and repetition,
+# when it started, how long it waited, where it landed, and the controller's writes around it. Reads that run's stored
+# artifacts; runs nothing on a cluster.
+name: pod-report
+on:
+  workflow_dispatch:
+    inputs:
+      run_id: {description: "benchmark-reps run id", required: true}
+permissions: {contents: read, actions: read}
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {pattern: "paired-*", path: reps, merge-multiple: true, run-id: "${{ inputs.run_id }}", github-token: "${{ secrets.GITHUB_TOKEN }}"}
+      - run: python3 tools/pod_report.py reps | tee pod_report.txt
+      - uses: actions/upload-artifact@v4
+        with: {name: pod-report, path: pod_report.txt}
