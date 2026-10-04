@@ -108,10 +108,16 @@ kubectl create configmap omni-security --from-literal=hold=false --dry-run=clien
 LOADGEN="${LOADGEN:-closed}"
 if [ "$LOADGEN" = "open" ]; then kubectl apply -f deploy/kind/loadgen-open.yaml; else kubectl apply -f deploy/kind/loadgen.yaml; fi
 if [ "$PLATFORM" = aks ]; then   # the load generator lives where kind keeps it, off the measured workers: the system pool
-  kubectl patch deployment load-generator -p '{"spec":{"template":{"spec":{"nodeSelector":{"kubernetes.azure.com/mode":"system"},"tolerations":[{"key":"CriticalAddonsOnly","operator":"Exists","effect":"NoSchedule"}]}}}}'
+  # (agentpool=system, the label AKS gives every machine of the pool named system), replaced in place (Recreate), so
+  # the first pod, which may have landed on a worker, never waits beside its replacement
+  kubectl patch deployment load-generator --type=merge -p '{"spec":{"strategy":{"type":"Recreate","rollingUpdate":null},"template":{"spec":{"nodeSelector":{"agentpool":"system"},"tolerations":[{"key":"CriticalAddonsOnly","operator":"Exists","effect":"NoSchedule"}]}}}}'
 fi
 echo "loadgen=$LOADGEN" | tee -a "$OUT_DIR/preflight.txt"
-kubectl rollout status deployment/load-generator --timeout=300s
+if ! kubectl rollout status deployment/load-generator --timeout=300s; then
+  # why it did not start, in the run's own record
+  { kubectl get nodes --show-labels; kubectl describe pods -l app=load-generator; kubectl get events --sort-by=.lastTimestamp | tail -30; } \
+    > "$OUT_DIR/loadgen_failed.txt" 2>&1; tail -40 "$OUT_DIR/loadgen_failed.txt"; exit 1
+fi
 for i in $(seq 1 30); do kubectl top nodes >/dev/null 2>&1 && break; sleep 10; done
 hpa_count=$(kubectl get hpa -A -o json | jq '.items | length')
 want_hpa=1; [ -z "${TWO_APP:-}" ] || want_hpa=2
