@@ -360,7 +360,7 @@ def label(per_seed, valid=True):
     p = interval([c["primary"] for c in per_seed])
     w = interval([c["work"] for c in per_seed])
     v = interval([c["viol_pp"] for c in per_seed])
-    guard = w[1] >= -0.01 and v[2] <= 1.0
+    guard = w[1] >= -0.01 and v[0] <= 0.0        # band first: time over the line no higher than native's (mean)
     if p[2] < 0:
         return "WORSE"
     if p[1] > 0:

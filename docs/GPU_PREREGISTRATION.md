@@ -411,6 +411,31 @@ budget whatever happens. At the budget the master switch is pulled (every govern
 still measuring stops and is reported as incomplete (an arm cut short is never counted: its repetition has no complete
 pair), the stages not started are skipped and named, and the finished ones are packed.
 
+
+## Amendment 11 (2026-10-04, before any trial on this code)
+
+The six organisms with the card inside (`tools/run_hil.py`), first run 2026-10-02 at commit `c908054`, labelled the
+card's part SUPERIOR in five organisms while its 95th percentile rose from about 500 ms to 600-935 ms in every organism.
+The harness counted the card's work and energy and never its response time (its time over the line was fixed at zero).
+That run is history: its governor was replaced in amendments 6 and 7, and its labels do not meet the founder's rule.
+
+From this amendment every row of the card harness is judged by the one rule, the same rule as every other benchmark:
+
+- the card's time over the line is measured (requests slower than the line, ten bare service times, percent of
+  requests) and paired against native; the 95th percentile is paired as a ratio;
+- a part (the stacks, the card, both) is labelled only when nothing is more than 2% worse than native (means over the
+  repetitions: work, energy, the card's 95th percentile) and its time over the line is no higher than native's; a part
+  that breaks it is NOT LABELLED and names what broke it;
+- the stacks' own label (`realms/harness.py label`) puts the band first: its guardrail is the mean time over the line
+  at or under native's, where it was the upper end of the interval under +1 point;
+- the GPU bench (`tools/gpu_reps.py`) keeps its preregistered guardrails and adds the one rule on its headline: a 95th
+  percentile more than 2% slower, or requests served more than 2% fewer, than native (means) is NOT LABELLED;
+- at one copy, each organism runs 5 paired repetitions (was 3), so an energy change of 1-3% on the card's own meter
+  can be told from noise; 3, 2 and 1 at 10, 100 and 1,000 copies as before.
+
+The single card and the eight cards run this code. A card run started before this amendment is re-scored by this rule
+from its own raw files before any figure is quoted.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

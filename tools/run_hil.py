@@ -19,7 +19,7 @@ Arms, the same organism, the same seed, the same request stream:
 
 Sizes (--scales, default 1,10,100,1000): each organism is run as 1, 10, 100 and 1,000 copies governed together on one
 clock (1,000 copies of the whole tower is 656,000 muscles), with the one real card inside as one more muscle. Each size
-runs its own number of paired repetitions (--reps-by-scale, default 3,3,2,1).
+runs its own number of paired repetitions (--reps-by-scale, default 5,3,2,1; amendment 11 of docs/GPU_PREREGISTRATION.md).
 
 Each organism step is --step-s seconds of wall clock (240 steps: 8 minutes at 2 s). A size whose simulated step takes
 longer than that gets a longer step, measured on this machine before the run (1.5 times the time the simulation needs
@@ -27,7 +27,8 @@ per muscle, times its muscles); the card's request stream runs for the same 240 
 on one clock. Every size's step is in the receipt. The simulated plants are evidence class S (models); the card's
 energy and requests are class P (its own meter). The receipt keeps them apart and also adds them up.
 
-  python3 tools/run_hil.py --out results/hil/run-STAMP [--scales 1,10,100,1000] [--reps-by-scale 3,3,2,1] [--sim]
+  python3 tools/run_hil.py --out results/hil/run-STAMP [--scales 1,10,100,1000] [--reps-by-scale 5,3,2,1] [--sim]
+  python3 tools/run_hil.py --rescore results/hil/run-STAMP      (a finished run judged again by the one rule)
 """
 from __future__ import annotations
 
@@ -177,11 +178,12 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
     joules, samples = card_energy(d / "smi.csv")
     summ = json.loads((d / "summary.json").read_text()) if (d / "summary.json").exists() else {}
     lat = sorted(float(x.split(",")[1]) for x in list(open(d / "latency.csv"))[1:] if x.strip()) if (d / "latency.csv").exists() else []
+    over = 100.0 * sum(1 for x in lat if x > slo_ms) / len(lat) if lat else 0.0      # the card's time over its line
     rec = {"organism": name, "arm": arm, "seed": seed, "muscles": len(rows), "step_s": step_s,
            "plants": [dict(p.m) for p in body.plants], "sim_writes": writes, "sim_restore_ok": restore_ok,
            "card": {"energy_j": joules, "samples": samples, "served": summ.get("served", 0),
                     "not_served": summ.get("not_served", summ.get("requests", 0) - summ.get("served", 0)),
-                    "p95_ms": lat[int(0.95 * (len(lat) - 1))] if lat else None, "limit_start_w": w0, "limit_end_w": w1,
+                    "p95_ms": lat[int(0.95 * (len(lat) - 1))] if lat else None, "over_line_pct": over, "limit_start_w": w0, "limit_end_w": w1,
                     "restored": abs(w1 - start_w) < 1.0, "governor_exit": gov_exit},
            "wall_s": round(time.time() - t0, 1)}
     (d / "arm.json").write_text(json.dumps(rec, indent=1))
@@ -207,17 +209,78 @@ def contrast(o, n):
     w_all = (sum(rs) + cw) / (len(rs) + 1)
     e_all = (es + o["card"]["energy_j"]) / (en + n["card"]["energy_j"])
     sim_w = sum(rs) / len(rs)
-    return {"sim": {"primary": sim_w / (es / en) - 1, "work": sim_w - 1, "energy": es / en - 1, "viol_pp": 100 * (va - vn)},
-            "card": {"primary": cw / ce - 1, "work": cw - 1, "energy": ce - 1, "viol_pp": 0.0},
-            "all": {"primary": w_all / e_all - 1, "work": w_all - 1, "energy": e_all - 1, "viol_pp": 100 * (va - vn)}}
+    # the card is judged on its own response time as well as its work and energy: its time over the line (requests
+    # slower than the line, percent) and its 95th percentile, Omni against native
+    po, pn = o["card"].get("p95_ms"), n["card"].get("p95_ms")
+    p95 = (po / pn - 1) if po and pn else 0.0
+    cv = o["card"].get("over_line_pct", 0.0) - n["card"].get("over_line_pct", 0.0)
+    nc = len(rs) + 1                                               # both: the card as one more plant in the share
+    v_all = (va * (nc - 1) + o["card"].get("over_line_pct", 0.0) / 100) / nc - (vn * (nc - 1) + n["card"].get("over_line_pct", 0.0) / 100) / nc
+    return {"sim": {"primary": sim_w / (es / en) - 1, "work": sim_w - 1, "energy": es / en - 1, "viol_pp": 100 * (va - vn), "p95": 0.0},
+            "card": {"primary": cw / ce - 1, "work": cw - 1, "energy": ce - 1, "viol_pp": cv, "p95": p95},
+            "all": {"primary": w_all / e_all - 1, "work": w_all - 1, "energy": e_all - 1, "viol_pp": 100 * v_all, "p95": p95}}
+
+
+def one_rule(xs):
+    """The one rule on one part's paired repetitions (means): what is more than 2% worse than native. The band comes
+    first: time over the line may not be higher than native's at all."""
+    m = lambda k: sum(x[k] for x in xs) / len(xs)
+    bad = []
+    if m("work") < -0.02:
+        bad.append(f"work {100 * m('work'):+.2f}%")
+    if m("energy") > 0.02:
+        bad.append(f"energy {100 * m('energy'):+.2f}%")
+    if m("p95") > 0.02:
+        bad.append(f"p95 {100 * m('p95'):+.1f}%")
+    if m("viol_pp") > 0.0:
+        bad.append(f"time over the line {m('viol_pp'):+.2f} pp")
+    return bad
+
+
+def rescore(root):
+    """Judge a finished card run again by the one rule, from its own raw files (arm.json and latency.csv): the card's
+    time over the line is counted from latency.csv where the run did not record it. Writes HIL_RESCORED.md."""
+    root = Path(root)
+    meta = json.loads((root / "HIL.json").read_text())["run"] if (root / "HIL.json").exists() else {}
+    slo = float(meta.get("slo_ms") or json.loads((root / "calib.json").read_text())["service_ms"] * 10)
+    res = {}
+    for f in sorted(root.rglob("arm.json")):
+        r = json.loads(f.read_text())
+        if "over_line_pct" not in r["card"] and (f.parent / "latency.csv").exists():
+            lat = [float(x.split(",")[1]) for x in list(open(f.parent / "latency.csv"))[1:] if x.strip()]
+            r["card"]["over_line_pct"] = 100.0 * sum(1 for x in lat if x > slo) / len(lat) if lat else 0.0
+        size = next((int(p.name[5:]) for p in f.parents if p.name.startswith("size-")), 1)
+        rep = next((p.name for p in f.parents if p.name.startswith("rep-")), "rep-1")
+        res.setdefault((size, r["organism"]), {}).setdefault(rep, {})[r["arm"]] = r
+    L = [f"# The card run, judged again by the one rule (amendment 11)", "",
+         f"Run `{root.name}`, commit `{str(meta.get('commit', ''))[:12]}`, line {slo} ms. Nothing more than 2% worse than "
+         "native (work, energy, the card's 95th percentile) and the time over the line no higher than native's.", "",
+         "| Size | Organism | Part | Repetitions | Label | Work per energy | Energy | Time over the line (pp) | p95 |",
+         "|---:|---|---|---:|---|---:|---:|---:|---:|"]
+    for (sc, name), reps in sorted(res.items()):
+        per = [contrast(a["omni"], a["native"]) for a in reps.values() if "omni" in a and "native" in a]
+        if not per:
+            continue
+        for part, pname in (("sim", "stacks (model)"), ("card", "card (meter)"), ("all", "both")):
+            xs = [p[part] for p in per]
+            bad = one_rule(xs)
+            lab = ("NOT LABELLED: " + ", ".join(bad)) if bad else (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)")
+            mm = lambda k: sum(x[k] for x in xs) / len(xs)
+            L.append(f"| {sc}x | {NAMES[name]} | {pname} | {len(xs)} | {lab} | {100 * mm('primary'):+.2f}% | {100 * mm('energy'):+.2f}% | "
+                     f"{mm('viol_pp'):+.2f} | {100 * mm('p95'):+.1f}% |")
+    (root / "HIL_RESCORED.md").write_text("\n".join(L) + "\n")
+    print("\n".join(L))
+    return 0
 
 
 def main(argv=None):
+    if argv is None and len(sys.argv) > 2 and sys.argv[1] == "--rescore":
+        return rescore(sys.argv[2])
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", required=True)
     ap.add_argument("--reps", type=int, default=None, help="one number of repetitions for every size (overrides --reps-by-scale)")
     ap.add_argument("--scales", default=os.environ.get("HIL_SCALES", "1,10,100,1000"))
-    ap.add_argument("--reps-by-scale", default=os.environ.get("HIL_REPS_BY_SCALE", "3,3,2,1"))
+    ap.add_argument("--reps-by-scale", default=os.environ.get("HIL_REPS_BY_SCALE", "5,3,2,1"))
     ap.add_argument("--step-s", type=float, default=float(os.environ.get("HIL_STEP_S", 2.0)))
     ap.add_argument("--organisms", default=os.environ.get("HIL_ORGANISMS", ",".join(REALMS + ("stack_1226", "organism_656"))))
     ap.add_argument("--gpu", type=int, default=int(os.environ.get("GPU", 0)))
@@ -279,7 +342,9 @@ def main(argv=None):
          "Work per energy: (work Omni / work native) / (energy Omni / energy native) - 1; for the stacks work is the mean "
          "over plants of each plant's ratio; *both* counts the card as one more plant and adds its joules.", "",
          "## Omni against native, by organism (mean over repetitions, 95% interval when there are two or more)", "",
-         "| Size | Organism | Part | Label | Work per energy | Work | Energy | Violations (pp) |", "|---:|---|---|---|---:|---:|---:|---:|"]
+         "The one rule labels every row: nothing more than 2% worse than native (work, energy, the card's 95th percentile) and "
+         "the time over the line no higher than native's; a row that breaks it is NOT LABELLED and names what broke it.", "",
+         "| Size | Organism | Part | Label | Work per energy | Work | Energy | Time over the line (pp) | p95 |", "|---:|---|---|---|---:|---:|---:|---:|---:|"]
     out = {}
     for (sc, name) in res:
         per = [contrast(res[(sc, name)][r]["omni"], res[(sc, name)][r]["native"]) for r in sorted(res[(sc, name)])]
@@ -287,19 +352,20 @@ def main(argv=None):
         out[key] = {}
         for part, pname in (("sim", "stacks (model)"), ("card", "card (meter)"), ("all", "both")):
             xs = [p[part] for p in per]
-            m = {k: ci([x[k] for x in xs]) for k in ("primary", "work", "energy", "viol_pp")}
-            lab = label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)"
-            out[key][part] = {"label": lab, **{k: list(v) for k, v in m.items()}}
+            m = {k: ci([x[k] for x in xs]) for k in ("primary", "work", "energy", "viol_pp", "p95")}
+            bad = one_rule(xs)
+            lab = ("NOT LABELLED: " + ", ".join(bad)) if bad else (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)")
+            out[key][part] = {"label": lab, "worse": bad, **{k: list(v) for k, v in m.items()}}
             f = lambda k, s=100.0, u="%": f"{s * m[k][0]:+.2f}{u}" + (f" ({s * m[k][1]:+.2f} to {s * m[k][2]:+.2f})" if len(xs) > 1 else "")
-            L.append(f"| {sc}x | {NAMES[name]} | {pname} | {lab} | {f('primary')} | {f('work')} | {f('energy')} | {f('viol_pp', 1.0, '')} |")
-    L += ["", "## The card's receipts, by arm", "", "| Size | Organism | Rep | Arm | Card energy (J) | Requests served | Not served | p95 (ms) | Limit start → end (W) | Governor exit |",
-          "|---:|---|---:|---|---:|---:|---:|---:|---|---|"]
+            L.append(f"| {sc}x | {NAMES[name]} | {pname} | {lab} | {f('primary')} | {f('work')} | {f('energy')} | {f('viol_pp', 1.0, '')} | {f('p95')} |")
+    L += ["", "## The card's receipts, by arm", "", "| Size | Organism | Rep | Arm | Card energy (J) | Requests served | Not served | p95 (ms) | Over the line (%) | Limit start → end (W) | Governor exit |",
+          "|---:|---|---:|---|---:|---:|---:|---:|---:|---|---|"]
     for (sc, name) in res:
         for rep in sorted(res[(sc, name)]):
             for arm in ("native", "omni"):
                 c = res[(sc, name)][rep][arm]["card"]
                 L.append(f"| {sc}x | {NAMES[name]} | {rep + 1} | {arm} | {c['energy_j']:.0f} | {c['served']} | {c['not_served']} | "
-                         f"{c['p95_ms'] if c['p95_ms'] is None else round(c['p95_ms'], 1)} | {c['limit_start_w']} → {c['limit_end_w']} | {c['governor_exit']} |")
+                         f"{c['p95_ms'] if c['p95_ms'] is None else round(c['p95_ms'], 1)} | {c.get('over_line_pct', 0.0):.2f} | {c['limit_start_w']} → {c['limit_end_w']} | {c['governor_exit']} |")
     L += ["", "## Validity", ""] + ([f"- {p}" for p in problems] or ["- Every arm ended with the card at its start limit and its own clock range; every simulated knob was handed back; the card's governor exited cleanly."])
     L += ["", "Raw: every arm's `arm.json`, `smi.csv` (the card's own samples), `latency.csv`, `requests.csv`, `audit.jsonl`; checksums in `SHA256SUMS.txt`."]
     (a.out / "HIL.md").write_text("\n".join(L) + "\n")
