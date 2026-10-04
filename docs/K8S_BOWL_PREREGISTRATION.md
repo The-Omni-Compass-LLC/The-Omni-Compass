@@ -275,6 +275,26 @@ existing *fault over*, *blind* and kill-switch cases.
 8, 1,600 s), the fairness test (`two_app` 1, 900 s) and the fault test (`faults` 1, 900 s), 10 paired repetitions
 each, arms native / omni / bowl. The second application is now probed and reported as before, and its HPA is held at
 the operator's target. Labelled by the one rule. Every number, whatever it says, is published beside the runs above.
+
+## The re-runs under the amendment: results (2026-10-04)
+
+All three on commit `199f350`, 10 paired repetitions each, the design unchanged.
+
+- **Fault test, set 32 F** (`results/live/FAULTS_32.md`, run 37162459956): **no measure significantly worse under
+  either law.** The bowl law recovers from a lost machine 58% faster and starts 34% fewer pods; the amendment left the
+  fault behaviour of set 31 F intact.
+- **Fairness** (`results/live/FAIRNESS_2.md`, run 37162458834): **correction 1 holds.** With the bowl law php-apache's
+  failed requests are no longer worse (−14.0%, not significant; before +26.0%), pending pods −10.5% (before +65.2%);
+  the neighbour unharmed under both laws. The bowl law's response-time gains in this test are no longer significant.
+  Still worse under both laws: the mean pod start wait (+1.1 s bowl, +1.7 s allocation law).
+- **Capacity** (`results/live/CAPACITY_2.md`, run 37162457542): the bowl law served **24.6 against native's 16.2
+  requests a second, +51.9% (+6.2 to +10.6)**, the same paired difference as the first run on slower runners;
+  response times −28% to −56%, failures −9.6%, HPA replicas −10.7%. **Correction 2 did not remove the extra pod
+  starts** (5.1 against 3.8, +34.2%; before +30.4%): its premise, that the extra starts were pods removed and started
+  again between steps, is not borne out. With the mean replicas lower, the reading the data support is pods started
+  earlier on a rising load, the mechanism of the added capacity. Correction 2 stays (it removes no gain and added no
+  measure worse); the pod-start rows stand as measured, and by the one rule neither the capacity nor the fairness arm
+  is labelled better while they do.
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
