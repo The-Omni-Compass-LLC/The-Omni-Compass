@@ -8,17 +8,36 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Rerun everything:** `pip install -r requirements.txt && python verify.py` ends with `VERIFICATION: PASS`.
 
-## In one paragraph
+## In one paragraph (2026-10-04)
 
-Omni-Compass is a supervisory governor that sits on top of Kubernetes and hardware. On a real Kubernetes control plane
-it measurably makes services answer faster, on about a third fewer machines, with a clean kill switch. On kind every
-machine stays powered, so energy there is a declared model. On a real card (NVIDIA A10 on Lambda, the card's own meter,
-10 paired runs, `results/gpu/run-20261002T082232Z/GPU_REPS.md`) the first governor saved energy (+3.6% work per energy,
-proven) but made the slowest answers 58.5% slower, so its label by rule is energy improvement with service tradeoff.
-The cause was the governor's wiring, corrected in GPU amendments 6 to 8; the corrected governor has not yet run on a
-card, so no real-hardware result inside the band exists yet. In the models, the bowl law on every muscle of the six organisms gives +0.20% to +0.30% work
-per energy at every size and run count completed, but it spends more time over the service line than native in every
-cell, so the band-first rule was not held. Round 6 (`docs/REALMS_PREREGISTRATION.md`) found the cause and corrects it; checked on 20 paired seeds per organism, every organism now spends less time over the line than native with work per energy +0.09% to +0.20%; the grid is rerun on it.
+Omni-Compass sits on top of Kubernetes and hardware and gets more out of what is already there. On real Kubernetes,
+paired against Kubernetes alone with the same work sent to both: **48% more work handled inside the response line on
+the same machines** (capacity test, 10 pairs), the same work **55-65% faster on 29-36% fewer machines** (sets 22-27,
+10 pairs each, no failed requests), and energy equal or lower in every test. With the real cluster wired inside each of
+the six organisms (the four realms, the whole tower of 656 muscles, the four stacked, 1,226), it was late 23-52% less
+often and 24-40% faster in every one (`results/live/SIX_KUBE.md`). On Azure, with Azure's own autoscaler underneath at a
+steady load, the bill is the same either way and answers are 20% faster (`results/live/AKS_BILL.md`); the burst bill
+test is running. All of it together, real machines only: **the Omni index +15.0%**, more for the same or the same for
+less, across work, speed, machines and energy (`results/OMNI_INDEX.md`).
+
+The card: the first real run (NVIDIA A10, 2026-10-02) used a card controller that held the card's speed down in busy
+bursts. It saved 2-3.5% energy and answered 43-84% slower, so it is not a result to stand on. That controller was
+replaced (`docs/GPU_PREREGISTRATION.md`, amendments 6-11): the card now runs at least at its own busy speed in every
+burst and saves only in the quiet. Its run is next, single card first, then eight cards.
+
+The 656 muscles are models of real control systems. With the real cluster or the real card inside, they show the
+mechanism (work the same, energy 0.1-0.2% lower, time over the line lower than native in every organism); they are
+never counted in the headline.
+
+| Test (real) | Work | Speed | Machines | Energy | Source |
+|---|---|---|---|---|---|
+| Capacity, load rising, 10 pairs | **+48%** | p95 -50% | -1% | -0.3% | `results/live/AMENDMENT_3_RUNS.md` |
+| Sets 22-27, same work, 10 pairs each | same, none failed | p95 -55% to -65% | **-29% to -36%** | -0.1% to -0.5% | `results/live/LIVE_REPS_22.md` to `results/live/LIVE_REPS_27.md` |
+| Six organisms, cluster inside, 5 pairs each | requests served +0.5% to +6% | p95 -24% to -40% | same to -2% | -0.1% to -0.6% | `results/live/SIX_KUBE.md` |
+| Azure AKS, steady load, 5 pairs | same | p95 -20% | same | (billed) same | `results/live/AKS_BILL.md` |
+
+Running now: all four in one run (load rising then falling, 10 pairs), demand that wanders (up, spike, down, back up,
+idle, 10 pairs), the Azure burst bill test, and the 1,000-copy grid of the six organisms on Lambda.
 
 ## Measured on real systems: the newest set, Omni-Compass against Kubernetes as it runs today
 
@@ -94,7 +113,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | Speed lock (speed won elsewhere spent on GPU watts) | `results/gpu/sim/pipeline/` |
 | CPU and GPU on one conserved power budget: +1.4% to +5.7% work served against a fixed cap, never over the budget | `results/hardware/NODE_EXCHANGE_*.json`, `docs/CONVEYANCE_LAW.md` |
 | GPU groups sharing a site budget: 0 minutes over the budget | `results/hardware/SITE_EXCHANGE_HELDOUT_*.json` |
-| Platform leagues, faults, PlanetLab traces, stack benchmark | `tuning/`, `results/protocol/`, `results/` (see `docs/BENCHMARK_REPORT.md`) |
+| Platform leagues, faults, PlanetLab traces, stack benchmark | `tuning/`, `results/protocol/`, `results/` (see `docs/history/BENCHMARK_REPORT.md`) |
 | **The 656-muscle tower as organisms**, round 3 (preregistered, 10 seeds; every realm carries the shared spine; Omni as the shipped controller commands): the whole tower native against one governor on top, work per energy **+0.1%, SUPERIOR WITHIN GUARDRAILS**; inside the realms the spine costs service: Energy +0.2% with +1.9 pp violations (tradeoff), Compute 0.0% (+2.1 pp, not established), Distribution −0.1% and Physics −0.7% (**WORSE**). Rounds 1 and 2 kept, superseded | `results/realms/REALMS.md`, `docs/REALM_MUSCLES.md` |
 
 ## Verified in code

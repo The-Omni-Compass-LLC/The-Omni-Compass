@@ -343,7 +343,7 @@ stay fair. It stays at the operator's value in every arm; a higher cap is the op
 setting if ever asked for. Already in place and unchanged: a pod waiting for a place reads as past the wall and asks
 for one machine more at once.
 
-A narrower form was proposed the same day (`docs/proposals/AMENDMENT_RISING_STEP_CAP.md`): while the demand rises and a
+A narrower form was proposed the same day (`docs/history/AMENDMENT_RISING_STEP_CAP.md`): while the demand rises and a
 pod of the sensed service is pending, raise `maxReplicas` by the pending count and lower the target to match. It is
 declined for a mechanical reason as well as the one above. The replica cap does not make pods pending: at the cap the
 autoscaler simply asks for no more pods, so the pending count there is zero and the write would never fire where it is

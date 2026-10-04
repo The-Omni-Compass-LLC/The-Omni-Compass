@@ -11,7 +11,7 @@ Three architectures, every gauge, every study in this repository:
 Inputs: results/heldout_seed_*/SUMMARY.json (pre-registered, 2 x 500 scenarios), a k8s_controlplane run (rows JSON),
 results/fleet/planetlab or a planetlab SUMMARY.json, the live kind results (--live JSON), results/VERIFY_LOG.txt.
 
-python tools/full_report.py --cp-rows ROWS.json --planetlab SUMMARY.json --live LIVE.json --out docs/BENCHMARK_REPORT.md
+python tools/full_report.py --cp-rows ROWS.json --planetlab SUMMARY.json --live LIVE.json --out docs/history/BENCHMARK_REPORT.md
 """
 from __future__ import annotations
 
@@ -768,7 +768,7 @@ def main():
               "python -m k8s_controlplane.benchmark --scenarios 24 --seed 424242",
               "python -m fleet.planetlab --dir fleet/traces/planetlab --scenarios 8 --out /tmp/pl",
               "GitHub Actions: benchmark (live side by side), live-kind-full, live-kind",
-              "python tools/full_report.py ... && python pilot/bench_pdf.py docs/BENCHMARK_REPORT.md docs/BENCHMARK_REPORT.pdf"]:
+              "python tools/full_report.py ... && python pilot/bench_pdf.py docs/history/BENCHMARK_REPORT.md docs/history/BENCHMARK_REPORT.pdf"]:
         w(c)
     w("```")
     w("")

@@ -2,7 +2,7 @@
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
 """The buyer edition: one clean report from the final result files. Every number is read from a file in the repository.
-Output: docs/OMNICOMPASS_BUYER_EDITION.md (render with pilot/bench_pdf.py)."""
+Output: docs/history/OMNICOMPASS_BUYER_EDITION.md (render with pilot/bench_pdf.py)."""
 from __future__ import annotations
 
 import json, subprocess, sys
@@ -265,8 +265,8 @@ def main():
               "live: push a commit whose message contains [reps], [levers] or [shadow]"]:
         w(c)
     w("```")
-    (ROOT / "docs/OMNICOMPASS_BUYER_EDITION.md").write_text("\n".join(L))
-    print(f"wrote docs/OMNICOMPASS_BUYER_EDITION.md ({len(L)} lines)")
+    (ROOT / "docs/history/OMNICOMPASS_BUYER_EDITION.md").write_text("\n".join(L))
+    print(f"wrote docs/history/OMNICOMPASS_BUYER_EDITION.md ({len(L)} lines)")
 
 
 if __name__ == "__main__":

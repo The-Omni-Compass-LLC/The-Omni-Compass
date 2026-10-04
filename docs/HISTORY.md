@@ -115,8 +115,8 @@ locally at this commit.
 | `fleet/`, `hardware/` | simulation plants |
 | `tuning/` | benchmarks, pre-registrations, results |
 | `results/live/` | every live run, including the failed and withdrawn ones |
-| `docs/OMNICOMPASS_BUYER_EDITION.md` | the buyer-facing report |
-| `docs/CONSENSUS_AUDIT.md` | the five-reviewer audit (written by the same assistant that built the code; internal, not independent) |
+| `docs/history/OMNICOMPASS_BUYER_EDITION.md` | the buyer-facing report |
+| `docs/history/CONSENSUS_AUDIT.md` | the five-reviewer audit (written by the same assistant that built the code; internal, not independent) |
 
 ---
 

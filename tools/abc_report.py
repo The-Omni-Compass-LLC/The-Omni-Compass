@@ -11,7 +11,7 @@ Every number is read from a result file in this repository; nothing is typed in 
   results/live/LIVE_*.json                                      live Kubernetes runs
   results/muscles/*_HELDOUT.json                                the nine problem-map muscles
   tuning/VENDOR_COMPARE_DEV.json                                the platforms side by side
-Output: docs/OMNICOMPASS_ABC_REPORT.md; render with pilot/bench_pdf.py.
+Output: docs/history/OMNICOMPASS_ABC_REPORT.md; render with pilot/bench_pdf.py.
 """
 from __future__ import annotations
 
@@ -437,11 +437,11 @@ def main():
               "python tools/protocol_bench.py 100                       # runtime protocol, faults at five stress levels",
               "for m in rightsize coldstart gpupack powersmooth health cooling inference containment vmenergy; do python -m omnilab.bench $m heldout; done",
               "GitHub Actions workflow 'benchmark' (commit message tag [bench]): live A vs B on kind",
-              "python tools/abc_report.py && python pilot/bench_pdf.py docs/OMNICOMPASS_ABC_REPORT.md docs/OMNICOMPASS_ABC_REPORT.pdf"]:
+              "python tools/abc_report.py && python pilot/bench_pdf.py docs/history/OMNICOMPASS_ABC_REPORT.md docs/history/OMNICOMPASS_ABC_REPORT.pdf"]:
         w(c)
     w("```")
-    (ROOT / "docs/OMNICOMPASS_ABC_REPORT.md").write_text("\n".join(L))
-    print(f"wrote docs/OMNICOMPASS_ABC_REPORT.md ({len(L)} lines)")
+    (ROOT / "docs/history/OMNICOMPASS_ABC_REPORT.md").write_text("\n".join(L))
+    print(f"wrote docs/history/OMNICOMPASS_ABC_REPORT.md ({len(L)} lines)")
 
 
 if __name__ == "__main__":

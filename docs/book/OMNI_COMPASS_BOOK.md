@@ -4969,7 +4969,7 @@ Nothing here is deleted when a later result looks better.
 | S | Typical response time about 20% slower than every platform in the web and four-cluster simulations. | `docs/HISTORY.md` |
 | S | GPU model: the engine without its guards breaks the p95 guardrail. | `results/gpu/sim/FINDINGS.md` |
 | S | The compass-stroke GPU variant was tried and not adopted. | same |
-| S | Right-sizing against VPA: p95 +15%, memory (OOM) kills +531%. | `docs/BENCHMARK_REPORT.md` |
+| S | Right-sizing against VPA: p95 +15%, memory (OOM) kills +531%. | `docs/history/BENCHMARK_REPORT.md` |
 | — | Reported in the external master-build report (not reproducible from this repository): on fresh scenarios Karpenter+VPA sometimes used less modelled energy than Omni, while Omni had lower churn and fewer request-induced evictions. Kept here so it is not lost; to be re-run here before it is cited. | external |
 
 ---
@@ -5521,7 +5521,7 @@ python benchmarks/stack_benchmark.py ...                # held-out stack benchma
 python -m k8s_controlplane.benchmark --scenarios 24 --seed 424242
 python -m fleet.planetlab --dir fleet/traces/planetlab --scenarios 8 --out /tmp/pl
 GitHub Actions: benchmark (live side by side), live-kind-full, live-kind
-python tools/full_report.py ... && python pilot/bench_pdf.py docs/BENCHMARK_REPORT.md docs/BENCHMARK_REPORT.pdf
+python tools/full_report.py ... && python pilot/bench_pdf.py docs/history/BENCHMARK_REPORT.md docs/history/BENCHMARK_REPORT.pdf
 ```
 
 ### 22. Glossary
@@ -5979,7 +5979,7 @@ python tuning/closure_search.py && python tuning/closure_search2.py && python tu
 python tools/protocol_bench.py 100                       # runtime protocol, faults at five stress levels
 for m in rightsize coldstart gpupack powersmooth health cooling inference containment vmenergy; do python -m omnilab.bench $m heldout; done
 GitHub Actions workflow 'benchmark' (commit message tag [bench]): live A vs B on kind
-python tools/abc_report.py && python pilot/bench_pdf.py docs/OMNICOMPASS_ABC_REPORT.md docs/OMNICOMPASS_ABC_REPORT.pdf
+python tools/abc_report.py && python pilot/bench_pdf.py docs/history/OMNICOMPASS_ABC_REPORT.md docs/history/OMNICOMPASS_ABC_REPORT.pdf
 ```
 
 ---
@@ -6175,7 +6175,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | Speed lock (speed won elsewhere spent on GPU watts) | `results/gpu/sim/pipeline/` |
 | CPU and GPU on one conserved power budget: +1.4% to +5.7% work served against a fixed cap, never over the budget | `results/hardware/NODE_EXCHANGE_*.json`, `docs/CONVEYANCE_LAW.md` |
 | GPU groups sharing a site budget: 0 minutes over the budget | `results/hardware/SITE_EXCHANGE_HELDOUT_*.json` |
-| Platform leagues, faults, PlanetLab traces, stack benchmark | `tuning/`, `results/protocol/`, `results/` (see `docs/BENCHMARK_REPORT.md`) |
+| Platform leagues, faults, PlanetLab traces, stack benchmark | `tuning/`, `results/protocol/`, `results/` (see `docs/history/BENCHMARK_REPORT.md`) |
 | **The 656-muscle tower as organisms**, round 3 (preregistered, 10 seeds; every realm carries the shared spine; Omni as the shipped controller commands): the whole tower native against one governor on top, work per energy **+0.1%, SUPERIOR WITHIN GUARDRAILS**; inside the realms the spine costs service: Energy +0.2% with +1.9 pp violations (tradeoff), Compute 0.0% (+2.1 pp, not established), Distribution −0.1% and Physics −0.7% (**WORSE**). Rounds 1 and 2 kept, superseded | `results/realms/REALMS.md`, `docs/REALM_MUSCLES.md` |
 
 ### Verified in code
@@ -7109,7 +7109,7 @@ locally at this commit.
 | `fleet/`, `hardware/` | simulation plants |
 | `tuning/` | benchmarks, pre-registrations, results |
 | `results/live/` | every live run, including the failed and withdrawn ones |
-| `docs/OMNICOMPASS_BUYER_EDITION.md` | the buyer-facing report |
+| `docs/history/OMNICOMPASS_BUYER_EDITION.md` | the buyer-facing report |
 
 ---
 

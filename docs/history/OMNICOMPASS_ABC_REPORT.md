@@ -1,6 +1,6 @@
 # Omni-Compass against every major cluster platform: A, B and C
 
-> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Protected by copyright, patents and trademarks: Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).
+> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Protected by copyright, patents and trademarks: Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../../LICENSE).
 
 > **Dated record, kept as written on 26 September 2026.** Where a figure here differs from `docs/STATE_OF_PLAY.md`, the State of Play governs. The results below are simulations of platforms (evidence class S), not measurements of those products.
 
@@ -434,7 +434,7 @@ python tuning/closure_search.py && python tuning/closure_search2.py && python tu
 python tools/protocol_bench.py 100                       # runtime protocol, faults at five stress levels
 for m in rightsize coldstart gpupack powersmooth health cooling inference containment vmenergy; do python -m omnilab.bench $m heldout; done
 GitHub Actions workflow 'benchmark' (commit message tag [bench]): live A vs B on kind
-python tools/abc_report.py && python pilot/bench_pdf.py docs/OMNICOMPASS_ABC_REPORT.md docs/OMNICOMPASS_ABC_REPORT.pdf
+python tools/abc_report.py && python pilot/bench_pdf.py docs/history/OMNICOMPASS_ABC_REPORT.md docs/history/OMNICOMPASS_ABC_REPORT.pdf
 ```
 
 ---
