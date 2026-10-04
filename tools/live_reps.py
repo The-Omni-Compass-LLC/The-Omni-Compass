@@ -17,18 +17,20 @@ KEYS = ["worker nodes in service, mean", "node-hours", "energy, parked workers s
         "CPU used (cores), mean", "Omni's own CPU (cores), mean", "CPU used with Omni's own (cores), mean",
         "energy per core-hour (Wh)", "HPA replicas, mean",
         "pods started", "pod start wait, total (s)", "pod start wait, mean (s)",
+        "host CPU busy, the real machine under kind (%)", "host cores (the real machine under kind)",
         "machines billed, machine-hours", "compute bill at list price ($)",
         "second app: response time (ms), 95th percentile", "second app: response time (ms), 99th percentile",
         "second app: time over the response line (% of samples)", "second app: failed requests (%)"]
 BILL = {"machines billed, machine-hours", "compute bill at list price ($)"}   # a real cloud only (PLATFORM=aks)
 SECOND = {k for k in KEYS if k.startswith("second app: ")}                     # the fairness test only (TWO_APP=1)
+HOST = {"host CPU busy, the real machine under kind (%)", "host cores (the real machine under kind)"}   # kind only
 
 
 LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked workers still on at idle power (Wh, declared model)",
          "energy (Wh)": "energy, parked workers at 25 W standby (Wh, declared model; kind never does this)",
          "energy per core-hour (Wh)": "energy per core-hour (Wh, the 25 W standby model)"}
 NEUTRAL = {"CPU used (cores), mean", "utilisation (used / allocatable)", "Omni's own CPU (cores), mean",
-           "CPU used with Omni's own (cores), mean"}   # more is not better or worse by itself
+           "CPU used with Omni's own (cores), mean"} | HOST   # more is not better or worse by itself
 NOTE = ["**Energy on kind is a declared model, not a meter.** Every worker stays powered and Ready in every arm; the first",
         "energy row counts a parked worker at its full idle power, which is what kind does. The second counts it at the",
         "declared standby power, which needs a node autoscaler that really removes the machine; this run has none.", ""]
@@ -61,9 +63,28 @@ def bill(d):
     return g
 
 
+def host_cpu(d):
+    """The real machine under a kind cluster (host_cpu.csv, scripts/kind_bench.sh): its mean busy share over the measured
+    window and its core count. kind's workers each report every host core as their own, so this, not "used /
+    allocatable", says how full the machine doing the work was. Absent on a real cloud."""
+    f = d / "host_cpu.csv"
+    if not f.exists():
+        return {}
+    try:
+        t0 = float((d / "window_start.txt").read_text().split()[0]); t1 = float((d / "window_end.txt").read_text().split()[0])
+    except (OSError, ValueError, IndexError):
+        return {}
+    r = [x for x in csv.DictReader(open(f)) if x.get("busy") and t0 <= float(x["epoch_s"]) <= t1]
+    if not r:
+        return {}
+    return {"host CPU busy, the real machine under kind (%)": 100.0 * sum(float(x["busy"]) for x in r) / len(r),
+            "host cores (the real machine under kind)": float(r[-1]["cores"])}
+
+
 def arm_gauges(d):
     rows = list(csv.DictReader(open(d / "capture.csv")))
     g = gauges(rows); g.update(latency(str(d / "latency.csv"))); g.update(pod_starts(d))
+    g.update(host_cpu(d))
     # the controller's own cost (its process and every command it ran; it runs beside the cluster, not in it), from its
     # audit: counted so a CPU saving in the cluster is never reported without what Omni itself spent. Native, and native
     # tuned by its operator (native40, native30, native20), run no Omni process: 0.
@@ -231,7 +252,8 @@ def main(root):
         out["means"][a] = {k: float(np.nanmean([g.get(k, np.nan) for g in r.values()])) for k in KEYS}
     cloud = any(not math.isnan(m.get("machines billed, machine-hours", float("nan"))) for m in out["means"].values())
     two = any(not math.isnan(m.get("second app: failed requests (%)", float("nan"))) for m in out["means"].values())
-    keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two)]
+    host = any(not math.isnan(m.get("host cores (the real machine under kind)", float("nan"))) for m in out["means"].values())
+    keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host)]
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native vs Omni watching only vs Omni on top vs Omni alone)", ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))

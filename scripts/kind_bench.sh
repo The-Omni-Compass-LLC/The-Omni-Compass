@@ -198,6 +198,16 @@ if [ "$PLATFORM" = aks ]; then
   ( echo "epoch_s,machines"; while :; do echo "$(date -u +%s),$(kubectl get nodes -l "$WORKER_SEL" --no-headers 2>/dev/null | wc -l)"; sleep 15; done ) > "$OUT_DIR/billed_nodes.csv" &
   meter_pid=$!
 fi
+# the real machine under the cluster: on kind every worker reports all of the host's cores as its own, so "used /
+# allocatable" counts the same cores once per worker. The host's own busy share (/proc/stat, every 5 s) and its real core
+# count say how full the machine that does the work actually is (Omni never reads this file)
+host_pid=""
+if [ "$PLATFORM" != aks ]; then
+  ( echo "epoch_s,busy,cores"; read -r _ a b c d e f g h _ < /proc/stat; pt=$((a+b+c+d+e+f+g+h)); pi=$((d+e))
+    while sleep 5; do read -r _ a b c d e f g h _ < /proc/stat; t=$((a+b+c+d+e+f+g+h)); i=$((d+e))
+      echo "$(date -u +%s),$(awk -v dt=$((t-pt)) -v di=$((i-pi)) 'BEGIN{printf "%.4f", (dt > 0 ? 1 - di / dt : 0)}'),$(nproc)"; pt=$t; pi=$i; done ) > "$OUT_DIR/host_cpu.csv" &
+  host_pid=$!
+fi
 kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json > "$OUT_DIR/pod_watch.json" 2>"$OUT_DIR/pod_watch.err" &
 watch_pid=$!
 omni_pid=""
@@ -223,6 +233,7 @@ wait "$probe_pid" || true
 [ -n "$fault_pid" ] && { wait "$fault_pid" || true; }
 date -u +%s > "$OUT_DIR/window_end.txt"
 [ -n "$meter_pid" ] && { kill "$meter_pid" 2>/dev/null || true; }
+[ -n "$host_pid" ] && { kill "$host_pid" 2>/dev/null || true; }
 kill "$watch_pid" 2>/dev/null || true; wait "$watch_pid" 2>/dev/null || true
 kubectl get pods -n default -l run=php-apache -o json > "$OUT_DIR/pods_end.json"
 [ -n "$omni_pid" ] && { wait "$omni_pid" || true; }
