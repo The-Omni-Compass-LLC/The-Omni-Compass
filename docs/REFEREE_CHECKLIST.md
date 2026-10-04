@@ -48,7 +48,7 @@ checklists for experimental computer science (code, data, seeds, environment, st
 | One rule decides the label, by code | `DISCLOSURES.md`, section 3; the label printed by `tools/live_reps.py`, `tools/gpu_reps.py` | met |
 | Every run reported, including the ones that went wrong | earlier sets and the first GPU law kept in `results/`; the fault test's first two runs and their fixes recorded | met |
 | A control arm that measures the cost of being there | the watch arm (Omni-Compass decides, writes nothing) on the GPU | met |
-| The native comparator includes its own autoscaling of machines | on kind native has no node autoscaler; the bill run on Azure (`aks-metered`, Azure's own autoscaler) | **open: built, waiting to run** |
+| The native comparator includes its own autoscaling of machines | the bill run on Azure with Azure's own autoscaler: no difference in the bill either way at this load (`results/live/AKS_BILL.md`) | **met: measured, no saving shown** |
 | Behaviour under heavy load, not only light load | the capacity test: bowl law +34.1% and, +51.9% after the first amendment; after the second, +41.4% (bowl) and +44.8% (allocation law) with no measure significantly worse (`results/live/CAPACITY.md`, `CAPACITY_2.md`, `AMENDMENT_2_RUNS.md`) | **met (bowl law and allocation law)** |
 | Many tenants on one cluster: one surging must not starve its neighbour | the fairness test: neighbour unharmed; bowl failures worse, fixed by the amendment; after the second amendment the bowl law has no measure worse for either application; the allocation law raises the neighbour's failures (`results/live/FAIRNESS.md`, `FAIRNESS_2.md`, `AMENDMENT_2_RUNS.md`) | **met (bowl law); open (allocation law)** |
 | Workloads beyond the synthetic one | real AI serving (vLLM) on the card; public data-center traces | vLLM in the card run; **traces open** |
@@ -81,8 +81,8 @@ checklists for experimental computer science (code, data, seeds, environment, st
 
 ## 8. What this repository does not yet claim
 
-Energy savings in watts on real hardware beyond the first card run; the bill on a real cloud; capacity under heavy load
-within the one rule;
+Energy savings in watts on real hardware beyond the first card run; a lower bill on a real cloud (measured: no difference at
+the load tested);
 results reproduced by an outside party. Each has its test built and written down before it runs, and each result will
 be published as it comes, whatever it says.
 

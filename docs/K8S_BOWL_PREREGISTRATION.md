@@ -397,6 +397,29 @@ the first change; the kill switch restores it. Tests: `tests/test_bowl_controlle
 **Its run** (a setting of its own, labelled as such): the capacity test unchanged, `replica_ceiling` 30, beside the
 runs without it. Native keeps its cap of 10, as an operator who has not raised it would; the extra pods the bowl uses
 are counted in the HPA replicas row, so the receipt shows what the capacity cost in pods, not the gain alone.
+
+## The third and fourth amendments, and the bill on a real cloud: results (2026-10-04)
+
+**Rule 4** (`results/live/AMENDMENT_3_RUNS.md`, commit `583c97f`): **the bowl law has no measure more than 2% worse in
+any of the three tests.** Capacity +48.1% (+5.7 to +9.9), nothing worse; fairness, neither application worse (energy
+per core-hour on the declared standby model +1.5%, inside the allowance); faults, nothing worse, lost-machine recovery
+−61%. The allocation law: capacity +55.6%, nothing worse; in fairness the neighbour no longer worse. The first runs with
+the real machine metered: a 4-core GitHub runner 48% to 70% busy, where kind's "used / allocatable" reads 0.07 to 0.10.
+
+**Rule 5, the replica lever** (`results/live/REPLICA_ROOM.md`, commit `2101c3d`, ceiling 30): the bowl law served 24.6
+requests a second, the same as without the lever, with 78% more pods and 26 pod starts against native's 4.6, both
+significant. **The replica cap was not what limited the service; the machine doing the work was.** The lever stays,
+off by default, as the operator's to grant where machines have room; it is not part of Omni-Compass's default setting
+and this setting is not labelled better.
+
+**The bill on a real cloud** (`results/live/AKS_BILL.md`, run 37187059424, commit `5b2832f`, four paired repetitions):
+**no difference in the bill either way** (allocation law −0.6%, bowl law +0.8%, intervals across zero) and no measure
+significantly worse. Azure's own autoscaler already ran the workload on about 1.86 of 4 workers, so this light
+workload leaves no machine to give back. The machine savings measured on kind, where native has no node autoscaler, do
+not carry to a cloud with one at this load; that is the reading of record. The preregistered size `Standard_D2s_v5` is
+not allowed in the subscription's region; `Standard_D2s_v4` (same 2 vCPU, 8 GiB and list price) was used. Three
+earlier attempts stopped at the load generator's placement before any measurement and are not results.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
