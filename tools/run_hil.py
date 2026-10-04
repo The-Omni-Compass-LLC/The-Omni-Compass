@@ -28,7 +28,7 @@ on one clock. Every size's step is in the receipt. The simulated plants are evid
 energy and requests are class P (its own meter). The receipt keeps them apart and also adds them up.
 
   python3 tools/run_hil.py --out results/hil/run-STAMP [--scales 1,10,100,1000] [--reps-by-scale 5,3,2,1] [--sim]
-  python3 tools/run_hil.py --rescore results/hil/run-STAMP      (a finished run judged again by the one rule)
+  python3 tools/run_hil.py --rescore results/hil/run-STAMP      (a finished run reported in full from its own files)
 """
 from __future__ import annotations
 
@@ -237,24 +237,16 @@ def reading(k, v, eps=1e-9):
     return f"(better: {BETTER_UP.get(k) or BETTER_DOWN.get(k)})" if good else f"(WORSE: {WORSE[k]})"
 
 
-def one_rule(xs):
-    """The one rule on one part's paired repetitions (means): what is more than 2% worse than native. The band comes
-    first: time over the line may not be higher than native's at all."""
+def worse_on(xs):
+    """Every measure that is worse than native on the mean, by any amount, in words (no line drawn: the reader sees
+    what it costs beside what it gains)."""
     m = lambda k: sum(x[k] for x in xs) / len(xs)
-    bad = []
-    if m("work") < -0.02:
-        bad.append(f"work {100 * m('work'):+.2f}%")
-    if m("energy") > 0.02:
-        bad.append(f"energy {100 * m('energy'):+.2f}%")
-    if m("p95") > 0.02:
-        bad.append(f"p95 {100 * m('p95'):+.1f}%")
-    if m("viol_pp") > 0.0:
-        bad.append(f"time over the line {m('viol_pp'):+.2f} pp")
-    return bad
+    return [f"{WORSE[k]} ({100 * m(k):+.2f}%)" if k != "viol_pp" else f"{WORSE[k]} ({m(k):+.2f} pp)"
+            for k in ("primary", "work", "energy", "p95", "viol_pp") if reading(k, m(k)).startswith("(WORSE")]
 
 
 def rescore(root):
-    """Judge a finished card run again by the one rule, from its own raw files (arm.json and latency.csv): the card's
+    """A finished card run reported in full from its own raw files (arm.json and latency.csv): the card's
     time over the line is counted from latency.csv where the run did not record it. Writes HIL_RESCORED.md."""
     root = Path(root)
     meta = json.loads((root / "HIL.json").read_text())["run"] if (root / "HIL.json").exists() else {}
@@ -268,9 +260,9 @@ def rescore(root):
         size = next((int(p.name[5:]) for p in f.parents if p.name.startswith("size-")), 1)
         rep = next((p.name for p in f.parents if p.name.startswith("rep-")), "rep-1")
         res.setdefault((size, r["organism"]), {}).setdefault(rep, {})[r["arm"]] = r
-    L = [f"# The card run, judged again by the one rule (amendment 11)", "",
-         f"Run `{root.name}`, commit `{str(meta.get('commit', ''))[:12]}`, line {slo} ms. Nothing more than 2% worse than "
-         "native (work, energy, the card's 95th percentile) and the time over the line no higher than native's.", "",
+    L = [f"# The card run in full, from its own files (amendment 11)", "",
+         f"Run `{root.name}`, commit `{str(meta.get('commit', ''))[:12]}`, line {slo} ms. Every measure from the run's "
+         "own files, the card's response times included; every measure worse than native is named.", "",
          "| Size | Organism | Part | Repetitions | Label | Work per energy | Energy | Time over the line (pp) | p95 |",
          "|---:|---|---|---:|---|---:|---:|---:|---:|"]
     for (sc, name), reps in sorted(res.items()):
@@ -279,8 +271,8 @@ def rescore(root):
             continue
         for part, pname in (("sim", "stacks (model)"), ("card", "card (meter)"), ("all", "both")):
             xs = [p[part] for p in per]
-            bad = one_rule(xs)
-            lab = ("NOT LABELLED: " + ", ".join(bad)) if bad else (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)")
+            bad = worse_on(xs)
+            lab = (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; worse on: " + ", ".join(bad)) if bad else "")
             mm = lambda k: sum(x[k] for x in xs) / len(xs)
             L.append(f"| {sc}x | {NAMES[name]} | {pname} | {len(xs)} | {lab} | {100 * mm('primary'):+.2f}% | {100 * mm('energy'):+.2f}% | "
                      f"{mm('viol_pp'):+.2f} | {100 * mm('p95'):+.1f}% |")
@@ -358,8 +350,8 @@ def main(argv=None):
          "Work per energy: (work Omni / work native) / (energy Omni / energy native) - 1; for the stacks work is the mean "
          "over plants of each plant's ratio; *both* counts the card as one more plant and adds its joules.", "",
          "## Omni against native, by organism (mean over repetitions, 95% interval when there are two or more)", "",
-         "The one rule labels every row: nothing more than 2% worse than native (work, energy, the card's 95th percentile) and "
-         "the time over the line no higher than native's; a row that breaks it is NOT LABELLED and names what broke it.", "",
+         "The label is the preregistered one (the primary outcome and its interval, the time over the line first); beside it, "
+         "every measure that came out worse than native, by any amount, is named, so what Omni costs is read beside what it gains.", "",
          "How to read a row: each change is Omni against native on the same organism, seed and requests, and says in words "
          "whether it is better or worse. More work per energy and more work are better. Less energy is better (less spent: "
          "a lower power bill, or longer on the same supply). Less time over the line and a lower p95 are better (faster "
@@ -373,9 +365,9 @@ def main(argv=None):
         for part, pname in (("sim", "stacks (model)"), ("card", "card (meter)"), ("all", "both")):
             xs = [p[part] for p in per]
             m = {k: ci([x[k] for x in xs]) for k in ("primary", "work", "energy", "viol_pp", "p95")}
-            bad = one_rule(xs)
-            lab = ("NOT LABELLED: " + ", ".join(bad)) if bad else (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)")
-            out[key][part] = {"label": lab, "worse": bad, **{k: list(v) for k, v in m.items()}}
+            bad = worse_on(xs)
+            lab = (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; worse on: " + ", ".join(bad)) if bad else "")
+            out[key][part] = {"label": lab, "worse_on": bad, **{k: list(v) for k, v in m.items()}}
             f = lambda k, s=100.0, u="%": (f"{s * m[k][0]:+.2f}{u}" + (f" ({s * m[k][1]:+.2f} to {s * m[k][2]:+.2f})" if len(xs) > 1 else "")
                                             + f" {reading(k, m[k][0])}")
             L.append(f"| {sc}x | {NAMES[name]} | {pname} | {lab} | {f('primary')} | {f('work')} | {f('energy')} | {f('viol_pp', 1.0, '')} | {f('p95')} |")

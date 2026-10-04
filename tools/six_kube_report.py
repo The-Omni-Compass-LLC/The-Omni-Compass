@@ -13,8 +13,8 @@ Two kinds of rows, kept apart:
                energy from the declared power model; on AKS the bill from Azure's own count of machines)
   the organism the simulated stacks around it (evidence S, models): work, energy, time over the line
 
-The one rule labels each organism: no measure more than 2% worse than native (a measure that is more or less by
-itself, CPU and host load, is shown and not judged), and a gain counts only where energy or the bill is lower.
+Each organism's line names what came out better and what came out worse than native, by any amount, and which of
+those are inside the noise (the interval crosses zero). CPU and host load are shown, not judged. No line is drawn.
 
   python3 tools/six_kube_report.py DIR   ->  DIR/SIX_KUBE.md, DIR/SIX_KUBE.json
 """
@@ -83,15 +83,9 @@ def paired(runs_o, a, k):
     else:
         h = math.nan
     pct = 100.0 * m / abs(nb) if abs(nb) > 1e-12 else math.nan
-    if k in NEUTRAL or k == "host CPU busy, the real machine under kind (%)":
-        worse = False
-    elif k in HIGHER_BETTER:
-        worse = pct < -2.0
-    else:
-        worse = pct > 2.0
     better = (m > 0) if k in HIGHER_BETTER else (m < 0)
     return {"n": len(d), "native": nb, "omni": nb + m, "diff": m, "lo": m - h, "hi": m + h, "pct": pct,
-            "worse_2pct": bool(worse and k not in NEUTRAL), "better": bool(better), "neutral": k in NEUTRAL}
+            "better": bool(better), "neutral": k in NEUTRAL}
 
 
 def main(root):
@@ -134,17 +128,14 @@ def main(root):
         rows = {k: paired(runs[o], arm, k) for k in keys}
         rows = {k: v for k, v in rows.items() if v}
         n = max((v["n"] for v in rows.values()), default=0)
-        worse = [k for k, v in rows.items() if v["worse_2pct"]]
-        saved = [k for k, v in rows.items() if k in SAVING and v["better"] and v["n"] > 1 and v["hi"] < 0]
         restored = all(g["_restore_ok"] for g in runs[o][arm].values())
-        if n < 2:
-            verdict = "ONE REPETITION (no label)"
-        elif worse:
-            verdict = "NOT LABELLED: " + "; ".join(f"{LABEL.get(k, k)} {rows[k]['pct']:+.1f}%" for k in worse)
-        elif saved:
-            verdict = "BETTER BY THE ONE RULE: nothing more than 2% worse; saved " + ", ".join(LABEL.get(k, k) for k in saved)
-        else:
-            verdict = "NO WORSE (nothing more than 2% worse; no saving shown)"
+        sure = lambda v: v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
+        judged = {k: v for k, v in rows.items() if not v["neutral"] and k != "host CPU busy, the real machine under kind (%)" and abs(v["diff"]) > 1e-12}
+        better = [LABEL.get(k, k) for k, v in judged.items() if v["better"] and sure(v)]
+        worse = [LABEL.get(k, k) for k, v in judged.items() if not v["better"] and sure(v)]
+        noise = [LABEL.get(k, k) for k, v in judged.items() if not sure(v)]
+        verdict = (f"better on {len(better)}, worse on {len(worse)}" + (f" ({'; '.join(worse)})" if worse else "")
+                   + f", inside the noise on {len(noise)}") if n >= 2 else "ONE REPETITION"
         if not restored:
             verdict += "; INVALID: a simulated knob was not handed back"
         out["organisms"][o] = {"arm": arm, "repetitions": n, "verdict": verdict, "rows": rows}

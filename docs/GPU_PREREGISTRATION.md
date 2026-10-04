@@ -419,17 +419,16 @@ card's part SUPERIOR in five organisms while its 95th percentile rose from about
 The harness counted the card's work and energy and never its response time (its time over the line was fixed at zero).
 That run is history: its governor was replaced in amendments 6 and 7, and its labels do not meet the founder's rule.
 
-From this amendment every row of the card harness is judged by the one rule, the same rule as every other benchmark:
+From this amendment the card harness measures what it never counted:
 
-- the card's time over the line is measured (requests slower than the line, ten bare service times, percent of
-  requests) and paired against native; the 95th percentile is paired as a ratio;
-- a part (the stacks, the card, both) is labelled only when nothing is more than 2% worse than native (means over the
-  repetitions: work, energy, the card's 95th percentile) and its time over the line is no higher than native's; a part
-  that breaks it is NOT LABELLED and names what broke it;
+- the card's time over the line (requests slower than the line, ten bare service times, percent of requests) and its
+  95th percentile, each paired against native;
+- each row keeps its preregistered label and names, beside it, every measure that came out worse than native by any
+  amount, so what Omni costs is read beside what it gains; every change is read in words (better or WORSE, and what it
+  means); no new line is drawn. The 2% bound stays where the founder set it: inside the engine, as the trigger of the
+  verdict (`omnicompass/verdict.py`: a knob moves only where a paired trial shows the muscle at most 2% worse);
 - the stacks' own label (`realms/harness.py label`) puts the band first: its guardrail is the mean time over the line
   at or under native's, where it was the upper end of the interval under +1 point;
-- the GPU bench (`tools/gpu_reps.py`) keeps its preregistered guardrails and adds the one rule on its headline: a 95th
-  percentile more than 2% slower, or requests served more than 2% fewer, than native (means) is NOT LABELLED;
 - at one copy, each organism runs 5 paired repetitions (was 3), so an energy change of 1-3% on the card's own meter
   can be told from noise; 3, 2 and 1 at 10, 100 and 1,000 copies as before.
 

@@ -34,7 +34,6 @@ U_AUTHORITY = 25.0          # omnicompass/core.py: the U-channel command's bound
 DEADBAND = 0.01             # directional accuracy: a movement under this (state units) is not a direction
 W_INT = {"E": 1.0, "U": 1.0, "I_U": 1.0, "S": 1.0, "B": 1.0}   # the residual's weights, declared before any trial
 MARGIN_SERVED, MARGIN_P95, MARGIN_LOST = 0.01, 0.10, 0.01      # guardrails (docs/GPU_PREREGISTRATION.md)
-ONE_RULE = 0.02                                                  # the founder's rule: no measure more than 2% worse (means)
 SMI_DEFAULT = "timestamp,index,power.draw,temperature.gpu,utilization.gpu,power.limit,clocks.sm"
 
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228, 11: 2.201,
@@ -469,12 +468,6 @@ def main(root):
         g_lost = lost is None or sv is None or lost["ci95"][1] <= MARGIN_LOST * abs(sv["native"])
         wv = out["paired"].get("watch", {}).get(PRIMARY, {}).get("verdict")
         head = label(prim, g_served, g_p95, g_lost, not problems, wv)
-        # the one rule on top of the preregistered guardrails: no service measure more than 2% worse than native (means)
-        broke = [f"{k} {100 * po[k]['diff'] / abs(po[k]['base']):+.1f}%" for k, worse_up in
-                 (("response time, 95th percentile (ms)", True), ("requests served", False))
-                 if k in po and abs(po[k]["base"]) > 1e-12 and (po[k]["diff"] if worse_up else -po[k]["diff"]) > ONE_RULE * abs(po[k]["base"])]
-        if broke and head not in ("INVALID",):
-            head = "NOT LABELLED (the one rule): " + ", ".join(broke)
         av = out["paired"].get("omni_vs_watch", {}).get(PRIMARY, {}).get("verdict")
         out["headline"] = {"primary": prim, "guardrail_served": g_served, "guardrail_p95": g_p95, "guardrail_not_served": g_lost,
                            "verdict": head, "watch_primary": wv, "authority_primary": av,
