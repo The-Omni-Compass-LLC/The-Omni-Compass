@@ -102,14 +102,20 @@ def main():
     S["hpas"] = [{"metadata": {"name": "web", "namespace": "default"}, "spec": {"minReplicas": 1, "maxReplicas": 10,
                   "scaleTargetRef": {"kind": "Deployment", "name": "web"}, "metrics": [{"type": "Resource", "resource": {
                       "name": "cpu", "target": {"type": "Utilization", "averageUtilization": 50}}}]},
-                  "status": {"currentReplicas": 4, "desiredReplicas": 4}}]
+                  "status": {"currentReplicas": 4, "desiredReplicas": 4, "currentMetrics": [{"type": "Resource",
+                      "resource": {"name": "cpu", "current": {"averageUtilization": 40}}}]}}]
     Path(p3).write_text(json.dumps(S))
     lf = Path(t3) / "latency.csv"; lf.write_text("elapsed_seconds,latency_ms,ok\n" + "".join(f"{i},100,1\n" for i in range(60)))
     c3 = Controller(args(t3)); c3.a.slo_ms = 500.0; c3.a.convey_on = 0.0; seen = []   # conveying always
     for _ in range(4):
         os.utime(lf); c3.step()
         seen.append(json.loads(Path(p3).read_text())["hpas"][0]["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"])
-    assert seen[0] == 50 and seen[-1] == 95, seen
+    # a raise (fewer, larger pods) waits for a demand steady for one autoscaler window: none seen yet, so 50 stands
+    assert seen == [50, 50, 50, 50], seen
+    k3 = ("default", "web"); c3.demand[k3] = [(t - 280, d) for t, d in c3.demand[k3]]   # the same demand, a window on
+    os.utime(lf); c3.step()
+    seen.append(json.loads(Path(p3).read_text())["hpas"][0]["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"])
+    assert seen[-1] == 95, seen
     # the muscle's own clock: a new target inside the autoscaler's scale-down window (300 s) is held back; after it,
     # the target follows. A machine leaving service changes the guaranteed share (10 over 2 machines: 5 a machine,
     # 760m, g 1.52 -> 76%)
@@ -144,7 +150,7 @@ def main():
     assert [e["convey"] for e in ev if e.get("convey") in ("engaged", "released")] == ["engaged", "released", "engaged"], ev
     print("convey: w0 1900m x2, w1 2800m, w2 left at 500m (crowded); requests untouched; no rollout; kill restored 500m; "
           "only when needed: calm 500m, p95 300 ms conveys, 150 ms holds, 100 ms returns 500m, blind conveys; "
-          "hold blocks expansion; HPA target 50 -> 95 once clean (the guaranteed share, same queue promise), held for the autoscaler's window, then 76; closed machine with work: in service 3, open 2")
+          "hold blocks expansion; HPA target 50 -> 95 once clean and the demand steady for one window (the guaranteed share, same queue promise), held for the autoscaler's window, then 76; closed machine with work: in service 3, open 2")
     print("PASS test_convey")
 
 

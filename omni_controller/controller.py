@@ -46,7 +46,7 @@ from omni_controller.muscles import Muscles, add_args as add_muscle_args
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
 BOWL_UP, BOWL_DOWN, BOWL_RELEASE = 0.10, 0.02, -0.2   # the bowl's gains, the same on every muscle (realms/bowl_arm.py)
-DEMAND_RISE = 0.05     # demand still growing: CPU used more than 5% above its least in the last HPA window
+DEMAND_RISE = 0.05     # the demand moves: more than 5% between its least and its most over one HPA window
 RANGE_ANN = "omnicompass.io/original-replica-range"
 
 
@@ -273,7 +273,7 @@ class Controller:
         self.n_native = None           # the machines the cluster ran on its own when Omni started (the verdict's step 0)
         self.lat_t = None              # elapsed_seconds of the last request the verdict has seen
         self.bowl_x = {}               # (ns, name) -> the bowl's continuous HPA target, before rounding
-        self.demand = []               # (time, CPU used m): the demand that calls pods, kept one HPA window back
+        self.demand = {}               # (ns, hpa) -> [(time, demand)]: the CPU its pods use, in units of one pod's request
 
     def _sensed(self, h):
         """Whether the probe senses the service this HPA scales (--sensed ns/deployment,...; empty: every HPA, the
@@ -283,12 +283,31 @@ class Controller:
         ref = (h.get("spec", {}).get("scaleTargetRef", {}) or {}).get("name", "")
         return not sel or f'{h["metadata"]["namespace"]}/{ref}' in sel
 
-    def _rising(self, win):
-        """Whether the demand is still growing: CPU used now above (1 + DEMAND_RISE) times its least over the last
-        window. While it grows, the pods a breach called are still owed to it; handing the operator's target back
-        would remove them and start them again on the next rise."""
-        now = time.time(); past = [u for t, u in self.demand if now - t <= win]
-        return bool(past) and self.demand[-1][1] > (1.0 + DEMAND_RISE) * min(past)
+    def _app_demand(self, h):
+        """The demand on an HPA's service, read from the autoscaler's own status: its pods' mean CPU utilisation (of
+        their request) times the pods running, i.e. the CPU used in units of one pod's request. None if not reported."""
+        st = h.get("status", {}) or {}
+        for m in st.get("currentMetrics", []) or []:
+            if m.get("type") == "Resource" and (m.get("resource") or {}).get("name") == "cpu":
+                u = (m["resource"].get("current") or {}).get("averageUtilization")
+                if u is not None:
+                    return float(u) / 100.0 * int(st.get("currentReplicas", 0) or 0)
+        return None
+
+    def _rising(self, key, win):
+        """Whether the demand is still growing: now above (1 + DEMAND_RISE) times its least over the last window.
+        While it grows, the pods a breach called are still owed to it; handing the operator's target back would remove
+        them and start them again on the next rise."""
+        now = time.time(); h = self.demand.get(key, []); past = [d for t, d in h if now - t <= win]
+        return bool(past) and h[-1][1] > (1.0 + DEMAND_RISE) * min(past)
+
+    def _steady(self, key, win):
+        """Whether the demand has held still for one whole window: samples spanning it, its most within (1 +
+        DEMAND_RISE) of its least. The autoscaler itself removes pods only after its scale-down window; a raise of the
+        target (fewer, larger pods) waits for the same, so pods are never removed from a demand that is still moving
+        and started again when it rises."""
+        now = time.time(); h = [(t, d) for t, d in self.demand.get(key, []) if now - t <= win]
+        return bool(h) and now - h[0][0] >= 0.9 * win and max(d for _, d in h) <= (1.0 + DEMAND_RISE) * min(d for _, d in h)
 
     def _new_latencies(self):
         """Response times (ms) of the requests served since the last decision (the probe's latency file)."""
@@ -588,7 +607,6 @@ class Controller:
             if blind.get("latency", False) or s["pending"] > 0 or (p95 is not None and slo > 0 and p95 >= slo):
                 pos = 1.0
             F = self.bowl.force(pos)
-            self.demand = [(t, u) for t, u in self.demand if time.time() - t <= 900.0] + [(time.time(), float(s["used_m"]))]
             # the verdict: the response times of the requests served since the last decision, at the machines the pool
             # stood at; then how many machines may be given back at all (or the count a trial needs)
             if self.n_native is None:
@@ -660,6 +678,10 @@ class Controller:
                 orig = int(h["metadata"].get("annotations", {}).get(ANNOTATION, cur))
                 # the muscle's own clock: the autoscaler's scale-down window (300 s unless the operator set one)
                 win = float(((h["spec"].get("behavior") or {}).get("scaleDown") or {}).get("stabilizationWindowSeconds", 300))
+                dem = self._app_demand(h)
+                if dem is not None:
+                    self.demand[(ns, name)] = [(t, v) for t, v in self.demand.get((ns, name), []) if time.time() - t <= 2 * win] \
+                        + [(time.time(), dem)]
                 # more headroom is always allowed; less never: at a given load fewer pods always means a longer M/M/c wait
                 # (no target above the operator's keeps the wait), so a raise only spends latency.
                 # Omni on top earns its keep on machines, not by packing the operator's pods tighter
@@ -685,7 +707,7 @@ class Controller:
                         # stopped growing (a fault, a spike that passed), they were for it only: the operator's own
                         # target returns at once. While the demand still grows they stay, so the autoscaler does not
                         # remove them and start them again on the next rise
-                        if not self._rising(win):
+                        if not self._rising((ns, name), win):
                             x = hi_t; back = True
                     else:
                         F_ = bowl_rec["force"]
@@ -697,6 +719,8 @@ class Controller:
                     continue
                 if cur == want_h:
                     continue
+                if want_h > cur and not back and not self._steady((ns, name), win):
+                    continue     # a raise (fewer pods) waits for a demand that has held still for one window
                 # the autoscaler takes its window to answer a target. A new target inside that window moves the muscle
                 # mid-movement and starts pods it then removes, so I hold each target for one window. A response-time
                 # breach returns the operator's target at once

@@ -10,6 +10,7 @@
   blind     no live probe samples: read as past the wall, same as hot
   demand    calm again while the demand still grows: the extra pods stay; the operator's target returns once the
             demand has stopped growing for one autoscaler window (no remove-then-restart)
+  steady    a raise of the target (fewer pods) waits for a demand steady for one autoscaler window
   sensed    two services, the probe measuring one: only its HPA moves; the neighbour's stays the operator's
   restore   the kill switch returns every HPA target to the operator's and removes every record
   engine    the six-state engine still runs every decision (E and U in the audit) and the decision names the bowl law
@@ -100,16 +101,29 @@ def main():
     t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 600.0)
     c, marker = controller(t, lat); c.step()
     assert target_now(st) == 30
-    S = json.loads(st.read_text()); S["used_per_node"] = "600m"; st.write_text(json.dumps(S))
+    S = json.loads(st.read_text()); S["hpas"][0]["status"]["currentMetrics"][0]["resource"]["current"]["averageUtilization"] = 90
+    st.write_text(json.dumps(S))
     lat = probe(t, 50.0)
     for _ in range(3):
         c.step()
     assert target_now(st) == 30, f"rising demand: target {target_now(st)}, expected the pods held at 30"
-    c.demand = [(tt - 400.0, u) for tt, u in c.demand]      # one window (300 s) on, the demand flat since
+    k = ("default", "web"); c.demand[k] = [(tt - 400.0, u) for tt, u in c.demand[k]]   # one window (300 s) on, flat since
     c.target_at = {k: v - 400.0 for k, v in c.target_at.items()}
     c.step()
     assert target_now(st) == 50, f"demand flat: target {target_now(st)}, expected the operator's 50 back"
     print("rising demand: pods held at 30 while the demand grew; back to 50 once it stopped growing for one window")
+
+    # consolidation waits for a steady demand: a raise of the target (fewer, larger pods) only after the demand has held
+    # still for one autoscaler window, as the autoscaler itself waits before removing pods
+    t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 50.0)
+    c, marker = controller(t, lat); now = time.time(); k = ("default", "web")
+    c.demand[k] = [(now - 120 + 60 * i, 1.2) for i in range(3)]
+    assert not c._steady(k, 300), "steady after 2 minutes of history"
+    c.demand[k] = [(now - 295 + 59 * i, 1.2 + 0.01 * i) for i in range(6)]
+    assert c._steady(k, 300), "not steady after a flat window"
+    c.demand[k] = [(now - 295 + 59 * i, 1.2 + 0.2 * i) for i in range(6)]
+    assert not c._steady(k, 300) and c._rising(k, 300), "a climbing demand read as steady"
+    print("consolidation: a raise waits for one steady window; a climbing demand never consolidates")
 
     # two services on the same machines, the probe measuring one (--sensed default/web): a breach moves only the HPA
     # of the service the probe measures; the neighbour's HPA stays at the operator's own target

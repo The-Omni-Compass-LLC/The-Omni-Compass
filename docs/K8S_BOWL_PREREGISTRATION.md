@@ -295,6 +295,33 @@ All three on commit `199f350`, 10 paired repetitions each, the design unchanged.
   earlier on a rising load, the mechanism of the added capacity. Correction 2 stays (it removes no gain and added no
   measure worse); the pod-start rows stand as measured, and by the one rule neither the capacity nor the fairness arm
   is labelled better while they do.
+
+## The pod record, and the second amendment (2026-10-04, before the next runs)
+
+**What the pod record shows** (`tools/pod_report.py`, workflow `pod-report`, read from the stored artifacts of runs
+37162457542 and 37162458834; nothing re-run). In the capacity test native started its pods once, early (33 of 38 in
+the first fifth of the window), and removed none. With Omni-Compass on top, two minutes into the window the controller
+raised the HPA target above the operator's (the conveyance: each pod given a larger CPU limit, the target raised by the
+same factor so each pod stays as busy, $x = g\,x^{op}$; 114% with the bowl law, 190% with the allocation law). The
+autoscaler then removed pods (14 with the bowl law, 35 with the allocation law, over ten repetitions), and the next
+load steps started them again. **The extra starts are exactly those removals.** Correction 2 above read the wrong
+signal: the CPU used by the whole node, where one load step is lost in the node's own load.
+
+**3. A raise of the target waits for a steady demand.** Let the demand on an HPA's service be read from the
+autoscaler's own status, $D(t) = \bar{u}(t)\, r(t)$: the pods' mean CPU utilisation of their request times the pods
+running, the CPU used in units of one pod's request. With $W$ the HPA's scale-down window and $\epsilon = 0.05$,
+
+$$S(t) = \Big[\, t - t_0 \ge 0.9\,W \ \wedge\ \max_{[t-W,\,t]} D \le (1+\epsilon)\min_{[t-W,\,t]} D \,\Big]$$
+
+($t_0$ the oldest sample in the window). A new target above the one standing (fewer, larger pods) is written only
+when $S(t)$ holds; the autoscaler itself removes pods only after its scale-down window, and Omni-Compass now asks the
+same of its own consolidation. A lower target (more pods) is never held, and the return of the operator's own target
+after a fault (rule 2) is unchanged. Correction 2's growth test $G(t)$ now reads the same $D(t)$ of the HPA concerned,
+not the node's CPU. Tests: `tests/test_bowl_controller.py`, case *steady*.
+
+The capacity, fairness and fault tests are run again on the commit that carries this amendment, unchanged in design,
+and published beside the runs above whatever they show. The bill run on Azure (`aks-metered`, run 37171672509)
+started on commit `199f350`, before this amendment, and is reported as of that commit.
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
