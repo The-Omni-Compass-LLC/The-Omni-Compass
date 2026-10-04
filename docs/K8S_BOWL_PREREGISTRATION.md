@@ -517,6 +517,20 @@ left out of that test, never filled in. A measure inside the noise is counted at
 the headline is the geometric mean of the real categories, each weighted the same; the modelled muscles are shown
 beside it, never inside it. Computed by `tools/omni_index.py` from each test's own paired results; nothing is typed in.
 
+
+## Demand that wanders: up, spike, partway down, back up, down to idle (written before its run, 2026-10-04)
+
+Real demand does not rise once and fall once. It climbs, spikes, eases part way, climbs again and finally settles to
+idle. This test drives that shape and asks whether machines follow it in order: the emptiest machine idles first on the
+way down (powered and Ready at its floor, never off), the warm machines wake first on the way up (no boot), one machine
+always in service for the first burst (`scripts/kind_nodepool.sh`).
+
+Design as the all-four test (ten pairs, native and bowl, open-loop load, fresh six-worker kind cluster per arm), with
+`load_steps` 1 2 3 2 3 4 5 6 5 3 5 6 5 4 3 2 3 2 1 1 (twenty steps of 135 s, 2,700 measured seconds), the same steps in
+every arm. Reported, native + Omni against native, paired with the 95% interval and read in words: time over the 500 ms
+line, failed requests, p95, worker machines in service (and its trace step by step), energy (declared model), CPU with
+Omni's own, pods started. No capacity is read (the load does not only rise).
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
