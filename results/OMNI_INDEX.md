@@ -9,7 +9,7 @@ Every measure of every test is a ratio oriented so that above 1 is better for Om
 
 | Category | Index | Work | Speed | Machines | Energy | Tests |
 |---|---:|---:|---:|---:|---:|---:|
-| Real Kubernetes (GitHub) | **+18.5%** | +6.5% | +75.0% | +1.0% | +0.2% | 11 |
+| Real Kubernetes (GitHub) | **+18.5%** | +6.5% | +68.8% | +2.9% | +1.5% | 12 |
 | Real cloud (Azure AKS, billed) | **+7.5%** | +0.0% | +25.4% | -0.8% |  | 1 |
 | Real card (NVIDIA, its own meter) | pending | | | | | the rerun on the current card controller (the 2026-10-02 run used the replaced one) |
 | Modelled muscles (evidence S) | **+0.1%** | +0.0% |  |  | +0.1% | 6 |
@@ -25,6 +25,7 @@ Read: +10% in a column means 10% better for Omni-Compass in that measure (more w
 | Real Kubernetes (GitHub) | All four in one run: load up and down one step at a time, ten pairs | **+40.5%** | +41.7% | +171.4% | +1.1% | +0.2% | `results/live/ALL_FOUR.md` |
 | Real Kubernetes (GitHub) | Fairness: a noisy neighbour, ten pairs | **+5.6%** | not taken | +17.8% | +0.0% | +0.1% | `results/live/FAIRNESS.md` |
 | Real Kubernetes (GitHub) | Faults: machine down, spike, runaway pod, blind probe, ten pairs | **+35.9%** | not taken | +150.4% | +0.2% | +0.1% | `results/live/FAULTS.md` |
+| Real Kubernetes (GitHub) | A queue of jobs: cruise, then the emergency brake, ten pairs | **+18.5%** | not taken | +13.3% | +26.0% | +16.7% | `results/live/BATCH.md` |
 | Real cloud (Azure AKS, billed) | Steady load, Azure's autoscaler underneath, five pairs (earlier engine; the rerun is running) | **+7.5%** | +0.0% | +25.4% | -0.8% | not taken | `results/live/AKS_BILL.md` |
 | Real Kubernetes (GitHub) | Six organisms: Compute / AI / Cloud, the cluster inside, five pairs | **+11.1%** | +1.9% | +49.6% | +0.0% | +0.1% | `results/live/SIX_KUBE.json` |
 | Modelled muscles (evidence S) | Compute / AI / Cloud: the modelled stacks around the real cluster | **+0.0%** | +0.0% | not taken | not taken | +0.1% | `results/live/SIX_KUBE.json` |

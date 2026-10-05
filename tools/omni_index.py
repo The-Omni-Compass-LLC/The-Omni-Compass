@@ -53,6 +53,8 @@ SOURCES = [
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
     ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs", "FAULTS.md",
      r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+    ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs", "BATCH.md",
+     r"^## omni \(compass law\)", {"speed": r"response time \(ms\), mean", "machines": NODES, "energy": r"energy, parked workers at 25 W standby"}, None),
     ("Real cloud (Azure AKS, billed)", "Steady load, Azure's autoscaler underneath, five pairs (earlier engine; the rerun is running)",
      "AKS_BILL.md", r"## B with the compass law", {"speed": P95, "machines": BILLED}, "equal"),
 ]

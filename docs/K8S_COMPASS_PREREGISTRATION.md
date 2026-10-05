@@ -771,6 +771,11 @@ decision (`docs/MECHANISM_OF_ACTION.md` 9.1). That touched the modelled organism
 (six-kube 37280090832, big organism 37287311224); their cluster rows are unaffected. The organism runs go again on the
 fixed code.
 
+The batch test on amendment 12 (GitHub run 37344765837, ten pairs, `results/live/BATCH.md`): machines in service -20.7%,
+-32.4% once the queue was done, energy -14.3% on the standby model, mean response -11.7%, all proven. The queue finished
++1.1% later, inside the noise (it was +1.8% and proven before cruise stepped back). No pod was left without a machine.
+Nothing came out worse beyond the noise.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
