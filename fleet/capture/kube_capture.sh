@@ -13,8 +13,13 @@ echo "timestamp,elapsed_seconds,nodes_ready,nodes_total,alloc_cpu_m,req_cpu_m,us
 start=$(date +%s)
 while :; do
   now=$(date +%s); el=$((now - start)); [ "$el" -gt "$DURATION" ] && break
-  nodes=$(kubectl get nodes -o json)
-  pods=$(kubectl get pods -A -o json)
+  # a reading the API server does not answer (a swamped cluster, a managed control plane under load) is logged and
+  # skipped; the recording goes on, so the moments a cluster struggles are kept, never the end of the run
+  if ! nodes=$(kubectl get nodes -o json --request-timeout=20s 2>>"$OUT.errors") || \
+     ! pods=$(kubectl get pods -A -o json --request-timeout=20s 2>>"$OUT.errors"); then
+    echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) elapsed $el s: the API server did not answer; reading skipped" >> "$OUT.errors"
+    sleep "$INTERVAL"; continue
+  fi
   if [ "${ACTIVE_ONLY:-0}" = "1" ]; then
     # in service: open to new work, or closed (idle mark or cordon) but still carrying work (not a DaemonSet's)
     carrying=$(echo "$pods" | jq -r '[.items[] | select(.status.phase=="Running" or .status.phase=="Pending")
@@ -31,7 +36,7 @@ while :; do
   req=$(echo "$pods" | jq -r '.items[] | select(.status.phase=="Running") | .spec.containers[].resources.requests.cpu // "0"' | to_m | awk '{s+=$1} END {printf "%.0f", s}')
   pending=$(echo "$pods" | jq '[.items[] | select(.status.phase=="Pending")] | length')
   used=$(kubectl top nodes --no-headers 2>/dev/null | awk -v names="$names" 'BEGIN{n=split(names,a," "); for(i=1;i<=n;i++) on[a[i]]=1} ($1 in on){print $2}' | to_m | awk '{s+=$1} END {printf "%.0f", s}')
-  hpa=$(kubectl get hpa -A -o json)
+  hpa=$(kubectl get hpa -A -o json --request-timeout=20s 2>>"$OUT.errors") || hpa='{"items":[]}' 
   hc=$(echo "$hpa" | jq '.items | length'); hcur=$(echo "$hpa" | jq '[.items[].status.currentReplicas // 0] | add // 0'); hdes=$(echo "$hpa" | jq '[.items[].status.desiredReplicas // 0] | add // 0')
   pw=""; if [ -n "${POWER_CMD:-}" ]; then pw=$(eval "$POWER_CMD" 2>/dev/null || echo ""); fi
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ),$el,$ready,$total,$alloc,$req,$used,$pending,$hc,$hcur,$hdes,$pw" >> "$OUT"

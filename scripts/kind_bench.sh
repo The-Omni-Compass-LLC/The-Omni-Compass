@@ -185,7 +185,10 @@ read -r -a steps <<< "$LOAD_STEPS"
 step_s=$(( DURATION / ${#steps[@]} ))
 ( for r in "${steps[@]}"; do
     echo "$(date -u +%H:%M:%S) load-generator replicas -> $r"
-    kubectl scale deployment/load-generator --replicas="$r" >/dev/null
+    # the same load in every arm: a scale the API server does not answer is tried again, and a failure is logged,
+    # never the end of the schedule
+    for t in 1 2 3 4 5 6; do kubectl scale deployment/load-generator --replicas="$r" --request-timeout=20s >/dev/null && break
+      echo "$(date -u +%H:%M:%S) scale to $r not answered (try $t)"; sleep 5; done || true
     sleep "$step_s"
   done ) > "$OUT_DIR/load_schedule.log" 2>&1 &
 load_pid=$!

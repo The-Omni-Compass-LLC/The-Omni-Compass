@@ -123,8 +123,14 @@ def main(argv=None):
         if reps[k] != set_r:
             log.write(f"{time.strftime('%H:%M:%S', time.gmtime())} load-generator replicas -> {reps[k]}\n"); log.flush()
             if not a.dry:
-                subprocess.run([a.kubectl, "scale", "deployment/load-generator", f"--replicas={reps[k]}"],
-                               capture_output=True, timeout=30)
+                for _ in range(6):                                   # tried again if the API server does not answer
+                    try:
+                        if subprocess.run([a.kubectl, "scale", "deployment/load-generator", f"--replicas={reps[k]}",
+                                           "--request-timeout=20s"], capture_output=True, timeout=30).returncode == 0:
+                            break
+                    except subprocess.TimeoutExpired:
+                        pass
+                    time.sleep(5)
             set_r = reps[k]
         body.couple()
         if omni:

@@ -601,6 +601,22 @@ the organism at 1,000 copies with the real cluster inside), copies every file ba
 happens. Three paired repetitions per organism, two machines at a time. Its results join `SIX_KUBE.md` at 1,000 copies;
 the same cells from GitHub runners count only if the runner held them.
 
+
+### The burst bill test on Azure: two native arms lost to the harness, and the fix (2026-10-05)
+
+Repetitions 2 and 3 of the burst bill test (run 37216328055) each lost their native arm (Kubernetes alone) at the
+same moment: the load step from one generator to six. Native's two work machines were full, answers timed out, and the
+API server stopped answering for minutes. The capture script ran with stop-on-first-error, so one unanswered reading
+ended the recording, and the load schedule stopped at its next unanswered scale; the arm failed its checks and was
+marked invalid. The Omni-Compass arms of the same repetitions ran every step. Those two arms are not counted.
+
+That is a fault of the harness, and it threw away exactly the moments a cluster struggles. Fixed: a reading the API
+server does not answer is logged (`capture.csv.errors`) and skipped, and the recording goes on; a scale the API server
+does not answer is tried again, then logged, and the schedule goes on (`fleet/capture/kube_capture.sh`,
+`scripts/kind_bench.sh`, `tools/run_kil.py`). Repetitions 4 and 5 started on the earlier code. When the run ends, three
+more repetitions of the same test run on the fixed code, and the report counts every valid pair and names every
+invalid arm with its cause.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
