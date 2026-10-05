@@ -1,12 +1,15 @@
 # Omni-Compass on top of CityLearn's own controller
 
-CityLearn (see each district file) (Intelligent Environments Lab, University of Texas at Austin; MIT license): an independent simulator of real buildings from measured data, with its own controllers and its own scoring. Native: CityLearn's rule-based battery controller (BasicRBC). Native + Omni: the same controller with the bowl law on top of its battery commands (gain 0.5, response 1.0 h, glide 0.05 an hour, band from the past week's district draw, handed back at 90% of the year). Every number is CityLearn's own score: the controller over no battery at all, lower is better for every row. Evidence class: an independent recognized simulator (not our model).
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+
+
+CityLearn (see each district file) (Intelligent Environments Lab, University of Texas at Austin; MIT license): an independent simulator of real buildings from measured data, with its own controllers and its own scoring. Native: CityLearn's rule-based battery controller (BasicRBC). Omni: the same controller with the bowl law on top of its battery commands (gain 0.5, response 1.0 h, glide 0.05 an hour, band from the past week's district draw, handed back at 90% of the year). Every number is CityLearn's own score: the controller over no battery at all, lower is better for every row. Evidence class: an independent recognized simulator (not our model).
 
 ## citylearn_challenge_2022_phase_1 (the tuning district: not counted in the confirmation): 5 buildings, 8,760 hours
 
 Omni-Compass moved the commands in 7,859 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.1158 | 0.9982 | -10.54% | better: less electricity bill |
 | electricity bought (`electricity_consumption_total`) | 1.2275 | 1.0094 | -17.77% | better: less electricity bought |
@@ -25,3 +28,7 @@ The tuning district is left out of this table.
 
 | CityLearn score | Districts better | Districts worse | Mean change |
 |---|---:|---:|---:|
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

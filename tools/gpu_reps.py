@@ -28,6 +28,11 @@ Usage: python tools/gpu_reps.py RUN_DIR   (RUN_DIR holds rep-<n>/<arm>/)  ->  RU
 from __future__ import annotations
 
 import csv, datetime as dt, json, math, statistics, sys
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from pathlib import Path
 
 U_AUTHORITY = 25.0          # omnicompass/core.py: the U-channel command's bound (saturation)
@@ -498,7 +503,7 @@ def main(root):
     L += ["## The control", "", f"- Writes executed (power limit and clock ceiling): " + ", ".join(f"{names[a]} {wr[a]}" for a in cols) + ".",
           "- Every arm ended at the start limit." if not any("restore" in p for p in problems) else "- An arm did NOT end at the start limit.",
           "- Energy is the device's own power.draw integrated over time; no number here is modelled.", ""]
-    (root / "GPU_REPS.json").write_text(json.dumps(out, indent=1)); (root / "GPU_REPS.md").write_text("\n".join(L))
+    (root / "GPU_REPS.json").write_text(json.dumps(out, indent=1)); (root / "GPU_REPS.md").write_text("\n".join(_legal_stamp(L)))
     print("\n".join(L))
     return 2 if problems else 0
 

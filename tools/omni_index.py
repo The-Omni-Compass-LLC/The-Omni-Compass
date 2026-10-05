@@ -21,6 +21,11 @@ the file, the table and the row); nothing is typed in. A test that did not take 
 from __future__ import annotations
 
 import json
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 import math
 import re
 import sys
@@ -202,7 +207,7 @@ def main():
         ix = "" if t["index_pct"] is None else f"{t['index_pct']:+.1f}%"
         L.append(f"| {t['category']} | {t['test']} | **{ix}** | {cell('work')} | {cell('speed')} | {cell('machines')} | "
                  f"{cell('energy')} | `{t['source']}` |")
-    (ROOT / "results" / "OMNI_INDEX.md").write_text("\n".join(L) + "\n")
+    (ROOT / "results" / "OMNI_INDEX.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     (ROOT / "results" / "OMNI_INDEX.json").write_text(json.dumps(
         {"headline_pct": None if head is None else 100 * (head - 1),
          "categories": {c: None if g is None else 100 * (g - 1) for c, g in cat_g.items()}, "tests": ts}, indent=1) + "\n")

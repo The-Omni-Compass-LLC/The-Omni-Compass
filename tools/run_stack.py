@@ -11,6 +11,11 @@ Checks that the stacked native run equals each realm's own native run, plant by 
 RUN.json and SHA256SUMS.txt.
 """
 import hashlib, json, os, subprocess, sys, time
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
@@ -76,7 +81,7 @@ def main(argv=None):
     L += ["", "Work is the mean over the stacked muscles of work with Omni over work native; energy is total joules; "
           "violations are the change in the share of periods any muscle was out of its service target. Labels by the "
           "preregistered rule. These are models, not meters."]
-    (out / "STACK.md").write_text("\n".join(L) + "\n")
+    (out / "STACK.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     (out / "STACK.json").write_text(json.dumps({"run": run, "results": res}, indent=1) + "\n")
     (out / "RUN.json").write_text(json.dumps(run, indent=1) + "\n")
     files = sorted(p for p in out.iterdir() if p.is_file() and p.name != "SHA256SUMS.txt")

@@ -10,6 +10,11 @@ controls the catalog does not have, sets aside protective actions and non-contro
 docs/realm_study/TRUE_MUSCLES.csv and docs/realm_study/WAVE3_REPORT.md.
 """
 import csv
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from collections import Counter, OrderedDict
 from pathlib import Path
 
@@ -105,7 +110,7 @@ def main():
           "any of them can be contested.",
           "- **The realm harness still runs on the 656 catalog (round 3).** Moving it onto this list is a new round, with "
           "its own preregistration."]
-    (S / "WAVE3_REPORT.md").write_text("\n".join(L) + "\n")
+    (S / "WAVE3_REPORT.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     print("\n".join(L[L.index("## The true muscle list, by realm"):L.index("## The true muscle list, by realm") + 9]))
 
 

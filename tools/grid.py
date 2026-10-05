@@ -13,6 +13,11 @@ machine-hours, beyond the machines available). How to read every table: docs/HOW
 from __future__ import annotations
 
 import re
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -100,7 +105,7 @@ def main():
           "(thermal zones held warmer have a little less margin in a heat spike; `docs/REALMS_PREREGISTRATION.md`, round 6 "
           "receipts), inside the 2% the rule allows (`DISCLOSURES.md`, section 3).",
           "- The full receipt of each size, with the 95% interval of every number, is in `results/scale/receipts/`."]
-    OUT.write_text("\n".join(L) + "\n")
+    OUT.write_text("\n".join(_legal_stamp(L)) + "\n")
     print(OUT, len(done), "cells")
 
 

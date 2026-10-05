@@ -7,6 +7,11 @@ Settings are all frozen before this run: B = tuning/B_SETTINGS_TONE.json (Kubern
 of tuning/GLOBAL_LEAGUE_PREREGISTRATION.json with the nervous-system coordination on (tuning/COORD_PREREGISTRATION.json).
 THEORETICAL SIMULATION (fleet/sim_slo.py). Usage: python tools/three_way.py  ->  results/THREE_WAY.md, results/THREE_WAY.json"""
 import json, sys
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from multiprocessing import Pool
 from pathlib import Path
 import numpy as np
@@ -87,7 +92,7 @@ def main():
     tag = "_C2" if C2 else ""
     if C2:
         L[0] += " (Omni alone v2, frozen in tuning/C2_PREREGISTRATION.json)"
-    (ROOT / f"results/THREE_WAY{tag}.md").write_text("\n".join(L) + "\n"); (ROOT / f"results/THREE_WAY{tag}.json").write_text(json.dumps(out, indent=1))
+    (ROOT / f"results/THREE_WAY{tag}.md").write_text("\n".join(_legal_stamp(L)) + "\n"); (ROOT / f"results/THREE_WAY{tag}.json").write_text(json.dumps(out, indent=1))
     print("\n".join(L))
 
 

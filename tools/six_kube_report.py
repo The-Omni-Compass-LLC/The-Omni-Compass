@@ -21,6 +21,11 @@ those are inside the noise (the interval crosses zero). CPU and host load are sh
 from __future__ import annotations
 
 import json
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 import math
 import sys
 from pathlib import Path
@@ -169,7 +174,7 @@ def main(root):
     missing = [o for o in ORDER if not any(k.split("@")[0] == o for k in runs)]
     if missing:
         L += ["## Not in this run", ""] + [f"- {name_of(o)}" for o in missing] + [""]
-    (root / "SIX_KUBE.md").write_text("\n".join(L) + "\n")
+    (root / "SIX_KUBE.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     (root / "SIX_KUBE.json").write_text(json.dumps(out, indent=1) + "\n")
     print("\n".join(L))
     return 0

@@ -33,6 +33,11 @@ energy and requests are class P (its own meter). The receipt keeps them apart an
 from __future__ import annotations
 
 import argparse
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 import datetime
 import hashlib
 import json
@@ -276,7 +281,7 @@ def rescore(root):
             mm = lambda k: sum(x[k] for x in xs) / len(xs)
             L.append(f"| {sc}x | {NAMES[name]} | {pname} | {len(xs)} | {lab} | {100 * mm('primary'):+.2f}% | {100 * mm('energy'):+.2f}% | "
                      f"{mm('viol_pp'):+.2f} | {100 * mm('p95'):+.1f}% |")
-    (root / "HIL_RESCORED.md").write_text("\n".join(L) + "\n")
+    (root / "HIL_RESCORED.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     print("\n".join(L))
     return 0
 
@@ -381,7 +386,7 @@ def main(argv=None):
                          f"{c['p95_ms'] if c['p95_ms'] is None else round(c['p95_ms'], 1)} | {c.get('over_line_pct', 0.0):.2f} | {c['limit_start_w']} → {c['limit_end_w']} | {c['governor_exit']} |")
     L += ["", "## Validity", ""] + ([f"- {p}" for p in problems] or ["- Every arm ended with the card at its start limit and its own clock range; every simulated knob was handed back; the card's governor exited cleanly."])
     L += ["", "Raw: every arm's `arm.json`, `smi.csv` (the card's own samples), `latency.csv`, `requests.csv`, `audit.jsonl`; checksums in `SHA256SUMS.txt`."]
-    (a.out / "HIL.md").write_text("\n".join(L) + "\n")
+    (a.out / "HIL.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     (a.out / "HIL.json").write_text(json.dumps({"run": run, "results": out, "problems": problems}, indent=1) + "\n")
     sums = [f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(a.out)}" for p in sorted(a.out.rglob("*"))
             if p.is_file() and p.name != "SHA256SUMS.txt"]

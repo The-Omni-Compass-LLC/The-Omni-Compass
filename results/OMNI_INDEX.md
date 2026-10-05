@@ -1,5 +1,8 @@
 # The Omni index: more for the same, or the same for less
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+
+
 Every measure of every test is a ratio oriented so that above 1 is better for Omni-Compass on top of native: work (more is better), speed (a lower response time), machines (fewer), energy (less). A test's index is the geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. Every number is read from the test's own result file (`tools/omni_index.py`).
 
 ## Headline: Omni-Compass on top of native, real machines: **+15.4%** (more for the same, or the same for less, across work, speed, machines and energy)
@@ -40,3 +43,7 @@ Read: +10% in a column means 10% better for Omni-Compass in that measure (more w
 | Modelled muscles (evidence S) | the whole tower (656): the modelled stacks around the real cluster | **+0.1%** | +0.0% | not taken | not taken | +0.2% | `results/live/SIX_KUBE.json` |
 | Real Kubernetes (GitHub) | Six organisms: the four stacked (1,226), the cluster inside, five pairs | **+8.9%** | +6.1% | +32.1% | +0.0% | +0.2% | `results/live/SIX_KUBE.json` |
 | Modelled muscles (evidence S) | the four stacked (1,226): the modelled stacks around the real cluster | **+0.1%** | +0.0% | not taken | not taken | +0.2% | `results/live/SIX_KUBE.json` |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

@@ -1,12 +1,15 @@
 # Omni-Compass on top of CityLearn's own controller
 
-CityLearn (see each district file) (Intelligent Environments Lab, University of Texas at Austin; MIT license): an independent simulator of real buildings from measured data, with its own controllers and its own scoring. Native: CityLearn's rule-based battery controller (BasicRBC). Native + Omni: the same controller with the bowl law on top of its battery commands (gain 0.5, response 1.0 h, glide 0.05 an hour, band from the past week's district draw, handed back at 90% of the year). Every number is CityLearn's own score: the controller over no battery at all, lower is better for every row. Evidence class: an independent recognized simulator (not our model).
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+
+
+CityLearn (see each district file) (Intelligent Environments Lab, University of Texas at Austin; MIT license): an independent simulator of real buildings from measured data, with its own controllers and its own scoring. Native: CityLearn's rule-based battery controller (BasicRBC). Omni: the same controller with the bowl law on top of its battery commands (gain 0.5, response 1.0 h, glide 0.05 an hour, band from the past week's district draw, handed back at 90% of the year). Every number is CityLearn's own score: the controller over no battery at all, lower is better for every row. Evidence class: an independent recognized simulator (not our model).
 
 ## citylearn_challenge_2020_climate_zone_1: 9 buildings, 8,760 hours
 
 Omni-Compass moved the commands in 7,827 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.0000 | 1.0000 | +0.00% | same |
 | electricity bought (`electricity_consumption_total`) | 1.0269 | 1.0264 | -0.05% | better: less electricity bought |
@@ -23,7 +26,7 @@ Omni-Compass moved the commands in 7,827 hours; every command handed back at 90%
 
 Omni-Compass moved the commands in 7,834 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.0000 | 1.0000 | +0.00% | same |
 | electricity bought (`electricity_consumption_total`) | 1.0495 | 1.0415 | -0.76% | better: less electricity bought |
@@ -40,7 +43,7 @@ Omni-Compass moved the commands in 7,834 hours; every command handed back at 90%
 
 Omni-Compass moved the commands in 7,836 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.0000 | 1.0000 | +0.00% | same |
 | electricity bought (`electricity_consumption_total`) | 1.0302 | 1.0281 | -0.21% | better: less electricity bought |
@@ -57,7 +60,7 @@ Omni-Compass moved the commands in 7,836 hours; every command handed back at 90%
 
 Omni-Compass moved the commands in 7,843 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.0000 | 1.0000 | +0.00% | same |
 | electricity bought (`electricity_consumption_total`) | 1.0582 | 1.0527 | -0.51% | better: less electricity bought |
@@ -74,7 +77,7 @@ Omni-Compass moved the commands in 7,843 hours; every command handed back at 90%
 
 Omni-Compass moved the commands in 31,363 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.0000 | 1.0000 | +0.00% | same |
 | electricity bought (`electricity_consumption_total`) | 1.0358 | 1.0327 | -0.30% | better: less electricity bought |
@@ -91,7 +94,7 @@ Omni-Compass moved the commands in 31,363 hours; every command handed back at 90
 
 Omni-Compass moved the commands in 7,855 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.1080 | 0.9880 | -10.83% | better: less electricity bill |
 | electricity bought (`electricity_consumption_total`) | 1.2124 | 1.0078 | -16.87% | better: less electricity bought |
@@ -108,7 +111,7 @@ Omni-Compass moved the commands in 7,855 hours; every command handed back at 90%
 
 Omni-Compass moved the commands in 7,854 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.0848 | 1.0395 | -4.17% | better: less electricity bill |
 | electricity bought (`electricity_consumption_total`) | 1.1573 | 1.0544 | -8.89% | better: less electricity bought |
@@ -125,7 +128,7 @@ Omni-Compass moved the commands in 7,854 hours; every command handed back at 90%
 
 Omni-Compass moved the commands in 7,851 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.1007 | 1.0060 | -8.61% | better: less electricity bill |
 | electricity bought (`electricity_consumption_total`) | 1.1941 | 1.0187 | -14.69% | better: less electricity bought |
@@ -142,7 +145,7 @@ Omni-Compass moved the commands in 7,851 hours; every command handed back at 90%
 
 Omni-Compass moved the commands in 625 hours; every command handed back at 90%: yes.
 
-| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |
+| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |
 |---|---:|---:|---:|---|
 | electricity bill (`cost_total`) | 1.8368 | 1.8430 | +0.34% | WORSE: more electricity bill |
 | electricity bought (`electricity_consumption_total`) | 1.8916 | 1.8892 | -0.13% | better: less electricity bought |
@@ -173,3 +176,7 @@ The tuning district is left out of this table.
 | distance from zero net energy | 4 of 9 | 5 of 9 | -1.73% |
 | energy not served | 4 of 6 | 0 of 6 | -39.70% |
 | time uncomfortable | 1 of 1 | 0 of 1 | -1.19% |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

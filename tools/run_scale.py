@@ -21,6 +21,11 @@ violations with their 95% intervals over runs, the label by the round-3 rule, an
 from __future__ import annotations
 
 import argparse
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 import json
 import os
 import subprocess
@@ -105,7 +110,7 @@ def main(argv=None):
         summary[k]["band_first"] = band
         L.append(f"| {num} | {nm} | {len(rows_for(k, a.scale))} | **{lab}** | {band} | {f('primary')} | {f('work')} | {f('energy')} | "
                  f"{f('viol_pp', 1.0, '')} | {all(c['restore_ok'] for c in per)} |")
-    (out / "SCALE.md").write_text("\n".join(L) + "\n")
+    (out / "SCALE.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     (out / "SCALE.json").write_text(json.dumps({"runs": a.runs, "scale": a.scale, "commit": commit, "summary": summary,
                                                 "per_run": {k: {str(s): c for s, c in v.items()} for k, v in res.items()}}) + "\n")
     print("\n".join(L))

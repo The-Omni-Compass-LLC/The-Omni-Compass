@@ -13,6 +13,11 @@ set). Run after any new result:
 from __future__ import annotations
 
 import csv
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 import json
 import math
 import re
@@ -317,7 +322,7 @@ def main():
           "- Energy saved on real hardware for Kubernetes: kind keeps every machine powered, so energy there is a declared model.",
           "- A net CPU saving on Kubernetes once the controller's own cost is counted on a small runner.",
           "- 1,000 runs at 1,000× (needs a larger machine).", ""]
-    OUT.write_text("\n".join(L) + "\n", encoding="utf-8")
+    OUT.write_text("\n".join(_legal_stamp(L)) + "\n", encoding="utf-8")
     print(OUT)
 
 

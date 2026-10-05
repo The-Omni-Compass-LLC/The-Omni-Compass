@@ -28,6 +28,11 @@ load factor). Nothing here is scored by Omni-Compass's own code.
 from __future__ import annotations
 
 import argparse
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 import hashlib
 import json
 import math
@@ -208,7 +213,7 @@ def main(argv=None):
         b = sum(1 for nv, ov in pairs if ov < nv - 1e-9); w = sum(1 for nv, ov in pairs if ov > nv + 1e-9)
         m = sum(100 * (ov - nv) / abs(nv) for nv, ov in pairs) / len(pairs)
         L.append(f"| {WORDS[x]} | {b} of {len(pairs)} | {w} of {len(pairs)} | {m:+.2f}% |")
-    (out / "CITYLEARN.md").write_text("\n".join(L) + "\n")
+    (out / "CITYLEARN.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     sums = [f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}" for p in sorted(out.glob("*.json"))]
     (out / "SHA256SUMS.txt").write_text("\n".join(sums) + "\n")
     print("\n".join(L))

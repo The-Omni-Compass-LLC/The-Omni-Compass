@@ -6,6 +6,11 @@ Per repetition the gauges come from pilot/bench_report.py (capture.csv, latency.
 means and, for each Omni arm against native, the paired mean difference with a t-based 95% interval (n repetitions).
 Usage: python tools/live_reps.py DIR  (DIR holds bench-<arm>-<rep>/)  ->  DIR/LIVE_REPS.md, DIR/LIVE_REPS.json"""
 import csv, json, math, re, sys
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from pathlib import Path
 import numpy as np
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
@@ -364,7 +369,7 @@ def main(root):
     cap_l, cap_o = capacity_table(root, cols)
     if cap_l:
         L += cap_l; out["capacity"] = cap_o
-    (root / "LIVE_REPS.json").write_text(json.dumps(out, indent=1)); (root / "LIVE_REPS.md").write_text("\n".join(L))
+    (root / "LIVE_REPS.json").write_text(json.dumps(out, indent=1)); (root / "LIVE_REPS.md").write_text("\n".join(_legal_stamp(L)))
     print("\n".join(L))
 
 

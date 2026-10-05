@@ -1,12 +1,15 @@
 # The six organisms with the real Kubernetes cluster inside: native against native with Omni-Compass on top
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+
+
 Each organism runs on the measured window's clock with the cluster as one more muscle (`tools/run_kil.py`): its own compute demand drives the load generator, the cluster's watts are its heat and load. Native: the stacks' own controllers and Kubernetes alone. Omni: the bowl law on every simulated muscle and the live controller on the cluster, handed back at 90% of the window. Cluster rows are measured on the real cluster (energy is the declared power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).
 
-How to read it: every change is native + Omni against native, and the Reading column says in words whether it is better or worse. Lower is better for response times, time over the line, failed requests, pods started, replicas, machines, energy and the bill (less spent). Higher is better for the organism's work and work per energy. A change whose interval crosses zero is marked inside the noise.
+How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column says in words whether it is better or worse. Lower is better for response times, time over the line, failed requests, pods started, replicas, machines, energy and the bill (less spent). Higher is better for the organism's work and work per energy. A change whose interval crosses zero is marked inside the noise.
 
 ## Twelve columns, mean over repetitions
 
-| Gauge | Compute / AI / Cloud: native | Compute / AI / Cloud: native + Omni | Physics / Robotics / Autonomous: native | Physics / Robotics / Autonomous: native + Omni | Energy / Facility / Industrial: native | Energy / Facility / Industrial: native + Omni | Distribution / Specialized: native | Distribution / Specialized: native + Omni | The whole tower (656 muscles): native | The whole tower (656 muscles): native + Omni | The four stacked, duplicates kept (1,226): native | The four stacked, duplicates kept (1,226): native + Omni |
+| Gauge | Compute / AI / Cloud: native | Compute / AI / Cloud: omni | Physics / Robotics / Autonomous: native | Physics / Robotics / Autonomous: omni | Energy / Facility / Industrial: native | Energy / Facility / Industrial: omni | Distribution / Specialized: native | Distribution / Specialized: omni | The whole tower (656 muscles): native | The whole tower (656 muscles): omni | The four stacked, duplicates kept (1,226): native | The four stacked, duplicates kept (1,226): omni |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | response time (ms), 95th percentile | 3967 | 2653 | 2440 | 1767 | 1951 | 1482 | 2830 | 1943 | 2085 | 1247 | 3703 | 2803 |
 | response time (ms), 99th percentile | 6847 | 6803 | 5070 | 4977 | 3487 | 3123 | 6635 | 6333 | 3462 | 2724 | 6354 | 6724 |
@@ -24,13 +27,13 @@ How to read it: every change is native + Omni against native, and the Reading co
 | organism time over the line (% of steps) | 2.087 | 2.059 | 3.515 | 3.499 | 1.667 | 1.634 | 2.37 | 2.35 | 2.546 | 2.532 | 2.535 | 2.512 |
 | organism work per energy | 1.484 | 1.485 | 1.518 | 1.519 | 0.9151 | 0.9169 | 1.503 | 1.504 | 0.8849 | 0.8866 | 1.09 | 1.091 |
 
-## Each organism: native + Omni against native, paired by repetition
+## Each organism: omni against native, paired by repetition
 
 ### Compute / AI / Cloud: better on 6, worse on 0, inside the noise on 6
 
 5 paired repetitions.
 
-| Gauge | Native | Native + Omni | Change | 95% interval of the difference | Reading |
+| Gauge | native | omni | Change | 95% interval of the difference | Reading |
 |---|---:|---:|---:|---:|---|
 | response time (ms), 95th percentile | 3967 | 2653 | -33.1% | -3240 to +610.3 | better (inside the noise) |
 | response time (ms), 99th percentile | 6847 | 6803 | -0.6% | -809.5 to +721.6 | better (inside the noise) |
@@ -52,7 +55,7 @@ How to read it: every change is native + Omni against native, and the Reading co
 
 5 paired repetitions.
 
-| Gauge | Native | Native + Omni | Change | 95% interval of the difference | Reading |
+| Gauge | native | omni | Change | 95% interval of the difference | Reading |
 |---|---:|---:|---:|---:|---|
 | response time (ms), 95th percentile | 2440 | 1767 | -27.6% | -1232 to -113.9 | better |
 | response time (ms), 99th percentile | 5070 | 4977 | -1.8% | -1121 to +933.9 | better (inside the noise) |
@@ -74,7 +77,7 @@ How to read it: every change is native + Omni against native, and the Reading co
 
 5 paired repetitions.
 
-| Gauge | Native | Native + Omni | Change | 95% interval of the difference | Reading |
+| Gauge | native | omni | Change | 95% interval of the difference | Reading |
 |---|---:|---:|---:|---:|---|
 | response time (ms), 95th percentile | 1951 | 1482 | -24.0% | -869.8 to -66.92 | better |
 | response time (ms), 99th percentile | 3487 | 3123 | -10.5% | -1086 to +356.6 | better (inside the noise) |
@@ -96,7 +99,7 @@ How to read it: every change is native + Omni against native, and the Reading co
 
 5 paired repetitions.
 
-| Gauge | Native | Native + Omni | Change | 95% interval of the difference | Reading |
+| Gauge | native | omni | Change | 95% interval of the difference | Reading |
 |---|---:|---:|---:|---:|---|
 | response time (ms), 95th percentile | 2830 | 1943 | -31.3% | -1467 to -306 | better |
 | response time (ms), 99th percentile | 6635 | 6333 | -4.6% | -1563 to +958.7 | better (inside the noise) |
@@ -118,7 +121,7 @@ How to read it: every change is native + Omni against native, and the Reading co
 
 5 paired repetitions.
 
-| Gauge | Native | Native + Omni | Change | 95% interval of the difference | Reading |
+| Gauge | native | omni | Change | 95% interval of the difference | Reading |
 |---|---:|---:|---:|---:|---|
 | response time (ms), 95th percentile | 2085 | 1247 | -40.2% | -1947 to +270.1 | better (inside the noise) |
 | response time (ms), 99th percentile | 3462 | 2724 | -21.3% | -2356 to +879.8 | better (inside the noise) |
@@ -140,7 +143,7 @@ How to read it: every change is native + Omni against native, and the Reading co
 
 5 paired repetitions.
 
-| Gauge | Native | Native + Omni | Change | 95% interval of the difference | Reading |
+| Gauge | native | omni | Change | 95% interval of the difference | Reading |
 |---|---:|---:|---:|---:|---|
 | response time (ms), 95th percentile | 3703 | 2803 | -24.3% | -1522 to -278.9 | better |
 | response time (ms), 99th percentile | 6354 | 6724 | +5.8% | -2257 to +2996 | WORSE (inside the noise) |
@@ -158,3 +161,7 @@ How to read it: every change is native + Omni against native, and the Reading co
 | organism time over the line (% of steps) | 2.535 | 2.512 | -0.9% | -0.02311 to -0.02311 | better |
 | organism work per energy | 1.09 | 1.091 | +0.2% | +0.001643 to +0.001643 | better |
 
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

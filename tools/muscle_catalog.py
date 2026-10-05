@@ -10,6 +10,11 @@ wired, and which organisms it belongs to. Read from realms/catalog.csv; writes d
 from __future__ import annotations
 
 import csv
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from collections import OrderedDict
 from pathlib import Path
 
@@ -153,7 +158,7 @@ def main():
         own = [r for r in rows if r["realm"] == k and len(r["realms"].split(";")) < 4]
         L += [f"## Realm: {n} ({len(own)} muscles of its own, {counts[k]} in its organism with the spine)", ""]
         L += family_tables(own, f"Its home realm is {n}.")
-    OUT.write_text("\n".join(L) + "\n", encoding="utf-8")
+    OUT.write_text("\n".join(_legal_stamp(L)) + "\n", encoding="utf-8")
     print(OUT, len(rows), "muscles")
 
 

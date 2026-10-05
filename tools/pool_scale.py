@@ -7,6 +7,11 @@
   python3 tools/pool_scale.py OUT.md parts/*/SCALE.json
 """
 import glob, json, sys
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -47,7 +52,7 @@ def main(out, *paths):
             L.append(f"| {num} | {nm} | {len(rows_for(k, scale))} | {len(xs)} | **{lab}** | {band} | {f('primary')} | {f('work')} | "
                      f"{f('energy')} | {f('viol_pp', 1.0, '')} | {ok} |")
         L.append("")
-    Path(out).write_text("\n".join(L) + "\n")
+    Path(out).write_text("\n".join(_legal_stamp(L)) + "\n")
     Path(out).with_suffix(".json").write_text(json.dumps({"scale": scale, "summary": summ}, indent=1) + "\n")
     print("\n".join(L))
 

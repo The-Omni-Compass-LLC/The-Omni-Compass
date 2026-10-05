@@ -39,7 +39,14 @@ jobs:
         with: {python-version: "3.11"}
       - run: pip install -q citylearn
       - run: GIT_LFS_SKIP_SMUDGE=1 git clone -q --depth 1 https://github.com/intelligent-environments-lab/citylearn /tmp/cl
-      - run: python tools/run_citylearn.py --datasets "${{ matrix.dataset }}" --data-dir /tmp/cl/data/datasets --out out
+      - name: Run the district, native and omni
+        run: |
+          set +e
+          python tools/run_citylearn.py --datasets "${{ matrix.dataset }}" --data-dir /tmp/cl/data/datasets --out out > run.log 2>&1
+          code=$?
+          # the end of the run's own output as annotations, readable on the run's page and through the API
+          grep -v -i "warning" run.log | tail -12 | while IFS= read -r l; do echo "::notice::$l"; done
+          [ "$code" = 0 ] || { echo "::error::${{ matrix.dataset }} ended with exit $code"; mkdir -p out; cp run.log out/; exit "$code"; }
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: "citylearn-${{ matrix.dataset }}", path: out}

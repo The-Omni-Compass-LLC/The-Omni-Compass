@@ -1,5 +1,8 @@
 # The six organisms: the full grid
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+
+
 Evidence class **S** (models of the plants, not hardware). Every organism runs native (its own controllers) and native with Omni-Compass on top (the bowl law on every muscle, round 6 of `docs/REALMS_PREREGISTRATION.md`) on the same seed, the same load and the same clock. **Size** is the number of copies of the organism governed together on one clock: 1, 10, 100 and 1,000 clusters. **Runs** are paired seeds from 7000 on; 1, 10, 100 and 1,000 runs are the first N of the same set, so each block nests inside the next. Built by `tools/grid.py` from the saved receipts in `results/scale/receipts/`. How to read it: `docs/HOW_TO_READ_THE_RESULTS.md`.
 
 Sources:
@@ -72,3 +75,7 @@ Sources:
 - Every knob handed back in every completed cell: True.
 - Work done: the largest cost in any completed cell is 0.007% (thermal zones held warmer have a little less margin in a heat spike; `docs/REALMS_PREREGISTRATION.md`, round 6 receipts), inside the 2% the rule allows (`DISCLOSURES.md`, section 3).
 - The full receipt of each size, with the 95% interval of every number, is in `results/scale/receipts/`.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

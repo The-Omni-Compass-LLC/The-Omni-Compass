@@ -7,6 +7,11 @@ on top, on the same seeds (5000-5009 tuning, 5100-5109 fresh), 600 s each, for t
 bench's pinned matrix products) and AI token generation (85% of a request's time waiting on memory). Bases: the card's
 own firmware (native) and an operator's fixed 105 W power cap. Writes results/sim/gpu_two_wire/."""
 import json, math, subprocess, sys, time
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,7 +94,7 @@ def main(out=ROOT / "results" / "sim" / "gpu_two_wire", fresh=""):
           "JSON. A model written by the same people who wrote the law is not an independent test. The card's power curve "
           "(dynamic power rising with clock times voltage squared) is the textbook shape, not a measurement of any "
           "product. The number that counts is a rented card's own meter."]
-    (out / "RESULT.md").write_text("\n".join(L) + "\n")
+    (out / "RESULT.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     (out / "RESULT.json").write_text(json.dumps({"seeds": SEEDS, "commit": commit,
                                                   "work": {str(m): v for m, v in res.items()}}, indent=1) + "\n")
     print("\n".join(L))

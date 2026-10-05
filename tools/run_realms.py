@@ -11,6 +11,11 @@ realm, and all 656 muscles together. Writes MUSCLES.csv (one row per muscle), RE
 tables), RUN.json (commit, seeds, fingerprints) and SHA256SUMS.txt. The preregistered seeds run only on committed code.
 """
 import argparse, csv, hashlib, json, math, os, subprocess, sys, time
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -159,7 +164,7 @@ def write_md(out, res, orgs, run):
       f"{sum(1 for o in orgs.values() if o['valid'])} of {len(orgs)} organisms.")
     w("- Raw per-seed contrasts: `REALMS.json`. One row per muscle: `MUSCLES.csv`. Fingerprints: `RUN.json`, "
       "`SHA256SUMS.txt`.")
-    (out / "REALMS.md").write_text("\n".join(L) + "\n")
+    (out / "REALMS.md").write_text("\n".join(_legal_stamp(L)) + "\n")
 
 
 def main(argv=None):
