@@ -60,6 +60,7 @@ Founder, The Omni-Compass LLC
 | CTO, architect, head of platform | Parts I-III; section 9 (wiring levels) to plan the rollout; Part VI |
 | The engineer wiring it | Everything, in order. Do not skip the wire check (section 8) or the watch level (section 9, level 1) |
 | Auditor, diligence team | Part II (mechanism), Part VI (proof), Appendix C (equations), Appendix F (evidence map) |
+| Anyone who wants the whole list | `docs/REGISTER.md`: every muscle wired (656, by family), every benchmark run on every platform (Kubernetes, Azure AKS, GPU, CPU, UPS and batteries, buildings, power grids, robotics) with its result and file, and every open benchmark still to run, in order |
 
 **Conventions.** `code` is a command, file or switch exactly as typed. "Native" means your system as it runs today,
 without Omni-Compass. "Muscle" means any machine, service or controller Omni-Compass can read and set. "Knob" or
@@ -148,7 +149,8 @@ When Omni-Compass stops, every one of those values goes back to what it was befo
 
 ## 2. The Muscles, the Realms and the Six Organisms
 
-The catalog (`realms/catalog.csv`) lists 656 distinct muscles, each with its family, its plant model and its knob.
+The catalog (`realms/catalog.csv`) lists 656 distinct muscles, each with its family, its plant model and its knob. The
+register (`docs/REGISTER.md`) lists them by family next to every benchmark, run and still to run.
 They fall into four realms. Every realm stands on the same spine (Kubernetes, machines, GPUs and CPUs, network,
 storage, observability, security, cooling and electrical distribution, 190 muscles), plus its own domain muscles.
 
