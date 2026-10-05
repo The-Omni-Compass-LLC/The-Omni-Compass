@@ -11,12 +11,14 @@ import sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from realms.compass_arm import compass_apply  # noqa: E402
+from realms.presets import PRESETS  # noqa: E402
 
 
 class Axis:
-    """A stand-in motion axis: calm (no queue, light load), so the compass gives speed and effort back step by step."""
+    """A stand-in reaction wheel (its own preset's physics, where an effort cap pays): calm (no queue, light load), so the
+    compass gives effort back step by step."""
     template = "motion_axis"
-    P = {}
+    P = PRESETS["reaction_wheel"]
     vhist = []
 
     def observe(self):

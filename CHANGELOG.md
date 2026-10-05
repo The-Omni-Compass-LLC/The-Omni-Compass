@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-05
+- Tweak A finished, muscle by muscle (`docs/MECHANISM_OF_ACTION.md` 9.6, `docs/REALMS_PREREGISTRATION.md`): the 656 muscles
+  on the compass law read 0 WORSE and 0 NOT ESTABLISHED (108 worse this morning), every organism SUPERIOR WITHIN
+  GUARDRAILS. Each lever moves only where its physics says it can pay: cooling power native; a UPS reserve native; a
+  battery reserve spent only at the connection's wall when it can cover the overrun (the four batteries that buy fewer
+  overruns read SERVICE IMPROVEMENT WITH ENERGY TRADEOFF); a power cap only where the machine's own curve saves (9.8);
+  an effort cap only where copper loss exceeds the standing draw; node-pool machines released at margin 0.3, where no
+  pool is later than native. Nine muscles read ENERGY IMPROVEMENT WITH SERVICE TRADEOFF: they run a little slower for
+  less energy, which the label states.
 - Tweaks A-E before any GPU run (`docs/MECHANISM_OF_ACTION.md` section 9; amendments 11 and 12; the realms amendment):
   - A. The 656-muscle realms table now runs the compass law (it still compared native against the retired allocation
     law). On the compass law all five organisms are SUPERIOR WITHIN GUARDRAILS: energy 0.1-0.2% lower, work the same,
