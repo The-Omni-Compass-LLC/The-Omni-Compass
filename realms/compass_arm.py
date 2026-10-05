@@ -14,7 +14,7 @@ Knob by plant (the override key the plant already obeys, its native value, its c
                  machine released while the force is clearly down and the machines left cover the recent peak with
                  margin (RELEASE_MARGIN); admission: native
   thermal_zone   setpoint between the band's stress (colder, more cooling) and calm ends; units: one released while the
-                 force is clearly down; power: 0.5-1
+                 force is clearly down; power: native (a cooling cap moves heat later, never away)
   energy_storage reserve between the band's ends (a lower reserve gives the battery to the site); power: native
   motion_axis    speed and effort: 0.4-1
   process_loop   setpoint from native toward the band's calm end; actuator range 0.3-1; power 0.4-1
@@ -57,6 +57,20 @@ def release_safe(plant) -> bool:
     return u > 1 and plant.T <= plant.setpoint() and plant.qc_cmd_avg / ((u - 1) * P["q_unit_w"]) <= 0.8
 
 
+def capping_saves(plant) -> bool:
+    """Whether a lower power cap saves energy on this pool at all (race to idle, MECHANISM_OF_ACTION 9.6).
+
+    With throughput mu(c) ~ c^eps at power cap c and the autoscaler holding utilisation near its target u*, the energy
+    per unit of work is (p_idle / u* + p_dyn c) / mu(c). Its slope at c = 1 is positive (a lower cap saves) only if
+    eps < p_dyn / (p_idle / u* + p_dyn). Where idle power dominates (a quantum computer's cryostat, a network switch),
+    running slower keeps the machines on longer and costs more than it saves: the cap is left native."""
+    import math
+    P = plant.P
+    eps = math.log(plant.mu(1.0) / plant.mu(0.99)) / math.log(1.0 / 0.99)   # the machine's own speed curve at full power
+    u = P.get("target", 0.7)
+    return eps < P["p_dyn"] / (P["p_idle"] / u + P["p_dyn"])
+
+
 def lever(plant, knob):
     """(override key, native value, low, high, sign): sign +1 when a higher value is more capacity."""
     P, t = plant.P, plant.template
@@ -64,7 +78,7 @@ def lever(plant, knob):
         return None
     if t == "compute_pool":
         if knob == "power":
-            return ("power", 1.0, 0.4, 1.0, 1)
+            return ("power", 1.0, 0.4, 1.0, 1) if capping_saves(plant) else None
         if P.get("ca"):
             return ("release", None, 0, 0, 0)
         return None                                            # the HPA target is held at the operator's own
@@ -73,10 +87,17 @@ def lever(plant, knob):
             return ("setpoint", P["t_set"], min(P["stress"], P["calm"]), max(P["stress"], P["calm"]), -1)
         if knob == "capacity":
             return ("release", None, 0, 0, 0)
-        return ("power", 1.0, 0.5, 1.0, 1)
+        # the cooling power cap gives nothing back: the heat the zone makes must leave it either way, so a lower cap only
+        # lets the temperature drift up while the PI command grows and stages more units (and their fans). Native
+        # (MECHANISM_OF_ACTION 9.6)
+        return None
     if t == "energy_storage":
+        if knob == "setpoint" and P.get("backup"):
+            return None                                        # a backup reserve (a UPS) is kept for an outage: native
         if knob == "setpoint":
-            return ("setpoint", P["reserve"], min(P["stress"], P["calm"]), max(P["stress"], P["calm"]), -1)
+            # the reserve may go down to the stress end (the battery given to the site under strain), never above the
+            # operator's own: a kWh held back in a calm battery is a kWh bought from the grid (MECHANISM_OF_ACTION 9.6)
+            return ("setpoint", P["reserve"], min(P["stress"], P["reserve"]), P["reserve"], -1)
         return None                                            # a battery's power limit gives nothing back: native
     if t == "motion_axis":
         return ("power", 1.0, 0.4, 1.0, 1) if knob == "power" else ("capacity", 1.0, 0.4, 1.0, 1)
@@ -108,6 +129,16 @@ def compass_apply(plant, knob, dt=1.0, tau=3.0):
         plant.override = {"release": 1.0} if ok else {}
         return plant.override
     span = hi - lo
+    if key == "setpoint" and plant.template == "energy_storage":
+        # a battery's reserve is spent only where it buys service: at the connection's wall the reserve drops to the
+        # stress end at once; anywhere else the operator's own reserve, so no round trip is paid for nothing (9.6)
+        P = plant.P
+        excess = plant.imp - P["p_lim_w"]                       # what the connection is over its limit by, now
+        coverable = 0.0 < excess <= P["p_batt_w"] * plant.override.get("power", 1.0)
+        x = lo if (b.p >= b.band.wall_high and (coverable or plant.imp >= 0.95 * P["p_lim_w"] and excess <= 0.0)) else native
+        plant._compass_law_x = x
+        plant.override = {} if abs(x - native) < 1e-9 else {key: x}
+        return plant.override
     if b.p >= b.band.wall_high:
         x = hi if sign > 0 else lo                                 # fail up: full capacity at once
     else:

@@ -362,6 +362,10 @@ def label(per_seed, valid=True):
     v = interval([c["viol_pp"] for c in per_seed])
     guard = w[1] >= -0.01 and v[0] <= 0.0        # band first: time over the line no higher than native's (mean)
     if p[2] < 0:
+        # the mirror of the energy tradeoff: less work per energy, but no work lost and the time over the line proven
+        # lower (the energy bought service; a battery's round trip is the usual price). Without that proof: worse
+        if w[1] >= -0.01 and v[2] < 0.0:
+            return "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF"
         return "WORSE"
     if p[1] > 0:
         return "SUPERIOR WITHIN GUARDRAILS" if guard else "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"

@@ -63,6 +63,8 @@ def main():
     assert label([c(0.05, 0.0, 0.0), c(0.06, 0.0, 0.0), c(0.04, 0.0, 0.0)]) == "SUPERIOR WITHIN GUARDRAILS"
     assert label([c(0.05, 0.0, 5.0), c(0.06, 0.0, 6.0), c(0.04, 0.0, 5.5)]) == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
     assert label([c(-0.05, 0.0, 0.0), c(-0.06, 0.0, 0.0), c(-0.04, 0.0, 0.0)]) == "WORSE"
+    assert label([c(-0.002, 0.0, -1.0), c(-0.003, 0.0, -1.2), c(-0.002, 0.0, -0.9)]) == "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF"
+    assert label([c(-0.002, -0.05, -1.0), c(-0.003, -0.05, -1.2), c(-0.002, -0.05, -0.9)]) == "WORSE"   # work lost: worse
     assert label([c(0.01, 0.0, 0.0), c(-0.01, 0.0, 0.0), c(0.0, 0.0, 0.0)]) == "NONINFERIOR / INCONCLUSIVE"
     assert label([c(0.05, 0.0, 0.0)] * 3, valid=False) == "INVALID"
     print("PASS test_realms: catalog 656, watch = native, kill hands back, deterministic, nervous-system capacity rule, labels")

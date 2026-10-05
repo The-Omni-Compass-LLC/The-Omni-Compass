@@ -60,7 +60,7 @@ PRESETS = {
                       start_h=0.0, noise=0.05),
     "ups": dict(dt=120.0, e_wh=50e3, p_batt_w=200e3, eta_rt=0.92, load_w=150e3, load_amp=0.1, peak_h=15.0,
                 pv_w=0.0, p_lim_w=180e3, reserve=0.6, calm=0.8, stress=0.5, flex=0.05, soc0=0.9, start_h=0.0,
-                noise=0.03),
+                noise=0.03, backup=True),   # a UPS reserve is held for an outage, not for a peak: never Omni's lever
     "facility": dict(dt=120.0, e_wh=1000e3, p_batt_w=300e3, eta_rt=0.90, load_w=400e3, load_amp=0.25, peak_h=17.0,
                      pv_w=200e3, p_lim_w=450e3, reserve=0.2, calm=0.5, stress=0.1, flex=0.10, soc0=0.5,
                      start_h=0.0, noise=0.04),
