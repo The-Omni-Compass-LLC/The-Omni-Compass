@@ -617,6 +617,28 @@ does not answer is tried again, then logged, and the schedule goes on (`fleet/ca
 more repetitions of the same test run on the fixed code, and the report counts every valid pair and names every
 invalid arm with its cause.
 
+
+## Amendment 6: a pinned gauge is not a steady demand (written before its run, 2026-10-05)
+
+The wandering test (run 37235231963, ten pairs) gave native + Omni-Compass p95 -54%, time over the line -38%, failed
+requests -14%, energy -0.3% and CPU -2%, each proven, and 1.5 more pod starts a run (+36%, proven). The founder holds
+that result back until the cause is fixed and the test is run again.
+
+The cause, read from the run's own audit (repetition 4, 12 pod starts against native's 7): at 972 s the load eased
+from five generators to four, rule 3 found the demand steady, and the target was raised (50 to 190: fewer pods); the
+load then climbed back to eight and the pods were started again. The demand was not steady. The autoscaler stood at its
+replica cap, every pod as busy as it could be, so the reading (utilisation times pods) could not rise however much the
+load did: a pinned gauge reads flat.
+
+Rule 5 (amends rule 3): a decision at which the autoscaler stands at its replica cap marks the window pinned; a window
+that touched the cap is not steady, so no raise of the target, and no return of a raised cap, until one whole
+autoscaler window after the cap was last touched (`omni_controller/controller.py _steady`, `self.pinned`; tested in
+`tests/test_bowl_controller.py`). Nothing else changes.
+
+The rerun: the same wandering test (ten pairs, native and bowl, `load_steps` 1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3
+2 1 2 1, 2,700 s, floor two, every machine usable). Reported in full, every gauge read in words; the first run is kept
+in its raw files and named beside the rerun.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

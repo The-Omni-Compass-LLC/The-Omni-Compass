@@ -274,6 +274,7 @@ class Controller:
         self.lat_t = None              # elapsed_seconds of the last request the verdict has seen
         self.bowl_x = {}               # (ns, name) -> the bowl's continuous HPA target, before rounding
         self.demand = {}               # (ns, hpa) -> [(time, demand)]: the CPU its pods use, in units of one pod's request
+        self.pinned = {}               # (ns, hpa) -> [time]: decisions at which the autoscaler stood at its replica cap
 
     def _sensed(self, h):
         """Whether the probe senses the service this HPA scales (--sensed ns/deployment,...; empty: every HPA, the
@@ -307,6 +308,11 @@ class Controller:
         target (fewer, larger pods) waits for the same, so pods are never removed from a demand that is still moving
         and started again when it rises."""
         now = time.time(); h = [(t, d) for t, d in self.demand.get(key, []) if now - t <= win]
+        # a pinned gauge is not a steady demand: while the autoscaler stands at its replica cap, every pod is as busy
+        # as it can be and the reading cannot rise however much the load does; a window that touched the cap is not
+        # steady (the wandering test: a target raised at the cap was taken back on the next climb, 1.5 pod starts a run)
+        if any(now - t <= win for t in self.pinned.get(key, [])):
+            return False
         return bool(h) and now - h[0][0] >= 0.9 * win and max(d for _, d in h) <= (1.0 + DEMAND_RISE) * min(d for _, d in h)
 
     def _replica_room(self, h, ns, name, win, obs, s):
@@ -714,6 +720,8 @@ class Controller:
                 if dem is not None:
                     self.demand[(ns, name)] = [(t, v) for t, v in self.demand.get((ns, name), []) if time.time() - t <= 2 * win] \
                         + [(time.time(), dem)]
+                if int((h.get("status") or {}).get("currentReplicas", 0) or 0) >= int(h["spec"].get("maxReplicas", 10 ** 9)):
+                    self.pinned[(ns, name)] = [t for t in self.pinned.get((ns, name), []) if time.time() - t <= 2 * win] + [time.time()]
                 # more headroom is always allowed; less never: at a given load fewer pods always means a longer M/M/c wait
                 # (no target above the operator's keeps the wait), so a raise only spends latency.
                 # Omni on top earns its keep on machines, not by packing the operator's pods tighter

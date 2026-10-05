@@ -110,6 +110,7 @@ def main():
         c.step()
     assert target_now(st) == 30, f"rising demand: target {target_now(st)}, expected the pods held at 30"
     k = ("default", "web"); c.demand[k] = [(tt - 400.0, u) for tt, u in c.demand[k]]   # one window (300 s) on, flat since
+    c.pinned[k] = [tt - 400.0 for tt in c.pinned.get(k, [])]
     c.target_at = {k: v - 400.0 for k, v in c.target_at.items()}
     c.step()
     assert target_now(st) == 50, f"demand flat: target {target_now(st)}, expected the operator's 50 back"
@@ -125,6 +126,11 @@ def main():
     assert c._steady(k, 300), "not steady after a flat window"
     c.demand[k] = [(now - 295 + 59 * i, 1.2 + 0.2 * i) for i in range(6)]
     assert not c._steady(k, 300) and c._rising(k, 300), "a climbing demand read as steady"
+    # a pinned gauge: the readings look flat because the autoscaler stood at its cap inside the window
+    c.demand[k] = [(now - 295 + 59 * i, 1.2) for i in range(6)]; c.pinned[k] = [now - 100]
+    assert not c._steady(k, 300.0), "flat readings at the replica cap are a pinned gauge, not a steady demand"
+    c.pinned[k] = [now - 400]
+    assert c._steady(k, 300.0), "flat readings a full window after the cap was last touched are steady"
     print("consolidation: a raise waits for one steady window; a climbing demand never consolidates")
 
     # the replica cap as a lever, up to the operator's ceiling: at the cap (10 of 10), the line breached, the autoscaler's
@@ -153,6 +159,7 @@ def main():
     for _ in range(4):
         c.step()
     k = ("default", "web"); now = time.time(); c.demand[k] = [(now - 280.0 + 56 * i, 1.6) for i in range(5)]   # a steady window
+    c.pinned[k] = [tt - 400.0 for tt in c.pinned.get(k, [])]                                                  # the cap last touched before it
     for _ in range(4):
         c.step()
         if cap(st) == 10:
