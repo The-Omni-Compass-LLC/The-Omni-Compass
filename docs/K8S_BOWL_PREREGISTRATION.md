@@ -639,6 +639,23 @@ The rerun: the same wandering test (ten pairs, native and bowl, `load_steps` 1 2
 2 1 2 1, 2,700 s, floor two, every machine usable). Reported in full, every gauge read in words; the first run is kept
 in its raw files and named beside the rerun.
 
+
+## Amendment 7: coasting, off the gas but still in gear (written before its run, 2026-10-05)
+
+The founder's picture: a car in drive. At idle it creeps, ready (the floor of two machines). On the gas it speeds up at
+once (more pods, machines woken, no boot). Off the gas it coasts down gradually toward idle; it does not drop into
+neutral. The brake is for stopping (the kill switch hands everything back at once).
+
+Rule 6: a raise of the HPA target (toward fewer pods) moves by at most `--coast-step` points of utilisation in one
+autoscaler window (default 25, `COAST_STEP`; 0 turns it off). The first wandering run raised the target 50 to 190 in
+one move; under rule 6 the same raise takes several calm windows (50, 75, 100, ...). A demand that comes back part way
+finds the pods still running and is met at once by a lower target, with no pod started again. A lower target (more
+pods) is never limited: the gas is always immediate. Rules 5 and 6 together: never ease off while the gauge is pinned,
+and then ease off a step at a time (`omni_controller/controller.py`; tested in `tests/test_convey.py`).
+
+The rerun with rule 5 alone (run 37255770249) was stopped before it finished, to run the test once with both rules;
+none of it is reported. The rerun: the wandering test as written in amendment 6.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

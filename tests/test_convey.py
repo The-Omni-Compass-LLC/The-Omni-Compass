@@ -107,6 +107,7 @@ def main():
     Path(p3).write_text(json.dumps(S))
     lf = Path(t3) / "latency.csv"; lf.write_text("elapsed_seconds,latency_ms,ok\n" + "".join(f"{i},100,1\n" for i in range(60)))
     c3 = Controller(args(t3)); c3.a.slo_ms = 500.0; c3.a.convey_on = 0.0; seen = []   # conveying always
+    c3.a.coast_step = 0          # the conveyance arithmetic itself, without coasting (rule 6 is checked below)
     for _ in range(4):
         os.utime(lf); c3.step()
         seen.append(json.loads(Path(p3).read_text())["hpas"][0]["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"])
@@ -116,6 +117,24 @@ def main():
     os.utime(lf); c3.step()
     seen.append(json.loads(Path(p3).read_text())["hpas"][0]["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"])
     assert seen[-1] == 95, seen
+    # coasting (rule 6): the same raise with coast_step 25 eases 50 -> 75 in one window, never 50 -> 95 at once
+    save = (os.environ["FAKE_KUBE_STATE"], os.environ["FAKE_KUBE_LOG"])
+    t5 = tempfile.mkdtemp(); p5 = state(t5); S5 = json.loads(Path(p5).read_text())
+    S5["hpas"] = [{"metadata": {"name": "web", "namespace": "default"}, "spec": {"minReplicas": 1, "maxReplicas": 10,
+                   "scaleTargetRef": {"kind": "Deployment", "name": "web"}, "metrics": [{"type": "Resource", "resource": {
+                       "name": "cpu", "target": {"type": "Utilization", "averageUtilization": 50}}}]},
+                   "status": {"currentReplicas": 4, "desiredReplicas": 4, "currentMetrics": [{"type": "Resource",
+                       "resource": {"name": "cpu", "current": {"averageUtilization": 40}}}]}}]
+    Path(p5).write_text(json.dumps(S5))
+    lf5 = Path(t5) / "latency.csv"; lf5.write_text("elapsed_seconds,latency_ms,ok\n" + "".join(f"{i},100,1\n" for i in range(60)))
+    c5 = Controller(args(t5)); c5.a.slo_ms = 500.0; c5.a.convey_on = 0.0; c5.a.coast_step = 25
+    for _ in range(4):
+        os.utime(lf5); c5.step()
+    k5 = ("default", "web"); c5.demand[k5] = [(t - 280, d) for t, d in c5.demand[k5]]
+    os.utime(lf5); c5.step()
+    eased = json.loads(Path(p5).read_text())["hpas"][0]["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"]
+    assert eased == 75, eased
+    os.environ["FAKE_KUBE_STATE"], os.environ["FAKE_KUBE_LOG"] = save
     # a machine leaving service changes the guaranteed share (10 over 2 machines: 5 a machine, 760m, g 1.52 -> 76%): a
     # lower target, more pods, so it is written at once, inside the autoscaler's window
     S3 = json.loads(Path(p3).read_text()); S3["nodes"] = S3["nodes"][:2]

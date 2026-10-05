@@ -762,6 +762,12 @@ class Controller:
                     continue
                 if want_h > cur and not back and not self._steady((ns, name), win):
                     continue     # a raise (fewer pods) waits for a demand that has held still for one window
+                if want_h > cur and self.a.coast_step > 0:
+                    # coasting (rule 6): off the gas, the target eases toward fewer pods by at most coast_step points a
+                    # window, never in one jump; a demand that comes back half way finds the pods still running and is
+                    # met at once by the lower target, with no pod started again. More pods (a lower target) is never
+                    # limited: the gas is always immediate
+                    want_h = min(want_h, cur + self.a.coast_step)
                 # the autoscaler takes its window to answer a target. A raise inside that window moves the muscle
                 # mid-movement and removes pods it then starts again, so a raise is held for one window. A lower target
                 # (more pods, the safe direction) is never held: on a step up the pods are asked for at once, before the
@@ -808,6 +814,9 @@ def parser():
     ap.add_argument("--no-api-proxy", action="store_true", help="read through a new kubectl process every time instead of one kubectl proxy (the controller's own cost is higher)")
     ap.add_argument("--restore-only", action="store_true", help="put every setting back from the records on the objects and exit (the watchdog's way back)")
     ap.add_argument("--node-scale-cmd", default="")
+    ap.add_argument("--coast-step", type=int, default=int(os.environ.get("COAST_STEP", 25)),
+                    help="the most the HPA target may ease toward fewer pods in one autoscaler window (points of "
+                         "utilisation; 0: no limit). Adding pods is never limited")
     ap.add_argument("--min-nodes", type=int, default=int(os.environ.get("MIN_NODES", 2)),
                     help="machines always in service, ready for the next burst (the founder's floor: two)")
     ap.add_argument("--max-nodes", type=int, default=1000)
