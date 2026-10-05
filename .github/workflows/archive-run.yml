@@ -2,10 +2,10 @@
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
 name: archive-run
-# Copies the raw files of a finished live run (every artifact: capture CSV, response-time CSV, audit log, controller
+# Copies the raw files of finished live runs (every artifact: capture CSV, response-time CSV, audit log, controller
 # log, SHA-256 manifest per repetition, and the aggregate) into the repository under results/live/raw/run-<id>/, so
-# they live with the code and survive the artifact retention window. The run id is read from
-# .github/archive_request.txt; pushing a change to that file starts this workflow.
+# they live with the code and survive the artifact retention window. The run ids are read from
+# .github/archive_request.txt (one per line); pushing a change to that file starts this workflow.
 on:
   push:
     paths: [".github/archive_request.txt"]
@@ -18,19 +18,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - id: req
-        run: echo "run=$(tr -d '[:space:]' < .github/archive_request.txt)" >> "$GITHUB_OUTPUT"
-      - uses: actions/download-artifact@v4
-        with:
-          run-id: ${{ steps.req.outputs.run }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: results/live/raw/run-${{ steps.req.outputs.run }}
-      - run: |
-          d="results/live/raw/run-${{ steps.req.outputs.run }}"
-          find "$d" -type f | sort
-          ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
+      - name: Copy every listed run's files
+        env: {GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"}
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$d"
-          git commit -m "Raw files of live run ${{ steps.req.outputs.run }} archived with the code"
-          git push
+          # one run id per line (or separated by spaces); a run already archived is left as it is
+          for run in $(cat .github/archive_request.txt); do
+            d="results/live/raw/run-$run"
+            [ -d "$d" ] && { echo "::notice::run $run is already archived"; continue; }
+            gh run download "$run" -R "${{ github.repository }}" -D "$d" || { echo "::warning::run $run: no files to copy"; continue; }
+            ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
+            git add "$d"
+            git commit -q -m "Raw files of live run $run archived with the code"
+            echo "::notice::run $run archived: $(find "$d" -type f | wc -l) files"
+          done
+          git pull -q --rebase && git push
