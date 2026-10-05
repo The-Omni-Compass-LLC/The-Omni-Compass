@@ -45,7 +45,7 @@ jobs:
           python tools/run_citylearn.py --datasets "${{ matrix.dataset }}" --data-dir /tmp/cl/data/datasets --out out > run.log 2>&1
           code=$?
           # the end of the run's own output as annotations, readable on the run's page and through the API
-          grep -v -i "warning" run.log | tail -12 | while IFS= read -r l; do echo "::notice::$l"; done
+          grep -v -i "warning" run.log | tail -10 | while IFS= read -r l; do echo "::notice::$l"; done
           [ "$code" = 0 ] || { echo "::error::${{ matrix.dataset }} ended with exit $code"; mkdir -p out; cp run.log out/; exit "$code"; }
       - uses: actions/upload-artifact@v4
         if: always()

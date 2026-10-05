@@ -171,7 +171,10 @@ def main(argv=None):
         res[name]["citylearn_version"] = version
         res[name]["settings"] = {"gain": GAIN, "tau_h": TAU, "glide_per_h": SLEW, "window_h": WINDOW_H, "kill_at": KILL_AT}
         (out / f"{name}.json").write_text(json.dumps(res[name], indent=1) + "\n")
-        print(f"== {name}: native {res[name]['native']['seconds']} s, omni {res[name]['omni']['seconds']} s", flush=True)
+        for arm in ("native", "omni"):
+            r = res[name][arm]
+            print(f"== {name} {arm}: " + (f"{r['seconds']} s" if "seconds" in r else f"ERROR {r['error']} at {r['where']}"),
+                  flush=True)
     L = ["# Omni-Compass on top of CityLearn's own controller", "",
          f"CityLearn {version} (Intelligent Environments Lab, University of Texas at Austin; MIT license): an "
          "independent simulator of real buildings from measured data, with its own controllers and its own scoring. "

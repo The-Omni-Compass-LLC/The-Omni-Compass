@@ -49,7 +49,14 @@ jobs:
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
       - uses: azure/setup-kubectl@v4
       - run: az provider register --namespace Microsoft.ContainerService --wait
-      - run: bash scripts/aks_paired.sh
+      - name: Run the paired repetition
+        run: |
+          set +e
+          bash scripts/aks_paired.sh > paired.log 2>&1
+          code=$?
+          # the end of the run's own output as annotations, readable on the run's page and through the API
+          grep -v -i "warning" paired.log | tail -10 | while IFS= read -r l; do echo "::notice::$l"; done
+          [ "$code" = 0 ] || { echo "::error::repetition ${{ matrix.rep }} ended with exit $code"; exit "$code"; }
         env:
           REP: ${{ matrix.rep }}
           ARMS: ${{ github.event.inputs.arms || 'native bowl omni' }}
@@ -64,7 +71,7 @@ jobs:
         run: az group delete -n "$AZ_RG" --yes --no-wait || true
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: "aks-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}"}
+        with: {name: "aks-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}\npaired.log"}
   aggregate:
     needs: run
     if: always() && needs.run.result != 'skipped'
