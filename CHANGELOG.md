@@ -8,6 +8,19 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-05
+- Tweaks A-E before any GPU run (`docs/MECHANISM_OF_ACTION.md` section 9; amendments 11 and 12; the realms amendment):
+  - A. The 656-muscle realms table now runs the compass law (it still compared native against the retired allocation
+    law). On the compass law all five organisms are SUPERIOR WITHIN GUARDRAILS: energy 0.1-0.2% lower, work the same,
+    lateness no higher. Per muscle: 64 superior, 9 worse (from 108). The allocation-law table moves to
+    `docs/history/realms_allocation_law/`. Also fixed: each modelled muscle's compass was made fresh at every decision
+    (from the rename); the organism runs go again on the fixed code.
+  - B. The Azure burst test at `1 3 1 4 1 3`: at `1 6 1 8 1 6` the service's capped autoscaler could not serve the load in
+    either arm (41% failed in both).
+  - C. While cruising, the floor step reads and writes nothing (it read every pod every five seconds while a queue
+    drained).
+  - D. A change under one part in a million of the value reads "same", the number still shown.
+  - E. The organism's start file is written whole and read only when whole (one six-kube repetition read it empty); the
+    CityLearn omni arm's undefined name, left by the rename, is fixed.
 - The Kubernetes results on the frozen engine: steady, wandering, all four, faults, fairness (`results/live/`). Capacity
   +41.7%, p95 59-64% faster, machines up to 2% fewer (the verdict keeps a machine when giving it back slows the
   service), energy equal or lower, no pod ever without a machine. The Omni index is now read from these only: +12.9%.

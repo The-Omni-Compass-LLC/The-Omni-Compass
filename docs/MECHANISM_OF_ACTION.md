@@ -244,6 +244,58 @@ faster on 29-36% fewer machines (sets 22-27) and 48% more work on the same machi
 demand that wanders (up, spike, part way down, back up, idle) is in progress. Open: an order across different kinds of
 unit (a battery before a generator, a CPU before a GPU) is not wired; each pool is ordered within itself.
 
+## 9. The state each muscle carries, and the modes as a state machine
+
+**9.1 The compass on a muscle is a dynamical system, so its state must persist.** On muscle i the compass carries
+z_i = (p_i, v_i, x_i): the position of the service in its band, its velocity, and the knob's continuous value. At each
+decision k, with reading r_k:
+
+    p_k = (r_k - lo) / (hi - lo),   v_k = s v_{k-1} + (1 - s)(p_k - p_{k-1}) / dt,   F_k = F(p_k, v_k) by (8.2)    (9.1)
+    x_{k+1} = clamp( x_k + sigma g(F_k) F_k (x_hi - x_lo), x_lo, x_hi ),   g = UP if F_k > 0 else DOWN          (9.2)
+
+with x_0 the native value and sigma = +1 when a higher value is more capacity. Two properties depend on z persisting:
+(a) the knob integrates the force, x_k - x_0 = sum_j sigma g F_j span (until the cover binds), so a calm muscle eases
+step by step toward its cover; and (b) the damping term kd v_k needs p_{k-1}. If z were made fresh at every decision
+(p_{k-1} = p_k, v = 0, x_k = x_0), (9.2) would collapse to x_{k+1} = clamp(x_0 + sigma g F(p_k, 0) span): a memoryless map
+of the present reading, at most one step from native, with no damping. That is a different, weaker law. A renamed
+attribute did exactly that on 2026-10-05; `tests/test_compass_arm.py` now fails if the compass is ever made twice on one
+muscle.
+
+**9.2 The modes.** The live controller is in exactly one mode at each decision. With q_k the pods waiting for a place,
+u_k the scaling-up flag, c the cruise count (`--cruise-after`, 2), M the machine ceiling and m the floor:
+
+    cruise on      q_j > 0 for the last c decisions                                                   (9.3)
+    cruise off     q_j = 0 and not u_j for the last c decisions                                       (9.4)
+    in cruise      n' = M; the service's autoscaler target held at the operator's own; the floor step
+                   makes no read and no write                                                         (9.5)
+    emergency brake (not cruising) q = 0, no breach, not u, every sensed service idle or at demand
+                   <= b, the gate G (8.5) holds, every sense live, the last command landed:
+                   n' = max(m, smallest n carrying the CPU in use at rho)                             (9.6)
+    idle (a service at its floor)   I(h) := current = min = desired, and u_h <= target_h / 2          (9.7)
+    gas / brake / idle             (8.3) / (8.4)-(8.5) / (8.8)
+
+**9.3 Why cruise steps back (9.5).** In cruise every machine is already in service, n = M, so the floor step's only
+action (raise n to the floor the waiting pods need) is empty: floor <= M = n. Its reads (every pod, every node, node
+metrics, every HPA, each five seconds) carry no value of information, so removing them cannot change any action; they
+only cost CPU and API-server time on the machines the queue is using. The service's response time is also confounded
+in cruise: with a queue of other work holding the machines, a request waits on contended CPU, R = S / (1 - u_host), not on
+the service's own pods. Reading that R as the service's own queue and adding pods would answer the wrong cause. So in
+cruise Omni holds the machines and leaves the service to its own autoscaler. `tests/test_compass_controller.py` checks
+that the floor step makes no API read during cruise; the controller before this rule made the full set of reads every
+five seconds.
+
+**9.4 Why idle is read from the autoscaler's floor (9.7).** A served service never reads zero: a health probe or a
+client's keep-alive keeps one pod at a few percent of its request. In the batch test, one pod at about 10% of its request
+read as demand 0.10, above b = 0.05, and the brake waited 15 minutes after the queue emptied. The autoscaler's own
+floor is the observable of "no demand beyond the minimum": the pods it keeps are its minimum, it wants no more, and they
+run under half the target. In the five frozen-engine web tests the service was never at its floor (0 of 5,102 readings),
+so (9.7) changes nothing there.
+
+**9.5 Reporting resolution.** A paired change smaller than one part in a million of the value
+(|mean difference| <= 1e-6 |native|) is read "same", the number still shown. Below that, a difference is rounding in
+floating point and in the models' accumulators, not behaviour; a deterministic run gives a zero-width interval around
+it, which would otherwise read as proven.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

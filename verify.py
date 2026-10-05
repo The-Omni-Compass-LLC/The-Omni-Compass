@@ -21,6 +21,10 @@ def check(name, cond, detail=""):
     print(("PASS  " if cond else "FAIL  ") + name + (f"  ({detail})" if detail else ""))
     ok = ok and bool(cond)
 
+def all_passed():
+    """Every check so far passed: the module-level record, read here so no local name in main() can stand in for it."""
+    return globals()["ok"]
+
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 def build_cpp(tmp):
@@ -208,8 +212,8 @@ def main():
     freg = json.loads((ROOT / "results" / "fleet" / "PREREGISTRATION.json").read_text())
     for f, h in freg["sha256"].items():
         if f != "omnicompass/adapter.py":
-            ok, note = locked(f, h)
-            check(f"fleet pre-registered file unchanged or amended on record (SHA-256): {f}", ok, note)
+            same, note = locked(f, h)
+            check(f"fleet pre-registered file unchanged or amended on record (SHA-256): {f}", same, note)
     from fleet.sim import run as frun, arms_for
     from fleet.harness import make_scenario
     frows = list(csv.DictReader(open(ROOT / "results" / "fleet" / "heldout" / "RUNS.csv")))
@@ -344,8 +348,8 @@ def main():
             law_ok = all(new_law.get(k) == v for k, v in old_law.items()) and all(k in inert and new_law[k] == inert[k] for k in set(new_law) - set(old_law))
             same_summary = new_s == old_s and law_ok
             check(f"full replay, held-out seed {sd}: all scenarios x all arms regenerate RUNS.csv exactly and SUMMARY.json exactly (recorded law may add only inert defaults)", same_runs and same_summary)
-    print("\nVERIFICATION:", "PASS" if ok else "FAIL")  # the global: every check above, not a local name
-    sys.exit(0 if ok else 1)
+    print("\nVERIFICATION:", "PASS" if all_passed() else "FAIL")
+    sys.exit(0 if all_passed() else 1)
 
 if __name__ == "__main__":
     main()

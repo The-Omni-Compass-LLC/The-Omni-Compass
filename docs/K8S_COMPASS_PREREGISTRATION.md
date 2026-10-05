@@ -737,6 +737,40 @@ Both rows stay in every table with their numbers and intervals; only the word in
 Nothing else changes. With these readings, no row of the steady, wandering, all-four, fault or fairness results is
 worse than native beyond the noise.
 
+## Amendment 11: the burst bill test sized to what the service can serve, and rounding read as the same (2026-10-05)
+
+Disclosed: written after three repetitions of the burst test at `1 6 1 8 1 6` were seen. In them about 41% of requests
+failed in both arms. The service's own autoscaler sat pinned at its cap of 10 pods, and 6 and 8 load generators (36
+and 48 requests a second) ask more than 10 pods can serve, whatever the machines. A test where neither arm can do the
+work cannot show a difference. The burst test runs at `1 3 1 4 1 3`: the peak is one step above the steady test's peak
+of 3, and inside what the capped service can serve. Everything else is as preregistered: five repetitions,
+1,800 measured seconds, Azure's autoscaler underneath, the bill metered every 15 s, native against compass. The three
+repetitions at the old steps stay in the archive (`results/live/raw/run-37294579764/`) and are reported as the reason
+for this amendment, not as a result.
+
+In every table a paired change under one part in a million of the value reads "same", the number still shown
+(`SAME_REL`, `docs/MECHANISM_OF_ACTION.md` 9.5).
+
+## Amendment 12: cruise steps back, and the organism's start file (written before the batch rerun, 2026-10-05)
+
+The batch rerun on amendment 9 (GitHub run 37275371557, ten valid pairs) gave machines -16.9%, -27.2% once the queue
+was done, and energy -11.6% on the standby model. The queue finished 10 s later (584 s against 594 s, +1.8%). Omni held
+every machine in service throughout, so the time went elsewhere: every five seconds the floor step read every pod (240
+batch pods), every node, node metrics and every HPA, on the one 4-core runner the queue was using. In cruise every
+machine is already in service, so those reads can change no action. From this amendment, while cruising the floor step
+makes no read and no write, and the service's target stays at the operator's own (`docs/MECHANISM_OF_ACTION.md` 9.3;
+`tests/test_compass_controller.py`). Cruise never engaged in the steady, wandering, all-four, fault or fairness runs,
+so this changes nothing there. The batch test runs again, ten pairs, design unchanged.
+
+The organism with the real cluster inside waits for a start file. One repetition of six-kube (the four stacked, 1 copy,
+repetition 2) read that file in the instant it existed but was still empty, and stopped. The file is now written whole
+or not at all, and read only once it holds a number. That repetition is reported as stopped, never counted.
+
+Also found and fixed on 2026-10-05, from the compass rename: each modelled muscle's compass was made fresh at every
+decision (`docs/MECHANISM_OF_ACTION.md` 9.1). That touched the modelled organism rows of the runs started after the rename
+(six-kube 37280090832, big organism 37287311224); their cluster rows are unaffected. The organism runs go again on the
+fixed code.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
