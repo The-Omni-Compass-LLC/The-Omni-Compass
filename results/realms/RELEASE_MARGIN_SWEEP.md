@@ -33,3 +33,20 @@ past 0.6 buys energy with lateness.
 
 Reproduce: the scratch script in this file's commit message, or run `realms.compass_arm` with `RELEASE_MARGIN` set and
 the HPA target lever on or off.
+
+## The per-muscle sweep (2026-10-05): every node pool on its own, the compass law
+
+The stack sweep above judged lateness at the organism. On each node pool alone (the 42 pools under a node autoscaler,
+seeds 3000-3009, native against the compass law, everything else fixed):
+
+| RELEASE_MARGIN | Energy, mean | Time over the line, mean (points) | Pools later than native |
+|---:|---:|---:|---:|
+| 0.6 | -2.00% | +0.157 (max +0.431) | 32 of 42 |
+| 0.5 | -0.71% | +0.055 (max +0.278) | 23 of 42 |
+| 0.4 | -0.11% | +0.004 (max +0.069) | 4 of 42 |
+| 0.3 | -0.00% | 0.000 | 0 of 42 |
+
+On a node pool every percent of energy saved by releasing a machine is paid in lateness: a machine boots in minutes,
+and a burst that comes in the meantime is served late. Work and speed come first, so the margin is 0.3, the largest
+at which no pool is later than native. It is the rule the live controller follows on real Kubernetes too: a machine goes
+back only where giving it back costs no speed.

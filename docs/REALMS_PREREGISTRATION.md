@@ -319,3 +319,23 @@ The engine is now one law on everything, the compass law on top of native, so th
 compass (`realms/harness.py` ARMS: native, watch, compass). The watch arm stays: Omni watching must write nothing and
 leave every muscle exactly as native. Seeds, plants, knobs, guardrails and the labelling rule are unchanged. The tables
 published until now describe the allocation law and stay as first measured in `docs/history/`.
+
+## Amendment (2026-10-05): four levers bounded by their physics, and the mirror label (written after the compass table was seen)
+
+Disclosed: written after the first compass-law table (nine muscles WORSE) was seen. Each change follows from the muscle's
+own model (`docs/MECHANISM_OF_ACTION.md` 9.6), applies to every muscle of its kind, and is tested:
+1. Cooling power is native. A cap moves heat removal later, never away, and stages more units.
+2. A battery's reserve is spent only at the connection's wall, and only when the battery can cover the excess. Below
+   the operator's reserve every kWh costs (1 - eta)/sqrt(eta) to buy back.
+3. A backup reserve (the UPS preset, `backup=True`) is never a lever.
+4. A compute pool's power cap moves only where (9.8) says a lower cap saves energy. A quantum computer, a network switch
+   and storage are left native (race to idle).
+
+The labelling rule gains the mirror of ENERGY IMPROVEMENT WITH SERVICE TRADEOFF: less work per energy, no work lost
+(at most 1%), and the time over the line proven lower is SERVICE IMPROVEMENT WITH ENERGY TRADEOFF. Everything else is as
+before, and every other label keeps its definition.
+
+Also in this amendment: an effort cap on a motion axis moves only where the copper loss it saves at full acceleration,
+(J a_max / kt)^2 R, exceeds the standing draw a longer move pays, p_idle + b v_max^2 (a reaction wheel; not traction, a
+flight axis or a robot joint). The machine-release margin on node pools is 0.3, the largest at which no pool is later than
+native (`results/realms/RELEASE_MARGIN_SWEEP.md`, the per-muscle sweep).

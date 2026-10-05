@@ -24,9 +24,11 @@ from __future__ import annotations
 from omnicompass.compass_law import Band, CompassLaw, clamp
 
 UP, DOWN, RELEASE = 0.10, 0.02, -0.2
-RELEASE_MARGIN = 0.6     # a machine goes back only when the rest covers the recent peak at 0.6 of the plant's own release level
-# 0.6: the least energy with no seed late more often than native (results/realms/RELEASE_MARGIN_SWEEP.md: 0.7 and up
-# leave a seed late more often)
+RELEASE_MARGIN = 0.3     # a machine goes back only when the rest covers the recent peak at 0.3 of the plant's own release level
+# 0.3: the largest margin at which no node pool is later than native (results/realms/RELEASE_MARGIN_SWEEP.md, the
+# per-muscle sweep of 2026-10-05: 0.6 saved 2.0% energy with 32 of 42 pools later, 0.4 left 4 later, 0.3 none). A machine
+# boots in minutes and a burst that comes in the meantime is served late, so speed first holds the machines (the same
+# rule as the verdict on real Kubernetes: a machine goes back only where it costs no speed)
 
 
 def position(plant) -> float:
@@ -71,6 +73,19 @@ def capping_saves(plant) -> bool:
     return eps < P["p_dyn"] / (P["p_idle"] / u + P["p_dyn"])
 
 
+def effort_cap_saves(plant) -> bool:
+    """Whether a lower effort cap saves energy on this axis at all (MECHANISM_OF_ACTION 9.6).
+
+    A cap on effort lowers the copper loss of a full-acceleration move, (J a_max / kt)^2 R, and stretches the move, during
+    which the axis keeps drawing its idle power and turning against viscous friction, p_idle + b v_max^2. It pays only
+    where the first exceeds the second (a reaction wheel); elsewhere (traction, a flight axis, a robot joint) a slower
+    move costs more than the current it saves, and the cap is left native."""
+    P = plant.P
+    copper = (P["J"] * P["a_max"] / P["kt"]) ** 2 * P["R"]
+    standing = P["p_idle"] + P["b"] * P["v_max"] ** 2
+    return copper > standing
+
+
 def lever(plant, knob):
     """(override key, native value, low, high, sign): sign +1 when a higher value is more capacity."""
     P, t = plant.P, plant.template
@@ -100,7 +115,9 @@ def lever(plant, knob):
             return ("setpoint", P["reserve"], min(P["stress"], P["reserve"]), P["reserve"], -1)
         return None                                            # a battery's power limit gives nothing back: native
     if t == "motion_axis":
-        return ("power", 1.0, 0.4, 1.0, 1) if knob == "power" else ("capacity", 1.0, 0.4, 1.0, 1)
+        if knob == "power":
+            return ("power", 1.0, 0.4, 1.0, 1) if effort_cap_saves(plant) else None
+        return ("capacity", 1.0, 0.4, 1.0, 1)
     if t == "process_loop":
         if knob == "setpoint":
             lo, hi = min(P["sp"], P["calm"]), max(P["sp"], P["calm"])

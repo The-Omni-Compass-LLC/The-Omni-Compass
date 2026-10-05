@@ -296,6 +296,46 @@ so (9.7) changes nothing there.
 floating point and in the models' accumulators, not behaviour; a deterministic run gives a zero-width interval around
 it, which would otherwise read as proven.
 
+**9.6 A lever is moved only where moving it can pay.** The compass decides how far and how fast. Whether a lever may
+move at all is a property of the muscle's physics. Four cases, each derived from the muscle's own model and each its own
+test:
+
+- *Cooling power.* A zone's heat must leave it: over a run, the heat removed equals the heat made plus what the
+  room's mass stores. A cap on cooling power q_max cannot remove less heat. It only lets the temperature drift above
+  setpoint while the PI command grows, and the staging rule, units = ceil(command / (0.8 q_unit)), turns that command
+  into more units and more fan power, p = q_c / COP + units x p_unit. So a lower cap never saves energy, and the lever
+  stays native. (The setpoint, which changes the COP, and the units, which change fan power at the same heat, remain
+  levers.)
+- *A battery's reserve.* Energy D drawn from the cells below the operator's reserve saves D sqrt(eta) of grid import,
+  and the deficit is bought back at D / sqrt(eta). The net, D (1 - eta) / sqrt(eta) (10.5% of D at eta = 0.90), is
+  always positive. Spending the reserve is never an energy saving; it is the price of keeping the draw under the
+  connection's limit. So the reserve is spent only at the wall (p >= 0.95) and only when the battery can cover the
+  excess (0 < imp - p_lim <= p_batt). Otherwise the operator's reserve holds, and no round trip is paid for nothing.
+- *A backup reserve (a UPS).* It is held for an outage, which the model does not contain, so spending it for a peak
+  trades away the reason it exists. Never a lever.
+- *A compute pool's power cap.* With throughput mu(c) proportional to c^eps and the autoscaler holding utilisation near its
+  target u*, the energy per unit of work is e(c) = (p_idle / u* + p_dyn c) / mu(c). At c = 1, de/dc > 0 (a lower cap
+  saves) if and only if
+
+      eps < p_dyn / (p_idle / u* + p_dyn)                                                                 (9.8)
+
+  At eps = 0.4 the cap saves on CPU hosts (threshold 0.62), GPUs (0.74), databases (0.51) and radio units (0.54). It
+  costs energy where idle power dominates: a quantum computer's cryostat (0.19), a network switch (0.32), storage
+  (0.26). There, running slower keeps the machines on longer: race to idle. In a deployment p_idle, p_dyn and the
+  speed curve come from the machine's own specification.
+
+- *A motion axis's effort cap.* It lowers the copper loss of a full-acceleration move, (J a_max / kt)^2 R, and stretches
+  the move, which keeps paying the standing draw p_idle + b v_max^2. It moves only where the first exceeds the second: a
+  reaction wheel (32 W against 5 W), not EV traction, a flight axis or a robot joint.
+- *A machine released from a node pool.* A machine boots in minutes, and a burst that arrives in the meantime is served
+  late. So a machine goes back only when the machines left cover the recent peak at 0.3 of the pool's own release level,
+  the largest margin at which no pool is later than native (`results/realms/RELEASE_MARGIN_SWEEP.md`). This is the
+  verdict of the live controller (section 8) in model form.
+
+What a lever buys is labelled for what it is. Less work per energy, with no work lost and the time over the line
+proven lower, is SERVICE IMPROVEMENT WITH ENERGY TRADEOFF, the mirror of ENERGY IMPROVEMENT WITH SERVICE TRADEOFF.
+Without that proof it is WORSE.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
