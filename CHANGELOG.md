@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-05
+- Amendment 9: the emergency brake also reads idle from the autoscaler's floor (least pods, wanting no more, half
+  its target or less), so it fires when a queue empties, not only at a zero reading a served service never shows. No
+  result already measured could change (0 of 5,102 readings at the floor). The recording script no longer stops on an
+  unanswered reading of machine CPU; end-of-window reads are retried. The batch test runs again.
 - The law is named for what it is: the compass law (the word "bowl" is gone). In code: `omnicompass/compass_law.py`
   (class `CompassLaw`), `realms/compass_arm.py`, `omni_controller/gpu_compass.py`; the arm is `compass`. Runs recorded
   before the rename keep their folder names (`bench-bowl-N`), which the report tools read as the compass arm.

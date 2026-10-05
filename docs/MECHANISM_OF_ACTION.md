@@ -162,7 +162,7 @@ comes as a pile.
 | **Brake** | Ramping down: traffic falls and capacity is eased off a step at a time, never below idle | (8.4)-(8.5); coasting, rule 6 |
 | **Reset** | The brake held to the floor: every setting the governor ever wrote is handed back to where native had it, read back, and the record removed; the next run starts fresh. Every benchmark arm ends with one and checks it | the reset file (`--kill-file`, a name kept for compatibility), `Controller.restore` |
 | **Cruise** | A pile of work waiting for a place: every machine in service, held there without second-guessing, until the line has been empty for two decisions | rule 7, `--cruise-after` |
-| **Emergency brake** | The work is done and demand is at zero: straight to idle (the floor) in one move, every safety check still holding | rule 8, `--brake-demand` |
+| **Emergency brake** | The work is done and demand is at zero (the service at its least pods, wanting no more, at half its target or less): straight to idle (the floor) in one move, every safety check still holding | rule 8, `--brake-demand`, amendment 9 |
 | **Kill switch** | Security only: one switch in a human hand that turns Omni-Compass's governing off across the whole system at once, for anything rogue or anyone trying to drive a system through Omni-Compass's brain | `omnicompass/master.py`, `tools/omni_switch.py off` |
 
 The fuel cut-off point (the floor) is a number the operator sets; the brake never takes the system below it, however

@@ -280,10 +280,13 @@ date -u +%s > "$OUT_DIR/window_end.txt"
 [ -n "$meter_pid" ] && { kill "$meter_pid" 2>/dev/null || true; }
 [ -n "$host_pid" ] && { kill "$host_pid" 2>/dev/null || true; }
 kill "$watch_pid" 2>/dev/null || true; wait "$watch_pid" 2>/dev/null || true
-kubectl get pods -n default -l run=php-apache -o json > "$OUT_DIR/pods_end.json"
+# the end-of-window record: a read the API server does not answer is tried again, never the end of the run
+end_read() { local f="$1"; shift; for t in 1 2 3 4 5 6; do kubectl "$@" --request-timeout=20s > "$f" 2>>"$OUT_DIR/end_reads.err" && return 0; sleep 10; done
+  echo "the API server did not answer: kubectl $*" >> "$OUT_DIR/end_reads.err"; }
+end_read "$OUT_DIR/pods_end.json" get pods -n default -l run=php-apache -o json
 [ -n "$omni_pid" ] && { wait "$omni_pid" || true; }
-kubectl get nodes -o wide > "$OUT_DIR/nodes_end.txt"
-kubectl get hpa php-apache -o json > "$OUT_DIR/hpa_end.json"
+end_read "$OUT_DIR/nodes_end.txt" get nodes -o wide
+end_read "$OUT_DIR/hpa_end.json" get hpa php-apache -o json
 
 if [ "$ARM" = "watch" ]; then
   echo "== watch arm: nothing may have reached the cluster"

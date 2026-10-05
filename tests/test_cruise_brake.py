@@ -59,6 +59,22 @@ def main():
     assert eb, "the emergency brake never engaged at zero demand"
     assert eb[0]["to"] == 2 and eb[0]["from"] > 2, eb
     assert all(n >= 2 for n in sizes()), sizes()
+    # idle as a served service really stands (amendment 9): one pod, its floor, a probe keeping it at 10% of a 50% target
+    def brakes(util, replicas):
+        t2 = tempfile.mkdtemp()
+        a2 = parser().parse_args(["--kubectl", FAKE, "--mode", "nodepool", "--interval", "0", "--min-nodes", "2", "--max-nodes", "6",
+                                  "--audit", str(Path(t2) / "audit.jsonl"), "--kill-file", str(Path(t2) / "kill"),
+                                  "--sensed", "default/php-apache", "--node-scale-cmd", "true"])
+        c2 = Controller(a2)
+        cluster(t2, pending=0, util=util, replicas=replicas, used="200m")
+        for _ in range(40):
+            c2.step()
+        return [json.loads(l)["emergency_brake"] for l in (Path(t2) / "audit.jsonl").read_text().splitlines()
+                if "emergency_brake" in json.loads(l)]
+    idle = brakes(10, 1)
+    assert idle and idle[0]["to"] == 2 and idle[0]["at_idle"], "the brake did not engage with the service idle at its floor"
+    assert not brakes(10, 3), "the brake engaged with the service above its floor"
+    assert not brakes(40, 1), "the brake engaged with the service busy at its floor (40% of a 50% target)"
     print(f"cruise: on after two decisions with work waiting, off after two with the line empty; emergency brake: "
           f"{eb[0]['from']} -> {eb[0]['to']} machines in one move at zero demand, never below the floor")
     print("PASS test_cruise_brake")

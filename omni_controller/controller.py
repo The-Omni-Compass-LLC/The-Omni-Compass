@@ -297,6 +297,20 @@ class Controller:
                     return float(u) / 100.0 * int(st.get("currentReplicas", 0) or 0)
         return None
 
+    def _at_idle(self, h):
+        """Whether an HPA's service stands at idle: at its least pods (spec.minReplicas), wanting no more, and running at
+        no more than half its target utilisation. A served service is never at zero CPU (a health probe, a client's
+        keep-alive), so idle is read from the autoscaler's own floor, not from a zero reading (amendment 9)."""
+        lo = int((h.get("spec", {}) or {}).get("minReplicas", 1) or 1)
+        st = h.get("status", {}) or {}
+        cur, want = int(st.get("currentReplicas", 0) or 0), int(st.get("desiredReplicas", 0) or 0)
+        _, target = cpu_target(h)
+        u = None
+        for m in st.get("currentMetrics", []) or []:
+            if m.get("type") == "Resource" and (m.get("resource") or {}).get("name") == "cpu":
+                u = (m["resource"].get("current") or {}).get("averageUtilization")
+        return cur == lo and want <= lo and u is not None and target is not None and float(u) <= 0.5 * float(target)
+
     def _rising(self, key, win):
         """Whether the demand is still growing: now above (1 + DEMAND_RISE) times its least over the last window.
         While it grows, the pods a breach called are still owed to it; handing the operator's target back would remove
@@ -696,16 +710,18 @@ class Controller:
         eb = float(getattr(self.a, "brake_demand", 0.05) or 0)
         if eb > 0 and self.a.mode == "nodepool" and not self.cruise and rec_n > self.a.min_nodes and s["pending"] == 0 \
                 and not breach_now and not scaling_up:
-            dem = [self._app_demand(h) for h in s["hpas"] if self._sensed(h)]
+            sensed = [h for h in s["hpas"] if self._sensed(h)]
+            dem = [self._app_demand(h) for h in sensed]
             dem = [x for x in dem if x is not None]
+            idle = bool(sensed) and all(self._at_idle(h) for h in sensed)
             g_ok = gate["ok"] or gate["reason"] == "release permitted"
-            if dem and max(dem) <= eb and g_ok and not any(blind.values()) and nodes_landed:
+            if dem and (max(dem) <= eb or idle) and g_ok and not any(blind.values()) and nodes_landed:
                 low = max(self.a.min_nodes, floor)
                 # the machines left must carry what runs now at or under the engine's utilisation target
                 while low < rec_n and s["used_m"] / max(low * per_node, 1e-9) > rho:
                     low += 1
                 if low < rec_n:
-                    self.audit({"emergency_brake": {"from": rec_n, "to": low, "demand": round(max(dem), 3)}})
+                    self.audit({"emergency_brake": {"from": rec_n, "to": low, "demand": round(max(dem), 3), "at_idle": idle}})
                     rec_n = low
         out = self.audit({"authority": {"calm": round(auth["scalars"]["calm"], 3), "execute": auth["execute"],
                                         "contract": {o: v.get("contract") for o, v in auth["organs"].items()},

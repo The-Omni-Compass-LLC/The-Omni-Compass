@@ -700,6 +700,26 @@ D2s_v5. The big-organism machine failed while seven kind nodes joined (kubelet-s
 inotify watchers for that; the rented machine now raises them as kind's own documentation advises. Neither change
 touches the controller.
 
+## Amendment 9: idle read from the autoscaler's floor, and the batch test again (written before its run, 2026-10-05)
+
+The batch test on the frozen engine (GitHub run 37262795697) showed rule 8 late. The queue emptied 664 s into the
+window, but the emergency brake fired at 1,574 s. The reason: a served service is never at zero CPU. The response
+probe alone keeps one pod at about 10% of its request, which reads as demand 0.10, above the brake's 0.05. Rule 8 now
+also counts a service as idle when its autoscaler stands at its least pods (`minReplicas`), wants no more, and runs at
+no more than half its target utilisation. Every other condition of rule 8 holds as before: nothing waiting, no breach,
+nothing scaling up, the release gate, every sense live, the last command landed, and the machines left carrying what
+runs now under the utilisation target. Test: `tests/test_cruise_brake.py` (it brakes at the idle floor, and it does not
+brake above the floor or busy at it).
+
+Effect on what was already measured: none. The steady, fault, fairness, wandering and all-four runs on the frozen engine
+had the service at one pod with nothing waiting in 0 of 5,102 readings, so the amended rule could not have fired in any
+of them.
+
+Three of the ten batch pairs stopped, all in the omni arm. The API server answered 500 under the batch load (60 jobs
+asking for 30 cores on a 4-core runner), and the recording script ended on an unanswered `kubectl top nodes`. That is a
+harness fault: a reading the API server does not answer is now logged and skipped, and the end-of-window reads are tried
+again. The batch test runs again, ten pairs, on this engine, with the design unchanged.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
