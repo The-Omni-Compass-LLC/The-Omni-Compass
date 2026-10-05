@@ -9,15 +9,23 @@ on:
   workflow_dispatch:
     inputs:
       datasets:
-        description: "CityLearn districts (the confirmation set: never used in tuning)"
-        default: "citylearn_challenge_2022_phase_2,citylearn_challenge_2022_phase_3,citylearn_challenge_2022_phase_all,citylearn_challenge_2021,citylearn_challenge_2020_climate_zone_1,citylearn_challenge_2020_climate_zone_2,citylearn_challenge_2020_climate_zone_3,citylearn_challenge_2020_climate_zone_4,citylearn_challenge_2023_phase_1"
+        description: "CityLearn districts, comma separated; 'untouched' runs every district CityLearn ships except the tuning district and round 1's"
+        default: "untouched"
 jobs:
   plan:
     runs-on: ubuntu-latest
     outputs: {sets: "${{ steps.r.outputs.sets }}"}
     steps:
       - id: r
-        run: echo "sets=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.datasets }}'.split(',')))")" >> "$GITHUB_OUTPUT"
+        run: |
+          if [ "${{ github.event.inputs.datasets }}" = untouched ]; then
+            GIT_LFS_SKIP_SMUDGE=1 git clone -q --depth 1 https://github.com/intelligent-environments-lab/citylearn /tmp/cl
+            seen="citylearn_challenge_2022_phase_1 citylearn_challenge_2022_phase_2 citylearn_challenge_2022_phase_3 citylearn_challenge_2022_phase_all citylearn_challenge_2021 citylearn_challenge_2020_climate_zone_1 citylearn_challenge_2020_climate_zone_2 citylearn_challenge_2020_climate_zone_3 citylearn_challenge_2020_climate_zone_4 citylearn_challenge_2023_phase_1"
+            sets=$(for d in /tmp/cl/data/datasets/*/; do n=$(basename "$d"); [ -f "$d/schema.json" ] && ! echo " $seen " | grep -q " $n " && echo "$n"; done | python3 -c "import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))")
+          else
+            sets=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.datasets }}'.split(',')))")
+          fi
+          echo "sets=$sets" | tee -a "$GITHUB_OUTPUT"
   run:
     needs: plan
     strategy:

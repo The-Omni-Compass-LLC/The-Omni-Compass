@@ -47,3 +47,34 @@ Every other CityLearn district that runs with the native controller: `citylearn_
 deterministic year, native and native + Omni-Compass. Reported per district and across districts: every CityLearn
 score, native, native + Omni-Compass, the change, and read in words (better or worse), with the number of districts
 better and worse for each score. Workflow `citylearn`; the report is written to results/citylearn/CITYLEARN.md when it has run.
+
+## Round 1 result, and the amendment written before round 2 (2026-10-05)
+
+Round 1 (workflow `citylearn`, run 37253566738, report `results/citylearn/round1/CITYLEARN.md`, raw files
+`results/live/raw/run-37253566738/`) split by the kind of
+storage in the district:
+
+| Districts | Bill | Electricity bought | Carbon | Daily peak | Highest peak | Ramping |
+|---|---|---|---|---|---|---|
+| 2022 phases 2, 3 and all (electric batteries; 5, 7, 17 buildings) | -4.2% to -10.8% | -8.9% to -16.9% | -6.6% to -14.1% | -11.0% to -14.0% | -2.7% to +0.5% | -7.1% to +3.4% |
+| 2020 climate zones 1-4 and 2021 (cold and hot water tanks; 9 buildings) | the same | -0.0% to -0.8% | -0.5% to +0.1% | +5.5% to +11.5% (worse) | +10.4% to +28.1% (worse) | +23.5% to +31.4% (worse) |
+| 2023 phase 1 (720 hours, 3 buildings) | +0.3% | -0.1% | -0.8% | -4.6% | the same | +25.3% (worse) |
+
+The cause: the wiring pushed every storage command the same way from the district's electricity reading, the water
+tanks (cooling_storage, dhw_storage) included. A tank is a thermal muscle; moving when it charges by an electricity
+reading made the peaks worse.
+
+**Amendment (one wire, one muscle):** the bowl steers only the electric batteries (`electrical_storage`) from the
+electricity reading; every water tank stays native (it would need its own wire and its own reading, the tank's
+temperature). A district with no electric battery is run and reported with Omni-Compass steering nothing. Gain,
+response, glide and band are unchanged. Round 1's districts have been seen and are not the test of this amendment.
+
+**Round 2, the untouched districts:** every other district CityLearn ships that runs with its rule-based controller:
+`baeda_3dem`, `ca_alameda_county_neighborhood`, `citylearn_challenge_2022_phase_all_demand_response`,
+`citylearn_challenge_2022_phase_all_plus_evs`, `citylearn_challenge_2022_phase_all_robustness`,
+`citylearn_challenge_2023_phase_2_local_evaluation`, `citylearn_challenge_2023_phase_2_online_evaluation_1` to `_3`,
+and the `citylearn_challenge_2023_phase_3` sets. Disclosed: the three 2022 variants share buildings with the 2022
+districts of round 1 (different scenarios: demand response, electric vehicles, robustness). A district whose files the
+rule-based controller cannot run is reported as such, never left out silently. Reported as in round 1, round 1 kept
+beside it.
+

@@ -11,7 +11,8 @@ is the native arm: it charges and discharges every battery by the hour of the da
 
 Arms, the same district, the same year, the same weather and loads:
   native  CityLearn's BasicRBC alone
-  omni    the same BasicRBC, with the bowl law (omnicompass/bowl.py) on top of its battery commands. The reading is the
+  omni    the same BasicRBC, with the bowl law (omnicompass/bowl.py) on top of its electric battery commands only (a
+          cold or hot water tank is a thermal muscle with its own reading and stays native). The reading is the
           district's draw without its batteries the hour before (the demand the batteries answer, not their own effect); its band is the 10th to the 90th percentile of the
           past week's draw (causal: only hours already seen). The bowl's force moves every battery command the same way:
           a positive force (the district drawing hard) pushes toward discharge, a negative force (a quiet district)
@@ -83,6 +84,10 @@ def run_arm(schema, arm):
     kill = int(KILL_AT * steps)
     bowl = None
     hist, moved, handed_back, off = [], 0, True, 0.0
+    # one wire, one muscle: the bowl steers only the electric batteries from the district's electricity reading; a cold
+    # or hot water tank (cooling_storage, dhw_storage) is a thermal muscle that needs its own reading and stays native
+    names = [n for agent in env.action_names for n in agent]
+    battery = [n == "electrical_storage" for n in names]
     t0, k = time.time(), 0
     while not env.terminated:
         a = agent.predict(obs)
@@ -105,7 +110,10 @@ def run_arm(schema, arm):
                     f = bowl.force(hist[-1])
                     off += max(-SLEW, min(SLEW, -GAIN * f - off))   # the adjustment glides, never jumps more than SLEW
                     if abs(off) > 1e-12:
-                        a = [[max(-1.0, min(1.0, x + off)) for x in row] for row in a]
+                        flat = [x for row in a for x in row]
+                        if any(battery):
+                            flat = [max(-1.0, min(1.0, x + off)) if b else x for x, b in zip(flat, battery)]
+                            a = [flat]
                         moved += 1
             elif k >= kill:
                 handed_back = handed_back and True          # from here every command is the native controller's own
@@ -113,7 +121,8 @@ def run_arm(schema, arm):
         k += 1
     ev = env.evaluate()
     d = ev[ev["level"] == "district"].set_index("cost_function")["value"].to_dict()
-    return {"arm": arm, "buildings": len(env.buildings), "steps": steps, "seconds": round(time.time() - t0, 1),
+    return {"arm": arm, "buildings": len(env.buildings), "steps": steps,
+            "batteries": sum(battery), "thermal_stores_left_native": sum(1 for n in names if n in ("cooling_storage", "dhw_storage")), "seconds": round(time.time() - t0, 1),
             "moved_hours": moved, "handed_back": handed_back and k >= kill,
             "kpis": {x: (None if (d.get(x) is None or (isinstance(d.get(x), float) and math.isnan(d.get(x)))) else float(d[x]))
                      for x in KPIS}}
