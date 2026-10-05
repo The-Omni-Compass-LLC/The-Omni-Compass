@@ -1,0 +1,84 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: big-organism
+# The organisms too big for one GitHub runner beside a cluster (1,000 copies of the whole tower, 656,000 modelled muscles,
+# and of the four stacked, 1.2 million): each repetition rents one larger Azure machine (Standard_D8s_v4, 8 vCPU, 32 GiB,
+# list price about $0.38 an hour), runs the same paired test there (scripts/kind_paired.sh: native against native with
+# Omni-Compass on top, a fresh six-worker kind cluster per arm, the organism at 1,000 copies with the real cluster
+# inside), copies every file back, and deletes the machine and its resource group whatever happens. Uses the
+# AZURE_CREDENTIALS secret; nothing to do by hand.
+on:
+  workflow_dispatch:
+    inputs:
+      organisms: {description: "Organisms, comma separated", default: "organism_656,stack_1226"}
+      size: {description: "Copies of each organism on one clock", default: "1000"}
+      reps: {description: "Paired repetitions per organism", default: "3"}
+      duration_s: {description: "Measured seconds per arm (240 organism steps)", default: "2880"}
+      vm_size: {description: "Azure machine size", default: "Standard_D8s_v4"}
+      location: {description: "Azure region", default: "eastus"}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {cells: "${{ steps.r.outputs.cells }}"}
+    steps:
+      - id: r
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          orgs = [o for o in "${{ github.event.inputs.organisms || 'organism_656,stack_1226' }}".split(",") if o]
+          reps = int("${{ github.event.inputs.reps || '3' }}")
+          print("cells=" + json.dumps([{"organism": o, "rep": r} for o in orgs for r in range(1, reps + 1)]))
+          PY
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        cell: "${{ fromJSON(needs.plan.outputs.cells) }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      RG: omni-big-${{ github.run_id }}-${{ strategy.job-index }}
+      LOC: ${{ github.event.inputs.location || 'eastus' }}
+      SIZE: ${{ github.event.inputs.vm_size || 'Standard_D8s_v4' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+      - name: Rent the machine
+        run: |
+          az group create -n "$RG" -l "$LOC" -o none
+          az vm create -g "$RG" -n big --image Ubuntu2204 --size "$SIZE" --admin-username omni \
+            --generate-ssh-keys --public-ip-sku Standard --os-disk-size-gb 128 -o none
+          ip=$(az vm show -d -g "$RG" -n big --query publicIps -o tsv); echo "IP=$ip" >> "$GITHUB_ENV"
+          for i in $(seq 1 30); do ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 omni@$ip true && break; sleep 10; done
+      - name: Install the tools on it
+        run: |
+          ssh -o StrictHostKeyChecking=no omni@$IP 'set -e
+            sudo apt-get update -qq && sudo apt-get install -y -qq docker.io jq git python3-pip python3-venv curl >/dev/null
+            sudo usermod -aG docker omni
+            curl -fsSLo kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64 && sudo install kind /usr/local/bin/kind
+            curl -fsSLo kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && sudo install kubectl /usr/local/bin/kubectl
+            git clone -q https://github.com/${{ github.repository }}.git omni && cd omni && git checkout -q ${{ github.sha }}
+            python3 -m venv .v && .v/bin/pip install -q -r requirements.txt'
+      - name: Run the paired test on it
+        run: |
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 omni@$IP "cd omni && sg docker -c '
+            export PATH=\$PWD/.v/bin:\$PATH REP=${{ matrix.cell.rep }} ARMS=\"native bowl\" DURATION=${{ github.event.inputs.duration_s || '2880' }}
+            export ORGANISM=${{ matrix.cell.organism }} ORGANISM_SCALE=${{ github.event.inputs.size || '1000' }} LOAD_MAX=6 LOADGEN=open
+            export CLOSURE=tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+            bash scripts/kind_paired.sh'" || echo "PAIRED RUN FAILED" | tee failed.txt
+      - name: Copy every file back
+        if: always()
+        run: |
+          mkdir -p out && scp -o StrictHostKeyChecking=no -r "omni@$IP:omni/bench-*" out/ || true
+          ssh -o StrictHostKeyChecking=no omni@$IP 'free -g; df -h /' > out/machine.txt 2>&1 || true
+          echo "${{ matrix.cell.organism }} x${{ github.event.inputs.size || '1000' }} rep ${{ matrix.cell.rep }} on $SIZE" >> out/machine.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "six-${{ matrix.cell.organism }}-x${{ github.event.inputs.size || '1000' }}-${{ matrix.cell.rep }}", path: out}
+      - name: Delete the machine
+        if: always()
+        run: az group delete -n "$RG" --yes --no-wait || true

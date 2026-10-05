@@ -591,6 +591,16 @@ The run dimension of the model grid (1, 10, 100, 1,000 runs) is a count of seeds
 is a real paired run of an hour or more, so the real cluster carries the repetitions above, and the model grid carries
 1 to 1,000 runs.
 
+
+### The two organisms too big for a GitHub runner: a larger rented machine (written before their run, 2026-10-05)
+
+1,000 copies of the whole tower and of the four stacked run on a larger rented machine, the same test otherwise:
+workflow `big-organism` rents one Azure Standard_D8s_v4 (8 vCPU, 32 GiB) per repetition, runs `scripts/kind_paired.sh`
+on it (native against native with Omni-Compass on top, fresh six-worker kind cluster per arm, 2,880 measured seconds,
+the organism at 1,000 copies with the real cluster inside), copies every file back and deletes the machine whatever
+happens. Three paired repetitions per organism, two machines at a time. Its results join `SIX_KUBE.md` at 1,000 copies;
+the same cells from GitHub runners count only if the runner held them.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
