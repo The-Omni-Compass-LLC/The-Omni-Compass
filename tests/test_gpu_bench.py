@@ -411,6 +411,27 @@ def one_writer():
     assert "powercap" not in (ROOT / "omni_controller" / "gpu_governor.py").read_text() and "energy_uj" not in (ROOT / "omni_controller" / "gpu_governor.py").read_text()
 
 
+def state_never_empty():
+    """The stand-in card's state file, shared by several cards' governors and the bench's sampler: while one process
+    writes limits, another's reads never fail. (Opening the file with "w" emptied it for a moment, and on a loaded
+    machine a read in that moment failed, which made the several-card run INVALID on GitHub's runners.)"""
+    import threading
+    d = Path(tempfile.mkdtemp()); state(d, limit={"0": 300.0, "1": 300.0, "2": 300.0}); stop, bad = [], []
+    def writer():
+        i = 0
+        while not stop:
+            subprocess.run([sys.executable, SMI, "-i", str(i % 3), "-pl", str(200 + i % 50)], capture_output=True); i += 1
+    t = threading.Thread(target=writer); t.start()
+    try:
+        for _ in range(150):
+            r = subprocess.run([sys.executable, SMI, "--query-gpu=power.limit", "--format=csv,noheader,nounits"], capture_output=True, text=True)
+            if r.returncode != 0 or len(r.stdout.split()) != 3:
+                bad.append(r.stderr.strip()[-200:] or r.stdout)
+    finally:
+        stop.append(True); t.join()
+    assert not bad, f"{len(bad)} of 150 reads failed while another process wrote: {bad[0]}"
+
+
 def several_cards():
     """One workload across three cards (the 8-GPU server's serving stage): one governor per card, the energy of every
     card summed, each card handed back; watch writes nothing on any card."""
@@ -432,7 +453,7 @@ def several_cards():
 
 
 def main():
-    plugs(); governor(); guards(); lock(); enforced(); one_writer(); bench(); bench_compass(); wire_check(); hil(); pooled(); several_cards()
+    plugs(); governor(); guards(); lock(); enforced(); one_writer(); bench(); bench_compass(); wire_check(); hil(); pooled(); state_never_empty(); several_cards()
     print("PASS  GPU bench: governor contract (watch writes nothing, shield floor, share floor, busy gate, read-back, blind, SLO reflex, kill), "
           "enforced limit (snapshot, override, power management, refused write ends the arm, fallback), one writer, heat fails up, blocked_by and decided_by, RAPL by domain, credit per write, workload plug, result labels, "
           "the one-command paired run with its validity checks, and one workload across several cards with one governor per card")

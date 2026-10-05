@@ -10,23 +10,21 @@ cycling, for a card that is busy in bursts)."""
 import datetime, fcntl, json, os, sys, time
 
 path = os.environ["FAKE_SMI_STATE"]
-_dump = json.dump
 
 
-def _atomic(obj, f):
-    """Several cards share one state file: every write is locked and replaces the file whole, so a reader never sees
-    half of it."""
-    f.close()
+def save(obj):
+    """Several cards share one state file: every write is locked and replaces the file whole, so a reader sees the old
+    state or the new one, never an empty or half-written file. (The file is never opened for writing in place: opening
+    it with "w" empties it at once, and a reader in that moment failed; tests/test_gpu_bench.py checks this.)"""
     tmp = f"{path}.{os.getpid()}.tmp"
     with open(tmp, "w") as t:
-        _dump(obj, t)
+        json.dump(obj, t)
     os.replace(tmp, path)
 
 
 args0 = sys.argv[1:]
 if "-pl" in args0 or "-lgc" in args0 or "-rgc" in args0:
     _lock = open(path + ".lock", "a"); fcntl.flock(_lock, fcntl.LOCK_EX)   # held until this command exits
-    json.dump = _atomic
 st = json.load(open(path))
 args = sys.argv[1:]
 gpu = args[args.index("-i") + 1] if "-i" in args else None
@@ -41,7 +39,7 @@ if "-lgc" in args or "-rgc" in args:                       # the clock wire: loc
         lo, hi = (float(x) for x in args[args.index("-lgc") + 1].split(","))
         if not st.get("ignore_lgc"):                           # a wire that takes the order but does nothing
             locks[g] = [lo, hi]
-    json.dump(st, open(path, "w"))
+    save(st)
     open(path + ".writes", "a").write(f"{g} clocks {args[args.index('-lgc') + 1] if '-lgc' in args else 'reset'}\n")
     print(f"GPU clocks set for GPU {g}" if "-lgc" in args else f"All done."); sys.exit(0)
 if "-pl" in args:
@@ -49,7 +47,7 @@ if "-pl" in args:
     if st.get("refuse_pl") or not st["min"] <= w <= st["max"]:
         print(f"Provided power limit {w} W is not a valid power limit", file=sys.stderr); sys.exit(2)
     st["limit"][gpu or "0"] = w
-    json.dump(st, open(path, "w"))
+    save(st)
     open(path + ".writes", "a").write(f"{gpu} {w}\n")
     print(f"Power limit for GPU {gpu} was set to {w:.2f} W"); sys.exit(0)
 if os.environ.get("FAKE_SMI_BLIND") == "1":

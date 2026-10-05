@@ -8,6 +8,19 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-05
+- Omni v1: the engine frozen and fingerprinted (`OMNI_V1.json`, `docs/OMNI_V1.md`, `tools/omni_version.py`): one SHA-256
+  per engine file (38) and one digest over all of them. Every result states the version it ran on; any change makes v2
+  and everything runs again. Every v1 benchmark runs three times (A, B, C); a claim is confirmed only when all three
+  agree, with the 95% interval clear of zero in each. The register states the old GPU card result as the trade-off it
+  was (card energy -3.5%, p95 +58.5%).
+- The verify check on GitHub failed on the register commit (`f162ce8`) in the several-card GPU bench, which was ruled
+  INVALID. The cause was in the test's stand-in `nvidia-smi` (`tests/fake_gpu/nvidia-smi`), not in Omni: every write
+  opened the shared state file with "w", which empties it before the atomic replace. A process reading in that moment
+  failed (22 of 400 reads with another process writing; 0 of 400 after the fix), which happens more often on GitHub's
+  slower runners. Writes now go only through a temporary file and an atomic replace. A new test
+  (`state_never_empty` in `tests/test_gpu_bench.py`) fails on the old stand-in (13 of 150 reads) and passes on the fixed
+  one. Engine bytes unchanged: still omni-v1.
+- `CLAUDE.md`: the founder's standing orders, kept in the repository so every working session starts from them.
 - The batch test with cruise stepping back (`results/live/BATCH.md`): machines -20.7%, -32.4% once the queue is done,
   energy -14.3% (standby model), mean response -11.7%; queue time +1.1%, inside the noise. Added to the Omni index.
 - Tweak A finished, muscle by muscle (`docs/MECHANISM_OF_ACTION.md` 9.6, `docs/REALMS_PREREGISTRATION.md`): the 656 muscles
