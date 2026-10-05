@@ -40,6 +40,20 @@ never counted in the headline.
 All four in one run is done: every one better and proven in the same run (`results/live/ALL_FOUR.md`). Running now: demand that wanders (up, spike, down, back up,
 idle, 10 pairs), the Azure burst bill test, and the 1,000-copy grid of the six organisms on Lambda.
 
+## The engine now, and what runs on it (2026-10-05)
+
+The live controller is frozen at rules 1-8 (`docs/K8S_BOWL_PREREGISTRATION.md`, amendments 1-8): rules 5-8 were added
+today (a pinned gauge is not a steady demand; coasting; cruise; the emergency brake). Every result above was measured on
+an earlier version of the controller, and each names its commit. So that every number comes from one engine, the whole
+Kubernetes suite runs again on the frozen engine: all four in one run, demand that wanders, the steady same-work set,
+the fault and fairness tests, the batch test, and the six organisms at every size; the Azure burst bill test and the two
+big organisms on rented Azure machines too. The card harness changed only in how it judges (amendment 11 of the GPU
+preregistration), so the single card and the eight cards run once, on this engine, on Lambda.
+
+Independent simulator: CityLearn round 1 split (the 2022 battery districts better on bill -4% to -11%, electricity -9%
+to -17%, carbon -7% to -14%; the 2020-2021 water-tank districts worse on peaks and ramping), the fix (only the electric
+batteries are steered), and round 2 on every untouched district (`docs/CITYLEARN_PREREGISTRATION.md`).
+
 ## Measured on real systems: the newest set, Omni-Compass against Kubernetes as it runs today
 
 **Set 24 (2026-10-02, commit `c908054`) repeats it again: machines in service −31.6%, p95 −60.1%, p99 −64.1%, HPA

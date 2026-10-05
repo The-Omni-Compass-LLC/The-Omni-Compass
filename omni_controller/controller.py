@@ -271,6 +271,8 @@ class Controller:
                                    probe_every=getattr(a, "verdict_every", 10), recheck=getattr(a, "verdict_recheck", 120),
                                    max_trial=20, incremental=True)
         self.n_native = None           # the machines the cluster ran on its own when Omni started (the verdict's step 0)
+        self.cruise = False            # cruise (rule 7): work waiting for a place, so every machine in service until the line is empty
+        self.cruise_hits = 0; self.cruise_clear = 0
         self.lat_t = None              # elapsed_seconds of the last request the verdict has seen
         self.bowl_x = {}               # (ns, name) -> the bowl's continuous HPA target, before rounding
         self.demand = {}               # (ns, hpa) -> [(time, demand)]: the CPU its pods use, in units of one pod's request
@@ -674,6 +676,37 @@ class Controller:
             rec_n = n            # nervous system: the machine organ may not give a machine back now (reason audited)
         elif rec_n < n:
             rec_n = n - 1        # one machine per decision: release is the slow, reversible direction
+        # cruise (rule 7): work waiting for a place, decision after decision, so every machine goes in service and stays
+        # there, without second-guessing, until the line has been empty for as many decisions
+        ca = int(getattr(self.a, "cruise_after", 2) or 0)
+        if ca > 0 and self.a.mode == "nodepool":
+            self.cruise_hits = self.cruise_hits + 1 if s["pending"] > 0 else 0
+            if not self.cruise and self.cruise_hits >= ca:
+                self.cruise = True; self.cruise_clear = 0
+                self.audit({"cruise": "on", "pending": s["pending"]})
+            elif self.cruise:
+                self.cruise_clear = self.cruise_clear + 1 if (s["pending"] == 0 and not scaling_up) else 0
+                if self.cruise_clear >= ca:
+                    self.cruise = False
+                    self.audit({"cruise": "off", "pending": s["pending"]})
+            if self.cruise:
+                rec_n = self.a.max_nodes
+        # the emergency brake (rule 8): nothing waiting, no breach, and the sensed services' demand at zero: straight to
+        # the floor in one move. Every check of the release gate still holds except one machine per decision
+        eb = float(getattr(self.a, "brake_demand", 0.05) or 0)
+        if eb > 0 and self.a.mode == "nodepool" and not self.cruise and rec_n > self.a.min_nodes and s["pending"] == 0 \
+                and not breach_now and not scaling_up:
+            dem = [self._app_demand(h) for h in s["hpas"] if self._sensed(h)]
+            dem = [x for x in dem if x is not None]
+            g_ok = gate["ok"] or gate["reason"] == "release permitted"
+            if dem and max(dem) <= eb and g_ok and not any(blind.values()) and nodes_landed:
+                low = max(self.a.min_nodes, floor)
+                # the machines left must carry what runs now at or under the engine's utilisation target
+                while low < rec_n and s["used_m"] / max(low * per_node, 1e-9) > rho:
+                    low += 1
+                if low < rec_n:
+                    self.audit({"emergency_brake": {"from": rec_n, "to": low, "demand": round(max(dem), 3)}})
+                    rec_n = low
         out = self.audit({"authority": {"calm": round(auth["scalars"]["calm"], 3), "execute": auth["execute"],
                                         "contract": {o: v.get("contract") for o, v in auth["organs"].items()},
                                         "scalars": {k: round(v, 3) for k, v in auth["scalars"].items()},
@@ -814,6 +847,12 @@ def parser():
     ap.add_argument("--no-api-proxy", action="store_true", help="read through a new kubectl process every time instead of one kubectl proxy (the controller's own cost is higher)")
     ap.add_argument("--restore-only", action="store_true", help="put every setting back from the records on the objects and exit (the watchdog's way back)")
     ap.add_argument("--node-scale-cmd", default="")
+    ap.add_argument("--cruise-after", type=int, default=int(os.environ.get("CRUISE_AFTER", 2)),
+                    help="decisions in a row with work waiting for a place before cruise puts every machine in service "
+                         "(and decisions with the line empty before it ends); 0 turns cruise off")
+    ap.add_argument("--brake-demand", type=float, default=float(os.environ.get("BRAKE_DEMAND", 0.05)),
+                    help="demand (CPU in units of one pod's request) at or under which, nothing waiting and no breach, "
+                         "the emergency brake takes the machines straight to the floor; 0 turns it off")
     ap.add_argument("--coast-step", type=int, default=int(os.environ.get("COAST_STEP", 25)),
                     help="the most the HPA target may ease toward fewer pods in one autoscaler window (points of "
                          "utilisation; 0: no limit). Adding pods is never limited")

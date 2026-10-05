@@ -656,6 +656,29 @@ and then ease off a step at a time (`omni_controller/controller.py`; tested in `
 The rerun with rule 5 alone (run 37255770249) was stopped before it finished, to run the test once with both rules;
 none of it is reported. The rerun: the wandering test as written in amendment 6.
 
+
+## Amendment 8: cruise and the emergency brake, and the batch test (written before its run, 2026-10-05)
+
+The founder's driving modes: off (native alone), watching (Omni-Compass reads, writes nothing), autopilot (gas, brake,
+idle), and two more for work that comes as a pile:
+
+- **Rule 7, cruise:** work waiting for a place (pods pending) two decisions in a row puts every machine in service
+  (`--max-nodes`), and they stay in service, without second-guessing, until the line has been empty and nothing is
+  scaling up for two decisions (`--cruise-after`, default 2; 0 turns it off).
+- **Rule 8, the emergency brake:** nothing waiting, no response-time breach, nothing scaling up, and the sensed
+  services' demand at or under 0.05 of one pod's request (`--brake-demand`): the machines go straight to the floor
+  (two) in one move. Every check of the release gate still holds (every sense live, the last command landed, the
+  machines left at or under the utilisation target) except one machine per decision. Never below the floor.
+- Tested through the live controller: `tests/test_cruise_brake.py` (in `verify.py`).
+
+**The batch test:** a queue of jobs on the six-worker kind cluster (`WORKLOAD=batch`, `deploy/kind/batch-jobs.yaml`):
+one Kubernetes Job of 240 pods, 60 at a time (more than the workers hold, so work waits for a place), each hashing
+3,000 MB (real CPU work, identical in every arm), opened with the measured window (1,500 s); the service's load
+generator stands at zero. Ten pairs, native and bowl, order rotated. Reported, paired with the 95% interval and read in
+words: how long the queue took to finish, the worker machines in service after it finished, machines in service and
+energy over the whole window, CPU with Omni-Compass's own, pods started. Cruise must not slow the queue; the brake must
+show in the machines held after it.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

@@ -7,6 +7,24 @@
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
+## 2026-10-05
+- One engine, frozen: the live Kubernetes controller with rules 1-8. New today: rule 5 (a pinned gauge is not a steady
+  demand), rule 6 (coasting: ease off a step a window), rule 7 (cruise: every machine in service while work waits),
+  rule 8 (the emergency brake: straight to the floor at zero demand). The floor of two machines; every machine usable.
+- The names: native (the system on its own) and omni (Omni-Compass on top of native); the pedals (idle, gas, brake,
+  reset) and the kill switch (security only, `omnicompass/master.py`).
+- CityLearn, an independent simulator of real buildings and batteries: round 1 recorded (battery districts better,
+  water-tank districts worse on peaks), the fix (only the electric batteries steered), round 2 on untouched districts.
+- The harness keeps recording through an unanswered reading or load step (the Azure burst test lost two native arms to
+  it before the fix).
+- The batch test (a queue of jobs) for cruise and the emergency brake.
+- The repository lined up: the front door, one index of documents, dated reports in `docs/history/`, the layout check
+  in every verification.
+
+## 2026-10-04
+- The Omni index; all four in one run (+29% work, p95 -62%, machines -3.6%, energy -0.3%, each proven); the six
+  organisms with the real cluster inside; the staging law written as equations.
+
 ## 2026-10-02
 - The bowl law (`omnicompass/bowl.py`) and the plug contract: one smooth law for every muscle, one restore point,
   read-back, the one-writer rule.

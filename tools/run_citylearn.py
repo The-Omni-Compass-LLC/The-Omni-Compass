@@ -155,7 +155,14 @@ def main(argv=None):
             res[f.stem] = json.loads(f.read_text())
     for name in [x for x in a.datasets.split(",") if x]:
         schema = schema_of(name, a.data_dir)
-        res[name] = {arm: run_arm(schema, arm) for arm in ("native", "omni")}
+        res[name] = {}
+        for arm in ("native", "omni"):
+            try:
+                res[name][arm] = run_arm(schema, arm)
+            except Exception as e:                       # a district an arm cannot run is reported, never left out
+                import traceback
+                res[name][arm] = {"arm": arm, "error": f"{type(e).__name__}: {e}"[:600],
+                                  "where": traceback.format_exc().strip().splitlines()[-3:]}
         res[name]["citylearn_version"] = version
         res[name]["settings"] = {"gain": GAIN, "tau_h": TAU, "glide_per_h": SLEW, "window_h": WINDOW_H, "kill_at": KILL_AT}
         (out / f"{name}.json").write_text(json.dumps(res[name], indent=1) + "\n")
@@ -163,18 +170,22 @@ def main(argv=None):
     L = ["# Omni-Compass on top of CityLearn's own controller", "",
          f"CityLearn {version} (Intelligent Environments Lab, University of Texas at Austin; MIT license): an "
          "independent simulator of real buildings from measured data, with its own controllers and its own scoring. "
-         "Native: CityLearn's rule-based battery controller (BasicRBC). Native + Omni: the same controller with the bowl "
+         "Native: CityLearn's rule-based battery controller (BasicRBC). Omni: the same controller with the bowl "
          f"law on top of its battery commands (gain {GAIN}, response {TAU} h, glide {SLEW} an hour, band from the past week's district draw, handed back at "
          f"{int(KILL_AT * 100)}% of the year). Every number is CityLearn's own score: the controller over no battery at "
          "all, lower is better for every row. Evidence class: an independent recognized simulator (not our model).", ""]
     for name, r in res.items():
         n, o = r["native"], r["omni"]
+        if "error" in n or "error" in o:
+            L += [f"## {name}: not run to the end", "",
+                  f"- native: {n.get('error', 'ran')}", f"- omni: {o.get('error', 'ran')}", ""]
+            continue
         if name.startswith("citylearn_challenge_2022_phase_1"):
             name += " (the tuning district: not counted in the confirmation)"
         L += [f"## {name}: {n['buildings']} buildings, {n['steps']:,} hours", "",
               f"Omni-Compass moved the commands in {o['moved_hours']:,} hours; every command handed back at "
               f"{int(KILL_AT * 100)}%: {'yes' if o['handed_back'] else 'NO'}.", "",
-              "| CityLearn score (over no battery; lower is better) | Native | Native + Omni | Change | Reading |",
+              "| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |",
               "|---|---:|---:|---:|---|"]
         for x in KPIS:
             nv, ov = n["kpis"][x], o["kpis"][x]
@@ -190,6 +201,7 @@ def main(argv=None):
           "| CityLearn score | Districts better | Districts worse | Mean change |", "|---|---:|---:|---:|"]
     for x in KPIS:
         pairs = [(r["native"]["kpis"][x], r["omni"]["kpis"][x]) for nm, r in res.items() if nm != "citylearn_challenge_2022_phase_1"
+                 and "kpis" in r["native"] and "kpis" in r["omni"]
                  if r["native"]["kpis"][x] not in (None, 0) and r["omni"]["kpis"][x] is not None]
         if not pairs:
             continue

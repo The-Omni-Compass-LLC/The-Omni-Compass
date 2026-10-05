@@ -18,12 +18,14 @@ KEYS = ["worker nodes in service, mean", "node-hours", "energy, parked workers s
         "energy per core-hour (Wh)", "HPA replicas, mean",
         "pods started", "pod start wait, total (s)", "pod start wait, mean (s)",
         "host CPU busy, the real machine under kind (%)", "host cores (the real machine under kind)",
+        "batch: queue finished (s)", "batch: worker machines in service after the queue finished, mean",
         "machines billed, machine-hours", "compute bill at list price ($)",
         "second app: response time (ms), 95th percentile", "second app: response time (ms), 99th percentile",
         "second app: time over the response line (% of samples)", "second app: failed requests (%)"]
 BILL = {"machines billed, machine-hours", "compute bill at list price ($)"}   # a real cloud only (PLATFORM=aks)
 SECOND = {k for k in KEYS if k.startswith("second app: ")}                     # the fairness test only (TWO_APP=1)
 HOST = {"host CPU busy, the real machine under kind (%)", "host cores (the real machine under kind)"}   # kind only
+BATCH = {"batch: queue finished (s)", "batch: worker machines in service after the queue finished, mean"}   # the batch test only
 
 
 LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked workers still on at idle power (Wh, declared model)",
@@ -81,6 +83,27 @@ def host_cpu(d):
             "host cores (the real machine under kind)": float(r[-1]["cores"])}
 
 
+def batch(d):
+    """The batch test (WORKLOAD=batch, scripts/kind_bench.sh): seconds from the window opening until the last job of the
+    queue finished (batch_done.txt), and the worker machines in service, on average, from then to the end of the window
+    (capture.csv): how fast the work was done, and what was held after it. A queue not finished in the window counts
+    the whole window. Absent from every other test."""
+    try:
+        t0 = float((d / "window_start.txt").read_text().split()[0]); t1 = float((d / "window_end.txt").read_text().split()[0])
+    except (OSError, ValueError, IndexError):
+        return {}
+    if not (d / "preflight.txt").exists() or "batch:" not in (d / "preflight.txt").read_text():
+        return {}
+    done = float((d / "batch_done.txt").read_text().split()[0]) if (d / "batch_done.txt").exists() else t1
+    g = {"batch: queue finished (s)": done - t0}
+    import datetime as _dt
+    rows = [r for r in csv.DictReader(open(d / "capture.csv"))
+            if _dt.datetime.strptime(r["timestamp"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=_dt.timezone.utc).timestamp() >= done]
+    if rows:
+        g["batch: worker machines in service after the queue finished, mean"] = sum(float(r["nodes_ready"]) for r in rows) / len(rows)
+    return g
+
+
 def arm_gauges(d):
     rows = list(csv.DictReader(open(d / "capture.csv")))
     g = gauges(rows); g.update(latency(str(d / "latency.csv"))); g.update(pod_starts(d))
@@ -100,7 +123,7 @@ def arm_gauges(d):
         own = float("nan")
     g["Omni's own CPU (cores), mean"] = own
     g["CPU used with Omni's own (cores), mean"] = g.get("CPU used (cores), mean", float("nan")) + own
-    g.update(bill(d)); g.update(second_app(d))
+    g.update(bill(d)); g.update(second_app(d)); g.update(batch(d))
     return g
 
 
@@ -260,12 +283,13 @@ def main(root):
     cloud = any(not math.isnan(m.get("machines billed, machine-hours", float("nan"))) for m in out["means"].values())
     two = any(not math.isnan(m.get("second app: failed requests (%)", float("nan"))) for m in out["means"].values())
     host = any(not math.isnan(m.get("host cores (the real machine under kind)", float("nan"))) for m in out["means"].values())
-    keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host)]
+    bat = any(not math.isnan(m.get("batch: queue finished (s)", float("nan"))) for m in out["means"].values())
+    keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host) and (k not in BATCH or bat)]
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native vs Omni watching only vs Omni on top vs Omni alone)", ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
     cols = [a for a in ("native",) if a in runs] + tuned + [a for a in ("watch", "omni", "bowl", "strict") if a in runs]
-    names = {"native": "Native", "watch": "Omni watches only", "omni": "Omni on top", "bowl": "Omni on top, bowl law", "strict": "Omni alone",
+    names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "bowl": "omni", "strict": "omni alone (not on top: earlier sets only)",
              **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned}}
     L += ["## All columns, mean over repetitions", "", "| Gauge | " + " | ".join(names[a] for a in cols) + " |",
           "|---|" + "---:|" * len(cols)]
@@ -279,10 +303,11 @@ def main(root):
             continue
         reps = sorted(set(runs[a]) & set(runs["native"]))
         out["paired"][a] = {}
-        title = {"watch": "W: Omni-Compass watches only (dry run: the cost of being there)", "omni": "B: Omni-Compass on top", "bowl": "B with the bowl law: Omni-Compass on top, push and pull on the HPA target and the node pool",
-                 "strict": "C: Omni-Compass decides (strict)"}[a]
+        title = {"watch": "omni, watching (dry run, writes nothing: the cost of being there)", "omni": "omni (allocation law, earlier sets)",
+                 "bowl": "omni (bowl law): Omni-Compass on top of native, push and pull on the HPA target and the node pool",
+                 "strict": "omni alone (not on top: earlier sets only)"}[a]
         L += [f"## {title} vs native, {len(reps)} paired repetitions", "",
-              "| Gauge | Native | Omni | Change | 95% interval of the difference | Significant |", "|---|---:|---:|---:|---:|---|"]
+              "| Gauge | native | omni | Change | 95% interval of the difference | Significant |", "|---|---:|---:|---:|---:|---|"]
         for k in KEYS:
             d = np.array([runs[a][r].get(k, np.nan) - runs["native"][r].get(k, np.nan) for r in reps], float)
             d = d[~np.isnan(d)]
@@ -291,7 +316,7 @@ def main(root):
             nb = float(np.nanmean([runs["native"][r].get(k, np.nan) for r in reps])); ob = nb + float(d.mean())
             half = T95.get(len(d) - 1, 1.96) * (d.std(ddof=1) / math.sqrt(len(d))) if len(d) > 1 else float("nan")
             sig = len(d) > 1 and (d.mean() - half > 0 or d.mean() + half < 0)
-            better = (d.mean() < 0) == (k in LOWER_BETTER or k in BILL or k in SECOND)
+            better = (d.mean() < 0) == (k in LOWER_BETTER or k in BILL or k in SECOND or k in BATCH)
             ch = (ob - nb) / abs(nb) * 100 if abs(nb) > 1e-12 else None
             out["paired"][a][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
             ch_s = f"{ch:+.1f}%" if ch is not None else f"{ob - nb:+.3g} (native is 0)"

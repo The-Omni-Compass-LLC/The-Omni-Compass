@@ -178,7 +178,19 @@ if [ -n "$kil_pid" ]; then
   date -u +%s > "$OUT_DIR/organism.go"
 fi
 
-if [ -n "$kil_pid" ]; then
+if [ "${WORKLOAD:-web}" = batch ]; then
+  # the batch test: the service's load generator stands at zero; a queue of jobs (deploy/kind/batch-jobs.yaml) opens the
+  # window, the same queue in every arm. When the last job finishes, the time is written (batch_done.txt); the window
+  # runs on to its end, so what each arm does after the work is done (idle, or still holding machines) is measured too
+  kubectl scale deployment/load-generator --replicas=0 >/dev/null 2>&1 || true
+  sed -e "s/BATCH_COMPLETIONS/${BATCH_COMPLETIONS:-240}/" -e "s/BATCH_PARALLELISM/${BATCH_PARALLELISM:-60}/" \
+      -e "s/BATCH_MB/${BATCH_MB:-3000}/" deploy/kind/batch-jobs.yaml | kubectl apply -f - >/dev/null
+  echo "batch: ${BATCH_COMPLETIONS:-240} jobs, ${BATCH_PARALLELISM:-60} at a time, ${BATCH_MB:-3000} MB hashed each" | tee -a "$OUT_DIR/preflight.txt"
+  ( until [ "$(kubectl get job omni-batch -o jsonpath='{.status.succeeded}' --request-timeout=20s 2>/dev/null)" = "${BATCH_COMPLETIONS:-240}" ]; do sleep 5; done
+    date -u +%s > "$OUT_DIR/batch_done.txt" ) &
+  ( sleep "$DURATION" ) &
+  load_pid=$!
+elif [ -n "$kil_pid" ]; then
   load_pid=$kil_pid
 else
 read -r -a steps <<< "$LOAD_STEPS"

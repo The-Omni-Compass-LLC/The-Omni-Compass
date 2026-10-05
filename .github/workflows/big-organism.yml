@@ -80,11 +80,18 @@ jobs:
             export PATH=\$PWD/.v/bin:\$PATH REP=${{ matrix.cell.rep }} ARMS=\"native bowl\" DURATION=${{ github.event.inputs.duration_s || '2880' }}
             export ORGANISM=${{ matrix.cell.organism }} ORGANISM_SCALE=${{ github.event.inputs.size || '1000' }} LOAD_MAX=6 LOADGEN=open
             export CLOSURE=tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
-            bash scripts/kind_paired.sh'" || echo "PAIRED RUN FAILED" | tee failed.txt
+            bash scripts/kind_paired.sh > paired.log 2>&1; echo \$? > paired.exit'" || true
+          scp -o StrictHostKeyChecking=no "omni@$IP:omni/paired.log" "omni@$IP:omni/paired.exit" . 2>/dev/null || true
+          code=$(cat paired.exit 2>/dev/null || echo missing)
+          if [ "$code" != 0 ]; then
+            tail -25 paired.log 2>/dev/null | while IFS= read -r l; do echo "::warning::$l"; done
+            echo "::error::the paired test on the rented machine ended with $code (paired.log in the artifact)"; exit 1
+          fi
       - name: Copy every file back
         if: always()
         run: |
           mkdir -p out && scp -o StrictHostKeyChecking=no -r "omni@$IP:omni/bench-*" out/ || true
+          cp paired.log out/ 2>/dev/null || true
           ssh -o StrictHostKeyChecking=no omni@$IP 'free -g; df -h /' > out/machine.txt 2>&1 || true
           echo "${{ matrix.cell.organism }} x${{ github.event.inputs.size || '1000' }} rep ${{ matrix.cell.rep }} on $SIZE" >> out/machine.txt
       - uses: actions/upload-artifact@v4

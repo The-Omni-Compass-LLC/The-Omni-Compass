@@ -144,8 +144,16 @@ there.
 
 ## The pedals: idle, gas, brake, reset, and the kill switch
 
-Omni-Compass drives a system the way a driver drives a car in gear. The words below are used the same way everywhere
-in this repository.
+Omni-Compass drives a system the way a self-driving car drives itself: it feels, gauges and adjusts, with nobody in
+the seat. The words below are used the same way everywhere in this repository.
+
+**Two names only.** **native** is the system as it runs on its own (Kubernetes and its autoscalers, the card's
+firmware, CityLearn's controller). **omni** is Omni-Compass on top of native: the same native system, with Omni-Compass
+governing it. Omni-Compass never runs instead of native, only on top of it, so every comparison is native against omni.
+
+**The modes.** Off (manual): Omni-Compass not driving, native runs alone. Watching: Omni-Compass reads every gauge and
+logs what it would do, and writes nothing. Autopilot: the pedals below. Cruise and the emergency brake: for work that
+comes as a pile.
 
 | Term | Meaning | In the code |
 |---|---|---|
@@ -153,6 +161,8 @@ in this repository.
 | **Gas** | Ramping up: traffic climbs and capacity is added at once, never held back; the whole cluster can take work the instant it is needed | (8.3); a lower HPA target is never limited |
 | **Brake** | Ramping down: traffic falls and capacity is eased off a step at a time, never below idle | (8.4)-(8.5); coasting, rule 6 |
 | **Reset** | The brake held to the floor: every setting the governor ever wrote is handed back to where native had it, read back, and the record removed; the next run starts fresh. Every benchmark arm ends with one and checks it | the reset file (`--kill-file`, a name kept for compatibility), `Controller.restore` |
+| **Cruise** | A pile of work waiting for a place: every machine in service, held there without second-guessing, until the line has been empty for two decisions | rule 7, `--cruise-after` |
+| **Emergency brake** | The work is done and demand is at zero: straight to idle (the floor) in one move, every safety check still holding | rule 8, `--brake-demand` |
 | **Kill switch** | Security only: one switch in a human hand that turns Omni-Compass's governing off across the whole system at once, for anything rogue or anyone trying to drive a system through Omni-Compass's brain | `omnicompass/master.py`, `tools/omni_switch.py off` |
 
 The fuel cut-off point (the floor) is a number the operator sets; the brake never takes the system below it, however

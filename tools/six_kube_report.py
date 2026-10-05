@@ -114,7 +114,7 @@ def main(root):
          "controllers and Kubernetes alone. Omni: the bowl law on every simulated muscle and the live controller on the "
          "cluster, handed back at 90% of the window. Cluster rows are measured on the real cluster (energy is the declared "
          "power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).", "",
-         "How to read it: every change is native + Omni against native, and the Reading column says in words whether it is "
+         "How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column says in words whether it is "
          "better or worse. Lower is better for response times, time over the line, failed requests, pods started, "
          "replicas, machines, energy and the bill (less spent). Higher is better for the organism's work and work per "
          "energy. A change whose interval crosses zero is marked inside the noise.", "",
@@ -123,7 +123,7 @@ def main(root):
     for o in orgs:
         arm = next((a for a in OMNI if a in runs[o]), None)
         cols += [(o, "native")] + ([(o, arm)] if arm else [])
-    L.append("| Gauge | " + " | ".join(f"{name_of(o)}: {'native' if a == 'native' else 'native + Omni'}" for o, a in cols) + " |")
+    L.append("| Gauge | " + " | ".join(f"{name_of(o)}: {'native' if a == 'native' else 'omni'}" for o, a in cols) + " |")
     L.append("|---|" + "---:|" * len(cols))
     for k in keys:
         cells = []
@@ -132,7 +132,7 @@ def main(root):
             v = [x for x in v if not math.isnan(x)]
             cells.append(f"{sum(v) / len(v):.4g}" if v else "")
         L.append(f"| {LABEL.get(k, k)} | " + " | ".join(cells) + " |")
-    L += ["", "## Each organism: native + Omni against native, paired by repetition", ""]
+    L += ["", "## Each organism: omni against native, paired by repetition", ""]
     for o in orgs:
         arm = next((a for a in OMNI if a in runs[o]), None)
         if not arm or "native" not in runs[o]:
@@ -153,7 +153,7 @@ def main(root):
             verdict += "; INVALID: a simulated knob was not handed back"
         out["organisms"][o] = {"arm": arm, "repetitions": n, "verdict": verdict, "rows": rows}
         L += [f"### {name_of(o)}: {verdict}", "", f"{n} paired repetitions.", "",
-              "| Gauge | Native | Native + Omni | Change | 95% interval of the difference | Reading |", "|---|---:|---:|---:|---:|---|"]
+              "| Gauge | native | omni | Change | 95% interval of the difference | Reading |", "|---|---:|---:|---:|---:|---|"]
         for k, v in rows.items():
             ch = f"{v['pct']:+.1f}%" if not math.isnan(v["pct"]) else f"{v['diff']:+.3g}"
             ci = f"{v['lo']:+.4g} to {v['hi']:+.4g}" if v["n"] > 1 else ""

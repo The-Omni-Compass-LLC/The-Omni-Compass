@@ -411,7 +411,7 @@ def main(root):
     if len({x.get("phase") for x in fz}) > 1:
         problems.append("smoke and confirmation repetitions mixed: smoke data never enter the confirmation")
     out = {"freeze": fz[0] if fz else None, "receipt": receipt, "start_limit_w": start, "checks": checks, "problems": problems, "means": {}, "paired": {}}
-    names = {"native": "Native", "watch": "Omni watches only", "omni": "Omni governs"}
+    names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni"}
     cols = [a for a in ("native", "watch", "omni") if a in runs]
     L = ["# GPU bench: native vs Omni-Compass, metered by the device", ""]
     if receipt:
@@ -433,7 +433,7 @@ def main(root):
     L.append("")
     # three contrasts: total (the preregistered one), observation, authority
     for a, b, key, what in (("omni", "native", "omni", "Total: Omni governs against native"),
-                            ("watch", "native", "watch", "Observation: Omni watches only against native"),
+                            ("watch", "native", "watch", "Observation: omni watching (writes nothing) against native"),
                             ("omni", "watch", "omni_vs_watch", "Authority: Omni governs against Omni watching")):
         if a not in runs or b not in runs:
             continue

@@ -16,6 +16,7 @@ on:
       load_steps: {description: "Load-generator replicas per step, in order (the capacity test: a rising list such as 1 2 3 4 5 6 7 8)", default: ""}
       replica_ceiling: {description: "The most replicas Omni-Compass may raise the HPA's cap to while it binds (bowl law; empty: the cap is never moved)", default: ""}
       faults: {description: "1: the fault test (a machine dies, a traffic spike, a runaway pod, a blind probe; scripts/kind_faults.sh)", default: ""}
+      workload: {description: "web (the service under load) or batch (a queue of jobs: deploy/kind/batch-jobs.yaml)", default: "web"}
   push:
 jobs:
   run:
@@ -43,6 +44,7 @@ jobs:
           LOAD_STEPS_IN: ${{ github.event.inputs.load_steps || '' }}
           TWO_APP: ${{ github.event.inputs.two_app || '' }}
           REPLICA_CEILING: ${{ github.event.inputs.replica_ceiling || '' }}
+          WORKLOAD: ${{ github.event.inputs.workload || 'web' }}
           LOADGEN: ${{ github.event.inputs.loadgen || (contains(github.event.head_commit.message, '[open-load]') && 'open' || 'closed') }}
       - uses: actions/upload-artifact@v4
         if: always()

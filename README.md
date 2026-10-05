@@ -6,11 +6,14 @@
 
 The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com)
 
+**Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass
+never replaces native; every comparison below is native against omni.
+
 ## The result
 
 Omni-Compass on top of native Kubernetes, real clusters, paired runs, the same work sent to both sides:
 
-| | Native | Native + Omni-Compass | Reading |
+| | native | omni | Reading |
 |---|---:|---:|---|
 | **Work handled inside the response line** (capacity test, 10 pairs) | 16.2 req/s | **24.0 req/s** | **+48% more work** on the same machines |
 | **Response time, 95th percentile** (sets 22-27, 10 pairs each) | 285-414 ms | 114-185 ms | **55-65% faster** |
@@ -39,7 +42,7 @@ late 23-52% less often and 24-40% faster in every one ([`results/live/SIX_KUBE.m
 
 ```
 pip install -r requirements.txt && python verify.py      # must end: VERIFICATION: PASS
-bash scripts/run_live_local.sh 3                          # native against native + Omni-Compass on your own kind cluster
+bash scripts/run_live_local.sh 3                          # native against omni on your own kind cluster
 sudo bash scripts/gpu_rented_run.sh                       # the card run, on any rented NVIDIA machine
 ```
 

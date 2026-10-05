@@ -313,6 +313,8 @@ def main():
     test_bowl.main(); check("bowl law and plug: smooth bounded push and pull to the center, fail up, cover, one restore point, foreign writer, two-wire card", True)
     from tests import test_failsafe
     test_failsafe.main(); check("no automated fallback: failed decisions are skipped; only the human switch turns the whole harness off and on", True)
+    from tests import test_cruise_brake
+    test_cruise_brake.main(); check("cruise and the emergency brake: every machine in service while work waits, straight to the floor at zero demand, never below it", True)
     from tests import test_staging_order
     test_staging_order.main(); check("staging order through the real actuator: the emptiest idles first, the warmest wakes first, two always in service (the floor), every machine usable, no pod moved", True)
     from tests import test_fleet_realdata_paths
