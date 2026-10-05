@@ -68,7 +68,10 @@ def main():
     if pyver == reg.get("fingerprint_python", ""):
         check("reference engine program fingerprint", fingerprint(ref) == prov["program_fingerprint"])
         for f, h in reg["code_fingerprint"].items():
-            check(f"program fingerprint: {f}", fingerprint(ROOT / f) == h)
+            # a file amended on record (its SHA-256 is the amendment's) carries the amended program's fingerprint there
+            rec, fp = amend.get(f), fingerprint(ROOT / f)
+            amended = rec is not None and sha(ROOT / f) == rec["to_sha256"] and fp == rec.get("to_fingerprint")
+            check(f"program fingerprint: {f}", fp == h or amended, f"amended in {rec['commit']}" if amended and fp != h else "")
     else:
         print(f"SKIP  program fingerprints (recorded with Python {reg.get('fingerprint_python')}, running {pyver}; "
               "ast.dump output is interpreter-version dependent; SHA-256 checks above are authoritative)")

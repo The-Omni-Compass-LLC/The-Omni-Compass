@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: pandapower
+# Omni-Compass on top of a distribution grid's own tap changer (docs/PANDAPOWER_PREREGISTRATION.md): pandapower solves
+# every power flow, SimBench gives the grids and their year. One job per grid, native and omni, ZIP and constant-power
+# loads; one report (PANDAPOWER.md). Two grids at a time, so the other benchmarks keep their runners.
+on:
+  workflow_dispatch:
+    inputs:
+      grids:
+        description: "SimBench grid codes, comma separated; 'untouched' runs every confirmation grid of the preregistration"
+        default: "untouched"
+      step:
+        description: "every n-th quarter hour (4: hourly)"
+        default: "4"
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {grids: "${{ steps.r.outputs.grids }}"}
+    steps:
+      - id: r
+        run: |
+          if [ "${{ github.event.inputs.grids }}" = untouched ]; then
+            grids=$(python3 -c "import json; print(json.dumps([f'1-MV-{t}--{s}-sw' for s in (0, 1, 2) for t in ('rural', 'semiurb', 'urban', 'comm') if (t, s) != ('rural', 0)]))")
+          else
+            grids=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.grids }}'.split(',')))")
+          fi
+          echo "grids=$grids" | tee -a "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: {grid: "${{ fromJSON(needs.plan.outputs.grids) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install -q "pandapower==3.5.5" simbench
+      - name: Run the grid, native and omni, both load models
+        run: |
+          set +e
+          python tools/run_pandapower.py --grids "${{ matrix.grid }}" --step "${{ github.event.inputs.step }}" --out out > run.log 2>&1
+          code=$?
+          grep -v -i "warning" run.log | grep "^==\|Error" | tail -10 | while IFS= read -r l; do echo "::notice::$l"; done
+          [ "$code" = 0 ] || { echo "::error::${{ matrix.grid }} ended with exit $code"; mkdir -p out; cp run.log out/; exit "$code"; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "pandapower-${{ matrix.grid }}", path: out}
+  report:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with: {pattern: "pandapower-*", path: all, merge-multiple: true}
+      - run: python tools/run_pandapower.py --report-only all --out all
+      - run: cat all/PANDAPOWER.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: pandapower-report, path: "all/PANDAPOWER.md"}
