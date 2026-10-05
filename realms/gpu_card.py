@@ -216,8 +216,9 @@ def run(seed: int, arm: str, duration: float = 600.0, memb: float = 0.0) -> Dict
                     if key:
                         events[key] += 1
                 at_limit = card.last_p >= 0.97 * card.limit
-                if saturated and at_limit and len(learn_f) >= 15:
-                    # saturated against the card's own limit: hold at its own busy clock under that limit (amendment 9)
+                if saturated and at_limit and len(learn_f) >= 15 and base_limit < LIMIT_DEFAULT:
+                    # saturated against an operator's cap: hold at the card's own busy clock under it (amendments 9, 12);
+                    # on the card's own factory limit the firmware's boost serves the burst
                     c = up.write(max(0.3, min(1.0, f_nat)))
                 elif brain.p >= brain.band.wall_high or saturated:
                     # fail up past the wall; and race while work waits (the card saturated: a queue is forming), so a

@@ -43,18 +43,18 @@ BILLED = r"machines billed, machine-hours"
 # work: "equal" (the same fixed-rate work was sent to both arms and none failed: ratio 1), "capacity" (read from the
 # capacity table of that file), or None (not taken)
 SOURCES = [
-    *[("Real Kubernetes (GitHub)", f"Set {n}: same work, ten pairs", f"LIVE_REPS_{n}.md", None,
-       {"speed": P95, "machines": NODES, "energy": ENERGY}, "equal") for n in (22, 23, 24, 25, 26, 27)],
-    ("Real Kubernetes (GitHub)", "Capacity: load rising, ten pairs", "AMENDMENT_3_RUNS.md", r"### Capacity, B with the compass law",
-     {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
+    ("Real Kubernetes (GitHub)", "Steady same work: the load in steps at a fixed rate, ten pairs", "STEADY.md",
+     r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, "equal"),
+    ("Real Kubernetes (GitHub)", "Demand that wanders: up and down one step at a time, ten pairs", "WANDERING.md",
+     r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+    ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs", "ALL_FOUR.md",
+     r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
     ("Real Kubernetes (GitHub)", "Fairness: a noisy neighbour, ten pairs", "FAIRNESS.md", r"^## omni \(compass law\)",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
     ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs", "FAULTS.md",
      r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs", "ALL_FOUR.md",
-     r"^## (B with the compass law|omni \(compass law\))", {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
-    ("Real cloud (Azure AKS, billed)", "Steady load, Azure's autoscaler underneath, five pairs", "AKS_BILL.md",
-     r"## B with the compass law", {"speed": P95, "machines": BILLED}, "equal"),
+    ("Real cloud (Azure AKS, billed)", "Steady load, Azure's autoscaler underneath, five pairs (earlier engine; the rerun is running)",
+     "AKS_BILL.md", r"## B with the compass law", {"speed": P95, "machines": BILLED}, "equal"),
 ]
 ORGANISMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
              "organism_656", "stack_1226"]

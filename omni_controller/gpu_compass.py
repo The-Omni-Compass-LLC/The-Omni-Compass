@@ -30,7 +30,9 @@ Every decision (--interval seconds):
   steady    while the card is saturated against its own power limit (work waiting and the draw at the limit), the
             firmware boosts a step, hits the limit and is knocked back: a sawtooth. The ceiling is then held at the
             card's own busy clock under that limit (what the sawtooth averages to), so the same watts serve the work
-            without the knock-backs (amendment 9). It never holds under that clock, and blind always fails up
+            without the knock-backs (amendment 9). Only under an operator's cap (the start limit under the card's
+            factory limit, amendment 12): on the card's own limit the firmware's boost is left to serve the burst. It
+            never holds under that clock, and blind always fails up
   write     up wire: the ceiling moves by the force (fast up, gently down), inside its cover: from the card's own busy
             clock (never slower than native while there is work) to the top; down wire: the lid at the card's own busy
             draw plus --lid-headroom, never under it and never over the start limit, inside the declared envelope;
@@ -86,6 +88,17 @@ def query_top_clock(smi, g):
         return None
 
 
+def query_default_limit(smi, g):
+    """The card's factory power limit (watts), or None if the driver will not say. A start limit under it means an
+    operator's cap is underneath (amendment 12)."""
+    try:
+        out = subprocess.run(shlex.split(smi) + ["-i", str(g), "--query-gpu=power.default_limit", "--format=csv,noheader,nounits"],
+                             capture_output=True, text=True, timeout=10, check=True).stdout
+        return float(out.strip().splitlines()[0])
+    except (subprocess.SubprocessError, OSError, ValueError, IndexError):
+        return None
+
+
 def query_min_clock(smi, g):
     """The lowest graphics clock the card supports (the floor of a -lgc range); 300 MHz if the driver will not list them."""
     try:
@@ -110,6 +123,9 @@ class GpuCompass:
             raise SystemExit("nvidia-smi unreadable at start: no snapshot, so I take no authority")
         snap = snapshot(a.smi, [self.g])
         self.start = s[self.g]["limit"]
+        # an operator's cap underneath: the start limit under the card's factory limit (unknown: treated as no cap)
+        dflt = query_default_limit(a.smi, self.g)
+        self.capped = dflt is not None and self.start < dflt - 1.0
         self.expect = self.start
         self.top = query_top_clock(a.smi, self.g) or s[self.g]["clock_mhz"]
         self.floor_w = max(float(a.floor_w or 0.0), s[self.g]["min"])
@@ -251,7 +267,7 @@ class GpuCompass:
         if ev:
             self.audit({"verdict": ev, "state": self.verdict.state, "deepest_step": self.verdict.allowed})
         at_limit = r is not None and r["draw"] >= 0.97 * r["limit"]
-        if p is not None and saturated and at_limit and n_clk is not None:
+        if p is not None and saturated and at_limit and n_clk is not None and self.capped:
             # saturated against the card's own limit: hold the ceiling at the card's own busy clock under that limit,
             # no knock-backs; the lid stays at the start limit
             self.brain.force(p)

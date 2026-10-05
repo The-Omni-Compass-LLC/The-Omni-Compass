@@ -18,7 +18,8 @@ from pilot.bench_report import gauges, latency, pod_starts, LOWER_BETTER
 
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
 KEYS = ["worker nodes in service, mean", "node-hours", "energy, parked workers still on at idle power (Wh)", "energy (Wh)", "response time (ms), mean", "response time (ms), 95th percentile",
-        "response time (ms), 99th percentile", "time over the response line (% of samples)", "failed requests (%)", "pending pods, pod-minutes", "utilisation (used / allocatable)",
+        "response time (ms), 99th percentile", "time over the response line (% of samples)", "failed requests (%)", "pods with no machine to take them (unschedulable)", "time pods had no machine to take them, pod-minutes",
+        "pending pods, pod-minutes", "utilisation (used / allocatable)",
         "CPU used (cores), mean", "Omni's own CPU (cores), mean", "CPU used with Omni's own (cores), mean",
         "energy per core-hour (Wh)", "HPA replicas, mean",
         "pods started", "pod start wait, total (s)", "pod start wait, mean (s)",
@@ -35,9 +36,13 @@ BATCH = {"batch: queue finished (s)", "batch: worker machines in service after t
 
 LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked workers still on at idle power (Wh, declared model)",
          "energy (Wh)": "energy, parked workers at 25 W standby (Wh, declared model; kind never does this)",
-         "energy per core-hour (Wh)": "energy per core-hour (Wh, the 25 W standby model)"}
+         "energy per core-hour (Wh)": "energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged)",
+         "pending pods, pod-minutes": "pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged)"}
 NEUTRAL = {"CPU used (cores), mean", "utilisation (used / allocatable)", "Omni's own CPU (cores), mean",
-           "CPU used with Omni's own (cores), mean"} | HOST   # more is not better or worse by itself
+           "CPU used with Omni's own (cores), mean", "energy per core-hour (Wh)", "pending pods, pod-minutes"} | HOST
+# more is not better or worse by itself. Energy per core-hour is energy over CPU used, and CPU used is not judged, so the
+# ratio is not either. A pod pending in the snapshot is waiting for a machine or is a pod the autoscaler just created and
+# is starting; the judged gauge is the scheduler's own verdict that no machine would take it (amendment 10)
 NOTE = ["**Energy on kind is a declared model, not a meter.** Every worker stays powered and Ready in every arm; the first",
         "energy row counts a parked worker at its full idle power, which is what kind does. The second counts it at the",
         "declared standby power, which needs a node autoscaler that really removes the machine; this run has none.", ""]

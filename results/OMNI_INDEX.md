@@ -5,11 +5,11 @@
 
 Every measure of every test is a ratio oriented so that above 1 is better for Omni-Compass on top of native: work (more is better), speed (a lower response time), machines (fewer), energy (less). A test's index is the geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. Every number is read from the test's own result file (`tools/omni_index.py`).
 
-## Headline: Omni-Compass on top of native, real machines: **+15.6%** (more for the same, or the same for less, across work, speed, machines and energy)
+## Headline: Omni-Compass on top of native, real machines: **+12.9%** (more for the same, or the same for less, across work, speed, machines and energy)
 
 | Category | Index | Work | Speed | Machines | Energy | Tests |
 |---|---:|---:|---:|---:|---:|---:|
-| Real Kubernetes (GitHub) | **+24.2%** | +5.9% | +88.9% | +16.8% | +0.3% | 16 |
+| Real Kubernetes (GitHub) | **+18.5%** | +6.5% | +75.0% | +1.0% | +0.2% | 11 |
 | Real cloud (Azure AKS, billed) | **+7.5%** | +0.0% | +25.4% | -0.8% |  | 1 |
 | Real card (NVIDIA, its own meter) | pending | | | | | the rerun on the current card controller (the 2026-10-02 run used the replaced one) |
 | Modelled muscles (evidence S) | **+0.1%** | +0.0% |  |  | +0.1% | 6 |
@@ -20,17 +20,12 @@ Read: +10% in a column means 10% better for Omni-Compass in that measure (more w
 
 | Category | Test | Index | Work | Speed | Machines | Energy | Source |
 |---|---|---:|---:|---:|---:|---:|---|
-| Real Kubernetes (GitHub) | Set 22: same work, ten pairs | **+38.9%** | +0.0% | +156.9% | +44.9% | +0.1% | `results/live/LIVE_REPS_22.md` |
-| Real Kubernetes (GitHub) | Set 23: same work, ten pairs | **+38.8%** | +0.0% | +164.4% | +40.2% | +0.2% | `results/live/LIVE_REPS_23.md` |
-| Real Kubernetes (GitHub) | Set 24: same work, ten pairs | **+38.5%** | +0.0% | +150.6% | +46.3% | +0.3% | `results/live/LIVE_REPS_24.md` |
-| Real Kubernetes (GitHub) | Set 25: same work, ten pairs | **+36.5%** | +0.0% | +134.2% | +47.8% | +0.4% | `results/live/LIVE_REPS_25.md` |
-| Real Kubernetes (GitHub) | Set 26: same work, ten pairs | **+36.8%** | +0.0% | +124.3% | +55.8% | +0.1% | `results/live/LIVE_REPS_26.md` |
-| Real Kubernetes (GitHub) | Set 27: same work, ten pairs | **+35.6%** | +0.0% | +113.1% | +57.8% | +0.5% | `results/live/LIVE_REPS_27.md` |
-| Real Kubernetes (GitHub) | Capacity: load rising, ten pairs | **+31.9%** | +48.1% | +101.1% | +1.4% | +0.3% | `results/live/AMENDMENT_3_RUNS.md` |
+| Real Kubernetes (GitHub) | Steady same work: the load in steps at a fixed rate, ten pairs | **+29.9%** | +0.0% | +179.1% | +1.9% | +0.1% | `results/live/STEADY.md` |
+| Real Kubernetes (GitHub) | Demand that wanders: up and down one step at a time, ten pairs | **+35.2%** | not taken | +141.5% | +2.0% | +0.3% | `results/live/WANDERING.md` |
+| Real Kubernetes (GitHub) | All four in one run: load up and down one step at a time, ten pairs | **+40.5%** | +41.7% | +171.4% | +1.1% | +0.2% | `results/live/ALL_FOUR.md` |
 | Real Kubernetes (GitHub) | Fairness: a noisy neighbour, ten pairs | **+5.6%** | not taken | +17.8% | +0.0% | +0.1% | `results/live/FAIRNESS.md` |
 | Real Kubernetes (GitHub) | Faults: machine down, spike, runaway pod, blind probe, ten pairs | **+35.9%** | not taken | +150.4% | +0.2% | +0.1% | `results/live/FAULTS.md` |
-| Real Kubernetes (GitHub) | All four in one run: load up and down one step at a time, ten pairs | **+37.5%** | +29.3% | +165.5% | +3.7% | +0.3% | `results/live/ALL_FOUR.md` |
-| Real cloud (Azure AKS, billed) | Steady load, Azure's autoscaler underneath, five pairs | **+7.5%** | +0.0% | +25.4% | -0.8% | not taken | `results/live/AKS_BILL.md` |
+| Real cloud (Azure AKS, billed) | Steady load, Azure's autoscaler underneath, five pairs (earlier engine; the rerun is running) | **+7.5%** | +0.0% | +25.4% | -0.8% | not taken | `results/live/AKS_BILL.md` |
 | Real Kubernetes (GitHub) | Six organisms: Compute / AI / Cloud, the cluster inside, five pairs | **+11.1%** | +1.9% | +49.6% | +0.0% | +0.1% | `results/live/SIX_KUBE.json` |
 | Modelled muscles (evidence S) | Compute / AI / Cloud: the modelled stacks around the real cluster | **+0.0%** | +0.0% | not taken | not taken | +0.1% | `results/live/SIX_KUBE.json` |
 | Real Kubernetes (GitHub) | Six organisms: Physics / Robotics / Autonomous, the cluster inside, five pairs | **+9.3%** | +0.8% | +38.1% | +2.2% | +0.2% | `results/live/SIX_KUBE.json` |

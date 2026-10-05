@@ -8,6 +8,15 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-05
+- The Kubernetes results on the frozen engine: steady, wandering, all four, faults, fairness (`results/live/`). Capacity
+  +41.7%, p95 59-64% faster, machines up to 2% fewer (the verdict keeps a machine when giving it back slows the
+  service), energy equal or lower, no pod ever without a machine. The Omni index is now read from these only: +12.9%.
+  The README and STATE_OF_PLAY say so; the earlier engines' sets go to history.
+- Amendment 10 (Kubernetes reporting): pods the scheduler could not place are counted and judged; the snapshot count of
+  pending pods and energy per core-hour are shown, not judged. Disclosed as made after the results were seen.
+- GPU amendment 12: the steady hold applies only under an operator's cap (bisected: it slowed the card on its own
+  firmware). The card model regenerated on this code.
+- CityLearn round 2: four districts better on electricity, peak and ramping (`results/citylearn/round2/`).
 - Amendment 9: the emergency brake also reads idle from the autoscaler's floor (least pods, wanting no more, half
   its target or less), so it fires when a queue empties, not only at a zero reading a served service never shows. No
   result already measured could change (0 of 5,102 readings at the floor). The recording script no longer stops on an

@@ -443,6 +443,24 @@ less often. The headroom is the least that keeps every seed un-late (`results/re
 
 Every report reads each change in words (better or WORSE, and what it means), so a sign is never read alone.
 
+## Amendment 12 (2026-10-05, before any trial on this code)
+
+The card model rerun on the current code (`tools/run_gpu_card.py`, 2026-10-05) showed amendment 9's steady hold making
+the card slower on its own firmware: compute work, p95 122 ms native against 149 ms with Omni on top, time over the line
++0.39 points. A bisection over every commit since the last clean model run puts the change in commit `bd455f9`
+(amendment 9, item 1). Holding the ceiling at the card's median busy clock takes away the boost the firmware uses to
+serve a burst at its own factory limit. Under an operator's cap the same hold is what helps: the firmware sawtooths
+against the low cap, and the hold smooths it.
+
+From this amendment the hold applies only under an operator's cap: the start limit under the card's factory limit,
+read from the card (`power.default_limit`). If the card will not say, it is treated as no cap, so no hold, and the
+firmware is left to serve the burst. On the card's own limit, saturated, Omni races, as it did before amendment 9.
+Test: `tests/test_gpu_compass.py` (no hold at the factory limit; the hold under a 150 W cap on a 214 W card).
+
+The card model with this amendment, 20 seeds (tuning and fresh). Under the cap: p95 6.4% and 7.1% faster, p99 3.2% and
+5.8% faster, time over the line 1.3 and 1.0 points lower. On the firmware: energy 0.5-3.7% lower, p95 even. The median
+is 0.6-1.5% slower, inside the verdict's allowance (`results/sim/gpu_two_wire/`). The real card is the test.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

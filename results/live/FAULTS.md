@@ -1,8 +1,8 @@
-# Faults: machine down, spike, runaway pod, blind probe: native against omni, ten paired repetitions on real Kubernetes
+# Faults: machine down, spike, runaway pod, blind probe: native against compass, ten paired repetitions on real Kubernetes
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
 
-GitHub Actions run 37262797634, engine frozen at commit 353903683009. Raw files with their SHA-256 sums: `results/live/raw/run-37262797634/`. Rebuilt with `python3 tools/live_reps.py` on those files.
+GitHub Actions run 37262797634, the live controller frozen at rules 1-8 (commit 353903683009; amendment 9, the brake at the idle floor, could not fire in this run: the service was never at its floor). Raw files with their SHA-256 sums: `results/live/raw/run-37262797634/`. Rebuilt with `python3 tools/live_reps.py` on those files.
 
 
 ## All columns, mean over repetitions
@@ -18,12 +18,14 @@ GitHub Actions run 37262797634, engine frozen at commit 353903683009. Raw files 
 | response time (ms), 99th percentile | 1361 | 1155 |
 | time over the response line (% of samples) | 8.001 | 6.195 |
 | failed requests (%) | 5.352 | 4.815 |
-| pending pods, pod-minutes | 0.7017 | 0.165 |
+| pods with no machine to take them (unschedulable) | 0 | 0 |
+| time pods had no machine to take them, pod-minutes | 0 | 0 |
+| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.7017 | 0.165 |
 | utilisation (used / allocatable) | 0.07249 | 0.07105 |
 | CPU used (cores), mean | 1.715 | 1.678 |
 | Omni's own CPU (cores), mean | 0 | 0.00975 |
 | CPU used with Omni's own (cores), mean | 1.715 | 1.688 |
-| energy per core-hour (Wh, the 25 W standby model) | 387.6 | 394 |
+| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 387.6 | 394 |
 | HPA replicas, mean | 8.873 | 9.107 |
 | pods started | 4.3 | 3.1 |
 | pod start wait, total (s) | 22 | 7.4 |
@@ -48,12 +50,14 @@ declared standby power, which needs a node autoscaler that really removes the ma
 | response time (ms), 99th percentile | 1361 | 1155 | -15.1% | -971.8 to +560.1 | no |
 | time over the response line (% of samples) | 8.001 | 6.195 | -22.6% | -3.147 to -0.4666 | yes, better |
 | failed requests (%) | 5.352 | 4.815 | -10.0% | -1.216 to +0.143 | no |
-| pending pods, pod-minutes | 0.7017 | 0.165 | -76.5% | -1.021 to -0.05228 | yes, better |
+| pods with no machine to take them (unschedulable) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
+| time pods had no machine to take them, pod-minutes | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
+| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.7017 | 0.165 | -76.5% | -1.021 to -0.05228 | yes, less |
 | utilisation (used / allocatable) | 0.07249 | 0.07105 | -2.0% | -0.003503 to +0.0006243 | no |
 | CPU used (cores), mean | 1.715 | 1.678 | -2.2% | -0.0862 to +0.01172 | no |
 | Omni's own CPU (cores), mean | 0 | 0.00975 | +0.00975 (native is 0) | +0.008975 to +0.01053 | yes, more |
 | CPU used with Omni's own (cores), mean | 1.715 | 1.688 | -1.6% | -0.07635 to +0.02138 | no |
-| energy per core-hour (Wh, the 25 W standby model) | 387.6 | 394 | +1.6% | -1.974 to +14.61 | no |
+| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 387.6 | 394 | +1.6% | -1.974 to +14.61 | no |
 | HPA replicas, mean | 8.873 | 9.107 | +2.6% | -0.05157 to +0.5198 | no |
 | pods started | 4.3 | 3.1 | -27.9% | -2.54 to +0.1403 | no |
 | pod start wait, total (s) | 22 | 7.4 | -66.4% | -34.07 to +4.871 | no |

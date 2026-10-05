@@ -73,10 +73,20 @@ def main():
     s = json.loads(st.read_text())
     assert s["limit"]["0"] == 150.0 and "0" not in s.get("clock_lock", {})
     print("restore: clocks reset, limit back to 150 W")
-    # steady: a card saturated against its own limit (it would draw far more): after learning, the ceiling holds at the
-    # card's own busy clock under that limit, never under it, the lid at the start (amendment 9)
+    # saturated against the card's own factory limit: the firmware's boost serves the burst (race), never held (amendment 12)
+    t3 = tempfile.mkdtemp(); st3 = setup(t3, util=100)
+    s3 = json.loads(st3.read_text()); s3["draw_w"] = 600.0; st3.write_text(json.dumps(s3))
+    lat3 = latency(t3, 100.0); g3 = gov(t3, lat3)
+    for _ in range(12):
+        latency(t3, 100.0); g3.step()
+    d3 = decisions(t3)
+    assert all(x["decided_by"] != "steady_under_limit" for x in d3) and d3[-1]["ceiling_mhz"] >= 1695, d3[-1]
+    g3.restore()
+    print("saturated at its own factory limit: no hold, the ceiling stays at the top (the firmware's boost serves the burst)")
+    # steady: saturated against an operator's cap (150 W under a 214 W factory limit): after learning, the ceiling holds at
+    # the card's own busy clock under the cap, never under it, the lid at the start (amendments 9, 12)
     t2 = tempfile.mkdtemp(); st2 = setup(t2, util=100)
-    s2 = json.loads(st2.read_text()); s2["draw_w"] = 600.0; st2.write_text(json.dumps(s2))
+    s2 = json.loads(st2.read_text()); s2["draw_w"] = 600.0; s2["default"] = 214.0; s2["max"] = 214.0; st2.write_text(json.dumps(s2))
     lat2 = latency(t2, 100.0); g2 = gov(t2, lat2)
     for _ in range(12):
         latency(t2, 100.0); g2.step()
@@ -84,7 +94,7 @@ def main():
     assert d2[-1]["decided_by"] == "steady_under_limit" and d2[-1]["ceiling_mhz"] == 900 and d2[-1]["want_w"] == 150, d2[-1]
     assert all(x["ceiling_mhz"] >= 900 for x in d2)
     g2.restore()
-    print("steady: saturated at its own limit, the ceiling holds at the card's own busy clock (900 MHz), lid at the start")
+    print("steady: saturated under an operator's cap, the ceiling holds at the card's own busy clock (900 MHz), lid at the start")
     print("PASS two-wire GPU governor: never slower than the card on its own while it works")
 
 

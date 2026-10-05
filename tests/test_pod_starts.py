@@ -11,8 +11,12 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from pilot.bench_report import pod_starts
 
 
-def pod(uid, created, ready=None):
+def pod(uid, created, ready=None, unsched=None, sched=None):
     cond = [{"type": "Ready", "status": "True" if ready else "False", "lastTransitionTime": ready or created}]
+    if unsched:            # the scheduler found no machine to take it (amendment 10)
+        cond.append({"type": "PodScheduled", "status": "False", "reason": "Unschedulable", "lastTransitionTime": unsched})
+    if sched:
+        cond.append({"type": "PodScheduled", "status": "True", "lastTransitionTime": sched})
     return {"metadata": {"uid": uid, "name": uid, "creationTimestamp": created}, "status": {"conditions": cond}}
 
 
@@ -26,13 +30,17 @@ def main():
               {"type": "ADDED", "object": pod("b", iso(100))},
               {"type": "MODIFIED", "object": pod("b", iso(100), iso(105))},          # 5 s
               {"type": "MODIFIED", "object": pod("b", iso(100), iso(105))},
+              {"type": "ADDED", "object": pod("b", iso(100), unsched=iso(100))},     # no machine for 60 s, then placed
+              {"type": "MODIFIED", "object": pod("b", iso(100), iso(165), sched=iso(160))},
               {"type": "ADDED", "object": pod("c", iso(890))}]                       # never Ready: waits to the end (10 s)
     (d / "pod_watch.json").write_text("\n".join(json.dumps(e, indent=4) for e in events) + "\n")
     (d / "window_start.txt").write_text(f"{t0}\n"); (d / "window_end.txt").write_text(f"{t0 + 900}\n")
     g = pod_starts(d)
-    assert g == {"pods started": 3.0, "pod start wait, total (s)": 18.0, "pod start wait, mean (s)": 6.0}, g
+    assert g == {"pods started": 3.0, "pod start wait, total (s)": 18.0, "pod start wait, mean (s)": 6.0,
+                 "pods with no machine to take them (unschedulable)": 1.0, "time pods had no machine to take them, pod-minutes": 1.0}, g
     assert pod_starts(Path(tempfile.mkdtemp())) == {}, "no stream, no gauge"
-    print("pod starts: 3 in the window (3 s, 5 s, 10 s until the end), the one before the window not counted")
+    print("pod starts: 3 in the window (3 s, 5 s, 10 s until the end), the one before the window not counted; "
+          "one pod with no machine to take it for 60 s")
     print("PASS test_pod_starts")
 
 

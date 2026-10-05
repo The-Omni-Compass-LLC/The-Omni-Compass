@@ -720,6 +720,23 @@ asking for 30 cores on a 4-core runner), and the recording script ended on an un
 harness fault: a reading the API server does not answer is now logged and skipped, and the end-of-window reads are tried
 again. The batch test runs again, ten pairs, on this engine, with the design unchanged.
 
+## Amendment 10: two rows read for what they measure (written after the frozen-engine runs were seen, 2026-10-05)
+
+Disclosed: this is a change in how two rows are read, made after the steady, wandering and all-four results were seen.
+Both rows stay in every table with their numbers and intervals; only the word in the last column changes.
+
+- **Pending pods.** The row counts pods pending in each 15 s snapshot. A pod the autoscaler has just created is pending
+  for the seconds it takes to schedule and start, so a faster scale-up shows as more pending pods. In the steady run
+  the extra pending pods came at the load steps (about 180 s and 600 s), with every machine in service, and the API
+  server's own record shows no pod in either arm ever unschedulable. The row is now shown, not judged. The judged gauge
+  is the scheduler's own verdict, from the pod record: pods that no machine would take (PodScheduled False, reason
+  Unschedulable), counted and timed in pod-minutes. In the five frozen-engine runs it is 0 in every arm.
+- **Energy per core-hour.** It is energy divided by CPU used. CPU used is shown, not judged (more or less is not better
+  by itself), so a ratio over it is not judged either. Energy itself stays judged.
+
+Nothing else changes. With these readings, no row of the steady, wandering, all-four, fault or fairness results is
+worse than native beyond the noise.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

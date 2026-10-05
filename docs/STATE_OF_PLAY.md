@@ -8,22 +8,24 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Rerun everything:** `pip install -r requirements.txt && python verify.py` ends with `VERIFICATION: PASS`.
 
-## In one paragraph (2026-10-04)
+## In one paragraph (2026-10-05, the frozen engine)
 
 Omni-Compass sits on top of Kubernetes and hardware and gets more out of what is already there. On real Kubernetes,
-paired against Kubernetes alone with the same work sent to both: **48% more work handled inside the response line on
-the same machines** (capacity test, 10 pairs), the same work **55-65% faster on 29-36% fewer machines** (sets 22-27,
-10 pairs each, no failed requests), and energy equal or lower in every test. With the real cluster wired inside each of
-the six organisms (the four realms, the whole tower of 656 muscles, the four stacked, 1,226), it was late 23-52% less
-often and 24-40% faster in every one (`results/live/SIX_KUBE.md`). On Azure, with Azure's own autoscaler underneath at a
-steady load, the bill is the same either way and answers are 20% faster (`results/live/AKS_BILL.md`); the burst bill
-test is running. All of it together, real machines only: **the Omni index +15.6%**, more for the same or the same for
-less, across work, speed, machines and energy (`results/OMNI_INDEX.md`).
+one frozen engine (rules 1-8), ten pairs per test, native against compass with the same work sent to both:
+**41.7% more work handled inside the response line on the same machines** (capacity, all four in one run), responses
+**59-64% faster** at the 95th percentile (steady, wandering, all four, faults), 12% fewer failed requests where load
+swings, energy equal or lower, and not one pod left without a machine. Machines: up to 2% fewer. Omni gives a machine
+back only when a paired trial shows the service no slower without it, and on these clusters one machine fewer made
+requests 30-45% slower in most trials, so it kept them and spent them on speed and work (earlier engines without that
+check parked 29-36%: `docs/history/`). All of it together, real machines only: **the Omni index +12.9%**
+(`results/OMNI_INDEX.md`). Running now on the same engine: the batch test, the six organisms at 1, 10, 100 and 1,000
+copies with the real cluster inside, the Azure burst and steady bill tests, and the two big organisms on rented Azure
+machines.
 
-The card: the first real run (NVIDIA A10, 2026-10-02) used a card controller that held the card's speed down in busy
-bursts. It saved 2-3.5% energy and answered 43-84% slower, so it is not a result to stand on. That controller was
-replaced (`docs/GPU_PREREGISTRATION.md`, amendments 6-11): the card now runs at least at its own busy speed in every
-burst and saves only in the quiet. Its run is next, single card first, then eight cards.
+The card: the first real run (NVIDIA A10, 2026-10-02) used a card controller since replaced; it is not a result to
+stand on. In simulation the current controller (amendment 12) is clearly faster under an operator's power cap (p95
+6-7% faster, time over the line 1 point lower) and saves 0.5-3.7% energy on the card's own firmware with p95 even
+(`results/sim/gpu_two_wire/`). The real card runs next: one card, the card inside the six organisms, then eight cards.
 
 The 656 muscles are models of real control systems. With the real cluster or the real card inside, they show the
 mechanism (work the same, energy 0.1-0.2% lower, time over the line lower than native in every organism); they are

@@ -11,23 +11,34 @@ never replaces native; every comparison below is native against omni.
 
 ## The result
 
-Omni-Compass on top of native Kubernetes, real clusters, paired runs, the same work sent to both sides:
+Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, one frozen engine (the live
+controller at rules 1-8, commit `353903683009`):
 
 | | native | omni | Reading |
 |---|---:|---:|---|
-| **Work handled inside the response line** (capacity test, 10 pairs) | 16.2 req/s | **24.0 req/s** | **+48% more work** on the same machines |
-| **Response time, 95th percentile** (sets 22-27, 10 pairs each) | 285-414 ms | 114-185 ms | **55-65% faster** |
-| **Machines in service** (sets 22-27) | 6 | 3.8-4.3 | **29-36% fewer machines** |
-| **Energy** (every test) | | | **equal or lower** in every test |
-| **Failed requests** (sets 22-27) | 0 | 0 | none lost |
-| **All four in one run** (load up 1 to 8 and down, one step at a time, 10 pairs) | | | **+29% more work, 62% faster, 3.6% fewer machines, 0.3% less energy: each proven** |
+| **Work handled inside the response line** (capacity, all four in one run) | 21.6 req/s | **30.6 req/s** | **+41.7% more work** on the same machines |
+| **Response time, 95th percentile** (steady, wandering, all four, faults) | 326-741 ms | 117-273 ms | **59-64% faster** |
+| **Failed requests** | 0-9.9% | 0-8.6% | none lost at steady load; 12% fewer where load swings |
+| **Machines in service** | 5.92-6 | 5.88-6 | **up to 2% fewer** |
+| **Energy** | | | **equal or lower** in every test |
+| **Pods left with no machine to take them** | 0 | 0 | none, in any of these five tests |
 
-**The Omni index, every real test together: +15.6%** more for the same, or the same for less, across work, speed,
-machines and energy (real Kubernetes +24.2%, Azure +7.5%). Every number is read from each test's own result file by
-[`tools/omni_index.py`](tools/omni_index.py): [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md).
+Omni gives a machine back only after a paired trial shows the service is no slower without it (the verdict). On these
+clusters one machine fewer made each request 30-45% slower in most trials, so Omni kept the machines and spent them on
+speed and work. Earlier engines without that check parked 29-36% of the machines (`docs/history/`); the frozen engine
+puts work and speed first.
 
-Six organisms with the real cluster inside (the four realms, the whole tower of 656 muscles, the four stacked, 1,226):
-late 23-52% less often and 24-40% faster in every one ([`results/live/SIX_KUBE.md`](results/live/SIX_KUBE.md)).
+**The Omni index, every real test together: +12.9%** more for the same, or the same for less, across work, speed,
+machines and energy (real Kubernetes +18.5%; Azure +7.5%, measured on an earlier engine, its rerun running). Every
+number is read from each test's own result file by [`tools/omni_index.py`](tools/omni_index.py):
+[`results/OMNI_INDEX.md`](results/OMNI_INDEX.md). Each test: [`STEADY`](results/live/STEADY.md),
+[`WANDERING`](results/live/WANDERING.md), [`ALL_FOUR`](results/live/ALL_FOUR.md), [`FAULTS`](results/live/FAULTS.md),
+[`FAIRNESS`](results/live/FAIRNESS.md).
+
+Six organisms with the real cluster inside (the four realms, the whole tower of 656 muscles, the four stacked, 1,226),
+on an earlier engine: late 23-52% less often and 24-40% faster in every one
+([`results/live/SIX_KUBE.md`](results/live/SIX_KUBE.md)); the rerun at 1, 10, 100 and 1,000 copies on the frozen
+engine is running.
 
 ## What is real and what is a model
 

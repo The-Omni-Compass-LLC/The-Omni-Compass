@@ -84,3 +84,12 @@ the newer districts size their solar panels with NREL's System Advisor Model (Py
 three-phase demonstration districts ship with CityLearn's non-flat interface, which its own rule-based controller
 refuses. The runner now installs PySAM and opens every district with the flat interface. These are harness fixes only:
 the controller, gain, response, glide and band are unchanged, and both arms see the same district.
+
+**Round 2, the result (2026-10-05, GitHub run 37271184088, `results/citylearn/round2/CITYLEARN.md`):** four districts
+ran to the end: Alameda County, Travis County, Chittenden County and the 2022 robustness district. Electricity bought
+was lower in all four (2.1-14.7%), the daily peak lower in all four (0.8-14.0%), and hour-to-hour ramping lower in all
+four (1.3-7.2%). The robustness district came out bill 8.6% lower, carbon 11.9% lower and daily peak 14.0% lower. Its
+monthly load unevenness was 0.11% higher, the one row worse than native, reported as measured. In the other three
+districts the bill and carbon came out the same. Five districts cannot be run by CityLearn's own rule-based controller in
+any arm: they need CityLearn's entity interface, which that controller refuses, or they carry an appliance action it
+does not know. Each is listed in the report with CityLearn's own message.

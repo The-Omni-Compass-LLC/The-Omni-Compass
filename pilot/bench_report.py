@@ -87,21 +87,31 @@ def pod_starts(d):
         o = ev.get("object", ev); m = o.get("metadata", {}); uid = m.get("uid")
         if not uid or not m.get("creationTimestamp"):
             continue
-        rec = pods.setdefault(uid, {"created": ts(m["creationTimestamp"]), "ready": None})
+        rec = pods.setdefault(uid, {"created": ts(m["creationTimestamp"]), "ready": None, "unsched": None, "sched": None})
         for c in (o.get("status", {}) or {}).get("conditions", []) or []:
             if c.get("type") == "Ready" and c.get("status") == "True" and c.get("lastTransitionTime") and rec["ready"] is None:
                 rec["ready"] = ts(c["lastTransitionTime"])
+            # no machine would take it: the scheduler's own verdict (PodScheduled False, reason Unschedulable)
+            if c.get("type") == "PodScheduled" and c.get("status") == "False" and c.get("reason") == "Unschedulable" \
+                    and rec["unsched"] is None:
+                rec["unsched"] = ts(c["lastTransitionTime"]) if c.get("lastTransitionTime") else rec["created"]
+            if c.get("type") == "PodScheduled" and c.get("status") == "True" and c.get("lastTransitionTime") and rec["sched"] is None:
+                rec["sched"] = ts(c["lastTransitionTime"])
     waits = [((r["ready"] if r["ready"] is not None else t1) - r["created"]) for r in pods.values() if t0 <= r["created"] <= t1]
     waits = [max(0.0, w) for w in waits]
+    stuck = [max(0.0, min(r["sched"] if r["sched"] is not None and r["sched"] >= r["unsched"] else t1, t1) - max(r["unsched"], t0))
+             for r in pods.values() if r["unsched"] is not None and r["unsched"] <= t1]
     return {"pods started": float(len(waits)), "pod start wait, total (s)": float(sum(waits)),
-            "pod start wait, mean (s)": float(sum(waits) / len(waits)) if waits else 0.0}
+            "pod start wait, mean (s)": float(sum(waits) / len(waits)) if waits else 0.0,
+            "pods with no machine to take them (unschedulable)": float(len(stuck)),
+            "time pods had no machine to take them, pod-minutes": float(sum(stuck)) / 60.0}
 
 
 LOWER_BETTER = {"worker nodes in service, mean", "node-hours", "power (W), mean", "power (W), peak", "energy (Wh)",
                 "energy, parked workers still on at idle power (Wh)",
                 "energy per core-hour (Wh)", "node-hours per core-hour", "time over the response line (% of samples)", "pending pods, pod-minutes", "pending pods, peak",
                 "HPA shortfall (desired > current), minutes", "HPA replicas, mean", "pods started", "pod start wait, total (s)",
-                "pod start wait, mean (s)", "response time (ms), mean", "response time (ms), median",
+                "pod start wait, mean (s)", "pods with no machine to take them (unschedulable)", "time pods had no machine to take them, pod-minutes", "response time (ms), mean", "response time (ms), median",
                 "response time (ms), 95th percentile", "response time (ms), 99th percentile", "failed requests (%)"}
 HIGHER_BETTER = {"utilisation (used / allocatable)", "CPU used (cores), mean"}
 

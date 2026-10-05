@@ -1,71 +1,68 @@
-# More work, faster, on fewer machines, with less energy: all four in one run
+# All four in one run: more work, faster, fewer machines, less energy: native against compass, ten paired repetitions on real Kubernetes
 
-Run: benchmark-reps 37226863122, commit `01d1033` (preregistered in `docs/K8S_COMPASS_PREREGISTRATION.md`, "all four in
-one run"), ten paired repetitions on real Kubernetes (kind, six workers), native against native with Omni-Compass on top
-(compass law), open-loop load rising one step at a time from 1 to 8 load generators and back down to 1, 180 s a step.
-Raw files: `results/live/raw/run-37226863122/`. Recomputed from them with `tools/live_reps.py`. This run's machine floor
-was one (the floor of two was adopted after it started).
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
 
-## In one line
+GitHub Actions run 37262789900, the live controller frozen at rules 1-8 (commit 353903683009; amendment 9, the brake at the idle floor, could not fire in this run: the service was never at its floor). Raw files with their SHA-256 sums: `results/live/raw/run-37262789900/`. Rebuilt with `python3 tools/live_reps.py` on those files.
 
-**+29.3% more work (24.6 to 31.8 requests a second inside the line), p95 62.3% lower, 3.6% fewer machines in service,
-0.3% less energy, 1.9% less CPU counting Omni-Compass's own: all four better, each proven (95% interval clear of
-zero); no measure worse beyond the noise.**
 
 ## All columns, mean over repetitions
 
-| Gauge | Native | Omni on top, compass law |
+| Gauge | native | omni |
 |---|---:|---:|
-| worker nodes in service, mean | 6 | 5.784 |
-| node-hours | 4.514 | 4.348 |
-| energy, parked workers still on at idle power (Wh, declared model) | 511.2 | 509.7 |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 511.2 | 497.5 |
-| response time (ms), mean | 245.2 | 134.6 |
-| response time (ms), 95th percentile | 685.8 | 258.3 |
-| response time (ms), 99th percentile | 2319 | 1532 |
-| time over the response line (% of samples) | 15.32 | 9.061 |
-| failed requests (%) | 8.285 | 7.282 |
-| pending pods, pod-minutes | 0.4933 | 0.59 |
-| utilisation (used / allocatable) | 0.09331 | 0.09383 |
-| CPU used (cores), mean | 2.239 | 2.188 |
-| Omni's own CPU (cores), mean | 0 | 0.00806 |
-| CPU used with Omni's own (cores), mean | 2.239 | 2.196 |
-| energy per core-hour (Wh, the 25 W standby model) | 332.2 | 331.5 |
-| HPA replicas, mean | 9.39 | 7.833 |
-| pods started | 5 | 5.2 |
-| pod start wait, total (s) | 15.8 | 17.3 |
-| pod start wait, mean (s) | 2.905 | 3.097 |
-| host CPU busy, the real machine under kind (%) | 62.96 | 61.76 |
+| worker nodes in service, mean | 6 | 5.933 |
+| node-hours | 4.51 | 4.462 |
+| energy, parked workers still on at idle power (Wh, declared model) | 514.4 | 513.2 |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 514.4 | 509.5 |
+| response time (ms), mean | 268.5 | 150.7 |
+| response time (ms), 95th percentile | 741.1 | 273.1 |
+| response time (ms), 99th percentile | 2544 | 2031 |
+| time over the response line (% of samples) | 17.88 | 10.61 |
+| failed requests (%) | 9.856 | 8.632 |
+| pods with no machine to take them (unschedulable) | 0 | 0 |
+| time pods had no machine to take them, pod-minutes | 0 | 0 |
+| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.3683 | 0.48 |
+| utilisation (used / allocatable) | 0.09873 | 0.09724 |
+| CPU used (cores), mean | 2.37 | 2.314 |
+| Omni's own CPU (cores), mean | 0 | 0.00858 |
+| CPU used with Omni's own (cores), mean | 2.37 | 2.322 |
+| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 313.8 | 320 |
+| HPA replicas, mean | 9.491 | 9.075 |
+| pods started | 4.5 | 4.9 |
+| pod start wait, total (s) | 14.6 | 15.5 |
+| pod start wait, mean (s) | 2.69 | 2.781 |
+| host CPU busy, the real machine under kind (%) | 66.77 | 65.6 |
 | host cores (the real machine under kind) | 4 | 4 |
 
 **Energy on kind is a declared model, not a meter.** Every worker stays powered and Ready in every arm; the first
 energy row counts a parked worker at its full idle power, which is what kind does. The second counts it at the
 declared standby power, which needs a node autoscaler that really removes the machine; this run has none.
 
-## B with the compass law: Omni-Compass on top, push and pull on the HPA target and the node pool vs native, 10 paired repetitions
+## omni (compass law): Omni-Compass on top of native, push and pull on the HPA target and the node pool vs native, 10 paired repetitions
 
-| Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
+| Gauge | native | omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
-| worker nodes in service, mean | 6 | 5.784 | -3.6% | -0.4012 to -0.03098 | yes, better |
-| node-hours | 4.514 | 4.348 | -3.7% | -0.3055 to -0.02621 | yes, better |
-| energy, parked workers still on at idle power (Wh, declared model) | 511.2 | 509.7 | -0.3% | -3.067 to -0.03068 | yes, better |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 511.2 | 497.5 | -2.7% | -24.11 to -3.364 | yes, better |
-| response time (ms), mean | 245.2 | 134.6 | -45.1% | -149.5 to -71.81 | yes, better |
-| response time (ms), 95th percentile | 685.8 | 258.3 | -62.3% | -565.1 to -289.8 | yes, better |
-| response time (ms), 99th percentile | 2319 | 1532 | -33.9% | -1885 to +310.6 | no |
-| time over the response line (% of samples) | 15.32 | 9.061 | -40.9% | -9.035 to -3.492 | yes, better |
-| failed requests (%) | 8.285 | 7.282 | -12.1% | -1.671 to -0.3337 | yes, better |
-| pending pods, pod-minutes | 0.4933 | 0.59 | +19.6% | -0.2516 to +0.4449 | no |
-| utilisation (used / allocatable) | 0.09331 | 0.09383 | +0.6% | -0.001943 to +0.002979 | no |
-| CPU used (cores), mean | 2.239 | 2.188 | -2.3% | -0.08277 to -0.0197 | yes, less |
-| Omni's own CPU (cores), mean | 0 | 0.00806 | +0.00806 (native is 0) | +0.006722 to +0.009398 | yes, more |
-| CPU used with Omni's own (cores), mean | 2.239 | 2.196 | -1.9% | -0.07505 to -0.0113 | yes, less |
-| energy per core-hour (Wh, the 25 W standby model) | 332.2 | 331.5 | -0.2% | -10.78 to +9.302 | no |
-| HPA replicas, mean | 9.39 | 7.833 | -16.6% | -2.657 to -0.4568 | yes, better |
-| pods started | 5 | 5.2 | +4.0% | -1.223 to +1.623 | no |
-| pod start wait, total (s) | 15.8 | 17.3 | +9.5% | -5.913 to +8.913 | no |
-| pod start wait, mean (s) | 2.905 | 3.097 | +6.6% | -0.8169 to +1.2 | no |
-| host CPU busy, the real machine under kind (%) | 62.96 | 61.76 | -1.9% | -1.959 to -0.436 | yes, less |
+| worker nodes in service, mean | 6 | 5.933 | -1.1% | -0.1301 to -0.003607 | yes, better |
+| node-hours | 4.51 | 4.462 | -1.1% | -0.09388 to -0.001734 | yes, better |
+| energy, parked workers still on at idle power (Wh, declared model) | 514.4 | 513.2 | -0.2% | -2.14 to -0.143 | yes, better |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 514.4 | 509.5 | -1.0% | -8.426 to -1.403 | yes, better |
+| response time (ms), mean | 268.5 | 150.7 | -43.9% | -151.7 to -83.89 | yes, better |
+| response time (ms), 95th percentile | 741.1 | 273.1 | -63.1% | -625.9 to -310.1 | yes, better |
+| response time (ms), 99th percentile | 2544 | 2031 | -20.2% | -1483 to +457.3 | no |
+| time over the response line (% of samples) | 17.88 | 10.61 | -40.7% | -10.26 to -4.292 | yes, better |
+| failed requests (%) | 9.856 | 8.632 | -12.4% | -1.913 to -0.5334 | yes, better |
+| pods with no machine to take them (unschedulable) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
+| time pods had no machine to take them, pod-minutes | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
+| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.3683 | 0.48 | +30.3% | -0.1365 to +0.3598 | no |
+| utilisation (used / allocatable) | 0.09873 | 0.09724 | -1.5% | -0.002657 to -0.0003366 | yes, less |
+| CPU used (cores), mean | 2.37 | 2.314 | -2.4% | -0.07066 to -0.04113 | yes, less |
+| Omni's own CPU (cores), mean | 0 | 0.00858 | +0.00858 (native is 0) | +0.00729 to +0.00987 | yes, more |
+| CPU used with Omni's own (cores), mean | 2.37 | 2.322 | -2.0% | -0.06302 to -0.03162 | yes, less |
+| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 313.8 | 320 | +2.0% | +2.475 to +9.981 | yes, more |
+| HPA replicas, mean | 9.491 | 9.075 | -4.4% | -0.7764 to -0.05564 | yes, better |
+| pods started | 4.5 | 4.9 | +8.9% | -0.5656 to +1.366 | no |
+| pod start wait, total (s) | 14.6 | 15.5 | +6.2% | -6.161 to +7.961 | no |
+| pod start wait, mean (s) | 2.69 | 2.781 | +3.4% | -0.8044 to +0.9873 | no |
+| host CPU busy, the real machine under kind (%) | 66.77 | 65.6 | -1.7% | -1.515 to -0.8193 | yes, less |
 | host cores (the real machine under kind) | 4 | 4 | +0.0% | +0 to +0 | no |
 
 ## The capacity test: the same machines, the load rising step by step
@@ -74,5 +71,10 @@ Each step adds one load generator (6 requests a second each). A run's capacity i
 
 | Arm | Capacity (requests a second), mean | Change against native | 95% interval of the difference (requests a second) | Repetitions |
 |---|---:|---:|---:|---:|
-| native | 24.6 |  |  | 10 |
-| compass | 31.8 | +29.3% | +5.4 to +9.0 | 10 |
+| native | 21.6 |  |  | 10 |
+| compass | 30.6 | +41.7% | +6.7 to +11.3 | 10 |
+
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
