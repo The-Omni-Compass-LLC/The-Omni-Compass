@@ -22,6 +22,7 @@ Read in this order. Every page here is current; dated records are in [`history/`
 | [`K8S_BOWL_PREREGISTRATION.md`](K8S_BOWL_PREREGISTRATION.md) | Kubernetes and Azure: every test, every amendment, every result |
 | [`GPU_PREREGISTRATION.md`](GPU_PREREGISTRATION.md) | The card and the eight cards |
 | [`REALMS_PREREGISTRATION.md`](REALMS_PREREGISTRATION.md) | The 656 muscles and the six organisms |
+| [`CITYLEARN_PREREGISTRATION.md`](CITYLEARN_PREREGISTRATION.md) | Omni-Compass on top of CityLearn, an independent building and battery simulator |
 | [`REFEREE_CHECKLIST.md`](REFEREE_CHECKLIST.md) | A referee's checklist, item by item |
 
 ## 3. The mechanism
