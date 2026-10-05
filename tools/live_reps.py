@@ -193,7 +193,7 @@ def fault_table(root, cols):
             rec = np.mean([v[0]["recover_s"] for v in vals]); ovr = np.mean([v[0]["over_pct"] for v in vals])
             base = np.mean([v[1]["recover_s"] for v in vals])
             ch = "" if a == "native" else (f"{(rec - base):+.0f} s" + (f" ({(rec - base) / base * 100:+.0f}%)" if base > 0 else ""))
-            L.append(f"| {k} | {a} | {rec:.0f} | {ovr:.1f} | {ch} |")
+            L.append(f"| {k} | {dict(bowl='omni').get(a, a)} | {rec:.0f} | {ovr:.1f} | {ch} |")
     return L + [""]
 
 
@@ -291,7 +291,7 @@ def main(root):
     bat = any(not math.isnan(m.get("batch: queue finished (s)", float("nan"))) for m in out["means"].values())
     keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host) and (k not in BATCH or bat)]
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
-         "(native vs Omni watching only vs Omni on top vs Omni alone)", ""]
+         "(native against omni: Omni-Compass on top of native)", ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
     cols = [a for a in ("native",) if a in runs] + tuned + [a for a in ("watch", "omni", "bowl", "strict") if a in runs]
     names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "bowl": "omni", "strict": "omni alone (not on top: earlier sets only)",

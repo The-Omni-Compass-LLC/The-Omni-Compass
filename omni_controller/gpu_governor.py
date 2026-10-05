@@ -46,7 +46,7 @@ Modes
   cap       the limit is written with nvidia-smi -i <gpu> -pl <W>. Refused at start unless every GPU reports
             power.management Enabled. A write the device refuses (nonzero return) ends the run: recorded, the start
             limit restored, exit 4, and the bench marks the arm invalid. No clock locks are ever written.
-Reset
+Kill switch
   the kill file (or SIGTERM) restores every GPU to the limit read at start, reads it back, and exits.
   The start limits are recorded first in the audit ("snapshot": power.limit, enforced.power.limit, default, min,
   max, persistence mode, power management, per GPU).
@@ -310,7 +310,7 @@ class GpuGovernor:
         return os.path.exists(self.a.kill_file)
 
     def restore(self):
-        """Reset: every GPU back to the limit read at start, read back from the device."""
+        """Kill switch: every GPU back to the limit read at start, read back from the device."""
         s = query(self.a.smi, self.gpus, self.enforced_ok) or {}
         failed = []
         for g in self.gpus:
@@ -318,7 +318,7 @@ class GpuGovernor:
                 break                  # another writer owns the limit: restoring would fight it
             if self.a.mode == "cap" and (g not in s or abs(s[g]["limit"] - self.start[g]) >= 1.0):
                 try:
-                    self.set_limit(g, self.start[g], "reset: the limit read at start")
+                    self.set_limit(g, self.start[g], "kill switch: the limit read at start")
                 except WriteFailed as e:
                     failed.append(str(e))
         s = query(self.a.smi, self.gpus, self.enforced_ok) or {}

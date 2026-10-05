@@ -56,7 +56,7 @@ def main():
         (d / "latency.csv").write_text("\n".join(rows) + "\n")
         (d / "faults.log").write_text("1100 machine down: kind-worker6\n1220 machine back: kind-worker6\n")
     tab = "\n".join(LR.fault_table(f, ["native", "bowl"]))
-    assert "| machine down | native | 120 |" in tab and "| machine down | bowl | 30 |" in tab and "-90 s" in tab, tab
+    assert "| machine down | native | 120 |" in tab and "| machine down | omni | 30 |" in tab and "-90 s" in tab, tab
     # the bill on a real cloud: 4 machines for the first hour, then 2 (Azure deleted two empty ones): 6 machine-hours
     b = Path(tempfile.mkdtemp()) / "bench-bowl-1"; b.mkdir()
     (b / "window_start.txt").write_text("0\n"); (b / "window_end.txt").write_text("7200\n")

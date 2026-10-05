@@ -679,6 +679,20 @@ words: how long the queue took to finish, the worker machines in service after i
 energy over the whole window, CPU with Omni-Compass's own, pods started. Cruise must not slow the queue; the brake must
 show in the machines held after it.
 
+## The frozen engine (rules 1-8, commit 353903683009): the fault and fairness results (2026-10-05)
+
+Both tests ran again with nothing changed but the engine: ten pairs each, native and omni, order rotated.
+
+- The fault test (GitHub run 37262797634, `results/live/FAULTS.md`): better and proven on p95 (−60.1%), mean response
+  (−34.5%), time over the line (−22.6%) and pending pods (−76.5%). Nothing came out worse beyond the noise. Recovery
+  after the fault, paired means: machine down 42 s against 70 s, a blind probe 54 s against 66 s, a runaway pod 98 s
+  against 105 s, a spike 266 s against 267 s.
+- The fairness test (GitHub run 37262799317, `results/live/FAIRNESS.md`): better and proven on mean response (−15.0%).
+  Nothing came out worse beyond the noise, the neighbour's app included.
+
+These replace the earlier engine's fault and fairness sections of `results/live/AMENDMENT_3_RUNS.md` in the Omni index.
+That file stays as first measured.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

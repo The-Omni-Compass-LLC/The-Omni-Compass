@@ -8,6 +8,15 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-05
+- The verifier's final line now reflects every check. It had read a local name left from the preregistration loop, so it
+  printed PASS even when a check above it failed (`verify.py`). With that fixed, two hidden failures surfaced and were
+  fixed. (1) The sealed GPU governor had three comment and log strings changed by the "reset" rename; its sealed bytes
+  are restored, and behaviour is unchanged. (2) The mechanism identity was re-recorded: only M_act (the GPU actuator)
+  changed, from the recorded GPU amendments; F, Theta, C, h, G, dt and A and every fixture result are identical.
+  160 checks pass, none fail.
+- On the frozen engine: the fault test and the fairness test, ten pairs each (`results/live/FAULTS.md`,
+  `results/live/FAIRNESS.md`). Nothing came out worse beyond the noise; the Omni index is now +15.6%.
+- The archive takes a list of runs; failed Azure and CityLearn runs post their own output on the run's page.
 - One engine, frozen: the live Kubernetes controller with rules 1-8. New today: rule 5 (a pinned gauge is not a steady
   demand), rule 6 (coasting: ease off a step a window), rule 7 (cruise: every machine in service while work waits),
   rule 8 (the emergency brake: straight to the floor at zero demand). The floor of two machines; every machine usable.

@@ -56,11 +56,11 @@ def main():
         if cur == h:
             return True, ""
         a = amend.get(f)
-        ok = a is not None and h in a["from_sha256"] and cur == a["to_sha256"]
-        return ok, (f"amended in {a['commit']}: {a['reason'][:60]}..." if ok else "")
+        same = a is not None and h in a["from_sha256"] and cur == a["to_sha256"]
+        return same, (f"amended in {a['commit']}: {a['reason'][:60]}..." if same else "")
     for f, h in reg["sha256"].items():
-        ok, note = locked(f, h)
-        check(f"pre-registered file unchanged or amended on record (SHA-256): {f}", ok, note)
+        same, note = locked(f, h)
+        check(f"pre-registered file unchanged or amended on record (SHA-256): {f}", same, note)
     if pyver == reg.get("fingerprint_python", ""):
         check("reference engine program fingerprint", fingerprint(ref) == prov["program_fingerprint"])
         for f, h in reg["code_fingerprint"].items():
@@ -342,7 +342,7 @@ def main():
             law_ok = all(new_law.get(k) == v for k, v in old_law.items()) and all(k in inert and new_law[k] == inert[k] for k in set(new_law) - set(old_law))
             same_summary = new_s == old_s and law_ok
             check(f"full replay, held-out seed {sd}: all scenarios x all arms regenerate RUNS.csv exactly and SUMMARY.json exactly (recorded law may add only inert defaults)", same_runs and same_summary)
-    print("\nVERIFICATION:", "PASS" if ok else "FAIL")
+    print("\nVERIFICATION:", "PASS" if ok else "FAIL")  # the global: every check above, not a local name
     sys.exit(0 if ok else 1)
 
 if __name__ == "__main__":

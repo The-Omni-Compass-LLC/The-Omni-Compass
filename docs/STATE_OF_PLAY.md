@@ -17,7 +17,7 @@ the same machines** (capacity test, 10 pairs), the same work **55-65% faster on 
 the six organisms (the four realms, the whole tower of 656 muscles, the four stacked, 1,226), it was late 23-52% less
 often and 24-40% faster in every one (`results/live/SIX_KUBE.md`). On Azure, with Azure's own autoscaler underneath at a
 steady load, the bill is the same either way and answers are 20% faster (`results/live/AKS_BILL.md`); the burst bill
-test is running. All of it together, real machines only: **the Omni index +15.4%**, more for the same or the same for
+test is running. All of it together, real machines only: **the Omni index +15.6%**, more for the same or the same for
 less, across work, speed, machines and energy (`results/OMNI_INDEX.md`).
 
 The card: the first real run (NVIDIA A10, 2026-10-02) used a card controller that held the card's speed down in busy
@@ -49,6 +49,13 @@ Kubernetes suite runs again on the frozen engine: all four in one run, demand th
 the fault and fairness tests, the batch test, and the six organisms at every size; the Azure burst bill test and the two
 big organisms on rented Azure machines too. The card harness changed only in how it judges (amendment 11 of the GPU
 preregistration), so the single card and the eight cards run once, on this engine, on Lambda.
+
+Back on the frozen engine so far, ten pairs each:
+- **Faults** (`results/live/FAULTS.md`): p95 −60%, mean response −35%, time over the line −23%, pending pods −77%.
+  Recovery is faster after every fault: machine down 42 s against 70 s, a blind probe 54 s against 66 s, a runaway pod
+  98 s against 105 s, a spike the same.
+- **Fairness** (`results/live/FAIRNESS.md`): a noisy neighbour on the same cluster. Mean response −15%, nothing worse,
+  and the neighbour's own app no worse. The earlier engine scored −0.3% on the index here; this engine scores +5.6%.
 
 Independent simulator: CityLearn round 1 split (the 2022 battery districts better on bill -4% to -11%, electricity -9%
 to -17%, carbon -7% to -14%; the 2020-2021 water-tank districts worse on peaks and ramping), the fix (only the electric
