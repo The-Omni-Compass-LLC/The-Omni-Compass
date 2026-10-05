@@ -6,7 +6,7 @@
   python3 tools/run_realms.py                       # the preregistered run (round 3): seeds 3000-3009, results/realms/
   python3 tools/run_realms.py --seeds 0 1 --out /tmp/realms-dev   # a look on development seeds (never reported)
 
-Every muscle alone (native, watch, omni; plus the fixed calm setpoint for setpoint muscles), then five organisms: each
+Every muscle alone (native, watch, compass; plus the fixed calm setpoint for setpoint muscles), then five organisms: each
 realm, and all 656 muscles together. Writes MUSCLES.csv (one row per muscle), REALMS.json (everything), REALMS.md (the
 tables), RUN.json (commit, seeds, fingerprints) and SHA256SUMS.txt. The preregistered seeds run only on committed code.
 """
@@ -50,10 +50,10 @@ def tree_sha(paths):
 def muscle_job(args):
     row, seeds = args
     runs = [run_muscle(row, s) for s in seeds]
-    valid = all(r["watch_equal"] and r["omni"]["restore_ok"] for r in runs)
-    per = [paired(r["omni"], r["native"]) for r in runs]
+    valid = all(r["watch_equal"] and r["compass"]["restore_ok"] for r in runs)
+    per = [paired(r["compass"], r["native"]) for r in runs]
     out = {"row": row, "valid": valid, "label": label(per, valid), "summary": summarize(per), "per_seed": per,
-           "writes": sum(r["omni"]["writes"] for r in runs) / len(runs),
+           "writes": sum(r["compass"]["writes"] for r in runs) / len(runs),
            "native_viol_share": sum(r["native"]["viol"] / r["native"]["steps"] for r in runs) / len(runs)}
     if row["knob"] == "setpoint":
         fx = [paired(r[FIXED], r["native"]) for r in runs]
@@ -206,10 +206,10 @@ def main(argv=None):
     orgs = {}
     for name, by_seed in raw.items():
         runs = [by_seed[s] for s in a.seeds]
-        valid = all(o["watch_equal"] and o["omni"]["restore_ok"] for o in runs)
-        per = [paired_organism(o["omni"], o["native"]) for o in runs]
+        valid = all(o["watch_equal"] and o["compass"]["restore_ok"] for o in runs)
+        per = [paired_organism(o["compass"], o["native"]) for o in runs]
         orgs[name] = {"n": len(groups[name]), "valid": valid, "label": label(per, valid), "summary": summarize(per),
-                      "per_seed": per, "writes": sum(o["omni"]["writes"] for o in runs) / len(runs)}
+                      "per_seed": per, "writes": sum(o["compass"]["writes"] for o in runs) / len(runs)}
     run["elapsed_s"] = round(time.time() - t0)
     with (out / "MUSCLES.csv").open("w", newline="") as f:
         cols = ["muscle_id", "family", "muscle", "realm", "template", "preset", "knob", "label", "primary", "primary_lo",

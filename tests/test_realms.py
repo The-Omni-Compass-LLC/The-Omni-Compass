@@ -42,7 +42,7 @@ def main():
         assert a == b, f"not deterministic: {r['muscle']}"
         assert a["watch_equal"], f"watch differs from native: {r['muscle']}"
         assert a["watch"]["writes"] == 0
-        assert a["omni"]["restore_ok"] and a["omni"]["after_kill_writes"] == 0, f"kill did not hand back: {r['muscle']}"
+        assert a["compass"]["restore_ok"] and a["compass"]["after_kill_writes"] == 0, f"kill did not hand back: {r['muscle']}"
         for arm in ARMS:
             m = a[arm]
             assert m["steps"] > 0 and m["energy_j"] == m["energy_j"], (r["muscle"], arm)
@@ -50,7 +50,7 @@ def main():
     realm = [r for r in rows if r["realm"] == "energy_facility_industrial"]
     o = run_organism(realm, 7)
     assert o["watch_equal"] and o["watch"]["writes"] == 0
-    assert o["omni"]["restore_ok"] and o["omni"]["writes"] > 0
+    assert o["compass"]["restore_ok"] and o["compass"]["writes"] > 0
 
     calm = {"execute": True, "scalars": {"calm": 0.5}, "organs": {"pods": {"contract": True}}}
     tense = {"execute": True, "scalars": {"calm": 0.1}, "organs": {"pods": {"contract": False}}}

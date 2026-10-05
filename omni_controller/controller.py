@@ -547,6 +547,11 @@ class Controller:
         """Fast path between governor decisions: add the nodes that pending and running pod requests need (nodepool mode)."""
         if self.killed() or self.a.mode != "nodepool" or not self.a.node_scale_cmd:
             return None
+        if getattr(self, "cruise", False):
+            # cruise (rule 7, amendment 12): every machine is already in service, so a floor check can add nothing; and a
+            # queue of other work starves the service's responses without any load on it, which the reflex would read as
+            # a queue and answer with idle pods. Omni steps back: no reads, no reflex, no conveyance until cruise ends
+            return None
         self.pod_reflex()
         # energy to where the work is: a new serving pod gets its machine's idle CPU within three checks, not a decision
         self.ticks = getattr(self, "ticks", 0) + 1
@@ -778,7 +783,12 @@ class Controller:
                 # limit g times the operator's, the target that keeps each pod exactly as busy is g times higher
                 want = int(round(100 * min(rho, orig / 100.0) * self._gain(h)))
                 back = False
-                if self.compass_law is not None:
+                if self.compass_law is not None and getattr(self, "cruise", False):
+                    # cruise (amendment 12): the service's own autoscaler runs it as it would alone (the operator's target);
+                    # Omni only holds every machine in service while the queue drains
+                    self.compass_law_x[(ns, name)] = orig * self._gain(h)
+                    want = orig
+                elif self.compass_law is not None:
                     # the compass's push and pull on the target, inside its cover [60% of the operator's, the operator's]
                     # (in queue terms, times the conveyed gain): a lower target is more pods, so the up force lowers it
                     g_ = self._gain(h); hi_t = orig * g_; lo_t = max(10.0, 0.6 * orig) * g_

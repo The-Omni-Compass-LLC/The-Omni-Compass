@@ -36,7 +36,7 @@ from .compass_arm import compass_apply
 from .presets import STEPS_SINGLE, ORGANISM_STEPS, CAL_SEED, params_for
 
 ROOT = Path(__file__).resolve().parents[1]
-ARMS = ("native", "watch", "omni")
+ARMS = ("native", "watch", "compass")   # native; Omni watching (writes nothing); the compass law on top (amendment, 2026-10-05)
 # for a setpoint muscle, a fourth arm: the native controller with the setpoint simply fixed at the band's calm end.
 # It shows how much of any Omni result on that muscle the band alone would give, with no governor.
 FIXED = "fixed_calm"

@@ -175,7 +175,7 @@ if [ -n "$kil_pid" ]; then
   until [ -f "$OUT_DIR/organism.ready" ] || ! kill -0 "$kil_pid" 2>/dev/null; do sleep 5; done
   [ -f "$OUT_DIR/organism.ready" ] || { echo "INVALID RUN: the organism stopped before it was built"; tail -20 "$OUT_DIR/organism.log"; exit 1; }
   echo "organism built at epoch $(cat "$OUT_DIR/organism.ready"), scale ${ORGANISM_SCALE:-1}; window opens $(date -u +%s)" | tee -a "$OUT_DIR/preflight.txt"
-  date -u +%s > "$OUT_DIR/organism.go"
+  date -u +%s > "$OUT_DIR/organism.go.tmp" && mv "$OUT_DIR/organism.go.tmp" "$OUT_DIR/organism.go"   # whole or absent, never half-written
 fi
 
 if [ "${WORKLOAD:-web}" = batch ]; then

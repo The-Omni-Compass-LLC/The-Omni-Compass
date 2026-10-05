@@ -44,6 +44,10 @@ def main():
     c.step(); assert "on" not in events("cruise"), "one decision with work waiting is not yet cruise"
     c.step(); assert events("cruise")[-1:] == ["on"], events("cruise")
     assert c.cruise
+    # cruise steps back (amendment 12): the floor step reads nothing and writes nothing while cruising
+    n_audit = len((Path(t) / "audit.jsonl").read_text().splitlines())
+    assert c.floor_step() is None and len((Path(t) / "audit.jsonl").read_text().splitlines()) == n_audit, \
+        "the floor step acted during cruise"
     # the line empties: cruise holds one decision more, then ends
     cluster(t, pending=0, util=60, replicas=6, used="2500m")
     c.step(); assert c.cruise, "cruise ends only after the line has been empty two decisions"

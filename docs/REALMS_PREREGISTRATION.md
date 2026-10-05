@@ -311,3 +311,11 @@ once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/receipts/
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
+
+## Amendment (2026-10-05): the compass law is the arm, written before its run
+
+The tables of round 3 compared native against the allocation law ("omni"), the arm that came before the compass law.
+The engine is now one law on everything, the compass law on top of native, so the realms runner compares native against
+compass (`realms/harness.py` ARMS: native, watch, compass). The watch arm stays: Omni watching must write nothing and
+leave every muscle exactly as native. Seeds, plants, knobs, guardrails and the labelling rule are unchanged. The tables
+published until now describe the allocation law and stay as first measured in `docs/history/`.

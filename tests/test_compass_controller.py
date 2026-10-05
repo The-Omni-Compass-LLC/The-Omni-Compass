@@ -202,6 +202,31 @@ def main():
     S = json.loads(st.read_text())
     assert target_now(st) == 50 and ANNOTATION not in S["hpas"][0]["metadata"].get("annotations", {})
     print("reset: target back to 50, no record left")
+
+    # cruise (amendment 12): a queue of other work waits for a place two decisions running, and the service's responses
+    # are slow only because the machines are busy with it. Omni holds every machine and leaves the service's target at the
+    # operator's own: no extra pods for a service nobody is loading
+    t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 600.0)
+    S = json.loads(st.read_text())
+    S["pods"] += [{"status": {"phase": "Pending"}, "spec": {"containers": [{"resources": {"requests": {"cpu": "500m"}}}]}}
+                  for _ in range(20)]
+    st.write_text(json.dumps(S))
+    c, marker = controller(t, lat)
+    c.step(); c.step()
+    assert c.cruise, "cruise did not engage with work waiting two decisions running"
+    assert target_now(st) == 50, f"cruise: target {target_now(st)}, expected the operator's own 50"
+    print("cruise: every machine held, the service's target left at the operator's 50 (no pods for an unloaded service)")
+    # and the five-second floor step stays still: every machine is in, so it reads nothing from the API server (the cost a
+    # draining queue felt was these reads: all pods, nodes, metrics and HPAs every five seconds on a saturated machine)
+    reads = []
+    get0 = c.k.get
+    c.k.get = lambda *a: (reads.append(a), get0(*a))[1]
+    before = (Path(t) / "audit.jsonl").read_text()
+    for _ in range(3):
+        assert c.floor_step() is None, "the floor step acted during cruise"
+    c.k.get = get0
+    assert not reads and (Path(t) / "audit.jsonl").read_text() == before, f"the floor step read the cluster during cruise: {reads[:3]}"
+    print("cruise: the floor step makes no API read and no write while the queue drains")
     print("PASS compass law in the live controller")
 
 

@@ -109,9 +109,12 @@ def main(argv=None):
     kill_at = int(KILL_AT * ORGANISM_STEPS)
     (out / "organism.ready").write_text(f"{time.time():.0f}\n")
     if a.go_file:
-        while not Path(a.go_file).exists():
-            time.sleep(1)
-        start = float(Path(a.go_file).read_text().split()[0])
+        start = None
+        while start is None:          # the start time, once the file holds it whole (never a half-written file)
+            try:
+                start = float(Path(a.go_file).read_text().split()[0])
+            except (OSError, IndexError, ValueError):
+                time.sleep(0.5)
         time.sleep(max(0.0, start - time.time()))
     elif a.start_at:
         time.sleep(max(0.0, a.start_at - time.time()))
