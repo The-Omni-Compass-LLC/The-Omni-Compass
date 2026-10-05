@@ -32,7 +32,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.live_reps import arm_rep, arm_gauges, T95, LABEL, NEUTRAL  # noqa: E402
+from tools.live_reps import arm_rep, arm_gauges, T95, LABEL, NEUTRAL, SAME_REL  # noqa: E402
 from tools.run_hil import NAMES, REALMS  # noqa: E402
 from pilot.bench_report import LOWER_BETTER  # noqa: E402
 
@@ -100,10 +100,9 @@ def paired(runs_o, a, k):
         h = math.nan
     pct = 100.0 * m / abs(nb) if abs(nb) > 1e-12 else math.nan
     better = (m > 0) if k in HIGHER_BETTER else (m < 0)
-    if abs(m) <= 1e-9 * max(abs(nb), 1e-12):          # a change below a billionth of the value is rounding: the same
-        m = 0.0
+    same = abs(m) <= SAME_REL * max(abs(nb), 1e-12)   # under one part in a million of the value is rounding: the same
     return {"n": len(d), "native": nb, "omni": nb + m, "diff": m, "lo": m - h, "hi": m + h, "pct": pct,
-            "better": bool(better), "neutral": k in NEUTRAL}
+            "better": bool(better), "neutral": k in NEUTRAL, "same": bool(same)}
 
 
 def main(root):
@@ -148,7 +147,7 @@ def main(root):
         n = max((v["n"] for v in rows.values()), default=0)
         restored = all(g["_restore_ok"] for g in runs[o][arm].values())
         sure = lambda v: v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
-        judged = {k: v for k, v in rows.items() if not v["neutral"] and k != "host CPU busy, the real machine under kind (%)" and abs(v["diff"]) > 0.0}
+        judged = {k: v for k, v in rows.items() if not v["neutral"] and k != "host CPU busy, the real machine under kind (%)" and not v["same"]}
         better = [LABEL.get(k, k) for k, v in judged.items() if v["better"] and sure(v)]
         worse = [LABEL.get(k, k) for k, v in judged.items() if not v["better"] and sure(v)]
         noise = [LABEL.get(k, k) for k, v in judged.items() if not sure(v)]
@@ -164,8 +163,8 @@ def main(root):
             ci = f"{v['lo']:+.4g} to {v['hi']:+.4g}" if v["n"] > 1 else ""
             if v["neutral"] or k == "host CPU busy, the real machine under kind (%)":
                 rd = "shown, not judged (more or less is not better by itself)"
-            elif v["diff"] == 0.0:
-                rd = "same"
+            elif v["same"]:
+                rd = "same" if v["diff"] == 0.0 else "same (under one part in a million)"
             else:
                 sure = v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
                 rd = ("better" if v["better"] else "WORSE") + ("" if sure else " (inside the noise)")

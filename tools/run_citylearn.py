@@ -112,7 +112,7 @@ def run_arm(schema, arm):
                 lo, hi = percentile(w, 0.10), percentile(w, 0.90)
                 if hi - lo > 1e-9:
                     band = Band(lo, hi)
-                    if compass is None:
+                    if compass_law is None:
                         compass_law = CompassLaw(band, dt=1.0, tau=TAU)
                     compass_law.band = band
                     f = compass_law.force(hist[-1])

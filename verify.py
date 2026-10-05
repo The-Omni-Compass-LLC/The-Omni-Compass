@@ -313,6 +313,8 @@ def main():
     test_compass_law.main(); check("compass law and plug: smooth bounded push and pull to the center, fail up, cover, one restore point, foreign writer, two-wire card", True)
     from tests import test_failsafe
     test_failsafe.main(); check("no automated fallback: failed decisions are skipped; only the human switch turns the whole harness off and on", True)
+    from tests import test_compass_arm
+    test_compass_arm.main(); check("compass arm on every realm muscle: one compass per muscle, its state kept from one decision to the next", True)
     from tests import test_cruise_brake
     test_cruise_brake.main(); check("cruise and the emergency brake: every machine in service while work waits, straight to the floor at zero demand, never below it", True)
     from tests import test_staging_order

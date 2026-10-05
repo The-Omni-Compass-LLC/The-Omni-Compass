@@ -96,7 +96,7 @@ def compass_apply(plant, knob, dt=1.0, tau=3.0):
     if lv is None:
         plant.override = {}
         return {}
-    if not hasattr(plant, "_compass"):
+    if not hasattr(plant, "_compass_law"):
         plant._compass_law = CompassLaw(Band(0.0, 1.0), dt=dt, tau=tau, kp=1.0, smooth=0.3)
         plant._compass_law.kd *= 3.0
         plant._compass_law_x = lv[1]
