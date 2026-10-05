@@ -9,7 +9,7 @@ release, wired here under the nervous system). On a fake sysfs tree:
   C4 governor gate: refuses non-schedutil policies when required
   C5 the lever never sets a ceiling below the schedutil request at the current utilisation (no performance cut)
   C6 the lever stays inside the nervous-system envelope; the heat ceiling wins over the schedutil floor
-  C7 kill switch restores the exact values, with an audit record"""
+  C7 reset restores the exact values, with an audit record"""
 from pathlib import Path
 from types import SimpleNamespace
 import random, sys, tempfile

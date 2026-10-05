@@ -614,7 +614,7 @@ P("omni_controller/controller.py runs the fleet-mode governor against a real clu
   "to 50-95% and changed only by at least 3 points, original recorded in an annotation; node management unchanged) and nodepool "
   "(one node pool sized to the governor's recommendation through a configured command, never below what running pod requests or "
   "current usage need, step-limited by the shield; the Cluster Autoscaler must not manage that pool). --dry-run logs writes "
-  "without executing them. The kill switch (a file or OMNI_KILL=1) restores every changed HPA target from its annotation, including "
+  "without executing them. The reset (a file or OMNI_KILL=1) restores every changed HPA target from its annotation, including "
   "after a restart, and returns to observe. Every decision and write is appended to an audit log. deploy/ contains a Dockerfile "
   "and manifests with separate read-only (observe) and HPA-write (target) permissions. The controller is tested against a fake "
   "kubectl (tests/test_omni_controller.py); it has not been run against a real cluster. The scheduling floor counts running and "

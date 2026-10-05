@@ -10,7 +10,7 @@ comes from a declared model. Nothing here is a meter, and nothing here is eviden
 ## Question
 
 For each of the 656 muscles of the canonical tower, and for each realm and the whole tower run as one organism: does
-the frozen governor (`omnicompass.adapter.Governor`, the engine with u = 0, the stack law, the kill switch), holding
+the frozen governor (`omnicompass.adapter.Governor`, the engine with u = 0, the stack law, the reset), holding
 that muscle's one knob on top of the plant's native controller, change work per energy against the native controller
 alone, without buying it with service?
 

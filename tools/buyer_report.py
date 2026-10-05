@@ -215,7 +215,7 @@ def main():
         w("")
         w("- **What acted:** right-sizing, cold start, batch pacing, agent containment and the cooling connector.")
         w("- **Authority:** each lever acted on real Kubernetes only inside the authority the nervous system granted.")
-        w("- **Kill switch:** it restored every lever, including from a fresh process.")
+        w("- **Reset:** it restored every lever, including from a fresh process.")
         w("- **Result:** 19 of 19 checks passed (`results/live/LIVE_LEVERS_2_NERVOUS.txt`, first pass "
           "`LIVE_LEVERS_1.txt`).")
         w("- **Identity:** least-privilege, with `kubectl auth can-i` receipts.")

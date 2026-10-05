@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE.
 # Live pilot on a real Kubernetes control plane (kind): real scheduler, real HPA, real metrics-server.
 # Phase A: baseline (HPA alone; Omni in observe mode, writing nothing). Phase B: Omni in target mode.
-# Then the kill switch is exercised and the original HPA target must be restored. Results in $OUT_DIR.
+# Then the reset is exercised and the original HPA target must be restored. Results in $OUT_DIR.
 set -euo pipefail
 OUT_DIR="${OUT_DIR:-kind_pilot_out}"; PHASE_S="${PHASE_S:-600}"; mkdir -p "$OUT_DIR"
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
@@ -30,7 +30,7 @@ OUT="$OUT_DIR/omni.csv" INTERVAL=15 DURATION="$PHASE_S" bash fleet/capture/kube_
 wait
 kubectl get hpa php-apache -o json > "$OUT_DIR/hpa_after_target.json"
 
-echo "== Kill switch: the original target (50) must be restored"
+echo "== Reset: the original target (50) must be restored"
 touch "$OUT_DIR/kill"
 python -m omni_controller.controller --mode target --iterations 1 --audit "$OUT_DIR/audit_kill.jsonl" --kill-file "$OUT_DIR/kill"
 restored=$(kubectl get hpa php-apache -o jsonpath='{.spec.metrics[0].resource.target.averageUtilization}')

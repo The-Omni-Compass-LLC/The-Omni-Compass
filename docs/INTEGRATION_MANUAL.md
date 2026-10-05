@@ -233,7 +233,7 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | `busy gate: utilization u, the limit read at start` | a busy GPU got its full power limit back |
 | `speed lock: worst ratio r vs line 0.99 (spend / hold / release)` | the speed lock's reading and what it did |
 | `response-time reflex: the limit read at start` | response time went over target; full power at once |
-| `kill switch: the limit read at start` | the OFF switch restored this setting |
+| `reset: the limit read at start` | the OFF switch restored this setting |
 
 ---
 

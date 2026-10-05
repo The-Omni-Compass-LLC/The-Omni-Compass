@@ -4,7 +4,7 @@
 """Energy to where the work is, against the fake kubectl: each machine's idle CPU (inside the living band, less the
 requests of every other pod on it) is conveyed to the serving pods on it as their CPU limit, resized in place with no
 restart and never below the operator's limit; requests are untouched; a security hold blocks expansion; a machine
-crowded with other work leaves the operator's limit as it is; the kill switch returns every pod to the operator's
+crowded with other work leaves the operator's limit as it is; the reset returns every pod to the operator's
 limit. A machine closed to new work that still carries work keeps counting in service, and my machine orders are
 judged by the machines open to work."""
 import json, os, sys, tempfile
@@ -73,7 +73,7 @@ def main():
     hpa = {"metadata": {"namespace": "default", "name": "web"}, "spec": {"scaleTargetRef": {"kind": "Deployment", "name": "web"}}}
     assert abs(c._gain(hpa) - 3.55) < 1e-9 and c._gain({"metadata": {"namespace": "x", "name": "y"}, "spec": {}}) == 1.0
     assert c.m.convey({}) == {}, "steady: nothing more to write"
-    # the kill switch returns every serving pod to the operator's limit
+    # the reset returns every serving pod to the operator's limit
     (Path(t) / "kill").touch(); c.restore()
     L = limits(p)
     assert all(L[n][0] == "500m" for n in ("web-0", "web-1", "web-2", "web-3")), L

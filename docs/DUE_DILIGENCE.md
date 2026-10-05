@@ -12,7 +12,7 @@ Answers reference the Claims Register (C-numbers) and the Technical Manual.
 ## Operations
 **Better than what we run today?** Compared against a documented-behaviour reference model of Kubernetes autoscaling (HPA tolerance 0.1, 300 s scale-down stabilization, HPA targets 0.5 to 0.8; simplified Cluster Autoscaler with 10-minute unneeded time, 0.5 utilization threshold, 10-minute delay after scale-up): C8 to C12, including where Omni-Compass is worse. The reference model is not the upstream controllers (C12b); running the upstream controllers against the same scenarios is the next baseline step.
 **On real traffic?** Not yet. Results use a synthetic stack model. Replay of published production traces and the pilot protocol are the next evidence steps (C14).
-**What happens when it is wrong?** Observe mode changes nothing (C6). The kill switch returns control to the native managers at the next interval (omni_kill arm). The shield blocks actions that violate I1 to I5 (C7).
+**What happens when it is wrong?** Observe mode changes nothing (C6). The reset returns control to the native managers at the next interval (omni_kill arm). The shield blocks actions that violate I1 to I5 (C7).
 **Will it wear hardware?** Machine start/stop cycles, power-cap travel and thermal travel are measured for every arm (C12, Manual Chapter 8).
 
 ## Security
@@ -25,7 +25,7 @@ Answers reference the Claims Register (C-numbers) and the Technical Manual.
 **What does it cost to run?** C5.
 
 ## Adoption
-**How is it introduced without risk?** Observe, then shadow on production telemetry, then one control loop at a time under the kill switch (docs/PILOT_PROTOCOL.md).
+**How is it introduced without risk?** Observe, then shadow on production telemetry, then one control loop at a time under the reset (docs/PILOT_PROTOCOL.md).
 
 ## Referees
 **Was it tuned on the test data?** No. Law, shield and baselines were frozen and fingerprinted before the held-out seeds 346410161 and 360555127 (results/PREREGISTRATION.json).

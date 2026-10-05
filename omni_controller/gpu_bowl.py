@@ -328,7 +328,7 @@ class GpuBowl:
             s = query(self.a.smi, [self.g], self.enforced_ok)
             if s is None or abs(s[self.g]["limit"] - self.start) >= 1.0:
                 try:
-                    self.write_limit(self.start, "kill switch: the limit read at start")
+                    self.write_limit(self.start, "reset: the limit read at start")
                 except WriteFailed as e:
                     failed.append(str(e))
         s = query(self.a.smi, [self.g], self.enforced_ok) or {}

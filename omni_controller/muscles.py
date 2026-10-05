@@ -1,6 +1,6 @@
 """Live muscles for the Kubernetes controller beyond HPA and nodes.
 
-Each muscle pulls (afferent) and pushes (efferent) through kubectl, records what it changed so the kill switch can hand
+Each muscle pulls (afferent) and pushes (efferent) through kubectl, records what it changed so the reset can hand
 the muscle back, and tags every write with its muscle name in the audit log.
 
   power_cap   push: CPU limit of each running pod of the capped deployments = base limit x the governor's power cap,
@@ -146,7 +146,7 @@ class Muscles:
         return (a or {}).get("organs", {}).get(organ, {}).get("envelope", default)
 
     def _guard(self, name, fn):
-        """One lever failing is logged and never stops the others (nor the kill switch)."""
+        """One lever failing is logged and never stops the others (nor the reset)."""
         try:
             fn()
         except Exception as e:  # noqa: BLE001
@@ -276,7 +276,7 @@ class Muscles:
                                   json.dumps([{"op": "replace", "path": "/spec/containers/0/resources/limits/cpu", "value": f"{want}m"}])],
                                  f"contain: pod CPU limit {lim} -> {want}m in place (budget share)")
             if changed:
-                # the original limits live on the quota object, so a kill switch in any process can restore them
+                # the original limits live on the quota object, so a reset in any process can restore them
                 self.k.write(["annotate", "resourcequota", QUOTA, "-n", ns, "--overwrite", f"{LIM_ANN}={json.dumps(held, sort_keys=True)}"],
                              "contain: record original pod CPU limits")
 
@@ -365,7 +365,7 @@ class Muscles:
         A_j the machine's allocatable CPU, Q_j the requests of every other pod on it, P_j the serving pods on it, L_i the
         operator's own limit. The machine's last five percent is never handed out (the living band), a pod never gets
         less than its operator gave it, and the requests (what the scheduler and the autoscaler read) are untouched.
-        Resized in place through pods/resize: no pod restarts. No expansion during a security hold. The kill switch
+        Resized in place through pods/resize: no pod restarts. No expansion during a security hold. The reset
         returns every pod to L_i.
 
         Conveyance is on by default. It moves no work: the same requests run with less waiting. (The +26% CPU seen on
@@ -459,7 +459,7 @@ class Muscles:
         ceiling = min(max(cap, envelope floor, schedutil request), envelope ceiling), where the schedutil request is
         min(1, 1.25 u) at the current CPU utilisation u: the ceiling never cuts below the frequency schedutil itself
         would ask for, so it only removes headroom the scheduler is not using. The envelope ceiling (heat) wins last.
-        The first write snapshots every policy; the kill switch restores those exact values."""
+        The first write snapshots every policy; the reset restores those exact values."""
         from hardware.cpufreq import CpuFreqPolicies, schedutil_frequency_invariant
         if getattr(self, "_cf", None) is None:
             self._cf = CpuFreqPolicies(self.a.cpufreq_policy_root)
@@ -519,20 +519,20 @@ class Muscles:
 
     def _restore_cooling(self):
         if getattr(self.a, "cooling_cmd", ""):
-            self._hw(self.a.cooling_cmd.replace("{c}", "{v}"), self.a.cooling_restore_c, "kill switch: restore cooling setpoint")
+            self._hw(self.a.cooling_cmd.replace("{c}", "{v}"), self.a.cooling_restore_c, "reset: restore cooling setpoint")
             self._setpoint = None
 
     def _restore_contain(self):
         for ns in filter(None, getattr(self.a, "contain_namespaces", "").split(",")):
             q = self._quota(ns)
             if q is not None:
-                self._release(ns, q, "kill switch")
+                self._release(ns, q, "reset")
 
     def _restore_pace(self):
         if getattr(self.a, "batch_pace", False):
             for j in self.k.get("get", "jobs", "-A", "-l", PAUSABLE_LABEL, "-o", "json")["items"]:
                 if j["spec"].get("suspend") and (j["metadata"].get("annotations") or {}).get(PACE_ANN) == "true":
-                    self._resume_job(j, "kill switch: resume paced job")
+                    self._resume_job(j, "reset: resume paced job")
 
     def _restore_coldstart(self):
         for target in filter(None, getattr(self.a, "coldstart_deployments", "").split(",")):
@@ -541,8 +541,8 @@ class Muscles:
             ann = dep["metadata"].get("annotations", {}) or {}
             if REPL_ANN in ann:
                 if int(dep["spec"].get("replicas", 1)) == 0:
-                    self.k.write(["scale", "deployment", name, "-n", ns, f"--replicas={ann[REPL_ANN]}"], "kill switch: restore replicas")
-                self.k.write(["annotate", "deployment", name, "-n", ns, f"{REPL_ANN}-"], "kill switch: clear replica record")
+                    self.k.write(["scale", "deployment", name, "-n", ns, f"--replicas={ann[REPL_ANN]}"], "reset: restore replicas")
+                self.k.write(["annotate", "deployment", name, "-n", ns, f"{REPL_ANN}-"], "reset: clear replica record")
 
     def _restore_rightsize(self):
         for target in filter(None, getattr(self.a, "rightsize_deployments", "").split(",")):
@@ -554,16 +554,16 @@ class Muscles:
                     if pod["spec"]["containers"][0].get("resources", {}).get("requests", {}).get("cpu") != orig:
                         self.k.write(["patch", "pod", pod["metadata"]["name"], "-n", ns, "--subresource", "resize", "--type=json", "-p",
                                       json.dumps([{"op": "replace", "path": "/spec/containers/0/resources/requests/cpu", "value": orig}])],
-                                     "kill switch: restore original CPU request in place")
-                self.k.write(["annotate", "deployment", name, "-n", ns, f"{REQ_ANN}-"], "kill switch: remove request record")
+                                     "reset: restore original CPU request in place")
+                self.k.write(["annotate", "deployment", name, "-n", ns, f"{REQ_ANN}-"], "reset: remove request record")
 
     def _restore_core(self):
         if getattr(self, "_cf", None) is not None:
-            self.audit({"cpu_pstate_restore": self._cf.restore(dry_run=self.a.dry_run), "why": "kill switch: exact pre-Omni CPU ceilings"})
+            self.audit({"cpu_pstate_restore": self._cf.restore(dry_run=self.a.dry_run), "why": "reset: exact pre-Omni CPU ceilings"})
         if getattr(self.a, "cpufreq_cmd", "") and self.a.cpu_max_khz and getattr(self, "_last_cap", 1.0) != 1.0:
-            self._hw(self.a.cpufreq_cmd, self.a.cpu_max_khz, "kill switch: restore maximum CPU frequency")
+            self._hw(self.a.cpufreq_cmd, self.a.cpu_max_khz, "reset: restore maximum CPU frequency")
         if getattr(self.a, "gpu_power_cmd", "") and self.a.gpu_max_w and getattr(self, "_last_cap", 1.0) != 1.0:
-            self._hw(self.a.gpu_power_cmd, self.a.gpu_max_w, "kill switch: restore maximum GPU power limit")
+            self._hw(self.a.gpu_power_cmd, self.a.gpu_max_w, "reset: restore maximum GPU power limit")
         self._last_cap = 1.0
         for target in filter(None, getattr(self.a, "cap_deployments", "").split(",")):
             ns, name = ref(target)
@@ -572,14 +572,14 @@ class Muscles:
             if orig:
                 for pod in self._pods(dep, ns):
                     if pod["spec"]["containers"][0].get("resources", {}).get("limits", {}).get("cpu") != orig:
-                        self._resize(pod, ns, orig, "kill switch: restore original pod CPU limit in place")
-                self.k.write(["annotate", "deployment", name, "-n", ns, f"{CPU_ANN}-"], "kill switch: remove CPU record")
+                        self._resize(pod, ns, orig, "reset: restore original pod CPU limit in place")
+                self.k.write(["annotate", "deployment", name, "-n", ns, f"{CPU_ANN}-"], "reset: remove CPU record")
         for target in filter(None, getattr(self.a, "rollout_guard", "").split(",")):
             ns, name = ref(target)
             dep = self.k.get("get", "deployment", name, "-n", ns, "-o", "json")
             if (dep["metadata"].get("annotations", {}) or {}).get(PAUSE_ANN) == "true":
-                self.k.write(["rollout", "resume", f"deployment/{name}", "-n", ns], "kill switch: resume rollout")
-                self.k.write(["annotate", "deployment", name, "-n", ns, f"{PAUSE_ANN}-"], "kill switch: clear pause record")
+                self.k.write(["rollout", "resume", f"deployment/{name}", "-n", ns], "reset: resume rollout")
+                self.k.write(["annotate", "deployment", name, "-n", ns, f"{PAUSE_ANN}-"], "reset: clear pause record")
 
 
 def latency_sense(path, window_s, now=None):

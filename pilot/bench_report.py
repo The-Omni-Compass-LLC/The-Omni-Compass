@@ -180,7 +180,7 @@ def report(native_csv, omni_csv, audit=None, kill=None, block_minutes=2.0, idle_
               f"- nodes decided per minute: {' '.join(str(d['nodes_recommended']) for d in dec)}",
               f"- HPA target decided per minute (%): {' '.join(str(round(100 * d['hpa_target_recommended'])) for d in dec)}"]
     if kill and Path(kill).exists():
-        L += ["", "## Kill switch", "", "```", Path(kill).read_text().strip(), "```"]
+        L += ["", "## Reset", "", "```", Path(kill).read_text().strip(), "```"]
     tn, to = timeline(N, 60), timeline(O, 60)
     L += ["", "## Minute by minute", "",
           "| min | nodes native | nodes omni | power W native | power W omni | replicas native | replicas omni | pending native | pending omni | CPU native | CPU omni |",

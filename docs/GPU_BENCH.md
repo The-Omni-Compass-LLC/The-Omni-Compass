@@ -59,7 +59,7 @@ The **primary outcome** is work per energy: requests served per kilojoule the GP
    **enforced** power limit and the clock-limit reasons every 200 ms for the whole arm (the fields the driver reports,
    listed in `smi_fields.txt`); RAPL CPU package counters are read at both ends where the machine has them. This is
    receipt C, the outcome: Omni never supplies it.
-6. **Kill switch.** After the omni arm Omni restores the snapshot limit and reads it back. The script checks the limit
+6. **Reset.** After the omni arm Omni restores the snapshot limit and reads it back. The script checks the limit
    after every arm.
 7. **The table** (`GPU_REPS.md`): each gauge for native, watch and omni, and three paired contrasts with 95%
    intervals — observation (watch − native), authority (omni − watch), total (omni − native). If an interval includes

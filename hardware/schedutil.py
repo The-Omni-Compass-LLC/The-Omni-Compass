@@ -11,7 +11,7 @@
                   [scaling_min_freq, scaling_max_freq] (itself inside [cpuinfo_min_freq, cpuinfo_max_freq]); thermal and
                   PM QoS can lower the effective maximum
   Omni-Compass:   writes scaling_max_freq (the policy ceiling). It does not replace schedutil; schedutil keeps choosing
-                  inside the ceiling. Kill switch: scaling_max_freq back to cpuinfo_max_freq.
+                  inside the ceiling. Reset: scaling_max_freq back to cpuinfo_max_freq.
 Units: kHz for frequencies, microseconds for time, util in [0, max] with max = 1024 (SCHED_CAPACITY_SCALE).
 Not modelled: intel_pstate / HWP (a different governor: the hardware picks within the limits), per-CPU PELT decay.
 """
@@ -93,7 +93,7 @@ def update(p: Policy, now_us: int, util: int, rt: bool = False, iowait_wakeup: b
 
 
 def set_ceiling(p: Policy, khz: Optional[int]) -> None:
-    """What Omni-Compass writes: scaling_max_freq. None restores cpuinfo_max_freq (the kill switch)."""
+    """What Omni-Compass writes: scaling_max_freq. None restores cpuinfo_max_freq (the reset)."""
     p.scaling_max = p.cpuinfo_max if khz is None else max(p.cpuinfo_min, min(p.cpuinfo_max, int(khz)))
     lo, hi = p.limits()
     if p.cur > hi:

@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The master switch for the whole Omni-Compass harness (omnicompass/master.py).
+"""The kill switch, from the command line (security: Omni-Compass off everywhere at once).
+The master switch for the whole Omni-Compass harness (omnicompass/master.py).
 
   python3 tools/omni_switch.py off [--reason TEXT] [--wait 60]
       turns every Omni-Compass governor on this machine off at once: sets the switch, signals every running governor

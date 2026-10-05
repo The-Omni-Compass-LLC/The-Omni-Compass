@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE.
 # Omni-Compass CPU frequency ceiling on a real Linux machine: writes scaling_max_freq for every cpufreq policy.
 #   cpufreq_ceiling.sh KHZ       set the ceiling (clamped to each policy's [cpuinfo_min_freq, cpuinfo_max_freq])
-#   cpufreq_ceiling.sh restore   kill switch: scaling_max_freq back to cpuinfo_max_freq
+#   cpufreq_ceiling.sh restore   reset: scaling_max_freq back to cpuinfo_max_freq
 # schedutil keeps choosing frequencies inside the ceiling (hardware/SCHEDUTIL.md). Needs root. SYSFS overrides the
 # root (tests). Used by the live controller as: --cpufreq-cmd "bash scripts/cpufreq_ceiling.sh {khz}"
 set -euo pipefail

@@ -5,7 +5,7 @@
 # Live proof of the added levers on a real Kubernetes API server (kind): rightsize, coldstart, batch pace, containment
 # and the cooling connector. Omni-Compass runs as its least-privilege service account (rbac-omni.yaml + rbac-levers.yaml,
 # with `kubectl auth can-i` receipts). For each lever the script drives the triggering condition, checks with kubectl that
-# the real object changed, then fires the kill switch from a fresh process and checks every object is back and no
+# the real object changed, then fires the reset from a fresh process and checks every object is back and no
 # omnicompass.io record is left. The cooling connector writes to a stand-in building controller (a file): a CI runner has
 # no chiller, so that lever proves the mechanism only. Results in $OUT_DIR/levers.txt.
 set -euo pipefail
@@ -72,7 +72,7 @@ echo "== phase 2: work waiting, calm, budget raised"
 kubectl patch configmap omni-work --type=merge -p '{"data":{"queue":"5"}}'
 run 2 --pace-high 5 --pace-low 5 --contain-cpu-m 100000
 P2="$(rep)"; S2="$(susp)"; Q2="$(quota)"; L2="$(lim)"
-echo "== phase 3: stress again, then the kill switch from a fresh process"
+echo "== phase 3: stress again, then the reset from a fresh process"
 kubectl patch configmap omni-work --type=merge -p '{"data":{"queue":"0"}}'
 run 3 --pace-high 0 --contain-cpu-m 200
 P3="$(rep)"; S3="$(susp)"; Q3="$(quota)"

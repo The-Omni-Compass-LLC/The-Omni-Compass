@@ -24,7 +24,7 @@
 # Evidence discipline (adopted from the ChatGPT-built harness, extended to every muscle): pinned, SHA-256-checked
 # metrics-server; preflight record of tool versions; clean-cluster check; Omni-Compass runs as a least-privilege service
 # account (deploy/kind/rbac-omni.yaml) with `kubectl auth can-i` receipts for what it can and cannot do; the run fails if
-# Omni made no write or if the kill switch leaves any record behind; SHA256SUMS.txt fingerprints every output file.
+# Omni made no write or if the reset leaves any record behind; SHA256SUMS.txt fingerprints every output file.
 set -euo pipefail
 ARM="${ARM:?set ARM=native, ARM=watch (Omni watches, writes nothing), ARM=omni (B: Omni on top), ARM=bowl (B with the bowl law) or ARM=strict (C: Omni decides replicas and nodes)}"
 STRICT=""; [ "$ARM" = "strict" ] && STRICT="--strict-replicas"
@@ -286,11 +286,11 @@ if [ "$ARM" = "watch" ]; then
   exist=$(kubectl get nodes -l "$WORKER_SEL" --no-headers | wc -l); [ "$PLATFORM" = aks ] || exist="$WORKERS"
   test "$executed" = "0" && test "$target" = "50" && test "$range_now" = "1,10" && test "$cpu_limit" = "500m" && test "$back" = "$exist"
 elif [ -z "$NATIVE" ]; then
-  echo "== kill switch"
+  echo "== reset"
   touch "$OUT_DIR/kill"
   omni_writes=$(grep -c '"write"' "$OUT_DIR/audit.jsonl" || true)
   echo "omni writes during the run: $omni_writes" | tee "$OUT_DIR/omni_writes.txt"
-  [ "$omni_writes" -gt 0 ] || { echo "Omni made no write, so the kill switch would prove nothing"; exit 1; }
+  [ "$omni_writes" -gt 0 ] || { echo "Omni made no write, so the reset would prove nothing"; exit 1; }
   python -m omni_controller.controller --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --iterations 1 \
     --cap-deployments default/php-apache --rollout-guard default/php-apache \
     --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" --audit "$OUT_DIR/audit_kill.jsonl" --kill-file "$OUT_DIR/kill"

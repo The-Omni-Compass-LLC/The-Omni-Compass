@@ -51,7 +51,8 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 Omni-Compass is a supervisory governor. It does not replace your autoscaler or your firmware: it sits on top, reads
 the meters of each muscle (response time, utilisation, power, heat), holds each muscle's own setting in the middle of
 its band with one bounded law, and hands every setting back the moment it stops. As demand rises, the warm machines
-take it first; as it falls, the emptiest machine idles first, powered and ready, never switched off. The law, its
+take it first; as it falls, the emptiest machine idles first, powered and ready, never switched off, and never below a floor of two (idle). The reset hands every setting back at
+the end of a run; the kill switch, a separate security switch, turns Omni-Compass off everywhere at once. The law, its
 proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.md),
 [`docs/TRACKING_THEOREM.md`](docs/TRACKING_THEOREM.md), [`docs/CONVEYANCE_LAW.md`](docs/CONVEYANCE_LAW.md).
 

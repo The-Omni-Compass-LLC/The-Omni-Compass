@@ -189,7 +189,7 @@ def main():
     w("")
     w("Omni-Compass is a single control engine that senses the whole compute stack and drives its actuators (its \"muscles\": "
       "replica counts, node pools, power caps and others) from one six-state dynamical model, with a safety shield before every "
-      "action and a kill switch that hands control back. It was compared in three architectures:")
+      "action and a reset that hands control back. It was compared in three architectures:")
     w("")
     w("- **A. Kubernetes alone.** Kubernetes' own controllers decide: Horizontal Pod Autoscaler (HPA) for replicas, Cluster Autoscaler "
       "for nodes; other managers act on their own proposals.")
@@ -214,7 +214,7 @@ def main():
       f"parked workers kept on standby, powered and ready ({lv['standby_note']}), energy was {lv['energy_native_wh']:.0f} vs "
       f"{lv['energy_omni_wh']:.0f} Wh ({pct(lv['energy_native_wh'], lv['energy_omni_wh'])}): parking alone saves essentially nothing; "
       f"energy per unit of work {lv['epc_change']}. The -43% first reported for this run holds only if parked workers are powered "
-      f"off. Waiting pods and HPA shortfall were not significantly different. The kill switch restored the original HPA target (50) and all 6 workers. "
+      f"off. Waiting pods and HPA shortfall were not significantly different. The reset restored the original HPA target (50) and all 6 workers. "
       f"**With every live muscle switched on (section 7.2) the application got slower: p95 response time 486 to 802 ms, energy per "
       f"unit of work +46% (significant).** The causes were found and fixed across runs 2-4 (section 7.4): response time went from +65% to a tie at p95.")
     w("")
@@ -262,7 +262,7 @@ def main():
       "containment and the rest of the 52-muscle domain map (`docs/DOMAIN_MAP.md`). AI value alignment is explicitly not an "
       "Omni-Compass muscle. Code: `omni_controller/controller.py`, `omni_controller/muscles.py`, `omnicompass/nervous.py`.")
     w("")
-    w("### 2.3 The shield and the kill switch")
+    w("### 2.3 The shield and the reset")
     w("Before any action the shield (`omnicompass/shield.py`) enforces invariants I1 to I5: no expansion during a security block, node "
       "count within bounds, step limits, never below the capacity running and pending work needs, and the site power limit. The kill "
       "switch (a file or `OMNI_KILL=1`) restores every HPA target Omni-Compass changed from the recorded original, returns the node pool "
@@ -371,7 +371,7 @@ def main():
         w("| " + " | ".join(r) + " |")
     w("")
     w(f"Omni-Compass decisions: nodes per minute {live['nodes_decided']}; HPA target {live['hpa_target']}. Node-pool resizes: 3 "
-      "(three workers cordoned and drained, their pods rescheduled by Kubernetes). Kill switch: HPA target restored to 50, 6 of 6 "
+      "(three workers cordoned and drained, their pods rescheduled by Kubernetes). Reset: HPA target restored to 50, 6 of 6 "
       "workers back in service.")
     w("")
     am1 = json.loads((ROOT / "results/live/LIVE_ALLMUSCLE_1.json").read_text())
@@ -388,7 +388,7 @@ def main():
     for r in am1["significance"]:
         w("| " + " | ".join(r) + " |")
     w("")
-    w("Actions: " + ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in am1["actions"].items()) + ". Kill switch: " + am1["kill_switch"] + ".")
+    w("Actions: " + ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in am1["actions"].items()) + ". Reset: " + am1["kill_switch"] + ".")
     w("")
     w("**Diagnosis:** " + am1["diagnosis"])
     w("")
@@ -436,7 +436,7 @@ def main():
     w("")
     w("Also tested: the live controller against a fake cluster (observe writes nothing; targets bounded; kill restores from the "
       "HPA annotation after a restart; node pool bounded and dry-run safe), the full-engine options (parked and control-plane nodes "
-      "excluded; the kill switch restores the node pool exactly once) and pilot scoring (detects a real gain, reports no gain on "
+      "excluded; the reset restores the node pool exactly once) and pilot scoring (detects a real gain, reports no gain on "
       "identical clusters, detects a service regression).")
     w("")
     w("## 9. Physics and models")
@@ -460,7 +460,7 @@ def main():
     w("|---|---|---|")
     for r in [("Engine equations are finite and deterministic; C++ equals Python", "Proven", "verify.py, 500 fixtures, max error 3.6e-15"),
               ("Observe mode changes nothing", "Proven (simulation and live)", "bit-identical trajectories; 0 writes live"),
-              ("Kill switch restores native control", "Proven (simulation and live)", "HPA target 50 and all workers restored live"),
+              ("Reset restores native control", "Proven (simulation and live)", "HPA target 50 and all workers restored live"),
               ("Omni-Compass acts on a real Kubernetes control plane (HPA target, node pool)", "Proven live", "section 7"),
               ("Fewer nodes in service than Kubernetes with a fixed node pool, same load served", "Measured live", "section 7.1"),
               ("Lower energy on the live cluster", "Not shown while parked nodes stay on standby; -22% to -43% only if parked nodes sleep or power off", "section 7.1"),
@@ -722,7 +722,7 @@ def main():
         ("Does Omni-Compass replace Kubernetes?", "No. Kubernetes keeps running containers, placing pods, restarting failures and "
          "networking. Omni-Compass replaces the separate decision loops (how many replicas, how many nodes, what power) with one "
          "authority. In architecture C Kubernetes becomes one muscle."),
-        ("What happens if Omni-Compass crashes or is switched off?", "The kill switch restores every setting it changed and returns "
+        ("What happens if Omni-Compass crashes or is switched off?", "The reset restores every setting it changed and returns "
          "control to Kubernetes' own controllers; this was exercised live and in simulation. A crashed controller writes nothing further."),
         ("Can it make things worse?", "Every action passes the shield first; it never goes below the capacity running and pending work "
          "needs, and never changes more than the step limit. In the held-out benchmark it had fewer safety violations than Kubernetes. "
@@ -746,7 +746,7 @@ def main():
          "were run; verify.py fails if any frozen file changes."),
         ("How many scenarios and how certain?", "1,000 pre-registered held-out scenarios, 24 control-plane scenarios, PlanetLab traces "
          "and live runs; 95% bootstrap intervals, two independent seeds must agree."),
-        ("What is measured versus modelled?", "Live: node counts, replicas, pods, CPU, the controller's actions and the kill switch. "
+        ("What is measured versus modelled?", "Live: node counts, replicas, pods, CPU, the controller's actions and the reset. "
          "Modelled: power and heat everywhere, and everything in the simulated studies."),
         ("Is the mathematics sound?", "The core is a closed six-state system integrated with RK4; the C++ and Python implementations "
          "agree to 3.6e-15 on 500 reference trajectories; 100 million decisions ran without a non-finite value."),

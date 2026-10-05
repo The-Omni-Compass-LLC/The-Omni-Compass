@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""Live muscles against the fake kubectl and fake hardware commands: power cap scales the CPU limit and the kill switch
+"""Live muscles against the fake kubectl and fake hardware commands: power cap scales the CPU limit and the reset
 restores it; a security hold blocks any expansion; rollouts pause when change is not permitted, resume when it is, and a
 stuck rollout is undone when rollback is authorised; batch admits one held job only with headroom and never during a
-hold; the CPU-frequency and GPU power-limit connectors follow the cap and are restored by the kill switch; the heat sense
+hold; the CPU-frequency and GPU power-limit connectors follow the cap and are restored by the reset; the heat sense
 follows the harness law and GPU temperature; observe mode writes nothing."""
 import json, os, sys, tempfile
 from pathlib import Path

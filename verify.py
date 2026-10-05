@@ -303,7 +303,7 @@ def main():
     from tests import test_convey
     test_convey.main(); check("energy to where the work is: idle machine CPU conveyed to serving pods in place, band-bounded, kill restores", True)
     from tests import test_active_nodes
-    test_active_nodes.main(); check("full-engine controller options: parked and control-plane nodes excluded, kill switch restores the node pool once", True)
+    test_active_nodes.main(); check("full-engine controller options: parked and control-plane nodes excluded, reset restores the node pool once", True)
     from tests import test_schedutil, test_cpufreq_ceiling
     test_schedutil.main(); check("schedutil model: 1.25 map tips at 80%, OPP snap, uclamp, RT to policy max, rate limit, iowait boost, Omni ceiling and kill", True)
     test_cpufreq_ceiling.main(); check("cpufreq ceiling writer: scaling_max_freq on every policy, clamped; restore puts cpuinfo_max_freq back", True)

@@ -120,7 +120,7 @@ outcome, the repetitions, and the two guardrails above are unchanged.
 
 - the watch arm executes any power-limit write;
 - a native or watch arm sees a power limit other than the snapshot;
-- any arm ends at a limit other than the snapshot (the kill switch failed);
+- any arm ends at a limit other than the snapshot (the reset failed);
 - Omni's frozen files change during the run;
 - the confirmation runs on uncommitted code.
 
@@ -208,7 +208,7 @@ trial data exist. Unchanged:
 The first smoke on a rented A10 (results/gpu/smoke-20261002T032459Z, never counted) was invalid by rule: two copies of
 `scripts/gpu_rented_run.sh` had been started on the same machine, so both benches wrote the same card's power limit.
 The native and watch arms saw limits they never wrote (116, 137 and 150 W), each governor refused to start beside the
-other one (exit 5), and one kill-switch restore was undone by the other copy. The card also began at 116 W, a limit an
+other one (exit 5), and one reset restore was undone by the other copy. The card also began at 116 W, a limit an
 earlier start had left behind, not its 150 W default, so native itself ran capped (83% of samples). None of these
 numbers measures Omni. The engine, the governor, the outcomes and the analysis are unchanged. The run script now:
 

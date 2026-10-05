@@ -4,7 +4,7 @@
 """The five added live levers against the fake kubectl: rightsize sets pod CPU requests from use in place and the kill
 switch restores them; coldstart scales an idle deployment to zero and wakes it when work waits; batch_pace pauses a
 pausable Job under power stress and resumes it when calm; contain puts a quota and scaled limits on an agent namespace
-over budget and lifts them; the cooling connector moves the setpoint with heat and the kill switch restores it."""
+over budget and lifts them; the cooling connector moves the setpoint with heat and the reset restores it."""
 import json, os, sys, tempfile
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
@@ -74,12 +74,12 @@ def main():
     assert load(p).get("quotas") == [], "containment lifted when back under budget"
     lims = [q["spec"]["containers"][0]["resources"]["limits"]["cpu"] for q in load(p)["pods"] if q["metadata"].get("namespace") == "agents"]
     assert lims == ["1000m", "1000m"], lims
-    # kill switch restores everything
+    # reset restores everything
     s = load(p); s["configmaps"][0]["data"]["queue"] = "0"; Path(p).write_text(json.dumps(s))
     for _ in range(3):
         m.push({"power_cap": 1.0, "change_permitted": True, "rollback_authorized": False}, hot)
     assert svc()["spec"]["replicas"] == 0 and load(p)["jobs"][0]["spec"]["suspend"] is True
-    # containment again, then the kill switch from a fresh process (records live in the cluster, not in memory)
+    # containment again, then the reset from a fresh process (records live in the cluster, not in memory)
     s = load(p)
     for q in s["pods"]:
         if q["metadata"].get("namespace") == "agents": q["usage"] = "900m"
@@ -89,7 +89,7 @@ def main():
     m = Muscles(Kube(FAKE, audit=rec.append), a, rec.append)
     m._setpoint = 18.9
     m.restore()
-    assert load(p).get("quotas") == [], "kill switch from a fresh process deletes the quota"
+    assert load(p).get("quotas") == [], "reset from a fresh process deletes the quota"
     lims = [q["spec"]["containers"][0]["resources"]["limits"]["cpu"] for q in load(p)["pods"] if q["metadata"].get("namespace") == "agents"]
     assert lims == ["1000m", "1000m"], lims
     assert svc()["spec"]["replicas"] == 3 and REPL_ANN not in svc()["metadata"]["annotations"]

@@ -48,7 +48,7 @@ def architecture():
         ax.text(x + w / 2, y + h - 0.32, title, ha="center", va="top", color=tc, fontsize=11, fontweight="bold")
         ax.text(x + w / 2, y + h - 0.72, sub, ha="center", va="top", color=tc, fontsize=8.5, linespacing=1.35)
     box(0.3, 4.1, 9.4, 1.9, "OMNI-COMPASS", "Engine: six-state dynamics (1)-(8)   |   Governor: sense, assimilate, evolve, allocate\n"
-        "Safety shield: invariants I1-I5   |   Modes: power-protect, throughput   |   Kill switch: hand-back", NAVY)
+        "Safety shield: invariants I1-I5   |   Modes: power-protect, throughput   |   Reset: hand-back", NAVY)
     box(0.3, 2.05, 9.4, 1.6, "KUBERNETES  (execution layer, retained)", "HPA with governor-set target   |   Cluster Autoscaler scale-up   |   scheduler, kubelet, runtime\n"
         "Retired from control: Terraform as live controller, separate power agents, paging path", "#3D5A80")
     box(0.3, 0.2, 9.4, 1.4, "MACHINES", "nodes and replicas   |   power caps   |   cooling and heat   |   network routing", LIGHT, NAVY)

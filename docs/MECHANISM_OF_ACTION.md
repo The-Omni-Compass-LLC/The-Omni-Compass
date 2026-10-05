@@ -142,6 +142,23 @@ Each is testable in the existing harness against every platform in the league (t
 there.
 
 
+## The pedals: idle, gas, brake, reset, and the kill switch
+
+Omni-Compass drives a system the way a driver drives a car in gear. The words below are used the same way everywhere
+in this repository.
+
+| Term | Meaning | In the code |
+|---|---|---|
+| **Idle** | No foot on the gas or the brake: calm traffic, the engine running at its floor (two machines in service, ready) | `MIN_NODES`, the floor of the staging law (8.8) |
+| **Gas** | Ramping up: traffic climbs and capacity is added at once, never held back; the whole cluster can take work the instant it is needed | (8.3); a lower HPA target is never limited |
+| **Brake** | Ramping down: traffic falls and capacity is eased off a step at a time, never below idle | (8.4)-(8.5); coasting, rule 6 |
+| **Reset** | The brake held to the floor: every setting the governor ever wrote is handed back to where native had it, read back, and the record removed; the next run starts fresh. Every benchmark arm ends with one and checks it | the reset file (`--kill-file`, a name kept for compatibility), `Controller.restore` |
+| **Kill switch** | Security only: one switch in a human hand that turns Omni-Compass's governing off across the whole system at once, for anything rogue or anyone trying to drive a system through Omni-Compass's brain | `omnicompass/master.py`, `tools/omni_switch.py off` |
+
+The fuel cut-off point (the floor) is a number the operator sets; the brake never takes the system below it, however
+hard it is pressed. Earlier dated records, and the sealed original engine files, call the reset a "kill switch"; they
+are kept word for word.
+
 ## 8. The staging law: machines on and off in order, with demand that moves
 
 Demand climbs, spikes, eases part way, climbs again and settles to idle. The staging law decides how many machines are

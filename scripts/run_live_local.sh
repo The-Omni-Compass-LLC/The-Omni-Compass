@@ -5,7 +5,7 @@
 # One command: the whole live comparison on real Kubernetes (kind) on any machine with Docker.
 # For each repetition it builds a fresh 7-node cluster (1 control plane + 6 workers) and runs three arms in turn:
 #   native  Kubernetes alone (HPA, scheduler)
-#   omni    Omni-Compass on top (B): closure law, nervous system, levers, kill switch at the end
+#   omni    Omni-Compass on top (B): closure law, nervous system, levers, reset at the end
 #   strict  Omni-Compass decides replicas and nodes (C)
 # then aggregates every repetition into live_runs/LIVE_REPS.md (paired differences, 95% intervals).
 # Needs: docker, kind (v0.27+), kubectl, python3 with requirements.txt, jq, curl. About 20 minutes per arm.

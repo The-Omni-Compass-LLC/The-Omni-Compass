@@ -70,7 +70,7 @@ rate, so both arms were given **the same work**.
   idle power a parked machine really draws it is unchanged.
 - **No CPU saving once Omni's own cost is counted.** The service used 7.6% less CPU; the controller spent almost all
   of it. Cutting the controller's cost is the next improvement.
-- The kill switch restored every setting in every run.
+- The reset restored every setting in every run.
 
 ## Kubernetes sets 25 and 26 (2026-10-02, 10 paired repetitions each, equal work)
 

@@ -155,7 +155,7 @@ def write_md(out, res, orgs, run):
     w("## Validity")
     w("")
     inv = [r for r in res if not r["valid"]]
-    w(f"- Watch equal to native and the kill switch handing back the knob: {len(res) - len(inv)} of {len(res)} muscles; "
+    w(f"- Watch equal to native and the reset handing back the knob: {len(res) - len(inv)} of {len(res)} muscles; "
       f"{sum(1 for o in orgs.values() if o['valid'])} of {len(orgs)} organisms.")
     w("- Raw per-seed contrasts: `REALMS.json`. One row per muscle: `MUSCLES.csv`. Fingerprints: `RUN.json`, "
       "`SHA256SUMS.txt`.")

@@ -66,7 +66,7 @@ def main(argv=None):
          "`docs/REALMS_PREREGISTRATION.md`, round 4.", "",
          f"- **Stacking changes nothing natively:** the stacked native run equals each realm's own native run, plant by "
          f"plant, on {'every seed' if run['native_equal_every_seed'] else 'NOT every seed'}.",
-         "- **Kill switch:** every knob handed back under both governor arms on every seed: "
+         "- **Reset:** every knob handed back under both governor arms on every seed: "
          f"{'yes' if valid else 'NO'}.", "",
          "| Comparison | Label | Work per energy | Work | Energy | Violations (pp) |", "|---|---|---:|---:|---:|---:|"]
     for name, r in res.items():

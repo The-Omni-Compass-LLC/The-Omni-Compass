@@ -2,7 +2,7 @@
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
 """schedutil model: the 1.25 map tips at 80% utilisation, OPP snap, uclamp, RT to policy max, rate limit, iowait boost,
-and the Omni-Compass ceiling (scaling_max_freq) with the kill switch restoring cpuinfo_max_freq."""
+and the Omni-Compass ceiling (scaling_max_freq) with the reset restoring cpuinfo_max_freq."""
 import sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
@@ -30,7 +30,7 @@ def main():
     assert update(p, 1, SCALE) == 2_000_000               # highest OPP <= the ceiling
     assert update(p, 2, 10, rt=True) == 2_000_000          # even RT stays under the policy ceiling
     assert update(p, 3, SCALE // 4) == 1_200_000           # below the ceiling schedutil is unchanged
-    set_ceiling(p, None)                                   # kill switch
+    set_ceiling(p, None)                                   # reset
     assert p.scaling_max == fmax and update(p, 4, SCALE) == fmax
     # rate limit: requests inside the window are dropped, a lowered ceiling applies at once
     r = Policy(OPPS, rate_limit_us=1000)

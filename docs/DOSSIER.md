@@ -70,7 +70,7 @@ Source: `results/sim/gpu_two_wire/RESULT.md` and `fresh/RESULT.md`. The rule, an
 
 ## 4. Real Kubernetes (evidence class L)
 
-Each set: 10 paired repetitions on one runner, native Kubernetes (HPA, scheduler) against the same Kubernetes with Omni-Compass on top, fresh cluster per arm, order rotated, fixed-rate load so both arms do the same work. Every Omni arm ends with the kill switch, which must return every setting and every machine to native.
+Each set: 10 paired repetitions on one runner, native Kubernetes (HPA, scheduler) against the same Kubernetes with Omni-Compass on top, fresh cluster per arm, order rotated, fixed-rate load so both arms do the same work. Every Omni arm ends with the reset, which must return every setting and every machine to native.
 
 ![Kubernetes](dossier/k8s.png)
 
@@ -107,7 +107,7 @@ The catalog (`realms/catalog.csv`): 656 muscles, 345 in Compute / AI / Cloud, 26
 |---|---|---|
 | `scripts/gpu_rented_run.sh` | one command on a rented card: wire check, smoke, the six organisms with the card inside, the preregistered confirmation; one packed file back | `results/gpu/run-*`, `results/hil/run-*` |
 | `tools/gpu_wire_check.py` | both of the card's wires follow, read back and go home; another writer is left alone | `results/gpu/wirecheck-*.txt` |
-| `scripts/kind_paired.sh`, `tools/live_reps.py` | native against Omni on real Kubernetes, paired on one runner, with the kill switch checked | `results/live/LIVE_REPS_*.md` |
+| `scripts/kind_paired.sh`, `tools/live_reps.py` | native against Omni on real Kubernetes, paired on one runner, with the reset checked | `results/live/LIVE_REPS_*.md` |
 | `tools/run_scale.py`, `.github/workflows/six.yml` | the six organisms at every run count and size | `results/scale/GRID.md` |
 | `tools/run_gpu_card.py` | the modelled card, both profiles, tuning and fresh seeds | `results/sim/gpu_two_wire/` |
 | `verify.py` | everything above re-runs and checks itself; the manifest fingerprints the result | `results/VERIFY_RECEIPT.txt`, `RELEASE_MANIFEST.json` |

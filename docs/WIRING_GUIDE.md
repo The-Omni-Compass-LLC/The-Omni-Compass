@@ -11,7 +11,7 @@
 > `docs/OPERATOR_MANUAL.md`. This page is the short version.
 
 **Three stages.** Each stage adds only the permissions it needs. A stage is promoted only after its evidence is in,
-and the kill switch works at every stage:
+and the reset works at every stage:
 
 ```
 kubectl -n omni-compass exec deploy/omni-compass -- touch /tmp/omni.kill

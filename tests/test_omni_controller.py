@@ -2,7 +2,7 @@
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
 """Live controller against a fake kubectl (tests/fake_cluster/kubectl): observe writes nothing; target patches HPA
-targets within bounds at the correct metric index and records originals; the kill switch restores originals from the
+targets within bounds at the correct metric index and records originals; the reset restores originals from the
 HPA annotation (also after a restart); nodepool respects dry-run, the shield step limit and the scheduling floor."""
 import json, os, sys, tempfile
 from pathlib import Path
@@ -60,7 +60,7 @@ def main():
     assert S["hpas"][0]["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"] == 90
     assert S["hpas"][1]["spec"]["metrics"][1]["resource"]["target"]["averageUtilization"] == 85
     assert all(ANNOTATION not in h["metadata"].get("annotations", {}) for h in S["hpas"])
-    print("kill switch (new process): originals restored from the HPA annotation, records removed")
+    print("reset (new process): originals restored from the HPA annotation, records removed")
     (Path(t) / "kill").unlink()
     marker = Path(t) / "scaled"
     cmd = f"python3 -c \"open('{marker}', 'a').write('{{n}}\\\\n')\""

@@ -5,7 +5,7 @@
 
 Catalog: 656 muscles, four realms, every row on a known plant with one of the four knobs.
 Arms: on one muscle of every plant and every knob kind, the watch arm equals native exactly and writes nothing; the omni
-arm's kill switch hands the knob back (no write after the kill, the knob at its native value); every run is
+arm's reset hands the knob back (no write after the kill, the knob at its native value); every run is
 deterministic. Organism: watch equals native for a realm organism; omni hands back every knob.
 Rules (the shipped nervous system): capacity goes up at once; it comes down only with contraction authority and a
 clean SLO, by the calm share of the surplus; no authority, no contraction; the label rule."""

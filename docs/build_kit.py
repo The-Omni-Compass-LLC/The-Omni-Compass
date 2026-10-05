@@ -104,7 +104,7 @@ claims = [
     ("C15", FLEET_TXT, "Measured in simulation (fleet harness, synthetic workloads, documented-behaviour execution layer)", "python -m fleet.benchmark --seeds 30 --seed-base 700000 --out out/"),
     ("C17", PL_TXT, "Measured in simulation driven by recorded traces (frozen laws, no retuning)", "python -m fleet.planetlab --dir fleet/traces/planetlab --scenarios 30 --seed-base 800000 --out out/"),
     ("C16", "Live-cluster capture, capture replay and the PlanetLab vessel are tested on generated inputs in the real formats. No real capture or recorded trace has been run in the package.", "Tested path; no real-data result", "python tests/test_fleet_realdata_paths.py"),
-    ("C19", "The live controller (omni_controller/) implements observe, target and nodepool modes with dry-run, audit log and a kill switch that restores HPA targets from annotations; tested against a fake kubectl only, never against a real cluster.", "Tested path; no live result", "python tests/test_omni_controller.py"),
+    ("C19", "The live controller (omni_controller/) implements observe, target and nodepool modes with dry-run, audit log and a reset that restores HPA targets from annotations; tested against a fake kubectl only, never against a real cluster.", "Tested path; no live result", "python tests/test_omni_controller.py"),
     ("C18", "Savings projection: the energy-first reduction relative to HPA + Karpenter-lite, applied to declared fleet profiles (results/SAVINGS.csv), computed identically in Python and C++. A projection from simulation, not measured savings.", "Projection", "python benchmarks/savings.py"),
     ("C21", "End-to-end self-pilot (shipped controller, simulated cluster, real capture and scoring), default headroom 50%: energy per core-hour -7.7%, node-hours per core-hour -13.8%, pending-pod time not significantly different from HPA + Cluster Autoscaler; HPA shortfall minutes higher. Lower headroom saves more energy with more pending-pod time (manual Section 8.12a).", "Measured in simulation", "python pilot/selfpilot.py"),
     ("C20", "pilot/score.py scores a user's own captures (node-hours and energy per used core-hour, utilisation, pending-pod and HPA-shortfall minutes, bootstrap intervals); tested to detect a real gain, report no difference for identical clusters and detect a service regression.", "Tested tool; no pilot result", "python tests/test_pilot_score.py"),
@@ -131,7 +131,7 @@ Answers reference the Claims Register (C-numbers) and the Technical Manual.
 ## Operations
 **Better than what we run today?** Compared against a documented-behaviour reference model of Kubernetes autoscaling (HPA tolerance 0.1, 300 s scale-down stabilization, HPA targets 0.5 to 0.8; simplified Cluster Autoscaler with 10-minute unneeded time, 0.5 utilization threshold, 10-minute delay after scale-up): C8 to C12, including where Omni-Compass is worse. The reference model is not the upstream controllers (C12b); running the upstream controllers against the same scenarios is the next baseline step.
 **On real traffic?** Not yet. Results use a synthetic stack model. Replay of published production traces and the pilot protocol are the next evidence steps (C14).
-**What happens when it is wrong?** Observe mode changes nothing (C6). The kill switch returns control to the native managers at the next interval (omni_kill arm). The shield blocks actions that violate I1 to I5 (C7).
+**What happens when it is wrong?** Observe mode changes nothing (C6). The reset returns control to the native managers at the next interval (omni_kill arm). The shield blocks actions that violate I1 to I5 (C7).
 **Will it wear hardware?** Machine start/stop cycles, power-cap travel and thermal travel are measured for every arm (C12, Manual Chapter 8).
 
 ## Security
@@ -144,7 +144,7 @@ Answers reference the Claims Register (C-numbers) and the Technical Manual.
 **What does it cost to run?** C5.
 
 ## Adoption
-**How is it introduced without risk?** Observe, then shadow on production telemetry, then one control loop at a time under the kill switch (docs/PILOT_PROTOCOL.md).
+**How is it introduced without risk?** Observe, then shadow on production telemetry, then one control loop at a time under the reset (docs/PILOT_PROTOCOL.md).
 
 ## Referees
 **Was it tuned on the test data?** No. Law, shield and baselines were frozen and fingerprinted before the held-out seeds {S1} and {S2} (results/PREREGISTRATION.json).
@@ -167,9 +167,9 @@ Run `python verify.py`. Pass criterion: VERIFICATION: PASS.
 
 ## Phase 2: Guarded control, one loop at a time (4 to 8 weeks)
 Order: power capping; node count (Cluster Autoscaler set to observe); replica count (HPA set to observe).
-- Each loop is handed over separately, with the kill switch tested at handover and at exit.
+- Each loop is handed over separately, with the reset tested at handover and at exit.
 - Pass criteria per loop, fixed in advance: SLO attainment not worse than the preceding shadow baseline at the agreed confidence level; zero shield invariant violations; energy per unit of completed work reported with confidence intervals.
-- Exit: any criterion failed triggers the kill switch and returns the loop to its native controller.
+- Exit: any criterion failed triggers the reset and returns the loop to its native controller.
 
 ## Scoring your own pilot
 Capture the baseline (a period before the controller, or a matched node pool left on your normal autoscaler) and the

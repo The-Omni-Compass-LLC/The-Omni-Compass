@@ -288,7 +288,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 395 | rate abuse gate | admission | reads it; left to its own controller | all four realms; stack; tower |
 | 396 | fault domain isolate | admission | reads it; left to its own controller | all four realms; stack; tower |
 | 397 | backup trigger | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
-| 400 | kill switch | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 400 | reset | admission | reads it; left to its own controller | all four realms; stack; tower |
 
 ### Storage Block/File/Object (16 muscles)
 

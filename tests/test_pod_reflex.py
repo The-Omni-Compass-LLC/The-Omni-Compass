@@ -3,7 +3,7 @@
 # Omni-Compass Enterprise License. See LICENSE.
 """Fast pod reflex on the fake cluster: calm queue -> no read, no write; a queue building up -> the HPA's replica floor
 rises to exactly the HPA's own rule (current x busy / target) with busy read from queueing (u = 1 - S/R) and the target
-in queue terms (target x request / limit); the queue drained -> the floor is handed back; the kill switch restores the
+in queue terms (target x request / limit); the queue drained -> the floor is handed back; the reset restores the
 range and leaves no record."""
 import json, os, sys, tempfile, time
 from pathlib import Path

@@ -49,7 +49,7 @@ This is the whole repository at the commit named in `STATE_OF_PLAY_COMMIT.txt`. 
 | **GPU power law** (engine cap over the MLPerf-measured performance law), against native at equal work: energy -27% to -33%, time over the heat limit -73% to -78% | simulation, held-out | `results/hardware/SUMMARY_HELDOUT.json` |
 | **Site power exchange (conveyance law, manuscript Ch. 29-31):** 4 GPU groups under one site budget: 0 minutes over the site limit at 70/60/50% budgets (native 10.5/45.6/106); least energy at every budget; 31-115 fewer backlog minutes than the static split | simulation, held-out; law proved (conservation, Lyapunov, exponential convergence) | `docs/CONVEYANCE_LAW.md`, `results/hardware/SITE_EXCHANGE_HELDOUT_*.json` |
 | **Same-tower OFF / observe / ON receipt:** observe identical to OFF; ON better than ChatGPT's graded-reflex build on healthy time, recovery, energy, violations and peak power (peak below OFF) | simulation, held-out | `results/tower_off_on/`, `results/external_review/CHATGPT2_REVIEW.md` |
-| **Live levers under the nervous system:** 19 of 19 checks on real Kubernetes; kill switch restores everything | live, kind | `results/live/LIVE_LEVERS_2_NERVOUS.txt` |
+| **Live levers under the nervous system:** 19 of 19 checks on real Kubernetes; reset restores everything | live, kind | `results/live/LIVE_LEVERS_2_NERVOUS.txt` |
 | **Shadow pilot kit:** a read-only identity made 0 writes across 40 decisions | live, kind | `results/live/LIVE_SHADOW_1.txt` |
 | **Safety shield:** 2,000,000 adversarial cases, 0 violations (the test found 2 real bugs, both fixed); C++ twin matches | test | `tests/test_shield_properties.py` |
 | **C++ engine:** 100,000,000 decisions, no failures, about 2.3 µs per decision | test | `results/SOAK.json` |

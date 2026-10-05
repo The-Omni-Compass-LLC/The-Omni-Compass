@@ -3,7 +3,7 @@
 # Omni-Compass Enterprise License. See LICENSE.
 """Strict C on the fake cluster: Omni-Compass sets the replica count from measured utilisation (up at once, down only to
 the highest recent recommendation), sets it as the HPA's floor within the HPA's own range (growth stays free up to the
-operator's maximum), and the kill switch restores the range and leaves no record."""
+operator's maximum), and the reset restores the range and leaves no record."""
 import json, os, sys, tempfile
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))

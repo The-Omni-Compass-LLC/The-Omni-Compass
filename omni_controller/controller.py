@@ -322,7 +322,7 @@ class Controller:
         replicas the autoscaler's own arithmetic asks for, ceil(r x u / x), never past the ceiling; once the demand has
         held still for one window, the bowl is under its centre, nothing breaches and that arithmetic fits the
         operator's own cap again, the cap returns to it. The operator's range is recorded before the first change, and
-        the kill switch restores it."""
+        the reset restores it."""
         ceil_ = int(getattr(self.a, "replica_ceiling", 0) or 0)
         if ceil_ <= 0 or self.bowl is None:
             return
@@ -385,8 +385,8 @@ class Controller:
                 lo0, hi0 = (int(x) for x in rng.split(","))
                 ns, name = h["metadata"]["namespace"], h["metadata"]["name"]
                 self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"minReplicas": lo0, "maxReplicas": hi0}})],
-                             "kill switch: restore the HPA's own replica range")
-                self.k.write(["annotate", "hpa", name, "-n", ns, f"{RANGE_ANN}-"], "kill switch: remove range record")
+                             "reset: restore the HPA's own replica range")
+                self.k.write(["annotate", "hpa", name, "-n", ns, f"{RANGE_ANN}-"], "reset: remove range record")
         for h in self.k.get("get", "hpa", "-A", "-o", "json")["items"]:
             orig = h["metadata"].get("annotations", {}).get(ANNOTATION)
             if orig is None:
@@ -396,13 +396,13 @@ class Controller:
             if idx is not None:
                 self.k.write(["patch", "hpa", name, "-n", ns, "--type=json", "-p",
                               json.dumps([{"op": "replace", "path": f"/spec/metrics/{idx}/resource/target/averageUtilization", "value": int(orig)}])],
-                             "kill switch: restore original HPA target")
-            self.k.write(["annotate", "hpa", name, "-n", ns, f"{ANNOTATION}-"], "kill switch: remove record")
+                             "reset: restore original HPA target")
+            self.k.write(["annotate", "hpa", name, "-n", ns, f"{ANNOTATION}-"], "reset: remove record")
         self.changed.clear()
         self.m.restore()
         cmd = getattr(self.a, "node_restore_cmd", "")
         if cmd and not self.nodes_restored:
-            self.audit({"write": shlex.split(cmd), "why": "kill switch: restore node pool", "dry_run": self.a.dry_run})
+            self.audit({"write": shlex.split(cmd), "why": "reset: restore node pool", "dry_run": self.a.dry_run})
             if not self.a.dry_run:
                 subprocess.run(shlex.split(cmd), check=True)
             self.nodes_restored = True
@@ -846,7 +846,7 @@ def parser():
     ap.add_argument("--headroom", type=float, default=0.5, help="spare capacity kept above pod requests (0.5 = 50%%, the default)")
     ap.add_argument("--active-nodes-only", action="store_true",
                     help="count only nodes in service (schedulable, or cordoned but still carrying work) and the pods and usage on them")
-    ap.add_argument("--node-restore-cmd", default="", help="command run once when the kill switch fires, returning the node pool to native")
+    ap.add_argument("--node-restore-cmd", default="", help="command run once when the reset fires, returning the node pool to native")
     add_muscle_args(ap)
     ap.add_argument("--power-cmd", default="")
     ap.add_argument("--site-limit-w", type=float, default=0.0)

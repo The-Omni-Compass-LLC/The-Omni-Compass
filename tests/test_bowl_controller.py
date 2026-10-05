@@ -12,9 +12,9 @@
             demand has stopped growing for one autoscaler window (no remove-then-restart)
   steady    a raise of the target (fewer pods) waits for a demand steady for one autoscaler window
   room      the replica cap raised only while it binds and the line is threatened, up to the operator's ceiling;
-            returned when calm and steady; the kill switch restores it
+            returned when calm and steady; the reset restores it
   sensed    two services, the probe measuring one: only its HPA moves; the neighbour's stays the operator's
-  restore   the kill switch returns every HPA target to the operator's and removes every record
+  restore   the reset returns every HPA target to the operator's and removes every record
   engine    the six-state engine still runs every decision (E and U in the audit) and the decision names the bowl law
 """
 import json, os, sys, tempfile, time
@@ -135,7 +135,7 @@ def main():
 
     # the replica cap as a lever, up to the operator's ceiling: at the cap (10 of 10), the line breached, the autoscaler's
     # own arithmetic asking for 18 (10 pods at 90% of a 50% target), the cap is raised to 18 (ceiling 30); calm and
-    # steady again, the operator's 10 returns; the kill switch restores the range and leaves no record. Without a
+    # steady again, the operator's 10 returns; the reset restores the range and leaves no record. Without a
     # ceiling the cap is never touched
     def capped(ceiling):
         t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 600.0)
@@ -193,7 +193,7 @@ def main():
     assert decisions(t)[-1]["bowl"]["position"] >= 0.95, "blind did not read as past the wall"
     print(f"blind: past the wall, target stays the operator's {target_now(st)} (more pods cannot answer a blind sense)")
 
-    # restore: the kill switch hands the target back and removes the record (after a real breach moved it)
+    # restore: the reset hands the target back and removes the record (after a real breach moved it)
     t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 600.0)
     c, marker = controller(t, lat); c.step()
     assert target_now(st) == 30
@@ -201,7 +201,7 @@ def main():
     c.step()
     S = json.loads(st.read_text())
     assert target_now(st) == 50 and ANNOTATION not in S["hpas"][0]["metadata"].get("annotations", {})
-    print("kill switch: target back to 50, no record left")
+    print("reset: target back to 50, no record left")
     print("PASS bowl law in the live controller")
 
 

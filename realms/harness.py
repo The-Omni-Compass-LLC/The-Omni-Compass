@@ -9,7 +9,7 @@ Arms, all on the same seed (the same demand, weather, disturbances):
   omni    the frozen governor holds the muscle's one knob; at 90% of the run it is killed, the knob returns to the
           native controller, and the harness checks that it did
 
-The governor is omnicompass.adapter.Governor, unchanged (the engine with u = 0, the stack law, the kill switch).
+The governor is omnicompass.adapter.Governor, unchanged (the engine with u = 0, the stack law, the reset).
 
 Single muscle: one plant, one governor reading that plant.
 Organism: all the plants of a realm (or all 656) on one 15 s clock, coupled: the electrical power of compute, motion

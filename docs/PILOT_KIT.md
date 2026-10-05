@@ -15,7 +15,7 @@ decides what it would do, using the same closure law that was benchmarked. It ne
 3. Scoring against a matched baseline: `python pilot/score.py --baseline baseline.csv --omni omni.csv` (bootstrap
    intervals over hourly blocks).
 
-Guarded control follows `docs/PILOT_PROTOCOL.md`: one loop at a time, the kill switch tested at each handover.
+Guarded control follows `docs/PILOT_PROTOCOL.md`: one loop at a time, the reset tested at each handover.
 
 The kit is exercised end to end on kind by the `live-shadow` workflow.
 

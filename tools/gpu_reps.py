@@ -21,7 +21,7 @@ telemetry shows next (the intertwining residual and directional accuracy), defin
 The result label is chosen by rule (label()), never by hand. A meter that was not fitted prints UNAVAILABLE.
 
 The run is INVALID (exit 2) when: a native or watch arm saw a power limit (or enforced limit) other than the one read at
-start, the watch arm executed a write, an arm ended with a limit that differs from the start (the kill switch did not
+start, the watch arm executed a write, an arm ended with a limit that differs from the start (the reset did not
 restore), a governor exited nonzero (a refused write, a refused start), a write was refused, Omni's frozen files
 changed, a confirmation ran on uncommitted code, or smoke and confirmation repetitions were mixed.
 Usage: python tools/gpu_reps.py RUN_DIR   (RUN_DIR holds rep-<n>/<arm>/)  ->  RUN_DIR/GPU_REPS.md, RUN_DIR/GPU_REPS.json"""
@@ -392,7 +392,7 @@ def main(root):
         if a == "native" and c["writes"] + c["would_write"]:
             problems.append(f"native rep {rep}: Omni records present")
         if not c["restored"]:
-            problems.append(f"{a} rep {rep}: the limit at the end differs from the start (kill switch did not restore)")
+            problems.append(f"{a} rep {rep}: the limit at the end differs from the start (reset did not restore)")
         rc = json.loads((d.parent / "receipt.json").read_text()) if (d.parent / "receipt.json").exists() else receipt
         enf0 = str(rc.get("power_limit_enforced_w", "unsupported"))
         if a in ("native", "watch") and c["enforced_seen"] and enf0 not in ("", "unsupported") \

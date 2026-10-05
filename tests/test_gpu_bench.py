@@ -7,7 +7,7 @@
 Governor contract: the start limit is read and recorded before any write; watch computes and records but executes no
 write; a written limit is never below draw x 1.3 nor the device minimum, never above the start limit; no second write
 until the last one reads back; a blind sense returns the start limit; a response-time breach returns the start limit;
-the kill switch restores the start limit and reads it back.
+the reset restores the start limit and reads it back.
 Bench: one command runs native / watch / omni with rotated order and prints the table; a watch arm that writes, or an
 arm that ends away from the start limit, makes the run INVALID."""
 import json, os, subprocess, sys, tempfile, time
@@ -80,7 +80,7 @@ def governor():
     g.step(); assert json.load(open(p))["limit"]["0"] == 234.0
     lat.write_text("elapsed_seconds,latency_ms,ok\n1,10,1\n2,500,1\n3,500,1\n"); g.step()
     assert json.load(open(p))["limit"]["0"] == 300.0, "a response-time breach did not return the start limit"
-    # kill switch after a cap
+    # reset after a cap
     lat.write_text("elapsed_seconds,latency_ms,ok\n1,10,1\n2,10,1\n"); g.lp_hist = []
     g.step(); assert json.load(open(p))["limit"]["0"] == 234.0
     assert g.restore() and json.load(open(p))["limit"]["0"] == 300.0

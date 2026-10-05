@@ -19,7 +19,7 @@
 # Three receipts, kept apart: A the governor's audit.jsonl (telemetry, six-state reading, command, shield), B its
 # actuator records (requested, return code, read-back, enforced limit, delay), C the bench's own nvidia-smi sampling
 # and the workload's requests.csv (Omni never supplies its own outcome). Refused unless power management is Enabled.
-# The power limit is read once at the start (the snapshot). Every arm must begin and end at it; the kill switch restores
+# The power limit is read once at the start (the snapshot). Every arm must begin and end at it; the reset restores
 # it after the omni arm. The table (tools/gpu_reps.py) prints each gauge with its 95% interval; an interval that includes
 # zero says not proven. Output: results/gpu/run-<UTC time>/ with every raw file and SHA256SUMS.txt.
 set -euo pipefail

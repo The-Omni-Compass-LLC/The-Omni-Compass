@@ -9,7 +9,7 @@
 #              hpa        HPA CPU target (rho*)
 #              nodes      node-pool size: cordon + drain specific workers, uncordon for pending pods
 #              power_cap  senses site power (declared model, scripts/kind_power.sh) into the governor
-#   Kill     the kill switch must restore the HPA target (50) and return every worker to service.
+#   Kill     the reset must restore the HPA target (50) and return every worker to service.
 # Results in $OUT_DIR.
 set -euo pipefail
 OUT_DIR="${OUT_DIR:-kind_full_out}"; PHASE_S="${PHASE_S:-600}"; mkdir -p "$OUT_DIR"
@@ -53,7 +53,7 @@ wait
 kubectl get hpa php-apache -o json > "$OUT_DIR/hpa_after_full.json"
 kubectl get nodes -o wide | tee "$OUT_DIR/nodes_after_full.txt"
 
-echo "== Kill switch: HPA target 50 and all $WORKERS workers must be restored"
+echo "== Reset: HPA target 50 and all $WORKERS workers must be restored"
 touch "$OUT_DIR/kill"
 python -m omni_controller.controller --mode nodepool --active-nodes-only --iterations 1 \
   --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \

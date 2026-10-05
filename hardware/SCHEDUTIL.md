@@ -33,7 +33,7 @@ then snaps to the next available frequency (OPP) and clips to the policy. In the
 | `hardware/plant.py`, arm B | `min(native, cap)` | the right shape for writing scaling_max_freq; it is **not** a second schedutil |
 | `hardware/schedutil.py` | `get_next_freq` (>> 2), OPP resolve (lowest OPP >= request), policy/thermal clamp, uclamp, RT to policy max, rate limit (a lowered ceiling still applies at once), iowait boost | kernel-shaped model; tested in `tests/test_schedutil.py` |
 | `scripts/cpufreq_ceiling.sh` | writes scaling_max_freq on every policy (clamped to cpuinfo limits); `restore` puts cpuinfo_max_freq back | the real write; tested against a fake sysfs in `tests/test_cpufreq_ceiling.py` |
-| `omni_controller/muscles.py`, cpu_pstate | the live muscle: `--cpufreq-cmd "bash scripts/cpufreq_ceiling.sh {khz}"`, ceiling = cpu_max_khz x power cap; the kill switch writes the maximum back | needs root on a real machine; kind nodes have no cpufreq |
+| `omni_controller/muscles.py`, cpu_pstate | the live muscle: `--cpufreq-cmd "bash scripts/cpufreq_ceiling.sh {khz}"`, ceiling = cpu_max_khz x power cap; the reset writes the maximum back | needs root on a real machine; kind nodes have no cpufreq |
 
 ## What is not claimed
 

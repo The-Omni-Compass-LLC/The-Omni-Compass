@@ -2,7 +2,7 @@
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
 """Full-engine controller options against the fake kubectl: --active-nodes-only ignores cordoned and NoSchedule-tainted
-nodes (and the pods and usage on them); without it every Ready node counts; the kill switch runs --node-restore-cmd
+nodes (and the pods and usage on them); without it every Ready node counts; the reset runs --node-restore-cmd
 exactly once and writes nothing else to the node pool."""
 import json, os, sys, tempfile
 from pathlib import Path
@@ -53,9 +53,9 @@ def main():
         c.step()
     assert marker.read_text().count("x") == 1, "node restore must run exactly once"
     audit = [json.loads(l) for l in (Path(t) / "audit.jsonl").read_text().splitlines()]
-    assert sum(1 for r in audit if r.get("why") == "kill switch: restore node pool") == 1
+    assert sum(1 for r in audit if r.get("why") == "reset: restore node pool") == 1
     assert not any(r.get("why") == "node pool size" for r in audit), "no node-pool resize while killed"
-    print("active nodes: 2 of 4 counted (control plane and cordoned worker excluded); kill switch restored the node pool once")
+    print("active nodes: 2 of 4 counted (control plane and cordoned worker excluded); reset restored the node pool once")
     print("PASS test_active_nodes")
 
 

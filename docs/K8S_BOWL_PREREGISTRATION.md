@@ -18,7 +18,7 @@ each on a fresh six-worker kind cluster, in an order rotated by repetition (`scr
 
 Load: fixed rate (`loadgen=open`), the same work in every arm. 900 measured seconds per arm. SLO 500 ms at the 95th
 percentile. Every Omni arm runs the six-state engine on every decision, the nervous system's authority and release
-gate, the shield, the compass, and ends with the kill switch, which must return the HPA target, its replica range,
+gate, the shield, the compass, and ends with the reset, which must return the HPA target, its replica range,
 the pods' CPU limits and every worker to native, with no record left (`scripts/kind_bench.sh`).
 
 ## The bowl law in the live controller
@@ -45,7 +45,7 @@ condition fails, the label is **tradeoff**. Otherwise **not established**.
 
 Secondary, reported, not used for the label: p99, mean response time, HPA replicas, pods started, pod start wait, CPU
 including Omni-Compass's own, the declared energy models. The omni arm is reported against native and against the
-bowl arm by the same rule. A run that fails its own checks (kill switch, controller stopped early, missing permission)
+bowl arm by the same rule. A run that fails its own checks (reset, controller stopped early, missing permission)
 is marked invalid and left out, never silently counted.
 
 Evidence class **L**: real Kubernetes software on kind. Energy on kind is a declared model, not a meter.
@@ -269,7 +269,7 @@ amendment (the target returns at once), so the correction can remove churn but c
 
 Nothing else changes: the bowl's band, gains and centre, the verdict, the fail-up rules, the release gate and the
 node-pool law are as registered. Tests: `tests/test_bowl_controller.py`, cases *demand* and *sensed*, beside the
-existing *fault over*, *blind* and kill-switch cases.
+existing *fault over*, *blind* and reset cases.
 
 **The re-runs**, on the commit that carries this amendment, unchanged in design: the capacity test (`load_steps` 1 to
 8, 1,600 s), the fairness test (`two_app` 1, 900 s) and the fault test (`faults` 1, 900 s), 10 paired repetitions
@@ -392,7 +392,7 @@ $$c \leftarrow c^{op} \quad \text{if } n \le c^{op},\ p < \text{centre},\ \text{
 
 The cap is raised only while it binds and the line is threatened, to what the autoscaler asks and never past the grant,
 and returns to the operator's once the demand has held still for a window. The operator's range is recorded before
-the first change; the kill switch restores it. Tests: `tests/test_bowl_controller.py`, case *room*.
+the first change; the reset restores it. Tests: `tests/test_bowl_controller.py`, case *room*.
 
 **Its run** (a setting of its own, labelled as such): the capacity test unchanged, `replica_ceiling` 30, beside the
 runs without it. Native keeps its cap of 10, as an operator who has not raised it would; the extra pods the bowl uses
@@ -644,7 +644,7 @@ in its raw files and named beside the rerun.
 
 The founder's picture: a car in drive. At idle it creeps, ready (the floor of two machines). On the gas it speeds up at
 once (more pods, machines woken, no boot). Off the gas it coasts down gradually toward idle; it does not drop into
-neutral. The brake is for stopping (the kill switch hands everything back at once).
+neutral. The brake is for stopping (the reset hands everything back at once).
 
 Rule 6: a raise of the HPA target (toward fewer pods) moves by at most `--coast-step` points of utilisation in one
 autoscaler window (default 25, `COAST_STEP`; 0 turns it off). The first wandering run raised the target 50 to 190 in

@@ -86,7 +86,7 @@ the power budget are designed (`docs/DOMAIN_MAP.md`, "on-site batteries") and no
 | Gauge | Where | Kind |
 |---|---|---|
 | Writes executed per arm (native 0, watch 0, Omni-Compass n) | GPU bench, live Kubernetes | measured |
-| Every arm ended at its start setting (the kill switch restored it) | GPU bench, live Kubernetes switch drill | measured |
+| Every arm ended at its start setting (the reset restored it) | GPU bench, live Kubernetes switch drill | measured |
 | Invariant violations (all, and excluding power) | stack benchmark | modelled |
 | Security violations, contradictions, pages | stack benchmark | modelled |
 | Freeze check: code hashes at start and end (confirmation runs) | GPU bench (`FREEZE.json`, `FREEZE_END.json`) | measured |
@@ -106,7 +106,7 @@ the power budget are designed (`docs/DOMAIN_MAP.md`, "on-site batteries") and no
 | `authority`: `calm` and its scalars (`kappa, h, sigma, nu`), `execute`, `contract` per organ, and the machine organ's own view | how settled the engine is, whether it may act at all, and which organs may give capacity back this decision (Kubernetes controller; `omnicompass/nervous_system.py`) |
 | compass readings | the direction the engine reads the whole system to be moving (`omnicompass/compass.py`) |
 | `write`, `would_write`, `why` | every command sent (or, in watch mode, withheld) and its reason |
-| `snapshot`, `restored` | every setting read at start, and its read-back after the kill switch |
+| `snapshot`, `restored` | every setting read at start, and its read-back after the reset |
 
 ## 8. Where each report lives
 

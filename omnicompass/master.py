@@ -1,7 +1,11 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The master switch: one OFF for the whole harness, not one muscle at a time.
+"""The kill switch (the master switch): one OFF for the whole harness, not one muscle at a time.
+
+Its purpose is security: if anything gets into Omni-Compass's brain and tries to drive a system for its own ends, or
+anything rogue happens, one switch in a human hand turns Omni-Compass's governing off everywhere at once. It is not
+the reset (the brake held to the floor at the end of a run, which hands one governor's settings back).
 
 Every Omni-Compass governor on a machine (the Kubernetes controller, the GPU governors, any muscle they drive) obeys one
 switch, in a human hand:
