@@ -86,7 +86,10 @@ jobs:
           scp -o StrictHostKeyChecking=no "omni@$IP:omni/paired.log" "omni@$IP:omni/paired.exit" . 2>/dev/null || true
           code=$(cat paired.exit 2>/dev/null || echo missing)
           if [ "$code" != 0 ]; then
-            tail -25 paired.log 2>/dev/null | while IFS= read -r l; do echo "::warning::$l"; done
+            # the lines that say why (kind's own progress lines left out), then the end of the log
+            grep -v -E "^ [✓•]|Preparing nodes|^Set kubectl context|^You can now use|^Have a nice day|^Thanks for using kind" paired.log 2>/dev/null \
+              | grep -i -E "error|invalid|fail|refused|denied|not found|cannot|timed out|exit" | tail -10 | while IFS= read -r l; do echo "::warning::$l"; done
+            grep -v -E "^ [✓•]|Preparing nodes" paired.log 2>/dev/null | tail -10 | while IFS= read -r l; do echo "::notice::$l"; done
             echo "::error::the paired test on the rented machine ended with $code (paired.log in the artifact)"; exit 1
           fi
       - name: Copy every file back
