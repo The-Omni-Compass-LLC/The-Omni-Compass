@@ -78,3 +78,9 @@ districts of round 1 (different scenarios: demand response, electric vehicles, r
 rule-based controller cannot run is reported as such, never left out silently. Reported as in round 1, round 1 kept
 beside it.
 
+
+**Round 2, running it (2026-10-05, before any of its scores were read):** nine districts stopped before a score. Six of
+the newer districts size their solar panels with NREL's System Advisor Model (PySAM), which the runner lacked. The three
+three-phase demonstration districts ship with CityLearn's non-flat interface, which its own rule-based controller
+refuses. The runner now installs PySAM and opens every district with the flat interface. These are harness fixes only:
+the controller, gain, response, glide and band are unchanged, and both arms see the same district.

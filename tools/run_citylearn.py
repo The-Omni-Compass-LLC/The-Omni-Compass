@@ -82,7 +82,10 @@ def schema_of(name, data_dir):
 def run_arm(schema, arm):
     from citylearn.citylearn import CityLearnEnv
     from citylearn.agents.rbc import BasicRBC
-    env = CityLearnEnv(schema, central_agent=True)
+    try:                       # CityLearn's own rule controllers need its flat interface; newer districts ship another
+        env = CityLearnEnv(schema, central_agent=True, interface="flat")
+    except TypeError:          # a CityLearn without the choice is flat already
+        env = CityLearnEnv(schema, central_agent=True)
     agent = BasicRBC(env)
     obs, _ = env.reset()
     steps = env.time_steps

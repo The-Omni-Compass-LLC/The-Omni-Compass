@@ -16,7 +16,7 @@
 set -euo pipefail
 echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native bowl omni}"
-RG="${AZ_RG:?set AZ_RG}"; LOC="${AZ_LOCATION:-eastus}"; SIZE="${AKS_VM_SIZE:-Standard_D2s_v5}"
+RG="${AZ_RG:?set AZ_RG}"; LOC="${AZ_LOCATION:-eastus}"; SIZE="${AKS_VM_SIZE:-Standard_D2s_v4}"
 MAX="${AKS_MAX_NODES:-4}"; export AKS_MAX_NODES="$MAX"
 PROFILE="${AKS_AUTOSCALER_PROFILE:-scale-down-unneeded-time=2m scale-down-delay-after-add=2m scan-interval=10s}"
 k=${#arms[@]}; off=$(( (REP - 1) % k ))

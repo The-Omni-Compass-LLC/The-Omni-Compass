@@ -693,6 +693,13 @@ Both tests ran again with nothing changed but the engine: ten pairs each, native
 These replace the earlier engine's fault and fairness sections of `results/live/AMENDMENT_3_RUNS.md` in the Omni index.
 That file stays as first measured.
 
+The Azure burst bill test and the big organisms, running them (2026-10-05): Azure no longer offers this subscription
+Standard_D2s_v5 in eastus, so AKS workers are Standard_D2s_v4 (2 vCPU, 8 GiB, the same list price, USD 0.096 an
+hour). Both arms use the same size; the steady-load result of record (`results/live/AKS_BILL.md`) stays as measured on
+D2s_v5. The big-organism machine failed while seven kind nodes joined (kubelet-start). Fresh Ubuntu ships too few
+inotify watchers for that; the rented machine now raises them as kind's own documentation advises. Neither change
+touches the controller.
+
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
