@@ -34,7 +34,7 @@ jobs:
     needs: plan
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         cell: "${{ fromJSON(needs.plan.outputs.cells) }}"
     runs-on: ubuntu-latest
@@ -50,8 +50,19 @@ jobs:
       - name: Rent the machine
         run: |
           az group create -n "$RG" -l "$LOC" -o none
-          az vm create -g "$RG" -n big --image Ubuntu2204 --size "$SIZE" --admin-username omni \
-            --generate-ssh-keys --public-ip-sku Standard --os-disk-size-gb 128 -o none
+          # the size asked for first, then sizes with the same memory or more, in case the region or the quota refuses it;
+          # Azure's own refusal is reported as an annotation (readable on the run's page and through the API)
+          ok=""
+          for sz in "$SIZE" Standard_D8s_v3 Standard_E4s_v4 Standard_E4s_v3 Standard_D8as_v4 Standard_B8ms; do
+            if az vm create -g "$RG" -n big --image Ubuntu2204 --size "$sz" --admin-username omni \
+                 --generate-ssh-keys --public-ip-sku Standard --os-disk-size-gb 128 -o none 2> err.txt; then
+              ok="$sz"; echo "::notice::rented $sz"; break
+            fi
+            echo "::warning::$sz refused: $(tr '\n' ' ' < err.txt | cut -c1-600)"
+            az vm delete -g "$RG" -n big --yes -o none 2>/dev/null || true
+          done
+          [ -n "$ok" ] || { echo "::error::no machine size was granted"; az vm list-usage -l "$LOC" -o tsv | grep -Ei "regional|DSv4|DSv3|ESv4|ESv3|DASv4|BS " | head -8 | while read -r l; do echo "::warning::quota $l"; done; exit 1; }
+          echo "SIZE=$ok" >> "$GITHUB_ENV"
           ip=$(az vm show -d -g "$RG" -n big --query publicIps -o tsv); echo "IP=$ip" >> "$GITHUB_ENV"
           for i in $(seq 1 30); do ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 omni@$ip true && break; sleep 10; done
       - name: Install the tools on it
