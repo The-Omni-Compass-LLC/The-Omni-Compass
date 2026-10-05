@@ -1,4 +1,4 @@
-# Repeated live runs on kind, set 27: native, Omni-Compass on top with the engine's allocation law, and with the bowl law as aligned with the GPU governor, 10 paired repetitions
+# Repeated live runs on kind, set 27: native, Omni-Compass on top with the engine's allocation law, and with the compass law as aligned with the GPU governor, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps`, run 37071353971, commit `d46c959`, 2026-10-02, job `aggregate`
 (job 111067346619, `python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds
@@ -6,13 +6,13 @@ per arm. Transcribed from the job's printed receipt; the run's artifact `live-re
 `7bc1ad7cb199312a6fb28f00352ac57ee4f70211801d43775b3a5c3e92e15dac`) holds the same table. Evidence class **L** (real
 Kubernetes software on kind; energy is a declared model, not a meter: every worker stays powered in every arm).
 
-The bowl arm here reads the service as the GPU governor does: the mean response time of the latency window between a
+The compass arm here reads the service as the GPU governor does: the mean response time of the latency window between a
 tenth of the SLO and the SLO, held at center 0.4; p95 at or past the SLO, a blind probe or a pending pod is past the
-wall (`docs/K8S_BOWL_PREREGISTRATION.md`, set 27).
+wall (`docs/K8S_COMPASS_PREREGISTRATION.md`, set 27).
 
 ## All columns, mean over repetitions
 
-| Gauge | Native | Omni on top | Omni on top, bowl law |
+| Gauge | Native | Omni on top | Omni on top, compass law |
 |---|---:|---:|---:|
 | worker nodes in service, mean | 6 | 3.802 | 5.044 |
 | node-hours | 1.523 | 0.9622 | 1.274 |
@@ -60,7 +60,7 @@ declared standby power, which needs a node autoscaler that really removes the ma
 | pod start wait, total (s) | 13.8 | 8.6 | -37.7% | -14.31 to +3.909 | no |
 | pod start wait, mean (s) | 3.135 | 2.07 | -34.0% | -2.465 to +0.3349 | no |
 
-### B with the bowl law (`--law bowl`, as wired at `d46c959`: mean response in the window, center 0.4) against native
+### B with the compass law (`--law compass`, as wired at `d46c959`: mean response in the window, center 0.4) against native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
@@ -83,6 +83,6 @@ declared standby power, which needs a node autoscaler that really removes the ma
 | pod start wait, total (s) | 13.8 | 6.5 | -52.9% | -14.66 to +0.06492 | no |
 | pod start wait, mean (s) | 3.135 | 1.45 | -53.7% | -2.74 to -0.6304 | yes, better |
 
-**Label of the bowl arm by the preregistered rule** (`docs/K8S_BOWL_PREREGISTRATION.md`): p95 not worse (the whole
+**Label of the compass arm by the preregistered rule** (`docs/K8S_COMPASS_PREREGISTRATION.md`): p95 not worse (the whole
 interval below 0), failed requests not higher, machines in service down with the whole interval below 0:
 **better on machines within the band**.

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The two-wire GPU governor (omni_controller/gpu_bowl.py) against the stand-in nvidia-smi (tests/fake_gpu/nvidia-smi),
+"""The two-wire GPU governor (omni_controller/gpu_compass.py) against the stand-in nvidia-smi (tests/fake_gpu/nvidia-smi),
 on a card its own power limit holds at 900 MHz while busy (top clock 1695 MHz), with calm response times:
 
   learn     until the card's own busy clock and draw are learned, neither wire moves below where the card is
@@ -9,14 +9,14 @@ on a card its own power limit holds at 900 MHz while busy (top clock 1695 MHz), 
             slower than native; the lid never goes under the card's own busy draw plus headroom
   race      a saturated card (work waiting) runs at full speed, ceiling at the top and the lid at the start; it is not a
             fail-up, and it is where the card's own level is learned
-  pace      at partial load with calm response times the bowl lowers the ceiling, never under the learned busy clock
+  pace      at partial load with calm response times the compass lowers the ceiling, never under the learned busy clock
   hot       response times past the line: fail up, ceiling to the top and the lid to the start limit
   restore   clocks reset and the start limit back at the end
 """
 import json, os, sys, tempfile, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from omni_controller.gpu_bowl import GpuBowl, parser
+from omni_controller.gpu_compass import GpuCompass, parser
 SMI = str(ROOT / "tests" / "fake_gpu" / "nvidia-smi")
 
 
@@ -37,7 +37,7 @@ def gov(tmp, lat):
     a = parser().parse_args(["--mode", "cap", "--gpus", "0", "--smi", SMI, "--interval", "1", "--audit", str(Path(tmp) / "a.jsonl"),
                              "--kill-file", str(Path(tmp) / "kill"), "--latency-file", str(lat), "--slo-ms", "800",
                              "--floor-w", "105", "--learn-samples", "5"])
-    return GpuBowl(a)
+    return GpuCompass(a)
 
 
 def decisions(tmp):

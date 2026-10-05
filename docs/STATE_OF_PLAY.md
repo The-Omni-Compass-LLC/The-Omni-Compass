@@ -42,7 +42,7 @@ idle, 10 pairs), the Azure burst bill test, and the 1,000-copy grid of the six o
 
 ## The engine now, and what runs on it (2026-10-05)
 
-The live controller is frozen at rules 1-8 (`docs/K8S_BOWL_PREREGISTRATION.md`, amendments 1-8): rules 5-8 were added
+The live controller is frozen at rules 1-8 (`docs/K8S_COMPASS_PREREGISTRATION.md`, amendments 1-8): rules 5-8 were added
 today (a pinned gauge is not a steady demand; coasting; cruise; the emergency brake). Every result above was measured on
 an earlier version of the controller, and each names its commit. So that every number comes from one engine, the whole
 Kubernetes suite runs again on the frozen engine: all four in one run, demand that wanders, the steady same-work set,
@@ -99,12 +99,12 @@ rate, so both arms were given **the same work**.
 |---|---:|---:|---:|---:|---|
 | Set 25, the engine's allocation law | **−32.3%** | **−57.3%** | 0 / 0 | −0.6% (not significant) | `results/live/LIVE_REPS_25.md` |
 | Set 26, the engine's allocation law | **−35.8%** | **−55.4%** | 0 / 0 | −1.5% (not significant) | `results/live/LIVE_REPS_26.md` |
-| Set 26, **the bowl law in the live controller** | **−17.2%** | **−64.8%** | 0 / 0 | +1.0% (not significant) | same; label by the preregistered rule: **better on machines within the band** |
+| Set 26, **the compass law in the live controller** | **−17.2%** | **−64.8%** | 0 / 0 | +1.0% (not significant) | same; label by the preregistered rule: **better on machines within the band** |
 | Set 27, the engine's allocation law | **−36.6%** | **−53.1%** | 0 / 0 | −0.0% (not significant) | `results/live/LIVE_REPS_27.md` |
-| Set 27, **the bowl law aligned with the GPU governor** | **−15.9%** | **−65.5%** | 0 / 0 | +0.2% (not significant) | same; label by the preregistered rule: **better on machines within the band** |
+| Set 27, **the compass law aligned with the GPU governor** | **−15.9%** | **−65.5%** | 0 / 0 | +0.2% (not significant) | same; label by the preregistered rule: **better on machines within the band** |
 
-Set 27 (running): the bowl in the live controller reads the service as the corrected GPU bowl does (mean response time,
-center 0.4), against native and the allocation law (`docs/K8S_BOWL_PREREGISTRATION.md`).
+Set 27 (running): the compass in the live controller reads the service as the corrected GPU compass does (mean response time,
+center 0.4), against native and the allocation law (`docs/K8S_COMPASS_PREREGISTRATION.md`).
 
 ## Measured on a real GPU: the card's own meter (evidence class P)
 
@@ -130,8 +130,8 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | Result | Where |
 |---|---|
 | GPU governor with share floor and busy gate (one wire, the power limit), MLPerf-calibrated card: +5.1% and +1.3% work per kJ, p95 within +10% | `results/gpu/sim/after` |
-| **Two-wire GPU card under the bowl law, corrected governor** (amendments 6-7), 10 seeds and 10 fresh seeds, geometric means: **service** profile work per energy **+6.9% / +3.8%**, energy −6.4% / −3.7%, p95 **−5.9% / −2.3%** (faster), time over the line −0.03 / −0.04 pp; **batch** profile +8.1% / +4.2%, p95 +7.0% / −2.3%; the one-wire governor +0.1%; both wires restored every seed | `results/sim/gpu_two_wire/RESULT.md`, `fresh/` |
-| **The six organisms** (Compute 345, Physics 262, Energy 282, Distribution 337, the four stacked 1,226, the whole tower 656), native against the bowl law on every muscle, 1,000 paired runs at 1× and at 10× size: work per energy +0.20% to +0.30%, energy −0.21% to −0.32%, work −0.01% to −0.02%, time over the service line **+0.19 to +0.27 pp in every cell (band first not held)**, every knob handed back. 100× and 1,000× are running | `results/scale/GRID.md` |
+| **Two-wire GPU card under the compass law, corrected governor** (amendments 6-7), 10 seeds and 10 fresh seeds, geometric means: **service** profile work per energy **+6.9% / +3.8%**, energy −6.4% / −3.7%, p95 **−5.9% / −2.3%** (faster), time over the line −0.03 / −0.04 pp; **batch** profile +8.1% / +4.2%, p95 +7.0% / −2.3%; the one-wire governor +0.1%; both wires restored every seed | `results/sim/gpu_two_wire/RESULT.md`, `fresh/` |
+| **The six organisms** (Compute 345, Physics 262, Energy 282, Distribution 337, the four stacked 1,226, the whole tower 656), native against the compass law on every muscle, 1,000 paired runs at 1× and at 10× size: work per energy +0.20% to +0.30%, energy −0.21% to −0.32%, work −0.01% to −0.02%, time over the service line **+0.19 to +0.27 pp in every cell (band first not held)**, every knob handed back. 100× and 1,000× are running | `results/scale/GRID.md` |
 | Speed lock (speed won elsewhere spent on GPU watts) | `results/gpu/sim/pipeline/` |
 | CPU and GPU on one conserved power budget: +1.4% to +5.7% work served against a fixed cap, never over the budget | `results/hardware/NODE_EXCHANGE_*.json`, `docs/CONVEYANCE_LAW.md` |
 | GPU groups sharing a site budget: 0 minutes over the budget | `results/hardware/SITE_EXCHANGE_HELDOUT_*.json` |
@@ -149,7 +149,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 
 ## Open
 
-1. **Band first.** In every organism and every size the bowl law raises the time over the service line by about 0.2
+1. **Band first.** In every organism and every size the compass law raises the time over the service line by about 0.2
    points. The rule is no win unless that is at or under native's. This is the first thing to fix in the law.
 2. **The first real-hardware run:** `sudo bash scripts/gpu_rented_run.sh` on a rented NVIDIA machine (smoke, then the
    10 preregistered repetitions, `docs/GPU_RUN_GUIDE.md`), or the gpu-bench workflow on GitHub's GPU runner. Then a

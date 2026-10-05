@@ -13,8 +13,8 @@ counted in the organism's receipt.
 
 Arms, the same organism, the same seed, the same request stream:
   native  the stacks' own controllers and the card's own firmware, no Omni
-  omni    one engine on everything: the bowl law (omnicompass/bowl.py) on every simulated muscle (realms/bowl_arm.py)
-          and on the card's two wires (omni_controller/gpu_bowl.py); at 90% of the arm every knob and both wires are
+  omni    one engine on everything: the compass law (omnicompass/compass_law.py) on every simulated muscle (realms/compass_arm.py)
+          and on the card's two wires (omni_controller/gpu_compass.py); at 90% of the arm every knob and both wires are
           handed back, and the harness checks they were
 
 Sizes (--scales, default 1,10,100,1000): each organism is run as 1, 10, 100 and 1,000 copies governed together on one
@@ -52,7 +52,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import catalog, Body, KILL_AT, T95, label  # noqa: E402
-from realms.bowl_arm import bowl_apply  # noqa: E402
+from realms.compass_arm import compass_apply  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
 
 REALMS = ("compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized")
@@ -115,7 +115,7 @@ def per_muscle_step_s():
     for _ in range(5):
         body.couple()
         for p, knob in zip(body.plants, body.knobs):
-            bowl_apply(p, knob)
+            compass_apply(p, knob)
         body.step()
     return (time.time() - t) / 5 / len(rows)
 
@@ -138,7 +138,7 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
     work = subprocess.Popen(wl, stdout=open(d / "workload.log", "w"), stderr=subprocess.STDOUT)
     gov = None
     if arm == "omni":
-        gov = subprocess.Popen([sys.executable, "-m", "omni_controller.gpu_bowl", "--mode", "cap", "--gpus", str(a.gpu),
+        gov = subprocess.Popen([sys.executable, "-m", "omni_controller.gpu_compass", "--mode", "cap", "--gpus", str(a.gpu),
                                 "--smi", a.smi, "--interval", str(a.interval), "--audit", str(d / "audit.jsonl"),
                                 "--kill-file", str(d / "kill"), "--latency-file", str(d / "latency.csv"),
                                 "--slo-ms", str(slo_ms), "--floor-w", str(a.floor_w)], cwd=ROOT,
@@ -158,7 +158,7 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
                 if k >= kill_at:
                     p.override = {}
                     continue
-                v = bowl_apply(p, knob)
+                v = compass_apply(p, knob)
                 if v and v != last.get(id(p)):
                     writes += 1
                 last[id(p)] = v
@@ -350,7 +350,7 @@ def main(argv=None):
          f"repetitions by size {reps_of}, seeds from {SEED0}, {ORGANISM_STEPS} steps per arm; step length by size and organism "
          f"(seconds, measured on this machine): {steps_of}. Card: {'SIMULATED (fake nvidia-smi)' if a.sim else 'the real GPU, its own meter'}; "
          f"start power limit {start_w} W; response-time line {slo_ms} ms (ten bare service times). One engine on everything "
-         "in the Omni arm: the bowl law on every simulated muscle and on the card's two wires. Harness `tools/run_hil.py`.", "",
+         "in the Omni arm: the compass law on every simulated muscle and on the card's two wires. Harness `tools/run_hil.py`.", "",
          "The simulated stacks are models (evidence S). The card's energy and requests are its own meter (evidence P). "
          "Work per energy: (work Omni / work native) / (energy Omni / energy native) - 1; for the stacks work is the mean "
          "over plants of each plant's ratio; *both* counts the card as one more plant and adds its joules.", "",

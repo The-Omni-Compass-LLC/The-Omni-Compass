@@ -6,7 +6,7 @@
 This connects GitHub to an Azure account so the workflow `aks-metered` can build a real Azure Kubernetes Service
 cluster, run native Kubernetes (with Azure's own cluster autoscaler) against the same with Omni-Compass on top, count
 the machines Azure bills every 15 seconds, and delete everything when it is done. The design is written before the
-run in `docs/K8S_BOWL_PREREGISTRATION.md`, "The bill on a real cloud". It costs about USD 10 to 30 of Azure time; a new
+run in `docs/K8S_COMPASS_PREREGISTRATION.md`, "The bill on a real cloud". It costs about USD 10 to 30 of Azure time; a new
 account's free credit usually covers it. About ten minutes, once.
 
 ## 1. An Azure account
@@ -47,7 +47,7 @@ That block is a password for this one purpose; never paste it anywhere but the G
 ## 5. Run it
 
 **Actions** tab, then **aks-metered** on the left, then **Run workflow**, then the green **Run workflow** button. The
-defaults are the preregistered design (5 repetitions, native / bowl / omni, 900 measured seconds, Standard_D2s_v5 in
+defaults are the preregistered design (5 repetitions, native / compass / omni, 900 measured seconds, Standard_D2s_v5 in
 eastus). About 6 hours on GitHub. Each cluster is deleted when its arm ends, and the resource group at the end of every
 repetition whatever happens, so nothing keeps billing.
 

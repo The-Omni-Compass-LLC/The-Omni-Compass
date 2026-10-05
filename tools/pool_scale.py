@@ -30,7 +30,7 @@ def main(out, *paths):
     total = max(len(v) for v in per.values())
     L = [f"# Six organisms at {scale}x size, up to {total} runs (pooled from {len(files)} shards)", "",
          f"Evidence class **S** (models). Commit(s) {', '.join(sorted(commits))}. Native: each organism's own controllers. "
-         "Omni: the bowl law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 "
+         "Omni: the compass law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 "
          "are nested. Band first: no win unless the time over the service line is no higher than native's.", ""]
     summ = {}
     for n in [x for x in (1, 10, 100, 1000) if x <= total]:

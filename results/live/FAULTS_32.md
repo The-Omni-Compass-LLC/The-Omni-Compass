@@ -1,13 +1,13 @@
 # The fault test on kind, set 32 F: run again under the amendment of 2026-10-03 evening, 10 paired repetitions
 
-Source: GitHub Actions workflow `benchmark-reps` (`faults` 1, arms native / omni / bowl, order rotated, 900 measured
+Source: GitHub Actions workflow `benchmark-reps` (`faults` 1, arms native / omni / compass, order rotated, 900 measured
 seconds per arm, open-loop load), run 37162459956, commit `199f350`, 2026-10-04, job `aggregate` (job 111327606574).
 Transcribed from the job's printed receipt; artifact `live-reps` (zip SHA-256
 `6ee05b4889a9690ab3252488e5917f545a651a079edcf44ae2a6201e415c464d`). The same four faults at the same moments of every
 arm (`scripts/kind_faults.sh`). Evidence class **L**.
 
 **Result. No measure is significantly worse than native under either law.** The amendment leaves the fault behaviour
-intact (set 31 F, `FAULTS_31.md`): the bowl law recovers from a lost machine 58% faster, starts 34% fewer pods, and
+intact (set 31 F, `FAULTS_31.md`): the compass law recovers from a lost machine 58% faster, starts 34% fewer pods, and
 cuts the 95th percentile by 61%, failed requests by 12.9% and time over the line by 27.6%. The 99th percentile reads
 higher in both arms with intervals far across zero, as in set 31 F.
 
@@ -17,16 +17,16 @@ higher in both arms with intervals far across zero, as in set 31 F.
 |---|---|---:|---:|---:|
 | machine down | native | 98 | 16.0 |  |
 | machine down | omni | 45 | 9.1 | -53 s (-54%) |
-| machine down | bowl | 41 | 9.8 | -57 s (-58%) |
+| machine down | compass | 41 | 9.8 | -57 s (-58%) |
 | spike | native | 277 | 68.7 |  |
 | spike | omni | 256 | 45.7 | -21 s (-8%) |
-| spike | bowl | 269 | 65.8 | -8 s (-3%) |
+| spike | compass | 269 | 65.8 | -8 s (-3%) |
 | runaway pod started | native | 130 | 11.7 |  |
 | runaway pod started | omni | 82 | 5.6 | -48 s (-37%) |
-| runaway pod started | bowl | 116 | 9.7 | -14 s (-11%) |
+| runaway pod started | compass | 116 | 9.7 | -14 s (-11%) |
 | probe blind | native | 62 | 0.1 |  |
 | probe blind | omni | 60 | 0.1 | -2 s (-3%) |
-| probe blind | bowl | 60 | 0.1 | -2 s (-4%) |
+| probe blind | compass | 60 | 0.1 | -2 s (-4%) |
 
 ## B: the allocation law vs native, whole run with the faults
 
@@ -52,7 +52,7 @@ higher in both arms with intervals far across zero, as in set 31 F.
 | pod start wait, total (s) | 26.9 | 5.1 | -81.0% | -45.33 to +1.726 | no |
 | pod start wait, mean (s) | 5.841 | 1.511 | -74.1% | -9.464 to +0.8035 | no |
 
-## B with the bowl law vs native, whole run with the faults
+## B with the compass law vs native, whole run with the faults
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

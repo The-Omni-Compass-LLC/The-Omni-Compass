@@ -97,7 +97,7 @@ def main():
     L = ["# The 656 Muscles: What Each Is For, and How It Is Wired", "", BANNER, "",
          "A **muscle** is one setting on one machine that already has its own control: a replica target, a node pool's size, "
          "a GPU's clock ceiling, a chiller's setpoint, a battery's reserve, a joint's effort. Omni-Compass does not replace "
-         "that control. It reads the machine's meters, computes one bounded force with the bowl law, and moves the setting "
+         "that control. It reads the machine's meters, computes one bounded force with the compass law, and moves the setting "
          "the machine already accepts, through a plug that reads the setting once before the first write, reads back every "
          "write, steps aside if another controller moves it, and puts it back at the end.", "",
          "This chapter lists all 656 muscles of the catalog (`realms/catalog.csv`). For each one it says what kind of machine "

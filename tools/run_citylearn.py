@@ -11,10 +11,10 @@ is the native arm: it charges and discharges every battery by the hour of the da
 
 Arms, the same district, the same year, the same weather and loads:
   native  CityLearn's BasicRBC alone
-  omni    the same BasicRBC, with the bowl law (omnicompass/bowl.py) on top of its electric battery commands only (a
+  omni    the same BasicRBC, with the compass law (omnicompass/compass_law.py) on top of its electric battery commands only (a
           cold or hot water tank is a thermal muscle with its own reading and stays native). The reading is the
           district's draw without its batteries the hour before (the demand the batteries answer, not their own effect); its band is the 10th to the 90th percentile of the
-          past week's draw (causal: only hours already seen). The bowl's force moves every battery command the same way:
+          past week's draw (causal: only hours already seen). The compass's force moves every battery command the same way:
           a positive force (the district drawing hard) pushes toward discharge, a negative force (a quiet district)
           toward charge, by at most GAIN of the command's range, always inside the battery's own limits [-1, 1]. At
           KILL_AT of the year Omni-Compass hands every command back to the native controller, and the file checks it did
@@ -42,13 +42,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from omnicompass.bowl import Band, Bowl  # noqa: E402
+from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
 
 import os
-GAIN = float(os.environ.get("CL_GAIN", 0.5))   # the most the bowl moves a battery command, as a share of its range
+GAIN = float(os.environ.get("CL_GAIN", 0.5))   # the most the compass moves a battery command, as a share of its range
 # the three settings below were chosen on the tuning district (citylearn_challenge_2022_phase_1) only and frozen before
 # any other district ran (docs/CITYLEARN_PREREGISTRATION.md)
-TAU = float(os.environ.get("CL_TAU", 1.0))     # the battery's response the bowl is damped for (hours)
+TAU = float(os.environ.get("CL_TAU", 1.0))     # the battery's response the compass is damped for (hours)
 SLEW = float(os.environ.get("CL_SLEW", 0.05))  # the most Omni-Compass's adjustment may change in one hour
 WINDOW_H = 168      # the band's window: the past week of hourly draw
 KILL_AT = 0.9       # Omni-Compass hands every command back at 90% of the year
@@ -90,9 +90,9 @@ def run_arm(schema, arm):
     obs, _ = env.reset()
     steps = env.time_steps
     kill = int(KILL_AT * steps)
-    bowl = None
+    compass_law = None
     hist, moved, handed_back, off = [], 0, True, 0.0
-    # one wire, one muscle: the bowl steers only the electric batteries from the district's electricity reading; a cold
+    # one wire, one muscle: the compass steers only the electric batteries from the district's electricity reading; a cold
     # or hot water tank (cooling_storage, dhw_storage) is a thermal muscle that needs its own reading and stays native
     names = [n for agent in env.action_names for n in agent]
     battery = [n == "electrical_storage" for n in names]
@@ -100,7 +100,7 @@ def run_arm(schema, arm):
     while not env.terminated:
         a = agent.predict(obs)
         if arm == "omni":
-            # demand the batteries do not cause: the district's draw without storage, the hour before (the bowl reads the
+            # demand the batteries do not cause: the district's draw without storage, the hour before (the compass reads the
             # room, not its own heater: a reading that includes the battery feeds every battery move straight back)
             seen = len(env.net_electricity_consumption)
             ws = env.net_electricity_consumption_without_storage
@@ -112,10 +112,10 @@ def run_arm(schema, arm):
                 lo, hi = percentile(w, 0.10), percentile(w, 0.90)
                 if hi - lo > 1e-9:
                     band = Band(lo, hi)
-                    if bowl is None:
-                        bowl = Bowl(band, dt=1.0, tau=TAU)
-                    bowl.band = band
-                    f = bowl.force(hist[-1])
+                    if compass is None:
+                        compass_law = CompassLaw(band, dt=1.0, tau=TAU)
+                    compass_law.band = band
+                    f = compass_law.force(hist[-1])
                     off += max(-SLEW, min(SLEW, -GAIN * f - off))   # the adjustment glides, never jumps more than SLEW
                     if abs(off) > 1e-12:
                         flat = [x for row in a for x in row]
@@ -181,7 +181,7 @@ def main(argv=None):
     L = ["# Omni-Compass on top of CityLearn's own controller", "",
          f"CityLearn {version} (Intelligent Environments Lab, University of Texas at Austin; MIT license): an "
          "independent simulator of real buildings from measured data, with its own controllers and its own scoring. "
-         "Native: CityLearn's rule-based battery controller (BasicRBC). Omni: the same controller with the bowl "
+         "Native: CityLearn's rule-based battery controller (BasicRBC). Omni: the same controller with the compass "
          f"law on top of its battery commands (gain {GAIN}, response {TAU} h, glide {SLEW} an hour, band from the past week's district draw, handed back at "
          f"{int(KILL_AT * 100)}% of the year). Every number is CityLearn's own score: the controller over no battery at "
          "all, lower is better for every row. Evidence class: an independent recognized simulator (not our model).", ""]

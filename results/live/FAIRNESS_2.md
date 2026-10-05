@@ -1,17 +1,17 @@
 # The fairness test, run again under the amendment of 2026-10-03 evening, 10 paired repetitions
 
-Source: GitHub Actions workflow `benchmark-reps` (`two_app` 1, arms native / omni / bowl, order rotated, 900 measured
+Source: GitHub Actions workflow `benchmark-reps` (`two_app` 1, arms native / omni / compass, order rotated, 900 measured
 seconds per arm, open-loop load, the neighbour's load 0, 0, 6, 0, 6, 0 generators), run 37162458834, commit `199f350`,
 2026-10-04, job `aggregate` (job 111327654178). Transcribed from the job's printed receipt; artifact `live-reps` (zip
 SHA-256 `73bb69ca72e6fec291e184aed577efde60194719a4628c6a44b7aeef36d35451`). Under the amendment only php-apache's HPA
 (the service the probe measures, `--sensed default/php-apache`) is moved; the neighbour's stays at the operator's
 target. Evidence class **L**.
 
-**Result.** **The bowl law's failure problem is gone:** php-apache's failed requests 2.91% against native's
+**Result.** **The compass law's failure problem is gone:** php-apache's failed requests 2.91% against native's
 3.38% (−14.0%, not significant; first run +26.0%, significant), pending pods −10.5% (first run +65.2%). **The
-neighbour is unharmed** under both laws (no row significant). With the neighbour's HPA left to the operator, the bowl
+neighbour is unharmed** under both laws (no row significant). With the neighbour's HPA left to the operator, the compass
 law's response-time gains in this test are no longer significant. **Still worse under both laws: the mean pod start
-wait, +1.1 s with the bowl law (1.99 to 3.09 s) and +1.7 s with the allocation law.** By the one rule neither arm is
+wait, +1.1 s with the compass law (1.99 to 3.09 s) and +1.7 s with the allocation law.** By the one rule neither arm is
 labelled better while that row stands. The allocation law: response times −35% to −45%, time over the line −39%, on
 9.1% fewer machines in service.
 
@@ -43,7 +43,7 @@ labelled better while that row stands. The allocation law: response times −35%
 | second app: time over the response line (% of samples) | 14.7 | 15.22 | +3.5% | -0.2167 to +1.247 | no |
 | second app: failed requests (%) | 12.43 | 13.02 | +4.8% | -0.06773 to +1.255 | no |
 
-## B with the bowl law vs native
+## B with the compass law vs native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

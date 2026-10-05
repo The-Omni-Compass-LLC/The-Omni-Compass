@@ -17,7 +17,7 @@ verdict is how the brain finds that out, on the muscle itself, before it acts an
             tolerance) and the step is allowed; higher and it is refused, the knob goes back, and that step is not tried
             again until recheck decisions have passed (the work may have changed). A trial that sees the service leave
             calm is abandoned, and the knob goes back at once
-  allowed   the bowl may move the knob only between native and the deepest allowed step; where no step is allowed, the
+  allowed   the compass may move the knob only between native and the deepest allowed step; where no step is allowed, the
             verdict is "left native" and the knob is never moved
 
   stepwise  for a knob that is slow to move back (a machine given back takes minutes to return), incremental=True runs
@@ -71,7 +71,7 @@ class Verdict:
         self.phase, self.trial, self.ref, self.got = None, None, [], []
 
     def tick(self, calm):
-        """One decision. calm: the service is inside its bowl and nothing waits (a trial is never run under stress).
+        """One decision. calm: the service is inside its compass and nothing waits (a trial is never run under stress).
         Returns (the step the knob must stand at during a trial, or the deepest step the law may use; is_trial; event).
         The event, if any, is for the audit."""
         self.t += 1

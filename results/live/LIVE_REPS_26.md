@@ -1,4 +1,4 @@
-# Repeated live runs on kind, set 26: native, Omni-Compass on top with the engine's allocation law, and with the bowl law, 10 paired repetitions
+# Repeated live runs on kind, set 26: native, Omni-Compass on top with the engine's allocation law, and with the compass law, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps`, run 37058424766, commit `e7f920d`, 2026-10-02, job `aggregate`
 (`python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds per arm. Transcribed
@@ -28,7 +28,7 @@ Kubernetes software on kind; energy is a declared model, not a meter: every work
 | pod start wait, total (s) | 13 | 7.4 | -43.1% | -14.3 to +3.097 | no |
 | pod start wait, mean (s) | 2.93 | 2.01 | -31.4% | -2.329 to +0.4885 | no |
 
-### B with the bowl law (`--law bowl`, as wired at `e7f920d`: p95 over the SLO, center 0.5) against native
+### B with the compass law (`--law compass`, as wired at `e7f920d`: p95 over the SLO, center 0.5) against native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
@@ -51,6 +51,6 @@ Kubernetes software on kind; energy is a declared model, not a meter: every work
 | pod start wait, total (s) | 13 | 2.9 | -77.7% | -18.11 to -2.089 | yes, better |
 | pod start wait, mean (s) | 2.93 | 1.383 | -52.8% | -2.998 to -0.09574 | yes, better |
 
-**Label of the bowl arm by the preregistered rule** (`docs/K8S_BOWL_PREREGISTRATION.md`): p95 not worse (the whole
+**Label of the compass arm by the preregistered rule** (`docs/K8S_COMPASS_PREREGISTRATION.md`): p95 not worse (the whole
 interval below 0), failed requests not higher, machines in service down with the whole interval below 0:
 **better on machines within the band**.

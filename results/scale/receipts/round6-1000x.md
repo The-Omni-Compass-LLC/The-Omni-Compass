@@ -1,6 +1,6 @@
 # Six organisms at 1000x size, up to 10 runs (pooled from organism-sized shards)
 
-Evidence class **S** (models). Commit(s) 9cef8d3. Native: each organism's own controllers. Omni: the bowl law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 are nested. Band first: no win unless the time over the service line is no higher than native's.
+Evidence class **S** (models). Commit(s) 9cef8d3. Native: each organism's own controllers. Omni: the compass law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 are nested. Band first: no win unless the time over the service line is no higher than native's.
 
 Source: GitHub Actions workflow `six`, run 37113091348 (#124), job `receipts` 111216853181, transcribed from the job's printed receipt; the run's artifact `six-receipts` (zip SHA-256 `47f6f366d846b7ae3816187dcf83a856b467c87f836f0cc397cc66932624c9bb`) holds the same table.
 

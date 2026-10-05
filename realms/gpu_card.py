@@ -24,9 +24,9 @@ The work
 
 The arms: each base alone, and the same base with Omni-Compass on top (Omni never runs the card itself)
   native    the card as shipped: power limit 150 W, clock ceiling at the top, firmware alone
-  omni      native + Omni-Compass on top, through two wires (omnicompass/bowl.py): the clock ceiling is the up wire (how
+  omni      native + Omni-Compass on top, through two wires (omnicompass/compass_law.py): the clock ceiling is the up wire (how
             high boost may push), the power limit is the down wire (the lid, set just above what the ceiling draws,
-            never under the card's own busy draw). The bowl's reading is the response time as a position between the
+            never under the card's own busy draw). The compass's reading is the response time as a position between the
             bare service time (0) and the service line (1); the brain pulls it to the center. The verdict
             (omnicompass/verdict.py) decides how far the ceiling may go: a step down is allowed only after a paired
             trial shows it costs each request at most ALLOW of the card's own time on it; where no step passes, the
@@ -40,7 +40,7 @@ import math
 import random
 from typing import Dict
 
-from omnicompass.bowl import Band, Bowl, Plug, clamp
+from omnicompass.compass_law import Band, CompassLaw, Plug, clamp
 from omnicompass.verdict import Verdict
 
 TICK = 0.02                 # firmware period, s
@@ -54,8 +54,8 @@ T_SLOW = 87.0
 MU = 100.0                  # requests per second at the top clock
 LIMIT_DEFAULT, LIMIT_MIN = 150.0, 105.0
 SLO_S = 10.0 / MU           # the service line: ten bare service times (as the GPU bench sets it)
-# the law of omni_controller/gpu_bowl.py (docs/GPU_PREREGISTRATION.md, amendment 8): up and down gains (share of the top
-# clock per unit of force), the bowl's center, the speed floor (a share of the card's own busy clock), the verdict's
+# the law of omni_controller/gpu_compass.py (docs/GPU_PREREGISTRATION.md, amendment 8): up and down gains (share of the top
+# clock per unit of force), the compass's center, the speed floor (a share of the card's own busy clock), the verdict's
 # allowance (the most a step may add to the card's own time on a request) and how often it runs a trial (decisions)
 UP, DOWN, CENTER, FLOOR, ALLOW, PROBE_EVERY = 0.10, 0.0125, 0.4, 1.0, 0.02, 8
 OMNI = ("omni", "cap_omni")
@@ -147,7 +147,7 @@ class CeilingPlug(Plug):
         self.card = card
 
     def _read_service(self):
-        """The service as a position in its bowl: response time only (bare service time 0, the line 1). A busy card is
+        """The service as a position in its compass: response time only (bare service time 0, the line 1). A busy card is
         doing its work; being busy is not a breach and is not read as one."""
         w = self.card.window
         return (sum(w) / len(w) - 1.0 / MU) / (SLO_S - 1.0 / MU) if w else 0.0
@@ -187,7 +187,7 @@ def run(seed: int, arm: str, duration: float = 600.0, memb: float = 0.0) -> Dict
     if arm in OMNI:
         up, down = CeilingPlug(card), LimitPlug(card, top=base_limit)
         up.attach(); down.attach()
-        brain = Bowl(Band(lo=0.0, hi=1.0, center=CENTER), dt=DECIDE, tau=2.0, kp=1.0, authority=1.0, smooth=0.3)
+        brain = CompassLaw(Band(lo=0.0, hi=1.0, center=CENTER), dt=DECIDE, tau=2.0, kp=1.0, authority=1.0, smooth=0.3)
         brain.kd *= 3.0                                  # the push: three times the damping that only stops the slosh,
                                                          # so a rising load is met before it reaches the wall
         vd = Verdict(tolerance=ALLOW, probe_every=PROBE_EVERY)
@@ -221,7 +221,7 @@ def run(seed: int, arm: str, duration: float = 600.0, memb: float = 0.0) -> Dict
                     c = up.write(max(0.3, min(1.0, f_nat)))
                 elif brain.p >= brain.band.wall_high or saturated:
                     # fail up past the wall; and race while work waits (the card saturated: a queue is forming), so a
-                    # burst is always served at full speed; the bowl paces only the slack between bursts
+                    # burst is always served at full speed; the compass paces only the slack between bursts
                     c = up.write(1.0)
                 elif trial:
                     c = up.write(1.0 - deepest * BIN)

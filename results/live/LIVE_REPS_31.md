@@ -1,11 +1,11 @@
-# Repeated live runs on kind, set 31: native, Omni-Compass on top with the allocation law, and with the bowl law and the verdict (the operator's HPA target at once when a fault is over; fail up from a blind sense or a lost machine is the operator's own target), 10 paired repetitions
+# Repeated live runs on kind, set 31: native, Omni-Compass on top with the allocation law, and with the compass law and the verdict (the operator's HPA target at once when a fault is over; fail up from a blind sense or a lost machine is the operator's own target), 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps`, run 37110007121, commit `0a38e76`, 2026-10-03, job `aggregate`
 (job 111175240710, `python tools/live_reps.py reps`), fixed-rate load, 900 measured seconds per arm. Transcribed from the job's
 printed receipt; the run's artifact `live-reps` (zip SHA-256 `7423ff466b76abb09aab03ff3f54e0f8c7616bdaf276f0f40af29619a48606f2`) holds the same tables.
 Evidence class **L** (real Kubernetes software on kind; energy is a declared model, not a meter).
 
-**No measure in either arm is significantly worse than native.** Total CPU including Omni-Compass's own: bowl −6.1%, allocation law −6.6%.
+**No measure in either arm is significantly worse than native.** Total CPU including Omni-Compass's own: compass −6.1%, allocation law −6.6%.
 
 ### B: the engine's allocation law against native
 
@@ -31,7 +31,7 @@ Evidence class **L** (real Kubernetes software on kind; energy is a declared mod
 | pod start wait, total (s) | 13.5 | 5.4 | -60.0% | -16.83 to +0.6311 | no |
 | pod start wait, mean (s) | 2.787 | 1.61 | -42.2% | -2.466 to +0.1124 | no |
 
-### B with the bowl law and the verdict against native
+### B with the compass law and the verdict against native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

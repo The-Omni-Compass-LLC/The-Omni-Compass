@@ -1,14 +1,14 @@
-# The cost to match on kind: native, native tuned harder by its operator (HPA target 40, 30, 20), and native with Omni-Compass on top (the allocation law; the bowl law with the verdict), 10 paired repetitions
+# The cost to match on kind: native, native tuned harder by its operator (HPA target 40, 30, 20), and native with Omni-Compass on top (the allocation law; the compass law with the verdict), 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps`, run 37094493912, commit `3866266`, 2026-10-03, job `aggregate`
 (job 111140097802, `python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds
 per arm, arms rotated in each repetition. Transcribed from the job's printed receipt; the run's artifact `live-reps`
 (zip SHA-256 `9bd1b4a41a23917d1a9e167f1b6ddfaafd76f82dbcd6c6d28a0d9042c0b6408d`) holds the same tables. Evidence class
 **L** (real Kubernetes software on kind; energy is a declared model, not a meter). Written before the run:
-`docs/K8S_BOWL_PREREGISTRATION.md`, the cost to match.
+`docs/K8S_COMPASS_PREREGISTRATION.md`, the cost to match.
 
 **The answer.** No native setting tried reached Omni-Compass's response time. Tuned all the way to HPA target 20
-(9.86 pods against native's 8.52), native's p95 is 346.6 ms; with Omni-Compass on top it is 123.5 ms (bowl law, 8.29
+(9.86 pods against native's 8.52), native's p95 is 346.6 ms; with Omni-Compass on top it is 123.5 ms (compass law, 8.29
 pods, fewer machines) and 149.4 ms (allocation law, 6.48 pods, 4.13 machines). Tuning the autoscaler buys a native
 cluster almost nothing; Omni-Compass on top cuts the p95 by about two thirds with fewer pods and fewer machines.
 
@@ -24,9 +24,9 @@ their own CPU is 0 and the column equals their CPU used (0.9728, 0.9596, 0.9567)
 | Native tuned, HPA target 30 | 348.9 | 546.7 | 9.733 | 0.9596 | 6 |
 | Native tuned, HPA target 20 | 346.6 | 570.1 | 9.86 | 0.9567 | 6 |
 | Omni on top | 149.4 | 220.6 | 6.484 | 0.9118 | 4.131 |
-| Omni on top, bowl law | 123.5 | 163.1 | 8.29 | 0.9332 | 5.797 |
+| Omni on top, compass law | 123.5 | 163.1 | 8.29 | 0.9332 | 5.797 |
 
-- Omni on top, bowl law (p95 123.5 ms): no native setting tried reached it; the lowest native p95 is 346.6 ms (Native tuned, HPA target 20).
+- Omni on top, compass law (p95 123.5 ms): no native setting tried reached it; the lowest native p95 is 346.6 ms (Native tuned, HPA target 20).
 - Omni on top (p95 149.4 ms): no native setting tried reached it; the lowest native p95 is 346.6 ms (Native tuned, HPA target 20).
 
 ## B: the engine's allocation law against native
@@ -52,7 +52,7 @@ their own CPU is 0 and the column equals their CPU used (0.9728, 0.9596, 0.9567)
 | pod start wait, total (s) | 13.1 | 8.4 | -35.9% | -12.84 to +3.442 | no |
 | pod start wait, mean (s) | 2.703 | 3.07 | +13.6% | -2.048 to +2.781 | no |
 
-## B with the bowl law and the verdict against native
+## B with the compass law and the verdict against native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

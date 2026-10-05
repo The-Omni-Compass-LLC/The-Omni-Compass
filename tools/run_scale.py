@@ -11,7 +11,7 @@
   5 the four stacked, every duplicate kept (1,226), one body on one clock
   6 the whole tower, every muscle once (656)
 
-Every organism runs native (its own controllers) and omni (the bowl law on every muscle, realms/bowl_arm.py) on the
+Every organism runs native (its own controllers) and omni (the compass law on every muscle, realms/compass_arm.py) on the
 same seed; --runs paired seeds (7000 on); --scale copies of the organism on one clock (each copy its own seeds), so
 10x is ten clusters of that organism governed together. Receipts: per organism, work per energy, work, energy and
 violations with their 95% intervals over runs, the label by the round-3 rule, and the raw per-run contrasts.
@@ -60,7 +60,7 @@ def job(args):
     key, scale, seed = args
     rows = rows_for(key, scale)
     nat = run_organism_arm(rows, seed, "native")
-    om = run_organism_arm(rows, seed, "bowl")
+    om = run_organism_arm(rows, seed, "compass")
     c = paired_organism(om, nat)
     c["restore_ok"] = om["restore_ok"]
     c["energy_native_j"] = sum(p["energy_j"] for p in nat["plants"])
@@ -92,7 +92,7 @@ def main(argv=None):
     L = [f"# Six organisms, {a.runs} runs, {a.scale}x size", "",
          f"Evidence class **S** (models). Commit `{commit[:12]}`, seeds {SEED0}-{SEED0 + a.runs - 1}, {a.scale} cop{'y' if a.scale == 1 else 'ies'} "
          f"of each organism on one clock, {time.time() - t0:.0f} s on {a.workers} workers. Native: each organism's own "
-         "controllers. Omni: the bowl law on every muscle (`realms/bowl_arm.py`). Harness `tools/run_scale.py`.", "",
+         "controllers. Omni: the compass law on every muscle (`realms/compass_arm.py`). Harness `tools/run_scale.py`.", "",
          "Band first (the founder's rule): no win unless the time over the service line is no higher than native's "
          "(violations, mean over runs, at or under 0 pp).", "",
          "| # | Organism | Muscles | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |",

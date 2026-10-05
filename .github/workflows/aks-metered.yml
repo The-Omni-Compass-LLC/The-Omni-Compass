@@ -3,7 +3,7 @@
 # Omni-Compass Enterprise License. See LICENSE.
 # The bill on a real cloud: native Kubernetes (Azure Kubernetes Service with its own cluster autoscaler) against the
 # same with Omni-Compass on top, the same work, the machines Azure bills counted every 15 s and priced at the list
-# price. Needs the repository secret AZURE_CREDENTIALS (docs/K8S_BOWL_PREREGISTRATION.md, the bill on a real cloud).
+# price. Needs the repository secret AZURE_CREDENTIALS (docs/K8S_COMPASS_PREREGISTRATION.md, the bill on a real cloud).
 # One repetition at a time (a new subscription's core quota), each cluster deleted when its arm ends; the resource
 # group is deleted at the end whatever happens.
 name: aks-metered
@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       reps: {description: "Paired repetitions", default: "5"}
-      arms: {description: "Arms, in rotation order", default: "native bowl omni"}
+      arms: {description: "Arms, in rotation order", default: "native compass omni"}
       duration_s: {description: "Measured seconds per arm", default: "900"}
       location: {description: "Azure region", default: "eastus"}
       vm_size: {description: "Worker machine size (Standard_D2s_v5 is no longer offered to this subscription in eastus)", default: "Standard_D2s_v4"}
@@ -59,7 +59,7 @@ jobs:
           [ "$code" = 0 ] || { echo "::error::repetition ${{ matrix.rep }} ended with exit $code"; exit "$code"; }
         env:
           REP: ${{ matrix.rep }}
-          ARMS: ${{ github.event.inputs.arms || 'native bowl omni' }}
+          ARMS: ${{ github.event.inputs.arms || 'native compass omni' }}
           DURATION: ${{ github.event.inputs.duration_s || '900' }}
           LOADGEN: open
           LOAD_STEPS: ${{ github.event.inputs.load_steps || '' }}

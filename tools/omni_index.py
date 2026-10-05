@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The Omni index: one number for more for the same, or the same for less (docs/K8S_BOWL_PREREGISTRATION.md).
+"""The Omni index: one number for more for the same, or the same for less (docs/K8S_COMPASS_PREREGISTRATION.md).
 
 Every measure of every test is turned into a ratio oriented so that above 1 is better for Omni-Compass:
 
@@ -45,16 +45,16 @@ BILLED = r"machines billed, machine-hours"
 SOURCES = [
     *[("Real Kubernetes (GitHub)", f"Set {n}: same work, ten pairs", f"LIVE_REPS_{n}.md", None,
        {"speed": P95, "machines": NODES, "energy": ENERGY}, "equal") for n in (22, 23, 24, 25, 26, 27)],
-    ("Real Kubernetes (GitHub)", "Capacity: load rising, ten pairs", "AMENDMENT_3_RUNS.md", r"### Capacity, B with the bowl law",
+    ("Real Kubernetes (GitHub)", "Capacity: load rising, ten pairs", "AMENDMENT_3_RUNS.md", r"### Capacity, B with the compass law",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
-    ("Real Kubernetes (GitHub)", "Fairness: a noisy neighbour, ten pairs", "FAIRNESS.md", r"^## omni \(bowl law\)",
+    ("Real Kubernetes (GitHub)", "Fairness: a noisy neighbour, ten pairs", "FAIRNESS.md", r"^## omni \(compass law\)",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
     ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs", "FAULTS.md",
-     r"^## omni \(bowl law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+     r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
     ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs", "ALL_FOUR.md",
-     r"^## (B with the bowl law|omni \(bowl law\))", {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
+     r"^## (B with the compass law|omni \(compass law\))", {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
     ("Real cloud (Azure AKS, billed)", "Steady load, Azure's autoscaler underneath, five pairs", "AKS_BILL.md",
-     r"## B with the bowl law", {"speed": P95, "machines": BILLED}, "equal"),
+     r"## B with the compass law", {"speed": P95, "machines": BILLED}, "equal"),
 ]
 ORGANISMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
              "organism_656", "stack_1226"]
@@ -100,7 +100,7 @@ def capacity(path):
     for label, cells in rows(path, r"^## (Capacity|The capacity test)"):
         if label == "native":
             n = num(cells[0])
-        if label == "bowl":
+        if label == "compass":
             return n, num(cells[0])
     return None
 

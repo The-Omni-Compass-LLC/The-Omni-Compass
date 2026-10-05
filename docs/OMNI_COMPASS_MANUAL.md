@@ -93,8 +93,8 @@ writes to a system is marked **WRITES**.
 
 **Part II - The Mechanism of Action**
 4. The Engine: Eight Equations and One Control Law
-5. The Closed Circle: Why It Cannot Leave Its Bowl
-6. The Bowl: Push, Pull and the Two Forces
+5. The Closed Circle: Why It Cannot Leave Its Compass
+6. The Compass: Push, Pull and the Two Forces
 7. The Two-Way Nervous System
 
 **Part III - The Harness: Plugs, Wires and the Wire Check**
@@ -236,11 +236,11 @@ Three rules for reading any receipt:
 | What | Measured gain *G* (same work) | Class | What a referee will ask |
 |---|---|---|---|
 | Kubernetes machine-hours, the allocation law | +45% to +61% (sets 29 to 31, cost to match) | L | native here has no node autoscaler and the cluster is ~4% busy: the AKS bill run and the capacity test answer this |
-| Kubernetes machine-hours, the bowl law with the verdict | +5% to +12% | L | the same |
+| Kubernetes machine-hours, the compass law with the verdict | +5% to +12% | L | the same |
 | Kubernetes CPU, Omni-Compass's own included | +5% to +8% | L | measured on real software |
 | Kubernetes response time, 95th percentile | 57% to 66% faster; no native setting tried reached it (cost to match) | L | measured |
 | Recovery from faults (machine lost, spike, runaway pod, blind probe) | faster than native from every fault, up to 49% | L | measured |
-| Energy per work, kind standby model | +8% (bowl) to +30% (allocation) | L, modelled | not a meter |
+| Energy per work, kind standby model | +8% (compass) to +30% (allocation) | L, modelled | not a meter |
 | Energy per work, six organisms, 1x to 1,000x | +0.08% to +0.19% | S | well-tuned native controllers in models leave little room |
 | Energy per work on a real GPU | the corrected law is measuring now on a real NVIDIA A10 and next on 8 cards | P | the decisive measurement |
 
@@ -255,7 +255,7 @@ On Kubernetes, Omni-Compass offers two laws, and a buyer chooses by what matters
 
 - **Efficiency mode** (the allocation law): the most machines given back (about a third fewer in service in sets 29 to
   31) with answers still about 60% faster than native;
-- **Service mode** (the bowl law with the verdict): the fastest answers (95th percentile about two thirds faster) and
+- **Service mode** (the compass law with the verdict): the fastest answers (95th percentile about two thirds faster) and
   fewer machines (about 10%).
 
 Both pass the one rule in every set since the fixes; neither is tuned to a benchmark after the fact. The laws are frozen
@@ -294,14 +294,14 @@ pulls U to its pole, harder the farther it is (the pull). The command is held un
 fourth-order Runge-Kutta step and U is never rewritten afterwards. Inside the authority limit, U converges to its pole
 at rate K_P; this is proved (`docs/TRACKING_THEOREM.md`).
 
-## 5. The Closed Circle: Why It Cannot Leave Its Bowl
+## 5. The Closed Circle: Why It Cannot Leave Its Compass
 
 The governing principle is the Unified Circle Principle:
 
     dX/dt = G(X),  X(0) in Omega
     G(X) . n(X) <= 0 on the boundary of Omega        (the flow points inward at the wall: nothing crosses)
-    grad L(X) . G(X) <= 0                            (the bowl's energy L only falls)
-    => lim X(t) in M*                                (every path settles in the bottom of the bowl)
+    grad L(X) . G(X) <= 0                            (the compass's energy L only falls)
+    => lim X(t) in M*                                (every path settles in the bottom of the compass)
 
 In control engineering the second line is the Nagumo condition for an invariant set and the third is a Lyapunov
 function. Together they mean: anything that starts inside the container stays inside it, for every disturbance up to a
@@ -319,15 +319,15 @@ side, Gamma and the pull inward on the other, the drive and the damping. The spi
 every path winds into. The ring closing on itself is the return: when Omni-Compass stops, every lever returns to where
 it began.
 
-## 6. The Bowl: Push, Pull and the Two Forces
+## 6. The Compass: Push, Pull and the Two Forces
 
-The bowl (`omnicompass/bowl.py`) is the law that carries the engine's push and pull to every muscle.
+The compass (`omnicompass/compass_law.py`) is the law that carries the engine's push and pull to every muscle.
 
 **Two bands.**
 - **The cover**, a knob's hard range (the device's or the operator's lowest and highest setting). Every write is
   clipped to it. Nothing Omni-Compass computes can set a knob outside it.
-- **The bowl**, the service reading as a position from 0 (calm) to 1 (the service line). Omni-Compass pulls that
-  position to the bottom of the bowl, the middle (0.5 by default; an operator may set it lower for extra margin). The
+- **The compass**, the service reading as a position from 0 (calm) to 1 (the service line). Omni-Compass pulls that
+  position to the bottom of the compass, the middle (0.5 by default; an operator may set it lower for extra margin). The
   walls run from 0.05 to 0.95; the last 5% on each side, 10% in all, is cushion.
 
 **The force.** F = A tanh((K_P (p - center) + K_D v) / A), where p is the position, v its rate of change, A the
@@ -338,7 +338,7 @@ authority.
   ringing. Overshoot is wasted energy: force spent going the wrong way and spent again coming back.
 - **Smooth, never a hammer:** tanh bends the force over into its maximum instead of slamming into a wall.
 - **Fail up:** past the 0.95 wall the up side goes to its full force at once and the down side may not act until the
-  position is back inside the bowl.
+  position is back inside the compass.
 
 **Two forces: antagonist pairs.** Like the muscles of an arm, every plug has an up side (adds capacity, power,
 cooling, speed) and a down side (takes it back), each with its own gain, because adding and taking back do not cost
@@ -357,12 +357,12 @@ gets its own lever:
 power limiter knocks the clock back each time the draw crosses the limit; on a busy card this happens many times a
 second, at the top of the clock range where each extra step of speed costs the most watts. With one wire (the power
 limit) a governor can only move the wall the boost pushes against. With two wires, the clock ceiling sets how high the
-boost may climb and the power limit becomes a lid that rarely needs to act: the card runs at the bottom of its bowl
+boost may climb and the power limit becomes a lid that rarely needs to act: the card runs at the bottom of its compass
 instead of fighting itself at the top.
 
 **What the card taught us.** Two rules make the difference between saving energy and spending the customer's time.
 First, *race while work waits*: when the card is saturated, both wires go to full at once, so a burst is always served
-at full speed; the bowl paces only the slack between bursts. Second, *never slower than the card on its own*: the
+at full speed; the compass paces only the slack between bursts. Second, *never slower than the card on its own*: the
 governor learns, from the card's own meter, the clock and the draw the card reaches by itself while busy, and never
 sets the clock ceiling or the lid under them. Without these rules the first real card saved 3.5% of its energy and
 made the slowest answers 58.5% slower; with them, the modelled card saves energy with the slowest answers at native
@@ -397,10 +397,10 @@ it did. Omni-Compass is wired the same way.
 
 **8.1 The plug (one design for every muscle).** Each plug has as many channels as its muscle has knobs. Every channel
 declares its cover (range), its direction (which way is "more"), its units and how fast it may move. Every plug keeps
-the same contract (`omnicompass/bowl.py`, `Plug`):
+the same contract (`omnicompass/compass_law.py`, `Plug`):
 
 1. **attach** - read the knob once, before any write: the snapshot. It never moves afterwards.
-2. **read** - the service reading, into the bowl.
+2. **read** - the service reading, into the compass.
 3. **write** - one value, clipped to the cover, then read back from the device.
 4. **one writer** - if the knob is found at a value Omni-Compass did not write, someone else owns it: Omni-Compass
    stops writing and leaves that value alone.
@@ -413,7 +413,7 @@ adapter. Status is stated plainly:
 | Standard | Muscles | Adapter status |
 |---|---|---|
 | Kubernetes API | HPAs, deployments, pods, nodes | **built** (`omni_controller/controller.py`, `muscles.py`) |
-| NVIDIA NVML / `nvidia-smi` | GPU clock ceiling, power limit | **built** (`omni_controller/gpu_bowl.py`, two wires; `gpu_governor.py`, one wire) |
+| NVIDIA NVML / `nvidia-smi` | GPU clock ceiling, power limit | **built** (`omni_controller/gpu_compass.py`, two wires; `gpu_governor.py`, one wire) |
 | Linux cpufreq, RAPL | CPU frequency ceiling, package watts | **built** (`--cpufreq-policy-root`, `--rapl-cmd`) |
 | Site meter, building controller by command | site watts, supply-air setpoint | **built** (`--power-cmd`, `--cooling-cmd` command templates) |
 | Cloud node groups (Karpenter, Cluster Autoscaler, MachineSet) | machines | **built** through `--node-scale-cmd` templates |
@@ -453,7 +453,7 @@ your first paired runs, before you believe any number, good or bad.
 | p95 and p99 response time | at native or faster | slower: the reading or the floors are wrong (rows below) |
 | GPU: the card's clock while busy | at or above the clock the card reaches on its own | below it: the speed floor is missing or the lid is under the card's own draw |
 | GPU: the lid while busy | at or above the card's own busy draw | at the envelope floor while busy: the lid is sized from a curve, not from the card's own meter |
-| GPU: credit per write (`GPU_REPS.md`) | bowl decisions pace the slack, race decisions cover the bursts; fail-up is rare | fail-up in most decisions: being busy is being read as a breach, or the service line is set too low |
+| GPU: credit per write (`GPU_REPS.md`) | compass decisions pace the slack, race decisions cover the bursts; fail-up is rare | fail-up in most decisions: being busy is being read as a breach, or the service line is set too low |
 | Kubernetes: machines given back | through the release gate, one per decision, with no pod waiting | machines given back while pods wait, or none at all while the service is far inside its band: check the latency feed, `--slo-ms` and the release gate's reasons in the audit |
 | Kubernetes: the reset | every HPA target, replica range, CPU limit and worker back to native, no record left | anything left: an earlier run or another controller wrote the same objects |
 | Every lever after the run | at its snapshot | not at its snapshot: another writer, or a restore that failed (exit 3): restore by hand and investigate |
@@ -546,9 +546,9 @@ Pass: p95, p99 and failed requests no worse than native, over paired runs (secti
 **Level 3 - The machines. WRITES.**
 1. Grant `patch nodes` and `patch pods` (`deploy/kind/rbac-omni.yaml`).
 2. Run with `--mode nodepool --active-nodes-only --closure /app/law/closure.json --node-scale-cmd "<command with {n}>"`
-   and `--node-restore-cmd "<command>"` for the OFF switch. For the bowl law on the same levers, use `--law bowl`
+   and `--node-restore-cmd "<command>"` for the OFF switch. For the compass law on the same levers, use `--law compass`
    (reads the mean response time of the latency window between a tenth of `--slo-ms` and `--slo-ms`, held at
-   `--bowl-center 0.4`; p95 at the SLO, a blind feed or a waiting pod adds capacity at once; the HPA target never goes
+   `--compass-center 0.4`; p95 at the SLO, a blind feed or a waiting pod adds capacity at once; the HPA target never goes
    above the operator's; machines go back one at a time through the release gate).
 
 | Your platform | The park/wake command |
@@ -571,10 +571,10 @@ Pass: as level 3.
 ```
 sudo python3 tools/gpu_wire_check.py --gpu 0                    # must end: WIRED RIGHT
 # watch: computes both wires and writes neither
-sudo python3 -m omni_controller.gpu_bowl --mode watch --gpus 0 --audit /var/log/omni/gpu.jsonl \
+sudo python3 -m omni_controller.gpu_compass --mode watch --gpus 0 --audit /var/log/omni/gpu.jsonl \
      --latency-file <feed> --slo-ms <p95 target> --floor-w <your lowest watts>
 # govern: writes the clock ceiling and the power limit
-sudo python3 -m omni_controller.gpu_bowl --mode cap --gpus 0 --audit /var/log/omni/gpu.jsonl \
+sudo python3 -m omni_controller.gpu_compass --mode cap --gpus 0 --audit /var/log/omni/gpu.jsonl \
      --latency-file <feed> --slo-ms <p95 target> --floor-w <your lowest watts>
 # OFF: clocks reset, power limit back to the start, read back
 sudo touch /tmp/omni-gpu-kill
@@ -585,7 +585,7 @@ Every `--interval` seconds (default 2) it reads the card's own meters and the re
   draw; until 15 such readings are in, neither wire moves;
 - **races while work waits**: at 95% utilization or more, the ceiling to the top and the lid to the start limit;
 - **paces the slack**: the mean response time of the last 5 s, between a tenth of `--slo-ms` and `--slo-ms`, held at
-  the bowl's center (0.4); the ceiling moves in whole 15 MHz steps, never under the card's own busy clock, and the lid
+  the compass's center (0.4); the ceiling moves in whole 15 MHz steps, never under the card's own busy clock, and the lid
   never under the card's own busy draw plus 10%, never over the start limit;
 - **asks the card first (the verdict)**: before the ceiling may go one step lower, a paired trial measures the card's own
   time on each request (the workload's `service_ms`) at the top and at that step; the step is allowed only if it adds
@@ -659,7 +659,7 @@ budget (`hardware/site_exchange.py`) run in simulation today. Batteries are desi
 | `gate: a sense is blind` | a reading failed; nothing is given back until it returns |
 | `gate: pods scaling up` | pods first, machines after |
 | `decision failed (n in a row)` | the cluster could not be reached; nothing was written; turn it OFF for native |
-| `decided_by: bowl` | the bowl set the wires this decision |
+| `decided_by: compass` | the compass set the wires this decision |
 | `decided_by: fail_up` / `blind_fail_up` | the service crossed the 0.95 wall, or a sense went blind: full capacity at once |
 | `decided_by: thermal_hold` | the card reported a heat slowdown; nothing was tightened |
 | `foreign_writer` | someone else changed a knob; Omni-Compass now observes only |
@@ -716,10 +716,10 @@ work in both arms. "Nothing worse" means no measure significantly worse than nat
 
 | Result | Class | Source |
 |---|---|---|
-| **Real Kubernetes, set 31** (10 paired runs, fixed-rate load): the bowl law with the verdict, machines −10.4%, p95 −66.0%, p99 −73.0%, time over the line −99.4%, HPA replicas −44.5%, pods started 0 against native's 4.3, total CPU including Omni-Compass's own −6.1%, failed requests 0; the allocation law, machines −32.2%, p95 −61.4%, total CPU −6.6%. Nothing worse in either arm | L | `results/live/LIVE_REPS_31.md` |
-| **Real Kubernetes, the fault test, set 31 F** (a machine lost, traffic tripled, a runaway pod, the probe blind, at the same moments in every arm): recovery faster than native from every fault (bowl law: machine down −49%, runaway pod −18%, spike −8%), p95 −62.6%, failed requests −16.4%, HPA replicas −1.1% (not significant). Nothing significantly worse; the p99 under faults reads higher with intervals far across zero | L | `results/live/FAULTS_31.md` (earlier runs: `FAULTS.md`, `FAULTS_30.md`, and the two fixes between them in `docs/K8S_BOWL_PREREGISTRATION.md`) |
-| **The cost to match**: native tuned harder by its operator (HPA target 40, 30, 20: more pods) never reached Omni-Compass's p95 (best native 346.6 ms against 123.5 ms bowl, 149.4 ms allocation law), with fewer pods and fewer machines on top | L | `results/live/COST_TO_MATCH.md` |
-| Real Kubernetes, sets 29 and 30: the controller reading through one proxy (Omni-Compass's own CPU 0.063 → 0.011 cores), the bowl law's total CPU −4.7% and −6.5%, nothing worse | L | `results/live/LIVE_REPS_29.md`, `LIVE_REPS_30.md` |
+| **Real Kubernetes, set 31** (10 paired runs, fixed-rate load): the compass law with the verdict, machines −10.4%, p95 −66.0%, p99 −73.0%, time over the line −99.4%, HPA replicas −44.5%, pods started 0 against native's 4.3, total CPU including Omni-Compass's own −6.1%, failed requests 0; the allocation law, machines −32.2%, p95 −61.4%, total CPU −6.6%. Nothing worse in either arm | L | `results/live/LIVE_REPS_31.md` |
+| **Real Kubernetes, the fault test, set 31 F** (a machine lost, traffic tripled, a runaway pod, the probe blind, at the same moments in every arm): recovery faster than native from every fault (compass law: machine down −49%, runaway pod −18%, spike −8%), p95 −62.6%, failed requests −16.4%, HPA replicas −1.1% (not significant). Nothing significantly worse; the p99 under faults reads higher with intervals far across zero | L | `results/live/FAULTS_31.md` (earlier runs: `FAULTS.md`, `FAULTS_30.md`, and the two fixes between them in `docs/K8S_COMPASS_PREREGISTRATION.md`) |
+| **The cost to match**: native tuned harder by its operator (HPA target 40, 30, 20: more pods) never reached Omni-Compass's p95 (best native 346.6 ms against 123.5 ms compass, 149.4 ms allocation law), with fewer pods and fewer machines on top | L | `results/live/COST_TO_MATCH.md` |
+| Real Kubernetes, sets 29 and 30: the controller reading through one proxy (Omni-Compass's own CPU 0.063 → 0.011 cores), the compass law's total CPU −4.7% and −6.5%, nothing worse | L | `results/live/LIVE_REPS_29.md`, `LIVE_REPS_30.md` |
 | **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | L | `results/scale/` (kwok-scale) |
 | **Six organisms, 1x to 1,000x clusters** (up to 1.2 million plants on one clock), 84 of 90 cells: energy lower in every cell (−0.08% to −0.19%), time over the service line lower in 83 of 84 (the one exception a single run at +0.001 points, lower over 10, 100 and 1,000 runs), work cost at most 0.007%, every knob handed back; every cell of 10 runs or more labelled SUPERIOR WITHIN GUARDRAILS. The 100-run cells at 1,000 copies are running on one rented machine | S | `results/scale/GRID.md`, `results/scale/receipts/` |
 | Modelled GPU card, the firmware alone against the firmware with Omni-Compass on top (the verdict, 2% allowance): compute-bound energy −0.70% / −0.48%, AI token generation energy −3.25% / −3.72%, both wires restored every run | S | `results/sim/gpu_two_wire/` |
@@ -728,11 +728,11 @@ work in both arms. "Nothing worse" means no measure significantly worse than nat
 | Earlier Kubernetes sets 23 to 28 (before the verdict, the proxy and the fault fixes) stay as they ran | L | `results/live/LIVE_REPS_23.md` to `LIVE_REPS_28.md` |
 
 Still to come, each built and preregistered: the bill on a real cloud (`.github/workflows/aks-metered.yml`,
-`docs/AZURE_SETUP.md`), the capacity test (`docs/K8S_BOWL_PREREGISTRATION.md`), the real-card results above and the
+`docs/AZURE_SETUP.md`), the capacity test (`docs/K8S_COMPASS_PREREGISTRATION.md`), the real-card results above and the
 8-card run.
 
 ---|---|---|
-| Real Kubernetes, set 27 (10 paired runs, the bowl law aligned with the GPU governor): machines -15.9%, p95 -65.5%, failed requests 0, better on machines within the band; set 26 (10 paired runs, three arms): the allocation law machines -35.8%, p95 -55.4%; the bowl law machines -17.2%, p95 -64.8%, failed requests 0, better on machines within the band by its preregistered rule; set 25: machines -32.3%, p95 -57.3% | L | `results/live/LIVE_REPS_25.md`, `results/live/LIVE_REPS_26.md`, `results/live/LIVE_REPS_27.md` |
+| Real Kubernetes, set 27 (10 paired runs, the compass law aligned with the GPU governor): machines -15.9%, p95 -65.5%, failed requests 0, better on machines within the band; set 26 (10 paired runs, three arms): the allocation law machines -35.8%, p95 -55.4%; the compass law machines -17.2%, p95 -64.8%, failed requests 0, better on machines within the band by its preregistered rule; set 25: machines -32.3%, p95 -57.3% | L | `results/live/LIVE_REPS_25.md`, `results/live/LIVE_REPS_26.md`, `results/live/LIVE_REPS_27.md` |
 | Real Kubernetes, set 24 (10 paired runs): machines in service -31.6%, p95 response -60.1%, p99 -64.1%, HPA replicas -38.6%, failed requests 0 on both, total CPU including Omni-Compass's own -1.8% (not significant) | L | `results/live/LIVE_REPS_24.md` (GitHub run 36983865216) |
 | Real Kubernetes, set 23 (10 paired runs): p95 -62.2%, replicas -36.6%, machines in service -28.7%, failed requests 0 | L | `results/live/LIVE_REPS_23.md` |
 | Modelled GPU card, the card's firmware alone against the firmware with Omni on top (the verdict, 2% allowance), tuning / fresh seeds: compute-bound work, energy -0.70% / -0.48%, median +1.56% / +1.47%, p95 and p99 unchanged within their intervals; AI token generation, energy -3.25% / -3.72%, median +0.55% / +0.70%, p95 +0.29% / +0.26%; both wires restored every run | S | `results/sim/gpu_two_wire/` |
@@ -770,8 +770,8 @@ test on every build (`cmake -S cpp -B cpp/build && cmake --build cpp/build`).
 | GPU governor rules | `omni_controller/gpu_governor.py` | `cpp/src/gpu_rules.cpp` | `tests/test_cpp_twins_parity.py` |
 
 The seal (`results/SEAL.json`) holds the SHA-256 fingerprint of every twinned file, written only after every parity
-test passes. `verify.py` fails, naming the file, if any sealed file changes afterwards. The bowl law
-(`omnicompass/bowl.py`) and the two-wire GPU governor are in Python today; their C++ twins are next.
+test passes. `verify.py` fails, naming the file, if any sealed file changes afterwards. The compass law
+(`omnicompass/compass_law.py`) and the two-wire GPU governor are in Python today; their C++ twins are next.
 
 ---
 
@@ -784,16 +784,16 @@ test passes. `verify.py` fails, naming the file, if any sealed file changes afte
 | Antagonist pair | the up side and the down side of a muscle's control, each with its own gain |
 | Authority | how far the nervous system lets an organ move this decision |
 | Band | a reading's or a knob's safe range |
-| Bowl | the band seen as a position from 0 (calm) to 1 (the line), with its bottom in the middle |
+| Compass | the band seen as a position from 0 (calm) to 1 (the line), with its bottom in the middle |
 | Cover | a knob's hard range; every write is clipped to it |
-| Cushion | the 5% at each edge of the bowl, 10% in all |
+| Cushion | the 5% at each edge of the compass, 10% in all |
 | Fail up | the return to full capacity the moment service crosses the wall or a sense goes blind |
 | Governor | the process that reads, decides and writes; Omni-Compass |
 | Muscle | any machine, service or controller Omni-Compass reads and sets |
 | Native | the system as it runs without Omni-Compass |
 | Organism | a set of muscles run together on one clock |
 | Plug | the two-way connection to one muscle: read, write, read back, restore |
-| Profile | a named set of the bowl's settings for one kind of work: service (the default) or batch |
+| Profile | a named set of the compass's settings for one kind of work: service (the default) or batch |
 | Race | full speed at once while work waits, so a burst is never served slowly |
 | Speed floor | the clock a card reaches on its own while busy, learned from its own meter; the governor never sets the ceiling under it |
 | Receipt | the paired record of native against Omni-Compass for one run |
@@ -812,7 +812,7 @@ test passes. `verify.py` fails, naming the file, if any sealed file changes afte
 | GPU wire check | `sudo python3 tools/gpu_wire_check.py --gpu 0` |
 | GPU, whole benchmark in one command | `sudo nohup bash scripts/gpu_rented_run.sh > run.log 2>&1 &` |
 | The six organisms with the real card inside | `python3 tools/run_hil.py --out <dir>` |
-| GPU governor, two wires | `sudo python3 -m omni_controller.gpu_bowl --mode watch|cap ...` |
+| GPU governor, two wires | `sudo python3 -m omni_controller.gpu_compass --mode watch|cap ...` |
 | Kubernetes, watch | `kubectl apply -f deploy/install/omni-compass.yaml` |
 | Kubernetes paired runs | `scripts/kind_paired.sh`, then `tools/live_reps.py` |
 | OFF (Kubernetes) | `touch /tmp/omni.kill` |
@@ -823,9 +823,9 @@ test passes. `verify.py` fails, naming the file, if any sealed file changes afte
 
 | Path | Contents |
 |---|---|
-| `omnicompass/` | the engine, governor, nervous system, shield, compass, conveyance law, the bowl |
+| `omnicompass/` | the engine, governor, nervous system, shield, compass, conveyance law, the compass |
 | `omni_controller/` | the Kubernetes controller and muscles; the GPU governors (one and two wires) |
-| `realms/` | the 656-muscle catalog, the plant models, the realm harness, the bowl on every muscle, the modelled card |
+| `realms/` | the 656-muscle catalog, the plant models, the realm harness, the compass on every muscle, the modelled card |
 | `tools/` | benchmarks, receipts, the wire check, the scale ladder, manifests, seals |
 | `scripts/` | one-command runs (GPU, Kubernetes, ladder) |
 | `deploy/` | container image, install and permission files |
@@ -848,13 +848,13 @@ test passes. `verify.py` fails, naming the file, if any sealed file changes afte
     Control (one micro step, zero-order hold across all four RK4 stages):
         u = clip(-f_U(x, t) + K_P (sigma - U), -U_AUTHORITY, +U_AUTHORITY),  K_P = 12,  sigma in {-1, +1}
 
-    The bowl (every muscle):
+    The compass (every muscle):
         p = position of the service reading in its band (0 calm, 1 the line)
         F = A tanh((K_P (p - center) + K_D v) / A),   K_D >= critical damping
         p >= 0.95  =>  full up force; down side held
         knob <- clip(knob + g_side F span, cover)
 
-    The GPU governor (two wires, omni_controller/gpu_bowl.py; one law, amendments 8 to 10):
+    The GPU governor (two wires, omni_controller/gpu_compass.py; one law, amendments 8 to 10):
         p = (mean response of the last 5 s - S) / (SLO - S),  S = SLO / 10;  p95 >= SLO, a failure, blind  =>  fail up
         fail up / race (utilization >= 0.95)  =>  ceiling = top clock, lid = start limit (the card's own settings)
         steady under the limit (saturated and drawing >= 0.97 of the limit)  =>  ceiling = the card's own busy clock,
@@ -873,7 +873,7 @@ test passes. `verify.py` fails, naming the file, if any sealed file changes afte
         a refused step is not tried again for R decisions (GPU R = 900; Kubernetes 120); the knob never goes past the
         deepest allowed step, so steps cannot add up beyond the allowance
 
-    Kubernetes, the bowl on the HPA target (omni_controller/controller.py; sets 30 and 31):
+    Kubernetes, the compass on the HPA target (omni_controller/controller.py; sets 30 and 31):
         target x in [0.6 x_op, x_op] (times the conveyed gain); the up force lowers x (more pods)
         p >= 0.95 from load (line breached, every sense live, nothing pending)  =>  x = 0.6 x_op at once
         p >= 0.95 from a blind sense or pods waiting for a lost machine           =>  x = x_op (native's own)
@@ -906,8 +906,8 @@ Every gauge, where it comes from, and whether it is measured or modelled: `docs/
 | `decision failed (n in a row)` | the cluster API is unreachable | turn it OFF; native runs on |
 | Energy saved but p95 slower than native | the card served bursts below its own clock, or the lid sat under its own draw | read section 8.5; in the audit compare `telemetry.clock_mhz` while busy with `native_busy_clock_mhz`, and `want_w` with `native_busy_draw_w` |
 | Fail-up in most decisions | `--slo-ms` set too low for the workload, or a stale feed read as blind | set `--slo-ms` from the workload's own target; check the feed's age |
-| No saving at all, service unchanged | the card is saturated almost all the time (it races), or the service sits above the bowl's center | expected on a card with no slack; the saving comes from the quiet stretches |
-| Kubernetes: no machine ever given back | the release gate refuses (its reason is in the audit), or the service is above the bowl's center | read `node_gate.reason` in the audit; check `--slo-ms` and the latency feed |
+| No saving at all, service unchanged | the card is saturated almost all the time (it races), or the service sits above the compass's center | expected on a card with no slack; the saving comes from the quiet stretches |
+| Kubernetes: no machine ever given back | the release gate refuses (its reason is in the audit), or the service is above the compass's center | read `node_gate.reason` in the audit; check `--slo-ms` and the latency feed |
 
 ## Appendix F - Evidence Map
 

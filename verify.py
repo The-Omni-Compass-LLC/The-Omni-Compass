@@ -251,8 +251,8 @@ def main():
     test_pilot_score.main(); check("pilot scoring: detects a real gain, no false gain on identical clusters, detects a service regression", True)
     from tests import test_omni_controller
     test_omni_controller.main(); check("live controller against a fake cluster: observe writes nothing, target bounded, kill restores, node pool bounded and dry-run safe", True)
-    from tests import test_bowl_controller
-    test_bowl_controller.main(); check("live controller, bowl law: never tighter than native, one machine back per decision through the gate, fail up past the wall and when blind, kill restores, the engine runs every decision", True)
+    from tests import test_compass_controller
+    test_compass_controller.main(); check("live controller, compass law: never tighter than native, one machine back per decision through the gate, fail up past the wall and when blind, kill restores, the engine runs every decision", True)
     from tests import test_muscles
     test_muscles.main(); check("live muscles: power cap, heat, security, rollout, batch, CPU frequency and GPU connectors; kill restores; observe writes nothing", True)
     from tests import test_nervous_system
@@ -283,8 +283,8 @@ def main():
     test_pod_starts.main(); check("exact pod-start timing from the API server's watch stream (creation to Ready, window-bounded)", True)
     from tests import test_gpu_bench
     test_gpu_bench.main(); check("GPU bench: watch writes nothing, limit never below draw x 1.3, read-back, blind and SLO reflexes, kill restores; paired run validity", True)
-    from tests import test_gpu_bowl
-    test_gpu_bowl.main(); check("two-wire GPU governor: races while work waits, never slower than the card on its own while busy, lid never under its own busy draw, fail up past the line, restores", True)
+    from tests import test_gpu_compass
+    test_gpu_compass.main(); check("two-wire GPU governor: races while work waits, never slower than the card on its own while busy, lid never under its own busy draw, fail up past the line, restores", True)
     from tests import test_cost_to_match
     test_cost_to_match.main(); check("cost to match: the cheapest native setting that reaches Omni-Compass's p95, its extra pods, CPU and machines", True)
     from tests import test_server_power
@@ -309,8 +309,8 @@ def main():
     test_cpufreq_ceiling.main(); check("cpufreq ceiling writer: scaling_max_freq on every policy, clamped; restore puts cpuinfo_max_freq back", True)
     from tests import test_realms
     test_realms.main(); check("realm harness: catalog of 656, watch equals native, kill hands back every knob, deterministic, capacity law, labels", True)
-    from tests import test_bowl
-    test_bowl.main(); check("bowl law and plug: smooth bounded push and pull to the center, fail up, cover, one restore point, foreign writer, two-wire card", True)
+    from tests import test_compass_law
+    test_compass_law.main(); check("compass law and plug: smooth bounded push and pull to the center, fail up, cover, one restore point, foreign writer, two-wire card", True)
     from tests import test_failsafe
     test_failsafe.main(); check("no automated fallback: failed decisions are skipped; only the human switch turns the whole harness off and on", True)
     from tests import test_cruise_brake

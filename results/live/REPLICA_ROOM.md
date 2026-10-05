@@ -1,14 +1,14 @@
 # The replica cap as a lever (the fourth amendment): capacity test with `replica_ceiling` 30, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps` (`load_steps` 1 to 8, 1,600 s, `replica_ceiling` 30, arms native /
-omni / bowl), run 37185767115, commit `2101c3d`, 2026-10-04, job `aggregate` (job 111402300427); artifact `live-reps`
-(zip SHA-256 `289cc8bf221314e87ff01503b877b7e1d5a6bfb16f16febf815e4095460de05d`). Native keeps the cap of 10; only the bowl
+omni / compass), run 37185767115, commit `2101c3d`, 2026-10-04, job `aggregate` (job 111402300427); artifact `live-reps`
+(zip SHA-256 `289cc8bf221314e87ff01503b877b7e1d5a6bfb16f16febf815e4095460de05d`). Native keeps the cap of 10; only the compass
 law is given the lever (the allocation law never moves the cap). Evidence class **L**.
 
-**Result. The cap was not what limited the service.** With the cap free to rise to 30, the bowl law served **24.6
+**Result. The cap was not what limited the service.** With the cap free to rise to 30, the compass law served **24.6
 requests a second, the same as without the lever** (24.0 and 24.6 in the runs without it); against this run's native
 15.0 that is +64.0% (+7.4 to +11.8), and the whole of the difference from earlier runs is native's own variation. To
-get it the bowl law ran **78% more pods (16.5 against 9.2)** and **started 26.2 against 4.6**, both significant: the cap
+get it the compass law ran **78% more pods (16.5 against 9.2)** and **started 26.2 against 4.6**, both significant: the cap
 rose, pods were added that the machine could not turn into served requests, and the cap came back. The real machine
 under kind was **69% busy on its 4 cores** in both arms: the limit is the machine doing the work, not the replica cap
 and not the "10% used" that kind's per-worker accounting shows.
@@ -23,9 +23,9 @@ default, and by the one rule this setting is not labelled better.
 |---|---:|---:|---:|---:|
 | native | 15.0 |  |  | 10 |
 | omni | 27.6 | +84.0% | +9.4 to +15.8 | 10 |
-| bowl | 24.6 | +64.0% | +7.4 to +11.8 | 10 |
+| compass | 24.6 | +64.0% | +7.4 to +11.8 | 10 |
 
-## B with the bowl law and the replica lever (ceiling 30) vs native (cap 10)
+## B with the compass law and the replica lever (ceiling 30) vs native (cap 10)
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

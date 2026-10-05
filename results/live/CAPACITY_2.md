@@ -1,12 +1,12 @@
 # The capacity test, run again under the amendment of 2026-10-03 evening, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps` (`load_steps` 1 to 8, 200 s a step, 1,600 measured seconds per arm,
-arms native / omni / bowl, order rotated, open-loop load), run 37162457542, commit `199f350`, 2026-10-04, job
+arms native / omni / compass, order rotated, open-loop load), run 37162457542, commit `199f350`, 2026-10-04, job
 `aggregate` (job 111332953338, `python tools/live_reps.py reps`). Transcribed from the job's printed receipt; the run's
 artifact `live-reps` (zip SHA-256 `3fe93f2d5ef23a44a3442fcfd24f5c5b14501ca9711c3fab3b53440e4d578d7b`) holds the same
-tables. Design: `docs/K8S_BOWL_PREREGISTRATION.md`, "The capacity test" and its amendment. Evidence class **L**.
+tables. Design: `docs/K8S_COMPASS_PREREGISTRATION.md`, "The capacity test" and its amendment. Evidence class **L**.
 
-**Result.** With the bowl law on top, the same six machines served **24.6 requests a second within the line against
+**Result.** With the compass law on top, the same six machines served **24.6 requests a second within the line against
 native's 16.2: +51.9%, 95% interval of the paired difference +6.2 to +10.6 requests a second.** The first run
 (`CAPACITY.md`, commit `422d60c`) measured the same paired difference, +8.4 requests a second, on runners where native
 served 24.6; GitHub's runners were slower this time for every arm (native's failures 7.3% against 3.5%), the gap the
@@ -14,7 +14,7 @@ same. Response times −28% to −56%, time over the line −49%, failed request
 significant. **Still worse: pods started, 5.1 against 3.8 (+34.2%, interval +0.29 to +2.31)**; the amendment's hold
 on a growing demand did not remove it (first run +30.4%). Read with the replicas 10.7% lower, the extra starts are
 pods started earlier on a rising load, the mechanism of the added capacity; it is reported here as measured and the
-bowl arm is not labelled better by the one rule while it stands. The allocation law: capacity unchanged (+0.0%), pods
+compass arm is not labelled better by the one rule while it stands. The allocation law: capacity unchanged (+0.0%), pods
 started +76.3%.
 
 ## Capacity
@@ -23,7 +23,7 @@ started +76.3%.
 |---|---:|---:|---:|---:|
 | native | 16.2 |  |  | 10 |
 | omni | 16.2 | +0.0% | -2.0 to +2.0 | 10 |
-| bowl | 24.6 | +51.9% | +6.2 to +10.6 | 10 |
+| compass | 24.6 | +51.9% | +6.2 to +10.6 | 10 |
 
 ## B: Omni-Compass on top (the allocation law) vs native
 
@@ -49,7 +49,7 @@ started +76.3%.
 | pod start wait, total (s) | 9.1 | 10.9 | +19.8% | -6.085 to +9.685 | no |
 | pod start wait, mean (s) | 2.024 | 1.625 | -19.7% | -1.401 to +0.6028 | no |
 
-## B with the bowl law vs native
+## B with the compass law vs native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

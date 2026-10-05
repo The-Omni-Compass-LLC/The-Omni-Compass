@@ -12,10 +12,10 @@
 #                same autoscaler, with Omni-Compass idling the machines it gives back, which the autoscaler then deletes
 # The bill (scripts/kind_bench.sh, PLATFORM=aks) counts every work machine that exists, every 15 s. Each cluster is
 # deleted when its arm ends, before the next is made, so nothing keeps billing and the subscription's core quota holds.
-# Usage: REP=n ARMS="native bowl omni" AZ_RG=... bash scripts/aks_paired.sh
+# Usage: REP=n ARMS="native compass omni" AZ_RG=... bash scripts/aks_paired.sh
 set -euo pipefail
 echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
-REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native bowl omni}"
+REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native compass omni}"
 RG="${AZ_RG:?set AZ_RG}"; LOC="${AZ_LOCATION:-eastus}"; SIZE="${AKS_VM_SIZE:-Standard_D2s_v4}"
 MAX="${AKS_MAX_NODES:-4}"; export AKS_MAX_NODES="$MAX"
 PROFILE="${AKS_AUTOSCALER_PROFILE:-scale-down-unneeded-time=2m scale-down-delay-after-add=2m scan-interval=10s}"

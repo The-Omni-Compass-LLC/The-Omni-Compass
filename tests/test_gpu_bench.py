@@ -142,7 +142,7 @@ def bench():
     assert reps(str(d / "run")) == 2
 
 
-def bench_bowl():
+def bench_compass():
     """The paired run with the two-wire engine (the default Omni arm): valid, watch writes nothing, Omni moves both wires,
     and the card's clock range and power limit are back at the start after every arm."""
     d = Path(tempfile.mkdtemp())
@@ -156,7 +156,7 @@ def bench_bowl():
     assert {c["writes"] for c in out["checks"]["watch"].values()} == {0}
     recs = [json.loads(x) for x in open(d / "run" / "rep-1" / "omni" / "audit.jsonl") if x.strip()]
     # in 20 s the gentle down pull moves the ceiling less than one 15 MHz step before each burst races it back up; the
-    # lid moves, and the clock wire is proved by the wire check and tests/test_gpu_bowl.py
+    # lid moves, and the clock wire is proved by the wire check and tests/test_gpu_compass.py
     assert any("write" in x and "-pl" in x["write"] for x in recs), "the down wire never moved"
     assert any(x.get("decision", {}).get("0", {}).get("decided_by") == "race" for x in recs), "the card never raced a burst"
     assert any("would_clock_write" in json.loads(x) or "decision" in json.loads(x)
@@ -432,7 +432,7 @@ def several_cards():
 
 
 def main():
-    plugs(); governor(); guards(); lock(); enforced(); one_writer(); bench(); bench_bowl(); wire_check(); hil(); pooled(); several_cards()
+    plugs(); governor(); guards(); lock(); enforced(); one_writer(); bench(); bench_compass(); wire_check(); hil(); pooled(); several_cards()
     print("PASS  GPU bench: governor contract (watch writes nothing, shield floor, share floor, busy gate, read-back, blind, SLO reflex, kill), "
           "enforced limit (snapshot, override, power management, refused write ends the arm, fallback), one writer, heat fails up, blocked_by and decided_by, RAPL by domain, credit per write, workload plug, result labels, "
           "the one-command paired run with its validity checks, and one workload across several cards with one governor per card")

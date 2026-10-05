@@ -1,5 +1,5 @@
 > **Status: proposed by an outside reviewer on 2026-10-04; not adopted.** The reasons are recorded in
-> `docs/K8S_BOWL_PREREGISTRATION.md`, "The third amendment, and a change considered and declined". Kept here unchanged
+> `docs/K8S_COMPASS_PREREGISTRATION.md`, "The third amendment, and a change considered and declined". Kept here unchanged
 > so the proposal and the decision can both be read.
 >
 > Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. See `LICENSE`.
@@ -14,7 +14,7 @@ Owner: The Omni-Compass LLC. Evaluation use. Not a change to the engine's law. A
 
 `results/live/CAPACITY_2.md`, run 37162457542, commit `199f350`, ten pairs, six workers, open-loop load rising in eight steps of 6 requests a second (1 to 8 generators, 48 requests a second offered).
 
-Bowl against native: 24.6 requests a second inside the line against 16.2, +51.9 percent (interval +6.2 to +10.6). p95 cut in half. Replicas down 10.7 percent. Pods started 5.1 against 3.8, +34.2 percent. The file does not label the arm better while that row stands.
+Compass against native: 24.6 requests a second inside the line against 16.2, +51.9 percent (interval +6.2 to +10.6). p95 cut in half. Replicas down 10.7 percent. Pods started 5.1 against 3.8, +34.2 percent. The file does not label the arm better while that row stands.
 
 CPU used over allocatable stayed about 0.10 in both arms. The line broke before the node filled. The load past 24.6 requests a second missed the 500 ms line.
 
@@ -38,18 +38,18 @@ No second write in the same decision. No machine added in this amendment. The no
 When demand has been steady for one window, the position is under the center, and no pod is pending:
 
 - put `maxReplicas` back to the annotated original in one write.
-- return the CPU target toward the operator's own as the bowl already does.
+- return the CPU target toward the operator's own as the compass already does.
 
 The kill switch restores both. A restored arm must show the original target, the original replica range, and no annotation left.
 
 ## What is not changed
 
-The bowl gains, the center, the verdict, the shield, the fail-up on a blind probe or a dead machine, and the rule that an unsensed HPA is not moved. The allocation law is not given this write. It stays the control arm.
+The compass gains, the center, the verdict, the shield, the fail-up on a blind probe or a dead machine, and the rule that an unsensed HPA is not moved. The allocation law is not given this write. It stays the control arm.
 
 ## The rerun
 
-Same capacity test as `CAPACITY_2.md`: ten pairs, native / omni / bowl, order rotated, eight steps, 200 seconds a step.
+Same capacity test as `CAPACITY_2.md`: ten pairs, native / omni / compass, order rotated, eight steps, 200 seconds a step.
 
 Label by the one rule. The row that failed last time is pods started. If capacity rises and pods started are not worse than native, the arm can be labelled. If capacity rises and pods started are still worse, report both and do not label it better.
 
-The number to read is requests a second inside the line, bowl against native, with the 95 percent interval of the paired difference. Last bowl result 24.6. Offered load 48. The room this write is aimed at is the pending pods that had no place, not a full node, and not a power cut.
+The number to read is requests a second inside the line, compass against native, with the 95 percent interval of the paired difference. Last compass result 24.6. Offered load 48. The room this write is aimed at is the pending pods that had no place, not a full node, and not a power cut.

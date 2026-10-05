@@ -44,13 +44,13 @@ checklists for experimental computer science (code, data, seeds, environment, st
 | The comparator is the real alternative | every arm is native alone against the same native with Omni-Compass on top (`DISCLOSURES.md`) | met |
 | Equal work in every arm | fixed-rate (open-loop) load on Kubernetes; the same seeded request stream on the GPU | met |
 | Paired runs, order rotated | `scripts/kind_paired.sh`, `scripts/gpu_paired.sh` | met |
-| Written before the run | `docs/K8S_BOWL_PREREGISTRATION.md`, `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, with every change and its reason | met |
+| Written before the run | `docs/K8S_COMPASS_PREREGISTRATION.md`, `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, with every change and its reason | met |
 | One rule decides the label, by code | `DISCLOSURES.md`, section 3; the label printed by `tools/live_reps.py`, `tools/gpu_reps.py` | met |
 | Every run reported, including the ones that went wrong | earlier sets and the first GPU law kept in `results/`; the fault test's first two runs and their fixes recorded | met |
 | A control arm that measures the cost of being there | the watch arm (Omni-Compass decides, writes nothing) on the GPU | met |
 | The native comparator includes its own autoscaling of machines | the bill run on Azure with Azure's own autoscaler: no difference in the bill either way at this load (`results/live/AKS_BILL.md`) | **met: measured, no saving shown** |
-| Behaviour under heavy load, not only light load | the capacity test: bowl law +34.1% and, +51.9% after the first amendment; after the second, +41.4% (bowl) and +44.8% (allocation law) with no measure significantly worse (`results/live/CAPACITY.md`, `CAPACITY_2.md`, `AMENDMENT_2_RUNS.md`) | **met (bowl law and allocation law)** |
-| Many tenants on one cluster: one surging must not starve its neighbour | the fairness test: neighbour unharmed; bowl failures worse, fixed by the amendment; after the second amendment the bowl law has no measure worse for either application; the allocation law raises the neighbour's failures (`results/live/FAIRNESS.md`, `FAIRNESS_2.md`, `AMENDMENT_2_RUNS.md`) | **met (bowl law); open (allocation law)** |
+| Behaviour under heavy load, not only light load | the capacity test: compass law +34.1% and, +51.9% after the first amendment; after the second, +41.4% (compass) and +44.8% (allocation law) with no measure significantly worse (`results/live/CAPACITY.md`, `CAPACITY_2.md`, `AMENDMENT_2_RUNS.md`) | **met (compass law and allocation law)** |
+| Many tenants on one cluster: one surging must not starve its neighbour | the fairness test: neighbour unharmed; compass failures worse, fixed by the amendment; after the second amendment the compass law has no measure worse for either application; the allocation law raises the neighbour's failures (`results/live/FAIRNESS.md`, `FAIRNESS_2.md`, `AMENDMENT_2_RUNS.md`) | **met (compass law); open (allocation law)** |
 | Workloads beyond the synthetic one | real AI serving (vLLM) on the card; public data-center traces | vLLM in the card run; **traces open** |
 
 ## 5. Statistics

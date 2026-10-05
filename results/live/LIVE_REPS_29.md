@@ -1,4 +1,4 @@
-# Repeated live runs on kind, set 29: native, Omni-Compass on top with the engine's allocation law, and with the bowl law and the verdict, the controller reading through one kubectl proxy, 10 paired repetitions
+# Repeated live runs on kind, set 29: native, Omni-Compass on top with the engine's allocation law, and with the compass law and the verdict, the controller reading through one kubectl proxy, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps`, run 37094338955, commit `a3721cc`, 2026-10-03, job `aggregate`
 (job 111130515923, `python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds
@@ -6,13 +6,13 @@ per arm. Transcribed from the job's printed receipt; the run's artifact `live-re
 `9ec964ec39340d8c493f99627d99425bacf8452bd5ac3d7ed7caa69bb8e3b904`) holds the same table. Evidence class **L** (real
 Kubernetes software on kind; energy is a declared model, not a meter: every worker stays powered in every arm).
 
-What changed from set 28: one thing, written before the run (`docs/K8S_BOWL_PREREGISTRATION.md`, set 29). The
+What changed from set 28: one thing, written before the run (`docs/K8S_COMPASS_PREREGISTRATION.md`, set 29). The
 controller reads through one `kubectl proxy` started once, so a read is a local HTTP request instead of a new kubectl
 process. Same arms, load, duration and outcomes.
 
-**Label by the preregistered rule:** total CPU including Omni-Compass's own no more than 2% above native. Bowl law with
+**Label by the preregistered rule:** total CPU including Omni-Compass's own no more than 2% above native. Compass law with
 the verdict: **−4.7%** (−0.071 to −0.017 cores), **passes, and significantly lower**. Allocation law: −7.7%, passes.
-Omni-Compass's own CPU fell from 0.063 cores in set 28 to 0.011 (bowl) and from 0.068 to 0.018 (allocation law). No
+Omni-Compass's own CPU fell from 0.063 cores in set 28 to 0.011 (compass) and from 0.068 to 0.018 (allocation law). No
 measure in either arm is significantly worse than native.
 
 ### B: the engine's allocation law (`--law governor`) against native
@@ -38,7 +38,7 @@ measure in either arm is significantly worse than native.
 | pod start wait, total (s) | 11.2 | 6.2 | -44.6% | -10.93 to +0.9274 | no |
 | pod start wait, mean (s) | 2.64 | 2.126 | -19.5% | -2.625 to +1.597 | no |
 
-### B with the bowl law and the verdict (`--law bowl`) against native
+### B with the compass law and the verdict (`--law compass`) against native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

@@ -66,7 +66,7 @@ def main(out=ROOT / "results" / "sim" / "gpu_two_wire", fresh=""):
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     L = ["# The GPU card in simulation: each base alone, and with Omni-Compass on top", "",
          f"Evidence class **S** (a model, not a meter). Seeds {SEEDS[0]}-{SEEDS[-1]}, 600 s each, commit `{commit}`, "
-         f"{time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())}. Model: `realms/gpu_card.py`; the law: `omnicompass/bowl.py` "
+         f"{time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())}. Model: `realms/gpu_card.py`; the law: `omnicompass/compass_law.py` "
          "and the verdict `omnicompass/verdict.py`.", "",
          "Omni-Compass never runs the card. It sits on top of what already runs it (the card's own firmware, or an operator's "
          "power cap) and moves two settings that base already accepts: the clock ceiling and the power limit. A step down "

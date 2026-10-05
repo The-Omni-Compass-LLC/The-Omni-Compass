@@ -1,18 +1,18 @@
 # The capacity test on kind: the same six machines, the load rising step by step, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps` (`load_steps` 1 to 8, 200 s a step, 1,600 measured seconds per arm,
-arms native / omni / bowl, order rotated), run 37150909816, commit `422d60c`, 2026-10-03, job `aggregate` (job
+arms native / omni / compass, order rotated), run 37150909816, commit `422d60c`, 2026-10-03, job `aggregate` (job
 111300598062, `python tools/live_reps.py reps`). Transcribed from the job's printed receipt; the run's artifact
 `live-reps` (zip SHA-256 `610f44548e98e1a8d7f15918fde2ffe9a8f4e37dcb48eb5ae2cc19bddffce99e`) holds the same tables.
-Design written before the run: `docs/K8S_BOWL_PREREGISTRATION.md`, "The capacity test". Evidence class **L** (real
+Design written before the run: `docs/K8S_COMPASS_PREREGISTRATION.md`, "The capacity test". Evidence class **L** (real
 Kubernetes software on kind; energy is a declared model, not a meter).
 
-**Result.** With the bowl law and the verdict on top, the same six machines served **33.0 requests a second within the
+**Result.** With the compass law and the verdict on top, the same six machines served **33.0 requests a second within the
 line against native's 24.6: +34.1%, 95% interval of the paired difference +6.2 to +10.6 requests a second** (+25% to
 +43%). Response times fell by about half at every percentile and failed requests fell 8.6%, both significant. One
 measure is significantly worse: **pods started, 7.3 against 5.6 (+30.4%)**, with the allocation law 7.8 (+39.3%). The
 mean HPA replicas are lower (−26.9%), so the extra starts are churn (pods removed between load steps and started again
-on the next), not more pods held. By the one rule (nothing more than 2% worse) the bowl arm is therefore not yet
+on the next), not more pods held. By the one rule (nothing more than 2% worse) the compass arm is therefore not yet
 labelled better; the cause and its correction are recorded in the preregistration, amendment of 2026-10-03 evening,
 and the test is run again under it.
 
@@ -26,7 +26,7 @@ a second).
 |---|---:|---:|---:|---:|
 | native | 24.6 |  |  | 10 |
 | omni | 25.8 | +4.9% | -0.6 to +3.0 | 10 |
-| bowl | 33.0 | +34.1% | +6.2 to +10.6 | 10 |
+| compass | 33.0 | +34.1% | +6.2 to +10.6 | 10 |
 
 ## B: Omni-Compass on top (the allocation law) vs native, 10 paired repetitions
 
@@ -52,7 +52,7 @@ a second).
 | pod start wait, total (s) | 21.2 | 16.5 | -22.2% | -10.84 to +1.445 | no |
 | pod start wait, mean (s) | 3.547 | 2.076 | -41.5% | -2.153 to -0.788 | yes, better |
 
-## B with the bowl law: Omni-Compass on top, push and pull on the HPA target and the node pool vs native, 10 paired repetitions
+## B with the compass law: Omni-Compass on top, push and pull on the HPA target and the node pool vs native, 10 paired repetitions
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

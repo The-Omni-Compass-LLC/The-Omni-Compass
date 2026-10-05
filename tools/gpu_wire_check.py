@@ -36,7 +36,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omni_controller.gpu_governor import query  # noqa: E402
-from omni_controller.gpu_bowl import query_top_clock, query_min_clock, smi_run  # noqa: E402
+from omni_controller.gpu_compass import query_top_clock, query_min_clock, smi_run  # noqa: E402
 
 LOAD = ("import torch,time,sys\n"
         "d=torch.device(sys.argv[1]); a=torch.randn(4096,4096,device=d); t=time.time()\n"
@@ -118,7 +118,7 @@ def main(argv=None):
 
         with tempfile.TemporaryDirectory() as d:
             env = dict(os.environ, NVIDIA_SMI=smi)
-            cmd = [sys.executable, "-m", "omni_controller.gpu_bowl", "--mode", "cap", "--gpus", str(g), "--smi", smi,
+            cmd = [sys.executable, "-m", "omni_controller.gpu_compass", "--mode", "cap", "--gpus", str(g), "--smi", smi,
                    "--interval", "0.5", "--audit", f"{d}/a.jsonl", "--kill-file", f"{d}/kill", "--down-gain", "0.5"]
             p = subprocess.Popen(cmd, cwd=ROOT, env=env)
             time.sleep(3.0)

@@ -9,9 +9,9 @@ Modes
             Cluster Autoscaler must not manage that pool
 Laws (--law)
   governor  (default) the engine's allocation law sets the HPA target (rho*) and the closure law or the governor sizes the pool
-  bowl      the bowl law (omnicompass/bowl.py) holds the service in its band, read as the GPU bowl reads it: the mean
+  compass      the compass law (omnicompass/compass_law.py) holds the service in its band, read as the GPU compass reads it: the mean
             response time of the latency window between the bare service time (a tenth of --slo-ms) and --slo-ms, held at
-            --bowl-center (0.4); p95 at or past the SLO, a blind sense or pods waiting for a place read as past the wall. Its push and pull move two levers: each HPA's CPU target inside its cover (from 60% of the
+            --compass-center (0.4); p95 at or past the SLO, a blind sense or pods waiting for a place read as past the wall. Its push and pull move two levers: each HPA's CPU target inside its cover (from 60% of the
             operator's target up to the operator's own, never tighter than native, so it only ever adds pods and gives them
             back) and the node pool (one machine back only while the force is clearly down, the position below the center
             and the nervous system's release gate open; past the 0.95 wall, one machine up at once). The verdict
@@ -45,7 +45,7 @@ from omnicompass.shield import enforce, ShieldLimits
 from omni_controller.muscles import Muscles, add_args as add_muscle_args
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
-BOWL_UP, BOWL_DOWN, BOWL_RELEASE = 0.10, 0.02, -0.2   # the bowl's gains, the same on every muscle (realms/bowl_arm.py)
+COMPASS_UP, COMPASS_DOWN, COMPASS_RELEASE = 0.10, 0.02, -0.2   # the compass's gains, the same on every muscle (realms/compass_arm.py)
 DEMAND_RISE = 0.05     # the demand moves: more than 5% between its least and its most over one HPA window
 RANGE_ANN = "omnicompass.io/original-replica-range"
 
@@ -259,13 +259,13 @@ class Controller:
         self.s_floor = None            # bare service time (ms): the fastest a request is served with no queue ahead of it
         self.reflex = {}               # (ns, name) -> replica floor the pod reflex holds while the queue says it is needed
         self.pod_cap = {}              # (ns, name) -> request / limit share: what the HPA's target means in queue terms
-        self.bowl = None
-        if getattr(a, "law", "governor") == "bowl":
-            from omnicompass.bowl import Band, Bowl
+        self.compass_law = None
+        if getattr(a, "law", "governor") == "compass":
+            from omnicompass.compass_law import Band, CompassLaw
             # one decision every --interval s; the service follows a target in about one HPA sync plus a pod start (tau)
-            self.bowl = Bowl(Band(0.0, 1.0, center=getattr(a, "bowl_center", 0.4)), dt=a.interval,
-                             tau=getattr(a, "bowl_tau", 60.0), kp=1.0, smooth=0.3)
-            self.bowl.kd *= 3.0                    # the same push as on every realm muscle (realms/bowl_arm.py)
+            self.compass_law = CompassLaw(Band(0.0, 1.0, center=getattr(a, "compass_center", 0.4)), dt=a.interval,
+                             tau=getattr(a, "compass_tau", 60.0), kp=1.0, smooth=0.3)
+            self.compass_law.kd *= 3.0                    # the same push as on every realm muscle (realms/compass_arm.py)
             from omnicompass.verdict import Verdict
             self.verdict = Verdict(tolerance=getattr(a, "allow", 0.02), min_samples=getattr(a, "verdict_samples", 200),
                                    probe_every=getattr(a, "verdict_every", 10), recheck=getattr(a, "verdict_recheck", 120),
@@ -274,7 +274,7 @@ class Controller:
         self.cruise = False            # cruise (rule 7): work waiting for a place, so every machine in service until the line is empty
         self.cruise_hits = 0; self.cruise_clear = 0
         self.lat_t = None              # elapsed_seconds of the last request the verdict has seen
-        self.bowl_x = {}               # (ns, name) -> the bowl's continuous HPA target, before rounding
+        self.compass_law_x = {}               # (ns, name) -> the compass's continuous HPA target, before rounding
         self.demand = {}               # (ns, hpa) -> [(time, demand)]: the CPU its pods use, in units of one pod's request
         self.pinned = {}               # (ns, hpa) -> [time]: decisions at which the autoscaler stood at its replica cap
 
@@ -319,14 +319,14 @@ class Controller:
 
     def _replica_room(self, h, ns, name, win, obs, s):
         """The HPA's replica cap as a lever, up to the ceiling the operator grants (--replica-ceiling; 0, the default:
-        the cap is the operator's and never moved). Only for a sensed service under the bowl law. While the autoscaler
-        stands at its cap and the bowl is at or past its centre (or the line is breached), the cap is raised to the
+        the cap is the operator's and never moved). Only for a sensed service under the compass law. While the autoscaler
+        stands at its cap and the compass is at or past its centre (or the line is breached), the cap is raised to the
         replicas the autoscaler's own arithmetic asks for, ceil(r x u / x), never past the ceiling; once the demand has
-        held still for one window, the bowl is under its centre, nothing breaches and that arithmetic fits the
+        held still for one window, the compass is under its centre, nothing breaches and that arithmetic fits the
         operator's own cap again, the cap returns to it. The operator's range is recorded before the first change, and
         the reset restores it."""
         ceil_ = int(getattr(self.a, "replica_ceiling", 0) or 0)
-        if ceil_ <= 0 or self.bowl is None:
+        if ceil_ <= 0 or self.compass_law is None:
             return
         spec = h.get("spec", {}); st = h.get("status", {}) or {}
         ann = h["metadata"].get("annotations", {}) or {}
@@ -336,14 +336,14 @@ class Controller:
         if not tgt or dem is None:
             return
         need = int(math.ceil(100.0 * dem / float(tgt) - 1e-9))      # the replicas the autoscaler's arithmetic asks for
-        pressed = self.bowl.p >= self.bowl.band.center or not obs["slo_clean"]
+        pressed = self.compass_law.p >= self.compass_law.band.center or not obs["slo_clean"]
         if cur >= cap and pressed and need > cap and cap < ceil_:
             new = min(ceil_, need)
             if RANGE_ANN not in ann:
                 self.k.write(["annotate", "hpa", name, "-n", ns, "--overwrite", f"{RANGE_ANN}={lo0},{hi0}"], "replica room: record the operator's range")
             self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"maxReplicas": new}})],
                          f"replica room: cap {cap} -> {new} (at the cap, {need} asked, ceiling {ceil_})")
-        elif cap > hi0 and need <= hi0 and self.bowl.p < self.bowl.band.center and obs["slo_clean"] and self._steady((ns, name), win):
+        elif cap > hi0 and need <= hi0 and self.compass_law.p < self.compass_law.band.center and obs["slo_clean"] and self._steady((ns, name), win):
             self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"maxReplicas": hi0}})],
                          f"replica room: cap {cap} -> {hi0}, the operator's own (demand steady, {need} asked)")
             if int(spec.get("minReplicas", lo0)) == lo0:
@@ -631,9 +631,9 @@ class Controller:
             # or the whole body's latency push, which a machine release does not cause
             cl_n = self.cl.decide(n, per_node / 1000.0, self.gn.last_push, self.a.min_nodes, self.a.max_nodes)
             rec_n = max(self.a.min_nodes, min(self.a.max_nodes, max(cl_n, floor)))
-        bowl_rec = None
-        if self.bowl is not None:
-            # the service position in its bowl, read as the GPU bowl reads it (omni_controller/gpu_bowl.py): the mean
+        compass_rec = None
+        if self.compass_law is not None:
+            # the service position in its compass, read as the GPU compass reads it (omni_controller/gpu_compass.py): the mean
             # response time of the window between the bare service time (a tenth of the SLO) and the SLO; p95 at or
             # past the SLO, a blind sense, or a pod waiting for a place is past the wall
             slo = float(getattr(self.a, "slo_ms", 0) or 0)
@@ -646,27 +646,27 @@ class Controller:
                 pos = max(0.0, (mean - bare) / (slo - bare))
             if blind.get("latency", False) or s["pending"] > 0 or (p95 is not None and slo > 0 and p95 >= slo):
                 pos = 1.0
-            F = self.bowl.force(pos)
+            F = self.compass_law.force(pos)
             # the verdict: the response times of the requests served since the last decision, at the machines the pool
             # stood at; then how many machines may be given back at all (or the count a trial needs)
             if self.n_native is None:
                 self.n_native = n
             self.verdict.observe(self._new_latencies())
-            calm = self.bowl.p < self.bowl.band.wall_high and s["pending"] == 0 and not breach_now
+            calm = self.compass_law.p < self.compass_law.band.wall_high and s["pending"] == 0 and not breach_now
             deepest, trial, ev = self.verdict.tick(calm)
             if ev:
                 self.audit({"verdict": ev, "state": self.verdict.state, "machines_given_back_allowed": self.verdict.allowed,
                             "machines_native": self.n_native})
-            if self.bowl.p >= self.bowl.band.wall_high:
+            if self.compass_law.p >= self.compass_law.band.wall_high:
                 rec_n = max(floor, n + 1)                                  # fail up: one machine more at once
             elif trial:
                 rec_n = max(floor, self.n_native - deepest)                # the trial's count (one machine per decision below)
-            elif F < BOWL_RELEASE and self.bowl.p < self.bowl.band.center and self.n_native - (n - 1) <= deepest:
+            elif F < COMPASS_RELEASE and self.compass_law.p < self.compass_law.band.center and self.n_native - (n - 1) <= deepest:
                 rec_n = max(floor, n - 1)                                  # one back, if the verdict and the release gate agree
             else:
                 rec_n = max(floor, n)
             rec_n = max(self.a.min_nodes, min(self.a.max_nodes, rec_n))
-            bowl_rec = {"position": round(self.bowl.p, 4), "velocity": round(self.bowl.v, 4), "force": round(F, 4),
+            compass_rec = {"position": round(self.compass_law.p, 4), "velocity": round(self.compass_law.v, 4), "force": round(F, 4),
                         "verdict_state": self.verdict.state, "machines_given_back_allowed": self.verdict.allowed}
         scaling_up = any(int(h.get("status", {}).get("desiredReplicas", 0) or 0) > int(h.get("status", {}).get("currentReplicas", 0) or 0)
                          for h in s["hpas"])
@@ -727,8 +727,8 @@ class Controller:
         forced = obs["queue_ratio"] > 0.0 or s["pending"] > 0
         self.audit({"compass": self.compass.read(d["state"]["E"], d["state"]["S"], levels, moves, forced, x=self.g.x, p=self.g.p)})
         out = self.audit({"decision": {"nodes_observed": n, "nodes_recommended": rec_n,
-                                       "law": "bowl" if self.bowl is not None else "closure" if self.cl is not None else "governor",
-                                       "bowl": bowl_rec, "hpa_target_recommended": round(rho, 3),
+                                       "law": "compass" if self.compass_law is not None else "closure" if self.cl is not None else "governor",
+                                       "compass_law": compass_rec, "hpa_target_recommended": round(rho, 3),
                                        "E": d["state"]["E"], "U": d["state"]["U"], "pending": s["pending"],
                                        "power_cap": round(float(d["power_cap"]), 3), "change_permitted": bool(d["change_permitted"]),
                                        "rollback_authorized": bool(d["rollback_authorized"]),
@@ -762,20 +762,20 @@ class Controller:
                 # limit g times the operator's, the target that keeps each pod exactly as busy is g times higher
                 want = int(round(100 * min(rho, orig / 100.0) * self._gain(h)))
                 back = False
-                if self.bowl is not None:
-                    # the bowl's push and pull on the target, inside its cover [60% of the operator's, the operator's]
+                if self.compass_law is not None:
+                    # the compass's push and pull on the target, inside its cover [60% of the operator's, the operator's]
                     # (in queue terms, times the conveyed gain): a lower target is more pods, so the up force lowers it
                     g_ = self._gain(h); hi_t = orig * g_; lo_t = max(10.0, 0.6 * orig) * g_
-                    x = self.bowl_x.get((ns, name), hi_t)
+                    x = self.compass_law_x.get((ns, name), hi_t)
                     load = not any(blind.values()) and s["pending"] == 0 and not obs["slo_clean"]
-                    if self.bowl.p >= self.bowl.band.wall_high and load:
+                    if self.compass_law.p >= self.compass_law.band.wall_high and load:
                         x = lo_t                                         # fail up: the most pods the cover allows, at once
-                    elif self.bowl.p >= self.bowl.band.wall_high:
+                    elif self.compass_law.p >= self.compass_law.band.wall_high:
                         # past the wall, but not from load: a blind sense, or pods waiting for a machine that is gone.
                         # More pods answer neither, so fail up is native's own target, as on the card, where fail up is
                         # the card's own settings
-                        x = hi_t; back = x != self.bowl_x.get((ns, name), hi_t)
-                    elif x < hi_t and self.bowl.p < self.bowl.band.center and obs["slo_clean"] and s["pending"] == 0:
+                        x = hi_t; back = x != self.compass_law_x.get((ns, name), hi_t)
+                    elif x < hi_t and self.compass_law.p < self.compass_law.band.center and obs["slo_clean"] and s["pending"] == 0:
                         # responses back inside the band, nothing waiting. If the demand that called the extra pods has
                         # stopped growing (a fault, a spike that passed), they were for it only: the operator's own
                         # target returns at once. While the demand still grows they stay, so the autoscaler does not
@@ -783,9 +783,9 @@ class Controller:
                         if not self._rising((ns, name), win):
                             x = hi_t; back = True
                     else:
-                        F_ = bowl_rec["force"]
-                        x = x - (BOWL_UP if F_ > 0 else BOWL_DOWN) * F_ * (hi_t - lo_t)
-                    x = max(lo_t, min(hi_t, x)); self.bowl_x[(ns, name)] = x
+                        F_ = compass_rec["force"]
+                        x = x - (COMPASS_UP if F_ > 0 else COMPASS_DOWN) * F_ * (hi_t - lo_t)
+                    x = max(lo_t, min(hi_t, x)); self.compass_law_x[(ns, name)] = x
                     self._replica_room(h, ns, name, win, obs, s)
                     want = int(round(x))
                 want_h = want if obs["slo_clean"] else min(want, orig)
@@ -861,18 +861,18 @@ def parser():
     ap.add_argument("--max-nodes", type=int, default=1000)
     ap.add_argument("--max-node-step", type=int, default=2)
     ap.add_argument("--min-target-change", type=int, default=3)
-    ap.add_argument("--law", choices=["governor", "bowl"], default="governor",
-                    help="governor (default): the engine's allocation law; bowl: the bowl law on the HPA target and the node pool")
+    ap.add_argument("--law", choices=["governor", "compass"], default="governor",
+                    help="governor (default): the engine's allocation law; compass: the compass law on the HPA target and the node pool")
     ap.add_argument("--allow", type=float, default=0.02, help="the most a machine given back may add to the response time")
     ap.add_argument("--verdict-samples", type=int, default=200, help="requests measured before and after a machine is given back on trial")
     ap.add_argument("--verdict-every", type=int, default=10, help="decisions between trials")
     ap.add_argument("--verdict-recheck", type=int, default=120, help="decisions before a refused machine is tried again")
-    ap.add_argument("--bowl-tau", type=float, default=60.0, help="seconds the service takes to follow a lever (the bowl's damping)")
-    ap.add_argument("--bowl-center", type=float, default=0.4,
-                    help="where the bowl holds the service (0 the bare service time, 1 the SLO); 0.4, as the GPU governor")
+    ap.add_argument("--compass-tau", type=float, default=60.0, help="seconds the service takes to follow a lever (the compass's damping)")
+    ap.add_argument("--compass-center", type=float, default=0.4,
+                    help="where the compass holds the service (0 the bare service time, 1 the SLO); 0.4, as the GPU governor")
     ap.add_argument("--replica-ceiling", type=int, default=0,
                     help="the most replicas the operator lets Omni-Compass raise a sensed HPA's cap to while it binds "
-                         "(bowl law; 0, the default: the operator's cap is never moved)")
+                         "(compass law; 0, the default: the operator's cap is never moved)")
     ap.add_argument("--sensed", default="",
                     help="ns/deployment,... whose response time the --latency-file measures; only their HPAs are moved "
                          "(empty: every HPA, the single-service case)")

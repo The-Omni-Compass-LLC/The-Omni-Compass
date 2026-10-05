@@ -145,11 +145,11 @@ def main():
           f"| The mechanism's identity against the code | {' '.join(ident)} | `results/MECHANISM_IDENTITY.json` |",
           "| The engine's convergence to its pole under the bounded command | proved | `docs/TRACKING_THEOREM.md` |",
           "| Safety shield: 2,000,000 adversarial cases | 0 violations | `tests/test_shield_properties.py` |",
-          "| The bowl law (push and pull, 5% cushions, fail up, plug contract) on every muscle, the card and Kubernetes | one law, one file | `omnicompass/bowl.py` |",
+          "| The compass law (push and pull, 5% cushions, fail up, plug contract) on every muscle, the card and Kubernetes | one law, one file | `omnicompass/compass_law.py` |",
           "| Every file the results depend on, by fingerprint | written after the check passes | `RELEASE_MANIFEST.json` |", "",
           "The engine is the founder's eight-line equation, integrated by RK4 with the bounded command held across all four "
-          "stages; it is frozen and fingerprinted, and the C++ twin matches it. The bowl law is the outer loop that moves "
-          "each muscle's own setting: it reads one service position (0 calm, 1 the line), pulls it to the bowl's center, "
+          "stages; it is frozen and fingerprinted, and the C++ twin matches it. The compass law is the outer loop that moves "
+          "each muscle's own setting: it reads one service position (0 calm, 1 the line), pulls it to the compass's center, "
           "pushes against whatever is rising, bounds its force by tanh, fails up past the wall, and writes through a plug "
           "that reads every lever once before the first write, reads back every write, yields to any other writer and "
           "restores the snapshot at the end.", ""]
@@ -193,7 +193,7 @@ def main():
     bars(FIG / "hil_card.png", "The real card inside each organism: its work per energy against native (3 runs each)",
          "change against native (%)", SHORT, m, lo, hi)
     L += ["### The real card inside the six organisms", "",
-          "The card is one more muscle of each organism, governed by the same bowl law as the 656 modelled muscles; its "
+          "The card is one more muscle of each organism, governed by the same compass law as the 656 modelled muscles; its "
           "energy and requests are its own meter (`results/hil/run-20261002T082232Z/HIL.md`).", "",
           "![The card in the organisms](dossier/hil_card.png)", "",
           "| Organism | The card, work per energy (meter) | The modelled stacks, work per energy |", "|---|---:|---:|"]
@@ -234,7 +234,7 @@ def main():
     fig.tight_layout(); fig.savefig(FIG / "gpu_model.png", facecolor=SURF); plt.close(fig)
     L += ["## 3. The GPU governor on the modelled card: each base alone, and with Omni on top (evidence class S)", "",
           "Omni-Compass never runs the card. It sits on the card's own firmware (or on an operator's power cap) and moves the "
-          "clock ceiling and the power limit, which that base already accepts (`omni_controller/gpu_bowl.py`, the same law "
+          "clock ceiling and the power limit, which that base already accepts (`omni_controller/gpu_compass.py`, the same law "
           "in `realms/gpu_card.py`). A step down is taken only after a paired trial on the card shows it adds at most 2% to "
           "the card's own time on a request (`omnicompass/verdict.py`); where no step passes, the card runs as it does alone.", "",
           "![The modelled card](dossier/gpu_model.png)", "",
@@ -249,12 +249,12 @@ def main():
     # ------------------------------------------------------------------ 4. Kubernetes
     K = [("22", 31.0, 61.0, -0.9, "results/live/LIVE_REPS_22.md"), ("23", 28.7, 62.2, -1.0, "results/live/LIVE_REPS_23.md"),
          ("24", 31.6, 60.1, -1.8, "results/live/LIVE_REPS_24.md"), ("25", 32.3, 57.3, -0.6, "results/live/LIVE_REPS_25.md"),
-         ("26", 35.8, 55.4, -1.5, "results/live/LIVE_REPS_26.md"), ("26 bowl", 17.2, 64.8, 1.0, "results/live/LIVE_REPS_26.md"),
-         ("27", 36.6, 53.1, -0.0, "results/live/LIVE_REPS_27.md"), ("27 bowl", 15.9, 65.5, 0.2, "results/live/LIVE_REPS_27.md")]
+         ("26", 35.8, 55.4, -1.5, "results/live/LIVE_REPS_26.md"), ("26 compass", 17.2, 64.8, 1.0, "results/live/LIVE_REPS_26.md"),
+         ("27", 36.6, 53.1, -0.0, "results/live/LIVE_REPS_27.md"), ("27 compass", 15.9, 65.5, 0.2, "results/live/LIVE_REPS_27.md")]
     fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), dpi=160, sharey=True); fig.patch.set_facecolor(SURF)
     for ax, (idx, ttl) in zip(axes, ((1, "Machines in service"), (2, "Response time, p95"))):
         v = [-k[idx] for k in K]
-        ax.bar(range(len(K)), v, width=0.56, color=[SERIES[2] if "bowl" in k[0] else SERIES[0] for k in K], edgecolor=SURF, linewidth=2)
+        ax.bar(range(len(K)), v, width=0.56, color=[SERIES[2] if "compass" in k[0] else SERIES[0] for k in K], edgecolor=SURF, linewidth=2)
         for i, x in enumerate(v):
             ax.annotate(f"{x:+.1f}%", (i, x), xytext=(0, -12), textcoords="offset points", ha="center", fontsize=8)
         ax.set_xticks(range(len(K))); ax.set_xticklabels([f"set {k[0]}" for k in K], fontsize=7, color=INK2, rotation=20)
@@ -269,11 +269,11 @@ def main():
           "| Set | Law | Machines in service | p95 response | Failed requests | Total CPU incl. Omni's own | Receipt |",
           "|---|---|---:|---:|---:|---:|---|"]
     for k in K:
-        law = "bowl" if "bowl" in k[0] else "allocation"
+        law = "compass" if "compass" in k[0] else "allocation"
         L.append(f"| {k[0].split()[0]} | {law} | −{k[1]:.1f}% | −{k[2]:.1f}% | 0 / 0 | {k[3]:+.1f}% (not significant) | `{k[4]}` |")
     L += ["", "Machines and response time are proven better in every set. Total CPU including the controller's own cost "
           "is no different from native: the service uses 6-9% less CPU (proven) and the controller spends about 0.07 "
-          "cores, on the same 4-core runner. Set 27 runs the bowl aligned with the GPU governor (`docs/K8S_BOWL_PREREGISTRATION.md`, set 27): machines −15.9%, p95 −65.5%, labelled *better on machines within the band* by its preregistered rule.", ""]
+          "cores, on the same 4-core runner. Set 27 runs the compass aligned with the GPU governor (`docs/K8S_COMPASS_PREREGISTRATION.md`, set 27): machines −15.9%, p95 −65.5%, labelled *better on machines within the band* by its preregistered rule.", ""]
 
     # ------------------------------------------------------------------ 5. Six organisms grid
     gt = grid_tables()
@@ -287,7 +287,7 @@ def main():
                 panels[f"{size}× size"] = rows
         lines(FIG / fn, ttl, yl, runs, panels)
     L += ["## 5. The six organisms at 1, 10, 100 and 1,000 runs and sizes (evidence class S)", "",
-          "Each organism runs native (its own controllers) and with the bowl law on every muscle, same seed, same load, "
+          "Each organism runs native (its own controllers) and with the compass law on every muscle, same seed, same load, "
           "same clock. Size is the number of copies of the organism governed together on one clock; runs are the first N "
           "of the same paired set, so 1, 10, 100 and 1,000 nest. 100× and 1,000× are being computed on GitHub; their "
           "cells read 'running' until they land. 1,000 runs at 1,000× is beyond the free machines.", "",
@@ -302,7 +302,7 @@ def main():
           "The catalog (`realms/catalog.csv`): 656 muscles, 345 in Compute / AI / Cloud, 262 in Physics / Robotics / "
           "Autonomous, 282 in Energy / Facility / Industrial and 337 in Distribution / Specialized (1,226 counting a muscle "
           "once per realm). Every muscle alone and every organism are in `results/realms/REALMS.md` (round 3, the earlier "
-          "governor) and in the six-organism grid above (the bowl law). Every knob was handed back in every run.", ""]
+          "governor) and in the six-organism grid above (the compass law). Every knob was handed back in every run.", ""]
 
     # ------------------------------------------------------------------ 7. Harnesses and receipts
     L += ["## 7. Harnesses and receipts", "", "| Harness | What it proves | Receipt |", "|---|---|---|",
@@ -313,7 +313,7 @@ def main():
           "| `tools/run_gpu_card.py` | the modelled card, both profiles, tuning and fresh seeds | `results/sim/gpu_two_wire/` |",
           "| `verify.py` | everything above re-runs and checks itself; the manifest fingerprints the result | `results/VERIFY_RECEIPT.txt`, `RELEASE_MANIFEST.json` |", "",
           "Every raw result folder carries its `SHA256SUMS.txt`; the rules for each run were written and committed before it "
-          "ran (`docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_BOWL_PREREGISTRATION.md`).", ""]
+          "ran (`docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md`).", ""]
 
     # ------------------------------------------------------------------ 8. Open
     L += ["## 8. What is not yet shown", "",

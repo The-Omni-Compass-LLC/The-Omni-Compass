@@ -1,8 +1,8 @@
 # The second amendment (a raise waits for a steady demand): capacity, fairness and fault tests, 10 paired repetitions each
 
-Commit `5d2e238`, 2026-10-04, GitHub Actions workflow `benchmark-reps`, arms native / omni / bowl, order rotated,
+Commit `5d2e238`, 2026-10-04, GitHub Actions workflow `benchmark-reps`, arms native / omni / compass, order rotated,
 open-loop load. Transcribed from each run's `aggregate` job; each run's artifact `live-reps` holds the same tables.
-Design: `docs/K8S_BOWL_PREREGISTRATION.md`, "The pod record, and the second amendment". Evidence class **L**.
+Design: `docs/K8S_COMPASS_PREREGISTRATION.md`, "The pod record, and the second amendment". Evidence class **L**.
 
 | Test | Run | Aggregate job | `live-reps` zip SHA-256 |
 |---|---|---|---|
@@ -12,16 +12,16 @@ Design: `docs/K8S_BOWL_PREREGISTRATION.md`, "The pod record, and the second amen
 
 **Result.**
 
-- **Capacity: no measure significantly worse under either law.** The bowl law served 24.6 requests a second within
+- **Capacity: no measure significantly worse under either law.** The compass law served 24.6 requests a second within
   the line against native's 17.4, **+41.4% (+5.4 to +9.0)**; the allocation law **25.2, +44.8% (+4.9 to +10.7)** (it
-  served +0.0% before the amendment). Pods started with the bowl law 5.7 against 4.1, interval −0.64 to +3.84, no
+  served +0.0% before the amendment). Pods started with the compass law 5.7 against 4.1, interval −0.64 to +3.84, no
   longer significant (before +34.2%, significant); with the allocation law 3.4, −17.1%.
 - **Faults: no measure significantly worse under either law.** Recovery faster from every fault in both arms.
-- **Fairness: the bowl law, no measure significantly worse for either application.** The allocation law cut
+- **Fairness: the compass law, no measure significantly worse for either application.** The allocation law cut
   php-apache's response times by a third and its failures by 37%, and **the neighbour's failed requests rose from
   13.80% to 14.54% (+0.19 to +1.28 points), significant**: the allocation law conveys idle CPU to the service it
   senses, and on machines shared with a surging neighbour that CPU is the neighbour's headroom. The allocation law is
-  not labelled better in the fairness test; the bowl law, the law carried forward, is clean in all three.
+  not labelled better in the fairness test; the compass law, the law carried forward, is clean in all three.
 
 ## Capacity
 
@@ -29,7 +29,7 @@ Design: `docs/K8S_BOWL_PREREGISTRATION.md`, "The pod record, and the second amen
 |---|---:|---:|---:|---:|
 | native | 17.4 |  |  | 10 |
 | omni | 25.2 | +44.8% | +4.9 to +10.7 | 10 |
-| bowl | 24.6 | +41.4% | +5.4 to +9.0 | 10 |
+| compass | 24.6 | +41.4% | +5.4 to +9.0 | 10 |
 
 ### Capacity, B: the allocation law vs native
 
@@ -55,7 +55,7 @@ Design: `docs/K8S_BOWL_PREREGISTRATION.md`, "The pod record, and the second amen
 | pod start wait, total (s) | 12.6 | 5.2 | -58.7% | -13.4 to -1.404 | yes, better |
 | pod start wait, mean (s) | 2.583 | 1.346 | -47.9% | -2.043 to -0.4307 | yes, better |
 
-### Capacity, B with the bowl law vs native
+### Capacity, B with the compass law vs native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
@@ -109,7 +109,7 @@ Design: `docs/K8S_BOWL_PREREGISTRATION.md`, "The pod record, and the second amen
 | second app: time over the response line (% of samples) | 15.5 | 15.28 | -1.4% | -0.8296 to +0.38 | no |
 | second app: failed requests (%) | 13.8 | 14.54 | +5.3% | +0.1896 to +1.277 | yes, worse |
 
-### Fairness, B with the bowl law vs native
+### Fairness, B with the compass law vs native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
@@ -143,16 +143,16 @@ Design: `docs/K8S_BOWL_PREREGISTRATION.md`, "The pod record, and the second amen
 |---|---|---:|---:|---:|
 | machine down | native | 52 | 13.5 |  |
 | machine down | omni | 41 | 9.0 | -12 s (-22%) |
-| machine down | bowl | 41 | 9.5 | -11 s (-21%) |
+| machine down | compass | 41 | 9.5 | -11 s (-21%) |
 | spike | native | 238 | 50.5 |  |
 | spike | omni | 213 | 32.7 | -25 s (-11%) |
-| spike | bowl | 214 | 45.1 | -25 s (-10%) |
+| spike | compass | 214 | 45.1 | -25 s (-10%) |
 | runaway pod started | native | 76 | 7.7 |  |
 | runaway pod started | omni | 56 | 3.7 | -19 s (-26%) |
-| runaway pod started | bowl | 69 | 5.7 | -7 s (-9%) |
+| runaway pod started | compass | 69 | 5.7 | -7 s (-9%) |
 | probe blind | native | 67 | 0.6 |  |
 | probe blind | omni | 54 | 0.0 | -13 s (-19%) |
-| probe blind | bowl | 60 | 0.1 | -7 s (-10%) |
+| probe blind | compass | 60 | 0.1 | -7 s (-10%) |
 
 ### Faults, B: the allocation law vs native
 
@@ -178,7 +178,7 @@ Design: `docs/K8S_BOWL_PREREGISTRATION.md`, "The pod record, and the second amen
 | pod start wait, total (s) | 17.2 | 8.5 | -50.6% | -13.42 to -3.979 | yes, better |
 | pod start wait, mean (s) | 3.153 | 1.907 | -39.5% | -2.06 to -0.4324 | yes, better |
 
-### Faults, B with the bowl law vs native
+### Faults, B with the compass law vs native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

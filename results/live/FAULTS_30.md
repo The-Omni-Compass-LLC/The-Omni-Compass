@@ -1,4 +1,4 @@
-# The fault test on kind, re-run (set 30 F): native, Omni-Compass on top with the allocation law, and with the bowl law and the verdict, the operator's HPA target handed back at once when a fault is over, 10 paired repetitions
+# The fault test on kind, re-run (set 30 F): native, Omni-Compass on top with the allocation law, and with the compass law and the verdict, the operator's HPA target handed back at once when a fault is over, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps` with `faults: 1`, run 37105046042, commit `acc1c4e`, 2026-10-03, job
 `aggregate` (job 111161043506, `python tools/live_reps.py reps`), fixed-rate load, 900 measured seconds per arm.
@@ -6,10 +6,10 @@ Transcribed from the job's printed receipt; the run's artifact `live-reps` (zip 
 `f76ab0b2fff54538de8e04a0d21b3fead4ede66e2eea095dc9cc048e6b5669e6`) holds the same tables. Evidence class **L**. The
 same four faults at the same moments as the first run (`results/live/FAULTS.md`).
 
-**Against the first run.** Recovery is faster than native from every fault in both arms. With the bowl law, HPA
+**Against the first run.** Recovery is faster than native from every fault in both arms. With the compass law, HPA
 replicas fell from +8.2% to **+5.6%** (+0.19 to +0.78 pods, significant): still worse, with CPU and machines unchanged and
 no energy saved, so still outside the one rule (`DISCLOSURES.md`, section 3). It is not closed by this change; the next
-change and its re-run are recorded in `docs/K8S_BOWL_PREREGISTRATION.md`.
+change and its re-run are recorded in `docs/K8S_COMPASS_PREREGISTRATION.md`.
 
 ## Recovery from each fault
 
@@ -17,16 +17,16 @@ change and its re-run are recorded in `docs/K8S_BOWL_PREREGISTRATION.md`.
 |---|---|---:|---:|---:|
 | machine down | native | 65 | 14.0 |  |
 | machine down | omni | 40 | 10.1 | -25 s (-38%) |
-| machine down | bowl | 43 | 8.9 | -21 s (-33%) |
+| machine down | compass | 43 | 8.9 | -21 s (-33%) |
 | spike | native | 249 | 62.4 |  |
 | spike | omni | 246 | 40.2 | -3 s (-1%) |
-| spike | bowl | 231 | 59.3 | -18 s (-7%) |
+| spike | compass | 231 | 59.3 | -18 s (-7%) |
 | runaway pod started | native | 98 | 10.4 |  |
 | runaway pod started | omni | 69 | 4.8 | -29 s (-30%) |
-| runaway pod started | bowl | 86 | 7.8 | -12 s (-12%) |
+| runaway pod started | compass | 86 | 7.8 | -12 s (-12%) |
 | probe blind | native | 63 | 0.3 |  |
 | probe blind | omni | 60 | 0.1 | -3 s (-5%) |
-| probe blind | bowl | 54 | 0.0 | -9 s (-14%) |
+| probe blind | compass | 54 | 0.0 | -9 s (-14%) |
 
 ## B: the engine's allocation law against native, whole run with the faults
 
@@ -52,7 +52,7 @@ change and its re-run are recorded in `docs/K8S_BOWL_PREREGISTRATION.md`.
 | pod start wait, total (s) | 18.4 | 6.7 | -63.6% | -18.37 to -5.032 | yes, better |
 | pod start wait, mean (s) | 3.417 | 1.582 | -53.7% | -2.636 to -1.034 | yes, better |
 
-## B with the bowl law and the verdict against native, whole run with the faults
+## B with the compass law and the verdict against native, whole run with the faults
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

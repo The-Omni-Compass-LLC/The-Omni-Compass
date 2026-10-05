@@ -23,7 +23,7 @@ The files the leading repositories carry, the open ones such as Kubernetes and t
 | Dependency updates | `.github/dependabot.yml` |
 | Continuous verification | `.github/workflows/verify.yml`, `python3 verify.py` |
 | Reproducibility: fingerprinted release, sealed twins, checksummed results | `RELEASE_MANIFEST.json`, `results/SEAL.json`, `SHA256SUMS.txt` in every result folder |
-| Rules written before every benchmark run | `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_BOWL_PREREGISTRATION.md` |
+| Rules written before every benchmark run | `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md` |
 | A manual and a printable book | `docs/OMNI_COMPASS_MANUAL.md`, `docs/OMNI_COMPASS_MANUAL.pdf` |
 | Every result in one place, with charts | `docs/DOSSIER.md` |
 | A one-file archive of the repository | GitHub's Download ZIP, at any commit (the copyright deposit is `release/copyright/`) |

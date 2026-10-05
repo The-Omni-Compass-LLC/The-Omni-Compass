@@ -1,8 +1,8 @@
 # The third amendment (a lower target never held): capacity, fairness and fault tests, 10 paired repetitions each
 
-Commit `583c97f` (rules 1 to 4), 2026-10-04, GitHub Actions workflow `benchmark-reps`, arms native / omni / bowl, order
+Commit `583c97f` (rules 1 to 4), 2026-10-04, GitHub Actions workflow `benchmark-reps`, arms native / omni / compass, order
 rotated, open-loop load. Transcribed from each run's `aggregate` job; each run's artifact `live-reps` holds every table,
-the allocation law's in full. Design: `docs/K8S_BOWL_PREREGISTRATION.md`, "The third amendment". Evidence class **L**.
+the allocation law's in full. Design: `docs/K8S_COMPASS_PREREGISTRATION.md`, "The third amendment". Evidence class **L**.
 The first runs to carry the real machine under kind: a GitHub runner of **4 cores, 48% to 70% busy** in every arm,
 where "used / allocatable" reads 0.07 to 0.10 because each kind worker reports the same four cores as its own.
 
@@ -12,14 +12,14 @@ where "used / allocatable" reads 0.07 to 0.10 because each kind worker reports t
 | fairness | 37182801578 | 111387185768 | `e97c32c069b7b8bcac2463cc03014a1a4c4e50e2f685076e0c7e4974835062e7` |
 | faults | 37182803035 | 111386924282 | `89b6258c26fb11f69b5c054c2fce346e8c692b1a542eea71a275795abf005cf1` |
 
-**Result. The bowl law: no measure more than 2% worse in any of the three tests.**
+**Result. The compass law: no measure more than 2% worse in any of the three tests.**
 
-- **Capacity:** bowl law 24.0 against native's 16.2 requests a second, **+48.1% (+5.7 to +9.9)**, no measure worse;
+- **Capacity:** compass law 24.0 against native's 16.2 requests a second, **+48.1% (+5.7 to +9.9)**, no measure worse;
   allocation law 25.2, **+55.6% (+6.7 to +11.3)**, no measure worse.
-- **Fairness:** bowl law, neither application worse; one row significant, energy per core-hour on the declared 25 W
+- **Fairness:** compass law, neither application worse; one row significant, energy per core-hour on the declared 25 W
   standby model **+1.5%**, inside the 2% the rule allows. The allocation law: php-apache's failures −38.5%, response
   times a third lower, and the neighbour no longer worse (+2.2%, not significant; under the previous setting +5.3%).
-- **Faults:** bowl law, no measure worse; recovery from a lost machine 54 s faster (−61%).
+- **Faults:** compass law, no measure worse; recovery from a lost machine 54 s faster (−61%).
 
 ## Capacity
 
@@ -27,9 +27,9 @@ where "used / allocatable" reads 0.07 to 0.10 because each kind worker reports t
 |---|---:|---:|---:|---:|
 | native | 16.2 |  |  | 10 |
 | omni | 25.2 | +55.6% | +6.7 to +11.3 | 10 |
-| bowl | 24.0 | +48.1% | +5.7 to +9.9 | 10 |
+| compass | 24.0 | +48.1% | +5.7 to +9.9 | 10 |
 
-### Capacity, B with the bowl law vs native
+### Capacity, B with the compass law vs native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
@@ -55,7 +55,7 @@ where "used / allocatable" reads 0.07 to 0.10 because each kind worker reports t
 | host CPU busy, the real machine under kind (%) | 69.77 | 68.62 | -1.6% | -1.491 to -0.7976 | yes, less |
 | host cores (the real machine under kind) | 4 | 4 | +0.0% | +0 to +0 | no |
 
-## Fairness, B with the bowl law vs native
+## Fairness, B with the compass law vs native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
@@ -91,18 +91,18 @@ where "used / allocatable" reads 0.07 to 0.10 because each kind worker reports t
 |---|---|---:|---:|---:|
 | machine down | native | 89 | 15.6 |  |
 | machine down | omni | 41 | 9.7 | -48 s (-54%) |
-| machine down | bowl | 35 | 8.0 | -54 s (-61%) |
+| machine down | compass | 35 | 8.0 | -54 s (-61%) |
 | spike | native | 263 | 66.8 |  |
 | spike | omni | 252 | 48.6 | -10 s (-4%) |
-| spike | bowl | 241 | 62.9 | -22 s (-8%) |
+| spike | compass | 241 | 62.9 | -22 s (-8%) |
 | runaway pod started | native | 121 | 11.2 |  |
 | runaway pod started | omni | 83 | 5.7 | -38 s (-32%) |
-| runaway pod started | bowl | 96 | 8.6 | -25 s (-20%) |
+| runaway pod started | compass | 96 | 8.6 | -25 s (-20%) |
 | probe blind | native | 65 | 0.6 |  |
 | probe blind | omni | 48 | 0.0 | -17 s (-26%) |
-| probe blind | bowl | 54 | 0.0 | -11 s (-17%) |
+| probe blind | compass | 54 | 0.0 | -11 s (-17%) |
 
-### Faults, B with the bowl law vs native
+### Faults, B with the compass law vs native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

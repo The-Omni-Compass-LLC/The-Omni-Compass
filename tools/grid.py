@@ -70,7 +70,7 @@ def main():
     rule = "|---|" + "---:|" * (len(SIZES) * len(RUNS))
     L = ["# The six organisms: the full grid", "",
          "Evidence class **S** (models of the plants, not hardware). Every organism runs native (its own controllers) "
-         "and native with Omni-Compass on top (the bowl law on every muscle, round 6 of `docs/REALMS_PREREGISTRATION.md`) "
+         "and native with Omni-Compass on top (the compass law on every muscle, round 6 of `docs/REALMS_PREREGISTRATION.md`) "
          "on the same seed, the same load and the same clock. **Size** is the number of copies of the organism governed "
          "together on one clock: 1, 10, 100 and 1,000 clusters. **Runs** are paired seeds from 7000 on; 1, 10, 100 and "
          "1,000 runs are the first N of the same set, so each block nests inside the next. Built by `tools/grid.py` from "

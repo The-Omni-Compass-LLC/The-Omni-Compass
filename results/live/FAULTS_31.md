@@ -1,11 +1,11 @@
-# The fault test on kind, set 31 F: native, Omni-Compass on top with the allocation law, and with the bowl law and the verdict, past the wall from a blind sense or a lost machine the operator's own HPA target, 10 paired repetitions
+# The fault test on kind, set 31 F: native, Omni-Compass on top with the allocation law, and with the compass law and the verdict, past the wall from a blind sense or a lost machine the operator's own HPA target, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps` with `faults: 1`, run 37110005322, commit `0a38e76`, 2026-10-03, job `aggregate`
 (job 111175082422, `python tools/live_reps.py reps`), fixed-rate load, 900 measured seconds per arm. Transcribed from the job's
 printed receipt; the run's artifact `live-reps` (zip SHA-256 `fdba8b3b02d9c52f4a9357cff569e8cf3c0f7357a471b78af844106f3ea0442c`) holds the same tables.
 Evidence class **L** (real Kubernetes software on kind; energy is a declared model, not a meter).
 
-**The pods are closed.** With the bowl law, HPA replicas under faults **−1.1%** (not significant; first run +8.2%, set 30 F +5.6%). No measure in either arm is significantly worse than native. Recovery is faster than native from every fault; the bowl law's machine-down recovery −49%. The 99th percentile, alone among the response rows, reads higher in both arms (+10.2%, +30.5%) with intervals far across zero (−754 to +979 ms, −361 to +1,030 ms): in a run with faults it is set by a few seconds around each fault and swings by more than its own size between repetitions; the 95th percentile, the mean and the time over the line are all lower.
+**The pods are closed.** With the compass law, HPA replicas under faults **−1.1%** (not significant; first run +8.2%, set 30 F +5.6%). No measure in either arm is significantly worse than native. Recovery is faster than native from every fault; the compass law's machine-down recovery −49%. The 99th percentile, alone among the response rows, reads higher in both arms (+10.2%, +30.5%) with intervals far across zero (−754 to +979 ms, −361 to +1,030 ms): in a run with faults it is set by a few seconds around each fault and swings by more than its own size between repetitions; the 95th percentile, the mean and the time over the line are all lower.
 
 ## Recovery from each fault
 
@@ -13,16 +13,16 @@ Evidence class **L** (real Kubernetes software on kind; energy is a declared mod
 |---|---|---:|---:|---:|
 | machine down | native | 71 | 13.9 |  |
 | machine down | omni | 45 | 10.2 | -26 s (-37%) |
-| machine down | bowl | 36 | 8.9 | -35 s (-49%) |
+| machine down | compass | 36 | 8.9 | -35 s (-49%) |
 | spike | native | 241 | 54.4 |  |
 | spike | omni | 232 | 35.5 | -9 s (-4%) |
-| spike | bowl | 222 | 47.0 | -19 s (-8%) |
+| spike | compass | 222 | 47.0 | -19 s (-8%) |
 | runaway pod started | native | 88 | 8.9 |  |
 | runaway pod started | omni | 60 | 3.9 | -28 s (-32%) |
-| runaway pod started | bowl | 72 | 6.3 | -16 s (-18%) |
+| runaway pod started | compass | 72 | 6.3 | -16 s (-18%) |
 | probe blind | native | 62 | 0.5 |  |
 | probe blind | omni | 60 | 0.0 | -2 s (-4%) |
-| probe blind | bowl | 61 | 0.2 | -2 s (-3%) |
+| probe blind | compass | 61 | 0.2 | -2 s (-3%) |
 
 ## B: the engine's allocation law against native, whole run with the faults
 
@@ -48,7 +48,7 @@ Evidence class **L** (real Kubernetes software on kind; energy is a declared mod
 | pod start wait, total (s) | 16.5 | 9.6 | -41.8% | -13.91 to +0.1122 | no |
 | pod start wait, mean (s) | 3.083 | 1.846 | -40.1% | -2.202 to -0.2718 | yes, better |
 
-## B with the bowl law and the verdict against native, whole run with the faults
+## B with the compass law and the verdict against native, whole run with the faults
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The bowl: one smooth law for every muscle, and the plug every muscle is wired through.
+"""The compass: one smooth law for every muscle, and the plug every muscle is wired through.
 
 A muscle is a plug with one wire in and one wire out. The plug reads its meters and writes its lever; all the
 thinking is here, in the brain, written once for every muscle.
@@ -16,11 +16,11 @@ The plug (Plug)
 Two bands
   cover     the outer band, the lever's hard range (the device's or the buyer's lowest and highest setting); every
             write is clipped to it, so nothing the math does can set the lever outside
-  bowl      the service reading as a position in its band, 0 to 1 (0: calm, 1: the service line); the brain pulls it
-            to the bottom of the bowl, the center (0.5 by default); the walls run to 0.05 and 0.95, and the last 5% on
+  compass      the service reading as a position in its band, 0 to 1 (0: calm, 1: the service line); the brain pulls it
+            to the bottom of the compass, the center (0.5 by default); the walls run to 0.05 and 0.95, and the last 5% on
             each side is cushion (10% in all) before the line
 
-The force (Bowl.force), the physics of a ball in a bowl with the right friction
+The force (CompassLaw.force), the physics of a ball in a compass with the right friction
   pull      K_P x (position - center): gentle near the bottom, harder up the walls
   push      K_D x velocity: whatever is shoving the position (a load rising, heat building) is met by an equal and
             opposite push; it is also the friction that stops the ball sloshing past the bottom (with K_D chosen for
@@ -28,7 +28,7 @@ The force (Bowl.force), the physics of a ball in a bowl with the right friction
   smooth    the force is A x tanh(raw / A): a spring near the center that bends over and flattens into its maximum A,
             never a corner, never a hammer; the same shape the engine already uses for v_eff (omnicompass/core.py)
   fail up   past the 0.95 wall the up side goes to its full force at once, and the down side may not act until the
-            position is back inside the bowl
+            position is back inside the compass
 
 Two forces (antagonist pairs)
   up        a positive force adds capacity, power, cooling or speed (scale out, raise a clock, start a chiller)
@@ -71,7 +71,7 @@ class Band:
 
 
 @dataclass
-class Bowl:
+class CompassLaw:
     """The brain's law for one muscle. dt: seconds between decisions; tau: the muscle's response time in seconds
     (how long the service reading takes to follow the lever); kd defaults to critical damping for that response."""
     band: Band

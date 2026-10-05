@@ -18,18 +18,18 @@ class SixKube(unittest.TestCase):
     def test_arms_share_demand_and_hand_back(self):
         with tempfile.TemporaryDirectory() as t:
             recs = {}
-            for arm in ("native", "bowl"):
+            for arm in ("native", "compass"):
                 d = Path(t) / arm
                 self.assertEqual(run_kil.main(["--organism", "compute_ai_cloud", "--arm", arm, "--duration", "0.5",
                                                "--out", str(d), "--dry", "--load-max", "6"]), 0)
                 recs[arm] = json.loads((d / "organism.json").read_text())
-            self.assertEqual(recs["native"]["demand"], recs["bowl"]["demand"])
-            self.assertEqual(recs["native"]["replicas"], recs["bowl"]["replicas"])
-            self.assertEqual((min(recs["bowl"]["replicas"]), max(recs["bowl"]["replicas"])), (1, 6))
+            self.assertEqual(recs["native"]["demand"], recs["compass"]["demand"])
+            self.assertEqual(recs["native"]["replicas"], recs["compass"]["replicas"])
+            self.assertEqual((min(recs["compass"]["replicas"]), max(recs["compass"]["replicas"])), (1, 6))
             self.assertEqual(recs["native"]["sim_writes"], 0)
-            self.assertGreater(recs["bowl"]["sim_writes"], 0)
-            self.assertTrue(recs["bowl"]["sim_restore_ok"])
-            log = (Path(t) / "bowl" / "load_schedule.log").read_text()
+            self.assertGreater(recs["compass"]["sim_writes"], 0)
+            self.assertTrue(recs["compass"]["sim_restore_ok"])
+            log = (Path(t) / "compass" / "load_schedule.log").read_text()
             self.assertIn("load-generator replicas -> ", log)
 
     def test_six_organisms_named(self):

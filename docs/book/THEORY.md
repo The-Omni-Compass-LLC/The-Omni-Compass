@@ -26,10 +26,10 @@ Read line by line:
 3. **G(X) . n(X) <= 0 on the boundary.** At the wall of Omega, the flow never points outward (n is the outward normal).
    Nothing that starts inside can cross out. In control theory this is the Nagumo condition: Omega is forward
    invariant.
-4. **grad L(X) . G(X) <= 0.** There is a function L, the energy of the bowl, that never increases along the motion.
+4. **grad L(X) . G(X) <= 0.** There is a function L, the energy of the compass, that never increases along the motion.
    This is a Lyapunov condition.
 5. **=> X(t) settles in M*.** Together, an invariant container and a non-increasing energy force every path into the
-   set M* where the energy stops falling: the bottom of the bowl.
+   set M* where the energy stops falling: the bottom of the compass.
 
 The power of the statement is that it does not depend on the particular disturbance. Every input up to the size the
 container is built for has the same answer before it is asked: the state stays inside and returns. That is what I mean
@@ -48,7 +48,7 @@ The theory sets five requirements on any law that claims to close the circle:
 | Finite curvature | the landscape the state moves on has no infinite slopes or pits | the drive is bounded by tanh; the authority is clipped |
 | Global conservation | what flows in is matched by what flows out | the drain and the bath's friction match the drive |
 | Recurrence | a disturbed state returns arbitrarily close to where it was | convergence to the target pole at rate K_P |
-| One law | every subsystem obeys the same law, no special cases | one engine, one bowl, every muscle |
+| One law | every subsystem obeys the same law, no special cases | one engine, one compass, every muscle |
 
 ## The closed circle tested
 
@@ -73,7 +73,7 @@ Every conservation law is the shadow of a symmetry (Noether). The closed circle 
 |---|---|---|
 | Temporal (the law does not change with time) | energy | the same law governs every decision; the receipt compares like with like |
 | Spatial (the law does not depend on where) | momentum | the same law governs every muscle in every realm |
-| Rotational | angular momentum | the bowl is symmetric about its center; the engine is symmetric between its poles |
+| Rotational | angular momentum | the compass is symmetric about its center; the engine is symmetric between its poles |
 | Internal alignment | alignment invariance | the alignment state is pulled to its pole whichever pole it is |
 
 Around them sit the boundary conditions of the circle: maximum deviation (the boundary limit), topological closure
@@ -113,7 +113,7 @@ The software uses the engineering core of this principle, and every part of that
 - The six-state engine, its bounded control command held through the integration step, and the convergence of its
   alignment state to its pole are proved (`docs/TRACKING_THEOREM.md`) and tested against a C++ twin.
 - The invariance and boundedness of each engine state were checked state by state (Chapter "Closing the Circle").
-- The bowl law pulls every muscle's service reading to the middle of its band under a bounded, smooth force, and its
+- The compass law pulls every muscle's service reading to the middle of its band under a bounded, smooth force, and its
   behavior is measured in simulation and on real software.
 
 The wider claims - one law across every physical scale, the cosmological and quantum readings, the candidate unified
@@ -211,7 +211,7 @@ flows spread outward. As T increases, curvature concentrates and a positive feed
 geometric funnel forms: self-reinforcing curvature, finite depth, bounded deviation, with the boundary abs(E) <= E_max
 respected. Structure emerges from fluctuation through curvature concentration and feedback.
 
-In the engine, the basin state S rolls down its potential Phi(S) to a stable bottom; in the bowl, every muscle's service
+In the engine, the basin state S rolls down its potential Phi(S) to a stable bottom; in the compass, every muscle's service
 reading is pulled into the bottom of its own funnel.
 
 ## Polarity
@@ -251,7 +251,7 @@ whose horizon boundary is forward invariant (the Nagumo condition again).
 
 **For an engineer,** the transform reads: pull toward the center (compression); a wall where the muscle saturates;
 and, when one muscle saturates, move the excess to its siblings rather than hammering it (redistribution). The first two
-are built into the bowl. Redistribution across muscles is designed and not yet built; it is on the roadmap.
+are built into the compass. Redistribution across muscles is designed and not yet built; it is on the roadmap.
 
 # Closing the Circle in the Engine
 
@@ -272,13 +272,13 @@ Each state of the engine was checked against the closed-circle conditions:
 
 Three openings were found and each has its closure:
 
-1. **The basin's negative side.** A quartic term in Phi(S) would give the bowl a wall on both sides. This changes the
+1. **The basin's negative side.** A quartic term in Phi(S) would give the compass a wall on both sides. This changes the
    frozen engine and is a new version with its own proof.
 2. **The outer loop.** The frozen live governor computes the push and pull u and uses it as a convergence signal; it
-   does not send u to a lever. The bowl closes this loop: reading, force, plug, lever, read-back. On the modelled card
+   does not send u to a lever. The compass closes this loop: reading, force, plug, lever, read-back. On the modelled card
    this is the difference between +0.1% and several percent of work per energy (the one-wire governor against the
-   corrected two-wire bowl, `results/sim/gpu_two_wire/`).
-3. **The corner.** clip() is a hard stop; tanh is its smooth form. The bowl uses tanh.
+   corrected two-wire compass, `results/sim/gpu_two_wire/`).
+3. **The corner.** clip() is a hard stop; tanh is its smooth form. The compass uses tanh.
 
 # The Physics of a Processor
 
@@ -297,7 +297,7 @@ customer's.
 
 Omni-Compass sits on the customer's side, where the job's service line is known. It holds two wires: the clock ceiling
 sets how high the boost may climb, and the power limit becomes a lid set just above what that ceiling draws. The boost
-stops at the bottom of the bowl instead of slamming into the wall; the limiter rarely needs to act. Every watt kept off
+stops at the bottom of the compass instead of slamming into the wall; the limiter rarely needs to act. Every watt kept off
 the chip is saved twice in a data center: once at the chip and again at the chillers that would have carried its heat.
 
 # The Six Organisms and the Benchmark Grid

@@ -1,4 +1,4 @@
-# Repeated live runs on kind, set 28: native, Omni-Compass on top with the engine's allocation law, and with the bowl law and the verdict, 10 paired repetitions
+# Repeated live runs on kind, set 28: native, Omni-Compass on top with the engine's allocation law, and with the compass law and the verdict, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps`, run 37087620193, commit `24666d7`, 2026-10-03, job `aggregate`
 (job 111111314584, `python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds
@@ -6,8 +6,8 @@ per arm. Transcribed from the job's printed receipt; the run's artifact `live-re
 `ca308239ad469e9429749ff6b976c46c2320922db99cc4b313f9200ecc4103fd`) holds the same table. Evidence class **L** (real
 Kubernetes software on kind; energy is a declared model, not a meter: every worker stays powered in every arm).
 
-The bowl arm gives a machine back only where the verdict (`omnicompass/verdict.py`, stepwise) measures responses at
-most 2% slower without it (`docs/K8S_BOWL_PREREGISTRATION.md`, the verdict in the live controller).
+The compass arm gives a machine back only where the verdict (`omnicompass/verdict.py`, stepwise) measures responses at
+most 2% slower without it (`docs/K8S_COMPASS_PREREGISTRATION.md`, the verdict in the live controller).
 
 ### B: the engine's allocation law (`--law governor`) against native
 
@@ -32,7 +32,7 @@ most 2% slower without it (`docs/K8S_BOWL_PREREGISTRATION.md`, the verdict in th
 | pod start wait, total (s) | 16.7 | 6.3 | -62.3% | -18.82 to -1.975 | yes, better |
 | pod start wait, mean (s) | 3.15 | 1.787 | -43.3% | -2.658 to -0.06823 | yes, better |
 
-### B with the bowl law and the verdict (`--law bowl`) against native
+### B with the compass law and the verdict (`--law compass`) against native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

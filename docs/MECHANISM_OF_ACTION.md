@@ -173,7 +173,7 @@ are kept word for word.
 
 Demand climbs, spikes, eases part way, climbs again and settles to idle. The staging law decides how many machines are
 in service at every decision, and which ones, so that capacity follows demand up at once and comes back down only as
-far as it safely can. It is the bowl law (`omnicompass/bowl.py`) applied to the machine pool
+far as it safely can. It is the compass law (`omnicompass/compass_law.py`) applied to the machine pool
 (`omni_controller/controller.py`), the release gate (`omnicompass/nervous_system.py node_release_gate`), the verdict
 (`omnicompass/verdict.py`) and the actuator (`scripts/kind_nodepool.sh`). Every symbol below is a line of that code.
 
@@ -232,7 +232,7 @@ machines full lands on it at once, so no request ever waits on a machine Omni-Co
 underneath really removes an empty machine (Azure's cluster autoscaler, Karpenter), that same order hands it the
 emptiest machine first, and the bill falls with the machine.
 
-**The same law on every discrete unit.** Machines are one case. In the muscle models (`realms/bowl_arm.py
+**The same law on every discrete unit.** Machines are one case. In the muscle models (`realms/compass_arm.py
 release_safe`), a cooling plant's chillers and a compute pool's machines follow the same law: one unit back only when
 the units left cover the recent peak with headroom (RELEASE_MARGIN 0.6 for machines, 0.8 of a unit's capacity for
 chillers), one at a time, and back at once when the wall is reached.

@@ -210,8 +210,8 @@ organisms (the four realms, the four stacked with every duplicate kept (1,226), 
 in as one more muscle of its NVIDIA GPU family (a spine family, so the card is in every organism). The card serves the
 pinned request stream; its own power.draw is heat in the organism's thermal zones and load on its storage sites.
 
-- **Arms:** native (the stacks' own controllers, the card's own firmware) and omni (one engine on everything: the bowl
-  law on every simulated muscle, `realms/bowl_arm.py`, and on the card's two wires, `omni_controller/gpu_bowl.py`). At
+- **Arms:** native (the stacks' own controllers, the card's own firmware) and omni (one engine on everything: the compass
+  law on every simulated muscle, `realms/compass_arm.py`, and on the card's two wires, `omni_controller/gpu_compass.py`). At
   90% of each arm every knob and both wires are handed back; a knob not handed back, a card limit not back at its
   start, or a card governor exiting non-zero makes the run invalid (exit 2).
 - **Seeds and repetitions:** 3 paired repetitions, seeds 6000-6002; arm order alternates by repetition and organism.
@@ -222,14 +222,14 @@ pinned request stream; its own power.draw is heat in the organism's thermal zone
 
 ## Round 6: the compute pools inside the band (2026-10-03, before any round-6 seed)
 
-Round 3's rule (band first) was not held on the organisms: the bowl law spent 0.20 to 0.29 points more time over the
+Round 3's rule (band first) was not held on the organisms: the compass law spent 0.20 to 0.29 points more time over the
 service line than native in every completed cell of the grid (`results/scale/GRID.md`). The cause was measured on the
 whole tower (seeds 7000-7003), muscle by muscle:
 - **compute pools giving a machine back** (42 muscles): +1.77 points of their own time over the line;
 - **the HPA target set looser than the operator's** (249 muscles): +0.22 points;
 - the process and thermal setpoints, which save the most energy, added none.
 
-Two changes, both in `realms/bowl_arm.py`, everything else as round 3:
+Two changes, both in `realms/compass_arm.py`, everything else as round 3:
 1. **The HPA target is held at the operator's own.** Loosening it past native costs the service time. This is the same
    rule as the card's speed floor and the live controller's cover.
 2. **A machine goes back only when the machines left cover the recent peak at 0.6 of the plant's own release level**

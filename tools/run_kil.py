@@ -18,8 +18,8 @@ on the measured window's clock, ORGANISM_STEPS steps, and the real cluster is wi
 
 Arms, the same organism, the same seed, the same demand:
   native  the stacks' own controllers, and Kubernetes alone underneath (Omni-Compass not started)
-  omni / bowl  one engine on everything: the bowl law (omnicompass/bowl.py) on every simulated muscle
-          (realms/bowl_arm.py) and the live controller on the cluster (started by kind_bench.sh). At KILL_AT of the
+  omni / compass  one engine on everything: the compass law (omnicompass/compass_law.py) on every simulated muscle
+          (realms/compass_arm.py) and the live controller on the cluster (started by kind_bench.sh). At KILL_AT of the
           window every simulated knob is handed back, and this file checks it was.
 
 Writes organism.json (every plant's receipt, the steps, the replica trace, the cluster's watts as the organism saw
@@ -30,7 +30,7 @@ one real cluster inside. A large organism is built before the window opens: this
 built and starts on the epoch written to the go file (--go-file), so the cluster's window and the organism's clock open
 together however long the build takes.
 
-  python3 tools/run_kil.py --organism organism_656 --arm bowl --duration 960 --out DIR [--scale 10] [--go-file F]
+  python3 tools/run_kil.py --organism organism_656 --arm compass --duration 960 --out DIR [--scale 10] [--go-file F]
 """
 from __future__ import annotations
 
@@ -46,11 +46,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import Body, KILL_AT  # noqa: E402
-from realms.bowl_arm import bowl_apply  # noqa: E402
+from realms.compass_arm import compass_apply  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
 from tools.run_hil import groups, NAMES, SEED0  # noqa: E402
 
-OMNI_ARMS = ("omni", "bowl", "strict")
+OMNI_ARMS = ("omni", "compass", "strict")
 
 
 def demand_trace(body):
@@ -138,7 +138,7 @@ def main(argv=None):
                 if k >= kill_at:
                     p.override = {}
                     continue
-                v = bowl_apply(p, knob)
+                v = compass_apply(p, knob)
                 if v and v != last.get(id(p)):
                     writes += 1
                 last[id(p)] = v

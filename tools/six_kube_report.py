@@ -32,12 +32,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.live_reps import arm_gauges, T95, LABEL, NEUTRAL  # noqa: E402
+from tools.live_reps import arm_rep, arm_gauges, T95, LABEL, NEUTRAL  # noqa: E402
 from tools.run_hil import NAMES, REALMS  # noqa: E402
 from pilot.bench_report import LOWER_BETTER  # noqa: E402
 
 ORDER = list(REALMS) + ["organism_656", "stack_1226"]
-OMNI = ("bowl", "omni")
+OMNI = ("compass", "omni")
 CLUSTER = ["response time (ms), 95th percentile", "response time (ms), 99th percentile",
            "time over the response line (% of samples)", "failed requests (%)", "HPA replicas, mean", "pods started",
            "worker nodes in service, mean", "energy, parked workers still on at idle power (Wh)", "energy (Wh)",
@@ -77,7 +77,7 @@ def collect(root):
         if not d.is_dir() or not (d / "organism.json").exists() or (d / "INVALID").exists() or not (d / "capture.csv").exists():
             continue
         rec = json.loads((d / "organism.json").read_text())
-        _, arm, rep = d.name.split("-", 2)
+        _, arm, rep = arm_rep(d)
         g = arm_gauges(d)
         g.update(organism_gauges(rec))
         g["_restore_ok"] = rec.get("sim_restore_ok", True)
@@ -116,7 +116,7 @@ def main(root):
     L = ["# The six organisms with the real Kubernetes cluster inside: native against native with Omni-Compass on top", "",
          "Each organism runs on the measured window's clock with the cluster as one more muscle (`tools/run_kil.py`): its "
          "own compute demand drives the load generator, the cluster's watts are its heat and load. Native: the stacks' own "
-         "controllers and Kubernetes alone. Omni: the bowl law on every simulated muscle and the live controller on the "
+         "controllers and Kubernetes alone. Omni: the compass law on every simulated muscle and the live controller on the "
          "cluster, handed back at 90% of the window. Cluster rows are measured on the real cluster (energy is the declared "
          "power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).", "",
          "How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column says in words whether it is "

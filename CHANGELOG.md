@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-05
+- The law is named for what it is: the compass law (the word "bowl" is gone). In code: `omnicompass/compass_law.py`
+  (class `CompassLaw`), `realms/compass_arm.py`, `omni_controller/gpu_compass.py`; the arm is `compass`. Runs recorded
+  before the rename keep their folder names (`bench-bowl-N`), which the report tools read as the compass arm.
+  The preregistration is `docs/K8S_COMPASS_PREREGISTRATION.md`. Raw recorded files and sealed records are untouched.
 - The verifier's final line now reflects every check. It had read a local name left from the preregistration loop, so it
   printed PASS even when a check above it failed (`verify.py`). With that fixed, two hidden failures surfaced and were
   fixed. (1) The sealed GPU governor had three comment and log strings changed by the "reset" rename; its sealed bytes
@@ -35,9 +39,9 @@
   organisms with the real cluster inside; the staging law written as equations.
 
 ## 2026-10-02
-- The bowl law (`omnicompass/bowl.py`) and the plug contract: one smooth law for every muscle, one restore point,
+- The compass law (`omnicompass/compass_law.py`) and the plug contract: one smooth law for every muscle, one restore point,
   read-back, the one-writer rule.
-- Two-wire GPU governor (`omni_controller/gpu_bowl.py`): clock ceiling and power limit; the wire check
+- Two-wire GPU governor (`omni_controller/gpu_compass.py`): clock ceiling and power limit; the wire check
   (`tools/gpu_wire_check.py`) runs before anything else.
 - The six organisms (four realms, the four stacked with duplicates, the whole tower) as one benchmark set, with the
   real card inside on a GPU machine (`tools/run_hil.py`) and the 1 / 10 / 100 / 1,000 runs-and-size grid

@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The bowl law on every realm muscle (omnicompass/bowl.py): each plant's knob held by its own bowl.
+"""The compass law on every realm muscle (omnicompass/compass_law.py): each plant's knob held by its own compass.
 
-Each plant's service is read as one position in its bowl (0 calm, 1 the line): the worst of its queue or lateness, its
+Each plant's service is read as one position in its compass (0 calm, 1 the line): the worst of its queue or lateness, its
 load above half, and, for a storage site, its draw on the grid connection above half. The last period in violation
-reads as past the wall (fail up). The bowl's force moves the knob: a positive force adds capacity, power, cooling or
+reads as past the wall (fail up). The compass's force moves the knob: a positive force adds capacity, power, cooling or
 protection, a negative force gives it back, each knob inside its own cover. At the kill every knob returns to native.
 
 Knob by plant (the override key the plant already obeys, its native value, its cover, and which way is "more"):
@@ -21,7 +21,7 @@ Knob by plant (the override key the plant already obeys, its native value, its c
 """
 from __future__ import annotations
 
-from omnicompass.bowl import Band, Bowl, clamp
+from omnicompass.compass_law import Band, CompassLaw, clamp
 
 UP, DOWN, RELEASE = 0.10, 0.02, -0.2
 RELEASE_MARGIN = 0.6     # a machine goes back only when the rest covers the recent peak at 0.6 of the plant's own release level
@@ -90,17 +90,17 @@ def lever(plant, knob):
     return None
 
 
-def bowl_apply(plant, knob, dt=1.0, tau=3.0):
-    """One decision: the plant's bowl reads its position and moves its knob. Returns the override written."""
+def compass_apply(plant, knob, dt=1.0, tau=3.0):
+    """One decision: the plant's compass reads its position and moves its knob. Returns the override written."""
     lv = lever(plant, knob)
     if lv is None:
         plant.override = {}
         return {}
-    if not hasattr(plant, "_bowl"):
-        plant._bowl = Bowl(Band(0.0, 1.0), dt=dt, tau=tau, kp=1.0, smooth=0.3)
-        plant._bowl.kd *= 3.0
-        plant._bowl_x = lv[1]
-    b = plant._bowl
+    if not hasattr(plant, "_compass"):
+        plant._compass_law = CompassLaw(Band(0.0, 1.0), dt=dt, tau=tau, kp=1.0, smooth=0.3)
+        plant._compass_law.kd *= 3.0
+        plant._compass_law_x = lv[1]
+    b = plant._compass_law
     F = b.force(position(plant))
     key, native, lo, hi, sign = lv
     if key == "release":
@@ -112,7 +112,7 @@ def bowl_apply(plant, knob, dt=1.0, tau=3.0):
         x = hi if sign > 0 else lo                                 # fail up: full capacity at once
     else:
         g = UP if F > 0 else DOWN
-        x = clamp(plant._bowl_x + sign * g * F * span, lo, hi)
-    plant._bowl_x = x
+        x = clamp(plant._compass_law_x + sign * g * F * span, lo, hi)
+    plant._compass_law_x = x
     plant.override = {} if abs(x - native) < 1e-9 else {key: x}
     return plant.override

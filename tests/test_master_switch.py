@@ -4,7 +4,7 @@
 """The master switch (omnicompass/master.py, tools/omni_switch.py): one OFF for the whole harness.
 
 Two governors run at once as their own processes, against the stand-in hardware: the two-wire GPU governor on the fake
-nvidia-smi, and the Kubernetes controller (bowl law, HPA target mode) on the fake kubectl. Then:
+nvidia-smi, and the Kubernetes controller (compass law, HPA target mode) on the fake kubectl. Then:
 
   running   both register themselves; status lists both
   off       one command turns the whole harness off: both governors put every setting back (the card's start limit and
@@ -45,11 +45,11 @@ def main():
     env.update(FAKE_SMI_STATE=str(smi), FAKE_KUBE_STATE=str(kube), FAKE_KUBE_LOG=str(t / "kube_writes.log"))
     hot = t / "hot.csv"
     hot.write_text("elapsed_seconds,latency_ms,ok\n" + "".join(f"{i * 0.5},900,1\n" for i in range(40)))
-    gpu_cmd = [sys.executable, "-m", "omni_controller.gpu_bowl", "--mode", "cap", "--smi", SMI, "--interval", "0.5",
+    gpu_cmd = [sys.executable, "-m", "omni_controller.gpu_compass", "--mode", "cap", "--smi", SMI, "--interval", "0.5",
                "--audit", str(t / "gpu.jsonl"), "--kill-file", str(t / "gpu.kill"), "--latency-file", str(lat),
                "--slo-ms", "800", "--floor-w", "105", "--learn-samples", "3"]
     k8s_cmd = [sys.executable, "-m", "omni_controller.controller", "--kubectl", KUBECTL, "--interval", "1",
-               "--audit", str(t / "k8s.jsonl"), "--kill-file", str(t / "k8s.kill"), "--mode", "target", "--law", "bowl",
+               "--audit", str(t / "k8s.jsonl"), "--kill-file", str(t / "k8s.kill"), "--mode", "target", "--law", "compass",
                "--latency-file", str(hot), "--slo-ms", "500", "--latency-window-s", "30"]
     switch = [sys.executable, str(ROOT / "tools" / "omni_switch.py")]
     gpu = subprocess.Popen(gpu_cmd, env=env, cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)

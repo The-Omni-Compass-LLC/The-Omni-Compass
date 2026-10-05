@@ -11,7 +11,7 @@ import tools.live_reps as LR
 
 G = {  # arm -> (p95, p99, replicas, cpu incl. Omni's own, machines)
     "native": (380, 590, 8.8, 1.00, 6.0), "native40": (300, 480, 10.5, 1.10, 6.0), "native30": (190, 300, 13.0, 1.30, 6.0),
-    "native20": (120, 190, 17.0, 1.60, 6.0), "bowl": (132, 186, 8.4, 1.02, 5.7)}
+    "native20": (120, 190, 17.0, 1.60, 6.0), "compass": (132, 186, 8.4, 1.02, 5.7)}
 
 
 def fake(d):
@@ -37,28 +37,28 @@ def main():
     assert "The cost to match" in md and "Native tuned, HPA target 20" in md
     import json
     out = json.loads((t / "LIVE_REPS.json").read_text())
-    c = out["cost_to_match"]["bowl"]
+    c = out["cost_to_match"]["compass"]
     assert c["native_setting"] == "native20", c                       # the only native setting at or under 132 ms
     assert abs(c["replicas_pct"] - (17.0 - 8.4) / 8.4 * 100) < 1.0 and c["cpu_pct"] > 50
-    G["native20"] = (140, 200, 17.0, 1.60, 6.0)                       # now no native setting reaches the bowl
+    G["native20"] = (140, 200, 17.0, 1.60, 6.0)                       # now no native setting reaches the compass
     for r in (1, 2, 3):
         (t / f"bench-native20-{r}" / "capture.csv").write_text("x\n")
     LR.main(str(t))
-    assert json.loads((t / "LIVE_REPS.json").read_text())["cost_to_match"]["bowl"] is None
+    assert json.loads((t / "LIVE_REPS.json").read_text())["cost_to_match"]["compass"] is None
     assert "no native setting tried reached it" in (t / "LIVE_REPS.md").read_text()
     # the fault table: one run per arm, a fault at t0+100 s; native stays over the line 120 s, Omni 30 s
     import time as _t
     f = Path(tempfile.mkdtemp())
-    for arm, bad in (("native", 120), ("bowl", 30)):
+    for arm, bad in (("native", 120), ("compass", 30)):
         d = f / f"bench-{arm}-1"; d.mkdir()
         (d / "window_start.txt").write_text("1000\n")
         rows = ["elapsed_seconds,latency_ms,ok"] + [f"{t},{900 if 100 <= t < 100 + bad else 100},1" for t in range(0, 600, 5)]
         (d / "latency.csv").write_text("\n".join(rows) + "\n")
         (d / "faults.log").write_text("1100 machine down: kind-worker6\n1220 machine back: kind-worker6\n")
-    tab = "\n".join(LR.fault_table(f, ["native", "bowl"]))
+    tab = "\n".join(LR.fault_table(f, ["native", "compass"]))
     assert "| machine down | native | 120 |" in tab and "| machine down | omni | 30 |" in tab and "-90 s" in tab, tab
     # the bill on a real cloud: 4 machines for the first hour, then 2 (Azure deleted two empty ones): 6 machine-hours
-    b = Path(tempfile.mkdtemp()) / "bench-bowl-1"; b.mkdir()
+    b = Path(tempfile.mkdtemp()) / "bench-compass-1"; b.mkdir()
     (b / "window_start.txt").write_text("0\n"); (b / "window_end.txt").write_text("7200\n")
     (b / "billed_nodes.csv").write_text("epoch_s,machines\n" + "".join(f"{t},{4 if t < 3600 else 2}\n" for t in range(0, 7201, 15)))
     bl = LR.bill(b)
@@ -67,7 +67,7 @@ def main():
     # the capacity test: load steps 1..8 every 100 s; native breaks the line from step 4, Omni from step 7
     import datetime as _dt
     cdir = Path(tempfile.mkdtemp()); t0 = 1_800_000_000
-    for arm, brk in (("native", 4), ("bowl", 7)):
+    for arm, brk in (("native", 4), ("compass", 7)):
         for rep in (1, 2):
             d = cdir / f"bench-{arm}-{rep}"; d.mkdir()
             (d / "window_start.txt").write_text(f"{t0}\n")
@@ -77,11 +77,11 @@ def main():
                 f"{t},{900 if t // 100 + 1 >= brk else 100},1\n" for t in range(0, 800, 5)))
     cap, sh = LR.capacity(cdir / "bench-native-1", 500)
     assert cap == 3 and len(sh) == 8, (cap, sh)
-    tab, co = LR.capacity_table(cdir, ["native", "bowl"])
-    assert co["native"]["capacity_rps"] == 18 and co["bowl"]["capacity_rps"] == 36 and abs(co["bowl"]["change_pct"] - 100) < 1e-6, co
+    tab, co = LR.capacity_table(cdir, ["native", "compass"])
+    assert co["native"]["capacity_rps"] == 18 and co["compass"]["capacity_rps"] == 36 and abs(co["compass"]["change_pct"] - 100) < 1e-6, co
     assert LR.capacity(f / "bench-native-1", 500)[0] is None        # a run without rising load is not a capacity run
     # the fairness test: the noisy neighbour's own gauges, from its own probe
-    nd = Path(tempfile.mkdtemp()) / "bench-bowl-1"; nd.mkdir()
+    nd = Path(tempfile.mkdtemp()) / "bench-compass-1"; nd.mkdir()
     (nd / "latency_noisy.csv").write_text("elapsed_seconds,latency_ms,ok\n" + "".join(f"{i},{100 + i},1\n" for i in range(100)) + "100,0,0\n")
     sa = LR.second_app(nd)
     assert abs(sa["second app: failed requests (%)"] - 100 / 101) < 1e-9 and sa["second app: response time (ms), 95th percentile"] > 190, sa

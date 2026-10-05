@@ -35,7 +35,7 @@ GitHub Actions run 37262797634, engine frozen at commit 353903683009. Raw files 
 energy row counts a parked worker at its full idle power, which is what kind does. The second counts it at the
 declared standby power, which needs a node autoscaler that really removes the machine; this run has none.
 
-## omni (bowl law): Omni-Compass on top of native, push and pull on the HPA target and the node pool vs native, 10 paired repetitions
+## omni (compass law): Omni-Compass on top of native, push and pull on the HPA target and the node pool vs native, 10 paired repetitions
 
 | Gauge | native | omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

@@ -14,7 +14,7 @@
 # counters read at both ends where the machine has them.
 #   native  no Omni process
 #   watch   Omni runs and decides, and is forbidden to write (the control: any write fails the run)
-#   omni    Omni holds the card's two wires, clock ceiling and power limit (omni_controller/gpu_bowl.py --mode cap;
+#   omni    Omni holds the card's two wires, clock ceiling and power limit (omni_controller/gpu_compass.py --mode cap;
 #           OMNI_ENGINE=one_wire runs the earlier power-limit-only governor, omni_controller/gpu_governor.py)
 # Three receipts, kept apart: A the governor's audit.jsonl (telemetry, six-state reading, command, shield), B its
 # actuator records (requested, return code, read-back, enforced limit, delay), C the bench's own nvidia-smi sampling
@@ -178,7 +178,7 @@ for rep in ${REP_ONLY:-$(seq 1 "$REPS")}; do
     if [ "$arm" != "native" ]; then
       mode=watch; [ "$arm" = "omni" ] && mode=cap
       rm -f "$D/kill"
-      ENGINE_MOD=omni_controller.gpu_governor; [ "${OMNI_ENGINE:-bowl}" = bowl ] && ENGINE_MOD=omni_controller.gpu_bowl
+      ENGINE_MOD=omni_controller.gpu_governor; [ "${OMNI_ENGINE:-compass}" = compass ] && ENGINE_MOD=omni_controller.gpu_compass
       # one governor per card, each on its own card's two wires, all reading the same response times
       for g in "${CARDS[@]}"; do
         sfx=""; [ "${#CARDS[@]}" = 1 ] || sfx="-$g"

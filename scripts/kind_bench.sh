@@ -26,9 +26,9 @@
 # account (deploy/kind/rbac-omni.yaml) with `kubectl auth can-i` receipts for what it can and cannot do; the run fails if
 # Omni made no write or if the reset leaves any record behind; SHA256SUMS.txt fingerprints every output file.
 set -euo pipefail
-ARM="${ARM:?set ARM=native, ARM=watch (Omni watches, writes nothing), ARM=omni (B: Omni on top), ARM=bowl (B with the bowl law) or ARM=strict (C: Omni decides replicas and nodes)}"
+ARM="${ARM:?set ARM=native, ARM=watch (Omni watches, writes nothing), ARM=omni (B: Omni on top), ARM=compass (B with the compass law) or ARM=strict (C: Omni decides replicas and nodes)}"
 STRICT=""; [ "$ARM" = "strict" ] && STRICT="--strict-replicas"
-LAW=""; [ "$ARM" = "bowl" ] && LAW="--law bowl"
+LAW=""; [ "$ARM" = "compass" ] && LAW="--law compass"
 DRY=""; [ "$ARM" = "watch" ] && DRY="--dry-run"
 # native tuned harder (the cost-to-match test): ARM=native40, native30, native20 is Kubernetes alone with its HPA target
 # lowered to that value by the operator, no Omni-Compass; it shows what native needs to reach Omni-Compass's response times

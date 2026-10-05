@@ -1,7 +1,7 @@
 # Why the stacks were late more often on 2026-10-02, and the knob that settles it
 
 Model runs (evidence S), organism Compute / AI / Cloud (345 muscles), seeds 6000-6004, 240 steps, native against the
-bowl law on every muscle, handed back at 90%. Each change is Omni against native. Late: time over the service line
+compass law on every muscle, handed back at 90%. Each change is Omni against native. Late: time over the service line
 (lower is better). Energy: lower is better (less spent). Work: higher is better.
 
 ## The two knobs that moved between commit `c908054` (the first card run) and `2a9285d`
@@ -31,5 +31,5 @@ wait; handing a machine back with no headroom leaves the next burst to wait for 
 at least one seed is late more often, which the founder's rule does not allow. The dial is the trade: every step
 past 0.6 buys energy with lateness.
 
-Reproduce: the scratch script in this file's commit message, or run `realms.bowl_arm` with `RELEASE_MARGIN` set and
+Reproduce: the scratch script in this file's commit message, or run `realms.compass_arm` with `RELEASE_MARGIN` set and
 the HPA target lever on or off.

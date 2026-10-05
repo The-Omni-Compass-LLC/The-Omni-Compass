@@ -32,7 +32,7 @@ from typing import Dict, List
 from omnicompass.adapter import Governor, OBSERVE
 from omnicompass.nervous_system import from_governor
 from .plants import TEMPLATES, ThermalZone, EnergyStorage, pack
-from .bowl_arm import bowl_apply
+from .compass_arm import compass_apply
 from .presets import STEPS_SINGLE, ORGANISM_STEPS, CAL_SEED, params_for
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -144,7 +144,7 @@ def run_muscle_arm(row, seed, arm):
             plant.step()
         plant.finalize()
         return dict(plant.m, writes=0, after_kill_writes=0, restore_ok=True)
-    g = None if arm in ("native", FIXED, "bowl") else Governor()
+    g = None if arm in ("native", FIXED, "compass") else Governor()
     if arm == "watch":
         g.set_mode(OBSERVE)
     kill_at = int(KILL_AT * plant.steps)
@@ -152,8 +152,8 @@ def run_muscle_arm(row, seed, arm):
     last = None
     restore_ok = True
     for k in range(plant.steps):
-        if arm == "bowl":
-            v = bowl_apply(plant, knob) if k < kill_at else {}
+        if arm == "compass":
+            v = compass_apply(plant, knob) if k < kill_at else {}
             if k >= kill_at:
                 plant.override = {}
                 restore_ok = restore_ok and _restored(plant, knob)
@@ -260,7 +260,7 @@ def run_bodies(bodies, arm, groups):
     """Run bodies on one 15 s clock. groups: lists of body indices, one governor per group (one group of all bodies is
     one governor over the whole stack; one group per body is a separate governor per body). arm native: no governor."""
     govs = []
-    if arm not in ("native", "bowl"):
+    if arm not in ("native", "compass"):
         for grp in groups:
             g = Governor()
             if arm == "watch":
@@ -273,13 +273,13 @@ def run_bodies(bodies, arm, groups):
     for k in range(ORGANISM_STEPS):
         for b in bodies:
             b.couple()
-        if arm == "bowl":
+        if arm == "compass":
             for b in bodies:
                 for p, knob in zip(b.plants, b.knobs):
                     if k >= kill_at:
                         p.override = {}
                         continue
-                    v = bowl_apply(p, knob)
+                    v = compass_apply(p, knob)
                     if v and v != last.get(id(p)):
                         writes += 1
                     last[id(p)] = v

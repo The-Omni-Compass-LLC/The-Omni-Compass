@@ -167,12 +167,18 @@ def fault_windows(d, slo):
     return out
 
 
+def arm_rep(d):
+    """(prefix, arm, repetition) of a bench-<arm>-<rep> folder; runs recorded before the rename name the compass arm 'bowl'."""
+    pre, arm, rep = d.name.split("-", 2)
+    return pre, {"bowl": "compass"}.get(arm, arm), rep
+
+
 def fault_table(root, cols):
     import os
     slo = float(os.environ.get("SLO_MS", 500))
     per = {}
     for d in sorted(root.glob("bench-*-*")):
-        _, arm, rep = d.name.split("-", 2)
+        _, arm, rep = arm_rep(d)
         w = fault_windows(d, slo)
         if w:
             per.setdefault(arm, {})[rep] = w
@@ -193,7 +199,7 @@ def fault_table(root, cols):
             rec = np.mean([v[0]["recover_s"] for v in vals]); ovr = np.mean([v[0]["over_pct"] for v in vals])
             base = np.mean([v[1]["recover_s"] for v in vals])
             ch = "" if a == "native" else (f"{(rec - base):+.0f} s" + (f" ({(rec - base) / base * 100:+.0f}%)" if base > 0 else ""))
-            L.append(f"| {k} | {dict(bowl='omni').get(a, a)} | {rec:.0f} | {ovr:.1f} | {ch} |")
+            L.append(f"| {k} | {dict(compass='omni').get(a, a)} | {rec:.0f} | {ovr:.1f} | {ch} |")
     return L + [""]
 
 
@@ -245,7 +251,7 @@ def capacity_table(root, cols):
     slo = float(os.environ.get("SLO_MS", 500)); rate = float(os.environ.get("LOAD_RATE", 6))
     per = {}
     for d in sorted(root.glob("bench-*-*")):
-        _, arm, rep = d.name.split("-", 2)
+        _, arm, rep = arm_rep(d)
         c, sh = capacity(d, slo)
         if c is not None:
             per.setdefault(arm, {})[rep] = c
@@ -279,7 +285,7 @@ def capacity_table(root, cols):
 def main(root):
     root = Path(root); runs = {}
     for d in sorted(root.glob("bench-*-*")):
-        _, arm, rep = d.name.split("-", 2)
+        _, arm, rep = arm_rep(d)
         if (d / "capture.csv").exists() and not (d / "INVALID").exists():
             runs.setdefault(arm, {})[rep] = arm_gauges(d)
     out = {"repetitions": {a: sorted(r) for a, r in runs.items()}, "means": {}, "paired": {}}
@@ -293,8 +299,8 @@ def main(root):
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native against omni: Omni-Compass on top of native)", ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
-    cols = [a for a in ("native",) if a in runs] + tuned + [a for a in ("watch", "omni", "bowl", "strict") if a in runs]
-    names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "bowl": "omni", "strict": "omni alone (not on top: earlier sets only)",
+    cols = [a for a in ("native",) if a in runs] + tuned + [a for a in ("watch", "omni", "compass", "strict") if a in runs]
+    names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "compass": "omni", "strict": "omni alone (not on top: earlier sets only)",
              **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned}}
     L += ["## All columns, mean over repetitions", "", "| Gauge | " + " | ".join(names[a] for a in cols) + " |",
           "|---|" + "---:|" * len(cols)]
@@ -303,13 +309,13 @@ def main(root):
                   "Azure's cluster autoscaler deletes a machine once it is empty. Machine-hours are integrated every 15 s over the",
                   "measured window and priced at the list price per machine-hour. The energy rows remain the declared model.", ""]
                  if cloud else NOTE)
-    for a in ("watch", "omni", "bowl", "strict"):
+    for a in ("watch", "omni", "compass", "strict"):
         if a not in runs or "native" not in runs:
             continue
         reps = sorted(set(runs[a]) & set(runs["native"]))
         out["paired"][a] = {}
         title = {"watch": "omni, watching (dry run, writes nothing: the cost of being there)", "omni": "omni (allocation law, earlier sets)",
-                 "bowl": "omni (bowl law): Omni-Compass on top of native, push and pull on the HPA target and the node pool",
+                 "compass": "omni (compass law): Omni-Compass on top of native, push and pull on the HPA target and the node pool",
                  "strict": "omni alone (not on top: earlier sets only)"}[a]
         L += [f"## {title} vs native, {len(reps)} paired repetitions", "",
               "| Gauge | native | omni | Change | 95% interval of the difference | Significant |", "|---|---:|---:|---:|---:|---|"]
@@ -328,7 +334,7 @@ def main(root):
             L.append(f"| {LABEL.get(k, k)} | {nb:.4g} | {ob:.4g} | {ch_s} | {d.mean() - half:+.4g} to {d.mean() + half:+.4g} | "
                      f"{(('yes, more' if d.mean() > 0 else 'yes, less') if k in NEUTRAL else ('yes, better' if better else 'yes, worse')) if sig else 'no'} |")
         L.append("")
-    if tuned and "native" in runs and any(a in runs for a in ("omni", "bowl")):
+    if tuned and "native" in runs and any(a in runs for a in ("omni", "compass")):
         # the cost to match: native tuned harder by its operator (a lower HPA target, more pods) against native with
         # Omni-Compass on top, at the same work; the cheapest native setting that reaches Omni-Compass's p95, and what
         # it costs over Omni-Compass
@@ -347,7 +353,7 @@ def main(root):
             L.append(f"| {names[a]} | {m[a][P95]:.4g} | {m[a][P99]:.4g} | {m[a][REP]:.4g} | {m[a][CPU]:.4g} | {m[a][NODES]:.4g} |")
         L.append("")
         out["cost_to_match"] = {}
-        for o in ("bowl", "omni"):
+        for o in ("compass", "omni"):
             if o not in runs:
                 continue
             match = [a for a in ["native"] + tuned if m[a][P95] <= m[o][P95]]

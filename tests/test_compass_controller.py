@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The bowl law in the live Kubernetes controller (--law bowl), against the fake kubectl (tests/fake_cluster/kubectl).
+"""The compass law in the live Kubernetes controller (--law compass), against the fake kubectl (tests/fake_cluster/kubectl).
 
-  calm      p95 far under the SLO: the bowl pulls down, the HPA target never rises above the operator's (never tighter
+  calm      p95 far under the SLO: the compass pulls down, the HPA target never rises above the operator's (never tighter
             than native), and the node pool gives one machine back per decision through the release gate
   hot       p95 past the 0.95 wall: fail up, the HPA target goes to the bottom of its cover (60% of the operator's) at
             once and the node pool asks for one machine more
@@ -15,7 +15,7 @@
             returned when calm and steady; the reset restores it
   sensed    two services, the probe measuring one: only its HPA moves; the neighbour's stays the operator's
   restore   the reset returns every HPA target to the operator's and removes every record
-  engine    the six-state engine still runs every decision (E and U in the audit) and the decision names the bowl law
+  engine    the six-state engine still runs every decision (E and U in the audit) and the decision names the compass law
 """
 import json, os, sys, tempfile, time
 from pathlib import Path
@@ -48,7 +48,7 @@ def controller(tmp, lat, *extra):
     marker = Path(tmp) / "scaled"
     cmd = f"python3 -c \"open('{marker}', 'a').write('{{n}}\\\\n')\""
     a = parser().parse_args(["--kubectl", FAKE, "--interval", "60", "--audit", str(Path(tmp) / "audit.jsonl"),
-                             "--kill-file", str(Path(tmp) / "kill"), "--mode", "nodepool", "--law", "bowl",
+                             "--kill-file", str(Path(tmp) / "kill"), "--mode", "nodepool", "--law", "compass",
                              "--node-scale-cmd", cmd, "--max-node-step", "1", "--latency-file", str(lat), "--slo-ms", "500",
                              "--latency-window-s", "30", *extra])
     return Controller(a), marker
@@ -71,12 +71,12 @@ def main():
         c.step()
     ns = [int(x) for x in marker.read_text().split()] if marker.exists() else []
     d = decisions(t)
-    assert all(x["law"] == "bowl" and x["bowl"] is not None for x in d), "decision does not name the bowl law"
+    assert all(x["law"] == "compass" and x["compass_law"] is not None for x in d), "decision does not name the compass law"
     assert all("E" in x and "U" in x for x in d), "the engine did not run"
-    assert target_now(st) <= 50, "the bowl tightened the HPA past the operator's target"
+    assert target_now(st) <= 50, "the compass tightened the HPA past the operator's target"
     assert all(b - a in (-1, 0) for a, b in zip([6] + ns, ns)), f"more than one machine back per decision: {ns}"
     print(f"calm: target {target_now(st)} (operator 50, never higher), node commands {ns}, "
-          f"force {d[-1]['bowl']['force']}, position {d[-1]['bowl']['position']}")
+          f"force {d[-1]['compass_law']['force']}, position {d[-1]['compass_law']['position']}")
 
     # hot: p95 = 600 ms (position 1.2, past the wall): fail up at once
     t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 600.0)
@@ -190,7 +190,7 @@ def main():
     c, marker = controller(t, lat)
     c.step()
     assert target_now(st) == 50, f"blind: target {target_now(st)}, expected the operator's own 50"
-    assert decisions(t)[-1]["bowl"]["position"] >= 0.95, "blind did not read as past the wall"
+    assert decisions(t)[-1]["compass_law"]["position"] >= 0.95, "blind did not read as past the wall"
     print(f"blind: past the wall, target stays the operator's {target_now(st)} (more pods cannot answer a blind sense)")
 
     # restore: the reset hands the target back and removes the record (after a real breach moved it)
@@ -202,7 +202,7 @@ def main():
     S = json.loads(st.read_text())
     assert target_now(st) == 50 and ANNOTATION not in S["hpas"][0]["metadata"].get("annotations", {})
     print("reset: target back to 50, no record left")
-    print("PASS bowl law in the live controller")
+    print("PASS compass law in the live controller")
 
 
 if __name__ == "__main__":

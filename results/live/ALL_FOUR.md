@@ -1,8 +1,8 @@
 # More work, faster, on fewer machines, with less energy: all four in one run
 
-Run: benchmark-reps 37226863122, commit `01d1033` (preregistered in `docs/K8S_BOWL_PREREGISTRATION.md`, "all four in
+Run: benchmark-reps 37226863122, commit `01d1033` (preregistered in `docs/K8S_COMPASS_PREREGISTRATION.md`, "all four in
 one run"), ten paired repetitions on real Kubernetes (kind, six workers), native against native with Omni-Compass on top
-(bowl law), open-loop load rising one step at a time from 1 to 8 load generators and back down to 1, 180 s a step.
+(compass law), open-loop load rising one step at a time from 1 to 8 load generators and back down to 1, 180 s a step.
 Raw files: `results/live/raw/run-37226863122/`. Recomputed from them with `tools/live_reps.py`. This run's machine floor
 was one (the floor of two was adopted after it started).
 
@@ -14,7 +14,7 @@ zero); no measure worse beyond the noise.**
 
 ## All columns, mean over repetitions
 
-| Gauge | Native | Omni on top, bowl law |
+| Gauge | Native | Omni on top, compass law |
 |---|---:|---:|
 | worker nodes in service, mean | 6 | 5.784 |
 | node-hours | 4.514 | 4.348 |
@@ -42,7 +42,7 @@ zero); no measure worse beyond the noise.**
 energy row counts a parked worker at its full idle power, which is what kind does. The second counts it at the
 declared standby power, which needs a node autoscaler that really removes the machine; this run has none.
 
-## B with the bowl law: Omni-Compass on top, push and pull on the HPA target and the node pool vs native, 10 paired repetitions
+## B with the compass law: Omni-Compass on top, push and pull on the HPA target and the node pool vs native, 10 paired repetitions
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
@@ -75,4 +75,4 @@ Each step adds one load generator (6 requests a second each). A run's capacity i
 | Arm | Capacity (requests a second), mean | Change against native | 95% interval of the difference (requests a second) | Repetitions |
 |---|---:|---:|---:|---:|
 | native | 24.6 |  |  | 10 |
-| bowl | 31.8 | +29.3% | +5.4 to +9.0 | 10 |
+| compass | 31.8 | +29.3% | +5.4 to +9.0 | 10 |

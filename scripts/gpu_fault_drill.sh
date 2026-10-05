@@ -25,7 +25,7 @@ $PY tools/gpu_workload.py calibrate --out "$OUT" --device "cuda:$GPU" ${SIM:+--s
 SLO=$($PY -c "import json; print(round(10*json.load(open('$OUT/calib.json'))['service_ms'],1))")
 $PY tools/gpu_workload.py run --calib-file "$OUT/calib.json" --out "$OUT/wl" --device "cuda:$GPU" --duration $(( STEP * 9 )) --drain 5 ${SIM:+--sim} > "$OUT/workload.log" 2>&1 &
 WL=$!
-gov() { $PY -m omni_controller.gpu_bowl --mode cap --gpus "$GPU" --smi "$SMI" --interval 2 --audit "$OUT/audit-$1.jsonl" \
+gov() { $PY -m omni_controller.gpu_compass --mode cap --gpus "$GPU" --smi "$SMI" --interval 2 --audit "$OUT/audit-$1.jsonl" \
           --kill-file "$OUT/kill-$1" --latency-file "$OUT/wl/latency.csv" --slo-ms "$SLO" --learn-samples 3 > "$OUT/governor-$1.log" 2>&1 & echo $!; }
 sleep 10
 # 1 crash
@@ -38,7 +38,7 @@ G=$(gov switch); sleep "$STEP"
 $PY tools/omni_switch.py off --reason "fault drill" --wait 60 > "$OUT/switch.txt" 2>&1
 wait "$G" 2>/dev/null
 check "switch: the master switch pulled, the governor handed back and exited (limit $(lim) W)" 'grep -q "every governor has restored and exited" "$OUT/switch.txt" && [ "$(lim)" = "$START" ]'
-$PY -m omni_controller.gpu_bowl --mode cap --gpus "$GPU" --smi "$SMI" --interval 2 --audit "$OUT/audit-refused.jsonl" --duration 5 > "$OUT/refused.log" 2>&1
+$PY -m omni_controller.gpu_compass --mode cap --gpus "$GPU" --smi "$SMI" --interval 2 --audit "$OUT/audit-refused.jsonl" --duration 5 > "$OUT/refused.log" 2>&1
 check "switch: while OFF, a governor refuses to start" 'grep -q "master switch is OFF" "$OUT/refused.log"'
 $PY tools/omni_switch.py on > /dev/null
 # 3 blind

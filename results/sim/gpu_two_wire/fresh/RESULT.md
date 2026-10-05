@@ -1,6 +1,6 @@
 # The GPU card in simulation: each base alone, and with Omni-Compass on top
 
-Evidence class **S** (a model, not a meter). Seeds 5100-5109, 600 s each, commit `9ec6e50`, 2026-10-03 01:03 UTC. Model: `realms/gpu_card.py`; the law: `omnicompass/bowl.py` and the verdict `omnicompass/verdict.py`.
+Evidence class **S** (a model, not a meter). Seeds 5100-5109, 600 s each, commit `9ec6e50`, 2026-10-03 01:03 UTC. Model: `realms/gpu_card.py`; the law: `omnicompass/compass_law.py` and the verdict `omnicompass/verdict.py`.
 
 Omni-Compass never runs the card. It sits on top of what already runs it (the card's own firmware, or an operator's power cap) and moves two settings that base already accepts: the clock ceiling and the power limit. A step down is taken only after a paired trial on the card shows it adds at most 2% to the card's own time on a request; where no step passes, Omni leaves the base exactly as it was. Every comparison below is a base alone against the same base with Omni on top, on the same seeds and the same requests.
 

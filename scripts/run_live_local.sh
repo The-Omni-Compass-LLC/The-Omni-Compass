@@ -16,7 +16,7 @@ for t in docker kind kubectl jq curl python3; do command -v "$t" >/dev/null || {
 pip install -q -r requirements.txt
 mkdir -p "$OUT"
 for rep in $(seq 1 "$REPS"); do
-  for arm in native bowl; do
+  for arm in native compass; do
     echo "=== repetition $rep, arm $arm ==="
     kind delete cluster --name omni-bench >/dev/null 2>&1 || true
     kind create cluster --name omni-bench --config deploy/kind/cluster-full.yaml --wait 300s

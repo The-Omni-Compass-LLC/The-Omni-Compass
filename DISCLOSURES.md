@@ -29,7 +29,7 @@ and every report point here. Where any other page seems to say more than this pa
 4. Every comparison is paired: the same seed, load and clock with and without Omni-Compass, in an order rotated by
    repetition. Intervals are 95% intervals over the paired repetitions. Ratios across seeds are summarised as geometric
    means. Labels are assigned by code from rules written and committed before the run
-   (`docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_BOWL_PREREGISTRATION.md`), never by hand.
+   (`docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md`), never by hand.
 5. Losses and failed runs are kept beside the wins (`docs/EVIDENCE_LEDGER.md`, `results/live/`, git history). The
    first real-card run, for example, saved energy (+3.6% work per energy, proven) and made the slowest answers 58.5%
    slower; it is published as it happened.
@@ -102,7 +102,7 @@ machines.
 | Question | Page |
 |---|---|
 | What has been measured, and how strongly | `docs/STATE_OF_PLAY.md`, `docs/DOSSIER.md`, `docs/EVIDENCE_LEDGER.md` |
-| The rules written before each run | `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_BOWL_PREREGISTRATION.md` |
+| The rules written before each run | `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md` |
 | How to wire it, level by level, and how to confirm it is wired right | `docs/OMNI_COMPASS_MANUAL.md` (chapters 8 and 9), the book `docs/OMNI_COMPASS_MANUAL.pdf` |
 | The license, in plain answers, and third-party components | `LICENSE`, `LICENSING_FAQ.md`, `NOTICE`, `THIRD_PARTY_NOTICES.md`, `PATENTS.md`, `TRADEMARKS.md` |
 | The 656 muscles, what each is for and how it is wired | `docs/MUSCLE_CATALOG.md` |

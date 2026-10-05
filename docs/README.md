@@ -19,7 +19,7 @@ Read in this order. Every page here is current; dated records are in [`history/`
 
 | Page | What it holds |
 |---|---|
-| [`K8S_BOWL_PREREGISTRATION.md`](K8S_BOWL_PREREGISTRATION.md) | Kubernetes and Azure: every test, every amendment, every result |
+| [`K8S_COMPASS_PREREGISTRATION.md`](K8S_COMPASS_PREREGISTRATION.md) | Kubernetes and Azure: every test, every amendment, every result |
 | [`GPU_PREREGISTRATION.md`](GPU_PREREGISTRATION.md) | The card and the eight cards |
 | [`REALMS_PREREGISTRATION.md`](REALMS_PREREGISTRATION.md) | The 656 muscles and the six organisms |
 | [`CITYLEARN_PREREGISTRATION.md`](CITYLEARN_PREREGISTRATION.md) | Omni-Compass on top of CityLearn, an independent building and battery simulator |

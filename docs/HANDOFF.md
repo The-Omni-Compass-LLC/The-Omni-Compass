@@ -9,10 +9,10 @@ The full manual: the book `docs/OMNI_COMPASS_MANUAL.pdf` (built by `python3 docs
 | Piece | File | What it is |
 |---|---|---|
 | Frozen engine | `omnicompass/core.py`, `omnicompass/adapter.py` | the 8-equation core and the governor; unchanged, with its proofs |
-| The bowl (new engine layer) | `omnicompass/bowl.py` | one smooth law for every muscle: pull to the middle of the band, push against drift, tanh-bounded, fail up past 95%; and the plug (cover, one restore point, foreign-writer rule) |
-| Two-wire GPU governor | `omni_controller/gpu_bowl.py` | the bowl on a real card: clock ceiling (`nvidia-smi -lgc`, up wire) and power limit (`-pl`, down wire) |
+| The compass (new engine layer) | `omnicompass/compass_law.py` | one smooth law for every muscle: pull to the middle of the band, push against drift, tanh-bounded, fail up past 95%; and the plug (cover, one restore point, foreign-writer rule) |
+| Two-wire GPU governor | `omni_controller/gpu_compass.py` | the compass on a real card: clock ceiling (`nvidia-smi -lgc`, up wire) and power limit (`-pl`, down wire) |
 | Wire check | `tools/gpu_wire_check.py` | proves both card wires follow, read back and go home before anything runs |
-| Realm muscles under the bowl | `realms/bowl_arm.py` | the bowl on every one of the 656 modelled muscles |
+| Realm muscles under the compass | `realms/compass_arm.py` | the compass on every one of the 656 modelled muscles |
 
 ## The six organisms
 
@@ -52,10 +52,10 @@ and 1,000 runs. Examples used: 1,000 runs at 1x = runs_per_shard 100, 10 shards;
 
 ## Open work
 
-1. Bring the bowl's time over the service line down to native or below (about +0.2 points today, every organism).
+1. Bring the compass's time over the service line down to native or below (about +0.2 points today, every organism).
 2. 1,000 runs at 1,000x and the two largest organisms at 1,000x need a bigger machine than GitHub's.
 3. Kubernetes and the GPU together on one Lambda box (k3s), one set of receipts.
-4. The C++ twin of the bowl (the frozen engine already has one, `cpp/`).
+4. The C++ twin of the compass (the frozen engine already has one, `cpp/`).
 
 ---
 

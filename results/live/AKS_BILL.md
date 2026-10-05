@@ -4,14 +4,14 @@ Source: GitHub Actions workflow `aks-metered`, run 37187059424, commit `5b2832f`
 111467353670). Artifact `live-reps-aks` (zip SHA-256 `75a545d88505e764a5a5ace0255f4ff977b4a5fa3cbd232d1efca557b15bdad8`).
 eastus, `Standard_D2s_v4` workers (2 vCPU, 8 GiB, USD 0.096 an hour; the subscription does not allow the preregistered
 `Standard_D2s_v5` in eastus, same size and price), one system machine and a work pool of 1 to 4 under Azure's
-autoscaler, a fresh cluster per arm, deleted after it. Arms native / bowl / omni, order rotated, 900 measured seconds.
+autoscaler, a fresh cluster per arm, deleted after it. Arms native / compass / omni, order rotated, 900 measured seconds.
 Repetition 2 lost an arm and is excluded, as preregistered; four paired repetitions remain. Three earlier attempts
 (runs 37171672509, 37178992436, 37183307625) stopped before any measurement at the load generator's placement (kind's
 control-plane selector kept beside the AKS one) and are not results. Evidence class **L**, the bill **metered** (Azure's
 own count of machines every 15 s, priced at list).
 
 **Result. No difference in the bill, either way, and no measure significantly worse.** Native 0.615 machine-hours
-(USD 0.059 a 15-minute window); with the allocation law −0.6%, with the bowl law +0.8%, intervals across zero. Azure's own
+(USD 0.059 a 15-minute window); with the allocation law −0.6%, with the compass law +0.8%, intervals across zero. Azure's own
 autoscaler already ran this workload on about 1.86 workers out of 4: on a real cloud with a node autoscaler underneath,
 this light workload leaves Omni-Compass no machine to give back. The machine savings measured on kind (where the native
 arm has no node autoscaler and all six workers stay on) do not carry to this setting, and that is now the reading of
@@ -43,7 +43,7 @@ record. Four repetitions with wide intervals: no saving shown, none excluded at 
 | machines billed, machine-hours | 0.615 | 0.6116 | -0.6% | -0.1364 to +0.1296 | no |
 | compute bill at list price ($) | 0.05904 | 0.05871 | -0.6% | -0.01309 to +0.01244 | no |
 
-## B with the bowl law vs native
+## B with the compass law vs native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

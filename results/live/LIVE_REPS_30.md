@@ -1,4 +1,4 @@
-# Repeated live runs on kind, set 30: native, Omni-Compass on top with the allocation law, and with the bowl law and the verdict, the operator's HPA target handed back at once when a fault is over, 10 paired repetitions
+# Repeated live runs on kind, set 30: native, Omni-Compass on top with the allocation law, and with the compass law and the verdict, the operator's HPA target handed back at once when a fault is over, 10 paired repetitions
 
 Source: GitHub Actions workflow `benchmark-reps`, run 37105047258, commit `acc1c4e`, 2026-10-03, job `aggregate`
 (job 111160884531, `python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds
@@ -6,10 +6,10 @@ per arm. Transcribed from the job's printed receipt; the run's artifact `live-re
 `d8c72f5fa76a2de0e5d67c0ab200147aeb2734bd8e68bfbbbe6ce6be363e0cb7`) holds the same tables. Evidence class **L**
 (real Kubernetes software on kind; energy is a declared model, not a meter).
 
-What changed from set 29: one thing, written before the run (`docs/K8S_BOWL_PREREGISTRATION.md`, the fault test): once
-responses are back inside the band, the line is clean and nothing waits, the bowl hands the operator's HPA target back
+What changed from set 29: one thing, written before the run (`docs/K8S_COMPASS_PREREGISTRATION.md`, the fault test): once
+responses are back inside the band, the line is clean and nothing waits, the compass hands the operator's HPA target back
 at once, never held by the autoscaler's window. **No measure in either arm is significantly worse than native.** Total
-CPU including Omni-Compass's own: bowl −6.5%, allocation law −6.7%, both inside the 2% rule.
+CPU including Omni-Compass's own: compass −6.5%, allocation law −6.7%, both inside the 2% rule.
 
 ### B: the engine's allocation law against native
 
@@ -35,7 +35,7 @@ CPU including Omni-Compass's own: bowl −6.5%, allocation law −6.7%, both ins
 | pod start wait, total (s) | 11.8 | 9.3 | -21.2% | -10.34 to +5.338 | no |
 | pod start wait, mean (s) | 2.547 | 2.178 | -14.5% | -1.129 to +0.3911 | no |
 
-### B with the bowl law and the verdict against native
+### B with the compass law and the verdict against native
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|

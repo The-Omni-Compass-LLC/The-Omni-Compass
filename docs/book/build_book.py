@@ -384,17 +384,17 @@ OUTLINE = [
     ("The Canonical Declaration", ("D", "The Canonical Declaration")),
     ("The Engine: Eight Equations and One Control Law", ("M", "The Engine: Eight Equations and One Control Law")),
     ("The Canonical Engine", ("F", "docs/CANONICAL_ENGINE.md")),
-    ("The Closed Circle: Why It Cannot Leave Its Bowl", ("M", "The Closed Circle: Why It Cannot Leave Its Bowl")),
+    ("The Closed Circle: Why It Cannot Leave Its Compass", ("M", "The Closed Circle: Why It Cannot Leave Its Compass")),
     ("Closing the Circle in the Engine", ("T", "Closing the Circle in the Engine")),
     ("The Tracking Theorem", ("F", "docs/TRACKING_THEOREM.md")),
     ("The Conveyance Law", ("F", "docs/CONVEYANCE_LAW.md")),
     ("Formal Status of the Mathematics", ("F", "docs/FORMAL_STATUS.md")),
     ("The Mechanism of Action", ("F", "docs/MECHANISM_OF_ACTION.md")),
     ("The Engines and Their Audit", ("FS", ["docs/ENGINES.md", "docs/history/ENGINE_AUDIT.md"])),
-    ("PART", "The Physics: the Bowl and the Nervous System",
+    ("PART", "The Physics: the Compass and the Nervous System",
      "Push and pull, the band and its cushions, the physics of a processor, and the two-way wires that carry the "
      "force from the brain to every muscle and back."),
-    ("The Bowl: Push, Pull and the Two Forces", ("M", "The Bowl: Push, Pull and the Two Forces")),
+    ("The Compass: Push, Pull and the Two Forces", ("M", "The Compass: Push, Pull and the Two Forces")),
     ("The Physics of a Processor", ("T", "The Physics of a Processor")),
     ("The Two-Way Nervous System", ("M", "The Two-Way Nervous System")),
     ("The Nervous System in Detail", ("FS", ["docs/TWO_WAY_NERVOUS_SYSTEM.md", "docs/NERVOUS.md"])),
@@ -435,7 +435,7 @@ OUTLINE = [
     ("The GPU Bench", ("F", "docs/GPU_BENCH.md")),
     ("The GPU Preregistration", ("F", "docs/GPU_PREREGISTRATION.md")),
     ("The Realms Preregistration", ("F", "docs/REALMS_PREREGISTRATION.md")),
-    ("The Bowl Law on Real Kubernetes: Preregistration", ("F", "docs/K8S_BOWL_PREREGISTRATION.md")),
+    ("The Compass Law on Real Kubernetes: Preregistration", ("F", "docs/K8S_COMPASS_PREREGISTRATION.md")),
     ("The Evidence Ledger", ("F", "docs/EVIDENCE_LEDGER.md")),
     ("The Claims Register", ("F", "docs/CLAIMS_REGISTER.md")),
     ("The Benchmark Report", ("F", "docs/history/BENCHMARK_REPORT.md")),
@@ -517,12 +517,12 @@ def special(name):
     if name == "catalog":
         return catalog_flow()
     if name == "source":
-        intro = ("The engine, the bowl law, the bowl on every muscle, the two-wire GPU governor, the plug adapter and the "
+        intro = ("The engine, the compass law, the compass on every muscle, the two-wire GPU governor, the plug adapter and the "
                  "nervous system, printed in full from the repository so that the book and the code can be read side by "
                  "side. The engine file is sealed: its fingerprint is in `results/SEAL.json`, and `verify.py` fails if a "
                  "byte of it changes.")
         story = [Paragraph(inline(intro), BODY)]
-        for rel in ["omnicompass/core.py", "omnicompass/bowl.py", "realms/bowl_arm.py", "omni_controller/gpu_bowl.py",
+        for rel in ["omnicompass/core.py", "omnicompass/compass_law.py", "realms/compass_arm.py", "omni_controller/gpu_compass.py",
                     "omnicompass/adapter.py", "omnicompass/nervous_system.py"]:
             story += source_listing(rel)
         return story
@@ -813,7 +813,7 @@ The book is in eight parts, and it can be read in two ways.
 **Part One, the philosophy and the theory,** sets out the closed circle: a system that is closed, bounded and pulled
 toward a center cannot run away, and everything it does is a return. **Part Two, the mathematics,** gives the eight
 equations and the control law that make the circle exact, with the theorem, the declaration and the audits that hold
-them fixed. **Part Three, the physics,** brings the law into the machine: the bowl, push and pull, the band and its
+them fixed. **Part Three, the physics,** brings the law into the machine: the compass, push and pull, the band and its
 cushions, the physics of a processor, and the two-way nervous system. **Part Four, the body,** lays out the 656
 muscles, the four realms and the six organisms. **Part Five, the harness and the wiring,** is the universal plug and
 the step-by-step work of wiring Omni-Compass onto a stack. **Part Six, operating it,** is the OFF switch, the rules
@@ -923,8 +923,8 @@ def md_text(src):
         if key == "catalog":
             return ["The full table of the 656 muscles is in `realms/catalog.csv`."]
         if key == "source":
-            return ["The full source of `omnicompass/core.py`, `omnicompass/bowl.py`, `realms/bowl_arm.py`, "
-                    "`omni_controller/gpu_bowl.py`, `omnicompass/adapter.py` and `omnicompass/nervous_system.py`."]
+            return ["The full source of `omnicompass/core.py`, `omnicompass/compass_law.py`, `realms/compass_arm.py`, "
+                    "`omni_controller/gpu_compass.py`, `omnicompass/adapter.py` and `omnicompass/nervous_system.py`."]
         if key == "license":
             return ["The license is the file `LICENSE`."]
         if key == "contact":

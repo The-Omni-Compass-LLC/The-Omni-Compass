@@ -8,7 +8,7 @@
 #   NODES=500 bash scripts/kwok_scale.sh
 #
 # It builds NODES worker nodes (4 CPU each), NODES/10 Deployments with their HPAs (CPU target 50) and two pods per node,
-# then runs the controller (bowl law, HPA target and node pool, the verdict) for ITER decisions against a response-time
+# then runs the controller (compass law, HPA target and node pool, the verdict) for ITER decisions against a response-time
 # feed that is calm, then hot, then calm. It measures what the controller costs at that size (decision time, its own
 # CPU) and checks that its counts are right and its commands land; then the master switch turns the whole harness off,
 # and every HPA target and every node must be back as the operator had them. Writes $OUT/KWOK.json.
@@ -83,7 +83,7 @@ PY
 feed=$!
 export OMNI_MASTER_OFF="$PWD/$OUT/switch/OFF"
 set +e
-/usr/bin/time -v python3 -m omni_controller.controller --kubectl deploy/kwok/kubectl_kwok.sh --mode nodepool --active-nodes-only --law bowl --interval "$INTERVAL" \
+/usr/bin/time -v python3 -m omni_controller.controller --kubectl deploy/kwok/kubectl_kwok.sh --mode nodepool --active-nodes-only --law compass --interval "$INTERVAL" \
   --iterations "$ITER" --min-nodes "${MIN_NODES:-2}" --max-nodes "$NODES" --max-node-step 1 \
   --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $NODES" \
   --latency-file "$OUT/latency.csv" --slo-ms 500 --latency-window-s 20 --audit "$OUT/audit.jsonl" --kill-file "$OUT/kill" \

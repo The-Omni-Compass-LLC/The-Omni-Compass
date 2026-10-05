@@ -16,7 +16,7 @@ win. Evidence class: an independent recognized simulator.
 ## The arms
 
 - **Native:** CityLearn's own rule-based battery controller (`citylearn.agents.rbc.BasicRBC`), unchanged.
-- **Native + Omni-Compass:** the same controller, with the bowl law (`omnicompass/bowl.py`) on top of its battery
+- **Native + Omni-Compass:** the same controller, with the compass law (`omnicompass/compass_law.py`) on top of its battery
   commands (`tools/run_citylearn.py`). The reading is the district's draw without its batteries the hour before (the
   demand the batteries answer, never their own effect); its band is the 10th to the 90th percentile of the past week's
   draw (only hours already seen). A positive force pushes every battery command toward discharge, a negative force
@@ -64,7 +64,7 @@ The cause: the wiring pushed every storage command the same way from the distric
 tanks (cooling_storage, dhw_storage) included. A tank is a thermal muscle; moving when it charges by an electricity
 reading made the peaks worse.
 
-**Amendment (one wire, one muscle):** the bowl steers only the electric batteries (`electrical_storage`) from the
+**Amendment (one wire, one muscle):** the compass steers only the electric batteries (`electrical_storage`) from the
 electricity reading; every water tank stays native (it would need its own wire and its own reading, the tank's
 temperature). A district with no electric battery is run and reported with Omni-Compass steering nothing. Gain,
 response, glide and band are unchanged. Round 1's districts have been seen and are not the test of this amendment.

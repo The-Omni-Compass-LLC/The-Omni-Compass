@@ -222,7 +222,7 @@ numbers measures Omni. The engine, the governor, the outcomes and the analysis a
 The Omni arm changes engine. The outcomes, the arms' order, the guardrails, the analysis and the validity rules are
 unchanged.
 
-- **The Omni arm holds two wires** (`omni_controller/gpu_bowl.py`, the bowl law of `omnicompass/bowl.py`): the clock
+- **The Omni arm holds two wires** (`omni_controller/gpu_compass.py`, the compass law of `omnicompass/compass_law.py`): the clock
   ceiling (`nvidia-smi -lgc`, reset with `-rgc`; cover 35% of the top clock to the top), which sets how high the card's own boost may climb, and the power
   limit (`-pl`), the lid at what a fully busy card draws at that ceiling plus 10%, never under the declared envelope
   floor and never over the start limit. The service is read as one position between calm and the response-time line
@@ -259,15 +259,15 @@ its own, and spent about 30% more time busy for the same work; requests queued b
 in the governor, not in the engine: (1) the position counted utilization above half as service trouble, so every
 burst read as past the wall (fail up in 46% of decisions) and every quiet gap pulled the ceiling down, so each burst
 began on a lowered clock; (2) the lid followed a curve from the top clock and sat at the 105 W envelope floor in 49 of
-165 bowl decisions, under the 135 W the card itself draws while busy; (3) the ceiling's cover reached 35% of the top
+165 compass decisions, under the 135 W the card itself draws while busy; (3) the ceiling's cover reached 35% of the top
 clock, far under the clock the card's own power limit holds it at while busy.
 
-**The Omni arm from now on** (`omni_controller/gpu_bowl.py`; the outcomes, arms, guardrails, analysis and validity
+**The Omni arm from now on** (`omni_controller/gpu_compass.py`; the outcomes, arms, guardrails, analysis and validity
 rules are unchanged):
 
 - the position is response time only (p95 over 5 s, not 30 s); being busy is not a breach;
 - **race while work waits:** at 95% utilization or more the ceiling goes to the top and the lid to the start limit;
-  the bowl paces only the slack between bursts;
+  the compass paces only the slack between bursts;
 - **the card's own level, learned from its own meter** while the ceiling is at the top and the card is busy: its
   busy clock (median) and busy draw (90th percentile); until 15 such readings are in, neither wire moves;
 - **speed floor:** the ceiling never goes under the card's own busy clock; **lid floor:** the lid never goes under the
@@ -275,23 +275,23 @@ rules are unchanged):
 - fail up (past 95% of the line, or blind) is unchanged.
 
 **On the modelled card, before any trial** (`results/sim/gpu_two_wire/`, seeds 5000 to 5009): p95 122.1 ms native,
-123.7 ms with the corrected bowl; work per energy +8.2% (+6.3% to +10.1%); energy -7.5%; the median response 10.1 to
-12.1 ms, slower in the quiet stretches the bowl paces. That is a model; the next trial is the card's own meter.
+123.7 ms with the corrected compass; work per energy +8.2% (+6.3% to +10.1%); energy -7.5%; the median response 10.1 to
+12.1 ms, slower in the quiet stretches the compass paces. That is a model; the next trial is the card's own meter.
 
 ## Amendment 7 (2026-10-02, before any further trial)
 
 The outcomes, arms, guardrails, analysis and validity rules are unchanged. The Omni arm of the confirmation runs the
 **service** profile.
 
-- **Two profiles, one switch** (`--profile`, `omni_controller/gpu_bowl.py`; the same in `realms/gpu_card.py`):
-  - **service**, the default and the confirmation's arm: down gain 0.0125, the bowl's center at 0.4, the speed floor 3%
+- **Two profiles, one switch** (`--profile`, `omni_controller/gpu_compass.py`; the same in `realms/gpu_card.py`):
+  - **service**, the default and the confirmation's arm: down gain 0.0125, the compass's center at 0.4, the speed floor 3%
     above the card's own busy clock;
   - **batch**: down gain 0.015, center 0.5, the floor at the card's own busy clock, for work nobody waits on answer by
     answer. It may be run as a separate, declared confirmation (`OMNI_ARGS="--profile batch"`) and is reported as its
     own result, never pooled with service.
 - **How service was chosen, on the model, before the trial** (20 paired seeds, 5000-5009 and 5100-5109; ratios
   summarised as the geometric mean of the per-seed ratios): down gains 0.01, 0.0125, 0.015, 0.0175 and 0.02 alone, and
-  0.0125 to 0.0175 crossed with the bowl's center (0.4, 0.5), the speed floor (1.00, 1.03 of the card's own busy clock)
+  0.0125 to 0.0175 crossed with the compass's center (0.4, 0.5), the speed floor (1.00, 1.03 of the card's own busy clock)
   and the race threshold (0.90, 0.95). The rule: the most work per energy at which no seed's p95 is more than 10% slower
   than native. Service (0.0125, 0.4, 1.03) gave work per energy +5.3% (+4.2 to +6.5), energy -5.0%, p95 -4.1% (-9.7 to
   +1.7), worst seed +9%, 0 of 20 seeds more than 10% slower, p99 -1.8%; its neighbours gave the same within a point.
@@ -309,16 +309,16 @@ The outcomes, arms, guardrails, analysis and validity rules are unchanged. The O
 The outcomes, arms, guardrails, analysis and validity rules are unchanged, except as stated here.
 
 - **Omni-Compass moves the card only where it measures that the card is no worse for it** (`omnicompass/verdict.py`, in
-  `omni_controller/gpu_bowl.py` and `realms/gpu_card.py`). While the service is calm, the governor runs a paired trial:
+  `omni_controller/gpu_compass.py` and `realms/gpu_card.py`). While the service is calm, the governor runs a paired trial:
   - first the ceiling at the top until 30 requests are measured;
   - then one 15 MHz step past the deepest step already allowed, until 30 more are measured.
 
   Each request's cost is the card's own time on it: the workload's new `service_ms` column, start to done, with the
   wait in the queue left out. The step is allowed if its median cost is at most **2%** above the median at the top.
-  Otherwise it is refused and not tried again for 900 decisions. The bowl may move the ceiling only between the top and
+  Otherwise it is refused and not tried again for 900 decisions. The compass may move the ceiling only between the top and
   the deepest allowed step. Where no step passes, the ceiling stays at the top and the card runs as it does alone. Every
   trial and every judgement is in the audit (`verdict`, `verdict_state`, `verdict_deepest_step`).
-- **One law, no profiles.** The service and batch profiles are removed. The law is: down gain 0.0125, the bowl's center
+- **One law, no profiles.** The service and batch profiles are removed. The law is: down gain 0.0125, the compass's center
   0.4, the speed floor at the card's own busy clock, and the verdict's allowance of 2%. The batch profile paced past the
   2% allowance, so it is gone.
 - **Why 2%** (the card model, 20 paired seeds):
@@ -350,7 +350,7 @@ The outcomes, arms, guardrails, analysis and validity rules are unchanged, excep
 Everything in amendment 8 stands. Four additions, each run by `scripts/gpu_rented_run.sh` after the two confirmations
 and each reported as its own result:
 
-1. **Steady under the limit** (`omni_controller/gpu_bowl.py`, the same in `realms/gpu_card.py`). While the card is
+1. **Steady under the limit** (`omni_controller/gpu_compass.py`, the same in `realms/gpu_card.py`). While the card is
    saturated against its own power limit (work waiting, the draw at 97% of the limit or more), the firmware boosts a
    step, hits the limit and is knocked back. The ceiling is then held at the card's own busy clock under that limit,
    so the same watts serve the work without the knock-backs. It is never held under that clock, the lid stays at the
