@@ -21,11 +21,12 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from pilot.bench_report import LOWER_BETTER
-from tools.live_reps import KEYS, LABEL, NEUTRAL, SAME_REL
+from tools.live_reps import BATCH, BILL, KEYS, LABEL, NEUTRAL, SAME_REL
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge, higher is better)"
 HIGHER_BETTER = {CAPACITY}
+LOWER = LOWER_BETTER | BATCH | BILL   # the batch queue's finish time and machines after it, and a real cloud's bill: less is better
 
 
 def load(d):
@@ -72,7 +73,7 @@ def verdict(k, rs):
         n = sum(1 for c in clear if not c)
         return "no difference beyond the noise (all three runs)" if n == len(rs) else f"no difference beyond the noise in {n} of {len(rs)} runs"
     lower = signs[0] == -1
-    if k in LOWER_BETTER:
+    if k in LOWER:
         return "**confirmed better**" if lower else "**confirmed WORSE**"
     if k in HIGHER_BETTER:
         return "**confirmed WORSE**" if lower else "**confirmed better**"

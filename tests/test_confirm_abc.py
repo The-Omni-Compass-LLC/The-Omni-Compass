@@ -41,6 +41,9 @@ def main():
     assert C.engine("1")[1] == "unknown", "a run whose commit cannot be read is never called v1 (GitHub's gh prints nothing for it)"
     assert C.verdict(C.CAPACITY, [r(18.6, 9.0, 6.0, 12.0)] * 3) == "**confirmed better**", "more work inside the line is better"
     assert C.verdict(C.CAPACITY, [r(18.6, -3.0, -5.0, -1.0)] * 3) == "**confirmed WORSE**"
+    assert C.verdict("batch: worker machines in service after the queue finished, mean", [r(6.0, -2.0, -2.5, -1.5)] * 3) == "**confirmed better**"
+    assert C.verdict("batch: queue finished (s)", [r(575.0, 5.0, 2.0, 8.0)] * 3) == "**confirmed WORSE**", "a later finish is worse"
+    assert C.verdict("compute bill at list price ($)", [r(1.0, -0.1, -0.15, -0.05)] * 3) == "**confirmed better**", "a smaller bill is better"
     with tempfile.TemporaryDirectory() as t:
         d = Path(t) / "run-124" / "live-reps"; d.mkdir(parents=True)
         (d / "LIVE_REPS.json").write_text(json.dumps({"repetitions": {"native": ["1"], "compass": ["1"]}, "means": {}, "paired": {"compass": {}},

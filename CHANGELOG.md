@@ -8,6 +8,21 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- The fourth v1 A/B/C table, the batch queue (`results/live/V1_BATCH.md`, runs 37385637932, 37385654462, 37394452486):
+  machines in service −15 to −24%, machines after the queue is done −26 to −36%, standby-model energy −11 to −17% and
+  mean response −11 to −13%, every one confirmed better in all three runs; the queue finished 0.7-0.9% later, clear of
+  the noise in two runs and inside it in one, so that row reads no difference beyond the noise in 1 of 3 runs; p95 and
+  the idle-power energy model no difference beyond the noise. The confirmation tool now reads the batch queue's finish
+  time and machines-after, and a real cloud's bill, as lower-is-better (one row had read "confirmed lower").
+- The power grid's A/B/C table by rule (`tools/pandapower_abc.py`; `tests/test_pandapower_abc.py`, run by `verify.py`):
+  pandapower is deterministic, so the three runs must reproduce each other; a gauge reads confirmed better or worse by its
+  sign when they do, same under one part in a million, "the runs differ" when they do not; any added voltage violation and
+  every extra tap operation read WORSE. The first v1 grid run (37377029333, 11 untouched SimBench grids, a full year,
+  both load models): with ZIP loads the energy the loads drew is 1.3-1.5% lower in all 11 grids and the net import lower
+  in all 11; losses are lower in 7 and higher in 4 (the rural and two semiurban grids, +0.6 to +1.5%); voltage violations
+  never increase; tap operations fall in 10 grids (the city, suburb and commercial grids tap hundreds to thousands of
+  times a year natively, Omni cuts that 20-35%) and double from 4 to 8 in one rural grid; with constant-power loads the
+  load energy cannot change and the loss and import rows split the same way.
 - GitHub's verify check caught a bug in the A/B/C tools that the local check missed: when a run's commit could not be
   read (GitHub's `gh` prints nothing for an unknown run), `tools/omni_version.py --commit ""` quietly checked the working
   tree instead, so an unresolvable run would have read as v1. Now a commit that cannot be read is "unknown" in both tables
