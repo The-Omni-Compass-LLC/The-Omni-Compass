@@ -326,6 +326,8 @@ def main():
     test_cruise_brake.main(); check("cruise and the emergency brake: every machine in service while work waits, straight to the floor at zero demand, never below it", True)
     from tests import test_staging_order
     test_staging_order.main(); check("staging order through the real actuator: the emptiest idles first, the warmest wakes first, two always in service (the floor), every machine usable, no pod moved", True)
+    from tests import test_confirm_abc
+    test_confirm_abc.main(); check("A/B/C confirmation rule: confirmed only with the same sign and every 95% interval clear of zero in all three runs", True)
     r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_six_kube"], cwd=ROOT, capture_output=True, text=True)
     check("six organisms with the cluster inside: the same demand in both arms, every simulated knob handed back, an archived "
           "record stored gzipped reads the same", r.returncode == 0, r.stderr[-300:])

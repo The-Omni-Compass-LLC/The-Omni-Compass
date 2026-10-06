@@ -8,6 +8,12 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- The A/B/C confirmation table is made by rule (`tools/confirm_abc.py`; `tests/test_confirm_abc.py`, run by `verify.py`):
+  three separate GitHub runs on the same frozen engine, each checked against the v1 fingerprint. Every judged row gets
+  one of three readings: confirmed better or confirmed worse (the same sign in all three, every 95% interval clear of
+  zero); no difference beyond the noise (an interval includes zero: native and omni could not be told apart on that
+  measure, with the count of such runs); the runs disagree (runs clear of the noise point different ways). Nothing reads
+  "not confirmed": a measurement the test cannot tell from zero is a result, and is stated as one.
 - The archive keeps every raw file within GitHub's limit: GitHub refuses a file over 100 MB, and the 1,226-muscle
   organism at 1,000 copies writes a 99.6 MB record, so a slightly larger v1 record would have stopped the archive.
   `archive-run.yml` now stores any raw file over 50 MB gzipped (`gzip -n`, the same bytes every time; its repetition's

@@ -70,6 +70,24 @@ Every v1 benchmark runs three times, as separate GitHub Actions runs on the same
 - **A** is the result.
 - **B** and **C** are the replications.
 
-A claim is confirmed only when it holds in all three: the same sign and the 95% interval clear of zero in each. If any
-replication disagrees, the claim is reported as not confirmed, with all three tables shown. Every row is reported,
-losses included.
+Every judged row gets one of three readings, and all three runs are shown beside it:
+
+- **Confirmed better** or **confirmed worse**: the same sign in all three runs, each with its 95% interval clear of zero.
+- **No difference beyond the noise**: in at least one run the interval includes zero, so native and omni could not be
+  told apart on that measure. That is the result, stated as such, with the count of runs it holds in.
+- **The runs disagree**: runs clear of the noise point different ways. The test itself is then unstable on that measure,
+  and it is looked into before anything is claimed.
+
+Every row is reported, losses included.
+
+The table is made by rule, never by hand:
+
+```
+python3 tools/confirm_abc.py "Steady load" results/live/raw/run-<A> results/live/raw/run-<B> results/live/raw/run-<C> \
+    --out results/live/V1_STEADY.md
+```
+
+It checks each run's commit against the v1 fingerprint, and heads the table with a warning if any run is not v1 or if the
+three are not separate runs. `tests/test_confirm_abc.py`, run by `verify.py`, proves the rule: an interval over zero
+reads no difference beyond the noise, a flipped sign clear of the noise reads disagreement, a rounding-level change reads
+same, and a loss in all three reads WORSE.

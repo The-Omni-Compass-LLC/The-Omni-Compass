@@ -35,8 +35,10 @@ the founder overrides one in the conversation.
 - `OMNI_V1.json` and `docs/OMNI_V1.md`. Check with `python3 tools/omni_version.py [--commit <sha>]`.
 - Any change to a rule, gain or guard makes **v2**, and every result is run again on it. Never read a result across
   versions. Never change the engine without telling the founder first.
-- Confirmation: each benchmark runs as A, B and C. A claim is confirmed only when all three show the same sign, with
-  the 95% interval clear of zero.
+- Confirmation: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
+  readings: confirmed better or confirmed worse (the same sign in all three, every 95% interval clear of zero); no
+  difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
+  pointing different ways: the test is unstable there, look into it). Never write "not confirmed".
 - Evidence classes: P (physical meter), L (live software), S (our own models). Never present S as proof.
 
 ## The six organisms and the grid
