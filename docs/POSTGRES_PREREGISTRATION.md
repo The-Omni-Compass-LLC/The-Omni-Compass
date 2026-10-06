@@ -146,3 +146,39 @@ The knob was handed back and read back at the end of every omni arm; Omni wrote 
 apart, native's own p95 varying forty-fold between repetitions; what did separate is the machines, half as many database
 connections held open for the same work, and the host's CPU, 11% more of it, which is the cost of PgBouncer queueing
 clients behind a smaller pool. Both go into the untouched runs as they are; nothing in the rule changes.
+
+## The first untouched run, and amendment 1 (2026-10-06, run 37425853293; declared before the counted runs)
+
+The three untouched workloads ran once on the rule above (run 37425853293, three paired repetitions each). The result is
+kept here as it came, and it is a loss:
+
+| Workload | Work inside the line | Throughput | p95 (ms) | Servers alive | Host CPU-seconds |
+|---|---|---|---|---|---|
+| `select` (read-only) | 11,423 → 5,995 tps, **worse** | 11,428 → 10,373, **worse** | 4 → 3,886, **worse** | 19.2 → 2.5 | −1%, better |
+| `simple_update` | no difference beyond the noise | no difference beyond the noise | 65 → 554, no difference beyond the noise | 20 → 8.1, better | +10%, **worse** |
+| `tpcb_hot` (two branches) | no difference beyond the noise | no difference beyond the noise | 8 → 54, no difference beyond the noise | 19 → 5.3, better | +18%, **worse** |
+
+**What happened on `select`.** The compass read the pooler's service time per transaction, 0.11 ms against a 50 ms
+line, and gave back one idle connection a second until the pool stood at its floor of two (18 writes an arm, no fail-up).
+Two connections serve about 15,500 read-only transactions a second; the peak notch offered 23,400. The backlog did not
+show at the pooler: a client with a transaction in flight is served in 0.1 ms, and the time it spent behind its own
+schedule waiting to send is not the pooler's to see. So the pooler's clock said calm while the users' p95 went from
+4 ms to 3.9 s. The rule was blind to the one thing that mattered, and the preregistration had said so in one line
+("the pooler cannot see time a client spends behind its own schedule") without drawing the consequence.
+
+**Amendment 1 (`tools/run_pgbench.py`, `service_reading`, `decide`).** Two changes, declared here before any counted run:
+
+1. **The reading** is the pooler's service time per transaction **or the share of its clients queued for a server**
+   (`SHOW POOLS`, `cl_waiting / (cl_active + cl_waiting)`) scaled to the line, whichever is worse. A pool too small for
+   the offered rate shows at the pooler as clients waiting; with every client waiting the position is past the wall and
+   the knob is handed back to the pooler's own setting at once. The waiting share also decides the direction with the
+   wait-time share: half or more waiting means the pool grows.
+2. **The dwell holds only the brake.** Adding connections is never held, not even two seconds after a take-back (the
+   gas is never held, as in every other Omni adapter); taking back waits five seconds after an add. The first rule held
+   the needed add for five seconds once in the local check.
+
+Nothing else changes: the band, the centre, the gains, the cushion, the cover [2, 90], one idle server a second on the
+way down, the fail-up, the one-writer rule and the hand-back are as frozen above. Local check of the amended rule on
+`select` (one short repetition, 16 clients): at the peak notch the pool held near 11 and the work inside the line and
+the p95 matched native's; at the light notches the pool eased to 3. The counted runs are three new untouched runs (A, B,
+C) on the amended rule; run 37425853293 stays in this file as the result the first rule produced and is not counted.
