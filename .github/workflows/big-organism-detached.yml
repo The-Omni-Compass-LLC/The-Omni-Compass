@@ -125,7 +125,9 @@ jobs:
           touch ALL_DONE
           EOF
           scp -o StrictHostKeyChecking=no run_all.sh omni@$IP:omni/run_all.sh
-          ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni && nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat omni/detached.log; echo "--- paired log"; tail -5 omni/paired-*.log 2>/dev/null; pgrep -af kind_paired >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
+          # the test is started in the background with every file handle redirected, and nothing else is put in the
+          # background with it (an "a && b &" list would leave a shell holding this ssh session open until the test ends)
+          ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni; nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat detached.log; echo "--- paired log"; tail -5 paired-*.log 2>/dev/null; pgrep -af kind_paired >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
           echo "::notice::$RG in $LOC: $ORGS at $SCALE copies, $REPS repetitions, commit $SHA; collect looks at it every two hours"
   collect:
     if: github.event_name == 'schedule' || github.event.inputs.mode == 'collect'

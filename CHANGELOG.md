@@ -21,7 +21,10 @@
   region, which 8-vCPU sizes this subscription may rent: eastus allows 32 vCPUs and the v4 sizes (D8as_v4 is the one
   granted on 2026-10-05); every other region surveyed allows 10 vCPUs and only the v5 to v7 sizes. So the start job
   asks Azure for each refused size's restriction, tries D8as_v4 and D8s_v4 first and falls back to the v7 sizes, and the
-  default region is eastus.
+  default region is eastus. Both machines were then granted (eastus, D8as_v4, the v3 stack; westus3, D8as_v7, the v1
+  stack) and the tests started, but the start step's ssh session hung until the job's hour ran out: the test had been
+  put in the background as part of an "a && b &" list, so a shell holding the session waited for it. Fixed; the collect
+  look, dispatched by hand, found both machines running.
 - **The version tool reads a commit from before a runner was written** (`tools/omni_version.py`, `tests/test_omni_version.py`):
   the power-grid runner was added at `8eab01c` inside v1 without touching any other engine file, so the Kubernetes and
   organism runs at `a004a8f` (six-kube 37359815637, big-organism 37359820055) hold 37 of the 38 v1 files, all v1 bytes.
