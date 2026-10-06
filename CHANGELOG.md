@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- **Six organisms with the real cluster, Omni v3, 10 and 100 copies** (`results/live/V3_SIX_KUBE.md`, run 37501769448 on
+  `33b15eb`, 12 cells, 5 pairs each, 62 of 62 jobs): every cell better on 4 to 6 gauges, worse on none beyond the noise
+  except a rounding-level organism-work loss (6 to 11 parts in a million; the rule reads anything past one part in a
+  million) in 4 cells. The v1 and v3 copies now carry a Source line naming run, commit and engine.
+- **Azure steady on Omni v1, 5 paired repetitions** (`results/live/V1_AKS_STEADY.md`, run 37385657374 on `f162ce8`;
+  repetitions 3 to 5 re-run after the regional quota refused them while the big-organism machine was up): no difference
+  beyond the noise on any gauge; the bill −4.7% with its interval across zero; Omni's own CPU 0.014 cores. The burst on v1
+  follows (branch `omni-v1` at `f162ce8`, since the workflow needs a branch to run an older commit; a tag push was refused).
 - **The stack at 1,000 copies, detached from the GitHub job** (`.github/workflows/big-organism-detached.yml`): every
   attempt at the four stacked with the real cluster inside was cut off by GitHub's six-hour job limit (v1 run
   37359820055: the tower 3 of 3 done, the stack 0 of 3). The new workflow rents one Azure machine, starts every repetition
