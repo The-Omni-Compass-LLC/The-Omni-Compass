@@ -1,0 +1,72 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: mujoco
+# Omni-Compass on top of a robot arm's own position servos (docs/ROBOTICS_PREREGISTRATION.md): MuJoCo integrates the
+# arm, MuJoCo Menagerie supplies the robot as its maker describes it. One job per robot, native and omni, the same
+# pick-and-place cycle; one report (MUJOCO.md). Two robots at a time, so the other benchmarks keep their runners.
+on:
+  workflow_dispatch:
+    inputs:
+      robots:
+        description: "Menagerie robots, comma separated; 'untouched' runs every confirmation robot of the preregistration"
+        default: "untouched"
+      cycles:
+        description: "Pick-and-place cycles per arm"
+        default: "10"
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {robots: "${{ steps.r.outputs.robots }}"}
+    steps:
+      - id: r
+        run: |
+          if [ "${{ github.event.inputs.robots }}" = untouched ]; then
+            robots='["universal_robots_ur5e","kuka_iiwa_14","kinova_gen3"]'
+          else
+            robots=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.robots }}'.split(',')))")
+          fi
+          echo "robots=$robots" | tee -a "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: {robot: "${{ fromJSON(needs.plan.outputs.robots) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install -q "mujoco==3.15.0" numpy
+      - name: Fetch the robot as its maker describes it (MuJoCo Menagerie, pinned)
+        run: |
+          git clone -q --filter=blob:none --sparse https://github.com/google-deepmind/mujoco_menagerie.git menagerie
+          cd menagerie && git checkout -q "$MENAGERIE_COMMIT" && git sparse-checkout set "${{ matrix.robot }}"
+        env: {MENAGERIE_COMMIT: "${{ vars.MENAGERIE_COMMIT || 'f054586a8e90465d49ee5be15335c4a0c7f57caf' }}"}
+      - name: Run the robot, native and omni
+        run: |
+          set +e
+          python tools/run_mujoco.py --menagerie menagerie --robots "${{ matrix.robot }}" --cycles "${{ github.event.inputs.cycles }}" --out out > run.log 2>&1
+          code=$?
+          grep "^==\|Error" run.log | tail -10 | while IFS= read -r l; do echo "::notice::$l"; done
+          [ "$code" = 0 ] || { echo "::error::${{ matrix.robot }} ended with exit $code"; mkdir -p out; cp run.log out/; exit "$code"; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "mujoco-${{ matrix.robot }}", path: out}
+  report:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install -q numpy
+      - uses: actions/download-artifact@v4
+        with: {pattern: "mujoco-*", path: all, merge-multiple: true}
+      - run: python tools/run_mujoco.py --report-only all --out all
+      - run: cat all/MUJOCO.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: mujoco-report, path: "all/MUJOCO.md"}

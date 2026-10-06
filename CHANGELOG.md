@@ -8,6 +8,17 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- The robot arms, preregistered and built (`docs/ROBOTICS_PREREGISTRATION.md`, `tools/run_mujoco.py`,
+  `.github/workflows/mujoco.yml`, `tools/mujoco_abc.py`; tests in `verify.py`): MuJoCo integrates each arm, MuJoCo
+  Menagerie supplies the robot with the position servos it ships with as native, and Omni sits on top on one knob, the
+  speed override, inside the task's takt. The planned speed is set per robot as the fastest its own servo tracks; a
+  paired physics trial in native mode, before any counted cycle, leaves the override native where a slower cycle is not
+  cheaper (the gravity-holding torque is paid for longer), the do-no-harm gate on the arm's own figures. Energy is a
+  declared model from MuJoCo's torques and velocities, with the standing draw charged for the whole takt in both arms.
+  The first smoke: the tuning robot and the Kinova move (motion energy −1.7% and −7%, energy per takt −0.5% and −0.8%,
+  tracking error and peak torque lower, cycles 25% longer inside the takt); the UR5e and the iiwa are left native by the
+  trial. Disclosed: the waypoint offset was capped at 0.6 rad after the first smoke showed the UR5e model's full-turn
+  joint ranges turned "25% of the range" into 90-degree swings into the floor. MuJoCo and the Menagerie commit are pinned.
 - CityLearn's v1 A/B/C table (`results/live/V1_CITYLEARN.md`, runs 37384954241, 37393198549, 37399402398, all on the v1
   fingerprint): 11 districts with electric batteries, every score reproduced to the last digit in all three runs except
   the comfort score, which CityLearn itself varies between runs (it reads "the runs differ" and is not claimed).
