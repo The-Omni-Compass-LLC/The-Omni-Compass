@@ -302,7 +302,7 @@ the four stacked at 1,000 copies needs about 9 GB. The re-run: 10 runs per organ
 
 The 100-run cells at 1,000 copies run on one rented machine (`scripts/grid_one_machine.sh`): every organism in turn,
 as many processes as the machine's cores and memory allow, the same seeds (7000 on), each finished organism saved at
-once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/receipts/round6-1000x.md` in place of the
+once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/v1/receipts/round6-1000x.md` in place of the
 1-run and 10-run receipt it contains.
 
 ---

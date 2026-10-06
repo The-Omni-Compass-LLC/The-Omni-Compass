@@ -43,7 +43,7 @@ GROUPS = {
     "gpu_rented_run": ["scripts/gpu_rented_run.sh", "scripts/gpu_8card.sh", "tools/wall_meter.py", "tests/test_server_power.py", "scripts/gpu_fault_drill.sh", "scripts/gpu_vllm.sh", "tools/llm_workload.py", "tools/run_hil.py", "tests/fake_gpu/nvidia-smi", "tools/run_kil.py", "tools/omni_index.py", "tools/layout_check.py", "tests/test_staging_order.py", "tests/test_cruise_brake.py", "deploy/kind/batch-jobs.yaml", "tools/run_citylearn.py", "docs/CITYLEARN_PREREGISTRATION.md", ".github/workflows/citylearn.yml", "tools/run_pandapower.py", "docs/PANDAPOWER_PREREGISTRATION.md", "docs/REGISTER.md", ".github/workflows/pandapower.yml", "tools/six_kube_report.py", ".github/workflows/six-kube.yml", "tests/test_six_kube.py"],
     "kwok_scale": ["scripts/kwok_scale.sh", "deploy/kwok/kubectl_kwok.sh", "tools/kwok_report.py", ".github/workflows/kwok-scale.yml"],
     "six_organisms": ["scripts/grid_one_machine.sh", "tools/run_scale.py", "tools/pool_scale.py", "scripts/scale_ladder.sh", ".github/workflows/six.yml",
-                      "results/scale/GRID.md", "tools/grid.py", "results/scale/receipts/round6-1x.md", "results/scale/receipts/round6-10x.md", "docs/HOW_TO_READ_THE_RESULTS.md"],
+                      "results/scale/GRID.md", "tools/grid.py", "results/scale/receipts/v3-1x.md", "results/scale/v1/GRID.md", "results/scale/v1/receipts/round6-1x.md", "results/scale/v1/receipts/round6-10x.md", "docs/HOW_TO_READ_THE_RESULTS.md"],
     "license": ["LICENSE", "NOTICE", "DISCLOSURES.md", "LICENSING_FAQ.md", "THIRD_PARTY_NOTICES.md", "PATENTS.md",
                 "TRADEMARKS.md"],
     "repository_standards": ["docs/REPOSITORY_STANDARDS.md", "codemeta.json", "sbom/omni-compass.cdx.json", ".github/SECURITY_CONTACTS",

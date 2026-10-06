@@ -24,6 +24,11 @@
   into `docs/REALMS_PREREGISTRATION.md`. `tools/omni_version.py` now prints omni-v2, omni-v1, or what differs; the
   three-run tables accept either fingerprint and refuse to mix them. Every modelled result is to be run again on v2;
   v1's tables stay v1's.
+- The six-organism grid on v3, 1 copy (`results/scale/GRID.md`, receipt `results/scale/receipts/v3-1x.md` from run
+  37430723080: 60 shards, 1,000 paired runs per organism): every organism superior within guardrails at 10, 100 and
+  1,000 runs, work per energy +0.08% to +0.3%, every knob handed back. The v1 grid and its receipts move to
+  `results/scale/v1/`; `tools/grid.py` builds the grid from the current engine's receipts (`v3-<size>x.md`) and marks
+  the sizes not yet run as "to run". 10 copies is running; 100 and 1,000 follow one at a time.
 - **PostgreSQL: the first untouched run was a loss, and it is kept** (run 37425853293, `docs/POSTGRES_PREREGISTRATION.md`):
   on the read-only workload Omni gave the pool back to its floor of two and the users' p95 went from 4 ms to 3.9 s,
   work inside the line −47%, because the compass read the pooler's own service time (0.1 ms per transaction) and the

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The six organisms' full grid, built from the saved receipts (results/scale/receipts/round6-<size>x.md, each the
+"""The six organisms' full grid, built from the saved receipts (results/scale/receipts/v3-<size>x.md, each the
 printed receipt of one GitHub `six` run): 6 organisms x sizes 1, 10, 100, 1,000 clusters x runs 1, 10, 100, 1,000.
 
     python3 tools/grid.py        writes results/scale/GRID.md
@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 import sys; sys.path.insert(0, str(ROOT))  # noqa: E402
 from realms.harness import STACK, TOWER, organism_sizes  # noqa: E402
 REC = ROOT / "results" / "scale" / "receipts"
+ENGINE = "v3"            # the receipts of the engine this grid is built on (v1's grid and receipts: results/scale/v1/)
 OUT = ROOT / "results" / "scale" / "GRID.md"
 SIZES, RUNS = (1, 10, 100, 1000), (1, 10, 100, 1000)
 ORGS = ["Compute / AI / Cloud", "Physics / Robotics / Autonomous", "Energy / Facility / Industrial",
@@ -54,7 +55,7 @@ def parse(path):
 def main():
     data, sources = {}, {}
     for sc in SIZES:
-        p = REC / f"round6-{sc}x.md"
+        p = REC / f"{ENGINE}-{sc}x.md"
         if p.exists():
             data[sc], sources[sc] = parse(p)
 
@@ -65,7 +66,7 @@ def main():
         if c is None and sc == 1000 and r == 100:
             return "not run yet"
         if c is None:
-            return "running"
+            return "to run"
         v = c[k]
         return v.split(" (")[0] if k in ("wpe", "work", "energy", "viol") else v
 
@@ -73,15 +74,15 @@ def main():
     rule = "|---|" + "---:|" * (len(SIZES) * len(RUNS))
     L = ["# The six organisms: the full grid", "",
          "Evidence class **S** (models of the plants, not hardware). Every organism runs native (its own controllers) "
-         "and native with Omni-Compass on top (the compass law on every muscle, round 6 of `docs/REALMS_PREREGISTRATION.md`) "
+         "and native with Omni-Compass on top (the compass law on every muscle, Omni v3, `docs/OMNI_V3.md`) "
          "on the same seed, the same load and the same clock. **Size** is the number of copies of the organism governed "
          "together on one clock: 1, 10, 100 and 1,000 clusters. **Runs** are paired seeds from 7000 on; 1, 10, 100 and "
          "1,000 runs are the first N of the same set, so each block nests inside the next. Built by `tools/grid.py` from "
-         "the saved receipts in `results/scale/receipts/`. How to read it: `docs/HOW_TO_READ_THE_RESULTS.md`.", "",
-         "Sources:"] + [f"- {sc}x: {sources[sc]}" if sc in sources else f"- {sc}x: running on GitHub" for sc in SIZES] + [
+         "the saved receipts in `results/scale/receipts/`; the v1 grid and its receipts are kept in `results/scale/v1/`. How to read it: `docs/HOW_TO_READ_THE_RESULTS.md`.", "",
+         "Sources:"] + [f"- {sc}x: {sources[sc]}" if sc in sources else f"- {sc}x: to run" for sc in SIZES] + [
          "- 1,000 runs at 1,000 clusters is not run: about 6,000 machine-hours, beyond the machines available.",
          "- 100 runs at 1,000 clusters is not run yet: about 650 runner-hours (one run of the four stacked at 1,000 copies "
-         "takes 2 to 3 hours); the 1-run and 10-run cells at 1,000 clusters are complete.", ""]
+         "takes 2 to 3 hours).", ""]
     for k, title, note in (("wpe", "Work per energy, with Omni-Compass on top against native", "higher is better"),
                            ("energy", "Energy, with Omni-Compass on top against native", "lower is better"),
                            ("viol", "Time over the service line, with Omni-Compass on top minus native (percentage points)",
@@ -105,8 +106,8 @@ def main():
               "2% the rule allows, and held over 10, 100 and 1,000 runs)."),
           f"- Every knob handed back in every completed cell: {knobs}.",
           f"- Work done: the largest cost in any completed cell is {max(0.0, -min(float(data[sc][(r, o)]['work'].split('%')[0]) for sc, r, o in done)):.3f}% "
-          "(thermal zones held warmer have a little less margin in a heat spike; `docs/REALMS_PREREGISTRATION.md`, round 6 "
-          "receipts), inside the 2% the rule allows (`DISCLOSURES.md`, section 3).",
+          "(thermal zones held warmer have a little less margin in a heat spike; `docs/REALMS_PREREGISTRATION.md`), inside "
+          "the 2% the rule allows (`DISCLOSURES.md`, section 3).",
           "- The full receipt of each size, with the 95% interval of every number, is in `results/scale/receipts/`."]
     OUT.write_text("\n".join(_legal_stamp(L)) + "\n")
     print(OUT, len(done), "cells")
