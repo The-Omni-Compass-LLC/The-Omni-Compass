@@ -24,6 +24,24 @@
   into `docs/REALMS_PREREGISTRATION.md`. `tools/omni_version.py` now prints omni-v2, omni-v1, or what differs; the
   three-run tables accept either fingerprint and refuse to mix them. Every modelled result is to be run again on v2;
   v1's tables stay v1's.
+- **PostgreSQL, the counted runs on amendment 1** (`results/live/V3_PGBENCH.md`; runs 37435740735, 37435751322, 37435761371,
+  three paired repetitions each, the three untouched workloads): the connections held open to the database (the machines)
+  confirmed better on `select` (−61% to −63%) and `tpcb_hot` (−69% to −72%); on `simple_update` the runs disagree (one
+  run +12%, two runs −34% and −35%). Host CPU-seconds **confirmed worse** on all three workloads (+14% to +28%): a smaller
+  pool makes PgBouncer queue clients, and queuing costs the host CPU. Work inside the line, throughput and every latency
+  gauge read no difference beyond the noise: native's own p95 swings a hundredfold between repetitions on GitHub's shared
+  runner. Failed transactions 0 in both arms; the knob handed back in every arm. The honest reading for a database behind
+  a pooler: Omni holds a third of the connections for the same work, at a CPU cost, and the shared runner is too noisy
+  to tell the latencies apart. Register row 30; the Omni index reads the table.
+- The six organisms with the real cluster inside, v1 (`results/live/V1_SIX_KUBE.md`, run 37359815637): 98 of 100 cells
+  (1, 10, 100 copies of all six; 1,000 copies of the four realms and the tower; the two 1,000-copy stack cells cut off by
+  GitHub's six-hour job limit). p95 and time over the line better in every cell of every organism; 0 gauges worse
+  beyond the noise except a rounding-level work loss (−0.0003%) in the larger cells and HPA replicas +0.7% in one cell;
+  the machines stay at 6 in both arms (kind has no node autoscaler). The big organisms on Azure (37359820055): the tower
+  at 1,000 copies 3 of 3 done; the stack at 1,000 copies never finished inside a six-hour job and needs a run detached
+  from GitHub's job, to build.
+- The six-organism grid on v3, 10 copies (`results/scale/receipts/v3-10x.md` from run 37433972731): every organism
+  superior within guardrails at 10, 100 and 1,000 runs; 100 copies dispatched.
 - The six-organism grid on v3, 1 copy (`results/scale/GRID.md`, receipt `results/scale/receipts/v3-1x.md` from run
   37430723080: 60 shards, 1,000 paired runs per organism): every organism superior within guardrails at 10, 100 and
   1,000 runs, work per energy +0.08% to +0.3%, every knob handed back. The v1 grid and its receipts move to

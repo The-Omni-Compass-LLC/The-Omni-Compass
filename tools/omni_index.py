@@ -34,7 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LIVE = ROOT / "results" / "live"
 
-# The v1 tables (tools/confirm_abc.py, docs/OMNI_V1.md): each test's three runs on the frozen engine, every row with
+# The three-run tables (tools/confirm_abc.py, docs/OMNI_V1.md, docs/OMNI_V3.md): each test's three runs on the frozen engine, every row with
 # its reading by rule. (category, test, file, {measure: row key}, work). work: "equal" (the same fixed-rate work was sent
 # to both arms and none failed: ratio 1), "capacity" (the capacity row of that table), or None (not taken). A measure
 # counts only as its reading allows: confirmed better or confirmed WORSE over all three runs gives the geometric mean of
@@ -60,7 +60,13 @@ SOURCES = [
     ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs, three runs", "V1_BATCH.json",
      {"speed": MEAN, "machines": NODES, "energy": STANDBY}, None),
 ]
-REAL = ("Real Kubernetes (GitHub)", "Real cloud (Azure AKS, billed)", "Real card (NVIDIA, its own meter)")
+REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer, GitHub)", "Real cloud (Azure AKS, billed)",
+        "Real card (NVIDIA, its own meter)")
+# the database's three-run table (tools/pgbench_abc.py): per workload, work = transactions inside the line, speed = p95,
+# machines = the connections held open to the database; energy = the host's CPU seconds over the run (no meter on a GitHub
+# runner; the CPU the compass itself burns is the declared cost, and a confirmed loss there counts against Omni)
+DB_FILE = "V3_PGBENCH.json"
+DB_MEASURES = {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "servers_alive_mean", "energy": "cpu_seconds"}
 LOWER_IS_BETTER = {"speed", "machines", "energy"}
 PENDING = {"Real cloud (Azure AKS, billed)": "the v1 steady and burst runs on Azure (the earlier engine's +7.5% is in `docs/history/OMNI_INDEX_pre_v1.md`)",
            "Real card (NVIDIA, its own meter)": "the rerun on the current card controller (the 2026-10-02 run used the replaced one)"}
@@ -101,6 +107,24 @@ def tests():
             r["work"] = measure(rows_[CAPACITY], "work")
         out.append({"category": cat, "test": name, "source": f"results/live/{f}", "runs": [x["run"] for x in data["runs"]],
                     "v1": bool(data.get("v1")), "measures": r})
+    db = LIVE / DB_FILE
+    if db.exists():
+        data = json.loads(db.read_text())
+        for wl, gauges in sorted(data["workloads"].items()):
+            r = {}
+            for m, key in DB_MEASURES.items():
+                g = gauges.get(key)
+                if not g or any(x is None for x in g["runs"]):
+                    continue
+                reading = g["reading"]
+                if reading.startswith("confirmed"):
+                    ratios = [(x["omni"] / x["native"]) if m == "work" else (x["native"] / x["omni"]) for x in g["runs"] if x["native"] and x["omni"]]
+                    ratio = gmean(ratios) if ratios else 1.0
+                else:
+                    ratio = 1.0
+                r[m] = {"native": g["runs"][0]["native"], "omni": g["runs"][0]["omni"], "ratio": ratio, "reading": reading}
+            out.append({"category": "Real database (PostgreSQL behind PgBouncer, GitHub)", "test": f"pgbench `{wl}`: the pooler's pool size, three paired repetitions, three runs",
+                        "source": f"results/live/{DB_FILE}", "runs": [x["run"] for x in data["runs"]], "v1": False, "measures": r})
     for t in out:
         g = gmean([m["ratio"] for m in t["measures"].values()])
         t["index_pct"] = 100 * (g - 1) if g else None
@@ -125,14 +149,15 @@ def main():
          "work (more is better), speed (a lower response time), machines (fewer), energy (less). A test's index is the "
          "geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric "
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
-         "Every number is read from the test's own v1 table (`results/live/V1_*.json`, made by `tools/confirm_abc.py` from the "
-         "three archived runs; `tools/omni_index.py`).", "",
-         f"## Headline: Omni-Compass on top of native, real machines, Omni v1 confirmed three times: **{pct(head)}** "
+         "Every number is read from the test's own three-run table (`results/live/V1_*.json` and `results/live/V3_*.json`, made by "
+         "`tools/confirm_abc.py` and `tools/pgbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
+         f"## Headline: Omni-Compass on top of native, real machines, confirmed three times: **{pct(head)}** "
          f"(more for the same, or the same for less, across work, speed, machines and energy)", "",
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): confirmed better or confirmed worse in all "
          "three runs counts, as the geometric mean of the runs' ratios; no difference beyond the noise counts as exactly 1, so "
-         "nothing inside the noise is claimed either way. Real Kubernetes is the only real category with its v1 runs in; "
-         "the others join as theirs land.", "",
+         "nothing inside the noise is claimed either way. Real Kubernetes (Omni v1) and the real database (Omni v3) are the real "
+         "categories in; Azure and the card join as their three-run tables land. The law, controllers and runners are the same bytes "
+         "in v1 and v3 (`docs/OMNI_V3.md`); each table names the engine it ran on.", "",
          "| Category | Index | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |", "|---|---:|---:|---:|---:|---:|---:|"]
     for c in list(REAL) + ["Modelled muscles (evidence S)"]:
         if c in cats:
@@ -143,8 +168,9 @@ def main():
     L += ["", "Read: every column points the same way, plus is good for Omni-Compass. \"Fewer machines by +4%\" means Omni did the "
           "same work on 4% fewer machine-hours; \"less energy by +3%\" means 3% less energy for the same work; \"faster by +95%\" means "
           "native's slowest-5% response is 1.95 times Omni's (Omni answers about twice as fast); \"more work by +45%\" means 45% more work "
-          "inside the response line. The energy figure on GitHub's Kubernetes is a declared model, not a meter; Azure's machines are its "
-          "own billed count.",
+          "inside the response line. The energy figure on GitHub's Kubernetes is a declared model, not a meter; the database's energy column "
+          "is the host's CPU seconds (the compass's own cost, confirmed worse, counted against Omni); its machines column is the "
+          "connections held open to the database; Azure's machines are its own billed count.",
           "", "## Every test", "",
           "| Category | Test | Index | More work by | Faster by | Fewer machines by | Less energy by | Source |", "|---|---|---:|---:|---:|---:|---:|---|"]
     for t in ts:

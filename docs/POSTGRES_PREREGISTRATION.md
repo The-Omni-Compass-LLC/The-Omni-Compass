@@ -182,3 +182,21 @@ way down, the fail-up, the one-writer rule and the hand-back are as frozen above
 `select` (one short repetition, 16 clients): at the peak notch the pool held near 11 and the work inside the line and
 the p95 matched native's; at the light notches the pool eased to 3. The counted runs are three new untouched runs (A, B,
 C) on the amended rule; run 37425853293 stays in this file as the result the first rule produced and is not counted.
+
+## The counted runs (2026-10-06, runs 37435740735, 37435751322, 37435761371, on amendment 1)
+
+The three untouched workloads, three separate GitHub runs, three paired repetitions each; the table by rule is
+`results/live/V3_PGBENCH.md` (`tools/pgbench_abc.py`).
+
+| Workload | Connections held open (the machines) | Host CPU-seconds | Work inside the line, throughput, p50, p95, p99 |
+|---|---|---|---|
+| `select` | 19.3 → 7.5, **confirmed better** (−61% to −63% in the three runs) | **confirmed worse** (+14% to +27%) | no difference beyond the noise (3 of 3 runs) |
+| `simple_update` | **the runs disagree** (+12% in one run, −34% and −35% in two) | **confirmed worse** (+18% to +28%) | no difference beyond the noise (2 or 3 of 3 runs) |
+| `tpcb_hot` | 19.4 → 6.0, **confirmed better** (−69% to −72%) | **confirmed worse** (+15% to +25%) | no difference beyond the noise (2 or 3 of 3 runs) |
+
+Failed transactions 0 and 0 in every run; the knob handed back and read back in every arm. Read: with the amended
+reading the read-only collapse of the first run did not recur (work inside the line and throughput within the noise of
+native's in all three runs), and Omni held a third of the connections open for the same work. The cost is real and
+confirmed: the host spent 14% to 28% more CPU, which is PgBouncer queuing clients behind a smaller pool. The latencies
+cannot be told apart on GitHub's shared runner, where native's own p95 moved from 3 ms to 3 s between repetitions; that
+is the runner, and it is said so. Nothing in the rule changes after these runs.

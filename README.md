@@ -54,7 +54,7 @@ from each test's own v1 table by [`tools/omni_index.py`](tools/omni_index.py):
 
 Six organisms with the real cluster inside (the four realms, the whole tower of 945 muscles, the four stacked, 1,716),
 on an earlier engine: late 23-52% less often and 24-40% faster in every one
-([`results/live/SIX_KUBE.md`](results/live/SIX_KUBE.md)); the rerun at 1, 10, 100 and 1,000 copies on the frozen
+([`results/live/V1_SIX_KUBE.md`](results/live/V1_SIX_KUBE.md), the frozen engine; the earlier engine's in [`results/live/SIX_KUBE.md`](results/live/SIX_KUBE.md)); the rerun at 1, 10, 100 and 1,000 copies on the frozen
 engine is running.
 
 ## What is real and what is a model
