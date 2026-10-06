@@ -24,6 +24,14 @@
   into `docs/REALMS_PREREGISTRATION.md`. `tools/omni_version.py` now prints omni-v2, omni-v1, or what differs; the
   three-run tables accept either fingerprint and refuse to mix them. Every modelled result is to be run again on v2;
   v1's tables stay v1's.
+- The power grid's v1 A/B/C table (`results/live/V1_PANDAPOWER.md`; runs 37377029333, 37397142210, 37412578757 on the
+  v1 fingerprint; 11 untouched SimBench grids, a full year each, both load models, every gauge reproduced in 3 of 3):
+  with ZIP loads the energy the loads drew is confirmed better in all 11 grids (−1.3% to −1.5%) and the net import in
+  all 11 (−1% to −15%); losses confirmed better in 7 and confirmed worse in 4 (the rural and semi-urban grids that carry
+  their own generation, +0.6% to +1.5%: a lower voltage draws more current for the same power through those feeders);
+  tap operations fewer in 10 grids (−27% to −36%) and 4 → 8 a year in one rural grid, the cost declared before the run;
+  no grid is ever more often outside its 0.95-1.05 band, two are less often. With constant-power loads the energy
+  drawn is the same by construction, the import better in 7 grids and worse by 0.01% to 0.03% in 4. Register row 28.
 - **The v3 realms table** (`results/realms/`; runs 37429141430, 37429151263 and 37429161515 on the v3 fingerprint, A, B
   and C reproduced to the last digit; v2's table moved to `results/realms/v2/`): 945 muscles, 0 worse; 124 superior
   within guardrails, 807 no difference beyond the noise, 9 energy improvement with a service tradeoff (all of them
