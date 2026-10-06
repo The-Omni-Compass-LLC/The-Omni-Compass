@@ -108,11 +108,11 @@ def draw(path, pgs, version, nfiles, nlines, kind, contents=None, numbers=None):
 def main():
     version = subprocess.run(["git", "rev-parse", "--short=12", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     try:                                                   # the frozen engine it carries, if the bytes match (docs/OMNI_V1.md)
-        sys.path.insert(0, str(ROOT / "tools")); import omni_version as ov, json
-        want = json.loads(ov.MANIFEST.read_text())
-        if ov.digest(ov.engine_files()) == want["digest"]:
-            version += f", {want['version']} (engine {want['digest'][:16]})"
-    except (OSError, ValueError, KeyError, ImportError):
+        sys.path.insert(0, str(ROOT / "tools")); import omni_version as ov
+        files = ov.engine_files(); v = ov.version_of(files)
+        if v:
+            version += f", {v} (engine {ov.digest(files)[:16]})"
+    except (OSError, ValueError, KeyError, ImportError, AttributeError, subprocess.SubprocessError):
         pass
     paths = files()
     nlines = sum(len((ROOT / f).read_text(errors="replace").splitlines()) for f in paths)
