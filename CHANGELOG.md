@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- The robot arms' v1 A/B/C tables (`results/live/V1_MUJOCO.md`: UR5e, iiwa 14, Gen3, runs 37409191253, 37409852642,
+  37410015922; `results/live/V1_MUJOCO_PANDA.md`: the tuning robot, runs 37409198316, 37409860065, 37410022940; all on
+  the v1 fingerprint, every gauge reproduced to the last digit in all three). Where the paired physics trial let Omni
+  move, the energy per takt is confirmed better by a little (Gen3 −0.8%, Panda −0.5%), peak torque and tracking error
+  confirmed better (Gen3 −29% and −21%, Panda −10% and −21%), cycles 27% longer inside the takt; the Panda's copper loss
+  is confirmed worse (+14%, the gravity-holding torque paid for longer). The UR5e and the iiwa 14 are left native by the
+  trial (a slower cycle is not cheaper on their own figures), so Omni moves nothing there. The honest reading: on a robot
+  arm the speed knob buys under one percent, and the gate refuses it where it would cost.
 - The robot arms, preregistered and built (`docs/ROBOTICS_PREREGISTRATION.md`, `tools/run_mujoco.py`,
   `.github/workflows/mujoco.yml`, `tools/mujoco_abc.py`; tests in `verify.py`): MuJoCo integrates each arm, MuJoCo
   Menagerie supplies the robot with the position servos it ships with as native, and Omni sits on top on one knob, the

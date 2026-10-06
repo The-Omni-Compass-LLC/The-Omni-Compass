@@ -142,7 +142,7 @@ Which engine each result ran on, and its v1 replications A, B and C: [`docs/OMNI
 
 | # | Benchmark (owner) | Native | Omni moves | Status | Result | File |
 |---:|---|---|---|---|---|---|
-| 29 | Robot arms in MuJoCo (Google DeepMind): Franka Panda (tuning), UR5e, KUKA iiwa 14, Kinova Gen3 from MuJoCo Menagerie, a pick-and-place cycle inside a takt | each robot's own shipped position servos | the speed override inside the takt; a paired physics trial leaves it native where a slower cycle is not cheaper | preregistered; A/B/C running | smoke on the tuning robot: motion energy −1.7%, energy per takt −0.5%, tracking better; two untouched arms expected to read nothing for Omni to move | `docs/ROBOTICS_PREREGISTRATION.md`, `tools/run_mujoco.py`, `.github/workflows/mujoco.yml` |
+| 29 | Robot arms in MuJoCo (Google DeepMind): Franka Panda (tuning), UR5e, KUKA iiwa 14, Kinova Gen3 from MuJoCo Menagerie, a pick-and-place cycle inside a takt | each robot's own shipped position servos | the speed override inside the takt; a paired physics trial leaves it native where a slower cycle is not cheaper | done, A/B/C on v1, reproduced in 3 of 3 | Gen3: energy per takt −0.8%, copper −11%, peak torque −29%, tracking −21%, confirmed better; Panda (tuning): energy per takt −0.5%, peak torque −10%, tracking −21% confirmed better, copper loss +14% confirmed worse; UR5e and iiwa 14: a slower cycle is not cheaper on their own figures, left native, nothing for Omni to move | `results/live/V1_MUJOCO.md`, `results/live/V1_MUJOCO_PANDA.md`, `docs/ROBOTICS_PREREGISTRATION.md` |
 
 ### 2.8 Outside readers
 
