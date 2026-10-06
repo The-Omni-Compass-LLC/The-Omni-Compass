@@ -17,8 +17,11 @@
   Package install on the fresh machine is tried five times (one v1 attempt lost its machine to a stale package list).
   First starts (17:57 UTC, westus2 and centralus): every size refused, the CLI hiding Azure's reason behind its own
   "content already consumed" error; the workflow now reads the reason out of Azure's answer and lists the region's SKU
-  restrictions. The subscription's regional quota is 10 vCPUs, so one 8-vCPU machine fills a region; eastus is the
-  region the metered AKS runs use, and the default is now eastus2.
+  restrictions. eastus2 refused every size too. The workflow's survey mode (rents nothing) then asked Azure, region by
+  region, which 8-vCPU sizes this subscription may rent: eastus allows 32 vCPUs and the v4 sizes (D8as_v4 is the one
+  granted on 2026-10-05); every other region surveyed allows 10 vCPUs and only the v5 to v7 sizes. So the start job
+  asks Azure for each refused size's restriction, tries D8as_v4 and D8s_v4 first and falls back to the v7 sizes, and the
+  default region is eastus.
 - **The version tool reads a commit from before a runner was written** (`tools/omni_version.py`, `tests/test_omni_version.py`):
   the power-grid runner was added at `8eab01c` inside v1 without touching any other engine file, so the Kubernetes and
   organism runs at `a004a8f` (six-kube 37359815637, big-organism 37359820055) hold 37 of the 38 v1 files, all v1 bytes.
