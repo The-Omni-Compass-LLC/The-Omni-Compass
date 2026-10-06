@@ -7,6 +7,13 @@
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
+## 2026-10-06
+- The archive keeps every raw file within GitHub's limit: GitHub refuses a file over 100 MB, and the 1,226-muscle
+  organism at 1,000 copies writes a 99.6 MB record, so a slightly larger v1 record would have stopped the archive.
+  `archive-run.yml` now stores any raw file over 50 MB gzipped (`gzip -n`, the same bytes every time; its repetition's
+  `SHA256SUMS.txt` keeps the original's hash: `gunzip -c FILE.gz | sha256sum`). `tools/six_kube_report.py` reads the
+  record plain or gzipped, and `tests/test_six_kube.py`, now run by `verify.py`, checks that both read the same.
+
 ## 2026-10-05
 - Omni v1: the engine frozen and fingerprinted (`OMNI_V1.json`, `docs/OMNI_V1.md`, `tools/omni_version.py`): one SHA-256
   per engine file (38) and one digest over all of them. Every result states the version it ran on; any change makes v2

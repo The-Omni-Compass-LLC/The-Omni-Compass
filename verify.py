@@ -326,6 +326,9 @@ def main():
     test_cruise_brake.main(); check("cruise and the emergency brake: every machine in service while work waits, straight to the floor at zero demand, never below it", True)
     from tests import test_staging_order
     test_staging_order.main(); check("staging order through the real actuator: the emptiest idles first, the warmest wakes first, two always in service (the floor), every machine usable, no pod moved", True)
+    r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_six_kube"], cwd=ROOT, capture_output=True, text=True)
+    check("six organisms with the cluster inside: the same demand in both arms, every simulated knob handed back, an archived "
+          "record stored gzipped reads the same", r.returncode == 0, r.stderr[-300:])
     from tests import test_fleet_realdata_paths
     test_fleet_realdata_paths.main(); check("capture replay and PlanetLab vessel on inputs in the real formats", True)
     r = subprocess.run(["bash", "-n", str(ROOT / "fleet" / "capture" / "kube_capture.sh")], capture_output=True)

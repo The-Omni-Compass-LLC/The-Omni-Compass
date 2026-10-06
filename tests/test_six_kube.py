@@ -36,6 +36,23 @@ class SixKube(unittest.TestCase):
         self.assertEqual(len(NAMES), 6)
         self.assertEqual(sorted(run_kil.groups(1)), sorted(NAMES))
 
+    def test_gzipped_record_reads_the_same(self):
+        """The archive stores a raw file over 50 MB gzipped (GitHub refuses a file over 100 MB); the report reads it
+        exactly as the plain file."""
+        import gzip
+        from tools import six_kube_report
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t) / "bench-compass-1"
+            self.assertEqual(run_kil.main(["--organism", "compute_ai_cloud", "--arm", "compass", "--duration", "0.5",
+                                           "--out", str(d), "--dry", "--load-max", "6"]), 0)
+            plain = six_kube_report.organism_record(d)
+            raw = (d / "organism.json").read_bytes()
+            (d / "organism.json.gz").write_bytes(gzip.compress(raw, mtime=0)); (d / "organism.json").unlink()
+            self.assertEqual(six_kube_report.organism_record(d), plain)
+            self.assertEqual(gzip.decompress((d / "organism.json.gz").read_bytes()), raw)
+            (d / "organism.json.gz").unlink()
+            self.assertIsNone(six_kube_report.organism_record(d))
+
 
 if __name__ == "__main__":
     unittest.main()

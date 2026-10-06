@@ -28,6 +28,10 @@ jobs:
             d="results/live/raw/run-$run"
             [ -d "$d" ] && { echo "::notice::run $run is already archived"; continue; }
             gh run download "$run" -R "${{ github.repository }}" -D "$d" || { echo "::warning::run $run: no files to copy"; continue; }
+            # GitHub refuses a file over 100 MB: a raw file over 50 MB (the 1,000-copy organism records) is stored
+            # gzipped (-n: the same bytes every time). Its repetition's SHA256SUMS.txt still holds the original's hash;
+            # check it with: gunzip -c FILE.gz | sha256sum
+            find "$d" -type f -size +50M -exec gzip -n -9 {} \;
             ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
             git add "$d"
             git commit -q -m "Raw files of live run $run archived with the code"

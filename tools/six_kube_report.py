@@ -20,6 +20,7 @@ those are inside the noise (the interval crosses zero). CPU and host load are sh
 """
 from __future__ import annotations
 
+import gzip
 import json
 
 try:                                                       # the legal notice every generated report carries
@@ -71,12 +72,24 @@ def organism_gauges(rec):
             "organism work per energy": work / energy if energy else float("nan")}
 
 
+def organism_record(d):
+    """The repetition's organism.json, or organism.json.gz where the archive compressed it (a raw file over 50 MB is
+    stored gzipped, byte-exact inside, because GitHub refuses a file over 100 MB; .github/workflows/archive-run.yml)."""
+    if (d / "organism.json").exists():
+        return json.loads((d / "organism.json").read_text())
+    if (d / "organism.json.gz").exists():
+        return json.loads(gzip.decompress((d / "organism.json.gz").read_bytes()))
+    return None
+
+
 def collect(root):
     runs = {}
     for d in sorted(root.rglob("bench-*-*")):
-        if not d.is_dir() or not (d / "organism.json").exists() or (d / "INVALID").exists() or not (d / "capture.csv").exists():
+        if not d.is_dir() or (d / "INVALID").exists() or not (d / "capture.csv").exists():
             continue
-        rec = json.loads((d / "organism.json").read_text())
+        rec = organism_record(d)
+        if rec is None:
+            continue
         _, arm, rep = arm_rep(d)
         g = arm_gauges(d)
         g.update(organism_gauges(rec))
