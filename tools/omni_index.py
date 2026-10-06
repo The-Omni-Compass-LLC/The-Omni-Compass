@@ -34,77 +34,36 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LIVE = ROOT / "results" / "live"
 
-P95 = r"response time.*95th percentile"
-NODES = r"worker nodes in service"
-ENERGY = r"energy, parked workers still on at idle power"
-BILLED = r"machines billed, machine-hours"
-
-# (category, test, file, section heading regex or None, {measure: row regex}, work)
-# work: "equal" (the same fixed-rate work was sent to both arms and none failed: ratio 1), "capacity" (read from the
-# capacity table of that file), or None (not taken)
+# The v1 tables (tools/confirm_abc.py, docs/OMNI_V1.md): each test's three runs on the frozen engine, every row with
+# its reading by rule. (category, test, file, {measure: row key}, work). work: "equal" (the same fixed-rate work was sent
+# to both arms and none failed: ratio 1), "capacity" (the capacity row of that table), or None (not taken). A measure
+# counts only as its reading allows: confirmed better or confirmed WORSE over all three runs gives the geometric mean of
+# the three runs' ratios; no difference beyond the noise, same, or the runs disagree gives exactly 1 (nothing is claimed
+# either way). Azure's billed runs and the six organisms join the index when their v1 tables land.
+P95 = "response time (ms), 95th percentile"
+MEAN = "response time (ms), mean"
+NODES = "worker nodes in service, mean"
+ENERGY = "energy, parked workers still on at idle power (Wh)"
+STANDBY = "energy (Wh)"
+CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge, higher is better)"
 SOURCES = [
-    ("Real Kubernetes (GitHub)", "Steady same work: the load in steps at a fixed rate, ten pairs", "STEADY.md",
-     r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, "equal"),
-    ("Real Kubernetes (GitHub)", "Demand that wanders: up and down one step at a time, ten pairs", "WANDERING.md",
-     r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs", "ALL_FOUR.md",
-     r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
-    ("Real Kubernetes (GitHub)", "Fairness: a noisy neighbour, ten pairs", "FAIRNESS.md", r"^## omni \(compass law\)",
+    ("Real Kubernetes (GitHub)", "Steady same work: the load in steps at a fixed rate, ten pairs, three runs", "V1_STEADY.json",
+     {"speed": P95, "machines": NODES, "energy": ENERGY}, "equal"),
+    ("Real Kubernetes (GitHub)", "Demand that wanders: up and down one step at a time, ten pairs, three runs", "V1_WANDERING.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs", "FAULTS.md",
-     r"^## omni \(compass law\)", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs", "BATCH.md",
-     r"^## omni \(compass law\)", {"speed": r"response time \(ms\), mean", "machines": NODES, "energy": r"energy, parked workers at 25 W standby"}, None),
-    ("Real cloud (Azure AKS, billed)", "Steady load, Azure's autoscaler underneath, five pairs (earlier engine; the rerun is running)",
-     "AKS_BILL.md", r"## B with the compass law", {"speed": P95, "machines": BILLED}, "equal"),
+    ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs, three runs", "V1_ALL_FOUR.json",
+     {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
+    ("Real Kubernetes (GitHub)", "Fairness: a noisy neighbour, ten pairs, three runs", "V1_FAIRNESS.json",
+     {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+    ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs, three runs", "V1_FAULTS.json",
+     {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+    ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs, three runs", "V1_BATCH.json",
+     {"speed": MEAN, "machines": NODES, "energy": STANDBY}, None),
 ]
-ORGANISMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
-             "organism_656", "stack_1226"]
-NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
-         "energy_facility_industrial": "Energy / Facility / Industrial", "distribution_specialized": "Distribution / Specialized",
-         "organism_656": "the whole tower (656)", "stack_1226": "the four stacked (1,226)"}
 REAL = ("Real Kubernetes (GitHub)", "Real cloud (Azure AKS, billed)", "Real card (NVIDIA, its own meter)")
 LOWER_IS_BETTER = {"speed", "machines", "energy"}
-
-
-def num(cell):
-    c = cell.replace("**", "").replace("−", "-").replace(",", "").strip()
-    m = re.match(r"^[-+]?\d+(\.\d+)?(e[-+]?\d+)?", c)
-    return float(m.group(0)) if m else None
-
-
-def rows(path, section):
-    """Table rows (label, cells) of a result file, from the first line matching section (the whole file if None)."""
-    lines = path.read_text().splitlines()
-    if section:
-        start = next((i for i, l in enumerate(lines) if re.search(section, l)), None)
-        if start is None:
-            raise KeyError(f"{path.name}: no section {section!r}")
-        lines = lines[start + 1:]
-        end = next((i for i, l in enumerate(lines) if l.startswith("#")), len(lines))
-        lines = lines[:end]
-    out = []
-    for l in lines:
-        if l.startswith("|") and not l.startswith("|---"):
-            cells = [c.strip() for c in l.strip().strip("|").split("|")]
-            out.append((cells[0].replace("**", ""), cells[1:]))
-    return out
-
-
-def pick(table, rx):
-    for label, cells in table:
-        if re.search(rx, label, re.I) and len(cells) >= 2 and num(cells[0]) is not None and num(cells[1]) is not None:
-            return num(cells[0]), num(cells[1])
-    return None
-
-
-def capacity(path):
-    for label, cells in rows(path, r"^## (Capacity|The capacity test)"):
-        if label == "native":
-            n = num(cells[0])
-        if label == "compass":
-            return n, num(cells[0])
-    return None
+PENDING = {"Real cloud (Azure AKS, billed)": "the v1 steady and burst runs on Azure (the earlier engine's +7.5% is in `docs/history/OMNI_INDEX_pre_v1.md`)",
+           "Real card (NVIDIA, its own meter)": "the rerun on the current card controller (the 2026-10-02 run used the replaced one)"}
 
 
 def ratio(measure, native, omni):
@@ -118,53 +77,30 @@ def gmean(xs):
     return math.exp(sum(math.log(x) for x in xs) / len(xs)) if xs else None
 
 
+def measure(row, m):
+    """One measure's ratio over the three runs, as its reading allows: confirmed in all three gives the geometric mean
+    of the runs' ratios (a confirmed loss counts against Omni); anything else is exactly 1, nothing claimed."""
+    reading = row["reading"]
+    rs = [ratio(m, r["native"], r["omni"]) for r in row["runs"]]
+    g = gmean(rs) if reading.startswith("confirmed") and all(rs) else 1.0
+    return {"native": row["runs"][0]["native"], "omni": row["runs"][0]["omni"], "ratio": g, "reading": reading}
+
+
 def tests():
     out = []
-    for cat, name, f, sec, measures, work in SOURCES:
+    for cat, name, f, measures, work in SOURCES:
         path = LIVE / f
         if not path.exists():
             continue
-        table = rows(path, sec)
-        r = {}
-        for m, rx in measures.items():
-            v = pick(table, rx)
-            if v:
-                r[m] = {"native": v[0], "omni": v[1], "ratio": ratio(m, *v)}
+        data = json.loads(path.read_text())
+        rows_ = data["rows"]
+        r = {m: measure(rows_[key], m) for m, key in measures.items() if key in rows_}
         if work == "equal":
-            r["work"] = {"native": 1.0, "omni": 1.0, "ratio": 1.0, "note": "the same fixed-rate work sent to both arms"}
-        elif work == "capacity":
-            v = capacity(path)
-            if v:
-                r["work"] = {"native": v[0], "omni": v[1], "ratio": ratio("work", *v)}
-        out.append({"category": cat, "test": name, "source": f"results/live/{f}", "measures": r})
-    six = LIVE / "SIX_KUBE.json"
-    if six.exists():
-        data = json.loads(six.read_text())["organisms"]
-        for o in ORGANISMS:
-            if o not in data:
-                continue
-            g = data[o]["rows"]
-            get = lambda k: (g[k]["native"], g[k]["omni"]) if k in g else None
-            r = {}
-            for m, k in (("speed", "response time (ms), 95th percentile"), ("machines", "worker nodes in service, mean"),
-                         ("energy", "energy, parked workers still on at idle power (Wh)")):
-                v = get(k)
-                if v:
-                    r[m] = {"native": v[0], "omni": v[1], "ratio": ratio(m, *v)}
-            f = get("failed requests (%)")
-            if f:
-                r["work"] = {"native": 100 - f[0], "omni": 100 - f[1], "ratio": ratio("work", 100 - f[0], 100 - f[1]),
-                             "note": "requests served (100 - failed %)"}
-            out.append({"category": "Real Kubernetes (GitHub)", "test": f"Six organisms: {NAMES[o]}, the cluster inside, five pairs",
-                        "source": "results/live/SIX_KUBE.json", "measures": r})
-            mw, me = get("organism work"), get("organism energy (J)")
-            rm = {}
-            if mw:
-                rm["work"] = {"native": mw[0], "omni": mw[1], "ratio": ratio("work", *mw)}
-            if me:
-                rm["energy"] = {"native": me[0], "omni": me[1], "ratio": ratio("energy", *me)}
-            out.append({"category": "Modelled muscles (evidence S)", "test": f"{NAMES[o]}: the modelled stacks around the real cluster",
-                        "source": "results/live/SIX_KUBE.json", "measures": rm})
+            r["work"] = {"native": 1.0, "omni": 1.0, "ratio": 1.0, "reading": "the same fixed-rate work sent to both arms"}
+        elif work == "capacity" and CAPACITY in rows_:
+            r["work"] = measure(rows_[CAPACITY], "work")
+        out.append({"category": cat, "test": name, "source": f"results/live/{f}", "runs": [x["run"] for x in data["runs"]],
+                    "v1": bool(data.get("v1")), "measures": r})
     for t in out:
         g = gmean([m["ratio"] for m in t["measures"].values()])
         t["index_pct"] = 100 * (g - 1) if g else None
@@ -189,23 +125,34 @@ def main():
          "work (more is better), speed (a lower response time), machines (fewer), energy (less). A test's index is the "
          "geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric "
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
-         "Every number is read from the test's own result file (`tools/omni_index.py`).", "",
-         f"## Headline: Omni-Compass on top of native, real machines: **{pct(head)}** "
+         "Every number is read from the test's own v1 table (`results/live/V1_*.json`, made by `tools/confirm_abc.py` from the "
+         "three archived runs; `tools/omni_index.py`).", "",
+         f"## Headline: Omni-Compass on top of native, real machines, Omni v1 confirmed three times: **{pct(head)}** "
          f"(more for the same, or the same for less, across work, speed, machines and energy)", "",
+         "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): confirmed better or confirmed worse in all "
+         "three runs counts, as the geometric mean of the runs' ratios; no difference beyond the noise counts as exactly 1, so "
+         "nothing inside the noise is claimed either way. Real Kubernetes is the only real category with its v1 runs in; "
+         "the others join as theirs land.", "",
          "| Category | Index | Work | Speed | Machines | Energy | Tests |", "|---|---:|---:|---:|---:|---:|---:|"]
     for c in list(REAL) + ["Modelled muscles (evidence S)"]:
         if c in cats:
             L.append(f"| {c} | **{pct(cat_g[c])}** | {pct(avg(c, 'work'))} | {pct(avg(c, 'speed'))} | {pct(avg(c, 'machines'))} | "
                      f"{pct(avg(c, 'energy'))} | {len(cats[c])} |")
-        elif c == "Real card (NVIDIA, its own meter)":
-            L.append(f"| {c} | pending | | | | | the rerun on the current card controller (the 2026-10-02 run used the replaced one) |")
+        elif c in PENDING:
+            L.append(f"| {c} | pending | | | | | {PENDING[c]} |")
     L += ["", "Read: +10% in a column means 10% better for Omni-Compass in that measure (more work, a faster answer, "
           "fewer machines, less energy). The energy figure on GitHub's Kubernetes is a declared model, not a meter; "
           "Azure's machines are its own billed count.", "", "## Every test", "",
           "| Category | Test | Index | Work | Speed | Machines | Energy | Source |", "|---|---|---:|---:|---:|---:|---:|---|"]
     for t in ts:
         m = t["measures"]
-        cell = lambda k: pct(m[k]["ratio"]) if k in m else "not taken"
+        def cell(k):
+            if k not in m:
+                return "not taken"
+            rd = m[k].get("reading", "")
+            if rd.startswith("confirmed"):
+                return pct(m[k]["ratio"])
+            return "equal" if rd.startswith("the same") else ("same" if rd == "same" else "no difference beyond the noise")
         ix = "" if t["index_pct"] is None else f"{t['index_pct']:+.1f}%"
         L.append(f"| {t['category']} | {t['test']} | **{ix}** | {cell('work')} | {cell('speed')} | {cell('machines')} | "
                  f"{cell('energy')} | `{t['source']}` |")

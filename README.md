@@ -43,10 +43,11 @@ current card governor on a real GPU (the one real-card run, on the governor sinc
 energy and made its 95th percentile 43-84% slower:
 [`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
-**The Omni index, every real test together: +12.9%** more for the same, or the same for less, across work, speed,
-machines and energy (real Kubernetes +18.5%; Azure +7.5%). The index still reads the earlier engine's result files; it is
-rebuilt from the v1 tables once the Azure v1 runs land. Every number is read from each test's own result file by
-[`tools/omni_index.py`](tools/omni_index.py):
+**The Omni index on v1, every real test together: +26.2%** more for the same, or the same for less, across work, speed,
+machines and energy on real Kubernetes (work +20%, speed +95%, machines +4%, energy +3%). Only a row confirmed in all
+three runs enters; a row inside the noise counts as exactly zero. Azure's billed runs and the card join the index when
+their v1 runs land (the earlier engine's +12.9% is kept in `docs/history/OMNI_INDEX_pre_v1.md`). Every number is read
+from each test's own v1 table by [`tools/omni_index.py`](tools/omni_index.py):
 [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md). Each test: [`STEADY`](results/live/STEADY.md),
 [`WANDERING`](results/live/WANDERING.md), [`ALL_FOUR`](results/live/ALL_FOUR.md), [`FAULTS`](results/live/FAULTS.md),
 [`FAIRNESS`](results/live/FAIRNESS.md).
@@ -127,7 +128,7 @@ trademark license is granted for any other use.
 |---|---|
 | [`LICENSE`](LICENSE) | evaluation and simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
 | [`NOTICE`](NOTICE) | copyright, the US filings notice, third-party notices |
-| [`PATENTS.md`](PATENTS.md) | patent applications filed in the United States; no patent license is granted |
+| [`PATENTS.md`](PATENTS.md) | the nonprovisional utility patent application "The Omni-Compass" filed in the United States (title, inventor, date; the number is withheld on purpose); no patent license is granted |
 | [`TRADEMARKS.md`](TRADEMARKS.md) | the Omni-Compass marks; trademark applications filed in the United States |
 | [`DISCLOSURES.md`](DISCLOSURES.md) | every declaration, disclosure and disclaimer, made once |
 | [`LICENSING_FAQ.md`](LICENSING_FAQ.md) | licensing in plain answers |

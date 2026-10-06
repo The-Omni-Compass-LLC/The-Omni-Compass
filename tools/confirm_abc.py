@@ -109,28 +109,32 @@ def main(argv=None):
          "result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable "
          "there. Every row is shown, losses included.", "",
          "| Run | GitHub run | Commit | Engine | Paired repetitions |", "|---|---|---|---|---:|"]
-    off = []
+    off, meta = [], []
     for tag, (run, _, n) in zip("ABC", runs):
         sha, ver = engine(run)
         if not ver.startswith("omni-v1"):
             off.append(f"{tag} (run {run}: {ver})")
+        meta.append({"tag": tag, "run": run, "commit": sha, "engine": ver, "paired_repetitions": n})
         L.append(f"| {tag} | {run} | `{sha}` | {ver} | {n if n is not None else '?'} |")
     if len({r for r, _, _ in runs}) < 3:
         off.append("A, B and C must be three separate runs")
     if off:
         L[2:2] = [f"**Not a v1 confirmation: {'; '.join(off)}.** The readings below compare runs on different engines.", ""]
     L += ["", "| Measure | A | B | C | Reading |", "|---|---|---|---|---|"]
-    tally = {}
+    tally, rows = {}, {}
     for k in [CAPACITY] + KEYS:
         rs = [p.get(k) for _, p, _ in runs]
         if any(r is None for r in rs):
             continue
         v = verdict(k, rs)
         tally[v] = tally.get(v, 0) + 1
+        rows[k] = {"reading": v.strip("*"), "runs": [{"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": list(r["ci95"])} for r in rs]}
         L.append(f"| {LABEL.get(k, k)} | {cell(rs[0])} | {cell(rs[1])} | {cell(rs[2])} | {v} |")
     L += ["", "Readings: " + ", ".join(f"{n} {v.strip('*')}" for v, n in sorted(tally.items())) + "."]
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(_legal_stamp(L)) + "\n")
+    # the same table as data, for the Omni index (tools/omni_index.py): every run's values and the reading, by rule
+    out.with_suffix(".json").write_text(json.dumps({"title": a.title, "v1": not off, "runs": meta, "rows": rows}, indent=1) + "\n")
     print(f"{out}: " + ", ".join(f"{n} {v.strip('*')}" for v, n in sorted(tally.items())))
     return 0
 

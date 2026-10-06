@@ -11,6 +11,21 @@ restore point, read-back, the one-writer rule), the two-wire governance of a pro
 the two-way nervous system that grants and withdraws authority per organ, and one governor over many machines and
 realms on one clock.
 
+## What has been filed
+
+| | |
+|---|---|
+| Application | a **nonprovisional utility patent application** under 35 U.S.C. 111(a), filed with the United States Patent and Trademark Office |
+| Title of the invention | **The Omni-Compass** |
+| Inventor | Alan John Dubra, Kissimmee, Florida, United States |
+| Drawing sheets | 15 |
+| Application data sheet signed | 20 September 2026 (form PTO/AIA/14, 37 CFR 1.76) |
+| Publication | normal eighteen-month publication requested |
+| Application number | withheld here on purpose; the filing is verifiable with the USPTO and is shown to a licensee under a signed Omni-Compass Enterprise License |
+
+The application data sheet names no assignee; the application stands in the inventor's name. Any assignment to The
+Omni-Compass LLC is recorded with the USPTO separately (37 CFR part 3).
+
 No patent license is granted by publishing this repository, by the evaluation license, or by any act of The
 Omni-Compass LLC other than a signed, paid Omni-Compass Enterprise License. Use outside the evaluation license is
 infringement. Everyone who downloads, forks, scans or runs this software is on notice of these filings.

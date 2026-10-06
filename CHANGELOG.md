@@ -8,6 +8,16 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- The Omni index rebuilt on v1 (`tools/omni_index.py`, `results/OMNI_INDEX.md`): it now reads each test's v1 table
+  (`results/live/V1_*.json`, which `tools/confirm_abc.py` writes beside every `.md`) and lets a measure in only as its
+  three-run reading allows: confirmed better or confirmed worse counts as the geometric mean of the three runs' ratios,
+  and anything inside the noise counts as exactly 1. Real Kubernetes, six tests: **+26.2%** (work +20.4%, speed +95.1%,
+  machines +4.4%, energy +2.7%). Azure's billed runs and the card join when their v1 runs land; the earlier engine's
+  index (+12.9%) is kept at `docs/history/OMNI_INDEX_pre_v1.md`. The register's Kubernetes rows point at the v1 tables.
+- `PATENTS.md` states what has been filed, from the application data sheet the founder supplied: a nonprovisional
+  utility patent application under 35 U.S.C. 111(a), "The Omni-Compass", inventor Alan John Dubra, 15 drawing sheets,
+  signed 20 September 2026, eighteen-month publication; the application number is withheld on purpose, and the sheet
+  itself (which carries personal details) is not in the repository.
 - The fifth and sixth v1 A/B/C tables: all four in one run (`results/live/V1_ALL_FOUR.md`, runs 37384945573, 37385646550,
   37394444337) and wandering demand (`results/live/V1_WANDERING.md`, runs 37384942870, 37385643291, 37394436586). All
   four: work inside the response line +48.4%, +44.7%, +42.1% (18.6 → 27.6 requests a second in A), p95 −57 to −63%,
