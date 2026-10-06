@@ -19,18 +19,36 @@ name: big-organism-detached
 on:
   workflow_dispatch:
     inputs:
-      mode: {description: "start (rent and start) or collect (look at every running machine now)", default: "start"}
+      mode: {description: "start (rent and start), collect (look at every running machine now) or survey (which 8-vCPU sizes this subscription may rent, region by region, and each region's quota; rents nothing)", default: "start"}
       organisms: {description: "Organisms, comma separated (start)", default: "stack"}
       size: {description: "Copies of each organism on one clock (start)", default: "1000"}
       reps: {description: "Paired repetitions per organism (start)", default: "3"}
       duration_s: {description: "Measured seconds per arm (240 organism steps) (start)", default: "2880"}
       commit: {description: "The commit to run (start); empty = this one", default: ""}
-      vm_size: {description: "Azure machine size (start)", default: "Standard_D8s_v4"}
+      vm_size: {description: "Azure machine size (start); Standard_D8as_v4 is the size eastus granted on 2026-10-05", default: "Standard_D8as_v4"}
       location: {description: "Azure region (start). The subscription's regional quota is 10 vCPUs, so an 8-vCPU machine shares a region with nothing else (the metered AKS runs use eastus); westus2 and centralus refused every size on 2026-10-06", default: "eastus2"}
       max_hours: {description: "Collect and delete a machine older than this, finished or not", default: "40"}
   schedule:
     - cron: "41 */2 * * *"       # collect: a look at every tagged machine; nothing to do when none is running
 jobs:
+  survey:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'survey'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: azure/login@v2
+        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+      - name: Which sizes may this subscription rent, where
+        run: |
+          # the 8-vCPU sizes the start job tries, in the regions it could use: unrestricted sizes and the regional quota
+          echo "| Region | vCPUs used/allowed | 8-vCPU sizes this subscription may rent |"; echo "|---|---|---|"
+          for loc in eastus eastus2 westus westus2 westus3 centralus southcentralus northcentralus canadacentral westeurope northeurope uksouth swedencentral australiaeast; do
+            q=$(az vm list-usage -l "$loc" --query "[?name.value=='cores'].join('/', [to_string(currentValue), to_string(limit)]) | [0]" -o tsv 2>/dev/null)
+            s=$(az vm list-skus -l "$loc" --resource-type virtualMachines -o tsv 2>/dev/null \
+                  --query "[?(starts_with(name,'Standard_D8') || starts_with(name,'Standard_E4') || starts_with(name,'Standard_B8') || starts_with(name,'Standard_F8')) && length(restrictions)==\`0\`].name" | sort -u | tr '\n' ' ')
+            echo "| $loc | ${q:-?} | ${s:-none} |"
+            echo "::notice::$loc: quota ${q:-?}; may rent: ${s:-none}"
+          done
   start:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'start'
     runs-on: ubuntu-latest
@@ -38,7 +56,7 @@ jobs:
     env:
       RG: omni-detached-${{ github.run_id }}
       LOC: ${{ github.event.inputs.location || 'eastus2' }}
-      SIZE: ${{ github.event.inputs.vm_size || 'Standard_D8s_v4' }}
+      SIZE: ${{ github.event.inputs.vm_size || 'Standard_D8as_v4' }}
       ORGS: ${{ github.event.inputs.organisms || 'stack' }}
       SCALE: ${{ github.event.inputs.size || '1000' }}
       REPS: ${{ github.event.inputs.reps || '3' }}
@@ -53,23 +71,21 @@ jobs:
           az group create -n "$RG" -l "$LOC" -o none \
             --tags omni-detached=1 "organisms=$ORGS" "size=$SCALE" "reps=$REPS" "sha=$SHA" "started=$(date -u +%s)" "run=${{ github.run_id }}"
           ok=""
-          for sz in "$SIZE" Standard_D8s_v3 Standard_E4s_v4 Standard_E4s_v3 Standard_D8as_v4 Standard_B8ms; do
+          for sz in "$SIZE" Standard_D8as_v4 Standard_D8s_v4 Standard_D8s_v3 Standard_E4s_v4 Standard_E4s_v3 Standard_B8ms; do
             if az vm create -g "$RG" -n big --image Ubuntu2204 --size "$sz" --admin-username omni \
                  --generate-ssh-keys --public-ip-sku Standard --os-disk-size-gb 128 -o none 2> err.txt; then
               ok="$sz"; echo "::notice::rented $sz in $LOC"; break
             fi
-            # the CLI's own report of a refusal is often hidden behind its "content already consumed" error: the reason is
-            # read from Azure's answer where it is, and the region's SKU restrictions are listed when nothing is granted
-            reason=$(grep -oE '"(code|message)": *"[^"]{0,300}"' err.txt | head -2 | tr '\n' ' ')
-            echo "::warning::$sz refused: ${reason:-$(tr '\n' ' ' < err.txt | grep -oE 'ERROR: [^T]{0,300}' | head -1)}"
+            # the CLI hides Azure's refusal behind its own "content already consumed" error, so the reason is asked for
+            # separately: the size's restriction in this region for this subscription (none listed means the quota, or a
+            # passing fault)
+            why=$(az vm list-skus -l "$LOC" --size "$sz" --resource-type virtualMachines -o tsv \
+                    --query "[?name=='$sz'].join(',', restrictions[].reasonCode) | [0]" 2>/dev/null)
+            echo "::warning::$sz refused in $LOC: ${why:-no restriction listed for this subscription; the regional quota ($(az vm list-usage -l "$LOC" --query "[?name.value=='cores'].join('/', [to_string(currentValue), to_string(limit)]) | [0]" -o tsv) vCPUs used/allowed), or a passing fault}"
             az vm delete -g "$RG" -n big --yes -o none 2>/dev/null || true
           done
           if [ -z "$ok" ]; then
-            echo "::error::no machine size was granted in $LOC"
-            az vm list-skus -l "$LOC" --resource-type virtualMachines -o tsv \
-              --query "[?contains(name,'D8s_v') || contains(name,'E4s_v') || contains(name,'D8as_v4') || name=='Standard_B8ms'].[name, join(',', restrictions[].reasonCode)]" \
-              | sort -u | head -8 | while read -r l; do echo "::warning::sku $l"; done
-            az vm list-usage -l "$LOC" -o tsv | grep -Ei "regional|DSv4|DSv3|ESv4|ESv3|DASv4|BS " | head -8 | while read -r l; do echo "::warning::quota $l"; done
+            echo "::error::no machine size was granted in $LOC (the survey mode lists, region by region, the sizes this subscription may rent)"
             az group delete -n "$RG" --yes --no-wait || true; exit 1
           fi
           az group update -n "$RG" --set "tags.vm=$ok" -o none
