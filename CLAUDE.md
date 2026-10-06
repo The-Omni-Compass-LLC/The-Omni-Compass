@@ -39,7 +39,7 @@ the founder overrides one in the conversation.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
   1.0, never as a second product.
-- Any change to a rule, gain or guard makes **v2**, and every result is run again on it. Never read a result across
+- Any change to a rule, gain, guard, preset or muscle makes **the next version**, and every result is run again on it. Never read a result across
   versions. Never change the engine without telling the founder first.
 - Confirmation: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
   readings: confirmed better or confirmed worse (the same sign in all three, every 95% interval clear of zero); no
