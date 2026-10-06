@@ -24,6 +24,10 @@
   into `docs/REALMS_PREREGISTRATION.md`. `tools/omni_version.py` now prints omni-v2, omni-v1, or what differs; the
   three-run tables accept either fingerprint and refuse to mix them. Every modelled result is to be run again on v2;
   v1's tables stay v1's.
+- The realms runner's report (`tools/run_realms.py`) names the muscle count from the results it writes (the first three v2
+  realms runs, 37420034190, 37420040519 and 37420047009, stopped at the report with an undefined name and are run again);
+  the realms workflow compares a run's table with the published one only when both are on the same engine (the same
+  muscle count), otherwise it says so and lets the run stand as the first on that engine.
 - Databases, preregistered and built (`docs/POSTGRES_PREREGISTRATION.md`, `tools/run_pgbench.py`,
   `.github/workflows/pgbench.yml`, `tests/test_run_pgbench.py` run by `verify.py`): PostgreSQL 16 as the distribution
   ships it behind PgBouncer 1.22 with the pool of 20 server connections it ships with (the DBA's one fixed setting) is

@@ -73,7 +73,7 @@ def fmt(m, scale=100.0, unit="%"):
 def write_md(out, res, orgs, run):
     L = []
     w = L.append
-    w(f"# The realms: {len(rows)} muscles on modelled plants, native against Omni on top")
+    w(f"# The realms: {len(res)} muscles on modelled plants, native against Omni on top")
     w("")
     w(f"Evidence class **S** (simulation). Run {run['started']}, commit `{run['commit'][:12]}`, seeds "
       f"{run['seeds'][0]}-{run['seeds'][-1]} ({len(run['seeds'])} paired seeds per muscle and per organism). "
