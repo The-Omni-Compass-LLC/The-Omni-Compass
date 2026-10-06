@@ -24,6 +24,27 @@
   into `docs/REALMS_PREREGISTRATION.md`. `tools/omni_version.py` now prints omni-v2, omni-v1, or what differs; the
   three-run tables accept either fingerprint and refuse to mix them. Every modelled result is to be run again on v2;
   v1's tables stay v1's.
+- **The v2 realms table** (`results/realms/REALMS.md`, `MUSCLES.csv`, `REALMS.json`; runs 37422832244, 37422840154 and
+  37422847697 on the v2 fingerprint, A, B and C reproduced to the last digit; v1's table moved to `results/realms/v1/`):
+  945 muscles, 0 worse; 126 superior within guardrails, 793 no difference beyond the noise, 15 energy improvement with a
+  service tradeoff (9 were v1's), 7 not established, 4 service improvement with an energy tradeoff. The not-established
+  rows are new: three rail traction speed muscles where Omni's slowing adds 1.6 to 2.7 points of lateness on a train
+  that runs near its timetable's capacity, two marine propulsion and two elevator speed muscles where the slower cycle
+  finishes fewer moves in the hour. The organisms: Compute, Energy and Distribution superior within guardrails;
+  Physics and the whole tower energy improvement with a service tradeoff (+0.1% and +0.3% work per energy, time over
+  the line up by under 0.01 point), where v1 had every organism superior. By the honesty rule the first suspect is our
+  own wiring: the speed knob on a motion axis has no do-no-harm gate in the realm harness (the robot benchmark has one,
+  its paired physics trial), so a train or a ship with no slack is slowed anyway. The fix is an engine change and makes
+  v3; it is declared in `docs/REALMS_PREREGISTRATION.md` before any v3 run.
+- The PostgreSQL tuning run (37420052827, `tpcb`, 3 paired repetitions, not counted): server connections alive 20 to
+  9.3 (−53%, better); work inside the line, throughput and every latency gauge no difference beyond the noise (native's
+  own p95 swung from 86 ms to 3.3 s between repetitions on GitHub's shared runner); host CPU-seconds +11% worse, CPU
+  per 1,000 transactions inside the line no difference; 0 failed transactions in both arms; the knob handed back every
+  time. Recorded in `docs/POSTGRES_PREREGISTRATION.md`; the three untouched workloads run next.
+- `OMNI_V2.json` rewritten from the checkout's tracked files (40 files, digest `4fc223939c4fab03`): its first write had
+  listed the last commit's tree and missed `realms/catalog_v1.csv` and `realms/wave4_families.csv`, so no commit read as
+  v2 although the engine's bytes were v2's throughout; `tools/omni_version.py` now lists every tracked or staged file
+  for the checkout, and `verify.py` requires the checkout's engine to carry a declared fingerprint.
 - The realms runner's report (`tools/run_realms.py`) names the muscle count from the results it writes (the first three v2
   realms runs, 37420034190, 37420040519 and 37420047009, stopped at the report with an undefined name and are run again);
   the realms workflow compares a run's table with the published one only when both are on the same engine (the same

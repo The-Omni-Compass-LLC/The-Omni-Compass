@@ -28,8 +28,10 @@ SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/
 
 def engine_files(commit: str | None = None) -> dict[str, str]:
     ref = commit or "HEAD"
-    names = subprocess.run(["git", "ls-tree", "-r", "--name-only", ref, "--", *SCOPE], cwd=ROOT, capture_output=True,
-                           text=True, check=True).stdout.split()
+    # a commit's engine is what its tree holds; this checkout's engine is every tracked or staged file (so a file added
+    # for a new version is fingerprinted before its first commit, never after)
+    cmd = ["git", "ls-tree", "-r", "--name-only", ref, "--", *SCOPE] if commit else ["git", "ls-files", "--", *SCOPE]
+    names = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
     out = {}
     for n in sorted(names):
         if not n.endswith((".py", ".csv")) or "__pycache__" in n:

@@ -123,3 +123,26 @@ show, that row included.
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
 Enterprise License. Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone.
+
+## The tuning run (2026-10-06, run 37420052827; rules frozen above, nothing changed after it)
+
+Three paired repetitions of `tpcb` on a GitHub runner (4 cores), 64 clients, the base rate from native's own unlimited
+capacity (5,626 transactions a second, peak notch 90% of it). Not counted; the untouched workloads follow.
+
+| Gauge | native | omni | reading |
+|---|---:|---:|---|
+| server connections alive, mean (the machines) | 20.0 | 9.3 | better (−53%, interval −57% to −50%) |
+| work inside the 50 ms line (tps) | 2,137 | 2,152 | no difference beyond the noise |
+| throughput (tps) | 2,437 | 2,474 | no difference beyond the noise |
+| latency p95 (ms) | 1,361 | 433 | no difference beyond the noise (native's own p95 swung from 86 to 3,331 ms between repetitions) |
+| latency p99 / median (ms) | 2,888 / 0.98 | 862 / 1.09 | no difference beyond the noise |
+| failed transactions | 0 | 0 | same |
+| host CPU-seconds | 433 | 480 | **worse** (+11%, interval +8% to +14%) |
+| CPU-seconds per 1,000 transactions inside the line | 0.68 | 0.74 | no difference beyond the noise |
+| pool size, mean (the knob) | 20 | 9.5 | shown |
+
+The knob was handed back and read back at the end of every omni arm; Omni wrote 161 to 175 times an arm and failed up
+9 times an arm. Read: on a shared 4-core runner the latencies are too noisy for three repetitions to tell the arms
+apart, native's own p95 varying forty-fold between repetitions; what did separate is the machines, half as many database
+connections held open for the same work, and the host's CPU, 11% more of it, which is the cost of PgBouncer queueing
+clients behind a smaller pool. Both go into the untouched runs as they are; nothing in the rule changes.

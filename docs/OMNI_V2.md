@@ -14,7 +14,10 @@ Omni v2 is the engine as it stands at the commit that carries `OMNI_V2.json`. It
 - the runners of the independent simulators (`tools/run_kil.py`, `tools/run_citylearn.py`, `tools/run_pandapower.py`),
   unchanged except for the organism names in `run_kil.py`'s usage text.
 
-`OMNI_V2.json` holds one SHA-256 for each file, plus one digest over all of them.
+`OMNI_V2.json` holds one SHA-256 for each of the 40 files, plus one digest over all of them: `4fc223939c4fab03…`. (The first
+write of the file, in commit `ce5eb80`, had missed the two catalog source files because the fingerprint tool listed the last
+commit's tree rather than the checkout; corrected the same morning, before any v2 table was published, and the tool now
+lists every tracked or staged file. The engine's bytes did not change: every commit from `ce5eb80` on reads omni-v2.)
 
 ```
 python3 tools/omni_version.py                    # this checkout: prints "omni-v2", "omni-v1", or every file that differs from v2
@@ -57,14 +60,14 @@ result is run again on it.
 
 | Result | v1 | v2 |
 |---|---|---|
-| The muscles and six organisms, modelled (`results/realms/`) | A, B, C done, reproduced byte for byte | **to run: A, B, C** (workflow `realms`) |
+| The muscles and six organisms, modelled | A, B, C done, reproduced byte for byte ([`results/realms/v1/REALMS.md`](../results/realms/v1/REALMS.md)) | **A, B, C done** (runs 37422832244, 37422840154, 37422847697; reproduced to the last digit in 3 of 3): [`results/realms/REALMS.md`](../results/realms/REALMS.md); 945 muscles, 0 worse; Physics and the whole tower read energy improvement with a service tradeoff, carried by three rail traction speed muscles (see the register, row 24) |
 | The organisms at 1 / 10 / 100 / 1,000 copies (`results/scale/GRID.md`) | partly (1,000x at 100 and 1,000 runs beyond the machines) | **to run** (workflow `six`) |
 | Kubernetes: the six organisms with the real cluster inside | running (37359815637) | **to run** (workflow `six-kube`) |
 | Kubernetes: the big organisms on Azure | running (37359820055) | **to run after** |
 | Kubernetes: steady, wandering, all four, fairness, faults, batch | A, B, C done (`results/live/V1_*.md`) | to run again as the queue allows; the controller is byte for byte v1's |
 | Azure AKS steady and burst | steady reps 1-2 done, 3-5 wait on quota | to run after the big organisms |
 | CityLearn, the power grid, the robot arms | A, B, C done (grid C running) | to run again as the queue allows; the runners are byte for byte v1's |
-| Databases (PostgreSQL behind PgBouncer) | tuning run 37416153735 running | the untouched workloads and A, B, C on v2 |
+| Databases (PostgreSQL behind PgBouncer) | none | tuning run done (37420052827, not counted; register row 30); the untouched workloads running, then A, B, C |
 | GPU, one card and the card in the organisms | none on v1 | the founder's rerun on Lambda, on v2 |
 
 ## How each result is confirmed
