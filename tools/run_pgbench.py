@@ -10,7 +10,8 @@ benchmark) offers the load. That is native: the pooler's fixed pool is the DBA's
 omni is the same database, the same pooler and the same load, with the compass law (omnicompass/compass_law.py) on
 one knob: the pooler's pool size, written through its own admin console (SET default_pool_size), inside the cover
 [2, 90]. The reading is the service time the pooler itself reports every second (transaction time plus the time clients
-waited for a server, per transaction), on a band from 0 to the response line. Past the wall the knob is handed back to
+waited for a server, per transaction), or the share of its clients queued for a server scaled to the line, whichever is
+worse (amendment 1), on a band from 0 to the response line. Past the wall the knob is handed back to
 the pooler's own setting at once (fail up). At the end it is handed back and read back.
 
 Load: pgbench at a fixed client count, rate-limited, the rate stepping one notch at a time (1 2 3 2 3 4 5 6 5 4 3 2 1 2
@@ -54,10 +55,18 @@ SMOOTH = 0.5
 DEAD = 0.05               # a force inside the cushion moves nothing
 UP = 0.10                 # adding: ceil(force / UP) slots a second (full force adds ten); taking back: one idle server a second
 PEAK = 0.9                # the peak notch offers nine tenths of native's unlimited capacity: native at its knee, not past it
-DWELL_S = 5.0             # no reversal of direction within five seconds (no hunting)
+DWELL_S = 5.0             # after adding, no taking back within five seconds (no hunting); adding is never held (amendment 1)
 FLOOR, CEILING = 2, 90    # the cover: never under two server connections; never within ten of PostgreSQL's 100 connections
 NATIVE_POOL = 20          # PgBouncer's shipped default_pool_size: native's setting and Omni's snapshot
 WAIT_SHARE = 0.5          # where the time goes decides the direction: waiting for a server (add one) or inside it (take one)
+
+
+def service_reading(latency_s, waiting_share, line_s=LINE_MS / 1000.0):
+    """The reading the compass sees (amendment 1, docs/POSTGRES_PREREGISTRATION.md): the pooler's service time per
+    transaction, or the share of its clients queued for a server scaled to the line, whichever is worse. A pool too small
+    for the offered rate shows at the pooler as clients waiting, not as a long transaction: its own clock cannot see the
+    backlog that piles up in the clients' schedules, and the first untouched run proved it."""
+    return max(latency_s, waiting_share * line_s)
 
 STEPS = "1 2 3 2 3 4 5 6 5 4 3 2 1 2 1"
 WORKLOADS = {             # name: (pgbench script flag, scale factor)
@@ -100,8 +109,8 @@ def decide(p, force, wait_share, idle, cur, snapshot, last_dir, since_change_s, 
     else:
         return cur, 0, "inside the cushion"
     sign = 1 if d > 0 else -1
-    if last_dir and sign != last_dir and since_change_s < DWELL_S:
-        return cur, 0, "dwell: no reversal within five seconds"
+    if sign < 0 and last_dir > 0 and since_change_s < DWELL_S:
+        return cur, 0, "dwell: no taking back within five seconds of adding"   # gas is never held; only the brake dwells (amendment 1)
     target = int(clamp(cur + d, FLOOR, CEILING))
     if target == cur:
         return cur, 0, "at the cover"
@@ -254,30 +263,34 @@ class Bouncer:
 class PoolPlug(Plug):
     """One wire in (the pooler's own service time per transaction), one wire out (its pool size)."""
 
-    def __init__(self, b: Bouncer, dbname: str):
+    def __init__(self, b: Bouncer, dbname: str, line_ms=LINE_MS):
         super().__init__(FLOOR, CEILING, tolerance=0.5)
-        self.b, self.db = b, dbname
+        self.b, self.db, self.line_s = b, dbname, line_ms / 1000.0
         self.prev = None
         self.wait_share = 0.0
+        self.waiting_share = 0.0
         self.last_latency_s = 0.0
 
     def _read_service(self):
         s = self.b.stats(self.db)
+        p = self.b.pools(self.db)
+        clients = p.get("cl_active", 0) + p.get("cl_waiting", 0)
+        self.waiting_share = p.get("cl_waiting", 0) / clients if clients else 0.0   # clients queued for a server (amendment 1)
         if not s:
-            return self.last_latency_s
+            return service_reading(self.last_latency_s, self.waiting_share, self.line_s)
         if self.prev is None:
             self.prev = s
-            return 0.0
+            return service_reading(0.0, self.waiting_share, self.line_s)
         dx = s["total_xact_count"] - self.prev["total_xact_count"]
         dt = s["total_xact_time"] - self.prev["total_xact_time"]
         dw = s["total_wait_time"] - self.prev["total_wait_time"]
         self.prev = s
         if dx <= 0:
-            self.wait_share, self.last_latency_s = 0.0, 0.0       # nothing asked: calm
-            return 0.0
-        self.wait_share = dw / (dt + dw) if (dt + dw) > 0 else 0.0
+            self.wait_share, self.last_latency_s = self.waiting_share, 0.0       # nothing served: calm unless clients are queued
+            return service_reading(0.0, self.waiting_share, self.line_s)
+        self.wait_share = max(dw / (dt + dw) if (dt + dw) > 0 else 0.0, self.waiting_share)
         self.last_latency_s = (dt + dw) / dx / 1e6
-        return self.last_latency_s
+        return service_reading(self.last_latency_s, self.waiting_share, self.line_s)
 
     def _read_lever(self):
         return float(self.b.pool_size())
@@ -320,7 +333,8 @@ class Omni(threading.Thread):
                         else:
                             self.failups += 1
                             self.last_dir, self.last_change = 0, tick
-                    fh.write(json.dumps({"t": round(tick - t0, 2), "latency_ms": round(reading * 1000, 3), "p": round(self.law.p, 4),
+                    fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "latency_ms": round(self.plug.last_latency_s * 1000, 3),
+                                         "waiting_share": round(self.plug.waiting_share, 3), "p": round(self.law.p, 4),
                                          "force": round(f, 4), "wait_share": round(self.plug.wait_share, 3), "idle": idle,
                                          "pool": cur, "target": target, "wrote": wrote, "why": why}) + "\n")
                 except Exception as e:  # a foreign writer or a lost console: say so, stop writing
@@ -388,7 +402,7 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
     sampler = Sampler(b, dbname); sampler.start()
     omni = None
     if arm == "omni":
-        omni = Omni(PoolPlug(b, dbname), d / "audit.jsonl", line_ms); omni.start()
+        omni = Omni(PoolPlug(b, dbname, line_ms), d / "audit.jsonl", line_ms); omni.start()
     cpu0, t0 = cpu_times(), time.monotonic()
     lat, failed, per_step = [], 0, []
     for k, notch in enumerate(steps):

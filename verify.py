@@ -340,6 +340,9 @@ def main():
     test_mujoco_abc.main(); check("robot arms A/B/C rule: a deterministic simulator's runs must reproduce; added tracking error or a cycle over the takt reads WORSE", True)
     from tests import test_pandapower_abc
     test_pandapower_abc.main(); check("power-grid A/B/C rule: a deterministic simulator's runs must reproduce; any added violation and every extra tap read WORSE", True)
+    from tests import test_pgbench_abc
+    test_pgbench_abc.main(); check("database A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero "
+                                   "reads no difference beyond the noise with its count; any added failed transaction is WORSE; the pool size is shown", True)
     from tests import test_run_pgbench
     test_run_pgbench.main(); check("database runner rule: the direction follows where the time goes, calm gives back one idle server and never one in use, "
                                    "cushion, dwell, cover and fail-up to the pooler's own setting; pgbench's log reads into the gauges; the paired reading by rule", True)

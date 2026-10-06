@@ -30,16 +30,25 @@ def main():
     # the cushion
     assert R.decide(0.4, 0.03, 0.9, 5, 10, snap, 0, 99)[:2] == (10, 0)
     assert R.decide(0.4, -0.03, 0.9, 5, 10, snap, 0, 99)[:2] == (10, 0)
-    # the dwell: no reversal within five seconds, a reversal after it
-    assert R.decide(0.5, 0.3, 0.9, 0, 10, snap, -1, 2.0)[:2] == (10, 0)
-    assert R.decide(0.5, 0.3, 0.9, 0, 10, snap, -1, 6.0)[:2] == (13, 1)
+    # the dwell (amendment 1): adding is never held, even two seconds after taking back; taking back waits five seconds
+    # after adding, then goes
+    assert R.decide(0.5, 0.3, 0.9, 0, 10, snap, -1, 2.0)[:2] == (13, 1), "gas is never held"
     assert R.decide(0.5, 0.3, 0.9, 0, 10, snap, 1, 2.0)[:2] == (13, 1), "the same direction is never held"
+    assert R.decide(0.1, -0.3, 0.0, 3, 10, snap, 1, 2.0)[:2] == (10, 0), "the brake dwells after the gas"
+    assert R.decide(0.1, -0.3, 0.0, 3, 10, snap, 1, 6.0)[:2] == (9, -1)
     # the cover
     assert R.decide(0.1, -0.3, 0.0, 1, R.FLOOR, snap, 0, 99)[:2] == (R.FLOOR, 0)
     assert R.decide(0.6, 1.0, 0.9, 0, R.CEILING - 3, snap, 0, 99)[:2] == (R.CEILING, 1)
     # fail up: the pooler's own setting at once, whatever the direction rule would say
     t, d, why = R.decide(0.97, 1.0, 0.1, 0, 7, snap, -1, 1.0)
     assert t == snap and d == 0 and "fail up" in why
+
+    # amendment 1: the reading is the pooler's service time or the share of its clients queued for a server, whichever is worse
+    assert R.service_reading(0.0001, 0.0, 0.05) == 0.0001, "no client waiting: the service time alone"
+    assert abs(R.service_reading(0.0001, 0.9, 0.05) - 0.045) < 1e-12, "nine in ten clients waiting reads as nine tenths of the line"
+    assert R.service_reading(0.06, 0.2, 0.05) == 0.06, "a long transaction still reads as itself"
+    p_full = R.Band(0.0, 0.05).position(R.service_reading(0.0001, 1.0, 0.05))
+    assert p_full >= 0.95, "every client waiting is past the wall: fail up"
 
     # pgbench's log into the gauges: 10 transactions, 8 inside a 50 ms line, over 2 s of load
     with tempfile.TemporaryDirectory() as tmp:

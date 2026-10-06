@@ -24,6 +24,16 @@
   into `docs/REALMS_PREREGISTRATION.md`. `tools/omni_version.py` now prints omni-v2, omni-v1, or what differs; the
   three-run tables accept either fingerprint and refuse to mix them. Every modelled result is to be run again on v2;
   v1's tables stay v1's.
+- **PostgreSQL: the first untouched run was a loss, and it is kept** (run 37425853293, `docs/POSTGRES_PREREGISTRATION.md`):
+  on the read-only workload Omni gave the pool back to its floor of two and the users' p95 went from 4 ms to 3.9 s,
+  work inside the line −47%, because the compass read the pooler's own service time (0.1 ms per transaction) and the
+  pooler cannot see clients backed up behind their own schedule. On the two write workloads no difference beyond the
+  noise on work and latency, half to three quarters fewer connections, 10% to 18% more host CPU. **Amendment 1**,
+  declared before the counted runs: the reading is the pooler's service time or the share of its clients queued for a
+  server, whichever is worse (every client waiting is past the wall); and the dwell holds only the brake, adding is never
+  held. The three untouched workloads run again three times on the amended rule (A, B, C); the first run is recorded, not
+  counted. `tools/pgbench_abc.py` (with `tests/test_pgbench_abc.py` in `verify.py`) builds the three-run table by the
+  readings rule.
 - The power grid's v1 A/B/C table (`results/live/V1_PANDAPOWER.md`; runs 37377029333, 37397142210, 37412578757 on the
   v1 fingerprint; 11 untouched SimBench grids, a full year each, both load models, every gauge reproduced in 3 of 3):
   with ZIP loads the energy the loads drew is confirmed better in all 11 grids (−1.3% to −1.5%) and the net import in
