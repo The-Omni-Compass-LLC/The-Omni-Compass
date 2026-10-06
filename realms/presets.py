@@ -133,11 +133,13 @@ PRESETS = {
                           t_amb=25.0, t_lim=150.0, kp=8000.0, kd=18000.0, ki=50.0, i_max=10.0, task_rate=1.0 / 300.0,
                           dist=3000.0, load_bias=0.0, regen=0.7, deadline_s=600.0),
     # motion_axis: a ship's propulsion shaft (large inertia, heavy drag, a standing hull load)
+    # (Omni v3: twelve speed changes an hour of 200 rad instead of four of 600, so a one-hour run holds enough moves for a
+    # count; a move of 126 s plus 30 s of dwell at one every 300 s is a duty of 0.52)
     "marine_propulsion": dict(dt_dec=10.0, dt=0.05, J=50000.0, b=3000.0, kt=2000.0, R=0.005, tau_max=500000.0,
-                              p_idle=50000.0, D=600.0, v_max=10.0, a_max=0.05, dwell=60.0, tol=2.0, e_max=5.0,
+                              p_idle=50000.0, D=200.0, v_max=10.0, a_max=0.05, dwell=30.0, tol=2.0, e_max=5.0,
                               c_th=50000.0, r_th=0.002, t_amb=30.0, t_lim=120.0, kp=25000.0, kd=56000.0, ki=100.0,
-                              i_max=50.0, task_rate=1.0 / 900.0, dist=50000.0, load_bias=10000.0, regen=0.0,
-                              deadline_s=3600.0),
+                              i_max=50.0, task_rate=1.0 / 300.0, dist=50000.0, load_bias=10000.0, regen=0.0,
+                              deadline_s=1200.0),
     # motion_axis: an elevator hoist (a stiff position loop, a counterweighted load, regeneration on the way down)
     "elevator_hoist": dict(dt_dec=1.0, dt=0.005, J=20.0, b=2.0, kt=8.0, R=0.3, tau_max=2500.0, p_idle=300.0, D=60.0,
                            v_max=8.0, a_max=1.5, dwell=8.0, tol=0.02, e_max=0.2, c_th=2000.0, r_th=0.3, t_amb=30.0,

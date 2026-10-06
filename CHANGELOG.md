@@ -24,6 +24,17 @@
   into `docs/REALMS_PREREGISTRATION.md`. `tools/omni_version.py` now prints omni-v2, omni-v1, or what differs; the
   three-run tables accept either fingerprint and refuse to mix them. Every modelled result is to be run again on v2;
   v1's tables stay v1's.
+- **Omni v3** (`OMNI_V3.json`, `docs/OMNI_V3.md`; declared in `docs/REALMS_PREREGISTRATION.md` before any v3 run, the
+  founder told first). Two changes against v2, both in the modelled realms: the slack gate on speed knobs
+  (`realms/compass_arm.py`, `speed_slack`): a motion axis is offered its speed knob only where it is busy at most half
+  the time at full speed (task rate × (move time + dwell) ≤ 0.5, from the plant's own figures), as the robot benchmark's
+  paired physics trial leaves a loaded arm native; and the marine propulsion preset, twelve 200 rad speed changes an
+  hour instead of four of 600, so a one-hour run holds enough moves to count. On the shipped presets the knob is offered
+  on a flight axis (duty 0.34) and a reaction wheel (0.35) and left native on rail traction (0.80), EV traction (0.76),
+  robot joints (0.54 at the middle size; a muscle's own size moves it either side), marine propulsion (0.52) and
+  elevator hoists (0.52). The law, the controllers, the catalog and the runners are v2's byte for byte.
+  `tests/test_compass_arm.py` proves the gate; the realms workflow compares a run with the published table only when
+  both carry the same frozen tree. Every modelled result is to be run again on v3; the v2 table stays a v2 result.
 - **The v2 realms table** (`results/realms/REALMS.md`, `MUSCLES.csv`, `REALMS.json`; runs 37422832244, 37422840154 and
   37422847697 on the v2 fingerprint, A, B and C reproduced to the last digit; v1's table moved to `results/realms/v1/`):
   945 muscles, 0 worse; 126 superior within guardrails, 793 no difference beyond the noise, 15 energy improvement with a

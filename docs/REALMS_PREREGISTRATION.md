@@ -398,3 +398,43 @@ six-organism grid at 1, 10, 100 and 1,000 copies, the six organisms with the rea
 on Azure, each on the v2 fingerprint; the live benchmarks that import none of the realm files (Kubernetes alone, Azure
 alone, CityLearn, the grid, the robots, the database) are run again on v2 as GitHub's queue allows, their v1 tables kept
 as v1 tables.
+
+## Omni v3: the slack gate on speed knobs (2026-10-06, after the v2 table, before any v3 seed)
+
+Declared on the v2 result and before any v3 run. The v2 table (`results/realms/REALMS.md`, three runs reproduced) read
+Physics and the whole tower as "energy improvement with a service tradeoff" where v1 had every organism superior. The rows
+that carried it were the new speed muscles: three rail traction muscles where Omni's slowing added 1.6 to 2.7 points of
+lateness on a train already near its timetable's capacity, and two marine and two elevator muscles where the slower cycle
+finished fewer moves in the hour. By the honesty rule the first suspect was our own wiring, and it was: the realm
+harness had no do-no-harm gate on the speed knob of a motion axis, so the compass slowed an axis that had no slack to
+spend. The robot benchmark has such a gate (its paired physics trial, `docs/ROBOTICS_PREREGISTRATION.md`); the realms
+get one now.
+
+**The rule (`realms/compass_arm.py`, `speed_slack`).** A motion axis is offered its speed knob only where its duty at full
+speed, task rate × (move time at full speed + dwell), is at most SLACK = 0.5, computed from the plant's own figures before
+any decision. The compass may ease an axis down to 0.4 of its speed, which stretches a move by up to 2.5 times; an axis
+busy more than half the time at full speed cannot absorb that when tasks arrive in bunches, and its knob stays native.
+Where the knob is offered, nothing else changes: the compass, its gains, the cover [0.4, 1.0] and the fail-up are v2's.
+
+**The marine preset.** Four 600 rad speed changes an hour made a one-hour run too coarse to count (one unfinished move
+is a quarter of the hour's work); the v3 preset is twelve changes of 200 rad an hour, a move of 126 s plus 30 s of dwell,
+deadline 1,200 s. No other preset changes.
+
+**What the gate does on the shipped presets (the middle size; a muscle's own size, 0.6 to 1.4 on the task rate, moves
+its duty either side):**
+
+| Preset | Move at full speed | Dwell | A task every | Duty | The speed knob |
+|---|---:|---:|---:|---:|---|
+| flight axis | 4.8 s | 2.0 s | 20 s | 0.34 | offered |
+| reaction wheel | 30.0 s | 5.0 s | 100 s | 0.35 | offered |
+| marine propulsion | 126.5 s | 30 s | 300 s | 0.52 | left native |
+| elevator hoist | 12.8 s | 8.0 s | 40 s | 0.52 | left native |
+| robot joint | 0.7 s | 0.2 s | 1.7 s | 0.54 | left native at the middle size, offered on the lightly loaded joints |
+| EV traction | 35.6 s | 10 s | 60 s | 0.76 | left native |
+| rail traction | 220 s | 20 s | 300 s | 0.80 | left native |
+
+The threshold is a declared number set on the v2 finding, not a fitted one: it is written here before the v3 runs and
+applies to every axis alike. Where it leaves a knob native the row will read as native does, and that is the result.
+Everything else, the plants, the outcomes, the guardrails, the label rule and the invalidity rules, is v2's. v3 runs the
+realms table three times (A, B, C), then the grid, then the organisms with the real cluster inside; the v2 table stays a
+v2 result.

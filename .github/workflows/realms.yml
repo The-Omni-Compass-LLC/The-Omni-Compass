@@ -33,10 +33,11 @@ jobs:
           a = list(csv.DictReader(open("realms-out/MUSCLES.csv"))); b = list(csv.DictReader(open("results/realms/MUSCLES.csv")))
           import json; n = json.load(open("realms/catalog_provenance.json"))["rows"]
           assert len(a) == n, (len(a), n)
-          if len(b) != n:
-              # the published table is another engine's (a different muscle count): this run is the first on this engine and
-              # becomes the published table; the next runs reproduce it
-              print(f"::notice::the published table has {len(b)} muscles, this engine's catalog {n}: nothing to compare yet; this run's table is the first on this engine")
+          mine, pub = json.load(open("realms-out/RUN.json")), json.load(open("results/realms/RUN.json"))
+          if len(b) != n or mine["frozen_tree_sha256"] != pub["frozen_tree_sha256"]:
+              # the published table is another engine's (another catalog or another frozen tree): this run is the first on
+              # this engine and becomes the published table; the next runs reproduce it
+              print(f"::notice::the published table is another engine's ({len(b)} muscles, tree {pub['frozen_tree_sha256'][:12]}; this run: {n}, {mine['frozen_tree_sha256'][:12]}): nothing to compare yet; this run's table is the first on this engine")
               sys.exit(0)
           bad = []
           for x, y in zip(a, b):

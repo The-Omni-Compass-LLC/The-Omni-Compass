@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The frozen engines, fingerprinted file by file: Omni v2 (OMNI_V2.json, docs/OMNI_V2.md) and Omni v1 (OMNI_V1.json,
-docs/OMNI_V1.md).
+"""The frozen engines, fingerprinted file by file: Omni v3 (OMNI_V3.json, docs/OMNI_V3.md), v2 (OMNI_V2.json,
+docs/OMNI_V2.md) and v1 (OMNI_V1.json, docs/OMNI_V1.md).
 
-  python3 tools/omni_version.py                 check this checkout: prints "omni-v2" or "omni-v1", or what differs from v2
+  python3 tools/omni_version.py                 check this checkout: prints "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
   python3 tools/omni_version.py --commit <sha>  the same, for the engine as it stood at a git commit (any result's run)
-  python3 tools/omni_version.py --write v2      write OMNI_V2.json from this checkout (only when a new version is declared)
+  python3 tools/omni_version.py --write v3      write OMNI_V3.json from this checkout (only when a new version is declared)
 
 The engine is the compass law, the live controllers, the realms and their organisms, and the runners of the
 independent simulators. One SHA-256 per file, and one over the sorted list. A result is a v2 result only if the commit
@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"v2": ROOT / "OMNI_V2.json", "v1": ROOT / "OMNI_V1.json"}     # newest first
+VERSIONS = {"v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json", "v1": ROOT / "OMNI_V1.json"}     # newest first
 SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py", "tools/run_pandapower.py")
 
 
@@ -62,7 +62,7 @@ def main() -> int:
         print("--commit needs a commit; an empty one is not the working tree", file=sys.stderr); return 2
     files = engine_files(commit)
     if "--write" in args:
-        v = args[args.index("--write") + 1] if len(args) > args.index("--write") + 1 and not args[args.index("--write") + 1].startswith("-") else "v2"
+        v = args[args.index("--write") + 1] if len(args) > args.index("--write") + 1 and not args[args.index("--write") + 1].startswith("-") else next(iter(VERSIONS))
         if v not in VERSIONS:
             print(f"unknown version {v}; one of {sorted(VERSIONS)}", file=sys.stderr); return 2
         VERSIONS[v].write_text(json.dumps({"version": f"omni-{v}", "digest": digest(files), "files": files}, indent=1) + "\n")
