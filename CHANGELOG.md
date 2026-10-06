@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- CityLearn's v1 A/B/C table (`results/live/V1_CITYLEARN.md`, runs 37384954241, 37393198549, 37399402398, all on the v1
+  fingerprint): 11 districts with electric batteries, every score reproduced to the last digit in all three runs except
+  the comfort score, which CityLearn itself varies between runs (it reads "the runs differ" and is not claimed).
+  Electricity bought, daily peak and daily load unevenness confirmed better in all 11 districts; carbon better in 8, same
+  in 3; the bill confirmed better in 1 district and confirmed worse in 7 (the 2023 challenge districts, +0.2% to
+  +0.35%); ramping confirmed better in 4 and worse in 7 (the 2023 districts, +4.5% to +6.2%); the highest peak worse in
+  the three 2023 phase-3 districts; energy not served worse in the 2023 districts. Three districts have no battery, so
+  Omni moves nothing there; eight CityLearn's own controller cannot run, listed with its error.
 - The Omni index rebuilt on v1 (`tools/omni_index.py`, `results/OMNI_INDEX.md`): it now reads each test's v1 table
   (`results/live/V1_*.json`, which `tools/confirm_abc.py` writes beside every `.md`) and lets a measure in only as its
   three-run reading allows: confirmed better or confirmed worse counts as the geometric mean of the three runs' ratios,

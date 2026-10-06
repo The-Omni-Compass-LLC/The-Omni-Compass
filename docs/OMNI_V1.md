@@ -62,7 +62,7 @@ result is run again on it. No result is ever read across versions.
 | Azure AKS burst | `8199e3a` | no | queued after v1 steady |
 | The 656 muscles and six organisms, modelled (`results/realms/`) | `9c5d417` | **yes** | **A, B, C done**: runs 37359815637's realms check, 37385660330 and 37393204931 each reproduced the published table byte for byte (a deterministic model: reproduced in 3 of 3) |
 | The organisms at 1 / 10 / 100 / 1,000 copies, modelled (`results/scale/GRID.md`) | `a8548b6` | no | to run after the six-kube queue clears |
-| CityLearn, every district | `ac39b16` | no | A done (run 37384954241: 12 districts ran, 3 have no battery to move, 8 CityLearn cannot run), B running, C to follow; table by `tools/citylearn_abc.py` |
+| CityLearn, every district | `ac39b16` | no | **A, B, C done: [`V1_CITYLEARN.md`](../results/live/V1_CITYLEARN.md)** (runs 37384954241, 37393198549, 37399402398): 11 districts with batteries, every score reproduced in 3 of 3 except the comfort score, which CityLearn itself varies between runs; 3 districts with nothing to move; 8 CityLearn cannot run |
 | Power grid, pandapower and SimBench | `8eab01c` | **yes** | running (run 37377029333) |
 | GPU, one card and the card in the organisms | earlier card controller | no | new runs on real cards (founder) |
 | Muscle studies, power budgets, PlanetLab fleet, tower off and on | September engines | no | marked old |
