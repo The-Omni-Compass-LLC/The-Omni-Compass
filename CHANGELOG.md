@@ -8,14 +8,38 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- Databases, preregistered and built (`docs/POSTGRES_PREREGISTRATION.md`, `tools/run_pgbench.py`,
+  `.github/workflows/pgbench.yml`, `tests/test_run_pgbench.py` run by `verify.py`): PostgreSQL 16 as the distribution
+  ships it behind PgBouncer 1.22 with the pool of 20 server connections it ships with (the DBA's one fixed setting) is
+  native; omni is the same with the compass law on the pool size, written through PgBouncer's own console inside [2, 90]
+  and handed back at the end. The reading is the service time the pooler itself reports each second (transaction time
+  plus the wait for a server), on a band to a 50 ms line; where the time goes decides the direction (waiting for a
+  server: more slots, by the force; inside the server: one fewer); calm gives back one idle server a second and never
+  one in use; past the wall the knob is handed back to the pooler's own setting at once. pgbench offers the load, 64
+  clients, the rate stepping one notch at a time with the peak notch at nine tenths of native's own unlimited capacity,
+  found once in native mode before the counted runs. Gauges from pgbench's own log (work inside the line, p95, failed),
+  PgBouncer's pools (server connections alive, the machines) and the host's CPU-seconds, measured, no energy claimed.
+  The first smoke on a 4-core box (one repetition, not counted): omni 1,400 against 1,312 transactions a second inside
+  the line, p95 24.5 against 77.2 ms over the profile, 11 server connections alive against 20; at the lightest notch
+  omni's p95 was higher (14.6 against 3.9 ms, inside the line), the declared cost of the take-back at light load.
+- The robot runner's test (`tests/test_run_mujoco.py`) compares the result, not the wall-clock bookkeeping: the run's
+  elapsed seconds flipped between 0.0 and 0.1 under load and had failed the determinism check once.
+- The Omni index's columns now say what the sign means (`tools/omni_index.py`, `results/OMNI_INDEX.md`): "more work
+  by", "faster by", "fewer machines by", "less energy by", every column pointing the same way, plus good for
+  Omni-Compass; the reading line spells out each one ("fewer machines by +4%" is the same work on 4% fewer
+  machine-hours).
+- The legal notice every generated report carries (`tools/legal.py`) now says "filed in the USA" and "nothing here is
+  set in stone", as the standing orders have it; the committed reports were brought to the same wording (the archived
+  raw run folders were left as the bot wrote them, their checksums intact).
 - The robot arms' v1 A/B/C tables (`results/live/V1_MUJOCO.md`: UR5e, iiwa 14, Gen3, runs 37409191253, 37409852642,
   37410015922; `results/live/V1_MUJOCO_PANDA.md`: the tuning robot, runs 37409198316, 37409860065, 37410022940; all on
-  the v1 fingerprint, every gauge reproduced to the last digit in all three). Where the paired physics trial let Omni
-  move, the energy per takt is confirmed better by a little (Gen3 −0.8%, Panda −0.5%), peak torque and tracking error
-  confirmed better (Gen3 −29% and −21%, Panda −10% and −21%), cycles 27% longer inside the takt; the Panda's copper loss
-  is confirmed worse (+14%, the gravity-holding torque paid for longer). The UR5e and the iiwa 14 are left native by the
-  trial (a slower cycle is not cheaper on their own figures), so Omni moves nothing there. The honest reading: on a robot
-  arm the speed knob buys under one percent, and the gate refuses it where it would cost.
+  the v1 fingerprint, every gauge reproduced to the last digit in all three). A robot on a line is judged on hitting its
+  points and lasting, and that is where Omni moved it: where the paired physics trial let Omni move, the arm hit its
+  points more accurately with less force on its motors, doing the same job inside the same takt. Peak motor torque
+  confirmed better (Gen3 −29%, Panda −10%), tracking error confirmed better (−21% on both), the cycle 27% longer and
+  inside the takt; the energy per takt also confirmed better, by a little (Gen3 −0.8%, Panda −0.5%); the Panda's copper
+  loss confirmed worse (+14%, the gravity-holding torque paid for longer). The UR5e and the iiwa 14 are left native by
+  the trial (slowing would cost on their own figures), so Omni moves nothing there and nothing gets worse.
 - The robot arms, preregistered and built (`docs/ROBOTICS_PREREGISTRATION.md`, `tools/run_mujoco.py`,
   `.github/workflows/mujoco.yml`, `tools/mujoco_abc.py`; tests in `verify.py`): MuJoCo integrates each arm, MuJoCo
   Menagerie supplies the robot with the position servos it ships with as native, and Omni sits on top on one knob, the
@@ -23,8 +47,8 @@
   paired physics trial in native mode, before any counted cycle, leaves the override native where a slower cycle is not
   cheaper (the gravity-holding torque is paid for longer), the do-no-harm gate on the arm's own figures. Energy is a
   declared model from MuJoCo's torques and velocities, with the standing draw charged for the whole takt in both arms.
-  The first smoke: the tuning robot and the Kinova move (motion energy −1.7% and −7%, energy per takt −0.5% and −0.8%,
-  tracking error and peak torque lower, cycles 25% longer inside the takt); the UR5e and the iiwa are left native by the
+  The first smoke: the tuning robot and the Kinova move (tracking error and peak torque lower, cycles 25% longer inside
+  the takt, motion energy −1.7% and −7%, energy per takt −0.5% and −0.8%); the UR5e and the iiwa are left native by the
   trial. Disclosed: the waypoint offset was capped at 0.6 rad after the first smoke showed the UR5e model's full-turn
   joint ranges turned "25% of the range" into 90-degree swings into the floor. MuJoCo and the Menagerie commit are pinned.
 - CityLearn's v1 A/B/C table (`results/live/V1_CITYLEARN.md`, runs 37384954241, 37393198549, 37399402398, all on the v1

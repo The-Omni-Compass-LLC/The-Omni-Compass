@@ -42,7 +42,10 @@ def main():
         out1, out2 = Path(t) / "o1", Path(t) / "o2"
         r1 = R.run_robot(men, "twolink", 3, out1)
         r2 = R.run_robot(men, "twolink", 3, out2)
-        assert json.dumps(r1, sort_keys=True) == json.dumps(r2, sort_keys=True), "the run is deterministic"
+        def result(r):                       # the wall-clock bookkeeping ("seconds") is not part of the result
+            return json.dumps({k: ({kk: vv for kk, vv in v.items() if kk != "seconds"} if isinstance(v, dict) else v)
+                               for k, v in r.items()}, sort_keys=True)
+        assert result(r1) == result(r2), "the run is deterministic"
         n, o = r1["native"], r1["omni"]
         assert r1["native_tracking_at_planned_speed"] <= R.TRACK_OK, "the task is one the arm's own servo can track"
         assert abs(n["standing_j"] - r1["energy_model"]["idle_w"] * r1["line_s"]) < 1e-9 and n["standing_j"] == o["standing_j"], \

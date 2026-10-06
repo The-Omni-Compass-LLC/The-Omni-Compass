@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: pgbench
+# Omni-Compass on top of a database's own connection pooler (docs/POSTGRES_PREREGISTRATION.md): PostgreSQL as the
+# distribution ships it behind PgBouncer's shipped pool of 20, pgbench offering a stepped load; one job per workload,
+# native and omni paired three times; one report (PGBENCH.md). Two workloads at a time, so the other benchmarks keep
+# their runners.
+on:
+  workflow_dispatch:
+    inputs:
+      workloads:
+        description: "Workloads, comma separated (tpcb, select, simple_update, tpcb_hot); 'untouched' runs every confirmation workload of the preregistration"
+        default: "untouched"
+      reps:
+        description: "Paired repetitions per workload"
+        default: "3"
+      step_s:
+        description: "Seconds per notch of the load"
+        default: "20"
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {workloads: "${{ steps.w.outputs.workloads }}"}
+    steps:
+      - id: w
+        run: |
+          if [ "${{ github.event.inputs.workloads }}" = untouched ]; then
+            w='["select","simple_update","tpcb_hot"]'
+          else
+            w=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.workloads }}'.split(',')))")
+          fi
+          echo "workloads=$w" | tee -a "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: {workload: "${{ fromJSON(needs.plan.outputs.workloads) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - name: PostgreSQL as shipped, PgBouncer as shipped
+        run: |
+          which pg_ctlcluster >/dev/null || sudo apt-get install -y -q postgresql
+          sudo apt-get install -y -q pgbouncer
+          sudo systemctl stop pgbouncer || true
+          sudo systemctl start postgresql
+          for i in $(seq 1 30); do sudo -u postgres psql -qc "select 1" >/dev/null 2>&1 && break; sleep 1; done
+          sudo -u postgres psql -c "select version()"
+          pgbouncer --version | head -1
+          pgbench --version
+          python3 tools/run_pgbench.py --setup
+      - name: Run the workload, native and omni
+        run: |
+          set +e
+          python3 tools/run_pgbench.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out > run.log 2>&1
+          code=$?
+          grep "^==\|Error\|error" run.log | tail -12 | while IFS= read -r l; do echo "::notice::$l"; done
+          mkdir -p out; cp run.log out/
+          [ "$code" = 0 ] || { echo "::error::${{ matrix.workload }} ended with exit $code"; tail -40 run.log; exit "$code"; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "pgbench-${{ matrix.workload }}", path: out}
+  report:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {pattern: "pgbench-*", path: all, merge-multiple: true}
+      - run: python3 tools/run_pgbench.py --report-only all --out all
+      - run: cat all/PGBENCH.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: pgbench-report, path: "all/PGBENCH.md"}

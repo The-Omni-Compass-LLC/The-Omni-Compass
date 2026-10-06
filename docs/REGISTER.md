@@ -1,6 +1,6 @@
 # The Omni-Compass register: every muscle wired, every benchmark run, every benchmark still to run
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
 
 
 One list to see and show. Native is always the system running on its own: its own controller, its own autoscaler, its
@@ -142,9 +142,15 @@ Which engine each result ran on, and its v1 replications A, B and C: [`docs/OMNI
 
 | # | Benchmark (owner) | Native | Omni moves | Status | Result | File |
 |---:|---|---|---|---|---|---|
-| 29 | Robot arms in MuJoCo (Google DeepMind): Franka Panda (tuning), UR5e, KUKA iiwa 14, Kinova Gen3 from MuJoCo Menagerie, a pick-and-place cycle inside a takt | each robot's own shipped position servos | the speed override inside the takt; a paired physics trial leaves it native where a slower cycle is not cheaper | done, A/B/C on v1, reproduced in 3 of 3 | Gen3: energy per takt −0.8%, copper −11%, peak torque −29%, tracking −21%, confirmed better; Panda (tuning): energy per takt −0.5%, peak torque −10%, tracking −21% confirmed better, copper loss +14% confirmed worse; UR5e and iiwa 14: a slower cycle is not cheaper on their own figures, left native, nothing for Omni to move | `results/live/V1_MUJOCO.md`, `results/live/V1_MUJOCO_PANDA.md`, `docs/ROBOTICS_PREREGISTRATION.md` |
+| 29 | Robot arms in MuJoCo (Google DeepMind): Franka Panda (tuning), UR5e, KUKA iiwa 14, Kinova Gen3 from MuJoCo Menagerie, a pick-and-place cycle inside a takt | each robot's own shipped position servos | the speed override inside the takt; a paired physics trial leaves it native where a slower cycle is not cheaper | done, A/B/C on v1, reproduced in 3 of 3 | the same job inside the same takt, hit more accurately with less force on the motors: Gen3 peak torque −29%, tracking error −21%, copper −11%, energy per takt −0.8%, all confirmed better; Panda (tuning) peak torque −10%, tracking error −21%, energy per takt −0.5% confirmed better, copper loss +14% confirmed worse; UR5e and iiwa 14: slowing would cost on their own figures, left native, nothing for Omni to move | `results/live/V1_MUJOCO.md`, `results/live/V1_MUJOCO_PANDA.md`, `docs/ROBOTICS_PREREGISTRATION.md` |
 
-### 2.8 Outside readers
+### 2.8 Databases
+
+| # | Benchmark (owner) | Native | Omni moves | Status | Result | File |
+|---:|---|---|---|---|---|---|
+| 30 | PostgreSQL 16 behind PgBouncer 1.22 (the PostgreSQL Global Development Group; the PgBouncer project), pgbench's TPC-B-like load stepping one notch at a time: `tpcb` (tuning), `select`, `simple_update`, `tpcb_hot` (untouched) | the pooler's shipped pool of 20 server connections, the DBA's one fixed setting | the pool size, through PgBouncer's own console, inside [2, 90]; handed back at the end | preregistered 2026-10-06; tuning run dispatched, then the untouched workloads, A/B/C on v1 | first smoke (one repetition, not counted): more work inside the line, lower p95 over the profile, 11 server connections against 20; p95 higher at the lightest notch (inside the line), the declared cost | `docs/POSTGRES_PREREGISTRATION.md`, workflow `pgbench`, `tools/run_pgbench.py` |
+
+### 2.9 Outside readers
 
 ChatGPT and Grok read the results to analyse them, never to produce them: `results/external_review/`.
 
@@ -191,4 +197,4 @@ cases run, a workflow on GitHub, the report with every row shown (worse included
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

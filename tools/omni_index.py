@@ -133,17 +133,20 @@ def main():
          "three runs counts, as the geometric mean of the runs' ratios; no difference beyond the noise counts as exactly 1, so "
          "nothing inside the noise is claimed either way. Real Kubernetes is the only real category with its v1 runs in; "
          "the others join as theirs land.", "",
-         "| Category | Index | Work | Speed | Machines | Energy | Tests |", "|---|---:|---:|---:|---:|---:|---:|"]
+         "| Category | Index | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |", "|---|---:|---:|---:|---:|---:|---:|"]
     for c in list(REAL) + ["Modelled muscles (evidence S)"]:
         if c in cats:
             L.append(f"| {c} | **{pct(cat_g[c])}** | {pct(avg(c, 'work'))} | {pct(avg(c, 'speed'))} | {pct(avg(c, 'machines'))} | "
                      f"{pct(avg(c, 'energy'))} | {len(cats[c])} |")
         elif c in PENDING:
             L.append(f"| {c} | pending | | | | | {PENDING[c]} |")
-    L += ["", "Read: +10% in a column means 10% better for Omni-Compass in that measure (more work, a faster answer, "
-          "fewer machines, less energy). The energy figure on GitHub's Kubernetes is a declared model, not a meter; "
-          "Azure's machines are its own billed count.", "", "## Every test", "",
-          "| Category | Test | Index | Work | Speed | Machines | Energy | Source |", "|---|---|---:|---:|---:|---:|---:|---|"]
+    L += ["", "Read: every column points the same way, plus is good for Omni-Compass. \"Fewer machines by +4%\" means Omni did the "
+          "same work on 4% fewer machine-hours; \"less energy by +3%\" means 3% less energy for the same work; \"faster by +95%\" means "
+          "native's slowest-5% response is 1.95 times Omni's (Omni answers about twice as fast); \"more work by +45%\" means 45% more work "
+          "inside the response line. The energy figure on GitHub's Kubernetes is a declared model, not a meter; Azure's machines are its "
+          "own billed count.",
+          "", "## Every test", "",
+          "| Category | Test | Index | More work by | Faster by | Fewer machines by | Less energy by | Source |", "|---|---|---:|---:|---:|---:|---:|---|"]
     for t in ts:
         m = t["measures"]
         def cell(k):
