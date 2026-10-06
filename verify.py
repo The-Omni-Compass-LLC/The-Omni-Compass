@@ -343,6 +343,9 @@ def main():
     from tests import test_pgbench_abc
     test_pgbench_abc.main(); check("database A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero "
                                    "reads no difference beyond the noise with its count; any added failed transaction is WORSE; the pool size is shown", True)
+    from tests import test_omni_version
+    test_omni_version.main(); check("engine fingerprints: this checkout is one declared version; a commit before a runner was written reads as that version "
+                                    "minus the runner; a changed byte or an extra engine file is no version", True)
     from tests import test_run_pgbench
     test_run_pgbench.main(); check("database runner rule: the direction follows where the time goes, calm gives back one idle server and never one in use, "
                                    "cushion, dwell, cover and fail-up to the pooler's own setting; pgbench's log reads into the gauges; the paired reading by rule", True)

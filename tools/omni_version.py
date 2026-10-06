@@ -55,6 +55,19 @@ def version_of(files: dict[str, str]) -> str | None:
     return None
 
 
+def version_before(files: dict[str, str]) -> tuple[str | None, list[str]]:
+    """('omni-vN', [files not yet written]) for a commit that holds a strict subset of a version's engine files, every
+    one of them that version's bytes (the commits between a version's freeze and a runner added inside it); else (None, [])."""
+    for v, path in VERSIONS.items():
+        if not path.exists():
+            continue
+        want = json.loads(path.read_text())["files"]
+        missing = sorted(set(want) - set(files))
+        if missing and set(files) <= set(want) and all(want[n] == h for n, h in files.items()):
+            return f"omni-{v}", missing
+    return None, []
+
+
 def main() -> int:
     args = sys.argv[1:]
     commit = args[args.index("--commit") + 1] if "--commit" in args and len(args) > args.index("--commit") + 1 else None
@@ -71,6 +84,12 @@ def main() -> int:
     v = version_of(files)
     if v:
         print(f"{v} (digest {digest(files)[:16]}, {len(files)} files)")
+        return 0
+    v, missing = version_before(files)
+    if v:
+        # a commit from before a runner was written, every other engine file that version's bytes: the version's result
+        # for every test but the one that runner serves (which could not have run there), and the line says so
+        print(f"{v} ({len(files)} of {len(files) + len(missing)} files, all {v[5:]} bytes; not yet in this commit: {', '.join(missing)})")
         return 0
     newest = next(iter(VERSIONS))
     want = json.loads(VERSIONS[newest].read_text())

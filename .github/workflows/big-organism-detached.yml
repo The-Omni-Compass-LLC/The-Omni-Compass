@@ -1,0 +1,174 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: big-organism-detached
+# The organism too big for one GitHub job even on a rented machine: the four stacked at 1,000 copies (1.7 million modelled
+# muscles) with the real cluster inside takes more than GitHub's six-hour job limit per repetition (every attempt in the
+# big-organism workflow was cut off). So the test is detached from the job: "start" rents one Azure machine
+# (Standard_D8s_v4, 8 vCPU, 32 GiB, list price about $0.38 an hour), installs the tools, starts every repetition of every
+# organism in turn under nohup (scripts/kind_paired.sh: native against native with Omni-Compass on top, a fresh
+# six-worker kind cluster per arm, the organism at the asked size with the real cluster inside), and leaves the machine
+# running. The machine is tagged omni-detached=1. "collect" runs every two hours on the clock (or by hand): for each tagged
+# machine it looks whether every repetition has finished; if so it copies every file back, publishes one artifact per
+# cell (six-<organism>-x<size>-<rep>, the same shape as big-organism's), and deletes the machine and its resource group;
+# if not, it reports the progress and leaves the machine alone. A machine older than max_hours is collected as it is
+# and deleted (nothing runs forever on the bill). Uses the AZURE_CREDENTIALS secret; nothing to do by hand. The
+# artifacts are archived with the code by archive-run (results/live/raw/run-<collect run id>/).
+# The commit the test runs is an input (default: the dispatching commit), so an older engine can be run again on the same
+# machine: the organism names must then be the ones that commit knows (v1: organism_656, stack_1226).
+on:
+  workflow_dispatch:
+    inputs:
+      mode: {description: "start (rent and start) or collect (look at every running machine now)", default: "start"}
+      organisms: {description: "Organisms, comma separated (start)", default: "stack"}
+      size: {description: "Copies of each organism on one clock (start)", default: "1000"}
+      reps: {description: "Paired repetitions per organism (start)", default: "3"}
+      duration_s: {description: "Measured seconds per arm (240 organism steps) (start)", default: "2880"}
+      commit: {description: "The commit to run (start); empty = this one", default: ""}
+      vm_size: {description: "Azure machine size (start)", default: "Standard_D8s_v4"}
+      location: {description: "Azure region (start); a region the metered AKS runs do not use, so the two never share a quota", default: "westus2"}
+      max_hours: {description: "Collect and delete a machine older than this, finished or not", default: "40"}
+  schedule:
+    - cron: "41 */2 * * *"       # collect: a look at every tagged machine; nothing to do when none is running
+jobs:
+  start:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'start'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      RG: omni-detached-${{ github.run_id }}
+      LOC: ${{ github.event.inputs.location || 'westus2' }}
+      SIZE: ${{ github.event.inputs.vm_size || 'Standard_D8s_v4' }}
+      ORGS: ${{ github.event.inputs.organisms || 'stack' }}
+      SCALE: ${{ github.event.inputs.size || '1000' }}
+      REPS: ${{ github.event.inputs.reps || '3' }}
+      DUR: ${{ github.event.inputs.duration_s || '2880' }}
+      SHA: ${{ github.event.inputs.commit || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+      - name: Rent the machine
+        run: |
+          az group create -n "$RG" -l "$LOC" -o none \
+            --tags omni-detached=1 "organisms=$ORGS" "size=$SCALE" "reps=$REPS" "sha=$SHA" "started=$(date -u +%s)" "run=${{ github.run_id }}"
+          ok=""
+          for sz in "$SIZE" Standard_D8s_v3 Standard_E4s_v4 Standard_E4s_v3 Standard_D8as_v4 Standard_B8ms; do
+            if az vm create -g "$RG" -n big --image Ubuntu2204 --size "$sz" --admin-username omni \
+                 --generate-ssh-keys --public-ip-sku Standard --os-disk-size-gb 128 -o none 2> err.txt; then
+              ok="$sz"; echo "::notice::rented $sz in $LOC"; break
+            fi
+            echo "::warning::$sz refused: $(tr '\n' ' ' < err.txt | cut -c1-600)"
+            az vm delete -g "$RG" -n big --yes -o none 2>/dev/null || true
+          done
+          if [ -z "$ok" ]; then
+            echo "::error::no machine size was granted in $LOC"
+            az vm list-usage -l "$LOC" -o tsv | grep -Ei "regional|DSv4|DSv3|ESv4|ESv3|DASv4|BS " | head -8 | while read -r l; do echo "::warning::quota $l"; done
+            az group delete -n "$RG" --yes --no-wait || true; exit 1
+          fi
+          az group update -n "$RG" --set "tags.vm=$ok" -o none
+          ip=$(az vm show -d -g "$RG" -n big --query publicIps -o tsv); echo "IP=$ip" >> "$GITHUB_ENV"
+          for i in $(seq 1 30); do ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 omni@$ip true && break; sleep 10; done
+      - name: Install the tools on it
+        run: |
+          ssh -o StrictHostKeyChecking=no omni@$IP 'set -e
+            # a fresh machine sometimes gets a stale package list (one attempt lost its machine to "unable to locate package
+            # docker.io"): the update and the install are tried five times
+            for i in 1 2 3 4 5; do
+              if sudo apt-get update -qq && sudo apt-get install -y -qq docker.io jq git python3-pip python3-venv curl >/dev/null; then break; fi
+              [ "$i" = 5 ] && exit 1; sleep 30
+            done
+            sudo usermod -aG docker omni
+            printf "fs.inotify.max_user_watches=524288\nfs.inotify.max_user_instances=512\n" | sudo tee /etc/sysctl.d/99-kind.conf >/dev/null && sudo sysctl -q --system
+            curl -fsSLo kind https://github.com/kubernetes-sigs/kind/releases/latest/download/kind-linux-amd64 && sudo install kind /usr/local/bin/kind
+            curl -fsSLo kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && sudo install kubectl /usr/local/bin/kubectl
+            git clone -q https://github.com/${{ github.repository }}.git omni && cd omni && git checkout -q '"$SHA"'
+            python3 -m venv .v && .v/bin/pip install -q -r requirements.txt'
+      - name: Start every repetition, detached from this job
+        run: |
+          # the runner script: every repetition of every organism in turn, each cell's files moved into cells/<cell>/ when
+          # it ends (bench-<arm>-<rep> carries no organism name), one .exit per cell, ALL_DONE at the end
+          cat > run_all.sh <<EOF
+          #!/bin/bash
+          cd \$HOME/omni
+          export PATH=\$PWD/.v/bin:\$PATH ARMS="native compass" DURATION=$DUR ORGANISM_SCALE=$SCALE LOAD_MAX=6 LOADGEN=open
+          export CLOSURE=tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+          mkdir -p cells
+          for rep in \$(seq 1 $REPS); do for org in \$(echo "$ORGS" | tr , ' '); do
+            cell="six-\$org-x$SCALE-\$rep"; echo "\$(date -u +%FT%TZ) start \$cell"
+            ORGANISM=\$org REP=\$rep bash scripts/kind_paired.sh > "paired-\$cell.log" 2>&1; code=\$?
+            mkdir -p "cells/\$cell" && mv bench-*-"\$rep" "cells/\$cell/" 2>/dev/null; mv "paired-\$cell.log" "cells/\$cell/paired.log"
+            echo "\$code" > "cells/\$cell/paired.exit"; echo "\$(date -u +%FT%TZ) end \$cell exit \$code"
+          done; done
+          touch ALL_DONE
+          EOF
+          scp -o StrictHostKeyChecking=no run_all.sh omni@$IP:omni/run_all.sh
+          ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni && nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat omni/detached.log; echo "--- paired log"; tail -5 omni/paired-*.log 2>/dev/null; pgrep -af kind_paired >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
+          echo "::notice::$RG in $LOC: $ORGS at $SCALE copies, $REPS repetitions, commit $SHA; collect looks at it every two hours"
+  collect:
+    if: github.event_name == 'schedule' || github.event.inputs.mode == 'collect'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: azure/login@v2
+        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+      - name: Look at every running machine
+        id: look
+        run: |
+          max_h=${{ github.event.inputs.max_hours || '40' }}
+          groups=$(az group list --tag omni-detached=1 --query "[].name" -o tsv)
+          [ -n "$groups" ] || { echo "::notice::no detached machine is running"; echo "any=0" >> "$GITHUB_OUTPUT"; exit 0; }
+          mkdir -p out; any=0
+          for RG in $groups; do
+            tags=$(az group show -n "$RG" --query tags -o json); echo "$RG: $tags"
+            started=$(echo "$tags" | jq -r .started); age_h=$(( ($(date -u +%s) - started) / 3600 ))
+            ip=$(az vm show -d -g "$RG" -n big --query publicIps -o tsv 2>/dev/null)
+            if [ -z "$ip" ]; then echo "::warning::$RG has no machine (deleted, or never rented)"; [ "$age_h" -ge 2 ] && az group delete -n "$RG" --yes --no-wait; continue; fi
+            # a fresh key for this job only, placed on the machine by Azure (the start job's key died with its runner)
+            rm -f k k.pub; ssh-keygen -q -N "" -f k
+            az vm user update -g "$RG" -n big -u omni --ssh-key-value "$(cat k.pub)" -o none
+            S="ssh -i k -o StrictHostKeyChecking=no -o ConnectTimeout=20 omni@$ip"
+            state=$($S 'cd omni; ls cells 2>/dev/null | tr "\n" " "; echo; test -f ALL_DONE && echo ALL_DONE || echo RUNNING; tail -3 detached.log')
+            echo "$state"
+            if ! echo "$state" | grep -q ALL_DONE; then
+              if [ "$age_h" -lt "$max_h" ]; then
+                echo "::notice::$RG running ${age_h} h: $(echo "$state" | head -1 | sed 's/^$/no cell finished yet/') finished; left alone"; continue
+              fi
+              echo "::warning::$RG is ${age_h} h old (limit ${max_h} h): collected as it stands and deleted"
+              $S 'cd omni && for d in bench-*-*; do [ -d "$d" ] && { mkdir -p cells/unfinished && mv "$d" cells/unfinished/; }; done; true'
+            fi
+            scp -i k -o StrictHostKeyChecking=no -r "omni@$ip:omni/cells/*" out/ || true
+            scp -i k -o StrictHostKeyChecking=no "omni@$ip:omni/detached.log" "out/detached-$RG.log" || true
+            { $S 'free -g; df -h /'; echo "$tags"; } > "out/machine-$RG.txt" 2>&1 || true
+            for c in out/six-*; do [ -d "$c" ] && echo "::notice::$(basename "$c"): exit $(cat "$c/paired.exit" 2>/dev/null || echo missing), $(find "$c" -type f | wc -l) files"; done
+            az group delete -n "$RG" --yes --no-wait || true; any=1
+          done
+          echo "any=$any" >> "$GITHUB_OUTPUT"
+      # one artifact per cell, the same shape as big-organism's (six-<organism>-x<size>-<rep>); up to six cells per look
+      - name: Name the cells collected
+        id: cells
+        if: steps.look.outputs.any == '1'
+        run: |
+          i=0; for c in out/six-*; do [ -d "$c" ] || continue; i=$((i + 1)); echo "c$i=$(basename "$c")" >> "$GITHUB_OUTPUT"; done
+          [ "$i" -le 6 ] || echo "::warning::$i cells collected, only the first six are published as artifacts; the rest are in detached-machines"
+      - uses: actions/upload-artifact@v4
+        if: steps.cells.outputs.c1 != ''
+        with: {name: "${{ steps.cells.outputs.c1 }}", path: "out/${{ steps.cells.outputs.c1 }}", if-no-files-found: ignore}
+      - uses: actions/upload-artifact@v4
+        if: steps.cells.outputs.c2 != ''
+        with: {name: "${{ steps.cells.outputs.c2 }}", path: "out/${{ steps.cells.outputs.c2 }}", if-no-files-found: ignore}
+      - uses: actions/upload-artifact@v4
+        if: steps.cells.outputs.c3 != ''
+        with: {name: "${{ steps.cells.outputs.c3 }}", path: "out/${{ steps.cells.outputs.c3 }}", if-no-files-found: ignore}
+      - uses: actions/upload-artifact@v4
+        if: steps.cells.outputs.c4 != ''
+        with: {name: "${{ steps.cells.outputs.c4 }}", path: "out/${{ steps.cells.outputs.c4 }}", if-no-files-found: ignore}
+      - uses: actions/upload-artifact@v4
+        if: steps.cells.outputs.c5 != ''
+        with: {name: "${{ steps.cells.outputs.c5 }}", path: "out/${{ steps.cells.outputs.c5 }}", if-no-files-found: ignore}
+      - uses: actions/upload-artifact@v4
+        if: steps.cells.outputs.c6 != ''
+        with: {name: "${{ steps.cells.outputs.c6 }}", path: "out/${{ steps.cells.outputs.c6 }}", if-no-files-found: ignore}
+      - uses: actions/upload-artifact@v4
+        if: steps.look.outputs.any == '1'
+        with: {name: "detached-machines", path: "out/*.log\nout/*.txt\nout/unfinished\nout/six-*[7-9]\n!out/six-*-[1-6]", if-no-files-found: ignore}

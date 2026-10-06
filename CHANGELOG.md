@@ -8,6 +8,22 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- **The stack at 1,000 copies, detached from the GitHub job** (`.github/workflows/big-organism-detached.yml`): every
+  attempt at the four stacked with the real cluster inside was cut off by GitHub's six-hour job limit (v1 run
+  37359820055: the tower 3 of 3 done, the stack 0 of 3). The new workflow rents one Azure machine, starts every repetition
+  under nohup and leaves it running; a look every two hours collects the files when all are done (one artifact per cell,
+  the same shape as `big-organism`'s) and deletes the machine; a machine older than 40 hours is collected as it stands.
+  The commit to run is an input, so the v1 stack runs again on `f162ce8` (named `stack_1226` there) beside the v3 stack.
+  Package install on the fresh machine is tried five times (one v1 attempt lost its machine to a stale package list).
+- **The version tool reads a commit from before a runner was written** (`tools/omni_version.py`, `tests/test_omni_version.py`):
+  the power-grid runner was added at `8eab01c` inside v1 without touching any other engine file, so the Kubernetes and
+  organism runs at `a004a8f` (six-kube 37359815637, big-organism 37359820055) hold 37 of the 38 v1 files, all v1 bytes.
+  The tool used to print only what differed from the newest version there; it now prints "omni-v1 (37 of 38 files, all v1
+  bytes; not yet in this commit: tools/run_pandapower.py)", and `docs/OMNI_V1.md` says the same. A changed byte or an
+  extra engine file is still no version. `tools/code_book.py` reads the version through the same functions.
+- **The real database joins the Omni index** (`tools/omni_index.py`, `results/OMNI_INDEX.md`): per workload, work inside
+  the line, p95, the connections held open (machines) and the host's CPU seconds (energy: the compass's own cost, confirmed
+  worse, counted against Omni). Headline +20.1% over the two real categories in (Kubernetes +26.2%, the database +14.2%).
 - **Omni v2** (`OMNI_V2.json`, `docs/OMNI_V2.md`; the founder's order: make v2, add every missing muscle family, don't be
   cheap). The law, the controllers and the runners are v1's byte for byte. The catalog (`realms/catalog.csv`, built by
   `tools/realms_catalog_v2.py` from `realms/catalog_v1.csv`, `docs/realm_study/TRUE_MUSCLES.csv` and the new

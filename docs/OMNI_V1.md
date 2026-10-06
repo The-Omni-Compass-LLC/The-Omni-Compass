@@ -8,7 +8,11 @@
 
 ## What is frozen
 
-Omni v1 is the engine as it stands at commit `a004a8f` and is unchanged through `f162ce8`. It covers:
+Omni v1 is the engine as it stands at commit `a004a8f` and is unchanged through `f162ce8`, with one addition inside the
+version: the power-grid runner (`tools/run_pandapower.py`) was written at `8eab01c` without touching any other engine
+file. A commit before it holds 37 of the 38 files, every one v1 bytes, and `tools/omni_version.py` says exactly that
+("omni-v1 (37 of 38 files, all v1 bytes; not yet in this commit: tools/run_pandapower.py)"): a v1 result for every test
+but the power grid, which could not have run there. It covers:
 
 - the compass law (`omnicompass/compass_law.py`);
 - the live controllers (`omni_controller/`);
@@ -61,7 +65,7 @@ result is run again on it. No result is ever read across versions.
 | Kubernetes: all four in one run (`results/live/ALL_FOUR.md`) | `3539036` | no | **A, B, C done: [`V1_ALL_FOUR.md`](../results/live/V1_ALL_FOUR.md)**: work inside the line +42% to +48% in all three |
 | Kubernetes: batch queue (`results/live/BATCH.md`) | `a0ebaff` | no | **A, B, C done: [`V1_BATCH.md`](../results/live/V1_BATCH.md)** |
 | Kubernetes: the six organisms with the real cluster inside (1 to 1,000 copies) | `a004a8f` | **yes** | **done: [`V1_SIX_KUBE.md`](../results/live/V1_SIX_KUBE.md)** (run 37359815637, 98 of 100 cells: 1, 10 and 100 copies of all six and 1,000 copies of the four realms and the tower, 5 paired repetitions each (3 at 1,000); the two 1,000-copy stack cells were cut off by GitHub's six-hour job limit). Every organism: p95 and time over the line better in every cell, 0 gauges worse beyond the noise except a rounding-level work loss (−0.0003%) in the 10-, 100- and 1,000-copy cells and HPA replicas +0.7% in one cell; the cluster's machines stay at 6 in both arms (no autoscaler under kind) |
-| Kubernetes: the big organisms (1,000 copies on a rented Azure machine) | `a004a8f` | **yes** | the tower at 1,000 copies: 3 of 3 repetitions done (run 37359820055); the stack at 1,000 copies: none finished, every attempt cut off by the six-hour job limit (one attempt lost its machine to an Azure package mirror); the stack needs a run detached from the GitHub job, to build |
+| Kubernetes: the big organisms (1,000 copies on a rented Azure machine) | `a004a8f` | **yes** | the tower at 1,000 copies: 3 of 3 repetitions done (run 37359820055); the stack at 1,000 copies: none finished, every attempt cut off by the six-hour job limit (one attempt lost its machine to an Azure package mirror); it runs again detached from the GitHub job (workflow `big-organism-detached`, commit `f162ce8`, the organism named `stack_1226` as v1 knows it) |
 | Azure AKS steady (`AKS_BILL.md`) | `5b2832f` | no | dispatched after the running burst |
 | Azure AKS burst | `8199e3a` | no | queued after v1 steady |
 | The 656 muscles and six organisms, modelled (`results/realms/`) | `9c5d417` | **yes** | **A, B, C done**: runs 37359815637's realms check, 37385660330 and 37393204931 each reproduced the published table byte for byte (a deterministic model: reproduced in 3 of 3) |
