@@ -8,7 +8,16 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Rerun everything:** `pip install -r requirements.txt && python verify.py` ends with `VERIFICATION: PASS`.
 
-## In one paragraph (2026-10-05; the numbers are the engine before v1, the v1 reruns are in progress)
+## In one paragraph (2026-10-06, Omni v1)
+
+**Omni v1, confirmed three times.** On real Kubernetes, every test ran three times as separate GitHub runs on the frozen
+engine, ten pairs each (`docs/OMNI_V1.md`, the six `results/live/V1_*.md` tables). Work inside the response line **+42%
+to +48%** in all three runs of the all-four test (18.6 → 27.6 requests a second in run A), confirmed better; the 95th
+percentile **−57% to −69%** in every run of the steady, wandering, all-four and fault tests, confirmed better; failed
+requests −12% to −13% where load swings, confirmed better; machines −1.5% to −3.4% at steady load and −15% to −24% on
+the batch queue, confirmed better, no difference beyond the noise elsewhere; energy a declared model (kind never powers a
+machine down); beside a noisy neighbour, no difference beyond the noise on every row. The paragraph below is the earlier
+engine's reading, kept as the record it was.
 
 Omni-Compass sits on top of Kubernetes and hardware and gets more out of what is already there. On real Kubernetes,
 the engine before v1 (the live controller at rules 1-8, commit `353903683009`), ten pairs per test, native against

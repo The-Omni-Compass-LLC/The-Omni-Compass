@@ -11,19 +11,23 @@ never replaces native; every comparison below is native against omni.
 
 ## The result
 
-Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, measured on the engine before v1 (the
-live controller at rules 1-8, commit `353903683009`). Omni v1 ([`docs/OMNI_V1.md`](docs/OMNI_V1.md)) runs every one of
-these tests three times on one frozen engine; those tables replace this one as they land, and until then every number
-here is the earlier engine's:
+Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v1**, the frozen and
+fingerprinted engine ([`docs/OMNI_V1.md`](docs/OMNI_V1.md)). Every test ran three times as separate GitHub runs (A the
+result, B and C the replications); a reading below is **confirmed** only when it holds in all three runs with every 95%
+interval clear of zero, and otherwise reads no difference beyond the noise. The six tables:
+[`V1_ALL_FOUR`](results/live/V1_ALL_FOUR.md), [`V1_STEADY`](results/live/V1_STEADY.md),
+[`V1_WANDERING`](results/live/V1_WANDERING.md), [`V1_FAULTS`](results/live/V1_FAULTS.md),
+[`V1_BATCH`](results/live/V1_BATCH.md), [`V1_FAIRNESS`](results/live/V1_FAIRNESS.md).
 
-| | native | omni | Reading |
+| | native (run A) | omni (run A) | Reading over the three runs |
 |---|---:|---:|---|
-| **Work handled inside the response line** (capacity, all four in one run) | 21.6 req/s | **30.6 req/s** | **+41.7% more work** on the same machines |
-| **Response time, 95th percentile** (steady, wandering, all four, faults) | 326-741 ms | 117-273 ms | **59-64% faster** |
-| **Failed requests** | 0-9.9% | 0-8.6% | none lost at steady load; 12% fewer where load swings |
-| **Machines in service** | 5.92-6 | 5.88-6 | **up to 2% fewer** |
-| **Energy** | | | **equal or lower** in every test, as a declared model: on kind the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill |
-| **Pods left with no machine to take them** | 0 | 0 | none, in any of these five tests |
+| **Work handled inside the response line** (all four in one run) | 18.6 req/s | **27.6 req/s** | **+42% to +48% more work on the same machines, confirmed better** |
+| **Response time, 95th percentile** (steady, wandering, all four, faults) | 361-830 ms | 122-321 ms | **−57% to −69% in every run of all four tests, confirmed better** |
+| **Failed requests** (wandering, all four) | 10.5-13.3% | 9.3-11.7% | **−12% to −13%, confirmed better**; zero in both arms at steady load; under faults no difference beyond the noise |
+| **Machines in service** | 6 | 5.88 (steady), 4.6 (batch) | steady **−1.5% to −3.4%** and batch **−15% to −24%, confirmed better**; the other tests no difference beyond the noise |
+| **Energy** (a declared model: on kind the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill) | | | standby model confirmed lower in steady (−1.0 to −2.9%), batch (−11 to −17%) and wandering (−0.4 to −0.8%); elsewhere no difference beyond the noise |
+| **A noisy neighbour on the same workers** (fairness) | | | no difference beyond the noise on every row: Omni neither helps nor hurts |
+| **Pods left with no machine to take them** | 0 | 0 | same, in every test |
 
 Omni gives a machine back only after a paired trial shows the service is no slower without it (the verdict). On these
 clusters one machine fewer made each request 30-45% slower in most trials, so Omni kept the machines and spent them on
@@ -40,8 +44,9 @@ energy and made its 95th percentile 43-84% slower:
 [`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
 **The Omni index, every real test together: +12.9%** more for the same, or the same for less, across work, speed,
-machines and energy (real Kubernetes +18.5%; Azure +7.5%, measured on an earlier engine, its rerun running). Every
-number is read from each test's own result file by [`tools/omni_index.py`](tools/omni_index.py):
+machines and energy (real Kubernetes +18.5%; Azure +7.5%). The index still reads the earlier engine's result files; it is
+rebuilt from the v1 tables once the Azure v1 runs land. Every number is read from each test's own result file by
+[`tools/omni_index.py`](tools/omni_index.py):
 [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md). Each test: [`STEADY`](results/live/STEADY.md),
 [`WANDERING`](results/live/WANDERING.md), [`ALL_FOUR`](results/live/ALL_FOUR.md), [`FAULTS`](results/live/FAULTS.md),
 [`FAIRNESS`](results/live/FAIRNESS.md).

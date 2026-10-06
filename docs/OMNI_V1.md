@@ -53,7 +53,8 @@ result is run again on it. No result is ever read across versions.
 | Kubernetes: fairness (`results/live/FAIRNESS.md`) | `3539036` | no | **A, B, C done: [`V1_FAIRNESS.md`](../results/live/V1_FAIRNESS.md)** |
 | Kubernetes: faults (`results/live/FAULTS.md`) | `3539036` | no | **A, B, C done: [`V1_FAULTS.md`](../results/live/V1_FAULTS.md)** |
 | Kubernetes: steady (`results/live/STEADY.md`) | `3539036` | no | **A, B, C done: [`V1_STEADY.md`](../results/live/V1_STEADY.md)** |
-| Kubernetes: wandering, all four (`results/live/WANDERING.md`, `ALL_FOUR.md`) | `3539036` | no | A and B done, C running; tables to follow |
+| Kubernetes: wandering (`results/live/WANDERING.md`) | `3539036` | no | **A, B, C done: [`V1_WANDERING.md`](../results/live/V1_WANDERING.md)** |
+| Kubernetes: all four in one run (`results/live/ALL_FOUR.md`) | `3539036` | no | **A, B, C done: [`V1_ALL_FOUR.md`](../results/live/V1_ALL_FOUR.md)**: work inside the line +42% to +48% in all three |
 | Kubernetes: batch queue (`results/live/BATCH.md`) | `a0ebaff` | no | **A, B, C done: [`V1_BATCH.md`](../results/live/V1_BATCH.md)** |
 | Kubernetes: the six organisms with the real cluster inside (1 to 1,000 copies) | `a004a8f` | **yes** | running (run 37359815637) |
 | Kubernetes: the big organisms | `a004a8f` | **yes** | running (run 37359820055) |

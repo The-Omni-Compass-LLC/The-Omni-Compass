@@ -8,6 +8,13 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- The fifth and sixth v1 A/B/C tables: all four in one run (`results/live/V1_ALL_FOUR.md`, runs 37384945573, 37385646550,
+  37394444337) and wandering demand (`results/live/V1_WANDERING.md`, runs 37384942870, 37385643291, 37394436586). All
+  four: work inside the response line +48.4%, +44.7%, +42.1% (18.6 → 27.6 requests a second in A), p95 −57 to −63%,
+  time over the line −39 to −43%, failed requests −12 to −13%, every one confirmed better in all three runs; machines and
+  energy no difference beyond the noise. Wandering: p95 −56 to −60%, time over the line −37 to −44%, failed requests −12
+  to −13%, confirmed better; machines no difference; the declared energy models −0.3 to −0.8%, confirmed lower. All six
+  Kubernetes tests now have their three v1 runs; the README's result table is the v1 readings.
 - The fourth v1 A/B/C table, the batch queue (`results/live/V1_BATCH.md`, runs 37385637932, 37385654462, 37394452486):
   machines in service −15 to −24%, machines after the queue is done −26 to −36%, standby-model energy −11 to −17% and
   mean response −11 to −13%, every one confirmed better in all three runs; the queue finished 0.7-0.9% later, clear of
