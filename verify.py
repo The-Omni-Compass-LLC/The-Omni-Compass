@@ -319,6 +319,9 @@ def main():
                               "watch equals native, kill hands back every knob, deterministic, capacity law, labels", True)
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "realms_catalog_v2.py"), "--check"], cwd=ROOT, capture_output=True, text=True)
     check("the v2 catalog rebuilds from its three committed sources by the v1 rules (tools/realms_catalog_v2.py --check)", r.returncode == 0, r.stdout[-200:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py")], cwd=ROOT, capture_output=True, text=True)
+    check("the engine in this checkout carries a declared fingerprint (tools/omni_version.py prints omni-vN; any change to the engine is a new version first)",
+          r.returncode == 0 and r.stdout.startswith("omni-v"), r.stdout[-200:])
     from tests import test_compass_law
     test_compass_law.main(); check("compass law and plug: smooth bounded push and pull to the center, fail up, cover, one restore point, foreign writer, two-wire card", True)
     from tests import test_failsafe
