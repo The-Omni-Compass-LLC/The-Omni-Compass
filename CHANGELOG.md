@@ -15,6 +15,10 @@
   the same shape as `big-organism`'s) and deletes the machine; a machine older than 40 hours is collected as it stands.
   The commit to run is an input, so the v1 stack runs again on `f162ce8` (named `stack_1226` there) beside the v3 stack.
   Package install on the fresh machine is tried five times (one v1 attempt lost its machine to a stale package list).
+  First starts (17:57 UTC, westus2 and centralus): every size refused, the CLI hiding Azure's reason behind its own
+  "content already consumed" error; the workflow now reads the reason out of Azure's answer and lists the region's SKU
+  restrictions. The subscription's regional quota is 10 vCPUs, so one 8-vCPU machine fills a region; eastus is the
+  region the metered AKS runs use, and the default is now eastus2.
 - **The version tool reads a commit from before a runner was written** (`tools/omni_version.py`, `tests/test_omni_version.py`):
   the power-grid runner was added at `8eab01c` inside v1 without touching any other engine file, so the Kubernetes and
   organism runs at `a004a8f` (six-kube 37359815637, big-organism 37359820055) hold 37 of the 38 v1 files, all v1 bytes.
