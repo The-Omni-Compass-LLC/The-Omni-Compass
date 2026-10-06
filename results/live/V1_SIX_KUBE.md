@@ -2,6 +2,8 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
 
+Source: GitHub Actions workflow `six-kube`, run 37359815637, commit `a004a8f` (Omni v1 for everything but the power grid: 37 of 38 v1 files, the power-grid runner not yet written, `tools/omni_version.py --commit a004a8f`), 2026-10-05/06; raw files under `results/live/raw/run-37359815637/`; 98 of 100 cells (1, 10 and 100 copies of all six organisms, 1,000 copies of the four realms and the tower; the two 1,000-copy stack cells cut off by GitHub's six-hour job limit). Made by `tools/six_kube_report.py`.
+
 
 Each organism runs on the measured window's clock with the cluster as one more muscle (`tools/run_kil.py`): its own compute demand drives the load generator, the cluster's watts are its heat and load. Native: the stacks' own controllers and Kubernetes alone. Omni: the compass law on every simulated muscle and the live controller on the cluster, handed back at 90% of the window. Cluster rows are measured on the real cluster (energy is the declared power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).
 

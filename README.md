@@ -38,24 +38,26 @@ puts work and speed first.
 machines, 34-52% across the three capacity runs on earlier engines ([`CAPACITY`](results/live/CAPACITY.md) +34.1%,
 [`CAPACITY_2`](results/live/CAPACITY_2.md) +51.9%, [`ALL_FOUR`](results/live/ALL_FOUR.md) +41.7%), with a faster tail; the
 v1 runs give one engine's number three times. Not yet shown: an energy or cloud-bill saving on real machines (Azure's bill
-did not move on the earlier engine, [`AKS_BILL`](results/live/AKS_BILL.md); the v1 Azure runs are in progress), and the
+did not move on the earlier engine, [`AKS_BILL`](results/live/AKS_BILL.md), nor on v1's steady run, [`V1_AKS_STEADY`](results/live/V1_AKS_STEADY.md): every gauge inside the noise; the v1 burst is running), and the
 current card governor on a real GPU (the one real-card run, on the governor since replaced, saved 1.6-3.5% of the card's
 energy and made its 95th percentile 43-84% slower:
 [`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
-**The Omni index on v1, every real test together: +26.2%** more for the same, or the same for less, across work, speed,
-machines and energy on real Kubernetes (work +20%, speed +95%, machines +4%, energy +3%). Only a row confirmed in all
-three runs enters; a row inside the noise counts as exactly zero. Azure's billed runs and the card join the index when
-their v1 runs land (the earlier engine's +12.9% is kept in `docs/history/OMNI_INDEX_pre_v1.md`). Every number is read
-from each test's own v1 table by [`tools/omni_index.py`](tools/omni_index.py):
+**The Omni index, every real test together: +20.1%** more for the same, or the same for less, across work, speed,
+machines and energy: real Kubernetes on v1 +26.2% (work +20%, speed +95%, machines +4%, energy +3%) and the real database
+on v3 +14.2% (connections to the database halved and more; the compass's own CPU, confirmed worse, counted against it).
+Only a row confirmed in all three runs enters; a row inside the noise counts as exactly zero. Azure's billed runs and the
+card join the index when their three-run tables land (the earlier engine's +12.9% is kept in
+`docs/history/OMNI_INDEX_pre_v1.md`). Every number is read from each test's own table by [`tools/omni_index.py`](tools/omni_index.py):
 [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md). Each test: [`STEADY`](results/live/STEADY.md),
 [`WANDERING`](results/live/WANDERING.md), [`ALL_FOUR`](results/live/ALL_FOUR.md), [`FAULTS`](results/live/FAULTS.md),
 [`FAIRNESS`](results/live/FAIRNESS.md).
 
 Six organisms with the real cluster inside (the four realms, the whole tower of 945 muscles, the four stacked, 1,716),
 on an earlier engine: late 23-52% less often and 24-40% faster in every one
-([`results/live/V1_SIX_KUBE.md`](results/live/V1_SIX_KUBE.md), the frozen engine; the earlier engine's in [`results/live/SIX_KUBE.md`](results/live/SIX_KUBE.md)); the rerun at 1, 10, 100 and 1,000 copies on the frozen
-engine is running.
+([`results/live/V1_SIX_KUBE.md`](results/live/V1_SIX_KUBE.md), v1; the earlier engine's in [`results/live/SIX_KUBE.md`](results/live/SIX_KUBE.md)); on v3 at 10 and 100 copies every
+cell is better on 4 to 6 gauges and worse on none beyond the noise but a rounding-level work loss in 4 of 12
+([`results/live/V3_SIX_KUBE.md`](results/live/V3_SIX_KUBE.md)); the 1,000-copy cells run on Azure.
 
 ## What is real and what is a model
 

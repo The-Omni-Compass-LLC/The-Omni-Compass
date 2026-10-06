@@ -68,7 +68,7 @@ REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer,
 DB_FILE = "V3_PGBENCH.json"
 DB_MEASURES = {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "servers_alive_mean", "energy": "cpu_seconds"}
 LOWER_IS_BETTER = {"speed", "machines", "energy"}
-PENDING = {"Real cloud (Azure AKS, billed)": "the v1 steady and burst runs on Azure (the earlier engine's +7.5% is in `docs/history/OMNI_INDEX_pre_v1.md`)",
+PENDING = {"Real cloud (Azure AKS, billed)": "the v1 steady run is in (`results/live/V1_AKS_STEADY.md`: every gauge inside the noise), the burst is running; both join as three-run tables (the earlier engine's +7.5% is in `docs/history/OMNI_INDEX_pre_v1.md`)",
            "Real card (NVIDIA, its own meter)": "the rerun on the current card controller (the 2026-10-02 run used the replaced one)"}
 
 
