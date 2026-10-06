@@ -44,6 +44,8 @@ def digest(files: dict[str, str]) -> str:
 
 def main() -> int:
     commit = sys.argv[2] if len(sys.argv) > 2 and sys.argv[1] == "--commit" else None
+    if len(sys.argv) > 1 and sys.argv[1] == "--commit" and not (commit or "").strip():
+        print("--commit needs a commit; an empty one is not the working tree", file=sys.stderr); return 2
     files = engine_files(commit)
     if "--write" in sys.argv:
         MANIFEST.write_text(json.dumps({"version": "omni-v1", "digest": digest(files), "files": files}, indent=1) + "\n")

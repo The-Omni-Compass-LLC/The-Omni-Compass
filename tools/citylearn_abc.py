@@ -73,6 +73,8 @@ def engine(run):
     try:
         sha = subprocess.run(["gh", "api", f"repos/the-omni-compass-llc/the-omni-compass/actions/runs/{run}", "--jq", ".head_sha"],
                              capture_output=True, text=True, timeout=60).stdout.strip()
+        if len(sha) != 40 or any(c not in "0123456789abcdef" for c in sha):
+            return "?", "unknown"                          # a run whose commit cannot be read is never called v1
         out = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", sha], cwd=ROOT,
                              capture_output=True, text=True, timeout=120).stdout.strip().splitlines()
         return sha[:12], (out[0] if out else "unknown")

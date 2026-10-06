@@ -38,6 +38,7 @@ def main():
                                                        "means": {}, "paired": {"compass": {P95: better}}}))
         run, paired, n = C.load(d.parent)
         assert (run, n, paired[P95]["diff"]) == ("123", 2, -150), (run, n)
+    assert C.engine("1")[1] == "unknown", "a run whose commit cannot be read is never called v1 (GitHub's gh prints nothing for it)"
     assert C.verdict(C.CAPACITY, [r(18.6, 9.0, 6.0, 12.0)] * 3) == "**confirmed better**", "more work inside the line is better"
     assert C.verdict(C.CAPACITY, [r(18.6, -3.0, -5.0, -1.0)] * 3) == "**confirmed WORSE**"
     with tempfile.TemporaryDirectory() as t:

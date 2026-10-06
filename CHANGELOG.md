@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- GitHub's verify check caught a bug in the A/B/C tools that the local check missed: when a run's commit could not be
+  read (GitHub's `gh` prints nothing for an unknown run), `tools/omni_version.py --commit ""` quietly checked the working
+  tree instead, so an unresolvable run would have read as v1. Now a commit that cannot be read is "unknown" in both tables
+  (`tools/confirm_abc.py`, `tools/citylearn_abc.py`), `omni_version.py` refuses an empty commit, and the test asserts it.
 - The third v1 A/B/C table, steady load (`results/live/V1_STEADY.md`, runs 37384939815, 37385640601, 37391296025, all
   on the v1 fingerprint): mean response −47 to −51%, p95 −65 to −69%, time over the line −98 to −99%, machines in service
   −1.5 to −3.4%, standby-model energy −1.0 to −2.9%, every one confirmed better in all three runs; the idle-power energy
