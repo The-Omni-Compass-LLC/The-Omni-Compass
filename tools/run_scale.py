@@ -4,12 +4,13 @@
 # Omni-Compass Enterprise License. See LICENSE.
 """Six organisms, native and Omni, over many runs and at many sizes (evidence class S: the realm models).
 
-  1 Compute / AI / Cloud              (345 muscles)
-  2 Physics / Robotics / Autonomous   (262)
-  3 Energy / Facility / Industrial    (282)
-  4 Distribution / Specialized        (337)
-  5 the four stacked, every duplicate kept (1,226), one body on one clock
-  6 the whole tower, every muscle once (656)
+  1 Compute / AI / Cloud
+  2 Physics / Robotics / Autonomous
+  3 Energy / Facility / Industrial
+  4 Distribution / Specialized
+  5 the four stacked, every duplicate kept, one body on one clock
+  6 the whole tower, every muscle once
+  (sizes: realms/catalog_provenance.json)
 
 Every organism runs native (its own controllers) and omni (the compass law on every muscle, realms/compass_arm.py) on the
 same seed; --runs paired seeds (7000 on); --scale copies of the organism on one clock (each copy its own seeds), so
@@ -36,20 +37,21 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from realms.harness import catalog, run_organism_arm, paired_organism, summarize, label  # noqa: E402
+from realms.harness import catalog, run_organism_arm, paired_organism, summarize, label, STACK, TOWER, organism_name  # noqa: E402
 
 REALMS = ("compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized")
 ORGS = {"1": ("compute_ai_cloud", "Compute / AI / Cloud"), "2": ("physics_robotics_autonomous", "Physics / Robotics / Autonomous"),
         "3": ("energy_facility_industrial", "Energy / Facility / Industrial"), "4": ("distribution_specialized", "Distribution / Specialized"),
-        "5": ("stack_1226", "The four stacked, duplicates kept"), "6": ("tower_656", "The whole tower, every muscle once")}
+        "5": (STACK, "The four stacked, duplicates kept"), "6": (TOWER, "The whole tower, every muscle once")}
 SEED0 = 7000
 
 
 def rows_for(key, scale):
     rows = catalog()
-    if key == "stack_1226":
+    key = organism_name(key)
+    if key == STACK:
         base = [dict(r, muscle_id=f"{r['muscle_id']}@{realm}") for realm in REALMS for r in rows if realm in r["realms"].split(";")]
-    elif key == "tower_656":
+    elif key == TOWER:
         base = rows
     else:
         base = [r for r in rows if key in r["realms"].split(";")]

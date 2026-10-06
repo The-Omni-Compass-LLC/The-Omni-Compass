@@ -101,7 +101,7 @@ if [ -z "${SKIP_HIL:-}" ] && ! timeup; then
   # the whole stacks with a real card inside (tools/run_hil.py), every organism at 1x, 10x, 100x and 1,000x copies,
   # native and Omni, the full repetitions (3, 3, 2, 1 by size): each organism on its own card, all at once, so the
   # stage that takes about 25 hours on one card takes the time of its longest organism
-  read -r -a ORGS <<< "${HIL_ORGS:-compute_ai_cloud physics_robotics_autonomous energy_facility_industrial distribution_specialized stack_1226 organism_656}"
+  read -r -a ORGS <<< "${HIL_ORGS:-compute_ai_cloud physics_robotics_autonomous energy_facility_industrial distribution_specialized stack tower}"
   H="results/hil/run-$STAMP-8card"; mkdir -p "$H"
   echo "== the whole stacks with the card inside: ${#ORGS[@]} organisms, each on its own card, 1x to 1,000x"
   hpids=(); hcard=()

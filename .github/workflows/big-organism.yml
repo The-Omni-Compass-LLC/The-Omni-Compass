@@ -2,7 +2,7 @@
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
 name: big-organism
-# The organisms too big for one GitHub runner beside a cluster (1,000 copies of the whole tower, 656,000 modelled muscles,
+# The organisms too big for one GitHub runner beside a cluster (1,000 copies of the whole tower, close to a million modelled muscles,
 # and of the four stacked, 1.2 million): each repetition rents one larger Azure machine (Standard_D8s_v4, 8 vCPU, 32 GiB,
 # list price about $0.38 an hour), runs the same paired test there (scripts/kind_paired.sh: native against native with
 # Omni-Compass on top, a fresh six-worker kind cluster per arm, the organism at 1,000 copies with the real cluster
@@ -11,7 +11,7 @@ name: big-organism
 on:
   workflow_dispatch:
     inputs:
-      organisms: {description: "Organisms, comma separated", default: "organism_656,stack_1226"}
+      organisms: {description: "Organisms, comma separated", default: "tower,stack"}
       size: {description: "Copies of each organism on one clock", default: "1000"}
       reps: {description: "Paired repetitions per organism", default: "3"}
       duration_s: {description: "Measured seconds per arm (240 organism steps)", default: "2880"}
@@ -26,7 +26,7 @@ jobs:
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import json
-          orgs = [o for o in "${{ github.event.inputs.organisms || 'organism_656,stack_1226' }}".split(",") if o]
+          orgs = [o for o in "${{ github.event.inputs.organisms || 'tower,stack' }}".split(",") if o]
           reps = int("${{ github.event.inputs.reps || '3' }}")
           print("cells=" + json.dumps([{"organism": o, "rep": r} for o in orgs for r in range(1, reps + 1)]))
           PY

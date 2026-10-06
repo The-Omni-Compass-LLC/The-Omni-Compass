@@ -5,7 +5,7 @@
 """The whole stacks with the real Kubernetes cluster inside: one organism, one clock, one engine.
 
 Started by scripts/kind_bench.sh when ORGANISM is set (kind on GitHub, or AKS on Azure). One of the six organisms of
-tools/run_hil.py (the four realms, the four stacked with every duplicate kept, 1,226, and the whole tower of 656) runs
+tools/run_hil.py (the four realms, the four stacked with every duplicate kept, and the whole tower) runs
 on the measured window's clock, ORGANISM_STEPS steps, and the real cluster is wired into it as one more muscle:
 
   efferent  the organism's own compute demand drives the cluster. Demand at step k is the organism's offered work
@@ -30,7 +30,7 @@ one real cluster inside. A large organism is built before the window opens: this
 built and starts on the epoch written to the go file (--go-file), so the cluster's window and the organism's clock open
 together however long the build takes.
 
-  python3 tools/run_kil.py --organism organism_656 --arm compass --duration 960 --out DIR [--scale 10] [--go-file F]
+  python3 tools/run_kil.py --organism tower --arm compass --duration 960 --out DIR [--scale 10] [--go-file F]
 """
 from __future__ import annotations
 

@@ -50,7 +50,7 @@ stand on. In simulation the current controller (amendment 12) is clearly faster 
 6-7% faster, time over the line 1 point lower) and saves 0.5-3.7% energy on the card's own firmware with p95 even
 (`results/sim/gpu_two_wire/`). The real card runs next: one card, the card inside the six organisms, then eight cards.
 
-The 656 muscles are models of real control systems. With the real cluster or the real card inside, they show the
+The 945 muscles (Omni v2; 656 in v1) are models of real control systems. With the real cluster or the real card inside, they show the
 mechanism (work the same, energy 0.1-0.2% lower, time over the line lower than native in every organism); they are
 never counted in the headline.
 

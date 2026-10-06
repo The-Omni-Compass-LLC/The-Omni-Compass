@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE.
 """Builds the printable book, docs/OMNI_COMPASS_MANUAL.pdf, and its one-file text, docs/book/OMNI_COMPASS_BOOK.md.
 
-The book is assembled from the theory chapters in docs/book/, the manual, the repository's documents, the 656-muscle
+The book is assembled from the theory chapters in docs/book/, the manual, the repository's documents, the muscle
 catalog and the source of the engine, in the order set in OUTLINE below. US Letter, mirrored margins for binding,
 parts and chapters open on a right-hand page, running heads, roman numerals in the front matter, a contents with page
 numbers, PDF bookmarks, the founder's plates, and a full-bleed front and back cover.
@@ -464,7 +464,7 @@ OUTLINE = [
     ("Appendix D. Metrics", ("M", "Appendix D - Metrics")),
     ("Appendix E. Troubleshooting", ("M", "Appendix E - Troubleshooting")),
     ("Appendix F. Evidence Map", ("M", "Appendix F - Evidence Map")),
-    ("Appendix G. The 656 Muscles: What Each Is For, and How It Is Wired", ("F", "docs/MUSCLE_CATALOG.md")),
+    ("Appendix G. The Muscles: What Each Is For, and How It Is Wired", ("F", "docs/MUSCLE_CATALOG.md")),
     ("Appendix H. Source of the Engine", ("X", "source")),
     ("Appendix I. The License", ("X", "license")),
     ("Contact", ("X", "contact")),
@@ -485,8 +485,8 @@ def source_listing(rel):
 def catalog_flow():
     rows = list(csv.DictReader(open(ROOT / "realms" / "catalog.csv", encoding="utf-8")))
     intro = ("Every muscle Omni-Compass governs in the six organisms, by number. Family is the kind of machine; realms "
-             "are the realms the muscle belongs to (a muscle in more than one realm is counted once in the tower of 656 "
-             "and once per realm in the stack of 1,226); template is the plant model that stands for it in simulation; "
+             "are the realms the muscle belongs to (a muscle in more than one realm is counted once in the tower "
+             "and once per realm in the stack); template is the plant model that stands for it in simulation; "
              "knob is the kind of setting the governor moves. Source: `realms/catalog.csv`.")
     short = {"compute_ai_cloud": "Compute", "physics_robotics_autonomous": "Physics",
              "energy_facility_industrial": "Energy", "distribution_specialized": "Distribution"}
@@ -814,7 +814,7 @@ The book is in eight parts, and it can be read in two ways.
 toward a center cannot run away, and everything it does is a return. **Part Two, the mathematics,** gives the eight
 equations and the control law that make the circle exact, with the theorem, the declaration and the audits that hold
 them fixed. **Part Three, the physics,** brings the law into the machine: the compass, push and pull, the band and its
-cushions, the physics of a processor, and the two-way nervous system. **Part Four, the body,** lays out the 656
+cushions, the physics of a processor, and the two-way nervous system. **Part Four, the body,** lays out the
 muscles, the four realms and the six organisms. **Part Five, the harness and the wiring,** is the universal plug and
 the step-by-step work of wiring Omni-Compass onto a stack. **Part Six, operating it,** is the OFF switch, the rules
 and the log. **Part Seven, proving it,** is every rule written before a run and every result after it. **Part Eight**
@@ -921,7 +921,7 @@ def md_text(src):
         return out
     if kind == "X":
         if key == "catalog":
-            return ["The full table of the 656 muscles is in `realms/catalog.csv`."]
+            return ["The full table of the muscles is in `realms/catalog.csv`."]
         if key == "source":
             return ["The full source of `omnicompass/core.py`, `omnicompass/compass_law.py`, `realms/compass_arm.py`, "
                     "`omni_controller/gpu_compass.py`, `omnicompass/adapter.py` and `omnicompass/nervous_system.py`."]

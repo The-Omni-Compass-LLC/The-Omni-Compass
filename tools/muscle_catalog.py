@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The catalog of the 656 muscles, explained: what each is for, what Omni-Compass reads and writes on it, how it is
+"""The catalog of the muscles, explained: what each is for, what Omni-Compass reads and writes on it, how it is
 wired, and which organisms it belongs to. Read from realms/catalog.csv; writes docs/MUSCLE_CATALOG.md.
 
     python3 tools/muscle_catalog.py
@@ -83,6 +83,20 @@ PRESET = {
     "water": ("a water or pumping process", "the SCADA system (Modbus, DNP3)"),
     "chamber": ("a controlled chamber (clean room, kiln, reactor)", "the PLC or DCS"),
     "feeder_voltage": ("a distribution feeder's voltage", "the distribution management system (IEC 61850, DNP3; modelled only)"),
+    # Omni v2, wave 4
+    "hospital": ("a hospital's critical rooms (operating rooms, isolation, pharmacy, imaging suites)", "the hospital's building management system (BACnet)"),
+    "clinical": ("clinical systems: imaging archives, records, interface engines, monitoring gateways", "the application's own scaling and admission settings (Kubernetes, the vendor console)"),
+    "port": ("a container terminal's cranes and vehicles taking moves", "the terminal operating system and fleet controllers"),
+    "irrigation": ("pumps, pressure and climate on a farm or in a greenhouse", "the pump station controller, the pivot panel or the climate computer (Modbus, the vendor cloud)"),
+    "pipeline": ("a pipeline segment with its compressors, pumps and valves", "pipeline SCADA (DNP3, Modbus, OPC UA)"),
+    "mill": ("a grinding, flotation or materials-handling circuit", "the plant DCS or PLC (OPC UA)"),
+    "district_heat": ("a district heating or cooling network", "the network control system and substation controllers (Modbus, M-Bus)"),
+    "turbine": ("a generating unit's governor, boiler or excitation loop", "the plant DCS and governor (OPC UA, IEC 61850; modelled only)"),
+    "inverter": ("a plant of grid-support inverters or wind turbines", "the plant controller and inverter settings (SunSpec, IEC 61850, IEEE 1547)"),
+    "batch_reactor": ("a GMP batch reactor, fermenter or food process", "the batch control system (ISA-88, OPC UA)"),
+    "rail_traction": ("a train's traction and auxiliary systems", "the train control and management system and ATO (modelled only)"),
+    "marine_propulsion": ("a ship's propulsion shaft and power plant", "the vessel automation and power management system (modelled only)"),
+    "elevator_hoist": ("an elevator or escalator drive and its group control", "the lift controller and destination dispatch (modelled only)"),
 }
 
 
@@ -94,13 +108,13 @@ def main():
     rows = list(csv.DictReader(open(ROOT / "realms" / "catalog.csv", encoding="utf-8")))
     spine = [r for r in rows if len(r["realms"].split(";")) == 4]
     counts = {k: sum(1 for r in rows if k in r["realms"].split(";")) for k in REALMS}
-    L = ["# The 656 Muscles: What Each Is For, and How It Is Wired", "", BANNER, "",
+    L = [f"# The {len(rows)} Muscles: What Each Is For, and How It Is Wired", "", BANNER, "",
          "A **muscle** is one setting on one machine that already has its own control: a replica target, a node pool's size, "
          "a GPU's clock ceiling, a chiller's setpoint, a battery's reserve, a joint's effort. Omni-Compass does not replace "
          "that control. It reads the machine's meters, computes one bounded force with the compass law, and moves the setting "
          "the machine already accepts, through a plug that reads the setting once before the first write, reads back every "
          "write, steps aside if another controller moves it, and puts it back at the end.", "",
-         "This chapter lists all 656 muscles of the catalog (`realms/catalog.csv`). For each one it says what kind of machine "
+         f"This chapter lists all {len(rows)} muscles of the catalog (`realms/catalog.csv`). For each one it says what kind of machine "
          "it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is "
          "reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of "
          "these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels "
@@ -111,8 +125,8 @@ def main():
          "lever:", "", "| Plant | What it is | What Omni-Compass reads | What Omni-Compass moves |", "|---|---|---|---|"]
     for k, (what, reads, moves) in TEMPLATE.items():
         L.append(f"| `{k}` | {what} | {reads} | {moves} |")
-    L += ["", "**The organisms.** The 656 muscles build six organisms: each of the four realms (every muscle whose realm list "
-          "includes it), the four stacked with every duplicate kept (1,226), and the whole tower with every muscle once (656). "
+    L += ["", f"**The organisms.** The {len(rows)} muscles build six organisms: each of the four realms (every muscle whose realm list "
+          f"includes it), the four stacked with every duplicate kept ({sum(counts.values()):,}), and the whole tower with every muscle once ({len(rows)}). "
           "A muscle of the shared spine sits in all four realms.", "",
           "| Organism | Muscles |", "|---|---:|"]
     for k, n in REALMS.items():

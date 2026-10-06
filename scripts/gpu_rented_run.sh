@@ -22,7 +22,7 @@
 # 7. the GPU fault drill, about 10 minutes: the governor killed outright, the master switch pulled, the response feed
 #    blind (SKIP_DRILL=1); everything so far is then packed;
 # 8. the whole stacks with this card inside (tools/run_hil.py): the four realms, the four stacked with duplicates
-#    (1,226) and the whole tower (656), each as 1, 10, 100 and 1,000 copies on one clock with the card inside, native
+#    and the whole tower, each as 1, 10, 100 and 1,000 copies on one clock with the card inside, native
 #    and Omni (repetitions 3, 3, 2, 1 by size; HIL_SCALES and HIL_REPS_BY_SCALE change them; SKIP_HIL=1 skips it);
 # 9. real AI serving last: a language model served by vLLM, installed in its own environment, 5 repetitions x 3 arms x
 #    300 s; if it cannot install or start, the stage says so and nothing before it is affected (SKIP_LLM=1);

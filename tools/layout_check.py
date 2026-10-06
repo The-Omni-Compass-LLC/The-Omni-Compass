@@ -30,7 +30,7 @@ ROOT_ALLOWED = {
     "LICENSE", "LICENSES", "NOTICE", "PATENTS.md", "TRADEMARKS.md", "THIRD_PARTY_NOTICES.md", "REUSE.toml",
     "DISCLOSURES.md", "LICENSING_FAQ.md", "CLAUDE.md",
     # build, verification and metadata
-    "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "codemeta.json",
+    "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "codemeta.json",
     "docker-compose.yml", ".gitignore", ".gitattributes", ".dockerignore", ".github", ".fossa.yml", ".snyk",
     # code and evidence
     "omnicompass", "omni_controller", "realms", "cpp", "tools", "scripts", "tests", "deploy", "fleet", "pilot",

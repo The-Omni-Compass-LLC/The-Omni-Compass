@@ -21,14 +21,17 @@ except ImportError:
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+import sys; sys.path.insert(0, str(ROOT))  # noqa: E402
+from realms.harness import STACK, TOWER, organism_sizes  # noqa: E402
 REC = ROOT / "results" / "scale" / "receipts"
 OUT = ROOT / "results" / "scale" / "GRID.md"
 SIZES, RUNS = (1, 10, 100, 1000), (1, 10, 100, 1000)
 ORGS = ["Compute / AI / Cloud", "Physics / Robotics / Autonomous", "Energy / Facility / Industrial",
         "Distribution / Specialized", "The four stacked, duplicates kept", "The whole tower, every muscle once"]
-MUSCLES = {"Compute / AI / Cloud": 345, "Physics / Robotics / Autonomous": 262, "Energy / Facility / Industrial": 282,
-           "Distribution / Specialized": 337, "The four stacked, duplicates kept": 1226,
-           "The whole tower, every muscle once": 656}
+_SZ = organism_sizes()
+MUSCLES = {"Compute / AI / Cloud": _SZ["compute_ai_cloud"], "Physics / Robotics / Autonomous": _SZ["physics_robotics_autonomous"],
+           "Energy / Facility / Industrial": _SZ["energy_facility_industrial"], "Distribution / Specialized": _SZ["distribution_specialized"],
+           "The four stacked, duplicates kept": _SZ[STACK], "The whole tower, every muscle once": _SZ[TOWER]}
 COLS = {"label": 4, "band": 5, "wpe": 6, "work": 7, "energy": 8, "viol": 9, "knobs": 10}
 
 

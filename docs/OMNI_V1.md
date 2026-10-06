@@ -2,6 +2,10 @@
 
 > © 2026 The Omni-Compass LLC. Evaluation and simulation use only. See LICENSE.
 
+> **Superseded on 2026-10-06 by Omni v2** (`docs/OMNI_V2.md`, `OMNI_V2.json`): the same law, controllers and runners byte
+> for byte, with the muscle catalog grown from 656 to 945. Every result in this file is a v1 result and stays one; nothing
+> is read across versions.
+
 ## What is frozen
 
 Omni v1 is the engine as it stands at commit `a004a8f` and is unchanged through `f162ce8`. It covers:

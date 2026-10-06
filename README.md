@@ -12,7 +12,7 @@ never replaces native; every comparison below is native against omni.
 ## The result
 
 Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v1**, the frozen and
-fingerprinted engine ([`docs/OMNI_V1.md`](docs/OMNI_V1.md)). Every test ran three times as separate GitHub runs (A the
+fingerprinted engine ([`docs/OMNI_V1.md`](docs/OMNI_V1.md); since 6 October the engine is Omni v2, [`docs/OMNI_V2.md`](docs/OMNI_V2.md), the same law with the muscle catalog grown to 945, and every modelled result is being run again on it). Every test ran three times as separate GitHub runs (A the
 result, B and C the replications); a reading below is **confirmed** only when it holds in all three runs with every 95%
 interval clear of zero, and otherwise reads no difference beyond the noise. The six tables:
 [`V1_ALL_FOUR`](results/live/V1_ALL_FOUR.md), [`V1_STEADY`](results/live/V1_STEADY.md),
@@ -52,7 +52,7 @@ from each test's own v1 table by [`tools/omni_index.py`](tools/omni_index.py):
 [`WANDERING`](results/live/WANDERING.md), [`ALL_FOUR`](results/live/ALL_FOUR.md), [`FAULTS`](results/live/FAULTS.md),
 [`FAIRNESS`](results/live/FAIRNESS.md).
 
-Six organisms with the real cluster inside (the four realms, the whole tower of 656 muscles, the four stacked, 1,226),
+Six organisms with the real cluster inside (the four realms, the whole tower of 945 muscles, the four stacked, 1,716),
 on an earlier engine: late 23-52% less often and 24-40% faster in every one
 ([`results/live/SIX_KUBE.md`](results/live/SIX_KUBE.md)); the rerun at 1, 10, 100 and 1,000 copies on the frozen
 engine is running.
@@ -64,7 +64,7 @@ engine is running.
 | Real Kubernetes on GitHub | Kubernetes itself (API server, scheduler, its own autoscaler), a real web service, real requests, real response times and CPU. The machines are containers on one runner; energy there is a declared formula, not a meter | L |
 | Real cloud, Azure AKS | All of the above on real Azure machines, Azure's own autoscaler, Azure's billed machine count | L |
 | Real card, NVIDIA A10 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. The first run (2026-10-02) used a card controller since replaced (it answered slower); the current controller's run is next | P |
-| The 656 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
+| The 945 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
 
 ## Check it yourself
 
@@ -92,7 +92,7 @@ proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.m
 | For | Read |
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
-| **Omni v1: the frozen engine, fingerprinted; which version every result ran on; how each is confirmed three times** | [`docs/OMNI_V1.md`](docs/OMNI_V1.md), `python3 tools/omni_version.py` |
+| **Omni v2 and v1: the frozen engines, fingerprinted; which version every result ran on; how each is confirmed three times** | [`docs/OMNI_V2.md`](docs/OMNI_V2.md), [`docs/OMNI_V1.md`](docs/OMNI_V1.md), `python3 tools/omni_version.py` |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | The method, written before each run | [`docs/K8S_COMPASS_PREREGISTRATION.md`](docs/K8S_COMPASS_PREREGISTRATION.md), [`docs/GPU_PREREGISTRATION.md`](docs/GPU_PREREGISTRATION.md), [`docs/REALMS_PREREGISTRATION.md`](docs/REALMS_PREREGISTRATION.md) |
@@ -100,7 +100,7 @@ proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.m
 | Every claim with its evidence class, losses kept | [`docs/EVIDENCE_LEDGER.md`](docs/EVIDENCE_LEDGER.md), [`docs/CLAIMS_REGISTER.md`](docs/CLAIMS_REGISTER.md) |
 | Due diligence | [`docs/DUE_DILIGENCE.md`](docs/DUE_DILIGENCE.md) |
 | The manual (wiring, operating, every result) | [`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf), [`docs/INTEGRATION_MANUAL.md`](docs/INTEGRATION_MANUAL.md) |
-| The 656 muscles | [`docs/MUSCLE_CATALOG.md`](docs/MUSCLE_CATALOG.md) |
+| The 945 muscles | [`docs/MUSCLE_CATALOG.md`](docs/MUSCLE_CATALOG.md) |
 | Every command on one page | [`docs/HANDOFF.md`](docs/HANDOFF.md) |
 
 ## Repository
@@ -110,7 +110,7 @@ proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.m
 | `omnicompass/` | The engine (`core.py`), the compass law (`compass_law.py`), the verdict, the shield, the master switch |
 | `omni_controller/` | The live controllers: Kubernetes (`controller.py`) and the card (`gpu_compass.py`) |
 | `cpp/` | The C++ twins, sealed equal to the Python laws |
-| `realms/` | The 656-muscle catalogue and its models |
+| `realms/` | The 945-muscle catalogue and its models (Omni v2) |
 | `scripts/`, `deploy/`, `.github/workflows/` | The benchmarks: kind, AKS, the card, eight cards |
 | `tools/` | Report builders, the Omni index, the layout check |
 | `results/` | Every result with its raw files and digests |

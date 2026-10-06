@@ -159,7 +159,7 @@ served across every card at once by vLLM, one Omni-Compass governor per card, th
 2 hours (`SKIP_LLM=1` skips it). Before it, **the whole stacks with a real card inside**: the six organisms at 1, 10,
 100 and 1,000 copies, native and Omni, the full repetitions (3, 3, 2, 1 by size), each organism on its own card at
 the same time, so the stage that takes about 25 hours on one card takes the time of its longest organism (the four
-stacked, 1,226 muscles, at 1,000 copies), about 4 to 6 hours (`SKIP_HIL=1` skips it). The whole design, every stage:
+stacked, at 1,000 copies), about 4 to 6 hours (`SKIP_HIL=1` skips it). The whole design, every stage:
 about 22 to 24 hours. Progress: `tail -f results/gpu/8card-<stamp>/card-*.log`. At the end: `== send this one file back:
 results/gpu/omni-8card-<stamp>.tar.gz`. The master switch (`sudo python3 tools/omni_switch.py off`) stops every card's
 governor at once.

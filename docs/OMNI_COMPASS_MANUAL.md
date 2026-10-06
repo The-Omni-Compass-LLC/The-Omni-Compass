@@ -60,7 +60,7 @@ Founder, The Omni-Compass LLC
 | CTO, architect, head of platform | Parts I-III; section 9 (wiring levels) to plan the rollout; Part VI |
 | The engineer wiring it | Everything, in order. Do not skip the wire check (section 8) or the watch level (section 9, level 1) |
 | Auditor, diligence team | Part II (mechanism), Part VI (proof), Appendix C (equations), Appendix F (evidence map) |
-| Anyone who wants the whole list | `docs/REGISTER.md`: every muscle wired (656, by family), every benchmark run on every platform (Kubernetes, Azure AKS, GPU, CPU, UPS and batteries, buildings, power grids, robotics) with its result and file, and every open benchmark still to run, in order |
+| Anyone who wants the whole list | `docs/REGISTER.md`: every muscle wired (945, by family), every benchmark run on every platform (Kubernetes, Azure AKS, GPU, CPU, UPS and batteries, buildings, power grids, robotics) with its result and file, and every open benchmark still to run, in order |
 
 **Conventions.** `code` is a command, file or switch exactly as typed. "Native" means your system as it runs today,
 without Omni-Compass. "Muscle" means any machine, service or controller Omni-Compass can read and set. "Knob" or
@@ -149,19 +149,19 @@ When Omni-Compass stops, every one of those values goes back to what it was befo
 
 ## 2. The Muscles, the Realms and the Six Organisms
 
-The catalog (`realms/catalog.csv`) lists 656 distinct muscles, each with its family, its plant model and its knob. The
+The catalog (`realms/catalog.csv`) lists 945 distinct muscles in 59 families (Omni v2; v1 listed 656 in 46), each with its family, its plant model and its knob. The
 register (`docs/REGISTER.md`) lists them by family next to every benchmark, run and still to run.
 They fall into four realms. Every realm stands on the same spine (Kubernetes, machines, GPUs and CPUs, network,
-storage, observability, security, cooling and electrical distribution, 190 muscles), plus its own domain muscles.
+storage, observability, security, cooling and electrical distribution, 257 muscles), plus its own domain muscles.
 
 | Organism | Muscles | What it is |
 |---|---:|---|
-| 1. Compute / AI / Cloud | 345 | clusters, GPUs, AI training and inference, cloud capacity |
-| 2. Physics / Robotics / Autonomous | 262 | joints, fleets, vehicles, flight and spacecraft axes |
-| 3. Energy / Facility / Industrial | 282 | data halls, buildings, batteries, UPS, process loops, feeders |
-| 4. Distribution / Specialized | 337 | networks, storage, databases, commerce, workflows, radio networks |
-| 5. The four stacked, every duplicate kept | 1,226 | all four realms on one clock, the shared spine counted in each |
-| 6. The whole tower, every muscle once | 656 | every distinct muscle on one clock |
+| 1. Compute / AI / Cloud | 430 | clusters, GPUs, AI training and inference, cloud capacity |
+| 2. Physics / Robotics / Autonomous | 376 | joints, fleets, vehicles, flight and spacecraft axes |
+| 3. Energy / Facility / Industrial | 470 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
+| 4. Distribution / Specialized | 440 | networks, storage, databases, commerce, workflows, radio networks, clinical systems, ports |
+| 5. The four stacked, every duplicate kept | 1,716 | all four realms on one clock, the shared spine counted in each |
+| 6. The whole tower, every muscle once | 945 | every distinct muscle on one clock |
 
 These six organisms are the benchmark set. Each is run native and with Omni-Compass on top, on the same seed, the
 same load and the same clock, and each produces its own receipt.
@@ -827,7 +827,7 @@ test passes. `verify.py` fails, naming the file, if any sealed file changes afte
 |---|---|
 | `omnicompass/` | the engine, governor, nervous system, shield, compass, conveyance law, the compass |
 | `omni_controller/` | the Kubernetes controller and muscles; the GPU governors (one and two wires) |
-| `realms/` | the 656-muscle catalog, the plant models, the realm harness, the compass on every muscle, the modelled card |
+| `realms/` | the 945-muscle catalog, the plant models, the realm harness, the compass on every muscle, the modelled card |
 | `tools/` | benchmarks, receipts, the wire check, the scale ladder, manifests, seals |
 | `scripts/` | one-command runs (GPU, Kubernetes, ladder) |
 | `deploy/` | container image, install and permission files |

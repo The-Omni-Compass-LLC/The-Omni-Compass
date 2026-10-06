@@ -7,7 +7,7 @@ Written 2026-10-05, before any district other than the tuning district was run w
 
 ## Why CityLearn
 
-Our own 656-muscle models show the mechanism; they cannot prove it on equipment we did not write. CityLearn
+Our own muscle models show the mechanism; they cannot prove it on equipment we did not write. CityLearn
 (Intelligent Environments Lab, University of Texas at Austin; MIT license; github.com/intelligent-environments-lab/citylearn)
 is an independent, widely used simulator of real buildings from measured data: each building's load, its solar
 panels and its battery, hour by hour for a year, with its own controllers and its own scoring. Neither side built it to

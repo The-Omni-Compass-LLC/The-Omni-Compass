@@ -339,3 +339,62 @@ Also in this amendment: an effort cap on a motion axis moves only where the copp
 (J a_max / kt)^2 R, exceeds the standing draw a longer move pays, p_idle + b v_max^2 (a reaction wheel; not traction, a
 flight axis or a robot joint). The machine-release margin on node pools is 0.3, the largest at which no pool is later than
 native (`results/realms/RELEASE_MARGIN_SWEEP.md`, the per-muscle sweep).
+
+## Omni v2: the catalog grows to 945 muscles in 59 families (2026-10-06, before any v2 seed)
+
+Written before any counted v2 run. **The law, the controllers, the plants, the Omni layer, the outcomes, the guardrails,
+the label rule and the invalidity rules are v1's, byte for byte.** Only the catalog and the presets it needs change, so by
+the change rule of `docs/OMNI_V1.md` this is a new version, Omni v2 (`OMNI_V2.json`, `docs/OMNI_V2.md`), and every
+modelled result is run again on it. No v1 result is read as a v2 result.
+
+What is added, each row with its real system, its setting and its source, built by `tools/realms_catalog_v2.py` from three
+committed files by the v1 rules (realm, membership, plant, preset and knob: `tools/realms_catalog.py`, unchanged):
+
+- **The 656 of v1, byte for byte** (`realms/catalog_v1.csv`): every v1 muscle keeps its id, realm, plant, preset and knob.
+- **118 real controls the realm study had already found and the tower lacked** (`docs/realm_study/TRUE_MUSCLES.csv`,
+  the rows marked "added (real, not in the 656)"; six of them were already in the tower under another name and are
+  listed as skipped in `realms/catalog_provenance.json`). They join the family the study filed them under; 70 of them
+  are spine muscles (Kubernetes, nodes, hosts, GPUs, storage, network, observability, power, cooling) and so sit in all
+  four realms.
+- **171 muscles in thirteen new families** (`realms/wave4_families.csv`), the domains the tower did not cover, one new
+  preset each (`realms/presets.py`, round engineering figures for the class of machine, as every other preset):
+
+| Family | Realm | Plant / preset | Muscles | Examples of the real system |
+|---|---|---|---:|---|
+| Healthcare Critical Environments | Energy / Facility / Industrial | thermal_zone / hospital | 13 | ASHRAE 170 rooms on a hospital BMS (Metasys, Desigo); isolation-room pressure; pharmacy cold rooms |
+| Medical Imaging & Clinical Systems | Distribution / Specialized | compute_pool / clinical | 12 | DICOM archives and routers (Orthanc, dcm4chee), EHR tiers, HL7/FHIR engines, monitoring gateways |
+| Agriculture & Irrigation | Energy / Facility / Industrial | process_loop / irrigation | 14 | pivot and pump controllers (Valley, Lindsay, Netafim), greenhouse climate computers (Priva), grain dryers |
+| Oil & Gas Pipelines | Energy / Facility / Industrial | process_loop / pipeline | 14 | compressor and pump station SCADA (Emerson, AVEVA, Honeywell), API 1130 leak detection, DRA injection |
+| Rail Traction & Train Control | Physics / Robotics / Autonomous | motion_axis / rail_traction | 14 | traction converters and ATO (Siemens Mobility, Alstom, Hitachi Rail), CBTC headway, ERTMS |
+| Marine Propulsion & Vessel Automation | Physics / Robotics / Autonomous | motion_axis / marine_propulsion | 12 | propulsion and power management (Kongsberg, Wärtsilä, MAN), IMO shaft power limitation |
+| Ports & Maritime Logistics | Distribution / Specialized | compute_pool / port | 12 | terminal operating systems (Navis N4), automated cranes and AGVs (Kalmar, Konecranes), shore power |
+| Mining & Mineral Processing | Energy / Facility / Industrial | process_loop / mill | 14 | grinding and flotation control (Metso, FLSmidth, ABB), ventilation on demand (Howden), dewatering |
+| District Heating & Cooling | Energy / Facility / Industrial | process_loop / district_heat | 13 | network and substation control (Danfoss Leanheat, Kamstrup), CHP dispatch, thermal storage |
+| Power Generation & Turbine Control | Energy / Facility / Industrial | process_loop / turbine | 14 | governors and plant DCS (GE Mark VIe, Emerson Ovation, Woodward), AVRs, hydro gates, reactor rods |
+| Renewable Generation & Inverter Control | Energy / Facility / Industrial | process_loop / inverter | 13 | IEEE 1547 inverter curves (SMA, Enphase), wake steering (NREL FLORIS), pitch and curtailment (Vestas) |
+| Elevators & Vertical Transport | Physics / Robotics / Autonomous | motion_axis / elevator_hoist | 12 | drives and destination dispatch (Otis, KONE, Schindler), ISO 25745 standby modes |
+| Pharmaceutical & Food Manufacturing | Energy / Facility / Industrial | process_loop / batch_reactor | 14 | ISA-88 batch control (DeltaV, SIMATIC Batch), bioreactors (Sartorius), pasteurizers, CIP, cleanrooms |
+
+Four wave-4 names collided with the tower and carry a domain prefix (`terminal_tank_level_target`,
+`train_auxiliary_power_budget`, `plant_reactive_power_target`, `inverter_frequency_droop_setpoint`). Eleven names the knob
+rules would have placed wrongly are set by hand in `tools/realms_catalog.py` OVERRIDE and listed there.
+
+The organisms of v2: Compute / AI / Cloud 430, Physics / Robotics / Autonomous 376, Energy / Facility / Industrial 470,
+Distribution / Specialized 440, the four stacked 1,716, the whole tower 945; the shared spine is 257 muscles. In code and
+workflows the two whole-tower organisms are now named `tower` and `stack` (nothing is named by a count); the v1 names
+`organism_656` and `stack_1226` are read as aliases, so every v1 run folder and record still reads.
+
+Checked before this freeze, on seed 7, every one of the 289 added muscles: deterministic, the watch arm equal to native,
+every knob handed back after the kill, no number undefined, Omni's time over the line never above native's. Two presets
+were adjusted on that check and before any counted run: the inverter plant's disturbance amplitude (0.8 to 0.5, with its
+noise 0.05 to 0.02) because native itself was outside its band a quarter of the time, and the elevator hoist's position
+gains (kp 2,000 to 3,000, kd 400 to 500) with a smaller load disturbance (400 to 100 N m), because the first figures
+put native's tracking error at its limit under passenger load. Where native is still often outside its band in some
+heavy-load muscles (the compute pools at their busiest sizes), that is the plant at the size the muscle id draws, the
+same for both arms, and it is reported as it comes.
+
+v2 runs: the realms table (every muscle alone and the five organisms, seeds 3000-3009, three GitHub runs A, B, C), the
+six-organism grid at 1, 10, 100 and 1,000 copies, the six organisms with the real cluster inside, and the big organisms
+on Azure, each on the v2 fingerprint; the live benchmarks that import none of the realm files (Kubernetes alone, Azure
+alone, CityLearn, the grid, the robots, the database) are run again on v2 as GitHub's queue allows, their v1 tables kept
+as v1 tables.

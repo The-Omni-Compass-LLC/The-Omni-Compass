@@ -121,7 +121,7 @@ def main(argv=None):
     off = []
     for tag, (run, recs) in zip("ABC", runs):
         sha, ver = engine(run)
-        if not ver.startswith("omni-v1"):
+        if not ver.startswith("omni-v"):                     # a fingerprinted engine (docs/OMNI_V2.md; v1 runs keep reading as v1)
             off.append(f"{tag} (run {run}: {ver})")
         L.append(f"| {tag} | {run} | `{sha}` | {ver} | {len(recs)} |")
     if len({r for r, _ in runs}) < 3:

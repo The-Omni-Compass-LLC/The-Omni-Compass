@@ -315,7 +315,10 @@ def main():
     test_schedutil.main(); check("schedutil model: 1.25 map tips at 80%, OPP snap, uclamp, RT to policy max, rate limit, iowait boost, Omni ceiling and kill", True)
     test_cpufreq_ceiling.main(); check("cpufreq ceiling writer: scaling_max_freq on every policy, clamped; restore puts cpuinfo_max_freq back", True)
     from tests import test_realms
-    test_realms.main(); check("realm harness: catalog of 656, watch equals native, kill hands back every knob, deterministic, capacity law, labels", True)
+    test_realms.main(); check("realm harness: the v2 catalog (the 656 of v1 byte for byte, the study-found muscles, the thirteen wave-4 families), "
+                              "watch equals native, kill hands back every knob, deterministic, capacity law, labels", True)
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "realms_catalog_v2.py"), "--check"], cwd=ROOT, capture_output=True, text=True)
+    check("the v2 catalog rebuilds from its three committed sources by the v1 rules (tools/realms_catalog_v2.py --check)", r.returncode == 0, r.stdout[-200:])
     from tests import test_compass_law
     test_compass_law.main(); check("compass law and plug: smooth bounded push and pull to the center, fail up, cover, one restore point, foreign writer, two-wire card", True)
     from tests import test_failsafe

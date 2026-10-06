@@ -29,6 +29,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
+import sys; sys.path.insert(0, str(ROOT))  # noqa: E402
+from realms.harness import STACK, TOWER, ORGANISM_ALIAS, organism_sizes  # noqa: E402
 OUT = ROOT / "docs" / "DOSSIER.md"
 FIG = ROOT / "docs" / "dossier"
 SURF, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
@@ -39,9 +41,11 @@ BANNER = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c)
           "requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Patent applications, "
           "copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its "
           "software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).")
-ORG = ["Compute / AI / Cloud (345)", "Physics / Robotics / Autonomous (262)", "Energy / Facility / Industrial (282)",
-       "Distribution / Specialized (337)", "The four stacked (1,226)", "The whole tower (656)"]
-SHORT = ["Compute", "Physics", "Energy", "Distribution", "Stacked 1,226", "Tower 656"]
+_SZ = organism_sizes()
+ORG = [f"Compute / AI / Cloud ({_SZ['compute_ai_cloud']})", f"Physics / Robotics / Autonomous ({_SZ['physics_robotics_autonomous']})",
+       f"Energy / Facility / Industrial ({_SZ['energy_facility_industrial']})", f"Distribution / Specialized ({_SZ['distribution_specialized']})",
+       f"The four stacked ({_SZ[STACK]:,})", f"The whole tower ({_SZ[TOWER]})"]
+SHORT = ["Compute", "Physics", "Energy", "Distribution", f"Stacked {_SZ[STACK]:,}", f"Tower {_SZ[TOWER]}"]
 
 
 def style(ax, title, ylabel):
@@ -181,10 +185,10 @@ def main():
 
     hil = json.loads((ROOT / "results" / "hil" / "run-20261002T082232Z" / "HIL.json").read_text())["results"]
     order = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
-             "stack_1226", "organism_656"]
+             STACK, TOWER]
     m, lo, hi, sm = [], [], [], []
     for k in order:
-        r = hil.get(k)
+        r = hil.get(k) or next((hil[a] for a, new in ORGANISM_ALIAS.items() if new == k and a in hil), None)   # the v1 card run names the organisms by their old counts
         if not r:
             raise KeyError(f"{k} missing from HIL.json")
         c = [100 * x for x in r["card"]["primary"]]
@@ -193,7 +197,7 @@ def main():
     bars(FIG / "hil_card.png", "The real card inside each organism: its work per energy against native (3 runs each)",
          "change against native (%)", SHORT, m, lo, hi)
     L += ["### The real card inside the six organisms", "",
-          "The card is one more muscle of each organism, governed by the same compass law as the 656 modelled muscles; its "
+          "The card is one more muscle of each organism, governed by the same compass law as the modelled muscles; its "
           "energy and requests are its own meter (`results/hil/run-20261002T082232Z/HIL.md`).", "",
           "![The card in the organisms](dossier/hil_card.png)", "",
           "| Organism | The card, work per energy (meter) | The modelled stacks, work per energy |", "|---|---:|---:|"]
@@ -298,9 +302,9 @@ def main():
           "into the band first.", ""]
 
     # ------------------------------------------------------------------ 6. Realms and muscles
-    L += ["## 6. The 656 muscles and the four realms (evidence class S)", "",
-          "The catalog (`realms/catalog.csv`): 656 muscles, 345 in Compute / AI / Cloud, 262 in Physics / Robotics / "
-          "Autonomous, 282 in Energy / Facility / Industrial and 337 in Distribution / Specialized (1,226 counting a muscle "
+    L += [f"## 6. The {_SZ[TOWER]} muscles and the four realms (evidence class S)", "",
+          f"The catalog (`realms/catalog.csv`): {_SZ[TOWER]} muscles, {_SZ['compute_ai_cloud']} in Compute / AI / Cloud, {_SZ['physics_robotics_autonomous']} in Physics / Robotics / "
+          f"Autonomous, {_SZ['energy_facility_industrial']} in Energy / Facility / Industrial and {_SZ['distribution_specialized']} in Distribution / Specialized ({_SZ[STACK]:,} counting a muscle "
           "once per realm). Every muscle alone and every organism are in `results/realms/REALMS.md` (round 3, the earlier "
           "governor) and in the six-organism grid above (the compass law). Every knob was handed back in every run.", ""]
 

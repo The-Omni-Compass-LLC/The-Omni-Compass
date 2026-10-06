@@ -112,12 +112,14 @@ def main(argv=None):
     off, meta = [], []
     for tag, (run, _, n) in zip("ABC", runs):
         sha, ver = engine(run)
-        if not ver.startswith("omni-v1"):
+        if not ver.startswith("omni-v"):                     # a fingerprinted engine (docs/OMNI_V2.md; v1 runs keep reading as v1)
             off.append(f"{tag} (run {run}: {ver})")
         meta.append({"tag": tag, "run": run, "commit": sha, "engine": ver, "paired_repetitions": n})
         L.append(f"| {tag} | {run} | `{sha}` | {ver} | {n if n is not None else '?'} |")
     if len({r for r, _, _ in runs}) < 3:
         off.append("A, B and C must be three separate runs")
+    if len({m["engine"].split(" ")[0] for m in meta}) > 1:
+        off.append("A, B and C are not all on the same engine: " + ", ".join(m["engine"].split(" ")[0] for m in meta))
     if off:
         L[2:2] = [f"**Not a v1 confirmation: {'; '.join(off)}.** The readings below compare runs on different engines.", ""]
     L += ["", "| Measure | A | B | C | Reading |", "|---|---|---|---|---|"]

@@ -303,9 +303,9 @@ the chip is saved twice in a data center: once at the chip and again at the chil
 # The Six Organisms and the Benchmark Grid
 
 Omni-Compass is benchmarked on six organisms, each run native and with Omni-Compass on top on the same seed, the same
-load and the same clock: Compute / AI / Cloud (345 muscles), Physics / Robotics / Autonomous (262), Energy / Facility /
-Industrial (282), Distribution / Specialized (337), the four stacked with every duplicate kept (1,226), and the whole
-tower with every muscle once (656).
+load and the same clock: Compute / AI / Cloud (430 muscles), Physics / Robotics / Autonomous (376), Energy / Facility /
+Industrial (470), Distribution / Specialized (440), the four stacked with every duplicate kept (1,716), and the whole
+tower with every muscle once (945); these are the Omni v2 counts, v1's were 345, 262, 282, 337, 1,226 and 656.
 
 Each organism is run at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of the organism on one
 clock. Every receipt shows work per energy, work, energy, the time spent outside the service line, and whether every

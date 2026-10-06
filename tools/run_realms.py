@@ -7,7 +7,7 @@
   python3 tools/run_realms.py --seeds 0 1 --out /tmp/realms-dev   # a look on development seeds (never reported)
 
 Every muscle alone (native, watch, compass; plus the fixed calm setpoint for setpoint muscles), then five organisms: each
-realm, and all 656 muscles together. Writes MUSCLES.csv (one row per muscle), REALMS.json (everything), REALMS.md (the
+realm, and every muscle together. Writes MUSCLES.csv (one row per muscle), REALMS.json (everything), REALMS.md (the
 tables), RUN.json (commit, seeds, fingerprints) and SHA256SUMS.txt. The preregistered seeds run only on committed code.
 """
 import argparse, csv, hashlib, json, math, os, subprocess, sys, time
@@ -23,14 +23,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from realms.harness import (catalog, run_muscle, run_organism, paired, paired_organism, label, summarize,  # noqa
+from realms.harness import (catalog, run_muscle, run_organism, paired, paired_organism, label, summarize, TOWER,  # noqa
                             FIXED)
 
 PREREG_SEEDS = list(range(3000, 3010))     # round 3 (rounds 1 and 2 are kept in results/realms/round1/ and round2/)
 REALMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized"]
 NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
          "energy_facility_industrial": "Energy / Facility / Industrial",
-         "distribution_specialized": "Distribution / Specialized", "organism_656": "The whole tower (656 muscles)"}
+         "distribution_specialized": "Distribution / Specialized", TOWER: "The whole tower, every muscle once"}
 LABELS = ["SUPERIOR WITHIN GUARDRAILS", "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF", "NONINFERIOR / INCONCLUSIVE",
           "NOT ESTABLISHED", "WORSE", "INVALID"]
 FROZEN = ["realms", "omnicompass", "tools/run_realms.py", "docs/REALMS_PREREGISTRATION.md"]
@@ -73,7 +73,7 @@ def fmt(m, scale=100.0, unit="%"):
 def write_md(out, res, orgs, run):
     L = []
     w = L.append
-    w("# The realms, round 3: 656 muscles on modelled plants, native against Omni on top")
+    w(f"# The realms: {len(rows)} muscles on modelled plants, native against Omni on top")
     w("")
     w(f"Evidence class **S** (simulation). Run {run['started']}, commit `{run['commit'][:12]}`, seeds "
       f"{run['seeds'][0]}-{run['seeds'][-1]} ({len(run['seeds'])} paired seeds per muscle and per organism). "
@@ -95,7 +95,7 @@ def write_md(out, res, orgs, run):
     w("")
     w("| Organism | Muscles | Label | Work per energy | Work | Energy | Violations (pp) | Valid |")
     w("|---|---:|---|---:|---:|---:|---:|---|")
-    for name in [n for n in REALMS + ["organism_656"] if n in orgs]:
+    for name in [n for n in REALMS + [TOWER] if n in orgs]:
         o = orgs[name]
         s = o["summary"]
         w(f"| {NAMES[name]} | {o['n']} | **{o['label']}** | {fmt(s['primary'])} | {fmt(s['work'])} | "
@@ -197,7 +197,7 @@ def main(argv=None):
         res = list(ex.map(muscle_job, [(r, a.seeds) for r in rows], chunksize=4))
         print(f"muscles: {len(res)} in {time.time() - t0:.0f} s", flush=True)
         groups = {realm: [r for r in rows if realm in r["realms"].split(";")] for realm in REALMS}
-        groups["organism_656"] = rows
+        groups[TOWER] = rows
         jobs = [(name, rs, s) for name, rs in groups.items() if rs for s in a.seeds]
         raw = defaultdict(dict)
         for name, seed, o in ex.map(organism_job, jobs):

@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE.
 """The whole stacks with the real card inside: one harness, one engine, one set of receipts.
 
-Each of six organisms (the four realms, the four stacked with every duplicate kept, 1,226, and the whole tower of 656,
+Each of six organisms (the four realms, the four stacked with every duplicate kept, and the whole tower,
 realms/catalog.csv) runs on one clock as in the realm
 harness, and the real GPU on this machine is wired into it as one more muscle of its NVIDIA GPU family (a spine family,
 so the card sits in every organism): the card serves the pinned request stream (tools/gpu_workload.py), its own
@@ -18,7 +18,7 @@ Arms, the same organism, the same seed, the same request stream:
           handed back, and the harness checks they were
 
 Sizes (--scales, default 1,10,100,1000): each organism is run as 1, 10, 100 and 1,000 copies governed together on one
-clock (1,000 copies of the whole tower is 656,000 muscles), with the one real card inside as one more muscle. Each size
+clock (1,000 copies of the whole tower is close to a million muscles), with the one real card inside as one more muscle. Each size
 runs its own number of paired repetitions (--reps-by-scale, default 5,3,2,1; amendment 11 of docs/GPU_PREREGISTRATION.md).
 
 Each organism step is --step-s seconds of wall clock (240 steps: 8 minutes at 2 s). A size whose simulated step takes
@@ -53,12 +53,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import catalog, Body, KILL_AT, T95, label  # noqa: E402
 from realms.compass_arm import compass_apply  # noqa: E402
+from realms.harness import STACK, TOWER, organism_name  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
 
 REALMS = ("compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized")
 NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
          "energy_facility_industrial": "Energy / Facility / Industrial", "distribution_specialized": "Distribution / Specialized",
-         "stack_1226": "The four stacked, duplicates kept (1,226)", "organism_656": "The whole tower (656 muscles)"}
+         STACK: "The four stacked, duplicates kept", TOWER: "The whole tower, every muscle once"}
 SEED0 = 6000
 SMI_FIELDS = "timestamp,power.draw,clocks.sm,power.limit,utilization.gpu,temperature.gpu"
 
@@ -100,8 +101,8 @@ def last_draw(path, fallback):
 def groups(scale=1):
     rows = catalog()
     g = {r: [x for x in rows if r in x["realms"].split(";")] for r in REALMS}
-    g["stack_1226"] = [dict(r, muscle_id=f"{r['muscle_id']}@{realm}") for realm in REALMS for r in g[realm]]
-    g["organism_656"] = rows
+    g[STACK] = [dict(r, muscle_id=f"{r['muscle_id']}@{realm}") for realm in REALMS for r in g[realm]]
+    g[TOWER] = rows
     # scale copies of each organism on one clock, each copy its own seeds (as tools/run_scale.py)
     return {k: [dict(r, muscle_id=r["muscle_id"] + (f"~{c}" if c else "")) for c in range(scale) for r in v]
             for k, v in g.items()}
@@ -109,7 +110,7 @@ def groups(scale=1):
 
 def per_muscle_step_s():
     """What one simulated step costs per muscle on this machine (the whole tower, a few steps, both laws' work)."""
-    rows = groups(1)["organism_656"]
+    rows = groups(1)[TOWER]
     body = Body(rows, SEED0)
     t = time.time()
     for _ in range(5):
@@ -295,7 +296,7 @@ def main(argv=None):
     ap.add_argument("--scales", default=os.environ.get("HIL_SCALES", "1,10,100,1000"))
     ap.add_argument("--reps-by-scale", default=os.environ.get("HIL_REPS_BY_SCALE", "5,3,2,1"))
     ap.add_argument("--step-s", type=float, default=float(os.environ.get("HIL_STEP_S", 2.0)))
-    ap.add_argument("--organisms", default=os.environ.get("HIL_ORGANISMS", ",".join(REALMS + ("stack_1226", "organism_656"))))
+    ap.add_argument("--organisms", default=os.environ.get("HIL_ORGANISMS", ",".join(REALMS + (STACK, TOWER))))
     ap.add_argument("--gpu", type=int, default=int(os.environ.get("GPU", 0)))
     ap.add_argument("--smi", default=os.environ.get("NVIDIA_SMI", "nvidia-smi"))
     ap.add_argument("--interval", type=float, default=2.0)

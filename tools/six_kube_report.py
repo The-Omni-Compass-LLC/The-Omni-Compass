@@ -35,9 +35,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.live_reps import arm_rep, arm_gauges, T95, LABEL, NEUTRAL, SAME_REL  # noqa: E402
 from tools.run_hil import NAMES, REALMS  # noqa: E402
+from realms.harness import STACK, TOWER, organism_name  # noqa: E402
 from pilot.bench_report import LOWER_BETTER  # noqa: E402
 
-ORDER = list(REALMS) + ["organism_656", "stack_1226"]
+ORDER = list(REALMS) + [TOWER, STACK]
 OMNI = ("compass", "omni")
 CLUSTER = ["response time (ms), 95th percentile", "response time (ms), 99th percentile",
            "time over the response line (% of samples)", "failed requests (%)", "HPA replicas, mean", "pods started",
@@ -58,7 +59,7 @@ def scale_of(key):
 
 def name_of(key):
     """An organism's name, with its size when it runs as more than one copy on one clock."""
-    o = key.split("@")[0]
+    o = organism_name(key.split("@")[0])                     # v1 run folders carry the old count-names
     return NAMES[o] + (f", {scale_of(key):,} copies" if scale_of(key) > 1 else "")
 
 
@@ -121,7 +122,7 @@ def paired(runs_o, a, k):
 def main(root):
     root = Path(root)
     runs = collect(root)
-    orgs = sorted(runs, key=lambda o: (scale_of(o), ORDER.index(o.split("@")[0])))
+    orgs = sorted(runs, key=lambda o: (scale_of(o), ORDER.index(organism_name(o.split("@")[0]))))
     keys = [k for k in CLUSTER + ORG if any(not math.isnan(g.get(k, math.nan)) for o in orgs for arms in runs[o].values()
                                              for g in arms.values())]
     out = {"organisms": {}}
@@ -183,7 +184,7 @@ def main(root):
                 rd = ("better" if v["better"] else "WORSE") + ("" if sure else " (inside the noise)")
             L.append(f"| {LABEL.get(k, k)} | {v['native']:.4g} | {v['omni']:.4g} | {ch} | {ci} | {rd} |")
         L.append("")
-    missing = [o for o in ORDER if not any(k.split("@")[0] == o for k in runs)]
+    missing = [o for o in ORDER if not any(organism_name(k.split("@")[0]) == o for k in runs)]
     if missing:
         L += ["## Not in this run", ""] + [f"- {name_of(o)}" for o in missing] + [""]
     (root / "SIX_KUBE.md").write_text("\n".join(_legal_stamp(L)) + "\n")

@@ -30,9 +30,11 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine is frozen: Omni v1
+## The engine is frozen: Omni v2 (v1 kept for its results)
 
-- `OMNI_V1.json` and `docs/OMNI_V1.md`. Check with `python3 tools/omni_version.py [--commit <sha>]`.
+- `OMNI_V2.json` and `docs/OMNI_V2.md` (v2 = v1's law, controllers and runners byte for byte, plus the 945-muscle catalog and its
+  thirteen new presets); `OMNI_V1.json` and `docs/OMNI_V1.md` stay for the v1 results. Check with
+  `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v2, omni-v1, or what differs.
 - Any change to a rule, gain or guard makes **v2**, and every result is run again on it. Never read a result across
   versions. Never change the engine without telling the founder first.
 - Confirmation: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
@@ -43,9 +45,11 @@ the founder overrides one in the conversation.
 
 ## The six organisms and the grid
 
-- Four realms (Compute/AI/Cloud 345, Physics/Robotics/Autonomous 262, Energy/Facility/Industrial 282,
-  Distribution/Specialized 337), the whole tower (656 distinct muscles), and the four stacked (1,226). They share a
-  spine of 190 muscles.
+- Omni v2 (6 Oct): four realms (Compute/AI/Cloud 430, Physics/Robotics/Autonomous 376, Energy/Facility/Industrial 470,
+  Distribution/Specialized 440), the whole tower (945 distinct muscles in 59 families), and the four stacked (1,716). They share
+  a spine of 257 muscles. v1 was 345/262/282/337, 656 and 1,226 with a spine of 190; its results stay v1 results.
+- The organisms are named `tower` and `stack` in code and workflows (never by a count); the old names `organism_656` and
+  `stack_1226` are read as aliases.
 - Each organism runs native and omni at 1, 10, 100 and 1,000 copies × 1, 10, 100 and 1,000 runs: 96 squares, with both
   values shown in every square. 1,000 is the maximum.
 - Benchmark breadth: every domain that can be benchmarked defensibly (`docs/REGISTER.md`), with Omni on top of that

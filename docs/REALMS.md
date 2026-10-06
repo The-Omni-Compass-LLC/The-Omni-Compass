@@ -2,14 +2,14 @@
 
 > **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Protected by copyright, patents and trademarks: Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).
 
-The 656-muscle tower on modelled plants: four realms and the whole tower as a fifth organism, each run natively and
+The muscle tower on modelled plants (945 muscles in Omni v2, 656 in v1): four realms and the whole tower as a fifth organism, each run natively and
 with Omni-Compass on top, with meters and receipts. Evidence class **S** (simulation).
 
 ## Run it
 
 ```
 pip install -r requirements.txt
-python3 tools/run_realms.py                      # the preregistered run: 656 muscles and 5 organisms, seeds 1000-1009
+python3 tools/run_realms.py                      # the preregistered run: every muscle and 5 organisms, seeds 1000-1009
 python3 tests/test_realms.py                     # the harness's own checks (also inside verify.py)
 ```
 
@@ -20,7 +20,7 @@ contrast), `RUN.json` and `SHA256SUMS.txt` (commit and fingerprints).
 
 | File | What it is |
 |---|---|
-| `realms/catalog.csv` | the 656 muscles: family, name, realm, plant, parameter set, knob |
+| `realms/catalog.csv` | the 945 muscles: family, name, realm, plant, parameter set, knob (v1's 656: `realms/catalog_v1.csv`) |
 | `tools/realms_catalog.py` | the rules that gave each muscle its realm, plant and knob |
 | `realms/plants.py` | the five plants and their native controllers; the four knobs; the capacity law for one plant |
 | `realms/presets.py` | every parameter, one set per family class |

@@ -12,12 +12,12 @@ The full manual: the book `docs/OMNI_COMPASS_MANUAL.pdf` (built by `python3 docs
 | The compass (new engine layer) | `omnicompass/compass_law.py` | one smooth law for every muscle: pull to the middle of the band, push against drift, tanh-bounded, fail up past 95%; and the plug (cover, one restore point, foreign-writer rule) |
 | Two-wire GPU governor | `omni_controller/gpu_compass.py` | the compass on a real card: clock ceiling (`nvidia-smi -lgc`, up wire) and power limit (`-pl`, down wire) |
 | Wire check | `tools/gpu_wire_check.py` | proves both card wires follow, read back and go home before anything runs |
-| Realm muscles under the compass | `realms/compass_arm.py` | the compass on every one of the 656 modelled muscles |
+| Realm muscles under the compass | `realms/compass_arm.py` | the compass on every one of the modelled muscles |
 
 ## The six organisms
 
-1 Compute (345 muscles) · 2 Physics (262) · 3 Energy (282) · 4 Distribution (337) · 5 the four stacked with every
-duplicate kept (1,226) · 6 the whole tower, every muscle once (656). Each is run native, then with Omni on top.
+1 Compute (430 muscles) · 2 Physics (376) · 3 Energy (470) · 4 Distribution (440) · 5 the four stacked with every
+duplicate kept (1,716) · 6 the whole tower, every muscle once (945). (Omni v2; v1 was 345, 262, 282, 337, 1,226 and 656.) Each is run native, then with Omni on top.
 
 ## How to run each benchmark
 

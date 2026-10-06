@@ -12,7 +12,7 @@ Arms, all on the same seed (the same demand, weather, disturbances):
 The governor is omnicompass.adapter.Governor, unchanged (the engine with u = 0, the stack law, the reset).
 
 Single muscle: one plant, one governor reading that plant.
-Organism: all the plants of a realm (or all 656) on one 15 s clock, coupled: the electrical power of compute, motion
+Organism: all the plants of a realm (or the whole tower) on one 15 s clock, coupled: the electrical power of compute, motion
 and process plants is heat in the realm's thermal zones; the organism's load swing is load on its storage sites; the
 zones' temperature is the ambient every other plant reports. One governor reads the organism's aggregate and its one
 directive sets every muscle's knob.
@@ -47,6 +47,26 @@ T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8:
 
 def catalog(path=None) -> List[dict]:
     return list(csv.DictReader((Path(path) if path else ROOT / "realms" / "catalog.csv").open()))
+
+
+# the six organisms: the four realms, the whole tower (every muscle once) and the stack (the four realms on one clock,
+# every duplicate kept). Nothing is named by a count: the v1 names carried one and are read as aliases.
+TOWER, STACK = "tower", "stack"
+ORGANISM_ALIAS = {"organism_656": TOWER, "tower_656": TOWER, "stack_1226": STACK}
+
+
+def organism_name(name: str) -> str:
+    return ORGANISM_ALIAS.get(name, name)
+
+
+def organism_sizes(rows=None) -> dict:
+    """{organism: muscles} for the six, from the catalog."""
+    rows = rows or catalog()
+    realms = ("compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized")
+    sizes = {r: sum(1 for x in rows if r in x["realms"].split(";")) for r in realms}
+    sizes[STACK] = sum(sizes.values())
+    sizes[TOWER] = len(rows)
+    return sizes
 
 
 def seed_for(muscle_id: str, seed: int) -> int:

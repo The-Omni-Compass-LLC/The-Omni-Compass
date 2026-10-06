@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""Build realms/catalog.csv: the 656-row muscle tower, each row given its realm, its plant, and the knob Omni may hold.
+"""The rules of the muscle catalog (realm, membership, plant, preset, knob), and the v1 build of the 656-row tower.
+Omni v2 builds realms/catalog.csv with tools/realms_catalog_v2.py, which imports these rules unchanged.
 
-  python3 tools/realms_catalog.py CANONICAL_656_TOWER.csv
+  python3 tools/realms_catalog.py CANONICAL_656_TOWER.csv      # the v1 build (kept for the record)
 
 The tower itself (muscle id, family, name) comes unchanged from the XPASS package's canonical 656 list. This tool adds
 four columns by the fixed rules below; the result is committed as data, so every row can be read and contested:
@@ -71,6 +72,20 @@ FAMILY = {
     "Commerce & Payment Systems": (R4, "compute_pool", "commerce"),
     "Workflow, Logistics & Fulfillment": (R4, "compute_pool", "workflow"),
     "Telecom RAN & Edge Radio": (R4, "compute_pool", "ran"),
+    # Omni v2, wave 4 (realms/wave4_families.csv): the domains the tower did not cover
+    "Healthcare Critical Environments": (R3, "thermal_zone", "hospital"),
+    "Medical Imaging & Clinical Systems": (R4, "compute_pool", "clinical"),
+    "Agriculture & Irrigation": (R3, "process_loop", "irrigation"),
+    "Oil & Gas Pipelines": (R3, "process_loop", "pipeline"),
+    "Rail Traction & Train Control": (R2, "motion_axis", "rail_traction"),
+    "Marine Propulsion & Vessel Automation": (R2, "motion_axis", "marine_propulsion"),
+    "Ports & Maritime Logistics": (R4, "compute_pool", "port"),
+    "Mining & Mineral Processing": (R3, "process_loop", "mill"),
+    "District Heating & Cooling": (R3, "process_loop", "district_heat"),
+    "Power Generation & Turbine Control": (R3, "process_loop", "turbine"),
+    "Renewable Generation & Inverter Control": (R3, "process_loop", "inverter"),
+    "Elevators & Vertical Transport": (R2, "motion_axis", "elevator_hoist"),
+    "Pharmaceutical & Food Manufacturing": (R3, "process_loop", "batch_reactor"),
 }
 
 # the shared spine: in every realm's organism, as every real stack runs on it
@@ -116,7 +131,12 @@ KNOB = {
 
 # names the rules above would place wrongly, set by hand
 OVERRIDE = {"node_power_on": "capacity", "erasure_code_profile": "capacity", "thermal_throttle_policy": "power",
-            "energy_recovery_target": "power", "microgrid_emergency_reserve": "setpoint", "jerk_limit": "capacity"}
+            "energy_recovery_target": "power", "microgrid_emergency_reserve": "setpoint", "jerk_limit": "capacity",
+            # wave 4 names the rules would place wrongly
+            "lab_analyzer_batch_window": "admission", "clinical_backup_window": "admission", "reefer_plug_power_budget": "power",
+            "shore_power_connection_capacity": "capacity", "vessel_arrival_pacing": "admission", "equipment_charging_window": "admission",
+            "cathodic_protection_voltage": "setpoint", "tracker_stow_mode": "admission", "noise_mode_schedule": "admission",
+            "acceleration_limit": "capacity", "regen_drive_mode": "power"}
 
 
 def knob_for(template, name):

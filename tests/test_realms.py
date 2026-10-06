@@ -23,9 +23,16 @@ from realms.presets import PRESETS  # noqa: E402
 
 
 def main():
+    import json
     rows = catalog()
-    assert len(rows) == 656, len(rows)
-    assert len({r["muscle_id"] for r in rows}) == 656
+    prov = json.loads((ROOT / "realms" / "catalog_provenance.json").read_text())
+    assert prov["version"] == "omni-v2" and prov["v1_rows"] == 656
+    assert len(rows) == prov["rows"] == prov["v1_rows"] + prov["study_rows_added"] + prov["wave4_rows"], len(rows)
+    assert len({r["muscle_id"] for r in rows}) == len(rows) and len({r["muscle"] for r in rows}) == len(rows)
+    assert len(prov["wave4_families"]) == 13 and len({r["family"] for r in rows}) == 46 + 13
+    v1 = {r["muscle_id"]: r for r in __import__("csv").DictReader((ROOT / "realms" / "catalog_v1.csv").open())}
+    assert all(dict(v1[r["muscle_id"]]) == dict(r) for r in rows if r["muscle_id"] in v1) and len(v1) == 656, \
+        "every v1 muscle is in v2 byte for byte"
     assert all(r["realm"] in r["realms"].split(";") for r in rows)
     assert set(Counter(r["realm"] for r in rows)) == {"compute_ai_cloud", "physics_robotics_autonomous",
                                                       "energy_facility_industrial", "distribution_specialized"}
@@ -67,7 +74,8 @@ def main():
     assert label([c(-0.002, -0.05, -1.0), c(-0.003, -0.05, -1.2), c(-0.002, -0.05, -0.9)]) == "WORSE"   # work lost: worse
     assert label([c(0.01, 0.0, 0.0), c(-0.01, 0.0, 0.0), c(0.0, 0.0, 0.0)]) == "NONINFERIOR / INCONCLUSIVE"
     assert label([c(0.05, 0.0, 0.0)] * 3, valid=False) == "INVALID"
-    print("PASS test_realms: catalog 656, watch = native, kill hands back, deterministic, nervous-system capacity rule, labels")
+    print(f"PASS test_realms: catalog {len(rows)} (v2: the 656 of v1 byte for byte + {prov['study_rows_added']} study-found + "
+          f"{prov['wave4_rows']} in 13 new families), watch = native, kill hands back, deterministic, nervous-system capacity rule, labels")
 
 
 if __name__ == "__main__":

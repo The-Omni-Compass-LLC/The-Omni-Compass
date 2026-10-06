@@ -92,6 +92,57 @@ PRESETS = {
     "feeder_voltage": dict(dt=10.0, sub=10, tau=5.0, K=1.0, theta=1.0, sp=1.0, mid=1.0, half=0.05, calm=0.97,
                            stress=1.0, u_max=2.0, aff=1.0, p_max_w=500e3, kp=1.0, ki=0.5, d_mean=0.1, d_amp=0.5,
                            noise=0.005),
+    # Omni v2, wave 4 of the realm study (docs/REALMS_PREREGISTRATION.md): thirteen new families, one preset each. Round
+    # engineering figures for the class of machine, as above; none is a measurement of any product.
+    # thermal_zone: a hospital's critical rooms (tighter band, smaller plant than a data hall)
+    "hospital": dict(dt=60.0, sub=12, c_j_k=6.0e6, ua=1500.0, q_it_w=80e3, it_amp=0.25, noise=0.04, units=4,
+                     q_unit_w=40e3, p_unit_w=1.0e3, t_set=21.0, t_limit=24.0, calm=22.5, stress=20.5, t_out=28.0,
+                     t_out_amp=6.0, start_frac=0.25, eta=0.40, approach=10.0, kp=20e3, ki=80.0),
+    # compute_pool: clinical systems (imaging archives, records, interface engines: a strict line, a daytime swing)
+    "clinical": dict(_CP, mu=40.0, slo_s=1.0, startup_steps=6, n0=4, p_idle=80.0, p_dyn=150.0, lam0=120.0, diurnal=0.5,
+                     burst_p=0.015, burst_max=1.2),
+    # compute_pool: a container terminal's cranes and vehicles taking moves from a queue (a move is a job; pausable)
+    "port": dict(_CP, pausable=1, mu=0.02, slo_s=1800.0, startup_steps=2, n0=8, n_min=2, n_max=40, p_idle=15e3,
+                 p_dyn=150e3, lam0=0.1, diurnal=0.3, burst_p=0.01, burst_max=1.0, queue_limit_s=7200.0),
+    # process_loop: pumps and pressure in a field or a greenhouse (a daily cycle, a fast loop)
+    "irrigation": dict(dt=10.0, sub=10, tau=60.0, K=1.0, theta=5.0, sp=1.0, mid=1.0, half=0.2, calm=0.9, stress=1.0,
+                       u_max=3.0, aff=3.0, p_max_w=90e3, kp=1.2, ki=0.03, d_mean=0.5, d_amp=0.5, noise=0.03),
+    # process_loop: a pipeline segment (line pack is slow, compressor power goes as the cube)
+    "pipeline": dict(dt=30.0, sub=10, tau=600.0, K=1.0, theta=30.0, sp=1.0, mid=1.0, half=0.1, calm=0.95, stress=1.0,
+                     u_max=2.5, aff=3.0, p_max_w=5e6, kp=1.5, ki=0.005, d_mean=0.5, d_amp=0.3, noise=0.02),
+    # process_loop: a grinding and flotation circuit (mill power goes roughly as the square of the drive setting)
+    "mill": dict(dt=10.0, sub=10, tau=120.0, K=1.0, theta=10.0, sp=1.0, mid=1.0, half=0.15, calm=0.93, stress=1.0,
+                 u_max=2.0, aff=2.0, p_max_w=10e6, kp=2.0, ki=0.02, d_mean=0.5, d_amp=0.25, noise=0.03),
+    # process_loop: a district heating network (half an hour of thermal inertia, a strong daily swing)
+    "district_heat": dict(dt=60.0, sub=10, tau=1800.0, K=1.0, theta=120.0, sp=1.0, mid=1.0, half=0.15, calm=0.9,
+                          stress=1.0, u_max=2.0, aff=2.0, p_max_w=20e6, kp=1.0, ki=0.001, d_mean=0.5, d_amp=0.6,
+                          noise=0.02),
+    # process_loop: a generating unit's steam, speed or gate loop (fast, tight band, near-linear fuel-to-power)
+    "turbine": dict(dt=5.0, sub=10, tau=20.0, K=1.0, theta=2.0, sp=1.0, mid=1.0, half=0.05, calm=0.97, stress=1.0,
+                    u_max=2.0, aff=1.2, p_max_w=300e6, kp=3.0, ki=0.2, d_mean=0.4, d_amp=0.3, noise=0.01),
+    # process_loop: a plant of grid-support inverters or turbines (very fast, the resource itself the disturbance)
+    "inverter": dict(dt=5.0, sub=10, tau=2.0, K=1.0, theta=0.2, sp=1.0, mid=1.0, half=0.05, calm=0.97, stress=1.0,
+                     u_max=1.5, aff=1.0, p_max_w=5e6, kp=2.0, ki=1.0, d_mean=0.3, d_amp=0.5, noise=0.02),
+    # process_loop: a GMP batch reactor, fermenter or food process (slow, very tight band, small disturbance)
+    "batch_reactor": dict(dt=10.0, sub=10, tau=600.0, K=1.0, theta=20.0, sp=1.0, mid=1.0, half=0.05, calm=0.98,
+                          stress=1.0, u_max=3.0, aff=1.0, p_max_w=200e3, kp=4.0, ki=0.01, d_mean=0.5, d_amp=0.1,
+                          noise=0.005),
+    # motion_axis: a train's traction axis (the EV axis scaled tenfold in inertia, torque and gains; the same dynamics)
+    "rail_traction": dict(dt_dec=5.0, dt=0.02, J=16000.0, b=250.0, kt=400.0, R=0.005, tau_max=60000.0, p_idle=3000.0,
+                          D=2500.0, v_max=12.0, a_max=1.0, dwell=20.0, tol=2.0, e_max=5.0, c_th=50000.0, r_th=0.01,
+                          t_amb=25.0, t_lim=150.0, kp=8000.0, kd=18000.0, ki=50.0, i_max=10.0, task_rate=1.0 / 300.0,
+                          dist=3000.0, load_bias=0.0, regen=0.7, deadline_s=600.0),
+    # motion_axis: a ship's propulsion shaft (large inertia, heavy drag, a standing hull load)
+    "marine_propulsion": dict(dt_dec=10.0, dt=0.05, J=50000.0, b=3000.0, kt=2000.0, R=0.005, tau_max=500000.0,
+                              p_idle=50000.0, D=600.0, v_max=10.0, a_max=0.05, dwell=60.0, tol=2.0, e_max=5.0,
+                              c_th=50000.0, r_th=0.002, t_amb=30.0, t_lim=120.0, kp=25000.0, kd=56000.0, ki=100.0,
+                              i_max=50.0, task_rate=1.0 / 900.0, dist=50000.0, load_bias=10000.0, regen=0.0,
+                              deadline_s=3600.0),
+    # motion_axis: an elevator hoist (a stiff position loop, a counterweighted load, regeneration on the way down)
+    "elevator_hoist": dict(dt_dec=1.0, dt=0.005, J=20.0, b=2.0, kt=8.0, R=0.3, tau_max=2500.0, p_idle=300.0, D=60.0,
+                           v_max=8.0, a_max=1.5, dwell=8.0, tol=0.02, e_max=0.2, c_th=2000.0, r_th=0.3, t_amb=30.0,
+                           t_lim=110.0, kp=3000.0, kd=500.0, ki=50.0, i_max=1.0, task_rate=1.0 / 40.0, dist=100.0,
+                           load_bias=0.0, regen=0.5, deadline_s=120.0),
 }
 
 # the parameter that sets each plant's size

@@ -2,7 +2,7 @@
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
 name: realms
-# The 656-muscle tower on GitHub's own machine: every muscle alone and the five organisms (each realm and the whole tower),
+# The muscle tower on GitHub's own machine: every muscle alone and the five organisms (each realm and the whole tower),
 # native against Omni-Compass on top, on the preregistered seeds (docs/REALMS_PREREGISTRATION.md, round 3).
 # The run is deterministic: every label in its MUSCLES.csv must match the one committed in results/realms/, and every
 # number to 1e-3 or 0.5% (Python versions differ in the last digits), so anyone can check the published table. Started by hand (Actions -> realms -> Run workflow) or by a commit message containing [realms].
@@ -31,7 +31,8 @@ jobs:
           python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import csv, sys
           a = list(csv.DictReader(open("realms-out/MUSCLES.csv"))); b = list(csv.DictReader(open("results/realms/MUSCLES.csv")))
-          assert len(a) == len(b) == 656
+          import json; n = json.load(open("realms/catalog_provenance.json"))["rows"]
+          assert len(a) == len(b) == n, (len(a), len(b), n)
           bad = []
           for x, y in zip(a, b):
               for k in x:
@@ -42,7 +43,7 @@ jobs:
                       ok = x[k] == y[k]
                   if not ok:
                       bad.append((x["muscle"], k, x[k], y[k]))
-          print(f"published table reproduced: 656 muscles, {len(bad)} differences beyond 1e-3 (or 0.5%), labels identical: {not any(k == 'label' for _, k, _, _ in bad)}")
+          print(f"published table reproduced: {n} muscles, {len(bad)} differences beyond 1e-3 (or 0.5%), labels identical: {not any(k == 'label' for _, k, _, _ in bad)}")
           for d in bad:
               print("  differs:", d)
           sys.exit(1 if bad else 0)

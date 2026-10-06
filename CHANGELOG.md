@@ -8,6 +8,22 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- **Omni v2** (`OMNI_V2.json`, `docs/OMNI_V2.md`; the founder's order: make v2, add every missing muscle family, don't be
+  cheap). The law, the controllers and the runners are v1's byte for byte. The catalog (`realms/catalog.csv`, built by
+  `tools/realms_catalog_v2.py` from `realms/catalog_v1.csv`, `docs/realm_study/TRUE_MUSCLES.csv` and the new
+  `realms/wave4_families.csv` by the v1 rules) grows from 656 muscles in 46 families to 945 in 59: the 656 of v1 byte for
+  byte, 118 real controls the realm study had found and the tower lacked, and 171 muscles in thirteen new families with
+  one new preset each (`realms/presets.py`): hospitals' critical rooms, clinical systems, farms and irrigation, oil and
+  gas pipelines, rail traction, marine propulsion, ports, mining, district heating and cooling, power generation,
+  renewables and inverters, elevators, pharmaceutical and food plants. Every added muscle names its real system, its
+  setting and its source. The organisms: Compute 430, Physics 376, Energy 470, Distribution 440, the stack 1,716, the
+  tower 945, the spine 257. The two whole-tower organisms are named `tower` and `stack` in code and workflows (nothing is
+  named by a count); `organism_656` and `stack_1226` are read as aliases, so every v1 record still reads. Every added
+  muscle was run through the harness before the freeze (deterministic, watch equals native, every knob handed back, Omni
+  never more often outside its band than native); two presets were adjusted on that check and the adjustment is written
+  into `docs/REALMS_PREREGISTRATION.md`. `tools/omni_version.py` now prints omni-v2, omni-v1, or what differs; the
+  three-run tables accept either fingerprint and refuse to mix them. Every modelled result is to be run again on v2;
+  v1's tables stay v1's.
 - Databases, preregistered and built (`docs/POSTGRES_PREREGISTRATION.md`, `tools/run_pgbench.py`,
   `.github/workflows/pgbench.yml`, `tests/test_run_pgbench.py` run by `verify.py`): PostgreSQL 16 as the distribution
   ships it behind PgBouncer 1.22 with the pool of 20 server connections it ships with (the DBA's one fixed setting) is
