@@ -8,19 +8,31 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Rerun everything:** `pip install -r requirements.txt && python verify.py` ends with `VERIFICATION: PASS`.
 
-## In one paragraph (2026-10-05, the frozen engine)
+## In one paragraph (2026-10-05; the numbers are the engine before v1, the v1 reruns are in progress)
 
 Omni-Compass sits on top of Kubernetes and hardware and gets more out of what is already there. On real Kubernetes,
-one frozen engine (rules 1-8), ten pairs per test, native against compass with the same work sent to both:
+the engine before v1 (the live controller at rules 1-8, commit `353903683009`), ten pairs per test, native against
+compass with the same work sent to both:
 **41.7% more work handled inside the response line on the same machines** (capacity, all four in one run), responses
 **59-64% faster** at the 95th percentile (steady, wandering, all four, faults), 12% fewer failed requests where load
 swings, energy equal or lower, and not one pod left without a machine. Machines: up to 2% fewer. Omni gives a machine
 back only when a paired trial shows the service no slower without it, and on these clusters one machine fewer made
 requests 30-45% slower in most trials, so it kept them and spent them on speed and work (earlier engines without that
 check parked 29-36%: `docs/history/`). All of it together, real machines only: **the Omni index +12.9%**
-(`results/OMNI_INDEX.md`). Running now on the same engine: the batch test, the six organisms at 1, 10, 100 and 1,000
-copies with the real cluster inside, the Azure burst and steady bill tests, and the two big organisms on rented Azure
-machines.
+(`results/OMNI_INDEX.md`).
+
+**Omni v1** (`docs/OMNI_V1.md`): the engine is frozen and fingerprinted (`OMNI_V1.json`), and every test above runs
+three times on it, as separate GitHub runs (A the result, B and C the replications); each table reads confirmed better,
+confirmed worse, no difference beyond the noise, or the runs disagree, and replaces the earlier engine's table as it
+lands. Running on v1 now: the Kubernetes suite three times, the batch test, the six organisms at 1, 10, 100 and 1,000
+copies with the real cluster inside, the big organisms on rented Azure machines, the Azure steady and burst bill tests,
+CityLearn, and the power grid.
+
+**What is shown and what is not.** Shown: more work inside the response line on the same machines (34-52% across the
+three capacity runs on earlier engines) and a faster tail, on real Kubernetes. Not yet shown: an energy or cloud-bill
+saving on real machines. On kind the machines are containers on one runner, so a machine out of service saves modelled
+watts, not a metered bill, and Azure's bill did not move on the earlier engine (`results/live/AKS_BILL.md`); the v1 Azure
+runs are the test of that. The current card governor has not run on a real GPU.
 
 The card: the first real run (NVIDIA A10, 2026-10-02) used a card controller since replaced; it is not a result to
 stand on. In simulation the current controller (amendment 12) is clearly faster under an operator's power cap (p95

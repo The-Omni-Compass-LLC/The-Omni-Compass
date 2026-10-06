@@ -74,3 +74,32 @@ a million reads "same".
 transformer, the hand-back included. Native SimBench grids barely tap, about 4 a year, so the count will read WORSE. It
 is reported as measured, next to the energy, never hidden. For scale, a substation tap changer is built for hundreds of
 thousands of operations.
+
+## The wiring check, before any confirmation grid is read (2026-10-05)
+
+Written after the tuning grid and before any untouched grid's result was looked at, as the founder asked: if Omni comes
+out behind, the first suspect is our own wiring, not Omni. Three things were checked on the runner (`tools/run_pandapower.py`)
+against pandapower's own grid data, and what was found is recorded here whether or not it flatters Omni.
+
+1. **Omni reaches the right knob, the right way.** One tap step up on the substation transformer lowers the
+   medium-voltage busbar by 1.55% on every one of the four grid types (the SimBench transformers' tap step), so the sign
+   and the size of the move are right, and nothing is clipped or ignored on the way. Both parallel transformers of the
+   substation are controlled together and both are counted in the tap operations, so the count is not understated.
+2. **Native runs as a utility runs it.** The native arm is the grid exactly as SimBench ships it, with its own tap
+   position held for the year; it is not weakened to make Omni look better or worse.
+3. **The simulator scores right.** The energy balance closes at every step (generation equals load plus losses plus net
+   import, to about a billionth of a megawatt) once solar on a load bus was accounted as generation rather than a
+   voltage-dependent load (that fix is in the runner and applies to both arms alike).
+
+Two things found that do not change the rules, stated so a reader knows them:
+
+- Omni's margin reading includes the high-voltage bus, which is fixed at 1.025 per unit and cannot be moved by the tap.
+  It never binds (the medium-voltage buses always sit closer to a limit), so it changes no decision. Harmless, and left
+  as frozen rather than changed after the fact.
+- On the grid the compass's force decides only *when* to step down; the guard rules (a whole week of margin before a
+  step, one whole tap per move, an immediate step back up when any bus nears a limit, the hand-back at 90% of the year)
+  decide everything else. That is less of the law and more of the guard than on Kubernetes, and the report says so.
+
+The tap-operation count stays as frozen above (about 8 a year against native's about 4). Capping Omni at 4 after seeing
+the tuning grid would be tuning on the test; the cost was declared before the untouched grids ran and is reported next to
+the energy, never hidden.

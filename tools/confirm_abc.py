@@ -24,6 +24,8 @@ from pilot.bench_report import LOWER_BETTER
 from tools.live_reps import KEYS, LABEL, NEUTRAL, SAME_REL
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
+CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge, higher is better)"
+HIGHER_BETTER = {CAPACITY}
 
 
 def load(d):
@@ -38,7 +40,13 @@ def load(d):
     run = Path(d).resolve().name.replace("run-", "")
     reps = j.get("repetitions") or {}
     n = len(set(reps.get("native", [])) & set(reps.get(arm, []))) if isinstance(reps, dict) else reps
-    return run, j["paired"][arm], n
+    paired = dict(j["paired"][arm])
+    cap = j.get("capacity")                                # the capacity test (a rising load): its own block in the run file
+    if cap and arm in cap and "capacity_rps" in cap.get("native", {}):
+        nat, om = cap["native"]["capacity_rps"], cap[arm]["capacity_rps"]
+        paired[CAPACITY] = {"native": nat, "omni": om, "diff": om - nat, "ci95": list(cap[arm]["ci95"]),
+                            "significant": cap[arm]["ci95"][0] > 0 or cap[arm]["ci95"][1] < 0}
+    return run, paired, n
 
 
 def cell(r):
@@ -66,6 +74,8 @@ def verdict(k, rs):
     lower = signs[0] == -1
     if k in LOWER_BETTER:
         return "**confirmed better**" if lower else "**confirmed WORSE**"
+    if k in HIGHER_BETTER:
+        return "**confirmed WORSE**" if lower else "**confirmed better**"
     return f"confirmed {'lower' if lower else 'higher'}"
 
 
@@ -108,7 +118,7 @@ def main(argv=None):
         L[2:2] = [f"**Not a v1 confirmation: {'; '.join(off)}.** The readings below compare runs on different engines.", ""]
     L += ["", "| Measure | A | B | C | Reading |", "|---|---|---|---|---|"]
     tally = {}
-    for k in KEYS:
+    for k in [CAPACITY] + KEYS:
         rs = [p.get(k) for _, p, _ in runs]
         if any(r is None for r in rs):
             continue

@@ -8,6 +8,18 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- CityLearn's A/B/C table by rule (`tools/citylearn_abc.py`; `tests/test_citylearn_abc.py`, run by `verify.py`). CityLearn is a
+  deterministic simulator, so the three runs must reproduce each other: a score reads confirmed better or confirmed worse
+  by its sign when they do, same under one part in a million, and "the runs differ" when they do not, which is a finding
+  about the simulator or the harness. Two things the first v1 run showed, now stated in the table rather than hidden in a
+  per-district reading: a district with no electric battery gets nothing from Omni (the runner moves only
+  `electrical_storage` commands; the Quebec districts' comfort score still differs between the arms, which is CityLearn's
+  own run-to-run variation, not an Omni result), and the 2023 challenge districts come out worse on the bill (+0.2 to
+  +0.35%), ramping (+4.5 to +6.2%) and energy not served (+2 to +10%) while better on daily peak and electricity bought.
+  Eight districts CityLearn's own controller cannot run are listed with CityLearn's error.
+- The confirmation table carries the capacity test's own gauge as a judged row: work inside the response line (requests a
+  second, higher is better), read from the run file's capacity block with its interval. The first v1 all-four run reads
+  18.6 → 27.6 requests a second, +48.4% (+6.0 to +12.0 requests a second), p95 −63.2%, time over the line −40.0%.
 - The A/B/C confirmation table is made by rule (`tools/confirm_abc.py`; `tests/test_confirm_abc.py`, run by `verify.py`):
   three separate GitHub runs on the same frozen engine, each checked against the v1 fingerprint. Every judged row gets
   one of three readings: confirmed better or confirmed worse (the same sign in all three, every 95% interval clear of

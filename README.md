@@ -11,8 +11,10 @@ never replaces native; every comparison below is native against omni.
 
 ## The result
 
-Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, one frozen engine (the live
-controller at rules 1-8, commit `353903683009`):
+Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, measured on the engine before v1 (the
+live controller at rules 1-8, commit `353903683009`). Omni v1 ([`docs/OMNI_V1.md`](docs/OMNI_V1.md)) runs every one of
+these tests three times on one frozen engine; those tables replace this one as they land, and until then every number
+here is the earlier engine's:
 
 | | native | omni | Reading |
 |---|---:|---:|---|
@@ -20,13 +22,22 @@ controller at rules 1-8, commit `353903683009`):
 | **Response time, 95th percentile** (steady, wandering, all four, faults) | 326-741 ms | 117-273 ms | **59-64% faster** |
 | **Failed requests** | 0-9.9% | 0-8.6% | none lost at steady load; 12% fewer where load swings |
 | **Machines in service** | 5.92-6 | 5.88-6 | **up to 2% fewer** |
-| **Energy** | | | **equal or lower** in every test |
+| **Energy** | | | **equal or lower** in every test, as a declared model: on kind the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill |
 | **Pods left with no machine to take them** | 0 | 0 | none, in any of these five tests |
 
 Omni gives a machine back only after a paired trial shows the service is no slower without it (the verdict). On these
 clusters one machine fewer made each request 30-45% slower in most trials, so Omni kept the machines and spent them on
 speed and work. Earlier engines without that check parked 29-36% of the machines (`docs/history/`); the frozen engine
 puts work and speed first.
+
+**What this does and does not show.** The product gain measured so far is more work inside the response line on the same
+machines, 34-52% across the three capacity runs on earlier engines ([`CAPACITY`](results/live/CAPACITY.md) +34.1%,
+[`CAPACITY_2`](results/live/CAPACITY_2.md) +51.9%, [`ALL_FOUR`](results/live/ALL_FOUR.md) +41.7%), with a faster tail; the
+v1 runs give one engine's number three times. Not yet shown: an energy or cloud-bill saving on real machines (Azure's bill
+did not move on the earlier engine, [`AKS_BILL`](results/live/AKS_BILL.md); the v1 Azure runs are in progress), and the
+current card governor on a real GPU (the one real-card run, on the governor since replaced, saved 1.6-3.5% of the card's
+energy and made its 95th percentile 43-84% slower:
+[`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
 **The Omni index, every real test together: +12.9%** more for the same, or the same for less, across work, speed,
 machines and energy (real Kubernetes +18.5%; Azure +7.5%, measured on an earlier engine, its rerun running). Every

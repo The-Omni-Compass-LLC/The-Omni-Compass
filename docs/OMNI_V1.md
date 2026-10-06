@@ -50,15 +50,18 @@ result is run again on it. No result is ever read across versions.
 
 | Result | Ran on | v1? | v1 run |
 |---|---|---|---|
-| Kubernetes: steady, wandering, all four, fairness, faults (`results/live/*.md`) | `3539036` | no | replication A, dispatched on `f162ce8` |
-| Kubernetes: batch queue | `a0ebaff` | no | replication A, dispatched |
+| Kubernetes: fairness (`results/live/FAIRNESS.md`) | `3539036` | no | **A, B, C done: [`V1_FAIRNESS.md`](../results/live/V1_FAIRNESS.md)** |
+| Kubernetes: faults (`results/live/FAULTS.md`) | `3539036` | no | **A, B, C done: [`V1_FAULTS.md`](../results/live/V1_FAULTS.md)** |
+| Kubernetes: steady (`results/live/STEADY.md`) | `3539036` | no | A and C done, B finishing its last pair; table to follow |
+| Kubernetes: wandering, all four (`results/live/WANDERING.md`, `ALL_FOUR.md`) | `3539036` | no | A and B done, C running; tables to follow |
+| Kubernetes: batch queue (`results/live/BATCH.md`) | `a0ebaff` | no | A and B done, C running; table to follow |
 | Kubernetes: the six organisms with the real cluster inside (1 to 1,000 copies) | `a004a8f` | **yes** | running (run 37359815637) |
 | Kubernetes: the big organisms | `a004a8f` | **yes** | running (run 37359820055) |
 | Azure AKS steady (`AKS_BILL.md`) | `5b2832f` | no | dispatched after the running burst |
 | Azure AKS burst | `8199e3a` | no | queued after v1 steady |
-| The 656 muscles and six organisms, modelled (`results/realms/`) | `9c5d417` | **yes** | replication B to run |
+| The 656 muscles and six organisms, modelled (`results/realms/`) | `9c5d417` | **yes** | **A, B, C done**: runs 37359815637's realms check, 37385660330 and 37393204931 each reproduced the published table byte for byte (a deterministic model: reproduced in 3 of 3) |
 | The organisms at 1 / 10 / 100 / 1,000 copies, modelled (`results/scale/GRID.md`) | `a8548b6` | no | to run after the six-kube queue clears |
-| CityLearn, every district | `ac39b16` | no | replication A, dispatched |
+| CityLearn, every district | `ac39b16` | no | A done (run 37384954241: 12 districts ran, 3 have no battery to move, 8 CityLearn cannot run), B running, C to follow; table by `tools/citylearn_abc.py` |
 | Power grid, pandapower and SimBench | `8eab01c` | **yes** | running (run 37377029333) |
 | GPU, one card and the card in the organisms | earlier card controller | no | new runs on real cards (founder) |
 | Muscle studies, power budgets, PlanetLab fleet, tower off and on | September engines | no | marked old |
@@ -88,6 +91,9 @@ python3 tools/confirm_abc.py "Steady load" results/live/raw/run-<A> results/live
 ```
 
 It checks each run's commit against the v1 fingerprint, and heads the table with a warning if any run is not v1 or if the
-three are not separate runs. `tests/test_confirm_abc.py`, run by `verify.py`, proves the rule: an interval over zero
+three are not separate runs. CityLearn has its own table (`tools/citylearn_abc.py`): the simulator is deterministic, so
+its three runs must reproduce each other, and a score reads confirmed better or worse by its sign when they do, same under
+one part in a million, and "the runs differ" when they do not; a district with no electric battery is listed as nothing
+for Omni to move, and a district CityLearn cannot run is listed with CityLearn's own error. `tests/test_confirm_abc.py`, run by `verify.py`, proves the rule: an interval over zero
 reads no difference beyond the noise, a flipped sign clear of the noise reads disagreement, a rounding-level change reads
 same, and a loss in all three reads WORSE.
