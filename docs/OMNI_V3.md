@@ -39,7 +39,7 @@ speed knobs, so it slowed an axis with no slack. The gate is an engine change, s
 
 | Result | v2 | v3 |
 |---|---|---|
-| The muscles and six organisms, modelled | A, B, C done (`results/realms/REALMS.md`), 0 worse, Physics and the tower a service tradeoff | **to run: A, B, C** (workflow `realms`) |
+| The muscles and six organisms, modelled | A, B, C done ([`results/realms/v2/REALMS.md`](../results/realms/v2/REALMS.md)), 0 worse, Physics and the tower a service tradeoff | **A, B, C done** (runs 37429141430, 37429151263, 37429161515; reproduced to the last digit in 3 of 3): [`results/realms/REALMS.md`](../results/realms/REALMS.md); 945 muscles, 0 worse, **every organism superior within guardrails** (work per energy +0.1% to +0.3%, work unchanged, time over the line not above native's) |
 | The organisms at 1 / 10 / 100 / 1,000 copies | not run | to run (workflow `six`) |
 | Kubernetes: the six organisms with the real cluster inside | not run | to run (workflow `six-kube`) |
 | Kubernetes: the big organisms on Azure | not run | to run after the v1 run finishes |

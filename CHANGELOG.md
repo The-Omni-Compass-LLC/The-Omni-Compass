@@ -24,6 +24,15 @@
   into `docs/REALMS_PREREGISTRATION.md`. `tools/omni_version.py` now prints omni-v2, omni-v1, or what differs; the
   three-run tables accept either fingerprint and refuse to mix them. Every modelled result is to be run again on v2;
   v1's tables stay v1's.
+- **The v3 realms table** (`results/realms/`; runs 37429141430, 37429151263 and 37429161515 on the v3 fingerprint, A, B
+  and C reproduced to the last digit; v2's table moved to `results/realms/v2/`): 945 muscles, 0 worse; 124 superior
+  within guardrails, 807 no difference beyond the noise, 9 energy improvement with a service tradeoff (all of them
+  v1's), 4 service improvement with an energy tradeoff, 1 not established (hoist_speed_target (elevator_hoist, capacity)). **Every organism superior within
+  guardrails**: work per energy Compute +0.1%, Physics +0.1%, Energy +0.3%, Distribution +0.2%, the whole tower +0.3%;
+  work unchanged; time over the line not above native's in any organism. Fourteen rows changed label against v2: the
+  rail, marine, elevator, EV and robot-joint speed muscles the slack gate now leaves native read no difference beyond
+  the noise (two of them had read superior under v2, two of them now read native: that is the price of the gate and it
+  is shown).
 - **Omni v3** (`OMNI_V3.json`, `docs/OMNI_V3.md`; declared in `docs/REALMS_PREREGISTRATION.md` before any v3 run, the
   founder told first). Two changes against v2, both in the modelled realms: the slack gate on speed knobs
   (`realms/compass_arm.py`, `speed_slack`): a motion axis is offered its speed knob only where it is busy at most half

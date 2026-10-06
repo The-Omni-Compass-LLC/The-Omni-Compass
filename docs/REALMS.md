@@ -13,7 +13,7 @@ python3 tools/run_realms.py                      # the preregistered run: every 
 python3 tests/test_realms.py                     # the harness's own checks (also inside verify.py)
 ```
 
-Results (Omni v2; v1's are in `results/realms/v1/`): `results/realms/REALMS.md` (the tables), `MUSCLES.csv` (one row per muscle), `REALMS.json` (every per-seed
+Results (Omni v3; v2's are in `results/realms/v2/`, v1's in `results/realms/v1/`): `results/realms/REALMS.md` (the tables), `MUSCLES.csv` (one row per muscle), `REALMS.json` (every per-seed
 contrast), `RUN.json` and `SHA256SUMS.txt` (commit and fingerprints).
 
 ## What is where
