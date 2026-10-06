@@ -8,6 +8,11 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-06
+- The third v1 A/B/C table, steady load (`results/live/V1_STEADY.md`, runs 37384939815, 37385640601, 37391296025, all
+  on the v1 fingerprint): mean response −47 to −51%, p95 −65 to −69%, time over the line −98 to −99%, machines in service
+  −1.5 to −3.4%, standby-model energy −1.0 to −2.9%, every one confirmed better in all three runs; the idle-power energy
+  model reads no difference beyond the noise in 2 of 3; failed requests zero in both arms. Three of the six Kubernetes
+  tests now have their three runs: steady and faults confirmed better, fairness no difference beyond the noise.
 - CityLearn's A/B/C table by rule (`tools/citylearn_abc.py`; `tests/test_citylearn_abc.py`, run by `verify.py`). CityLearn is a
   deterministic simulator, so the three runs must reproduce each other: a score reads confirmed better or confirmed worse
   by its sign when they do, same under one part in a million, and "the runs differ" when they do not, which is a finding
