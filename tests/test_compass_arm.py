@@ -39,6 +39,21 @@ def main():
     assert xs[-1] >= 0.4 - 1e-12, "never under the cover"
     print(f"compass arm: one compass per muscle, kept across decisions; a calm axis eased from 1.00 to {xs[-1]:.2f} "
           f"over 40 decisions, never under its cover (0.40)")
+
+    # Omni v3: the speed knob is offered only where the axis has slack (duty at full speed at most one half)
+    from realms.compass_arm import lever, speed_slack
+    class Busy(Axis):
+        P = PRESETS["rail_traction"]                            # a train at its timetable's capacity: duty about 0.8
+    class Light(Axis):
+        P = PRESETS["flight_axis"]                              # a flight axis: duty about 0.34
+    assert not speed_slack(Busy()) and lever(Busy(), "capacity") is None, "a loaded axis's speed knob stays native"
+    assert speed_slack(Light()) and lever(Light(), "capacity") is not None, "an axis with slack offers its speed knob"
+    for name, P in PRESETS.items():
+        if "task_rate" in P:
+            class Any(Axis):
+                pass
+            Any.P = P
+            print(f"  speed knob on {name}: {'offered' if speed_slack(Any()) else 'left native (no slack)'}")
     print("PASS test_compass_arm")
 
 

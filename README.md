@@ -12,7 +12,7 @@ never replaces native; every comparison below is native against omni.
 ## The result
 
 Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v1**, the frozen and
-fingerprinted engine ([`docs/OMNI_V1.md`](docs/OMNI_V1.md); since 6 October the engine is Omni v2, [`docs/OMNI_V2.md`](docs/OMNI_V2.md), the same law with the muscle catalog grown to 945, and every modelled result is being run again on it). Every test ran three times as separate GitHub runs (A the
+fingerprinted engine ([`docs/OMNI_V1.md`](docs/OMNI_V1.md); since 6 October the engine is Omni v3, [`docs/OMNI_V3.md`](docs/OMNI_V3.md): the same law, the muscle catalog grown to 945 ([`docs/OMNI_V2.md`](docs/OMNI_V2.md)) and a do-no-harm gate on speed knobs; every modelled result is being run again on it). Every test ran three times as separate GitHub runs (A the
 result, B and C the replications); a reading below is **confirmed** only when it holds in all three runs with every 95%
 interval clear of zero, and otherwise reads no difference beyond the noise. The six tables:
 [`V1_ALL_FOUR`](results/live/V1_ALL_FOUR.md), [`V1_STEADY`](results/live/V1_STEADY.md),
@@ -92,7 +92,7 @@ proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.m
 | For | Read |
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
-| **Omni v2 and v1: the frozen engines, fingerprinted; which version every result ran on; how each is confirmed three times** | [`docs/OMNI_V2.md`](docs/OMNI_V2.md), [`docs/OMNI_V1.md`](docs/OMNI_V1.md), `python3 tools/omni_version.py` |
+| **Omni v3, v2 and v1: the frozen engines, fingerprinted; which version every result ran on; how each is confirmed three times** | [`docs/OMNI_V3.md`](docs/OMNI_V3.md), [`docs/OMNI_V2.md`](docs/OMNI_V2.md), [`docs/OMNI_V1.md`](docs/OMNI_V1.md), `python3 tools/omni_version.py` |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | The method, written before each run | [`docs/K8S_COMPASS_PREREGISTRATION.md`](docs/K8S_COMPASS_PREREGISTRATION.md), [`docs/GPU_PREREGISTRATION.md`](docs/GPU_PREREGISTRATION.md), [`docs/REALMS_PREREGISTRATION.md`](docs/REALMS_PREREGISTRATION.md) |

@@ -2,6 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. Evaluation and simulation use only. See LICENSE.
 
+> **Superseded on 2026-10-06 by Omni v3** (`docs/OMNI_V3.md`, `OMNI_V3.json`): the slack gate on speed knobs and the marine
+> preset, nothing else. The v2 realms table stays a v2 result.
+
 ## What is frozen
 
 Omni v2 is the engine as it stands at the commit that carries `OMNI_V2.json`. It covers the same files as v1

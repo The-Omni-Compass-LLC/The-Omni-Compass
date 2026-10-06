@@ -30,11 +30,15 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine is frozen: Omni v2 (v1 kept for its results)
+## The engine is frozen: Omni v3 (v2 and v1 kept for their results)
 
-- `OMNI_V2.json` and `docs/OMNI_V2.md` (v2 = v1's law, controllers and runners byte for byte, plus the 945-muscle catalog and its
-  thirteen new presets); `OMNI_V1.json` and `docs/OMNI_V1.md` stay for the v1 results. Check with
-  `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v2, omni-v1, or what differs.
+- `OMNI_V3.json` and `docs/OMNI_V3.md` (v3 = v2 plus the slack gate on speed knobs and the marine preset); `OMNI_V2.json`
+  (v2 = v1's law, controllers and runners byte for byte, plus the 945-muscle catalog and its thirteen new presets) and
+  `OMNI_V1.json` stay for their results. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v3,
+  omni-v2, omni-v1, or what differs.
+- The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
+  engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
+  1.0, never as a second product.
 - Any change to a rule, gain or guard makes **v2**, and every result is run again on it. Never read a result across
   versions. Never change the engine without telling the founder first.
 - Confirmation: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three

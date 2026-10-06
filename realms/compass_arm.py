@@ -86,6 +86,24 @@ def effort_cap_saves(plant) -> bool:
     return copper > standing
 
 
+SLACK = 0.5              # a speed knob is offered only where the axis at full speed is busy at most half the time (Omni v3)
+
+
+def speed_slack(plant) -> bool:
+    """Whether the axis has slack to spend on a slower, gentler move at all (Omni v3, docs/REALMS_PREREGISTRATION.md).
+
+    The compass may ease a motion axis down to 0.4 of its speed, which stretches every move by up to 2.5 times. An axis
+    whose duty at full speed, task rate x (move time + dwell), is already above one half has no room for that: tasks
+    arrive in bunches, and a stretched move pushes the next ones past their deadline (a train on its timetable, a lift at
+    rush hour). There the speed knob is left native, as the robot benchmark's paired trial leaves it
+    (docs/ROBOTICS_PREREGISTRATION.md). Computed from the plant's own figures before any decision."""
+    import math
+    P = plant.P
+    v, a, D = P["v_max"], P["a_max"], P["D"]
+    move = 2.0 * math.sqrt(D / a) if D < v * v / a else D / v + v / a
+    return P["task_rate"] * (move + P["dwell"]) <= SLACK
+
+
 def lever(plant, knob):
     """(override key, native value, low, high, sign): sign +1 when a higher value is more capacity."""
     P, t = plant.P, plant.template
@@ -117,7 +135,7 @@ def lever(plant, knob):
     if t == "motion_axis":
         if knob == "power":
             return ("power", 1.0, 0.4, 1.0, 1) if effort_cap_saves(plant) else None
-        return ("capacity", 1.0, 0.4, 1.0, 1)
+        return ("capacity", 1.0, 0.4, 1.0, 1) if speed_slack(plant) else None
     if t == "process_loop":
         if knob == "setpoint":
             lo, hi = min(P["sp"], P["calm"]), max(P["sp"], P["calm"])
