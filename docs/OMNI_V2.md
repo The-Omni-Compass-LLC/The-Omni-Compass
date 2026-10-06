@@ -64,7 +64,7 @@ result is run again on it.
 | Result | v1 | v2 |
 |---|---|---|
 | The muscles and six organisms, modelled | A, B, C done, reproduced byte for byte ([`results/realms/v1/REALMS.md`](../results/realms/v1/REALMS.md)) | **A, B, C done** (runs 37422832244, 37422840154, 37422847697; reproduced to the last digit in 3 of 3): [`results/realms/REALMS.md`](../results/realms/REALMS.md); 945 muscles, 0 worse; Physics and the whole tower read energy improvement with a service tradeoff, carried by three rail traction speed muscles (see the register, row 24) |
-| The organisms at 1 / 10 / 100 / 1,000 copies (`results/scale/GRID.md`) | partly (1,000x at 100 and 1,000 runs beyond the machines) | **to run** (workflow `six`) |
+| The organisms at 1 / 10 / 100 / 1,000 copies (v1: `results/scale/v1/GRID.md`) | partly (1,000x at 100 and 1,000 runs beyond the machines) | **to run** (workflow `six`) |
 | Kubernetes: the six organisms with the real cluster inside | running (37359815637) | **to run** (workflow `six-kube`) |
 | Kubernetes: the big organisms on Azure | running (37359820055) | **to run after** |
 | Kubernetes: steady, wandering, all four, fairness, faults, batch | A, B, C done (`results/live/V1_*.md`) | to run again as the queue allows; the controller is byte for byte v1's |
