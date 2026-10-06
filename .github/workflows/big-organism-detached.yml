@@ -26,7 +26,7 @@ on:
       duration_s: {description: "Measured seconds per arm (240 organism steps) (start)", default: "2880"}
       commit: {description: "The commit to run (start); empty = this one", default: ""}
       vm_size: {description: "Azure machine size (start); Standard_D8as_v4 is the size eastus granted on 2026-10-05", default: "Standard_D8as_v4"}
-      location: {description: "Azure region (start). The subscription's regional quota is 10 vCPUs, so an 8-vCPU machine shares a region with nothing else (the metered AKS runs use eastus); westus2 and centralus refused every size on 2026-10-06", default: "eastus2"}
+      location: {description: "Azure region (start). Survey of 2026-10-06: eastus allows 32 vCPUs and the v4 sizes; every other region allows 10 vCPUs and only the v5 to v7 sizes (the sizes tried fall back to v7)", default: "eastus"}
       max_hours: {description: "Collect and delete a machine older than this, finished or not", default: "40"}
   schedule:
     - cron: "41 */2 * * *"       # collect: a look at every tagged machine; nothing to do when none is running
@@ -55,7 +55,7 @@ jobs:
     timeout-minutes: 60
     env:
       RG: omni-detached-${{ github.run_id }}
-      LOC: ${{ github.event.inputs.location || 'eastus2' }}
+      LOC: ${{ github.event.inputs.location || 'eastus' }}
       SIZE: ${{ github.event.inputs.vm_size || 'Standard_D8as_v4' }}
       ORGS: ${{ github.event.inputs.organisms || 'stack' }}
       SCALE: ${{ github.event.inputs.size || '1000' }}
@@ -71,7 +71,7 @@ jobs:
           az group create -n "$RG" -l "$LOC" -o none \
             --tags omni-detached=1 "organisms=$ORGS" "size=$SCALE" "reps=$REPS" "sha=$SHA" "started=$(date -u +%s)" "run=${{ github.run_id }}"
           ok=""
-          for sz in "$SIZE" Standard_D8as_v4 Standard_D8s_v4 Standard_D8s_v3 Standard_E4s_v4 Standard_E4s_v3 Standard_B8ms; do
+          for sz in "$SIZE" Standard_D8as_v4 Standard_D8s_v4 Standard_D8as_v7 Standard_D8s_v7 Standard_D8ls_v7 Standard_E4as_v7 Standard_B8as_v2; do
             if az vm create -g "$RG" -n big --image Ubuntu2204 --size "$sz" --admin-username omni \
                  --generate-ssh-keys --public-ip-sku Standard --os-disk-size-gb 128 -o none 2> err.txt; then
               ok="$sz"; echo "::notice::rented $sz in $LOC"; break
