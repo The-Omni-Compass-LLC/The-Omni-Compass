@@ -8,6 +8,12 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **All six Kubernetes tests confirmed on v3** (`results/live/V3_WANDERING.md`, `V3_ALL_FOUR.md` join the four already in):
+  wandering p95 −57% to −63% and failed requests −9% to −12%; all four work inside the line +35% to +49%, p95 −61% to
+  −66%, failed requests −11% to −14%; all confirmed better; machines and energy inside the noise in both. The same
+  readings as v1. **The Omni index now reads from the v3 tables** (`tools/omni_index.py`, `results/OMNI_INDEX.md`): +19.7%,
+  real Kubernetes +25.5% (work +19%, speed +93%, machines +4%, energy +3%), the database +14.2%; the README's result
+  table is the v3 run A. The v1 tables stay as the first engine's record in `docs/OMNI_V1.md`.
 - **Power grid on v3, confirmed three times** (`results/live/V3_PANDAPOWER.md`, runs 37568375564, 37568393269, 37568411160):
   the same table as v1 to the digit, as a deterministic simulator under the same runner bytes must give: 67 gauge-rows
   better, 14 worse (losses in the four grids with their own generation; tap operations 4 → 8 a year in one rural grid),
