@@ -114,7 +114,9 @@ Which engine each result ran on, and its v1 replications A, B and C: [`docs/OMNI
 | 10 | Steady load, 5 pairs (earlier engine) | AKS cluster autoscaler + HPA | replicas, floor | done | index +7.5%; response +25.4% faster; machines −0.8% | `results/live/AKS_BILL.md` |
 | 11 | Steady load on Omni v1, 5 pairs | as 10 | as 10 | done (run 37385657374, commit `f162ce8`) | no difference beyond the noise on any gauge: bill −4.7% (interval −$0.028 to +$0.022), machines billed −4.7%, p95 −2.1%, failed requests −32%, all inside the noise; Omni's own CPU 0.014 cores, the declared cost | `results/live/V1_AKS_STEADY.md` |
 | 12 | Burst sized to the cluster on Omni v1, 5 pairs, 1,800 s, load 1 3 1 4 1 3 | as 10 | as 10 | running (run 37534538088, branch `omni-v1` at `f162ce8`) | | workflow `aks-metered` |
-| 12b | Steady and burst on Omni v3 | as 10 | as 10 | queued after 12 (one Azure run at a time) | | workflow `aks-metered` |
+| 12b | Steady and burst on Omni v3, 4 workers | as 10 | as 10 | queued (one Azure run at a time) | | workflow `aks-metered` |
+| 12c | Steady on Omni v3, 11 workers (15 when the quota's room is there), replica ceiling 9 a worker, load `5 10 15 5 10 5`, 900 s, 5 pairs | as 10 | as 10 | preregistered 2026-10-07, queued after 12 | | `docs/K8S_COMPASS_PREREGISTRATION.md` (the fleet that can show one machine) |
+| 12d | Burst on Omni v3, 11 workers, load `3 10 3 15 3 10`, 1,800 s, 5 pairs | as 10 | as 10 | queued after 12c | | as 12c |
 
 ### 2.3 GPU (NVIDIA cards, the card's own power meter)
 

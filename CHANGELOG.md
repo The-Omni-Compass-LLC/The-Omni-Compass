@@ -8,6 +8,12 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Azure with a fleet that can show one machine** (`docs/K8S_COMPASS_PREREGISTRATION.md`, written before the run;
+  `.github/workflows/aks-metered.yml` inputs `max_workers` and `hpa_max`; `scripts/kind_bench.sh` raises the app's
+  replica ceiling with the fleet and expects it back untouched): the 4-worker runs could not show anything under a
+  quarter of the fleet, and the 10-pod ceiling kept the autoscaler at about 1.9 workers in both arms. Now 11 workers
+  (15 once the stack machine frees its 8 vCPUs), ceiling 9 pods a worker, load steps scaled with the fleet, 5 pairs,
+  v3 first. Register rows 12c and 12d.
 - **The organism must keep the window's clock** (`tools/six_kube_report.py`, `docs/K8S_COMPASS_PREREGISTRATION.md`): the
   report now shows "organism behind its window (s)" (shown, not judged) and marks a repetition OFF THE CLOCK when either
   arm ended more than 5% of the window late, its last steps having seen a cluster whose load schedule had ended. Found
