@@ -64,6 +64,17 @@ jobs:
           print("::notice::eastus, families allowed and idle: " + "; ".join(f"{n} {l}" for n, c, l in allowed))
           print("::notice::eastus, families with no allowance: " + ", ".join(n for n, c, l in rows if l == 0 and "Family" in n)[:900])
           PY
+      - name: List prices of the 2-vCPU worker sizes in eastus (Azure's public price list)
+        run: |
+          # the bill is each pool's machine-hours at its family's list price (aks-metered pool_prices); the prices come
+          # from Azure's own retail price API, Linux, pay as you go, eastus
+          out=""
+          for s in Standard_D2s_v4 Standard_D2as_v4 Standard_D2_v4 Standard_D2ds_v4 Standard_D2d_v4 Standard_D2s_v3 Standard_D2_v2 Standard_D2as_v7 Standard_D2ads_v7 Standard_D2als_v7 Standard_D2alds_v7 Standard_D2s_v7 Standard_D2ds_v7 Standard_D2ls_v7 Standard_D2lds_v7 Standard_D2s_v6 Standard_D2ds_v6 Standard_D2ls_v6 Standard_D2lds_v6 Standard_B2s_v2 Standard_B2als_v2; do
+            p=$(curl -sS --max-time 30 "https://prices.azure.com/api/retail/prices?\$filter=armRegionName%20eq%20'eastus'%20and%20armSkuName%20eq%20'$s'%20and%20priceType%20eq%20'Consumption'" \
+                | python3 -c "import sys,json; d=json.load(sys.stdin); r=[i for i in d.get('Items',[]) if 'Windows' not in i['productName'] and 'Spot' not in i['skuName'] and 'Low Priority' not in i['skuName']]; print(r[0]['retailPrice'] if r else 'none')" 2>/dev/null || echo "?")
+            out="$out $s=$p;"
+          done
+          echo "::notice::eastus list prices, Linux, pay as you go, USD a machine-hour:$out"
       - name: What of ours still stands
         run: |
           # a cluster still being deleted holds its family's vCPUs
