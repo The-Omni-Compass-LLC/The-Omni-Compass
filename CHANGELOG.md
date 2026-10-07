@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Azure fleet, 35 workers while the detached machine runs**: the 39-worker steady run was refused on every repetition
+  (the DASv4 family had 2 vCPUs left: the rented Standard_D8as_v4 running the v3 stack holds 8 of its 10), cancelled
+  before any arm ran, and dispatched again at 35 workers with the steps scaled as preregistered (amendment in
+  `docs/K8S_COMPASS_PREREGISTRATION.md`, the fleet that can show one machine).
 - **Kubernetes on v3, three of six tests confirmed three times** (`results/live/V3_STEADY.md`, `V3_FAIRNESS.md`,
   `V3_FAULTS.md`; every run omni-v3): steady p95 −65% to −66%, machines −1.5% to −2.9%, standby-model energy −1.3% to
   −2.1%, all confirmed better; fairness no difference beyond the noise on every row; faults p95 −47% to −62% and time

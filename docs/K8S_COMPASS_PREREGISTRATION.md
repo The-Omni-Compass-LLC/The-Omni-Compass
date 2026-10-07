@@ -815,6 +815,13 @@ is a statement about the lever, not about the law. This run makes the lever big 
   the fleet is big enough to see a machine. Even again: Omni's value there is nil at this size too, and that is the
   reading. Worse: our own wiring is suspected first, found, fixed, and the run is made again.
 - **Cost.** About $8 for the steady set and $15 for the burst set at 15 workers, at list price.
+- **Amendment (2026-10-07 07:18 UTC, before the counted run).** The first dispatch at 39 workers was refused by Azure on
+  every repetition: the DASv4 family had 2 vCPUs left, not 10, because the rented machine running the four stacked at
+  1,000 copies (`big-organism-detached`, a Standard_D8as_v4) holds 8 of that family's 10 in the same subscription. The
+  run was cancelled (no arm ran) and dispatched again at **35 workers**: `Standard_D2as_v4:1`, the other seven pools as
+  above; `hpa_max` 315; the steps scaled by 35/39 as this section says, steady `16 31 48 16 31 16`, burst
+  `10 31 10 48 10 31`. One machine is 2.9% of this fleet. Nothing else changes. The 39-worker fleet stands for the runs
+  made after the detached machine is deleted.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
