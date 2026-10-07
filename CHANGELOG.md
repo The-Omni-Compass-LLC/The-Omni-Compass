@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **The v3 grid at 100 copies** (`results/scale/receipts/v3-100x.md`, run 37501765605, 170 shards pooled from the archive with
+  the run's own command): every organism superior within guardrails at 10, 100 and 1,000 runs, work per energy +0.07%
+  to +0.36%. **The grid is complete at 84 of 90 cells** (`results/scale/GRID.md`); the six left are beyond the machines
+  available, as declared. The same figure at every size from 1 to 1,000 copies.
 - **The v3 grid at 1,000 copies** (`results/scale/receipts/v3-1000x.md`, run 37578946088, 60 shards, 10 paired runs per
   organism; `results/scale/GRID.md` now 60 of 90 cells): every organism superior within guardrails at 10 runs, work per
   energy +0.07% (Physics) to +0.37% (Energy, the four stacked, the tower), work unchanged, every knob handed back. The
