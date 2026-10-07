@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Azure burst v1, five pairs** (`results/live/V1_AKS_BURST.md`, run 37534538088 attempt 2): the bill +5.0% with its
+  interval across zero; machines, p95 and failed requests inside the noise; p99 −34% (6.0 s → 4.0 s) clear of the noise
+  in this one run. Replaces the four-pair table. Power-grid v3 runs 1 and 2 archived; run C of the batch test on v3
+  finished (37581021752) and requested for archive.
 - **Azure fleet, 35 workers while the detached machine runs**: the 39-worker steady run was refused on every repetition
   (the DASv4 family had 2 vCPUs left: the rented Standard_D8as_v4 running the v3 stack holds 8 of its 10), cancelled
   before any arm ran, and dispatched again at 35 workers with the steps scaled as preregistered (amendment in
