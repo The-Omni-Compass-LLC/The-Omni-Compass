@@ -16,7 +16,9 @@ Two kinds of rows, kept apart:
 Each organism's line names what came out better and what came out worse than native, by any amount, and which of
 those are inside the noise (the interval crosses zero). CPU and host load are shown, not judged. No line is drawn.
 
-  python3 tools/six_kube_report.py DIR   ->  DIR/SIX_KUBE.md, DIR/SIX_KUBE.json
+  python3 tools/six_kube_report.py DIR [DIR ...] [--out FILE.md]   ->  DIR/SIX_KUBE.md and .json (the first DIR), or FILE.md and
+  FILE.json; several DIRs when one benchmark's cells were archived from more than one run (the big organisms: the tower from
+  the job-bound run, the stack from the detached machine's collection)
 """
 from __future__ import annotations
 
@@ -93,9 +95,9 @@ def organism_record(d):
     return None
 
 
-def collect(root):
+def collect(root, *more):
     runs = {}
-    for d in sorted(root.rglob("bench-*-*")):
+    for d in sorted(x for r in (root, *more) for x in Path(r).rglob("bench-*-*")):
         if not d.is_dir() or (d / "INVALID").exists() or not (d / "capture.csv").exists():
             continue
         rec = organism_record(d)
@@ -129,13 +131,13 @@ def paired(runs_o, a, k):
             "better": bool(better), "neutral": k in NEUTRAL, "same": bool(same)}
 
 
-def main(root):
+def main(root, *more, out=None):
     root = Path(root)
-    runs = collect(root)
+    runs = collect(root, *more)
     orgs = sorted(runs, key=lambda o: (scale_of(o), ORDER.index(organism_name(o.split("@")[0]))))
     keys = [k for k in CLUSTER + ORG if any(not math.isnan(g.get(k, math.nan)) for o in orgs for arms in runs[o].values()
                                              for g in arms.values())]
-    out = {"organisms": {}}
+    out_json = {"organisms": {}}
     L = ["# The six organisms with the real Kubernetes cluster inside: native against native with Omni-Compass on top", "",
          "Each organism runs on the measured window's clock with the cluster as one more muscle (`tools/run_kil.py`): its "
          "own compute demand drives the load generator, the cluster's watts are its heat and load. Native: the stacks' own "
@@ -191,7 +193,7 @@ def main(root):
         if off:
             verdict += (f"; OFF THE CLOCK in {len(off)} of {n} repetitions (the organism ended up to {worst:,.0f} s after its "
                         f"window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)")
-        out["organisms"][o] = {"arm": arm, "repetitions": n, "verdict": verdict, "rows": rows, "off_the_clock_reps": off,
+        out_json["organisms"][o] = {"arm": arm, "repetitions": n, "verdict": verdict, "rows": rows, "off_the_clock_reps": off,
                                "behind_max_s": worst}
         L += [f"### {name_of(o)}: {verdict}", "", f"{n} paired repetitions.", "",
               "| Gauge | native | omni | Change | 95% interval of the difference | Reading |", "|---|---:|---:|---:|---:|---|"]
@@ -212,11 +214,15 @@ def main(root):
     missing = [o for o in ORDER if not any(organism_name(k.split("@")[0]) == o for k in runs)]
     if missing:
         L += ["## Not in this run", ""] + [f"- {name_of(o)}" for o in missing] + [""]
-    (root / "SIX_KUBE.md").write_text("\n".join(_legal_stamp(L)) + "\n")
-    (root / "SIX_KUBE.json").write_text(json.dumps(out, indent=1) + "\n")
+    md = Path(out) if out else root / "SIX_KUBE.md"
+    md.write_text("\n".join(_legal_stamp(L)) + "\n")
+    md.with_suffix(".json").write_text(json.dumps(out_json, indent=1) + "\n")
     print("\n".join(L))
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1]))
+    args = sys.argv[1:]
+    out = args[args.index("--out") + 1] if "--out" in args else None
+    dirs = [a for i, a in enumerate(args) if a != "--out" and (i == 0 or args[i - 1] != "--out")]
+    sys.exit(main(dirs[0], *dirs[1:], out=out))

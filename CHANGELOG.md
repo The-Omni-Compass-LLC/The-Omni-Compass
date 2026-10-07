@@ -8,6 +8,11 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **CityLearn on v3, A/B/C** (`results/live/V3_CITYLEARN.md`, runs 37568381751, 37568399439, 37568416917): the same pattern
+  as v1: electricity bought, daily peak and daily unevenness better in all 11 battery districts, carbon in 8; the bill
+  worse in 7 and ramping worse in 7 (the 2023 districts), reported as such; 71 score-rows better, 33 worse, 1 where the runs
+  differ. `tools/six_kube_report.py` now reads several archived runs and writes to a named file, so the big organisms'
+  tower (job-bound run) and stack (collected from the detached machine) make one report.
 - **The proof program** (`docs/PROOF_PROGRAM.md`): the program of record on the founder's order: every benchmark at the
   largest size each platform allows, on open native engines, with the rules, sizes, order, costs, the defensibility
   package and the disclosures.
