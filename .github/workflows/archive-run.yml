@@ -27,6 +27,10 @@ jobs:
           for run in $(cat .github/archive_request.txt); do
             d="results/live/raw/run-$run"
             [ -d "$d" ] && { echo "::notice::run $run is already archived"; continue; }
+            # only a finished run is copied: a run still going would leave a part of its files here, and the part would
+            # then be taken for the whole (the directory is never touched again once it exists)
+            state=$(gh run view "$run" -R "${{ github.repository }}" --json status,conclusion -q '.status + " " + .conclusion')
+            case "$state" in completed*) ;; *) echo "::warning::run $run is not finished ($state): left for a later pass"; continue;; esac
             gh run download "$run" -R "${{ github.repository }}" -D "$d" || { echo "::warning::run $run: no files to copy"; continue; }
             # GitHub refuses a file over 100 MB: a raw file over 50 MB (the 1,000-copy organism records) is stored
             # gzipped (-n: the same bytes every time). Its repetition's SHA256SUMS.txt still holds the original's hash;
