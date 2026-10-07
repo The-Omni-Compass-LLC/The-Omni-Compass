@@ -50,15 +50,27 @@ jobs:
             echo "| $loc | ${q:-?} | ${s:-none} |"
             echo "::notice::$loc: quota ${q:-?}; may rent: ${s:-none}"
           done
-      - name: What holds the allowance in eastus right now
+      - name: The allowance in eastus, family by family
         run: |
-          # every machine family with vCPUs in use (the 10-a-family allowance is what a fleet run fails on), and every
-          # resource group of ours still standing, with its state: a cluster still being deleted holds its family's vCPUs
-          echo "::group::families in use, eastus"
-          az vm list-usage -l eastus -o tsv --query "[?currentValue > \`0\`].join(' ', [name.value, to_string(currentValue), to_string(limit)])" | while read -r l; do echo "::notice::eastus $l"; done
-          echo "::endgroup::"
-          az group list -o tsv --query "[?starts_with(name,'omni')].join(' ', [name, properties.provisioningState, location])" | while read -r l; do echo "::notice::group $l"; done
-          az aks list -o tsv --query "[].join(' ', [resourceGroup, name, provisioningState, powerState.code])" 2>/dev/null | while read -r l; do echo "::notice::cluster $l"; done
+          # every machine family with an allowance or vCPUs in use (a fleet run fails on the family, not the region);
+          # ten notices a step is all GitHub shows, so the families with vCPUs in use come first
+          az vm list-usage -l eastus -o json > usage.json
+          python3 - <<'PY'
+          import json
+          rows = [(u["name"]["value"], int(u["currentValue"]), int(u["limit"])) for u in json.load(open("usage.json"))]
+          used = [r for r in rows if r[1] > 0]
+          allowed = [r for r in rows if r[2] > 0 and r[1] == 0 and "Family" in r[0]]
+          print("::notice::eastus, in use: " + "; ".join(f"{n} {c}/{l}" for n, c, l in used))
+          print("::notice::eastus, families allowed and idle: " + "; ".join(f"{n} {l}" for n, c, l in allowed))
+          print("::notice::eastus, families with no allowance: " + ", ".join(n for n, c, l in rows if l == 0 and "Family" in n)[:900])
+          PY
+      - name: What of ours still stands
+        run: |
+          # a cluster still being deleted holds its family's vCPUs
+          g=$(az group list -o tsv --query "[?starts_with(name,'omni')].join(' ', [name, properties.provisioningState, location])" | tr '\n' ';')
+          echo "::notice::our resource groups: ${g:-none}"
+          c=$(az aks list -o tsv --query "[].join(' ', [resourceGroup, name, provisioningState])" 2>/dev/null | tr '\n' ';')
+          echo "::notice::our clusters: ${c:-none}"
   start:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'start'
     runs-on: ubuntu-latest
