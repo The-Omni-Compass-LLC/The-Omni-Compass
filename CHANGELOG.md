@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Drone swarms, the first item of the queue, built and preregistered** (`docs/SWARM_PREREGISTRATION.md`, `tools/run_swarm.py`,
+  `tools/swarm_abc.py`, workflow `swarm`, tests in `verify.py`): gym-pybullet-drones (University of Toronto, MIT) flies
+  Crazyflie 2.x quadrotors with its shipped position controller as native; Omni sits on top on one knob, the cruise
+  override inside the autopilot's limits, spending tracking slack as speed; a declared energy model, the autopilot's
+  battery reserve, collisions void the cell. The tuning swarm (5 drones, not counted): energy a mission −16%, missions a
+  charge 5.8 → 6.9, no late mission, no collision. Three untouched 20-drone cells run as A, B and C on v3.
+- **Azure fleet run refused five times by Azure's own cluster capacity in eastus** (run 37651333302, "creating a new cluster is
+  unavailable at this time"); dispatched again.
 - **The referee dossier rebuilt from the v3 tables** (`tools/dossier.py`, `docs/DOSSIER.md`): real Kubernetes three times
   (one chart, every run's interval), the real database, the bill on a real cloud, the grid at 84 of 90 cells, the 945
   muscles and the three simulators, the harnesses, and what is not yet shown; the obsolete card charts removed.
