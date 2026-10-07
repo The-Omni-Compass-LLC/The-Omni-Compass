@@ -1,36 +1,40 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-# The vCPU quota the bill run on Azure needs (docs/AZURE_SETUP.md): reads the region's usage and limits, and asks Azure
-# for the regional and the machine family's vCPU limits the aks-metered design needs (one system machine and up to four
-# workers of 2 vCPUs, with room for a surge machine). Uses the same AZURE_CREDENTIALS secret; creates no machine.
 name: azure-quota
+# Asks Azure to raise the subscription's compute core allowance in one region (the Microsoft.Quota API, free of charge;
+# Azure grants or refuses, usually within minutes to a day). The allowance, not the credits, sets how big an AKS fleet
+# the metered runs can rent: 2 vCPUs a worker, one machine for the system pool. Prints the allowance before and after
+# and the request's state. Nothing is rented. Uses the AZURE_CREDENTIALS secret; if the service principal may not file
+# quota requests, the job says so and the owner files the same request in the portal (Quotas > Compute > the region).
 on:
   workflow_dispatch:
     inputs:
       location: {description: "Azure region", default: "eastus"}
-      family: {description: "Machine family quota name", default: "standardDSv4Family"}
-      limit: {description: "vCPUs to ask for", default: "16"}
-permissions: {contents: read}
+      cores: {description: "Total regional vCPUs to ask for", default: "200"}
+      family: {description: "The machine family to raise with it (the AKS workers' size family)", default: "standardDSv4Family"}
 jobs:
   quota:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: azure/login@v2
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
-      - name: Usage and limits before
-        run: az vm list-usage -l "${{ inputs.location }}" -o table | grep -Ei "Name|Total Regional|DSv4|---" || true
-      - name: Ask for the limits
+      - name: Ask for the allowance
         run: |
-          az config set extension.dynamic_install_allow_preview=true --only-show-errors
-          az extension add -n quota -y --only-show-errors
-          S="/subscriptions/$(az account show --query id -o tsv)/providers/Microsoft.Compute/locations/${{ inputs.location }}"
-          for q in cores "${{ inputs.family }}"; do
-            echo "== $q -> ${{ inputs.limit }}"
-            az quota update --resource-name "$q" --scope "$S" --limit-object value=${{ inputs.limit }} --resource-type dedicated -o json \
-              || az quota create --resource-name "$q" --scope "$S" --limit-object value=${{ inputs.limit }} --resource-type dedicated -o json \
-              || echo "REQUEST FAILED for $q"
+          LOC="${{ github.event.inputs.location || 'eastus' }}"; CORES="${{ github.event.inputs.cores || '200' }}"
+          FAM="${{ github.event.inputs.family || 'standardDSv4Family' }}"
+          SUB=$(az account show --query id -o tsv)
+          echo "before:"; az vm list-usage -l "$LOC" -o tsv --query "[?name.value=='cores' || name.value=='$FAM'].[name.localizedValue, currentValue, limit]"
+          az extension add -n quota -y >/dev/null 2>&1 || true
+          SCOPE="/subscriptions/$SUB/providers/Microsoft.Compute/locations/$LOC"
+          ok=1
+          for res in cores "$FAM"; do
+            if az quota update --resource-name "$res" --scope "$SCOPE" --limit-object value="$CORES" --resource-type dedicated -o json > "q-$res.json" 2> "q-$res.err"; then
+              echo "::notice::$res in $LOC: asked for $CORES; state $(python3 -c "import json;d=json.load(open('q-$res.json'));print(d.get('properties',{}).get('provisioningState') or d.get('provisioningState') or d)")"
+            else
+              ok=0; echo "::warning::$res in $LOC: the request was not accepted: $(tr '\n' ' ' < q-$res.err | cut -c1-500)"
+            fi
           done
-      - name: Usage and limits after
-        if: always()
-        run: az vm list-usage -l "${{ inputs.location }}" -o table | grep -Ei "Name|Total Regional|DSv4|---" || true
+          echo "after:"; az vm list-usage -l "$LOC" -o tsv --query "[?name.value=='cores' || name.value=='$FAM'].[name.localizedValue, currentValue, limit]"
+          [ "$ok" = 1 ] || echo "::error::Azure did not accept the automated request; file it in the portal: Subscriptions > this subscription > Usage + quotas > Compute > $LOC > Total Regional vCPUs and $FAM > Request increase > $CORES"
