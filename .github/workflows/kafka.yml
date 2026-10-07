@@ -1,0 +1,80 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: kafka
+# Omni-Compass on top of a Kafka consumer group's operator-set size (docs/KAFKA_PREREGISTRATION.md): Apache Kafka as
+# shipped (one KRaft broker on the runner), a producer at a stepped rate, a consumer group at the operator's count
+# (native) against the same with the compass law on the consumer count (omni). One job per workload, three paired
+# repetitions each; one report (KAFKA.md). Two workloads at a time, so the other benchmarks keep their runners.
+on:
+  workflow_dispatch:
+    inputs:
+      workloads:
+        description: "Workloads, comma separated: tuning, light, heavy, burst; 'all' runs every one"
+        default: "all"
+      reps: {description: "Paired repetitions per workload", default: "3"}
+      step_s: {description: "Seconds per load notch", default: "20"}
+env:
+  KAFKA_VERSION: "3.9.1"
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {workloads: "${{ steps.w.outputs.workloads }}"}
+    steps:
+      - id: w
+        run: |
+          if [ "${{ github.event.inputs.workloads }}" = all ] || [ -z "${{ github.event.inputs.workloads }}" ]; then
+            w='["tuning","light","heavy","burst"]'
+          else
+            w=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.workloads }}'.split(',')))")
+          fi
+          echo "workloads=$w" | tee -a "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: {workload: "${{ fromJSON(needs.plan.outputs.workloads) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt kafka-python-ng
+      - name: Apache Kafka as shipped, one KRaft broker
+        run: |
+          java -version 2>&1 | head -1
+          curl -sSL -o kafka.tgz "https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz"
+          curl -sSL -o kafka.tgz.sha512 "https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz.sha512"
+          # Apache's own checksum file: the download must match it
+          want=$(tr -d ' \n' < kafka.tgz.sha512 | sed 's/^.*://'); have=$(sha512sum kafka.tgz | cut -d' ' -f1)
+          [ "${want,,}" = "${have,,}" ] || { echo "checksum mismatch"; exit 1; }
+          tar xzf kafka.tgz && echo "KAFKA_HOME=$PWD/kafka_2.13-${KAFKA_VERSION}" >> "$GITHUB_ENV"
+      - run: KAFKA_HEAP_OPTS="-Xmx1g -Xms512m" python tools/run_kafka.py --setup
+      - name: Run the workload, native and omni
+        run: |
+          set +e
+          python tools/run_kafka.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out > run.log 2>&1
+          code=$?
+          grep -v "Picked up" run.log | tail -40
+          grep "^==\|^   " run.log | grep -v "Picked up" | tee -a "$GITHUB_STEP_SUMMARY"
+          cp /tmp/omni-kafka-server.log out/broker.log 2>/dev/null || true
+          exit $code
+      - run: cd out && find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "kafka-${{ matrix.workload }}", path: out}
+  report:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - uses: actions/download-artifact@v4
+        with: {pattern: "kafka-*", path: all, merge-multiple: true}
+      - run: ls all && python tools/run_kafka.py --report-only all && cat all/KAFKA.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: kafka-report, path: all/KAFKA.md}

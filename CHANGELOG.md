@@ -8,6 +8,11 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Kafka, preregistered and built** (`docs/KAFKA_PREREGISTRATION.md`, `tools/run_kafka.py`, `tools/kafka_abc.py`, workflow
+  `kafka`, tests in `verify.py`): Apache Kafka 3.9.1 as shipped on the runner, a producer at a stepped rate, the consumer
+  group at the operator's count as native; Omni on the consumer count inside [1, 8], holding the group's own end-to-end
+  latency at 40% of a 500 ms line; the host's CPU seconds as the cost. The tuning workload on one machine (not counted):
+  p95 429 → 12 ms, lag 329 → 45, consumers held 2 → 5.8. Three untouched workloads run as A, B and C on v3.
 - **Drone swarms on v3, confirmed three times** (`results/live/V3_SWARM.md`, runs 37677964512, 37677984739, 37678005151): in
   all three untouched 20-drone cells energy a mission −7% (short), −18% (mixed), −20% (long) and missions a charge +8%,
   +22%, +25%, confirmed better; no late mission, reserve breach, near miss or collision in any arm of any run; 9 gauge-rows
