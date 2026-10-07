@@ -1,6 +1,6 @@
 # The proof program: every benchmark at full size, every open native engine, the referee-grade package
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
 
 Written 2026-10-07 on the founder's order: the strongest evidence that can be built, at the largest size each platform
 allows, on open native engines the industry itself runs, so that the only step left to a buyer is to run the same
@@ -101,6 +101,12 @@ and preregistration not yet written). Every "to build" item names the open nativ
 | 35 | Traffic signals | SUMO with RESCO | phase timing | delay, stops, emissions | free | queued |
 | 36 | Supply chains | OR-Gym base-stock | order quantities | cost, stockouts | free | queued |
 | 37 | Defense edge | K3s on constrained hardware with the Kubernetes six tests | HPA | as 1 | free | to build |
+| 38 | Spacecraft attitude, momentum and thrusters | Basilisk: its attitude law, reaction wheels, thruster dumping | wheel effort cap, dump timing, thruster duty | pointing error, wheel energy, propellant, dumps | free | to build |
+| 39 | Orbit station-keeping | Orekit, GMAT: the deadband law | deadband timing, burn sizing inside the box | propellant a year; box violations zero | free | to build |
+| 40 | Satellite constellations | Basilisk multi-vehicle | fleet power and pointing admission | as 38, fleet-wide | free | to build |
+| 41 | Rockets | RocketPy, OpenRocket: air-brake and recovery controllers | brake deployment inside limits | apogee error, loads, recovery margin | free | to build |
+| 42 | Combustion and thruster chambers | Cantera: a shipped setpoint loop | setpoints inside the stable band | efficiency, excursions zero, emissions | free | to build |
+| - | Pure physics solvers (OpenFOAM, SU2, REBOUND, GADGET, MESA) | none: no controller, no knob | | | | not a benchmark, by design; their HPC cluster is row 8 |
 
 ## 4. The defensibility package
 
@@ -139,8 +145,8 @@ pushed as it lands, wins and losses alike, and reported to the founder in plain 
   published as Omni-Compass 1.0; earlier fingerprints go to `docs/history`.
 - Patent applications, copyright registrations and trademark applications have been filed in the United States by The
   Omni-Compass LLC. Numbers are not given here.
-- Nothing here is set in stone.
+-
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

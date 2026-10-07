@@ -73,7 +73,7 @@ the founder overrides one in the conversation.
 
 - At the top and end of every output: © 2026 The Omni-Compass LLC; evaluation and simulation use only; any
   commercialization or monetization requires a signed, paid Omni-Compass Enterprise License; patents, copyrights and
-  trademarks filed in the USA (say "filed", never give numbers); nothing is set in stone.
+  trademarks filed in the USA (say "filed", never give numbers).
 - Keep the SPDX headers so Black Duck, FOSSA and Snyk detect the license.
 
 ## Repository
@@ -101,4 +101,4 @@ the founder overrides one in the conversation.
 
 ---
 
-© 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass Enterprise License. Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone.
+© 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass Enterprise License. Patents, copyrights and trademarks filed in the USA.

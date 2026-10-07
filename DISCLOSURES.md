@@ -81,7 +81,7 @@ Therefore:
 4. The software is provided "as is", without warranty of any kind, as stated in `LICENSE`. The operator is responsible
    for its use on their systems.
 
-## 6. Nothing is set in stone
+## 6. Changes to the work and to this page
 
 1. The software, the law's settings, the benchmarks, the results, the documents, the licensing terms and this page may
    change at any time, without notice. The version in the repository's `main` branch at a given commit is the version
