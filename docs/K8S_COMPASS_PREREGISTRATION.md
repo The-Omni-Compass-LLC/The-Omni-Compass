@@ -836,6 +836,11 @@ is a statement about the lever, not about the law. This run makes the lever big 
   in the refused dispatches was wrong; no bill was ever made with it). `scripts/aks_paired.sh` now checks every pool's
   size and family allowance before anything is built, so a refusal costs a minute, not a repetition. Nothing else
   changes.
+- **Amendment 3 (2026-10-07 16:21 UTC, before the counted run).** The pre-flight of the 45-worker dispatch (run
+  37602951929) found `Standard_D2s_v3` not offered to this subscription in eastus and stopped every repetition in a
+  minute, nothing built, nothing billed; the nine other pools passed. That pool is dropped: **40 workers** of nine
+  families (one machine 2.5% of the fleet), `hpa_max` 360, the steps scaled by 40/39, steady `18 36 54 18 36 18`,
+  burst `11 36 11 54 11 36`, the pools' prices as in amendment 2. Nothing else changes.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

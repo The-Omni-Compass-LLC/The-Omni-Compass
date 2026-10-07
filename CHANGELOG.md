@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Azure fleet at 40 workers** (amendment 3): the pre-flight found `Standard_D2s_v3` not offered in eastus and stopped the
+  45-worker run before anything was built or billed; the pool is dropped and v3 steady runs on the nine remaining
+  families (run 37651333302). **The v3 grid at 1,000 copies finished** (run 37578946088, 61 shards) and is requested for
+  archive; the receipt and the grid table follow.
 - **Azure fleet rebuilt from the families the subscription allows** (preregistration amendment 2): the DAv4, ESv4 and
   EAv4 families have no allowance at all (the "remaining 0" refusals), so three of the eight pools could never be built.
   Ten allowed families give 45 workers; list prices from Azure's own price API; `scripts/aks_paired.sh` pre-flights
