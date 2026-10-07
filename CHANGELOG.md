@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **The archive bot copies finished runs only** (`.github/workflows/archive-run.yml`): it had copied the first 108 jobs of
+  the v3 grid at 100 copies (run 37501765605) while the run was still going, and would never have looked again. That
+  part-copy is removed; the run is re-requested when it ends. The grid at 1,000 copies is queued behind it (run
+  37578946088). Run C of the Kubernetes batch test on v3 dispatched (37581021752); run B (37573759437) archived.
 - **A fleet of several machine families on Azure** (`scripts/aks_paired.sh` `AKS_WORKER_POOLS`, `scripts/kind_bench.sh`
   worker selector `omni-role=work` and per-pool machine counts in the bill file, `tools/live_reps.py` the bill at each
   pool's own list price, `aks-metered` inputs `worker_pools` and `pool_prices`): the subscription allows 200 vCPUs in
