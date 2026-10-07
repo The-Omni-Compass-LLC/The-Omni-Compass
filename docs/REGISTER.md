@@ -12,7 +12,7 @@ on hardware or a go), **next** (being built now), **queued** (in the order of se
 
 Last updated 2026-10-07.
 
-## 1. Every muscle wired (656 muscles, 46 families, four realms and the shared spine)
+## 1. Every muscle wired (945 muscles, 59 families, four realms and the shared spine of 257; v1 had 656 in 46)
 
 A muscle is one knob on one real system that Omni-Compass may move inside its cover: **capacity** (how many machines,
 replicas or units), **setpoint** (a temperature, voltage, pressure or speed), **power** (a power or effort cap), or

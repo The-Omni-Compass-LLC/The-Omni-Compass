@@ -92,6 +92,30 @@ against the same Kubernetes with Omni-Compass on top. Read:
 
 Energy on kind is a declared model, not a meter: kind keeps every machine powered.
 
+## The three-run tables (`results/live/V1_<TEST>.md`, `V3_<TEST>.md`)
+
+Every benchmark since the engine was frozen runs three separate times, A, B and C, on the same bytes, and the table
+shows all three beside each gauge. Read the last column first: **confirmed better** or **confirmed worse** (the same sign
+in all three, every interval clear of zero), **no difference beyond the noise** (an interval over zero in at least one
+run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "not
+confirmed". The `V1_` or `V3_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
+a table never mixes engines, and a reading is never carried from one engine to another. Losses are in the table beside
+the gains: the database's host CPU-seconds, the grid's losses in four grids, the Panda's copper, CityLearn's bill.
+
+## The organisms with a real cluster inside (`V1_SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`)
+
+Two kinds of rows, kept apart: **the cluster** (real Kubernetes, measured) and **the organism** (the modelled stacks
+around it, evidence S). "Organism behind its window (s)" is shown and not judged; a repetition reads **OFF THE CLOCK**
+when either arm ended more than 5% of its window late (its last steps saw a cluster whose load had already ended). The
+pairing stands, the mark stays, and the remedy is a longer window for that size on that machine.
+
+## The one number (`results/OMNI_INDEX.md`)
+
+Every measure is a ratio oriented so that above 1 is better for Omni-Compass on top of native: work, speed, machines,
+energy. A test's index is the geometric mean of its ratios, a category's of its tests, the headline of the real
+categories, each weighted the same. A measure enters only as its three-run reading allows; no difference beyond the
+noise enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
+
 ## The six organisms grid (`results/scale/GRID.md`)
 
 Columns are **size × runs**: 1, 10, 100 and 1,000 clusters, each at 1, 10, 100 and 1,000 paired runs. Rows are the six
