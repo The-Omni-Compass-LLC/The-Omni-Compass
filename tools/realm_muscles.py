@@ -23,7 +23,7 @@ BANNER = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c)
           "software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).")
 END = ("*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or\n"
        "monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.\n"
-       "Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone. See `LICENSE` and `NOTICE` at the root of\n"
+       "Patents, copyrights and trademarks filed in the USA. See `LICENSE` and `NOTICE` at the root of\n"
        "this repository.*")
 
 

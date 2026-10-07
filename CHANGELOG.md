@@ -8,6 +8,17 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **The v1 stack at 1,000 copies, 3 of 3** (`results/live/V1_BIG_ORGANISM.md`, collection run 37575930111 from the detached
+  machine): p95 −74%, p99 −83%, clear of the noise; machines 6 in both arms; organism energy −0.2%; organism work
+  rounding-level worse; the compass arm ended up to 615 s after the 2,880 s window in all three repetitions (marked OFF
+  THE CLOCK; native kept the clock). The tower and the stack now make one report from both archived runs.
+- **"Nothing here is set in stone" removed** from the notice (`tools/legal.py`), the standing orders and every tracked
+  file outside the archived raw records (which stay byte-exact under their checksums), on the founder's order. The manual
+  PDF carries the old notice until its rebuild.
+- **Aerospace and propulsion in the queue** (`docs/REGISTER.md` rows 32 to 37, `docs/PROOF_PROGRAM.md`): Basilisk attitude,
+  momentum and thrusters; Orekit and GMAT station-keeping; Basilisk constellations; RocketPy and OpenRocket; Cantera
+  combustion. Pure physics solvers (OpenFOAM, SU2, REBOUND, GADGET, MESA) are named as not benchmarkable: no controller,
+  no knob; their value is the HPC cluster that runs them.
 - **CityLearn on v3, A/B/C** (`results/live/V3_CITYLEARN.md`, runs 37568381751, 37568399439, 37568416917): the same pattern
   as v1: electricity bought, daily peak and daily unevenness better in all 11 battery districts, carbon in 8; the bill
   worse in 7 and ramping worse in 7 (the 2023 districts), reported as such; 71 score-rows better, 33 worse, 1 where the runs
@@ -210,8 +221,7 @@
   by", "faster by", "fewer machines by", "less energy by", every column pointing the same way, plus good for
   Omni-Compass; the reading line spells out each one ("fewer machines by +4%" is the same work on 4% fewer
   machine-hours).
-- The legal notice every generated report carries (`tools/legal.py`) now says "filed in the USA" and "nothing here is
-  set in stone", as the standing orders have it; the committed reports were brought to the same wording (the archived
+- The legal notice every generated report carries (`tools/legal.py`) now says "filed in the USA" and "filed in the USA" with a closing sentence since removed (2026-10-07), as the standing orders had it; the committed reports were brought to the same wording (the archived
   raw run folders were left as the bot wrote them, their checksums intact).
 - The robot arms' v1 A/B/C tables (`results/live/V1_MUJOCO.md`: UR5e, iiwa 14, Gen3, runs 37409191253, 37409852642,
   37410015922; `results/live/V1_MUJOCO_PANDA.md`: the tuning robot, runs 37409198316, 37409860065, 37410022940; all on

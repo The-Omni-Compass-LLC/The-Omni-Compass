@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
 
-Source: GitHub Actions workflow `big-organism`, run 37359820055, commit `a004a8f` (Omni v1 for everything but the power grid, `tools/omni_version.py --commit a004a8f`), 2026-10-05/06; raw files under `results/live/raw/run-37359820055/`. One rented Azure machine per repetition (eastus, `Standard_D8as_v4`, 8 vCPU, 32 GiB), a fresh six-worker kind cluster per arm, the organism at 1,000 copies with the real cluster inside, 2,880 s window. The tower: 3 of 3 paired repetitions. The four stacked (1,226,000 muscles): no repetition finished inside GitHub's six-hour job (two native arms ran 8,056 s and 8,856 s, 5,184 s and 5,984 s past the window; one attempt lost its machine to a stale package list); the stack runs again detached from the job (`big-organism-detached`). Made by `tools/six_kube_report.py`.
+Source: GitHub Actions workflow `big-organism`, run 37359820055 (the tower: one rented Azure machine per repetition, eastus, `Standard_D8as_v4`, 2,880 s window, commit `a004a8f`, Omni v1 for everything but the power grid) and workflow `big-organism-detached`, collection run 37575930111 (the four stacked: one rented machine, westus3, `Standard_D8as_v7`, three repetitions in turn under nohup, 2,880 s window, commit `f162ce8`, Omni v1; the machine collected and deleted when all three had finished); raw files under `results/live/raw/run-37359820055/` and `results/live/raw/run-37575930111/`. A fresh six-worker kind cluster per arm, the organism at 1,000 copies with the real cluster inside. Made by `tools/six_kube_report.py` from both. The stack's compass arm ended 300 to 615 s after its 2,880 s window in every repetition (native 14 s): marked OFF THE CLOCK; the v3 stack runs with a 10,800 s window for that reason.
 
 
 Each organism runs on the measured window's clock with the cluster as one more muscle (`tools/run_kil.py`): its own compute demand drives the load generator, the cluster's watts are its heat and load. Native: the stacks' own controllers and Kubernetes alone. Omni: the compass law on every simulated muscle and the live controller on the cluster, handed back at 90% of the window. Cluster rows are measured on the real cluster (energy is the declared power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).
@@ -11,24 +11,24 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 
 ## Twelve columns, mean over repetitions
 
-| Gauge | The whole tower, every muscle once, 1,000 copies: native | The whole tower, every muscle once, 1,000 copies: omni | The four stacked, duplicates kept, 1,000 copies: native |
-|---|---:|---:|---:|
-| response time (ms), 95th percentile | 4104 | 203.8 | 5824 |
-| response time (ms), 99th percentile | 6372 | 257.8 | 7974 |
-| time over the response line (% of samples) | 64.02 | 0.1645 | 73.17 |
-| failed requests (%) | 22.25 | 0 | 58.33 |
-| HPA replicas, mean | 9.886 | 9.894 | 9.889 |
-| pods started | 5 | 4.667 | 4 |
-| worker nodes in service, mean | 6 | 6 | 6 |
-| energy, parked workers still on at idle power (Wh, declared model) | 541.8 | 540.8 | 551.3 |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 541.8 | 540.8 | 551.3 |
-| CPU used with Omni's own (cores), mean | 4.263 | 4.188 | 4.932 |
-| host CPU busy, the real machine under kind (%) | 69.33 | 69.92 | 78.57 |
-| organism work | 5.629e+13 | 5.629e+13 | 1.067e+14 |
-| organism energy (J) | 6.387e+13 | 6.375e+13 | 9.605e+13 |
-| organism time over the line (% of steps) | 2.722 | 2.714 | 2.568 |
-| organism work per energy | 0.8814 | 0.883 | 1.111 |
-| organism behind its window (s) | 802.5 | 408.3 | 5584 |
+| Gauge | The whole tower, every muscle once, 1,000 copies: native | The whole tower, every muscle once, 1,000 copies: omni | The four stacked, duplicates kept, 1,000 copies: native | The four stacked, duplicates kept, 1,000 copies: omni |
+|---|---:|---:|---:|---:|
+| response time (ms), 95th percentile | 4104 | 203.8 | 273.7 | 70.23 |
+| response time (ms), 99th percentile | 6372 | 257.8 | 453.6 | 77.04 |
+| time over the response line (% of samples) | 64.02 | 0.1645 | 0.7166 | 0 |
+| failed requests (%) | 22.25 | 0 | 0 | 0 |
+| HPA replicas, mean | 9.886 | 9.894 | 9.788 | 9.764 |
+| pods started | 5 | 4.667 | 7 | 7 |
+| worker nodes in service, mean | 6 | 6 | 6 | 6 |
+| energy, parked workers still on at idle power (Wh, declared model) | 541.8 | 540.8 | 504 | 504.9 |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 541.8 | 540.8 | 504 | 504.9 |
+| CPU used with Omni's own (cores), mean | 4.263 | 4.188 | 1.775 | 1.802 |
+| host CPU busy, the real machine under kind (%) | 69.33 | 69.92 | 36.5 | 37.89 |
+| organism work | 5.629e+13 | 5.629e+13 | 1.067e+14 | 1.067e+14 |
+| organism energy (J) | 6.387e+13 | 6.375e+13 | 9.605e+13 | 9.59e+13 |
+| organism time over the line (% of steps) | 2.722 | 2.714 | 2.568 | 2.546 |
+| organism work per energy | 0.8814 | 0.883 | 1.111 | 1.112 |
+| organism behind its window (s) | 802.5 | 408.3 | 14.5 | 456.8 |
 
 ## Each organism: omni against native, paired by repetition
 
@@ -55,9 +55,28 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism work per energy | 0.8814 | 0.883 | +0.2% | +0.001614 to +0.001614 | better |
 | organism behind its window (s) | 802.5 | 408.3 | -49.1% | -2104 to +1315 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
-### The four stacked, duplicates kept, 1,000 copies
+### The four stacked, duplicates kept, 1,000 copies: better on 5, worse on 1 (organism work), inside the noise on 4; OFF THE CLOCK in 3 of 3 repetitions (the organism ended up to 615 s after its window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)
 
-No paired arms.
+3 paired repetitions.
+
+| Gauge | native | omni | Change | 95% interval of the difference | Reading |
+|---|---:|---:|---:|---:|---|
+| response time (ms), 95th percentile | 273.7 | 70.23 | -74.3% | -252.9 to -154 | better |
+| response time (ms), 99th percentile | 453.6 | 77.04 | -83.0% | -492.5 to -260.6 | better |
+| time over the response line (% of samples) | 0.7166 | 0 | -100.0% | -1.702 to +0.269 | better (inside the noise) |
+| failed requests (%) | 0 | 0 | +0 | +0 to +0 | same |
+| HPA replicas, mean | 9.788 | 9.764 | -0.2% | -0.08812 to +0.03989 | better (inside the noise) |
+| pods started | 7 | 7 | +0.0% | +0 to +0 | same |
+| worker nodes in service, mean | 6 | 6 | +0.0% | -9.779e-16 to +1.57e-15 | same (under one part in a million) |
+| energy, parked workers still on at idle power (Wh, declared model) | 504 | 504.9 | +0.2% | -4.344 to +6.001 | WORSE (inside the noise) |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 504 | 504.9 | +0.2% | -4.344 to +6.001 | WORSE (inside the noise) |
+| CPU used with Omni's own (cores), mean | 1.775 | 1.802 | +1.5% | -0.4546 to +0.5072 | shown, not judged (more or less is not better by itself) |
+| host CPU busy, the real machine under kind (%) | 36.5 | 37.89 | +3.8% | -5.031 to +7.823 | shown, not judged (more or less is not better by itself) |
+| organism work | 1.067e+14 | 1.067e+14 | -0.0% | -5.684e+08 to -5.684e+08 | WORSE |
+| organism energy (J) | 9.605e+13 | 9.59e+13 | -0.2% | -1.539e+11 to -1.539e+11 | better |
+| organism time over the line (% of steps) | 2.568 | 2.546 | -0.9% | -0.02235 to -0.02235 | better |
+| organism work per energy | 1.111 | 1.112 | +0.2% | +0.001777 to +0.001777 | better |
+| organism behind its window (s) | 14.5 | 456.8 | +3050.1% | +86.26 to +798.3 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ## Not in this run
 

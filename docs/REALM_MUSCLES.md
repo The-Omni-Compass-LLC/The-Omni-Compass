@@ -199,5 +199,5 @@ workflow_admission [admission], workflow_worker_rate [capacity], task_queue_rate
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-Patents, copyrights and trademarks filed in the USA. Nothing here is set in stone. See `LICENSE` and `NOTICE` at the root of
+Patents, copyrights and trademarks filed in the USA. See `LICENSE` and `NOTICE` at the root of
 this repository.*
