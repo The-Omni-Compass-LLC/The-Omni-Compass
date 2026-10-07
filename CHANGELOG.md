@@ -8,6 +8,15 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **The proof program** (`docs/PROOF_PROGRAM.md`): the program of record on the founder's order: every benchmark at the
+  largest size each platform allows, on open native engines, with the rules, sizes, order, costs, the defensibility
+  package and the disclosures.
+- **Azure burst on v1** (`results/live/V1_AKS_BURST.md`, run 37534538088, 4 pairs; repetition 4 lost its native cluster to
+  an Azure API error and is run again): no difference beyond the noise on any gauge on the 4-worker fleet; Omni's own CPU
+  0.009 cores. The 11-worker start was refused by the machine family's 10-vCPU allowance; the regional total was raised to
+  200 but every family's request was refused through the API (QuotaNotAvailableForResource, ContactSupport): the
+  subscription's terms. Next: a fleet of several machine families (4 to 5 workers each under the one allowance), or the
+  owner's request in the portal.
 - **Robot arms on v3, A/B/C** (`results/live/V3_MUJOCO.md`, runs 37568387334, 37568405026, 37568422829): the same
   readings as v1, as the runner is the same bytes: Gen3 7 gauges confirmed better, 0 worse; UR5e and iiwa 14 nothing to
   move. The four A/B/C table tools (`confirm_abc`, `mujoco_abc`, `pandapower_abc`, `citylearn_abc`) now name in their

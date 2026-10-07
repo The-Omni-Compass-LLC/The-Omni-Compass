@@ -13,7 +13,7 @@ A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): confi
 |---|---:|---:|---:|---:|---:|---:|
 | Real Kubernetes (GitHub) | **+26.2%** | +20.4% | +95.1% | +4.4% | +2.7% | 6 |
 | Real database (PostgreSQL behind PgBouncer, GitHub) | **+14.2%** | +0.0% | +0.0% | +106.6% | -17.7% | 3 |
-| Real cloud (Azure AKS, billed) | pending | | | | | the v1 steady run is in (`results/live/V1_AKS_STEADY.md`: every gauge inside the noise), the burst is running; both join as three-run tables (the earlier engine's +7.5% is in `docs/history/OMNI_INDEX_pre_v1.md`) |
+| Real cloud (Azure AKS, billed) | pending | | | | | the v1 steady and burst runs are in (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`: every gauge inside the noise on a 4-worker fleet); both join as three-run tables, and a fleet big enough to see one machine is next (the earlier engine's +7.5% is in `docs/history/OMNI_INDEX_pre_v1.md`) |
 | Real card (NVIDIA, its own meter) | pending | | | | | the rerun on the current card controller (the 2026-10-02 run used the replaced one) |
 
 Read: every column points the same way, plus is good for Omni-Compass. "Fewer machines by +4%" means Omni did the same work on 4% fewer machine-hours; "less energy by +3%" means 3% less energy for the same work; "faster by +95%" means native's slowest-5% response is 1.95 times Omni's (Omni answers about twice as fast); "more work by +45%" means 45% more work inside the response line. The energy figure on GitHub's Kubernetes is a declared model, not a meter; the database's energy column is the host's CPU seconds (the compass's own cost, confirmed worse, counted against Omni); its machines column is the connections held open to the database; Azure's machines are its own billed count.
