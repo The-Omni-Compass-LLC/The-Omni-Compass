@@ -78,6 +78,13 @@ kubectl -n kube-system rollout status deployment/metrics-server --timeout=300s
 kubectl -n kube-system rollout status deployment/coredns --timeout=300s
 fi   # AKS runs its own metrics-server and CoreDNS on the system pool
 kubectl apply -f deploy/kind/demo.yaml
+# a bigger fleet needs a higher replica ceiling or its machines stay empty (9 pods of 200m fit one 2-vCPU worker): the
+# ceiling scales with the fleet when HPA_MAX is set, the same in every arm; the restore checks below expect that range
+HPA_RANGE="1,${HPA_MAX:-10}"
+if [ -n "${HPA_MAX:-}" ]; then
+  kubectl patch hpa php-apache --type merge -p "{\"spec\":{\"maxReplicas\":${HPA_MAX}}}" >/dev/null
+  echo "hpa_max=$HPA_MAX (the fleet's ceiling, the same in every arm)" | tee -a "$OUT_DIR/preflight.txt"
+fi
 if [ -n "$TUNE" ]; then
   kubectl patch hpa php-apache --type=json -p "[{\"op\":\"replace\",\"path\":\"/spec/metrics/0/resource/target/averageUtilization\",\"value\":$TUNE}]"
   echo "native tuned by the operator: HPA target $TUNE (no Omni-Compass)" | tee "$OUT_DIR/tuned.txt"
@@ -299,7 +306,7 @@ if [ "$ARM" = "watch" ]; then
   back=$(kubectl get nodes -l "$WORKER_SEL" -o json | jq '[.items[] | select(.spec.unschedulable != true and (any(.spec.taints[]?; .key == "omnicompass.io/idle") | not))] | length')
   echo "cluster after the run: target $target, range $range_now, CPU limits $cpu_limit, workers $back of $WORKERS" | tee "$OUT_DIR/kill_switch.txt"
   exist=$(kubectl get nodes -l "$WORKER_SEL" --no-headers | wc -l); [ "$PLATFORM" = aks ] || exist="$WORKERS"
-  test "$executed" = "0" && test "$target" = "50" && test "$range_now" = "1,10" && test "$cpu_limit" = "500m" && test "$back" = "$exist"
+  test "$executed" = "0" && test "$target" = "50" && test "$range_now" = "$HPA_RANGE" && test "$cpu_limit" = "500m" && test "$back" = "$exist"
 elif [ -z "$NATIVE" ]; then
   echo "== reset"
   touch "$OUT_DIR/kill"
@@ -314,7 +321,7 @@ elif [ -z "$NATIVE" ]; then
   restored=$(kubectl get hpa php-apache -o jsonpath='{.spec.metrics[0].resource.target.averageUtilization}')
   range_now=$(kubectl get hpa php-apache -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')
   echo "HPA replica range after kill: $range_now" | tee -a "$OUT_DIR/kill_switch.txt"
-  test "$range_now" = "1,10"
+  test "$range_now" = "$HPA_RANGE"
   back=$(kubectl get nodes -l "$WORKER_SEL" -o json | jq '[.items[] | select(.spec.unschedulable != true and (any(.spec.taints[]?; .key == "omnicompass.io/idle") | not))] | length')
   { echo "restored target: $restored"; echo "workers in service: $back of $WORKERS"; } | tee "$OUT_DIR/kill_switch.txt"
   leftover=$(kubectl get hpa php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))'; kubectl get deployment php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')

@@ -17,6 +17,8 @@ on:
       vm_size: {description: "Worker machine size (Standard_D2s_v5 is no longer offered to this subscription in eastus)", default: "Standard_D2s_v4"}
       price_per_node_hour: {description: "List price of one worker machine-hour in USD (Standard_D2s_v4, Linux, pay as you go, eastus)", default: "0.096"}
       load_steps: {description: "Load-generator replicas per step, in order (the burst bill test: e.g. 1 6 1 8 1 6); empty: steady load", default: ""}
+      max_workers: {description: "Worker machines in the work pool (Azure's autoscaler runs 1 to this many); the subscription's eastus quota is 32 vCPUs, 2 a machine, one for the system pool", default: "4"}
+      hpa_max: {description: "The app's replica ceiling, the same in every arm; 9 pods of 200m fit one 2-vCPU worker, so 9 x max_workers lets the fleet fill (empty: the manifest's 10)", default: ""}
       organism: {description: "One of the six organisms with this cluster inside it (tools/run_kil.py): compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower; empty: the service alone", default: ""}
       load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
       organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "1"}
@@ -66,6 +68,8 @@ jobs:
           ORGANISM: ${{ github.event.inputs.organism || '' }}
           LOAD_MAX: ${{ github.event.inputs.load_max || '6' }}
           ORGANISM_SCALE: ${{ github.event.inputs.organism_scale || '1' }}
+          AKS_MAX_NODES: ${{ github.event.inputs.max_workers || '4' }}
+          HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - if: always()
         run: az group delete -n "$AZ_RG" --yes --no-wait || true

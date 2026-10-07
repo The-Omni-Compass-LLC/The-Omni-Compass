@@ -784,8 +784,32 @@ The batch test on amendment 12 (GitHub run 37344765837, ten pairs, `results/live
 +1.1% later, inside the noise (it was +1.8% and proven before cruise stepped back). No pod was left without a machine.
 Nothing came out worse beyond the noise.
 
----
+## The fleet that can show one machine: Azure at 11 and 15 workers (written before its run, 2026-10-07)
 
+The Azure runs so far used a work pool of 1 to 4 machines. One machine is a quarter to a half of that fleet, and the
+app's replica ceiling (10 pods of 200m, about one worker's worth) kept Azure's autoscaler at about 1.9 workers in both
+arms, so nothing under a quarter of the fleet could show. The steady run on v1 (5 pairs) read even on every gauge. That
+is a statement about the lever, not about the law. This run makes the lever big enough to see one machine.
+
+- **Fleet.** `max_workers` = 11 while the detached stack machine holds 8 of the subscription's 32 eastus vCPUs (one
+  system machine plus 11 workers of 2 vCPUs each fill the rest), 15 once it is gone. One machine is then 9% or 7% of
+  the fleet. Same `Standard_D2s_v4` workers, same autoscaler profile, a fresh cluster per arm, as before.
+- **Ceiling.** `hpa_max` = 9 × workers (99 at 11, 135 at 15): nine 200m pods fit one 2-vCPU worker, so the fleet can
+  fill. The same ceiling in every arm; the restore checks expect it back untouched.
+- **Load.** The load generator's replica steps scale with the fleet, the same in every arm. Steady: `5 10 15 5 10 5`
+  over 900 s at 11 workers (one load replica drove about five pods at 50% on the 4-worker runs, so the peak asks for
+  about 80 pods, nine workers' worth). Burst: `3 10 3 15 3 10` over 1,800 s (the 4-worker burst was `1 3 1 4 1 3`).
+  At 15 workers the steps scale by 15/11, rounded.
+- **Everything else as preregistered**: native (Azure's autoscaler alone) against omni (Omni-Compass on top of it,
+  rule 4 on the node pool, the HPA target inside its range, handed back at 90% of the window), 5 paired repetitions,
+  order rotated, the bill Azure's own machine count every 15 s at list price, the reading by `tools/live_reps.py`'s
+  paired interval, every gauge reported. Engine: Omni v3 first (the newest), v1 after if the credits allow.
+- **What it can say.** Better, clear of the noise, in bill or response time: Omni has value on the managed service when
+  the fleet is big enough to see a machine. Even again: Omni's value there is nil at this size too, and that is the
+  reading. Worse: our own wiring is suspected first, found, fixed, and the run is made again.
+- **Cost.** About $8 for the steady set and $15 for the burst set at 15 workers, at list price.
+
+---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
