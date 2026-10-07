@@ -3,16 +3,18 @@
 # Omni-Compass Enterprise License. See LICENSE.
 name: azure-quota
 # Asks Azure to raise the subscription's compute core allowance in one region (the Microsoft.Quota API, free of charge;
-# Azure grants or refuses, usually within minutes to a day). The allowance, not the credits, sets how big an AKS fleet
-# the metered runs can rent: 2 vCPUs a worker, one machine for the system pool. Prints the allowance before and after
-# and the request's state. Nothing is rented. Uses the AZURE_CREDENTIALS secret; if the service principal may not file
-# quota requests, the job says so and the owner files the same request in the portal (Quotas > Compute > the region).
+# Azure grants or refuses, usually within minutes to a day). Two allowances bind an AKS fleet: the region's total vCPUs
+# and the machine family's vCPUs (2 a worker, one machine for the system pool). The first run raised the regional total
+# to 200 but the family stayed at 10, so this job asks for every worker-capable family it can and reports which were
+# granted; the metered runs then pick a worker size from a granted family (aks-metered's vm_size input). Prints the
+# allowances before and after. Nothing is rented. Uses the AZURE_CREDENTIALS secret; a family Azure refuses to raise
+# through the API is named for the owner to request in the portal (Quotas > Compute > the region).
 on:
   workflow_dispatch:
     inputs:
       location: {description: "Azure region", default: "eastus"}
-      cores: {description: "Total regional vCPUs to ask for", default: "200"}
-      family: {description: "The machine family to raise with it (the AKS workers' size family)", default: "standardDSv4Family"}
+      cores: {description: "vCPUs to ask for, for the regional total and for each family", default: "200"}
+      families: {description: "Machine families to raise, space separated (list-usage names)", default: "standardDSv4Family standardDASv4Family standardDSv5Family standardDASv5Family standardDSv3Family standardDv4Family standardDAv4Family standardDDSv4Family standardDDSv5Family standardDADSv5Family standardESv4Family standardEASv4Family"}
 jobs:
   quota:
     runs-on: ubuntu-latest
@@ -20,25 +22,30 @@ jobs:
     steps:
       - uses: azure/login@v2
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
-      - name: Ask for the allowance
+      - name: Ask for the allowances
         run: |
           LOC="${{ github.event.inputs.location || 'eastus' }}"; CORES="${{ github.event.inputs.cores || '200' }}"
-          FAM="${{ github.event.inputs.family || 'standardDSv4Family' }}"
+          FAMS="${{ github.event.inputs.families || 'standardDSv4Family standardDASv4Family standardDSv5Family standardDASv5Family standardDSv3Family standardDv4Family standardDAv4Family standardDDSv4Family standardDDSv5Family standardDADSv5Family standardESv4Family standardEASv4Family' }}"
           SUB=$(az account show --query id -o tsv)
-          echo "before:"; az vm list-usage -l "$LOC" -o tsv --query "[?name.value=='cores' || name.value=='$FAM'].[name.localizedValue, currentValue, limit]"
+          echo "subscription: $(az account show --query '[name, state]' -o tsv | tr '\n' ' ')"
           az extension add -n quota -y >/dev/null 2>&1 || true
-          # the first request failed because the subscription had never used the Quota service: register it first
-          az provider register --namespace Microsoft.Quota --wait 2>&1 | tail -1 || echo "::warning::could not register Microsoft.Quota"
-          az provider show --namespace Microsoft.Quota --query registrationState -o tsv
-          echo "subscription kind: $(az account show --query '[name, state]' -o tsv | tr '\n' ' ')"
+          az provider register --namespace Microsoft.Quota --wait 2>&1 | tail -1 || true
+          echo "before ($LOC):"; az vm list-usage -l "$LOC" -o tsv --query "[?name.value=='cores' || contains(name.value,'Family')].[name.value, currentValue, limit]" | awk '$3 > 0' | sort
           SCOPE="/subscriptions/$SUB/providers/Microsoft.Compute/locations/$LOC"
-          ok=1
-          for res in cores "$FAM"; do
+          granted=""; refused=""
+          for res in cores $FAMS; do
+            cur=$(az vm list-usage -l "$LOC" -o tsv --query "[?name.value=='$res'].limit | [0]" 2>/dev/null); cur=${cur:-?}
+            if [ "$cur" != "?" ] && [ "$cur" -ge "$CORES" ] 2>/dev/null; then echo "$res already $cur"; granted="$granted $res=$cur"; continue; fi
             if az quota update --resource-name "$res" --scope "$SCOPE" --limit-object value="$CORES" --resource-type dedicated -o json > "q-$res.json" 2> "q-$res.err"; then
-              echo "::notice::$res in $LOC: asked for $CORES; state $(python3 -c "import json;d=json.load(open('q-$res.json'));print(d.get('properties',{}).get('provisioningState') or d.get('provisioningState') or d)")"
+              new=$(python3 -c "import json;d=json.load(open('q-$res.json'));print(d.get('properties',{}).get('limit',{}).get('value',''))")
+              echo "$res: asked $CORES, now $new"; granted="$granted $res=$new"
             else
-              ok=0; echo "::warning::$res in $LOC: the request was not accepted: $(tr '\n' ' ' < q-$res.err | cut -c1-500)"
+              echo "$res: refused: $(grep -oE '\([A-Za-z]+\)' "q-$res.err" | head -1)"; refused="$refused $res"
             fi
           done
-          echo "after:"; az vm list-usage -l "$LOC" -o tsv --query "[?name.value=='cores' || name.value=='$FAM'].[name.localizedValue, currentValue, limit]"
-          [ "$ok" = 1 ] || echo "::error::Azure did not accept the automated request; file it in the portal: Subscriptions > this subscription > Usage + quotas > Compute > $LOC > Total Regional vCPUs and $FAM > Request increase > $CORES"
+          echo "after ($LOC):"; az vm list-usage -l "$LOC" -o tsv --query "[?name.value=='cores' || contains(name.value,'Family')].[name.value, currentValue, limit]" | awk '$3 > 0' | sort
+          echo "::notice::granted or already there:$granted"
+          [ -z "$refused" ] || echo "::warning::refused through the API:$refused (the owner can ask in the portal: Subscriptions > Usage + quotas > Compute > $LOC > the family > Request increase; a Free Trial subscription cannot raise family allowances until it is upgraded to pay-as-you-go, which keeps the credits)"
+          # the biggest worker fleet now possible from any granted family: (family limit - 2 for the system machine) / 2
+          best=$(az vm list-usage -l "$LOC" -o tsv --query "[?contains(name.value,'Family') && (contains(name.value,'DS') || contains(name.value,'DAS') || contains(name.value,'Dv') || contains(name.value,'DAv') || contains(name.value,'DDS') || contains(name.value,'DADS') || contains(name.value,'ES') || contains(name.value,'EAS'))].[limit, name.value]" | sort -n | tail -1)
+          echo "::notice::largest family allowance in $LOC: $best vCPUs -> up to $(( ($(echo "$best" | cut -f1) - 2) / 2 )) workers of 2 vCPUs with one system machine"
