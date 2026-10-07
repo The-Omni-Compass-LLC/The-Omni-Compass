@@ -152,7 +152,12 @@ jobs:
             rm -f k k.pub; ssh-keygen -q -N "" -f k
             az vm user update -g "$RG" -n big -u omni --ssh-key-value "$(cat k.pub)" -o none
             S="ssh -i k -o StrictHostKeyChecking=no -o ConnectTimeout=20 omni@$ip"
-            state=$($S 'cd omni; ls cells 2>/dev/null | tr "\n" " "; echo; test -f ALL_DONE && echo ALL_DONE || echo RUNNING; tail -3 detached.log')
+            # the state, then the progress of the cell under way: which arm the paired script is on, the last line of its
+            # log, and the organism's own log (built, window open, steps done), so a slow machine can be told from a stuck one
+            state=$($S 'cd omni; ls cells 2>/dev/null | tr "\n" " "; echo; test -f ALL_DONE && echo ALL_DONE || echo RUNNING; tail -3 detached.log;
+                        for f in paired-*.log; do [ -f "$f" ] && echo "$f: $(grep -c "^######## ARM" "$f") arm(s) started; last: $(tail -1 "$f" | cut -c1-160)"; done
+                        for d in bench-*-*; do [ -d "$d" ] && echo "$d: $(ls "$d" | tr "\n" " " | cut -c1-200)"; [ -f "$d/organism.log" ] && tail -2 "$d/organism.log" | cut -c1-200; done
+                        uptime; free -g | head -2')
             echo "$state"
             if ! echo "$state" | grep -q ALL_DONE; then
               if [ "$age_h" -lt "$max_h" ]; then
