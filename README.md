@@ -11,22 +11,22 @@ never replaces native; every comparison below is native against omni.
 
 ## The result
 
-Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v1**, the frozen and
-fingerprinted engine ([`docs/OMNI_V1.md`](docs/OMNI_V1.md); since 6 October the engine is Omni v3, [`docs/OMNI_V3.md`](docs/OMNI_V3.md): the same law, the muscle catalog grown to 945 ([`docs/OMNI_V2.md`](docs/OMNI_V2.md)) and a do-no-harm gate on speed knobs; every modelled result is being run again on it). Every test ran three times as separate GitHub runs (A the
+Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v3**, the frozen and
+fingerprinted engine ([`docs/OMNI_V3.md`](docs/OMNI_V3.md): v1's law and controllers byte for byte, the muscle catalog grown to 945 and a do-no-harm gate on speed knobs; the v1 tables, [`docs/OMNI_V1.md`](docs/OMNI_V1.md), read the same and stay as the first engine's record). Every test ran three times as separate GitHub runs (A the
 result, B and C the replications); a reading below is **confirmed** only when it holds in all three runs with every 95%
 interval clear of zero, and otherwise reads no difference beyond the noise. The six tables:
-[`V1_ALL_FOUR`](results/live/V1_ALL_FOUR.md), [`V1_STEADY`](results/live/V1_STEADY.md),
-[`V1_WANDERING`](results/live/V1_WANDERING.md), [`V1_FAULTS`](results/live/V1_FAULTS.md),
-[`V1_BATCH`](results/live/V1_BATCH.md), [`V1_FAIRNESS`](results/live/V1_FAIRNESS.md).
+[`V3_ALL_FOUR`](results/live/V3_ALL_FOUR.md), [`V3_STEADY`](results/live/V3_STEADY.md),
+[`V3_WANDERING`](results/live/V3_WANDERING.md), [`V3_FAULTS`](results/live/V3_FAULTS.md),
+[`V3_BATCH`](results/live/V3_BATCH.md), [`V3_FAIRNESS`](results/live/V3_FAIRNESS.md).
 
 | | native (run A) | omni (run A) | Reading over the three runs |
 |---|---:|---:|---|
-| **Work handled inside the response line** (all four in one run) | 18.6 req/s | **27.6 req/s** | **+42% to +48% more work on the same machines, confirmed better** |
-| **Response time, 95th percentile** (steady, wandering, all four, faults) | 361-830 ms | 122-321 ms | **−57% to −69% in every run of all four tests, confirmed better** |
-| **Failed requests** (wandering, all four) | 10.5-13.3% | 9.3-11.7% | **−12% to −13%, confirmed better**; zero in both arms at steady load; under faults no difference beyond the noise |
-| **Machines in service** | 6 | 5.88 (steady), 4.6 (batch) | steady **−1.5% to −3.4%** and batch **−15% to −24%, confirmed better**; the other tests no difference beyond the noise |
-| **Energy** (a declared model: on kind the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill) | | | standby model confirmed lower in steady (−1.0 to −2.9%), batch (−11 to −17%) and wandering (−0.4 to −0.8%); elsewhere no difference beyond the noise |
-| **A noisy neighbour on the same workers** (fairness) | | | no difference beyond the noise on every row: Omni neither helps nor hurts |
+| **Work handled inside the response line** (all four in one run) | 21.0 req/s | **31.2 req/s** | **+35% to +49% more work on the same machines, confirmed better** |
+| **Response time, 95th percentile** (steady, wandering, all four, faults) | 321-820 ms | 111-306 ms | **−47% to −66% in every run of all four tests, confirmed better** |
+| **Failed requests** (wandering, all four) | 8.9-12.3% | 7.7-10.9% | **−9% to −14%, confirmed better**; zero in both arms at steady load; under faults lower in all three, clear of the noise in one |
+| **Machines in service** | 6 | 5.90 (steady), 4.89 (batch) | steady **−1.5% to −2.9%** and batch **−19% to −23%, confirmed better**; the other tests no difference beyond the noise |
+| **Energy** (a declared model: on kind the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill) | | | standby model confirmed lower in steady (−1.3% to −2.1%) and batch (−13% to −16%); elsewhere no difference beyond the noise |
+| **A noisy neighbour on the same workers** (fairness) | | | no difference beyond the noise on every row, the neighbour's own service included: Omni neither helps nor hurts |
 | **Pods left with no machine to take them** | 0 | 0 | same, in every test |
 
 Omni gives a machine back only after a paired trial shows the service is no slower without it (the verdict). On these
@@ -43,8 +43,8 @@ current card governor on a real GPU (the one real-card run, on the governor sinc
 energy and made its 95th percentile 43-84% slower:
 [`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
-**The Omni index, every real test together: +20.1%** more for the same, or the same for less, across work, speed,
-machines and energy: real Kubernetes on v1 +26.2% (work +20%, speed +95%, machines +4%, energy +3%) and the real database
+**The Omni index, every real test together: +19.7%** more for the same, or the same for less, across work, speed,
+machines and energy: real Kubernetes on v3 +25.5% (work +19%, speed +93%, machines +4%, energy +3%) and the real database
 on v3 +14.2% (connections to the database halved and more; the compass's own CPU, confirmed worse, counted against it).
 Only a row confirmed in all three runs enters; a row inside the noise counts as exactly zero. Azure's billed runs and the
 card join the index when their three-run tables land (the earlier engine's +12.9% is kept in

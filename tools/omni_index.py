@@ -47,17 +47,17 @@ ENERGY = "energy, parked workers still on at idle power (Wh)"
 STANDBY = "energy (Wh)"
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge, higher is better)"
 SOURCES = [
-    ("Real Kubernetes (GitHub)", "Steady same work: the load in steps at a fixed rate, ten pairs, three runs", "V1_STEADY.json",
+    ("Real Kubernetes (GitHub)", "Steady same work: the load in steps at a fixed rate, ten pairs, three runs", "V3_STEADY.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, "equal"),
-    ("Real Kubernetes (GitHub)", "Demand that wanders: up and down one step at a time, ten pairs, three runs", "V1_WANDERING.json",
+    ("Real Kubernetes (GitHub)", "Demand that wanders: up and down one step at a time, ten pairs, three runs", "V3_WANDERING.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs, three runs", "V1_ALL_FOUR.json",
+    ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs, three runs", "V3_ALL_FOUR.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
-    ("Real Kubernetes (GitHub)", "Fairness: a noisy neighbour, ten pairs, three runs", "V1_FAIRNESS.json",
+    ("Real Kubernetes (GitHub)", "Fairness: a noisy neighbour, ten pairs, three runs", "V3_FAIRNESS.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs, three runs", "V1_FAULTS.json",
+    ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs, three runs", "V3_FAULTS.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs, three runs", "V1_BATCH.json",
+    ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs, three runs", "V3_BATCH.json",
      {"speed": MEAN, "machines": NODES, "energy": STANDBY}, None),
 ]
 REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer, GitHub)", "Real cloud (Azure AKS, billed)",
@@ -155,7 +155,7 @@ def main():
          f"(more for the same, or the same for less, across work, speed, machines and energy)", "",
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): confirmed better or confirmed worse in all "
          "three runs counts, as the geometric mean of the runs' ratios; no difference beyond the noise counts as exactly 1, so "
-         "nothing inside the noise is claimed either way. Real Kubernetes (Omni v1) and the real database (Omni v3) are the real "
+         "nothing inside the noise is claimed either way. Real Kubernetes (Omni v3; the v1 tables read the same and stay in `docs/OMNI_V1.md`) and the real database (Omni v3) are the real "
          "categories in; Azure and the card join as their three-run tables land. The law, controllers and runners are the same bytes "
          "in v1 and v3 (`docs/OMNI_V3.md`); each table names the engine it ran on.", "",
          "| Category | Index | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |", "|---|---:|---:|---:|---:|---:|---:|"]
