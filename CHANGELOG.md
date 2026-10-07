@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Azure fleet rebuilt from the families the subscription allows** (preregistration amendment 2): the DAv4, ESv4 and
+  EAv4 families have no allowance at all (the "remaining 0" refusals), so three of the eight pools could never be built.
+  Ten allowed families give 45 workers; list prices from Azure's own price API; `scripts/aks_paired.sh` pre-flights
+  every pool's size and family allowance before anything is built or billed.
 - **All six Kubernetes tests confirmed on v3** (`results/live/V3_WANDERING.md`, `V3_ALL_FOUR.md` join the four already in):
   wandering p95 −57% to −63% and failed requests −9% to −12%; all four work inside the line +35% to +49%, p95 −61% to
   −66%, failed requests −11% to −14%; all confirmed better; machines and energy inside the noise in both. The same

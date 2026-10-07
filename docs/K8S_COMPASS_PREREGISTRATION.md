@@ -822,6 +822,20 @@ is a statement about the lever, not about the law. This run makes the lever big 
   above; `hpa_max` 315; the steps scaled by 35/39 as this section says, steady `16 31 48 16 31 16`, burst
   `10 31 10 48 10 31`. One machine is 2.9% of this fleet. Nothing else changes. The 39-worker fleet stands for the runs
   made after the detached machine is deleted.
+- **Amendment 2 (2026-10-07 09:40 UTC, before the counted run).** The 35-worker dispatch was refused too, on three
+  repetitions: the DAv4 family (`Standard_D2a_v4`) has **no allowance at all** in this subscription ("remaining 0" is
+  a limit of 0, not a holder), and the survey (`big-organism-detached`, mode survey, now listing every family's
+  allowance and Azure's list prices) shows the same for the ESv4 and EAv4 families (`Standard_E2s_v4`,
+  `Standard_E2as_v4`). Three of the eight pools could never be built. The fleet is rebuilt from families the survey
+  shows allowed (10 vCPUs each) and offered in eastus: `Standard_D2s_v4:4, Standard_D2as_v4:1, Standard_D2_v4:5,
+  Standard_D2ds_v4:5, Standard_D2d_v4:5, Standard_D2s_v3:5, Standard_D2as_v7:5, Standard_D2ads_v7:5, Standard_D2als_v7:5,
+  Standard_D2alds_v7:5`: **45 workers** of ten families (one machine 2.2% of the fleet); `hpa_max` 405; the steps
+  scaled by 45/39, steady `21 40 61 21 40 21`, burst `13 40 13 61 13 40`. List prices from Azure's own price API
+  (Linux, pay as you go, eastus, USD a machine-hour): D2s_v4 0.096, D2as_v4 0.096, D2_v4 0.096, D2ds_v4 0.113, D2d_v4
+  0.113, D2s_v3 0.096, D2as_v7 0.0908, D2ads_v7 0.114, D2als_v7 0.0804, D2alds_v7 0.0952 (the 0.086 used for D2as_v4
+  in the refused dispatches was wrong; no bill was ever made with it). `scripts/aks_paired.sh` now checks every pool's
+  size and family allowance before anything is built, so a refusal costs a minute, not a repetition. Nothing else
+  changes.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

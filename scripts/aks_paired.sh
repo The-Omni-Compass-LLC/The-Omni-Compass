@@ -29,6 +29,24 @@ PROFILE="${AKS_AUTOSCALER_PROFILE:-scale-down-unneeded-time=2m scale-down-delay-
 k=${#arms[@]}; off=$(( (REP - 1) % k ))
 order=( "${arms[@]:off}" "${arms[@]:0:off}" )
 echo "repetition $REP, order: ${order[*]}, work pools $POOLS (up to $TOTAL workers) in $LOC"
+# Pre-flight, before anything is built or billed: every pool's size must be offered to this subscription in the region,
+# and its machine family must have the vCPUs free (the per-family allowance, not the regional one, is what a fleet fails
+# on; a family with no allowance at all reads "remaining 0" only once the cluster is half built). One refusal ends the
+# repetition here, in a minute, instead of after ten minutes of cluster building.
+az vm list-usage -l "$LOC" -o json > "/tmp/usage-$LOC.json"
+bad=0
+for p in ${POOLS//,/ }; do
+  psize="${p%%:*}"; pmax="${p##*:}"
+  fam=$(az vm list-skus -l "$LOC" --size "$psize" --resource-type virtualMachines -o tsv --query "[0].family" 2>/dev/null)
+  restricted=$(az vm list-skus -l "$LOC" --size "$psize" --resource-type virtualMachines -o tsv --query "[0].restrictions[0].reasonCode" 2>/dev/null)
+  vcpus=$(az vm list-skus -l "$LOC" --size "$psize" --resource-type virtualMachines -o tsv --query "[0].capabilities[?name=='vCPUs'].value | [0]" 2>/dev/null)
+  if [ -z "$fam" ]; then echo "pre-flight: $psize is not offered in $LOC"; bad=1; continue; fi
+  if [ -n "$restricted" ]; then echo "pre-flight: $psize is restricted in $LOC ($restricted)"; bad=1; continue; fi
+  read -r used limit < <(python3 -c "import json,sys; u=[x for x in json.load(open(sys.argv[1])) if x['name']['value']==sys.argv[2]]; print(u[0]['currentValue'], u[0]['limit']) if u else print(0, 0)" "/tmp/usage-$LOC.json" "$fam")
+  need=$(( pmax * ${vcpus:-2} )); [ "$psize" = "$SIZE" ] && need=$(( need + ${vcpus:-2} ))     # the system machine shares the first pool's family
+  if [ $(( limit - used )) -lt "$need" ]; then echo "pre-flight: $psize ($fam) needs $need vCPUs, $(( limit - used )) free of $limit"; bad=1; else echo "pre-flight: $psize ($fam) $need of $(( limit - used )) free vCPUs: ok"; fi
+done
+[ "$bad" = 0 ] || { echo "pre-flight failed: nothing built, nothing billed"; exit 2; }
 az group create -n "$RG" -l "$LOC" -o none
 gone() { az aks delete -g "$RG" -n "$1" --yes -o none 2>/dev/null || true; }
 for arm in "${order[@]}"; do
