@@ -32,9 +32,12 @@ Founder, The Omni-Compass LLC
   clock ceiling, a power limit, a setpoint) to hold the service in the middle of its band. The muscles keep their own
   controls. Omni-Compass sets what they already accept.
 - **What it does for you.** It turns the room your systems keep "just in case" into either more work for the same
-  energy or the same work on fewer machines and fewer watts. On real Kubernetes (two independent sets of ten paired
-  runs) it served the same traffic with about a third fewer machines in service, responses about 60% faster at the
-  95th percentile, and zero failed requests (section 15).
+  energy or the same work on fewer machines and fewer watts. On real Kubernetes, on the frozen engine Omni v1, run
+  three separate times with ten paired runs each, it handled 42% to 48% more work inside the response line on the same
+  machines, answered 57% to 69% faster at the 95th percentile, and gave back machines only where a paired trial showed
+  no request slower (section 16). On a real database it held 61% to 72% fewer connections open for the same work and
+  the same latency, at a confirmed cost in the host's CPU seconds (+14% to +28%), reported as such. The one combined
+  number, the Omni index over the real categories confirmed three times, stands at +20.1% (`results/OMNI_INDEX.md`).
 - **How it stays safe.** It watches before it writes, records every original setting before it acts, reads back
   every write, never writes past a knob's cover, gives everything back the moment service is at risk, stops writing
   if anyone else touches a knob, and returns every setting to its original value on one OFF switch.
@@ -60,7 +63,7 @@ The book is in eight parts, and it can be read in two ways.
 toward a center cannot run away, and everything it does is a return. **Part Two, the mathematics,** gives the eight
 equations and the control law that make the circle exact, with the theorem, the declaration and the audits that hold
 them fixed. **Part Three, the physics,** brings the law into the machine: the compass, push and pull, the band and its
-cushions, the physics of a processor, and the two-way nervous system. **Part Four, the body,** lays out the 656
+cushions, the physics of a processor, and the two-way nervous system. **Part Four, the body,** lays out the
 muscles, the four realms and the six organisms. **Part Five, the harness and the wiring,** is the universal plug and
 the step-by-step work of wiring Omni-Compass onto a stack. **Part Six, operating it,** is the OFF switch, the rules
 and the log. **Part Seven, proving it,** is every rule written before a run and every result after it. **Part Eight**
@@ -1534,7 +1537,7 @@ at full speed; the compass paces only the slack between bursts. Second, *never s
 governor learns, from the card's own meter, the clock and the draw the card reaches by itself while busy, and never
 sets the clock ceiling or the lid under them. Without these rules the first real card saved 3.5% of its energy and
 made the slowest answers 58.5% slower; with them, the modelled card saves energy with the slowest answers at native
-speed or faster (section 15, and `docs/GPU_PREREGISTRATION.md`, amendments 6 and 7).
+speed or faster (section 16, and `docs/GPU_PREREGISTRATION.md`, amendments 6 and 7).
 
 
 ## 17. The Physics of a Processor
@@ -1694,19 +1697,19 @@ Patent applications, copyright registrations and trademark applications filed in
 ## 20. The Muscles, the Realms and the Six Organisms
 
 
-The catalog (`realms/catalog.csv`) lists 656 distinct muscles, each with its family, its plant model and its knob. The
+The catalog (`realms/catalog.csv`) lists 945 distinct muscles in 59 families (Omni v2; v1 listed 656 in 46), each with its family, its plant model and its knob. The
 register (`docs/REGISTER.md`) lists them by family next to every benchmark, run and still to run.
 They fall into four realms. Every realm stands on the same spine (Kubernetes, machines, GPUs and CPUs, network,
-storage, observability, security, cooling and electrical distribution, 190 muscles), plus its own domain muscles.
+storage, observability, security, cooling and electrical distribution, 257 muscles), plus its own domain muscles.
 
 | Organism | Muscles | What it is |
 |---|---:|---|
-| 1. Compute / AI / Cloud | 345 | clusters, GPUs, AI training and inference, cloud capacity |
-| 2. Physics / Robotics / Autonomous | 262 | joints, fleets, vehicles, flight and spacecraft axes |
-| 3. Energy / Facility / Industrial | 282 | data halls, buildings, batteries, UPS, process loops, feeders |
-| 4. Distribution / Specialized | 337 | networks, storage, databases, commerce, workflows, radio networks |
-| 5. The four stacked, every duplicate kept | 1,226 | all four realms on one clock, the shared spine counted in each |
-| 6. The whole tower, every muscle once | 656 | every distinct muscle on one clock |
+| 1. Compute / AI / Cloud | 430 | clusters, GPUs, AI training and inference, cloud capacity |
+| 2. Physics / Robotics / Autonomous | 376 | joints, fleets, vehicles, flight and spacecraft axes |
+| 3. Energy / Facility / Industrial | 470 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
+| 4. Distribution / Specialized | 440 | networks, storage, databases, commerce, workflows, radio networks, clinical systems, ports |
+| 5. The four stacked, every duplicate kept | 1,716 | all four realms on one clock, the shared spine counted in each |
+| 6. The whole tower, every muscle once | 945 | every distinct muscle on one clock |
 
 These six organisms are the benchmark set. Each is run native and with Omni-Compass on top, on the same seed, the
 same load and the same clock, and each produces its own receipt.
@@ -1716,25 +1719,25 @@ same load and the same clock, and each produces its own receipt.
 
 
 
-The 656-muscle tower on modelled plants: four realms and the whole tower as a fifth organism, each run natively and
+The muscle tower on modelled plants (945 muscles in Omni v2, 656 in v1): four realms and the whole tower as a fifth organism, each run natively and
 with Omni-Compass on top, with meters and receipts. Evidence class **S** (simulation).
 
 ### Run it
 
 ```
 pip install -r requirements.txt
-python3 tools/run_realms.py                      # the preregistered run: 656 muscles and 5 organisms, seeds 1000-1009
+python3 tools/run_realms.py                      # the preregistered run: every muscle and 5 organisms, seeds 1000-1009
 python3 tests/test_realms.py                     # the harness's own checks (also inside verify.py)
 ```
 
-Results: `results/realms/REALMS.md` (the tables), `MUSCLES.csv` (one row per muscle), `REALMS.json` (every per-seed
+Results (Omni v3; v2's are in `results/realms/v2/`, v1's in `results/realms/v1/`): `results/realms/REALMS.md` (the tables), `MUSCLES.csv` (one row per muscle), `REALMS.json` (every per-seed
 contrast), `RUN.json` and `SHA256SUMS.txt` (commit and fingerprints).
 
 ### What is where
 
 | File | What it is |
 |---|---|
-| `realms/catalog.csv` | the 656 muscles: family, name, realm, plant, parameter set, knob |
+| `realms/catalog.csv` | the 945 muscles: family, name, realm, plant, parameter set, knob (v1's 656: `realms/catalog_v1.csv`) |
 | `tools/realms_catalog.py` | the rules that gave each muscle its realm, plant and knob |
 | `realms/plants.py` | the five plants and their native controllers; the four knobs; the capacity law for one plant |
 | `realms/presets.py` | every parameter, one set per family class |
@@ -1765,56 +1768,56 @@ Patent applications, copyright registrations and trademark applications filed in
 
 
 
-Generated from `realms/catalog.csv` (rules: `tools/realms_catalog.py`). Every realm's organism is its own families plus the **shared spine** (the infrastructure every real stack runs on), so the realms overlap on purpose. The fifth organism holds each of the 656 once. Each muscle's plant model and the one knob Omni may hold are in brackets.
+Generated from `realms/catalog.csv` (rules: `tools/realms_catalog.py`; the v2 build: `tools/realms_catalog_v2.py`). Every realm's organism is its own families plus the **shared spine** (the infrastructure every real stack runs on), so the realm counts add to more than the tower. Each muscle is followed by the one knob Omni may hold on it.
 
-### The shared spine: 190 muscles, in all four realms
+### The shared spine: 257 muscles, in all four realms
 
-#### Cloud VM & Capacity (16; plant: compute_pool, node)
-vm_count [capacity], vm_size [capacity], vm_start_stop [capacity], vm_migrate [capacity], instance_family [capacity], asg_min [capacity], asg_max [capacity], spot_mix [capacity], reservation_mix [capacity], zone_selection [capacity], region_selection [capacity], architecture_selection [capacity], accelerator_selection [capacity], boot_disk_class [capacity], placement_group [capacity], interruption_response [capacity]
+#### Cloud VM & Capacity (21; plant: compute_pool, node)
+vm_count [capacity], vm_size [capacity], vm_start_stop [capacity], vm_migrate [capacity], instance_family [capacity], asg_min [capacity], asg_max [capacity], spot_mix [capacity], reservation_mix [capacity], zone_selection [capacity], region_selection [capacity], architecture_selection [capacity], accelerator_selection [capacity], boot_disk_class [capacity], placement_group [capacity], interruption_response [capacity], target_tracking_policy [setpoint], scaling_cooldown_warmup [capacity], vm_cpu_cap_by_priority [admission], predictive_scaling [capacity], instance_refresh [capacity]
 
-#### Container Resources (16; plant: compute_pool, server)
-cpu_request [capacity], cpu_limit [capacity], memory_request [capacity], memory_limit [capacity], ephemeral_storage [capacity], hugepages [capacity], io_weight [setpoint], pids_limit [capacity], memory_high [capacity], memory_reclaim [capacity], swap_limit [capacity], cgroup_io_max [capacity], cpu_weight [setpoint], cpu_quota [admission], cpuset [capacity], runtime_class [capacity]
+#### Container Resources (23; plant: compute_pool, server)
+cpu_request [capacity], cpu_limit [capacity], memory_request [capacity], memory_limit [capacity], ephemeral_storage [capacity], hugepages [capacity], io_weight [setpoint], pids_limit [capacity], memory_high [capacity], memory_reclaim [capacity], swap_limit [capacity], cgroup_io_max [capacity], cpu_weight [setpoint], cpu_quota [admission], cpuset [capacity], runtime_class [capacity], in_place_resize [capacity], namespace_quota [admission], default_limits [capacity], memory_hard_limit [capacity], memory_protection [capacity], io_latency_target [setpoint], freeze [admission]
 
-#### Host CPU & Memory (16; plant: compute_pool, cpu_host)
-cpufreq_min [power], cpufreq_max [power], rapl_package_power [power], uncore_frequency [power], energy_perf_preference [power], cpu_idle_policy [power], memory_bandwidth [capacity], numa_balance [capacity], irq_affinity [capacity], llc_allocation [capacity], memory_pressure_gate [admission], page_reclaim_rate [capacity], transparent_hugepages [capacity], core_online_offline [capacity], thermal_throttle_policy [power], host_power_profile [power]
+#### Cooling, Chillers & Thermodynamics (18; plant: thermal_zone, data_hall)
+supply_air_temperature [setpoint], return_air_target [setpoint], coolant_supply_temperature [setpoint], coolant_flow [capacity], pump_speed [capacity], fan_speed [capacity], chiller_setpoint [setpoint], compressor_authority [power], cooling_tower_fan [capacity], cooling_capacity [capacity], rack_thermal_budget [power], gpu_thermal_envelope [setpoint], cpu_thermal_envelope [setpoint], thermal_workload_migrate [admission], thermal_load_shed [admission], server_fan_speed [capacity], economiser [capacity], chiller_plant_supervisory_control_rl_with_safety_layer [capacity]
 
-#### Kubernetes Placement & Scheduling (16; plant: compute_pool, server)
-node_selector [capacity], node_affinity [capacity], pod_anti_affinity [capacity], topology_spread [capacity], numa_placement [capacity], gpu_topology [capacity], storage_locality [capacity], network_locality [capacity], taint_toleration [setpoint], priority_class [admission], preemption_policy [admission], device_claim [capacity], failure_domain_spread [capacity], scheduler_backoff [admission], gang_admission [admission], deschedule [capacity]
+#### Host CPU & Memory (23; plant: compute_pool, cpu_host)
+cpufreq_min [power], cpufreq_max [power], rapl_package_power [power], uncore_frequency [power], energy_perf_preference [power], cpu_idle_policy [power], memory_bandwidth [capacity], numa_balance [capacity], irq_affinity [capacity], llc_allocation [capacity], memory_pressure_gate [admission], page_reclaim_rate [capacity], transparent_hugepages [capacity], core_online_offline [capacity], thermal_throttle_policy [power], host_power_profile [power], frequency_governor [power], turbo_boost [capacity], dram_power_limit [power], swappiness_reclaim [capacity], core_packing [capacity], per_pod_cpu_frequency_range_and_c_state_access [power], uncore_frequency_per_node [power]
 
-#### Kubernetes Workload Scaling (16; plant: compute_pool, server)
-replicas [capacity], hpa_cpu_target [setpoint], hpa_memory_target [setpoint], hpa_custom_target [setpoint], vpa_apply [capacity], scale_to_zero [capacity], keda_threshold [admission], rollout_rate [capacity], max_surge [capacity], max_unavailable [capacity], deployment_pause_resume [admission], rollout_abort [admission], pod_eviction [admission], pdb_policy [capacity], scheduler_queue_priority [admission], api_priority_fairness [admission]
+#### Kubernetes Placement & Scheduling (20; plant: compute_pool, server)
+node_selector [capacity], node_affinity [capacity], pod_anti_affinity [capacity], topology_spread [capacity], numa_placement [capacity], gpu_topology [capacity], storage_locality [capacity], network_locality [capacity], taint_toleration [setpoint], priority_class [admission], preemption_policy [admission], device_claim [capacity], failure_domain_spread [capacity], scheduler_backoff [admission], gang_admission [admission], deschedule [capacity], scheduler_scoring_strategy [capacity], scheduler_plugin_weights [setpoint], scheduling_gates [admission], cpu_manager [capacity]
 
-#### NVIDIA GPU Hardware (15; plant: compute_pool, gpu)
-gpu_allocate [capacity], gpu_power_limit [power], gpu_sm_clock [power], gpu_memory_clock [power], gpu_persistence_mode [capacity], gpu_compute_mode [capacity], mig_mode [capacity], mig_geometry [capacity], gpu_timeslice [capacity], gpu_mps [capacity], gpu_quarantine [admission], gpu_reset [capacity], gpu_thermal_limit [power], gpu_ecc_response [capacity], gpu_job_power_budget [admission]
+#### Kubernetes Workload Scaling (31; plant: compute_pool, server)
+replicas [capacity], hpa_cpu_target [setpoint], hpa_memory_target [setpoint], hpa_custom_target [setpoint], vpa_apply [capacity], scale_to_zero [capacity], keda_threshold [admission], rollout_rate [capacity], max_surge [capacity], max_unavailable [capacity], deployment_pause_resume [admission], rollout_abort [admission], pod_eviction [admission], pdb_policy [capacity], scheduler_queue_priority [admission], api_priority_fairness [admission], hpa_min_replicas [capacity], hpa_max_replicas [capacity], hpa_scale_down_stabilisation_window [setpoint], hpa_scale_up_stabilisation_window [setpoint], hpa_scaling_rate_policies [capacity], hpa_policy_selection [capacity], hpa_tolerance [capacity], hpa_sync_period [capacity], vpa_minmax_allowed_resources [capacity], keda_polling_interval [setpoint], rollout_progress_deadline [admission], rollout_readiness_delay [capacity], unhealthy_pod_eviction_policy [admission], graceful_termination [capacity], probes [capacity]
 
-#### Node Fleet & Karpenter-Class Control (16; plant: compute_pool, node)
-node_desired [capacity], node_pool_min [capacity], node_pool_max [capacity], node_provision [capacity], node_cordon [admission], node_drain [admission], node_consolidate [capacity], node_replace [capacity], node_shutdown [capacity], node_power_on [capacity], nodepool_weight [setpoint], disruption_budget [admission], consolidation_policy [capacity], consolidate_after [capacity], expire_after [capacity], capacity_class [capacity]
+#### NVIDIA GPU Hardware (19; plant: compute_pool, gpu)
+gpu_allocate [capacity], gpu_power_limit [power], gpu_sm_clock [power], gpu_memory_clock [power], gpu_persistence_mode [capacity], gpu_compute_mode [capacity], mig_mode [capacity], mig_geometry [capacity], gpu_timeslice [capacity], gpu_mps [capacity], gpu_quarantine [admission], gpu_reset [capacity], gpu_thermal_limit [power], gpu_ecc_response [capacity], gpu_job_power_budget [admission], application_clocks [power], gpu_temperature_target [setpoint], sync_boost [capacity], target_clocks [power]
 
-#### Network Routing & Switching (16; plant: compute_pool, network)
-lb_weight [setpoint], route_weight [setpoint], rate_limit [admission], bandwidth_limit [capacity], qos_class [capacity], connection_limit [admission], failover_route [capacity], nic_rate_limit [admission], nic_queue_count [capacity], queue_discipline [capacity], congestion_control [capacity], egress_budget [admission], ingress_budget [admission], ecmp_weight [setpoint], path_selection [capacity], network_isolation [admission]
+#### Network Routing & Switching (19; plant: compute_pool, network)
+lb_weight [setpoint], route_weight [setpoint], rate_limit [admission], bandwidth_limit [capacity], qos_class [capacity], connection_limit [admission], failover_route [capacity], nic_rate_limit [admission], nic_queue_count [capacity], queue_discipline [capacity], congestion_control [capacity], egress_budget [admission], ingress_budget [admission], ecmp_weight [setpoint], path_selection [capacity], network_isolation [admission], nic_interrupt_coalescing [capacity], nic_ring_size [capacity], port_link_power [power]
 
-#### Observability & Telemetry (6; plant: compute_pool, server)
-collector_memory_limit [capacity], export_concurrency [admission], cardinality_budget [admission], retention_window [setpoint], remote_write_queue [capacity], telemetry_shed [admission]
+#### Node Fleet & Karpenter-Class Control (24; plant: compute_pool, node)
+node_desired [capacity], node_pool_min [capacity], node_pool_max [capacity], node_provision [capacity], node_cordon [admission], node_drain [admission], node_consolidate [capacity], node_replace [capacity], node_shutdown [capacity], node_power_on [capacity], nodepool_weight [setpoint], disruption_budget [admission], consolidation_policy [capacity], consolidate_after [capacity], expire_after [capacity], capacity_class [capacity], scale_down_utilisation_threshold [admission], scale_down_unneeded_time [capacity], scale_down_delay_after_add [capacity], expander [capacity], node_pool_limits [capacity], kubelet_eviction_thresholds [admission], kubelet_reserved_resources [capacity], max_pods_per_node [capacity]
+
+#### Observability & Telemetry (9; plant: compute_pool, server)
+collector_memory_limit [capacity], export_concurrency [admission], cardinality_budget [admission], retention_window [setpoint], remote_write_queue [capacity], telemetry_shed [admission], metric_scrape_interval [setpoint], batching [capacity], per_pod_energy_attribution [capacity]
+
+#### PDU, UPS & Electrical Distribution (18; plant: energy_storage, ups)
+server_power_cap [power], rack_power_cap [power], pdu_branch_power_limit [power], pdu_outlet_control [capacity], ups_operating_mode [capacity], ups_charge_rate [power], ups_discharge_rate [power], phase_balance [capacity], load_transfer [admission], reactive_power_target [setpoint], voltage_target [setpoint], generator_dispatch [capacity], electrical_isolation [admission], breaker_trip_gate [admission], ups_shutdown_battery_test [capacity], hierarchical_power_budget_row_pdu_switchboard_controllers [power], priority_aware_capping_throttle_low_priority_first [power], power_oversubscription_with_prediction [power]
 
 #### Reliability, Security & Recovery (12; plant: compute_pool, server)
 restart [capacity], rollback [capacity], traffic_divert_recovery [capacity], degraded_mode [capacity], actuator_freeze [admission], workload_isolate [admission], credential_rotation_gate [admission], policy_enforcement [capacity], rate_abuse_gate [admission], fault_domain_isolate [admission], backup_trigger [capacity], kill_switch [admission]
 
-#### Storage Block/File/Object (16; plant: compute_pool, storage)
-volume_size [capacity], iops_limit [capacity], throughput_limit [capacity], replica_count [capacity], storage_tier [capacity], volume_placement [capacity], snapshot_trigger [capacity], rebalance [capacity], recovery_rate [capacity], backfill_rate [capacity], compaction_pressure [capacity], cache_allocation [capacity], object_replication [capacity], erasure_code_profile [capacity], storage_admission [admission], degraded_storage_gate [admission]
+#### Storage Block/File/Object (20; plant: compute_pool, storage)
+volume_size [capacity], iops_limit [capacity], throughput_limit [capacity], replica_count [capacity], storage_tier [capacity], volume_placement [capacity], snapshot_trigger [capacity], rebalance [capacity], recovery_rate [capacity], backfill_rate [capacity], compaction_pressure [capacity], cache_allocation [capacity], object_replication [capacity], erasure_code_profile [capacity], storage_admission [admission], degraded_storage_gate [admission], scrub_schedule [capacity], io_scheduler [capacity], disk_power_spin_down [power], lifecycle_tiering [capacity]
 
-#### Cooling, Chillers & Thermodynamics (15; plant: thermal_zone, data_hall)
-supply_air_temperature [setpoint], return_air_target [setpoint], coolant_supply_temperature [setpoint], coolant_flow [capacity], pump_speed [capacity], fan_speed [capacity], chiller_setpoint [setpoint], compressor_authority [power], cooling_tower_fan [capacity], cooling_capacity [capacity], rack_thermal_budget [power], gpu_thermal_envelope [setpoint], cpu_thermal_envelope [setpoint], thermal_workload_migrate [admission], thermal_load_shed [admission]
+### Realm 1: Compute / AI / Cloud: 173 own muscles + the spine = 430 in its organism
 
-#### PDU, UPS & Electrical Distribution (14; plant: energy_storage, ups)
-server_power_cap [power], rack_power_cap [power], pdu_branch_power_limit [power], pdu_outlet_control [capacity], ups_operating_mode [capacity], ups_charge_rate [power], ups_discharge_rate [power], phase_balance [capacity], load_transfer [admission], reactive_power_target [setpoint], voltage_target [setpoint], generator_dispatch [capacity], electrical_isolation [admission], breaker_trip_gate [admission]
+#### AI Inference Serving (24; plant: compute_pool, gpu)
+model_replicas [capacity], model_route_weight [setpoint], model_load [capacity], model_unload [capacity], model_instance_count [capacity], continuous_batching [capacity], max_batch_size [capacity], batch_queue_delay [capacity], inference_concurrency [admission], inference_max_tokens [capacity], kv_cache_budget [admission], prefix_cache_budget [admission], speculative_decode_budget [admission], model_precision [power], inference_priority [admission], inference_slo_gate [admission], autoscaling_target_concurrency_qps [admission], scale_to_zero_panic_window [setpoint], request_priority_levels [admission], kv_cache_swap_space [capacity], chunked_prefill [capacity], tensor_parallel_degree [capacity], disaggregated_prefill_decode [capacity], lora_adapter_load [capacity]
 
-### Realm 1: Compute / AI / Cloud: 155 own muscles + the spine = 345 in its organism
-
-#### AI Inference Serving (16; plant: compute_pool, gpu)
-model_replicas [capacity], model_route_weight [setpoint], model_load [capacity], model_unload [capacity], model_instance_count [capacity], continuous_batching [capacity], max_batch_size [capacity], batch_queue_delay [capacity], inference_concurrency [admission], inference_max_tokens [capacity], kv_cache_budget [admission], prefix_cache_budget [admission], speculative_decode_budget [admission], model_precision [power], inference_priority [admission], inference_slo_gate [admission]
-
-#### AI Training (16; plant: compute_pool, gpu_batch)
-training_workers [capacity], global_batch_size [capacity], microbatch_size [capacity], gradient_accumulation [capacity], data_parallelism [capacity], tensor_parallelism [capacity], pipeline_parallelism [capacity], expert_parallelism [capacity], checkpoint_interval [setpoint], checkpoint_trigger [capacity], training_preempt [admission], training_gang_size [capacity], elastic_worker_count [capacity], straggler_mitigation [capacity], training_precision [power], compute_comm_overlap [capacity]
+#### AI Training (18; plant: compute_pool, gpu_batch)
+training_workers [capacity], global_batch_size [capacity], microbatch_size [capacity], gradient_accumulation [capacity], data_parallelism [capacity], tensor_parallelism [capacity], pipeline_parallelism [capacity], expert_parallelism [capacity], checkpoint_interval [setpoint], checkpoint_trigger [capacity], training_preempt [admission], training_gang_size [capacity], elastic_worker_count [capacity], straggler_mitigation [capacity], training_precision [power], compute_comm_overlap [capacity], activation_checkpointing [capacity], dataloader_workers [capacity]
 
 #### Cross-Cluster, Multi-Region & Edge (15; plant: compute_pool, node)
 multi_cluster_dispatch [capacity], region_dispatch [capacity], zone_dispatch [capacity], edge_dispatch [capacity], cloud_capacity_class [capacity], workload_migrate_region [capacity], data_residency_gate [admission], latency_region_gate [admission], cost_region_gate [admission], carbon_region_gate [admission], global_failover [capacity], federation_quota [admission], cross_cluster_replication [capacity], edge_offload [capacity], global_admission [admission]
@@ -1825,11 +1828,11 @@ dpu_pf_tx_rate [capacity], dpu_vf_tx_rate [capacity], dpu_sf_tx_rate [capacity],
 #### Distributed Cluster Managers (15; plant: compute_pool, batch)
 task_admission [admission], task_priority [admission], resource_reservation [capacity], cluster_quota [admission], task_preemption [admission], binpack_pressure [capacity], spread_pressure [capacity], gang_schedule [capacity], worker_allocation [capacity], maintenance_evacuation [capacity], oversubscription [capacity], resource_reclaim [capacity], queue_fairness [admission], deadline_pressure [admission], scheduler_retry [admission]
 
-#### GPU Fabric & RDMA (16; plant: compute_pool, fabric)
-nvlink_placement [capacity], nvswitch_route [capacity], gpu_fabric_quarantine [admission], rdma_bandwidth [capacity], rdma_route [capacity], nic_affinity [capacity], collective_concurrency [admission], collective_algorithm [capacity], collective_chunk_size [capacity], rank_placement [capacity], gpudirect_policy [capacity], congestion_response [capacity], rail_selection [capacity], fabric_failover [capacity], communication_priority [admission], fabric_isolation [admission]
+#### GPU Fabric & RDMA (18; plant: compute_pool, fabric)
+nvlink_placement [capacity], nvswitch_route [capacity], gpu_fabric_quarantine [admission], rdma_bandwidth [capacity], rdma_route [capacity], nic_affinity [capacity], collective_concurrency [admission], collective_algorithm [capacity], collective_chunk_size [capacity], rank_placement [capacity], gpudirect_policy [capacity], congestion_response [capacity], rail_selection [capacity], fabric_failover [capacity], communication_priority [admission], fabric_isolation [admission], collective_protocol [capacity], nic_hca_selection [capacity]
 
-#### HPC & Distributed Compute (16; plant: compute_pool, batch)
-job_slots [capacity], mpi_ranks [capacity], rank_mapping [capacity], node_allocation [capacity], job_walltime [capacity], job_priority [admission], job_preemption [admission], checkpoint_restart [capacity], parallel_io_budget [admission], collective_budget [admission], accelerator_share [capacity], cpu_gpu_ratio [setpoint], memory_per_rank [capacity], scratch_budget [admission], scheduler_fair_share [admission], backfill_policy [capacity]
+#### HPC & Distributed Compute (19; plant: compute_pool, batch)
+job_slots [capacity], mpi_ranks [capacity], rank_mapping [capacity], node_allocation [capacity], job_walltime [capacity], job_priority [admission], job_preemption [admission], checkpoint_restart [capacity], parallel_io_budget [admission], collective_budget [admission], accelerator_share [capacity], cpu_gpu_ratio [setpoint], memory_per_rank [capacity], scratch_budget [admission], scheduler_fair_share [admission], backfill_policy [capacity], node_power_saving [power], cpu_frequency_per_job [power], partition_limits [capacity]
 
 #### Kubernetes Dynamic Device Allocation (8; plant: compute_pool, gpu)
 dra_device_class_selection [capacity], dra_claim_capacity [capacity], dra_claim_sharing [capacity], dra_device_taint [capacity], dra_device_eviction [admission], dra_binding_readiness [capacity], dra_binding_failure_response [capacity], dra_device_configuration [setpoint]
@@ -1840,33 +1843,48 @@ machine_remediation [capacity], machine_health_gate [admission], mcp_pause [admi
 #### Quantum Computing Control Simulation (16; plant: compute_pool, qpu)
 qubit_mapping [capacity], circuit_admission [admission], shot_allocation [capacity], circuit_scheduling [admission], gate_scheduling [capacity], pulse_amplitude [capacity], pulse_duration [setpoint], pulse_phase [capacity], pulse_frequency [power], coupling_control [capacity], reset_scheduling [capacity], measurement_scheduling [capacity], dynamical_decoupling [capacity], noise_aware_routing [capacity], error_mitigation_budget [admission], quantum_queue_priority [admission]
 
-#### Work Admission & Demand Shaping (16; plant: compute_pool, server)
-api_concurrency [admission], queue_concurrency [admission], queue_backpressure [admission], job_admission [admission], batch_admission [admission], inference_admission [admission], load_shed [admission], priority_gate [admission], tenant_admission [admission], burst_limit [admission], deadline_admission [admission], work_budget [admission], request_queue_limit [admission], retry_admission [admission], background_work_gate [admission], maintenance_work_gate [admission]
+#### Work Admission & Demand Shaping (19; plant: compute_pool, server)
+api_concurrency [admission], queue_concurrency [admission], queue_backpressure [admission], job_admission [admission], batch_admission [admission], inference_admission [admission], load_shed [admission], priority_gate [admission], tenant_admission [admission], burst_limit [admission], deadline_admission [admission], work_budget [admission], request_queue_limit [admission], retry_admission [admission], background_work_gate [admission], maintenance_work_gate [admission], request_concurrency_limit [admission], adaptive_concurrency_limit [admission], priority_request_queue_under_limit [admission]
 
-### Realm 2: Physics / Robotics / Autonomous: 72 own muscles + the spine = 262 in its organism
+### Realm 2: Physics / Robotics / Autonomous: 119 own muscles + the spine = 376 in its organism
 
-#### Automotive EV & Mobile Powertrain (12; plant: motion_axis, ev_traction)
-traction_torque_limit [power], regen_braking_level [power], battery_charge_limit [power], battery_discharge_limit [power], battery_thermal_target [power], motor_thermal_limit [power], vehicle_speed_envelope [capacity], energy_recovery_target [power], auxiliary_power_budget [power], fast_charge_current [power], fast_charge_voltage [power], vehicle_safe_state [admission]
+#### Automotive EV & Mobile Powertrain (14; plant: motion_axis, ev_traction)
+traction_torque_limit [power], regen_braking_level [power], battery_charge_limit [power], battery_discharge_limit [power], battery_thermal_target [power], motor_thermal_limit [power], vehicle_speed_envelope [capacity], energy_recovery_target [power], auxiliary_power_budget [power], fast_charge_current [power], fast_charge_voltage [power], vehicle_safe_state [admission], state_of_charge_limits [power], smart_charging_schedule [admission]
 
-#### Aviation & Autonomous Flight (16; plant: motion_axis, flight_axis)
-throttle_envelope [power], attitude_target [capacity], attitude_rate_target [capacity], velocity_target [capacity], altitude_target [capacity], waypoint_authority [capacity], flight_hold [admission], return_to_home [admission], land_action [admission], mission_admission [admission], geofence_response [admission], failsafe_selection [admission], battery_reserve_threshold [admission], actuator_saturation_envelope [capacity], flight_mode_transition [admission], flight_termination_safe_state [admission]
+#### Aviation & Autonomous Flight (20; plant: motion_axis, flight_axis)
+throttle_envelope [power], attitude_target [capacity], attitude_rate_target [capacity], velocity_target [capacity], altitude_target [capacity], waypoint_authority [capacity], flight_hold [admission], return_to_home [admission], land_action [admission], mission_admission [admission], geofence_response [admission], failsafe_selection [admission], battery_reserve_threshold [admission], actuator_saturation_envelope [capacity], flight_mode_transition [admission], flight_termination_safe_state [admission], attitude_rate_gains [capacity], horizontal_speed_limit [power], vertical_speed_limits [power], acceleration_jerk_limits [power]
+
+#### Elevators & Vertical Transport (12; plant: motion_axis, elevator_hoist)
+hoist_speed_target [capacity], acceleration_limit [capacity], regen_drive_mode [power], standby_power_mode [admission], destination_dispatch_schedule [admission], car_parking_mode [admission], door_dwell_hold [admission], escalator_speed_target [capacity], group_capacity_mode [admission], motor_thermal_derate [power], brake_test_schedule [admission], fire_recall_mode [admission]
+
+#### Marine Propulsion & Vessel Automation (12; plant: motion_axis, marine_propulsion)
+shaft_speed_target [capacity], propeller_pitch_limit [power], shaft_power_limit [power], bow_thruster_duty [power], ballast_pump_mode [admission], engine_load_sharing_setpoint [capacity], slow_steaming_speed_target [capacity], auxiliary_engine_staging [capacity], shore_power_mode [admission], hotel_load_budget [power], trim_target [capacity], rudder_rate_limit [power]
+
+#### Rail Traction & Train Control (14; plant: motion_axis, rail_traction)
+traction_effort_limit [power], regenerative_braking_share [power], coasting_speed_target [capacity], dwell_time_schedule [admission], hvac_duty_cycle [power], train_auxiliary_power_budget [power], platform_approach_speed [capacity], acceleration_rate_setpoint [capacity], wheel_slip_protection_mode [admission], traction_motor_thermal_derate [power], catenary_voltage_limit [power], timetable_recovery_margin [admission], headway_target [capacity], door_release_hold [admission]
 
 #### Robotics Fleet & Warehouse Automation (15; plant: compute_pool, robot_fleet)
 robot_dispatch [capacity], task_assignment [capacity], traffic_reservation [capacity], robot_route [capacity], charging_dispatch [capacity], battery_reserve [capacity], elevator_request [capacity], door_request [capacity], conveyor_speed [capacity], agv_speed [capacity], warehouse_zone_admission [admission], robot_quarantine [admission], fleet_failover [capacity], human_safe_stop [capacity], fleet_concurrency [admission]
 
-#### Robotics Motion Control (15; plant: motion_axis, robot_joint)
-joint_position [capacity], joint_velocity [capacity], joint_acceleration [capacity], joint_effort [power], cartesian_velocity [capacity], trajectory_speed [capacity], trajectory_acceleration [capacity], jerk_limit [capacity], collision_margin [capacity], force_limit [power], gripper_force [power], locomotion_speed [capacity], steering_angle [capacity], braking_force [power], balance_correction [capacity]
+#### Robotics Motion Control (18; plant: motion_axis, robot_joint)
+joint_position [capacity], joint_velocity [capacity], joint_acceleration [capacity], joint_effort [power], cartesian_velocity [capacity], trajectory_speed [capacity], trajectory_acceleration [capacity], jerk_limit [capacity], collision_margin [capacity], force_limit [power], gripper_force [power], locomotion_speed [capacity], steering_angle [capacity], braking_force [power], balance_correction [capacity], trajectory_tolerances [capacity], velocity_acceleration_scaling [capacity], controller_update_rate [capacity]
 
 #### Spacecraft & Flight Software (14; plant: motion_axis, reaction_wheel)
 space_command_admission [admission], flight_task_schedule [admission], space_mode_transition [admission], payload_duty_cycle [power], communication_allocation [capacity], space_power_budget [power], space_thermal_command [power], attitude_command_envelope [capacity], reaction_wheel_allocation [capacity], rcs_authority [power], safe_mode_transition [admission], watchdog_recovery [admission], instrument_activation [capacity], fault_isolation [admission]
 
-### Realm 3: Energy / Facility / Industrial: 92 own muscles + the spine = 282 in its organism
+### Realm 3: Energy / Facility / Industrial: 213 own muscles + the spine = 470 in its organism
 
-#### Building & Critical Environment HVAC (12; plant: thermal_zone, building)
-zone_temperature_target [setpoint], zone_airflow [capacity], ahu_fan_speed [capacity], damper_position [capacity], economizer_position [capacity], boiler_setpoint [setpoint], heat_pump_mode [admission], humidity_target [setpoint], occupancy_ventilation [admission], building_demand_limit [power], thermal_storage_dispatch [capacity], hvac_emergency_mode [admission]
+#### Agriculture & Irrigation (14; plant: process_loop, irrigation)
+irrigation_pump_speed [capacity], mainline_pressure_setpoint [setpoint], soil_moisture_target [setpoint], pivot_speed_setpoint [setpoint], fertigation_dose [power], greenhouse_temperature_setpoint [setpoint], greenhouse_co2_target [setpoint], vent_position_setpoint [setpoint], grain_dryer_temperature_setpoint [setpoint], cold_storage_temperature_setpoint [setpoint], barn_ventilation_rate [capacity], milking_vacuum_level_setpoint [setpoint], well_drawdown_level_target [setpoint], drip_zone_dispatch [admission]
 
-#### Energy Storage & Microgrid (16; plant: energy_storage, microgrid)
-battery_charge_power [power], battery_discharge_power [power], battery_soc_reserve [setpoint], grid_import_limit [power], grid_export_limit [power], pv_curtailment [power], ev_charge_power [power], heat_pump_power [power], electrolyzer_power [power], microgrid_demand_limit [power], peak_shaving [capacity], time_of_use_schedule [setpoint], energy_load_shed [admission], flex_load_admission [admission], storage_dispatch [capacity], microgrid_emergency_reserve [setpoint]
+#### Building & Critical Environment HVAC (15; plant: thermal_zone, building)
+zone_temperature_target [setpoint], zone_airflow [capacity], ahu_fan_speed [capacity], damper_position [capacity], economizer_position [capacity], boiler_setpoint [setpoint], heat_pump_mode [admission], humidity_target [setpoint], occupancy_ventilation [admission], building_demand_limit [power], thermal_storage_dispatch [capacity], hvac_emergency_mode [admission], setpoint_reset_trim_and_respond [setpoint], duct_static_pressure_setpoint [setpoint], optimal_start_stop [capacity]
+
+#### District Heating & Cooling (13; plant: process_loop, district_heat)
+supply_temperature_setpoint [setpoint], return_temperature_target [setpoint], differential_pressure_setpoint [setpoint], network_pump_speed [capacity], heat_pump_staging [capacity], chp_dispatch [admission], thermal_storage_level_target [setpoint], peak_boiler_heater_output [power], substation_flow_limit [capacity], peak_demand_shed [admission], outdoor_reset_setpoint [setpoint], cooling_network_supply_temperature [setpoint], cooling_storage_level_target [setpoint]
+
+#### Energy Storage & Microgrid (19; plant: energy_storage, microgrid)
+battery_charge_power [power], battery_discharge_power [power], battery_soc_reserve [setpoint], grid_import_limit [power], grid_export_limit [power], pv_curtailment [power], ev_charge_power [power], heat_pump_power [power], electrolyzer_power [power], microgrid_demand_limit [power], peak_shaving [capacity], time_of_use_schedule [setpoint], energy_load_shed [admission], flex_load_admission [admission], storage_dispatch [capacity], microgrid_emergency_reserve [setpoint], volt_var [capacity], volt_watt [capacity], constant_power_factor_reactive_power [power]
 
 #### Facility & Grid Optimization (15; plant: energy_storage, facility)
 facility_power_budget [power], utility_demand_limit [power], demand_response [admission], electricity_price_gate [admission], carbon_intensity_gate [admission], renewable_dispatch [capacity], generator_start_stop [capacity], site_battery_dispatch [capacity], pue_target [setpoint], cooling_power_budget [power], it_power_budget [power], rack_power_allocation [power], facility_peak_guard [capacity], grid_frequency_response [admission], facility_islanding [admission]
@@ -1874,19 +1892,37 @@ facility_power_budget [power], utility_demand_limit [power], demand_response [ad
 #### Grid Transmission & Distribution (12; plant: process_loop, feeder_voltage)
 capacitor_bank_switch [capacity], voltage_regulator_tap [setpoint], transformer_tap [setpoint], inverter_real_power [power], inverter_reactive_power [power], feeder_voltage_target [setpoint], feeder_load_transfer [capacity], distribution_storage_dispatch [admission], demand_response_dispatch [admission], frequency_droop_setpoint [setpoint], grid_protection_mode [admission], grid_restoration_sequence [admission]
 
-#### Industrial PLC & Process Automation (14; plant: process_loop, process)
-plc_cycle_authority [admission], machine_cell_admission [admission], valve_position [setpoint], pump_flow [capacity], compressor_speed [capacity], heater_power [power], furnace_setpoint [setpoint], pressure_setpoint [setpoint], temperature_setpoint [setpoint], mass_flow_setpoint [setpoint], tank_level_target [setpoint], conveyor_rate [capacity], feed_rate [capacity], purge_vent_action [admission]
+#### Healthcare Critical Environments (13; plant: thermal_zone, hospital)
+operating_room_air_change_setpoint [setpoint], isolation_room_pressure_target [setpoint], patient_room_temperature_setpoint [setpoint], surgical_suite_humidity_target [setpoint], ahu_supply_air_temperature [setpoint], pharmacy_cold_room_setpoint [setpoint], sterile_storage_humidity_setpoint [setpoint], imaging_suite_cooling_capacity [capacity], chiller_plant_staging [capacity], exhaust_fan_capacity [capacity], ward_night_setback_mode [admission], medical_gas_plant_demand_limit [power], emergency_power_load_shed [admission]
 
-#### Semiconductor Fab & Precision Manufacturing (11; plant: process_loop, chamber)
-tool_job_dispatch [admission], wafer_route [capacity], chamber_recipe_selection [admission], chamber_temperature [setpoint], chamber_pressure [setpoint], gas_flow [capacity], rf_power [power], vacuum_pump_speed [capacity], robot_transfer_rate [capacity], lot_priority [admission], tool_quarantine [admission]
+#### Industrial PLC & Process Automation (18; plant: process_loop, process)
+plc_cycle_authority [admission], machine_cell_admission [admission], valve_position [setpoint], pump_flow [capacity], compressor_speed [capacity], heater_power [power], furnace_setpoint [setpoint], pressure_setpoint [setpoint], temperature_setpoint [setpoint], mass_flow_setpoint [setpoint], tank_level_target [setpoint], conveyor_rate [capacity], feed_rate [capacity], purge_vent_action [admission], controller_mode [capacity], alarm_limits [capacity], safety_interlock_trip [capacity], opc_ua_writes [capacity]
+
+#### Mining & Mineral Processing (14; plant: process_loop, mill)
+sag_mill_load_setpoint [setpoint], mill_speed_target [setpoint], crusher_gap_setpoint [setpoint], flotation_aeration_rate [power], cyclone_feed_pressure_target [setpoint], thickener_underflow_density_target [setpoint], reagent_dose [power], conveyor_speed_setpoint [setpoint], dewatering_pump_level_target [setpoint], ventilation_on_demand_airflow [capacity], stockpile_level_target [setpoint], slurry_pump_speed [capacity], tailings_discharge_shutdown [admission], ore_blend_dispatch [admission]
+
+#### Oil & Gas Pipelines (14; plant: process_loop, pipeline)
+compressor_discharge_pressure_setpoint [setpoint], pump_station_suction_pressure_target [setpoint], line_pack_target [setpoint], pipeline_flow_setpoint [setpoint], compressor_unit_staging [capacity], vfd_pump_speed [capacity], terminal_tank_level_target [setpoint], leak_detection_shutdown [admission], batch_interface_dispatch [admission], heater_outlet_temperature_setpoint [setpoint], drag_reducing_agent_dose [power], valve_position_target [setpoint], cathodic_protection_voltage [setpoint], pressure_protection_priority [admission]
+
+#### Pharmaceutical & Food Manufacturing (14; plant: process_loop, batch_reactor)
+reactor_temperature_setpoint [setpoint], agitator_speed_setpoint [setpoint], fermenter_dissolved_oxygen_target [setpoint], ph_setpoint [setpoint], pasteurizer_holding_temperature_setpoint [setpoint], freezer_tunnel_temperature_setpoint [setpoint], cip_cycle_dispatch [admission], cleanroom_pressure_cascade_setpoint [setpoint], lyophilizer_shelf_temperature_setpoint [setpoint], chromatography_flow_setpoint [setpoint], steam_sterilizer_cycle_priority [admission], oven_zone_temperature_setpoint [setpoint], refrigerant_compressor_authority [admission], batch_hold_quarantine [admission]
+
+#### Power Generation & Turbine Control (14; plant: process_loop, turbine)
+turbine_speed_droop_setpoint [setpoint], unit_load_setpoint [setpoint], boiler_steam_pressure_setpoint [setpoint], feedwater_level_target [setpoint], agc_participation_limit [capacity], excitation_voltage_setpoint [setpoint], hydro_gate_position_target [setpoint], combustion_air_ratio_setpoint [setpoint], cooling_water_flow_setpoint [setpoint], inlet_guide_vane_position [setpoint], reserve_dispatch_priority [admission], turbine_ramp_rate_limit [capacity], emissions_shutdown [admission], nuclear_rod_position_target [setpoint]
+
+#### Renewable Generation & Inverter Control (13; plant: process_loop, inverter)
+inverter_volt_var_setpoint [setpoint], inverter_volt_watt_setpoint [setpoint], active_power_curtailment [power], plant_reactive_power_target [setpoint], wind_turbine_yaw_offset [capacity], pitch_angle_limit [capacity], rotor_speed_setpoint [setpoint], inverter_frequency_droop_setpoint [setpoint], ramp_rate_limit [capacity], tracker_stow_mode [admission], string_mppt_voltage_setpoint [setpoint], noise_mode_schedule [admission], ice_detection_shutdown [admission]
+
+#### Semiconductor Fab & Precision Manufacturing (13; plant: process_loop, chamber)
+tool_job_dispatch [admission], wafer_route [capacity], chamber_recipe_selection [admission], chamber_temperature [setpoint], chamber_pressure [setpoint], gas_flow [capacity], rf_power [power], vacuum_pump_speed [capacity], robot_transfer_rate [capacity], lot_priority [admission], tool_quarantine [admission], run_to_run_control [capacity], idle_sleep_mode [capacity]
 
 #### Water Wastewater & Pumping (12; plant: process_loop, water)
 pump_speed_water [capacity], valve_position_water [setpoint], reservoir_level_target [setpoint], line_pressure_target [setpoint], flow_target_water [setpoint], aeration_rate [power], chemical_dose_rate [power], filtration_backwash [admission], lift_station_dispatch [admission], leak_isolation [admission], water_demand_shed [admission], water_emergency_shutdown [admission]
 
-### Realm 4: Distribution / Specialized: 147 own muscles + the spine = 337 in its organism
+### Realm 4: Distribution / Specialized: 183 own muscles + the spine = 440 in its organism
 
-#### Cache & Memory Services (15; plant: compute_pool, server)
-cache_size [capacity], cache_ttl [setpoint], cache_eviction_policy [admission], cache_replicas [capacity], cache_sharding [capacity], cache_prefetch [capacity], cache_writeback_rate [capacity], cache_admission [admission], hot_key_isolation [admission], cache_connection_limit [admission], cache_memory_limit [capacity], cache_compression [capacity], cache_warmup [capacity], cache_failover [capacity], cache_flush_rate [capacity]
+#### Cache & Memory Services (16; plant: compute_pool, server)
+cache_size [capacity], cache_ttl [setpoint], cache_eviction_policy [admission], cache_replicas [capacity], cache_sharding [capacity], cache_prefetch [capacity], cache_writeback_rate [capacity], cache_admission [admission], hot_key_isolation [admission], cache_connection_limit [admission], cache_memory_limit [capacity], cache_compression [capacity], cache_warmup [capacity], cache_failover [capacity], cache_flush_rate [capacity], memory_size_threads [capacity]
 
 #### Commerce & Payment Systems (15; plant: compute_pool, commerce)
 payment_admission [admission], payment_concurrency [admission], payment_retry [admission], payment_timeout [admission], fraud_review_gate [admission], authorization_route [capacity], processor_route_weight [setpoint], transaction_queue_limit [admission], idempotency_window [setpoint], order_reservation [capacity], inventory_hold [admission], checkout_load_shed [admission], refund_queue_rate [capacity], settlement_batch [capacity], payment_failover [capacity]
@@ -1894,20 +1930,26 @@ payment_admission [admission], payment_concurrency [admission], payment_retry [a
 #### Data Analytics & ETL (15; plant: compute_pool, batch)
 executor_size [capacity], dynamic_allocation_min [capacity], dynamic_allocation_max [capacity], shuffle_partitions [capacity], shuffle_bandwidth [capacity], etl_concurrency [admission], stage_parallelism [capacity], query_slots [capacity], spill_threshold [admission], cache_fraction [setpoint], batch_interval [setpoint], stream_backpressure [admission], data_locality_wait [capacity], speculation_policy [capacity], analytics_admission [admission]
 
-#### Database & Transactions (14; plant: compute_pool, database)
-db_replicas [capacity], db_memory [capacity], db_cache [capacity], query_concurrency [admission], read_route [capacity], shard_placement [capacity], db_failover [capacity], replication_lag_gate [admission], db_write_throttle [admission], db_pool_resize [capacity], transaction_concurrency [admission], lock_timeout [admission], checkpoint_rate [capacity], vacuum_compaction_rate [capacity]
+#### Database & Transactions (19; plant: compute_pool, database)
+db_replicas [capacity], db_memory [capacity], db_cache [capacity], query_concurrency [admission], read_route [capacity], shard_placement [capacity], db_failover [capacity], replication_lag_gate [admission], db_write_throttle [admission], db_pool_resize [capacity], transaction_concurrency [admission], lock_timeout [admission], checkpoint_rate [capacity], vacuum_compaction_rate [capacity], parallel_workers [capacity], background_writer [capacity], synchronous_replication [capacity], buffer_pool [capacity], io_capacity [capacity]
 
-#### Messaging & Streaming (16; plant: compute_pool, server)
-partition_count [capacity], partition_placement [capacity], producer_quota [admission], consumer_quota [admission], broker_io_quota [admission], message_retention [capacity], queue_depth_limit [admission], consumer_concurrency [admission], producer_batch_size [capacity], fetch_batch_size [capacity], rebalance_rate [capacity], replication_factor [capacity], retry_backoff [admission], dead_letter_divert [capacity], stream_priority [admission], broker_failover [capacity]
+#### Medical Imaging & Clinical Systems (12; plant: compute_pool, clinical)
+pacs_archive_tier_target [setpoint], dicom_router_concurrency [admission], ehr_application_replicas [capacity], hl7_interface_queue_limit [admission], fhir_api_rate_limit [admission], reconstruction_gpu_workers [capacity], modality_worklist_timeout [admission], patient_monitoring_gateway_capacity [admission], lab_analyzer_batch_window [admission], telehealth_session_admission [admission], clinical_backup_window [admission], imaging_prefetch_priority [admission]
 
-#### Runtime & Application (15; plant: compute_pool, server)
-worker_count [capacity], thread_pool [capacity], jvm_heap [capacity], gc_budget [admission], connection_pool_runtime [capacity], application_cache_size [capacity], runtime_memory [capacity], async_concurrency [admission], event_loop_workers [capacity], process_count [capacity], request_timeout [admission], background_workers [capacity], runtime_cpu_budget [admission], runtime_io_budget [admission], runtime_restart [capacity]
+#### Messaging & Streaming (18; plant: compute_pool, server)
+partition_count [capacity], partition_placement [capacity], producer_quota [admission], consumer_quota [admission], broker_io_quota [admission], message_retention [capacity], queue_depth_limit [admission], consumer_concurrency [admission], producer_batch_size [capacity], fetch_batch_size [capacity], rebalance_rate [capacity], replication_factor [capacity], retry_backoff [admission], dead_letter_divert [capacity], stream_priority [admission], broker_failover [capacity], prefetch [capacity], memory_disk_alarm [capacity]
 
-#### Search, Indexing & Vector DB (15; plant: compute_pool, server)
-index_workers [capacity], index_refresh_rate [capacity], segment_merge_rate [capacity], search_concurrency [admission], search_timeout [admission], shard_count [capacity], shard_replication [capacity], shard_rebalance [capacity], vector_search_k [capacity], vector_batch_size [capacity], embedding_workers [capacity], index_memory_budget [admission], query_route [capacity], hot_shard_isolation [admission], search_admission [admission]
+#### Ports & Maritime Logistics (12; plant: compute_pool, port)
+quay_crane_allocation [capacity], yard_crane_fleet_size [capacity], berth_window_admission [admission], truck_gate_rate_limit [admission], horizontal_transport_fleet_size [capacity], reefer_plug_power_budget [power], shore_power_connection_capacity [capacity], rail_mounted_gantry_dispatch [capacity], container_dwell_priority [admission], vessel_arrival_pacing [admission], stacking_height_target [setpoint], equipment_charging_window [admission]
 
-#### Service Mesh & API Reliability (15; plant: compute_pool, server)
-circuit_breaker [admission], retry_budget [admission], service_timeout [admission], service_concurrency [admission], connection_pool [capacity], traffic_divert [capacity], traffic_mirror [capacity], canary_weight [setpoint], outlier_ejection [admission], health_threshold [admission], dns_traffic_weight [setpoint], session_affinity [capacity], request_hedging [capacity], fault_injection_gate [admission], service_failover [capacity]
+#### Runtime & Application (17; plant: compute_pool, server)
+worker_count [capacity], thread_pool [capacity], jvm_heap [capacity], gc_budget [admission], connection_pool_runtime [capacity], application_cache_size [capacity], runtime_memory [capacity], async_concurrency [admission], event_loop_workers [capacity], process_count [capacity], request_timeout [admission], background_workers [capacity], runtime_cpu_budget [admission], runtime_io_budget [admission], runtime_restart [capacity], go_runtime [capacity], keepalive_connection_reuse [capacity]
+
+#### Search, Indexing & Vector DB (16; plant: compute_pool, server)
+index_workers [capacity], index_refresh_rate [capacity], segment_merge_rate [capacity], search_concurrency [admission], search_timeout [admission], shard_count [capacity], shard_replication [capacity], shard_rebalance [capacity], vector_search_k [capacity], vector_batch_size [capacity], embedding_workers [capacity], index_memory_budget [admission], query_route [capacity], hot_shard_isolation [admission], search_admission [admission], circuit_breakers [admission]
+
+#### Service Mesh & API Reliability (16; plant: compute_pool, server)
+circuit_breaker [admission], retry_budget [admission], service_timeout [admission], service_concurrency [admission], connection_pool [capacity], traffic_divert [capacity], traffic_mirror [capacity], canary_weight [setpoint], outlier_ejection [admission], health_threshold [admission], dns_traffic_weight [setpoint], session_affinity [capacity], request_hedging [capacity], fault_injection_gate [admission], service_failover [capacity], load_balancing_policy [capacity]
 
 #### Telecom RAN & Edge Radio (12; plant: compute_pool, ran)
 ran_connection_admission [admission], ran_ue_handover [capacity], ran_cell_traffic_steering [capacity], ran_slice_resource_budget [admission], ran_prb_allocation [capacity], ran_scheduler_weight [setpoint], ran_tx_power [power], ran_antenna_tilt [capacity], ran_carrier_enable [capacity], ran_cell_sleep [capacity], ran_du_cu_placement [capacity], ran_fronthaul_budget [admission]
@@ -1915,14 +1957,16 @@ ran_connection_admission [admission], ran_ue_handover [capacity], ran_cell_traff
 #### Workflow, Logistics & Fulfillment (15; plant: compute_pool, workflow)
 workflow_admission [admission], workflow_worker_rate [capacity], task_queue_rate [capacity], workflow_retry [admission], workflow_backoff [admission], workflow_timeout [admission], inventory_allocation [capacity], fulfillment_route [capacity], warehouse_queue [capacity], carrier_selection [capacity], dispatch_priority [admission], shipment_batch [capacity], route_replan [capacity], sla_escalation [capacity], compensation_action [capacity]
 
-### Organism 5: the whole tower, all 656 muscles once
+### Organism 5: the four stacked, every duplicate kept, 1,716 muscles
+
+### Organism 6: the whole tower, all 945 muscles once
 
 ---
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
-`NOTICE` at the root of this repository.*
+Patents, copyrights and trademarks filed in the USA. See `LICENSE` and `NOTICE` at the root of
+this repository.*
 
 ## 23. The Domain Map
 
@@ -2172,9 +2216,9 @@ Patent applications, copyright registrations and trademark applications filed in
 
 
 Omni-Compass is benchmarked on six organisms, each run native and with Omni-Compass on top on the same seed, the same
-load and the same clock: Compute / AI / Cloud (345 muscles), Physics / Robotics / Autonomous (262), Energy / Facility /
-Industrial (282), Distribution / Specialized (337), the four stacked with every duplicate kept (1,226), and the whole
-tower with every muscle once (656).
+load and the same clock: Compute / AI / Cloud (430 muscles), Physics / Robotics / Autonomous (376), Energy / Facility /
+Industrial (470), Distribution / Specialized (440), the four stacked with every duplicate kept (1,716), and the whole
+tower with every muscle once (945); these are the Omni v2 counts, v1's were 345, 262, 282, 337, 1,226 and 656.
 
 Each organism is run at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of the organism on one
 clock. Every receipt shows work per energy, work, energy, the time spent outside the service line, and whether every
@@ -2557,6 +2601,8 @@ A PodDisruptionBudget on each service is required, because drains go through the
 | Least-privilege identity receipts | `rbac_omni.txt` in every live run |
 | Native vs Omni on top vs Omni alone, paired on one machine, real Kubernetes | `results/live/LIVE_PAIRED.md` |
 | The full wiring manual | `docs/OPERATOR_MANUAL.md` |
+| The frozen engine's results, three runs each, read by rule | `results/live/V1_*.md`, `results/live/V3_*.md`; `docs/OMNI_V1.md`, `docs/OMNI_V3.md` |
+| The same wiring on Azure's managed Kubernetes (the bill), a database pooler, a rented machine, the simulators | the manual, section 10 (`docs/OMNI_COMPASS_MANUAL.md`) |
 
 ---
 
@@ -2672,16 +2718,93 @@ sudo python3 tools/gpu_wire_check.py --gpu 0                    # must end: WIRE
 ## 31. Stack by Stack
 
 
+Every wiring below is the same plug (section 8): one wire in (the stack's own meter), one wire out (one setting the
+stack already accepts), a snapshot taken once before the first write, every write read back, everything restored on
+OFF. Native is always the stack's own controller left as shipped; omni is that controller with Omni-Compass on top.
+
 | Stack | Levels | Notes |
 |---|---|---|
 | Vanilla Kubernetes, kind, Rancher | 1-7 | as written |
 | Amazon EKS | 1-5 | machines via Cluster Autoscaler node group or Karpenter; CPU power control is not exposed on EC2 VMs; GPUs on bare-metal or full-GPU instances |
-| Google GKE, Azure AKS | 1-5 | the provider's node-pool size as the park/wake command |
+| Google GKE, Azure AKS | 1-5 | the provider's node-pool size as the park/wake command; on AKS the managed cluster autoscaler stays native and deletes the machines Omni-Compass idles (10.1) |
 | Red Hat OpenShift / OKD | 1-5 | the same permissions through a Role; machines via the worker MachineSet |
 | NVIDIA GPU servers without Kubernetes | 5 | the two-wire GPU governor alone |
 | Bare-metal CPU servers | 6 | cpufreq and RAPL through sysfs |
 | Slurm / HPC | 5 on the GPU nodes | a job-level Slurm connector is not built |
 | Building management | 7 | through your BMS's command line or API, in the command templates |
+| PostgreSQL behind PgBouncer (any database behind a pooler with a console) | one knob | the pool size through the pooler's own admin console (10.2) |
+| A power grid's substation tap changer (pandapower, SimBench) | one knob | the tap position, one whole tap per move (10.3) |
+| Buildings with batteries (CityLearn) | one knob a building | the battery's charge and discharge inside the simulator's own limits (10.3) |
+| Robot arms (MuJoCo Menagerie) | one knob an axis | the joint speed where the axis has slack; never on an axis at its takt (10.3) |
+| A rented cloud machine running the big organisms | the whole harness | the detached run: rent, run, collect, delete (10.4) |
+
+### 10.1 Managed Kubernetes on Azure: the bill as the gauge
+
+On Azure Kubernetes Service the muscle is the same as on kind (section 9, levels 1 to 3) and one thing is new: the
+bill is real. The workflow `aks-metered` builds a fresh cluster for every arm the same way: a system pool of one
+machine, tainted so no workload lands on it (Azure's add-ons and the load generator live there; it is never measured
+and never governed), and one or several **work pools** under Azure's own cluster autoscaler, every pool labelled
+`omni-role=work`, every pool starting full. Native is that autoscaler alone. Omni on top is the same autoscaler with
+Omni-Compass idling the machines it gives back, which the autoscaler then deletes on its own schedule. The bill counts
+every work machine that exists, every 15 seconds, priced at Azure's list price for its family (`tools/live_reps.py`,
+`POOL_PRICES`); each cluster is deleted when its arm ends, so nothing keeps billing.
+
+**Sizing the fleet to the lever.** The smallest saving a fleet can show is one machine. On 4 workers one machine is
+25% of the fleet, so only a saving of about 30% or more can clear the noise; on 15 workers about 10%; on 96 about 3%.
+The expected machine saving under Omni-Compass is a few percent, so the 4-worker runs (`results/live/V1_AKS_STEADY.md`,
+`V1_AKS_BURST.md`) read no difference beyond the noise on every gauge, which is the honest reading of a fleet too small
+for the lever, not a result against it. A new subscription allows 200 vCPUs in a region but 10 per machine family, so
+one family gives five 2-vCPU workers; the way past it is **several families at once**: eight pools of four to five
+workers each make a fleet of 39 (`worker_pools` input, `size:max,size:max,...`; `pool_prices` names each family's
+price). The app's replica ceiling is raised with the fleet (`hpa_max`: nine 200-millicore pods fit one 2-vCPU worker,
+so 9 × workers lets the fleet fill), the same in both arms. The preregistered design is in
+`docs/K8S_COMPASS_PREREGISTRATION.md`, "The fleet that can show one machine"; the account setup, click by click, in
+`docs/AZURE_SETUP.md`.
+
+### 10.2 A database behind its connection pooler
+
+PostgreSQL is wired through PgBouncer, the pooler most of its deployments already run (`docs/POSTGRES_PREREGISTRATION.md`,
+`tools/run_pgbench.py`). Nothing models the database. The wire in is the pooler's own report (`SHOW STATS`,
+`SHOW POOLS`): once a second, the time a transaction spent in the server plus the time clients waited for one, over the
+transactions completed. The wire out is one setting through the pooler's own admin console, `SET default_pool_size`,
+inside the cover [2, 90]: never under two server connections, never within ten of PostgreSQL's connection limit. The
+compass holds that reading at 40% of a 50 ms line. Where the time was spent decides the direction: waiting for a
+server grows the pool; time inside the server shrinks it by one, so fewer backends fight for the same cores; calm gives
+back one idle server a second, and only one the pooler itself shows idle. At 95% of the line the knob is handed back
+to the pooler's own setting at once. If the knob is found at a value Omni-Compass did not write, it stops writing (one
+writer). At the end of every omni arm the pool size is restored to the snapshot and read back. The same plug fits any
+pooler or proxy with a console and a pool-size setting (PgBouncer, Pgpool-II, ProxySQL, the application's own pool).
+
+### 10.3 Independent simulators, each with its own native controller
+
+Three published simulators are wired the same way, and the simulator's own controller is always native:
+
+- **CityLearn** (`tools/run_citylearn.py`): every district the simulator ships; the knob is each building's battery
+  charge and discharge inside the simulator's own limits; the native arm is the simulator's own rule-based control.
+- **pandapower on SimBench grids** (`tools/run_pandapower.py`): the knob is the substation tap changer, one whole tap
+  per move and a week of evidence before stepping down; the native arm holds the tap at 1.00 per unit as the grid
+  ships.
+- **MuJoCo Menagerie robot arms** (`tools/run_mujoco.py`): the knob is the joint speed of an axis that has slack; the
+  paired physics trial written before the run leaves an axis at its takt native, so UR5e and iiwa 14 have nothing for
+  Omni-Compass to move and the Gen3 and Panda do.
+
+Each is preregistered (`docs/CITYLEARN_PREREGISTRATION.md`, `docs/PANDAPOWER_PREREGISTRATION.md`,
+`docs/ROBOTICS_PREREGISTRATION.md`), each runs A, B and C as separate GitHub runs, and each table is made by rule
+(`tools/citylearn_abc.py`, `tools/pandapower_abc.py`, `tools/mujoco_abc.py`). These are evidence class S: statements
+about the simulator's model, never about hardware.
+
+### 10.4 The big organisms on a rented machine
+
+The four stacked at 1,000 copies (1.7 million modelled muscles) with a real cluster inside takes more than GitHub's
+six-hour job limit per repetition, so it runs **detached** (`.github/workflows/big-organism-detached.yml`): `start`
+rents one Azure machine, installs the tools, starts every repetition of every organism under `nohup` and leaves the
+machine running on its own; `collect` (every two hours on the clock, or by hand) copies the files back when every
+repetition has finished, publishes one artifact per cell and deletes the machine; `survey` lists which machine sizes
+and quotas a subscription may rent, region by region, and rents nothing. A machine older than `max_hours` is collected
+as it is and deleted, so nothing runs forever on the bill. The commit to run is an input, so an older engine can be
+run again on the same machine. **The clock rule** (section 13) decides the window for each size on each machine: the
+first v3 machine stepped the stack in 31 s against a 12 s step and fell 4,628 s behind its window, so it was stopped,
+recorded, and started again with a 10,800 s window and 45 s steps.
 
 ---
 
@@ -2894,6 +3017,10 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | Bare-metal CPU servers | 6 | cpufreq and RAPL through sysfs |
 | Slurm / HPC schedulers | 5 on the GPU nodes | a Slurm connector for job-level decisions is not built |
 | Building management (cooling, power meters) | 7 | through your BMS's command line or API, wrapped in the command templates |
+| Azure AKS, the bill as the gauge | 1-3 | Azure's managed cluster autoscaler stays native and deletes the machines Omni-Compass idles; one or several work pools (`worker_pools`), the replica ceiling raised with the fleet (`hpa_max`); a fleet of 4 cannot show a saving of one machine, 39 can (manual, section 10.1; `docs/AZURE_SETUP.md`) |
+| PostgreSQL behind PgBouncer, or any pooler with a console | one knob | the pool size through the pooler's own admin console, cover [2, 90], one writer, restored on OFF (manual, section 10.2; `docs/POSTGRES_PREREGISTRATION.md`) |
+| A rented cloud machine running the big organisms | the whole harness | `big-organism-detached`: start, collect, survey; the clock rule sets the window (manual, section 10.4) |
+| Independent simulators (CityLearn, pandapower, MuJoCo) | one knob each | the simulator's own controller is native; preregistered, A/B/C (manual, section 10.3) |
 
 ---
 
@@ -2929,9 +3056,11 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 
 | Claim | Evidence | Kind |
 |---|---|---|
-| On real Kubernetes: faster responses, fewer replicas and machines in service | `results/live/LIVE_REPS_20.md`, `LIVE_REPS_21.md` (10 paired runs each) | measured on kind |
+| On real Kubernetes, Omni v1, three runs of ten pairs each: more work inside the response line (+42% to +48%), p95 −57% to −69%, machines fewer where a paired trial allowed it (steady −1.5% to −3.4%, batch −15% to −24%) | `results/live/V1_ALL_FOUR.md`, `V1_STEADY.md`, `V1_WANDERING.md`, `V1_FAULTS.md`, `V1_BATCH.md`, `V1_FAIRNESS.md` | measured on kind; read by the three-run rule (`docs/OMNI_V1.md`) |
+| On a real database, Omni v3: 61% to 72% fewer connections held open for the same work and latency, at +14% to +28% host CPU-seconds (confirmed worse, reported) | `results/live/V3_PGBENCH.md` | measured on GitHub's machines |
+| On Azure's bill, 4 workers: no difference beyond the noise on any gauge (the fleet is too small for the lever) | `results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md` | a real bill |
 | Energy on Kubernetes | declared model on kind, no meter | modelled |
-| GPU: more work per energy within the speed guardrail | `results/gpu/sim/after` | modelled (MLPerf-calibrated card); a real-card run is pending |
+| GPU: more work per energy within the speed guardrail | earlier card controller, obsolete; rerun on rented cards pending | hardware meter |
 | CPU and GPU on one power budget: more work, never over the budget | `results/hardware/NODE_EXCHANGE_*.json` | modelled |
 | Safety: OFF switch restores everything; watch mode writes nothing | every live run's switch drill; `verify.py` | measured / checked |
 
@@ -3129,7 +3258,7 @@ served across every card at once by vLLM, one Omni-Compass governor per card, th
 2 hours (`SKIP_LLM=1` skips it). Before it, **the whole stacks with a real card inside**: the six organisms at 1, 10,
 100 and 1,000 copies, native and Omni, the full repetitions (3, 3, 2, 1 by size), each organism on its own card at
 the same time, so the stage that takes about 25 hours on one card takes the time of its longest organism (the four
-stacked, 1,226 muscles, at 1,000 copies), about 4 to 6 hours (`SKIP_HIL=1` skips it). The whole design, every stage:
+stacked, at 1,000 copies), about 4 to 6 hours (`SKIP_HIL=1` skips it). The whole design, every stage:
 about 22 to 24 hours. Progress: `tail -f results/gpu/8card-<stamp>/card-*.log`. At the end: `== send this one file back:
 results/gpu/omni-8card-<stamp>.tar.gz`. The master switch (`sudo python3 tools/omni_switch.py off`) stops every card's
 governor at once.
@@ -3667,6 +3796,30 @@ against the same Kubernetes with Omni-Compass on top. Read:
 
 Energy on kind is a declared model, not a meter: kind keeps every machine powered.
 
+### The three-run tables (`results/live/V1_<TEST>.md`, `V3_<TEST>.md`)
+
+Every benchmark since the engine was frozen runs three separate times, A, B and C, on the same bytes, and the table
+shows all three beside each gauge. Read the last column first: **confirmed better** or **confirmed worse** (the same sign
+in all three, every interval clear of zero), **no difference beyond the noise** (an interval over zero in at least one
+run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "not
+confirmed". The `V1_` or `V3_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
+a table never mixes engines, and a reading is never carried from one engine to another. Losses are in the table beside
+the gains: the database's host CPU-seconds, the grid's losses in four grids, the Panda's copper, CityLearn's bill.
+
+### The organisms with a real cluster inside (`V1_SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`)
+
+Two kinds of rows, kept apart: **the cluster** (real Kubernetes, measured) and **the organism** (the modelled stacks
+around it, evidence S). "Organism behind its window (s)" is shown and not judged; a repetition reads **OFF THE CLOCK**
+when either arm ended more than 5% of its window late (its last steps saw a cluster whose load had already ended). The
+pairing stands, the mark stays, and the remedy is a longer window for that size on that machine.
+
+### The one number (`results/OMNI_INDEX.md`)
+
+Every measure is a ratio oriented so that above 1 is better for Omni-Compass on top of native: work, speed, machines,
+energy. A test's index is the geometric mean of its ratios, a category's of its tests, the headline of the real
+categories, each weighted the same. A measure enters only as its three-run reading allows; no difference beyond the
+noise enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
+
 ### The six organisms grid (`results/scale/GRID.md`)
 
 Columns are **size × runs**: 1, 10, 100 and 1,000 clusters, each at 1, 10, 100 and 1,000 paired runs. Rows are the six
@@ -3852,7 +4005,25 @@ Every raw result folder carries its `SHA256SUMS.txt`; the rules for each run wer
 
 **At scale (simulated).** The six organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
 (`bash scripts/scale_ladder.sh`) at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of each
-organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`).
+organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`); the six organisms with
+a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on GitHub) and `big-organism` and
+`big-organism-detached` (1,000 copies on a rented machine).
+
+5. **Preregister, then run.** The arms, the knob, the cover, the gauges and the readings are written before the first
+   counted run (`docs/*_PREREGISTRATION.md`); the rules are frozen on one tuning case and then applied unchanged to
+   untouched cases. A rule changed after a result is a new version of the engine (section 15), never a footnote.
+6. **The clock rule.** An organism must keep its window. `tools/run_kil.py` records how long after the window its last
+   step ended; the report shows it as "organism behind its window (s)", shown and not judged, and marks a repetition
+   **OFF THE CLOCK** when either arm ended more than 5% of the window late, because its last steps then saw a cluster
+   whose load schedule had already ended. The pairing stands (both arms slip alike) and the mark stays on the cell. The
+   remedy is a longer window for that size on that machine, never a faster reading of the same run.
+7. **Every row, losses included.** A row that went against Omni-Compass is reported with the others. If Omni-Compass
+   loses, the first suspect is our own wiring, native setup or scoring; that is fixed and the test run again, and the
+   loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut out.
+8. **The raw files live with the code.** Every finished run's files (capture, response times, audit log, controller
+   log, one SHA-256 manifest per repetition) are copied into `results/live/raw/run-<id>/` by the `archive-run`
+   workflow (one run id per line in `.github/archive_request.txt`; a run still going is left for a later pass), and
+   every table names the runs and the commit it was made from.
 
 
 ## 40. Evidence Classes and How to Read a Result
@@ -3873,32 +4044,43 @@ receipt's energy line is modelled, the receipt says so.
 
 
 Every result below is Omni-Compass **on top of** a native system against the same native system alone, with the same
-work in both arms. "Nothing worse" means no measure significantly worse than native beyond the one 2% rule.
+work in both arms, read by the three-run rule of section 15, on the engine named. Losses are in the tables beside the
+gains. The whole list, benchmark by benchmark with its native engine, its knob, its gauges and its file, is
+`docs/REGISTER.md`; the program that takes every benchmark to full size is `docs/PROOF_PROGRAM.md`.
 
-| Result | Class | Source |
-|---|---|---|
-| **Real Kubernetes, set 31** (10 paired runs, fixed-rate load): the compass law with the verdict, machines −10.4%, p95 −66.0%, p99 −73.0%, time over the line −99.4%, HPA replicas −44.5%, pods started 0 against native's 4.3, total CPU including Omni-Compass's own −6.1%, failed requests 0; the allocation law, machines −32.2%, p95 −61.4%, total CPU −6.6%. Nothing worse in either arm | L | `results/live/LIVE_REPS_31.md` |
-| **Real Kubernetes, the fault test, set 31 F** (a machine lost, traffic tripled, a runaway pod, the probe blind, at the same moments in every arm): recovery faster than native from every fault (compass law: machine down −49%, runaway pod −18%, spike −8%), p95 −62.6%, failed requests −16.4%, HPA replicas −1.1% (not significant). Nothing significantly worse; the p99 under faults reads higher with intervals far across zero | L | `results/live/FAULTS_31.md` (earlier runs: `FAULTS.md`, `FAULTS_30.md`, and the two fixes between them in `docs/K8S_COMPASS_PREREGISTRATION.md`) |
-| **The cost to match**: native tuned harder by its operator (HPA target 40, 30, 20: more pods) never reached Omni-Compass's p95 (best native 346.6 ms against 123.5 ms compass, 149.4 ms allocation law), with fewer pods and fewer machines on top | L | `results/live/COST_TO_MATCH.md` |
-| Real Kubernetes, sets 29 and 30: the controller reading through one proxy (Omni-Compass's own CPU 0.063 → 0.011 cores), the compass law's total CPU −4.7% and −6.5%, nothing worse | L | `results/live/LIVE_REPS_29.md`, `LIVE_REPS_30.md` |
-| **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | L | `results/scale/` (kwok-scale) |
-| **Six organisms, 1x to 1,000x clusters** (up to 1.2 million plants on one clock), 84 of 90 cells: energy lower in every cell (−0.08% to −0.19%), time over the service line lower in 83 of 84 (the one exception a single run at +0.001 points, lower over 10, 100 and 1,000 runs), work cost at most 0.007%, every knob handed back; every cell of 10 runs or more labelled SUPERIOR WITHIN GUARDRAILS. The 100-run cells at 1,000 copies are running on one rented machine | S | `results/scale/GRID.md`, `results/scale/receipts/` |
-| Modelled GPU card, the firmware alone against the firmware with Omni-Compass on top (the verdict, 2% allowance): compute-bound energy −0.70% / −0.48%, AI token generation energy −3.25% / −3.72%, both wires restored every run | S | `results/sim/gpu_two_wire/` |
-| **Real GPU (NVIDIA A10), the corrected law** (the verdict, steady under the limit): the preregistered confirmations (compute and AI token generation), the operator's power cap at usual and full load, the fault drill, the six organisms with the card inside and real AI serving, running now; the 8-card server run is built (`scripts/gpu_8card.sh`) | P | `docs/GPU_PREREGISTRATION.md` (amendments 8 to 10) |
-| Real GPU (NVIDIA A10), the first law (history): work per energy +3.6% (proven), energy −3.5%, but p95 +58.5% worse, so the label by rule was energy improvement with service tradeoff. That law was replaced; the cause and the fix are in amendments 6 to 8 | P | `results/gpu/run-20261002T082232Z/GPU_REPS.md` |
-| Earlier Kubernetes sets 23 to 28 (before the verdict, the proxy and the fault fixes) stay as they ran | L | `results/live/LIVE_REPS_23.md` to `LIVE_REPS_28.md` |
+**The one number.** The Omni index over the real categories confirmed three times: **+20.1%** (real Kubernetes +26.2%,
+the real database +14.2%; Azure and the card join as their three-run tables land).
 
-Still to come, each built and preregistered: the bill on a real cloud (`.github/workflows/aks-metered.yml`,
-`docs/AZURE_SETUP.md`), the capacity test (`docs/K8S_COMPASS_PREREGISTRATION.md`), the real-card results above and the
-8-card run.
+| Result | Engine | Class | Reading | Source |
+|---|---|---|---|---|
+| **Real Kubernetes, all four in one run** (load up and down one step at a time, 10 pairs × 3 runs) | v1 | L | work inside the response line **+42% to +48% in all three runs, confirmed better**; p95 −57% to −63% confirmed better; failed requests −12% to −13% confirmed better; machines no difference beyond the noise | `results/live/V1_ALL_FOUR.md` |
+| **Real Kubernetes, steady work in steps** (10 pairs × 3 runs) | v1 | L | p95 **−65% to −69%** and time over the line confirmed better; machines −1.5% to −3.4% confirmed better; failed requests zero in both arms | `results/live/V1_STEADY.md` |
+| **Real Kubernetes, demand that wanders** (10 pairs × 3 runs) | v1 | L | p95 **−56% to −60%** confirmed better; failed requests confirmed better; modelled standby energy −0.4% to −0.8% confirmed lower | `results/live/V1_WANDERING.md` |
+| **Real Kubernetes, faults** (a machine down, a spike, a runaway pod, a blind probe, 10 pairs × 3 runs) | v1 | L | p95 **−61% to −64%** confirmed better; failed requests, machines and energy no difference beyond the noise | `results/live/V1_FAULTS.md` |
+| **Real Kubernetes, a queue of batch jobs** (cruise, then the emergency brake, 10 pairs × 3 runs) | v1 | L | machines **−15% to −24%** and modelled energy −11% to −17% confirmed better; p95 no difference beyond the noise | `results/live/V1_BATCH.md` |
+| **Real Kubernetes, fairness** (a noisy neighbour on the same workers, 10 pairs × 3 runs) | v1 | L | no difference beyond the noise on every row: Omni-Compass neither helps nor hurts the neighbour | `results/live/V1_FAIRNESS.md` |
+| **The six organisms with the real cluster inside**, 1 to 1,000 copies, 5 paired repetitions a cell (3 at 1,000) | v1 | L + S | 98 of 100 cells: p95 and time over the line better in every cell; 0 gauges worse beyond the noise except a rounding-level work loss (−0.0003%) and HPA replicas +0.7% in one cell; machines stay at 6 in both arms (no autoscaler under kind); the Physics realm and the tower at 1,000 copies off the clock in 2 of 3 repetitions (marked) | `results/live/V1_SIX_KUBE.md` |
+| The same at 10 and 100 copies | v3 | L + S | 12 cells, 5 pairs each: every cell better on 4 to 6 gauges, worse on none beyond the noise except a rounding-level work loss in 4 cells; the stack at 100 copies off the clock in 4 of 5 repetitions (marked) | `results/live/V3_SIX_KUBE.md` |
+| **The big organisms at 1,000 copies on a rented machine**: the tower (3 of 3) and the four stacked (3 of 3, detached) | v1 | L + S | tower: p95 **−95%** (4.1 s → 0.2 s) and time over the line −99.7% clear of the noise, machines 6 in both arms, energy −0.2%, work rounding-level worse, repetition 3 off the clock; stack: p95 **−74%** and p99 −83% clear of the noise, the compass arm 300 to 615 s past the 2,880 s window in all three (marked OFF THE CLOCK; native kept the clock), which is why the v3 stack runs with a 10,800 s window | `results/live/V1_BIG_ORGANISM.md` |
+| **Azure AKS, the bill, steady load**, 4 workers, 5 pairs | v1 | L (a real bill) | no difference beyond the noise on any gauge; the bill −4.7% with its interval across zero; a fleet of 4 cannot show the lever (10.1) | `results/live/V1_AKS_STEADY.md` |
+| **Azure AKS, the bill, a burst sized to the cluster**, 4 workers, 4 pairs (repetition 4 lost its native cluster to an Azure API error and is run again) | v1 | L (a real bill) | no difference beyond the noise on any gauge; the bill +6.3% with its interval across zero | `results/live/V1_AKS_BURST.md` |
+| **PostgreSQL behind PgBouncer, the three untouched workloads**, 3 pairs × 3 runs | v3 | L | connections held open **−61% to −72% confirmed better** on `select` and `tpcb_hot`, the runs disagree on `simple_update`; host CPU-seconds **confirmed worse** on all three (+14% to +28%, the compass's own cost, counted against Omni-Compass); work and latency no difference beyond the noise | `results/live/V3_PGBENCH.md` |
+| **The 945 muscles and six organisms, modelled**, A/B/C | v3 | S | reproduced to the last digit in 3 of 3; 0 muscles worse; **every organism superior within guardrails** (work per energy +0.1% to +0.3%, work unchanged, time over the line not above native's); on v2 Physics and the tower read a service tradeoff, which the slack gate corrected | `results/realms/REALMS.md` |
+| **The organisms at 1 and 10 copies**, 1 to 1,000 paired runs a cell | v3 | S | every organism superior within guardrails at 10, 100 and 1,000 runs; work per energy +0.06% to +0.40%; 100 and 1,000 copies running | `results/scale/GRID.md` |
+| **Power grid: 11 SimBench grids solved by pandapower**, both load models, A/B/C | v1 | S | with ZIP loads the energy the loads drew confirmed better in all 11 (−1.3% to −1.5%) and the net import in all 11; losses confirmed better in 7 and **worse in 4** (the rural and semi-urban grids with their own generation, +0.6% to +1.5%); tap operations fewer in 10 grids, 4 → 8 a year in one (confirmed worse, the declared cost); no grid more often outside its band | `results/live/V1_PANDAPOWER.md` |
+| **Robot arms, MuJoCo Menagerie**, A/B/C | v1 and v3 | S | where Omni-Compass moved (Gen3, Panda): peak torque −29% and −10%, tracking error −21%, energy per takt −0.8% and −0.5%, confirmed better; the Panda's copper loss +14% **confirmed worse**; UR5e and iiwa 14 left native by the paired physics trial | `results/live/V1_MUJOCO.md`, `V1_MUJOCO_PANDA.md`, `V3_MUJOCO.md` |
+| **CityLearn, every district it ships**, A/B/C | v1 and v3 | S | 11 battery districts: electricity bought, daily peak and daily unevenness confirmed better in all 11, carbon in 8; the bill **worse in 7** (the 2023 districts) and ramping worse in 7; 71 score-rows better, 33 worse, 1 where the runs differ (the simulator's own variation); 3 districts with nothing to move; 8 the simulator cannot run | `results/live/V1_CITYLEARN.md`, `V3_CITYLEARN.md` |
+| **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
+| GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
----|---|---|
-| Real Kubernetes, set 27 (10 paired runs, the compass law aligned with the GPU governor): machines -15.9%, p95 -65.5%, failed requests 0, better on machines within the band; set 26 (10 paired runs, three arms): the allocation law machines -35.8%, p95 -55.4%; the compass law machines -17.2%, p95 -64.8%, failed requests 0, better on machines within the band by its preregistered rule; set 25: machines -32.3%, p95 -57.3% | L | `results/live/LIVE_REPS_25.md`, `results/live/LIVE_REPS_26.md`, `results/live/LIVE_REPS_27.md` |
-| Real Kubernetes, set 24 (10 paired runs): machines in service -31.6%, p95 response -60.1%, p99 -64.1%, HPA replicas -38.6%, failed requests 0 on both, total CPU including Omni-Compass's own -1.8% (not significant) | L | `results/live/LIVE_REPS_24.md` (GitHub run 36983865216) |
-| Real Kubernetes, set 23 (10 paired runs): p95 -62.2%, replicas -36.6%, machines in service -28.7%, failed requests 0 | L | `results/live/LIVE_REPS_23.md` |
-| Modelled GPU card, the card's firmware alone against the firmware with Omni on top (the verdict, 2% allowance), tuning / fresh seeds: compute-bound work, energy -0.70% / -0.48%, median +1.56% / +1.47%, p95 and p99 unchanged within their intervals; AI token generation, energy -3.25% / -3.72%, median +0.55% / +0.70%, p95 +0.29% / +0.26%; both wires restored every run | S | `results/sim/gpu_two_wire/` |
-| Six organisms, 1,000 paired runs each at 1x and at 10x size: work per energy +0.30% / +0.29% (compute), +0.23% / +0.22% (physics), +0.21% / +0.20% (energy), +0.25% / +0.24% (distribution), +0.21% / +0.21% (four stacked), +0.22% / +0.22% (whole tower); every knob handed back; time over the service line +0.19 to +0.27 points above native in every cell, so the band-first rule is not yet met. 100x and 1,000x running | S | `results/scale/GRID.md` |
-| Real GPU (NVIDIA A10), first confirmation, 10 paired runs, the card's own meter: work per energy +3.6% (proven), energy -3.5%, same requests, none lost, every write read back and restored; p95 response +58.5% worse, so the label by rule is energy improvement with service tradeoff. The cause was governor wiring, corrected (amendments 6-8); the corrected governor is next on a card | P | `results/gpu/run-20261002T082232Z/GPU_REPS.md` |
+**Running now** (7 October): the v3 repeats of the six Kubernetes tests (A done, B and C landing), the power grid ×3,
+the grid at 100 and 1,000 copies, the four stacked at 1,000 copies on the detached machine, and Azure steady and burst
+on the 39-worker fleet of eight families. **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
+defense edge (PX4 and ArduPilot multi-vehicle, Crazyswarm), databases and caches at large (YCSB, HammerDB), Spark,
+Kafka, Redis, OpenSearch, fio, Open-RMF, the 24-hour robustness run, spacecraft attitude and thrusters (Basilisk),
+station-keeping (Orekit, GMAT), constellations, rockets (RocketPy, OpenRocket) and combustion (Cantera). Pure physics
+solvers (OpenFOAM, SU2, REBOUND, GADGET, MESA) are not benchmarked: they have no controller and no knob, so Omni-Compass
+has no place on them; their value is the HPC cluster that runs them.
 
 ---
 
@@ -4878,7 +5060,7 @@ the four stacked at 1,000 copies needs about 9 GB. The re-run: 10 runs per organ
 
 The 100-run cells at 1,000 copies run on one rented machine (`scripts/grid_one_machine.sh`): every organism in turn,
 as many processes as the machine's cores and memory allow, the same seeds (7000 on), each finished organism saved at
-once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/receipts/round6-1000x.md` in place of the
+once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/v1/receipts/round6-1000x.md` in place of the
 1-run and 10-run receipt it contains.
 
 ---
@@ -4915,6 +5097,105 @@ Also in this amendment: an effort cap on a motion axis moves only where the copp
 (J a_max / kt)^2 R, exceeds the standing draw a longer move pays, p_idle + b v_max^2 (a reaction wheel; not traction, a
 flight axis or a robot joint). The machine-release margin on node pools is 0.3, the largest at which no pool is later than
 native (`results/realms/RELEASE_MARGIN_SWEEP.md`, the per-muscle sweep).
+
+### Omni v2: the catalog grows to 945 muscles in 59 families (2026-10-06, before any v2 seed)
+
+Written before any counted v2 run. **The law, the controllers, the plants, the Omni layer, the outcomes, the guardrails,
+the label rule and the invalidity rules are v1's, byte for byte.** Only the catalog and the presets it needs change, so by
+the change rule of `docs/OMNI_V1.md` this is a new version, Omni v2 (`OMNI_V2.json`, `docs/OMNI_V2.md`), and every
+modelled result is run again on it. No v1 result is read as a v2 result.
+
+What is added, each row with its real system, its setting and its source, built by `tools/realms_catalog_v2.py` from three
+committed files by the v1 rules (realm, membership, plant, preset and knob: `tools/realms_catalog.py`, unchanged):
+
+- **The 656 of v1, byte for byte** (`realms/catalog_v1.csv`): every v1 muscle keeps its id, realm, plant, preset and knob.
+- **118 real controls the realm study had already found and the tower lacked** (`docs/realm_study/TRUE_MUSCLES.csv`,
+  the rows marked "added (real, not in the 656)"; six of them were already in the tower under another name and are
+  listed as skipped in `realms/catalog_provenance.json`). They join the family the study filed them under; 70 of them
+  are spine muscles (Kubernetes, nodes, hosts, GPUs, storage, network, observability, power, cooling) and so sit in all
+  four realms.
+- **171 muscles in thirteen new families** (`realms/wave4_families.csv`), the domains the tower did not cover, one new
+  preset each (`realms/presets.py`, round engineering figures for the class of machine, as every other preset):
+
+| Family | Realm | Plant / preset | Muscles | Examples of the real system |
+|---|---|---|---:|---|
+| Healthcare Critical Environments | Energy / Facility / Industrial | thermal_zone / hospital | 13 | ASHRAE 170 rooms on a hospital BMS (Metasys, Desigo); isolation-room pressure; pharmacy cold rooms |
+| Medical Imaging & Clinical Systems | Distribution / Specialized | compute_pool / clinical | 12 | DICOM archives and routers (Orthanc, dcm4chee), EHR tiers, HL7/FHIR engines, monitoring gateways |
+| Agriculture & Irrigation | Energy / Facility / Industrial | process_loop / irrigation | 14 | pivot and pump controllers (Valley, Lindsay, Netafim), greenhouse climate computers (Priva), grain dryers |
+| Oil & Gas Pipelines | Energy / Facility / Industrial | process_loop / pipeline | 14 | compressor and pump station SCADA (Emerson, AVEVA, Honeywell), API 1130 leak detection, DRA injection |
+| Rail Traction & Train Control | Physics / Robotics / Autonomous | motion_axis / rail_traction | 14 | traction converters and ATO (Siemens Mobility, Alstom, Hitachi Rail), CBTC headway, ERTMS |
+| Marine Propulsion & Vessel Automation | Physics / Robotics / Autonomous | motion_axis / marine_propulsion | 12 | propulsion and power management (Kongsberg, Wärtsilä, MAN), IMO shaft power limitation |
+| Ports & Maritime Logistics | Distribution / Specialized | compute_pool / port | 12 | terminal operating systems (Navis N4), automated cranes and AGVs (Kalmar, Konecranes), shore power |
+| Mining & Mineral Processing | Energy / Facility / Industrial | process_loop / mill | 14 | grinding and flotation control (Metso, FLSmidth, ABB), ventilation on demand (Howden), dewatering |
+| District Heating & Cooling | Energy / Facility / Industrial | process_loop / district_heat | 13 | network and substation control (Danfoss Leanheat, Kamstrup), CHP dispatch, thermal storage |
+| Power Generation & Turbine Control | Energy / Facility / Industrial | process_loop / turbine | 14 | governors and plant DCS (GE Mark VIe, Emerson Ovation, Woodward), AVRs, hydro gates, reactor rods |
+| Renewable Generation & Inverter Control | Energy / Facility / Industrial | process_loop / inverter | 13 | IEEE 1547 inverter curves (SMA, Enphase), wake steering (NREL FLORIS), pitch and curtailment (Vestas) |
+| Elevators & Vertical Transport | Physics / Robotics / Autonomous | motion_axis / elevator_hoist | 12 | drives and destination dispatch (Otis, KONE, Schindler), ISO 25745 standby modes |
+| Pharmaceutical & Food Manufacturing | Energy / Facility / Industrial | process_loop / batch_reactor | 14 | ISA-88 batch control (DeltaV, SIMATIC Batch), bioreactors (Sartorius), pasteurizers, CIP, cleanrooms |
+
+Four wave-4 names collided with the tower and carry a domain prefix (`terminal_tank_level_target`,
+`train_auxiliary_power_budget`, `plant_reactive_power_target`, `inverter_frequency_droop_setpoint`). Eleven names the knob
+rules would have placed wrongly are set by hand in `tools/realms_catalog.py` OVERRIDE and listed there.
+
+The organisms of v2: Compute / AI / Cloud 430, Physics / Robotics / Autonomous 376, Energy / Facility / Industrial 470,
+Distribution / Specialized 440, the four stacked 1,716, the whole tower 945; the shared spine is 257 muscles. In code and
+workflows the two whole-tower organisms are now named `tower` and `stack` (nothing is named by a count); the v1 names
+`organism_656` and `stack_1226` are read as aliases, so every v1 run folder and record still reads.
+
+Checked before this freeze, on seed 7, every one of the 289 added muscles: deterministic, the watch arm equal to native,
+every knob handed back after the kill, no number undefined, Omni's time over the line never above native's. Two presets
+were adjusted on that check and before any counted run: the inverter plant's disturbance amplitude (0.8 to 0.5, with its
+noise 0.05 to 0.02) because native itself was outside its band a quarter of the time, and the elevator hoist's position
+gains (kp 2,000 to 3,000, kd 400 to 500) with a smaller load disturbance (400 to 100 N m), because the first figures
+put native's tracking error at its limit under passenger load. Where native is still often outside its band in some
+heavy-load muscles (the compute pools at their busiest sizes), that is the plant at the size the muscle id draws, the
+same for both arms, and it is reported as it comes.
+
+v2 runs: the realms table (every muscle alone and the five organisms, seeds 3000-3009, three GitHub runs A, B, C), the
+six-organism grid at 1, 10, 100 and 1,000 copies, the six organisms with the real cluster inside, and the big organisms
+on Azure, each on the v2 fingerprint; the live benchmarks that import none of the realm files (Kubernetes alone, Azure
+alone, CityLearn, the grid, the robots, the database) are run again on v2 as GitHub's queue allows, their v1 tables kept
+as v1 tables.
+
+### Omni v3: the slack gate on speed knobs (2026-10-06, after the v2 table, before any v3 seed)
+
+Declared on the v2 result and before any v3 run. The v2 table (`results/realms/REALMS.md`, three runs reproduced) read
+Physics and the whole tower as "energy improvement with a service tradeoff" where v1 had every organism superior. The rows
+that carried it were the new speed muscles: three rail traction muscles where Omni's slowing added 1.6 to 2.7 points of
+lateness on a train already near its timetable's capacity, and two marine and two elevator muscles where the slower cycle
+finished fewer moves in the hour. By the honesty rule the first suspect was our own wiring, and it was: the realm
+harness had no do-no-harm gate on the speed knob of a motion axis, so the compass slowed an axis that had no slack to
+spend. The robot benchmark has such a gate (its paired physics trial, `docs/ROBOTICS_PREREGISTRATION.md`); the realms
+get one now.
+
+**The rule (`realms/compass_arm.py`, `speed_slack`).** A motion axis is offered its speed knob only where its duty at full
+speed, task rate × (move time at full speed + dwell), is at most SLACK = 0.5, computed from the plant's own figures before
+any decision. The compass may ease an axis down to 0.4 of its speed, which stretches a move by up to 2.5 times; an axis
+busy more than half the time at full speed cannot absorb that when tasks arrive in bunches, and its knob stays native.
+Where the knob is offered, nothing else changes: the compass, its gains, the cover [0.4, 1.0] and the fail-up are v2's.
+
+**The marine preset.** Four 600 rad speed changes an hour made a one-hour run too coarse to count (one unfinished move
+is a quarter of the hour's work); the v3 preset is twelve changes of 200 rad an hour, a move of 126 s plus 30 s of dwell,
+deadline 1,200 s. No other preset changes.
+
+**What the gate does on the shipped presets (the middle size; a muscle's own size, 0.6 to 1.4 on the task rate, moves
+its duty either side):**
+
+| Preset | Move at full speed | Dwell | A task every | Duty | The speed knob |
+|---|---:|---:|---:|---:|---|
+| flight axis | 4.8 s | 2.0 s | 20 s | 0.34 | offered |
+| reaction wheel | 30.0 s | 5.0 s | 100 s | 0.35 | offered |
+| marine propulsion | 126.5 s | 30 s | 300 s | 0.52 | left native |
+| elevator hoist | 12.8 s | 8.0 s | 40 s | 0.52 | left native |
+| robot joint | 0.7 s | 0.2 s | 1.7 s | 0.54 | left native at the middle size, offered on the lightly loaded joints |
+| EV traction | 35.6 s | 10 s | 60 s | 0.76 | left native |
+| rail traction | 220 s | 20 s | 300 s | 0.80 | left native |
+
+The threshold is a declared number set on the v2 finding, not a fitted one: it is written here before the v3 runs and
+applies to every axis alike. Where it leaves a knob native the row will read as native does, and that is the result.
+Everything else, the plants, the outcomes, the guardrails, the label rule and the invalidity rules, is v2's. v3 runs the
+realms table three times (A, B, C), then the grid, then the organisms with the real cluster inside; the v2 table stays a
+v2 result.
 
 ## 46. The Compass Law on Real Kubernetes: Preregistration
 
@@ -5365,6 +5646,14 @@ Each organism runs on the measured window's clock, 240 steps, with the real clus
   r(k) = 1 + round((LOAD_MAX - 1) (D(k) - min D) / (max D - min D)) replicas, LOAD_MAX = 6 declared here, open-loop load.
 - afferent: the cluster's watts (capture.csv, the declared power model, every 15 s, identical accounting in both arms)
   are added to the organism's source, zone and site power, as the card's watts are in the card harness.
+- the clock (stated 2026-10-07, after the 1,000-copy runs): the organism must keep the window's clock. `tools/run_kil.py`
+  records how long after the window its last step ended (`behind_s`); the report (`tools/six_kube_report.py`) shows it as
+  "organism behind its window (s)", shown and not judged, and marks a repetition OFF THE CLOCK when either arm ended more
+  than 5% of the window late, because its last steps then saw a cluster whose load schedule had already ended. The pairing
+  stands (both arms slip alike), the mark stays on the cell. The remedy is a longer window for that size on that machine
+  (240 steps, each at least the machine's time to step the organism once), never a change to the organism or the law:
+  the four stacked at 1,000 copies (1.7 million muscles) step in about 31 s on an 8-vCPU machine, so their window is
+  10,800 s (45 s steps), against 2,880 s for the tower at 1,000 copies.
 
 Arms: native (the stacks' own controllers, Kubernetes alone, Omni-Compass not started) and compass (the compass law on every
 simulated muscle, rule 4 on the cluster, handed back at 90% of the window; the run is invalid if any knob is not handed
@@ -5694,8 +5983,39 @@ The batch test on amendment 12 (GitHub run 37344765837, ten pairs, `results/live
 +1.1% later, inside the noise (it was +1.8% and proven before cruise stepped back). No pod was left without a machine.
 Nothing came out worse beyond the noise.
 
----
+### The fleet that can show one machine: Azure at 11 and 15 workers (written before its run, 2026-10-07)
 
+The Azure runs so far used a work pool of 1 to 4 machines. One machine is a quarter to a half of that fleet, and the
+app's replica ceiling (10 pods of 200m, about one worker's worth) kept Azure's autoscaler at about 1.9 workers in both
+arms, so nothing under a quarter of the fleet could show. The steady run on v1 (5 pairs) read even on every gauge. That
+is a statement about the lever, not about the law. This run makes the lever big enough to see one machine.
+
+- **Fleet.** The subscription allows 200 vCPUs in eastus but 10 vCPUs in each machine family (every family's request to
+  raise it was refused through the API on 2026-10-07: the subscription's terms), so one family gives at most 5 machines.
+  The fleet is therefore several work pools, one 2-vCPU machine family each, each capped at what its family allows:
+  `worker_pools` = `Standard_D2s_v4:4,Standard_D2as_v4:5,Standard_D2_v4:5,Standard_D2a_v4:5,Standard_D2ds_v4:5,Standard_D2s_v3:5,Standard_E2s_v4:5,Standard_E2as_v4:5`,
+  39 workers (the DSv4 family also carries the system machine, hence 4). Every pool carries the label `omni-role=work`,
+  the worker selector in both arms; the first pool keeps one machine, the others may scale to zero; every pool starts
+  full and Azure's own autoscaler trims, as before. One machine is then 2.6% of the fleet. Mixed machine families are how
+  real cloud fleets run; the bill is each pool's machine-hours at its own list price (`pool_prices`), Azure's own count
+  every 15 s. The same autoscaler profile, a fresh cluster per arm. (Written first for 11 then 15 workers of one family;
+  the family allowance made that impossible and this replaces it before any such run.)
+- **Ceiling.** `hpa_max` = 9 × workers = 351 at 39 workers: nine 200m pods fit one 2-vCPU worker, so the fleet can
+  fill. The same ceiling in every arm; the restore checks expect it back untouched.
+- **Load.** The load generator's replica steps scale with the fleet, the same in every arm (one load replica drove
+  about five pods at 50% on the 4-worker runs). Steady: `18 35 53 18 35 18` over 900 s at 39 workers (the peak asks
+  for about 265 pods, thirty workers' worth). Burst: `11 35 11 53 11 35` over 1,800 s (the 4-worker burst was
+  `1 3 1 4 1 3`). A fleet of another size scales the steps by workers/39, rounded.
+- **Everything else as preregistered**: native (Azure's autoscaler alone) against omni (Omni-Compass on top of it,
+  rule 4 on the node pool, the HPA target inside its range, handed back at 90% of the window), 5 paired repetitions,
+  order rotated, the bill Azure's own machine count every 15 s at list price, the reading by `tools/live_reps.py`'s
+  paired interval, every gauge reported. Engine: Omni v3 first (the newest), v1 after if the credits allow.
+- **What it can say.** Better, clear of the noise, in bill or response time: Omni has value on the managed service when
+  the fleet is big enough to see a machine. Even again: Omni's value there is nil at this size too, and that is the
+  reading. Worse: our own wiring is suspected first, found, fixed, and the run is made again.
+- **Cost.** About $8 for the steady set and $15 for the burst set at 15 workers, at list price.
+
+---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
@@ -6926,26 +7246,49 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Rerun everything:** `pip install -r requirements.txt && python verify.py` ends with `VERIFICATION: PASS`.
 
-### In one paragraph (2026-10-05, the frozen engine)
+### In one paragraph (2026-10-06, Omni v1)
+
+**Omni v1, confirmed three times.** On real Kubernetes, every test ran three times as separate GitHub runs on the frozen
+engine, ten pairs each (`docs/OMNI_V1.md`, the six `results/live/V1_*.md` tables). Work inside the response line **+42%
+to +48%** in all three runs of the all-four test (18.6 → 27.6 requests a second in run A), confirmed better; the 95th
+percentile **−57% to −69%** in every run of the steady, wandering, all-four and fault tests, confirmed better; failed
+requests −12% to −13% where load swings, confirmed better; machines −1.5% to −3.4% at steady load and −15% to −24% on
+the batch queue, confirmed better, no difference beyond the noise elsewhere; energy a declared model (kind never powers a
+machine down); beside a noisy neighbour, no difference beyond the noise on every row. **The Omni index on v1: +26.2%**
+on real Kubernetes (`results/OMNI_INDEX.md`; only rows confirmed in all three runs count, a row inside the noise counts
+as zero; Azure and the card join when their v1 runs land). The paragraph below is the earlier engine's reading, kept as
+the record it was.
 
 Omni-Compass sits on top of Kubernetes and hardware and gets more out of what is already there. On real Kubernetes,
-one frozen engine (rules 1-8), ten pairs per test, native against compass with the same work sent to both:
+the engine before v1 (the live controller at rules 1-8, commit `353903683009`), ten pairs per test, native against
+compass with the same work sent to both:
 **41.7% more work handled inside the response line on the same machines** (capacity, all four in one run), responses
 **59-64% faster** at the 95th percentile (steady, wandering, all four, faults), 12% fewer failed requests where load
 swings, energy equal or lower, and not one pod left without a machine. Machines: up to 2% fewer. Omni gives a machine
 back only when a paired trial shows the service no slower without it, and on these clusters one machine fewer made
 requests 30-45% slower in most trials, so it kept them and spent them on speed and work (earlier engines without that
 check parked 29-36%: `docs/history/`). All of it together, real machines only: **the Omni index +12.9%**
-(`results/OMNI_INDEX.md`). Running now on the same engine: the batch test, the six organisms at 1, 10, 100 and 1,000
-copies with the real cluster inside, the Azure burst and steady bill tests, and the two big organisms on rented Azure
-machines.
+(`results/OMNI_INDEX.md`).
+
+**Omni v1** (`docs/OMNI_V1.md`): the engine is frozen and fingerprinted (`OMNI_V1.json`), and every test above runs
+three times on it, as separate GitHub runs (A the result, B and C the replications); each table reads confirmed better,
+confirmed worse, no difference beyond the noise, or the runs disagree, and replaces the earlier engine's table as it
+lands. Running on v1 now: the Kubernetes suite three times, the batch test, the six organisms at 1, 10, 100 and 1,000
+copies with the real cluster inside, the big organisms on rented Azure machines, the Azure steady and burst bill tests,
+CityLearn, and the power grid.
+
+**What is shown and what is not.** Shown: more work inside the response line on the same machines (34-52% across the
+three capacity runs on earlier engines) and a faster tail, on real Kubernetes. Not yet shown: an energy or cloud-bill
+saving on real machines. On kind the machines are containers on one runner, so a machine out of service saves modelled
+watts, not a metered bill, and Azure's bill did not move on the earlier engine (`results/live/AKS_BILL.md`); the v1 Azure
+runs are the test of that. The current card governor has not run on a real GPU.
 
 The card: the first real run (NVIDIA A10, 2026-10-02) used a card controller since replaced; it is not a result to
 stand on. In simulation the current controller (amendment 12) is clearly faster under an operator's power cap (p95
 6-7% faster, time over the line 1 point lower) and saves 0.5-3.7% energy on the card's own firmware with p95 even
 (`results/sim/gpu_two_wire/`). The real card runs next: one card, the card inside the six organisms, then eight cards.
 
-The 656 muscles are models of real control systems. With the real cluster or the real card inside, they show the
+The 945 muscles (Omni v2; 656 in v1) are models of real control systems. With the real cluster or the real card inside, they show the
 mechanism (work the same, energy 0.1-0.2% lower, time over the line lower than native in every organism); they are
 never counted in the headline.
 
@@ -7173,7 +7516,7 @@ Three rules for reading any receipt:
    own CPU, each with its 95% interval. Our one rule (`DISCLOSURES.md`, section 3): no measure more than 2% worse, and
    only where energy or the bill is saved. A gain paid for with worse service is not a gain.
 3. **Know the class and the comparator.** A machine-hour gain on kind (where idle machines stay powered and native has
-   no node autoscaler) is not yet a bill; a modelled energy line is not a meter. Section 14 lists the classes; section 15
+   no node autoscaler) is not yet a bill; a modelled energy line is not a meter. Section 14 lists the classes; section 16
    says, for every result, what it is measured against.
 
 ### 3.5 Where the evidence stands today, read honestly
@@ -8010,19 +8353,26 @@ Patent applications, copyright registrations and trademark applications filed in
 | Authority | how far the nervous system lets an organ move this decision |
 | Band | a reading's or a knob's safe range |
 | Compass | the band seen as a position from 0 (calm) to 1 (the line), with its bottom in the middle |
+| Confirmed better / confirmed worse | the same sign in all three runs (A, B, C), every 95% interval clear of zero |
 | Cover | a knob's hard range; every write is clipped to it |
 | Cushion | the 5% at each edge of the compass, 10% in all |
 | Fail up | the return to full capacity the moment service crosses the wall or a sense goes blind |
 | Governor | the process that reads, decides and writes; Omni-Compass |
 | Muscle | any machine, service or controller Omni-Compass reads and sets |
 | Native | the system as it runs without Omni-Compass |
+| No difference beyond the noise | an interval over zero in at least one run: native and omni could not be told apart; the result, stated as such |
+| Off the clock | a repetition in which either arm ended more than 5% of its window late; marked, the pairing stands |
 | Organism | a set of muscles run together on one clock |
+| Omni index | the one combined number: the geometric mean of every real category's work, speed, machines and energy ratios, each read by the three-run rule |
+| Omni v1, v2, v3 | the frozen engines, fingerprinted file by file; a result belongs to the engine its commit carries |
 | Plug | the two-way connection to one muscle: read, write, read back, restore |
+| Pool (Azure) | one machine family under Azure's autoscaler with its own ceiling; several pools make the fleet |
 | Profile | a named set of the compass's settings for one kind of work: service (the default) or batch |
 | Race | full speed at once while work waits, so a burst is never served slowly |
 | Speed floor | the clock a card reaches on its own while busy, learned from its own meter; the governor never sets the ceiling under it |
 | Receipt | the paired record of native against Omni-Compass for one run |
 | Snapshot | a knob's value read once before the first write; the restore point |
+| The runs disagree | runs clear of the noise point different ways; the test is unstable on that measure and is looked into |
 | Wire check | the test that proves every wire follows, reads back and returns before anything runs |
 | Work per energy | work done divided by energy used; the primary outcome |
 
@@ -8044,7 +8394,20 @@ Patent applications, copyright registrations and trademark applications filed in
 | Kubernetes paired runs | `scripts/kind_paired.sh`, then `tools/live_reps.py` |
 | OFF (Kubernetes) | `touch /tmp/omni.kill` |
 | OFF (GPU) | `sudo touch /tmp/omni-gpu-kill` |
+| The whole harness OFF, ON, status, watchdog | `python3 tools/omni_switch.py off|on|status|watchdog` |
 | Seal check | `python3 tools/seal.py --check` |
+| Which engine a checkout or a commit carries | `python3 tools/omni_version.py [--commit <sha>]` |
+| The three-run table (Kubernetes, Azure) | `python3 tools/confirm_abc.py "<title>" raw/run-<A> raw/run-<B> raw/run-<C> --out results/live/V3_<TEST>.md` |
+| The three-run table (database, robots, grid, buildings) | `tools/pgbench_abc.py`, `tools/mujoco_abc.py`, `tools/pandapower_abc.py`, `tools/citylearn_abc.py`, the same arguments |
+| The six organisms with the cluster inside | `python3 tools/six_kube_report.py <raw dirs> --out results/live/V3_SIX_KUBE.md` |
+| The grid of copies and runs | `python3 tools/grid.py` (reads `results/scale/receipts/`) |
+| The Omni index | `python3 tools/omni_index.py` |
+| The database benchmark, one run | `python3 tools/run_pgbench.py --out <dir>` (workflow `pgbench`) |
+| The independent simulators | `python3 tools/run_citylearn.py`, `run_pandapower.py`, `run_mujoco.py` (workflows `citylearn`, `pandapower`, `mujoco`) |
+| Azure, the bill | workflow `aks-metered`: `reps`, `arms`, `duration_s`, `load_steps`, `worker_pools`, `pool_prices`, `hpa_max` |
+| The big organisms, detached | workflow `big-organism-detached`: `mode` start / collect / survey, `organisms`, `size`, `duration_s`, `commit`, `max_hours` |
+| Archive a finished run with the code | add its id to `.github/archive_request.txt` and push (workflow `archive-run`) |
+| Verify before a push, as GitHub runs it | `python3 tools/release_manifest.py` under Python 3.12: 0 FAIL |
 
 
 ## Appendix B. File Map
@@ -8054,13 +8417,20 @@ Patent applications, copyright registrations and trademark applications filed in
 |---|---|
 | `omnicompass/` | the engine, governor, nervous system, shield, compass, conveyance law, the compass |
 | `omni_controller/` | the Kubernetes controller and muscles; the GPU governors (one and two wires) |
-| `realms/` | the 656-muscle catalog, the plant models, the realm harness, the compass on every muscle, the modelled card |
+| `realms/` | the 945-muscle catalog, the plant models, the realm harness, the compass on every muscle, the modelled card |
 | `tools/` | benchmarks, receipts, the wire check, the scale ladder, manifests, seals |
 | `scripts/` | one-command runs (GPU, Kubernetes, ladder) |
 | `deploy/` | container image, install and permission files |
 | `cpp/` | the C++20 twins |
 | `results/` | every published result, with its raw files and checksums |
+| `results/live/V1_*.md`, `V3_*.md` (+ `.json`) | the three-run tables, one per test, named by the engine they ran on |
+| `results/live/raw/run-<id>/` | every archived run's files, one SHA-256 manifest per repetition |
+| `results/scale/GRID.md`, `results/realms/REALMS.md`, `results/OMNI_INDEX.md` | the grid of copies and runs, the modelled realms, the one combined number |
+| `OMNI_V1.json`, `OMNI_V2.json`, `OMNI_V3.json` | the frozen engines' fingerprints |
 | `docs/` | this manual, the preregistrations, the evidence ledger, the theorem, the realm study |
+| `docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md` | what each engine is and every result read on it |
+| `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and every benchmark still to run; the program to full size |
+| `.github/workflows/` | every benchmark as GitHub runs it: `benchmark-reps`, `six`, `six-kube`, `big-organism`, `big-organism-detached`, `aks-metered`, `pgbench`, `citylearn`, `pandapower`, `mujoco`, `archive-run`, `verify` |
 | `LICENSE`, `NOTICE`, `LICENSES/` | the license and notices |
 
 
@@ -8149,11 +8519,14 @@ Every gauge, where it comes from, and whether it is measured or modelled: `docs/
 
 
 `docs/EVIDENCE_LEDGER.md` (every claim and its class), `docs/CLAIMS_REGISTER.md` (what is claimed and what is not),
-`docs/GPU_PREREGISTRATION.md` and `docs/REALMS_PREREGISTRATION.md` (the rules written before each run),
-`docs/STATE_OF_PLAY.md` (where everything stands), `docs/HANDOFF.md` (every command in one page).
+`docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md`,
+`docs/POSTGRES_PREREGISTRATION.md`, `docs/CITYLEARN_PREREGISTRATION.md`, `docs/PANDAPOWER_PREREGISTRATION.md` and
+`docs/ROBOTICS_PREREGISTRATION.md` (the rules written before each run), `docs/OMNI_V1.md` to `OMNI_V3.md` (every
+result by engine), `docs/REGISTER.md` (every benchmark and its file), `docs/STATE_OF_PLAY.md` (where everything
+stands), `docs/HANDOFF.md` (every command in one page).
 
 
-## Appendix G. The 656 Muscles: What Each Is For, and How It Is Wired
+## Appendix G. The Muscles: What Each Is For, and How It Is Wired
 
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
@@ -8162,7 +8535,7 @@ Every gauge, where it comes from, and whether it is measured or modelled: `docs/
 
 A **muscle** is one setting on one machine that already has its own control: a replica target, a node pool's size, a GPU's clock ceiling, a chiller's setpoint, a battery's reserve, a joint's effort. Omni-Compass does not replace that control. It reads the machine's meters, computes one bounded force with the compass law, and moves the setting the machine already accepts, through a plug that reads the setting once before the first write, reads back every write, steps aside if another controller moves it, and puts it back at the end.
 
-This chapter lists all 656 muscles of the catalog (`realms/catalog.csv`). For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 8 and 9). See `DISCLOSURES.md`.
+This chapter lists all 945 muscles of the catalog (`realms/catalog.csv`). For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 8 and 9). See `DISCLOSURES.md`.
 
 ### How to read an entry
 
@@ -8183,28 +8556,32 @@ This chapter lists all 656 muscles of the catalog (`realms/catalog.csv`). For ea
 | `motion_axis` | a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor | its tracking error and its load | its speed and effort share, or its power share |
 | `process_loop` | a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint | how far the process sits from its band | its setpoint within its safe band, its actuator range, or its power share |
 
-**The organisms.** The 656 muscles build six organisms: each of the four realms (every muscle whose realm list includes it), the four stacked with every duplicate kept (1,226), and the whole tower with every muscle once (656). A muscle of the shared spine sits in all four realms.
+**The organisms.** The 945 muscles build six organisms: each of the four realms (every muscle whose realm list includes it), the four stacked with every duplicate kept (1,716), and the whole tower with every muscle once (945). A muscle of the shared spine sits in all four realms.
 
 | Organism | Muscles |
 |---|---:|
-| Compute / AI / Cloud | 345 |
-| Physics / Robotics / Autonomous | 262 |
-| Energy / Facility / Industrial | 282 |
-| Distribution / Specialized | 337 |
-| The four stacked, every duplicate kept | 1,226 |
-| The whole tower, every muscle once | 656 |
+| Compute / AI / Cloud | 430 |
+| Physics / Robotics / Autonomous | 376 |
+| Energy / Facility / Industrial | 470 |
+| Distribution / Specialized | 440 |
+| The four stacked, every duplicate kept | 1,716 |
+| The whole tower, every muscle once | 945 |
 
 **How a muscle is reached in a real stack.** The class of machine decides the wire:
 
 | Class of machine | What it is | The wire in a real stack |
 |---|---|---|
 | `batch` | batch and queued jobs | the job queue (Kubernetes Jobs, Slurm, Spark) |
+| `batch_reactor` | a GMP batch reactor, fermenter or food process | the batch control system (ISA-88, OPC UA) |
 | `building` | a building zone | the building management system |
 | `chamber` | a controlled chamber (clean room, kiln, reactor) | the PLC or DCS |
+| `clinical` | clinical systems: imaging archives, records, interface engines, monitoring gateways | the application's own scaling and admission settings (Kubernetes, the vendor console) |
 | `commerce` | a customer-facing service with bursts | the Kubernetes API |
 | `cpu_host` | a CPU host whose clock and power can be set | Linux cpufreq and RAPL |
 | `data_hall` | a data hall cooling plant | the building management system (BACnet, Modbus) or its command line |
 | `database` | a database cluster | the database operator (replicas, connection pools) |
+| `district_heat` | a district heating or cooling network | the network control system and substation controllers (Modbus, M-Bus) |
+| `elevator_hoist` | an elevator or escalator drive and its group control | the lift controller and destination dispatch (modelled only) |
 | `ev_traction` | an electric vehicle traction motor | the vehicle's motor controller (CAN; modelled only) |
 | `fabric` | a high-speed fabric (RDMA, DPU, SmartNIC) | the fabric manager's API |
 | `facility` | a facility battery behind the meter | the energy management system |
@@ -8212,28 +8589,37 @@ This chapter lists all 656 muscles of the catalog (`realms/catalog.csv`). For ea
 | `flight_axis` | a flight-control axis | the flight controller (modelled only) |
 | `gpu` | GPU serving with a response-time target | nvidia-smi (clock ceiling and power limit) or the serving autoscaler |
 | `gpu_batch` | GPU training and batch work | nvidia-smi, the job scheduler's pause and resume |
+| `hospital` | a hospital's critical rooms (operating rooms, isolation, pharmacy, imaging suites) | the hospital's building management system (BACnet) |
+| `inverter` | a plant of grid-support inverters or wind turbines | the plant controller and inverter settings (SunSpec, IEC 61850, IEEE 1547) |
+| `irrigation` | pumps, pressure and climate on a farm or in a greenhouse | the pump station controller, the pivot panel or the climate computer (Modbus, the vendor cloud) |
+| `marine_propulsion` | a ship's propulsion shaft and power plant | the vessel automation and power management system (modelled only) |
 | `microgrid` | a microgrid battery and loads | the inverter or energy management system (IEEE 2030.5, SunSpec, OpenADR) |
+| `mill` | a grinding, flotation or materials-handling circuit | the plant DCS or PLC (OPC UA) |
 | `network` | network routing and switching | the network controller (SDN, routing API) |
 | `node` | a fleet of machines or VMs that boot in minutes | the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG) |
+| `pipeline` | a pipeline segment with its compressors, pumps and valves | pipeline SCADA (DNP3, Modbus, OPC UA) |
+| `port` | a container terminal's cranes and vehicles taking moves | the terminal operating system and fleet controllers |
 | `process` | an industrial process loop | the PLC or DCS (OPC UA, EtherNet/IP, PROFINET) |
 | `qpu` | a quantum or specialised accelerator queue | the accelerator's job queue |
+| `rail_traction` | a train's traction and auxiliary systems | the train control and management system and ATO (modelled only) |
 | `ran` | a radio access network cell or site | the RAN controller (O-RAN interfaces) |
 | `reaction_wheel` | a spacecraft reaction wheel | the attitude controller (modelled only) |
 | `robot_fleet` | a fleet of robots or vehicles taking tasks | the fleet manager's dispatch API |
 | `robot_joint` | a robot joint servo | the robot controller (ROS 2, EtherCAT, the drive's fieldbus) |
 | `server` | an application service on servers or pods | the Kubernetes API (HPA target and floor, pod resize) |
 | `storage` | block, file or object storage | the storage system's QoS and tiering API |
+| `turbine` | a generating unit's governor, boiler or excitation loop | the plant DCS and governor (OPC UA, IEC 61850; modelled only) |
 | `ups` | an uninterruptible power supply | the UPS and PDU management interface (SNMP, Modbus) |
 | `water` | a water or pumping process | the SCADA system (Modbus, DNP3) |
 | `workflow` | a workflow or pipeline engine | the workflow engine's concurrency settings |
 
 Wires marked *modelled only* exist as plants in the benchmark and are not built for live use.
 
-### The shared spine: 190 muscles in all four realms
+### The shared spine: 257 muscles in all four realms
 
 The machines every realm stands on: servers, machines, GPUs and CPUs, network, storage, observability, security, cooling and electrical distribution. Each spine muscle is part of every realm's organism, counted once in the tower and four times in the stack.
 
-#### Cloud VM & Capacity (16 muscles)
+#### Cloud VM & Capacity (21 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8255,8 +8641,13 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 110 | boot disk class | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 111 | placement group | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 112 | interruption response | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1038 | target tracking policy | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
+| 1039 | scaling cooldown warmup | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1114 | vm cpu cap by priority | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1120 | predictive scaling | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1121 | instance refresh | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 
-#### Container Resources (16 muscles)
+#### Container Resources (23 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8278,8 +8669,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 46 | cpu quota | admission | reads it; left to its own controller | all four realms; stack; tower |
 | 47 | cpuset | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 48 | runtime class | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1017 | in place resize | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1019 | namespace quota | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1020 | default limits | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1022 | memory hard limit | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1023 | memory protection | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1024 | io latency target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
+| 1025 | freeze | admission | reads it; left to its own controller | all four realms; stack; tower |
 
-#### Host CPU & Memory (16 muscles)
+#### Host CPU & Memory (23 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `cpu_host` (a CPU host whose clock and power can be set), reached through Linux cpufreq and RAPL. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8301,8 +8699,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 126 | core online offline | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 127 | thermal throttle policy | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
 | 128 | host power profile | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
+| 1040 | frequency governor | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
+| 1041 | turbo boost | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1042 | dram power limit | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
+| 1043 | swappiness reclaim | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1112 | core packing | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1115 | per pod cpu frequency range and c state access | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
+| 1116 | uncore frequency per node | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
 
-#### Kubernetes Placement & Scheduling (16 muscles)
+#### Kubernetes Placement & Scheduling (20 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8324,8 +8729,12 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 62 | scheduler backoff | admission | reads it; left to its own controller | all four realms; stack; tower |
 | 63 | gang admission | admission | reads it; left to its own controller | all four realms; stack; tower |
 | 64 | deschedule | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1026 | scheduler scoring strategy | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1027 | scheduler plugin weights | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
+| 1028 | scheduling gates | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1029 | cpu manager | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 
-#### Kubernetes Workload Scaling (16 muscles)
+#### Kubernetes Workload Scaling (31 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8347,8 +8756,23 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 30 | pdb policy | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 31 | scheduler queue priority | admission | reads it; left to its own controller | all four realms; stack; tower |
 | 32 | api priority fairness | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1001 | hpa min replicas | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1002 | hpa max replicas | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1003 | hpa scale down stabilisation window | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
+| 1004 | hpa scale up stabilisation window | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
+| 1005 | hpa scaling rate policies | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1006 | hpa policy selection | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1007 | hpa tolerance | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1008 | hpa sync period | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1009 | vpa minmax allowed resources | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1010 | keda polling interval | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
+| 1011 | rollout progress deadline | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1012 | rollout readiness delay | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1014 | unhealthy pod eviction policy | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1015 | graceful termination | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1016 | probes | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 
-#### NVIDIA GPU Hardware (15 muscles)
+#### NVIDIA GPU Hardware (19 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8369,8 +8793,12 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 141 | gpu thermal limit | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
 | 142 | gpu ecc response | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 143 | gpu job power budget | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1044 | application clocks | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
+| 1045 | gpu temperature target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
+| 1117 | sync boost | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1118 | target clocks | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
 
-#### Node Fleet & Karpenter-Class Control (16 muscles)
+#### Node Fleet & Karpenter-Class Control (24 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8392,8 +8820,16 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 78 | consolidate after | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 79 | expire after | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 80 | capacity class | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1030 | scale down utilisation threshold | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1031 | scale down unneeded time | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1032 | scale down delay after add | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1033 | expander | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1034 | node pool limits | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1035 | kubelet eviction thresholds | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1036 | kubelet reserved resources | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1037 | max pods per node | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 
-#### Network Routing & Switching (16 muscles)
+#### Network Routing & Switching (19 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `network` (network routing and switching), reached through the network controller (SDN, routing API). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8415,8 +8851,11 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 238 | ecmp weight | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
 | 239 | path selection | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 240 | network isolation | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1046 | nic interrupt coalescing | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1047 | nic ring size | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1048 | port link power | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
 
-#### Observability & Telemetry (6 muscles)
+#### Observability & Telemetry (9 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8428,6 +8867,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 377 | retention window | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
 | 378 | remote write queue | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 379 | telemetry shed | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1053 | metric scrape interval | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
+| 1054 | batching | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1119 | per pod energy attribution | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 
 #### Reliability, Security & Recovery (12 muscles)
 
@@ -8448,7 +8890,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 397 | backup trigger | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 400 | kill switch | admission | reads it; left to its own controller | all four realms; stack; tower |
 
-#### Storage Block/File/Object (16 muscles)
+#### Storage Block/File/Object (20 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `storage` (block, file or object storage), reached through the storage system's QoS and tiering API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -8470,8 +8912,12 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 270 | erasure code profile | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 271 | storage admission | admission | reads it; left to its own controller | all four realms; stack; tower |
 | 272 | degraded storage gate | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1049 | scrub schedule | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1050 | io scheduler | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1051 | disk power spin down | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
+| 1052 | lifecycle tiering | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 
-#### Cooling, Chillers & Thermodynamics (15 muscles)
+#### Cooling, Chillers & Thermodynamics (18 muscles)
 
 Each is a data hall or building zone cooled by chillers, air handlers or fans; its class is `data_hall` (a data hall cooling plant), reached through the building management system (BACnet, Modbus) or its command line. Omni-Compass reads its temperature against its limit. It belongs to every organism.
 
@@ -8492,8 +8938,11 @@ Each is a data hall or building zone cooled by chillers, air handlers or fans; i
 | 557 | cpu thermal envelope | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | all four realms; stack; tower |
 | 558 | thermal workload migrate | admission | reads it; left to its own controller | all four realms; stack; tower |
 | 559 | thermal load shed | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1055 | server fan speed | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1056 | economiser | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1122 | chiller plant supervisory control rl with safety layer | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 
-#### PDU, UPS & Electrical Distribution (14 muscles)
+#### PDU, UPS & Electrical Distribution (18 muscles)
 
 Each is a battery, UPS or microgrid store with a load and a grid connection; its class is `ups` (an uninterruptible power supply), reached through the UPS and PDU management interface (SNMP, Modbus). Omni-Compass reads its draw on the grid connection and its reserve. It belongs to every organism.
 
@@ -8513,10 +8962,14 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 | 541 | generator dispatch | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
 | 542 | electrical isolation | admission | reads it; left to its own controller | all four realms; stack; tower |
 | 543 | breaker trip gate | admission | reads it; left to its own controller | all four realms; stack; tower |
+| 1057 | ups shutdown battery test | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | all four realms; stack; tower |
+| 1110 | hierarchical power budget row pdu switchboard controllers | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
+| 1111 | priority aware capping throttle low priority first | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
+| 1113 | power oversubscription with prediction | power | holds the power share inside its cover; full at once past the wall | all four realms; stack; tower |
 
-### Realm: Compute / AI / Cloud (155 muscles of its own, 345 in its organism with the spine)
+### Realm: Compute / AI / Cloud (173 muscles of its own, 430 in its organism with the spine)
 
-#### AI Inference Serving (16 muscles)
+#### AI Inference Serving (24 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
@@ -8538,8 +8991,16 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 174 | model precision | power | holds the power share inside its cover; full at once past the wall | Compute; stack; tower |
 | 175 | inference priority | admission | reads it; left to its own controller | Compute; stack; tower |
 | 176 | inference slo gate | admission | reads it; left to its own controller | Compute; stack; tower |
+| 1058 | autoscaling target concurrency qps | admission | reads it; left to its own controller | Compute; stack; tower |
+| 1059 | scale to zero panic window | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Compute; stack; tower |
+| 1060 | request priority levels | admission | reads it; left to its own controller | Compute; stack; tower |
+| 1061 | kv cache swap space | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
+| 1062 | chunked prefill | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
+| 1063 | tensor parallel degree | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
+| 1064 | disaggregated prefill decode | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
+| 1065 | lora adapter load | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
 
-#### AI Training (16 muscles)
+#### AI Training (18 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu_batch` (GPU training and batch work), reached through nvidia-smi, the job scheduler's pause and resume. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
@@ -8561,6 +9022,8 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 190 | straggler mitigation | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
 | 191 | training precision | power | holds the power share inside its cover; full at once past the wall | Compute; stack; tower |
 | 192 | compute comm overlap | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
+| 1066 | activation checkpointing | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
+| 1067 | dataloader workers | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
 
 #### Cross-Cluster, Multi-Region & Edge (15 muscles)
 
@@ -8625,7 +9088,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 222 | deadline pressure | admission | reads it; left to its own controller | Compute; stack; tower |
 | 223 | scheduler retry | admission | reads it; left to its own controller | Compute; stack; tower |
 
-#### GPU Fabric & RDMA (16 muscles)
+#### GPU Fabric & RDMA (18 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `fabric` (a high-speed fabric (RDMA, DPU, SmartNIC)), reached through the fabric manager's API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
@@ -8647,8 +9110,10 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 158 | fabric failover | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
 | 159 | communication priority | admission | reads it; left to its own controller | Compute; stack; tower |
 | 160 | fabric isolation | admission | reads it; left to its own controller | Compute; stack; tower |
+| 1068 | collective protocol | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
+| 1069 | nic hca selection | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
 
-#### HPC & Distributed Compute (16 muscles)
+#### HPC & Distributed Compute (19 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `batch` (batch and queued jobs), reached through the job queue (Kubernetes Jobs, Slurm, Spark). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
@@ -8670,6 +9135,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 206 | scratch budget | admission | reads it; left to its own controller | Compute; stack; tower |
 | 207 | scheduler fair share | admission | reads it; left to its own controller | Compute; stack; tower |
 | 208 | backfill policy | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
+| 1070 | node power saving | power | holds the power share inside its cover; full at once past the wall | Compute; stack; tower |
+| 1071 | cpu frequency per job | power | holds the power share inside its cover; full at once past the wall | Compute; stack; tower |
+| 1072 | partition limits | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Compute; stack; tower |
 
 #### Kubernetes Dynamic Device Allocation (8 muscles)
 
@@ -8725,7 +9193,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 607 | error mitigation budget | admission | reads it; left to its own controller | Compute; stack; tower |
 | 608 | quantum queue priority | admission | reads it; left to its own controller | Compute; stack; tower |
 
-#### Work Admission & Demand Shaping (16 muscles)
+#### Work Admission & Demand Shaping (19 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
@@ -8747,15 +9215,20 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 14 | retry admission | admission | reads it; left to its own controller | Compute; stack; tower |
 | 15 | background work gate | admission | reads it; left to its own controller | Compute; stack; tower |
 | 16 | maintenance work gate | admission | reads it; left to its own controller | Compute; stack; tower |
+| 1074 | request concurrency limit | admission | reads it; left to its own controller | Compute; stack; tower |
+| 1123 | adaptive concurrency limit | admission | reads it; left to its own controller | Compute; stack; tower |
+| 1124 | priority request queue under limit | admission | reads it; left to its own controller | Compute; stack; tower |
 
-### Realm: Physics / Robotics / Autonomous (72 muscles of its own, 262 in its organism with the spine)
+### Realm: Physics / Robotics / Autonomous (119 muscles of its own, 376 in its organism with the spine)
 
-#### Automotive EV & Mobile Powertrain (12 muscles)
+#### Automotive EV & Mobile Powertrain (14 muscles)
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `ev_traction` (an electric vehicle traction motor), reached through the vehicle's motor controller (CAN; modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
+| 1083 | state of charge limits | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 1084 | smart charging schedule | admission | reads it; left to its own controller | Physics; stack; tower |
 | AUDIT-0045 | traction torque limit | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
 | AUDIT-0046 | regen braking level | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
 | AUDIT-0047 | battery charge limit | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
@@ -8769,7 +9242,7 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 | AUDIT-0055 | fast charge voltage | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
 | AUDIT-0056 | vehicle safe state | admission | reads it; left to its own controller | Physics; stack; tower |
 
-#### Aviation & Autonomous Flight (16 muscles)
+#### Aviation & Autonomous Flight (20 muscles)
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `flight_axis` (a flight-control axis), reached through the flight controller (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
@@ -8791,6 +9264,10 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 | 494 | actuator saturation envelope | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
 | 495 | flight mode transition | admission | reads it; left to its own controller | Physics; stack; tower |
 | 496 | flight termination safe state | admission | reads it; left to its own controller | Physics; stack; tower |
+| 1079 | attitude rate gains | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 1080 | horizontal speed limit | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 1081 | vertical speed limits | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 1082 | acceleration jerk limits | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
 
 #### Robotics Fleet & Warehouse Automation (15 muscles)
 
@@ -8814,7 +9291,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 462 | human safe stop | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
 | 463 | fleet concurrency | admission | reads it; left to its own controller | Physics; stack; tower |
 
-#### Robotics Motion Control (15 muscles)
+#### Robotics Motion Control (18 muscles)
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `robot_joint` (a robot joint servo), reached through the robot controller (ROS 2, EtherCAT, the drive's fieldbus). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
@@ -8835,6 +9312,9 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 | 445 | steering angle | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
 | 446 | braking force | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
 | 447 | balance correction | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 1076 | trajectory tolerances | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 1077 | velocity acceleration scaling | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 1078 | controller update rate | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
 
 #### Spacecraft & Flight Software (14 muscles)
 
@@ -8857,14 +9337,76 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 | 510 | instrument activation | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
 | 511 | fault isolation | admission | reads it; left to its own controller | Physics; stack; tower |
 
-### Realm: Energy / Facility / Industrial (92 muscles of its own, 282 in its organism with the spine)
+#### Rail Traction & Train Control (14 muscles)
 
-#### Building & Critical Environment HVAC (12 muscles)
+Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `rail_traction` (a train's traction and auxiliary systems), reached through the train control and management system and ATO (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2054 | traction effort limit | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2055 | regenerative braking share | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2056 | coasting speed target | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2057 | dwell time schedule | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2058 | hvac duty cycle | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2059 | train auxiliary power budget | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2060 | platform approach speed | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2061 | acceleration rate setpoint | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2062 | wheel slip protection mode | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2063 | traction motor thermal derate | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2064 | catenary voltage limit | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2065 | timetable recovery margin | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2066 | headway target | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2067 | door release hold | admission | reads it; left to its own controller | Physics; stack; tower |
+
+#### Marine Propulsion & Vessel Automation (12 muscles)
+
+Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `marine_propulsion` (a ship's propulsion shaft and power plant), reached through the vessel automation and power management system (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2068 | shaft speed target | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2069 | propeller pitch limit | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2070 | shaft power limit | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2071 | bow thruster duty | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2072 | ballast pump mode | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2073 | engine load sharing setpoint | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2074 | slow steaming speed target | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2075 | auxiliary engine staging | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2076 | shore power mode | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2077 | hotel load budget | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2078 | trim target | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2079 | rudder rate limit | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+
+#### Elevators & Vertical Transport (12 muscles)
+
+Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `elevator_hoist` (an elevator or escalator drive and its group control), reached through the lift controller and destination dispatch (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2146 | hoist speed target | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2147 | acceleration limit | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2148 | regen drive mode | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2149 | standby power mode | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2150 | destination dispatch schedule | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2151 | car parking mode | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2152 | door dwell hold | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2153 | escalator speed target | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Physics; stack; tower |
+| 2154 | group capacity mode | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2155 | motor thermal derate | power | holds the power share inside its cover; full at once past the wall | Physics; stack; tower |
+| 2156 | brake test schedule | admission | reads it; left to its own controller | Physics; stack; tower |
+| 2157 | fire recall mode | admission | reads it; left to its own controller | Physics; stack; tower |
+
+### Realm: Energy / Facility / Industrial (213 muscles of its own, 470 in its organism with the spine)
+
+#### Building & Critical Environment HVAC (15 muscles)
 
 Each is a data hall or building zone cooled by chillers, air handlers or fans; its class is `building` (a building zone), reached through the building management system. Omni-Compass reads its temperature against its limit. Its home realm is Energy / Facility / Industrial.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
+| 1094 | setpoint reset trim and respond | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 1095 | duct static pressure setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 1096 | optimal start stop | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
 | AUDIT-0081 | zone temperature target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
 | AUDIT-0082 | zone airflow | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
 | AUDIT-0083 | ahu fan speed | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
@@ -8878,7 +9420,7 @@ Each is a data hall or building zone cooled by chillers, air handlers or fans; i
 | AUDIT-0091 | thermal storage dispatch | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
 | AUDIT-0092 | hvac emergency mode | admission | reads it; left to its own controller | Energy; stack; tower |
 
-#### Energy Storage & Microgrid (16 muscles)
+#### Energy Storage & Microgrid (19 muscles)
 
 Each is a battery, UPS or microgrid store with a load and a grid connection; its class is `microgrid` (a microgrid battery and loads), reached through the inverter or energy management system (IEEE 2030.5, SunSpec, OpenADR). Omni-Compass reads its draw on the grid connection and its reserve. Its home realm is Energy / Facility / Industrial.
 
@@ -8900,6 +9442,9 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 | 526 | flex load admission | admission | reads it; left to its own controller | Energy; stack; tower |
 | 527 | storage dispatch | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
 | 528 | microgrid emergency reserve | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 1085 | volt var | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 1086 | volt watt | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 1087 | constant power factor reactive power | power | holds the power share inside its cover; full at once past the wall | Energy; stack; tower |
 
 #### Facility & Grid Optimization (15 muscles)
 
@@ -8942,7 +9487,7 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 | AUDIT-0043 | grid protection mode | admission | reads it; left to its own controller | Energy; stack; tower |
 | AUDIT-0044 | grid restoration sequence | admission | reads it; left to its own controller | Energy; stack; tower |
 
-#### Industrial PLC & Process Automation (14 muscles)
+#### Industrial PLC & Process Automation (18 muscles)
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `process` (an industrial process loop), reached through the PLC or DCS (OPC UA, EtherNet/IP, PROFINET). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
@@ -8962,13 +9507,19 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 | 476 | conveyor rate | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
 | 477 | feed rate | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
 | 478 | purge vent action | admission | reads it; left to its own controller | Energy; stack; tower |
+| 1088 | controller mode | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 1089 | alarm limits | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 1090 | safety interlock trip | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 1091 | opc ua writes | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
 
-#### Semiconductor Fab & Precision Manufacturing (11 muscles)
+#### Semiconductor Fab & Precision Manufacturing (13 muscles)
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `chamber` (a controlled chamber (clean room, kiln, reactor)), reached through the PLC or DCS. Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
+| 1092 | run to run control | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 1093 | idle sleep mode | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
 | AUDIT-0057 | tool job dispatch | admission | reads it; left to its own controller | Energy; stack; tower |
 | AUDIT-0058 | wafer route | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
 | AUDIT-0059 | chamber recipe selection | admission | reads it; left to its own controller | Energy; stack; tower |
@@ -9000,9 +9551,174 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 | AUDIT-0079 | water demand shed | admission | reads it; left to its own controller | Energy; stack; tower |
 | AUDIT-0080 | water emergency shutdown | admission | reads it; left to its own controller | Energy; stack; tower |
 
-### Realm: Distribution / Specialized (147 muscles of its own, 337 in its organism with the spine)
+#### Healthcare Critical Environments (13 muscles)
 
-#### Cache & Memory Services (15 muscles)
+Each is a data hall or building zone cooled by chillers, air handlers or fans; its class is `hospital` (a hospital's critical rooms (operating rooms, isolation, pharmacy, imaging suites)), reached through the hospital's building management system (BACnet). Omni-Compass reads its temperature against its limit. Its home realm is Energy / Facility / Industrial.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2001 | operating room air change setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2002 | isolation room pressure target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2003 | patient room temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2004 | surgical suite humidity target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2005 | ahu supply air temperature | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2006 | pharmacy cold room setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2007 | sterile storage humidity setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2008 | imaging suite cooling capacity | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2009 | chiller plant staging | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2010 | exhaust fan capacity | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2011 | ward night setback mode | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2012 | medical gas plant demand limit | power | holds the power share inside its cover; full at once past the wall | Energy; stack; tower |
+| 2013 | emergency power load shed | admission | reads it; left to its own controller | Energy; stack; tower |
+
+#### Agriculture & Irrigation (14 muscles)
+
+Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `irrigation` (pumps, pressure and climate on a farm or in a greenhouse), reached through the pump station controller, the pivot panel or the climate computer (Modbus, the vendor cloud). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2026 | irrigation pump speed | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2027 | mainline pressure setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2028 | soil moisture target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2029 | pivot speed setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2030 | fertigation dose | power | holds the power share inside its cover; full at once past the wall | Energy; stack; tower |
+| 2031 | greenhouse temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2032 | greenhouse co2 target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2033 | vent position setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2034 | grain dryer temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2035 | cold storage temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2036 | barn ventilation rate | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2037 | milking vacuum level setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2038 | well drawdown level target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2039 | drip zone dispatch | admission | reads it; left to its own controller | Energy; stack; tower |
+
+#### Oil & Gas Pipelines (14 muscles)
+
+Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `pipeline` (a pipeline segment with its compressors, pumps and valves), reached through pipeline SCADA (DNP3, Modbus, OPC UA). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2040 | compressor discharge pressure setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2041 | pump station suction pressure target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2042 | line pack target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2043 | pipeline flow setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2044 | compressor unit staging | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2045 | vfd pump speed | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2046 | terminal tank level target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2047 | leak detection shutdown | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2048 | batch interface dispatch | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2049 | heater outlet temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2050 | drag reducing agent dose | power | holds the power share inside its cover; full at once past the wall | Energy; stack; tower |
+| 2051 | valve position target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2052 | cathodic protection voltage | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2053 | pressure protection priority | admission | reads it; left to its own controller | Energy; stack; tower |
+
+#### Mining & Mineral Processing (14 muscles)
+
+Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `mill` (a grinding, flotation or materials-handling circuit), reached through the plant DCS or PLC (OPC UA). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2092 | sag mill load setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2093 | mill speed target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2094 | crusher gap setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2095 | flotation aeration rate | power | holds the power share inside its cover; full at once past the wall | Energy; stack; tower |
+| 2096 | cyclone feed pressure target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2097 | thickener underflow density target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2098 | reagent dose | power | holds the power share inside its cover; full at once past the wall | Energy; stack; tower |
+| 2099 | conveyor speed setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2100 | dewatering pump level target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2101 | ventilation on demand airflow | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2102 | stockpile level target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2103 | slurry pump speed | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2104 | tailings discharge shutdown | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2105 | ore blend dispatch | admission | reads it; left to its own controller | Energy; stack; tower |
+
+#### District Heating & Cooling (13 muscles)
+
+Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `district_heat` (a district heating or cooling network), reached through the network control system and substation controllers (Modbus, M-Bus). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2106 | supply temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2107 | return temperature target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2108 | differential pressure setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2109 | network pump speed | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2110 | heat pump staging | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2111 | chp dispatch | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2112 | thermal storage level target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2113 | peak boiler heater output | power | holds the power share inside its cover; full at once past the wall | Energy; stack; tower |
+| 2114 | substation flow limit | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2115 | peak demand shed | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2116 | outdoor reset setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2117 | cooling network supply temperature | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2118 | cooling storage level target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+
+#### Power Generation & Turbine Control (14 muscles)
+
+Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `turbine` (a generating unit's governor, boiler or excitation loop), reached through the plant DCS and governor (OPC UA, IEC 61850; modelled only). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2119 | turbine speed droop setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2120 | unit load setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2121 | boiler steam pressure setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2122 | feedwater level target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2123 | agc participation limit | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2124 | excitation voltage setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2125 | hydro gate position target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2126 | combustion air ratio setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2127 | cooling water flow setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2128 | inlet guide vane position | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2129 | reserve dispatch priority | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2130 | turbine ramp rate limit | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2131 | emissions shutdown | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2132 | nuclear rod position target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+
+#### Renewable Generation & Inverter Control (13 muscles)
+
+Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `inverter` (a plant of grid-support inverters or wind turbines), reached through the plant controller and inverter settings (SunSpec, IEC 61850, IEEE 1547). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2133 | inverter volt var setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2134 | inverter volt watt setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2135 | active power curtailment | power | holds the power share inside its cover; full at once past the wall | Energy; stack; tower |
+| 2136 | plant reactive power target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2137 | wind turbine yaw offset | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2138 | pitch angle limit | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2139 | rotor speed setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2140 | inverter frequency droop setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2141 | ramp rate limit | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Energy; stack; tower |
+| 2142 | tracker stow mode | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2143 | string mppt voltage setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2144 | noise mode schedule | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2145 | ice detection shutdown | admission | reads it; left to its own controller | Energy; stack; tower |
+
+#### Pharmaceutical & Food Manufacturing (14 muscles)
+
+Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `batch_reactor` (a GMP batch reactor, fermenter or food process), reached through the batch control system (ISA-88, OPC UA). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2158 | reactor temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2159 | agitator speed setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2160 | fermenter dissolved oxygen target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2161 | ph setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2162 | pasteurizer holding temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2163 | freezer tunnel temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2164 | cip cycle dispatch | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2165 | cleanroom pressure cascade setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2166 | lyophilizer shelf temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2167 | chromatography flow setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2168 | steam sterilizer cycle priority | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2169 | oven zone temperature setpoint | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Energy; stack; tower |
+| 2170 | refrigerant compressor authority | admission | reads it; left to its own controller | Energy; stack; tower |
+| 2171 | batch hold quarantine | admission | reads it; left to its own controller | Energy; stack; tower |
+
+### Realm: Distribution / Specialized (183 muscles of its own, 440 in its organism with the spine)
+
+#### Cache & Memory Services (16 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
@@ -9023,6 +9739,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 317 | cache warmup | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 318 | cache failover | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 319 | cache flush rate | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1106 | memory size threads | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 
 #### Commerce & Payment Systems (15 muscles)
 
@@ -9068,7 +9785,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 351 | speculation policy | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 352 | analytics admission | admission | reads it; left to its own controller | Distribution; stack; tower |
 
-#### Database & Transactions (14 muscles)
+#### Database & Transactions (19 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `database` (a database cluster), reached through the database operator (replicas, connection pools). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
@@ -9088,8 +9805,13 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 285 | lock timeout | admission | reads it; left to its own controller | Distribution; stack; tower |
 | 286 | checkpoint rate | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 287 | vacuum compaction rate | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1099 | parallel workers | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1100 | background writer | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1101 | synchronous replication | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1102 | buffer pool | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1103 | io capacity | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 
-#### Messaging & Streaming (16 muscles)
+#### Messaging & Streaming (18 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
@@ -9111,8 +9833,10 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 302 | dead letter divert | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 303 | stream priority | admission | reads it; left to its own controller | Distribution; stack; tower |
 | 304 | broker failover | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1104 | prefetch | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1105 | memory disk alarm | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 
-#### Runtime & Application (15 muscles)
+#### Runtime & Application (17 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
@@ -9133,8 +9857,10 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 365 | runtime cpu budget | admission | reads it; left to its own controller | Distribution; stack; tower |
 | 366 | runtime io budget | admission | reads it; left to its own controller | Distribution; stack; tower |
 | 367 | runtime restart | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1108 | go runtime | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1109 | keepalive connection reuse | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 
-#### Search, Indexing & Vector DB (15 muscles)
+#### Search, Indexing & Vector DB (16 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
@@ -9155,8 +9881,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 333 | query route | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 334 | hot shard isolation | admission | reads it; left to its own controller | Distribution; stack; tower |
 | 335 | search admission | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 1107 | circuit breakers | admission | reads it; left to its own controller | Distribution; stack; tower |
 
-#### Service Mesh & API Reliability (15 muscles)
+#### Service Mesh & API Reliability (16 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
@@ -9177,6 +9904,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 253 | request hedging | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 254 | fault injection gate | admission | reads it; left to its own controller | Distribution; stack; tower |
 | 255 | service failover | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 1097 | load balancing policy | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 
 #### Telecom RAN & Edge Radio (12 muscles)
 
@@ -9218,6 +9946,44 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 429 | route replan | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 430 | sla escalation | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
 | 431 | compensation action | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+
+#### Medical Imaging & Clinical Systems (12 muscles)
+
+Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `clinical` (clinical systems: imaging archives, records, interface engines, monitoring gateways), reached through the application's own scaling and admission settings (Kubernetes, the vendor console). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2014 | pacs archive tier target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Distribution; stack; tower |
+| 2015 | dicom router concurrency | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2016 | ehr application replicas | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 2017 | hl7 interface queue limit | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2018 | fhir api rate limit | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2019 | reconstruction gpu workers | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 2020 | modality worklist timeout | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2021 | patient monitoring gateway capacity | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2022 | lab analyzer batch window | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2023 | telehealth session admission | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2024 | clinical backup window | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2025 | imaging prefetch priority | admission | reads it; left to its own controller | Distribution; stack; tower |
+
+#### Ports & Maritime Logistics (12 muscles)
+
+Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `port` (a container terminal's cranes and vehicles taking moves), reached through the terminal operating system and fleet controllers. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
+
+| # | Muscle | Knob | What Omni-Compass does with it | Organisms |
+|---:|---|---|---|---|
+| 2080 | quay crane allocation | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 2081 | yard crane fleet size | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 2082 | berth window admission | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2083 | truck gate rate limit | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2084 | horizontal transport fleet size | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 2085 | reefer plug power budget | power | holds the power share inside its cover; full at once past the wall | Distribution; stack; tower |
+| 2086 | shore power connection capacity | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 2087 | rail mounted gantry dispatch | capacity | holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate | Distribution; stack; tower |
+| 2088 | container dwell priority | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2089 | vessel arrival pacing | admission | reads it; left to its own controller | Distribution; stack; tower |
+| 2090 | stacking height target | setpoint | moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not | Distribution; stack; tower |
+| 2091 | equipment charging window | admission | reads it; left to its own controller | Distribution; stack; tower |
 
 
 ---

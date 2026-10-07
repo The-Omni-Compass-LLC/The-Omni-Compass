@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **The manual brought up to everything built since v1** (`docs/OMNI_COMPASS_MANUAL.md`, PDF rebuilt): section 10 now
+  wires Azure's managed Kubernetes with the bill as the gauge and the fleet sized to the lever, a database behind its
+  pooler, the three independent simulators and the big organisms on a rented machine; section 13 adds preregistration,
+  the clock rule, every-row reporting and the raw-file archive; a new section 15 explains the frozen engines v1, v2 and
+  v3, the version tool, the three-run rule and the Omni index; section 16 (results) is rewritten from the v1 and v3
+  tables, losses beside gains, the earlier card results marked obsolete and the queue named; the glossary, command
+  reference, file map and evidence map follow. `docs/INTEGRATION_MANUAL.md`, `docs/WIRING_GUIDE.md` and
+  `docs/HOW_TO_READ_THE_RESULTS.md` carry the same additions; the register's heading reads 945 muscles in 59 families.
 - **The archive bot copies finished runs only** (`.github/workflows/archive-run.yml`): it had copied the first 108 jobs of
   the v3 grid at 100 copies (run 37501765605) while the run was still going, and would never have looked again. That
   part-copy is removed; the run is re-requested when it ends. The grid at 1,000 copies is queued behind it (run

@@ -206,6 +206,10 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | Bare-metal CPU servers | 6 | cpufreq and RAPL through sysfs |
 | Slurm / HPC schedulers | 5 on the GPU nodes | a Slurm connector for job-level decisions is not built |
 | Building management (cooling, power meters) | 7 | through your BMS's command line or API, wrapped in the command templates |
+| Azure AKS, the bill as the gauge | 1-3 | Azure's managed cluster autoscaler stays native and deletes the machines Omni-Compass idles; one or several work pools (`worker_pools`), the replica ceiling raised with the fleet (`hpa_max`); a fleet of 4 cannot show a saving of one machine, 39 can (manual, section 10.1; `docs/AZURE_SETUP.md`) |
+| PostgreSQL behind PgBouncer, or any pooler with a console | one knob | the pool size through the pooler's own admin console, cover [2, 90], one writer, restored on OFF (manual, section 10.2; `docs/POSTGRES_PREREGISTRATION.md`) |
+| A rented cloud machine running the big organisms | the whole harness | `big-organism-detached`: start, collect, survey; the clock rule sets the window (manual, section 10.4) |
+| Independent simulators (CityLearn, pandapower, MuJoCo) | one knob each | the simulator's own controller is native; preregistered, A/B/C (manual, section 10.3) |
 
 ---
 
@@ -241,9 +245,11 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 
 | Claim | Evidence | Kind |
 |---|---|---|
-| On real Kubernetes: faster responses, fewer replicas and machines in service | `results/live/LIVE_REPS_20.md`, `LIVE_REPS_21.md` (10 paired runs each) | measured on kind |
+| On real Kubernetes, Omni v1, three runs of ten pairs each: more work inside the response line (+42% to +48%), p95 −57% to −69%, machines fewer where a paired trial allowed it (steady −1.5% to −3.4%, batch −15% to −24%) | `results/live/V1_ALL_FOUR.md`, `V1_STEADY.md`, `V1_WANDERING.md`, `V1_FAULTS.md`, `V1_BATCH.md`, `V1_FAIRNESS.md` | measured on kind; read by the three-run rule (`docs/OMNI_V1.md`) |
+| On a real database, Omni v3: 61% to 72% fewer connections held open for the same work and latency, at +14% to +28% host CPU-seconds (confirmed worse, reported) | `results/live/V3_PGBENCH.md` | measured on GitHub's machines |
+| On Azure's bill, 4 workers: no difference beyond the noise on any gauge (the fleet is too small for the lever) | `results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md` | a real bill |
 | Energy on Kubernetes | declared model on kind, no meter | modelled |
-| GPU: more work per energy within the speed guardrail | `results/gpu/sim/after` | modelled (MLPerf-calibrated card); a real-card run is pending |
+| GPU: more work per energy within the speed guardrail | earlier card controller, obsolete; rerun on rented cards pending | hardware meter |
 | CPU and GPU on one power budget: more work, never over the budget | `results/hardware/NODE_EXCHANGE_*.json` | modelled |
 | Safety: OFF switch restores everything; watch mode writes nothing | every live run's switch drill; `verify.py` | measured / checked |
 
