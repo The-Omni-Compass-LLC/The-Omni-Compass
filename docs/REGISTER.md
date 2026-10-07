@@ -10,7 +10,7 @@ owner when the benchmark is someone else's. Every result named here is read from
 Status words: **done** (result in the repo), **running** (on GitHub or Azure now), **ready** (harness built, waiting
 on hardware or a go), **next** (being built now), **queued** (in the order of section 4, one or two at a time).
 
-Last updated 2026-10-05.
+Last updated 2026-10-07.
 
 ## 1. Every muscle wired (656 muscles, 46 families, four realms and the shared spine)
 
@@ -205,6 +205,15 @@ is not ours.
 | 20 | AI training | MLPerf Training power (MLCommons) | the framework as shipped | power limit, clocks | queued (GPU) |
 | 21 | Networks | ns-3 data-centre and 5G-LENA cell sleep (ns-3 consortium; CTTC) | their own congestion control and cell schedulers | pacing, cell sleep | queued |
 | 22 | Supply chains | OR-Gym inventory (Hubbs et al.) | base-stock policy | order quantities | queued |
+| 23 | Drone swarms, aircraft, defense | PX4 and ArduPilot multi-vehicle simulation (the shipped flight code), Crazyswarm, gym-pybullet-drones first; JSBSim for fixed-wing (NASA, AFRL); K3s edge clusters on constrained hardware | each drone's own autopilot and the fleet's own mission planner | drones airborne at once, cruise and climb margins inside the autopilot's limits, battery reserve, mission admission; collisions zero in both arms or the cell is void | queued, after row 17 (added 2026-10-07) |
+| 24 | Databases and caches at large | YCSB on Cassandra, MongoDB and Redis (Yahoo; the Apache and MongoDB projects); HammerDB TPC-C on MySQL | each store's shipped settings | pools, admission, replicas | queued (added 2026-10-07) |
+| 25 | Big data | Spark on TPC-DS (Apache; the TPC) | Spark's dynamic allocation as shipped | executors, admission | queued (added 2026-10-07) |
+| 26 | Messaging | Kafka with the OpenMessaging benchmark (Apache; the Linux Foundation) | Kafka's shipped settings | partitions, consumer count, admission | queued (added 2026-10-07) |
+| 27 | Caches | Redis with memtier (Redis Ltd) | Redis as shipped | memory ceiling, eviction, admission | queued (added 2026-10-07) |
+| 28 | Search | OpenSearch with Rally (Amazon; Elastic's benchmark) | the cluster's own shard allocator | replicas, refresh interval, admission | queued (added 2026-10-07) |
+| 29 | Storage | fio on block and object stores (Jens Axboe) | the store's own queue depth and cache | queue depth, admission, power | queued (added 2026-10-07) |
+| 30 | Warehouse and logistics robots | Open-RMF fleet manager (Open Robotics) | its own fleet adapter and task allocator | fleet size in service, task admission | queued (added 2026-10-07) |
+| 31 | Robustness, every platform | a 24-hour run; Omni killed mid-run (the dead-man lease); Omni's own CPU and memory at 1, 10, 100 and 1,000 copies | as the platform | none: the test is of Omni itself | queued (added 2026-10-07) |
 
 Each row, when it runs, gets what the power grid got: a preregistration frozen on one tuning case before the untouched
 cases run, a workflow on GitHub, the report with every row shown (worse included), and its line moved up into section
