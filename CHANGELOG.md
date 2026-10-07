@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Kubernetes on v3, three of six tests confirmed three times** (`results/live/V3_STEADY.md`, `V3_FAIRNESS.md`,
+  `V3_FAULTS.md`; every run omni-v3): steady p95 −65% to −66%, machines −1.5% to −2.9%, standby-model energy −1.3% to
+  −2.1%, all confirmed better; fairness no difference beyond the noise on every row; faults p95 −47% to −62% and time
+  over the line −22% to −42% confirmed better, machines and energy inside the noise. The same readings as v1. Register
+  rows 1, 4 and 5; the other three tests land as their B and C runs finish.
+- **Azure burst v1, the four-pair copy withdrawn**: repetition 4's rerun finished (run 37534538088, attempt 2, 5 of 5),
+  so the raw copy of the first attempt is removed and the whole run is archived in its place; the table is remade with
+  five pairs when the copy lands.
 - **The manual brought up to everything built since v1** (`docs/OMNI_COMPASS_MANUAL.md`, PDF rebuilt): section 10 now
   wires Azure's managed Kubernetes with the bill as the gauge and the fleet sized to the lever, a database behind its
   pooler, the three independent simulators and the big organisms on a rented machine; section 13 adds preregistration,
