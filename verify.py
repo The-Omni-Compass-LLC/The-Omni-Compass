@@ -348,6 +348,11 @@ def main():
                                  "inside its guards (slack spent as speed, the planner's cruise at the wall and near another drone) and handed back, the declared energy model", True)
     test_swarm_abc.main(); check("drone swarms A/B/C rule: a deterministic simulator's runs must reproduce; a late mission, a reserve breach or a near miss added reads "
                                  "WORSE; a collision voids the cell; the tuning cell is shown and not counted", True)
+    from tests import test_run_kafka, test_kafka_abc
+    test_run_kafka.main(); check("Kafka runner: slow with messages waiting adds consumers, calm gives back one idle consumer after the dwell and only with nothing "
+                                 "waiting, the wall starts every consumer at once, the cover holds; the group's own reading; the paired reading; the service time as CPU", True)
+    test_kafka_abc.main(); check("Kafka A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
+                                 "no difference beyond the noise with its count; any lost message is WORSE; the tuning workload is shown and not counted", True)
     from tests import test_omni_version
     test_omni_version.main(); check("engine fingerprints: this checkout is one declared version; a commit before a runner was written reads as that version "
                                     "minus the runner; a changed byte or an extra engine file is no version", True)
