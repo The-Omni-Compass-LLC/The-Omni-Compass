@@ -193,6 +193,9 @@ jobs:
                         for d in bench-*-*; do [ -d "$d" ] && echo "$d: $(ls "$d" | tr "\n" " " | cut -c1-200)"; [ -f "$d/organism.log" ] && tail -2 "$d/organism.log" | cut -c1-200; done
                         uptime; free -g | head -2')
             echo "$state"
+            # the progress lines as notices too (GitHub shows ten a step), so a slow machine can be told from a stuck one
+            # without the log: the arms started, the paired script's last line, the organism's own last lines, the load
+            echo "$state" | tail -n +3 | grep -v "^$" | head -8 | while IFS= read -r l; do echo "::notice::$RG: ${l:0:300}"; done
             if ! echo "$state" | grep -q ALL_DONE; then
               if [ "$age_h" -lt "$max_h" ]; then
                 echo "::notice::$RG running ${age_h} h: $(echo "$state" | head -1 | sed 's/^$/no cell finished yet/') finished; left alone"; continue
