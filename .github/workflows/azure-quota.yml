@@ -27,6 +27,10 @@ jobs:
           SUB=$(az account show --query id -o tsv)
           echo "before:"; az vm list-usage -l "$LOC" -o tsv --query "[?name.value=='cores' || name.value=='$FAM'].[name.localizedValue, currentValue, limit]"
           az extension add -n quota -y >/dev/null 2>&1 || true
+          # the first request failed because the subscription had never used the Quota service: register it first
+          az provider register --namespace Microsoft.Quota --wait 2>&1 | tail -1 || echo "::warning::could not register Microsoft.Quota"
+          az provider show --namespace Microsoft.Quota --query registrationState -o tsv
+          echo "subscription kind: $(az account show --query '[name, state]' -o tsv | tr '\n' ' ')"
           SCOPE="/subscriptions/$SUB/providers/Microsoft.Compute/locations/$LOC"
           ok=1
           for res in cores "$FAM"; do
