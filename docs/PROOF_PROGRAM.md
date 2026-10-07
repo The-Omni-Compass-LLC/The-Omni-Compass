@@ -66,7 +66,7 @@ and preregistration not yet written). Every "to build" item names the open nativ
 | 10 | PostgreSQL behind PgBouncer (pgbench) | the pooler's shipped pool, the DBA's fixed setting | the pool size | work inside the line, p95, connections held, host CPU | free | v3 done |
 | 11 | YCSB on Cassandra, MongoDB and Redis; HammerDB TPC-C on MySQL | each store as shipped | pools, admission, replicas | throughput inside the line, p95, resources held, host CPU | free | to build |
 | 12 | Apache Kafka as shipped, a producer at a stepped rate (the OpenMessaging benchmark later) | the operator's fixed consumer count | consumer count inside [1, partitions] | work inside the line, end-to-end p95, lag, consumers held, lost messages, host CPU | free | **preregistered, A/B/C running on v3** (`docs/KAFKA_PREREGISTRATION.md`) |
-| 13 | Redis with memtier | Redis as shipped | memory ceiling, eviction, admission | p95, hit rate, memory, CPU | free | to build |
+| 13 | Redis as shipped, an application in front with a declared store trip on a miss | the operator's memory ceiling and eviction rule | the memory ceiling inside [16, 512] MB | work inside the line, hit rate, p95, memory held, CPU | free | **preregistered, A/B/C running on v3** (`docs/REDIS_PREREGISTRATION.md`) |
 | 14 | OpenSearch with Rally | the cluster's own shard allocator | replicas, refresh interval, admission | query p95, indexing throughput, nodes busy | free | to build |
 | 15 | Storage with fio | the store's own queue depth and cache | queue depth, admission, power | IOPS, p95, power | free | to build |
 | 16 | Spark on TPC-DS | Spark's dynamic allocation | executors, admission | query time, executor-hours | free | to build |

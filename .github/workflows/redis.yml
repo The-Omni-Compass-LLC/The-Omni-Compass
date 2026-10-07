@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: redis
+# Omni-Compass on top of a Redis cache's operator-set memory ceiling (docs/REDIS_PREREGISTRATION.md): Redis as shipped by
+# Ubuntu, an application in front of it asking for keys from a working set that widens and narrows, the operator's fixed
+# ceiling (native) against the same with the compass law on the ceiling through Redis's own console (omni). One job per
+# workload, three paired repetitions each; one report (REDIS.md). Two workloads at a time.
+on:
+  workflow_dispatch:
+    inputs:
+      workloads:
+        description: "Workloads, comma separated: tuning, small, large, burst; 'all' runs every one"
+        default: "all"
+      reps: {description: "Paired repetitions per workload", default: "3"}
+      step_s: {description: "Seconds per working-set notch", default: "20"}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {workloads: "${{ steps.w.outputs.workloads }}"}
+    steps:
+      - id: w
+        run: |
+          if [ "${{ github.event.inputs.workloads }}" = all ] || [ -z "${{ github.event.inputs.workloads }}" ]; then
+            w='["tuning","small","large","burst"]'
+          else
+            w=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.workloads }}'.split(',')))")
+          fi
+          echo "workloads=$w" | tee -a "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: {workload: "${{ fromJSON(needs.plan.outputs.workloads) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt redis
+      - name: Redis as shipped
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q redis-server
+          sudo systemctl stop redis-server || true
+          redis-server --version
+          python tools/run_redis.py --setup
+      - name: Run the workload, native and omni
+        run: |
+          set +e
+          python tools/run_redis.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out > run.log 2>&1
+          code=$?
+          tail -40 run.log
+          grep "^==\|^   " run.log | tee -a "$GITHUB_STEP_SUMMARY"
+          cp /tmp/omni-redis.log out/redis-server.log 2>/dev/null || true
+          exit $code
+      - run: cd out && find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "redis-${{ matrix.workload }}", path: out}
+  report:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - uses: actions/download-artifact@v4
+        with: {pattern: "redis-*", path: all, merge-multiple: true}
+      - run: ls all && python tools/run_redis.py --report-only all && cat all/REDIS.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: redis-report, path: all/REDIS.md}

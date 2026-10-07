@@ -8,6 +8,15 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Redis, preregistered and built** (`docs/REDIS_PREREGISTRATION.md`, `tools/run_redis.py`, `tools/redis_abc.py`, workflow
+  `redis`, tests in `verify.py`): Redis as shipped with the operator's 64 MB ceiling and allkeys-lru as native; an
+  application with a declared 5 ms store trip on a miss and a working set that steps 1 2 3 2 3 4 5 6 …; Omni on the
+  ceiling inside [16, 512] MB through Redis's own console, growing only while the cache is full (a cold miss is not the
+  ceiling's), giving back a notch a second when calm and nothing is evicted. The tuning workload on one machine (not
+  counted): hit rate 66% → 81%, work inside the line +22%, the ceiling held 64 → 304 MB (the cost). Three untouched
+  workloads run as A, B and C on v3. The two smoke runs that shaped the rule are described in the preregistration.
+- **Azure**: the standard-tier fleet run was refused on all five repetitions too (seventeen refusals in seven hours, all
+  Azure's eastus capacity for new clusters); dispatched again.
 - **Kafka, preregistered and built** (`docs/KAFKA_PREREGISTRATION.md`, `tools/run_kafka.py`, `tools/kafka_abc.py`, workflow
   `kafka`, tests in `verify.py`): Apache Kafka 3.9.1 as shipped on the runner, a producer at a stepped rate, the consumer
   group at the operator's count as native; Omni on the consumer count inside [1, 8], holding the group's own end-to-end
