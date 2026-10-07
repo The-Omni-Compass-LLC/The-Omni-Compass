@@ -59,8 +59,16 @@ def main():
     while time.time() - t0 < 30 and (target() == 50 or not (t / "gpu.jsonl").exists()):
         time.sleep(0.5)
     assert target() < 50, "the controller never acted (the hot probe should have tightened the HPA target)"
-    st = subprocess.run(switch + ["status"], env=env, capture_output=True, text=True).stdout
-    assert "kubernetes controller" in st and "GPU governor (two wires)" in st and "ON" in st, st
+    # both governors register with the switch on their own clocks: on a loaded machine the second may be a moment behind
+    # the first's audit line, so the status is read until both are listed (up to 20 s), then judged
+    st = ""
+    for _ in range(40):
+        st = subprocess.run(switch + ["status"], env=env, capture_output=True, text=True).stdout
+        if "kubernetes controller" in st and "GPU governor (two wires)" in st:
+            break
+        time.sleep(0.5)
+    died = "" if gpu.poll() is None else f"\nGPU governor exited {gpu.returncode}: {gpu.stderr.read().decode()[-800:]}"
+    assert "kubernetes controller" in st and "GPU governor (two wires)" in st and "ON" in st, st + died
     # OFF: the whole harness at once
     r = subprocess.run(switch + ["off", "--reason", "test", "--wait", "30"], env=env, capture_output=True, text=True)
     assert r.returncode == 0, r.stdout + r.stderr

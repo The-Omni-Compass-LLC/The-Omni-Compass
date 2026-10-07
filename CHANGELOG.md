@@ -8,6 +8,11 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **The register's queue, audited against every family and what a referee or buyer expects** (`docs/REGISTER.md` §4, rows
+  23 to 31): drone swarms, aircraft and defense edge (PX4, ArduPilot, Crazyswarm, JSBSim, K3s), databases and caches at
+  large (YCSB, HammerDB), big data (Spark TPC-DS), messaging (Kafka), caches (Redis), search (OpenSearch), storage (fio),
+  warehouse robots (Open-RMF), and a robustness row (a 24-hour run, Omni killed mid-run, Omni's own cost at every size).
+  None changes a result that stands; each gets its own preregistration, A, B and C, every row shown.
 - **Azure with a fleet that can show one machine** (`docs/K8S_COMPASS_PREREGISTRATION.md`, written before the run;
   `.github/workflows/aks-metered.yml` inputs `max_workers` and `hpa_max`; `scripts/kind_bench.sh` raises the app's
   replica ceiling with the fleet and expects it back untouched): the 4-worker runs could not show anything under a
