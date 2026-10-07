@@ -36,7 +36,7 @@ register (`docs/REGISTER.md`) and a chapter in the manual (`docs/OMNI_COMPASS_MA
 | Azure's managed Kubernetes | | the largest fleet the allowance gives: 15 workers today (32 cores), 96 at 200 cores once a machine family is granted; the app's ceiling 9 pods a worker | `aks-metered` (`max_workers`, `hpa_max`), `azure-quota` |
 | GPU | | one card; one card inside 1,000 copies; eight cards; vLLM serving (Lambda) | `scripts/gpu_*.sh`, `tools/run_hil.py` |
 | CPU power, a real meter | | one rented bare-metal machine, RAPL energy counters | to build |
-| Drone swarms | 20 drones | 100 and more on a rented machine | to build |
+| Drone swarms | 20 drones | 100 and more on a rented machine | built and preregistered (`docs/SWARM_PREREGISTRATION.md`); A/B/C running on v3 |
 | Databases, messaging, caches, search, storage, big data | the service in a container on a 4-core runner, three untouched workloads each | | `pgbench` done; the rest to build |
 | Independent simulators (grid, buildings, robots, batteries, process, water, wind, traffic) | every case the simulator ships | | `pandapower`, `citylearn`, `mujoco` done; the rest to build |
 
@@ -92,7 +92,7 @@ and preregistration not yet written). Every "to build" item names the open nativ
 | # | Benchmark | Native engine | Omni's lever | Gauges | Size and cost | Status |
 |---:|---|---|---|---|---|---|
 | 28 | Robot arms, MuJoCo Menagerie | each robot's shipped position servos | the speed override inside the takt | torque, tracking error, energy per takt, cycles over the line | free | v1 and v3 done |
-| 29 | Drone swarms | PX4 and ArduPilot multi-vehicle simulation (the shipped flight code); Crazyswarm; gym-pybullet-drones first | drones airborne at once, cruise and climb margins inside the autopilot's limits, battery reserve, mission admission | missions per charge, late missions, reserve breaches, energy per mission; collisions zero in both arms or the cell is void | 20 drones free; 100 on a rented machine, about $10 | to build |
+| 29 | Drone swarms | PX4 and ArduPilot multi-vehicle simulation (the shipped flight code); Crazyswarm; gym-pybullet-drones first | drones airborne at once, cruise and climb margins inside the autopilot's limits, battery reserve, mission admission | missions per charge, late missions, reserve breaches, near misses, energy per mission; collisions zero in both arms or the cell is void | 20 drones free; 100 on a rented machine, about $10 | preregistered, A/B/C running on v3 (gym-pybullet-drones first) |
 | 30 | Fixed-wing aircraft | JSBSim | speed and climb margins | fuel, time, envelope violations | free | to build |
 | 31 | Spacecraft attitude | Basilisk | wheel effort cap | pointing error, wheel energy | free | queued |
 | 32 | Legged robots | MuJoCo Playground, Unitree Go2 | gait speed, effort | energy per metre, falls | free | queued |

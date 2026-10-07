@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: swarm
+# Omni-Compass on top of a drone swarm's own autopilots (docs/SWARM_PREREGISTRATION.md): gym-pybullet-drones (University
+# of Toronto, DSL; MIT) integrates every Crazyflie 2.x and flies it with the position controller it ships with. One job per
+# cell (the tuning swarm of 5 drones; the untouched swarms of 20: short, mixed and long missions), native and omni on the
+# same missions; one report (SWARM.md) and one JSON per cell. The package is installed from its repository at a pinned
+# commit (it is not on PyPI) without its learning extras, which the controller does not need.
+on:
+  workflow_dispatch:
+    inputs:
+      cells:
+        description: "Cells, comma separated: tuning, short, mixed, long; 'all' runs every cell"
+        default: "all"
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {cells: "${{ steps.c.outputs.cells }}"}
+    steps:
+      - id: c
+        run: |
+          if [ "${{ github.event.inputs.cells }}" = all ] || [ -z "${{ github.event.inputs.cells }}" ]; then
+            cells='["tuning","short","mixed","long"]'
+          else
+            cells=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.cells }}'.split(',')))")
+          fi
+          echo "cells=$cells" | tee -a "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix: {cell: "${{ fromJSON(needs.plan.outputs.cells) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - name: The simulator, pinned (gym-pybullet-drones 2.2.0 at 7ebad1ec, MIT; PyBullet)
+        run: |
+          pip install numpy scipy matplotlib pillow gymnasium transforms3d pybullet
+          pip install --no-deps "git+https://github.com/utiasDSL/gym-pybullet-drones@7ebad1ecabd28a7000add2d05f888aa2e837c2cc"
+          python -c "import gym_pybullet_drones, pybullet; print('gym-pybullet-drones', gym_pybullet_drones.__file__); print('pybullet ok')"
+      - name: Fly the cell, native and omni
+        run: python tools/run_swarm.py --cell "${{ matrix.cell }}" --out "swarm-${{ matrix.cell }}" 2>&1 | grep -v "gym.logger\|WARN\|\[INFO\]" | tee -a "$GITHUB_STEP_SUMMARY"
+      - run: cd "swarm-${{ matrix.cell }}" && sha256sum * > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with: {name: "swarm-${{ matrix.cell }}", path: "swarm-${{ matrix.cell }}"}
+  report:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - uses: actions/download-artifact@v4
+        with: {pattern: "swarm-*", path: cells, merge-multiple: true}
+      - run: ls cells && python tools/run_swarm.py --report-only cells && cat cells/SWARM.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: swarm-report, path: cells/SWARM.md}
