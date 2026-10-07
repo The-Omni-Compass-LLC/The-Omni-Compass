@@ -5,8 +5,7 @@
 """The referee dossier: every mechanism, harness, receipt and result in one place, read from the result files.
 
 Writes docs/DOSSIER.md and its charts in docs/dossier/. Every number is read from a file named next to it; the only
-numbers written here by hand are the Kubernetes rows, transcribed from the receipts they cite (their formats differ by
-set). Run after any new result:
+numbers written here by hand are the Azure rows, transcribed from the receipts they cite. Run after any new result:
 
     python3 tools/dossier.py
 """
@@ -158,53 +157,95 @@ def main():
           "that reads every lever once before the first write, reads back every write, yields to any other writer and "
           "restores the snapshot at the end.", ""]
 
-    # ------------------------------------------------------------------ 2. GPU, real card
-    g = json.loads((ROOT / "results" / "gpu" / "run-20261002T082232Z" / "GPU_REPS.json").read_text())
-    po = g["paired"]["omni"]
-    keys = [("work per energy (served requests per kJ)", "Work per energy"), ("energy, GPU (J)", "GPU energy"),
-            ("power, GPU mean (W)", "GPU power"), ("response time, mean (ms)", "Response, mean"),
-            ("response time, 95th percentile (ms)", "Response, p95"), ("response time, 99th percentile (ms)", "Response, p99")]
-    vals = [pct_ci(po[k]) for k, _ in keys]
-    bars(FIG / "gpu_real.png", "Real NVIDIA A10, Omni against the card alone (10 paired runs, the card's own meter)",
-         "change against native (%)", [n for _, n in keys], [v[0] for v in vals], [v[1] for v in vals], [v[2] for v in vals],
-         colors=[SERIES[0]] * 3 + [SERIES[1]] * 3,
-         note="Blue: energy side (higher work per energy, lower energy and power are better). Orange: response time (lower is better). Bars: 95% interval.")
-    L += ["## 2. The real GPU (evidence class P)", "",
-          f"NVIDIA A10 on Lambda, 2026-10-02, frozen at commit `{g['freeze'].get('commit', 'c908054')[:7] if isinstance(g.get('freeze'), dict) else 'c908054'}`, "
-          "10 paired repetitions of native, Omni watching only and Omni governing, 600 s each, energy from the card's own "
-          "power meter. Wire check 7 of 7; every write read back; every arm ended at the start limit.", "",
-          "![The real card](dossier/gpu_real.png)", "",
-          "| Gauge | Native | Omni | Change | 95% interval | Verdict |", "|---|---:|---:|---:|---:|---|"]
-    for (k, n), v in zip(keys, vals):
-        d = po[k]
-        L.append(f"| {n} | {d['native']:.4g} | {d['omni']:.4g} | {v[0]:+.1f}% | {v[1]:+.1f}% to {v[2]:+.1f}% | {d['verdict']} |")
-    L += ["", f"**Result, by rule: {g['headline']['verdict']}.** The energy result is proven; the 95th-percentile "
-          "response time breached the +10% guardrail. The cause, read from the card's own samples, was wiring in the "
-          "governor (bursts served at 736-768 MHz against 861-889 MHz on the card's own); corrected in amendments 6 and 7 "
-          "of `docs/GPU_PREREGISTRATION.md`. The corrected governor is the next card run.", ""]
+    # ------------------------------------------------------------------ 2. Real Kubernetes on v3, three runs each
+    K8S = [("STEADY", "Steady work in steps", "equal by design"), ("WANDERING", "Demand that wanders", None),
+           ("ALL_FOUR", "All four in one run", "capacity"), ("FAIRNESS", "Fairness, a noisy neighbour", None),
+           ("FAULTS", "Faults: machine down, spike, runaway pod, blind probe", None), ("BATCH", "A queue of batch jobs", None)]
+    P95, MEAN_RT = "response time (ms), 95th percentile", "response time (ms), mean"
+    NODES, FAILED = "worker nodes in service, mean", "failed requests (%)"
+    STANDBY = "energy (Wh)"                     # the standby model, as the three-run table names it
+    CAP = "work inside the response line (requests a second; the capacity test's own gauge, higher is better)"
 
-    hil = json.loads((ROOT / "results" / "hil" / "run-20261002T082232Z" / "HIL.json").read_text())["results"]
-    order = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
-             STACK, TOWER]
-    m, lo, hi, sm = [], [], [], []
-    for k in order:
-        r = hil.get(k) or next((hil[a] for a, new in ORGANISM_ALIAS.items() if new == k and a in hil), None)   # the v1 card run names the organisms by their old counts
-        if not r:
-            raise KeyError(f"{k} missing from HIL.json")
-        c = [100 * x for x in r["card"]["primary"]]
-        mu = sum(c) / len(c); sd = math.sqrt(sum((x - mu) ** 2 for x in c) / (len(c) - 1)); h = 4.303 * sd / math.sqrt(len(c))
-        m.append(mu); lo.append(mu - h); hi.append(mu + h); sm.append(100 * sum(r["sim"]["primary"]) / len(r["sim"]["primary"]))
-    bars(FIG / "hil_card.png", "The real card inside each organism: its work per energy against native (3 runs each)",
-         "change against native (%)", SHORT, m, lo, hi)
-    L += ["### The real card inside the six organisms", "",
-          "The card is one more muscle of each organism, governed by the same compass law as the modelled muscles; its "
-          "energy and requests are its own meter (`results/hil/run-20261002T082232Z/HIL.md`).", "",
-          "![The card in the organisms](dossier/hil_card.png)", "",
-          "| Organism | The card, work per energy (meter) | The modelled stacks, work per energy |", "|---|---:|---:|"]
-    for n, a, b in zip(ORG, m, sm):
-        L.append(f"| {n} | {a:+.2f}% | {b:+.2f}% |")
-    L += ["", "In every organism the card served the same requests with none lost; its p95 rose from about 500 ms to "
-          "600-935 ms under the governor of that run (the same wiring fault).", ""]
+    def pct_runs(row):
+        return [100 * r["diff"] / r["native"] if r.get("native") else 0.0 for r in row["runs"]]
+
+    def cell(row, better_is_lower=True):
+        if row is None:
+            return "not taken"
+        p = pct_runs(row); rd = row["reading"]
+        if rd.startswith("confirmed"):
+            return f"**{min(p):+.0f}% to {max(p):+.0f}%, {rd}**"
+        if rd == "same":
+            return "same"
+        return "no difference beyond the noise" if "no difference" in rd else rd
+
+    tabs = {}
+    for key, _, _ in K8S:
+        tabs[key] = json.loads((ROOT / "results" / "live" / f"V3_{key}.json").read_text())
+    runs_line = "; ".join(f"{t['tag']} {t['run']} ({t['engine'].split(' (')[0]})" for t in tabs["STEADY"]["runs"])
+    # chart: the 95th percentile and the machines, three runs a test
+    labels, vals, lows, highs, cols = [], [], [], [], []
+    for key, name, _ in K8S:
+        row = tabs[key]["rows"].get(MEAN_RT if key == "BATCH" else P95)
+        for i, r in enumerate(row["runs"]):
+            labels.append(f"{name.split(':')[0].split(',')[0][:14]} {'ABC'[i]}")
+            vals.append(100 * r["diff"] / r["native"]); lows.append(100 * r["ci95"][0] / r["native"]); highs.append(100 * r["ci95"][1] / r["native"])
+            cols.append(SERIES[[k for k, _, _ in K8S].index(key)])
+    fig, ax = plt.subplots(figsize=(11, 3.8), dpi=160); fig.patch.set_facecolor(SURF)
+    x = range(len(vals)); ax.bar(x, vals, width=0.7, color=cols, edgecolor=SURF, linewidth=1)
+    ax.errorbar(x, vals, yerr=[[v - l for v, l in zip(vals, lows)], [h - v for v, h in zip(vals, highs)]], fmt="none", ecolor=INK2, elinewidth=1, capsize=2)
+    ax.set_xticks(list(x)); ax.set_xticklabels(labels, fontsize=6.5, color=INK2, rotation=60, ha="right")
+    style(ax, "Real Kubernetes on Omni v3: response time against native, three runs of ten pairs each (p95; the batch queue's mean)", "change (%)")
+    fig.tight_layout(); fig.savefig(FIG / "k8s_v3.png", facecolor=SURF); plt.close(fig)
+    L += ["## 2. Real Kubernetes, Omni v3, every test three times (evidence class L)", "",
+          "Six tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the "
+          "replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a "
+          "fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **confirmed better** or "
+          "**confirmed worse** only when all three runs move the same way with every 95% interval clear of zero; otherwise it "
+          "reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and "
+          f"read back. Steady runs: {runs_line}; the other tests' runs are named in their tables.", "",
+          "![Kubernetes on v3](dossier/k8s_v3.png)", "",
+          "| Test | Work | Response time (p95; the batch queue's mean) | Machines in service | Energy (declared model) | Failed requests | Table |", "|---|---|---|---|---|---|---|"]
+    for key, name, work in K8S:
+        rows = tabs[key]["rows"]
+        w = "equal by design" if work == "equal by design" else (cell(rows.get(CAP)) if work == "capacity" else "not taken")
+        L.append(f"| {name} | {w} | {cell(rows.get(MEAN_RT if key == 'BATCH' else P95))} | {cell(rows.get(NODES))} | {cell(rows.get(STANDBY))} | {cell(rows.get(FAILED))} | `results/live/V3_{key}.md` |")
+    L += ["", "Energy on kind is a declared model: the machines are containers on one runner, so a machine out of service saves "
+          "modelled watts, not a metered bill. Omni-Compass gives a machine back only after a paired trial shows the service no "
+          "slower without it (the verdict, `omnicompass/verdict.py`); on these clusters one machine fewer made requests 30-45% "
+          "slower in most trials, so the machines stayed and were spent on speed and work. The v1 tables (`results/live/V1_*.md`, "
+          "`docs/OMNI_V1.md`) read the same; the sets before v1 are in `docs/history/`.", ""]
+
+    # ------------------------------------------------------------------ 3. The real database on v3
+    pg = json.loads((ROOT / "results" / "live" / "V3_PGBENCH.json").read_text())
+    L += ["## 3. A real database: PostgreSQL behind PgBouncer, Omni v3, three runs (evidence class L)", "",
+          "PostgreSQL 16 as shipped behind PgBouncer's shipped pool of 20 is native; omni is the compass law on one knob, the "
+          "pool size, through PgBouncer's own console, inside the cover [2, 90] (`docs/POSTGRES_PREREGISTRATION.md`). Three "
+          "paired repetitions a run, three runs, pgbench's own log for the gauges. Runs: "
+          + "; ".join(f"{t['tag']} {t['run']}" for t in pg["runs"]) + ".", "",
+          "| Workload | Work inside the 50 ms line | p95 | Connections held open | Host CPU-seconds (the compass's own cost) |", "|---|---|---|---|---|"]
+    for wl, m in pg["workloads"].items():
+        def c2(k):
+            r = m.get(k)
+            return "not taken" if r is None else cell(r)
+        L.append(f"| `{wl}` | {c2('work_inside_line_tps')} | {c2('p95_ms')} | {c2('servers_alive_mean')} | {c2('cpu_seconds')} |")
+    L += ["", "The compass holds fewer connections open for the same work and the same latency, and it costs CPU on the host to do "
+          "so; that cost is confirmed worse and counted against Omni in the index. Table: `results/live/V3_PGBENCH.md`.", ""]
+
+    # ------------------------------------------------------------------ 4. The bill on a real cloud
+    L += ["## 4. The bill on a real cloud: Azure Kubernetes Service, Omni v1 (evidence class L, a metered bill)", "",
+          "Azure's own cluster autoscaler is native; omni is the same autoscaler with Omni-Compass idling the machines it gives "
+          "back; the bill is Azure's own count of machines every 15 s at list price, a fresh cluster per arm, deleted after it "
+          "(`.github/workflows/aks-metered.yml`, `docs/K8S_COMPASS_PREREGISTRATION.md`, the bill on a real cloud). Transcribed "
+          "from the receipts they cite:", "",
+          "| Test | Fleet | Bill | Response time | Reading | Receipt |", "|---|---|---|---|---|---|",
+          "| Steady load, 5 pairs | 4 workers | −4.7%, interval across zero | inside the noise | no difference beyond the noise on any gauge | `results/live/V1_AKS_STEADY.md` |",
+          "| A burst sized to the cluster, 5 pairs | 4 workers | +5.0%, interval across zero | p99 −34% clear of the noise in this one run; p95 inside the noise | the bill inside the noise | `results/live/V1_AKS_BURST.md` |", "",
+          "One machine is a quarter of a 4-worker fleet, so only a saving of about 30% or more can clear the noise there; the "
+          "expected machine saving is a few percent. The fleet that can show one machine (40 workers in nine machine "
+          "families, the subscription's per-family allowance being 10 vCPUs) is preregistered and dispatched on v3; its "
+          "first dispatches were refused by the subscription's allowances and by Azure's own cluster capacity in eastus "
+          "before any arm ran, each refusal recorded in the preregistration's amendments.", ""]
 
     # ------------------------------------------------------------------ 3. GPU model
     KEYS = ("work_per_kj", "energy_j", "p50_ms", "p95_ms", "p99_ms")
@@ -236,7 +277,7 @@ def main():
     style(ax, "The card's firmware with Omni on top, against the firmware alone (model, geometric means)", "change (%)")
     ax.legend(fontsize=8, frameon=False)
     fig.tight_layout(); fig.savefig(FIG / "gpu_model.png", facecolor=SURF); plt.close(fig)
-    L += ["## 3. The GPU governor on the modelled card: each base alone, and with Omni on top (evidence class S)", "",
+    L += ["## 4b. The GPU governor on the modelled card: each base alone, and with Omni on top (evidence class S)", "",
           "Omni-Compass never runs the card. It sits on the card's own firmware (or on an operator's power cap) and moves the "
           "clock ceiling and the power limit, which that base already accepts (`omni_controller/gpu_compass.py`, the same law "
           "in `realms/gpu_card.py`). A step down is taken only after a paired trial on the card shows it adds at most 2% to "
@@ -250,35 +291,6 @@ def main():
     L += ["", "Source: `results/sim/gpu_two_wire/RESULT.md` and `fresh/RESULT.md`. The rule, and why the allowance is 2%, is "
           "amendment 8 of `docs/GPU_PREREGISTRATION.md`.", ""]
 
-    # ------------------------------------------------------------------ 4. Kubernetes
-    K = [("22", 31.0, 61.0, -0.9, "results/live/LIVE_REPS_22.md"), ("23", 28.7, 62.2, -1.0, "results/live/LIVE_REPS_23.md"),
-         ("24", 31.6, 60.1, -1.8, "results/live/LIVE_REPS_24.md"), ("25", 32.3, 57.3, -0.6, "results/live/LIVE_REPS_25.md"),
-         ("26", 35.8, 55.4, -1.5, "results/live/LIVE_REPS_26.md"), ("26 compass", 17.2, 64.8, 1.0, "results/live/LIVE_REPS_26.md"),
-         ("27", 36.6, 53.1, -0.0, "results/live/LIVE_REPS_27.md"), ("27 compass", 15.9, 65.5, 0.2, "results/live/LIVE_REPS_27.md")]
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), dpi=160, sharey=True); fig.patch.set_facecolor(SURF)
-    for ax, (idx, ttl) in zip(axes, ((1, "Machines in service"), (2, "Response time, p95"))):
-        v = [-k[idx] for k in K]
-        ax.bar(range(len(K)), v, width=0.56, color=[SERIES[2] if "compass" in k[0] else SERIES[0] for k in K], edgecolor=SURF, linewidth=2)
-        for i, x in enumerate(v):
-            ax.annotate(f"{x:+.1f}%", (i, x), xytext=(0, -12), textcoords="offset points", ha="center", fontsize=8)
-        ax.set_xticks(range(len(K))); ax.set_xticklabels([f"set {k[0]}" for k in K], fontsize=7, color=INK2, rotation=20)
-        style(ax, ttl, "change against native (%)" if ax is axes[0] else "")
-    fig.suptitle("Real Kubernetes (kind), 10 paired runs per set, same work; lower is better", color=INK, fontsize=11, x=0.01, ha="left")
-    fig.tight_layout(); fig.savefig(FIG / "k8s.png", facecolor=SURF); plt.close(fig)
-    L += ["## 4. Real Kubernetes (evidence class L)", "",
-          "Each set: 10 paired repetitions on one runner, native Kubernetes (HPA, scheduler) against the same Kubernetes "
-          "with Omni-Compass on top, fresh cluster per arm, order rotated, fixed-rate load so both arms do the same work. "
-          "Every Omni arm ends with the reset, which must return every setting and every machine to native.", "",
-          "![Kubernetes](dossier/k8s.png)", "",
-          "| Set | Law | Machines in service | p95 response | Failed requests | Total CPU incl. Omni's own | Receipt |",
-          "|---|---|---:|---:|---:|---:|---|"]
-    for k in K:
-        law = "compass" if "compass" in k[0] else "allocation"
-        L.append(f"| {k[0].split()[0]} | {law} | −{k[1]:.1f}% | −{k[2]:.1f}% | 0 / 0 | {k[3]:+.1f}% (not significant) | `{k[4]}` |")
-    L += ["", "Machines and response time are proven better in every set. Total CPU including the controller's own cost "
-          "is no different from native: the service uses 6-9% less CPU (proven) and the controller spends about 0.07 "
-          "cores, on the same 4-core runner. Set 27 runs the compass aligned with the GPU governor (`docs/K8S_COMPASS_PREREGISTRATION.md`, set 27): machines −15.9%, p95 −65.5%, labelled *better on machines within the band* by its preregistered rule.", ""]
-
     # ------------------------------------------------------------------ 5. Six organisms grid
     gt = grid_tables()
     runs = [1, 10, 100, 1000]
@@ -290,42 +302,62 @@ def main():
             if any(y is not None for _, ys in rows for y in ys):
                 panels[f"{size}× size"] = rows
         lines(FIG / fn, ttl, yl, runs, panels)
-    L += ["## 5. The six organisms at 1, 10, 100 and 1,000 runs and sizes (evidence class S)", "",
+    L += ["## 5. The six organisms at 1, 10, 100 and 1,000 runs and sizes, Omni v3 (evidence class S)", "",
           "Each organism runs native (its own controllers) and with the compass law on every muscle, same seed, same load, "
-          "same clock. Size is the number of copies of the organism governed together on one clock; runs are the first N "
-          "of the same paired set, so 1, 10, 100 and 1,000 nest. 100× and 1,000× are being computed on GitHub; their "
-          "cells read 'running' until they land. 1,000 runs at 1,000× is beyond the free machines.", "",
+          "same clock. Size is the number of copies of the organism governed together on one clock (1,000 copies of the four "
+          "stacked is 1.7 million modelled muscles); runs are the first N of the same paired set, so 1, 10, 100 and 1,000 "
+          "nest. 84 of 90 cells are done; the six left (100 and 1,000 runs at 1,000 copies) are beyond the machines "
+          "available and say so.", "",
           "![Work per energy](dossier/grid_wpe.png)", "", "![Time over the line](dossier/grid_viol.png)", "",
-          "The full grid with every cell: `results/scale/GRID.md`. Work per energy is better in every completed cell; the "
-          "time over the service line is about 0.2 points higher in every completed cell, so the band-first rule is not yet "
-          "held on the modelled organisms. That is the open work on the realm muscles; the card and Kubernetes were brought "
-          "into the band first.", ""]
+          "The full grid with every cell: `results/scale/GRID.md`; the receipts, one per size: `results/scale/receipts/`. "
+          "Work per energy is better in every cell, the same figure at every size (+0.07% for Physics to +0.37% for Energy, "
+          "the four stacked and the tower); the time over the service line is at or under native's in every cell, so the "
+          "band-first rule holds and every cell of 10 runs or more is labelled superior within guardrails by the "
+          "preregistered rule. Every knob was handed back in every run.", ""]
 
     # ------------------------------------------------------------------ 6. Realms and muscles
-    L += [f"## 6. The {_SZ[TOWER]} muscles and the four realms (evidence class S)", "",
-          f"The catalog (`realms/catalog.csv`): {_SZ[TOWER]} muscles, {_SZ['compute_ai_cloud']} in Compute / AI / Cloud, {_SZ['physics_robotics_autonomous']} in Physics / Robotics / "
+    L += [f"## 6. The {_SZ[TOWER]} muscles and the four realms, Omni v3 (evidence class S)", "",
+          f"The catalog (`realms/catalog.csv`): {_SZ[TOWER]} muscles in 59 families, {_SZ['compute_ai_cloud']} in Compute / AI / Cloud, {_SZ['physics_robotics_autonomous']} in Physics / Robotics / "
           f"Autonomous, {_SZ['energy_facility_industrial']} in Energy / Facility / Industrial and {_SZ['distribution_specialized']} in Distribution / Specialized ({_SZ[STACK]:,} counting a muscle "
-          "once per realm). Every muscle alone and every organism are in `results/realms/REALMS.md` (round 3, the earlier "
-          "governor) and in the six-organism grid above (the compass law). Every knob was handed back in every run.", ""]
+          "once per realm, a shared spine of 257). Every muscle alone and every organism whole ran as A, B and C on v3 and "
+          "reproduced to the last digit (`results/realms/REALMS.md`): 0 muscles worse, every organism superior within "
+          "guardrails (work per energy +0.1% to +0.3%, work unchanged, time over the line not above native's). On v2 the "
+          "Physics realm and the tower read a service tradeoff; the cause was a missing do-no-harm gate on speed knobs, "
+          "which made v3 (`docs/OMNI_V3.md`). Three independent simulators with their own native controllers are wired the "
+          "same way and read by the same rule: the power grid (`results/live/V3_PANDAPOWER.md`: energy drawn and net import "
+          "better in all 11 SimBench grids with ZIP loads, losses worse in 4, tap operations 4 → 8 a year in one), robot arms "
+          "(`results/live/V3_MUJOCO.md`: Gen3 peak torque −29%, tracking error −21%, energy per takt −0.8%; the Panda's "
+          "copper +14% worse; two arms left native) and CityLearn (`results/live/V3_CITYLEARN.md`: electricity bought, peak "
+          "and unevenness better in all 11 battery districts; the bill worse in 7). Losses stand in every table.", ""]
 
     # ------------------------------------------------------------------ 7. Harnesses and receipts
     L += ["## 7. Harnesses and receipts", "", "| Harness | What it proves | Receipt |", "|---|---|---|",
-          "| `scripts/gpu_rented_run.sh` | one command on a rented card: wire check, smoke, the six organisms with the card inside, the preregistered confirmation; one packed file back | `results/gpu/run-*`, `results/hil/run-*` |",
-          "| `tools/gpu_wire_check.py` | both of the card's wires follow, read back and go home; another writer is left alone | `results/gpu/wirecheck-*.txt` |",
-          "| `scripts/kind_paired.sh`, `tools/live_reps.py` | native against Omni on real Kubernetes, paired on one runner, with the reset checked | `results/live/LIVE_REPS_*.md` |",
-          "| `tools/run_scale.py`, `.github/workflows/six.yml` | the six organisms at every run count and size | `results/scale/GRID.md` |",
-          "| `tools/run_gpu_card.py` | the modelled card, both profiles, tuning and fresh seeds | `results/sim/gpu_two_wire/` |",
-          "| `verify.py` | everything above re-runs and checks itself; the manifest fingerprints the result | `results/VERIFY_RECEIPT.txt`, `RELEASE_MANIFEST.json` |", "",
-          "Every raw result folder carries its `SHA256SUMS.txt`; the rules for each run were written and committed before it "
-          "ran (`docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md`).", ""]
+          "| `scripts/kind_paired.sh`, `tools/live_reps.py`, workflow `benchmark-reps` | native against Omni on real Kubernetes, paired on one runner, the reset checked | `results/live/raw/run-*/live-reps/` |",
+          "| `tools/confirm_abc.py` (and `pgbench_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | three separate runs read by one rule: confirmed better, confirmed worse, no difference beyond the noise, the runs disagree; each run's engine checked against the fingerprint | `results/live/V3_*.md`, `V1_*.md` |",
+          "| `tools/omni_version.py` | which frozen engine a checkout or any result's commit carries | `OMNI_V1.json`, `OMNI_V2.json`, `OMNI_V3.json` |",
+          "| `scripts/aks_paired.sh`, workflow `aks-metered` | the same on Azure's managed Kubernetes, Azure's own bill, a fresh cluster per arm, the fleet pre-flighted against the subscription's allowances | `results/live/V1_AKS_*.md` |",
+          "| `tools/run_kil.py`, workflows `six-kube`, `big-organism`, `big-organism-detached`; `tools/six_kube_report.py` | the six organisms with a real cluster inside at 1 to 1,000 copies, on GitHub and on a rented machine; the clock rule | `results/live/V1_SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V1_BIG_ORGANISM.md` |",
+          "| `tools/run_pgbench.py`, workflow `pgbench` | a real database behind its pooler, one knob through the pooler's console | `results/live/V3_PGBENCH.md` |",
+          "| `tools/run_scale.py`, `tools/pool_scale.py`, workflow `six`; `tools/grid.py` | the six organisms at every run count and size | `results/scale/GRID.md`, `results/scale/receipts/` |",
+          "| `tools/run_realms.py`, workflow `realms` | every muscle alone and every organism whole | `results/realms/REALMS.md` |",
+          "| `tools/run_pandapower.py`, `run_mujoco.py`, `run_citylearn.py` | Omni on top of an independent simulator's own controller | `results/live/V3_PANDAPOWER.md`, `V3_MUJOCO.md`, `V3_CITYLEARN.md` |",
+          "| `tools/omni_index.py` | the one combined number, read only from the three-run tables | `results/OMNI_INDEX.md` |",
+          "| `scripts/gpu_rented_run.sh`, `tools/gpu_wire_check.py` | one command on a rented card: wire check, smoke, the organisms with the card inside, the preregistered confirmation | the founder's runs, to come |",
+          "| workflow `archive-run` | every finished run's files copied with the code, one SHA-256 manifest per repetition | `results/live/raw/run-<id>/` |",
+          "| `verify.py`, `tools/release_manifest.py` | everything above re-runs and checks itself; the manifest fingerprints the result | `results/VERIFY_RECEIPT.txt`, `RELEASE_MANIFEST.json` |", "",
+          "The rules for each run were written and committed before it ran (`docs/*_PREREGISTRATION.md`); every row is reported, "
+          "losses included; nothing is read across engine versions.", ""]
 
     # ------------------------------------------------------------------ 8. Open
     L += ["## 8. What is not yet shown", "",
-          "- The corrected GPU governor on a real card (the run after amendments 6 and 7).",
-          "- Band first on the modelled organisms (time over the line about +0.2 points).",
-          "- Energy saved on real hardware for Kubernetes: kind keeps every machine powered, so energy there is a declared model.",
-          "- A net CPU saving on Kubernetes once the controller's own cost is counted on a small runner.",
-          "- 1,000 runs at 1,000× (needs a larger machine).", ""]
+          "- A cloud-bill or energy saving on real machines: the 4-worker Azure fleet reads inside the noise, as a fleet too small "
+          "to show one machine must; the 40-worker fleet runs are the test of that.",
+          "- The real card on the current governor: every earlier card result ran on a controller since replaced and is obsolete; "
+          "the one-card, card-inside-the-organisms and eight-card runs are the founder's, on rented cards, at one named commit.",
+          "- The four stacked and the tower at 1,000 copies with the real cluster inside on v3 (the stack runs on a rented machine).",
+          "- 100 and 1,000 runs at 1,000 copies (beyond the machines available).",
+          "- The queue in `docs/REGISTER.md` section 4: drone swarms, YCSB and HammerDB, Spark, Kafka, Redis, OpenSearch, fio, "
+          "Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera.", ""]
     OUT.write_text("\n".join(_legal_stamp(L)) + "\n", encoding="utf-8")
     print(OUT)
 
