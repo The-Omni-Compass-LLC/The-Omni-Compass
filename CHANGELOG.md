@@ -8,6 +8,12 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **A fleet of several machine families on Azure** (`scripts/aks_paired.sh` `AKS_WORKER_POOLS`, `scripts/kind_bench.sh`
+  worker selector `omni-role=work` and per-pool machine counts in the bill file, `tools/live_reps.py` the bill at each
+  pool's own list price, `aks-metered` inputs `worker_pools` and `pool_prices`): the subscription allows 200 vCPUs in
+  eastus but 10 a family, so one family gives 5 machines; eight families give 39 workers. Preregistered in
+  `docs/K8S_COMPASS_PREREGISTRATION.md` (the fleet that can show one machine), replacing the one-family 11- and 15-worker
+  plan the allowance refused. Register rows 12c and 12d.
 - **The v1 stack at 1,000 copies, 3 of 3** (`results/live/V1_BIG_ORGANISM.md`, collection run 37575930111 from the detached
   machine): p95 −74%, p99 −83%, clear of the noise; machines 6 in both arms; organism energy −0.2%; organism work
   rounding-level worse; the compass arm ended up to 615 s after the 2,880 s window in all three repetitions (marked OFF

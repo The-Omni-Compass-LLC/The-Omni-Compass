@@ -19,6 +19,8 @@ on:
       load_steps: {description: "Load-generator replicas per step, in order (the burst bill test: e.g. 1 6 1 8 1 6); empty: steady load", default: ""}
       max_workers: {description: "Worker machines in the work pool (Azure's autoscaler runs 1 to this many); the subscription's eastus quota is 32 vCPUs, 2 a machine, one for the system pool", default: "4"}
       hpa_max: {description: "The app's replica ceiling, the same in every arm; 9 pods of 200m fit one 2-vCPU worker, so 9 x max_workers lets the fleet fill (empty: the manifest's 10)", default: ""}
+      worker_pools: {description: "Several work pools, one machine family each with its own ceiling: size:max,size:max,... (the way past a 10-vCPU-a-family allowance; empty: one pool of vm_size x max_workers)", default: ""}
+      pool_prices: {description: "List price per machine-hour of each pool, work0=0.096;work1=0.086;... (a pool without one is priced at price_per_node_hour)", default: ""}
       organism: {description: "One of the six organisms with this cluster inside it (tools/run_kil.py): compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower; empty: the service alone", default: ""}
       load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
       organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "1"}
@@ -70,6 +72,7 @@ jobs:
           ORGANISM_SCALE: ${{ github.event.inputs.organism_scale || '1' }}
           AKS_MAX_NODES: ${{ github.event.inputs.max_workers || '4' }}
           HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
+          AKS_WORKER_POOLS: ${{ github.event.inputs.worker_pools || '' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - if: always()
         run: az group delete -n "$AZ_RG" --yes --no-wait || true
@@ -88,7 +91,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with: {pattern: "aks-*", path: reps, merge-multiple: true}
       - run: ls reps && python tools/live_reps.py reps
-        env: {PRICE_PER_NODE_HOUR: "${{ github.event.inputs.price_per_node_hour || '0.096' }}"}
+        env: {PRICE_PER_NODE_HOUR: "${{ github.event.inputs.price_per_node_hour || '0.096' }}", POOL_PRICES: "${{ github.event.inputs.pool_prices || '' }}"}
       - run: cat reps/LIVE_REPS.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with: {name: live-reps-aks, path: "reps/LIVE_REPS.*"}

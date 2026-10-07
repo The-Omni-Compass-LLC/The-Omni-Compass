@@ -791,15 +791,22 @@ app's replica ceiling (10 pods of 200m, about one worker's worth) kept Azure's a
 arms, so nothing under a quarter of the fleet could show. The steady run on v1 (5 pairs) read even on every gauge. That
 is a statement about the lever, not about the law. This run makes the lever big enough to see one machine.
 
-- **Fleet.** `max_workers` = 11 while the detached stack machine holds 8 of the subscription's 32 eastus vCPUs (one
-  system machine plus 11 workers of 2 vCPUs each fill the rest), 15 once it is gone. One machine is then 9% or 7% of
-  the fleet. Same `Standard_D2s_v4` workers, same autoscaler profile, a fresh cluster per arm, as before.
-- **Ceiling.** `hpa_max` = 9 × workers (99 at 11, 135 at 15): nine 200m pods fit one 2-vCPU worker, so the fleet can
+- **Fleet.** The subscription allows 200 vCPUs in eastus but 10 vCPUs in each machine family (every family's request to
+  raise it was refused through the API on 2026-10-07: the subscription's terms), so one family gives at most 5 machines.
+  The fleet is therefore several work pools, one 2-vCPU machine family each, each capped at what its family allows:
+  `worker_pools` = `Standard_D2s_v4:4,Standard_D2as_v4:5,Standard_D2_v4:5,Standard_D2a_v4:5,Standard_D2ds_v4:5,Standard_D2s_v3:5,Standard_E2s_v4:5,Standard_E2as_v4:5`,
+  39 workers (the DSv4 family also carries the system machine, hence 4). Every pool carries the label `omni-role=work`,
+  the worker selector in both arms; the first pool keeps one machine, the others may scale to zero; every pool starts
+  full and Azure's own autoscaler trims, as before. One machine is then 2.6% of the fleet. Mixed machine families are how
+  real cloud fleets run; the bill is each pool's machine-hours at its own list price (`pool_prices`), Azure's own count
+  every 15 s. The same autoscaler profile, a fresh cluster per arm. (Written first for 11 then 15 workers of one family;
+  the family allowance made that impossible and this replaces it before any such run.)
+- **Ceiling.** `hpa_max` = 9 × workers = 351 at 39 workers: nine 200m pods fit one 2-vCPU worker, so the fleet can
   fill. The same ceiling in every arm; the restore checks expect it back untouched.
-- **Load.** The load generator's replica steps scale with the fleet, the same in every arm. Steady: `5 10 15 5 10 5`
-  over 900 s at 11 workers (one load replica drove about five pods at 50% on the 4-worker runs, so the peak asks for
-  about 80 pods, nine workers' worth). Burst: `3 10 3 15 3 10` over 1,800 s (the 4-worker burst was `1 3 1 4 1 3`).
-  At 15 workers the steps scale by 15/11, rounded.
+- **Load.** The load generator's replica steps scale with the fleet, the same in every arm (one load replica drove
+  about five pods at 50% on the 4-worker runs). Steady: `18 35 53 18 35 18` over 900 s at 39 workers (the peak asks
+  for about 265 pods, thirty workers' worth). Burst: `11 35 11 53 11 35` over 1,800 s (the 4-worker burst was
+  `1 3 1 4 1 3`). A fleet of another size scales the steps by workers/39, rounded.
 - **Everything else as preregistered**: native (Azure's autoscaler alone) against omni (Omni-Compass on top of it,
   rule 4 on the node pool, the HPA target inside its range, handed back at 90% of the window), 5 paired repetitions,
   order rotated, the bill Azure's own machine count every 15 s at list price, the reading by `tools/live_reps.py`'s

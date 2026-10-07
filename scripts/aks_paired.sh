@@ -17,11 +17,18 @@ set -euo pipefail
 echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native compass omni}"
 RG="${AZ_RG:?set AZ_RG}"; LOC="${AZ_LOCATION:-eastus}"; SIZE="${AKS_VM_SIZE:-Standard_D2s_v4}"
-MAX="${AKS_MAX_NODES:-4}"; export AKS_MAX_NODES="$MAX"
+MAX="${AKS_MAX_NODES:-4}"
+# The work pools: one or several, each its own machine family with its own ceiling ("size:max,size:max,..."). Several
+# families are how a fleet gets past a subscription's per-family core allowance (10 vCPUs a family here, 200 in the
+# region) and how real cloud fleets run anyway. Every pool carries the label omni-role=work (the worker selector), the
+# first pool keeps one machine, the others may scale to zero; every pool starts full, Azure's autoscaler trims.
+POOLS="${AKS_WORKER_POOLS:-$SIZE:$MAX}"
+TOTAL=0; for p in ${POOLS//,/ }; do TOTAL=$(( TOTAL + ${p##*:} )); done
+export AKS_MAX_NODES="$TOTAL" WORKER_SEL="omni-role=work"
 PROFILE="${AKS_AUTOSCALER_PROFILE:-scale-down-unneeded-time=2m scale-down-delay-after-add=2m scan-interval=10s}"
 k=${#arms[@]}; off=$(( (REP - 1) % k ))
 order=( "${arms[@]:off}" "${arms[@]:0:off}" )
-echo "repetition $REP, order: ${order[*]}, $SIZE x up to $MAX workers in $LOC"
+echo "repetition $REP, order: ${order[*]}, work pools $POOLS (up to $TOTAL workers) in $LOC"
 az group create -n "$RG" -l "$LOC" -o none
 gone() { az aks delete -g "$RG" -n "$1" --yes -o none 2>/dev/null || true; }
 for arm in "${order[@]}"; do
@@ -32,8 +39,13 @@ for arm in "${order[@]}"; do
   az aks create -g "$RG" -n "$name" -l "$LOC" --tier free --node-count 1 --node-vm-size "$SIZE" \
     --nodepool-name system --nodepool-taints CriticalAddonsOnly=true:NoSchedule \
     --cluster-autoscaler-profile $PROFILE --generate-ssh-keys -o none
-  az aks nodepool add -g "$RG" --cluster-name "$name" -n work --mode User --node-vm-size "$SIZE" \
-    --node-count "$MAX" --enable-cluster-autoscaler --min-count 1 --max-count "$MAX" -o none   # AKS labels its nodes agentpool=work
+  i=0
+  for p in ${POOLS//,/ }; do
+    psize="${p%%:*}"; pmax="${p##*:}"; pmin=$([ "$i" = 0 ] && echo 1 || echo 0)
+    az aks nodepool add -g "$RG" --cluster-name "$name" -n "work$i" --mode User --node-vm-size "$psize" --labels omni-role=work \
+      --node-count "$pmax" --enable-cluster-autoscaler --min-count "$pmin" --max-count "$pmax" -o none   # AKS also labels its nodes agentpool=work$i
+    i=$(( i + 1 ))
+  done
   az aks get-credentials -g "$RG" -n "$name" --admin --overwrite-existing
   kubectl wait --for=condition=Ready nodes --all --timeout=600s
   az aks show -g "$RG" -n "$name" -o json > "/tmp/aks-$name.json"

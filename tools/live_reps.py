@@ -67,12 +67,26 @@ def bill(d):
     import os
     t0 = float((d / "window_start.txt").read_text().split()[0])
     t1 = float((d / "window_end.txt").read_text().split()[0]) if (d / "window_end.txt").exists() else float("inf")
-    b = [(float(r["epoch_s"]), float(r["machines"])) for r in csv.DictReader(open(d / "billed_nodes.csv")) if r.get("machines")]
+    default_price = float(os.environ.get("PRICE_PER_NODE_HOUR", "0.096"))
+    # a fleet of several machine families: each work pool at its own list price (POOL_PRICES="work0=0.096;work1=0.086"),
+    # read from the pools column (pool=count;...) the bench writes beside the machine count; a pool without a price, or
+    # a file without the column, is priced at the default
+    prices = dict(kv.split("=") for kv in os.environ.get("POOL_PRICES", "").replace(",", ";").split(";") if "=" in kv)
+    rows = [r for r in csv.DictReader(open(d / "billed_nodes.csv")) if r.get("machines")]
+    b = [(float(r["epoch_s"]), float(r["machines"]), r.get("pools") or "") for r in rows]
     b = [x for x in b if t0 <= x[0] <= t1]
     if len(b) > 1:
         mh = sum((y[0] - x[0]) * x[1] for x, y in zip(b, b[1:])) / 3600.0
         g["machines billed, machine-hours"] = mh
-        g["compute bill at list price ($)"] = mh * float(os.environ.get("PRICE_PER_NODE_HOUR", "0.096"))
+        cost = 0.0
+        for x, y in zip(b, b[1:]):
+            dt = (y[0] - x[0]) / 3600.0
+            pools = dict(kv.split("=") for kv in x[2].split(";") if "=" in kv)
+            if pools:
+                cost += sum(dt * float(n) * float(prices.get(p, default_price)) for p, n in pools.items())
+            else:
+                cost += dt * x[1] * default_price
+        g["compute bill at list price ($)"] = cost
     return g
 
 
