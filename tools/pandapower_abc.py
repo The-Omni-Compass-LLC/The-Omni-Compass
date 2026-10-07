@@ -118,12 +118,16 @@ def main(argv=None):
          "0.95-1.05: any increase is WORSE. Tap operations: lower is better, and more of them was declared in advance as Omni's "
          "expected cost. Every row is shown, losses included.", "",
          "| Run | GitHub run | Commit | Engine | Grids in the run |", "|---|---|---|---|---:|"]
-    off = []
+    off = []; seen = []
     for tag, (run, recs) in zip("ABC", runs):
         sha, ver = engine(run)
+        seen.append(ver.split(" ")[0])
         if not ver.startswith("omni-v"):                     # a fingerprinted engine (docs/OMNI_V2.md; v1 runs keep reading as v1)
             off.append(f"{tag} (run {run}: {ver})")
         L.append(f"| {tag} | {run} | `{sha}` | {ver} | {len(recs)} |")
+    # the title names the engine the three runs carry (one engine, or it says they differ): never read across versions
+    label = f"Omni {seen[0][5:]}" if len(set(seen)) == 1 and seen[0].startswith("omni-v") else "the runs' engines differ"
+    L[0] = L[0].replace("(Omni v1)", f"({label})")
     if len({r for r, _ in runs}) < 3:
         off.append("A, B and C must be three separate runs")
     if off:
