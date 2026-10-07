@@ -49,7 +49,7 @@ mkdir -p "$OUT_DIR"
 # which deletes a machine once it is empty, so a machine given back is a machine no longer billed; the system pool
 # carries the NoSchedule taint kind's control plane carries, so every count below is the same on both
 PLATFORM="${PLATFORM:-kind}"
-if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-agentpool=work}"; else export WORKER_SEL="!node-role.kubernetes.io/control-plane"; fi
+if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"; else export WORKER_SEL="!node-role.kubernetes.io/control-plane"; fi   # every AKS work pool carries omni-role=work (scripts/aks_paired.sh)
 WORKERS=${AKS_MAX_NODES:-$(kubectl get nodes -l "$WORKER_SEL" --no-headers | wc -l)}
 SITE_LIMIT_W=$(( WORKERS * (IDLE_W + DYN_W) ))
 
@@ -242,7 +242,10 @@ meter_pid=""
 if [ "$PLATFORM" = aks ]; then
   # the bill: every worker machine that exists is billed, in service or idle; every 15 s, how many exist (Omni never
   # reads this file)
-  ( echo "epoch_s,machines"; while :; do echo "$(date -u +%s),$(kubectl get nodes -l "$WORKER_SEL" --no-headers 2>/dev/null | wc -l)"; sleep 15; done ) > "$OUT_DIR/billed_nodes.csv" &
+  # ... and how many in each work pool (pool=count;...), so a fleet of several machine families is billed at each family's price
+  ( echo "epoch_s,machines,pools"; while :; do
+      nodes=$(kubectl get nodes -l "$WORKER_SEL" -o jsonpath='{range .items[*]}{.metadata.labels.agentpool}{"\n"}{end}' 2>/dev/null)
+      echo "$(date -u +%s),$(echo -n "$nodes" | grep -c .),$(echo -n "$nodes" | grep . | sort | uniq -c | awk '{printf "%s=%s;", $2, $1}')"; sleep 15; done ) > "$OUT_DIR/billed_nodes.csv" &
   meter_pid=$!
 fi
 # the real machine under the cluster: on kind every worker reports all of the host's cores as its own, so "used /
