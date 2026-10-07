@@ -54,7 +54,10 @@ for arm in "${order[@]}"; do
   gone "$name"
   echo "######## creating $name"
   # shellcheck disable=SC2086
-  az aks create -g "$RG" -n "$name" -l "$LOC" --tier free --node-count 1 --node-vm-size "$SIZE" \
+  # the control plane's tier (AKS_TIER): free, or standard (about $0.10 an hour a cluster, Azure's uptime SLA). Neither is in
+  # the bill, which counts worker machines only; standard is the way past "creating a new cluster is unavailable at this
+  # time in region", which Azure's free tier returned for hours on 2026-10-07 (docs/K8S_COMPASS_PREREGISTRATION.md, amendment 4)
+  az aks create -g "$RG" -n "$name" -l "$LOC" --tier "${AKS_TIER:-free}" --node-count 1 --node-vm-size "$SIZE" \
     --nodepool-name system --nodepool-taints CriticalAddonsOnly=true:NoSchedule \
     --cluster-autoscaler-profile $PROFILE --generate-ssh-keys -o none
   i=0

@@ -21,6 +21,7 @@ on:
       hpa_max: {description: "The app's replica ceiling, the same in every arm; 9 pods of 200m fit one 2-vCPU worker, so 9 x max_workers lets the fleet fill (empty: the manifest's 10)", default: ""}
       worker_pools: {description: "Several work pools, one machine family each with its own ceiling: size:max,size:max,... (the way past a 10-vCPU-a-family allowance; empty: one pool of vm_size x max_workers)", default: ""}
       pool_prices: {description: "List price per machine-hour of each pool, work0=0.096;work1=0.086;... (a pool without one is priced at price_per_node_hour)", default: ""}
+      tier: {description: "The clusters' control-plane tier: free, or standard (about $0.10 an hour a cluster, not in the bill; the way past Azure's free-tier capacity refusals)", default: "free"}
       organism: {description: "One of the six organisms with this cluster inside it (tools/run_kil.py): compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower; empty: the service alone", default: ""}
       load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
       organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "1"}
@@ -44,6 +45,7 @@ jobs:
       AZ_RG: omni-compass-bench-${{ github.run_id }}-${{ matrix.rep }}
       AZ_LOCATION: ${{ github.event.inputs.location || 'eastus' }}
       AKS_VM_SIZE: ${{ github.event.inputs.vm_size || 'Standard_D2s_v4' }}
+      AKS_TIER: ${{ github.event.inputs.tier || 'free' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
