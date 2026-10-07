@@ -841,6 +841,14 @@ is a statement about the lever, not about the law. This run makes the lever big 
   minute, nothing built, nothing billed; the nine other pools passed. That pool is dropped: **40 workers** of nine
   families (one machine 2.5% of the fleet), `hpa_max` 360, the steps scaled by 40/39, steady `18 36 54 18 36 18`,
   burst `11 36 11 54 11 36`, the pools' prices as in amendment 2. Nothing else changes.
+- **Amendment 4 (2026-10-07 20:25 UTC, before the counted run).** Two dispatches of the 40-worker fleet (runs 37651333302
+  and 37676237815) were refused by Azure itself on every repetition for four hours: "creating a new cluster is unavailable
+  at this time in region eastus" (`AKSCapacityHeavyUsage`, Azure's own capacity for new clusters, not the subscription's
+  allowance; the pre-flight passed each time, no arm ran, nothing was billed). Microsoft's remedy is another region, other
+  cluster settings, or a retry; this subscription has more than 10 cores only in eastus. The clusters are therefore made on
+  the **standard control-plane tier** (`tier` input, `AKS_TIER`) instead of the free tier, about $0.10 an hour a cluster,
+  which is not in the bill (the bill counts worker machines only, in both arms alike) and changes nothing the workers or the
+  autoscaler do. If the standard tier is refused too, the run waits for Azure. Nothing else changes.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

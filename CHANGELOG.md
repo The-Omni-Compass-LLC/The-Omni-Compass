@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Azure fleet on the standard control-plane tier** (amendment 4; `tier` input of `aks-metered`, `AKS_TIER` in
+  `scripts/aks_paired.sh`): the free tier was refused by Azure's capacity in eastus on ten repetitions over four hours; the
+  control plane's tier is not in the bill. The drone swarm runs A, B and C finished (37677964512, 37677984739, 37678005151)
+  and are requested for archive.
 - **Drone swarms, the first item of the queue, built and preregistered** (`docs/SWARM_PREREGISTRATION.md`, `tools/run_swarm.py`,
   `tools/swarm_abc.py`, workflow `swarm`, tests in `verify.py`): gym-pybullet-drones (University of Toronto, MIT) flies
   Crazyflie 2.x quadrotors with its shipped position controller as native; Omni sits on top on one knob, the cruise
