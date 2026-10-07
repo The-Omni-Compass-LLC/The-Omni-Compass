@@ -7,6 +7,21 @@
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
+## 2026-10-07
+- **The organism must keep the window's clock** (`tools/six_kube_report.py`, `docs/K8S_COMPASS_PREREGISTRATION.md`): the
+  report now shows "organism behind its window (s)" (shown, not judged) and marks a repetition OFF THE CLOCK when either
+  arm ended more than 5% of the window late, its last steps having seen a cluster whose load schedule had ended. Found
+  while watching the v3 stack at 1,000 copies on Azure: 1.7 million muscles step in 31 s against a 12 s step, 4,628 s
+  behind after the native arm. Marked in the published reports: v1 six-kube at 1,000 copies, the Physics realm (2 of 3,
+  up to 290 s) and the tower (2 of 3, up to 3,820 s) on GitHub's 4-core runners; v3 six-kube, the stack at 100 copies
+  (4 of 5, up to 277 s); v1 big organism, the tower's repetition 3 (2,392 s). The pairing stands in every case. The
+  remedy is a longer window for that size on that machine, never a change to the organism or the law: the v3 stack
+  machine was collected as it stood and started again with a 10,800 s window (45 s steps).
+- **The v1 big organisms** (`results/live/V1_BIG_ORGANISM.md`, run 37359820055): the tower at 1,000 copies on a rented
+  Azure machine, 3 of 3: p95 −95% (4.1 s → 0.2 s), time over the line −99.7%, both clear of the noise; machines 6 in both
+  arms; organism energy −0.2%; organism work rounding-level worse. The stack's native arms ran 5,184 s and 5,984 s past
+  the window and never finished a pair inside the six-hour job.
+
 ## 2026-10-06
 - **Six organisms with the real cluster, Omni v3, 10 and 100 copies** (`results/live/V3_SIX_KUBE.md`, run 37501769448 on
   `33b15eb`, 12 cells, 5 pairs each, 62 of 62 jobs): every cell better on 4 to 6 gauges, worse on none beyond the noise

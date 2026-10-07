@@ -28,6 +28,7 @@ on:
       vm_size: {description: "Azure machine size (start); Standard_D8as_v4 is the size eastus granted on 2026-10-05", default: "Standard_D8as_v4"}
       location: {description: "Azure region (start). Survey of 2026-10-06: eastus allows 32 vCPUs and the v4 sizes; every other region allows 10 vCPUs and only the v5 to v7 sizes (the sizes tried fall back to v7)", default: "eastus"}
       max_hours: {description: "Collect and delete a machine older than this, finished or not", default: "40"}
+      group: {description: "collect: look at this resource group only (omni-detached-<run id>); empty = every tagged machine", default: ""}
   schedule:
     - cron: "41 */2 * * *"       # collect: a look at every tagged machine; nothing to do when none is running
 jobs:
@@ -141,6 +142,7 @@ jobs:
         run: |
           max_h=${{ github.event.inputs.max_hours || '40' }}
           groups=$(az group list --tag omni-detached=1 --query "[].name" -o tsv)
+          only="${{ github.event.inputs.group }}"; [ -z "$only" ] || groups=$(echo "$groups" | grep -x "$only" || true)
           [ -n "$groups" ] || { echo "::notice::no detached machine is running"; echo "any=0" >> "$GITHUB_OUTPUT"; exit 0; }
           mkdir -p out; any=0
           for RG in $groups; do
