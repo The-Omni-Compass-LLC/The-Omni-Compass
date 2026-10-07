@@ -8,6 +8,13 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Kubernetes batch queue on v3, confirmed three times** (`results/live/V3_BATCH.md`): machines −19% to −23%, machines
+  after the queue −29% to −35%, standby-model energy −13% to −16%, mean response −10% to −14%, all confirmed better; the
+  queue finished no difference beyond the noise in all three runs. Four of the six v3 Kubernetes tests are now in.
+- **Azure fleet runs refused twice**: the 39-worker run (DASv4 held by the detached machine) and the 35-worker run (DAv4
+  "remaining 0" on three repetitions over 45 minutes, something in the subscription holding that family); both cancelled
+  before any arm ran; the survey mode now lists the families in use and every resource group and cluster still standing,
+  so the holder can be found before the next dispatch.
 - **Azure burst v1, five pairs** (`results/live/V1_AKS_BURST.md`, run 37534538088 attempt 2): the bill +5.0% with its
   interval across zero; machines, p95 and failed requests inside the noise; p99 −34% (6.0 s → 4.0 s) clear of the noise
   in this one run. Replaces the four-pair table. Power-grid v3 runs 1 and 2 archived; run C of the batch test on v3
