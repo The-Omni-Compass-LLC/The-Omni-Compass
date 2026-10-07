@@ -8,6 +8,9 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **The referee dossier rebuilt from the v3 tables** (`tools/dossier.py`, `docs/DOSSIER.md`): real Kubernetes three times
+  (one chart, every run's interval), the real database, the bill on a real cloud, the grid at 84 of 90 cells, the 945
+  muscles and the three simulators, the harnesses, and what is not yet shown; the obsolete card charts removed.
 - **The state of play rewritten for v3** (`docs/STATE_OF_PLAY.md`): current facts only, the six Kubernetes tests, the
   database, Azure, the simulated results, the card and the open items; the 2026-10-06 page moved whole to `docs/HISTORY.md`.
 - **The v3 grid at 100 copies** (`results/scale/receipts/v3-100x.md`, run 37501765605, 170 shards pooled from the archive with
