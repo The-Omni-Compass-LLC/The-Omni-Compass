@@ -5,7 +5,7 @@
 
 Each organism runs on the measured window's clock with the cluster as one more muscle (`tools/run_kil.py`): its own compute demand drives the load generator, the cluster's watts are its heat and load. Native: the stacks' own controllers and Kubernetes alone. Omni: the compass law on every simulated muscle and the live controller on the cluster, handed back at 90% of the window. Cluster rows are measured on the real cluster (energy is the declared power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).
 
-How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column says in words whether it is better or worse. Lower is better for response times, time over the line, failed requests, pods started, replicas, machines, energy and the bill (less spent). Higher is better for the organism's work and work per energy. A change whose interval crosses zero is marked inside the noise.
+How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column says in words whether it is better or worse. Lower is better for response times, time over the line, failed requests, pods started, replicas, machines, energy and the bill (less spent). Higher is better for the organism's work and work per energy. A change whose interval crosses zero is marked inside the noise. The organism must keep the window's clock: the row "organism behind its window" says how long after the window its last step ended (0 is on the clock), and a repetition where either arm ended more than 5% of the window late is marked OFF THE CLOCK in the organism's line, because its last steps saw a cluster whose load schedule had already ended.
 
 ## Twelve columns, mean over repetitions
 
@@ -26,6 +26,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.129e+10 | 1.128e+10 | 1.097e+10 | 1.096e+10 | 6.237e+10 | 6.225e+10 | 1.114e+10 | 1.113e+10 | 6.473e+10 | 6.461e+10 | 9.862e+10 | 9.847e+10 | 1.2e+11 | 1.199e+11 | 1.167e+11 | 1.166e+11 | 6.18e+11 | 6.168e+11 | 1.187e+11 | 1.185e+11 | 6.411e+11 | 6.399e+11 | 9.668e+11 | 9.653e+11 | 1.17e+12 | 1.169e+12 | 1.14e+12 | 1.139e+12 | 6.163e+12 | 6.151e+12 | 1.157e+12 | 1.156e+12 | 6.396e+12 | 6.385e+12 | 9.618e+12 | 9.603e+12 | 1.169e+13 | 1.168e+13 | 1.14e+13 | 1.138e+13 | 6.153e+13 | 6.141e+13 | 1.157e+13 | 1.156e+13 | 6.387e+13 | 6.375e+13 | 9.605e+13 | 9.59e+13 |
 | organism time over the line (% of steps) | 2.087 | 2.06 | 3.515 | 3.499 | 1.667 | 1.633 | 2.37 | 2.35 | 2.546 | 2.532 | 2.535 | 2.513 | 2.187 | 2.17 | 4.118 | 4.104 | 1.83 | 1.796 | 2.55 | 2.531 | 2.846 | 2.836 | 2.579 | 2.554 | 2.126 | 2.11 | 3.895 | 3.884 | 1.836 | 1.803 | 2.518 | 2.501 | 2.698 | 2.689 | 2.568 | 2.545 | 2.095 | 2.079 | 3.944 | 3.937 | 1.811 | 1.781 | 2.502 | 2.486 | 2.722 | 2.714 | 2.568 | 2.546 |
 | organism work per energy | 1.484 | 1.486 | 1.518 | 1.519 | 0.9151 | 0.9169 | 1.503 | 1.505 | 0.8849 | 0.8866 | 1.09 | 1.092 | 1.441 | 1.443 | 1.473 | 1.475 | 0.907 | 0.9087 | 1.457 | 1.459 | 0.8774 | 0.879 | 1.102 | 1.104 | 1.446 | 1.447 | 1.475 | 1.476 | 0.9121 | 0.9138 | 1.462 | 1.463 | 0.8819 | 0.8835 | 1.11 | 1.112 | 1.446 | 1.447 | 1.474 | 1.476 | 0.9116 | 0.9133 | 1.461 | 1.462 | 0.8814 | 0.883 | 1.111 | 1.112 |
+| organism behind its window (s) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0.04 | 0.02 | 0.02 | 0 | 0 | 0.02 | 0.04 | 0.04 | 0.06 | 0.08 | 0.1 | 0.1 | 1.4 | 0.7 | 0.6 | 0.58 | 0.4 | 0.44 | 0.66 | 0.8 | 1.26 | 1.32 | 2.72 | 2.64 | 6.3 | 5.667 | 6 | 154.8 | 7.233 | 42.4 | 7.067 | 8.933 | 1508 | 2418 | 2949 | 3307 |
 
 ## Each organism: omni against native, paired by repetition
 
@@ -50,6 +51,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.129e+10 | 1.128e+10 | -0.1% | -1.195e+07 to -1.195e+07 | better |
 | organism time over the line (% of steps) | 2.087 | 2.06 | -1.3% | -0.02657 to -0.02657 | better |
 | organism work per energy | 1.484 | 1.486 | +0.1% | +0.001573 to +0.001573 | better |
+| organism behind its window (s) | 0 | 0 | +0 | +0 to +0 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Physics / Robotics / Autonomous: better on 4, worse on 0, inside the noise on 7
 
@@ -72,6 +74,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.097e+10 | 1.096e+10 | -0.1% | -1.184e+07 to -1.184e+07 | better |
 | organism time over the line (% of steps) | 3.515 | 3.499 | -0.5% | -0.0159 to -0.0159 | better |
 | organism work per energy | 1.518 | 1.519 | +0.1% | +0.001639 to +0.00164 | better |
+| organism behind its window (s) | 0 | 0 | +0 | +0 to +0 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Energy / Facility / Industrial: better on 6, worse on 0, inside the noise on 6
 
@@ -94,6 +97,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 6.237e+10 | 6.225e+10 | -0.2% | -1.242e+08 to -1.242e+08 | better |
 | organism time over the line (% of steps) | 1.667 | 1.633 | -2.0% | -0.03398 to -0.03398 | better |
 | organism work per energy | 0.9151 | 0.9169 | +0.2% | +0.001825 to +0.001826 | better |
+| organism behind its window (s) | 0 | 0 | +0 | +0 to +0 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Distribution / Specialized: better on 3, worse on 0, inside the noise on 8
 
@@ -116,6 +120,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.114e+10 | 1.113e+10 | -0.1% | -1.201e+07 to -1.201e+07 | better |
 | organism time over the line (% of steps) | 2.37 | 2.35 | -0.9% | -0.02112 to -0.01944 | better |
 | organism work per energy | 1.503 | 1.505 | +0.1% | +0.001622 to +0.001622 | better |
+| organism behind its window (s) | 0 | 0 | +0 | +0 to +0 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### The whole tower, every muscle once: better on 6, worse on 0, inside the noise on 4
 
@@ -138,6 +143,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 6.473e+10 | 6.461e+10 | -0.2% | -1.241e+08 to -1.241e+08 | better |
 | organism time over the line (% of steps) | 2.546 | 2.532 | -0.5% | -0.01397 to -0.01397 | better |
 | organism work per energy | 0.8849 | 0.8866 | +0.2% | +0.0017 to +0.0017 | better |
+| organism behind its window (s) | 0 | 0 | +0 | +0 to +0 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### The four stacked, duplicates kept: better on 3, worse on 0, inside the noise on 8
 
@@ -160,6 +166,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 9.862e+10 | 9.847e+10 | -0.2% | -1.56e+08 to -1.56e+08 | better |
 | organism time over the line (% of steps) | 2.535 | 2.513 | -0.9% | -0.02243 to -0.02243 | better |
 | organism work per energy | 1.09 | 1.092 | +0.2% | +0.001727 to +0.001727 | better |
+| organism behind its window (s) | 0 | 0 | +0 | +0 to +0 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Compute / AI / Cloud, 10 copies: better on 4, worse on 0, inside the noise on 7
 
@@ -182,6 +189,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.2e+11 | 1.199e+11 | -0.1% | -1.24e+08 to -1.24e+08 | better |
 | organism time over the line (% of steps) | 2.187 | 2.17 | -0.8% | -0.01679 to -0.01679 | better |
 | organism work per energy | 1.441 | 1.443 | +0.1% | +0.001491 to +0.001491 | better |
+| organism behind its window (s) | 0.04 | 0.02 | -50.0% | -0.07552 to +0.03552 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Physics / Robotics / Autonomous, 10 copies: better on 4, worse on 0, inside the noise on 7
 
@@ -204,6 +212,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.167e+11 | 1.166e+11 | -0.1% | -1.234e+08 to -1.234e+08 | better |
 | organism time over the line (% of steps) | 4.118 | 4.104 | -0.3% | -0.01384 to -0.01384 | better |
 | organism work per energy | 1.473 | 1.475 | +0.1% | +0.001558 to +0.001558 | better |
+| organism behind its window (s) | 0.02 | 0 | -100.0% | -0.07552 to +0.03552 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Energy / Facility / Industrial, 10 copies: better on 4, worse on 0, inside the noise on 7
 
@@ -226,6 +235,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 6.18e+11 | 6.168e+11 | -0.2% | -1.205e+09 to -1.205e+09 | better |
 | organism time over the line (% of steps) | 1.83 | 1.796 | -1.8% | -0.03369 to -0.03369 | better |
 | organism work per energy | 0.907 | 0.9087 | +0.2% | +0.001772 to +0.001772 | better |
+| organism behind its window (s) | 0 | 0.02 | +0.02 | -0.03552 to +0.07552 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Distribution / Specialized, 10 copies: better on 4, worse on 1 (HPA replicas, mean), inside the noise on 6
 
@@ -248,6 +258,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.187e+11 | 1.185e+11 | -0.1% | -1.231e+08 to -1.231e+08 | better |
 | organism time over the line (% of steps) | 2.55 | 2.531 | -0.8% | -0.01966 to -0.01966 | better |
 | organism work per energy | 1.457 | 1.459 | +0.1% | +0.001513 to +0.001513 | better |
+| organism behind its window (s) | 0.04 | 0.04 | +0.0% | -0.08778 to +0.08778 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### The whole tower, every muscle once, 10 copies: better on 4, worse on 0, inside the noise on 7
 
@@ -270,6 +281,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 6.411e+11 | 6.399e+11 | -0.2% | -1.205e+09 to -1.205e+09 | better |
 | organism time over the line (% of steps) | 2.846 | 2.836 | -0.4% | -0.01061 to -0.01061 | better |
 | organism work per energy | 0.8774 | 0.879 | +0.2% | +0.001652 to +0.001652 | better |
+| organism behind its window (s) | 0.06 | 0.08 | +33.3% | -0.08387 to +0.1239 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### The four stacked, duplicates kept, 10 copies: better on 3, worse on 1 (organism work), inside the noise on 7
 
@@ -292,6 +304,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 9.668e+11 | 9.653e+11 | -0.2% | -1.57e+09 to -1.57e+09 | better |
 | organism time over the line (% of steps) | 2.579 | 2.554 | -1.0% | -0.02529 to -0.02529 | better |
 | organism work per energy | 1.102 | 1.104 | +0.2% | +0.001789 to +0.001789 | better |
+| organism behind its window (s) | 0.1 | 0.1 | +0.0% | -0.08778 to +0.08778 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Compute / AI / Cloud, 100 copies: better on 5, worse on 1 (organism work), inside the noise on 6
 
@@ -314,6 +327,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.17e+12 | 1.169e+12 | -0.1% | -1.17e+09 to -1.17e+09 | better |
 | organism time over the line (% of steps) | 2.126 | 2.11 | -0.8% | -0.01628 to -0.01628 | better |
 | organism work per energy | 1.446 | 1.447 | +0.1% | +0.001433 to +0.001433 | better |
+| organism behind its window (s) | 1.4 | 0.7 | -50.0% | -1.102 to -0.2977 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Physics / Robotics / Autonomous, 100 copies: better on 5, worse on 1 (organism work), inside the noise on 6
 
@@ -336,6 +350,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.14e+12 | 1.139e+12 | -0.1% | -1.163e+09 to -1.163e+09 | better |
 | organism time over the line (% of steps) | 3.895 | 3.884 | -0.3% | -0.01073 to -0.01073 | better |
 | organism work per energy | 1.475 | 1.476 | +0.1% | +0.001498 to +0.001498 | better |
+| organism behind its window (s) | 0.6 | 0.58 | -3.3% | -0.1239 to +0.08387 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Energy / Facility / Industrial, 100 copies: better on 5, worse on 0, inside the noise on 7
 
@@ -358,6 +373,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 6.163e+12 | 6.151e+12 | -0.2% | -1.157e+10 to -1.157e+10 | better |
 | organism time over the line (% of steps) | 1.836 | 1.803 | -1.8% | -0.0328 to -0.0328 | better |
 | organism work per energy | 0.9121 | 0.9138 | +0.2% | +0.001726 to +0.001726 | better |
+| organism behind its window (s) | 0.4 | 0.44 | +10.0% | -0.1015 to +0.1815 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Distribution / Specialized, 100 copies: better on 3, worse on 1 (organism work), inside the noise on 7
 
@@ -380,6 +396,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.157e+12 | 1.156e+12 | -0.1% | -1.161e+09 to -1.161e+09 | better |
 | organism time over the line (% of steps) | 2.518 | 2.501 | -0.7% | -0.01707 to -0.01707 | better |
 | organism work per energy | 1.462 | 1.463 | +0.1% | +0.001459 to +0.001459 | better |
+| organism behind its window (s) | 0.66 | 0.8 | +21.2% | -0.4844 to +0.7644 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### The whole tower, every muscle once, 100 copies: better on 6, worse on 0, inside the noise on 6
 
@@ -402,6 +419,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 6.396e+12 | 6.385e+12 | -0.2% | -1.158e+10 to -1.158e+10 | better |
 | organism time over the line (% of steps) | 2.698 | 2.689 | -0.3% | -0.009038 to -0.009038 | better |
 | organism work per energy | 0.8819 | 0.8835 | +0.2% | +0.001608 to +0.001608 | better |
+| organism behind its window (s) | 1.26 | 1.32 | +4.8% | -0.5827 to +0.7027 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### The four stacked, duplicates kept, 100 copies: better on 4, worse on 1 (organism work), inside the noise on 6
 
@@ -424,6 +442,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 9.618e+12 | 9.603e+12 | -0.2% | -1.535e+10 to -1.535e+10 | better |
 | organism time over the line (% of steps) | 2.568 | 2.545 | -0.9% | -0.02275 to -0.02275 | better |
 | organism work per energy | 1.11 | 1.112 | +0.2% | +0.001768 to +0.001768 | better |
+| organism behind its window (s) | 2.72 | 2.64 | -2.9% | -0.9812 to +0.8212 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Compute / AI / Cloud, 1,000 copies: better on 5, worse on 1 (organism work), inside the noise on 6
 
@@ -446,8 +465,9 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.169e+13 | 1.168e+13 | -0.1% | -1.144e+10 to -1.144e+10 | better |
 | organism time over the line (% of steps) | 2.095 | 2.079 | -0.7% | -0.01544 to -0.01544 | better |
 | organism work per energy | 1.446 | 1.447 | +0.1% | +0.001365 to +0.001365 | better |
+| organism behind its window (s) | 6.3 | 5.667 | -10.1% | -3.876 to +2.609 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
-### Physics / Robotics / Autonomous, 1,000 copies: better on 3, worse on 1 (organism work), inside the noise on 7
+### Physics / Robotics / Autonomous, 1,000 copies: better on 3, worse on 1 (organism work), inside the noise on 7; OFF THE CLOCK in 2 of 3 repetitions (the organism ended up to 290 s after its window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)
 
 3 paired repetitions.
 
@@ -468,6 +488,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.14e+13 | 1.138e+13 | -0.1% | -1.14e+10 to -1.14e+10 | better |
 | organism time over the line (% of steps) | 3.944 | 3.937 | -0.2% | -0.007573 to -0.007568 | better |
 | organism work per energy | 1.474 | 1.476 | +0.1% | +0.001429 to +0.001429 | better |
+| organism behind its window (s) | 6 | 154.8 | +2480.0% | -203.2 to +500.8 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Energy / Facility / Industrial, 1,000 copies: better on 5, worse on 0, inside the noise on 6
 
@@ -490,6 +511,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 6.153e+13 | 6.141e+13 | -0.2% | -1.168e+11 to -1.168e+11 | better |
 | organism time over the line (% of steps) | 1.811 | 1.781 | -1.7% | -0.03057 to -0.03057 | better |
 | organism work per energy | 0.9116 | 0.9133 | +0.2% | +0.001733 to +0.001733 | better |
+| organism behind its window (s) | 7.233 | 42.4 | +486.2% | -76.77 to +147.1 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### Distribution / Specialized, 1,000 copies: better on 3, worse on 1 (organism work), inside the noise on 8
 
@@ -512,8 +534,9 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 1.157e+13 | 1.156e+13 | -0.1% | -1.132e+10 to -1.132e+10 | better |
 | organism time over the line (% of steps) | 2.502 | 2.486 | -0.6% | -0.01532 to -0.01532 | better |
 | organism work per energy | 1.461 | 1.462 | +0.1% | +0.001379 to +0.001379 | better |
+| organism behind its window (s) | 7.067 | 8.933 | +26.4% | -2.482 to +6.215 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
-### The whole tower, every muscle once, 1,000 copies: better on 3, worse on 1 (organism work), inside the noise on 7
+### The whole tower, every muscle once, 1,000 copies: better on 3, worse on 1 (organism work), inside the noise on 7; OFF THE CLOCK in 2 of 3 repetitions (the organism ended up to 3,820 s after its window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)
 
 3 paired repetitions.
 
@@ -534,8 +557,9 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 6.387e+13 | 6.375e+13 | -0.2% | -1.168e+11 to -1.168e+11 | better |
 | organism time over the line (% of steps) | 2.722 | 2.714 | -0.3% | -0.007881 to -0.007879 | better |
 | organism work per energy | 0.8814 | 0.883 | +0.2% | +0.001614 to +0.001614 | better |
+| organism behind its window (s) | 1508 | 2418 | +60.4% | -1175 to +2996 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
-### The four stacked, duplicates kept, 1,000 copies: ONE REPETITION
+### The four stacked, duplicates kept, 1,000 copies: ONE REPETITION; OFF THE CLOCK in 1 of 1 repetitions (the organism ended up to 1,345 s after its window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)
 
 1 paired repetitions.
 
@@ -556,6 +580,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism energy (J) | 9.605e+13 | 9.59e+13 | -0.2% |  | better (inside the noise) |
 | organism time over the line (% of steps) | 2.568 | 2.546 | -0.9% |  | better (inside the noise) |
 | organism work per energy | 1.111 | 1.112 | +0.2% |  | better (inside the noise) |
+| organism behind its window (s) | 602.8 | 1345 | +123.1% |  | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 
 ---

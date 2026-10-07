@@ -57,7 +57,10 @@ Six organisms with the real cluster inside (the four realms, the whole tower of 
 on an earlier engine: late 23-52% less often and 24-40% faster in every one
 ([`results/live/V1_SIX_KUBE.md`](results/live/V1_SIX_KUBE.md), v1; the earlier engine's in [`results/live/SIX_KUBE.md`](results/live/SIX_KUBE.md)); on v3 at 10 and 100 copies every
 cell is better on 4 to 6 gauges and worse on none beyond the noise but a rounding-level work loss in 4 of 12
-([`results/live/V3_SIX_KUBE.md`](results/live/V3_SIX_KUBE.md)); the 1,000-copy cells run on Azure.
+([`results/live/V3_SIX_KUBE.md`](results/live/V3_SIX_KUBE.md)); the 1,000-copy cells run on Azure: the tower
+on v1 ([`results/live/V1_BIG_ORGANISM.md`](results/live/V1_BIG_ORGANISM.md)) answered its slowest 5% in 0.2 s against native's
+4.1 s and was over its line 0.2% of the time against 64%. A cell whose machine could not step the organism inside its window
+is marked off the clock in the report and run again with a longer window.
 
 ## What is real and what is a model
 

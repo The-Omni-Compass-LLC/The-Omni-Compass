@@ -45,7 +45,12 @@ CLUSTER = ["response time (ms), 95th percentile", "response time (ms), 99th perc
            "worker nodes in service, mean", "energy, parked workers still on at idle power (Wh)", "energy (Wh)",
            "CPU used with Omni's own (cores), mean", "host CPU busy, the real machine under kind (%)",
            "machines billed, machine-hours", "compute bill at list price ($)"]
-ORG = ["organism work", "organism energy (J)", "organism time over the line (% of steps)", "organism work per energy"]
+ORG = ["organism work", "organism energy (J)", "organism time over the line (% of steps)", "organism work per energy",
+       "organism behind its window (s)"]
+BEHIND = "organism behind its window (s)"                  # shown, not judged: how long after the measured window the organism's
+                                                           # last step ended (0 = on the clock); past 5% of the window the cell is off the clock
+OFF_CLOCK_SHARE = 0.05
+SHOWN = {"host CPU busy, the real machine under kind (%)", BEHIND}
 SAVING = {"energy, parked workers still on at idle power (Wh)", "energy (Wh)", "organism energy (J)",
           "machines billed, machine-hours", "compute bill at list price ($)"}
 HIGHER_BETTER = {"organism work", "organism work per energy"}
@@ -68,9 +73,14 @@ def organism_gauges(rec):
     work = sum(p["work"] for p in pl)
     energy = sum(p["energy_j"] for p in pl)
     steps = sum(p["steps"] for p in pl) or 1
+    window = float(rec.get("steps", 0)) * float(rec.get("step_s", 0))
+    behind = rec.get("behind_s")
+    if behind is None:                                     # older records: the wall time past the window
+        behind = max(0.0, float(rec.get("wall_s", window)) - window) if window else float("nan")
     return {"organism work": work, "organism energy (J)": energy,
             "organism time over the line (% of steps)": 100.0 * sum(p["viol"] for p in pl) / steps,
-            "organism work per energy": work / energy if energy else float("nan")}
+            "organism work per energy": work / energy if energy else float("nan"),
+            BEHIND: float(behind), "_window_s": window}
 
 
 def organism_record(d):
@@ -135,7 +145,10 @@ def main(root):
          "How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column says in words whether it is "
          "better or worse. Lower is better for response times, time over the line, failed requests, pods started, "
          "replicas, machines, energy and the bill (less spent). Higher is better for the organism's work and work per "
-         "energy. A change whose interval crosses zero is marked inside the noise.", "",
+         "energy. A change whose interval crosses zero is marked inside the noise. The organism must keep the window's clock: "
+         "the row \"organism behind its window\" says how long after the window its last step ended (0 is on the clock), and a "
+         "repetition where either arm ended more than 5% of the window late is marked OFF THE CLOCK in the organism's line, "
+         "because its last steps saw a cluster whose load schedule had already ended.", "",
          "## Twelve columns, mean over repetitions", ""]
     cols = []
     for o in orgs:
@@ -161,7 +174,13 @@ def main(root):
         n = max((v["n"] for v in rows.values()), default=0)
         restored = all(g["_restore_ok"] for g in runs[o][arm].values())
         sure = lambda v: v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
-        judged = {k: v for k, v in rows.items() if not v["neutral"] and k != "host CPU busy, the real machine under kind (%)" and not v["same"]}
+        judged = {k: v for k, v in rows.items() if not v["neutral"] and k not in SHOWN and not v["same"]}
+        # off the clock: in a repetition where either arm's organism ended more than 5% of the window after it, the
+        # organism's last steps saw a cluster whose load schedule had already ended; the pairing stands, the cell is marked
+        pairs = set(runs[o][arm]) & set(runs[o]["native"])
+        off = sorted({r for a in ("native", arm) for r, g in runs[o][a].items()
+                      if r in pairs and g.get("_window_s") and g.get(BEHIND, 0.0) > OFF_CLOCK_SHARE * g["_window_s"]})
+        worst = max((g.get(BEHIND, 0.0) for a in ("native", arm) for r, g in runs[o][a].items() if r in pairs), default=0.0)
         better = [LABEL.get(k, k) for k, v in judged.items() if v["better"] and sure(v)]
         worse = [LABEL.get(k, k) for k, v in judged.items() if not v["better"] and sure(v)]
         noise = [LABEL.get(k, k) for k, v in judged.items() if not sure(v)]
@@ -169,13 +188,19 @@ def main(root):
                    + f", inside the noise on {len(noise)}") if n >= 2 else "ONE REPETITION"
         if not restored:
             verdict += "; INVALID: a simulated knob was not handed back"
-        out["organisms"][o] = {"arm": arm, "repetitions": n, "verdict": verdict, "rows": rows}
+        if off:
+            verdict += (f"; OFF THE CLOCK in {len(off)} of {n} repetitions (the organism ended up to {worst:,.0f} s after its "
+                        f"window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)")
+        out["organisms"][o] = {"arm": arm, "repetitions": n, "verdict": verdict, "rows": rows, "off_the_clock_reps": off,
+                               "behind_max_s": worst}
         L += [f"### {name_of(o)}: {verdict}", "", f"{n} paired repetitions.", "",
               "| Gauge | native | omni | Change | 95% interval of the difference | Reading |", "|---|---:|---:|---:|---:|---|"]
         for k, v in rows.items():
             ch = f"{v['pct']:+.1f}%" if not math.isnan(v["pct"]) else f"{v['diff']:+.3g}"
             ci = f"{v['lo']:+.4g} to {v['hi']:+.4g}" if v["n"] > 1 else ""
-            if v["neutral"] or k == "host CPU busy, the real machine under kind (%)":
+            if k == BEHIND:
+                rd = "shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock)"
+            elif v["neutral"] or k in SHOWN:
                 rd = "shown, not judged (more or less is not better by itself)"
             elif v["same"]:
                 rd = "same" if v["diff"] == 0.0 else "same (under one part in a million)"

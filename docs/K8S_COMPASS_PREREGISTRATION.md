@@ -447,6 +447,14 @@ Each organism runs on the measured window's clock, 240 steps, with the real clus
   r(k) = 1 + round((LOAD_MAX - 1) (D(k) - min D) / (max D - min D)) replicas, LOAD_MAX = 6 declared here, open-loop load.
 - afferent: the cluster's watts (capture.csv, the declared power model, every 15 s, identical accounting in both arms)
   are added to the organism's source, zone and site power, as the card's watts are in the card harness.
+- the clock (stated 2026-10-07, after the 1,000-copy runs): the organism must keep the window's clock. `tools/run_kil.py`
+  records how long after the window its last step ended (`behind_s`); the report (`tools/six_kube_report.py`) shows it as
+  "organism behind its window (s)", shown and not judged, and marks a repetition OFF THE CLOCK when either arm ended more
+  than 5% of the window late, because its last steps then saw a cluster whose load schedule had already ended. The pairing
+  stands (both arms slip alike), the mark stays on the cell. The remedy is a longer window for that size on that machine
+  (240 steps, each at least the machine's time to step the organism once), never a change to the organism or the law:
+  the four stacked at 1,000 copies (1.7 million muscles) step in about 31 s on an 8-vCPU machine, so their window is
+  10,800 s (45 s steps), against 2,880 s for the tower at 1,000 copies.
 
 Arms: native (the stacks' own controllers, Kubernetes alone, Omni-Compass not started) and compass (the compass law on every
 simulated muscle, rule 4 on the cluster, handed back at 90% of the window; the run is invalid if any knob is not handed
