@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Power grid on v3, confirmed three times** (`results/live/V3_PANDAPOWER.md`, runs 37568375564, 37568393269, 37568411160):
+  the same table as v1 to the digit, as a deterministic simulator under the same runner bytes must give: 67 gauge-rows
+  better, 14 worse (losses in the four grids with their own generation; tap operations 4 → 8 a year in one rural grid),
+  0 where the runs differ. Run C of the wandering and all-four tests finished and requested for archive.
 - **Kubernetes batch queue on v3, confirmed three times** (`results/live/V3_BATCH.md`): machines −19% to −23%, machines
   after the queue −29% to −35%, standby-model energy −13% to −16%, mean response −10% to −14%, all confirmed better; the
   queue finished no difference beyond the noise in all three runs. Four of the six v3 Kubernetes tests are now in.
