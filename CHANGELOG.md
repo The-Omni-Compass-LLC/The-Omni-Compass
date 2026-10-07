@@ -8,6 +8,11 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Drone swarms on v3, confirmed three times** (`results/live/V3_SWARM.md`, runs 37677964512, 37677984739, 37678005151): in
+  all three untouched 20-drone cells energy a mission −7% (short), −18% (mixed), −20% (long) and missions a charge +8%,
+  +22%, +25%, confirmed better; no late mission, reserve breach, near miss or collision in any arm of any run; 9 gauge-rows
+  better, 0 worse. PyBullet reproduced to a part in a thousand across GitHub's machines, not to the bit, so the table's
+  reproduction tolerance is one part in a thousand (preregistration amendment 1, made after the runs were seen and said so).
 - **Azure fleet on the standard control-plane tier** (amendment 4; `tier` input of `aks-metered`, `AKS_TIER` in
   `scripts/aks_paired.sh`): the free tier was refused by Azure's capacity in eastus on ten repetitions over four hours; the
   control plane's tier is not in the bill. The drone swarm runs A, B and C finished (37677964512, 37677984739, 37678005151)

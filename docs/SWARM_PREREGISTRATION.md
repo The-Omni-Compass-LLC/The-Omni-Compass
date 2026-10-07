@@ -109,6 +109,16 @@ they do not. `tests/test_run_swarm.py` and `tests/test_swarm_abc.py`, run by `ve
 simulator: the task keeps the fleet apart, a perfect autopilot finishes every mission inside its deadline, the override
 stays inside its guards and is handed back, the energy model is the declared formula.
 
+## Amendment 1 (2026-10-07 20:40 UTC, after the first A, B and C were seen; said so)
+
+The three counted runs (37677964512, 37677984739, 37678005151) gave every gauge the same sign and the same size to within
+a few parts in ten thousand, and not to the bit: PyBullet's floating point differs from one GitHub machine to the next
+(the runs' energy per mission in the mixed cell: −17.79%, −17.79%, −17.82%). The table tool had demanded bit-exact
+reproduction, as MuJoCo gives, and so read every row "the runs differ". The reproduction tolerance is set to **one part in a
+thousand** (`tools/swarm_abc.py`, `REPRO_REL`), the readings stay by the sign of all three runs, and this change, its
+timing and its reason are stated here and in the table. Nothing in the task, the omni rule or the gauges changes; the runs
+are not rerun.
+
 ## What the tuning swarm showed, said before the counted runs
 
 On one machine, five drones, four missions each: a faster mission is cheaper (498 J at the planner's cruise, 446 J at
