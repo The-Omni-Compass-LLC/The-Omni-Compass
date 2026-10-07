@@ -8,6 +8,12 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **Robot arms on v3, A/B/C** (`results/live/V3_MUJOCO.md`, runs 37568387334, 37568405026, 37568422829): the same
+  readings as v1, as the runner is the same bytes: Gen3 7 gauges confirmed better, 0 worse; UR5e and iiwa 14 nothing to
+  move. The four A/B/C table tools (`confirm_abc`, `mujoco_abc`, `pandapower_abc`, `citylearn_abc`) now name in their
+  title the engine the three runs carry instead of a fixed "Omni v1".
+- **The v3 repeats dispatched** (03:48 UTC): power grid ×3, CityLearn ×3, robots ×3, the six Kubernetes tests (run A;
+  B and C follow each A). They should have been queued when v3 was declared; they were not.
 - **The register's queue, audited against every family and what a referee or buyer expects** (`docs/REGISTER.md` §4, rows
   23 to 31): drone swarms, aircraft and defense edge (PX4, ArduPilot, Crazyswarm, JSBSim, K3s), databases and caches at
   large (YCSB, HammerDB), big data (Spark TPC-DS), messaging (Kafka), caches (Redis), search (OpenSearch), storage (fio),

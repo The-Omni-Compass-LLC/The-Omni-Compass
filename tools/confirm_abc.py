@@ -116,6 +116,10 @@ def main(argv=None):
             off.append(f"{tag} (run {run}: {ver})")
         meta.append({"tag": tag, "run": run, "commit": sha, "engine": ver, "paired_repetitions": n})
         L.append(f"| {tag} | {run} | `{sha}` | {ver} | {n if n is not None else '?'} |")
+    # the title names the engine the three runs carry (one engine, or it says they differ): never read across versions
+    seen = [m["engine"].split(" ")[0] for m in meta]
+    label = f"Omni {seen[0][5:]}" if len(set(seen)) == 1 and seen[0].startswith("omni-v") else "the runs' engines differ"
+    L[0] = L[0].replace("(Omni v1)", f"({label})")
     if len({r for r, _, _ in runs}) < 3:
         off.append("A, B and C must be three separate runs")
     if len({m["engine"].split(" ")[0] for m in meta}) > 1:
