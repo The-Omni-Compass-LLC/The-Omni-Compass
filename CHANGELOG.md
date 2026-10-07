@@ -8,6 +8,8 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **The state of play rewritten for v3** (`docs/STATE_OF_PLAY.md`): current facts only, the six Kubernetes tests, the
+  database, Azure, the simulated results, the card and the open items; the 2026-10-06 page moved whole to `docs/HISTORY.md`.
 - **The v3 grid at 100 copies** (`results/scale/receipts/v3-100x.md`, run 37501765605, 170 shards pooled from the archive with
   the run's own command): every organism superior within guardrails at 10, 100 and 1,000 runs, work per energy +0.07%
   to +0.36%. **The grid is complete at 84 of 90 cells** (`results/scale/GRID.md`); the six left are beyond the machines
