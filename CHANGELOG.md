@@ -8,6 +8,10 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-07
+- **The v3 grid at 1,000 copies** (`results/scale/receipts/v3-1000x.md`, run 37578946088, 60 shards, 10 paired runs per
+  organism; `results/scale/GRID.md` now 60 of 90 cells): every organism superior within guardrails at 10 runs, work per
+  energy +0.07% (Physics) to +0.37% (Energy, the four stacked, the tower), work unchanged, every knob handed back. The
+  100-copy run's shards are all done; its pooling job did not start, so the receipt is pooled from the archived shards.
 - **Azure fleet at 40 workers** (amendment 3): the pre-flight found `Standard_D2s_v3` not offered in eastus and stopped the
   45-worker run before anything was built or billed; the pool is dropped and v3 steady runs on the nine remaining
   families (run 37651333302). **The v3 grid at 1,000 copies finished** (run 37578946088, 61 shards) and is requested for
