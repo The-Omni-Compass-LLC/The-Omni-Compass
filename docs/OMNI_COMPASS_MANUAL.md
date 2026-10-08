@@ -745,7 +745,7 @@ stack in this manual, so a referee can see that the "gains" differ only through 
 | Kafka, the consumer count | the group's own end-to-end latency, mean of the last second | 500 ms | 0.4 | 1 s | 3 s (a rebalance) | [1, the topic's partitions] |
 | Redis, the memory ceiling | the application's request latency, mean of the last second | 2 ms | 0.4 | 1 s | 2 s | [16 MB, 512 MB] |
 | MongoDB, the storage-engine cache | the server's own mean read latency, last second | 1 ms (set on the tuning workload's smoke run, from 2 ms) | 0.4 | 1 s | 2 s | [256 MB, 2,048 MB] |
-| MySQL, the InnoDB buffer pool | the server's own mean statement latency, last second | 1 ms a statement (to be confirmed on the tuning workload's smoke run) | 0.4 | 1 s | 2 s | [128 MB, 2,048 MB], in 128 MB chunks |
+| MySQL, the InnoDB buffer pool | the server's own mean statement latency, last second | 0.5 ms a statement (set on the tuning workload's second smoke run, from 1 ms) | 0.4 | 1 s | 2 s | [128 MB, 2,048 MB], in 128 MB chunks |
 | A drone's cruise override | the drone's tracking error | 0.25 m, the declared safe error | 0.5 | one control tick (48 Hz) | 1 s | [1.0, 2.0] × the planner's cruise |
 | A substation's tap | the bus voltage in its band | the band's edge | 0.5 | one solve | a week of evidence before a step down | the tap's own range, one tap per move |
 | A robot axis's speed | the axis's tracking error against its takt | the declared error | 0.5 | one control step | the axis's response | the axis's own limits |
@@ -1377,7 +1377,8 @@ about this knob differ from the MongoDB cache and the plug carries both. The ser
 progress in its own status variable, so the plug waits for the resize to complete before reading back, and a pool found
 mid-resize is the server still carrying out Omni-Compass's own write, not a foreign hand. And a shrink evicts pages while
 the resize runs, so the dwell after any move is ten seconds rather than five. The compass holds the reading at 40% of a
-1 ms statement line (to be confirmed on the tuning workload's smoke run, as the MongoDB line was); the direction rule is
+0.5 ms statement line (written as 1 ms, set at 0.5 ms on the tuning workload's second smoke run, as the MongoDB line was:
+a hit reads 0.14 to 0.17 ms on this stack and a full pool missing a third of its reads 0.20 to 0.22 ms); the direction rule is
 the cache's: slow statements grow the pool by chunks only while the pool is full, calm with no page read from disk gives one
 chunk back after the dwell, and at 95% of the line with the pool full four chunks are added at once. The work-inside-the-line
 gauge uses a transaction line, the statement line times the statements a transaction as sysbench's script ships it (one for

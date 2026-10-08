@@ -76,11 +76,11 @@ asked about; they are declared here and are the same in both arms.
 - **Reading.** Once a second, the server's own mean statement latency over the last second: the performance schema's statement
   summary (`events_statements_summary_global_by_event_name`, the select, update, insert and delete rows), the timer total and the
   statement count, differenced; a second with no statements reads as calm (0).
-- **Band.** From 0 to the **statement line, 1 ms** (a statement served from the pool is well inside; one that reads pages from the
-  file system is slower). The compass pulls the reading to 40% of the line (0.4 ms), the service profile of the Kubernetes adapter,
-  with its usual gains (kp 1.0, response time 2 s, smoothing 0.5, one decision a second). *The statement line is to be confirmed or
-  changed on the tuning workload's smoke run, on its figures, before any counted run, as the MongoDB preregistration did; the change,
-  if any, will be written here with the figures.*
+- **Band.** From 0 to the **statement line, 0.5 ms** (a statement served from the pool is well inside; one that reads pages from
+  the file system is slower). The compass pulls the reading to 40% of the line (0.2 ms), the service profile of the Kubernetes
+  adapter, with its usual gains (kp 1.0, response time 2 s, smoothing 0.5, one decision a second). *Written as 1 ms before the
+  first smoke run and set at 0.5 ms on the tuning workload's second smoke run, on its figures, before any counted run, as the
+  MongoDB preregistration did; the figures are under "What the smoke run shows" below.*
 - **Direction, and the do-no-harm gate.** A positive force (slow statements) grows the pool by ceil(force / 0.10) chunks of
   **128 MB**, **only while the pool is full** (pages holding data at 90% of its pages or more): slow statements in a pool with room to
   spare are not the pool's to mend, and the knob is left alone. A negative force (calm) with **no page read from disk in the last
@@ -104,7 +104,7 @@ memory, and the result will say what it is. The MongoDB test on the same kind of
 
 | Gauge | Direction |
 |---|---|
-| work inside the response line: transactions a second answered within the **transaction line**, the statement line times the statements a transaction as the script ships it (1 ms for the point select and the indexed update, 14 ms for read-only, 18 ms for read-write) | **higher is better** (the product number) |
+| work inside the response line: transactions a second answered within the **transaction line**, the statement line times the statements a transaction as the script ships it (0.5 ms for the point select and the indexed update, 7 ms for read-only, 9 ms for read-write) | **higher is better** (the product number) |
 | throughput (transactions a second); queries a second | higher is better |
 | latency p95, p99, mean (from the histogram) | lower is better |
 | errors (sysbench's ignored errors: deadlocks and retries) | **any increase is WORSE** |
@@ -146,6 +146,21 @@ result is recorded here when it has run, and it is not counted.
   uniformly over the tables in use** (`--rand-type=uniform`), so the working set is the tables in use; the scripts' operation
   mixes stay as shipped. A second smoke run follows; the statement line is confirmed or changed here on its figures before
   the counted runs. Nothing in the rules, the gauges or the workloads changed.
+- **Second smoke run (37748144365, 08:10 UTC): the working set reached the pool, and the figures set the line.** With the
+  uniform draw native's pages holding data reached 493 MB of 512 MB from the second notch on and stayed there, and its pages
+  read from disk were 269,370 over the arm, 30% of its reads; omni gave one chunk back in the first notch (512 to 384 MB), held
+  there with the pool full for the whole run but one chunk added and given back near the end, and read 349,742 pages from disk.
+  The server's mean statement latency, by notch, in native: **0.14 to 0.17 ms** at the low notches once warm (the pool holding
+  the working set), **0.20 to 0.22 ms** at the notches whose working set outgrew it (30% misses, each a read from the operating
+  system's page cache); p95 0.20 to 0.23 ms when the pool held the working set and 0.47 to 0.50 ms when it did not. Against
+  the 1 ms line every reading sat under 0.22 of the band, below the 0.4 center in every notch, so the compass could only ever
+  read calm, the same mis-set band the MongoDB test found. **The statement line is set at 0.5 ms**, with the center unchanged
+  at 0.4 (0.2 ms): the hit range (0.14 to 0.17 ms) is calm and a full pool missing a third of its reads (0.20 to 0.22 ms) is at
+  or past the center and grows. The transaction lines scale with it (0.5 ms a point select or indexed update, 7 ms the
+  read-only transaction, 9 ms read-write). The one repetition's whole-arm figures are recorded, not counted: work inside the
+  line 2,901 a second in both arms; p95 0.40 ms in both; pool held 512 MB against 408 MB; disk reads 269,370 against 349,742;
+  CPU-seconds 172.3 against 171.7; both arms handed back. This is the last change before the counted runs, and a third
+  smoke run first shows the band at work; everything else in this document stands as written.
 
 ---
 

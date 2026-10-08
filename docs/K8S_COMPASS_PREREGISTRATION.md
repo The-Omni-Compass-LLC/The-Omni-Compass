@@ -863,6 +863,10 @@ is a statement about the lever, not about the law. This run makes the lever big 
   forty. No other region can take this fleet until the account holder raises its allowance there. The fleet is therefore
   dispatched a sixth time in eastus, unchanged in every input, and runs when the region admits a cluster. The cancellation
   and the reason are recorded here so the count of dispatches reads right. Nothing else changes.
+- **Amendment 7 (2026-10-08 08:30 UTC, before the counted run).** The sixth dispatch (run 37730249970) was refused on all
+  five repetitions too, the same `AKSCapacityHeavyUsage` in eastus, over three and a half hours (05:01 to 08:26 UTC): 29
+  refusals in sixteen hours across six dispatches, the pre-flight passing each time, no arm run, nothing billed. The fleet
+  is dispatched a seventh time, unchanged; nothing else changes. Each refused repetition costs GitHub runner minutes only.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
