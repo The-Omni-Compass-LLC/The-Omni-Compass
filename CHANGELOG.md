@@ -8,6 +8,12 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **The fleet's seventh dispatch ran no arm; an inventory workflow for the subscription** (`docs/K8S_COMPASS_PREREGISTRATION.md`
+  amendment 8; `.github/workflows/azure-inventory.yml`): repetitions 1 to 3 refused by Azure's cluster capacity in eastus as
+  before (32 refusals across seven dispatches); repetitions 4 and 5 stopped at the pre-flight, which found only 2 of 10 vCPUs
+  free in two machine families where nothing of ours is known to run. The new workflow lists, read-only, every resource group,
+  AKS cluster, machine and scale set and one region's per-family vCPU usage, and deletes only groups named in full that begin
+  with our own runs' prefixes; it is run before the eighth dispatch.
 - **MySQL under sysbench, the first counted set A/B/C on v3, every row inside the noise, and a hand-back finding**
   (`results/live/V3_SYSBENCH.md`, runs 37757840760, 37757850988, 37757861572, commit `23f6ca4c`; `docs/MYSQL_PREREGISTRATION.md`,
   register row 24, proof-program row 11, the v3 record): on the four untouched workloads no gauge-row is confirmed better or

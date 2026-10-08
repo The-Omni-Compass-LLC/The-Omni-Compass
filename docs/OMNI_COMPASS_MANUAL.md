@@ -775,6 +775,21 @@ convergence and the band and dwell allow; and whether change is permitted, which
 security block. All of this is written to the audit every decision (`docs/MECHANISM_OF_ACTION.md`, sections 3 to 6, and
 `python tools/mechanism.py`, which reproduces the measured numbers in `results/MECHANISM_OF_ACTION.json`).
 
+The nine observations are worth naming in plain words, because every later number is a weighted sum of them
+(`omnicompass/adapter.py`, `observe_vector` and `assimilate`). **Queue** is the work waiting as a share of the work being
+served; **load** is utilisation against the stack's own target; **power** and **thermal** are the electrical and heat
+stress against their limits; **network** is the same for the wire; **drift** is how far the levers stand from where native
+had them, so that a governor that has pushed far from the operator's settings reads as more stressed than one that has
+not; **staleness** is the age of the readings, which rises when a sense goes quiet; **security** is the hold flag; and
+**conflict** counts other hands seen on the levers. Each is clipped to a declared range before it is used, so no single
+runaway reading can swamp the others. The stress the engine assimilates leans most on the queue (a weight of 0.25) and on
+load above 85% of target (0.18), then power, heat, network and drift in that order, with conflict and staleness last; the
+utilisation it blends toward falls with the queue first (0.27) and with power and heat next. The weights are fixed numbers
+in the frozen engine, the same on every stack, and a reader who wants to know why a decision read the body as stressed can
+recompute the sum from the audit line, which records all nine observations. What the weights encode is a judgement made
+once: that work waiting is the first sign of a body in trouble, that a lever far from native is itself a mild stress, and
+that a reading one cannot trust is a reason for caution rather than for action.
+
 ### 4.3 Where the engine sits, and where the compass law sits
 
 A reader meeting the engine and then the compass law (section 6) may ask which of the two moves the knob. The answer, in
@@ -2177,10 +2192,10 @@ capacity in its region on every dispatch so far, each refusal recorded; it runs 
 The refusals are themselves part of the record, and the preregistration's amendments 5 to 7 keep the count: six dispatches
 and 29 refused repetitions in eastus, each with Azure's own reason (its managed-Kubernetes capacity in the region, not
 the subscription's quota), a survey of every other region showing none with the vCPU quota the fleet needs, one dispatch
-cancelled by hand and recorded as such, and the seventh dispatch left to try. That seventh dispatch had been refused on
-its first three repetitions as this edition went to press, 32 refusals in all; its repetitions run one after another, and
-whatever the region admits is read by the same table as the four-worker runs, with the refused repetitions counted in the
-amendment, not in the table. A reader should take
+cancelled by hand and recorded as such, and the seventh dispatch left to try. That seventh dispatch was refused on all
+five of its repetitions over the morning of 8 October, 34 refusals in all (amendment 8); whatever the region admits on a
+later dispatch is read by the same table as the four-worker runs, with the refused repetitions counted in the amendment,
+not in the table. A reader should take
 from this what it says and no more: the small fleet's bill reading is inside the noise by the arithmetic of its size, the
 large fleet's reading does not exist yet, and nothing about the bill on a real cloud is claimed in the index until it does.
 
