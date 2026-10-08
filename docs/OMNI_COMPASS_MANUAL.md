@@ -2226,8 +2226,21 @@ appear in the three-run tables of this manual, with their source and their direc
 | HPA replicas, pods started, pod start wait | the API server's own records | measured | shown, not judged except pod start wait |
 | organism work, energy, time over its line | the organism's plant models | **modelled** | by direction; S class |
 | energy a mission, missions a charge (drones) | the simulator's motor constants through a declared model | **modelled** | lower; higher |
+| cache size held, mean; bytes in the cache, mean; pages read into the cache (MongoDB) | the server's own `serverStatus` (WiredTiger cache) | measured | lower is better (the resource held); shown, not judged (pages read) |
+| seconds from the kill to every setting back at the operator's (robustness) | the harness polling the cluster once a second from the kill | measured | lower is better; past 60 s WORSE; never, INVALID |
+| the governor's resident memory, last ten minutes over the first ten (robustness, long run) | the process table, sampled every 15 s by the harness | measured | a growth over a quarter is WORSE |
+| decisions made of expected; failed decisions (robustness, long run) | the governor's audit | measured | under 95% INVALID; any failed decision shown with its reason |
+| mission time, position error, collisions (drones) | the simulator's own state at every step | measured in the simulator (S class) | lower; under the safe error; any collision voids the cell |
 | handed back (every arm) | the knob read back at the end of the arm | measured | yes in every arm, or the run is invalid |
 | off the clock | the organism's own clock against its window | measured | shown; marks the cell |
+
+**Three rules for reading any gauge in this appendix.** A measured gauge is one the system under test, or the host's own
+kernel, reported about itself; a modelled gauge is one computed from a declared formula over measured inputs, and every
+table says which it is on the line itself, never only here. A resource gauge (machines, connections, consumers, memory,
+cache) is always judged lower-is-better, even where the governor's purpose was to add the resource to buy service, so that
+a gain bought with a resource is paid for in the same table and in the index. And a gauge marked "shown, not judged"
+never enters a reading or the index; it is there so that a reader can see what the governor did (how often it moved, how
+many pages it read, how many pods it started), not to be counted for or against it.
 
 ## Appendix E - Troubleshooting
 
