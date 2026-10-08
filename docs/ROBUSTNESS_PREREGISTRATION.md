@@ -149,6 +149,24 @@ its duration, so the decision time is read as the gap between decisions less the
 governor does between two decisions; this derivation is declared here. The 24-hour run on a rented machine follows the
 same rules.
 
+## Scenario 2b: the 24-hour run on rented machines, declared before it starts (2026-10-08 10:00 UTC)
+
+The same long scenario with the window stretched to a working day: **86,400 s an arm**, the wandering schedule repeated 96
+times (2,400 steps of 36 s), **one paired repetition on each of three rented Azure machines**, started at the same time and
+read as runs A, B and C by the same table (`tools/confirm_abc.py`), each machine a four-core size of the kind GitHub's
+runners are (`Standard_D4as_v4`, eastus, 128 GB disk), through the detached workflow's `test=robust` mode
+(`big-organism-detached`: the machine is rented, kind and the harness installed, `scripts/kind_paired.sh` run with
+`ROBUST=long` exactly as the GitHub job runs it, and the files collected and the machine deleted when the run ends or at
+60 hours at the latest). The gauges, thresholds and directions are scenario 2's, unchanged: the governor's memory over the
+first and last ten minutes (a quarter), the decisions made against the 1,440 the interval predicts (95%), failed decisions
+shown with their reasons, the decision time's last hour against its first (a half), every setting handed back at the end,
+and the whole window's gauges. What is different, and said here: with one pair a machine there is no within-run interval, so
+the paired rows read as single differences and the three-run rule alone judges them (the same sign in all three machines
+with no interval is "three machines agree", not "confirmed", and the table will say which); the robustness rows (memory,
+decisions, decision time, hand-back) are single readings per machine and are judged against their thresholds as declared.
+Cost: three machines for about 50 hours, about $25 at list price, declared here before the dispatch; nothing in the engine
+changes (`tools/omni_version.py` on the commit).
+
 ## What is declared before the first run
 
 The 60-second hand-back allowance is the sum of the watchdog's pass (5 s), the restore command's own run (one kubectl per

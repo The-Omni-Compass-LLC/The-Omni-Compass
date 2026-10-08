@@ -129,8 +129,17 @@ def verdict(k, rs):
         return "shown, not judged"
     if all(abs(r["diff"]) <= SAME_REL * abs(r["native"]) for r in rs):
         return "same"
-    clear = [r["ci95"][0] > 0 or r["ci95"][1] < 0 for r in rs]
     signs = [(r["diff"] > 0) - (r["diff"] < 0) for r in rs]
+    # a run of one pair has no interval (the 24-hour robustness run: one pair a rented machine): three such runs are read by
+    # their signs alone and said to be single pairs, never a confirmation
+    single = [any(isinstance(x, float) and x != x for x in r["ci95"]) for r in rs]
+    if all(single):
+        if len(set(signs)) > 1:
+            return "single pairs point different ways (one pair a run, no interval)"
+        lower = signs[0] == -1
+        word = ("better" if lower else "WORSE") if k in LOWER else (("WORSE" if lower else "better") if k in HIGHER_BETTER else ("lower" if lower else "higher"))
+        return f"three single pairs agree: {word} (one pair a run, no interval: not a confirmation)"
+    clear = [r["ci95"][0] > 0 or r["ci95"][1] < 0 for r in rs]
     if len({s for s, c in zip(signs, clear) if c}) > 1:
         return "**the runs disagree**"
     if not all(clear):
