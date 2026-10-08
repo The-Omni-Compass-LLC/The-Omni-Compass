@@ -353,6 +353,11 @@ def main():
                                  "waiting, the wall starts every consumer at once, the cover holds; the group's own reading; the paired reading; the service time as CPU", True)
     test_kafka_abc.main(); check("Kafka A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
                                  "no difference beyond the noise with its count; any lost message is WORSE; the tuning workload is shown and not counted", True)
+    from tests import test_run_ycsb, test_ycsb_abc
+    test_run_ycsb.main(); check("YCSB runner: slow reads with the cache full grow the cache by notches, calm with nothing evicted gives one back after the dwell, the wall "
+                                "adds a quarter of the cover, the cover holds; the plug snapshots, reads back, stops for another writer and restores; the paired reading", True)
+    test_ycsb_abc.main(); check("YCSB A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
+                                "no difference beyond the noise with the count; clear runs pointing different ways read as a disagreement", True)
     from tests import test_robust
     test_robust.main(); check("robustness readings: the kill and hand-back marks, the 120 s after the kill in both arms, the governor's memory ratio; a late hand-back, "
                               "a leak or a missing second governor reads WORSE; the three-run rows confirm only when every repetition of every run was handed back", True)

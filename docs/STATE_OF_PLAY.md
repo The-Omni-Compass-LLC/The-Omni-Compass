@@ -105,10 +105,12 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
    mid-run and the watchdog's hand-back, the long run, and the governor's own CPU at 1 to 1,000 copies; the last is done
    from the archives (`results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size); the first two run as A,
    B and C next.
-5. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB and
-   HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera
-   (Kafka and Redis done); one or two at a time, each preregistered.
-6. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
+5. **YCSB on MongoDB** (`docs/YCSB_PREREGISTRATION.md`, built): the operator's WiredTiger cache as native, Omni on the cache
+   size through the server's own console; the smoke run first, then A, B and C on v3.
+6. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
+   Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,
+   RocketPy, Cantera (Kafka and Redis done); one or two at a time, each preregistered.
+7. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
    fingerprints go to `docs/history` as the road to it.
 
 ## Where things are
