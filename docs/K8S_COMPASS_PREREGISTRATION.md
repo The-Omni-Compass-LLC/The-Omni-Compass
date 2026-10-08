@@ -849,6 +849,12 @@ is a statement about the lever, not about the law. This run makes the lever big 
   the **standard control-plane tier** (`tier` input, `AKS_TIER`) instead of the free tier, about $0.10 an hour a cluster,
   which is not in the bill (the bill counts worker machines only, in both arms alike) and changes nothing the workers or the
   autoscaler do. If the standard tier is refused too, the run waits for Azure. Nothing else changes.
+- **Amendment 5 (2026-10-08 03:55 UTC, before the counted run).** The standard-tier dispatch (run 37703460186) was refused
+  by Azure's own cluster capacity in eastus on all five repetitions too, over three hours (23:39 to 02:48 UTC), the same
+  `AKSCapacityHeavyUsage` on each: 22 refusals in eleven hours across four dispatches, the pre-flight passing each time, no arm
+  run, nothing billed but the resource groups' minutes. The fleet is dispatched again unchanged; it runs when the region
+  admits a cluster. The alternative, a second region, needs the subscription's regional vCPU allowance raised there, which
+  only the account holder can request in the portal. Nothing else changes.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
