@@ -8,6 +8,16 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **MySQL under sysbench, preregistered, built and smoke-tested four times** (`docs/MYSQL_PREREGISTRATION.md`,
+  `tools/run_sysbench.py`, `tools/sysbench_abc.py`, workflow `sysbench`, tests in `tests/test_run_sysbench.py` and
+  `tests/test_sysbench_abc.py`; register row 24, proof-program row 11): MySQL 8.0 and sysbench from Ubuntu's own packages,
+  the operator's 512 MB InnoDB buffer pool as native, Omni on the pool size in the server's own 128 MB chunks through its
+  console, reading the server's own statement latency from the performance schema. The four smoke runs on the tuning
+  workload, all recorded: sysbench's shipped request draw never reached the pool (made uniform), the 1 ms line kept every
+  reading under the center (set at 0.5 ms, then 0.6 ms), and the "no page read from disk" give-back gate was never satisfied
+  because InnoDB keeps stale pages resident (now the pool's miss share under one percent); on the fourth smoke the pool
+  followed the working set both ways. The counted runs A, B and C follow. The manual carries section 10.9 and the stack's
+  settings row; the integration manual its row.
 - **Robustness, the long run, three runs** (`results/live/V3_ROBUST_LONG.md`, runs 37716886448, 37716900258, 37716913526,
   3 pairs × 7,200 s an arm each, Omni v3; `docs/ROBUSTNESS_PREREGISTRATION.md` scenario 2): the governor's memory at most
   1.07 of its first ten minutes after two hours (no leak), 97.5% or more of the expected decisions in every repetition
