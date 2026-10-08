@@ -235,6 +235,25 @@ It is a process on a host. It reads meters, steps a bounded mathematical law, an
 given. It is not the chip, not the GPU driver, not Kubernetes, not the building controller. Those keep running exactly
 as they do today; Omni-Compass sets the values they already accept.
 
+Three facts about that process fix what the rest of this manual can and cannot claim. First, it is **one process per
+stack**, a controller (`omni_controller/controller.py` on a cluster; the harness's own controller on a database or a
+cache) that wakes on a fixed period, reads the stack's own gauges through the stack's own interface, decides, writes
+through the same interface, and reads back what the device took; it has no agent inside the pods, no kernel module, no
+hook in the request path, so it can add latency to nothing it does not govern. Second, every lever it may touch is
+**named before it starts**, read once into a snapshot, and handed back to that snapshot when it stops, is killed, or
+loses a sense; a lever it was not given it cannot reach, because the plug for it does not exist. Third, it has a
+**watching mode** in which it reads and decides and writes nothing, and every rollout begins there (section 9): the
+first thing an operator learns about Omni-Compass on their own stack is what it would have done, in a log, with the
+stack untouched.
+
+What follows from those three is the shape of the evidence in Part VI. Because the native controller keeps running
+underneath, every benchmark is the native stack against the same native stack with Omni-Compass on top, and never
+Omni-Compass against anything else. Because the levers are the stack's own settings, every gain is one the operator
+could have reached by hand, if they had been able to read every gauge every few seconds and move every knob without
+ever being wrong; the claim is not a new mechanism but a steady hand on the mechanisms that exist. And because the
+process is small and separate, its own cost (CPU on the host, reads of the API) is measured in every run and counted
+against it where it shows.
+
 ### 1.1 Always on top of a native controller
 
 The first design decision, and the one every other follows from, is that Omni-Compass is **supervisory**. It never
@@ -661,6 +680,23 @@ one law, and it is the one every table in Part VI was made on. Each new result t
 produced the old ones, and when the founder declares the engine final, the engine that stands then is published as
 Omni-Compass 1.0, with the older fingerprints kept as the road to it, never as a second product.
 
+"Frozen" has a precise meaning here. The engine is a fixed set of 40 files, and `OMNI_V3.json` holds one SHA-256 for
+each of them and one digest over all of them; `OMNI_V2.json` and `OMNI_V1.json` do the same for the two earlier sets.
+`python3 tools/omni_version.py` hashes the files in a checkout and prints which fingerprint they match (for this edition,
+`omni-v3 (digest b53d05449ee04c4b, 40 files)`), or, when they match none, which files differ from the nearest; with
+`--commit <sha>` it asks the same of any pushed commit, which is how every three-run table checks that its runs A, B and
+C were on the same engine before it combines them, and refuses if they were not. The three versions differ in exactly
+the ways their records name: v2 added the 945-muscle catalog and thirteen presets to v1 without touching the law, the
+controllers or the runners, which are the same bytes in all three; v3 added the slack gate on speed knobs and the marine
+propulsion preset to v2 (`docs/OMNI_V3.md`). Nothing else changed, and a reader can confirm that from the fingerprints
+rather than from this sentence.
+
+The rule that any change makes the next version is also the rule that keeps the results honest. A gain or a guard
+changed after a result is in would make that result unrepeatable on the engine that now stands, so the change moves the
+version, every result is run again on the new version, and the old tables keep their version in their name and move to
+history. The founder's standing order is that the engine is never changed without being told first; this manual records
+no change made otherwise.
+
 ---
 
 # PART II - THE MECHANISM OF ACTION
@@ -908,6 +944,25 @@ quarter of the cache's cover added at once, the planner's own cruise, the card's
 down side is slow and gated because adding and taking back do not cost the same, and because a gain bought by taking
 something back must be able to prove itself before it is kept.
 
+Written out stack by stack, from the preregistrations, the rule reads as follows; the unit, the cover and the fail-up move
+are each the stack's own, and the shape is the same in every row.
+
+| Stack | The knob and its unit | The cover | One notch back, when idle | Fail up at 95% of the line |
+|---|---|---|---|---|
+| Kubernetes (the cluster) | worker machines in service | the floor of two to every machine the operator has | one machine a decision, when the remaining machines would carry the load far under the wall | one machine up at once |
+| PostgreSQL behind PgBouncer | the pooler's pool size, server connections | [2, 90]: the floor of two, never within ten of PostgreSQL's 100 | one connection a decision, when the pooler itself shows a server idle | the pooler's own setting (20) handed back at once |
+| Apache Kafka | consumers in the group | one to the topic's partitions (8) | one consumer a decision, when a consumer read nothing in the last second | every consumer the topic can use |
+| Redis | the memory ceiling, MB | [16, 512] MB | one notch a decision, when calm and nothing was evicted in the last second | a quarter of the cover added at once |
+| MongoDB (WiredTiger) | the cache size, 64 MB notches | [256, 2,048] MB | one notch a decision, when calm and nothing was evicted in the last second | a quarter of the cover (448 MB) added at once while full |
+| MySQL (InnoDB) | the buffer pool, 128 MB chunks | [128, 2,048] MB | one chunk a decision, when the miss share is under 1% | four chunks at once while the pool is full |
+
+Two things in the table deserve a reader's attention. The "when idle" column is never a guess from the knob's own
+value: it is a reading from the stack's own counters (the pooler's idle servers, the consumer's last fetch, the cache's
+eviction count, the pool's disk reads against its requests), so the law gives back only what the stack itself reports it
+is not using. And the fail-up column is the stack's own fastest safe move, not a multiple of the notch; where the stack
+has a controller of its own (the pooler, the planner, the card's firmware), fail up means handing the knob back to it,
+which is the one move that can never be worse than native by construction.
+
 ### 6.3 The do-no-harm gates inside the law
 
 Three gates sit inside the law itself, each a consequence of a loss seen on a tuning case and each disclosed in the
@@ -967,6 +1022,24 @@ authority each organ has at each moment:
 
 One brain reads every organ at once. Because one law sets every knob, no two muscles fight: when the GPU's watts turn
 to heat, the cooling knob already knows it is coming; when pods scale up, the power envelope is ready.
+
+"Two-way" is a statement about wiring, and it is checked, not assumed. Each muscle's plug (section 8) carries exactly one
+sensory wire and one motor wire, and the wire check that must pass before any write (section 8.4) proves that the wires
+move: a value written through the motor wire is taken by the device and read back as the value sent, and the snapshot is
+restored and read back at the end. No governor writes a knob whose wire check has not passed, because a knob that can be
+written but not read back cannot be handed back with proof. What the wire check does not prove, section 8.5 says plainly:
+that the governor is reading the right gauge for the knob; that is what the watching arm is for. The receipts of every run
+therefore carry, for every write, the value sent and the value the device reported, side by side, and a reader who wants
+to know whether the governor's hand was really on the stack can check the two columns rather than take the summary's word.
+
+The four rules above are the whole of the nervous system's authority model, and they are asymmetric on purpose. Adding
+is cheap to undo and expensive to delay, so it is never gated beyond the security hold. Taking back is cheap to delay and
+expensive to get wrong, so it is gated three ways: by calm (the engine's own state must report that the body is
+settling), by the service record (the gauge must have been inside its line for the last three decisions, not merely
+this one), and by the release gate's reasons, which are written into the audit every time the gate holds (section 7.1).
+Sections 7.2 to 7.4 take the three ideas that make this safe at scale, the governor's sense of its own hand, the rule that
+a missing reading is a hold and not a guess, and the case for one brain over many, and give the evidence for each from
+the live runs.
 
 ### 7.1 Authority, and the release gate
 
@@ -1995,6 +2068,23 @@ Every result below is Omni-Compass **on top of** a native system against the sam
 work in both arms, read by the three-run rule of section 15, on the engine named. Losses are in the tables beside the
 gains. The whole list, benchmark by benchmark with its native engine, its knob, its gauges and its file, is
 `docs/REGISTER.md`; the program that takes every benchmark to full size is `docs/PROOF_PROGRAM.md`.
+
+How to read the chapter. Each section names the stack, the native controller Omni-Compass sat on, the one knob it moved,
+the result file in `results/live/` or `results/`, the three GitHub run numbers (or the rented machine's start and
+collect runs) and the engine version those runs were on; a reader can open the file, find the runs under the repository's
+Actions tab, and check the commit with `tools/omni_version.py --commit`. The figures quoted in prose are the table's
+figures and no others; where a range is given ("−13% to −37%") it is the span of the three runs' point estimates, not an
+interval. Every row of every table has one of the readings of the three-run rule (section 15): confirmed better, confirmed WORSE, no
+difference beyond the noise with the count of runs, or the runs disagree; rows that are shown and not judged say so and
+why. A loss is written in the same sentence as the gain it came with, never in a footnote, and the index (section 16.6)
+counts every confirmed loss against Omni at full weight.
+
+Two cautions a referee should hold while reading. The real-software results (evidence class L) were taken on GitHub's
+shared runners or on single rented machines, with the host's CPU-seconds as the only measure of energy and no meter on
+the wall; sections 13 and 14 say what that does and does not allow. And the modelled results (evidence class S) are
+reported as what they are, our own plant models run whole, and are never summed with the live ones; the index is built
+from the real categories alone, and the modelled realms sit beside it as a separate finding about the law's coherence
+at scale.
 
 ### 16.1 Real Kubernetes: six tests, ten pairs each, three runs each
 
