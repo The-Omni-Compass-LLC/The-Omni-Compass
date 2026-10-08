@@ -232,6 +232,44 @@ def main():
     L += ["", "The compass holds fewer connections open for the same work and the same latency, and it costs CPU on the host to do "
           "so; that cost is confirmed worse and counted against Omni in the index. Table: `results/live/V3_PGBENCH.md`.", ""]
 
+    # ------------------------------------------------------------------ 3b, 3c. Real messaging and the real cache on v3 (each when its table has landed)
+    WORKLOAD_SECTIONS = (
+        ("V3_KAFKA.json", "## 3b. Real messaging: Apache Kafka, a consumer group's operator-set size, Omni v3, three runs (evidence class L)",
+         "Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer group at the operator's 2 consumers is native; "
+         "omni is the compass law on one knob, the consumer count, inside the cover [1, 8], holding the group's own end-to-end latency "
+         "at 40% of the 500 ms line (`docs/KAFKA_PREREGISTRATION.md`). Three paired repetitions a run, three runs, the consumers' own "
+         "records for the gauges; the tuning workload is shown and not counted.",
+         "| Workload | Work inside the 500 ms line | End-to-end p95 | Consumers running (the resource held) | Host CPU-seconds (the compass's own cost) |",
+         ("work_inside_line_mps", "p95_ms", "consumers_mean", "cpu_seconds"),
+         "Native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5% waited "
+         "about 1.6 s; Omni added consumers while messages waited and gave them back when the queue was empty, so its slowest 5% waited "
+         "9 to 14 ms, at the cost of three to four times the consumers running, confirmed worse and counted against Omni in the index. "
+         "No message was lost in any arm; every count was handed back. Table: `results/live/V3_KAFKA.md`."),
+        ("V3_REDIS.json", "## 3c. A real cache: Redis, the operator's memory ceiling, Omni v3, three runs (evidence class L)",
+         "Redis as Ubuntu ships it with the operator's 64 MB ceiling and allkeys-lru is native; omni is the compass law on one knob, the "
+         "ceiling, inside the cover [16, 512] MB through Redis's own console, growing only while the cache is full and giving a notch "
+         "back when calm and nothing is evicted (`docs/REDIS_PREREGISTRATION.md`). An application with a declared 5 ms store trip on a "
+         "miss and a working set that steps up and down; three paired repetitions a run, three runs; the tuning workload is shown and not counted.",
+         "| Workload | Work inside the 2 ms line | Cache hit rate | p95 | Memory ceiling held, MB (the resource held) | Host CPU-seconds |",
+         ("work_inside_line_rps", "hit_rate", "p95_ms", "maxmemory_mb_mean", "cpu_seconds"),
+         "The memory the compass holds for a wide working set is the resource this benchmark trades, and reads worse by rule. "
+         "Table: `results/live/V3_REDIS.md`."),
+    )
+    for fname, head, intro, header, keys, after in WORKLOAD_SECTIONS:
+        p = ROOT / "results" / "live" / fname
+        if not p.exists():
+            continue
+        tab = json.loads(p.read_text())
+        L += [head, "", intro + " Runs: " + "; ".join(f"{t['tag']} {t['run']}" for t in tab["runs"]) + ".", "",
+              header, "|" + "---|" * (len(keys) + 1)]
+        for wl, m in tab["workloads"].items():
+            def c3(k):
+                r = m.get(k)
+                return "not taken" if r is None else cell(r)
+            name = f"`{wl}` (tuning, shown, not counted)" if wl == "tuning" else f"`{wl}`"
+            L.append("| " + name + " | " + " | ".join(c3(k) for k in keys) + " |")
+        L += ["", after, ""]
+
     # ------------------------------------------------------------------ 4. The bill on a real cloud
     L += ["## 4. The bill on a real cloud: Azure Kubernetes Service, Omni v1 (evidence class L, a metered bill)", "",
           "Azure's own cluster autoscaler is native; omni is the same autoscaler with Omni-Compass idling the machines it gives "
@@ -333,11 +371,14 @@ def main():
     # ------------------------------------------------------------------ 7. Harnesses and receipts
     L += ["## 7. Harnesses and receipts", "", "| Harness | What it proves | Receipt |", "|---|---|---|",
           "| `scripts/kind_paired.sh`, `tools/live_reps.py`, workflow `benchmark-reps` | native against Omni on real Kubernetes, paired on one runner, the reset checked | `results/live/raw/run-*/live-reps/` |",
-          "| `tools/confirm_abc.py` (and `pgbench_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | three separate runs read by one rule: confirmed better, confirmed worse, no difference beyond the noise, the runs disagree; each run's engine checked against the fingerprint | `results/live/V3_*.md`, `V1_*.md` |",
+          "| `tools/confirm_abc.py` (and `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | three separate runs read by one rule: confirmed better, confirmed worse, no difference beyond the noise, the runs disagree; each run's engine checked against the fingerprint | `results/live/V3_*.md`, `V1_*.md` |",
           "| `tools/omni_version.py` | which frozen engine a checkout or any result's commit carries | `OMNI_V1.json`, `OMNI_V2.json`, `OMNI_V3.json` |",
           "| `scripts/aks_paired.sh`, workflow `aks-metered` | the same on Azure's managed Kubernetes, Azure's own bill, a fresh cluster per arm, the fleet pre-flighted against the subscription's allowances | `results/live/V1_AKS_*.md` |",
           "| `tools/run_kil.py`, workflows `six-kube`, `big-organism`, `big-organism-detached`; `tools/six_kube_report.py` | the six organisms with a real cluster inside at 1 to 1,000 copies, on GitHub and on a rented machine; the clock rule | `results/live/V1_SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V1_BIG_ORGANISM.md` |",
           "| `tools/run_pgbench.py`, workflow `pgbench` | a real database behind its pooler, one knob through the pooler's console | `results/live/V3_PGBENCH.md` |",
+          "| `tools/run_kafka.py`, workflow `kafka` | a real message broker as shipped, one knob (the consumer group's size) read from the consumers' own records | `results/live/V3_KAFKA.md` |",
+          "| `tools/run_redis.py`, workflow `redis` | a real cache as shipped, one knob (the memory ceiling) through its own console, growing only while the cache is full | the three-run table V3_REDIS.md in `results/live/` when its runs land |",
+          "| `tools/run_swarm.py`, workflow `swarm` | Omni on top of each drone's shipped autopilot in gym-pybullet-drones, collisions voiding the cell | `results/live/V3_SWARM.md` |",
           "| `tools/run_scale.py`, `tools/pool_scale.py`, workflow `six`; `tools/grid.py` | the six organisms at every run count and size | `results/scale/GRID.md`, `results/scale/receipts/` |",
           "| `tools/run_realms.py`, workflow `realms` | every muscle alone and every organism whole | `results/realms/REALMS.md` |",
           "| `tools/run_pandapower.py`, `run_mujoco.py`, `run_citylearn.py` | Omni on top of an independent simulator's own controller | `results/live/V3_PANDAPOWER.md`, `V3_MUJOCO.md`, `V3_CITYLEARN.md` |",
@@ -356,8 +397,9 @@ def main():
           "the one-card, card-inside-the-organisms and eight-card runs are the founder's, on rented cards, at one named commit.",
           "- The four stacked and the tower at 1,000 copies with the real cluster inside on v3 (the stack runs on a rented machine).",
           "- 100 and 1,000 runs at 1,000 copies (beyond the machines available).",
-          "- The queue in `docs/REGISTER.md` section 4: drone swarms, YCSB and HammerDB, Spark, Kafka, Redis, OpenSearch, fio, "
-          "Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera.", ""]
+          "- The queue in `docs/REGISTER.md` section 4 (drone swarms on gym-pybullet-drones and Kafka done; Redis running): PX4 and "
+          "ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and "
+          "GMAT, RocketPy, Cantera.", ""]
     OUT.write_text("\n".join(_legal_stamp(L)) + "\n", encoding="utf-8")
     print(OUT)
 

@@ -21,12 +21,18 @@ run of the steady, wandering, all-four and fault tests; failed requests −9% to
 −2.9% at steady load and −19% to −23% on the batch queue, with the standby-model energy −13% to −16% there; beside a
 noisy neighbour no difference beyond the noise on every row. **A real database** (PostgreSQL behind PgBouncer,
 `results/live/V3_PGBENCH.md`): 61% to 72% fewer connections held open for the same work and latency on two of three
-workloads, at a confirmed cost in the host's CPU seconds (+14% to +28%), counted against Omni. **The Omni index, real
-machines only, confirmed three times: +19.7%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database +14.2%; a row
-inside the noise counts as exactly 1). The v1 tables read the same and stay as the first engine's record.
+workloads, at a confirmed cost in the host's CPU seconds (+14% to +28%), counted against Omni. **Real messaging** (Apache
+Kafka as shipped, `results/live/V3_KAFKA.md`): on all three untouched workloads work inside the 500 ms line **+16% to
++21%**, the 95th percentile 1.6 s → 9 to 14 ms and messages waiting −92% to −97%, confirmed better, no message lost;
+consumers held 2 → 6 to 8, **confirmed worse**, the resource the gain costs; host CPU worse on one workload, inside the
+noise on two. **The Omni index, real machines only, confirmed three times: +56.4%** (`results/OMNI_INDEX.md`; Kubernetes
++25.5%, the database +14.2%, Kafka +166.9%, each category weighed the same; a row inside the noise counts as exactly 1;
+Kafka's speed ratio is large because native's queue grew at nine tenths of its capacity and Omni's did not). The v1
+tables read the same and stay as the first engine's record.
 
 **What is shown and what is not.** Shown: more work inside the response line on the same machines and a faster tail,
-on real Kubernetes, three times on a frozen engine; a real database holding fewer connections for the same service.
+on real Kubernetes, three times on a frozen engine; a real database holding fewer connections for the same service; a
+real message queue kept short at the cost of more consumers running.
 Not yet shown: an energy or cloud-bill saving on real machines. Energy on kind is a declared model (the machines are
 containers on one runner); Azure's bill on a 4-worker fleet read no difference beyond the noise on every gauge
 (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`), which is a fleet too small to show one machine; the fleet of 40
@@ -45,6 +51,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | A queue of batch jobs | queue finished no difference beyond the noise | mean response −10% to −14% | **−19% to −23%** (−29% to −35% after the queue) | **−13% to −16%** | `results/live/V3_BATCH.md` |
 | Fairness, a noisy neighbour | inside the noise on every row | inside the noise | inside the noise | inside the noise | `results/live/V3_FAIRNESS.md` |
 | PostgreSQL behind PgBouncer, three workloads | inside the noise | inside the noise | connections held open **−61% to −72%** on two workloads; the runs disagree on the third | host CPU-seconds **+14% to +28%, confirmed worse** | `results/live/V3_PGBENCH.md` |
+| Apache Kafka, a consumer group's size, three workloads | work inside the line **+16% to +21%**; no message lost | p95 **1.6 s → 9 to 14 ms**, lag −92% to −97% | consumers held **2 → 5.8 to 7.9, confirmed worse** | host CPU-seconds +10% to +20% confirmed worse on light, inside the noise on heavy and burst; CPU per message inside the line −10% to −12% on burst | `results/live/V3_KAFKA.md` |
 | The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell | the organisms' work unchanged | p95 better in every cell | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
 
 ## Measured on a real cloud (Azure, its own bill), Omni v1
@@ -89,10 +96,12 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack runs on a rented
    machine (10,800 s window, three repetitions, about 20 hours); the tower follows.
 3. **The real card**: the founder's runs on Lambda, one exact commit.
-4. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB and
-   HammerDB, Spark, Kafka, Redis, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,
-   RocketPy, Cantera; one or two at a time, each preregistered.
-5. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
+4. **Redis** (`docs/REDIS_PREREGISTRATION.md`): the three untouched workloads run as A, B and C on v3; the three-run
+   table V3_REDIS.md joins `results/live/` and the index when they land.
+5. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB and
+   HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera
+   (Kafka and Redis done or running); one or two at a time, each preregistered.
+6. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
    fingerprints go to `docs/history` as the road to it.
 
 ## Where things are
