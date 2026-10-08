@@ -79,6 +79,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | What | Reading | Source |
 |---|---|---|
 | The 945 muscles and six organisms, A/B/C | reproduced to the digit in 3 of 3; 0 muscles worse; every organism superior within guardrails (work per energy +0.1% to +0.3%) | `results/realms/REALMS.md` |
+| The four stacked at 1,000 copies with the real cluster inside, on a rented machine, 3 pairs (v3) | the organism's work unchanged (rounding-level) | the cluster's p95 **2.9 s → 150 ms**, p99 −97%, time over the line **51% → 0**, failed requests **0.14% → 0** | 6 machines in both arms | inside the noise (standby model); the organism's energy −0.4% (model) | `results/live/V3_BIG_ORGANISM.md` |
 | The organisms at 1, 10, 100 and 1,000 copies × 1 to 1,000 runs, 84 of 90 cells | every organism superior within guardrails in every cell of 10 runs or more; work per energy +0.07% to +0.37%, the same figure at every size; the six cells left are beyond the machines available | `results/scale/GRID.md` |
 | Power grid, 11 SimBench grids in pandapower, A/B/C (v1 and v3 identical) | with ZIP loads energy drawn and net import better in all 11; losses better in 7, worse in 4; tap operations fewer in 10, 4 → 8 a year in one (worse, the declared cost) | `results/live/V3_PANDAPOWER.md` |
 | Robot arms, MuJoCo Menagerie, A/B/C | Gen3 and Panda: peak torque −29% and −10%, tracking error −21%, energy per takt −0.8% and −0.5%; the Panda's copper +14% worse; UR5e and iiwa left native | `results/live/V3_MUJOCO.md`, `V1_MUJOCO_PANDA.md` |
@@ -105,8 +106,10 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 
 1. **Azure, the fleet that can show one machine**: steady and burst on 40 workers, v3; waiting on Azure's cluster
    capacity in eastus (the only region where this subscription has more than 10 cores). Then B and C.
-2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack runs on a rented
-   machine (10,800 s window, three repetitions, about 20 hours); the tower follows.
+2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack is done, 3 of 3 on
+   the clock (`results/live/V3_BIG_ORGANISM.md`: the cluster's p95 2.9 s → 150 ms, time over the line 51% → 0, failed
+   requests 0.14% → 0, machines and energy unchanged, 22 s behind a 10,800 s window); the tower runs now on a second rented
+   machine the same way (about $10, about a day).
 3. **The real card**: the founder's runs on Lambda, one exact commit.
 4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, no engine file changes): the kill scenario is done
    (`results/live/V3_ROBUST_KILL.md`: every setting back 7 to 11 s after the kill in 30 of 30 repetitions) and the

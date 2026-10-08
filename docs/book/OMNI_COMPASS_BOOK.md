@@ -4980,7 +4980,17 @@ in four of five repetitions (up to 277 s past a 1,440 s window): the machine cou
 window, both arms slipped alike, the pairing stands and the mark stays on the cell. At 1,000 copies on v1 the tower
 answered its slowest 5% in 0.2 s against native's 4.1 s and was over its line 0.2% of the time against 64%; the four
 stacked read p95 −74% and p99 −83% with the compass arm 300 to 615 s past its 2,880 s window in all three repetitions,
-marked off the clock, which is why the v3 stack runs with a 10,800 s window and is running as this edition is written.
+marked off the clock, which is why the v3 stack was run with a 10,800 s window. **On v3 the four stacked at 1,000 copies**
+(`V3_BIG_ORGANISM.md`: 1.7 million muscles on one clock with the real cluster inside, three paired repetitions on one
+rented machine over 29 hours, 240 steps of 45 s an arm) **kept the clock in both arms**, 22 s behind a 10,800 s window
+(0.2%), and read: the cluster's slowest 5% answered in 150 ms against native's 2,882 ms (−95%), its slowest 1% in 165 ms
+against 5,405 ms (−97%), time over the response line 51% of samples to none, failed requests 0.14% to none, all clear of
+zero with three pairs; replicas, pods started and machines (six in both arms) the same; the standby-model energy −0.6%
+inside the noise; the host's CPU −1%, shown. The organism's own model (class S, shown beside the cluster and never inside
+the index) read energy −0.4% and work per energy +0.4% better, time over its own line −0.7% better, and work −0.0006%, a
+rounding-level model difference that the rule reads as worse and the table shows as such. The v1 stack's loss, the compass
+arm falling off the clock, is gone with the longer window; the gain, the cluster's tail, is the same shape at 1,000 copies
+as at 10 and 100. The whole tower at 1,000 copies runs the same way on a second rented machine as this edition is written.
 
 ### 16.3 The bill on a real cloud
 
@@ -5149,7 +5159,8 @@ themselves, which is why every row is in its table.
 | **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
 | GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
-**Running now** (8 October): the four stacked at 1,000 copies on the detached machine; the robustness test
+**Running now** (8 October): the whole tower at 1,000 copies on a rented machine (the four stacked at 1,000 copies done,
+section 16.2); MySQL's buffer pool under sysbench as A, B and C (section 10.9); the robustness test
 (`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario and the two-hour long run both done (section 16.4b), the
 24-hour run on a rented machine next;
 YCSB on MongoDB done (`V3_YCSB.md`, section 16.4), MySQL's buffer pool under sysbench preregistered, built and in its smoke
@@ -8514,6 +8525,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | What | Reading | Source |
 |---|---|---|
 | The 945 muscles and six organisms, A/B/C | reproduced to the digit in 3 of 3; 0 muscles worse; every organism superior within guardrails (work per energy +0.1% to +0.3%) | `results/realms/REALMS.md` |
+| The four stacked at 1,000 copies with the real cluster inside, on a rented machine, 3 pairs (v3) | the organism's work unchanged (rounding-level) | the cluster's p95 **2.9 s → 150 ms**, p99 −97%, time over the line **51% → 0**, failed requests **0.14% → 0** | 6 machines in both arms | inside the noise (standby model); the organism's energy −0.4% (model) | `results/live/V3_BIG_ORGANISM.md` |
 | The organisms at 1, 10, 100 and 1,000 copies × 1 to 1,000 runs, 84 of 90 cells | every organism superior within guardrails in every cell of 10 runs or more; work per energy +0.07% to +0.37%, the same figure at every size; the six cells left are beyond the machines available | `results/scale/GRID.md` |
 | Power grid, 11 SimBench grids in pandapower, A/B/C (v1 and v3 identical) | with ZIP loads energy drawn and net import better in all 11; losses better in 7, worse in 4; tap operations fewer in 10, 4 → 8 a year in one (worse, the declared cost) | `results/live/V3_PANDAPOWER.md` |
 | Robot arms, MuJoCo Menagerie, A/B/C | Gen3 and Panda: peak torque −29% and −10%, tracking error −21%, energy per takt −0.8% and −0.5%; the Panda's copper +14% worse; UR5e and iiwa left native | `results/live/V3_MUJOCO.md`, `V1_MUJOCO_PANDA.md` |
@@ -8540,8 +8552,10 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 
 1. **Azure, the fleet that can show one machine**: steady and burst on 40 workers, v3; waiting on Azure's cluster
    capacity in eastus (the only region where this subscription has more than 10 cores). Then B and C.
-2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack runs on a rented
-   machine (10,800 s window, three repetitions, about 20 hours); the tower follows.
+2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack is done, 3 of 3 on
+   the clock (`results/live/V3_BIG_ORGANISM.md`: the cluster's p95 2.9 s → 150 ms, time over the line 51% → 0, failed
+   requests 0.14% → 0, machines and energy unchanged, 22 s behind a 10,800 s window); the tower runs now on a second rented
+   machine the same way (about $10, about a day).
 3. **The real card**: the founder's runs on Lambda, one exact commit.
 4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, no engine file changes): the kill scenario is done
    (`results/live/V3_ROBUST_KILL.md`: every setting back 7 to 11 s after the kill in 30 of 30 repetitions) and the
