@@ -59,6 +59,8 @@ SOURCES = [
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
     ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs, three runs", "V3_BATCH.json",
      {"speed": MEAN, "machines": NODES, "energy": STANDBY}, None),
+    ("Real Kubernetes (GitHub)", "A public day of demand: the Google cluster trace of 2011 replayed one step at a time, ten pairs, three runs",
+     "V3_TRACE_GOOGLE2011.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
 ]
 REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer, GitHub)", "Real messaging (Apache Kafka, GitHub)",
         "Real cache (Redis, GitHub)", "Real database cache (MongoDB under YCSB, GitHub)",

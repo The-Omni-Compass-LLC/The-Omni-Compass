@@ -33,7 +33,7 @@ from realms.harness import STACK, TOWER, ORGANISM_ALIAS, organism_sizes  # noqa:
 OUT = ROOT / "docs" / "DOSSIER.md"
 FIG = ROOT / "docs" / "dossier"
 SURF, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
-SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"]   # validated categorical order
+SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#8a63d2"]   # validated categorical order
 BANNER = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not "
           "open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, "
           "commercialization, monetization, production use, redistribution, hosted service or incorporation into a product "
@@ -160,7 +160,10 @@ def main():
     # ------------------------------------------------------------------ 2. Real Kubernetes on v3, three runs each
     K8S = [("STEADY", "Steady work in steps", "equal by design"), ("WANDERING", "Demand that wanders", None),
            ("ALL_FOUR", "All four in one run", "capacity"), ("FAIRNESS", "Fairness, a noisy neighbour", None),
-           ("FAULTS", "Faults: machine down, spike, runaway pod, blind probe", None), ("BATCH", "A queue of batch jobs", None)]
+           ("FAULTS", "Faults: machine down, spike, runaway pod, blind probe", None), ("BATCH", "A queue of batch jobs", None),
+           ("TRACE_GOOGLE2011", "A public day of demand: the Google cluster trace of 2011, replayed one step at a time", None)]
+    K8S = [k for k in K8S if (ROOT / "results" / "live" / f"V3_{k[0]}.json").exists()]   # a test joins when its three-run table lands
+    NUM = {6: "Six", 7: "Seven", 8: "Eight"}.get(len(K8S), str(len(K8S)))
     P95, MEAN_RT = "response time (ms), 95th percentile", "response time (ms), mean"
     NODES, FAILED = "worker nodes in service, mean", "failed requests (%)"
     STANDBY = "energy (Wh)"                     # the standby model, as the three-run table names it
@@ -198,7 +201,7 @@ def main():
     style(ax, "Real Kubernetes on Omni v3: response time against native, three runs of ten pairs each (p95; the batch queue's mean)", "change (%)")
     fig.tight_layout(); fig.savefig(FIG / "k8s_v3.png", facecolor=SURF); plt.close(fig)
     L += ["## 2. Real Kubernetes, Omni v3, every test three times (evidence class L)", "",
-          "Six tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the "
+          f"{NUM} tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the "
           "replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a "
           "fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **confirmed better** or "
           "**confirmed worse** only when all three runs move the same way with every 95% interval clear of zero; otherwise it "
