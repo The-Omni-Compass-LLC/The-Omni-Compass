@@ -182,6 +182,24 @@ result is recorded here when it has run, and it is not counted.
   transaction lines scale with it (0.6 ms a point select or indexed update, 8.4 ms read-only, 10.8 ms read-write). The one
   repetition's whole-arm figures are recorded, not counted. A fourth smoke run follows; the counted runs begin on its figures
   if the pool follows the working set both ways. Nothing else in this document changed.
+- **Fourth smoke run (37754681298, 09:09 UTC): the pool followed the working set both ways, and the rules stand.** On a
+  faster runner than the first three (hits 0.06 to 0.08 ms, miss-heavy notches 0.11 to 0.13 ms, every reading well under the
+  0.24 ms center), omni gave the pool back to 256 MB at the first notch, grew it to 896 MB on the cold start of the second
+  (the first reads of each table come from the file system before the page cache has them, and those are slow: a fail-up on
+  a real stall), gave back to 512 MB as the misses fell under one percent, grew again to 640 and then 1,024 MB as the tables
+  in use widened to four, five and six, and gave back chunk by chunk to 256 MB as they narrowed to one, ending where the
+  working set was. The one repetition's whole-arm figures, recorded and not counted: work inside the line 2,936 against
+  2,945 a second (−0.3%); p95 0.24 against 0.23 ms; pool held 672 against 512 MB (+31%); pages read from disk 189,773 against
+  268,721 (−29%); host CPU-seconds 86.3 against 92.1 (−6%); both arms handed back. One figure is the knob's own cost and the
+  gauges will carry it: at one notch the mean latency read 0.57 ms against a p95 of 0.26 ms, a heavy tail from the server's
+  own stall while it resized the pool; the mean-latency row is where that shows, and it will be judged like every other row.
+  Two things are declared on these figures before the counted runs. The hit latency of GitHub's runners ranges from 0.06 to
+  0.22 ms across the four smoke runs, so on a fast runner the compass reads calm throughout and the pool is governed by the
+  miss-share gate and the fail-up alone; on a slow runner the center also bites; both are the same rule applied to what the
+  server reports, and the counted runs will pool them as they come. And the memory the governor holds over a whole run may
+  read above native's (it buys pool for the wide notches and gives it back for the narrow ones), which the resource row will
+  show as WORSE if it does; the question the benchmark asks is whether the misses it saves bought any service, and the work,
+  p95 and CPU rows answer it. **The counted runs A, B and C begin on these rules, unchanged from here.**
 
 ---
 
