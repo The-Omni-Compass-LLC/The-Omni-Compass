@@ -13,7 +13,8 @@
   the first day of the Google cluster-usage trace 2011 (jobs submitted an hour, 18 public parts named with their SHA-256)
   turned into the wandering test's load schedule by a rule written before the runs (min-max onto 1 to 8 generators, one
   step a bin, 24 steps of 108 s), the receipt committed; everything else is the wandering test's. Runs A, B and C on v3
-  follow the push. The register's queue rows for robot arms and drones now read done (they were).
+  dispatched at 18:43 UTC on commit `13ee69e8`: 37826513664, 37826518868, 37826522419. The register's queue rows for robot
+  arms and drones now read done (they were).
 - **MySQL under sysbench, the second counted set A2/B2/C2 on the amended plug: the pool given back on read-mostly working sets,
   bought on a written one, handed back on every arm** (`results/live/V3_SYSBENCH.md`, runs 37770617236, 37770620582,
   37770624805, commit `a033fd09`, Omni v3): the pool held **−67% on burst and −50% to −56% on read_only, confirmed better**; on

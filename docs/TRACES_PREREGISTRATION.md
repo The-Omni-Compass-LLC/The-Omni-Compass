@@ -65,6 +65,13 @@ the steps in the receipt. Nothing in this table was changed after the runs were 
 - **Engine**: Omni v3, checked on every run by `tools/omni_version.py --commit`.
 - **Cost**: free (GitHub's runners); about 1 h 40 min a run, the ten repetitions in parallel.
 
+## Dispatched (2026-10-08 18:43 UTC, on commit `13ee69e8`, Omni v3)
+
+Three dispatches of `benchmark-reps` with the inputs above (`duration_s` 2592, `arms` native compass, `loadgen` open,
+`load_steps` 2 3 3 3 3 4 4 3 2 2 2 2 2 3 2 3 4 4 3 4 5 6 5 4, no replica ceiling): **A 37826513664, B 37826518868,
+C 37826522419**, ten paired repetitions each, in parallel. Nothing above this line changed after the dispatch; the
+derivation receipt in `results/traces/google2011/schedule.json` is the one committed in that commit.
+
 ## What a referee should ask, and the answers given before the result
 
 - *Is a batch cluster's job arrival a fair stand-in for a web service's demand?* It is a real day's demand shape measured
