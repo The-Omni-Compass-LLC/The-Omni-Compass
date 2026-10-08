@@ -183,10 +183,12 @@ def robust_memory(d):
     f = d / "rss.csv"
     if not f.exists():
         return None
-    rows = [r for r in csv.DictReader(open(f)) if r.get("rss_kb") and int(r.get("processes") or 0) > 0]
+    rows = [r for r in csv.DictReader(open(f)) if r.get("rss_kb") and int(r.get("processes") or 0) > 0 and float(r["rss_kb"]) > 0]
     if len(rows) < 4:
         return None
     t = [float(r["epoch_s"]) for r in rows]; rss = [float(r["rss_kb"]) for r in rows]
+    if t[-1] - t[0] < 1200:
+        return None          # the first and last ten minutes must not overlap: the ratio is for the long run
     first = [v for tt, v in zip(t, rss) if tt <= t[0] + 600]; last = [v for tt, v in zip(t, rss) if tt >= t[-1] - 600]
     a, b = sum(first) / len(first), sum(last) / len(last)
     return {"first_kb": a, "last_kb": b, "ratio": b / max(a, 1.0)}

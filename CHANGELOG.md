@@ -29,6 +29,17 @@
   (`tools/own_cost.py`, `results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size). `tools/live_reps.py`
   gains the robustness rows and `tools/confirm_abc.py` the three-run rows for them; `tests/test_robust.py` in
   `verify.py`. No engine file changes: `omni_controller/`, `omnicompass/` and `realms/` are the v3 bytes.
+- **Robustness smoke run passed** (run 37713124793, one repetition, 600 s, not counted): the governor killed at 240 s,
+  every setting back at the operator's 7 s later by the watchdog's hand-back, a second governor to the end, the reset
+  check passed. One harness fault fixed before the counted runs: the memory sampler's process-id join (every sample read
+  zero); the memory ratio now needs a window over twenty minutes. The kill (10 pairs × 3 runs) and long (3 pairs × 3
+  runs) scenarios dispatched on v3.
+- **The manual, further expanded**: the governor's audit read end to end, what an upgrade is and is not, why each
+  requirement of a stack is there, the four realms in prose, what the Azure, database and simulator runs taught us, the
+  twins and the three fingerprints, Appendix D as a table of every gauge with its source and class, Appendix G
+  (reproducing everything from a clean machine); the theory chapters carry what the grid has shown, the receipt's
+  arithmetic and the one number, and what closing the loop has shown since; the results reader carries the workload,
+  swarm, own-cost and robustness tables.
 - **Redis on v3, confirmed three times** (`results/live/V3_REDIS.md`, runs 37704450300, 37704464642, 37704479534, all
   omni-v3 at `467f73eba7a6`): on all three untouched workloads (small, large, burst) work inside the 2 ms line +14% to
   +27%, the hit rate +14% to +27% and the mean latency −30% to −61%, confirmed better; no failed request; the memory

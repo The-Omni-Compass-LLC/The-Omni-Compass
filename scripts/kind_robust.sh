@@ -31,8 +31,8 @@ settings() {   # one line: the knob state as the operator should find it
 native_state() { [ "$1" = "target=50 range=${HPA_RANGE:?} limits=500m workers=${WORKERS}/${WORKERS} left=none" ]; }
 # the governor's resident memory, every 15 s, every governor process there is (the first, then the second)
 ( echo "epoch_s,rss_kb,processes"; while :; do
-    pids=$(pgrep -f "omni_controller.controller" 2>/dev/null | tr '\n' ' ')
-    if [ -n "$pids" ]; then rss=$(ps -o rss= -p $(echo "$pids" | tr ' ' ',') 2>/dev/null | awk '{s+=$1} END{print s+0}'); n=$(echo "$pids" | wc -w); else rss=0; n=0; fi
+    pids=$(pgrep -f "omni_controller.controller" 2>/dev/null | paste -sd, -)
+    if [ -n "$pids" ]; then rss=$(ps -o rss= -p "$pids" 2>/dev/null | awk '{s+=$1} END{print s+0}'); n=$(echo "$pids" | tr ',' '\n' | grep -c .); else rss=0; n=0; fi
     echo "$(date -u +%s),$rss,$n"; sleep 15; done ) > "$OUT/rss.csv" &
 rss_pid=$!
 say "robust $MODE: window $D s, start $t0"

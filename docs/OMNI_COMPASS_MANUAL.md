@@ -217,7 +217,7 @@ written before the run, confirmed only when three separate runs agree, and repor
 18. Python, C++ and the Seal
 
 **Back Matter** - Glossary; Appendix A Command Reference; Appendix B File Map; Appendix C The Equations in Full;
-Appendix D Metrics; Appendix E Troubleshooting; Appendix F Evidence Map; Contact
+Appendix D Metrics; Appendix E Troubleshooting; Appendix F Evidence Map; Appendix G Reproducing Everything; Contact
 
 ---
 
@@ -360,6 +360,19 @@ runs on computers that must be cooled and powered, plus its own domain muscles.
 | 4. Distribution / Specialized | 440 | networks, storage, databases, commerce, workflows, radio networks, clinical systems, ports |
 | 5. The four stacked, every duplicate kept | 1,716 | all four realms on one clock, the shared spine counted in each |
 | 6. The whole tower, every muscle once | 945 | every distinct muscle on one clock |
+
+The realms differ in what their domain muscles are and in how much slack their native controllers leave. Compute, AI and
+Cloud is clusters, cards, training and inference pools and cloud capacity, where the knobs are replica targets, machine
+counts, clock ceilings and power limits, and where native controllers are already good, so the modelled gains are small
+and the real gains come from the queue and the tail. Physics, Robotics and Autonomous is joints, fleets, vehicles, flight
+and spacecraft axes, where the knob is a speed or effort limit and the physics decides, axis by axis, whether spending
+slack as speed saves energy at all; this is the realm the v3 slack gate was written for. Energy, Facility and Industrial
+is data halls, buildings, batteries, UPS, process loops, feeders and plants, where the knobs are setpoints, units in
+service, reserves and taps, and where the muscles with the most room are also the ones whose reserves exist for a reason
+the model does not contain (a UPS held for an outage is never a lever). Distribution and Specialized is networks, storage,
+databases, commerce, workflows, radio networks, clinical systems and ports, where the knob is usually an admission, a
+pool or a replica count, and where the real stacks of this manual (the pooler, the broker, the cache) live. Every realm's
+list, by family and knob, is `docs/REALM_MUSCLES.md` and `docs/REGISTER.md` section 1.
 
 ### 2.3 What an organism run is
 
@@ -938,6 +951,17 @@ not in Omni-Compass.
 | CPU power control | Linux cpufreq with the schedutil governor; RAPL for package watts; usually bare metal |
 | Site power and cooling | a command that prints site watts, and a command that sets the supply-air setpoint through your building management system |
 
+**Why each requirement is there.** Kubernetes 1.34 or newer is required because the conveyance muscle resizes a pod's CPU
+limit in place, which older versions do only by restarting the pod, and a restart is a disruption Omni-Compass never
+causes. metrics-server is the HPA's own eyes and the governor's: without it neither knows what the pods use. An HPA with a
+CPU target on each governed service is the native controller Omni-Compass sits on; a service without one has nothing for
+level 2 to move. A readiness probe and a short preStop pause are what make a drain invisible to clients: the Service
+stops sending requests to a pod before it stops, and kube-proxy sends them to another ready endpoint. The response-time
+feed is the one wire a cluster does not already have: Kubernetes knows what its pods use, not what its users wait; the
+compass needs the second, and `scripts/latency_probe.py` writes it against any HTTP endpoint every five seconds. On the
+GPU, root is needed only for the two `nvidia-smi` writes, and a VM must pass the whole card through or the driver refuses
+to lock clocks (the wire check's step 3 is where that shows).
+
 ### 9.2 Get the software and check it
 
 ```
@@ -1325,11 +1349,36 @@ three: every setting at native, read back, with no record left.
 | `decided_by: thermal_hold` | the card reported a heat slowdown; nothing was tightened |
 | `foreign_writer` | someone else changed a knob; Omni-Compass now observes only |
 | `restored ... ok: true` | the OFF switch put every setting back and read it back |
+| `"watchdog": "handed back"` (in the watchdog's own log) | a governor died or hung without handing back; the watchdog ran its recorded restore command; `ok` says whether every command exited 0 |
+| `cruise: on` / `cruise: off` | work waited for a place for two decisions: every machine in service; the line has been empty for two: cruise ends |
+| `emergency_brake` | the work is done and demand is at zero: straight to the floor in one move |
+| `verdict_state: left native` | no step of the slow knob passed the paired trial: the knob is never moved on this muscle |
+| `shield_interventions` | the shield clipped a write to its bounds or its step limit; the count says how often |
+| `overhead` (the last line of the audit) | the governor's own CPU over the window: its process and every command it ran |
+
+**How to read an audit from end to end.** The audit (`audit.jsonl`, one JSON record a line, every line timestamped) is the
+governor's complete account of itself, and a reader can follow a run through it without the manual: the first lines are
+the snapshot (every setting as found, written to the objects as annotations so a watchdog can restore from them); then,
+every decision, the readings (the response time and its age, the pods waiting, the machines seen, whether any sense is
+blind), the compass's position and force (`compass`), the authority the nervous system granted and the release gate's
+reason (`authority`, `node_gate`), the decision itself (the machines recommended against the machines seen, the HPA
+target set), every write with the command that made it and the value read back, and the decision's wall time
+(`decision_ms`); in cruise, the floor step's silence; at the end, the reset's writes and read-backs and the `overhead`
+record. The benchmark harness prints a decision trail from the audit at the end of every omni arm (`scripts/kind_bench.sh`),
+one line a decision, so a reviewer reading a run's log sees what the governor saw and did at each minute.
 
 ## 12. Maintenance, Upgrades and Security
 
 - Run `python3 verify.py` after every upgrade; it must end `VERIFICATION: PASS`.
 - Upgrade in watch mode first; take the levels again from level 1.
+
+**What an upgrade is, and what it is not.** The engine is frozen and fingerprinted (section 15). An upgrade that changes
+any engine file, a rule, a gain, a guard, a preset or a muscle, is by definition the next engine version, and every
+published result is run again on it before it is quoted beside the old ones; `tools/omni_version.py` says which version a
+checkout carries, and a checkout that matches none says which files differ. An upgrade that changes only the harness,
+the tools, the tables or this manual leaves the engine's fingerprint as it was and every result standing; the robustness
+harness of section 16.8 is an example, built without touching an engine file. An operator can therefore tell, from one
+command, whether a new checkout is the engine the results were made on or something that must prove itself again.
 - The container runs non-root, read-only, with no capabilities; the Kubernetes identity has only the permissions of
   the level you run.
 - The GPU governor needs root only for `nvidia-smi -pl` and `-lgc`.
@@ -2047,6 +2096,37 @@ manifest per repetition). The table tool named in the table's text (`tools/confi
 table from those folders; `tools/omni_index.py` rebuilds the index from the tables; `tools/dossier.py` rebuilds the
 dossier. The preregistration named in the table's text holds the rules, written before the first counted run, with every
 amendment dated. Nothing in that chain is by hand.
+
+## Appendix G - Reproducing Everything, From a Clean Machine
+
+A referee with a laptop and a GitHub account can rebuild every table in this manual and rerun every benchmark. The steps,
+in order, with what each costs:
+
+1. **Get the code and prove it is the code.** `git clone` the repository, `pip install -r requirements.txt` under Python
+   3.12 (the version GitHub runs), then `python3 verify.py`: it checks every sealed file's fingerprint, runs every test in
+   `tests/`, including the rules of every three-run table on fixed cases, and ends `VERIFICATION: PASS`. About ten
+   minutes on a laptop. `python3 tools/omni_version.py` then says which frozen engine the checkout carries.
+2. **Rebuild any table from its raw files.** Every three-run table names its three run ids; their files are in
+   `results/live/raw/run-<id>/`. `python3 tools/confirm_abc.py "<title>" results/live/raw/run-<A> results/live/raw/run-<B>
+   results/live/raw/run-<C> --out /tmp/check.md` rebuilds a Kubernetes or Azure table; `tools/pgbench_abc.py`,
+   `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py` and `citylearn_abc.py` the others,
+   with the same arguments. Compare the result with the committed table: they are the same bytes below the legal notice. A
+   few seconds each.
+3. **Rebuild the index and the dossier.** `python3 tools/omni_index.py` reads every `V1_*.json` and `V3_*.json` table and
+   writes `results/OMNI_INDEX.md`; `python3 tools/dossier.py` writes `docs/DOSSIER.md` and its charts. Seconds.
+4. **Rerun a benchmark.** Every benchmark is a GitHub Actions workflow with its inputs documented at its head
+   (`.github/workflows/`): `benchmark-reps` for the Kubernetes tests (`duration_s`, `arms`, `loadgen`, `load_steps`,
+   `faults`, `workload`), `pgbench`, `kafka`, `redis`, `swarm`, `robustness`, `citylearn`, `pandapower`, `mujoco`, `six`,
+   `six-kube`. Dispatch it three times for A, B and C; each run archives its files when its id is added to
+   `.github/archive_request.txt`. The Kubernetes tests run on GitHub's free runners in about an hour each; the database,
+   broker, cache and swarm runs in about half an hour; the organisms at 1,000 copies need a rented machine (`aks-metered`
+   and `big-organism-detached` need an Azure subscription and its credentials in the repository's secrets).
+5. **Run it on your own system.** Section 13 is the method; `scripts/kind_paired.sh` and `tools/live_reps.py` are the
+   tools; the preregistrations are the templates for writing your own rules down before you run.
+6. **Check a result against its preregistration.** Each `docs/*_PREREGISTRATION.md` was committed before its first
+   counted run; `git log` on the file shows when, and every amendment carries its own date and reason in the text.
+
+Nothing in this chain requires a credential, a licence key or a word from us; the evaluation licence covers all of it.
 
 ## Contact
 

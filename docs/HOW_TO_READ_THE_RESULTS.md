@@ -102,6 +102,31 @@ confirmed". The `V1_` or `V3_` in the name is the engine the runs carried (`pyth
 a table never mixes engines, and a reading is never carried from one engine to another. Losses are in the table beside
 the gains: the database's host CPU-seconds, the grid's losses in four grids, the Panda's copper, CityLearn's bill.
 
+## The workload tables (`V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`) and the swarm table (`V3_SWARM.md`)
+
+The database, the broker and the cache share one shape. The head names the three runs, their commits and the engine each
+carried. Then one section per **workload**: the tuning workload first, marked "shown and not counted" because the rules were
+fitted on it, then the untouched workloads, which are the judged ones. Each section says what the workload is (value sizes,
+rates, steps) and what native's own capacity measured on that run, so the reader knows how hard native was pushed. The
+rows are the gauges with their direction in the name: the first row is always **work inside the response line**, the
+product number; then throughput, the latency percentiles, failures (any increase in any run is WORSE), **the resource
+held** (connections, consumers, the memory ceiling: lower is better, and Omni-Compass holds more of it wherever it bought
+a gain, so expect WORSE there), the host's CPU (the compass's own cost included), and the knob's moves (shown, not
+judged). The last line of each section says whether every arm handed the knob back; the last line of the table counts the
+rows better, worse and disagreeing across the untouched workloads. The swarm table reads the same way with cells instead
+of workloads, with collisions voiding a cell, and with a declared reproduction tolerance (one part in a thousand) because
+PyBullet does not reproduce to the bit across machines; its amendment says so.
+
+## The governor's own cost (`V3_OWN_COST.md`) and the robustness tables
+
+`V3_OWN_COST.md` is Omni-Compass's own CPU, from the `overhead` record every omni arm's audit carries, by organism and
+copies, under the engine each run carried; it is shown and not judged, and it is a few thousandths of one core at every
+size. The robustness tables (V3_ROBUST_KILL.md and V3_ROBUST_LONG.md in `results/live/`, when they land) add rows that belong to the omni
+arm alone, since native has no governor to kill: the seconds from the kill until every setting was back at the operator's
+(the allowance is 60 s, declared before the run), whether a second governor started and governed to the end, and the
+governor's memory in the last ten minutes over the first ten (a quarter's growth is a leak, declared before the run); the
+120 s after the kill are compared between the arms like any paired gauge.
+
 ## The organisms with a real cluster inside (`V1_SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`)
 
 Two kinds of rows, kept apart: **the cluster** (real Kubernetes, measured) and **the organism** (the modelled stacks

@@ -103,6 +103,17 @@ three paired repetitions, three runs, V3_ROBUST_LONG.md in the same place. Scena
 the archived files (`tools/own_cost.py`). `tests/test_robust.py`, run by `verify.py`, proves the kill and hand-back marks,
 the window reading, the memory rule and the three-run rows on fixed cases without a cluster.
 
+## The smoke run, said before the counted runs (2026-10-08 02:00 UTC, run 37713124793, one repetition, 600 s, not counted)
+
+One repetition of the kill scenario on a 600 s window exercised the harness end to end before any counted run: the
+governor was killed at 240 s, the watchdog's one hand-back put every setting back at the operator's **7 s** after the kill,
+the second governor started at 300 s and made its decisions to the end, the reset check passed, and the 120 s after the
+kill read 4.8% of samples over the line in native against 2.9% in omni (one repetition, no interval). One harness fault
+was found and fixed before the counted runs: the memory sampler joined process ids with a trailing comma, so every
+memory sample read zero; the join is fixed (`scripts/kind_robust.sh`), and the memory ratio is now computed only for
+windows longer than twenty minutes, so the first and last ten minutes cannot overlap (`tools/live_reps.py`). Nothing in
+the scenarios, the gauges, the allowance or the limits changed. The smoke run is not counted and is kept in the record.
+
 ## What is declared before the first run
 
 The 60-second hand-back allowance is the sum of the watchdog's pass (5 s), the restore command's own run (one kubectl per

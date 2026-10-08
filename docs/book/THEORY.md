@@ -280,6 +280,16 @@ Three openings were found and each has its closure:
    corrected two-wire compass, `results/sim/gpu_two_wire/`).
 3. **The corner.** clip() is a hard stop; tanh is its smooth form. The compass uses tanh.
 
+**What closing the loop has shown since.** The compass law of the second opening is the law every result in the manual
+was made on: it was frozen as Omni v1 on 5 October 2026 with its proofs untouched, grown to the 945-muscle catalog as v2,
+and given one gate as v3, the slack gate on speed knobs, after the v2 realms read a service tradeoff on the Physics realm
+and the tower. That gate is the closed circle applied to a muscle's physics: an axis that is busy more than half the time
+at full speed has no slack to spend, and a law that spent it anyway would be spending energy for nothing; with the gate,
+every organism reads superior within its guardrails and zero muscles read worse (`results/realms/REALMS.md`). On real
+software the same law, read through the plug and the read-back, is the law of the Kubernetes, database, broker and cache
+tables, with their gains and their losses. The first opening, the basin's negative side, remains open and documented: it
+would be a new version with its own proof, and no result depends on it.
+
 # The Physics of a Processor
 
 A GPU's firmware raises its clock one step at a time whenever there is work and room; each higher clock needs a higher
@@ -311,13 +321,27 @@ Each organism is run at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1
 clock. Every receipt shows work per energy, work, energy, the time spent outside the service line, and whether every
 knob was handed back.
 
+**What the grid has shown.** On Omni v3, 84 of the 90 judged cells are done (`results/scale/GRID.md`): every organism
+reads superior within its guardrails in every cell of ten runs or more, with work per energy +0.07% (the Physics realm) to
++0.37% (the Energy realm, the four stacked and the tower), the work unchanged, the time over the line not above native's,
+and every knob handed back. The figure is the same at every size, from one copy to a thousand, which is the property the
+grid exists to test: one brain stays coherent at 1.7 million muscles. The six cells left, 100 and 1,000 runs at 1,000
+copies, are beyond the machines available and are declared, not hidden. The number is small because the native controllers
+in the models are well tuned and leave little room; it is real within the model, and it is never counted in the Omni
+index, which is made of real stacks only.
+
 On a GPU machine the real card is wired into each organism as one more muscle of its NVIDIA GPU family; its own power
 meter and its requests are counted in the organism's receipt, kept apart from the modelled plants and also added to
-them. Real Kubernetes is benchmarked separately on real clusters.
+them. Real Kubernetes is benchmarked separately on real clusters, and it is also wired into the organisms as one more
+muscle (`tools/run_kil.py`): at 1 to 100 copies on GitHub's machines and at 1,000 copies on a rented machine, the
+organism's own compute demand drives a real load generator against a real service on a real cluster, and the cluster's
+watts come back into the organism as heat and load. Those runs are labelled "L + S": the cluster is live software, the
+organism around it a model.
 
 The six organisms are models (evidence class S). They show how the law behaves across hundreds of kinds of machine at
-once and whether its effect is stable as the count and the size grow. Real Kubernetes and the real card are the anchors
-measured on real software and a real meter.
+once and whether its effect is stable as the count and the size grow. Real Kubernetes, the real database, the real broker,
+the real cache and the real card are the anchors measured on real software and, for the card, a real meter; their results
+and their losses are in the manual's section 16.
 
 # The Economics of a Receipt
 
@@ -337,6 +361,20 @@ The value a customer sees comes in three forms, each on its own line of the rece
 
 The babysitting tax - the people and tools kept on the clock to set caps, answer pages and turn knobs back after a run
 or a crash - is the cost Omni-Compass removes by holding the knobs and returning them itself.
+
+**The receipt's arithmetic, and the one number.** With the work held equal, a gain G in productivity is the same
+measurement as a saving S = G / (1 + G) in resources: a third more work is a quarter off the bill (manual, section 3.4).
+Across every real stack the one number is the Omni index (`results/OMNI_INDEX.md`): each test's work, speed, machines and
+energy as ratios, combined by geometric means so that a gain and an equal loss cancel exactly, each real category weighed
+the same, and only rows confirmed in three separate runs counted. The index is honest in both directions by construction.
+As this edition is written it reads +30.2%: real Kubernetes +25.5%, the database +14.2%, messaging +166.9%, and the cache
+−24.9%, the last negative because the memory the governor holds for a wide working set is the resource it trades and
+reads worse by rule, even as the cache's work and hit rate read better. A buyer reads the category that matches their
+stack, and reads its losses in the same table as its gains.
+
+**What a receipt is not.** A receipt is not a forecast. It is the measured difference between two arms on one system at
+one time, with its interval. The only number that applies to a customer's system is the one their own paired runs produce,
+and the method of those runs is the manual's section 13, the same method every table in this book was made with.
 
 ---
 
