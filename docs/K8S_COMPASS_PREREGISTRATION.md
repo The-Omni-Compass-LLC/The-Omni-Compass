@@ -872,12 +872,16 @@ is a statement about the lever, not about the law. This run makes the lever big 
   pre-flight passing each time): 32 refusals across seven dispatches. Repetitions 4 and 5 never reached Azure's cluster
   service: the pre-flight itself found only 2 of the 10 vCPUs free in two of the nine families (`standardDSv4Family`,
   `StandardDasv7Family`), and the fleet is dispatched only when every family has room, so it stopped with nothing built and
-  nothing billed. Nothing of ours is known to run in those two families (the rented machines of the 24-hour robustness run and
-  the tower are `Standard_D4as_v4` and `Standard_D8as_v4`, the DASv4 family), so the held vCPUs are either a cluster of an
-  earlier refused repetition that Azure left behind in a failed state, or another tenant of the subscription; an inventory of
-  the subscription's resource groups and per-family usage is taken by a read-only workflow before anything else is done, and
-  any group left behind by a finished run of ours is deleted and named here. The eighth dispatch follows the inventory, unchanged
-  in every input. Nothing else changes.
+  nothing billed. An inventory of the subscription (`.github/workflows/azure-inventory.yml`, run 37773586107, 11:58 UTC)
+  answered it: the subscription holds exactly four machines, all ours and all running, and no cluster, scale set or group
+  left behind by any earlier repetition. The holders are the three machines of the 24-hour robustness run
+  (`docs/ROBUSTNESS_PREREGISTRATION.md`, scenario 2b): the detached start job, which tries the size it is given and falls back
+  through the eight-core sizes it may rent when the allowance refuses it (the four-core size asked for was refused because the
+  tower's machine held its family's allowance), rented `Standard_D8as_v7`, `Standard_D8s_v7` and `Standard_D8s_v4`, eight vCPUs
+  in each of the Dasv7, Dsv7 and DSv4 families, where the allowance is 10, and the fleet's pre-flight (which asks every one of
+  its nine families for 10 free vCPUs) found 2. The tower's `Standard_D8as_v4` holds 8 of the DASv4 family's 10 the same way.
+  Nothing is deleted. The eighth dispatch, unchanged in every input, follows the collect that deletes the 24-hour machines
+  (about 2026-10-09 12:00 UTC); until then the fleet cannot pass its own pre-flight, and that is the pre-flight doing its job.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

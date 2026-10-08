@@ -11,9 +11,10 @@
 - **The fleet's seventh dispatch ran no arm; an inventory workflow for the subscription** (`docs/K8S_COMPASS_PREREGISTRATION.md`
   amendment 8; `.github/workflows/azure-inventory.yml`): repetitions 1 to 3 refused by Azure's cluster capacity in eastus as
   before (32 refusals across seven dispatches); repetitions 4 and 5 stopped at the pre-flight, which found only 2 of 10 vCPUs
-  free in two machine families where nothing of ours is known to run. The new workflow lists, read-only, every resource group,
-  AKS cluster, machine and scale set and one region's per-family vCPU usage, and deletes only groups named in full that begin
-  with our own runs' prefixes; it is run before the eighth dispatch.
+  free in two machine families. The new workflow lists, read-only, every resource group, AKS cluster, machine and scale set
+  and one region's per-family vCPU usage, and deletes only groups named in full that begin with our own runs' prefixes. Its
+  first run (37773586107) found exactly our four machines and nothing left behind: the holders are two of the 24-hour
+  robustness machines, rented as eight-core sizes in those families; the eighth dispatch follows their collect.
 - **MySQL under sysbench, the first counted set A/B/C on v3, every row inside the noise, and a hand-back finding**
   (`results/live/V3_SYSBENCH.md`, runs 37757840760, 37757850988, 37757861572, commit `23f6ca4c`; `docs/MYSQL_PREREGISTRATION.md`,
   register row 24, proof-program row 11, the v3 record): on the four untouched workloads no gauge-row is confirmed better or
@@ -30,8 +31,10 @@
   counted set dispatched on the amended plug at 11:31 UTC, commit `a033fd09`: runs 37770617236, 37770620582, 37770624805.
 - **The 24-hour robustness run dispatched on three rented machines** (`docs/ROBUSTNESS_PREREGISTRATION.md` scenario 2b, the
   dispatch record): runs 37761059781, 37761072412 and 37761084779 of `big-organism-detached` with `test=robust`, 86,400 s an
-  arm, one pair a machine, commit `4d5633dd` (v3), eastus `Standard_D4as_v4`, all three rented at the first attempt and
-  running by 10:20 UTC; collected and deleted at 60 hours at the latest. The index tool carries the MySQL table's entry
+  arm, one pair a machine, commit `4d5633dd` (v3), eastus, all three rented at the first attempt and running by 10:20 UTC;
+  collected and deleted at 60 hours at the latest. Corrected from the subscription's inventory the same day: the start job
+  rented eight-core machines of three families (`Standard_D8as_v7`, `Standard_D8s_v7`, `Standard_D8s_v4`), not the four-core
+  size the scenario named; about $55 to $70 for the three, the rules unchanged, the correction in the scenario's record. The index tool carries the MySQL table's entry
   ahead of the result (silent until the sysbench table exists in `results/live/`).
 - **The manual, twelve thin sections expanded** (1.4 nothing hardwired, 1.5 the word, 2.3 the organism receipt, 2.4 the two
   axes of the grid, 2.5 the clock rule and the 1,000-copies result, 2.6 reading a register row, 3.1 why the room is there,
