@@ -5,7 +5,7 @@
 
 > **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `596359bc`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `d88461a8`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ## 1. The mechanism, and proof that it is the one that ran
 
@@ -63,6 +63,19 @@ Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer 
 | `light` | **+16% to +16%, confirmed better** | **-99% to -99%, confirmed better** | **+255% to +297%, confirmed WORSE** | **+10% to +20%, confirmed WORSE** |
 
 Native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5% waited about 1.6 s; Omni added consumers while messages waited and gave them back when the queue was empty, so its slowest 5% waited 9 to 14 ms, at the cost of three to four times the consumers running, confirmed worse and counted against Omni in the index. No message was lost in any arm; every count was handed back. Table: `results/live/V3_KAFKA.md`.
+
+## 3c. A real cache: Redis, the operator's memory ceiling, Omni v3, three runs (evidence class L)
+
+Redis as Ubuntu ships it with the operator's 64 MB ceiling and allkeys-lru is native; omni is the compass law on one knob, the ceiling, inside the cover [16, 512] MB through Redis's own console, growing only while the cache is full and giving a notch back when calm and nothing is evicted (`docs/REDIS_PREREGISTRATION.md`). An application with a declared 5 ms store trip on a miss and a working set that steps up and down; three paired repetitions a run, three runs; the tuning workload is shown and not counted. Runs: A 37704450300; B 37704464642; C 37704479534.
+
+| Workload | Work inside the 2 ms line | Cache hit rate | p95 | Memory ceiling held, MB (the resource held) | Host CPU-seconds |
+|---|---|---|---|---|---|
+| `tuning` (tuning, shown, not counted) | **+15% to +15%, confirmed better** | **+15% to +15%, confirmed better** | **-1% to -1%, confirmed better** | **+363% to +367%, confirmed WORSE** | no difference beyond the noise |
+| `burst` | **+14% to +15%, confirmed better** | **+14% to +15%, confirmed better** | **-1% to -0%, confirmed better** | **+205% to +215%, confirmed WORSE** | no difference beyond the noise |
+| `large` | **+14% to +14%, confirmed better** | **+14% to +14%, confirmed better** | no difference beyond the noise | **+294% to +301%, confirmed WORSE** | no difference beyond the noise |
+| `small` | **+26% to +27%, confirmed better** | **+26% to +27%, confirmed better** | **-1% to -0%, confirmed better** | **+320% to +325%, confirmed WORSE** | no difference beyond the noise |
+
+The memory the compass holds for a wide working set is the resource this benchmark trades, and reads worse by rule. Table: `results/live/V3_REDIS.md`.
 
 ## 4. The bill on a real cloud: Azure Kubernetes Service, Omni v1 (evidence class L, a metered bill)
 
