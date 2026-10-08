@@ -727,7 +727,7 @@ stack in this manual, so a referee can see that the "gains" differ only through 
 | PgBouncer, the pool size | time in the server plus time waiting for one, per transaction | 50 ms | 0.4 | 1 s | 2 s | [2, PostgreSQL's limit minus 10] |
 | Kafka, the consumer count | the group's own end-to-end latency, mean of the last second | 500 ms | 0.4 | 1 s | 3 s (a rebalance) | [1, the topic's partitions] |
 | Redis, the memory ceiling | the application's request latency, mean of the last second | 2 ms | 0.4 | 1 s | 2 s | [16 MB, 512 MB] |
-| MongoDB, the storage-engine cache | the server's own mean read latency, last second | 2 ms | 0.4 | 1 s | 2 s | [256 MB, 2,048 MB] |
+| MongoDB, the storage-engine cache | the server's own mean read latency, last second | 1 ms (set on the tuning workload's smoke run, from 2 ms) | 0.4 | 1 s | 2 s | [256 MB, 2,048 MB] |
 | A drone's cruise override | the drone's tracking error | 0.25 m, the declared safe error | 0.5 | one control tick (48 Hz) | 1 s | [1.0, 2.0] × the planner's cruise |
 | A substation's tap | the bus voltage in its band | the band's edge | 0.5 | one solve | a week of evidence before a step down | the tap's own range, one tap per move |
 | A robot axis's speed | the axis's tracking error against its takt | the declared error | 0.5 | one control step | the axis's response | the axis's own limits |
@@ -1298,7 +1298,8 @@ it, so the working set fits the operator's cache at the low notches and outgrows
 server's own mean read latency over the last second, from its `serverStatus` operation latencies, differenced. The wire out
 is one setting through the server's own console, `setParameter wiredTigerEngineRuntimeConfig cache_size`, inside the cover
 [256 MB, 2,048 MB]: the server's own floor at one end, a quarter of the machine at the other. The compass holds the reading
-at 40% of a 2 ms line. The direction rule is the cache's: slow reads grow the cache by notches of 64 MB only while the
+at 40% of a 1 ms line (written as 2 ms before the first smoke run and set at 1 ms on the tuning workload's figures, as the
+preregistration reserved; see below). The direction rule is the cache's: slow reads grow the cache by notches of 64 MB only while the
 cache is full (bytes in it at 90% of its size or more), because slow reads in a cache with room to spare are not the
 cache's to mend; calm with no page evicted in the last second gives back one notch a second after a five-second dwell; at
 95% of the line with the cache full a quarter of the cover is added at once. One writer, read-back and the hand-back at the
@@ -1307,6 +1308,32 @@ system's own page cache, a storage-engine cache miss is a read from memory and a
 gain available to this knob is smaller than it would be on a machine whose data does not fit in memory; the result will
 say what it is. The same plug fits any store whose engine exposes a cache size at run time (InnoDB's buffer pool, RocksDB's
 block cache) and any store that does not can only be sized at restart, which is not a knob Omni-Compass moves.
+
+**What the smoke runs taught, and why they are in the record.** A benchmark of a cache is only a benchmark if the
+working set reaches the cache. Three smoke runs of the tuning workload, one repetition each and none counted, were needed
+before the harness asked the question it was built to ask, and each is written in the preregistration with its run number
+and its figures. The first failed before an arm ran, on two harness faults (a relative file path handed to a program that
+runs from its own directory; a server log copied as a file the upload step could not read). The second ran end to end and
+showed the design did not touch the cache at all: YCSB's shipped request distribution is zipfian, which concentrates
+almost every request on a few thousand hot records whatever the key space, so at the top notch of 1.5 million records the
+cache held 36 MB of its 512 MB, both arms answered inside the line with a p95 of 0.20 ms, and omni, seeing calm and nothing
+evicted, gave memory back to the floor of the cover. That would have read as a free memory saving for Omni-Compass, and it
+would have been worthless: a knob with nothing to do had moved to its floor. The requests were changed to a uniform draw
+over the notch's key space so the working set is the key space, the one departure from YCSB as shipped, and said so. The
+third smoke still held 38 MB, and the per-notch figures the runner now prints showed why: the dataset was loaded with
+ordered keys but the run phase used YCSB's default hashed keys, so every read asked for a record that did not exist and
+was answered from the index alone, which fits in a few megabytes. The run phase now names ordered keys too. Nothing in the
+rules, the gauges or the workloads changed across the three. The fourth smoke reached the cache: native held 336 to 481 MB
+of its 512 MB across the notches and read 453,000 pages into it, and its per-notch figures set the line. The server's mean
+read latency ran 0.15 to 0.24 ms while the cache held the working set and 0.23 to 0.33 ms while it did not, with a p95
+never above 0.42 ms; against a 2 ms line every one of those readings sat in the bottom quarter of the band, under the 0.4
+center, so the compass could only ever read calm, the same fault as a Kubernetes line set at ten times the service's normal
+response. The line was set at 1 ms, the one change the preregistration had reserved for the tuning workload, with the
+center unchanged, so that a hit is calm and a full cache reading past 0.4 ms is slow; the one repetition's whole-arm figures
+(work inside the line −1.9%, cache held −31%, pages read +32%, host CPU +8%, p95 equal) are recorded and not counted. The
+point for a referee is the method: a result that flatters the governor is the first thing to suspect, the suspicion is
+pursued to a harness cause, the cause is written down with the run that showed it, a band is set on the tuning case's own
+figures and never on an untouched one, and the counted runs begin only when the harness provably asks the question.
 
 ---
 
@@ -1956,6 +1983,12 @@ any one of the three can tell whether the files in front of them are the files t
 | Own cost | the governor's CPU (its process and every command it ran) as a share of one core over the window, from its audit; a few thousandths of a core at every size |
 | Smoke run | one repetition that exercises a harness end to end before any counted run; never counted, always recorded |
 | L + S | an organism run with a real cluster inside: the cluster is L, the organism around it S |
+| Working set | the records a workload actually touches over a window; a cache benchmark measures nothing unless the working set reaches the cache |
+| Key space | the records a benchmark may ask for at one notch; in the MongoDB test the knob's load, stepped one notch at a time |
+| Uniform draw | every record in the key space equally likely, so the working set is the key space; YCSB's shipped zipfian draw concentrates on a few thousand hot records whatever the key space |
+| Ordered keys | records named in load order, so a run that asks for record n finds record n; a run with hashed keys against an ordered load asks for records that do not exist |
+| Full-cache gate | the MongoDB and Redis rule: slow reads grow the cache only while the cache is full (nine tenths used), because a miss in a cache with room to spare is not the cache's to mend |
+| Page cache | the operating system's own cache of file contents; where the data fits in it, a storage-engine miss is a read from memory and a decompression, not a disk read, and the gain available to the cache knob is smaller |
 
 ## Appendix A - Command Reference
 
