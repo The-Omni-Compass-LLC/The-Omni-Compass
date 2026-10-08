@@ -24,7 +24,9 @@
   nothing; the give-back gate is now the miss share under 1% of requests (the MySQL gate), growth is gated on missing the same
   way, and a second with no request moves nothing. Said before the runs: the MongoDB memory rows may fall to the noise, because
   the saving was the artefact. Tests cover every new case; the second (PostgreSQL, MongoDB) and third (MySQL) counted sets
-  follow on these rules, the earlier tables kept whole in `docs/history`.
+  follow on these rules, the earlier tables kept whole in `docs/history`. Dispatched 23:16 UTC on commit `310cf318`:
+  PostgreSQL A2/B2/C2 37858494179, 37858496620, 37858499033; MySQL A3/B3/C3 37858501997, 37858505059, 37858509109; MongoDB
+  A2/B2/C2 37858512907, 37858515717, 37858519010.
 - **The public-trace test done, A/B/C on v3: a day of demand nobody here wrote reads the same way as our own schedules**
   (`results/live/V3_TRACE_GOOGLE2011.md`, runs 37826513664, 37826518868, 37826522419, commit `13ee69e8`, 30 of 30 pairs
   valid): p95 **−65% to −71%**, p99 −49% to −61%, mean −51% to −55%, time over the line −81% to −84%, failed requests −8% to
