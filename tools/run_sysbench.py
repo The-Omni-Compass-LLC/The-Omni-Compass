@@ -56,7 +56,9 @@ PASSWORD = os.environ.get("MYSQL_PWD", "omni-bench")       # a local benchmark u
 DB = "sbtest"
 MB = 1024 * 1024
 PAGE = 16 * 1024          # InnoDB's page
-LINE_STMT_MS = 1.0        # the statement line: one SQL statement answered within 1 ms on the server (set on the tuning workload)
+LINE_STMT_MS = 0.5        # the statement line: one SQL statement answered within 0.5 ms on the server (set on the tuning workload's second
+                          # smoke run, from 1 ms: a hit reads 0.14 to 0.17 ms on this stack and a notch of page-cache misses 0.20 to 0.22 ms,
+                          # so the 1 ms line kept every reading under the 40% center and the compass could only read calm)
 CENTER = 0.4              # the compass holds the server's own statement latency at 40% of the line
 DT = 1.0                  # one decision a second
 TAU = 2.0
