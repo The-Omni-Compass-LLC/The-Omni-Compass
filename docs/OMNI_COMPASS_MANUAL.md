@@ -2383,11 +2383,13 @@ themselves, which is why every row is in its table.
 **Running now** (8 October): the whole tower at 1,000 copies on a rented machine (the four stacked at 1,000 copies done,
 section 16.2); MySQL's buffer pool under sysbench done, two counted sets (`V3_SYSBENCH.md`, section 16.4; the first set and the plug's amendment in section 10.9); the robustness test
 (`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario and the two-hour long run both done (section 16.4b), the
-24-hour run on a rented machine next;
+24-hour run on three rented machines under way (one pair a machine, two arms of a day each, collected on 10 October);
+the real cluster under a public demand trace (the Google cluster trace of 2011, `docs/TRACES_PREREGISTRATION.md`), A, B
+and C dispatched on the day's derived schedule;
 YCSB on MongoDB done (`V3_YCSB.md`, section 16.4), MySQL's buffer pool under sysbench done (`V3_SYSBENCH.md`, section 16.4),
-the other stores of register row 24 after; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
-subscription's family allowances before any arm ran, the next by Azure's own cluster capacity in eastus; the fleet is
-rebuilt from the families the survey shows allowed). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
+the other stores of register row 24 after; and Azure steady and burst on the fleet of several machine families (seven
+dispatches refused by Azure's own cluster capacity in eastus or held by our own machines' quota, 34 refusals, amendments 5
+to 8; the eighth dispatch follows the 24-hour machines' collect). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
 defense edge (PX4 and ArduPilot multi-vehicle, Crazyswarm), databases and caches at large (YCSB, HammerDB), Spark,
 OpenSearch, fio, Open-RMF, the 24-hour robustness run, spacecraft attitude and thrusters (Basilisk),
 station-keeping (Orekit, GMAT), constellations, rockets (RocketPy, OpenRocket) and combustion (Cantera). Pure physics
@@ -2436,7 +2438,10 @@ numbers, and what the record does about it.
    generator and the probe are ours. They are declared, versioned, archived with every run and reproducible from the
    repository; they are not independent of us. The independent pieces are the systems under test, their native
    controllers, the simulators and their shipped controllers, and the benchmark tools (pgbench, kind, Kubernetes,
-   PyBullet, MuJoCo, pandapower, CityLearn) that others wrote.
+   PyBullet, MuJoCo, pandapower, CityLearn) that others wrote. The load schedules of the Kubernetes tests were ours too,
+   written one step at a time; the public-trace test (`docs/TRACES_PREREGISTRATION.md`) answers that by replaying a day
+   of demand somebody else measured (the Google cluster trace of 2011, then the Azure Functions trace) under the wandering
+   test's own rules, the derivation receipted and committed before the runs.
 
 ### 16.8 What is not yet shown, and the open program
 

@@ -363,6 +363,9 @@ def main():
                                     "the dwell, the wall adds four chunks, the cover holds; the plug writes whole chunks, waits for the server's resize, reads back, stops for "
                                     "another writer and restores; sysbench's histogram and summary parsed; the paired reading", True)
     test_sysbench_abc.main(); check("sysbench A/B/C table: the same three-run rule as the other stores; the runner's records found; every gauge has a known direction", True)
+    from tests import test_trace_schedule
+    test_trace_schedule.main(); check("public-trace schedule: submits counted per hour of the trace's first day only, min-max onto the load range with half-up "
+                                      "rounding, one step a bin toward the level, parts read until the day is covered, every part named with its SHA-256", True)
     from tests import test_robust
     test_robust.main(); check("robustness readings: the kill and hand-back marks, the 120 s after the kill in both arms, the governor's memory ratio; a late hand-back, "
                               "a leak or a missing second governor reads WORSE; the three-run rows confirm only when every repetition of every run was handed back", True)
