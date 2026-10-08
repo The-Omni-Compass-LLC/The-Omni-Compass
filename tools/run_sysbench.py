@@ -14,7 +14,9 @@ and past it. The operator's fixed pool is the native controller here.
           server's own console (SET GLOBAL innodb_buffer_pool_size), inside the cover [128 MB, 2,048 MB]: the compass reads the
           server's own mean statement latency over the last second (performance_schema) on a band from 0 to the statement
           line and holds it at 40% of the line; slow statements with the pool full push the pool up a chunk or more (slow
-          statements with room to spare are not the pool's to mend), calm with no page read from disk gives a chunk back
+          statements with room to spare are not the pool's to mend), calm with the pool's misses under one percent of its read requests gives a chunk back
+          (amendment 2: the pool grows only while it is missing, one percent or more, the same line the other way; a second
+          with no read request moves nothing)
           after a dwell; at 95% of the line with the pool full four chunks are added at once (fail up); the pool is handed back
           to the operator's at the end and read back; a size found at a value Omni did not write stops it writing
 
@@ -237,18 +239,29 @@ class BufferPool:
         return info["ok"]
 
 
-def decide(p, force, misses_last_s, cur_mb, last_change_age, full, wall=0.95):
+GROW_MISS_SHARE = GIVEBACK_MISS_SHARE  # amendment 2: the pool grows only while its misses are 1% or more of its read requests (it is not holding
+                                       # the working set); a slow statement in a full pool that holds its working set is not the pool's to mend.
+                                       # The same one-percent line gates the give-back; no new number.
+
+
+def decide(p, force, misses_last_s, cur_mb, last_change_age, full, wall=0.95, reads=True):
     """The knob's move this second, in MB: slow statements (the service slow) grow the pool by ceil(force / 0.1) chunks, but only
-    while the pool is full (a slow statement with room to spare is not the pool's to mend); calm with the pool's misses under one
-    percent of its read requests (the pool holds the working set) gives back one chunk after the dwell; past the wall, with the
-    pool full, four chunks at once. misses_last_s is the miss share of the last second."""
+    while the pool is full (a slow statement with room to spare is not the pool's to mend) and missing (amendment 2: misses at one
+    percent of its read requests or more; a full pool that holds its working set cannot mend a slow statement); calm with the
+    pool's misses under one percent of its read requests (the pool holds the working set) gives back one chunk after the dwell,
+    and only in a second that saw read requests (amendment 2: a second with none says nothing about the working set); past the
+    wall, with the pool full, four chunks at once. misses_last_s is the miss share of the last second."""
     lo, hi = COVER_MB
     if p is not None and p >= wall and full:
         return min(hi, cur_mb + FAILUP_MB), "fail up: the line is at hand and the pool is full, four chunks at once"
     if force > 0.05:
         if not full:
             return cur_mb, "slow with room to spare: not the pool's to mend"
-        return min(hi, cur_mb + STEP_MB * max(1, math.ceil(force / 0.1))), "slow with the pool full: grow"
+        if misses_last_s < GROW_MISS_SHARE:
+            return cur_mb, "slow with the pool full but holding its working set (misses under 1% of reads): not the pool's to mend"
+        return min(hi, cur_mb + STEP_MB * max(1, math.ceil(force / 0.1))), "slow with the pool full and missing: grow"
+    if force < -0.05 and not reads:
+        return cur_mb, "calm, but no read request in the last second: nothing known, nothing taken"
     if force < -0.05 and misses_last_s < GIVEBACK_MISS_SHARE and cur_mb > lo and last_change_age >= DWELL_S:
         return max(lo, cur_mb - STEP_MB), "calm, the pool holding the working set (misses under 1% of reads): a chunk given back"
     return cur_mb, "hold"
@@ -263,10 +276,16 @@ class Omni(threading.Thread):
         self.plug, self.audit = plug, audit_path
         self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
         self.stop_flag = threading.Event(); self.last_change = -1e9; self.writes = 0; self.failups = 0
-        self.foreign = False; self.handed_back = False
+        self.foreign = False; self.handed_back = False; self.error = None
 
     def run(self):
-        self.plug.attach(); st = self.plug._status(); lat0, n0 = stmt_latency(st); _, _, rd0, _ = pool_stats(st); rq0 = read_requests(st); t0 = time.monotonic()
+        try:
+            self.plug.attach(); st = self.plug._status(); lat0, n0 = stmt_latency(st); _, _, rd0, _ = pool_stats(st); rq0 = read_requests(st)
+        except Exception as e:                                      # the brain never ran: say so in the audit and the record, never silently
+            self.error = repr(e)
+            self.audit.write_text(json.dumps({"t": 0.0, "error": self.error, "note": "the brain could not attach; no decision was made"}) + "\n")
+            return
+        t0 = time.monotonic()
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
@@ -279,7 +298,7 @@ class Omni(threading.Thread):
                     rq = read_requests(st); rq_last = rq - rq0; rq0 = rq
                     share = miss_share(rd_last, rq_last)
                     cur = self.plug.lever(st); full = pool_full(st)
-                    target, why = decide(self.law.p, f, share, cur, tick - self.last_change, full, wall=self.law.band.wall_high)
+                    target, why = decide(self.law.p, f, share, cur, tick - self.last_change, full, wall=self.law.band.wall_high, reads=rq_last > 0)
                     wrote = None
                     if target != cur and not resizing(rs):
                         wrote = self.plug.write(target); self.writes += 1
@@ -424,6 +443,7 @@ def run_arm(arm, wl_dir: Path, rep, script, stmts, rate, steps, step_s, line_stm
          "disk_reads": rows[-1][2] - rows[0][2], "cpu_busy_share": (total - idle) / max(1, total), "cpu_seconds": cpu_s,
          "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside), "writes": (omni.writes if omni else 0),
          "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0),
+         "controller_error": (omni.error if omni else None),
          "restore": (omni.plug.restore_info if omni else {})}
     (d / "arm.json").write_text(json.dumps(g, indent=1))
     print(f"   {arm} rep {rep}: {tx} transactions, inside the line {g['work_inside_line_tps']:.0f}/s, p95 {g['p95_ms']:.2f} ms, pool {g['pool_mb_mean']:.0f} MB, "

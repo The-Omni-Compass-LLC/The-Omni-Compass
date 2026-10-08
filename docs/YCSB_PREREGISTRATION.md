@@ -182,6 +182,58 @@ knob on a machine whose data does not fit in memory, where a miss is a disk read
 In the Omni index the category enters as the work, p95, cache size and CPU-seconds columns by rule (`tools/omni_index.py`):
 the cache given back is its gain, and the mean-latency loss, not an index column, is in the table where it belongs.
 
+## Amendment 1 (2026-10-08, declared before the second counted set): the give-back asks whether the cache holds its working set
+
+**The question.** The founder asked for every cost in the counted tables to be traced to its mechanism and removed where the
+mechanism is ours, with the engine locked (Omni v3; `tools/run_ycsb.py` is a harness outside the engine's fingerprint, and
+`tools/omni_version.py` prints omni-v3 before and after this amendment). The one cost in `V3_YCSB.md` is **burst: the mean
+latency +2.2% to +3.7%, confirmed WORSE**.
+
+**The mechanism, read from the counted runs' own audits** (`results/live/raw/run-37727968670`, `-37727976107`, `-37727983746`,
+every omni arm's `audit.jsonl`). The give-back rule was "calm, and no page evicted in the last second". A cache that is
+still filling evicts nothing, so the rule was satisfied by every cold cache from its first second. In **all 9 burst arms** the
+compass gave back four notches in the first five seconds of the arm, with the cache 0% to 69% used, and the first eviction
+came one second after the last give-back, when the cache had already been taken from 512 MB to its floor of 256 MB; it then
+sat at the floor, evicting, for 115 to 118 of the arm's 124 decisions, and the rule never gave anything else back (one arm gave
+back a fifth notch at 57 s). **All 9 c arms** read the same way (four notches by the fifth second, the first eviction a
+second later, 301 to 303 of 306 to 309 decisions evicting at the floor), and 6 of the 9 b arms; on f and the tuning workload
+the cache was taken down one to four notches over minutes. So the memory the table credits on b, c and burst was not a
+working set measured and found small: it was a cold cache shrunk before its working set had arrived, held at the floor by
+the evictions that followed. On c (reads only, every record in the operating system's page cache) that cost nothing the
+table could see; on burst it cost +2% to +4% of mean latency, which is the row that stands. The reading that would have
+said so was already in the harness: the arm records carry "pages read into the cache" (the misses), and WiredTiger reports the
+pages requested from the cache beside them.
+
+**The amendment (`decide` and `cache_stats` in `tools/run_ycsb.py`), three parts, nothing else.**
+
+1. **The give-back gate is the miss share.** A notch is given back only while **the cache's misses (pages read into it) are
+   under one percent of the pages requested from it in the last second**: the cache holds its working set. This is the MySQL
+   test's gate, adopted there on its third smoke run for the same reason (`docs/MYSQL_PREREGISTRATION.md`: a store keeps stale
+   pages resident, so neither "pages free" nor "nothing evicted" says whether it holds its working set, and the miss share
+   does); one line for both stores. A cold cache misses on nearly every request, so it is not given back while it fills.
+2. **Growth is gated on missing** the same way: slow reads with the cache full grow it only while the misses are one percent
+   or more; a full cache that holds its working set cannot mend a slow read. The fail-up is unchanged.
+3. **No give-back in a second without a request** (a second with no page requested says nothing about the working set).
+
+Unchanged: the reading (the server's own mean read latency), the band, the 1 ms line, the centre, the gains, the cushion, the
+notch, the cover, the dwell, the full gate, the fail-up, the one-writer rule, the hand-back, the load (uniform over the notch's
+key space, ordered keys), the gauges, the workloads, the three-run rule. `tests/test_run_ycsb.py` holds the new cases (misses
+under one percent: a notch given back, full or not; one percent or more: nothing taken; no request: nothing taken; slow with
+the cache full but holding its working set: nothing grown).
+
+**What is expected, said before the runs, and it is not flattering.** The cache given back on b, c and burst should fall, and
+may fall to nothing beyond the noise, because the saving the first set showed was the cold-start artefact and not a working set
+found small; where the working set at the light notches (one notch, about 250 MB of records plus indexes) does fit under the
+operator's 512 MB with room, the cache should ease toward it and stop when misses pass one percent. The burst mean-latency row
+should return to the noise, because the cache is no longer held under its working set. If the memory rows lose their
+confirmation, that is the result, and the index reads it: a knob that cannot give memory back without a cost in service stays
+at native, which is the rule this program runs under.
+
+**The second counted set (A2, B2, C2)** runs on this rule, the same inputs as the first (every workload, three paired
+repetitions, 20 s a notch, three separate dispatches on one commit); its table replaces the first in `results/live/V3_YCSB.md`,
+and the first set's table moves to `docs/history` with this note, every row kept. The index reads the second set when it lands
+and says so.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

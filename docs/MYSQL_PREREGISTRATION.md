@@ -271,6 +271,62 @@ line (1 to 2 transactions a second of about 975) and that row reads no differenc
 pool and CPU rows of that workload are unaffected and are the rows to read. The rule is kept for the second set so that the two
 sets are read on the same line; a line set from the client's own round trip is a change for a later version, declared when made.
 
+## Amendment 2 (2026-10-08, declared before the third counted set): the pool grows only while it is missing
+
+**The question.** The founder asked for every cost in the counted tables to be traced to its mechanism and removed where the
+mechanism is ours, with the engine locked (Omni v3; `tools/run_sysbench.py` is a harness outside the engine's fingerprint, and
+`tools/omni_version.py` prints omni-v3 before and after this amendment). The one cost in `V3_SYSBENCH.md` is **read_write: the
+pages holding data +53% to +70%, confirmed WORSE** (the pool held +59% to +79% as point estimates), with nothing bought for it
+beyond the noise (p95 −11% to −18%, two runs inside the noise).
+
+**The mechanism, read from the second set's own audits** (`results/live/raw/run-37770617236`, `-37770620582`, `-37770624805`,
+every omni arm's `audit.jsonl`, 9 arms a workload). The growth rule fired on slow statements with the pool full, and asked no
+further question. Where it fired, and the pool's miss share of its read requests at that second:
+
+| Workload | grows in 9 arms | at a miss share under 1% | at 1% to 5% | at 5% or more | pool held, mean |
+|---|---:|---:|---:|---:|---:|
+| tuning (point select) | 18 | 2 | 7 | 9 | 503 MB |
+| read_only | 36 | 3 | 0 | 33 | 245 MB |
+| burst | 17 | 1 | 0 | 16 | 169 MB |
+| **read_write** | **82** | **36** | 29 | 17 | **876 MB** |
+| update_index | 84 | 28 | 56 | 0 | 602 MB |
+
+On the read-mostly workloads the pool grew when it was missing (33 of 36 read_only grows and 16 of 17 burst grows at five
+percent or more). On read_write **36 of the 82 grows came with the pool missing under one percent of its reads**: the
+statements were slow for a reason the pool cannot mend (a written transaction waits on the redo log and on locks, not on a
+page), and the rule bought 128 MB chunks for them anyway, up to 1.4 to 1.7 GB; the same on update_index (28 of 84), whose pool
+row read inside the noise. The give-back side already carried the question the growth side lacked: a chunk is given back only
+while the pool's misses are under one percent of its reads (the pool holds the working set). One more thing the audits show: in
+every one of the 45 omni arms the very first decision, in a second with no read request yet counted, read a miss share of zero
+and gave a chunk back before any statement had run; a second with no reads says nothing about the working set.
+
+**The amendment (`decide` in `tools/run_sysbench.py`), two parts, nothing else.**
+
+1. **Growth is gated on missing.** Slow statements with the pool full grow the pool only while **the pool's misses are one
+   percent of its read requests or more** in the last second; a full pool that holds its working set (misses under one
+   percent) cannot mend a slow statement, and the knob is left alone. One percent is the line the give-back already uses, so
+   the rule has one line, used both ways; no new number. The fail-up (95% of the line with the pool full: four chunks at
+   once) is unchanged.
+2. **No give-back in a second without a read request.** The give-back needs a second that saw read requests; a second with
+   none moves nothing.
+
+Unchanged: the reading, the band, the 0.6 ms statement line, the centre, the gains, the cushion, the chunk, the cover, the
+dwell, the full gate, the fail-up, the one-writer rule, the plug's restore (amendment 1), the load, the gauges, the workloads,
+the three-run rule. `tests/test_run_sysbench.py` holds the new cases (slow with the pool full but holding its working set:
+nothing grown; a second with no read request: nothing taken; the two gates share one line).
+
+**What is expected, said before the runs.** The replay above cannot predict the pool's path, because a chunk not bought changes
+the misses that follow; it says only which decisions the gate would have refused. On read_write the pages-holding-data row
+should move toward native's, and may or may not leave "confirmed worse": 46 of its 82 grows came at one percent or more and
+stay allowed. If it stays confirmed worse, the remaining growth is on real misses, the trade is the knob's, and the table says
+so. The read-mostly workloads should read as before (3 of 36 and 1 of 17 grows refused). The tuning workload's two refused grows
+are shown and not counted, as always.
+
+**The third counted set (A3, B3, C3)** runs on this rule, the same inputs as the second (every workload, three paired
+repetitions, 20 s a notch, three separate dispatches on one commit); its table replaces the second in
+`results/live/V3_SYSBENCH.md`, and the second set's table moves to `docs/history` beside the first, every row kept. The index
+reads the third set when it lands and says so.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

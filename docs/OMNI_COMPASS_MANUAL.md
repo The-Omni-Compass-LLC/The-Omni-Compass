@@ -1562,6 +1562,24 @@ amended rule; the first run is not counted and is not hidden. The confirmed resu
 confirmed cost is the host's CPU: the compass's own reads of the pooler's console every second are CPU the native pooler
 never spends, and they are counted against it.
 
+**What the cost turned out to be (amendment 2, 8 October).** The record had explained the +14% to +28% of host CPU as
+"PgBouncer queuing clients behind a smaller pool", without a measurement. Measured, it was ours. The pooler's own log of one
+counted workload holds 7,956 logins to its admin console, one for every `psql` process the harness launched to take a reading
+(about two a second in both arms for the sampler, four more a second plus three per write in the omni arm for the brain); one
+launch costs about 52 ms of CPU on a machine of the runner's class, because psql loads libpq, OpenSSL, GSSAPI and LDAP and
+connects before it runs one command; and a paired repetition of `select` with a per-process meter put +55.9 CPU-seconds on
+those launches against a +52.8 s difference in the host total, with PgBouncer at +1.2 s and PostgreSQL at −4.7 s. The second
+cost in the table, the median latency +15% to +17%, was the take-back rule giving back one idle server a second whenever the
+pooler's service time read calm, which against a 50 ms line it always did, so the pool was shrunk into a queue the pooler
+itself was reporting. Amendment 2, declared before the second counted set (`docs/POSTGRES_PREREGISTRATION.md`): the harness
+speaks the pooler's wire protocol over one connection held for the whole arm, in both arms, so no process is launched for a
+reading; the queue line: a server is taken back only while the pooler's clients waited for one under one percent of its
+time in the last second and a transaction was served, and while they waited one percent or more servers are added back, one
+for every percent of waiting, up to the pooler's own setting (the one-percent line the two other database tests already
+use), so the pool probes down to the smallest size that serves without waiting and gets its servers back the moment anyone
+waits; and the harness records its own CPU beside the host's. The engine's 40 files are untouched (`tools/omni_version.py` prints omni-v3). The second set's
+table replaces the first when it lands, and the first moves whole to `docs/history`.
+
 ### 10.3 Independent simulators, each with its own native controller
 
 Three published simulators are wired the same way, and the simulator's own controller is always native:
@@ -1694,7 +1712,12 @@ preregistration reserved; see below). The direction rule is the cache's: slow re
 cache is full (bytes in it at 90% of its size or more), because slow reads in a cache with room to spare are not the
 cache's to mend; calm with no page evicted in the last second gives back one notch a second after a five-second dwell; at
 95% of the line with the cache full a quarter of the cover is added at once. One writer, read-back and the hand-back at the
-end are the plug's, as everywhere. Disclosed before the run: on a machine where the data files fit in the operating
+end are the plug's, as everywhere. *Amendment 1 (8 October, declared before the second counted set): the give-back gate is
+now the cache's miss share, pages read into it under one percent of the pages requested from it in the last second, the
+MySQL test's gate, and growth is gated on missing the same way; the first set's audits showed that "no page evicted" is
+satisfied by every cold cache while it fills, so every burst and c arm gave four notches back in its first five seconds,
+before its first eviction, and then sat at the floor of the cover evicting for the rest of the arm. The memory the first
+set credited was that artefact, and the second set is expected to credit less, perhaps nothing beyond the noise.* Disclosed before the run: on a machine where the data files fit in the operating
 system's own page cache, a storage-engine cache miss is a read from memory and a decompression, not a disk read, so the
 gain available to this knob is smaller than it would be on a machine whose data does not fit in memory; the result will
 say what it is. The same plug fits any store whose engine exposes a cache size at run time (InnoDB's buffer pool, RocksDB's
@@ -1747,7 +1770,10 @@ to 0.22 ms across GitHub's runners and a full pool missing a third of its reads 
 slow statements grow the pool by chunks only while the pool is full, at 95% of the line with the pool full four chunks are
 added at once, and calm gives one chunk back after the dwell only while the pool's misses are under one percent of its read
 requests, because InnoDB keeps stale pages resident, so neither "pages free" nor "no page read from disk" ever says that a
-pool holds its working set, and the miss share does. The work-inside-the-line
+pool holds its working set, and the miss share does (amendment 2 of 8 October, declared before the third counted set: the
+pool also grows only while it is missing, one percent or more, the same line the other way, because the second set's audits
+showed 36 of read_write's 82 grows bought chunks while the pool missed under one percent of its reads, for slow writes the
+pool cannot mend; and no chunk is given back in a second with no read request). The work-inside-the-line
 gauge uses a transaction line, the statement line times the statements a transaction as sysbench's script ships it (one for
 a point select, fourteen for the read-only mix), and says so. One writer, read-back and the hand-back at the end are the
 plug's, as everywhere. The same disclosure as MongoDB's holds and is made before the run: on a 16 GB machine with a 1.4 GB
@@ -2254,7 +2280,13 @@ console as omni, a tuning workload shown and not counted, and untouched workload
 - **PostgreSQL 16 behind PgBouncer** (`V3_PGBENCH.md`): connections held open fell 61% to 72% on `select` and `tpcb_hot`,
   confirmed better; the runs disagreed on `simple_update`; the host's CPU-seconds rose 14% to 28% on all three, confirmed
   worse, the compass's own cost included and counted against Omni-Compass in the index; work and latency read inside the
-  noise. The gain is a resource held, not speed; the cost is CPU, and both are in the table.
+  noise. The gain is a resource held, not speed; the cost is CPU, and both are in the table. Amendment 2 (8 October,
+  `docs/POSTGRES_PREREGISTRATION.md`, section 10.2): the CPU cost was measured and traced to the harness's own `psql`
+  launches, one per reading, not to the pooler (+55.9 CPU-seconds on the launches against a +52.8 s host difference on a
+  metered repetition; PgBouncer +1.2 s); the median-latency cost was the pool shrunk into a queue the pooler reported. The
+  harness now holds one console connection an arm, takes a server back only while clients waited under 1% of the pooler's
+  time and adds servers back, one per percent of waiting, up to the operator's setting; the second counted set runs on it
+  and replaces this table when it lands, this one moving whole to `docs/history`.
 - **Apache Kafka 3.9.1** (`V3_KAFKA.md`): on light, heavy and burst, work inside the 500 ms line rose 16% to 21%, the
   end-to-end 95th percentile fell from about 1.6 s to 9 to 14 ms, the mean lag fell 92% to 97%, all confirmed better; no
   message was lost in any arm; consumers running rose from 2 to 5.8 to 7.9, confirmed worse; host CPU-seconds rose 10% to
@@ -2283,7 +2315,11 @@ console as omni, a tuning workload shown and not counted, and untouched workload
   before the run held: on this machine the data sits in the operating system's page cache too, so a storage-engine miss
   costs a memory read and a decompression, not a disk read, which is why half the cache could be given back at no
   measurable cost in work or p95 and a few percent of mean latency; on a machine whose data does not fit in memory the
-  same knob would be asked a harder question, and this table does not answer it.
+  same knob would be asked a harder question, and this table does not answer it. Amendment 1 (8 October,
+  `docs/YCSB_PREREGISTRATION.md`, section 10.8): the audits show the memory was given back in the first five seconds of
+  every burst and c arm, before the first eviction, because a cold cache evicts nothing while it fills; the give-back gate is
+  now the miss share under 1% of requests, as MySQL's; the second counted set runs on it and replaces this table when it
+  lands, this one moving whole to `docs/history`, and its memory rows may fall to the noise, said beforehand.
 
 - **MySQL 8.0.46 under sysbench 1.0.20** (`V3_SYSBENCH.md`, `docs/MYSQL_PREREGISTRATION.md`): the knob is the InnoDB buffer
   pool, 512 MB at the operator's setting, moved in the server's own 128 MB chunks inside [128, 2,048] MB through the server's
@@ -2300,7 +2336,10 @@ console as omni, a tuning workload shown and not counted, and untouched workload
   update_index inside the noise on every row; no error in any arm; **the pool handed back and read back on all 45 omni arms**.
   4 gauge-rows better, 1 worse, 0 disagree; the category enters the index at +12.2%. The update_index "work inside the line"
   row counts almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line) and is
-  disclosed as such.
+  disclosed as such. Amendment 2 (8 October, `docs/MYSQL_PREREGISTRATION.md`, section 10.9): 36 of read_write's 82 grows
+  bought chunks while the pool missed under 1% of its reads, for slow writes the pool cannot mend; the pool now grows only
+  while missing, the give-back's own line used both ways; the third counted set runs on it and replaces this table when it
+  lands, this one moving whole to `docs/history` beside the first.
 
 ### 16.4b Robustness: the governor killed outright, and its own cost
 

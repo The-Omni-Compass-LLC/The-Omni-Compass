@@ -76,6 +76,9 @@ def main():
     lo, hi = S.COVER_MB
     # the decision rule
     assert S.decide(0.5, 0.35, misses_last_s=0.3, cur_mb=512, last_change_age=20, full=True)[0] == 512 + S.STEP_MB * 4, "slow with the pool full grows by ceil(force / 0.1) chunks"
+    assert S.decide(0.5, 0.35, misses_last_s=0.004, cur_mb=512, last_change_age=20, full=True)[0] == 512, "slow with the pool full but holding its working set (misses under 1%): not the pool's to mend (amendment 2)"
+    assert S.decide(0.1, -0.5, misses_last_s=0.0, cur_mb=512, last_change_age=20, full=True, reads=False)[0] == 512, "a second with no read request says nothing: nothing taken (amendment 2)"
+    assert S.GROW_MISS_SHARE == S.GIVEBACK_MISS_SHARE == 0.01, "one line, used both ways; no new number"
     assert S.decide(0.5, 0.35, misses_last_s=0.0, cur_mb=512, last_change_age=20, full=False)[0] == 512, "slow with room to spare: not the pool's to mend"
     assert S.decide(0.5, 1.0, misses_last_s=0.3, cur_mb=2000, last_change_age=20, full=True)[0] == hi, "the cover holds on the way up"
     assert S.decide(0.96, 0.0, misses_last_s=0.0, cur_mb=512, last_change_age=20, full=True)[0] == 512 + S.FAILUP_MB and "fail up" in S.decide(0.96, 0.0, 0.0, 512, 20, True)[1]
@@ -151,7 +154,7 @@ def main():
     assert S.paired(reps, "failed", "never more")["reading"] == "same"
     assert S.COVER_MB == (128, 2048) and S.NATIVE_MB == 512 and lo <= S.NATIVE_MB <= hi and S.STEP_MB == S.CHUNK_MB == 128 and S.NATIVE_MB % S.CHUNK_MB == 0
     assert all(s_ >= 1 and r_ > 0 for _, s_, r_, _, _ in S.WORKLOADS.values()) and sum(1 for w in S.WORKLOADS.values() if w[4]) == 1, "one tuning workload"
-    print("PASS  sysbench runner: slow statements with the pool full grow the pool by chunks, calm with nothing read from disk gives one back after the dwell, "
+    print("PASS  sysbench runner: slow statements with the pool full and missing grow the pool by chunks, calm with misses under 1% of reads gives one back after the dwell, "
           "the wall adds four chunks, the cover holds; the plug snapshots, writes whole chunks, waits for the server's resize, reads back, stops for another "
           "writer and restores; the server's own reading; sysbench's histogram and summary parsed; the paired reading")
 
