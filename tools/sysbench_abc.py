@@ -22,7 +22,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.run_sysbench import GAUGES, SAME_REL, paired  # noqa: E402
+from tools.run_sysbench import GAUGES, SAME_REL, paired, resizing  # noqa: E402
 from tools.ycsb_abc import cell, fmt, verdict  # noqa: E402  (the same three-run rule and cells as the other stores)
 
 
@@ -104,8 +104,18 @@ def main(argv=None):
             nat = fmt(rs[0]["native"]) if rs[0] else "n/a"; om = fmt(rs[0]["omni"]) if rs[0] else "n/a"
             L.append(f"| {label} | {nat} | {om} | " + " | ".join(cell(r, k) for r in rs) + f" | {v} |")
             out["workloads"][wl][k] = {"reading": v.strip("*"), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
-        hb = all(all(x["omni"].get("handed_back") for x in r["reps"]) for r in recs)
-        L += ["", f"The buffer pool handed back to the operator's and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
+        arms = [x["omni"] for r in recs for x in r["reps"]]
+        not_hb = [x for x in arms if not x.get("handed_back")]
+        receipts = any("restore" in x for x in arms)
+        in_flight = sum(1 for x in not_hb if resizing((x.get("restore") or {}).get("resize_in_flight_at_end", "")))
+        if not not_hb:
+            line = "The buffer pool handed back to the operator's and read back at the end of every omni arm in every run: yes."
+        else:
+            line = (f"The buffer pool handed back to the operator's and read back at the end of every omni arm in every run: **NO** "
+                    f"({len(not_hb)} of {len(arms)} omni arms not handed back"
+                    + (f"; in {in_flight} of them the server was still carrying out a resize when the restore was issued" if receipts else "") + ").")
+        L += ["", line]
+        out.setdefault("handed_back", {})[wl] = {"omni_arms": len(arms), "not_handed_back": len(not_hb), "resize_in_flight": in_flight if receipts else None}
     n_wl = sum(1 for w in wls if not any((r.get(w) or {}).get("tuning") for _, r in runs))
     L += ["", f"**Across {n_wl} untouched workloads: {better} gauge-rows confirmed better, {worse} confirmed worse, {disagree} where the runs disagree.**"]
     Path(a.out).write_text("\n".join(_legal_stamp(L)) + "\n")

@@ -172,6 +172,7 @@ class BufferPool:
 
     def __init__(self, conn):
         self.c, self.snapshot, self.last_written = conn, None, None
+        self.restore_info = {}
 
     def _status(self):
         return status(self.c)
@@ -205,11 +206,35 @@ class BufferPool:
             time.sleep(0.5)
         return self.configured_mb()
 
+    def _settle(self, budget_s):
+        """Wait, up to budget_s, for a resize the server is still carrying out; the status seen first and the seconds waited."""
+        t0 = time.monotonic(); st = self._status(); first = pool_stats(st)[3]
+        while resizing(pool_stats(st)[3]) and time.monotonic() - t0 < budget_s:
+            time.sleep(0.5); st = self._status()
+        return first, round(time.monotonic() - t0, 1)
+
     def restore(self):
+        """Hand the pool back to the snapshot and read it back. The server carries out a resize on its own time, and a shrink
+        under load withdraws its last blocks only when the load eases; while one is in progress the server ignores a new size.
+        So: wait for any resize in flight, write the snapshot, and if the server did not take it (still resizing), wait once
+        more and write once more. The receipt (what was in flight, the seconds waited, the writes, the final read-back) is
+        restore_info, written into the arm's record. The first counted runs restored without this wait and 15 of 45 omni arms
+        read not handed back for exactly this reason (docs/MYSQL_PREREGISTRATION.md, the first set's result)."""
+        info = {"ok": False, "resize_in_flight_at_end": "", "waited_s": 0.0, "writes": 0, "final_mb": None}
         try:
-            return self.write(self.snapshot) == self.snapshot
-        except Exception:
-            return False
+            first, waited = self._settle(RESIZE_WAIT_S)
+            info["resize_in_flight_at_end"], info["waited_s"] = first, waited
+            got = None
+            for _ in range(2):
+                got = self.write(self.snapshot); info["writes"] += 1
+                if got == self.snapshot:
+                    break
+                _, w2 = self._settle(RESIZE_WAIT_S); info["waited_s"] = round(info["waited_s"] + w2, 1)
+            info["final_mb"], info["ok"] = got, (got == self.snapshot)
+        except Exception as e:
+            info["error"] = repr(e)
+        self.restore_info = info
+        return info["ok"]
 
 
 def decide(p, force, misses_last_s, cur_mb, last_change_age, full, wall=0.95):
@@ -384,7 +409,7 @@ def run_arm(arm, wl_dir: Path, rep, script, stmts, rate, steps, step_s, line_stm
               f"{100 * inside / max(1, n):.1f}%, pool {row[0]:.0f} MB, data pages {row[1]:.0f} MB", flush=True)
     t1 = time.time(); cpu1 = cpu_times()
     if omni:
-        omni.stop_flag.set(); omni.join(timeout=RESIZE_WAIT_S + 30)
+        omni.stop_flag.set(); omni.join(timeout=4 * RESIZE_WAIT_S + 30)      # the last decision's resize, the settle, two writes
     sampler.stop_flag.set(); sampler.join(timeout=5)
     (d / "sysbench.log").write_text("\n\n".join(summaries))
     seconds = t1 - t0
@@ -398,7 +423,8 @@ def run_arm(arm, wl_dir: Path, rep, script, stmts, rate, steps, step_s, line_stm
          "pool_mb_mean": sum(x[0] for x in rows) / len(rows), "pool_used_mb_mean": sum(x[1] for x in rows) / len(rows),
          "disk_reads": rows[-1][2] - rows[0][2], "cpu_busy_share": (total - idle) / max(1, total), "cpu_seconds": cpu_s,
          "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside), "writes": (omni.writes if omni else 0),
-         "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0)}
+         "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0),
+         "restore": (omni.plug.restore_info if omni else {})}
     (d / "arm.json").write_text(json.dumps(g, indent=1))
     print(f"   {arm} rep {rep}: {tx} transactions, inside the line {g['work_inside_line_tps']:.0f}/s, p95 {g['p95_ms']:.2f} ms, pool {g['pool_mb_mean']:.0f} MB, "
           f"data pages {g['pool_used_mb_mean']:.0f} MB, disk reads {g['disk_reads']:,}, CPU {cpu_s:.1f} s, handed back {g['handed_back']}", flush=True)

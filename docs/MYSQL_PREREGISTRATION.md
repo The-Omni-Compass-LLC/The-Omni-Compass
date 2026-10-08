@@ -201,6 +201,46 @@ result is recorded here when it has run, and it is not counted.
   show as WORSE if it does; the question the benchmark asks is whether the misses it saves bought any service, and the work,
   p95 and CPU rows answer it. **The counted runs A, B and C begin on these rules, unchanged from here.**
 
+## The first counted set (runs A, B and C of 2026-10-08): the result, a hand-back finding, and the amendment it forces
+
+**The result, every row.** Runs 37757840760, 37757850988 and 37757861572, commit `23f6ca4c`, Omni v3, each run five workloads of
+three paired repetitions (`results/live/V3_SYSBENCH.md`). On the four untouched workloads **no gauge-row is confirmed better or
+confirmed worse and none disagrees**: work inside the line, throughput, p95, p99, mean, CPU and the pool held are all inside the
+noise in every run or in two of three (the pool held read −45% to −71% on burst, −4% to −36% on read_only, +38% to +84% on
+read_write and +7% to +29% on update_index as the runs' point estimates, with at most one run of three clear of zero on any
+workload, so the three-run rule confirms none of them); no error in any arm. The compass moved the pool 3 to 26 times an arm and never met another writer. The tuning workload
+read the same. Two readings in that table need the explanation a referee would ask for, and both are given here, not in the
+table's favour.
+
+**The hand-back row reads NO on four of the five workloads, and the cause is our plug, not the law.** 15 of the 45 omni arms did
+not read the operator's 512 MB back at the end. The audits show why: in 12 of them the server was still carrying out a shrink
+the law had asked for (the status `buffer pool 0 : withdrawing blocks. (8173/8191)`: InnoDB withdraws the last blocks of a
+shrink only when the pages pinned by the load are released, so under load the withdrawal does not finish), and MySQL ignores a
+new `innodb_buffer_pool_size` while a resize is in progress, so the restore the plug issued at that moment was dropped, and 90 s
+later the pool still read 128 or 256 MB; in the other 3 the last decision's own write and the restore collided in the same way.
+Every following arm began from a fresh server at 512 MB (`fresh_server`), so no native arm and no later omni arm was affected,
+and the decision loop itself never wrote during a resize (its writes are gated on the status); only the restore was. The rows
+stand as they are: a hand-back that did not read back is a NO, whatever its cause.
+
+**The amendment (a plug fix, declared here before the second set).** `BufferPool.restore` now waits, up to the same 90 s, for
+any resize the server is still carrying out (the load has stopped by then, so a stalled withdrawal finishes), then writes the
+snapshot, and if the server did not take it, waits once more and writes once more; its receipt (what was in flight when the arm
+ended, the seconds waited, the writes, the final read-back) is written into every omni arm's record, and the table reports how
+many arms were not handed back and in how many the server was mid-resize. `tests/test_run_sysbench.py` proves the three cases
+against the fake console (a withdrawal that eases inside the wait; one that eases after the first write is ignored; one that
+never eases, which still reads NO). Nothing in the law, the gates, the line, the cover, the chunk, the dwell or the gauges
+changes; `tools/omni_version.py` still prints omni-v3. **The second counted set (A2, B2, C2) runs on this plug; its table
+replaces the first in `results/live/V3_SYSBENCH.md`, and the first set's table moves to `docs/history` with this note, every
+row kept.**
+
+**The update_index line, disclosed and left as it is.** The transaction line is the statement line times the statements a
+transaction (0.6 ms × 1 for update_index), and it is the server's own statement latency that the compass reads; sysbench's
+histogram, which the "work inside the line" gauge is counted from, is client-side and includes the round trip, which for a
+single-statement update is about 1.1 ms on these runners. So on update_index almost nothing in either arm counted as inside the
+line (1 to 2 transactions a second of about 975) and that row reads no difference by construction; the throughput, latency,
+pool and CPU rows of that workload are unaffected and are the rows to read. The rule is kept for the second set so that the two
+sets are read on the same line; a line set from the client's own round trip is a change for a later version, declared when made.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

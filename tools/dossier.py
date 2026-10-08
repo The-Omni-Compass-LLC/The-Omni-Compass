@@ -265,6 +265,20 @@ def main():
          "On this machine the data files sit in the operating system's page cache as well, so a storage-engine miss is a read from memory, "
          "not a disk, as disclosed before the run: the result is memory given back at no measurable cost in work inside the line, p95 or "
          "CPU, with one confirmed loss, the mean latency on the burst workload. Table: `results/live/V3_YCSB.md`."),
+        ("V3_SYSBENCH.json", "## 3e. A real database's buffer pool: MySQL under sysbench, the operator's InnoDB pool size, Omni v3, three runs (evidence class L)",
+         "MySQL 8.0 as Ubuntu ships it with the operator's 512 MB InnoDB buffer pool is native; omni is the compass law on one knob, the pool "
+         "size, inside the cover [128, 2,048] MB in the server's own 128 MB chunks through its own console, growing only while the pool is full "
+         "and the server's own statement latency is slow, and giving a chunk back only while the pool's misses are under 1% of its reads "
+         "(`docs/MYSQL_PREREGISTRATION.md`). sysbench's OLTP scripts as shipped with the tables in use stepping through the pool and past it, "
+         "at a fixed offered rate from 32 threads; three paired repetitions a run, three runs; the tuning workload (point select) is shown and "
+         "not counted.",
+         "| Workload | Work inside the line | p95 | Buffer pool held, MB (the resource held) | Pages read from disk | Host CPU-seconds |",
+         ("work_inside_line_tps", "p95_ms", "pool_mb_mean", "disk_reads", "cpu_seconds"),
+         "The first counted set: every gauge-row inside the noise in three runs, no error, and the pool handed back on 30 of 45 omni arms "
+         "only; the server was still withdrawing the blocks of a shrink when the restore was issued, which MySQL ignores, so the plug's "
+         "restore (not the law) is fixed and declared as an amendment and the second counted set runs on it, this table standing as it is. "
+         "The update_index work-inside-the-line row counts almost nothing in either arm (a single update's client round trip exceeds the "
+         "server-side 0.6 ms line) and is disclosed. The category enters the index at exactly 1. Table: `results/live/V3_SYSBENCH.md`."),
     )
     for fname, head, intro, header, keys, after in WORKLOAD_SECTIONS:
         p = ROOT / "results" / "live" / fname
