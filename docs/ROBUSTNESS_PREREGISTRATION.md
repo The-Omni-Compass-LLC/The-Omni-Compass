@@ -167,6 +167,15 @@ decisions, decision time, hand-back) are single readings per machine and are jud
 Cost: three machines for about 50 hours, about $25 at list price, declared here before the dispatch; nothing in the engine
 changes (`tools/omni_version.py` on the commit).
 
+**Dispatched (2026-10-08 10:04 UTC).** Three `start` runs of `big-organism-detached` with `test=robust`, `duration_s=86400`,
+`reps=1`, `max_hours=60`, commit `4d5633dd` (Omni v3 by `tools/omni_version.py --commit`): runs 37761059781, 37761072412
+and 37761084779, resource groups `omni-detached-<run>` in eastus, each one `Standard_D4as_v4`. All three machines were
+rented at the first attempt and all three reported RUNNING with the cell `robust-long-x86400-1` started between 10:15 and
+10:20 UTC (repetition 1, order native then compass). The scheduled collect looks at them every two hours; the arms end about
+48 hours after the start plus the cluster's set-up, and the three collected runs are read as A, B and C by
+`tools/confirm_abc.py` into a 24-hour table written beside the long-run table in `results/live/`. Nothing above this line
+changed after the dispatch.
+
 ## What is declared before the first run
 
 The 60-second hand-back allowance is the sum of the watchdog's pass (5 s), the restore command's own run (one kubectl per

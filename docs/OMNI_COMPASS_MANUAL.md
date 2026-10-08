@@ -305,11 +305,48 @@ response time, its decision period and its cover. Where a rule was found not to 
 left in the code: the engine files are frozen and fingerprinted, and `verify.py` fails if any of them changes. A reader
 who finds a behaviour in a result can find the exact lines that produced it, and will find no second path.
 
+The rule has a practical consequence for anyone comparing Omni-Compass with a tuned controller. A tuned controller
+carries, somewhere, a number that someone chose for one stack: a cool-down of five minutes, a target of 70%, a step of
+two replicas. Each of those numbers is a bet that the stack will behave tomorrow as it did when the number was chosen, and
+each is one more place where a reader has to ask whether the result was the law or the tuning. Omni-Compass has a handful
+of such numbers, the centre of the band, the 5% cushions and the 2% do-no-harm line, and they are the same on every
+muscle, written once in the law and declared in every preregistration. Everything
+else the law needs (how fast the muscle answers, how often it may be moved, how far it may go) is read from the muscle's
+own declaration in the catalog (`omnicompass/muscles.py`) or from the native controller's own settings at the start of the
+run, never typed in by hand for a benchmark. When a benchmark needs a line, a cover or a chunk size (the MySQL pool moves
+in the server's own 128 MB chunks, the Redis ceiling in notches), the number comes from the stack being governed and is
+written in the preregistration before the first counted run, where a referee can see that it was not chosen after seeing
+the result.
+
+The second consequence is how the repository changes. A guard or a gain that turned out not to help is not left in the
+code under a flag, because a flag is a second path that a later reader has to reason about and a later test has to cover.
+It is removed, the removal is written in the changelog, and the fingerprint moves to the next engine version (section 15),
+so that no result taken on the old path is ever read against the new one. The three fingerprints that exist, v1, v2 and
+v3, are the whole history of such changes.
+
 ### 1.5 The word
 
 The law is a **compass**: a band with a cushion at each wall, pushed to its middle by two antagonist forces, smooth,
 never hammering. The repository uses that word and no other for it. Earlier dated records that used another word are kept
 word for word, as records are; the current law is `omnicompass/compass_law.py`, `CompassLaw`.
+
+The word was chosen for what the law does, not for decoration. A compass has a needle, a centre it is drawn back to, and
+a card marked at the edges; it does not slam to a wall and stay there, and it does not chatter when the hand holding it is
+steady. The law has the same three parts. The **band** is the range the gauge is allowed to travel, from 0 to 1 once the
+reading is placed on it, with the operator's line at the top. The **cushions** are the last 5% at each wall, 10% of the
+band in all: a reading inside a cushion is already too close to a wall, and the law treats it as such before the line is
+touched rather than after. The **centre**, 0.5 by default, is where the needle comes to rest, and two forces bring it
+there: a **pull** proportional to the distance from the centre, gentle near it and harder up the walls, like a spring;
+and a **push** proportional to the speed at which the reading is moving, meeting whatever is shoving it (a load rising, heat
+building) with an equal and opposite force and doubling as the friction that stops the needle sloshing past the centre
+(the gain is chosen for critical damping: it glides to the centre and stops, with no overshoot and no ringing). Past the
+upper wall the pull goes to its full force at once, and the down side may not act until the reading is back inside the
+band: the law fails up, never down. The force itself is `A × tanh(raw / A)`: near the centre it behaves as a spring, in
+proportion to the distance, and far from the centre it bends over and flattens into its maximum `A`, the law's authority,
+so that no reading, however far out, can make the law ask for more than one full step. That flattening is what "never
+hammering" means in code: there is no reading that produces a jump, and two readings a decision apart produce two forces
+a small amount apart. Section 6 gives the rules in full and Appendix C the equations; the reader who only needs the
+picture can keep the needle, the centre and the two cushions in mind and will not be misled by anything later.
 
 ### 1.6 What it sets, muscle by muscle
 
@@ -388,6 +425,20 @@ organism's work, its energy, its time over its service line, and every knob's ha
 two large organisms are named `tower` and `stack`, never by a count, because the counts changed between v1 and v2 and a
 name that carried a count would read as a different organism; the old names are read as aliases.
 
+The receipt is read in a fixed order. **Work** first: the organism's output over the window, which must not fall, and
+which reads worse by rule if it does, however little, as the four stacked at 1,000 copies showed on a difference of one
+part in a million (section 2.5). **Energy** second, and **work per energy** with it, which is the gain the modelled realms
+are built to show. **Time over the service line** third, the share of steps on which any muscle's service reading was past
+its line, which is the do-no-harm gauge for the body as a whole. Then **every knob's hand-back**, which must be complete
+in every run or the run fails. The reading given to an organism (the realms tables under `results/realms/`, one per engine) uses the words
+"superior within guardrails" when work and energy both improve with the service line respected, "service tradeoff" when a
+gain in energy came with time over the line, and names the loss when there is one: the v2 reading on the Physics realm
+and the tower was a service tradeoff, traced to the speed knobs on busy motion axes, and the slack gate that answers it is
+the one rule that makes v3 (section 6.3). What an organism run cannot show is also fixed: it is evidence class S, the
+plant models are our own, and nothing in it is presented as proof of a real stack. Its use is to show that one law holds
+across every realm at once, at a size no live benchmark can reach, and to find the rules that then have to earn their
+place on real software.
+
 ### 2.4 The grid of copies and runs
 
 Every organism runs at **1, 10, 100 and 1,000 copies** (that many instances of the organism on one clock, so the four
@@ -396,6 +447,17 @@ native-and-omni pairs, each from its own seed): 96 cells in all, both arms shown
 maximum in both directions. The grid as it stands (`results/scale/GRID.md`) is 84 of 90 judged cells on Omni v3; the six
 cells left, 100 and 1,000 runs at 1,000 copies, are beyond the machines available and are declared as such, not hidden.
 The reading at every size is the same to the digit, which is itself a finding about the law: it does not drift with scale.
+
+The two axes answer two different questions, and a reader should keep them apart. **Copies** is the size of the body
+the one brain governs: at 1,000 copies of the four stacked, the law computes a force for 1.7 million muscles from one
+reading of one clock, and the question is whether it stays coherent, whether the decision time stays inside the decision
+period, and whether the cluster inside it (section 2.5) is still served on time. **Runs** is the number of independent
+paired trials, each from its own seed, and the question is statistical: how wide the interval of the paired difference is
+and whether it moves as the trials multiply. A cell at 1 copy and 1,000 runs tells a reader about the noise of the method;
+a cell at 1,000 copies and 1 run tells a reader about the scale of the brain; the cells on the diagonal tell both at once.
+Every cell shows the native value and the omni value side by side, never a change alone, because a change without its
+two ends cannot be checked against the organism's own records. The grid is rebuilt whole on every engine version, never
+patched cell by cell, so that no square carries a result from a different engine than its neighbours (section 15).
 
 ### 2.5 The organisms with a real cluster inside
 
@@ -406,6 +468,24 @@ At 1 to 100 copies this runs on GitHub's machines; at 1,000 copies it needs a re
 the GitHub job that started it, for about seven hours a repetition. These runs are evidence class L for the cluster and S
 for the organism around it, and are labelled "L + S".
 
+Two rules keep these runs honest, and both are written in the preregistration before the machine is rented. The first is
+the **clock rule**. The organism must step on the measured window's clock: the row "organism behind its window" says how
+many seconds after the window its last step ended, and a repetition in which either arm ended more than 5% of the window
+late is marked **off the clock** in the organism's line, because its last steps saw a cluster whose load schedule had
+already ended. The row is shown and never judged; at 1,000 copies of the four stacked, both arms ended about 22 s behind
+a 10,800 s window, a fifth of one percent, and no repetition was off the clock. The second is the **hand-back at 90%**.
+Omni-Compass releases the cluster's knob at nine tenths of the window and the last tenth is run by native alone in both
+arms, so that every repetition ends with the proof that the knob was given back and that native resumed where it would
+have been.
+
+The first such run on Omni v3 is in `results/live/V3_BIG_ORGANISM.md`: the four stacked at 1,000 copies, three paired
+repetitions on one rented eight-core machine over 29 hours, the cluster's slowest 5% of requests at 2,882 ms under native
+and 150 ms under omni, the time over the response line from 51% of samples to none, no failed request under omni, the
+same six machines in service in both arms and the energy inside the noise. The organism's own rows, which are models, show
+the work the same to one part in a million and read worse by the rule that any confirmed decrease is worse, however small;
+the row is in the table with that word on it. The whole tower at 1,000 copies runs on the same machine type as this is
+written, and the full organism-by-organism table is rebuilt when it lands.
+
 ### 2.6 The register
 
 The register (`docs/REGISTER.md`) is the one list a referee can audit: every muscle by family (section 1), every
@@ -413,6 +493,23 @@ benchmark by platform with its native controller, Omni-Compass's knob, its gauge
 what is not measured yet, said plainly (section 3), and every open benchmark still to run, in order, one or two at a time
 (section 4). The program that takes each benchmark to its full size, with what each step costs, is `docs/PROOF_PROGRAM.md`.
 Every benchmark in this manual appears in the register under the same name.
+
+A row in the register is read left to right as a sentence: the platform, the open benchmark used for it and who publishes
+that benchmark, the native controller Omni-Compass sits on top of, the knob it moves, the gauges it is judged on, and its
+state. The state is written in a small, repeated vocabulary so that a reader can scan the column: **queued** (in the audited queue,
+not yet preregistered), **preregistered and built** (the rules are frozen and the harness runs, no counted result yet),
+the smoke runs with what each one taught and what was changed before the counted runs, and **A, B, C done** with the
+three run numbers, the engine version and the readings, losses first where there are any. A row never loses its history:
+when a benchmark moves from smoke to counted, the smoke record stays in its preregistration, and when a result is
+superseded by a run on a later engine, the earlier table moves to `docs/history` with its engine named. The register is
+the only list that must be complete; the manual's section 16 and the dossier (`docs/DOSSIER.md`) are readings of it, and
+anything in them that is not in the register is an error to be fixed in the register's favour.
+
+The audited queue (section 4 of the register) is the program's promise about what comes next, and it is deliberately
+short at the front: one or two benchmarks are run at a time, each preregistered, built, smoked and counted before the
+next is opened, so that no result is ever waiting on a harness that was half built when the runs began. The queue is
+ordered by what each benchmark adds to the index that the ones before it did not: a new resource traded (memory after
+machines, a buffer pool after a cache), a new native controller, a new class of evidence.
 
 ## 3. Where the Value Comes From
 
@@ -432,6 +529,22 @@ We attack it from the other side. Every system already running wastes room it pa
 
 That room is paid for in energy, in machines and in floor space, and it produces nothing.
 
+Why the room is there is worth a paragraph, because it decides what can be done about it. Each layer of a stack is sized
+by someone who cannot see the others. The autoscaler's author does not know what the power cap will do; the cooling
+engineer sizes for the hottest hour of the year; the database operator sets a buffer pool for the largest table and leaves
+it there; each of them, sensibly, leaves a margin against the layer next door, and the margins add up. None of these
+people is wrong. The waste is not a mistake anyone made; it is the price of layers that cannot talk to each other, and it
+is why a fix at one layer, however good, moves the margin rather than removing it. The benchmarks in this manual are
+each a measurement of one such margin on real software: the connections a pooler holds open that no client is using, the
+memory a cache keeps for data it will not be asked for, the machines a cluster keeps in service for a minute that has
+passed. Each is small on its own and each is paid for every hour of the year.
+
+The attack, then, is not a better autoscaler or a better cache. It is a governor that reads every layer's own gauge, keeps
+each layer in the middle of its own band, and gives the margin back where the layer's own controller shows it is not
+needed, with the layer's own controller still underneath and the layer's own setting restored when the governor is gone.
+That is a different kind of thing from a point fix, and it is why it stacks on top of every point fix a data center has
+already made rather than competing with any of them.
+
 ### 3.2 What Omni-Compass is, in one paragraph
 
 Omni-Compass is software that sits **on top of** the controllers a system already has (the GPU's firmware, the
@@ -450,6 +563,18 @@ The room that was spent on nothing becomes one of two things, and a company choo
 
 They are the same gain read from two sides (3.4). The health side comes with it: faster answers, faster recovery from
 failures, nothing waiting, every knob returned, no human babysitting the stack.
+
+The results to date (section 16) show both readings on real software, and show that which one a stack gets is decided by
+the stack, not by Omni-Compass. On the real Kubernetes cluster and on Apache Kafka the gain was taken as **more work,
+faster**: the cluster carried more requests inside its response line on the same machines, and Kafka's slowest 5% of
+messages waited 9 to 14 ms instead of about 1.6 s, at the cost of more consumers running while messages waited. On
+PostgreSQL behind its pooler and on MongoDB the gain was taken as **the same work for less**: the same transactions
+answered inside the same line with fewer connections open, or a smaller storage-engine cache, with the resource handed
+back at the end of every run. On Redis neither reading came out ahead: the compass held more memory for a wide working
+set and the rule says that the resource held reads worse. The combined index (section 16.6) is +25.9% over the five real
+categories so far, and the Redis category inside it is a loss (−24.9%), counted in full. An operator
+should expect the same honesty from their own paired run: the receipts will say which side of the gain their stack took,
+and whether the compass's own cost (its CPU, its reads) ate into it.
 
 ### 3.4 How to read the benefit: the arithmetic
 
@@ -623,6 +748,19 @@ evaluated, not applied to a knob directly: it is the push the nervous system rea
 back is permitted now. This separation is why the engine could be frozen with its proofs untouched while the compass law
 was written as its own, separately tested law, and why `verify.py` seals both.
 
+One decision, followed through, shows the order. The controller wakes on its period and reads its senses: the service
+gauge (a response time, a statement latency, a consumer lag), the resource gauge (machines, connections, memory) and the
+knob's current value read back from the device. The **engine** takes the normalised observations, blends its state toward
+them and evolves one macro step; from the state it reports whether the body is converging, what authority the organ has
+earned and whether a release is permitted at all (section 4.2). The **compass law** then reads the service gauge as a
+position in its band and computes the force (section 6): positive, and the direction rule asks for capacity in proportion;
+negative, and it asks for one notch back, but only if the engine's release gate is open, the resource is demonstrably idle
+and the dwell has passed. The **verdict** stands over the slow knobs: a knob the paired trial has not cleared at the 2%
+line is not moved at all and stays native. What survives all three is one write to the **plug**, read back from the device,
+and one line in the **audit** that records the senses read, the engine's state and push, the force, the gate's reasons and
+the value sent and taken. In the kill test's first repetition (section 7.1) this produced 114 such lines and 42 writes:
+every decision that wrote nothing is in the record with the reason the gate held, which is the point of writing all of it down.
+
 ## 5. The Closed Circle: Why It Cannot Leave Its Compass
 
 The governing principle is the Unified Circle Principle:
@@ -784,6 +922,26 @@ preregistration that carries it:
   ceiling grows only while the cache is at 90% of it or more. On the tuning workload without that gate the law raised the
   ceiling to 500 MB while 21 MB were in use; with it, the ceiling follows the working set.
 
+The same gate recurs, in the form each store's own gauges allow, on every memory knob that followed, and each form was
+fixed on the tuning workload and disclosed before the counted runs:
+
+- **MongoDB's storage-engine cache** grows by a notch only while the cache is full and the server's own read latency is
+  above the centre of its band, and gives a notch back only while calm and nothing has been evicted in the last second
+  (`docs/YCSB_PREREGISTRATION.md`). The smoke runs showed the line itself had to be set from the server's own readings
+  (0.15 to 0.46 ms under a 2 ms line left the law nothing to do), and it was set to 1 ms before the counted runs.
+- **MySQL's buffer pool** grows by a chunk only while the pool is at least 90% full of data pages and the server's own
+  statement latency is above the centre, and gives a chunk back only while the **miss share**, pages read from disk as a
+  share of the pool's requests in the last second, is under 1% (`docs/MYSQL_PREREGISTRATION.md`). The earlier rule, "no
+  disk reads in the last second", was never satisfied on the tuning workload: InnoDB keeps stale pages resident, so a pool
+  once filled reads full for ever, and a few new-page reads a second never stop even when the working set fits, so the
+  pool the law had grown was never given back (877 MB held on average against native's 512 on that smoke run); the smoke
+  record says so, and the miss-share rule replaced it before run A.
+
+What the three forms share is the reason: a memory knob has no slack to spend unless the memory is both full and being
+missed, and memory given back while it is being missed is not a saving but a cost moved to the disk. The gate is written
+in each harness in the store's own units and checked by that harness's own tests against a fake server, so that a reader
+can see in the preregistration exactly which reading opens the gate and which closes it.
+
 ### 6.4 The profiles and the pedals
 
 The compass has two **profiles**, service (the default) and batch, which differ only in what the pedals do with a pile of
@@ -839,6 +997,25 @@ would fight the new owner. This is **proprioception**: the governor's sense of i
 installation leaves a signature in the receipts (section 8.5) rather than a silent error, and it is what the wire check
 proves before anything runs.
 
+The rule begins with the **snapshot**. The governor reads every knob it may move once, at the start, before its first
+decision, and that reading is the operator's setting for the whole run: every reset, every hand-back and every kill
+returns the knob to the snapshot, never to a value computed later, and the receipts record the snapshot beside the final
+read-back so that a reader can check the two are equal. The rule continues with the **read-back** after every write: the
+plug sends a value, waits for the device to take it, and reads the device's own report of what it holds. Where the device
+takes time to apply a setting, the plug knows that and does not mistake the transition for a foreign hand. The clearest
+case is MySQL's buffer pool, which the server resizes in chunks over several seconds and reports as it goes: the plug
+reads the server's own resize status and treats a pool caught mid-resize as its own write in progress, not as another
+owner's value, and waits for the server to report completion before it judges the write (`tools/run_sysbench.py`,
+`BufferPool`). The same shape holds on the Kubernetes autoscaler's bounds, Redis's memory ceiling and MongoDB's cache
+size: the value is read from the device's own console, and only a value that the governor neither wrote nor is waiting
+on is read as someone else's.
+
+What follows from a foreign value is deliberately conservative. The governor does not restore over it, because an
+operator who changed a knob by hand meant to, and a second controller that changed it is a conflict to be reported, not
+won. The lever is left where it was found, the audit records the value and the time, and the governor goes on governing
+the other levers. A reader of the receipts who finds such a record knows at once that two hands were on the stack, and
+the paired run that contains it is read with that in mind.
+
 ### 7.3 Blind means hold, and fail up
 
 A sense that goes stale or unreadable is not read as calm. It is read as **blind**, and while any sense is blind nothing
@@ -846,6 +1023,18 @@ is given back; the knob holds, or, if the service was breached when the sense we
 the fault test on real Kubernetes the response-time probe is deliberately paused for a minute in every arm; the audit
 shows the governor holding through the blind minute and resuming when the sense returns, and the table shows no row
 worse for it. The rule is simple to state and strict in effect: Omni-Compass never acts on a reading it does not have.
+
+The rule was also tested without being arranged. In the two-hour robustness run on real Kubernetes
+(`results/live/V3_ROBUST_LONG.md`), the cluster's own API answered a handful of the governor's reads of the autoscaler
+with a server error, two or three times a run out of the 120 decisions a two-hour window expects. Each of those decisions is in the controller's
+log with the reason the API gave, each was held (no write, no hand-back, no guess), and the governor took its next
+decision on schedule when the API answered again. The preregistration had said in advance that such decisions would be
+shown with their reason and not judged, and that is how they appear in the table: 97.5% of the expected decisions valid,
+the failed ones counted and named, the knob handed back at the end of every run. A referee who wants to see the rule in
+the same rule written by the gate itself can find it in the kill test's receipts (section 7.1), where a decision whose
+latency sense read stale is held with "a sense is blind" among its reasons, and in the fault test's blind-probe window,
+where it was arranged on purpose. The point in every case is the same:
+a stale or missing reading produces a hold, never a move, and the hold is in the record.
 
 ### 7.4 Why one brain
 
@@ -855,6 +1044,16 @@ controllers fight because none of them knows the others' intent. One law that se
 fight itself: the force on each lever is computed from the same reading of the same body at the same moment. This is also
 why the modelled organisms are run whole, at up to 1.7 million muscles on one clock (section 2.4): the question they
 answer is whether one brain stays coherent at that size, and the reading at every size is the same to the digit.
+
+One brain also has to stay the same brain over time, and that is a measurable claim. The two-hour robustness run
+(section 16.8) measures the governor's own memory at the start and the end of each run and the time it takes to reach a
+decision in the last hour against the first. Over three runs the memory ratio was 1.05 to 1.07 and the decision-time
+ratio 1.07 to 1.20, both inside the limits set before the run (a leak would show as steady growth; a brain that slows as
+its records accumulate would show a ratio climbing toward the 1.5 limit), and the cluster's service under the governed arm
+was inside the noise of native in two of three runs. The 24-hour runs on three rented machines, started as this is
+written, ask the same two questions over twelve times the window. A single controller that keeps its memory and its
+speed over a day is the least a referee should ask of a brain that proposes to hold every knob at once; the figures are
+in the table, not asserted here.
 
 ---
 
@@ -1009,6 +1208,27 @@ docker push <your-registry>/omni-compass:<tag>
 ```
 
 It runs as non-root, with a read-only root filesystem and no Linux capabilities.
+
+What `verify.py` checks is worth knowing before it is run, because its last line, `VERIFICATION: PASS` or `FAIL`, is the
+only thing a reader has to read. It runs every test in `tests/` (the law, the plugs, the readings rule, every benchmark's
+own harness against a fake server), checks the engine's fingerprints against the preregistered registry so that a changed
+engine file fails before anything is measured, compares the release's files with its manifest
+(`tools/release_manifest.py --check`: the engine, the C++ twins, the live evidence's digests, one object that names the
+commit it was written at) and runs the layout check (`tools/layout_check.py`: the declared root, every link and every
+named path present). It takes a few minutes on a laptop and needs no network beyond the clone. GitHub runs the same
+script on every push under Python 3.12, and each run is listed under the repository's Actions tab with the commit it
+checked; a result in this manual is only ever cited from a commit whose run passed.
+
+To know which engine a checkout carries, ask it:
+
+```
+python3 tools/omni_version.py                  # omni-v3, omni-v2, omni-v1, or what differs
+python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
+```
+
+Every result table in `results/live/` cites the commit it ran on, and the three-run tools refuse to combine runs from
+different engines (section 15). The founder's standing order is that no result is ever read across engines, and the
+command above is how a reader checks that for themselves.
 
 ### 9.3 The levels
 
@@ -1262,7 +1482,26 @@ and quotas a subscription may rent, region by region, and rents nothing. A machi
 as it is and deleted, so nothing runs forever on the bill. The commit to run is an input, so an older engine can be
 run again on the same machine. **The clock rule** (section 13) decides the window for each size on each machine: the
 first v3 machine stepped the stack in 31 s against a 12 s step and fell 4,628 s behind its window, so it was stopped,
-recorded, and started again with a 10,800 s window and 45 s steps.
+recorded, and started again with a 10,800 s window and 45 s steps. That second machine is the one that produced the
+result in section 2.5: three repetitions over 29 hours on one eight-core machine, both arms about 22 s behind a 10,800 s
+window, no repetition off the clock.
+
+The same workflow carries a second test. With the input `test=robust` the machine runs the robustness harness's long
+scenario instead of an organism (`scripts/kind_paired.sh` with `ROBUST=long`, exactly as the GitHub job runs it), with
+the window stretched to whatever `duration_s` asks and the wandering load schedule repeated to fill it; the 24-hour run of
+section 16.8 uses it, one paired repetition on each of three four-core machines, collected and deleted at 60 hours at the
+latest. The cells it writes are named `robust-long-x<window>-<repetition>` beside the organisms' `six-<organism>-x<copies>-
+<repetition>`, and the collect job gathers both. The `max_hours` input is the machine's own limit, written into the
+machine at start, so a collect that finds a machine past its limit takes what is there and deletes it, whichever job
+started it.
+
+Three things a reader should know about any detached result. The machine is one Azure virtual machine rented for this
+run alone, not a GitHub runner shared with a queue of other jobs, so its size is known (the table names it) and it is not
+cut off at six hours; that, and not only the job limit, is why the big organisms are run there. The files come back
+exactly as the machine wrote them, copied cell by cell with the machine's own log beside them, and the archive bot stores
+them under the collect run's number with a SHA-256 list of every file, so the start run and the collect run are both
+cited in the table. And the machine is deleted after the collect, so a result cannot be re-read from the machine, only
+from the archived files; the preregistration says this before the first start.
 
 ### 10.5 A message broker's consumer group
 
@@ -1827,6 +2066,16 @@ one machine is a quarter of the fleet, so that only a saving of about 30% could 
 of a few percent (section 10.1). The fleet of 40 workers in nine machine families that can show one machine is
 preregistered (`docs/K8S_COMPASS_PREREGISTRATION.md`, amendments 1 to 4) and has been refused by Azure's own cluster
 capacity in its region on every dispatch so far, each refusal recorded; it runs the moment the region admits a cluster.
+
+The refusals are themselves part of the record, and the preregistration's amendments 5 to 7 keep the count: six dispatches
+and 29 refused repetitions in eastus, each with Azure's own reason (its managed-Kubernetes capacity in the region, not
+the subscription's quota), a survey of every other region showing none with the vCPU quota the fleet needs, one dispatch
+cancelled by hand and recorded as such, and the seventh dispatch left to try. That seventh dispatch had been refused on
+its first three repetitions as this edition went to press, 32 refusals in all; its repetitions run one after another, and
+whatever the region admits is read by the same table as the four-worker runs, with the refused repetitions counted in the
+amendment, not in the table. A reader should take
+from this what it says and no more: the small fleet's bill reading is inside the noise by the arithmetic of its size, the
+large fleet's reading does not exist yet, and nothing about the bill on a real cloud is claimed in the index until it does.
 
 ### 16.4 A real database, a real message broker, a real cache
 
