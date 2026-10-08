@@ -358,6 +358,11 @@ def main():
                                 "adds a quarter of the cover, the cover holds; the plug snapshots, reads back, stops for another writer and restores; the paired reading", True)
     test_ycsb_abc.main(); check("YCSB A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
                                 "no difference beyond the noise with the count; clear runs pointing different ways read as a disagreement", True)
+    from tests import test_run_sysbench, test_sysbench_abc
+    test_run_sysbench.main(); check("sysbench runner: slow statements with the pool full grow the pool by chunks, calm with nothing read from disk gives one back after "
+                                    "the dwell, the wall adds four chunks, the cover holds; the plug writes whole chunks, waits for the server's resize, reads back, stops for "
+                                    "another writer and restores; sysbench's histogram and summary parsed; the paired reading", True)
+    test_sysbench_abc.main(); check("sysbench A/B/C table: the same three-run rule as the other stores; the runner's records found; every gauge has a known direction", True)
     from tests import test_robust
     test_robust.main(); check("robustness readings: the kill and hand-back marks, the 120 s after the kill in both arms, the governor's memory ratio; a late hand-back, "
                               "a leak or a missing second governor reads WORSE; the three-run rows confirm only when every repetition of every run was handed back", True)

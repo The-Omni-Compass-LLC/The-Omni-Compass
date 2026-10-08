@@ -1,0 +1,496 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+"""Omni-Compass on top of a database's operator-set buffer pool: sysbench on MySQL (docs/MYSQL_PREREGISTRATION.md).
+
+MySQL 8.0 as Ubuntu ships it, with the one setting an operator sets once for InnoDB: the buffer pool size, which the server
+resizes online in chunks of 128 MB. sysbench's published OLTP workloads ask for rows from a set of tables that widens and
+narrows over the run (one notch = one more table of a million rows), so the working set steps through the operator's pool
+and past it. The operator's fixed pool is the native controller here.
+
+  native  MySQL at the operator's pool (512 MB) for the whole run
+  omni    the same MySQL, with the compass law (omnicompass/compass_law.py) on one knob, the buffer pool size, through the
+          server's own console (SET GLOBAL innodb_buffer_pool_size), inside the cover [128 MB, 2,048 MB]: the compass reads the
+          server's own mean statement latency over the last second (performance_schema) on a band from 0 to the statement
+          line and holds it at 40% of the line; slow statements with the pool full push the pool up a chunk or more (slow
+          statements with room to spare are not the pool's to mend), calm with no page read from disk gives a chunk back
+          after a dwell; at 95% of the line with the pool full four chunks are added at once (fail up); the pool is handed back
+          to the operator's at the end and read back; a size found at a value Omni did not write stops it writing
+
+Gauges from sysbench's own latency histogram and summary (every transaction counted into buckets about 2% wide), the server's
+own status (the pool configured, the pages in it, the pages read from disk) and the host's /proc/stat (CPU seconds, the
+compass's own cost included). Memory held is the resource; no energy is claimed beyond the host's CPU seconds. Every row is
+reported, losses included.
+
+  python3 tools/run_sysbench.py --setup                    # the benchmark user, the operator's pool in the server's own
+                                                           # configuration file, the server restarted
+  python3 tools/run_sysbench.py --workloads tuning --reps 3 --out DIR
+  python3 tools/run_sysbench.py --report-only DIR          # re-read finished <workload>.json files and write SYSBENCH.md
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import os
+import re
+import subprocess
+import sys
+import threading
+import time
+from pathlib import Path
+
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import pathlib as _p; sys.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
+from tools.run_ycsb import cpu_times, engine, fmt, paired  # noqa: E402  (the same paired reading and host clock as the other stores)
+
+HOST = os.environ.get("MYSQL_HOST", "127.0.0.1")
+USER = os.environ.get("MYSQL_USER", "omni")
+PASSWORD = os.environ.get("MYSQL_PWD", "omni-bench")       # a local benchmark user on a throwaway runner, created by --setup
+DB = "sbtest"
+MB = 1024 * 1024
+PAGE = 16 * 1024          # InnoDB's page
+LINE_STMT_MS = 1.0        # the statement line: one SQL statement answered within 1 ms on the server (set on the tuning workload)
+CENTER = 0.4              # the compass holds the server's own statement latency at 40% of the line
+DT = 1.0                  # one decision a second
+TAU = 2.0
+SMOOTH = 0.5
+NATIVE_MB = 512           # the operator's pool
+CHUNK_MB = 128            # innodb_buffer_pool_chunk_size as shipped: the pool is resized in whole chunks
+COVER_MB = (128, 2048)    # never under one chunk, never over 2 GB
+STEP_MB = CHUNK_MB        # one notch of the knob is one chunk
+FAILUP_MB = 512           # past the wall: four chunks at once (about a quarter of the cover), and again the next second if still past it
+DWELL_S = 10.0            # after growing, no taking back within ten seconds (a shrink evicts pages and the resize itself takes seconds)
+FULL = 0.9                # the pool counts as full when the pages holding data are 90% of its pages or more
+THREADS = 32              # sysbench's client threads
+TABLES = 6                # tables prepared; notch n uses the first n
+TABLE_ROWS = 1_000_000    # rows a table: about 240 MB of data and index each, so notch 1 fits the operator's pool and notch 6 does not
+STEPS = "1 2 3 2 3 4 5 6 5 4 3 2 1 2 1"
+BURST = "1 6 1 8 1 6"
+RESIZE_WAIT_S = 90.0      # the server's online resize is asynchronous; the plug waits this long for it to complete
+T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
+SAME_REL = 1e-6
+LUA = Path(os.environ.get("SYSBENCH_LUA", "/usr/share/sysbench"))
+
+WORKLOADS = {
+    # name: (sysbench script, statements a transaction as the script ships, transactions a second offered (--rate), steps, tuning?)
+    #   the transaction line for the work-inside-the-line gauge is the statement line times the statements a transaction
+    "tuning": ("oltp_point_select", 1, 3000, STEPS, True),       # one point select a transaction: the rules were set here
+    "read_only": ("oltp_read_only", 14, 300, STEPS, False),      # 10 point selects and 4 range queries a transaction
+    "read_write": ("oltp_read_write", 18, 200, STEPS, False),    # the read-only mix plus 2 updates, a delete and an insert
+    "update_index": ("oltp_update_index", 1, 1000, STEPS, False),  # one indexed update a transaction
+    "burst": ("oltp_read_only", 14, 300, BURST, False),          # read-only on the burst schedule
+}
+
+GAUGES = [  # key, label, direction
+    ("work_inside_line_tps", "work inside the response line (transactions a second answered within the line)", "higher"),
+    ("tps", "throughput (transactions a second)", "higher"),
+    ("qps", "queries a second", "higher"),
+    ("p95_ms", "latency, 95th percentile (ms)", "lower"),
+    ("p99_ms", "latency, 99th percentile (ms)", "lower"),
+    ("mean_ms", "latency, mean (ms)", "lower"),
+    ("failed", "errors (sysbench's ignored errors: deadlocks and retries)", "never more"),
+    ("pool_mb_mean", "buffer pool held, mean (MB; the knob, the resource)", "lower"),
+    ("pool_used_mb_mean", "pages holding data, mean (MB)", "lower"),
+    ("disk_reads", "pages read from disk into the pool (misses)", "shown"),
+    ("cpu_busy_share", "host CPU busy (share of the run)", "lower"),
+    ("cpu_seconds", "host CPU-seconds", "lower"),
+    ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 transactions inside the line", "lower"),
+    ("writes", "buffer pool size changes written (the knob's moves)", "shown"),
+]
+
+
+def connect():
+    import pymysql
+    return pymysql.connect(host=HOST, user=USER, password=PASSWORD, autocommit=True, connect_timeout=5)
+
+
+def query(conn, sql):
+    with conn.cursor() as cur:
+        cur.execute(sql)
+        return cur.fetchall()
+
+
+def status(conn):
+    """The server's own figures, one read: {name: value} from SHOW GLOBAL STATUS for the pool and the statements' timer."""
+    rows = query(conn, "SHOW GLOBAL STATUS WHERE Variable_name IN ('Innodb_buffer_pool_pages_total', 'Innodb_buffer_pool_pages_data', "
+                       "'Innodb_buffer_pool_pages_free', 'Innodb_buffer_pool_reads', 'Innodb_buffer_pool_read_requests', 'Innodb_buffer_pool_resize_status')")
+    st = {k: v for k, v in rows}
+    st["pool_bytes"] = int(query(conn, "SELECT @@innodb_buffer_pool_size")[0][0])
+    t = query(conn, "SELECT COALESCE(SUM(SUM_TIMER_WAIT), 0), COALESCE(SUM(COUNT_STAR), 0) FROM performance_schema.events_statements_summary_global_by_event_name "
+                    "WHERE EVENT_NAME IN ('statement/sql/select', 'statement/sql/update', 'statement/sql/insert', 'statement/sql/delete')")[0]
+    st["stmt_timer_ps"], st["stmt_count"] = int(t[0]), int(t[1])
+    return st
+
+
+def pool_stats(st):
+    """(configured MB, pages holding data MB, pages read from disk, resize status text) from one status read."""
+    return st["pool_bytes"] // MB, int(st.get("Innodb_buffer_pool_pages_data", 0)) * PAGE / MB, int(st.get("Innodb_buffer_pool_reads", 0)), str(st.get("Innodb_buffer_pool_resize_status", ""))
+
+
+def pool_full(st):
+    total = int(st.get("Innodb_buffer_pool_pages_total", 0)) or 1
+    return int(st.get("Innodb_buffer_pool_pages_data", 0)) >= FULL * total
+
+
+def stmt_latency(st):
+    """(total statement time in picoseconds, statements) from one status read (performance_schema)."""
+    return st["stmt_timer_ps"], st["stmt_count"]
+
+
+def resizing(text):
+    t = text.lower()
+    return bool(t) and "completed" not in t and ("resiz" in t or "progress" in t or "withdraw" in t or "start" in t)
+
+
+class BufferPool:
+    """The plug on the server's buffer pool size: read once before the first write, write through the server's own console in
+    whole chunks, wait for the server's online resize, read back, yield to any other writer, restore."""
+
+    def __init__(self, conn):
+        self.c, self.snapshot, self.last_written = conn, None, None
+
+    def _status(self):
+        return status(self.c)
+
+    def configured_mb(self, st=None):
+        st = st or self._status()
+        return st["pool_bytes"] // MB
+
+    def attach(self):
+        self.snapshot = self.configured_mb(); self.last_written = self.snapshot
+        return self.snapshot
+
+    def lever(self, st=None):
+        st = st or self._status()
+        cur = self.configured_mb(st)
+        if resizing(pool_stats(st)[3]):
+            return self.last_written if self.last_written is not None else cur     # mid-resize: the server is still carrying out our write
+        if self.last_written is not None and cur != self.last_written:
+            raise RuntimeError(f"another writer set the pool to {cur} MB (we wrote {self.last_written}): Omni stops writing")
+        return cur
+
+    def write(self, mb):
+        mb = int(round(mb / CHUNK_MB)) * CHUNK_MB
+        query(self.c, f"SET GLOBAL innodb_buffer_pool_size = {mb * MB}")
+        self.last_written = mb
+        t0 = time.monotonic()
+        while time.monotonic() - t0 < RESIZE_WAIT_S:
+            st = self._status()
+            if self.configured_mb(st) == mb and not resizing(pool_stats(st)[3]):
+                return mb
+            time.sleep(0.5)
+        return self.configured_mb()
+
+    def restore(self):
+        try:
+            return self.write(self.snapshot) == self.snapshot
+        except Exception:
+            return False
+
+
+def decide(p, force, disk_reads_last_s, cur_mb, last_change_age, full, wall=0.95):
+    """The knob's move this second, in MB: slow statements (the service slow) grow the pool by ceil(force / 0.1) chunks, but only
+    while the pool is full (a slow statement with room to spare is not the pool's to mend); calm with no page read from disk gives
+    back one chunk after the dwell; past the wall, with the pool full, four chunks at once."""
+    lo, hi = COVER_MB
+    if p is not None and p >= wall and full:
+        return min(hi, cur_mb + FAILUP_MB), "fail up: the line is at hand and the pool is full, four chunks at once"
+    if force > 0.05:
+        if not full:
+            return cur_mb, "slow with room to spare: not the pool's to mend"
+        return min(hi, cur_mb + STEP_MB * max(1, math.ceil(force / 0.1))), "slow with the pool full: grow"
+    if force < -0.05 and disk_reads_last_s == 0 and cur_mb > lo and last_change_age >= DWELL_S:
+        return max(lo, cur_mb - STEP_MB), "calm, nothing read from disk: a chunk given back"
+    return cur_mb, "hold"
+
+
+class Omni(threading.Thread):
+    """The brain, one decision a second, reading the server's own statement latency, writing the audit; the knob is handed back
+    at the end and read back."""
+
+    def __init__(self, plug: BufferPool, audit_path: Path, line_ms=LINE_STMT_MS):
+        super().__init__(daemon=True)
+        self.plug, self.audit = plug, audit_path
+        self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
+        self.stop_flag = threading.Event(); self.last_change = -1e9; self.writes = 0; self.failups = 0
+        self.foreign = False; self.handed_back = False
+
+    def run(self):
+        self.plug.attach(); st = self.plug._status(); lat0, n0 = stmt_latency(st); _, _, rd0, _ = pool_stats(st); t0 = time.monotonic()
+        with open(self.audit, "w") as fh:
+            while not self.stop_flag.is_set():
+                tick = time.monotonic()
+                try:
+                    st = self.plug._status()
+                    lat, n = stmt_latency(st); dl, dn = lat - lat0, n - n0; lat0, n0 = lat, n
+                    reading = (dl / dn / 1e12) if dn > 0 else 0.0        # the mean statement latency of the last second, in seconds; none reads calm
+                    f = self.law.force(reading)
+                    cur, used, rd, rs = pool_stats(st); rd_last = rd - rd0; rd0 = rd
+                    cur = self.plug.lever(st); full = pool_full(st)
+                    target, why = decide(self.law.p, f, rd_last, cur, tick - self.last_change, full, wall=self.law.band.wall_high)
+                    wrote = None
+                    if target != cur and not resizing(rs):
+                        wrote = self.plug.write(target); self.writes += 1
+                        self.last_change = tick                            # a shrink and a grow both start the dwell: the resize takes seconds
+                        if why.startswith("fail up"):
+                            self.failups += 1
+                    fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "statements": dn, "p": round(self.law.p, 4), "force": round(f, 4),
+                                         "disk_reads_last_s": rd_last, "pool_mb": cur, "used_mb": round(used, 1), "full": full, "resize": rs, "target_mb": target,
+                                         "wrote_mb": wrote, "why": why}) + "\n")
+                except Exception as e:
+                    fh.write(json.dumps({"t": round(tick - t0, 2), "error": repr(e)}) + "\n")
+                    self.foreign = True
+                    break
+                time.sleep(max(0.0, DT - (time.monotonic() - tick)))
+        self.handed_back = self.plug.restore()
+
+
+class Sampler(threading.Thread):
+    """The pool configured, the pages holding data and the pages read from disk, once a second, in both arms."""
+
+    def __init__(self, conn):
+        super().__init__(daemon=True)
+        self.c, self.stop_flag, self.rows = conn, threading.Event(), []
+
+    def run(self):
+        while not self.stop_flag.is_set():
+            try:
+                self.rows.append(pool_stats(status(self.c))[:3])
+            except Exception:
+                pass
+            time.sleep(DT)
+
+
+def parse_histogram(text):
+    """sysbench's latency histogram (--histogram=on): one line a bucket, 'value |bars count', values in ms; returns [(ms, count)]."""
+    out = []
+    on = False
+    for line in text.splitlines():
+        if "Latency histogram" in line:
+            on = True; continue
+        if on:
+            m = re.match(r"\s*([0-9.]+)\s*\|[* ]*\s*(\d+)\s*$", line)
+            if m:
+                out.append((float(m.group(1)), int(m.group(2))))
+            elif out and line.strip() and not line.strip().startswith("value"):
+                on = False
+    return out
+
+
+def parse_summary(text):
+    """transactions, queries, ignored errors, seconds, and sysbench's own mean and 95th percentile (ms) from its summary."""
+    def grab(pat, default=0.0):
+        m = re.search(pat, text)
+        return float(m.group(1)) if m else default
+    return {"transactions": grab(r"transactions:\s+(\d+)"), "queries": grab(r"queries:\s+(\d+)"), "errors": grab(r"ignored errors:\s+(\d+)"),
+            "seconds": grab(r"total time:\s+([0-9.]+)s"), "avg_ms": grab(r"avg:\s+([0-9.]+)"), "p95_ms_sysbench": grab(r"95th percentile:\s+([0-9.]+)")}
+
+
+def quantile(hist, q):
+    """A quantile from the histogram's buckets (the bucket's value stands for its latency; buckets are about 2% apart)."""
+    total = sum(c for _, c in hist)
+    if not total:
+        return float("nan")
+    acc = 0
+    for v, c in hist:
+        acc += c
+        if acc >= q * total:
+            return v
+    return hist[-1][0]
+
+
+def sysbench(script, cmd, tables, rate, seconds, out_file: Path | None, extra=()):
+    args = ["sysbench", str(LUA / f"{script}.lua"), f"--mysql-host={HOST}", f"--mysql-user={USER}", f"--mysql-password={PASSWORD}", f"--mysql-db={DB}",
+            f"--tables={tables}", f"--table-size={TABLE_ROWS}", f"--threads={THREADS}", *extra]
+    if cmd == "run":
+        args += [f"--rate={rate}", f"--time={int(seconds)}", "--histogram=on", "--report-interval=0", "--percentile=95"]
+    args.append(cmd)
+    r = subprocess.run(args, capture_output=True, text=True)
+    txt = r.stdout + "\n" + r.stderr
+    if out_file is not None:
+        out_file.write_text(txt)
+    return txt
+
+
+def prepare_dataset(log: Path):
+    """The dataset, the same tables for every workload: dropped and prepared once per workload (both arms read the same rows)."""
+    c = connect(); query(c, f"DROP DATABASE IF EXISTS {DB}"); query(c, f"CREATE DATABASE {DB}"); c.close()
+    txt = sysbench("oltp_read_only", "prepare", TABLES, 0, 0, log)
+    if "Creating table" not in txt and "Inserting" not in txt:
+        raise RuntimeError(f"sysbench prepare failed: {txt[-2000:]}")
+
+
+def fresh_server(pool_mb):
+    """The pool emptied and the operator's size restored before an arm, both arms alike: the server restarted at the operator's
+    configured size, the OS page cache dropped."""
+    subprocess.run(["sudo", "systemctl", "restart", "mysql"], check=True)
+    subprocess.run(["sudo", "sh", "-c", "sync; echo 3 > /proc/sys/vm/drop_caches"], check=False)
+    for _ in range(90):
+        try:
+            c = connect(); st = status(c)
+            if st["pool_bytes"] // MB != pool_mb:
+                BufferPool(c).write(pool_mb)
+            return c
+        except Exception:
+            time.sleep(1)
+    raise RuntimeError("mysql did not come back after the restart")
+
+
+def run_arm(arm, wl_dir: Path, rep, script, stmts, rate, steps, step_s, line_stmt_ms):
+    d = wl_dir / f"rep-{rep}" / arm; d.mkdir(parents=True, exist_ok=True)
+    line_ms = line_stmt_ms * stmts                            # the transaction line: the statement line times the statements a transaction
+    c = fresh_server(NATIVE_MB)
+    sampler = Sampler(connect()); sampler.start()
+    omni = None
+    if arm == "omni":
+        omni = Omni(BufferPool(connect()), d / "audit.jsonl", line_stmt_ms); omni.start()
+    hist_all, failed, tx, qs, summaries = [], 0, 0, 0, []
+    cpu0 = cpu_times(); t0 = time.time()
+    for i, notch in enumerate(int(s) for s in steps.split()):
+        txt = sysbench(script, "run", notch, rate, step_s, d / f"notch-{i + 1}.log")
+        h = parse_histogram(txt); s = parse_summary(txt); summaries.append(txt)
+        hist_all += h; failed += int(s["errors"]); tx += int(s["transactions"]); qs += int(s["queries"])
+        inside = sum(cnt for v, cnt in h if v <= line_ms); n = sum(cnt for _, cnt in h)
+        row = sampler.rows[-1] if sampler.rows else (NATIVE_MB, 0.0, 0)
+        print(f"   {arm} rep {rep} notch {notch}: {int(s['transactions'])} transactions, mean {s['avg_ms']:.3f} ms, p95 {quantile(h, 0.95):.3f} ms, inside the line "
+              f"{100 * inside / max(1, n):.1f}%, pool {row[0]:.0f} MB, data pages {row[1]:.0f} MB", flush=True)
+    t1 = time.time(); cpu1 = cpu_times()
+    if omni:
+        omni.stop_flag.set(); omni.join(timeout=RESIZE_WAIT_S + 30)
+    sampler.stop_flag.set(); sampler.join(timeout=5)
+    (d / "sysbench.log").write_text("\n\n".join(summaries))
+    seconds = t1 - t0
+    hist = sorted(hist_all); n = sum(cnt for _, cnt in hist)
+    inside = sum(cnt for v, cnt in hist if v <= line_ms)
+    rows = sampler.rows or [(NATIVE_MB, 0.0, 0)]
+    total = cpu1[0] - cpu0[0]; idle = cpu1[1] - cpu0[1]; cpu_s = (total - idle) / os.sysconf("SC_CLK_TCK")
+    g = {"arm": arm, "rep": rep, "seconds": round(seconds, 1), "transactions": tx, "queries": qs,
+         "work_inside_line_tps": inside / seconds, "tps": tx / seconds, "qps": qs / seconds, "p95_ms": quantile(hist, 0.95), "p99_ms": quantile(hist, 0.99),
+         "mean_ms": (sum(v * cnt for v, cnt in hist) / n) if n else float("nan"), "failed": failed,
+         "pool_mb_mean": sum(x[0] for x in rows) / len(rows), "pool_used_mb_mean": sum(x[1] for x in rows) / len(rows),
+         "disk_reads": rows[-1][2] - rows[0][2], "cpu_busy_share": (total - idle) / max(1, total), "cpu_seconds": cpu_s,
+         "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside), "writes": (omni.writes if omni else 0),
+         "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0)}
+    (d / "arm.json").write_text(json.dumps(g, indent=1))
+    print(f"   {arm} rep {rep}: {tx} transactions, inside the line {g['work_inside_line_tps']:.0f}/s, p95 {g['p95_ms']:.2f} ms, pool {g['pool_mb_mean']:.0f} MB, "
+          f"data pages {g['pool_used_mb_mean']:.0f} MB, disk reads {g['disk_reads']:,}, CPU {cpu_s:.1f} s, handed back {g['handed_back']}", flush=True)
+    return g
+
+
+def server_version():
+    try:
+        return str(query(connect(), "SELECT VERSION()")[0][0])
+    except Exception:
+        return "?"
+
+
+def sysbench_version():
+    try:
+        return subprocess.run(["sysbench", "--version"], capture_output=True, text=True).stdout.strip()
+    except OSError:
+        return "?"
+
+
+def run_workload(name, out: Path, reps, step_s, line_stmt_ms):
+    script, stmts, rate, steps, tuning = WORKLOADS[name]
+    wl_dir = out / f"sysbench-{name}"; wl_dir.mkdir(parents=True, exist_ok=True)
+    ver = server_version()
+    print(f"== {name}: sysbench {script} ({stmts} statements a transaction, {rate} a second offered), {TABLES} tables of {TABLE_ROWS:,} rows, steps {steps}, "
+          f"{step_s} s a notch, MySQL {ver}", flush=True)
+    fresh_server(NATIVE_MB)
+    prepare_dataset(wl_dir / "prepare.log")
+    rec = {"workload": name, "tuning": tuning, "script": script, "statements": stmts, "rate_tps": rate, "steps": steps, "step_s": step_s,
+           "line_stmt_ms": line_stmt_ms, "line_ms": line_stmt_ms * stmts, "threads": THREADS, "tables": TABLES, "table_rows": TABLE_ROWS,
+           "native_mb": NATIVE_MB, "chunk_mb": CHUNK_MB, "cover_mb": list(COVER_MB), "mysql_version": ver, "sysbench_version": sysbench_version(),
+           "engine": engine(), "reps": []}
+    for rep in range(1, reps + 1):
+        order = ("native", "omni") if rep % 2 else ("omni", "native")
+        r = {}
+        for arm in order:
+            r[arm] = run_arm(arm, wl_dir, rep, script, stmts, rate, steps, step_s, line_stmt_ms)
+        rec["reps"].append(r)
+        (wl_dir / f"{name}.json").write_text(json.dumps(rec, indent=1))
+    rec["paired"] = {k: paired(rec["reps"], k, dr) for k, _, dr in GAUGES}
+    (wl_dir / f"{name}.json").write_text(json.dumps(rec, indent=1))
+    return rec
+
+
+def report(recs, out: Path):
+    L = ["# sysbench on MySQL: Omni-Compass on top of a database's operator-set buffer pool", "",
+         f"MySQL as Ubuntu ships it with the operator's InnoDB buffer pool ({NATIVE_MB} MB) is native; omni is the compass law on the pool size "
+         f"through the server's own console inside [{COVER_MB[0]}, {COVER_MB[1]}] MB in chunks of {CHUNK_MB} MB, holding the server's own statement "
+         f"latency at {CENTER:.0%} of the {LINE_STMT_MS:g} ms statement line. sysbench's published OLTP workloads, the same transactions in both arms, "
+         "the tables in use stepping through the pool and past it. Memory held is the resource; the host's CPU seconds include the compass's own "
+         "cost. Every row is reported, losses included.", ""]
+    for rec in recs:
+        L += [f"## {rec['workload']}: sysbench {rec['script']}, {rec['statements']} statements a transaction, {rec['rate_tps']} a second offered, steps {rec['steps']} × {rec['step_s']} s"
+              + (" (the tuning workload)" if rec.get("tuning") else ""), "",
+              f"MySQL {rec['mysql_version']}, {rec['sysbench_version']}; {rec['threads']} client threads; the transaction line {rec['line_ms']:g} ms; "
+              f"{len(rec['reps'])} paired repetitions; engine {rec['engine']['version']} at `{rec['engine']['commit']}`.", "",
+              "| Gauge | native | omni | change | 95% interval of the difference | reading |", "|---|---:|---:|---:|---:|---|"]
+        for k, label, direction in GAUGES:
+            p = rec.get("paired", {}).get(k)
+            if not p:
+                continue
+            ch = "" if p["native"] == 0 else f"{100 * p['diff'] / abs(p['native']):+.1f}%"
+            L.append(f"| {label} | {fmt(p['native'])} | {fmt(p['omni'])} | {ch} | {fmt(p['ci95'][0])} to {fmt(p['ci95'][1])} | {p['reading']} |")
+        hb = all(r["omni"]["handed_back"] for r in rec["reps"]); fw = any(r["omni"]["foreign_writer"] for r in rec["reps"])
+        L += ["", f"Every omni arm handed back to the operator's pool size: {'yes' if hb else 'NO'}; another writer seen: {'yes' if fw else 'no'}; "
+              f"fail-ups: {sum(r['omni']['failups'] for r in rec['reps'])}.", ""]
+    (out / "SYSBENCH.md").write_text("\n".join(_legal_stamp(L)) + "\n")
+    return out / "SYSBENCH.md"
+
+
+def setup():
+    """The benchmark user on the local server, the operator's pool and chunk in the server's own configuration file, the
+    performance schema on; the server restarted. MySQL and sysbench themselves are installed by the workflow from Ubuntu's own
+    packages."""
+    sql = (f"CREATE USER IF NOT EXISTS '{USER}'@'%' IDENTIFIED BY '{PASSWORD}'; GRANT ALL PRIVILEGES ON *.* TO '{USER}'@'%' WITH GRANT OPTION; FLUSH PRIVILEGES;")
+    ok = False
+    for cmd in (["sudo", "mysql", "-e", sql], ["mysql", "-uroot", "-proot", "-h", HOST, "-e", sql]):
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode == 0:
+            ok = True; break
+    if not ok:
+        print(f"could not create the benchmark user: {r.stderr[-500:]}", file=sys.stderr); return 1
+    conf = Path("/etc/mysql/mysql.conf.d/omni-bench.cnf")
+    txt = (f"[mysqld]\ninnodb_buffer_pool_size = {NATIVE_MB}M\ninnodb_buffer_pool_chunk_size = {CHUNK_MB}M\ninnodb_buffer_pool_instances = 1\n"
+           "performance_schema = ON\n")
+    subprocess.run(["sudo", "tee", str(conf)], input=txt, text=True, check=True, capture_output=True)
+    subprocess.run(["sudo", "systemctl", "restart", "mysql"], check=True)
+    c = fresh_server(NATIVE_MB)
+    print(f"MySQL {server_version()} at the operator's {NATIVE_MB} MB pool (chunk {CHUNK_MB} MB); {sysbench_version()}; user {USER}; pool reads {status(c)['pool_bytes'] // MB} MB")
+    return 0
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--setup", action="store_true")
+    ap.add_argument("--workloads", default="tuning")
+    ap.add_argument("--reps", type=int, default=3)
+    ap.add_argument("--step-s", type=float, default=20.0)
+    ap.add_argument("--line-ms", type=float, default=LINE_STMT_MS, help="the statement line (ms)")
+    ap.add_argument("--out", default="sysbench-out")
+    ap.add_argument("--report-only", default="")
+    a = ap.parse_args(argv)
+    if a.setup:
+        return setup()
+    out = Path(a.out)
+    if a.report_only:
+        recs = [json.loads(f.read_text()) for f in sorted(Path(a.report_only).rglob("sysbench-*/*.json"))]
+        print(report(recs, Path(a.report_only))); return 0
+    names = list(WORKLOADS) if a.workloads == "all" else a.workloads.split(",")
+    recs = [run_workload(n, out, a.reps, a.step_s, a.line_ms) for n in names]
+    print(report(recs, out))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
