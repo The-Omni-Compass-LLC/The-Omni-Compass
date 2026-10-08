@@ -183,9 +183,9 @@ is not ours.
 
 | Order | Domain | Open benchmark (owner) | Native it runs on top of | Omni's lever | Status |
 |---:|---|---|---|---|---|
-| 1 | Robot arms | MuJoCo Menagerie: Panda, UR5e (Google DeepMind) | shipped position servos | motion speed, effort | next |
+| 1 | Robot arms | MuJoCo Menagerie: Panda, UR5e, iiwa 14, Gen3 (Google DeepMind) | shipped position servos | motion speed, effort | **done, A/B/C on v1 and v3** (section 2, row 29: `results/live/V3_MUJOCO.md`) |
 | 2 | Legged robots | MuJoCo Menagerie: Unitree Go2; MuJoCo Playground | shipped gait controller | gait speed, effort | queued |
-| 3 | Drones | gym-pybullet-drones (University of Toronto) | its PID controller | speed, thrust margin | queued |
+| 3 | Drones | gym-pybullet-drones (University of Toronto) | its PID controller | speed, thrust margin | **done, A/B/C on v3**, as the first cell of row 23 (`results/live/V3_SWARM.md`); the single-drone speed and thrust-margin cell stays queued |
 | 4 | Spacecraft attitude, reaction wheels | Basilisk (University of Colorado, LASP) | its attitude feedback law | wheel effort cap | queued |
 | 5 | Transmission grid | Grid2Op / L2RPN (RTE France) | its do-nothing and expert baselines | redispatch, topology timing | queued |
 | 6 | Distribution feeders | OpenDSS IEEE 13 / 34 / 123-bus feeders (EPRI, IEEE) | their voltage regulators and capacitors | regulator setpoints | queued |
@@ -199,7 +199,7 @@ is not ours.
 | 14 | Traffic signals | SUMO with the RESCO benchmark (DLR; UMass) | fixed-time and max-pressure | phase timing | queued |
 | 15 | Driving | highway-env (Leurent) | its IDM and MOBIL drivers | speed and spacing margins | queued |
 | 16 | HPC job scheduling | Batsim with the Parallel Workloads Archive (Inria; Feitelson) | EASY backfilling | node power-down, admission | queued |
-| 17 | Cloud traces | Alibaba and Google cluster traces, Azure Functions trace on KWOK | Kubernetes HPA and scheduler | replicas, nodes | queued |
+| 17 | Cloud traces | Google cluster trace 2011 first (`clusterdata-2011-2`, job submissions, a day's shape), then the Azure Functions trace; Alibaba later; on the real kind cluster, KWOK later | Kubernetes HPA and scheduler | replicas, nodes | **preregistered and built** (`docs/TRACES_PREREGISTRATION.md`, `tools/trace_schedule.py`, `results/traces/google2011/`): the trace's first day turned into the wandering test's load schedule by a declared rule, with the receipt committed before the runs; A, B and C on v3 dispatched next |
 | 18 | CPU power | Linux cpufreq (schedutil) under SPECpower-style load on rented machines with RAPL | schedutil | frequency and power caps | queued |
 | 19 | AI serving at scale | vLLM benchmark, MLPerf Inference (MLCommons) | vLLM as shipped | power, clocks, admission | ready (GPU) |
 | 20 | AI training | MLPerf Training power (MLCommons) | the framework as shipped | power limit, clocks | queued (GPU) |
