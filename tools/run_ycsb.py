@@ -67,6 +67,7 @@ THREADS = 32              # YCSB's client threads
 STEPS = "1 2 3 2 3 4 5 6 5 4 3 2 1 2 1"
 BURST = "1 6 1 8 1 6"
 RECORD_BYTES = 1000       # YCSB's default: 10 fields of 100 bytes
+DISTRIBUTION = "uniform"  # over the notch's key space, so the working set is the key space (see run_arm)
 YCSB_VERSION = "0.17.0"
 YCSB_URL = f"https://github.com/brianfrankcooper/YCSB/releases/download/{YCSB_VERSION}/ycsb-mongodb-binding-{YCSB_VERSION}.tar.gz"
 YCSB_SHA256 = "6a054a706812269c80bfc6ed1e83457990c1c60b01f5083c873aaed05577e30d"   # recorded from the release before any run
@@ -311,10 +312,15 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
     cpu0 = cpu_times(); t0 = time.time()
     for i, notch in enumerate(int(s) for s in steps.split()):
         raw = d / f"notch-{i + 1}.raw"
-        # the notch's key space: the first base x notch records of the loaded dataset, YCSB's own distribution over them
+        # the notch's key space: the first base x notch records of the loaded dataset, drawn uniformly, so the working set IS the
+        # key space (YCSB's shipped zipfian keeps the hot set in a few megabytes whatever the key space: the smoke run showed the
+        # cache never filling); the workload's read/update mix stays as shipped
         txt = ycsb("run", workload_file, {"recordcount": base * notch, "operationcount": 10 ** 9, "maxexecutiontime": int(step_s), "target": RATE,
-                                          "threads": THREADS, "insertstart": 0, "seed": seed * 100 + i}, raw)
-        summaries.append(txt); failed += parse_failed(txt); records += parse_raw(raw)
+                                          "threads": THREADS, "insertstart": 0, "requestdistribution": DISTRIBUTION, "seed": seed * 100 + i}, raw)
+        got = parse_raw(raw); summaries.append(txt); failed += parse_failed(txt); records += got
+        lat = sorted(l for _, l in got); row = sampler.rows[-1] if sampler.rows else (NATIVE_MB, 0.0, 0, 0)
+        print(f"   {arm} rep {rep} notch {notch}: {len(lat)} ops, mean {sum(lat) / max(1, len(lat)):.3f} ms, p95 {(lat[int(0.95 * len(lat))] if lat else float('nan')):.3f} ms, "
+              f"inside the line {100 * sum(1 for l in lat if l <= line_ms) / max(1, len(lat)):.1f}%, cache {row[0]:.0f} MB, in cache {row[1]:.0f} MB", flush=True)
     t1 = time.time(); cpu1 = cpu_times()
     if omni:
         omni.stop_flag.set(); omni.join(timeout=30)
