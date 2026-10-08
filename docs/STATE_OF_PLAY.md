@@ -27,12 +27,16 @@ Kafka as shipped, `results/live/V3_KAFKA.md`): on all three untouched workloads 
 consumers held 2 → 6 to 8, **confirmed worse**, the resource the gain costs; host CPU worse on one workload, inside the
 noise on two. **A real cache** (Redis as shipped, `results/live/V3_REDIS.md`): on all three untouched workloads work inside
 the 2 ms line **+14% to +27%**, the hit rate +14% to +27% and the mean latency −30% to −61%, confirmed better; the memory
-ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain costs; host CPU inside the noise. **The Omni
-index, real machines only, confirmed three times: +30.2%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database
-+14.2%, Kafka +166.9%, Redis −24.9%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's
-speed ratio is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is
-negative because the memory it holds for a wide working set is the resource it trades and reads worse by rule). The v1
-tables read the same and stay as the first engine's record.
+ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain costs; host CPU inside the noise. **A real
+database's storage-engine cache** (MongoDB as its publisher ships it under YCSB, `results/live/V3_YCSB.md`): on four
+untouched workloads the cache size held fell about half on c and burst and 13% to 37% on f, **confirmed better** (b inside
+the noise in one run); work inside the 1 ms line, p95 and host CPU inside the noise on all four; no failed operation; the
+burst mean latency **+2% to +4%, confirmed worse**, the one loss. **The Omni index, real machines only, confirmed three
+times: +25.9%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database +14.2%, Kafka +166.9%, Redis −24.9%, the
+database's cache +10.2%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's speed ratio
+is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is negative
+because the memory it holds for a wide working set is the resource it trades and reads worse by rule; MongoDB's is
+positive because there the governor gave memory back). The v1 tables read the same and stay as the first engine's record.
 
 **What is shown and what is not.** Shown: more work inside the response line on the same machines and a faster tail,
 on real Kubernetes, three times on a frozen engine; a real database holding fewer connections for the same service; a
@@ -57,6 +61,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | PostgreSQL behind PgBouncer, three workloads | inside the noise | inside the noise | connections held open **−61% to −72%** on two workloads; the runs disagree on the third | host CPU-seconds **+14% to +28%, confirmed worse** | `results/live/V3_PGBENCH.md` |
 | Apache Kafka, a consumer group's size, three workloads | work inside the line **+16% to +21%**; no message lost | p95 **1.6 s → 9 to 14 ms**, lag −92% to −97% | consumers held **2 → 5.8 to 7.9, confirmed worse** | host CPU-seconds +10% to +20% confirmed worse on light, inside the noise on heavy and burst; CPU per message inside the line −10% to −12% on burst | `results/live/V3_KAFKA.md` |
 | Redis, a cache's memory ceiling, three workloads | work inside the line **+14% to +27%**, hit rate +14% to +27%; no failed request | mean latency −30% to −61%; p95 within a hair of native's (a miss is a miss in both arms) | memory ceiling held **64 → 200 to 270 MB, confirmed worse** | host CPU-seconds inside the noise on all three | `results/live/V3_REDIS.md` |
+| MongoDB under YCSB, a database's storage-engine cache size, four workloads | inside the noise on all four; no failed operation | p95 and p99 inside the noise; mean latency on burst **+2% to +4%, confirmed worse** | cache size held **−49% on c, −41% to −49% on burst, −13% to −37% on f, confirmed better**; b inside the noise in one run | host CPU-seconds inside the noise on all four | `results/live/V3_YCSB.md` |
 | Robustness: the governor killed outright at 40% of the window, 10 pairs × 3 runs | **every setting back at the operator's 7 to 11 s after the kill, 30 of 30**; a second governor to the end; failed requests over the window −9% to −15% | the 120 s after the kill inside the noise against native; the whole window p95 −42% to −45% | inside the noise | inside the noise | `results/live/V3_ROBUST_KILL.md` |
 | The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell | the organisms' work unchanged | p95 better in every cell | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
 
@@ -106,8 +111,11 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
    (`results/live/V3_ROBUST_KILL.md`: every setting back 7 to 11 s after the kill in 30 of 30 repetitions) and the
    governor's own CPU is tabulated (`results/live/V3_OWN_COST.md`); the long run (3 pairs × 3 runs, 7,200 s) is running;
    the 24-hour run on a rented machine follows.
-5. **YCSB on MongoDB** (`docs/YCSB_PREREGISTRATION.md`, built): the operator's WiredTiger cache as native, Omni on the cache
-   size through the server's own console; the smoke run first, then A, B and C on v3.
+5. **YCSB on MongoDB, done** (`docs/YCSB_PREREGISTRATION.md`, `results/live/V3_YCSB.md`): the operator's WiredTiger cache
+   as native, Omni on the cache size through the server's own console; four smoke runs recorded, then A, B and C on v3; the
+   cache held given back by about half on two untouched workloads at no measurable cost in work, p95 or CPU, one confirmed
+   loss (the burst mean latency, +2% to +4%); the index now spans five real categories at +25.9%. Cassandra and Redis under
+   YCSB and HammerDB are next in row 24.
 6. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
    Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,
    RocketPy, Cantera (Kafka and Redis done); one or two at a time, each preregistered.

@@ -62,15 +62,18 @@ inside the 500 ms line on all three untouched workloads, a 95th percentile of 9 
 message lost, at the confirmed cost of three to four times the consumers running. On a real cache, Redis as shipped
 (`results/live/V3_REDIS.md`): 14% to 27% more requests inside the 2 ms line and a hit rate 14% to 27% higher on all three
 untouched workloads, at the confirmed cost of a memory ceiling held at 200 to 270 MB against the operator's 64 MB, which
-outweighs the gain in the index. In the modelled realms, 945 muscles
+outweighs the gain in the index. On a real database's storage-engine cache, MongoDB as its publisher ships it under YCSB
+(`results/live/V3_YCSB.md`): the cache given back by about half on two of four untouched workloads and by 13% to 37% on a
+third, confirmed, with work inside the line, p95 and CPU inside the noise and no failed operation, at the confirmed cost
+of 2% to 4% on the mean latency of the burst workload. In the modelled realms, 945 muscles
 and six organisms (`results/realms/REALMS.md`): every organism superior within its guardrails, zero muscles worse, at
 every size from 1 to 1,000 copies. On the independent simulators: a power grid's losses better in 7 of 11 grids and
 worse in 4; robot arms' peak torque down 10% to 29% where Omni-Compass moved and left native where the paired trial said
 not to; buildings' electricity bought and daily peak better in all 11 battery districts and the bill worse in 7; drone
 swarms' energy a mission 7% to 20% lower with no late mission, near miss or collision. The one combined number, the Omni
-index over the four real categories confirmed three times, stands at **+30.2%** (`results/OMNI_INDEX.md`): Kubernetes
-+25.5%, the database +14.2%, messaging +166.9% and the cache −24.9%, every category weighed the same and every row inside
-the noise counted as exactly nothing. The cache's category is negative because the memory it holds is the resource it
+index over the five real categories confirmed three times, stands at **+25.9%** (`results/OMNI_INDEX.md`): Kubernetes
++25.5%, the database +14.2%, messaging +166.9%, the cache −24.9% and the database's storage-engine cache +10.2%, every
+category weighed the same and every row inside the noise counted as exactly nothing. The cache's category is negative because the memory it holds is the resource it
 trades and reads worse by rule, even as its work and hit rate read better; the index does not hide that.
 
 **What has not been shown, said plainly.** An energy or cloud-bill saving on real machines. Energy on kind is a
@@ -232,6 +235,7 @@ Every muscle keeps its own control, and Omni-Compass sets what that control alre
 | Robot joint, vehicle axis | the servo loop | speed and effort limits |
 | Process loop, feeder | the PI controller | the setpoint inside its band |
 | Database behind a pooler | PgBouncer's pool, the DBA's fixed setting | the pool size through the pooler's own console |
+| Database's storage engine | MongoDB's WiredTiger cache, the operator's fixed setting | the cache size through the server's own console |
 | Message broker | the consumer group at the operator's count | how many consumers are in the group |
 | Cache | the operator's memory ceiling and eviction rule | the memory ceiling through the cache's own console |
 | Substation | the tap changer's own controller | the tap position, one whole tap per move |
@@ -4512,7 +4516,7 @@ confirmed". The `V1_` or `V3_` in the name is the engine the runs carried (`pyth
 a table never mixes engines, and a reading is never carried from one engine to another. Losses are in the table beside
 the gains: the database's host CPU-seconds, the grid's losses in four grids, the Panda's copper, CityLearn's bill.
 
-### The workload tables (`V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`) and the swarm table (`V3_SWARM.md`)
+### The workload tables (`V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`, `V3_YCSB.md`) and the swarm table (`V3_SWARM.md`)
 
 The database, the broker and the cache share one shape. The head names the three runs, their commits and the engine each
 carried. Then one section per **workload**: the tuning workload first, marked "shown and not counted" because the rules were
@@ -4593,7 +4597,7 @@ Patent applications, copyright registrations and trademark applications filed in
 
 
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `d88461a8`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `7514d1e5`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 1. The mechanism, and proof that it is the one that ran
 
@@ -4664,6 +4668,20 @@ Redis as Ubuntu ships it with the operator's 64 MB ceiling and allkeys-lru is na
 | `small` | **+26% to +27%, confirmed better** | **+26% to +27%, confirmed better** | **-1% to -0%, confirmed better** | **+320% to +325%, confirmed WORSE** | no difference beyond the noise |
 
 The memory the compass holds for a wide working set is the resource this benchmark trades, and reads worse by rule. Table: `results/live/V3_REDIS.md`.
+
+### 3d. A real database's storage-engine cache: MongoDB under YCSB, the operator's cache size, Omni v3, three runs (evidence class L)
+
+MongoDB 8.0 as its publisher ships it with the operator's WiredTiger cache of 512 MB is native; omni is the compass law on one knob, the cache size, inside the cover [256, 2,048] MB through the server's own console, growing by notches of 64 MB only while the cache is full and reads are slow, and giving a notch back when calm and nothing is evicted (`docs/YCSB_PREREGISTRATION.md`). YCSB's published core workloads with the key space stepping through the cache and past it, drawn uniformly, at 3,000 operations a second from 32 threads; three paired repetitions a run, three runs; the tuning workload (workload A) is shown and not counted. Runs: A 37727968670; B 37727976107; C 37727983746.
+
+| Workload | Work inside the 1 ms line | p95 | Cache size held, MB (the resource held) | Pages read into the cache | Host CPU-seconds |
+|---|---|---|---|---|---|
+| `tuning` (tuning, shown, not counted) | no difference beyond the noise | no difference beyond the noise | **-15% to -12%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `b` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
+| `burst` | no difference beyond the noise | no difference beyond the noise | **-49% to -41%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `c` | no difference beyond the noise | no difference beyond the noise | **-50% to -49%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `f` | no difference beyond the noise | no difference beyond the noise | **-37% to -12%, confirmed better** | shown, not judged | no difference beyond the noise |
+
+On this machine the data files sit in the operating system's page cache as well, so a storage-engine miss is a read from memory, not a disk, as disclosed before the run: the result is memory given back at no measurable cost in work inside the line, p95 or CPU, with one confirmed loss, the mean latency on the burst workload. Table: `results/live/V3_YCSB.md`.
 
 ### 4. The bill on a real cloud: Azure Kubernetes Service, Omni v1 (evidence class L, a metered bill)
 
@@ -4970,6 +4988,21 @@ console as omni, a tuning workload shown and not counted, and untouched workload
   gain costs; the host's CPU-seconds read inside the noise on all three; keys evicted fell 76% to 92% (shown); every
   ceiling was handed back. 12 gauge-rows better, 6 worse, 0 where the runs disagree. The tuning workload, shown and not
   counted, read the same way (hit rate 75% to 87%, the ceiling 64 to 299 MB).
+- **MongoDB 8.0.32 under YCSB 0.17.0** (`V3_YCSB.md`, `docs/YCSB_PREREGISTRATION.md`): the knob is the storage engine's
+  cache size, the operator's 512 MB as native, and the question is the opposite of the Redis one: not whether the governor
+  will buy service with memory, but whether it will give memory back without losing service. On workloads c and burst the
+  cache held fell by about half (512 to about 260 MB) and on f by 13% to 37%, confirmed better; on b it fell 27% to 50% but
+  one run's interval included zero, so that row reads no difference beyond the noise; work inside the 1 ms line, p95 and
+  p99 read inside the noise on all four workloads (work between −2.7% and +1.1%, every interval over zero); no operation
+  failed in any arm; the host's CPU-seconds read inside the noise on all four, +12% to +15% on c with intervals over zero;
+  pages read into the cache rose 14% to 58% (shown, not judged: the misses the smaller cache costs); and one row is a
+  confirmed loss, the mean latency on burst, +2.2% to +3.7% in all three runs, clear of zero, which stands. Every cache
+  size was handed back in every arm. 6 gauge-rows better, 1 worse, 0 where the runs disagree. The tuning workload, shown
+  and not counted, read the same way (the cache 12% to 15% smaller, everything else inside the noise). The disclosure made
+  before the run held: on this machine the data sits in the operating system's page cache too, so a storage-engine miss
+  costs a memory read and a decompression, not a disk read, which is why half the cache could be given back at no
+  measurable cost in work or p95 and a few percent of mean latency; on a machine whose data does not fit in memory the
+  same knob would be asked a harder question, and this table does not answer it.
 
 ### 16.4b Robustness: the governor killed outright, and its own cost
 
@@ -5027,9 +5060,15 @@ hardware, and never counted in the Omni index.
 
 ### 16.6 The one number, and the table
 
-**The one number.** The Omni index over the real categories confirmed three times: **+30.2%** (real Kubernetes on v3 +25.5%,
-the real database on v3 +14.2%, real messaging on v3 +166.9%, the real cache on v3 −24.9%, each category weighed the
-same; Azure and the card join as their three-run tables land). The messaging figure is large because its speed ratio is:
+**The one number.** The Omni index over the real categories confirmed three times: **+25.9%** (real Kubernetes on v3 +25.5%,
+the real database on v3 +14.2%, real messaging on v3 +166.9%, the real cache on v3 −24.9%, the real database's
+storage-engine cache on v3 +10.2%, each category weighed the same; Azure and the card join as their three-run tables
+land). The fifth category lowered the headline from +30.2% to +25.9% when it joined on 8 October, and that is how the
+number is meant to move: every real category enters at equal weight as its table lands, whatever it does to the mean.
+The storage-engine cache's figure is positive for the reason the Redis figure is negative, read the other way: there the
+governor gave memory back (the cache held halved on two workloads) while work, p95 and CPU stayed inside the noise, so
+its resource column is a gain and its other columns are exactly one; its one confirmed loss, the burst mean latency, is
+not an index column and stands in its table. The messaging figure is large because its speed ratio is:
 native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5%
 waited 1.6 s, while Omni's waited 9 to 14 ms; the resource that bought it, three to four times the consumers, stands
 beside it as a confirmed loss. The cache's figure is negative because the memory held is its resource column: the ceiling
@@ -5061,6 +5100,7 @@ themselves, which is why every row is in its table.
 | **Drone swarms, gym-pybullet-drones** (Crazyflie 2.x, the shipped autopilot as native; Omni on the cruise override inside the autopilot's limits), 20 drones × 4 missions, three cells, A/B/C | v3 | S | energy a mission −7% (short), −18% (mixed), −20% (long) and missions a charge +8% to +25%, confirmed better; no late mission, reserve breach, near miss or collision in any arm; tracking error 0.07 → 0.13 m inside its 0.25 m band | `results/live/V3_SWARM.md` |
 | **Apache Kafka as shipped, a consumer group's operator-set size** (one broker, 8 partitions; the group at the operator's 2 consumers as native; Omni on the count inside [1, 8]), three untouched workloads, 3 pairs × 3 runs | v3 | L | work inside the 500 ms line **+16% to +21% confirmed better** on all three; end-to-end p95 1.6 s → 9 to 14 ms and mean lag −92% to −97% confirmed better; no message lost in any arm; consumers held 2 → 5.8 to 7.9 **confirmed worse** (the resource the gain costs); host CPU-seconds confirmed worse on light (+10% to +20%), inside the noise on heavy and burst; every count handed back; 21 gauge-rows better, 8 worse | `results/live/V3_KAFKA.md` |
 | **Redis as shipped, a cache's operator-set memory ceiling** (64 MB, allkeys-lru as native; Omni on the ceiling inside [16, 512] MB through Redis's own console, grown only while the cache is full), three untouched workloads, 3 pairs × 3 runs | v3 | L | work inside the 2 ms line **+14% to +27% confirmed better** on all three; hit rate +14% to +27% and mean latency −30% to −61% confirmed better; no failed request; the memory ceiling held 64 → 200 to 270 MB and the memory used **confirmed worse** (the resource the gain costs); p95 within a hair of native's; host CPU inside the noise; every ceiling handed back; 12 gauge-rows better, 6 worse | `results/live/V3_REDIS.md` |
+| **MongoDB as its publisher ships it, a database's operator-set storage-engine cache size** (512 MB as native; Omni on the cache size inside [256, 2,048] MB through the server's own console, grown only while the cache is full and reads are slow), YCSB's workloads b, c, f and burst untouched, 3 pairs × 3 runs | v3 | L | the cache size held **−49% on c, −41% to −49% on burst, −13% to −37% on f, confirmed better**; on b −27% to −50% with one run's interval over zero, no difference beyond the noise; work inside the 1 ms line, p95, p99 and host CPU inside the noise on all four; no failed operation; the mean latency on burst **+2% to +4%, confirmed worse**; pages read into the cache +14% to +58% (shown); every cache handed back; 6 gauge-rows better, 1 worse. "Why is the gain memory and not speed?" Because on this machine the data sits in the operating system's page cache too, so a storage-engine miss costs a memory read, not a disk read, as disclosed before the run; the question the knob would face on a disk-bound store is not answered here. "Is the mean-latency loss hidden?" No: it is a confirmed-worse row in the table and in this manual; it is not an index column, which the index's rules name | `results/live/V3_YCSB.md` |
 | **Robustness: the governor killed outright mid-run** (SIGKILL at 40% of the window, the watchdog beside it), 10 pairs × 3 runs | v3 | L | every setting back at the operator's **7 to 11 s after the kill in 30 of 30 repetitions** (allowance 60 s), a second governor to the end in every one, the 120 s after the kill inside the noise against native; the whole window still confirmed better on mean response, p95, time over the line and failed requests | `results/live/V3_ROBUST_KILL.md` |
 | **The governor's own cost** at 1, 10, 100 and 1,000 copies with the real cluster inside | v3 and v1, each under its own engine | L | 0.006 to 0.013 of one core at every size, 0.1% to 0.3% of the host's cores; shown, not judged | `results/live/V3_OWN_COST.md` |
 | **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
@@ -5068,7 +5108,7 @@ themselves, which is why every row is in its table.
 
 **Running now** (8 October): the four stacked at 1,000 copies on the detached machine; the robustness test
 (`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario done (section 16.4b) and the long run running as A, B and C;
-YCSB on MongoDB (`docs/YCSB_PREREGISTRATION.md`), its smoke run first and then A, B and C; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
+YCSB on MongoDB done (`V3_YCSB.md`, section 16.4) and the other stores of register row 24 next; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
 subscription's family allowances before any arm ran, the next by Azure's own cluster capacity in eastus; the fleet is
 rebuilt from the families the survey shows allowed). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
 defense edge (PX4 and ArduPilot multi-vehicle, Crazyswarm), databases and caches at large (YCSB, HammerDB), Spark,
@@ -8372,12 +8412,16 @@ Kafka as shipped, `results/live/V3_KAFKA.md`): on all three untouched workloads 
 consumers held 2 → 6 to 8, **confirmed worse**, the resource the gain costs; host CPU worse on one workload, inside the
 noise on two. **A real cache** (Redis as shipped, `results/live/V3_REDIS.md`): on all three untouched workloads work inside
 the 2 ms line **+14% to +27%**, the hit rate +14% to +27% and the mean latency −30% to −61%, confirmed better; the memory
-ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain costs; host CPU inside the noise. **The Omni
-index, real machines only, confirmed three times: +30.2%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database
-+14.2%, Kafka +166.9%, Redis −24.9%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's
-speed ratio is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is
-negative because the memory it holds for a wide working set is the resource it trades and reads worse by rule). The v1
-tables read the same and stay as the first engine's record.
+ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain costs; host CPU inside the noise. **A real
+database's storage-engine cache** (MongoDB as its publisher ships it under YCSB, `results/live/V3_YCSB.md`): on four
+untouched workloads the cache size held fell about half on c and burst and 13% to 37% on f, **confirmed better** (b inside
+the noise in one run); work inside the 1 ms line, p95 and host CPU inside the noise on all four; no failed operation; the
+burst mean latency **+2% to +4%, confirmed worse**, the one loss. **The Omni index, real machines only, confirmed three
+times: +25.9%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database +14.2%, Kafka +166.9%, Redis −24.9%, the
+database's cache +10.2%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's speed ratio
+is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is negative
+because the memory it holds for a wide working set is the resource it trades and reads worse by rule; MongoDB's is
+positive because there the governor gave memory back). The v1 tables read the same and stay as the first engine's record.
 
 **What is shown and what is not.** Shown: more work inside the response line on the same machines and a faster tail,
 on real Kubernetes, three times on a frozen engine; a real database holding fewer connections for the same service; a
@@ -8402,6 +8446,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | PostgreSQL behind PgBouncer, three workloads | inside the noise | inside the noise | connections held open **−61% to −72%** on two workloads; the runs disagree on the third | host CPU-seconds **+14% to +28%, confirmed worse** | `results/live/V3_PGBENCH.md` |
 | Apache Kafka, a consumer group's size, three workloads | work inside the line **+16% to +21%**; no message lost | p95 **1.6 s → 9 to 14 ms**, lag −92% to −97% | consumers held **2 → 5.8 to 7.9, confirmed worse** | host CPU-seconds +10% to +20% confirmed worse on light, inside the noise on heavy and burst; CPU per message inside the line −10% to −12% on burst | `results/live/V3_KAFKA.md` |
 | Redis, a cache's memory ceiling, three workloads | work inside the line **+14% to +27%**, hit rate +14% to +27%; no failed request | mean latency −30% to −61%; p95 within a hair of native's (a miss is a miss in both arms) | memory ceiling held **64 → 200 to 270 MB, confirmed worse** | host CPU-seconds inside the noise on all three | `results/live/V3_REDIS.md` |
+| MongoDB under YCSB, a database's storage-engine cache size, four workloads | inside the noise on all four; no failed operation | p95 and p99 inside the noise; mean latency on burst **+2% to +4%, confirmed worse** | cache size held **−49% on c, −41% to −49% on burst, −13% to −37% on f, confirmed better**; b inside the noise in one run | host CPU-seconds inside the noise on all four | `results/live/V3_YCSB.md` |
 | Robustness: the governor killed outright at 40% of the window, 10 pairs × 3 runs | **every setting back at the operator's 7 to 11 s after the kill, 30 of 30**; a second governor to the end; failed requests over the window −9% to −15% | the 120 s after the kill inside the noise against native; the whole window p95 −42% to −45% | inside the noise | inside the noise | `results/live/V3_ROBUST_KILL.md` |
 | The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell | the organisms' work unchanged | p95 better in every cell | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
 
@@ -8578,6 +8623,7 @@ do not yet exist, the row says what will supply them.
 | Kubernetes: fairness beside a noisy neighbour | no difference beyond the noise on every row, the neighbour's included | L | "Does it hurt the other tenant?" Not measurably, in three runs of ten pairs |
 | Database behind its pooler: connections held open | **−61% to −72%** confirmed better on two workloads; the runs disagree on the third | L | "What did it cost?" Host CPU-seconds +14% to +28%, confirmed worse on all three workloads, the compass's own cost included, counted against Omni in the index; work and latency inside the noise |
 | Message broker: work inside the 500 ms line; the 95th percentile | **+16% to +21%**; 1.6 s → 9 to 14 ms, confirmed better on all three workloads; no message lost | L | "Why is the latency figure so large?" By design native sat at nine tenths of its measured capacity, so its queue grew at the high steps and Omni's did not; the gain is the queue kept short. "What did it cost?" Consumers running 2 → 5.8 to 7.9, confirmed worse; host CPU worse on one workload, inside the noise on two |
+| Database's storage-engine cache (MongoDB under YCSB): the cache size held | **−49% on c, −41% to −49% on burst, −13% to −37% on f**, confirmed better; b inside the noise in one run | L | "What did it cost?" Work inside the 1 ms line, p95, p99 and host CPU inside the noise on all four workloads, no failed operation; the burst mean latency **+2% to +4%, confirmed worse**, in the table. "Why is this the mirror of the Redis result?" Because here the operator's setting was larger than the working set needed on this machine, so the governor gave memory back; there it was smaller, so the governor bought service with memory. "Would this hold on a disk-bound store?" Not shown: on this machine a miss is a memory read, as disclosed before the run |
 | Cache: work inside the 2 ms line; the hit rate | **+14% to +27%** and +14% to +27%, confirmed better on all three workloads; no failed request | L | "What did it cost?" The memory ceiling held, 64 → 200 to 270 MB, confirmed worse, and the memory used with it; host CPU inside the noise. "Why is p95 unchanged?" A miss costs the declared 5 ms trip in both arms and 5% of requests still miss at the high notches; the gain is in the mean and in the work inside the line. "Why is the cache's index negative?" Because its resource column is the memory held, a ratio of about 0.25, and the geometric mean of a 1.2 gain and a 0.25 cost is below one |
 | The modelled realms: work per energy, 945 muscles, six organisms, 1 to 1,000 copies | **+0.07% to +0.37%**, every organism superior within guardrails, 0 muscles worse | S | "Why so small?" The native controllers in the models are well tuned and leave little room; the number is small and real within the model, the same at every size, and it is never counted in the headline |
 | Power grid, 11 SimBench grids in pandapower | energy drawn and net import better in all 11; losses better in 7, **worse in 4**; tap operations fewer in 10, 4 → 8 a year in one, worse | S | "Where does it lose?" In the rural and semi-urban grids with their own generation, where a lower voltage raises losses; the table shows it |
@@ -9871,7 +9917,7 @@ to be wrong for the sentence to be wrong.
 | Killed outright, the governor's settings are back at the operator's within seconds | L | `results/live/V3_ROBUST_KILL.md`, `docs/ROBUSTNESS_PREREGISTRATION.md` | a repetition handed back after 60 s, or not at all |
 | Governing costs a few thousandths of a core at every size | L | `results/live/V3_OWN_COST.md` | an own-cost figure growing with the organism |
 | The pooler, the broker and the cache each gain on their untouched workloads | L | `V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`, each preregistration | a confirmed-worse product row on an untouched workload; the memory row of the cache is such a loss and stands |
-| The one number is +30.2% across the real categories, losses included | L, by rule | `results/OMNI_INDEX.md`, `tools/omni_index.py` | a category omitted, a loss not entered, a tuning row counted |
+| The one number is +25.9% across the real categories, losses included | L, by rule | `results/OMNI_INDEX.md`, `tools/omni_index.py` | a category omitted, a loss not entered, a tuning row counted |
 | The modelled realms, grids, arms, buildings and swarms gain under their own native controllers | S | `results/realms/`, `V3_PANDAPOWER.md`, `V3_MUJOCO.md`, `V3_CITYLEARN.md`, `V3_SWARM.md` | a run of the same simulator at the same version and seed giving other digits |
 | A physical meter shows less energy for the same work | P | **no current result**; `docs/GPU_PREREGISTRATION.md` names the run | the rerun on the current card controller reading no difference or worse |
 | Omni-Compass never changes the engine between a rule and its result | by construction | `OMNI_V3.json`, `tools/omni_version.py --commit <sha>` on every table's commits | a table whose runs' commits carry different fingerprints |

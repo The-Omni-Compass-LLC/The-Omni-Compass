@@ -254,6 +254,17 @@ def main():
          ("work_inside_line_rps", "hit_rate", "p95_ms", "maxmemory_mb_mean", "cpu_seconds"),
          "The memory the compass holds for a wide working set is the resource this benchmark trades, and reads worse by rule. "
          "Table: `results/live/V3_REDIS.md`."),
+        ("V3_YCSB.json", "## 3d. A real database's storage-engine cache: MongoDB under YCSB, the operator's cache size, Omni v3, three runs (evidence class L)",
+         "MongoDB 8.0 as its publisher ships it with the operator's WiredTiger cache of 512 MB is native; omni is the compass law on one knob, "
+         "the cache size, inside the cover [256, 2,048] MB through the server's own console, growing by notches of 64 MB only while the cache "
+         "is full and reads are slow, and giving a notch back when calm and nothing is evicted (`docs/YCSB_PREREGISTRATION.md`). YCSB's "
+         "published core workloads with the key space stepping through the cache and past it, drawn uniformly, at 3,000 operations a second "
+         "from 32 threads; three paired repetitions a run, three runs; the tuning workload (workload A) is shown and not counted.",
+         "| Workload | Work inside the 1 ms line | p95 | Cache size held, MB (the resource held) | Pages read into the cache | Host CPU-seconds |",
+         ("work_inside_line_ops", "p95_ms", "cache_mb_mean", "pages_read", "cpu_seconds"),
+         "On this machine the data files sit in the operating system's page cache as well, so a storage-engine miss is a read from memory, "
+         "not a disk, as disclosed before the run: the result is memory given back at no measurable cost in work inside the line, p95 or "
+         "CPU, with one confirmed loss, the mean latency on the burst workload. Table: `results/live/V3_YCSB.md`."),
     )
     for fname, head, intro, header, keys, after in WORKLOAD_SECTIONS:
         p = ROOT / "results" / "live" / fname
