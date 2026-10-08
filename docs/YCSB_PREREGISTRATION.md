@@ -113,6 +113,12 @@ run by `verify.py`, prove the rules without a server.
 A one-repetition run of the tuning workload on GitHub's machine exercises the harness end to end before any counted run; its
 result is recorded here when it has run, and it is not counted.
 
+- **First smoke run (37718548245, 2026-10-08 02:35 UTC): failed before any arm ran**, on two harness faults, both fixed
+  before the second smoke: YCSB was given a relative path for its raw measurements while it runs from its own directory, so
+  the load phase could not open the file (the path is now absolute); and the server's log was copied into the artifact as a
+  root-owned file the upload step could not read. MongoDB 8.0.32 installed from its publisher's repository and YCSB's
+  checksum matched. Nothing in the rules, the gauges or the workloads changed.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

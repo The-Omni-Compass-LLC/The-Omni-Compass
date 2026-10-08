@@ -262,6 +262,7 @@ def parse_failed(summary_text):
 
 def ycsb(cmd, workload_file, props, out_file: Path):
     """One YCSB invocation (load or run) with raw per-operation measurements written to out_file; returns its summary text."""
+    out_file = Path(out_file).resolve(); out_file.parent.mkdir(parents=True, exist_ok=True)   # YCSB runs from its own home: absolute paths
     args = ["bash", str(YCSB_HOME / "bin" / "ycsb.sh"), cmd, "mongodb", "-s", "-P", str(YCSB_HOME / "workloads" / workload_file),
             "-p", f"mongodb.url={URL}/{DB}?w=1", "-p", "measurementtype=raw", "-p", f"measurement.raw.output_file={out_file}"]
     for k, v in props.items():

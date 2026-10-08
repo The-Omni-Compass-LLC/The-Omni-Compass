@@ -62,7 +62,7 @@ jobs:
           code=$?
           tail -40 run.log
           grep "^==\|^   " run.log | tee -a "$GITHUB_STEP_SUMMARY"
-          sudo cp /var/log/mongodb/mongod.log out/mongod.log 2>/dev/null || true
+          sudo cat /var/log/mongodb/mongod.log > out/mongod.log 2>/dev/null || true
           exit $code
       - run: cd out && find . -type f -name '*.raw' -size +20M -delete; find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
