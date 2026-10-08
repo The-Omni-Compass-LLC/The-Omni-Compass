@@ -508,6 +508,8 @@ do not yet exist, the row says what will supply them.
 | Robot arms, MuJoCo Menagerie | peak torque −29% and −10%, tracking error −21% where Omni moved; the Panda's copper loss **+14% worse**; two arms left native | S | "What about the arms that gained nothing?" The paired physics trial left them native and the table says "nothing for Omni to move" |
 | Buildings with batteries, CityLearn, 11 districts | electricity bought, daily peak and unevenness better in all 11; the bill **worse in 7**; ramping worse in 7 | S | "Is the bill a loss?" Yes, in the 2023 districts, and it is in the table as such |
 | Drone swarms, gym-pybullet-drones, three 20-drone cells | energy a mission −7% to −20%, missions a charge +8% to +25%; no late mission, reserve breach, near miss or collision | S | "Is the energy a meter?" No, a declared model from the simulator's own motor constants; the tracking error rose from 0.07 to 0.13 m inside its 0.25 m band and is shown |
+| The governor's own cost, 1 to 1,000 copies with the real cluster inside | **0.006 to 0.013 of one core** at every size, 0.1% to 0.3% of the host's cores | L | "Does the brain's cost grow with the body?" No: it governs the real cluster, and that cost does not grow with the organism around it; shown, not judged, each run under its own engine (`results/live/V3_OWN_COST.md`) |
+| The governor killed outright mid-run (the smoke run; A, B and C running) | every setting back at the operator's **7 s** after the kill in the one smoke repetition; the counted runs decide | L | "What if Omni-Compass dies?" The watchdog hands back from the lease the governor left; the preregistered allowance is 60 s and the three counted runs read against it |
 | Azure's bill on a 4-worker fleet (v1) | no difference beyond the noise on any gauge | L, a real bill | "Then where is the saving?" A fleet of 4 cannot show one machine; the 40-worker fleet that can is preregistered and waits on Azure's own cluster capacity in its region |
 | The real card (GPU) | **obsolete**: every earlier card result ran on a controller since replaced | P pending | "When?" The founder's runs on rented cards at one named commit, after the CPU and cloud work |
 
@@ -725,6 +727,7 @@ stack in this manual, so a referee can see that the "gains" differ only through 
 | PgBouncer, the pool size | time in the server plus time waiting for one, per transaction | 50 ms | 0.4 | 1 s | 2 s | [2, PostgreSQL's limit minus 10] |
 | Kafka, the consumer count | the group's own end-to-end latency, mean of the last second | 500 ms | 0.4 | 1 s | 3 s (a rebalance) | [1, the topic's partitions] |
 | Redis, the memory ceiling | the application's request latency, mean of the last second | 2 ms | 0.4 | 1 s | 2 s | [16 MB, 512 MB] |
+| MongoDB, the storage-engine cache | the server's own mean read latency, last second | 2 ms | 0.4 | 1 s | 2 s | [256 MB, 2,048 MB] |
 | A drone's cruise override | the drone's tracking error | 0.25 m, the declared safe error | 0.5 | one control tick (48 Hz) | 1 s | [1.0, 2.0] × the planner's cruise |
 | A substation's tap | the bus voltage in its band | the band's edge | 0.5 | one solve | a week of evidence before a step down | the tap's own range, one tap per move |
 | A robot axis's speed | the axis's tracking error against its takt | the declared error | 0.5 | one control step | the axis's response | the axis's own limits |
@@ -1129,6 +1132,7 @@ OFF. Native is always the stack's own controller left as shipped; omni is that c
 | A message broker's consumer group (Apache Kafka) | one knob | the consumer count inside [1, partitions], read from the consumers' own records; the rebalance paid on every move (10.5) |
 | A cache's memory ceiling (Redis) | one knob | `maxmemory` through the cache's own console, grown only while the cache is full (10.6) |
 | Drone swarms (gym-pybullet-drones; PX4 and ArduPilot next) | one knob a drone | the cruise override inside the autopilot's limits; a separation wall; collisions void the cell (10.7) |
+| A database's storage-engine cache (MongoDB under YCSB) | one knob | the WiredTiger cache size through the server's own console, grown only while the cache is full (10.8) |
 
 ### 10.1 Managed Kubernetes on Azure: the bill as the gauge
 
@@ -1283,6 +1287,26 @@ costs less energy at all and keeps the error under the safe error; where it does
 that cell and the cell reads "nothing for Omni to move". Energy is a declared model from the simulator's own motor
 constants, said to be a model wherever it is printed; a collision voids the cell. At every landing and at the end of the
 run the override is handed back and read back.
+
+### 10.8 A database's storage-engine cache
+
+MongoDB is wired as an operator runs it (`docs/YCSB_PREREGISTRATION.md`, `tools/run_ycsb.py`): the 8.0 series from its
+publisher's own signed repository, its configuration as shipped but for the one setting an operator sets for the storage
+engine, the WiredTiger cache, at 512 MB. The questions are asked by YCSB, the published cloud-serving benchmark, running its
+own core workloads as the project ships them, with the key space stepping one notch at a time through the cache and past
+it, so the working set fits the operator's cache at the low notches and outgrows it at the high ones. The wire in is the
+server's own mean read latency over the last second, from its `serverStatus` operation latencies, differenced. The wire out
+is one setting through the server's own console, `setParameter wiredTigerEngineRuntimeConfig cache_size`, inside the cover
+[256 MB, 2,048 MB]: the server's own floor at one end, a quarter of the machine at the other. The compass holds the reading
+at 40% of a 2 ms line. The direction rule is the cache's: slow reads grow the cache by notches of 64 MB only while the
+cache is full (bytes in it at 90% of its size or more), because slow reads in a cache with room to spare are not the
+cache's to mend; calm with no page evicted in the last second gives back one notch a second after a five-second dwell; at
+95% of the line with the cache full a quarter of the cover is added at once. One writer, read-back and the hand-back at the
+end are the plug's, as everywhere. Disclosed before the run: on a machine where the data files fit in the operating
+system's own page cache, a storage-engine cache miss is a read from memory and a decompression, not a disk read, so the
+gain available to this knob is smaller than it would be on a machine whose data does not fit in memory; the result will
+say what it is. The same plug fits any store whose engine exposes a cache size at run time (InnoDB's buffer pool, RocksDB's
+block cache) and any store that does not can only be sized at restart, which is not a knob Omni-Compass moves.
 
 ---
 
@@ -1735,8 +1759,8 @@ themselves, which is why every row is in its table.
 | GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
 **Running now** (8 October): the four stacked at 1,000 copies on the detached machine; the robustness test
-(`docs/ROBUSTNESS_PREREGISTRATION.md`), its one-repetition smoke run first and then the kill and long scenarios as A, B
-and C; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
+(`docs/ROBUSTNESS_PREREGISTRATION.md`), its one-repetition smoke run passed and the kill and long scenarios running as A, B
+and C; YCSB on MongoDB (`docs/YCSB_PREREGISTRATION.md`), its smoke run first and then A, B and C; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
 subscription's family allowances before any arm ran, the next by Azure's own cluster capacity in eastus; the fleet is
 rebuilt from the families the survey shows allowed). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
 defense edge (PX4 and ArduPilot multi-vehicle, Crazyswarm), databases and caches at large (YCSB, HammerDB), Spark,
@@ -1914,6 +1938,8 @@ any one of the three can tell whether the files in front of them are the files t
 | Evidence class P, L, S | a physical meter; live software with no meter; a model of ours |
 | Handed back | the knob read back at the operator's value at the end of an arm; every table says whether every arm was |
 | Off the clock | see above; a repetition whose arm ended more than 5% of its window late |
+| Own cost | the governor's CPU (its process and every command it ran) as a share of one core over the window, from its audit; a few thousandths of a core at every size |
+| Smoke run | one repetition that exercises a harness end to end before any counted run; never counted, always recorded |
 | L + S | an organism run with a real cluster inside: the cluster is L, the organism around it S |
 
 ## Appendix A - Command Reference
@@ -1943,6 +1969,8 @@ any one of the three can tell whether the files in front of them are the files t
 | The database benchmark, one run | `python3 tools/run_pgbench.py --out <dir>` (workflow `pgbench`) |
 | The message broker, one run | `python3 tools/run_kafka.py --setup`, then `--workloads light,heavy,burst --out <dir>` (workflow `kafka`) |
 | The cache, one run | `python3 tools/run_redis.py --setup`, then `--workloads small,large,burst --out <dir>` (workflow `redis`) |
+| The database's storage-engine cache under YCSB, one run | `python3 tools/run_ycsb.py --setup`, then `--workloads b,c,f,burst --out <dir>` (workflow `ycsb`) |
+| The robustness test | workflow `robustness`: `scenario` kill or long, `reps`, `duration_s`; the own-cost table `python3 tools/own_cost.py <raw run dirs> --out results/live/V3_OWN_COST.md` |
 | The drone swarms, one cell | `python3 tools/run_swarm.py --cell short|mixed|long|all --out <dir>` (workflow `swarm`) |
 | The independent simulators | `python3 tools/run_citylearn.py`, `run_pandapower.py`, `run_mujoco.py` (workflows `citylearn`, `pandapower`, `mujoco`) |
 | Azure, the bill | workflow `aks-metered`: `reps`, `arms`, `duration_s`, `load_steps`, `worker_pools`, `pool_prices`, `hpa_max` |
