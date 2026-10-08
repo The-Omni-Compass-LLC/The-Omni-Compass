@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: azure-inventory
+# Lists, read-only, what the subscription holds: every resource group with its state and tags, every AKS cluster with its
+# node pools, every virtual machine and scale set, and one region's vCPU usage against its allowance family by family, so
+# the founder and a referee can see what is being billed and what holds quota (the fleet's pre-flight found 8 of 10 vCPUs
+# held in two families on 8 October with nothing of ours known to run there; docs/K8S_COMPASS_PREREGISTRATION.md,
+# amendment 8). Rents nothing. With `delete_groups` set to an explicit, space-separated list of resource-group names, it
+# deletes those and only those, and only if every name begins with omni-compass-bench- or omni-detached- (the groups our
+# own runs create and normally delete themselves); any other name is refused and nothing is deleted. Uses the
+# AZURE_CREDENTIALS secret.
+on:
+  workflow_dispatch:
+    inputs:
+      location: {description: "Azure region for the vCPU usage figures", default: "eastus"}
+      delete_groups: {description: "Resource groups to delete, space separated, each named in full (omni-compass-bench-* or omni-detached-* only); empty: list only", default: ""}
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/login@v2
+        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+      - name: What the subscription holds
+        env: {LOC: "${{ github.event.inputs.location }}"}
+        run: |
+          echo "subscription: $(az account show --query '[name, state]' -o tsv | tr '\n' ' ')"
+          echo "--- resource groups (name, location, state, tags)"
+          az group list --query "[].[name, location, properties.provisioningState, to_string(tags)]" -o tsv | sort
+          echo "--- AKS clusters (name, group, state, power, node pools name/count/size)"
+          az aks list --query "[].[name, resourceGroup, provisioningState, powerState.code, join(' ', agentPoolProfiles[].join('/', [name, to_string(count), vmSize]))]" -o tsv
+          echo "--- virtual machines (name, group, size, power state)"
+          az vm list -d --query "[].[name, resourceGroup, hardwareProfile.vmSize, powerState]" -o tsv
+          echo "--- scale sets (name, group, size, capacity)"
+          az vmss list --query "[].[name, resourceGroup, sku.name, sku.capacity]" -o tsv
+          echo "--- vCPU usage in $LOC (family, used, allowed), families with an allowance"
+          az vm list-usage -l "$LOC" -o tsv --query "[?name.value=='cores' || contains(name.value,'Family')].[name.value, currentValue, limit]" | awk '$3 > 0' | sort
+      - name: Delete only the groups named, and only ours
+        if: github.event.inputs.delete_groups != ''
+        env: {GROUPS: "${{ github.event.inputs.delete_groups }}"}
+        run: |
+          for g in $GROUPS; do
+            case "$g" in
+              omni-compass-bench-*|omni-detached-*) ;;
+              *) echo "::error::$g is not a group our runs create; nothing deleted"; exit 1 ;;
+            esac
+          done
+          for g in $GROUPS; do
+            if az group show -n "$g" -o none 2>/dev/null; then
+              az group delete -n "$g" --yes --no-wait && echo "::notice::deleting $g"
+            else
+              echo "::notice::$g does not exist"
+            fi
+          done

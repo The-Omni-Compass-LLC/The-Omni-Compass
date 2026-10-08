@@ -867,6 +867,17 @@ is a statement about the lever, not about the law. This run makes the lever big 
   five repetitions too, the same `AKSCapacityHeavyUsage` in eastus, over three and a half hours (05:01 to 08:26 UTC): 29
   refusals in sixteen hours across six dispatches, the pre-flight passing each time, no arm run, nothing billed. The fleet
   is dispatched a seventh time, unchanged; nothing else changes. Each refused repetition costs GitHub runner minutes only.
+- **Amendment 8 (2026-10-08 11:50 UTC, before the counted run).** The seventh dispatch (run 37750047768, 08:28 to 11:33 UTC)
+  ran no arm either, but not for one reason. Repetitions 1 to 3 were refused as before (`AKSCapacityHeavyUsage` in eastus, the
+  pre-flight passing each time): 32 refusals across seven dispatches. Repetitions 4 and 5 never reached Azure's cluster
+  service: the pre-flight itself found only 2 of the 10 vCPUs free in two of the nine families (`standardDSv4Family`,
+  `StandardDasv7Family`), and the fleet is dispatched only when every family has room, so it stopped with nothing built and
+  nothing billed. Nothing of ours is known to run in those two families (the rented machines of the 24-hour robustness run and
+  the tower are `Standard_D4as_v4` and `Standard_D8as_v4`, the DASv4 family), so the held vCPUs are either a cluster of an
+  earlier refused repetition that Azure left behind in a failed state, or another tenant of the subscription; an inventory of
+  the subscription's resource groups and per-family usage is taken by a read-only workflow before anything else is done, and
+  any group left behind by a finished run of ours is deleted and named here. The eighth dispatch follows the inventory, unchanged
+  in every input. Nothing else changes.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
