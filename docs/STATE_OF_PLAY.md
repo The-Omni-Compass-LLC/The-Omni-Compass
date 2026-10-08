@@ -31,9 +31,12 @@ ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain co
 database's storage-engine cache** (MongoDB as its publisher ships it under YCSB, `results/live/V3_YCSB.md`): on four
 untouched workloads the cache size held fell about half on c and burst and 13% to 37% on f, **confirmed better** (b inside
 the noise in one run); work inside the 1 ms line, p95 and host CPU inside the noise on all four; no failed operation; the
-burst mean latency **+2% to +4%, confirmed worse**, the one loss. **The Omni index, real machines only, confirmed three
-times: +25.9%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database +14.2%, Kafka +166.9%, Redis −24.9%, the
-database's cache +10.2%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's speed ratio
+burst mean latency **+2% to +4%, confirmed worse**, the one loss. **A real database's buffer pool** (MySQL as Ubuntu ships it under sysbench, `results/live/V3_SYSBENCH.md`, the first
+counted set): on four untouched workloads every gauge-row inside the noise in three runs, no error; the hand-back read NO on
+15 of 45 omni arms (the plug's restore issued while the server was still carrying out a shrink, which MySQL ignores; the
+plug's fault, fixed and declared in `docs/MYSQL_PREREGISTRATION.md`, the second set running on it). **The Omni index, real
+machines only, confirmed three times: +21.2%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database +14.2%, Kafka
++166.9%, Redis −24.9%, the database's cache +10.2%, the database's buffer pool +0.0%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's speed ratio
 is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is negative
 because the memory it holds for a wide working set is the resource it trades and reads worse by rule; MongoDB's is
 positive because there the governor gave memory back). The v1 tables read the same and stay as the first engine's record.
@@ -62,6 +65,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | Apache Kafka, a consumer group's size, three workloads | work inside the line **+16% to +21%**; no message lost | p95 **1.6 s → 9 to 14 ms**, lag −92% to −97% | consumers held **2 → 5.8 to 7.9, confirmed worse** | host CPU-seconds +10% to +20% confirmed worse on light, inside the noise on heavy and burst; CPU per message inside the line −10% to −12% on burst | `results/live/V3_KAFKA.md` |
 | Redis, a cache's memory ceiling, three workloads | work inside the line **+14% to +27%**, hit rate +14% to +27%; no failed request | mean latency −30% to −61%; p95 within a hair of native's (a miss is a miss in both arms) | memory ceiling held **64 → 200 to 270 MB, confirmed worse** | host CPU-seconds inside the noise on all three | `results/live/V3_REDIS.md` |
 | MongoDB under YCSB, a database's storage-engine cache size, four workloads | inside the noise on all four; no failed operation | p95 and p99 inside the noise; mean latency on burst **+2% to +4%, confirmed worse** | cache size held **−49% on c, −41% to −49% on burst, −13% to −37% on f, confirmed better**; b inside the noise in one run | host CPU-seconds inside the noise on all four | `results/live/V3_YCSB.md` |
+| MySQL under sysbench, a database's buffer pool size, four workloads (first counted set) | inside the noise on all four; no error | p95, p99 and mean inside the noise | pool held inside the noise (−45% to −71% on burst, +38% to +84% on read_write as point estimates, none confirmed); **hand-back NO on 15 of 45 omni arms**: the restore met the server's unfinished shrink; the plug fixed and declared, the second set running | host CPU inside the noise | `results/live/V3_SYSBENCH.md` |
 | Robustness: the governor killed outright at 40% of the window, 10 pairs × 3 runs | **every setting back at the operator's 7 to 11 s after the kill, 30 of 30**; a second governor to the end; failed requests over the window −9% to −15% | the 120 s after the kill inside the noise against native; the whole window p95 −42% to −45% | inside the noise | inside the noise | `results/live/V3_ROBUST_KILL.md` |
 | Robustness: the long run, 7,200 s an arm, 3 pairs × 3 runs | decisions 97.5% or more of expected (valid); failed requests inside the noise | service confirmed better in A, inside the noise in B and C (no difference beyond the noise in 2 of 3) | inside the noise; **memory at most 1.07 of its first ten minutes (no leak)**; decision time at most 1.20 (no slowing); every setting handed back at the end | inside the noise | `results/live/V3_ROBUST_LONG.md` |
 | The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell | the organisms' work unchanged | p95 better in every cell | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
@@ -118,7 +122,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 5. **YCSB on MongoDB, done** (`docs/YCSB_PREREGISTRATION.md`, `results/live/V3_YCSB.md`): the operator's WiredTiger cache
    as native, Omni on the cache size through the server's own console; four smoke runs recorded, then A, B and C on v3; the
    cache held given back by about half on two untouched workloads at no measurable cost in work, p95 or CPU, one confirmed
-   loss (the burst mean latency, +2% to +4%); the index now spans five real categories at +25.9%. Cassandra and Redis under
+   loss (the burst mean latency, +2% to +4%); the index spanned five real categories at +25.9%, and six at +21.2% once MySQL's first set joined with every row inside the noise. Cassandra and Redis under
    YCSB and HammerDB are next in row 24.
 6. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
    Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,

@@ -169,13 +169,13 @@ def main():
          "geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric "
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
          "Every number is read from the test's own three-run table (`results/live/V1_*.json` and `results/live/V3_*.json`, made by "
-         "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py` and `tools/ycsb_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
+         "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/ycsb_abc.py` and `tools/sysbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
          f"## Headline: Omni-Compass on top of native, real machines, confirmed three times: **{pct(head)}** "
          f"(more for the same, or the same for less, across work, speed, machines and energy)", "",
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): confirmed better or confirmed worse in all "
          "three runs counts, as the geometric mean of the runs' ratios; no difference beyond the noise counts as exactly 1, so "
          "nothing inside the noise is claimed either way. Real Kubernetes (Omni v3; the v1 tables read the same and stay in `docs/OMNI_V1.md`), the real database, "
-         "real messaging, the real cache and the real database's storage-engine cache (Omni v3) are the real categories in; Azure and the card join as their three-run tables land. A category's "
+         "real messaging, the real cache, the real database's storage-engine cache and the real database's buffer pool (Omni v3) are the real categories in; Azure and the card join as their three-run tables land. A category's "
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
          "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it costs stands beside it. The law, controllers and runners are the same bytes "
          "in v1 and v3 (`docs/OMNI_V3.md`); each table names the engine it ran on.", "",
@@ -192,7 +192,7 @@ def main():
           "inside the response line. The energy figure on GitHub's Kubernetes is a declared model, not a meter; the database's, the "
           "messaging and the cache's energy columns are the host's CPU seconds (the compass's own cost included, a confirmed loss counted "
           "against Omni); their machines columns are the resource held: connections open to the database, consumers running, the cache's "
-          "memory ceiling, the storage engine's cache size; Azure's machines are its own billed count.",
+          "memory ceiling, the storage engine's cache size, the buffer pool's size; Azure's machines are its own billed count.",
           "", "## Every test", "",
           "| Category | Test | Index | More work by | Faster by | Fewer machines by | Less energy by | Source |", "|---|---|---:|---:|---:|---:|---:|---|"]
     for t in ts:

@@ -8,6 +8,19 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **MySQL under sysbench, the first counted set A/B/C on v3, every row inside the noise, and a hand-back finding**
+  (`results/live/V3_SYSBENCH.md`, runs 37757840760, 37757850988, 37757861572, commit `23f6ca4c`; `docs/MYSQL_PREREGISTRATION.md`,
+  register row 24, proof-program row 11, the v3 record): on the four untouched workloads no gauge-row is confirmed better or
+  worse and none disagrees; no error; the pool moved 3 to 26 times an arm. **15 of 45 omni arms did not read the operator's
+  512 MB back at the end**: the audits show the server still withdrawing the blocks of a shrink the law had asked for when the
+  restore was issued (InnoDB finishes a shrink only when the load releases the pinned pages), and MySQL ignores a new size
+  while a resize is in progress. The plug's restore, not the law: `BufferPool.restore` now waits for the resize in flight,
+  writes the snapshot and writes once more if the server ignored it, with a receipt in every omni arm's record; the table
+  (`tools/sysbench_abc.py`) counts the arms not handed back and those mid-resize; `tests/test_run_sysbench.py` proves the three
+  cases. Declared as an amendment; the first set's rows stand; the second counted set runs on the amended plug. The index now
+  spans six real categories at **+21.2%** (MySQL at +0.0%); README, the state of play, the manual (3.3, 3.5, 10.9, 16.4, 16.6,
+  the executive summary, the evidence map) and the dossier carry it. The update_index "inside the line" row is disclosed as
+  counting almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line).
 - **The 24-hour robustness run dispatched on three rented machines** (`docs/ROBUSTNESS_PREREGISTRATION.md` scenario 2b, the
   dispatch record): runs 37761059781, 37761072412 and 37761084779 of `big-organism-detached` with `test=robust`, 86,400 s an
   arm, one pair a machine, commit `4d5633dd` (v3), eastus `Standard_D4as_v4`, all three rented at the first attempt and
