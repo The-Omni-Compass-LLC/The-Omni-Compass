@@ -132,6 +132,13 @@ result is recorded here when it has run, and it is not counted.
   workload shows the 2 ms line or the 0.4 center to be wrong for this stack, the change is written here before the
   counted runs, with the figures that led to it. The host's CPU-seconds in this smoke read 239 s native against 188 s
   omni on one repetition, a difference the counted runs will judge.
+- **Third smoke run (37723201831, 03:32 UTC): ran end to end with the uniform draw, and the cache still held 38 MB at the top
+  notch with 1,300 pages read in the whole arm, every operation inside the line at a mean of 0.09 ms.** The per-notch figures
+  showed why: the dataset was loaded with ordered keys (`insertorder=ordered`) but the run phase used YCSB's default, hashed
+  keys, so the reads asked for records that were not there and were answered from the index alone, which fits in a few
+  megabytes. The run phase now names ordered keys too, so every read is of a record that exists. The fault is the harness's,
+  found and fixed before any counted run; nothing in the rules, the gauges or the workloads changed. A fourth smoke run
+  follows, and the line and center are confirmed or changed here on its figures before the counted runs.
 
 ---
 

@@ -316,7 +316,8 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
         # key space (YCSB's shipped zipfian keeps the hot set in a few megabytes whatever the key space: the smoke run showed the
         # cache never filling); the workload's read/update mix stays as shipped
         txt = ycsb("run", workload_file, {"recordcount": base * notch, "operationcount": 10 ** 9, "maxexecutiontime": int(step_s), "target": RATE,
-                                          "threads": THREADS, "insertstart": 0, "requestdistribution": DISTRIBUTION, "seed": seed * 100 + i}, raw)
+                                          "threads": THREADS, "insertstart": 0, "insertorder": "ordered", "requestdistribution": DISTRIBUTION,
+                                          "seed": seed * 100 + i}, raw)      # ordered keys, as loaded: a hashed key space would read records that are not there
         got = parse_raw(raw); summaries.append(txt); failed += parse_failed(txt); records += got
         lat = sorted(l for _, l in got); row = sampler.rows[-1] if sampler.rows else (NATIVE_MB, 0.0, 0, 0)
         print(f"   {arm} rep {rep} notch {notch}: {len(lat)} ops, mean {sum(lat) / max(1, len(lat)):.3f} ms, p95 {(lat[int(0.95 * len(lat))] if lat else float('nan')):.3f} ms, "
