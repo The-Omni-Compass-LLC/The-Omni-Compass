@@ -73,6 +73,8 @@ WORKLOAD_TABLES = [
      {"work": "work_inside_line_mps", "speed": "p95_ms", "machines": "consumers_mean", "energy": "cpu_seconds"}),
     ("Real cache (Redis, GitHub)", "V3_REDIS.json", "Redis `{wl}`: the cache's memory ceiling, three paired repetitions, three runs",
      {"work": "work_inside_line_rps", "speed": "p95_ms", "machines": "maxmemory_mb_mean", "energy": "cpu_seconds"}),
+    ("Real database cache (MongoDB under YCSB, GitHub)", "V3_YCSB.json", "YCSB `{wl}`: the storage engine's cache size, three paired repetitions, three runs",
+     {"work": "work_inside_line_ops", "speed": "p95_ms", "machines": "cache_mb_mean", "energy": "cpu_seconds"}),
 ]
 DB_FILE = WORKLOAD_TABLES[0][1]
 LOWER_IS_BETTER = {"speed", "machines", "energy"}

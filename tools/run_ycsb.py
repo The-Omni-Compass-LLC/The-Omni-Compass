@@ -51,7 +51,8 @@ from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
 URL = os.environ.get("MONGO_URL", "mongodb://127.0.0.1:27017")
 DB = "ycsb"
 MB = 1024 * 1024
-LINE_MS = 2.0             # the response line: an operation answered within 2 ms (a cache hit is inside; a read that misses the cache is slower)
+LINE_MS = 1.0             # the response line: an operation answered within 1 ms (set on the tuning workload's fourth smoke run, from 2 ms:
+                          # on this stack a hit reads 0.15 to 0.24 ms and a miss 0.28 to 0.46 ms, so the 2 ms line kept every reading under the center)
 CENTER = 0.4              # the compass holds the server's own read latency at 40% of the line
 DT = 1.0                  # one decision a second
 TAU = 2.0                 # memory given or taken shows in the misses within a couple of seconds

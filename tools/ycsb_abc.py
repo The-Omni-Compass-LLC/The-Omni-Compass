@@ -93,7 +93,7 @@ def main(argv=None):
     eng = [engine(d) for d in a.dirs]
     L = ["# YCSB on MongoDB, a database's operator-set cache size: the A/B/C confirmation", "",
          "MongoDB as shipped with the operator's WiredTiger cache (512 MB) is native; omni is the compass law on the cache size through the "
-         "server's own console inside [256, 2,048] MB, holding the server's own mean read latency at 40% of the 2 ms line "
+         "server's own console inside [256, 2,048] MB, holding the server's own mean read latency at 40% of the 1 ms line"
          "(`docs/YCSB_PREREGISTRATION.md`). YCSB's published core workloads ask for records from a key space that steps through the cache "
          "and past it, the same operations in both arms. Each run holds three paired repetitions; the paired difference's 95% interval "
          "within a run, and the same sign with every interval clear of zero across the three runs, make a reading **confirmed better** or "

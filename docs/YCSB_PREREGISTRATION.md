@@ -60,9 +60,11 @@ offers **3,000 operations a second from 32 threads** at every notch, the same in
 
 - **Reading.** Once a second, the server's own mean read latency over the last second: `serverStatus().opLatencies.reads`, the
   latency total and the operation count, differenced; a second with no reads reads as calm (0).
-- **Band.** From 0 to the response line, **2 ms** (a read served from the cache is well inside; a read that misses the cache
-  and comes from the file system is slower). The compass pulls the reading to 40% of the line (0.8 ms), the service profile of
-  the Kubernetes adapter, with its usual gains (kp 1.0, response time 2 s, smoothing 0.5, one decision a second).
+- **Band.** From 0 to the response line, **1 ms** (a read served from the cache is well inside; a read that misses the cache
+  and comes from the file system is slower). The compass pulls the reading to 40% of the line (0.4 ms), the service profile of
+  the Kubernetes adapter, with its usual gains (kp 1.0, response time 2 s, smoothing 0.5, one decision a second). *Set at 1 ms on
+  the tuning workload's fourth smoke run, from the 2 ms first written; the figures that set it are under "What the smoke run
+  shows" below.*
 - **Direction, and the do-no-harm gate.** A positive force (slow reads) grows the cache by ceil(force / 0.10) notches of
   **64 MB**, **only while the cache is full** (bytes in the cache at 90% of its size or more): slow reads in a cache with room to
   spare are not the cache's to mend, and the knob is left alone. A negative force (calm) with **no page evicted in the last second**
@@ -83,7 +85,7 @@ whose data does not fit in memory, and the result will say what it is.
 
 | Gauge | Direction |
 |---|---|
-| work inside the response line: operations a second answered within 2 ms (YCSB's own client-side latency) | **higher is better** (the product number) |
+| work inside the response line: operations a second answered within 1 ms (YCSB's own client-side latency) | **higher is better** (the product number) |
 | throughput (operations a second) | higher is better |
 | latency p95, p99, mean | lower is better |
 | failed operations (YCSB's own count) | **any increase is WORSE** |
@@ -139,6 +141,24 @@ result is recorded here when it has run, and it is not counted.
   megabytes. The run phase now names ordered keys too, so every read is of a record that exists. The fault is the harness's,
   found and fixed before any counted run; nothing in the rules, the gauges or the workloads changed. A fourth smoke run
   follows, and the line and center are confirmed or changed here on its figures before the counted runs.
+- **Fourth smoke run (37725541273, 04:02 UTC): the working set reached the cache, and the figures set the line.** Native held
+  336 to 481 MB of its 512 MB cache across the notches and read 452,928 pages into it over the arm; omni's cache held 251 to
+  350 MB. The server's mean read latency, by notch, in native: **0.15 to 0.24 ms** while the cache held the working set (the
+  low notches on the way down, warm), **0.23 to 0.33 ms** while it did not (the first pass up, cold, and notches 4 to 6);
+  p95 never above 0.42 ms; 99.3% to 99.9% of operations inside 2 ms in every notch of both arms. Against the 2 ms line
+  these readings sit between 0.08 and 0.23 of the band, under the 0.4 center in every notch, so the compass could only ever
+  read calm: the cache could shrink, under the eviction gate, and could grow only through a single second's spike (it grew
+  one notch, at the top notch). That is a mis-set band, the same fault as a Kubernetes line set at ten times the service's
+  normal response. **The line is set at 1 ms**, with the center unchanged at 0.4 (0.4 ms): native's hit range (0.15 to 0.24
+  ms) is calm, and a full cache reading past 0.4 ms (omni's top notch read 0.457 ms at 350 MB in a 384 MB cache) is slow and
+  grows. The work-inside-the-line gauge uses the same 1 ms line (p95 was 0.21 to 0.42 ms, so most operations remain inside
+  it in both arms; the gauge is now more discriminating). The one repetition's whole-arm figures are recorded, not counted:
+  work inside 2 ms 2,860/s native against 2,805/s omni (−1.9%); p95 0.34 ms in both; cache held 512 MB against 353 MB
+  (−31%); pages read in 452,928 against 597,707 (+32%); host CPU-seconds 251 against 272 (+8%); both arms handed back. The
+  shape to expect on this machine is therefore memory given back at a cost in misses that the page cache makes cheap, as
+  disclosed above; the counted runs judge whether the work inside the line and the CPU pay for it. This is the last change
+  before the counted runs; everything else in this document stands as written. The ordered-keys fix of the third smoke
+  worked: the dataset is now what the run reads.
 
 ---
 
