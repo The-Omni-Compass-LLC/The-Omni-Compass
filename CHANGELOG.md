@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **Millennium seats begin: the Navier–Stokes seat sheet** (`docs/seats/NAVIER_STOKES.md`, `docs/seats/README.md`,
+  `tools/seats/navier_stokes_check.py`, `results/seats/navier_stokes/CHECKS.json`; 5 of 5 checks pass). Built outside the
+  frozen engine and attached by an explicit map. Level 1 only: the problem stays open. What Omni supplies (the energy decay
+  of equation (1), α_E = 2ν, as an inequality) is shown insufficient alone (Tao 2016), and no finite-dimensional Omni
+  sector can realize Navier–Stokes (σ-compactness). The team's pressure-rotation branch (Attack 10) is **shown false**: a
+  symmetry theorem plus an explicit divergence-free field with the dangerous alignment and the transverse pressure Hessian
+  exactly zero (to 1.5×10⁻¹⁵ of its size) at 70 points on an axis and a mirror plane. The frontier is stated: one
+  nonlocal diagonal pressure term against the local brake on symmetry sets (Attack 11, open).
 - **The public-trace test done, A/B/C on v3: a day of demand nobody here wrote reads the same way as our own schedules**
   (`results/live/V3_TRACE_GOOGLE2011.md`, runs 37826513664, 37826518868, 37826522419, commit `13ee69e8`, 30 of 30 pairs
   valid): p95 **−65% to −71%**, p99 −49% to −61%, mean −51% to −55%, time over the line −81% to −84%, failed requests −8% to
