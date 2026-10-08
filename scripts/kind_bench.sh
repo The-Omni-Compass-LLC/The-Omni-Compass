@@ -261,18 +261,47 @@ fi
 kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json > "$OUT_DIR/pod_watch.json" 2>"$OUT_DIR/pod_watch.err" &
 watch_pid=$!
 omni_pid=""
-if [ -z "$NATIVE" ]; then
-  echo "== ARM $ARM: Omni-Compass driving HPA target + node pool + power sensing${DRY:+ (dry run: watches only, writes nothing)}"
+# the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
+start_controller() {   # $1 decisions to make, $2 log file
   nice -n 19 python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval 60 --floor-interval 5 --reflex-window-s 15 \
-    --iterations $(( DURATION / 60 )) --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
+    --iterations "$1" --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
     --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
     --power-cmd "bash scripts/kind_power.sh" --site-limit-w "$SITE_LIMIT_W" \
     --cap-deployments default/php-apache --thermal-model --security-configmap default/omni-security \
     --rollout-guard default/php-apache --sensed default/php-apache --latency-file "$OUT_DIR/latency.csv" --slo-ms "${SLO_MS:-500}" \
-    --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" $STRICT $LAW ${CLOSURE:+--closure "$CLOSURE"} ${REPLICA_CEILING:+--replica-ceiling "$REPLICA_CEILING"} > "$OUT_DIR/controller.log" 2>&1 &
-  omni_pid=$!
+    --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" $STRICT $LAW ${CLOSURE:+--closure "$CLOSURE"} ${REPLICA_CEILING:+--replica-ceiling "$REPLICA_CEILING"} > "$2" 2>&1 &
+  echo $!
+}
+watchdog_pid=""
+if [ -z "$NATIVE" ]; then
+  echo "== ARM $ARM: Omni-Compass driving HPA target + node pool + power sensing${DRY:+ (dry run: watches only, writes nothing)}"
+  if [ -n "${ROBUST:-}" ]; then
+    # the robustness test (docs/ROBUSTNESS_PREREGISTRATION.md): the governor registers its lease in this arm's own
+    # registry, and the watchdog runs beside it from the start, as it would in service
+    export OMNI_REGISTRY="$OUT_DIR/registry"
+    python tools/omni_switch.py watchdog --every 5 > "$OUT_DIR/watchdog.log" 2>&1 &
+    watchdog_pid=$!
+  fi
+  omni_pid=$(start_controller $(( DURATION / 60 )) "$OUT_DIR/controller.log")
 else
   echo "== ARM native: Omni-Compass not running; Kubernetes alone"
+fi
+robust_pid=""
+if [ -n "${ROBUST:-}" ]; then
+  # scenario 1 (ROBUST=kill): at 40% of the window the governor is killed outright (SIGKILL, no chance to hand back); the
+  # harness then asks the cluster every 2 s until every setting is back at the operator's (the watchdog's doing), and at
+  # 50% starts a second governor that governs to the end. Native gets the same time marks and nothing else. Scenario 2
+  # (ROBUST=long): no kill; the governor runs the whole long window. In both the governor's resident memory is sampled
+  # every 15 s from the process table (never by the governor itself: no engine file changes).
+  if [ -z "$NATIVE" ]; then
+    # the second governor is started by the robustness script when its moment comes, with the same command line: the
+    # function and what it reads are exported before the script starts
+    export -f start_controller
+    export DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING MIN_NODES NODE_CUSHION SLO_MS
+  fi
+  OUT_DIR="$OUT_DIR" DURATION="$DURATION" ROBUST="$ROBUST" OMNI_PID="$omni_pid" WORKERS="$WORKERS" HPA_RANGE="$HPA_RANGE" \
+    WORKER_SEL="$WORKER_SEL" NATIVE="$NATIVE" bash scripts/kind_robust.sh > "$OUT_DIR/robust.out" 2>&1 &
+  robust_pid=$!
 fi
 
 ACTIVE_ONLY=1 INTERVAL=15 DURATION="$DURATION" POWER_CMD="bash scripts/kind_power.sh" OUT="$OUT_DIR/capture.csv" \
@@ -295,6 +324,13 @@ end_read() { local f="$1"; shift; for t in 1 2 3 4 5 6; do kubectl "$@" --reques
   echo "the API server did not answer: kubectl $*" >> "$OUT_DIR/end_reads.err"; }
 end_read "$OUT_DIR/pods_end.json" get pods -n default -l run=php-apache -o json
 [ -n "$omni_pid" ] && { wait "$omni_pid" || true; }
+if [ -n "$robust_pid" ]; then
+  wait "$robust_pid" || true
+  # the second governor of the kill scenario was started by the robustness script: wait for it to finish its decisions
+  if [ -f "$OUT_DIR/omni2.pid" ]; then
+    p2=$(cat "$OUT_DIR/omni2.pid"); while kill -0 "$p2" 2>/dev/null; do sleep 2; done
+  fi
+fi
 end_read "$OUT_DIR/nodes_end.txt" get nodes -o wide
 end_read "$OUT_DIR/hpa_end.json" get hpa php-apache -o json
 
@@ -336,8 +372,9 @@ elif [ -z "$NATIVE" ]; then
   exist=$(kubectl get nodes -l "$WORKER_SEL" --no-headers | wc -l); [ "$PLATFORM" = aks ] || exist="$WORKERS"
   test "$restored" = "50" && test "$back" = "$exist" && test "$cpu_limit" = "500m" && test -z "$leftover"
 fi
+[ -n "$watchdog_pid" ] && { kill "$watchdog_pid" 2>/dev/null || true; }
 echo "rows captured: $(( $(wc -l < "$OUT_DIR/capture.csv") - 1 ))"
-( cd "$OUT_DIR" && sha256sum $(ls -1 | grep -v '^SHA256SUMS.txt$') > SHA256SUMS.txt )
+( cd "$OUT_DIR" && sha256sum $(ls -1 -p | grep -v '/$' | grep -v '^SHA256SUMS.txt$') > SHA256SUMS.txt )
 if [ -z "$NATIVE" ]; then
   # Evidence discipline: the run counts only if the engine decided for the whole run.
   decisions=$(grep -c '"decision"' "$OUT_DIR/audit.jsonl" || true); expected=$(( DURATION / 60 ))

@@ -33,6 +33,11 @@ BILL = {"machines billed, machine-hours", "compute bill at list price ($)"}   # 
 SECOND = {k for k in KEYS if k.startswith("second app: ")}                     # the fairness test only (TWO_APP=1)
 HOST = {"host CPU busy, the real machine under kind (%)", "host cores (the real machine under kind)"}   # kind only
 BATCH = {"batch: queue finished (s)", "batch: worker machines in service after the queue finished, mean"}   # the batch test only
+# the robustness test only (ROBUST=kill, scripts/kind_robust.sh): the same 120 s after the kill mark in both arms
+ROBUST = {"robust: time over the line in the 120 s after the kill (% of samples)", "robust: failed requests in the 120 s after the kill (%)"}
+KEYS += sorted(ROBUST)
+ROBUST_MEMORY_LIMIT = 1.25   # a governor whose resident memory in the last ten minutes is more than a quarter above the first ten has a leak (preregistered)
+ROBUST_HANDBACK_S = 60.0     # every setting back at the operator's within this many seconds of the kill, or the repetition reads WORSE (preregistered)
 
 
 LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked workers still on at idle power (Wh, declared model)",
@@ -129,10 +134,115 @@ def batch(d):
     return g
 
 
+def robust_marks(d):
+    """The robustness test's time marks (robust.log, scripts/kind_robust.sh): the kill mark (both arms), the seconds from the
+    kill until every setting was back at the operator's (inf: never), whether the second governor started, the mode."""
+    f = d / "robust.log"
+    if not f.exists():
+        return {}
+    out = {}
+    for line in f.read_text().splitlines():
+        try:
+            t, txt = line.split(" ", 1); t = float(t)
+        except ValueError:
+            continue
+        if txt.startswith("kill"):
+            out["kill_epoch"] = t
+        elif txt.startswith("handed back:"):
+            m = re.search(r"after (\d+) s", txt); out["handed_back_s"] = float(m.group(1)) if m else float("inf")
+        elif txt.startswith("NOT handed back"):
+            out["handed_back_s"] = float("inf")
+        elif txt.startswith("second governor started"):
+            out["second_governor"] = True
+        elif txt.startswith("robust ") and len(txt.split()) > 1:
+            out["mode"] = txt.split()[1].rstrip(":")
+    return out
+
+
+def robust_window(d, slo):
+    """Both arms: in the 120 s after the kill mark, the share of response samples over the line or failed, and the share failed."""
+    m = robust_marks(d)
+    if "kill_epoch" not in m:
+        return {}
+    try:
+        t0 = float((d / "window_start.txt").read_text().split()[0]); rows = list(csv.DictReader(open(d / "latency.csv")))
+    except (OSError, ValueError, IndexError):
+        return {}
+    k = m["kill_epoch"]
+    win = [r for r in rows if k <= t0 + float(r["elapsed_seconds"]) <= k + 120]
+    if not win:
+        return {}
+    over = 100.0 * sum(1 for r in win if not (r.get("ok") == "1" and float(r["latency_ms"]) <= slo)) / len(win)
+    failed = 100.0 * sum(1 for r in win if r.get("ok") != "1") / len(win)
+    return {"robust: time over the line in the 120 s after the kill (% of samples)": over, "robust: failed requests in the 120 s after the kill (%)": failed}
+
+
+def robust_memory(d):
+    """The governor's resident memory (rss.csv, sampled from the process table every 15 s while a governor ran): the mean of
+    the last ten minutes over the mean of the first ten."""
+    f = d / "rss.csv"
+    if not f.exists():
+        return None
+    rows = [r for r in csv.DictReader(open(f)) if r.get("rss_kb") and int(r.get("processes") or 0) > 0]
+    if len(rows) < 4:
+        return None
+    t = [float(r["epoch_s"]) for r in rows]; rss = [float(r["rss_kb"]) for r in rows]
+    first = [v for tt, v in zip(t, rss) if tt <= t[0] + 600]; last = [v for tt, v in zip(t, rss) if tt >= t[-1] - 600]
+    a, b = sum(first) / len(first), sum(last) / len(last)
+    return {"first_kb": a, "last_kb": b, "ratio": b / max(a, 1.0)}
+
+
+def robust_table(root, cols):
+    """The robustness rows (omni arms only; native has no governor): seconds from the kill to the hand-back, whether within the
+    preregistered allowance, the second governor, the watchdog's records, the governor's memory ratio, its decisions."""
+    per = {}
+    for d in sorted(root.glob("bench-*-*")):
+        _, arm, rep = arm_rep(d)
+        m = robust_marks(d)
+        if not m or arm.startswith("native"):
+            continue
+        mem = robust_memory(d)
+        decisions = sum(1 for l in open(d / "audit.jsonl") if '"decision"' in l) if (d / "audit.jsonl").exists() else None
+        wd = sum(1 for l in open(d / "watchdog.log") if '"watchdog"' in l) if (d / "watchdog.log").exists() else 0
+        per.setdefault(arm, {})[rep] = {"mode": m.get("mode"), "handed_back_s": m.get("handed_back_s"), "second_governor": bool(m.get("second_governor", False)),
+                                        "watchdog_records": wd, "memory": mem, "decisions": decisions}
+    if not per:
+        return [], {}
+    L = ["## The robustness test: the governor killed outright, the lease, and the long run", "",
+         f"In the kill scenario the governor receives SIGKILL at 40% of the window and the watchdog beside it must hand every setting back "
+         f"from the lease it left; the harness asks the cluster every 2 s until the HPA target, the replica range, every CPU limit, every worker "
+         f"and the records are at the operator's. Preregistered: within {ROBUST_HANDBACK_S:.0f} s, or the repetition reads WORSE. A second governor "
+         f"starts at 50% and governs to the end. The governor's resident memory is sampled from the process table; the mean of the last ten "
+         f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} reads WORSE (a leak). The 120 s after the kill mark are compared between the arms "
+         "in the paired table above (`docs/ROBUSTNESS_PREREGISTRATION.md`).", "",
+         "| Arm | Repetition | Mode | Seconds from the kill to every setting back | Within the allowance | Second governor | Watchdog hand-backs | Governor memory, last ten minutes / first ten | Decisions |",
+         "|---|---:|---|---:|---|---|---:|---:|---:|"]
+    summary = {}
+    for a, reps in per.items():
+        hb = [r["handed_back_s"] for r in reps.values() if r.get("mode") == "kill"]
+        hb_ok = [h is not None and h <= ROBUST_HANDBACK_S for h in hb]
+        mems = [r["memory"]["ratio"] for r in reps.values() if r.get("memory")]
+        finite = [h for h in hb if h is not None and h != float("inf")]
+        summary[a] = {"repetitions": len(reps), "kill_repetitions": len(hb), "handed_back_within_allowance_all": (all(hb_ok) if hb else None),
+                      "handed_back_s_mean": (sum(finite) / len(finite) if finite else None), "handed_back_s_max": (max(hb) if hb else None),
+                      "never_handed_back": sum(1 for h in hb if h == float("inf") or h is None),
+                      "second_governor_all": (all(r["second_governor"] for r in reps.values() if r.get("mode") == "kill") if hb else None),
+                      "memory_ratio_max": (max(mems) if mems else None), "allowance_s": ROBUST_HANDBACK_S, "memory_limit": ROBUST_MEMORY_LIMIT}
+        for rep in sorted(reps, key=lambda x: int(x) if x.isdigit() else x):
+            r = reps[rep]; h = r["handed_back_s"]
+            hs = "" if r.get("mode") != "kill" else ("never" if h is None or h == float("inf") else f"{h:.0f}")
+            ok = "" if r.get("mode") != "kill" else ("**no: WORSE**" if (h is None or h > ROBUST_HANDBACK_S) else "yes")
+            sg = "" if r.get("mode") != "kill" else ("yes" if r["second_governor"] else "**no: WORSE**")
+            mr = "" if not r["memory"] else (f"{r['memory']['ratio']:.3f}" + ("" if r["memory"]["ratio"] <= ROBUST_MEMORY_LIMIT else " **(a leak: WORSE)**"))
+            L.append(f"| {dict(compass='omni').get(a, a)} | {rep} | {r.get('mode') or ''} | {hs} | {ok} | {sg} | {r['watchdog_records']} | {mr} | {r['decisions'] if r['decisions'] is not None else ''} |")
+    return L + [""], summary
+
+
 def arm_gauges(d):
+    import os
     rows = list(csv.DictReader(open(d / "capture.csv")))
     g = gauges(rows); g.update(latency(str(d / "latency.csv"))); g.update(pod_starts(d))
-    g.update(host_cpu(d))
+    g.update(host_cpu(d)); g.update(robust_window(d, float(os.environ.get("SLO_MS", 500))))
     # the controller's own cost (its process and every command it ran; it runs beside the cluster, not in it), from its
     # audit: counted so a CPU saving in the cluster is never reported without what Omni itself spent. Native, and native
     # tuned by its operator (native40, native30, native20), run no Omni process: 0.
@@ -315,7 +425,8 @@ def main(root):
     two = any(not math.isnan(m.get("second app: failed requests (%)", float("nan"))) for m in out["means"].values())
     host = any(not math.isnan(m.get("host cores (the real machine under kind)", float("nan"))) for m in out["means"].values())
     bat = any(not math.isnan(m.get("batch: queue finished (s)", float("nan"))) for m in out["means"].values())
-    keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host) and (k not in BATCH or bat)]
+    rob = any(not math.isnan(m.get("robust: failed requests in the 120 s after the kill (%)", float("nan"))) for m in out["means"].values())
+    keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host) and (k not in BATCH or bat) and (k not in ROBUST or rob)]
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native against omni: Omni-Compass on top of native)", ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
@@ -350,7 +461,7 @@ def main(root):
             # a change under one part in a million of the value is rounding, not a difference: read "same" (SAME_REL)
             same = abs(d.mean()) <= SAME_REL * max(abs(nb), 1e-12)
             sig = sig and not same
-            better = (d.mean() < 0) == (k in LOWER_BETTER or k in BILL or k in SECOND or k in BATCH)
+            better = (d.mean() < 0) == (k in LOWER_BETTER or k in BILL or k in SECOND or k in BATCH or k in ROBUST)
             ch = (ob - nb) / abs(nb) * 100 if abs(nb) > 1e-12 else None
             out["paired"][a][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
             ch_s = f"{ch:+.1f}%" if ch is not None else f"{ob - nb:+.3g} (native is 0)"
@@ -398,6 +509,9 @@ def main(root):
     cap_l, cap_o = capacity_table(root, cols)
     if cap_l:
         L += cap_l; out["capacity"] = cap_o
+    rob_l, rob_o = robust_table(root, cols)
+    if rob_l:
+        L += rob_l; out["robust"] = rob_o
     (root / "LIVE_REPS.json").write_text(json.dumps(out, indent=1)); (root / "LIVE_REPS.md").write_text("\n".join(_legal_stamp(L)))
     print("\n".join(L))
 

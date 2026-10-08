@@ -96,8 +96,13 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack runs on a rented
    machine (10,800 s window, three repetitions, about 20 hours); the tower follows.
 3. **The real card**: the founder's runs on Lambda, one exact commit.
-4. **Redis** (`docs/REDIS_PREREGISTRATION.md`): the three untouched workloads run as A, B and C on v3; the three-run
-   table V3_REDIS.md joins `results/live/` and the index when they land.
+4. **Redis** (`docs/REDIS_PREREGISTRATION.md`): the three untouched workloads ran as A, B and C on v3 (runs 37704450300,
+   37704464642, 37704479534, finished 8 October); the three-run table V3_REDIS.md joins `results/live/` and the index
+   as soon as the archive bot copies the files.
+4b. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, built, no engine file changes): the governor killed outright
+   mid-run and the watchdog's hand-back, the long run, and the governor's own CPU at 1 to 1,000 copies; the last is done
+   from the archives (`results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size); the first two run as A,
+   B and C next.
 5. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB and
    HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera
    (Kafka and Redis done or running); one or two at a time, each preregistered.

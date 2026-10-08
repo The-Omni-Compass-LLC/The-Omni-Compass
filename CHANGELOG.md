@@ -8,6 +8,28 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **The manual, expanded to referee and underwriter level** (`docs/OMNI_COMPASS_MANUAL.md`, the PDF rebuilt): the
+  standards every page keeps, the executive summary as prose with what is and is not shown, the governor's on-top
+  principle, the verdict, the pedals, the modes and the two switches, the catalog, the realms, the organisms and the
+  grid, the arithmetic with worked examples, every result with the question a referee will ask beside it, the engine's
+  equations in words and where the engine sits against the compass law, the closed circle in plain words and what it does
+  and does not certify, the compass's settings on every stack in one table, the direction rules, the do-no-harm gates,
+  the profiles and the pedals, the nervous system's authority and release gate, the plug contract line by line, the
+  levels, the wiring of a message broker, a cache and a drone swarm (sections 10.5 to 10.7), the three ways a governor
+  stops and what each leaves behind, least privilege and the supply chain, the method of paired runs, the evidence
+  classes with examples and how to read a row, why three runs and why geometric means, a narrative of every result family
+  with its losses (16.1 to 16.6), threats to validity stated by us (16.7), what is not yet shown and the open program
+  (16.8), a fuller glossary, file map, troubleshooting and the audit trail from any row to its raw files. The
+  integration manual and the wiring guide carry the three new stacks.
+- **Robustness, preregistered and built** (`docs/ROBUSTNESS_PREREGISTRATION.md`, register row 31): the governor killed
+  outright at 40% of a governed window (SIGKILL) with the watchdog beside it, the seconds until every setting is back at
+  the operator's polled by the harness (`scripts/kind_robust.sh`, `ROBUST=kill` in `scripts/kind_bench.sh`), a second
+  governor to the end, the 120 s after the kill compared in both arms; the long run (eight windows) with the governor's
+  memory sampled from the process table; the governor's own CPU at 1 to 1,000 copies from the audits already archived
+  (`tools/own_cost.py`, `results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size). `tools/live_reps.py`
+  gains the robustness rows and `tools/confirm_abc.py` the three-run rows for them; `tests/test_robust.py` in
+  `verify.py`. No engine file changes: `omni_controller/`, `omnicompass/` and `realms/` are the v3 bytes.
+- **Redis runs A, B and C finished** (37704450300, 37704464642, 37704479534) and are requested for archive.
 - **Kafka on v3, confirmed three times** (`results/live/V3_KAFKA.md`, runs 37697222651, 37697239400, 37697255445, all
   omni-v3 at `a0b5d2381e9e`): on all three untouched workloads (light, heavy, burst) work inside the 500 ms line +16% to
   +21%, end-to-end p95 1.6 s → 9 to 14 ms, mean lag −92% to −97%, confirmed better; no message lost in any arm;

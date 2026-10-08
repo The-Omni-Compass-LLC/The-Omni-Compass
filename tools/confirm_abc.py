@@ -21,12 +21,46 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from pilot.bench_report import LOWER_BETTER
-from tools.live_reps import BATCH, BILL, KEYS, LABEL, NEUTRAL, SAME_REL
+from tools.live_reps import BATCH, BILL, KEYS, LABEL, NEUTRAL, ROBUST, SAME_REL
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge, higher is better)"
 HIGHER_BETTER = {CAPACITY}
-LOWER = LOWER_BETTER | BATCH | BILL   # the batch queue's finish time and machines after it, and a real cloud's bill: less is better
+LOWER = LOWER_BETTER | BATCH | BILL | ROBUST   # the batch queue's finish time and machines after it, a real cloud's bill, the 120 s after a kill: less is better
+
+
+def robust_rows(runs):
+    """The robustness test's own rows (docs/ROBUSTNESS_PREREGISTRATION.md), from each run's `robust` block (omni arm only, so
+    not paired): every setting back within the allowance in every repetition, the seconds it took, the second governor, the
+    governor's memory. Returns table lines and the rows as data; empty when no run carries the block."""
+    blocks = []
+    for _, _, _, rb in runs:
+        arm = next((a for a in ARMS if rb and a in rb), None)
+        blocks.append(rb[arm] if arm else None)
+    if any(b is None for b in blocks):
+        return [], {}
+    L, rows = [], {}
+    kill = all(b.get("kill_repetitions") for b in blocks)
+    if kill:
+        ok = all(b.get("handed_back_within_allowance_all") for b in blocks)
+        v = "**confirmed: handed back within the allowance in every repetition of every run**" if ok else "**WORSE: a repetition was not handed back within the allowance**"
+        cells = [f"{'yes' if b['handed_back_within_allowance_all'] else 'NO'} ({b['kill_repetitions']} reps; mean {b['handed_back_s_mean']:.0f} s, max {b['handed_back_s_max']:.0f} s"
+                 + (f", never: {b['never_handed_back']}" if b.get('never_handed_back') else "") + ")" if b['handed_back_s_mean'] is not None else f"NO (never handed back in {b['never_handed_back']} reps)" for b in blocks]
+        k = f"robust: every setting back at the operator's within {blocks[0]['allowance_s']:.0f} s of the kill, every repetition (the governor killed outright; the watchdog's hand-back)"
+        L.append(f"| {k} | {cells[0]} | {cells[1]} | {cells[2]} | {v} |"); rows[k] = {"reading": v.strip("*"), "runs": blocks}
+        sg = all(b.get("second_governor_all") for b in blocks)
+        v2 = "**confirmed**" if sg else "**WORSE**"
+        k2 = "robust: a second governor started after the hand-back and governed to the end, every repetition"
+        L.append(f"| {k2} | {'yes' if blocks[0]['second_governor_all'] else 'NO'} | {'yes' if blocks[1]['second_governor_all'] else 'NO'} | {'yes' if blocks[2]['second_governor_all'] else 'NO'} | {v2} |")
+        rows[k2] = {"reading": v2.strip("*"), "runs": [b.get("second_governor_all") for b in blocks]}
+    if all(b.get("memory_ratio_max") is not None for b in blocks):
+        lim = blocks[0]["memory_limit"]
+        leak = any(b["memory_ratio_max"] > lim for b in blocks)
+        v3 = "**WORSE: a leak (over the preregistered limit)**" if leak else f"no leak (every repetition under {lim})"
+        k3 = "robust: governor resident memory, mean of the last ten minutes over the first ten, the most over the repetitions"
+        L.append(f"| {k3} | {blocks[0]['memory_ratio_max']:.3f} | {blocks[1]['memory_ratio_max']:.3f} | {blocks[2]['memory_ratio_max']:.3f} | {v3} |")
+        rows[k3] = {"reading": v3.strip("*"), "runs": [b["memory_ratio_max"] for b in blocks]}
+    return L, rows
 
 
 def load(d):
@@ -47,7 +81,7 @@ def load(d):
         nat, om = cap["native"]["capacity_rps"], cap[arm]["capacity_rps"]
         paired[CAPACITY] = {"native": nat, "omni": om, "diff": om - nat, "ci95": list(cap[arm]["ci95"]),
                             "significant": cap[arm]["ci95"][0] > 0 or cap[arm]["ci95"][1] < 0}
-    return run, paired, n
+    return run, paired, n, j.get("robust")
 
 
 def cell(r):
@@ -110,7 +144,7 @@ def main(argv=None):
          "there. Every row is shown, losses included.", "",
          "| Run | GitHub run | Commit | Engine | Paired repetitions |", "|---|---|---|---|---:|"]
     off, meta = [], []
-    for tag, (run, _, n) in zip("ABC", runs):
+    for tag, (run, _, n, _) in zip("ABC", runs):
         sha, ver = engine(run)
         if not ver.startswith("omni-v"):                     # a fingerprinted engine (docs/OMNI_V2.md; v1 runs keep reading as v1)
             off.append(f"{tag} (run {run}: {ver})")
@@ -120,7 +154,7 @@ def main(argv=None):
     seen = [m["engine"].split(" ")[0] for m in meta]
     label = f"Omni {seen[0][5:]}" if len(set(seen)) == 1 and seen[0].startswith("omni-v") else "the runs' engines differ"
     L[0] = L[0].replace("(Omni v1)", f"({label})")
-    if len({r for r, _, _ in runs}) < 3:
+    if len({r for r, _, _, _ in runs}) < 3:
         off.append("A, B and C must be three separate runs")
     if len({m["engine"].split(" ")[0] for m in meta}) > 1:
         off.append("A, B and C are not all on the same engine: " + ", ".join(m["engine"].split(" ")[0] for m in meta))
@@ -129,13 +163,17 @@ def main(argv=None):
     L += ["", "| Measure | A | B | C | Reading |", "|---|---|---|---|---|"]
     tally, rows = {}, {}
     for k in [CAPACITY] + KEYS:
-        rs = [p.get(k) for _, p, _ in runs]
+        rs = [p.get(k) for _, p, _, _ in runs]
         if any(r is None for r in rs):
             continue
         v = verdict(k, rs)
         tally[v] = tally.get(v, 0) + 1
         rows[k] = {"reading": v.strip("*"), "runs": [{"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": list(r["ci95"])} for r in rs]}
         L.append(f"| {LABEL.get(k, k)} | {cell(rs[0])} | {cell(rs[1])} | {cell(rs[2])} | {v} |")
+    rob_l, rob_rows = robust_rows(runs)           # the robustness test's own rows (omni only, by rule, not paired)
+    for line in rob_l:
+        v = line.rsplit("|", 2)[-2].strip(); tally[v] = tally.get(v, 0) + 1
+    L += rob_l; rows.update(rob_rows)
     L += ["", "Readings: " + ", ".join(f"{n} {v.strip('*')}" for v, n in sorted(tally.items())) + "."]
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(_legal_stamp(L)) + "\n")

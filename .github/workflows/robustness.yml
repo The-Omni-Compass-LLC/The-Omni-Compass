@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: robustness
+# The robustness test (docs/ROBUSTNESS_PREREGISTRATION.md): the governor killed outright in the middle of a governed run
+# (scenario kill: the lease and the watchdog's hand-back, a second governor to the end) and the long run (scenario long:
+# eight times the usual window, the governor's memory and decisions watched). The same paired harness as every Kubernetes
+# test (scripts/kind_paired.sh, scripts/kind_bench.sh with ROBUST set, scripts/kind_robust.sh); aggregated by
+# tools/live_reps.py with the robustness rows. Three separate runs (A, B, C) make the table with tools/confirm_abc.py.
+on:
+  workflow_dispatch:
+    inputs:
+      scenario: {description: "kill (the governor killed at 40%, the hand-back, a second governor) or long (the long run)", default: "kill"}
+      reps: {description: "Paired repetitions (kill: 10; long: 3)", default: "10"}
+      duration_s: {description: "Measured seconds per arm (kill: 900; long: 7200)", default: "900"}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {reps: "${{ steps.r.outputs.reps }}", steps: "${{ steps.r.outputs.steps }}"}
+    steps:
+      - id: r
+        run: |
+          n="${{ github.event.inputs.reps }}"; echo "reps=$(python3 -c "import json; print(json.dumps(list(range(1, int('$n') + 1))))")" | tee -a "$GITHUB_OUTPUT"
+          w="1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1"   # the wandering test's schedule
+          if [ "${{ github.event.inputs.scenario }}" = long ]; then s=""; for i in 1 2 3 4 5 6 7 8; do s="$s $w"; done; w="${s# }"; fi
+          echo "steps=$w" | tee -a "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix: {rep: "${{ fromJSON(needs.plan.outputs.reps) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: helm/kind-action@v1
+        with: {install_only: true}
+      - run: python tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
+      - run: bash scripts/kind_paired.sh
+        env:
+          REP: ${{ matrix.rep }}
+          ARMS: "native compass"
+          DURATION: ${{ github.event.inputs.duration_s }}
+          CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+          LOAD_STEPS_IN: ${{ needs.plan.outputs.steps }}
+          LOADGEN: open
+          ROBUST: ${{ github.event.inputs.scenario }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "paired-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}"}
+  aggregate:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: {pattern: "paired-*", path: reps, merge-multiple: true}
+      - run: ls reps && python tools/live_reps.py reps
+      - run: cat reps/LIVE_REPS.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: live-reps, path: "reps/LIVE_REPS.*"}
