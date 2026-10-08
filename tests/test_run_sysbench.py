@@ -62,17 +62,18 @@ class FakeServer:
 def main():
     lo, hi = S.COVER_MB
     # the decision rule
-    assert S.decide(0.5, 0.35, disk_reads_last_s=10, cur_mb=512, last_change_age=20, full=True)[0] == 512 + S.STEP_MB * 4, "slow with the pool full grows by ceil(force / 0.1) chunks"
-    assert S.decide(0.5, 0.35, disk_reads_last_s=0, cur_mb=512, last_change_age=20, full=False)[0] == 512, "slow with room to spare: not the pool's to mend"
-    assert S.decide(0.5, 1.0, disk_reads_last_s=10, cur_mb=2000, last_change_age=20, full=True)[0] == hi, "the cover holds on the way up"
-    assert S.decide(0.96, 0.0, disk_reads_last_s=0, cur_mb=512, last_change_age=20, full=True)[0] == 512 + S.FAILUP_MB and "fail up" in S.decide(0.96, 0.0, 0, 512, 20, True)[1]
-    assert S.decide(0.96, 0.0, disk_reads_last_s=0, cur_mb=1900, last_change_age=20, full=True)[0] == hi, "the cover holds on a fail-up too"
-    assert S.decide(0.96, 0.0, disk_reads_last_s=0, cur_mb=512, last_change_age=20, full=False)[0] == 512, "no fail-up for a pool with room"
-    assert S.decide(0.1, -0.5, disk_reads_last_s=0, cur_mb=512, last_change_age=20, full=False)[0] == 512 - S.STEP_MB, "calm with nothing read from disk gives a chunk back"
-    assert S.decide(0.1, -0.5, disk_reads_last_s=3, cur_mb=512, last_change_age=20, full=True)[0] == 512, "not while pages come in from disk"
-    assert S.decide(0.1, -0.5, disk_reads_last_s=0, cur_mb=512, last_change_age=5, full=False)[0] == 512, "not within the dwell"
-    assert S.decide(0.1, -0.5, disk_reads_last_s=0, cur_mb=lo, last_change_age=20, full=False)[0] == lo, "never under the cover"
-    assert S.decide(0.3, 0.02, disk_reads_last_s=0, cur_mb=512, last_change_age=20, full=True)[0] == 512, "inside the cushion nothing moves"
+    assert S.decide(0.5, 0.35, misses_last_s=0.3, cur_mb=512, last_change_age=20, full=True)[0] == 512 + S.STEP_MB * 4, "slow with the pool full grows by ceil(force / 0.1) chunks"
+    assert S.decide(0.5, 0.35, misses_last_s=0.0, cur_mb=512, last_change_age=20, full=False)[0] == 512, "slow with room to spare: not the pool's to mend"
+    assert S.decide(0.5, 1.0, misses_last_s=0.3, cur_mb=2000, last_change_age=20, full=True)[0] == hi, "the cover holds on the way up"
+    assert S.decide(0.96, 0.0, misses_last_s=0.0, cur_mb=512, last_change_age=20, full=True)[0] == 512 + S.FAILUP_MB and "fail up" in S.decide(0.96, 0.0, 0.0, 512, 20, True)[1]
+    assert S.decide(0.96, 0.0, misses_last_s=0.0, cur_mb=1900, last_change_age=20, full=True)[0] == hi, "the cover holds on a fail-up too"
+    assert S.decide(0.96, 0.0, misses_last_s=0.0, cur_mb=512, last_change_age=20, full=False)[0] == 512, "no fail-up for a pool with room"
+    assert S.decide(0.1, -0.5, misses_last_s=0.004, cur_mb=512, last_change_age=20, full=True)[0] == 512 - S.STEP_MB, "calm with misses under 1% of reads gives a chunk back, full or not (stale pages stay resident)"
+    assert S.decide(0.1, -0.5, misses_last_s=0.05, cur_mb=512, last_change_age=20, full=True)[0] == 512, "not while the pool misses more than 1% of its reads: it does not hold the working set"
+    assert S.decide(0.1, -0.5, misses_last_s=0.0, cur_mb=512, last_change_age=5, full=False)[0] == 512, "not within the dwell"
+    assert S.decide(0.1, -0.5, misses_last_s=0.0, cur_mb=lo, last_change_age=20, full=False)[0] == lo, "never under the cover"
+    assert S.decide(0.3, 0.02, misses_last_s=0.0, cur_mb=512, last_change_age=20, full=True)[0] == 512, "inside the cushion nothing moves"
+    assert S.miss_share(5, 1000) == 0.005 and S.miss_share(0, 0) == 0.0 and S.miss_share(300, 1000) == 0.3
     # the plug: snapshot once, write in whole chunks and wait for the server's resize, read back, another writer stops it, restore
     srv = FakeServer(512); plug = S.BufferPool(srv)
     assert plug.attach() == 512
@@ -91,7 +92,7 @@ def main():
     # the server's own reading and pool figures
     srv.timer_ps, srv.count = 2_000_000_000_000, 1000              # 2 s over 1,000 statements: 2 ms each
     st = S.status(srv)
-    assert S.stmt_latency(st) == (2_000_000_000_000, 1000)
+    assert S.stmt_latency(st) == (2_000_000_000_000, 1000) and S.read_requests(st) == 1000
     mb, used, reads, rs = S.pool_stats(st)
     assert mb == 512 and abs(used - 256) < 1.0 and reads == 0 and not S.resizing(rs), (mb, used, reads, rs)
     assert not S.pool_full(st); srv.fill = 0.95; assert S.pool_full(S.status(srv))

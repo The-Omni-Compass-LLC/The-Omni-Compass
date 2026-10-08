@@ -76,16 +76,19 @@ asked about; they are declared here and are the same in both arms.
 - **Reading.** Once a second, the server's own mean statement latency over the last second: the performance schema's statement
   summary (`events_statements_summary_global_by_event_name`, the select, update, insert and delete rows), the timer total and the
   statement count, differenced; a second with no statements reads as calm (0).
-- **Band.** From 0 to the **statement line, 0.5 ms** (a statement served from the pool is well inside; one that reads pages from
-  the file system is slower). The compass pulls the reading to 40% of the line (0.2 ms), the service profile of the Kubernetes
+- **Band.** From 0 to the **statement line, 0.6 ms** (a statement served from the pool is well inside; one that reads pages from
+  the file system is slower). The compass pulls the reading to 40% of the line (0.24 ms), the service profile of the Kubernetes
   adapter, with its usual gains (kp 1.0, response time 2 s, smoothing 0.5, one decision a second). *Written as 1 ms before the
-  first smoke run and set at 0.5 ms on the tuning workload's second smoke run, on its figures, before any counted run, as the
-  MongoDB preregistration did; the figures are under "What the smoke run shows" below.*
+  first smoke run, set at 0.5 ms on the tuning workload's second smoke run and at 0.6 ms on its third, on their figures, before
+  any counted run, as the MongoDB preregistration did; the figures are under "What the smoke run shows" below.*
 - **Direction, and the do-no-harm gate.** A positive force (slow statements) grows the pool by ceil(force / 0.10) chunks of
   **128 MB**, **only while the pool is full** (pages holding data at 90% of its pages or more): slow statements in a pool with room to
-  spare are not the pool's to mend, and the knob is left alone. A negative force (calm) with **no page read from disk in the last
-  second** gives back one chunk, after a ten-second dwell since the last change (a shrink evicts pages, and the server's resize
-  itself takes seconds).
+  spare are not the pool's to mend, and the knob is left alone. A negative force (calm) **while the pool's misses are under one
+  percent of its read requests in the last second** (the pool holds the working set) gives back one chunk, after a ten-second
+  dwell since the last change (a shrink evicts pages, and the server's resize itself takes seconds). *Written as "no page read
+  from disk in the last second" and changed on the third smoke run: InnoDB keeps stale pages resident, so a pool once filled
+  never reads empty and a few new-page reads a second never stop; the operator's question is whether the pool holds the working
+  set, and the miss share answers it.*
 - **Cushion.** A force inside ±0.05 moves nothing.
 - **Fail up.** At 95% of the line with the pool full, four chunks (512 MB, about a quarter of the cover) are added at once, and
   again the next second if the service is still past the wall; never past the cover.
@@ -104,7 +107,7 @@ memory, and the result will say what it is. The MongoDB test on the same kind of
 
 | Gauge | Direction |
 |---|---|
-| work inside the response line: transactions a second answered within the **transaction line**, the statement line times the statements a transaction as the script ships it (0.5 ms for the point select and the indexed update, 7 ms for read-only, 9 ms for read-write) | **higher is better** (the product number) |
+| work inside the response line: transactions a second answered within the **transaction line**, the statement line times the statements a transaction as the script ships it (0.6 ms for the point select and the indexed update, 8.4 ms for read-only, 10.8 ms for read-write) | **higher is better** (the product number) |
 | throughput (transactions a second); queries a second | higher is better |
 | latency p95, p99, mean (from the histogram) | lower is better |
 | errors (sysbench's ignored errors: deadlocks and retries) | **any increase is WORSE** |
@@ -159,8 +162,26 @@ result is recorded here when it has run, and it is not counted.
   or past the center and grows. The transaction lines scale with it (0.5 ms a point select or indexed update, 7 ms the
   read-only transaction, 9 ms read-write). The one repetition's whole-arm figures are recorded, not counted: work inside the
   line 2,901 a second in both arms; p95 0.40 ms in both; pool held 512 MB against 408 MB; disk reads 269,370 against 349,742;
-  CPU-seconds 172.3 against 171.7; both arms handed back. This is the last change before the counted runs, and a third
-  smoke run first shows the band at work; everything else in this document stands as written.
+  CPU-seconds 172.3 against 171.7; both arms handed back. A third smoke run follows to show the band at work.
+- **Third smoke run (37751313605, 08:39 UTC): the band worked one way and not the other, and the figures set the gate.** With
+  the 0.5 ms line omni grew the pool as the working set widened, 384 to 640, 768, 896 and 1,024 MB over the first ten notches,
+  and read 116,437 pages from disk against native's 268,450 (−57%); work inside the line (2,887 against 2,885 a second), p95
+  (0.41 ms in both) and the host's CPU (135.8 against 140.6 s) did not move, because a miss on this machine is a read from
+  the page cache. But at the low notches on the way down, where the working set was one or two tables (240 to 480 MB), the
+  pool went on growing, to 1,408 MB at a notch whose working set was 240 MB, and ended the run at 1,152 MB: the pool held
+  877 MB on average against native's 512. Two causes, both in the rule as written, both fixed here on the tuning workload.
+  First, the give-back gate, "no page read from disk in the last second", was never satisfied: InnoDB keeps stale pages
+  resident, so a pool once filled reads full forever, and a few new-page reads a second never stop even when the working set
+  fits; **the gate is now the pool's miss share, under one percent of its read requests in the last second**, which is the
+  operator's own question (does the pool hold the working set?) asked of the server's own counters. Second, this runner's hit
+  latency (0.20 to 0.22 ms) sat at the 0.5 ms line's center (0.20 ms), so calm reads drew a small upward force; the second
+  smoke's runner read hits at 0.14 to 0.17 ms, and the difference between runners is as large as the difference a notch of
+  misses makes (0.05 to 0.06 ms). **The statement line is set at 0.6 ms** (center 0.24 ms), above the hit range seen on both
+  runners and under the miss-heavy range of this one (0.25 to 0.27 ms); on a runner like the second smoke's the compass will
+  read calm throughout and the miss-share gate will hold the pool at the working set, which is the right answer there. The
+  transaction lines scale with it (0.6 ms a point select or indexed update, 8.4 ms read-only, 10.8 ms read-write). The one
+  repetition's whole-arm figures are recorded, not counted. A fourth smoke run follows; the counted runs begin on its figures
+  if the pool follows the working set both ways. Nothing else in this document changed.
 
 ---
 
