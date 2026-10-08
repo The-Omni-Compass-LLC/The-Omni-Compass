@@ -881,7 +881,8 @@ is a statement about the lever, not about the law. This run makes the lever big 
   in each of the Dasv7, Dsv7 and DSv4 families, where the allowance is 10, and the fleet's pre-flight (which asks every one of
   its nine families for 10 free vCPUs) found 2. The tower's `Standard_D8as_v4` holds 8 of the DASv4 family's 10 the same way.
   Nothing is deleted. The eighth dispatch, unchanged in every input, follows the collect that deletes the 24-hour machines
-  (about 2026-10-09 12:00 UTC); until then the fleet cannot pass its own pre-flight, and that is the pre-flight doing its job.
+  (each machine runs two arms of 86,400 s one after the other, so about 2026-10-10 12:00 UTC, and by their 60-hour limit at the
+  latest); until then the fleet cannot pass its own pre-flight, and that is the pre-flight doing its job.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
