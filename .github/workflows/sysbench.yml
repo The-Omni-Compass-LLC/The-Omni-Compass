@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: sysbench
+# Omni-Compass on top of a database's operator-set buffer pool (docs/MYSQL_PREREGISTRATION.md): MySQL 8.0 and sysbench from
+# Ubuntu's own packages, the operator's fixed InnoDB buffer pool (native) against the same with the compass law on the pool size
+# through the server's own console (omni). One job per workload, three paired repetitions each; one report (SYSBENCH.md). Two
+# workloads at a time.
+on:
+  workflow_dispatch:
+    inputs:
+      workloads:
+        description: "Workloads, comma separated: tuning, read_only, read_write, update_index, burst; 'all' runs every one"
+        default: "all"
+      reps: {description: "Paired repetitions per workload", default: "3"}
+      step_s: {description: "Seconds per table-count notch", default: "20"}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {workloads: "${{ steps.w.outputs.workloads }}"}
+    steps:
+      - id: w
+        run: |
+          if [ "${{ github.event.inputs.workloads }}" = all ] || [ -z "${{ github.event.inputs.workloads }}" ]; then
+            w='["tuning","read_only","read_write","update_index","burst"]'
+          else
+            w=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.workloads }}'.split(',')))")
+          fi
+          echo "workloads=$w" | tee -a "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: {workload: "${{ fromJSON(needs.plan.outputs.workloads) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt pymysql
+      - name: MySQL and sysbench from Ubuntu's own packages
+        run: |
+          set -e
+          sudo apt-get update -q
+          sudo apt-get install -y -q mysql-server sysbench
+          sudo systemctl enable --now mysql
+          for i in $(seq 1 30); do (sudo mysql -e "SELECT 1" >/dev/null 2>&1 || mysql -uroot -proot -e "SELECT 1" >/dev/null 2>&1) && break; sleep 2; done
+          mysqld --version; sysbench --version
+          python tools/run_sysbench.py --setup
+      - name: Run the workload, native and omni
+        run: |
+          set +e
+          python tools/run_sysbench.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out > run.log 2>&1
+          code=$?
+          tail -40 run.log
+          grep "^==\|^   " run.log | tee -a "$GITHUB_STEP_SUMMARY"
+          sudo cat /var/log/mysql/error.log > out/mysql-error.log 2>/dev/null || true
+          exit $code
+      - run: cd out && find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "sysbench-${{ matrix.workload }}", path: out}
+  report:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - uses: actions/download-artifact@v4
+        with: {pattern: "sysbench-*", path: all, merge-multiple: true}
+      - run: ls all && python tools/run_sysbench.py --report-only all && cat all/SYSBENCH.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: sysbench-report, path: all/SYSBENCH.md}
