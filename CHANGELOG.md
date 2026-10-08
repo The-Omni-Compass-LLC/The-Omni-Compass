@@ -29,6 +29,13 @@
   (`tools/own_cost.py`, `results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size). `tools/live_reps.py`
   gains the robustness rows and `tools/confirm_abc.py` the three-run rows for them; `tests/test_robust.py` in
   `verify.py`. No engine file changes: `omni_controller/`, `omnicompass/` and `realms/` are the v3 bytes.
+- **YCSB on MongoDB, preregistered and built** (`docs/YCSB_PREREGISTRATION.md`, `tools/run_ycsb.py`, `tools/ycsb_abc.py`,
+  workflow `ycsb`, tests in `verify.py`; register row 24): MongoDB 8.0 from its publisher's signed repository with the
+  operator's 512 MB WiredTiger cache as native; Omni on the cache size inside [256, 2,048] MB through the server's own
+  console, reading the server's own mean read latency, growing only while the cache is full, giving a notch back when calm
+  and nothing is evicted; YCSB 0.17.0 (pinned by SHA-256) running its published core workloads with the key space stepping
+  through the cache and past it; the disclosed limit that the data also sits in the OS page cache on this machine. The
+  smoke run first, then A, B and C.
 - **Robustness smoke run passed** (run 37713124793, one repetition, 600 s, not counted): the governor killed at 240 s,
   every setting back at the operator's 7 s later by the watchdog's hand-back, a second governor to the end, the reset
   check passed. One harness fault fixed before the counted runs: the memory sampler's process-id join (every sample read
