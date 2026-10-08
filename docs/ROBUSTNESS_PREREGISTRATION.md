@@ -169,12 +169,27 @@ changes (`tools/omni_version.py` on the commit).
 
 **Dispatched (2026-10-08 10:04 UTC).** Three `start` runs of `big-organism-detached` with `test=robust`, `duration_s=86400`,
 `reps=1`, `max_hours=60`, commit `4d5633dd` (Omni v3 by `tools/omni_version.py --commit`): runs 37761059781, 37761072412
-and 37761084779, resource groups `omni-detached-<run>` in eastus, each one `Standard_D4as_v4`. All three machines were
-rented at the first attempt and all three reported RUNNING with the cell `robust-long-x86400-1` started between 10:15 and
-10:20 UTC (repetition 1, order native then compass). The scheduled collect looks at them every two hours; the arms end about
-48 hours after the start plus the cluster's set-up, and the three collected runs are read as A, B and C by
-`tools/confirm_abc.py` into a 24-hour table written beside the long-run table in `results/live/`. Nothing above this line
-changed after the dispatch.
+and 37761084779, resource groups `omni-detached-<run>` in eastus. All three machines were rented at the first attempt and
+all three reported RUNNING with the cell `robust-long-x86400-1` started between 10:15 and 10:20 UTC (repetition 1, order
+native then compass). The scheduled collect looks at them every two hours; the arms end about 48 hours after the start plus
+the cluster's set-up, and the three collected runs are read as A, B and C by `tools/confirm_abc.py` into a 24-hour table
+written beside the long-run table in `results/live/`.
+
+**Corrected the same day (11:58 UTC), from the subscription's own inventory, before any result.** The machines are not the
+four-core `Standard_D4as_v4` written above. The detached workflow's start job tries the size it is given first and, when the
+region or the subscription's allowance refuses it, falls back through the eight-core sizes it may rent, taking the first
+admitted and tagging the group with it. The four-core size was asked for and refused by the allowance: it is of the DASv4
+family, whose 10 vCPUs the tower's `Standard_D8as_v4` already held 8 of, and the fallback then rented **`Standard_D8as_v7` (run 37761059781), `Standard_D8s_v7` (run 37761072412) and `Standard_D8s_v4` (run 37761084779)**:
+eight vCPUs each, of three machine families, twice the cores of a GitHub runner, about $0.35 to $0.45 an hour each at list
+price, so about **$55 to $70** for the three over 50 hours rather than the $25 written above. Three things follow and are said
+here. The arms are paired on the same machine, so the readings this scenario judges (the governor's memory, decisions, decision
+time and hand-back over a day, and the paired service rows) are unaffected in kind; what changes is the headroom, which is
+larger than on a runner, and a referee should read the 24-hour result as "on an eight-core machine" and not compare its
+service rows to the two-hour run's on a four-core runner. The three machines are of three different families, which the
+preregistration did not ask for and which is a mild strength (three machines, three families, one engine). And the
+eight-vCPU footprints of two of them sit in the families the AKS fleet's pre-flight asks for, so the fleet cannot be
+dispatched until the collect deletes them (`docs/K8S_COMPASS_PREREGISTRATION.md`, amendment 8); that is the pre-flight working
+as designed and costs nothing. The scenario's rules, thresholds and gauges are unchanged.
 
 ## What is declared before the first run
 

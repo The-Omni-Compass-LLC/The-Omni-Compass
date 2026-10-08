@@ -1579,7 +1579,10 @@ window, no repetition off the clock.
 The same workflow carries a second test. With the input `test=robust` the machine runs the robustness harness's long
 scenario instead of an organism (`scripts/kind_paired.sh` with `ROBUST=long`, exactly as the GitHub job runs it), with
 the window stretched to whatever `duration_s` asks and the wandering load schedule repeated to fill it; the 24-hour run of
-section 16.8 uses it, one paired repetition on each of three four-core machines, collected and deleted at 60 hours at the
+section 16.8 uses it, one paired repetition on each of three rented eight-core machines of three families (the start job
+tries the size it is given and falls back through the eight-core sizes the subscription may rent when the allowance refuses
+it; the four-core size asked for was refused because the tower's machine held its family's allowance, and the
+preregistration records what was rented), collected and deleted at 60 hours at the
 latest. The cells it writes are named `robust-long-x<window>-<repetition>` beside the organisms' `six-<organism>-x<copies>-
 <repetition>`, and the collect job gathers both. The `max_hours` input is the machine's own limit, written into the
 machine at start, so a collect that finds a machine past its limit takes what is there and deletes it, whichever job

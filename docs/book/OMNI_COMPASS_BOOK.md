@@ -842,6 +842,21 @@ convergence and the band and dwell allow; and whether change is permitted, which
 security block. All of this is written to the audit every decision (`docs/MECHANISM_OF_ACTION.md`, sections 3 to 6, and
 `python tools/mechanism.py`, which reproduces the measured numbers in `results/MECHANISM_OF_ACTION.json`).
 
+The nine observations are worth naming in plain words, because every later number is a weighted sum of them
+(`omnicompass/adapter.py`, `observe_vector` and `assimilate`). **Queue** is the work waiting as a share of the work being
+served; **load** is utilisation against the stack's own target; **power** and **thermal** are the electrical and heat
+stress against their limits; **network** is the same for the wire; **drift** is how far the levers stand from where native
+had them, so that a governor that has pushed far from the operator's settings reads as more stressed than one that has
+not; **staleness** is the age of the readings, which rises when a sense goes quiet; **security** is the hold flag; and
+**conflict** counts other hands seen on the levers. Each is clipped to a declared range before it is used, so no single
+runaway reading can swamp the others. The stress the engine assimilates leans most on the queue (a weight of 0.25) and on
+load above 85% of target (0.18), then power, heat, network and drift in that order, with conflict and staleness last; the
+utilisation it blends toward falls with the queue first (0.27) and with power and heat next. The weights are fixed numbers
+in the frozen engine, the same on every stack, and a reader who wants to know why a decision read the body as stressed can
+recompute the sum from the audit line, which records all nine observations. What the weights encode is a judgement made
+once: that work waiting is the first sign of a body in trouble, that a lever far from native is itself a mild stress, and
+that a reading one cannot trust is a reason for caution rather than for action.
+
 ### 4.3 Where the engine sits, and where the compass law sits
 
 A reader meeting the engine and then the compass law (section 6) may ask which of the two moves the knob. The answer, in
@@ -3569,7 +3584,10 @@ window, no repetition off the clock.
 The same workflow carries a second test. With the input `test=robust` the machine runs the robustness harness's long
 scenario instead of an organism (`scripts/kind_paired.sh` with `ROBUST=long`, exactly as the GitHub job runs it), with
 the window stretched to whatever `duration_s` asks and the wandering load schedule repeated to fill it; the 24-hour run of
-section 16.8 uses it, one paired repetition on each of three four-core machines, collected and deleted at 60 hours at the
+section 16.8 uses it, one paired repetition on each of three rented eight-core machines of three families (the start job
+tries the size it is given and falls back through the eight-core sizes the subscription may rent when the allowance refuses
+it; the four-core size asked for was refused because the tower's machine held its family's allowance, and the
+preregistration records what was rented), collected and deleted at 60 hours at the
 latest. The cells it writes are named `robust-long-x<window>-<repetition>` beside the organisms' `six-<organism>-x<copies>-
 <repetition>`, and the collect job gathers both. The `max_hours` input is the machine's own limit, written into the
 machine at start, so a collect that finds a machine past its limit takes what is there and deletes it, whichever job
@@ -5319,10 +5337,10 @@ capacity in its region on every dispatch so far, each refusal recorded; it runs 
 The refusals are themselves part of the record, and the preregistration's amendments 5 to 7 keep the count: six dispatches
 and 29 refused repetitions in eastus, each with Azure's own reason (its managed-Kubernetes capacity in the region, not
 the subscription's quota), a survey of every other region showing none with the vCPU quota the fleet needs, one dispatch
-cancelled by hand and recorded as such, and the seventh dispatch left to try. That seventh dispatch had been refused on
-its first three repetitions as this edition went to press, 32 refusals in all; its repetitions run one after another, and
-whatever the region admits is read by the same table as the four-worker runs, with the refused repetitions counted in the
-amendment, not in the table. A reader should take
+cancelled by hand and recorded as such, and the seventh dispatch left to try. That seventh dispatch was refused on all
+five of its repetitions over the morning of 8 October, 34 refusals in all (amendment 8); whatever the region admits on a
+later dispatch is read by the same table as the four-worker runs, with the refused repetitions counted in the amendment,
+not in the table. A reader should take
 from this what it says and no more: the small fleet's bill reading is inside the noise by the arithmetic of its size, the
 large fleet's reading does not exist yet, and nothing about the bill on a real cloud is claimed in the index until it does.
 
@@ -7563,6 +7581,21 @@ is a statement about the lever, not about the law. This run makes the lever big 
   five repetitions too, the same `AKSCapacityHeavyUsage` in eastus, over three and a half hours (05:01 to 08:26 UTC): 29
   refusals in sixteen hours across six dispatches, the pre-flight passing each time, no arm run, nothing billed. The fleet
   is dispatched a seventh time, unchanged; nothing else changes. Each refused repetition costs GitHub runner minutes only.
+- **Amendment 8 (2026-10-08 11:50 UTC, before the counted run).** The seventh dispatch (run 37750047768, 08:28 to 11:33 UTC)
+  ran no arm either, but not for one reason. Repetitions 1 to 3 were refused as before (`AKSCapacityHeavyUsage` in eastus, the
+  pre-flight passing each time): 32 refusals across seven dispatches. Repetitions 4 and 5 never reached Azure's cluster
+  service: the pre-flight itself found only 2 of the 10 vCPUs free in two of the nine families (`standardDSv4Family`,
+  `StandardDasv7Family`), and the fleet is dispatched only when every family has room, so it stopped with nothing built and
+  nothing billed. An inventory of the subscription (`.github/workflows/azure-inventory.yml`, run 37773586107, 11:58 UTC)
+  answered it: the subscription holds exactly four machines, all ours and all running, and no cluster, scale set or group
+  left behind by any earlier repetition. The holders are the three machines of the 24-hour robustness run
+  (`docs/ROBUSTNESS_PREREGISTRATION.md`, scenario 2b): the detached start job, which tries the size it is given and falls back
+  through the eight-core sizes it may rent when the allowance refuses it (the four-core size asked for was refused because the
+  tower's machine held its family's allowance), rented `Standard_D8as_v7`, `Standard_D8s_v7` and `Standard_D8s_v4`, eight vCPUs
+  in each of the Dasv7, Dsv7 and DSv4 families, where the allowance is 10, and the fleet's pre-flight (which asks every one of
+  its nine families for 10 free vCPUs) found 2. The tower's `Standard_D8as_v4` holds 8 of the DASv4 family's 10 the same way.
+  Nothing is deleted. The eighth dispatch, unchanged in every input, follows the collect that deletes the 24-hour machines
+  (about 2026-10-09 12:00 UTC); until then the fleet cannot pass its own pre-flight, and that is the pre-flight doing its job.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
