@@ -43,7 +43,7 @@ current card governor on a real GPU (the one real-card run, on the governor sinc
 energy and made its 95th percentile 43-84% slower:
 [`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
-**The Omni index, every real test together: +21.2%** more for the same, or the same for less, across work, speed,
+**The Omni index, every real test together: +23.5%** more for the same, or the same for less, across work, speed,
 machines and energy, five real categories each weighed the same: real Kubernetes on v3 +25.5% (work +19%, speed +93%,
 machines +4%, energy +3%); the real database on v3 +14.2% (connections to the database halved and more; the compass's own
 CPU, confirmed worse, counted against it); real messaging on v3, Apache Kafka, +166.9% (work inside the line +17%; a 95th
@@ -54,9 +54,10 @@ confirmed worse, the resource the gain costs, which outweighs the gain in the ge
 the real database's storage-engine cache on v3, MongoDB under YCSB, **+10.2%** (the cache given back by about half on two
 of four untouched workloads and 13% to 37% on a third, confirmed better; work inside the line, p95 and CPU inside the
 noise; the burst mean latency +2% to +4%, confirmed worse, in the table); and the real database's buffer pool on v3, MySQL
-under sysbench, **+0.0%** (every row of the first counted set inside the noise in three runs, no error; the hand-back failed
-on 15 of 45 omni arms because the plug's restore met the server's own unfinished shrink, fixed and declared, the second set
-running). Only a
+under sysbench, **+12.2%** (the pool held −67% on burst and −50% to −56% on read_only, confirmed better; the pages the pool
+holds on read_write +53% to +70%, confirmed worse, the memory bought for a written working set; work inside the line, p95 and
+CPU inside the noise; the pool handed back on all 45 omni arms; the first counted set, every row inside the noise and 15 arms
+not handed back through the plug's restore, is kept whole in the history). Only a
 row confirmed in all three runs enters; a row inside the noise counts as exactly zero. Azure's billed runs and the card
 join the index when their three-run tables land (the earlier engine's +12.9% is kept in
 `docs/history/OMNI_INDEX_pre_v1.md`). Every number is read from each test's own table by
