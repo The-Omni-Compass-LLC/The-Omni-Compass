@@ -5,7 +5,7 @@
 
 > **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `f4faa3df`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `86374f84`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ## 1. The mechanism, and proof that it is the one that ran
 
@@ -24,7 +24,7 @@ The engine is the founder's eight-line equation, integrated by RK4 with the boun
 
 ## 2. Real Kubernetes, Omni v3, every test three times (evidence class L)
 
-Six tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **confirmed better** or **confirmed worse** only when all three runs move the same way with every 95% interval clear of zero; otherwise it reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and read back. Steady runs: A 37568428903 (omni-v3); B 37573736336 (omni-v3); C 37578883344 (omni-v3); the other tests' runs are named in their tables.
+Seven tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **confirmed better** or **confirmed worse** only when all three runs move the same way with every 95% interval clear of zero; otherwise it reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and read back. Steady runs: A 37568428903 (omni-v3); B 37573736336 (omni-v3); C 37578883344 (omni-v3); the other tests' runs are named in their tables.
 
 ![Kubernetes on v3](dossier/k8s_v3.png)
 
@@ -36,6 +36,7 @@ Six tests, ten paired repetitions each, three separate GitHub runs on the frozen
 | Fairness, a noisy neighbour | not taken | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | `results/live/V3_FAIRNESS.md` |
 | Faults: machine down, spike, runaway pod, blind probe | not taken | **-62% to -47%, confirmed better** | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | `results/live/V3_FAULTS.md` |
 | A queue of batch jobs | not taken | **-14% to -10%, confirmed better** | **-23% to -18%, confirmed better** | **-16% to -13%, confirmed better** | no difference beyond the noise | `results/live/V3_BATCH.md` |
+| A public day of demand: the Google cluster trace of 2011, replayed one step at a time | not taken | **-71% to -65%, confirmed better** | **-10% to -6%, confirmed better** | **-7% to -4%, confirmed better** | **-17% to -8%, confirmed better** | `results/live/V3_TRACE_GOOGLE2011.md` |
 
 Energy on kind is a declared model: the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill. Omni-Compass gives a machine back only after a paired trial shows the service no slower without it (the verdict, `omnicompass/verdict.py`); on these clusters one machine fewer made requests 30-45% slower in most trials, so the machines stayed and were spent on speed and work. The v1 tables (`results/live/V1_*.md`, `docs/OMNI_V1.md`) read the same; the sets before v1 are in `docs/history/`.
 

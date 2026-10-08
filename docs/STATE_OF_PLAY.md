@@ -31,13 +31,16 @@ ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain co
 database's storage-engine cache** (MongoDB as its publisher ships it under YCSB, `results/live/V3_YCSB.md`): on four
 untouched workloads the cache size held fell about half on c and burst and 13% to 37% on f, **confirmed better** (b inside
 the noise in one run); work inside the 1 ms line, p95 and host CPU inside the noise on all four; no failed operation; the
-burst mean latency **+2% to +4%, confirmed worse**, the one loss. **A real database's buffer pool** (MySQL as Ubuntu ships it under sysbench, `results/live/V3_SYSBENCH.md`): on the four
+burst mean latency **+2% to +4%, confirmed worse**, the one loss. **A public day of demand on the real cluster** (the Google cluster trace of 2011, its first day of job submissions turned
+into the wandering test's schedule by a rule written before the runs, `results/live/V3_TRACE_GOOGLE2011.md`): p95 **−65% to
+−71%**, time over the line −81% to −84%, failed requests −8% to −17%, **machines in service −6% to −10%**, confirmed better in
+three runs of ten pairs; pods started +23% to +35% as point estimates, inside the noise in one run; 9 rows better, 0 worse. **A real database's buffer pool** (MySQL as Ubuntu ships it under sysbench, `results/live/V3_SYSBENCH.md`): on the four
 untouched workloads the pool held fell **−67% on burst and −50% to −56% on read_only, confirmed better**; on read_write the
 pages the pool holds rose **+53% to +70%, confirmed worse** (memory bought for a written working set); work inside the line,
 p95, p99 and host CPU inside the noise everywhere; no error; the pool handed back on all 45 omni arms. The first counted set
 (every row inside the noise, 15 arms not handed back because the plug's restore met the server's unfinished shrink) is kept
 whole in `docs/history/V3_SYSBENCH_set1.md`, the plug fixed and the fix declared in `docs/MYSQL_PREREGISTRATION.md`. **The
-Omni index, real machines only, confirmed three times: +23.5%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database
+Omni index, real machines only, confirmed three times: +24.1%** (`results/OMNI_INDEX.md`; Kubernetes +28.8% over seven tests, the database
 +14.2%, Kafka +166.9%, Redis −24.9%, the database's cache +10.2%, the database's buffer pool +12.2%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's speed ratio
 is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is negative
 because the memory it holds for a wide working set is the resource it trades and reads worse by rule; MongoDB's is
@@ -60,6 +63,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | All four in one run | **+35% to +49%** | −61% to −66% | inside the noise | inside the noise | `results/live/V3_ALL_FOUR.md` |
 | Steady work in steps | equal by design | −65% to −66% | **−1.5% to −2.9%** | −1.3% to −2.1% | `results/live/V3_STEADY.md` |
 | Demand that wanders | failed requests −9% to −12% | −57% to −63% | inside the noise | inside the noise | `results/live/V3_WANDERING.md` |
+| A public day of demand: the Google cluster trace of 2011 replayed one step at a time (`docs/TRACES_PREREGISTRATION.md`) | failed requests **−8% to −17%**, confirmed better; no pod ever without a machine | **−65% to −71%** (p99 −49% to −61%) | **−6% to −10%, confirmed better** (replicas −5% to −6%) | standby model **−4% to −7%, confirmed better**; idle-power model inside the noise in one run | `results/live/V3_TRACE_GOOGLE2011.md` |
 | Faults: machine down, spike, runaway pod, blind probe | failed requests lower in all three, clear of the noise in one | −47% to −62% | inside the noise | inside the noise | `results/live/V3_FAULTS.md` |
 | A queue of batch jobs | queue finished no difference beyond the noise | mean response −10% to −14% | **−19% to −23%** (−29% to −35% after the queue) | **−13% to −16%** | `results/live/V3_BATCH.md` |
 | Fairness, a noisy neighbour | inside the noise on every row | inside the noise | inside the noise | inside the noise | `results/live/V3_FAIRNESS.md` |
@@ -124,7 +128,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 5. **YCSB on MongoDB, done** (`docs/YCSB_PREREGISTRATION.md`, `results/live/V3_YCSB.md`): the operator's WiredTiger cache
    as native, Omni on the cache size through the server's own console; four smoke runs recorded, then A, B and C on v3; the
    cache held given back by about half on two untouched workloads at no measurable cost in work, p95 or CPU, one confirmed
-   loss (the burst mean latency, +2% to +4%); the index spans six real categories at +23.5% with MySQL's second set (+12.2%; the first set entered at +0.0%, every row inside the noise). Cassandra and Redis under
+   loss (the burst mean latency, +2% to +4%); the index spans six real categories at +24.1%: MySQL's second set entered at +12.2% (the first set at +0.0%, every row inside the noise) and the public-trace test raised the Kubernetes category from +25.5% to +28.8%. Cassandra and Redis under
    YCSB and HammerDB are next in row 24.
 6. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
    Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,

@@ -71,8 +71,8 @@ every size from 1 to 1,000 copies. On the independent simulators: a power grid's
 worse in 4; robot arms' peak torque down 10% to 29% where Omni-Compass moved and left native where the paired trial said
 not to; buildings' electricity bought and daily peak better in all 11 battery districts and the bill worse in 7; drone
 swarms' energy a mission 7% to 20% lower with no late mission, near miss or collision. The one combined number, the Omni
-index over the six real categories confirmed three times, stands at **+23.5%** (`results/OMNI_INDEX.md`): Kubernetes
-+25.5%, the database +14.2%, messaging +166.9%, the cache −24.9%, the database's storage-engine cache +10.2% and the
+index over the six real categories confirmed three times, stands at **+24.1%** (`results/OMNI_INDEX.md`): Kubernetes
++28.8% over seven tests, the database +14.2%, messaging +166.9%, the cache −24.9%, the database's storage-engine cache +10.2% and the
 database's buffer pool +12.2%, every category weighed the same and every row inside the noise counted as exactly nothing. The cache's category is negative because the memory it holds is the resource it
 trades and reads worse by rule, even as its work and hit rate read better; the index does not hide that.
 
@@ -4958,7 +4958,7 @@ Patent applications, copyright registrations and trademark applications filed in
 
 
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `9cb6019f`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `86374f84`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 1. The mechanism, and proof that it is the one that ran
 
@@ -4977,7 +4977,7 @@ The engine is the founder's eight-line equation, integrated by RK4 with the boun
 
 ### 2. Real Kubernetes, Omni v3, every test three times (evidence class L)
 
-Six tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **confirmed better** or **confirmed worse** only when all three runs move the same way with every 95% interval clear of zero; otherwise it reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and read back. Steady runs: A 37568428903 (omni-v3); B 37573736336 (omni-v3); C 37578883344 (omni-v3); the other tests' runs are named in their tables.
+Seven tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **confirmed better** or **confirmed worse** only when all three runs move the same way with every 95% interval clear of zero; otherwise it reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and read back. Steady runs: A 37568428903 (omni-v3); B 37573736336 (omni-v3); C 37578883344 (omni-v3); the other tests' runs are named in their tables.
 
 ![Kubernetes on v3](dossier/k8s_v3.png)
 
@@ -4989,6 +4989,7 @@ Six tests, ten paired repetitions each, three separate GitHub runs on the frozen
 | Fairness, a noisy neighbour | not taken | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | `results/live/V3_FAIRNESS.md` |
 | Faults: machine down, spike, runaway pod, blind probe | not taken | **-62% to -47%, confirmed better** | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | `results/live/V3_FAULTS.md` |
 | A queue of batch jobs | not taken | **-14% to -10%, confirmed better** | **-23% to -18%, confirmed better** | **-16% to -13%, confirmed better** | no difference beyond the noise | `results/live/V3_BATCH.md` |
+| A public day of demand: the Google cluster trace of 2011, replayed one step at a time | not taken | **-71% to -65%, confirmed better** | **-10% to -6%, confirmed better** | **-7% to -4%, confirmed better** | **-17% to -8%, confirmed better** | `results/live/V3_TRACE_GOOGLE2011.md` |
 
 Energy on kind is a declared model: the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill. Omni-Compass gives a machine back only after a paired trial shows the service no slower without it (the verdict, `omnicompass/verdict.py`); on these clusters one machine fewer made requests 30-45% slower in most trials, so the machines stayed and were spent on speed and work. The v1 tables (`results/live/V1_*.md`, `docs/OMNI_V1.md`) read the same; the sets before v1 are in `docs/history/`.
 
@@ -5295,9 +5296,10 @@ reported as what they are, our own plant models run whole, and are never summed 
 from the real categories alone, and the modelled realms sit beside it as a separate finding about the law's coherence
 at scale.
 
-### 16.1 Real Kubernetes: six tests, ten pairs each, three runs each
+### 16.1 Real Kubernetes: seven tests, ten pairs each, three runs each
 
-The six Kubernetes tests were designed to ask six different questions of the same cluster, and they are read together.
+The six Kubernetes tests were designed to ask six different questions of the same cluster, and they are read together; a
+seventh, added on 8 October, asks the same questions under a day of demand that somebody else measured.
 The cluster is kind: a real Kubernetes control plane and six worker nodes as containers on one 4-core GitHub runner, with
 a real metrics-server, a real HPA at the operator's target of 50% CPU, a real PHP service behind a NodePort, and a real
 load generator whose replica count steps through a schedule identical in both arms. A real probe times HTTP requests
@@ -5326,6 +5328,15 @@ start from the same fresh cluster, run for 900 s after a 120 s warm-up, and end 
   differently beyond the noise in all three runs (on v1 it had read 0.7% to 0.9% later, a loss that stayed in the record).
 - **Fairness** (`V3_FAIRNESS.md`) asks: does the governor help or hurt a noisy neighbour on the same workers? No difference
   beyond the noise on every row, the neighbour's own p95, p99, failures and time over the line included.
+- **A public day of demand** (`V3_TRACE_GOOGLE2011.md`, `docs/TRACES_PREREGISTRATION.md`) asks: when the shape of the load is
+  not ours, does the governor still read the same way? The first day of the Google cluster trace of 2011 (jobs submitted an
+  hour, 18 public parts named with their SHA-256) was turned into the wandering test's schedule by a rule written before the
+  runs (min-max onto 1 to 8 generators, one step a bin, 24 steps of 108 s), and everything else was the wandering test's. p95
+  fell 65% to 71%, p99 49% to 61%, the mean 51% to 55%, time over the line 81% to 84%, failed requests 8% to 17%, machines in
+  service 6% to 10%, HPA replicas 5% to 6% and the standby-model energy 4% to 7%, all confirmed better in three runs of ten
+  pairs; pods started rose 23% to 35% as point estimates with one run's interval across zero; no pod was ever without a
+  machine. The machines row is confirmed here where the wandering test's was inside the noise, because the trace has a long
+  quiet stretch (six hours at two generators) in which machines are given back and our own schedule had none.
 
 The same six tests were run on Omni v1 with the same readings (`V1_*.md`), the controllers being the same bytes, and the
 v1 tables stay as the first engine's record. The earlier engines' sets, before the verdict, parked 29% to 36% of the
@@ -5503,13 +5514,15 @@ hardware, and never counted in the Omni index.
 
 ### 16.6 The one number, and the table
 
-**The one number.** The Omni index over the real categories confirmed three times: **+23.5%** (real Kubernetes on v3 +25.5%,
+**The one number.** The Omni index over the real categories confirmed three times: **+24.1%** (real Kubernetes on v3 +28.8% over seven tests,
 the real database on v3 +14.2%, real messaging on v3 +166.9%, the real cache on v3 −24.9%, the real database's
 storage-engine cache on v3 +10.2%, the real database's buffer pool on v3 +12.2%, each category weighed the same; Azure and
 the card join as their three-run tables land). The fifth category lowered the headline from +30.2% to +25.9% when it joined
 on 8 October; the sixth, MySQL's buffer pool, entered the same day at exactly nothing on its first counted set (every row
 inside the noise, the headline at +21.2%) and at +12.2% on the second set run the same afternoon on the amended plug, the
-headline at +23.5%: a category enters at whatever its table confirms, nothing included, which is the reader's guarantee
+headline at +23.5%; and the public-trace test (section 16.1) joined the Kubernetes category as its seventh test the same
+evening, moving that category from +25.5% to +28.8% and the headline to +24.1%. A category enters at whatever its tables
+confirm, nothing included, which is the reader's guarantee
 that the number is not built from the categories that happened to work. That is how the number is meant to move: every real category enters at equal weight as its table lands, whatever it does to the mean.
 The storage-engine cache's figure is positive for the reason the Redis figure is negative, read the other way: there the
 governor gave memory back (the cache held halved on two workloads) while work, p95 and CPU stayed inside the noise, so
@@ -5532,6 +5545,7 @@ themselves, which is why every row is in its table.
 | **Real Kubernetes, a queue of batch jobs** (cruise, then the emergency brake, 10 pairs × 3 runs) | v1 | L | machines **−15% to −24%** and modelled energy −11% to −17% confirmed better; p95 no difference beyond the noise | `results/live/V1_BATCH.md` |
 | **Real Kubernetes, fairness** (a noisy neighbour on the same workers, 10 pairs × 3 runs) | v1 | L | no difference beyond the noise on every row: Omni-Compass neither helps nor hurts the neighbour | `results/live/V1_FAIRNESS.md` |
 | **The same six Kubernetes tests on v3** (10 pairs × 3 runs each) | v3 | L | the same readings as v1, the controllers being v1's bytes: all four work inside the line +35% to +49%, p95 −47% to −66% across steady, wandering, all four and faults, failed requests −9% to −14% where they occur, steady machines −1.5% to −2.9%, batch machines −19% to −23% and standby-model energy −13% to −16%, all confirmed better; fairness no difference beyond the noise on every row | `results/live/V3_STEADY.md`, `V3_WANDERING.md`, `V3_ALL_FOUR.md`, `V3_FAIRNESS.md`, `V3_FAULTS.md`, `V3_BATCH.md` |
+| **Real Kubernetes under a public day of demand** (the Google cluster trace of 2011 replayed one step at a time, 10 pairs × 3 runs) | v3 | L | p95 **−65% to −71%**, p99 −49% to −61%, time over the line −81% to −84%, failed requests −8% to −17%, machines in service **−6% to −10%**, replicas −5% to −6%, standby-model energy −4% to −7%, all confirmed better; pods started +23% to +35% as point estimates, inside the noise in one run; 9 rows better, 0 worse | `results/live/V3_TRACE_GOOGLE2011.md` |
 | **The six organisms with the real cluster inside**, 1 to 1,000 copies, 5 paired repetitions a cell (3 at 1,000) | v1 | L + S | 98 of 100 cells: p95 and time over the line better in every cell; 0 gauges worse beyond the noise except a rounding-level work loss (−0.0003%) and HPA replicas +0.7% in one cell; machines stay at 6 in both arms (no autoscaler under kind); the Physics realm and the tower at 1,000 copies off the clock in 2 of 3 repetitions (marked) | `results/live/V1_SIX_KUBE.md` |
 | The same at 10 and 100 copies | v3 | L + S | 12 cells, 5 pairs each: every cell better on 4 to 6 gauges, worse on none beyond the noise except a rounding-level work loss in 4 cells; the stack at 100 copies off the clock in 4 of 5 repetitions (marked) | `results/live/V3_SIX_KUBE.md` |
 | **The big organisms at 1,000 copies on a rented machine**: the tower (3 of 3) and the four stacked (3 of 3, detached) | v1 | L + S | tower: p95 **−95%** (4.1 s → 0.2 s) and time over the line −99.7% clear of the noise, machines 6 in both arms, energy −0.2%, work rounding-level worse, repetition 3 off the clock; stack: p95 **−74%** and p99 −83% clear of the noise, the compass arm 300 to 615 s past the 2,880 s window in all three (marked OFF THE CLOCK; native kept the clock), which is why the v3 stack runs with a 10,800 s window | `results/live/V1_BIG_ORGANISM.md` |
@@ -5557,8 +5571,8 @@ themselves, which is why every row is in its table.
 section 16.2); MySQL's buffer pool under sysbench done, two counted sets (`V3_SYSBENCH.md`, section 16.4; the first set and the plug's amendment in section 10.9); the robustness test
 (`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario and the two-hour long run both done (section 16.4b), the
 24-hour run on three rented machines under way (one pair a machine, two arms of a day each, collected on 10 October);
-the real cluster under a public demand trace (the Google cluster trace of 2011, `docs/TRACES_PREREGISTRATION.md`), A, B
-and C dispatched on the day's derived schedule;
+the real cluster under a public demand trace done (the Google cluster trace of 2011, `V3_TRACE_GOOGLE2011.md`, section
+16.1), the Azure Functions trace next by the same rule;
 YCSB on MongoDB done (`V3_YCSB.md`, section 16.4), MySQL's buffer pool under sysbench done (`V3_SYSBENCH.md`, section 16.4),
 the other stores of register row 24 after; and Azure steady and burst on the fleet of several machine families (seven
 dispatches refused by Azure's own cluster capacity in eastus or held by our own machines' quota, 34 refusals, amendments 5
@@ -5614,7 +5628,8 @@ numbers, and what the record does about it.
    PyBullet, MuJoCo, pandapower, CityLearn) that others wrote. The load schedules of the Kubernetes tests were ours too,
    written one step at a time; the public-trace test (`docs/TRACES_PREREGISTRATION.md`) answers that by replaying a day
    of demand somebody else measured (the Google cluster trace of 2011, then the Azure Functions trace) under the wandering
-   test's own rules, the derivation receipted and committed before the runs.
+   test's own rules, the derivation receipted and committed before the runs; its result (section 16.1) read the same way
+   as the six, p95 65% to 71% faster and machines 6% to 10% fewer, confirmed in three runs, with no row worse.
 
 ### 16.8 What is not yet shown, and the open program
 
@@ -5632,10 +5647,11 @@ Three things this manual does not show, and the program that will show them or s
   no slowing, every decision expected but a few the cluster's API refused, every setting handed back); the 24-hour run,
   one pair on each of three rented eight-core machines of three families, is under way (`docs/ROBUSTNESS_PREREGISTRATION.md`,
   scenario 2b) and is read when its machines are collected; the same test on the other stacks remains open.
-- **A demand shape that is not ours.** Every Kubernetes result so far was driven by a load schedule we wrote. The
-  public-trace test (`docs/TRACES_PREREGISTRATION.md`) replays a day of the Google cluster trace of 2011 under the
-  wandering test's own rules, three runs of ten pairs, dispatched on 8 October; the Azure Functions trace follows by the
-  same rule. Until its table lands, the "our own schedules" threat of section 16.7 stands unanswered, and the manual says so.
+- **A demand shape that is not ours, on more than one trace.** The first public trace (a day of the Google cluster trace of
+  2011, section 16.1) read the same way as our own schedules, nine rows confirmed better and none worse; it is one day of one
+  batch cluster's job arrivals. The Azure Functions invocation trace, a request-driven shape, follows by the same rule, and
+  the "our own schedules" threat of section 16.7 is answered in full only when a second, differently shaped day reads the
+  same way.
 
 The queue beyond these, in order, is `docs/REGISTER.md` section 4, one or two at a time, each preregistered before it
 runs: PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, Basilisk, Orekit and GMAT, RocketPy
@@ -8897,13 +8913,16 @@ ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain co
 database's storage-engine cache** (MongoDB as its publisher ships it under YCSB, `results/live/V3_YCSB.md`): on four
 untouched workloads the cache size held fell about half on c and burst and 13% to 37% on f, **confirmed better** (b inside
 the noise in one run); work inside the 1 ms line, p95 and host CPU inside the noise on all four; no failed operation; the
-burst mean latency **+2% to +4%, confirmed worse**, the one loss. **A real database's buffer pool** (MySQL as Ubuntu ships it under sysbench, `results/live/V3_SYSBENCH.md`): on the four
+burst mean latency **+2% to +4%, confirmed worse**, the one loss. **A public day of demand on the real cluster** (the Google cluster trace of 2011, its first day of job submissions turned
+into the wandering test's schedule by a rule written before the runs, `results/live/V3_TRACE_GOOGLE2011.md`): p95 **−65% to
+−71%**, time over the line −81% to −84%, failed requests −8% to −17%, **machines in service −6% to −10%**, confirmed better in
+three runs of ten pairs; pods started +23% to +35% as point estimates, inside the noise in one run; 9 rows better, 0 worse. **A real database's buffer pool** (MySQL as Ubuntu ships it under sysbench, `results/live/V3_SYSBENCH.md`): on the four
 untouched workloads the pool held fell **−67% on burst and −50% to −56% on read_only, confirmed better**; on read_write the
 pages the pool holds rose **+53% to +70%, confirmed worse** (memory bought for a written working set); work inside the line,
 p95, p99 and host CPU inside the noise everywhere; no error; the pool handed back on all 45 omni arms. The first counted set
 (every row inside the noise, 15 arms not handed back because the plug's restore met the server's unfinished shrink) is kept
 whole in `docs/history/V3_SYSBENCH_set1.md`, the plug fixed and the fix declared in `docs/MYSQL_PREREGISTRATION.md`. **The
-Omni index, real machines only, confirmed three times: +23.5%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database
+Omni index, real machines only, confirmed three times: +24.1%** (`results/OMNI_INDEX.md`; Kubernetes +28.8% over seven tests, the database
 +14.2%, Kafka +166.9%, Redis −24.9%, the database's cache +10.2%, the database's buffer pool +12.2%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's speed ratio
 is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is negative
 because the memory it holds for a wide working set is the resource it trades and reads worse by rule; MongoDB's is
@@ -8926,6 +8945,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | All four in one run | **+35% to +49%** | −61% to −66% | inside the noise | inside the noise | `results/live/V3_ALL_FOUR.md` |
 | Steady work in steps | equal by design | −65% to −66% | **−1.5% to −2.9%** | −1.3% to −2.1% | `results/live/V3_STEADY.md` |
 | Demand that wanders | failed requests −9% to −12% | −57% to −63% | inside the noise | inside the noise | `results/live/V3_WANDERING.md` |
+| A public day of demand: the Google cluster trace of 2011 replayed one step at a time (`docs/TRACES_PREREGISTRATION.md`) | failed requests **−8% to −17%**, confirmed better; no pod ever without a machine | **−65% to −71%** (p99 −49% to −61%) | **−6% to −10%, confirmed better** (replicas −5% to −6%) | standby model **−4% to −7%, confirmed better**; idle-power model inside the noise in one run | `results/live/V3_TRACE_GOOGLE2011.md` |
 | Faults: machine down, spike, runaway pod, blind probe | failed requests lower in all three, clear of the noise in one | −47% to −62% | inside the noise | inside the noise | `results/live/V3_FAULTS.md` |
 | A queue of batch jobs | queue finished no difference beyond the noise | mean response −10% to −14% | **−19% to −23%** (−29% to −35% after the queue) | **−13% to −16%** | `results/live/V3_BATCH.md` |
 | Fairness, a noisy neighbour | inside the noise on every row | inside the noise | inside the noise | inside the noise | `results/live/V3_FAIRNESS.md` |
@@ -8990,7 +9010,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 5. **YCSB on MongoDB, done** (`docs/YCSB_PREREGISTRATION.md`, `results/live/V3_YCSB.md`): the operator's WiredTiger cache
    as native, Omni on the cache size through the server's own console; four smoke runs recorded, then A, B and C on v3; the
    cache held given back by about half on two untouched workloads at no measurable cost in work, p95 or CPU, one confirmed
-   loss (the burst mean latency, +2% to +4%); the index spans six real categories at +23.5% with MySQL's second set (+12.2%; the first set entered at +0.0%, every row inside the noise). Cassandra and Redis under
+   loss (the burst mean latency, +2% to +4%); the index spans six real categories at +24.1%: MySQL's second set entered at +12.2% (the first set at +0.0%, every row inside the noise) and the public-trace test raised the Kubernetes category from +25.5% to +28.8%. Cassandra and Redis under
    YCSB and HammerDB are next in row 24.
 6. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
    Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,
@@ -9085,7 +9105,7 @@ messages waited 9 to 14 ms instead of about 1.6 s, at the cost of more consumers
 PostgreSQL behind its pooler and on MongoDB the gain was taken as **the same work for less**: the same transactions
 answered inside the same line with fewer connections open, or a smaller storage-engine cache, with the resource handed
 back at the end of every run. On Redis neither reading came out ahead: the compass held more memory for a wide working
-set and the rule says that the resource held reads worse. The combined index (section 16.6) is +23.5% over the six real
+set and the rule says that the resource held reads worse. The combined index (section 16.6) is +24.1% over the six real
 categories so far; the Redis category inside it is a loss (−24.9%), counted in full, and the MySQL category (+12.2%)
 carries one confirmed loss of its own, the memory bought for a written working set. An operator
 should expect the same honesty from their own paired run: the receipts will say which side of the gain their stack took,
@@ -9144,6 +9164,7 @@ do not yet exist, the row says what will supply them.
 | Kubernetes: machines in service | −1.5% to −2.9% at steady load, **−19% to −23%** on the batch queue, confirmed better; inside the noise on the other tests | L | "Why so little?" Because the verdict kept every machine whose removal made requests slower in the paired trial. Earlier engines without that check parked 29% to 36% of the machines and paid for it in response time; the frozen engine puts service first. kind has no node autoscaler, so parked machines stay powered: the saving is machine-hours, not watts |
 | Kubernetes: energy | the standby model, −13% to −16% on the batch queue, inside the noise elsewhere | L, modelled | "Is it a meter?" No. The machines are containers; energy is a declared formula (a parked worker at 25 W standby), stated as a model on every line |
 | Kubernetes: fairness beside a noisy neighbour | no difference beyond the noise on every row, the neighbour's included | L | "Does it hurt the other tenant?" Not measurably, in three runs of ten pairs |
+| Kubernetes under a public day of demand (the Google cluster trace of 2011): the 95th percentile; machines in service | **65% to 71% faster**; machines **−6% to −10%**, confirmed better in three runs; failed requests −8% to −17% | L | "Whose demand shape?" Google's, from a published trace, turned into the schedule by a rule written before the runs and receipted with every part's SHA-256; the trace's two sharp hours are blunted by the one-step rule, in both arms alike. "Any cost?" Pods started +23% to +35% as point estimates, inside the noise in one run; shown in the table |
 | Database behind its pooler: connections held open | **−61% to −72%** confirmed better on two workloads; the runs disagree on the third | L | "What did it cost?" Host CPU-seconds +14% to +28%, confirmed worse on all three workloads, the compass's own cost included, counted against Omni in the index; work and latency inside the noise |
 | Message broker: work inside the 500 ms line; the 95th percentile | **+16% to +21%**; 1.6 s → 9 to 14 ms, confirmed better on all three workloads; no message lost | L | "Why is the latency figure so large?" By design native sat at nine tenths of its measured capacity, so its queue grew at the high steps and Omni's did not; the gain is the queue kept short. "What did it cost?" Consumers running 2 → 5.8 to 7.9, confirmed worse; host CPU worse on one workload, inside the noise on two |
 | Database's storage-engine cache (MongoDB under YCSB): the cache size held | **−49% on c, −41% to −49% on burst, −13% to −37% on f**, confirmed better; b inside the noise in one run | L | "What did it cost?" Work inside the 1 ms line, p95, p99 and host CPU inside the noise on all four workloads, no failed operation; the burst mean latency **+2% to +4%, confirmed worse**, in the table. "Why is this the mirror of the Redis result?" Because here the operator's setting was larger than the working set needed on this machine, so the governor gave memory back; there it was smaller, so the governor bought service with memory. "Would this hold on a disk-bound store?" Not shown: on this machine a miss is a memory read, as disclosed before the run |
@@ -10462,7 +10483,8 @@ to be wrong for the sentence to be wrong.
 | Over two hours the governor neither leaks, slows nor drifts, and hands everything back at the end | L | `results/live/V3_ROBUST_LONG.md`, `docs/ROBUSTNESS_PREREGISTRATION.md` | memory growing past a quarter, the decision time growing past a half, fewer than 95% of expected decisions, or a setting not handed back |
 | Governing costs a few thousandths of a core at every size | L | `results/live/V3_OWN_COST.md` | an own-cost figure growing with the organism |
 | The pooler, the broker and the cache each gain on their untouched workloads | L | `V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`, each preregistration | a confirmed-worse product row on an untouched workload; the memory row of the cache is such a loss and stands |
-| The one number is +23.5% across the real categories, losses included | L, by rule | `results/OMNI_INDEX.md`, `tools/omni_index.py` | a category omitted, a loss not entered, a tuning row counted |
+| The one number is +24.1% across the real categories, losses included | L, by rule | `results/OMNI_INDEX.md`, `tools/omni_index.py` | a category omitted, a loss not entered, a tuning row counted |
+| A day of demand measured by someone else reads the same way as our own schedules | L | `results/live/V3_TRACE_GOOGLE2011.md`, `results/traces/google2011/schedule.json`, `docs/TRACES_PREREGISTRATION.md` | a schedule derived after the runs; a rule fitted to the governor; a trace part whose SHA-256 does not match |
 | The modelled realms, grids, arms, buildings and swarms gain under their own native controllers | S | `results/realms/`, `V3_PANDAPOWER.md`, `V3_MUJOCO.md`, `V3_CITYLEARN.md`, `V3_SWARM.md` | a run of the same simulator at the same version and seed giving other digits |
 | A physical meter shows less energy for the same work | P | **no current result**; `docs/GPU_PREREGISTRATION.md` names the run | the rerun on the current card controller reading no difference or worse |
 | Omni-Compass never changes the engine between a rule and its result | by construction | `OMNI_V3.json`, `tools/omni_version.py --commit <sha>` on every table's commits | a table whose runs' commits carry different fingerprints |

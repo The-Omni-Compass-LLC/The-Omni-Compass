@@ -43,9 +43,9 @@ current card governor on a real GPU (the one real-card run, on the governor sinc
 energy and made its 95th percentile 43-84% slower:
 [`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
-**The Omni index, every real test together: +23.5%** more for the same, or the same for less, across work, speed,
-machines and energy, five real categories each weighed the same: real Kubernetes on v3 +25.5% (work +19%, speed +93%,
-machines +4%, energy +3%); the real database on v3 +14.2% (connections to the database halved and more; the compass's own
+**The Omni index, every real test together: +24.1%** more for the same, or the same for less, across work, speed,
+machines and energy, six real categories each weighed the same: real Kubernetes on v3 +28.8% over seven tests (work +19%, speed +107%,
+machines +5%, energy +2%); the real database on v3 +14.2% (connections to the database halved and more; the compass's own
 CPU, confirmed worse, counted against it); real messaging on v3, Apache Kafka, +166.9% (work inside the line +17%; a 95th
 percentile of 1.6 s against 9 to 14 ms, because native's queue grew at nine tenths of its capacity and Omni's did not;
 consumers held 2 → 6 to 8, confirmed worse and counted against it); and the real cache on v3, Redis, **−24.9%** (work inside

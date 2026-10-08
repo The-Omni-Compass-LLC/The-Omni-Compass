@@ -72,6 +72,38 @@ Three dispatches of `benchmark-reps` with the inputs above (`duration_s` 2592, `
 C 37826522419**, ten paired repetitions each, in parallel. Nothing above this line changed after the dispatch; the
 derivation receipt in `results/traces/google2011/schedule.json` is the one committed in that commit.
 
+## Result (runs A, B and C of 2026-10-08, `results/live/V3_TRACE_GOOGLE2011.md`)
+
+All thirty paired repetitions ran and none was marked invalid; the schedule read back from every arm's own log is the one
+above, identical in both arms. Native + Omni against native, three runs, the three-run rule:
+
+| Gauge | A | B | C | Reading |
+|---|---|---|---|---|
+| response time, 95th percentile | −65% | −68% | −71% | **confirmed better** |
+| response time, 99th percentile | −49% | −61% | −61% | **confirmed better** |
+| response time, mean | −51% | −53% | −55% | **confirmed better** |
+| time over the 500 ms line | −81% | −82% | −84% | **confirmed better** |
+| failed requests | −13% | −8% | −17% | **confirmed better** |
+| worker machines in service, mean | −9.5% | −5.9% | −6.1% | **confirmed better** |
+| HPA replicas, mean | −6.3% | −4.8% | −6.2% | **confirmed better** |
+| energy, 25 W standby model | −6.7% | −4.3% | −4.6% | **confirmed better** |
+| energy, idle-power model | −0.2% | −0.4% | −0.5% | no difference beyond the noise in 1 of 3 runs |
+| pods started | +23% | +27% | +35% | no difference beyond the noise in 1 of 3 runs |
+| pod start wait | inside the noise | inside the noise | inside the noise | no difference beyond the noise |
+| pods with no machine to take them | 0 in both arms | 0 | 0 | same |
+
+**9 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree.** Shown and not judged: CPU used with
+Omni's own −3.7% to −4.5% (Omni's own CPU about 0.0095 of a core), host CPU busy −3% to −4%, utilisation +0.4% to +3.8%.
+Read against the wandering test (our own schedule: p95 −57% to −63%, machines inside the noise): under a day somebody else
+measured the governor read the same way on service and did better on machines (−6% to −10%, confirmed, where the wandering
+test's machines row was inside the noise), because the trace's long quiet stretch (hours 8 to 14 at two generators) is
+where machines are given back and the wandering schedule has no such stretch. The one row that leans the other way, more
+pods started (+23% to +35% as point estimates, one run's interval across zero), is the price of following demand up and
+down; it is in the table and is not an index column. The test enters the Omni index's Kubernetes category as its seventh
+test: the category moves from +25.5% to **+28.8%** and the headline from +23.5% to **+24.1%**. The "our own schedules"
+threat (`docs/OMNI_COMPASS_MANUAL.md`, section 16.7) is answered for one public day-shape; the Azure Functions trace, a
+request-driven shape, follows by the same rule.
+
 ## What a referee should ask, and the answers given before the result
 
 - *Is a batch cluster's job arrival a fair stand-in for a web service's demand?* It is a real day's demand shape measured
