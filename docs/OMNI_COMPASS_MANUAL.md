@@ -815,6 +815,15 @@ pods are not scaling up; the service is not breached; the organ's own pressure i
 sense is live; and the last command has landed (no new order goes on top of one the cluster has not yet carried out).
 One machine per decision is the rule in the slow, reversible direction; past the wall, one machine up at once.
 
+**What the gate writes, in a real run.** The first repetition of the first kill-scenario run (`results/live/raw/run-37716845219/paired-1/`,
+the omni arm's `audit.jsonl`) holds 114 decisions and 42 writes. Its gate records read, in the governor's own words,
+"release permitted" eleven times, each with the utilisation the remaining machines would carry after the release (0.034
+to 0.153, all far under the 95% wall); "node organ has no contraction authority" once, a calm cluster whose engine state
+had not yet earned the right to give back; and "latency breached now; node organ has no contraction authority; a sense is
+blind" once, three reasons at once in a decision whose latency sense read stale, every one of them a reason to hold. A reader can
+therefore see, decision by decision, not only what the governor did but why it declined to do the rest, and the first
+reason that failed is the one written, so that a machine kept in service always has a stated cause.
+
 ### 7.2 Proprioception and the one-writer rule
 
 The nervous system knows where its own levers are. Every write is read back from the device (the plug contract, section
