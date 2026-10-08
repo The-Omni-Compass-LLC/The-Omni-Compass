@@ -31,6 +31,12 @@ def main():
     assert C.verdict(P95, [better, better, r(300, 20, -5, 45)]) == "no difference beyond the noise in 1 of 3 runs", "a flipped sign inside the noise is noise"
     assert C.verdict(P95, [r(300, 1e-7, 5e-8, 2e-7)] * 3) == "same", "a change under one part in a million"
     assert C.verdict("CPU used (cores), mean", [r(2.0, -0.5, -0.7, -0.3)] * 3) == "shown, not judged"
+    # one pair a run (the 24-hour robustness run on rented machines): no interval, read by sign alone, never a confirmation
+    nan = float("nan")
+    single = {"native": 300.0, "omni": 150.0, "diff": -150.0, "ci95": [nan, nan], "significant": False}
+    assert C.verdict(P95, [single] * 3) == "three single pairs agree: better (one pair a run, no interval: not a confirmation)"
+    assert C.verdict(P95, [single, single, dict(single, diff=20.0, omni=320.0)]) == "single pairs point different ways (one pair a run, no interval)"
+    assert "WORSE" in C.verdict(C.CAPACITY, [single] * 3), "less work inside the line from three single pairs reads worse, and still not a confirmation"
     assert C.cell(better) == "-50.0% (-66.7 to -33.3)"
     with tempfile.TemporaryDirectory() as t:
         d = Path(t) / "run-123" / "live-reps"; d.mkdir(parents=True)

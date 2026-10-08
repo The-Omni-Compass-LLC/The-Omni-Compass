@@ -27,7 +27,8 @@ on:
       commit: {description: "The commit to run (start); empty = this one", default: ""}
       vm_size: {description: "Azure machine size (start); Standard_D8as_v4 is the size eastus granted on 2026-10-05", default: "Standard_D8as_v4"}
       location: {description: "Azure region (start). Survey of 2026-10-06: eastus allows 32 vCPUs and the v4 sizes; every other region allows 10 vCPUs and only the v5 to v7 sizes (the sizes tried fall back to v7)", default: "eastus"}
-      max_hours: {description: "Collect and delete a machine older than this, finished or not", default: "40"}
+      max_hours: {description: "Collect and delete a machine older than this, finished or not (start: stored on the machine's group; collect: the default for machines without one)", default: "40"}
+      test: {description: "organism (the organisms with the cluster inside, above) or robust (the robustness long scenario, docs/ROBUSTNESS_PREREGISTRATION.md: the governor's memory and decisions over duration_s an arm, the wandering schedule repeated; the 24-hour run)", default: "organism"}
       group: {description: "collect: look at this resource group only (omni-detached-<run id>); empty = every tagged machine", default: ""}
   schedule:
     - cron: "41 */2 * * *"       # collect: a look at every tagged machine; nothing to do when none is running
@@ -95,6 +96,8 @@ jobs:
       REPS: ${{ github.event.inputs.reps || '3' }}
       DUR: ${{ github.event.inputs.duration_s || '2880' }}
       SHA: ${{ github.event.inputs.commit || github.sha }}
+      TEST: ${{ github.event.inputs.test || 'organism' }}
+      MAXH: ${{ github.event.inputs.max_hours || '40' }}
     steps:
       - uses: actions/checkout@v4
       - uses: azure/login@v2
@@ -102,7 +105,7 @@ jobs:
       - name: Rent the machine
         run: |
           az group create -n "$RG" -l "$LOC" -o none \
-            --tags omni-detached=1 "organisms=$ORGS" "size=$SCALE" "reps=$REPS" "sha=$SHA" "started=$(date -u +%s)" "run=${{ github.run_id }}"
+            --tags omni-detached=1 "organisms=$ORGS" "size=$SCALE" "reps=$REPS" "sha=$SHA" "started=$(date -u +%s)" "run=${{ github.run_id }}" "test=$TEST" "max_hours=$MAXH"
           ok=""
           for sz in "$SIZE" Standard_D8as_v4 Standard_D8s_v4 Standard_D8as_v7 Standard_D8s_v7 Standard_D8ls_v7 Standard_E4as_v7 Standard_B8as_v2; do
             if az vm create -g "$RG" -n big --image Ubuntu2204 --size "$sz" --admin-username omni \
@@ -143,25 +146,39 @@ jobs:
         run: |
           # the runner script: every repetition of every organism in turn, each cell's files moved into cells/<cell>/ when
           # it ends (bench-<arm>-<rep> carries no organism name), one .exit per cell, ALL_DONE at the end
+          # test=robust runs the robustness long scenario instead (scripts/kind_bench.sh with ROBUST=long, the wandering
+          # schedule repeated to fill the window, no organism): one cell a repetition, robust-long-x<seconds>-<rep>
           cat > run_all.sh <<EOF
           #!/bin/bash
           cd \$HOME/omni
           export PATH=\$PWD/.v/bin:\$PATH ARMS="native compass" DURATION=$DUR ORGANISM_SCALE=$SCALE LOAD_MAX=6 LOADGEN=open
           export CLOSURE=tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
           mkdir -p cells
+          if [ "$TEST" = robust ]; then
+            w="1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1"; s=""
+            for i in \$(seq 1 $((DUR / 900))); do s="\$s \$w"; done
+            export ROBUST=long LOAD_STEPS_IN="\${s# }"
+            for rep in \$(seq 1 $REPS); do
+              cell="robust-long-x$DUR-\$rep"; echo "\$(date -u +%FT%TZ) start \$cell"
+              REP=\$rep bash scripts/kind_paired.sh > "paired-\$cell.log" 2>&1; code=\$?
+              mkdir -p "cells/\$cell" && mv bench-*-"\$rep" "cells/\$cell/" 2>/dev/null; mv "paired-\$cell.log" "cells/\$cell/paired.log"
+              echo "\$code" > "cells/\$cell/paired.exit"; echo "\$(date -u +%FT%TZ) end \$cell exit \$code"
+            done
+          else
           for rep in \$(seq 1 $REPS); do for org in \$(echo "$ORGS" | tr , ' '); do
             cell="six-\$org-x$SCALE-\$rep"; echo "\$(date -u +%FT%TZ) start \$cell"
             ORGANISM=\$org REP=\$rep bash scripts/kind_paired.sh > "paired-\$cell.log" 2>&1; code=\$?
             mkdir -p "cells/\$cell" && mv bench-*-"\$rep" "cells/\$cell/" 2>/dev/null; mv "paired-\$cell.log" "cells/\$cell/paired.log"
             echo "\$code" > "cells/\$cell/paired.exit"; echo "\$(date -u +%FT%TZ) end \$cell exit \$code"
           done; done
+          fi
           touch ALL_DONE
           EOF
           scp -o StrictHostKeyChecking=no run_all.sh omni@$IP:omni/run_all.sh
           # the test is started in the background with every file handle redirected, and nothing else is put in the
           # background with it (an "a && b &" list would leave a shell holding this ssh session open until the test ends)
           ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni; nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat detached.log; echo "--- paired log"; tail -5 paired-*.log 2>/dev/null; pgrep -af kind_paired >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
-          echo "::notice::$RG in $LOC: $ORGS at $SCALE copies, $REPS repetitions, commit $SHA; collect looks at it every two hours"
+          echo "::notice::$RG in $LOC: test $TEST, $ORGS at $SCALE copies, $REPS repetitions of $DUR s an arm, commit $SHA, collected and deleted after $MAXH h at the latest; collect looks at it every two hours"
   collect:
     if: github.event_name == 'schedule' || github.event.inputs.mode == 'collect'
     runs-on: ubuntu-latest
@@ -180,6 +197,8 @@ jobs:
           for RG in $groups; do
             tags=$(az group show -n "$RG" --query tags -o json); echo "$RG: $tags"
             started=$(echo "$tags" | jq -r .started); age_h=$(( ($(date -u +%s) - started) / 3600 ))
+            # a machine started with its own limit (the max_hours tag, e.g. the 24-hour robustness run) keeps it; the input is for the rest
+            own=$(echo "$tags" | jq -r '.max_hours // empty'); max_h_rg=${own:-$max_h}
             ip=$(az vm show -d -g "$RG" -n big --query publicIps -o tsv 2>/dev/null)
             if [ -z "$ip" ]; then echo "::warning::$RG has no machine (deleted, or never rented)"; [ "$age_h" -ge 2 ] && az group delete -n "$RG" --yes --no-wait; continue; fi
             # a fresh key for this job only, placed on the machine by Azure (the start job's key died with its runner)
@@ -197,16 +216,16 @@ jobs:
             # without the log: the arms started, the paired script's last line, the organism's own last lines, the load
             echo "$state" | tail -n +3 | grep -v "^$" | head -8 | while IFS= read -r l; do echo "::notice::$RG: ${l:0:300}"; done
             if ! echo "$state" | grep -q ALL_DONE; then
-              if [ "$age_h" -lt "$max_h" ]; then
-                echo "::notice::$RG running ${age_h} h: $(echo "$state" | head -1 | sed 's/^$/no cell finished yet/') finished; left alone"; continue
+              if [ "$age_h" -lt "$max_h_rg" ]; then
+                echo "::notice::$RG running ${age_h} h (limit ${max_h_rg} h): $(echo "$state" | head -1 | sed 's/^$/no cell finished yet/') finished; left alone"; continue
               fi
-              echo "::warning::$RG is ${age_h} h old (limit ${max_h} h): collected as it stands and deleted"
+              echo "::warning::$RG is ${age_h} h old (limit ${max_h_rg} h): collected as it stands and deleted"
               $S 'cd omni && for d in bench-*-*; do [ -d "$d" ] && { mkdir -p cells/unfinished && mv "$d" cells/unfinished/; }; done; true'
             fi
             scp -i k -o StrictHostKeyChecking=no -r "omni@$ip:omni/cells/*" out/ || true
             scp -i k -o StrictHostKeyChecking=no "omni@$ip:omni/detached.log" "out/detached-$RG.log" || true
             { $S 'free -g; df -h /'; echo "$tags"; } > "out/machine-$RG.txt" 2>&1 || true
-            for c in out/six-*; do [ -d "$c" ] && echo "::notice::$(basename "$c"): exit $(cat "$c/paired.exit" 2>/dev/null || echo missing), $(find "$c" -type f | wc -l) files"; done
+            for c in out/six-* out/robust-*; do [ -d "$c" ] && echo "::notice::$(basename "$c"): exit $(cat "$c/paired.exit" 2>/dev/null || echo missing), $(find "$c" -type f | wc -l) files"; done
             az group delete -n "$RG" --yes --no-wait || true; any=1
           done
           echo "any=$any" >> "$GITHUB_OUTPUT"
@@ -215,7 +234,7 @@ jobs:
         id: cells
         if: steps.look.outputs.any == '1'
         run: |
-          i=0; for c in out/six-*; do [ -d "$c" ] || continue; i=$((i + 1)); echo "c$i=$(basename "$c")" >> "$GITHUB_OUTPUT"; done
+          i=0; for c in out/six-* out/robust-*; do [ -d "$c" ] || continue; i=$((i + 1)); echo "c$i=$(basename "$c")" >> "$GITHUB_OUTPUT"; done
           [ "$i" -le 6 ] || echo "::warning::$i cells collected, only the first six are published as artifacts; the rest are in detached-machines"
       - uses: actions/upload-artifact@v4
         if: steps.cells.outputs.c1 != ''
