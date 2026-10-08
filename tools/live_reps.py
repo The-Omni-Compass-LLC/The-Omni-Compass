@@ -156,6 +156,66 @@ def robust_marks(d):
             out["second_governor"] = True
         elif txt.startswith("robust ") and len(txt.split()) > 1:
             out["mode"] = txt.split()[1].rstrip(":")
+            w = re.search(r"window (\d+) s", txt)
+            if w:
+                out["window_s"] = float(w.group(1))
+    return out
+
+
+ROBUST_INTERVAL_S = 60.0       # the governor's configured decision interval in the robustness runs (scripts/kind_bench.sh, --interval 60)
+ROBUST_DECISION_SHARE = 0.95   # fewer decisions than this share of the count the interval predicts reads INVALID (docs/ROBUSTNESS_PREREGISTRATION.md)
+ROBUST_CYCLE_GROWTH = 1.5      # the governor's decision time, last hour over the first: more than half again reads WORSE
+ROBUST_LONG_MIN_S = 6840.0     # the decision-time ratio needs a span of at least 95% of the 7,200 s window, so the first and last hours do not overlap
+
+
+def robust_decisions(d, window_s):
+    """The long run's decision gauges from the governor's own audit (omni arm): decisions made against the count the configured
+    interval predicts for the window; failed decisions (the audit's own failure records and the controller log's); the governor's
+    decision time, read as the gap between consecutive decisions less the configured interval it sleeps between them, mean of the
+    last hour over the first; and the reset check at the end (kill_switch.txt): every setting handed back, no record left."""
+    f = d / "audit.jsonl"
+    if not f.exists() or not window_s:
+        return None
+    times, failed, reasons = [], 0, []
+    for line in open(f):
+        if '"decision"' in line:
+            try:
+                times.append(float(json.loads(line)["time"]))
+            except (ValueError, KeyError, TypeError):
+                pass
+        if '"decision_failed"' in line:
+            failed += 1
+            try:
+                reasons.append(str(json.loads(line)["decision_failed"])[:160])
+            except (ValueError, KeyError, TypeError):
+                reasons.append(line.strip()[:160])
+    log = d / "controller.log"
+    if log.exists():
+        for l in open(log):
+            if "decision failed" in l:
+                failed += 1
+                # "decision failed (n in a row): <exception> <the API's own words>": keep the API's words, not the command path
+                r = l.split("):", 1)[-1].strip() if "):" in l else l.strip()
+                r = re.sub(r"CalledProcessError\(\d+, \[.*?\]\)\s*", "", r)[:160]
+                reasons.append(r)
+    expected = window_s / ROBUST_INTERVAL_S
+    out = {"decisions": len(times), "expected": expected, "share": (len(times) / expected if expected else None), "failed": failed,
+           "failed_reasons": sorted(set(reasons)), "decision_time_ratio": None}
+    if len(times) >= 4 and times[-1] - times[0] >= ROBUST_LONG_MIN_S:
+        gaps = [(b - a, a) for a, b in zip(times, times[1:])]
+        t0, t1 = times[0], times[-1]
+        first = [g for g, t in gaps if t <= t0 + 3600]; last = [g for g, t in gaps if t >= t1 - 3600]
+        if first and last:
+            a = max(sum(first) / len(first) - ROBUST_INTERVAL_S, 0.0); b = max(sum(last) / len(last) - ROBUST_INTERVAL_S, 0.0)
+            out["decision_time_first_s"], out["decision_time_last_s"] = a, b
+            out["decision_time_ratio"] = (b / a) if a >= 0.1 else None    # under a tenth of a second there is nothing to compare
+    ks = d / "kill_switch.txt"
+    if ks.exists():
+        txt = ks.read_text()
+        m = re.search(r"workers in service: (\d+) of (\d+)", txt)
+        out["handed_back_end"] = ("restored target" in txt and bool(re.search(r"records left.*: none", txt)) and bool(m) and m.group(1) == m.group(2))
+    else:
+        out["handed_back_end"] = None
     return out
 
 
@@ -206,8 +266,9 @@ def robust_table(root, cols):
         mem = robust_memory(d)
         decisions = sum(1 for l in open(d / "audit.jsonl") if '"decision"' in l) if (d / "audit.jsonl").exists() else None
         wd = sum(1 for l in open(d / "watchdog.log") if '"watchdog"' in l) if (d / "watchdog.log").exists() else 0
+        dec = robust_decisions(d, m.get("window_s")) if m.get("mode") == "long" else None
         per.setdefault(arm, {})[rep] = {"mode": m.get("mode"), "handed_back_s": m.get("handed_back_s"), "second_governor": bool(m.get("second_governor", False)),
-                                        "watchdog_records": wd, "memory": mem, "decisions": decisions}
+                                        "watchdog_records": wd, "memory": mem, "decisions": decisions, "long": dec}
     if not per:
         return [], {}
     L = ["## The robustness test: the governor killed outright, the lease, and the long run", "",
@@ -216,27 +277,46 @@ def robust_table(root, cols):
          f"and the records are at the operator's. Preregistered: within {ROBUST_HANDBACK_S:.0f} s, or the repetition reads WORSE. A second governor "
          f"starts at 50% and governs to the end. The governor's resident memory is sampled from the process table; the mean of the last ten "
          f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} reads WORSE (a leak). The 120 s after the kill mark are compared between the arms "
-         "in the paired table above (`docs/ROBUSTNESS_PREREGISTRATION.md`).", "",
-         "| Arm | Repetition | Mode | Seconds from the kill to every setting back | Within the allowance | Second governor | Watchdog hand-backs | Governor memory, last ten minutes / first ten | Decisions |",
-         "|---|---:|---|---:|---|---|---:|---:|---:|"]
+         "in the paired table above (`docs/ROBUSTNESS_PREREGISTRATION.md`). In the long run the governor's own audit gives its decisions against "
+         f"the count its {ROBUST_INTERVAL_S:.0f} s interval predicts for the window (under {ROBUST_DECISION_SHARE:.0%} reads INVALID), its failed decisions, "
+         f"and its decision time (the gap between decisions less the interval it sleeps), mean of the last hour over the first (over {ROBUST_CYCLE_GROWTH} "
+         "reads WORSE); the reset check at the end says whether every setting was handed back.", "",
+         "| Arm | Repetition | Mode | Seconds from the kill to every setting back | Within the allowance | Second governor | Watchdog hand-backs | Governor memory, last ten minutes / first ten | Decisions | Decisions of expected | Failed decisions | Decision time, last hour / first hour | Handed back at the end |",
+         "|---|---:|---|---:|---|---|---:|---:|---:|---:|---:|---:|---|"]
     summary = {}
     for a, reps in per.items():
         hb = [r["handed_back_s"] for r in reps.values() if r.get("mode") == "kill"]
         hb_ok = [h is not None and h <= ROBUST_HANDBACK_S for h in hb]
         mems = [r["memory"]["ratio"] for r in reps.values() if r.get("memory")]
         finite = [h for h in hb if h is not None and h != float("inf")]
+        longs = [r["long"] for r in reps.values() if r.get("long")]
         summary[a] = {"repetitions": len(reps), "kill_repetitions": len(hb), "handed_back_within_allowance_all": (all(hb_ok) if hb else None),
                       "handed_back_s_mean": (sum(finite) / len(finite) if finite else None), "handed_back_s_max": (max(hb) if hb else None),
                       "never_handed_back": sum(1 for h in hb if h == float("inf") or h is None),
                       "second_governor_all": (all(r["second_governor"] for r in reps.values() if r.get("mode") == "kill") if hb else None),
                       "memory_ratio_max": (max(mems) if mems else None), "allowance_s": ROBUST_HANDBACK_S, "memory_limit": ROBUST_MEMORY_LIMIT}
+        if longs:
+            shares = [x["share"] for x in longs if x.get("share") is not None]
+            ratios = [x["decision_time_ratio"] for x in longs if x.get("decision_time_ratio") is not None]
+            ends = [x["handed_back_end"] for x in longs if x.get("handed_back_end") is not None]
+            summary[a].update({"long_repetitions": len(longs), "decisions_expected": longs[0]["expected"],
+                               "decisions_share_min": (min(shares) if shares else None), "failed_decisions_total": sum(x["failed"] for x in longs),
+                               "failed_reasons": sorted({r for x in longs for r in (x.get("failed_reasons") or [])}),
+                               "decision_time_ratio_max": (max(ratios) if ratios else None),
+                               "handed_back_end_all": (all(ends) if ends and len(ends) == len(longs) else None),
+                               "decision_share_limit": ROBUST_DECISION_SHARE, "cycle_growth_limit": ROBUST_CYCLE_GROWTH})
         for rep in sorted(reps, key=lambda x: int(x) if x.isdigit() else x):
             r = reps[rep]; h = r["handed_back_s"]
             hs = "" if r.get("mode") != "kill" else ("never" if h is None or h == float("inf") else f"{h:.0f}")
             ok = "" if r.get("mode") != "kill" else ("**no: WORSE**" if (h is None or h > ROBUST_HANDBACK_S) else "yes")
             sg = "" if r.get("mode") != "kill" else ("yes" if r["second_governor"] else "**no: WORSE**")
             mr = "" if not r["memory"] else (f"{r['memory']['ratio']:.3f}" + ("" if r["memory"]["ratio"] <= ROBUST_MEMORY_LIMIT else " **(a leak: WORSE)**"))
-            L.append(f"| {dict(compass='omni').get(a, a)} | {rep} | {r.get('mode') or ''} | {hs} | {ok} | {sg} | {r['watchdog_records']} | {mr} | {r['decisions'] if r['decisions'] is not None else ''} |")
+            lg = r.get("long") or {}
+            share = "" if lg.get("share") is None else (f"{lg['share']:.1%}" + ("" if lg["share"] >= ROBUST_DECISION_SHARE else " **(INVALID)**"))
+            fl = "" if not lg else (str(lg["failed"]) + ("" if lg["failed"] == 0 else " (shown: " + "; ".join(lg.get("failed_reasons") or ["no reason recorded"]) + ")"))
+            dt = "" if lg.get("decision_time_ratio") is None else (f"{lg['decision_time_ratio']:.2f}" + ("" if lg["decision_time_ratio"] <= ROBUST_CYCLE_GROWTH else " **(WORSE)**"))
+            hb_end = "" if lg.get("handed_back_end") is None else ("yes" if lg["handed_back_end"] else "**no: WORSE**")
+            L.append(f"| {dict(compass='omni').get(a, a)} | {rep} | {r.get('mode') or ''} | {hs} | {ok} | {sg} | {r['watchdog_records']} | {mr} | {r['decisions'] if r['decisions'] is not None else ''} | {share} | {fl} | {dt} | {hb_end} |")
     return L + [""], summary
 
 

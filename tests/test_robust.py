@@ -15,10 +15,21 @@ from tools import live_reps as R
 from tools import confirm_abc as C
 
 
-def arm(root, name, rep, t0, kill_at, handed_back, mode="kill", rss=(50000, 52000), second=True, native=False):
+def arm(root, name, rep, t0, kill_at, handed_back, mode="kill", rss=(50000, 52000), second=True, native=False, window=900,
+        gaps=None, failed=0, end_ok=True):
     d = root / f"bench-{name}-{rep}"; d.mkdir()
     (d / "window_start.txt").write_text(f"{t0}\n")
-    lines = [f"{t0} robust {mode}: window 900 s, start {t0}"]
+    lines = [f"{t0} robust {mode}: window {window} s, start {t0}"]
+    if mode == "long":
+        # the long run: decisions at the governor's own cadence (the configured 60 s interval plus its decision time), the reset check at the end
+        g1, g2 = gaps or (62.0, 62.0)
+        t, recs = t0, []
+        while t < t0 + window - 1:
+            recs.append(json.dumps({"time": t, "mode": "nodepool", "decision": {"n": len(recs)}}) + "\n")
+            t += g1 if t < t0 + window / 2 else g2
+        recs += [json.dumps({"time": t0 + 100, "decision_failed": "API 500 for apis/autoscaling/v2/horizontalpodautoscalers"}) + "\n"] * failed
+        (d / "audit.jsonl").write_text("".join(recs))
+        (d / "kill_switch.txt").write_text(f"restored target: 50\nworkers in service: {'6 of 6' if end_ok else '5 of 6'}\nOmni records left after kill: none\n")
     if mode == "kill":
         if native:
             lines.append(f"{t0 + kill_at} kill mark (native: nothing to kill)")
@@ -40,7 +51,8 @@ def arm(root, name, rep, t0, kill_at, handed_back, mode="kill", rss=(50000, 5200
         last_t = 15 * 479
         samples = ["epoch_s,rss_kb,processes"] + [f"{t0 + 15 * i},{rss[0] if 15 * i <= 600 else rss[1] if 15 * i >= last_t - 600 else (rss[0] + rss[1]) // 2},1" for i in range(480)]
         (d / "rss.csv").write_text("\n".join(samples) + "\n")
-        (d / "audit.jsonl").write_text("".join(json.dumps({"decision": {"n": i}}) + "\n" for i in range(13)))
+        if mode != "long":
+            (d / "audit.jsonl").write_text("".join(json.dumps({"decision": {"n": i}}) + "\n" for i in range(13)))
         (d / "watchdog.log").write_text(json.dumps({"watchdog": "handed back", "ok": True}) + "\n")
     return d
 
@@ -80,8 +92,46 @@ def main():
         assert "WORSE" in lines[0] and "a leak" in lines[2]
         assert C.robust_rows([("1", {}, 10, good), ("2", {}, 10, None), ("3", {}, 10, good)]) == ([], {}), "a run without the block makes no robustness rows"
         assert set(R.ROBUST) <= set(R.KEYS) and R.ROBUST <= C.LOWER
+    with tempfile.TemporaryDirectory() as t:
+        # the long run: 7,200 s, decisions every 62 s (60 s interval + 2 s of the governor's own), the reset check at the end
+        root = Path(t); t0 = 1_800_000_000.0
+        o = arm(root, "compass", 1, t0, None, None, mode="long", window=7200)
+        m = R.robust_marks(o)
+        assert m["mode"] == "long" and m["window_s"] == 7200.0, m
+        dec = R.robust_decisions(o, 7200.0)
+        assert dec["expected"] == 120.0 and 0.95 <= dec["share"] <= 1.0 and dec["failed"] == 0 and dec["handed_back_end"] is True, dec
+        assert abs(dec["decision_time_first_s"] - 2.0) < 1e-6 and abs(dec["decision_time_ratio"] - 1.0) < 1e-6, dec
+        L, s = R.robust_table(root, ["native", "compass"])
+        c = s["compass"]
+        assert c["long_repetitions"] == 1 and c["decisions_share_min"] >= 0.95 and c["failed_decisions_total"] == 0 and c["handed_back_end_all"] is True
+        assert abs(c["decision_time_ratio_max"] - 1.0) < 1e-6 and any("| 1.00 | yes |" in x for x in L), L
+        # a slower governor in the last hour (4 s a decision against 2 s), a failed decision, a worker not back: each reads WORSE or INVALID
+        arm(root, "compass", 2, t0, None, None, mode="long", window=7200, gaps=(62.0, 64.0), failed=1, end_ok=False)
+        L, s = R.robust_table(root, ["native", "compass"])
+        c = s["compass"]
+        assert 1.9 < c["decision_time_ratio_max"] <= 2.0 and c["failed_decisions_total"] == 1 and c["handed_back_end_all"] is False, c
+        assert c["failed_reasons"] == ["API 500 for apis/autoscaling/v2/horizontalpodautoscalers"], c
+        assert any("**(WORSE)**" in x and "**no: WORSE**" in x and "1 (shown: API 500" in x for x in L), L
+        # too few decisions reads INVALID
+        arm(root, "compass", 3, t0, None, None, mode="long", window=7200, gaps=(90.0, 90.0))
+        _, s = R.robust_table(root, ["native", "compass"])
+        assert s["compass"]["decisions_share_min"] < 0.95
+        # the three-run rows
+        good = {"compass": {"repetitions": 3, "kill_repetitions": 0, "handed_back_within_allowance_all": None, "handed_back_s_mean": None, "handed_back_s_max": None,
+                            "never_handed_back": 0, "second_governor_all": None, "memory_ratio_max": 1.05, "allowance_s": 60.0, "memory_limit": 1.25,
+                            "long_repetitions": 3, "decisions_expected": 120.0, "decisions_share_min": 0.975, "failed_decisions_total": 0,
+                            "decision_time_ratio_max": 1.1, "handed_back_end_all": True, "decision_share_limit": 0.95, "cycle_growth_limit": 1.5}}
+        bad = {"compass": dict(good["compass"], decisions_share_min=0.90, failed_decisions_total=2, failed_reasons=["API 500 for apis/autoscaling/v2/horizontalpodautoscalers"],
+                               decision_time_ratio_max=1.8, handed_back_end_all=False)}
+        lines, rows = C.robust_rows([("1", {}, 3, good), ("2", {}, 3, good), ("3", {}, 3, good)])
+        assert len(lines) == 5 and "no leak" in lines[0] and "valid (every repetition" in lines[1] and "none in any repetition" in lines[2] \
+            and "no growth" in lines[3] and "confirmed: every setting handed back" in lines[4], lines
+        lines, rows = C.robust_rows([("1", {}, 3, good), ("2", {}, 3, bad), ("3", {}, 3, good)])
+        assert "INVALID" in lines[1] and "shown, not judged: API 500" in lines[2] and "WORSE" not in lines[2] and "grew by more than half" in lines[3] \
+            and "not handed back at the end" in lines[4], lines
     print("PASS  robustness readings: the kill and hand-back marks, the 120 s after the kill in both arms, the memory ratio; a late hand-back, a leak or a missing "
-          "second governor reads WORSE; the three-run rows confirm only when every run's every repetition was handed back within the allowance")
+          "second governor reads WORSE; the long run's decisions of expected, failed decisions, decision-time growth and hand-back at the end; "
+          "the three-run rows confirm only when every run's every repetition was handed back within the allowance")
 
 
 if __name__ == "__main__":

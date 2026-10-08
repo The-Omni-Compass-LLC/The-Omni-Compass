@@ -8,6 +8,15 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **Robustness, the long run, three runs** (`results/live/V3_ROBUST_LONG.md`, runs 37716886448, 37716900258, 37716913526,
+  3 pairs × 7,200 s an arm each, Omni v3; `docs/ROBUSTNESS_PREREGISTRATION.md` scenario 2): the governor's memory at most
+  1.07 of its first ten minutes after two hours (no leak), 97.5% or more of the expected decisions in every repetition
+  (valid), 2 to 3 failed decisions a run where the cluster's API answered 500 on the HPA read (held and resumed; shown with
+  the reason, as preregistered), the decision time's last hour at most 1.20 of its first (no slowing), every setting handed
+  back at the end; machines and energy inside the noise, service confirmed better in one run and inside the noise in two.
+  The reader (`tools/live_reps.py` `robust_decisions`, `tools/confirm_abc.py`) gained the long run's preregistered rows,
+  with fixed cases in `tests/test_robust.py`; each run's live report in the archive was rebuilt from the untouched raw
+  files and its checksum list updated for those two derived files.
 - **MongoDB under YCSB on v3, confirmed three times** (`results/live/V3_YCSB.md`, runs 37727968670, 37727976107,
   37727983746, all at `7ee471b4` on Omni v3; `docs/YCSB_PREREGISTRATION.md`, register row 24, proof-program row 11):
   the operator's 512 MB WiredTiger cache as native, the compass on the cache size inside [256, 2,048] MB through the

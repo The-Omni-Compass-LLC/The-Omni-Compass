@@ -63,6 +63,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | Redis, a cache's memory ceiling, three workloads | work inside the line **+14% to +27%**, hit rate +14% to +27%; no failed request | mean latency −30% to −61%; p95 within a hair of native's (a miss is a miss in both arms) | memory ceiling held **64 → 200 to 270 MB, confirmed worse** | host CPU-seconds inside the noise on all three | `results/live/V3_REDIS.md` |
 | MongoDB under YCSB, a database's storage-engine cache size, four workloads | inside the noise on all four; no failed operation | p95 and p99 inside the noise; mean latency on burst **+2% to +4%, confirmed worse** | cache size held **−49% on c, −41% to −49% on burst, −13% to −37% on f, confirmed better**; b inside the noise in one run | host CPU-seconds inside the noise on all four | `results/live/V3_YCSB.md` |
 | Robustness: the governor killed outright at 40% of the window, 10 pairs × 3 runs | **every setting back at the operator's 7 to 11 s after the kill, 30 of 30**; a second governor to the end; failed requests over the window −9% to −15% | the 120 s after the kill inside the noise against native; the whole window p95 −42% to −45% | inside the noise | inside the noise | `results/live/V3_ROBUST_KILL.md` |
+| Robustness: the long run, 7,200 s an arm, 3 pairs × 3 runs | decisions 97.5% or more of expected (valid); failed requests inside the noise | service confirmed better in A, inside the noise in B and C (no difference beyond the noise in 2 of 3) | inside the noise; **memory at most 1.07 of its first ten minutes (no leak)**; decision time at most 1.20 (no slowing); every setting handed back at the end | inside the noise | `results/live/V3_ROBUST_LONG.md` |
 | The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell | the organisms' work unchanged | p95 better in every cell | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
 
 ## Measured on a real cloud (Azure, its own bill), Omni v1
@@ -109,7 +110,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 3. **The real card**: the founder's runs on Lambda, one exact commit.
 4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, no engine file changes): the kill scenario is done
    (`results/live/V3_ROBUST_KILL.md`: every setting back 7 to 11 s after the kill in 30 of 30 repetitions) and the
-   governor's own CPU is tabulated (`results/live/V3_OWN_COST.md`); the long run (3 pairs × 3 runs, 7,200 s) is running;
+   governor's own CPU is tabulated (`results/live/V3_OWN_COST.md`); the long run is done (`results/live/V3_ROBUST_LONG.md`, 3 pairs × 3 runs, 7,200 s an arm: no leak, the decisions valid, no slowing, every setting handed back at the end; service inside the noise in two of three runs);
    the 24-hour run on a rented machine follows.
 5. **YCSB on MongoDB, done** (`docs/YCSB_PREREGISTRATION.md`, `results/live/V3_YCSB.md`): the operator's WiredTiger cache
    as native, Omni on the cache size through the server's own console; four smoke runs recorded, then A, B and C on v3; the

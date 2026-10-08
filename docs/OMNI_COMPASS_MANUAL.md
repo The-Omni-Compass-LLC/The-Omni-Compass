@@ -1844,8 +1844,22 @@ window, with a kill and a restart inside it, still read mean response 32% to 39%
 the line 28% to 34% lower and failed requests 9% to 15% fewer, confirmed better, with machines and energy inside the noise.
 The governor's own CPU over every archived run with the real cluster inside (`V3_OWN_COST.md`) is 0.006 to 0.013 of one
 core at every size from 1 to 1,000 copies, 0.1% to 0.3% of the host's cores, each run under its own engine; the cost of
-governing a real cluster does not grow with the modelled organism around it. The long run, eight windows with the
-governor's memory and decisions watched, runs as A, B and C as this edition is written.
+governing a real cluster does not grow with the modelled organism around it.
+
+**The long run** (`V3_ROBUST_LONG.md`, three pairs of 7,200 s an arm in each of three runs) asks whether the governor
+drifts, leaks or slows over hours. Its resident memory after two hours was at most 1.048, 1.067 and 1.052 times its first
+ten minutes in the three runs, against a preregistered limit of a quarter: no leak. It made 117 to 119 of the 120
+decisions its 60-second interval predicts in every repetition, 97.5% at the fewest against a threshold of 95%: valid. Its
+decision time, read as the gap between consecutive decisions less the interval it sleeps, was at most 1.20 times in the
+last hour what it was in the first: no slowing. Every setting was handed back at the end of every repetition and read
+back at the operator's with no record left. Two things are shown rather than judged, as the preregistration said they
+would be. First, failed decisions: 2, 3 and 3 in the three runs, all in one repetition's omni arm, all the same cause, the
+cluster's own API answering 500 to the governor's read of the HPA for two or three decisions in a row; the governor held,
+wrote nothing, and resumed on the next good read, which is the blind-means-hold rule doing what section 7.3 says it does.
+Second, the whole window's service: with three pairs a run the intervals are wide, and mean response, p95, p99 and time
+over the line read confirmed better in run A and inside the noise in B and C, so the reading is no difference beyond the
+noise in two of three runs; machines, energy and failed requests read inside the noise in all three. The long run is a
+test of the governor's constancy, and on that question every row answered as the preregistration required.
 
 ### 16.5 The modelled realms and the independent simulators
 
@@ -1933,7 +1947,8 @@ themselves, which is why every row is in its table.
 | GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
 **Running now** (8 October): the four stacked at 1,000 copies on the detached machine; the robustness test
-(`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario done (section 16.4b) and the long run running as A, B and C;
+(`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario and the two-hour long run both done (section 16.4b), the
+24-hour run on a rented machine next;
 YCSB on MongoDB done (`V3_YCSB.md`, section 16.4) and the other stores of register row 24 next; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
 subscription's family allowances before any arm ran, the next by Azure's own cluster capacity in eastus; the fleet is
 rebuilt from the families the survey shows allowed). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
@@ -1998,9 +2013,10 @@ Three things this manual does not show, and the program that will show them or s
 - **The real card.** Every earlier GPU result ran on a controller since replaced. The two-wire governor with the verdict
   runs on rented cards at one named commit, with the wire check first (`docs/GPU_RUN_GUIDE.md`,
   `docs/GPU_PREREGISTRATION.md`); until then the card has no result and the manual says so.
-- **Robustness over hours.** The governor killed outright is now a measured result (section 16.4b: every setting back in
-  7 to 11 s, thirty times out of thirty) and its own cost is tabulated; what remains open is the long run, eight windows on
-  GitHub (running as A, B and C) and then 24 hours on a rented machine, for drift and leaks.
+- **Robustness over a day.** The governor killed outright is a measured result (section 16.4b: every setting back in 7 to
+  11 s, thirty times out of thirty), its own cost is tabulated, and the two-hour run is measured three times (no leak,
+  no slowing, every decision expected but a few the cluster's API refused, every setting handed back); what remains open is
+  the 24-hour run on a rented machine, for drift and leaks over a working day, and the same test on the other stacks.
 
 The queue beyond these, in order, is `docs/REGISTER.md` section 4, one or two at a time, each preregistered before it
 runs: PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour run, Basilisk, Orekit and
@@ -2326,6 +2342,7 @@ to be wrong for the sentence to be wrong.
 | No write ever leaves a knob's cover; a blind sense holds; fail-up is immediate | T / V | `tests/test_shield_properties.py` (two million cases), the plug tests per stack | one case of a write past the cover or a give-back while blind |
 | On a real cluster the governor does more work inside the line, faster, on no more machines, at no more energy | L | the six Kubernetes tables in `results/live/`, A/B/C each, `docs/K8S_COMPASS_PREREGISTRATION.md` | a confirmed-worse row on work, speed, machines or energy in any of the six, which would stand in the table |
 | Killed outright, the governor's settings are back at the operator's within seconds | L | `results/live/V3_ROBUST_KILL.md`, `docs/ROBUSTNESS_PREREGISTRATION.md` | a repetition handed back after 60 s, or not at all |
+| Over two hours the governor neither leaks, slows nor drifts, and hands everything back at the end | L | `results/live/V3_ROBUST_LONG.md`, `docs/ROBUSTNESS_PREREGISTRATION.md` | memory growing past a quarter, the decision time growing past a half, fewer than 95% of expected decisions, or a setting not handed back |
 | Governing costs a few thousandths of a core at every size | L | `results/live/V3_OWN_COST.md` | an own-cost figure growing with the organism |
 | The pooler, the broker and the cache each gain on their untouched workloads | L | `V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`, each preregistration | a confirmed-worse product row on an untouched workload; the memory row of the cache is such a loss and stands |
 | The one number is +25.9% across the real categories, losses included | L, by rule | `results/OMNI_INDEX.md`, `tools/omni_index.py` | a category omitted, a loss not entered, a tuning row counted |
