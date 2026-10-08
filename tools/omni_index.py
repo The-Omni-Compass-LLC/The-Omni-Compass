@@ -61,7 +61,8 @@ SOURCES = [
      {"speed": MEAN, "machines": NODES, "energy": STANDBY}, None),
 ]
 REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer, GitHub)", "Real messaging (Apache Kafka, GitHub)",
-        "Real cache (Redis, GitHub)", "Real database cache (MongoDB under YCSB, GitHub)", "Real cloud (Azure AKS, billed)",
+        "Real cache (Redis, GitHub)", "Real database cache (MongoDB under YCSB, GitHub)",
+        "Real database buffer pool (MySQL under sysbench, GitHub)", "Real cloud (Azure AKS, billed)",
         "Real card (NVIDIA, its own meter)")
 # the workload tables (tools/pgbench_abc.py, kafka_abc.py, redis_abc.py): per untouched workload, work = the work inside the
 # line, speed = p95, machines = the resource held (connections to the database; consumers running; the cache's memory ceiling),
@@ -76,6 +77,8 @@ WORKLOAD_TABLES = [
      {"work": "work_inside_line_rps", "speed": "p95_ms", "machines": "maxmemory_mb_mean", "energy": "cpu_seconds"}),
     ("Real database cache (MongoDB under YCSB, GitHub)", "V3_YCSB.json", "YCSB `{wl}`: the storage engine's cache size, three paired repetitions, three runs",
      {"work": "work_inside_line_ops", "speed": "p95_ms", "machines": "cache_mb_mean", "energy": "cpu_seconds"}),
+    ("Real database buffer pool (MySQL under sysbench, GitHub)", "V3_SYSBENCH.json", "sysbench `{wl}`: the buffer pool's size, three paired repetitions, three runs",
+     {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "pool_mb_mean", "energy": "cpu_seconds"}),
 ]
 DB_FILE = WORKLOAD_TABLES[0][1]
 LOWER_IS_BETTER = {"speed", "machines", "energy"}

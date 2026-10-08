@@ -8,6 +8,16 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **The 24-hour robustness run dispatched on three rented machines** (`docs/ROBUSTNESS_PREREGISTRATION.md` scenario 2b, the
+  dispatch record): runs 37761059781, 37761072412 and 37761084779 of `big-organism-detached` with `test=robust`, 86,400 s an
+  arm, one pair a machine, commit `4d5633dd` (v3), eastus `Standard_D4as_v4`, all three rented at the first attempt and
+  running by 10:20 UTC; collected and deleted at 60 hours at the latest. The index tool carries the MySQL table's entry
+  ahead of the result (silent until the sysbench table exists in `results/live/`).
+- **The manual, twelve thin sections expanded** (1.4 nothing hardwired, 1.5 the word, 2.3 the organism receipt, 2.4 the two
+  axes of the grid, 2.5 the clock rule and the 1,000-copies result, 2.6 reading a register row, 3.1 why the room is there,
+  3.3 both readings on real software, 4.3 one decision followed through, 6.3 the memory gates on MongoDB and MySQL, 7.2 the
+  snapshot and the read-back, 7.3 the API errors held in the long run, 7.4 memory and decision time over time, 9.2 what the
+  verifier checks, 10.4 the robust mode of the detached workflow, 16.3 the fleet's refusals); PDF rebuilt, 472 pages.
 - **The four stacked at 1,000 copies with the real cluster inside, on v3, 3 of 3 on the clock** (`results/live/V3_BIG_ORGANISM.md`;
   started by run 37564821425, collected by run 37754612102; one rented Azure machine, eastus `Standard_D8as_v4`, a 10,800 s
   window of 240 steps of 45 s, three paired repetitions over 29 hours, commit `126b8941`, Omni v3): the cluster's p95 2,882
