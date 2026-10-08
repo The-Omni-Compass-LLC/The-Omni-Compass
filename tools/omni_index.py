@@ -60,13 +60,21 @@ SOURCES = [
     ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs, three runs", "V3_BATCH.json",
      {"speed": MEAN, "machines": NODES, "energy": STANDBY}, None),
 ]
-REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer, GitHub)", "Real cloud (Azure AKS, billed)",
-        "Real card (NVIDIA, its own meter)")
-# the database's three-run table (tools/pgbench_abc.py): per workload, work = transactions inside the line, speed = p95,
-# machines = the connections held open to the database; energy = the host's CPU seconds over the run (no meter on a GitHub
-# runner; the CPU the compass itself burns is the declared cost, and a confirmed loss there counts against Omni)
-DB_FILE = "V3_PGBENCH.json"
-DB_MEASURES = {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "servers_alive_mean", "energy": "cpu_seconds"}
+REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer, GitHub)", "Real messaging (Apache Kafka, GitHub)",
+        "Real cache (Redis, GitHub)", "Real cloud (Azure AKS, billed)", "Real card (NVIDIA, its own meter)")
+# the workload tables (tools/pgbench_abc.py, kafka_abc.py, redis_abc.py): per untouched workload, work = the work inside the
+# line, speed = p95, machines = the resource held (connections to the database; consumers running; the cache's memory ceiling),
+# energy = the host's CPU seconds over the run (no meter on a GitHub runner; the CPU the compass itself burns is the declared
+# cost, and a confirmed loss there counts against Omni). A table's tuning workload is shown in its own file and never counted.
+WORKLOAD_TABLES = [
+    ("Real database (PostgreSQL behind PgBouncer, GitHub)", "V3_PGBENCH.json", "pgbench `{wl}`: the pooler's pool size, three paired repetitions, three runs",
+     {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "servers_alive_mean", "energy": "cpu_seconds"}),
+    ("Real messaging (Apache Kafka, GitHub)", "V3_KAFKA.json", "Kafka `{wl}`: the consumer group's size, three paired repetitions, three runs",
+     {"work": "work_inside_line_mps", "speed": "p95_ms", "machines": "consumers_mean", "energy": "cpu_seconds"}),
+    ("Real cache (Redis, GitHub)", "V3_REDIS.json", "Redis `{wl}`: the cache's memory ceiling, three paired repetitions, three runs",
+     {"work": "work_inside_line_rps", "speed": "p95_ms", "machines": "maxmemory_mb_mean", "energy": "cpu_seconds"}),
+]
+DB_FILE = WORKLOAD_TABLES[0][1]
 LOWER_IS_BETTER = {"speed", "machines", "energy"}
 PENDING = {"Real cloud (Azure AKS, billed)": "the v1 steady and burst runs are in (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`: on a 4-worker fleet every gauge inside the noise but the burst's p99, −34% in one run); both join as three-run tables, and a fleet big enough to see one machine is next (the earlier engine's +7.5% is in `docs/history/OMNI_INDEX_pre_v1.md`)",
            "Real card (NVIDIA, its own meter)": "the rerun on the current card controller (the 2026-10-02 run used the replaced one)"}
@@ -107,12 +115,17 @@ def tests():
             r["work"] = measure(rows_[CAPACITY], "work")
         out.append({"category": cat, "test": name, "source": f"results/live/{f}", "runs": [x["run"] for x in data["runs"]],
                     "v1": bool(data.get("v1")), "measures": r})
-    db = LIVE / DB_FILE
-    if db.exists():
+    for cat, fname, label, measures_ in WORKLOAD_TABLES:
+      db = LIVE / fname
+      if not db.exists():
+        continue
+      if True:
         data = json.loads(db.read_text())
         for wl, gauges in sorted(data["workloads"].items()):
+            if wl == "tuning":
+                continue                                        # the tuning workload is shown in its table, never counted
             r = {}
-            for m, key in DB_MEASURES.items():
+            for m, key in measures_.items():
                 g = gauges.get(key)
                 if not g or any(x is None for x in g["runs"]):
                     continue
@@ -123,8 +136,8 @@ def tests():
                 else:
                     ratio = 1.0
                 r[m] = {"native": g["runs"][0]["native"], "omni": g["runs"][0]["omni"], "ratio": ratio, "reading": reading}
-            out.append({"category": "Real database (PostgreSQL behind PgBouncer, GitHub)", "test": f"pgbench `{wl}`: the pooler's pool size, three paired repetitions, three runs",
-                        "source": f"results/live/{DB_FILE}", "runs": [x["run"] for x in data["runs"]], "v1": False, "measures": r})
+            out.append({"category": cat, "test": label.format(wl=wl),
+                        "source": f"results/live/{fname}", "runs": [x["run"] for x in data["runs"]], "v1": False, "measures": r})
     for t in out:
         g = gmean([m["ratio"] for m in t["measures"].values()])
         t["index_pct"] = 100 * (g - 1) if g else None
@@ -150,13 +163,15 @@ def main():
          "geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric "
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
          "Every number is read from the test's own three-run table (`results/live/V1_*.json` and `results/live/V3_*.json`, made by "
-         "`tools/confirm_abc.py` and `tools/pgbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
+         "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py` and `tools/redis_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
          f"## Headline: Omni-Compass on top of native, real machines, confirmed three times: **{pct(head)}** "
          f"(more for the same, or the same for less, across work, speed, machines and energy)", "",
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): confirmed better or confirmed worse in all "
          "three runs counts, as the geometric mean of the runs' ratios; no difference beyond the noise counts as exactly 1, so "
-         "nothing inside the noise is claimed either way. Real Kubernetes (Omni v3; the v1 tables read the same and stay in `docs/OMNI_V1.md`) and the real database (Omni v3) are the real "
-         "categories in; Azure and the card join as their three-run tables land. The law, controllers and runners are the same bytes "
+         "nothing inside the noise is claimed either way. Real Kubernetes (Omni v3; the v1 tables read the same and stay in `docs/OMNI_V1.md`), the real database, "
+         "real messaging and the real cache (Omni v3) are the real categories in; Azure and the card join as their three-run tables land. A category's "
+         "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
+         "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it costs stands beside it. The law, controllers and runners are the same bytes "
          "in v1 and v3 (`docs/OMNI_V3.md`); each table names the engine it ran on.", "",
          "| Category | Index | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |", "|---|---:|---:|---:|---:|---:|---:|"]
     for c in list(REAL) + ["Modelled muscles (evidence S)"]:
@@ -168,9 +183,10 @@ def main():
     L += ["", "Read: every column points the same way, plus is good for Omni-Compass. \"Fewer machines by +4%\" means Omni did the "
           "same work on 4% fewer machine-hours; \"less energy by +3%\" means 3% less energy for the same work; \"faster by +95%\" means "
           "native's slowest-5% response is 1.95 times Omni's (Omni answers about twice as fast); \"more work by +45%\" means 45% more work "
-          "inside the response line. The energy figure on GitHub's Kubernetes is a declared model, not a meter; the database's energy column "
-          "is the host's CPU seconds (the compass's own cost, confirmed worse, counted against Omni); its machines column is the "
-          "connections held open to the database; Azure's machines are its own billed count.",
+          "inside the response line. The energy figure on GitHub's Kubernetes is a declared model, not a meter; the database's, the "
+          "messaging and the cache's energy columns are the host's CPU seconds (the compass's own cost included, a confirmed loss counted "
+          "against Omni); their machines columns are the resource held: connections open to the database, consumers running, the cache's "
+          "memory ceiling; Azure's machines are its own billed count.",
           "", "## Every test", "",
           "| Category | Test | Index | More work by | Faster by | Fewer machines by | Less energy by | Source |", "|---|---|---:|---:|---:|---:|---:|---|"]
     for t in ts:

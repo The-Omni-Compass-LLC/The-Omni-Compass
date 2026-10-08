@@ -78,8 +78,10 @@ writes to a system is marked **WRITES**.
   three separate times with ten paired runs each, it handled 42% to 48% more work inside the response line on the same
   machines, answered 57% to 69% faster at the 95th percentile, and gave back machines only where a paired trial showed
   no request slower (section 16). On a real database it held 61% to 72% fewer connections open for the same work and
-  the same latency, at a confirmed cost in the host's CPU seconds (+14% to +28%), reported as such. The one combined
-  number, the Omni index over the real categories confirmed three times, stands at +19.7% (`results/OMNI_INDEX.md`).
+  the same latency, at a confirmed cost in the host's CPU seconds (+14% to +28%), reported as such. On a real message
+  queue (Apache Kafka) it handled 16% to 21% more messages inside the response line and kept the queue short where
+  native's grew, at the confirmed cost of three to four times the consumers running. The one combined number, the Omni
+  index over the real categories confirmed three times, stands at +56.4% (`results/OMNI_INDEX.md`).
 - **How it stays safe.** It watches before it writes, records every original setting before it acts, reads back
   every write, never writes past a knob's cover, gives everything back the moment service is at risk, stops writing
   if anyone else touches a knob, and returns every setting to its original value on one OFF switch.
@@ -848,9 +850,10 @@ Every judged row gets one of three readings, and all three runs are shown beside
   measure, and it is looked into before anything is claimed.
 
 Nothing reads "not confirmed". The tables are made by rule, never by hand (`tools/confirm_abc.py` for the paired
-Kubernetes and Azure tests, `pgbench_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`; a
-deterministic simulator's three runs must reproduce each other to the digit, and a score reads "the runs differ" when
-they do not), and `tests/test_confirm_abc.py`, run by `verify.py`, proves the rule on fixed cases.
+Kubernetes and Azure tests, `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`,
+`pandapower_abc.py`, `citylearn_abc.py`; a deterministic simulator's three runs must reproduce each other to the digit,
+or to the declared tolerance where the simulator is not bit-reproducible across machines, and a score reads "the runs
+differ" when they do not), and `tests/test_confirm_abc.py`, run by `verify.py`, proves the rule on fixed cases.
 
 **The Omni index** (`tools/omni_index.py`, `results/OMNI_INDEX.md`) is the one combined number. Every measure of every
 test is a ratio oriented so that above 1 is better for Omni-Compass on top of native: work (more), speed (a lower
@@ -866,8 +869,12 @@ work in both arms, read by the three-run rule of section 15, on the engine named
 gains. The whole list, benchmark by benchmark with its native engine, its knob, its gauges and its file, is
 `docs/REGISTER.md`; the program that takes every benchmark to full size is `docs/PROOF_PROGRAM.md`.
 
-**The one number.** The Omni index over the real categories confirmed three times: **+19.7%** (real Kubernetes on v3 +25.5%,
-the real database on v3 +14.2%; Azure and the card join as their three-run tables land).
+**The one number.** The Omni index over the real categories confirmed three times: **+56.4%** (real Kubernetes on v3 +25.5%,
+the real database on v3 +14.2%, real messaging on v3 +166.9%, each category weighed the same; Redis, Azure and the card
+join as their three-run tables land). The messaging figure is large because its speed ratio is: native sat at nine
+tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5% waited 1.6 s, while
+Omni's waited 9 to 14 ms; the resource that bought it, three to four times the consumers, stands beside it as a
+confirmed loss.
 
 | Result | Engine | Class | Reading | Source |
 |---|---|---|---|---|
@@ -890,14 +897,17 @@ the real database on v3 +14.2%; Azure and the card join as their three-run table
 | **Robot arms, MuJoCo Menagerie**, A/B/C | v1 and v3 | S | where Omni-Compass moved (Gen3, Panda): peak torque −29% and −10%, tracking error −21%, energy per takt −0.8% and −0.5%, confirmed better; the Panda's copper loss +14% **confirmed worse**; UR5e and iiwa 14 left native by the paired physics trial | `results/live/V1_MUJOCO.md`, `V1_MUJOCO_PANDA.md`, `V3_MUJOCO.md` |
 | **CityLearn, every district it ships**, A/B/C | v1 and v3 | S | 11 battery districts: electricity bought, daily peak and daily unevenness confirmed better in all 11, carbon in 8; the bill **worse in 7** (the 2023 districts) and ramping worse in 7; 71 score-rows better, 33 worse, 1 where the runs differ (the simulator's own variation); 3 districts with nothing to move; 8 the simulator cannot run | `results/live/V1_CITYLEARN.md`, `V3_CITYLEARN.md` |
 | **Drone swarms, gym-pybullet-drones** (Crazyflie 2.x, the shipped autopilot as native; Omni on the cruise override inside the autopilot's limits), 20 drones × 4 missions, three cells, A/B/C | v3 | S | energy a mission −7% (short), −18% (mixed), −20% (long) and missions a charge +8% to +25%, confirmed better; no late mission, reserve breach, near miss or collision in any arm; tracking error 0.07 → 0.13 m inside its 0.25 m band | `results/live/V3_SWARM.md` |
+| **Apache Kafka as shipped, a consumer group's operator-set size** (one broker, 8 partitions; the group at the operator's 2 consumers as native; Omni on the count inside [1, 8]), three untouched workloads, 3 pairs × 3 runs | v3 | L | work inside the 500 ms line **+16% to +21% confirmed better** on all three; end-to-end p95 1.6 s → 9 to 14 ms and mean lag −92% to −97% confirmed better; no message lost in any arm; consumers held 2 → 5.8 to 7.9 **confirmed worse** (the resource the gain costs); host CPU-seconds confirmed worse on light (+10% to +20%), inside the noise on heavy and burst; every count handed back; 21 gauge-rows better, 8 worse | `results/live/V3_KAFKA.md` |
 | **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
 | GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
-**Running now** (7 October): the four stacked at 1,000 copies on the detached machine,
-and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
-subscription's family allowances before any arm ran; the fleet is rebuilt from the families the survey shows allowed). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
+**Running now** (8 October): the four stacked at 1,000 copies on the detached machine; Redis, Omni on top of a cache's
+operator-set memory ceiling, as A, B and C (`docs/REDIS_PREREGISTRATION.md`; the table V3_REDIS.md joins `results/live/`
+when the runs land); and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
+subscription's family allowances before any arm ran, the next by Azure's own cluster capacity in eastus; the fleet is
+rebuilt from the families the survey shows allowed). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
 defense edge (PX4 and ArduPilot multi-vehicle, Crazyswarm), databases and caches at large (YCSB, HammerDB), Spark,
-Kafka, Redis, OpenSearch, fio, Open-RMF, the 24-hour robustness run, spacecraft attitude and thrusters (Basilisk),
+OpenSearch, fio, Open-RMF, the 24-hour robustness run, spacecraft attitude and thrusters (Basilisk),
 station-keeping (Orekit, GMAT), constellations, rockets (RocketPy, OpenRocket) and combustion (Cantera). Pure physics
 solvers (OpenFOAM, SU2, REBOUND, GADGET, MESA) are not benchmarked: they have no controller and no knob, so Omni-Compass
 has no place on them; their value is the HPC cluster that runs them.

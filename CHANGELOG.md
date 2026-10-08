@@ -7,6 +7,20 @@
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
+## 2026-10-08
+- **Kafka on v3, confirmed three times** (`results/live/V3_KAFKA.md`, runs 37697222651, 37697239400, 37697255445, all
+  omni-v3 at `a0b5d2381e9e`): on all three untouched workloads (light, heavy, burst) work inside the 500 ms line +16% to
+  +21%, end-to-end p95 1.6 s → 9 to 14 ms, mean lag −92% to −97%, confirmed better; no message lost in any arm;
+  consumers held 2 → 5.8 to 7.9 confirmed worse (the resource the gain costs); host CPU-seconds confirmed worse on light
+  (+10% to +20%), inside the noise on heavy and burst; CPU per 1,000 messages inside the line better on burst; every count
+  handed back; 21 gauge-rows better, 8 worse, 0 where the runs disagree. The tuning workload is shown and not counted.
+- **The Omni index reads every workload table the same way** (`tools/omni_index.py`): the database, messaging and cache
+  tables (`V3_PGBENCH.json`, `V3_KAFKA.json`, `V3_REDIS.json` when it lands) enter through one list, each a real category
+  weighed the same, tuning workloads excluded. With Kafka in, the headline is **+56.4%** (Kubernetes +25.5%, the database
+  +14.2%, Kafka +166.9%). The index page says why the messaging speed ratio is large: native sat at nine tenths of its
+  measured capacity by design, so its queue grew and Omni's did not. README, the state of play, the manual, the engine
+  page, the register and the proof program carry the result.
+
 ## 2026-10-07
 - **Redis, preregistered and built** (`docs/REDIS_PREREGISTRATION.md`, `tools/run_redis.py`, `tools/redis_abc.py`, workflow
   `redis`, tests in `verify.py`): Redis as shipped with the operator's 64 MB ceiling and allkeys-lru as native; an
