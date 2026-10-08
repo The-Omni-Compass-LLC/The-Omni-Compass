@@ -655,6 +655,18 @@ formal status of each statement, what is proved, what is tested and what is conj
 `docs/FORMAL_STATUS.md` and `docs/TRACKING_THEOREM.md`, and the theory chapters of this book (The Unified Circle
 Principle, Closing the Circle in the Engine) give the derivations.
 
+**What the certificate buys an operator, in practice.** Three things. The engine cannot run away: there is no input, no
+sequence of readings and no fault in a sense that drives its internal state to infinity or into oscillation that grows,
+because the walls are part of the equations and not a check bolted on afterwards. The engine cannot hold a grudge: the
+memory state forgets at a fixed rate, so a bad hour does not bias the next day, and a governor restarted after a kill
+starts from the same rest state the certificate names. And the engine's behaviour under any disturbance smaller than the
+fence is the same kind of behaviour, a descent to the bottom, so a test on one plant's readings says something about the
+engine on another's; what it does not say, and what no mathematics of the engine alone could say, is how the plant
+answers, which is why the paired runs exist. An underwriter reading this section should take from it exactly this much:
+the part of the system that makes decisions is bounded by proof; the part of the system that carries them out is bounded
+by the cover, the gates and the hand-back, each tested; and the part that is the customer's own plant is measured, never
+assumed.
+
 **The compass.** The Omni-Compass rose carries the whole Greek alphabet, Alpha to Omega: the complete set, in a ring
 whose end runs back into its beginning. Its north-south axis is polarity: Alpha and plus at the top, Omega and minus at
 the bottom, the two poles of the alignment's double well. Its east-west axis is flow: Beta and the push outward on one
@@ -1541,6 +1553,26 @@ difference beyond the noise (3 of 3 runs)" with intervals of −30% to +25% is a
 size either way, which is a statement about the test's power, and the manual says so where it applies (the 4-worker Azure
 fleet). A "confirmed WORSE" row is a loss, stands in the table, and enters the index as a loss.
 
+**A worked reading, from the cache table.** Take the Redis table's `large` workload (`results/live/V3_REDIS.md`). The
+product row, work inside the 2 ms line, reads confirmed better, with the three runs' paired changes each clear of zero and
+of the same sign; that is the gain. The resource row, the memory ceiling held, reads confirmed WORSE: Omni held a ceiling
+of about 256 MB on average where the operator had set 64 MB, in every run, clear of zero. The two rows together are the result: the
+cache answered more requests inside the line because it was given more memory, and the table says both. A reader who
+quotes the first row without the second has misread the table, and the index is built so that this cannot happen there:
+the cache's category enters the one number as a loss (about 0.75 on its own), because the resource it spent is counted at
+full weight against the work it gained. The CPU row, inside the noise, says the host did not pay in processor time; the
+failed-request row, zero in both arms, says nothing was refused to get there. Four rows, three directions, one honest
+sentence: more work inside the line, bought with memory, at no cost in CPU or refusals. That is how every table in
+section 16 should be read, row by row, before any sentence about it is written.
+
+**Three questions to ask of any class L result.** First, what was native, exactly: which controller, at which published
+version, with which settings, and were those settings an operator's or ours? (Every preregistration names them; the
+broker's native was set at its knee by design and says so.) Second, what did the governor spend: machines, memory,
+connections, CPU, its own cost? (Every table has the resource rows; a result with a gain and no resource row is not in this
+program.) Third, who else could have produced the gain: the order of the arms, the warm-up, the runner's neighbour, the
+clock? (Rotation of the arm order, the warm-up before every window, the paired design on one machine and the clock rule
+are the answers, and section 16.7 names the residue they do not remove.)
+
 ## 15. The Frozen Engines and the Three-Run Rule
 
 **The engine is frozen, and every freeze has a fingerprint.** The engine is the compass law
@@ -2158,11 +2190,38 @@ appear in the three-run tables of this manual, with their source and their direc
 `docs/EVIDENCE_LEDGER.md` (every claim and its class), `docs/CLAIMS_REGISTER.md` (what is claimed and what is not),
 `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md`,
 `docs/POSTGRES_PREREGISTRATION.md`, `docs/KAFKA_PREREGISTRATION.md`, `docs/REDIS_PREREGISTRATION.md`,
-`docs/SWARM_PREREGISTRATION.md`, `docs/CITYLEARN_PREREGISTRATION.md`, `docs/PANDAPOWER_PREREGISTRATION.md` and
-`docs/ROBOTICS_PREREGISTRATION.md` (the rules written before each run), `docs/OMNI_V1.md` to `OMNI_V3.md` (every
-result by engine), `docs/REGISTER.md` (every benchmark and its file), `docs/PROOF_PROGRAM.md` (the program to full size
-with its costs), `docs/DOSSIER.md` (every result in one place), `results/OMNI_INDEX.md` (the one number),
-`docs/STATE_OF_PLAY.md` (where everything stands), `docs/HANDOFF.md` (every command in one page).
+`docs/SWARM_PREREGISTRATION.md`, `docs/CITYLEARN_PREREGISTRATION.md`, `docs/PANDAPOWER_PREREGISTRATION.md`,
+`docs/ROBOTICS_PREREGISTRATION.md`, `docs/ROBUSTNESS_PREREGISTRATION.md` and `docs/YCSB_PREREGISTRATION.md` (the rules
+written before each run), `docs/OMNI_V1.md` to `OMNI_V3.md` (every result by engine), `docs/REGISTER.md` (every benchmark
+and its file), `docs/PROOF_PROGRAM.md` (the program to full size with its costs), `docs/DOSSIER.md` (every result in one
+place), `results/OMNI_INDEX.md` (the one number), `docs/STATE_OF_PLAY.md` (where everything stands), `docs/HANDOFF.md`
+(every command in one page).
+
+**The map, claim by claim.** Each claim this manual makes is listed here with the class of evidence behind it and the
+document that carries it, so that a reader can go from any sentence of the executive summary to the file that would have
+to be wrong for the sentence to be wrong.
+
+| Claim | Class | Where the evidence is | What would falsify it |
+|---|---|---|---|
+| The engine's six states stay inside their walls and settle | T / V (proof and test) | `docs/FORMAL_STATUS.md`, `docs/TRACKING_THEOREM.md`, `tests/`, `results/SOAK.json` | a trajectory leaving its wall, or the C++ twin disagreeing with the Python |
+| No write ever leaves a knob's cover; a blind sense holds; fail-up is immediate | T / V | `tests/test_shield_properties.py` (two million cases), the plug tests per stack | one case of a write past the cover or a give-back while blind |
+| On a real cluster the governor does more work inside the line, faster, on no more machines, at no more energy | L | the six Kubernetes tables in `results/live/`, A/B/C each, `docs/K8S_COMPASS_PREREGISTRATION.md` | a confirmed-worse row on work, speed, machines or energy in any of the six, which would stand in the table |
+| Killed outright, the governor's settings are back at the operator's within seconds | L | `results/live/V3_ROBUST_KILL.md`, `docs/ROBUSTNESS_PREREGISTRATION.md` | a repetition handed back after 60 s, or not at all |
+| Governing costs a few thousandths of a core at every size | L | `results/live/V3_OWN_COST.md` | an own-cost figure growing with the organism |
+| The pooler, the broker and the cache each gain on their untouched workloads | L | `V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`, each preregistration | a confirmed-worse product row on an untouched workload; the memory row of the cache is such a loss and stands |
+| The one number is +30.2% across the real categories, losses included | L, by rule | `results/OMNI_INDEX.md`, `tools/omni_index.py` | a category omitted, a loss not entered, a tuning row counted |
+| The modelled realms, grids, arms, buildings and swarms gain under their own native controllers | S | `results/realms/`, `V3_PANDAPOWER.md`, `V3_MUJOCO.md`, `V3_CITYLEARN.md`, `V3_SWARM.md` | a run of the same simulator at the same version and seed giving other digits |
+| A physical meter shows less energy for the same work | P | **no current result**; `docs/GPU_PREREGISTRATION.md` names the run | the rerun on the current card controller reading no difference or worse |
+| Omni-Compass never changes the engine between a rule and its result | by construction | `OMNI_V3.json`, `tools/omni_version.py --commit <sha>` on every table's commits | a table whose runs' commits carry different fingerprints |
+
+**What a referee asks of each document.** Of a preregistration: is it dated before the first counted run, does it name the
+tuning case and the untouched cases, is every amendment dated and does any amendment made after a result was seen say so?
+Of a three-run table: are the three run ids separate runs, does the head name the engine at each commit, is every gauge
+of the preregistration present including the ones that went against the governor, and is the reading one of the three the
+rule allows? Of the index: is every real category in it, is every tuning row out of it, and does a confirmed loss enter
+as a loss? Of the raw folder: does the SHA-256 manifest in it match the files, does the governor's audit show every
+decision with its reading and its write, and does the hand-back record read the operator's value? Every one of those
+questions has a yes in this program or a disclosure naming the exception; the disclosures are in section 16.7.
 
 **How to audit one result from this manual to its raw files.** Take any row of section 16. Its source column names a
 three-run table in `results/live/`; the table's head names the three GitHub run ids, the commit each ran on and the engine
