@@ -5,13 +5,13 @@
 
 Every measure of every test is a ratio oriented so that above 1 is better for Omni-Compass on top of native: work (more is better), speed (a lower response time), machines (fewer), energy (less). A test's index is the geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. Every number is read from the test's own three-run table (`results/live/V1_*.json` and `results/live/V3_*.json`, made by `tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/ycsb_abc.py` and `tools/sysbench_abc.py` from the three archived runs; `tools/omni_index.py`).
 
-## Headline: Omni-Compass on top of native, real machines, confirmed three times: **+23.5%** (more for the same, or the same for less, across work, speed, machines and energy)
+## Headline: Omni-Compass on top of native, real machines, confirmed three times: **+24.1%** (more for the same, or the same for less, across work, speed, machines and energy)
 
 A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): confirmed better or confirmed worse in all three runs counts, as the geometric mean of the runs' ratios; no difference beyond the noise counts as exactly 1, so nothing inside the noise is claimed either way. Real Kubernetes (Omni v3; the v1 tables read the same and stay in `docs/OMNI_V1.md`), the real database, real messaging, the real cache, the real database's storage-engine cache and the real database's buffer pool (Omni v3) are the real categories in; Azure and the card join as their three-run tables land. A category's tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it costs stands beside it. The law, controllers and runners are the same bytes in v1 and v3 (`docs/OMNI_V3.md`); each table names the engine it ran on.
 
 | Category | Index | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |
 |---|---:|---:|---:|---:|---:|---:|
-| Real Kubernetes (GitHub) | **+25.5%** | +19.3% | +92.9% | +4.3% | +2.6% | 6 |
+| Real Kubernetes (GitHub) | **+28.8%** | +19.3% | +106.7% | +4.7% | +2.2% | 7 |
 | Real database (PostgreSQL behind PgBouncer, GitHub) | **+14.2%** | +0.0% | +0.0% | +106.6% | -17.7% | 3 |
 | Real messaging (Apache Kafka, GitHub) | **+166.9%** | +17.5% | +14127.2% | -68.1% | -4.7% | 3 |
 | Real cache (Redis, GitHub) | **-24.9%** | +17.9% | +0.3% | -73.2% | +0.0% | 3 |
@@ -32,6 +32,7 @@ Read: every column points the same way, plus is good for Omni-Compass. "Fewer ma
 | Real Kubernetes (GitHub) | Fairness: a noisy neighbour, ten pairs, three runs | **+0.0%** | not taken | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | `results/live/V3_FAIRNESS.json` |
 | Real Kubernetes (GitHub) | Faults: machine down, spike, runaway pod, blind probe, ten pairs, three runs | **+31.7%** | not taken | +128.3% | no difference beyond the noise | no difference beyond the noise | `results/live/V3_FAULTS.json` |
 | Real Kubernetes (GitHub) | A queue of jobs: cruise, then the emergency brake, ten pairs, three runs | **+18.5%** | not taken | +13.6% | +25.8% | +16.5% | `results/live/V3_BATCH.json` |
+| Real Kubernetes (GitHub) | A public day of demand: the Google cluster trace of 2011 replayed one step at a time, ten pairs, three runs | **+50.0%** | not taken | +213.2% | +7.7% | no difference beyond the noise | `results/live/V3_TRACE_GOOGLE2011.json` |
 | Real database (PostgreSQL behind PgBouncer, GitHub) | pgbench `select`: the pooler's pool size, three paired repetitions, three runs | **+21.2%** | no difference beyond the noise | no difference beyond the noise | +164.1% | -18.2% | `results/live/V3_PGBENCH.json` |
 | Real database (PostgreSQL behind PgBouncer, GitHub) | pgbench `simple_update`: the pooler's pool size, three paired repetitions, three runs | **-5.3%** | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | -19.6% | `results/live/V3_PGBENCH.json` |
 | Real database (PostgreSQL behind PgBouncer, GitHub) | pgbench `tpcb_hot`: the pooler's pool size, three paired repetitions, three runs | **+29.7%** | no difference beyond the noise | no difference beyond the noise | +233.9% | -15.3% | `results/live/V3_PGBENCH.json` |

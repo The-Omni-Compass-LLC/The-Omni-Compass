@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **The public-trace test done, A/B/C on v3: a day of demand nobody here wrote reads the same way as our own schedules**
+  (`results/live/V3_TRACE_GOOGLE2011.md`, runs 37826513664, 37826518868, 37826522419, commit `13ee69e8`, 30 of 30 pairs
+  valid): p95 **−65% to −71%**, p99 −49% to −61%, mean −51% to −55%, time over the line −81% to −84%, failed requests −8% to
+  −17%, **machines in service −6% to −10%**, HPA replicas −5% to −6%, standby-model energy −4% to −7%, all confirmed better;
+  pods started +23% to +35% as point estimates, inside the noise in one run; no pod ever without a machine; 9 rows better, 0
+  worse. The Kubernetes category of the index moves to **+28.8%** over seven tests and the headline to **+24.1%**. The
+  preregistration carries the result and the comparison with the wandering test; register row 17, proof-program row 4, the
+  v3 record, state of play, README, the manual (3.5, 16.1, 16.6, 16.7, 16.8, the executive summary) and the dossier carry it.
 - **A public demand trace on the real Kubernetes cluster, preregistered and built** (`docs/TRACES_PREREGISTRATION.md`,
   `tools/trace_schedule.py`, `tests/test_trace_schedule.py`, `results/traces/google2011/`; register row 17, proof-program row 4):
   the first day of the Google cluster-usage trace 2011 (jobs submitted an hour, 18 public parts named with their SHA-256)
