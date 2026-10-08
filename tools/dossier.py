@@ -274,11 +274,13 @@ def main():
          "not counted.",
          "| Workload | Work inside the line | p95 | Buffer pool held, MB (the resource held) | Pages read from disk | Host CPU-seconds |",
          ("work_inside_line_tps", "p95_ms", "pool_mb_mean", "disk_reads", "cpu_seconds"),
-         "The first counted set: every gauge-row inside the noise in three runs, no error, and the pool handed back on 30 of 45 omni arms "
-         "only; the server was still withdrawing the blocks of a shrink when the restore was issued, which MySQL ignores, so the plug's "
-         "restore (not the law) is fixed and declared as an amendment and the second counted set runs on it, this table standing as it is. "
-         "The update_index work-inside-the-line row counts almost nothing in either arm (a single update's client round trip exceeds the "
-         "server-side 0.6 ms line) and is disclosed. The category enters the index at exactly 1. Table: `results/live/V3_SYSBENCH.md`."),
+         "The second counted set, on the amended plug: the pool held −67% on burst and −50% to −56% on read_only, confirmed better, with "
+         "work, latency and CPU inside the noise; on read_write the compass bought pool for a written working set and the pages held read "
+         "+53% to +70%, confirmed worse, counted against Omni in the index; the pool handed back on all 45 omni arms. The first counted set "
+         "(every row inside the noise; 15 of 45 arms not handed back because the plug's restore was issued while the server was still "
+         "withdrawing the blocks of a shrink, which MySQL ignores; the plug fixed and the fix declared) is kept whole in "
+         "`docs/history/V3_SYSBENCH_set1.md`. The update_index work-inside-the-line row counts almost nothing in either arm (a single "
+         "update's client round trip exceeds the server-side 0.6 ms line) and is disclosed. Table: `results/live/V3_SYSBENCH.md`."),
     )
     for fname, head, intro, header, keys, after in WORKLOAD_SECTIONS:
         p = ROOT / "results" / "live" / fname

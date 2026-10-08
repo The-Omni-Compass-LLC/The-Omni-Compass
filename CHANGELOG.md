@@ -8,6 +8,15 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **MySQL under sysbench, the second counted set A2/B2/C2 on the amended plug: the pool given back on read-mostly working sets,
+  bought on a written one, handed back on every arm** (`results/live/V3_SYSBENCH.md`, runs 37770617236, 37770620582,
+  37770624805, commit `a033fd09`, Omni v3): the pool held **−67% on burst and −50% to −56% on read_only, confirmed better**; on
+  read_write the pages holding data **+53% to +70%, confirmed WORSE**; work inside the line, p95, p99 and host CPU inside the
+  noise on every workload; no error; **the pool handed back and read back on all 45 omni arms**. 4 rows better, 1 worse, 0
+  disagree; the category enters the index at +12.2% and the headline moves to **+23.5%** over six real categories. The first
+  set's table (every row inside the noise, 15 arms not handed back) is kept whole in `docs/history/V3_SYSBENCH_set1.md`; the
+  preregistration carries both sets. Register row 24, proof-program row 11, the v3 record, state of play, README, the manual
+  (3.3, 3.5, 10.9, 16.4, 16.6, the executive summary, the evidence map) and the dossier carry the result.
 - **The fleet's seventh dispatch ran no arm; an inventory workflow for the subscription** (`docs/K8S_COMPASS_PREREGISTRATION.md`
   amendment 8; `.github/workflows/azure-inventory.yml`): repetitions 1 to 3 refused by Azure's cluster capacity in eastus as
   before (32 refusals across seven dispatches); repetitions 4 and 5 stopped at the pre-flight, which found only 2 of 10 vCPUs

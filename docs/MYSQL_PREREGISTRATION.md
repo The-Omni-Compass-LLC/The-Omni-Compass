@@ -235,6 +235,34 @@ row kept.** Dispatched 2026-10-08 11:31 UTC on commit `a033fd09` (Omni v3 by `to
 this note are in it, nothing in the engine): runs **A2 37770617236, B2 37770620582, C2 37770624805**, the same inputs as the
 first set (every workload, three repetitions, 20 s a notch). Nothing above this line changed after the dispatch.
 
+## The second counted set (runs A2, B2 and C2 of 2026-10-08): the result
+
+Runs 37770617236, 37770620582 and 37770624805, commit `a033fd09`, Omni v3 (the same 40 engine files as the first set), five
+workloads of three paired repetitions each, on the amended plug (`results/live/V3_SYSBENCH.md`; the first set's table is kept
+whole in `docs/history/V3_SYSBENCH_set1.md`). **The pool handed back and read back on all 45 omni arms.** On the four untouched
+workloads:
+
+- **burst:** the pool held **−67% in all three runs, confirmed better** (512 → 170 MB), the pages holding data −66%, confirmed
+  better; work inside the line, throughput, p95, p99 and host CPU inside the noise; misses from disk about double (shown);
+  three writes an arm.
+- **read_only:** the pool held **−50% to −56%, confirmed better** (512 → 258 MB), the pages holding data −50% to −54%,
+  confirmed better; work, latency and CPU inside the noise; misses +123% to +142% (shown).
+- **read_write:** the compass bought pool for the written working set: the pool held +59% to +79% as point estimates, one run
+  clear of zero (no difference beyond the noise in 2 of 3), and **the pages holding data +53% to +70%, confirmed WORSE**; p95
+  −11% to −18% and host CPU −4% to −5% as point estimates, inside the noise in two runs; misses −40% to −47% (shown); work
+  inside the line inside the noise.
+- **update_index:** every row inside the noise (run A2's omni arm used 78% more host CPU than its native arm, with an
+  interval of −59% to +215%; the other two runs read −1%); the "inside the line" row counts almost nothing in either arm, as
+  disclosed below.
+
+No error in any arm; no other writer seen. **4 gauge-rows confirmed better, 1 confirmed worse, 0 where the runs disagree.**
+The category enters the index at +12.2% (the first set had entered at +0.0%), the headline moving from +21.2% to +23.5%.
+What the two sets together say: the knob does what the law asks on read-mostly working sets that fit in less pool than the
+operator gave (the memory is given back, with no measurable cost in work, latency or CPU on these runners, where the data
+files sit in the operating system's page cache as well); on a written working set the compass buys pool, and the rule counts
+the memory held as worse whatever the latency did. A referee should read both sets, and the Redis result, as the same
+lesson: a memory knob trades memory, and the index charges for it.
+
 **The update_index line, disclosed and left as it is.** The transaction line is the statement line times the statements a
 transaction (0.6 ms × 1 for update_index), and it is the server's own statement latency that the compass reads; sysbench's
 histogram, which the "work inside the line" gauge is counted from, is client-side and includes the round trip, which for a
