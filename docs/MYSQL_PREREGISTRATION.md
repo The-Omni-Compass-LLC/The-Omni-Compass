@@ -34,7 +34,8 @@ different engine's console.
   the reading's source is plain). The version the runner finds is recorded in every result.
 - **sysbench** (Alexey Kopytov's sysbench, GPL, as Ubuntu's own `sysbench` package ships it, version 1.0 series) with its published
   OLTP scripts as shipped (`oltp_point_select`, `oltp_read_only`, `oltp_read_write`, `oltp_update_index`); only the table count, the
-  table size, the thread count, the offered rate and the run time are set from the command line.
+  table size, the thread count, the offered rate, the run time and the request distribution (uniform, for the reason the first
+  smoke run gave below) are set from the command line.
 - **The machine:** a GitHub Actions runner (4 cores, 16 GB): the server and sysbench share it. There is no watt-meter on it.
 
 Nothing here models a database. Omni-Compass writes one setting through the server's own console (`SET GLOBAL
@@ -47,8 +48,8 @@ For each workload six tables of 1,000,000 rows each are prepared once by sysbenc
 both arms read the same rows. Before every arm the server is restarted at the operator's configured pool and the operating
 system's page cache is dropped, so both arms start cold alike. The **working set** then steps one notch at a time, **1 2 3 2 3 4 5
 6 5 4 3 2 1 2 1**, 20 s a notch (the burst workload steps **1 6 1 8 1 6**): notch n lets sysbench range over the first n tables,
-about 240 MB at notch 1 and 1.4 GB at notch 6, so the working set fits the operator's pool at the low notches and outgrows it at
-the high ones. sysbench offers transactions at a **fixed rate** (its `--rate`, open-loop: the next transaction is due whatever the
+**drawn uniformly** (`--rand-type=uniform`), about 240 MB at notch 1 and 1.4 GB at notch 6, so the working set is the tables in
+use and fits the operator's pool at the low notches and outgrows it at the high ones. sysbench offers transactions at a **fixed rate** (its `--rate`, open-loop: the next transaction is due whatever the
 last one took) **from 32 threads**, the same in both arms, and counts every transaction's latency into its own histogram (buckets
 about 2% apart), from which the gauges are read.
 
@@ -131,6 +132,20 @@ ways. `tests/test_run_sysbench.py` and `tests/test_sysbench_abc.py`, run by `ver
 
 A one-repetition run of the tuning workload on GitHub's machine exercises the harness end to end before any counted run; its
 result is recorded here when it has run, and it is not counted.
+
+- **First smoke run (37745096028, 2026-10-08 07:42 UTC): ran end to end on the first try, and showed the design did not
+  reach the pool.** MySQL 8.0.46 from Ubuntu's package, sysbench 1.0.20; both arms answered about 2,930 transactions a second
+  inside the line with a mean of 0.18 to 0.22 ms and a p95 of 0.24 to 0.39 ms at every notch; native's pages holding data
+  reached 496 MB of its 512 MB only at the top notch and its pages read from disk were 34,524 over the whole arm, 3.8% of its
+  900,194 reads; omni, seeing calm and nothing read from disk, gave one chunk back in the first notch (512 to 384 MB) and
+  then held, its own misses 31,220, and handed the pool back. The cause is sysbench's shipped request distribution,
+  `special`, which sends three quarters of the requests to one percent of the rows, so the hot set stayed in a few dozen
+  megabytes whatever the tables in use; a benchmark in which the working set never reaches the operator's pool has nothing
+  for the knob to do and would read as a free memory saving, which is not the question. The same fault the YCSB test met
+  in its zipfian draw, met here in sysbench's. The one change, made here before any counted run: **rows are drawn
+  uniformly over the tables in use** (`--rand-type=uniform`), so the working set is the tables in use; the scripts' operation
+  mixes stay as shipped. A second smoke run follows; the statement line is confirmed or changed here on its figures before
+  the counted runs. Nothing in the rules, the gauges or the workloads changed.
 
 ---
 
