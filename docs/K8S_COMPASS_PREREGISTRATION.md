@@ -855,6 +855,14 @@ is a statement about the lever, not about the law. This run makes the lever big 
   run, nothing billed but the resource groups' minutes. The fleet is dispatched again unchanged; it runs when the region
   admits a cluster. The alternative, a second region, needs the subscription's regional vCPU allowance raised there, which
   only the account holder can request in the portal. Nothing else changes.
+- **Amendment 6 (2026-10-08 05:00 UTC, before the counted run).** The fifth dispatch (run 37724667075) was refused on its
+  first repetition after a forty-minute wait, the same `AKSCapacityHeavyUsage` in eastus, the twenty-third refusal; the
+  pre-flight passed, no arm ran. We cancelled the run ourselves at that point to weigh a second region, and the answer is in
+  the 6 October survey already on record (`big-organism-detached`, mode survey): eastus allows this subscription 32 vCPUs
+  and the v4 machine sizes, and every other region allows 10 vCPUs in all, which is five two-core workers, not a fleet of
+  forty. No other region can take this fleet until the account holder raises its allowance there. The fleet is therefore
+  dispatched a sixth time in eastus, unchanged in every input, and runs when the region admits a cluster. The cancellation
+  and the reason are recorded here so the count of dispatches reads right. Nothing else changes.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or

@@ -7104,6 +7104,14 @@ is a statement about the lever, not about the law. This run makes the lever big 
   run, nothing billed but the resource groups' minutes. The fleet is dispatched again unchanged; it runs when the region
   admits a cluster. The alternative, a second region, needs the subscription's regional vCPU allowance raised there, which
   only the account holder can request in the portal. Nothing else changes.
+- **Amendment 6 (2026-10-08 05:00 UTC, before the counted run).** The fifth dispatch (run 37724667075) was refused on its
+  first repetition after a forty-minute wait, the same `AKSCapacityHeavyUsage` in eastus, the twenty-third refusal; the
+  pre-flight passed, no arm ran. We cancelled the run ourselves at that point to weigh a second region, and the answer is in
+  the 6 October survey already on record (`big-organism-detached`, mode survey): eastus allows this subscription 32 vCPUs
+  and the v4 machine sizes, and every other region allows 10 vCPUs in all, which is five two-core workers, not a fleet of
+  forty. No other region can take this fleet until the account holder raises its allowance there. The fleet is therefore
+  dispatched a sixth time in eastus, unchanged in every input, and runs when the region admits a cluster. The cancellation
+  and the reason are recorded here so the count of dispatches reads right. Nothing else changes.
 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
@@ -9691,7 +9699,15 @@ Patent applications, copyright registrations and trademark applications filed in
 | `docs/` | this manual, the preregistrations, the evidence ledger, the theorem, the realm study |
 | `docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md` | what each engine is and every result read on it |
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and every benchmark still to run; the program to full size |
-| `.github/workflows/` | every benchmark as GitHub runs it: `benchmark-reps`, `six`, `six-kube`, `big-organism`, `big-organism-detached`, `aks-metered`, `pgbench`, `kafka`, `redis`, `swarm`, `citylearn`, `pandapower`, `mujoco`, `archive-run`, `verify` |
+| `.github/workflows/` | every benchmark as GitHub runs it: `benchmark-reps`, `six`, `six-kube`, `big-organism`, `big-organism-detached`, `aks-metered`, `pgbench`, `kafka`, `redis`, `ycsb`, `robustness`, `swarm`, `citylearn`, `pandapower`, `mujoco`, `archive-run`, `verify` |
+| `tests/`, `verify.py` | every unit and property test, the shield's adversarial cases, the Python-against-C++ agreement; `verify.py` runs them all and must end with its pass line |
+| `tools/omni_version.py`, `tools/release_manifest.py`, `tools/layout_check.py` | which engine a checkout or commit carries; the release manifest and verification as GitHub runs it; the check that every path the documents name exists |
+| `tools/confirm_abc.py` and its siblings (`pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | the three-run tables, one tool per kind of raw record, each checking the engine of every run it reads |
+| `tools/omni_index.py`, `tools/dossier.py`, `tools/own_cost.py` | the one number from the tables; the dossier from the tables; the governor's own cost from the archived audits |
+| `tools/legal.py` | the legal notice every generated report carries at its head and foot |
+| `docs/book/` | the builder of this manual's PDF (`build_book.py`) and the theory chapters bound into it |
+| `release/` | the copyright deposit and the release notes, printed at named commits |
+| `CHANGELOG.md`, `docs/STATE_OF_PLAY.md` | what changed, by date; where everything stands today |
 | `docs/*_PREREGISTRATION.md` | the rules of every benchmark, written before it ran, with every amendment and its time |
 | `docs/DOSSIER.md`, `docs/dossier/` | every result in one place, with its charts, built by `tools/dossier.py` from the tables |
 | `docs/HISTORY.md`, `docs/history/` | earlier states of play, earlier engines' sets and the pre-v1 index, kept whole |
