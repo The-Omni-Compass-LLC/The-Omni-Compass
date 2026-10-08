@@ -1464,8 +1464,38 @@ filed; no filing number appears anywhere.
 
 **Supply chain.** Everything the benchmarks download is pinned and checked: metrics-server by version and SHA-256
 (`scripts/kind_bench.sh`), Apache Kafka against the Apache Software Foundation's own SHA-512 file for that release,
-Redis as the Ubuntu runner's own package, gym-pybullet-drones at one named commit, Python packages by
+Redis as the Ubuntu runner's own package, MongoDB from its publisher's own repository signed by the publisher's key and
+YCSB against the SHA-256 written in its preregistration, gym-pybullet-drones at one named commit, Python packages by
 `requirements.txt`. A download whose checksum does not match stops the run before anything else happens.
+
+**The upgrade drill, step by step.** An operator who receives a new checkout does five things, in order, and stops at the
+first that fails. First, `python3 tools/omni_version.py`: if it prints the version the operator's results were made on, the
+engine is unchanged and the rest of the drill is about the harness; if it prints a list of differing files, the checkout
+is a new engine and nothing the operator measured before applies to it until measured again. Second, `python3 verify.py`,
+which must end with its pass line; the verifier runs every unit test, the shield's adversarial cases, the Python-against-C++
+agreement and the release manifest, and a checkout that fails it is not installed anywhere. Third, the wire check on the
+operator's own stack, which proves that every wire the new checkout would use still follows, reads back and returns.
+Fourth, watch mode for at least one full cycle of the operator's load, reading the log the governor would have written
+and comparing its would-be decisions against what the operator would have done. Fifth, the levels again from level one,
+each with its paired receipt. An upgrade that skips a step has not been upgraded; it has been installed.
+
+**The security hold, and who holds it.** The hold is the one control that outranks the governor's own judgment, and it
+is deliberately not the governor's to hold. It lives in a ConfigMap owned by another identity (the operator's security
+team, in practice); while its key reads true, every expansion the governor would make is blocked and every contraction is
+still allowed, so a governor under a hold can only give capacity back, never take more. The governor reads the hold on
+every decision and records in its audit that it read it; it has no verb that could write it. The kill switch (section 11)
+is the blunter instrument beside it: the hold constrains a running governor, the switch stops every governor on the machine
+and hands everything back. An operator who suspects anything untoward uses the switch first, reads the audit second, and
+rotates the governor's identity third; the hold is for the slower case of a change window or an incident elsewhere during
+which no one wants capacity added.
+
+**What has been reviewed, and what has not.** Reviewed and tested on every run: the governor's permissions against the
+list above, read from the cluster itself; the shield's refusal of every write past a cover, of every give-back while
+blind, and of every move under a hold, on two million generated cases; the lease and the watchdog's hand-back on a real
+cluster, thirty times (section 16.4b); the checksums of every download. Not yet done, and said so: an independent
+security review of the code by a party outside the company, which is in the open program (section 16.8), and a
+penetration test of the deployed governor on a customer-like cluster. Until those are done, the operator's own review
+stands in for them, and this section tells the operator exactly what to look at.
 
 ---
 
@@ -1516,6 +1546,36 @@ a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on G
    log, one SHA-256 manifest per repetition) are copied into `results/live/raw/run-<id>/` by the `archive-run`
    workflow (one run id per line in `.github/archive_request.txt`; a run still going is left for a later pass), and
    every table names the runs and the commit it was made from.
+
+**How many repetitions, and why.** The width of a paired interval shrinks with the square root of the number of pairs,
+so going from five pairs to ten narrows it by about a third, and from ten to forty by half again. On GitHub's runners,
+ten pairs of a 900 s window put the interval on work inside the line at about ±10 points of native and on p95 at ±13
+to ±29 points (the all-four table: +48.6% with an interval of +38.7 to +58.4; p95 −61.6% with −74.8 to −48.4), wide
+intervals that still confirm because the gains are tens of percent; the energy intervals on the same runs are ±0.2 to
+±3%, narrow because the gauge is a declared formula over counts of machines, and that is why energy there reads "no
+difference beyond the noise" honestly rather than as a small claimed gain. A gain of a few percent on a cluster would
+need forty pairs or more to confirm at these widths, and the manual does not claim one anywhere a table shows it
+inside the noise. Three pairs of a 7,200 s window, the long run's shape, give a wider interval on each run
+but three such runs, each read on its own, still have to agree in sign for a confirmed reading. On a stack with a finer
+knob (connections, consumers, megabytes) the intervals are narrower at three pairs than the cluster's at ten, because
+the knob moves in hundreds of small steps rather than in whole machines. An operator planning their own receipt should
+run five pairs first, look at the interval widths on the gauges they care about, and set the count for the published
+run from those widths, never from the result.
+
+**Why the load is open-loop.** A closed-loop load generator waits for each answer before sending the next request, so
+a slower system is offered less work and its throughput "improves" its own latency; two arms under closed-loop load are
+not doing the same work. An open-loop generator sends requests at fixed moments whatever the system does, so both arms
+are offered the same work to the request, a queue forms when the system falls behind, and the time over the line and
+the failed requests record the cost. Every real-stack test in this program (the cluster's load generator, pgbench's rate
+limit, Kafka's producer at a fixed rate, Redis and YCSB at a fixed target rate) offers its work open-loop, and a lower
+resource count in the omni arm can therefore never mean less work was asked.
+
+**What a receipt looks like.** One row per gauge: the gauge's name and direction; native's value and omni's; the paired
+change as a percentage of native with its 95% interval; the reading. A head naming the system, the knob, the cover, the
+window, the number of pairs, the order rotation, the engine's fingerprint and the commit; a foot saying whether every
+arm was handed back and whether any repetition was off the clock. `tools/live_reps.py` prints exactly this for a
+Kubernetes run and the three-run tools print it for three runs side by side; a receipt from any other tool should be
+laid out the same way so that a reader of this manual can read it without learning a new shape.
 
 ## 14. Evidence Classes and How to Read a Result
 
