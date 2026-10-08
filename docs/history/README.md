@@ -16,5 +16,6 @@ Each page here is kept as written on its date. None is current: where one differ
 | [`HANDOFF_CHAPTER.md`](HANDOFF_CHAPTER.md), [`HANDOFF_EARLIER.md`](HANDOFF_EARLIER.md) | Earlier handoff notes |
 | [`PROBLEM_MAP_2026-09.md`](PROBLEM_MAP_2026-09.md) | The September 2026 problem map |
 | [`AMENDMENT_RISING_STEP_CAP.md`](AMENDMENT_RISING_STEP_CAP.md) | A proposed amendment, declined |
+| [`V3_SYSBENCH_set1.md`](V3_SYSBENCH_set1.md) | MySQL under sysbench, the first counted set (8 October 2026): every row inside the noise; the hand-back read NO on 15 of 45 omni arms through the plug's restore, fixed and rerun as the second set, which `results/live/V3_SYSBENCH.md` carries |
 | [`OMNI_COMPASS_TECHNICAL_MANUAL.pdf`](OMNI_COMPASS_TECHNICAL_MANUAL.pdf) | The earlier technical manual |
 | [`xpass/`](xpass) | The earlier XPASS package indexes |
