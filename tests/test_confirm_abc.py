@@ -36,7 +36,7 @@ def main():
         d = Path(t) / "run-123" / "live-reps"; d.mkdir(parents=True)
         (d / "LIVE_REPS.json").write_text(json.dumps({"repetitions": {"native": ["1", "2", "3"], "compass": ["1", "2"]},
                                                        "means": {}, "paired": {"compass": {P95: better}}}))
-        run, paired, n = C.load(d.parent)
+        run, paired, n, _ = C.load(d.parent)
         assert (run, n, paired[P95]["diff"]) == ("123", 2, -150), (run, n)
     assert C.engine("1")[1] == "unknown", "a run whose commit cannot be read is never called v1 (GitHub's gh prints nothing for it)"
     assert C.verdict(C.CAPACITY, [r(18.6, 9.0, 6.0, 12.0)] * 3) == "**confirmed better**", "more work inside the line is better"
@@ -48,7 +48,7 @@ def main():
         d = Path(t) / "run-124" / "live-reps"; d.mkdir(parents=True)
         (d / "LIVE_REPS.json").write_text(json.dumps({"repetitions": {"native": ["1"], "compass": ["1"]}, "means": {}, "paired": {"compass": {}},
                                                        "capacity": {"native": {"capacity_rps": 18.6}, "compass": {"capacity_rps": 27.6, "change_pct": 48.4, "ci95": [6.0, 12.0]}}}))
-        _, paired, _ = C.load(d.parent)
+        _, paired, _, _ = C.load(d.parent)
         assert paired[C.CAPACITY]["diff"] == 9.0 and paired[C.CAPACITY]["significant"], "the capacity block becomes a judged row"
     print("PASS  A/B/C confirmation rule: confirmed only with the same sign and every interval clear of zero in all three; "
           "an interval over zero reads no difference beyond the noise; clear runs pointing different ways read as a disagreement")

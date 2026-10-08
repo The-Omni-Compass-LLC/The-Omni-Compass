@@ -1,0 +1,117 @@
+# Robustness: the governor killed outright, the long run, and its own cost, preregistered
+
+> **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
+> commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
+> Omni-Compass Enterprise License. Patent applications, copyright registrations and trademark applications have been
+> filed in the United States by The Omni-Compass LLC. See `LICENSE` and `NOTICE`.
+
+> `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
+
+Written 2026-10-08, before any counted run. This is register row 31 (robustness, every platform) and proof-program row 9.
+It is not a benchmark of a gain: it is a benchmark of Omni-Compass itself, of what it leaves behind when it dies, of
+whether it drifts or leaks over hours, and of what it costs to run. Native is the same cluster with no governor, as in every
+Kubernetes test (`docs/K8S_COMPASS_PREREGISTRATION.md`); omni is the compass law on the HPA target and the machines,
+frozen as Omni v3. **No engine file changes for this benchmark**: the harness (`scripts/kind_bench.sh`, `tools/live_reps.py`,
+`tools/omni_switch.py`) is extended; `omni_controller/`, `omnicompass/` and `realms/` are the v3 bytes, which
+`tools/omni_version.py` confirms on every run. The readings are the three-run readings of `docs/OMNI_V1.md`; every row is
+reported, losses included.
+
+## Why this benchmark
+
+A supervisory governor earns its place by what happens when it fails. Three questions an underwriter asks before any gain
+is weighed: if the governor is killed outright while it holds a knob away from native, who puts the knob back, and how
+fast? Over hours, does it drift, hold settings it should have given back, or grow in memory? And what does it cost in CPU
+and memory to have it there? The code that answers the first question exists (`omnicompass/master.py`: every governor
+records, before its first write, the command that puts every setting back, and renews a lease every decision;
+`tools/omni_switch.py watchdog` runs that command for a governor whose process is gone or whose lease has run out), and it
+is tested without a cluster. This benchmark measures it on a real cluster, in the middle of a governed run, three times.
+
+## What is someone else's
+
+Everything the six Kubernetes tests use (`scripts/kind_bench.sh`): kind, Kubernetes with its HPA and scheduler,
+metrics-server pinned by SHA-256, a PHP service, a load generator at a fixed rate, a response-time probe; one 4-core
+GitHub runner for both arms, order rotated by repetition. The watchdog is ours (`tools/omni_switch.py`), and it is part of
+what is tested.
+
+## Arms
+
+- **native**: the cluster with its HPA alone, for the whole window; nothing to kill. The kill moment is a time mark used
+  only to compare the same window of the two arms.
+- **omni**: the compass law on the HPA target and the machines (the all-four wiring), with the watchdog running beside the
+  governor from the start of the arm (`python3 tools/omni_switch.py watchdog --every 5`, its registry inside the arm's own
+  folder so it sees this arm's governor and no other).
+
+## Scenario 1: the governor killed outright (the lease)
+
+- **The window**: 900 s after the usual 120 s warm-up, the wandering test's load schedule (`1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1`, each step 36 s), ten paired repetitions a run, three runs.
+- **The kill**: at 40% of the window (360 s), the governor process receives SIGKILL. It has no chance to hand back; its
+  registry record stays behind with a dead process id. Native receives nothing at that moment.
+- **The hand-back**: the watchdog's next pass (within 5 s) finds the dead governor and runs its recorded restore command
+  (`omni_controller.controller --restore-only`, which restores from the snapshot annotations on the objects themselves).
+  The harness polls the cluster once a second from the moment of the kill and records the first second at which **every**
+  setting is at the operator's: the HPA target at 50, the replica range as set, every serving pod's CPU limit at its shipped
+  value, every worker in service, and no `omnicompass.io/` annotation left on the HPA or the deployment.
+- **The second governor**: at 50% of the window (450 s) a new governor is started with the same command and governs to the
+  end of the window. Its snapshot must read the operator's settings, because the hand-back put them there.
+- **The end**: the usual reset and reset check.
+
+### Gauges, scenario 1
+
+| Gauge | Direction |
+|---|---|
+| seconds from the kill to every setting back at the operator's (omni only) | **lower is better; shown with its interval**; an arm not handed back within 60 s reads **WORSE**, and an arm never handed back is INVALID and a loss |
+| settings after the hand-back equal the operator's; no record left (omni only) | **any failure is WORSE** |
+| the second governor's snapshot equals the operator's settings (omni only) | **any difference is WORSE** |
+| time over the response line and failed requests in the 120 s after the kill, native against omni | lower is better (the paired reading, as the fault test reads its windows) |
+| the whole window's gauges, as in every Kubernetes test: work inside the line, p95, p99, time over the line, failed requests, machines, standby-model energy | by the usual directions: a governor killed and restarted mid-run must not leave omni worse than native over the window |
+| the watchdog's own record: which governor, hung or dead, which commands, each exit code | shown |
+
+## Scenario 2: the long run
+
+- **The window**: 7,200 s an arm (eight times the usual window), the wandering schedule repeated eight times (200 steps of
+  36 s), three paired repetitions a run, three runs; both arms in one GitHub job (about 4.3 hours, inside the six-hour
+  limit). The 24-hour run on a rented machine follows the same rules later, through `big-organism-detached`'s pattern.
+- **What is watched**: the governor's resident memory, sampled every 15 s by the harness from the process table (never by
+  the governor itself, so no engine file changes); its decision count and failed decisions from its audit; the knob's
+  position over time; the reset at the end.
+
+### Gauges, scenario 2
+
+| Gauge | Direction |
+|---|---|
+| the whole window's gauges, as in every Kubernetes test | by the usual directions |
+| governor resident memory, mean of the last ten minutes over the mean of the first ten (omni only) | shown; a growth of more than a quarter reads **WORSE** (a leak) |
+| decisions made of expected; failed decisions (omni only) | shown; fewer than 95% of expected is INVALID; any failed decision is shown with its reason |
+| decision time, mean of the last hour against the first (omni only) | shown; a growth of more than half reads **WORSE** |
+| every setting handed back at the end, read back (omni only) | **any failure is WORSE** |
+
+## Scenario 3: the governor's own cost at 1, 10, 100 and 1,000 copies
+
+The governor's own CPU (its process and every command it ran, as a share of one core over the window) is already recorded
+in every omni arm's audit (`"overhead"`), and reported as "Omni's own CPU (cores), mean" in every Kubernetes table, shown
+and not judged. This scenario tabulates it across sizes from the runs already archived: the six organisms with the real
+cluster inside at 1, 10 and 100 copies (`results/live/raw/run-37501769448/`, v3) and at 1,000 copies on the rented machine
+(v1, labelled as such), by `tools/own_cost.py`, with the host's core count beside it. Nothing is rerun for it; the table
+says which engine each cell is from, and never reads across them.
+
+## Runs
+
+Scenario 1: workflow `robustness`, `scenario=kill`, ten paired repetitions as separate jobs on separate runners, three
+separate runs (A, B, C) on the frozen engine; the table `tools/confirm_abc.py` with the robustness rows added
+(`tools/live_reps.py`, `robust_table`), written to `results/live/` as V3_ROBUST_KILL.md. Scenario 2: `scenario=long`,
+three paired repetitions, three runs, V3_ROBUST_LONG.md in the same place. Scenario 3: `results/live/V3_OWN_COST.md` from
+the archived files (`tools/own_cost.py`). `tests/test_robust.py`, run by `verify.py`, proves the kill and hand-back marks,
+the window reading, the memory rule and the three-run rows on fixed cases without a cluster.
+
+## What is declared before the first run
+
+The 60-second hand-back allowance is the sum of the watchdog's pass (5 s), the restore command's own run (one kubectl per
+setting, a few seconds) and the cluster's time to carry out the node un-taint and the HPA patch; it is set here, before the
+run, and if the hand-back takes longer the row reads WORSE and the reason is looked into. The memory rule (a quarter) and
+the decision-time rule (a half) are set here too. No rule is fitted on a result; there is no tuning case in this benchmark
+because nothing is tuned.
+
+---
+
+© 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
+Enterprise License. Patents, copyrights and trademarks filed in the USA.

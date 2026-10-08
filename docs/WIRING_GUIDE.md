@@ -94,7 +94,7 @@ A PodDisruptionBudget on each service is required, because drains go through the
 | Native vs Omni on top vs Omni alone, paired on one machine, real Kubernetes | `results/live/LIVE_PAIRED.md` |
 | The full wiring manual | `docs/OPERATOR_MANUAL.md` |
 | The frozen engine's results, three runs each, read by rule | `results/live/V1_*.md`, `results/live/V3_*.md`; `docs/OMNI_V1.md`, `docs/OMNI_V3.md` |
-| The same wiring on Azure's managed Kubernetes (the bill), a database pooler, a rented machine, the simulators | the manual, section 10 (`docs/OMNI_COMPASS_MANUAL.md`) |
+| The same wiring on Azure's managed Kubernetes (the bill), a database pooler, a rented machine, the simulators, a message broker's consumer group, a cache's memory ceiling, a drone swarm's autopilot | the manual, section 10 (`docs/OMNI_COMPASS_MANUAL.md`) |
 
 ---
 

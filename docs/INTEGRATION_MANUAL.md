@@ -208,6 +208,9 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | Building management (cooling, power meters) | 7 | through your BMS's command line or API, wrapped in the command templates |
 | Azure AKS, the bill as the gauge | 1-3 | Azure's managed cluster autoscaler stays native and deletes the machines Omni-Compass idles; one or several work pools (`worker_pools`), the replica ceiling raised with the fleet (`hpa_max`); a fleet of 4 cannot show a saving of one machine, 39 can (manual, section 10.1; `docs/AZURE_SETUP.md`) |
 | PostgreSQL behind PgBouncer, or any pooler with a console | one knob | the pool size through the pooler's own admin console, cover [2, 90], one writer, restored on OFF (manual, section 10.2; `docs/POSTGRES_PREREGISTRATION.md`) |
+| Apache Kafka, or any consumer group an operator sizes | one knob | the consumer count inside [1, partitions], the group's own end-to-end latency as the reading, the rebalance paid on every move, handed back on OFF (manual, section 10.5; `docs/KAFKA_PREREGISTRATION.md`) |
+| Redis, or any cache with a console and a memory ceiling | one knob | `maxmemory` through the cache's own console, cover [16, 512] MB, grown only while the cache is full (a cold miss is not the ceiling's), one writer, restored on OFF (manual, section 10.6; `docs/REDIS_PREREGISTRATION.md`) |
+| Drone swarms (gym-pybullet-drones; PX4 and ArduPilot next) | one knob a drone | the cruise override inside the autopilot's limits, a separation wall, the paired physics trial, collisions void the cell (manual, section 10.7; `docs/SWARM_PREREGISTRATION.md`) |
 | A rented cloud machine running the big organisms | the whole harness | `big-organism-detached`: start, collect, survey; the clock rule sets the window (manual, section 10.4) |
 | Independent simulators (CityLearn, pandapower, MuJoCo) | one knob each | the simulator's own controller is native; preregistered, A/B/C (manual, section 10.3) |
 

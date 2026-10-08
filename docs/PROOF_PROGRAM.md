@@ -57,7 +57,7 @@ and preregistration not yet written). Every "to build" item names the open nativ
 | 6 | CPU power with a real meter | Linux cpufreq, schedutil governor | frequency ceiling and power cap inside the governor | energy from RAPL (class P), work, p95 | one rented bare-metal machine, about $10 | to build |
 | 7 | GPU: one card; the card inside 1,000 copies; eight cards; vLLM serving (MLPerf-style) | the card's own power limit and clocks; vLLM as shipped | power limit, clock ceiling, admission | the card's own meter (class P), work, p95 | Lambda, about $60 | ready; founder runs |
 | 8 | HPC job scheduling | Batsim with EASY backfilling on Parallel Workloads Archive logs | node power-down, admission | makespan, wait, node-hours, energy | free | queued |
-| 9 | Robustness, every platform | as the platform | none: the test is of Omni itself | 24-hour run; Omni killed mid-run and the dead-man lease; Omni's own CPU and memory at 1, 10, 100 and 1,000 copies | free | to build |
+| 9 | Robustness, every platform | as the platform | none: the test is of Omni itself | the governor killed mid-run and the lease (seconds to hand back, the 120 s after the kill); the long run (memory, decisions); Omni's own CPU at 1, 10, 100 and 1,000 copies | free (the 24-hour run on a rented machine about $3) | **preregistered and built** (`docs/ROBUSTNESS_PREREGISTRATION.md`); the own-cost table done from the archives (`results/live/V3_OWN_COST.md`); the kill and long scenarios run as A, B and C on v3 next |
 
 ### 3.2 Distribution and specialized
 
