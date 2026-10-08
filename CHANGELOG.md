@@ -29,6 +29,14 @@
   (`tools/own_cost.py`, `results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size). `tools/live_reps.py`
   gains the robustness rows and `tools/confirm_abc.py` the three-run rows for them; `tests/test_robust.py` in
   `verify.py`. No engine file changes: `omni_controller/`, `omnicompass/` and `realms/` are the v3 bytes.
+- **Robustness, the kill scenario, confirmed three times** (`results/live/V3_ROBUST_KILL.md`, runs 37716845219,
+  37716859133, 37716872788, all omni-v3 at `bd389c409ad9`, 10 pairs each): the governor killed with SIGKILL at 40% of the
+  window in every repetition; the watchdog's hand-back put every setting back at the operator's 7 to 11 s later in 30 of
+  30 (mean 9 s; allowance 60 s); a second governor started and governed to the end in every one; the 120 s after the kill
+  read no difference beyond the noise against native in all three runs; the whole window, a kill and a restart inside it,
+  read mean response −32% to −39%, p95 −42% to −45%, time over the line −28% to −34% and failed requests −9% to −15%,
+  confirmed better; machines and energy inside the noise. The register, the proof program, the engine page, the state of
+  play and the manual (3.5, 16.4b, 16.8, the results table) carry it; the long run (3 pairs × 3 runs) is running.
 - **YCSB on MongoDB, preregistered and built** (`docs/YCSB_PREREGISTRATION.md`, `tools/run_ycsb.py`, `tools/ycsb_abc.py`,
   workflow `ycsb`, tests in `verify.py`; register row 24): MongoDB 8.0 from its publisher's signed repository with the
   operator's 512 MB WiredTiger cache as native; Omni on the cache size inside [256, 2,048] MB through the server's own

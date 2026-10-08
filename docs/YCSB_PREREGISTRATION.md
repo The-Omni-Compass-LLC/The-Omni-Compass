@@ -42,10 +42,12 @@ in it, the pages read into it, and its own operation latencies) and what YCSB it
 For each workload the dataset is loaded once (YCSB's own `load`, 1 KB records, as many as the highest notch needs), and both
 arms read the same records. Before every arm the server is restarted at the operator's configured cache and the operating
 system's page cache is dropped, so both arms start cold alike. The **key space** then steps one notch at a time, **1 2 3 2 3 4 5 6 5
-4 3 2 1 2 1**, 20 s a notch (the burst workload steps **1 6 1 8 1 6**): notch n lets YCSB's distribution range over the first n ×
-250,000 records, about 275 MB in the cache at notch 1 and 1.6 GB at notch 6, so the working set fits the operator's cache at the
-low notches and outgrows it at the high ones. YCSB offers **3,000 operations a second from 32 threads** at every notch, the same in
-both arms, and records every operation's latency (`measurementtype=raw`).
+4 3 2 1 2 1**, 20 s a notch (the burst workload steps **1 6 1 8 1 6**): notch n lets YCSB range over the first n × 250,000
+records, **drawn uniformly**, about 275 MB in the cache at notch 1 and 1.6 GB at notch 6, so the working set is the key space and
+fits the operator's cache at the low notches and outgrows it at the high ones (the workloads' read, update and read-modify-write
+mixes stay as YCSB ships them; the request distribution is the one setting changed, for the reason the smoke run gave below). YCSB
+offers **3,000 operations a second from 32 threads** at every notch, the same in both arms, and records every operation's latency
+(`measurementtype=raw`).
 
 ## Arms
 
@@ -118,6 +120,18 @@ result is recorded here when it has run, and it is not counted.
   the load phase could not open the file (the path is now absolute); and the server's log was copied into the artifact as a
   root-owned file the upload step could not read. MongoDB 8.0.32 installed from its publisher's repository and YCSB's
   checksum matched. Nothing in the rules, the gauges or the workloads changed.
+- **Second smoke run (37720412929, 03:00 UTC): ran end to end, and showed the design did not touch the cache.** With YCSB's
+  shipped zipfian distribution (constant 0.99) the hot set stayed in a few megabytes whatever the notch's key space: at the
+  top notch of 1.5 million records the cache held **36 MB** of its 512 MB, 1,300 pages were read into it over the whole arm,
+  both arms answered 2,890 operations a second inside the line with p95 0.20 ms, and omni, seeing calm and nothing evicted,
+  gave memory back to 258 MB with no cost and nothing to mend. A benchmark in which the working set never reaches the
+  operator's cache has nothing for the knob to do and would read as a free memory saving, which is not the question. The
+  one change, made here before any counted run: **the requests are drawn uniformly over the notch's key space**, so the
+  working set is the key space (`requestdistribution=uniform`); the workloads' operation mixes stay as shipped. The runner
+  also prints each notch's mean, p95 and cache figures, so the third smoke shows where the line should sit; if the tuning
+  workload shows the 2 ms line or the 0.4 center to be wrong for this stack, the change is written here before the
+  counted runs, with the figures that led to it. The host's CPU-seconds in this smoke read 239 s native against 188 s
+  omni on one repetition, a difference the counted runs will judge.
 
 ---
 

@@ -4843,6 +4843,23 @@ console as omni, a tuning workload shown and not counted, and untouched workload
   ceiling was handed back. 12 gauge-rows better, 6 worse, 0 where the runs disagree. The tuning workload, shown and not
   counted, read the same way (hit rate 75% to 87%, the ceiling 64 to 299 MB).
 
+### 16.4b Robustness: the governor killed outright, and its own cost
+
+The robustness benchmark (`docs/ROBUSTNESS_PREREGISTRATION.md`) is a test of Omni-Compass itself, not of a gain. In the
+kill scenario (`V3_ROBUST_KILL.md`, ten pairs in each of three runs), the governor received SIGKILL at 40% of a 900 s
+window on the wandering load, with the watchdog running beside it from the start as it would in service. In all thirty
+repetitions the watchdog found the dead lease on its next pass, ran the governor's recorded restore command, and every
+setting (the HPA target, the replica range, every pod's CPU limit, every worker, the records on the objects) was back at
+the operator's **7 to 11 s after the kill**, mean 9 s against a preregistered allowance of 60 s; a second governor started
+at 50% and governed to the end in every repetition; and the 120 s after the kill read no difference beyond the noise
+against native's same window in all three runs, so the service did not measurably notice the governor's death. The whole
+window, with a kill and a restart inside it, still read mean response 32% to 39% faster, p95 42% to 45% faster, time over
+the line 28% to 34% lower and failed requests 9% to 15% fewer, confirmed better, with machines and energy inside the noise.
+The governor's own CPU over every archived run with the real cluster inside (`V3_OWN_COST.md`) is 0.006 to 0.013 of one
+core at every size from 1 to 1,000 copies, 0.1% to 0.3% of the host's cores, each run under its own engine; the cost of
+governing a real cluster does not grow with the modelled organism around it. The long run, eight windows with the
+governor's memory and decisions watched, runs as A, B and C as this edition is written.
+
 ### 16.5 The modelled realms and the independent simulators
 
 Every result here is evidence class S: a statement about a published model under its own native controller, never about
@@ -4916,12 +4933,14 @@ themselves, which is why every row is in its table.
 | **Drone swarms, gym-pybullet-drones** (Crazyflie 2.x, the shipped autopilot as native; Omni on the cruise override inside the autopilot's limits), 20 drones × 4 missions, three cells, A/B/C | v3 | S | energy a mission −7% (short), −18% (mixed), −20% (long) and missions a charge +8% to +25%, confirmed better; no late mission, reserve breach, near miss or collision in any arm; tracking error 0.07 → 0.13 m inside its 0.25 m band | `results/live/V3_SWARM.md` |
 | **Apache Kafka as shipped, a consumer group's operator-set size** (one broker, 8 partitions; the group at the operator's 2 consumers as native; Omni on the count inside [1, 8]), three untouched workloads, 3 pairs × 3 runs | v3 | L | work inside the 500 ms line **+16% to +21% confirmed better** on all three; end-to-end p95 1.6 s → 9 to 14 ms and mean lag −92% to −97% confirmed better; no message lost in any arm; consumers held 2 → 5.8 to 7.9 **confirmed worse** (the resource the gain costs); host CPU-seconds confirmed worse on light (+10% to +20%), inside the noise on heavy and burst; every count handed back; 21 gauge-rows better, 8 worse | `results/live/V3_KAFKA.md` |
 | **Redis as shipped, a cache's operator-set memory ceiling** (64 MB, allkeys-lru as native; Omni on the ceiling inside [16, 512] MB through Redis's own console, grown only while the cache is full), three untouched workloads, 3 pairs × 3 runs | v3 | L | work inside the 2 ms line **+14% to +27% confirmed better** on all three; hit rate +14% to +27% and mean latency −30% to −61% confirmed better; no failed request; the memory ceiling held 64 → 200 to 270 MB and the memory used **confirmed worse** (the resource the gain costs); p95 within a hair of native's; host CPU inside the noise; every ceiling handed back; 12 gauge-rows better, 6 worse | `results/live/V3_REDIS.md` |
+| **Robustness: the governor killed outright mid-run** (SIGKILL at 40% of the window, the watchdog beside it), 10 pairs × 3 runs | v3 | L | every setting back at the operator's **7 to 11 s after the kill in 30 of 30 repetitions** (allowance 60 s), a second governor to the end in every one, the 120 s after the kill inside the noise against native; the whole window still confirmed better on mean response, p95, time over the line and failed requests | `results/live/V3_ROBUST_KILL.md` |
+| **The governor's own cost** at 1, 10, 100 and 1,000 copies with the real cluster inside | v3 and v1, each under its own engine | L | 0.006 to 0.013 of one core at every size, 0.1% to 0.3% of the host's cores; shown, not judged | `results/live/V3_OWN_COST.md` |
 | **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
 | GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
 **Running now** (8 October): the four stacked at 1,000 copies on the detached machine; the robustness test
-(`docs/ROBUSTNESS_PREREGISTRATION.md`), its one-repetition smoke run passed and the kill and long scenarios running as A, B
-and C; YCSB on MongoDB (`docs/YCSB_PREREGISTRATION.md`), its smoke run first and then A, B and C; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
+(`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario done (section 16.4b) and the long run running as A, B and C;
+YCSB on MongoDB (`docs/YCSB_PREREGISTRATION.md`), its smoke run first and then A, B and C; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
 subscription's family allowances before any arm ran, the next by Azure's own cluster capacity in eastus; the fleet is
 rebuilt from the families the survey shows allowed). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
 defense edge (PX4 and ArduPilot multi-vehicle, Crazyswarm), databases and caches at large (YCSB, HammerDB), Spark,
@@ -4985,13 +5004,9 @@ Three things this manual does not show, and the program that will show them or s
 - **The real card.** Every earlier GPU result ran on a controller since replaced. The two-wire governor with the verdict
   runs on rented cards at one named commit, with the wire check first (`docs/GPU_RUN_GUIDE.md`,
   `docs/GPU_PREREGISTRATION.md`); until then the card has no result and the manual says so.
-- **Robustness as a measured result.** The lease, the watchdog and the kill switch exist in code and are tested; the
-  benchmark that kills the governor outright in a governed run, measures the seconds to hand-back and what the service
-  saw, runs the governor for hours against drift and leaks, and prices its own CPU at 1, 10, 100 and 1,000 copies, is
-  preregistered (`docs/ROBUSTNESS_PREREGISTRATION.md`, register row 31) with its harness built (`scripts/kind_robust.sh`,
-  workflow `robustness`) and runs next. Its third part needs no new run: the governor's own CPU, from the audits of the
-  runs already archived, is 0.006 to 0.013 of one core at every size from 1 to 1,000 copies, 0.1% to 0.3% of the host's
-  cores (`results/live/V3_OWN_COST.md`; shown, not judged, each run under its own engine).
+- **Robustness over hours.** The governor killed outright is now a measured result (section 16.4b: every setting back in
+  7 to 11 s, thirty times out of thirty) and its own cost is tabulated; what remains open is the long run, eight windows on
+  GitHub (running as A, B and C) and then 24 hours on a rented machine, for drift and leaks.
 
 The queue beyond these, in order, is `docs/REGISTER.md` section 4, one or two at a time, each preregistered before it
 runs: PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour run, Basilisk, Orekit and
@@ -8245,6 +8260,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | PostgreSQL behind PgBouncer, three workloads | inside the noise | inside the noise | connections held open **−61% to −72%** on two workloads; the runs disagree on the third | host CPU-seconds **+14% to +28%, confirmed worse** | `results/live/V3_PGBENCH.md` |
 | Apache Kafka, a consumer group's size, three workloads | work inside the line **+16% to +21%**; no message lost | p95 **1.6 s → 9 to 14 ms**, lag −92% to −97% | consumers held **2 → 5.8 to 7.9, confirmed worse** | host CPU-seconds +10% to +20% confirmed worse on light, inside the noise on heavy and burst; CPU per message inside the line −10% to −12% on burst | `results/live/V3_KAFKA.md` |
 | Redis, a cache's memory ceiling, three workloads | work inside the line **+14% to +27%**, hit rate +14% to +27%; no failed request | mean latency −30% to −61%; p95 within a hair of native's (a miss is a miss in both arms) | memory ceiling held **64 → 200 to 270 MB, confirmed worse** | host CPU-seconds inside the noise on all three | `results/live/V3_REDIS.md` |
+| Robustness: the governor killed outright at 40% of the window, 10 pairs × 3 runs | **every setting back at the operator's 7 to 11 s after the kill, 30 of 30**; a second governor to the end; failed requests over the window −9% to −15% | the 120 s after the kill inside the noise against native; the whole window p95 −42% to −45% | inside the noise | inside the noise | `results/live/V3_ROBUST_KILL.md` |
 | The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell | the organisms' work unchanged | p95 better in every cell | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
 
 ### Measured on a real cloud (Azure, its own bill), Omni v1
@@ -8289,10 +8305,10 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack runs on a rented
    machine (10,800 s window, three repetitions, about 20 hours); the tower follows.
 3. **The real card**: the founder's runs on Lambda, one exact commit.
-4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, built, no engine file changes): the governor killed outright
-   mid-run and the watchdog's hand-back, the long run, and the governor's own CPU at 1 to 1,000 copies; the last is done
-   from the archives (`results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size); the first two run as A,
-   B and C next.
+4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, no engine file changes): the kill scenario is done
+   (`results/live/V3_ROBUST_KILL.md`: every setting back 7 to 11 s after the kill in 30 of 30 repetitions) and the
+   governor's own CPU is tabulated (`results/live/V3_OWN_COST.md`); the long run (3 pairs × 3 runs, 7,200 s) is running;
+   the 24-hour run on a rented machine follows.
 5. **YCSB on MongoDB** (`docs/YCSB_PREREGISTRATION.md`, built): the operator's WiredTiger cache as native, Omni on the cache
    size through the server's own console; the smoke run first, then A, B and C on v3.
 6. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
@@ -8427,7 +8443,7 @@ do not yet exist, the row says what will supply them.
 | Buildings with batteries, CityLearn, 11 districts | electricity bought, daily peak and unevenness better in all 11; the bill **worse in 7**; ramping worse in 7 | S | "Is the bill a loss?" Yes, in the 2023 districts, and it is in the table as such |
 | Drone swarms, gym-pybullet-drones, three 20-drone cells | energy a mission −7% to −20%, missions a charge +8% to +25%; no late mission, reserve breach, near miss or collision | S | "Is the energy a meter?" No, a declared model from the simulator's own motor constants; the tracking error rose from 0.07 to 0.13 m inside its 0.25 m band and is shown |
 | The governor's own cost, 1 to 1,000 copies with the real cluster inside | **0.006 to 0.013 of one core** at every size, 0.1% to 0.3% of the host's cores | L | "Does the brain's cost grow with the body?" No: it governs the real cluster, and that cost does not grow with the organism around it; shown, not judged, each run under its own engine (`results/live/V3_OWN_COST.md`) |
-| The governor killed outright mid-run (the smoke run; A, B and C running) | every setting back at the operator's **7 s** after the kill in the one smoke repetition; the counted runs decide | L | "What if Omni-Compass dies?" The watchdog hands back from the lease the governor left; the preregistered allowance is 60 s and the three counted runs read against it |
+| The governor killed outright mid-run, 10 pairs × 3 runs | every setting back at the operator's **7 to 11 s** after the kill in 30 of 30 repetitions (mean 9 s; allowance 60 s); a second governor to the end in every one; the 120 s after the kill inside the noise against native | L | "What if Omni-Compass dies?" The watchdog hands back from the lease the governor left, within seconds, and the service does not measurably notice; the whole window with a kill and a restart in it still read faster and with fewer failures than native (`results/live/V3_ROBUST_KILL.md`) |
 | Azure's bill on a 4-worker fleet (v1) | no difference beyond the noise on any gauge | L, a real bill | "Then where is the saving?" A fleet of 4 cannot show one machine; the 40-worker fleet that can is preregistered and waits on Azure's own cluster capacity in its region |
 | The real card (GPU) | **obsolete**: every earlier card result ran on a controller since replaced | P pending | "When?" The founder's runs on rented cards at one named commit, after the CPU and cloud work |
 

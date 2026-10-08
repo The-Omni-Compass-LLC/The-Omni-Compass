@@ -114,6 +114,14 @@ memory sample read zero; the join is fixed (`scripts/kind_robust.sh`), and the m
 windows longer than twenty minutes, so the first and last ten minutes cannot overlap (`tools/live_reps.py`). Nothing in
 the scenarios, the gauges, the allowance or the limits changed. The smoke run is not counted and is kept in the record.
 
+## Scenario 1, the result (2026-10-08, runs 37716845219, 37716859133, 37716872788, on the rules above unchanged)
+
+`results/live/V3_ROBUST_KILL.md`: every setting back at the operator's 7 to 11 s after the kill in 30 of 30 repetitions
+(mean 9 s), a second governor to the end in every one, the 120 s after the kill no difference beyond the noise against
+native in all three runs, the whole window confirmed better on mean response, p95, time over the line and failed requests,
+machines and energy inside the noise. The memory ratio is not reported for this scenario, as declared: its window is
+shorter than twenty minutes. Nothing in the rules changed between the smoke run and the counted runs.
+
 ## What is declared before the first run
 
 The 60-second hand-back allowance is the sum of the watchdog's pass (5 s), the restore command's own run (one kubectl per
