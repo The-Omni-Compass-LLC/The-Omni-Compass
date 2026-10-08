@@ -260,7 +260,9 @@ def main():
         ("V3_YCSB.json", "## 3d. A real database's storage-engine cache: MongoDB under YCSB, the operator's cache size, Omni v3, three runs (evidence class L)",
          "MongoDB 8.0 as its publisher ships it with the operator's WiredTiger cache of 512 MB is native; omni is the compass law on one knob, "
          "the cache size, inside the cover [256, 2,048] MB through the server's own console, growing by notches of 64 MB only while the cache "
-         "is full and reads are slow, and giving a notch back when calm and nothing is evicted (`docs/YCSB_PREREGISTRATION.md`). YCSB's "
+         "is full and reads are slow, and giving a notch back when calm and the cache holds its working set (`docs/YCSB_PREREGISTRATION.md`; "
+         "the first counted set's gate was 'nothing evicted', which its amendment 1 of 8 October records as satisfied by a cold cache, and the "
+         "table named below says which set it is). YCSB's "
          "published core workloads with the key space stepping through the cache and past it, drawn uniformly, at 3,000 operations a second "
          "from 32 threads; three paired repetitions a run, three runs; the tuning workload (workload A) is shown and not counted.",
          "| Workload | Work inside the 1 ms line | p95 | Cache size held, MB (the resource held) | Pages read into the cache | Host CPU-seconds |",

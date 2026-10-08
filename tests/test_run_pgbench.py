@@ -27,6 +27,51 @@ def main():
     # calm: one idle server given back, never a server in use
     assert R.decide(0.1, -0.3, 0.0, 2, 10, snap, 0, 99)[:2] == (9, -1)
     assert R.decide(0.1, -0.3, 0.0, 0, 10, snap, 0, 99)[:2] == (10, 0), "no idle server: nothing taken"
+    # amendment 2, the queue line: a server is taken back only while clients waited for one under 1% of the pooler's time in the
+    # last second and a transaction was served; at 1% or more one is added back a second, up to the pooler's own setting; above
+    # that setting only slowness adds; adding is never held
+    assert R.decide(0.1, -0.3, 0.0, 2, 10, snap, 0, 99, queue_share=0.012)[:2] == (12, 1), "clients waited 1.2% of the time under the pooler's setting: two added back (one per percent, rounded up)"
+    assert R.decide(0.1, -0.3, 0.0, 2, 10, snap, -1, 1.0, queue_share=0.01)[:2] == (11, 1), "a take-back that put clients in the queue (1%) is undone the next second"
+    assert R.decide(0.1, -0.3, 0.0, 2, 10, snap, 0, 99, queue_share=0.06)[:2] == (16, 1), "6% waiting: six added back"
+    assert R.decide(0.1, -0.3, 0.0, 2, 10, snap, 0, 99, queue_share=0.30)[:2] == (snap, 1), "30% waiting: back to the pooler's own setting, never past it by the queue line"
+    assert R.decide(0.1, -0.3, 0.0, 2, snap, snap, 0, 99, queue_share=0.02)[:2] == (snap, 0), "at the pooler's own setting with clients waiting: nothing taken, nothing added by the queue line"
+    assert R.decide(0.1, -0.3, 0.0, 2, 25, snap, 0, 99, queue_share=0.02)[:2] == (25, 0), "above the pooler's own setting with clients waiting: nothing taken; only slowness adds"
+    assert R.decide(0.4, 0.0, 0.0, 2, 10, snap, 0, 99, queue_share=0.02)[:2] == (12, 1), "inside the cushion the queue line still adds back"
+    assert R.decide(0.1, -0.3, 0.0, 2, 10, snap, 0, 99, queue_share=0.005)[:2] == (9, -1), "under 1%: an idle server given back"
+    assert R.decide(0.1, -0.3, 0.0, 2, 10, snap, 0, 99, served=False)[:2] == (10, 0), "nothing served in the last second: nothing known, nothing moved"
+    assert R.decide(0.5, 0.25, 0.2, 3, 10, snap, 0, 99, queue_share=0.02)[:2] == (12, 1), "slow inside the server, but clients waited: added back, not taken"
+    assert R.decide(0.5, 0.25, 0.2, 3, 10, snap, 0, 99, queue_share=0.005)[:2] == (9, -1), "slow inside the server, nobody waiting: one fewer"
+    assert R.decide(0.5, 0.25, 0.2, 3, 10, snap, 0, 99, served=False)[:2] == (10, 0), "slow inside the server, nothing served: nothing moved"
+    assert R.decide(0.5, 0.25, 0.8, 0, 10, snap, 0, 99, queue_share=0.5)[:2] == (13, 1), "slow and waiting: the force adds, as before"
+    assert R.decide(0.5, 0.25, 0.8, 0, 25, snap, 0, 99, queue_share=0.5, served=False)[:2] == (28, 1), "the force's add is never held, served or not"
+    assert R.decide(0.1, -0.3, 0.0, 2, 10, snap, 1, 2.0, queue_share=0.005)[:2] == (10, 0), "the brake still dwells five seconds after an add"
+    assert R.GIVEBACK_WAIT_SHARE == 0.01
+
+    # the console client's protocol parsing (amendment 2: one held connection for the arm, no process launched for a reading)
+    import struct
+    def field(name):
+        return name.encode() + b"\0" + b"\0" * R.Console.ROW_DESCRIPTION_TAIL
+    def row(*vals):
+        out = struct.pack("!H", len(vals))
+        for v in vals:
+            out += struct.pack("!i", -1) if v is None else struct.pack("!i", len(v)) + v.encode()
+        return out
+    T = struct.pack("!H", 2) + field("key") + field("value")
+    rows = R.Console.parse_messages([(b"T", T), (b"D", row("default_pool_size", "20")), (b"D", row("other", None)), (b"C", b"SHOW\0"), (b"Z", b"I")])
+    assert rows == [{"key": "default_pool_size", "value": "20"}, {"key": "other", "value": None}], rows
+    assert R.Console.parse_messages([(b"C", b"SET\0"), (b"Z", b"I")]) == [], "a command with no rows gives none"
+    try:
+        R.Console.parse_messages([(b"E", b"SERROR\0Mno such command\0\0"), (b"Z", b"I")]); raise AssertionError("the console's refusal must be raised once the result ends")
+    except RuntimeError as e:
+        assert "no such command" in str(e)
+    try:
+        R.Console.parse_messages([(b"T", T)]); raise AssertionError("a connection closed before the result ends must be said")
+    except ConnectionError:
+        pass
+    try:
+        R.Console.parse_messages([(b"T", b"\x00\x02garbage"), (b"Z", b"I")]); raise AssertionError("a garbled message must not parse")
+    except (ValueError, ConnectionError):
+        pass
     # the cushion
     assert R.decide(0.4, 0.03, 0.9, 5, 10, snap, 0, 99)[:2] == (10, 0)
     assert R.decide(0.4, -0.03, 0.9, 5, 10, snap, 0, 99)[:2] == (10, 0)
@@ -81,7 +126,7 @@ def main():
     r = R.paired(reps([20, 20, 20], [11, 12, 10], "pool_mean"), "pool_mean", "shown")
     assert r["reading"] == "shown, not judged"
     assert R.paired(reps([1, 2], [float("nan"), 3], "x"), "x", "lower")["n"] == 1
-    print("PASS  database runner: the direction follows where the time goes, calm gives back one idle server and never one in use, "
+    print("PASS  database runner: the direction follows where the time goes, calm gives back one idle server and never one in use nor one in demand, "
           "cushion, dwell, cover and fail-up to the pooler's own setting hold; pgbench's log reads into the gauges; the paired "
           "reading says better, WORSE, no difference beyond the noise, same, and never-more")
 

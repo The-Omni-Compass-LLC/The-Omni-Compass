@@ -8,14 +8,23 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
-- **Millennium seats begin: the Navier–Stokes seat sheet** (`docs/seats/NAVIER_STOKES.md`, `docs/seats/README.md`,
-  `tools/seats/navier_stokes_check.py`, `results/seats/navier_stokes/CHECKS.json`; 5 of 5 checks pass). Built outside the
-  frozen engine and attached by an explicit map. Level 1 only: the problem stays open. What Omni supplies (the energy decay
-  of equation (1), α_E = 2ν, as an inequality) is shown insufficient alone (Tao 2016), and no finite-dimensional Omni
-  sector can realize Navier–Stokes (σ-compactness). The team's pressure-rotation branch (Attack 10) is **shown false**: a
-  symmetry theorem plus an explicit divergence-free field with the dangerous alignment and the transverse pressure Hessian
-  exactly zero (to 1.5×10⁻¹⁵ of its size) at 70 points on an axis and a mirror plane. The frontier is stated: one
-  nonlocal diagonal pressure term against the local brake on symmetry sets (Attack 11, open).
+- **The costs in the three database tables traced to their mechanisms, and the three that were ours amended, with the engine
+  locked** (Omni v3 before and after; the harnesses are outside the fingerprint). **PostgreSQL** (`docs/POSTGRES_PREREGISTRATION.md`,
+  amendment 2): the +14% to +28% host CPU was not "PgBouncer queuing", as the record had said without a measurement; it was
+  our harness launching a `psql` process for every reading (7,956 console logins in one workload's pooler log; 52 ms of CPU
+  a launch; a per-process meter on a paired `select` repetition put +55.9 CPU-seconds on the launches against a +52.8 s host
+  difference, PgBouncer +1.2 s, PostgreSQL −4.7 s). The harness now holds one console connection an arm (`Console`, the
+  server's own wire protocol), takes a server back only while clients waited for one under 1% of the pooler's time and a
+  transaction was served, adds servers back one per percent of waiting, up to the operator's 20 (the +15% to +17% median was
+  the pool shrunk into a queue), and records its own CPU. **MySQL**
+  (`docs/MYSQL_PREREGISTRATION.md`, amendment 2): 36 of read_write's 82 grows came with the pool missing under 1% of its
+  reads (slow writes the pool cannot mend); the pool now grows only while missing (1% or more, the give-back's own line), and
+  no chunk is given back in a second with no read request. **MongoDB** (`docs/YCSB_PREREGISTRATION.md`, amendment 1): every
+  burst and c arm gave four notches back in its first five seconds, before its first eviction, because a cold cache evicts
+  nothing; the give-back gate is now the miss share under 1% of requests (the MySQL gate), growth is gated on missing the same
+  way, and a second with no request moves nothing. Said before the runs: the MongoDB memory rows may fall to the noise, because
+  the saving was the artefact. Tests cover every new case; the second (PostgreSQL, MongoDB) and third (MySQL) counted sets
+  follow on these rules, the earlier tables kept whole in `docs/history`.
 - **The public-trace test done, A/B/C on v3: a day of demand nobody here wrote reads the same way as our own schedules**
   (`results/live/V3_TRACE_GOOGLE2011.md`, runs 37826513664, 37826518868, 37826522419, commit `13ee69e8`, 30 of 30 pairs
   valid): p95 **−65% to −71%**, p99 −49% to −61%, mean −51% to −55%, time over the line −81% to −84%, failed requests −8% to

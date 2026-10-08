@@ -13,8 +13,10 @@ cache is the native controller here.
   omni    the same MongoDB, with the compass law (omnicompass/compass_law.py) on one knob, the cache size, through the
           server's own console (setParameter wiredTigerEngineRuntimeConfig cache_size), inside the cover [256 MB, 2,048 MB]:
           the compass reads the server's own mean read latency over the last second (serverStatus opLatencies) on a band from
-          0 to the response line and holds it at 40% of the line; slow reads with the cache full push the cache up (slow reads
-          with room to spare are not the cache's to mend), calm gives memory back 64 MB a second when the cache is not evicting;
+          0 to the response line and holds it at 40% of the line; slow reads with the cache full and missing push the cache up
+          (slow reads with room to spare, or in a cache that holds its working set, are not the cache's to mend), calm gives
+          memory back 64 MB a second while the cache's misses are under one percent of the pages requested from it (amendment
+          1: it holds the working set; the first counted set read "nothing evicted", which a cold cache satisfies while it fills);
           at 95% of the line with the cache full a quarter of the cover is added at once (fail up); the cache size is handed
           back to the operator's at the end and read back; a size found at a value Omni did not write stops it writing
 
@@ -141,10 +143,16 @@ class CacheSize:
 
 
 def cache_stats(st):
-    """(configured MB, bytes in cache MB, pages read into cache, pages evicted) from one serverStatus."""
+    """(configured MB, bytes in cache MB, pages read into cache, pages evicted, pages requested from the cache) from one serverStatus."""
     c = st["wiredTiger"]["cache"]
     evicted = sum(int(c.get(k, 0)) for k in ("unmodified pages evicted", "modified pages evicted", "pages evicted by application threads"))
-    return int(c["maximum bytes configured"]) // MB, int(c["bytes currently in the cache"]) / MB, int(c.get("pages read into cache", 0)), evicted
+    return (int(c["maximum bytes configured"]) // MB, int(c["bytes currently in the cache"]) / MB, int(c.get("pages read into cache", 0)), evicted,
+            int(c.get("pages requested from the cache", 0)))
+
+
+def miss_share(pages_read_last_s, requested_last_s):
+    """The cache's misses as a share of the pages requested from it in the last second; no request reads as no miss."""
+    return pages_read_last_s / requested_last_s if requested_last_s > 0 else 0.0
 
 
 def read_latency(st):
@@ -153,19 +161,32 @@ def read_latency(st):
     return int(r["latency"]), int(r["ops"])
 
 
-def decide(p, force, evicted_last_s, cur_mb, last_change_age, full, wall=0.95):
+GIVEBACK_MISS_SHARE = 0.01  # amendment 1: a notch is given back only while the cache's misses (pages read into it) are under 1% of the pages
+                            # requested from it in the last second (the cache holds the working set). The first counted set read "no page
+                            # evicted in the last second", which a cold cache satisfies while it fills: every give-back of every burst arm came
+                            # in the first seconds, and the cache then sat at the floor of the cover, evicting, for the rest of the arm.
+GROW_MISS_SHARE = GIVEBACK_MISS_SHARE  # and the cache grows only while missing (1% or more): a full cache that holds its working set cannot mend a slow read
+
+
+def decide(p, force, miss_share_last_s, cur_mb, last_change_age, full, wall=0.95, reads=True):
     """The knob's move this second, in MB: slow reads (the service slow) grow the cache by ceil(force / 0.1) notches, but only
-    while the cache is full (a slow read with room to spare is not the cache's to mend); calm with the cache not evicting gives
-    back one notch after the dwell; past the wall, with the cache full, a quarter of the cover at once."""
+    while the cache is full (a slow read with room to spare is not the cache's to mend) and missing (amendment 1: misses at one
+    percent of its requests or more); calm with the cache's misses under one percent of its requests (it holds the working set)
+    gives back one notch after the dwell, and only in a second that requested pages (a second with none says nothing about the
+    working set); past the wall, with the cache full, a quarter of the cover at once."""
     lo, hi = COVER_MB
     if p is not None and p >= wall and full:
         return min(hi, cur_mb + FAILUP_MB), "fail up: the line is at hand and the cache is full, a quarter of the cover at once"
     if force > 0.05:
         if not full:
             return cur_mb, "slow with room to spare: not the cache's to mend"
-        return min(hi, cur_mb + STEP_MB * max(1, math.ceil(force / 0.1))), "slow with the cache full: grow"
-    if force < -0.05 and evicted_last_s == 0 and cur_mb > lo and last_change_age >= DWELL_S:
-        return max(lo, cur_mb - STEP_MB), "calm, nothing evicted: a notch given back"
+        if miss_share_last_s < GROW_MISS_SHARE:
+            return cur_mb, "slow with the cache full but holding its working set (misses under 1% of requests): not the cache's to mend"
+        return min(hi, cur_mb + STEP_MB * max(1, math.ceil(force / 0.1))), "slow with the cache full and missing: grow"
+    if force < -0.05 and not reads:
+        return cur_mb, "calm, but no page requested in the last second: nothing known, nothing taken"
+    if force < -0.05 and miss_share_last_s < GIVEBACK_MISS_SHARE and cur_mb > lo and last_change_age >= DWELL_S:
+        return max(lo, cur_mb - STEP_MB), "calm, the cache holding the working set (misses under 1% of requests): a notch given back"
     return cur_mb, "hold"
 
 
@@ -178,10 +199,16 @@ class Omni(threading.Thread):
         self.plug, self.audit = plug, audit_path
         self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
         self.stop_flag = threading.Event(); self.last_change = -1e9; self.writes = 0; self.failups = 0
-        self.foreign = False; self.handed_back = False
+        self.foreign = False; self.handed_back = False; self.error = None
 
     def run(self):
-        self.plug.attach(); st = self.plug._status(); lat0, ops0 = read_latency(st); _, _, _, ev0 = cache_stats(st); t0 = time.monotonic()
+        try:
+            self.plug.attach(); st = self.plug._status(); lat0, ops0 = read_latency(st); _, _, rd0, ev0, rq0 = cache_stats(st)
+        except Exception as e:                                      # the brain never ran: say so in the audit and the record, never silently
+            self.error = repr(e)
+            self.audit.write_text(json.dumps({"t": 0.0, "error": self.error, "note": "the brain could not attach; no decision was made"}) + "\n")
+            return
+        t0 = time.monotonic()
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
@@ -190,9 +217,11 @@ class Omni(threading.Thread):
                     lat, ops = read_latency(st); dl, do = lat - lat0, ops - ops0; lat0, ops0 = lat, ops
                     reading = (dl / do / 1e6) if do > 0 else 0.0           # the mean read latency of the last second, in seconds; no reads reads calm
                     f = self.law.force(reading)
-                    cur, used, _, ev = cache_stats(st); ev_last = ev - ev0; ev0 = ev
+                    cur, used, rd, ev, rq = cache_stats(st); ev_last = ev - ev0; ev0 = ev
+                    rd_last = rd - rd0; rd0 = rd; rq_last = rq - rq0; rq0 = rq
+                    share = miss_share(rd_last, rq_last)
                     cur = self.plug.lever(st); full = used >= FULL * cur
-                    target, why = decide(self.law.p, f, ev_last, cur, tick - self.last_change, full, wall=self.law.band.wall_high)
+                    target, why = decide(self.law.p, f, share, cur, tick - self.last_change, full, wall=self.law.band.wall_high, reads=rq_last > 0)
                     wrote = None
                     if target != cur:
                         wrote = self.plug.write(target); self.writes += 1
@@ -201,7 +230,8 @@ class Omni(threading.Thread):
                         if why.startswith("fail up"):
                             self.failups += 1
                     fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "reads": do, "p": round(self.law.p, 4), "force": round(f, 4),
-                                         "evicted_last_s": ev_last, "cache_mb": cur, "used_mb": round(used, 1), "full": full, "target_mb": target, "wrote_mb": wrote, "why": why}) + "\n")
+                                         "evicted_last_s": ev_last, "pages_read_last_s": rd_last, "pages_requested_last_s": rq_last, "miss_share": round(share, 4),
+                                         "cache_mb": cur, "used_mb": round(used, 1), "full": full, "target_mb": target, "wrote_mb": wrote, "why": why}) + "\n")
                 except Exception as e:
                     fh.write(json.dumps({"t": round(tick - t0, 2), "error": repr(e)}) + "\n")
                     self.foreign = True
@@ -320,7 +350,7 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
                                           "threads": THREADS, "insertstart": 0, "insertorder": "ordered", "requestdistribution": DISTRIBUTION,
                                           "seed": seed * 100 + i}, raw)      # ordered keys, as loaded: a hashed key space would read records that are not there
         got = parse_raw(raw); summaries.append(txt); failed += parse_failed(txt); records += got
-        lat = sorted(l for _, l in got); row = sampler.rows[-1] if sampler.rows else (NATIVE_MB, 0.0, 0, 0)
+        lat = sorted(l for _, l in got); row = sampler.rows[-1] if sampler.rows else (NATIVE_MB, 0.0, 0, 0, 0)
         print(f"   {arm} rep {rep} notch {notch}: {len(lat)} ops, mean {sum(lat) / max(1, len(lat)):.3f} ms, p95 {(lat[int(0.95 * len(lat))] if lat else float('nan')):.3f} ms, "
               f"inside the line {100 * sum(1 for l in lat if l <= line_ms) / max(1, len(lat)):.1f}%, cache {row[0]:.0f} MB, in cache {row[1]:.0f} MB", flush=True)
     t1 = time.time(); cpu1 = cpu_times()
@@ -341,7 +371,8 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
          "cache_mb_mean": sum(x[0] for x in rows) / len(rows), "cache_used_mb_mean": sum(x[1] for x in rows) / len(rows),
          "pages_read": rows[-1][2] - rows[0][2], "cpu_busy_share": (total - idle) / max(1, total), "cpu_seconds": cpu_s,
          "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside), "writes": (omni.writes if omni else 0),
-         "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0)}
+         "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0),
+         "controller_error": (omni.error if omni else None)}
     (d / "arm.json").write_text(json.dumps(g, indent=1))
     print(f"   {arm} rep {rep}: {n} operations, inside the line {g['work_inside_line_ops']:.0f}/s, p95 {g['p95_ms']:.2f} ms, cache {g['cache_mb_mean']:.0f} MB, "
           f"in cache {g['cache_used_mb_mean']:.0f} MB, pages read {g['pages_read']:,}, CPU {cpu_s:.1f} s, handed back {g['handed_back']}", flush=True)
@@ -407,7 +438,11 @@ def run_workload(name, out: Path, reps, step_s, line_ms):
     ver = server_version()
     top = max(int(s) for s in steps.split())
     print(f"== {name}: YCSB {workload_file}, {base:,} records x notch (loaded to notch {top}: {base * top:,}), steps {steps}, {step_s} s a notch, MongoDB {ver}", flush=True)
-    fresh_server(NATIVE_MB)
+    c0 = fresh_server(NATIVE_MB)
+    have = c0.admin.command("serverStatus")["wiredTiger"]["cache"]
+    for key in ("maximum bytes configured", "bytes currently in the cache", "pages read into cache", "pages requested from the cache"):
+        if key not in have:                                        # the gate reads these; a server that lacks one must stop the run, not run native in Omni's name
+            raise SystemExit(f"serverStatus().wiredTiger.cache has no '{key}' on this server: the miss-share gate cannot be read")
     load_dataset(workload_file, base * top, wl_dir / "load.log")
     rec = {"workload": name, "tuning": tuning, "ycsb_workload": workload_file, "base_records": base, "steps": steps, "step_s": step_s,
            "line_ms": line_ms, "rate_ops": RATE, "threads": THREADS, "record_bytes": RECORD_BYTES, "native_mb": NATIVE_MB, "cover_mb": list(COVER_MB),

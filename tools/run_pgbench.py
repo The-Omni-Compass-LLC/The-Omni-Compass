@@ -23,6 +23,14 @@ response line (transactions a second whose latency, lag included, was within the
 latency, failed transactions, server connections alive (the "machines"), the host's CPU busy share and CPU-seconds.
 There is no watt-meter on a GitHub runner: nothing here is an energy claim.
 
+Amendment 2 (docs/POSTGRES_PREREGISTRATION.md, declared before the second counted set): the console is read over one
+connection held for the whole arm (class Console, the server's own wire protocol) instead of a psql process launched for
+every reading, which was about five launches a second in the omni arm at about 50 ms of CPU each and was the CPU the
+first counted set charged to Omni; the queue line: a server is taken back (the calm give-back and the slow-inside-the-server
+shrink alike) only while the pooler's clients waited for a server under one percent of its time in the last second and a
+transaction was served, and while they waited one percent or more one server a second is added back, up to the pooler's own
+setting; the harness's own CPU is recorded beside the host's.
+
 Usage:
   python tools/run_pgbench.py --setup                      # create the bench role and database (needs the postgres user)
   python tools/run_pgbench.py --workloads tpcb --reps 3 --out out
@@ -31,10 +39,14 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
+import resource
 import shutil
+import socket
+import struct
 import subprocess
 import sys
 import threading
@@ -59,6 +71,8 @@ DWELL_S = 5.0             # after adding, no taking back within five seconds (no
 FLOOR, CEILING = 2, 90    # the cover: never under two server connections; never within ten of PostgreSQL's 100 connections
 NATIVE_POOL = 20          # PgBouncer's shipped default_pool_size: native's setting and Omni's snapshot
 WAIT_SHARE = 0.5          # where the time goes decides the direction: waiting for a server (add one) or inside it (take one)
+GIVEBACK_WAIT_SHARE = 0.01  # amendment 2: a server is taken back only while clients waited for one under 1% of the pooler's time in the
+                            # last second (the pool holds the demand), the one line the three database tests share (misses under 1%)
 
 
 def service_reading(latency_s, waiting_share, line_s=LINE_MS / 1000.0):
@@ -88,6 +102,7 @@ GAUGES = [  # key, label, direction
     ("cpu_busy_share", "host CPU busy (share of the run)", "lower"),
     ("cpu_seconds", "host CPU-seconds", "lower"),
     ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 transactions inside the line", "lower"),
+    ("harness_cpu_seconds", "the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both; inside the host's)", "shown"),
     ("pool_mean", "pool size, mean (the knob)", "shown"),
 ]
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
@@ -95,13 +110,29 @@ SAME_REL = 1e-6
 
 
 # --- pure pieces (tested without a database) -----------------------------------------------------------------------
-def decide(p, force, wait_share, idle, cur, snapshot, last_dir, since_change_s, wall=0.95):
-    """The pool size the brain wants this second, by the frozen rule. Returns (target, direction, reason)."""
+def decide(p, force, wait_share, idle, cur, snapshot, last_dir, since_change_s, wall=0.95, queue_share=0.0, served=True):
+    """The pool size the brain wants this second, by the frozen rule. Returns (target, direction, reason).
+
+    Amendment 2, the queue line: `queue_share` is the share of the pooler's time its clients spent waiting for a server in
+    the last second and `served` says whether it counted a transaction. A server is taken back (the calm give-back and the
+    slow-inside-the-server shrink alike) only while a transaction was served and that share is under GIVEBACK_WAIT_SHARE;
+    while it is at the line or above, servers are added back, one per percent of waiting, up to the pooler's own setting
+    (the snapshot), so a take-back that put clients in the queue is undone the next second and a rising load gets its
+    servers back at once. Above the pooler's own setting only slowness adds, by the force, as before; adding is never held."""
     if p >= wall:
         return snapshot, 0, "fail up: handed back to the pooler's own setting"
-    if force > DEAD:
-        d = math.ceil(force / UP) if wait_share >= WAIT_SHARE else -1
-        why = f"slow, clients waiting for a server: {d} more" if d > 0 else "slow inside the server: one fewer"
+    if force > DEAD and wait_share >= WAIT_SHARE:
+        d, why = math.ceil(force / UP), f"slow, clients waiting for a server: {math.ceil(force / UP)} more"
+    elif not served:
+        return cur, 0, "nothing served in the last second: nothing known, nothing moved"
+    elif queue_share >= GIVEBACK_WAIT_SHARE:
+        if cur < snapshot:
+            d = min(snapshot - cur, max(1, math.ceil(queue_share / GIVEBACK_WAIT_SHARE)))   # one server per percent of waiting
+            why = f"clients waited for a server {100 * queue_share:.1f}% of the time: {d} added back, up to the pooler's own setting"
+        else:
+            return cur, 0, "clients waited for a server (1% or more of the time) at the pooler's own setting or above: the pool is in demand, nothing taken"
+    elif force > DEAD:
+        d, why = -1, "slow inside the server: one fewer"
     elif force < -DEAD:
         if idle < 1:
             return cur, 0, "calm, but no idle server to give back"
@@ -183,8 +214,133 @@ def _num(x):
 
 
 # --- the wires -----------------------------------------------------------------------------------------------------
+class Console:
+    """One connection to PgBouncer's admin console, held for the whole arm, speaking the server's own wire protocol (the
+    simple query of PostgreSQL's protocol, version 3). No process is started for a reading (amendment 2): the first counted
+    set launched a psql process for every reading, about five a second in the omni arm, at about 50 ms of CPU each.
+    `query` returns the rows as dicts of strings (none for a command such as SET) and reconnects once on a lost connection;
+    the protocol parsing is in `parse_messages`, tested without a server."""
+
+    PROTOCOL_3 = 196608
+    ROW_DESCRIPTION_TAIL = 18                                   # after a field's name: table oid, column, type oid, length, modifier, format
+
+    def __init__(self, host, port, user, password="", database="pgbouncer", timeout=5.0):
+        self.host, self.port, self.user, self.password, self.database, self.timeout = host, port, user, password, database, timeout
+        self.sock = None
+        self.logins = 0
+        self.lock = threading.Lock()                                # the sampler and the brain share the one connection, one query at a time
+
+    # the wire
+    def _send(self, kind: bytes, payload: bytes):
+        self.sock.sendall(kind + struct.pack("!I", len(payload) + 4) + payload)
+
+    def _recv_exact(self, n):
+        buf = b""
+        while len(buf) < n:
+            chunk = self.sock.recv(n - len(buf))
+            if not chunk:
+                raise ConnectionError("the console closed the connection")
+            buf += chunk
+        return buf
+
+    def _message(self):
+        head = self._recv_exact(5)
+        return head[:1], self._recv_exact(struct.unpack("!I", head[1:])[0] - 4)
+
+    def connect(self):
+        self.close()
+        self.sock = socket.create_connection((self.host, self.port), timeout=self.timeout)
+        params = f"user\0{self.user}\0database\0{self.database}\0\0".encode()
+        self._send(b"", struct.pack("!I", self.PROTOCOL_3) + params)
+        while True:
+            kind, body = self._message()
+            if kind == b"R":                                    # authentication: ok, cleartext password, md5 password
+                code = struct.unpack("!I", body[:4])[0]
+                if code == 0:
+                    continue
+                if code == 3:
+                    self._send(b"p", self.password.encode() + b"\0"); continue
+                if code == 5:
+                    inner = hashlib.md5(self.password.encode() + self.user.encode()).hexdigest()
+                    self._send(b"p", ("md5" + hashlib.md5(inner.encode() + body[4:8]).hexdigest()).encode() + b"\0"); continue
+                raise ConnectionError(f"the console asked for authentication method {code}, which this client does not speak")
+            if kind == b"E":
+                raise ConnectionError(self.error_text(body))
+            if kind == b"Z":                                    # ready for query: logged in ('S' parameters, 'K' key, 'N' notices skipped)
+                break
+        self.logins += 1
+
+    def close(self):
+        if self.sock is not None:
+            try:
+                self.sock.close()
+            except OSError:
+                pass
+            self.sock = None
+
+    @staticmethod
+    def error_text(body: bytes):
+        fields = {}
+        for part in body.split(b"\0"):
+            if part:
+                fields[chr(part[0])] = part[1:].decode(errors="replace")
+        return f"{fields.get('S', 'ERROR')}: {fields.get('M', '')}".strip()
+
+    @classmethod
+    def parse_messages(cls, messages):
+        """Rows from the messages of one simple query, as the server sends them: 'T' names the columns, each 'D' is a row,
+        'E' is an error (raised once 'Z' arrives), 'Z' ends the result. Messages are (kind, body) pairs."""
+        cols, rows, err = [], [], None
+        for kind, body in messages:
+            if kind == b"T":
+                n = struct.unpack("!H", body[:2])[0]; pos = 2; cols = []
+                for _ in range(n):
+                    end = body.index(b"\0", pos); cols.append(body[pos:end].decode()); pos = end + 1 + cls.ROW_DESCRIPTION_TAIL
+            elif kind == b"D":
+                n = struct.unpack("!H", body[:2])[0]; pos = 2; vals = []
+                for _ in range(n):
+                    ln = struct.unpack("!i", body[pos:pos + 4])[0]; pos += 4
+                    if ln < 0:
+                        vals.append(None)
+                    else:
+                        vals.append(body[pos:pos + ln].decode()); pos += ln
+                rows.append(dict(zip(cols, vals)))
+            elif kind == b"E":
+                err = cls.error_text(body)
+            elif kind == b"Z":
+                if err:
+                    raise RuntimeError(err)
+                return rows
+        raise ConnectionError("the console closed the connection before the result ended")
+
+    def _messages_until_ready(self):
+        while True:
+            kind, body = self._message()
+            yield kind, body
+            if kind == b"Z":
+                return
+
+    def query(self, sql, retry=True):
+        """The rows of one console command; one reconnect on a lost connection, never on a command the console refused."""
+        with self.lock:
+            return self._query(sql, retry)
+
+    def _query(self, sql, retry):
+        try:
+            if self.sock is None:
+                self.connect()
+            self._send(b"Q", sql.encode() + b"\0")
+            return self.parse_messages(self._messages_until_ready())
+        except (OSError, ConnectionError, ValueError, struct.error, UnicodeDecodeError):   # a lost or garbled connection: once more, fresh
+            self.close()
+            if not retry:
+                raise
+            self.connect()
+            return self._query(sql, retry=False)
+
+
 class Bouncer:
-    """PgBouncer as a child process with its own ini, admin console through psql."""
+    """PgBouncer as a child process with its own ini, its admin console read over one held connection (Console)."""
 
     def __init__(self, workdir: Path, port: int, pg: str, dbname: str, user: str, password: str):
         self.dir, self.port, self.user = workdir, port, user
@@ -201,6 +357,7 @@ class Bouncer:
             f"default_pool_size = {NATIVE_POOL}", "max_client_conn = 1000", f"logfile = {self.dir / 'pgbouncer.log'}",
             f"pidfile = {self.dir / 'pgbouncer.pid'}", ""]))
         self.proc = None
+        self.console = Console("127.0.0.1", port, user, password)
 
     def start(self):
         cmd = ["pgbouncer", "-d", str(self.ini)]
@@ -209,26 +366,25 @@ class Bouncer:
         subprocess.run(cmd, check=True)
         for _ in range(50):
             time.sleep(0.1)
-            if self.admin("SHOW VERSION", quiet=True) is not None:
+            try:
+                self.console.connect()
+                self.console.query("SHOW VERSION", retry=False)
                 return
+            except (OSError, ConnectionError, RuntimeError):
+                continue
         raise RuntimeError("PgBouncer did not come up")
 
     def admin(self, sql, quiet=False):
-        r = subprocess.run(["psql", "-h", "127.0.0.1", "-p", str(self.port), "-U", self.user, "pgbouncer", "--csv", "-c", sql],
-                           capture_output=True, text=True, env={**os.environ, "PGPASSWORD": "x", "PGCONNECT_TIMEOUT": "3"})
-        if r.returncode != 0:
+        """One console command; the rows, or None if the console refused it (said on stderr unless quiet)."""
+        try:
+            return self.console.query(sql)
+        except (OSError, ConnectionError, RuntimeError) as e:
             if not quiet:
-                sys.stderr.write(r.stderr)
+                sys.stderr.write(f"{sql}: {e}\n")
             return None
-        return r.stdout
 
     def rows(self, sql):
-        out = self.admin(sql)
-        if not out:
-            return []
-        lines = [l for l in out.splitlines() if l.strip()]
-        head = lines[0].split(",")
-        return [dict(zip(head, l.split(","))) for l in lines[1:]]
+        return self.console.query(sql)
 
     def pool_size(self):
         for r in self.rows("SHOW CONFIG"):
@@ -237,22 +393,26 @@ class Bouncer:
         raise RuntimeError("SHOW CONFIG gave no default_pool_size")
 
     def set_pool_size(self, n):
-        self.admin(f"SET default_pool_size = {int(n)}")
+        self.console.query(f"SET default_pool_size = {int(n)}")
 
     def pools(self, dbname):
         for r in self.rows("SHOW POOLS"):
             if r.get("database") == dbname:
-                return {k: int(v) for k, v in r.items() if k.startswith(("cl_", "sv_", "maxwait"))}
+                return {k: int(v) for k, v in r.items() if k.startswith(("cl_", "sv_", "maxwait")) and v is not None and v.lstrip("-").isdigit()}
         return {}
 
     def stats(self, dbname):
         for r in self.rows("SHOW STATS"):
             if r.get("database") == dbname:
-                return {k: int(v) for k, v in r.items() if k.startswith("total_")}
+                return {k: int(v) for k, v in r.items() if k.startswith("total_") and v is not None and v.lstrip("-").isdigit()}
         return {}
 
     def stop(self):
-        self.admin("SHUTDOWN", quiet=True)
+        try:
+            self.console.query("SHUTDOWN", retry=False)
+        except (OSError, ConnectionError, RuntimeError):
+            pass                                                # the console closes as it shuts down
+        self.console.close()
         pid = self.dir / "pgbouncer.pid"
         for _ in range(30):
             if not pid.exists():
@@ -270,16 +430,22 @@ class PoolPlug(Plug):
         self.wait_share = 0.0
         self.waiting_share = 0.0
         self.last_latency_s = 0.0
+        self.last_pools = {}       # the SHOW POOLS row of the last reading, so the brain reads it once a second (amendment 2)
+        self.queue_share = 0.0     # the share of the pooler's time its clients spent waiting for a server, last second (amendment 2)
+        self.served = False        # whether the pooler counted a transaction in the last second (amendment 2)
 
     def _read_service(self):
         s = self.b.stats(self.db)
         p = self.b.pools(self.db)
+        self.last_pools = p
         clients = p.get("cl_active", 0) + p.get("cl_waiting", 0)
         self.waiting_share = p.get("cl_waiting", 0) / clients if clients else 0.0   # clients queued for a server (amendment 1)
         if not s:
+            self.served = False
             return service_reading(self.last_latency_s, self.waiting_share, self.line_s)
         if self.prev is None:
             self.prev = s
+            self.served = False
             return service_reading(0.0, self.waiting_share, self.line_s)
         dx = s["total_xact_count"] - self.prev["total_xact_count"]
         dt = s["total_xact_time"] - self.prev["total_xact_time"]
@@ -287,8 +453,11 @@ class PoolPlug(Plug):
         self.prev = s
         if dx <= 0:
             self.wait_share, self.last_latency_s = self.waiting_share, 0.0       # nothing served: calm unless clients are queued
+            self.served, self.queue_share = False, (1.0 if dw > 0 else 0.0)
             return service_reading(0.0, self.waiting_share, self.line_s)
-        self.wait_share = max(dw / (dt + dw) if (dt + dw) > 0 else 0.0, self.waiting_share)
+        self.served = True
+        self.queue_share = dw / (dt + dw) if (dt + dw) > 0 else 0.0
+        self.wait_share = max(self.queue_share, self.waiting_share)
         self.last_latency_s = (dt + dw) / dx / 1e6
         return service_reading(self.last_latency_s, self.waiting_share, self.line_s)
 
@@ -310,9 +479,15 @@ class Omni(threading.Thread):
         self.last_dir, self.last_change = 0, -1e9
         self.writes, self.failups = 0, 0
         self.foreign, self.handed_back = False, False
+        self.error = None                                           # a fault before the first decision, written into the arm's record
 
     def run(self):
-        snapshot = self.plug.attach()
+        try:
+            snapshot = self.plug.attach()
+        except Exception as e:                                      # the brain never ran: say so in the audit and the record, never silently
+            self.error = repr(e)
+            self.audit.write_text(json.dumps({"t": 0.0, "error": self.error, "note": "the brain could not attach; no decision was made"}) + "\n")
+            return
         t0 = time.monotonic()
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
@@ -320,10 +495,11 @@ class Omni(threading.Thread):
                 try:
                     reading = self.plug.read()
                     f = self.law.force(reading)
-                    idle = self.plug.b.pools(self.plug.db).get("sv_idle", 0)
+                    idle = self.plug.last_pools.get("sv_idle", 0)              # the reading's own SHOW POOLS row (amendment 2)
                     cur = int(self.plug.lever())
                     target, d, why = decide(self.law.p, f, self.plug.wait_share, idle, cur, int(snapshot), self.last_dir,
-                                            tick - self.last_change, wall=self.law.band.wall_high)
+                                            tick - self.last_change, wall=self.law.band.wall_high,
+                                            queue_share=self.plug.queue_share, served=self.plug.served)
                     wrote = None
                     if target != cur:
                         wrote = self.plug.write(target)
@@ -335,7 +511,8 @@ class Omni(threading.Thread):
                             self.last_dir, self.last_change = 0, tick
                     fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "latency_ms": round(self.plug.last_latency_s * 1000, 3),
                                          "waiting_share": round(self.plug.waiting_share, 3), "p": round(self.law.p, 4),
-                                         "force": round(f, 4), "wait_share": round(self.plug.wait_share, 3), "idle": idle,
+                                         "force": round(f, 4), "wait_share": round(self.plug.wait_share, 3),
+                                         "queue_share": round(self.plug.queue_share, 4), "served": self.plug.served, "idle": idle,
                                          "pool": cur, "target": target, "wrote": wrote, "why": why}) + "\n")
                 except Exception as e:  # a foreign writer or a lost console: say so, stop writing
                     fh.write(json.dumps({"t": round(tick - t0, 2), "error": repr(e)}) + "\n")
@@ -404,6 +581,7 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
     if arm == "omni":
         omni = Omni(PoolPlug(b, dbname, line_ms), d / "audit.jsonl", line_ms); omni.start()
     cpu0, t0 = cpu_times(), time.monotonic()
+    own0 = resource.getrusage(resource.RUSAGE_SELF)
     lat, failed, per_step = [], 0, []
     for k, notch in enumerate(steps):
         rate = base * notch
@@ -420,9 +598,12 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
             f.unlink()                                             # the per-step gauges are kept; the raw log is large
     seconds = time.monotonic() - t0
     cpu1 = cpu_times()
+    own1 = resource.getrusage(resource.RUSAGE_SELF)
     sampler.stop_flag.set(); sampler.join(timeout=5)
     g = latency_gauges(lat, step_s * len(steps), line_ms)
     g.update({"failed": failed, "seconds": seconds,
+              "harness_cpu_seconds": (own1.ru_utime + own1.ru_stime) - (own0.ru_utime + own0.ru_stime),
+              "console_logins": b.console.logins,
               "servers_alive_mean": sum(sampler.alive) / len(sampler.alive) if sampler.alive else float("nan"),
               "servers_alive_max": max(sampler.alive) if sampler.alive else float("nan"),
               "cpu_busy_share": (cpu1[0] - cpu0[0]) / max(1, cpu1[1] - cpu0[1]),
@@ -435,7 +616,7 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
     if omni is not None:
         omni.stop_flag.set(); omni.join(timeout=10)
         g.update({"writes": omni.writes, "fail_ups": omni.failups, "handed_back": bool(omni.handed_back),
-                  "foreign_writer": omni.foreign, "pool_read_back": b.pool_size()})
+                  "foreign_writer": omni.foreign, "controller_error": omni.error, "pool_read_back": b.pool_size()})
     else:
         g.update({"writes": 0, "handed_back": True, "pool_read_back": b.pool_size()})
     if b.pool_size() != NATIVE_POOL:                             # belt and braces: the next arm starts native

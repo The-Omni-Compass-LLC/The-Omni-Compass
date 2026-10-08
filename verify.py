@@ -354,12 +354,12 @@ def main():
     test_kafka_abc.main(); check("Kafka A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
                                  "no difference beyond the noise with its count; any lost message is WORSE; the tuning workload is shown and not counted", True)
     from tests import test_run_ycsb, test_ycsb_abc
-    test_run_ycsb.main(); check("YCSB runner: slow reads with the cache full grow the cache by notches, calm with nothing evicted gives one back after the dwell, the wall "
+    test_run_ycsb.main(); check("YCSB runner: slow reads with the cache full and missing grow the cache by notches, calm with misses under 1% of requests gives one back after the dwell, the wall "
                                 "adds a quarter of the cover, the cover holds; the plug snapshots, reads back, stops for another writer and restores; the paired reading", True)
     test_ycsb_abc.main(); check("YCSB A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
                                 "no difference beyond the noise with the count; clear runs pointing different ways read as a disagreement", True)
     from tests import test_run_sysbench, test_sysbench_abc
-    test_run_sysbench.main(); check("sysbench runner: slow statements with the pool full grow the pool by chunks, calm with nothing read from disk gives one back after "
+    test_run_sysbench.main(); check("sysbench runner: slow statements with the pool full and missing grow the pool by chunks, calm with misses under 1% of reads gives one back after "
                                     "the dwell, the wall adds four chunks, the cover holds; the plug writes whole chunks, waits for the server's resize, reads back, stops for "
                                     "another writer and restores; sysbench's histogram and summary parsed; the paired reading", True)
     test_sysbench_abc.main(); check("sysbench A/B/C table: the same three-run rule as the other stores; the runner's records found; every gauge has a known direction", True)

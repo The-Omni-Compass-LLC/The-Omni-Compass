@@ -145,6 +145,7 @@ The knob was handed back and read back at the end of every omni arm; Omni wrote 
 9 times an arm. Read: on a shared 4-core runner the latencies are too noisy for three repetitions to tell the arms
 apart, native's own p95 varying forty-fold between repetitions; what did separate is the machines, half as many database
 connections held open for the same work, and the host's CPU, 11% more of it, which is the cost of PgBouncer queueing
+(*corrected by amendment 2 below: measured, the CPU was the harness's own `psql` launches, not the pooler's queueing*)
 clients behind a smaller pool. Both go into the untouched runs as they are; nothing in the rule changes.
 
 ## The first untouched run, and amendment 1 (2026-10-06, run 37425853293; declared before the counted runs)
@@ -200,3 +201,133 @@ native's in all three runs), and Omni held a third of the connections open for t
 confirmed: the host spent 14% to 28% more CPU, which is PgBouncer queuing clients behind a smaller pool. The latencies
 cannot be told apart on GitHub's shared runner, where native's own p95 moved from 3 ms to 3 s between repetitions; that
 is the runner, and it is said so. Nothing in the rule changes after these runs.
+
+*Correction, 2026-10-08 (amendment 2 below): the sentence "which is PgBouncer queuing clients behind a smaller pool" was an
+explanation written without a measurement, and the measurement shows it was wrong. The CPU was our own harness launching a
+`psql` process for every reading. The sentence stays as written; the amendment says what was found.*
+
+## Amendment 2 (2026-10-08, declared before the second counted set): where the CPU went, and the take-back gate
+
+**The question.** The founder asked for every cost in the counted tables to be traced to its mechanism and removed where
+the mechanism is ours, with the engine locked (Omni v3; `tools/omni_version.py` prints omni-v3 before and after this
+amendment: `tools/run_pgbench.py` is a harness, outside the engine's fingerprint). Two rows of `V3_PGBENCH.md` are costs:
+**host CPU +14% to +28%, confirmed worse on all three workloads**, and **median latency +15% to +17%, confirmed worse on
+`select` and `tpcb_hot`** (the p95 moved from 2.7 ms to 143 ms on `select` as a point estimate, inside the noise only
+because one repetition read 367 ms and another 17 ms).
+
+**Where the CPU went: measured, not guessed.** Three measurements, all repeatable from the files in the repository or
+from the harness itself.
+
+1. *The pooler's own log of the counted set* (`results/live/raw/run-37435740735/pgbench-select/pgbench-select/pgb/pgbouncer.log`,
+   one workload, six arms): **7,956 logins to the admin console**, about 110 a minute in the native arms' minutes and 400 to
+   450 a minute in the omni arms' minutes, against 269 server connections opened and 267 closed over the whole workload.
+   Every console login was one `psql` process the harness launched: two a second from the sampler in both arms, and in the
+   omni arm four more a second from the brain (SHOW STATS, SHOW POOLS, SHOW POOLS again for the idle count, SHOW CONFIG for
+   the lever) plus three per write (read the lever, SET, read it back). The server churn that would have supported the
+   "queuing" explanation is small: about 70 reconnects an omni arm.
+2. *The cost of one launch.* 100 launches of `psql --csv -c "select 1"` from Python on a four-core Ubuntu 24.04 machine of
+   the runner's class: **52 ms of CPU each** (4.27 s user, 0.95 s system, 6.1 s of wall). psql loads libpq, OpenSSL, GSSAPI
+   and LDAP and opens a connection before it runs one command; that is where the time goes.
+3. *A paired repetition of `select` on the unchanged harness with a per-process meter* (`/proc` read every 0.25 s; PgBouncer,
+   every PostgreSQL process with the postmaster's reaped children, pgbench by process, the harness's Python and its reaped
+   children; the same machine as 2):
+
+   | CPU-seconds over the 302 s arm | native | omni | omni − native |
+   |---|---:|---:|---:|
+   | the whole host (the gauge the table reports) | 573.5 | 626.3 | **+52.8** |
+   | PgBouncer | 138.0 | 139.2 | +1.2 |
+   | PostgreSQL, every process | 307.5 | 302.8 | −4.7 |
+   | pgbench | 128.7 | 121.6 | −7.1 |
+   | the harness's Python itself | 2.3 | 3.9 | +1.6 |
+   | `psql` launches (the harness's children less pgbench) | 21.3 | 77.2 | **+55.9** |
+
+   The pooler did not spend the CPU (+1.2 s), nor did the database (−4.7 s): **the `psql` launches did (+55.9 s against a
+   +52.8 s host difference)**, about 35 ms each at the console. On GitHub's runner the omni arms' extra was 95 CPU-seconds
+   for about 1,570 extra launches, about 60 ms each; a slower runner, the same cause. In this repetition the omni arm also
+   read servers alive 7.8 against 20.0, median latency 0.656 ms against 0.554 ms (+18%, the counted set's +17%), p95 23.5 ms
+   against 4.3 ms, work inside the line 7,859 against 8,088 tps.
+
+**Where the median latency went.** The take-back rule gave back one idle server a second whenever the pooler's service time
+read calm, and with 0.4 ms transactions against a 50 ms line it always read calm: the pool went from 20 to the floor of 2 in
+the light notches and held near 8 on average (`audit.jsonl`: 100 to 117 writes an arm, 89 to 104 of them take-backs), and the
+users' queue behind it is the +17% on the median and the 143 ms p95. The pool was shrunk into demand that the pooler
+itself was reporting (`total_wait_time`, clients waiting for a server) and the rule did not ask.
+
+**The amendment, three parts, nothing else.**
+
+1. **One console connection an arm** (`tools/run_pgbench.py`, class `Console`): the harness speaks the server's own wire
+   protocol (PostgreSQL's protocol, version 3, the simple query) over one connection held for the whole arm, in both arms
+   alike, for the sampler and the brain; no process is launched for a reading; the brain reads SHOW POOLS once a decision
+   and takes its idle count from that row. The parsing is tested without a server (`tests/test_run_pgbench.py`). The console's
+   logins per arm are written into the arm's record.
+2. **The queue line.** The share of the pooler's time its clients spent waiting for a server in the last second
+   (`total_wait_time` against `total_xact_time + total_wait_time`, differenced) is read every second. A server is taken
+   back, by the calm give-back and by the slow-inside-the-server shrink alike, only while that share is **under one percent
+   and a transaction was served in that second**; while it is **at one percent or above, servers are added back, one for
+   every percent of waiting (rounded up), up to the pooler's own setting** (20), so a take-back that put clients in the
+   queue is undone the next second and a rising load gets its servers back at once (waiting 6% of the time adds six). Above
+   the pooler's own setting only slowness adds, by the force, as amendment 1 wrote it; adding is never held, and the fail-up
+   is unchanged. One percent is the line the two other database tests already use for their give-back (misses under one
+   percent of reads), and it is the unit of the add-back; no new number. At the smallest pool that serves the load without
+   waiting the rule probes down one server and comes back, no oftener than the five-second dwell allows (one connection
+   closed and reopened every six seconds or so, written in the audit as the knob's moves): that is how it finds the knee,
+   and it is said here so the writes count in the table is read for what it is. Said plainly: the pool is only ever taken
+   from idle servers, and it is given back the moment anyone waits; the saving comes from the hours when the pool was bigger
+   than the demand, and from nowhere else.
+
+   *Disclosed: this mechanism was found in the counted set's own audits, which are the untouched workloads' audits; the rule
+   it fixes was frozen on the tuning workload, but the fix was designed with the untouched workloads' failures in view, and
+   its one number is borrowed, not fitted. The second counted set is therefore read as a test of the amended rule on the
+   same three workloads, not as a fresh untouched test; a referee who wants an untouched test of this rule needs a workload
+   none of these runs has seen, and that is noted for the register.*
+3. **The harness's own CPU is recorded** beside the host's (`harness_cpu_seconds`, the Python process's own time: the
+   compass's brain in the omni arm, the sampler in both; shown, not judged), so the next table says what the governor
+   itself costs instead of leaving it inside the host's figure.
+
+Unchanged: the reading of amendment 1, the band, the centre, the gains, the cushion, the direction rule, the dwell, the
+cover [2, 90], the fail-up, the one-writer rule, the hand-back, the load, the gauges, the workloads, the three-run rule.
+`tests/test_run_pgbench.py` holds the gate's cases (clients waiting 2% of the time: nothing taken; under 1%: an idle server
+given back; nothing served: nothing taken; adding never gated) and the console parsing.
+
+**Local check of the amended harness (8 October, the four-core machine above, one paired repetition each, the per-process
+meter running; not counted).** Three versions of the queue line were tried in the order written, and all three are recorded:
+
+| Pair (select unless named) | host CPU-s, native → omni | `psql` CPU-s | servers alive | p50 (ms) | p95 (ms) | p99 (ms) | work inside the line (tps) |
+|---|---|---|---|---|---|---|---|
+| the unchanged harness (the meter's pair above) | 573.5 → 626.3 (+9%) | 21.3 → 77.2 | 20 → 7.8 | 0.554 → 0.656 | 4.3 → 23.5 | | 8,088 → 7,859 |
+| console held, take-back gated, no add-back | 564.1 → 530.0 (−6%) | 0.9 → 0.8 | 20 → 8.0 | 0.562 → 0.490 | 4.1 → 3.0 | 12.2 → 43.6 | 8,110 → 8,037 |
+| the same, one server a second added back | 592.7 → 591.1 (0%) | 1.0 → 1.2 | 20 → 17.7 | 0.582 → 0.590 | 6.9 → 8.0 | 19.3 → 23.2 | 9,052 → 9,051 |
+| the same, `tpcb` (the tuning workload) | 513.9 → 520.8 (+1%) | 0.7 → 0.8 | 20 → 14.7 | 3.17 → 3.25 | 74.1 → 46.4 | 213 → 204 | 1,045 → 1,078 |
+| **the rule above: one server per percent added back** | 604.7 → 603.3 (0%) | 1.2 → 1.0 | 20 → 18.2 | 0.575 → 0.598 | 8.1 → 12.6 | 24.4 → 40.9 | 9,489 → 9,446 |
+
+Read: the CPU cost is gone in every amended pair (the `psql` line is the sampler's one login and the brain's one), with
+PgBouncer and PostgreSQL within a few seconds of native in each (second pair: 139.3 → 136.4 and 315.6 → 290.5; third: 143.1 →
+142.7 and 329.1 → 333.7; fifth: 146.7 → 146.6 and 340.2 → 343.5), and the harness's own CPU with the brain running is 0.5 to
+0.6 CPU-seconds over a 300 s arm. The gate without an add-back (second pair) let the pool slip one server at every step
+boundary, where a second with no waiting is read, and never come back: by the light notches at the end of the arm it stood
+at 2 with clients waiting 8% to 28% of the time, which is the harm the amendment is meant to remove, so the add-back was
+written. With the add-back the pool follows the demand (at 20 through the peak notches in both arms, 13 to 19 at the light
+ones) and the saving is 9% to 11% of the servers on `select` and 27% on `tpcb`, where the pool also rose above 20 on the
+force's own add at the peak and fell to 3 at the light notches. The p95 and p99 of the last pair are worse in the omni arm,
+and the difference sits in the peak notches (45.6 against 27.3 ms at notch 6) where the pool was 20 in both arms for the
+whole notch: at nine tenths of the machine's capacity a pair on this box swings by that much on its own (the unchanged
+harness's pair read 761 against 15 ms there, and two native-equivalent arms of `tpcb`, below, read 2,688 against 26 ms), so
+these single pairs cannot settle the tail and are not asked to; the three-run set is. One fault found by the check and fixed
+before the dispatch: in the `tpcb` pair of the second version the brain died at its first read, because the sampler and the
+brain shared the one console connection without a lock and a garbled message was read; that arm ran as native in Omni's
+name, and the record would have said nothing. The console now takes one query at a time, a garbled message reconnects once,
+and a brain that cannot attach writes the fault into its audit and into the arm's record (`controller_error`), so such an
+arm reads NO on the hand-back line and says why.
+
+**What is expected, said before the runs.** The host CPU rows should come down to the noise, because the cost was ours; the
+median and p95 rows should come back toward native's, because the pool is no longer shrunk into a queue; the connections
+held open should still fall, by much less than the 61% to 72% of the first set (the local pairs say 9% to 27%), because the
+pool is now taken only from idle servers and given back the moment anyone waits. If the CPU rows stay confirmed worse after
+this, the cost is the pooler's or the database's after all and the next amendment is not ours to make; if the connections
+row loses its confirmation, that is the result; if the tail rows read confirmed worse over three runs, the probing itself
+costs service and the rule is not good enough, and that too is the result.
+
+**The second counted set (A2, B2, C2)** runs on this harness, the same inputs as the first (the three untouched workloads,
+three paired repetitions, 20 s a notch, three separate dispatches on one commit); its table replaces the first in
+`results/live/V3_PGBENCH.md`, and the first set's table moves to `docs/history` with this note, every row kept. The index
+reads the second set when it lands and says so.

@@ -130,7 +130,19 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
    cache held given back by about half on two untouched workloads at no measurable cost in work, p95 or CPU, one confirmed
    loss (the burst mean latency, +2% to +4%); the index spans six real categories at +24.1%: MySQL's second set entered at +12.2% (the first set at +0.0%, every row inside the noise) and the public-trace test raised the Kubernetes category from +25.5% to +28.8%. Cassandra and Redis under
    YCSB and HammerDB are next in row 24.
-6. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
+6. **The costs in the database tables, traced and amended with the engine locked** (8 October; `docs/POSTGRES_PREREGISTRATION.md`
+   amendment 2, `docs/MYSQL_PREREGISTRATION.md` amendment 2, `docs/YCSB_PREREGISTRATION.md` amendment 1; Omni v3 before and
+   after, the harnesses are outside the fingerprint). PostgreSQL's +14% to +28% host CPU was our harness launching a `psql`
+   process for every reading (measured: 52 ms of CPU a launch, 7,956 console logins in one workload's pooler log, +55.9 CPU-s
+   on the launches against a +52.8 s host difference on a metered repetition; the pooler +1.2 s), and its +15% to +17% median
+   latency was the pool shrunk into a queue the pooler itself reported: one console connection an arm and the queue line (a
+   server taken back only while clients waited under 1% of the pooler's time, servers added back one per percent of
+   waiting, up to the operator's 20). MySQL's read_write pool was bought for slow writes the pool cannot mend (36 of 82 grows at a miss share under
+   1%): the pool grows only while missing. MongoDB's memory saving on b, c and burst was a cold cache given back before its
+   first eviction (four notches in the first five seconds of every arm) and held at the floor evicting: the give-back gate is
+   the miss share, as MySQL's, and the saving may fall to the noise, said beforehand. The second (PostgreSQL, MongoDB) and
+   third (MySQL) counted sets run on these rules; the earlier tables move whole to `docs/history` when the new ones land.
+7. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
    Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,
    RocketPy, Cantera (Kafka and Redis done); one or two at a time, each preregistered.
 7. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
