@@ -122,6 +122,33 @@ native in all three runs, the whole window confirmed better on mean response, p9
 machines and energy inside the noise. The memory ratio is not reported for this scenario, as declared: its window is
 shorter than twenty minutes. Nothing in the rules changed between the smoke run and the counted runs.
 
+## Scenario 2, the result (2026-10-08, runs 37716886448, 37716900258, 37716913526, on the rules above unchanged)
+
+`results/live/V3_ROBUST_LONG.md`, three paired repetitions of 7,200 s an arm in each of three separate runs, all at commit
+`bd389c40` on Omni v3. **The governor's resident memory**, the mean of the last ten minutes over the first ten, read at most
+**1.048, 1.067 and 1.052** in the three runs: no leak (the limit was a quarter). **Decisions made**: 117 to 119 of the 120
+the 60-second interval predicts in every repetition (97.5% at the fewest; the threshold was 95%): valid. **Failed
+decisions**: 2, 3 and 3 in the three runs, all in the second repetition's omni arm, all the same cause, the cluster's own
+API answering 500 on the governor's read of the HPA (`API 500 for apis/autoscaling/v2/horizontalpodautoscalers`) for two
+or three consecutive decisions; the governor held, wrote nothing, and resumed on the next successful read, as the
+blind-means-hold rule requires; shown with their reason, as declared, and not judged. **Decision time**, the gap between
+consecutive decisions less the 60 s the governor sleeps, mean of the last hour over the first: at most 1.20, 1.14 and 1.07,
+under the limit of a half: no slowing. **Every setting handed back at the end** and read back at the operator's, no record
+left, in every repetition of every run. The whole window's gauges: machines, node-hours and both energy models no
+difference beyond the noise in all three runs; mean response, p95, p99 and time over the line read confirmed better in run
+A and inside the noise in B and C, so **no difference beyond the noise in 2 of 3 runs** (three pairs give wide intervals,
+as the gauges' own direction says they would); failed requests no difference in all three; HPA replicas, pods started and
+pod start wait inside the noise. The governor's own CPU read 0.008 to 0.010 of a core. Readings: 9 no difference beyond the
+noise in all three runs, 4 in 2 of 3, no leak, valid, no growth, handed back, 2 same, 8 shown.
+
+Disclosed: the reader that turns the audits into the decision rows (`tools/live_reps.py`, `robust_decisions`) was
+finished after these runs completed; the gauges themselves, their thresholds and their directions are the ones written
+above before the first run, the raw files were not touched, and each run's live report in the archive was rebuilt from
+them with the checksum list updated for those two derived files. The audit records the moment of every decision and not
+its duration, so the decision time is read as the gap between decisions less the configured interval, which is what the
+governor does between two decisions; this derivation is declared here. The 24-hour run on a rented machine follows the
+same rules.
+
 ## What is declared before the first run
 
 The 60-second hand-back allowance is the sum of the watchdog's pass (5 s), the restore command's own run (one kubectl per

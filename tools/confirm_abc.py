@@ -60,6 +60,36 @@ def robust_rows(runs):
         k3 = "robust: governor resident memory, mean of the last ten minutes over the first ten, the most over the repetitions"
         L.append(f"| {k3} | {blocks[0]['memory_ratio_max']:.3f} | {blocks[1]['memory_ratio_max']:.3f} | {blocks[2]['memory_ratio_max']:.3f} | {v3} |")
         rows[k3] = {"reading": v3.strip("*"), "runs": [b["memory_ratio_max"] for b in blocks]}
+    if all(b.get("decisions_share_min") is not None for b in blocks):
+        # the long run's own rows (docs/ROBUSTNESS_PREREGISTRATION.md, scenario 2): decisions made of expected, failed decisions,
+        # the decision time's growth, the hand-back at the end
+        lim = blocks[0]["decision_share_limit"]
+        bad = any(b["decisions_share_min"] < lim for b in blocks)
+        v4 = f"**INVALID: a repetition made fewer decisions than {lim:.0%} of the expected**" if bad else f"valid (every repetition at {lim:.0%} of the expected or more)"
+        k4 = f"robust: decisions made, the fewest repetition's share of the count the configured interval predicts for the window ({blocks[0]['decisions_expected']:.0f})"
+        L.append(f"| {k4} | {blocks[0]['decisions_share_min']:.1%} | {blocks[1]['decisions_share_min']:.1%} | {blocks[2]['decisions_share_min']:.1%} | {v4} |")
+        rows[k4] = {"reading": v4.strip("*"), "runs": [b["decisions_share_min"] for b in blocks]}
+        fails = [b.get("failed_decisions_total", 0) for b in blocks]
+        reasons = sorted({r for b in blocks for r in (b.get("failed_reasons") or [])})
+        # preregistered as shown, not judged: a failed decision is a decision the governor could not make (the cluster API did not
+        # answer), held through and resumed; each is shown with its reason, here and in the run's live report
+        v5 = ("shown, not judged: " + ("; ".join(reasons) if reasons else "no reason recorded") + "; the governor held and resumed") if any(fails) else "none in any repetition"
+        k5 = "robust: failed decisions over the whole window (the governor could not read the cluster that second), with the API's own reason"
+        L.append(f"| {k5} | {fails[0]} | {fails[1]} | {fails[2]} | {v5} |")
+        rows[k5] = {"reading": v5, "runs": fails}
+        if all(b.get("decision_time_ratio_max") is not None for b in blocks):
+            g = blocks[0]["cycle_growth_limit"]
+            worse = any(b["decision_time_ratio_max"] > g for b in blocks)
+            v6 = "**WORSE: the decision time grew by more than half**" if worse else f"no growth beyond the limit (every repetition under {g})"
+            k6 = "robust: the governor's decision time, mean of the last hour over the first (the gap between decisions less the configured interval), the most over the repetitions"
+            L.append(f"| {k6} | {blocks[0]['decision_time_ratio_max']:.2f} | {blocks[1]['decision_time_ratio_max']:.2f} | {blocks[2]['decision_time_ratio_max']:.2f} | {v6} |")
+            rows[k6] = {"reading": v6.strip("*"), "runs": [b["decision_time_ratio_max"] for b in blocks]}
+        if all(b.get("handed_back_end_all") is not None for b in blocks):
+            ok = all(b["handed_back_end_all"] for b in blocks)
+            v7 = "**confirmed: every setting handed back at the end of every repetition**" if ok else "**WORSE: a repetition was not handed back at the end**"
+            k7 = "robust: every setting handed back at the end and read back at the operator's, no record left, every repetition"
+            L.append(f"| {k7} | {'yes' if blocks[0]['handed_back_end_all'] else 'NO'} | {'yes' if blocks[1]['handed_back_end_all'] else 'NO'} | {'yes' if blocks[2]['handed_back_end_all'] else 'NO'} | {v7} |")
+            rows[k7] = {"reading": v7.strip("*"), "runs": [b["handed_back_end_all"] for b in blocks]}
     return L, rows
 
 
