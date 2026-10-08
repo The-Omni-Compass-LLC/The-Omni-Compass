@@ -160,6 +160,28 @@ result is recorded here when it has run, and it is not counted.
   before the counted runs; everything else in this document stands as written. The ordered-keys fix of the third smoke
   worked: the dataset is now what the run reads.
 
+## The result (2026-10-08, runs 37727968670, 37727976107, 37727983746, on the rules above unchanged after the fourth smoke)
+
+`results/live/V3_YCSB.md` (`tools/ycsb_abc.py`), all three runs at commit `7ee471b4` on Omni v3, three paired repetitions a
+run. On the four untouched workloads: the **cache size held** fell by about half on c (512 to about 259 MB, −49% in every
+run) and on burst (−41% to −49%), and by 13% to 37% on f, **confirmed better**; on b it fell 27% to 50% but run A's interval
+included zero, so the row reads **no difference beyond the noise (1 of 3 runs)**, and that is the result there. **Work
+inside the 1 ms line, p95 and p99 read inside the noise on all four** (work between −2.7% and +1.1%, every interval over
+zero); **no operation failed** in any arm; **host CPU-seconds inside the noise on all four** (c read +12% to +15% with every
+interval over zero); pages read into the cache rose 14% to 58% (shown, not judged: the misses the smaller cache costs); and
+the **mean latency on burst read +2.2% to +3.7% in all three runs, clear of zero: confirmed WORSE**, the one loss, which
+stands. Every cache size was handed back to the operator's 512 MB and read back in every arm of every run. 6 gauge-rows
+confirmed better, 1 confirmed worse, 0 where the runs disagree. The tuning workload, shown and not counted, read the same
+way (the cache 12% to 15% smaller, confirmed; everything else inside the noise).
+
+What the result means, within the disclosure made above before any run: on this machine the data files sit in the
+operating system's page cache as well, so a storage-engine miss is a memory read and a decompression, and the governor
+could give half the cache back at no measurable cost in work or tail latency and a few percent of mean latency. That is the
+answer to the question this benchmark can ask on a 16 GB runner whose dataset is 1.6 GB. The harder question, the same
+knob on a machine whose data does not fit in memory, where a miss is a disk read, is not answered here and is not claimed.
+In the Omni index the category enters as the work, p95, cache size and CPU-seconds columns by rule (`tools/omni_index.py`):
+the cache given back is its gain, and the mean-latency loss, not an index column, is in the table where it belongs.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

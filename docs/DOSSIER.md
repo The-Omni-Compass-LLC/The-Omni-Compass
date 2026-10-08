@@ -5,7 +5,7 @@
 
 > **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `d88461a8`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `7514d1e5`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ## 1. The mechanism, and proof that it is the one that ran
 
@@ -76,6 +76,20 @@ Redis as Ubuntu ships it with the operator's 64 MB ceiling and allkeys-lru is na
 | `small` | **+26% to +27%, confirmed better** | **+26% to +27%, confirmed better** | **-1% to -0%, confirmed better** | **+320% to +325%, confirmed WORSE** | no difference beyond the noise |
 
 The memory the compass holds for a wide working set is the resource this benchmark trades, and reads worse by rule. Table: `results/live/V3_REDIS.md`.
+
+## 3d. A real database's storage-engine cache: MongoDB under YCSB, the operator's cache size, Omni v3, three runs (evidence class L)
+
+MongoDB 8.0 as its publisher ships it with the operator's WiredTiger cache of 512 MB is native; omni is the compass law on one knob, the cache size, inside the cover [256, 2,048] MB through the server's own console, growing by notches of 64 MB only while the cache is full and reads are slow, and giving a notch back when calm and nothing is evicted (`docs/YCSB_PREREGISTRATION.md`). YCSB's published core workloads with the key space stepping through the cache and past it, drawn uniformly, at 3,000 operations a second from 32 threads; three paired repetitions a run, three runs; the tuning workload (workload A) is shown and not counted. Runs: A 37727968670; B 37727976107; C 37727983746.
+
+| Workload | Work inside the 1 ms line | p95 | Cache size held, MB (the resource held) | Pages read into the cache | Host CPU-seconds |
+|---|---|---|---|---|---|
+| `tuning` (tuning, shown, not counted) | no difference beyond the noise | no difference beyond the noise | **-15% to -12%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `b` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
+| `burst` | no difference beyond the noise | no difference beyond the noise | **-49% to -41%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `c` | no difference beyond the noise | no difference beyond the noise | **-50% to -49%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `f` | no difference beyond the noise | no difference beyond the noise | **-37% to -12%, confirmed better** | shown, not judged | no difference beyond the noise |
+
+On this machine the data files sit in the operating system's page cache as well, so a storage-engine miss is a read from memory, not a disk, as disclosed before the run: the result is memory given back at no measurable cost in work inside the line, p95 or CPU, with one confirmed loss, the mean latency on the burst workload. Table: `results/live/V3_YCSB.md`.
 
 ## 4. The bill on a real cloud: Azure Kubernetes Service, Omni v1 (evidence class L, a metered bill)
 

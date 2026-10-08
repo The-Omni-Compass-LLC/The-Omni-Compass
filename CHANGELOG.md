@@ -8,6 +8,21 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **MongoDB under YCSB on v3, confirmed three times** (`results/live/V3_YCSB.md`, runs 37727968670, 37727976107,
+  37727983746, all at `7ee471b4` on Omni v3; `docs/YCSB_PREREGISTRATION.md`, register row 24, proof-program row 11):
+  the operator's 512 MB WiredTiger cache as native, the compass on the cache size inside [256, 2,048] MB through the
+  server's own console as omni. On the four untouched workloads the cache held fell about half on c and burst and 13% to
+  37% on f, confirmed better (b inside the noise in one run); work inside the 1 ms line, p95, p99 and host CPU inside the
+  noise on all four; no failed operation; the burst mean latency +2% to +4%, confirmed worse, the one loss; every cache
+  handed back. 6 rows better, 1 worse, 0 disagree. Four smoke runs preceded the counted runs and are all in the
+  preregistration: two harness faults, YCSB's zipfian draw that never reached the cache, hashed run keys over an ordered
+  load, and the line set at 1 ms from 2 ms on the tuning workload's own figures. **The Omni index now spans five real
+  categories: +25.9%** (`results/OMNI_INDEX.md`; the MongoDB category +10.2%); `tools/omni_index.py` and `tools/dossier.py`
+  carry the table (dossier section 3d).
+- **The fleet's sixth dispatch** (`docs/K8S_COMPASS_PREREGISTRATION.md`, amendments 5 and 6): eastus refused the fifth
+  dispatch's first repetition (the 23rd refusal), the run was cancelled to weigh a second region, the 6 October survey shows
+  no other region can take a 40-worker fleet on this subscription, and the fleet was dispatched a sixth time in eastus
+  unchanged; its first repetition was refused too (the 24th); the run continues.
 - **The manual, expanded to referee and underwriter level** (`docs/OMNI_COMPASS_MANUAL.md`, the PDF rebuilt): the
   standards every page keeps, the executive summary as prose with what is and is not shown, the governor's on-top
   principle, the verdict, the pedals, the modes and the two switches, the catalog, the realms, the organisms and the

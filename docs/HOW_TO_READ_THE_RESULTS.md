@@ -102,7 +102,7 @@ confirmed". The `V1_` or `V3_` in the name is the engine the runs carried (`pyth
 a table never mixes engines, and a reading is never carried from one engine to another. Losses are in the table beside
 the gains: the database's host CPU-seconds, the grid's losses in four grids, the Panda's copper, CityLearn's bill.
 
-## The workload tables (`V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`) and the swarm table (`V3_SWARM.md`)
+## The workload tables (`V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`, `V3_YCSB.md`) and the swarm table (`V3_SWARM.md`)
 
 The database, the broker and the cache share one shape. The head names the three runs, their commits and the engine each
 carried. Then one section per **workload**: the tuning workload first, marked "shown and not counted" because the rules were
