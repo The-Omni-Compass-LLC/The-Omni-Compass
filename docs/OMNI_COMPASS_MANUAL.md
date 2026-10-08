@@ -406,6 +406,37 @@ controllers, and a verification, de-duplication and mapping pass. The register (
 every family with its muscle count and the kinds of knob it carries, so a reader can see at a glance what the modelled
 realms contain and what they do not.
 
+The fifty-nine families, by realm, are these. **Compute, AI and cloud** (eighteen): AI inference serving, AI training,
+cloud virtual machines and capacity, container resources, cross-cluster and edge placement, DPU and programmable IO,
+distributed cluster managers, GPU fabric and RDMA, HPC and distributed compute, host CPU and memory, Kubernetes dynamic
+device allocation, Kubernetes placement and scheduling, Kubernetes workload scaling (the largest family, 31 muscles),
+NVIDIA GPU hardware, node fleets and Karpenter-class control, OpenShift and the Machine API, quantum computing control
+(simulated), and work admission and demand shaping. **Physics, robotics and autonomous** (eight): automotive EV and mobile
+powertrains, aviation and autonomous flight, elevators and vertical transport, marine propulsion and vessel automation,
+rail traction and train control, robotics fleets and warehouse automation, robotics motion control, and spacecraft and
+flight software. **Energy, facility and industrial** (seventeen): agriculture and irrigation, building and
+critical-environment HVAC, cooling and chillers, district heating and cooling, energy storage and microgrids, facility
+and grid optimisation, grid transmission and distribution, healthcare critical environments, industrial PLCs and process
+automation, mining and mineral processing, oil and gas pipelines, PDUs, UPS and electrical distribution, pharmaceutical
+and food manufacturing, power generation and turbine control, renewable generation and inverter control, semiconductor
+fabs and precision manufacturing, and water and wastewater pumping. **Distribution and specialized** (sixteen): cache and
+memory services, commerce and payments, data analytics and ETL, databases and transactions, medical imaging and clinical
+systems, messaging and streaming, network routing and switching, observability and telemetry, ports and maritime
+logistics, reliability, security and recovery, runtimes and applications, search, indexing and vector databases, service
+meshes and API reliability, block, file and object storage, telecom radio access and edge radio, and workflow, logistics
+and fulfilment. Thirteen of these, marked "v2" in the register (the elevators, marine, rail, agriculture, district
+heating, healthcare, mining, pipelines, pharmaceutical and food, power generation, renewable generation, medical imaging
+and ports families), came with the second engine version; they, with the muscles added to the families that already
+existed, are the difference between the 656 muscles in 46 families of v1 and the 945 in 59 of v2 and v3.
+
+Every live benchmark in Part VI sits inside one of these families: the Kubernetes tests inside workload scaling and node
+fleets, PostgreSQL and MySQL inside databases and transactions, Redis and MongoDB's cache inside cache and memory
+services, Kafka inside messaging and streaming, the robot arms inside robotics motion control, the drones inside aviation
+and autonomous flight, the power grids inside transmission and distribution, the buildings inside HVAC. A live result is
+therefore also a check on one family's model: where the real stack and the modelled muscle move the same way under the
+same law, the model has earned some trust; where they do not, the model is the thing to doubt, and the catalog's plant
+model for that family is the place to look.
+
 ### 2.2 The four realms and the spine
 
 The muscles fall into four realms. Every realm stands on the same **spine** of 257 muscles (Kubernetes, machines, GPUs
@@ -2456,12 +2487,17 @@ Three things this manual does not show, and the program that will show them or s
   `docs/GPU_PREREGISTRATION.md`); until then the card has no result and the manual says so.
 - **Robustness over a day.** The governor killed outright is a measured result (section 16.4b: every setting back in 7 to
   11 s, thirty times out of thirty), its own cost is tabulated, and the two-hour run is measured three times (no leak,
-  no slowing, every decision expected but a few the cluster's API refused, every setting handed back); what remains open is
-  the 24-hour run on a rented machine, for drift and leaks over a working day, and the same test on the other stacks.
+  no slowing, every decision expected but a few the cluster's API refused, every setting handed back); the 24-hour run,
+  one pair on each of three rented eight-core machines of three families, is under way (`docs/ROBUSTNESS_PREREGISTRATION.md`,
+  scenario 2b) and is read when its machines are collected; the same test on the other stacks remains open.
+- **A demand shape that is not ours.** Every Kubernetes result so far was driven by a load schedule we wrote. The
+  public-trace test (`docs/TRACES_PREREGISTRATION.md`) replays a day of the Google cluster trace of 2011 under the
+  wandering test's own rules, three runs of ten pairs, dispatched on 8 October; the Azure Functions trace follows by the
+  same rule. Until its table lands, the "our own schedules" threat of section 16.7 stands unanswered, and the manual says so.
 
 The queue beyond these, in order, is `docs/REGISTER.md` section 4, one or two at a time, each preregistered before it
-runs: PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour run, Basilisk, Orekit and
-GMAT, RocketPy and OpenRocket, Cantera. When the founder declares the engine final, the engine that stands then is
+runs: PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, Basilisk, Orekit and GMAT, RocketPy
+and OpenRocket, Cantera. When the founder declares the engine final, the engine that stands then is
 published as Omni-Compass 1.0, and the older fingerprints go to `docs/history` as the road to it.
 
 ---
