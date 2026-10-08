@@ -29,7 +29,14 @@
   (`tools/own_cost.py`, `results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size). `tools/live_reps.py`
   gains the robustness rows and `tools/confirm_abc.py` the three-run rows for them; `tests/test_robust.py` in
   `verify.py`. No engine file changes: `omni_controller/`, `omnicompass/` and `realms/` are the v3 bytes.
-- **Redis runs A, B and C finished** (37704450300, 37704464642, 37704479534) and are requested for archive.
+- **Redis on v3, confirmed three times** (`results/live/V3_REDIS.md`, runs 37704450300, 37704464642, 37704479534, all
+  omni-v3 at `467f73eba7a6`): on all three untouched workloads (small, large, burst) work inside the 2 ms line +14% to
+  +27%, the hit rate +14% to +27% and the mean latency −30% to −61%, confirmed better; no failed request; the memory
+  ceiling held 64 → 200 to 270 MB and the memory used confirmed worse (the resource the gain costs); host CPU-seconds
+  inside the noise on all three; keys evicted −76% to −92% (shown); every ceiling handed back; 12 gauge-rows better, 6
+  worse, 0 where the runs disagree. **The Omni index with the cache in: +30.2%** (Kubernetes +25.5%, the database +14.2%,
+  Kafka +166.9%, Redis −24.9%): the cache's category reads negative because the memory it holds for a wide working set is
+  the resource it trades, and reads worse by rule, while its work and hit rate read better; every category weighs the same.
 - **Kafka on v3, confirmed three times** (`results/live/V3_KAFKA.md`, runs 37697222651, 37697239400, 37697255445, all
   omni-v3 at `a0b5d2381e9e`): on all three untouched workloads (light, heavy, burst) work inside the 500 ms line +16% to
   +21%, end-to-end p95 1.6 s → 9 to 14 ms, mean lag −92% to −97%, confirmed better; no message lost in any arm;

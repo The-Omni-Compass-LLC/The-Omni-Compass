@@ -25,9 +25,13 @@ workloads, at a confirmed cost in the host's CPU seconds (+14% to +28%), counted
 Kafka as shipped, `results/live/V3_KAFKA.md`): on all three untouched workloads work inside the 500 ms line **+16% to
 +21%**, the 95th percentile 1.6 s → 9 to 14 ms and messages waiting −92% to −97%, confirmed better, no message lost;
 consumers held 2 → 6 to 8, **confirmed worse**, the resource the gain costs; host CPU worse on one workload, inside the
-noise on two. **The Omni index, real machines only, confirmed three times: +56.4%** (`results/OMNI_INDEX.md`; Kubernetes
-+25.5%, the database +14.2%, Kafka +166.9%, each category weighed the same; a row inside the noise counts as exactly 1;
-Kafka's speed ratio is large because native's queue grew at nine tenths of its capacity and Omni's did not). The v1
+noise on two. **A real cache** (Redis as shipped, `results/live/V3_REDIS.md`): on all three untouched workloads work inside
+the 2 ms line **+14% to +27%**, the hit rate +14% to +27% and the mean latency −30% to −61%, confirmed better; the memory
+ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain costs; host CPU inside the noise. **The Omni
+index, real machines only, confirmed three times: +30.2%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database
++14.2%, Kafka +166.9%, Redis −24.9%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's
+speed ratio is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is
+negative because the memory it holds for a wide working set is the resource it trades and reads worse by rule). The v1
 tables read the same and stay as the first engine's record.
 
 **What is shown and what is not.** Shown: more work inside the response line on the same machines and a faster tail,
@@ -52,6 +56,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | Fairness, a noisy neighbour | inside the noise on every row | inside the noise | inside the noise | inside the noise | `results/live/V3_FAIRNESS.md` |
 | PostgreSQL behind PgBouncer, three workloads | inside the noise | inside the noise | connections held open **−61% to −72%** on two workloads; the runs disagree on the third | host CPU-seconds **+14% to +28%, confirmed worse** | `results/live/V3_PGBENCH.md` |
 | Apache Kafka, a consumer group's size, three workloads | work inside the line **+16% to +21%**; no message lost | p95 **1.6 s → 9 to 14 ms**, lag −92% to −97% | consumers held **2 → 5.8 to 7.9, confirmed worse** | host CPU-seconds +10% to +20% confirmed worse on light, inside the noise on heavy and burst; CPU per message inside the line −10% to −12% on burst | `results/live/V3_KAFKA.md` |
+| Redis, a cache's memory ceiling, three workloads | work inside the line **+14% to +27%**, hit rate +14% to +27%; no failed request | mean latency −30% to −61%; p95 within a hair of native's (a miss is a miss in both arms) | memory ceiling held **64 → 200 to 270 MB, confirmed worse** | host CPU-seconds inside the noise on all three | `results/live/V3_REDIS.md` |
 | The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell | the organisms' work unchanged | p95 better in every cell | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
 
 ## Measured on a real cloud (Azure, its own bill), Omni v1
@@ -96,16 +101,13 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack runs on a rented
    machine (10,800 s window, three repetitions, about 20 hours); the tower follows.
 3. **The real card**: the founder's runs on Lambda, one exact commit.
-4. **Redis** (`docs/REDIS_PREREGISTRATION.md`): the three untouched workloads ran as A, B and C on v3 (runs 37704450300,
-   37704464642, 37704479534, finished 8 October); the three-run table V3_REDIS.md joins `results/live/` and the index
-   as soon as the archive bot copies the files.
-4b. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, built, no engine file changes): the governor killed outright
+4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, built, no engine file changes): the governor killed outright
    mid-run and the watchdog's hand-back, the long run, and the governor's own CPU at 1 to 1,000 copies; the last is done
    from the archives (`results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size); the first two run as A,
    B and C next.
 5. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB and
    HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera
-   (Kafka and Redis done or running); one or two at a time, each preregistered.
+   (Kafka and Redis done); one or two at a time, each preregistered.
 6. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
    fingerprints go to `docs/history` as the road to it.
 

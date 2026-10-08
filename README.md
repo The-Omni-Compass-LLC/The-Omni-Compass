@@ -43,18 +43,22 @@ current card governor on a real GPU (the one real-card run, on the governor sinc
 energy and made its 95th percentile 43-84% slower:
 [`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
-**The Omni index, every real test together: +56.4%** more for the same, or the same for less, across work, speed,
-machines and energy: real Kubernetes on v3 +25.5% (work +19%, speed +93%, machines +4%, energy +3%), the real database
-on v3 +14.2% (connections to the database halved and more; the compass's own CPU, confirmed worse, counted against it)
-and real messaging on v3, Apache Kafka, +166.9% (work inside the line +17%; a 95th percentile of 1.6 s against 9 to 14 ms,
-because native's queue grew at nine tenths of its capacity and Omni's did not; consumers held 2 → 6 to 8, confirmed
-worse and counted against it; CPU −5%). Only a row confirmed in all three runs enters; a row inside the noise counts as
-exactly zero; each real category weighs the same. Redis, Azure's billed runs and the card join the index when their
-three-run tables land (the earlier engine's +12.9% is kept in `docs/history/OMNI_INDEX_pre_v1.md`). Every number is read
-from each test's own table by [`tools/omni_index.py`](tools/omni_index.py): [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md).
+**The Omni index, every real test together: +30.2%** more for the same, or the same for less, across work, speed,
+machines and energy, four real categories each weighed the same: real Kubernetes on v3 +25.5% (work +19%, speed +93%,
+machines +4%, energy +3%); the real database on v3 +14.2% (connections to the database halved and more; the compass's own
+CPU, confirmed worse, counted against it); real messaging on v3, Apache Kafka, +166.9% (work inside the line +17%; a 95th
+percentile of 1.6 s against 9 to 14 ms, because native's queue grew at nine tenths of its capacity and Omni's did not;
+consumers held 2 → 6 to 8, confirmed worse and counted against it); and the real cache on v3, Redis, **−24.9%** (work inside
+the line +14% to +27% and the hit rate +14% to +27%, confirmed better; the memory ceiling held 64 → 200 to 270 MB,
+confirmed worse, the resource the gain costs, which outweighs the gain in the geometric mean; CPU inside the noise). Only a
+row confirmed in all three runs enters; a row inside the noise counts as exactly zero. Azure's billed runs and the card
+join the index when their three-run tables land (the earlier engine's +12.9% is kept in
+`docs/history/OMNI_INDEX_pre_v1.md`). Every number is read from each test's own table by
+[`tools/omni_index.py`](tools/omni_index.py): [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md).
 Each test: [`V3_STEADY`](results/live/V3_STEADY.md), [`V3_WANDERING`](results/live/V3_WANDERING.md),
 [`V3_ALL_FOUR`](results/live/V3_ALL_FOUR.md), [`V3_FAULTS`](results/live/V3_FAULTS.md), [`V3_FAIRNESS`](results/live/V3_FAIRNESS.md),
-[`V3_BATCH`](results/live/V3_BATCH.md), [`V3_PGBENCH`](results/live/V3_PGBENCH.md), [`V3_KAFKA`](results/live/V3_KAFKA.md).
+[`V3_BATCH`](results/live/V3_BATCH.md), [`V3_PGBENCH`](results/live/V3_PGBENCH.md), [`V3_KAFKA`](results/live/V3_KAFKA.md),
+[`V3_REDIS`](results/live/V3_REDIS.md).
 
 Six organisms with the real cluster inside (the four realms, the whole tower of 945 muscles, the four stacked, 1,716),
 on an earlier engine: late 23-52% less often and 24-40% faster in every one

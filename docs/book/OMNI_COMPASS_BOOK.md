@@ -59,14 +59,19 @@ database behind its pooler (`results/live/V3_PGBENCH.md`): 61% to 72% fewer conn
 the same latency on two of three workloads, at a confirmed cost of 14% to 28% more CPU on the host, counted against
 Omni-Compass. On a real message broker, Apache Kafka as shipped (`results/live/V3_KAFKA.md`): 16% to 21% more messages
 inside the 500 ms line on all three untouched workloads, a 95th percentile of 9 to 14 ms against native's 1.6 s, no
-message lost, at the confirmed cost of three to four times the consumers running. In the modelled realms, 945 muscles
+message lost, at the confirmed cost of three to four times the consumers running. On a real cache, Redis as shipped
+(`results/live/V3_REDIS.md`): 14% to 27% more requests inside the 2 ms line and a hit rate 14% to 27% higher on all three
+untouched workloads, at the confirmed cost of a memory ceiling held at 200 to 270 MB against the operator's 64 MB, which
+outweighs the gain in the index. In the modelled realms, 945 muscles
 and six organisms (`results/realms/REALMS.md`): every organism superior within its guardrails, zero muscles worse, at
 every size from 1 to 1,000 copies. On the independent simulators: a power grid's losses better in 7 of 11 grids and
 worse in 4; robot arms' peak torque down 10% to 29% where Omni-Compass moved and left native where the paired trial said
 not to; buildings' electricity bought and daily peak better in all 11 battery districts and the bill worse in 7; drone
 swarms' energy a mission 7% to 20% lower with no late mission, near miss or collision. The one combined number, the Omni
-index over the real categories confirmed three times, stands at **+56.4%** (`results/OMNI_INDEX.md`), with every
-category weighed the same and every row inside the noise counted as exactly nothing.
+index over the four real categories confirmed three times, stands at **+30.2%** (`results/OMNI_INDEX.md`): Kubernetes
++25.5%, the database +14.2%, messaging +166.9% and the cache −24.9%, every category weighed the same and every row inside
+the noise counted as exactly nothing. The cache's category is negative because the memory it holds is the resource it
+trades and reads worse by rule, even as its work and hit rate read better; the index does not hide that.
 
 **What has not been shown, said plainly.** An energy or cloud-bill saving on real machines. Energy on kind is a
 declared model, because the machines are containers on one runner. Azure's bill on a 4-worker fleet read no difference
@@ -3155,6 +3160,15 @@ so 9 × workers lets the fleet fill), the same in both arms. The preregistered d
 `docs/K8S_COMPASS_PREREGISTRATION.md`, "The fleet that can show one machine"; the account setup, click by click, in
 `docs/AZURE_SETUP.md`.
 
+**What the Azure runs taught us.** Three lessons, each recorded as an amendment to the preregistration before the fleet was
+dispatched again. First, a fleet is sized by the lever, not by the budget: a 4-worker fleet cannot show the few-percent
+machine saving the law makes, so its honest reading is "inside the noise", and running it again would not change that.
+Second, a new subscription's allowance is per machine family, so the fleet that can show one machine is built from nine
+families at once, each pool at its own list price, and the bill prices each pool separately. Third, a cloud region can
+refuse a new cluster for hours at a time (Azure's capacity for new control planes in its region, on both control-plane
+tiers); the harness therefore checks the subscription's allowances before it builds anything, so a refusal costs cents and
+not a cluster, and every refusal is recorded with its time.
+
 ### 10.2 A database behind its connection pooler
 
 PostgreSQL is wired through PgBouncer, the pooler most of its deployments already run (`docs/POSTGRES_PREREGISTRATION.md`,
@@ -3168,6 +3182,19 @@ back one idle server a second, and only one the pooler itself shows idle. At 95%
 to the pooler's own setting at once. If the knob is found at a value Omni-Compass did not write, it stops writing (one
 writer). At the end of every omni arm the pool size is restored to the snapshot and read back. The same plug fits any
 pooler or proxy with a console and a pool-size setting (PgBouncer, Pgpool-II, ProxySQL, the application's own pool).
+
+**What the database taught us.** The first untouched run on this stack was a loss, and it stays in the preregistration as
+it came (`docs/POSTGRES_PREREGISTRATION.md`, "The first untouched run, and amendment 1"): on the read-only workload the
+pooler's own clock read 0.11 ms a transaction against a 50 ms line, so the law gave back one idle connection a second until
+the pool stood at its floor of two, while the users' 95th percentile went from 4 ms to 3.9 s. The pooler could not see the
+time a client spent behind its own schedule waiting to send, so its clock said calm while the users waited; the
+preregistration had said so in one line without drawing the consequence. Amendment 1, declared before any counted run,
+made the reading the worse of two: the pooler's service time, or the share of its clients queued for a server, so a pool
+too small for the offered rate shows at the pooler as clients waiting and the knob fails up to the operator's setting at
+once; and it held the dwell on the brake only, never on the gas. The counted runs are three new untouched runs on the
+amended rule; the first run is not counted and is not hidden. The confirmed result is a resource held, not speed, and its
+confirmed cost is the host's CPU: the compass's own reads of the pooler's console every second are CPU the native pooler
+never spends, and they are counted against it.
 
 ### 10.3 Independent simulators, each with its own native controller
 
@@ -3186,6 +3213,19 @@ Each is preregistered (`docs/CITYLEARN_PREREGISTRATION.md`, `docs/PANDAPOWER_PRE
 `docs/ROBOTICS_PREREGISTRATION.md`), each runs A, B and C as separate GitHub runs, and each table is made by rule
 (`tools/citylearn_abc.py`, `tools/pandapower_abc.py`, `tools/mujoco_abc.py`). These are evidence class S: statements
 about the simulator's model, never about hardware.
+
+**What the simulators taught us.** Three things a referee should weigh. First, a deterministic simulator makes the
+three-run rule stricter, not looser: MuJoCo and pandapower reproduce to the digit on any machine, so their A, B and C must
+agree to the digit and any difference is a finding about the harness, while PyBullet reproduces only to a part in a
+thousand across machines, which the swarm table discloses as an amendment and tolerates by that much and no more.
+Second, a knob that cannot pay is left alone by the physics, not by a rule of thumb: the robot arms' paired trial showed
+that two of four arms gain nothing from a speed override and left them native, the cooling model showed that a cap on
+cooling power can never remove less heat and so is never a lever, and a battery's reserve is spent only at the wall
+because every round trip through the cells costs the efficiency loss (`docs/MECHANISM_OF_ACTION.md`, 9.6). Third, a gain
+in one gauge is often a loss in another, and the simulators show both: the grid's losses rise in the four grids with their
+own generation while the energy drawn falls everywhere; the buildings' bills rise in the 2023 districts while their peaks
+fall; the Panda's copper loss rises while its torque falls. The tables carry every one of those rows, and the index
+carries none of them, because they are models.
 
 ### 10.4 The big organisms on a rented machine
 
@@ -3231,7 +3271,9 @@ notch a second, after a five-second dwell since the last growth; at 95% of the l
 cover is added at once. One writer: a ceiling found at a value Omni-Compass did not write stops it. At the end of every
 omni arm the ceiling is handed back to the operator's 64 MB and read back. The memory the compass holds for a wide
 working set is the resource this benchmark trades and reads worse by rule; the gain is the hit rate and the work inside
-the line.
+the line. The result (section 16.4) is exactly that shape: on all three untouched workloads the work inside the line and
+the hit rate rose 14% to 27% and the ceiling held rose from 64 MB to 200 to 270 MB, with the host's CPU inside the noise
+and every ceiling handed back.
 
 ### 10.7 Drone swarms: the autopilot's cruise
 
@@ -4352,7 +4394,7 @@ Patent applications, copyright registrations and trademark applications filed in
 
 
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `596359bc`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `d88461a8`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 1. The mechanism, and proof that it is the one that ran
 
@@ -4410,6 +4452,19 @@ Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer 
 | `light` | **+16% to +16%, confirmed better** | **-99% to -99%, confirmed better** | **+255% to +297%, confirmed WORSE** | **+10% to +20%, confirmed WORSE** |
 
 Native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5% waited about 1.6 s; Omni added consumers while messages waited and gave them back when the queue was empty, so its slowest 5% waited 9 to 14 ms, at the cost of three to four times the consumers running, confirmed worse and counted against Omni in the index. No message was lost in any arm; every count was handed back. Table: `results/live/V3_KAFKA.md`.
+
+### 3c. A real cache: Redis, the operator's memory ceiling, Omni v3, three runs (evidence class L)
+
+Redis as Ubuntu ships it with the operator's 64 MB ceiling and allkeys-lru is native; omni is the compass law on one knob, the ceiling, inside the cover [16, 512] MB through Redis's own console, growing only while the cache is full and giving a notch back when calm and nothing is evicted (`docs/REDIS_PREREGISTRATION.md`). An application with a declared 5 ms store trip on a miss and a working set that steps up and down; three paired repetitions a run, three runs; the tuning workload is shown and not counted. Runs: A 37704450300; B 37704464642; C 37704479534.
+
+| Workload | Work inside the 2 ms line | Cache hit rate | p95 | Memory ceiling held, MB (the resource held) | Host CPU-seconds |
+|---|---|---|---|---|---|
+| `tuning` (tuning, shown, not counted) | **+15% to +15%, confirmed better** | **+15% to +15%, confirmed better** | **-1% to -1%, confirmed better** | **+363% to +367%, confirmed WORSE** | no difference beyond the noise |
+| `burst` | **+14% to +15%, confirmed better** | **+14% to +15%, confirmed better** | **-1% to -0%, confirmed better** | **+205% to +215%, confirmed WORSE** | no difference beyond the noise |
+| `large` | **+14% to +14%, confirmed better** | **+14% to +14%, confirmed better** | no difference beyond the noise | **+294% to +301%, confirmed WORSE** | no difference beyond the noise |
+| `small` | **+26% to +27%, confirmed better** | **+26% to +27%, confirmed better** | **-1% to -0%, confirmed better** | **+320% to +325%, confirmed WORSE** | no difference beyond the noise |
+
+The memory the compass holds for a wide working set is the resource this benchmark trades, and reads worse by rule. Table: `results/live/V3_REDIS.md`.
 
 ### 4. The bill on a real cloud: Azure Kubernetes Service, Omni v1 (evidence class L, a metered bill)
 
@@ -4659,10 +4714,13 @@ console as omni, a tuning workload shown and not counted, and untouched workload
   fell 10% to 12% on burst. Native sat at nine tenths of its measured capacity by design, so its queue grew at the high
   steps and Omni's did not; the gain is the queue kept short and the cost is the consumers that kept it so. 21 gauge-rows
   better, 8 worse, 0 where the runs disagree.
-- **Redis 7.0.15** (`V3_REDIS.md`): the three untouched workloads (small, large, burst) are running as A, B and C as this
-  edition is written; the table joins `results/live/` and this section when they land. On the tuning workload on one
-  machine, shown and not counted, the hit rate rose from 66% to 81% and the work inside the 2 ms line 22%, with the ceiling
-  held at 304 MB on average against the operator's 64 MB, the cost that will read worse by rule.
+- **Redis 7.0.15** (`V3_REDIS.md`): on small, large and burst, work inside the 2 ms line rose 14% to 27%, the hit rate
+  14% to 27% and the mean latency fell 30% to 61%, all confirmed better; no request failed; the 95th percentile stayed
+  within a hair of native's, because a miss costs the declared 5 ms trip in both arms and 5% of requests still miss; the
+  memory ceiling held rose from 64 MB to 200 to 270 MB and the memory used with it, both confirmed worse, the resource the
+  gain costs; the host's CPU-seconds read inside the noise on all three; keys evicted fell 76% to 92% (shown); every
+  ceiling was handed back. 12 gauge-rows better, 6 worse, 0 where the runs disagree. The tuning workload, shown and not
+  counted, read the same way (hit rate 75% to 87%, the ceiling 64 to 299 MB).
 
 ### 16.5 The modelled realms and the independent simulators
 
@@ -4703,12 +4761,16 @@ hardware, and never counted in the Omni index.
 
 ### 16.6 The one number, and the table
 
-**The one number.** The Omni index over the real categories confirmed three times: **+56.4%** (real Kubernetes on v3 +25.5%,
-the real database on v3 +14.2%, real messaging on v3 +166.9%, each category weighed the same; Redis, Azure and the card
-join as their three-run tables land). The messaging figure is large because its speed ratio is: native sat at nine
-tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5% waited 1.6 s, while
-Omni's waited 9 to 14 ms; the resource that bought it, three to four times the consumers, stands beside it as a
-confirmed loss.
+**The one number.** The Omni index over the real categories confirmed three times: **+30.2%** (real Kubernetes on v3 +25.5%,
+the real database on v3 +14.2%, real messaging on v3 +166.9%, the real cache on v3 −24.9%, each category weighed the
+same; Azure and the card join as their three-run tables land). The messaging figure is large because its speed ratio is:
+native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5%
+waited 1.6 s, while Omni's waited 9 to 14 ms; the resource that bought it, three to four times the consumers, stands
+beside it as a confirmed loss. The cache's figure is negative because the memory held is its resource column: the ceiling
+rose from 64 MB to 200 to 270 MB (a ratio of about 0.25 in the index's "fewer machines" sense) while work and the hit rate
+rose 14% to 27%, and a geometric mean of those four columns is below one. That is the arithmetic of a resource bought,
+reported as such; a reader who weighs memory as cheaper than a consumer or a machine will read the cache's rows for
+themselves, which is why every row is in its table.
 
 | Result | Engine | Class | Reading | Source |
 |---|---|---|---|---|
@@ -4732,12 +4794,13 @@ confirmed loss.
 | **CityLearn, every district it ships**, A/B/C | v1 and v3 | S | 11 battery districts: electricity bought, daily peak and daily unevenness confirmed better in all 11, carbon in 8; the bill **worse in 7** (the 2023 districts) and ramping worse in 7; 71 score-rows better, 33 worse, 1 where the runs differ (the simulator's own variation); 3 districts with nothing to move; 8 the simulator cannot run | `results/live/V1_CITYLEARN.md`, `V3_CITYLEARN.md` |
 | **Drone swarms, gym-pybullet-drones** (Crazyflie 2.x, the shipped autopilot as native; Omni on the cruise override inside the autopilot's limits), 20 drones × 4 missions, three cells, A/B/C | v3 | S | energy a mission −7% (short), −18% (mixed), −20% (long) and missions a charge +8% to +25%, confirmed better; no late mission, reserve breach, near miss or collision in any arm; tracking error 0.07 → 0.13 m inside its 0.25 m band | `results/live/V3_SWARM.md` |
 | **Apache Kafka as shipped, a consumer group's operator-set size** (one broker, 8 partitions; the group at the operator's 2 consumers as native; Omni on the count inside [1, 8]), three untouched workloads, 3 pairs × 3 runs | v3 | L | work inside the 500 ms line **+16% to +21% confirmed better** on all three; end-to-end p95 1.6 s → 9 to 14 ms and mean lag −92% to −97% confirmed better; no message lost in any arm; consumers held 2 → 5.8 to 7.9 **confirmed worse** (the resource the gain costs); host CPU-seconds confirmed worse on light (+10% to +20%), inside the noise on heavy and burst; every count handed back; 21 gauge-rows better, 8 worse | `results/live/V3_KAFKA.md` |
+| **Redis as shipped, a cache's operator-set memory ceiling** (64 MB, allkeys-lru as native; Omni on the ceiling inside [16, 512] MB through Redis's own console, grown only while the cache is full), three untouched workloads, 3 pairs × 3 runs | v3 | L | work inside the 2 ms line **+14% to +27% confirmed better** on all three; hit rate +14% to +27% and mean latency −30% to −61% confirmed better; no failed request; the memory ceiling held 64 → 200 to 270 MB and the memory used **confirmed worse** (the resource the gain costs); p95 within a hair of native's; host CPU inside the noise; every ceiling handed back; 12 gauge-rows better, 6 worse | `results/live/V3_REDIS.md` |
 | **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
 | GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
-**Running now** (8 October): the four stacked at 1,000 copies on the detached machine; Redis, Omni on top of a cache's
-operator-set memory ceiling, as A, B and C (`docs/REDIS_PREREGISTRATION.md`; the table V3_REDIS.md joins `results/live/`
-when the runs land); and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
+**Running now** (8 October): the four stacked at 1,000 copies on the detached machine; the robustness test
+(`docs/ROBUSTNESS_PREREGISTRATION.md`), its one-repetition smoke run first and then the kill and long scenarios as A, B
+and C; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
 subscription's family allowances before any arm ran, the next by Azure's own cluster capacity in eastus; the fleet is
 rebuilt from the families the survey shows allowed). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
 defense edge (PX4 and ArduPilot multi-vehicle, Crazyswarm), databases and caches at large (YCSB, HammerDB), Spark,
@@ -8029,9 +8092,13 @@ workloads, at a confirmed cost in the host's CPU seconds (+14% to +28%), counted
 Kafka as shipped, `results/live/V3_KAFKA.md`): on all three untouched workloads work inside the 500 ms line **+16% to
 +21%**, the 95th percentile 1.6 s → 9 to 14 ms and messages waiting −92% to −97%, confirmed better, no message lost;
 consumers held 2 → 6 to 8, **confirmed worse**, the resource the gain costs; host CPU worse on one workload, inside the
-noise on two. **The Omni index, real machines only, confirmed three times: +56.4%** (`results/OMNI_INDEX.md`; Kubernetes
-+25.5%, the database +14.2%, Kafka +166.9%, each category weighed the same; a row inside the noise counts as exactly 1;
-Kafka's speed ratio is large because native's queue grew at nine tenths of its capacity and Omni's did not). The v1
+noise on two. **A real cache** (Redis as shipped, `results/live/V3_REDIS.md`): on all three untouched workloads work inside
+the 2 ms line **+14% to +27%**, the hit rate +14% to +27% and the mean latency −30% to −61%, confirmed better; the memory
+ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain costs; host CPU inside the noise. **The Omni
+index, real machines only, confirmed three times: +30.2%** (`results/OMNI_INDEX.md`; Kubernetes +25.5%, the database
++14.2%, Kafka +166.9%, Redis −24.9%, each category weighed the same; a row inside the noise counts as exactly 1; Kafka's
+speed ratio is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is
+negative because the memory it holds for a wide working set is the resource it trades and reads worse by rule). The v1
 tables read the same and stay as the first engine's record.
 
 **What is shown and what is not.** Shown: more work inside the response line on the same machines and a faster tail,
@@ -8056,6 +8123,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | Fairness, a noisy neighbour | inside the noise on every row | inside the noise | inside the noise | inside the noise | `results/live/V3_FAIRNESS.md` |
 | PostgreSQL behind PgBouncer, three workloads | inside the noise | inside the noise | connections held open **−61% to −72%** on two workloads; the runs disagree on the third | host CPU-seconds **+14% to +28%, confirmed worse** | `results/live/V3_PGBENCH.md` |
 | Apache Kafka, a consumer group's size, three workloads | work inside the line **+16% to +21%**; no message lost | p95 **1.6 s → 9 to 14 ms**, lag −92% to −97% | consumers held **2 → 5.8 to 7.9, confirmed worse** | host CPU-seconds +10% to +20% confirmed worse on light, inside the noise on heavy and burst; CPU per message inside the line −10% to −12% on burst | `results/live/V3_KAFKA.md` |
+| Redis, a cache's memory ceiling, three workloads | work inside the line **+14% to +27%**, hit rate +14% to +27%; no failed request | mean latency −30% to −61%; p95 within a hair of native's (a miss is a miss in both arms) | memory ceiling held **64 → 200 to 270 MB, confirmed worse** | host CPU-seconds inside the noise on all three | `results/live/V3_REDIS.md` |
 | The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell | the organisms' work unchanged | p95 better in every cell | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
 
 ### Measured on a real cloud (Azure, its own bill), Omni v1
@@ -8100,16 +8168,13 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack runs on a rented
    machine (10,800 s window, three repetitions, about 20 hours); the tower follows.
 3. **The real card**: the founder's runs on Lambda, one exact commit.
-4. **Redis** (`docs/REDIS_PREREGISTRATION.md`): the three untouched workloads ran as A, B and C on v3 (runs 37704450300,
-   37704464642, 37704479534, finished 8 October); the three-run table V3_REDIS.md joins `results/live/` and the index
-   as soon as the archive bot copies the files.
-4b. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, built, no engine file changes): the governor killed outright
+4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, built, no engine file changes): the governor killed outright
    mid-run and the watchdog's hand-back, the long run, and the governor's own CPU at 1 to 1,000 copies; the last is done
    from the archives (`results/live/V3_OWN_COST.md`: 0.006 to 0.013 of one core at every size); the first two run as A,
    B and C next.
 5. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB and
    HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera
-   (Kafka and Redis done or running); one or two at a time, each preregistered.
+   (Kafka and Redis done); one or two at a time, each preregistered.
 6. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
    fingerprints go to `docs/history` as the road to it.
 
@@ -8232,6 +8297,7 @@ do not yet exist, the row says what will supply them.
 | Kubernetes: fairness beside a noisy neighbour | no difference beyond the noise on every row, the neighbour's included | L | "Does it hurt the other tenant?" Not measurably, in three runs of ten pairs |
 | Database behind its pooler: connections held open | **−61% to −72%** confirmed better on two workloads; the runs disagree on the third | L | "What did it cost?" Host CPU-seconds +14% to +28%, confirmed worse on all three workloads, the compass's own cost included, counted against Omni in the index; work and latency inside the noise |
 | Message broker: work inside the 500 ms line; the 95th percentile | **+16% to +21%**; 1.6 s → 9 to 14 ms, confirmed better on all three workloads; no message lost | L | "Why is the latency figure so large?" By design native sat at nine tenths of its measured capacity, so its queue grew at the high steps and Omni's did not; the gain is the queue kept short. "What did it cost?" Consumers running 2 → 5.8 to 7.9, confirmed worse; host CPU worse on one workload, inside the noise on two |
+| Cache: work inside the 2 ms line; the hit rate | **+14% to +27%** and +14% to +27%, confirmed better on all three workloads; no failed request | L | "What did it cost?" The memory ceiling held, 64 → 200 to 270 MB, confirmed worse, and the memory used with it; host CPU inside the noise. "Why is p95 unchanged?" A miss costs the declared 5 ms trip in both arms and 5% of requests still miss at the high notches; the gain is in the mean and in the work inside the line. "Why is the cache's index negative?" Because its resource column is the memory held, a ratio of about 0.25, and the geometric mean of a 1.2 gain and a 0.25 cost is below one |
 | The modelled realms: work per energy, 945 muscles, six organisms, 1 to 1,000 copies | **+0.07% to +0.37%**, every organism superior within guardrails, 0 muscles worse | S | "Why so small?" The native controllers in the models are well tuned and leave little room; the number is small and real within the model, the same at every size, and it is never counted in the headline |
 | Power grid, 11 SimBench grids in pandapower | energy drawn and net import better in all 11; losses better in 7, **worse in 4**; tap operations fewer in 10, 4 → 8 a year in one, worse | S | "Where does it lose?" In the rural and semi-urban grids with their own generation, where a lower voltage raises losses; the table shows it |
 | Robot arms, MuJoCo Menagerie | peak torque −29% and −10%, tracking error −21% where Omni moved; the Panda's copper loss **+14% worse**; two arms left native | S | "What about the arms that gained nothing?" The paired physics trial left them native and the table says "nothing for Omni to move" |
@@ -8731,6 +8797,21 @@ test on every build (`cmake -S cpp -B cpp/build && cmake --build cpp/build`).
 The seal (`results/SEAL.json`) holds the SHA-256 fingerprint of every twinned file, written only after every parity
 test passes. `verify.py` fails, naming the file, if any sealed file changes afterwards. The compass law
 (`omnicompass/compass_law.py`) and the two-wire GPU governor are in Python today; their C++ twins are next.
+
+**Why two languages.** A law that exists in one implementation can hide a bug that is also its behaviour: the tests pass
+because the tests were written against the same code. Two implementations written separately, in languages with
+different numerics and different defaults, that agree to fifteen decimal places on five hundred trajectories and on every
+fixture of the governor, the shield, the HPA law, the closure, the conveyance and the nervous system, are evidence that the
+text of the law is what both compute. The C++ twin is also the one a buyer would embed where Python does not run (a
+controller, a firmware, a PLC), and the soak (`results/SOAK.json`, one hundred million decisions, no failure) is run on
+it. The seal makes the twins' agreement a property of the repository rather than a claim: change a sealed byte and
+`verify.py` fails, naming the file.
+
+**The three fingerprints.** The seal fingerprints the twinned laws; `OMNI_V1.json`, `OMNI_V2.json` and `OMNI_V3.json`
+fingerprint the engine as a whole (law, controllers, muscles, runners: 38 to 40 files); `RELEASE_MANIFEST.json`
+fingerprints the release (the commit, the engine, the twins, the GPU protocol, the live evidence and the verification
+receipt) and is rewritten by `tools/release_manifest.py` before every push, under the Python GitHub runs. A reader holding
+any one of the three can tell whether the files in front of them are the files the results were made on.
 
 ---
 
@@ -9386,7 +9467,27 @@ Parameter ranges, defaults and the proof of convergence: `omnicompass/core.py`, 
 ## Appendix D. Metrics
 
 
-Every gauge, where it comes from, and whether it is measured or modelled: `docs/METRICS_CATALOG.md`.
+Every gauge, where it comes from, and whether it is measured or modelled: `docs/METRICS_CATALOG.md`. The gauges that
+appear in the three-run tables of this manual, with their source and their direction, are these:
+
+| Gauge | Source | Measured or modelled | Direction |
+|---|---|---|---|
+| work inside the response line (requests, transactions or messages a second answered within the line) | the probe's own records, pgbench's log, the consumers' records, the application's records | measured | higher is better; the product number |
+| response time, mean, median, 95th and 99th percentile | the same | measured | lower is better |
+| time over the response line (share of samples) | the same, against the preregistered line | measured | lower is better |
+| failed requests, lost messages | the same | measured | any increase is WORSE |
+| worker machines in service, mean; node-hours | the cluster's own node records every 15 s | measured (machine-hours on kind; Azure's own count on AKS) | lower is better |
+| compute bill at list price | Azure's own machine count × list price per family | measured (a real bill) | lower is better |
+| energy (Wh), the standby model | a declared formula over the machines in service (kind) | **modelled**, said so on every line | lower is better |
+| host CPU busy; host CPU-seconds; CPU-seconds per 1,000 units inside the line | `/proc/stat` of the real machine under the test | measured | lower is better |
+| Omni's own CPU (cores), mean | the governor's audit (its process and every command it ran) | measured | shown, not judged in the Kubernetes tables; a confirmed loss where it is one |
+| connections held open, consumers running, memory ceiling held | the pooler's, the group's, the cache's own reports | measured | lower is better (the resource held) |
+| cache hit rate; consumer lag | Redis's INFO; the consumers' records | measured | higher is better; lower is better |
+| HPA replicas, pods started, pod start wait | the API server's own records | measured | shown, not judged except pod start wait |
+| organism work, energy, time over its line | the organism's plant models | **modelled** | by direction; S class |
+| energy a mission, missions a charge (drones) | the simulator's motor constants through a declared model | **modelled** | lower; higher |
+| handed back (every arm) | the knob read back at the end of the arm | measured | yes in every arm, or the run is invalid |
+| off the clock | the organism's own clock against its window | measured | shown; marks the cell |
 
 
 ## Appendix E. Troubleshooting
