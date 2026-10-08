@@ -20,7 +20,8 @@
   cases. Declared as an amendment; the first set's rows stand; the second counted set runs on the amended plug. The index now
   spans six real categories at **+21.2%** (MySQL at +0.0%); README, the state of play, the manual (3.3, 3.5, 10.9, 16.4, 16.6,
   the executive summary, the evidence map) and the dossier carry it. The update_index "inside the line" row is disclosed as
-  counting almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line).
+  counting almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line). The second
+  counted set dispatched on the amended plug at 11:31 UTC, commit `a033fd09`: runs 37770617236, 37770620582, 37770624805.
 - **The 24-hour robustness run dispatched on three rented machines** (`docs/ROBUSTNESS_PREREGISTRATION.md` scenario 2b, the
   dispatch record): runs 37761059781, 37761072412 and 37761084779 of `big-organism-detached` with `test=robust`, 86,400 s an
   arm, one pair a machine, commit `4d5633dd` (v3), eastus `Standard_D4as_v4`, all three rented at the first attempt and

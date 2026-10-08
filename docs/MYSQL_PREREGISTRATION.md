@@ -231,7 +231,9 @@ against the fake console (a withdrawal that eases inside the wait; one that ease
 never eases, which still reads NO). Nothing in the law, the gates, the line, the cover, the chunk, the dwell or the gauges
 changes; `tools/omni_version.py` still prints omni-v3. **The second counted set (A2, B2, C2) runs on this plug; its table
 replaces the first in `results/live/V3_SYSBENCH.md`, and the first set's table moves to `docs/history` with this note, every
-row kept.**
+row kept.** Dispatched 2026-10-08 11:31 UTC on commit `a033fd09` (Omni v3 by `tools/omni_version.py --commit`; the plug fix and
+this note are in it, nothing in the engine): runs **A2 37770617236, B2 37770620582, C2 37770624805**, the same inputs as the
+first set (every workload, three repetitions, 20 s a notch). Nothing above this line changed after the dispatch.
 
 **The update_index line, disclosed and left as it is.** The transaction line is the statement line times the statements a
 transaction (0.6 ms × 1 for update_index), and it is the server's own statement latency that the compass reads; sysbench's
