@@ -141,7 +141,9 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
    1%): the pool grows only while missing. MongoDB's memory saving on b, c and burst was a cold cache given back before its
    first eviction (four notches in the first five seconds of every arm) and held at the floor evicting: the give-back gate is
    the miss share, as MySQL's, and the saving may fall to the noise, said beforehand. The second (PostgreSQL, MongoDB) and
-   third (MySQL) counted sets run on these rules; the earlier tables move whole to `docs/history` when the new ones land.
+   third (MySQL) counted sets run on these rules, dispatched 23:16 UTC on commit `310cf318` (PostgreSQL 37858494179,
+   37858496620, 37858499033; MySQL 37858501997, 37858505059, 37858509109; MongoDB 37858512907, 37858515717, 37858519010);
+   the earlier tables move whole to `docs/history` when the new ones land.
 7. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
    Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,
    RocketPy, Cantera (Kafka and Redis done); one or two at a time, each preregistered.

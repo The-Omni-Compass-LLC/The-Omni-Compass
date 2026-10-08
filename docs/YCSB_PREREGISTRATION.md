@@ -234,6 +234,12 @@ repetitions, 20 s a notch, three separate dispatches on one commit); its table r
 and the first set's table moves to `docs/history` with this note, every row kept. The index reads the second set when it lands
 and says so.
 
+**Dispatched 2026-10-08 23:16 UTC on commit `310cf318`** (Omni v3 by `tools/omni_version.py --commit`; the amended rule and
+this text are in it, nothing in the engine): runs **A2 37858512907, B2 37858515717, C2 37858519010**, every workload, three
+paired repetitions each, 20 s a notch. The harness refuses to run if the server does not report the pages requested from its
+cache, so a server that lacked the figure would stop the run rather than run native in Omni's name. Nothing above this line
+changed after the dispatch.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

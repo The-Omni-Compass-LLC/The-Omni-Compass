@@ -327,6 +327,10 @@ repetitions, 20 s a notch, three separate dispatches on one commit); its table r
 `results/live/V3_SYSBENCH.md`, and the second set's table moves to `docs/history` beside the first, every row kept. The index
 reads the third set when it lands and says so.
 
+**Dispatched 2026-10-08 23:16 UTC on commit `310cf318`** (Omni v3 by `tools/omni_version.py --commit`; the amended rule and
+this text are in it, nothing in the engine): runs **A3 37858501997, B3 37858505059, C3 37858509109**, every workload, three
+paired repetitions each, 20 s a notch. Nothing above this line changed after the dispatch.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

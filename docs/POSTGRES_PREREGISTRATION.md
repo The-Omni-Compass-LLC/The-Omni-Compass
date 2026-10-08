@@ -331,3 +331,8 @@ costs service and the rule is not good enough, and that too is the result.
 three paired repetitions, 20 s a notch, three separate dispatches on one commit); its table replaces the first in
 `results/live/V3_PGBENCH.md`, and the first set's table moves to `docs/history` with this note, every row kept. The index
 reads the second set when it lands and says so.
+
+**Dispatched 2026-10-08 23:16 UTC on commit `310cf318`** (Omni v3 by `tools/omni_version.py --commit`; the amended harness
+and this text are in it, nothing in the engine): runs **A2 37858494179, B2 37858496620, C2 37858499033**, the three untouched
+workloads, three paired repetitions each, 20 s a notch, dispatched within ten seconds of one another. Nothing above this line
+changed after the dispatch.
