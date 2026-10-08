@@ -56,9 +56,11 @@ PASSWORD = os.environ.get("MYSQL_PWD", "omni-bench")       # a local benchmark u
 DB = "sbtest"
 MB = 1024 * 1024
 PAGE = 16 * 1024          # InnoDB's page
-LINE_STMT_MS = 0.5        # the statement line: one SQL statement answered within 0.5 ms on the server (set on the tuning workload's second
-                          # smoke run, from 1 ms: a hit reads 0.14 to 0.17 ms on this stack and a notch of page-cache misses 0.20 to 0.22 ms,
-                          # so the 1 ms line kept every reading under the 40% center and the compass could only read calm)
+LINE_STMT_MS = 0.6        # the statement line: one SQL statement answered within 0.6 ms on the server (written as 1 ms; set on the tuning
+                          # workload's smoke runs: a hit reads 0.14 to 0.22 ms on GitHub's runners and a notch missing a third of its reads
+                          # 0.05 to 0.06 ms more, so the center, 40% of the line, sits at 0.24 ms, above the hits and under the misses)
+GIVEBACK_MISS_SHARE = 0.01  # a chunk is given back only while the pool's misses are under 1% of its read requests (the pool holds the working
+                          # set); InnoDB keeps stale pages resident, so "pages free" and "no page read from disk" never say that
 CENTER = 0.4              # the compass holds the server's own statement latency at 40% of the line
 DT = 1.0                  # one decision a second
 TAU = 2.0
@@ -139,6 +141,16 @@ def pool_stats(st):
     return st["pool_bytes"] // MB, int(st.get("Innodb_buffer_pool_pages_data", 0)) * PAGE / MB, int(st.get("Innodb_buffer_pool_reads", 0)), str(st.get("Innodb_buffer_pool_resize_status", ""))
 
 
+def read_requests(st):
+    """The pool's logical read requests (hits and misses together) from one status read."""
+    return int(st.get("Innodb_buffer_pool_read_requests", 0))
+
+
+def miss_share(disk_reads_delta, requests_delta):
+    """The pool's misses as a share of its read requests over an interval; no requests reads as no misses."""
+    return (disk_reads_delta / requests_delta) if requests_delta > 0 else 0.0
+
+
 def pool_full(st):
     total = int(st.get("Innodb_buffer_pool_pages_total", 0)) or 1
     return int(st.get("Innodb_buffer_pool_pages_data", 0)) >= FULL * total
@@ -200,10 +212,11 @@ class BufferPool:
             return False
 
 
-def decide(p, force, disk_reads_last_s, cur_mb, last_change_age, full, wall=0.95):
+def decide(p, force, misses_last_s, cur_mb, last_change_age, full, wall=0.95):
     """The knob's move this second, in MB: slow statements (the service slow) grow the pool by ceil(force / 0.1) chunks, but only
-    while the pool is full (a slow statement with room to spare is not the pool's to mend); calm with no page read from disk gives
-    back one chunk after the dwell; past the wall, with the pool full, four chunks at once."""
+    while the pool is full (a slow statement with room to spare is not the pool's to mend); calm with the pool's misses under one
+    percent of its read requests (the pool holds the working set) gives back one chunk after the dwell; past the wall, with the
+    pool full, four chunks at once. misses_last_s is the miss share of the last second."""
     lo, hi = COVER_MB
     if p is not None and p >= wall and full:
         return min(hi, cur_mb + FAILUP_MB), "fail up: the line is at hand and the pool is full, four chunks at once"
@@ -211,8 +224,8 @@ def decide(p, force, disk_reads_last_s, cur_mb, last_change_age, full, wall=0.95
         if not full:
             return cur_mb, "slow with room to spare: not the pool's to mend"
         return min(hi, cur_mb + STEP_MB * max(1, math.ceil(force / 0.1))), "slow with the pool full: grow"
-    if force < -0.05 and disk_reads_last_s == 0 and cur_mb > lo and last_change_age >= DWELL_S:
-        return max(lo, cur_mb - STEP_MB), "calm, nothing read from disk: a chunk given back"
+    if force < -0.05 and misses_last_s < GIVEBACK_MISS_SHARE and cur_mb > lo and last_change_age >= DWELL_S:
+        return max(lo, cur_mb - STEP_MB), "calm, the pool holding the working set (misses under 1% of reads): a chunk given back"
     return cur_mb, "hold"
 
 
@@ -228,7 +241,7 @@ class Omni(threading.Thread):
         self.foreign = False; self.handed_back = False
 
     def run(self):
-        self.plug.attach(); st = self.plug._status(); lat0, n0 = stmt_latency(st); _, _, rd0, _ = pool_stats(st); t0 = time.monotonic()
+        self.plug.attach(); st = self.plug._status(); lat0, n0 = stmt_latency(st); _, _, rd0, _ = pool_stats(st); rq0 = read_requests(st); t0 = time.monotonic()
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
@@ -238,8 +251,10 @@ class Omni(threading.Thread):
                     reading = (dl / dn / 1e12) if dn > 0 else 0.0        # the mean statement latency of the last second, in seconds; none reads calm
                     f = self.law.force(reading)
                     cur, used, rd, rs = pool_stats(st); rd_last = rd - rd0; rd0 = rd
+                    rq = read_requests(st); rq_last = rq - rq0; rq0 = rq
+                    share = miss_share(rd_last, rq_last)
                     cur = self.plug.lever(st); full = pool_full(st)
-                    target, why = decide(self.law.p, f, rd_last, cur, tick - self.last_change, full, wall=self.law.band.wall_high)
+                    target, why = decide(self.law.p, f, share, cur, tick - self.last_change, full, wall=self.law.band.wall_high)
                     wrote = None
                     if target != cur and not resizing(rs):
                         wrote = self.plug.write(target); self.writes += 1
@@ -247,7 +262,8 @@ class Omni(threading.Thread):
                         if why.startswith("fail up"):
                             self.failups += 1
                     fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "statements": dn, "p": round(self.law.p, 4), "force": round(f, 4),
-                                         "disk_reads_last_s": rd_last, "pool_mb": cur, "used_mb": round(used, 1), "full": full, "resize": rs, "target_mb": target,
+                                         "disk_reads_last_s": rd_last, "read_requests_last_s": rq_last, "miss_share": round(share, 4), "pool_mb": cur, "used_mb": round(used, 1),
+                                         "full": full, "resize": rs, "target_mb": target,
                                          "wrote_mb": wrote, "why": why}) + "\n")
                 except Exception as e:
                     fh.write(json.dumps({"t": round(tick - t0, 2), "error": repr(e)}) + "\n")
