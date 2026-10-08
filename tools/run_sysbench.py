@@ -74,6 +74,9 @@ TABLE_ROWS = 1_000_000    # rows a table: about 240 MB of data and index each, s
 STEPS = "1 2 3 2 3 4 5 6 5 4 3 2 1 2 1"
 BURST = "1 6 1 8 1 6"
 RESIZE_WAIT_S = 90.0      # the server's online resize is asynchronous; the plug waits this long for it to complete
+RAND_TYPE = "uniform"     # rows drawn uniformly over the tables in use, so the working set is the key space (sysbench's shipped 'special'
+                          # draw sends three quarters of the requests to one percent of the rows: the first smoke run showed the pool
+                          # filling only at the top notch and misses at 3.5% of reads, nothing for the knob to answer; see the preregistration)
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
 SAME_REL = 1e-6
 LUA = Path(os.environ.get("SYSBENCH_LUA", "/usr/share/sysbench"))
@@ -310,7 +313,7 @@ def sysbench(script, cmd, tables, rate, seconds, out_file: Path | None, extra=()
     args = ["sysbench", str(LUA / f"{script}.lua"), f"--mysql-host={HOST}", f"--mysql-user={USER}", f"--mysql-password={PASSWORD}", f"--mysql-db={DB}",
             f"--tables={tables}", f"--table-size={TABLE_ROWS}", f"--threads={THREADS}", *extra]
     if cmd == "run":
-        args += [f"--rate={rate}", f"--time={int(seconds)}", "--histogram=on", "--report-interval=0", "--percentile=95"]
+        args += [f"--rate={rate}", f"--time={int(seconds)}", f"--rand-type={RAND_TYPE}", "--histogram=on", "--report-interval=0", "--percentile=95"]
     args.append(cmd)
     r = subprocess.run(args, capture_output=True, text=True)
     txt = r.stdout + "\n" + r.stderr
@@ -407,7 +410,7 @@ def run_workload(name, out: Path, reps, step_s, line_stmt_ms):
     fresh_server(NATIVE_MB)
     prepare_dataset(wl_dir / "prepare.log")
     rec = {"workload": name, "tuning": tuning, "script": script, "statements": stmts, "rate_tps": rate, "steps": steps, "step_s": step_s,
-           "line_stmt_ms": line_stmt_ms, "line_ms": line_stmt_ms * stmts, "threads": THREADS, "tables": TABLES, "table_rows": TABLE_ROWS,
+           "line_stmt_ms": line_stmt_ms, "line_ms": line_stmt_ms * stmts, "threads": THREADS, "tables": TABLES, "table_rows": TABLE_ROWS, "rand_type": RAND_TYPE,
            "native_mb": NATIVE_MB, "chunk_mb": CHUNK_MB, "cover_mb": list(COVER_MB), "mysql_version": ver, "sysbench_version": sysbench_version(),
            "engine": engine(), "reps": []}
     for rep in range(1, reps + 1):

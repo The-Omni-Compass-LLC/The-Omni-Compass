@@ -745,6 +745,7 @@ stack in this manual, so a referee can see that the "gains" differ only through 
 | Kafka, the consumer count | the group's own end-to-end latency, mean of the last second | 500 ms | 0.4 | 1 s | 3 s (a rebalance) | [1, the topic's partitions] |
 | Redis, the memory ceiling | the application's request latency, mean of the last second | 2 ms | 0.4 | 1 s | 2 s | [16 MB, 512 MB] |
 | MongoDB, the storage-engine cache | the server's own mean read latency, last second | 1 ms (set on the tuning workload's smoke run, from 2 ms) | 0.4 | 1 s | 2 s | [256 MB, 2,048 MB] |
+| MySQL, the InnoDB buffer pool | the server's own mean statement latency, last second | 1 ms a statement (to be confirmed on the tuning workload's smoke run) | 0.4 | 1 s | 2 s | [128 MB, 2,048 MB], in 128 MB chunks |
 | A drone's cruise override | the drone's tracking error | 0.25 m, the declared safe error | 0.5 | one control tick (48 Hz) | 1 s | [1.0, 2.0] × the planner's cruise |
 | A substation's tap | the bus voltage in its band | the band's edge | 0.5 | one solve | a week of evidence before a step down | the tap's own range, one tap per move |
 | A robot axis's speed | the axis's tracking error against its takt | the declared error | 0.5 | one control step | the axis's response | the axis's own limits |
@@ -1361,6 +1362,29 @@ point for a referee is the method: a result that flatters the governor is the fi
 pursued to a harness cause, the cause is written down with the run that showed it, a band is set on the tuning case's own
 figures and never on an untouched one, and the counted runs begin only when the harness provably asks the question.
 
+### 10.9 A database's buffer pool, resized online in the server's own chunks
+
+MySQL is wired as an operator runs it (`docs/MYSQL_PREREGISTRATION.md`, `tools/run_sysbench.py`): the 8.0 series from
+Ubuntu's own package, its configuration as shipped but for the settings an operator sets for InnoDB, the buffer pool at
+512 MB (MySQL's own default is 128 MB, and the preregistration says why 512 MB is the operator's setting here), the chunk the
+server resizes in at its shipped 128 MB, one pool instance, and the performance schema on. The questions are asked by
+sysbench, the standard OLTP benchmark Ubuntu ships as its own package, running its published scripts as shipped at a fixed
+offered rate, with the number of tables in use stepping one notch at a time through the pool and past it. The wire in is
+the server's own mean statement latency over the last second, from the performance schema's statement summary,
+differenced. The wire out is one statement through the server's own console, `SET GLOBAL innodb_buffer_pool_size`, inside
+the cover [128 MB, 2,048 MB] and always in whole chunks, because that is how the server itself moves the pool. Two things
+about this knob differ from the MongoDB cache and the plug carries both. The server resizes asynchronously and reports its
+progress in its own status variable, so the plug waits for the resize to complete before reading back, and a pool found
+mid-resize is the server still carrying out Omni-Compass's own write, not a foreign hand. And a shrink evicts pages while
+the resize runs, so the dwell after any move is ten seconds rather than five. The compass holds the reading at 40% of a
+1 ms statement line (to be confirmed on the tuning workload's smoke run, as the MongoDB line was); the direction rule is
+the cache's: slow statements grow the pool by chunks only while the pool is full, calm with no page read from disk gives one
+chunk back after the dwell, and at 95% of the line with the pool full four chunks are added at once. The work-inside-the-line
+gauge uses a transaction line, the statement line times the statements a transaction as sysbench's script ships it (one for
+a point select, fourteen for the read-only mix), and says so. One writer, read-back and the hand-back at the end are the
+plug's, as everywhere. The same disclosure as MongoDB's holds and is made before the run: on a 16 GB machine with a 1.4 GB
+dataset a pool miss is a read from the operating system's page cache, not from disk.
+
 ---
 
 # PART V - OPERATING IT
@@ -1949,7 +1973,8 @@ themselves, which is why every row is in its table.
 **Running now** (8 October): the four stacked at 1,000 copies on the detached machine; the robustness test
 (`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario and the two-hour long run both done (section 16.4b), the
 24-hour run on a rented machine next;
-YCSB on MongoDB done (`V3_YCSB.md`, section 16.4) and the other stores of register row 24 next; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
+YCSB on MongoDB done (`V3_YCSB.md`, section 16.4), MySQL's buffer pool under sysbench preregistered, built and in its smoke
+run (`docs/MYSQL_PREREGISTRATION.md`, section 10.9), the other stores of register row 24 after; and Azure steady and burst on the fleet of several machine families (the first two dispatches were refused by the
 subscription's family allowances before any arm ran, the next by Azure's own cluster capacity in eastus; the fleet is
 rebuilt from the families the survey shows allowed). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
 defense edge (PX4 and ArduPilot multi-vehicle, Crazyswarm), databases and caches at large (YCSB, HammerDB), Spark,
@@ -2132,6 +2157,8 @@ any one of the three can tell whether the files in front of them are the files t
 | Uniform draw | every record in the key space equally likely, so the working set is the key space; YCSB's shipped zipfian draw concentrates on a few thousand hot records whatever the key space |
 | Ordered keys | records named in load order, so a run that asks for record n finds record n; a run with hashed keys against an ordered load asks for records that do not exist |
 | Full-cache gate | the MongoDB and Redis rule: slow reads grow the cache only while the cache is full (nine tenths used), because a miss in a cache with room to spare is not the cache's to mend |
+| Buffer pool | InnoDB's cache of table and index pages, the one memory setting every MySQL operator sizes; resized online by the server in whole chunks |
+| Chunk | the unit in which MySQL resizes its buffer pool (128 MB as shipped); the knob's notch on that stack |
 | Page cache | the operating system's own cache of file contents; where the data fits in it, a storage-engine miss is a read from memory and a decompression, not a disk read, and the gain available to the cache knob is smaller |
 
 ## Appendix A - Command Reference
@@ -2162,6 +2189,7 @@ any one of the three can tell whether the files in front of them are the files t
 | The message broker, one run | `python3 tools/run_kafka.py --setup`, then `--workloads light,heavy,burst --out <dir>` (workflow `kafka`) |
 | The cache, one run | `python3 tools/run_redis.py --setup`, then `--workloads small,large,burst --out <dir>` (workflow `redis`) |
 | The database's storage-engine cache under YCSB, one run | `python3 tools/run_ycsb.py --setup`, then `--workloads b,c,f,burst --out <dir>` (workflow `ycsb`) |
+| The database's buffer pool under sysbench, one run | `python3 tools/run_sysbench.py --setup`, then `--workloads read_only,read_write,update_index,burst --out <dir>` (workflow `sysbench`) |
 | The robustness test | workflow `robustness`: `scenario` kill or long, `reps`, `duration_s`; the own-cost table `python3 tools/own_cost.py <raw run dirs> --out results/live/V3_OWN_COST.md` |
 | The drone swarms, one cell | `python3 tools/run_swarm.py --cell short|mixed|long|all --out <dir>` (workflow `swarm`) |
 | The independent simulators | `python3 tools/run_citylearn.py`, `run_pandapower.py`, `run_mujoco.py` (workflows `citylearn`, `pandapower`, `mujoco`) |
@@ -2189,10 +2217,10 @@ any one of the three can tell whether the files in front of them are the files t
 | `docs/` | this manual, the preregistrations, the evidence ledger, the theorem, the realm study |
 | `docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md` | what each engine is and every result read on it |
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and every benchmark still to run; the program to full size |
-| `.github/workflows/` | every benchmark as GitHub runs it: `benchmark-reps`, `six`, `six-kube`, `big-organism`, `big-organism-detached`, `aks-metered`, `pgbench`, `kafka`, `redis`, `ycsb`, `robustness`, `swarm`, `citylearn`, `pandapower`, `mujoco`, `archive-run`, `verify` |
+| `.github/workflows/` | every benchmark as GitHub runs it: `benchmark-reps`, `six`, `six-kube`, `big-organism`, `big-organism-detached`, `aks-metered`, `pgbench`, `kafka`, `redis`, `ycsb`, `sysbench`, `robustness`, `swarm`, `citylearn`, `pandapower`, `mujoco`, `archive-run`, `verify` |
 | `tests/`, `verify.py` | every unit and property test, the shield's adversarial cases, the Python-against-C++ agreement; `verify.py` runs them all and must end with its pass line |
 | `tools/omni_version.py`, `tools/release_manifest.py`, `tools/layout_check.py` | which engine a checkout or commit carries; the release manifest and verification as GitHub runs it; the check that every path the documents name exists |
-| `tools/confirm_abc.py` and its siblings (`pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | the three-run tables, one tool per kind of raw record, each checking the engine of every run it reads |
+| `tools/confirm_abc.py` and its siblings (`pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `sysbench_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | the three-run tables, one tool per kind of raw record, each checking the engine of every run it reads |
 | `tools/omni_index.py`, `tools/dossier.py`, `tools/own_cost.py` | the one number from the tables; the dossier from the tables; the governor's own cost from the archived audits |
 | `tools/legal.py` | the legal notice every generated report carries at its head and foot |
 | `docs/book/` | the builder of this manual's PDF (`build_book.py`) and the theory chapters bound into it |
@@ -2326,8 +2354,8 @@ many pages it read, how many pods it started), not to be counted for or against 
 `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md`,
 `docs/POSTGRES_PREREGISTRATION.md`, `docs/KAFKA_PREREGISTRATION.md`, `docs/REDIS_PREREGISTRATION.md`,
 `docs/SWARM_PREREGISTRATION.md`, `docs/CITYLEARN_PREREGISTRATION.md`, `docs/PANDAPOWER_PREREGISTRATION.md`,
-`docs/ROBOTICS_PREREGISTRATION.md`, `docs/ROBUSTNESS_PREREGISTRATION.md` and `docs/YCSB_PREREGISTRATION.md` (the rules
-written before each run), `docs/OMNI_V1.md` to `OMNI_V3.md` (every result by engine), `docs/REGISTER.md` (every benchmark
+`docs/ROBOTICS_PREREGISTRATION.md`, `docs/ROBUSTNESS_PREREGISTRATION.md`, `docs/YCSB_PREREGISTRATION.md` and
+`docs/MYSQL_PREREGISTRATION.md` (the rules written before each run), `docs/OMNI_V1.md` to `OMNI_V3.md` (every result by engine), `docs/REGISTER.md` (every benchmark
 and its file), `docs/PROOF_PROGRAM.md` (the program to full size with its costs), `docs/DOSSIER.md` (every result in one
 place), `results/OMNI_INDEX.md` (the one number), `docs/STATE_OF_PLAY.md` (where everything stands), `docs/HANDOFF.md`
 (every command in one page).
