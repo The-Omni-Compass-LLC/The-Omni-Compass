@@ -1805,7 +1805,17 @@ in four of five repetitions (up to 277 s past a 1,440 s window): the machine cou
 window, both arms slipped alike, the pairing stands and the mark stays on the cell. At 1,000 copies on v1 the tower
 answered its slowest 5% in 0.2 s against native's 4.1 s and was over its line 0.2% of the time against 64%; the four
 stacked read p95 −74% and p99 −83% with the compass arm 300 to 615 s past its 2,880 s window in all three repetitions,
-marked off the clock, which is why the v3 stack runs with a 10,800 s window and is running as this edition is written.
+marked off the clock, which is why the v3 stack was run with a 10,800 s window. **On v3 the four stacked at 1,000 copies**
+(`V3_BIG_ORGANISM.md`: 1.7 million muscles on one clock with the real cluster inside, three paired repetitions on one
+rented machine over 29 hours, 240 steps of 45 s an arm) **kept the clock in both arms**, 22 s behind a 10,800 s window
+(0.2%), and read: the cluster's slowest 5% answered in 150 ms against native's 2,882 ms (−95%), its slowest 1% in 165 ms
+against 5,405 ms (−97%), time over the response line 51% of samples to none, failed requests 0.14% to none, all clear of
+zero with three pairs; replicas, pods started and machines (six in both arms) the same; the standby-model energy −0.6%
+inside the noise; the host's CPU −1%, shown. The organism's own model (class S, shown beside the cluster and never inside
+the index) read energy −0.4% and work per energy +0.4% better, time over its own line −0.7% better, and work −0.0006%, a
+rounding-level model difference that the rule reads as worse and the table shows as such. The v1 stack's loss, the compass
+arm falling off the clock, is gone with the longer window; the gain, the cluster's tail, is the same shape at 1,000 copies
+as at 10 and 100. The whole tower at 1,000 copies runs the same way on a second rented machine as this edition is written.
 
 ### 16.3 The bill on a real cloud
 
@@ -1974,7 +1984,8 @@ themselves, which is why every row is in its table.
 | **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
 | GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
-**Running now** (8 October): the four stacked at 1,000 copies on the detached machine; the robustness test
+**Running now** (8 October): the whole tower at 1,000 copies on a rented machine (the four stacked at 1,000 copies done,
+section 16.2); MySQL's buffer pool under sysbench as A, B and C (section 10.9); the robustness test
 (`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario and the two-hour long run both done (section 16.4b), the
 24-hour run on a rented machine next;
 YCSB on MongoDB done (`V3_YCSB.md`, section 16.4), MySQL's buffer pool under sysbench preregistered, built and in its smoke

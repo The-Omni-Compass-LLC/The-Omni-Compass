@@ -69,7 +69,11 @@ on an earlier engine: late 23-52% less often and 24-40% faster in every one
 cell is better on 4 to 6 gauges and worse on none beyond the noise but a rounding-level work loss in 4 of 12
 ([`results/live/V3_SIX_KUBE.md`](results/live/V3_SIX_KUBE.md)); the 1,000-copy cells run on Azure: the tower
 on v1 ([`results/live/V1_BIG_ORGANISM.md`](results/live/V1_BIG_ORGANISM.md)) answered its slowest 5% in 0.2 s against native's
-4.1 s and was over its line 0.2% of the time against 64%. A cell whose machine could not step the organism inside its window
+4.1 s and was over its line 0.2% of the time against 64%; the four stacked on v3
+([`results/live/V3_BIG_ORGANISM.md`](results/live/V3_BIG_ORGANISM.md), 1.7 million muscles on one clock with the cluster
+inside, three repetitions on a rented machine with a 10,800 s window) answered their slowest 5% in 150 ms against native's
+2.9 s, were over the line 0% of the time against 51%, failed no request against 0.14%, on the same six machines and the
+same energy inside the noise, both arms on the clock. A cell whose machine could not step the organism inside its window
 is marked off the clock in the report and run again with a longer window.
 
 ## What is real and what is a model

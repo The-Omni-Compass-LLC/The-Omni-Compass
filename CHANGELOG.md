@@ -8,6 +8,13 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-08
+- **The four stacked at 1,000 copies with the real cluster inside, on v3, 3 of 3 on the clock** (`results/live/V3_BIG_ORGANISM.md`;
+  started by run 37564821425, collected by run 37754612102; one rented Azure machine, eastus `Standard_D8as_v4`, a 10,800 s
+  window of 240 steps of 45 s, three paired repetitions over 29 hours, commit `126b8941`, Omni v3): the cluster's p95 2,882
+  → 150 ms, p99 5,405 → 165 ms, time over the line 51% → 0, failed requests 0.14% → 0, all clear of zero; replicas, pods and
+  machines the same; energy inside the noise; the organism's model energy −0.4% and work rounding-level worse, shown; both
+  arms 22 s behind the window (0.2%). The machine was deleted by the collect. The whole tower at 1,000 copies started the same
+  way (run 37756284680). The v3 record, register row 8, state of play, README and the manual's section 16.2 carry it.
 - **MySQL under sysbench, preregistered, built and smoke-tested four times** (`docs/MYSQL_PREREGISTRATION.md`,
   `tools/run_sysbench.py`, `tools/sysbench_abc.py`, workflow `sysbench`, tests in `tests/test_run_sysbench.py` and
   `tests/test_sysbench_abc.py`; register row 24, proof-program row 11): MySQL 8.0 and sysbench from Ubuntu's own packages,
