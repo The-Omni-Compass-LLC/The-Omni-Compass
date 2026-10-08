@@ -2313,6 +2313,28 @@ table from those folders; `tools/omni_index.py` rebuilds the index from the tabl
 dossier. The preregistration named in the table's text holds the rules, written before the first counted run, with every
 amendment dated. Nothing in that chain is by hand.
 
+**What one repetition leaves behind.** Take the first repetition of the first kill-scenario run, archived at
+`results/live/raw/run-37716845219/paired-1/`. It holds two folders, one per arm, and the omni arm's folder holds
+twenty-nine files, every one of which a reader can open: `preflight.txt` (the UTC time, the arm, the git commit the arm
+ran at, the versions of Docker, kind, kubectl, the API server and Python, the metrics-server version with its SHA-256,
+the worker count and the probe's address); `rbac_omni.txt` (twenty lines of `kubectl auth can-i`, each verb the governor
+needs reading yes and each it must not have reading no); `window_start.txt` and `window_end.txt` (the window's clock);
+`load_schedule.log` (every load step and when it was applied); `latency.csv` (the probe's response times, one row a
+second); `capture.csv` (the cluster's state every fifteen seconds: replicas, workers, pods pending, the HPA's target);
+`host_cpu.csv` (the runner's own `/proc/stat`); `pod_watch.json` and `pods_end.json`, `nodes_end.txt`, `hpa_end.json`
+(the API server's own records at the end); `audit.jsonl` (one line per decision: the compass's position, heading and
+letter, the engine's state, every write with its value sent and its value read back); `controller.log` and
+`controller2.log` (the first governor's log, and the second one's after the kill); `audit_kill.jsonl` (the watchdog's
+restore writes, each with its command and its reason, such as "reset: remove record"); `watchdog.log` (one record: which
+governor, its process id, whether it was hung or dead, every command run and each exit code); `robust.log` (the kill at
+the 360th second with the settings as they stood, "target=50 range=1,10 limits=1850m 3700m workers=5/6", and the
+hand-back "every setting at the operator's after 8 s, target=50 limits=500m workers=6/6 left=none"); `rss.csv` (the
+governor's resident memory every fifteen seconds); `omni_writes.txt` (how many writes the governor made in the window:
+42); `kill_switch.txt` (the reset check: target restored, workers in service, no record left); `omni2.pid` (the second
+governor's process id) and `kill` (the marker the harness wrote at the kill); `robust.out` (the same robustness log as the
+job printed it); `end_reads.err`, `pod_watch.err` and `capture.csv.errors` (empty, as they should be);
+`metrics-server-components.yaml` (the pinned manifest as applied); and `SHA256SUMS.txt`, one line per file. A reader who doubts a number in the kill table can find the second it was taken.
+
 ## Appendix G - Reproducing Everything, From a Clean Machine
 
 A referee with a laptop and a GitHub account can rebuild every table in this manual and rerun every benchmark. The steps,
