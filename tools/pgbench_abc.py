@@ -21,6 +21,7 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.run_pgbench import GAUGES, SAME_REL, paired  # noqa: E402
+from tools.knob_verdict import summarize  # noqa: E402
 
 
 def load(d):
@@ -133,6 +134,12 @@ def main(argv=None):
             out["workloads"][wl][k] = {"reading": v.strip("*"), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
         hb = all(all(x["omni"].get("handed_back") for x in r["reps"]) for r in recs)
         L += ["", f"The knob handed back and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
+        vr = {t: [x["omni"]["verdict"] for x in r["reps"] if x["omni"].get("verdict")] for t, r in zip("ABC", recs)}
+        if any(vr.values()):                                   # the brain's own verdict on the knob, live in the omni arms (the amendment of 2026-10-09)
+            objs = sorted({v["objective"] for vs in vr.values() for v in vs})
+            L += ["", "The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: " + ", ".join(objs) + "): "
+                  + "; ".join(f"run {t}: {summarize(vs)}" for t, vs in vr.items() if vs) + "."]
+            out.setdefault("verdicts", {})[wl] = {t: [{k: v.get(k) for k in ("objective", "state", "spend_allowed_steps", "give_back_allowed_steps", "allowed_low", "allowed_high", "counts")} for v in vs] for t, vs in vr.items()}
     L += ["", f"**Across {len(wls)} workloads: {better} gauge-rows confirmed better, {worse} confirmed worse, {disagree} where the runs disagree.**"]
     Path(a.out).write_text("\n".join(_legal_stamp(L)) + "\n")
     Path(a.out).with_suffix(".json").write_text(json.dumps(out, indent=1))

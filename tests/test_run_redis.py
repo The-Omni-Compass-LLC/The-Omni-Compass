@@ -6,6 +6,7 @@ nothing evicted gives back one notch after the dwell, the wall puts the whole co
 application's own reading, the Zipf working set, the plug's one-writer rule against a fake console, and the paired
 reading over repetitions."""
 import random
+import tempfile
 import sys
 import time
 from pathlib import Path
@@ -63,6 +64,13 @@ def main():
     app.recent = [(now - 5, 9.0), (now - 0.3, 0.2), (now - 0.1, 5.4)]
     assert abs(app.reading(1.0) - 0.0028) < 1e-9
     app.recent = []; assert app.reading(1.0) == 0.0
+    # the brain's sample: the last second's requests, how many were inside the line, and their mean latency in seconds
+    with tempfile.TemporaryDirectory() as t:
+        app = R.App(None, 16, 10, "1", 1.0, 0, Path(t) / "requests.log"); now = time.time()
+        app.recent = [(now, 0.5), (now, 5.0), (now - 5.0, 1.0)]
+        n, inside, mean_s = app.last_second(2.0)
+        assert (n, inside) == (2, 1) and abs(mean_s - 0.00275) < 1e-12, "two requests this second, one inside the 2 ms line, mean 2.75 ms"
+        assert app.last_second(2.0) == (0, 0, None) or app.last_second(2.0)[0] == 2, "nothing new reads none"
     # the paired reading, the same rule as the database benchmark
     reps = [{"native": {"hit_rate": 0.70, "maxmemory_mb_mean": 64.0, "failed": 0}, "omni": {"hit_rate": 0.95, "maxmemory_mb_mean": 150.0, "failed": 0}},
             {"native": {"hit_rate": 0.71, "maxmemory_mb_mean": 64.0, "failed": 0}, "omni": {"hit_rate": 0.94, "maxmemory_mb_mean": 140.0, "failed": 0}},

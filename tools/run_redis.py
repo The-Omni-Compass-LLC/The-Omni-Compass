@@ -46,6 +46,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
+from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 2: the brain's own verdict)
 
 HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
 PORT = int(os.environ.get("REDIS_PORT", "6390"))
@@ -171,6 +172,16 @@ class App(threading.Thread):
             lat = [l for _, l in self.recent]
         return (sum(lat) / len(lat) / 1000.0) if lat else 0.0
 
+    def last_second(self, line_ms, since_s=1.0):
+        """The brain's sample: (requests answered, of them inside the line, mean latency in s) over the last second."""
+        now = time.time()
+        with self.lock:
+            self.recent = [(t, l) for t, l in self.recent if t >= now - since_s]
+            lat = [l for _, l in self.recent]
+        if not lat:
+            return 0, 0, None
+        return len(lat), sum(1 for l in lat if l <= line_ms), sum(lat) / len(lat) / 1000.0
+
 
 class Ceiling:
     """The plug on Redis's memory ceiling: read once before the first write, write through the console, read back,
@@ -226,27 +237,38 @@ def decide(p, force, evicted_last_s, cur_mb, last_change_age, full, wall=0.95):
 
 
 class Omni(threading.Thread):
-    """The brain, one decision a second, writing the audit; the knob is handed back at the end and read back."""
+    """The brain, one decision a second, writing the audit; the knob is handed back at the end and read back. Amendment 2 (the
+    brain's own verdict, 2026-10-09): the ceiling starts in watch and is written only inside the allowance a paired trial on
+    the cache itself has earned under the declared objective (tools/knob_verdict.py around the engine's own Verdict); a trial
+    holds the ceiling; a fail-up never spends beyond the allowance."""
 
-    def __init__(self, plug: Ceiling, app: App, audit_path: Path, line_ms=LINE_MS):
+    def __init__(self, plug: Ceiling, app: App, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE):
         super().__init__(daemon=True)
-        self.plug, self.app, self.audit = plug, app, audit_path
+        self.plug, self.app, self.audit, self.line_ms, self.objective = plug, app, audit_path, line_ms, objective
         self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
         self.stop_flag = threading.Event(); self.last_change = -1e9; self.writes = 0; self.failups = 0
-        self.foreign = False; self.handed_back = False
+        self.foreign = False; self.handed_back = False; self.verdict = None
 
     def run(self):
-        self.plug.attach(); ev0 = self.plug.evicted(); t0 = time.monotonic()
+        native_mb = self.plug.attach() // MB; ev0 = self.plug.evicted(); t0 = time.monotonic(); cpu_prev = cpu_times()
+        self.verdict = KnobVerdict(native_mb, STEP_MB, COVER_MB, objective=self.objective, settle_s=TAU)
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
                 try:
                     reading = self.app.reading(1.0)
+                    n_req, inside, mean_s = self.app.last_second(self.line_ms)
                     f = self.law.force(reading)
                     ev = self.plug.evicted(); ev_last = ev - ev0; ev0 = ev
                     cur = self.plug.lever() // MB
                     used = self.plug.used_mb(); full = used >= FULL * cur
+                    cpu_now = cpu_times(); d_total = cpu_now[0] - cpu_prev[0]; d_idle = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
+                    cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
+                    cost = sample_cost(self.objective, inside, mean_s, cur, cpu_share)
+                    self.verdict.observe(cost, tick - t0)                                # measured under the ceiling of the last second
                     target, why = decide(self.law.p, f, ev_last, cur, tick - self.last_change, full, wall=self.law.band.wall_high)
+                    target, why, vinfo = self.verdict.decide(target, spend_ok=(f > 0.05 and full), give_ok=(f < -0.05 and ev_last == 0),
+                                                             t=tick - t0, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=why.startswith("fail up"))
                     wrote = None
                     if target != cur:
                         wrote = self.plug.write(target); self.writes += 1
@@ -255,7 +277,9 @@ class Omni(threading.Thread):
                         if why.startswith("fail up"):
                             self.failups += 1
                     fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "p": round(self.law.p, 4), "force": round(f, 4),
-                                         "evicted_last_s": ev_last, "maxmemory_mb": cur, "used_mb": round(used, 1), "full": full, "target_mb": target, "wrote_mb": wrote, "why": why}) + "\n")
+                                         "evicted_last_s": ev_last, "maxmemory_mb": cur, "used_mb": round(used, 1), "full": full, "target_mb": target, "wrote_mb": wrote,
+                                         "requests_last_s": n_req, "inside_last_s": inside, "cpu_share": None if cpu_share is None else round(cpu_share, 4),
+                                         "cost": None if cost is None else round(cost, 9), **vinfo, "why": why}) + "\n")
                 except Exception as e:                        # a foreign writer or a lost console: say so, stop writing
                     fh.write(json.dumps({"t": round(tick - t0, 2), "error": repr(e)}) + "\n")
                     self.foreign = True
@@ -288,7 +312,7 @@ def cpu_times():
     return sum(vals), vals[3] + vals[4]
 
 
-def run_arm(arm, wl_dir: Path, rep, value_bytes, base_keys, steps, step_s, line_ms, seed):
+def run_arm(arm, wl_dir: Path, rep, value_bytes, base_keys, steps, step_s, line_ms, seed, objective=DEFAULT_OBJECTIVE):
     import redis
     d = wl_dir / f"rep-{rep}" / arm; d.mkdir(parents=True, exist_ok=True)
     r = redis.Redis(host=HOST, port=PORT, socket_timeout=5)
@@ -305,7 +329,7 @@ def run_arm(arm, wl_dir: Path, rep, value_bytes, base_keys, steps, step_s, line_
     sampler = Sampler(redis.Redis(host=HOST, port=PORT, socket_timeout=5)); sampler.start()
     omni = None
     if arm == "omni":
-        omni = Omni(Ceiling(redis.Redis(host=HOST, port=PORT, socket_timeout=5)), app, d / "audit.jsonl", line_ms); omni.start()
+        omni = Omni(Ceiling(redis.Redis(host=HOST, port=PORT, socket_timeout=5)), app, d / "audit.jsonl", line_ms, objective); omni.start()
     cpu0 = cpu_times(); t0 = time.time()
     app.start(); app.join()
     t1 = time.time(); cpu1 = cpu_times()
@@ -328,10 +352,12 @@ def run_arm(arm, wl_dir: Path, rep, value_bytes, base_keys, steps, step_s, line_
          "maxmemory_mb_mean": sum(x[0] for x in rows) / len(rows), "used_mb_mean": sum(x[1] for x in rows) / len(rows),
          "evictions": rows[-1][2], "cpu_busy_share": (total - idle) / max(1, total), "cpu_seconds": cpu_s,
          "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside), "writes": (omni.writes if omni else 0),
-         "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0)}
+         "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0),
+         "verdict": (omni.verdict.record() if omni and omni.verdict else None)}
     (d / "arm.json").write_text(json.dumps(g, indent=1))
     print(f"   {arm} rep {rep}: {n} requests, hit rate {g['hit_rate']:.1%}, inside the line {g['work_inside_line_rps']:.0f}/s, p95 {g['p95_ms']:.2f} ms, "
-          f"ceiling {g['maxmemory_mb_mean']:.0f} MB, used {g['used_mb_mean']:.0f} MB, CPU {cpu_s:.1f} s, handed back {g['handed_back']}", flush=True)
+          f"ceiling {g['maxmemory_mb_mean']:.0f} MB, used {g['used_mb_mean']:.0f} MB, CPU {cpu_s:.1f} s, handed back {g['handed_back']}"
+          + (f", verdict {g['verdict']['state']}" if g.get("verdict") else ""), flush=True)
     return g
 
 
@@ -380,20 +406,20 @@ def engine():
         return {"version": "unknown", "commit": "?"}
 
 
-def run_workload(name, out: Path, reps, step_s, line_ms):
+def run_workload(name, out: Path, reps, step_s, line_ms, objective=DEFAULT_OBJECTIVE):
     import redis
     value_bytes, base_keys, steps, tuning = WORKLOADS[name]
     wl_dir = out / f"redis-{name}"; wl_dir.mkdir(parents=True, exist_ok=True)
     ver = redis.Redis(host=HOST, port=PORT).info("server").get("redis_version", "?")
-    print(f"== {name}: {value_bytes} B values, working set {base_keys:,} keys x notch, steps {steps}, {step_s} s a notch, Redis {ver}", flush=True)
+    print(f"== {name}: {value_bytes} B values, working set {base_keys:,} keys x notch, steps {steps}, {step_s} s a notch, Redis {ver}, the verdict's objective {objective}", flush=True)
     rec = {"workload": name, "tuning": tuning, "value_bytes": value_bytes, "base_keys": base_keys, "steps": steps, "step_s": step_s,
            "line_ms": line_ms, "rate_rps": RATE, "miss_penalty_ms": MISS_PENALTY_MS, "native_mb": NATIVE_MB, "cover_mb": list(COVER_MB),
-           "redis_version": ver, "engine": engine(), "reps": []}
+           "objective": objective, "redis_version": ver, "engine": engine(), "reps": []}
     for rep in range(1, reps + 1):
         order = ("native", "omni") if rep % 2 else ("omni", "native")
         r = {}
         for arm in order:
-            r[arm] = run_arm(arm, wl_dir, rep, value_bytes, base_keys, steps, step_s, line_ms, seed=1000 + rep)
+            r[arm] = run_arm(arm, wl_dir, rep, value_bytes, base_keys, steps, step_s, line_ms, seed=1000 + rep, objective=objective)
         rec["reps"].append(r)
         (wl_dir / f"{name}.json").write_text(json.dumps(rec, indent=1))
     rec["paired"] = {k: paired(rec["reps"], k, dr) for k, _, dr in GAUGES}
@@ -454,6 +480,8 @@ def main(argv=None):
     ap.add_argument("--step-s", type=float, default=20.0)
     ap.add_argument("--line-ms", type=float, default=LINE_MS)
     ap.add_argument("--out", default="redis-out")
+    ap.add_argument("--objective", default=DEFAULT_OBJECTIVE, choices=OBJECTIVES,
+                    help="what the brain's verdict judges a step by: resource (the index's reading: work, speed, memory and CPU together) or service (work and speed alone)")
     ap.add_argument("--report-only", default="")
     a = ap.parse_args(argv)
     if a.setup:
@@ -463,7 +491,7 @@ def main(argv=None):
         recs = [json.loads(f.read_text()) for f in sorted(Path(a.report_only).rglob("redis-*/*.json"))]
         print(report(recs, Path(a.report_only))); return 0
     names = list(WORKLOADS) if a.workloads == "all" else a.workloads.split(",")
-    recs = [run_workload(n, out, a.reps, a.step_s, a.line_ms) for n in names]
+    recs = [run_workload(n, out, a.reps, a.step_s, a.line_ms, a.objective) for n in names]
     print(report(recs, out))
     return 0
 

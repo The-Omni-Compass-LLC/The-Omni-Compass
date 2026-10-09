@@ -1492,6 +1492,43 @@ Pass: energy per unit of work down, no service gauge worse.
 setpoint in its band. CPU and GPU sharing one power budget (`hardware/node_exchange.py`) and GPU groups sharing a site
 budget (`hardware/site_exchange.py`) run in simulation today. Batteries are designed as an organ, not yet wired.
 
+### 9.4 Wiring for superiority: watch first, then the brain's own verdict on every knob
+
+The founder's order of 9 October 2026 fixes the order of wiring. Every knob is wired out first and in last, and the wire
+in is connected only by a measurement the brain makes on the knob itself. The steps, for any stack:
+
+1. **Wire out, everything.** Every muscle's readings reach the brain, one wire out per muscle. Nothing is written. This is
+   watch mode (section 1.3): where every installation starts, and where any knob returns the moment it stops paying.
+2. **Run the observation.** With the stack together and under its real or replayed demand, let the brain watch for at
+   least one full cycle of that demand. In watch mode the brain learns the band of every reading, where the native
+   controllers hold them, and which readings leave calm and when. Nothing is decided yet; the audit says what the brain saw.
+3. **Let the verdict decide each knob, one trial at a time.** Switch the knobs the operator is willing to have moved into
+   verdict mode. A knob still writes nothing until the brain has run a paired trial on it (section 1.2;
+   `omnicompass/verdict.py`; on the live stacks `tools/knob_verdict.py` around it): the knob is held at the operator's
+   setting for a reference, then one notch away, under the same traffic, and the step is allowed only if the muscle's own
+   cost did not rise under the declared objective. The objective is the operator's one declaration per knob: the resource
+   reading (the service, the resource and the CPU weighed together, the default and the index's own reading) or the service
+   reading (work and speed alone). A refused step is not retried for a set time; an allowed step widens the allowance by one
+   notch, and the next trial probes the next. The compass then moves the knob by its law inside the allowance, never outside.
+4. **Keep checking.** The trials recur. A knob whose last step stops paying when the demand changes is refused on its
+   recheck and the allowance narrows back; a knob that never passes a trial stays native for good, which is the right
+   answer for that knob and costs nothing. New noise in the system is answered the same way: the compass reacts inside the
+   allowance within its time constant, and the allowance itself is re-earned by measurement.
+5. **Read the verdicts, muscle by muscle.** The audit carries the state of every knob every second (`verdict_phase`,
+   `verdict_direction`, `allowed_low`, `allowed_high`, the cost sample) and the arm's record sums it; the wiring page
+   (`docs/WIRING_VERDICTS.md`, section 16.6b) is the same judgement made from the published tables after the fact. An
+   operator who wants one knob wired both ways and another watched only sets the objective on the first and leaves the
+   second in watch.
+
+What this gives: no knob is ever written on faith. Where Omni-Compass can beat the native controller on the muscle's own
+gauges, it will have proved it on that muscle before it moved it; where it cannot, the muscle lives by itself and Omni
+reads it. The organism's superiority is then the sum of the knobs that earned it, not one turn of a single dial for the
+whole system. On the five live stacks of section 10 this is built and declared (the amendments of 9 October in the Redis,
+Kafka, PostgreSQL, MySQL and YCSB preregistrations); the counted runs on it go when the founder says. On the Kubernetes
+controller the verdict already guards the machines (section 1.2). Inside the modelled realms the organism still takes one
+directive for every muscle; making the verdict per muscle there is the next engine, Omni v4 (`docs/OMNI_V4_PLAN.md`),
+designed and not built, because every result must be run again on a new engine.
+
 ## 10. Stack by Stack
 
 Every wiring below is the same plug (section 8): one wire in (the stack's own meter), one wire out (one setting the
@@ -2560,6 +2597,17 @@ cushion, and all 255 admission muscles are among them, the admission knob being 
 The 14 organism cells with the real cluster inside all write on the cluster's gauges. Nothing on the page changes the
 engine, which stays Omni v3; it changes what an operator connects.
 
+**The same verdict, live (built 9 October, not yet run).** The page judges after the fact; the founder's order is that the
+brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 9.4;
+`tools/knob_verdict.py` around the engine's own verdict, the engine unchanged): every knob starts in watch and is written
+only inside the allowance a paired trial on the stack itself has earned under the declared objective, one notch a trial; a
+refused step is not taken, a trial holds the knob, a fail-up never spends beyond the allowance, the operator's setting is
+always free. The amendments are declared in the five preregistrations with the expectation written before the runs
+(Redis left native under the resource objective, the first notch refused; Kafka allowed step by step while each consumer
+pays; PostgreSQL's add above the operator's setting refused on `simple_update`; MySQL's `read_write` chunks refused;
+MongoDB's cache given back a notch a trial). The runs go when the founder says, and the tables, the index and the page are
+then read again from them.
+
 ### 16.7 Threats to validity, stated by us
 
 A referee will look for the ways these results could mislead. We list the ones we know, what each would do to the
@@ -2811,6 +2859,7 @@ any one of the three can tell whether the files in front of them are the files t
 | `tools/confirm_abc.py` and its siblings (`pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `sysbench_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | the three-run tables, one tool per kind of raw record, each checking the engine of every run it reads |
 | `tools/omni_index.py`, `tools/dossier.py`, `tools/own_cost.py` | the one number from the tables; the dossier from the tables; the governor's own cost from the archived audits |
 | `tools/wiring_verdicts.py`, `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | the verdict per knob from every table: write, watch or the operator's choice, every loss with its cause; one row per knob and per muscle |
+| `tools/knob_verdict.py` | the brain's own verdict on a live knob, around the engine's `omnicompass/verdict.py`: watch first, one notch a trial, the allowance, the two objectives; used by the five live harnesses |
 | `tools/legal.py` | the legal notice every generated report carries at its head and foot |
 | `docs/book/` | the builder of this manual's PDF (`build_book.py`) and the theory chapters bound into it |
 | `release/` | the copyright deposit and the release notes, printed at named commits |

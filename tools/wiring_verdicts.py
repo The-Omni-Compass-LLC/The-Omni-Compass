@@ -803,7 +803,22 @@ def main(check=False):
           "and never writes it; the native controller lives by itself. A knob marked **operator's choice** is wired out, and in only by the "
           "operator who wants that trade. The engine's verdict (`omnicompass/verdict.py`) does the same on the muscle itself at run time, and a "
           "knob it has left native is a watch knob whatever this page says. Nothing on this page changes the engine, which stays Omni v3; it "
-          "changes what an operator connects.", ""]
+          "changes what an operator connects.", "",
+          "## The same verdict, live: the brain decides on the knob before it writes", "",
+          "This page judges after the fact, from published tables. The founder's order of 9 October is that the brain judge in real time, on "
+          "the knob, before it writes, and that a knob which cannot prove it pays stay native. On the five live stacks (the pool, the consumer "
+          "group, the memory ceiling, the storage-engine cache, the buffer pool) that is now built into the harnesses: `tools/knob_verdict.py` "
+          "wraps the frozen engine's own verdict (`omnicompass/verdict.py`, unchanged) around every live knob. The knob starts in watch; a "
+          "paired trial on the stack itself (the knob held at the deepest step already allowed, then one notch further, under the same traffic) "
+          "allows one notch at a time under the declared objective, the resource reading of the index by default or the service reading at the "
+          "operator's choice; a refused step is not taken and not retried for a minute; a trial holds the knob; a fail-up never spends beyond "
+          "the allowance; the operator's setting is always free. The audit carries the cost sample and the verdict's state every second, the arm "
+          "record sums it, and the three-run tables print the verdict per workload. It is declared as an amendment in each of the five "
+          "preregistrations with the expectation written before the runs (Redis: left native under the resource objective; Kafka: allowed step by "
+          "step while each consumer pays; PostgreSQL: the add above the operator's setting refused on `simple_update`; MySQL: the `read_write` "
+          "chunks refused; MongoDB: the cache given back a notch a trial). The runs on it go when the founder says; this page is then read again "
+          "from their tables. Inside the modelled realms the organism still takes one directive for every muscle; the verdict per muscle there "
+          "is the next engine, Omni v4, designed in `docs/OMNI_V4_PLAN.md` and not built.", ""]
 
     md = "\n".join(legal_stamp(L)) + "\n"
 

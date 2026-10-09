@@ -23,6 +23,7 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.run_sysbench import GAUGES, SAME_REL, paired, resizing  # noqa: E402
+from tools.knob_verdict import summarize  # noqa: E402
 from tools.ycsb_abc import cell, fmt, verdict  # noqa: E402  (the same three-run rule and cells as the other stores)
 
 
@@ -116,6 +117,12 @@ def main(argv=None):
                     + (f"; in {in_flight} of them the server was still carrying out a resize when the restore was issued" if receipts else "") + ").")
         L += ["", line]
         out.setdefault("handed_back", {})[wl] = {"omni_arms": len(arms), "not_handed_back": len(not_hb), "resize_in_flight": in_flight if receipts else None}
+        vr = {t: [x["omni"]["verdict"] for x in r["reps"] if x["omni"].get("verdict")] for t, r in zip("ABC", recs)}
+        if any(vr.values()):                                   # the brain's own verdict on the knob, live in the omni arms (the amendment of 2026-10-09)
+            objs = sorted({v["objective"] for vs in vr.values() for v in vs})
+            L += ["", "The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: " + ", ".join(objs) + "): "
+                  + "; ".join(f"run {t}: {summarize(vs)}" for t, vs in vr.items() if vs) + "."]
+            out.setdefault("verdicts", {})[wl] = {t: [{k: v.get(k) for k in ("objective", "state", "spend_allowed_steps", "give_back_allowed_steps", "allowed_low", "allowed_high", "counts")} for v in vs] for t, vs in vr.items()}
     n_wl = sum(1 for w in wls if not any((r.get(w) or {}).get("tuning") for _, r in runs))
     L += ["", f"**Across {n_wl} untouched workloads: {better} gauge-rows confirmed better, {worse} confirmed worse, {disagree} where the runs disagree.**"]
     Path(a.out).write_text("\n".join(_legal_stamp(L)) + "\n")

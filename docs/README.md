@@ -23,6 +23,7 @@ Read in this order. Every page here is current; dated records are in [`history/`
 | [`K8S_COMPASS_PREREGISTRATION.md`](K8S_COMPASS_PREREGISTRATION.md) | Kubernetes and Azure: every test, every amendment, every result |
 | [`GPU_PREREGISTRATION.md`](GPU_PREREGISTRATION.md) | The card and the eight cards |
 | [`REALMS_PREREGISTRATION.md`](REALMS_PREREGISTRATION.md) | The muscles and the six organisms (945 in Omni v2) |
+| [`OMNI_V4_PLAN.md`](OMNI_V4_PLAN.md) | The next engine, designed and not built: the brain's verdict on every muscle inside the engine, what it changes and what it costs |
 | [`CITYLEARN_PREREGISTRATION.md`](CITYLEARN_PREREGISTRATION.md) | Omni-Compass on top of CityLearn, an independent building and battery simulator |
 | [`REFEREE_CHECKLIST.md`](REFEREE_CHECKLIST.md) | A referee's checklist, item by item |
 

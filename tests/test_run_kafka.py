@@ -35,6 +35,9 @@ def main():
         r = K.service_reading([f], 1.0)
         assert abs(r - 0.2) < 1e-9, "the last second's messages, mean, in seconds"
         assert K.service_reading([Path(t) / "none.log"], 1.0) is None, "no record reads None (the caller decides: the line if waiting, calm if not)"
+        mean_s, n, inside = K.service_sample([f], 1.0, line_ms=200.0)
+        assert abs(mean_s - 0.2) < 1e-9 and n == 2 and inside == 1, "the brain's sample: the mean, the count, and how many were inside the line"
+        assert K.service_sample([Path(t) / "none.log"], 1.0) == (None, 0, 0)
     # the paired reading over repetitions, the same rule as the database benchmark
     reps = [{"native": {"p95_ms": 400.0, "lost": 0, "consumers_mean": 2.0}, "omni": {"p95_ms": 20.0, "lost": 0, "consumers_mean": 5.0}},
             {"native": {"p95_ms": 420.0, "lost": 0, "consumers_mean": 2.0}, "omni": {"p95_ms": 25.0, "lost": 0, "consumers_mean": 5.5}},

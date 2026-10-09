@@ -8,6 +8,18 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-09
+- **The brain's own verdict on every live knob, in real time** (`tools/knob_verdict.py`, `tests/test_knob_verdict.py`; the five
+  harnesses `tools/run_redis.py`, `run_kafka.py`, `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py` and their three-run table
+  tools; the five workflows take an `objective` input; `verify.py` runs the tests): at the founder's order that the brain must
+  decide, on the muscle and in real time, whether a knob pays before it writes it, every live knob now starts in watch and is
+  written only inside the allowance a paired trial on the stack itself has earned, one notch a trial, under the declared
+  objective (resource: the index's reading, the default; service: work and speed alone). A refused step is not taken, a trial
+  holds the knob, a fail-up never spends beyond the allowance, the operator's setting is always free. The trial, the judge and
+  the allowance are the frozen engine's own `omnicompass/verdict.py`, unchanged: Omni v3 stays v3. The audit lines carry the cost
+  sample and the verdict's state every second; the arm records and the three-run tables carry the verdict per workload. Declared
+  as amendments (Redis 2, Kafka 2, PostgreSQL 3, MySQL 3, YCSB 2) with the expectation written before the runs; no run dispatched
+  yet, at the founder's word. The manual (9.4, 16.6b, appendix B), the integration manual, the state of play, the register and the
+  wiring page carry it; `docs/OMNI_V4_PLAN.md` designs the same verdict per muscle inside the engine as the next engine, not built.
 - **Wire in, or watch: the verdict per knob, from every result** (`tools/wiring_verdicts.py`, `docs/WIRING_VERDICTS.md`,
   `results/WIRING_VERDICTS.csv`, checked by `verify.py`): at the founder's order that Omni need not be wired into every
   muscle (where it cannot beat native, the muscle stays native and Omni only reads it: one wire out, no wire in), every

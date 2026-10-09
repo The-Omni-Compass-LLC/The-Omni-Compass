@@ -398,6 +398,10 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "wiring_verdicts.py"), "--check"], capture_output=True, text=True)
     check("the wiring verdicts (write, watch, operator's choice per knob) are in line with every table they are read from (tools/wiring_verdicts.py)",
           r.returncode == 0, (r.stdout + r.stderr)[-300:])
+    r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_knob_verdict"], cwd=ROOT, capture_output=True, text=True)
+    check("the brain's own verdict on a live knob (tools/knob_verdict.py around the frozen engine's Verdict): every knob starts in watch, a spend that "
+          "costs more than it buys is refused, a give-back that costs nothing is allowed one step a trial, a trial holds the knob, native is always free",
+          r.returncode == 0, r.stderr[-300:])
     import benchmarks.multiplicity as MP
     mp_tmp = tmp / "mult.json"; MP.main(mp_tmp)
     check("multiplicity analysis reproduces results/MULTIPLICITY.json",

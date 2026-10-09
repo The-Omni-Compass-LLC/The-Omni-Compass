@@ -57,6 +57,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw, Plug, clamp  # noqa: E402
 from tools.legal import stamp as _legal_stamp  # noqa: E402
+from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 3: the brain's own verdict)
 
 # --- the frozen rule -----------------------------------------------------------------------------------------------
 LINE_MS = 50.0            # the response line: a transaction answered within 50 ms, lag included
@@ -433,6 +434,7 @@ class PoolPlug(Plug):
         self.last_pools = {}       # the SHOW POOLS row of the last reading, so the brain reads it once a second (amendment 2)
         self.queue_share = 0.0     # the share of the pooler's time its clients spent waiting for a server, last second (amendment 2)
         self.served = False        # whether the pooler counted a transaction in the last second (amendment 2)
+        self.last_xacts = 0        # the transactions the pooler counted in the last second: the brain's work sample (amendment 3)
 
     def _read_service(self):
         s = self.b.stats(self.db)
@@ -441,11 +443,11 @@ class PoolPlug(Plug):
         clients = p.get("cl_active", 0) + p.get("cl_waiting", 0)
         self.waiting_share = p.get("cl_waiting", 0) / clients if clients else 0.0   # clients queued for a server (amendment 1)
         if not s:
-            self.served = False
+            self.served, self.last_xacts = False, 0
             return service_reading(self.last_latency_s, self.waiting_share, self.line_s)
         if self.prev is None:
             self.prev = s
-            self.served = False
+            self.served, self.last_xacts = False, 0
             return service_reading(0.0, self.waiting_share, self.line_s)
         dx = s["total_xact_count"] - self.prev["total_xact_count"]
         dt = s["total_xact_time"] - self.prev["total_xact_time"]
@@ -453,9 +455,9 @@ class PoolPlug(Plug):
         self.prev = s
         if dx <= 0:
             self.wait_share, self.last_latency_s = self.waiting_share, 0.0       # nothing served: calm unless clients are queued
-            self.served, self.queue_share = False, (1.0 if dw > 0 else 0.0)
+            self.served, self.queue_share, self.last_xacts = False, (1.0 if dw > 0 else 0.0), 0
             return service_reading(0.0, self.waiting_share, self.line_s)
-        self.served = True
+        self.served, self.last_xacts = True, dx
         self.queue_share = dw / (dt + dw) if (dt + dw) > 0 else 0.0
         self.wait_share = max(self.queue_share, self.waiting_share)
         self.last_latency_s = (dt + dw) / dx / 1e6
@@ -469,17 +471,22 @@ class PoolPlug(Plug):
 
 
 class Omni(threading.Thread):
-    """The brain, one decision a second, writing the audit."""
+    """The brain, one decision a second, writing the audit. Amendment 3 (the brain's own verdict, 2026-10-09): the pool starts in
+    watch and is written only inside the allowance a paired trial on the pooler itself has earned under the declared objective
+    (tools/knob_verdict.py around the engine's own Verdict): one server fewer while calm, one more while clients wait, each step
+    judged on the pooler's own second-by-second readings; a trial holds the pool; the fail-up back to the operator's setting is
+    always free, a spend beyond the allowance never."""
 
-    def __init__(self, plug: PoolPlug, audit_path: Path, line_ms=LINE_MS):
+    def __init__(self, plug: PoolPlug, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE):
         super().__init__(daemon=True)
-        self.plug, self.audit = plug, audit_path
+        self.plug, self.audit, self.objective = plug, audit_path, objective
         self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
         self.stop_flag = threading.Event()
         self.last_dir, self.last_change = 0, -1e9
         self.writes, self.failups = 0, 0
         self.foreign, self.handed_back = False, False
         self.error = None                                           # a fault before the first decision, written into the arm's record
+        self.verdict = None
 
     def run(self):
         try:
@@ -488,7 +495,8 @@ class Omni(threading.Thread):
             self.error = repr(e)
             self.audit.write_text(json.dumps({"t": 0.0, "error": self.error, "note": "the brain could not attach; no decision was made"}) + "\n")
             return
-        t0 = time.monotonic()
+        t0 = time.monotonic(); cpu_prev = cpu_times()
+        self.verdict = KnobVerdict(int(snapshot), 1, (FLOOR, CEILING), objective=self.objective, settle_s=TAU)
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
@@ -497,22 +505,34 @@ class Omni(threading.Thread):
                     f = self.law.force(reading)
                     idle = self.plug.last_pools.get("sv_idle", 0)              # the reading's own SHOW POOLS row (amendment 2)
                     cur = int(self.plug.lever())
+                    cpu_now = cpu_times(); d_busy = cpu_now[0] - cpu_prev[0]; d_total = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
+                    cpu_share = (d_busy / d_total) if d_total > 0 else None
+                    cost = sample_cost(self.objective, self.plug.last_xacts, self.plug.last_latency_s if self.plug.served else None, cur, cpu_share)
+                    self.verdict.observe(cost, tick - t0)                       # measured under the pool of the last second
                     target, d, why = decide(self.law.p, f, self.plug.wait_share, idle, cur, int(snapshot), self.last_dir,
                                             tick - self.last_change, wall=self.law.band.wall_high,
                                             queue_share=self.plug.queue_share, served=self.plug.served)
+                    fail_up = why.startswith("fail up")
+                    target, why, vinfo = self.verdict.decide(
+                        target, spend_ok=(f > DEAD and self.plug.wait_share >= WAIT_SHARE),
+                        give_ok=(f < -DEAD and self.plug.served and self.plug.queue_share < GIVEBACK_WAIT_SHARE and idle >= 1),
+                        t=tick - t0, why=why, stress=f > DEAD, calm=f < -DEAD, fail_up=fail_up)
+                    d = (target > cur) - (target < cur)
                     wrote = None
                     if target != cur:
                         wrote = self.plug.write(target)
                         self.writes += 1
-                        if d:
-                            self.last_dir, self.last_change = d, tick
-                        else:
+                        if fail_up:
                             self.failups += 1
                             self.last_dir, self.last_change = 0, tick
+                        else:
+                            self.last_dir, self.last_change = d, tick
                     fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "latency_ms": round(self.plug.last_latency_s * 1000, 3),
                                          "waiting_share": round(self.plug.waiting_share, 3), "p": round(self.law.p, 4),
                                          "force": round(f, 4), "wait_share": round(self.plug.wait_share, 3),
                                          "queue_share": round(self.plug.queue_share, 4), "served": self.plug.served, "idle": idle,
+                                         "xacts_last_s": self.plug.last_xacts, "cpu_share": None if cpu_share is None else round(cpu_share, 4),
+                                         "cost": None if cost is None else round(cost, 9), **vinfo,
                                          "pool": cur, "target": target, "wrote": wrote, "why": why}) + "\n")
                 except Exception as e:  # a foreign writer or a lost console: say so, stop writing
                     fh.write(json.dumps({"t": round(tick - t0, 2), "error": repr(e)}) + "\n")
@@ -568,7 +588,7 @@ def parse_summary(text):
 
 
 # --- one workload --------------------------------------------------------------------------------------------------
-def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base, clients, jobs, line_ms):
+def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base, clients, jobs, line_ms, objective=DEFAULT_OBJECTIVE):
     d = wl_dir / f"rep-{rep}" / arm
     d.mkdir(parents=True, exist_ok=True)
     env = {**os.environ, "PGPASSWORD": "x"}
@@ -579,7 +599,7 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
     sampler = Sampler(b, dbname); sampler.start()
     omni = None
     if arm == "omni":
-        omni = Omni(PoolPlug(b, dbname, line_ms), d / "audit.jsonl", line_ms); omni.start()
+        omni = Omni(PoolPlug(b, dbname, line_ms), d / "audit.jsonl", line_ms, objective); omni.start()
     cpu0, t0 = cpu_times(), time.monotonic()
     own0 = resource.getrusage(resource.RUSAGE_SELF)
     lat, failed, per_step = [], 0, []
@@ -616,7 +636,8 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
     if omni is not None:
         omni.stop_flag.set(); omni.join(timeout=10)
         g.update({"writes": omni.writes, "fail_ups": omni.failups, "handed_back": bool(omni.handed_back),
-                  "foreign_writer": omni.foreign, "controller_error": omni.error, "pool_read_back": b.pool_size()})
+                  "foreign_writer": omni.foreign, "controller_error": omni.error, "pool_read_back": b.pool_size(),
+                  "verdict": (omni.verdict.record() if omni.verdict else None)})
     else:
         g.update({"writes": 0, "handed_back": True, "pool_read_back": b.pool_size()})
     if b.pool_size() != NATIVE_POOL:                             # belt and braces: the next arm starts native
@@ -625,7 +646,7 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
     return g
 
 
-def run_workload(name, out, pg, dbname, user, password, port, reps, steps, step_s, clients, jobs, calib_s, line_ms):
+def run_workload(name, out, pg, dbname, user, password, port, reps, steps, step_s, clients, jobs, calib_s, line_ms, objective=DEFAULT_OBJECTIVE):
     script_flag, scale = WORKLOADS[name]
     script = [script_flag] if script_flag else []
     wl_dir = out / f"pgbench-{name}"
@@ -650,12 +671,12 @@ def run_workload(name, out, pg, dbname, user, password, port, reps, steps, step_
         print(f"== {name}: native capacity {cap:.0f} tps unlimited; base rate {base:.0f} tps (peak notch {100 * PEAK:.0f}% of it); steps {steps}", flush=True)
         rec = {"workload": name, "script": script_flag or "tpcb (default)", "scale": scale, "line_ms": line_ms, "steps": steps,
                "step_s": step_s, "clients": clients, "jobs": jobs, "native_capacity_tps": cap, "base_tps": base,
-               "snapshot_pool": snapshot, "cover": [FLOOR, CEILING], "center": CENTER, "engine": engine(), "reps": []}
+               "snapshot_pool": snapshot, "cover": [FLOOR, CEILING], "center": CENTER, "objective": objective, "engine": engine(), "reps": []}
         for rep in range(1, reps + 1):
             order = ["native", "omni"] if rep % 2 else ["omni", "native"]
             one = {"rep": rep, "order": order}
             for arm in order:
-                one[arm] = run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base, clients, jobs, line_ms)
+                one[arm] = run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base, clients, jobs, line_ms, objective)
                 print(f"== {name} rep {rep} {arm}: inside the line {one[arm]['work_inside_line_tps']:.0f} tps, p95 {one[arm]['p95_ms']:.1f} ms, "
                       f"servers {one[arm]['servers_alive_mean']:.1f}, pool {one[arm]['pool_mean']:.1f}, CPU {100 * one[arm]['cpu_busy_share']:.0f}%", flush=True)
             rec["reps"].append(one)
@@ -767,6 +788,8 @@ def main(argv=None):
     ap.add_argument("--password", default="bench")
     ap.add_argument("--port", type=int, default=6543, help="the port our PgBouncer listens on")
     ap.add_argument("--out", default="out")
+    ap.add_argument("--objective", default=DEFAULT_OBJECTIVE, choices=OBJECTIVES,
+                    help="what the brain's verdict judges a step by: resource (the index's reading: work, speed, connections and CPU together) or service (work and speed alone)")
     ap.add_argument("--report-only", default="")
     ap.add_argument("--setup", action="store_true")
     ap.add_argument("--smoke", action="store_true", help="a one-minute pass: short steps, one repetition")
@@ -793,7 +816,7 @@ def main(argv=None):
         if name not in WORKLOADS:
             raise SystemExit(f"unknown workload {name}; one of {sorted(WORKLOADS)}")
         recs.append(run_workload(name, out, a.pg, a.dbname, a.user, a.password, a.port, a.reps, steps, a.step_s, a.clients, a.jobs,
-                                 a.calib_s, a.line_ms))
+                                 a.calib_s, a.line_ms, a.objective))
     report(recs, out)
     print(f"report: {out / 'PGBENCH.md'}")
     return 0

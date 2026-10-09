@@ -78,6 +78,19 @@ is worse), 3 watch (two robots the engine itself left native, one grid where not
 all 255 admission muscles are among the 746. The 14 organism cells with the real cluster inside all write on the cluster's
 gauges. The engine is unchanged; the page decides what an operator connects.
 
+**The brain's own verdict, live (9 October, built, not yet run).** The founder's order of the same evening: the verdict must
+be the brain's, in real time, on the knob, before it writes; a knob that cannot prove it pays stays native. `tools/knob_verdict.py`
+wraps the frozen engine's verdict (`omnicompass/verdict.py`, unchanged) around every live knob of the five database, messaging
+and cache harnesses: the knob starts in watch, a paired trial on the stack itself allows one notch at a time under the declared
+objective (resource, the index's reading, or service), a refused step is not taken, a trial holds the knob, a fail-up never
+spends beyond the allowance, the operator's setting is always free. Declared as amendments in the five preregistrations with the
+expectation written before the runs: Redis left native under the resource objective (the first notch refused), Kafka allowed step
+by step while each consumer pays, PostgreSQL's add above the operator's setting refused on simple_update, MySQL's read_write
+chunks refused, MongoDB's cache given back a notch a trial. The 21 runs (the five stacks under the resource objective; Redis and
+Kafka also under the service objective; three runs each) go when the founder says. Inside the modelled realms the organism still
+takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, designed in
+`docs/OMNI_V4_PLAN.md` and not built, because every result must be run again on a new engine.
+
 ## Measured on real systems (evidence class L), Omni v3
 
 | Test, ten pairs × three runs | Work | Speed (p95) | Machines | Energy (declared model) | Source |
