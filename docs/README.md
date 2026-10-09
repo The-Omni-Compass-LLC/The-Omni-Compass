@@ -10,6 +10,7 @@ Read in this order. Every page here is current; dated records are in [`history/`
 | Page | What it holds |
 |---|---|
 | [`STATE_OF_PLAY.md`](STATE_OF_PLAY.md) | Where everything stands: every result, every platform, real and modelled kept apart |
+| [`BENEFIT_SHEET.md`](BENEFIT_SHEET.md) | The benefit sheet: one number per benchmark, plus always good for Omni, minus always bad, whatever the gauge measures |
 | [`../results/OMNI_INDEX.md`](../results/OMNI_INDEX.md) | The Omni index: every test as more for the same, or the same for less, in one number |
 | [`WIRING_VERDICTS.md`](WIRING_VERDICTS.md) | Wire in, or watch: every knob's verdict (write, watch, operator's choice) from every table, with every loss and its cause |
 | [`HOW_TO_READ_THE_RESULTS.md`](HOW_TO_READ_THE_RESULTS.md) | Every column of every table, in plain words |

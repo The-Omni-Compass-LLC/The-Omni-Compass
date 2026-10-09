@@ -155,6 +155,14 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 - **memory** is what it uses;
 - **master switch** must read "yes": everything handed back.
 
+## One number, one meaning of the sign (`docs/BENEFIT_SHEET.md`)
+
+In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
+whether each is good depends on the gauge. The benefit sheet turns every one the same way round: **plus is always good for
+Omni, minus is always bad**, whatever the gauge measures. Less energy, fewer machines, less memory, a shorter wait and
+fewer failures all read plus there; 0% means nothing beyond the noise. One number per benchmark, by the index's own rule,
+with **yes**, **no**, **none** or **trade** beside it. Read that sheet first; read the tables for the rows behind a number.
+
 ## Wire in, or watch (`docs/WIRING_VERDICTS.md`)
 
 One of three words per knob, by one rule from the tables above. **Write**: a gauge confirmed better over all three runs

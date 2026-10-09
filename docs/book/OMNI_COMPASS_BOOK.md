@@ -4980,6 +4980,14 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 - **memory** is what it uses;
 - **master switch** must read "yes": everything handed back.
 
+### One number, one meaning of the sign (`docs/BENEFIT_SHEET.md`)
+
+In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
+whether each is good depends on the gauge. The benefit sheet turns every one the same way round: **plus is always good for
+Omni, minus is always bad**, whatever the gauge measures. Less energy, fewer machines, less memory, a shorter wait and
+fewer failures all read plus there; 0% means nothing beyond the noise. One number per benchmark, by the index's own rule,
+with **yes**, **no**, **none** or **trade** beside it. Read that sheet first; read the tables for the rows behind a number.
+
 ### Wire in, or watch (`docs/WIRING_VERDICTS.md`)
 
 One of three words per knob, by one rule from the tables above. **Write**: a gauge confirmed better over all three runs
@@ -5010,7 +5018,72 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 38. The Dossier: Every Result in One Place
+## 38. The Benefit Sheet: One Number per Benchmark
+
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+
+
+The founder's order of 9 October 2026: next to every benchmark, say whether Omni-Compass was a benefit and by how much, in one number whose sign always means the same thing. **Plus is good for Omni, minus is bad, whatever the gauge measures.** Less energy, fewer machines, less memory, a shorter wait and fewer failures are all plus here; more of any of them is minus. **0%** means nothing beyond the noise. The tables keep their raw signs (a response time that fell reads "-65%" in its table); this sheet turns every one the same way round, by one rule, from the tables themselves (`tools/benefit_sheet.py`, checked by `verify.py`).
+
+The rule is the Omni index's (`results/OMNI_INDEX.md`): each judged gauge becomes a ratio oriented so that above one is good for Omni; it counts only where confirmed over all three runs, anything else counts as exactly one; the number is the geometric mean of the ratios, minus one, in percent. For the tests inside the index the number is the index's own resource reading of that test; for a stack with several workloads it is the stack's index category; for the simulators and the organisms the same arithmetic runs over every judged gauge of their tables.
+
+**Benefit?** reads **yes** (a confirmed gain, no confirmed loss), **no** (a confirmed loss, no confirmed gain), **none** (nothing confirmed either way) or **trade** (gains and losses both; the number says which way the trade nets by this scoring, and the wiring page `docs/WIRING_VERDICTS.md` says what pays for what).
+
+| Date | Benchmark | Benefit? | How much (plus is good) | Gauges better / worse | What the number is | Table |
+|---|---|---|---:|---:|---|---|
+| 2026-10-09 | Every real test together: the Omni index | **trade** | **+21%** | 82 / 16 | the headline: six real categories weighed the same (the index's resource reading) | `results/OMNI_INDEX.md` |
+| 2026-10-09 | The big organisms with the real cluster inside, 1,000 copies on Azure | **yes** | **+155%** | 4 / 0 | the cluster's own gauges in both cells | `results/live/V3_BIG_ORGANISM.md` |
+| 2026-10-09 | PostgreSQL, the pooler's pool size | **trade** | **+4.0%** | 1 / 1 | the index's category: its untouched workloads together (work, p95, the resource held, host CPU) | `results/live/V3_PGBENCH.md` |
+| 2026-10-09 | MySQL, the buffer pool's size | **trade** | **+5.2%** | 4 / 1 | the index's category: its untouched workloads together (work, p95, the resource held, host CPU) | `results/live/V3_SYSBENCH.md` |
+| 2026-10-09 | MongoDB, the storage engine's cache size | **yes** | **+8.5%** | 8 / 0 | the index's category: its untouched workloads together (work, p95, the resource held, host CPU) | `results/live/V3_YCSB.md` |
+| 2026-10-08 | Robustness: the two-hour run | **none** | **0%** | 0 / 0 | the two-hour window; p95, machines, energy | `results/live/V3_ROBUST_LONG.md` |
+| 2026-10-08 | Robustness: the governor killed outright mid-run | **yes** | **+9.4%** | 4 / 0 | the whole window, a kill and a restart inside it; p95, machines, energy | `results/live/V3_ROBUST_KILL.md` |
+| 2026-10-08 | Redis, the cache's memory ceiling | **trade** | **-25%** | 12 / 6 | the index's category: its untouched workloads together (work, p95, the resource held, host CPU) | `results/live/V3_REDIS.md` |
+| 2026-10-08 | Real Kubernetes, a public day of demand (Google 2011) | **yes** | **+50%** | 9 / 0 | the index's reading of this test: p95, machines, energy, and work where measured | `results/live/V3_TRACE_GOOGLE2011.md` |
+| 2026-10-08 | Kafka, the consumer group's size | **trade** | **+167%** | 21 / 8 | the index's category: its untouched workloads together (work, p95, the resource held, host CPU) | `results/live/V3_KAFKA.md` |
+| 2026-10-07 | The six organisms with the real cluster inside, 10 and 100 copies | **yes** | **+3.7%** | 19 / 0 | the cluster's own gauges in every cell; the modelled organism is judged in the realms table | `results/live/V3_SIX_KUBE.md` |
+| 2026-10-07 | The 945 modelled muscles as one tower, every muscle written at once | **yes** | **+0.3%** | 1 / 0 | the tower's work per energy over ten paired seeds; a model, evidence class S | `results/realms/REALMS.md` |
+| 2026-10-07 | Robot arms (MuJoCo), the three untouched robots | **yes** | **+3.8%** | 6 / 0 | every judged gauge of each robot's table (energy, losses, torque, tracking); a robot the engine left native reads 0 | `results/live/V3_MUJOCO.md` |
+| 2026-10-07 | Real Kubernetes, steady work | **yes** | **+31%** | 7 / 0 | the index's reading of this test: p95, machines, energy, and work where measured | `results/live/V3_STEADY.md` |
+| 2026-10-07 | Real Kubernetes, faults | **yes** | **+32%** | 4 / 0 | the index's reading of this test: p95, machines, energy, and work where measured | `results/live/V3_FAULTS.md` |
+| 2026-10-07 | Real Kubernetes, demand that wanders | **yes** | **+37%** | 5 / 0 | the index's reading of this test: p95, machines, energy, and work where measured | `results/live/V3_WANDERING.md` |
+| 2026-10-07 | Real Kubernetes, all four at once | **yes** | **+40%** | 5 / 0 | the index's reading of this test: p95, machines, energy, and work where measured | `results/live/V3_ALL_FOUR.md` |
+| 2026-10-07 | Real Kubernetes, a queue of jobs | **yes** | **+19%** | 6 / 0 | the index's reading of this test: p95, machines, energy, and work where measured | `results/live/V3_BATCH.md` |
+| 2026-10-07 | Real Kubernetes, a noisy neighbour | **none** | **0%** | 0 / 0 | the index's reading of this test: p95, machines, energy, and work where measured | `results/live/V3_FAIRNESS.md` |
+| 2026-10-07 | Power grids (SimBench), both load models | **trade** | **+5.8%** | 63 / 14 | every judged gauge of every grid, then the grids together | `results/live/V3_PANDAPOWER.md` |
+| 2026-10-07 | Drone swarms, the three untouched cells | **yes** | **+6.1%** | 9 / 0 | every judged gauge of every cell | `results/live/V3_SWARM.md` |
+| 2026-10-07 | Buildings and batteries (CityLearn), the districts with batteries | **trade** | **+0.8%** | 71 / 33 | every CityLearn score of every district, then the districts together | `results/live/V3_CITYLEARN.md` |
+
+### The parts behind a row
+
+Where a row sums several workloads, grids, districts, cells or robots, each part with its own number, the same way round:
+
+- **The big organisms with the real cluster inside, 1,000 copies on Azure**: tower at 1000 copies +159% (yes); stack at 1000 copies +151% (yes).
+- **PostgreSQL, the pooler's pool size**: select +12% (yes); simple_update 0% (no); tpcb_hot 0% (none).
+- **MySQL, the buffer pool's size**: burst +21% (yes); read_only 0% (none); read_write +1.2% (trade); update_index 0% (none).
+- **MongoDB, the storage engine's cache size**: b +9.6% (yes); burst +6.8% (yes); c +7.1% (yes); f +11% (yes).
+- **Redis, the cache's memory ceiling**: burst -22% (trade); large -27% (trade); small -26% (trade).
+- **Kafka, the consumer group's size**: burst +182% (trade); heavy +156% (trade); light +163% (trade).
+- **The six organisms with the real cluster inside, 10 and 100 copies**: compute_ai_cloud at 10 copies +3.6% (yes); physics_robotics_autonomous at 10 copies +4.5% (yes); energy_facility_industrial at 10 copies +4.3% (yes); distribution_specialized at 10 copies +3.1% (yes); tower at 10 copies +5.8% (yes); stack at 10 copies +6.2% (yes); compute_ai_cloud at 100 copies +3.7% (yes); physics_robotics_autonomous at 100 copies +2.5% (yes); energy_facility_industrial at 100 copies +6.1% (yes); distribution_specialized at 100 copies +0.1% (yes); tower at 100 copies +2.6% (yes); stack at 100 copies +1.6% (yes).
+- **Robot arms (MuJoCo), the three untouched robots**: kinova_gen3 +12% (yes); kuka_iiwa_14 (left native by the engine's own trial) 0% (none); universal_robots_ur5e (left native by the engine's own trial) 0% (none).
+- **Power grids (SimBench), both load models**: 1-MV-comm--0-sw (ZIP loads) +9.7% (yes); 1-MV-comm--1-sw (ZIP loads) +13% (yes); 1-MV-comm--2-sw (ZIP loads) +11% (yes); 1-MV-rural--1-sw (ZIP loads) -13% (trade); 1-MV-rural--2-sw (ZIP loads) +6.8% (trade); 1-MV-semiurb--0-sw (ZIP loads) +12% (yes); 1-MV-semiurb--1-sw (ZIP loads) +9.0% (trade); 1-MV-semiurb--2-sw (ZIP loads) +5.8% (trade); 1-MV-urban--0-sw (ZIP loads) +8.9% (yes); 1-MV-urban--1-sw (ZIP loads) +8.6% (yes); 1-MV-urban--2-sw (ZIP loads) +6.8% (yes); 1-MV-comm--0-sw (constant-power loads) +7.8% (yes); 1-MV-comm--1-sw (constant-power loads) +7.7% (yes); 1-MV-comm--2-sw (constant-power loads) +7.8% (yes); 1-MV-rural--1-sw (constant-power loads) -13% (no); 1-MV-rural--2-sw (constant-power loads) +3.3% (trade); 1-MV-semiurb--0-sw (constant-power loads) +7.4% (yes); 1-MV-semiurb--1-sw (constant-power loads) +7.6% (trade); 1-MV-semiurb--2-sw (constant-power loads) +4.7% (trade); 1-MV-urban--0-sw (constant-power loads) +7.7% (yes); 1-MV-urban--1-sw (constant-power loads) +6.8% (yes); 1-MV-urban--2-sw (constant-power loads) +5.4% (yes).
+- **Drone swarms, the three untouched cells**: long +7.6% (yes); mixed +6.8% (yes); short +3.9% (yes).
+- **Buildings and batteries (CityLearn), the districts with batteries**: ca_alameda_county_neighborhood +1.7% (yes); citylearn_challenge_2022_phase_all_robustness +8.3% (trade); citylearn_challenge_2023_phase_2_local_evaluation -0.7% (trade); citylearn_challenge_2023_phase_2_online_evaluation_1 -0.2% (trade); citylearn_challenge_2023_phase_2_online_evaluation_2 -0.3% (trade); citylearn_challenge_2023_phase_2_online_evaluation_3 -0.5% (trade); citylearn_challenge_2023_phase_3_1 -0.1% (trade); citylearn_challenge_2023_phase_3_2 -0.4% (trade); citylearn_challenge_2023_phase_3_3 -0.1% (trade); tx_travis_county_neighborhood +0.9% (yes); vt_chittenden_county_neighborhood +0.5% (yes).
+
+### Not on the sheet, and why
+
+- **Azure's managed Kubernetes, the bill** (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): Omni v1, a 4-worker fleet, every gauge inside the noise: 0%, and too small a fleet to show one machine.
+- **The governor's own cost** (`results/live/V3_OWN_COST.md`): 0.6% to 1.3% of one core at every size; a cost shown, not a benchmark against native.
+- **The card (NVIDIA)**: every earlier result is obsolete; the current governor has not run on a real card.
+- **The index's second reading** (service alone, `results/OMNI_INDEX.md`): a second true number for the same tests, not repeated here; this sheet carries the preregistered one.
+
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+
+## 39. The Dossier: Every Result in One Place
 
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
@@ -5194,7 +5267,7 @@ The rules for each run were written and committed before it ran (`docs/*_PREREGI
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
 
-## 39. Paired Runs and Receipts on Your Own System
+## 40. Paired Runs and Receipts on Your Own System
 
 
 The method of every benchmark in this manual is the method a reader can use on their own system, and it is deliberately
@@ -5272,8 +5345,17 @@ Kubernetes run and the three-run tools print it for three runs side by side; a r
 laid out the same way so that a reader of this manual can read it without learning a new shape.
 
 
-## 40. Evidence Classes and How to Read a Result
+## 41. Evidence Classes and How to Read a Result
 
+
+**One number, one meaning of the sign.** In every table a change keeps its raw sign: a response time that fell reads
+"-65%", a cache that grew reads "+300%", and whether each is good depends on the gauge. The benefit sheet
+(`docs/BENEFIT_SHEET.md`, built from the tables by `tools/benefit_sheet.py` and checked by `verify.py`) turns every one the
+same way round, at the founder's order of 9 October 2026: **plus is always good for Omni-Compass, minus is always bad**,
+whatever the gauge measures. Less energy, fewer machines, less memory, a shorter wait and fewer failures all read plus
+there; 0% is nothing beyond the noise. One number per benchmark, by the index's own rule, with yes, no, none or trade
+beside it. A reader who wants one figure for a benchmark reads that sheet; a reader who wants the rows behind it reads the
+table it names.
 
 | Class | Rung | What it is | What it can show |
 |---|---|---|---|
@@ -5330,7 +5412,7 @@ clock? (Rotation of the arm order, the warm-up before every window, the paired d
 are the answers, and section 16.7 names the residue they do not remove.)
 
 
-## 41. Results to Date
+## 42. Results to Date
 
 
 Every result below is Omni-Compass **on top of** a native system against the same native system alone, with the same
@@ -5809,7 +5891,7 @@ published as Omni-Compass 1.0, and the older fingerprints go to `docs/history` a
 ---
 
 
-## 42. Wire In, or Watch: The Verdict per Knob
+## 43. Wire In, or Watch: The Verdict per Knob
 
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
@@ -6177,7 +6259,7 @@ This page judges after the fact, from published tables. The founder's order of 9
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
 
-## 43. The Pilot Protocol and Kit
+## 44. The Pilot Protocol and Kit
 
 ### Pilot Protocol
 
@@ -6251,7 +6333,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 44. The GPU Bench
+## 45. The GPU Bench
 
 
 
@@ -6378,7 +6460,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 45. The GPU Preregistration
+## 46. The GPU Preregistration
 
 
 
@@ -6848,7 +6930,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 46. The Realms Preregistration
+## 47. The Realms Preregistration
 
 
 
@@ -7289,7 +7371,7 @@ Everything else, the plants, the outcomes, the guardrails, the label rule and th
 realms table three times (A, B, C), then the grid, then the organisms with the real cluster inside; the v2 table stays a
 v2 result.
 
-## 47. The Compass Law on Real Kubernetes: Preregistration
+## 48. The Compass Law on Real Kubernetes: Preregistration
 
 
 
@@ -8217,7 +8299,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 48. The Evidence Ledger
+## 49. The Evidence Ledger
 
 
 
@@ -8332,7 +8414,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 49. The Claims Register
+## 50. The Claims Register
 
 
 
@@ -8378,7 +8460,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 50. The Benchmark Report
+## 51. The Benchmark Report
 
 
 
@@ -8896,7 +8978,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 51. The Referee Report
+## 52. The Referee Report
 
 
 
@@ -9342,7 +9424,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 52. Comparison with Existing Controllers
+## 53. Comparison with Existing Controllers
 
 
 
@@ -9432,7 +9514,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 53. The State of Play
+## 54. The State of Play
 
 
 
@@ -9639,6 +9721,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and still to run; the program to full size |
 | `results/live/V3_*.md`, `V1_*.md`, `results/live/raw/` | the three-run tables and every archived run's files |
 | `results/OMNI_INDEX.md` | the one combined number |
+| `docs/BENEFIT_SHEET.md` | one number per benchmark, plus always good for Omni and minus always bad, whatever the gauge measures; yes, no, none or trade beside it |
 | `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | which knobs earn a wire in: write, watch or the operator's choice, per knob and per muscle, from every table, every loss with its cause |
 | `docs/INTEGRATION_MANUAL.md`, `docs/WIRING_GUIDE.md` | wiring it in yourself |
 | `docs/METRICS_CATALOG.md` | every gauge, and whether it is measured or modelled |
@@ -9657,7 +9740,7 @@ Patent applications, copyright registrations and trademark applications filed in
 *What a receipt is worth, how the license is priced against it, how the code is sealed, and how Omni-Compass came to be.*
 
 
-## 54. Where the Value Comes From
+## 55. Where the Value Comes From
 
 
 ### 3.1 The problem we are attacking
@@ -9832,7 +9915,7 @@ no change made otherwise.
 ---
 
 
-## 55. The Economics of a Receipt
+## 56. The Economics of a Receipt
 
 
 Run the stack native and print the receipt. Run the same stack with Omni-Compass and print the receipt. The difference
@@ -9873,7 +9956,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 56. The Buyer Edition
+## 57. The Buyer Edition
 
 
 
@@ -10126,7 +10209,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 57. Due Diligence
+## 58. Due Diligence
 
 
 
@@ -10166,7 +10249,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 58. License and Commercial Terms
+## 59. License and Commercial Terms
 
 
 The software and this manual are licensed under the Omni-Compass Evaluation License (`LICENSE`): evaluation and
@@ -10177,7 +10260,7 @@ LLC and paid for. Patent applications, copyright registrations and trademark app
 terms in `.github/CONTRIBUTING.md`, which assign their rights to The Omni-Compass LLC.
 
 
-## 59. Licensing: Questions and Answers
+## 60. Licensing: Questions and Answers
 
 
 
@@ -10228,7 +10311,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 60. Third-Party Notices
+## 61. Third-Party Notices
 
 
 
@@ -10256,7 +10339,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 61. Repository Standards
+## 62. Repository Standards
 
 
 
@@ -10295,7 +10378,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 62. Python, C++ and the Seal
+## 63. Python, C++ and the Seal
 
 
 The laws are twinned: each has a Python version and a C++20 version that give the same answers, proven by a parity
@@ -10335,7 +10418,7 @@ any one of the three can tell whether the files in front of them are the files t
 ---
 
 
-## 63. The Founder's Working Notes
+## 64. The Founder's Working Notes
 
 
 
@@ -10535,7 +10618,7 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
 `NOTICE` at the root of this repository.*
 
-## 64. History
+## 65. History
 
 
 
@@ -10900,6 +10983,7 @@ Patent applications, copyright registrations and trademark applications filed in
 | The grid of copies and runs | `python3 tools/grid.py` (reads `results/scale/receipts/`) |
 | The Omni index | `python3 tools/omni_index.py` |
 | Which knobs earn a wire in (write, watch, operator's choice) | `python3 tools/wiring_verdicts.py` (`--check` compares the page with the tables; `verify.py` runs it) |
+| One number per benchmark, plus always good for Omni | `python3 tools/benefit_sheet.py` (`--check` the same way; `verify.py` runs it) |
 | The database benchmark, one run | `python3 tools/run_pgbench.py --out <dir>` (workflow `pgbench`) |
 | The message broker, one run | `python3 tools/run_kafka.py --setup`, then `--workloads light,heavy,burst --out <dir>` (workflow `kafka`) |
 | The cache, one run | `python3 tools/run_redis.py --setup`, then `--workloads small,large,burst --out <dir>` (workflow `redis`) |
@@ -10941,6 +11025,7 @@ Patent applications, copyright registrations and trademark applications filed in
 | `tools/omni_index.py`, `tools/dossier.py`, `tools/own_cost.py` | the one number from the tables; the dossier from the tables; the governor's own cost from the archived audits |
 | `tools/wiring_verdicts.py`, `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | the verdict per knob from every table: write, watch or the operator's choice, every loss with its cause; one row per knob and per muscle |
 | `tools/knob_verdict.py` | the brain's own verdict on a live knob, around the engine's `omnicompass/verdict.py`: watch first, one notch a trial, the allowance, the two objectives; used by the five live harnesses |
+| `tools/benefit_sheet.py`, `docs/BENEFIT_SHEET.md`, `results/BENEFIT_SHEET.json` | one number per benchmark from the tables, plus always good for Omni, with yes, no, none or trade beside it |
 | `tools/legal.py` | the legal notice every generated report carries at its head and foot |
 | `docs/book/` | the builder of this manual's PDF (`build_book.py`) and the theory chapters bound into it |
 | `release/` | the copyright deposit and the release notes, printed at named commits |

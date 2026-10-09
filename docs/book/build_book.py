@@ -427,6 +427,7 @@ OUTLINE = [
      "Paired runs, receipts, rules written before the runs, and every result to date with its evidence class.",
      "empirical_validation"),
     ("How to Read the Results", ("F", "docs/HOW_TO_READ_THE_RESULTS.md")),
+    ("The Benefit Sheet: One Number per Benchmark", ("F", "docs/BENEFIT_SHEET.md")),
     ("The Dossier: Every Result in One Place", ("F", "docs/DOSSIER.md")),
     ("Paired Runs and Receipts on Your Own System", ("M", "Paired Runs and Receipts on Your Own System")),
     ("Evidence Classes and How to Read a Result", ("M", "Evidence Classes and How to Read a Result")),

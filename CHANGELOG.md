@@ -8,6 +8,12 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-09
+- **The benefit sheet: one number per benchmark, plus always good for Omni** (`tools/benefit_sheet.py`, `docs/BENEFIT_SHEET.md`,
+  `results/BENEFIT_SHEET.json`, checked by `verify.py`): at the founder's order that a reader must never have to work out
+  whether a minus is good, every benchmark gets one figure whose sign always means the same thing (less energy, fewer machines,
+  less memory, a shorter wait all read plus), with yes, no, none or trade beside it. The number is the Omni index's own reading
+  where the test is in the index, and the same arithmetic over every judged gauge for the simulators and the organisms. README,
+  the documents index, how to read the results, the state of play and the manual (14, the appendices) point to it.
 - **The brain's own verdict on every live knob, in real time** (`tools/knob_verdict.py`, `tests/test_knob_verdict.py`; the five
   harnesses `tools/run_redis.py`, `run_kafka.py`, `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py` and their three-run table
   tools; the five workflows take an `objective` input; `verify.py` runs the tests): at the founder's order that the brain must
