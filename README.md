@@ -57,6 +57,10 @@ muscle no worse for it; where it shows nothing, or a loss, the muscle stays nati
 watch; of the 945 modelled muscles 124 write and 808 stay native, 746 of them because the native controller never left
 the band. Every confirmed loss is listed there with its cause.
 
+**One number per benchmark, one meaning of the sign.** `docs/BENEFIT_SHEET.md` gives every benchmark one figure where
+plus is always good for Omni and minus always bad, whatever the gauge measures: less energy, fewer machines, less memory and
+a shorter wait all read plus. Beside it: yes, no, none or trade. It is built from the tables by `tools/benefit_sheet.py`.
+
 **The Omni index, every real test together: +20.5%** more for the same, or the same for less, across work, speed,
 machines and energy, six real categories each weighed the same: real Kubernetes on v3 +28.8% over seven tests (work +19%, speed +107%,
 machines +5%, energy +2%); the real database on v3 +4.0% (on the second counted set: connections held open −36% to −38% on

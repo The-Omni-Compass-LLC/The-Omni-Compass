@@ -205,6 +205,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and still to run; the program to full size |
 | `results/live/V3_*.md`, `V1_*.md`, `results/live/raw/` | the three-run tables and every archived run's files |
 | `results/OMNI_INDEX.md` | the one combined number |
+| `docs/BENEFIT_SHEET.md` | one number per benchmark, plus always good for Omni and minus always bad, whatever the gauge measures; yes, no, none or trade beside it |
 | `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | which knobs earn a wire in: write, watch or the operator's choice, per knob and per muscle, from every table, every loss with its cause |
 | `docs/INTEGRATION_MANUAL.md`, `docs/WIRING_GUIDE.md` | wiring it in yourself |
 | `docs/METRICS_CATALOG.md` | every gauge, and whether it is measured or modelled |

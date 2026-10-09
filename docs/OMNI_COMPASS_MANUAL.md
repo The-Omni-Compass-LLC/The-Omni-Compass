@@ -2079,6 +2079,15 @@ laid out the same way so that a reader of this manual can read it without learni
 
 ## 14. Evidence Classes and How to Read a Result
 
+**One number, one meaning of the sign.** In every table a change keeps its raw sign: a response time that fell reads
+"-65%", a cache that grew reads "+300%", and whether each is good depends on the gauge. The benefit sheet
+(`docs/BENEFIT_SHEET.md`, built from the tables by `tools/benefit_sheet.py` and checked by `verify.py`) turns every one the
+same way round, at the founder's order of 9 October 2026: **plus is always good for Omni-Compass, minus is always bad**,
+whatever the gauge measures. Less energy, fewer machines, less memory, a shorter wait and fewer failures all read plus
+there; 0% is nothing beyond the noise. One number per benchmark, by the index's own rule, with yes, no, none or trade
+beside it. A reader who wants one figure for a benchmark reads that sheet; a reader who wants the rows behind it reads the
+table it names.
+
 | Class | Rung | What it is | What it can show |
 |---|---|---|---|
 | T / V | E1 | deterministic tests, proofs, Python against the C++ twin | the law is what it says, and both languages agree |
@@ -2821,6 +2830,7 @@ any one of the three can tell whether the files in front of them are the files t
 | The grid of copies and runs | `python3 tools/grid.py` (reads `results/scale/receipts/`) |
 | The Omni index | `python3 tools/omni_index.py` |
 | Which knobs earn a wire in (write, watch, operator's choice) | `python3 tools/wiring_verdicts.py` (`--check` compares the page with the tables; `verify.py` runs it) |
+| One number per benchmark, plus always good for Omni | `python3 tools/benefit_sheet.py` (`--check` the same way; `verify.py` runs it) |
 | The database benchmark, one run | `python3 tools/run_pgbench.py --out <dir>` (workflow `pgbench`) |
 | The message broker, one run | `python3 tools/run_kafka.py --setup`, then `--workloads light,heavy,burst --out <dir>` (workflow `kafka`) |
 | The cache, one run | `python3 tools/run_redis.py --setup`, then `--workloads small,large,burst --out <dir>` (workflow `redis`) |
@@ -2860,6 +2870,7 @@ any one of the three can tell whether the files in front of them are the files t
 | `tools/omni_index.py`, `tools/dossier.py`, `tools/own_cost.py` | the one number from the tables; the dossier from the tables; the governor's own cost from the archived audits |
 | `tools/wiring_verdicts.py`, `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | the verdict per knob from every table: write, watch or the operator's choice, every loss with its cause; one row per knob and per muscle |
 | `tools/knob_verdict.py` | the brain's own verdict on a live knob, around the engine's `omnicompass/verdict.py`: watch first, one notch a trial, the allowance, the two objectives; used by the five live harnesses |
+| `tools/benefit_sheet.py`, `docs/BENEFIT_SHEET.md`, `results/BENEFIT_SHEET.json` | one number per benchmark from the tables, plus always good for Omni, with yes, no, none or trade beside it |
 | `tools/legal.py` | the legal notice every generated report carries at its head and foot |
 | `docs/book/` | the builder of this manual's PDF (`build_book.py`) and the theory chapters bound into it |
 | `release/` | the copyright deposit and the release notes, printed at named commits |
