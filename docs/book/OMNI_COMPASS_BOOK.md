@@ -2365,8 +2365,11 @@ repetitions on one rented eight-core machine over 29 hours, the cluster's slowes
 and 150 ms under omni, the time over the response line from 51% of samples to none, no failed request under omni, the
 same six machines in service in both arms and the energy inside the noise. The organism's own rows, which are models, show
 the work the same to one part in a million and read worse by the rule that any confirmed decrease is worse, however small;
-the row is in the table with that word on it. The whole tower at 1,000 copies runs on the same machine type as this is
-written, and the full organism-by-organism table is rebuilt when it lands.
+the row is in the table with that word on it. The whole tower at 1,000 copies, 945,000 modelled muscles on one clock, ran
+the same way on a second machine of the same type over 25 hours and landed on 9 October: the cluster's slowest 5% of
+requests at 6,690 ms under native and 160 ms under omni, the slowest 1% at 9,068 against 187 ms, time over the line from
+76% of samples to none, failed requests from 4.8% to none, all clear of zero with three pairs; machines, replicas and pods
+the same; energy inside the noise; both arms 14 s behind a 10,800 s window. The table holds both organisms side by side.
 
 ### 2.6 The register
 
@@ -5086,7 +5089,7 @@ MySQL 8.0 as Ubuntu ships it with the operator's 512 MB InnoDB buffer pool is na
 | `read_write` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | **-6% to -4%, confirmed better** |
 | `update_index` | no difference beyond the noise | no difference beyond the noise | the runs disagree | shown, not judged | no difference beyond the noise |
 
-The second counted set, on the amended plug: the pool held −67% on burst and −50% to −56% on read_only, confirmed better, with work, latency and CPU inside the noise; on read_write the compass bought pool for a written working set and the pages held read +53% to +70%, confirmed worse, counted against Omni in the index; the pool handed back on all 45 omni arms. The first counted set (every row inside the noise; 15 of 45 arms not handed back because the plug's restore was issued while the server was still withdrawing the blocks of a shrink, which MySQL ignores; the plug fixed and the fix declared) is kept whole in `docs/history/V3_SYSBENCH_set1.md`. The update_index work-inside-the-line row counts almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line) and is disclosed. Table: `results/live/V3_SYSBENCH.md`.
+The third counted set, on amendment 2 (the pool grows only while it is missing): the pool held −49% to −56% on burst, confirmed better, with work, latency and CPU inside the noise; on read_write the pages held read +44% to +52%, confirmed worse, with the host's CPU −4% to −6%, confirmed better, a trade counted both ways in the index; read_only inside the noise and update_index disagreeing; the pool handed back on all 45 omni arms. The second counted set (the pool −67% on burst and −50% to −56% on read_only, read_write's pages held +53% to +70% worse) is kept whole in `docs/history/V3_SYSBENCH_set2.md`; the first counted set (every row inside the noise; 15 of 45 arms not handed back because the plug's restore was issued while the server was still withdrawing the blocks of a shrink, which MySQL ignores; the plug fixed and the fix declared) is kept whole in `docs/history/V3_SYSBENCH_set1.md`. The update_index work-inside-the-line row counts almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line) and is disclosed. Table: `results/live/V3_SYSBENCH.md`.
 
 ### 4. The bill on a real cloud: Azure Kubernetes Service, Omni v1 (evidence class L, a metered bill)
 
@@ -5393,7 +5396,16 @@ inside the noise; the host's CPU −1%, shown. The organism's own model (class S
 the index) read energy −0.4% and work per energy +0.4% better, time over its own line −0.7% better, and work −0.0006%, a
 rounding-level model difference that the rule reads as worse and the table shows as such. The v1 stack's loss, the compass
 arm falling off the clock, is gone with the longer window; the gain, the cluster's tail, is the same shape at 1,000 copies
-as at 10 and 100. The whole tower at 1,000 copies runs the same way on a second rented machine as this edition is written.
+as at 10 and 100. **The whole tower at 1,000 copies** (945,000 modelled muscles; started by run 37756284680, collected by
+run 37945866426 on 9 October after 25 hours on a second machine of the same type, commit `6f0f93e5`, Omni v3) read the same
+way and harder: the cluster's p95 6,690 → 160 ms (−98%), p99 9,068 → 187 ms (−98%), time over the response line 76% of
+samples to none, failed requests 4.8% to none, all clear of zero with three pairs; replicas (9.97 in both arms), pods
+started (4 against 3.7) and machines (6) the same or inside the noise; the standby-model energy −0.3% inside the noise;
+CPU with the governor's own −2.5% and the host −1.2%, shown; both arms 14 s behind the 10,800 s window (0.13%), on the
+clock in every repetition; the organism's own model energy −0.4% better and work −0.0004%, the rounding-level loss the
+rule reads as worse. Native's own tail was worse under the tower than under the stack (6.7 s against 2.9 s at the 95th
+percentile) because the tower's 945 distinct muscles drive the load generator harder at its peaks, and the governor's
+answer was the same 150 to 160 ms under both.
 
 ### 16.3 The bill on a real cloud
 
@@ -5606,6 +5618,7 @@ themselves, which is why every row is in its table.
 | **Real Kubernetes under a public day of demand** (the Google cluster trace of 2011 replayed one step at a time, 10 pairs × 3 runs) | v3 | L | p95 **−65% to −71%**, p99 −49% to −61%, time over the line −81% to −84%, failed requests −8% to −17%, machines in service **−6% to −10%**, replicas −5% to −6%, standby-model energy −4% to −7%, all confirmed better; pods started +23% to +35% as point estimates, inside the noise in one run; 9 rows better, 0 worse | `results/live/V3_TRACE_GOOGLE2011.md` |
 | **The six organisms with the real cluster inside**, 1 to 1,000 copies, 5 paired repetitions a cell (3 at 1,000) | v1 | L + S | 98 of 100 cells: p95 and time over the line better in every cell; 0 gauges worse beyond the noise except a rounding-level work loss (−0.0003%) and HPA replicas +0.7% in one cell; machines stay at 6 in both arms (no autoscaler under kind); the Physics realm and the tower at 1,000 copies off the clock in 2 of 3 repetitions (marked) | `results/live/V1_SIX_KUBE.md` |
 | The same at 10 and 100 copies | v3 | L + S | 12 cells, 5 pairs each: every cell better on 4 to 6 gauges, worse on none beyond the noise except a rounding-level work loss in 4 cells; the stack at 100 copies off the clock in 4 of 5 repetitions (marked) | `results/live/V3_SIX_KUBE.md` |
+| **The big organisms at 1,000 copies on rented machines, on v3**: the tower (3 of 3) and the four stacked (3 of 3), each on its own machine with a 10,800 s window, every repetition on the clock | v3 | L + S | tower: the cluster's p95 **6.7 s → 160 ms (−98%)**, p99 −98%, time over the line 76% → 0, failed requests 4.8% → 0, clear of zero; stack: p95 **2.9 s → 150 ms (−95%)**, p99 −97%, time over the line 51% → 0, failed requests 0.14% → 0, clear of zero; machines 6 in both arms of both; energy inside the noise; the organisms' model work rounding-level worse by rule, energy −0.4% | `results/live/V3_BIG_ORGANISM.md` |
 | **The big organisms at 1,000 copies on a rented machine**: the tower (3 of 3) and the four stacked (3 of 3, detached) | v1 | L + S | tower: p95 **−95%** (4.1 s → 0.2 s) and time over the line −99.7% clear of the noise, machines 6 in both arms, energy −0.2%, work rounding-level worse, repetition 3 off the clock; stack: p95 **−74%** and p99 −83% clear of the noise, the compass arm 300 to 615 s past the 2,880 s window in all three (marked OFF THE CLOCK; native kept the clock), which is why the v3 stack runs with a 10,800 s window | `results/live/V1_BIG_ORGANISM.md` |
 | **Azure AKS, the bill, steady load**, 4 workers, 5 pairs | v1 | L (a real bill) | no difference beyond the noise on any gauge; the bill −4.7% with its interval across zero; a fleet of 4 cannot show the lever (10.1) | `results/live/V1_AKS_STEADY.md` |
 | **Azure AKS, the bill, a burst sized to the cluster**, 4 workers, 5 pairs (repetition 4 lost its native cluster to an Azure API error in the first attempt and was run again by itself) | v1 | L (a real bill) | the bill +5.0% with its interval across zero; machines, p95 and failed requests inside the noise; p99 −34% clear of the noise in this one run; B and C to follow | `results/live/V1_AKS_BURST.md` |
@@ -7442,6 +7455,16 @@ the organism at 1,000 copies with the real cluster inside), copies every file ba
 happens. Three paired repetitions per organism, two machines at a time. Its results join `SIX_KUBE.md` at 1,000 copies;
 the same cells from GitHub runners count only if the runner held them.
 
+*Result on Omni v3 (`results/live/V3_BIG_ORGANISM.md`, both organisms, written 9 October after the second collect).* The
+machines were rented one at a time through `big-organism-detached` with a 10,800 s window an arm (the 2,880 s window of the
+v1 runs put the compass arm off the clock; the clock rule and the longer window are declared in the robustness and v3
+notes). The four stacked: three repetitions over 29 hours (collected by run 37754612102), p95 2,882 → 150 ms, time over the
+line 51% → 0, failed requests 0.14% → 0, machines 6 in both arms, both arms 22 s behind the window. The whole tower: three
+repetitions over 25 hours (started by run 37756284680, collected by run 37945866426), p95 6,690 → 160 ms, p99 9,068 → 187
+ms, time over the line 76% → 0, failed requests 4.8% → 0, machines 6 in both arms, both arms 14 s behind the window. Every
+cluster row that moved is clear of zero with three pairs; the organisms' own model rows are shown beside them and never
+enter the index; the rounding-level model work loss reads worse by rule in both. Six repetitions, six on the clock.
+
 
 #### The burst bill test on Azure: two native arms lost to the harness, and the fix (2026-10-05)
 
@@ -9035,6 +9058,7 @@ not run on the current governor; every earlier card result is obsolete and is ru
 | What | Reading | Source |
 |---|---|---|
 | The 945 muscles and six organisms, A/B/C | reproduced to the digit in 3 of 3; 0 muscles worse; every organism superior within guardrails (work per energy +0.1% to +0.3%) | `results/realms/REALMS.md` |
+| The whole tower at 1,000 copies (945,000 modelled muscles) with the real cluster inside, on a rented machine, 3 pairs (v3) | the organism's work unchanged (rounding-level) | the cluster's p95 **6.7 s → 160 ms**, p99 −98%, time over the line **76% → 0**, failed requests **4.8% → 0** | 6 machines in both arms | inside the noise (standby model); the organism's energy −0.4% (model) | `results/live/V3_BIG_ORGANISM.md` |
 | The four stacked at 1,000 copies with the real cluster inside, on a rented machine, 3 pairs (v3) | the organism's work unchanged (rounding-level) | the cluster's p95 **2.9 s → 150 ms**, p99 −97%, time over the line **51% → 0**, failed requests **0.14% → 0** | 6 machines in both arms | inside the noise (standby model); the organism's energy −0.4% (model) | `results/live/V3_BIG_ORGANISM.md` |
 | The organisms at 1, 10, 100 and 1,000 copies × 1 to 1,000 runs, 84 of 90 cells | every organism superior within guardrails in every cell of 10 runs or more; work per energy +0.07% to +0.37%, the same figure at every size; the six cells left are beyond the machines available | `results/scale/GRID.md` |
 | Power grid, 11 SimBench grids in pandapower, A/B/C (v1 and v3 identical) | with ZIP loads energy drawn and net import better in all 11; losses better in 7, worse in 4; tap operations fewer in 10, 4 → 8 a year in one (worse, the declared cost) | `results/live/V3_PANDAPOWER.md` |
@@ -9062,10 +9086,13 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 
 1. **Azure, the fleet that can show one machine**: steady and burst on 40 workers, v3; waiting on Azure's cluster
    capacity in eastus (the only region where this subscription has more than 10 cores). Then B and C.
-2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3**: the stack is done, 3 of 3 on
-   the clock (`results/live/V3_BIG_ORGANISM.md`: the cluster's p95 2.9 s → 150 ms, time over the line 51% → 0, failed
-   requests 0.14% → 0, machines and energy unchanged, 22 s behind a 10,800 s window); the tower runs now on a second rented
-   machine the same way (about $10, about a day).
+2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3: both done, 3 of 3 on the clock**
+   (`results/live/V3_BIG_ORGANISM.md`). The stack: the cluster's p95 2.9 s → 150 ms, time over the line 51% → 0, failed
+   requests 0.14% → 0, machines and energy unchanged, 22 s behind a 10,800 s window. The tower (945,000 modelled muscles,
+   collected 9 October by run 37945866426 after 25 hours on its rented machine): the cluster's **p95 6.7 s → 160 ms (−98%)**,
+   p99 9.1 s → 187 ms, **time over the line 76% → 0, failed requests 4.8% → 0**, all clear of zero; replicas, pods started
+   and machines (6 in both arms) the same; energy inside the noise; 14 s behind the window in both arms; the organism's own
+   model (shown, never in the index) energy −0.4% and work rounding-level worse by rule. Both machines deleted.
 3. **The real card**: the founder's runs on Lambda, one exact commit.
 4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, no engine file changes): the kill scenario is done
    (`results/live/V3_ROBUST_KILL.md`: every setting back 7 to 11 s after the kill in 30 of 30 repetitions) and the

@@ -8,6 +8,14 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-09
+- **The whole tower at 1,000 copies with the real cluster inside, on v3, 3 of 3 on the clock** (`results/live/V3_BIG_ORGANISM.md`,
+  now both big organisms side by side; started by run 37756284680, collected by run 37945866426 after 25 hours on one rented
+  Azure machine, eastus `Standard_D8as_v4`, a 10,800 s window of 240 steps of 45 s, commit `6f0f93e5`, Omni v3): 945,000
+  modelled muscles on one clock; the cluster's **p95 6,690 → 160 ms (−98%)**, p99 9,068 → 187 ms, **time over the line 76% →
+  0, failed requests 4.8% → 0**, all clear of zero; replicas, pods started and machines (6 in both arms) the same or inside
+  the noise; energy inside the noise; both arms 14 s behind the window; the organism's model energy −0.4% and work
+  rounding-level worse, shown. The machine was deleted by the collect. The v3 record, register row 8, state of play, the
+  manual (2.5, 16.2, the evidence map) and the Kubernetes preregistration carry it.
 - **The second counted sets of PostgreSQL and MongoDB and the third of MySQL, on the amended harnesses: the costs are gone,
   the gains are smaller and real; the index moves from +24.1% to +20.5%** (runs 37858494179, 37858496620, 37858499033;
   37858501997, 37858505059, 37858509109; 37858512907, 37858515717, 37858519010; commit `310cf318`, Omni v3; the earlier
