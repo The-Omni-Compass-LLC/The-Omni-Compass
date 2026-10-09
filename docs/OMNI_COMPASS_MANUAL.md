@@ -163,7 +163,9 @@ index over the six real categories confirmed three times, stands at **+20.5%** (
 database's buffer pool +5.2%, every category weighed the same and every row inside the noise counted as exactly nothing. The
 three database categories read their second or third counted sets of 9 October, on which the costs the first sets had
 charged to the governor were traced to our own harness and removed (section 16.4); the gains that remained are smaller, and
-nothing under them is ours. The cache's category is negative because the memory it holds is the resource it
+nothing under them is ours. A second reading of the same tables, declared the same day and scoring service alone (work and
+speed, with the resources shown and not scored), stands at **+71.8%**; it is printed beside the first in the index file,
+and section 16.6 says what each of the two is for. The cache's category is negative because the memory it holds is the resource it
 trades and reads worse by rule, even as its work and hit rate read better; the index does not hide that.
 
 **What has not been shown, said plainly.** An energy or cloud-bill saving on real machines. Energy on kind is a
@@ -2450,7 +2452,14 @@ categories were re-read on their second or third counted sets, after the costs t
 were measured and found to be our own harness (section 16.4): the database fell from +14.2% to +4.0%, the storage-engine
 cache from +10.2% to +8.5%, the buffer pool from +12.2% to +5.2%, and the headline from +24.1% to +20.5%. The number went
 down because the costs came out and took the gains they had been propping up with them; what is left is smaller and has
-nothing of ours under it. A category enters at whatever its tables
+nothing of ours under it. The same day a **second reading** was declared beside the first, at the founder's question about
+what a cache is for (`docs/K8S_COMPASS_PREREGISTRATION.md`, the service reading): the same tests and the same three-run
+rule scored on work and speed only, the resources spent or saved shown and not scored, computed for every test alike. It
+stands at **+71.8%**: Kubernetes +83%, Kafka +1,193% (its hundredfold tail), Redis +8.8% where the resource reading says
+−24.9%, and the three database stacks exactly nothing, because their gains are resources given back for the same service.
+The two readings are two true sentences about the same tables: one says what the governor did for the service, the other
+what it cost or saved in resources to do it. The resource reading stays the headline because it was the one preregistered;
+the service reading is printed in the same file, in the same tables, as a second column. A category enters at whatever its tables
 confirm, nothing included, which is the reader's guarantee
 that the number is not built from the categories that happened to work. That is how the number is meant to move: every real category enters at equal weight as its table lands, whatever it does to the mean.
 The storage-engine cache's figure is positive for the reason the Redis figure is negative, read the other way: there the

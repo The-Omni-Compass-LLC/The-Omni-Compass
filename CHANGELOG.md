@@ -8,6 +8,15 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-09
+- **A second reading of the Omni index, declared beside the first** (`tools/omni_index.py`, `results/OMNI_INDEX.md`,
+  `docs/K8S_COMPASS_PREREGISTRATION.md`): at the founder's question about what a cache is for (Redis is bought for speed and
+  spends memory to deliver it; the resource reading counts that memory as a cost and reads Redis at −24.9% while its work and
+  hit rate read confirmed better), the same tests and the same three-run rule are also scored on **service alone, work and
+  speed**, with machines, energy, memory, connections and consumers shown and not scored, for every test alike. The service
+  reading stands at **+71.8%** (Kubernetes +83.2%, Kafka +1,192.8%, Redis +8.8%, the three database stacks exactly nothing,
+  their gains being resources given back); the resource reading, +20.5%, stays the headline the program preregistered. Both
+  are printed in the same tables as two columns; a confirmed loss in work or speed counts against Omni in both. README, the
+  state of play and the manual (summary, 16.6) carry the second number beside the first.
 - **The whole tower at 1,000 copies with the real cluster inside, on v3, 3 of 3 on the clock** (`results/live/V3_BIG_ORGANISM.md`,
   now both big organisms side by side; started by run 37756284680, collected by run 37945866426 after 25 hours on one rented
   Azure machine, eastus `Standard_D8as_v4`, a 10,800 s window of 240 steps of 45 s, commit `6f0f93e5`, Omni v3): 945,000

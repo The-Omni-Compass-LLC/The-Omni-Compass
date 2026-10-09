@@ -76,7 +76,9 @@ index over the six real categories confirmed three times, stands at **+20.5%** (
 database's buffer pool +5.2%, every category weighed the same and every row inside the noise counted as exactly nothing. The
 three database categories read their second or third counted sets of 9 October, on which the costs the first sets had
 charged to the governor were traced to our own harness and removed (section 16.4); the gains that remained are smaller, and
-nothing under them is ours. The cache's category is negative because the memory it holds is the resource it
+nothing under them is ours. A second reading of the same tables, declared the same day and scoring service alone (work and
+speed, with the resources shown and not scored), stands at **+71.8%**; it is printed beside the first in the index file,
+and section 16.6 says what each of the two is for. The cache's category is negative because the memory it holds is the resource it
 trades and reads worse by rule, even as its work and hit rate read better; the index does not hide that.
 
 **What has not been shown, said plainly.** An energy or cloud-bill saving on real machines. Energy on kind is a
@@ -4990,7 +4992,7 @@ Patent applications, copyright registrations and trademark applications filed in
 
 
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `3858c22a`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `942e4e95`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 1. The mechanism, and proof that it is the one that ran
 
@@ -5591,7 +5593,14 @@ categories were re-read on their second or third counted sets, after the costs t
 were measured and found to be our own harness (section 16.4): the database fell from +14.2% to +4.0%, the storage-engine
 cache from +10.2% to +8.5%, the buffer pool from +12.2% to +5.2%, and the headline from +24.1% to +20.5%. The number went
 down because the costs came out and took the gains they had been propping up with them; what is left is smaller and has
-nothing of ours under it. A category enters at whatever its tables
+nothing of ours under it. The same day a **second reading** was declared beside the first, at the founder's question about
+what a cache is for (`docs/K8S_COMPASS_PREREGISTRATION.md`, the service reading): the same tests and the same three-run
+rule scored on work and speed only, the resources spent or saved shown and not scored, computed for every test alike. It
+stands at **+71.8%**: Kubernetes +83%, Kafka +1,193% (its hundredfold tail), Redis +8.8% where the resource reading says
+−24.9%, and the three database stacks exactly nothing, because their gains are resources given back for the same service.
+The two readings are two true sentences about the same tables: one says what the governor did for the service, the other
+what it cost or saved in resources to do it. The resource reading stays the headline because it was the one preregistered;
+the service reading is printed in the same file, in the same tables, as a second column. A category enters at whatever its tables
 confirm, nothing included, which is the reader's guarantee
 that the number is not built from the categories that happened to work. That is how the number is meant to move: every real category enters at equal weight as its table lands, whatever it does to the mean.
 The storage-engine cache's figure is positive for the reason the Redis figure is negative, read the other way: there the
@@ -5638,10 +5647,13 @@ themselves, which is why every row is in its table.
 | **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
 | GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
-**Running now** (8 October): the whole tower at 1,000 copies on a rented machine (the four stacked at 1,000 copies done,
-section 16.2); MySQL's buffer pool under sysbench done, two counted sets (`V3_SYSBENCH.md`, section 16.4; the first set and the plug's amendment in section 10.9); the robustness test
+**Running now** (9 October): both big organisms at 1,000 copies done on rented machines (the four stacked and the whole
+tower, 3 of 3 on the clock each, section 16.2); the three database tables re-read on their second or third counted sets
+after the costs the first sets charged to the governor were traced to our own harness and removed (section 16.4; the
+amendments in sections 10.2, 10.8 and 10.9); the robustness test
 (`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario and the two-hour long run both done (section 16.4b), the
-24-hour run on three rented machines under way (one pair a machine, two arms of a day each, collected on 10 October);
+24-hour run on three rented machines in its second (omni) arm (one pair a machine, two arms of a day each, collected on
+10 October);
 the real cluster under a public demand trace done (the Google cluster trace of 2011, `V3_TRACE_GOOGLE2011.md`, section
 16.1), the Azure Functions trace next by the same rule;
 YCSB on MongoDB done (`V3_YCSB.md`, section 16.4), MySQL's buffer pool under sysbench done (`V3_SYSBENCH.md`, section 16.4),
@@ -7371,6 +7383,22 @@ left out of that test, never filled in. A measure inside the noise is counted at
 the headline is the geometric mean of the real categories, each weighted the same; the modelled muscles are shown
 beside it, never inside it. Computed by `tools/omni_index.py` from each test's own paired results; nothing is typed in.
 
+**The service reading, a second reading declared 2026-10-09 (the first unchanged).** The founder asked what a cache is
+for. Redis is bought for speed and spends memory to deliver it; the index above counts that memory as a cost at the same
+weight as the speed it buys, so the Redis category reads −24.9% while its work inside the line and its hit rate read
+confirmed better in every run. The question is fair, and the answer is a second reading beside the first, never a change
+to the first: the same tests, the same three-run rule, scored on the service the stack is bought for, **work and speed
+only**, with the resources it spent or saved (machines, energy, memory, connections, consumers) shown beside it and not
+scored. It is computed for every test alike by the same tool (`service_pct`, `service_headline_pct`), never for one
+stack, and printed in the same tables as a second column; the resource reading above stays the headline this program
+preregistered. The two readings say different true things: where the governor buys service with a resource (Redis's
+memory ceiling, Kafka's consumers) the service reading is higher and the resource reading says what it cost; where it
+gives a resource back for the same service (the database pools and caches) the service reading is nothing and the
+resource reading carries the gain. On the day it was declared the service reading stood at +71.8% against the resource
+reading's +20.5% (Kubernetes +83.2%, Kafka +1,192.8%, Redis +8.8%, the three database stacks exactly nothing); Kafka's
+hundredfold speed ratio is why the service headline is large, and the category table is where a reader sees it. A
+confirmed loss in work or speed counts against Omni in both readings; neither hides one.
+
 
 ### Demand that wanders: up, spike, partway down, back up, down to idle (written before its run, 2026-10-04)
 
@@ -9010,7 +9038,7 @@ pool handed back on all 45 omni arms; the second set is kept whole in `docs/hist
 (every row inside the noise, 15 arms not handed back because the plug's restore met the server's unfinished shrink) is kept
 whole in `docs/history/V3_SYSBENCH_set1.md`, the plug fixed and the fix declared in `docs/MYSQL_PREREGISTRATION.md`. **The
 Omni index, real machines only, confirmed three times: +20.5%** (`results/OMNI_INDEX.md`; Kubernetes +28.8% over seven tests, the database
-+4.0%, Kafka +166.9%, Redis −24.9%, the database's cache +8.5%, the database's buffer pool +5.2%, each category weighed the same; a row inside the noise counts as exactly 1; the three database categories read their second or third counted sets of 9 October, on which the harness costs of the first sets were removed and the gains came down to what is real; Kafka's speed ratio
++4.0%, Kafka +166.9%, Redis −24.9%, the database's cache +8.5%, the database's buffer pool +5.2%, each category weighed the same; a row inside the noise counts as exactly 1; the three database categories read their second or third counted sets of 9 October, on which the harness costs of the first sets were removed and the gains came down to what is real; a second reading, declared 9 October at the founder's question about what a cache is for, scores service alone (work and speed, resources shown and not scored) and stands at **+71.8%** beside the +20.5%, Redis +8.8%, Kafka +1,193%, Kubernetes +83%, the database stacks nothing, both readings in the index file and the first the headline; Kafka's speed ratio
 is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is negative
 because the memory it holds for a wide working set is the resource it trades and reads worse by rule; MongoDB's is
 positive because there the governor gave memory back). The v1 tables read the same and stay as the first engine's record.

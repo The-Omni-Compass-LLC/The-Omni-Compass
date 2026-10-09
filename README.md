@@ -43,6 +43,13 @@ current card governor on a real GPU (the one real-card run, on the governor sinc
 energy and made its 95th percentile 43-84% slower:
 [`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
+**Two readings of one index, both in `results/OMNI_INDEX.md`.** The resource reading (the headline below) scores work,
+speed, machines and energy together, so a governor that buys speed with memory pays for the memory. The service reading,
+declared on 9 October at the founder's question about what a cache is for, scores work and speed only and shows the
+resources beside them: **+71.8%** over the same six categories (Kubernetes +83%, Kafka +1,193%, Redis +8.8%, the three
+database stacks exactly nothing, because their gains are resources given back). Neither hides a loss; each says a
+different true thing, and the first is the one preregistered.
+
 **The Omni index, every real test together: +20.5%** more for the same, or the same for less, across work, speed,
 machines and energy, six real categories each weighed the same: real Kubernetes on v3 +28.8% over seven tests (work +19%, speed +107%,
 machines +5%, energy +2%); the real database on v3 +4.0% (on the second counted set: connections held open −36% to −38% on
