@@ -18,6 +18,9 @@ on:
       step_s:
         description: "Seconds per notch of the load"
         default: "20"
+      objective:
+        description: "What the brain's verdict judges a step by: resource (work, speed, connections and CPU together, the index's reading) or service (work and speed alone)"
+        default: "resource"
 jobs:
   plan:
     runs-on: ubuntu-latest
@@ -56,7 +59,7 @@ jobs:
       - name: Run the workload, native and omni
         run: |
           set +e
-          python3 tools/run_pgbench.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out > run.log 2>&1
+          python3 tools/run_pgbench.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out --objective "${{ github.event.inputs.objective || 'resource' }}" > run.log 2>&1
           code=$?
           grep "^==\|Error\|error" run.log | tail -12 | while IFS= read -r l; do echo "::notice::$l"; done
           mkdir -p out; cp run.log out/

@@ -364,6 +364,45 @@ at about +1%); read_only and update_index show no settled value. The expectation
 memory row moved toward native and stayed confirmed worse on real misses, and the read-mostly workloads were not meant to
 change, but read_only did, for the reason given, and that is the result.
 
+## Amendment 3 (2026-10-09, declared before any run on it): the brain's own verdict on the pool
+
+**Why, and when.** Written after the third counted set was read (the section above: `burst` pool −49% to −56% with nothing worse;
+`read_write` pages holding data +44% to +52% confirmed worse with CPU −4% to −6% better; `read_only` inside the noise; `update_index`
+the runs disagree), at the founder's order of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it
+pays stays native and Omni only reads it. The brain must decide that on the muscle itself, in real time, by a measurement.
+
+The rule, the same in the five live harnesses (`tools/knob_verdict.py`, a wrapper around the frozen engine's own
+verdict, `omnicompass/verdict.py`, which is unchanged: the engine stays Omni v3): **the knob starts in watch**, one wire out
+and nothing written, and the compass's moves are clamped to the allowance a paired trial on the stack itself has earned. Two
+directions from the operator's setting, each with its own allowance: **spend** (more of the resource) and **give back**
+(less). A trial is one notch past the deepest step already allowed: the reference phase holds the knob at that deepest step
+(the operator's setting at first) until 8 one-second samples are in, then the trial phase holds it one notch further for 8
+more; the first 2 s after any change are not sampled. The judge is the engine's: the trial's median cost no higher
+than the reference's within 2%, and no higher than the cost first measured at the operator's setting. The cost is one sample
+a second from the stack's own readings: under the **resource objective** (the Omni index's preregistered reading, the
+default) cost = the buffer pool held (MB) × the host's CPU busy share × the mean statement latency on the server in the last second / the statements the server counted in the last second, so a step passes only if the service gained
+outweighs the resource and CPU spent by the index's own arithmetic; under the **service objective** (`--objective service`)
+cost = the mean statement latency on the server in the last second / the statements the server counted in the last second, the resources shown and not judged. A spend step is tried only while the compass asks to spend
+and the pool is full and missing at 1% of its read requests or more (amendment 2's condition); a give-back step only while the service is calm and the pool saw read requests and its misses were under 1% of them. A trial once started runs on until its
+samples are in unless the service swings to the other direction's condition, when it is abandoned; a refused step is not
+tried again for 60 s; a trial is started at most every 20 s. During a trial the knob stands at the phase's value whatever
+the compass asks; between trials the compass moves it by its own law inside the allowance. No sample is taken while the server is still carrying out a resize, and a trial may take up to 120 s before it is abandoned, because a chunk takes seconds to add or withdraw. The fail-up (four chunks at the wall) is clamped to the allowance like every other move. Restoring the
+operator's setting is always free. Every trial, allowance, refusal and abandonment is written to the audit (`cost`,
+`cpu_share`, `verdict_phase`, `verdict_direction`, `allowed_low`, `allowed_high` on every line) and summed in the arm's
+record (`verdict`: the objective, the state, the allowance, the counts, the events); the three-run table prints the
+brain's verdict per workload and run. The counted runs on this amendment will use 30 s a notch (a whole trial inside one
+notch of traffic), declared here; the native arm runs the same ladder. Nothing is typed in; the rule is in the code the
+runs execute.
+
+**Expected before the runs.** `burst`: the pool given back a chunk a trial while calm, −25% to −50%, less than the third set's −49%
+to −56%, with nothing worse. `read_write`: each chunk above 512 MB must pass its trial under the resource objective (memory × CPU ×
+latency / work no higher); a chunk that buys a few percent of CPU for a quarter more memory fails it, so the pages holding data are
+expected inside the noise and the CPU saving of the third set with them: no loss, no gain. `read_only` and `update_index`: inside
+the noise. The third counted set stays in `docs/history` as the result of the rule before this amendment.
+
+**Dispatch.** None yet: the founder asked, on the evening of 9 October, to be shown where everything stands before the next
+runs; the runs go when the founder says.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

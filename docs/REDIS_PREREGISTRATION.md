@@ -112,6 +112,46 @@ Three short repetitions (10 s a notch) on the development machine shaped the rul
    7.1 ms, the ceiling held 64 → 304 MB on average against 256 MB used (the cost, which will read WORSE), host CPU 137 →
    113 s, every arm handed back. The counted runs will show whatever they show.
 
+## Amendment 2 (2026-10-09, declared before any run on it): the brain's own verdict on the ceiling
+
+**Why, and when.** Written after the first counted set was read (`results/live/V3_REDIS.md`: work inside the line +14% to +27%,
+the hit rate up, the ceiling held 64 → 200 to 300 MB confirmed worse, the index's resource reading −24.9%), at the founder's order
+of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it pays stays native and Omni only reads it.
+The brain must decide that on the muscle itself, in real time, by a measurement, not by a table after the fact.
+
+The rule, the same in the five live harnesses (`tools/knob_verdict.py`, a wrapper around the frozen engine's own
+verdict, `omnicompass/verdict.py`, which is unchanged: the engine stays Omni v3): **the knob starts in watch**, one wire out
+and nothing written, and the compass's moves are clamped to the allowance a paired trial on the stack itself has earned. Two
+directions from the operator's setting, each with its own allowance: **spend** (more of the resource) and **give back**
+(less). A trial is one notch past the deepest step already allowed: the reference phase holds the knob at that deepest step
+(the operator's setting at first) until 8 one-second samples are in, then the trial phase holds it one notch further for 8
+more; the first 2 s after any change are not sampled. The judge is the engine's: the trial's median cost no higher
+than the reference's within 2%, and no higher than the cost first measured at the operator's setting. The cost is one sample
+a second from the stack's own readings: under the **resource objective** (the Omni index's preregistered reading, the
+default) cost = the ceiling held (MB) × the host's CPU busy share × the mean latency of the last second's requests (the compass's own reading) / the requests answered inside the 2 ms line in the last second, so a step passes only if the service gained
+outweighs the resource and CPU spent by the index's own arithmetic; under the **service objective** (`--objective service`)
+cost = the mean latency of the last second's requests (the compass's own reading) / the requests answered inside the 2 ms line in the last second, the resources shown and not judged. A spend step is tried only while the compass asks to spend
+and the cache is full (memory used at 90% of the ceiling or more); a give-back step only while the service is calm and nothing was evicted in the last second. A trial once started runs on until its
+samples are in unless the service swings to the other direction's condition, when it is abandoned; a refused step is not
+tried again for 60 s; a trial is started at most every 20 s. During a trial the knob stands at the phase's value whatever
+the compass asks; between trials the compass moves it by its own law inside the allowance. The fail-up rule (+128 MB at the wall) is clamped to the allowance like every other move: the first counted set shows it fired 3 to 10 times an arm, and most of the 64 → 200 to 300 MB came from it; under this amendment no unproven step is taken. Restoring the
+operator's setting is always free. Every trial, allowance, refusal and abandonment is written to the audit (`cost`,
+`cpu_share`, `verdict_phase`, `verdict_direction`, `allowed_low`, `allowed_high` on every line) and summed in the arm's
+record (`verdict`: the objective, the state, the allowance, the counts, the events); the three-run table prints the
+brain's verdict per workload and run. The counted runs on this amendment will use 30 s a notch (a whole trial inside one
+notch of traffic), declared here; the native arm runs the same ladder. Nothing is typed in; the rule is in the code the
+runs execute.
+
+**Expected before the runs.** Under the resource objective the first notch is refused: 12.5% more memory buys about one percent
+of latency on these workloads, the cost rises and the step fails. The ceiling then stays at 64 MB in both arms, every gauge reads
+inside the noise and the Redis category of the index reads exactly nothing: no gain, no loss. Under the service objective the
+ceiling grows one notch a trial while the cache is full and missing, to perhaps 120 to 200 MB by the end of an arm; work inside
+the line and the hit rate rise by less than the first set's +14% to +27%, the memory held by less than before. Both readings
+are run: three runs each. The first counted set stays in `docs/history` as the result of the rule before this amendment.
+
+**Dispatch.** None yet: the founder asked, on the evening of 9 October, to be shown where everything stands before the next
+runs; the runs go when the founder says.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

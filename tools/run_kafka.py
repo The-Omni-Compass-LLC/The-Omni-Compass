@@ -45,6 +45,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
+from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 2: the brain's own verdict)
 
 BOOTSTRAP = os.environ.get("KAFKA_BOOTSTRAP", "localhost:9092")
 PARTITIONS = 8
@@ -186,9 +187,9 @@ class Group:
 
 
 # ------------------------------------------------------------------ the compass on the consumer count
-def service_reading(rec_files, since_s):
-    """The group's own reading: the mean end-to-end latency (s) of the messages consumed in the last second; nothing
-    consumed reads as the lag's age (messages waiting with no one taking them), capped at the line."""
+def service_sample(rec_files, since_s, line_ms=LINE_MS):
+    """The brain's sample from the consumers' own records: (the mean end-to-end latency in s of the messages consumed in the
+    last second, or None when none was; how many were consumed; how many of them inside the line)."""
     now = time.time(); lat = []
     for f in rec_files:
         try:
@@ -200,7 +201,15 @@ def service_reading(rec_files, since_s):
                         lat.append(float(l) / 1000.0)
         except (OSError, ValueError):
             pass
-    return (sum(lat) / len(lat)) if lat else None
+    if not lat:
+        return None, 0, 0
+    return sum(lat) / len(lat), len(lat), sum(1 for l in lat if l * 1000.0 <= line_ms)
+
+
+def service_reading(rec_files, since_s):
+    """The group's own reading: the mean end-to-end latency (s) of the messages consumed in the last second; nothing
+    consumed reads as the lag's age (messages waiting with no one taking them), capped at the line."""
+    return service_sample(rec_files, since_s)[0]
 
 
 def decide(p, force, lag, idle, cur, last_change_age, wall=0.95):
@@ -219,40 +228,53 @@ def decide(p, force, lag, idle, cur, last_change_age, wall=0.95):
 
 
 class Omni(threading.Thread):
-    """The brain, one decision a second, writing the audit; the knob is handed back at the end and read back."""
+    """The brain, one decision a second, writing the audit; the knob is handed back at the end and read back. Amendment 2 (the
+    brain's own verdict, 2026-10-09): the group's size starts in watch and is written only inside the allowance a paired trial
+    on the group itself has earned under the declared objective (tools/knob_verdict.py around the engine's own Verdict); a
+    trial holds the count; a fail-up never spends beyond the allowance."""
 
-    def __init__(self, grp: Group, produced, audit_path: Path, line_ms=LINE_MS):
+    def __init__(self, grp: Group, produced, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE):
         super().__init__(daemon=True)
-        self.grp, self.produced, self.audit = grp, produced, audit_path
+        self.grp, self.produced, self.audit, self.line_ms, self.objective = grp, produced, audit_path, line_ms, objective
         self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
-        self.stop_flag = threading.Event(); self.last_change = -1e9; self.failups = 0; self.handed_back = False
+        self.stop_flag = threading.Event(); self.last_change = -1e9; self.failups = 0; self.handed_back = False; self.verdict = None
 
     def run(self):
         snapshot = self.grp.count()                        # read once, before the first write: the operator's count
-        t0 = time.monotonic()
+        t0 = time.monotonic(); cpu_prev = cpu_times()
+        self.verdict = KnobVerdict(snapshot, 1, COVER, objective=self.objective, settle_s=2 * TAU)   # a consumer that joins rebalances the group first
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
                 recs = [self.grp.out / f"consumer-{k}.log" for k in range(1, self.grp.k + 1)]
                 lag = max(0, self.produced.value - self.grp.consumed.value)
-                reading = service_reading(recs, 1.0)
+                reading, n_msg, inside = service_sample(recs, 1.0, self.line_ms)
                 if reading is None:
                     reading = min(LINE_MS / 1000.0, 0.0 if lag == 0 else LINE_MS / 1000.0)   # waiting with no one consuming: the line
                 f = self.law.force(reading)
                 cur = self.grp.count(); idle = self.grp.idle()
+                cpu_now = cpu_times(); d_total = cpu_now[0] - cpu_prev[0]; d_idle = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
+                cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
+                cost = sample_cost(self.objective, inside, reading if n_msg else None, cur, cpu_share)
+                self.verdict.observe(cost, tick - t0)                                    # measured under the count of the last second
                 target, d, why = decide(self.law.p, f, lag, idle, cur, tick - self.last_change, wall=self.law.band.wall_high)
+                fail_up = why.startswith("fail up")
+                target, why, vinfo = self.verdict.decide(target, spend_ok=(f > 0.05 and lag > 0), give_ok=(f < -0.05 and idle > 0 and lag == 0),
+                                                         t=tick - t0, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=fail_up)
                 if target > cur:
                     for _ in range(target - cur):
                         self.grp.start_one()
                     self.last_change = tick
-                    if d == 0:
+                    if fail_up:
                         self.failups += 1
                 elif target < cur:
                     for _ in range(cur - target):
                         self.grp.stop_one()
                     self.last_change = tick
                 fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 2), "p": round(self.law.p, 4), "force": round(f, 4),
-                                     "lag": lag, "idle": idle, "consumers": cur, "target": target, "why": why}) + "\n")
+                                     "lag": lag, "idle": idle, "consumers": cur, "target": target, "consumed_last_s": n_msg, "inside_last_s": inside,
+                                     "cpu_share": None if cpu_share is None else round(cpu_share, 4), "cost": None if cost is None else round(cost, 9),
+                                     **vinfo, "why": why}) + "\n")
                 time.sleep(max(0.0, DT - (time.monotonic() - tick)))
         # the hand-back: the operator's count, read back
         while self.grp.count() > snapshot:
@@ -298,7 +320,7 @@ def delete_topic(topic):
 
 
 # ------------------------------------------------------------------ one arm, one repetition
-def run_arm(arm, wl_dir: Path, rep, service_ms, payload, steps, step_s, base, line_ms):
+def run_arm(arm, wl_dir: Path, rep, service_ms, payload, steps, step_s, base, line_ms, objective=DEFAULT_OBJECTIVE):
     d = wl_dir / f"rep-{rep}" / arm; d.mkdir(parents=True, exist_ok=True)
     topic = f"omni-{wl_dir.name}-{rep}-{arm}-{int(time.time())}"; group = topic + "-g"
     make_topic(topic)
@@ -311,7 +333,7 @@ def run_arm(arm, wl_dir: Path, rep, service_ms, payload, steps, step_s, base, li
     sampler = Sampler(grp, produced); sampler.start()
     omni = None
     if arm == "omni":
-        omni = Omni(grp, produced, d / "audit.jsonl", line_ms); omni.start()
+        omni = Omni(grp, produced, d / "audit.jsonl", line_ms, objective); omni.start()
     cpu0 = cpu_times(); t0 = time.time()
     prod = mp.Process(target=producer_proc, args=(topic, rates, step_s, payload, produced, stop_prod, str(d / "producer.log")))
     prod.start(); prod.join()
@@ -347,11 +369,13 @@ def run_arm(arm, wl_dir: Path, rep, service_ms, payload, steps, step_s, base, li
          "mean_ms": (sum(lat_sorted) / n) if n else float("nan"), "lag_max": max(lags), "lag_mean": sum(lags) / len(lags),
          "lost": max(0, produced.value - n), "consumers_mean": sum(cons) / len(cons), "consumers_max": max(cons),
          "cpu_busy_share": (total - idle) / max(1, total), "cpu_seconds": cpu_s, "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside),
-         "rebalances": changes, "handed_back": (omni.handed_back if omni else True), "failups": (omni.failups if omni else 0)}
+         "rebalances": changes, "handed_back": (omni.handed_back if omni else True), "failups": (omni.failups if omni else 0),
+         "verdict": (omni.verdict.record() if omni and omni.verdict else None)}
     (d / "arm.json").write_text(json.dumps(g, indent=1))
     delete_topic(topic)
     print(f"   {arm} rep {rep}: {n} of {produced.value} consumed, inside the line {inside / seconds:.1f}/s, p95 {g['p95_ms']:.0f} ms, "
-          f"lag max {g['lag_max']}, consumers {g['consumers_mean']:.2f}, CPU {cpu_s:.1f} s, handed back {g['handed_back']}", flush=True)
+          f"lag max {g['lag_max']}, consumers {g['consumers_mean']:.2f}, CPU {cpu_s:.1f} s, handed back {g['handed_back']}"
+          + (f", verdict {g['verdict']['state']}" if g.get("verdict") else ""), flush=True)
     return g
 
 
@@ -417,22 +441,22 @@ def engine():
         return {"version": "unknown", "commit": "?"}
 
 
-def run_workload(name, out: Path, reps, step_s, calib_s, line_ms):
+def run_workload(name, out: Path, reps, step_s, calib_s, line_ms, objective=DEFAULT_OBJECTIVE):
     service_ms, payload, steps, tuning = WORKLOADS[name]
     wl_dir = out / f"kafka-{name}"; wl_dir.mkdir(parents=True, exist_ok=True)
-    print(f"== {name}: {service_ms} ms of work a message, {payload} B, steps {steps}, {step_s} s a notch", flush=True)
+    print(f"== {name}: {service_ms} ms of work a message, {payload} B, steps {steps}, {step_s} s a notch, the verdict's objective {objective}", flush=True)
     cap = capacity(wl_dir, service_ms, payload, calib_s)
     peak = max(int(s) for s in steps.split())
     base = PEAK_SHARE * cap / peak
     print(f"   native capacity with {NATIVE_CONSUMERS} consumers: {cap:.0f} messages a second; base rate {base:.1f}/s (peak notch {peak} offers {PEAK_SHARE:.0%} of it)", flush=True)
     rec = {"workload": name, "tuning": tuning, "service_ms": service_ms, "payload_bytes": payload, "steps": steps, "step_s": step_s,
            "line_ms": line_ms, "native_consumers": NATIVE_CONSUMERS, "cover": list(COVER), "capacity_mps": cap, "base_rate_mps": base,
-           "engine": engine(), "reps": []}
+           "objective": objective, "engine": engine(), "reps": []}
     for rep in range(1, reps + 1):
         order = ("native", "omni") if rep % 2 else ("omni", "native")
         r = {}
         for arm in order:
-            r[arm] = run_arm(arm, wl_dir, rep, service_ms, payload, steps, step_s, base, line_ms)
+            r[arm] = run_arm(arm, wl_dir, rep, service_ms, payload, steps, step_s, base, line_ms, objective)
         rec["reps"].append(r)
         (wl_dir / f"{name}.json").write_text(json.dumps(rec, indent=1))
     rec["paired"] = {k: paired(rec["reps"], k, dr) for k, _, dr in GAUGES}
@@ -495,6 +519,8 @@ def main(argv=None):
     ap.add_argument("--calib-s", type=float, default=20.0)
     ap.add_argument("--line-ms", type=float, default=LINE_MS)
     ap.add_argument("--out", default="kafka-out")
+    ap.add_argument("--objective", default=DEFAULT_OBJECTIVE, choices=OBJECTIVES,
+                    help="what the brain's verdict judges a step by: resource (the index's reading: work, speed, consumers and CPU together) or service (work and speed alone)")
     ap.add_argument("--report-only", default="")
     a = ap.parse_args(argv)
     if a.setup:
@@ -504,7 +530,7 @@ def main(argv=None):
         recs = [json.loads(f.read_text()) for f in sorted(Path(a.report_only).rglob("kafka-*/*.json"))]
         print(report(recs, Path(a.report_only))); return 0
     names = list(WORKLOADS) if a.workloads == "all" else a.workloads.split(",")
-    recs = [run_workload(n, out, a.reps, a.step_s, a.calib_s, a.line_ms) for n in names]
+    recs = [run_workload(n, out, a.reps, a.step_s, a.calib_s, a.line_ms, a.objective) for n in names]
     print(report(recs, out))
     return 0
 

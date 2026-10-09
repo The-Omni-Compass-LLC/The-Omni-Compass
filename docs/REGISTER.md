@@ -94,7 +94,9 @@ order that Omni need not be wired into every muscle): every table on this page i
 per knob, **write** (a gauge confirmed better, none confirmed worse: Omni holds the knob), **watch** (nothing confirmed
 better: the muscle stays native and Omni only reads it, one wire out and no wire in) or **operator's choice** (a trade). On
 the real stacks 12 of 24 knob-cases write, 7 are trades and 5 watch; of the 945 modelled muscles 124 write, 13 are trades and
-808 watch, 746 of them because they never wrote at all. Every confirmed loss is listed there with its cause.
+808 watch, 746 of them because they never wrote at all. Every confirmed loss is listed there with its cause. Since the evening of
+9 October the same verdict runs live inside the five database, messaging and cache harnesses (the brain's own trial on the knob
+before it writes, `tools/knob_verdict.py`; the amendment in each preregistration); the counted runs on it go when the founder says.
 
 ## 2. Every benchmark, by platform
 

@@ -373,3 +373,43 @@ more connections at the peak and nothing bought; `tpcb_hot` shows no settled val
 true in three parts of four: the CPU rows came down to the noise, the median came back, the connections saving fell to a
 third; the fourth, that the tail rows might read confirmed worse, did not happen, and the point estimates say the probing
 costs something in the tail that three runs could not settle.
+
+## Amendment 3 (2026-10-09, declared before any run on it): the brain's own verdict on the pool
+
+**Why, and when.** Written after the second counted set was read (the section above: `select` −36% to −38% connections with nothing
+worse; `simple_update` connections most at once +72% to +80% confirmed worse with nothing bought; `tpcb_hot` the runs disagree), at
+the founder's order of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it pays stays native and Omni
+only reads it. The brain must decide that on the muscle itself, in real time, by a measurement.
+
+The rule, the same in the five live harnesses (`tools/knob_verdict.py`, a wrapper around the frozen engine's own
+verdict, `omnicompass/verdict.py`, which is unchanged: the engine stays Omni v3): **the knob starts in watch**, one wire out
+and nothing written, and the compass's moves are clamped to the allowance a paired trial on the stack itself has earned. Two
+directions from the operator's setting, each with its own allowance: **spend** (more of the resource) and **give back**
+(less). A trial is one notch past the deepest step already allowed: the reference phase holds the knob at that deepest step
+(the operator's setting at first) until 8 one-second samples are in, then the trial phase holds it one notch further for 8
+more; the first 2 s after any change are not sampled. The judge is the engine's: the trial's median cost no higher
+than the reference's within 2%, and no higher than the cost first measured at the operator's setting. The cost is one sample
+a second from the stack's own readings: under the **resource objective** (the Omni index's preregistered reading, the
+default) cost = the pool size (server connections) × the host's CPU busy share × the mean transaction time including the wait for a server, from the pooler's own counters / the transactions the pooler counted in the last second, so a step passes only if the service gained
+outweighs the resource and CPU spent by the index's own arithmetic; under the **service objective** (`--objective service`)
+cost = the mean transaction time including the wait for a server, from the pooler's own counters / the transactions the pooler counted in the last second, the resources shown and not judged. A spend step is tried only while the compass asks to spend
+and clients are waiting for a server half the time or more (amendment 1's add condition); a give-back step only while the service is calm and the pooler served transactions, its clients waited under 1% of its time (amendment 2's line) and a server is idle. A trial once started runs on until its
+samples are in unless the service swings to the other direction's condition, when it is abandoned; a refused step is not
+tried again for 60 s; a trial is started at most every 20 s. During a trial the knob stands at the phase's value whatever
+the compass asks; between trials the compass moves it by its own law inside the allowance. The fail-up (back to the pooler's own setting) is always free; a spend above the operator's setting is taken only one notch at a time and only when its trial has shown it pays. Restoring the
+operator's setting is always free. Every trial, allowance, refusal and abandonment is written to the audit (`cost`,
+`cpu_share`, `verdict_phase`, `verdict_direction`, `allowed_low`, `allowed_high` on every line) and summed in the arm's
+record (`verdict`: the objective, the state, the allowance, the counts, the events); the three-run table prints the
+brain's verdict per workload and run. The counted runs on this amendment will use 30 s a notch (a whole trial inside one
+notch of traffic), declared here; the native arm runs the same ladder. Nothing is typed in; the rule is in the code the
+runs execute.
+
+**Expected before the runs.** `select`: connections given back one a trial while calm, −20% to −35% held open, less than the second
+set's −36% to −38%, with work, latency and CPU inside the noise. `simple_update`: the add above the operator's 20 is tried once and
+refused (a server more buys nothing on a workload the disk bounds), so connections most at once read 20 in both arms and every
+gauge inside the noise: the confirmed loss of the second set is gone because the brain refused the move, not because the table
+was changed. `tpcb_hot`: inside the noise or a smaller saving. The second counted set stays in `docs/history` as the result of
+the rule before this amendment.
+
+**Dispatch.** None yet: the founder asked, on the evening of 9 October, to be shown where everything stands before the next
+runs; the runs go when the founder says.

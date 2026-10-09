@@ -51,6 +51,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
 from tools.run_ycsb import cpu_times, engine, fmt, paired  # noqa: E402  (the same paired reading and host clock as the other stores)
+from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 3: the brain's own verdict)
 
 HOST = os.environ.get("MYSQL_HOST", "127.0.0.1")
 USER = os.environ.get("MYSQL_USER", "omni")
@@ -269,23 +270,27 @@ def decide(p, force, misses_last_s, cur_mb, last_change_age, full, wall=0.95, re
 
 class Omni(threading.Thread):
     """The brain, one decision a second, reading the server's own statement latency, writing the audit; the knob is handed back
-    at the end and read back."""
+    at the end and read back. Amendment 3 (the brain's own verdict, 2026-10-09): the pool starts in watch and is written only
+    inside the allowance a paired trial on the server itself has earned under the declared objective (tools/knob_verdict.py
+    around the engine's own Verdict), one chunk a trial; a trial holds the pool, and no sample is taken while the server is
+    still resizing; a fail-up never spends beyond the allowance."""
 
-    def __init__(self, plug: BufferPool, audit_path: Path, line_ms=LINE_STMT_MS):
+    def __init__(self, plug: BufferPool, audit_path: Path, line_ms=LINE_STMT_MS, objective=DEFAULT_OBJECTIVE):
         super().__init__(daemon=True)
-        self.plug, self.audit = plug, audit_path
+        self.plug, self.audit, self.objective = plug, audit_path, objective
         self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
         self.stop_flag = threading.Event(); self.last_change = -1e9; self.writes = 0; self.failups = 0
-        self.foreign = False; self.handed_back = False; self.error = None
+        self.foreign = False; self.handed_back = False; self.error = None; self.verdict = None
 
     def run(self):
         try:
-            self.plug.attach(); st = self.plug._status(); lat0, n0 = stmt_latency(st); _, _, rd0, _ = pool_stats(st); rq0 = read_requests(st)
+            native = self.plug.attach(); st = self.plug._status(); lat0, n0 = stmt_latency(st); _, _, rd0, _ = pool_stats(st); rq0 = read_requests(st)
         except Exception as e:                                      # the brain never ran: say so in the audit and the record, never silently
             self.error = repr(e)
             self.audit.write_text(json.dumps({"t": 0.0, "error": self.error, "note": "the brain could not attach; no decision was made"}) + "\n")
             return
-        t0 = time.monotonic()
+        t0 = time.monotonic(); cpu_prev = cpu_times()
+        self.verdict = KnobVerdict(native, STEP_MB, COVER_MB, objective=self.objective, settle_s=TAU, max_trial=120)   # a resize takes seconds
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
@@ -298,7 +303,15 @@ class Omni(threading.Thread):
                     rq = read_requests(st); rq_last = rq - rq0; rq0 = rq
                     share = miss_share(rd_last, rq_last)
                     cur = self.plug.lever(st); full = pool_full(st)
+                    cpu_now = cpu_times(); d_total = cpu_now[0] - cpu_prev[0]; d_idle = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
+                    cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
+                    cost = sample_cost(self.objective, dn, reading if dn > 0 else None, cur, cpu_share)
+                    self.verdict.observe(cost, tick - t0, settled=not resizing(rs))      # measured under the pool of the last second, once resized
                     target, why = decide(self.law.p, f, share, cur, tick - self.last_change, full, wall=self.law.band.wall_high, reads=rq_last > 0)
+                    target, why, vinfo = self.verdict.decide(
+                        target, spend_ok=(f > 0.05 and full and share >= GROW_MISS_SHARE),
+                        give_ok=(f < -0.05 and rq_last > 0 and share < GIVEBACK_MISS_SHARE),
+                        t=tick - t0, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=why.startswith("fail up"))
                     wrote = None
                     if target != cur and not resizing(rs):
                         wrote = self.plug.write(target); self.writes += 1
@@ -307,7 +320,8 @@ class Omni(threading.Thread):
                             self.failups += 1
                     fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "statements": dn, "p": round(self.law.p, 4), "force": round(f, 4),
                                          "disk_reads_last_s": rd_last, "read_requests_last_s": rq_last, "miss_share": round(share, 4), "pool_mb": cur, "used_mb": round(used, 1),
-                                         "full": full, "resize": rs, "target_mb": target,
+                                         "full": full, "resize": rs, "target_mb": target, "cpu_share": None if cpu_share is None else round(cpu_share, 4),
+                                         "cost": None if cost is None else round(cost, 9), **vinfo,
                                          "wrote_mb": wrote, "why": why}) + "\n")
                 except Exception as e:
                     fh.write(json.dumps({"t": round(tick - t0, 2), "error": repr(e)}) + "\n")
@@ -408,14 +422,14 @@ def fresh_server(pool_mb):
     raise RuntimeError("mysql did not come back after the restart")
 
 
-def run_arm(arm, wl_dir: Path, rep, script, stmts, rate, steps, step_s, line_stmt_ms):
+def run_arm(arm, wl_dir: Path, rep, script, stmts, rate, steps, step_s, line_stmt_ms, objective=DEFAULT_OBJECTIVE):
     d = wl_dir / f"rep-{rep}" / arm; d.mkdir(parents=True, exist_ok=True)
     line_ms = line_stmt_ms * stmts                            # the transaction line: the statement line times the statements a transaction
     c = fresh_server(NATIVE_MB)
     sampler = Sampler(connect()); sampler.start()
     omni = None
     if arm == "omni":
-        omni = Omni(BufferPool(connect()), d / "audit.jsonl", line_stmt_ms); omni.start()
+        omni = Omni(BufferPool(connect()), d / "audit.jsonl", line_stmt_ms, objective); omni.start()
     hist_all, failed, tx, qs, summaries = [], 0, 0, 0, []
     cpu0 = cpu_times(); t0 = time.time()
     for i, notch in enumerate(int(s) for s in steps.split()):
@@ -444,10 +458,12 @@ def run_arm(arm, wl_dir: Path, rep, script, stmts, rate, steps, step_s, line_stm
          "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside), "writes": (omni.writes if omni else 0),
          "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0),
          "controller_error": (omni.error if omni else None),
-         "restore": (omni.plug.restore_info if omni else {})}
+         "restore": (omni.plug.restore_info if omni else {}),
+         "verdict": (omni.verdict.record() if omni and omni.verdict else None)}
     (d / "arm.json").write_text(json.dumps(g, indent=1))
     print(f"   {arm} rep {rep}: {tx} transactions, inside the line {g['work_inside_line_tps']:.0f}/s, p95 {g['p95_ms']:.2f} ms, pool {g['pool_mb_mean']:.0f} MB, "
-          f"data pages {g['pool_used_mb_mean']:.0f} MB, disk reads {g['disk_reads']:,}, CPU {cpu_s:.1f} s, handed back {g['handed_back']}", flush=True)
+          f"data pages {g['pool_used_mb_mean']:.0f} MB, disk reads {g['disk_reads']:,}, CPU {cpu_s:.1f} s, handed back {g['handed_back']}"
+          + (f", verdict {g['verdict']['state']}" if g.get("verdict") else ""), flush=True)
     return g
 
 
@@ -465,23 +481,23 @@ def sysbench_version():
         return "?"
 
 
-def run_workload(name, out: Path, reps, step_s, line_stmt_ms):
+def run_workload(name, out: Path, reps, step_s, line_stmt_ms, objective=DEFAULT_OBJECTIVE):
     script, stmts, rate, steps, tuning = WORKLOADS[name]
     wl_dir = out / f"sysbench-{name}"; wl_dir.mkdir(parents=True, exist_ok=True)
     ver = server_version()
     print(f"== {name}: sysbench {script} ({stmts} statements a transaction, {rate} a second offered), {TABLES} tables of {TABLE_ROWS:,} rows, steps {steps}, "
-          f"{step_s} s a notch, MySQL {ver}", flush=True)
+          f"{step_s} s a notch, MySQL {ver}, the verdict's objective {objective}", flush=True)
     fresh_server(NATIVE_MB)
     prepare_dataset(wl_dir / "prepare.log")
     rec = {"workload": name, "tuning": tuning, "script": script, "statements": stmts, "rate_tps": rate, "steps": steps, "step_s": step_s,
            "line_stmt_ms": line_stmt_ms, "line_ms": line_stmt_ms * stmts, "threads": THREADS, "tables": TABLES, "table_rows": TABLE_ROWS, "rand_type": RAND_TYPE,
            "native_mb": NATIVE_MB, "chunk_mb": CHUNK_MB, "cover_mb": list(COVER_MB), "mysql_version": ver, "sysbench_version": sysbench_version(),
-           "engine": engine(), "reps": []}
+           "objective": objective, "engine": engine(), "reps": []}
     for rep in range(1, reps + 1):
         order = ("native", "omni") if rep % 2 else ("omni", "native")
         r = {}
         for arm in order:
-            r[arm] = run_arm(arm, wl_dir, rep, script, stmts, rate, steps, step_s, line_stmt_ms)
+            r[arm] = run_arm(arm, wl_dir, rep, script, stmts, rate, steps, step_s, line_stmt_ms, objective)
         rec["reps"].append(r)
         (wl_dir / f"{name}.json").write_text(json.dumps(rec, indent=1))
     rec["paired"] = {k: paired(rec["reps"], k, dr) for k, _, dr in GAUGES}
@@ -545,6 +561,8 @@ def main(argv=None):
     ap.add_argument("--step-s", type=float, default=20.0)
     ap.add_argument("--line-ms", type=float, default=LINE_STMT_MS, help="the statement line (ms)")
     ap.add_argument("--out", default="sysbench-out")
+    ap.add_argument("--objective", default=DEFAULT_OBJECTIVE, choices=OBJECTIVES,
+                    help="what the brain's verdict judges a step by: resource (the index's reading: work, speed, memory and CPU together) or service (work and speed alone)")
     ap.add_argument("--report-only", default="")
     a = ap.parse_args(argv)
     if a.setup:
@@ -554,7 +572,7 @@ def main(argv=None):
         recs = [json.loads(f.read_text()) for f in sorted(Path(a.report_only).rglob("sysbench-*/*.json"))]
         print(report(recs, Path(a.report_only))); return 0
     names = list(WORKLOADS) if a.workloads == "all" else a.workloads.split(",")
-    recs = [run_workload(n, out, a.reps, a.step_s, a.line_ms) for n in names]
+    recs = [run_workload(n, out, a.reps, a.step_s, a.line_ms, a.objective) for n in names]
     print(report(recs, out))
     return 0
 

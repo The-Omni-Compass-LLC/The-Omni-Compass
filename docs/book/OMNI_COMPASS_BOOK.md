@@ -3828,7 +3828,9 @@ read-back, not the write.
 
 > **Which knobs to wire in at all:** `docs/WIRING_VERDICTS.md` gives every knob in every published result one of three
 > words from the tables themselves: **write** (wire both ways), **watch** (wire out only: Omni reads, the native controller
-> lives by itself) or **operator's choice** (a trade). A knob that showed nothing, or lost, stays native.
+> lives by itself) or **operator's choice** (a trade). A knob that showed nothing, or lost, stays native. How to wire for
+> superiority, step by step (watch first, the observation run, the brain's own verdict on each knob, the recheck): the manual,
+> section 9.4.
 
 How to wire Omni-Compass into your own systems yourself, from watching only to running your stack from the top. This
 manual ships in the box with the code and the license. Nobody from The Omni-Compass LLC needs to be on site.
@@ -5718,6 +5720,17 @@ cushion, and all 255 admission muscles are among them, the admission knob being 
 The 14 organism cells with the real cluster inside all write on the cluster's gauges. Nothing on the page changes the
 engine, which stays Omni v3; it changes what an operator connects.
 
+**The same verdict, live (built 9 October, not yet run).** The page judges after the fact; the founder's order is that the
+brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 9.4;
+`tools/knob_verdict.py` around the engine's own verdict, the engine unchanged): every knob starts in watch and is written
+only inside the allowance a paired trial on the stack itself has earned under the declared objective, one notch a trial; a
+refused step is not taken, a trial holds the knob, a fail-up never spends beyond the allowance, the operator's setting is
+always free. The amendments are declared in the five preregistrations with the expectation written before the runs
+(Redis left native under the resource objective, the first notch refused; Kafka allowed step by step while each consumer
+pays; PostgreSQL's add above the operator's setting refused on `simple_update`; MySQL's `read_write` chunks refused;
+MongoDB's cache given back a notch a trial). The runs go when the founder says, and the tables, the index and the page are
+then read again from them.
+
 ### 16.7 Threats to validity, stated by us
 
 A referee will look for the ways these results could mislead. We list the ones we know, what each would do to the
@@ -6154,6 +6167,10 @@ The knob is the cluster's (the autoscaler's replicas, the floor and the machines
 ### What this means for the wiring
 
 The two-way plug stays one wire in and one wire out (`docs/WIRING_GUIDE.md`). This page decides, per knob, whether the wire in is connected. A knob marked **write** is wired both ways. A knob marked **watch** is wired out only: Omni reads it, learns from it, and never writes it; the native controller lives by itself. A knob marked **operator's choice** is wired out, and in only by the operator who wants that trade. The engine's verdict (`omnicompass/verdict.py`) does the same on the muscle itself at run time, and a knob it has left native is a watch knob whatever this page says. Nothing on this page changes the engine, which stays Omni v3; it changes what an operator connects.
+
+### The same verdict, live: the brain decides on the knob before it writes
+
+This page judges after the fact, from published tables. The founder's order of 9 October is that the brain judge in real time, on the knob, before it writes, and that a knob which cannot prove it pays stay native. On the five live stacks (the pool, the consumer group, the memory ceiling, the storage-engine cache, the buffer pool) that is now built into the harnesses: `tools/knob_verdict.py` wraps the frozen engine's own verdict (`omnicompass/verdict.py`, unchanged) around every live knob. The knob starts in watch; a paired trial on the stack itself (the knob held at the deepest step already allowed, then one notch further, under the same traffic) allows one notch at a time under the declared objective, the resource reading of the index by default or the service reading at the operator's choice; a refused step is not taken and not retried for a minute; a trial holds the knob; a fail-up never spends beyond the allowance; the operator's setting is always free. The audit carries the cost sample and the verdict's state every second, the arm record sums it, and the three-run tables print the verdict per workload. It is declared as an amendment in each of the five preregistrations with the expectation written before the runs (Redis: left native under the resource objective; Kafka: allowed step by step while each consumer pays; PostgreSQL: the add above the operator's setting refused on `simple_update`; MySQL: the `read_write` chunks refused; MongoDB: the cache given back a notch a trial). The runs on it go when the founder says; this page is then read again from their tables. Inside the modelled realms the organism still takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, designed in `docs/OMNI_V4_PLAN.md` and not built.
 
 
 ---
@@ -9495,6 +9512,19 @@ is worse), 3 watch (two robots the engine itself left native, one grid where not
 all 255 admission muscles are among the 746. The 14 organism cells with the real cluster inside all write on the cluster's
 gauges. The engine is unchanged; the page decides what an operator connects.
 
+**The brain's own verdict, live (9 October, built, not yet run).** The founder's order of the same evening: the verdict must
+be the brain's, in real time, on the knob, before it writes; a knob that cannot prove it pays stays native. `tools/knob_verdict.py`
+wraps the frozen engine's verdict (`omnicompass/verdict.py`, unchanged) around every live knob of the five database, messaging
+and cache harnesses: the knob starts in watch, a paired trial on the stack itself allows one notch at a time under the declared
+objective (resource, the index's reading, or service), a refused step is not taken, a trial holds the knob, a fail-up never
+spends beyond the allowance, the operator's setting is always free. Declared as amendments in the five preregistrations with the
+expectation written before the runs: Redis left native under the resource objective (the first notch refused), Kafka allowed step
+by step while each consumer pays, PostgreSQL's add above the operator's setting refused on simple_update, MySQL's read_write
+chunks refused, MongoDB's cache given back a notch a trial. The 21 runs (the five stacks under the resource objective; Redis and
+Kafka also under the service objective; three runs each) go when the founder says. Inside the modelled realms the organism still
+takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, designed in
+`docs/OMNI_V4_PLAN.md` and not built, because every result must be run again on a new engine.
+
 ### Measured on real systems (evidence class L), Omni v3
 
 | Test, ten pairs × three runs | Work | Speed (p95) | Machines | Energy (declared model) | Source |
@@ -10910,6 +10940,7 @@ Patent applications, copyright registrations and trademark applications filed in
 | `tools/confirm_abc.py` and its siblings (`pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `sysbench_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | the three-run tables, one tool per kind of raw record, each checking the engine of every run it reads |
 | `tools/omni_index.py`, `tools/dossier.py`, `tools/own_cost.py` | the one number from the tables; the dossier from the tables; the governor's own cost from the archived audits |
 | `tools/wiring_verdicts.py`, `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | the verdict per knob from every table: write, watch or the operator's choice, every loss with its cause; one row per knob and per muscle |
+| `tools/knob_verdict.py` | the brain's own verdict on a live knob, around the engine's `omnicompass/verdict.py`: watch first, one notch a trial, the allowance, the two objectives; used by the five live harnesses |
 | `tools/legal.py` | the legal notice every generated report carries at its head and foot |
 | `docs/book/` | the builder of this manual's PDF (`build_book.py`) and the theory chapters bound into it |
 | `release/` | the copyright deposit and the release notes, printed at named commits |

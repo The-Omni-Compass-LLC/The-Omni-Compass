@@ -261,6 +261,43 @@ enters the index at **+8.5%** (the first set's +10.2% included the floor-pinned 
 on all four workloads, no cost. The disclosure made before the first run still bounds the claim: on this machine a miss is a
 memory read, and the same knob on a disk-bound store is not answered here.
 
+## Amendment 2 (2026-10-09, declared before any run on it): the brain's own verdict on the cache
+
+**Why, and when.** Written after the second counted set was read (the section above: the cache −21% to −36% on all four workloads,
+nothing worse), at the founder's order of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it pays
+stays native and Omni only reads it. The brain must decide that on the muscle itself, in real time, by a measurement, and the
+same rule must stand on every live knob, the ones that win included.
+
+The rule, the same in the five live harnesses (`tools/knob_verdict.py`, a wrapper around the frozen engine's own
+verdict, `omnicompass/verdict.py`, which is unchanged: the engine stays Omni v3): **the knob starts in watch**, one wire out
+and nothing written, and the compass's moves are clamped to the allowance a paired trial on the stack itself has earned. Two
+directions from the operator's setting, each with its own allowance: **spend** (more of the resource) and **give back**
+(less). A trial is one notch past the deepest step already allowed: the reference phase holds the knob at that deepest step
+(the operator's setting at first) until 8 one-second samples are in, then the trial phase holds it one notch further for 8
+more; the first 2 s after any change are not sampled. The judge is the engine's: the trial's median cost no higher
+than the reference's within 2%, and no higher than the cost first measured at the operator's setting. The cost is one sample
+a second from the stack's own readings: under the **resource objective** (the Omni index's preregistered reading, the
+default) cost = the cache size held (MB) × the host's CPU busy share × the mean read latency on the server in the last second / the reads the server counted in the last second, so a step passes only if the service gained
+outweighs the resource and CPU spent by the index's own arithmetic; under the **service objective** (`--objective service`)
+cost = the mean read latency on the server in the last second / the reads the server counted in the last second, the resources shown and not judged. A spend step is tried only while the compass asks to spend
+and the cache is full and missing at 1% of its requests or more (amendment 1's condition); a give-back step only while the service is calm and pages were requested and the misses were under 1% of them. A trial once started runs on until its
+samples are in unless the service swings to the other direction's condition, when it is abandoned; a refused step is not
+tried again for 60 s; a trial is started at most every 20 s. During a trial the knob stands at the phase's value whatever
+the compass asks; between trials the compass moves it by its own law inside the allowance. The fail-up (a quarter of the cover at the wall) is clamped to the allowance like every other move. Restoring the
+operator's setting is always free. Every trial, allowance, refusal and abandonment is written to the audit (`cost`,
+`cpu_share`, `verdict_phase`, `verdict_direction`, `allowed_low`, `allowed_high` on every line) and summed in the arm's
+record (`verdict`: the objective, the state, the allowance, the counts, the events); the three-run table prints the
+brain's verdict per workload and run. The counted runs on this amendment will use 30 s a notch (a whole trial inside one
+notch of traffic), declared here; the native arm runs the same ladder. Nothing is typed in; the rule is in the code the
+runs execute.
+
+**Expected before the runs.** The cache given back one notch a trial while calm and holding its working set: −10% to −25% on the four
+workloads, less than the second set's −21% to −36% because each notch now waits for its trial; work, p95, mean latency and CPU inside
+the noise; no failed operation. The second counted set stays in `docs/history` as the result of the rule before this amendment.
+
+**Dispatch.** None yet: the founder asked, on the evening of 9 October, to be shown where everything stands before the next
+runs; the runs go when the founder says.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
