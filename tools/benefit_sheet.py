@@ -71,8 +71,16 @@ def benefit_word(better, worse):
     return "none"
 
 
+def shallow():
+    """A shallow checkout (GitHub's default) carries no history: the dates must then come from the committed sheet."""
+    r = subprocess.run(["git", "-c", "safe.directory=*", "rev-parse", "--is-shallow-repository"], cwd=ROOT, capture_output=True, text=True)
+    return r.stdout.strip() == "true"
+
+
 def updated(path):
-    """The date the file was last changed in the repository (the day the result landed)."""
+    """The date the file was last changed in the repository (the day the result landed); None where the history is not here."""
+    if shallow():
+        return None
     r = subprocess.run(["git", "-c", "safe.directory=*", "log", "-1", "--format=%cs", "--", str(path)], cwd=ROOT, capture_output=True, text=True)
     return r.stdout.strip() or "uncommitted"
 
@@ -287,10 +295,19 @@ def main(check=False):
     r = from_realms()
     if r:
         rows.append(r)
-    rows.sort(key=lambda x: (x["date"], x["benchmark"]), reverse=True)
     hl = headline_row()
     if hl:
-        rows.insert(0, hl)
+        rows.append(hl)
+    if any(r["date"] is None for r in rows):                       # no history here: the dates the sheet already carries, by benchmark
+        known = {}
+        if OUT_JSON.exists():
+            known = {(x["benchmark"], x["file"]): x["date"] for x in json.loads(OUT_JSON.read_text())["rows"]}
+        for r in rows:
+            if r["date"] is None:
+                r["date"] = known.get((r["benchmark"], r["file"]), "unknown")
+    rows.sort(key=lambda x: (x["date"], x["benchmark"]), reverse=True)
+    if hl:
+        rows.remove(hl); rows.insert(0, hl)
 
     L = ["# The benefit sheet: one number per benchmark, plus always good for Omni", "",
          "The founder's order of 9 October 2026: next to every benchmark, say whether Omni-Compass was a benefit and by how much, in "
