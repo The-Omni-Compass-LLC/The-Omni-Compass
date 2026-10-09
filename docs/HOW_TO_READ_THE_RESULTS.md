@@ -155,6 +155,15 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 - **memory** is what it uses;
 - **master switch** must read "yes": everything handed back.
 
+## Wire in, or watch (`docs/WIRING_VERDICTS.md`)
+
+One of three words per knob, by one rule from the tables above. **Write**: a gauge confirmed better over all three runs
+and none confirmed worse; Omni holds the knob. **Watch**: nothing confirmed better; the knob stays native and Omni only
+reads it (one wire out, no wire in), and a confirmed loss is named with its cause. **Operator's choice**: gains and losses
+both confirmed, a trade, shown with both readings of the index. Rows marked "shown, not judged" never count. A modelled
+muscle takes its word from its label: superior is write, a tradeoff label is the operator's choice, the rest is watch. The
+CSV beside the page (`results/WIRING_VERDICTS.csv`) has one row per knob and per muscle.
+
 ## Where to start
 
 1. `docs/STATE_OF_PLAY.md`: one page, every result and how strong it is.

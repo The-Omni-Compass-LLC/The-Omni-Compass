@@ -10,7 +10,7 @@ owner when the benchmark is someone else's. Every result named here is read from
 Status words: **done** (result in the repo), **running** (on GitHub or Azure now), **ready** (harness built, waiting
 on hardware or a go), **next** (being built now), **queued** (in the order of section 4, one or two at a time).
 
-Last updated 2026-10-07.
+Last updated 2026-10-09.
 
 ## 1. Every muscle wired (945 muscles, 59 families, four realms and the shared spine of 257; v1 had 656 in 46)
 
@@ -84,10 +84,17 @@ kind of system until it is measured live.
 
 **945 muscles in 59 families (Omni v2: the 656 of v1 byte for byte, 118 real controls the realm study had found that the tower lacked, and 171 in the thirteen families marked v2).** Every muscle by name, with its knob and what it is for: `realms/catalog.csv` and `docs/MUSCLE_CATALOG.md`; the sources of every added muscle: `docs/realm_study/TRUE_MUSCLES.csv` and `realms/wave4_families.csv`.
 
-How they are proven so far: every muscle alone, and every organism whole, on its model (`results/realms/REALMS.md`):
-**57 superior within guardrails, 9 energy improvement with a service tradeoff, 586 noninferior, 0 not established,
-0 worse; all five organisms superior within guardrails.** Evidence class S: a model, not a meter. The live rows of
-section 2 are where muscles meet real systems.
+How they are proven so far: every muscle alone, and every organism whole, on its model (`results/realms/REALMS.md`, Omni
+v3, seeds 3000 to 3009): **124 superior within guardrails, 9 energy improvement with a service tradeoff, 4 service
+improvement with an energy tradeoff, 807 noninferior, 1 not established, 0 worse; all five organisms superior within
+guardrails.** Evidence class S: a model, not a meter. The live rows of section 2 are where muscles meet real systems.
+
+**Which knobs earn a wire in** (`docs/WIRING_VERDICTS.md`, `tools/wiring_verdicts.py`, declared 9 October at the founder's
+order that Omni need not be wired into every muscle): every table on this page is read by one rule into one of three words
+per knob, **write** (a gauge confirmed better, none confirmed worse: Omni holds the knob), **watch** (nothing confirmed
+better: the muscle stays native and Omni only reads it, one wire out and no wire in) or **operator's choice** (a trade). On
+the real stacks 12 of 24 knob-cases write, 7 are trades and 5 watch; of the 945 modelled muscles 124 write, 13 are trades and
+808 watch, 746 of them because they never wrote at all. Every confirmed loss is listed there with its cause.
 
 ## 2. Every benchmark, by platform
 

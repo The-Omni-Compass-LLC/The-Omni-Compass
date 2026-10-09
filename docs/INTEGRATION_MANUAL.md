@@ -4,6 +4,10 @@
 
 > **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: confirm the installation with section 8.5 of the manual (*Wired right or wired wrong*).
 
+> **Which knobs to wire in at all:** `docs/WIRING_VERDICTS.md` gives every knob in every published result one of three
+> words from the tables themselves: **write** (wire both ways), **watch** (wire out only: Omni reads, the native controller
+> lives by itself) or **operator's choice** (a trade). A knob that showed nothing, or lost, stays native.
+
 How to wire Omni-Compass into your own systems yourself, from watching only to running your stack from the top. This
 manual ships in the box with the code and the license. Nobody from The Omni-Compass LLC needs to be on site.
 
