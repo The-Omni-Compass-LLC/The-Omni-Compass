@@ -525,6 +525,22 @@ left out of that test, never filled in. A measure inside the noise is counted at
 the headline is the geometric mean of the real categories, each weighted the same; the modelled muscles are shown
 beside it, never inside it. Computed by `tools/omni_index.py` from each test's own paired results; nothing is typed in.
 
+**The service reading, a second reading declared 2026-10-09 (the first unchanged).** The founder asked what a cache is
+for. Redis is bought for speed and spends memory to deliver it; the index above counts that memory as a cost at the same
+weight as the speed it buys, so the Redis category reads −24.9% while its work inside the line and its hit rate read
+confirmed better in every run. The question is fair, and the answer is a second reading beside the first, never a change
+to the first: the same tests, the same three-run rule, scored on the service the stack is bought for, **work and speed
+only**, with the resources it spent or saved (machines, energy, memory, connections, consumers) shown beside it and not
+scored. It is computed for every test alike by the same tool (`service_pct`, `service_headline_pct`), never for one
+stack, and printed in the same tables as a second column; the resource reading above stays the headline this program
+preregistered. The two readings say different true things: where the governor buys service with a resource (Redis's
+memory ceiling, Kafka's consumers) the service reading is higher and the resource reading says what it cost; where it
+gives a resource back for the same service (the database pools and caches) the service reading is nothing and the
+resource reading carries the gain. On the day it was declared the service reading stood at +71.8% against the resource
+reading's +20.5% (Kubernetes +83.2%, Kafka +1,192.8%, Redis +8.8%, the three database stacks exactly nothing); Kafka's
+hundredfold speed ratio is why the service headline is large, and the category table is where a reader sees it. A
+confirmed loss in work or speed counts against Omni in both readings; neither hides one.
+
 
 ## Demand that wanders: up, spike, partway down, back up, down to idle (written before its run, 2026-10-04)
 

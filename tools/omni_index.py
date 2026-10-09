@@ -149,7 +149,18 @@ def tests():
     for t in out:
         g = gmean([m["ratio"] for m in t["measures"].values()])
         t["index_pct"] = 100 * (g - 1) if g else None
+        s = gmean([m["ratio"] for k, m in t["measures"].items() if k in SERVICE])
+        t["service_pct"] = 100 * (s - 1) if s else None
     return out
+
+
+# The second reading, declared 2026-10-09 at the founder's question about the cache (docs/K8S_COMPASS_PREREGISTRATION.md, the
+# Omni index, the service reading): the same tests, the same three-run rule, scored on what the stack is bought for, its
+# service (work and speed), with the resources it spends or saves (machines, energy) shown beside it and not scored. It is
+# computed for every test alike, never for one stack, and printed beside the resource reading, which stays the headline the
+# program preregistered. Where a governor buys service with a resource (Redis's memory, Kafka's consumers) the two readings
+# part; where it gives a resource back for the same service (the databases) the service reading says nothing was gained.
+SERVICE = {"work", "speed"}
 
 
 def pct(x):
@@ -164,6 +175,8 @@ def main():
     cat_g = {c: gmean([1 + t["index_pct"] / 100 for t in v if t["index_pct"] is not None]) for c, v in cats.items()}
     real = [cat_g[c] for c in REAL if c in cat_g]
     head = gmean(real)
+    cat_s = {c: gmean([1 + t["service_pct"] / 100 for t in v if t["service_pct"] is not None]) for c, v in cats.items()}
+    head_s = gmean([cat_s[c] for c in REAL if c in cat_s and cat_s[c]])
     avg = lambda c, m: gmean([t["measures"][m]["ratio"] for t in cats[c] if m in t["measures"]])
     L = ["# The Omni index: more for the same, or the same for less", "",
          "Every measure of every test is a ratio oriented so that above 1 is better for Omni-Compass on top of native: "
@@ -181,13 +194,27 @@ def main():
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
          "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it costs stands beside it. The law, controllers and runners are the same bytes "
          "in v1 and v3 (`docs/OMNI_V3.md`); each table names the engine it ran on.", "",
-         "| Category | Index | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |", "|---|---:|---:|---:|---:|---:|---:|"]
+         "| Category | Index (work, speed, machines, energy) | Service reading (work and speed only) | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |",
+         "|---|---:|---:|---:|---:|---:|---:|---:|"]
     for c in list(REAL) + ["Modelled muscles (evidence S)"]:
         if c in cats:
-            L.append(f"| {c} | **{pct(cat_g[c])}** | {pct(avg(c, 'work'))} | {pct(avg(c, 'speed'))} | {pct(avg(c, 'machines'))} | "
+            L.append(f"| {c} | **{pct(cat_g[c])}** | {pct(cat_s.get(c))} | {pct(avg(c, 'work'))} | {pct(avg(c, 'speed'))} | {pct(avg(c, 'machines'))} | "
                      f"{pct(avg(c, 'energy'))} | {len(cats[c])} |")
         elif c in PENDING:
-            L.append(f"| {c} | pending | | | | | {PENDING[c]} |")
+            L.append(f"| {c} | pending | | | | | | {PENDING[c]} |")
+    L += ["", f"## The second reading, declared 2026-10-09: service alone, **{pct(head_s)}** (work and speed scored; machines and energy shown, not scored)", "",
+          "The founder asked what a cache is for. Redis is bought for speed and spends memory to deliver it; the index above counts "
+          "that memory as a cost at the same weight as the speed, so Redis reads as a loss (−25%) while its work and hit rate read "
+          "confirmed better. The question is fair and the answer is a second reading, not a changed first one: the same tests, the "
+          "same three-run rule, scored on the service the stack is bought for (work inside the line and the 95th percentile) with "
+          "the resources it spent or saved shown beside it and not scored. It is computed for every test alike, never for one "
+          "stack, and the preregistered reading above stays the headline. The two readings say different true things. Where the "
+          "governor buys service with a resource (Redis's memory ceiling, Kafka's consumers) the service reading is higher and the "
+          "resource reading says what it cost; where it gives a resource back for the same service (the database pools and caches) "
+          "the service reading is nothing and the resource reading carries the gain. Kafka's speed ratio is a hundredfold (native's "
+          "queue grew at nine tenths of its capacity by design), so the service reading leans on it; a reader who wants the number "
+          "without that lean has the category table, where each category is one row. Neither reading hides a loss: a confirmed "
+          "loss in work or speed counts against Omni in both.", ""]
     L += ["", "Read: every column points the same way, plus is good for Omni-Compass. \"Fewer machines by +4%\" means Omni did the "
           "same work on 4% fewer machine-hours; \"less energy by +3%\" means 3% less energy for the same work; \"faster by +95%\" means "
           "native's slowest-5% response is 1.95 times Omni's (Omni answers about twice as fast); \"more work by +45%\" means 45% more work "
@@ -196,7 +223,7 @@ def main():
           "against Omni); their machines columns are the resource held: connections open to the database, consumers running, the cache's "
           "memory ceiling, the storage engine's cache size, the buffer pool's size; Azure's machines are its own billed count.",
           "", "## Every test", "",
-          "| Category | Test | Index | More work by | Faster by | Fewer machines by | Less energy by | Source |", "|---|---|---:|---:|---:|---:|---:|---|"]
+          "| Category | Test | Index | Service reading | More work by | Faster by | Fewer machines by | Less energy by | Source |", "|---|---|---:|---:|---:|---:|---:|---:|---|"]
     for t in ts:
         m = t["measures"]
         def cell(k):
@@ -207,12 +234,15 @@ def main():
                 return pct(m[k]["ratio"])
             return "equal" if rd.startswith("the same") else ("same" if rd == "same" else "no difference beyond the noise")
         ix = "" if t["index_pct"] is None else f"{t['index_pct']:+.1f}%"
-        L.append(f"| {t['category']} | {t['test']} | **{ix}** | {cell('work')} | {cell('speed')} | {cell('machines')} | "
+        sx = "not taken" if t["service_pct"] is None else f"{t['service_pct']:+.1f}%"
+        L.append(f"| {t['category']} | {t['test']} | **{ix}** | {sx} | {cell('work')} | {cell('speed')} | {cell('machines')} | "
                  f"{cell('energy')} | `{t['source']}` |")
     (ROOT / "results" / "OMNI_INDEX.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     (ROOT / "results" / "OMNI_INDEX.json").write_text(json.dumps(
         {"headline_pct": None if head is None else 100 * (head - 1),
-         "categories": {c: None if g is None else 100 * (g - 1) for c, g in cat_g.items()}, "tests": ts}, indent=1) + "\n")
+         "service_headline_pct": None if head_s is None else 100 * (head_s - 1),
+         "categories": {c: None if g is None else 100 * (g - 1) for c, g in cat_g.items()},
+         "service_categories": {c: None if g is None else 100 * (g - 1) for c, g in cat_s.items()}, "tests": ts}, indent=1) + "\n")
     print("\n".join(L))
     return 0
 
