@@ -43,21 +43,23 @@ current card governor on a real GPU (the one real-card run, on the governor sinc
 energy and made its 95th percentile 43-84% slower:
 [`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
 
-**The Omni index, every real test together: +24.1%** more for the same, or the same for less, across work, speed,
+**The Omni index, every real test together: +20.5%** more for the same, or the same for less, across work, speed,
 machines and energy, six real categories each weighed the same: real Kubernetes on v3 +28.8% over seven tests (work +19%, speed +107%,
-machines +5%, energy +2%); the real database on v3 +14.2% (connections to the database halved and more; the compass's own
-CPU, confirmed worse, counted against it); real messaging on v3, Apache Kafka, +166.9% (work inside the line +17%; a 95th
+machines +5%, energy +2%); the real database on v3 +4.0% (on the second counted set: connections held open −36% to −38% on
+the read-only workload with CPU and latency inside the noise; the first set's CPU cost was our own harness, measured and
+removed, and its table is kept in the history; on the slow write workload the add rule buys connections above the operator's
+setting, confirmed worse and counted against it); real messaging on v3, Apache Kafka, +166.9% (work inside the line +17%; a 95th
 percentile of 1.6 s against 9 to 14 ms, because native's queue grew at nine tenths of its capacity and Omni's did not;
 consumers held 2 → 6 to 8, confirmed worse and counted against it); and the real cache on v3, Redis, **−24.9%** (work inside
 the line +14% to +27% and the hit rate +14% to +27%, confirmed better; the memory ceiling held 64 → 200 to 270 MB,
 confirmed worse, the resource the gain costs, which outweighs the gain in the geometric mean; CPU inside the noise); and
-the real database's storage-engine cache on v3, MongoDB under YCSB, **+10.2%** (the cache given back by about half on two
-of four untouched workloads and 13% to 37% on a third, confirmed better; work inside the line, p95 and CPU inside the
-noise; the burst mean latency +2% to +4%, confirmed worse, in the table); and the real database's buffer pool on v3, MySQL
-under sysbench, **+12.2%** (the pool held −67% on burst and −50% to −56% on read_only, confirmed better; the pages the pool
-holds on read_write +53% to +70%, confirmed worse, the memory bought for a written working set; work inside the line, p95 and
-CPU inside the noise; the pool handed back on all 45 omni arms; the first counted set, every row inside the noise and 15 arms
-not handed back through the plug's restore, is kept whole in the history). Only a
+the real database's storage-engine cache on v3, MongoDB under YCSB, **+8.5%** (the second counted set: the cache given back
+by a quarter to a third on all four untouched workloads, confirmed better, with work, p95, mean latency and CPU inside the
+noise; the first set's larger saving came from a cold cache emptied before its first eviction and cost latency, and it is
+kept in the history); and the real database's buffer pool on v3, MySQL under sysbench, **+5.2%** (the third counted set:
+the pool held −49% to −56% on burst, confirmed better; on read_write the pages the pool holds +44% to +52%, confirmed worse,
+with the host's CPU −4% to −6%, confirmed better, a trade; read_only inside the noise and update_index disagreeing; the pool
+handed back on all 45 omni arms; the two earlier sets kept whole in the history). Only a
 row confirmed in all three runs enters; a row inside the noise counts as exactly zero. Azure's billed runs and the card
 join the index when their three-run tables land (the earlier engine's +12.9% is kept in
 `docs/history/OMNI_INDEX_pre_v1.md`). Every number is read from each test's own table by

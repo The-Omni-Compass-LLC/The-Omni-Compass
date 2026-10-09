@@ -336,3 +336,40 @@ reads the second set when it lands and says so.
 and this text are in it, nothing in the engine): runs **A2 37858494179, B2 37858496620, C2 37858499033**, the three untouched
 workloads, three paired repetitions each, 20 s a notch, dispatched within ten seconds of one another. Nothing above this line
 changed after the dispatch.
+
+## The second counted set (runs A2, B2 and C2 of 2026-10-08/09, on amendment 2): the result
+
+Runs 37858494179, 37858496620 and 37858499033, commit `310cf318`, Omni v3, the three untouched workloads, three paired
+repetitions each; the table by rule is `results/live/V3_PGBENCH.md` (`tools/pgbench_abc.py`), and the first set's table is
+kept whole in `docs/history/V3_PGBENCH_set1.md`.
+
+**The two costs are gone.** Host CPU reads inside the noise on all three workloads (`select` −3.2%, +0.9%, +2.8%;
+`simple_update` +1.6% to +2.7%; `tpcb_hot` +2.4% to +6.1%; the first set read +14% to +28%, confirmed worse). The median
+latency reads inside the noise on all three (`select` −3.8%, +0.9%, +0.7%; the first set read +15% to +17%, confirmed worse
+on `select` and `tpcb_hot`). The harness's own CPU, now in the table, is 0.4 to 2.5 CPU-seconds an arm with the sampler
+included, the brain's share about half a second; every arm made one console login; no arm reported a controller fault; every
+pool was handed back and read back.
+
+**What the governor did, workload by workload.**
+
+- `select`: the pool moved between 2 and 20 (170 to 193 take-backs and 29 to 41 queue-line adds an arm, no force add), mean
+  13 to 15. **Connections held open 19.3 → 11.9, −36% to −38%, confirmed better** (the first set's −61% to −63% was bought
+  with the queue). Work and throughput equal; p95 inside the noise (−12%, +23%, +18%); p99 and mean inside the noise by the
+  rule (one run's interval across zero) but worse as point estimates in two runs (p99 +30% and +175%, mean +16% and +46%):
+  the probing of the knee shows in the tails and is not confirmed. It is in the table.
+- `simple_update`: the force rule of amendment 1 ("slow, clients waiting for a server: add") fired 4 to 15 times an arm and
+  took the pool to 33 to 38 at its peak. **Connections most at once 20 → 36, +72% to +80%, confirmed WORSE** (the first set
+  read the same, +80%); connections held open +8% to +10%, two runs inside the noise; work, latencies and CPU inside the
+  noise. Nothing was bought for the connections added. This cost is not the queue line's and not the console's: it is the
+  add rule of amendment 1 buying servers above the operator's setting on a slow write workload, and it stands as written.
+- `tpcb_hot`: **the runs disagree** on connections held open (+5% in A, −46% and −48% in B and C). In A the force rule fired 12
+  to 19 times an arm and the pool stood near 20 (native's own p95 was 2.4 s on that runner); in B and C it never fired and
+  the pool went down to the queue line. Latencies, work and CPU inside the noise.
+
+**Read.** 1 gauge-row confirmed better, 1 confirmed worse, 1 where the runs disagree. The category enters the index at
+**+4.0%** (the first set's +14.2% was the connections saving bought with the CPU and the queue the amendment removed). Said
+in the founder's words: `select` is a yes with no cost, a third fewer connections and nothing worse; `simple_update` is a no,
+more connections at the peak and nothing bought; `tpcb_hot` shows no settled value. What was expected before the runs came
+true in three parts of four: the CPU rows came down to the noise, the median came back, the connections saving fell to a
+third; the fourth, that the tail rows might read confirmed worse, did not happen, and the point estimates say the probing
+costs something in the tail that three runs could not settle.

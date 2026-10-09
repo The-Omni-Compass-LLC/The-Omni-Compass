@@ -7,6 +7,23 @@
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
+## 2026-10-09
+- **The second counted sets of PostgreSQL and MongoDB and the third of MySQL, on the amended harnesses: the costs are gone,
+  the gains are smaller and real; the index moves from +24.1% to +20.5%** (runs 37858494179, 37858496620, 37858499033;
+  37858501997, 37858505059, 37858509109; 37858512907, 37858515717, 37858519010; commit `310cf318`, Omni v3; the earlier
+  tables kept whole in `docs/history`). **PostgreSQL** (`results/live/V3_PGBENCH.md`): host CPU and median latency inside the
+  noise on all three workloads (the first set's +14% to +28% and +15% to +17% worse, gone); connections held open **−36% to
+  −38% on `select`, confirmed better**; `simple_update` connections most at once **+72% to +80%, confirmed WORSE** (amendment
+  1's add rule buying servers above the operator's 20 on a slow write workload, as in the first set, nothing bought); the runs
+  disagree on `tpcb_hot`; category +4.0% (was +14.2%). **MongoDB** (`results/live/V3_YCSB.md`): the cache held **−21% to −36% on
+  all four untouched workloads, confirmed better**, settling at 330 to 405 MB where the gate finds the working set; the burst
+  mean latency inside the noise (the +2% to +4% worse, gone); 8 rows better, 0 worse; category +8.5% (was +10.2%). **MySQL**
+  (`results/live/V3_SYSBENCH.md`): burst pool **−49% to −56%, confirmed better**; read_write pages holding data **+44% to +52%,
+  confirmed WORSE** (was +53% to +70%) with host CPU **−4% to −6%, confirmed better**, a trade; read_only inside the noise (the
+  second set's −50% to −56% was in part the cold-start give-back now refused); update_index the runs disagree; category +5.2%
+  (was +12.2%). Every knob handed back in every arm; no controller fault. The index, the dossier, the register, the v3 record,
+  the state of play, README and the manual carry the new tables.
+
 ## 2026-10-08
 - **The costs in the three database tables traced to their mechanisms, and the three that were ours amended, with the engine
   locked** (Omni v3 before and after; the harnesses are outside the fingerprint). **PostgreSQL** (`docs/POSTGRES_PREREGISTRATION.md`,
