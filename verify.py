@@ -395,6 +395,9 @@ def main():
           r.returncode == 0, r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_index.py")], capture_output=True, text=True)
     check("the Omni index rebuilds from every test's own result file (tools/omni_index.py)", r.returncode == 0, r.stderr[-300:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "wiring_verdicts.py"), "--check"], capture_output=True, text=True)
+    check("the wiring verdicts (write, watch, operator's choice per knob) are in line with every table they are read from (tools/wiring_verdicts.py)",
+          r.returncode == 0, (r.stdout + r.stderr)[-300:])
     import benchmarks.multiplicity as MP
     mp_tmp = tmp / "mult.json"; MP.main(mp_tmp)
     check("multiplicity analysis reproduces results/MULTIPLICITY.json",

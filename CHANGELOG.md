@@ -8,6 +8,19 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-09
+- **Wire in, or watch: the verdict per knob, from every result** (`tools/wiring_verdicts.py`, `docs/WIRING_VERDICTS.md`,
+  `results/WIRING_VERDICTS.csv`, checked by `verify.py`): at the founder's order that Omni need not be wired into every
+  muscle (where it cannot beat native, the muscle stays native and Omni only reads it: one wire out, no wire in), every
+  three-run table, the four simulator tables, the 945 modelled muscles and the organism tables are read by one rule into
+  three words: **write** (a gauge confirmed better, none confirmed worse), **watch** (nothing confirmed better; a loss is
+  named with its cause) and **operator's choice** (a trade, shown with both readings of the index). Real stacks 12 write, 7
+  operator's choice, 5 watch of 24; simulators 21, 15, 3 of 39; modelled muscles 124, 13, 808 of 945 (746 never wrote); the
+  14 organism cells with the cluster inside all write on the cluster's gauges. Every confirmed loss on a real stack is listed
+  with its cause: Kafka's consumers and the CPU they poll with, Redis's memory, MySQL's pages on a written working set, and
+  PostgreSQL's connections above the operator's setting on `simple_update`, where nothing was bought and the verdict is
+  watch. The engine is unchanged (Omni v3); the page decides what an operator connects. README, the register, the state of
+  play, how to read the results, the Kubernetes preregistration (the declaration), the wiring guide, the integration manual
+  and the manual (1.2, 16.6b, the appendices; PDF rebuilt) carry it.
 - **A second reading of the Omni index, declared beside the first** (`tools/omni_index.py`, `results/OMNI_INDEX.md`,
   `docs/K8S_COMPASS_PREREGISTRATION.md`): at the founder's question about what a cache is for (Redis is bought for speed and
   spends memory to deliver it; the resource reading counts that memory as a cost and reads Redis at −24.9% while its work and

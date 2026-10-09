@@ -50,6 +50,13 @@ resources beside them: **+71.8%** over the same six categories (Kubernetes +83%,
 database stacks exactly nothing, because their gains are resources given back). Neither hides a loss; each says a
 different true thing, and the first is the one preregistered.
 
+**Wire in, or watch.** Omni is wired out of every muscle and into a knob only where the paired measurement shows the
+muscle no worse for it; where it shows nothing, or a loss, the muscle stays native and Omni only reads it.
+`docs/WIRING_VERDICTS.md` gives every knob in every result one of three words from the tables themselves, **write**,
+**watch** or **operator's choice**: on the real stacks 12 of 24 knob-cases write, 7 are trades the operator decides and 5
+watch; of the 945 modelled muscles 124 write and 808 stay native, 746 of them because the native controller never left
+the band. Every confirmed loss is listed there with its cause.
+
 **The Omni index, every real test together: +20.5%** more for the same, or the same for less, across work, speed,
 machines and energy, six real categories each weighed the same: real Kubernetes on v3 +28.8% over seven tests (work +19%, speed +107%,
 machines +5%, energy +2%); the real database on v3 +4.0% (on the second counted set: connections held open −36% to −38% on

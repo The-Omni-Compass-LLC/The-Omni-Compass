@@ -62,6 +62,22 @@ workers in nine machine families that can show one is preregistered and dispatch
 the fleet that can show one machine, amendments 1 to 3), waiting on Azure's own capacity in eastus. The real card has
 not run on the current governor; every earlier card result is obsolete and is run again by the founder on rented cards.
 
+**Wire in, or watch (9 October).** The founder's order: Omni need not be wired into every muscle; where it cannot beat
+native, the muscle stays native and Omni only reads it. `docs/WIRING_VERDICTS.md` (`tools/wiring_verdicts.py`, checked by
+`verify.py` against every table it reads) gives every knob in every result one of three words. Real stacks: 12 of 24
+knob-cases **write** (six of the seven Kubernetes demands, PostgreSQL's read-only workload, MongoDB's four workloads, MySQL's
+burst); 7 are **the operator's choice** (Kafka's three workloads, where consumers buy a hundredfold shorter queue and both
+readings of the index say the trade pays; Redis's three, where memory buys the hit rate and only the service reading says it
+pays; MySQL's read_write, pages for CPU); 5 **watch** (Kubernetes beside a noisy neighbour, PostgreSQL's simple_update, where
+connections were bought above the operator's setting and nothing bought for them, and tpcb_hot, where the runs disagree;
+MySQL's read_only and update_index). Every confirmed loss on a real stack is a resource spent for the knob's own service,
+declared in advance or disclosed on the first counted set; none is a service loss. The simulators: 21 write, 15 trades (the
+four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill
+is worse), 3 watch (two robots the engine itself left native, one grid where nothing was bought). The 945 modelled muscles:
+124 write, 13 trades, 808 watch, 746 of them because the native controller kept the reading in band and the law never wrote;
+all 255 admission muscles are among the 746. The 14 organism cells with the real cluster inside all write on the cluster's
+gauges. The engine is unchanged; the page decides what an operator connects.
+
 ## Measured on real systems (evidence class L), Omni v3
 
 | Test, ten pairs × three runs | Work | Speed (p95) | Machines | Energy (declared model) | Source |
@@ -176,6 +192,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and still to run; the program to full size |
 | `results/live/V3_*.md`, `V1_*.md`, `results/live/raw/` | the three-run tables and every archived run's files |
 | `results/OMNI_INDEX.md` | the one combined number |
+| `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | which knobs earn a wire in: write, watch or the operator's choice, per knob and per muscle, from every table, every loss with its cause |
 | `docs/INTEGRATION_MANUAL.md`, `docs/WIRING_GUIDE.md` | wiring it in yourself |
 | `docs/METRICS_CATALOG.md` | every gauge, and whether it is measured or modelled |
 | `omnicompass/`, `omni_controller/`, `realms/`, `cpp/` | the engine, the controllers, the muscles, the C++20 twins |

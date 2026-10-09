@@ -431,6 +431,7 @@ OUTLINE = [
     ("Paired Runs and Receipts on Your Own System", ("M", "Paired Runs and Receipts on Your Own System")),
     ("Evidence Classes and How to Read a Result", ("M", "Evidence Classes and How to Read a Result")),
     ("Results to Date", ("M", "Results to Date")),
+    ("Wire In, or Watch: The Verdict per Knob", ("F", "docs/WIRING_VERDICTS.md")),
     ("The Pilot Protocol and Kit", ("FS", ["docs/PILOT_PROTOCOL.md", "docs/PILOT_KIT.md"])),
     ("The GPU Bench", ("F", "docs/GPU_BENCH.md")),
     ("The GPU Preregistration", ("F", "docs/GPU_PREREGISTRATION.md")),

@@ -11,6 +11,7 @@ Read in this order. Every page here is current; dated records are in [`history/`
 |---|---|
 | [`STATE_OF_PLAY.md`](STATE_OF_PLAY.md) | Where everything stands: every result, every platform, real and modelled kept apart |
 | [`../results/OMNI_INDEX.md`](../results/OMNI_INDEX.md) | The Omni index: every test as more for the same, or the same for less, in one number |
+| [`WIRING_VERDICTS.md`](WIRING_VERDICTS.md) | Wire in, or watch: every knob's verdict (write, watch, operator's choice) from every table, with every loss and its cause |
 | [`HOW_TO_READ_THE_RESULTS.md`](HOW_TO_READ_THE_RESULTS.md) | Every column of every table, in plain words |
 | [`DOSSIER.md`](DOSSIER.md) | Every result with its charts |
 | [`EVIDENCE_LEDGER.md`](EVIDENCE_LEDGER.md), [`CLAIMS_REGISTER.md`](CLAIMS_REGISTER.md) | Every claim with its evidence class, the losses kept |

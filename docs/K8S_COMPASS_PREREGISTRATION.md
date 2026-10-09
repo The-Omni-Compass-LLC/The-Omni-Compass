@@ -541,6 +541,16 @@ reading's +20.5% (Kubernetes +83.2%, Kafka +1,192.8%, Redis +8.8%, the three dat
 hundredfold speed ratio is why the service headline is large, and the category table is where a reader sees it. A
 confirmed loss in work or speed counts against Omni in both readings; neither hides one.
 
+**The wiring verdicts, declared 2026-10-09 (a reading of the tables, not a change to any rule).** The founder's order of
+the same day: Omni need not be wired into every muscle; where it cannot beat native, the muscle stays native and Omni only
+reads it, one wire out and no wire in. `tools/wiring_verdicts.py` reads every three-run table, the simulator tables, the
+realms table and the organism tables by one rule into three words per knob and case: **write** (a judged gauge confirmed
+better over all three runs, none confirmed worse), **watch** (nothing confirmed better, whether inside the noise, the runs
+disagreeing, or a loss with nothing against it) and **operator's choice** (gains and losses both confirmed, shown with both
+readings of the index). Rows shown and not judged never count. Nothing is typed in, and `verify.py` fails if the page
+(`docs/WIRING_VERDICTS.md`) differs from what the tables give. The verdicts change what an operator connects, never the
+engine (Omni v3) or any rule written here, and every test on this page is read as before.
+
 
 ## Demand that wanders: up, spike, partway down, back up, down to idle (written before its run, 2026-10-04)
 

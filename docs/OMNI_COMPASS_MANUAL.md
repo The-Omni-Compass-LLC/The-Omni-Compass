@@ -292,6 +292,12 @@ why, in the robot-arm benchmark, two of four arms were left entirely native and 
 real Kubernetes tests machines were kept whenever one machine fewer made the requests slower in the trial. Gains are not
 capped; the allowance caps only what may be spent to get them.
 
+The same principle, applied after the fact to every published result, is the page of wiring verdicts
+(`docs/WIRING_VERDICTS.md`, section 16.6b): every knob in every table is given one of three words from the table itself,
+**write** where a gauge is confirmed better and none confirmed worse, **watch** where nothing is confirmed better (the knob
+stays native and Omni only reads it, one wire out and no wire in), and **operator's choice** where gains and losses are
+both confirmed. Omni-Compass is wired out of every muscle; it is wired in only where it has earned it.
+
 ### 1.3 The pedals, the modes and the two switches
 
 Omni-Compass drives a system the way a self-driving car drives itself: it feels, gauges and adjusts, with nobody in the
@@ -2525,6 +2531,35 @@ station-keeping (Orekit, GMAT), constellations, rockets (RocketPy, OpenRocket) a
 solvers (OpenFOAM, SU2, REBOUND, GADGET, MESA) are not benchmarked: they have no controller and no knob, so Omni-Compass
 has no place on them; their value is the HPC cluster that runs them.
 
+### 16.6b Wire in, or watch: the verdict per knob
+
+The founder's order of 9 October 2026 made a principle of what section 1.2 describes as a mechanism: Omni-Compass need
+not be wired into every muscle. Where it cannot beat the native controller on the muscle's own gauges, the muscle lives by
+itself and Omni only reads it, one wire out and no wire in. `tools/wiring_verdicts.py` applies that principle to every
+published result and prints the page `docs/WIRING_VERDICTS.md` (one row per knob and per muscle in
+`results/WIRING_VERDICTS.csv`; `verify.py` fails if the page differs from what the tables give). The rule is the same for
+every table: a knob reads **write** where at least one judged gauge is confirmed better over all three runs and none is
+confirmed worse; **watch** where nothing is confirmed better, whether the rows are inside the noise, the runs disagree, or
+a gauge is confirmed worse with nothing against it (the loss is then named with its cause); and **operator's choice** where
+gains and losses are both confirmed, a trade shown with both readings of the index. A modelled muscle takes its word from
+its realms label: superior within guardrails is write, a tradeoff label is the operator's choice, the rest is watch.
+
+What the page said on the day it was declared. On the real stacks, 12 of 24 knob-cases write: six of the seven Kubernetes
+demands (beside a noisy neighbour the knob showed nothing and watches), PostgreSQL's read-only workload, MongoDB's four
+workloads and MySQL's burst. Seven are the operator's choice: Kafka's three workloads, where consumers buy a hundredfold
+shorter queue and both readings of the index say the trade pays; Redis's three, where memory buys the hit rate and only the
+service reading says it pays; and MySQL's read_write, where pages holding data buy a few percent of CPU. Five watch: the
+noisy neighbour, PostgreSQL's simple_update (connections bought above the operator's setting with nothing bought for them)
+and tpcb_hot (the runs disagree), MySQL's read_only and update_index. Every confirmed loss on a real stack is a resource
+spent for the knob's own service, declared in advance or disclosed on the first counted set; none is a service loss. Of the
+independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage
+costs line losses; the seven 2023 CityLearn districts, where the bill is worse) and 3 watch (two robots the engine itself
+left native, one grid where nothing was bought). Of the 945 modelled muscles, 124 write, 13 are trades and 808 watch; 746 of
+the 808 never wrote at all, because the native controller held the reading inside the band and the law never left its
+cushion, and all 255 admission muscles are among them, the admission knob being a brake for a stress the hour did not hold.
+The 14 organism cells with the real cluster inside all write on the cluster's gauges. Nothing on the page changes the
+engine, which stays Omni v3; it changes what an operator connects.
+
 ### 16.7 Threats to validity, stated by us
 
 A referee will look for the ways these results could mislead. We list the ones we know, what each would do to the
@@ -2737,6 +2772,7 @@ any one of the three can tell whether the files in front of them are the files t
 | The six organisms with the cluster inside | `python3 tools/six_kube_report.py <raw dirs> --out results/live/V3_SIX_KUBE.md` |
 | The grid of copies and runs | `python3 tools/grid.py` (reads `results/scale/receipts/`) |
 | The Omni index | `python3 tools/omni_index.py` |
+| Which knobs earn a wire in (write, watch, operator's choice) | `python3 tools/wiring_verdicts.py` (`--check` compares the page with the tables; `verify.py` runs it) |
 | The database benchmark, one run | `python3 tools/run_pgbench.py --out <dir>` (workflow `pgbench`) |
 | The message broker, one run | `python3 tools/run_kafka.py --setup`, then `--workloads light,heavy,burst --out <dir>` (workflow `kafka`) |
 | The cache, one run | `python3 tools/run_redis.py --setup`, then `--workloads small,large,burst --out <dir>` (workflow `redis`) |
@@ -2774,6 +2810,7 @@ any one of the three can tell whether the files in front of them are the files t
 | `tools/omni_version.py`, `tools/release_manifest.py`, `tools/layout_check.py` | which engine a checkout or commit carries; the release manifest and verification as GitHub runs it; the check that every path the documents name exists |
 | `tools/confirm_abc.py` and its siblings (`pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `sysbench_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | the three-run tables, one tool per kind of raw record, each checking the engine of every run it reads |
 | `tools/omni_index.py`, `tools/dossier.py`, `tools/own_cost.py` | the one number from the tables; the dossier from the tables; the governor's own cost from the archived audits |
+| `tools/wiring_verdicts.py`, `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | the verdict per knob from every table: write, watch or the operator's choice, every loss with its cause; one row per knob and per muscle |
 | `tools/legal.py` | the legal notice every generated report carries at its head and foot |
 | `docs/book/` | the builder of this manual's PDF (`build_book.py`) and the theory chapters bound into it |
 | `release/` | the copyright deposit and the release notes, printed at named commits |
@@ -2909,8 +2946,8 @@ many pages it read, how many pods it started), not to be counted for or against 
 `docs/ROBOTICS_PREREGISTRATION.md`, `docs/ROBUSTNESS_PREREGISTRATION.md`, `docs/YCSB_PREREGISTRATION.md` and
 `docs/MYSQL_PREREGISTRATION.md` (the rules written before each run), `docs/OMNI_V1.md` to `OMNI_V3.md` (every result by engine), `docs/REGISTER.md` (every benchmark
 and its file), `docs/PROOF_PROGRAM.md` (the program to full size with its costs), `docs/DOSSIER.md` (every result in one
-place), `results/OMNI_INDEX.md` (the one number), `docs/STATE_OF_PLAY.md` (where everything stands), `docs/HANDOFF.md`
-(every command in one page).
+place), `results/OMNI_INDEX.md` (the one number), `docs/WIRING_VERDICTS.md` (which knobs earn a wire in, and every loss
+with its cause), `docs/STATE_OF_PLAY.md` (where everything stands), `docs/HANDOFF.md` (every command in one page).
 
 **The map, claim by claim.** Each claim this manual makes is listed here with the class of evidence behind it and the
 document that carries it, so that a reader can go from any sentence of the executive summary to the file that would have

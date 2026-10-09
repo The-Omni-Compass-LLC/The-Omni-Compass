@@ -7,6 +7,10 @@
 > **The current manual is `docs/INTEGRATION_MANUAL.md`** (every stack, every level, every switch). This page is kept for
 > reference; where the two differ, the integration manual is current.
 
+> **Which knobs to wire in at all:** `docs/WIRING_VERDICTS.md` gives every knob in every published result one of three
+> words from the tables themselves: **write** (wire both ways), **watch** (wire out only: Omni reads, the native controller
+> lives by itself) or **operator's choice** (a trade). A knob that showed nothing, or lost, stays native.
+
 > The full step-by-step manual, with the switch, the living band, parking and the pod reflex, is
 > `docs/OPERATOR_MANUAL.md`. This page is the short version.
 
