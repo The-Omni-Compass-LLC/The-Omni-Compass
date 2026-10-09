@@ -609,6 +609,16 @@ the organism at 1,000 copies with the real cluster inside), copies every file ba
 happens. Three paired repetitions per organism, two machines at a time. Its results join `SIX_KUBE.md` at 1,000 copies;
 the same cells from GitHub runners count only if the runner held them.
 
+*Result on Omni v3 (`results/live/V3_BIG_ORGANISM.md`, both organisms, written 9 October after the second collect).* The
+machines were rented one at a time through `big-organism-detached` with a 10,800 s window an arm (the 2,880 s window of the
+v1 runs put the compass arm off the clock; the clock rule and the longer window are declared in the robustness and v3
+notes). The four stacked: three repetitions over 29 hours (collected by run 37754612102), p95 2,882 → 150 ms, time over the
+line 51% → 0, failed requests 0.14% → 0, machines 6 in both arms, both arms 22 s behind the window. The whole tower: three
+repetitions over 25 hours (started by run 37756284680, collected by run 37945866426), p95 6,690 → 160 ms, p99 9,068 → 187
+ms, time over the line 76% → 0, failed requests 4.8% → 0, machines 6 in both arms, both arms 14 s behind the window. Every
+cluster row that moved is clear of zero with three pairs; the organisms' own model rows are shown beside them and never
+enter the index; the rounding-level model work loss reads worse by rule in both. Six repetitions, six on the clock.
+
 
 ### The burst bill test on Azure: two native arms lost to the harness, and the fix (2026-10-05)
 
