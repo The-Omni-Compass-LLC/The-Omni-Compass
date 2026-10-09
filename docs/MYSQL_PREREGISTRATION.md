@@ -331,6 +331,39 @@ reads the third set when it lands and says so.
 this text are in it, nothing in the engine): runs **A3 37858501997, B3 37858505059, C3 37858509109**, every workload, three
 paired repetitions each, 20 s a notch. Nothing above this line changed after the dispatch.
 
+## The third counted set (runs A3, B3 and C3 of 2026-10-08/09, on amendment 2): the result
+
+Runs 37858501997, 37858505059 and 37858509109, commit `310cf318`, Omni v3, five workloads, three paired repetitions each; the
+table by rule is `results/live/V3_SYSBENCH.md`, and the second set's table is kept whole in `docs/history/V3_SYSBENCH_set2.md`
+beside the first set's.
+
+- **burst**: the pool held **−49% to −56%** and the pages holding data −52% to −57%, **confirmed better** (the second set read
+  −67%); work, latencies and CPU inside the noise.
+- **read_only**: every row inside the noise. The pool held read +1%, −25% and +1% as the runs' means, with intervals of ±40
+  to ±80 points: the second set's −50% to −56% is not reproduced. The audits say why. In the second set the very first
+  decision of every arm gave a chunk back before any read had been counted (the gate read a miss share of zero on zero
+  reads), and the pool cascaded to the floor of 128 MB inside the first minute, where it sat at 12% to 15% misses for most of
+  the arm, because misses served from the operating system's page cache never made a statement slow enough to grow it. In
+  the third set that first give-back is refused; the pool keeps the operator's 512 MB until the first table is in it, gives
+  chunks back once misses fall under one percent, and by then the notches of two to six tables have arrived, so the pool is
+  bought back on real misses (4 to 12 grows an arm in six of the nine arms). The second set's read_only saving was in part the
+  cold-start artefact the MongoDB amendment names, and it is gone with it; what remains is inside the noise.
+- **read_write**: the pages holding data **+44% to +52%, confirmed WORSE** (the second set read +53% to +70%); **host CPU −4% to
+  −6%, confirmed better**, new; the pool held +59%, +62% and +63% as means with one run's interval across zero (inside the
+  noise by the rule); p95 −13%, −24%, +2% and work inside the noise. The growth gate refused 0 to 6 grows an arm; the grows at
+  one to five percent of misses stayed allowed, as the replay above said they would, and the pool still grew to 1.1 to 1.6 GB
+  in the wide notches. The row stands as a trade: memory bought on real misses, CPU saved, latency unchanged.
+- **update_index**: the pool held **the runs disagree** (+13% in A, −4% and −12% in B and C); everything else inside the noise.
+- **tuning**: shown and not counted, as always.
+- Every pool handed back and read back in every arm; no error; no controller fault.
+
+**Read.** 4 gauge-rows confirmed better, 1 confirmed worse, 1 where the runs disagree. The category enters the index at
+**+5.2%** (the second set's +12.2% included the read_only saving that was in part the artefact). Said in the founder's words:
+burst is a yes with no cost (half the memory, nothing worse); read_write is a trade (more memory, less CPU; the index nets it
+at about +1%); read_only and update_index show no settled value. The expectation written before the runs held: the read_write
+memory row moved toward native and stayed confirmed worse on real misses, and the read-mostly workloads were not meant to
+change, but read_only did, for the reason given, and that is the result.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

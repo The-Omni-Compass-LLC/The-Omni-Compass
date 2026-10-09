@@ -7,9 +7,9 @@ MongoDB as shipped with the operator's WiredTiger cache (512 MB) is native; omni
 
 | Run | GitHub run | Commit | Engine | Workloads |
 |---|---|---|---|---:|
-| A | 37727968670 | `7ee471b4098e` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 5 |
-| B | 37727976107 | `7ee471b4098e` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 5 |
-| C | 37727983746 | `7ee471b4098e` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 5 |
+| A | 37858512907 | `310cf31838e7` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 5 |
+| B | 37858515717 | `310cf31838e7` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 5 |
+| C | 37858519010 | `310cf31838e7` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 5 |
 
 ## tuning: YCSB workloada, 250,000 records × notch; line 1 ms, 3 paired repetitions a run (the tuning workload, shown and not counted)
 
@@ -17,19 +17,19 @@ MongoDB 8.0.32, YCSB 0.17.0; 3,000 operations a second offered from 32 threads; 
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (operations a second answered within the line) | 2,833 | 2,841 | +0.3% (-1.4 to +2.0) | -0.1% (-0.3 to +0.1) | +0.1% (-0.0 to +0.2) | no difference beyond the noise (3 of 3 runs) |
-| throughput (operations a second) | 2,847 | 2,854 | +0.2% (-1.4 to +1.9) | -0.0% (-0.2 to +0.2) | +0.1% (+0.0 to +0.1) | no difference beyond the noise (2 of 3 runs) |
-| latency, 95th percentile (ms) | 0.488 | 0.485 | -0.6% (-3.3 to +2.1) | +2.8% (-3.9 to +9.5) | +1.2% (-2.9 to +5.2) | no difference beyond the noise (3 of 3 runs) |
-| latency, 99th percentile (ms) | 0.693 | 0.679 | -2.0% (-8.5 to +4.6) | +5.0% (-3.7 to +13.7) | +1.0% (-0.8 to +2.8) | no difference beyond the noise (3 of 3 runs) |
-| latency, mean (ms) | 0.241 | 0.239 | -0.8% (-5.1 to +3.4) | +2.4% (+0.1 to +4.6) | +1.9% (-0.2 to +4.0) | no difference beyond the noise (2 of 3 runs) |
+| work inside the response line (operations a second answered within the line) | 2,878 | 2,878 | -0.0% (-0.2 to +0.1) | -0.1% (-0.4 to +0.1) | -0.0% (-1.2 to +1.2) | no difference beyond the noise (3 of 3 runs) |
+| throughput (operations a second) | 2,888 | 2,886 | -0.1% (-0.2 to +0.1) | -0.2% (-0.4 to +0.1) | -0.1% (-1.3 to +1.1) | no difference beyond the noise (3 of 3 runs) |
+| latency, 95th percentile (ms) | 0.333 | 0.334 | +0.3% (-1.7 to +2.3) | +2.0% (-2.5 to +6.5) | +0.7% (-0.7 to +2.0) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 0.486 | 0.482 | -0.9% (-3.3 to +1.5) | +1.5% (-3.9 to +6.9) | -1.6% (-4.8 to +1.6) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 0.188 | 0.186 | -1.1% (-6.4 to +4.2) | +2.2% (-3.9 to +8.3) | +0.9% (-1.6 to +3.5) | no difference beyond the noise (3 of 3 runs) |
 | failed operations | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| cache size held, mean (MB; the knob, the resource) | 512.0 | 435.6 | -14.9% (-21.1 to -8.8) | -15.3% (-27.7 to -3.0) | -12.5% (-12.5 to -12.5) | **confirmed better** |
-| bytes in the cache, mean (MB) | 415.6 | 357.0 | -14.1% (-19.6 to -8.6) | -14.4% (-26.1 to -2.7) | -11.7% (-12.3 to -11.1) | **confirmed better** |
-| pages read into the cache (misses) | 458,716 | 533,512 | +16.3% (+5.1 to +27.5) | +16.5% (+1.2 to +31.8) | +10.0% (+8.8 to +11.2) | shown, not judged |
-| host CPU busy (share of the run) | 0.256 | 0.258 | +0.7% (-34.4 to +35.8) | +3.2% (-11.6 to +18.0) | +2.7% (-56.9 to +62.3) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 292.7 | 295.7 | +1.0% (-44.4 to +46.4) | +3.5% (-16.1 to +23.2) | +3.3% (-70.9 to +77.5) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 operations inside the line | 0.335 | 0.337 | +0.7% (-43.2 to +44.5) | +3.6% (-16.0 to +23.2) | +3.3% (-70.9 to +77.5) | no difference beyond the noise (3 of 3 runs) |
-| cache size changes written (the knob's moves) | 0 | 1.67 | +1.67 (+0.232 to +3.1) | +1.67 (-1.2 to +4.54) | +1 (+1 to +1) | shown, not judged |
+| cache size held, mean (MB; the knob, the resource) | 512.0 | 388.9 | -24.0% (-24.2 to -23.9) | -20.0% (-36.9 to -3.1) | -22.1% (-30.3 to -14.0) | **confirmed better** |
+| bytes in the cache, mean (MB) | 415.0 | 317.7 | -23.4% (-25.1 to -21.8) | -19.3% (-36.1 to -2.4) | -21.2% (-29.2 to -13.2) | **confirmed better** |
+| pages read into the cache (misses) | 464,294 | 577,605 | +24.4% (+16.3 to +32.5) | +24.3% (+7.2 to +41.5) | +25.5% (+13.9 to +37.1) | shown, not judged |
+| host CPU busy (share of the run) | 0.23 | 0.218 | -5.0% (-18.6 to +8.6) | +7.0% (-7.8 to +21.8) | -1.0% (-15.0 to +13.1) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 283.2 | 264.4 | -6.6% (-25.6 to +12.3) | +8.8% (-10.4 to +28.0) | -1.7% (-20.6 to +17.2) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 operations inside the line | 0.321 | 0.299 | -6.6% (-25.6 to +12.4) | +8.9% (-10.3 to +28.0) | -1.8% (-21.7 to +18.2) | no difference beyond the noise (3 of 3 runs) |
+| cache size changes written (the knob's moves) | 0 | 2 | +2 (+2 to +2) | +3 (-1.3 to +7.3) | +2.67 (-0.202 to +5.54) | shown, not judged |
 
 The cache size handed back to the operator's and read back at the end of every omni arm in every run: yes.
 
@@ -39,19 +39,19 @@ MongoDB 8.0.32, YCSB 0.17.0; 3,000 operations a second offered from 32 threads; 
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (operations a second answered within the line) | 2,726 | 2,757 | +1.1% (-1.2 to +3.5) | -0.1% (-0.2 to +0.1) | +0.0% (-0.1 to +0.1) | no difference beyond the noise (3 of 3 runs) |
-| throughput (operations a second) | 2,735 | 2,765 | +1.1% (-1.2 to +3.4) | -0.1% (-0.2 to +0.1) | -0.0% (-0.1 to +0.1) | no difference beyond the noise (3 of 3 runs) |
-| latency, 95th percentile (ms) | 0.308 | 0.312 | +1.4% (-0.6 to +3.4) | +0.4% (-2.2 to +3.0) | -1.1% (-3.6 to +1.3) | no difference beyond the noise (3 of 3 runs) |
-| latency, 99th percentile (ms) | 0.477 | 0.48 | +0.5% (-4.0 to +5.0) | +0.8% (-2.7 to +4.2) | -1.4% (-5.0 to +2.3) | no difference beyond the noise (3 of 3 runs) |
-| latency, mean (ms) | 0.241 | 0.235 | -2.6% (-11.8 to +6.5) | +4.2% (+0.7 to +7.7) | +0.5% (-5.1 to +6.1) | no difference beyond the noise (2 of 3 runs) |
+| work inside the response line (operations a second answered within the line) | 2,858 | 2,856 | -0.1% (-0.2 to +0.1) | -0.0% (-0.1 to +0.1) | +0.0% (-0.4 to +0.4) | no difference beyond the noise (3 of 3 runs) |
+| throughput (operations a second) | 2,864 | 2,862 | -0.1% (-0.2 to +0.1) | -0.0% (-0.1 to +0.0) | -0.0% (-0.3 to +0.3) | no difference beyond the noise (3 of 3 runs) |
+| latency, 95th percentile (ms) | 0.406 | 0.406 | -0.1% (-1.5 to +1.3) | +1.1% (-0.7 to +2.9) | -1.3% (-3.6 to +0.9) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 0.568 | 0.565 | -0.5% (-7.1 to +6.0) | -0.3% (-11.7 to +11.1) | -5.2% (-13.0 to +2.6) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 0.213 | 0.215 | +1.1% (-1.3 to +3.6) | +2.1% (-2.6 to +6.7) | -2.4% (-8.9 to +4.1) | no difference beyond the noise (3 of 3 runs) |
 | failed operations | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| cache size held, mean (MB; the knob, the resource) | 512.0 | 376.6 | -26.5% (-62.0 to +9.1) | -49.0% (-51.1 to -46.8) | -49.5% (-49.5 to -49.5) | no difference beyond the noise (1 of 3 runs) |
-| bytes in the cache, mean (MB) | 412.2 | 309.6 | -24.9% (-61.4 to +11.6) | -47.6% (-49.5 to -45.7) | -48.7% (-51.5 to -45.9) | no difference beyond the noise (1 of 3 runs) |
-| pages read into the cache (misses) | 479,449 | 586,126 | +22.2% (-2.0 to +46.5) | +50.6% (+42.9 to +58.3) | +46.5% (+43.8 to +49.2) | shown, not judged |
-| host CPU busy (share of the run) | 0.183 | 0.181 | -0.9% (-27.7 to +25.9) | +9.2% (-1.5 to +19.8) | -3.8% (-41.1 to +33.4) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 224.7 | 220.5 | -1.8% (-32.9 to +29.2) | +11.1% (-4.4 to +26.6) | -5.0% (-50.4 to +40.4) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 operations inside the line | 0.268 | 0.26 | -2.8% (-32.0 to +26.4) | +11.1% (-4.3 to +26.6) | -5.0% (-50.4 to +40.3) | no difference beyond the noise (3 of 3 runs) |
-| cache size changes written (the knob's moves) | 0 | 5 | +5 (+5 to +5) | +4 (+4 to +4) | +4 (+4 to +4) | shown, not judged |
+| cache size held, mean (MB; the knob, the resource) | 512.0 | 368.8 | -28.0% (-45.1 to -10.8) | -35.9% (-35.9 to -35.9) | -28.0% (-45.1 to -10.9) | **confirmed better** |
+| bytes in the cache, mean (MB) | 414.8 | 301.8 | -27.2% (-45.6 to -8.9) | -36.2% (-39.2 to -33.1) | -27.3% (-44.1 to -10.5) | **confirmed better** |
+| pages read into the cache (misses) | 488,743 | 613,152 | +25.5% (+5.5 to +45.4) | +32.3% (+19.1 to +45.5) | +23.5% (-2.7 to +49.6) | shown, not judged |
+| host CPU busy (share of the run) | 0.211 | 0.213 | +1.0% (-16.9 to +18.8) | +0.9% (-58.7 to +60.5) | -2.4% (-55.1 to +50.3) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 240.5 | 242.1 | +0.7% (-21.4 to +22.7) | +0.5% (-68.1 to +69.1) | -2.5% (-62.8 to +57.8) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 operations inside the line | 0.273 | 0.275 | +0.7% (-21.4 to +22.7) | +0.5% (-68.1 to +69.0) | -2.5% (-62.6 to +57.5) | no difference beyond the noise (3 of 3 runs) |
+| cache size changes written (the knob's moves) | 0 | 2.33 | +2.33 (+0.899 to +3.77) | +3 (+3 to +3) | +2.33 (+0.899 to +3.77) | shown, not judged |
 
 The cache size handed back to the operator's and read back at the end of every omni arm in every run: yes.
 
@@ -61,19 +61,19 @@ MongoDB 8.0.32, YCSB 0.17.0; 3,000 operations a second offered from 32 threads; 
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (operations a second answered within the line) | 2,852 | 2,849 | -0.1% (-0.3 to +0.1) | -0.1% (-0.4 to +0.1) | -0.1% (-0.4 to +0.2) | no difference beyond the noise (3 of 3 runs) |
-| throughput (operations a second) | 2,861 | 2,859 | -0.1% (-0.2 to +0.1) | -0.1% (-0.4 to +0.2) | -0.1% (-0.4 to +0.2) | no difference beyond the noise (3 of 3 runs) |
-| latency, 95th percentile (ms) | 0.457 | 0.458 | +0.1% (-2.6 to +2.9) | +1.6% (-1.0 to +4.1) | +0.7% (-0.4 to +1.7) | no difference beyond the noise (3 of 3 runs) |
-| latency, 99th percentile (ms) | 0.669 | 0.67 | +0.1% (-6.7 to +7.0) | +1.5% (-2.7 to +5.7) | +0.3% (-1.1 to +1.8) | no difference beyond the noise (3 of 3 runs) |
-| latency, mean (ms) | 0.241 | 0.246 | +2.2% (+0.8 to +3.6) | +2.7% (+0.8 to +4.7) | +3.7% (+2.3 to +5.0) | **confirmed WORSE** |
+| work inside the response line (operations a second answered within the line) | 2,611 | 2,737 | +4.8% (-14.3 to +23.9) | -0.0% (-0.3 to +0.3) | +0.0% (-0.2 to +0.2) | no difference beyond the noise (3 of 3 runs) |
+| throughput (operations a second) | 2,625 | 2,747 | +4.6% (-13.9 to +23.2) | -0.0% (-0.3 to +0.3) | +0.0% (-0.1 to +0.2) | no difference beyond the noise (3 of 3 runs) |
+| latency, 95th percentile (ms) | 0.347 | 0.346 | -0.2% (-9.3 to +8.9) | +0.1% (-2.0 to +2.1) | +0.2% (-0.8 to +1.3) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 0.629 | 0.549 | -12.7% (-52.1 to +26.8) | -0.8% (-6.7 to +5.1) | -0.3% (-4.5 to +3.9) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 0.252 | 0.231 | -8.2% (-35.8 to +19.3) | +1.4% (-2.2 to +4.9) | +1.1% (-2.8 to +5.0) | no difference beyond the noise (3 of 3 runs) |
 | failed operations | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| cache size held, mean (MB; the knob, the resource) | 512.0 | 262.7 | -48.7% (-48.7 to -48.7) | -41.8% (-71.3 to -12.3) | -40.6% (-75.1 to -6.1) | **confirmed better** |
-| bytes in the cache, mean (MB) | 398.6 | 210.3 | -47.2% (-50.9 to -43.6) | -40.0% (-70.9 to -9.1) | -38.6% (-74.6 to -2.7) | **confirmed better** |
-| pages read into the cache (misses) | 175,012 | 277,156 | +58.4% (+50.8 to +66.0) | +50.0% (+13.0 to +87.0) | +45.5% (-7.2 to +98.1) | shown, not judged |
-| host CPU busy (share of the run) | 0.203 | 0.196 | -3.5% (-28.8 to +21.9) | +4.8% (-41.3 to +50.9) | +16.4% (-11.0 to +43.7) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 91.3 | 87.0 | -4.7% (-35.5 to +26.1) | +5.1% (-52.5 to +62.6) | +20.6% (-15.6 to +56.8) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 operations inside the line | 0.259 | 0.247 | -4.7% (-35.3 to +26.0) | +5.1% (-52.4 to +62.5) | +20.7% (-15.6 to +57.0) | no difference beyond the noise (3 of 3 runs) |
-| cache size changes written (the knob's moves) | 0 | 4 | +4 (+4 to +4) | +4.33 (+2.9 to +5.77) | +4.67 (+1.8 to +7.54) | shown, not judged |
+| cache size held, mean (MB; the knob, the resource) | 512.0 | 404.5 | -21.0% (-24.1 to -17.9) | -22.4% (-22.7 to -22.1) | -26.2% (-42.1 to -10.3) | **confirmed better** |
+| bytes in the cache, mean (MB) | 387.0 | 305.1 | -21.2% (-28.9 to -13.5) | -21.5% (-23.2 to -19.8) | -26.6% (-44.3 to -8.9) | **confirmed better** |
+| pages read into the cache (misses) | 178,538 | 200,667 | +12.4% (-25.9 to +50.6) | +21.6% (+12.9 to +30.3) | +21.9% (+10.4 to +33.4) | shown, not judged |
+| host CPU busy (share of the run) | 0.171 | 0.183 | +7.0% (-49.4 to +63.4) | +3.6% (-30.5 to +37.7) | -11.9% (-35.4 to +11.6) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 83.7 | 89.7 | +7.2% (-58.8 to +73.2) | +4.3% (-38.1 to +46.7) | -15.0% (-44.1 to +14.1) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 operations inside the line | 0.26 | 0.268 | +3.0% (-48.9 to +54.9) | +4.3% (-38.1 to +46.7) | -15.0% (-44.2 to +14.2) | no difference beyond the noise (3 of 3 runs) |
+| cache size changes written (the knob's moves) | 0 | 2.33 | +2.33 (+0.899 to +3.77) | +2 (+2 to +2) | +2.33 (+0.899 to +3.77) | shown, not judged |
 
 The cache size handed back to the operator's and read back at the end of every omni arm in every run: yes.
 
@@ -83,19 +83,19 @@ MongoDB 8.0.32, YCSB 0.17.0; 3,000 operations a second offered from 32 threads; 
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (operations a second answered within the line) | 2,881 | 2,880 | -0.0% (-0.1 to -0.0) | -0.1% (-0.2 to +0.0) | +0.0% (-0.6 to +0.7) | no difference beyond the noise (2 of 3 runs) |
-| throughput (operations a second) | 2,885 | 2,884 | -0.0% (-0.1 to +0.0) | -0.1% (-0.2 to -0.0) | +0.0% (-0.6 to +0.6) | no difference beyond the noise (2 of 3 runs) |
-| latency, 95th percentile (ms) | 0.357 | 0.359 | +0.6% (-2.5 to +3.6) | +1.1% (-0.4 to +2.5) | -0.2% (-5.0 to +4.7) | no difference beyond the noise (3 of 3 runs) |
-| latency, 99th percentile (ms) | 0.537 | 0.536 | -0.2% (-0.6 to +0.3) | +0.9% (-2.6 to +4.5) | -0.3% (-8.9 to +8.3) | no difference beyond the noise (3 of 3 runs) |
-| latency, mean (ms) | 0.127 | 0.133 | +4.9% (+3.4 to +6.5) | +4.4% (-2.9 to +11.7) | +3.2% (-4.7 to +11.1) | no difference beyond the noise (2 of 3 runs) |
+| work inside the response line (operations a second answered within the line) | 2,899 | 2,898 | -0.0% (-0.2 to +0.1) | -0.0% (-0.1 to +0.1) | -0.1% (-0.2 to +0.1) | no difference beyond the noise (3 of 3 runs) |
+| throughput (operations a second) | 2,902 | 2,900 | -0.0% (-0.2 to +0.1) | -0.0% (-0.1 to +0.1) | -0.1% (-0.2 to +0.1) | no difference beyond the noise (3 of 3 runs) |
+| latency, 95th percentile (ms) | 0.278 | 0.281 | +0.8% (-6.9 to +8.5) | +0.6% (-0.4 to +1.6) | -0.1% (-0.7 to +0.5) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 0.426 | 0.425 | -0.2% (-2.8 to +2.3) | +0.5% (-2.7 to +3.8) | +0.2% (-2.0 to +2.3) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 0.107 | 0.11 | +2.3% (+0.9 to +3.8) | +2.3% (+1.7 to +2.8) | +1.1% (-1.5 to +3.6) | no difference beyond the noise (1 of 3 runs) |
 | failed operations | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| cache size held, mean (MB; the knob, the resource) | 512.0 | 258.8 | -49.4% (-49.5 to -49.4) | -49.6% (-49.6 to -49.5) | -49.5% (-49.5 to -49.5) | **confirmed better** |
-| bytes in the cache, mean (MB) | 415.5 | 216.2 | -48.0% (-51.2 to -44.7) | -48.1% (-50.2 to -46.0) | -48.0% (-50.4 to -45.5) | **confirmed better** |
-| pages read into the cache (misses) | 468,164 | 727,442 | +55.4% (+43.3 to +67.4) | +52.9% (+29.9 to +75.9) | +57.7% (+46.2 to +69.2) | shown, not judged |
-| host CPU busy (share of the run) | 0.164 | 0.185 | +13.1% (-5.3 to +31.4) | +11.0% (-18.0 to +40.0) | +10.7% (-2.7 to +24.1) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 199.8 | 229.2 | +14.7% (-7.6 to +37.1) | +11.6% (-19.8 to +43.1) | +12.8% (-3.7 to +29.3) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 operations inside the line | 0.226 | 0.259 | +14.7% (-7.7 to +37.1) | +11.7% (-19.9 to +43.2) | +12.8% (-3.6 to +29.2) | no difference beyond the noise (3 of 3 runs) |
-| cache size changes written (the knob's moves) | 0 | 4 | +4 (+4 to +4) | +4 (+4 to +4) | +4 (+4 to +4) | shown, not judged |
+| cache size held, mean (MB; the knob, the resource) | 512.0 | 389.1 | -24.0% (-24.1 to -23.9) | -24.0% (-24.1 to -23.9) | -24.0% (-24.0 to -24.0) | **confirmed better** |
+| bytes in the cache, mean (MB) | 416.3 | 319.7 | -23.2% (-25.5 to -21.0) | -22.8% (-24.4 to -21.3) | -22.3% (-24.4 to -20.2) | **confirmed better** |
+| pages read into the cache (misses) | 466,300 | 583,886 | +25.2% (+12.0 to +38.5) | +29.6% (+22.5 to +36.6) | +28.5% (+1.5 to +55.6) | shown, not judged |
+| host CPU busy (share of the run) | 0.144 | 0.146 | +1.5% (-39.8 to +42.8) | +7.6% (-28.3 to +43.4) | -4.3% (-28.7 to +20.0) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 176.1 | 178.6 | +1.4% (-46.9 to +49.7) | +8.8% (-36.6 to +54.2) | -5.9% (-36.6 to +24.7) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 operations inside the line | 0.198 | 0.201 | +1.4% (-46.9 to +49.7) | +8.8% (-36.6 to +54.2) | -5.9% (-36.5 to +24.7) | no difference beyond the noise (3 of 3 runs) |
+| cache size changes written (the knob's moves) | 0 | 2 | +2 (+2 to +2) | +2 (+2 to +2) | +2 (+2 to +2) | shown, not judged |
 
 The cache size handed back to the operator's and read back at the end of every omni arm in every run: yes.
 
@@ -105,23 +105,23 @@ MongoDB 8.0.32, YCSB 0.17.0; 3,000 operations a second offered from 32 threads; 
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (operations a second answered within the line) | 5,767 | 5,769 | +0.0% (-0.2 to +0.2) | -0.3% (-1.5 to +0.9) | -2.7% (-9.8 to +4.4) | no difference beyond the noise (3 of 3 runs) |
-| throughput (operations a second) | 5,781 | 5,781 | +0.0% (-0.2 to +0.2) | -0.3% (-1.5 to +0.8) | -2.7% (-9.7 to +4.3) | no difference beyond the noise (3 of 3 runs) |
-| latency, 95th percentile (ms) | 0.255 | 0.259 | +1.4% (-2.5 to +5.4) | +1.0% (+0.2 to +1.8) | +0.6% (-0.1 to +1.4) | no difference beyond the noise (2 of 3 runs) |
-| latency, 99th percentile (ms) | 0.434 | 0.435 | +0.4% (-4.6 to +5.4) | -0.7% (-3.2 to +1.7) | -0.1% (-7.2 to +7.0) | no difference beyond the noise (3 of 3 runs) |
-| latency, mean (ms) | 0.118 | 0.117 | -0.7% (-5.2 to +3.8) | +1.0% (-0.4 to +2.3) | +4.5% (-3.3 to +12.3) | no difference beyond the noise (3 of 3 runs) |
+| work inside the response line (operations a second answered within the line) | 5,656 | 5,601 | -1.0% (-4.2 to +2.3) | -0.2% (-1.6 to +1.2) | -0.1% (-0.5 to +0.2) | no difference beyond the noise (3 of 3 runs) |
+| throughput (operations a second) | 5,675 | 5,618 | -1.0% (-4.1 to +2.1) | -0.2% (-1.6 to +1.2) | -0.2% (-0.6 to +0.2) | no difference beyond the noise (3 of 3 runs) |
+| latency, 95th percentile (ms) | 0.344 | 0.347 | +0.8% (-2.9 to +4.5) | +0.9% (-2.5 to +4.3) | -0.6% (-1.7 to +0.5) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 0.55 | 0.546 | -0.8% (-9.2 to +7.5) | -0.4% (-4.7 to +3.9) | -3.5% (-11.0 to +4.0) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 0.211 | 0.214 | +1.7% (-2.3 to +5.7) | +0.5% (-2.9 to +4.0) | +0.2% (-5.9 to +6.3) | no difference beyond the noise (3 of 3 runs) |
 | failed operations | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| cache size held, mean (MB; the knob, the resource) | 512.0 | 448.2 | -12.5% (-12.5 to -12.5) | -36.8% (-51.3 to -22.3) | -25.9% (-30.4 to -21.4) | **confirmed better** |
-| bytes in the cache, mean (MB) | 415.2 | 369.5 | -11.0% (-11.5 to -10.5) | -36.6% (-51.8 to -21.4) | -24.4% (-28.5 to -20.3) | **confirmed better** |
-| pages read into the cache (misses) | 465,847 | 531,465 | +14.1% (+8.4 to +19.8) | +48.5% (+27.8 to +69.2) | +25.3% (+1.7 to +49.0) | shown, not judged |
-| host CPU busy (share of the run) | 0.172 | 0.161 | -6.3% (-32.7 to +20.1) | -0.6% (-4.3 to +3.2) | -7.5% (-11.9 to -3.2) | no difference beyond the noise (2 of 3 runs) |
-| host CPU-seconds | 210.4 | 193.9 | -7.8% (-39.2 to +23.5) | -0.9% (-5.8 to +4.1) | -9.1% (-13.7 to -4.5) | no difference beyond the noise (2 of 3 runs) |
-| host CPU-seconds per 1,000 operations inside the line | 0.119 | 0.109 | -7.9% (-39.3 to +23.5) | -0.7% (-5.3 to +4.0) | -6.6% (-14.4 to +1.1) | no difference beyond the noise (3 of 3 runs) |
-| cache size changes written (the knob's moves) | 0 | 1 | +1 (+1 to +1) | +4 (+4 to +4) | +2.67 (-0.202 to +5.54) | shown, not judged |
+| cache size held, mean (MB; the knob, the resource) | 512.0 | 327.9 | -35.9% (-36.4 to -35.5) | -28.0% (-45.1 to -10.8) | -36.1% (-36.4 to -35.7) | **confirmed better** |
+| bytes in the cache, mean (MB) | 412.9 | 265.7 | -35.6% (-37.3 to -34.0) | -28.0% (-45.1 to -10.8) | -36.2% (-36.3 to -36.0) | **confirmed better** |
+| pages read into the cache (misses) | 472,245 | 674,851 | +42.9% (+31.1 to +54.8) | +35.3% (+8.9 to +61.8) | +43.8% (+38.3 to +49.4) | shown, not judged |
+| host CPU busy (share of the run) | 0.268 | 0.275 | +2.6% (-10.4 to +15.6) | +1.3% (-2.4 to +4.9) | +2.1% (-37.3 to +41.5) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 325.7 | 336.8 | +3.4% (-16.0 to +22.9) | +0.9% (-4.3 to +6.0) | +2.0% (-45.4 to +49.4) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 operations inside the line | 0.186 | 0.194 | +4.4% (-11.8 to +20.6) | +0.9% (-2.8 to +4.6) | +2.0% (-45.2 to +49.3) | no difference beyond the noise (3 of 3 runs) |
+| cache size changes written (the knob's moves) | 0 | 3 | +3 (+3 to +3) | +2.33 (+0.899 to +3.77) | +3 (+3 to +3) | shown, not judged |
 
 The cache size handed back to the operator's and read back at the end of every omni arm in every run: yes.
 
-**Across 4 untouched workloads: 6 gauge-rows confirmed better, 1 confirmed worse, 0 where the runs disagree.**
+**Across 4 untouched workloads: 8 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree.**
 
 ---
 

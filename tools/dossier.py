@@ -232,8 +232,12 @@ def main():
             r = m.get(k)
             return "not taken" if r is None else cell(r)
         L.append(f"| `{wl}` | {c2('work_inside_line_tps')} | {c2('p95_ms')} | {c2('servers_alive_mean')} | {c2('cpu_seconds')} |")
-    L += ["", "The compass holds fewer connections open for the same work and the same latency, and it costs CPU on the host to do "
-          "so; that cost is confirmed worse and counted against Omni in the index. Table: `results/live/V3_PGBENCH.md`.", ""]
+    L += ["", "The compass takes connections back only while the pooler's clients wait for one under 1% of the time and gives them back "
+          "the moment anyone waits (amendment 2 of `docs/POSTGRES_PREREGISTRATION.md`, 8 October: the first counted set's CPU cost was measured "
+          "and traced to the harness's own psql launches, not to the pooler, and its first table is kept whole in `docs/history/V3_PGBENCH_set1.md`). "
+          "Where it reads a saving it is connections held open for the same work with the host's CPU inside the noise; where the add rule "
+          "buys connections above the operator's setting on a slow write workload, that reads worse and is counted against Omni in the "
+          "index. Table: `results/live/V3_PGBENCH.md`.", ""]
 
     # ------------------------------------------------------------------ 3b, 3c. Real messaging and the real cache on v3 (each when its table has landed)
     WORKLOAD_SECTIONS = (
@@ -279,9 +283,11 @@ def main():
          "not counted.",
          "| Workload | Work inside the line | p95 | Buffer pool held, MB (the resource held) | Pages read from disk | Host CPU-seconds |",
          ("work_inside_line_tps", "p95_ms", "pool_mb_mean", "disk_reads", "cpu_seconds"),
-         "The second counted set, on the amended plug: the pool held −67% on burst and −50% to −56% on read_only, confirmed better, with "
-         "work, latency and CPU inside the noise; on read_write the compass bought pool for a written working set and the pages held read "
-         "+53% to +70%, confirmed worse, counted against Omni in the index; the pool handed back on all 45 omni arms. The first counted set "
+         "The third counted set, on amendment 2 (the pool grows only while it is missing): the pool held −49% to −56% on burst, confirmed better, "
+         "with work, latency and CPU inside the noise; on read_write the pages held read +44% to +52%, confirmed worse, with the host's CPU −4% to "
+         "−6%, confirmed better, a trade counted both ways in the index; read_only inside the noise and update_index disagreeing; the pool handed "
+         "back on all 45 omni arms. The second counted set (the pool −67% on burst and −50% to −56% on read_only, read_write's pages held +53% to "
+         "+70% worse) is kept whole in `docs/history/V3_SYSBENCH_set2.md`; the first counted set "
          "(every row inside the noise; 15 of 45 arms not handed back because the plug's restore was issued while the server was still "
          "withdrawing the blocks of a shrink, which MySQL ignores; the plug fixed and the fix declared) is kept whole in "
          "`docs/history/V3_SYSBENCH_set1.md`. The update_index work-inside-the-line row counts almost nothing in either arm (a single "

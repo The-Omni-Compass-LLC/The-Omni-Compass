@@ -240,6 +240,27 @@ paired repetitions each, 20 s a notch. The harness refuses to run if the server 
 cache, so a server that lacked the figure would stop the run rather than run native in Omni's name. Nothing above this line
 changed after the dispatch.
 
+## The second counted set (runs A2, B2 and C2 of 2026-10-08/09, on amendment 1): the result
+
+Runs 37858512907, 37858515717 and 37858519010, commit `310cf318`, Omni v3, five workloads, three paired repetitions each; the
+table by rule is `results/live/V3_YCSB.md`, and the first set's table is kept whole in `docs/history/V3_YCSB_set1.md`.
+
+**The cache given back is smaller, and it is real.** Cache size held: **b −28% to −36%, burst −21% to −26%, c −24% in all three
+runs, f −28% to −36%, all confirmed better**, and the bytes in the cache the same. The cache settled between 330 and 405 MB,
+where the gate found the working set, instead of the first set's floor of 256 MB; the knob moved two or three times an arm
+instead of four or five. **The cost is gone:** the mean latency reads inside the noise on all four workloads (burst +1.4%,
++1.1%, −8.2%, where the first set read +2% to +4% confirmed worse; c +2.3%, +2.3%, +1.1% with one run across zero); work
+inside the 1 ms line, p95, p99 and host CPU inside the noise on all four; no operation failed; pages read into the cache
++12% to +44% (shown, not judged: the misses a smaller cache costs, served from the page cache); every cache handed back and
+read back. **8 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree.** The tuning workload, shown and
+not counted, read the same way (the cache −20% to −24%, confirmed; everything else inside the noise).
+
+**Read.** The expectation written before the runs, that the memory rows might fall to the noise, did not come true: a quarter
+to a third of the cache is given back without a measurable cost, where the first set gave half back with one. The category
+enters the index at **+8.5%** (the first set's +10.2% included the floor-pinned artefact). Said in the founder's words: a yes
+on all four workloads, no cost. The disclosure made before the first run still bounds the claim: on this machine a miss is a
+memory read, and the same knob on a disk-bound store is not answered here.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
