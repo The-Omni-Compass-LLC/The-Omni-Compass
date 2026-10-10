@@ -23,6 +23,18 @@
   counted runs keep the resource objective and are untouched by it. The manual (10.10; PDF rebuilt), the integration manual, the
   harness page, the documents index, the register (row 18), the proof program (row 6), the state of play and the wiring page's
   knob table carry it. No run yet: it waits for a machine.
+- **The coverage map, the founder's second check the same night** (`docs/COVERAGE_MAP.md`; register rows 58 to 73 and the
+  exclusions paragraph of section 4; proof program rows 50 to 62): every domain in the world of controllers walked against the
+  register and the 59 muscle families, each read as done or running, queued, model only (with the nearest candidate named and why
+  nothing open exists yet) or excluded by rule; the abbreviations the founder asked about (AKS, CPU, UPS, GPU, AWS, EKS, GKE, HPA,
+  KEDA, KWOK, RAPL, RAN, FHIR, FIX, ROS, AMoD, EV, HVAC, PLC, CDN, ATM) each given its place. Added: self-driving stacks (Autoware on
+  CARLA, openpilot), the EV powertrain (FASTSim), mobility fleets (AMoDeus), stream processing (Flink's autoscaler), storage clusters
+  (Ceph), AI batch admission (Kueue, Volcano), games (Godot, candidate), thermal plants (the open Modelica libraries, candidate; nuclear
+  stands as the model only because no open plant benchmark ships a controller), fabs (candidate), surgical robot servos (candidate),
+  the other Kubernetes scalers (Karpenter-class, the Cluster Autoscaler, KEDA, VPA, which the proof program had and the register did
+  not), distributed SQL, the other brokers, CDN caches, air traffic management (BlueSky), observability pipelines. Written as rules:
+  safety reserves, clinical dosing controllers, trading decisions, weapons, a person's command and solvers without a controller are
+  never a knob.
 - **The founder's sweep: nothing with value left out** (register rows 39 to 57; proof program section 3.5): operating systems (the
   Linux kernel's scheduler, network and memory knobs; Windows processor power management on the founder's own laptop), television
   and streaming (adaptive bitrate), telecom (a software 5G cell), web platforms and social media (the serving layer; the LDBC Social

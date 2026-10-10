@@ -227,7 +227,13 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
    television and telecom, satellites and signals, energy, oil and minerals, finance, the platforms and social media, science and
    physics, robotics to the top) added rows 39 to 57 to the register's queue and section 3.5 to the proof program, each an open
    benchmark with a shipped controller for native and one knob for Omni, each to be preregistered before its first run; aerospace
-   and rockets were already rows 32 to 36.
+   and rockets were already rows 32 to 36. **The second check the same night** (cars, self-driving, batteries, nuclear, power plants,
+   medicine, surgery named) is written as `docs/COVERAGE_MAP.md`: every domain in the world of controllers against the register,
+   with the abbreviations (AKS, CPU, UPS, GPU, AWS and the rest) each given its place; it added rows 58 to 73 (self-driving stacks,
+   the EV powertrain, mobility fleets, stream processing, storage clusters, AI batch admission, games, thermal plants with nuclear as
+   the model only, fabs, surgical robot servos, the other Kubernetes scalers, distributed SQL, the other brokers, CDN caches, air
+   traffic, observability pipelines) and wrote the exclusions by rule: safety reserves, clinical dosing, trading decisions, weapons, a
+   person's command, solvers without a controller.
 9. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
    fingerprints go to `docs/history` as the road to it.
 
