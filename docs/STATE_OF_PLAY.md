@@ -209,7 +209,16 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 7. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
    Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,
    RocketPy, Cantera (Kafka and Redis done); one or two at a time, each preregistered.
-7. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
+8. **The gaps the tree shows (the founder's reading, 10 October).** The index's six real categories are the cluster, PostgreSQL,
+   Kafka, Redis, MongoDB and MySQL; Azure waits on its three-run close (item 1) and the card on its run on the current controller
+   (item 3); the power grids and the districts are in as simulations, never in the index by rule. Not yet a category: **a second
+   and a third cloud**, AWS and Google Cloud under Azure's method (`docs/REGISTER.md` row 38; each needs its own account credential
+   in a GitHub secret and an allowance of about 90 cores, about $12 a steady and $22 a burst run, nothing spent until the account
+   exists); **CPU power through Linux's own governor with the RAPL meter** (row 18; a machine where both are writable, the founder's
+   own tower or a rented bare-metal server, since GitHub's runners and cloud machines allow neither; about a day to build on the
+   paired-run machinery); **the card's energy meter**, which the card harness already has (the integral of the device's power draw,
+   the CPU package by RAPL, the wall plug where fitted, `tools/gpu_reps.py`) and which reads on the founder's run.
+9. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
    fingerprints go to `docs/history` as the road to it.
 
 ## Where things are
