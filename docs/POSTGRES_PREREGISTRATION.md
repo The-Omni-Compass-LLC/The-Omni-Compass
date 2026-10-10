@@ -119,6 +119,18 @@ against 3.9 ms, inside the line)** because the pool had been given back to two o
 take-back at light load, stated here in advance. One repetition proves nothing; the counted runs will show whatever they
 show, that row included.
 
+## Amendment 4 (2026-10-10 13:05 UTC, after the first counted set on amendment 3, before the next): a spend trial runs to its samples
+
+The first counted set on the brain's verdict (runs 38013313943, 38013319893, 38013324861; the table `results/live/V3_PGBENCH.md`) landed at midday on 10 October. What it showed about the trials: the trials were judged on this stack (10 to 28 trials an arm, 3 to 7 allowed, 2 to 4 refused, few abandoned), the pool was given back on `select` (connections held open −6% to −11%, confirmed better) and the add above the operator's 20 on `simple_update` was refused as expected, with every other gauge inside the noise.
+
+**The cause is ours.** Amendment 3 ended a trial when the service swung to the other direction's condition: a give-back trial when the service left calm (the engine's own rule, kept), and a spend trial when the service turned calm. A spend that works calms the service within seconds, so a spend trial could never reach its samples: every successful spend ended its own trial unjudged. Nothing in the stack and nothing in the engine did this; the engine's verdict ends a trial when the condition it is given ends, and we gave it the wrong condition for spending. Found on the first set, corrected before the second, declared here.
+
+**From this amendment** (`tools/knob_verdict.py`, the harness outside the engine; Omni v3 unchanged): a spend trial, once started, runs to its samples whatever the compass's force; only the wall (a fail-up) or the engine's own time limit on a trial ends it early. A give-back trial still ends when the service leaves calm. The conditions to start a trial, the cost, the judge, the allowance and the recheck are unchanged.
+
+**Expected before the runs:** little change: the trials were already judged here; a spend trial that the queue line starts now runs to its samples instead of ending when the queue clears, so a server added while clients waited is judged on what it bought. The first set's table stands as the result of amendment 3 until the set on this amendment lands and supersedes it; it then goes whole to `docs/history`.
+
+**Dispatch.** None yet at the time of writing; the runs are dispatched when this amendment is pushed, and their ids are recorded in `docs/RERUN_2026-10-10.md`.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

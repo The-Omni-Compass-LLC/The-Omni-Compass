@@ -7,9 +7,9 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 
 | Run | GitHub run | Commit | Engine | Grids in the run |
 |---|---|---|---|---:|
-| A | 37568375564 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 11 |
-| B | 37568393269 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 11 |
-| C | 37568411160 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 11 |
+| A | 38013399224 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 11 |
+| B | 38013404663 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 11 |
+| C | 38013410574 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 11 |
 
 ## ZIP loads (40% Z, 30% I, 30% P)
 

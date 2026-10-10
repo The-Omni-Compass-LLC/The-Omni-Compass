@@ -1,4 +1,4 @@
-# All four in one run: more work, faster, fewer machines, less energy (load rising 1 to 8 and back): the A/B/C confirmation (Omni v3)
+# All four in one run: more work, faster, fewer machines, less energy (load rising 1 to 8 and back): the A/B/C confirmation (Omni v3): the A/B/C confirmation (Omni v3)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
 
@@ -7,38 +7,38 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 
 | Run | GitHub run | Commit | Engine | Paired repetitions |
 |---|---|---|---|---:|
-| A | 37568440904 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 10 |
-| B | 37578875988 | `3edcfb68a6c6` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 10 |
-| C | 37583092384 | `03cef9868c3e` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 10 |
+| A | 38013221512 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 10 |
+| B | 38013226173 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 10 |
+| C | 38013230522 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 10 |
 
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
-| work inside the response line (requests a second; the capacity test's own gauge, higher is better) | +48.6% (+38.7 to +58.4) | +43.8% (+32.2 to +55.3) | +34.9% (+26.1 to +43.7) | **confirmed better** |
-| worker nodes in service, mean | -1.8% (-5.1 to +1.6) | -1.7% (-5.0 to +1.6) | -2.5% (-5.8 to +0.8) | no difference beyond the noise (all three runs) |
-| node-hours | -1.7% (-5.0 to +1.7) | -1.8% (-5.0 to +1.4) | -2.4% (-5.7 to +0.8) | no difference beyond the noise (all three runs) |
-| energy, parked workers still on at idle power (Wh, declared model) | -0.3% (-0.5 to -0.1) | -0.3% (-0.5 to -0.0) | -0.0% (-0.3 to +0.2) | no difference beyond the noise in 1 of 3 runs |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | -1.4% (-3.7 to +0.9) | -1.4% (-3.4 to +0.6) | -1.7% (-3.9 to +0.5) | no difference beyond the noise (all three runs) |
-| response time (ms), mean | -46.1% (-58.3 to -34.0) | -45.4% (-57.3 to -33.6) | -45.2% (-63.1 to -27.3) | **confirmed better** |
-| response time (ms), 95th percentile | -61.6% (-74.8 to -48.4) | -61.1% (-76.6 to -45.5) | -65.8% (-94.6 to -37.0) | **confirmed better** |
-| response time (ms), 99th percentile | -40.0% (-71.8 to -8.2) | -40.1% (-60.3 to -20.0) | -32.1% (-79.6 to +15.4) | no difference beyond the noise in 1 of 3 runs |
-| time over the response line (% of samples) | -45.5% (-61.0 to -30.0) | -39.1% (-52.7 to -25.4) | -41.3% (-64.4 to -18.2) | **confirmed better** |
-| failed requests (%) | -13.8% (-23.0 to -4.7) | -12.1% (-19.5 to -4.7) | -10.8% (-21.0 to -0.6) | **confirmed better** |
+| work inside the response line (requests a second; the capacity test's own gauge, higher is better) | +53.6% (+35.5 to +71.6) | +55.6% (+36.8 to +74.3) | +67.9% (+53.4 to +82.4) | **confirmed better** |
+| worker nodes in service, mean | -0.2% (-0.8 to +0.3) | -0.2% (-0.7 to +0.3) | -0.4% (-1.0 to +0.2) | no difference beyond the noise (all three runs) |
+| node-hours | -0.3% (-0.9 to +0.3) | -0.2% (-0.7 to +0.2) | -0.3% (-1.0 to +0.5) | no difference beyond the noise (all three runs) |
+| energy, parked workers still on at idle power (Wh, declared model) | -0.3% (-0.4 to -0.2) | -0.3% (-0.5 to -0.1) | -0.1% (-0.4 to +0.1) | no difference beyond the noise in 1 of 3 runs |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | -0.5% (-0.9 to -0.1) | -0.4% (-0.6 to -0.2) | -0.4% (-1.0 to +0.2) | no difference beyond the noise in 1 of 3 runs |
+| response time (ms), mean | -48.4% (-58.2 to -38.5) | -43.0% (-52.8 to -33.2) | -47.0% (-55.3 to -38.7) | **confirmed better** |
+| response time (ms), 95th percentile | -61.9% (-75.7 to -48.0) | -57.4% (-71.2 to -43.6) | -62.5% (-74.2 to -50.7) | **confirmed better** |
+| response time (ms), 99th percentile | -48.3% (-69.3 to -27.3) | -33.1% (-56.6 to -9.5) | -40.0% (-80.1 to +0.1) | no difference beyond the noise in 1 of 3 runs |
+| time over the response line (% of samples) | -38.1% (-47.4 to -28.7) | -38.6% (-48.3 to -29.0) | -40.6% (-50.4 to -30.9) | **confirmed better** |
+| failed requests (%) | -13.6% (-19.1 to -8.0) | -13.8% (-19.2 to -8.4) | -11.0% (-16.8 to -5.1) | **confirmed better** |
 | pods with no machine to take them (unschedulable) | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
 | time pods had no machine to take them, pod-minutes | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | +10.9% (-44.4 to +66.3) | -6.5% (-56.4 to +43.4) | -3.2% (-58.5 to +52.2) | shown, not judged |
-| utilisation (used / allocatable) | -1.9% (-3.4 to -0.3) | -0.7% (-3.0 to +1.6) | +0.3% (-2.0 to +2.6) | shown, not judged |
-| CPU used (cores), mean | -3.0% (-4.1 to -1.9) | -1.8% (-2.4 to -1.1) | -1.7% (-3.2 to -0.1) | shown, not judged |
-| Omni's own CPU (cores), mean | +0.00885 (+0.00754 to +0.01016) | +0.00909 (+0.007768 to +0.01041) | +0.00796 (+0.006568 to +0.009352) | shown, not judged |
-| CPU used with Omni's own (cores), mean | -2.6% (-3.8 to -1.5) | -1.4% (-2.1 to -0.7) | -1.3% (-2.9 to +0.2) | shown, not judged |
-| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | +2.1% (-0.1 to +4.4) | -0.1% (-3.5 to +3.3) | -0.4% (-2.7 to +1.9) | shown, not judged |
-| HPA replicas, mean | -2.5% (-3.3 to -1.6) | -1.2% (-3.2 to +0.7) | -3.5% (-7.5 to +0.5) | no difference beyond the noise in 2 of 3 runs |
-| pods started | +8.3% (-10.5 to +27.2) | -17.4% (-36.5 to +1.7) | -1.9% (-17.7 to +14.0) | no difference beyond the noise (all three runs) |
-| pod start wait, total (s) | +6.0% (-28.7 to +40.7) | -31.0% (-65.8 to +3.9) | +7.7% (-28.8 to +44.3) | no difference beyond the noise (all three runs) |
-| pod start wait, mean (s) | +1.9% (-29.9 to +33.7) | -19.1% (-47.5 to +9.3) | +6.3% (-23.2 to +35.9) | no difference beyond the noise (all three runs) |
-| host CPU busy, the real machine under kind (%) | -2.5% (-3.6 to -1.3) | -1.1% (-1.6 to -0.7) | -1.2% (-2.7 to +0.2) | shown, not judged |
+| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | -10.1% (-106.5 to +86.3) | -5.9% (-48.2 to +36.5) | +20.2% (-56.4 to +96.9) | shown, not judged |
+| utilisation (used / allocatable) | -1.8% (-2.2 to -1.3) | -1.8% (-2.9 to -0.7) | -1.8% (-2.6 to -1.0) | shown, not judged |
+| CPU used (cores), mean | -1.9% (-2.3 to -1.6) | -1.9% (-2.7 to -1.1) | -2.1% (-2.8 to -1.5) | shown, not judged |
+| Omni's own CPU (cores), mean | +0.00931 (+0.00826 to +0.01036) | +0.009211 (+0.008043 to +0.01038) | +0.00906 (+0.008085 to +0.01004) | shown, not judged |
+| CPU used with Omni's own (cores), mean | -1.6% (-1.9 to -1.2) | -1.5% (-2.4 to -0.7) | -1.8% (-2.5 to -1.1) | shown, not judged |
+| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | +1.7% (+1.2 to +2.1) | +1.0% (-0.7 to +2.8) | +2.2% (+0.4 to +3.9) | shown, not judged |
+| HPA replicas, mean | -0.0% (-1.4 to +1.4) | -0.9% (-2.7 to +0.9) | -0.9% (-2.7 to +0.9) | no difference beyond the noise (all three runs) |
+| pods started | -21.3% (-45.1 to +2.5) | -13.0% (-32.7 to +6.6) | -12.0% (-27.4 to +3.4) | no difference beyond the noise (all three runs) |
+| pod start wait, total (s) | -29.8% (-88.0 to +28.4) | -21.8% (-64.2 to +20.6) | -11.2% (-49.3 to +26.9) | no difference beyond the noise (all three runs) |
+| pod start wait, mean (s) | -17.9% (-62.3 to +26.5) | -15.7% (-51.0 to +19.5) | -5.1% (-34.1 to +23.8) | no difference beyond the noise (all three runs) |
+| host CPU busy, the real machine under kind (%) | -1.4% (-1.6 to -1.1) | -1.2% (-2.0 to -0.4) | -1.8% (-2.4 to -1.2) | shown, not judged |
 | host cores (the real machine under kind) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | shown, not judged |
 
-Readings: 5 confirmed better, 6 no difference beyond the noise (all three runs), 2 no difference beyond the noise in 1 of 3 runs, 1 no difference beyond the noise in 2 of 3 runs, 2 same, 8 shown, not judged.
+Readings: 5 confirmed better, 6 no difference beyond the noise (all three runs), 3 no difference beyond the noise in 1 of 3 runs, 2 same, 8 shown, not judged.
 
 ---
 

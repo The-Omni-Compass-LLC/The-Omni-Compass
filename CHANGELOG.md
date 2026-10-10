@@ -8,6 +8,21 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-10
+- **Every table remade from the rerun of 10 October** (69 of the 71 runs landed by 12:30 UTC; `docs/RERUN_2026-10-10.md`,
+  "what landed"): the seven Kubernetes tests, the two robustness scenarios, the five stacks under both objectives (two new
+  tables for the service objective, `results/live/V3_REDIS_SERVICE.md` and `results/live/V3_KAFKA_SERVICE.md`), the four
+  simulators and the six organisms with the cluster inside were read from the archived runs by their table tools; the grid's
+  receipts at 1, 10 and 100 copies were replaced (the 1,000-copy run's one cut-off shard runs again); the index, the wiring page,
+  the benefit sheet and the dossier were regenerated; 19 superseded tables and 3 receipts went whole to `docs/history`. The index
+  reads **+4.8%** (service reading +10.7%): Kubernetes +28.9%, PostgreSQL +0.8%, Kafka +0.1%, Redis nothing, MongoDB +0.7%, MySQL
+  +1.0%. The five stacks ran for the first time with the brain's own verdict on the knob: PostgreSQL, MySQL and MongoDB gave memory
+  back where it paid and lost nothing; **Kafka and Redis read nothing because every spend trial on Kafka and most on Redis were
+  abandoned before they were judged**: the rule of 9 October ended a spend trial when the service turned calm, and a spend that
+  works calms the service within seconds. **Amendment 3** (Redis, Kafka, MongoDB) and **amendment 4** (PostgreSQL, MySQL):
+  `tools/knob_verdict.py` lets a spend trial run to its samples, only the wall or the engine's own time limit ending it early; a
+  give-back trial still ends when the service leaves calm; `tests/test_knob_verdict.py` holds both rules; the five stacks run again
+  on it and that set becomes the result of record. The state of play, the README, the engine page, the register, the manual and
+  the history index carry the new numbers; the earlier numbers stay in the history pages and in the dated paragraphs.
 - **The Linux kernel benchmark, built and preregistered** (`docs/CPU_POWER_PREREGISTRATION.md`; `tools/run_cpu_power.py`,
   `tools/cpu_power_abc.py`, `scripts/cpu_power_run.sh`, `.github/workflows/cpu-power.yml`, `tests/test_run_cpu_power.py`, run by
   `verify.py`), at the founder's order that the kernel's own knobs be benchmarked: the kernel's frequency governor as shipped is

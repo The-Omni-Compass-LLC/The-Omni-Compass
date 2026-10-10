@@ -14,59 +14,56 @@ benchmark with a result was dispatched again on the current commit `3aac0ab7` (O
 70 GitHub runs (the seven Kubernetes tests, the five live stacks on the brain's own verdict, the four simulators, the realms table
 and the kill and long robustness scenarios, three runs each; the six organisms with the real cluster inside; the modelled grid at
 1, 10, 100 and 1,000 copies) and the two big organisms at 1,000 copies on rented Azure machines, plus one replacement run for a Kafka
-job GitHub's runner cut off (the record says which and why). Every table on this page stands
-until its new set lands; the new set is then the result and the old table goes whole to `docs/history`. The record, run by run
+job GitHub's runner cut off (the record says which and why). By 12:30 UTC 69 of the 71 had landed and every
+table on this page was remade from them; the tables they supersede are whole in `docs/history`. The one shard the runner's
+six-hour limit cut off (the tower at 1,000 copies in the modelled grid) runs again, and that row reads the earlier run until it lands. The record, run by run
 with inputs, times and ids, is `docs/RERUN_2026-10-10.md`. Not restarted, and why: the three 24-hour robustness machines (started
 8 October on the same harness, byte for byte, ending about 10:15 UTC today) and the Azure fleet that can show one machine, which
 waits on the family allowance those machines hold.
 
 
-## In one paragraph (2026-10-07, Omni v3)
+## In one paragraph (2026-10-10, Omni v3, every table remade)
 
 **The engine is Omni v3, frozen and fingerprinted** (`OMNI_V3.json`, `docs/OMNI_V3.md`: v1's law and controllers byte
 for byte, 945 muscles in 59 families, a do-no-harm gate on speed knobs). Every benchmark runs three times as separate
 GitHub runs on it (A the result, B and C the replications) and every judged row reads confirmed better, confirmed worse,
-no difference beyond the noise, or the runs disagree (`docs/OMNI_V1.md`, the rule). **Real Kubernetes, six tests, ten
-pairs each, all six confirmed on v3** (`results/live/V3_*.md`): work inside the response line **+35% to +49%** in all
-three runs of the all-four test (21.0 → 31.2 requests a second in run A); the 95th percentile **−47% to −66%** in every
-run of the steady, wandering, all-four and fault tests; failed requests −9% to −14% where load swings; machines −1.5% to
-−2.9% at steady load and −19% to −23% on the batch queue, with the standby-model energy −13% to −16% there; beside a
-noisy neighbour no difference beyond the noise on every row. **A real database** (PostgreSQL behind PgBouncer,
-`results/live/V3_PGBENCH.md`, the second counted set): 36% to 38% fewer connections held open for the same work and latency
-on the read-only workload, host CPU and median latency inside the noise on all three workloads (the first set's CPU cost was
-measured and found to be our own harness, and is gone); on the slow write workload the add rule bought connections above
-the operator's setting, confirmed worse, nothing bought; the runs disagree on the third. **Real messaging** (Apache
-Kafka as shipped, `results/live/V3_KAFKA.md`): on all three untouched workloads work inside the 500 ms line **+16% to
-+21%**, the 95th percentile 1.6 s → 9 to 14 ms and messages waiting −92% to −97%, confirmed better, no message lost;
-consumers held 2 → 6 to 8, **confirmed worse**, the resource the gain costs; host CPU worse on one workload, inside the
-noise on two. **A real cache** (Redis as shipped, `results/live/V3_REDIS.md`): on all three untouched workloads work inside
-the 2 ms line **+14% to +27%**, the hit rate +14% to +27% and the mean latency −30% to −61%, confirmed better; the memory
-ceiling held 64 → 200 to 270 MB, **confirmed worse**, the resource the gain costs; host CPU inside the noise. **A real
-database's storage-engine cache** (MongoDB as its publisher ships it under YCSB, `results/live/V3_YCSB.md`): on four
-untouched workloads the cache size held fell **−21% to −36%, confirmed better** on all four (the second counted set of 9
-October, on the miss-share gate; the first set's larger saving was a cold cache emptied before its first eviction, kept in
-the history), settling where the gate finds the working set; work inside the 1 ms line, p95, mean latency and host CPU
-inside the noise on all four; no failed operation; 8 rows better, 0 worse. **A public day of demand on the real cluster** (the Google cluster trace of 2011, its first day of job submissions turned
-into the wandering test's schedule by a rule written before the runs, `results/live/V3_TRACE_GOOGLE2011.md`): p95 **−65% to
-−71%**, time over the line −81% to −84%, failed requests −8% to −17%, **machines in service −6% to −10%**, confirmed better in
-three runs of ten pairs; pods started +23% to +35% as point estimates, inside the noise in one run; 9 rows better, 0 worse. **A real database's buffer pool** (MySQL as Ubuntu ships it under sysbench, `results/live/V3_SYSBENCH.md`): on the four
-untouched workloads (the third counted set of 9 October, on the rule that grows the pool only while it is missing) the pool
-held fell **−49% to −56% on burst, confirmed better**; on read_write the pages the pool holds rose **+44% to +52%, confirmed
-worse** (memory bought on real misses for a written working set) with the host's CPU **−4% to −6%, confirmed better**, a
-trade; read_only inside the noise (the second set's −50% to −56% there was in part the first chunk given back before any
-read, now refused) and update_index disagreeing; work inside the line, p95, p99 inside the noise everywhere; no error; the
-pool handed back on all 45 omni arms; the second set is kept whole in `docs/history/V3_SYSBENCH_set2.md`. The first counted set
-(every row inside the noise, 15 arms not handed back because the plug's restore met the server's unfinished shrink) is kept
-whole in `docs/history/V3_SYSBENCH_set1.md`, the plug fixed and the fix declared in `docs/MYSQL_PREREGISTRATION.md`. **The
-Omni index, real machines only, confirmed three times: +20.5%** (`results/OMNI_INDEX.md`; Kubernetes +28.8% over seven tests, the database
-+4.0%, Kafka +166.9%, Redis −24.9%, the database's cache +8.5%, the database's buffer pool +5.2%, each category weighed the same; a row inside the noise counts as exactly 1; the three database categories read their second or third counted sets of 9 October, on which the harness costs of the first sets were removed and the gains came down to what is real; a second reading, declared 9 October at the founder's question about what a cache is for, scores service alone (work and speed, resources shown and not scored) and stands at **+71.8%** beside the +20.5%, Redis +8.8%, Kafka +1,193%, Kubernetes +83%, the database stacks nothing, both readings in the index file and the first the headline; Kafka's speed ratio
-is large because native's queue grew at nine tenths of its capacity and Omni's did not; Redis's category is negative
-because the memory it holds for a wide working set is the resource it trades and reads worse by rule; MongoDB's is
-positive because there the governor gave memory back). The v1 tables read the same and stay as the first engine's record.
+no difference beyond the noise, or the runs disagree (`docs/OMNI_V1.md`, the rule). On 10 October every benchmark was run
+again on one commit (`3aac0ab7`) and every table below was remade from the new runs; the tables they supersede are whole in
+`docs/history`. **Real Kubernetes, seven tests, ten pairs each, all seven confirmed again on v3** (`results/live/V3_*.md`):
+work inside the response line **+54% to +68%** in all three runs of the all-four test; the 95th percentile **−57% to −66%**
+in every run of the steady, wandering, all-four and fault tests; failed requests −11% to −18% where load swings and under
+faults; machines −1.7% to −2.0% at steady load and −16% to −20% on the batch queue (−26% to −33% after the queue finished),
+with the standby-model energy −11% to −14% there; under the Google trace of 2011 machines −7% to −9% and p95 −64% to −67%;
+beside a noisy neighbour no difference beyond the noise on every row. **The five live stacks ran for the first time with the
+brain's own verdict on the knob** (the amendments of 9 October: every knob starts in watch and is written only inside the
+allowance a paired trial on the stack itself has earned under the index's own reading). What they read. **PostgreSQL**
+(`results/live/V3_PGBENCH.md`): connections held open **−6% to −11% on `select`, confirmed better**; the add above the
+operator's 20 on `simple_update` refused, as expected; everything else inside the noise; no loss anywhere. **MySQL**
+(`results/live/V3_SYSBENCH.md`): the pool held **−10% to −20% on `read_write`, confirmed better**, the pages holding data
+with it; the earlier set's memory bought for the written working set is gone; the other three workloads inside the noise.
+**MongoDB** (`results/live/V3_YCSB.md`): the cache held **−3% to −13% on `f`, confirmed better**; the other three inside the
+noise; nothing worse. **Kafka** (`results/live/V3_KAFKA.md`) and **Redis** (`results/live/V3_REDIS.md`) read exactly nothing:
+no gain and no loss, every gauge inside the noise under both objectives, because every spend trial on Kafka (36 of 36 arms)
+and most on Redis were abandoned before they could be judged. **That is our wiring, found on the first set and amended the
+same day** (amendment 3 in all five preregistrations): the rule of 9 October ended a spend trial when the service turned
+calm, and a spend that works calms the service within seconds, so no spend could ever be judged; from amendment 3 a spend
+trial runs to its samples, and the five stacks run again on it, those runs becoming the result of record when they land.
+**The Omni index on the tables as they stand: +4.8%** (`results/OMNI_INDEX.md`: Kubernetes +28.9% over seven tests,
+PostgreSQL +0.8%, Kafka +0.1%, Redis exactly nothing, MongoDB +0.7%, MySQL +1.0%, each category weighed the same); the
+service reading **+10.7%** (Kubernetes +84.5%, the five stacks nothing). The number is down from +20.5% because the brain
+refused, or could not yet judge, the spends that bought the earlier gains at a resource cost: every gain left is one the
+brain proved on the stack itself, and no row anywhere is a loss. **Robustness**: the governor killed outright, every setting
+handed back within the allowance in every repetition of every run, the whole window's p95 −27% to −48%; the long run, no
+leak, every decision valid, no slowing, the service inside the noise in two of three runs. **The six organisms with the real
+cluster inside**: the cluster's p95 lower in all 12 cells (−1% to −52%), failed requests lower in 11. **The realms**: the
+published table reproduced in 3 of 3. **The simulators** read as their earlier sets (they are deterministic): power grids 67
+gauge-rows better and 14 worse, the districts 71 better, 33 worse and 2 where the runs differ, the robot arms 7 better with
+Gen3 moved and UR5e and iiwa left native, the drone swarms 9 better and 0 worse. The v1 tables stay as the first engine's record.
 
 **What is shown and what is not.** Shown: more work inside the response line on the same machines and a faster tail,
-on real Kubernetes, three times on a frozen engine; a real database holding fewer connections for the same service; a
-real message queue kept short at the cost of more consumers running.
+on real Kubernetes, three times on a frozen engine, and again on 10 October; a real database, a buffer pool and a
+storage-engine cache each giving memory back for the same service, every notch proved on the stack first; a message queue
+and a cache on which the brain's first set could not yet judge a spend (amendment 3, the next set running).
 Not yet shown: an energy or cloud-bill saving on real machines. Energy on kind is a declared model (the machines are
 containers on one runner); Azure's bill on a 4-worker fleet read no difference beyond the noise on every gauge
 (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`), which is a fleet too small to show one machine; the fleet of 40
@@ -76,21 +73,19 @@ not run on the current governor; every earlier card result is obsolete and is ru
 
 **Wire in, or watch (9 October).** The founder's order: Omni need not be wired into every muscle; where it cannot beat
 native, the muscle stays native and Omni only reads it. `docs/WIRING_VERDICTS.md` (`tools/wiring_verdicts.py`, checked by
-`verify.py` against every table it reads) gives every knob in every result one of three words. Real stacks: 12 of 24
-knob-cases **write** (six of the seven Kubernetes demands, PostgreSQL's read-only workload, MongoDB's four workloads, MySQL's
-burst); 7 are **the operator's choice** (Kafka's three workloads, where consumers buy a hundredfold shorter queue and both
-readings of the index say the trade pays; Redis's three, where memory buys the hit rate and only the service reading says it
-pays; MySQL's read_write, pages for CPU); 5 **watch** (Kubernetes beside a noisy neighbour, PostgreSQL's simple_update, where
-connections were bought above the operator's setting and nothing bought for them, and tpcb_hot, where the runs disagree;
-MySQL's read_only and update_index). Every confirmed loss on a real stack is a resource spent for the knob's own service,
-declared in advance or disclosed on the first counted set; none is a service loss. The simulators: 21 write, 15 trades (the
+`verify.py` against every table it reads) gives every knob in every result one of three words. Real stacks, on the sets of 10 October: 11 of 24
+knob-cases **write** (six of the seven Kubernetes demands, PostgreSQL's `select`, MySQL's `read_write`, MongoDB's `f`, and
+Kafka's `heavy` and `burst` on a fraction of a consumer); 0 are **the operator's choice**, because the brain's verdict took
+no spend the index would read as a trade; 13 **watch** (Kubernetes beside a noisy neighbour, PostgreSQL's `simple_update` and
+`tpcb_hot`, Kafka's `light`, Redis's three, MongoDB's `b`, `c` and `burst`, MySQL's `burst`, `read_only` and `update_index`:
+nothing confirmed either way). No real stack carries a confirmed loss on these sets. The simulators: 21 write, 15 trades (the
 four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill
 is worse), 3 watch (two robots the engine itself left native, one grid where nothing was bought). The 945 modelled muscles:
 124 write, 13 trades, 808 watch, 746 of them because the native controller kept the reading in band and the law never wrote;
-all 255 admission muscles are among the 746. The 14 organism cells with the real cluster inside all write on the cluster's
-gauges. The engine is unchanged; the page decides what an operator connects.
+all 255 admission muscles are among the 746. Of the 12 organism cells with the real cluster inside 12 write on the cluster's gauges
+(one with a replica cost beside its gains, one watching). The engine is unchanged; the page decides what an operator connects.
 
-**The brain's own verdict, live (built 9 October, running since 10 October).** The founder's order of the same evening: the verdict must
+**The brain's own verdict, live (built 9 October; the first set landed 10 October; the second set, on amendment 3, running).** The founder's order of 9 October: the verdict must
 be the brain's, in real time, on the knob, before it writes; a knob that cannot prove it pays stays native. `tools/knob_verdict.py`
 wraps the frozen engine's verdict (`omnicompass/verdict.py`, unchanged) around every live knob of the five database, messaging
 and cache harnesses: the knob starts in watch, a paired trial on the stack itself allows one notch at a time under the declared
@@ -100,7 +95,11 @@ expectation written before the runs: Redis left native under the resource object
 by step while each consumer pays, PostgreSQL's add above the operator's setting refused on simple_update, MySQL's read_write
 chunks refused, MongoDB's cache given back a notch a trial. The 21 runs (the five stacks under the resource objective; Redis and
 Kafka also under the service objective; three runs each) were dispatched on 10 October at 01:28 to 01:29 UTC on commit `3aac0ab7`
-(`docs/RERUN_2026-10-10.md`); the tables are read from them when they land. Where the brain's verdict stands today, knob by knob
+(`docs/RERUN_2026-10-10.md`) and landed by midday: PostgreSQL, MySQL and MongoDB gave memory back where it paid (connections −6% to −11% on `select`;
+the pool −10% to −20% on `read_write`; the cache −3% to −13% on `f`) and lost nothing; Kafka and Redis read nothing, because every
+spend trial on Kafka and most on Redis were abandoned before they were judged: the rule ended a spend trial when the service turned
+calm, and a spend that works calms the service within seconds. Amendment 3 (all five preregistrations, 13:05 UTC) lets a spend
+trial run to its samples; the five stacks run again on it, and the result of record is that set. Where the brain's verdict stands today, knob by knob
 (the five stacks both ways; the cluster's machines, the card's clock, the robots' speed and the drones' cruise by the engine's own
 verdict; the grids, the districts and the 945 modelled muscles by the law alone), is the last table of `docs/WIRING_VERDICTS.md`.
 Inside the modelled realms the organism still
@@ -111,21 +110,21 @@ takes one directive for every muscle; the verdict per muscle there is the next e
 
 | Test, ten pairs × three runs | Work | Speed (p95) | Machines | Energy (declared model) | Source |
 |---|---|---|---|---|---|
-| All four in one run | **+35% to +49%** | −61% to −66% | inside the noise | inside the noise | `results/live/V3_ALL_FOUR.md` |
-| Steady work in steps | equal by design | −65% to −66% | **−1.5% to −2.9%** | −1.3% to −2.1% | `results/live/V3_STEADY.md` |
-| Demand that wanders | failed requests −9% to −12% | −57% to −63% | inside the noise | inside the noise | `results/live/V3_WANDERING.md` |
-| A public day of demand: the Google cluster trace of 2011 replayed one step at a time (`docs/TRACES_PREREGISTRATION.md`) | failed requests **−8% to −17%**, confirmed better; no pod ever without a machine | **−65% to −71%** (p99 −49% to −61%) | **−6% to −10%, confirmed better** (replicas −5% to −6%) | standby model **−4% to −7%, confirmed better**; idle-power model inside the noise in one run | `results/live/V3_TRACE_GOOGLE2011.md` |
-| Faults: machine down, spike, runaway pod, blind probe | failed requests lower in all three, clear of the noise in one | −47% to −62% | inside the noise | inside the noise | `results/live/V3_FAULTS.md` |
-| A queue of batch jobs | queue finished no difference beyond the noise | mean response −10% to −14% | **−19% to −23%** (−29% to −35% after the queue) | **−13% to −16%** | `results/live/V3_BATCH.md` |
+| All four in one run | **+54% to +68%** | −57% to −63% | inside the noise | inside the noise | `results/live/V3_ALL_FOUR.md` |
+| Steady work in steps | equal by design | −64% to −66% | **−1.7% to −2.0%** | −1.3% to −1.8% | `results/live/V3_STEADY.md` |
+| Demand that wanders | failed requests −12% to −13% | −57% to −64% | inside the noise | idle-power model −0.1% to −0.4% | `results/live/V3_WANDERING.md` |
+| A public day of demand: the Google cluster trace of 2011 replayed one step at a time (`docs/TRACES_PREREGISTRATION.md`) | failed requests **−11% to −18%**, confirmed better; no pod ever without a machine | **−64% to −67%** (p99 −60% to −62%) | **−7% to −9%, confirmed better** (replicas −4% to −8%) | standby model **−5% to −7%, confirmed better**; idle-power model −0.3% to −0.4% | `results/live/V3_TRACE_GOOGLE2011.md` |
+| Faults: machine down, spike, runaway pod, blind probe | failed requests **−14% to −18%**, confirmed better | −58% to −63% | inside the noise | inside the noise | `results/live/V3_FAULTS.md` |
+| A queue of batch jobs | queue finished no difference beyond the noise | mean response −11% to −13% | **−16% to −20%** (−26% to −33% after the queue) | **−11% to −14%** | `results/live/V3_BATCH.md` |
 | Fairness, a noisy neighbour | inside the noise on every row | inside the noise | inside the noise | inside the noise | `results/live/V3_FAIRNESS.md` |
-| PostgreSQL behind PgBouncer, three workloads (the second counted set) | inside the noise | inside the noise (median and p95; the tails worse as point estimates on `select`, inside the noise by the rule) | connections held open **−36% to −38% on `select`, confirmed better**; the runs disagree on `tpcb_hot`; `simple_update` connections most at once **+72% to +80%, confirmed worse** | host CPU-seconds inside the noise on all three (the first set's +14% to +28% was our harness's own `psql` launches, measured and removed) | `results/live/V3_PGBENCH.md` |
-| Apache Kafka, a consumer group's size, three workloads | work inside the line **+16% to +21%**; no message lost | p95 **1.6 s → 9 to 14 ms**, lag −92% to −97% | consumers held **2 → 5.8 to 7.9, confirmed worse** | host CPU-seconds +10% to +20% confirmed worse on light, inside the noise on heavy and burst; CPU per message inside the line −10% to −12% on burst | `results/live/V3_KAFKA.md` |
-| Redis, a cache's memory ceiling, three workloads | work inside the line **+14% to +27%**, hit rate +14% to +27%; no failed request | mean latency −30% to −61%; p95 within a hair of native's (a miss is a miss in both arms) | memory ceiling held **64 → 200 to 270 MB, confirmed worse** | host CPU-seconds inside the noise on all three | `results/live/V3_REDIS.md` |
-| MongoDB under YCSB, a database's storage-engine cache size, four workloads (the second counted set) | inside the noise on all four; no failed operation | p95, p99 and mean latency inside the noise on all four (the first set's burst mean +2% to +4% worse is gone) | cache size held **−21% to −36% on all four, confirmed better**, settling at 330 to 405 MB where the gate finds the working set | host CPU-seconds inside the noise on all four | `results/live/V3_YCSB.md` |
-| MySQL under sysbench, a database's buffer pool size, four workloads (the third counted set) | inside the noise on all four; no error | p95, p99 and mean inside the noise on all four | pool held **−49% to −56% on burst, confirmed better**; on read_write the pages held **+44% to +52%, confirmed worse**; read_only inside the noise; update_index the runs disagree; handed back on all 45 omni arms (the two earlier sets kept whole in the history) | host CPU **−4% to −6% on read_write, confirmed better**; inside the noise elsewhere | `results/live/V3_SYSBENCH.md` |
-| Robustness: the governor killed outright at 40% of the window, 10 pairs × 3 runs | **every setting back at the operator's 7 to 11 s after the kill, 30 of 30**; a second governor to the end; failed requests over the window −9% to −15% | the 120 s after the kill inside the noise against native; the whole window p95 −42% to −45% | inside the noise | inside the noise | `results/live/V3_ROBUST_KILL.md` |
-| Robustness: the long run, 7,200 s an arm, 3 pairs × 3 runs | decisions 97.5% or more of expected (valid); failed requests inside the noise | service confirmed better in A, inside the noise in B and C (no difference beyond the noise in 2 of 3) | inside the noise; **memory at most 1.07 of its first ten minutes (no leak)**; decision time at most 1.20 (no slowing); every setting handed back at the end | inside the noise | `results/live/V3_ROBUST_LONG.md` |
-| The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell | the organisms' work unchanged | p95 better in every cell | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
+| PostgreSQL behind PgBouncer, three workloads (the set of 10 October, the brain's verdict on the pool) | inside the noise | inside the noise | connections held open **−6% to −11% on `select`, confirmed better**; `simple_update` and `tpcb_hot` inside the noise (the add above the operator's 20 refused, as expected) | host CPU inside the noise on all three | `results/live/V3_PGBENCH.md` |
+| Apache Kafka, a consumer group's size, three workloads (the set of 10 October, the brain's verdict on the count) | inside the noise | inside the noise | consumers 2 → 1.98 to 1.99, confirmed better by a fraction (the trial's reference seconds); every spend trial abandoned unjudged, the group left at the operator's two: amendment 3, the next set running | inside the noise | `results/live/V3_KAFKA.md`, `results/live/V3_KAFKA_SERVICE.md` |
+| Redis, a cache's memory ceiling, three workloads (the set of 10 October, the brain's verdict on the ceiling) | inside the noise | inside the noise | the allowance one notch each way (56 to 72 MB), most trials abandoned unjudged, every gauge inside the noise: amendment 3, the next set running | inside the noise | `results/live/V3_REDIS.md`, `results/live/V3_REDIS_SERVICE.md` |
+| MongoDB under YCSB, a database's storage-engine cache size, four workloads (the set of 10 October, the brain's verdict on the cache) | inside the noise on all four; no failed operation | inside the noise on all four | cache size held **−3% to −13% on `f`, confirmed better**; `b`, `c` and `burst` inside the noise | inside the noise | `results/live/V3_YCSB.md` |
+| MySQL under sysbench, a database's buffer pool size, four workloads (the set of 10 October, the brain's verdict on the pool) | inside the noise on all four; no error | inside the noise on all four | pool held **−10% to −20% on `read_write`, confirmed better**, the pages holding data with it; `burst`, `read_only` and `update_index` inside the noise; handed back on every omni arm | inside the noise | `results/live/V3_SYSBENCH.md` |
+| Robustness: the governor killed outright at 40% of the window, 10 pairs × 3 runs | **every setting back within the allowance in every repetition of every run**; a second governor to the end; failed requests inside the noise | the whole window p95 −27% to −48%, mean response −33% to −40%, time over the line −32% to −36%, confirmed better | inside the noise | inside the noise | `results/live/V3_ROBUST_KILL.md` |
+| Robustness: the long run, 7,200 s an arm, 3 pairs × 3 runs | decisions valid in every repetition; failed requests inside the noise | inside the noise in 2 of 3 runs (confirmed better in B) | inside the noise; **no leak** (memory under its limit in every repetition); no slowing; every setting handed back | inside the noise | `results/live/V3_ROBUST_LONG.md` |
+| The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell (the set of 10 October) | the organisms' work unchanged | the cluster's p95 lower in all 12 cells (−1% to −52%); failed requests lower in 11 | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
 
 ## Measured on a real cloud (Azure, its own bill), Omni v1
 

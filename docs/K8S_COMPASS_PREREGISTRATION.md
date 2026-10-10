@@ -537,7 +537,8 @@ preregistered. The two readings say different true things: where the governor bu
 memory ceiling, Kafka's consumers) the service reading is higher and the resource reading says what it cost; where it
 gives a resource back for the same service (the database pools and caches) the service reading is nothing and the
 resource reading carries the gain. On the day it was declared the service reading stood at +71.8% against the resource
-reading's +20.5% (Kubernetes +83.2%, Kafka +1,192.8%, Redis +8.8%, the three database stacks exactly nothing); Kafka's
+reading's +20.5% (Kubernetes +83.2%, Kafka +1,192.8%, Redis +8.8%, the three database stacks exactly nothing; on the sets of
+10 October, the brain's verdict on every stack knob, the two readings stand at +10.7% and +4.8%); Kafka's
 hundredfold speed ratio is why the service headline is large, and the category table is where a reader sees it. A
 confirmed loss in work or speed counts against Omni in both readings; neither hides one.
 

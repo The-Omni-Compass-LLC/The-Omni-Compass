@@ -156,6 +156,18 @@ harness is byte for byte that of `3aac0ab7`; the table reads it as A. The whole 
 (`tools/kafka_abc.py`), the index, the wiring page and the benefit sheet are read again, and the set this one supersedes goes whole to
 `docs/history`.
 
+## Amendment 3 (2026-10-10 13:05 UTC, after the first counted set on amendment 2, before the next): a spend trial runs to its samples
+
+The first counted set on the brain's verdict (runs 38021564790, 38013304929, 38013309420 under the resource objective and 38013371103, 38013376137, 38013380640 under the service objective; the table `results/live/V3_KAFKA.md` and `results/live/V3_KAFKA_SERVICE.md`) landed at midday on 10 October. What it showed about the trials: every spend trial was abandoned before it could be judged: 2 or 3 trials an omni arm, all abandoned, 0 allowed, 0 refused, in all 36 omni arms of each objective; the group stayed at the operator's two consumers (1.98 to 1.99 on average, the trial's reference seconds included) and the lag and latency gains of the earlier set, bought with 6 to 8 consumers, did not appear: consumers running read confirmed better by a fraction of one percent, everything else inside the noise.
+
+**The cause is ours.** Amendment 2 ended a trial when the service swung to the other direction's condition: a give-back trial when the service left calm (the engine's own rule, kept), and a spend trial when the service turned calm. A spend that works calms the service within seconds, so a spend trial could never reach its samples: every successful spend ended its own trial unjudged. Nothing in the stack and nothing in the engine did this; the engine's verdict ends a trial when the condition it is given ends, and we gave it the wrong condition for spending. Found on the first set, corrected before the second, declared here.
+
+**From this amendment** (`tools/knob_verdict.py`, the harness outside the engine; Omni v3 unchanged): a spend trial, once started, runs to its samples whatever the compass's force; only the wall (a fail-up) or the engine's own time limit on a trial ends it early. A give-back trial still ends when the service leaves calm. The conditions to start a trial, the cost, the judge, the allowance and the recheck are unchanged.
+
+**Expected before the runs:** the consumer trials are judged: a third consumer is allowed where the latency falls and the work inside the line rises by more than the consumer count rises (the index's arithmetic), and the next one only if it pays again; the lag and p95 gains return (lag cut by most of its length, p95 from seconds to tens of milliseconds) with fewer consumers than the earlier set's 6 to 8, each one paid for; under the service objective the same with the consumers shown and not judged. The first set's table stands as the result of amendment 2 until the set on this amendment lands and supersedes it; it then goes whole to `docs/history`.
+
+**Dispatch.** None yet at the time of writing; the runs are dispatched when this amendment is pushed, and their ids are recorded in `docs/RERUN_2026-10-10.md`.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
