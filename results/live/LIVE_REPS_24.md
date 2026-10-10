@@ -1,5 +1,7 @@
 # Repeated live runs on kind, set 24: Omni-Compass on top against native, 10 paired repetitions
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Source: GitHub Actions workflow `benchmark-reps`, run 36983865216, commit `c908054`, 2026-10-02, job `aggregate`
 (`python tools/live_reps.py reps`). Transcribed from the job's printed receipt; the run's artifact `live-reps`
 (ID 11218009199, SHA-256 of the zip 28062fb8fd023d4b4cb6847f4d3103a3e7c70f61362118cf11efeaa957870b57) holds the same
@@ -54,3 +56,7 @@ declared standby power, which needs a node autoscaler that really removes the ma
 | pods started | 4.3 | 2 | -53.5% | -3.847 to -0.7529 | yes, better |
 | pod start wait, total (s) | 14.5 | 3.8 | -73.8% | -19.32 to -2.083 | yes, better |
 | pod start wait, mean (s) | 2.777 | 1.25 | -55.0% | -2.713 to -0.3417 | yes, better |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

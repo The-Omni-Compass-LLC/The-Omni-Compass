@@ -1,5 +1,7 @@
 # The stacked organism: all four realms on one clock, native against Omni
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Evidence class **S** (simulation). Commit `fcefbc8d8d11`, seeds 4000-4009, 1226 muscles stacked: the four realm organisms (345 + 262 + 282 + 337), every muscle as often as it appears in them, duplicates included. A duplicate is still a muscle that has to converge. Each realm keeps its own internal coupling (heat into its cooling, load onto its batteries). Preregistered: `docs/REALMS_PREREGISTRATION.md`, round 4.
 
 - **Stacking changes nothing natively:** the stacked native run equals each realm's own native run, plant by plant, on every seed.
@@ -12,3 +14,7 @@ Evidence class **S** (simulation). Commit `fcefbc8d8d11`, seeds 4000-4009, 1226 
 | one governor vs separate governors | **WORSE** | -0.02% (-0.02 to -0.01) | -0.00% (-0.01 to +0.01) | +0.01% (-0.00 to +0.03) | -0.02 (-0.14 to +0.10) |
 
 Work is the mean over the stacked muscles of work with Omni over work native; energy is total joules; violations are the change in the share of periods any muscle was out of its service target. Labels by the preregistered rule. These are models, not meters.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

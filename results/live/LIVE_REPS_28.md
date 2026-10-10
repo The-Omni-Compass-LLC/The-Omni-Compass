@@ -1,5 +1,7 @@
 # Repeated live runs on kind, set 28: native, Omni-Compass on top with the engine's allocation law, and with the compass law and the verdict, 10 paired repetitions
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Source: GitHub Actions workflow `benchmark-reps`, run 37087620193, commit `24666d7`, 2026-10-03, job `aggregate`
 (job 111111314584, `python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds
 per arm. Transcribed from the job's printed receipt; the run's artifact `live-reps` (zip SHA-256
@@ -54,3 +56,7 @@ most 2% slower without it (`docs/K8S_COMPASS_PREREGISTRATION.md`, the verdict in
 | pods started | 4.9 | 3.3 | -32.7% | -2.957 to -0.2428 | yes, better |
 | pod start wait, total (s) | 16.7 | 8.9 | -46.7% | -13.89 to -1.714 | yes, better |
 | pod start wait, mean (s) | 3.15 | 2.241 | -28.9% | -1.846 to +0.02798 | no |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

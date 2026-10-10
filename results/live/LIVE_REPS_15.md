@@ -1,5 +1,7 @@
 # Set 15 on real Kubernetes: conveyed CPU, the promise in queue terms, machines empty one at a time
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36351987055, commit 82d46a7. Five paired repetitions (native, me on top, me alone back to back on
 one runner, order rotated), 15 minutes each, kind with 1 control plane and 6 workers.
 
@@ -37,3 +39,7 @@ A change is significant when its paired 95% interval excludes zero. Lower respon
 - A new pod could wait up to 5 s for me to open a machine I had closed with a cordon.
 - **Fix, running as set 16:** the prefer-not mark. A pod that finds the open machines full is placed on a marked one
   at once.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

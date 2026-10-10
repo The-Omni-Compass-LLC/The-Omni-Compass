@@ -1,5 +1,7 @@
 # Review of OmniCompass_FULL_HARNESS.zip (Grok build), 27 September 2026
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 ## What it is
 The zip holds 209 files. It combines:
 - this repository at commit 1e0f4c3 (older than the current branch);
@@ -74,3 +76,7 @@ times the unified law's.
   envelope. This repository's wiring has both.
 - **`grandmaster.py`, `connectors.py`, `dcgm.py`, `gpu_vessel.py`.** These are launchers, named interfaces and
   labelled models. None has a live path: each returns "no nv-hostengine" or refuses the push.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

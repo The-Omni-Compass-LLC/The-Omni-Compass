@@ -1,5 +1,7 @@
 # Set 13 on real Kubernetes: machines idle by attrition, no pod moved
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36339800926, commit b0b72fb. Five paired repetitions (native, me on top, me alone back to back on
 one runner, order rotated), 15 minutes each, kind with 1 control plane and 6 workers.
 
@@ -32,3 +34,7 @@ A change is significant when its paired 95% interval excludes zero.
 - The pod reflex never raised a floor, because the queue was not the delay: the quota was.
 - I now convey each machine's idle CPU to the pods serving on it, in place, never below the operator's limit
   (`omni_controller/muscles.py`, `convey`).
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

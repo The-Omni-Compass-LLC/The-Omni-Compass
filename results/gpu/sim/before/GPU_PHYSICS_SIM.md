@@ -1,5 +1,7 @@
 # GPU physics simulation: native against Omni-Compass, modelled card
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Every number below comes from the card model in tools/gpu_physics_sim.py, not from a meter. It shows what
 the governor does to a card that behaves as modelled; the hardware answer is scripts/gpu_paired.sh.
 
@@ -47,3 +49,6 @@ Guardrail (preregistered): 95th-percentile response time not above +10%: FAILED 
 Guardrail (preregistered): 95th-percentile response time not above +10%: FAILED (upper bound +85.3%).
 **Model verdict: better on energy, fails the service guardrail.**
 
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

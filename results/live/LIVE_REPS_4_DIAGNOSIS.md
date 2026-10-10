@@ -1,5 +1,7 @@
 # Live set 4 (GitHub Actions run 36291308356, commit cdc8cd9): why Omni-Compass held all six machines
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 All 15 runs succeeded. The aggregate job failed before it got a runner (no steps ran), so this set has no aggregate
 table. Its purpose was the decision trail, printed in each job log.
 
@@ -56,3 +58,7 @@ The machine organ now has its own engine view and a release gate
 **Pace.** At most one machine per decision.
 
 Every decision records the gate's reason in the audit, and the trail prints it.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

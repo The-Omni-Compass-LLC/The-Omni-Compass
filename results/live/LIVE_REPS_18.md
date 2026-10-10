@@ -1,5 +1,7 @@
 # Set 18 on real Kubernetes: native against me on top; the autoscaler alone makes pods
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36358460215, commit f5bff2b. Five paired repetitions, 15 minutes each, kind with 1 control plane
 and 6 workers. I gauge the queue and write no replica floor; the target I hold uses the CPU each pod is guaranteed.
 
@@ -25,3 +27,7 @@ A change is significant when its paired 95% interval excludes zero. Lower respon
 - **Pods:** the autoscaler ran 24% fewer pods than native, each with more CPU.
 - **Machines:** I closed five of six to new work by the sixth decision. They idle as their pods leave, so machines in
   service fell by 18%, against 36% in sets 15–17, where the extra pod churn also emptied them faster.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

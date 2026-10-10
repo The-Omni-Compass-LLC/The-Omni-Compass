@@ -1,5 +1,7 @@
 # The card run in full, from its own files (amendment 11)
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run `run-20261002T082232Z`, commit `c908054053e9`, line 782.3 ms. Every measure from the run's own files, the card's response times included; every measure worse than native is named.
 
 | Size | Organism | Part | Repetitions | Label | Work per energy | Energy | Time over the line (pp) | p95 |
@@ -22,3 +24,7 @@ Run `run-20261002T082232Z`, commit `c908054053e9`, line 782.3 ms. Every measure 
 | 1x | The four stacked, duplicates kept (1,226) | stacks (model) | 3 | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF; worse on: less work (-0.02%), late more often (+0.23 pp) | +0.21% | -0.23% | +0.23 | +0.0% |
 | 1x | The four stacked, duplicates kept (1,226) | card (meter) | 3 | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF; worse on: slower (+83.49%), late more often (+6.59 pp) | +1.63% | -1.60% | +6.59 | +83.5% |
 | 1x | The four stacked, duplicates kept (1,226) | both | 3 | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF; worse on: less work (-0.02%), slower (+83.49%), late more often (+0.24 pp) | +0.21% | -0.23% | +0.24 | +83.5% |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

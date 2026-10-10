@@ -1,5 +1,7 @@
 # Set 14 on real Kubernetes: idle CPU conveyed to the work
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36346848307, commit 7d07754. Five paired repetitions (native, me on top, me alone back to back on
 one runner, order rotated), 15 minutes each, kind with 1 control plane and 6 workers.
 
@@ -38,3 +40,7 @@ machine, against the operator's 500m, in place, with no pod restarted.
   alone column reads the same promise.
 - **Machines.** The closed machine with the least work is marked first to go, the next after it, so each scale-down
   empties whole machines, one at a time.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

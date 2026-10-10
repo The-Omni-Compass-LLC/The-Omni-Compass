@@ -1,5 +1,7 @@
 # The whole stacks with the real card inside
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run 2026-10-02 08:59 UTC, commit `c908054053e9`, 3 paired repetition(s), seeds [6000, 6001, 6002], 240 steps of 2.0 s per arm. Card: the real GPU, its own meter; start power limit 150.0 W; response-time line 782.3 ms (ten bare service times). One engine on everything in the Omni arm: the bowl law on every simulated muscle and on the card's two wires. Harness `tools/run_hil.py`.
 
 The simulated stacks are models (evidence S). The card's energy and requests are its own meter (evidence P). Work per energy: (work Omni / work native) / (energy Omni / energy native) - 1; for the stacks work is the mean over plants of each plant's ratio; *both* counts the card as one more plant and adds its joules.
@@ -73,3 +75,7 @@ The simulated stacks are models (evidence S). The card's energy and requests are
 - Every arm ended with the card at its start limit and its own clock range; every simulated knob was handed back; the card's governor exited cleanly.
 
 Raw: every arm's `arm.json`, `smi.csv` (the card's own samples), `latency.csv`, `requests.csv`, `audit.jsonl`; checksums in `SHA256SUMS.txt`.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

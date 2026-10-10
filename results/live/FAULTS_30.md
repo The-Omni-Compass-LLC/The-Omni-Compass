@@ -1,5 +1,7 @@
 # The fault test on kind, re-run (set 30 F): native, Omni-Compass on top with the allocation law, and with the compass law and the verdict, the operator's HPA target handed back at once when a fault is over, 10 paired repetitions
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Source: GitHub Actions workflow `benchmark-reps` with `faults: 1`, run 37105046042, commit `acc1c4e`, 2026-10-03, job
 `aggregate` (job 111161043506, `python tools/live_reps.py reps`), fixed-rate load, 900 measured seconds per arm.
 Transcribed from the job's printed receipt; the run's artifact `live-reps` (zip SHA-256
@@ -75,3 +77,7 @@ change and its re-run are recorded in `docs/K8S_COMPASS_PREREGISTRATION.md`.
 | pods started | 4.8 | 3.7 | -22.9% | -1.887 to -0.3128 | yes, better |
 | pod start wait, total (s) | 18.4 | 13.9 | -24.5% | -9.971 to +0.971 | no |
 | pod start wait, mean (s) | 3.417 | 2.725 | -20.2% | -1.659 to +0.2759 | no |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

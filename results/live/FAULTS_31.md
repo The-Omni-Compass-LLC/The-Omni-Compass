@@ -1,5 +1,7 @@
 # The fault test on kind, set 31 F: native, Omni-Compass on top with the allocation law, and with the compass law and the verdict, past the wall from a blind sense or a lost machine the operator's own HPA target, 10 paired repetitions
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Source: GitHub Actions workflow `benchmark-reps` with `faults: 1`, run 37110005322, commit `0a38e76`, 2026-10-03, job `aggregate`
 (job 111175082422, `python tools/live_reps.py reps`), fixed-rate load, 900 measured seconds per arm. Transcribed from the job's
 printed receipt; the run's artifact `live-reps` (zip SHA-256 `fdba8b3b02d9c52f4a9357cff569e8cf3c0f7357a471b78af844106f3ea0442c`) holds the same tables.
@@ -71,3 +73,7 @@ Evidence class **L** (real Kubernetes software on kind; energy is a declared mod
 | pods started | 4.7 | 4 | -14.9% | -2.133 to +0.7326 | no |
 | pod start wait, total (s) | 16.5 | 15.7 | -4.8% | -9.461 to +7.861 | no |
 | pod start wait, mean (s) | 3.083 | 2.823 | -8.4% | -1.524 to +1.005 | no |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

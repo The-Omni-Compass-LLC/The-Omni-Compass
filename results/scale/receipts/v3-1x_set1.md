@@ -1,8 +1,8 @@
 # Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)
 
-Source: GitHub Actions workflow `six`, run 37430723080 (Omni v3, commit ea99eb6818cb); the pooled receipt `six-receipts/SIX.md`, archived in `results/live/raw/run-37430723080/`.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+Source: GitHub Actions workflow `six`, run 37430723080 (Omni v3, commit ea99eb6818cb); the pooled receipt `six-receipts/SIX.md`, archived in `results/live/raw/run-37430723080/`.
 
 
 Evidence class **S** (models). Commit(s) ea99eb6818cb. Native: each organism's own controllers. Omni: the compass law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 are nested. Band first: no win unless the time over the service line is no higher than native's.
@@ -51,7 +51,6 @@ Evidence class **S** (models). Commit(s) ea99eb6818cb. Native: each organism's o
 | 5 | The four stacked, duplicates kept | 1716 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.354% (+0.348 to +0.360) | +0.000% (+0.000 to +0.000) | -0.353% (-0.358 to -0.347) | -0.019 (-0.020 to -0.019) | True |
 | 6 | The whole tower, every muscle once | 945 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.367% (+0.362 to +0.373) | +0.000% (+0.000 to +0.000) | -0.366% (-0.372 to -0.360) | -0.008 (-0.009 to -0.008) | True |
 
-
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

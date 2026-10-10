@@ -1,5 +1,7 @@
 # Set 22 on real Kubernetes: native against Omni on top, ten paired repetitions, equal work
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36488547793, commit cfdc17c. Conveyance is on by default. The load is **open-loop at a fixed
 rate** (`deploy/kind/loadgen-open.yaml`, 6 requests a second per generator, `LOADGEN=open`, confirmed in every job
 log), so both arms were sent the same work.
@@ -55,3 +57,7 @@ no proven CPU saving.
   fixed-rate, so both arms were sent the same requests.
 - The generators do not record their own failures; the probe saw none in either arm.
 - Kill switch: every setting restored in every repetition (target, CPU limits, replica range, all workers open to work).
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

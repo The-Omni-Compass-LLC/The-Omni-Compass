@@ -1,5 +1,7 @@
 # Repeated live runs on kind, set 26: native, Omni-Compass on top with the engine's allocation law, and with the compass law, 10 paired repetitions
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Source: GitHub Actions workflow `benchmark-reps`, run 37058424766, commit `e7f920d`, 2026-10-02, job `aggregate`
 (`python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds per arm. Transcribed
 from the job's printed receipt; the run's artifact `live-reps` holds the same table. Evidence class **L** (real
@@ -54,3 +56,7 @@ Kubernetes software on kind; energy is a declared model, not a meter: every work
 **Label of the compass arm by the preregistered rule** (`docs/K8S_COMPASS_PREREGISTRATION.md`): p95 not worse (the whole
 interval below 0), failed requests not higher, machines in service down with the whole interval below 0:
 **better on machines within the band**.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

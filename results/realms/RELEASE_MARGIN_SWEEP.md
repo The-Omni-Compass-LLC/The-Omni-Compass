@@ -1,5 +1,7 @@
 # Why the stacks were late more often on 2026-10-02, and the knob that settles it
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Model runs (evidence S), organism Compute / AI / Cloud (345 muscles), seeds 6000-6004, 240 steps, native against the
 compass law on every muscle, handed back at 90%. Each change is Omni against native. Late: time over the service line
 (lower is better). Energy: lower is better (less spent). Work: higher is better.
@@ -50,3 +52,7 @@ On a node pool every percent of energy saved by releasing a machine is paid in l
 and a burst that comes in the meantime is served late. Work and speed come first, so the margin is 0.3, the largest
 at which no pool is later than native. It is the rule the live controller follows on real Kubernetes too: a machine goes
 back only where giving it back costs no speed.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
