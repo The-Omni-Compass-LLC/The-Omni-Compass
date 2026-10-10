@@ -1,0 +1,55 @@
+# Six organisms at 10x size, up to 1000 runs (pooled from 60 shards)
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+
+
+Evidence class **S** (models). Commit(s) 3aac0ab7d384. Native: each organism's own controllers. Omni: the compass law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 are nested. Band first: no win unless the time over the service line is no higher than native's.
+
+## 1 run
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 4300 | 1 | **ONE RUN (no label)** | held | +0.083% | +0.001% | -0.082% | -0.015 | True |
+| 2 | Physics / Robotics / Autonomous | 3760 | 1 | **ONE RUN (no label)** | held | +0.070% | +0.001% | -0.069% | -0.008 | True |
+| 3 | Energy / Facility / Industrial | 4700 | 1 | **ONE RUN (no label)** | held | +0.356% | +0.001% | -0.354% | -0.013 | True |
+| 4 | Distribution / Specialized | 4400 | 1 | **ONE RUN (no label)** | held | +0.201% | +0.001% | -0.200% | -0.016 | True |
+| 5 | The four stacked, duplicates kept | 17160 | 1 | **ONE RUN (no label)** | held | +0.375% | +0.001% | -0.373% | -0.018 | True |
+| 6 | The whole tower, every muscle once | 9450 | 1 | **ONE RUN (no label)** | held | +0.356% | +0.001% | -0.354% | -0.006 | True |
+
+## 10 runs
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 4300 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.084% (+0.081 to +0.087) | +0.000% (-0.000 to +0.001) | -0.083% (-0.086 to -0.081) | -0.015 (-0.017 to -0.013) | True |
+| 2 | Physics / Robotics / Autonomous | 3760 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.067% (+0.065 to +0.070) | -0.002% (-0.004 to +0.001) | -0.069% (-0.072 to -0.065) | -0.010 (-0.014 to -0.006) | True |
+| 3 | Energy / Facility / Industrial | 4700 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.349% (+0.327 to +0.372) | +0.000% (+0.000 to +0.001) | -0.348% (-0.370 to -0.325) | -0.015 (-0.017 to -0.014) | True |
+| 4 | Distribution / Specialized | 4400 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.190% (+0.172 to +0.208) | +0.000% (-0.000 to +0.001) | -0.189% (-0.207 to -0.171) | -0.014 (-0.017 to -0.012) | True |
+| 5 | The four stacked, duplicates kept | 17160 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.366% (+0.342 to +0.390) | +0.000% (-0.000 to +0.000) | -0.364% (-0.388 to -0.340) | -0.018 (-0.018 to -0.017) | True |
+| 6 | The whole tower, every muscle once | 9450 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.348% (+0.325 to +0.371) | -0.000% (-0.001 to +0.000) | -0.347% (-0.369 to -0.325) | -0.007 (-0.009 to -0.006) | True |
+
+## 100 runs
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 4300 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.083% (+0.082 to +0.084) | +0.000% (+0.000 to +0.000) | -0.082% (-0.083 to -0.082) | -0.016 (-0.016 to -0.015) | True |
+| 2 | Physics / Robotics / Autonomous | 3760 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.070% (+0.069 to +0.071) | -0.001% (-0.001 to -0.000) | -0.070% (-0.072 to -0.069) | -0.011 (-0.012 to -0.010) | True |
+| 3 | Energy / Facility / Industrial | 4700 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.360% (+0.353 to +0.366) | +0.000% (+0.000 to +0.000) | -0.358% (-0.364 to -0.352) | -0.016 (-0.016 to -0.016) | True |
+| 4 | Distribution / Specialized | 4400 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.194% (+0.190 to +0.197) | +0.000% (-0.000 to +0.000) | -0.193% (-0.197 to -0.189) | -0.015 (-0.016 to -0.014) | True |
+| 5 | The four stacked, duplicates kept | 17160 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.361% (+0.355 to +0.367) | -0.000% (-0.000 to +0.000) | -0.360% (-0.366 to -0.354) | -0.017 (-0.018 to -0.017) | True |
+| 6 | The whole tower, every muscle once | 9450 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.359% (+0.352 to +0.365) | -0.000% (-0.000 to +0.000) | -0.357% (-0.364 to -0.351) | -0.007 (-0.008 to -0.007) | True |
+
+## 1000 runs
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 4300 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.082% (+0.082 to +0.083) | +0.000% (+0.000 to +0.000) | -0.082% (-0.082 to -0.082) | -0.016 (-0.016 to -0.016) | True |
+| 2 | Physics / Robotics / Autonomous | 3760 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.070% (+0.069 to +0.070) | -0.001% (-0.001 to -0.001) | -0.070% (-0.071 to -0.070) | -0.011 (-0.011 to -0.011) | True |
+| 3 | Energy / Facility / Industrial | 4700 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.358% (+0.357 to +0.360) | +0.000% (+0.000 to +0.000) | -0.357% (-0.359 to -0.355) | -0.016 (-0.016 to -0.016) | True |
+| 4 | Distribution / Specialized | 4400 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.192% (+0.191 to +0.194) | +0.000% (+0.000 to +0.000) | -0.192% (-0.193 to -0.191) | -0.015 (-0.015 to -0.015) | True |
+| 5 | The four stacked, duplicates kept | 17160 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.362% (+0.360 to +0.364) | -0.000% (-0.000 to -0.000) | -0.361% (-0.363 to -0.359) | -0.018 (-0.018 to -0.018) | True |
+| 6 | The whole tower, every muscle once | 9450 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.357% (+0.356 to +0.359) | -0.000% (-0.000 to -0.000) | -0.356% (-0.358 to -0.355) | -0.007 (-0.007 to -0.007) | True |
+
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
