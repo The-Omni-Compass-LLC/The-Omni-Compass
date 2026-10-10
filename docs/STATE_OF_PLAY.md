@@ -13,7 +13,8 @@ benchmark with a result was dispatched again on the current commit `3aac0ab7` (O
 `tools/omni_version.py --commit`), native and omni, the wiring of each checked against its preregistration before the dispatch:
 70 GitHub runs (the seven Kubernetes tests, the five live stacks on the brain's own verdict, the four simulators, the realms table
 and the kill and long robustness scenarios, three runs each; the six organisms with the real cluster inside; the modelled grid at
-1, 10, 100 and 1,000 copies) and the two big organisms at 1,000 copies on rented Azure machines. Every table on this page stands
+1, 10, 100 and 1,000 copies) and the two big organisms at 1,000 copies on rented Azure machines, plus one replacement run for a Kafka
+job GitHub's runner cut off (the record says which and why). Every table on this page stands
 until its new set lands; the new set is then the result and the old table goes whole to `docs/history`. The record, run by run
 with inputs, times and ids, is `docs/RERUN_2026-10-10.md`. Not restarted, and why: the three 24-hour robustness machines (started
 8 October on the same harness, byte for byte, ending about 10:15 UTC today) and the Azure fleet that can show one machine, which
@@ -214,10 +215,19 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
    (item 3); the power grids and the districts are in as simulations, never in the index by rule. Not yet a category: **a second
    and a third cloud**, AWS and Google Cloud under Azure's method (`docs/REGISTER.md` row 38; each needs its own account credential
    in a GitHub secret and an allowance of about 90 cores, about $12 a steady and $22 a burst run, nothing spent until the account
-   exists); **CPU power through Linux's own governor with the RAPL meter** (row 18; a machine where both are writable, the founder's
-   own tower or a rented bare-metal server, since GitHub's runners and cloud machines allow neither; about a day to build on the
-   paired-run machinery); **the card's energy meter**, which the card harness already has (the integral of the device's power draw,
-   the CPU package by RAPL, the wall plug where fitted, `tools/gpu_reps.py`) and which reads on the founder's run.
+   exists); **CPU power through Linux's own governor with the RAPL meter**: **built and preregistered the same day**
+   (`docs/CPU_POWER_PREREGISTRATION.md`; `tools/run_cpu_power.py`, one command `scripts/cpu_power_run.sh`, workflow `cpu-power`,
+   the three-run table `tools/cpu_power_abc.py`): the kernel's governor stays native, Omni moves the frequency ceiling on top
+   inside [half the top clock, the top], every notch down tried on the machine first by the brain's verdict, energy from the
+   processor's own meter and a wall plug where fitted; it waits for a machine on the metal, the founder's own tower or laptop on
+   Linux (free) or a rented bare-metal server (about $10), because GitHub's machines are virtual and expose neither the governor
+   nor the meter (the workflow's probe says so on every dispatch); **the card's energy meter**, which the card harness already
+   has (the integral of the device's power draw, the CPU package by RAPL, the wall plug where fitted, `tools/gpu_reps.py`) and
+   which reads on the founder's run. **The founder's sweep of the same day** (nothing with value left out: operating systems,
+   television and telecom, satellites and signals, energy, oil and minerals, finance, the platforms and social media, science and
+   physics, robotics to the top) added rows 39 to 57 to the register's queue and section 3.5 to the proof program, each an open
+   benchmark with a shipped controller for native and one knob for Omni, each to be preregistered before its first run; aerospace
+   and rockets were already rows 32 to 36.
 9. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
    fingerprints go to `docs/history` as the road to it.
 

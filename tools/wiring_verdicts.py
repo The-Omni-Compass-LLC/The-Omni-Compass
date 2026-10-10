@@ -872,7 +872,11 @@ def main(check=False):
           "seven 2023 districts are read from the tables above as the operator's choice | the law's own push and pull | Omni v3 (a trial there is "
           "the next engine) |",
           "| The 945 modelled muscles | each muscle's knob | one directive from the organism's governor, no trial per muscle; 746 never wrote, 13 are "
-          "trades | the law's own push and pull | Omni v3 (the verdict per muscle is Omni v4, `docs/OMNI_V4_PLAN.md`, not built) |", ""]
+          "trades | the law's own push and pull | Omni v3 (the verdict per muscle is Omni v4, `docs/OMNI_V4_PLAN.md`, not built) |",
+          "| The machine itself: the Linux kernel's frequency ceiling (`docs/CPU_POWER_PREREGISTRATION.md`) | one knob | `tools/knob_verdict.py` "
+          "around the engine's verdict: every notch down tried on the machine first, under the index's reading for one machine (energy x "
+          "latency / work) or energy per request inside the line | give back only (the ceiling cannot go above the top; the top always free) | "
+          "outside the engine; built 10 October, waiting for a machine on the metal, no run yet |", ""]
 
     md = "\n".join(legal_stamp(L)) + "\n"
 

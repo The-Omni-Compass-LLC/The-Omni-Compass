@@ -405,6 +405,11 @@ def main():
     check("the brain's own verdict on a live knob (tools/knob_verdict.py around the frozen engine's Verdict): every knob starts in watch, a spend that "
           "costs more than it buys is refused, a give-back that costs nothing is allowed one step a trial, a trial holds the knob, native is always free",
           r.returncode == 0, r.stderr[-300:])
+    r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_run_cpu_power"], cwd=ROOT, capture_output=True, text=True)
+    check("CPU power harness (tools/run_cpu_power.py) on a modelled machine: the decision rule, the grid of notches, the plug on the kernel's files "
+          "(snapshot once, one writer, restore), the meter's wrap-around, the probe, the hand-back from a snapshot file, one paired run with the "
+          "brain's verdict allowing notches by trial and the ceiling handed back, the three-run table flagging a modelled machine",
+          r.returncode == 0, r.stderr[-300:])
     import benchmarks.multiplicity as MP
     mp_tmp = tmp / "mult.json"; MP.main(mp_tmp)
     check("multiplicity analysis reproduces results/MULTIPLICITY.json",

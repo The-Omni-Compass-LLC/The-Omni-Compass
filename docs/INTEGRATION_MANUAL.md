@@ -221,6 +221,7 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | MySQL, or any store whose engine resizes its buffer pool online | one knob | the InnoDB buffer pool through the server's own console (`SET GLOBAL innodb_buffer_pool_size`), cover [128, 2,048] MB in the server's own 128 MB chunks, grown only while the pool is full, the plug waiting for the server's asynchronous resize before reading back, one writer, restored on OFF (manual, section 10.9; `docs/MYSQL_PREREGISTRATION.md`) |
 | A rented cloud machine running the big organisms | the whole harness | `big-organism-detached`: start, collect, survey; the clock rule sets the window (manual, section 10.4) |
 | Independent simulators (CityLearn, pandapower, MuJoCo) | one knob each | the simulator's own controller is native; preregistered, A/B/C (manual, section 10.3) |
+| The machine itself: Linux's frequency governor under the processor's meter | one knob | the frequency ceiling of every CPU through the kernel's own files, cover [half the top clock, the top], the governor still running under it; every notch down tried on the machine first by the brain's verdict; energy from RAPL and a wall plug where fitted; root on a machine on the metal, never a virtual one (manual, section 10.10; `docs/CPU_POWER_PREREGISTRATION.md`; `sudo bash scripts/cpu_power_run.sh`) |
 
 ---
 

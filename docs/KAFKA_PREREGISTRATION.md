@@ -148,7 +148,10 @@ before this amendment.
 
 **Dispatched (2026-10-10 01:28 and 01:29 UTC, commit `3aac0ab7`, Omni v3 by `tools/omni_version.py --commit`).** At the founder's order of
 10 October that every benchmark be run again on the current code, native and omni, the counted runs on this amendment were
-dispatched with `workloads=all`, `reps=3`, `step_s=30`: under the resource objective runs 38013300872 (A), 38013304929 (B) and 38013309420 (C), 01:28:23 to 01:28:31 UTC; under the service objective runs 38013371103 (A), 38013376137 (B) and 38013380640 (C), 01:29:31 to 01:29:40 UTC. The whole day's dispatch, run by run, is
+dispatched with `workloads=all`, `reps=3`, `step_s=30`: under the resource objective runs 38013300872 (A), 38013304929 (B) and 38013309420 (C), 01:28:23 to 01:28:31 UTC; under the service objective runs 38013371103 (A), 38013376137 (B) and 38013380640 (C), 01:29:31 to 01:29:40 UTC. Run A under the resource objective lost
+its `heavy` job to GitHub (the runner shut down at 03:20:53 UTC, the harness never failed, the other three workloads finished); one
+replacement run of all four workloads, the same inputs, was dispatched at 03:43:29 UTC: run 38021564790 on commit `0a74e9a6`, whose Kafka
+harness is byte for byte that of `3aac0ab7`; the table reads it as A. The whole day's dispatch, run by run, is
 `docs/RERUN_2026-10-10.md`. The expectation above stands as written before the runs; when they land the table is read from them
 (`tools/kafka_abc.py`), the index, the wiring page and the benefit sheet are read again, and the set this one supersedes goes whole to
 `docs/history`.
