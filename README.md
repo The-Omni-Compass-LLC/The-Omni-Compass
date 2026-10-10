@@ -62,7 +62,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-10 14:53 | pgbench | success | [38054761503](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054761503) |
 | 2026-10-10 14:52 | redis | success | [38054800068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054800068) |
 | 2026-10-10 13:13 | cpu-power | failure | [38054876829](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054876829) |
-| 2026-10-10 07:15 | robustness | success | [38013471943](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38013471943) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
