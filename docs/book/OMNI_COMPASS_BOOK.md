@@ -1010,7 +1010,7 @@ function. Together they mean: anything that starts inside the container stays in
 known size, and comes to rest at the bottom. That is a certificate, not a test: it answers every case inside the walls
 at once.
 
-**In plain words.** Picture a bowl-shaped valley with a fence around its rim. The first line says the valley has a
+**In plain words.** Picture a round valley with a fence around its rim. The first line says the valley has a
 shape: given where the system is, the equations say which way it rolls. The second line says that at the fence the
 ground always slopes inward, so nothing that starts inside can ever roll out, however it is pushed within the strength
 the fence was built for. The third line says there is a height, *L*, that only ever decreases along any path, so the
@@ -3252,6 +3252,11 @@ Patent applications, copyright registrations and trademark applications filed in
 > **Which knobs to wire in at all:** `docs/WIRING_VERDICTS.md` gives every knob in every published result one of three
 > words from the tables themselves: **write** (wire both ways), **watch** (wire out only: Omni reads, the native controller
 > lives by itself) or **operator's choice** (a trade). A knob that showed nothing, or lost, stays native.
+> **How to wire for superiority:** every knob starts in watch (wire out only); an observation run shows what native does
+> alone; then the brain's own verdict decides on the knob, in real time, whether a notch pays before it is written
+> (`tools/knob_verdict.py` around the engine's verdict; the manual, section 9.4); a knob that cannot prove it pays stays
+> native, and the operator's setting is always free. Where that verdict stands today, knob by knob, is the last table of
+> `docs/WIRING_VERDICTS.md`.
 
 > The full step-by-step manual, with the switch, the living band, parking and the pod reflex, is
 > `docs/OPERATOR_MANUAL.md`. This page is the short version.
@@ -5561,7 +5566,7 @@ console as omni, a tuning workload shown and not counted, and untouched workload
   taken back only while clients waited under 1% of the pooler's time, servers added back one per percent of waiting up to
   the operator's 20) the costs are gone: host CPU and median latency inside the noise on all three workloads. The gain is
   smaller and real: **connections held open −36% to −38% on `select`, confirmed better**, with p95 inside the noise and the
-  tails worse as point estimates in two runs, not confirmed; the runs disagree on `tpcb_hot` (+5%, −46%, −48%: on one runner
+  tails worse as point estimates in two runs, inside the noise by the rule; the runs disagree on `tpcb_hot` (+5%, −46%, −48%: on one runner
   the add rule fired, on two it did not); on `simple_update` the add rule of amendment 1 bought servers above the operator's
   20 on a slow write workload and **connections most at once read +72% to +80%, confirmed worse**, nothing bought for them,
   as in the first set. 1 gauge-row better, 1 worse, 1 where the runs disagree; the category enters the index at +4.0%.
@@ -6263,6 +6268,17 @@ The two-way plug stays one wire in and one wire out (`docs/WIRING_GUIDE.md`). Th
 ### The same verdict, live: the brain decides on the knob before it writes
 
 This page judges after the fact, from published tables. The founder's order of 9 October is that the brain judge in real time, on the knob, before it writes, and that a knob which cannot prove it pays stay native. On the five live stacks (the pool, the consumer group, the memory ceiling, the storage-engine cache, the buffer pool) that is now built into the harnesses: `tools/knob_verdict.py` wraps the frozen engine's own verdict (`omnicompass/verdict.py`, unchanged) around every live knob. The knob starts in watch; a paired trial on the stack itself (the knob held at the deepest step already allowed, then one notch further, under the same traffic) allows one notch at a time under the declared objective, the resource reading of the index by default or the service reading at the operator's choice; a refused step is not taken and not retried for a minute; a trial holds the knob; a fail-up never spends beyond the allowance; the operator's setting is always free. The audit carries the cost sample and the verdict's state every second, the arm record sums it, and the three-run tables print the verdict per workload. It is declared as an amendment in each of the five preregistrations with the expectation written before the runs (Redis: left native under the resource objective; Kafka: allowed step by step while each consumer pays; PostgreSQL: the add above the operator's setting refused on `simple_update`; MySQL: the `read_write` chunks refused; MongoDB: the cache given back a notch a trial). The runs on it were dispatched on 10 October 2026 (`docs/RERUN_2026-10-10.md`); this page is then read again from their tables. Inside the modelled realms the organism still takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, designed in `docs/OMNI_V4_PLAN.md` and not built.
+
+**Where the brain's verdict stands today, knob by knob.** Who decides, in real time, whether a knob pays before it is written, and in which directions (spend: more resource for service; give back: less resource where the service holds):
+
+| Where | The knob | Who decides it pays, and when | Directions tried | Engine |
+|---|---|---|---|---|
+| The five live stacks: Redis's memory ceiling, Kafka's consumers, PostgreSQL's pool, MySQL's buffer pool, MongoDB's cache | one knob each | `tools/knob_verdict.py` around the engine's verdict: the knob starts in watch; a paired trial on the stack itself before every notch, one notch a trial, under the declared objective | spend and give back, both tried; the operator's setting always free | outside the engine (Omni v3 unchanged); running since 10 October |
+| Kubernetes: the machines | nodes in service | the engine's verdict (`omnicompass/verdict.py`): a paired trial before a machine is taken | give back (a machine taken only when the trial shows the service holds); gas and brake on replicas and the floor by the compass law's band, no trial | Omni v3 |
+| The card: the clock ceiling | one 15 MHz step at a time | the engine's verdict: a paired trial per step while the service is calm; no step passing, the card runs as it does alone; the power lid stays at the operator's | give back (slower clock for the same service); the speed floor never under the card's own busy clock | Omni v3 (`omni_controller/gpu_compass.py`) |
+| Robot arms: the speed override; drones: the cruise | one knob each | the engine's verdict on the robot and the swarm; two of four robots left native by it | give back | Omni v3 |
+| Power grids: the tap; buildings: the batteries | one knob each | the compass law alone, no trial; the trades on four exporting grids and seven 2023 districts are read from the tables above as the operator's choice | the law's own push and pull | Omni v3 (a trial there is the next engine) |
+| The 945 modelled muscles | each muscle's knob | one directive from the organism's governor, no trial per muscle; 746 never wrote, 13 are trades | the law's own push and pull | Omni v3 (the verdict per muscle is Omni v4, `docs/OMNI_V4_PLAN.md`, not built) |
 
 
 ---
@@ -9625,7 +9641,10 @@ expectation written before the runs: Redis left native under the resource object
 by step while each consumer pays, PostgreSQL's add above the operator's setting refused on simple_update, MySQL's read_write
 chunks refused, MongoDB's cache given back a notch a trial. The 21 runs (the five stacks under the resource objective; Redis and
 Kafka also under the service objective; three runs each) were dispatched on 10 October at 01:28 to 01:29 UTC on commit `3aac0ab7`
-(`docs/RERUN_2026-10-10.md`); the tables are read from them when they land. Inside the modelled realms the organism still
+(`docs/RERUN_2026-10-10.md`); the tables are read from them when they land. Where the brain's verdict stands today, knob by knob
+(the five stacks both ways; the cluster's machines, the card's clock, the robots' speed and the drones' cruise by the engine's own
+verdict; the grids, the districts and the 945 modelled muscles by the law alone), is the last table of `docs/WIRING_VERDICTS.md`.
+Inside the modelled realms the organism still
 takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, designed in
 `docs/OMNI_V4_PLAN.md` and not built, because every result must be run again on a new engine.
 
@@ -9640,7 +9659,7 @@ takes one directive for every muscle; the verdict per muscle there is the next e
 | Faults: machine down, spike, runaway pod, blind probe | failed requests lower in all three, clear of the noise in one | −47% to −62% | inside the noise | inside the noise | `results/live/V3_FAULTS.md` |
 | A queue of batch jobs | queue finished no difference beyond the noise | mean response −10% to −14% | **−19% to −23%** (−29% to −35% after the queue) | **−13% to −16%** | `results/live/V3_BATCH.md` |
 | Fairness, a noisy neighbour | inside the noise on every row | inside the noise | inside the noise | inside the noise | `results/live/V3_FAIRNESS.md` |
-| PostgreSQL behind PgBouncer, three workloads (the second counted set) | inside the noise | inside the noise (median and p95; the tails worse as point estimates on `select`, not confirmed) | connections held open **−36% to −38% on `select`, confirmed better**; the runs disagree on `tpcb_hot`; `simple_update` connections most at once **+72% to +80%, confirmed worse** | host CPU-seconds inside the noise on all three (the first set's +14% to +28% was our harness's own `psql` launches, measured and removed) | `results/live/V3_PGBENCH.md` |
+| PostgreSQL behind PgBouncer, three workloads (the second counted set) | inside the noise | inside the noise (median and p95; the tails worse as point estimates on `select`, inside the noise by the rule) | connections held open **−36% to −38% on `select`, confirmed better**; the runs disagree on `tpcb_hot`; `simple_update` connections most at once **+72% to +80%, confirmed worse** | host CPU-seconds inside the noise on all three (the first set's +14% to +28% was our harness's own `psql` launches, measured and removed) | `results/live/V3_PGBENCH.md` |
 | Apache Kafka, a consumer group's size, three workloads | work inside the line **+16% to +21%**; no message lost | p95 **1.6 s → 9 to 14 ms**, lag −92% to −97% | consumers held **2 → 5.8 to 7.9, confirmed worse** | host CPU-seconds +10% to +20% confirmed worse on light, inside the noise on heavy and burst; CPU per message inside the line −10% to −12% on burst | `results/live/V3_KAFKA.md` |
 | Redis, a cache's memory ceiling, three workloads | work inside the line **+14% to +27%**, hit rate +14% to +27%; no failed request | mean latency −30% to −61%; p95 within a hair of native's (a miss is a miss in both arms) | memory ceiling held **64 → 200 to 270 MB, confirmed worse** | host CPU-seconds inside the noise on all three | `results/live/V3_REDIS.md` |
 | MongoDB under YCSB, a database's storage-engine cache size, four workloads (the second counted set) | inside the noise on all four; no failed operation | p95, p99 and mean latency inside the noise on all four (the first set's burst mean +2% to +4% worse is gone) | cache size held **−21% to −36% on all four, confirmed better**, settling at 330 to 405 MB where the gate finds the working set | host CPU-seconds inside the noise on all four | `results/live/V3_YCSB.md` |

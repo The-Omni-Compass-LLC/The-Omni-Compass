@@ -18,7 +18,15 @@
   16.6b), the wiring page and the v4 plan say so. Every published table stands until its new set lands; the new set then supersedes
   it and the old table goes whole to `docs/history`. Not restarted: the three 24-hour robustness machines (the same harness byte for
   byte, ending about 10:15 UTC) and the Azure fleet, which waits on the family allowance those machines hold.
-- **Every change said in words, never by a bare sign** (`tools/benefit_sheet.py`, `tools/wiring_verdicts.py`, both pages regenerated):
+- **The audit after the dispatch, at the founder's order that every term of 9 and 10 October be wired everywhere**: the wiring
+  page gains a knob-by-knob table of where the brain's verdict stands today (the five stacks both ways through
+  `tools/knob_verdict.py`; the cluster's machines, the card's clock ceiling, the robots' speed and the drones' cruise by the
+  engine's own verdict; the grids, the districts and the 945 modelled muscles by the law alone, their trial being the next engine),
+  pointed to from the state of play and the wiring guide, which now states how to wire for superiority (watch first, the
+  observation run, the brain's verdict on the knob, the operator's setting always free). Three places that read "not confirmed"
+  against the rule (the manual's PostgreSQL paragraph, the state of play's PostgreSQL row, the PostgreSQL preregistration) now read
+  "inside the noise by the rule"; the manual's valley metaphor no longer uses the word the founder retired. The rerun record
+  carries the measured length of every kind of run (from the earlier run of each kind, in runner-hours) and the two-day timeline. (`tools/benefit_sheet.py`, `tools/wiring_verdicts.py`, both pages regenerated):
   the founder found the sheet read backwards against the tables (plus is good on the sheet; a cut reads minus in a table). Now the
   sheet's number carries its word (gain, loss, nothing) and every confirmed change is written out beside it: a gauge that fell when
   falling is good reads **cut** (less waiting, fewer machines, less energy, less memory), one that rose when rising is good reads

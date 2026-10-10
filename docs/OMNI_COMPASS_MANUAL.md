@@ -875,7 +875,7 @@ function. Together they mean: anything that starts inside the container stays in
 known size, and comes to rest at the bottom. That is a certificate, not a test: it answers every case inside the walls
 at once.
 
-**In plain words.** Picture a bowl-shaped valley with a fence around its rim. The first line says the valley has a
+**In plain words.** Picture a round valley with a fence around its rim. The first line says the valley has a
 shape: given where the system is, the equations say which way it rolls. The second line says that at the fence the
 ground always slopes inward, so nothing that starts inside can ever roll out, however it is pushed within the strength
 the fence was built for. The third line says there is a height, *L*, that only ever decreases along any path, so the
@@ -2360,7 +2360,7 @@ console as omni, a tuning workload shown and not counted, and untouched workload
   taken back only while clients waited under 1% of the pooler's time, servers added back one per percent of waiting up to
   the operator's 20) the costs are gone: host CPU and median latency inside the noise on all three workloads. The gain is
   smaller and real: **connections held open −36% to −38% on `select`, confirmed better**, with p95 inside the noise and the
-  tails worse as point estimates in two runs, not confirmed; the runs disagree on `tpcb_hot` (+5%, −46%, −48%: on one runner
+  tails worse as point estimates in two runs, inside the noise by the rule; the runs disagree on `tpcb_hot` (+5%, −46%, −48%: on one runner
   the add rule fired, on two it did not); on `simple_update` the add rule of amendment 1 bought servers above the operator's
   20 on a slow write workload and **connections most at once read +72% to +80%, confirmed worse**, nothing bought for them,
   as in the first set. 1 gauge-row better, 1 worse, 1 where the runs disagree; the category enters the index at +4.0%.
