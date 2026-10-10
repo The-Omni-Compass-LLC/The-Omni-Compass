@@ -1,6 +1,6 @@
 # How to Read the Results
 
-> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).
+> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).
 
 This chapter teaches you to read every table Omni-Compass produces. You do not need to know Kubernetes or GPUs to
 follow it. Read the five ideas first, then go to the table you have in front of you.
@@ -194,5 +194,5 @@ and where every number stands today are in the manual, section 3 (`docs/OMNI_COM
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
 `NOTICE` at the root of this repository.*

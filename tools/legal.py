@@ -5,8 +5,11 @@
 
 NOTICE = ("© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial "
           "use, commercialization, monetization, production use, redistribution or hosted service of any part of "
-          "Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, "
-          "copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.")
+          "Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, "
+          "copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; "
+          "www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.")
+# the founder's wording of 10 October 2026: "all" before patents, copyrights and trademarks; all rights reserved; subject to
+# change at any time; the website the authority of record. Every generated report carries it at its top and at its end.
 MARK = "© 2026 The Omni-Compass LLC"      # a report carrying this already carries the notice (in this or an earlier wording)
 
 

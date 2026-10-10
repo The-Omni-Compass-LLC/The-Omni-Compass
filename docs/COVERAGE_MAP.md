@@ -2,7 +2,7 @@
 
 > **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
 > commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
-> Omni-Compass Enterprise License. Patent applications, copyright registrations and trademark applications have been
+> Omni-Compass Enterprise License. All patent applications, copyright registrations and trademark applications have been
 > filed in the United States by The Omni-Compass LLC. See `LICENSE` and `NOTICE`.
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
@@ -22,6 +22,14 @@ the 945 modelled muscles in 59 families) and says, for each, one of four things:
 What a row needs to enter the queue: an open benchmark or simulator anyone can run, a controller that ships with it (native), one
 knob Omni can move inside that controller's own limits, gauges that read the service and the resource, and an owner to name. A
 candidate that lacks one of these is said to lack it and is not named as a benchmark.
+
+**The final sweep of 10 October (15:00 UTC).** At the founder's order the three lists were walked once more against the internet:
+the most-used open software of 2025-26 (GitHub's own report of the fastest-growing projects; the cloud-native foundation's top
+tier), the mega-caps' open code and the open analogs of their closed systems, and every domain the founder named. Five rows were
+missing (74 to 78), five lines were added to existing rows, and five families are missing from the catalog (financial markets,
+media streaming and CDN, game servers, ledger nodes, build farms) and enter it at v4. The company-by-company map of closed
+systems to the open analogs that carry the same muscles is `docs/OMNI_V4_PLAN.md`, section C. The founder's check stands: name
+any system; it must be in one of the three lists, or it is a gap and gets a row.
 
 ## 1. The abbreviations, each with its place
 
@@ -49,6 +57,11 @@ candidate that lacks one of these is said to lack it and is not named as a bench
 | CDN | content delivery caches | row 71 |
 | ATM | air traffic management | row 72 |
 | CFD, FEA | the physics solvers | row 37: no controller, no knob, not a benchmark |
+| ARC | GitHub's actions-runner-controller, a build farm's own scaler | row 76 (added 10 October, the final sweep) |
+| IDS | an intrusion detection engine (Suricata, Zeek) | row 77 (added 10 October) |
+| MQTT | the device messaging protocol and its brokers (EMQX, Mosquitto) | row 78 (added 10 October) |
+| cFS, NOS3 | NASA's open core Flight System and its open distribution | row 32 (line added 10 October) |
+| UPF | the user-plane function of a 5G core (Open5GS, OpenAirInterface) | row 42 (line added 10 October) |
 
 ## 2. The map, domain by domain
 
@@ -59,28 +72,30 @@ candidate that lacks one of these is said to lack it and is not named as a bench
 | Operating systems | row 18 (Linux: the clock, built today), row 39 (the kernel's scheduler, network and memory), row 40 (Windows power management) | 10 | built; queued | macOS exposes no writable power or scheduler knob to a program: not benchmarkable, by survey |
 | Processors and hardware | the card (section 2 rows 13 to 18), the CPU (row 18), AI serving and training on the card (rows 19, 20) | 6 (DPU), 8 (GPU fabric), 10 (host), 14 (NVIDIA hardware), 17 (quantum control) | the card pending the founder's run; the CPU waiting for a machine | DPUs, fabrics and quantum control are model only: open control toolkits exist (Qiskit Pulse, QuTiP) but no benchmark ships a controller to sit on; a real test needs the hardware |
 | Databases and caches | PostgreSQL, MySQL, MongoDB, Redis (done, section 2 row 30 and section 4 rows 24, 26, 27); Cassandra, Redis under YCSB, HammerDB (row 24); graph databases (row 44); OpenSearch (row 28) | 44, 47, 55 | done and running | distributed SQL with its own rebalancing: **row 69 added** |
-| Messaging and streaming | Kafka (done, row 26); Flink's autoscaler (row 61) | 49 | done; queued | the other brokers (RabbitMQ, NATS, Pulsar) with their shipped flow control: **row 70 added** |
+| Messaging and streaming | Kafka (done, row 26); Flink's autoscaler (row 61); device brokers, EMQX and Mosquitto (row 78) | 49 | done; queued | the other brokers (RabbitMQ, NATS, Pulsar) with their shipped flow control: **row 70 added**; device brokers: **row 78 added 10 October**, their connection and in-flight muscles into family 49 at v4 |
 | Storage | fio on the device (row 29); Ceph's own throttles (row 62) | 57 | queued | none |
 | Web platforms and social media | the serving layer (row 43), the graph data layer (row 44), streaming (row 41), transcoding (row 57), CDN caches (row 71) | 54, 56, 51, 53, 45 | queued | observability pipelines were model only: **row 73 added** |
 | Serverless and distributed compute | Knative (row 46), Ray and Dask (row 47), Spark (row 25), workflows (row 49) | 7, 46 | queued | none |
 | AI | serving (row 19, ready on the card), training (row 20), batch admission on Kubernetes (row 63), the card itself (section 2) | 1, 2, 11, 14 | ready and queued | inference engines on the CPU (llama.cpp) run in row 19's pattern when asked |
 | HPC and science | Slurm's power saving (row 48), Batsim (row 16), workflows (row 49), the solvers (row 37: no knob) | 7, 9 | queued | a solver's own adaptive step controller is a possible native, to be judged by the physics criterion before any row |
-| Networks and telecom | ns-3 and 5G-LENA (row 21), srsRAN (row 42), the kernel's network stack (row 39), edge clusters (row 23) | 50, 58 | queued | none; Open vSwitch and Linux traffic control belong to row 39's network knobs |
-| Television and streaming | adaptive bitrate (row 41), CDN caches (row 71), transcoding (row 57) | 54 | queued | none |
-| Finance and commerce | trading infrastructure (row 45); payment switches in row 43's pattern | 45 | queued | **trading decisions are excluded by rule** (section 3) |
+| Networks and telecom | ns-3 and 5G-LENA (row 21), srsRAN with the 5G core beside it, Open5GS or OpenAirInterface (row 42), the kernel's network stack (row 39), edge clusters (row 23) | 50, 58 | queued | the core was missing from row 42: **line added 10 October**; Open vSwitch and Linux traffic control belong to row 39's network knobs |
+| Television and streaming | adaptive bitrate (row 41), CDN caches (row 71), transcoding (row 57) | 54; a Media Streaming & CDN family at v4 (the rows exist, the family does not yet) | queued | none |
+| Finance and commerce | trading infrastructure (row 45); payment switches in row 43's pattern | 45 (payments); a Financial Markets & Trading Systems family at v4 (the muscles of row 45 exist as a row, not yet as a family) | queued | **trading decisions are excluded by rule** (section 3) |
 | Healthcare and medicine | hospital systems and imaging pipelines (row 53), surgical robot servos (row 67, candidate), hospital environments (rows 9, 10; family 34) | 34, 48 | queued; candidate | **clinical dosing controllers are excluded by rule** (section 3) |
 | Robotics | arms (done, section 2 row 29), legged (row 2), humanoids and marine (row 55), navigation (row 54), fleets (row 30), surgical (row 67) | 24, 25 | done; queued | none |
 | Drones and aviation | gym-pybullet-drones (done), PX4, ArduPilot, Crazyswarm, JSBSim (row 23) | 20 | done; queued | air traffic management was missing: **row 72 added** |
-| Space and rockets | Basilisk attitude, momentum and constellations (rows 4, 32, 34), Orekit and GMAT (row 33), RocketPy and OpenRocket (row 35), Cantera (row 36) | 26 | queued | none; ascent guidance has no open shipped controller beyond the rocket rows, said here |
+| Space and rockets | Basilisk attitude, momentum and constellations (rows 4, 32, 34), NASA's open flight software cFS through NOS3 (row 32, line added 10 October), Orekit and GMAT (row 33), RocketPy and OpenRocket (row 35), Cantera (row 36) | 26 | queued | ascent guidance has no open shipped controller beyond the rocket rows, said here; the real flight software's open line is now on row 32 |
 | Cars and mobility | driving models (row 15), **self-driving stacks (row 58 added)**, **the EV powertrain (row 59 added)**, charging (row 7), the cell (row 8), traffic signals (row 14), **mobility fleets (row 60 added)** | 19 | queued | engine control units (open ECU firmware) are a candidate only until a simulator with the shipped maps is confirmed |
 | Rail, elevators, ports | marine vehicles (row 55) | 21, 22, 23, 52 | model only for rail, elevators and ports | no open benchmark ships a train, lift or port controller we can run (Flatland is a scheduling game without one); the muscles stand as the model until one exists |
 | Energy grids | pandapower (done, section 2 row 28), Grid2Op (row 5), OpenDSS feeders (row 6), microgrids and storage (row 8), CityLearn (done, row 26) | 31, 32, 33, 41 | done; queued | none |
 | Power plants and generation | one wind turbine (row 51), wind farms (row 11), combustion (row 36), **thermal plants (row 65 added, candidate)** | 40, 41 | queued; candidate | **nuclear**: no open plant benchmark ships a controller (OpenMC and its kind are solvers without a knob); the thermal-plant libraries are the nearest; nuclear stands as the model only, said plainly |
-| Buildings and facilities | BOPTEST (row 9), Sinergym with its data-centre model (row 10), CityLearn (done), district heating (row 50), the UPS reserve (row 27, excluded) | 28, 29, 30, 34, 38 | done; queued | none |
-| Industry and process | Tennessee Eastman (row 13), pipelines (row 50), water (row 12), agriculture (row 52), mining (row 56, candidate), **fabs (row 66 added, candidate)** | 27, 35, 36, 37, 39, 42, 43 | queued; candidates | pharmaceutical and food batch processes have no open shipped controller beyond the process models (BioSTEAM is a design tool); 3D printing and CNC (Klipper) lack a standard benchmark: both candidates, not rows |
+| Buildings and facilities | BOPTEST (row 9, with Home Assistant's climate automations noted as a candidate shipped controller), Sinergym with its data-centre model (row 10), CityLearn (done), district heating (row 50), the UPS reserve (row 27, excluded) | 28, 29, 30, 34, 38 | done; queued | none |
+| Industry and process | Tennessee Eastman (row 13, with the OpenPLC runtime noted as a candidate real PLC under the process model), pipelines (row 50), water (row 12), agriculture (row 52), mining (row 56, candidate), **fabs (row 66 added, candidate)** | 27, 35, 36, 37, 39, 42, 43 | queued; candidates | pharmaceutical and food batch processes have no open shipped controller beyond the process models (BioSTEAM is a design tool); 3D printing and CNC (Klipper) lack a standard benchmark: both candidates, not rows |
 | Supply chain and logistics | OR-Gym (row 22), Open-RMF (row 30), mobility fleets (row 60) | 59, 52 | queued | none |
-| Games and graphics | Godot (row 64, candidate) | 54 | candidate | the knob exists; the shipped frame-time controller is to be confirmed |
-| Robustness and security | the governor killed, the long run, the 24-hour run (row 31, done and running) | 53 | done | security is a review, not a benchmark; the kill switch and the lease are tested in row 31 |
+| Games and graphics | Godot (row 64, candidate); **game server fleets, Agones (row 74 added 10 October)** | 54; a Game Servers family at v4 | candidate; queued | game servers were in neither list until the final sweep: row 74 and a family at v4 |
+| Blockchain and ledgers | **Bitcoin Core in regtest, go-ethereum later (row 75 added 10 October)** | none yet; a Ledger Nodes family at v4 | queued | the node's machinery only (cache, mempool, peers); **consensus and transaction decisions are excluded by rule** (section 3) |
+| Software build farms | **actions-runner-controller runner scale sets, GitLab Runner later (row 76 added 10 October)** | none yet; a Build Farms family at v4 | queued | in neither list until the final sweep |
+| Robustness and security | the governor killed, the long run, the 24-hour run (row 31, done and running); **network security engines as a governed system, Suricata and Zeek (row 77 added 10 October)** | 53 | done; queued | security of Omni itself is a review, not a benchmark; the kill switch and the lease are tested in row 31; the engines' capture threads and ring sizes are muscles of family 53 at v4 |
 
 ## 3. Excluded by rule, and why
 
@@ -98,6 +113,8 @@ Omni-Compass governs machinery. These are never a knob, whatever the gain would 
    sits only on the servo margins beneath (rows 58, 67), never on the command.
 6. **Solvers without a controller**: OpenFOAM, SU2 and their kind (row 37) have no knob; their value here is the cluster that
    runs them (rows 16, 48).
+7. **Consensus and transactions in a ledger node** (row 75, added 10 October): Omni governs the node's cache, peers and
+   threads; it never decides what is validated, signed or relayed.
 
 ## 4. How this page is kept true
 
@@ -110,4 +127,4 @@ owner, not a claim.
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
-Enterprise License. Patents, copyrights and trademarks filed in the USA.
+Enterprise License. All patents, copyrights and trademarks filed in the USA. All rights reserved. Subject to change at any time.

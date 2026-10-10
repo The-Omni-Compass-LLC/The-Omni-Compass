@@ -5,7 +5,7 @@
 **October 2026**
 **The Omni-Compass LLC**
 
-Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.
+All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.
 
 ---
 
@@ -15,7 +15,7 @@ Patent applications, copyright registrations and trademark applications covering
 > shadow or test mode on systems you own or control. Any commercial use, commercialization, monetization, production
 > use, operation of any system beyond evaluation, redistribution, hosted or managed service, or incorporation into any
 > product or service requires a written **Omni-Compass Enterprise License**, signed by The Omni-Compass LLC and paid
-> for. Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.
+> for. All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.
 > "Omni-Compass" and its marks are trademarks of The Omni-Compass LLC. Full terms: `LICENSE` and `NOTICE`.
 
 ---
@@ -25,11 +25,17 @@ Patent applications, copyright registrations and trademark applications covering
 ## Notice and Disclaimer
 
 The software is provided "as is", without warranty of any kind. Every result in this manual carries its evidence
-class (section 14). A simulated result is a statement about a model; a software benchmark is a statement about the
+class (section 14). A modelled result is a statement about a model; a software benchmark is a statement about the
 software it ran on; only a hardware meter speaks for hardware. Nothing in this manual is a promise of a particular
 saving on a particular system. The only number that applies to your system is the one your own paired runs produce,
 on your own receipt. Before Omni-Compass writes to any production system, it must run in watch mode, pass the wire
 check, and be covered by a signed Omni-Compass Enterprise License.
+
+**Rights and changes.** © 2026 The Omni-Compass LLC. All rights reserved. All patents, copyrights and trademarks filed in
+the USA. Everything in this manual and in the repository it describes is subject to change at any time without notice;
+the authority of record for Omni-Compass, its current state and its terms is The Omni-Compass LLC at
+www.omni-compass.com, and where this manual and that record differ, the record governs. Every copy, export or printout
+of this manual carries this notice, `LICENSE`, `NOTICE` and `DISCLOSURES.md` unchanged.
 
 **The wiring declaration.** Omni-Compass acts only through the wires it is given. A wrong reading, a wrong or shared
 lever, a wrong range, or a service line set for another workload makes it do exactly what its law says with the wrong
@@ -424,7 +430,7 @@ cloud virtual machines and capacity, container resources, cross-cluster and edge
 distributed cluster managers, GPU fabric and RDMA, HPC and distributed compute, host CPU and memory, Kubernetes dynamic
 device allocation, Kubernetes placement and scheduling, Kubernetes workload scaling (the largest family, 31 muscles),
 NVIDIA GPU hardware, node fleets and Karpenter-class control, OpenShift and the Machine API, quantum computing control
-(simulated), and work admission and demand shaping. **Physics, robotics and autonomous** (eight): automotive EV and mobile
+(modelled), and work admission and demand shaping. **Physics, robotics and autonomous** (eight): automotive EV and mobile
 powertrains, aviation and autonomous flight, elevators and vertical transport, marine propulsion and vessel automation,
 rail traction and train control, robotics fleets and warehouse automation, robotics motion control, and spacecraft and
 flight software. **Energy, facility and industrial** (seventeen): agriculture and irrigation, building and
@@ -1391,7 +1397,7 @@ run there indefinitely; most will stop at level 3.
 
 ```
 python3 verify.py
-python3 tools/run_scale.py --runs 10 --scale 1 --out results/scale/eval     # the six organisms, simulated
+python3 tools/run_scale.py --runs 10 --scale 1 --out results/scale/eval     # the six organisms, modelled
 python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # the two-wire card, modelled
 ```
 
@@ -1492,7 +1498,7 @@ Pass: energy per unit of work down, no service gauge worse.
 `--power-cmd "<prints site watts>" --site-limit-w <limit>` brings site power stress into the engine;
 `--cooling-cmd "<sets {c}>" --cooling-min-c 18 --cooling-max-c 27 --cooling-restore-c 22` lets it hold the supply-air
 setpoint in its band. CPU and GPU sharing one power budget (`hardware/node_exchange.py`) and GPU groups sharing a site
-budget (`hardware/site_exchange.py`) run in simulation today. Batteries are designed as an organ, not yet wired.
+budget (`hardware/site_exchange.py`) run as models today. Batteries are designed as an organ, not yet wired.
 
 ### 9.4 Wiring for superiority: watch first, then the brain's own verdict on every knob
 
@@ -2053,7 +2059,7 @@ less work was done. The steps below are the whole method.
    time outside the service line not higher by more than 1 percentage point. The band-first rule is stricter: no win
    is claimed while the time outside the service line is above native's.
 
-**At scale (simulated).** The six organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
+**At scale (modelled).** The six organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
 (`bash scripts/scale_ladder.sh`) at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of each
 organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`); the six organisms with
 a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on GitHub) and `big-organism` and
@@ -2122,11 +2128,11 @@ sheet; a reader who wants the rows behind it reads the table it names, and reads
 | Class | Rung | What it is | What it can show |
 |---|---|---|---|
 | T / V | E1 | deterministic tests, proofs, Python against the C++ twin | the law is what it says, and both languages agree |
-| S | E2 | simulation on a modelled plant | whether the law helps the model, and where it breaks |
+| S | E2 | a run on a modelled plant, our own model | whether the law helps the model, and where it breaks |
 | L | E3 | real software (Kubernetes on kind), no hardware meter | real decisions on real software; energy there is a declared model |
 | P | E4 | a physical meter (the GPU's own power reading) | the hardware's own answer |
 
-Read every number with its class beside it. A simulation number is never quoted as a hardware result. When a
+Read every number with its class beside it. A modelled number is never quoted as a hardware result. When a
 receipt's energy line is modelled, the receipt says so.
 
 **What each class can and cannot carry, with the examples in this manual.** A class **T / V** result (the C++ twin
@@ -2697,6 +2703,33 @@ MongoDB's cache given back a notch a trial). The runs were dispatched on 10 Octo
 rerun of every benchmark on one commit (`docs/RERUN_2026-10-10.md`), and the tables, the index and the page are then read again
 from them.
 
+### 16.6c The second set of 10 October, and the four rules it taught the trial
+
+The five live products ran a second time on 10 October on the amended trial rule (a spend trial runs to its samples; it is
+never ended by the calm it causes). The trials finished. The brain still refused the Kafka consumer almost every time, and
+in the one repetition where it allowed the third consumer early, the whole gain of the earlier law came back at a fraction of
+the spend: the 95th-percentile delay fell from 2,450 ms to 57 ms, the queue from 3,375 waiting messages to 253, the work inside
+the line rose 17%, with 2.52 consumers on average where the earlier law had spent 5.8 to 7.9. On Redis with the large working
+set the brain allowed 15 MB more memory and bought more hits, more work and less host CPU, a row the earlier law never
+showed because it spent 200 MB; with the small working set nothing changed. PostgreSQL gave back about a tenth of its pool
+with the service inside the noise.
+
+The Kafka reading is the finding. The gain is real and cheap; the brain's test of it is unreliable, and the fault is in how the
+harness measures, not in the law or the engine's judge. The cost sample it is shown is the age of the backlog, which does not
+fall until the backlog is gone. A consumer joining the group rebalances it and the settle time is eaten by the pause. The
+reference and the trial phases, fourteen seconds each, straddle a thirty-second load step and compare different loads. Four
+rules follow for the trial, written into the next engine (`docs/OMNI_V4_PLAN.md`): samples count only once the muscle reports
+itself settled; a spend on a queue or a cache is judged by the muscle's own reading, the lag and its drain rate, the misses,
+with the body's cost taken at the settled state; the reference and the trial are compared at the same load, else the trial
+waits for a steady step; and coarse to fine, one scout step to the far side of the cover when single notches read flat, so a
+hill of forty notches is not refused one notch at a time. The founder's words of the same day say it in one line: what the
+brain sends to a muscle has to coincide with what the muscle reports about itself and where it stands.
+
+The next engine, Omni v4, is ordered on that day: one body, one brain, one tick a second; the body's cost judged; nothing
+anywhere made worse to make one thing better; one trial at a time inside a body; nothing permanent; the wall belonging to the
+body; every wire forced through it. Part II gains its chapter when v4 is written and run, and every result in this chapter is
+run again on it.
+
 ### 16.7 Threats to validity, stated by us
 
 A referee will look for the ways these results could mislead. We list the ones we know, what each would do to the
@@ -2782,7 +2815,7 @@ The software and this manual are licensed under the Omni-Compass Evaluation Lice
 simulation use only. Everything else - commercial use, production use, operating any system beyond evaluation,
 redistribution, a hosted or managed service, incorporation into a product or service, or using the software or its
 results to build a competing product - requires a written Omni-Compass Enterprise License signed by The Omni-Compass
-LLC and paid for. Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. No patent or trademark license is granted for any other use. Contributions are accepted only on the
+LLC and paid for. All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. No patent or trademark license is granted for any other use. Contributions are accepted only on the
 terms in `.github/CONTRIBUTING.md`, which assign their rights to The Omni-Compass LLC.
 
 ## 18. Python, C++ and the Seal
@@ -2890,7 +2923,7 @@ any one of the three can tell whether the files in front of them are the files t
 | Task | Command |
 |---|---|
 | Verify everything | `python3 verify.py` |
-| Six organisms, simulated | `python3 tools/run_scale.py --runs N --scale K --out <dir>` |
+| Six organisms, modelled | `python3 tools/run_scale.py --runs N --scale K --out <dir>` |
 | The full ladder | `bash scripts/scale_ladder.sh` |
 | Two-wire card, modelled | `python3 tools/run_gpu_card.py <dir> [fresh]` |
 | GPU wire check | `sudo python3 tools/gpu_wire_check.py --gpu 0` |
@@ -3189,5 +3222,5 @@ Licensing, pilots and the Omni-Compass Enterprise License: **The Omni-Compass LL
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
 `NOTICE` at the root of this repository.*

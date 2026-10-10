@@ -2,9 +2,24 @@
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
-> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. Not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and [`DISCLOSURES.md`](DISCLOSURES.md).
+> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights reserved. Not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. Everything in this repository is subject to change at any time; the authority of record for Omni-Compass, its current state and its terms is The Omni-Compass LLC at [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report, archive or printout of any part of Omni-Compass carries this notice, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and [`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
 
 The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com)
+
+## Latest (10 October 2026, newest first)
+
+- **Omni v4 ordered: the collective mechanism.** One body, one brain, one tick a second; a trial runs to its full measurement and
+  is never ended by the calm it causes; the body's cost is judged and nothing anywhere is made worse to make one thing better;
+  every wire forced through it. Designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md), with the final coverage sweep
+  (register rows 74 to 78, five new muscle families, the closed systems of the mega-caps mapped to the open analogs that carry
+  the same muscles) and the order of the rerun. Every result is run again on v4 when it is built.
+- **The second set of the five live products** (Redis, Kafka, PostgreSQL, MySQL, MongoDB; 21 runs on the amended trial rule)
+  landed and is archived; its three-run tables follow. From the logs: on Kafka the brain allowed the third consumer once and the
+  whole gain returned at 2.5 consumers instead of 6 to 8 (delay 2.4 s to 57 ms); on every other repetition it refused. The
+  trial's measurement, not the law, is the fault, and the four rules that fix it are in the v4 plan
+  ([`docs/RERUN_2026-10-10.md`](docs/RERUN_2026-10-10.md)).
+- **The rerun of 10 October**: every table remade from 67 archived runs on Omni v3; the Omni index +4.8%, service reading
+  +10.7%, no losing row ([`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md)).
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass
 never replaces native; every comparison below is native against omni.
@@ -151,6 +166,20 @@ proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.m
 | `docs/` | Results, method, manual, due diligence |
 | `tests/` | The tests `verify.py` runs |
 
+## Find it
+
+Omni-Compass is a **supervisory governor**: a control plane that sits on top of a native controller and never replaces it.
+People searching for any of these should find this page: supervisory governor, supervisory control, control plane,
+governor, controller, autoscaler, autoscaling, Kubernetes HPA, cluster autoscaler, Karpenter, KEDA, node pool, right-sizing,
+conveyance, machinery, engine control, power cap, clock ceiling, DVFS, cpufreq, RAPL, GPU power limit, energy efficiency,
+energy per unit of work, data center efficiency, PUE, green computing, FinOps, SRE, SLO, p95, tail latency, do no harm,
+paired trial, A/B/C replication, preregistration, Redis maxmemory, Kafka consumer group, PostgreSQL pooler, MySQL buffer
+pool, MongoDB WiredTiger cache, HVAC setpoint, building management, chiller plant, UPS, PDU, battery management, microgrid,
+grid tap changer, voltage regulator, wind turbine pitch, pipeline compressor, water pump scheduling, robot servo, drone
+autopilot, flight software, autonomous driving stack, 5G RAN scheduler, matching engine, game server fleet, build farm,
+ledger node, IDS workers, control theory, closed loop, two antagonist forces, tanh law, nervous system, muscles, realms,
+organisms, Omni index. GitHub topics for this repository are set from the repository's About panel by its owner.
+
 ## License
 
 **Proprietary. Evaluation and simulation use only.** You may download, run and modify the software only to evaluate
@@ -173,5 +202,5 @@ trademark license is granted for any other use.
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
 `NOTICE` at the root of this repository.*

@@ -35,13 +35,14 @@ PLATES = BOOK / "plates"
 OUT_PDF = ROOT / "docs" / "OMNI_COMPASS_MANUAL.pdf"
 OUT_MD = BOOK / "OMNI_COMPASS_BOOK.md"
 EDITION = "October 2026"
-BANNER_MD = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not "
-             "open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, "
-             "commercialization, monetization, production use, redistribution, hosted service or incorporation into a product "
-             "requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Patent applications, "
-             "copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its "
-             "software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../../LICENSE).")
-FILED = ("Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its "
+BANNER_MD = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights "
+             "reserved. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any "
+             "commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation "
+             "into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent "
+             "applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics "
+             "and its software have been filed in the United States by The Omni-Compass LLC. Everything here is subject to change "
+             "at any time; www.omni-compass.com is the authority of record. See [`LICENSE`](../../LICENSE).")
+FILED = ("All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its "
          "mathematics and its software have been filed in the United States by The Omni-Compass LLC.")
 
 # ---------------------------------------------------------------- fonts

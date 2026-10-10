@@ -1,12 +1,27 @@
 # Omni-Compass: state of play (read this first)
 
-> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Protected by copyright, patents and trademarks: Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).
+> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Protected by copyright, patents and trademarks: All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).
 
 Current facts only. Earlier states, failures and chronology are kept whole in `docs/HISTORY.md`. The release this page
 describes is identified by `RELEASE_MANIFEST.json` (commit, fingerprints of the engine, the C++ twins, the GPU protocol,
 the live evidence and the verification receipt), which `verify.py` checks against the files.
 
 **Rerun everything:** `pip install -r requirements.txt && python verify.py` ends with `VERIFICATION: PASS`.
+
+**The afternoon of 10 October: Omni v4 ordered, the sweep closed, two faults found, the second set landed.** The founder ordered
+the collective mechanism as the next engine (`docs/OMNI_V4_PLAN.md`: one body, one brain, one tick a second; a trial runs to its
+full measurement and is never ended by the calm it causes; the body's cost judged, nothing anywhere made worse to make one thing
+better; one trial at a time inside a body; nothing permanent; the wall belonging to the body; every wire forced through it; the
+six organisms, the four realms, all realms stacked and the whole catalog, re-cut by a written rule). The final coverage sweep
+against the internet added register rows 74 to 78 and five catalog families for v4, and mapped the mega-caps' closed systems to
+the open analogs that carry the same muscles (`docs/COVERAGE_MAP.md`). Two faults GitHub's own runs showed and no local check had
+were fixed: the release manifest, not refreshed after the morning's last document edits, and the cpu-power workflow file, refused
+by GitHub since its first push for an unquoted colon; the verifier now parses every workflow file. The five live products' second
+set on the amended trial rule landed (21 runs) and is archived; its early reading, from the logs, is in `docs/RERUN_2026-10-10.md`
+and the manual's 16.6c: on Kafka the brain allowed the third consumer once and the whole gain returned at 2.5 consumers instead of
+6 to 8, and refused on every other repetition; the trial's measurement, not the law, is the fault, and four trial rules for v4
+follow from it. The legal wording on every page outside the frozen engine now reads "all patents, copyrights and trademarks",
+"all rights reserved", "subject to change at any time", with www.omni-compass.com the authority of record.
 
 **Everything run again (10 October 2026, 01:24 to 01:31 UTC).** At the founder's order that every result be as of today, every
 benchmark with a result was dispatched again on the current commit `3aac0ab7` (Omni v3, digest `b53d05449ee04c4b`, by
@@ -103,8 +118,9 @@ trial run to its samples; the five stacks run again on it, and the result of rec
 (the five stacks both ways; the cluster's machines, the card's clock, the robots' speed and the drones' cruise by the engine's own
 verdict; the grids, the districts and the 945 modelled muscles by the law alone), is the last table of `docs/WIRING_VERDICTS.md`.
 Inside the modelled realms the organism still
-takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, designed in
-`docs/OMNI_V4_PLAN.md` and not built, because every result must be run again on a new engine.
+takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, ordered on 10 October and
+designed in `docs/OMNI_V4_PLAN.md` as the collective mechanism (one body, one brain); it is built next and every result is run
+again on it.
 
 ## Measured on real systems (evidence class L), Omni v3
 
@@ -134,7 +150,7 @@ takes one directive for every muscle; the verdict per muscle there is the next e
 | A burst sized to the cluster, 4 workers, 5 pairs | the bill +5.0% with its interval across zero; p99 −34% clear of the noise in this one run; the rest inside the noise | `results/live/V1_AKS_BURST.md` |
 | The fleet that can show one machine (40 workers, nine families) on v3 | dispatched; two earlier dispatches refused by the subscription's family allowances before any arm ran, the third by Azure's own cluster capacity in eastus; every refusal cost cents and is recorded | `docs/K8S_COMPASS_PREREGISTRATION.md` |
 
-## Simulated (evidence class S: models, never counted in the headline), Omni v3
+## Modelled (evidence class S: our own models, never counted in the headline), Omni v3
 
 | What | Reading | Source |
 |---|---|---|
@@ -211,7 +227,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
    RocketPy, Cantera (Kafka and Redis done); one or two at a time, each preregistered.
 8. **The gaps the tree shows (the founder's reading, 10 October).** The index's six real categories are the cluster, PostgreSQL,
    Kafka, Redis, MongoDB and MySQL; Azure waits on its three-run close (item 1) and the card on its run on the current controller
-   (item 3); the power grids and the districts are in as simulations, never in the index by rule. Not yet a category: **a second
+   (item 3); the power grids and the districts are in as modelled results, never in the index by rule. Not yet a category: **a second
    and a third cloud**, AWS and Google Cloud under Azure's method (`docs/REGISTER.md` row 38; each needs its own account credential
    in a GitHub secret and an allowance of about 90 cores, about $12 a steady and $22 a burst run, nothing spent until the account
    exists); **CPU power through Linux's own governor with the RAPL meter**: **built and preregistered the same day**
@@ -257,5 +273,5 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
 `NOTICE` at the root of this repository.*
