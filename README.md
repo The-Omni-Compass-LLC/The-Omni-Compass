@@ -53,8 +53,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-10 19:40 | kwok-scale | success | [38079735503](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38079735503) |
 | 2026-10-10 17:21 | six | success | [38052254140](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38052254140) |
-| 2026-10-10 16:33 | kwok-scale | success | [38067955639](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38067955639) |
 | 2026-10-10 15:58 | big-organism-detached | success | [38065681492](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38065681492) |
 | 2026-10-10 15:25 | ycsb | success | [38054787517](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054787517) |
 | 2026-10-10 15:16 | sysbench | success | [38054773573](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054773573) |
