@@ -39,7 +39,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4   # the archived raw runs (25 GB) stay out: the run reads none of them
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
@@ -68,8 +73,13 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
-        with: {ref: "${{ github.ref_name }}"}
+      - uses: actions/checkout@v4   # the branch, to commit the results back; the archived raw runs (25 GB) stay out
+        with:
+          ref: "${{ github.ref_name }}"
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
@@ -99,7 +109,7 @@ jobs:
           ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add "$d"
+          git add --sparse "$d"
           git commit -q -m "Add-on test, run ${{ github.run_id }}: raw files and tables (test branch only)"
           for i in 1 2 3 4 5 6; do
             git push origin "HEAD:${{ github.ref_name }}" && exit 0
