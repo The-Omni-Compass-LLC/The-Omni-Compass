@@ -1,6 +1,6 @@
 # The governor's own cost at 1, 10, 100 and 1,000 copies
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
 
 
 Omni-Compass's own CPU: the seconds its process and every command it ran spent on the CPU over the measured window, as a share of one core, from the `overhead` record every omni arm's audit carries (`omni_controller/controller.py`, written at exit), with the host's core count beside it. Native runs no governor: its cost is zero by construction. The organisms are the six with the real cluster inside (`tools/run_kil.py`); the governor's cost is the cost of governing the real cluster, which does not grow with the organism around it. Each run is shown under the engine its commit carries, and nothing is read across engines (`docs/ROBUSTNESS_PREREGISTRATION.md`, scenario 3). Shown, not judged.
@@ -66,4 +66,4 @@ Omni-Compass's own CPU: the seconds its process and every command it ran spent o
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

@@ -68,4 +68,4 @@ tables are made by rule and refuse to mix engines.
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
-Enterprise License. Patents, copyrights and trademarks filed in the USA.
+Enterprise License. All patents, copyrights and trademarks filed in the USA. All rights reserved. Subject to change at any time.

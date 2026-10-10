@@ -34,12 +34,13 @@ OUT = ROOT / "docs" / "DOSSIER.md"
 FIG = ROOT / "docs" / "dossier"
 SURF, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
 SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#8a63d2"]   # validated categorical order
-BANNER = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not "
-          "open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, "
-          "commercialization, monetization, production use, redistribution, hosted service or incorporation into a product "
-          "requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Patent applications, "
-          "copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its "
-          "software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../LICENSE).")
+BANNER = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights "
+          "reserved. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any "
+          "commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation "
+          "into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent "
+          "applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics "
+          "and its software have been filed in the United States by The Omni-Compass LLC. Everything here is subject to change "
+          "at any time; www.omni-compass.com is the authority of record. See [`LICENSE`](../LICENSE).")
 _SZ = organism_sizes()
 ORG = [f"Compute / AI / Cloud ({_SZ['compute_ai_cloud']})", f"Physics / Robotics / Autonomous ({_SZ['physics_robotics_autonomous']})",
        f"Energy / Facility / Industrial ({_SZ['energy_facility_industrial']})", f"Distribution / Specialized ({_SZ['distribution_specialized']})",

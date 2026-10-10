@@ -2,8 +2,9 @@
 
 > **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
 > commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
-> Omni-Compass Enterprise License. Patent applications, copyright registrations and trademark applications have been
-> filed in the United States by The Omni-Compass LLC. See `LICENSE` and `NOTICE`.
+> Omni-Compass Enterprise License. All patent applications, copyright registrations and trademark applications have been
+> filed in the United States by The Omni-Compass LLC. All rights reserved. Everything here is subject to change at any
+> time; www.omni-compass.com is the authority of record. See `LICENSE` and `NOTICE`.
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
@@ -71,10 +72,32 @@ the founder overrides one in the conversation.
 
 ## Legal, on every output
 
-- At the top and end of every output: © 2026 The Omni-Compass LLC; evaluation and simulation use only; any
-  commercialization or monetization requires a signed, paid Omni-Compass Enterprise License; patents, copyrights and
-  trademarks filed in the USA (say "filed", never give numbers).
+- At the top and end of every output: © 2026 The Omni-Compass LLC; all rights reserved; evaluation and simulation use
+  only; any commercialization or monetization requires a signed, paid Omni-Compass Enterprise License; **all** patents,
+  copyrights and trademarks filed in the USA (say "filed", never give numbers); everything subject to change at any time;
+  www.omni-compass.com is the authority of record (the founder's wording of 10 October: the word "all" before patents,
+  "all rights reserved" and "subject to change at any time" everywhere, the website as the authority of record).
+- Every export of any part of Omni-Compass (a zip, a report, a table, a PDF, a chat answer) carries the README's notice,
+  the LICENSE, the NOTICE and DISCLOSURES.md the same way, written as a multi-billion-dollar company would protect a
+  released asset.
 - Keep the SPDX headers so Black Duck, FOSSA and Snyk detect the license.
+
+## Orders of 10 October (afternoon)
+
+- The reflex rule is the whole mechanism: a trial runs to its full measurement and is never ended by the calm it causes;
+  the brain never forces, it reacts to what the system shows; one body, one brain, the body's cost judged, nothing anywhere
+  made worse to make one thing better; one trial at a time inside a body; nothing permanent; the wall belongs to the body.
+  Written into the engine as **Omni v4** (`docs/OMNI_V4_PLAN.md`), every wire forced through it, every result rerun.
+- Everything is wired. Staying native is the brain's live decision every second, never a verdict from one run.
+- **Six organisms**, never five: the four realms, all realms stacked (1,716), the whole catalog once (945). The live
+  software products are never counted beside them. Realms are re-cut by a written rule at v4; new muscles raise the count.
+- The word "simulation" is not used for our own models in reports: they are "modelled" (class S); live software is "the
+  real thing" (class L); a meter is class P. The license's own phrase stays as written.
+- The newest result is always at the front; the repository keeps itself current (the archive bot and the front page);
+  old material goes to `docs/history`.
+- The manual is a printed book: front matter, body, back matter, the wiring instructions for the people who implement it,
+  the theory of the mechanism; rebuilt as a PDF whenever it changes.
+- The founder hears what a result says before it goes up.
 
 ## Repository
 
@@ -101,4 +124,4 @@ the founder overrides one in the conversation.
 
 ---
 
-© 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass Enterprise License. Patents, copyrights and trademarks filed in the USA.
+© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. Subject to change at any time; www.omni-compass.com is the authority of record.

@@ -2,7 +2,7 @@
 
 > **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
 > commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
-> Omni-Compass Enterprise License. Patent applications, copyright registrations and trademark applications have been
+> Omni-Compass Enterprise License. All patent applications, copyright registrations and trademark applications have been
 > filed in the United States by The Omni-Compass LLC. See `LICENSE` and `NOTICE`.
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
@@ -109,4 +109,4 @@ runs will show whatever they show.
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
-Enterprise License. Patents, copyrights and trademarks filed in the USA.
+Enterprise License. All patents, copyrights and trademarks filed in the USA. All rights reserved. Subject to change at any time.

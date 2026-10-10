@@ -1,6 +1,6 @@
 # Licensing: Questions and Answers
 
-> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](LICENSE).
+> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](LICENSE).
 
 Plain answers to the questions buyers, engineers and their lawyers ask. The binding terms are in `LICENSE`; where
 this page and `LICENSE` differ, `LICENSE` governs. Every declaration is in `DISCLOSURES.md`.
@@ -22,7 +22,7 @@ agreement signed by The Omni-Compass LLC and paid for.
 against Omni-Compass on the same system, the same load and the same clock). Terms are set in each signed agreement; no
 price stated anywhere in this repository is an offer.
 
-**Are patents involved?** Patent applications, copyright registrations and trademark applications covering the
+**Are patents involved?** All patent applications, copyright registrations and trademark applications covering the
 Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC
 (`PATENTS.md`). The evaluation license grants no patent license beyond evaluation.
 
@@ -46,5 +46,5 @@ time; a signed Enterprise License governs its own term (`DISCLOSURES.md`, sectio
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
 `NOTICE` at the root of this repository.*

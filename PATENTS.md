@@ -2,7 +2,7 @@
 
 > **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`.
 
-**Patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.**
+**All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.**
 
 The filings cover, among other things, the Omni-Compass engine (the six-state closed law and its bounded control
 command held through the integration step), the compass law (the service position pulled to the middle of its band by a

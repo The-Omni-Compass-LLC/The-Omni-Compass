@@ -2,12 +2,33 @@
 
 > **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
 > commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
-> Omni-Compass Enterprise License. Patent applications, copyright registrations and trademark applications have been
+> Omni-Compass Enterprise License. All patent applications, copyright registrations and trademark applications have been
 > filed in the United States by The Omni-Compass LLC. See `LICENSE` and `NOTICE` at the root of this repository.
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-10
+- **The founder's afternoon orders, held and pushed as one (15:45 UTC).** (1) **Omni v4 ordered**: the collective mechanism, one
+  body, one brain, one tick a second; a trial runs to its full measurement and is never ended by the calm it causes; the brain never
+  forces, it reacts to what the system shows; the body's cost is judged with a guard for every part; one trial at a time inside a body;
+  nothing permanent; the wall belongs to the body; every wire forced through it (`docs/OMNI_V4_PLAN.md`, rewritten). Everything is
+  wired; staying native is the brain's live decision every second, never a verdict from one run. (2) **Six organisms**, restated and
+  never again counted beside the live products; realms re-cut by a written rule at v4. (3) **The final coverage sweep** against the
+  internet: register rows 74 to 78 (game server fleets, ledger nodes, build farms, network security engines, device brokers), lines
+  on rows 9, 13, 19, 32 and 42, any vendor's card in section 2.3, five families and the robotics widening for the catalog at v4, the
+  mega-caps' closed systems mapped to the open analogs that carry the same muscles, a ledger node's consensus added to the
+  exclusions (`docs/REGISTER.md`, `docs/COVERAGE_MAP.md`). (4) **The legal wording** on every page outside the frozen engine: "all"
+  before patents, copyrights and trademarks; "All rights reserved"; "subject to change at any time"; www.omni-compass.com the
+  authority of record; every export carries the notice, the license, the NOTICE and the disclosures (190 files, `LICENSE` section 9,
+  `NOTICE`, `DISCLOSURES.md` item 4, the SBOM's embedded license, `CLAUDE.md`). (5) **Two faults GitHub's own runs showed and no
+  local check had**: the release manifest not refreshed after the morning's last document edits (GitHub's verify red on four commits;
+  refreshed) and `.github/workflows/cpu-power.yml` refused by GitHub since its first push for an unquoted colon in a step name (ten
+  failed runs with zero jobs; quoted); `verify.py` now parses every workflow file (PyYAML in the requirements). (6) **The second set
+  of the five live products** complete (21 runs, every job green) and archived; its early reading from the logs in
+  `docs/RERUN_2026-10-10.md` and the manual's 16.6c: the Kafka gain is real and cheap and the trial's measurement is the fault, four
+  trial rules written for v4. (7) The README leads with the newest work and carries a "Find it" section of the terms people search
+  for; the word "simulation" is kept only in the license's own phrase and for third-party simulators by name, our own models being
+  "modelled".
 - **Every table remade from the rerun of 10 October** (69 of the 71 runs landed by 12:30 UTC; `docs/RERUN_2026-10-10.md`,
   "what landed"): the seven Kubernetes tests, the two robustness scenarios, the five stacks under both objectives (two new
   tables for the service objective, `results/live/V3_REDIS_SERVICE.md` and `results/live/V3_KAFKA_SERVICE.md`), the four
@@ -856,5 +877,5 @@ See `docs/HISTORY.md` and `docs/STATE_OF_PLAY.md`.
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-Patent applications, copyright registrations and trademark applications filed in the United States. See `LICENSE` and
+All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
 `NOTICE` at the root of this repository.*
