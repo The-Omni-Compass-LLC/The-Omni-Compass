@@ -166,7 +166,7 @@ The first counted set on the brain's verdict (runs 38021564790, 38013304929, 380
 
 **Expected before the runs:** the consumer trials are judged: a third consumer is allowed where the latency falls and the work inside the line rises by more than the consumer count rises (the index's arithmetic), and the next one only if it pays again; the lag and p95 gains return (lag cut by most of its length, p95 from seconds to tens of milliseconds) with fewer consumers than the earlier set's 6 to 8, each one paid for; under the service objective the same with the consumers shown and not judged. The first set's table stands as the result of amendment 2 until the set on this amendment lands and supersedes it; it then goes whole to `docs/history`.
 
-**Dispatch.** None yet at the time of writing; the runs are dispatched when this amendment is pushed, and their ids are recorded in `docs/RERUN_2026-10-10.md`.
+**Dispatched (2026-10-10 13:11 to 13:12 UTC, commit `ca745467`).** Under the resource objective runs 38054742933, 38054746778, 38054750788 (A, B, C); under the service objective runs 38054804459, 38054808912, 38054812962 (A, B, C); the same inputs as the morning's; recorded run by run in `docs/RERUN_2026-10-10.md`.
 
 ---
 
