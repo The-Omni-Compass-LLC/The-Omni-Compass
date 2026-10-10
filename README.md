@@ -12,6 +12,13 @@ The lines between the two markers below are written by the repository itself: af
 workflow archives the run and rebuilds every table whose three runs are in (`tools/front_page.py`, `.github/workflows/front-page.yml`).
 
 <!-- front-page:begin -->
+- 2026-10-10 16:50 UTC: `V3_YCSB` rebuilt from runs 38054777807, 38054782696, 38054787517 (ycsb, the resource objective, omni-v3): /home/runner/work/The-Omni-Compass/The-Omni-Compass/results/live/V3_YCSB.md: 4 untouched workloads; 4 better, 0 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_SYSBENCH` rebuilt from runs 38054765202, 38054768832, 38054773573 (sysbench, the resource objective, omni-v3): /home/runner/work/The-Omni-Compass/The-Omni-Compass/results/live/V3_SYSBENCH.md: 4 untouched workloads; 0 better, 0 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_REDIS_SERVICE` rebuilt from runs 38054791688, 38054795871, 38054800068 (redis, the service objective, omni-v3): /home/runner/work/The-Omni-Compass/The-Omni-Compass/results/live/V3_REDIS_SERVICE.md: 3 untouched workloads; 5 better, 2 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_REDIS` rebuilt from runs 38054731163, 38054735302, 38054739168 (redis, the resource objective, omni-v3): /home/runner/work/The-Omni-Compass/The-Omni-Compass/results/live/V3_REDIS.md: 3 untouched workloads; 0 better, 0 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_PGBENCH` rebuilt from runs 38054754511, 38054758150, 38054761503 (pgbench, the resource objective, omni-v3): /home/runner/work/The-Omni-Compass/The-Omni-Compass/results/live/V3_PGBENCH.md: 3 workloads; 1 better, 1 worse, 1 disagree
+- 2026-10-10 16:50 UTC: `V3_KAFKA_SERVICE` rebuilt from runs 38054804459, 38054808912, 38054812962 (kafka, the service objective, omni-v3): /home/runner/work/The-Omni-Compass/The-Omni-Compass/results/live/V3_KAFKA_SERVICE.md: 3 untouched workloads; 1 better, 0 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_KAFKA` rebuilt from runs 38054742933, 38054746778, 38054750788 (kafka, the resource objective, omni-v3): /home/runner/work/The-Omni-Compass/The-Omni-Compass/results/live/V3_KAFKA.md: 3 untouched workloads; 1 better, 0 worse, 0 disagree
 <!-- front-page:end -->
 
 - **Omni v4 ordered: the collective mechanism.** One body, one brain, one tick a second; a trial runs to its full measurement and

@@ -21,12 +21,12 @@ A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes 
 
 | Where | Knobs or cases | Write | Operator's choice | Watch |
 |---|---:|---:|---:|---:|
-| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 24 | 11 | 0 | 13 |
+| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 24 | 10 | 0 | 14 |
 | Independent simulators, three runs each (robot arms, grids, districts, swarms; evidence class S) | 39 | 21 | 15 | 3 |
 | The 945 modelled muscles, alone on their plants (evidence class S) | 945 | 124 | 13 | 808 |
 | The organisms with the real cluster inside (GitHub at 10 and 100 copies; Azure at 1,000) | 14 | 12 | 1 | 1 |
 
-In words: on the real stacks Omni earns its wire in on 11 of 24 knob-cases, trades on 0 and watches on 13. Of the 945 modelled muscles, 124 earn a wire in, 13 are trades and 808 stay native: 746 of the 808 wrote nothing in any run, because the native controller already held the reading inside the band and the law never left its cushion. A knob that never writes costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
+In words: on the real stacks Omni earns its wire in on 10 of 24 knob-cases, trades on 0 and watches on 14. Of the 945 modelled muscles, 124 earn a wire in, 13 are trades and 808 stay native: 746 of the 808 wrote nothing in any run, because the native controller already held the reading inside the band and the law never left its cushion. A knob that never writes costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
 
 ## The real stacks (evidence class L: live software, three separate GitHub runs on the frozen engine)
 
@@ -52,9 +52,9 @@ The knob: the pooler's pool size (server connections).
 
 | Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| select | connections held open cut 6% to 11% | none | **write** | +2.4% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_PGBENCH.md` |
-| simple_update | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (10 gauges inside the noise, 2 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_PGBENCH.md` |
-| tpcb_hot | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (10 gauges inside the noise, 2 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_PGBENCH.md` |
+| select | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_PGBENCH.md` |
+| simple_update | none | connections most at once up 8% to 12% | **watch** | +0.0% | +0.0% | the runs disagree on connections held open (-4.0% to +2.2%). Why: connections most at once up 8% to 12%: cost, because amendment 1's add rule ("slow, clients waiting for a server: add") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch. | `results/live/V3_PGBENCH.md` |
+| tpcb_hot | connections held open cut 7% to 13% | none | **write** | +2.8% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_PGBENCH.md` |
 
 ### Real messaging (Apache Kafka, GitHub)
 
@@ -64,7 +64,7 @@ The knob: the consumer group's size.
 |---|---|---|---|---:|---:|---|---|
 | tuning (tuning workload: shown, never counted) | consumers running cut 0.3% | none | **write** (not counted) |  |  |  Nothing worse: Omni holds the knob. | `results/live/V3_KAFKA.md` |
 | burst | consumers running cut 0.8% | none | **write** | +0.2% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_KAFKA.md` |
-| heavy | consumers running cut 0.3% | none | **write** | +0.1% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_KAFKA.md` |
+| heavy | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (13 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_KAFKA.md` |
 | light | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (13 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_KAFKA.md` |
 
 ### Real cache (Redis, GitHub)
@@ -73,7 +73,7 @@ The knob: the cache's memory ceiling.
 
 | Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | the runs disagree on work inside the line (-0.2% to +1.5%), hit rate (-0.2% to +1.5%), mean (-5.3% to +1.0%); nothing confirmed either way (8 gauges inside the noise, 1 the same). Nothing is settled here, so the knob stays native until three runs agree. | `results/live/V3_REDIS.md` |
+| tuning (tuning workload: shown, never counted) | work inside the line up 4.4% to 4.9%, hit rate up 4.4% to 5.0%, mean cut 14% to 16% | memory ceiling held up 19% to 26%, memory used up 16% to 21% | **operator's choice** (not counted) |  |  | Why: memory ceiling held up 19% to 26%: cost, because the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the cost that reads worse (`docs/REDIS_PREREGISTRATION.md`, the gauges); memory used up 16% to 21%: cost, because the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held. | `results/live/V3_REDIS.md` |
 | burst | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_REDIS.md` |
 | large | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (10 gauges inside the noise, 2 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_REDIS.md` |
 | small | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_REDIS.md` |
@@ -84,11 +84,11 @@ The knob: the storage engine's cache size.
 
 | Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | nothing confirmed either way (10 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_YCSB.md` |
+| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | the runs disagree on p95 (-0.3% to +2.1%); nothing confirmed either way (9 gauges inside the noise, 1 the same). Nothing is settled here, so the knob stays native until three runs agree. | `results/live/V3_YCSB.md` |
 | b | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (10 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_YCSB.md` |
-| burst | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (10 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_YCSB.md` |
+| burst | cache size held cut 10% to 13%, cache in use cut 10% to 13% | none | **write** | +3.1% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_YCSB.md` |
 | c | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (10 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_YCSB.md` |
-| f | cache size held cut 3% to 13%, cache in use cut 4% to 13% | none | **write** | +2.6% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_YCSB.md` |
+| f | cache size held cut 13% to 15%, cache in use cut 12% to 14% | none | **write** | +3.7% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_YCSB.md` |
 
 ### Real database buffer pool (MySQL under sysbench, GitHub)
 
@@ -99,14 +99,14 @@ The knob: the buffer pool's size.
 | tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
 | burst | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
 | read_only | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
-| read_write | pool held cut 10% to 20%, pages holding data cut 11% to 20% | none | **write** | +4.2% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_SYSBENCH.md` |
+| read_write | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
 | update_index | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
 
 ## Every confirmed loss on a real stack, and why
 
 The founder's question was where the negatives are and why each is there. Every gauge confirmed worse on a real stack, with its cause read from the preregistration that carries the result:
 
-- none
+- **PostgreSQL, connections most at once: simple_update up 8% to 12%, a cost** (20 → 21.67 in run A). Amendment 1's add rule ("slow, clients waiting for a server: add") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch. Verdict: **watch**.
 
 What the losses have in common: every one is a resource spent to buy the service the knob exists for (consumers and the CPU they poll with, memory, pages, connections), and each was declared in advance in its preregistration as the cost that would read worse, or found on the first counted set and disclosed. None is a service loss: on no real stack did work inside the line, p95 or failed requests read confirmed worse. Where the resource was spent and nothing was bought (PostgreSQL's `simple_update`), the verdict is watch; where it bought service, the verdict is the operator's, and both index readings say what the trade is worth.
 
