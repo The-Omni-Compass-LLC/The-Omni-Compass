@@ -1,22 +1,13 @@
 # THE OMNI-COMPASS MANUAL
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 ## The Governor, Its Mechanism, and How to Wire It onto Your Stack
 
 **October 2026**
 **The Omni-Compass LLC**
 
-All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.
-
----
-
-> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-> `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. This manual and the software it describes are not
-> open source. You may use them only to evaluate Omni-Compass and to reproduce its published results, including in
-> shadow or test mode on systems you own or control. Any commercial use, commercialization, monetization, production
-> use, operation of any system beyond evaluation, redistribution, hosted or managed service, or incorporation into any
-> product or service requires a written **Omni-Compass Enterprise License**, signed by The Omni-Compass LLC and paid
-> for. All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.
-> "Omni-Compass" and its marks are trademarks of The Omni-Compass LLC. Full terms: `LICENSE` and `NOTICE`.
+All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.
 
 ---
 
@@ -76,6 +67,10 @@ Founder, The Omni-Compass LLC
 | Auditor, diligence team | Part II (mechanism), Part VI (proof), Appendix C (equations), Appendix F (evidence map) |
 | Referee, reviewer | The standards below; sections 13 to 15 (the method, the classes, the frozen engines and the three-run rule); section 16.7 (threats to validity, stated by us); Appendix F, "How to audit one result from this manual to its raw files"; then any table in `results/live/` and its preregistration |
 | Underwriter, insurer | Sections 1.2 and 1.3 (do no harm, the pedals, the two switches); section 11 (the three ways a governor stops and what each leaves behind); section 12 (least privilege, supply chain); section 16.7 |
+| Data-center, facility or energy operator | The Quick Reference card; sections 1.1 to 1.3; section 9 (levels 5 to 7: the card, the processor, the site); section 10.10 (the processor itself) and 10.11 (the data center under the servers); section 11 (the switches); Appendix E |
+| Site reliability engineer, on call | The Quick Reference card; section 11 (the three ways a governor stops, and what each leaves behind); section 8.5 (wired right or wired wrong); section 7.3 (blind means hold); Appendix E |
+| Security and compliance | Section 11 (the master switch, the kill file and the lease); section 12 (least privilege, supply chain, the audit log); `SECURITY.md`; `DISCLOSURES.md`, sections 4 and 5 |
+| Procurement and counsel | `LICENSE`, `NOTICE`, `PATENTS.md`, `TRADEMARKS.md`, `DISCLOSURES.md`, `LICENSING_FAQ.md`; section 17 (license and commercial terms) |
 | Anyone who wants the whole list | `docs/REGISTER.md`: every muscle wired (945, by family), every benchmark run on every platform (Kubernetes, Azure AKS, GPU, CPU, UPS and batteries, buildings, power grids, robotics) with its result and file, and every open benchmark still to run, in order |
 
 **Conventions.** `code` is a command, file or switch exactly as typed. "Native" means your system as it runs today,
@@ -119,12 +114,72 @@ law, the closed-circle principle that keeps it inside its walls, the compass law
 muscle, and the two-way nervous system that decides how much authority each organ has. Part III is the harness: the
 plug every muscle is wired through, the adapters, and the wire check that must pass before anything writes. Part IV
 wires it onto a stack one level at a time and then stack by stack: Kubernetes on kind and on Azure, a database behind
-its pooler, a message broker's consumer group, a cache's memory ceiling, the independent simulators, drone swarms and
-the big organisms on a rented machine. Part V is operating it: the switches, the rules the governor keeps, the log, and
+its pooler, a message broker's consumer group, a cache's memory ceiling, the independent simulators, drone swarms, the
+big organisms on a rented machine, the processor itself, and the data center under the servers. Part V is operating it: the switches, the rules the governor keeps, the log, and
 maintenance. Part VI is proof: paired runs and receipts, evidence classes, the frozen engines and the three-run rule,
 the Omni index, and every result to date with its losses, followed by the threats to validity we state ourselves and the
 open program. Part VII is the code, the C++ twins and the license. The back matter holds the glossary, every command,
 the file map, the equations in full, the metrics, troubleshooting and the evidence map.
+
+## Quick Reference: The Card for the Glove Box
+
+Keep this page where the people who run the system can reach it, the way a driver keeps the card in the glove box. Every
+line is explained in the section named beside it; nothing on this page replaces those sections.
+
+**What it is.** A supervisory governor on top of the controllers you already run. It never replaces them: it moves only
+settings they already accept, inside a band you set, and hands every setting back when it stops (sections 1.1 and 8).
+
+**The two names.** *Native* is your system as it runs on its own. *Omni* is the same system with Omni-Compass on top.
+There is no third arm and no other name (section 1.1).
+
+**The modes** (section 1.3).
+
+| Mode | What it does | When |
+|---|---|---|
+| Off (manual) | nothing; native runs alone | before installing, and whenever you choose |
+| Watching | reads every gauge and logs what it would do; writes nothing | the first level of every installation (level 1) |
+| Autopilot | idle, gas, brake and reset, by its law | after the watch level has passed |
+| Cruise | every machine in service while a known queue waits | batch work |
+
+**The pedals.** *Idle*: no gas, no brake, the floor of two machines in service, ready for the next burst. *Gas*: capacity
+added at once as traffic climbs, never held back. *Brake*: capacity eased off a step at a time, never below idle. *Reset*:
+the brake held to the floor; every setting handed back to where native had it, read back, and the record removed.
+
+**The ways it stops, and what each leaves behind** (section 11).
+
+| You want to, or it happens that | Do this | What is left |
+|---|---|---|
+| a run ends | nothing: the reset runs by itself at the end of every run | every setting at the operator's value, read back |
+| stop everything at once, for any security reason | `python3 tools/omni_switch.py off` | every governor hands back and exits; none starts again until `python3 tools/omni_switch.py on` |
+| stop one muscle | its kill file, or `OMNI_KILL=1` | that muscle handed back; the others run on |
+| Omni-Compass dies without handing back (killed, crashed, hung) | nothing: the watchdog's lease hands back for it | every setting back at the operator's value, measured at 7 to 11 seconds in 30 of 30 repetitions (section 3.5) |
+
+**The eight levels of an installation** (section 9.3). Take them in order; go to the next only when the pass holds.
+
+| Level | What it touches | Pass |
+|---|---|---|
+| 0 | nothing: `python3 verify.py` | `VERIFICATION: PASS` |
+| 1 | nothing: watch mode, with a read-only identity | zero writes, and readings your operators agree with |
+| 2 | the pods, through your autoscalers (**WRITES**) | p95, p99 and failed requests no worse than native, over paired runs |
+| 3 | the machines, through the release gate and the verdict (**WRITES**) | fewer machines in service, with no service gauge worse |
+| 4 | the replica decision itself (an option, not a step) | as level 3 |
+| 5 | a GPU box, two wires: the clock ceiling and the power limit (**WRITES**) | work per energy up or equal; no request more than 2% slower at the median, p95 or p99 |
+| 6 | the processor's clock and power on bare metal (**WRITES**) | energy per unit of work down, no service gauge worse |
+| 7 | site power and the supply-air setpoint (**WRITES**) | the site meter's energy down, every rack inlet inside its band, no service gauge worse (section 10.11) |
+
+**Before any level that writes:** run the wire check (section 8.4), start in watch, and keep the master switch in reach.
+
+**Warning signs, and the first thing to do.**
+
+| You see | First | Then read |
+|---|---|---|
+| a service slower or failing more with Omni than without | `python3 tools/omni_switch.py off`: the system is native again | section 8.5, wired right or wired wrong |
+| a setting at a value Omni-Compass did not write | nothing: it stops writing that lever by itself (one writer) | section 7.2 |
+| a meter that is blind or late | nothing: blind means hold; it moves nothing it cannot see | section 7.3 |
+| your results point the other way from the published ones | presume the wiring first, not the law | `DISCLOSURES.md`, section 4 |
+
+**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, www.omni-compass.com, the
+authority of record. Security reports: the process in `SECURITY.md`, never a public issue.
 
 ## Executive Summary
 
@@ -196,7 +251,7 @@ written before the run, confirmed only when three separate runs agree, and repor
 
 ## Table of Contents
 
-**Front Matter** - Notice and Disclaimer; Foreword; Preface; Executive Summary
+**Front Matter** - Notice and Disclaimer; Foreword; Preface; Quick Reference: The Card for the Glove Box; Executive Summary
 
 **Part I - The Governor**
 1. What Omni-Compass Is
@@ -206,7 +261,7 @@ written before the run, confirmed only when three separate runs agree, and repor
 **Part II - The Mechanism of Action**
 4. The Engine: Eight Equations and One Control Law
 5. The Closed Circle: Why It Cannot Leave Its Compass
-6. The Compass: Push, Pull and the Two Forces
+6. The Compass: Push, Pull and the Two Forces (6.5 the reflex rule: one body, one brain)
 7. The Two-Way Nervous System
 
 **Part III - The Harness: Plugs, Wires and the Wire Check**
@@ -214,7 +269,7 @@ written before the run, confirmed only when three separate runs agree, and repor
 
 **Part IV - Wiring It onto Your Stack, Step by Step**
 9. Before You Start, and the Eight Levels
-10. Stack by Stack
+10. Stack by Stack (10.11 the data center under the servers: cooling, power and batteries)
 
 **Part V - Operating It**
 11. The OFF Switch, the Rules, and the Log
@@ -1078,6 +1133,47 @@ Both are written out in the Kubernetes preregistration (`docs/K8S_COMPASS_PREREG
 9), both ran in the batch test, and the result (section 16) is machines 19% to 23% fewer over the whole window and 29% to
 35% fewer after the queue finished, with the queue itself finishing no later beyond the noise.
 
+### 6.5 The reflex rule: one body, one brain
+
+Everything in this chapter so far is the force: where a reading sits in its band, how hard the compass pushes, in which
+direction, and which gates stand in the way. This section is the rule that decides when the force may become a new
+setting. The founder's order of 10 October 2026 states it in one line: what the brain sends to a muscle has to coincide with
+what the muscle sends to itself and where it is at. Made into rules, it reads:
+
+1. **Signal out, the muscle moves, the brain feels the full reaction, then it decides.** A trial runs to its full
+   measurement and is never ended by the calm it causes. Only the wall (a fail-up) or the engine's own time limit ends a
+   trial early.
+2. **No forcing.** A spend is tried only when the muscle's own reading says there is something to buy (messages waiting, a
+   cache missing, clients queued); a give-back only when the whole body is calm. The force is an urge, smooth, never a
+   hammer.
+3. **One body, one brain, one tick a second.** Everything is read first: every muscle's state, every service's speed and
+   work, the host's processor, memory and energy where a meter exists. Then the brain decides. The cost it judges is the
+   body's cost, the Omni index's own arithmetic over all the work, all the speed, all the machines and all the resources,
+   never one muscle's.
+4. **Hurt nothing anywhere.** On top of the body's cost, a guard for every part: a step is refused if any one service got
+   worse beyond its cushion, even when the body's total improved.
+5. **One trial at a time inside a body.** Two muscles moved together cannot be told apart, so the body grants one new trial
+   at a time, to the muscle asking loudest whose own condition holds. Every other muscle keeps acting inside what it has
+   already proven.
+6. **Nothing is permanent.** Every allowed step is tried again on the recheck and pulled back when it stops paying; a muscle
+   at native is asked again whenever its signal returns. Native is where the brain stands when it has not yet been shown a
+   reason, never a verdict.
+7. **The wall belongs to the body.** If any service reaches its line, the trial stops, that step is undone, and every force
+   in the body turns to brake: the law's brake, not a reset.
+
+The trial itself keeps four rules, each learned from a measured run (`docs/OMNI_V4_PLAN.md`, section 4): samples count only
+once the muscle reports itself settled; a spend on a queue or a cache is judged by the muscle's own reading, with the
+body's cost taken at the settled state; the reference and the trial are compared at the same load; and where single notches
+read flat, one scout step to the far side of the cover decides whether there is a hill to climb at all.
+
+**Which engine enforces what.** In Omni v3, the engine on main, the verdict tries a slow knob on the muscle itself before
+it moves it (section 1.2), and the live harnesses carry the same verdict around every live knob (section 9.4). Omni v4 is
+the engine written to enforce all seven rules on every wire by construction: one body file that every muscle's wire passes
+through, the trial rules inside the verdict, and no wire that can write around them. It is designed
+(`docs/OMNI_V4_PLAN.md`) and not yet built; when it is, it carries its own fingerprint, the package version follows it, and
+every result in this book is run again on it. The theory of the rule is the chapter "The Reflex Rule" in Part One of the
+book.
+
 ## 7. The Two-Way Nervous System
 
 Every muscle is wired both ways: a sensory wire in (its meters) and a motor wire out (its knob), with the read-back
@@ -1880,6 +1976,57 @@ machines are virtual and expose neither the governor nor the meter: the workflow
 The benchmark runs on a machine on the metal as root, in one command (`sudo bash scripts/cpu_power_run.sh`): the founder's
 own tower or laptop on Linux, a rented bare-metal server, or a self-hosted runner on either. Three runs make the table
 (`tools/cpu_power_abc.py`). Nothing in the engine changes.
+
+### 10.11 The data center under the servers: cooling, power and batteries
+
+Under every cluster in this book stands a building. Its native controllers are older and more conservative than any
+autoscaler: the building management system holds the supply-air temperature through the cooling units' own loops, the
+chilled-water plant runs its own sequence, the uninterruptible power supply holds its reserve, the power distribution units
+meter every rack, and every server's management controller and every card's firmware enforce their own power limits.
+Omni-Compass sits on top of them exactly as it sits on the HPA. They keep running; it moves only the settings they already
+accept, and only inside the band the operator writes down.
+
+**What it may set, and what it never sets.**
+
+| Muscle | Native controller | The knob Omni-Compass may hold | Switch | Status |
+|---|---|---|---|---|
+| Cooling | the building management system and the cooling units' own loops | the supply-air setpoint, inside the operator's band | `--cooling-cmd "<sets {c}>" --cooling-min-c --cooling-max-c --cooling-restore-c` | built (level 7) |
+| Site power | the site's own limit and its breakers | none: site watts are read, and the site limit enters the engine as a stress | `--power-cmd "<prints site watts>" --site-limit-w <limit>` | built (level 7) |
+| Servers' processors | the kernel's frequency governor and the processor's own limits | the clock ceiling and the power limit | section 10.10 | built (level 6) |
+| Cards | the card's firmware | the clock ceiling and the power limit | level 5 | built |
+| Uninterruptible power and batteries held as reserve | the UPS's own reserve | **none, ever**: a reserve held for an outage is never a lever (the physics criterion) | | native by design |
+| Batteries held for shifting energy | the site's dispatch | the charge window | | designed as an organ, not yet wired |
+
+**How the cooling muscle moves.** The setpoint is moved by the heat state between the operator's minimum and maximum: a
+warmer setpoint while every reading is cool, which saves the chiller's energy, and a colder one as heat rises. The band must
+sit inside what the equipment is rated for; for most data-center equipment that is the 18 to 27 °C inlet range of the
+ASHRAE thermal guidelines, and inside any narrower limit the equipment's own warranty sets. The restore value is the
+operator's own setpoint, handed back and read back on OFF, at the end of every run, and by the lease if the governor dies.
+
+**The do-no-harm gate at the site meter.** A warmer setpoint saves chiller energy only up to the point where the servers'
+own fans spend the saving: fan power rises steeply with inlet temperature. That is why the cooling knob is judged at the
+site meter and not at the chiller: a step is allowed only where the paired trial shows the site's energy for the same work
+no higher, every rack inlet inside its band, and no service gauge worse. Where it does not, the setpoint stays the
+operator's, and the result says so.
+
+**Wiring it, in order.**
+
+1. **Watch.** Give Omni-Compass read access to the building management system's points (supply and return air, every rack
+   inlet, the chilled-water temperatures) and to the site meter, and let it watch at least one full cycle of the site's
+   demand. Nothing is written.
+2. **Write the band.** The minimum, the maximum and the restore value of the supply-air setpoint, inside the equipment's
+   ratings, signed off by the facility's engineer; the site limit in watts.
+3. **The wire check** (section 8.4). The cooling command must read back the setpoint it wrote; a building schedule that
+   rewrites the setpoint is another writer, and Omni-Compass stops writing that lever by itself (section 7.2).
+4. **One hall first.** A test hall or a single row, paired against its own native weeks, before any other hall.
+5. **Keep the switches in reach.** The master switch and the kill file work at the facility level exactly as at every other
+   level.
+
+**What is proven, and what is not.** The facility muscles are modelled today (class S): the data-hall cooling family of the
+catalog, the power distribution family, and the site budget shared by groups of cards, which held out with no minute over
+its budget (`docs/REGISTER.md`: the families of rows 29 and 38 of its catalog table, and row 20 of its benchmark table). No live facility has run yet. A class P result needs a building
+management system's point list, read access, a site meter and a test hall; until a facility pilot has produced its own
+paired receipts, this section is a wiring instruction, not a claim of savings.
 
 ---
 
@@ -2815,7 +2962,7 @@ The software and this manual are licensed under the Omni-Compass Evaluation Lice
 simulation use only. Everything else - commercial use, production use, operating any system beyond evaluation,
 redistribution, a hosted or managed service, incorporation into a product or service, or using the software or its
 results to build a competing product - requires a written Omni-Compass Enterprise License signed by The Omni-Compass
-LLC and paid for. All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. No patent or trademark license is granted for any other use. Contributions are accepted only on the
+LLC and paid for. All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. No patent or trademark license is granted for any other use. Contributions are accepted only on the
 terms in `.github/CONTRIBUTING.md`, which assign their rights to The Omni-Compass LLC.
 
 ## 18. Python, C++ and the Seal
@@ -3216,11 +3363,6 @@ Nothing in this chain requires a credential, a licence key or a word from us; th
 
 Licensing, pilots and the Omni-Compass Enterprise License: **The Omni-Compass LLC.**
 
-*Copyright (c) 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only.*
-
 ---
 
-*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
-monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
-`NOTICE` at the root of this repository.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

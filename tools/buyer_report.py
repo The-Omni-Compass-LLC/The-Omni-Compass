@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """The buyer edition: one clean report from the final result files. Every number is read from a file in the repository.
 Output: docs/history/OMNICOMPASS_BUYER_EDITION.md (render with pilot/bench_pdf.py)."""
 from __future__ import annotations
@@ -8,6 +10,10 @@ from __future__ import annotations
 import json, subprocess, sys
 from collections import Counter
 from pathlib import Path
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAT = ["k8s_hpa70_ca", "openshift", "gke_optimize", "aks_nap", "turbonomic", "cast_ai", "spot_ocean"]
@@ -265,7 +271,7 @@ def main():
               "live: push a commit whose message contains [reps], [levers] or [shadow]"]:
         w(c)
     w("```")
-    (ROOT / "docs/history/OMNICOMPASS_BUYER_EDITION.md").write_text("\n".join(L))
+    (ROOT / "docs/history/OMNICOMPASS_BUYER_EDITION.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     print(f"wrote docs/history/OMNICOMPASS_BUYER_EDITION.md ({len(L)} lines)")
 
 

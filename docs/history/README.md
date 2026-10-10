@@ -1,7 +1,6 @@
 # Dated records
 
-> **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Any commercial use requires a signed,
-> paid Omni-Compass Enterprise License. See [`LICENSE`](../../LICENSE) and [`NOTICE`](../../NOTICE).
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 Each page here is kept as written on its date. None is current: where one differs from
 [`../STATE_OF_PLAY.md`](../STATE_OF_PLAY.md) or [`../../results/OMNI_INDEX.md`](../../results/OMNI_INDEX.md), those govern.
@@ -42,3 +41,7 @@ Each page here is kept as written on its date. None is current: where one differ
 | [`OMNI_COMPASS_TECHNICAL_MANUAL.pdf`](OMNI_COMPASS_TECHNICAL_MANUAL.pdf) | The earlier technical manual |
 | `../../results/scale/receipts/v3-1x_set1.md`, `v3-10x_set1.md`, `v3-100x_set1.md` | The grid receipts of the first v3 runs at 1, 10 and 100 copies (7 to 8 October 2026), kept beside the receipts of 10 October |
 | [`xpass/`](xpass) | The earlier XPASS package indexes |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

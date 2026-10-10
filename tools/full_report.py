@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """Build the Omni-Compass benchmark report (Markdown, then PDF via pilot/bench_pdf.py).
 
 Three architectures, every gauge, every study in this repository:
@@ -750,8 +752,9 @@ def main():
          "Modelled: power and heat everywhere, and everything in the simulated studies."),
         ("Is the mathematics sound?", "The core is a closed six-state system integrated with RK4; the C++ and Python implementations "
          "agree to 3.6e-15 on 500 reference trajectories; 100 million decisions ran without a non-finite value."),
-        ("Who owns it and how can it be used?", "The Omni-Compass LLC. Free for evaluation, research and non-commercial use; commercial "
-         "use requires a paid licence; protected by copyright and by patents and patent applications (see LICENSE and NOTICE)."),
+        ("Who owns it and how can it be used?", "The Omni-Compass LLC. Free of charge only to evaluate it and to reproduce its "
+         "published results (LICENSE, section 1); every other use requires a signed, paid Omni-Compass Enterprise License. "
+         "All rights reserved. All patents, copyrights and trademarks filed in the USA (see LICENSE and NOTICE)."),
         ("What is not claimed?", "Superiority over upstream Karpenter or Cluster Autoscaler live, metered savings on physical hardware, "
          "GPU or facility control on real hardware, the vendor products' own binaries (they are emulated from documentation), and anything about AI value alignment."),
         ("How do I check it myself?", "Run the commands in section 21; the live runs are GitHub Actions workflows in the repository."),

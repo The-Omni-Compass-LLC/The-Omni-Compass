@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """One-command verification of the Omni-Compass package.
 
   python verify.py           full verification (about 15-30 minutes, single core)
@@ -118,6 +120,18 @@ def main():
     from tools import release_manifest
     bad = release_manifest.check()
     check("release manifest: engine, C++ seal, GPU protocol, live evidence and license match RELEASE_MANIFEST.json", not bad, "; ".join(bad))
+    from tools import legal
+    bad = legal.check()
+    check("legal notice on every page, header, workflow report and license paper: all rights reserved, all patents, copyrights "
+          "and trademarks filed in the USA, subject to change at any time, www.omni-compass.com the authority of record "
+          "(tools/legal.py; files locked by a fingerprint keep their header until the next engine version)", not bad, "; ".join(bad[:4]))
+    import re as _re
+    from tools import omni_version as _ov
+    _eng = _ov.version_of(_ov.engine_files())
+    _pkg = _re.search(r'^version = "([^"]+)"', (ROOT / "pyproject.toml").read_text(), _re.M)
+    check("the package version follows the engine on main (0.N.0 is omni-vN; tools/omni_version.py), so a changed engine "
+          "cannot keep an old number", bool(_eng and _pkg and _pkg.group(1) == f"0.{_eng.split('-v')[1]}.0"),
+          f"engine {_eng}, package {_pkg.group(1) if _pkg else None}")
     src = (ROOT / "cpp" / "src" / "shield.cpp").read_text()
     mut_src = tmp / "shield_mut.cpp"
     mut_src.write_text(src.replace('return k == "nodes" || k == "terraform_plan" || k == "rollout"; }', 'return k == "nodes" || k == "terraform_plan"; }'))
@@ -406,6 +420,10 @@ def main():
             bad_workflows.append(f"{wf.name}: {str(e).splitlines()[0][:90]}")
     check("every GitHub workflow file parses as YAML with its on and jobs (a file that does not is never run by GitHub)",
           not bad_workflows, "; ".join(bad_workflows)[:300])
+    r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_legal"], cwd=ROOT, capture_output=True, text=True)
+    check("the legal tool (tools/legal.py): one notice under every title and at every end, older notices replaced not doubled, "
+          "headers rewritten after a shebang, a workflow's own steps kept exactly while each job opens and closes its report "
+          "with the notice, locked files untouched, the export bundle complete", r.returncode == 0, r.stderr[-300:])
     r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_front_page"], cwd=ROOT, capture_output=True, text=True)
     check("the front page keeps itself current (tools/front_page.py): archived runs grouped by what they are, the three newest "
           "complete runs of a kind as A, B and C, a table rebuilt only when its runs changed, the README's latest lines newest first",

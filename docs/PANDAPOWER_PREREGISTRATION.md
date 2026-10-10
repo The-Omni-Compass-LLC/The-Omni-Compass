@@ -1,5 +1,7 @@
 # Preregistration: Omni-Compass on top of a distribution grid's own voltage control (pandapower, SimBench)
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Frozen 2026-10-05, before any confirmation grid was run. The tool is `tools/run_pandapower.py`, and the workflow is
 `.github/workflows/pandapower.yml`.
 
@@ -103,3 +105,7 @@ Two things found that do not change the rules, stated so a reader knows them:
 The tap-operation count stays as frozen above (about 8 a year against native's about 4). Capping Omni at 4 after seeing
 the tuning grid would be tuning on the test; the cost was declared before the untouched grids ran and is reported next to
 the energy, never hidden.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

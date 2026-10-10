@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 name: gpu-bench
 # The GPU test (scripts/gpu_paired.sh) on GitHub's own GPU machines: native / watch / Omni on a real NVIDIA GPU,
 # energy from the GPU's own meter. One repetition per machine (its three arms back to back on that machine, order
@@ -22,6 +24,8 @@ on:
   push:
 permissions:
   contents: write
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
 jobs:
   run:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[gpu]') || contains(github.event.head_commit.message, '[gpu-confirm]')
@@ -36,6 +40,8 @@ jobs:
     env:
       PHASE: ${{ (inputs.phase == 'confirm' || contains(github.event.head_commit.message, '[gpu-confirm]')) && 'confirm' || 'smoke' }}
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - name: The GPU
         run: nvidia-smi && nvidia-smi --query-gpu=name,driver_version,power.limit,power.min_limit,power.max_limit --format=csv
@@ -53,11 +59,42 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: "gpu-rep-${{ matrix.rep }}", path: "gpu-out"}
+      - name: Legal files beside the files this run hands out
+        if: always() && strategy.job-index == 0
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always() && strategy.job-index == 0
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   pool:
     needs: run
     if: always() && needs.run.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with: {pattern: "gpu-rep-*", path: parts}
@@ -82,6 +119,10 @@ jobs:
         if: env.NO_RESULT != '1'
         run: |
           git config user.name "gpu-bench"; git config user.email "gpu-bench@users.noreply.github.com"
+          python3 tools/legal.py --fix results/gpu
           git add results/gpu
           git commit -m "GPU bench raw files: run ${{ github.run_id }}" || exit 0
           for i in 1 2 3 4; do git pull --rebase -q origin "${{ github.ref_name }}" && git push -q origin "HEAD:${{ github.ref_name }}" && break; sleep $((2**i)); done
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

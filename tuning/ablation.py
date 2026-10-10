@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """What each mechanism contributes. The confirmatory setting (tuning/GLOBAL_LEAGUE_PREREGISTRATION.json) against
 versions with one mechanism removed, on 30 fresh scenarios per workload (seeds 711001-711030), paired:
   gate_off      the six-state engine's equation-(2) push no longer gates releases (push_release = infinity)

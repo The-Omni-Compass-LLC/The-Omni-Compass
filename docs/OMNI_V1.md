@@ -1,6 +1,6 @@
 # Omni v1: the frozen engine, and every result checked against it
 
-> © 2026 The Omni-Compass LLC. Evaluation and simulation use only. See LICENSE.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 > **Superseded on 2026-10-06 by Omni v2** (`docs/OMNI_V2.md`, `OMNI_V2.json`): the same law, controllers and runners byte
 > for byte, with the muscle catalog grown from 656 to 945. Every result in this file is a v1 result and stays one; nothing
@@ -108,3 +108,7 @@ one part in a million, and "the runs differ" when they do not; a district with n
 for Omni to move, and a district CityLearn cannot run is listed with CityLearn's own error. `tests/test_confirm_abc.py`, run by `verify.py`, proves the rule: an interval over zero
 reads no difference beyond the noise, a flipped sign clear of the noise reads disagreement, a rounding-level change reads
 same, and a loss in all three reads WORSE.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
