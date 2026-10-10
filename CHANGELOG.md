@@ -8,6 +8,16 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-10
+- **Every benchmark run again on one commit** (`docs/RERUN_2026-10-10.md`): at the founder's order that every result be as of today,
+  the seven Kubernetes tests, the five live stacks on the brain's own verdict (the resource objective; Redis and Kafka also under the
+  service objective), the four simulators, the realms table and the kill and long robustness scenarios (three runs each), the six
+  organisms with the real cluster inside, the modelled grid at 1, 10, 100 and 1,000 copies and the two big organisms at 1,000 copies
+  on rented Azure machines were dispatched between 01:24 and 01:31 UTC on commit `3aac0ab7` (Omni v3 by `tools/omni_version.py`),
+  native and omni, the wiring of each checked against its preregistration before the dispatch: 70 GitHub runs and two Azure
+  machines. The five preregistrations' dispatch paragraphs, the state of play, the register (every row marked), the manual (9.4,
+  16.6b), the wiring page and the v4 plan say so. Every published table stands until its new set lands; the new set then supersedes
+  it and the old table goes whole to `docs/history`. Not restarted: the three 24-hour robustness machines (the same harness byte for
+  byte, ending about 10:15 UTC) and the Azure fleet, which waits on the family allowance those machines hold.
 - **Every change said in words, never by a bare sign** (`tools/benefit_sheet.py`, `tools/wiring_verdicts.py`, both pages regenerated):
   the founder found the sheet read backwards against the tables (plus is good on the sheet; a cut reads minus in a table). Now the
   sheet's number carries its word (gain, loss, nothing) and every confirmed change is written out beside it: a gauge that fell when
