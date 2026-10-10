@@ -3199,6 +3199,15 @@ python tests/test_hpa_three_way.py
 python tests/test_omni_controller.py
 ```
 
+The machine's own power (the Linux frequency governor as native, Omni on the frequency ceiling, energy from the processor's
+meter; root on a machine on the metal, not a virtual one; `docs/CPU_POWER_PREREGISTRATION.md`):
+
+```bash
+sudo python3 tools/run_cpu_power.py --probe            # can this machine run it?
+sudo bash scripts/cpu_power_run.sh                     # the three workloads, native and omni, three repetitions; one folder
+python3 tools/cpu_power_abc.py A B C --out V3_CPU_POWER.md   # three runs into the table
+```
+
 Fleet plant (Omni as node authority vs HPA+CA / Karpenter-lite):
 
 ```bash
@@ -3822,6 +3831,31 @@ handed the pool back on all 45 omni arms and is the result in section 16.4. The 
 knob the device applies on its own time has to be handed back on the device's time, and the proof of the hand-back is the
 read-back, not the write.
 
+### 10.10 The machine itself: the kernel's frequency governor under the processor's meter
+
+The lowest level a governor can sit on is the machine it runs on. Linux already has a controller for the processor's clock,
+the frequency governor (`schedutil`, or the processor driver's own), choosing the clock every few milliseconds under a
+ceiling the operator sets once; and the processor has its own energy meter (RAPL) ticking in microjoules. Omni-Compass sits
+on top of the governor exactly as it sits on the HPA: the governor keeps running, and Omni moves one knob, the frequency
+ceiling of every CPU, through the kernel's own files (`tools/run_cpu_power.py`, `docs/CPU_POWER_PREREGISTRATION.md`).
+
+The reading is the service's own mean latency, held at 40% of a 20 ms line by the compass law; calm gives one notch of the
+ceiling back (5% of the top clock), a slow service raises it by notches, the wall puts the top on at once. Every notch down
+is tried on the machine itself first (section 9.4): the brain's verdict around the engine's own, eight cost samples at the
+deepest notch already allowed and eight one notch further, allowed only if the cost does not rise within 2%. The cost is the
+index's own reading for one machine (package power × latency / work inside the line), so a notch that saves less energy
+than it costs in speed is refused and the ceiling stays where the operator left it; a second declared objective, energy per
+request inside the line with the line as the guardrail, is run beside it. The snapshot of every CPU's governor and ceiling
+is taken once; the ceiling is handed back and read back at the end; a ceiling found at a value Omni did not write stops it;
+the master switch and the lease hand back if Omni dies.
+
+The meter is the processor's own counter, class P with the caveat that it is the processor's calibrated counter and not an
+external meter; a smart plug on the wall socket (`WALL_METER`) adds the whole machine, read by the harness only. GitHub's own
+machines are virtual and expose neither the governor nor the meter: the workflow proves it with the probe on every dispatch.
+The benchmark runs on a machine on the metal as root, in one command (`sudo bash scripts/cpu_power_run.sh`): the founder's
+own tower or laptop on Linux, a rented bare-metal server, or a self-hosted runner on either. Three runs make the table
+(`tools/cpu_power_abc.py`). Nothing in the engine changes.
+
 ---
 
 
@@ -4048,6 +4082,7 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | MySQL, or any store whose engine resizes its buffer pool online | one knob | the InnoDB buffer pool through the server's own console (`SET GLOBAL innodb_buffer_pool_size`), cover [128, 2,048] MB in the server's own 128 MB chunks, grown only while the pool is full, the plug waiting for the server's asynchronous resize before reading back, one writer, restored on OFF (manual, section 10.9; `docs/MYSQL_PREREGISTRATION.md`) |
 | A rented cloud machine running the big organisms | the whole harness | `big-organism-detached`: start, collect, survey; the clock rule sets the window (manual, section 10.4) |
 | Independent simulators (CityLearn, pandapower, MuJoCo) | one knob each | the simulator's own controller is native; preregistered, A/B/C (manual, section 10.3) |
+| The machine itself: Linux's frequency governor under the processor's meter | one knob | the frequency ceiling of every CPU through the kernel's own files, cover [half the top clock, the top], the governor still running under it; every notch down tried on the machine first by the brain's verdict; energy from RAPL and a wall plug where fitted; root on a machine on the metal, never a virtual one (manual, section 10.10; `docs/CPU_POWER_PREREGISTRATION.md`; `sudo bash scripts/cpu_power_run.sh`) |
 
 ---
 
@@ -9751,7 +9786,16 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 7. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
    Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,
    RocketPy, Cantera (Kafka and Redis done); one or two at a time, each preregistered.
-7. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
+8. **The gaps the tree shows (the founder's reading, 10 October).** The index's six real categories are the cluster, PostgreSQL,
+   Kafka, Redis, MongoDB and MySQL; Azure waits on its three-run close (item 1) and the card on its run on the current controller
+   (item 3); the power grids and the districts are in as simulations, never in the index by rule. Not yet a category: **a second
+   and a third cloud**, AWS and Google Cloud under Azure's method (`docs/REGISTER.md` row 38; each needs its own account credential
+   in a GitHub secret and an allowance of about 90 cores, about $12 a steady and $22 a burst run, nothing spent until the account
+   exists); **CPU power through Linux's own governor with the RAPL meter** (row 18; a machine where both are writable, the founder's
+   own tower or a rented bare-metal server, since GitHub's runners and cloud machines allow neither; about a day to build on the
+   paired-run machinery); **the card's energy meter**, which the card harness already has (the integral of the device's power draw,
+   the CPU package by RAPL, the wall plug where fitted, `tools/gpu_reps.py`) and which reads on the founder's run.
+9. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
    fingerprints go to `docs/history` as the road to it.
 
 ### Where things are

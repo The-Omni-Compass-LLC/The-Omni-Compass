@@ -27,6 +27,7 @@ Read in this order. Every page here is current; dated records are in [`history/`
 | [`REALMS_PREREGISTRATION.md`](REALMS_PREREGISTRATION.md) | The muscles and the six organisms (945 in Omni v2) |
 | [`OMNI_V4_PLAN.md`](OMNI_V4_PLAN.md) | The next engine, designed and not built: the brain's verdict on every muscle inside the engine, what it changes and what it costs |
 | [`CITYLEARN_PREREGISTRATION.md`](CITYLEARN_PREREGISTRATION.md) | Omni-Compass on top of CityLearn, an independent building and battery simulator |
+| [`CPU_POWER_PREREGISTRATION.md`](CPU_POWER_PREREGISTRATION.md) | The machine itself: Omni-Compass on top of the Linux kernel's own frequency governor, energy from the processor's meter; built, waiting for a machine on the metal |
 | [`REFEREE_CHECKLIST.md`](REFEREE_CHECKLIST.md) | A referee's checklist, item by item |
 
 ## 3. The mechanism

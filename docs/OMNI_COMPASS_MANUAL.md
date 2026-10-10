@@ -1848,6 +1848,31 @@ handed the pool back on all 45 omni arms and is the result in section 16.4. The 
 knob the device applies on its own time has to be handed back on the device's time, and the proof of the hand-back is the
 read-back, not the write.
 
+### 10.10 The machine itself: the kernel's frequency governor under the processor's meter
+
+The lowest level a governor can sit on is the machine it runs on. Linux already has a controller for the processor's clock,
+the frequency governor (`schedutil`, or the processor driver's own), choosing the clock every few milliseconds under a
+ceiling the operator sets once; and the processor has its own energy meter (RAPL) ticking in microjoules. Omni-Compass sits
+on top of the governor exactly as it sits on the HPA: the governor keeps running, and Omni moves one knob, the frequency
+ceiling of every CPU, through the kernel's own files (`tools/run_cpu_power.py`, `docs/CPU_POWER_PREREGISTRATION.md`).
+
+The reading is the service's own mean latency, held at 40% of a 20 ms line by the compass law; calm gives one notch of the
+ceiling back (5% of the top clock), a slow service raises it by notches, the wall puts the top on at once. Every notch down
+is tried on the machine itself first (section 9.4): the brain's verdict around the engine's own, eight cost samples at the
+deepest notch already allowed and eight one notch further, allowed only if the cost does not rise within 2%. The cost is the
+index's own reading for one machine (package power × latency / work inside the line), so a notch that saves less energy
+than it costs in speed is refused and the ceiling stays where the operator left it; a second declared objective, energy per
+request inside the line with the line as the guardrail, is run beside it. The snapshot of every CPU's governor and ceiling
+is taken once; the ceiling is handed back and read back at the end; a ceiling found at a value Omni did not write stops it;
+the master switch and the lease hand back if Omni dies.
+
+The meter is the processor's own counter, class P with the caveat that it is the processor's calibrated counter and not an
+external meter; a smart plug on the wall socket (`WALL_METER`) adds the whole machine, read by the harness only. GitHub's own
+machines are virtual and expose neither the governor nor the meter: the workflow proves it with the probe on every dispatch.
+The benchmark runs on a machine on the metal as root, in one command (`sudo bash scripts/cpu_power_run.sh`): the founder's
+own tower or laptop on Linux, a rented bare-metal server, or a self-hosted runner on either. Three runs make the table
+(`tools/cpu_power_abc.py`). Nothing in the engine changes.
+
 ---
 
 # PART V - OPERATING IT

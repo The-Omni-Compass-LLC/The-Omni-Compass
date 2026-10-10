@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: cpu-power
+# Omni-Compass on top of the Linux kernel's own CPU frequency governor, energy read by the processor's own meter
+# (docs/CPU_POWER_PREREGISTRATION.md). GitHub's own machines are virtual: they expose neither the governor nor the meter, so
+# here they run the harness's tests and the probe only (expected: "CANNOT RUN HERE"). The benchmark itself runs on a machine
+# whose kernel exposes both, as root: a self-hosted runner registered on the founder's own tower or on a rented bare-metal
+# server, named by its label in the `runner` input; or by hand with scripts/cpu_power_run.sh.
+on:
+  workflow_dispatch:
+    inputs:
+      runner: {description: "Where the benchmark runs: the label of a self-hosted runner on a machine whose governor and meter are writable; ubuntu-latest runs the checks and the probe only", default: "ubuntu-latest"}
+      workloads: {description: "Workloads, comma separated: tuning, wandering, burst; 'all' runs every one", default: "all"}
+      reps: {description: "Paired repetitions per workload", default: "3"}
+      step_s: {description: "Seconds per demand step", default: "60"}
+      objective: {description: "What the brain's verdict judges a notch by: resource (energy, speed and work together, the index's reading), per-work (energy per request inside the line, the line the guardrail) or service (speed and work alone)", default: "resource"}
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - run: python tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: The harness's own checks (a modelled machine)
+        run: python -m unittest tests.test_run_cpu_power 2>&1 | tail -5
+      - name: Can this machine run it? (GitHub's machines are virtual: expected no)
+        run: |
+          set +e
+          sudo -E python3 tools/run_cpu_power.py --probe | tee -a "$GITHUB_STEP_SUMMARY"
+          code=$?
+          if [ $code -ne 0 ]; then echo "::notice::GitHub's machine cannot run the benchmark (no governor, no meter): run it on your own machine or name a self-hosted runner"; fi
+          exit 0
+  run:
+    needs: checks
+    if: github.event.inputs.runner != '' && github.event.inputs.runner != 'ubuntu-latest'
+    runs-on: ${{ github.event.inputs.runner }}
+    timeout-minutes: 720
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install -q -r requirements.txt
+      - run: python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: The machine, as found
+        run: sudo -E python3 tools/run_cpu_power.py --probe | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Run every workload, native and omni
+        run: |
+          set +e
+          sudo -E python3 tools/run_cpu_power.py --workloads "${{ github.event.inputs.workloads }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --objective "${{ github.event.inputs.objective || 'resource' }}" --out out > run.log 2>&1
+          code=$?
+          sudo chown -R "$(id -u):$(id -g)" out run.log || true
+          tail -40 run.log
+          grep "^==\|^   " run.log | tee -a "$GITHUB_STEP_SUMMARY"
+          mv run.log out/run.log
+          exit $code
+      - run: cd out && find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+      - run: cat out/CPU_POWER.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: cpu-power, path: out}

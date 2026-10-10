@@ -8,6 +8,30 @@
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
 ## 2026-10-10
+- **The Linux kernel benchmark, built and preregistered** (`docs/CPU_POWER_PREREGISTRATION.md`; `tools/run_cpu_power.py`,
+  `tools/cpu_power_abc.py`, `scripts/cpu_power_run.sh`, `.github/workflows/cpu-power.yml`, `tests/test_run_cpu_power.py`, run by
+  `verify.py`), at the founder's order that the kernel's own knobs be benchmarked: the kernel's frequency governor as shipped is
+  native; Omni moves the frequency ceiling of every CPU through the kernel's own files inside [half the top clock, the top], the
+  governor still running under it; the compass law holds the service's own latency at 40% of a 20 ms line; every notch down is
+  tried on the machine itself first by the brain's verdict (the knob verdict around the engine's own, unchanged); the snapshot is
+  taken once, the ceiling handed back and read back, one writer, the master switch and the lease honoured; energy from the
+  processor's own meter (RAPL, class P with the caveat stated) and a wall plug where fitted; a CPU-bound service under an open
+  stepped load, the same requests in count and spacing in both arms. GitHub's machines are virtual and expose neither the governor
+  nor the meter, so the workflow runs the tests and the probe there and the benchmark on a machine on the metal (the founder's own,
+  a rented bare-metal server, or a self-hosted runner), in one command. The knob verdict gains a third objective, **per-work**
+  (the resource per unit of work inside the line, the card's reading), declared for this benchmark's second set; the five stacks'
+  counted runs keep the resource objective and are untouched by it. The manual (10.10; PDF rebuilt), the integration manual, the
+  harness page, the documents index, the register (row 18), the proof program (row 6), the state of play and the wiring page's
+  knob table carry it. No run yet: it waits for a machine.
+- **The founder's sweep: nothing with value left out** (register rows 39 to 57; proof program section 3.5): operating systems (the
+  Linux kernel's scheduler, network and memory knobs; Windows processor power management on the founder's own laptop), television
+  and streaming (adaptive bitrate), telecom (a software 5G cell), web platforms and social media (the serving layer; the LDBC Social
+  Network Benchmark on a graph database), financial trading infrastructure (a matching engine and a FIX gateway; Omni governs the
+  machinery, never a trade), serverless (Knative), distributed compute (Ray, Dask), HPC power saving (Slurm) and scientific
+  workflows, oil, gas and heat networks (pandapipes), a wind turbine (OpenFAST with ROSCO), agriculture and irrigation, healthcare
+  systems, robotics navigation, humanoids and marine vehicles, mining (a candidate until an open source with a shipped controller
+  is confirmed), video transcoding; aerospace and rockets were already rows 32 to 36. Each row names an open benchmark anyone can
+  run, its shipped controller as native and one knob for Omni, and is preregistered before its first run.
 - **Every benchmark run again on one commit** (`docs/RERUN_2026-10-10.md`): at the founder's order that every result be as of today,
   the seven Kubernetes tests, the five live stacks on the brain's own verdict (the resource objective; Redis and Kafka also under the
   service objective), the four simulators, the realms table and the kill and long robustness scenarios (three runs each), the six

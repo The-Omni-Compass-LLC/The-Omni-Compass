@@ -39,17 +39,25 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from omnicompass.verdict import Verdict  # noqa: E402  (the frozen engine's verdict, unchanged)
 
-RESOURCE, SERVICE = "resource", "service"
-OBJECTIVES = (RESOURCE, SERVICE)
+RESOURCE, SERVICE, PER_WORK = "resource", "service", "per-work"
+OBJECTIVES = (RESOURCE, SERVICE, PER_WORK)
 SPEND, GIVE = "spend", "give back"
 
 
 def sample_cost(objective, work, latency, resource, cpu_share):
-    """One second's cost under the objective, lower is better; None when nothing worked (nothing was measured)."""
+    """One second's cost under the objective, lower is better; None when nothing worked (nothing was measured).
+
+    resource   the index's reading: resource x host CPU busy share x latency / work (declared 9 October)
+    service    latency / work: the resources shown, not judged (declared 9 October)
+    per-work   resource / work: the resource spent per unit of work inside the line, the speed left to the compass's own line
+               as the guardrail (the card's reading, work per energy; added 10 October for the machine's own power, where the
+               resource is the energy the processor's meter reads)"""
     if work is None or latency is None or work <= 0 or latency < 0:
         return None
     if objective == SERVICE:
         return latency / work
+    if objective == PER_WORK:
+        return max(float(resource), 1e-9) / work
     cpu = 1.0 if cpu_share is None else max(float(cpu_share), 1e-3)
     return max(float(resource), 1e-9) * cpu * latency / work
 

@@ -17,6 +17,15 @@ python tests/test_hpa_three_way.py
 python tests/test_omni_controller.py
 ```
 
+The machine's own power (the Linux frequency governor as native, Omni on the frequency ceiling, energy from the processor's
+meter; root on a machine on the metal, not a virtual one; `docs/CPU_POWER_PREREGISTRATION.md`):
+
+```bash
+sudo python3 tools/run_cpu_power.py --probe            # can this machine run it?
+sudo bash scripts/cpu_power_run.sh                     # the three workloads, native and omni, three repetitions; one folder
+python3 tools/cpu_power_abc.py A B C --out V3_CPU_POWER.md   # three runs into the table
+```
+
 Fleet plant (Omni as node authority vs HPA+CA / Karpenter-lite):
 
 ```bash
