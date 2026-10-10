@@ -8,6 +8,12 @@ The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com)
 
 ## Latest (10 October 2026, newest first)
 
+The lines between the two markers below are written by the repository itself: after every finished live run, the front-page
+workflow archives the run and rebuilds every table whose three runs are in (`tools/front_page.py`, `.github/workflows/front-page.yml`).
+
+<!-- front-page:begin -->
+<!-- front-page:end -->
+
 - **Omni v4 ordered: the collective mechanism.** One body, one brain, one tick a second; a trial runs to its full measurement and
   is never ended by the calm it causes; the body's cost is judged and nothing anywhere is made worse to make one thing better;
   every wire forced through it. Designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md), with the final coverage sweep

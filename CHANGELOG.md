@@ -28,7 +28,12 @@
   `docs/RERUN_2026-10-10.md` and the manual's 16.6c: the Kafka gain is real and cheap and the trial's measurement is the fault, four
   trial rules written for v4. (7) The README leads with the newest work and carries a "Find it" section of the terms people search
   for; the word "simulation" is kept only in the license's own phrase and for third-party simulators by name, our own models being
-  "modelled".
+  "modelled". (8) **The repository keeps itself current**: `.github/workflows/front-page.yml` runs after every finished live run
+  of the five products, archives it with the code and runs `tools/front_page.py`, which groups the archived runs by what they are
+  (product, objective, engine, workloads), takes the three newest complete runs of a kind as A, B and C, rebuilds every table whose
+  runs changed (the old one kept whole in `docs/history`), then the index, the wiring page, the benefit sheet and the dossier, and
+  writes the newest lines into the README's latest block; `results/live/FRONT_PAGE_STATE.json` records what each table was built
+  from (seeded with the first set of 10 October); tests in `tests/test_front_page.py`, run by `verify.py`.
 - **Every table remade from the rerun of 10 October** (69 of the 71 runs landed by 12:30 UTC; `docs/RERUN_2026-10-10.md`,
   "what landed"): the seven Kubernetes tests, the two robustness scenarios, the five stacks under both objectives (two new
   tables for the service objective, `results/live/V3_REDIS_SERVICE.md` and `results/live/V3_KAFKA_SERVICE.md`), the four

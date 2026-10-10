@@ -406,6 +406,10 @@ def main():
             bad_workflows.append(f"{wf.name}: {str(e).splitlines()[0][:90]}")
     check("every GitHub workflow file parses as YAML with its on and jobs (a file that does not is never run by GitHub)",
           not bad_workflows, "; ".join(bad_workflows)[:300])
+    r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_front_page"], cwd=ROOT, capture_output=True, text=True)
+    check("the front page keeps itself current (tools/front_page.py): archived runs grouped by what they are, the three newest "
+          "complete runs of a kind as A, B and C, a table rebuilt only when its runs changed, the README's latest lines newest first",
+          r.returncode == 0, r.stderr[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_index.py")], capture_output=True, text=True)
     check("the Omni index rebuilds from every test's own result file (tools/omni_index.py)", r.returncode == 0, r.stderr[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "wiring_verdicts.py"), "--check"], capture_output=True, text=True)

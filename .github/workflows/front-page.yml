@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE.
+name: front-page
+# The repository keeps itself current (the founder's order of 10 October 2026). When a live product's run finishes, its raw
+# files are archived with the code (results/live/raw/run-<id>/, the same copy the archive-run workflow makes), and
+# tools/front_page.py rebuilds every table whose three newest runs are in, then the index, the wiring page, the benefit sheet,
+# the dossier and the README's latest lines; the superseded table goes whole into docs/history. One refresh at a time.
+on:
+  workflow_run:
+    workflows: [redis, kafka, pgbench, sysbench, ycsb]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      run_id: {description: "A finished run to archive before the refresh (optional; the refresh alone when empty)", default: ""}
+permissions:
+  contents: write
+  actions: read
+concurrency: {group: front-page, cancel-in-progress: false}
+jobs:
+  refresh:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q -r requirements.txt
+      - name: Archive the finished run with the code
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          RUN: "${{ github.event.workflow_run.id || github.event.inputs.run_id }}"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -n "$RUN" ] || { echo "::notice::no run named: the refresh alone"; exit 0; }
+          d="results/live/raw/run-$RUN"
+          if [ -d "$d" ]; then echo "::notice::run $RUN is already archived"; exit 0; fi
+          state=$(gh run view "$RUN" -R "${{ github.repository }}" --json status,conclusion -q '.status + " " + .conclusion')
+          case "$state" in completed*) ;; *) echo "::warning::run $RUN is not finished ($state)"; exit 0;; esac
+          gh run download "$RUN" -R "${{ github.repository }}" -D "$d" || { echo "::warning::run $RUN: no files to copy"; exit 0; }
+          find "$d" -type f -size +50M -exec gzip -n -9 {} \;
+          ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
+          grep -qx "$RUN" .github/archive_request.txt || echo "$RUN" >> .github/archive_request.txt
+          git add "$d" .github/archive_request.txt
+          git commit -q -m "Raw files of live run $RUN archived with the code"
+          echo "::notice::run $RUN archived: $(find "$d" -type f | wc -l) files"
+      - name: Rebuild what is complete, then the pages read from every table
+        run: |
+          echo "## Front page" >> "$GITHUB_STEP_SUMMARY"
+          python tools/front_page.py | tee plan.json
+          summary=$(python tools/front_page.py --summary)
+          python tools/front_page.py --apply | tee -a "$GITHUB_STEP_SUMMARY"
+          git add -A results docs README.md
+          git commit -q -m "Front page refreshed: $summary" || echo "::notice::nothing to refresh"
+      - run: git pull -q --rebase && git push
