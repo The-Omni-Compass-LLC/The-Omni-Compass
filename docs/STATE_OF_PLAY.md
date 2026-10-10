@@ -21,7 +21,10 @@ set on the amended trial rule landed (21 runs) and is archived; its early readin
 and the manual's 16.6c: on Kafka the brain allowed the third consumer once and the whole gain returned at 2.5 consumers instead of
 6 to 8, and refused on every other repetition; the trial's measurement, not the law, is the fault, and four trial rules for v4
 follow from it. The legal wording on every page outside the frozen engine now reads "all patents, copyrights and trademarks",
-"all rights reserved", "subject to change at any time", with www.omni-compass.com the authority of record.
+"all rights reserved", "subject to change at any time", with www.omni-compass.com the authority of record. The repository now
+keeps itself current: after every finished live run the front-page workflow archives it and `tools/front_page.py` rebuilds every
+table whose three runs are in, the pages read from the tables, and the README's latest lines (`results/live/FRONT_PAGE_STATE.json`
+records what each table was built from).
 
 **Everything run again (10 October 2026, 01:24 to 01:31 UTC).** At the founder's order that every result be as of today, every
 benchmark with a result was dispatched again on the current commit `3aac0ab7` (Omni v3, digest `b53d05449ee04c4b`, by
