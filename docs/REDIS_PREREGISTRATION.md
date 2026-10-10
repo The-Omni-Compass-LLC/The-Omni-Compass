@@ -149,8 +149,12 @@ ceiling grows one notch a trial while the cache is full and missing, to perhaps 
 the line and the hit rate rise by less than the first set's +14% to +27%, the memory held by less than before. Both readings
 are run: three runs each. The first counted set stays in `docs/history` as the result of the rule before this amendment.
 
-**Dispatch.** None yet: the founder asked, on the evening of 9 October, to be shown where everything stands before the next
-runs; the runs go when the founder says.
+**Dispatched (2026-10-10 01:28 and 01:29 UTC, commit `3aac0ab7`, Omni v3 by `tools/omni_version.py --commit`).** At the founder's order of
+10 October that every benchmark be run again on the current code, native and omni, the counted runs on this amendment were
+dispatched with `workloads=all`, `reps=3`, `step_s=30`: under the resource objective runs 38013287665 (A), 38013291972 (B) and 38013296599 (C), 01:28:10 to 01:28:19 UTC; under the service objective runs 38013357351 (A), 38013361862 (B) and 38013366329 (C), 01:29:17 to 01:29:26 UTC. The whole day's dispatch, run by run, is
+`docs/RERUN_2026-10-10.md`. The expectation above stands as written before the runs; when they land the table is read from them
+(`tools/redis_abc.py`), the index, the wiring page and the benefit sheet are read again, and the set this one supersedes goes whole to
+`docs/history`.
 
 ---
 

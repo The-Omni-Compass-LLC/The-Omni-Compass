@@ -411,5 +411,9 @@ gauge inside the noise: the confirmed loss of the second set is gone because the
 was changed. `tpcb_hot`: inside the noise or a smaller saving. The second counted set stays in `docs/history` as the result of
 the rule before this amendment.
 
-**Dispatch.** None yet: the founder asked, on the evening of 9 October, to be shown where everything stands before the next
-runs; the runs go when the founder says.
+**Dispatched (2026-10-10 01:28 UTC, commit `3aac0ab7`, Omni v3 by `tools/omni_version.py --commit`).** At the founder's order of
+10 October that every benchmark be run again on the current code, native and omni, the counted runs on this amendment were
+dispatched with `workloads=untouched`, `reps=3`, `step_s=30`, the resource objective: runs 38013313943 (A), 38013319893 (B) and 38013324861 (C), 01:28:36 to 01:28:45 UTC. The whole day's dispatch, run by run, is
+`docs/RERUN_2026-10-10.md`. The expectation above stands as written before the runs; when they land the table is read from them
+(`tools/pgbench_abc.py`), the index, the wiring page and the benefit sheet are read again, and the set this one supersedes goes whole to
+`docs/history`.

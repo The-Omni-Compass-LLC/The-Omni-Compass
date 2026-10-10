@@ -5811,7 +5811,7 @@ cushion, and all 255 admission muscles are among them, the admission knob being 
 The 14 organism cells with the real cluster inside all write on the cluster's gauges. Nothing on the page changes the
 engine, which stays Omni v3; it changes what an operator connects.
 
-**The same verdict, live (built 9 October, not yet run).** The page judges after the fact; the founder's order is that the
+**The same verdict, live (built 9 October, running since 10 October).** The page judges after the fact; the founder's order is that the
 brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 9.4;
 `tools/knob_verdict.py` around the engine's own verdict, the engine unchanged): every knob starts in watch and is written
 only inside the allowance a paired trial on the stack itself has earned under the declared objective, one notch a trial; a
@@ -5819,8 +5819,9 @@ refused step is not taken, a trial holds the knob, a fail-up never spends beyond
 always free. The amendments are declared in the five preregistrations with the expectation written before the runs
 (Redis left native under the resource objective, the first notch refused; Kafka allowed step by step while each consumer
 pays; PostgreSQL's add above the operator's setting refused on `simple_update`; MySQL's `read_write` chunks refused;
-MongoDB's cache given back a notch a trial). The runs go when the founder says, and the tables, the index and the page are
-then read again from them.
+MongoDB's cache given back a notch a trial). The runs were dispatched on 10 October, three a stack and objective, in the day's
+rerun of every benchmark on one commit (`docs/RERUN_2026-10-10.md`), and the tables, the index and the page are then read again
+from them.
 
 ### 16.7 Threats to validity, stated by us
 
@@ -6261,7 +6262,7 @@ The two-way plug stays one wire in and one wire out (`docs/WIRING_GUIDE.md`). Th
 
 ### The same verdict, live: the brain decides on the knob before it writes
 
-This page judges after the fact, from published tables. The founder's order of 9 October is that the brain judge in real time, on the knob, before it writes, and that a knob which cannot prove it pays stay native. On the five live stacks (the pool, the consumer group, the memory ceiling, the storage-engine cache, the buffer pool) that is now built into the harnesses: `tools/knob_verdict.py` wraps the frozen engine's own verdict (`omnicompass/verdict.py`, unchanged) around every live knob. The knob starts in watch; a paired trial on the stack itself (the knob held at the deepest step already allowed, then one notch further, under the same traffic) allows one notch at a time under the declared objective, the resource reading of the index by default or the service reading at the operator's choice; a refused step is not taken and not retried for a minute; a trial holds the knob; a fail-up never spends beyond the allowance; the operator's setting is always free. The audit carries the cost sample and the verdict's state every second, the arm record sums it, and the three-run tables print the verdict per workload. It is declared as an amendment in each of the five preregistrations with the expectation written before the runs (Redis: left native under the resource objective; Kafka: allowed step by step while each consumer pays; PostgreSQL: the add above the operator's setting refused on `simple_update`; MySQL: the `read_write` chunks refused; MongoDB: the cache given back a notch a trial). The runs on it go when the founder says; this page is then read again from their tables. Inside the modelled realms the organism still takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, designed in `docs/OMNI_V4_PLAN.md` and not built.
+This page judges after the fact, from published tables. The founder's order of 9 October is that the brain judge in real time, on the knob, before it writes, and that a knob which cannot prove it pays stay native. On the five live stacks (the pool, the consumer group, the memory ceiling, the storage-engine cache, the buffer pool) that is now built into the harnesses: `tools/knob_verdict.py` wraps the frozen engine's own verdict (`omnicompass/verdict.py`, unchanged) around every live knob. The knob starts in watch; a paired trial on the stack itself (the knob held at the deepest step already allowed, then one notch further, under the same traffic) allows one notch at a time under the declared objective, the resource reading of the index by default or the service reading at the operator's choice; a refused step is not taken and not retried for a minute; a trial holds the knob; a fail-up never spends beyond the allowance; the operator's setting is always free. The audit carries the cost sample and the verdict's state every second, the arm record sums it, and the three-run tables print the verdict per workload. It is declared as an amendment in each of the five preregistrations with the expectation written before the runs (Redis: left native under the resource objective; Kafka: allowed step by step while each consumer pays; PostgreSQL: the add above the operator's setting refused on `simple_update`; MySQL: the `read_write` chunks refused; MongoDB: the cache given back a notch a trial). The runs on it were dispatched on 10 October 2026 (`docs/RERUN_2026-10-10.md`); this page is then read again from their tables. Inside the modelled realms the organism still takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, designed in `docs/OMNI_V4_PLAN.md` and not built.
 
 
 ---
@@ -9533,6 +9534,17 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Rerun everything:** `pip install -r requirements.txt && python verify.py` ends with `VERIFICATION: PASS`.
 
+**Everything run again (10 October 2026, 01:24 to 01:31 UTC).** At the founder's order that every result be as of today, every
+benchmark with a result was dispatched again on the current commit `3aac0ab7` (Omni v3, digest `b53d05449ee04c4b`, by
+`tools/omni_version.py --commit`), native and omni, the wiring of each checked against its preregistration before the dispatch:
+70 GitHub runs (the seven Kubernetes tests, the five live stacks on the brain's own verdict, the four simulators, the realms table
+and the kill and long robustness scenarios, three runs each; the six organisms with the real cluster inside; the modelled grid at
+1, 10, 100 and 1,000 copies) and the two big organisms at 1,000 copies on rented Azure machines. Every table on this page stands
+until its new set lands; the new set is then the result and the old table goes whole to `docs/history`. The record, run by run
+with inputs, times and ids, is `docs/RERUN_2026-10-10.md`. Not restarted, and why: the three 24-hour robustness machines (started
+8 October on the same harness, byte for byte, ending about 10:15 UTC today) and the Azure fleet that can show one machine, which
+waits on the family allowance those machines hold.
+
 
 ### In one paragraph (2026-10-07, Omni v3)
 
@@ -9603,7 +9615,7 @@ is worse), 3 watch (two robots the engine itself left native, one grid where not
 all 255 admission muscles are among the 746. The 14 organism cells with the real cluster inside all write on the cluster's
 gauges. The engine is unchanged; the page decides what an operator connects.
 
-**The brain's own verdict, live (9 October, built, not yet run).** The founder's order of the same evening: the verdict must
+**The brain's own verdict, live (built 9 October, running since 10 October).** The founder's order of the same evening: the verdict must
 be the brain's, in real time, on the knob, before it writes; a knob that cannot prove it pays stays native. `tools/knob_verdict.py`
 wraps the frozen engine's verdict (`omnicompass/verdict.py`, unchanged) around every live knob of the five database, messaging
 and cache harnesses: the knob starts in watch, a paired trial on the stack itself allows one notch at a time under the declared
@@ -9612,7 +9624,8 @@ spends beyond the allowance, the operator's setting is always free. Declared as 
 expectation written before the runs: Redis left native under the resource objective (the first notch refused), Kafka allowed step
 by step while each consumer pays, PostgreSQL's add above the operator's setting refused on simple_update, MySQL's read_write
 chunks refused, MongoDB's cache given back a notch a trial. The 21 runs (the five stacks under the resource objective; Redis and
-Kafka also under the service objective; three runs each) go when the founder says. Inside the modelled realms the organism still
+Kafka also under the service objective; three runs each) were dispatched on 10 October at 01:28 to 01:29 UTC on commit `3aac0ab7`
+(`docs/RERUN_2026-10-10.md`); the tables are read from them when they land. Inside the modelled realms the organism still
 takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, designed in
 `docs/OMNI_V4_PLAN.md` and not built, because every result must be run again on a new engine.
 
@@ -9688,7 +9701,8 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, no engine file changes): the kill scenario is done
    (`results/live/V3_ROBUST_KILL.md`: every setting back 7 to 11 s after the kill in 30 of 30 repetitions) and the
    governor's own CPU is tabulated (`results/live/V3_OWN_COST.md`); the long run is done (`results/live/V3_ROBUST_LONG.md`, 3 pairs × 3 runs, 7,200 s an arm: no leak, the decisions valid, no slowing, every setting handed back at the end; service inside the noise in two of three runs);
-   the 24-hour run on a rented machine follows.
+   the 24-hour run on three rented machines (scenario 2b, started 8 October 10:15 UTC) ends about 10:15 UTC on 10 October and is
+   collected by the scheduled collect; the kill and long scenarios were dispatched again on 10 October (`docs/RERUN_2026-10-10.md`).
 5. **YCSB on MongoDB, done** (`docs/YCSB_PREREGISTRATION.md`, `results/live/V3_YCSB.md`): the operator's WiredTiger cache
    as native, Omni on the cache size through the server's own console; four smoke runs recorded, then A, B and C on v3; the
    cache held given back by about half on two untouched workloads at no measurable cost in work, p95 or CPU, one confirmed
@@ -9726,6 +9740,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 | Path | What it is |
 |---|---|
 | `docs/OMNI_COMPASS_MANUAL.md` (PDF: `docs/OMNI_COMPASS_MANUAL.pdf`) | the manual: the governor, its mechanism, the wiring stack by stack, the frozen engines, the three-run rule, every result |
+| `docs/RERUN_2026-10-10.md` | every benchmark dispatched again on 10 October 2026 on one commit: the record, run by run |
 | `docs/OMNI_V3.md`, `docs/OMNI_V1.md` | what each engine is and every result read on it |
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and still to run; the program to full size |
 | `results/live/V3_*.md`, `V1_*.md`, `results/live/raw/` | the three-run tables and every archived run's files |

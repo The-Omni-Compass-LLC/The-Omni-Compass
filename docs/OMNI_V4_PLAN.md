@@ -21,7 +21,8 @@ the muscle native. "If it cannot, it shall not be."
   native" where no step passes. In v3 it guards the Kubernetes controller's machines, the robot arms' speed override and the
   drones' cruise. It does not guard every muscle.
 - **The five live harnesses** (since 9 October, `tools/knob_verdict.py`): the same verdict around every live knob of the
-  database, messaging and cache stacks, with the declared objective, outside the engine. Built, declared, not yet run.
+  database, messaging and cache stacks, with the declared objective, outside the engine. Built, declared, and dispatched on
+  10 October 2026 (`docs/RERUN_2026-10-10.md`).
 - **The modelled realms** (`realms/harness.py`, in the engine): one governor reads the organism's aggregate and its one
   directive sets every muscle's knob (`docs/REALMS_PREREGISTRATION.md`, the arms). Each muscle obeys the shipped nervous
   system and its own cover, but no muscle is tried before it is moved. That is where the 13 trade muscles of the realms table

@@ -1524,7 +1524,8 @@ What this gives: no knob is ever written on faith. Where Omni-Compass can beat t
 gauges, it will have proved it on that muscle before it moved it; where it cannot, the muscle lives by itself and Omni
 reads it. The organism's superiority is then the sum of the knobs that earned it, not one turn of a single dial for the
 whole system. On the five live stacks of section 10 this is built and declared (the amendments of 9 October in the Redis,
-Kafka, PostgreSQL, MySQL and YCSB preregistrations); the counted runs on it go when the founder says. On the Kubernetes
+Kafka, PostgreSQL, MySQL and YCSB preregistrations); the counted runs on it were dispatched on 10 October, three runs a stack
+and objective, the expectation written before them (`docs/RERUN_2026-10-10.md`). On the Kubernetes
 controller the verdict already guards the machines (section 1.2). Inside the modelled realms the organism still takes one
 directive for every muscle; making the verdict per muscle there is the next engine, Omni v4 (`docs/OMNI_V4_PLAN.md`),
 designed and not built, because every result must be run again on a new engine.
@@ -2609,7 +2610,7 @@ cushion, and all 255 admission muscles are among them, the admission knob being 
 The 14 organism cells with the real cluster inside all write on the cluster's gauges. Nothing on the page changes the
 engine, which stays Omni v3; it changes what an operator connects.
 
-**The same verdict, live (built 9 October, not yet run).** The page judges after the fact; the founder's order is that the
+**The same verdict, live (built 9 October, running since 10 October).** The page judges after the fact; the founder's order is that the
 brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 9.4;
 `tools/knob_verdict.py` around the engine's own verdict, the engine unchanged): every knob starts in watch and is written
 only inside the allowance a paired trial on the stack itself has earned under the declared objective, one notch a trial; a
@@ -2617,8 +2618,9 @@ refused step is not taken, a trial holds the knob, a fail-up never spends beyond
 always free. The amendments are declared in the five preregistrations with the expectation written before the runs
 (Redis left native under the resource objective, the first notch refused; Kafka allowed step by step while each consumer
 pays; PostgreSQL's add above the operator's setting refused on `simple_update`; MySQL's `read_write` chunks refused;
-MongoDB's cache given back a notch a trial). The runs go when the founder says, and the tables, the index and the page are
-then read again from them.
+MongoDB's cache given back a notch a trial). The runs were dispatched on 10 October, three a stack and objective, in the day's
+rerun of every benchmark on one commit (`docs/RERUN_2026-10-10.md`), and the tables, the index and the page are then read again
+from them.
 
 ### 16.7 Threats to validity, stated by us
 

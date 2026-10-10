@@ -848,7 +848,8 @@ def main(check=False):
           "record sums it, and the three-run tables print the verdict per workload. It is declared as an amendment in each of the five "
           "preregistrations with the expectation written before the runs (Redis: left native under the resource objective; Kafka: allowed step by "
           "step while each consumer pays; PostgreSQL: the add above the operator's setting refused on `simple_update`; MySQL: the `read_write` "
-          "chunks refused; MongoDB: the cache given back a notch a trial). The runs on it go when the founder says; this page is then read again "
+          "chunks refused; MongoDB: the cache given back a notch a trial). The runs on it were dispatched on 10 October 2026 "
+          "(`docs/RERUN_2026-10-10.md`); this page is then read again "
           "from their tables. Inside the modelled realms the organism still takes one directive for every muscle; the verdict per muscle there "
           "is the next engine, Omni v4, designed in `docs/OMNI_V4_PLAN.md` and not built.", ""]
 
