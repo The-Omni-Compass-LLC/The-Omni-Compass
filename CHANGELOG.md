@@ -7,6 +7,14 @@
 
 > `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
 
+## 2026-10-10
+- **Every change said in words, never by a bare sign** (`tools/benefit_sheet.py`, `tools/wiring_verdicts.py`, both pages regenerated):
+  the founder found the sheet read backwards against the tables (plus is good on the sheet; a cut reads minus in a table). Now the
+  sheet's number carries its word (gain, loss, nothing) and every confirmed change is written out beside it: a gauge that fell when
+  falling is good reads **cut** (less waiting, fewer machines, less energy, less memory), one that rose when rising is good reads
+  **up**, each with **good** or **cost**; the wiring page's columns, causes and loss list use the same words. The tables keep their
+  raw signs with the Reading column beside them, and how to read the results and the manual (14) say so.
+
 ## 2026-10-09
 - **The benefit sheet: one number per benchmark, plus always good for Omni** (`tools/benefit_sheet.py`, `docs/BENEFIT_SHEET.md`,
   `results/BENEFIT_SHEET.json`, checked by `verify.py`): at the founder's order that a reader must never have to work out

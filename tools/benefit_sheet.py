@@ -61,6 +61,34 @@ def fmt_pct(x):
     return f"{x:+.0f}%" if abs(x) >= 10 else f"{x:+.1f}%"
 
 
+def fmt_pct_words(x):
+    """The one number with its meaning in a word: '+31% gain', '-25% loss', '0% nothing'."""
+    if x is None:
+        return "no number"
+    if abs(x) < 0.05:
+        return "0% nothing"
+    return fmt_pct(x) + (" gain" if x > 0 else " loss")
+
+
+def in_words(items):
+    """Every confirmed change of a benchmark in words, grouped by gauge: (name, class, range) -> 'p95 cut 65% to 71%: good'.
+    A gauge that fell when falling is good reads cut; one that rose when rising is good reads up; each carries good or cost."""
+    groups = {}
+    for name, cls, rg in items:
+        nums = re.findall(r"[-+]?\d+(?:\.\d+)?%", rg or "")
+        if not nums:
+            continue
+        groups.setdefault((name, cls, nums[0].startswith("-")), []).extend(abs(float(n.rstrip("%"))) for n in nums)
+    out = []
+    for (name, cls, fell), mags in groups.items():
+        mags = sorted(mags)
+        f = (lambda x: f"{x:.0f}%") if mags[-1] >= 10 else (lambda x: f"{x:.1f}%")
+        m = f(mags[0]) if f(mags[0]) == f(mags[-1]) else f"{f(mags[0])} to {f(mags[-1])}"
+        v = ("cut" if fell else "up") if cls == "better" else ("down" if fell else "up")
+        out.append(f"{name} {v} {m}: {'good' if cls == 'better' else 'cost'}")
+    return "; ".join(out) if out else "nothing confirmed either way"
+
+
 def benefit_word(better, worse):
     if better and worse:
         return "trade"
@@ -99,17 +127,19 @@ def from_index():
         if not c["counted"]:
             continue
         b, w = len(c["judged"]["better"]), len(c["judged"]["worse"])
+        items = [(nm, "better", rg) for _, nm, rg, _ in c["judged"]["better"]] + [(nm, "worse", rg) for _, nm, rg, _ in c["judged"]["worse"]]
         f = c["source"].rsplit("/", 1)[-1]
         if "Kubernetes" in c["domain"]:
             rows.append({"date": updated(LIVE / f), "benchmark": "Real Kubernetes, " + c["case"], "benefit": benefit_word(b, w), "pct": c["resource_pct"],
-                         "better": b, "worse": w, "what": "the index's reading of this test: p95, machines, energy, and work where measured", "file": c["source"]})
+                         "better": b, "worse": w, "words": in_words(items), "what": "the index's reading of this test: p95, machines, energy, and work where measured", "file": c["source"]})
         else:
-            s_ = stacks.setdefault(f, {"ratios": [], "better": 0, "worse": 0, "parts": []})
-            s_["ratios"].append(1 + (c["resource_pct"] or 0.0) / 100.0); s_["better"] += b; s_["worse"] += w
-            s_["parts"].append({"case": c["workload"], "pct": c["resource_pct"] or 0.0, "benefit": benefit_word(b, w)})
+            s_ = stacks.setdefault(f, {"ratios": [], "better": 0, "worse": 0, "parts": [], "items": []})
+            s_["ratios"].append(1 + (c["resource_pct"] or 0.0) / 100.0); s_["better"] += b; s_["worse"] += w; s_["items"] += items
+            s_["parts"].append({"case": c["workload"], "pct": c["resource_pct"] or 0.0, "benefit": benefit_word(b, w), "words": in_words(items)})
     for f, s_ in stacks.items():
         rows.append({"date": updated(LIVE / f), "benchmark": names.get(f, f), "benefit": benefit_word(s_["better"], s_["worse"]), "pct": pct(gmean(s_["ratios"])),
-                     "better": s_["better"], "worse": s_["worse"], "what": "the index's category: its untouched workloads together (work, p95, the resource held, host CPU)",
+                     "better": s_["better"], "worse": s_["worse"], "words": in_words(s_["items"]),
+                     "what": "the index's category: its untouched workloads together (work, p95, the resource held, host CPU)",
                      "file": f"results/live/{f}", "parts": s_["parts"]})
     return rows
 
@@ -126,7 +156,8 @@ def headline_row():
     cases = [c for c in wv.real_stacks(wv.load_index()) if c["counted"]]
     b = sum(len(c["judged"]["better"]) for c in cases); w = sum(len(c["judged"]["worse"]) for c in cases)
     return {"date": updated(ROOT / "results" / "OMNI_INDEX.md"), "benchmark": "Every real test together: the Omni index", "benefit": benefit_word(b, w), "pct": hl,
-            "better": b, "worse": w, "what": "the headline: six real categories weighed the same (the index's resource reading)", "file": "results/OMNI_INDEX.md"}
+            "better": b, "worse": w, "words": "the six real categories together; each stack's own words are in its row",
+            "what": "the headline: six real categories weighed the same (the index's resource reading)", "file": "results/OMNI_INDEX.md"}
 
 
 # -------------------------------------------------------------------------- three-run tables outside the index
@@ -137,7 +168,7 @@ def from_abc_table(fname, name, what):
     if not p.exists():
         return None
     d = json.loads(p.read_text())
-    ratios, better, worse = [], 0, 0
+    ratios, better, worse, items = [], 0, 0, []
     for key, row in d["rows"].items():
         try:
             c = wv.classify(row["reading"])
@@ -155,12 +186,13 @@ def from_abc_table(fname, name, what):
                 rs.append(n / o if lower else o / n)
             if rs:
                 ratios.append(gmean(rs)); better += c == "better"; worse += c == "worse"
+                items.append((wv.K8S_GAUGE.get(key, key), c, wv.pct_range(row["runs"])))
             else:
                 ratios.append(1.0)
         else:
             ratios.append(1.0)
     return {"date": updated(LIVE / fname.replace(".json", ".md")), "benchmark": name, "benefit": benefit_word(better, worse), "pct": pct(gmean(ratios)),
-            "better": better, "worse": worse, "what": what, "file": f"results/live/{fname.replace('.json', '.md')}"}
+            "better": better, "worse": worse, "words": in_words(items), "what": what, "file": f"results/live/{fname.replace('.json', '.md')}"}
 
 
 # ------------------------------------------------------------------------------------- the simulators (markdown)
@@ -206,7 +238,7 @@ def from_sim(fname, name, moved_titles, what, left_native_title=None):
         if left_native_title and sec["title"].startswith(left_native_title):
             for r in sec["table"][1:]:                             # nothing moved: nothing gained, nothing lost
                 if r and r[0]:
-                    cases.append({"case": r[0] + " (left native by the engine's own trial)", "pct": 0.0, "benefit": "none", "better": 0, "worse": 0})
+                    cases.append({"case": r[0] + " (left native by the engine's own trial)", "pct": 0.0, "benefit": "none", "better": 0, "worse": 0, "words": "nothing moved", "items": []})
             continue
         tag = next((t for t in moved_titles if sec["title"].startswith(t)), None)
         if tag is None:
@@ -218,12 +250,18 @@ def from_sim(fname, name, moved_titles, what, left_native_title=None):
             if not sub["rows"]:
                 continue
             r, b, w = sim_case_ratio(sub["rows"])
-            cases.append({"case": cname + (f" ({moved_titles[tag]})" if moved_titles[tag] else ""), "pct": pct(r), "benefit": benefit_word(b, w), "better": b, "worse": w})
+            j = wv.sim_rows_judged(sub["rows"])
+            items = [(nm, "better", rg) for _, nm, rg, _ in j["better"]] + [(nm, "worse", rg) for _, nm, rg, _ in j["worse"]]
+            cases.append({"case": cname + (f" ({moved_titles[tag]})" if moved_titles[tag] else ""), "pct": pct(r), "benefit": benefit_word(b, w), "better": b, "worse": w,
+                          "words": in_words(items), "items": items})
     if not cases:
         return None
     better = sum(c["better"] for c in cases); worse = sum(c["worse"] for c in cases)
+    all_items = [it for c in cases for it in c.get("items", [])]
+    for c in cases:
+        c.pop("items", None)
     return {"date": updated(p), "benchmark": name, "benefit": benefit_word(better, worse), "pct": pct(gmean([1 + c["pct"] / 100.0 for c in cases])),
-            "better": better, "worse": worse, "what": what, "file": f"results/live/{fname}", "parts": cases}
+            "better": better, "worse": worse, "words": in_words(all_items), "what": what, "file": f"results/live/{fname}", "parts": cases}
 
 
 # ---------------------------------------------------------------------------------------------- the organisms
@@ -232,9 +270,9 @@ def from_organisms(fname, name, what):
     if not p.exists():
         return None
     d = json.loads(p.read_text())
-    cells = []
+    cells, all_items = [], []
     for cell, c in d["organisms"].items():
-        ratios, better, worse = [], 0, 0
+        ratios, better, worse, items = [], 0, 0, []
         for k, v in c["rows"].items():
             if k.startswith("organism") or v.get("neutral") or v.get("same"):
                 continue                                           # the cluster's own gauges decide; the modelled organism is judged in the realms table
@@ -244,10 +282,13 @@ def from_organisms(fname, name, what):
             lower = v["better"] == (v["omni"] < v["native"])     # the report's own direction: better and fell means lower is better
             ratios.append(v["native"] / v["omni"] if lower else v["omni"] / v["native"])
             better += bool(v["better"]); worse += not v["better"]
-        cells.append({"case": cell.replace("@", " at ") + " copies", "pct": pct(gmean(ratios)), "benefit": benefit_word(better, worse), "better": better, "worse": worse})
+            items.append((wv.K8S_GAUGE.get(k, k), "better" if v["better"] else "worse", f"{v['pct']:+.1f}%"))
+        all_items += items
+        cells.append({"case": cell.replace("@", " at ") + " copies", "pct": pct(gmean(ratios)), "benefit": benefit_word(better, worse), "better": better, "worse": worse,
+                      "words": in_words(items)})
     better = sum(x["better"] for x in cells); worse = sum(x["worse"] for x in cells)
     return {"date": updated(LIVE / fname.replace(".json", ".md")), "benchmark": name, "benefit": benefit_word(better, worse),
-            "pct": pct(gmean([1 + x["pct"] / 100.0 for x in cells])), "better": better, "worse": worse, "what": what,
+            "pct": pct(gmean([1 + x["pct"] / 100.0 for x in cells])), "better": better, "worse": worse, "words": in_words(all_items), "what": what,
             "file": f"results/live/{fname.replace('.json', '.md')}", "parts": cells}
 
 
@@ -264,6 +305,7 @@ def from_realms():
     better = int(clear and prim[0] > 0); worse = int(clear and prim[0] < 0)
     return {"date": updated(ROOT / "results" / "realms" / "REALMS.md"), "benchmark": "The 945 modelled muscles as one tower, every muscle written at once",
             "benefit": benefit_word(better, worse), "pct": 100 * prim[0] if clear else 0.0, "better": better, "worse": worse,
+            "words": (f"work per energy up {100 * prim[0]:.1f}%: good" if clear and prim[0] > 0 else f"work per energy down {abs(100 * prim[0]):.1f}%: cost" if clear else "nothing confirmed either way"),
             "what": "the tower's work per energy over ten paired seeds; a model, evidence class S", "file": "results/realms/REALMS.md"}
 
 
@@ -309,30 +351,34 @@ def main(check=False):
     if hl:
         rows.remove(hl); rows.insert(0, hl)
 
-    L = ["# The benefit sheet: one number per benchmark, plus always good for Omni", "",
+    L = ["# The benefit sheet: one number per benchmark, plus always good for Omni, and every change said in words", "",
          "The founder's order of 9 October 2026: next to every benchmark, say whether Omni-Compass was a benefit and by how much, in "
-         "one number whose sign always means the same thing. **Plus is good for Omni, minus is bad, whatever the gauge measures.** "
-         "Less energy, fewer machines, less memory, a shorter wait and fewer failures are all plus here; more of any of them is minus. "
-         "**0%** means nothing beyond the noise. The tables keep their raw signs (a response time that fell reads \"-65%\" in its "
-         "table); this sheet turns every one the same way round, by one rule, from the tables themselves (`tools/benefit_sheet.py`, "
-         "checked by `verify.py`).", "",
-         "The rule is the Omni index's (`results/OMNI_INDEX.md`): each judged gauge becomes a ratio oriented so that above one is good "
-         "for Omni; it counts only where confirmed over all three runs, anything else counts as exactly one; the number is the "
+         "one number whose sign always means the same thing, and say every change in words so that nobody has to work out which way a "
+         "gauge points. **On this sheet plus is good for Omni and minus is bad, whatever the gauge measures.** The number carries its "
+         "word: **gain**, **loss** or **nothing**. Beside it every confirmed change is written out: a gauge that fell when falling is good "
+         "reads **cut** (less waiting, fewer machines, less energy, less memory, fewer failures), a gauge that rose when rising is good "
+         "reads **up**, and each one carries **good** or **cost**. So \"p95 cut 65%: good\" and \"memory ceiling held up 215%: cost\" "
+         "cannot be misread.", "",
+         "The result tables (the files in the last column) keep every change with its raw sign: a response time that fell reads \"-65%\" "
+         "there, and whether a fall is good is said in the Reading column beside it. Read the words here, not the bare signs there.", "",
+         "The number is the Omni index's rule (`results/OMNI_INDEX.md`): each judged gauge becomes a ratio oriented so that above one is "
+         "good for Omni; it counts only where confirmed over all three runs, anything else counts as exactly one; the number is the "
          "geometric mean of the ratios, minus one, in percent. For the tests inside the index the number is the index's own resource "
          "reading of that test; for a stack with several workloads it is the stack's index category; for the simulators and the "
-         "organisms the same arithmetic runs over every judged gauge of their tables.", "",
-         "**Benefit?** reads **yes** (a confirmed gain, no confirmed loss), **no** (a confirmed loss, no confirmed gain), **none** "
+         "organisms the same arithmetic runs over every judged gauge of their tables. Built from the tables by `tools/benefit_sheet.py`, "
+         "checked by `verify.py`.", "",
+         "**Benefit?** reads **yes** (confirmed gains, no confirmed loss), **no** (a confirmed loss, no confirmed gain), **none** "
          "(nothing confirmed either way) or **trade** (gains and losses both; the number says which way the trade nets by this "
          "scoring, and the wiring page `docs/WIRING_VERDICTS.md` says what pays for what).", "",
-         "| Date | Benchmark | Benefit? | How much (plus is good) | Gauges better / worse | What the number is | Table |",
-         "|---|---|---|---:|---:|---|---|"]
+         "| Date | Benchmark | Benefit? | How much | Every confirmed change, in words | Table |",
+         "|---|---|---|---:|---|---|"]
     for r in rows:
-        L.append(f"| {r['date']} | {r['benchmark']} | **{r['benefit']}** | **{fmt_pct(r['pct'])}** | {r['better']} / {r['worse']} | {r['what']} | `{r['file']}` |")
+        L.append(f"| {r['date']} | {r['benchmark']} | **{r['benefit']}** | **{fmt_pct_words(r['pct'])}** | {r.get('words', '')} | `{r['file']}` |")
     L += ["", "## The parts behind a row", "",
           "Where a row sums several workloads, grids, districts, cells or robots, each part with its own number, the same way round:", ""]
     for r in rows:
         if r.get("parts"):
-            L.append(f"- **{r['benchmark']}**: " + "; ".join(f"{p_['case']} {fmt_pct(p_['pct'])} ({p_['benefit']})" for p_ in r["parts"]) + ".")
+            L.append(f"- **{r['benchmark']}**: " + "; ".join(f"{p_['case']} {fmt_pct_words(p_['pct'])} ({p_['benefit']}" + (f": {p_['words']}" if p_.get('words') else "") + ")" for p_ in r["parts"]) + ".")
     L += ["", "## Not on the sheet, and why", "",
           "- **Azure's managed Kubernetes, the bill** (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): Omni v1, a 4-worker fleet, every gauge inside the noise: 0%, and too small a fleet to show one machine.",
           "- **The governor's own cost** (`results/live/V3_OWN_COST.md`): 0.6% to 1.3% of one core at every size; a cost shown, not a benchmark against native.",

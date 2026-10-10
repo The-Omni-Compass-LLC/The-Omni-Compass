@@ -214,9 +214,38 @@ def real_stacks(index):
     return cases
 
 
-def fmt_list(items, n=4):
-    """'p95 −65% to −66%, p99 −68% to −72%, ...' from classified items."""
-    s = [f"{nm} {rg}".strip() for _, nm, rg, _ in items[:n]]
+def magnitude(rg):
+    """'-65% to -66%' -> '65% to 66%': the size of a change without its sign (the sign is said in words instead)."""
+    nums = re.findall(r"[-+]?\d+(?:\.\d+)?%", rg or "")
+    if not nums:
+        return rg or ""
+    mags = sorted(abs(float(x.rstrip("%"))) for x in nums)
+    f = (lambda x: f"{x:.0f}%") if mags[-1] >= 10 else (lambda x: f"{x:.1f}%")
+    return f(mags[0]) if f(mags[0]) == f(mags[-1]) else f"{f(mags[0])} to {f(mags[-1])}"
+
+
+def verb(cls, rg):
+    """The direction of a change in a word: a gauge that fell was 'cut' when that is good and went 'down' when that is bad;
+    one that rose went 'up'. So a reader never has to know which way a gauge points to read its sign."""
+    nums = re.findall(r"[-+]?\d+(?:\.\d+)?%", rg or "")
+    fell = bool(nums) and nums[0].startswith("-")
+    if rg == "from zero":
+        return "up from zero"
+    if cls == "better":
+        return "cut" if fell else "up"
+    return "down" if fell else "up"
+
+
+def words(name, cls, rg, tag=True):
+    """'p95 cut 65% to 66%: good' or 'memory ceiling held up 205% to 215%: cost'."""
+    v = verb(cls, rg); m = magnitude(rg)
+    core = f"{name} {v}" + (f" {m}" if m and v != "up from zero" else "")
+    return core + (": good" if cls == "better" else ": cost") if tag else core
+
+
+def fmt_list(items, n=4, cls=None, tag=False):
+    """'p95 cut 65% to 66%, p99 cut 68% to 72%, ...' from classified items; cls names the class the items came from."""
+    s = [words(nm, cls or "better", rg, tag) for _, nm, rg, _ in items[:n]]
     more = len(items) - n
     return ", ".join(s) + (f" and {more} more" if more > 0 else "")
 
@@ -236,7 +265,7 @@ def stack_why(f, wl, j, v, res, svc):
     short = STACK_SHORT[f]
     parts = []
     if j["disagree"]:
-        parts.append(f"the runs disagree on {fmt_list(j['disagree'], 3)}")
+        parts.append(f"the runs disagree on {', '.join(f'{nm} ({rg})' for _, nm, rg, _ in j['disagree'][:3])}")
     if not j["better"] and not j["worse"]:
         parts.append(f"nothing confirmed either way ({len(j['noise'])} gauges inside the noise" + (f", {len(j['same'])} the same" if j["same"] else "") + ")")
     s = ("; ".join(parts) + ".") if parts else ""
@@ -244,7 +273,7 @@ def stack_why(f, wl, j, v, res, svc):
     for k, nm, rg, _ in j["worse"]:
         w = WHY.get((f, wl, k)) or WHY.get((f, "*", k))
         if w:
-            causes.append(f"{nm} {rg}: {w}")
+            causes.append(f"{words(nm, 'worse', rg)}, because {w}")
     if causes:
         s += " Why: " + "; ".join(causes) + "."
     s = s.strip()
@@ -415,7 +444,7 @@ def sims():
 def sim_why(f, name, j, v):
     parts = []
     if j["disagree"]:
-        parts.append(f"the runs differ on {fmt_list(j['disagree'], 3)}")
+        parts.append(f"the runs differ on {', '.join(f'{nm} ({rg})' for _, nm, rg, _ in j['disagree'][:3])}")
     if not j["better"] and not j["worse"]:
         parts.append("nothing confirmed either way")
     s = ("; ".join(parts) + ".") if parts else ""
@@ -608,7 +637,10 @@ def main(check=False):
          "`verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` "
          f"({len(all_cases)} rows, the 945 modelled muscles included one by one).", "",
          "## The rule", "",
-         "Every judged gauge of a table counts (rows marked \"shown, not judged\" never do). A knob reads:", "",
+         "Every judged gauge of a table counts (rows marked \"shown, not judged\" never do). Every change on this page is said in words, never "
+         "by a bare sign: a gauge that fell when falling is good reads **cut** (less waiting, fewer machines, less energy, less memory), one "
+         "that rose when rising is good reads **up**, and each carries **good** or **cost**. In the result tables the same change keeps its raw "
+         "sign (a cut reads minus there), with the Reading column beside it saying which way is good. A knob reads:", "",
          "- **write**: at least one gauge confirmed better over all three runs and none confirmed worse. Omni holds the knob.",
          "- **watch**: nothing confirmed better. The knob stays native; Omni reads it and writes nothing. Where a gauge is confirmed "
          "worse, the loss is named and its cause given below. Where the runs disagree, nothing is settled and the knob stays native until it is.",
@@ -639,7 +671,7 @@ def main(check=False):
           "| Demand | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
     for x in [c for c in real if c["kind"] == "real knob" and "Kubernetes" in c["domain"]]:
         j = x["judged"]
-        L.append(f"| {x['case']} | {esc(fmt_list(j['better'], 12)) or 'none'} | {esc(fmt_list(j['worse'], 12)) or 'none'} | **{x['verdict']}** | "
+        L.append(f"| {x['case']} | {esc(fmt_list(j['better'], 12, 'better')) or 'none'} | {esc(fmt_list(j['worse'], 12, 'worse')) or 'none'} | **{x['verdict']}** | "
                  f"{pct_s(x['resource_pct'])} | {pct_s(x['service_pct'])} | {esc(x['why'])} | `{x['source']}` |")
     L.append("")
     for cat, f, knob, names in WORKLOAD_STACKS:
@@ -650,7 +682,7 @@ def main(check=False):
               "| Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
         for x in rows:
             j = x["judged"]
-            L.append(f"| {x['case']} | {esc(fmt_list(j['better'], 12)) or 'none'} | {esc(fmt_list(j['worse'], 12)) or 'none'} | "
+            L.append(f"| {x['case']} | {esc(fmt_list(j['better'], 12, 'better')) or 'none'} | {esc(fmt_list(j['worse'], 12, 'worse')) or 'none'} | "
                      f"**{x['verdict']}**{'' if x['counted'] else ' (not counted)'} | {pct_s(x['resource_pct'])} | {pct_s(x['service_pct'])} | {esc(x['why'])} | `{x['source']}` |")
         L.append("")
 
@@ -667,7 +699,7 @@ def main(check=False):
             w = WHY.get((f, x.get("workload", "*"), k)) or WHY.get((f, "*", k)) or "see the table"
             groups.setdefault((x.get("stack", "Kubernetes"), nm, w), []).append((x.get("workload", x["case"]), rg, runs, x["verdict"]))
     for (stack, nm, w), items in groups.items():
-        cases = ", ".join(f"{wl} {rg}" for wl, rg, _, _ in items)
+        cases = ", ".join(f"{wl} {verb('worse', rg)} {magnitude(rg)}" for wl, rg, _, _ in items)
         figs = []
         for _, _, runs, _ in items:
             n0, o0 = first(runs, "native"), first(runs, "omni")
@@ -678,7 +710,7 @@ def main(check=False):
             ns = sorted({f"{n:.4g}" for n, _ in figs}); os_ = sorted(f"{o:.4g}" for _, o in figs)
             fig = f" ({' / '.join(ns)} → {os_[0]}{' to ' + os_[-1] if len(os_) > 1 and os_[0] != os_[-1] else ''} in run A)"
         vs = sorted({v for _, _, _, v in items})
-        L.append(f"- **{stack}, {nm}: {cases}**{fig}. {w[0].upper() + w[1:]}. Verdict: **{' / '.join(vs)}**"
+        L.append(f"- **{stack}, {nm}: {cases}, a cost**{fig}. {w[0].upper() + w[1:]}. Verdict: **{' / '.join(vs)}**"
                  + (" on every workload named" if len(items) > 1 else "") + ".")
     if not groups:
         L.append("- none")
@@ -698,8 +730,8 @@ def main(check=False):
               "| Case | Confirmed better | Confirmed worse | Verdict | Why | Source |", "|---|---|---|---|---|---|"]
         for x in rows:
             j = x["judged"]
-            b = esc(fmt_list(j["better"], 12)) if j else ""
-            w = esc(fmt_list(j["worse"], 12)) if j else ""
+            b = esc(fmt_list(j["better"], 12, "better")) if j else ""
+            w = esc(fmt_list(j["worse"], 12, "worse")) if j else ""
             L.append(f"| {x['case']} | {b or ('none' if j else '')} | {w or ('none' if j else '')} | **{x['verdict']}**"
                      f"{'' if x['counted'] or x['verdict'] == 'no knob' else ' (not counted)'} | {esc(x['why'])} | `{x['source']}` |")
         L.append("")
@@ -830,8 +862,8 @@ def main(check=False):
     for x in all_cases:
         j = x["judged"]
         w.writerow([x["kind"], x["domain"], x["knob"], x["case"], "yes" if x["counted"] else "no",
-                    "; ".join(f"{nm} {rg}".strip() for _, nm, rg, _ in j["better"]) if j else "",
-                    "; ".join(f"{nm} {rg}".strip() for _, nm, rg, _ in j["worse"]) if j else "",
+                    "; ".join(words(nm, "better", rg) for _, nm, rg, _ in j["better"]) if j else "",
+                    "; ".join(words(nm, "worse", rg) for _, nm, rg, _ in j["worse"]) if j else "",
                     len(j["noise"]) if j else "", len(j["disagree"]) if j else "",
                     x["verdict"], "" if x["resource_pct"] is None else f"{x['resource_pct']:.2f}",
                     "" if x["service_pct"] is None else f"{x['service_pct']:.2f}", x["why"], x["source"]])

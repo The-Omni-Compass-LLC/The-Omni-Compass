@@ -159,9 +159,13 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 
 In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
 whether each is good depends on the gauge. The benefit sheet turns every one the same way round: **plus is always good for
-Omni, minus is always bad**, whatever the gauge measures. Less energy, fewer machines, less memory, a shorter wait and
-fewer failures all read plus there; 0% means nothing beyond the noise. One number per benchmark, by the index's own rule,
-with **yes**, **no**, **none** or **trade** beside it. Read that sheet first; read the tables for the rows behind a number.
+Omni, minus is always bad**, whatever the gauge measures, and the number carries its word, **gain**, **loss** or
+**nothing**. Beside it every confirmed change is written out in words, never as a bare sign: a gauge that fell when
+falling is good reads **cut** (less waiting, fewer machines, less energy, less memory, fewer failures), a gauge that rose
+when rising is good reads **up**, and each carries **good** or **cost**. So "p95 cut 65%: good" and "memory ceiling held up
+215%: cost" cannot be misread against a table that shows the same changes as "-65%" and "+215%". One number per benchmark,
+by the index's own rule, with **yes**, **no**, **none** or **trade** beside it. Read that sheet first; read the tables for
+the rows behind a number, and read their Reading column, never the sign alone. The wiring page uses the same words.
 
 ## Wire in, or watch (`docs/WIRING_VERDICTS.md`)
 

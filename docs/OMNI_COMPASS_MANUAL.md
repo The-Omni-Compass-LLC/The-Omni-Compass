@@ -2084,9 +2084,12 @@ laid out the same way so that a reader of this manual can read it without learni
 (`docs/BENEFIT_SHEET.md`, built from the tables by `tools/benefit_sheet.py` and checked by `verify.py`) turns every one the
 same way round, at the founder's order of 9 October 2026: **plus is always good for Omni-Compass, minus is always bad**,
 whatever the gauge measures. Less energy, fewer machines, less memory, a shorter wait and fewer failures all read plus
-there; 0% is nothing beyond the noise. One number per benchmark, by the index's own rule, with yes, no, none or trade
-beside it. A reader who wants one figure for a benchmark reads that sheet; a reader who wants the rows behind it reads the
-table it names.
+there; 0% is nothing beyond the noise, and the number carries its word, gain, loss or nothing. Beside it every confirmed
+change is written in words, never as a bare sign: a gauge that fell when falling is good reads **cut**, one that rose when
+rising is good reads **up**, and each carries **good** or **cost**, so "p95 cut 65%: good" cannot be misread against a
+table that shows the same change as "-65%". One number per benchmark, by the index's own rule, with yes, no, none or trade
+beside it. The wiring page (section 16.6b) uses the same words. A reader who wants one figure for a benchmark reads that
+sheet; a reader who wants the rows behind it reads the table it names, and reads its Reading column, never the sign alone.
 
 | Class | Rung | What it is | What it can show |
 |---|---|---|---|
