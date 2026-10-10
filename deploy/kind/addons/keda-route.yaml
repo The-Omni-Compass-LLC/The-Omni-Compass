@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+# The add-on native's front door (scripts/kind_addons.sh, ADDONS=keda), the same in every arm.
+# 1. The KEDA HTTP add-on's route: every request that reaches the interceptor (any host, any path) goes to php-apache, and
+#    the interceptor counts the requests in flight, the live concurrency the add-on's scaler reports to KEDA. One request
+#    in flight per pod is the target: one php-apache request fills its pod's 500m CPU limit, so a second one only waits.
+# 2. A NodePort in front of the interceptor on the control plane (never parked), so the response-time probe enters where
+#    the load enters, through the add-on, as a client does.
+apiVersion: http.keda.sh/v1beta1
+kind: InterceptorRoute
+metadata: {name: php-apache, namespace: default}
+spec:
+  target: {service: php-apache, port: 80}
+  rules:
+    - hosts: ["*"]
+  scalingMetric:
+    concurrency: {targetValue: 1}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: php-apache-edge-keda, namespace: keda}
+spec:
+  type: NodePort
+  ports: [{port: 8080, targetPort: proxy, nodePort: 30090}]
+  selector:
+    app.kubernetes.io/component: add-on
+    app.kubernetes.io/instance: interceptor
+    app.kubernetes.io/name: http
+    app.kubernetes.io/part-of: keda

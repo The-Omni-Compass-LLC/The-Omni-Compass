@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+"""Stand-in kubectl for tests/test_kubectl_keda.py: a cluster where KEDA owns an HPA, as KEDA 2.21 does
+(controllers/keda/hpa.go). On every change of the ScaledObject's spec the HPA is rebuilt from it, its annotations replaced
+by the ScaledObject's, its metrics sorted by type (External before Resource); a write to the HPA's spec is undone the same
+way; a change of the HPA's annotations is undone only when the ScaledObject's annotations are not all on the HPA. State in
+$FAKE_STATE; every call appended to $FAKE_CALLS when set."""
+import json, os, sys, copy
+S = os.environ["FAKE_STATE"]; C = os.environ.get("FAKE_CALLS")
+st = json.load(open(S))
+args = sys.argv[1:]
+if C:
+    open(C, "a").write(json.dumps(args) + "\n")
+def save(): json.dump(st, open(S, "w"))
+def rebuild():
+    so, hpa = st["so"], st["hpa"]
+    hpa["spec"]["minReplicas"] = so["spec"].get("minReplicaCount", 1)
+    hpa["spec"]["maxReplicas"] = so["spec"].get("maxReplicaCount", 100)
+    mets = []
+    for t in so["spec"]["triggers"]:
+        if t["type"] in ("cpu", "memory"):
+            mets.append({"type": "Resource", "resource": {"name": t["type"], "target": {"type": "Utilization", "averageUtilization": int(t["metadata"]["value"])}}})
+        else:
+            mets.append({"type": "External", "external": {"metric": {"name": "s1-http"}, "target": {"type": "AverageValue", "averageValue": "1"}}})
+    mets.sort(key=lambda m: m["type"])
+    hpa["spec"]["metrics"] = mets
+    hpa["metadata"]["annotations"] = copy.deepcopy(so["metadata"].get("annotations"))
+def subset(a, b):
+    if not a: return True
+    return all(k in (b or {}) and b[k] == v for k, v in a.items())
+def annotate(obj, toks):
+    ann = obj["metadata"].get("annotations")
+    ann = dict(ann or {})
+    for t in toks:
+        if t.startswith("-"): continue
+        if "=" in t:
+            k, v = t.split("=", 1); ann[k] = v
+        elif t.endswith("-"):
+            ann.pop(t[:-1], None)
+    obj["metadata"]["annotations"] = ann
+def jsonpatch(obj, ops):
+    for op in ops:
+        parts = op["path"].strip("/").split("/")
+        cur = obj
+        for p in parts[:-1]:
+            cur = cur[int(p)] if isinstance(cur, list) else cur[p]
+        last = parts[-1]
+        if isinstance(cur, list): cur[int(last)] = op["value"]
+        else: cur[last] = op["value"]
+def payload(a):
+    for i, t in enumerate(a):
+        if t == "-p": return json.loads(a[i+1])
+    raise SystemExit("no payload")
+def ptype(a):
+    for t in a:
+        if t.startswith("--type="): return t.split("=",1)[1]
+    return "strategic"
+verb = args[0]
+if verb == "get":
+    kind = args[1]
+    if kind == "hpa" and "-A" in args:
+        print(json.dumps({"items": [st["hpa"]]})); sys.exit(0)
+    if kind == "hpa": print(json.dumps(st["hpa"])); sys.exit(0)
+    if kind.startswith("scaledobject"): print(json.dumps(st["so"])); sys.exit(0)
+    if kind == "deployment": print(json.dumps({"metadata": {"annotations": {}}, "spec": {"template": {"spec": {"containers": [{"resources": {"requests": {"cpu": "200m"}, "limits": {"cpu": "500m"}}}]}}}})); sys.exit(0)
+    print(json.dumps({"items": []})); sys.exit(0)
+if verb == "patch":
+    kind = args[1]
+    if kind.startswith("scaledobject"):
+        if ptype(args) == "json": jsonpatch(st["so"], payload(args))
+        else:
+            for k, v in payload(args)["spec"].items(): st["so"]["spec"][k] = v
+        rebuild(); save(); sys.exit(0)
+    if kind == "hpa":
+        if ptype(args) == "json": jsonpatch(st["hpa"], payload(args))
+        else:
+            for k, v in payload(args)["spec"].items(): st["hpa"]["spec"][k] = v
+        rebuild(); save(); sys.exit(0)   # KEDA undoes it
+if verb == "annotate":
+    kind = args[1]
+    toks = [t for t in args[3:] if t not in ("-n", "default")]
+    if kind.startswith("scaledobject"):
+        annotate(st["so"], toks); save(); sys.exit(0)
+    if kind == "hpa":
+        annotate(st["hpa"], toks)
+        so_ann = st["so"]["metadata"].get("annotations")
+        if (so_ann is None and st["hpa"]["metadata"].get("annotations") is not None) or not subset(so_ann, st["hpa"]["metadata"].get("annotations")):
+            st["hpa"]["metadata"]["annotations"] = copy.deepcopy(so_ann)
+        save(); sys.exit(0)
+print("fake: unsupported", args, file=sys.stderr); sys.exit(3)

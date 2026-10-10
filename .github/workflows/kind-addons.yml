@@ -1,0 +1,137 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+name: kind-addons
+# The add-on test (the founder's order of 10 October; docs/ADDONS_PREREGISTRATION.md): native is Kubernetes with its
+# add-ons, as clusters run it, and Omni-Compass runs on top of that. KEDA and its HTTP add-on own the service's autoscaler
+# in every arm (scripts/kind_addons.sh). The arms are paired on one runner as in benchmark-reps (scripts/kind_paired.sh),
+# each on a fresh six-worker kind cluster, the order rotated by repetition: native, and compass (Omni-Compass, the compass
+# law, on top of the same), whose autoscaler moves reach KEDA through the plug (scripts/kubectl_keda.py). Two native
+# setups, one job each: both (KEDA on the CPU target and the live requests in flight) and http (the requests in flight
+# alone). Started by hand, or by a pushed commit whose message contains [addons]; [smoke] makes it one short repetition
+# per setup (360 s) to prove the wiring. The results are committed back to the branch the run ran on
+# (results/live/raw/addons-run-<id>/), never to main, and the front page does not listen to this workflow: the founder
+# hears the result before it goes up.
+on:
+  workflow_dispatch:
+    inputs:
+      duration_s: {description: "Measured seconds per run", default: "900"}
+      reps: {description: "Repetitions, as a JSON list", default: "[1,2,3,4,5,6,7,8,9,10]"}
+      profiles: {description: "Native setups, as a JSON list (both, http)", default: '["both","http"]'}
+  push:
+permissions:
+  contents: write
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
+jobs:
+  run:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[addons]')
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        profile: ${{ fromJSON(github.event.inputs.profiles || (contains(github.event.head_commit.message, '[http-only]') && '["http"]' || (contains(github.event.head_commit.message, '[both-only]') && '["both"]' || '["both","http"]'))) }}
+        rep: ${{ fromJSON(github.event.inputs.reps || (contains(github.event.head_commit.message, '[smoke]') && '[1]' || '[1,2,3,4,5,6,7,8,9,10]')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: helm/kind-action@v1
+        with: {install_only: true}
+      - run: bash scripts/kind_paired.sh
+        env:
+          REP: ${{ matrix.rep }}
+          ARMS: native compass
+          ADDONS: keda
+          ADDONS_PROFILE: ${{ matrix.profile }}
+          DURATION: ${{ github.event.inputs.duration_s || (contains(github.event.head_commit.message, '[smoke]') && '360' || '900') }}
+          WARMUP: ${{ contains(github.event.head_commit.message, '[smoke]') && '60' || '120' }}
+          CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+          LOADGEN: closed
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "keda-${{ matrix.profile }}-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}"}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  aggregate:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with: {ref: "${{ github.ref_name }}"}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with: {pattern: "keda-both-*", path: reps-both, merge-multiple: true}
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with: {pattern: "keda-http-*", path: reps-http, merge-multiple: true}
+      - name: The table, one per native setup
+        run: |
+          for p in both http; do
+            [ -d "reps-$p" ] || continue
+            ls "reps-$p"
+            python tools/live_reps.py "reps-$p" || { echo "no table for setup $p (every run invalid?)" | tee -a "$GITHUB_STEP_SUMMARY"; continue; }
+            { echo "## Native with its add-ons, setup $p (KEDA $( [ "$p" = both ] && echo 'on the CPU target and the live requests in flight' || echo 'on the live requests in flight alone')); omni is Omni-Compass on top of the same"; echo; cat "reps-$p/LIVE_REPS.md"; echo; } >> "$GITHUB_STEP_SUMMARY"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: addons-reps, path: "reps-*/LIVE_REPS.*"}
+      - name: The results, committed back to this branch (never to main)
+        if: always() && github.ref_name != 'main'
+        run: |
+          d="results/live/raw/addons-run-${{ github.run_id }}"
+          mkdir -p "$d"
+          for p in both http; do [ -d "reps-$p" ] && cp -r "reps-$p" "$d/$p"; done
+          ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add "$d"
+          git commit -q -m "Add-on test, run ${{ github.run_id }}: raw files and tables (test branch only)"
+          for i in 1 2 3 4 5 6; do
+            git push origin "HEAD:${{ github.ref_name }}" && exit 0
+            sleep $((i * 5)); git pull --rebase -q origin "${{ github.ref_name }}" || true
+          done
+          echo "::error::the results could not be pushed after six attempts"; exit 1
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
