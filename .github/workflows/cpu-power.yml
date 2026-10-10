@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 name: cpu-power
 # Omni-Compass on top of the Linux kernel's own CPU frequency governor, energy read by the processor's own meter
 # (docs/CPU_POWER_PREREGISTRATION.md). GitHub's own machines are virtual: they expose neither the governor nor the meter, so
@@ -15,11 +17,15 @@ on:
       reps: {description: "Paired repetitions per workload", default: "3"}
       step_s: {description: "Seconds per demand step", default: "60"}
       objective: {description: "What the brain's verdict judges a notch by: resource (energy, speed and work together, the index's reading), per-work (energy per request inside the line, the line the guardrail) or service (speed and work alone)", default: "resource"}
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
 jobs:
   checks:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
@@ -34,12 +40,17 @@ jobs:
           code=$?
           if [ $code -ne 0 ]; then echo "::notice::GitHub's machine cannot run the benchmark (no governor, no meter): run it on your own machine or name a self-hosted runner"; fi
           exit 0
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   run:
     needs: checks
     if: github.event.inputs.runner != '' && github.event.inputs.runner != 'ubuntu-latest'
     runs-on: ${{ github.event.inputs.runner }}
     timeout-minutes: 720
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - run: python3 -m pip install -q -r requirements.txt
       - run: python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
@@ -60,3 +71,32 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: cpu-power, path: out}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """The five added live levers against the fake kubectl: rightsize sets pod CPU requests from use in place and the kill
 switch restores them; coldstart scales an idle deployment to zero and wakes it when work waits; batch_pace pauses a
 pausable Job under power stress and resumes it when calm; contain puts a quota and scaled limits on an agent namespace

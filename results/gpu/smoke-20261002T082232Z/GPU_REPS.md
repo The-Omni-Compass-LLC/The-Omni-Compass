@@ -1,5 +1,7 @@
 # GPU bench: native vs Omni-Compass, metered by the device
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 GPU NVIDIA A10, driver 580.105.08, persistence mode Enabled, start power limit 150.00 W, workload tools/gpu_workload.py (seeded fp16 matmul request stream).
 3 repetitions, order rotated, 180.0 s per arm plus 30.0 s drain, 30.0 s idle before each arm.
 
@@ -157,3 +159,7 @@ Each write owns the interval until the next write. Joules and requests finished 
 - Writes executed (power limit and clock ceiling): Native 0, Omni watches only 0, Omni governs 183.
 - Every arm ended at the start limit.
 - Energy is the device's own power.draw integrated over time; no number here is modelled.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

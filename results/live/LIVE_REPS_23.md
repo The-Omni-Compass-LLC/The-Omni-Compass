@@ -1,5 +1,7 @@
 # Set 23 on real Kubernetes: set 22 repeated on the current code, ten paired repetitions, equal work
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36940088922, on `main` at the release with realm round 2 (`6475bea`). Same protocol as set 22:
 - open-loop load at a fixed rate (`loadgen=open`), so both arms were sent the same work;
 - 10 paired repetitions, each arm 15 minutes on kind (1 control plane, 6 workers), both arms of a repetition on one
@@ -30,3 +32,7 @@ Recomputed from the run's own raw files by `.github/workflows/reaggregate.yml`:
   Counting Omni's own CPU, total CPU is unchanged too (−1.0%, not proven).
 - **The closed-loop work estimate printed under the recomputed table does not apply.** The load is fixed-rate, so
   both arms were sent the same requests.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

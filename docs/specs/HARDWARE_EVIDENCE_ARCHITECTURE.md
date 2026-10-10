@@ -1,7 +1,6 @@
 # Hardware Evidence Architecture
 
-> **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Any other use requires a signed, paid
-> Omni-Compass Enterprise License. See [`LICENSE`](../../LICENSE).
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 > **Specification, carried from the package XPASS27 (2026-10-01).** It specifies a contract or a measurement; any result
 > it quotes is as of that package. Current results: the manual, section 15 (`docs/OMNI_COMPASS_MANUAL.md`).
@@ -161,5 +160,4 @@ Open external evidence remains: 500-scenario confirmation, Kind CLAIM1-23, and p
 
 ---
 
-*Evaluation and simulation use only. Commercial use, commercialization or monetization requires a signed, paid
-Omni-Compass Enterprise License from The Omni-Compass LLC. See [`LICENSE`](../../LICENSE) and [`NOTICE`](../../NOTICE).*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

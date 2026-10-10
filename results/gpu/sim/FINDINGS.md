@@ -1,5 +1,7 @@
 # GPU governor on the modelled card: what binds, and what was tried
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Model only (`tools/gpu_physics_sim.py`, MLPerf-calibrated card shape, 5-10 paired repetitions, gammas 3 and 1.5).
 
 ## What decides the power limit (defaults: 2 s decisions, 0.70 share floor, busy gate at 0.5)
@@ -33,3 +35,7 @@ the lowest power cap the safety shield admits (invariant I2 in `omnicompass/shie
 | compass stroke: the start limit in expansion (quadrant I), floor 0.50-0.65 in compression and re-alignment | +4.1%, +0.3% | +1.1%, +3.8% | not adopted: less energy saved; the floors below 0.65 never bind (shield I2) |
 | stroke with a 0.75 share floor | +3.5%, +0.5% | +1.0%, +2.3% | not adopted |
 | graded mid-load floor 0.85-0.90 | up to +7.1% | fails the guardrail | not adopted |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

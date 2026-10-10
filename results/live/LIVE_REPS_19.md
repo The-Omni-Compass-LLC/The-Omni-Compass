@@ -1,5 +1,7 @@
 # Set 19 on real Kubernetes: native against me on top
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36362185876, commit d0ddb94. Five paired repetitions, each with native and me on top back to back
 on one runner, order rotated. Each arm is 15 minutes (DURATION 900 s) after a 120 s warm-up, on kind v0.31.0 and
 Kubernetes v1.35.0 with 1 control plane and 6 workers, metrics-server v0.9.0.
@@ -94,3 +96,7 @@ holds:
 
 `SHA256SUMS_ALL.txt` covers all of them. The table above recomputes exactly from these files:
 `python tools/live_reps.py <folder holding the bench-* folders>`.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

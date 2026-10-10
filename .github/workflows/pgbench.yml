@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 name: pgbench
 # Omni-Compass on top of a database's own connection pooler (docs/POSTGRES_PREREGISTRATION.md): PostgreSQL as the
 # distribution ships it behind PgBouncer's shipped pool of 20, pgbench offering a stepped load; one job per workload,
@@ -21,11 +23,15 @@ on:
       objective:
         description: "What the brain's verdict judges a step by: resource (work, speed, connections and CPU together, the index's reading) or service (work and speed alone)"
         default: "resource"
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
 jobs:
   plan:
     runs-on: ubuntu-latest
     outputs: {workloads: "${{ steps.w.outputs.workloads }}"}
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - id: w
         run: |
           if [ "${{ github.event.inputs.workloads }}" = untouched ]; then
@@ -34,6 +40,9 @@ jobs:
             w=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.workloads }}'.split(',')))")
           fi
           echo "workloads=$w" | tee -a "$GITHUB_OUTPUT"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   run:
     needs: plan
     strategy:
@@ -43,6 +52,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 150
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - name: PostgreSQL as shipped, PgBouncer as shipped
         run: |
@@ -67,11 +78,16 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: "pgbench-${{ matrix.workload }}", path: out}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   report:
     needs: run
     if: always() && needs.run.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with: {pattern: "pgbench-*", path: all, merge-multiple: true}
@@ -79,3 +95,32 @@ jobs:
       - run: cat all/PGBENCH.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with: {name: pgbench-report, path: "all/PGBENCH.md"}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

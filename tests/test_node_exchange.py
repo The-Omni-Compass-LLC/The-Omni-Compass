@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """CPU and GPU on one conserved power budget (hardware/node_exchange.py), checked on every card fit and two budgets.
 N1 the budget is conserved: the joint conveyance (XC) never draws the site over its budget
 N2 holding the CPUs is what makes the hand-over safe: counting only the CPUs' last measured draw (XM) does go over

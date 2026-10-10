@@ -1,12 +1,6 @@
 # CLAUDE.md: standing orders for any session working on this repository
 
-> **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
-> commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
-> Omni-Compass Enterprise License. All patent applications, copyright registrations and trademark applications have been
-> filed in the United States by The Omni-Compass LLC. All rights reserved. Everything here is subject to change at any
-> time; www.omni-compass.com is the authority of record. See `LICENSE` and `NOTICE`.
-
-> `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 These are the founder's orders, gathered from the full working record. They load every session. Follow them unless
 the founder overrides one in the conversation.
@@ -81,6 +75,9 @@ the founder overrides one in the conversation.
   the LICENSE, the NOTICE and DISCLOSURES.md the same way, written as a multi-billion-dollar company would protect a
   released asset.
 - Keep the SPDX headers so Black Duck, FOSSA and Snyk detect the license.
+- The notice is written once, in `tools/legal.py`; `python3 tools/legal.py --fix` puts it on every page, header, workflow
+  report and export, and `--check` (run by `verify.py`) fails any push where a file lacks it. Engine files locked by a
+  fingerprint take the new header only with the next engine version.
 
 ## Orders of 10 October (afternoon)
 
@@ -122,6 +119,7 @@ the founder overrides one in the conversation.
 - Latest standing order (Oct 5): push everything on the newest engine, run it again and double-check it, keep the old
   runs going, don't ask questions, and work to the highest referee and underwriter level.
 
+
 ---
 
-© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. Subject to change at any time; www.omni-compass.com is the authority of record.
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

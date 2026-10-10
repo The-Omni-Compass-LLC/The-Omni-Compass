@@ -1,11 +1,6 @@
 # CPU power: Omni-Compass on top of the Linux kernel's own frequency governor, preregistered before any run
 
-> **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
-> commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
-> Omni-Compass Enterprise License. All patent applications, copyright registrations and trademark applications have been
-> filed in the United States by The Omni-Compass LLC. See `LICENSE` and `NOTICE`.
-
-> `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 Written 2026-10-10, before any run, at the founder's order that the Linux kernel's own knobs be benchmarked (the register,
 row 18). The rules below are frozen on the tuning workload before any untouched workload runs; a change is an amendment,
@@ -158,3 +153,7 @@ workload, shown and not counted. The rules above are frozen before it.
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
 Enterprise License. All patents, copyrights and trademarks filed in the USA. All rights reserved. Subject to change at any time.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

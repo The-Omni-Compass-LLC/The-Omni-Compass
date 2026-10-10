@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """docs/REALM_MUSCLES.md from realms/catalog.csv: the shared spine, then each realm's own families, then the tower.
 
     python3 tools/realm_muscles.py
@@ -11,21 +13,15 @@ import csv
 from collections import OrderedDict
 from pathlib import Path
 
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp, TOP as _LEGAL_TOP
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp, TOP as _LEGAL_TOP
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "REALM_MUSCLES.md"
 REALMS = OrderedDict([("compute_ai_cloud", "Compute / AI / Cloud"), ("physics_robotics_autonomous", "Physics / Robotics / Autonomous"),
                       ("energy_facility_industrial", "Energy / Facility / Industrial"), ("distribution_specialized", "Distribution / Specialized")])
-BANNER = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights "
-          "reserved. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any "
-          "commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation "
-          "into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent "
-          "applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics "
-          "and its software have been filed in the United States by The Omni-Compass LLC. Everything here is subject to change "
-          "at any time; www.omni-compass.com is the authority of record. See [`LICENSE`](../LICENSE).")
-END = ("*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or\n"
-       "monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.\n"
-       "All patents, copyrights and trademarks filed in the USA. See `LICENSE` and `NOTICE` at the root of\n"
-       "this repository.*")
+BANNER = f"> {_LEGAL_TOP}"                 # the one notice (tools/legal.py); stamp() keeps one copy of it
 
 
 def families(rows):
@@ -57,8 +53,8 @@ def main():
         L += [f"## Realm {i}: {name}: {len(own)} own muscles + the spine = {total} in its organism", ""] + section(families(own))
     stack = sum(sum(1 for r in rows if k in r["realms"].split(";")) for k in REALMS)
     L += [f"## Organism 5: the four stacked, every duplicate kept, {stack:,} muscles", "",
-          f"## Organism 6: the whole tower, all {len(rows)} muscles once", "", "---", "", END, ""]
-    OUT.write_text("\n".join(L))
+          f"## Organism 6: the whole tower, all {len(rows)} muscles once", ""]
+    OUT.write_text("\n".join(_legal_stamp(L)) + "\n", encoding="utf-8")
     print(f"{OUT} {len(rows)} muscles, spine {len(spine)}")
 
 

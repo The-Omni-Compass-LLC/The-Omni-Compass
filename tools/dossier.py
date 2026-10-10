@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """The referee dossier: every mechanism, harness, receipt and result in one place, read from the result files.
 
 Writes docs/DOSSIER.md and its charts in docs/dossier/. Every number is read from a file named next to it; the only
@@ -14,9 +16,9 @@ from __future__ import annotations
 import csv
 
 try:                                                       # the legal notice every generated report carries
-    from tools.legal import stamp as _legal_stamp
+    from tools.legal import stamp as _legal_stamp, TOP as _LEGAL_TOP
 except ImportError:
-    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp, TOP as _LEGAL_TOP
 import json
 import math
 import re
@@ -34,13 +36,7 @@ OUT = ROOT / "docs" / "DOSSIER.md"
 FIG = ROOT / "docs" / "dossier"
 SURF, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
 SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#8a63d2"]   # validated categorical order
-BANNER = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights "
-          "reserved. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any "
-          "commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation "
-          "into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent "
-          "applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics "
-          "and its software have been filed in the United States by The Omni-Compass LLC. Everything here is subject to change "
-          "at any time; www.omni-compass.com is the authority of record. See [`LICENSE`](../LICENSE).")
+BANNER = f"> {_LEGAL_TOP}"                 # the one notice (tools/legal.py); stamp() keeps one copy of it
 _SZ = organism_sizes()
 ORG = [f"Compute / AI / Cloud ({_SZ['compute_ai_cloud']})", f"Physics / Robotics / Autonomous ({_SZ['physics_robotics_autonomous']})",
        f"Energy / Facility / Industrial ({_SZ['energy_facility_industrial']})", f"Distribution / Specialized ({_SZ['distribution_specialized']})",

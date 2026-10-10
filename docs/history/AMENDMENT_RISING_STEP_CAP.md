@@ -1,10 +1,6 @@
-> **Status: proposed by an outside reviewer on 2026-10-04; not adopted.** The reasons are recorded in
-> `docs/K8S_COMPASS_PREREGISTRATION.md`, "The third amendment, and a change considered and declined". Kept here unchanged
-> so the proposal and the decision can both be read.
->
-> Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. See `LICENSE`.
-
 # Amendment: a rising step adds only the pods already waiting
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 Written before the next capacity run. The run in progress (`benchmark-reps` 294, commit `5d2e238`) is the previous setting. Nothing in this file is a result.
 
@@ -53,3 +49,7 @@ Same capacity test as `CAPACITY_2.md`: ten pairs, native / omni / compass, order
 Label by the one rule. The row that failed last time is pods started. If capacity rises and pods started are not worse than native, the arm can be labelled. If capacity rises and pods started are still worse, report both and do not label it better.
 
 The number to read is requests a second inside the line, compass against native, with the 95 percent interval of the paired difference. Last compass result 24.6. Offered load 48. The room this write is aimed at is the pending pods that had no place, not a full node, and not a power cut.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

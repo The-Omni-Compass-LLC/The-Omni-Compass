@@ -1,5 +1,7 @@
 # Repeated live runs on kind, set 25: native against Omni-Compass on top (the engine's allocation law), 10 paired repetitions
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Source: GitHub Actions workflow `benchmark-reps`, run 37057508359, commit `6fa7a97`, 2026-10-02, job `aggregate`
 (`python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds per arm. Transcribed
 from the job's printed receipt; the run's artifact `live-reps` holds the same table. Evidence class **L** (real
@@ -25,3 +27,7 @@ Kubernetes software on kind; energy is a declared model, not a meter: every work
 | pods started | 3.5 | 3 | -14.3% | -2.355 to +1.355 | no |
 | pod start wait, total (s) | 13 | 6.2 | -52.3% | -15.37 to +1.769 | no |
 | pod start wait, mean (s) | 2.81 | 1.86 | -33.8% | -2.145 to +0.2448 | no |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

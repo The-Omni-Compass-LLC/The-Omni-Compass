@@ -1,5 +1,7 @@
 # Set 17 on real Kubernetes: native against me on top
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36356742965, commit 40c95af (two arms; prefer-not idle mark, conveyed CPU, the promise in queue
 terms, machines empty one at a time, pod reflex with S and R from the same window). Five paired repetitions, 15
 minutes each, kind with 1 control plane and 6 workers.
@@ -33,3 +35,7 @@ A change is significant when its paired 95% interval excludes zero. Lower respon
 - The autoscaler alone makes and removes pods. My pod reflex gauges the queue and writes nothing.
 - The target I hold uses the CPU each pod is guaranteed across the machines in service, so it moves only when a
   machine idles or wakes.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

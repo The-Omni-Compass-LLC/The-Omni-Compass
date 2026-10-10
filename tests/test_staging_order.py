@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """The staging law's order, run through the real actuator (scripts/kind_nodepool.sh) against a stand-in kubectl:
 on the way down the emptiest machine idles first (fewest serving pods, then fewest pods), on the way up the warmest
 idle machine wakes first (most work still on it), two machines always stay in service (the floor), every machine is usable (an operator may hold some back), no pod is ever moved, and an

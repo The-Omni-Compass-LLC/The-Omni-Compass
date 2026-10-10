@@ -1,5 +1,7 @@
 # Set 20 on real Kubernetes: native against me on top, ten paired repetitions
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36366603505, commit 18220d4. Ten paired repetitions, each with native and me on top back to back on
 one GitHub Actions runner, order rotated. Each arm is 15 minutes after a 120 s warm-up, on kind (Kubernetes in Docker)
 with 1 control plane and 6 workers. The engine is the same as set 19; only the measurement changed:
@@ -60,3 +62,7 @@ schedule (the generators do not log their own counts), with me on top the servic
 (95% interval +28% to +42%) with 26% more CPU, so **CPU per request was about 7% lower** (−9% to −5%). The energy rows
 compare runs that served different amounts of work. A count of requests served, or an open-loop load at a fixed rate,
 is needed to state work per energy; set 22 does that (`LOADGEN=open`).
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

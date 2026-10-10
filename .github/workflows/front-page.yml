@@ -1,15 +1,28 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 name: front-page
-# The repository keeps itself current (the founder's order of 10 October 2026). When a live product's run finishes, its raw
-# files are archived with the code (results/live/raw/run-<id>/, the same copy the archive-run workflow makes), and
-# tools/front_page.py rebuilds every table whose three newest runs are in, then the index, the wiring page, the benefit sheet,
-# the dossier and the README's latest lines; the superseded table goes whole into docs/history. One refresh at a time.
+# The repository keeps itself current (the founder's order of 10 October 2026: the newest result is always at the front, and
+# the repository, not a person, moves it there). Within minutes of every finished benchmark run, and every hour besides:
+#   1. a finished run of a live product (Redis, Kafka, PostgreSQL, MySQL, MongoDB) has its raw files archived with the code
+#      (results/live/raw/run-<id>/, the same copy the archive-run workflow makes);
+#   2. tools/front_page.py rebuilds every table whose three newest runs are in (the superseded table goes whole into
+#      docs/history), then the index, the wiring page, the benefit sheet and the dossier;
+#   3. the front page's own blocks are written again: the engine on main and the index now, every result table by when it
+#      last changed, and the newest finished run of every benchmark;
+#   4. the legal notice is checked on every page it touched, and the result is pushed.
+# The checkout leaves out the archived runs it does not read (the archive is tens of gigabytes; the product runs' own folders
+# are all the rebuild needs). One refresh at a time.
 on:
   workflow_run:
-    workflows: [redis, kafka, pgbench, sysbench, ycsb]
+    workflows: [redis, kafka, pgbench, sysbench, ycsb, live-kind, live-kind-full, live-kind-levers, live-shadow, benchmark,
+                benchmark-reps, robustness, six, six-kube, big-organism, big-organism-detached, realms, citylearn, mujoco,
+                pandapower, swarm, cpu-power, kwok-scale, gpu-bench, aks-metered]
     types: [completed]
+  schedule:
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       run_id: {description: "A finished run to archive before the refresh (optional; the refresh alone when empty)", default: ""}
@@ -17,18 +30,38 @@ permissions:
   contents: write
   actions: read
 concurrency: {group: front-page, cancel-in-progress: false}
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
 jobs:
   refresh:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 0}
+        with:
+          ref: main
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
+            /results/live/raw/*/redis-*/
+            /results/live/raw/*/kafka-*/
+            /results/live/raw/*/pgbench-*/
+            /results/live/raw/*/sysbench-*/
+            /results/live/raw/*/ycsb-*/
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -q -r requirements.txt
       - name: Archive the finished run with the code
+        # a live product's successful run, or a run named by hand; every other benchmark's files stay in its own artifacts
+        # (or are archived on request through .github/archive_request.txt), so the repository does not outgrow GitHub
+        if: >-
+          github.event_name == 'workflow_dispatch' ||
+          (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' &&
+           contains(fromJSON('["redis", "kafka", "pgbench", "sysbench", "ycsb"]'), github.event.workflow_run.name))
         env:
           GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           RUN: "${{ github.event.workflow_run.id || github.event.inputs.run_id }}"
@@ -37,22 +70,38 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           [ -n "$RUN" ] || { echo "::notice::no run named: the refresh alone"; exit 0; }
           d="results/live/raw/run-$RUN"
-          if [ -d "$d" ]; then echo "::notice::run $RUN is already archived"; exit 0; fi
+          if git cat-file -e "HEAD:$d" 2>/dev/null; then echo "::notice::run $RUN is already archived"; exit 0; fi
           state=$(gh run view "$RUN" -R "${{ github.repository }}" --json status,conclusion -q '.status + " " + .conclusion')
           case "$state" in completed*) ;; *) echo "::warning::run $RUN is not finished ($state)"; exit 0;; esac
           gh run download "$RUN" -R "${{ github.repository }}" -D "$d" || { echo "::warning::run $RUN: no files to copy"; exit 0; }
           find "$d" -type f -size +50M -exec gzip -n -9 {} \;
           ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
           grep -qx "$RUN" .github/archive_request.txt || echo "$RUN" >> .github/archive_request.txt
-          git add "$d" .github/archive_request.txt
+          git add --sparse "$d" .github/archive_request.txt
           git commit -q -m "Raw files of live run $RUN archived with the code"
           echo "::notice::run $RUN archived: $(find "$d" -type f | wc -l) files"
-      - name: Rebuild what is complete, then the pages read from every table
+      - name: Rebuild what is complete, then the pages read from every table, then the front page's own blocks
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           echo "## Front page" >> "$GITHUB_STEP_SUMMARY"
           python tools/front_page.py | tee plan.json
           summary=$(python tools/front_page.py --summary)
           python tools/front_page.py --apply | tee -a "$GITHUB_STEP_SUMMARY"
+          python tools/legal.py --fix results docs README.md
+          python tools/legal.py --check > legal.txt || { tail -20 legal.txt; echo "::error::a page lacks the legal notice"; exit 1; }
+          tail -1 legal.txt >> "$GITHUB_STEP_SUMMARY"
           git add -A results docs README.md
-          git commit -q -m "Front page refreshed: $summary" || echo "::notice::nothing to refresh"
-      - run: git pull -q --rebase && git push
+          git commit -q -m "Front page refreshed: $summary" || echo "::notice::nothing new for the front page"
+      - name: Push, trying again if the branch moved meanwhile
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            git pull -q --rebase && git push && exit 0
+            echo "::warning::push attempt $attempt failed (the branch moved); trying again"; sleep 15
+          done
+          echo "::error::the refreshed front page could not be pushed after six attempts"; exit 1
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

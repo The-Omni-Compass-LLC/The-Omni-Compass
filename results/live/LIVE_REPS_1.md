@@ -1,5 +1,7 @@
 # Live repetitions, set 1: GitHub Actions run 36286889273 (commit eae9efc), 5 × native / omni / strict on kind
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 **Status: failed-request and latency rows are INVALID for the Omni arms (probe defect, see LIVE_REPS_PROBE_DEFECT.md).**
 Node rows are valid. Kept here unedited as the record.
 
@@ -30,3 +32,7 @@ Node rows are valid. Kept here unedited as the record.
 | failed requests (%) | 0 | 41.68 | +0.0% | -12.96 to +96.31 | no |
 | pending pods, pod-minutes | 0.3333 | 0.4733 | +42.0% | -0.109 to +0.389 | no |
 | utilisation (used / allocatable) | 0.07224 | 0.09439 | +30.7% | -0.004397 to +0.04869 | no |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

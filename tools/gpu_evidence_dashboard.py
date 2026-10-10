@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """Generate a compact evidence dashboard only from completed arm receipts. Refuses empty/fabricated runs."""
 import argparse,json,pathlib,sys
+try:                                                       # the legal notice every generated report carries
+    from tools.legal import stamp as _legal_stamp
+except ImportError:
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 
 def main():
  ap=argparse.ArgumentParser(); ap.add_argument('run_dir'); a=ap.parse_args(); root=pathlib.Path(a.run_dir)
@@ -24,5 +30,5 @@ def main():
  watch0=all(r.get('watch_pl_writes')==0 for _,a,r in rows if a=='watch')
  restore=all(r.get('restore_ok') for _,_,r in rows); slo=all(r.get('slo_ok') for _,_,r in rows)
  L += ['', '## Qualification lights','',f'- Watch writes zero: {"PASS" if watch0 else "FAIL"}',f'- Restore: {"PASS" if restore else "FAIL"}',f'- SLO held in every arm: {"PASS" if slo else "FAIL"}', '- Requested/enforced actuator fidelity and statistical verdict: see GPU_REPS.md / GPU_REPS.json.','']
- (root/'GPU_EVIDENCE_DASHBOARD.md').write_text('\n'.join(L)); print(root/'GPU_EVIDENCE_DASHBOARD.md')
+ (root/'GPU_EVIDENCE_DASHBOARD.md').write_text('\n'.join(_legal_stamp(L)) + '\n'); print(root/'GPU_EVIDENCE_DASHBOARD.md')
 if __name__=='__main__': main()

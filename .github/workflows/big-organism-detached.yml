@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 name: big-organism-detached
 # The organism too big for one GitHub job even on a rented machine: the four stacked at 1,000 copies (1.7 million modelled
 # muscles) with the real cluster inside takes more than GitHub's six-hour job limit per repetition (every attempt in the
@@ -32,12 +34,16 @@ on:
       group: {description: "collect: look at this resource group only (omni-detached-<run id>); empty = every tagged machine", default: ""}
   schedule:
     - cron: "41 */2 * * *"       # collect: a look at every tagged machine; nothing to do when none is running
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
 jobs:
   survey:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'survey'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: azure/login@v2
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
       - name: Which sizes may this subscription rent, where
@@ -83,6 +89,9 @@ jobs:
           echo "::notice::our resource groups: ${g:-none}"
           c=$(az aks list -o tsv --query "[].join(' ', [resourceGroup, name, provisioningState])" 2>/dev/null | tr '\n' ';')
           echo "::notice::our clusters: ${c:-none}"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   start:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'start'
     runs-on: ubuntu-latest
@@ -99,6 +108,8 @@ jobs:
       TEST: ${{ github.event.inputs.test || 'organism' }}
       MAXH: ${{ github.event.inputs.max_hours || '40' }}
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: azure/login@v2
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
@@ -179,11 +190,16 @@ jobs:
           # background with it (an "a && b &" list would leave a shell holding this ssh session open until the test ends)
           ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni; nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat detached.log; echo "--- paired log"; tail -5 paired-*.log 2>/dev/null; pgrep -af kind_paired >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
           echo "::notice::$RG in $LOC: test $TEST, $ORGS at $SCALE copies, $REPS repetitions of $DUR s an arm, commit $SHA, collected and deleted after $MAXH h at the latest; collect looks at it every two hours"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   collect:
     if: github.event_name == 'schedule' || github.event.inputs.mode == 'collect'
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: azure/login@v2
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
       - name: Look at every running machine
@@ -257,3 +273,32 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: steps.look.outputs.any == '1'
         with: {name: "detached-machines", path: "out/*.log\nout/*.txt\nout/unfinished\nout/six-*[7-9]\n!out/six-*-[1-6]", if-no-files-found: ignore}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

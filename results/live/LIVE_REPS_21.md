@@ -1,5 +1,7 @@
 # Set 21 on real Kubernetes: native against me on top, ten paired repetitions
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36466558583, commit 9e64f7b (conveyance only when response time needs it: `--convey-on 0.5`,
 `--convey-off 0.25` of the 500 ms SLO). Ten paired repetitions, each arm 15 minutes on kind (1 control plane, 6 workers),
 order rotated, both arms of a repetition on one runner. The table was recomputed from the run's own raw files by
@@ -51,3 +53,7 @@ includes more work served. This set's own estimate (`tools/closed_loop_estimate.
 | energy per request (energy row "still on at idle power" ÷ requests; both a model and an estimate) | about −21% | not computed per repetition |
 
 Work per energy stated without an estimate needs equal work; the next set runs a fixed-rate load (`LOADGEN=open`).
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

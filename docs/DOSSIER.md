@@ -1,17 +1,14 @@
 # The Omni-Compass Dossier
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
-
-> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights reserved. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. Everything here is subject to change at any time; www.omni-compass.com is the authority of record. See [`LICENSE`](../LICENSE).
-
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `eaec83fc`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `a9aaf92e9`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ## 1. The mechanism, and proof that it is the one that ran
 
 | Check | Result | Where |
 |---|---|---|
-| The whole repository re-runs and checks itself (`python3 verify.py`) | **see results/VERIFY_RECEIPT.txt** | `results/VERIFY_RECEIPT.txt` |
+| The whole repository re-runs and checks itself (`python3 verify.py`) | **PASS** | `results/VERIFY_RECEIPT.txt` |
 | The eight-line engine and its six states, fingerprinted (`omnicompass/core.py`) | sha256 `bd615f156169f679…` | `RELEASE_MANIFEST.json` |
 | Python and C++20 twins of every law, proven equal and sealed | seal intact: 9 Python/C++ twins | `results/SEAL.json` |
 | The mechanism's identity against the code | mechanism identity matches the code | `results/MECHANISM_IDENTITY.json` |
@@ -42,36 +39,36 @@ Energy on kind is a declared model: the machines are containers on one runner, s
 
 ## 3. A real database: PostgreSQL behind PgBouncer, Omni v3, three runs (evidence class L)
 
-PostgreSQL 16 as shipped behind PgBouncer's shipped pool of 20 is native; omni is the compass law on one knob, the pool size, through PgBouncer's own console, inside the cover [2, 90] (`docs/POSTGRES_PREREGISTRATION.md`). Three paired repetitions a run, three runs, pgbench's own log for the gauges. Runs: A 38013313943; B 38013319893; C 38013324861.
+PostgreSQL 16 as shipped behind PgBouncer's shipped pool of 20 is native; omni is the compass law on one knob, the pool size, through PgBouncer's own console, inside the cover [2, 90] (`docs/POSTGRES_PREREGISTRATION.md`). Three paired repetitions a run, three runs, pgbench's own log for the gauges. Runs: A 38054754511; B 38054758150; C 38054761503.
 
 | Workload | Work inside the 50 ms line | p95 | Connections held open | Host CPU-seconds (the compass's own cost) |
 |---|---|---|---|---|
-| `select` | no difference beyond the noise | no difference beyond the noise | **-11% to -6%, confirmed better** | no difference beyond the noise |
-| `simple_update` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
-| `tpcb_hot` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
+| `select` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
+| `simple_update` | no difference beyond the noise | no difference beyond the noise | the runs disagree | no difference beyond the noise |
+| `tpcb_hot` | no difference beyond the noise | no difference beyond the noise | **-13% to -7%, confirmed better** | no difference beyond the noise |
 
 The compass takes connections back only while the pooler's clients wait for one under 1% of the time and gives them back the moment anyone waits (amendment 2 of `docs/POSTGRES_PREREGISTRATION.md`, 8 October: the first counted set's CPU cost was measured and traced to the harness's own psql launches, not to the pooler, and its first table is kept whole in `docs/history/V3_PGBENCH_set1.md`). Where it reads a saving it is connections held open for the same work with the host's CPU inside the noise; where the add rule buys connections above the operator's setting on a slow write workload, that reads worse and is counted against Omni in the index. Table: `results/live/V3_PGBENCH.md`.
 
 ## 3b. Real messaging: Apache Kafka, a consumer group's operator-set size, Omni v3, three runs (evidence class L)
 
-Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer group at the operator's 2 consumers is native; omni is the compass law on one knob, the consumer count, inside the cover [1, 8], holding the group's own end-to-end latency at 40% of the 500 ms line (`docs/KAFKA_PREREGISTRATION.md`). Three paired repetitions a run, three runs, the consumers' own records for the gauges; the tuning workload is shown and not counted. Runs: A 38021564790; B 38013304929; C 38013309420.
+Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer group at the operator's 2 consumers is native; omni is the compass law on one knob, the consumer count, inside the cover [1, 8], holding the group's own end-to-end latency at 40% of the 500 ms line (`docs/KAFKA_PREREGISTRATION.md`). Three paired repetitions a run, three runs, the consumers' own records for the gauges; the tuning workload is shown and not counted. Runs: A 38054742933; B 38054746778; C 38054750788.
 
 | Workload | Work inside the 500 ms line | End-to-end p95 | Consumers running (the resource held) | Host CPU-seconds (the compass's own cost) |
 |---|---|---|---|---|
 | `tuning` (tuning, shown, not counted) | no difference beyond the noise | no difference beyond the noise | **-0% to -0%, confirmed better** | no difference beyond the noise |
 | `burst` | no difference beyond the noise | no difference beyond the noise | **-1% to -1%, confirmed better** | no difference beyond the noise |
-| `heavy` | no difference beyond the noise | no difference beyond the noise | **-0% to -0%, confirmed better** | no difference beyond the noise |
+| `heavy` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
 | `light` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
 
 Native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5% waited about 1.6 s; Omni added consumers while messages waited and gave them back when the queue was empty, so its slowest 5% waited 9 to 14 ms, at the cost of three to four times the consumers running, confirmed worse and counted against Omni in the index. No message was lost in any arm; every count was handed back. Table: `results/live/V3_KAFKA.md`.
 
 ## 3c. A real cache: Redis, the operator's memory ceiling, Omni v3, three runs (evidence class L)
 
-Redis as Ubuntu ships it with the operator's 64 MB ceiling and allkeys-lru is native; omni is the compass law on one knob, the ceiling, inside the cover [16, 512] MB through Redis's own console, growing only while the cache is full and giving a notch back when calm and nothing is evicted (`docs/REDIS_PREREGISTRATION.md`). An application with a declared 5 ms store trip on a miss and a working set that steps up and down; three paired repetitions a run, three runs; the tuning workload is shown and not counted. Runs: A 38013287665; B 38013291972; C 38013296599.
+Redis as Ubuntu ships it with the operator's 64 MB ceiling and allkeys-lru is native; omni is the compass law on one knob, the ceiling, inside the cover [16, 512] MB through Redis's own console, growing only while the cache is full and giving a notch back when calm and nothing is evicted (`docs/REDIS_PREREGISTRATION.md`). An application with a declared 5 ms store trip on a miss and a working set that steps up and down; three paired repetitions a run, three runs; the tuning workload is shown and not counted. Runs: A 38054731163; B 38054735302; C 38054739168.
 
 | Workload | Work inside the 2 ms line | Cache hit rate | p95 | Memory ceiling held, MB (the resource held) | Host CPU-seconds |
 |---|---|---|---|---|---|
-| `tuning` (tuning, shown, not counted) | the runs disagree | the runs disagree | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
+| `tuning` (tuning, shown, not counted) | **+4% to +5%, confirmed better** | **+4% to +5%, confirmed better** | no difference beyond the noise | **+19% to +26%, confirmed WORSE** | no difference beyond the noise |
 | `burst` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
 | `large` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
 | `small` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
@@ -80,28 +77,28 @@ The memory the compass holds for a wide working set is the resource this benchma
 
 ## 3d. A real database's storage-engine cache: MongoDB under YCSB, the operator's cache size, Omni v3, three runs (evidence class L)
 
-MongoDB 8.0 as its publisher ships it with the operator's WiredTiger cache of 512 MB is native; omni is the compass law on one knob, the cache size, inside the cover [256, 2,048] MB through the server's own console, growing by notches of 64 MB only while the cache is full and reads are slow, and giving a notch back when calm and the cache holds its working set (`docs/YCSB_PREREGISTRATION.md`; the first counted set's gate was 'nothing evicted', which its amendment 1 of 8 October records as satisfied by a cold cache, and the table named below says which set it is). YCSB's published core workloads with the key space stepping through the cache and past it, drawn uniformly, at 3,000 operations a second from 32 threads; three paired repetitions a run, three runs; the tuning workload (workload A) is shown and not counted. Runs: A 38013343689; B 38013348512; C 38013353044.
+MongoDB 8.0 as its publisher ships it with the operator's WiredTiger cache of 512 MB is native; omni is the compass law on one knob, the cache size, inside the cover [256, 2,048] MB through the server's own console, growing by notches of 64 MB only while the cache is full and reads are slow, and giving a notch back when calm and the cache holds its working set (`docs/YCSB_PREREGISTRATION.md`; the first counted set's gate was 'nothing evicted', which its amendment 1 of 8 October records as satisfied by a cold cache, and the table named below says which set it is). YCSB's published core workloads with the key space stepping through the cache and past it, drawn uniformly, at 3,000 operations a second from 32 threads; three paired repetitions a run, three runs; the tuning workload (workload A) is shown and not counted. Runs: A 38054777807; B 38054782696; C 38054787517.
 
 | Workload | Work inside the 1 ms line | p95 | Cache size held, MB (the resource held) | Pages read into the cache | Host CPU-seconds |
 |---|---|---|---|---|---|
-| `tuning` (tuning, shown, not counted) | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
+| `tuning` (tuning, shown, not counted) | no difference beyond the noise | the runs disagree | no difference beyond the noise | shown, not judged | no difference beyond the noise |
 | `b` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
-| `burst` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
+| `burst` | no difference beyond the noise | no difference beyond the noise | **-13% to -10%, confirmed better** | shown, not judged | no difference beyond the noise |
 | `c` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
-| `f` | no difference beyond the noise | no difference beyond the noise | **-13% to -3%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `f` | no difference beyond the noise | no difference beyond the noise | **-15% to -13%, confirmed better** | shown, not judged | no difference beyond the noise |
 
 On this machine the data files sit in the operating system's page cache as well, so a storage-engine miss is a read from memory, not a disk, as disclosed before the run: the result is memory given back at no measurable cost in work inside the line, p95 or CPU, with one confirmed loss, the mean latency on the burst workload. Table: `results/live/V3_YCSB.md`.
 
 ## 3e. A real database's buffer pool: MySQL under sysbench, the operator's InnoDB pool size, Omni v3, three runs (evidence class L)
 
-MySQL 8.0 as Ubuntu ships it with the operator's 512 MB InnoDB buffer pool is native; omni is the compass law on one knob, the pool size, inside the cover [128, 2,048] MB in the server's own 128 MB chunks through its own console, growing only while the pool is full and the server's own statement latency is slow, and giving a chunk back only while the pool's misses are under 1% of its reads (`docs/MYSQL_PREREGISTRATION.md`). sysbench's OLTP scripts as shipped with the tables in use stepping through the pool and past it, at a fixed offered rate from 32 threads; three paired repetitions a run, three runs; the tuning workload (point select) is shown and not counted. Runs: A 38013329351; B 38013334121; C 38013338730.
+MySQL 8.0 as Ubuntu ships it with the operator's 512 MB InnoDB buffer pool is native; omni is the compass law on one knob, the pool size, inside the cover [128, 2,048] MB in the server's own 128 MB chunks through its own console, growing only while the pool is full and the server's own statement latency is slow, and giving a chunk back only while the pool's misses are under 1% of its reads (`docs/MYSQL_PREREGISTRATION.md`). sysbench's OLTP scripts as shipped with the tables in use stepping through the pool and past it, at a fixed offered rate from 32 threads; three paired repetitions a run, three runs; the tuning workload (point select) is shown and not counted. Runs: A 38054765202; B 38054768832; C 38054773573.
 
 | Workload | Work inside the line | p95 | Buffer pool held, MB (the resource held) | Pages read from disk | Host CPU-seconds |
 |---|---|---|---|---|---|
 | `tuning` (tuning, shown, not counted) | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
 | `burst` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
 | `read_only` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
-| `read_write` | no difference beyond the noise | no difference beyond the noise | **-20% to -10%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `read_write` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
 | `update_index` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
 
 The third counted set, on amendment 2 (the pool grows only while it is missing): the pool held −49% to −56% on burst, confirmed better, with work, latency and CPU inside the noise; on read_write the pages held read +44% to +52%, confirmed worse, with the host's CPU −4% to −6%, confirmed better, a trade counted both ways in the index; read_only inside the noise and update_index disagreeing; the pool handed back on all 45 omni arms. The second counted set (the pool −67% on burst and −50% to −56% on read_only, read_write's pages held +53% to +70% worse) is kept whole in `docs/history/V3_SYSBENCH_set2.md`; the first counted set (every row inside the noise; 15 of 45 arms not handed back because the plug's restore was issued while the server was still withdrawing the blocks of a shrink, which MySQL ignores; the plug fixed and the fix declared) is kept whole in `docs/history/V3_SYSBENCH_set1.md`. The update_index work-inside-the-line row counts almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line) and is disclosed. Table: `results/live/V3_SYSBENCH.md`.
@@ -177,7 +174,6 @@ The rules for each run were written and committed before it ran (`docs/*_PREREGI
 - 100 and 1,000 runs at 1,000 copies (beyond the machines available).
 - The queue in `docs/REGISTER.md` section 4 (drone swarms on gym-pybullet-drones and Kafka done; Redis running): PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera.
 
-
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

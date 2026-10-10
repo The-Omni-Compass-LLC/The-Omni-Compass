@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """The repository stays lined up: run by verify.py on every release, so a push that leaves the tree out of line fails.
 
 Checks:
@@ -29,6 +31,8 @@ ROOT_ALLOWED = {
     # the license and the intellectual property
     "LICENSE", "LICENSES", "NOTICE", "PATENTS.md", "TRADEMARKS.md", "THIRD_PARTY_NOTICES.md", "REUSE.toml",
     "DISCLOSURES.md", "LICENSING_FAQ.md", "CLAUDE.md",
+    # the same rules for every AI assistant that reads this repository (Codex, Copilot, Gemini, Cursor)
+    "AGENTS.md", "GEMINI.md", ".cursorrules",
     # build, verification and metadata
     "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "OMNI_V3.json", "codemeta.json",
     "docker-compose.yml", ".gitignore", ".gitattributes", ".dockerignore", ".github", ".fossa.yml", ".snyk",

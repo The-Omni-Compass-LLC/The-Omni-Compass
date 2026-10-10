@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 name: reaggregate
 # Recompute a finished benchmark-reps run's table with the current tools/live_reps.py, from that run's own raw files
 # (its paired-* artifacts), without rerunning anything. The run id comes from the dispatch input, or from
@@ -15,10 +17,14 @@ on:
 permissions:
   contents: write
   actions: read
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
 jobs:
   reaggregate:
     runs-on: ubuntu-latest
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
@@ -45,6 +51,10 @@ jobs:
           cp reps/LIVE_REPS.json "results/live/reaggregated/LIVE_REPS_${{ steps.rid.outputs.id }}.json"
           cp reps/CLOSED_LOOP_ESTIMATE.json "results/live/reaggregated/CLOSED_LOOP_ESTIMATE_${{ steps.rid.outputs.id }}.json" || true
           git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
+          python3 tools/legal.py --fix results/live/reaggregated
           git add results/live/reaggregated
           git commit -m "Recomputed run ${{ steps.rid.outputs.id }} with the current tools/live_reps.py" || exit 0
           for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((2**i)); done
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

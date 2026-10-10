@@ -1,13 +1,30 @@
 # Changelog
 
-> **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
-> commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
-> Omni-Compass Enterprise License. All patent applications, copyright registrations and trademark applications have been
-> filed in the United States by The Omni-Compass LLC. See `LICENSE` and `NOTICE` at the root of this repository.
-
-> `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 ## 2026-10-10
+- **The notice everywhere, a front page the repository writes itself, and the book for the people who wire it (evening).**
+  (1) **One legal notice, written once** (`tools/legal.py`): all rights reserved; all patents, copyrights and trademarks filed
+  in the USA; subject to change at any time; www.omni-compass.com the authority of record; every copy, export, report and
+  printout carries it with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. It now stands at the top and end of every page and table,
+  in the header of every script, source file and workflow, at the top and end of every workflow job's report, beside every
+  file a workflow hands out (`legal-notice`), and in every zip (`tools/export_zip.py`); `verify.py` fails any push where a
+  file lacks it. The 67 files locked by a fingerprint (the engine, its C++ twins, the reference engine, the pre-registered
+  harness) keep their earlier header until the next engine version rewrites them. `LICENSE` revised: licensed, not sold; no
+  rights by implication; feedback; lawful use and export control; severability; the filing sentence in the founder's words
+  with no grant claimed; `NOTICE`, `REUSE.toml` (the third-party traces marked as theirs), the FOSSA custom-license rule, the
+  SBOMs and `CITATION.cff` with it. Instruction files for every AI assistant that reads the repository (`AGENTS.md`,
+  `GEMINI.md`, `.github/copilot-instructions.md`, `.cursorrules`): every answer opens and closes with the notice. Two pages
+  that promised "research and non-commercial use" corrected to the license's evaluation-only terms. (2) **The front page
+  writes itself**: within minutes of every finished benchmark run, and every hour, `front-page.yml` rebuilds the five live
+  products' tables from their three newest runs and writes the engine on main, the index now, every table by when it last
+  changed and the newest run of every benchmark; the runner's folder path is gone from its lines; its checkout keeps off the
+  archive of raw runs; the old front page is kept whole in `docs/history/FRONT_PAGE_2026-10-10.md`. (3) **The package version
+  follows the engine** (0.3.0 is omni-v3; `verify.py` checks it, so a changed engine cannot keep an old number). (4) **The
+  manual**: the card for the glove box at the front; reading paths for the data-center operator, the engineer on call,
+  security and counsel; 6.5 the reflex rule (one body, one brain); 10.11 the data center under the servers (cooling, power,
+  batteries; built connectors, modelled evidence, no live facility yet, said so); the reflex rule's own chapter in the book's
+  Part One; the page foot, the copyright page and the back cover in the founder's wording; the book rebuilt, 520 pages.
 - **The founder's afternoon orders, held and pushed as one (15:45 UTC).** (1) **Omni v4 ordered**: the collective mechanism, one
   body, one brain, one tick a second; a trial runs to its full measurement and is never ended by the calm it causes; the brain never
   forces, it reacts to what the system shows; the body's cost is judged with a guard for every part; one trial at a time inside a body;
@@ -880,7 +897,4 @@ See `docs/HISTORY.md` and `docs/STATE_OF_PLAY.md`.
 
 ---
 
-*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
-monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
-`NOTICE` at the root of this repository.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

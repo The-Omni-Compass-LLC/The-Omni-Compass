@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 name: six-kube
 # The six organisms with the real Kubernetes cluster inside (tools/run_kil.py): the four realms, the whole tower and the
 # four stacked, each native against native with Omni-Compass on top (compass law), paired on one
@@ -15,11 +17,15 @@ on:
       arms: {description: "Arms, in rotation order", default: "native compass"}
       load_max: {description: "Load-generator replicas at each organism's peak demand", default: "6"}
       loadgen: {description: "closed (waits for answers) or open (fixed rate, equal work)", default: "open"}
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
 jobs:
   plan:
     runs-on: ubuntu-latest
     outputs: {cells: "${{ steps.r.outputs.cells }}"}
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - id: r
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
@@ -33,6 +39,9 @@ jobs:
                    for i, sz in enumerate(sizes) for o in orgs for r in range(1, reps[min(i, len(reps) - 1)] + 1)]
           print("cells=" + json.dumps(cells))
           PY
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   run:
     needs: plan
     strategy:
@@ -43,6 +52,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 350
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
@@ -62,11 +73,16 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: "six-${{ matrix.cell.organism }}-x${{ matrix.cell.size }}-${{ matrix.cell.rep }}", path: "bench-*-${{ matrix.cell.rep }}"}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   report:
     needs: run
     if: always() && needs.run.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
@@ -77,3 +93,32 @@ jobs:
       - run: cat six/SIX_KUBE.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with: {name: six-kube, path: "six/SIX_KUBE.*"}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

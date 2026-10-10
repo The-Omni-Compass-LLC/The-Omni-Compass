@@ -1,36 +1,75 @@
 # Omni-Compass
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
-> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights reserved. Not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. Everything in this repository is subject to change at any time; the authority of record for Omni-Compass, its current state and its terms is The Omni-Compass LLC at [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report, archive or printout of any part of Omni-Compass carries this notice, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and [`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
+The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com), the authority of record for Omni-Compass, its
+current state and its terms. Every copy, fork, export, report and printout of any part of Omni-Compass carries the notice
+above, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and [`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
 
-The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com)
+## Latest, newest first
 
-## Latest (10 October 2026, newest first)
+Everything between the markers below is written by the repository itself (`tools/front_page.py`, run by
+`.github/workflows/front-page.yml` within minutes of every finished benchmark run, and every hour besides): no person moves
+it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
-The lines between the two markers below are written by the repository itself: after every finished live run, the front-page
-workflow archives the run and rebuilds every table whose three runs are in (`tools/front_page.py`, `.github/workflows/front-page.yml`).
+<!-- front-page:status:begin -->
+- **Engine on main:** omni-v3, fingerprint `b53d05449ee04c4b` (40 files); package 0.3.0. Omni v4 (the reflex rule on every wire) is designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md) and not yet built; every result runs again on it when it is.
+- **The Omni index now:** +4.8% on the resource reading (work, speed, machines and energy) and +10.7% on the service reading (work and speed), real machines, every test confirmed three times ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+<!-- front-page:status:end -->
+
+**Tables the repository rebuilt by itself** (the five live products, each from its three newest runs on one engine):
 
 <!-- front-page:begin -->
+- 2026-10-10 16:50 UTC: `V3_YCSB` rebuilt from runs 38054777807, 38054782696, 38054787517 (ycsb, the resource objective, omni-v3): 4 untouched workloads; 4 better, 0 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_SYSBENCH` rebuilt from runs 38054765202, 38054768832, 38054773573 (sysbench, the resource objective, omni-v3): 4 untouched workloads; 0 better, 0 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_REDIS_SERVICE` rebuilt from runs 38054791688, 38054795871, 38054800068 (redis, the service objective, omni-v3): 3 untouched workloads; 5 better, 2 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_REDIS` rebuilt from runs 38054731163, 38054735302, 38054739168 (redis, the resource objective, omni-v3): 3 untouched workloads; 0 better, 0 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_PGBENCH` rebuilt from runs 38054754511, 38054758150, 38054761503 (pgbench, the resource objective, omni-v3): 3 workloads; 1 better, 1 worse, 1 disagree
+- 2026-10-10 16:50 UTC: `V3_KAFKA_SERVICE` rebuilt from runs 38054804459, 38054808912, 38054812962 (kafka, the service objective, omni-v3): 3 untouched workloads; 1 better, 0 worse, 0 disagree
+- 2026-10-10 16:50 UTC: `V3_KAFKA` rebuilt from runs 38054742933, 38054746778, 38054750788 (kafka, the resource objective, omni-v3): 3 untouched workloads; 1 better, 0 worse, 0 disagree
 <!-- front-page:end -->
 
-- **Omni v4 ordered: the collective mechanism.** One body, one brain, one tick a second; a trial runs to its full measurement and
-  is never ended by the calm it causes; the body's cost is judged and nothing anywhere is made worse to make one thing better;
-  every wire forced through it. Designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md), with the final coverage sweep
-  (register rows 74 to 78, five new muscle families, the closed systems of the mega-caps mapped to the open analogs that carry
-  the same muscles) and the order of the rerun. Every result is run again on v4 when it is built.
-- **The second set of the five live products** (Redis, Kafka, PostgreSQL, MySQL, MongoDB; 21 runs on the amended trial rule)
-  landed and is archived; its three-run tables follow. From the logs: on Kafka the brain allowed the third consumer once and the
-  whole gain returned at 2.5 consumers instead of 6 to 8 (delay 2.4 s to 57 ms); on every other repetition it refused. The
-  trial's measurement, not the law, is the fault, and the four rules that fix it are in the v4 plan
-  ([`docs/RERUN_2026-10-10.md`](docs/RERUN_2026-10-10.md)).
-- **The rerun of 10 October**: every table remade from 67 archived runs on Omni v3; the Omni index +4.8%, service reading
-  +10.7%, no losing row ([`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md)).
+**Every result table, by when it last changed:**
 
-**Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass
-never replaces native; every comparison below is native against omni.
+<!-- front-page:tables:begin -->
+| Last changed (UTC) | Table | Reading |
+|---|---|---|
+| 2026-10-10 16:50 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C confirmation](results/live/V3_YCSB.md) | Across 4 untouched workloads: 4 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
+| 2026-10-10 16:50 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C confirmation](results/live/V3_SYSBENCH.md) | Across 4 untouched workloads: 0 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
+| 2026-10-10 16:50 | [Redis, a cache's operator-set memory ceiling: the A/B/C confirmation](results/live/V3_REDIS_SERVICE.md) | Across 3 untouched workloads: 5 gauge-rows confirmed better, 2 confirmed worse, 0 where the runs disagree. |
+| 2026-10-10 16:50 | [Redis, a cache's operator-set memory ceiling: the A/B/C confirmation](results/live/V3_REDIS.md) | Across 3 untouched workloads: 0 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
+| 2026-10-10 16:50 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C confirmation](results/live/V3_PGBENCH.md) | Across 3 workloads: 1 gauge-rows confirmed better, 1 confirmed worse, 1 where the runs disagree. |
+| 2026-10-10 16:50 | [Kafka, a consumer group's operator-set size: the A/B/C confirmation](results/live/V3_KAFKA_SERVICE.md) | Across 3 untouched workloads: 1 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
+| 2026-10-10 16:50 | [Kafka, a consumer group's operator-set size: the A/B/C confirmation](results/live/V3_KAFKA.md) | Across 3 untouched workloads: 1 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
+| 2026-10-10 16:50 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-10 16:16 | [Public demand traces, turned into load schedules](results/traces/README.md) |  |
+| 2026-10-10 16:16 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/fresh/RESULT.md) |  |
+<!-- front-page:tables:end -->
 
-## The result
+**Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
+
+<!-- front-page:runs:begin -->
+| Finished (UTC) | Benchmark | Outcome | Run |
+|---|---|---|---|
+| 2026-10-10 17:21 | six | success | [38052254140](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38052254140) |
+| 2026-10-10 16:33 | kwok-scale | success | [38067955639](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38067955639) |
+| 2026-10-10 15:58 | big-organism-detached | success | [38065681492](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38065681492) |
+| 2026-10-10 15:25 | ycsb | success | [38054787517](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054787517) |
+| 2026-10-10 15:16 | sysbench | success | [38054773573](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054773573) |
+| 2026-10-10 14:56 | kafka | success | [38054812962](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054812962) |
+| 2026-10-10 14:53 | pgbench | success | [38054761503](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054761503) |
+| 2026-10-10 14:52 | redis | success | [38054800068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054800068) |
+| 2026-10-10 13:13 | cpu-power | failure | [38054876829](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054876829) |
+| 2026-10-10 07:15 | robustness | success | [38013471943](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38013471943) |
+<!-- front-page:runs:end -->
+
+**Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
+replaces native; every comparison is native against omni.
+
+## The result on real Kubernetes
+
 
 Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v3**, the frozen and
 fingerprinted engine ([`docs/OMNI_V3.md`](docs/OMNI_V3.md): v1's law and controllers byte for byte, the muscle catalog grown to 945 and a do-no-harm gate on speed knobs; the v1 tables, [`docs/OMNI_V1.md`](docs/OMNI_V1.md), read the same and stay as the first engine's record). Every test ran three times as separate GitHub runs (A the
@@ -55,61 +94,22 @@ clusters one machine fewer made each request 30-45% slower in most trials, so Om
 speed and work. Earlier engines without that check parked 29-36% of the machines (`docs/history/`); the frozen engine
 puts work and speed first.
 
-**What this does and does not show.** The product gain measured so far is more work inside the response line on the same
-machines, 34-52% across the three capacity runs on earlier engines ([`CAPACITY`](results/live/CAPACITY.md) +34.1%,
-[`CAPACITY_2`](results/live/CAPACITY_2.md) +51.9%, [`ALL_FOUR`](results/live/ALL_FOUR.md) +41.7%), with a faster tail; the
-v1 runs give one engine's number three times. Not yet shown: an energy or cloud-bill saving on real machines (Azure's bill
-did not move on the earlier engine, [`AKS_BILL`](results/live/AKS_BILL.md), nor on v1's steady run, [`V1_AKS_STEADY`](results/live/V1_AKS_STEADY.md): every gauge inside the noise; the v1 burst is running), and the
-current card governor on a real GPU (the one real-card run, on the governor since replaced, saved 1.6-3.5% of the card's
-energy and made its 95th percentile 43-84% slower:
-[`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)).
+**Not yet shown**, stated as plainly as the gains: an energy or cloud-bill saving on real machines (Azure's bill did not
+move on the earlier engines, [`AKS_BILL`](results/live/AKS_BILL.md) and [`V1_AKS_STEADY`](results/live/V1_AKS_STEADY.md):
+every gauge inside the noise), and the current card governor on a real GPU (the one real-card run, on a governor since
+replaced, saved 1.6-3.5% of the card's energy and made its 95th percentile 43-84% slower:
+[`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)). The five live products, the index and every row,
+losses included, are in [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md), [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md)
+and [`docs/WIRING_VERDICTS.md`](docs/WIRING_VERDICTS.md), each rebuilt from the tables by the repository itself.
 
-**Two readings of one index, both in `results/OMNI_INDEX.md`.** The resource reading (the headline below) scores work,
-speed, machines and energy together, so a governor that buys speed with memory pays for the memory. The service reading,
-declared on 9 October at the founder's question about what a cache is for, scores work and speed only and shows the
-resources beside them: **+10.7%** over the same six categories on the sets of 10 October (Kubernetes +84.5%; the five
-stacks exactly nothing, because their gains are resources given back, and on Kafka and Redis the brain's first set could not
-yet judge a spend: amendment 3, the next set running). Neither hides a loss; each says a
-different true thing, and the first is the one preregistered.
+## The manual: the book for the people who wire it
 
-**Wire in, or watch.** Omni is wired out of every muscle and into a knob only where the paired measurement shows the
-muscle no worse for it; where it shows nothing, or a loss, the muscle stays native and Omni only reads it.
-`docs/WIRING_VERDICTS.md` gives every knob in every result one of three words from the tables themselves, **write**,
-**watch** or **operator's choice**: on the real stacks' sets of 10 October 11 of 24 knob-cases write, 0 are trades and 13
-watch; of the 945 modelled muscles 124 write and 808 stay native, 746 of them because the native controller never left
-the band. Every confirmed loss is listed there with its cause.
-
-**One number per benchmark, one meaning of the sign.** `docs/BENEFIT_SHEET.md` gives every benchmark one figure where
-plus is always good for Omni and minus always bad, whatever the gauge measures: less energy, fewer machines, less memory and
-a shorter wait all read plus. Beside it: yes, no, none or trade. It is built from the tables by `tools/benefit_sheet.py`.
-
-**The Omni index, every real test together: +4.8%** more for the same, or the same for less, across work, speed,
-machines and energy, six real categories each weighed the same, on the sets of 10 October (every benchmark run again on one
-commit, `docs/RERUN_2026-10-10.md`): real Kubernetes on v3 +28.9% over seven tests (work +26%, speed +106%, machines +4%,
-energy +2%); the real database on v3, PostgreSQL behind PgBouncer, +0.8% (connections held open −6% to −11% on `select`,
-confirmed better, with CPU and latency inside the noise, the add above the operator's setting refused on the slow write
-workload, no loss); real messaging on v3, Apache Kafka, +0.1% (consumers 2 → 1.98 to 1.99, every other gauge inside the
-noise: every spend trial was abandoned before it could be judged, our wiring, amended the same day as amendment 3, the next
-set running); the real cache on v3, Redis, exactly nothing (every gauge inside the noise under both objectives, the same
-amendment); the real database's storage-engine cache on v3, MongoDB under YCSB, +0.7% (the cache held −3% to −13% on `f`,
-confirmed better, nothing worse); the real database's buffer pool on v3, MySQL under sysbench, +1.0% (the pool held −10% to
-−20% on `read_write`, confirmed better, the earlier memory cost gone, nothing worse). These are the first sets on which the
-brain's own verdict judged every notch on the stack before it was written: the number came down from +20.5% because the
-spends that bought the earlier gains at a resource cost were refused or not yet judged, and every gain left is one the brain
-proved on the stack itself. No row is a loss. The earlier tables are whole in `docs/history`.
-
-Six organisms with the real cluster inside (the four realms, the whole tower of 945 muscles, the four stacked, 1,716),
-on an earlier engine: late 23-52% less often and 24-40% faster in every one
-([`results/live/V1_SIX_KUBE.md`](results/live/V1_SIX_KUBE.md), v1; the earlier engine's in [`results/live/SIX_KUBE.md`](results/live/SIX_KUBE.md)); on v3 at 10 and 100 copies every
-cell is better on 4 to 6 gauges and worse on none beyond the noise but a rounding-level work loss in 4 of 12
-([`results/live/V3_SIX_KUBE.md`](results/live/V3_SIX_KUBE.md)); the 1,000-copy cells run on Azure: the tower
-on v1 ([`results/live/V1_BIG_ORGANISM.md`](results/live/V1_BIG_ORGANISM.md)) answered its slowest 5% in 0.2 s against native's
-4.1 s and was over its line 0.2% of the time against 64%; the four stacked on v3
-([`results/live/V3_BIG_ORGANISM.md`](results/live/V3_BIG_ORGANISM.md), 1.7 million muscles on one clock with the cluster
-inside, three repetitions on a rented machine with a 10,800 s window) answered their slowest 5% in 150 ms against native's
-2.9 s, were over the line 0% of the time against 51%, failed no request against 0.14%, on the same six machines and the
-same energy inside the noise, both arms on the clock. A cell whose machine could not step the organism inside its window
-is marked off the clock in the report and run again with a longer window.
+[`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf) is Omni-Compass as a printed book, built from the
+repository whenever it changes (`docs/book/build_book.py`): front matter with the card for the glove box, the theory of
+the mechanism, the wiring instructions level by level and stack by stack (Kubernetes, databases, message brokers, caches,
+GPUs, the processor itself, the data center under the servers, robots and drones), operating it, proving it, and back
+matter. Its text is [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md). It is written for the CTO who decides,
+the engineer who wires, the operator who runs a data center, and the auditor who checks.
 
 ## What is real and what is a model
 
@@ -119,6 +119,16 @@ is marked off the clock in the report and run again with a longer window.
 | Real cloud, Azure AKS | All of the above on real Azure machines, Azure's own autoscaler, Azure's billed machine count | L |
 | Real card, NVIDIA A10 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. The first run (2026-10-02) used a card controller since replaced (it answered slower); the current controller's run is next | P |
 | The 945 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
+
+## How it works
+
+Omni-Compass is a supervisory governor. It does not replace your autoscaler or your firmware: it sits on top, reads
+the meters of each muscle (response time, utilisation, power, heat), holds each muscle's own setting in the middle of
+its band with one bounded law, and hands every setting back the moment it stops. As demand rises, the warm machines
+take it first; as it falls, the emptiest machine idles first, powered and ready, never switched off, and never below a floor of two (idle). The reset hands every setting back at
+the end of a run; the kill switch, a separate security switch, turns Omni-Compass off everywhere at once. The law, its
+proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.md),
+[`docs/TRACKING_THEOREM.md`](docs/TRACKING_THEOREM.md), [`docs/CONVEYANCE_LAW.md`](docs/CONVEYANCE_LAW.md).
 
 ## Check it yourself
 
@@ -130,16 +140,6 @@ sudo bash scripts/gpu_rented_run.sh                       # the card run, on any
 
 `verify.py` reruns every held-out result byte for byte, the Python and C++ twins, the property tests, and checks that
 the repository is lined up (`tools/layout_check.py`). Every live result carries its raw files and SHA-256 digests.
-
-## How it works
-
-Omni-Compass is a supervisory governor. It does not replace your autoscaler or your firmware: it sits on top, reads
-the meters of each muscle (response time, utilisation, power, heat), holds each muscle's own setting in the middle of
-its band with one bounded law, and hands every setting back the moment it stops. As demand rises, the warm machines
-take it first; as it falls, the emptiest machine idles first, powered and ready, never switched off, and never below a floor of two (idle). The reset hands every setting back at
-the end of a run; the kill switch, a separate security switch, turns Omni-Compass off everywhere at once. The law, its
-proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.md),
-[`docs/TRACKING_THEOREM.md`](docs/TRACKING_THEOREM.md), [`docs/CONVEYANCE_LAW.md`](docs/CONVEYANCE_LAW.md).
 
 ## Read next
 
@@ -184,7 +184,7 @@ pool, MongoDB WiredTiger cache, HVAC setpoint, building management, chiller plan
 grid tap changer, voltage regulator, wind turbine pitch, pipeline compressor, water pump scheduling, robot servo, drone
 autopilot, flight software, autonomous driving stack, 5G RAN scheduler, matching engine, game server fleet, build farm,
 ledger node, IDS workers, control theory, closed loop, two antagonist forces, tanh law, nervous system, muscles, realms,
-organisms, Omni index. GitHub topics for this repository are set from the repository's About panel by its owner.
+organisms, Omni index. The repository's GitHub topics (set by its owner from the About panel, with www.omni-compass.com as its website): `omni-compass`, `governor`, `supervisory-control`, `control-plane`, `control-core`, `control-engine`, `control-theory`, `control-systems`, `feedback-control`, `conveyance`, `machinery`, `autoscaling`, `kubernetes`, `gpu`, `data-center`, `energy-efficiency`, `power-management`, `smart-grid`, `robotics`, `industrial-automation`.
 
 ## License
 
@@ -206,7 +206,4 @@ trademark license is granted for any other use.
 
 ---
 
-*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
-monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
-`NOTICE` at the root of this repository.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

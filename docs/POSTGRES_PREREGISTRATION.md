@@ -1,11 +1,6 @@
 # Databases: Omni-Compass on top of a database's own connection pooler, preregistered
 
-> **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Not open source. Any commercial use,
-> commercialization, monetization, production use, redistribution or hosted service requires a signed, paid
-> Omni-Compass Enterprise License. All patent applications, copyright registrations and trademark applications have been
-> filed in the United States by The Omni-Compass LLC. See `LICENSE` and `NOTICE`.
-
-> `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`. Copyright (c) 2026 The Omni-Compass LLC.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 Written 2026-10-06, before any counted run. The rules below were set on the tuning workload and are then applied
 unchanged to the untouched workloads; every row is reported, losses included; the readings are the three-run readings of
@@ -429,3 +424,7 @@ dispatched with `workloads=untouched`, `reps=3`, `step_s=30`, the resource objec
 `docs/RERUN_2026-10-10.md`. The expectation above stands as written before the runs; when they land the table is read from them
 (`tools/pgbench_abc.py`), the index, the wiring page and the benefit sheet are read again, and the set this one supersedes goes whole to
 `docs/history`.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

@@ -1,5 +1,7 @@
 # What I measure on real Kubernetes: native against me on top
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 The latest paired set is **set 20** (`results/live/LIVE_REPS_20.md`, benchmark-reps run 36366603505, commit 18220d4),
 ten paired repetitions on kind in GitHub Actions.
 
@@ -30,3 +32,7 @@ real meter, and a node autoscaler that removes the machines I idle.
 
 **Earlier sets.** Each earlier set is recorded as measured: `LIVE_REPS_9.md`, `LIVE_REPS_11.md`, `LIVE_REPS_13.md` to
 `LIVE_REPS_19.md`. Set 19's "energy" and "work done" rows carry the same caveats as above.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

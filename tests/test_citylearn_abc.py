@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """The CityLearn A/B/C rule (tools/citylearn_abc.py, docs/OMNI_V1.md): a deterministic simulator, so the three runs must
 reproduce each other; a score reads confirmed better or WORSE by its sign when they do, same under one part in a million,
 and "the runs differ" when they do not; a district with no electric battery is listed as nothing for Omni to move, and a

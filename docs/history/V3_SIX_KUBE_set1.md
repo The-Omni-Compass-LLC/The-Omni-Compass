@@ -1,6 +1,6 @@
 # The six organisms with the real Kubernetes cluster inside: native against native with Omni-Compass on top
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 Source: GitHub Actions workflow `six-kube`, run 37501769448, commit `33b15eb` (Omni v3, `tools/omni_version.py --commit 33b15eb`), 2026-10-06; raw files under `results/live/raw/run-37501769448/`; 12 cells (10 and 100 copies of all six organisms), 5 paired repetitions each, 62 of 62 jobs finished. Made by `tools/six_kube_report.py` from those files; the 1,000-copy cells run on Azure (`docs/OMNI_V3.md`).
 
@@ -308,7 +308,6 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism work per energy | 0.01172 | 0.01176 | +0.4% | +4.308e-05 to +4.308e-05 | better |
 | organism behind its window (s) | 4.8 | 167.1 | +3381.3% | +36.19 to +288.4 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
-
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

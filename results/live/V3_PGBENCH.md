@@ -1,93 +1,92 @@
 # PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C confirmation
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
-
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 PostgreSQL as shipped behind PgBouncer's shipped pool of 20 is native; omni is the compass law on the pool size through PgBouncer's own console (`docs/POSTGRES_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **confirmed better** or **confirmed WORSE**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed transactions: any increase in any run is WORSE. Every row is shown, losses included. The host's CPU-seconds are measured on GitHub's shared runner; no energy is claimed.
 
 | Run | GitHub run | Commit | Engine | Workloads |
 |---|---|---|---|---:|
-| A | 38013313943 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
-| B | 38013319893 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
-| C | 38013324861 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
+| A | 38054754511 | `ca745467845c` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
+| B | 38054758150 | `ca745467845c` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
+| C | 38054761503 | `ca745467845c` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
 
 ## select (-S, scale 20): line 50 ms, 3 paired repetitions a run
 
-Native capacity, unlimited, per run: 25,799, 26,100, 16,340 tps; steps [1, 2, 3, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 2, 1] × 30 s; 64 clients.
+Native capacity, unlimited, per run: 39,229, 16,729, 26,435 tps; steps [1, 2, 3, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 2, 1] × 30 s; 64 clients.
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (transactions a second answered within the line) | 11,348 | 11,350 | +0.0% (-0.0 to +0.1) | -0.1% (-0.4 to +0.2) | +0.0% (-0.2 to +0.2) | no difference beyond the noise (3 of 3 runs) |
-| throughput (transactions a second) | 11,351 | 11,351 | -0.0% (-0.1 to +0.1) | -0.0% (-0.2 to +0.1) | +0.0% (-0.2 to +0.2) | no difference beyond the noise (3 of 3 runs) |
-| latency, 95th percentile (ms, lag included) | 2 | 1.67 | -16.3% (-105.1 to +72.5) | +21.4% (-7.9 to +50.7) | +6.6% (-15.1 to +28.3) | no difference beyond the noise (3 of 3 runs) |
-| latency, 99th percentile (ms) | 6.38 | 5.64 | -11.6% (-65.1 to +41.9) | +32.6% (-11.5 to +76.7) | +14.7% (-29.2 to +58.5) | no difference beyond the noise (3 of 3 runs) |
-| latency, median (ms) | 0.252 | 0.251 | -0.1% (-2.2 to +1.9) | +0.4% (-0.6 to +1.4) | +0.5% (-2.1 to +3.0) | no difference beyond the noise (3 of 3 runs) |
-| latency, mean (ms) | 0.622 | 0.539 | -13.3% (-83.0 to +56.4) | +25.6% (-33.5 to +84.8) | +1.5% (-18.6 to +21.6) | no difference beyond the noise (3 of 3 runs) |
+| work inside the response line (transactions a second answered within the line) | 17,233 | 17,193 | -0.2% (-1.5 to +1.0) | -0.1% (-0.4 to +0.2) | -0.0% (-0.1 to +0.0) | no difference beyond the noise (3 of 3 runs) |
+| throughput (transactions a second) | 17,255 | 17,256 | +0.0% (-0.1 to +0.1) | -0.1% (-0.2 to +0.1) | -0.0% (-0.1 to +0.0) | no difference beyond the noise (3 of 3 runs) |
+| latency, 95th percentile (ms, lag included) | 7.14 | 8.95 | +25.5% (-255.2 to +306.1) | -17.9% (-60.1 to +24.3) | -0.5% (-35.0 to +33.9) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 19.3 | 29.3 | +51.5% (-202.2 to +305.2) | -2.8% (-45.8 to +40.1) | +4.3% (-39.6 to +48.3) | no difference beyond the noise (3 of 3 runs) |
+| latency, median (ms) | 0.22 | 0.222 | +0.9% (-5.9 to +7.7) | -0.9% (-4.6 to +2.9) | +0.1% (-2.6 to +2.9) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 1.23 | 1.64 | +32.9% (-174.3 to +240.2) | +0.5% (-38.8 to +39.8) | +2.3% (-25.6 to +30.1) | no difference beyond the noise (3 of 3 runs) |
 | failed transactions | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| server connections alive, mean (the machines) | 19.6 | 17.6 | -10.6% (-18.8 to -2.5) | -10.7% (-19.3 to -2.1) | -6.3% (-12.3 to -0.3) | **confirmed better** |
-| server connections alive, most at once | 20.0 | 20.0 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | same |
-| host CPU busy (share of the run) | 0.43 | 0.43 | +0.0% (-2.2 to +2.2) | +0.1% (-0.2 to +0.4) | +0.8% (-3.0 to +4.6) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 739.3 | 738.9 | -0.1% (-2.4 to +2.3) | +0.1% (-0.1 to +0.3) | +0.9% (-3.7 to +5.5) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 transactions inside the line | 0.145 | 0.145 | -0.1% (-2.4 to +2.3) | +0.2% (-0.3 to +0.7) | +0.9% (-3.9 to +5.6) | no difference beyond the noise (3 of 3 runs) |
-| the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both; inside the host's) | 2.93 | 3.58 | +22.3% (+14.0 to +30.6) | +21.4% (+19.0 to +23.9) | +30.1% (+27.1 to +33.1) | shown, not judged |
-| pool size, mean (the knob) | 20.0 | 18.2 | -9.0% (-16.3 to -1.7) | -10.6% (-11.8 to -9.3) | -5.0% (-5.0 to -4.9) | shown, not judged |
+| server connections alive, mean (the machines) | 19.6 | 17.7 | -9.6% (-20.3 to +1.1) | -6.7% (-11.4 to -1.9) | -7.2% (-8.1 to -6.4) | no difference beyond the noise (1 of 3 runs) |
+| server connections alive, most at once | 20.0 | 21.0 | +5.0% (+5.0 to +5.0) | +0.0% (+0.0 to +0.0) | +1.7% (-5.5 to +8.8) | no difference beyond the noise (2 of 3 runs) |
+| host CPU busy (share of the run) | 0.468 | 0.471 | +0.7% (-2.5 to +3.8) | -0.7% (-3.1 to +1.7) | -0.1% (-1.7 to +1.6) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 807.4 | 814.2 | +0.8% (-2.4 to +4.0) | -0.8% (-3.8 to +2.1) | -0.1% (-1.8 to +1.7) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 transactions inside the line | 0.104 | 0.105 | +1.1% (-2.4 to +4.5) | -0.7% (-3.9 to +2.4) | -0.0% (-1.8 to +1.7) | no difference beyond the noise (3 of 3 runs) |
+| the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both; inside the host's) | 4.44 | 5.08 | +14.4% (+7.8 to +21.0) | +31.7% (+25.3 to +38.1) | +16.4% (+15.3 to +17.5) | shown, not judged |
+| pool size, mean (the knob) | 20.0 | 18.0 | -10.2% (-25.7 to +5.3) | -6.0% (-10.7 to -1.3) | -6.4% (-12.1 to -0.7) | shown, not judged |
 
 The knob handed back and read back at the end of every omni arm in every run: yes.
 
-The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 13 to 20 (12 trials, 7 allowed, 4 refused); acting: 13 to 20 (12 trials, 7 allowed, 4 refused); acting: 18 to 20 (10 trials, 2 allowed, 5 refused); run B: acting: 15 to 20 (10 trials, 5 allowed, 4 refused); acting: 13 to 20 (12 trials, 7 allowed, 4 refused); acting: 13 to 20 (12 trials, 7 allowed, 4 refused); run C: acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused).
+The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 14 to 21 (12 trials, 7 allowed, 3 refused); acting: 8 to 21 (16 trials, 13 allowed, 2 refused); acting: 14 to 21 (13 trials, 7 allowed, 3 refused); run B: acting: 17 to 20 (9 trials, 3 allowed, 5 refused); acting: 15 to 20 (10 trials, 5 allowed, 4 refused); acting: 17 to 20 (8 trials, 3 allowed, 5 refused); run C: acting: 17 to 20 (10 trials, 3 allowed, 6 refused); acting: 13 to 20 (12 trials, 7 allowed, 4 refused); acting: 17 to 20 (9 trials, 3 allowed, 5 refused).
 
 ## simple_update (-N, scale 20): line 50 ms, 3 paired repetitions a run
 
-Native capacity, unlimited, per run: 7,549, 5,431, 3,602 tps; steps [1, 2, 3, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 2, 1] × 30 s; 64 clients.
+Native capacity, unlimited, per run: 3,754, 4,448, 7,385 tps; steps [1, 2, 3, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 2, 1] × 30 s; 64 clients.
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (transactions a second answered within the line) | 3,124 | 3,133 | +0.3% (-5.3 to +5.9) | +0.0% (-2.6 to +2.7) | -0.1% (-0.9 to +0.8) | no difference beyond the noise (3 of 3 runs) |
-| throughput (transactions a second) | 3,322 | 3,319 | -0.1% (-0.5 to +0.3) | -0.1% (-0.2 to +0.0) | -0.1% (-0.6 to +0.5) | no difference beyond the noise (3 of 3 runs) |
-| latency, 95th percentile (ms, lag included) | 90.7 | 111.5 | +22.9% (-253.8 to +299.6) | -50.8% (-310.7 to +209.0) | +13.9% (-42.9 to +70.7) | no difference beyond the noise (3 of 3 runs) |
-| latency, 99th percentile (ms) | 585.4 | 559.2 | -4.5% (-31.4 to +22.5) | -3.2% (-66.9 to +60.6) | -0.4% (-45.2 to +44.4) | no difference beyond the noise (3 of 3 runs) |
-| latency, median (ms) | 0.707 | 0.711 | +0.7% (-3.7 to +5.0) | +0.7% (-3.2 to +4.6) | +2.1% (-0.3 to +4.5) | no difference beyond the noise (3 of 3 runs) |
-| latency, mean (ms) | 21.6 | 20.8 | -3.5% (-87.5 to +80.6) | -0.3% (-94.5 to +93.8) | +2.0% (-48.3 to +52.3) | no difference beyond the noise (3 of 3 runs) |
+| work inside the response line (transactions a second answered within the line) | 1,611 | 1,613 | +0.1% (-1.1 to +1.3) | +24.9% (-47.5 to +97.4) | -0.5% (-3.3 to +2.3) | no difference beyond the noise (3 of 3 runs) |
+| throughput (transactions a second) | 1,653 | 1,652 | -0.1% (-0.2 to +0.1) | +1.7% (-7.7 to +11.2) | -0.2% (-0.3 to +0.0) | no difference beyond the noise (3 of 3 runs) |
+| latency, 95th percentile (ms, lag included) | 6.46 | 6.18 | -4.3% (-28.3 to +19.8) | -60.9% (-300.3 to +178.4) | +21.8% (-24.1 to +67.6) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 198.8 | 182.9 | -8.0% (-37.9 to +21.8) | -61.6% (-301.5 to +178.4) | -4.4% (-23.9 to +15.1) | no difference beyond the noise (3 of 3 runs) |
+| latency, median (ms) | 1.53 | 1.53 | -0.1% (-0.9 to +0.8) | -81.5% (-263.9 to +100.9) | -0.4% (-2.6 to +1.8) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 6.5 | 6.1 | -6.1% (-39.2 to +27.0) | -64.2% (-296.7 to +168.3) | +6.5% (-25.1 to +38.0) | no difference beyond the noise (3 of 3 runs) |
 | failed transactions | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| server connections alive, mean (the machines) | 20.0 | 18.6 | -6.9% (-11.4 to -2.4) | -12.2% (-32.9 to +8.5) | -5.3% (-5.8 to -4.8) | no difference beyond the noise (1 of 3 runs) |
-| server connections alive, most at once | 20.0 | 20.0 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | same |
-| host CPU busy (share of the run) | 0.353 | 0.356 | +0.7% (-4.1 to +5.6) | +0.7% (-5.0 to +6.5) | +2.6% (-1.4 to +6.6) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 602.1 | 606.2 | +0.7% (-4.1 to +5.4) | +0.7% (-5.2 to +6.5) | +2.8% (-1.6 to +7.2) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 transactions inside the line | 0.428 | 0.43 | +0.4% (-3.3 to +4.1) | +0.7% (-7.9 to +9.2) | +2.9% (-2.0 to +7.8) | no difference beyond the noise (3 of 3 runs) |
-| the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both; inside the host's) | 0.87 | 1.48 | +69.6% (+61.5 to +77.7) | +79.7% (+61.6 to +97.7) | +85.9% (+79.6 to +92.1) | shown, not judged |
-| pool size, mean (the knob) | 20.0 | 18.8 | -6.2% (-10.4 to -2.0) | -11.4% (-29.9 to +7.1) | -4.6% (-5.3 to -3.9) | shown, not judged |
+| server connections alive, mean (the machines) | 20.0 | 19.2 | -4.0% (-5.1 to -2.8) | +2.2% (+0.8 to +3.6) | -3.5% (-6.5 to -0.6) | **the runs disagree** |
+| server connections alive, most at once | 20.0 | 21.7 | +8.3% (+1.2 to +15.5) | +11.7% (+4.5 to +18.8) | +11.7% (+4.5 to +18.8) | **confirmed WORSE** |
+| host CPU busy (share of the run) | 0.336 | 0.336 | +0.0% (-1.0 to +1.0) | +2.1% (-8.6 to +12.8) | +0.1% (-2.2 to +2.4) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 506.2 | 506.2 | +0.0% (-1.2 to +1.2) | +1.5% (-7.5 to +10.4) | +0.1% (-2.1 to +2.4) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 transactions inside the line | 0.698 | 0.698 | -0.1% (-2.2 to +2.0) | -17.8% (-63.1 to +27.5) | +0.6% (-2.1 to +3.3) | no difference beyond the noise (3 of 3 runs) |
+| the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both; inside the host's) | 1 | 1.81 | +80.9% (+77.8 to +84.1) | +76.0% (+70.8 to +81.2) | +48.9% (+43.8 to +54.0) | shown, not judged |
+| pool size, mean (the knob) | 20.0 | 19.4 | -2.9% (-4.7 to -1.1) | +1.9% (+1.0 to +2.8) | -2.9% (-6.1 to +0.2) | shown, not judged |
 
 The knob handed back and read back at the end of every omni arm in every run: yes.
 
-The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 16 to 20 (21 trials, 4 allowed, 3 refused); acting: 17 to 20 (28 trials, 3 allowed, 2 refused); acting: 16 to 20 (21 trials, 4 allowed, 4 refused); run B: acting: 18 to 20 (17 trials, 2 allowed, 4 refused); acting: 14 to 20 (24 trials, 6 allowed, 3 refused); acting: 12 to 20 (26 trials, 8 allowed, 1 refused); run C: acting: 19 to 20 (15 trials, 1 allowed, 5 refused); acting: 18 to 20 (16 trials, 2 allowed, 4 refused); acting: 19 to 20 (15 trials, 1 allowed, 5 refused).
+The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 19 to 22 (16 trials, 3 allowed, 6 refused); acting: 19 to 21 (14 trials, 2 allowed, 7 refused); acting: 19 to 20 (11 trials, 1 allowed, 7 refused); run B: acting: 20 to 21 (24 trials, 1 allowed, 2 refused); acting: 20 to 22 (26 trials, 2 allowed, 1 refused); acting: 20 to 22 (25 trials, 2 allowed, 1 refused); run C: acting: 18 to 22 (17 trials, 4 allowed, 7 refused); acting: 16 to 22 (22 trials, 6 allowed, 5 refused); acting: 18 to 22 (16 trials, 4 allowed, 7 refused).
 
 ## tpcb_hot (tpcb (default), scale 2): line 50 ms, 3 paired repetitions a run
 
-Native capacity, unlimited, per run: 2,530, 2,705, 1,962 tps; steps [1, 2, 3, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 2, 1] × 30 s; 64 clients.
+Native capacity, unlimited, per run: 1,922, 1,867, 3,130 tps; steps [1, 2, 3, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 2, 1] × 30 s; 64 clients.
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (transactions a second answered within the line) | 1,107 | 1,112 | +0.4% (-2.1 to +2.9) | +0.7% (-2.7 to +4.1) | +0.1% (-2.0 to +2.2) | no difference beyond the noise (3 of 3 runs) |
-| throughput (transactions a second) | 1,114 | 1,115 | +0.1% (-0.5 to +0.7) | +0.2% (-0.2 to +0.5) | -0.1% (-0.7 to +0.5) | no difference beyond the noise (3 of 3 runs) |
-| latency, 95th percentile (ms, lag included) | 3.93 | 3.82 | -2.8% (-52.7 to +47.0) | -14.6% (-86.7 to +57.5) | -1.3% (-37.9 to +35.3) | no difference beyond the noise (3 of 3 runs) |
-| latency, 99th percentile (ms) | 38.9 | 15.9 | -59.1% (-427.4 to +309.3) | -70.4% (-406.0 to +265.1) | -33.3% (-257.2 to +190.6) | no difference beyond the noise (3 of 3 runs) |
-| latency, median (ms) | 1.39 | 1.41 | +1.2% (+0.1 to +2.4) | -0.6% (-2.2 to +0.9) | -0.3% (-4.3 to +3.7) | no difference beyond the noise (2 of 3 runs) |
-| latency, mean (ms) | 2.48 | 2.17 | -12.4% (-151.2 to +126.4) | -22.4% (-158.6 to +113.7) | -2.6% (-125.7 to +120.5) | no difference beyond the noise (3 of 3 runs) |
+| work inside the response line (transactions a second answered within the line) | 845.0 | 845.9 | +0.1% (-0.5 to +0.7) | +0.0% (-0.2 to +0.3) | +0.3% (-1.3 to +1.9) | no difference beyond the noise (3 of 3 runs) |
+| throughput (transactions a second) | 845.0 | 846.0 | +0.1% (-0.4 to +0.7) | +0.0% (-0.3 to +0.4) | +0.1% (-0.1 to +0.2) | no difference beyond the noise (3 of 3 runs) |
+| latency, 95th percentile (ms, lag included) | 4.95 | 5.24 | +6.0% (-8.3 to +20.3) | -2.7% (-33.0 to +27.6) | -1.6% (-44.7 to +41.5) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 9.71 | 12.4 | +27.6% (-28.4 to +83.5) | +2.1% (-57.7 to +61.8) | -52.4% (-379.5 to +274.7) | no difference beyond the noise (3 of 3 runs) |
+| latency, median (ms) | 1.87 | 1.87 | -0.1% (-0.7 to +0.6) | -1.4% (-6.7 to +3.8) | -0.3% (-2.1 to +1.5) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 2.39 | 2.49 | +4.2% (-5.4 to +13.9) | -0.4% (-20.1 to +19.2) | -9.6% (-102.2 to +83.1) | no difference beyond the noise (3 of 3 runs) |
 | failed transactions | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| server connections alive, mean (the machines) | 19.2 | 17.2 | -10.7% (-22.9 to +1.5) | -7.3% (-11.9 to -2.6) | -8.0% (-9.2 to -6.7) | no difference beyond the noise (1 of 3 runs) |
-| server connections alive, most at once | 20.0 | 20.0 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | same |
-| host CPU busy (share of the run) | 0.263 | 0.267 | +1.4% (-0.0 to +2.8) | -0.4% (-1.9 to +1.0) | -0.5% (-5.7 to +4.6) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 459.9 | 466.2 | +1.4% (-0.0 to +2.7) | -0.4% (-1.9 to +1.0) | -0.6% (-6.1 to +5.0) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 transactions inside the line | 0.923 | 0.932 | +1.0% (-2.7 to +4.6) | -1.1% (-5.3 to +3.0) | -0.6% (-8.3 to +7.0) | no difference beyond the noise (3 of 3 runs) |
-| the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both; inside the host's) | 0.691 | 1.31 | +89.1% (+85.7 to +92.6) | +82.6% (+80.8 to +84.3) | +93.9% (+87.7 to +100.2) | shown, not judged |
-| pool size, mean (the knob) | 20.0 | 17.7 | -11.6% (-14.3 to -8.9) | -7.4% (-12.5 to -2.3) | -5.2% (-5.3 to -5.0) | shown, not judged |
+| server connections alive, mean (the machines) | 19.5 | 16.9 | -13.4% (-26.9 to -0.0) | -7.0% (-12.4 to -1.5) | -11.0% (-22.0 to -0.0) | **confirmed better** |
+| server connections alive, most at once | 20.0 | 20.0 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +1.7% (-5.5 to +8.8) | no difference beyond the noise (3 of 3 runs) |
+| host CPU busy (share of the run) | 0.231 | 0.231 | +0.2% (-1.0 to +1.3) | -1.9% (-8.1 to +4.4) | +0.0% (-2.6 to +2.6) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 359.4 | 360.1 | +0.2% (-1.0 to +1.4) | -1.9% (-8.3 to +4.5) | +0.1% (-2.5 to +2.6) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 transactions inside the line | 0.945 | 0.946 | +0.1% (-1.2 to +1.4) | -1.9% (-8.2 to +4.3) | -0.2% (-4.3 to +3.9) | no difference beyond the noise (3 of 3 runs) |
+| the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both; inside the host's) | 0.763 | 1.49 | +95.9% (+90.3 to +101.5) | +96.4% (+89.1 to +103.7) | +77.2% (+73.0 to +81.5) | shown, not judged |
+| pool size, mean (the knob) | 20.0 | 17.3 | -13.5% (-31.5 to +4.5) | -5.2% (-5.6 to -4.8) | -8.5% (-19.7 to +2.7) | shown, not judged |
 
 The knob handed back and read back at the end of every omni arm in every run: yes.
 
-The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 13 to 20 (13 trials, 7 allowed, 4 refused); acting: 13 to 20 (14 trials, 7 allowed, 4 refused); acting: 13 to 20 (12 trials, 7 allowed, 4 refused); run B: acting: 17 to 20 (10 trials, 3 allowed, 5 refused); acting: 15 to 20 (13 trials, 5 allowed, 4 refused); acting: 14 to 20 (13 trials, 6 allowed, 4 refused); run C: acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused).
+The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 9 to 20 (14 trials, 11 allowed, 3 refused); acting: 10 to 20 (14 trials, 10 allowed, 3 refused); run B: acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused); run C: acting: 14 to 20 (11 trials, 6 allowed, 4 refused); acting: 18 to 20 (11 trials, 2 allowed, 7 refused); acting: 17 to 20 (9 trials, 3 allowed, 5 refused).
 
-**Across 3 workloads: 1 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree.**
+**Across 3 workloads: 1 gauge-rows confirmed better, 1 confirmed worse, 1 where the runs disagree.**
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

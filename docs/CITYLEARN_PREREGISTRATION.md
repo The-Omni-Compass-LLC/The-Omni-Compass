@@ -1,7 +1,6 @@
 # Omni-Compass on top of CityLearn's own controller: written before the confirmation run
 
-> **Evaluation and simulation use only.** Copyright (c) 2026 The Omni-Compass LLC. Any commercial use requires a signed,
-> paid Omni-Compass Enterprise License. See [`LICENSE`](../LICENSE) and [`NOTICE`](../NOTICE).
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 Written 2026-10-05, before any district other than the tuning district was run with Omni-Compass.
 
@@ -93,3 +92,7 @@ monthly load unevenness was 0.11% higher, the one row worse than native, reporte
 districts the bill and carbon came out the same. Five districts cannot be run by CityLearn's own rule-based controller in
 any arm: they need CityLearn's entity interface, which that controller refuses, or they carry an appliance action it
 does not know. Each is listed in the report with CityLearn's own message.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

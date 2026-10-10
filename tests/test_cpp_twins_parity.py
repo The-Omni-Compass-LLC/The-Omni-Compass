@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """C++ twins (cpp/src/nervous_system.cpp, compass.cpp, gpu_rules.cpp) vs their Python originals
 (omnicompass/nervous_system.py, omnicompass/compass.py with omnicompass/storage.py, and the pure rules of
 omni_controller/gpu_governor.py) on random inputs: the same authority, gate, compass reading, ledger, GPU limit, busy

@@ -1,6 +1,6 @@
 # The six organisms with the real Kubernetes cluster inside: native against native with Omni-Compass on top
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 Source: GitHub Actions workflow `six-kube`, run 37359815637, commit `a004a8f` (Omni v1 for everything but the power grid: 37 of 38 v1 files, the power-grid runner not yet written, `tools/omni_version.py --commit a004a8f`), 2026-10-05/06; raw files under `results/live/raw/run-37359815637/`; 98 of 100 cells (1, 10 and 100 copies of all six organisms, 1,000 copies of the four realms and the tower; the two 1,000-copy stack cells cut off by GitHub's six-hour job limit). Made by `tools/six_kube_report.py`.
 
@@ -584,7 +584,6 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | organism work per energy | 1.111 | 1.112 | +0.2% |  | better (inside the noise) |
 | organism behind its window (s) | 602.8 | 1345 | +123.1% |  | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
-
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

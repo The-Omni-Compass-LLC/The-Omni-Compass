@@ -1,5 +1,7 @@
 # Set 16 on real Kubernetes: native against me on top
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36354068590, commit 2d6fccc (prefer-not idle mark, conveyed CPU, the promise in queue terms,
 machines empty one at a time). Five paired repetitions, 15 minutes each, kind with 1 control plane and 6 workers.
 
@@ -24,3 +26,7 @@ A change is significant when its paired 95% interval excludes zero. Lower respon
 **Pods not yet running.** With the prefer-not mark no pod waited for a place. What is left is pod starts native never
 makes: my pod reflex still raised and released the replica floor. The autoscaler alone makes pods from set 18 on; the
 reflex gauges and writes nothing.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

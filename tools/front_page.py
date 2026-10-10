@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """The front page keeps itself current (the founder's order of 10 October 2026: the newest result is always at the front, and
 the repository, not a person, moves it there).
 
@@ -22,6 +24,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import re
 import subprocess
 import sys
@@ -34,6 +37,13 @@ HISTORY = ROOT / "docs" / "history"
 STATE = LIVE / "FRONT_PAGE_STATE.json"
 README = ROOT / "README.md"
 BEGIN, END = "<!-- front-page:begin -->", "<!-- front-page:end -->"
+# the other blocks the repository writes on its front page: the engine and the index now, every table by when it last
+# changed, and the runs that just finished on GitHub
+BLOCKS = ("status", "tables", "runs")
+# workflows that are not benchmarks: their runs are housekeeping and never listed as results
+NOT_BENCHMARKS = {"front-page", "archive-run", "verify", "reaggregate", "pod-report", "azure-inventory", "azure-quota",
+                  "Push on main", "Code Quality: Push on main", "CodeQL", "Dependabot Updates", "Dependency Graph",
+                  "pages-build-deployment"}
 
 # the five live products: the artifact prefix the run's files carry, the table's base name, the three-run tool
 PRODUCTS = {
@@ -183,12 +193,14 @@ def apply(items, root: Path = ROOT):
         if table.exists():
             dest = next_history_name(name)
             HISTORY.mkdir(parents=True, exist_ok=True)
-            dest.write_text(table.read_text(encoding="utf-8"), encoding="utf-8")   # kept whole, then replaced
-        dirs = [str(RAW / f"run-{r}") for r in it["runs"]]
-        r = subprocess.run([py, str(root / it["tool"]), *dirs, "--out", str(table)], capture_output=True, text=True)
+            kept, _ = _legal_normalize(table.read_text(encoding="utf-8"))           # kept whole, in the one notice's wording
+            dest.write_text(kept, encoding="utf-8")
+        dirs = [os.path.relpath(RAW / f"run-{r}", ROOT) for r in it["runs"]]
+        r = subprocess.run([py, it["tool"], *dirs, "--out", os.path.relpath(table, ROOT)], capture_output=True, text=True,
+                           cwd=ROOT)
         if r.returncode != 0:
             raise SystemExit(f"{it['tool']} failed on {name}: {(r.stdout + r.stderr)[-800:]}")
-        summary = (r.stdout.strip().splitlines() or [""])[-1][:160]
+        summary = _plain_summary((r.stdout.strip().splitlines() or [""])[-1])
         state[name] = {"runs": it["runs"], "built": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
                        "engine": it["engine"], "objective": it["objective"], "summary": summary}
         lines.append(f"- {state[name]['built']}: `{name}` rebuilt from runs {it['runs'][0]}, {it['runs'][1]}, {it['runs'][2]}"
@@ -196,7 +208,7 @@ def apply(items, root: Path = ROOT):
     if items:
         STATE.write_text(json.dumps(state, indent=1, sort_keys=True) + "\n", encoding="utf-8")
         for tool in AFTER:
-            r = subprocess.run([py, str(root / tool)], capture_output=True, text=True)
+            r = subprocess.run([py, tool], capture_output=True, text=True, cwd=ROOT)
             if r.returncode != 0:
                 raise SystemExit(f"{tool} failed: {(r.stdout + r.stderr)[-800:]}")
         write_readme(lines)
@@ -221,6 +233,149 @@ def write_readme(lines, readme: Path = README, keep: int = 8):
     return True
 
 
+def _legal_normalize(text):
+    sys.path.insert(0, str(ROOT))
+    from tools.legal import normalize_markdown
+    return normalize_markdown(text)
+
+
+def _no_machine_path(text: str) -> str:
+    """A line with any machine's checkout folder taken out (a GitHub runner's, or this repository's own)."""
+    text = text.replace(str(ROOT) + "/", "")
+    return re.sub(r"/home/runner/work/[^/\s]+/[^/\s]+/", "", text)
+
+
+def _plain_summary(text: str) -> str:
+    """A tool's last line without the file it wrote ("results/live/V3_YCSB.md: 4 untouched workloads; ..." reads "4 untouched
+    workloads; ...") and without any machine's folder."""
+    return re.sub(r"^\S+\.md:\s*", "", _no_machine_path(text).strip())[:240]
+
+
+def _git(*args, root: Path = ROOT) -> str:
+    return subprocess.run(["git", "-c", "safe.directory=*", *args], cwd=root, capture_output=True, text=True).stdout
+
+
+def status_lines(root: Path = ROOT) -> list[str]:
+    """The engine on main and the index now, read from the version tool and the index's own file."""
+    sys.path.insert(0, str(root))
+    from tools import omni_version as ov
+    files = ov.engine_files()
+    v, d = ov.version_of(files), ov.digest(files)[:16]
+    pkg = re.search(r'^version = "([^"]+)"', (root / "pyproject.toml").read_text(encoding="utf-8"), re.M)
+    if (root / "OMNI_V4.json").exists():
+        nxt = "Omni v4 is built: every result is being run again on it."
+    else:
+        nxt = ("Omni v4 (the reflex rule on every wire) is designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md) and not "
+               "yet built; every result runs again on it when it is.")
+    out = [f"- **Engine on main:** {v or 'unversioned (it differs from every frozen engine)'}, fingerprint `{d}` "
+           f"({len(files)} files); package {pkg.group(1) if pkg else 'unknown'}. {nxt}"]
+    ix = root / "results" / "OMNI_INDEX.json"
+    if ix.exists():
+        idx = json.loads(ix.read_text(encoding="utf-8"))
+        out.append(f"- **The Omni index now:** {idx['headline_pct']:+.1f}% on the resource reading (work, speed, machines and "
+                   f"energy) and {idx['service_headline_pct']:+.1f}% on the service reading (work and speed), real machines, "
+                   "every test confirmed three times ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).")
+    return out
+
+
+def table_lines(root: Path = ROOT, n: int = 10) -> list[str]:
+    """Every result table, newest first by the time it last changed (now, for one changed and not yet committed)."""
+    present = [p for p in _git("ls-files", "--", "results", root=root).splitlines()
+               if p.endswith(".md") and not p.startswith(("results/live/raw/", "results/external_review/"))]
+    present = [p for p in present if (root / p).is_file()]
+    when = {}
+    changed = {ln[3:].strip() for ln in _git("status", "--porcelain", "--", "results", root=root).splitlines() if len(ln) > 3}
+    now = dt.datetime.now(dt.timezone.utc)
+    for p in present:
+        if p in changed:
+            when[p] = now
+    cur = None
+    log = _git("log", "--format=@%cI\t%(trailers:key=Front-page-ignore,valueonly,separator=%x20)", "--name-only", "--",
+               "results/*.md", ":(exclude)results/live/raw", root=root)
+    for ln in log.splitlines():
+        if ln.startswith("@"):
+            stamp, _, ignore = ln[1:].partition("\t")
+            cur = None if ignore.strip() else dt.datetime.fromisoformat(stamp.strip()).astimezone(dt.timezone.utc)
+        elif ln.strip() and cur is not None and ln not in when:
+            when[ln] = cur
+    rows = sorted(((when[p], p) for p in present if p in when), reverse=True)[:n]
+    out = ["| Last changed (UTC) | Table | Reading |", "|---|---|---|"]
+    for t, p in rows:
+        text = (root / p).read_text(encoding="utf-8", errors="ignore").splitlines()
+        title = next((ln[2:].strip() for ln in text if ln.startswith("# ")), Path(p).stem)
+        reading = next((ln.strip("* ").strip() for ln in reversed(text) if ln.startswith("**Across ")), "")
+        out.append(f"| {t:%Y-%m-%d %H:%M} | [{title.replace('|', '/')}]({p}) | {reading.replace('|', '/')} |")
+    return out
+
+
+def run_lines(n: int = 10, pages: int = 4) -> list[str] | None:
+    """The newest finished run of each benchmark workflow on GitHub, newest first (None when GitHub cannot be asked from
+    here). Housekeeping workflows and GitHub's own dynamic runs are left out; a skipped run is not a run."""
+    repo = os.environ.get("GITHUB_REPOSITORY") or "The-Omni-Compass-LLC/The-Omni-Compass"
+    out = ["| Finished (UTC) | Benchmark | Outcome | Run |", "|---|---|---|---|"]
+    seen, asked, rows = set(), False, []
+    for page in range(1, pages + 1):
+        try:
+            r = subprocess.run(["gh", "api", f"repos/{repo}/actions/runs?status=completed&per_page=100&page={page}"],
+                               capture_output=True, text=True, timeout=60)
+            runs = json.loads(r.stdout)["workflow_runs"] if r.returncode == 0 else None
+        except (OSError, ValueError, KeyError, subprocess.TimeoutExpired):
+            runs = None
+        if runs is None:
+            break
+        asked = True
+        for x in runs:
+            path = str(x.get("path", ""))
+            name = str(x.get("name", ""))
+            if name.startswith(".github/workflows/"):              # a run of a file GitHub could not read is named by its path
+                name = Path(name).stem
+            if (name in NOT_BENCHMARKS or x.get("conclusion") in (None, "skipped") or not path.startswith(".github/workflows/")
+                    or name in seen):
+                continue
+            seen.add(name)
+            t = dt.datetime.fromisoformat(x["updated_at"].replace("Z", "+00:00"))
+            rows.append((t, f"| {t:%Y-%m-%d %H:%M} | {name} | {x['conclusion']} | [{x['id']}]({x['html_url']}) |"))
+        if len(runs) < 100 or len(rows) >= n:
+            break
+    return out + [r for _, r in sorted(rows, reverse=True)[:n]] if asked else None
+
+
+def write_block(name: str, lines: list[str], readme: Path = README) -> bool:
+    """Replaces what stands between `<!-- front-page:NAME:begin -->` and its end marker (a README without them is left alone)."""
+    b, e = f"<!-- front-page:{name}:begin -->", f"<!-- front-page:{name}:end -->"
+    s = readme.read_text(encoding="utf-8")
+    if b not in s or e not in s:
+        return False
+    head, rest = s.split(b, 1)
+    _, tail = rest.split(e, 1)
+    new = head + b + "\n" + "\n".join(lines) + "\n" + e + tail
+    if new != s:
+        readme.write_text(new, encoding="utf-8")
+    return True
+
+
+def refresh(readme: Path = README) -> list[str]:
+    """Writes the engine and index line, the newest tables and the runs that just finished; returns the blocks written."""
+    done = []
+    for name, lines in (("status", status_lines()), ("tables", table_lines()), ("runs", run_lines())):
+        if lines is not None and write_block(name, lines, readme):
+            done.append(name)
+    # lines written before the paths were made relative keep no machine's folder either
+    s = readme.read_text(encoding="utf-8")
+    t = re.sub(r"\): (?:\S+/)?V\d+_[A-Z_]+\.md: ", "): ", _no_machine_path(s))
+    if t != s:
+        readme.write_text(t, encoding="utf-8")
+    if STATE.exists():
+        st = json.loads(STATE.read_text(encoding="utf-8"))
+        for v in st.values():
+            if isinstance(v, dict) and "summary" in v:
+                v["summary"] = _plain_summary(v["summary"])
+        new = json.dumps(st, indent=1, sort_keys=True) + "\n"
+        if new != STATE.read_text(encoding="utf-8"):
+            STATE.write_text(new, encoding="utf-8")
+    return done
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--apply", action="store_true", help="rebuild what the plan names; without it, print the plan only")
@@ -235,6 +390,7 @@ def main(argv=None):
         return 0
     lines = apply(items)
     print("\n".join(lines) if lines else "nothing to rebuild: every table is built from its three newest runs")
+    print("front page refreshed: " + ", ".join(refresh()))
     return 0
 
 

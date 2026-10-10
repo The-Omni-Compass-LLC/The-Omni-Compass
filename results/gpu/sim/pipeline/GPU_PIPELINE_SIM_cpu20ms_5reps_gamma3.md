@@ -1,5 +1,7 @@
 # Speed won on the CPU, spent on the GPU (model)
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 CPU work 20 ms per request; pod CPU limit 0.5 core native, 1 conveyed. GPU as tools/gpu_physics_sim.py. Baseline from 3 native runs on other seeds.
 Lock settings: speed_gain 0.01, lock_margin 0.08, lock_step 0.02, lock_window_s 60.0, lock_floor 0.5, interval 2.0
 Every number comes from the model in this file and tools/gpu_physics_sim.py, not from a meter.
@@ -36,3 +38,6 @@ Every number comes from the model in this file and tools/gpu_physics_sim.py, not
 
 Speed lock (every gauge at least 1% faster than native, upper end of its 95% interval): mean +2.5%, 95th percentile +6.1%, 99th percentile +10.5% -> **NOT HELD**.
 
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

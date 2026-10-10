@@ -1,5 +1,7 @@
 # Six organisms at 10x size, up to 1000 runs (pooled from 60 shards)
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Evidence class **S** (models). Commit(s) e0294a584531. Native: each organism's own controllers. Omni: the compass law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 are nested. Band first: no win unless the time over the service line is no higher than native's.
 
 Source: GitHub Actions workflow `six`, run 37089060757 (#88), job `receipts` 111117951412, transcribed from the job's printed receipt; the run's artifact `six-receipts` (zip SHA-256 `c24ce2d4f95d30e0199f4d95db9c5f1c1e1c56a2fb51f2c69fe5bcad255d4afc`) holds the same table.
@@ -47,3 +49,7 @@ Source: GitHub Actions workflow `six`, run 37089060757 (#88), job `receipts` 111
 | 4 | Distribution / Specialized | 3370 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.084% (+0.083 to +0.084) | -0.000% (-0.000 to -0.000) | -0.084% (-0.084 to -0.084) | -0.016 (-0.016 to -0.016) | True |
 | 5 | The four stacked, duplicates kept | 12260 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.156% (+0.156 to +0.156) | -0.000% (-0.000 to -0.000) | -0.156% (-0.156 to -0.156) | -0.022 (-0.023 to -0.022) | True |
 | 6 | The whole tower, every muscle once | 6560 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.185% (+0.185 to +0.186) | -0.000% (-0.000 to -0.000) | -0.185% (-0.185 to -0.185) | -0.008 (-0.008 to -0.007) | True |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """The YCSB A/B/C rule (tools/ycsb_abc.py): confirmed only with the same sign and every interval clear of zero in all three
 runs; an interval over zero reads no difference beyond the noise with the count of such runs; clear runs pointing different
 ways read as a disagreement; a failed operation added in any run is WORSE; the resource held reads WORSE when it grows."""

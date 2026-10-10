@@ -1,5 +1,7 @@
 # Review of OmniCompass_SUPERVISORY_NERVOUS_SYSTEM_PROOF_RELEASE.zip (ChatGPT build), 27 September 2026
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 ## What it is
 The zip holds 442 files. Most are an older copy of this repository. It predates:
 - the closure-law work (its `omnicompass/closure.py` lacks 144 lines of ours);
@@ -90,3 +92,7 @@ envelope. It checks:
 
 **Still unproven.** Real silicon. A ceiling write is not a measurement of the delivered frequency, and GitHub-hosted
 runners expose no CPUFreq policies.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

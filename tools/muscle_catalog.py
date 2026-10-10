@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """The catalog of the muscles, explained: what each is for, what Omni-Compass reads and writes on it, how it is
 wired, and which organisms it belongs to. Read from realms/catalog.csv; writes docs/MUSCLE_CATALOG.md.
 
@@ -12,9 +14,9 @@ from __future__ import annotations
 import csv
 
 try:                                                       # the legal notice every generated report carries
-    from tools.legal import stamp as _legal_stamp
+    from tools.legal import stamp as _legal_stamp, TOP as _LEGAL_TOP
 except ImportError:
-    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
+    import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp, TOP as _LEGAL_TOP
 from collections import OrderedDict
 from pathlib import Path
 
@@ -22,13 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "MUSCLE_CATALOG.md"
 REALMS = OrderedDict([("compute_ai_cloud", "Compute / AI / Cloud"), ("physics_robotics_autonomous", "Physics / Robotics / Autonomous"),
                       ("energy_facility_industrial", "Energy / Facility / Industrial"), ("distribution_specialized", "Distribution / Specialized")])
-BANNER = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights "
-          "reserved. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any "
-          "commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation "
-          "into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent "
-          "applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics "
-          "and its software have been filed in the United States by The Omni-Compass LLC. Everything here is subject to change "
-          "at any time; www.omni-compass.com is the authority of record. See [`LICENSE`](../LICENSE).")
+BANNER = f"> {_LEGAL_TOP}"                 # the one notice (tools/legal.py); stamp() keeps one copy of it
 
 # the plant each muscle is modelled on (realms/plants.py): what it is, what its service reading is, what its lever does
 TEMPLATE = {

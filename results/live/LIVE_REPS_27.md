@@ -1,5 +1,7 @@
 # Repeated live runs on kind, set 27: native, Omni-Compass on top with the engine's allocation law, and with the compass law as aligned with the GPU governor, 10 paired repetitions
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Source: GitHub Actions workflow `benchmark-reps`, run 37071353971, commit `d46c959`, 2026-10-02, job `aggregate`
 (job 111067346619, `python tools/live_reps.py reps`), fixed-rate load (equal work in every arm), 900 measured seconds
 per arm. Transcribed from the job's printed receipt; the run's artifact `live-reps` (artifact 11257320626, zip SHA-256
@@ -86,3 +88,7 @@ declared standby power, which needs a node autoscaler that really removes the ma
 **Label of the compass arm by the preregistered rule** (`docs/K8S_COMPASS_PREREGISTRATION.md`): p95 not worse (the whole
 interval below 0), failed requests not higher, machines in service down with the whole interval below 0:
 **better on machines within the band**.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

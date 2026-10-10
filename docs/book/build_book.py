@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 """Builds the printable book, docs/OMNI_COMPASS_MANUAL.pdf, and its one-file text, docs/book/OMNI_COMPASS_BOOK.md.
 
 The book is assembled from the theory chapters in docs/book/, the manual, the repository's documents, the muscle
@@ -15,6 +17,7 @@ from __future__ import annotations
 
 import csv
 import re
+import sys
 from pathlib import Path
 
 from fontTools.ttLib import TTFont
@@ -35,14 +38,10 @@ PLATES = BOOK / "plates"
 OUT_PDF = ROOT / "docs" / "OMNI_COMPASS_MANUAL.pdf"
 OUT_MD = BOOK / "OMNI_COMPASS_BOOK.md"
 EDITION = "October 2026"
-BANNER_MD = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. All rights "
-             "reserved. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any "
-             "commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation "
-             "into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent "
-             "applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics "
-             "and its software have been filed in the United States by The Omni-Compass LLC. Everything here is subject to change "
-             "at any time; www.omni-compass.com is the authority of record. See [`LICENSE`](../../LICENSE).")
-FILED = ("All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its "
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.legal import TOP, _drop_end, normalize_markdown  # noqa: E402  (the one notice, written once)
+BANNER_MD = f"> {TOP}"
+FILED = ("All patents, copyrights and trademarks covering the Omni-Compass engine, its "
          "mathematics and its software have been filed in the United States by The Omni-Compass LLC.")
 
 # ---------------------------------------------------------------- fonts
@@ -90,7 +89,7 @@ TOC3 = ParagraphStyle("toc3", fontName="Serif", fontSize=9, leading=11.5, leftIn
 
 # ---------------------------------------------------------------- text cleaning
 AI_WORDS = re.compile(r"\b(grok|chatgpt|claude|gemini|anthropic|openai|xai|copilot|same assistant|other AI builds?)\b", re.I)
-BANNER = re.compile(r"^>\s*\*\*PROPRIETARY")
+BANNER = re.compile(r"^>\s*(\*\*PROPRIETARY|©\s*2026 The Omni-Compass LLC|\*\*Evaluation and simulation use only)")
 
 
 def clean_lines(text: str) -> list[str]:
@@ -122,7 +121,7 @@ def clean_lines(text: str) -> list[str]:
                     i += 1
             continue
         out.append(ln); i += 1
-    return out
+    return _drop_end(out)[0]
 
 
 def glyphs(t: str, cmap: set) -> str:
@@ -373,13 +372,14 @@ MAN = manual_sections()
 # ("F", path) a repository document; ("FS", [paths]) several documents in one chapter; ("X", name) generated here.
 OUTLINE = [
     ("PART", "The Philosophy and the Theory",
-     "Where Omni-Compass comes from: the closed circle, the four pieces, the compass and the basins. The engineering in "
-     "the rest of the book is this idea made exact."),
+     "Where Omni-Compass comes from: the closed circle, the four pieces, the compass, the basins and the reflex. The "
+     "engineering in the rest of the book is this idea made exact."),
     ("What Omni-Compass Is", ("M", "What Omni-Compass Is")),
     ("The Unified Circle Principle", ("T", "The Unified Circle Principle")),
     ("The Four-Piece Engine", ("T", "The Four-Piece Engine")),
     ("The Compass", ("T", "The Compass")),
     ("Basins, Polarity and the Dual-Basin Engine", ("T", "Basins, Polarity and the Dual-Basin Engine")),
+    ("The Reflex Rule: One Body, One Brain", ("T", "The Reflex Rule: One Body, One Brain")),
     ("PART", "The Mathematics",
      "Eight equations, one control law, and the proofs, audits and declarations that hold them fixed."),
     ("The Canonical Declaration", ("D", "The Canonical Declaration")),
@@ -400,7 +400,7 @@ OUTLINE = [
     ("The Two-Way Nervous System", ("M", "The Two-Way Nervous System")),
     ("The Nervous System in Detail", ("FS", ["docs/TWO_WAY_NERVOUS_SYSTEM.md", "docs/NERVOUS.md"])),
     ("PART", "The Body: Muscles, Realms and Organisms",
-     "Six hundred and fifty-six muscles in four realms, stacked into six organisms, and every gauge used to judge "
+     "Nine hundred and forty-five muscles in four realms, stacked into six organisms, and every gauge used to judge "
      "them."),
     ("The Muscles, the Realms and the Six Organisms", ("M", "The Muscles, the Realms and the Six Organisms")),
     ("The Four Realms", ("F", "docs/REALMS.md")),
@@ -641,9 +641,11 @@ class Book(BaseDocTemplate):
         c.setFont("Serif", 9.5); c.setFillColor(INK)
         lab = self.label(p)
         (c.drawRightString if right else c.drawString)(x1 if right else x0, 0.55 * inch, lab)
-        c.setFont("Serif-Italic", 6.8); c.setFillColor(GREY)
-        c.drawCentredString((x0 + x1) / 2, 0.55 * inch, "Copyright © 2026 The Omni-Compass LLC. Evaluation and "
-                            "simulation use only. US patent, copyright and trademark applications filed.")
+        c.setFont("Serif-Italic", 6.3); c.setFillColor(GREY)
+        c.drawCentredString((x0 + x1) / 2, 0.55 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. All patents, "
+                            "copyrights and trademarks filed in the USA.")
+        c.drawCentredString((x0 + x1) / 2, 0.43 * inch, "Evaluation and simulation use only. Subject to change at any time; "
+                            "www.omni-compass.com is the authority of record.")
         c.restoreState()
 
     def cover(self, c, d):
@@ -660,8 +662,10 @@ class Book(BaseDocTemplate):
         c.setFillColor(colors.HexColor("#d9c79a")); c.setFont("Serif-Bold", 11)
         c.drawCentredString(PW / 2, 0.55 * inch, "THE OMNI-COMPASS LLC  ·  www.omni-compass.com")
         c.setFont("Serif", 7.5)
-        c.drawCentredString(PW / 2, 0.36 * inch, "US patent, copyright and trademark applications filed. Evaluation and "
-                            "simulation use only; all other use requires a signed, paid Omni-Compass Enterprise License.")
+        c.drawCentredString(PW / 2, 0.38 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. All patents, copyrights "
+                            "and trademarks filed in the USA. Evaluation and simulation use only;")
+        c.drawCentredString(PW / 2, 0.24 * inch, "all other use requires a signed, paid Omni-Compass Enterprise License. Subject "
+                            "to change at any time; www.omni-compass.com is the authority of record.")
 
     def afterFlowable(self, f):
         if isinstance(f, Marker):
@@ -763,7 +767,11 @@ def front_matter(doc):
         "Copyright © 2026 The Omni-Compass LLC. All rights reserved. No part of this book may be reproduced, stored "
         "or transmitted in any form or by any means, except as allowed by the Omni-Compass Evaluation License, without "
         "the written permission of The Omni-Compass LLC.",
-        FILED,
+        FILED + " No filing number is stated, and no grant, registration or approval is claimed.",
+        "Everything in this book and in the software it describes is subject to change at any time without notice. The "
+        "authority of record for Omni-Compass, its current state and its terms is The Omni-Compass LLC at "
+        "www.omni-compass.com. Every copy, export and printout of any part of this book carries this page, the LICENSE, "
+        "the NOTICE and the Disclosures unchanged.",
         "“Omni-Compass”, the Omni-Compass rose and the related names and marks are trademarks of The "
         "Omni-Compass LLC. Other names that appear in this book are the property of their owners and are used only to "
         "identify the systems Omni-Compass works with.",
@@ -811,7 +819,10 @@ The book is in eight parts, and it can be read in two ways.
 | CEO, board member, investor | the Foreword, the Executive Summary, Part One, the Results to Date, and Part Eight |
 | CTO, architect, head of platform | Parts One to Four, then the eight wiring levels in Part Five, then Part Seven |
 | The engineer wiring it | everything, in order. Do not skip the wire check or the watch level |
+| Data-center, facility or energy operator | the Quick Reference card, Part One's chapter on the reflex, Part Five (levels five to seven, the processor and the data center under the servers), Part Six |
+| Site reliability engineer, on call | the Quick Reference card, Part Six (the switches and the log), the troubleshooting appendix |
 | Auditor, diligence team | Part Two (the mathematics), Part Seven (the proof), Appendices C, F and H |
+| Procurement and counsel | the Disclosures, the license in the back matter, Part Eight |
 
 **Part One, the philosophy and the theory,** sets out the closed circle: a system that is closed, bounded and pulled
 toward a center cannot run away, and everything it does is a return. **Part Two, the mathematics,** gives the eight
@@ -848,6 +859,7 @@ def build():
         story.append(Paragraph(inline(re.match(r"!\[([^\]]*)\]", ln).group(1)), ParagraphStyle("pl", parent=BODY, alignment=TA_LEFT)))
     story += front_chapter(doc, "Foreword", MAN["Foreword"])
     story += front_chapter(doc, "Preface", PREFACE.splitlines())
+    story += front_chapter(doc, "Quick Reference: The Card for the Glove Box", MAN["Quick Reference: The Card for the Glove Box"])
     story += front_chapter(doc, "Executive Summary", MAN["Executive Summary"])
     story += front_chapter(doc, "Disclosures, Declarations and Disclaimers", doc_body("DISCLOSURES.md")[1])
     md_parts = ["# THE OMNI-COMPASS MANUAL", "", BANNER_MD, "", EDITION, "", FILED, "",
@@ -856,6 +868,7 @@ def build():
     for sec in ("Foreword", "Executive Summary"):
         md_parts += [f"## {sec}", ""] + MAN[sec]
     md_parts += ["## Preface", ""] + PREFACE.splitlines()
+    md_parts += ["", "## Quick Reference: The Card for the Glove Box", ""] + MAN["Quick Reference: The Card for the Glove Box"]
 
     part_no = 0
     words = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
@@ -902,7 +915,7 @@ def build():
     # back cover on an even page
     story += [NextPageTemplate("back"), PageBreak(), _ToRecto(doc, even=True), Spacer(1, 1)]
     doc.multiBuild(story)
-    OUT_MD.write_text("\n".join(md_parts) + "\n", encoding="utf-8")
+    OUT_MD.write_text(normalize_markdown("\n".join(md_parts) + "\n")[0], encoding="utf-8")   # the notice on top and at the end
     print(OUT_PDF, doc.page, "pages")
 
 

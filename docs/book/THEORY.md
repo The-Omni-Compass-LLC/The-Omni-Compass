@@ -1,9 +1,8 @@
 # The Unified Circle Principle
 
-> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c) 2026 The Omni-Compass LLC. This is not open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use, commercialization, monetization, production use, redistribution, hosted service or incorporation into a product requires a signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. Protected by copyright, patents and trademarks: All patent applications, copyright registrations and trademark applications covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. See [`LICENSE`](../../LICENSE).
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
 
 ![Plate 1. The Unified Circle Principle](plates/unified_circle_principle.jpg)
-
 
 Omni-Compass begins with one idea: a system that is closed, bounded and pulled toward a center cannot run away, and
 everything it does is a return. I call this the closed circle. This chapter states the principle as I hold it, in its
@@ -38,7 +37,6 @@ when I say that a closed circle holds the answer to every question that can be p
 ## Closure, admissibility, boundedness
 
 ![Plate 2. Closed-circle structural architecture of the unified law](plates/closed_circle_architecture.jpg)
-
 
 The theory sets five requirements on any law that claims to close the circle:
 
@@ -253,6 +251,77 @@ whose horizon boundary is forward invariant (the Nagumo condition again).
 and, when one muscle saturates, move the excess to its siblings rather than hammering it (redistribution). The first two
 are built into the compass. Redistribution across muscles is designed and not yet built; it is on the roadmap.
 
+# The Reflex Rule: One Body, One Brain
+
+A body does not decide in advance how much force a muscle will need. It sends a signal, the muscle moves, the nerves report
+what the movement did, and only then does the brain choose the next signal. Nothing in that loop is a forecast. The decision
+is made on the reaction, after the reaction, and from the reaction. The founder's order of 10 October 2026 puts the whole of
+it in one sentence: what the brain sends to a muscle has to coincide with what the muscle sends to itself and where it is
+at. This chapter is the theory of that sentence, and the reason it is the whole mechanism rather than one more rule beside
+the others.
+
+## The reflex, not the forecast
+
+The compass of the earlier chapters is a force: where a reading sits in its band, how hard the two opposing forces push it
+back toward the middle, and how smoothly. A force alone does not say when it may become a new setting. A governor that
+turns every urge straight into a move is a governor that guesses, and a guess made on a machine that is already working is
+a guess paid for by that machine. The reflex rule closes the gap: a new setting is earned by a trial on the muscle itself,
+and the trial is read from the muscle's own reaction. The urge proposes; the reaction disposes.
+
+## A trial runs to its end
+
+The rule that taught this was broken in a measured run. On 10 October the message broker's consumer group was given a spend
+trial: one more consumer, then measure. The extra consumer drained the waiting messages so fast that the service went calm
+at once, and the harness of that day ended the trial the moment the calm arrived, before the measurement it existed to
+take. Every spend was abandoned by the success it caused. A trial that can be ended by the calm it creates can never prove
+that it was worth it. Hence the first rule: a trial runs to its full measurement and is never ended by the calm it causes;
+only the wall, a service reaching its line, or the engine's own time limit ends it early. In the one repetition of that day
+in which the brain allowed the third consumer early, the whole of the earlier gain came back at a fraction of the spend:
+the slowest five percent of messages from 2,450 ms to 57 ms, the queue from 3,375 waiting messages to 253, the work done
+inside the line up 17%, with 2.5 consumers on average where the earlier law had spent six to eight. The gain is real and
+cheap; what was missing was a fair trial of it.
+
+## No forcing: the need and the urge
+
+A spend is tried only when the muscle's own reading says there is something to buy: messages waiting, a cache missing,
+clients queued at a pool. A give-back is tried only when the whole body is calm. The compass force is the urge, smooth and
+bounded; the muscle's own condition is the need. The brain never moves a muscle because it wants to. It moves it because the
+muscle has shown that a move can pay, and then only by trial.
+
+## One body, one brain, one tick
+
+A muscle judged alone can be made better by making its neighbour worse: a cache that takes memory from the database beside
+it, a consumer that takes processor time from the service it feeds. So the brain reads the whole body first, every
+muscle's state, every service's speed and work, the host's processor, memory and energy where a meter exists, and judges
+the body's cost: the Omni index's own arithmetic over all the work, all the speed, all the machines and all the resources.
+On top of the body's total stands a guard for every part. A step is refused if any one service got worse beyond its cushion,
+even when the total improved. Making one thing best by making another worse is refused by rule, not by luck.
+
+## One trial at a time, nothing permanent, the wall belongs to the body
+
+If two muscles move together, the brain cannot tell which one caused what it feels. Inside a body, one new trial runs at a
+time, granted to the muscle asking loudest whose own condition holds; every other muscle keeps acting inside what it has
+already proven, so nothing is frozen and only new trials wait their turn. Every allowed step is tried again on the recheck
+and pulled back when it stops paying, and a muscle at native is asked again whenever its signal returns: native is where the
+brain stands when it has not yet been shown a reason, never a verdict. And if any service reaches its line, the trial
+stops, that step is undone, and every force in the body turns to brake. The wall is the body's, not the muscle's.
+
+## Why this is the closed circle again
+
+The Unified Circle Principle says that a system closed on itself, bounded, and pulled toward its center cannot run away:
+everything it does is a return. The reflex rule is that principle carried into time. The loop is closed through the system's
+own reaction; every excursion is bounded by the trial's limits, the cover and the wall; and every allowance is pulled back to
+native unless the body keeps proving it. The compass holds each reading in the middle of its band. The reflex holds each
+decision in the middle of what has been shown.
+
+## What it means for the evidence
+
+Omni v3, the engine on main, already tries a slow knob on the muscle itself before it moves it, and the live harnesses carry
+the same verdict around every live knob. Omni v4 is the engine written to make the rule hold on every wire by construction:
+one body that every muscle's wire passes through, the trial's rules inside the verdict, and no wire that can write around
+them. Because that changes the engine, v4 carries its own fingerprint, the package version follows it, and every result in
+this book is run again on it. No result is read across engines.
+
 # Closing the Circle in the Engine
 
 ![Plate 16. Mathematical integration](plates/mathematical_integration.jpg)
@@ -378,7 +447,4 @@ and the method of those runs is the manual's section 13, the same method every t
 
 ---
 
-*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
-monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-All patent applications, copyright registrations and trademark applications filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
-`NOTICE` at the root of this repository.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

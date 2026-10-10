@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 # The robustness test (ROBUST=kill or ROBUST=long in scripts/kind_bench.sh; docs/ROBUSTNESS_PREREGISTRATION.md).
 #   kill   at 40% of the window the governor is killed outright (SIGKILL): it cannot hand back. The watchdog running beside
 #          it (tools/omni_switch.py watchdog) must find the dead lease and run the governor's recorded restore command. This

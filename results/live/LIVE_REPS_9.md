@@ -1,5 +1,7 @@
 # Live set 9: kind, 7 nodes (6 workers), 5 paired reps per arm, 900 s each
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36309238960 on commit 5ae3f01 (set 8, run 36308670935, was cancelled before it finished;
 this set replaces it). Aggregated with `tools/live_reps.py`.
 
@@ -60,3 +62,7 @@ Response time went the wrong way in both arms. This set is not a win.
 - `omni_controller/muscles.py`: no power cap on a request-served workload (latency sense wired). Energy comes from
   machines.
 - `omni_controller/controller.py`: Omni on top may tighten the HPA target but never loosen it.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

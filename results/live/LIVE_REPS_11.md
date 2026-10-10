@@ -1,5 +1,7 @@
 # Live set 11: kind, 7 nodes (6 workers), 5 paired reps per arm, 900 s each, four arms
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Run: benchmark-reps 36331060116 (workflow_dispatch) on commit 5e5dd56. The repository was made public so GitHub
 Actions would start it; five earlier attempts were refused before any runner started. Set 10 (commit b98763a) ran all
 15 jobs, but its aggregate step was refused the same way, so it has no table.
@@ -59,3 +61,7 @@ Changes since set 9:
   Next: why the law holds at 6 here when Omni alone gives machines back.
 - Five reps cannot separate ±15% effects on p95. Either more reps or paired runs on one machine (all arms back to back
   on the same runner) are needed to prove p95 either way.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

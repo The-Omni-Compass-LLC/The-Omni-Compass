@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
+# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
+# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
 name: swarm
 # Omni-Compass on top of a drone swarm's own autopilots (docs/SWARM_PREREGISTRATION.md): gym-pybullet-drones (University
 # of Toronto, DSL; MIT) integrates every Crazyflie 2.x and flies it with the position controller it ships with. One job per
@@ -13,11 +15,15 @@ on:
       cells:
         description: "Cells, comma separated: tuning, short, mixed, long; 'all' runs every cell"
         default: "all"
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
 jobs:
   plan:
     runs-on: ubuntu-latest
     outputs: {cells: "${{ steps.c.outputs.cells }}"}
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - id: c
         run: |
           if [ "${{ github.event.inputs.cells }}" = all ] || [ -z "${{ github.event.inputs.cells }}" ]; then
@@ -26,6 +32,9 @@ jobs:
             cells=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.cells }}'.split(',')))")
           fi
           echo "cells=$cells" | tee -a "$GITHUB_OUTPUT"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   run:
     needs: plan
     strategy:
@@ -34,6 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
@@ -48,11 +59,16 @@ jobs:
       - run: cd "swarm-${{ matrix.cell }}" && sha256sum * > SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with: {name: "swarm-${{ matrix.cell }}", path: "swarm-${{ matrix.cell }}"}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   report:
     needs: run
     if: always() && needs.run.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
@@ -61,3 +77,32 @@ jobs:
       - run: ls cells && python tools/run_swarm.py --report-only cells && cat cells/SWARM.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with: {name: swarm-report, path: cells/SWARM.md}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

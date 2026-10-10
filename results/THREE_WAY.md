@@ -1,5 +1,7 @@
 # Three columns: Kubernetes alone | Omni-Compass on top | Omni-Compass alone
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+
 Fresh scenarios 713001-713030 (30 per workload, never used before). THEORETICAL SIMULATION (fleet/sim_slo.py).
 Settings frozen before the run. Marks: **better** / *worse* = paired 95% interval vs Kubernetes excludes 0 and the difference is over 0.5%; otherwise equal.
 
@@ -85,3 +87,7 @@ Settings frozen before the run. Marks: **better** / *worse* = paired 95% interva
 |---|---:|---:|---:|
 | Omni on top | 9 | 47 | 0 |
 | Omni alone | 18 | 31 | 7 |
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
