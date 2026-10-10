@@ -356,7 +356,7 @@ pool was handed back and read back.
   13 to 15. **Connections held open 19.3 → 11.9, −36% to −38%, confirmed better** (the first set's −61% to −63% was bought
   with the queue). Work and throughput equal; p95 inside the noise (−12%, +23%, +18%); p99 and mean inside the noise by the
   rule (one run's interval across zero) but worse as point estimates in two runs (p99 +30% and +175%, mean +16% and +46%):
-  the probing of the knee shows in the tails and is not confirmed. It is in the table.
+  the probing of the knee shows in the tails and reads inside the noise by the rule. It is in the table.
 - `simple_update`: the force rule of amendment 1 ("slow, clients waiting for a server: add") fired 4 to 15 times an arm and
   took the pool to 33 to 38 at its peak. **Connections most at once 20 → 36, +72% to +80%, confirmed WORSE** (the first set
   read the same, +80%); connections held open +8% to +10%, two runs inside the noise; work, latencies and CPU inside the

@@ -851,7 +851,28 @@ def main(check=False):
           "chunks refused; MongoDB: the cache given back a notch a trial). The runs on it were dispatched on 10 October 2026 "
           "(`docs/RERUN_2026-10-10.md`); this page is then read again "
           "from their tables. Inside the modelled realms the organism still takes one directive for every muscle; the verdict per muscle there "
-          "is the next engine, Omni v4, designed in `docs/OMNI_V4_PLAN.md` and not built.", ""]
+          "is the next engine, Omni v4, designed in `docs/OMNI_V4_PLAN.md` and not built.", "",
+          "**Where the brain's verdict stands today, knob by knob.** Who decides, in real time, whether a knob pays before it is written, "
+          "and in which directions (spend: more resource for service; give back: less resource where the service holds):", "",
+          "| Where | The knob | Who decides it pays, and when | Directions tried | Engine |",
+          "|---|---|---|---|---|",
+          "| The five live stacks: Redis's memory ceiling, Kafka's consumers, PostgreSQL's pool, MySQL's buffer pool, MongoDB's cache | one knob each | "
+          "`tools/knob_verdict.py` around the engine's verdict: the knob starts in watch; a paired trial on the stack itself before every notch, "
+          "one notch a trial, under the declared objective | spend and give back, both tried; the operator's setting always free | outside the "
+          "engine (Omni v3 unchanged); running since 10 October |",
+          "| Kubernetes: the machines | nodes in service | the engine's verdict (`omnicompass/verdict.py`): a paired trial before a machine is taken | "
+          "give back (a machine taken only when the trial shows the service holds); gas and brake on replicas and the floor by the compass law's "
+          "band, no trial | Omni v3 |",
+          "| The card: the clock ceiling | one 15 MHz step at a time | the engine's verdict: a paired trial per step while the service is calm; no step "
+          "passing, the card runs as it does alone; the power lid stays at the operator's | give back (slower clock for the same service); the "
+          "speed floor never under the card's own busy clock | Omni v3 (`omni_controller/gpu_compass.py`) |",
+          "| Robot arms: the speed override; drones: the cruise | one knob each | the engine's verdict on the robot and the swarm; two of four robots "
+          "left native by it | give back | Omni v3 |",
+          "| Power grids: the tap; buildings: the batteries | one knob each | the compass law alone, no trial; the trades on four exporting grids and "
+          "seven 2023 districts are read from the tables above as the operator's choice | the law's own push and pull | Omni v3 (a trial there is "
+          "the next engine) |",
+          "| The 945 modelled muscles | each muscle's knob | one directive from the organism's governor, no trial per muscle; 746 never wrote, 13 are "
+          "trades | the law's own push and pull | Omni v3 (the verdict per muscle is Omni v4, `docs/OMNI_V4_PLAN.md`, not built) |", ""]
 
     md = "\n".join(legal_stamp(L)) + "\n"
 

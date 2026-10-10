@@ -10,6 +10,11 @@
 > **Which knobs to wire in at all:** `docs/WIRING_VERDICTS.md` gives every knob in every published result one of three
 > words from the tables themselves: **write** (wire both ways), **watch** (wire out only: Omni reads, the native controller
 > lives by itself) or **operator's choice** (a trade). A knob that showed nothing, or lost, stays native.
+> **How to wire for superiority:** every knob starts in watch (wire out only); an observation run shows what native does
+> alone; then the brain's own verdict decides on the knob, in real time, whether a notch pays before it is written
+> (`tools/knob_verdict.py` around the engine's verdict; the manual, section 9.4); a knob that cannot prove it pays stays
+> native, and the operator's setting is always free. Where that verdict stands today, knob by knob, is the last table of
+> `docs/WIRING_VERDICTS.md`.
 
 > The full step-by-step manual, with the switch, the living band, parking and the pod reflex, is
 > `docs/OPERATOR_MANUAL.md`. This page is the short version.
