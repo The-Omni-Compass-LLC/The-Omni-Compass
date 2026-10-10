@@ -26,7 +26,16 @@
   observation run, the brain's verdict on the knob, the operator's setting always free). Three places that read "not confirmed"
   against the rule (the manual's PostgreSQL paragraph, the state of play's PostgreSQL row, the PostgreSQL preregistration) now read
   "inside the noise by the rule"; the manual's valley metaphor no longer uses the word the founder retired. The rerun record
-  carries the measured length of every kind of run (from the earlier run of each kind, in runner-hours) and the two-day timeline. (`tools/benefit_sheet.py`, `tools/wiring_verdicts.py`, both pages regenerated):
+  carries the measured length of every kind of run (from the earlier run of each kind, in runner-hours) and the two-day timeline.
+- **The gaps the tree shows, written into the register** (the founder's reading of 10 October): the index's six real categories are
+  Kubernetes, PostgreSQL, Kafka, Redis, MongoDB and MySQL; Azure waits on its three-run close and the card on its run on the current
+  controller; the power grids and the districts are in as simulations, never in the index by rule. What is not yet a category: a
+  second and a third cloud (AWS and Google Cloud under Azure's method, new row 38 of the register's queue: each needs its own
+  account credential in a GitHub secret and its own allowance, nothing spent until then), CPU power through Linux's own governor
+  with RAPL (row 18, now saying what it needs: a machine where the governor and the meter are writable, the founder's own tower or a
+  rented bare-metal server, since GitHub's runners and cloud machines allow neither), and the card's energy meter, which the card
+  harness already has (the integral of the device's power draw, the CPU package by RAPL, the wall plug where fitted) and which reads
+  on the founder's run. The state of play lists the three as open item 8. (`tools/benefit_sheet.py`, `tools/wiring_verdicts.py`, both pages regenerated):
   the founder found the sheet read backwards against the tables (plus is good on the sheet; a cut reads minus in a table). Now the
   sheet's number carries its word (gain, loss, nothing) and every confirmed change is written out beside it: a gauge that fell when
   falling is good reads **cut** (less waiting, fewer machines, less energy, less memory), one that rose when rising is good reads
