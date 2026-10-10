@@ -110,7 +110,9 @@ and preregistration not yet written). Every "to build" item names the open nativ
 
 ### 3.5 Added 10 October 2026 at the founder's sweep: nothing with value left out
 
-The founder asked that no domain with value be missed: aerospace and rockets (already rows 31 and the register's 32 to 36),
+The founder asked that no domain with value be missed, and asked again the same day with cars, self-driving, batteries, nuclear
+energy, power plants, medicine and surgery named; the second check is written as `docs/COVERAGE_MAP.md`, every domain against the
+register. Aerospace and rockets were already there (the register's rows 32 to 36),
 operating systems, television and telecom, satellites and signals, energy, oil and minerals, finance, the platforms and social
 media, science and physics, robotics to the top. Each row below is an open benchmark anyone can run, with a shipped controller
 for native and one knob for Omni; each gets its own preregistration before its first run; the register's section 4 carries the
@@ -135,6 +137,19 @@ same rows (38 to 57) with their owners. Where no open source with a shipped cont
 | 47 | Robotics: ROS 2 navigation (Nav2 on a TurtleBot in Gazebo); humanoids (MuJoCo Playground); marine vehicles (Stonefish, UUV Simulator) | the shipped controllers and policies | velocity and acceleration limits; speed and effort margins | time to goal, energy, collisions zero; falls zero | free | queued |
 | 48 | Mining and mineral processing | a shipped circuit controller | setpoints inside the band | throughput, specific energy, grade | free | candidate: no open source with a shipped controller confirmed yet |
 | 49 | Video platforms: transcoding queues (FFmpeg) | the worker pool | parallelism and admission | jobs an hour, queue wait, energy where a meter is present | free | queued |
+| 50 | Self-driving stacks: Autoware on CARLA; openpilot in its simulation bridge | the stack's planner and velocity controller | speed, acceleration and jerk margins | trip time, energy, comfort, collisions and near misses zero | free | queued (register row 58) |
+| 51 | The EV powertrain: FASTSim on standard drive cycles | the shipped energy management | power split, charge and thermal setpoints | energy a mile, battery stress, range | free | queued (row 59) |
+| 52 | Mobility fleets: AMoDeus | the shipped dispatchers | fleet in service, rebalancing rate | wait time, empty distance, energy | free | queued (row 60) |
+| 53 | Stream processing: Flink's Kubernetes operator autoscaler | the autoscaler | target utilization, parallelism bounds | lag, p95, task slots | free | queued (row 61) |
+| 54 | Storage clusters: Ceph's recovery and scrub throttles | Ceph's balancer and throttles | recovery and backfill limits | client p95, recovery time, IOPS | free | queued (row 62) |
+| 55 | AI batch on Kubernetes: Kueue and Volcano with KWOK accelerators | their quotas and admission | admission and quota | job wait, idle accelerator-hours, makespan | free | queued (row 63) |
+| 56 | Games: Godot's resolution scale under its frame pacing | the engine's frame pacing | resolution scale, quality tier | frame time inside the line, GPU energy | on the card | candidate (row 64) |
+| 57 | Thermal power plants (nuclear as the model only): the open Modelica plant libraries | the plants' shipped controllers | load ramps and setpoints | fuel or energy, thermal stress, excursions zero | free | candidate (row 65) |
+| 58 | Semiconductor fabs: the SMT2020 testbed | the shipped dispatching | lot release and admission | cycle time, throughput, work in process | free | candidate (row 66) |
+| 59 | Surgical robot simulation: AMBF, SurRoL, the dVRK software | the shipped servos | servo speed and force margins only | task time, tracking error, force breaches zero | free | candidate (row 67) |
+| 60 | Kubernetes with Karpenter-class node scaling, the Cluster Autoscaler, KEDA and VPA underneath | each scaler as shipped | the HPA target, the node pool, the event thresholds, the vertical bounds | p95, machines, energy (declared model), failed requests | free on kind with KWOK; Karpenter itself needs a cloud | queued (row 68) |
+| 61 | Distributed SQL (CockroachDB, TiDB); the other brokers (RabbitMQ, NATS, Pulsar); CDN caches (Varnish, nginx); observability pipelines (OpenTelemetry Collector, Prometheus) | their shipped rebalancing, flow control, cache size, queue and sampling limits | the YCSB, Kafka, Redis and serving patterns | as those rows | free | queued (rows 69, 70, 71, 73) |
+| 62 | Air traffic management: BlueSky with its shipped conflict detection and resolution | the shipped resolution | spacing and admission margins inside the rules | delays, conflicts zero, fuel | free | queued (row 72) |
 
 
 ## 4. The defensibility package
