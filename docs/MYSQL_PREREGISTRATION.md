@@ -417,7 +417,7 @@ The first counted set on the brain's verdict (runs 38013329351, 38013334121, 380
 
 **Expected before the runs:** the grow trials are judged: a chunk is allowed on `read_write` only where the misses it stops lower the latency and raise the work inside the line by more than the memory it costs (the index's arithmetic), otherwise refused; the give-back results stand. The first set's table stands as the result of amendment 3 until the set on this amendment lands and supersedes it; it then goes whole to `docs/history`.
 
-**Dispatch.** None yet at the time of writing; the runs are dispatched when this amendment is pushed, and their ids are recorded in `docs/RERUN_2026-10-10.md`.
+**Dispatched (2026-10-10 13:11 UTC, commit `ca745467`).** Runs 38054765202, 38054768832, 38054773573 (A, B, C), the same inputs as the morning's; recorded run by run in `docs/RERUN_2026-10-10.md`.
 
 ---
 

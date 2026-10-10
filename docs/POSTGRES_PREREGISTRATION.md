@@ -129,7 +129,7 @@ The first counted set on the brain's verdict (runs 38013313943, 38013319893, 380
 
 **Expected before the runs:** little change: the trials were already judged here; a spend trial that the queue line starts now runs to its samples instead of ending when the queue clears, so a server added while clients waited is judged on what it bought. The first set's table stands as the result of amendment 3 until the set on this amendment lands and supersedes it; it then goes whole to `docs/history`.
 
-**Dispatch.** None yet at the time of writing; the runs are dispatched when this amendment is pushed, and their ids are recorded in `docs/RERUN_2026-10-10.md`.
+**Dispatched (2026-10-10 13:11 UTC, commit `ca745467`).** Runs 38054754511, 38054758150, 38054761503 (A, B, C), the same inputs as the morning's; recorded run by run in `docs/RERUN_2026-10-10.md`.
 
 ---
 

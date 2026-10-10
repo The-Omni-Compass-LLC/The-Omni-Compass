@@ -166,7 +166,7 @@ The first counted set on the brain's verdict (runs 38013287665, 38013291972, 380
 
 **Expected before the runs:** under the resource objective the first spend notch is judged and most likely refused (12.5% more memory buys about one percent of latency on these workloads: the cost rises), so the ceiling stays near the operator's and the category reads nothing; under the service objective the spend notches are judged on latency and work alone and allowed while the hit rate rises, the ceiling growing to perhaps 100 to 200 MB with work inside the line and the hit rate up by less than the first set's +14% to +27%. The first set's table stands as the result of amendment 2 until the set on this amendment lands and supersedes it; it then goes whole to `docs/history`.
 
-**Dispatch.** None yet at the time of writing; the runs are dispatched when this amendment is pushed, and their ids are recorded in `docs/RERUN_2026-10-10.md`.
+**Dispatched (2026-10-10 13:10 to 13:12 UTC, commit `ca745467`).** Under the resource objective runs 38054731163, 38054735302, 38054739168 (A, B, C); under the service objective runs 38054791688, 38054795871, 38054800068 (A, B, C); the same inputs as the morning's; recorded run by run in `docs/RERUN_2026-10-10.md`.
 
 ---
 

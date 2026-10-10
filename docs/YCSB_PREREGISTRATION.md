@@ -312,7 +312,7 @@ The first counted set on the brain's verdict (runs 38013343689, 38013348512, 380
 
 **Expected before the runs:** little change: the trials were already judged here; a grow trial started by misses now runs to its samples. The first set's table stands as the result of amendment 2 until the set on this amendment lands and supersedes it; it then goes whole to `docs/history`.
 
-**Dispatch.** None yet at the time of writing; the runs are dispatched when this amendment is pushed, and their ids are recorded in `docs/RERUN_2026-10-10.md`.
+**Dispatched (2026-10-10 13:11 UTC, commit `ca745467`).** Runs 38054777807, 38054782696, 38054787517 (A, B, C), the same inputs as the morning's; recorded run by run in `docs/RERUN_2026-10-10.md`.
 
 ---
 
