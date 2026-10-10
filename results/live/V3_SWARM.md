@@ -7,9 +7,9 @@ gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadr
 
 | Run | GitHub run | Commit | Engine | Cells in the run |
 |---|---|---|---|---:|
-| A | 37677964512 | `ec6d992f269a` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
-| B | 37677984739 | `ec6d992f269a` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
-| C | 37678005151 | `ec6d992f269a` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
+| A | 38013432603 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
+| B | 38013437505 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
+| C | 38013442794 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
 
 ## Cells where Omni moved the cruise
 
@@ -17,65 +17,65 @@ gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadr
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per mission (J, declared model: motors and avionics over the fleet window) | 456.1 | 384 | -15.83% | -15.77% | -15.83% | **confirmed better** |
-| fleet energy over the window (J, declared model) | 9123 | 7679 | -15.83% | -15.77% | -15.83% | **confirmed better** |
-| missions per charge at the autopilot's reserve | 5.84 | 6.938 | +18.80% | +18.72% | +18.80% | **confirmed better** |
+| energy per mission (J, declared model: motors and avionics over the fleet window) | 456.3 | 384.3 | -15.77% | -15.77% | -15.83% | **confirmed better** |
+| fleet energy over the window (J, declared model) | 9125 | 7686 | -15.77% | -15.77% | -15.83% | **confirmed better** |
+| missions per charge at the autopilot's reserve | 5.839 | 6.932 | +18.72% | +18.72% | +18.80% | **confirmed better** |
 | missions over their deadline (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | drones that broke the battery reserve | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | control ticks with two drones under half the keep-out apart (near misses) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
-| closest two drones ever came (m) | 0.3574 | 0.1948 | -45.49% | -50.80% | -45.49% | **the runs differ** |
-| tracking error, RMS (m; the compass's reading, held inside its band) | 0.07384 | 0.1385 | +87.59% | +90.85% | +87.59% | **the runs differ** |
+| closest two drones ever came (m) | 0.3717 | 0.1829 | -50.80% | -50.80% | -45.49% | **the runs differ** |
+| tracking error, RMS (m; the compass's reading, held inside its band) | 0.07381 | 0.1409 | +90.85% | +90.85% | +87.59% | **the runs differ** |
 | mission time (s) | 18.46 | 14.54 | -21.22% | -21.22% | -21.22% | shown, not judged |
 | seconds airborne per mission | 18.44 | 14.52 | -21.24% | -21.24% | -21.24% | shown, not judged |
-| cruise override, mean | 1 | 1.487 | +48.65% | +48.84% | +48.65% | **the runs differ** |
+| cruise override, mean | 1 | 1.488 | +48.84% | +48.84% | +48.65% | **the runs differ** |
 
 ### long: 20 drones x 4 missions, 8 to 8 m; handed back: yes
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per mission (J, declared model: motors and avionics over the fleet window) | 548.5 | 439.9 | -19.79% | -19.84% | -19.84% | **confirmed better** |
-| fleet energy over the window (J, declared model) | 4.388e+04 | 3.519e+04 | -19.79% | -19.84% | -19.84% | **confirmed better** |
-| missions per charge at the autopilot's reserve | 4.857 | 6.056 | +24.67% | +24.76% | +24.76% | **confirmed better** |
+| energy per mission (J, declared model: motors and avionics over the fleet window) | 548.4 | 439.6 | -19.84% | -19.79% | -19.79% | **confirmed better** |
+| fleet energy over the window (J, declared model) | 4.387e+04 | 3.517e+04 | -19.84% | -19.79% | -19.79% | **confirmed better** |
+| missions per charge at the autopilot's reserve | 4.858 | 6.06 | +24.76% | +24.67% | +24.67% | **confirmed better** |
 | missions over their deadline (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | drones that broke the battery reserve | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | control ticks with two drones under half the keep-out apart (near misses) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
-| closest two drones ever came (m) | 0.46 | 0.4339 | -5.68% | -1.50% | -1.50% | **the runs differ** |
-| tracking error, RMS (m; the compass's reading, held inside its band) | 0.06622 | 0.1279 | +93.16% | +91.84% | +91.84% | **the runs differ** |
-| mission time (s) | 23.29 | 17.42 | -25.21% | -25.17% | -25.17% | shown, not judged |
-| seconds airborne per mission | 23.27 | 17.4 | -25.23% | -25.19% | -25.19% | shown, not judged |
-| cruise override, mean | 1 | 1.52 | +51.98% | +51.65% | +51.65% | **the runs differ** |
+| closest two drones ever came (m) | 0.451 | 0.4442 | -1.50% | -5.68% | -5.68% | **the runs differ** |
+| tracking error, RMS (m; the compass's reading, held inside its band) | 0.0659 | 0.1264 | +91.84% | +93.16% | +93.16% | **the runs differ** |
+| mission time (s) | 23.29 | 17.43 | -25.17% | -25.21% | -25.21% | shown, not judged |
+| seconds airborne per mission | 23.27 | 17.41 | -25.19% | -25.23% | -25.23% | shown, not judged |
+| cruise override, mean | 1 | 1.516 | +51.65% | +51.98% | +51.98% | **the runs differ** |
 
 ### mixed: 20 drones x 4 missions, 3 to 8 m; handed back: yes
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per mission (J, declared model: motors and avionics over the fleet window) | 499.3 | 410.5 | -17.79% | -17.79% | -17.82% | **confirmed better** |
-| fleet energy over the window (J, declared model) | 3.994e+04 | 3.284e+04 | -17.79% | -17.79% | -17.82% | **confirmed better** |
-| missions per charge at the autopilot's reserve | 5.336 | 6.49 | +21.64% | +21.64% | +21.68% | **confirmed better** |
+| energy per mission (J, declared model: motors and avionics over the fleet window) | 499.3 | 410.3 | -17.82% | -17.79% | -17.79% | **confirmed better** |
+| fleet energy over the window (J, declared model) | 3.994e+04 | 3.282e+04 | -17.82% | -17.79% | -17.79% | **confirmed better** |
+| missions per charge at the autopilot's reserve | 5.336 | 6.493 | +21.68% | +21.64% | +21.64% | **confirmed better** |
 | missions over their deadline (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | drones that broke the battery reserve | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | control ticks with two drones under half the keep-out apart (near misses) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
-| closest two drones ever came (m) | 0.2999 | 0.1741 | -41.96% | -41.96% | -46.46% | **the runs differ** |
-| tracking error, RMS (m; the compass's reading, held inside its band) | 0.07449 | 0.1386 | +86.02% | +86.02% | +83.00% | **the runs differ** |
-| mission time (s) | 18.19 | 14.38 | -20.94% | -20.94% | -21.01% | shown, not judged |
-| seconds airborne per mission | 18.17 | 14.36 | -20.96% | -20.96% | -21.03% | shown, not judged |
-| cruise override, mean | 1 | 1.483 | +48.32% | +48.32% | +48.58% | **the runs differ** |
+| closest two drones ever came (m) | 0.3003 | 0.1608 | -46.46% | -41.96% | -41.96% | **the runs differ** |
+| tracking error, RMS (m; the compass's reading, held inside its band) | 0.07469 | 0.1367 | +83.00% | +86.02% | +86.02% | **the runs differ** |
+| mission time (s) | 18.19 | 14.37 | -21.01% | -20.94% | -20.94% | shown, not judged |
+| seconds airborne per mission | 18.17 | 14.35 | -21.03% | -20.96% | -20.96% | shown, not judged |
+| cruise override, mean | 1 | 1.486 | +48.58% | +48.32% | +48.32% | **the runs differ** |
 
 ### short: 20 drones x 4 missions, 3 to 3 m; handed back: yes
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per mission (J, declared model: motors and avionics over the fleet window) | 337.7 | 312.6 | -7.43% | -7.43% | -7.43% | **confirmed better** |
-| fleet energy over the window (J, declared model) | 2.702e+04 | 2.501e+04 | -7.43% | -7.43% | -7.43% | **confirmed better** |
-| missions per charge at the autopilot's reserve | 7.888 | 8.522 | +8.03% | +8.03% | +8.03% | **confirmed better** |
+| energy per mission (J, declared model: motors and avionics over the fleet window) | 337.7 | 312.6 | -7.42% | -7.43% | -7.42% | **confirmed better** |
+| fleet energy over the window (J, declared model) | 2.702e+04 | 2.501e+04 | -7.42% | -7.43% | -7.42% | **confirmed better** |
+| missions per charge at the autopilot's reserve | 7.888 | 8.521 | +8.02% | +8.03% | +8.02% | **confirmed better** |
 | missions over their deadline (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | drones that broke the battery reserve | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | control ticks with two drones under half the keep-out apart (near misses) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
-| closest two drones ever came (m) | 0.3047 | 0.1561 | -48.77% | -48.77% | -48.77% | shown, not judged |
-| tracking error, RMS (m; the compass's reading, held inside its band) | 0.08571 | 0.1523 | +77.74% | +77.74% | +77.74% | shown, not judged |
-| mission time (s) | 13.29 | 11.44 | -13.87% | -13.87% | -13.87% | shown, not judged |
-| seconds airborne per mission | 13.27 | 11.42 | -13.89% | -13.89% | -13.89% | shown, not judged |
-| cruise override, mean | 1 | 1.445 | +44.54% | +44.54% | +44.54% | shown, not judged |
+| closest two drones ever came (m) | 0.307 | 0.2264 | -26.26% | -48.77% | -26.26% | **the runs differ** |
+| tracking error, RMS (m; the compass's reading, held inside its band) | 0.08475 | 0.1524 | +79.79% | +77.74% | +79.79% | shown, not judged |
+| mission time (s) | 13.29 | 11.45 | -13.84% | -13.87% | -13.84% | shown, not judged |
+| seconds airborne per mission | 13.27 | 11.43 | -13.87% | -13.89% | -13.87% | shown, not judged |
+| cruise override, mean | 1 | 1.445 | +44.53% | +44.54% | +44.53% | shown, not judged |
 
 ## Across the untouched cells Omni moved
 

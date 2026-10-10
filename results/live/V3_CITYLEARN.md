@@ -7,9 +7,9 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 
 | Run | GitHub run | Commit | Engine | Districts in the run |
 |---|---|---|---|---:|
-| A | 37568381751 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 22 |
-| B | 37568399439 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 22 |
-| C | 37568416917 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 22 |
+| A | 38013416444 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 22 |
+| B | 38013421915 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 22 |
+| C | 38013427418 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 22 |
 
 ## Districts with electric batteries: omni against native, each run
 
@@ -27,7 +27,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -0.72% | -0.72% | -0.72% | **confirmed better** |
 | distance from zero net energy (`zero_net_energy`) | -0.10% | -0.10% | -0.10% | **confirmed better** |
 | energy not served (`annual_normalized_unserved_energy_total`) | +0.00% | +0.00% | +0.00% | same |
-| time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | **the runs differ** |
+| time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | same |
 
 ### citylearn_challenge_2022_phase_all_robustness: 17 buildings, 17 batteries, 0 water tanks left native, 8,760 hours
 
@@ -169,7 +169,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -0.71% | -0.71% | -0.71% | **confirmed better** |
 | distance from zero net energy (`zero_net_energy`) | -0.58% | -0.58% | -0.58% | **confirmed better** |
 | energy not served (`annual_normalized_unserved_energy_total`) | +0.00% | +0.00% | +0.00% | same |
-| time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | same |
+| time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | **the runs differ** |
 
 ### vt_chittenden_county_neighborhood: 47 buildings, 47 batteries, 11 water tanks left native, 8,760 hours
 
@@ -185,7 +185,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -0.23% | -0.23% | -0.23% | **confirmed better** |
 | distance from zero net energy (`zero_net_energy`) | -0.33% | -0.33% | -0.33% | **confirmed better** |
 | energy not served (`annual_normalized_unserved_energy_total`) | +0.00% | +0.00% | +0.00% | same |
-| time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | same |
+| time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | **the runs differ** |
 
 ## Across the districts with batteries
 
@@ -203,7 +203,7 @@ A district counts only when all three runs agree.
 | monthly load unevenness | 9 | 2 (citylearn_challenge_2022_phase_all_robustness, citylearn_challenge_2023_phase_2_local_evaluation) | 0 | 0 |
 | distance from zero net energy | 10 | 1 (citylearn_challenge_2023_phase_3_2) | 0 | 0 |
 | energy not served | 0 | 7 (citylearn_challenge_2023_phase_2_local_evaluation, citylearn_challenge_2023_phase_2_online_evaluation_1, citylearn_challenge_2023_phase_2_online_evaluation_2, citylearn_challenge_2023_phase_2_online_evaluation_3, citylearn_challenge_2023_phase_3_1, citylearn_challenge_2023_phase_3_2, citylearn_challenge_2023_phase_3_3) | 3 | 0 |
-| time uncomfortable | 1 | 6 (citylearn_challenge_2023_phase_2_local_evaluation, citylearn_challenge_2023_phase_2_online_evaluation_1, citylearn_challenge_2023_phase_2_online_evaluation_2, citylearn_challenge_2023_phase_3_1, citylearn_challenge_2023_phase_3_2, citylearn_challenge_2023_phase_3_3) | 2 | 1 |
+| time uncomfortable | 1 | 6 (citylearn_challenge_2023_phase_2_local_evaluation, citylearn_challenge_2023_phase_2_online_evaluation_1, citylearn_challenge_2023_phase_2_online_evaluation_2, citylearn_challenge_2023_phase_3_1, citylearn_challenge_2023_phase_3_2, citylearn_challenge_2023_phase_3_3) | 1 | 2 |
 
 ## Districts with no electric battery: nothing for Omni to move
 
@@ -212,7 +212,7 @@ The runner changes only `electrical_storage` commands, so in these districts omn
 | District | Buildings | Water tanks (native) | Scores where native and omni differ in A | Reproduced over A, B, C |
 |---|---:|---:|---|---|
 | baeda_3dem | 4 | 7 | none | yes |
-| quebec_neighborhood_with_demand_response_set_points | 20 | 0 | time uncomfortable +0.41% | no |
+| quebec_neighborhood_with_demand_response_set_points | 20 | 0 | time uncomfortable +0.09% | no |
 | quebec_neighborhood_without_demand_response_set_points | 20 | 0 | time uncomfortable +0.18% | no |
 
 ## Districts CityLearn cannot run with its own controller
@@ -228,7 +228,7 @@ The same for native and omni; listed, never dropped.
 | citylearn_three_phase_dynamic_assets_only_demo_15s_parquet | `ValueError: topology_mode='dynamic' requires interface='entity'.` |
 | citylearn_three_phase_dynamic_topology_demo | `ValueError: topology_mode='dynamic' requires interface='entity'.` |
 | citylearn_three_phase_electrical_service_demo | `ValueError: Unknown action name: deferrable_appliance_deferrable_appliance_1` |
-| citylearn_three_phase_electrical_service_demo_15s_parquet | `FileNotFoundError: [Errno 2] Failed to open local file '/tmp/cl/data/datasets/citylearn_three_phase_electrical_service_d` |
+| citylearn_three_phase_electrical_service_demo_15s_parquet | `ImportError: Reading Parquet CityLearn datasets requires the optional 'pyarrow' dependency. Install pyarrow or use CSV f` |
 
 ---
 

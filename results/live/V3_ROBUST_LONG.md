@@ -1,4 +1,4 @@
-# Robustness: the long run, 7,200 s an arm, the governor's memory and decisions watched: the A/B/C confirmation (Omni v3)
+# Robustness: the long run, 7,200 s an arm, the governor's memory and decisions watched: the A/B/C confirmation (Omni v3): the A/B/C confirmation (Omni v3)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
 
@@ -7,42 +7,42 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 
 | Run | GitHub run | Commit | Engine | Paired repetitions |
 |---|---|---|---|---:|
-| A | 37716886448 | `bd389c409ad9` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
-| B | 37716900258 | `bd389c409ad9` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
-| C | 37716913526 | `bd389c409ad9` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
+| A | 38013462081 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
+| B | 38013467123 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
+| C | 38013471943 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
 
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
-| worker nodes in service, mean | -0.2% (-1.0 to +0.6) | -2.7% (-14.6 to +9.1) | -0.2% (-1.0 to +0.6) | no difference beyond the noise (all three runs) |
-| node-hours | -0.2% (-1.1 to +0.6) | -2.8% (-14.5 to +9.0) | -0.2% (-1.1 to +0.7) | no difference beyond the noise (all three runs) |
-| energy, parked workers still on at idle power (Wh, declared model) | -0.4% (-1.2 to +0.4) | -0.2% (-0.7 to +0.2) | -0.2% (-0.6 to +0.2) | no difference beyond the noise (all three runs) |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | -0.5% (-1.5 to +0.5) | -2.0% (-10.0 to +6.0) | -0.3% (-1.2 to +0.6) | no difference beyond the noise (all three runs) |
-| response time (ms), mean | -46.0% (-80.1 to -11.9) | -38.9% (-96.5 to +18.7) | -42.1% (-91.9 to +7.7) | no difference beyond the noise in 2 of 3 runs |
-| response time (ms), 95th percentile | -59.1% (-115.7 to -2.5) | -40.3% (-109.3 to +28.7) | -53.8% (-140.7 to +33.2) | no difference beyond the noise in 2 of 3 runs |
-| response time (ms), 99th percentile | -30.6% (-46.3 to -15.0) | -13.9% (-29.7 to +1.9) | -21.6% (-55.6 to +12.4) | no difference beyond the noise in 2 of 3 runs |
-| time over the response line (% of samples) | -48.5% (-95.9 to -1.1) | -30.2% (-88.3 to +28.0) | -35.2% (-84.4 to +14.1) | no difference beyond the noise in 2 of 3 runs |
-| failed requests (%) | -11.2% (-44.2 to +21.7) | -12.7% (-41.3 to +16.0) | -14.0% (-49.1 to +21.2) | no difference beyond the noise (all three runs) |
+| worker nodes in service, mean | -1.9% (-9.9 to +6.2) | +0.0% (-0.0 to +0.0) | -4.1% (-20.1 to +11.9) | no difference beyond the noise (all three runs) |
+| node-hours | -1.9% (-9.8 to +6.1) | -0.0% (-0.4 to +0.3) | -4.0% (-20.3 to +12.3) | no difference beyond the noise (all three runs) |
+| energy, parked workers still on at idle power (Wh, declared model) | -0.4% (-0.7 to -0.0) | -0.3% (-1.2 to +0.6) | -0.1% (-1.1 to +1.0) | no difference beyond the noise in 2 of 3 runs |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | -1.6% (-7.0 to +3.9) | -0.3% (-1.2 to +0.6) | -2.8% (-13.5 to +7.9) | no difference beyond the noise (all three runs) |
+| response time (ms), mean | -43.9% (-113.1 to +25.3) | -45.2% (-75.0 to -15.5) | -33.5% (-84.5 to +17.5) | no difference beyond the noise in 2 of 3 runs |
+| response time (ms), 95th percentile | -58.6% (-153.2 to +35.9) | -49.8% (-64.4 to -35.1) | -41.9% (-102.6 to +18.7) | no difference beyond the noise in 2 of 3 runs |
+| response time (ms), 99th percentile | -18.0% (-40.7 to +4.6) | -37.5% (-73.7 to -1.2) | +6.1% (-64.9 to +77.1) | no difference beyond the noise in 2 of 3 runs |
+| time over the response line (% of samples) | -42.8% (-126.4 to +40.9) | -45.3% (-47.9 to -42.8) | -33.2% (-106.1 to +39.6) | no difference beyond the noise in 2 of 3 runs |
+| failed requests (%) | -12.6% (-53.6 to +28.4) | -8.0% (-19.9 to +4.0) | -7.1% (-26.8 to +12.6) | no difference beyond the noise (all three runs) |
 | pods with no machine to take them (unschedulable) | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
 | time pods had no machine to take them, pod-minutes | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | +7.9% (-103.1 to +118.9) | -18.9% (-139.0 to +101.2) | +14.1% (-155.1 to +183.4) | shown, not judged |
-| utilisation (used / allocatable) | -2.3% (-6.7 to +2.1) | -0.2% (-3.9 to +3.5) | -1.3% (-4.8 to +2.1) | shown, not judged |
-| CPU used (cores), mean | -2.5% (-6.8 to +1.9) | -1.7% (-4.8 to +1.5) | -1.5% (-5.2 to +2.2) | shown, not judged |
-| Omni's own CPU (cores), mean | +0.0099 (+nan to +nan) | +0.00825 (-0.008903 to +0.0254) | +0.0095 (+nan to +nan) | shown, not judged |
-| CPU used with Omni's own (cores), mean | -2.1% (+nan to +nan) | -1.9% (-13.0 to +9.2) | +0.6% (+nan to +nan) | shown, not judged |
-| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | +2.4% (-2.1 to +7.0) | +0.1% (-1.6 to +1.9) | +1.6% (-2.8 to +6.0) | shown, not judged |
-| HPA replicas, mean | -0.1% (-1.0 to +0.7) | -7.2% (-37.6 to +23.2) | -0.2% (-0.5 to +0.1) | no difference beyond the noise (all three runs) |
-| pods started | +20.0% (-129.1 to +169.1) | +53.3% (-50.1 to +156.8) | +35.7% (-45.6 to +117.0) | no difference beyond the noise (all three runs) |
-| pod start wait, total (s) | +19.6% (-199.3 to +238.5) | +20.4% (-55.6 to +96.4) | +24.1% (-91.7 to +139.8) | no difference beyond the noise (all three runs) |
-| pod start wait, mean (s) | -9.6% (-86.6 to +67.4) | -8.2% (-144.6 to +128.3) | +3.4% (-136.0 to +142.8) | no difference beyond the noise (all three runs) |
-| host CPU busy, the real machine under kind (%) | -1.7% (-5.6 to +2.2) | -1.2% (-3.7 to +1.4) | -0.9% (-4.0 to +2.2) | shown, not judged |
+| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | +79.9% (-258.0 to +417.9) | +46.0% (-55.3 to +147.4) | +4.9% (-221.5 to +231.4) | shown, not judged |
+| utilisation (used / allocatable) | -2.0% (-5.5 to +1.5) | -1.5% (-5.3 to +2.4) | +1.4% (-13.0 to +15.8) | shown, not judged |
+| CPU used (cores), mean | -3.1% (-6.1 to -0.0) | -1.5% (-5.3 to +2.4) | -1.4% (-9.6 to +6.7) | shown, not judged |
+| Omni's own CPU (cores), mean | +0.0063 (+nan to +nan) | +0.008 (+nan to +nan) | +0.0083 (-0.006947 to +0.02355) | shown, not judged |
+| CPU used with Omni's own (cores), mean | -3.7% (+nan to +nan) | -1.1% (+nan to +nan) | +0.7% (-12.7 to +14.1) | shown, not judged |
+| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | +2.4% (-1.3 to +6.1) | +1.5% (-2.5 to +5.6) | -2.0% (-20.0 to +16.1) | shown, not judged |
+| HPA replicas, mean | -4.4% (-23.9 to +15.0) | +0.2% (-0.7 to +1.0) | -4.7% (-24.0 to +14.6) | no difference beyond the noise (all three runs) |
+| pods started | +9.5% (-92.9 to +112.0) | -35.3% (-151.3 to +80.7) | +35.0% (-133.0 to +203.0) | no difference beyond the noise (all three runs) |
+| pod start wait, total (s) | +4.5% (-115.0 to +124.1) | -37.3% (-126.0 to +51.4) | +50.0% (-187.4 to +287.4) | no difference beyond the noise (all three runs) |
+| pod start wait, mean (s) | +3.9% (-146.4 to +154.2) | -35.9% (-139.4 to +67.5) | -0.5% (-93.0 to +92.1) | no difference beyond the noise (all three runs) |
+| host CPU busy, the real machine under kind (%) | -2.1% (-4.4 to +0.2) | -0.8% (-4.0 to +2.4) | -0.6% (-8.6 to +7.4) | shown, not judged |
 | host cores (the real machine under kind) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | shown, not judged |
-| robust: governor resident memory, mean of the last ten minutes over the first ten, the most over the repetitions | 1.048 | 1.067 | 1.052 | no leak (every repetition under 1.25) |
+| robust: governor resident memory, mean of the last ten minutes over the first ten, the most over the repetitions | 1.067 | 1.053 | 1.073 | no leak (every repetition under 1.25) |
 | robust: decisions made, the fewest repetition's share of the count the configured interval predicts for the window (120) | 97.5% | 97.5% | 97.5% | valid (every repetition at 95% of the expected or more) |
-| robust: failed decisions over the whole window (the governor could not read the cluster that second), with the API's own reason | 2 | 3 | 3 | shown, not judged: API 500 for apis/autoscaling/v2/horizontalpodautoscalers; the governor held and resumed |
-| robust: the governor's decision time, mean of the last hour over the first (the gap between decisions less the configured interval), the most over the repetitions | 1.20 | 1.14 | 1.07 | no growth beyond the limit (every repetition under 1.5) |
+| robust: failed decisions over the whole window (the governor could not read the cluster that second), with the API's own reason | 1 | 3 | 5 | shown, not judged: API 500 for apis/autoscaling/v2/horizontalpodautoscalers; the governor held and resumed |
+| robust: the governor's decision time, mean of the last hour over the first (the gap between decisions less the configured interval), the most over the repetitions | 1.15 | 1.27 | 1.30 | no growth beyond the limit (every repetition under 1.5) |
 | robust: every setting handed back at the end and read back at the operator's, no record left, every repetition | yes | yes | yes | **confirmed: every setting handed back at the end of every repetition** |
 
-Readings: 1 confirmed: every setting handed back at the end of every repetition, 9 no difference beyond the noise (all three runs), 4 no difference beyond the noise in 2 of 3 runs, 1 no growth beyond the limit (every repetition under 1.5), 1 no leak (every repetition under 1.25), 2 same, 8 shown, not judged, 1 shown, not judged: API 500 for apis/autoscaling/v2/horizontalpodautoscalers; the governor held and resumed, 1 valid (every repetition at 95% of the expected or more).
+Readings: 1 confirmed: every setting handed back at the end of every repetition, 8 no difference beyond the noise (all three runs), 5 no difference beyond the noise in 2 of 3 runs, 1 no growth beyond the limit (every repetition under 1.5), 1 no leak (every repetition under 1.25), 2 same, 8 shown, not judged, 1 shown, not judged: API 500 for apis/autoscaling/v2/horizontalpodautoscalers; the governor held and resumed, 1 valid (every repetition at 95% of the expected or more).
 
 ---
 

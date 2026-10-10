@@ -7,103 +7,111 @@ Redis as shipped with the operator's memory ceiling (64 MB, allkeys-lru) is nati
 
 | Run | GitHub run | Commit | Engine | Workloads |
 |---|---|---|---|---:|
-| A | 37704450300 | `467f73eba7a6` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
-| B | 37704464642 | `467f73eba7a6` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
-| C | 37704479534 | `467f73eba7a6` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
+| A | 38013287665 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
+| B | 38013291972 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
+| C | 38013296599 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 4 |
 
 ## tuning: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run (the tuning workload, shown and not counted)
 
-Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms store trip; steps 1 2 3 2 3 4 5 6 5 4 3 2 1 2 1 × 20.0 s; the operator's ceiling 64 MB, the cover 16 to 512 MB.
+Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms store trip; steps 1 2 3 2 3 4 5 6 5 4 3 2 1 2 1 × 30.0 s; the operator's ceiling 64 MB, the cover 16 to 512 MB.
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (requests a second answered within the line) | 1,131 | 1,304 | +15.3% (+14.2 to +16.5) | +15.2% (+14.4 to +16.0) | +15.3% (+14.3 to +16.3) | **confirmed better** |
-| throughput (requests a second) | 1,500 | 1,500 | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | no difference beyond the noise (3 of 3 runs) |
-| cache hit rate | 0.754 | 0.87 | +15.3% (+14.2 to +16.5) | +15.2% (+14.5 to +15.9) | +15.3% (+14.3 to +16.3) | **confirmed better** |
-| latency, 95th percentile (ms) | 5.62 | 5.57 | -1.0% (-1.6 to -0.3) | -1.2% (-1.4 to -1.1) | -1.3% (-1.6 to -1.0) | **confirmed better** |
-| latency, 99th percentile (ms) | 5.69 | 5.67 | -0.3% (-0.8 to +0.1) | -0.2% (-0.3 to -0.2) | -0.3% (-0.4 to -0.3) | no difference beyond the noise (1 of 3 runs) |
-| latency, mean (ms) | 1.46 | 0.836 | -42.9% (-46.0 to -39.9) | -42.5% (-44.8 to -40.1) | -43.2% (-46.1 to -40.3) | **confirmed better** |
+| work inside the response line (requests a second answered within the line) | 1,184 | 1,181 | -0.2% (-0.3 to -0.1) | +0.5% (-2.0 to +3.1) | +1.5% (+0.7 to +2.4) | **the runs disagree** |
+| throughput (requests a second) | 1,500 | 1,500 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | no difference beyond the noise (3 of 3 runs) |
+| cache hit rate | 0.789 | 0.788 | -0.2% (-0.3 to -0.1) | +0.5% (-2.0 to +3.1) | +1.5% (+0.7 to +2.4) | **the runs disagree** |
+| latency, 95th percentile (ms) | 5.74 | 5.75 | +0.1% (-0.0 to +0.2) | -0.1% (-0.2 to +0.0) | -0.2% (-1.1 to +0.7) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 5.8 | 5.81 | +0.2% (-0.1 to +0.5) | +0.1% (-0.1 to +0.3) | -0.0% (-0.5 to +0.4) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 1.35 | 1.36 | +1.0% (+0.5 to +1.4) | -1.5% (-9.5 to +6.5) | -5.3% (-7.2 to -3.4) | **the runs disagree** |
 | failed requests | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 298.6 | +366.6% (+364.5 to +368.7) | +362.6% (+356.6 to +368.6) | +364.0% (+360.6 to +367.3) | **confirmed WORSE** |
-| memory used, mean (MB) | 61.1 | 269.1 | +340.6% (+339.6 to +341.6) | +336.1% (+329.2 to +343.1) | +337.7% (+333.9 to +341.5) | **confirmed WORSE** |
-| keys evicted | 106,700 | 28,696 | -73.1% (-75.8 to -70.4) | -72.4% (-76.2 to -68.7) | -72.0% (-73.3 to -70.6) | shown, not judged |
-| host CPU busy (share of the run) | 0.119 | 0.097 | -18.4% (-33.8 to -3.1) | -7.8% (-49.2 to +33.6) | -17.8% (-74.1 to +38.6) | no difference beyond the noise (2 of 3 runs) |
-| host CPU-seconds | 140.5 | 113.7 | -19.1% (-37.2 to -1.0) | -7.6% (-53.4 to +38.2) | -18.3% (-80.1 to +43.5) | no difference beyond the noise (2 of 3 runs) |
-| host CPU-seconds per 1,000 requests inside the line | 0.414 | 0.29 | -29.9% (-46.2 to -13.5) | -19.8% (-63.8 to +24.3) | -29.1% (-87.1 to +28.9) | no difference beyond the noise (2 of 3 runs) |
-| ceiling changes written (the knob's moves) | 0 | 97.0 | +97 (+92.7 to +101) | +101 (+95.5 to +106) | +98.7 (+97.2 to +100) | shown, not judged |
+| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 63.5 | -0.8% (-3.8 to +2.2) | +1.5% (-8.6 to +11.6) | +4.8% (+0.5 to +9.2) | no difference beyond the noise (2 of 3 runs) |
+| memory used, mean (MB) | 61.2 | 60.8 | -0.7% (-3.2 to +1.8) | +1.7% (-8.4 to +11.8) | +5.1% (+0.5 to +9.7) | no difference beyond the noise (2 of 3 runs) |
+| keys evicted | 138,149 | 140,340 | +1.6% (+0.3 to +2.8) | -0.8% (-10.6 to +9.1) | -5.0% (-7.8 to -2.2) | shown, not judged |
+| host CPU busy (share of the run) | 0.13 | 0.122 | -5.9% (-24.0 to +12.1) | -9.5% (-36.7 to +17.6) | +7.2% (-18.6 to +32.9) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 218.1 | 202.9 | -6.9% (-27.6 to +13.8) | -10.8% (-41.2 to +19.6) | +8.2% (-20.6 to +37.0) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 requests inside the line | 0.409 | 0.382 | -6.7% (-27.4 to +13.9) | -11.2% (-43.6 to +21.3) | +6.5% (-22.5 to +35.6) | no difference beyond the noise (3 of 3 runs) |
+| ceiling changes written (the knob's moves) | 0 | 22.0 | +22 (+15.4 to +28.6) | +22.7 (+10.9 to +34.4) | +21.7 (+17.9 to +25.5) | shown, not judged |
 
 The ceiling handed back to the operator's and read back at the end of every omni arm in every run: yes.
+
+The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 56 to 72 (15 trials, 2 allowed, 1 refused); acting: 56 to 64 (16 trials, 1 allowed, 0 refused); acting: 56 to 72 (14 trials, 2 allowed, 1 refused); run B: acting: 56 to 72 (17 trials, 2 allowed, 0 refused); acting: 48 to 80 (17 trials, 4 allowed, 0 refused); acting: 56 to 64 (16 trials, 1 allowed, 0 refused); run C: acting: 56 to 72 (17 trials, 2 allowed, 0 refused); acting: 48 to 80 (15 trials, 4 allowed, 0 refused); acting: 56 to 72 (14 trials, 2 allowed, 2 refused).
 
 ## burst: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run
 
-Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms store trip; steps 1 6 1 8 1 6 × 20.0 s; the operator's ceiling 64 MB, the cover 16 to 512 MB.
+Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms store trip; steps 1 6 1 8 1 6 × 30.0 s; the operator's ceiling 64 MB, the cover 16 to 512 MB.
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (requests a second answered within the line) | 1,046 | 1,200 | +14.7% (+11.3 to +18.1) | +13.9% (+11.3 to +16.6) | +13.9% (+11.2 to +16.6) | **confirmed better** |
-| throughput (requests a second) | 1,500 | 1,500 | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | no difference beyond the noise (3 of 3 runs) |
-| cache hit rate | 0.698 | 0.8 | +14.7% (+11.4 to +18.0) | +13.9% (+11.3 to +16.6) | +13.9% (+11.1 to +16.7) | **confirmed better** |
-| latency, 95th percentile (ms) | 5.75 | 5.74 | -0.2% (-0.3 to -0.1) | -0.6% (-0.9 to -0.4) | -0.3% (-0.4 to -0.2) | **confirmed better** |
-| latency, 99th percentile (ms) | 5.82 | 5.81 | -0.0% (-0.5 to +0.4) | -0.2% (-0.4 to +0.1) | -0.1% (-0.1 to -0.1) | no difference beyond the noise (2 of 3 runs) |
-| latency, mean (ms) | 1.86 | 1.3 | -30.5% (-38.2 to -22.8) | -30.1% (-35.6 to -24.5) | -29.4% (-35.4 to -23.4) | **confirmed better** |
+| work inside the response line (requests a second answered within the line) | 1,077 | 1,076 | -0.0% (-0.1 to +0.0) | -0.0% (-0.2 to +0.2) | -0.1% (-0.3 to +0.1) | no difference beyond the noise (3 of 3 runs) |
+| throughput (requests a second) | 1,500 | 1,500 | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | no difference beyond the noise (3 of 3 runs) |
+| cache hit rate | 0.718 | 0.718 | -0.0% (-0.1 to +0.0) | -0.0% (-0.2 to +0.2) | -0.1% (-0.2 to +0.1) | no difference beyond the noise (3 of 3 runs) |
+| latency, 95th percentile (ms) | 5.57 | 5.56 | -0.2% (-0.8 to +0.4) | -0.0% (-0.2 to +0.2) | +0.0% (-0.4 to +0.5) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 5.66 | 5.66 | -0.0% (-0.4 to +0.4) | +0.1% (-0.2 to +0.4) | +0.1% (-0.3 to +0.6) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 1.6 | 1.6 | -0.1% (-1.1 to +1.0) | +0.3% (-0.1 to +0.7) | +0.4% (-0.2 to +1.0) | no difference beyond the noise (3 of 3 runs) |
 | failed requests | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 201.3 | +214.6% (+145.8 to +283.3) | +204.8% (+140.2 to +269.4) | +204.9% (+139.1 to +270.8) | **confirmed WORSE** |
-| memory used, mean (MB) | 56.9 | 155.8 | +173.6% (+134.9 to +212.3) | +171.4% (+136.3 to +206.6) | +171.1% (+135.3 to +206.9) | **confirmed WORSE** |
-| keys evicted | 49,913 | 9,703 | -80.6% (-92.7 to -68.4) | -77.6% (-88.6 to -66.5) | -77.5% (-88.2 to -66.9) | shown, not judged |
-| host CPU busy (share of the run) | 0.141 | 0.129 | -8.7% (-38.9 to +21.6) | -2.7% (-60.0 to +54.6) | -8.5% (-38.4 to +21.5) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 63.2 | 58.1 | -8.1% (-43.5 to +27.3) | -2.2% (-67.7 to +63.4) | -8.0% (-42.9 to +27.0) | no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 requests inside the line | 0.504 | 0.404 | -19.9% (-53.3 to +13.5) | -14.1% (-76.7 to +48.5) | -19.2% (-50.8 to +12.4) | no difference beyond the noise (3 of 3 runs) |
-| ceiling changes written (the knob's moves) | 0 | 33.0 | +33 (+12.7 to +53.3) | +30.7 (+10.4 to +50.9) | +29.7 (+11.4 to +48) | shown, not judged |
+| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 61.2 | -4.3% (-5.5 to -3.1) | -4.6% (-5.3 to -3.9) | -3.7% (-8.6 to +1.2) | no difference beyond the noise (1 of 3 runs) |
+| memory used, mean (MB) | 57.1 | 55.3 | -3.2% (-4.4 to -2.0) | -3.5% (-4.4 to -2.6) | -2.7% (-6.4 to +1.0) | no difference beyond the noise (1 of 3 runs) |
+| keys evicted | 71,668 | 71,754 | +0.1% (-0.1 to +0.4) | +0.1% (-0.5 to +0.7) | +0.2% (-0.2 to +0.6) | shown, not judged |
+| host CPU busy (share of the run) | 0.102 | 0.109 | +6.7% (-87.7 to +101.2) | +2.4% (-68.4 to +73.2) | +5.5% (-5.6 to +16.5) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds | 72.8 | 78.5 | +7.8% (-97.3 to +112.8) | +2.4% (-80.2 to +85.0) | +6.4% (-5.9 to +18.6) | no difference beyond the noise (3 of 3 runs) |
+| host CPU-seconds per 1,000 requests inside the line | 0.376 | 0.405 | +7.8% (-97.2 to +112.8) | +2.4% (-80.3 to +85.2) | +6.4% (-5.7 to +18.6) | no difference beyond the noise (3 of 3 runs) |
+| ceiling changes written (the knob's moves) | 0 | 10.0 | +10 (+10 to +10) | +10 (+10 to +10) | +8.67 (+2.93 to +14.4) | shown, not judged |
 
 The ceiling handed back to the operator's and read back at the end of every omni arm in every run: yes.
+
+The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 56 to 64 (4 trials, 1 allowed, 0 refused); acting: 56 to 64 (4 trials, 1 allowed, 0 refused); acting: 56 to 64 (4 trials, 1 allowed, 0 refused); run B: acting: 56 to 64 (4 trials, 1 allowed, 0 refused); acting: 56 to 64 (4 trials, 1 allowed, 0 refused); acting: 56 to 64 (4 trials, 1 allowed, 0 refused); run C: acting: 56 to 64 (4 trials, 1 allowed, 0 refused); acting: 56 to 64 (4 trials, 1 allowed, 0 refused); left native (3 trials, 0 allowed, 1 refused).
 
 ## large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run
 
-Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms store trip; steps 1 2 3 2 3 4 5 6 5 4 3 2 1 2 1 × 20.0 s; the operator's ceiling 64 MB, the cover 16 to 512 MB.
+Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms store trip; steps 1 2 3 2 3 4 5 6 5 4 3 2 1 2 1 × 30.0 s; the operator's ceiling 64 MB, the cover 16 to 512 MB.
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (requests a second answered within the line) | 1,251 | 1,425 | +13.9% (+13.8 to +14.0) | +13.8% (+13.6 to +14.1) | +13.7% (+13.3 to +14.1) | **confirmed better** |
-| throughput (requests a second) | 1,500 | 1,500 | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | no difference beyond the noise (3 of 3 runs) |
-| cache hit rate | 0.834 | 0.95 | +13.9% (+13.8 to +14.0) | +13.8% (+13.6 to +14.1) | +13.7% (+13.3 to +14.1) | **confirmed better** |
-| latency, 95th percentile (ms) | 5.75 | 2.52 | -56.1% (-169.8 to +57.6) | -3.4% (-4.3 to -2.5) | -6.5% (-6.7 to -6.2) | no difference beyond the noise (1 of 3 runs) |
-| latency, 99th percentile (ms) | 5.82 | 5.78 | -0.6% (-0.6 to -0.5) | -0.5% (-0.8 to -0.3) | -1.1% (-1.4 to -0.9) | **confirmed better** |
-| latency, mean (ms) | 1.11 | 0.469 | -57.9% (-58.1 to -57.6) | -57.8% (-59.3 to -56.3) | -60.7% (-62.8 to -58.7) | **confirmed better** |
+| work inside the response line (requests a second answered within the line) | 1,267 | 1,287 | +1.6% (-1.4 to +4.6) | +2.1% (+2.0 to +2.2) | +3.2% (+1.1 to +5.3) | no difference beyond the noise (1 of 3 runs) |
+| throughput (requests a second) | 1,500 | 1,500 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | same |
+| cache hit rate | 0.845 | 0.859 | +1.6% (-1.3 to +4.6) | +2.1% (+2.0 to +2.2) | +3.2% (+1.1 to +5.3) | no difference beyond the noise (1 of 3 runs) |
+| latency, 95th percentile (ms) | 5.74 | 5.75 | +0.1% (-0.4 to +0.6) | -0.4% (-0.6 to -0.2) | -0.1% (-0.1 to -0.0) | no difference beyond the noise (1 of 3 runs) |
+| latency, 99th percentile (ms) | 5.8 | 5.82 | +0.3% (-0.3 to +0.9) | -0.1% (-0.3 to +0.1) | -0.1% (-0.4 to +0.2) | no difference beyond the noise (3 of 3 runs) |
+| latency, mean (ms) | 1.05 | 0.984 | -6.5% (-20.1 to +7.0) | -10.1% (-10.8 to -9.3) | -15.9% (-26.9 to -5.0) | no difference beyond the noise (1 of 3 runs) |
 | failed requests | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 256.4 | +300.7% (+296.8 to +304.5) | +297.0% (+285.1 to +308.8) | +294.2% (+282.2 to +306.2) | **confirmed WORSE** |
-| memory used, mean (MB) | 61.2 | 221.7 | +262.0% (+258.4 to +265.6) | +257.8% (+246.4 to +269.3) | +254.6% (+242.1 to +267.1) | **confirmed WORSE** |
-| keys evicted | 73,285 | 17,277 | -76.4% (-77.4 to -75.4) | -75.9% (-77.3 to -74.6) | -75.6% (-78.1 to -73.2) | shown, not judged |
-| host CPU busy (share of the run) | 0.11 | 0.0928 | -15.6% (-26.3 to -4.9) | -5.3% (-42.6 to +31.9) | -17.4% (-46.9 to +12.0) | no difference beyond the noise (2 of 3 runs) |
-| host CPU-seconds | 121.0 | 102.8 | -15.0% (-27.1 to -3.0) | -3.6% (-45.4 to +38.3) | -17.5% (-49.9 to +14.9) | no difference beyond the noise (2 of 3 runs) |
-| host CPU-seconds per 1,000 requests inside the line | 0.322 | 0.24 | -25.4% (-36.7 to -14.1) | -15.3% (-54.7 to +24.1) | -27.5% (-54.9 to +0.0) | no difference beyond the noise (2 of 3 runs) |
-| ceiling changes written (the knob's moves) | 0 | 159.0 | +159 (+157 to +161) | +160 (+159 to +162) | +161 (+160 to +163) | shown, not judged |
+| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 64.0 | +0.0% (-5.2 to +5.3) | +0.5% (-0.1 to +1.0) | +3.6% (-2.5 to +9.7) | no difference beyond the noise (3 of 3 runs) |
+| memory used, mean (MB) | 61.3 | 60.9 | -0.7% (-5.7 to +4.3) | +0.0% (-1.2 to +1.2) | +3.1% (-2.3 to +8.5) | no difference beyond the noise (3 of 3 runs) |
+| keys evicted | 103,325 | 94,452 | -8.6% (-24.4 to +7.3) | -11.3% (-11.9 to -10.7) | -17.2% (-28.9 to -5.4) | shown, not judged |
+| host CPU busy (share of the run) | 0.118 | 0.122 | +3.4% (-24.6 to +31.4) | -21.1% (-36.8 to -5.4) | +33.0% (-40.5 to +106.5) | no difference beyond the noise (2 of 3 runs) |
+| host CPU-seconds | 197.5 | 204.9 | +3.8% (-27.8 to +35.4) | -23.1% (-40.7 to -5.5) | +35.4% (-43.3 to +114.0) | no difference beyond the noise (2 of 3 runs) |
+| host CPU-seconds per 1,000 requests inside the line | 0.346 | 0.354 | +2.1% (-31.8 to +36.0) | -24.7% (-42.3 to -7.0) | +31.0% (-43.4 to +105.5) | no difference beyond the noise (2 of 3 runs) |
+| ceiling changes written (the knob's moves) | 0 | 27.7 | +27.7 (+20.1 to +35.3) | +27 (+20.4 to +33.6) | +29.3 (+25.5 to +33.1) | shown, not judged |
 
 The ceiling handed back to the operator's and read back at the end of every omni arm in every run: yes.
+
+The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 56 to 72 (17 trials, 2 allowed, 1 refused); acting: 40 to 80 (19 trials, 5 allowed, 1 refused); acting: 56 to 72 (18 trials, 2 allowed, 2 refused); run B: acting: 56 to 72 (17 trials, 2 allowed, 2 refused); acting: 56 to 72 (17 trials, 2 allowed, 2 refused); acting: 56 to 72 (19 trials, 2 allowed, 2 refused); run C: acting: 56 to 80 (20 trials, 3 allowed, 2 refused); acting: 56 to 72 (17 trials, 2 allowed, 3 refused); acting: 56 to 80 (18 trials, 3 allowed, 2 refused).
 
 ## small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run
 
-Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms store trip; steps 1 2 3 2 3 4 5 6 5 4 3 2 1 2 1 × 20.0 s; the operator's ceiling 64 MB, the cover 16 to 512 MB.
+Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms store trip; steps 1 2 3 2 3 4 5 6 5 4 3 2 1 2 1 × 30.0 s; the operator's ceiling 64 MB, the cover 16 to 512 MB.
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (requests a second answered within the line) | 832.4 | 1,049 | +26.0% (+25.7 to +26.4) | +26.0% (+25.7 to +26.3) | +26.6% (+24.9 to +28.2) | **confirmed better** |
-| throughput (requests a second) | 1,500 | 1,500 | +0.0% (+0.0 to +0.0) | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | no difference beyond the noise (2 of 3 runs) |
-| cache hit rate | 0.555 | 0.7 | +26.1% (+25.7 to +26.4) | +26.0% (+25.7 to +26.3) | +26.5% (+25.0 to +28.1) | **confirmed better** |
-| latency, 95th percentile (ms) | 5.64 | 5.6 | -0.6% (-0.8 to -0.4) | -0.6% (-0.8 to -0.3) | -0.4% (-0.5 to -0.3) | **confirmed better** |
-| latency, 99th percentile (ms) | 5.7 | 5.68 | -0.3% (-0.5 to -0.1) | -0.2% (-0.2 to -0.1) | -4.9% (-12.1 to +2.3) | no difference beyond the noise (1 of 3 runs) |
-| latency, mean (ms) | 2.54 | 1.75 | -31.1% (-31.1 to -31.0) | -30.9% (-31.8 to -30.1) | -30.7% (-33.0 to -28.3) | **confirmed better** |
+| work inside the response line (requests a second answered within the line) | 925.0 | 926.1 | +0.1% (-3.0 to +3.2) | -0.6% (-0.7 to -0.5) | -0.4% (-0.6 to -0.2) | no difference beyond the noise (1 of 3 runs) |
+| throughput (requests a second) | 1,500 | 1,500 | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | no difference beyond the noise (3 of 3 runs) |
+| cache hit rate | 0.617 | 0.618 | +0.1% (-3.0 to +3.2) | -0.6% (-0.6 to -0.5) | -0.4% (-0.6 to -0.3) | no difference beyond the noise (1 of 3 runs) |
+| latency, 95th percentile (ms) | 5.21 | 5.21 | +0.1% (-0.2 to +0.3) | +0.1% (-0.4 to +0.6) | -0.0% (-0.1 to +0.0) | no difference beyond the noise (3 of 3 runs) |
+| latency, 99th percentile (ms) | 5.27 | 5.33 | +1.1% (-0.9 to +3.2) | +0.1% (-0.2 to +0.5) | +0.1% (+0.0 to +0.2) | no difference beyond the noise (2 of 3 runs) |
+| latency, mean (ms) | 2.04 | 2.04 | +0.0% (-4.5 to +4.5) | +1.1% (+0.4 to +1.8) | +0.7% (+0.4 to +0.9) | no difference beyond the noise (1 of 3 runs) |
 | failed requests | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 270.4 | +322.5% (+309.6 to +335.4) | +319.9% (+307.0 to +332.7) | +325.0% (+307.2 to +342.7) | **confirmed WORSE** |
-| memory used, mean (MB) | 60.3 | 210.7 | +249.2% (+248.1 to +250.3) | +248.4% (+248.3 to +248.6) | +250.8% (+244.6 to +257.0) | **confirmed WORSE** |
-| keys evicted | 185,038 | 16,311 | -91.2% (-94.0 to -88.3) | -89.9% (-90.3 to -89.5) | -91.8% (-98.7 to -84.9) | shown, not judged |
-| host CPU busy (share of the run) | 0.143 | 0.125 | -12.5% (-15.2 to -9.8) | -2.6% (-63.6 to +58.4) | -11.7% (-27.8 to +4.4) | no difference beyond the noise (2 of 3 runs) |
-| host CPU-seconds | 170.0 | 148.4 | -12.7% (-15.5 to -9.8) | -1.5% (-69.2 to +66.3) | -11.4% (-30.3 to +7.6) | no difference beyond the noise (2 of 3 runs) |
-| host CPU-seconds per 1,000 requests inside the line | 0.68 | 0.471 | -30.7% (-34.5 to -26.9) | -21.8% (-81.3 to +37.6) | -30.0% (-49.9 to -10.1) | no difference beyond the noise (1 of 3 runs) |
-| ceiling changes written (the knob's moves) | 0 | 50.3 | +50.3 (+34.4 to +66.3) | +49.7 (+37.4 to +61.9) | +48 (+38.1 to +57.9) | shown, not judged |
+| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 65.5 | +2.4% (-11.2 to +16.0) | -0.9% (-1.1 to -0.7) | -0.1% (-0.8 to +0.5) | no difference beyond the noise (2 of 3 runs) |
+| memory used, mean (MB) | 60.7 | 62.1 | +2.4% (-11.8 to +16.6) | -1.2% (-1.3 to -1.1) | -0.4% (-1.3 to +0.4) | no difference beyond the noise (2 of 3 runs) |
+| keys evicted | 243,056 | 242,642 | -0.2% (-8.4 to +8.0) | +2.3% (+2.3 to +2.4) | +1.2% (-0.7 to +3.1) | shown, not judged |
+| host CPU busy (share of the run) | 0.0646 | 0.0718 | +11.1% (-29.4 to +51.7) | +1.2% (-6.7 to +9.2) | -8.3% (-16.1 to -0.4) | no difference beyond the noise (2 of 3 runs) |
+| host CPU-seconds | 114.3 | 127.7 | +11.8% (-31.0 to +54.5) | +1.2% (-8.1 to +10.6) | -9.5% (-18.4 to -0.6) | no difference beyond the noise (2 of 3 runs) |
+| host CPU-seconds per 1,000 requests inside the line | 0.275 | 0.306 | +11.6% (-27.7 to +50.9) | +1.8% (-7.7 to +11.4) | -9.1% (-17.9 to -0.4) | no difference beyond the noise (2 of 3 runs) |
+| ceiling changes written (the knob's moves) | 0 | 21.0 | +21 (+7.85 to +34.1) | +25.7 (+22.8 to +28.5) | +22.3 (+13.6 to +31.1) | shown, not judged |
 
 The ceiling handed back to the operator's and read back at the end of every omni arm in every run: yes.
 
-**Across 3 untouched workloads: 12 gauge-rows confirmed better, 6 confirmed worse, 0 where the runs disagree.**
+The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 56 to 64 (18 trials, 1 allowed, 0 refused); acting: 56 to 64 (16 trials, 1 allowed, 0 refused); acting: 56 to 72 (15 trials, 2 allowed, 0 refused); run B: acting: 56 to 64 (18 trials, 1 allowed, 0 refused); acting: 56 to 64 (18 trials, 1 allowed, 0 refused); acting: 56 to 64 (18 trials, 1 allowed, 0 refused); run C: acting: 56 to 64 (12 trials, 1 allowed, 0 refused); acting: 56 to 72 (15 trials, 2 allowed, 0 refused); acting: 56 to 64 (16 trials, 1 allowed, 0 refused).
+
+**Across 3 untouched workloads: 0 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree.**
 
 ---
 

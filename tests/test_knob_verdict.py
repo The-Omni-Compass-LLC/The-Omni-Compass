@@ -87,6 +87,39 @@ class ASpendKnob(unittest.TestCase):
         self.assertEqual(v.counts["abandoned"], 0)
         self.assertGreaterEqual(v.counts["allowed"], 1, "the consumer that drains the queue pays, and the step is allowed")
 
+    def test_a_spend_trial_is_not_ended_by_the_calm_it_causes(self):
+        """Amendment 3 (10 October 2026): the harness tells the verdict the service is calm the moment the spend works (the
+        force drops below the cushion). The spend trial must still run to its samples and be judged; only the wall ends it."""
+        v = kv.KnobVerdict(2, 1, (1, 8), objective=kv.RESOURCE, min_samples=5, probe_every=10, recheck=30, settle_s=1.0)
+        cur = 2
+        for t in range(60):
+            v.observe(kv.sample_cost(kv.RESOURCE, work=100.0 * cur, latency=1.0 / cur ** 2, resource=cur, cpu_share=0.3), float(t))
+            calm = cur > 2                                   # the extra consumer drains the queue: the compass reads calm at once
+            target, why, info = v.decide(8, spend_ok=(cur == 2), give_ok=False, t=float(t), why="compass", stress=not calm, calm=calm)
+            cur = target
+        self.assertEqual(v.counts["abandoned"], 0, "the calm the spend causes never ends its own trial")
+        self.assertGreaterEqual(v.counts["allowed"], 1)
+        # the wall still ends every trial
+        v2 = kv.KnobVerdict(2, 1, (1, 8), objective=kv.RESOURCE, min_samples=5, probe_every=10, recheck=30, settle_s=1.0)
+        cur = 2
+        for t in range(8):
+            v2.observe(kv.sample_cost(kv.RESOURCE, work=100.0, latency=0.5, resource=cur, cpu_share=0.3), float(t))
+            target, why, info = v2.decide(8, spend_ok=(cur == 2), give_ok=False, t=float(t), why="compass", stress=True, calm=False, fail_up=(t == 6))
+            cur = target
+        self.assertEqual(v2.counts["abandoned"], 1, "a fail-up abandons the running trial")
+        self.assertEqual(cur, 2, "and the fail-up is clamped to the allowance: with no step allowed yet, native")
+
+    def test_a_give_back_trial_still_ends_when_the_service_leaves_calm(self):
+        v = kv.KnobVerdict(20, 1, (2, 20), objective=kv.RESOURCE, min_samples=5, probe_every=10, recheck=30, settle_s=1.0)
+        cur = 20
+        for t in range(12):
+            v.observe(kv.sample_cost(kv.RESOURCE, work=100.0, latency=0.01, resource=cur, cpu_share=0.3), float(t))
+            stress = t >= 6                                  # the service leaves calm mid-trial
+            target, why, info = v.decide(2, spend_ok=False, give_ok=not stress, t=float(t), why="compass", stress=stress, calm=not stress)
+            cur = target
+        self.assertEqual(v.counts["abandoned"], 1, "the engine's rule: never a give-back trial under stress")
+        self.assertEqual(cur, 20, "the knob is back at native")
+
 
 class AGiveBackKnob(unittest.TestCase):
     """A pool: connections given back cost nothing while the service holds."""

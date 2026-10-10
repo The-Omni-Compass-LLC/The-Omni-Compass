@@ -15,8 +15,12 @@ knob is fair. Nothing in the engine changes.
   the condition    a give-back step is tried while the service is calm and the stack's own give-back condition holds (the
                    engine's rule: a trial is never run under stress); a spend step is tried while the compass asks to spend
                    and the stack's own spend condition holds (a cache full and missing, messages waiting, clients queued),
-                   because that is the only time a spend can show what it buys. A trial once started runs on until its
-                   samples are in, unless the service swings to the other direction's condition, when it is abandoned.
+                   because that is the only time a spend can show what it buys. A give-back trial once started runs on
+                   until its samples are in unless the service leaves calm, when it is abandoned (the engine's rule). A
+                   spend trial runs to its samples whatever the compass's force: the spend's own effect calms the service
+                   within seconds, and a trial ended on that calm could never be judged (the first counted set of 10
+                   October 2026 abandoned every Kafka spend trial that way; amendment 3 in the five preregistrations). Only
+                   the wall (a fail-up) or the engine's own time limit ends a spend trial early.
   the cost         one sample a second from the stack's own readings. Under the resource objective, the preregistered
                    reading of the Omni index, cost = resource held x host CPU busy share x latency / work: a step passes only
                    if the service gained outweighs the resource and CPU spent, by the index's own arithmetic (a geometric mean
@@ -118,10 +122,10 @@ class KnobVerdict:
         """The compass's wanted value becomes the knob's target: the phase's value while a trial holds the knob, the wanted
         value clamped to the allowance otherwise. spend_ok / give_ok: the stack's own conditions for a step in each direction
         this second (the compass asking to spend with the stack full and missing; calm with the stack holding its demand).
-        stress / calm: the service past the cushion toward the line / inside the calm cushion (the compass's force), which
-        end a running trial of the other kind: a give-back trial is abandoned when the service leaves calm (the engine's
-        rule), a spend trial when the service is calm enough to give back. fail_up: the service at the wall: every trial is
-        abandoned and the knob goes where the fail-up says, native always free, never beyond the allowance.
+        stress / calm: the service past the cushion toward the line / inside the calm cushion (the compass's force): a
+        give-back trial is abandoned when the service leaves calm (the engine's rule); a spend trial runs to its samples
+        whatever the force (amendment 3, 10 October 2026). fail_up: the service at the wall: every trial is abandoned and
+        the knob goes where the fail-up says, native always free, never beyond the allowance.
         Returns (target, why, info)."""
         self.t = t
         order = [SPEND, GIVE] if self.phase_dir != GIVE else [GIVE, SPEND]
@@ -135,7 +139,11 @@ class KnobVerdict:
             if fail_up:
                 go_on = False
             elif v.phase is not None:
-                go_on = (not stress) if name == GIVE else (not calm)     # a trial runs on unless the service swings the other way
+                # a give-back trial is abandoned when the service leaves calm (the engine's rule: never a trial under stress);
+                # a spend trial runs to its samples whatever the compass's force, because the spend's own effect calms the
+                # service within seconds and ending the trial on that calm would mean no spend could ever be judged (seen on
+                # every Kafka trial of the first counted set, 10 October 2026: amendment 3); only the wall ends it early
+                go_on = (not stress) if name == GIVE else True
             else:
                 go_on = ok[name] and holding in (None, name)             # a new trial only in a free second, in the direction asked for
             step, is_trial, ev = v.tick(go_on)

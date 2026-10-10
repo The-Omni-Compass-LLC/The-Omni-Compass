@@ -1,0 +1,57 @@
+# Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)
+
+Source: GitHub Actions workflow `six`, run 37430723080 (Omni v3, commit ea99eb6818cb); the pooled receipt `six-receipts/SIX.md`, archived in `results/live/raw/run-37430723080/`.
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+
+
+Evidence class **S** (models). Commit(s) ea99eb6818cb. Native: each organism's own controllers. Omni: the compass law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 are nested. Band first: no win unless the time over the service line is no higher than native's.
+
+## 1 run
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 430 | 1 | **ONE RUN (no label)** | held | +0.077% | -0.000% | -0.077% | -0.018 | True |
+| 2 | Physics / Robotics / Autonomous | 376 | 1 | **ONE RUN (no label)** | held | +0.093% | -0.000% | -0.092% | -0.017 | True |
+| 3 | Energy / Facility / Industrial | 470 | 1 | **ONE RUN (no label)** | held | +0.318% | -0.000% | -0.317% | -0.020 | True |
+| 4 | Distribution / Specialized | 440 | 1 | **ONE RUN (no label)** | held | +0.214% | -0.000% | -0.213% | -0.014 | True |
+| 5 | The four stacked, duplicates kept | 1716 | 1 | **ONE RUN (no label)** | held | +0.401% | +0.001% | -0.399% | -0.018 | True |
+| 6 | The whole tower, every muscle once | 945 | 1 | **ONE RUN (no label)** | held | +0.318% | -0.000% | -0.317% | -0.010 | True |
+
+## 10 runs
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 430 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.087% (+0.082 to +0.092) | +0.000% (-0.001 to +0.001) | -0.087% (-0.092 to -0.082) | -0.015 (-0.017 to -0.013) | True |
+| 2 | Physics / Robotics / Autonomous | 376 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.061% (+0.044 to +0.077) | -0.005% (-0.014 to +0.003) | -0.066% (-0.077 to -0.054) | -0.012 (-0.020 to -0.004) | True |
+| 3 | Energy / Facility / Industrial | 470 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.390% (+0.326 to +0.454) | -0.000% (-0.001 to +0.001) | -0.389% (-0.453 to -0.325) | -0.017 (-0.022 to -0.013) | True |
+| 4 | Distribution / Specialized | 440 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.164% (+0.126 to +0.203) | +0.000% (-0.000 to +0.001) | -0.164% (-0.202 to -0.125) | -0.012 (-0.016 to -0.008) | True |
+| 5 | The four stacked, duplicates kept | 1716 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.393% (+0.298 to +0.489) | +0.000% (-0.000 to +0.001) | -0.391% (-0.486 to -0.297) | -0.017 (-0.021 to -0.013) | True |
+| 6 | The whole tower, every muscle once | 945 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.387% (+0.323 to +0.452) | -0.002% (-0.005 to +0.002) | -0.388% (-0.452 to -0.324) | -0.008 (-0.010 to -0.006) | True |
+
+## 100 runs
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 430 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.084% (+0.080 to +0.087) | +0.000% (-0.000 to +0.000) | -0.084% (-0.087 to -0.081) | -0.015 (-0.016 to -0.013) | True |
+| 2 | Physics / Robotics / Autonomous | 376 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.064% (+0.060 to +0.068) | -0.001% (-0.002 to +0.001) | -0.064% (-0.068 to -0.061) | -0.011 (-0.013 to -0.009) | True |
+| 3 | Energy / Facility / Industrial | 470 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.366% (+0.347 to +0.384) | -0.000% (-0.001 to +0.000) | -0.364% (-0.382 to -0.346) | -0.016 (-0.018 to -0.015) | True |
+| 4 | Distribution / Specialized | 440 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.176% (+0.166 to +0.187) | -0.000% (-0.001 to +0.000) | -0.176% (-0.187 to -0.166) | -0.011 (-0.013 to -0.010) | True |
+| 5 | The four stacked, duplicates kept | 1716 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.368% (+0.348 to +0.388) | +0.000% (-0.000 to +0.000) | -0.366% (-0.386 to -0.346) | -0.019 (-0.020 to -0.018) | True |
+| 6 | The whole tower, every muscle once | 945 | 100 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.365% (+0.347 to +0.383) | -0.000% (-0.001 to +0.000) | -0.363% (-0.381 to -0.346) | -0.008 (-0.009 to -0.007) | True |
+
+## 1000 runs
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 430 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.085% (+0.084 to +0.086) | +0.000% (+0.000 to +0.000) | -0.085% (-0.086 to -0.084) | -0.016 (-0.016 to -0.015) | True |
+| 2 | Physics / Robotics / Autonomous | 376 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.064% (+0.063 to +0.065) | +0.000% (-0.000 to +0.000) | -0.064% (-0.065 to -0.063) | -0.011 (-0.012 to -0.010) | True |
+| 3 | Energy / Facility / Industrial | 470 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.368% (+0.362 to +0.374) | +0.000% (+0.000 to +0.000) | -0.367% (-0.373 to -0.361) | -0.018 (-0.018 to -0.017) | True |
+| 4 | Distribution / Specialized | 440 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.171% (+0.168 to +0.175) | +0.000% (+0.000 to +0.000) | -0.171% (-0.174 to -0.168) | -0.012 (-0.013 to -0.012) | True |
+| 5 | The four stacked, duplicates kept | 1716 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.354% (+0.348 to +0.360) | +0.000% (+0.000 to +0.000) | -0.353% (-0.358 to -0.347) | -0.019 (-0.020 to -0.019) | True |
+| 6 | The whole tower, every muscle once | 945 | 1000 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.367% (+0.362 to +0.373) | +0.000% (+0.000 to +0.000) | -0.366% (-0.372 to -0.360) | -0.008 (-0.009 to -0.008) | True |
+
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*

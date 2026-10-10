@@ -7,9 +7,9 @@ MuJoCo (Google DeepMind) integrates each arm; MuJoCo Menagerie supplies the robo
 
 | Run | GitHub run | Commit | Engine | Robots in the run |
 |---|---|---|---|---:|
-| A | 37568387334 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
-| B | 37568405026 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
-| C | 37568422829 | `69f027ec9387` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
+| A | 38013384848 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
+| B | 38013389391 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
+| C | 38013393952 | `3aac0ab7d384` | omni-v3 (digest b53d05449ee04c4b, 40 files) | 3 |
 
 ## Robots where Omni moved the override
 

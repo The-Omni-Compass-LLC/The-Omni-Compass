@@ -156,6 +156,18 @@ dispatched with `workloads=all`, `reps=3`, `step_s=30`: under the resource objec
 (`tools/redis_abc.py`), the index, the wiring page and the benefit sheet are read again, and the set this one supersedes goes whole to
 `docs/history`.
 
+## Amendment 3 (2026-10-10 13:05 UTC, after the first counted set on amendment 2, before the next): a spend trial runs to its samples
+
+The first counted set on the brain's verdict (runs 38013287665, 38013291972, 38013296599 under the resource objective and 38013357351, 38013361862, 38013366329 under the service objective; the table `results/live/V3_REDIS.md` and `results/live/V3_REDIS_SERVICE.md`) landed at midday on 10 October. What it showed about the trials: most trials in both directions were abandoned before they could be judged: of 14 to 20 trials an omni arm, 10 to 17 were abandoned, 1 to 5 allowed, 0 to 3 refused; the allowance stayed at one notch each way (56 to 72 MB) and every gauge read inside the noise in both objectives: no gain, no loss.
+
+**The cause is ours.** Amendment 2 ended a trial when the service swung to the other direction's condition: a give-back trial when the service left calm (the engine's own rule, kept), and a spend trial when the service turned calm. A spend that works calms the service within seconds, so a spend trial could never reach its samples: every successful spend ended its own trial unjudged. Nothing in the stack and nothing in the engine did this; the engine's verdict ends a trial when the condition it is given ends, and we gave it the wrong condition for spending. Found on the first set, corrected before the second, declared here.
+
+**From this amendment** (`tools/knob_verdict.py`, the harness outside the engine; Omni v3 unchanged): a spend trial, once started, runs to its samples whatever the compass's force; only the wall (a fail-up) or the engine's own time limit on a trial ends it early. A give-back trial still ends when the service leaves calm. The conditions to start a trial, the cost, the judge, the allowance and the recheck are unchanged.
+
+**Expected before the runs:** under the resource objective the first spend notch is judged and most likely refused (12.5% more memory buys about one percent of latency on these workloads: the cost rises), so the ceiling stays near the operator's and the category reads nothing; under the service objective the spend notches are judged on latency and work alone and allowed while the hit rate rises, the ceiling growing to perhaps 100 to 200 MB with work inside the line and the hit rate up by less than the first set's +14% to +27%. The first set's table stands as the result of amendment 2 until the set on this amendment lands and supersedes it; it then goes whole to `docs/history`.
+
+**Dispatch.** None yet at the time of writing; the runs are dispatched when this amendment is pushed, and their ids are recorded in `docs/RERUN_2026-10-10.md`.
+
 ---
 
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass

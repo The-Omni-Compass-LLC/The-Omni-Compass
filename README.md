@@ -46,14 +46,15 @@ energy and made its 95th percentile 43-84% slower:
 **Two readings of one index, both in `results/OMNI_INDEX.md`.** The resource reading (the headline below) scores work,
 speed, machines and energy together, so a governor that buys speed with memory pays for the memory. The service reading,
 declared on 9 October at the founder's question about what a cache is for, scores work and speed only and shows the
-resources beside them: **+71.8%** over the same six categories (Kubernetes +83%, Kafka +1,193%, Redis +8.8%, the three
-database stacks exactly nothing, because their gains are resources given back). Neither hides a loss; each says a
+resources beside them: **+10.7%** over the same six categories on the sets of 10 October (Kubernetes +84.5%; the five
+stacks exactly nothing, because their gains are resources given back, and on Kafka and Redis the brain's first set could not
+yet judge a spend: amendment 3, the next set running). Neither hides a loss; each says a
 different true thing, and the first is the one preregistered.
 
 **Wire in, or watch.** Omni is wired out of every muscle and into a knob only where the paired measurement shows the
 muscle no worse for it; where it shows nothing, or a loss, the muscle stays native and Omni only reads it.
 `docs/WIRING_VERDICTS.md` gives every knob in every result one of three words from the tables themselves, **write**,
-**watch** or **operator's choice**: on the real stacks 12 of 24 knob-cases write, 7 are trades the operator decides and 5
+**watch** or **operator's choice**: on the real stacks' sets of 10 October 11 of 24 knob-cases write, 0 are trades and 13
 watch; of the 945 modelled muscles 124 write and 808 stay native, 746 of them because the native controller never left
 the band. Every confirmed loss is listed there with its cause.
 
@@ -61,31 +62,20 @@ the band. Every confirmed loss is listed there with its cause.
 plus is always good for Omni and minus always bad, whatever the gauge measures: less energy, fewer machines, less memory and
 a shorter wait all read plus. Beside it: yes, no, none or trade. It is built from the tables by `tools/benefit_sheet.py`.
 
-**The Omni index, every real test together: +20.5%** more for the same, or the same for less, across work, speed,
-machines and energy, six real categories each weighed the same: real Kubernetes on v3 +28.8% over seven tests (work +19%, speed +107%,
-machines +5%, energy +2%); the real database on v3 +4.0% (on the second counted set: connections held open −36% to −38% on
-the read-only workload with CPU and latency inside the noise; the first set's CPU cost was our own harness, measured and
-removed, and its table is kept in the history; on the slow write workload the add rule buys connections above the operator's
-setting, confirmed worse and counted against it); real messaging on v3, Apache Kafka, +166.9% (work inside the line +17%; a 95th
-percentile of 1.6 s against 9 to 14 ms, because native's queue grew at nine tenths of its capacity and Omni's did not;
-consumers held 2 → 6 to 8, confirmed worse and counted against it); and the real cache on v3, Redis, **−24.9%** (work inside
-the line +14% to +27% and the hit rate +14% to +27%, confirmed better; the memory ceiling held 64 → 200 to 270 MB,
-confirmed worse, the resource the gain costs, which outweighs the gain in the geometric mean; CPU inside the noise); and
-the real database's storage-engine cache on v3, MongoDB under YCSB, **+8.5%** (the second counted set: the cache given back
-by a quarter to a third on all four untouched workloads, confirmed better, with work, p95, mean latency and CPU inside the
-noise; the first set's larger saving came from a cold cache emptied before its first eviction and cost latency, and it is
-kept in the history); and the real database's buffer pool on v3, MySQL under sysbench, **+5.2%** (the third counted set:
-the pool held −49% to −56% on burst, confirmed better; on read_write the pages the pool holds +44% to +52%, confirmed worse,
-with the host's CPU −4% to −6%, confirmed better, a trade; read_only inside the noise and update_index disagreeing; the pool
-handed back on all 45 omni arms; the two earlier sets kept whole in the history). Only a
-row confirmed in all three runs enters; a row inside the noise counts as exactly zero. Azure's billed runs and the card
-join the index when their three-run tables land (the earlier engine's +12.9% is kept in
-`docs/history/OMNI_INDEX_pre_v1.md`). Every number is read from each test's own table by
-[`tools/omni_index.py`](tools/omni_index.py): [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md).
-Each test: [`V3_STEADY`](results/live/V3_STEADY.md), [`V3_WANDERING`](results/live/V3_WANDERING.md),
-[`V3_ALL_FOUR`](results/live/V3_ALL_FOUR.md), [`V3_FAULTS`](results/live/V3_FAULTS.md), [`V3_FAIRNESS`](results/live/V3_FAIRNESS.md),
-[`V3_BATCH`](results/live/V3_BATCH.md), [`V3_PGBENCH`](results/live/V3_PGBENCH.md), [`V3_KAFKA`](results/live/V3_KAFKA.md),
-[`V3_REDIS`](results/live/V3_REDIS.md), [`V3_YCSB`](results/live/V3_YCSB.md).
+**The Omni index, every real test together: +4.8%** more for the same, or the same for less, across work, speed,
+machines and energy, six real categories each weighed the same, on the sets of 10 October (every benchmark run again on one
+commit, `docs/RERUN_2026-10-10.md`): real Kubernetes on v3 +28.9% over seven tests (work +26%, speed +106%, machines +4%,
+energy +2%); the real database on v3, PostgreSQL behind PgBouncer, +0.8% (connections held open −6% to −11% on `select`,
+confirmed better, with CPU and latency inside the noise, the add above the operator's setting refused on the slow write
+workload, no loss); real messaging on v3, Apache Kafka, +0.1% (consumers 2 → 1.98 to 1.99, every other gauge inside the
+noise: every spend trial was abandoned before it could be judged, our wiring, amended the same day as amendment 3, the next
+set running); the real cache on v3, Redis, exactly nothing (every gauge inside the noise under both objectives, the same
+amendment); the real database's storage-engine cache on v3, MongoDB under YCSB, +0.7% (the cache held −3% to −13% on `f`,
+confirmed better, nothing worse); the real database's buffer pool on v3, MySQL under sysbench, +1.0% (the pool held −10% to
+−20% on `read_write`, confirmed better, the earlier memory cost gone, nothing worse). These are the first sets on which the
+brain's own verdict judged every notch on the stack before it was written: the number came down from +20.5% because the
+spends that bought the earlier gains at a resource cost were refused or not yet judged, and every gain left is one the brain
+proved on the stack itself. No row is a loss. The earlier tables are whole in `docs/history`.
 
 Six organisms with the real cluster inside (the four realms, the whole tower of 945 muscles, the four stacked, 1,716),
 on an earlier engine: late 23-52% less often and 24-40% faster in every one
