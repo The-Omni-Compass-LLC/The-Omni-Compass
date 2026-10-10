@@ -70,7 +70,6 @@ replaces native; every comparison is native against omni.
 
 ## The result on real Kubernetes
 
-
 Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v3**, the frozen and
 fingerprinted engine ([`docs/OMNI_V3.md`](docs/OMNI_V3.md): v1's law and controllers byte for byte, the muscle catalog grown to 945 and a do-no-harm gate on speed knobs; the v1 tables, [`docs/OMNI_V1.md`](docs/OMNI_V1.md), read the same and stay as the first engine's record). Every test ran three times as separate GitHub runs (A the
 result, B and C the replications); a reading below is **confirmed** only when it holds in all three runs with every 95%

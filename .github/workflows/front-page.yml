@@ -29,11 +29,16 @@ on:
 permissions:
   contents: write
   actions: read
-concurrency: {group: front-page, cancel-in-progress: false}
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.'
 jobs:
   refresh:
+    # a run that skipped itself or was cancelled has nothing new to show; only a finished run (or the hour, or a hand) refreshes
+    if: >-
+      github.event_name != 'workflow_run' ||
+      contains(fromJSON('["success", "failure", "timed_out"]'), github.event.workflow_run.conclusion)
+    # one refresh at a time; the queue is the job's, so a run whose job is skipped never displaces one waiting to refresh
+    concurrency: {group: front-page, cancel-in-progress: false}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
