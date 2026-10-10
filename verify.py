@@ -393,6 +393,19 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "layout_check.py")], capture_output=True, text=True)
     check("the repository is lined up: the declared root, every link and every named path present (tools/layout_check.py)",
           r.returncode == 0, r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr[-300:])
+    # GitHub refuses a workflow file that does not parse and never runs it; it records only a failed run named after the file,
+    # which no local test saw for ten pushes on 10 October 2026 (an unquoted colon in a step name). Every workflow is parsed here.
+    import yaml
+    bad_workflows = []
+    for wf in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
+        try:
+            doc = yaml.safe_load(wf.read_text(encoding="utf-8"))
+            if not isinstance(doc, dict) or "jobs" not in doc or not ({"on", True} & set(doc)):   # YAML 1.1 reads `on` as True
+                bad_workflows.append(f"{wf.name}: no on/jobs mapping")
+        except Exception as e:  # noqa: BLE001  (any parse error is the finding)
+            bad_workflows.append(f"{wf.name}: {str(e).splitlines()[0][:90]}")
+    check("every GitHub workflow file parses as YAML with its on and jobs (a file that does not is never run by GitHub)",
+          not bad_workflows, "; ".join(bad_workflows)[:300])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_index.py")], capture_output=True, text=True)
     check("the Omni index rebuilds from every test's own result file (tools/omni_index.py)", r.returncode == 0, r.stderr[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "wiring_verdicts.py"), "--check"], capture_output=True, text=True)
