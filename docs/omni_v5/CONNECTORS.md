@@ -160,8 +160,8 @@ behalf, by the master's rules, never overriding the master) → **muscles** (do 
 are always the last word; whatever Omni does, and at whatever cost, is because the master set it that way.
 
 ## Build note
-- Code it as `omnicompass/connectors/` — one small adapter per muscle (read fn, write fn, readback fn, unit, edge-source),
-  all behind the one Plug interface already in `omnicompass/wire.py`. Discovery in `omnicompass/discover.py`. Panel +
+- Code it as omnicompass/connectors/* — one small adapter per muscle (read fn, write fn, readback fn, unit, edge-source),
+  all behind the one Plug interface already in omnicompass/wire.py. Discovery in omnicompass/discover.py. Panel +
   outside watcher as separate always-on processes. Nothing here changes the DNA.
 - Not pushed. When the founder says go: build adapters, wire discovery, run the modelled organisms through them, then the
   free clouds, then GPU on Lambda (one exact commit).

@@ -108,8 +108,8 @@ bloodline); every result names its seed; seeds can be crossed.
   Save+Max+bill+wear, zero-harm per muscle, kill drill; (4) founder review; (5) write into engine as next version, rerun
   all, verifier 0 FAIL under 3.12, push; (6) real clusters — GitHub (free), AKS, GCP; (7) GPU on Lambda, one exact commit.
 - **Files to touch when pushing:** `omnicompass/compass_law.py`, `omnicompass/verdict.py`, `realms/compass_arm.py`,
-  `realms/plants.py`, `realms/harness.py`, `realms/presets.py`, `tools/run_scale.py`, new `omnicompass/immune.py` +
-  `omnicompass/wear.py` + watcher/panel, `OMNI_V5.json`, `docs/OMNI_V5_PLAN.md`, manual chapter "The brain you build",
+  `realms/plants.py`, `realms/harness.py`, `realms/presets.py`, `tools/run_scale.py`, new omnicompass/immune.py +
+  omnicompass/wear.py + watcher/panel, `OMNI_V5.json`, docs/OMNI_V5_PLAN.md, manual chapter "The brain you build",
   `tools/omni_version.py`, `tools/legal.py` headers. Commit trailers: no model identifier (CLAUDE.md).
 
 ## 12. Switches, the real security threat, and a brain that breaks down
