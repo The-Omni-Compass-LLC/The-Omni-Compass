@@ -1,12 +1,27 @@
 # Changelog
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+
+## 2026-10-11
+- **The notice as the founder ordered it (night of 10 October).** Two sentences are struck from the legal notice everywhere,
+  and the notice now closes with the filing sentence and the website, nothing after it: "All patents, copyrights and
+  trademarks filed in the USA. www.omni-compass.com". `tools/legal.py` holds the new wording (the page notice, the source
+  header, the short line) and `--fix` wrote it into 663 files; the license papers (`LICENSE` and its SPDX copy, now revised
+  11 October 2026, `NOTICE`, `DISCLOSURES.md`), the README's line under the headline, the assistants' rules files
+  (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, Copilot's and Cursor's), `CITATION.cff`, `REUSE.toml`, `codemeta.json`, the SBOM,
+  the manual's front matter, the old closing lines of seventeen pages and the book's page footers, back cover and copyright
+  page were rewritten by hand, and the printed book was rebuilt (520 pages, neither sentence in its text). `--check`, which
+  `verify.py` runs on every push, now fails any file of any kind that still carries either sentence (`RETIRED`; a new test
+  in `tests/test_legal.py`). The frozen engine files never carried them: omni-v3 is unchanged and no result is read
+  differently. Two frozen originals keep a different sentence, about the introductory 10% license benchmark (that the
+  benchmark may change or be withdrawn): the reference engine (`reference/`, held by its recorded SHA-256 and program fingerprint) and its
+  dated source snapshot (`docs/handoff/`); they change only on the founder's word.
 
 ## 2026-10-10
 - **The notice everywhere, a front page the repository writes itself, and the book for the people who wire it (evening).**
   (1) **One legal notice, written once** (`tools/legal.py`): all rights reserved; all patents, copyrights and trademarks filed
-  in the USA; subject to change at any time; www.omni-compass.com the authority of record; every copy, export, report and
-  printout carries it with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. It now stands at the top and end of every page and table,
+  in the USA; www.omni-compass.com; every copy, export, report and printout carries it with `LICENSE`, `NOTICE` and
+  `DISCLOSURES.md`. It now stands at the top and end of every page and table,
   in the header of every script, source file and workflow, at the top and end of every workflow job's report, beside every
   file a workflow hands out (`legal-notice`), and in every zip (`tools/export_zip.py`); `verify.py` fails any push where a
   file lacks it. The 67 files locked by a fingerprint (the engine, its C++ twins, the reference engine, the pre-registered
@@ -35,8 +50,7 @@
   on rows 9, 13, 19, 32 and 42, any vendor's card in section 2.3, five families and the robotics widening for the catalog at v4, the
   mega-caps' closed systems mapped to the open analogs that carry the same muscles, a ledger node's consensus added to the
   exclusions (`docs/REGISTER.md`, `docs/COVERAGE_MAP.md`). (4) **The legal wording** on every page outside the frozen engine: "all"
-  before patents, copyrights and trademarks; "All rights reserved"; "subject to change at any time"; www.omni-compass.com the
-  authority of record; every export carries the notice, the license, the NOTICE and the disclosures (190 files, `LICENSE` section 9,
+  before patents, copyrights and trademarks; "All rights reserved"; www.omni-compass.com; every export carries the notice, the license, the NOTICE and the disclosures (190 files, `LICENSE` section 9,
   `NOTICE`, `DISCLOSURES.md` item 4, the SBOM's embedded license, `CLAUDE.md`). (5) **Two faults GitHub's own runs showed and no
   local check had**: the release manifest not refreshed after the morning's last document edits (GitHub's verify red on four commits;
   refreshed) and `.github/workflows/cpu-power.yml` refused by GitHub since its first push for an unquoted colon in a step name (ten
@@ -897,4 +911,4 @@ See `docs/HISTORY.md` and `docs/STATE_OF_PLAY.md`.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

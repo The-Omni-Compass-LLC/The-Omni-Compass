@@ -1,12 +1,12 @@
 # Omni-Compass
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
-The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com), the authority of record for Omni-Compass, its
-current state and its terms. Every copy, fork, export, report and printout of any part of Omni-Compass carries the notice
-above, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and [`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
+The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report and printout
+of any part of Omni-Compass carries the notice above, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and
+[`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
 
 ## Latest, newest first
 
@@ -53,8 +53,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-10 20:20 | big-organism-detached | success | [38083275110](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38083275110) |
-| 2026-10-10 19:46 | kwok-scale | success | [38080115336](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38080115336) |
+| 2026-10-11 00:09 | kwok-scale | success | [38096658891](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096658891) |
+| 2026-10-11 00:01 | kind-addons | cancelled | [38096241326](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096241326) |
+| 2026-10-10 23:51 | big-organism-detached | success | [38096351977](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096351977) |
 | 2026-10-10 17:21 | six | success | [38052254140](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38052254140) |
 | 2026-10-10 15:25 | ycsb | success | [38054787517](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054787517) |
 | 2026-10-10 15:16 | sysbench | success | [38054773573](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054773573) |
@@ -62,7 +63,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-10 14:53 | pgbench | success | [38054761503](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054761503) |
 | 2026-10-10 14:52 | redis | success | [38054800068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054800068) |
 | 2026-10-10 13:13 | cpu-power | failure | [38054876829](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054876829) |
-| 2026-10-10 07:15 | robustness | success | [38013471943](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38013471943) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
@@ -205,4 +205,4 @@ trademark license is granted for any other use.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

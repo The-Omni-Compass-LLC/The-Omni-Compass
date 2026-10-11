@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
-# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
-# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The legal tool: one notice under every title and at every end, older notices replaced and never doubled, headers rewritten
 after a shebang, every workflow job opening and closing its report with the notice while its own steps stay exactly as they
 were, the final job handing out the legal papers, locked files untouched, and the export bundle complete."""
@@ -94,6 +94,22 @@ class TestMarkdown(unittest.TestCase):
         page = f"# T\n\n> {legal.TOP}\n\nAll patent " + "applications, copyright registrations and trademark applications were filed.\n\n---\n\n*" + legal.NOTICE + "*\n"
         self.assertTrue(any("older filing" in p for p in legal.problems("x.md", page, "md")))
         self.assertTrue(legal.problems("y.md", "# T\n\nno notice\n", "md"))
+
+    def test_the_notice_closes_with_the_website_and_the_struck_wording_is_a_problem(self):
+        # the founder's order of 10 October (night): the filing sentence, then the website, nothing after it; the two struck
+        # sentences stand nowhere (spelled word by word here too, so this file carries neither)
+        close = "All patents, copyrights and trademarks filed in the USA. www.omni-compass.com"
+        self.assertTrue(legal.NOTICE.endswith(close) and legal.TOP.endswith(close) and legal.HEADER[-1] == close)
+        for r in legal.RETIRED:
+            for text in (legal.NOTICE, legal.SHORT, " ".join(legal.HEADER)):
+                self.assertNotIn(r, legal._flat(text))
+        struck = " ".join(("Everything", "here", "is", "subject", "to", "change", "at", "any", "time."))
+        page = f"# T\n\n> {legal.TOP}\n\nBody. {struck}\n\n---\n\n*{legal.NOTICE}*\n"
+        self.assertTrue(any("retired" in p for p in legal.problems("x.md", page, "md")))
+        old_top = "> © 2026 The Omni-Compass LLC. All rights reserved. " + struck + " See LICENSE."
+        fixed, _ = legal.normalize_markdown(f"# T\n\n{old_top}\n\nBody.\n")
+        self.assertFalse([r for r in legal.RETIRED if r in legal._flat(fixed)])
+        self.assertFalse(legal.problems("x.md", fixed, "md"))
 
 
 class TestHeaders(unittest.TestCase):

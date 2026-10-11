@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
-# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
-# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The legal notice, written once, and the check that it stands everywhere.
 
-The founder's order of 10 October 2026: every page, table, report, script, workflow run, export and chat answer about
-Omni-Compass carries "all rights reserved", "all patents, copyrights and trademarks filed in the USA", "subject to change at
-any time" and www.omni-compass.com as the authority of record, at its top and at its end, the way a company protects a
-released asset. This module holds the one wording and the machinery that keeps it in place.
+The founder's orders of 10 October 2026: every page, table, report, script, workflow run, export and chat answer about
+Omni-Compass carries "all rights reserved" and "all patents, copyrights and trademarks filed in the USA" followed by
+www.omni-compass.com and nothing after it, at its top and at its end, the way a company protects a released asset. Two
+earlier sentences of the notice were retired the same evening and may stand nowhere (RETIRED; --check fails on them). This
+module holds the one wording and the machinery that keeps it in place.
 
   python3 tools/legal.py --check           every file that lacks the notice or still carries an older wording; exit 1 if any
   python3 tools/legal.py --fix [PATH...]   write the notice wherever it is missing or old (all files, or only those under PATH)
@@ -37,33 +38,36 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-NOTICE = ("© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial "
-          "use, commercialization, monetization, production use, redistribution or hosted service of any part of "
-          "Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, "
-          "copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; "
-          "www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with "
-          "`LICENSE`, `NOTICE` and `DISCLOSURES.md`.")
-# the founder's wording of 10 October 2026: "all" before patents, copyrights and trademarks; all rights reserved; subject to
-# change at any time; the website the authority of record. Every generated report carries it at its top and at its end.
+BODY = ("© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial "
+        "use, commercialization, monetization, production use, redistribution or hosted service of any part of "
+        "Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, "
+        "report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.")
+CLOSE = "All patents, copyrights and trademarks filed in the USA. www.omni-compass.com"
+NOTICE = f"{BODY} {CLOSE}"
+# the founder's wording of 10 October 2026: "all" before patents, copyrights and trademarks; all rights reserved; and, as
+# ordered that evening, the website directly after the filing sentence with nothing after it. Every generated report
+# carries it at its top and at its end.
 SPDX = "SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0"
-TOP = f"{NOTICE} `{SPDX}`"                # a page's opening notice carries the license tag for the scanners (Black Duck, FOSSA, Snyk)
+TOP = f"{BODY} `{SPDX}` {CLOSE}"          # a page's opening notice carries the license tag for the scanners (Black Duck, FOSSA, Snyk)
 MARK = "© 2026 The Omni-Compass LLC"      # a page carrying this carries the notice in this wording or an earlier one
 PLAIN = re.sub(r"[*`]", "", NOTICE)       # the same words without Markdown, for plain text, PDFs and chat answers
 FILED = "All patents, copyrights and trademarks filed in the USA."
-SHORT = ("© 2026 The Omni-Compass LLC. All rights reserved. All patents, copyrights and trademarks filed in the USA. "
-         "Evaluation and simulation use only. Subject to change at any time; www.omni-compass.com is the authority of record.")
+SHORT = ("© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only. All patents, copyrights "
+         "and trademarks filed in the USA. www.omni-compass.com")
 HEADER = (
     "SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0",
     "Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.",
-    "All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,",
-    "monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;",
-    "www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.",
+    "Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid",
+    "Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.",
+    "All patents, copyrights and trademarks filed in the USA. www.omni-compass.com",
 )
 BUNDLE = ("README.md", "LICENSE", "NOTICE", "DISCLOSURES.md", "PATENTS.md", "TRADEMARKS.md")
 # the earlier filing sentence, written in two pieces so that --fix, which rewrites it everywhere, cannot rewrite it here
 OLD_FILED = re.compile("All patent " + "applications, copyright registrations and trademark applications")
-REQUIRED = ("omni-compass llc", "all rights reserved", "all patents, copyrights and trademarks", "subject to change at any time",
-            "omni-compass.com")
+REQUIRED = ("omni-compass llc", "all rights reserved", "all patents, copyrights and trademarks", "omni-compass.com")
+# the two sentences the founder retired from the notice on the evening of 10 October; no page, header, report or program
+# may carry them. Spelled word by word so that this file, which looks for them, carries neither
+RETIRED = (" ".join(("subject", "to", "change")), " ".join(("authority", "of", "record")))
 
 HASH, SLASH = "#", "//"
 BY_SUFFIX = {".py": HASH, ".sh": HASH, ".bash": HASH, ".yml": HASH, ".yaml": HASH, ".toml": HASH, ".cff": HASH, ".cfg": HASH,
@@ -152,7 +156,7 @@ def _legal_paragraph(par: list[str]) -> bool:
     if "omni-compass llc" not in t and "spdx-license-identifier" not in t:
         return False
     return any(h in t for h in ("evaluation and simulation use only", "enterprise license", "all rights reserved",
-                                "spdx-license-identifier", "proprietary", "authority of record"))
+                                "spdx-license-identifier", "proprietary") + RETIRED)
 
 
 def _rstrip_blank(lines: list[str]) -> list[str]:
@@ -258,8 +262,7 @@ def stamp(lines):
 def _legal_comment(line: str, c: str) -> bool:
     t = line.strip()[len(c):].strip().lower()
     return any(h in t for h in ("spdx-", "copyright", "evaluation and simulation", "enterprise license", "see license",
-                                "all rights reserved", "all patents", "subject to change", "authority of record",
-                                "omni-compass.com", "monetization or other use"))
+                                "all rights reserved", "all patents", "omni-compass.com", "monetization or other use") + RETIRED)
 
 
 def normalize_header(text: str, c: str) -> str:
@@ -429,6 +432,10 @@ def problems(path: str, text: str, k) -> list[str]:
     bad = []
     if OLD_FILED.search(text):
         bad.append("an older filing sentence (not 'All patents, copyrights and trademarks')")
+    flat_all = _flat(text)
+    gone = [r for r in RETIRED if r in flat_all]
+    if gone:
+        bad.append("wording retired from the notice on 10 October still stands here (" + "; ".join(gone) + ")")
     if k == "md":
         lines = text.rstrip("\n").split("\n")
         top, end = _flat("\n".join(lines[:30])), _flat("\n".join(lines[-6:]))
@@ -469,6 +476,11 @@ def check(root: Path = ROOT) -> list[str]:
             continue
         k = kind(p, text)
         if k is None:
+            # a file that carries no notice of its own (data, JSON, plain text, an assistant's rules file) still carries no
+            # retired wording; archived run files and third-party files keep their bytes
+            gone = [r for r in RETIRED if r in _flat(text)]
+            if gone and not p.startswith(EXEMPT):
+                out.append(f"{p}: wording retired from the notice on 10 October still stands here (" + "; ".join(gone) + ")")
             continue
         for b in problems(p, text, k):
             out.append(f"{p}: {b}")
