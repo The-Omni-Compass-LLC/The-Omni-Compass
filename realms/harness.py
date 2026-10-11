@@ -32,11 +32,12 @@ from typing import Dict, List
 from omnicompass.adapter import Governor, OBSERVE
 from omnicompass.nervous_system import from_governor
 from .plants import TEMPLATES, ThermalZone, EnergyStorage, pack
-from .compass_arm import compass_apply
+from .compass_arm import compass_apply, Gate, position, LINE
 from .presets import STEPS_SINGLE, ORGANISM_STEPS, CAL_SEED, params_for
 
 ROOT = Path(__file__).resolve().parents[1]
-ARMS = ("native", "watch", "compass")   # native; Omni watching (writes nothing); the compass law on top (amendment, 2026-10-05)
+ARMS = ("native", "watch", "compass")   # native; Omni watching (writes nothing); Omni on top: the compass law through each
+# muscle's own body (Omni v4: the law acts on a muscle only where that muscle's verdict has proven it no worse)
 # for a setpoint muscle, a fourth arm: the native controller with the setpoint simply fixed at the band's calm end.
 # It shows how much of any Omni result on that muscle the band alone would give, with no governor.
 FIXED = "fixed_calm"
@@ -171,14 +172,18 @@ def run_muscle_arm(row, seed, arm):
     writes = after_kill_writes = 0
     last = None
     restore_ok = True
+    gate = Gate(plant) if arm == "compass" else None             # Omni v4: the muscle's own body decides if the law acts
     for k in range(plant.steps):
         if arm == "compass":
-            v = compass_apply(plant, knob) if k < kill_at else {}
             if k >= kill_at:
+                v = {}
                 plant.override = {}
                 restore_ok = restore_ok and _restored(plant, knob)
-            elif v and v != last:
-                writes += 1
+            else:
+                v = gate.step(plant, compass_apply(plant, knob))
+                plant.override = v
+                if v and v != last:
+                    writes += 1
             last = v
         elif g is not None:
             obs = plant.observe()
@@ -295,11 +300,19 @@ def run_bodies(bodies, arm, groups):
             b.couple()
         if arm == "compass":
             for b in bodies:
+                # the wall belongs to the organism for what its plants share: its whole draw at its power budget, or its
+                # thermal zones on average at their line, ends every trial in flight in that organism (each plant's own
+                # line ends its own trial in its gate)
+                zt = sum(position(z) for z in b.zones) / len(b.zones) if b.zones else 0.0
+                shared_wall = b.all_w / b.budget >= LINE or zt >= LINE
                 for p, knob in zip(b.plants, b.knobs):
                     if k >= kill_at:
                         p.override = {}
                         continue
-                    v = compass_apply(p, knob)
+                    if not hasattr(p, "_gate"):
+                        p._gate = Gate(p)
+                    v = p._gate.step(p, compass_apply(p, knob), wall=shared_wall)
+                    p.override = v
                     if v and v != last.get(id(p)):
                         writes += 1
                     last[id(p)] = v
