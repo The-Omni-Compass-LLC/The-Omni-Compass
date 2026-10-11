@@ -15,9 +15,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+import importlib.util as _u                                   # noqa: E402
+
 import realms.harness as H                                    # noqa: E402
-from realms.compass_arm_v5 import compass_apply_v5, Cfg       # noqa: E402
 from tools.run_scale import rows_for, ORGS                    # noqa: E402
+
+# The v5 compass law lives OUT of the engine fingerprint scope (docs/omni_v5/) until the v5 freeze, so this checkout still
+# reads as omni-v3 (tools/omni_version.py). Load it by path from there.
+_V5 = ROOT / "docs" / "omni_v5" / "study" / "v5_law.py"
+_spec = _u.spec_from_file_location("omni_v5_law", _V5)
+_mod = _u.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
+compass_apply_v5, Cfg = _mod.compass_apply_v5, _mod.Cfg
 
 CFG = dict(target_free=False, est=2, learn_fall=0.1, hybrid=True, physics_memory=True,
            motion_safe=True, band=True, drop_guard=True, hole_guard=True)

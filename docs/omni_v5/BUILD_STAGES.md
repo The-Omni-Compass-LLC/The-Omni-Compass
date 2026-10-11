@@ -15,9 +15,13 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
 ## Status
 - **Stage 0 — DONE, pushed to branch `v5`.** The whole design: `OMNI_V5_PLAN.md`, `CONNECTORS.md`, the study that produced
   the modelled numbers (`study/`). Legal 0 problems; release manifest matches.
-- **Stage 1 — DONE this push.** The v5 compass law is in the engine as `realms/compass_arm_v5.py` (clean, additive, NOT
-  frozen), with `tests/test_compass_arm_v5.py` (imports, runs in-repo on real presets, finite, no-harm vs native on a
-  fixed seed). v3 untouched.
+- **Stage 1 — DONE.** The v5 compass law runs in the repo and is proven no-harm vs native by `tests/test_compass_arm_v5.py`
+  (imports it, runs on real presets, finite, energy not above native, work not below, on a fixed seed). The law lives at
+  `docs/omni_v5/study/v5_law.py` — deliberately OUTSIDE the engine fingerprint scope (`omnicompass/`, `omni_controller/`,
+  `realms/`, the named runners in `tools/omni_version.py`) — so this checkout still reads exactly **omni-v3** and the frozen
+  engine is untouched. (A first attempt put it under `realms/`; the version tool correctly flagged the checkout as "no
+  longer v3", so it was moved out of scope. The law enters the engine only at the v5 freeze, stage 12, when `OMNI_V5.json`
+  is declared.)
 
 ## Stages to build (each: files → math → test → acceptance → rerun)
 2. **Edge & centre as the only two guards, generalised off the toy presets.** Files: `realms/compass_arm_v5.py`,
