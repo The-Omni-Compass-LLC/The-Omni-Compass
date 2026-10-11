@@ -1,6 +1,6 @@
 # Disclosures, Declarations and Disclaimers
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 This page is the one place every declaration about Omni-Compass is made. The README, the manual, the book, every guide
 and every report point here. Where any other page seems to say more than this page, this page governs.
@@ -16,11 +16,8 @@ and every report point here. Where any other page seems to say more than this pa
 3. Names of other companies and products (NVIDIA, Kubernetes, Red Hat OpenShift, Amazon EKS, Google GKE, Microsoft
    AKS, Karpenter, Lambda and others) are the property of their owners. They identify the systems Omni-Compass was
    tested with or connects to. No affiliation, endorsement or certification by any of them is stated or implied.
-4. All rights reserved. Everything in this repository, the software, the documentation, the results and the terms, is
-   subject to change at any time without notice. The authority of record for Omni-Compass, its current state and its
-   terms is The Omni-Compass LLC at https://www.omni-compass.com; where this repository and that record differ, the record
-   governs. Every copy, fork, export, report, archive or printout of any part of Omni-Compass carries the README's
-   notice, `LICENSE`, `NOTICE` and this page unchanged.
+4. All rights reserved. Every copy, fork, export, report, archive or printout of any part of Omni-Compass carries the
+   README's notice, `LICENSE`, `NOTICE` and this page unchanged. The Omni-Compass LLC, www.omni-compass.com
 
 ## 2. What a result is, and what it is not
 
@@ -115,4 +112,4 @@ machines.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

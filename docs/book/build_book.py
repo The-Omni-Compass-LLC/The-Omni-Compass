@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
-# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
-# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Builds the printable book, docs/OMNI_COMPASS_MANUAL.pdf, and its one-file text, docs/book/OMNI_COMPASS_BOOK.md.
 
 The book is assembled from the theory chapters in docs/book/, the manual, the repository's documents, the muscle
@@ -642,10 +642,10 @@ class Book(BaseDocTemplate):
         lab = self.label(p)
         (c.drawRightString if right else c.drawString)(x1 if right else x0, 0.55 * inch, lab)
         c.setFont("Serif-Italic", 6.3); c.setFillColor(GREY)
-        c.drawCentredString((x0 + x1) / 2, 0.55 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. All patents, "
-                            "copyrights and trademarks filed in the USA.")
-        c.drawCentredString((x0 + x1) / 2, 0.43 * inch, "Evaluation and simulation use only. Subject to change at any time; "
-                            "www.omni-compass.com is the authority of record.")
+        c.drawCentredString((x0 + x1) / 2, 0.55 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and "
+                            "simulation use only.")
+        c.drawCentredString((x0 + x1) / 2, 0.43 * inch, "All patents, copyrights and trademarks filed in the USA. "
+                            "www.omni-compass.com")
         c.restoreState()
 
     def cover(self, c, d):
@@ -662,10 +662,10 @@ class Book(BaseDocTemplate):
         c.setFillColor(colors.HexColor("#d9c79a")); c.setFont("Serif-Bold", 11)
         c.drawCentredString(PW / 2, 0.55 * inch, "THE OMNI-COMPASS LLC  ·  www.omni-compass.com")
         c.setFont("Serif", 7.5)
-        c.drawCentredString(PW / 2, 0.38 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. All patents, copyrights "
-                            "and trademarks filed in the USA. Evaluation and simulation use only;")
-        c.drawCentredString(PW / 2, 0.24 * inch, "all other use requires a signed, paid Omni-Compass Enterprise License. Subject "
-                            "to change at any time; www.omni-compass.com is the authority of record.")
+        c.drawCentredString(PW / 2, 0.38 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation "
+                            "use only; all other use requires a signed,")
+        c.drawCentredString(PW / 2, 0.24 * inch, "paid Omni-Compass Enterprise License. All patents, copyrights and trademarks "
+                            "filed in the USA. www.omni-compass.com")
 
     def afterFlowable(self, f):
         if isinstance(f, Marker):
@@ -767,11 +767,9 @@ def front_matter(doc):
         "Copyright © 2026 The Omni-Compass LLC. All rights reserved. No part of this book may be reproduced, stored "
         "or transmitted in any form or by any means, except as allowed by the Omni-Compass Evaluation License, without "
         "the written permission of The Omni-Compass LLC.",
-        FILED + " No filing number is stated, and no grant, registration or approval is claimed.",
-        "Everything in this book and in the software it describes is subject to change at any time without notice. The "
-        "authority of record for Omni-Compass, its current state and its terms is The Omni-Compass LLC at "
-        "www.omni-compass.com. Every copy, export and printout of any part of this book carries this page, the LICENSE, "
-        "the NOTICE and the Disclosures unchanged.",
+        "Every copy, export and printout of any part of this book carries this page, the LICENSE, the NOTICE and the "
+        "Disclosures unchanged.",
+        FILED[:-1] + " (no filing number is stated, and no grant, registration or approval is claimed). www.omni-compass.com",
         "“Omni-Compass”, the Omni-Compass rose and the related names and marks are trademarks of The "
         "Omni-Compass LLC. Other names that appear in this book are the property of their owners and are used only to "
         "identify the systems Omni-Compass works with.",

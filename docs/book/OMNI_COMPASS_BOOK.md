@@ -1,6 +1,6 @@
 # THE OMNI-COMPASS MANUAL
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 October 2026
 
@@ -197,8 +197,8 @@ the brake held to the floor; every setting handed back to where native had it, r
 | a meter that is blind or late | nothing: blind means hold; it moves nothing it cannot see | section 7.3 |
 | your results point the other way from the published ones | presume the wiring first, not the law | `DISCLOSURES.md`, section 4 |
 
-**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, www.omni-compass.com, the
-authority of record. Security reports: the process in `SECURITY.md`, never a public issue.
+**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, www.omni-compass.com.
+Security reports: the process in `SECURITY.md`, never a public issue.
 
 
 # Part One. The Philosophy and the Theory
@@ -7406,8 +7406,8 @@ once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/v1/receip
 
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-All patents, copyrights and trademarks filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
-`NOTICE` at the root of this repository.*
+All rights reserved. See `LICENSE` and `NOTICE` at the root of this repository. All patents, copyrights and trademarks
+filed in the USA. www.omni-compass.com*
 
 ### Amendment (2026-10-05): the compass law is the arm, written before its run
 
@@ -8462,8 +8462,8 @@ is a statement about the lever, not about the law. This run makes the lever big 
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
-All patents, copyrights and trademarks filed in the United States. All rights reserved. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. See `LICENSE` and
-`NOTICE` at the root of this repository.*
+All rights reserved. See `LICENSE` and `NOTICE` at the root of this repository. All patents, copyrights and trademarks
+filed in the USA. www.omni-compass.com*
 
 ## 50. The Evidence Ledger
 
@@ -9667,8 +9667,8 @@ by GitHub since its first push for an unquoted colon; the verifier now parses ev
 set on the amended trial rule landed (21 runs) and is archived; its early reading, from the logs, is in `docs/RERUN_2026-10-10.md`
 and the manual's 16.6c: on Kafka the brain allowed the third consumer once and the whole gain returned at 2.5 consumers instead of
 6 to 8, and refused on every other repetition; the trial's measurement, not the law, is the fault, and four trial rules for v4
-follow from it. The legal wording on every page outside the frozen engine now reads "all patents, copyrights and trademarks",
-"all rights reserved", "subject to change at any time", with www.omni-compass.com the authority of record. The repository now
+follow from it. The legal wording on every page outside the frozen engine now reads "all rights reserved" and "all patents,
+copyrights and trademarks filed in the USA", followed by www.omni-compass.com and nothing after it. The repository now
 keeps itself current: after every finished live run the front-page workflow archives it and `tools/front_page.py` rebuilds every
 table whose three runs are in, the pages read from the tables, and the README's latest lines (`results/live/FRONT_PAGE_STATE.json`
 records what each table was built from).
@@ -12831,4 +12831,4 @@ The Omni-Compass LLC. Owner and developer: AJ Dubra. www.omni-compass.com
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
