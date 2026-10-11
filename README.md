@@ -53,15 +53,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-11 00:40 | kwok-scale | success | [38098329499](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38098329499) |
+| 2026-10-11 00:55 | kwok-scale | success | [38099265574](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38099265574) |
 | 2026-10-11 00:37 | kind-addons | failure | [38096663118](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096663118) |
 | 2026-10-10 23:51 | big-organism-detached | success | [38096351977](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096351977) |
-| 2026-10-10 17:21 | six | success | [38052254140](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38052254140) |
-| 2026-10-10 15:25 | ycsb | success | [38054787517](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054787517) |
-| 2026-10-10 15:16 | sysbench | success | [38054773573](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054773573) |
-| 2026-10-10 14:56 | kafka | success | [38054812962](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054812962) |
-| 2026-10-10 14:53 | pgbench | success | [38054761503](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054761503) |
-| 2026-10-10 14:52 | redis | success | [38054800068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054800068) |
 | 2026-10-10 13:13 | cpu-power | failure | [38054876829](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054876829) |
 <!-- front-page:runs:end -->
 
