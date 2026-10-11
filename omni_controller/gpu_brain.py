@@ -26,14 +26,16 @@ The pedals, on the card's one up wire (the clock ceiling) and its down wire (the
   brake         a power target (an operator's or the grid's): the lid to the target, the park and cruise levels as above
   reset         past the wall, blind meters, or the chip hot: every wire to native at once (fail up)
 
-The verdict (omnicompass/verdict.py), on the card's own time per request, decides both depths, one trial at a time:
+The verdict (omnicompass/verdict.py), on the card's own time per request, decides both depths, one trial at a time, with
+no fixed percentage: the card's own wobble draws the line and the engine must be 99.9% sure a step stays inside it:
   park    paired trials on the first request after a rest: rests at the top (the reference: the card as it is alone),
-          then rests parked one level deeper; that request's own time may rise at most `allow` (2%), or the level is
-          refused and not tried again for recheck_s. A card whose clock answers slowly is held at a shallow level by its
-          own measurements, never by a setting
+          then rests parked at the level under trial (coarse to fine); the level is allowed only when that request's own
+          time is proven inside the card's own wobble, else it is refused and not tried again for recheck_s. A card whose
+          clock answers slowly is held at a shallow level by its own measurements, never by a setting
   cruise  paired trials on requests served behind other work: the ceiling one busy step lower while work is queued; the
-          request's own time may rise at most `allow` AND the card must draw at least `busy_gain` less while busy, or the
-          step is refused (a card held by its own limit draws the same watts under a lower ceiling: no gain, refused)
+          step is allowed only when the request's own time is proven inside the wobble AND the card is proven to draw less
+          while busy (a card held by its own limit draws the same watts under a lower ceiling: no gain, refused)
+Every kept level is proven again every recheck_s, and taken back if it no longer proves.
 A trial runs to its full measurement; only the wall ends it early (the reflex rule, docs/OMNI_V4_PLAN.md). Without an
 arrival signal the brain cannot race in time, so it never parks (nothing that cannot work is switched on).
 """
@@ -55,8 +57,8 @@ def park_levels(top, floor, shares=(0.88, 0.77, 0.65, 0.53, 0.41, 0.30, 0.18), s
 
 
 class CardBrain:
-    def __init__(self, top, floor, start_w, allow=0.005, samples=30, decision_s=0.25, hold_ms=20.0, rest_ms=80.0,
-                 busy_step_mhz=60.0, busy_gain=0.02, probe_every_s=8.0, recheck_s=900.0, trial_s=120.0,
+    def __init__(self, top, floor, start_w, samples=30, decision_s=0.25, hold_ms=20.0, rest_ms=80.0,
+                 busy_step_mhz=60.0, probe_every_s=8.0, recheck_s=900.0, trial_s=120.0,
                  learn_samples=15, signal=True, park=True, cruise=True, power_target_w=None):
         self.top, self.floor, self.start_w = float(top), float(floor), float(start_w)
         self.levels = park_levels(top, floor)
@@ -65,11 +67,11 @@ class CardBrain:
         d = lambda s: max(1, int(round(s / decision_s)))
         self.park_on = bool(park and signal)                 # parking needs a race in time: only with the arrival signal
         self.cruise_on = bool(cruise)
-        self.park_vd = Verdict(tolerance=allow, min_samples=samples, probe_every=d(probe_every_s), recheck=d(recheck_s),
+        self.park_vd = Verdict(min_samples=samples, probe_every=d(probe_every_s), recheck=d(recheck_s),
                                max_steps=len(self.levels) - 1, max_trial=d(trial_s), bisect=True)
-        self.busy_vd = Verdict(tolerance=allow, min_samples=samples, probe_every=d(probe_every_s), recheck=d(recheck_s),
+        self.busy_vd = Verdict(min_samples=samples, probe_every=d(probe_every_s), recheck=d(recheck_s),
                                max_steps=max(1, int((self.top - self.floor) // self.busy_step)), max_trial=d(trial_s),
-                               gain=busy_gain)
+                               gain=True)
         self.park_step = 0                                   # the step the verdict lets idle rests use now (0: the top)
         self.busy_step_now = 0
         self.power_target = power_target_w
@@ -106,15 +108,21 @@ class CardBrain:
         idle = not self.inflight
         if idle:
             from_rest = t - self.last_done >= self.rest_s
-            tag = ("park", self.park_vd.phase, self.park_vd.trial) if (from_rest and self.park_on and self.fail is None) else None
+            vd = self.park_vd
+            # the level the request met is the ceiling it found the card parked at; it counts only where the block in
+            # flight holds the park level there (a rest begun under the block before is not this block's)
+            met_ok = vd.position() is not None and abs(self.ceiling - self.levels[min(vd.position(), len(self.levels) - 1)]) < 0.5
+            tag = ("park", vd.phase, vd.trial, vd.block_no) if (from_rest and self.park_on and self.fail is None and met_ok) else None
             self.inflight[rid] = tag
             self.parked = False
             w = self._set(self.top, "race")
             if w:
                 self.counts["races"] += 1
             return w
-        # work already on the card: this request will be served behind it, under the cruise level
-        self.inflight[rid] = ("busy", self.busy_vd.phase, self.busy_vd.trial) if (self.cruise_on and self.fail is None) else None
+        # work already on the card: this request will be served behind it, under the cruise level the block in flight
+        # holds (its service starts when the work ahead of it is done, inside the block it arrived in, or it is not counted)
+        vd = self.busy_vd
+        self.inflight[rid] = ("busy", vd.phase, vd.trial, vd.block_no) if (self.cruise_on and self.fail is None and vd.phase) else None
         return None
 
     def done(self, t, rid, cost_ms):
@@ -123,7 +131,7 @@ class CardBrain:
         tag = self.inflight.pop(rid, None)
         if tag is not None and cost_ms is not None:
             vd = self.park_vd if tag[0] == "park" else self.busy_vd
-            if vd.phase is not None and (vd.phase, vd.trial) == (tag[1], tag[2]):
+            if vd.phase is not None and (vd.phase, vd.trial, vd.block_no) == tag[1:]:
                 vd.observe([float(cost_ms)])
         self.last_done = t
         if self.inflight:

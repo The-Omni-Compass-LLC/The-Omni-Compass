@@ -61,7 +61,6 @@ PHASES = (0.3, 0.6, 0.8, 0.3, 0.6, 0.3)
 SERVICE_MS = 81.6                     # the run's calibrated service time (sustained, at the 150 W limit)
 SLO_MS = 10.0 * SERVICE_MS            # the service line: ten service times, as the bench sets it
 LIMIT_DEFAULT, LIMIT_CAP = 150.0, 105.0
-ALLOW = 0.005                         # the verdict's allowance: the most a step may add to the card's own time (0.5%, inside the measurement)
 DECIDE_S = 0.25
 OMNI = ("omni", "cap_omni")
 _IX = [p[0] for p in IDLE_PTS]; _IY = [p[1] for p in IDLE_PTS]
@@ -103,7 +102,7 @@ def run(seed: int, arm: str, duration: float = 600.0, memb: float = 0.0, ramp: f
     start_w = LIMIT_CAP if arm in ("cap", "cap_omni") else LIMIT_DEFAULT
     brain = None
     if arm in OMNI:
-        kw = dict(allow=ALLOW, samples=30, decision_s=DECIDE_S, signal=True)
+        kw = dict(samples=30, decision_s=DECIDE_S, signal=True)
         kw.update(brain_kw or {})
         brain = CardBrain(TOP, FLOOR, start_w, **kw)
     kill_ms = int(0.9 * duration * 1000.0)

@@ -7,15 +7,16 @@
 
   race      work arriving on an idle card puts the ceiling back at the top at once, before any decision
   park      an idle card parks its clock after hold_ms, only with the arrival signal (never without it)
-  verdict   the park depth is found by measurement: levels whose first request after a rest is slower are refused,
-            found coarse to fine; a cruise step that costs nothing but saves nothing is refused (no gain); no cruise
+  verdict   the park depth is found by measurement (interleaved blocks, the card's own wobble as the line, 99.9% sure):
+            levels whose first request after a rest is slower are refused, found coarse to fine; a cruise step that costs nothing but saves nothing is refused (no gain); no cruise
             trial opens on a card held by its own power limit while busy
   lid       the power limit stays at the start limit (the paid run's slowdown was a lid under the busy draw); a power
             target brakes to the target
   guards    past the line, blind meters, or heat: every wire to native at once, trials ended
   wires     against the stand-in nvidia-smi: the signal's arrivals race the clock, idle parks it, the audit records each,
             watch writes nothing, restore resets the clock and the limit, another writer is left alone (exit 5)
-  model     the A10 model with the same brain: less energy than native, no slower at the median, wires handed back
+  model     the A10 model with the same brain: less energy than native, never proven slower beyond the card's own wobble,
+            wires handed back
 """
 import json, os, socket, sys, tempfile, threading, time
 from pathlib import Path
@@ -159,10 +160,13 @@ def wires():
 
 
 def model():
-    from realms.gpu_card import run, ALLOW
+    from realms.gpu_card import run
+    from omnicompass.verdict import Verdict, compare, stats
     n, o = run(5000, "native", duration=240.0), run(5000, "omni", duration=240.0, handback=True)
     assert o["energy_j"] < n["energy_j"], (o["energy_j"], n["energy_j"])
-    assert o["p50_ms"] <= n["p50_ms"] * (1 + ALLOW) + 1e-9 and o["restored"]
+    # no slower than the card's own wobble: the two arms' request times by the verdict's own arithmetic
+    d, hw, _, _ = compare(n["svc"], o["svc"])
+    assert d - hw <= Verdict().line(stats(n["svc"])[1]) and o["restored"], (d, hw)
     print(f"model: the A10 model with the same brain, {o['energy_j'] / n['energy_j'] - 1:+.1%} energy, median "
           f"{o['p50_ms'] / n['p50_ms'] - 1:+.1%}, wires handed back")
 

@@ -3,10 +3,10 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The brain's own verdict on a live knob (tools/knob_verdict.py), around the frozen engine's Verdict: every knob starts in
-watch; a spend that costs more than it buys is refused and the knob stays native; a give-back that costs nothing is allowed
-one step a trial; a trial holds the knob whatever the compass asks; the compass is clamped to the allowance between trials;
-native is always free."""
+"""The brain's own verdict on a live knob (tools/knob_verdict.py), around the engine's Verdict: every knob starts in watch; a
+spend that costs more than it buys is refused and the knob stays native; a give-back that costs nothing is allowed one step a
+trial; a trial holds the knob whatever the compass asks, its blocks alternating between the reference and the step under
+trial; the compass is clamped to the allowance between trials; native is always free."""
 import sys
 import unittest
 from pathlib import Path
@@ -23,7 +23,7 @@ def run_knob(verdict, seconds, wanted_of, spend_ok_of, give_ok_of, cost_of):
     for t in range(seconds):
         verdict.observe(cost_of(cur, t), float(t))
         target, why, info = verdict.decide(wanted_of(cur, t), spend_ok_of(cur, t), give_ok_of(cur, t), float(t), "compass")
-        trace.append((t, cur, target, info["verdict_phase"], why))
+        trace.append((t, cur, target, info["verdict_phase"], why, info["allowed_low"], info["allowed_high"]))
         cur = target
     return trace
 
@@ -55,7 +55,7 @@ class ASpendKnob(unittest.TestCase):
         self.assertEqual(v.state, "left native")
         self.assertGreaterEqual(v.counts["refused"], 2, "the first notch was tried, refused, and tried again after the recheck")
         self.assertEqual(v.counts["allowed"], 0)
-        values = {target for _, _, target, _, _ in trace}
+        values = {target for _, _, target, _, _, _, _ in trace}
         self.assertEqual(values, {64, 72}, "the knob never went past the one notch under trial; the compass's wish of 512 was never granted")
         self.assertGreater(v.counts["clamped"], 100)
         self.assertEqual(trace[-1][2], 64)
@@ -66,18 +66,26 @@ class ASpendKnob(unittest.TestCase):
         self.assertTrue(v.state.startswith("acting"))
         self.assertGreaterEqual(v.verdicts[kv.SPEND].allowed, 5, "one notch a trial, as far as the trials got")
         self.assertEqual(v.counts["refused"], 0)
-        self.assertLessEqual(max(target for _, _, target, _, _ in trace), v.allowed_high, "never past the allowance, even with the compass asking for the top of the cover")
+        self.assertTrue(all(target <= hi for _, _, target, phase, _, _, hi in trace if phase is None),
+                        "between trials never past the allowance, even with the compass asking for the top of the cover")
+        self.assertTrue(all(target <= hi + 8 for _, _, target, phase, _, _, hi in trace),
+                        "in a trial never more than the one notch under trial past it")
 
     def test_a_trial_holds_the_knob_whatever_the_compass_asks(self):
         v = kv.KnobVerdict(64, 8, (16, 512), objective=kv.SERVICE, min_samples=5, probe_every=10, recheck=30, settle_s=1.0)
-        trace = run_knob(v, 12, wanted_of=lambda cur, t: 64 if t % 2 else 512, spend_ok_of=lambda cur, t: True, give_ok_of=lambda cur, t: False, cost_of=self.cost(kv.SERVICE))
+        trace = run_knob(v, 60, wanted_of=lambda cur, t: 64 if t % 2 else 512, spend_ok_of=lambda cur, t: True, give_ok_of=lambda cur, t: False, cost_of=self.cost(kv.SERVICE))
         first_allowed = next(e["t"] for e in v.events if e["verdict"] == "step allowed")
         ref = [x for x in trace if x[3] == "ref" and x[0] < first_allowed]; trial = [x for x in trace if x[3] == "trial" and x[0] < first_allowed]
         self.assertTrue(ref and trial)
-        self.assertTrue(all(x[2] == 64 for x in ref), "the first reference stands at native (the deepest step allowed so far)")
-        self.assertTrue(all(x[2] == 72 for x in trial), "the trial stands one notch further")
+        self.assertTrue(all(x[2] == 64 for x in ref), "every reference block stands at native (the deepest step allowed so far)")
+        self.assertTrue(all(x[2] == 72 for x in trial), "every trial block stands one notch further")
+        phases = [x[3] for x in trace if x[0] < first_allowed and x[3]]
+        self.assertGreaterEqual(sum(1 for a, b in zip(phases, phases[1:]) if a == "trial" and b == "ref"), 2,
+                                "the blocks alternate: reference, trial, reference, trial, reference")
         self.assertGreater(v.counts["held"], 0)
-        self.assertEqual(v.verdicts[kv.SPEND].allowed, 1, "allowed; the next reference will stand at 72 (incremental)")
+        self.assertGreaterEqual(v.verdicts[kv.SPEND].allowed, 1, "allowed; the next reference stands at the step allowed (incremental)")
+        after = [x for x in trace if x[3] == "ref" and x[0] > first_allowed + 1]
+        self.assertTrue(all(x[2] >= 72 for x in after if x[0] < first_allowed + 20), "the next trial's reference stands at 72")
 
     def test_a_spend_trial_runs_on_when_its_own_gain_calms_the_compass(self):
         """The trial's success removes the reason for it (the queue drains, the force drops): the trial must still finish."""
@@ -135,7 +143,7 @@ class AGiveBackKnob(unittest.TestCase):
         trace = run_knob(v, 400, wanted_of=lambda cur, t: 2, spend_ok_of=lambda cur, t: False, give_ok_of=lambda cur, t: True, cost_of=self.cost)
         self.assertGreaterEqual(v.verdicts[kv.GIVE].allowed, 8)
         self.assertEqual(v.counts["refused"], 0)
-        self.assertTrue(all(target >= v.allowed_low for _, _, target, _, _ in trace), "never deeper than the allowance")
+        self.assertTrue(all(target >= v.allowed_low for _, _, target, _, _, _, _ in trace), "never deeper than the allowance")
         self.assertEqual(trace[-1][2], v.allowed_low, "the compass, wanting the floor, gets the allowance")
 
     def test_native_is_always_free_and_a_spend_above_native_is_not(self):
