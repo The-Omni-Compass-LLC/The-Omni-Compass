@@ -36,16 +36,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-10 16:50 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C confirmation](results/live/V3_YCSB.md) | Across 4 untouched workloads: 4 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
-| 2026-10-10 16:50 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C confirmation](results/live/V3_SYSBENCH.md) | Across 4 untouched workloads: 0 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
-| 2026-10-10 16:50 | [Redis, a cache's operator-set memory ceiling: the A/B/C confirmation](results/live/V3_REDIS_SERVICE.md) | Across 3 untouched workloads: 5 gauge-rows confirmed better, 2 confirmed worse, 0 where the runs disagree. |
-| 2026-10-10 16:50 | [Redis, a cache's operator-set memory ceiling: the A/B/C confirmation](results/live/V3_REDIS.md) | Across 3 untouched workloads: 0 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
-| 2026-10-10 16:50 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C confirmation](results/live/V3_PGBENCH.md) | Across 3 workloads: 1 gauge-rows confirmed better, 1 confirmed worse, 1 where the runs disagree. |
-| 2026-10-10 16:50 | [Kafka, a consumer group's operator-set size: the A/B/C confirmation](results/live/V3_KAFKA_SERVICE.md) | Across 3 untouched workloads: 1 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
-| 2026-10-10 16:50 | [Kafka, a consumer group's operator-set size: the A/B/C confirmation](results/live/V3_KAFKA.md) | Across 3 untouched workloads: 1 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree. |
-| 2026-10-10 16:50 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-10 16:16 | [Public demand traces, turned into load schedules](results/traces/README.md) |  |
-| 2026-10-10 16:16 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/fresh/RESULT.md) |  |
+| 2026-10-11 00:21 | [Public demand traces, turned into load schedules](results/traces/README.md) |  |
+| 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/fresh/RESULT.md) |  |
+| 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/RESULT.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)](results/scale/v1/receipts/round6-1x.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 10x size, up to 1000 runs (pooled from 60 shards)](results/scale/v1/receipts/round6-10x.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 100x size, up to 1000 runs (pooled from 240 shards)](results/scale/v1/receipts/round6-100x.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 1000x size, up to 10 runs (pooled from organism-sized shards)](results/scale/v1/receipts/round6-1000x.md) |  |
+| 2026-10-11 00:21 | [The six organisms: the full grid](results/scale/v1/GRID.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)](results/scale/receipts/v3-1x_set1.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)](results/scale/receipts/v3-1x.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -53,8 +53,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-11 00:09 | kwok-scale | success | [38096658891](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096658891) |
-| 2026-10-11 00:01 | kind-addons | cancelled | [38096241326](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096241326) |
+| 2026-10-11 00:40 | kwok-scale | success | [38098329499](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38098329499) |
+| 2026-10-11 00:37 | kind-addons | failure | [38096663118](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096663118) |
 | 2026-10-10 23:51 | big-organism-detached | success | [38096351977](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096351977) |
 | 2026-10-10 17:21 | six | success | [38052254140](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38052254140) |
 | 2026-10-10 15:25 | ycsb | success | [38054787517](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38054787517) |

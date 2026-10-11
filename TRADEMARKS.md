@@ -4,13 +4,36 @@
 
 **All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.**
 
-"Omni-Compass", "OmniCompass", the Omni-Compass compass rose with its ring of Greek letters, and related names and logos
-are trademarks of The Omni-Compass LLC (trademark applications filed in the United States). No license to use them is
-granted except in a signed Omni-Compass Enterprise License. Do not use them to name, describe or market any product,
-service, fork or derivative, or in any way that suggests endorsement by The Omni-Compass LLC.
+## The marks
 
-Kubernetes is a trademark of The Linux Foundation; NVIDIA is a trademark of NVIDIA Corporation; other names belong to
-their owners. Their mention describes compatibility only.
+"Omni-Compass", "OmniCompass", the Omni-Compass compass rose with its ring of Greek letters, and the related names, logos
+and trade dress (the "Marks") are trademarks of The Omni-Compass LLC; trademark applications have been filed in the
+United States. Neither the evaluation license (`LICENSE`) nor publication of this repository grants any license to the
+Marks. A license to use them is granted only in a signed Omni-Compass Enterprise License, and only as it states.
+
+## What is allowed without a license
+
+- Referring to Omni-Compass by name, accurately and in plain text, to say what it is, that you evaluated it, or that a
+  result was produced with it, with the engine version and commit (`LICENSE`, section 4).
+- Linking to the repository or to www.omni-compass.com.
+
+## What is not allowed
+
+- Using any Mark, or anything confusingly similar, in the name of a product, service, company, domain, account, package,
+  repository, fork or derivative.
+- Using the logo or the compass rose, or altering any Mark.
+- Suggesting endorsement, sponsorship, certification, partnership or affiliation by The Omni-Compass LLC.
+- Using a Mark in advertising, comparative claims or sales material without a signed license.
+
+## Other companies' marks
+
+Kubernetes is a trademark of The Linux Foundation; NVIDIA is a trademark of NVIDIA Corporation; KEDA and Karpenter are
+projects of their maintainers; other names belong to their owners. Their mention describes compatibility or a system
+Omni-Compass was tested with; it states no affiliation, endorsement or certification (`DISCLOSURES.md`, section 1).
+
+## Reporting misuse
+
+The Omni-Compass LLC, www.omni-compass.com.
 
 ---
 
