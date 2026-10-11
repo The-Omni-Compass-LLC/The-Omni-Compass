@@ -33,7 +33,7 @@ from omnicompass.adapter import Governor, OBSERVE
 from omnicompass.nervous_system import from_governor
 from .plants import TEMPLATES, ThermalZone, EnergyStorage, pack
 from .compass_arm import compass_apply, Gate, position, LINE
-from .presets import STEPS_SINGLE, ORGANISM_STEPS, CAL_SEED, params_for
+from .presets import STEPS_SINGLE, ORGANISM_STEPS, LEARN_STEPS, CAL_SEED, params_for
 
 ROOT = Path(__file__).resolve().parents[1]
 ARMS = ("native", "watch", "compass")   # native; Omni watching (writes nothing); Omni on top: the compass law through each
@@ -77,9 +77,9 @@ def seed_for(muscle_id: str, seed: int) -> int:
     return h
 
 
-def make_plant(row, seed, organism=False):
-    steps = ORGANISM_STEPS if organism else STEPS_SINGLE[row["template"]]
-    p = TEMPLATES[row["template"]](params_for(row, organism), seed_for(row["muscle_id"], seed), steps)
+def make_plant(row, seed, organism=False, learn=0):
+    steps = learn + ORGANISM_STEPS if organism else STEPS_SINGLE[row["template"]]
+    p = TEMPLATES[row["template"]](params_for(row, organism, learn), seed_for(row["muscle_id"], seed), steps)
     if row["template"] == "compute_pool" and not organism:
         p.budget_w = 1.25 * native_mean_power(row)
     return p
@@ -101,12 +101,12 @@ def native_mean_power(row):
     return _CAL[key]
 
 
-def calibrate_organism(rows):
+def calibrate_organism(rows, learn=LEARN_STEPS):
     """Each plant's mean native power in the organism on the calibration seed: the organism's declared budget and
     coupling basis (the same for every arm and every result seed)."""
-    key = tuple(r["muscle_id"] for r in rows)
+    key = (tuple(r["muscle_id"] for r in rows), learn)
     if key not in _CAL:
-        nat = run_organism_arm(rows, CAL_SEED, "native", nominal=None)
+        nat = run_organism_arm(rows, CAL_SEED, "native", nominal=None, learn=learn)
         _CAL[key] = nat["mean_power"]
     return _CAL[key]
 
@@ -172,7 +172,7 @@ def run_muscle_arm(row, seed, arm):
     writes = after_kill_writes = 0
     last = None
     restore_ok = True
-    gate = Gate(plant) if arm == "compass" else None             # Omni v4: the muscle's own body decides if the law acts
+    gate = Gate(plant, knob) if arm == "compass" else None       # Omni v4: the muscle's own body decides if the law acts
     for k in range(plant.steps):
         if arm == "compass":
             if k >= kill_at:
@@ -224,12 +224,13 @@ class Body:
     heat in its thermal zones, its load swing is load on its storage sites, and its zones' temperature is the ambient
     every other plant reports."""
 
-    def __init__(self, rows, seed, nominal="calibrated"):
+    def __init__(self, rows, seed, nominal="calibrated", learn=LEARN_STEPS):
         self.rows = rows
+        self.learn = learn                                    # the declared learning steps before the scored hour
         # the calibration run first, then this body: one organism in memory at a time (1,000 copies of the four stacked
         # is 1.2 million plants). Each plant is packed as it is made (plants.pack): the same numbers, a quarter of the room
-        cal = calibrate_organism(rows) if nominal == "calibrated" else None
-        self.plants = [pack(make_plant(r, seed, organism=True)) for r in rows]
+        cal = calibrate_organism(rows, learn) if nominal == "calibrated" else None
+        self.plants = [pack(make_plant(r, seed, organism=True, learn=learn)) for r in rows]
         if cal is not None:
             for p, w in zip(self.plants, cal):
                 p.nominal_w = max(w, 1.0)
@@ -281,9 +282,65 @@ def aggregate(bodies):
     return agg
 
 
+def organism_wall(b, extra_w=0.0):
+    """The wall belongs to the organism for what its plants share: its whole draw (and any real machine's watts inside it)
+    at its power budget, or its thermal zones on average at their line, ends every trial in flight in that organism (a
+    copy at its own line is held native that moment by its own gate)."""
+    zt = sum(position(z) for z in b.zones) / len(b.zones) if b.zones else 0.0
+    return (b.all_w + extra_w) / b.budget >= LINE or zt >= LINE
+
+
+def omni_step(b, last, wall=None):
+    """One decision of Omni v4 on an organism: every copy of a muscle (the same catalog muscle, ~copy) proven together by
+    one gate (realms/compass_arm.py Gate), each copy's override set. Returns the writes it made (a changed override)."""
+    if not hasattr(b, "_gates"):
+        by_muscle = {}
+        for idx, r in enumerate(b.rows):
+            by_muscle.setdefault(r["muscle_id"].split("~")[0], []).append(idx)
+        b._gates = [(idxs, Gate([b.plants[i] for i in idxs], b.knobs[idxs[0]])) for idxs in by_muscle.values()]
+    wall = organism_wall(b) if wall is None else wall
+    writes = 0
+    for idxs, gate in b._gates:
+        ps = [b.plants[i] for i in idxs]
+        vs = gate.step(ps, [compass_apply(p, b.knobs[i]) for p, i in zip(ps, idxs)], wall=wall)
+        for p, v in zip(ps, vs):
+            p.override = v
+            if v and v != last.get(id(p)):
+                writes += 1
+            last[id(p)] = v
+    return writes
+
+
+def proof_of(bodies):
+    """What the organism's gates proved: muscles, muscles proven by the end, and the trials' counts."""
+    gates = [g for b in bodies for _, g in getattr(b, "_gates", [])]
+    proof = {"muscles": len(gates), "proven": sum(1 for g in gates if g.muscle.verdicts["give back"].allowed > 0)}
+    for g in gates:
+        for key, v in g.body.counts.items():
+            proof[key] = proof.get(key, 0) + v
+    return proof
+
+
+def learn_off_clock(b, arm):
+    """The organism's declared learning period run ahead of a live window (the six with a real cluster or a real card
+    inside): the modelled muscles learn on their own clock before the window opens, in both arms, and the meters close
+    at its end. Returns the learning period's receipts."""
+    last = {}
+    for _ in range(b.learn):
+        b.couple()
+        if arm:
+            omni_step(b, last)
+        b.step()
+    return [p.split() for p in b.plants]
+
+
 def run_bodies(bodies, arm, groups):
     """Run bodies on one 15 s clock. groups: lists of body indices, one governor per group (one group of all bodies is
-    one governor over the whole stack; one group per body is a separate governor per body). arm native: no governor."""
+    one governor over the whole stack; one group per body is a separate governor per body). arm native: no governor.
+
+    Omni v4: the bodies' declared learning period runs first, in every arm on the same seed, and its meters are closed at
+    its end (learn_plants); the scored hour that follows is metered on its own (plants). Every trial, proof and recheck
+    carries on across the boundary: nothing is reset, the brain only keeps learning."""
     govs = []
     if arm not in ("native", "compass"):
         for grp in groups:
@@ -291,31 +348,26 @@ def run_bodies(bodies, arm, groups):
             if arm == "watch":
                 g.set_mode(OBSERVE)
             govs.append((g, [bodies[i] for i in grp]))
-    kill_at = int(KILL_AT * ORGANISM_STEPS)
+    learn = bodies[0].learn
+    assert all(b.learn == learn for b in bodies), "one clock: every body learns for the same period"
+    total = learn + ORGANISM_STEPS
+    kill_at = learn + int(KILL_AT * ORGANISM_STEPS)
     writes = after_kill_writes = 0
     restore_ok = True
     last = {}
-    for k in range(ORGANISM_STEPS):
+    learned = []
+    for k in range(total):
+        if learn and k == learn:
+            learned = [p.split() for b in bodies for p in b.plants]
         for b in bodies:
             b.couple()
         if arm == "compass":
             for b in bodies:
-                # the wall belongs to the organism for what its plants share: its whole draw at its power budget, or its
-                # thermal zones on average at their line, ends every trial in flight in that organism (each plant's own
-                # line ends its own trial in its gate)
-                zt = sum(position(z) for z in b.zones) / len(b.zones) if b.zones else 0.0
-                shared_wall = b.all_w / b.budget >= LINE or zt >= LINE
-                for p, knob in zip(b.plants, b.knobs):
-                    if k >= kill_at:
+                if k >= kill_at:
+                    for p in b.plants:
                         p.override = {}
-                        continue
-                    if not hasattr(p, "_gate"):
-                        p._gate = Gate(p)
-                    v = p._gate.step(p, compass_apply(p, knob), wall=shared_wall)
-                    p.override = v
-                    if v and v != last.get(id(p)):
-                        writes += 1
-                    last[id(p)] = v
+                    continue
+                writes += omni_step(b, last)
         for g, bs in govs:
             agg = aggregate(bs)
             if arm == "omni" and k == kill_at:
@@ -340,18 +392,20 @@ def run_bodies(bodies, arm, groups):
     for b in bodies:
         for p in b.plants:
             p.finalize()
-    return {"plants": [dict(p.m) for b in bodies for p in b.plants], "writes": writes,
+    proof = proof_of(bodies) if arm == "compass" else None
+    return {"plants": [dict(p.m) for b in bodies for p in b.plants], "learn_plants": learned, "writes": writes,
             "after_kill_writes": after_kill_writes, "restore_ok": restore_ok and after_kill_writes == 0,
-            "mean_power": [x / ORGANISM_STEPS for b in bodies for x in b.psum]}
+            "mean_power": [x / total for b in bodies for x in b.psum], "proof": proof}
 
 
-def run_organism_arm(rows, seed, arm, nominal="calibrated"):
-    return run_bodies([Body(rows, seed, nominal)], arm, [[0]])
+def run_organism_arm(rows, seed, arm, nominal="calibrated", learn=LEARN_STEPS):
+    return run_bodies([Body(rows, seed, nominal, learn)], arm, [[0]])
 
 
 def run_organism(rows, seed) -> Dict:
     out = {arm: run_organism_arm(rows, seed, arm) for arm in ARMS}
-    out["watch_equal"] = out["watch"]["plants"] == out["native"]["plants"] and out["watch"]["writes"] == 0
+    out["watch_equal"] = (out["watch"]["plants"] == out["native"]["plants"]
+                          and out["watch"]["learn_plants"] == out["native"]["learn_plants"] and out["watch"]["writes"] == 0)
     for arm in ARMS:
         out[arm].pop("mean_power", None)
     return out
@@ -388,7 +442,7 @@ def interval(xs):
 
 def label(per_seed, valid=True):
     """Result label by rule (the GPU bench's rule, docs/GPU_PREREGISTRATION.md, amendment 1)."""
-    if not valid or not all(all(math.isfinite(c[k]) for k in c) for c in per_seed):
+    if not valid or not all(all(math.isfinite(c[k]) for k in ("primary", "work", "energy", "viol_pp")) for c in per_seed):
         return "INVALID"
     p = interval([c["primary"] for c in per_seed])
     w = interval([c["work"] for c in per_seed])

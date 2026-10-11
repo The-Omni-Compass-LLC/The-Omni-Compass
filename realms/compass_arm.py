@@ -194,6 +194,23 @@ WALL = 0.95                # the compass's high wall (omnicompass/compass_law.py
 LINE = 1.0                 # the service line itself: a service that hits it ends the trial in flight (the founder's rule 7)
 
 
+def settle_steps(plant) -> int:
+    """Decisions a muscle takes to settle after its knob moves, from the plant's own physics (docs/OMNI_V4_PLAN.md, section
+    4, rule 1: samples count only once the muscle is settled): a compute pool's machine start; a process loop's three time
+    constants and its dead time; a thermal zone's three time constants (its heat capacity over its loss to outside); a
+    storage site or a motion axis answers within its own decision."""
+    import math
+    P, t = plant.P, plant.template
+    dt = float(P.get("dt", 15.0))
+    if t == "compute_pool":
+        return max(1, int(P.get("startup_steps", 1)))
+    if t == "process_loop":
+        return max(1, math.ceil((3.0 * P.get("tau", dt) + P.get("theta", 0.0)) / dt))
+    if t == "thermal_zone":
+        return max(1, math.ceil(3.0 * P["c_j_k"] / P["ua"] / dt))
+    return 1
+
+
 def step_cost(plant, dw, de):
     """One decision's cost on the plant's own work, lower is better: the energy that decision drew per unit of work done
     in it (a storage site's grid draw counted from minus its connection's limit, so a decision that exports reads cheaper
@@ -205,35 +222,119 @@ def step_cost(plant, dw, de):
     return de / dw
 
 
+def saves(plant, key) -> bool:
+    """Whether giving this knob back can lower the plant's energy per unit of work at all, by the plant's own figures
+    (MECHANISM_OF_ACTION 9.6), read at every decision: a power cap only where the machine is not racing to idle
+    (capping_saves), an effort cap only where the copper it saves outweighs the longer move (effort_cap_saves), a speed
+    knob only where the axis has room to stretch its moves (speed_slack); a cooling cap moves heat later, never away, and a
+    battery's power cap defers its draw, never saves it, and a process loop draws what its demand needs, so a cap on its
+    actuator or power saves only where it binds, that is, only by not delivering. Everything else given back (a machine or
+    a unit handed back, a setpoint toward its calm end) draws less. This is the brain's own reading of what the plant
+    shows, never a hold: where the figures say a step cannot save, there is nothing to try."""
+    t = plant.template
+    if t == "process_loop" and key in ("power", "capacity"):
+        return False                       # a loop draws what its demand needs: a cap that binds saves only by not delivering
+    if key == "power":
+        if t == "compute_pool":
+            return capping_saves(plant)
+        if t == "motion_axis":
+            return effort_cap_saves(plant)
+        return False
+    if key == "capacity" and t == "motion_axis":
+        return speed_slack(plant)
+    return True
+
+
+def give_back(plant, knob, proposal):
+    """The part of the law's proposal on one copy that gives back (less capacity, power or cooling than native, where the
+    plant's own figures say it saves); {} otherwise. Omni v4 never buys service with energy: where the law would spend
+    beyond native, the copy stays at native, which is always free, and its own controller answers the stress."""
+    if not proposal:
+        return {}
+    lv = lever(plant, knob)
+    if lv is None:
+        return {}
+    key, native, lo, hi, sign = lv
+    if key == "release":
+        return dict(proposal)
+    x = proposal.get(key)
+    if x is None or sign * (x - native) >= 0.0:
+        return {}
+    return dict(proposal) if saves(plant, key) else {}
+
+
 class Gate:
-    """The muscle's body (omnicompass/body.py, Omni v4): one muscle, one step from native, "the law acts". Its trial
-    interleaves native and the law's own setting block by block (omnicompass/verdict.py). Nothing anywhere is made worse to
-    make one thing better: the law may act only where the plant's whole cost (its energy per unit of work times its
-    service, the index's arithmetic on one plant) is proven lower at 99.9%, and neither part of it, the energy per unit of
-    work nor the service, is worse beyond the plant's own wobble. It is proven again on the recheck and taken back when it
-    no longer pays. A plant past its wall (or an organism at its own) ends the trial in flight and holds the muscle where
-    it has proven."""
+    """The muscle's body (omnicompass/body.py, Omni v4): one muscle, one step from native, "the law gives back", for every
+    copy of that muscle at once (a muscle in a ten-copy organism is the same muscle ten times: it is proven on all ten, so
+    the proof sharpens with the size of the fleet, as a fleet's operator would prove it).
 
-    def __init__(self, plant, block=20, recheck=120):
-        self.muscle = Muscle("law", 0, 1, (0, 1), min_samples=block, probe_every=1, recheck=recheck, max_trial=4 * block,
-                             incremental=False, gain=True)
-        self.body = Body([self.muscle], name=getattr(plant, "template", "muscle"))
-        self.prev = (plant.m["work"], plant.m["energy_j"])
-        self.acting = 0
+      what is tried   only what the law gives back where the plant's own figures say it saves (give_back); never a spend
+                      beyond native: native is always free, and nothing is made worse to make one thing better
+      the trial       interleaves native and the law's give-back block by block (omnicompass/verdict.py), every copy in
+                      the same block; each block's first decisions are left out while the muscle settles (settle_steps).
+                      Every copy's work counts in every block, a copy the law held at native for its own safety included,
+                      so whatever the trial does to any copy is in its measurement
+      the judgement   the law may give back only where the muscle's whole cost (its energy per unit of work times its
+                      service, the index's arithmetic on one plant) is proven lower at 99.9%, and neither part of it is
+                      worse beyond the muscle's own wobble; proven again on the recheck and taken back when it no longer
+                      pays
+      calm            a give-back is asked for, and its trial runs, only while the muscle is calm (its copies on average
+                      inside their compass); a copy outside its own calm is held at native that moment
+      the wall        an organism at its own line ends the trial in flight"""
 
-    def step(self, plant, proposal, wall=False):
-        """Once a decision, before the plant steps: proposal is the override the law wants now; returns the override
-        the plant gets (the law's, where the muscle may act; native otherwise)."""
-        w, e = plant.m["work"], plant.m["energy_j"]
-        dw, de = w - self.prev[0], e - self.prev[1]
-        self.prev = (w, e)
-        p = position(plant)
-        c = step_cost(plant, dw, de)
-        if c is not None:
+    def __init__(self, plants, knob, block=20, recheck=120):
+        plants = list(plants) if isinstance(plants, (list, tuple)) else [plants]
+        n = max(1, len(plants))
+        self.knob = knob
+        self.settle = settle_steps(plants[0])
+        # native stands at 1 and the law's give-back at 0: one step down from native, so the body's give-back rules hold
+        self.muscle = Muscle("law", 1, 1, (0, 1), min_samples=block * n, probe_every=1, recheck=recheck,
+                             max_trial=4 * block + self.settle, incremental=False, gain=True)
+        self.body = Body([self.muscle], name=getattr(plants[0], "template", "muscle"))
+        self.prev = [(p.m["work"], p.m["energy_j"]) for p in plants]
+        self.acc = [(0.0, 0.0)] * n                       # work and energy since the copy's last finished piece of work
+        self.at = 1                                       # where the muscle stood for the decision just measured
+        self.block_seen, self.settling = None, 0
+
+    def step(self, plants, proposals, wall=False):
+        """Once a decision, before the plants step: proposals are the overrides the law wants now, one per copy; returns
+        the override each copy gets (the law's give-back where the muscle may give back and the copy is calm; native
+        otherwise)."""
+        single = not isinstance(plants, (list, tuple))
+        if single:
+            plants, proposals = [plants], [proposals]
+        v = self.muscle.verdicts["give back"]
+        if v.block_no != self.block_seen:                 # the knob moved to a new block: let the muscle settle
+            self.block_seen, self.settling = v.block_no, self.settle
+            self.acc = [(0.0, 0.0)] * len(plants)
+        whole, energy, service, pos = [], [], [], []
+        for i, plant in enumerate(plants):
+            w, e = plant.m["work"], plant.m["energy_j"]
+            if w < self.prev[i][0]:                      # the meters started again (the end of the learning period)
+                self.prev[i] = (0.0, 0.0)
+            dw, de = w - self.prev[i][0], e - self.prev[i][1]
+            self.prev[i] = (w, e)
+            p = position(plant)
+            pos.append(p)
+            aw, ae = self.acc[i]
+            aw, ae = aw + dw, ae + de
+            c = step_cost(plant, aw, ae)
+            if c is None:
+                self.acc[i] = (aw, ae) if aw <= 0 else (0.0, 0.0)
+                continue
+            self.acc[i] = (0.0, 0.0)
             svc = 1.0 + max(0.0, p)
-            whole = c * svc
-            self.body.observe([whole], benefit=[whole], parts={"energy": [c], "service": [svc]}, at={"law": self.acting})
-        out = self.body.tick({"law": {"force": 1.0 if proposal else 0.0, "spend_ok": bool(proposal), "wanted": 1}},
-                             wall=bool(wall) or p >= LINE, calm=p < WALL)
-        self.acting = out.get("law", 0)
-        return dict(proposal) if (self.acting >= 1 and proposal) else {}
+            whole.append(c * svc)
+            energy.append(c)
+            service.append(svc)
+        if self.settling > 0:
+            self.settling -= 1
+        elif whole:
+            self.body.observe(whole, benefit=whole, parts={"energy": energy, "service": service}, at={"law": self.at})
+        offers = [give_back(pl, self.knob, pr) if p < WALL else {} for pl, pr, p in zip(plants, proposals, pos)]
+        asking = sum(1 for o in offers if o) / len(offers)
+        calm = sum(pos) / len(pos) < WALL
+        out = self.body.tick({"law": {"force": -asking, "give_ok": asking > 0, "wanted": 0}}, wall=bool(wall), calm=calm)
+        self.at = out.get("law", 1)
+        res = [o if self.at <= 0 else {} for o in offers]
+        return res[0] if single else res

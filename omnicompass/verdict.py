@@ -37,6 +37,9 @@ sureness, SURE = 99.9%, holds for the whole engine.
              across every look, the chance of allowing a step that costs more than the line is at most 1 in 1,000. A clear
              win is taken at the first cycle, a clear loss refused at the first cycle, and only a close call takes more;
              nothing unproven is ever allowed
+  no harm    a step whose own measured extra cost, on the whole or on any part, is already past that part's line is refused
+  while it   at that look, without waiting to be sure of the harm: a trial that is hurting the muscle is stopped at once.
+  learns     This only ever refuses sooner; it never allows anything more, so the 1 in 1,000 holds as it is
   gain       a step must also buy something: with gain=True the caller hands every block a second reading (lower is better:
              the watts the muscle drew), and the step is allowed only when the engine is 99.9% sure the reading fell under
              the trial step. A step that costs nothing but saves nothing has no reason to be taken ("no gain")
@@ -48,8 +51,10 @@ sureness, SURE = 99.9%, holds for the whole engine.
              hill of many steps is found in a handful of trials
   nothing    every kept step is proven again against native itself every recheck decisions (the work may have changed); a
   permanent  step that no longer proves is taken back to the deepest step still proven, and that one is proven again at the
-             next probe. A refused step is not tried again until recheck decisions have passed. A trial the caller ends
-             (calm False: the wall, or another trial in the same body) is abandoned and the knob goes back at once
+             next probe. A refused step is not tried again until recheck decisions have passed, and each refusal in a row
+             doubles that wait (up to 32 times: what keeps failing costs less and less to keep asking, and is still asked).
+             A trial the caller ends (calm False: the wall, or the service leaving its calm) is abandoned and the knob goes
+             back at once; if the step itself was on when the service left its calm, it waits a recheck too
 
 The verdict never makes the knob more aggressive than the law: it only narrows where the law may go. Every probe and every
 judgement, with its numbers, is returned to the caller for the audit. Its arithmetic (the t, normal, chi-square and
@@ -64,6 +69,7 @@ import math
 SURE = 0.999            # the one sureness of the whole engine (the founder's order, 10 October 2026); never 1
 TRIM = 0.10             # the share trimmed from each end of a sample before its mean (Yuen's trimmed mean)
 RESOLUTION = 1e-6       # a change under one part in a million is the arithmetic's own resolution, never a difference
+BACKOFF = 32            # the longest a refused step waits before it is asked again, in recheck periods
 
 
 def median(xs):
@@ -346,6 +352,7 @@ class Verdict:
         self.proven = []                      # the steps proven, shallow to deep (the knob goes back along them)
         self.kept_at = 0                      # decision at which the deepest step was last proven
         self.refused_until = {}               # step -> decision index before which it is not tried again
+        self.refusals = {}                    # step -> refusals in a row (each doubles the wait, up to BACKOFF times)
         self.phase = None                     # None, "ref" (a reference block) or "trial" (a trial block)
         self.trial = None
         self.reproof = False                  # the trial in flight proves a kept step again, against native
@@ -459,6 +466,8 @@ class Verdict:
                 "cost_ref": median([x for b in self.blocks[0::2] for x in b["x"]]),
                 "cost_step": median([x for b in self.blocks[1::2] for x in b["x"]])}
         inside, past = self._inside(r), self._past(r)
+        worse = d > r["line"]                               # no harm while it learns: measured past its own line, stopped
+        past = past or worse
         own = (d, sum(v for v, _ in parts) + tau * area, parts + [(tau * area, len(self.walk))])
         cum = own
         if self.incremental and not self.reproof and self.ref_step() != 0 and self.native_block is not None:
@@ -484,7 +493,7 @@ class Verdict:
             pparts = [(wi * wi * s_[1], s_[2]) for wi, s_ in zip(w, pst)]
             pref = sum(pst[i][1] for i in range(0, 2 * m + 1, 2)) / (m + 1)
             pr = self.test(pd, pparts, area, self.line(pref), design_var=pref * sum(wi * wi for wi in w))
-            if self._past(pr):
+            if self._past(pr) or pd > pr["line"]:
                 hurt.append(name)
                 past = True
             elif not self._inside(pr):
@@ -494,6 +503,8 @@ class Verdict:
         last = m >= self.looks
         if past:
             why = "the muscle is slower there" if not hurt else "it makes a part worse (" + ", ".join(hurt) + ")"
+            if worse and not hurt:
+                nums["measured_past_line"] = True
             return False, {"verdict": "step refused: " + why, **nums}, cum
         if not inside:
             return (False, {"verdict": "step refused: never proven inside the muscle's own wobble", **nums}, cum) if last else None
@@ -575,8 +586,12 @@ class Verdict:
                         self.proven = sorted(set([p for p in self.proven if p < step] + [step]))
                     self.cum[step] = cum
                     self.kept_at = self.t
+                    self.refusals.pop(step, None)
                 else:
-                    self.refused_until[step] = self.t + self.recheck
+                    k = self.refusals.get(step, 0)
+                    self.refused_until[step] = self.t + self.recheck * min(2 ** k, BACKOFF)
+                    self.refusals[step] = k + 1
+                    event["wait"] = self.refused_until[step] - self.t
                     if self.reproof:
                         self._pull_back(step)
                         event["back_to"] = self.allowed
@@ -595,6 +610,9 @@ class Verdict:
             if not calm or self.t - self.block_t > self.max_trial:
                 event = {"verdict": "trial abandoned (service not calm)" if not calm else "trial abandoned (too little work)",
                          "step": self.trial, "reproof": self.reproof}
+                if not calm and self.phase == "trial" and not self.reproof:
+                    # the step itself was on when the service left its calm: it may have done it, so it waits a recheck
+                    self.refused_until[self.trial] = max(self.refused_until.get(self.trial, -1), self.t + self.recheck)
                 self._end()
             elif len(self.blocks[-1]["x"]) >= self.min_n:
                 event = self._close_block()

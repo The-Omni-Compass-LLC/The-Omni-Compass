@@ -67,9 +67,37 @@ def job(args):
     om = run_organism_arm(rows, seed, "compass")
     c = paired_organism(om, nat)
     c["restore_ok"] = om["restore_ok"]
+    # Omni v4: the declared learning period before the scored hour, reported beside it, and the muscles proven
+    c["learn"] = paired_organism({"plants": om["learn_plants"]}, {"plants": nat["learn_plants"]}) if om["learn_plants"] else None
+    c["proof"] = om.get("proof")
     c["energy_native_j"] = sum(p["energy_j"] for p in nat["plants"])
     c["energy_omni_j"] = sum(p["energy_j"] for p in om["plants"])
     return key, seed, c
+
+
+def learning_table(res, scale, n=None):
+    """Omni v4: the declared learning period that ran before each scored hour, in both arms on the same seed, and the
+    muscles each run had proven by its end (realms/presets.py LEARN_STEPS)."""
+    L = ["", "Omni v4: before each scored hour above, a declared learning period ran in both arms on the same seed "
+         "(`realms/presets.py` LEARN_STEPS). What it cost or gave, and how many muscles had proven their law by the end "
+         "of the run:", "",
+         "| # | Organism | Runs | Learning period: work per energy | Work | Energy | Violations (pp) | Muscles proven (mean of runs) |",
+         "|---|---|---:|---:|---:|---:|---:|---:|"]
+    rows = 0
+    for num, (k, nm) in ORGS.items():
+        if k not in res:
+            continue
+        per = [res[k][s] for s in sorted(res[k], key=int)][:n]
+        lp = [c["learn"] for c in per if c.get("learn")]
+        pr = [c["proof"] for c in per if c.get("proof")]
+        if not lp:
+            continue
+        rows += 1
+        sm = summarize(lp) if len(lp) > 1 else {q: (lp[0][q],) * 3 for q in ("primary", "work", "energy", "viol_pp")}
+        f = lambda q, s=100.0, u="%": f"{s * sm[q][0]:+.3f}{u}" + (f" ({s * sm[q][1]:+.3f} to {s * sm[q][2]:+.3f})" if len(lp) > 1 else "")
+        proven = (f"{sum(p['proven'] for p in pr) / len(pr):.1f} of {pr[0]['muscles']}" if pr else "n/a")
+        L.append(f"| {num} | {nm} | {len(lp)} | {f('primary')} | {f('work')} | {f('energy')} | {f('viol_pp', 1.0, '')} | {proven} |")
+    return L if rows else []
 
 
 def main(argv=None):
@@ -96,7 +124,8 @@ def main(argv=None):
     L = [f"# Six organisms, {a.runs} runs, {a.scale}x size", "",
          f"Evidence class **S** (models). Commit `{commit[:12]}`, seeds {SEED0}-{SEED0 + a.runs - 1}, {a.scale} cop{'y' if a.scale == 1 else 'ies'} "
          f"of each organism on one clock, {time.time() - t0:.0f} s on {a.workers} workers. Native: each organism's own "
-         "controllers. Omni: the compass law on every muscle (`realms/compass_arm.py`). Harness `tools/run_scale.py`.", "",
+         "controllers. Omni (v4): the compass law on every muscle, acting on a muscle only where that muscle's own verdict has proven it, "
+         "every copy of the muscle proven together (`realms/compass_arm.py`). Harness `tools/run_scale.py`.", "",
          "Band first (the founder's rule): no win unless the time over the service line is no higher than native's "
          "(violations, mean over runs, at or under 0 pp).", "",
          "| # | Organism | Muscles | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |",
@@ -114,6 +143,7 @@ def main(argv=None):
         summary[k]["band_first"] = band
         L.append(f"| {num} | {nm} | {len(rows_for(k, a.scale))} | **{lab}** | {band} | {f('primary')} | {f('work')} | {f('energy')} | "
                  f"{f('viol_pp', 1.0, '')} | {all(c['restore_ok'] for c in per)} |")
+    L += learning_table(res, a.scale)
     (out / "SCALE.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     (out / "SCALE.json").write_text(json.dumps({"runs": a.runs, "scale": a.scale, "commit": commit, "summary": summary,
                                                 "per_run": {k: {str(s): c for s, c in v.items()} for k, v in res.items()}}) + "\n")

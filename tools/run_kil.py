@@ -18,9 +18,14 @@ on the measured window's clock, ORGANISM_STEPS steps, and the real cluster is wi
 
 Arms, the same organism, the same seed, the same demand:
   native  the stacks' own controllers, and Kubernetes alone underneath (Omni-Compass not started)
-  omni / compass  one engine on everything: the compass law (omnicompass/compass_law.py) on every simulated muscle
-          (realms/compass_arm.py) and the live controller on the cluster (started by kind_bench.sh). At KILL_AT of the
-          window every simulated knob is handed back, and this file checks it was.
+  omni / compass  one engine on everything: the compass law (omnicompass/compass_law.py) on every simulated muscle,
+          acting only where that muscle's own gate has proven it (Omni v4, realms/compass_arm.py), and the live
+          controller on the cluster (started by kind_bench.sh). At KILL_AT of the window every simulated knob is handed
+          back, and this file checks it was.
+
+Omni v4: the modelled muscles' declared learning period (realms/presets.py LEARN_STEPS) runs before the window opens, on
+the organism's own clock and in both arms, and its receipts are kept beside the window's (learn_plants); the cluster is
+the real thing and learns inside the window.
 
 Writes organism.json (every plant's receipt, the steps, the replica trace, the cluster's watts as the organism saw
 them) and appends each replica change to load_schedule.log in the format scripts/kind_bench.sh writes.
@@ -45,8 +50,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from realms.harness import Body, KILL_AT  # noqa: E402
-from realms.compass_arm import compass_apply  # noqa: E402
+from realms.harness import Body, KILL_AT, omni_step, learn_off_clock, proof_of  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
 from tools.run_hil import groups, NAMES, SEED0  # noqa: E402
 
@@ -54,12 +58,14 @@ OMNI_ARMS = ("omni", "compass", "strict")
 
 
 def demand_trace(body):
-    """The organism's offered compute work over its declared mean, per step (the seeded trace: arm-independent)."""
+    """The organism's offered compute work over its declared mean, per step of the window (the seeded trace, after the
+    learning period: arm-independent)."""
     pools = [p for p in body.plants if hasattr(p, "lam")]
     if not pools:
         return [1.0] * ORGANISM_STEPS
     lam0 = sum(p.P["lam0"] for p in pools) or 1.0
-    return [sum(p.lam[k] for p in pools) / lam0 for k in range(ORGANISM_STEPS)]
+    k0 = getattr(body, "learn", 0)
+    return [sum(p.lam[k0 + k] for p in pools) / lam0 for k in range(ORGANISM_STEPS)]
 
 
 def replicas_of(trace, load_max):
@@ -107,6 +113,7 @@ def main(argv=None):
     omni = a.arm in OMNI_ARMS
     step_s = a.duration / ORGANISM_STEPS
     kill_at = int(KILL_AT * ORGANISM_STEPS)
+    learned = learn_off_clock(body, omni)                       # the modelled muscles' learning period, before the window
     (out / "organism.ready").write_text(f"{time.time():.0f}\n")
     if a.go_file:
         start = None
@@ -137,14 +144,11 @@ def main(argv=None):
             set_r = reps[k]
         body.couple()
         if omni:
-            for p, knob in zip(body.plants, body.knobs):
-                if k >= kill_at:
+            if k >= kill_at:
+                for p in body.plants:
                     p.override = {}
-                    continue
-                v = compass_apply(p, knob)
-                if v and v != last.get(id(p)):
-                    writes += 1
-                last[id(p)] = v
+            else:
+                writes += omni_step(body, last)
         body.step()
         w = cluster_w(out / "capture.csv", nominal_cluster or 0.0)
         if nominal_cluster is None and w:
@@ -161,7 +165,8 @@ def main(argv=None):
     rec = {"organism": a.organism, "name": NAMES[a.organism], "arm": a.arm, "omni": omni, "seed": a.seed,
            "muscles": len(rows), "scale": a.scale, "steps": ORGANISM_STEPS, "step_s": step_s, "load_max": a.load_max,
            "demand": trace, "replicas": reps, "cluster_w": seen_w, "sim_writes": writes, "sim_restore_ok": restore_ok,
-           "plants": [dict(p.m) for p in body.plants], "wall_s": round(time.time() - t0, 1)}
+           "plants": [dict(p.m) for p in body.plants], "learn_steps": body.learn, "learn_plants": learned,
+           "proof": proof_of([body]) if omni else None, "wall_s": round(time.time() - t0, 1)}
     (out / "organism.json").write_text(json.dumps(rec) + "\n")
     behind = max(0.0, time.time() - t0 - a.duration)
     rec["behind_s"] = round(behind, 1)

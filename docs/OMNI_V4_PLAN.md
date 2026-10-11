@@ -239,6 +239,50 @@ are read again from the v4 tables.
 5. Every result run again on v4 in the order of section 7; then the CPU power benchmark on the metal, the card on Lambda, the two
    clouds; then the manual's Part II gains the body chapter and the PDF is rebuilt.
 
+## 9. What the build of 11 October taught on the modelled organisms, and the rules it added
+
+The organisms were the first place the whole engine ran through the body at scale (stage 4d on the `v4` branch). The first
+measurement, every knob wired and the verdict deciding, read worse than native on energy at one copy (compute +0.43%,
+distribution +0.61%, with fewer violations): a trade, which rule 4 refuses. Nearly all of it came from one knob v3 never moved,
+the compute pools' autoscaler target lowered (more pods), whose trials alone raised those pools' energy by 5.6%. The rules below
+remove the cause; each is the founder's own rule made exact, and each is in the engine or the realm harness with its test.
+
+1. **A muscle is proven across all its copies.** A muscle in a ten-copy organism is the same muscle ten times; one gate proves it
+   on every copy at once (`realms/compass_arm.py`, `Gate`), so the proof sharpens with the size of the fleet, as a fleet's
+   operator would prove it. Each block's first decisions are left out while the muscle settles, from the plant's own physics.
+2. **A declared learning period.** Every organism run is one hour of learning followed by the scored hour, in both arms on the same
+   seed (`realms/presets.py`, `LEARN_STEPS`). The learning hour is reported beside the scored hour, never hidden; nothing the brain
+   learned is reset at the boundary.
+3. **On the modelled plants only give-backs are tried.** Every spend these plants offer buys service with energy (more machines,
+   colder air, a battery's round trip), which rule 4 refuses, so none is tried: native is always free and the plant's own
+   controller answers the stress. The plant's own figures also say where a give-back can save at all (a power cap only where the
+   machine is not racing to idle, an effort cap only where the copper it saves outweighs the longer move, a speed knob only where
+   the axis has room); a cooling cap moves heat later, a battery's power cap defers its draw, and a process loop's actuator or
+   power cap saves only by not delivering, so there is nothing to try there. This is the brain's own reading every decision, not a
+   hold: if a plant's figures changed, it would ask.
+4. **A trial cannot hide what it does.** Every copy's work counts in every block, a copy held at native for its own safety
+   included, so whatever the trial does to any copy is in its measurement.
+5. **No harm while it learns.** A step whose own measured extra cost, on the whole or on any part, is already past that part's line
+   is refused at that look, without waiting to be sure of the harm (`omnicompass/verdict.py`). It only ever refuses sooner, so the
+   1 in 1,000 guarantee on allowing holds as it is.
+6. **What keeps failing costs less and less to keep asking.** Each refusal in a row doubles the wait before the step is asked again
+   (up to 32 recheck periods); it is always asked again. A give-back trial abandoned while its own step was on waits a recheck.
+
+Measured after these rules, four paired runs at one copy, the scored hour (evidence class S, modelled; not a result of record):
+
+| Organism | Work per energy | Energy | Work | Violations (pp) | Muscles proven by the end |
+|---|---:|---:|---:|---:|---:|
+| Compute / AI / Cloud (430) | +0.004% | -0.004% | 0.000% | -0.006 | 1.5 |
+| Physics / Robotics / Autonomous (376) | +0.003% | -0.002% | 0.000% | -0.006 | 1.0 |
+| Energy / Facility / Industrial (470) | +0.199% | -0.198% | 0.000% | -0.018 | 6.8 |
+| Distribution / Specialized (440) | +0.031% | -0.031% | 0.000% | -0.007 | 1.0 |
+| The four stacked (1,716) | +0.164% | -0.164% | 0.000% | -0.012 | 9.8 |
+| The whole tower (945) | +0.198% | -0.197% | 0.000% | -0.008 | 7.2 |
+
+Nothing is worse anywhere, in the scored hour or in the learning hour. The saving is about half of v3's at one copy (v3: compute
++0.084%, energy +0.366%, the stack +0.368%, the tower +0.365%), because v4 keeps only what it has proven at 99.9%, and in one hour a
+single copy proves only a handful of its muscles. The grid at 10, 100 and 1,000 copies shows how much more a fleet proves.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

@@ -10,7 +10,8 @@ not measurements of any product.
 
 Two clocks:
   single     each plant on its own natural decision period and horizon (STEPS_SINGLE)
-  organism   every plant on one shared 15 s decision clock for 240 steps (one hour), so they can be coupled
+  organism   every plant on one shared 15 s decision clock for 240 steps (one hour), so they can be coupled; under Omni
+             v4 a declared learning period (LEARN_STEPS, one more hour) runs before that scored hour, in both arms
 """
 from __future__ import annotations
 
@@ -20,6 +21,7 @@ STEPS_SINGLE = {"compute_pool": 720, "thermal_zone": 720, "energy_storage": 720,
                 "process_loop": 720}
 ORGANISM_DT = 15.0
 ORGANISM_STEPS = 240
+LEARN_STEPS = 240       # Omni v4: the declared learning period before the scored hour (one hour on the organism clock)
 CAL_SEED = 999          # the calibration seed: sets declared power budgets from native draw; never a result seed
 
 _CP = dict(dt=15.0, mu=50.0, slo_s=0.5, startup_steps=4, n0=6, n_min=2, n_max=80, p_idle=60.0, p_dyn=140.0,
@@ -157,8 +159,8 @@ def muscle_scale(muscle_id: str) -> float:
     return 0.6 + 0.8 * h
 
 
-def params_for(row: dict, organism: bool = False) -> dict:
-    """The parameter set one muscle's plant runs with."""
+def params_for(row: dict, organism: bool = False, learn: int = 0) -> dict:
+    """The parameter set one muscle's plant runs with. learn: the organism's learning steps before its scored hour."""
     P = dict(PRESETS[row["preset"]])
     s = muscle_scale(row["muscle_id"])
     for key in SCALE_KEY[row["template"]]:
@@ -184,7 +186,8 @@ def params_for(row: dict, organism: bool = False) -> dict:
                     P["ca_unneeded_steps"] = max(1, int(round(P["ca_unneeded_steps"] / ratio)))
                 P["period_steps"] = ORGANISM_STEPS * 4
             if row["template"] == "energy_storage":
-                P["start_h"] = P["peak_h"] - 0.5                   # the hour around the site's peak
+                # the scored hour around the site's peak, the learning period before it
+                P["start_h"] = P["peak_h"] - 0.5 - learn * ORGANISM_DT / 3600.0
         else:
             P["dt_dec"] = ORGANISM_DT
     return P

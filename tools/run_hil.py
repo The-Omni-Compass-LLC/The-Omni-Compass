@@ -15,9 +15,14 @@ counted in the organism's receipt.
 
 Arms, the same organism, the same seed, the same request stream:
   native  the stacks' own controllers and the card's own firmware, no Omni
-  omni    one engine on everything: the compass law (omnicompass/compass_law.py) on every simulated muscle (realms/compass_arm.py)
-          and on the card's two wires (omni_controller/gpu_compass.py); at 90% of the arm every knob and both wires are
-          handed back, and the harness checks they were
+  omni    one engine on everything: the compass law (omnicompass/compass_law.py) on every simulated muscle, acting only
+          where that muscle's own gate has proven it (Omni v4, realms/compass_arm.py), and on the card's two wires
+          (omni_controller/gpu_compass.py); at 90% of the arm every knob and both wires are handed back, and the harness
+          checks they were
+
+Omni v4: the modelled muscles' declared learning period (realms/presets.py LEARN_STEPS) runs before the card's window
+opens, on the organism's own clock and in both arms, and its receipts are kept beside the window's (learn_plants); the card
+is the real thing and learns inside the window.
 
 Sizes (--scales, default 1,10,100,1000): each organism is run as 1, 10, 100 and 1,000 copies governed together on one
 clock (1,000 copies of the whole tower is close to a million muscles), with the one real card inside as one more muscle. Each size
@@ -53,8 +58,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from realms.harness import catalog, Body, KILL_AT, T95, label  # noqa: E402
-from realms.compass_arm import compass_apply  # noqa: E402
+from realms.harness import catalog, Body, KILL_AT, T95, label, omni_step, learn_off_clock, proof_of  # noqa: E402
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
 
@@ -113,12 +117,12 @@ def groups(scale=1):
 def per_muscle_step_s():
     """What one simulated step costs per muscle on this machine (the whole tower, a few steps, both laws' work)."""
     rows = groups(1)[TOWER]
-    body = Body(rows, SEED0)
+    body = Body(rows, SEED0, learn=0)
+    last = {}
     t = time.time()
     for _ in range(5):
         body.couple()
-        for p, knob in zip(body.plants, body.knobs):
-            compass_apply(p, knob)
+        omni_step(body, last)
         body.step()
     return (time.time() - t) / 5 / len(rows)
 
@@ -127,6 +131,7 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
     step_s = step_s or a.step_s
     d.mkdir(parents=True, exist_ok=True)
     body = Body(rows, seed)
+    learned = learn_off_clock(body, arm == "omni")             # the modelled muscles' learning period, before the window
     for f in ("kill",):
         (d / f).unlink(missing_ok=True)
     smi(a, "-i", str(a.gpu), "-rgc")
@@ -162,14 +167,11 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
         if arm == "omni":
             if k == kill_at:
                 (d / "kill").touch()                              # the card's governor hands both wires back
-            for p, knob in zip(body.plants, body.knobs):
-                if k >= kill_at:
+            if k >= kill_at:
+                for p in body.plants:
                     p.override = {}
-                    continue
-                v = compass_apply(p, knob)
-                if v and v != last.get(id(p)):
-                    writes += 1
-                last[id(p)] = v
+            else:
+                writes += omni_step(body, last)
         body.step()
         draw = last_draw(d / "smi.csv", draw)
         body.src_w += draw; body.sz_w += draw; body.all_w += draw      # the card's watts in the organism
@@ -193,7 +195,8 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
     lat = sorted(float(x.split(",")[1]) for x in list(open(d / "latency.csv"))[1:] if x.strip()) if (d / "latency.csv").exists() else []
     over = 100.0 * sum(1 for x in lat if x > slo_ms) / len(lat) if lat else 0.0      # the card's time over its line
     rec = {"organism": name, "arm": arm, "seed": seed, "muscles": len(rows), "step_s": step_s,
-           "plants": [dict(p.m) for p in body.plants], "sim_writes": writes, "sim_restore_ok": restore_ok,
+           "plants": [dict(p.m) for p in body.plants], "learn_steps": body.learn, "learn_plants": learned,
+           "proof": proof_of([body]) if arm == "omni" else None, "sim_writes": writes, "sim_restore_ok": restore_ok,
            "card": {"energy_j": joules, "samples": samples, "served": summ.get("served", 0),
                     "not_served": summ.get("not_served", summ.get("requests", 0) - summ.get("served", 0)),
                     "p95_ms": lat[int(0.95 * (len(lat) - 1))] if lat else None, "over_line_pct": over, "limit_start_w": w0, "limit_end_w": w1,

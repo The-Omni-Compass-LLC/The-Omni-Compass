@@ -192,6 +192,29 @@ def recheck():
     assert len(tries) >= 2 and v.allowed == 0
 
 
+def no_harm():
+    # a step that hurts by far more than the machine's own wobble is stopped at the first look on its own measurement, and
+    # every refusal in a row doubles the wait before it is asked again (never past 32 recheck periods)
+    rng = random.Random(4)
+    v = Verdict(min_samples=30, probe_every=1, recheck=20, max_steps=1)
+    log = drive(v, lambda k: 10.0 * (1.5 if k == 1 else 1.0), 2600, rng=rng, sigma=0.3)
+    refused = [e for e in log if e["verdict"].startswith("step refused")]
+    # a machine never measured before is judged after its second cycle; from then on at the first
+    assert len(refused) > 4 and refused[0]["cycles"] <= 2 and refused[1]["cycles"] == 1 and v.allowed == 0, refused[:2]
+    waits = [e["wait"] for e in refused]
+    assert waits[:4] == [20, 40, 80, 160] and max(waits) <= 20 * 32, waits
+    # a give-back abandoned while its own step was on (the service left its calm) waits a recheck too
+    v = Verdict(min_samples=10, probe_every=1, recheck=50, max_steps=1)
+    v.first = v.fresh = False                                       # a machine already measured: no measuring twice
+    t = 0
+    while v.phase != "trial":
+        v.observe([10.0] * 10)
+        v.tick(True)
+        t += 1
+    v.tick(False)                                                   # the service leaves its calm with the step on
+    assert v.refused_until.get(1, -1) >= v.t + 49 and not v.ready()
+
+
 def permanent():
     # step 1 free until decision 300, then 20% dearer: it is allowed, proven again, and taken back once it costs
     v = Verdict(min_samples=30, probe_every=2, recheck=100, max_steps=1)
@@ -224,12 +247,13 @@ def card():
 def main():
     arithmetic(); exact()
     bad, free = guarantee()
-    own_line(); drift(); stepwise(); gain(); calm(); recheck(); permanent(); determinism(); card()
+    own_line(); drift(); stepwise(); gain(); calm(); recheck(); no_harm(); permanent(); determinism(); card()
     print(f"PASS verdict: the quantiles exact, a sureness of 1 refused; on a machine with no wobble a free step allowed and a "
           f"costly one refused; on a noisy one a step one line past native allowed {bad} times in 4,000 (at most 1 in 1,000), "
           f"a free step allowed {free} times in 400, a clearly costly one refused at the first judgement; each machine its own "
           "line; a wandering machine held to the same guarantee; a stepwise climb held to native's line; no gain refused; "
-          "trials abandoned when the caller ends them; refused steps rechecked; a kept step proven again against native and "
+          "trials abandoned when the caller ends them; refused steps rechecked; a harmful step stopped at the first look on its own "
+          "measurement and its wait doubled with each refusal; a kept step proven again against native and "
           "taken back when it costs; the card never proven slower")
 
 

@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from realms.harness import summarize, label  # noqa: E402
-from tools.run_scale import ORGS, rows_for  # noqa: E402
+from tools.run_scale import ORGS, rows_for, learning_table  # noqa: E402
 
 
 def main(out, *paths):
@@ -32,7 +32,7 @@ def main(out, *paths):
     total = max(len(v) for v in per.values())
     L = [f"# Six organisms at {scale}x size, up to {total} runs (pooled from {len(files)} shards)", "",
          f"Evidence class **S** (models). Commit(s) {', '.join(sorted(commits))}. Native: each organism's own controllers. "
-         "Omni: the compass law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 "
+         "Omni (v4): the compass law on every muscle, acting on a muscle only where its own verdict has proven it. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 "
          "are nested. Band first: no win unless the time over the service line is no higher than native's.", ""]
     summ = {}
     for n in [x for x in (1, 10, 100, 1000) if x <= total]:
@@ -53,6 +53,7 @@ def main(out, *paths):
             f = lambda q, s=100.0, u="%": f"{s * sm[q][0]:+.3f}{u}" + (f" ({s * sm[q][1]:+.3f} to {s * sm[q][2]:+.3f})" if len(xs) > 1 else "")
             L.append(f"| {num} | {nm} | {len(rows_for(k, scale))} | {len(xs)} | **{lab}** | {band} | {f('primary')} | {f('work')} | "
                      f"{f('energy')} | {f('viol_pp', 1.0, '')} | {ok} |")
+        L += learning_table(per, scale, n)
         L.append("")
     Path(out).write_text("\n".join(_legal_stamp(L)) + "\n")
     Path(out).with_suffix(".json").write_text(json.dumps({"scale": scale, "summary": summ}, indent=1) + "\n")

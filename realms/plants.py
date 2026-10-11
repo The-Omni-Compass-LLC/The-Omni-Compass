@@ -259,6 +259,13 @@ class Plant:
     def finalize(self):
         pass
 
+    def split(self):
+        """The meters so far, closed as if the run ended at this decision, and the meters started again from here: the
+        end of a declared learning period, after which the scored hour is metered on its own."""
+        m = dict(self.m)
+        self.m = {"work": 0.0, "energy_j": 0.0, "viol": 0, "steps": 0}
+        return m
+
 
 # ---------------------------------------------------------------------------------------------------------------
 class ComputePool(Plant):
@@ -608,6 +615,14 @@ class EnergyStorage(Plant):
     def finalize(self):
         # battery energy left below (or above) where it started is bought back (or credited) at the round trip
         self.m["energy_j"] += (self.soc0 - self.soc) * self.E / math.sqrt(self.P["eta_rt"])
+
+    def split(self):
+        # the learning period closed the same way: its battery energy squared at the round trip, and the scored hour
+        # judged from the charge it starts with
+        m = super().split()
+        m["energy_j"] += (self.soc0 - self.soc) * self.E / math.sqrt(self.P["eta_rt"])
+        self.soc0 = self.soc
+        return m
 
 
 # ---------------------------------------------------------------------------------------------------------------
