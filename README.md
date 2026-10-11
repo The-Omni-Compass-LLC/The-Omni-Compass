@@ -36,7 +36,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-11 01:36 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-11 01:57 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C confirmation (Omni v3)](results/live/V3_KEDA_REQUESTS.md) |  |
+| 2026-10-11 01:57 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C confirmation (Omni v3)](results/live/V3_KEDA_CPU_REQUESTS.md) |  |
+| 2026-10-11 01:57 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-11 00:21 | [Public demand traces, turned into load schedules](results/traces/README.md) |  |
 | 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/fresh/RESULT.md) |  |
 | 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/RESULT.md) |  |
@@ -44,8 +46,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-11 00:21 | [Six organisms at 10x size, up to 1000 runs (pooled from 60 shards)](results/scale/v1/receipts/round6-10x.md) |  |
 | 2026-10-11 00:21 | [Six organisms at 100x size, up to 1000 runs (pooled from 240 shards)](results/scale/v1/receipts/round6-100x.md) |  |
 | 2026-10-11 00:21 | [Six organisms at 1000x size, up to 10 runs (pooled from organism-sized shards)](results/scale/v1/receipts/round6-1000x.md) |  |
-| 2026-10-11 00:21 | [The six organisms: the full grid](results/scale/v1/GRID.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)](results/scale/receipts/v3-1x_set1.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -53,7 +53,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-11 01:33 | kwok-scale | success | [38101429176](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38101429176) |
+| 2026-10-11 02:12 | kwok-scale | success | [38103571413](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38103571413) |
 | 2026-10-11 01:29 | kind-addons | success | [38099656930](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38099656930) |
 | 2026-10-10 23:51 | big-organism-detached | success | [38096351977](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38096351977) |
 <!-- front-page:runs:end -->
