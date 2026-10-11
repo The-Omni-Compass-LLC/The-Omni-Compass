@@ -15,7 +15,10 @@
   in `tests/test_legal.py`). The frozen engine files never carried them: omni-v3 is unchanged and no result is read
   differently. Two frozen originals keep a different sentence, about the introductory 10% license benchmark (that the
   benchmark may change or be withdrawn): the reference engine (`reference/`, held by its recorded SHA-256 and program fingerprint) and its
-  dated source snapshot (`docs/handoff/`); they change only on the founder's word.
+  dated source snapshot (`docs/handoff/`); they change only on the founder's word. The founder's reservation of the right
+  to change the software, its documentation, its results and its terms at any time, without notice, stands in plain words
+  in `LICENSE` section 9 (and its SPDX copy and the SBOM), `NOTICE`, `DISCLOSURES.md` item 4, the manual and the book's
+  copyright page: it was taken out with the struck sentences by mistake and put back the same night.
 
 ## 2026-10-10
 - **The notice everywhere, a front page the repository writes itself, and the book for the people who wire it (evening).**
