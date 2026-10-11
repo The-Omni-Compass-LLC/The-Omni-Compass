@@ -1,17 +1,10 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
-"""The compass: one smooth law for every muscle, and the plug every muscle is wired through.
+"""The compass: one smooth law for every muscle.
 
-A muscle is a plug with one wire in and one wire out. The plug reads its meters and writes its lever; all the
-thinking is here, in the brain, written once for every muscle.
-
-The plug (Plug)
-  read      the service reading (response time, temperature, queue) and the lever as it stands
-  write     one value; the plug clips it to the cover, sends it, and reads back what the device took
-  restore   the lever back to the snapshot, the value read once before the first write; it never moves after that
-  one writer if the lever is found at a value the brain did not write, someone else owns it: the brain stops writing
-            and leaves that value alone (restoring over it would fight the new owner)
+A muscle is plugged in with one wire in and one wire out (omnicompass/wire.py: snapshot once, write only from the body's
+tick, read back, one writer, restore). All the thinking is here, in the brain, written once for every muscle.
 
 Two bands
   cover     the outer band, the lever's hard range (the device's or the buyer's lowest and highest setting); every
@@ -109,66 +102,6 @@ class CompassLaw:
         return f
 
 
-class ForeignWriter(Exception):
-    pass
-
-
-class Plug:
-    """One wire in, one wire out. Subclasses implement _read_service, _read_lever and _send; everything else is here."""
-
-    def __init__(self, lo: float, hi: float, tolerance: float = 1e-6):
-        self.lo, self.hi, self.tol = lo, hi, tolerance
-        self.snapshot: Optional[float] = None
-        self.last_written: Optional[float] = None
-        self.owned = True
-        self.writes = 0
-        self.clipped = 0
-
-    # the wires ----------------------------------------------------------------------------------------------------
-    def _read_service(self) -> float:
-        raise NotImplementedError
-
-    def _read_lever(self) -> float:
-        raise NotImplementedError
-
-    def _send(self, value: float) -> None:
-        raise NotImplementedError
-
-    # the contract -------------------------------------------------------------------------------------------------
-    def attach(self) -> float:
-        """Read the lever once, before any write: the restore point. It never moves after this."""
-        self.snapshot = self._read_lever()
-        return self.snapshot
-
-    def read(self) -> float:
-        return self._read_service()
-
-    def lever(self) -> float:
-        return self._read_lever()
-
-    def write(self, value: float) -> Optional[float]:
-        """Clip to the cover, check nobody else moved the lever, send, read back. None: not written (not owned)."""
-        if not self.owned:
-            return None
-        now = self._read_lever()
-        expected = self.last_written if self.last_written is not None else self.snapshot
-        if expected is not None and abs(now - expected) > self.tol:
-            self.owned = False                                     # someone else moved it: it is theirs now
-            raise ForeignWriter(f"lever at {now}, last written {expected}")
-        v = clamp(value, self.lo, self.hi)
-        self.clipped += int(v != value)
-        if abs(v - now) <= self.tol:
-            return now
-        self._send(v)
-        self.last_written = self._read_lever()
-        self.writes += 1
-        return self.last_written
-
-    def restore(self) -> bool:
-        """The lever back to the snapshot. Left alone when someone else owns it. True: at the snapshot (or not ours)."""
-        if not self.owned or self.snapshot is None:
-            return True
-        if abs(self._read_lever() - self.snapshot) > self.tol:
-            self._send(self.snapshot)
-        self.last_written = None
-        return abs(self._read_lever() - self.snapshot) <= self.tol
+# The plug every muscle is wired through lives in omnicompass/wire.py (Omni v4: the wire belongs to the body); its v3 names
+# are kept here for the harnesses that import them.
+from omnicompass.wire import ForeignWriter, Plug, Wire  # noqa: E402,F401
