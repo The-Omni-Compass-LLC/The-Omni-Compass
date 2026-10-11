@@ -63,6 +63,10 @@ SOURCES = [
      {"speed": MEAN, "machines": NODES, "energy": STANDBY}, None),
     ("Real Kubernetes (GitHub)", "A public day of demand: the Google cluster trace of 2011 replayed one step at a time, ten pairs, three runs",
      "V3_TRACE_GOOGLE2011.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+    ("Real Kubernetes (GitHub)", "With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs",
+     "V3_KEDA_CPU_REQUESTS.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+    ("Real Kubernetes (GitHub)", "With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs",
+     "V3_KEDA_REQUESTS.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
 ]
 REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer, GitHub)", "Real messaging (Apache Kafka, GitHub)",
         "Real cache (Redis, GitHub)", "Real database cache (MongoDB under YCSB, GitHub)",
