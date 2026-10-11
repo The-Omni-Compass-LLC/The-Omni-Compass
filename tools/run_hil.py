@@ -138,14 +138,19 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
           "--out", str(d), "--device", f"cuda:{a.gpu}", "--duration", str(dur), "--drain", str(a.drain)]
     if a.sim:
         wl.append("--sim")
-    work = subprocess.Popen(wl, stdout=open(d / "workload.log", "w"), stderr=subprocess.STDOUT)
+    # the arrival signal (omni_controller/gpu_compass.py --signal): the card's brain races the clock the moment a request
+    # arrives and parks it between bursts; the workload sends it in both arms, so both arms run the same workload code
+    sig = f"/tmp/omni-sig-{os.getpid()}-{a.gpu}.sock"
+    wl += ["--signal", sig]
     gov = None
     if arm == "omni":
         gov = subprocess.Popen([sys.executable, "-m", "omni_controller.gpu_compass", "--mode", "cap", "--gpus", str(a.gpu),
                                 "--smi", a.smi, "--interval", str(a.interval), "--audit", str(d / "audit.jsonl"),
                                 "--kill-file", str(d / "kill"), "--latency-file", str(d / "latency.csv"),
-                                "--slo-ms", str(slo_ms), "--floor-w", str(a.floor_w)], cwd=ROOT,
+                                "--slo-ms", str(slo_ms), "--floor-w", str(a.floor_w), "--signal", sig], cwd=ROOT,
                                stdout=open(d / "governor.log", "w"), stderr=subprocess.STDOUT)
+    time.sleep(1.0)                                                # the governor's socket bound before the first arrival
+    work = subprocess.Popen(wl, stdout=open(d / "workload.log", "w"), stderr=subprocess.STDOUT)
     kill_at = int(KILL_AT * ORGANISM_STEPS)
     writes = after_kill = 0
     restore_ok = True
@@ -301,7 +306,7 @@ def main(argv=None):
     ap.add_argument("--organisms", default=os.environ.get("HIL_ORGANISMS", ",".join(REALMS + (STACK, TOWER))))
     ap.add_argument("--gpu", type=int, default=int(os.environ.get("GPU", 0)))
     ap.add_argument("--smi", default=os.environ.get("NVIDIA_SMI", "nvidia-smi"))
-    ap.add_argument("--interval", type=float, default=2.0)
+    ap.add_argument("--interval", type=float, default=0.25)
     ap.add_argument("--drain", type=float, default=10.0)
     ap.add_argument("--floor-w", type=float, default=float(os.environ.get("ENV_FLOOR_W", 0.0)))
     ap.add_argument("--sim", action="store_true", default=bool(os.environ.get("SIM")))

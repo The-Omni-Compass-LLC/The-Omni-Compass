@@ -23,6 +23,14 @@ verdict is how the brain finds that out, on the muscle itself, before it acts an
   stepwise  for a knob that is slow to move back (a machine given back takes minutes to return), incremental=True runs
             the reference at the deepest step already allowed instead of at native, and judges the trial step against
             both that reference and the cost first measured at native, so steps can never add up past the allowance
+  scout     coarse to fine (docs/OMNI_V4_PLAN.md, section 4, rule 4): with bisect=True the next trial is halfway between
+            the deepest step allowed and the shallowest step refused (the far end of the cover at first), so the edge of
+            a hill of many steps is found in a handful of trials instead of one step at a time; a refused step holds
+            every deeper step back until its recheck
+  gain      a step must also buy something: with gain set, the caller hands each phase a second reading (lower is
+            better: the watts the muscle drew under that step) and the step is allowed only if its median reading is at
+            least that share under the reference's. A step that costs nothing but saves nothing has no reason to be taken
+            (a card held by its own power limit draws the same watts under a lower ceiling: refused, "no gain")
 
 The verdict never makes the knob more aggressive than the law: it only narrows where the law may go. Every probe and
 every judgement is returned to the caller for the audit.
@@ -38,8 +46,11 @@ def median(xs):
 
 class Verdict:
     def __init__(self, tolerance=0.005, min_samples=30, probe_every=120, recheck=1800, max_steps=60, max_trial=30,
-                 incremental=False):
+                 incremental=False, gain=None, bisect=False):
         self.tol = tolerance
+        self.bisect = bisect
+        self.gain = gain                  # the least share a step's second reading must fall under the reference's
+        self.ref_b, self.got_b = [], []
         self.min_n = min_samples
         self.probe_every = probe_every
         self.recheck = recheck
@@ -60,15 +71,21 @@ class Verdict:
     def state(self):
         return "left native" if self.allowed == 0 else "acting"
 
-    def observe(self, costs):
-        """Costs (one per piece of work) measured since the last decision, under the step tick() last returned."""
+    def observe(self, costs, benefit=None):
+        """Costs (one per piece of work) measured since the last decision, under the step tick() last returned; and,
+        where the verdict asks for a gain, the second readings (lower is better) taken under that step."""
         if self.phase == "ref":
             self.ref.extend(costs)
+            if benefit:
+                self.ref_b.extend(benefit)
         elif self.phase == "trial":
             self.got.extend(costs)
+            if benefit:
+                self.got_b.extend(benefit)
 
     def _end(self):
         self.phase, self.trial, self.ref, self.got = None, None, [], []
+        self.ref_b, self.got_b = [], []
 
     def tick(self, calm):
         """One decision. calm: the service is inside its compass and nothing waits (a trial is never run under stress).
@@ -87,9 +104,17 @@ class Verdict:
             if self.incremental and self.allowed == 0:
                 self.native_cost = m0
             bound = m0 if self.native_cost is None else min(m0, self.native_cost)
-            if mk <= bound * (1.0 + self.tol):
+            b0, bk = median(self.ref_b), median(self.got_b)
+            gained = self.gain is None or (b0 is not None and bk is not None and bk <= b0 * (1.0 - self.gain))
+            if mk <= bound * (1.0 + self.tol) and gained:
                 self.allowed = self.trial
                 event = {"verdict": "step allowed", "step": self.trial, "cost_native": m0, "cost_step": mk}
+                if self.gain is not None:
+                    event.update({"reading_native": b0, "reading_step": bk})
+            elif mk <= bound * (1.0 + self.tol):
+                self.refused_until[self.trial] = self.t + self.recheck
+                event = {"verdict": "step refused: no gain (it costs nothing and saves nothing)", "step": self.trial,
+                         "cost_native": m0, "cost_step": mk, "reading_native": b0, "reading_step": bk}
             else:
                 self.refused_until[self.trial] = self.t + self.recheck
                 event = {"verdict": "step refused: the muscle is slower there", "step": self.trial,
@@ -97,7 +122,12 @@ class Verdict:
             self._end()
         elif (self.phase is None and calm and self.t - self.last_probe >= self.probe_every
               and self.allowed < self.max_steps and self.refused_until.get(self.allowed + 1, -1) <= self.t):
-            self.phase, self.trial, self.phase_t, self.last_probe = "ref", self.allowed + 1, self.t, self.t
+            nxt = self.allowed + 1
+            if self.bisect:
+                # the shallowest step still refused bounds the search; halfway between it and the deepest allowed
+                ub = min([k for k, u in self.refused_until.items() if u > self.t and k > self.allowed] + [self.max_steps + 1]) - 1
+                nxt = self.allowed + max(1, (ub - self.allowed + 1) // 2)
+            self.phase, self.trial, self.phase_t, self.last_probe = "ref", nxt, self.t, self.t
             self.ref, self.got = [], []
             event = {"verdict": "trial", "step": self.trial}
         if self.phase == "ref":

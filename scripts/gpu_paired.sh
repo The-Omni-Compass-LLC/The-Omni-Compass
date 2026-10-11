@@ -27,7 +27,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 REPS="${REPS:-5}"; DURATION="${DURATION:-600}"; DRAIN="${DRAIN:-30}"; COOLDOWN="${COOLDOWN:-60}"
-GPU="${GPU:-0}"; SAMPLE_MS="${SAMPLE_MS:-200}"; INTERVAL="${INTERVAL:-2}"
+GPU="${GPU:-0}"; SAMPLE_MS="${SAMPLE_MS:-200}"; INTERVAL="${INTERVAL:-0.25}"
 SMI="${NVIDIA_SMI:-nvidia-smi}"; PY="${PYTHON:-python3}"
 ARMS=(native watch omni)
 PHASE="${PHASE:-smoke}"          # smoke: look, any n. confirm: preregistered, frozen, committed code, n from the prereg
@@ -48,7 +48,7 @@ rgc() { local g; for g in "${CARDS[@]}"; do $SMI -i "$g" -rgc >/dev/null 2>&1 ||
 [ "${#CARDS[@]}" = 1 ] || [ -n "${WORKLOAD_CMD:-}" ] || { echo "several cards need WORKLOAD_CMD (one workload across them, e.g. scripts/gpu_vllm.sh)"; exit 1; }
 devmeter() {  # the card's own energy counter (NVML total energy, millijoules, Volta and newer) and its health counters:
   # a cross-check on the integrated power.draw and a record of wear, read by the bench only. "unavailable" where absent.
-  local e; e=$($PY -c "import pynvml as n; n.nvmlInit(); print(n.nvmlDeviceGetTotalEnergyConsumption(n.nvmlDeviceGetHandleByIndex($GPU)))" 2>/dev/null || true)
+  local e; e=$($PY -c "import pynvml as n; n.nvmlInit(); print(sum(n.nvmlDeviceGetTotalEnergyConsumption(n.nvmlDeviceGetHandleByIndex(int(g))) for g in '$GPU'.split(',')))" 2>/dev/null || true)
   echo "energy_mj ${e:-unavailable}"
   local f; for f in ecc.errors.uncorrected.volatile.total ecc.errors.corrected.volatile.total retired_pages.pending clocks_event_reasons.hw_thermal_slowdown; do
     echo "$f $(q1 "$f" || true)"; done
@@ -107,8 +107,10 @@ r = {"gpus": gpu, "gpu_name": q("name"), "driver": q("driver_version"), "persist
      "power_limit_max_w": q("power.max_limit"), "reps": int(os.environ.get("REPS", 5)),
      "duration_s": float(os.environ.get("DURATION", 600)), "drain_s": float(os.environ.get("DRAIN", 30)),
      "cooldown_s": float(os.environ.get("COOLDOWN", 60)), "sample_ms": int(os.environ.get("SAMPLE_MS", 200)),
-     "workload": "tools/gpu_workload.py (seeded fp16 matmul request stream)",
+     "workload": (os.environ.get("WORKLOAD_CMD") or "tools/gpu_workload.py " + (os.environ.get("WORKLOAD_ARGS") or "--kind matmul (seeded fp16 matmul request stream)")),
      "workload_sha256": __import__("hashlib").sha256(open("tools/gpu_workload.py", "rb").read()).hexdigest(),
+     "llm_workload_sha256": __import__("hashlib").sha256(open("tools/llm_workload.py", "rb").read()).hexdigest(),
+     "nvml_fast_path": subprocess.run([sys.executable, "-c", "import pynvml; pynvml.nvmlInit()"], capture_output=True).returncode == 0,
      "workload_cmd": os.environ.get("WORKLOAD_CMD", ""),
      "envelope": json.load(open(f"{out}/envelope.json")) if os.path.exists(f"{out}/envelope.json") else None,
      "mechanism_id": subprocess.run([sys.executable, "tools/mechanism_identity.py", "--id"], capture_output=True, text=True).stdout.strip(),
@@ -119,8 +121,10 @@ EOF
 freeze() {  # every file that decides or measures, hashed; the commit; whether any of them has uncommitted changes
   $PY - "$1" "$PHASE" <<'EOF'
 import hashlib, json, subprocess, sys
-files = ["omni_controller/gpu_governor.py", "omni_controller/muscles.py", "omnicompass/adapter.py", "omnicompass/core.py",
-         "tools/gpu_workload.py", "tools/gpu_reps.py", "scripts/gpu_paired.sh", "docs/GPU_PREREGISTRATION.md"]
+files = ["omni_controller/gpu_compass.py", "omni_controller/gpu_brain.py", "omni_controller/gpu_governor.py",
+         "omni_controller/muscles.py", "omnicompass/verdict.py", "omnicompass/compass_law.py", "omnicompass/master.py",
+         "omnicompass/adapter.py", "omnicompass/core.py", "tools/gpu_workload.py", "tools/llm_workload.py",
+         "tools/gpu_reps.py", "scripts/gpu_paired.sh", "docs/GPU_PREREGISTRATION.md"]
 h = {f: hashlib.sha256(open(f, "rb").read()).hexdigest() for f in files}
 git = ["git", "-c", "safe.directory=*"]   # run as root on a clone the login user owns
 st = subprocess.run(git + ["status", "--porcelain", "--"] + files, capture_output=True, text=True)
@@ -177,6 +181,9 @@ for rep in ${REP_ONLY:-$(seq 1 "$REPS")}; do
     devmeter > "$D/device_start.txt"
     date -u +%s.%N > "$D/window_start.txt"
     gov_pids=()
+    # the arrival signal (omni_controller/gpu_compass.py --signal): one socket per card, short paths (a socket path has
+    # a length limit), handed to the workload in every arm so every arm runs the same workload code
+    SIGS=""; for g in "${CARDS[@]}"; do SIGS="${SIGS:+$SIGS,}/tmp/omni-sig-$$-$g.sock"; done
     if [ "$arm" != "native" ]; then
       mode=watch; [ "$arm" = "omni" ] && mode=cap
       rm -f "$D/kill"
@@ -184,17 +191,20 @@ for rep in ${REP_ONLY:-$(seq 1 "$REPS")}; do
       # one governor per card, each on its own card's two wires, all reading the same response times
       for g in "${CARDS[@]}"; do
         sfx=""; [ "${#CARDS[@]}" = 1 ] || sfx="-$g"
-        $PY -m "$ENGINE_MOD" --mode "$mode" --gpus "$g" --smi "$SMI" --interval "$INTERVAL" \
+        SIGARG=(); [ "$ENGINE_MOD" = omni_controller.gpu_compass ] && SIGARG=(--signal "/tmp/omni-sig-$$-$g.sock")
+        $PY -m "$ENGINE_MOD" --mode "$mode" --gpus "$g" --smi "$SMI" --interval "$INTERVAL" "${SIGARG[@]}" \
           --audit "$D/audit$sfx.jsonl" --kill-file "$D/kill" --latency-file "$D/latency.csv" --slo-ms "$SLO_MS" --floor-w "$ENV_FLOOR_W" ${OMNI_ARGS:-} \
           > "$D/governor$sfx.log" 2>&1 &
         gov_pids+=($!)
       done
     fi
     if [ -n "${WORKLOAD_CMD:-}" ]; then
-      OUT_DIR="$D" DEVICE="cuda:${CARDS[0]}" CARDS="$GPU" bash -c "$WORKLOAD_CMD" > "$D/workload.log" 2>&1 || echo "workload exited $?" >> "$D/workload.log"
+      sleep 1                                              # the governors' sockets are bound before the first arrival
+      OUT_DIR="$D" DEVICE="cuda:${CARDS[0]}" CARDS="$GPU" OMNI_SIGNAL="$SIGS" bash -c "$WORKLOAD_CMD" > "$D/workload.log" 2>&1 || echo "workload exited $?" >> "$D/workload.log"
     else
+      sleep 1
       $PY tools/gpu_workload.py run --calib-file "$OUT/calib.json" --out "$D" --device "cuda:$GPU" \
-        --duration "$DURATION" --drain "$DRAIN" > "$D/workload.log" 2>&1
+        --duration "$DURATION" --drain "$DRAIN" --signal "$SIGS" > "$D/workload.log" 2>&1
     fi
     date -u +%s.%N > "$D/window_end.txt"
     devmeter > "$D/device_end.txt"

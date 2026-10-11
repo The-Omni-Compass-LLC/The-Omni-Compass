@@ -145,22 +145,26 @@ def bench():
 
 
 def bench_compass():
-    """The paired run with the two-wire engine (the default Omni arm): valid, watch writes nothing, Omni moves both wires,
-    and the card's clock range and power limit are back at the start after every arm."""
+    """The paired run with the card's brain (the default Omni arm): valid, watch writes nothing, the arrival signal reaches
+    the brain, the lid stays at the start, and the card's clock range and power limit are back at the start after every arm."""
     d = Path(tempfile.mkdtemp())
     state(d, util_pattern=[100, 100, 100, 40, 40, 40], busy_clock=1200.0)   # busy in bursts, held at 1200 MHz by its own limit
     env = dict(os.environ, NVIDIA_SMI=SMI, SIM="1", REPS="2", DURATION="20", DRAIN="1", COOLDOWN="0", INTERVAL="1",
-               SAMPLE_MS="200", OUT=str(d / "run"), WORKLOAD_ARGS="--calib 5 --target-ms 20", OMNI_ARGS="--learn-samples 3")
+               SAMPLE_MS="200", OUT=str(d / "run"), WORKLOAD_ARGS="--calib 5 --target-ms 20",
+               OMNI_ARGS="--learn-samples 3 --park-slow-path")          # the stand-in card has no NVML fast path
     r = subprocess.run(["bash", str(ROOT / "scripts" / "gpu_paired.sh")], cwd=ROOT, env=env, capture_output=True, text=True, timeout=600)
     assert r.returncode == 0, r.stdout[-3000:] + r.stderr[-2000:]
     out = json.loads((d / "run" / "GPU_REPS.json").read_text())
     assert not out["problems"], out["problems"]
     assert {c["writes"] for c in out["checks"]["watch"].values()} == {0}
     recs = [json.loads(x) for x in open(d / "run" / "rep-1" / "omni" / "audit.jsonl") if x.strip()]
-    # in 20 s the gentle down pull moves the ceiling less than one 15 MHz step before each burst races it back up; the
-    # lid moves, and the clock wire is proved by the wire check and tests/test_gpu_compass.py
-    assert any("write" in x and "-pl" in x["write"] for x in recs), "the down wire never moved"
-    assert any(x.get("decision", {}).get("0", {}).get("decided_by") == "race" for x in recs), "the card never raced a burst"
+    # the card's brain on the arrival signal: every arrival on an idle card races the clock to the top, every rest parks
+    # it (at the top until the verdict allows a level); the lid never moves without a power target (amendment 13)
+    dec = [x["decision"]["0"] for x in recs if "decision" in x]
+    assert dec and dec[-1]["arrivals"] > 0, "the arrival signal never reached the brain"
+    assert any("race" in x or "park" in x for x in recs), "the brain never parked or raced"
+    assert not any("write" in x and "-pl" in x["write"] for x in recs), "the lid moved without a power target"
+    assert any(x.get("decision", {}).get("0", {}).get("decided_by") in ("race", "park", "idle_unparked", "cruise") for x in recs)
     assert any("would_clock_write" in json.loads(x) or "decision" in json.loads(x)
                for x in open(d / "run" / "rep-1" / "watch" / "audit.jsonl") if x.strip())
     rest = [x for x in recs if "restored" in x][-1]
@@ -435,8 +439,8 @@ def state_never_empty():
 
 
 def several_cards():
-    """One workload across three cards (the 8-GPU server's serving stage): one governor per card, the energy of every
-    card summed, each card handed back; watch writes nothing on any card."""
+    """One workload across three cards (the 8-GPU server's serving stage): one governor per card, each hearing every
+    arrival, the energy of every card summed, each card handed back; watch writes nothing on any card."""
     d = Path(tempfile.mkdtemp()); state(d, limit={"0": 300.0, "1": 300.0, "2": 300.0})
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "gpu_workload.py"), "calibrate", "--out", str(d), "--sim",
                         "--calib", "5", "--target-ms", "20"], cwd=ROOT, capture_output=True, text=True, timeout=120)
@@ -449,8 +453,13 @@ def several_cards():
     assert r.returncode == 0, r.stdout[-3000:] + r.stderr[-2000:]
     out = json.loads((d / "run" / "GPU_REPS.json").read_text())
     assert not out["problems"], out["problems"]
-    assert {c["writes"] for c in out["checks"]["watch"].values()} == {0} and all(c["writes"] > 0 for c in out["checks"]["omni"].values())
+    assert {c["writes"] for c in out["checks"]["watch"].values()} == {0}
     assert all((d / "run" / "rep-1" / "omni" / f"audit-{g}.jsonl").exists() for g in "012")
+    # every card's brain heard the arrivals (the signal reaches one governor per card); in five seconds nothing is proven
+    # yet, so the brain may rightly write nothing: staying native until measured is the rule
+    for g in "012":
+        dec = [json.loads(x)["decision"][g] for x in open(d / "run" / "rep-1" / "omni" / f"audit-{g}.jsonl") if '"decision"' in x]
+        assert dec and dec[-1]["arrivals"] > 0, (g, dec[-1] if dec else None)
     assert json.loads((d / "state.json").read_text())["limit"] == {"0": 300.0, "1": 300.0, "2": 300.0}
 
 

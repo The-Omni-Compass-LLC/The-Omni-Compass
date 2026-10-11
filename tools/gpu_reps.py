@@ -40,7 +40,7 @@ from pathlib import Path
 U_AUTHORITY = 25.0          # omnicompass/core.py: the U-channel command's bound (saturation)
 DEADBAND = 0.01             # directional accuracy: a movement under this (state units) is not a direction
 W_INT = {"E": 1.0, "U": 1.0, "I_U": 1.0, "S": 1.0, "B": 1.0}   # the residual's weights, declared before any trial
-MARGIN_SERVED, MARGIN_P95, MARGIN_LOST = 0.01, 0.10, 0.01      # guardrails (docs/GPU_PREREGISTRATION.md)
+MARGIN_SERVED, MARGIN_P95, MARGIN_LOST = 0.01, 0.02, 0.01      # guardrails (docs/GPU_PREREGISTRATION.md, amendment 13)
 SMI_DEFAULT = "timestamp,index,power.draw,temperature.gpu,utilization.gpu,power.limit,clocks.sm"
 
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228, 11: 2.201,
@@ -48,13 +48,20 @@ T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8:
 LOWER = {"energy, whole machine at the wall (J)", "energy, GPU (J)", "energy per served request (J)", "power, GPU mean (W)", "temperature, peak (C)",
          "temperature, mean (C)", "requests not served", "response time, mean (ms)", "response time, 95th percentile (ms)",
          "response time, 99th percentile (ms)", "energy, CPU package (J)", "energy, rest of the machine (J)",
-         "energy, DRAM (J)", "energy, platform psys (J)", "energy, GPU device counter (J)"}
+         "energy, DRAM (J)", "energy, platform psys (J)", "energy, GPU device counter (J)",
+         "service time, median (ms)", "service time, 95th percentile (ms)", "first request after a rest, service median (ms)",
+         "time to first token, median (ms)", "time to first token, 95th percentile (ms)",
+         "time per output token, median (ms)", "time per output token, 95th percentile (ms)", "temperature, swing (C)"}
 PRIMARY = "work per energy (served requests per kJ)"
 WALL = "work per wall energy (served requests per kJ, whole machine)"
 KEYS = [PRIMARY, WALL, "energy, whole machine at the wall (J)", "energy, GPU (J)", "energy per served request (J)", "power, GPU mean (W)", "requests served", "requests not served",
         "response time, mean (ms)", "response time, 95th percentile (ms)", "response time, 99th percentile (ms)",
         "temperature, peak (C)", "temperature, mean (C)", "energy, CPU package (J)", "energy, DRAM (J)", "energy, platform psys (J)",
-        "energy, rest of the machine (J)", "energy, GPU device counter (J)", "power-capped share of samples"]
+        "energy, rest of the machine (J)", "energy, GPU device counter (J)", "power-capped share of samples",
+        "service time, median (ms)", "service time, 95th percentile (ms)", "first request after a rest, service median (ms)",
+        "time to first token, median (ms)", "time to first token, 95th percentile (ms)",
+        "time per output token, median (ms)", "time per output token, 95th percentile (ms)",
+        "temperature, swing (C)", "capacity inside the line (requests per s)", "capacity inside the line (tokens per s)"]
 PHYSICAL = {"energy, whole machine at the wall (J)", "energy, CPU package (J)", "energy, rest of the machine (J)", WALL,
             "energy, DRAM (J)", "energy, platform psys (J)", "energy, GPU device counter (J)"}
 
@@ -67,6 +74,27 @@ def smi_time(s):
         except ValueError:
             pass
     raise ValueError(s)
+
+
+def _own_times(req):
+    """The card's own time per request (start to done, the queue left out), the first request after a rest of 80 ms or
+    more (the request a parked clock could slow), and an AI answer's own times where the workload wrote them."""
+    nan = float("nan")
+    ok = sorted((float(r["start_s"]), float(r["done_s"]), r) for r in req if r.get("ok") == "1" and r.get("start_s") and r.get("done_s"))
+    svc = [(d - s0) * 1000.0 for s0, d, _ in ok]
+    first, last = [], None
+    for s0, d, _ in ok:
+        if last is not None and s0 - last >= 0.08:
+            first.append((d - s0) * 1000.0)
+        last = d if last is None else max(last, d)
+    out = {"service time, median (ms)": pct(svc, 0.5) if svc else nan, "service time, 95th percentile (ms)": pct(svc, 0.95) if svc else nan,
+           "first request after a rest, service median (ms)": pct(first, 0.5) if first else nan}
+    for col, name in (("ttft_ms", "time to first token"), ("tpot_ms", "time per output token")):
+        v = [float(r[col]) for _, _, r in ok if r.get(col) not in (None, "", "nan")]
+        v = [x for x in v if x == x]
+        out[f"{name}, median (ms)"] = pct(v, 0.5) if v else nan
+        out[f"{name}, 95th percentile (ms)"] = pct(v, 0.95) if v else nan
+    return out
 
 
 def pct(xs, q):
@@ -105,6 +133,7 @@ def arm(d, gpus):
     req = list(csv.DictReader(open(d / "requests.csv")))
     ms = [float(r["latency_ms"]) for r in req if r["ok"] == "1"]
     served, lost = len(ms), sum(1 for r in req if r["ok"] != "1")
+    own = _own_times(req)
     g = {PRIMARY: served / (joules / 1000.0) if joules > 0 else float("nan"), "energy, GPU (J)": joules, "energy per served request (J)": joules / served if served else float("nan"),
          "power, GPU mean (W)": joules / max(1e-9, t1 - t0), "requests served": float(served), "requests not served": float(lost),
          "response time, mean (ms)": sum(ms) / served if served else float("nan"),
@@ -112,7 +141,14 @@ def arm(d, gpus):
          "temperature, peak (C)": peak, "temperature, mean (C)": sum(temps) / len(temps) if temps else float("nan"),
          "energy, CPU package (J)": float("nan"), "energy, whole machine at the wall (J)": float("nan"), WALL: float("nan"),
          "energy, rest of the machine (J)": float("nan"), "energy, DRAM (J)": float("nan"), "energy, platform psys (J)": float("nan"),
-         "power-capped share of samples": capped / nre if nre else float("nan")}
+         "power-capped share of samples": capped / nre if nre else float("nan"),
+         "temperature, swing (C)": (max(temps) - min(temps)) if temps else float("nan"), **own}
+    g["capacity inside the line (requests per s)"] = g["capacity inside the line (tokens per s)"] = float("nan")
+    cj = d / "capacity.json"
+    if cj.exists():
+        c = json.loads(cj.read_text())
+        g["capacity inside the line (requests per s)"] = float(c.get("capacity_requests_per_s", float("nan")))
+        g["capacity inside the line (tokens per s)"] = float(c.get("capacity_tokens_per_s", float("nan")))
     if (d / "wall.csv").exists():
         w = [(float(r["epoch_s"]), float(r["watts"])) for r in csv.DictReader(open(d / "wall.csv")) if r["watts"]]
         w = [x for x in w if t0 <= x[0] <= t1]
@@ -471,7 +507,8 @@ def main(root):
         sv, p95 = po.get("requests served"), po.get("response time, 95th percentile (ms)")
         lost = po.get("requests not served")
         g_served = sv is not None and sv["ci95"][0] >= -MARGIN_SERVED * abs(sv["native"])
-        g_p95 = p95 is not None and p95["ci95"][1] <= MARGIN_P95 * abs(p95["native"])
+        # amendment 13: no confirmed slowdown of the 95th percentile, and its point estimate at most +2%
+        g_p95 = p95 is not None and p95["verdict"] != "worse, proven" and p95["diff"] <= MARGIN_P95 * abs(p95["native"])
         g_lost = lost is None or sv is None or lost["ci95"][1] <= MARGIN_LOST * abs(sv["native"])
         wv = out["paired"].get("watch", {}).get(PRIMARY, {}).get("verdict")
         head = label(prim, g_served, g_p95, g_lost, not problems, wv)
@@ -484,7 +521,7 @@ def main(root):
               f"Work per energy under Omni against native: {_f(c['native'])} -> {_f(c['omni'])} served requests per kJ, "
               f"difference {c['diff']:+.4g} (95% interval {c['ci95'][0]:+.4g} to {c['ci95'][1]:+.4g}).",
               f"Guardrails: requests served {'held' if g_served else 'FAILED'} (not below -1%), "
-              f"95th-percentile response time {'held' if g_p95 else 'FAILED'} (not above +10%), "
+              f"95th-percentile response time {'held' if g_p95 else 'FAILED'} (no confirmed slowdown, and at most +2%), "
               f"requests not served {'held' if g_lost else 'FAILED'} (not above +1% of native served).",
               f"Observation (watch against native) on the same outcome: {wv or 'n/a'}. "
               f"Authority (omni against watch): {av or 'n/a'}.",
