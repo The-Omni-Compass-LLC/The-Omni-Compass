@@ -361,13 +361,25 @@ class Verdict:
     def state(self):
         return "left native" if self.allowed == 0 else "acting"
 
-    def observe(self, costs, benefit=None):
-        """Costs (one per piece of work) measured since the last decision, under the step tick() last returned; and,
-        where the verdict asks for a gain, the second readings (lower is better) taken under that step."""
+    def observe(self, costs, benefit=None, parts=None):
+        """Costs (one per piece of work) measured since the last decision, under the step tick() last returned; where the
+        verdict asks for a gain, the second readings (lower is better) taken under that step; and parts, {part: costs},
+        each part of the body's own cost (one service's), for the guard that nothing anywhere is made worse."""
         if self.phase is not None and self.blocks:
             self.blocks[-1]["x"].extend(costs)
             if benefit:
                 self.blocks[-1]["b"].extend(benefit)
+            for name, xs in (parts or {}).items():
+                self.blocks[-1]["p"].setdefault(name, []).extend(xs)
+
+    def ready(self):
+        """Whether tick(True) would open a trial now (a step to try, or a kept step due to be proven again): the body asks
+        before it grants the one trial of its tick."""
+        if self.phase is not None or self.t + 1 - self.last_probe < self.probe_every:
+            return False
+        if self.allowed > 0 and self.t + 1 - self.kept_at >= self.recheck:
+            return True
+        return self.allowed < self.max_steps and self.refused_until.get(self.allowed + 1, -1) <= self.t + 1
 
     def ref_step(self):
         """Where the knob stands in a reference block: native, or stepwise the deepest step allowed (a kept step is
@@ -458,9 +470,31 @@ class Verdict:
                 nums.update({"share_more_native": round(cum[0], 6), "allow_below_native": round(rn["allow_below"], 6),
                              "line_native": round(ln, 6)})
                 inside, past = inside and self._inside(rn), past or self._past(rn)
+        # the guard for every part: the step must also hold every part of the body inside that part's own line, so
+        # nothing anywhere is made worse to make the whole better (each part's test at the same sureness: allowed only
+        # when every part is inside, refused when any part is proven past)
+        hurt = []
+        for name in sorted({k for b in self.blocks for k in b["p"]}):
+            xs = [b["p"].get(name, []) for b in self.blocks]
+            if any(len(x) < 2 for x in xs):
+                inside = False                              # a part not measured in every block is not proven inside
+                continue
+            pst = [stats(x) for x in xs]
+            pd = sum(wi * s_[0] for wi, s_ in zip(w, pst))
+            pparts = [(wi * wi * s_[1], s_[2]) for wi, s_ in zip(w, pst)]
+            pref = sum(pst[i][1] for i in range(0, 2 * m + 1, 2)) / (m + 1)
+            pr = self.test(pd, pparts, area, self.line(pref), design_var=pref * sum(wi * wi for wi in w))
+            if self._past(pr):
+                hurt.append(name)
+                past = True
+            elif not self._inside(pr):
+                inside = False
+        if hurt:
+            nums["parts_hurt"] = hurt
         last = m >= self.looks
         if past:
-            return False, {"verdict": "step refused: the muscle is slower there", **nums}, cum
+            why = "the muscle is slower there" if not hurt else "it makes a part worse (" + ", ".join(hurt) + ")"
+            return False, {"verdict": "step refused: " + why, **nums}, cum
         if not inside:
             return (False, {"verdict": "step refused: never proven inside the muscle's own wobble", **nums}, cum) if last else None
         if self.gain:
@@ -481,7 +515,7 @@ class Verdict:
     def _open(self, kind):
         self.phase, self.block_t = kind, self.t
         self.block_no += 1
-        self.blocks.append({"kind": kind, "x": [], "b": []})
+        self.blocks.append({"kind": kind, "x": [], "b": [], "p": {}})
 
     def position(self):
         """The step the block in flight holds the knob at (None between trials): a caller hands observe() only the work
