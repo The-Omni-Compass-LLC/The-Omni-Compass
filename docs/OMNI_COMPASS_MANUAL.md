@@ -22,9 +22,10 @@ saving on a particular system. The only number that applies to your system is th
 on your own receipt. Before Omni-Compass writes to any production system, it must run in watch mode, pass the wire
 check, and be covered by a signed Omni-Compass Enterprise License.
 
-**Rights.** © 2026 The Omni-Compass LLC. All rights reserved. Every copy, export or printout of this manual carries this
-notice, `LICENSE`, `NOTICE` and `DISCLOSURES.md` unchanged. All patents, copyrights and trademarks filed in the USA.
-www.omni-compass.com
+**Rights and changes.** © 2026 The Omni-Compass LLC. All rights reserved. The Omni-Compass LLC reserves the right to
+change this manual, the software it describes and their terms at any time, without notice. Every copy, export or printout
+of this manual carries this notice, `LICENSE`, `NOTICE` and `DISCLOSURES.md` unchanged. All patents, copyrights and
+trademarks filed in the USA. www.omni-compass.com
 
 **The wiring declaration.** Omni-Compass acts only through the wires it is given. A wrong reading, a wrong or shared
 lever, a wrong range, or a service line set for another workload makes it do exactly what its law says with the wrong
