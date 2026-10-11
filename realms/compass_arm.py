@@ -21,6 +21,7 @@ Knob by plant (the override key the plant already obeys, its native value, its c
 """
 from __future__ import annotations
 
+from omnicompass.body import Body, Muscle
 from omnicompass.compass_law import Band, CompassLaw, clamp
 
 UP, DOWN, RELEASE = 0.10, 0.02, -0.2
@@ -105,37 +106,41 @@ def speed_slack(plant) -> bool:
 
 
 def lever(plant, knob):
-    """(override key, native value, low, high, sign): sign +1 when a higher value is more capacity."""
+    """(override key, native value, low, high, sign): sign +1 when a higher value is more capacity.
+
+    Omni v4: every knob is wired (docs/OMNI_V4_PLAN.md, section 1, rule 8). The v3 rules that held a knob native by the
+    plant's physics (capping_saves, effort_cap_saves, speed_slack, the cooling and battery power caps) no longer decide:
+    the muscle's own verdict does, live, on the plant (Gate below), and refuses the step where the physics says it cannot
+    pay. Only two stay out: a backup reserve (a UPS kept for an outage: a safety lock, never a trial), and admission,
+    which is the organism's power-budget muscle (the pace rule), not a muscle with a service of its own to steer."""
     P, t = plant.P, plant.template
     if knob == "admission":
         return None
     if t == "compute_pool":
         if knob == "power":
-            return ("power", 1.0, 0.4, 1.0, 1) if capping_saves(plant) else None
+            return ("power", 1.0, 0.4, 1.0, 1)
         if P.get("ca"):
             return ("release", None, 0, 0, 0)
-        return None                                            # the HPA target is held at the operator's own
+        # the HPA target: a lower target is more pods (more capacity), never above the operator's own
+        return ("target", P["target"], 0.6 * P["target"], P["target"], -1)
     if t == "thermal_zone":
         if knob == "setpoint":
             return ("setpoint", P["t_set"], min(P["stress"], P["calm"]), max(P["stress"], P["calm"]), -1)
         if knob == "capacity":
             return ("release", None, 0, 0, 0)
-        # the cooling power cap gives nothing back: the heat the zone makes must leave it either way, so a lower cap only
-        # lets the temperature drift up while the PI command grows and stages more units (and their fans). Native
-        # (MECHANISM_OF_ACTION 9.6)
-        return None
+        return ("power", 1.0, 0.4, 1.0, 1)
     if t == "energy_storage":
         if knob == "setpoint" and P.get("backup"):
-            return None                                        # a backup reserve (a UPS) is kept for an outage: native
+            return None                                        # a backup reserve (a UPS) is kept for an outage: locked
         if knob == "setpoint":
             # the reserve may go down to the stress end (the battery given to the site under strain), never above the
             # operator's own: a kWh held back in a calm battery is a kWh bought from the grid (MECHANISM_OF_ACTION 9.6)
             return ("setpoint", P["reserve"], min(P["stress"], P["reserve"]), P["reserve"], -1)
-        return None                                            # a battery's power limit gives nothing back: native
+        return ("power", 1.0, 0.4, 1.0, 1)
     if t == "motion_axis":
         if knob == "power":
-            return ("power", 1.0, 0.4, 1.0, 1) if effort_cap_saves(plant) else None
-        return ("capacity", 1.0, 0.4, 1.0, 1) if speed_slack(plant) else None
+            return ("power", 1.0, 0.4, 1.0, 1)
+        return ("capacity", 1.0, 0.4, 1.0, 1)
     if t == "process_loop":
         if knob == "setpoint":
             lo, hi = min(P["sp"], P["calm"]), max(P["sp"], P["calm"])
@@ -182,3 +187,53 @@ def compass_apply(plant, knob, dt=1.0, tau=3.0):
     plant._compass_law_x = x
     plant.override = {} if abs(x - native) < 1e-9 else {key: x}
     return plant.override
+
+
+# ---- Omni v4: every muscle through its body ---------------------------------------------------------------------
+WALL = 0.95                # the compass's high wall (omnicompass/compass_law.py): past it the service is out of its calm
+LINE = 1.0                 # the service line itself: a service that hits it ends the trial in flight (the founder's rule 7)
+
+
+def step_cost(plant, dw, de):
+    """One decision's cost on the plant's own work, lower is better: the energy that decision drew per unit of work done
+    in it (a storage site's grid draw counted from minus its connection's limit, so a decision that exports reads cheaper
+    and never below zero). None when no work was done (nothing measured)."""
+    if plant.template == "energy_storage":
+        de = de + plant.P["p_lim_w"] * plant.P["dt"]
+    if dw <= 0 or de <= 0:
+        return None
+    return de / dw
+
+
+class Gate:
+    """The muscle's body (omnicompass/body.py, Omni v4): one muscle, one step from native, "the law acts". Its trial
+    interleaves native and the law's own setting block by block (omnicompass/verdict.py). Nothing anywhere is made worse to
+    make one thing better: the law may act only where the plant's whole cost (its energy per unit of work times its
+    service, the index's arithmetic on one plant) is proven lower at 99.9%, and neither part of it, the energy per unit of
+    work nor the service, is worse beyond the plant's own wobble. It is proven again on the recheck and taken back when it
+    no longer pays. A plant past its wall (or an organism at its own) ends the trial in flight and holds the muscle where
+    it has proven."""
+
+    def __init__(self, plant, block=20, recheck=120):
+        self.muscle = Muscle("law", 0, 1, (0, 1), min_samples=block, probe_every=1, recheck=recheck, max_trial=4 * block,
+                             incremental=False, gain=True)
+        self.body = Body([self.muscle], name=getattr(plant, "template", "muscle"))
+        self.prev = (plant.m["work"], plant.m["energy_j"])
+        self.acting = 0
+
+    def step(self, plant, proposal, wall=False):
+        """Once a decision, before the plant steps: proposal is the override the law wants now; returns the override
+        the plant gets (the law's, where the muscle may act; native otherwise)."""
+        w, e = plant.m["work"], plant.m["energy_j"]
+        dw, de = w - self.prev[0], e - self.prev[1]
+        self.prev = (w, e)
+        p = position(plant)
+        c = step_cost(plant, dw, de)
+        if c is not None:
+            svc = 1.0 + max(0.0, p)
+            whole = c * svc
+            self.body.observe([whole], benefit=[whole], parts={"energy": [c], "service": [svc]}, at={"law": self.acting})
+        out = self.body.tick({"law": {"force": 1.0 if proposal else 0.0, "spend_ok": bool(proposal), "wanted": 1}},
+                             wall=bool(wall) or p >= LINE, calm=p < WALL)
+        self.acting = out.get("law", 0)
+        return dict(proposal) if (self.acting >= 1 and proposal) else {}
