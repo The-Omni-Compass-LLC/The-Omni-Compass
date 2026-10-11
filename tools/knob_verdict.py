@@ -43,11 +43,10 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from omnicompass.verdict import Verdict  # noqa: E402  (the engine's verdict, unchanged)
+from omnicompass.body import Body, Muscle, SPEND, GIVE  # noqa: E402  (the engine's body, Omni v4)
 
 RESOURCE, SERVICE, PER_WORK = "resource", "service", "per-work"
 OBJECTIVES = (RESOURCE, SERVICE, PER_WORK)
-SPEND, GIVE = "spend", "give back"
 
 
 def sample_cost(objective, work, latency, resource, cpu_share):
@@ -69,6 +68,9 @@ def sample_cost(objective, work, latency, resource, cpu_share):
 
 
 class KnobVerdict:
+    """One live knob as a body of one muscle (omnicompass/body.py, Omni v4): the engine's body does the granting, the
+    reflex rule, the wall and the clamping; this adapter gives it the knob's notch, the settle and the harness's words."""
+
     def __init__(self, native, notch, cover, objective=RESOURCE, min_samples=8, probe_every=20, recheck=60,
                  max_trial=40, settle_s=2.0):
         if objective not in OBJECTIVES:
@@ -77,13 +79,10 @@ class KnobVerdict:
         self.native, self.notch, self.lo, self.hi = native, notch, lo, hi
         self.objective = objective
         self.settle_s = settle_s
-        self.verdicts = {
-            SPEND: Verdict(min_samples=min_samples, probe_every=probe_every, recheck=recheck,
-                           max_steps=max(0, int((hi - native) // notch)), max_trial=max_trial, incremental=True),
-            GIVE: Verdict(min_samples=min_samples, probe_every=probe_every, recheck=recheck,
-                          max_steps=max(0, int((native - lo) // notch)), max_trial=max_trial, incremental=True),
-        }
-        self.phase_dir = None                     # the direction whose trial phase holds the knob, or None
+        self.muscle = Muscle("knob", native, notch, cover, min_samples=min_samples, probe_every=probe_every,
+                             recheck=recheck, max_trial=max_trial, incremental=True)
+        self.body = Body([self.muscle], name="knob")
+        self.verdicts = self.muscle.verdicts
         self.events = []
         self.counts = {"trials": 0, "allowed": 0, "refused": 0, "abandoned": 0, "clamped": 0, "held": 0, "samples": 0,
                        "proven_again": 0, "taken_back": 0}
@@ -91,88 +90,72 @@ class KnobVerdict:
 
     # ---------------------------------------------------------------------------------------------- the steps
     def value_of(self, direction, step):
-        v = self.native + step * self.notch if direction == SPEND else self.native - step * self.notch
-        return max(self.lo, min(self.hi, v))
+        return self.muscle.value_of(direction, step)
+
+    @property
+    def phase_dir(self):
+        """The direction whose trial holds the knob, or None."""
+        f = self.muscle.in_flight()
+        return f[0] if f else None
 
     @property
     def allowed_low(self):
-        return self.value_of(GIVE, self.verdicts[GIVE].allowed)
+        return self.muscle.allowed_low
 
     @property
     def allowed_high(self):
-        return self.value_of(SPEND, self.verdicts[SPEND].allowed)
+        return self.muscle.allowed_high
 
     @property
     def state(self):
-        if self.verdicts[SPEND].allowed == 0 and self.verdicts[GIVE].allowed == 0:
-            return "left native"
-        return f"acting: {self.allowed_low} to {self.allowed_high}"
+        return self.muscle.state
 
     # ---------------------------------------------------------------------------------------------- the samples
     def observe(self, cost, t, settled=True):
-        """This second's cost sample, measured under the value the knob stood at. Fed to the direction in a trial phase,
-        once the knob has settled after its last change; nothing else is kept."""
+        """This second's cost sample, measured under the value the knob stood at. Fed to the trial in flight, once the
+        knob has settled after its last change; nothing else is kept."""
         if cost is None or not settled or self.phase_dir is None:
             return False
         if self.changed_at is not None and t - self.changed_at < self.settle_s:
             return False
-        self.verdicts[self.phase_dir].observe([cost])
-        self.counts["samples"] += 1
-        return True
+        if self.body.observe([cost], at={"knob": self.last_value}):
+            self.counts["samples"] += 1
+            return True
+        return False
 
     # ---------------------------------------------------------------------------------------------- the decision
     def decide(self, wanted, spend_ok, give_ok, t, why="", stress=None, calm=None, fail_up=False):
-        """The compass's wanted value becomes the knob's target: the phase's value while a trial holds the knob, the wanted
+        """The compass's wanted value becomes the knob's target: the block's value while a trial holds the knob, the wanted
         value clamped to the allowance otherwise. spend_ok / give_ok: the stack's own conditions for a step in each direction
         this second (the compass asking to spend with the stack full and missing; calm with the stack holding its demand).
         stress / calm: the service past the cushion toward the line / inside the calm cushion (the compass's force): a
-        give-back trial is abandoned when the service leaves calm (the engine's rule); a spend trial runs to its samples
-        whatever the force (amendment 3, 10 October 2026). fail_up: the service at the wall: every trial is abandoned and
-        the knob goes where the fail-up says, native always free, never beyond the allowance.
+        give-back trial is abandoned when the service leaves calm; a spend trial runs to its samples whatever the force (the
+        reflex rule, now the engine's own). fail_up: the service at the wall: every trial is abandoned and the knob goes
+        where the fail-up says, native always free, never beyond the allowance.
         Returns (target, why, info)."""
         self.t = t
-        order = [SPEND, GIVE] if self.phase_dir != GIVE else [GIVE, SPEND]
-        ok = {SPEND: bool(spend_ok), GIVE: bool(give_ok)}
         stress = bool(spend_ok) if stress is None else bool(stress)
-        calm = bool(give_ok) if calm is None else bool(calm)
-        holding = self.phase_dir
-        results = {}
-        for name in order:
-            v = self.verdicts[name]
-            if fail_up:
-                go_on = False
-            elif v.phase is not None:
-                # a give-back trial is abandoned when the service leaves calm (the engine's rule: never a trial under stress);
-                # a spend trial runs to its samples whatever the compass's force, because the spend's own effect calms the
-                # service within seconds and ending the trial on that calm would mean no spend could ever be judged (seen on
-                # every Kafka trial of the first counted set, 10 October 2026: amendment 3); only the wall ends it early
-                go_on = (not stress) if name == GIVE else True
-            else:
-                go_on = ok[name] and holding in (None, name)             # a new trial only in a free second, in the direction asked for
-            step, is_trial, ev = v.tick(go_on)
-            if ev:
-                self.events.append({"t": round(t, 1), "direction": name, **ev})
-                self._count(ev)
-            results[name] = (step, is_trial)
-            if v.phase is not None:
-                holding = name
-            elif holding == name:
-                holding = None
-        self.phase_dir = holding
-        info = {"verdict_phase": None, "verdict_direction": self.phase_dir, "allowed_low": self.allowed_low, "allowed_high": self.allowed_high}
-        if self.phase_dir is not None:
-            v = self.verdicts[self.phase_dir]
-            step, _ = results[self.phase_dir]
-            target = self.value_of(self.phase_dir, step)
-            info["verdict_phase"] = v.phase
+        force = 1.0 if spend_ok else (-1.0 if give_ok else 0.0)
+        n0 = len(self.body.events)
+        out = self.body.tick({"knob": {"force": force, "spend_ok": bool(spend_ok), "give_ok": bool(give_ok),
+                                       "wanted": wanted}}, wall=bool(fail_up), calm=not stress)
+        for ev in self.body.events[n0:]:
+            e = {k: v for k, v in ev.items() if k not in ("muscle",)}
+            e["t"] = round(t, 1)
+            self.events.append(e)
+            self._count(e)
+        target = out.get("knob", self.last_value)
+        info = {"verdict_phase": None, "verdict_direction": self.phase_dir, "allowed_low": self.allowed_low,
+                "allowed_high": self.allowed_high}
+        f = self.muscle.in_flight()
+        if f is not None:
+            info["verdict_phase"] = f[1].phase
             if target != wanted:
                 self.counts["held"] += 1
-            why = f"{why}; held by the verdict: {self.phase_dir} {'reference' if v.phase == 'ref' else 'trial'} at {target}"
-        else:
-            target = min(max(wanted, self.allowed_low), self.allowed_high)
-            if target != wanted:
-                self.counts["clamped"] += 1
-                why = f"{why}; the verdict allows {self.allowed_low} to {self.allowed_high}: held at {target}"
+            why = f"{why}; held by the verdict: {f[0]} {'reference' if f[1].phase == 'ref' else 'trial'} at {target}"
+        elif target != wanted:
+            self.counts["clamped"] += 1
+            why = f"{why}; the verdict allows {self.allowed_low} to {self.allowed_high}: held at {target}"
         if target != self.last_value:
             self.changed_at, self.last_value = t, target
         return target, why, info
