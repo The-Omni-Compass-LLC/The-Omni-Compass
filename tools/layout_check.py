@@ -30,7 +30,7 @@ ROOT_ALLOWED = {
     "README.md", "CHANGELOG.md", "CITATION.cff", "SECURITY.md",
     # the license and the intellectual property
     "LICENSE", "LICENSES", "NOTICE", "PATENTS.md", "TRADEMARKS.md", "THIRD_PARTY_NOTICES.md", "REUSE.toml",
-    "DISCLOSURES.md", "LICENSING_FAQ.md", "CLAUDE.md",
+    "DISCLOSURES.md", "LICENSING_FAQ.md", "ENTERPRISE_LICENSE.md", "CLAUDE.md",
     # the same rules for every AI assistant that reads this repository (Codex, Copilot, Gemini, Cursor)
     "AGENTS.md", "GEMINI.md", ".cursorrules",
     # build, verification and metadata
