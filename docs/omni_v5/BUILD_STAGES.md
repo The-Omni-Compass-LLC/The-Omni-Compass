@@ -15,13 +15,18 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
 ## Status
 - **Stage 0 — DONE, pushed to branch `v5`.** The whole design: `OMNI_V5_PLAN.md`, `CONNECTORS.md`, the study that produced
   the modelled numbers (`study/`). Legal 0 problems; release manifest matches.
-- **Stage 1 — DONE.** The v5 compass law runs in the repo and is proven no-harm vs native by `tests/test_compass_arm_v5.py`
-  (imports it, runs on real presets, finite, energy not above native, work not below, on a fixed seed). The law lives at
-  `docs/omni_v5/study/v5_law.py` — deliberately OUTSIDE the engine fingerprint scope (`omnicompass/`, `omni_controller/`,
-  `realms/`, the named runners in `tools/omni_version.py`) — so this checkout still reads exactly **omni-v3** and the frozen
-  engine is untouched. (A first attempt put it under `realms/`; the version tool correctly flagged the checkout as "no
-  longer v3", so it was moved out of scope. The law enters the engine only at the v5 freeze, stage 12, when `OMNI_V5.json`
-  is declared.)
+- **Stage 1 — DONE.** The v5 compass law is in the engine: `realms/compass_arm_v5.py`, with its arm in `realms/harness.py`
+  (additive; v3's arms are byte-unchanged, so v3's stored results stand). The checkout reads **omni-v5**
+  (`tools/omni_version.py`, `OMNI_V5.json`); v1, v2 and v3 stay frozen for their results. While v5 is in development its
+  fingerprint is re-declared on each engine change, and no v5 result is published until the freeze. Do-no-harm is proven
+  on every muscle by `tests/test_compass_arm_v5.py`: the levers that trade service or output for energy (power cap,
+  battery shave, generation setpoint) stay native in the no-harm default and move only on the Max/service dial.
+- **Stage 9 — DONE (first wave).** The v5 catalog `realms/catalog_v5.csv`: 1,002 muscles in 65 families (v3's 945 plus
+  Linux Kernel & OS Control, Serverless & FaaS, Virtualization & Hypervisor, Content Delivery & Edge Cache, Gut, Skin). The
+  official v5 table: `results/realms_v5/REALMS_V5.md`, all six organisms superior within guardrails, 0 of 1,002 worse.
+- **Benchmarks — written.** Google GKE and Amazon EKS paired runs, the AMD APU adapter, the realms-v5 workflow and one
+  button for every benchmark (`docs/omni_v5/BENCHMARKS_V5.md`). The live benchmarks measure the v5 law only after stages
+  6–11 port it into the live controllers.
 
 ## Stages to build (each: files → math → test → acceptance → rerun)
 2. **Edge & centre as the only two guards, generalised off the toy presets.** Files: realms/compass_arm_v5.py,
@@ -51,7 +56,7 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
    skeleton limit caps every muscle on it; blood = data+power vital; heart = loop clock (arrhythmia watch); skin =
    perimeter; senses = external forecasts feeding anticipation. Test: a bone fracture fails muscles over; a blood/heart
    stall is a vital alarm. Accept: shared edges honoured; vitals watched.
-9. **The new muscle families → catalog past 1,000.** Files: `realms/presets.py`, `realms/catalog.csv`,
+9. **The new muscle families → catalog past 1,000 (first wave DONE: 1,002).** Files: `realms/presets.py`, `realms/catalog.csv`,
    `docs/REGISTER.md`, `docs/MUSCLE_CATALOG.md`. Add: Serverless/FaaS, Virtualization/hypervisor, Network fabric/SDN/LB/
    CDN, Gut/data-plane controls, Skin/perimeter. Test: catalog loads, each new muscle read-write-read-back. Accept:
    distinct count locked (~1,005–1,065); AI Training stays family 2, AI Inference family 1.

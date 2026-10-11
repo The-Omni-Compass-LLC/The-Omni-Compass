@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: v5-all-benchmarks
+# Every benchmark, one button (Actions -> v5-all-benchmarks -> Run workflow), on the branch it is started from. Nothing is
+# left out: the free tier starts every benchmark that runs on GitHub's own machines; the paid tiers start the GPU runner
+# and the metered clouds only when chosen AND their secrets are in place (a missing secret is reported and skipped, never
+# billed). Each benchmark runs as its own workflow with its own preregistered defaults, tables and legal notices; this one
+# only starts them and lists what it started (docs/omni_v5/BENCHMARKS_V5.md is the map). Nothing here publishes a result:
+# the founder hears what each says before it goes up.
+on:
+  workflow_dispatch:
+    inputs:
+      free: {description: "Every free benchmark on GitHub's machines (yes/no)", default: "yes"}
+      gpu: {description: "The GPU benchmark on the GPU runner, billed per minute (yes/no; needs the gpu-t4 runner)", default: "no"}
+      clouds: {description: "Metered Kubernetes clouds, comma-separated: aks,gke,eks (empty: none)", default: ""}
+      big_organisms: {description: "The big organisms on a rented Azure machine (yes/no; needs AZURE_CREDENTIALS)", default: "no"}
+      dry_run: {description: "List what would start, start nothing (yes/no)", default: "no"}
+permissions:
+  actions: write
+  contents: read
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  start:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REF: ${{ github.ref_name }}
+      HAVE_AZURE: ${{ secrets.AZURE_CREDENTIALS != '' }}
+      HAVE_GCP: ${{ secrets.GCP_CREDENTIALS != '' }}
+      HAVE_AWS: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Start every chosen benchmark
+        run: |
+          set -u
+          FREE="benchmark benchmark-reps citylearn cpu-power kafka kind-addons kwok-scale live-kind live-kind-full live-kind-levers live-shadow mujoco pandapower pgbench realms realms-v5 redis robustness six six-kube swarm sysbench ycsb"
+          list=""
+          [ "${{ github.event.inputs.free }}" = yes ] && list="$FREE"
+          [ "${{ github.event.inputs.gpu }}" = yes ] && list="$list gpu-bench"
+          skipped=""
+          for c in $(echo "${{ github.event.inputs.clouds }}" | tr ',' ' '); do
+            case "$c" in
+              aks) [ "$HAVE_AZURE" = true ] && list="$list aks-metered" || skipped="$skipped aks-metered(no AZURE_CREDENTIALS)";;
+              gke) [ "$HAVE_GCP" = true ] && list="$list gke-metered" || skipped="$skipped gke-metered(no GCP_CREDENTIALS)";;
+              eks) [ "$HAVE_AWS" = true ] && list="$list eks-metered" || skipped="$skipped eks-metered(no AWS keys)";;
+              *) skipped="$skipped $c(unknown cloud)";;
+            esac
+          done
+          if [ "${{ github.event.inputs.big_organisms }}" = yes ]; then
+            [ "$HAVE_AZURE" = true ] && list="$list big-organism" || skipped="$skipped big-organism(no AZURE_CREDENTIALS)"
+          fi
+          { echo "## Every benchmark, one button: on branch \`$REF\`"; echo; echo "| Benchmark | Started |"; echo "|---|---|"; } >> "$GITHUB_STEP_SUMMARY"
+          started=0; failed=0
+          for w in $list; do
+            f=".github/workflows/$w.yml"
+            if [ ! -f "$f" ]; then echo "| $w | no such workflow |" >> "$GITHUB_STEP_SUMMARY"; continue; fi
+            if [ "${{ github.event.inputs.dry_run }}" = yes ]; then echo "| $w | would start (dry run) |" >> "$GITHUB_STEP_SUMMARY"; continue; fi
+            if gh workflow run "$w.yml" --ref "$REF"; then
+              echo "| $w | yes |" >> "$GITHUB_STEP_SUMMARY"; started=$((started + 1))
+            else
+              echo "| $w | FAILED to start |" >> "$GITHUB_STEP_SUMMARY"; failed=$((failed + 1))
+            fi
+            sleep 2
+          done
+          for s in $skipped; do echo "| ${s%%(*} | skipped: ${s#*(} |" | sed 's/)|/|/; s/) |/ |/' >> "$GITHUB_STEP_SUMMARY"; done
+          echo >> "$GITHUB_STEP_SUMMARY"
+          echo "Started $started workflow(s); $failed failed to start. Each runs on its own; its table lands in its own run." >> "$GITHUB_STEP_SUMMARY"
+          [ "$failed" = 0 ]
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

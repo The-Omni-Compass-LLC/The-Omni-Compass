@@ -1,4 +1,4 @@
-# Omni v5 — the living cyborg engine (scratch design, NOT pushed)
+# Omni v5 — the living cyborg engine (the whole mechanism of action; the v5 engine is declared omni-v5)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
@@ -6,7 +6,9 @@
 monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the
 USA. www.omni-compass.com
 
-Founder's orders, 11 Oct. This file is the record so the engine can be built, rewired and pushed on his word. Scratch only.
+Founder's orders, 11 Oct. This file is the record of the whole mechanism of action, so the engine can be built, rewired
+and pushed on his word. It is pushed on branch v5; what is built and what is still to build is marked in §10, §26, §27
+and `docs/omni_v5/BUILD_STAGES.md`.
 
 ## 1. The goal (changed)
 - Not only SAVE (least energy for the work). Also MAX (the most work the same hardware can do inside its edge), with a
@@ -36,14 +38,14 @@ Everything else is Omni's mathematics pushing coherence. Nothing is hardwired.
   - impossible reading (dead sensor), foreign writer (one-writer rule already catches), unknown workload (miner on a
     GPU: busy power + ~zero work), a part going bad (fan moving less air per watt).
   - Response: local reflex → neighbours help → **quarantine to native** → named alarm → remember (faster next time).
-  - Specificity is the law: it flags only the sick muscle, never healthy ones (the autoimmune failure). PROVEN in sim
-    (`maxsim/immune.py`): injected one runaway, flagged exactly it, quarantined, body returned to healthy, 0 false
+  - Specificity is the law: it flags only the sick muscle, never healthy ones (the autoimmune failure). shown in the model (class S, not proof)
+    (`docs/omni_v5/study/immune.py`): injected one runaway, flagged exactly it, quarantined, body returned to healthy, 0 false
     positives. Detector = busy-level power AND served-work ≈ 0 together (neither alone fires).
   - **Fever:** if inflammation spreads, the whole body goes native until it calms.
   - **Cancer:** a part of the body itself turned bad and spreading (leak, runaway, dying disk, compromise). Omni can
     contain and work around it (quarantine, protect neighbours, alarm) but cannot repair hardware — a person replaces it.
 - **Health / wear (so the super-athlete doesn't die at 25).** Every muscle has a wear gauge; the rule: never age a part
-  faster per unit of work than native, unless the owner turns the dial past it. PROVEN gauge in sim (`maxarm.life_used`,
+  faster per unit of work than native, unless the owner turns the dial past it. a gauge shown in the model (class S, not proof) (`maxarm.life_used`,
   Arrhenius, life halves ~every 10 °C). Models: silicon Arrhenius (Ea≈0.5 eV), thermal-cycle fatigue (Coffin–Manson,
   swing²), battery cycle+calendar aging, motor/fan bearing+insulation.
 
@@ -53,12 +55,18 @@ Everything else is Omni's mathematics pushing coherence. Nothing is hardwired.
 - Read each chip's own limits (current temp, throttle temp, shutdown temp, power limit) + the room's cool-to temp and
   spare cooling. Running 1–2 °C warmer: ~1–2 °C warmer chip, no speed lost while below throttle with margin, a little
   more leakage power + faster fans. Keep the change only if net benefit is positive. Cost is not a limit; net benefit is.
+- The boundary is the chip's own **junction temperature**: its slowdown (throttle) point and its shutdown point above it,
+  both read from the chip itself (nvidia-smi and amd-smi report them), never assumed. Omni keeps the junction a learned
+  margin below the slowdown point — the edge: how fast the junction has climbed times how long the cooling takes to
+  answer, plus z times its wobble — pushes to that limit, holds there and never goes past it. The room's cool-to
+  temperature and the cooling's spare capacity decide how close the junction may run; the chip's own shutdown and
+  protection stay the machine's (§8), never Omni's.
 
 ## 5. The dial (owner's choice, shown with its bill)
 - Default we ship: **Balanced** — strong, fast, pushing hard never shortens life.
 - Settings: **Long-life → Balanced → Edge → Sprint** (Sprint = burn for speed, life rule relaxed). The manual states
   plainly an owner may tune past health for their own economics (run organisms like pawns, replace and continue). Omni
-  shows the numbers; the owner decides. PROVEN in sim (`maxarm.DIAL`, `sweep.py`): at 2× load, misses −20%→−23% for
+  shows the numbers; the owner decides. shown in the model (class S, not proof) (`maxarm.DIAL`, `sweep.py`): at 2× load, misses −20%→−23% for
   +1%→+4% chip-life, +5%→+16% energy.
 
 ## 6. The cyborg wiring — gauges & knobs, by body part (full instrumentation)
@@ -96,12 +104,16 @@ bloodline); every result names its seed; seeds can be crossed.
   below native. Fingerprint proves which brain runs. Even a mad brain can't move a knob past its native-set range.
 
 ## 10. State & build order
-- **Pushed:** v3 (main). v4 (own branch). v5 = scratch only, NOT pushed.
-- **v5 SAVE proven (12 fresh runs, 6 organisms):** beats every version + native on energy & misses; work = native; the
+- **Pushed:** v3 (main). v4 (own branch). v5 on branch v5: declared omni-v5 with the v5 law in the engine, the
+  1,002-muscle catalog, the official v5 realms table (0 of 1,002 worse than native) and the benchmark code for every
+  platform (§26, §27).
+- **v5 SAVE shown in the model (class S, not proof; 12 fresh runs, 6 organisms):** beats every version + native on energy & misses; work = native; the
   one exception Physics vs v1/v2 energy is inside the noise and v1/v2 bought it with late trains/ships.
-- **v5 MAX/dial/wear/immune proven in quick sim** (`maxsim/`): +14% load at equal quality, −23% misses at 2×, dial
+- **v5 MAX/dial/wear/immune shown in a quick model (class S, not proof; the Max dial, with its tradeoffs)**
+  (`docs/omni_v5/study/`): +14% load at equal quality, −23% misses at 2×, dial
   tradeoff, Arrhenius wear, specific immune quarantine with 0 false positives.
-- **NOT built yet:** sleep/wake floor on every muscle; outside watcher + monitor panel; physical switch; stacked levels;
+- **NOT built yet:** the v5 law inside the live controllers and live organism runners (stages 6–11; until then a live
+  benchmark measures the v3 live law); sleep/wake floor on every muscle; outside watcher + monitor panel; physical switch; stacked levels;
   combined GPU+k8s+cloud+data-center organism; full early-warning on every muscle.
 - **Build order on GO:** (1) wiring map per body part; (2) v5 engine = edge+centre+health+immune+dial+seed, both open
   harms (data-hall precool, robot-joint lateness) at zero; (3) modelled test all organisms + combined, 4 dial settings,
@@ -179,8 +191,8 @@ bloodline); every result names its seed; seeds can be crossed.
     is adequate; a muscle starved of supply is diagnosed as starved, not broken.
   - **Fried actuator (nerve-into-muscle at the muscle end)** = the driver/actuator that takes the command is dead.
     Detection: read-back shows the knob never moves though the path upstream is live. Response: native, alarm.
-  - Dying part, runaway/cancer, foreign workload — detected and quarantined by the immune system (§3, proven in
-    `maxsim/immune.py`).
+  - Dying part, runaway/cancer, foreign workload — detected and quarantined by the immune system (§3, shown in the model, class S, in
+    `docs/omni_v5/study/immune.py`).
 
   SKELETON ailments (the frame everything is built on and that bears the load — the layer that was missing; computational
   = servers/chassis, racks, power distribution (PDU/UPS/transformer/phase), network backbone, cooling plant, the building,
@@ -414,24 +426,47 @@ Body map, now complete, before the repo is locked:
   registry, the connectors + one pane + self-wiring. Safety-of-life stays watch-only. With these the body is complete to
   lock and build against; the muscle catalog was already complete.
 
-## 26. The count — 945 today, crosses 1,000 with the v5 families (reconciled)
-Repo truth right now (`realms/catalog.csv`, same on main, v4, v4-card-brain, sync): **945 distinct muscles in 59 families**
-(the tower). Stacked as all four realms together it is **1,716** (the stack, with the 257-muscle shared spine counted in
-each realm). The "1,000" in the docs is the 1,000-**copy** scale, not a muscle count.
-- The founder is right that the count is going past 945: this v5 design ADDS new muscle families that are not yet in
-  catalog.csv, so when built the distinct count **crosses 1,000**. New families to add (each ~10–20 muscles):
-  **Serverless / FaaS** (provisioned concurrency, memory-size, warm-pool), **Virtualization / hypervisor** (vCPU, memory
-  balloon, live-migration/consolidation), **Network fabric / SDN / load-balancer / CDN** (beyond routing: QoS/shaping,
-  ECMP, cache TTL, EEE), **Gut / data-plane control** (intake pacing, dead-letter, GC, retry caps / circuit-breaker, TTL),
-  **Skin / perimeter** (firewall/WAF throughput, rate-limit, TLS offload). That is roughly **+60–120 muscles → ~1,005–1,065
-  distinct**, with AI Training (already family 2) and AI Inference (family 1) staying the two biggest.
-- Not pushed, so catalog.csv still reads 945; the exact 1,000-something number is fixed when these families are built and
-  counted at v5 freeze. Each added muscle also raises the stack total above 1,716.
+## 26. The count — 1,002 muscles in 65 families on v5 (built)
+Repo truth on branch v5: v5's catalog (`realms/catalog_v5.csv`) is **1,002 distinct muscles in 65 families** — v3's 945 in
+59 families (`realms/catalog.csv`, frozen for v3's results) plus **57 new muscles in six new families**:
+- **Linux Kernel & OS Control** (20): cgroup CPU weight, CPU quota and memory.high; the CFS scheduler's latency; the
+  cpufreq/DVFS governor; C-states; transparent hugepages and the hugepage pool; the I/O scheduler's depth and the block
+  queue; NUMA balancing; dirty-ratio writeback; swappiness; zswap; page-cache reclaim; KSM; irqbalance; TCP buffers;
+  receive coalescing; the CoDel queue target.
+- **Serverless & Functions (FaaS)** (9), **Virtualization & Hypervisor** (9), **Content Delivery & Edge Cache** (6),
+  **Gut: Data-plane Intake & Waste** (8), **Skin: Perimeter & Admission** (5).
+Each is a distinct real-world knob, modelled on the matching plant template, as v3's 945 already share five templates; AI
+Inference and AI Training stay the two biggest compute families. The stack (all four realms, the 257-muscle spine counted
+in each) is **1,773** on v5 (v3: 1,716). The "1,000" elsewhere in the docs is the 1,000-**copy** scale, not a muscle count.
+The do-no-harm check runs on all 1,002 (`tests/test_compass_arm_v5.py`); the official table is
+`results/realms_v5/REALMS_V5.md` (all six organisms superior within guardrails, 0 of 1,002 worse than native). More
+families — the SDN/load-balancer fabric beyond routing, more of the body's vitals — raise the count again when built.
 
-## 11. Scratch files (this study)
-- `v5wt/v5_law.py` — the v5 compass law (edge, centre, motion-safe, drop-guard, band, hole-guard+precool).
-- `allrun/` — every-version-same-hour runner + comparison + founder table.
-- `maxsim/maxarm.py` — MAX dial + wear gauge. `maxsim/sweep.py` — load sweep per organism. `maxsim/immune.py` — immune drill.
+## 27. The benchmark program — every run, nothing left out
+The map is `docs/omni_v5/BENCHMARKS_V5.md`; one button starts them all (`.github/workflows/v5-all-benchmarks.yml`).
+- **The v5 law, modelled:** `realms-v5` — all 1,002 muscles and the six organisms, with the no-harm check.
+- **23 free benchmarks on GitHub's machines:** Kubernetes (steady, every lever, full, shadow, add-ons, 50/500/1,000 nodes),
+  the six organisms at 1, 10, 100 and 1,000 copies with and without the real cluster inside, the v3 table, CPU power,
+  PostgreSQL, MySQL, MongoDB, Redis, Kafka, buildings and grid (CityLearn), the power grid (pandapower), robot arms
+  (MuJoCo), drones (PX4 swarms), robustness (Omni killed mid-run, the long run, Omni's own cost).
+- **The GPU:** GitHub's T4; **one chip**, the whole preregistered test (`scripts/gpu_rented_run.sh`); **the 1,000 copies**
+  of the six organisms with the real card inside; **eight chips** at once (`scripts/gpu_8card.sh`); the **AMD APU** and
+  AMD GPUs (`scripts/apu_run.sh`).
+- **The clouds:** **Azure AKS**, **Google GKE**, **Amazon EKS** (the same paired design, the bill counted every 15 s at
+  list price), and the big organisms on a rented Azure machine.
+- The plain truth: the live benchmarks run the live controllers, which carry the v3 live law until v5 is ported into them
+  (`docs/omni_v5/BUILD_STAGES.md`, stages 6–11); only after that port is a live run a v5 result.
+
+## 28. The babysitting tax — one screen, counted as a benefit
+A thousand muscles can mean a thousand dashboards and an engineer babysitting each. Omni collapses that to one screen of
+tiles (green, yellow, orange, red) that a couple of engineers watch, with a human override on every tile; the engineer-
+hours saved are a counted line on the bill beside energy, work and wear (`docs/omni_v5/CONNECTORS.md`, "One screen, not
+a thousand").
+
+## 11. Where the law and its study live
+- The law, in the engine (omni-v5): `realms/compass_arm_v5.py`, run by the v5 arm in `realms/harness.py`.
+- The study it came from: `docs/omni_v5/study/` (`v5_law.py`, `maxarm.py`, `sweep.py`, `immune.py`).
+- The runner `tools/run_realms_v5.py`, the test `tests/test_compass_arm_v5.py`, the table `results/realms_v5/`.
 
 © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only. Any commercialization or
 monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the

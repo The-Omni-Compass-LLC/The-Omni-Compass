@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+"""The card's two wires on an AMD chip (an APU, CPU and GPU on one die under one power budget, or an AMD GPU): the
+commands the GPU harness gives nvidia-smi, answered through AMD's own amd-smi, so the whole preregistered GPU protocol
+(scripts/gpu_rented_run.sh, scripts/gpu_8card.sh) runs unchanged on AMD with NVIDIA_SMI pointing here
+(scripts/apu_run.sh does that).
+
+  -i N -pl W                         the power wire: amd-smi set --gpu N --power-cap W
+  -i N -lgc MIN,MAX / -i N -rgc      the clock wire: amd-smi set --gpu N --clk-limit sclk min|max MHz / reset --clocks
+  --query-gpu=F1,F2,... --format=csv,noheader,nounits [-i N] [-lms MS]
+                                     readings from amd-smi metric / static (JSON), one CSV line, or one every MS ms
+  --query-compute-apps=...           the processes on the card (amd-smi process)
+  -L                                 the cards, one line each
+  (no arguments)                     the driver answers, or this exits non-zero
+
+On an APU the power is the package's (socket power): the CPU and the GPU share it, which is the meter an APU's owner
+pays for. An adapter, not yet run on an AMD card: the harness's own wire check (tools/gpu_wire_check.py, step 1 of every
+run) counts nothing unless each wire follows, reads back and goes home, so a reading this adapter gets wrong stops the
+run there; it is never a result. AMD_SMI overrides the amd-smi binary (tests/test_apu_shim.py uses a stand-in)."""
+import json, os, subprocess, sys, time
+
+AMD = os.environ.get("AMD_SMI", "amd-smi")
+
+
+def amd(*args, check=True):
+    r = subprocess.run([AMD, *args], capture_output=True, text=True)
+    if check and r.returncode != 0:
+        sys.stderr.write(r.stderr or r.stdout)
+        sys.exit(r.returncode or 1)
+    return r
+
+
+def amd_json(*args):
+    out = amd(*args, "--json").stdout
+    try:
+        d = json.loads(out)
+    except json.JSONDecodeError:
+        return {}
+    return d[0] if isinstance(d, list) and d else d
+
+
+def find(d, *names):
+    """The first numeric value under any of these keys, at any depth (amd-smi's JSON names shift between releases)."""
+    stack = [d]
+    while stack:
+        x = stack.pop(0)
+        if isinstance(x, dict):
+            for n in names:
+                if n in x:
+                    v = x[n]
+                    if isinstance(v, dict):
+                        v = v.get("value", v.get("val"))
+                    try:
+                        return float(str(v).split()[0])
+                    except (TypeError, ValueError):
+                        pass
+            stack.extend(x.values())
+        elif isinstance(x, list):
+            stack.extend(x)
+    return None
+
+
+def cards():
+    d = amd(*["list", "--json"]).stdout
+    try:
+        lst = json.loads(d)
+    except json.JSONDecodeError:
+        lst = []
+    return [str(x.get("gpu", i)) for i, x in enumerate(lst)] or ["0"]
+
+
+def reading(gpu, field):
+    m = amd_json("metric", "--gpu", gpu)
+    s = amd_json("static", "--gpu", gpu)
+    f = field.strip()
+    if f == "index":
+        return gpu
+    if f in ("name", "gpu_name"):
+        return str((s.get("asic") or {}).get("market_name", "AMD")) if isinstance(s, dict) else "AMD"
+    if f == "power.draw":
+        return find(m, "socket_power", "average_socket_power", "current_socket_power", "power")
+    if f in ("power.limit", "enforced.power.limit"):
+        return find(m, "power_cap", "current_power_cap", "socket_power_limit", "ppt0_limit") or \
+            find(s, "socket_power_limit", "power_cap", "current_power_cap")
+    if f == "power.default_limit":
+        return find(s, "default_power_cap", "default_power_limit", "socket_power_limit", "max_power_limit")
+    if f == "power.min_limit":
+        return find(s, "min_power_cap", "min_power_limit")
+    if f == "power.max_limit":
+        return find(s, "max_power_cap", "max_power_limit")
+    if f == "temperature.gpu":
+        return find(m, "edge", "temperature_edge", "hotspot", "temperature_hotspot")
+    if f == "utilization.gpu":
+        return find(m, "gfx_activity", "gfx_busy", "usage")
+    if f in ("clocks.sm", "clocks.gr", "clocks.current.graphics"):
+        return find(m, "gfx_0", "clk", "sclk", "current_gfxclk")
+    if f in ("clocks.max.sm", "clocks.max.graphics"):
+        return find(s, "max_gfxclk", "sclk_max", "max")
+    if f == "power.management":
+        return "Enabled"
+    return None
+
+
+def fmt(v):
+    if v is None:
+        return "[N/A]"
+    return f"{v:.2f}" if isinstance(v, float) else str(v)
+
+
+def main(a):
+    gpu = a[a.index("-i") + 1] if "-i" in a else None
+    if not a:
+        amd("version"); print("amd-smi answers"); return 0
+    if a == ["-L"] or "-L" in a:
+        for i, g in enumerate(cards()):
+            print(f"GPU {g}: AMD (amd-smi index {i})")
+        return 0
+    if "-pl" in a:
+        w = float(a[a.index("-pl") + 1])
+        amd("set", "--gpu", gpu or "0", "--power-cap", f"{int(round(w))}")
+        print(f"Power limit for GPU {gpu or '0'} was set to {w:.2f} W"); return 0
+    if "-lgc" in a:
+        lo, hi = a[a.index("-lgc") + 1].split(",")
+        g = gpu or "0"
+        r1 = amd("set", "--gpu", g, "--clk-limit", "sclk", "min", lo.split(".")[0], check=False)
+        r2 = amd("set", "--gpu", g, "--clk-limit", "sclk", "max", hi.split(".")[0], check=False)
+        if r1.returncode or r2.returncode:
+            sys.stderr.write("Setting locked GPU clocks is not supported for GPU " + g + "\n"); return 3
+        print(f"GPU clocks set for GPU {g}"); return 0
+    if "-rgc" in a:
+        amd("reset", "--gpu", gpu or "0", "--clocks", check=False)
+        print("All done."); return 0
+    q = next((x for x in a if x.startswith("--query-gpu=")), None)
+    if q:
+        fields = q.split("=", 1)[1].split(",")
+        gs = [gpu] if gpu is not None else cards()
+        ms = int(a[a.index("-lms") + 1]) if "-lms" in a else (1000 * int(a[a.index("-l") + 1]) if "-l" in a else 0)
+        while True:
+            for g in gs:
+                print(", ".join(fmt(reading(g, f)) for f in fields), flush=True)
+            if not ms:
+                return 0
+            time.sleep(ms / 1000.0)
+    if any(x.startswith("--query-compute-apps=") for x in a):
+        d = amd_json("process", "--gpu", gpu or "0")
+        for p in (d.get("process_list") or d.get("processes") or []) if isinstance(d, dict) else []:
+            info = p.get("process_info", p)
+            print(f"{info.get('pid', '')}, {info.get('name', '')}, {fmt(find(info, 'mem', 'memory_usage', 'vram_mem'))}")
+        return 0
+    sys.stderr.write(f"apu adapter: unsupported command {' '.join(a)}\n")
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

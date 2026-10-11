@@ -306,6 +306,11 @@ def main():
     test_gpu_bench.main(); check("GPU bench: watch writes nothing, limit never below draw x 1.3, read-back, blind and SLO reflexes, kill restores; paired run validity", True)
     from tests import test_gpu_compass
     test_gpu_compass.main(); check("two-wire GPU governor: races while work waits, never slower than the card on its own while busy, lid never under its own busy draw, fail up past the line, restores", True)
+    from tests import test_apu_shim
+    test_apu_shim.main(); check("AMD chip wires (scripts/apu/nvidia-smi through amd-smi): power wire, readings in order, card list, clock wire refused cleanly, an unknown command refused", True)
+    from tests import test_compass_arm_v5 as _v5
+    _v5.test_v5_default_does_no_harm_to_any_muscle(); _v5.test_v5_tower_is_no_worse_than_native(); _v5.test_v5_default_config_present()
+    check("the v5 law does no harm (realms/compass_arm_v5.py, V5CFG): on every one of the v5 catalog's muscles no more energy, no less work, no more violations than native, every knob handed back on the kill; the whole tower no worse", True)
     from tests import test_cost_to_match
     test_cost_to_match.main(); check("cost to match: the cheapest native setting that reaches Omni-Compass's p95, its extra pods, CPU and machines", True)
     from tests import test_server_power

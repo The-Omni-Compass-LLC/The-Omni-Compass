@@ -51,6 +51,10 @@ mkdir -p "$OUT_DIR"
 # which deletes a machine once it is empty, so a machine given back is a machine no longer billed; the system pool
 # carries the NoSchedule taint kind's control plane carries, so every count below is the same on both
 PLATFORM="${PLATFORM:-kind}"
+# Google (GKE) and Amazon (EKS) clusters are built to the AKS shape (a tainted system pool; work pools labelled
+# omni-role=work and agentpool=<pool>: scripts/gke_paired.sh, scripts/eks_paired.sh), so they run the same managed mode
+# (kubectl only); CLOUD keeps the provider's name
+CLOUD="$PLATFORM"; case "$PLATFORM" in gke|eks) PLATFORM=aks;; esac; export CLOUD
 if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"; else export WORKER_SEL="!node-role.kubernetes.io/control-plane"; fi   # every AKS work pool carries omni-role=work (scripts/aks_paired.sh)
 # ADDONS=keda, the add-on test: in every arm KEDA and its HTTP add-on own the service's autoscaler (scripts/kind_addons.sh;
 # ADDONS_PROFILE=both: the CPU target and the live requests in flight, the default; http: the requests in flight alone),
@@ -127,7 +131,7 @@ if [ "$PLATFORM" = aks ]; then
   # the runner is outside Azure's network: the probe reaches the Service through Azure's load balancer, still
   # load-balanced across every ready endpoint, as a client outside the cluster sees it
   kubectl patch service php-apache-edge -p '{"spec":{"type":"LoadBalancer"}}'
-  for i in $(seq 1 60); do EDGE_IP=$(kubectl get service php-apache-edge -o jsonpath='{.status.loadBalancer.ingress[0].ip}'); [ -n "$EDGE_IP" ] && break; sleep 5; done
+  for i in $(seq 1 60); do EDGE_IP=$(kubectl get service php-apache-edge -o jsonpath='{.status.loadBalancer.ingress[0].ip}'); [ -n "$EDGE_IP" ] || EDGE_IP=$(kubectl get service php-apache-edge -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'); [ -n "$EDGE_IP" ] && break; sleep 5; done   # EKS: a host name
   PROBE_URL="http://${EDGE_IP}:80/"
 else
 EDGE_IP=$(kubectl get nodes -l node-role.kubernetes.io/control-plane -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')

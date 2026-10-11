@@ -1,0 +1,150 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The bill on Amazon Web Services: native Kubernetes (Elastic Kubernetes Service with the Kubernetes cluster autoscaler)
+# against the same with Omni-Compass on top, the same work, the machines Amazon bills counted every 15 s and priced at
+# the list price. The same design as aks-metered.yml (scripts/eks_paired.sh). Needs the repository secrets
+# AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY (an IAM user able to run eksctl: EKS, EC2, CloudFormation, IAM roles for
+# the node groups and the autoscaler's service account). One repetition at a time; each cluster is deleted when its arm
+# ends, and every cluster this run made is deleted at the end whatever happens. EKS's control plane (about $0.10 an hour
+# a cluster) is not in the bill, which counts worker machines only, as on AKS. Written, not yet run on Amazon: the first
+# repetition is a shakedown.
+name: eks-metered
+on:
+  workflow_dispatch:
+    inputs:
+      reps: {description: "Paired repetitions", default: "5"}
+      arms: {description: "Arms, in rotation order", default: "native compass"}
+      duration_s: {description: "Measured seconds per arm", default: "900"}
+      region: {description: "AWS region", default: "us-east-1"}
+      instance: {description: "Worker instance type", default: "m5.large"}
+      price_per_node_hour: {description: "List price of one worker instance-hour in USD (m5.large, Linux, on demand, us-east-1; check the price list on the day)", default: "0.096"}
+      load_steps: {description: "Load-generator replicas per step, in order (the burst bill test: e.g. 1 6 1 8 1 6); empty: steady load", default: ""}
+      max_workers: {description: "Worker machines in the work group (the autoscaler runs 1 to this many)", default: "4"}
+      hpa_max: {description: "The app's replica ceiling, the same in every arm (empty: the manifest's 10)", default: ""}
+      organism: {description: "One of the six organisms with this cluster inside it (tools/run_kil.py): compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower; empty: the service alone", default: ""}
+      load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
+      organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "1"}
+concurrency: {group: eks-metered, cancel-in-progress: false}
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {reps: "${{ steps.r.outputs.reps }}"}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - id: r
+        run: echo "reps=$(python3 -c "import json; print(json.dumps(list(range(1, ${{ github.event.inputs.reps || '5' }} + 1))))")" >> "$GITHUB_OUTPUT"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: {rep: "${{ fromJSON(needs.plan.outputs.reps) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      AWS_REGION: ${{ github.event.inputs.region || 'us-east-1' }}
+      EKS_INSTANCE: ${{ github.event.inputs.instance || 'm5.large' }}
+      RUN_ID: ${{ github.run_id }}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.region || 'us-east-1' }}
+      - name: Install eksctl (the official release)
+        run: |
+          curl -sSL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
+          sudo mv /tmp/eksctl /usr/local/bin/eksctl && eksctl version
+      - name: Run the paired repetition
+        run: |
+          set +e
+          bash scripts/eks_paired.sh > paired.log 2>&1
+          code=$?
+          grep -v -i "warning" paired.log | tail -10 | while IFS= read -r l; do echo "::notice::$l"; done
+          [ "$code" = 0 ] || { echo "::error::repetition ${{ matrix.rep }} ended with exit $code"; exit "$code"; }
+        env:
+          REP: ${{ matrix.rep }}
+          ARMS: ${{ github.event.inputs.arms || 'native compass' }}
+          DURATION: ${{ github.event.inputs.duration_s || '900' }}
+          LOADGEN: open
+          LOAD_STEPS: ${{ github.event.inputs.load_steps || '' }}
+          ORGANISM: ${{ github.event.inputs.organism || '' }}
+          LOAD_MAX: ${{ github.event.inputs.load_max || '6' }}
+          ORGANISM_SCALE: ${{ github.event.inputs.organism_scale || '1' }}
+          EKS_MAX_NODES: ${{ github.event.inputs.max_workers || '4' }}
+          HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
+          CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+      - name: Delete every cluster this run made, whatever happened
+        if: always()
+        run: |
+          for c in $(eksctl get cluster --region "$AWS_REGION" -o json 2>/dev/null | python3 -c "import json,sys; [print(x['Name']) for x in json.load(sys.stdin)]" | grep -- "-${RUN_ID}" || true); do
+            eksctl delete cluster --name "$c" --region "$AWS_REGION" --wait=false || true
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "eks-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}\npaired.log"}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  aggregate:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: {pattern: "eks-*", path: reps, merge-multiple: true}
+      - run: ls reps && python tools/live_reps.py reps
+        env: {PRICE_PER_NODE_HOUR: "${{ github.event.inputs.price_per_node_hour || '0.096' }}"}
+      - run: cat reps/LIVE_REPS.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: live-reps-eks, path: "reps/LIVE_REPS.*"}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

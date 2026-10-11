@@ -1,0 +1,147 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The bill on Google Cloud: native Kubernetes (Google Kubernetes Engine with its own cluster autoscaler) against the same
+# with Omni-Compass on top, the same work, the machines Google bills counted every 15 s and priced at the list price.
+# The same design as aks-metered.yml (scripts/gke_paired.sh). Needs the repository secrets GCP_CREDENTIALS (a service
+# account key, JSON, with Kubernetes Engine Admin, Compute Viewer and Service Account User) and GCP_PROJECT (the project
+# id), or the project as an input. One repetition at a time; each cluster is deleted when its arm ends, and every
+# cluster this run made is deleted at the end whatever happens. Written, not yet run on Google Cloud: the first
+# repetition is a shakedown.
+name: gke-metered
+on:
+  workflow_dispatch:
+    inputs:
+      reps: {description: "Paired repetitions", default: "5"}
+      arms: {description: "Arms, in rotation order", default: "native compass"}
+      duration_s: {description: "Measured seconds per arm", default: "900"}
+      project: {description: "Google Cloud project id (empty: the GCP_PROJECT secret)", default: ""}
+      zone: {description: "Zone", default: "us-central1-a"}
+      machine: {description: "Worker machine type", default: "e2-standard-2"}
+      price_per_node_hour: {description: "List price of one worker machine-hour in USD (e2-standard-2, on demand, us-central1; check the price list on the day)", default: "0.067"}
+      load_steps: {description: "Load-generator replicas per step, in order (the burst bill test: e.g. 1 6 1 8 1 6); empty: steady load", default: ""}
+      max_workers: {description: "Worker machines in the work pool (Google's autoscaler runs 1 to this many)", default: "4"}
+      hpa_max: {description: "The app's replica ceiling, the same in every arm (empty: the manifest's 10)", default: ""}
+      organism: {description: "One of the six organisms with this cluster inside it (tools/run_kil.py): compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower; empty: the service alone", default: ""}
+      load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
+      organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "1"}
+concurrency: {group: gke-metered, cancel-in-progress: false}
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {reps: "${{ steps.r.outputs.reps }}"}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - id: r
+        run: echo "reps=$(python3 -c "import json; print(json.dumps(list(range(1, ${{ github.event.inputs.reps || '5' }} + 1))))")" >> "$GITHUB_OUTPUT"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: {rep: "${{ fromJSON(needs.plan.outputs.reps) }}"}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      GCP_PROJECT: ${{ github.event.inputs.project || secrets.GCP_PROJECT }}
+      GCP_ZONE: ${{ github.event.inputs.zone || 'us-central1-a' }}
+      GKE_MACHINE: ${{ github.event.inputs.machine || 'e2-standard-2' }}
+      RUN_ID: ${{ github.run_id }}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - uses: google-github-actions/setup-gcloud@v2
+        with: {install_components: "kubectl,gke-gcloud-auth-plugin"}
+      - run: gcloud services enable container.googleapis.com compute.googleapis.com --project "$GCP_PROJECT"
+      - name: Run the paired repetition
+        run: |
+          set +e
+          bash scripts/gke_paired.sh > paired.log 2>&1
+          code=$?
+          grep -v -i "warning" paired.log | tail -10 | while IFS= read -r l; do echo "::notice::$l"; done
+          [ "$code" = 0 ] || { echo "::error::repetition ${{ matrix.rep }} ended with exit $code"; exit "$code"; }
+        env:
+          REP: ${{ matrix.rep }}
+          ARMS: ${{ github.event.inputs.arms || 'native compass' }}
+          DURATION: ${{ github.event.inputs.duration_s || '900' }}
+          LOADGEN: open
+          LOAD_STEPS: ${{ github.event.inputs.load_steps || '' }}
+          ORGANISM: ${{ github.event.inputs.organism || '' }}
+          LOAD_MAX: ${{ github.event.inputs.load_max || '6' }}
+          ORGANISM_SCALE: ${{ github.event.inputs.organism_scale || '1' }}
+          GKE_MAX_NODES: ${{ github.event.inputs.max_workers || '4' }}
+          HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
+          CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+      - name: Delete every cluster this run made, whatever happened
+        if: always()
+        run: |
+          for c in $(gcloud container clusters list --project "$GCP_PROJECT" --format='value(name)' --filter="name~-${RUN_ID}" 2>/dev/null); do
+            gcloud container clusters delete "$c" --zone "$GCP_ZONE" --project "$GCP_PROJECT" --quiet --async || true
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "gke-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}\npaired.log"}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  aggregate:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: {pattern: "gke-*", path: reps, merge-multiple: true}
+      - run: ls reps && python tools/live_reps.py reps
+        env: {PRICE_PER_NODE_HOUR: "${{ github.event.inputs.price_per_node_hour || '0.067' }}"}
+      - run: cat reps/LIVE_REPS.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: {name: live-reps-gke, path: "reps/LIVE_REPS.*"}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

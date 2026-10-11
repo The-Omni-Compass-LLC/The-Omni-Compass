@@ -1,0 +1,101 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: realms-v5
+# The Omni v5 law on the whole v5 muscle catalog (realms/catalog_v5.csv, 1,002 muscles in 65 families) on GitHub's own
+# machine: every muscle alone and the five organisms, native against the v5 law on top (realms/compass_arm_v5.py), on the
+# preregistered seeds 3000-3009 (tools/run_realms_v5.py). Evidence class S (modelled). The run is deterministic: every
+# label must match the table committed in results/realms_v5/, every number within 1e-3 or 0.5%, and no muscle may be
+# worse than native (the no-harm check). Started by hand (Actions -> realms-v5 -> Run workflow), by a commit message
+# containing [realms-v5], or by v5-all-benchmarks.yml.
+on:
+  workflow_dispatch:
+  push:
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  realms-v5:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[realms-v5]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - name: The engine reads omni-v5
+        run: python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: The v5 law does no harm to any muscle (tests/test_compass_arm_v5.py)
+        run: python3 tests/test_compass_arm_v5.py
+      - name: Every muscle and the five organisms on the v5 law (seeds 3000-3009)
+        run: python3 tools/run_realms_v5.py --out realms5-out
+      - name: Same table as the one published, and no muscle worse than native
+        run: |
+          set -o pipefail
+          python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import csv, json, sys
+          a = list(csv.DictReader(open("realms5-out/MUSCLES_V5.csv")))
+          worse = [x["muscle"] for x in a if x["label"] == "WORSE"]
+          print(f"no-harm: {len(a)} muscles, {len(worse)} worse than native" + (": " + ", ".join(worse) if worse else ""))
+          try:
+              b = list(csv.DictReader(open("results/realms_v5/MUSCLES_V5.csv")))
+              mine, pub = json.load(open("realms5-out/RUN.json")), json.load(open("results/realms_v5/RUN.json"))
+          except FileNotFoundError:
+              b, mine, pub = [], {}, {}
+          if len(b) != len(a) or mine.get("frozen_tree_sha256") != pub.get("frozen_tree_sha256"):
+              print("::notice::the committed table is from another engine tree: nothing to compare yet; this run's table is the first on this tree")
+              sys.exit(1 if worse else 0)
+          bad = []
+          for x, y in zip(a, b):
+              for k in x:
+                  try:
+                      fx, fy = float(x[k]), float(y[k])
+                      ok = abs(fx - fy) <= max(1e-3, 0.005 * abs(fy))
+                  except ValueError:
+                      ok = x[k] == y[k]
+                  if not ok:
+                      bad.append((x["muscle"], k, x[k], y[k]))
+          print(f"published v5 table reproduced: {len(a)} muscles, {len(bad)} differences beyond 1e-3 (or 0.5%)")
+          for d in bad[:40]:
+              print("  differs:", d)
+          sys.exit(1 if (bad or worse) else 0)
+          PY
+      - name: Results summary
+        if: always()
+        run: sed -n '/## The five organisms/,/## Every muscle/p' realms5-out/REALMS_V5.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: realms-v5-results, path: realms5-out}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
