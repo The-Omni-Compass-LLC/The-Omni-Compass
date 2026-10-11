@@ -1,6 +1,6 @@
 # CLAUDE.md: standing orders for any session working on this repository
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 These are the founder's orders, gathered from the full working record. They load every session. Follow them unless
 the founder overrides one in the conversation.
@@ -67,10 +67,11 @@ the founder overrides one in the conversation.
 ## Legal, on every output
 
 - At the top and end of every output: © 2026 The Omni-Compass LLC; all rights reserved; evaluation and simulation use
-  only; any commercialization or monetization requires a signed, paid Omni-Compass Enterprise License; **all** patents,
-  copyrights and trademarks filed in the USA (say "filed", never give numbers); everything subject to change at any time;
-  www.omni-compass.com is the authority of record (the founder's wording of 10 October: the word "all" before patents,
-  "all rights reserved" and "subject to change at any time" everywhere, the website as the authority of record).
+  only; any commercialization or monetization requires a signed, paid Omni-Compass Enterprise License; then **all**
+  patents, copyrights and trademarks filed in the USA (say "filed", never give numbers), followed by www.omni-compass.com
+  and nothing after it (the founder's wording of 10 October: the word "all" before patents and "all rights reserved"
+  everywhere; that night he struck two earlier sentences from the notice, and they stand nowhere: no page, header, report,
+  license paper or program output carries them, and `tools/legal.py --check` fails any file that does).
 - Every export of any part of Omni-Compass (a zip, a report, a table, a PDF, a chat answer) carries the README's notice,
   the LICENSE, the NOTICE and DISCLOSURES.md the same way, written as a multi-billion-dollar company would protect a
   released asset.
@@ -119,7 +120,6 @@ the founder overrides one in the conversation.
 - Latest standing order (Oct 5): push everything on the newest engine, run it again and double-check it, keep the old
   runs going, don't ask questions, and work to the highest referee and underwriter level.
 
-
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

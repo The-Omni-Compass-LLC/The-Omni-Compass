@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
-# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
-# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The robustness test's readings (tools/live_reps.py, docs/ROBUSTNESS_PREREGISTRATION.md) without a cluster: the kill and
 hand-back marks are read from robust.log, the 120 s after the kill are compared in both arms from the probe's own records,
 the governor's memory ratio comes from the process-table samples, a hand-back past the allowance or a memory growth past

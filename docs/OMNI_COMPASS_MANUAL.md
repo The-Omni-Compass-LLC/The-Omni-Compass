@@ -1,6 +1,6 @@
 # THE OMNI-COMPASS MANUAL
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 ## The Governor, Its Mechanism, and How to Wire It onto Your Stack
 
@@ -22,11 +22,9 @@ saving on a particular system. The only number that applies to your system is th
 on your own receipt. Before Omni-Compass writes to any production system, it must run in watch mode, pass the wire
 check, and be covered by a signed Omni-Compass Enterprise License.
 
-**Rights and changes.** © 2026 The Omni-Compass LLC. All rights reserved. All patents, copyrights and trademarks filed in
-the USA. Everything in this manual and in the repository it describes is subject to change at any time without notice;
-the authority of record for Omni-Compass, its current state and its terms is The Omni-Compass LLC at
-www.omni-compass.com, and where this manual and that record differ, the record governs. Every copy, export or printout
-of this manual carries this notice, `LICENSE`, `NOTICE` and `DISCLOSURES.md` unchanged.
+**Rights.** © 2026 The Omni-Compass LLC. All rights reserved. Every copy, export or printout of this manual carries this
+notice, `LICENSE`, `NOTICE` and `DISCLOSURES.md` unchanged. All patents, copyrights and trademarks filed in the USA.
+www.omni-compass.com
 
 **The wiring declaration.** Omni-Compass acts only through the wires it is given. A wrong reading, a wrong or shared
 lever, a wrong range, or a service line set for another workload makes it do exactly what its law says with the wrong
@@ -178,8 +176,8 @@ the brake held to the floor; every setting handed back to where native had it, r
 | a meter that is blind or late | nothing: blind means hold; it moves nothing it cannot see | section 7.3 |
 | your results point the other way from the published ones | presume the wiring first, not the law | `DISCLOSURES.md`, section 4 |
 
-**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, www.omni-compass.com, the
-authority of record. Security reports: the process in `SECURITY.md`, never a public issue.
+**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, www.omni-compass.com.
+Security reports: the process in `SECURITY.md`, never a public issue.
 
 ## Executive Summary
 
@@ -3365,4 +3363,4 @@ Licensing, pilots and the Omni-Compass Enterprise License: **The Omni-Compass LL
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. All patents, copyrights and trademarks filed in the USA. Everything in this repository is subject to change at any time; www.omni-compass.com is the authority of record. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

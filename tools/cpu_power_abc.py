@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
-# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
-# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The three-run table for CPU power (docs/CPU_POWER_PREREGISTRATION.md): three separate runs of tools/run_cpu_power.py
 (A, B, C; on one machine, or three machines of one kind) read by the three-run rule, every row shown, losses included.
 

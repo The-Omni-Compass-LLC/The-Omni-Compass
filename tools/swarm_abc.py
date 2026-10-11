@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
-# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
-# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for the drone swarms (docs/OMNI_V1.md's readings, docs/SWARM_PREREGISTRATION.md): each cell run three
 times as separate GitHub runs on the same frozen engine (tools/run_swarm.py). PyBullet is deterministic for a fixed step,
 so the runs must give the same numbers to within one part in a thousand (PyBullet's floating point differs by that much

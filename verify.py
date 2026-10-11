@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
-# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
-# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """One-command verification of the Omni-Compass package.
 
   python verify.py           full verification (about 15-30 minutes, single core)
@@ -123,7 +123,7 @@ def main():
     from tools import legal
     bad = legal.check()
     check("legal notice on every page, header, workflow report and license paper: all rights reserved, all patents, copyrights "
-          "and trademarks filed in the USA, subject to change at any time, www.omni-compass.com the authority of record "
+          "and trademarks filed in the USA, www.omni-compass.com and nothing after it, no struck wording anywhere "
           "(tools/legal.py; files locked by a fingerprint keep their header until the next engine version)", not bad, "; ".join(bad[:4]))
     import re as _re
     from tools import omni_version as _ov

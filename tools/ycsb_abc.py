@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# All patents, copyrights and trademarks filed in the USA. Evaluation and simulation use only; any commercialization,
-# monetization or other use requires a signed, paid Omni-Compass Enterprise License. Subject to change at any time;
-# www.omni-compass.com is the authority of record. See LICENSE, NOTICE and DISCLOSURES.md.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for the YCSB on MongoDB benchmark (docs/OMNI_V1.md's readings, docs/YCSB_PREREGISTRATION.md): the untouched
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_ycsb.py), each run holding three paired
 repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions gives a 95%
