@@ -12,7 +12,7 @@
   results, every row included; the Enterprise License path; ownership and the filings; patent and rights defense;
   feedback and contributions; the founder's reserved right to change the software, its documentation, its results and
   its terms at any time, without notice; safety; export control and sanctions; data; third-party components; term,
-  termination and a narrow cure; no warranty; a liability cap; indemnity; U.S. Government end users; Florida law and
+  termination and a narrow cure; no warranty; a liability cap; indemnity; U.S. Government end users; Delaware law and
   venue; general terms. New `ENTERPRISE_LICENSE.md` summarizes the paid license (production, hosted service, OEM and
   embedded, managed service provider, research; fees, deliverables, warranties, patent license, infringement indemnity,
   liability, confidentiality, data, security, safety, audit, transition and escrow). `.github/CLA.md` (assignment plus a
