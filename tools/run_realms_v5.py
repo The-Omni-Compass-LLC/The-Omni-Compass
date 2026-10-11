@@ -5,9 +5,9 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Run the realm harness on the Omni v5 law and write its tables (results/realms_v5/).
 
-  python3 tools/run_realms_v5.py                      # the preregistered run: seeds 3000-3009, results/realms_v5/
+  python3 tools/run_realms_v5.py                      # the preregistered run: seeds 3000-3009, the v5 catalog (1,002), results/realms_v5/
   python3 tools/run_realms_v5.py --seeds 0 1 --out /tmp/realms5-dev   # a look on development seeds (never reported)
-  python3 tools/run_realms_v5.py --catalog realms/catalog_v5.csv      # a different catalog (the expanded v5 muscle set)
+  python3 tools/run_realms_v5.py --catalog realms/catalog.csv         # the v3 muscle set (945) on the v5 law, for comparison
 
 Every muscle alone, native against the v5 law (realms/compass_arm_v5.py, the engine's default V5CFG), then the five
 organisms. The v5 law carries the two math-only guardrails (the edge, the centre/hole) and holds a knob native wherever
@@ -150,11 +150,11 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--seeds", type=int, nargs="+", default=PREREG_SEEDS)
     ap.add_argument("--out", default=str(ROOT / "results" / "realms_v5"))
-    ap.add_argument("--catalog", default=str(ROOT / "realms" / "catalog.csv"))
+    ap.add_argument("--catalog", default=str(ROOT / "realms" / "catalog_v5.csv"))   # the v5 muscle set (1,002)
     ap.add_argument("--workers", type=int, default=os.cpu_count() or 2)
     ap.add_argument("--limit", type=int, default=0, help="first N muscles only (a look; never reported)")
     a = ap.parse_args(argv)
-    prereg = a.seeds == PREREG_SEEDS and not a.limit and a.catalog == str(ROOT / "realms" / "catalog.csv")
+    prereg = a.seeds == PREREG_SEEDS and not a.limit and a.catalog == str(ROOT / "realms" / "catalog_v5.csv")
     dirty = subprocess.run(["git", "status", "--porcelain", "--"] + FROZEN, cwd=ROOT, capture_output=True,
                            text=True).stdout.strip()
     if prereg and dirty:

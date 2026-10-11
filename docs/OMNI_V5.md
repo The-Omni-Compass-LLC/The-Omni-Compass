@@ -13,6 +13,13 @@ runners) and adds the **v5 compass law** (`realms/compass_arm_v5.py`) and its ar
 goal is to be equal to or better than native and every prior version on every measure, and never worse on any — *do no
 harm*.
 
+The v5 muscle catalog (`realms/catalog_v5.csv`) is **1,002 muscles in 65 families** — v3's 945 plus six new families of
+real control points: **Linux Kernel & OS Control** (cgroups, the CFS scheduler, DVFS/cpufreq, transparent hugepages, the
+I/O scheduler, NUMA balancing, dirty-ratio writeback, swappiness, TCP buffers, …), **Serverless & Functions (FaaS)**,
+**Virtualization & Hypervisor**, **Content Delivery & Edge Cache**, **Gut** (data-plane intake and waste), and **Skin**
+(perimeter and admission). Each is a distinct real-world knob, modelled on the matching plant template, exactly as v3's
+945 already share five templates. (v3's own catalog `realms/catalog.csv` stays 945, frozen for v3's results.)
+
 Two math-only guardrails, and otherwise free arms:
 
 - **The edge** — a per-knob cushion that widens at once when service climbs and narrows slowly when it falls

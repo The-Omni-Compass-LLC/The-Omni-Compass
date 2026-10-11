@@ -40,7 +40,7 @@ def _muscle_harms(row):
 
 
 def test_v5_default_does_no_harm_to_any_muscle():
-    rows = H.catalog()
+    rows = H.catalog(str(ROOT / "realms" / "catalog_v5.csv"))   # the v5 muscle set (1,002)
     bad, acted = [], 0
     for row in rows:
         harms, writes = _muscle_harms(row)
@@ -52,7 +52,7 @@ def test_v5_default_does_no_harm_to_any_muscle():
 
 
 def test_v5_tower_is_no_worse_than_native():
-    rows = H.catalog()
+    rows = H.catalog(str(ROOT / "realms" / "catalog_v5.csv"))
     nat = H.run_organism_arm(rows, SEED, "native")
     v5 = H.run_organism_arm(rows, SEED, "v5")
     assert sum(v5["plants"][i]["energy_j"] for i in range(len(v5["plants"]))) <= \
