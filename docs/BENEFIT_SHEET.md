@@ -12,7 +12,9 @@ The number is the Omni index's rule (`results/OMNI_INDEX.md`): each judged gauge
 
 | Date | Benchmark | Benefit? | How much | Every confirmed change, in words | Table |
 |---|---|---|---:|---|---|
-| 2026-10-10 | Every real test together: the Omni index | **trade** | **+4.8% gain** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
+| 2026-10-10 | Every real test together: the Omni index | **trade** | **+5.2% gain** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
+| unknown | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | **trade** | **+60% gain** | machines cut 5.9% to 7.8%: good; machine-hours cut 5.8% to 8.2%: good; mean response cut 59%: good; p95 cut 73% to 76%: good; p99 cut 70% to 72%: good; time over the line cut 96% to 97%: good; replicas cut 14%: good; parked-worker energy up 1.4% to 2.6%: cost | `results/live/V3_KEDA_REQUESTS.md` |
+| unknown | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | **trade** | **+28% gain** | mean response cut 36% to 38%: good; p95 cut 51% to 53%: good; p99 cut 60% to 62%: good; time over the line cut 97% to 100%: good; parked-worker energy up 1.0% to 1.6%: cost | `results/live/V3_KEDA_CPU_REQUESTS.md` |
 | 2026-10-10 | The six organisms with the real cluster inside, 10 and 100 copies | **trade** | **+5.3% gain** | p95 cut 32% to 52%: good; time over the line cut 8% to 36%: good; replicas up 0.6%: cost; failed requests cut 8.4% to 8.5%: good; parked-worker energy cut 0.3%: good; standby-model energy cut 0.3%: good | `results/live/V3_SIX_KUBE.md` |
 | 2026-10-10 | The big organisms with the real cluster inside, 1,000 copies on Azure | **yes** | **+155% gain** | p95 cut 95% to 98%: good; p99 cut 97% to 98%: good | `results/live/V3_BIG_ORGANISM.md` |
 | 2026-10-10 | The 945 modelled muscles as one tower, every muscle written at once | **yes** | **+0.3% gain** | work per energy up 0.3%: good | `results/realms/REALMS.md` |

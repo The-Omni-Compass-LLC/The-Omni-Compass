@@ -11,7 +11,8 @@ difference (omni minus native) is clear of zero; no difference beyond the noise 
 runs disagree when runs clear of the noise point different ways (the test itself is then unstable, and is looked into).
 Rows that are shown but never judged (tools/live_reps.py NEUTRAL) stay unjudged. Every row is reported, losses included.
 Usage: python tools/confirm_abc.py "TITLE" A_DIR B_DIR C_DIR --out results/live/V1_<NAME>.md
-  each DIR is an archived run (results/live/raw/run-<id>/) holding live-reps/LIVE_REPS.json; its engine is checked."""
+  each DIR is an archived run (results/live/raw/run-<id>/) holding live-reps/LIVE_REPS.json, or one native setup's folder
+  inside an add-on run (results/live/raw/addons-run-<id>/<setup>/); its engine is checked."""
 from __future__ import annotations
 
 import argparse, json, subprocess, sys
@@ -104,7 +105,9 @@ def load(d):
     arm = next((a for a in ARMS if a in j["paired"]), None)
     if arm is None:
         raise SystemExit(f"{f}: no compass arm in the paired table ({sorted(j['paired'])})")
-    run = Path(d).resolve().name.replace("run-", "")
+    # the run id from the run's own folder: run-<id>, or addons-run-<id> with one folder per native setup inside it
+    run = next((q.name.rsplit("run-", 1)[1] for q in [Path(d).resolve(), *Path(d).resolve().parents]
+                if q.name.rsplit("run-", 1)[-1].isdigit() and "run-" in q.name), Path(d).resolve().name.replace("run-", ""))
     reps = j.get("repetitions") or {}
     n = len(set(reps.get("native", [])) & set(reps.get(arm, []))) if isinstance(reps, dict) else reps
     paired = dict(j["paired"][arm])

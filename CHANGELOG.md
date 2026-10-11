@@ -2,6 +2,22 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-11: the add-on test on main (Omni-Compass on top of KEDA)
+
+- **Kubernetes with its add-ons, A/B/C on v3** (`docs/ADDONS_PREREGISTRATION.md`, declared before the first run; runs
+  38096663118, 38099655092, 38099656930; 59 of 60 pairs valid): native is Kubernetes with KEDA 2.21 and its HTTP add-on
+  0.16 owning the service's autoscaler; omni is Omni-Compass on top, its moves carried to KEDA's ScaledObject by the plug
+  (`scripts/kubectl_keda.py`). With KEDA on the CPU target and the requests in flight (`results/live/V3_KEDA_CPU_REQUESTS.md`):
+  p95 −51% to −53%, p99 −60% to −62%, time over the line −97% to −100%, confirmed better; machines inside the noise. With the
+  HTTP add-on alone (`results/live/V3_KEDA_REQUESTS.md`): p95 −73% to −76%, machines in service −5.9% to −7.8%, node-hours
+  −5.8% to −8.2%, replicas −14%, confirmed better. **Confirmed worse in both:** the energy counted with parked workers at idle
+  power, +1.0% to +2.6% (the closed-loop load put 24% to 54% more work through the service: its CPU, shown, not judged).
+  The index moves to +5.2% (Kubernetes +31.8% over nine tests); the energy loss counts against Omni-Compass.
+- The workflow (`.github/workflows/kind-addons.yml`), the plug, the add-on manifests (SHA-256 pinned), the KEDA role and the
+  plug's tests (`tests/test_kubectl_keda.py`, a fake KEDA) are on main; every run commits its raw files and tables to
+  `results/live/raw/addons-run-<id>/` on the branch it ran on, and the front page lists its runs.
+- `tools/confirm_abc.py` reads one native setup's folder inside an add-on run (`addons-run-<id>/<setup>/`).
+
 ## 2026-10-11
 - **The legal set at underwriter level.** `LICENSE` (Omni-Compass Evaluation License 1.0, revised 11 October 2026) now
   reads as a proprietary software asset's license: acceptance; definitions (evaluation, simulation, production use,
@@ -12,7 +28,7 @@
   results, every row included; the Enterprise License path; ownership and the filings; patent and rights defense;
   feedback and contributions; the founder's reserved right to change the software, its documentation, its results and
   its terms at any time, without notice; safety; export control and sanctions; data; third-party components; term,
-  termination and a narrow cure; no warranty; a liability cap; indemnity; U.S. Government end users; Florida law and
+  termination and a narrow cure; no warranty; a liability cap; indemnity; U.S. Government end users; Delaware law and
   venue; general terms. New `ENTERPRISE_LICENSE.md` summarizes the paid license (production, hosted service, OEM and
   embedded, managed service provider, research; fees, deliverables, warranties, patent license, infringement indemnity,
   liability, confidentiality, data, security, safety, audit, transition and escrow). `.github/CLA.md` (assignment plus a

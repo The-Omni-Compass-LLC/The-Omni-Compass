@@ -4,7 +4,7 @@
 
 Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired measurement shows the muscle no worse for it. Where the measurement shows nothing, or shows a loss, the muscle stays native and Omni only watches it: one wire out, no wire in. This is not a new rule. It is what the engine does on the muscle itself before it moves anything (`omnicompass/verdict.py`: the paired trial, and the verdict **left native** where no step is allowed), and it is the watch arm of every realms run (`docs/REALMS_PREREGISTRATION.md`: the governor reads every period and writes nothing). This page applies the same principle to every published result, one verdict per knob, so that an operator can see which knobs earn a wire in and which stay native. The founder's order of 9 October 2026: where Omni cannot beat native, the muscle lives by itself; we only wire out of it.
 
-Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1035 rows, the 945 modelled muscles included one by one).
+Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1037 rows, the 945 modelled muscles included one by one).
 
 ## The rule
 
@@ -20,12 +20,12 @@ A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes 
 
 | Where | Knobs or cases | Write | Operator's choice | Watch |
 |---|---:|---:|---:|---:|
-| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 24 | 10 | 0 | 14 |
+| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 26 | 10 | 2 | 14 |
 | Independent simulators, three runs each (robot arms, grids, districts, swarms; evidence class S) | 39 | 21 | 15 | 3 |
 | The 945 modelled muscles, alone on their plants (evidence class S) | 945 | 124 | 13 | 808 |
 | The organisms with the real cluster inside (GitHub at 10 and 100 copies; Azure at 1,000) | 14 | 12 | 1 | 1 |
 
-In words: on the real stacks Omni earns its wire in on 10 of 24 knob-cases, trades on 0 and watches on 14. Of the 945 modelled muscles, 124 earn a wire in, 13 are trades and 808 stay native: 746 of the 808 wrote nothing in any run, because the native controller already held the reading inside the band and the law never left its cushion. A knob that never writes costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
+In words: on the real stacks Omni earns its wire in on 10 of 26 knob-cases, trades on 2 and watches on 14. Of the 945 modelled muscles, 124 earn a wire in, 13 are trades and 808 stay native: 746 of the 808 wrote nothing in any run, because the native controller already held the reading inside the band and the law never left its cushion. A knob that never writes costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
 
 ## The real stacks (evidence class L: live software, three separate GitHub runs on the frozen engine)
 
@@ -44,6 +44,8 @@ The knob: the autoscaler's replicas, the floor and the machines, on top of the H
 | faults | mean response cut 34% to 51%, p95 cut 58% to 63%, time over the line cut 27% to 43%, failed requests cut 14% to 18% | none | **write** | +36.6% | +154.8% | confirmed better on 4 gauges, nothing confirmed worse; 9 gauges inside the noise. Omni holds the knob | `results/live/V3_FAULTS.md` |
 | a queue of jobs | machines cut 16% to 20%, machine-hours cut 16% to 20%, standby-model energy cut 11% to 14%, mean response cut 11% to 13%, machines after the queue cut 26% to 33% | none | **write** | +16.5% | +14.1% | confirmed better on 5 gauges, nothing confirmed worse; 10 gauges inside the noise. Omni holds the knob | `results/live/V3_BATCH.md` |
 | a public day of demand (Google 2011) | machines cut 7.3% to 9.2%, machine-hours cut 7.4% to 9.2%, parked-worker energy cut 0.3% to 0.4%, standby-model energy cut 5.3% to 6.7%, mean response cut 51% to 53%, p95 cut 64% to 66%, p99 cut 60% to 62%, time over the line cut 81% to 82%, failed requests cut 11% to 18%, replicas cut 3.8% to 8.3% | none | **write** | +46.4% | +187.5% | confirmed better on 10 gauges, nothing confirmed worse; 3 gauges inside the noise. Omni holds the knob | `results/live/V3_TRACE_GOOGLE2011.md` |
+| With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | mean response cut 36% to 38%, p95 cut 51% to 53%, p99 cut 60% to 62%, time over the line cut 97% to 100% | parked-worker energy up 1.0% to 1.6% | **operator's choice** | +27.5% | +110.1% | confirmed better on mean response cut 36% to 38%, p95 cut 51% to 53%, p99 cut 60% to 62%, time over the line cut 97% to 100%; confirmed worse on parked-worker energy up 1.0% to 1.6% | `results/live/V3_KEDA_CPU_REQUESTS.md` |
+| With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | machines cut 5.9% to 7.8%, machine-hours cut 5.8% to 8.2%, mean response cut 59%, p95 cut 73% to 76%, p99 cut 70% to 72%, time over the line cut 96% to 97%, replicas cut 14% | parked-worker energy up 1.4% to 2.6% | **operator's choice** | +59.5% | +284.1% | confirmed better on machines cut 5.9% to 7.8%, machine-hours cut 5.8% to 8.2%, mean response cut 59%, p95 cut 73% to 76% and 3 more; confirmed worse on parked-worker energy up 1.4% to 2.6% | `results/live/V3_KEDA_REQUESTS.md` |
 
 ### Real database (PostgreSQL behind PgBouncer, GitHub)
 
@@ -105,6 +107,7 @@ The knob: the buffer pool's size.
 
 The founder's question was where the negatives are and why each is there. Every gauge confirmed worse on a real stack, with its cause read from the preregistration that carries the result:
 
+- **Kubernetes, parked-worker energy: With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.0% to 1.6%, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.4% to 2.6%, a cost** (157.2 / 159.1 → 159.4 to 161.4 in run A). See the table. Verdict: **operator's choice** on every workload named.
 - **PostgreSQL, connections most at once: simple_update up 8% to 12%, a cost** (20 → 21.67 in run A). Amendment 1's add rule ("slow, clients waiting for a server: add") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch. Verdict: **watch**.
 
 What the losses have in common: every one is a resource spent to buy the service the knob exists for (consumers and the CPU they poll with, memory, pages, connections), and each was declared in advance in its preregistration as the cost that would read worse, or found on the first counted set and disclosed. None is a service loss: on no real stack did work inside the line, p95 or failed requests read confirmed worse. Where the resource was spent and nothing was bought (PostgreSQL's `simple_update`), the verdict is watch; where it bought service, the verdict is the operator's, and both index readings say what the trade is worth.

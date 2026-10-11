@@ -5161,7 +5161,9 @@ The number is the Omni index's rule (`results/OMNI_INDEX.md`): each judged gauge
 
 | Date | Benchmark | Benefit? | How much | Every confirmed change, in words | Table |
 |---|---|---|---:|---|---|
-| 2026-10-10 | Every real test together: the Omni index | **trade** | **+4.8% gain** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
+| 2026-10-10 | Every real test together: the Omni index | **trade** | **+5.2% gain** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
+| unknown | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | **trade** | **+60% gain** | machines cut 5.9% to 7.8%: good; machine-hours cut 5.8% to 8.2%: good; mean response cut 59%: good; p95 cut 73% to 76%: good; p99 cut 70% to 72%: good; time over the line cut 96% to 97%: good; replicas cut 14%: good; parked-worker energy up 1.4% to 2.6%: cost | `results/live/V3_KEDA_REQUESTS.md` |
+| unknown | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | **trade** | **+28% gain** | mean response cut 36% to 38%: good; p95 cut 51% to 53%: good; p99 cut 60% to 62%: good; time over the line cut 97% to 100%: good; parked-worker energy up 1.0% to 1.6%: cost | `results/live/V3_KEDA_CPU_REQUESTS.md` |
 | 2026-10-10 | The six organisms with the real cluster inside, 10 and 100 copies | **trade** | **+5.3% gain** | p95 cut 32% to 52%: good; time over the line cut 8% to 36%: good; replicas up 0.6%: cost; failed requests cut 8.4% to 8.5%: good; parked-worker energy cut 0.3%: good; standby-model energy cut 0.3%: good | `results/live/V3_SIX_KUBE.md` |
 | 2026-10-10 | The big organisms with the real cluster inside, 1,000 copies on Azure | **yes** | **+155% gain** | p95 cut 95% to 98%: good; p99 cut 97% to 98%: good | `results/live/V3_BIG_ORGANISM.md` |
 | 2026-10-10 | The 945 modelled muscles as one tower, every muscle written at once | **yes** | **+0.3% gain** | work per energy up 0.3%: good | `results/realms/REALMS.md` |
@@ -5211,7 +5213,7 @@ Where a row sums several workloads, grids, districts, cells or robots, each part
 
 
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `a9aaf92e9`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `b8630e583`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 1. The mechanism, and proof that it is the one that ran
 
@@ -5596,6 +5598,18 @@ start from the same fresh cluster, run for 900 s after a 120 s warm-up, and end 
   confirmed better in three runs of ten pairs; no pod was ever without a machine. The machines row is confirmed here where the
   wandering test's was inside the noise, because the trace has a long quiet stretch (six hours at two generators) in which
   machines are given back and our own schedule had none.
+- **On top of Kubernetes with its add-ons** (`V3_KEDA_CPU_REQUESTS.md`, `V3_KEDA_REQUESTS.md`,
+  `docs/ADDONS_PREREGISTRATION.md`) asks: when native is the stack clusters actually run, with KEDA 2.21 and its HTTP add-on
+  0.16 owning the service's autoscaler, does the governor still add anything on top? Its moves reach KEDA's ScaledObject
+  through the plug (`scripts/kubectl_keda.py`), because KEDA rebuilds the autoscaler from it and would undo a move written
+  anywhere else. With KEDA on the CPU target and the requests in flight, p95 fell 51% to 53%, p99 60% to 62%, the mean 36%
+  to 39% and time over the line 97% to 100%, all confirmed better; machines did not change beyond the noise. With the HTTP
+  add-on alone, p95 fell 73% to 76%, the mean 59%, machines in service 5.9% to 7.8% and replicas 14%, all confirmed better.
+  In both setups the energy counted with every parked worker at idle power rose 1.0% to 2.6%, **confirmed worse**, and it
+  counts against the governor in the index: the load is closed-loop, so the faster answers drew 24% to 54% more work
+  through the service (its CPU, shown and not judged), and the modelled watts rose with the work while the energy per
+  core-hour fell 18% to 36%. The next run counts the requests served and gives native a node autoscaler (Karpenter, on
+  Azure).
 
 The first v3 sets of 7 and 8 October read the same way (the all-four work +35% to +49%, the batch machines −19% to −23%) and
 are whole in `docs/history` as `_set1`; the numbers above are the sets of 10 October, every test run again on one commit.
@@ -5899,6 +5913,7 @@ themselves, which is why every row is in its table.
 | **Real Kubernetes, fairness** (a noisy neighbour on the same workers, 10 pairs × 3 runs) | v1 | L | no difference beyond the noise on every row: Omni-Compass neither helps nor hurts the neighbour | `results/live/V1_FAIRNESS.md` |
 | **The same six Kubernetes tests on v3** (10 pairs × 3 runs each) | v3 | L | the same readings as v1, the controllers being v1's bytes: all four work inside the line +35% to +49%, p95 −47% to −66% across steady, wandering, all four and faults, failed requests −9% to −14% where they occur, steady machines −1.5% to −2.9%, batch machines −19% to −23% and standby-model energy −13% to −16%, all confirmed better; fairness no difference beyond the noise on every row | `results/live/V3_STEADY.md`, `V3_WANDERING.md`, `V3_ALL_FOUR.md`, `V3_FAIRNESS.md`, `V3_FAULTS.md`, `V3_BATCH.md` |
 | **Real Kubernetes under a public day of demand** (the Google cluster trace of 2011 replayed one step at a time, 10 pairs × 3 runs) | v3 | L | p95 **−65% to −71%**, p99 −49% to −61%, time over the line −81% to −84%, failed requests −8% to −17%, machines in service **−6% to −10%**, replicas −5% to −6%, standby-model energy −4% to −7%, all confirmed better; pods started +23% to +35% as point estimates, inside the noise in one run; 9 rows better, 0 worse | `results/live/V3_TRACE_GOOGLE2011.md` |
+| **Real Kubernetes with its add-ons: Omni-Compass on top of KEDA** (KEDA 2.21 and its HTTP add-on 0.16, two native setups, 10 pairs × 3 runs each) | v3 | L (energy S) | p95 **−51% to −53%** (KEDA on CPU and requests) and **−73% to −76%** (the HTTP add-on alone), time over the line −96% to −100%, confirmed better; machines **−5.9% to −7.8%** with the HTTP add-on, confirmed better, inside the noise with the CPU target; idle-power energy **+1.0% to +2.6%, confirmed worse** in both (more work put through by the closed-loop load, shown, not judged) | `results/live/V3_KEDA_CPU_REQUESTS.md`, `results/live/V3_KEDA_REQUESTS.md` |
 | **The six organisms with the real cluster inside**, 1 to 1,000 copies, 5 paired repetitions a cell (3 at 1,000) | v1 | L + S | 98 of 100 cells: p95 and time over the line better in every cell; 0 gauges worse beyond the noise except a rounding-level work loss (−0.0003%) and HPA replicas +0.7% in one cell; machines stay at 6 in both arms (no autoscaler under kind); the Physics realm and the tower at 1,000 copies off the clock in 2 of 3 repetitions (marked) | `results/live/V1_SIX_KUBE.md` |
 | The same at 10 and 100 copies | v3 | L + S | 12 cells, 5 pairs each: every cell better on 4 to 6 gauges, worse on none beyond the noise except a rounding-level work loss in 4 cells; the stack at 100 copies off the clock in 4 of 5 repetitions (marked) | `results/live/V3_SIX_KUBE.md` |
 | **The big organisms at 1,000 copies on rented machines, on v3**: the tower (3 of 3) and the four stacked (3 of 3), each on its own machine with a 10,800 s window, every repetition on the clock | v3 | L + S | tower: the cluster's p95 **6.7 s → 160 ms (−98%)**, p99 −98%, time over the line 76% → 0, failed requests 4.8% → 0, clear of zero; stack: p95 **2.9 s → 150 ms (−95%)**, p99 −97%, time over the line 51% → 0, failed requests 0.14% → 0, clear of zero; machines 6 in both arms of both; energy inside the noise; the organisms' model work rounding-level worse by rule, energy −0.4% | `results/live/V3_BIG_ORGANISM.md` |
@@ -5930,6 +5945,8 @@ amendments in sections 10.2, 10.8 and 10.9); the robustness test
 10 October);
 the real cluster under a public demand trace done (the Google cluster trace of 2011, `V3_TRACE_GOOGLE2011.md`, section
 16.1), the Azure Functions trace next by the same rule;
+the real cluster with its add-ons done for KEDA and its HTTP add-on (`V3_KEDA_CPU_REQUESTS.md`, `V3_KEDA_REQUESTS.md`,
+section 16.1), Karpenter on Azure next;
 YCSB on MongoDB done (`V3_YCSB.md`, section 16.4), MySQL's buffer pool under sysbench done (`V3_SYSBENCH.md`, section 16.4),
 the other stores of register row 24 after; and Azure steady and burst on the fleet of several machine families (seven
 dispatches refused by Azure's own cluster capacity in eastus or held by our own machines' quota, 34 refusals, amendments 5
@@ -6092,7 +6109,7 @@ published as Omni-Compass 1.0, and the older fingerprints go to `docs/history` a
 
 Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired measurement shows the muscle no worse for it. Where the measurement shows nothing, or shows a loss, the muscle stays native and Omni only watches it: one wire out, no wire in. This is not a new rule. It is what the engine does on the muscle itself before it moves anything (`omnicompass/verdict.py`: the paired trial, and the verdict **left native** where no step is allowed), and it is the watch arm of every realms run (`docs/REALMS_PREREGISTRATION.md`: the governor reads every period and writes nothing). This page applies the same principle to every published result, one verdict per knob, so that an operator can see which knobs earn a wire in and which stay native. The founder's order of 9 October 2026: where Omni cannot beat native, the muscle lives by itself; we only wire out of it.
 
-Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1035 rows, the 945 modelled muscles included one by one).
+Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1037 rows, the 945 modelled muscles included one by one).
 
 ### The rule
 
@@ -6108,12 +6125,12 @@ A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes 
 
 | Where | Knobs or cases | Write | Operator's choice | Watch |
 |---|---:|---:|---:|---:|
-| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 24 | 10 | 0 | 14 |
+| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 26 | 10 | 2 | 14 |
 | Independent simulators, three runs each (robot arms, grids, districts, swarms; evidence class S) | 39 | 21 | 15 | 3 |
 | The 945 modelled muscles, alone on their plants (evidence class S) | 945 | 124 | 13 | 808 |
 | The organisms with the real cluster inside (GitHub at 10 and 100 copies; Azure at 1,000) | 14 | 12 | 1 | 1 |
 
-In words: on the real stacks Omni earns its wire in on 10 of 24 knob-cases, trades on 0 and watches on 14. Of the 945 modelled muscles, 124 earn a wire in, 13 are trades and 808 stay native: 746 of the 808 wrote nothing in any run, because the native controller already held the reading inside the band and the law never left its cushion. A knob that never writes costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
+In words: on the real stacks Omni earns its wire in on 10 of 26 knob-cases, trades on 2 and watches on 14. Of the 945 modelled muscles, 124 earn a wire in, 13 are trades and 808 stay native: 746 of the 808 wrote nothing in any run, because the native controller already held the reading inside the band and the law never left its cushion. A knob that never writes costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
 
 ### The real stacks (evidence class L: live software, three separate GitHub runs on the frozen engine)
 
@@ -6132,6 +6149,8 @@ The knob: the autoscaler's replicas, the floor and the machines, on top of the H
 | faults | mean response cut 34% to 51%, p95 cut 58% to 63%, time over the line cut 27% to 43%, failed requests cut 14% to 18% | none | **write** | +36.6% | +154.8% | confirmed better on 4 gauges, nothing confirmed worse; 9 gauges inside the noise. Omni holds the knob | `results/live/V3_FAULTS.md` |
 | a queue of jobs | machines cut 16% to 20%, machine-hours cut 16% to 20%, standby-model energy cut 11% to 14%, mean response cut 11% to 13%, machines after the queue cut 26% to 33% | none | **write** | +16.5% | +14.1% | confirmed better on 5 gauges, nothing confirmed worse; 10 gauges inside the noise. Omni holds the knob | `results/live/V3_BATCH.md` |
 | a public day of demand (Google 2011) | machines cut 7.3% to 9.2%, machine-hours cut 7.4% to 9.2%, parked-worker energy cut 0.3% to 0.4%, standby-model energy cut 5.3% to 6.7%, mean response cut 51% to 53%, p95 cut 64% to 66%, p99 cut 60% to 62%, time over the line cut 81% to 82%, failed requests cut 11% to 18%, replicas cut 3.8% to 8.3% | none | **write** | +46.4% | +187.5% | confirmed better on 10 gauges, nothing confirmed worse; 3 gauges inside the noise. Omni holds the knob | `results/live/V3_TRACE_GOOGLE2011.md` |
+| With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | mean response cut 36% to 38%, p95 cut 51% to 53%, p99 cut 60% to 62%, time over the line cut 97% to 100% | parked-worker energy up 1.0% to 1.6% | **operator's choice** | +27.5% | +110.1% | confirmed better on mean response cut 36% to 38%, p95 cut 51% to 53%, p99 cut 60% to 62%, time over the line cut 97% to 100%; confirmed worse on parked-worker energy up 1.0% to 1.6% | `results/live/V3_KEDA_CPU_REQUESTS.md` |
+| With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | machines cut 5.9% to 7.8%, machine-hours cut 5.8% to 8.2%, mean response cut 59%, p95 cut 73% to 76%, p99 cut 70% to 72%, time over the line cut 96% to 97%, replicas cut 14% | parked-worker energy up 1.4% to 2.6% | **operator's choice** | +59.5% | +284.1% | confirmed better on machines cut 5.9% to 7.8%, machine-hours cut 5.8% to 8.2%, mean response cut 59%, p95 cut 73% to 76% and 3 more; confirmed worse on parked-worker energy up 1.4% to 2.6% | `results/live/V3_KEDA_REQUESTS.md` |
 
 #### Real database (PostgreSQL behind PgBouncer, GitHub)
 
@@ -6193,6 +6212,7 @@ The knob: the buffer pool's size.
 
 The founder's question was where the negatives are and why each is there. Every gauge confirmed worse on a real stack, with its cause read from the preregistration that carries the result:
 
+- **Kubernetes, parked-worker energy: With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.0% to 1.6%, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.4% to 2.6%, a cost** (157.2 / 159.1 → 159.4 to 161.4 in run A). See the table. Verdict: **operator's choice** on every workload named.
 - **PostgreSQL, connections most at once: simple_update up 8% to 12%, a cost** (20 → 21.67 in run A). Amendment 1's add rule ("slow, clients waiting for a server: add") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch. Verdict: **watch**.
 
 What the losses have in common: every one is a resource spent to buy the service the knob exists for (consumers and the CPU they poll with, memory, pages, connections), and each was declared in advance in its preregistration as the cost that would read worse, or found on the first counted set and disclosed. None is a service loss: on no real stack did work inside the line, p95 or failed requests read confirmed worse. Where the resource was spent and nothing was bought (PostgreSQL's `simple_update`), the verdict is watch; where it bought service, the verdict is the operator's, and both index readings say what the trade is worth.
@@ -9776,6 +9796,8 @@ again on it.
 
 | Test, ten pairs × three runs | Work | Speed (p95) | Machines | Energy (declared model) | Source |
 |---|---|---|---|---|---|
+| **Newest: on top of KEDA, Kubernetes with its add-ons** (`docs/ADDONS_PREREGISTRATION.md`): KEDA on the CPU target and the requests in flight | service CPU +24% to +32% (closed-loop load: work shown, not judged); failed requests no difference beyond the noise | **−51% to −53%** (time over the line −97% to −100%) | no difference beyond the noise | idle-power model **+1.0% to +1.6%, confirmed WORSE**; standby model inside the noise in 1 of 3 runs | `results/live/V3_KEDA_CPU_REQUESTS.md` |
+| **Newest: on top of KEDA's HTTP add-on** (the requests in flight alone) | service CPU +45% to +54% (shown, not judged); failed requests no difference beyond the noise | **−73% to −76%** (time over the line −96% to −97%) | **−5.9% to −7.8%, confirmed better** (replicas −14%) | idle-power model **+1.4% to +2.6%, confirmed WORSE**; standby model −1.6% to −4.2%, inside the noise in 1 of 3 runs | `results/live/V3_KEDA_REQUESTS.md` |
 | All four in one run | **+54% to +68%** | −57% to −63% | inside the noise | inside the noise | `results/live/V3_ALL_FOUR.md` |
 | Steady work in steps | equal by design | −64% to −66% | **−1.7% to −2.0%** | −1.3% to −1.8% | `results/live/V3_STEADY.md` |
 | Demand that wanders | failed requests −12% to −13% | −57% to −64% | inside the noise | idle-power model −0.1% to −0.4% | `results/live/V3_WANDERING.md` |
@@ -10434,14 +10456,25 @@ this page and `LICENSE` differ, `LICENSE` governs. Every declaration is in `DISC
 licensed under the Omni-Compass Evaluation License 1.0 (`LicenseRef-OmniCompass-Evaluation-1.0`), which permits
 evaluation and simulation only.
 
-**What may I do without a commercial license?** Read the code; run `verify.py`, the simulations and the benchmarks;
-reproduce the published results; run Omni-Compass in watch or shadow mode, or in test, on systems you own or control,
-for the purpose of evaluating it.
+**What may I do without a commercial license?** Evaluation and simulation, free of charge (`LICENSE`, sections 1.4,
+1.5 and 2): read the code; run `verify.py`, the simulations and the benchmarks; reproduce the published results and
+publish your own, every row included (section 4); run Omni-Compass in watch, dry-run or shadow mode, or in a test
+environment, on systems you own or control, where it writes to nothing that serves production traffic or real users and
+to no physical process outside a test bench. A limited patent license comes with it, for evaluation only (section 2.2).
 
-**What needs the Omni-Compass Enterprise License?** Any commercial use, commercialization or monetization; production
-use; operating any system beyond evaluation; offering it as a hosted or managed service; redistributing it; or
-incorporating it, or any part or derivative of it, into a product or service. The Enterprise License is a written
-agreement signed by The Omni-Compass LLC and paid for.
+**What needs the Omni-Compass Enterprise License?** Every commercialization or monetization of any kind; production
+use; operating any system beyond evaluation; offering it, or its function, as a hosted, managed or software-as-a-service
+offering; redistributing it; incorporating it, or any part or derivative of it, into a product, service, appliance or
+firmware; using it or its results to build or train a competing product (`LICENSE`, sections 3 and 5). The Enterprise
+License is a written agreement signed by The Omni-Compass LLC and paid for; its standard terms are summarized in
+`ENTERPRISE_LICENSE.md` (production, hosted service, OEM and embedded, managed service provider, research).
+
+**May I run it as a service for others?** Not without an Enterprise License with a hosted-service rider (`LICENSE`,
+section 3(c); `ENTERPRISE_LICENSE.md`, section 1).
+
+**May I connect it to a grid, a plant, a vehicle or a medical device?** Not under the evaluation license: such systems may
+be studied only in simulation. A live connection to any physical system needs an Enterprise License and a written safety
+case accepted by the system's owner (`LICENSE`, section 10).
 
 **How is the Enterprise License priced?** Against the measured gain on the customer's own paired receipts (native
 against Omni-Compass on the same system, the same load and the same clock). Terms are set in each signed agreement; no
@@ -10453,7 +10486,8 @@ Omni-Compass engine, its mathematics and its software have been filed in the Uni
 
 **May I use the name or the compass rose?** Only to refer to Omni-Compass accurately (`TRADEMARKS.md`).
 
-**May I contribute?** Contributions require the contributor license agreement (`.github/CLA.md`).
+**May I contribute?** Contributions require the contributor license agreement (`.github/CLA.md`): every contribution
+is assigned to The Omni-Compass LLC, with a patent license from the contributor.
 
 **Does Omni-Compass send data anywhere?** No. The software contains no telemetry and makes no network connection of
 its own except to the systems an operator points it at (a Kubernetes API, `nvidia-smi`, a meter command).
@@ -10462,8 +10496,13 @@ its own except to the systems an operator points it at (a Kubernetes API, `nvidi
 (`pyproject.toml`, `REUSE.toml`, `.fossa.yml`, `.snyk`, `sbom/`); third-party components are listed in
 `THIRD_PARTY_NOTICES.md`.
 
-**Can the terms change?** Yes. The Omni-Compass LLC may change these terms, the software and every document at any
-time; a signed Enterprise License governs its own term (`DISCLOSURES.md`, section 5).
+**Can the terms change?** Yes. The Omni-Compass LLC reserves the right to change the software, its documentation, its
+results and these terms at any time, without notice; a changed version applies to copies obtained and uses made after it
+is published (`LICENSE`, section 9). A signed Enterprise License governs its own term.
+
+**Which law governs?** The laws of the State of Delaware and the federal laws of the United States, with exclusive
+venue in the Delaware state courts and the United States District Court for the District of Delaware (`LICENSE`,
+section 19). The Omni-Compass LLC is based in Florida.
 
 **Who do I contact?** The Omni-Compass LLC, www.omni-compass.com.
 

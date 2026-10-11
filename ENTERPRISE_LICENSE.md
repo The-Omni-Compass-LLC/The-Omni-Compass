@@ -106,7 +106,8 @@ license scope).
 
 ## 11. Governing law and precedence
 
-The signed agreement states its governing law and venue. Its order of precedence is: the order form, then any rider, then
+The signed agreement states its governing law and venue; the standard is the law of the State of Delaware, with venue in
+the Delaware state courts and the United States District Court for the District of Delaware. Its order of precedence is: the order form, then any rider, then
 the Enterprise License terms, then the documentation. This page and the evaluation license (`LICENSE`) are superseded by
 the signed agreement for the licensee and its scope.
 

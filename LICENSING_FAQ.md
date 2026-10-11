@@ -53,8 +53,9 @@ its own except to the systems an operator points it at (a Kubernetes API, `nvidi
 results and these terms at any time, without notice; a changed version applies to copies obtained and uses made after it
 is published (`LICENSE`, section 9). A signed Enterprise License governs its own term.
 
-**Which law governs?** The laws of the State of Florida and the federal laws of the United States, with venue in the
-courts located in Florida (`LICENSE`, section 19).
+**Which law governs?** The laws of the State of Delaware and the federal laws of the United States, with exclusive
+venue in the Delaware state courts and the United States District Court for the District of Delaware (`LICENSE`,
+section 19). The Omni-Compass LLC is based in Florida.
 
 **Who do I contact?** The Omni-Compass LLC, www.omni-compass.com.
 
