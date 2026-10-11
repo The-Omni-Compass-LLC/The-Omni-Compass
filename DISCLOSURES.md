@@ -16,8 +16,10 @@ and every report point here. Where any other page seems to say more than this pa
 3. Names of other companies and products (NVIDIA, Kubernetes, Red Hat OpenShift, Amazon EKS, Google GKE, Microsoft
    AKS, Karpenter, Lambda and others) are the property of their owners. They identify the systems Omni-Compass was
    tested with or connects to. No affiliation, endorsement or certification by any of them is stated or implied.
-4. All rights reserved. Every copy, fork, export, report, archive or printout of any part of Omni-Compass carries the
-   README's notice, `LICENSE`, `NOTICE` and this page unchanged. The Omni-Compass LLC, www.omni-compass.com
+4. All rights reserved. The Omni-Compass LLC reserves the right to change the software, the documentation, the results
+   and the terms at any time, without notice. Every copy, fork, export, report, archive or printout of any part of
+   Omni-Compass carries the README's notice, `LICENSE`, `NOTICE` and this page unchanged. The Omni-Compass LLC,
+   www.omni-compass.com
 
 ## 2. What a result is, and what it is not
 

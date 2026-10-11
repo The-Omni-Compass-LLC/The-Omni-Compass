@@ -767,8 +767,9 @@ def front_matter(doc):
         "Copyright © 2026 The Omni-Compass LLC. All rights reserved. No part of this book may be reproduced, stored "
         "or transmitted in any form or by any means, except as allowed by the Omni-Compass Evaluation License, without "
         "the written permission of The Omni-Compass LLC.",
-        "Every copy, export and printout of any part of this book carries this page, the LICENSE, the NOTICE and the "
-        "Disclosures unchanged.",
+        "The Omni-Compass LLC reserves the right to change this book, the software it describes and their terms at any "
+        "time, without notice. Every copy, export and printout of any part of this book carries this page, the LICENSE, "
+        "the NOTICE and the Disclosures unchanged.",
         FILED[:-1] + " (no filing number is stated, and no grant, registration or approval is claimed). www.omni-compass.com",
         "“Omni-Compass”, the Omni-Compass rose and the related names and marks are trademarks of The "
         "Omni-Compass LLC. Other names that appear in this book are the property of their owners and are used only to "
