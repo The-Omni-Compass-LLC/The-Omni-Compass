@@ -16,7 +16,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 
 <!-- front-page:status:begin -->
 - **Engine on main:** omni-v3, fingerprint `b53d05449ee04c4b` (40 files); package 0.3.0. Omni v4 (the reflex rule on every wire) is designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md) and not yet built; every result runs again on it when it is.
-- **The Omni index now:** +4.8% on the resource reading (work, speed, machines and energy) and +10.7% on the service reading (work and speed), real machines, every test confirmed three times ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+- **The Omni index now:** +5.2% on the resource reading (work, speed, machines and energy) and +12.5% on the service reading (work and speed), real machines, every test confirmed three times ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 <!-- front-page:status:end -->
 
 **Tables the repository rebuilt by itself** (the five live products, each from its three newest runs on one engine):
@@ -36,6 +36,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-11 01:36 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-11 00:21 | [Public demand traces, turned into load schedules](results/traces/README.md) |  |
 | 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/fresh/RESULT.md) |  |
 | 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/RESULT.md) |  |
@@ -45,7 +46,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-11 00:21 | [Six organisms at 1000x size, up to 10 runs (pooled from organism-sized shards)](results/scale/v1/receipts/round6-1000x.md) |  |
 | 2026-10-11 00:21 | [The six organisms: the full grid](results/scale/v1/GRID.md) |  |
 | 2026-10-11 00:21 | [Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)](results/scale/receipts/v3-1x_set1.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)](results/scale/receipts/v3-1x.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -60,6 +60,28 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
+
+## Newest result: on top of Kubernetes with its add-ons (KEDA)
+
+Native here is Kubernetes as clusters run it, with **KEDA 2.21** and its **HTTP add-on 0.16** owning the service's
+autoscaler; omni is Omni-Compass on top of that same stack, its moves carried to KEDA through the plug
+(`scripts/kubectl_keda.py`). Ten paired runs per setup, three separate GitHub runs, engine omni-v3, every row shown
+([`docs/ADDONS_PREREGISTRATION.md`](docs/ADDONS_PREREGISTRATION.md), declared before the first run). Tables:
+[`V3_KEDA_CPU_REQUESTS`](results/live/V3_KEDA_CPU_REQUESTS.md) (KEDA on the CPU target and the requests in flight) and
+[`V3_KEDA_REQUESTS`](results/live/V3_KEDA_REQUESTS.md) (the HTTP add-on on the requests in flight alone).
+
+| | KEDA on CPU and requests | KEDA's HTTP add-on |
+|---|---|---|
+| **Response time, 95th percentile** | **−51% to −53%, confirmed better** | **−73% to −76%, confirmed better** |
+| **Time over the response line** | −97% to −100%, confirmed better | −96% to −97%, confirmed better |
+| **Worker nodes in service** | no difference beyond the noise | **−5.9% to −7.8%, confirmed better** |
+| **Failed requests** | no difference beyond the noise | no difference beyond the noise |
+| **Energy, parked workers still on at idle power** (declared model) | **+1.0% to +1.6%, confirmed WORSE** | **+1.4% to +2.6%, confirmed WORSE** |
+| Service CPU, i.e. work put through by the closed-loop load (shown, not judged) | +24% to +32% | +45% to +54% |
+
+The energy loss stands and counts against Omni-Compass in the index. Faster answers drew more requests from the
+closed-loop load, so the service burned 24% to 54% more CPU while the energy per core-hour fell 18% to 36%. The next run
+counts requests served directly. It also gives native a node autoscaler: Karpenter, on Azure.
 
 ## The result on real Kubernetes
 
