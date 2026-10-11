@@ -1,74 +1,56 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
-"""Omni-Compass on one GPU through two wires: the compass law (omnicompass/compass_law.py) on a real card.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+"""Omni-Compass on one GPU, on top of the card's own firmware: the wires of the card's brain (omni_controller/gpu_brain.py).
 
 The card keeps its own control: NVIDIA's firmware still boosts and still protects the chip. Omni holds two settings the
 card already accepts, and nothing else:
-  up wire    the clock ceiling: how high boost may climb (nvidia-smi -lgc MIN,MAX; -rgc resets it)
-  down wire  the power limit: the lid above what that ceiling draws (nvidia-smi -pl W)
+  up wire    the clock ceiling: how high boost may climb (NVML locked clocks, or nvidia-smi -lgc FLOOR,MAX; reset with
+             -rgc, which hands the clock back to the firmware)
+  down wire  the power limit (NVML or nvidia-smi -pl W): the start limit, always, unless a power target is set (brake)
 
-Every decision (--interval seconds):
-  read      nvidia-smi: power.draw, temperature, utilization, power.limit, clocks.sm; the workload's response times
-  position  the service as one place in its compass, 0 calm to 1 the line: response time only (the mean over the last
-            --latency-window-s, between a tenth of the line, the bare service time, and the line; the 95th percentile at
-            or past the line, or a failed request, is past the wall). A card that is busy is doing its work; being busy
-            is not a breach and is not read as one
-  native    what the card does on its own, learned from its own meter before the compass may lower anything: while the
-            ceiling is at the top and the card is busy, its clock and its draw (the clock its own power limit holds it
-            at, and what that costs). Until --learn-samples busy readings are in, the ceiling stays at the top
-  race      while the card is saturated (utilization at or over --race-util: work is waiting), the ceiling goes to the
-            top and the lid to the start limit, so a burst is served at full speed; the compass paces only the slack
-  force     the compass: pull to the center, push against what is rising, tanh-bounded; past the 0.95 wall: fail up
-  verdict   how far the ceiling may go (omnicompass/verdict.py): while the service is calm, a paired trial: the ceiling
-            at the top until --verdict-samples requests are measured, then one 15 MHz step past the deepest step
-            already allowed until as many again are measured; the card's own time on each request (the workload's
-            service_ms, the wait in the queue left out) is compared: at most --allow slower and the step is allowed,
-            slower than that and it is refused and not tried again for --verdict-recheck decisions. Where no step
-            passes, the ceiling stays at the top: the card runs as it does alone
-  law       down gain 0.0125, the compass's center at 0.4, the speed floor at the card's own busy clock (amendment 8)
-  steady    while the card is saturated against its own power limit (work waiting and the draw at the limit), the
-            firmware boosts a step, hits the limit and is knocked back: a sawtooth. The ceiling is then held at the
-            card's own busy clock under that limit (what the sawtooth averages to), so the same watts serve the work
-            without the knock-backs (amendment 9). Only under an operator's cap (the start limit under the card's
-            factory limit, amendment 12): on the card's own limit the firmware's boost is left to serve the burst. It
-            never holds under that clock, and blind always fails up
-  write     up wire: the ceiling moves by the force (fast up, gently down), inside its cover: from the card's own busy
-            clock (never slower than native while there is work) to the top; down wire: the lid at the card's own busy
-            draw plus --lid-headroom, never under it and never over the start limit, inside the declared envelope;
-            fail up: ceiling to the top and the lid to the start limit at once
-  guards    blind (meters unreadable, response times stale): fail up; heat (the card reports a thermal or hardware
-            slowdown): never tighten; one writer: a power limit neither mine nor the start means another writer, so
-            observe only from then on and exit 5; read-back: every write is read back
-  restore   on exit, kill file or SIGTERM: clocks reset (-rgc) and the power limit back to the start, read back
+Two paths into the brain:
+  signal     the workload (or the proxy in front of it) tells the brain each arrival and each finished request through a
+             local datagram socket (--signal PATH; lines "a <id>" and "d <id> <cost_ms>"). An arrival on an idle card is
+             answered at once: the ceiling goes back to the top before the next decision, which is what lets the card
+             park its clock between bursts without slowing the burst. Without a signal the brain never parks
+  decision   every --interval seconds: the card's own readings (power, utilization, clock, temperature, limits, the
+             clock-limit reasons), the service's position in its compass from the response times (--latency-file,
+             --slo-ms: past the line, or any failed request, is past the wall), the verdict's trials, the guards
 
-The audit (--audit) carries the same records the bench reads from the one-wire governor (snapshot, decision with
-telemetry and decided_by, write and actuator for each power-limit write, restored), plus clock_write records.
-Exit: 0 clean, 3 restore failed, 4 a write refused, 5 another writer.
+Writes go through NVML when the driver library is present (a write takes milliseconds) and through nvidia-smi
+otherwise (tens of milliseconds a write). Parking needs the fast path: through nvidia-smi the race comes too late for
+the first request after a rest, so the park pedal stays off (--park-slow-path overrides it, for the tests). Every write
+is read back; every write and every race and park is in the audit.
+
+Guards: blind (meters unreadable; the response feed silent while work is on the card): fail up. Heat (the card reports a
+thermal or hardware slowdown): fail up. One writer: a power limit neither mine nor the start means another writer, so
+observe only from then on and exit 5. Restore on exit, kill file, master switch or SIGTERM: clocks reset and the start
+limit back, read back.
+
+The audit (--audit) carries the records the bench reads (snapshot, decision with telemetry and decided_by, write and
+actuator for each power-limit write, clock_write for each clock write, restored) plus race, park and cruise records with
+their timestamps and the verdict's events. Exit: 0 clean, 3 restore failed, 4 a write refused, 5 another writer.
 """
 from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 import shlex
 import signal
+import socket
 import subprocess
 import sys
+import threading
 import time
 
 from omnicompass import master
-from omnicompass.compass_law import Band, CompassLaw, clamp
-from omnicompass.verdict import Verdict
+from omni_controller.gpu_brain import CardBrain
 from omni_controller.gpu_governor import query, snapshot, throttle, slowed, WriteFailed, SNAPSHOT
 from omni_controller.muscles import latency_sense, latency_window
-
-
-# the law (docs/GPU_PREREGISTRATION.md, amendment 8): the down gain (share of the top clock per unit of force), the compass's
-# center (where it holds the response time, 0 the bare service time and 1 the line) and the speed floor (a share of the
-# card's own busy clock); the same in realms/gpu_card.py
-LAW = {"down": 0.0125, "center": 0.4, "floor": 1.0}
 
 
 def smi_run(smi, args):
@@ -89,8 +71,7 @@ def query_top_clock(smi, g):
 
 
 def query_default_limit(smi, g):
-    """The card's factory power limit (watts), or None if the driver will not say. A start limit under it means an
-    operator's cap is underneath (amendment 12)."""
+    """The card's factory power limit (watts), or None if the driver will not say."""
     try:
         out = subprocess.run(shlex.split(smi) + ["-i", str(g), "--query-gpu=power.default_limit", "--format=csv,noheader,nounits"],
                              capture_output=True, text=True, timeout=10, check=True).stdout
@@ -109,11 +90,47 @@ def query_min_clock(smi, g):
         return 300
 
 
+class Nvml:
+    """The fast path: the driver's own library (nvidia-ml-py). Writes take milliseconds instead of a process start."""
+    def __init__(self, g):
+        import pynvml as n                                    # noqa: N813  (the library's own name)
+        n.nvmlInit()
+        self.n, self.h = n, n.nvmlDeviceGetHandleByIndex(int(g))
+
+    def set_clock(self, floor, mhz):
+        self.n.nvmlDeviceSetGpuLockedClocks(self.h, int(floor), int(mhz))
+
+    def reset_clock(self):
+        self.n.nvmlDeviceResetGpuLockedClocks(self.h)
+
+    def set_limit(self, w):
+        self.n.nvmlDeviceSetPowerManagementLimit(self.h, int(round(w * 1000)))
+
+    def read(self):
+        n, h = self.n, self.h
+        r = {"draw": n.nvmlDeviceGetPowerUsage(h) / 1000.0, "temp": float(n.nvmlDeviceGetTemperature(h, n.NVML_TEMPERATURE_GPU)),
+             "util": n.nvmlDeviceGetUtilizationRates(h).gpu / 100.0, "limit": n.nvmlDeviceGetPowerManagementLimit(h) / 1000.0,
+             "clock_mhz": float(n.nvmlDeviceGetClockInfo(h, n.NVML_CLOCK_SM))}
+        try:
+            r["enforced"] = n.nvmlDeviceGetEnforcedPowerLimit(h) / 1000.0
+        except Exception:  # noqa: BLE001  older drivers
+            r["enforced"] = r["limit"]
+        for f in ("nvmlDeviceGetCurrentClocksEventReasons", "nvmlDeviceGetCurrentClocksThrottleReasons"):
+            if hasattr(n, f):
+                try:
+                    r["reasons"] = f"0x{getattr(n, f)(h):016x}"
+                    break
+                except Exception:  # noqa: BLE001
+                    continue
+        return r
+
+
 class GpuCompass:
     def __init__(self, a):
         self.a = a
         self.g = int(str(a.gpus).split(",")[0])
         self.log = open(a.audit, "a")
+        self.lock = threading.RLock()
         self.writes = 0
         self.foreign = False
         self.clock_set = False
@@ -123,221 +140,247 @@ class GpuCompass:
             raise SystemExit("nvidia-smi unreadable at start: no snapshot, so I take no authority")
         snap = snapshot(a.smi, [self.g])
         self.start = s[self.g]["limit"]
-        # an operator's cap underneath: the start limit under the card's factory limit (unknown: treated as no cap)
         dflt = query_default_limit(a.smi, self.g)
         self.capped = dflt is not None and self.start < dflt - 1.0
         self.expect = self.start
         self.top = query_top_clock(a.smi, self.g) or s[self.g]["clock_mhz"]
-        self.floor_w = max(float(a.floor_w or 0.0), s[self.g]["min"])
-        self.c_lo = a.clock_min_share * self.top
         self.c_floor = query_min_clock(a.smi, self.g)
-        self.ceiling = self.top            # where the compass holds the ceiling (continuous)
-        self.written_ceiling = self.top    # what the card was last told
-        self.busy_clk, self.busy_draw = [], []    # the card on its own: busy clock and busy draw, ceiling at the top
-        self.prof = dict(LAW)
-        if a.down_gain is not None:
-            self.prof["down"] = a.down_gain
-        self.verdict = Verdict(tolerance=a.allow, min_samples=a.verdict_samples, probe_every=a.verdict_every,
-                               recheck=a.verdict_recheck)
-        self.svc_t = None                  # elapsed_seconds of the last request whose service time the verdict has seen
-        self.brain = CompassLaw(Band(0.0, 1.0, center=self.prof["center"]), dt=a.interval, tau=2.0 * a.interval, kp=1.0, smooth=0.3)
-        self.brain.kd *= 3.0
+        self.nvml = None
+        if a.nvml != "off":
+            try:
+                self.nvml = Nvml(self.g)
+            except Exception as e:  # noqa: BLE001  no library, no driver binding: the slow path
+                if a.nvml == "on":
+                    raise SystemExit(f"NVML requested but unavailable: {e}")
+        self.signal_on = bool(a.signal)
+        # parking needs a race in time: through nvidia-smi a write takes tens of milliseconds, which the modelled card
+        # showed costs the first request after a rest about 1% (amendment 13). So the park pedal needs the fast path
+        slow_path = self.nvml is None and not a.park_slow_path
+        self.brain = CardBrain(self.top, self.c_floor, self.start, allow=a.allow, samples=a.verdict_samples,
+                               decision_s=a.interval, hold_ms=a.hold_ms, rest_ms=a.rest_ms, busy_step_mhz=a.busy_step_mhz,
+                               busy_gain=a.busy_gain, probe_every_s=a.probe_every_s, recheck_s=a.recheck_s,
+                               trial_s=a.trial_s, learn_samples=a.learn_samples, signal=self.signal_on,
+                               park=not (a.no_park or slow_path), cruise=not a.no_cruise, power_target_w=a.power_target_w)
+        self.written_ceiling = self.top
+        self.last_arrival = {}                     # request id -> arrival time (the signal's view of work in flight)
         self.audit({"snapshot": {str(self.g): {"limit_w": self.start, "min_limit_w": s[self.g]["min"],
                                                "enforced_w": s[self.g]["enforced"] if self.enforced_ok else None,
-                                               "clock_top_mhz": self.top,
+                                               "clock_top_mhz": self.top, "clock_floor_mhz": self.c_floor,
                                                **{f: snap[f][str(self.g)] for f in SNAPSHOT}}},
-                    "engine": "compass, two wires", "mode": a.mode, "law": self.prof,
-                    "verdict": {"allow": a.allow, "samples": a.verdict_samples, "every": a.verdict_every,
-                                "recheck": a.verdict_recheck},
-                    "covers": {"clock_mhz": [round(self.c_lo), round(self.top)], "power_w": [self.floor_w, self.start]}})
+                    "engine": "card brain, two wires (v4)", "mode": a.mode, "path": "nvml" if self.nvml else "nvidia-smi",
+                    "signal": a.signal or None, "park_levels_mhz": self.brain.levels, "operator_cap": self.capped,
+                    "verdict": {"allow": a.allow, "samples": a.verdict_samples, "probe_every_s": a.probe_every_s,
+                                "recheck_s": a.recheck_s, "trial_s": a.trial_s, "busy_gain": a.busy_gain},
+                    "covers": {"clock_mhz": [self.c_floor, round(self.top)], "power_w": [s[self.g]["min"], self.start]}})
         if a.mode == "cap" and snap["power.management"][str(self.g)].lower() != "enabled":
             self.audit({"refused": "power management not Enabled: a written limit would not bind"})
             raise SystemExit("power management not Enabled: cap mode refused, no authority taken")
 
     def audit(self, rec):
-        self.log.write(json.dumps({"time": time.time(), **rec}) + "\n"); self.log.flush()
+        with self.lock:
+            self.log.write(json.dumps({"time": time.time(), **rec}) + "\n"); self.log.flush()
 
-    def position(self, util):
-        a = self.a
-        ls = latency_sense(a.latency_file, a.latency_window_s) if a.latency_file and a.slo_ms else None
-        if ls is not None and ls["blind"]:
-            return None, ls
-        resp = 0.0
-        if ls is not None:
-            # the position is the mean response time of the window between the bare service time and the line (what
-            # the model reads); the 95th percentile at or past the line, or any failed request, is past the wall
-            bare = a.slo_ms / 10.0
-            w = latency_window(a.latency_file, a.latency_window_s)["ms"]
-            mean = sum(w) / len(w) if w else ls["p95"]
-            resp = (mean - bare) / (a.slo_ms - bare)
-            if ls["fail"] or ls["p95"] >= a.slo_ms:
-                resp = max(resp, 1.0)
-        return resp, ls
+    # ---- the wires ------------------------------------------------------------------------------------------------
+    def write_ceiling(self, mhz, why):
+        """The up wire: at the top the clock goes back to the firmware (reset); under it, a locked range floor..mhz."""
+        mhz = float(mhz)
+        with self.lock:
+            if abs(mhz - self.written_ceiling) < 0.5 and not (mhz >= self.top and self.clock_set):
+                return
+            if self.a.mode != "cap" or self.foreign:
+                self.audit({"would_clock_write": round(mhz), "why": why}); self.written_ceiling = mhz; return
+            t0 = time.time()
+            if mhz >= self.top:
+                cmd = ["-i", str(self.g), "-rgc"]
+                rc, err = self._reset()
+            else:
+                cmd = ["-i", str(self.g), "-lgc", f"{self.c_floor},{int(round(mhz))}"]
+                rc, err = self._lock(int(round(mhz)))
+            self.audit({"clock_write": cmd, "why": why, "rc": rc, "stderr": err, "t_requested": t0,
+                        "write_s": round(time.time() - t0, 5), "path": "nvml" if self.nvml else "nvidia-smi"})
+            if rc != 0:
+                raise WriteFailed(f"clock write {cmd} returned {rc}: {err}")
+            self.clock_set = mhz < self.top
+            self.written_ceiling = mhz
+            self.writes += 1
 
-    def service_costs(self):
-        """The card's own time (ms) on each request finished since the last decision (the workload's service_ms)."""
-        import csv
-        try:
-            rows = list(csv.DictReader(open(self.a.latency_file)))
-        except (OSError, TypeError):
-            return []
-        out, last = [], self.svc_t
-        for row in rows:
-            t, svc = row.get("elapsed_seconds"), row.get("service_ms")
-            if row.get("ok") != "1" or not t or not svc:
-                continue
-            t = float(t)
-            if last is None or t > last:
-                out.append(float(svc))
-                self.svc_t = t if self.svc_t is None else max(self.svc_t, t)
-        if last is None:                   # the first read only finds where the file stands
-            return []
-        return out
+    def _lock(self, mhz):
+        if self.nvml:
+            try:
+                self.nvml.set_clock(self.c_floor, mhz); return 0, ""
+            except Exception as e:  # noqa: BLE001
+                return 1, f"NVML: {e}"[:300]
+        return smi_run(self.a.smi, ["-i", str(self.g), "-lgc", f"{self.c_floor},{mhz}"])
 
-    def learn(self, r):
-        """The card on its own: while the ceiling is at the top and the card is busy, its clock and draw are native's."""
-        if r is not None and self.written_ceiling >= self.top and r["limit"] >= self.start - 1.0 and r["util"] >= 0.9:
-            self.busy_clk = (self.busy_clk + [r["clock_mhz"]])[-200:]
-            self.busy_draw = (self.busy_draw + [r["draw"]])[-200:]
-
-    def native(self):
-        """(busy clock, busy draw) of the card on its own, or (None, None) until enough busy readings are in."""
-        if len(self.busy_clk) < self.a.learn_samples:
-            return None, None
-        c, d = sorted(self.busy_clk), sorted(self.busy_draw)
-        return c[len(c) // 2], d[int(0.9 * (len(d) - 1))]
-
-    def write_clock(self, mhz, why):
-        mhz = int(round(mhz))
-        cmd = ["-i", str(self.g), "-lgc", f"{self.c_floor},{mhz}"]
-        if self.a.mode != "cap" or self.foreign:
-            self.audit({"would_clock_write": cmd, "why": why}); return
-        rc, err = smi_run(self.a.smi, cmd)
-        self.audit({"clock_write": cmd, "why": why, "rc": rc, "stderr": err})
-        if rc != 0:
-            raise WriteFailed(f"nvidia-smi -lgc {self.c_floor},{mhz} returned {rc}: {err}")
-        self.clock_set = True
-        self.writes += 1
+    def _reset(self):
+        if self.nvml:
+            try:
+                self.nvml.reset_clock(); return 0, ""
+            except Exception as e:  # noqa: BLE001
+                return 1, f"NVML: {e}"[:300]
+        return smi_run(self.a.smi, ["-i", str(self.g), "-rgc"])
 
     def write_limit(self, w, why):
         w = int(w)
         cmd = ["nvidia-smi", "-i", str(self.g), "-pl", str(w)]
-        if self.a.mode != "cap" or self.foreign:
-            self.audit({"would_write": cmd, "why": why}); return
-        self.audit({"write": cmd, "why": why})
-        t0 = time.time()
-        rc, err = smi_run(self.a.smi, ["-i", str(self.g), "-pl", str(w)])
-        act = {"gpu": self.g, "requested_w": w, "t_requested": t0, "rc": rc, "stderr": err}
-        if rc != 0:
-            self.audit({"actuator": act, "write_failed": cmd})
-            raise WriteFailed(f"nvidia-smi -pl {w} returned {rc}: {err}")
-        self.writes += 1
+        with self.lock:
+            if self.a.mode != "cap" or self.foreign:
+                self.audit({"would_write": cmd, "why": why}); return
+            self.audit({"write": cmd, "why": why})
+            t0 = time.time()
+            if self.nvml:
+                try:
+                    self.nvml.set_limit(w); rc, err = 0, ""
+                except Exception as e:  # noqa: BLE001
+                    rc, err = 1, f"NVML: {e}"[:300]
+            else:
+                rc, err = smi_run(self.a.smi, ["-i", str(self.g), "-pl", str(w)])
+            act = {"gpu": self.g, "requested_w": w, "t_requested": t0, "rc": rc, "stderr": err}
+            if rc != 0:
+                self.audit({"actuator": act, "write_failed": cmd})
+                raise WriteFailed(f"power limit {w} W returned {rc}: {err}")
+            self.writes += 1
+            s = query(self.a.smi, [self.g], self.enforced_ok)
+            if s is not None:
+                back = s[self.g]
+                act.update({"readback_w": back["limit"], "enforced_w": back["enforced"], "t_readback": time.time(),
+                            "realized": abs(back["limit"] - w) < 1.0, "override": back["enforced"] < back["limit"] - 1.0})
+                if act["realized"]:
+                    act["delay_s"] = round(act["t_readback"] - t0, 3)
+                    self.expect = w
+            self.audit({"actuator": act})
+
+    # ---- the signal: arrivals and finished requests, answered at once -------------------------------------------------
+    def on_arrival(self, rid):
+        with self.lock:
+            now = time.time()
+            self.last_arrival[rid] = now
+            w = self.brain.arrival(now, rid)
+            if w:
+                self.write_ceiling(w[0], w[1])
+                self.audit({"race": {"id": rid, "to_mhz": round(w[0])}})
+
+    def on_done(self, rid, cost):
+        with self.lock:
+            now = time.time()
+            self.last_arrival.pop(rid, None)
+            w = self.brain.done(now, rid, cost)
+            if w:
+                self.write_ceiling(w[0], w[1])
+                self.audit({w[1]: {"id": rid, "to_mhz": round(w[0])}})
+
+    def on_idle(self):
+        with self.lock:
+            w = self.brain.idle_due(time.time())
+            if w:
+                self.write_ceiling(w[0], w[1])
+                self.audit({"park": {"to_mhz": round(w[0]), "step": self.brain.park_step}})
+
+    def listen(self, stop):
+        """The signal thread: a datagram socket the workload writes to; idle checks between messages."""
+        path = self.a.signal
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+        sk = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        sk.bind(path)
+        try:
+            os.chmod(path, 0o666)                    # the workload may run as another user than the governor
+        except OSError:
+            pass
+        while not stop["now"]:
+            nxt = self.brain.next_idle_check()
+            timeout = 0.2 if nxt is None else min(0.2, max(0.0005, nxt - time.time()))
+            sk.settimeout(timeout)
+            try:
+                msg = sk.recv(256).decode(errors="replace").split()
+            except socket.timeout:
+                msg = None
+            except OSError:
+                break
+            try:
+                if msg and msg[0] == "a" and len(msg) >= 2:
+                    self.on_arrival(msg[1])
+                elif msg and msg[0] == "d" and len(msg) >= 2:
+                    self.on_done(msg[1], float(msg[2]) if len(msg) > 2 and msg[2] not in ("", "nan") else None)
+                nxt = self.brain.next_idle_check()
+                if nxt is not None and time.time() >= nxt:
+                    self.on_idle()
+            except WriteFailed as e:
+                self.audit({"fatal": f"write failed: {e}"}); stop["failed"] = True; stop["now"] = True
+            except Exception as e:  # noqa: BLE001  a bad message is logged, never fatal
+                self.audit({"error": f"signal: {type(e).__name__}: {e}"})
+        sk.close()
+
+    # ---- the decision ---------------------------------------------------------------------------------------------
+    def position(self):
+        a = self.a
+        if not (a.latency_file and a.slo_ms):
+            return 0.0, None
+        ls = latency_sense(a.latency_file, a.latency_window_s)
+        if self.signal_on:
+            # with the signal the brain knows when nothing is on the card: a silent feed then is an idle card, not a
+            # blind one. Blind only if a request has been on the card longer than two windows without finishing
+            stuck = any(time.time() - t > 2.0 * a.latency_window_s for t in self.last_arrival.values())
+            if stuck:
+                return None, ls
+            if ls["blind"]:
+                return 0.0, ls
+        elif ls["blind"]:
+            return None, ls
+        bare = a.slo_ms / 10.0
+        w = latency_window(a.latency_file, a.latency_window_s)["ms"]
+        mean = sum(w) / len(w) if w else ls["p95"]
+        resp = (mean - bare) / (a.slo_ms - bare)
+        if ls["fail"] or ls["p95"] >= a.slo_ms:
+            resp = max(resp, 1.0)
+        return resp, ls
+
+    def read(self):
+        if self.nvml:
+            try:
+                r = self.nvml.read()
+                return r, r.get("reasons")
+            except Exception:  # noqa: BLE001  fall through to nvidia-smi
+                pass
         s = query(self.a.smi, [self.g], self.enforced_ok)
-        if s is not None:
-            back = s[self.g]
-            act.update({"readback_w": back["limit"], "enforced_w": back["enforced"], "t_readback": time.time(),
-                        "realized": abs(back["limit"] - w) < 1.0, "override": back["enforced"] < back["limit"] - 1.0})
-            if act["realized"]:
-                act["delay_s"] = round(act["t_readback"] - t0, 3)
-                self.expect = w
-        self.audit({"actuator": act})
+        if s is None:
+            return None, None
+        thr = throttle(self.a.smi, [self.g])
+        return s[self.g], (thr or {}).get(self.g)
 
     def step(self):
         a, g = self.a, self.g
-        s = query(a.smi, [g], self.enforced_ok)
-        if s is None:
-            p, ls, r = None, None, None
-        else:
-            r = s[g]
-            if abs(r["limit"] - self.expect) >= 1.0 and not self.foreign:
+        r, reasons = self.read()
+        with self.lock:
+            if r is not None and abs(r["limit"] - self.expect) >= 1.0 and not self.foreign:
                 self.foreign = True
                 self.audit({"foreign_writer": {"gpu": g, "reads_w": r["limit"], "expected_w": self.expect},
                             "action": "observe only from now on; both wires left to the other writer"})
-            p, ls = self.position(r["util"])
-        self.learn(r)
-        n_clk, n_draw = self.native()
-        thr = throttle(a.smi, [g]) if r is not None else None
-        heat = slowed((thr or {}).get(g))
-        saturated = r is not None and r["util"] >= a.race_util
-        # the verdict: the card's own time on the requests since the last decision, at the step the ceiling stood at;
-        # then the deepest step the compass may use now, or the step a trial needs
-        self.verdict.observe(self.service_costs())
-        calm = p is not None and p < self.brain.band.wall_high and not saturated
-        deepest, trial, ev = self.verdict.tick(calm)
-        if ev:
-            self.audit({"verdict": ev, "state": self.verdict.state, "deepest_step": self.verdict.allowed})
-        at_limit = r is not None and r["draw"] >= 0.97 * r["limit"]
-        if p is not None and saturated and at_limit and n_clk is not None and self.capped:
-            # saturated against the card's own limit: hold the ceiling at the card's own busy clock under that limit,
-            # no knock-backs; the lid stays at the start limit
-            self.brain.force(p)
-            ceiling = clamp(round(n_clk / a.min_change_mhz) * a.min_change_mhz, self.c_lo, self.top)
-            lid = self.start
-            who = "steady_under_limit"
-        elif p is None or p >= self.brain.band.wall_high or saturated:
-            # fail up past the wall or blind; and race while work waits (the card saturated: a queue is forming), so a
-            # burst is always served at full speed and the compass paces only the slack between bursts
-            if p is not None:
-                self.brain.force(p)
-            ceiling, lid = self.top, self.start
-            who = "blind_fail_up" if p is None else "fail_up" if p >= self.brain.band.wall_high else "race"
-        elif trial:
-            self.brain.force(p)
-            ceiling = self.top - deepest * a.min_change_mhz
-            lid = self.start
-            who = "verdict_trial"
-        else:
-            F = self.brain.force(p)
-            # the speed floor: never under the clock the card reaches on its own while busy (until that is learned,
-            # the top), so work waiting on the card is never served slower than native
-            c_floor = self.top if n_clk is None else max(self.c_lo, min(self.top, n_clk * self.prof["floor"]))
-            # and never past the deepest step the verdict has allowed (none allowed: the ceiling stays at the top)
-            c_floor = max(c_floor, self.top - deepest * a.min_change_mhz)
-            # the ceiling moves in whole clock steps, as the card's own clock does: the force times the gain (a share
-            # of the top clock per unit of force) rounded to whole --min-change-mhz steps; a pull under half a step
-            # moves nothing and is not stored up, so a calm card is paced only when the pull is clearly down
-            down = self.prof["down"]
-            step = (a.up_gain if F > 0 else down) * F * self.top
-            step = round(step / a.min_change_mhz) * a.min_change_mhz
-            ceiling = clamp(self.ceiling + step, c_floor, self.top)
-            if heat and ceiling < self.ceiling:
-                ceiling, who = self.ceiling, "thermal_hold"
-            else:
-                who = "compass"
-            # the lid: the start limit scaled to what a fully busy card draws at this ceiling (a fifth of the draw does not
-            # scale with the clock; the rest goes as clock^2.5, clock times voltage squared), plus headroom; at the top
-            # clock the lid is the start limit, so the lid never adds a hammer of its own
-            # the lid: never under what the card draws on its own while busy (its own meter, not a curve), plus
-            # headroom; the start limit until that is learned
-            lid = self.start if n_draw is None else clamp(math.ceil(n_draw * (1.0 + a.lid_headroom)), self.floor_w, self.start)
-        rec = {"decision": {str(g): {"telemetry": None if r is None else {
-                   "util": r["util"], "draw_w": r["draw"], "temp_c": r["temp"], "limit_w": r["limit"],
-                   "enforced_w": r["enforced"], "clock_mhz": r["clock_mhz"], "throttle": (thr or {}).get(g)},
-               "position": None if p is None else round(p, 4), "velocity": round(self.brain.v, 4),
-               "latency_p95_ms": None if not ls else ls.get("p95"),
-               "ceiling_mhz": round(ceiling), "want_w": int(lid), "decided_by": who,
-               "native_busy_clock_mhz": n_clk, "native_busy_draw_w": n_draw,
-               "verdict_state": self.verdict.state, "verdict_deepest_step": self.verdict.allowed}}}
-        self.audit(rec)
-        self.ceiling = ceiling
-        if abs(ceiling - self.written_ceiling) >= a.min_change_mhz or (ceiling >= self.top and self.written_ceiling < self.top):
-            if ceiling >= self.top and self.clock_set and a.mode == "cap" and not self.foreign:
-                rc, err = smi_run(a.smi, ["-i", str(g), "-rgc"])
-                self.audit({"clock_write": ["-i", str(g), "-rgc"], "why": who, "rc": rc, "stderr": err})
-                if rc != 0:
-                    raise WriteFailed(f"nvidia-smi -rgc returned {rc}: {err}")
-                self.clock_set = False
-            elif ceiling < self.top:
-                self.write_clock(ceiling, who)
-            self.written_ceiling = ceiling
-        cur = r["limit"] if r is not None else self.expect
-        if abs(lid - cur) >= a.min_change_w or (lid == self.start and cur != lid):
-            self.write_limit(lid, who)
+            p, ls = self.position() if r is not None else (None, None)
+            heat = slowed(reasons)
+            tele = None if r is None else {"util": r["util"], "draw_w": r["draw"], "clock_mhz": r["clock_mhz"], "limit_w": r["limit"]}
+            ceiling, lid, why = self.brain.decide(time.time(), tele, p, heat)
+            n_clk, n_draw = self.brain.native()
+            for ev in self.brain.take_events():
+                self.audit(ev)
+            self.audit({"decision": {str(g): {"telemetry": None if r is None else {
+                            "util": r["util"], "draw_w": r["draw"], "temp_c": r["temp"], "limit_w": r["limit"],
+                            "enforced_w": r.get("enforced"), "clock_mhz": r["clock_mhz"], "throttle": reasons},
+                        "position": None if p is None else round(p, 4),
+                        "latency_p95_ms": None if not ls else ls.get("p95"),
+                        "ceiling_mhz": round(ceiling), "want_w": int(lid), "decided_by": why,
+                        "native_busy_clock_mhz": n_clk, "native_busy_draw_w": n_draw, **self.brain.state()}}})
+            self.write_ceiling(ceiling, why)
+            cur = r["limit"] if r is not None else self.expect
+            if abs(lid - cur) >= a.min_change_w or (abs(lid - self.start) < 0.5 and abs(cur - lid) >= 1.0):
+                self.write_limit(lid, why)
 
     def restore(self):
         failed = []
         if self.a.mode == "cap" and not self.foreign:
-            rc, err = smi_run(self.a.smi, ["-i", str(self.g), "-rgc"])
+            rc, err = self._reset()
             self.audit({"clock_write": ["-i", str(self.g), "-rgc"], "why": "restore", "rc": rc, "stderr": err})
             if rc != 0:
                 failed.append(f"-rgc returned {rc}: {err}")
@@ -351,7 +394,8 @@ class GpuCompass:
         back = s[self.g]["limit"] if self.g in s else None
         ok = self.foreign or (not failed and back is not None and abs(back - self.start) < 1.0)
         self.audit({"restored": {str(self.g): back}, "start": {str(self.g): self.start}, "ok": ok,
-                    "writes": self.writes, "foreign_writer": self.foreign, "restore_write_failed": failed})
+                    "writes": self.writes, "foreign_writer": self.foreign, "restore_write_failed": failed,
+                    "brain": self.brain.state()})
         return ok
 
 
@@ -360,39 +404,52 @@ def parser():
     ap.add_argument("--mode", choices=["watch", "cap"], default="watch")
     ap.add_argument("--gpus", default="0")
     ap.add_argument("--smi", default=os.environ.get("NVIDIA_SMI", "nvidia-smi"))
-    ap.add_argument("--interval", type=float, default=2.0)
+    ap.add_argument("--nvml", choices=["auto", "on", "off"], default="auto", help="the fast write path (driver library)")
+    ap.add_argument("--signal", default="", help="datagram socket the workload reports arrivals and finished requests to")
+    ap.add_argument("--interval", type=float, default=0.25, help="seconds between decisions")
     ap.add_argument("--duration", type=float, default=0.0)
     ap.add_argument("--audit", default="gpu_compass_audit.jsonl")
     ap.add_argument("--kill-file", default="/tmp/omni-gpu-kill")
     ap.add_argument("--latency-file", default="")
     ap.add_argument("--slo-ms", type=float, default=0.0)
     ap.add_argument("--latency-window-s", type=float, default=5.0, help="seconds of response times the position reads")
-    ap.add_argument("--race-util", type=float, default=0.95, help="utilization at which work is waiting: race, never pace")
-    ap.add_argument("--learn-samples", type=int, default=15, help="busy readings of the card on its own before the compass may lower anything")
-    ap.add_argument("--floor-w", type=float, default=0.0, help="the declared envelope's lowest watts")
-    ap.add_argument("--clock-min-share", type=float, default=0.35, help="the clock ceiling's cover: lowest share of the top")
-    ap.add_argument("--allow", type=float, default=0.02, help="the most a ceiling step may add to the card's own time on a request")
-    ap.add_argument("--verdict-samples", type=int, default=30, help="requests measured at native and at the trial step")
-    ap.add_argument("--verdict-every", type=int, default=8, help="decisions between trials")
-    ap.add_argument("--verdict-recheck", type=int, default=900, help="decisions before a refused step is tried again")
-    ap.add_argument("--up-gain", type=float, default=0.10, help="share of the top clock moved per unit of force, up")
-    ap.add_argument("--down-gain", type=float, default=None, help="share of the top clock moved per unit of force, down (default: the law's)")
-    ap.add_argument("--lid-headroom", type=float, default=0.10, help="the lid above the draw the ceiling takes")
-    ap.add_argument("--min-change-mhz", type=float, default=15.0)
+    ap.add_argument("--learn-samples", type=int, default=15, help="busy readings before the card's own level is reported")
+    ap.add_argument("--floor-w", type=float, default=0.0, help="the declared envelope's lowest watts (a power target never goes under it)")
+    ap.add_argument("--allow", type=float, default=0.005, help="the most a step may add to the card's own time on a request (0.5%%: inside the measurement; the engine's outer bound is 2%%)")
+    ap.add_argument("--verdict-samples", type=int, default=30, help="requests measured at the reference and at the trial step")
+    ap.add_argument("--probe-every-s", type=float, default=8.0, help="seconds between trials")
+    ap.add_argument("--recheck-s", type=float, default=900.0, help="seconds before a refused step is tried again")
+    ap.add_argument("--trial-s", type=float, default=120.0, help="the most a trial phase may take before it is abandoned")
+    ap.add_argument("--hold-ms", type=float, default=20.0, help="idle milliseconds before the clock parks")
+    ap.add_argument("--rest-ms", type=float, default=80.0, help="idle milliseconds after which a request counts as from rest")
+    ap.add_argument("--busy-step-mhz", type=float, default=60.0, help="one cruise step under the top clock")
+    ap.add_argument("--busy-gain", type=float, default=0.02, help="the least share of busy watts a cruise step must save")
+    ap.add_argument("--no-park", action="store_true", help="never park (the park pedal off)")
+    ap.add_argument("--park-slow-path", action="store_true", help="park even when writes go through nvidia-smi (tests only)")
+    ap.add_argument("--no-cruise", action="store_true", help="never lower the ceiling under queued work")
+    ap.add_argument("--power-target-w", type=float, default=None, help="brake: the lid at this target (never under --floor-w)")
     ap.add_argument("--min-change-w", type=float, default=3.0)
+    # kept so older callers keep working; the brain has no use for them (anything that does not work is removed)
+    ap.add_argument("--race-util", type=float, default=0.95, help=argparse.SUPPRESS)
+    ap.add_argument("--down-gain", type=float, default=None, help=argparse.SUPPRESS)
+    ap.add_argument("--min-change-mhz", type=float, default=15.0, help=argparse.SUPPRESS)
     return ap
 
 
 def main(argv=None):
     a = parser().parse_args(argv)
+    if a.power_target_w is not None and a.floor_w:
+        a.power_target_w = max(a.power_target_w, a.floor_w)
     master.refuse_if_off("GPU governor (two wires)")
     gov = GpuCompass(a)
-    # what puts the card back if this process dies without doing it itself (the watchdog runs it)
     back = ([[a.smi, "-i", str(gov.g), "-rgc"], [a.smi, "-i", str(gov.g), "-pl", str(int(round(gov.start)))]]
             if a.mode == "cap" else [])
     master.register("GPU governor (two wires)", restore=back, stale_s=max(60.0, 5 * a.interval))
-    stop = {"now": False}
+    stop = {"now": False, "failed": False}
     signal.signal(signal.SIGTERM, lambda *_: stop.__setitem__("now", True))
+    lt = None
+    if a.signal:
+        lt = threading.Thread(target=gov.listen, args=(stop,), daemon=True); lt.start()
     t0 = time.time()
     failed = False
     try:
@@ -406,9 +463,13 @@ def main(argv=None):
                 gov.audit({"error": f"{type(e).__name__}: {e}"})
             end = time.time() + a.interval
             while time.time() < end and not stop["now"] and not os.path.exists(a.kill_file) and not master.is_off():
-                time.sleep(0.2)
+                time.sleep(min(0.05, max(0.001, end - time.time())))
     finally:
+        stop["now"] = True
+        if lt is not None:
+            lt.join(timeout=2.0)
         ok = gov.restore()
+    failed = failed or stop.get("failed", False)
     return 5 if gov.foreign else 3 if not ok else 4 if failed else 0
 
 

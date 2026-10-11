@@ -4,10 +4,11 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The two-wire GPU card in simulation (realms/gpu_card.py; evidence class S). Each base runs alone and with Omni-Compass
-on top, on the same seeds (5000-5009 tuning, 5100-5109 fresh), 600 s each, for two kinds of work: compute-bound (the
-bench's pinned matrix products) and AI token generation (85% of a request's time waiting on memory). Bases: the card's
-own firmware (native) and an operator's fixed 105 W power cap. Writes results/sim/gpu_two_wire/."""
+"""The A10 card modelled (realms/gpu_card.py, fitted to the paid run of 2 October; evidence class S). Each base runs alone
+and with the card's brain on top, on the same seeds (5000-5009 tuning, 5100-5109 fresh; `fresh` as the second argument),
+600 s each, for two kinds of work: compute-bound (the bench's pinned matrix products) and AI token generation (85% of a
+request's time waiting on memory, assumed). Bases: the card's own firmware (native) and an operator's fixed 105 W power
+cap. Writes results/sim/gpu_two_wire/."""
 import json, math, subprocess, sys, time
 
 try:                                                       # the legal notice every generated report carries
@@ -29,8 +30,8 @@ WORK = ((0.0, "compute-bound work (matrix products)"), (0.85, "AI token generati
 ROWS = [("work_per_kj", "work per energy (requests per kJ)", "{:.1f}"), ("energy_j", "energy (J)", "{:.0f}"),
         ("served", "requests served", "{:.0f}"), ("p50_ms", "response, median (ms)", "{:.1f}"),
         ("p95_ms", "response, 95th percentile (ms)", "{:.1f}"), ("p99_ms", "response, 99th percentile (ms)", "{:.1f}"),
-        ("viol_share", "time over the service line (%)", "{:.2%}"), ("hammer_per_s", "hammer blows per second", "{:.2f}"),
-        ("reversals_per_s", "clock reversals per second", "{:.2f}"), ("clock_mean", "clock, mean share of top", "{:.3f}"),
+        ("viol_share", "requests over the service line (%)", "{:.2%}"), ("first_p50_ms", "first request after a rest, median (ms)", "{:.1f}"),
+        ("svc_p50_ms", "the card's own time per request, median (ms)", "{:.1f}"), ("clock_mean", "clock, mean share of top", "{:.3f}"),
         ("clock_jitter", "clock, standard deviation", "{:.3f}"), ("t_peak", "temperature, peak (C)", "{:.1f}"),
         ("t_mean", "temperature, mean (C)", "{:.1f}")]
 
@@ -64,17 +65,19 @@ def main(out=ROOT / "results" / "sim" / "gpu_two_wire", fresh=""):
         SEEDS = FRESH
     out = Path(out); out.mkdir(parents=True, exist_ok=True)
     arms = [a for p in PAIRS for a in p[:2]]
-    res = {memb: {arm: [run(s, arm, memb=memb) for s in SEEDS] for arm in arms} for memb, _ in WORK}
+    res = {memb: {arm: [{k: v for k, v in run(s, arm, memb=memb).items() if k not in ("svc", "resp")} for s in SEEDS]
+                  for arm in arms} for memb, _ in WORK}
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     L = ["# The GPU card in simulation: each base alone, and with Omni-Compass on top", "",
          f"Evidence class **S** (a model, not a meter). Seeds {SEEDS[0]}-{SEEDS[-1]}, 600 s each, commit `{commit}`, "
          f"{time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())}. Model: `realms/gpu_card.py`; the law: `omnicompass/compass_law.py` "
          "and the verdict `omnicompass/verdict.py`.", "",
          "Omni-Compass never runs the card. It sits on top of what already runs it (the card's own firmware, or an operator's "
-         "power cap) and moves two settings that base already accepts: the clock ceiling and the power limit. A step down "
-         "is taken only after a paired trial on the card shows it adds at most 2% to the card's own time on a request; "
-         "where no step passes, Omni leaves the base exactly as it was. Every comparison below is a base alone against "
-         "the same base with Omni on top, on the same seeds and the same requests.", ""]
+         "power cap) and moves the clock ceiling that base already accepts (the power limit stays where the base set it): "
+         "it parks the clock when the work stops and races it back the moment work arrives, and a level is used only after "
+         "a paired trial on the card shows it adds at most 0.5% to the card's own time on the first request after a rest "
+         "(docs/GPU_PREREGISTRATION.md, amendment 13). Every comparison below is a base alone against the same base with "
+         "Omni on top, on the same seeds and the same requests.", ""]
     for memb, wname in WORK:
         r = res[memb]
         L += [f"## {wname[0].upper() + wname[1:]}", "", "### Mean over seeds", "",
@@ -90,12 +93,11 @@ def main(out=ROOT / "results" / "sim" / "gpu_two_wire", fresh=""):
             L.append(f"| {name} | " + " | ".join(c[name] for c in cells) + " |")
         ev = [x["verdict_events"] for p in PAIRS for x in r[p[1]]]
         L += ["", f"Verdict over all Omni runs: {sum(e['trials'] for e in ev)} trials, {sum(e['allowed'] for e in ev)} steps "
-              f"allowed, {sum(e['refused'] for e in ev)} refused. Both wires back at their snapshot after the kill on every "
-              f"seed: {all(x['restored'] for p in PAIRS for x in r[p[1]])}.", ""]
-    L += ["Requests served are the same work in every arm (the stream is the seed's); a backlog left at the end is in the "
-          "JSON. A model written by the same people who wrote the law is not an independent test. The card's power curve "
-          "(dynamic power rising with clock times voltage squared) is the textbook shape, not a measurement of any "
-          "product. The number that counts is a rented card's own meter."]
+              f"allowed, {sum(e['refused'] for e in ev)} refused.", ""]
+    L += ["Requests served are the same work in every arm (the stream is the seed's). The compute model is fitted to one "
+          "A10's own meter (energy within 0.1% of both arms of the paid run); the token-generation model's power and memory "
+          "share are assumed. A model written by the same people who wrote the brain is not an independent test: the number "
+          "that counts is a rented card's own meter."]
     (out / "RESULT.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     (out / "RESULT.json").write_text(json.dumps({"seeds": SEEDS, "commit": commit,
                                                   "work": {str(m): v for m, v in res.items()}}, indent=1) + "\n")

@@ -2,9 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Evidence class **S** (a model, not a meter). Seeds 5000-5009, 600 s each, commit `7eca5d2`, 2026-10-05 08:14 UTC. Model: `realms/gpu_card.py`; the law: `omnicompass/compass_law.py` and the verdict `omnicompass/verdict.py`.
+Evidence class **S** (a model, not a meter). Seeds 5000-5009, 600 s each, commit `54b28cf8c`, 2026-10-10 21:24 UTC. Model: `realms/gpu_card.py`; the law: `omnicompass/compass_law.py` and the verdict `omnicompass/verdict.py`.
 
-Omni-Compass never runs the card. It sits on top of what already runs it (the card's own firmware, or an operator's power cap) and moves two settings that base already accepts: the clock ceiling and the power limit. A step down is taken only after a paired trial on the card shows it adds at most 2% to the card's own time on a request; where no step passes, Omni leaves the base exactly as it was. Every comparison below is a base alone against the same base with Omni on top, on the same seeds and the same requests.
+Omni-Compass never runs the card. It sits on top of what already runs it (the card's own firmware, or an operator's power cap) and moves the clock ceiling that base already accepts (the power limit stays where the base set it): it parks the clock when the work stops and races it back the moment work arrives, and a level is used only after a paired trial on the card shows it adds at most 0.5% to the card's own time on the first request after a rest (docs/GPU_PREREGISTRATION.md, amendment 13). Every comparison below is a base alone against the same base with Omni on top, on the same seeds and the same requests.
 
 ## Compute-bound work (matrix products)
 
@@ -12,33 +12,33 @@ Omni-Compass never runs the card. It sits on top of what already runs it (the ca
 
 | Gauge | The card's firmware alone | Firmware + Omni on top | A fixed 105 W power cap alone | The cap + Omni on top |
 |---|---:|---:|---:|---:|
-| work per energy (requests per kJ) | 432.1 | 435.2 | 498.0 | 497.9 |
-| energy (J) | 68760 | 68282 | 59412 | 59427 |
-| requests served | 29719 | 29719 | 29592 | 29593 |
-| response, median (ms) | 10.1 | 10.2 | 306.5 | 243.1 |
-| response, 95th percentile (ms) | 122.1 | 122.9 | 6942.1 | 6548.4 |
-| response, 99th percentile (ms) | 602.0 | 602.0 | 8221.0 | 7969.7 |
-| time over the service line (%) | 2.80% | 2.80% | 40.30% | 38.99% |
-| hammer blows per second | 0.95 | 0.89 | 8.39 | 4.46 |
-| clock reversals per second | 1.80 | 1.70 | 16.33 | 8.49 |
-| clock, mean share of top | 0.984 | 0.972 | 0.777 | 0.776 |
-| clock, standard deviation | 0.041 | 0.039 | 0.178 | 0.174 |
-| temperature, peak (C) | 75.4 | 75.1 | 64.1 | 64.1 |
-| temperature, mean (C) | 66.6 | 66.4 | 61.8 | 61.8 |
+| work per energy (requests per kJ) | 51.7 | 57.5 | 54.4 | 54.7 |
+| energy (J) | 68549 | 61681 | 64514 | 64109 |
+| requests served | 3547 | 3547 | 3507 | 3510 |
+| response, median (ms) | 92.7 | 86.8 | 49134.4 | 48441.8 |
+| response, 95th percentile (ms) | 471.9 | 438.3 | 76440.1 | 75760.9 |
+| response, 99th percentile (ms) | 827.1 | 776.0 | 81883.7 | 81209.9 |
+| requests over the service line (%) | 1.08% | 0.91% | 88.65% | 88.59% |
+| first request after a rest, median (ms) | 60.1 | 56.4 | 109.5 | 110.0 |
+| the card's own time per request, median (ms) | 76.7 | 74.8 | 166.2 | 166.0 |
+| clock, mean share of top | 0.769 | 0.559 | 0.287 | 0.276 |
+| clock, standard deviation | 0.277 | 0.157 | 0.213 | 0.184 |
+| temperature, peak (C) | 72.9 | 71.7 | 64.4 | 64.4 |
+| temperature, mean (C) | 64.3 | 61.4 | 62.0 | 61.8 |
 
 ### With Omni on top against the same base alone (ratios: geometric mean over seeds, 95% interval; time over the line: mean difference)
 
 | Gauge | firmware + Omni on top vs the card's firmware alone | the cap + Omni on top vs a fixed 105 W power cap alone |
 |---|---:|---:|
-| work per energy | +0.70% (+0.54% to +0.86%) | -0.02% (-0.18% to +0.13%) |
-| energy | -0.70% (-0.85% to -0.54%) | +0.02% (-0.13% to +0.18%) |
-| response, median | +1.56% (+1.12% to +2.01%) | -12.29% (-20.46% to -3.27%) |
-| response, p95 | -0.84% (-4.10% to +2.52%) | -6.41% (-9.35% to -3.38%) |
-| response, p99 | -0.09% (-0.37% to +0.20%) | -3.15% (-4.61% to -1.67%) |
-| time over the line (pp) | -0.001 (-0.010 to +0.008) | -1.315 (-1.919 to -0.712) |
-| requests served | +0.00% (-0.00% to +0.00%) | +0.00% (-0.00% to +0.01%) |
+| work per energy | +11.14% (+10.80% to +11.47%) | +0.71% (+0.61% to +0.81%) |
+| energy | -10.02% (-10.29% to -9.75%) | -0.63% (-0.72% to -0.54%) |
+| response, median | -6.31% (-6.82% to -5.80%) | -1.42% (-1.68% to -1.16%) |
+| response, p95 | -7.00% (-7.93% to -6.07%) | -0.89% (-1.05% to -0.73%) |
+| response, p99 | -6.22% (-7.20% to -5.22%) | -0.82% (-0.97% to -0.68%) |
+| time over the line (pp) | -0.173 (-0.313 to -0.032) | -0.054 (-0.115 to +0.008) |
+| requests served | +0.00% (+0.00% to +0.00%) | +0.08% (+0.03% to +0.12%) |
 
-Verdict over all Omni runs: 53 trials, 29 steps allowed, 20 refused. Both wires back at their snapshot after the kill on every seed: True.
+Verdict over all Omni runs: 60 trials, 16 steps allowed, 31 refused.
 
 ## AI token generation (85% of each request waiting on memory)
 
@@ -46,35 +46,35 @@ Verdict over all Omni runs: 53 trials, 29 steps allowed, 20 refused. Both wires 
 
 | Gauge | The card's firmware alone | Firmware + Omni on top | A fixed 105 W power cap alone | The cap + Omni on top |
 |---|---:|---:|---:|---:|
-| work per energy (requests per kJ) | 433.8 | 448.8 | 500.4 | 511.2 |
-| energy (J) | 68505 | 66290 | 59393 | 58158 |
-| requests served | 29726 | 29726 | 29726 | 29726 |
-| response, median (ms) | 10.0 | 10.1 | 10.2 | 10.2 |
-| response, 95th percentile (ms) | 10.1 | 10.2 | 10.7 | 10.8 |
-| response, 99th percentile (ms) | 11.5 | 11.5 | 41.7 | 41.5 |
-| time over the service line (%) | 0.02% | 0.02% | 0.10% | 0.10% |
-| hammer blows per second | 0.85 | 0.68 | 7.89 | 6.93 |
-| clock reversals per second | 1.65 | 1.35 | 15.40 | 13.55 |
-| clock, mean share of top | 0.989 | 0.961 | 0.893 | 0.872 |
-| clock, standard deviation | 0.025 | 0.038 | 0.104 | 0.091 |
-| temperature, peak (C) | 75.2 | 74.3 | 64.2 | 64.2 |
-| temperature, mean (C) | 66.5 | 65.3 | 61.8 | 61.1 |
+| work per energy (requests per kJ) | 69.2 | 79.0 | 70.6 | 80.3 |
+| energy (J) | 51282 | 45031 | 50244 | 44418 |
+| requests served | 3547 | 3547 | 3547 | 3547 |
+| response, median (ms) | 38.4 | 38.6 | 38.6 | 38.8 |
+| response, 95th percentile (ms) | 75.9 | 76.1 | 80.0 | 79.3 |
+| response, 99th percentile (ms) | 106.9 | 107.3 | 115.3 | 114.4 |
+| requests over the service line (%) | 0.00% | 0.00% | 0.00% | 0.00% |
+| first request after a rest, median (ms) | 36.8 | 37.1 | 36.9 | 37.1 |
+| the card's own time per request, median (ms) | 36.8 | 37.0 | 37.4 | 37.5 |
+| clock, mean share of top | 1.000 | 0.862 | 0.977 | 0.839 |
+| clock, standard deviation | 0.000 | 0.109 | 0.067 | 0.114 |
+| temperature, peak (C) | 60.1 | 57.6 | 59.0 | 56.9 |
+| temperature, mean (C) | 56.5 | 53.8 | 56.0 | 53.5 |
 
 ### With Omni on top against the same base alone (ratios: geometric mean over seeds, 95% interval; time over the line: mean difference)
 
 | Gauge | firmware + Omni on top vs the card's firmware alone | the cap + Omni on top vs a fixed 105 W power cap alone |
 |---|---:|---:|
-| work per energy | +3.36% (+0.62% to +6.17%) | +2.14% (+0.81% to +3.49%) |
-| energy | -3.25% (-5.81% to -0.62%) | -2.10% (-3.38% to -0.81%) |
-| response, median | +0.55% (-0.08% to +1.18%) | +0.07% (-0.09% to +0.23%) |
-| response, p95 | +0.29% (+0.06% to +0.53%) | +0.03% (-0.04% to +0.10%) |
-| response, p99 | +0.02% (-0.02% to +0.05%) | -0.06% (-0.23% to +0.11%) |
-| time over the line (pp) | +0.000 (+0.000 to +0.000) | -0.001 (-0.002 to +0.001) |
-| requests served | +0.00% (+0.00% to +0.00%) | +0.00% (-0.00% to +0.00%) |
+| work per energy | +14.03% (+9.63% to +18.61%) | +13.39% (+7.60% to +19.49%) |
+| energy | -12.30% (-15.69% to -8.79%) | -11.81% (-16.31% to -7.06%) |
+| response, median | +0.63% (+0.06% to +1.20%) | +0.48% (-0.03% to +1.00%) |
+| response, p95 | +0.32% (-0.00% to +0.64%) | -0.86% (-1.27% to -0.45%) |
+| response, p99 | +0.40% (+0.05% to +0.74%) | -0.85% (-1.25% to -0.44%) |
+| time over the line (pp) | +0.000 (+0.000 to +0.000) | +0.000 (+0.000 to +0.000) |
+| requests served | +0.00% (+0.00% to +0.00%) | +0.00% (+0.00% to +0.00%) |
 
-Verdict over all Omni runs: 255 trials, 235 steps allowed, 20 refused. Both wires back at their snapshot after the kill on every seed: True.
+Verdict over all Omni runs: 70 trials, 21 steps allowed, 49 refused.
 
-Requests served are the same work in every arm (the stream is the seed's); a backlog left at the end is in the JSON. A model written by the same people who wrote the law is not an independent test. The card's power curve (dynamic power rising with clock times voltage squared) is the textbook shape, not a measurement of any product. The number that counts is a rented card's own meter.
+Requests served are the same work in every arm (the stream is the seed's). The compute model is fitted to one A10's own meter (energy within 0.1% of both arms of the paid run); the token-generation model's power and memory share are assumed. A model written by the same people who wrote the brain is not an independent test: the number that counts is a rented card's own meter.
 
 ---
 

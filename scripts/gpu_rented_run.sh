@@ -6,29 +6,34 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # The whole GPU test on a rented NVIDIA machine, one command (docs/GPU_RUN_GUIDE.md, section C):
 #
-#   sudo bash scripts/gpu_rented_run.sh
+#   sudo bash scripts/gpu_rented_run.sh                       everything, in the order below
+#   sudo STOP_AFTER_PROBE=1 bash scripts/gpu_rented_run.sh    only steps 1 and 2: the machine checked and the chip measured
+#                                                             (about 10 minutes; nothing counts; the numbers come back)
 #
-# 1. checks the machine (NVIDIA GPU, root, PyTorch with CUDA, power management Enabled), then the wire check
-#    (tools/gpu_wire_check.py: both of the card's wires follow, read back and go home);
-# 2. declares the envelope before any trial (docs/GPU_PREREGISTRATION.md, amendment 3): lowest watts =
-#    max(device minimum, 70% of the limit read now), unless ENVELOPE=file.json is given;
-# 3. smoke: 3 repetitions x 3 arms x 180 s (about 40 minutes). It checks the wiring on real hardware. It never counts;
-# 4. if smoke is valid: the preregistered confirmation, 10 repetitions x 3 arms x 600 s (about 6 hours), on the same
-#    committed code (STOP_AFTER_SMOKE=1 stops after step 3), on the pinned compute-bound workload (matrix products);
-# 5. the second preregistered confirmation, the same 10 x 3 x 600 s on AI token generation (the decode workload:
-#    every weight streamed from memory once per pass, batch one), about 6 hours more (SKIP_DECODE=1 skips it). Each
-#    workload is its own result, never pooled;
-# 6. an operator's power cap underneath (70% of the default limit): the cap alone vs the cap with Omni-Compass on top,
-#    at the usual load and fully loaded (more work from the same watts), 5 repetitions each, 300 s per arm, about 3 hours
-#    (SKIP_CAP=1);
-# 7. the GPU fault drill, about 10 minutes: the governor killed outright, the master switch pulled, the response feed
-#    blind (SKIP_DRILL=1); everything so far is then packed;
-# 8. the whole stacks with this card inside (tools/run_hil.py): the four realms, the four stacked with duplicates
-#    and the whole tower, each as 1, 10, 100 and 1,000 copies on one clock with the card inside, native
-#    and Omni (repetitions 3, 3, 2, 1 by size; HIL_SCALES and HIL_REPS_BY_SCALE change them; SKIP_HIL=1 skips it);
-# 9. real AI serving last: a language model served by vLLM, installed in its own environment, 5 repetitions x 3 arms x
-#    300 s; if it cannot install or start, the stage says so and nothing before it is affected (SKIP_LLM=1);
-# 10. packs every result folder into one file to send back, and prints the label each table chose by rule.
+# 1. checks the machine (NVIDIA GPU, root, PyTorch with CUDA, power management Enabled, the driver's library for the fast
+#    write path: nvidia-ml-py, installed if missing), then the wire check (tools/gpu_wire_check.py: both of the card's
+#    wires follow, read back and go home);
+# 2. the card probe (tools/gpu_probe.py, about 5 minutes, never counted): idle power at each park level, how fast the
+#    clock comes back to the top, what parking costs the first request after a rest, and each kind of work at each clock;
+# 3. declares the envelope before any trial (docs/GPU_PREREGISTRATION.md, amendment 3);
+# 4. smoke: 3 repetitions x 3 arms x 180 s (about 40 minutes). It checks the wiring on real hardware. It never counts;
+# 5. real AI serving, first because it is what a buyer runs: a language model served by vLLM in its own environment,
+#    5 repetitions x 3 arms x 300 s (the time to first token, the time per token, the energy), then the capacity test on
+#    each arm (the most requests per second inside the response line at the same power), about 2.5 hours; if vLLM
+#    cannot install or start, the stage says so and nothing else is affected (SKIP_LLM=1);
+# 6. the preregistered confirmation, 10 repetitions x 3 arms x 600 s (about 6 hours), on the same committed code
+#    (STOP_AFTER_SMOKE=1 stops after step 4), on the pinned compute-bound workload (matrix products);
+# 7. the second preregistered confirmation, the same 10 x 3 x 600 s on AI token generation (the decode workload: every
+#    weight streamed from memory once per pass, batch one), about 6 hours more (SKIP_DECODE=1 skips it);
+# 8. an operator's power cap underneath (70% of the default limit): the cap alone vs the cap with Omni-Compass on top,
+#    at the usual load and fully loaded, 5 repetitions each, 300 s per arm, about 3 hours (SKIP_CAP=1). On one card
+#    running flat out the firmware already uses every watt the cap allows: expect no more work there (amendment 13);
+# 9. the GPU fault drill, about 10 minutes (SKIP_DRILL=1); everything so far is then packed;
+# 10. the whole stacks with this card inside (tools/run_hil.py): the six organisms at 1, 10, 100 and 1,000 copies with
+#    the card inside, native and Omni, about 25 hours on one card (SKIP_HIL=1 skips it; on an 8-card machine
+#    scripts/gpu_8card.sh runs the organisms side by side);
+# 11. packs every result folder into one file to send back, and prints the label each table chose by rule.
+# PRICE_PER_HOUR (the machine's price in dollars) prints what each stage costs before it starts.
 set -euo pipefail
 echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 cd "$(dirname "$0")/.."
@@ -63,6 +68,23 @@ echo "== wire check (both wires follow, read back and go home; nothing runs if t
 $PY tools/gpu_wire_check.py --gpu "$GPU" --smi "$SMI" | tee "results/gpu/wirecheck-$STAMP.txt"
 [ "${PIPESTATUS[0]}" = 0 ] || { echo "WIRE CHECK FAILED: send results/gpu/wirecheck-$STAMP.txt back; nothing else was run."; exit 1; }
 
+echo "== the fast write path (the driver's own library, nvidia-ml-py)"
+$PY -c "import pynvml; pynvml.nvmlInit()" 2>/dev/null || $PY -m pip install -q nvidia-ml-py >/dev/null 2>&1 || true
+if $PY -c "import pynvml; pynvml.nvmlInit()" 2>/dev/null; then echo "NVML ready: clock writes take milliseconds";
+else echo "WARNING: NVML not available; the governor falls back to nvidia-smi (tens of ms a write), so its own trials will keep parking shallow"; fi
+
+echo "== the card probe (about 5 minutes; measures the chip, never counts)"
+set +e
+$PY tools/gpu_probe.py --gpu "$GPU" --smi "$SMI" --out "results/gpu/probe-$STAMP" | tee "results/gpu/probe-$STAMP.log"
+set -e
+$SMI -i "$GPU" -rgc >/dev/null 2>&1 || true
+if [ -n "${STOP_AFTER_PROBE:-}" ]; then
+  tar czf "results/gpu/omni-gpu-$STAMP-probe.tar.gz" "results/gpu/probe-$STAMP" "results/gpu/wirecheck-$STAMP.txt"
+  echo "== stopped after the probe, as asked. Send this file back: results/gpu/omni-gpu-$STAMP-probe.tar.gz"; exit 0
+fi
+price() { [ -n "${PRICE_PER_HOUR:-}" ] && python3 -c "print(f'about \${float(\"$1\")*float(\"$PRICE_PER_HOUR\"):.0f}')" || echo ""; }
+echo "== the plan: smoke 0.7 h $(price 0.7); AI serving 2.5 h $(price 2.5); compute 6 h $(price 6); token generation 6 h $(price 6); operator cap 3 h $(price 3); drill 0.2 h; organisms 25 h $(price 25). Skip any with SKIP_LLM, SKIP_DECODE, SKIP_CAP, SKIP_HIL=1."
+
 if [ -z "${ENVELOPE:-}" ]; then
   ENVELOPE="results/gpu/envelope-$STAMP.json"
   $PY tools/declare_envelope.py "$ENVELOPE" --gpu "$GPU" --smi "$SMI"
@@ -75,12 +97,19 @@ PHASE=smoke REPS="${SMOKE_REPS:-3}" DURATION="${SMOKE_DURATION:-180}" COOLDOWN="
   OUT="results/gpu/smoke-$STAMP" bash scripts/gpu_paired.sh
 smoke_rc=$?
 set -e
-PACK=("results/gpu/smoke-$STAMP" "$ENVELOPE" "results/gpu/wirecheck-$STAMP.txt")
+PACK=("results/gpu/smoke-$STAMP" "$ENVELOPE" "results/gpu/wirecheck-$STAMP.txt" "results/gpu/probe-$STAMP")
 if [ "$smoke_rc" != 0 ]; then
   echo "SMOKE INVALID (exit $smoke_rc): the wiring needs a fix before any confirmation. Send the packed file back."
 elif [ -n "${STOP_AFTER_SMOKE:-}" ]; then
   echo "smoke valid; stopping as asked (STOP_AFTER_SMOKE)."
 else
+  if [ -z "${SKIP_LLM:-}" ]; then
+    echo "== real AI serving: a language model served by vLLM, the firmware alone vs with Omni-Compass on top, then capacity"
+    set +e; OUT="results/gpu/run-$STAMP-llm" bash scripts/gpu_vllm.sh; set -e
+    PACK+=("results/gpu/run-$STAMP-llm")
+    tar czf "results/gpu/omni-gpu-$STAMP-llm.tar.gz" "${PACK[@]}"
+    echo "== AI serving packed (send this now if you like): results/gpu/omni-gpu-$STAMP-llm.tar.gz"
+  fi
   echo "== confirmation (preregistered: 10 repetitions, 600 s per arm, frozen code)"
   set +e
   PHASE=confirm OUT="results/gpu/run-$STAMP" bash scripts/gpu_paired.sh
@@ -133,11 +162,6 @@ else
     set -e
     PACK+=("results/hil/run-$STAMP")
     echo "whole stacks: exit $hil_rc (0 valid, 2 a validity problem, see results/hil/run-$STAMP/HIL.md)"
-  fi
-  if [ -z "${SKIP_LLM:-}" ]; then
-    echo "== real AI serving: a language model served by vLLM, the firmware alone vs with Omni-Compass on top"
-    set +e; OUT="results/gpu/run-$STAMP-llm" bash scripts/gpu_vllm.sh; set -e
-    PACK+=("results/gpu/run-$STAMP-llm")
   fi
 fi
 tar czf "results/gpu/omni-gpu-$STAMP.tar.gz" "${PACK[@]}"

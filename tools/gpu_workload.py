@@ -25,11 +25,32 @@ Any other workload (vLLM, TensorRT-LLM, an MLPerf inference harness) plugs into 
 (scripts/gpu_paired.sh) by writing the same three files; tools/gpu_reps.py checks them.
              A request still queued when the drain ends is not served (ok = 0).
 --sim replaces the GPU by a sleep of service_ms (for the harness's own tests on machines without a GPU).
+--signal PATH[,PATH] (or OMNI_SIGNAL) reports every arrival and every finished request to the card's governor(s), the
+same in every arm (class Signal below).
 """
 from __future__ import annotations
 
-import argparse, json, queue, random, sys, threading, time
+import argparse, json, os, queue, random, socket, sys, threading, time
 from pathlib import Path
+
+
+class Signal:
+    """The arrival signal (omni_controller/gpu_compass.py --signal): one datagram per arrival ("a <id>") and per finished
+    request ("d <id> <service_ms>") to each path given (comma-separated: one per card's governor). Every arm runs the same
+    code; where nothing listens the send fails at once and is ignored, so it costs microseconds and never changes the
+    work. A load balancer or proxy in front of a real server sees the same arrivals; this is the bench's own stand-in."""
+    def __init__(self, paths):
+        self.paths = [p for p in (paths or "").split(",") if p]
+        self.sk = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) if self.paths else None
+        if self.sk:
+            self.sk.setblocking(False)
+
+    def send(self, msg):
+        for p in self.paths:
+            try:
+                self.sk.sendto(msg.encode(), p)
+            except OSError:
+                pass
 
 
 def gpu_kernel(n, device, kind="matmul", layers=8):
@@ -106,26 +127,32 @@ def serve(a):
     t0_epoch = time.time()                   # the wall clock at t0, so the bench can line requests up with its meters
     end = a.duration + a.drain
 
+    sig = Signal(a.signal)
+
     def worker():
         while True:
-            arr = q.get()
-            if arr is None:
+            item = q.get()
+            if item is None:
                 return
+            i, arr = item
             now = time.perf_counter() - t0
             if now >= end:
-                rows.append((arr, None, None, None, 0)); continue
+                rows.append((arr, None, None, None, 0)); sig.send(f"d {i} nan"); continue
             run(c["iters"])
             done = time.perf_counter() - t0
             ms = (done - arr) * 1000.0
+            svc = (done - now) * 1000.0
+            sig.send(f"d {i} {svc:.3f}")
             rows.append((arr, now, done, ms, 1))
-            lat.write(f"{done:.3f},{ms:.3f},1,{(done - now) * 1000.0:.3f}\n"); lat.flush()
+            lat.write(f"{done:.3f},{ms:.3f},1,{svc:.3f}\n"); lat.flush()
 
     th = threading.Thread(target=worker, daemon=True); th.start()
-    for arr in sched:
+    for i, arr in enumerate(sched):
         wait = arr - (time.perf_counter() - t0)
         if wait > 0:
             time.sleep(wait)
-        q.put(arr)
+        sig.send(f"a {i}")
+        q.put((i, arr))
     q.put(None)
     th.join(timeout=max(0.0, end - (time.perf_counter() - t0)) + 5.0)
     left = end - (time.perf_counter() - t0)
@@ -159,6 +186,7 @@ def main(argv=None):
     ap.add_argument("--drain", type=float, default=30.0)
     ap.add_argument("--sim", action="store_true")
     ap.add_argument("--sim-ms", type=float, default=20.0)
+    ap.add_argument("--signal", default=os.environ.get("OMNI_SIGNAL", ""), help="arrival signal socket(s), comma-separated")
     a = ap.parse_args(argv)
     if a.n is None:
         a.n = 8192 if a.kind == "decode" else 4096

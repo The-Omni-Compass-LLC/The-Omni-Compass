@@ -461,6 +461,100 @@ The card model with this amendment, 20 seeds (tuning and fresh). Under the cap: 
 5.8% faster, time over the line 1.3 and 1.0 points lower. On the firmware: energy 0.5-3.7% lower, p95 even. The median
 is 0.6-1.5% slower, inside the verdict's allowance (`results/sim/gpu_two_wire/`). The real card is the test.
 
+
+## Amendment 13 (2026-10-10, before any trial on this code: the card's brain, from the paid run's own samples)
+
+**What the paid run of 2 October measured** (`results/gpu/run-20261002T082232Z`, one NVIDIA A10, 150 W, ten repetitions;
+recomputed from its 200 ms meter samples and every request's own times):
+
+| The card on its own | Measured |
+|---|---|
+| idle with the model loaded | 1695 MHz, 66.2 W, 58% of the arm's time |
+| idle with the clock held lower | 45.7 W at 700 MHz, 50.0 W at 1300 MHz, 57.1 W at 1500 MHz |
+| busy, sustained | at its own 150 W limit, 690 to 765 MHz, steady (no sawtooth) |
+| one request | 62,475 MHz·ms: service follows 1/clock (85 ms at 735 MHz, 170 ms at 367 MHz) |
+| busy power | 61.8 + 0.1108 f + 0.615 (T − 60) W at clock f (every lid the earlier governor set, within 2 W) |
+| the firmware's limiter | first request after a rest 62 ms, the second 86 ms, sustained 81 ms; recovered after about 60 ms of rest |
+| heat | the same request 79 ms at 58 °C and 90 ms at 74 °C under the same limit (a hot chip leaks) |
+
+**Why the earlier governor was slower.** Under a 105 W lid each request took 170 ms against 85 and cost 17.9 J against
+12.7 (+40%): a third of the busy draw does not follow the clock, so on this card running slower costs more energy, not
+less. The lid under the card's own busy draw (at the start of 18% of requests) and the ceiling lowered between bursts
+(14%) made the slowdown; the rest of the arm ran as native.
+
+**A model fitted to it** (`realms/gpu_card.py`, evidence class S). On the run's own arrival times it reproduces the energy
+of both arms within 0.1%, the earlier governor's energy change (−3.0%, measured −3.0%) and its slowdown on the slowest
+responses (+72%, measured +57%); it reads the slowest responses about 15% short in absolute terms, so it is used for
+differences between arms on the same arrivals. The earlier card model failed this test (it predicted +0.5%).
+
+**The card's brain** (`omni_controller/gpu_brain.py`; the same object on the card and in the model), replacing the law of
+amendments 6 to 12 on the card:
+1. The lid stays at the start limit: never lowered without a power target (brake). Removed: the lid scaled to the
+   ceiling, the steady hold of amendments 9 and 12 (the card's own busy clock is already steady), the compass's pacing
+   of the ceiling between bursts. Anything that does not work is removed.
+2. Park: when the card has had no work for 20 ms, the clock ceiling goes to the park level the verdict allows; race: the
+   moment work arrives on an idle card, the ceiling goes back to the top, before the next decision. The arrival signal
+   comes from the workload (`--signal`, a local datagram socket), the bench's stand-in for the load balancer or proxy in
+   front of a real server; every arm runs the same workload code. Without the signal, or with writes only through
+   nvidia-smi (tens of milliseconds a write), the brain never parks.
+3. The park verdict: paired trials on the first request after a rest (80 ms or more), rests at the top as the reference
+   against rests parked one level deeper; the level is allowed only if that request's own median time rises at most
+   0.5% (`--allow 0.005`; the engine's outer bound stays 2%). Levels are the top and seven shares of it down to the
+   card's floor, searched coarse to fine (halfway between the deepest allowed and the shallowest refused). 30 requests
+   a phase; a refused level and every deeper one wait 900 s before they are tried again.
+4. The cruise verdict, for work served behind other work: one 60 MHz step lower at a time, allowed only if the request's
+   own median time rises at most 0.5% and the card draws at least 2% less while busy (a step that saves nothing has no
+   reason to be taken). No cruise trial opens while the card, busy on its own, draws within 8% of its limit (memory-bound
+   work is where cruise can pay).
+5. One trial at a time; a trial runs to its full measurement; only the wall ends it early (docs/OMNI_V4_PLAN.md).
+6. Guards: past the line (95th percentile of the last 5 s at or over it, or a failed request), blind meters, a request on
+   the card longer than two windows without finishing, or a thermal slowdown: every wire to native at once.
+7. Writes through the driver's library (NVML, nvidia-ml-py) where present; decisions every 0.25 s.
+
+**Prediction, written before any trial on this code** (modelled, class S; the model's fresh seeds 5100 to 5109, never used
+while tuning; 95% intervals over the ten seeds). How fast the chip's clock answers a raised ceiling is unknown until the
+probe measures it, so three answers are shown:
+
+| Case | Energy | Response, median | Response, 95th | Response, 99th | First request after a rest |
+|---|---:|---:|---:|---:|---:|
+| compute work, clock answers at 40 MHz per ms | −9.3% (−10.4 to −8.2) | −5.8% | −6.4% | −5.9% | −6.6% |
+| compute work, at 6 MHz per ms (slow) | −4.5% (−6.9 to −2.0) | −3.6% | −3.0% | −2.7% | −0.4% (no difference) |
+| compute work, at 200 MHz per ms (fast) | −11.8% (−13.5 to −10.1) | −7.2% | −7.6% | −7.3% | −9.4% |
+| token generation (memory-bound), 40 MHz per ms | −10.6% (−14.8 to −6.3) | +0.4% | +0.2% | 0.0% | +0.5% |
+
+The paid run's own arrivals (the tuning case): energy −9.5%, response median −6.6%, 95th −5.8%, 99th −6.4%. The faster
+responses come from a cooler chip (about 2.6 °C cooler: less leakage, more clock under the same limit) and from bursts
+starting without the firmware's overshoot; the first of these is measured on the card, the second is the model's
+reading of the limiter and needs the card. 3.8% of single requests (compute, 40 MHz per ms) come out more than 2% slower
+than their twin under native; most of those by about 3%. Token generation's +0.4% median is inside the 0.5% allowance;
+the model's token generation is assumed (its power and its memory share were never measured on this card).
+
+**On one card running flat out there is no more work to find**: the firmware already spends every watt of the limit on
+the clock, steadily. More work from the same power needs idle time, several cards sharing one budget, or a fleet that can
+hold more cards in the same power; the capacity test measures what one card does.
+
+**The harness from this amendment:**
+- The card probe first (`tools/gpu_probe.py`, about 5 minutes, never counted): idle power at each park level, how long a
+  write takes and how long the clock takes to reach the top from each level, what each level costs the first request
+  after a rest, each kind of work at each locked clock (time, power, energy per request). `STOP_AFTER_PROBE=1` runs the
+  machine checks and the probe alone.
+- Real AI serving (`tools/llm_workload.py`): streamed answers, so every request has its time to first token and its time
+  per output token; seeded prompts of 40 to 400 words (the server's prefix cache cannot make it a cache test); the
+  request rate steps through phases (2, 6, 12, 4, 8, 2 per second by default); the capacity test climbs the rate until
+  the 95th percentile passes the line, on each arm, two repetitions each (one reading; a confirmation needs A, B and C).
+  It runs right after the smoke, before the confirmations, so its evidence is packed first.
+- The freeze hashes every file that decides or measures (the card's brain and wires, the verdict, the law, the master
+  switch, both workloads, the table, the bench, this page); the receipt names the workload actually run and whether the
+  fast write path was present; the card's own energy counter is summed over every card of an arm.
+- The table adds the card's own time per request (median, 95th), the first request after a rest, time to first token
+  and time per output token (median, 95th), the temperature's swing, and the capacity inside the line.
+- **The 95th-percentile guardrail** becomes: no confirmed slowdown (the interval not wholly above zero) and a point
+  estimate at most +2%. The earlier +10% allowance is withdrawn: nothing may be slower.
+
+**Engine version.** The brain, its wires and the verdict's two new options (`gain`, `bisect`, both off by default for every
+other caller) are inside the engine's fingerprint, so this code is the next engine version, and the card runs on it at
+one named commit. Earlier results stay on the engine they ran on and are never read across.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
