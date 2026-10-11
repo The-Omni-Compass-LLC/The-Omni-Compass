@@ -49,6 +49,7 @@ import time
 
 from omnicompass import master
 from omni_controller.gpu_brain import CardBrain
+from omnicompass.verdict import SURE
 from omni_controller.gpu_governor import query, snapshot, throttle, slowed, WriteFailed, SNAPSHOT
 from omni_controller.muscles import latency_sense, latency_window
 
@@ -156,9 +157,9 @@ class GpuCompass:
         # parking needs a race in time: through nvidia-smi a write takes tens of milliseconds, which the modelled card
         # showed costs the first request after a rest about 1% (amendment 13). So the park pedal needs the fast path
         slow_path = self.nvml is None and not a.park_slow_path
-        self.brain = CardBrain(self.top, self.c_floor, self.start, allow=a.allow, samples=a.verdict_samples,
+        self.brain = CardBrain(self.top, self.c_floor, self.start, samples=a.verdict_samples,
                                decision_s=a.interval, hold_ms=a.hold_ms, rest_ms=a.rest_ms, busy_step_mhz=a.busy_step_mhz,
-                               busy_gain=a.busy_gain, probe_every_s=a.probe_every_s, recheck_s=a.recheck_s,
+                               probe_every_s=a.probe_every_s, recheck_s=a.recheck_s,
                                trial_s=a.trial_s, learn_samples=a.learn_samples, signal=self.signal_on,
                                park=not (a.no_park or slow_path), cruise=not a.no_cruise, power_target_w=a.power_target_w)
         self.written_ceiling = self.top
@@ -169,8 +170,8 @@ class GpuCompass:
                                                **{f: snap[f][str(self.g)] for f in SNAPSHOT}}},
                     "engine": "card brain, two wires (v4)", "mode": a.mode, "path": "nvml" if self.nvml else "nvidia-smi",
                     "signal": a.signal or None, "park_levels_mhz": self.brain.levels, "operator_cap": self.capped,
-                    "verdict": {"allow": a.allow, "samples": a.verdict_samples, "probe_every_s": a.probe_every_s,
-                                "recheck_s": a.recheck_s, "trial_s": a.trial_s, "busy_gain": a.busy_gain},
+                    "verdict": {"sure": SURE, "line": "the card's own wobble", "samples": a.verdict_samples,
+                                "probe_every_s": a.probe_every_s, "recheck_s": a.recheck_s, "trial_s": a.trial_s},
                     "covers": {"clock_mhz": [self.c_floor, round(self.top)], "power_w": [s[self.g]["min"], self.start]}})
         if a.mode == "cap" and snap["power.management"][str(self.g)].lower() != "enabled":
             self.audit({"refused": "power management not Enabled: a written limit would not bind"})
@@ -415,7 +416,6 @@ def parser():
     ap.add_argument("--latency-window-s", type=float, default=5.0, help="seconds of response times the position reads")
     ap.add_argument("--learn-samples", type=int, default=15, help="busy readings before the card's own level is reported")
     ap.add_argument("--floor-w", type=float, default=0.0, help="the declared envelope's lowest watts (a power target never goes under it)")
-    ap.add_argument("--allow", type=float, default=0.005, help="the most a step may add to the card's own time on a request (0.5%%: inside the measurement; the engine's outer bound is 2%%)")
     ap.add_argument("--verdict-samples", type=int, default=30, help="requests measured at the reference and at the trial step")
     ap.add_argument("--probe-every-s", type=float, default=8.0, help="seconds between trials")
     ap.add_argument("--recheck-s", type=float, default=900.0, help="seconds before a refused step is tried again")
@@ -423,7 +423,6 @@ def parser():
     ap.add_argument("--hold-ms", type=float, default=20.0, help="idle milliseconds before the clock parks")
     ap.add_argument("--rest-ms", type=float, default=80.0, help="idle milliseconds after which a request counts as from rest")
     ap.add_argument("--busy-step-mhz", type=float, default=60.0, help="one cruise step under the top clock")
-    ap.add_argument("--busy-gain", type=float, default=0.02, help="the least share of busy watts a cruise step must save")
     ap.add_argument("--no-park", action="store_true", help="never park (the park pedal off)")
     ap.add_argument("--park-slow-path", action="store_true", help="park even when writes go through nvidia-smi (tests only)")
     ap.add_argument("--no-cruise", action="store_true", help="never lower the ceiling under queued work")

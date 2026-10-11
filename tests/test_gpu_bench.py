@@ -151,7 +151,8 @@ def bench_compass():
     state(d, util_pattern=[100, 100, 100, 40, 40, 40], busy_clock=1200.0)   # busy in bursts, held at 1200 MHz by its own limit
     env = dict(os.environ, NVIDIA_SMI=SMI, SIM="1", REPS="2", DURATION="20", DRAIN="1", COOLDOWN="0", INTERVAL="1",
                SAMPLE_MS="200", OUT=str(d / "run"), WORKLOAD_ARGS="--calib 5 --target-ms 20",
-               OMNI_ARGS="--learn-samples 3 --park-slow-path")          # the stand-in card has no NVML fast path
+               OMNI_ARGS="--learn-samples 3 --park-slow-path --verdict-samples 8")   # the stand-in card has no NVML fast
+    # path; blocks of 8 first requests so the verdict's first trial (measured twice first) reaches its trial block in 20 s
     r = subprocess.run(["bash", str(ROOT / "scripts" / "gpu_paired.sh")], cwd=ROOT, env=env, capture_output=True, text=True, timeout=600)
     assert r.returncode == 0, r.stdout[-3000:] + r.stderr[-2000:]
     out = json.loads((d / "run" / "GPU_REPS.json").read_text())

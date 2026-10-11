@@ -17,9 +17,10 @@ Laws (--law)
             and the nervous system's release gate open; past the 0.95 wall, one machine up at once). The verdict
             (omnicompass/verdict.py, stepwise) decides how many machines may be given back at all: while the service is
             calm, one more machine is given back on trial and the response time of the requests served without it is set
-            against the requests served just before and against the cluster as it ran on its own at the start; at most
-            --allow slower and that machine stays given back, slower than that and it is taken back and not tried again
-            for --verdict-recheck decisions. Where no machine passes, the pool stays as the cluster runs it alone. The
+            against the requests served just before and against the newest reference of the cluster at native; proven
+            inside the cluster's own wobble at the engine's one sureness (99.9%, no fixed percentage) and that machine stays
+            given back, otherwise it is taken back and not tried again for --verdict-recheck decisions; a machine kept is
+            proven again every --verdict-recheck decisions. Where no machine passes, the pool stays as the cluster runs it alone. The
             six-state engine still runs every decision: it grants the authority, feeds the release gate and the compass,
             and is audited
 Safety
@@ -267,7 +268,7 @@ class Controller:
                              tau=getattr(a, "compass_tau", 60.0), kp=1.0, smooth=0.3)
             self.compass_law.kd *= 3.0                    # the same push as on every realm muscle (realms/compass_arm.py)
             from omnicompass.verdict import Verdict
-            self.verdict = Verdict(tolerance=getattr(a, "allow", 0.02), min_samples=getattr(a, "verdict_samples", 200),
+            self.verdict = Verdict(min_samples=getattr(a, "verdict_samples", 200),
                                    probe_every=getattr(a, "verdict_every", 10), recheck=getattr(a, "verdict_recheck", 120),
                                    max_trial=20, incremental=True)
         self.n_native = None           # the machines the cluster ran on its own when Omni started (the verdict's step 0)
@@ -670,7 +671,11 @@ class Controller:
             # stood at; then how many machines may be given back at all (or the count a trial needs)
             if self.n_native is None:
                 self.n_native = n
-            self.verdict.observe(self._new_latencies())
+            # the requests served since the last decision count only in the block that holds the machines where they
+            # stood (a block's first decisions, while a machine is still coming or going, are not that block's)
+            lat = self._new_latencies()
+            if self.verdict.position() is not None and self.n_native - n == self.verdict.position():
+                self.verdict.observe(lat)
             calm = self.compass_law.p < self.compass_law.band.wall_high and s["pending"] == 0 and not breach_now
             deepest, trial, ev = self.verdict.tick(calm)
             if ev:
@@ -889,10 +894,9 @@ def parser():
     ap.add_argument("--min-target-change", type=int, default=3)
     ap.add_argument("--law", choices=["governor", "compass"], default="governor",
                     help="governor (default): the engine's allocation law; compass: the compass law on the HPA target and the node pool")
-    ap.add_argument("--allow", type=float, default=0.02, help="the most a machine given back may add to the response time")
     ap.add_argument("--verdict-samples", type=int, default=200, help="requests measured before and after a machine is given back on trial")
     ap.add_argument("--verdict-every", type=int, default=10, help="decisions between trials")
-    ap.add_argument("--verdict-recheck", type=int, default=120, help="decisions before a refused machine is tried again")
+    ap.add_argument("--verdict-recheck", type=int, default=120, help="decisions before a refused machine is tried again, and between proofs of a kept one")
     ap.add_argument("--compass-tau", type=float, default=60.0, help="seconds the service takes to follow a lever (the compass's damping)")
     ap.add_argument("--compass-center", type=float, default=0.4,
                     help="where the compass holds the service (0 the bare service time, 1 the SLO); 0.4, as the GPU governor")

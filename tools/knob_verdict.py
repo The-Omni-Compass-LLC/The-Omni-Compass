@@ -7,9 +7,9 @@
 
 Every knob starts in watch: one wire out, nothing written. It is written only between native and the deepest step a paired
 trial on the stack itself has allowed under the declared objective, and a step that fails its trial is not taken. The
-trial, the judgement, the allowance and the recheck are the frozen engine's (omnicompass/verdict.py, Omni v3, byte for
-byte); this module gives that Verdict the knob's notch, the cost it judges and the condition under which a trial of this
-knob is fair. Nothing in the engine changes.
+trial, the judgement, the line and the recheck are the engine's (omnicompass/verdict.py: no fixed percentage, the knob's own
+wobble as the line, one sureness of 99.9% for the whole engine); this module gives that Verdict the knob's notch, the cost
+it judges and the condition under which a trial of this knob is fair. Nothing in the engine changes.
 
   two directions   spend (more of the resource: a bigger ceiling, more consumers, more connections) and give back (less:
                    fewer connections, a smaller pool or cache), each its own Verdict with its own steps outward from native.
@@ -27,9 +27,9 @@ knob is fair. Nothing in the engine changes.
                    reading of the Omni index, cost = resource held x host CPU busy share x latency / work: a step passes only
                    if the service gained outweighs the resource and CPU spent, by the index's own arithmetic (a geometric mean
                    of the four ratios no lower than one is the same statement). Under the service objective cost = latency /
-                   work: the resources are shown and not judged. Lower is better; "no higher within the tolerance" passes,
-                   which is the engine's judge, so a step that buys nothing and costs nothing is allowed and a step that costs
-                   more than it buys is refused.
+                   work: the resources are shown and not judged. Lower is better; a step passes when the engine is 99.9% sure
+                   its cost stays inside the knob's own wobble, which is the engine's judge, so a step that costs more than it
+                   buys is refused and nothing unproven is taken.
   the hold         during a trial the knob stands at the phase's value whatever the compass asks: the reference at the
                    deepest step already allowed (native at first), then the trial step one notch further. Between trials the
                    compass moves the knob by its own law, clamped to the allowance. A fail-up never spends beyond the
@@ -43,7 +43,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from omnicompass.verdict import Verdict  # noqa: E402  (the frozen engine's verdict, unchanged)
+from omnicompass.verdict import Verdict  # noqa: E402  (the engine's verdict, unchanged)
 
 RESOURCE, SERVICE, PER_WORK = "resource", "service", "per-work"
 OBJECTIVES = (RESOURCE, SERVICE, PER_WORK)
@@ -69,7 +69,7 @@ def sample_cost(objective, work, latency, resource, cpu_share):
 
 
 class KnobVerdict:
-    def __init__(self, native, notch, cover, objective=RESOURCE, tolerance=0.02, min_samples=8, probe_every=20, recheck=60,
+    def __init__(self, native, notch, cover, objective=RESOURCE, min_samples=8, probe_every=20, recheck=60,
                  max_trial=40, settle_s=2.0):
         if objective not in OBJECTIVES:
             raise ValueError(f"objective must be one of {OBJECTIVES}, not {objective!r}")
@@ -78,14 +78,15 @@ class KnobVerdict:
         self.objective = objective
         self.settle_s = settle_s
         self.verdicts = {
-            SPEND: Verdict(tolerance, min_samples, probe_every, recheck, max_steps=max(0, int((hi - native) // notch)),
-                           max_trial=max_trial, incremental=True),
-            GIVE: Verdict(tolerance, min_samples, probe_every, recheck, max_steps=max(0, int((native - lo) // notch)),
-                          max_trial=max_trial, incremental=True),
+            SPEND: Verdict(min_samples=min_samples, probe_every=probe_every, recheck=recheck,
+                           max_steps=max(0, int((hi - native) // notch)), max_trial=max_trial, incremental=True),
+            GIVE: Verdict(min_samples=min_samples, probe_every=probe_every, recheck=recheck,
+                          max_steps=max(0, int((native - lo) // notch)), max_trial=max_trial, incremental=True),
         }
         self.phase_dir = None                     # the direction whose trial phase holds the knob, or None
         self.events = []
-        self.counts = {"trials": 0, "allowed": 0, "refused": 0, "abandoned": 0, "clamped": 0, "held": 0, "samples": 0}
+        self.counts = {"trials": 0, "allowed": 0, "refused": 0, "abandoned": 0, "clamped": 0, "held": 0, "samples": 0,
+                       "proven_again": 0, "taken_back": 0}
         self.last_value, self.changed_at, self.t = native, None, 0.0
 
     # ---------------------------------------------------------------------------------------------- the steps
@@ -186,6 +187,10 @@ class KnobVerdict:
             self.counts["refused"] += 1
         elif s.startswith("trial abandoned"):
             self.counts["abandoned"] += 1
+        elif s.startswith("step kept"):
+            self.counts["proven_again"] += 1
+        if "back_to" in ev:
+            self.counts["taken_back"] += 1
 
     # ---------------------------------------------------------------------------------------------- the record
     def record(self, keep_events=400):

@@ -92,7 +92,9 @@ class PairedRun(unittest.TestCase):
         R.Service.JITTER = (0.9, 1.1)
         try:
             sim = tempfile.mkdtemp(); out = Path(tempfile.mkdtemp()) / "out"
-            rc = R.main(["--plant", "sim", "--sim-dir", sim, "--workloads", "tuning", "--reps", "1", "--step-s", "4", "--out", str(out)])
+            # 6 steps of 12 s: room for the verdict's first trial (it measures the machine twice before its first notch, about
+            # 30 s) even after a trial abandoned when the modelled service leaves calm, and on a loaded runner
+            rc = R.main(["--plant", "sim", "--sim-dir", sim, "--workloads", "tuning", "--reps", "1", "--step-s", "12", "--out", str(out)])
         finally:
             R.VERDICT_KW = {}; R.Service.JITTER = (0.5, 1.5)
         self.assertEqual(rc, 0)
