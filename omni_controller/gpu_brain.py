@@ -41,7 +41,7 @@ arrival signal the brain cannot race in time, so it never parks (nothing that ca
 """
 from __future__ import annotations
 
-from omnicompass.verdict import Verdict
+from omnicompass.body import Body, Muscle, GIVE
 
 
 def park_levels(top, floor, shares=(0.88, 0.77, 0.65, 0.53, 0.41, 0.30, 0.18), step=15.0):
@@ -67,11 +67,18 @@ class CardBrain:
         d = lambda s: max(1, int(round(s / decision_s)))
         self.park_on = bool(park and signal)                 # parking needs a race in time: only with the arrival signal
         self.cruise_on = bool(cruise)
-        self.park_vd = Verdict(min_samples=samples, probe_every=d(probe_every_s), recheck=d(recheck_s),
-                               max_steps=len(self.levels) - 1, max_trial=d(trial_s), bisect=True)
-        self.busy_vd = Verdict(min_samples=samples, probe_every=d(probe_every_s), recheck=d(recheck_s),
-                               max_steps=max(1, int((self.top - self.floor) // self.busy_step)), max_trial=d(trial_s),
-                               gain=True)
+        vkw = dict(min_samples=samples, probe_every=d(probe_every_s), recheck=d(recheck_s), max_trial=d(trial_s))
+        # the card is one body with two muscles, one trial at a time between them (omnicompass/body.py): the park level
+        # (the clock a rest is parked at, coarse to fine over the levels) and the cruise level (the ceiling under queued
+        # work, one busy step at a time, a gain in watts to prove)
+        self.park_m = Muscle("park", self.top, 1.0, (self.floor, self.top), values={GIVE: self.levels[1:]},
+                             kw={GIVE: dict(bisect=True, incremental=False)}, **vkw)
+        self.cruise_m = Muscle("cruise", self.top, self.busy_step, (self.floor, self.top),
+                               kw={GIVE: dict(gain=True, incremental=False)}, **vkw)
+        self.body = Body([self.park_m, self.cruise_m], name="card")
+        self.park_vd = self.park_m.verdicts[GIVE]
+        self.busy_vd = self.cruise_m.verdicts[GIVE]
+        self.rest_arrivals = 0                               # requests that met the card after a rest: the park's chance
         self.park_step = 0                                   # the step the verdict lets idle rests use now (0: the top)
         self.busy_step_now = 0
         self.power_target = power_target_w
@@ -108,6 +115,7 @@ class CardBrain:
         idle = not self.inflight
         if idle:
             from_rest = t - self.last_done >= self.rest_s
+            self.rest_arrivals += int(from_rest)
             vd = self.park_vd
             # the level the request met is the ceiling it found the card parked at; it counts only where the block in
             # flight holds the park level there (a rest begun under the block before is not this block's)
@@ -183,11 +191,8 @@ class CardBrain:
             self.parked = False
             self.ceiling = self.top
             self.lid = self.start_w if self.power_target is None else min(self.start_w, float(self.power_target))
-            # the wall ends the trials in flight (and undoes their step): calm False aborts them
-            for vd, name in ((self.park_vd, "park"), (self.busy_vd, "cruise")):
-                _, _, ev = vd.tick(False)
-                if ev:
-                    self.events.append({"verdict": ev, "of": name})
+            # the wall belongs to the body: the trial in flight ends and its step is undone
+            self._body_tick({}, wall=True)
             return self.ceiling, self.lid, why
         if prev is not None:
             self.events.append({"recovered_from": prev})
@@ -198,21 +203,20 @@ class CardBrain:
         # the cruise verdict's second reading: the watts drawn while busy under the step in force
         if tele is not None and tele.get("util", 0) >= 0.9 and self.busy_vd.phase is not None:
             self.busy_vd.observe([], benefit=[float(tele.get("draw_w", 0.0))])
-        # one trial at a time inside the body: a verdict may open a trial only while the other has none in flight
-        p_ev = b_ev = None
+        # the body's tick: each muscle asks with the share of the card's requests it can save on (those that met a rested
+        # card for the park, those served behind other work for the cruise), only where its own condition holds: rests to
+        # park (the arrival signal and requests that came after a rest), or watts to save under queued work (a card held by
+        # its own power limit draws the limit under any ceiling above the clock that limit allows: nothing to buy, so the
+        # cruise does not ask; a trial already open runs to its measurement)
+        rested = self.rest_arrivals / max(1, self.counts["arrivals"])
+        readings = {}
         if self.park_on:
-            step, _, p_ev = self.park_vd.tick(self.busy_vd.phase is None)
-            self.park_step = step
+            readings["park"] = {"force": -max(rested, 1e-9), "give_ok": self.rest_arrivals > 0, "wanted": self.levels[-1]}
         if self.cruise_on:
-            # a card held by its own power limit while busy draws the limit under any ceiling above the clock that
-            # limit allows: nothing to buy, so no cruise trial opens (one already open runs to its measurement)
             headroom = self.busy_headroom()
-            open_ok = self.park_vd.phase is None and (self.busy_vd.phase is not None or headroom)
-            step, _, b_ev = self.busy_vd.tick(open_ok)
-            self.busy_step_now = step
-        for ev, name in ((p_ev, "park"), (b_ev, "cruise")):
-            if ev:
-                self.events.append({"verdict": ev, "of": name})
+            readings["cruise"] = {"force": -max(1.0 - rested, 1e-9) if headroom else 0.0, "give_ok": bool(headroom),
+                                  "wanted": self.floor}
+        self._body_tick(readings, wall=False)
         self.lid = self.start_w if self.power_target is None else min(self.start_w, float(self.power_target))
         # hold what the work calls for now (the events move it between decisions)
         if self.inflight:
@@ -223,6 +227,15 @@ class CardBrain:
             want, why = self.top, "idle_unparked"
         self.ceiling = want
         return self.ceiling, self.lid, why
+
+    def _body_tick(self, readings, wall):
+        n0 = len(self.body.events)
+        self.body.tick(readings, wall=wall, calm=not wall)
+        for ev in self.body.events[n0:]:
+            self.events.append({"verdict": {k: v for k, v in ev.items() if k not in ("muscle", "direction", "t")},
+                                "of": ev.get("muscle")})
+        self.park_step = self.park_vd.position() if self.park_vd.phase else self.park_vd.allowed
+        self.busy_step_now = self.busy_vd.position() if self.busy_vd.phase else self.busy_vd.allowed
 
     def busy_headroom(self):
         """True when the card, busy on its own, draws clearly under its power limit (memory-bound work): only then can
