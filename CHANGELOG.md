@@ -3,6 +3,21 @@
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 ## 2026-10-11
+- **The legal set at underwriter level.** `LICENSE` (Omni-Compass Evaluation License 1.0, revised 11 October 2026) now
+  reads as a proprietary software asset's license: acceptance; definitions (evaluation, simulation, production use,
+  commercial use, hosted service, derivative, results, Enterprise License); a copyright license and a patent license for
+  evaluation and simulation only; every prohibited use (production, any commercialization or monetization, hosted or
+  software-as-a-service offerings, resale and distribution, incorporation, competing products, machine-learning
+  imitation, removing notices or the kill switch, safety-critical writes, the marks); rules for reproducing and publishing
+  results, every row included; the Enterprise License path; ownership and the filings; patent and rights defense;
+  feedback and contributions; the founder's reserved right to change the software, its documentation, its results and
+  its terms at any time, without notice; safety; export control and sanctions; data; third-party components; term,
+  termination and a narrow cure; no warranty; a liability cap; indemnity; U.S. Government end users; Florida law and
+  venue; general terms. New `ENTERPRISE_LICENSE.md` summarizes the paid license (production, hosted service, OEM and
+  embedded, managed service provider, research; fees, deliverables, warranties, patent license, infringement indemnity,
+  liability, confidentiality, data, security, safety, audit, transition and escrow). `.github/CLA.md` (assignment plus a
+  contributor patent license), `TRADEMARKS.md` (usage rules), `SECURITY.md` (coordinated disclosure, fail-safe design),
+  `LICENSING_FAQ.md` and `DISCLOSURES.md` follow; the SPDX copy and the SBOM carry the license word for word.
 - **The notice as the founder ordered it (night of 10 October).** Two sentences are struck from the legal notice everywhere,
   and the notice now closes with the filing sentence and the website, nothing after it: "All patents, copyrights and
   trademarks filed in the USA. www.omni-compass.com". `tools/legal.py` holds the new wording (the page notice, the source
