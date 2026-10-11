@@ -4,12 +4,15 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The frozen engines, fingerprinted file by file: Omni v3 (OMNI_V3.json, docs/OMNI_V3.md), v2 (OMNI_V2.json,
-docs/OMNI_V2.md) and v1 (OMNI_V1.json, docs/OMNI_V1.md).
+"""The engines, fingerprinted file by file: Omni v5 (OMNI_V5.json, docs/OMNI_V5.md) — the live engine — then the frozen
+v3 (OMNI_V3.json, docs/OMNI_V3.md), v2 (OMNI_V2.json, docs/OMNI_V2.md) and v1 (OMNI_V1.json, docs/OMNI_V1.md), each kept
+for its own results. v5 adds the v5 compass law (realms/compass_arm_v5.py) and its arm in the harness to v3's engine; while
+v5 is in active development its fingerprint is re-declared on each engine change, and no v5 result is published until the
+v5 freeze. No result is ever read across versions.
 
-  python3 tools/omni_version.py                 check this checkout: prints "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
+  python3 tools/omni_version.py                 check this checkout: prints "omni-v5", "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
   python3 tools/omni_version.py --commit <sha>  the same, for the engine as it stood at a git commit (any result's run)
-  python3 tools/omni_version.py --write v3      write OMNI_V3.json from this checkout (only when a new version is declared)
+  python3 tools/omni_version.py --write v5      write OMNI_V5.json from this checkout (only when a new version is declared or re-declared in development)
 
 The engine is the compass law, the live controllers, the realms and their organisms, and the runners of the
 independent simulators. One SHA-256 per file, and one over the sorted list. A result is a v2 result only if the commit
@@ -24,7 +27,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json", "v1": ROOT / "OMNI_V1.json"}     # newest first
+VERSIONS = {"v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
+            "v1": ROOT / "OMNI_V1.json"}     # newest first
 SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py", "tools/run_pandapower.py")
 
 
@@ -93,11 +97,14 @@ def main() -> int:
         # for every test but the one that runner serves (which could not have run there), and the line says so
         print(f"{v} ({len(files)} of {len(files) + len(missing)} files, all {v[5:]} bytes; not yet in this commit: {', '.join(missing)})")
         return 0
-    newest = next(iter(VERSIONS))
+    newest = next((v for v in VERSIONS if VERSIONS[v].exists()), None)
+    if newest is None:                                 # no version declared yet (e.g. before the first --write)
+        print(f"no declared version (digest {digest(files)[:16]}, {len(files)} files)")
+        return 1
     want = json.loads(VERSIONS[newest].read_text())
     for n in sorted(set(files) | set(want["files"])):
         if files.get(n) != want["files"].get(n):
-            print(f"differs from {newest}: {n}")
+            print(f"differs from omni-{newest}: {n}")
     return 1
 
 

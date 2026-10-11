@@ -33,6 +33,7 @@ from omnicompass.adapter import Governor, OBSERVE
 from omnicompass.nervous_system import from_governor
 from .plants import TEMPLATES, ThermalZone, EnergyStorage, pack
 from .compass_arm import compass_apply
+from .compass_arm_v5 import apply_v5          # the v5 law arm (additive; this file's v5 branches are what make the tree omni-v5)
 from .presets import STEPS_SINGLE, ORGANISM_STEPS, CAL_SEED, params_for
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -79,6 +80,7 @@ def seed_for(muscle_id: str, seed: int) -> int:
 def make_plant(row, seed, organism=False):
     steps = ORGANISM_STEPS if organism else STEPS_SINGLE[row["template"]]
     p = TEMPLATES[row["template"]](params_for(row, organism), seed_for(row["muscle_id"], seed), steps)
+    p.preset = row["preset"]                  # the plant's preset (the v5 law reads it to hold generation loops native)
     if row["template"] == "compute_pool" and not organism:
         p.budget_w = 1.25 * native_mean_power(row)
     return p
@@ -164,7 +166,7 @@ def run_muscle_arm(row, seed, arm):
             plant.step()
         plant.finalize()
         return dict(plant.m, writes=0, after_kill_writes=0, restore_ok=True)
-    g = None if arm in ("native", FIXED, "compass") else Governor()
+    g = None if arm in ("native", FIXED, "compass", "v5") else Governor()
     if arm == "watch":
         g.set_mode(OBSERVE)
     kill_at = int(KILL_AT * plant.steps)
@@ -172,8 +174,9 @@ def run_muscle_arm(row, seed, arm):
     last = None
     restore_ok = True
     for k in range(plant.steps):
-        if arm == "compass":
-            v = compass_apply(plant, knob) if k < kill_at else {}
+        if arm in ("compass", "v5"):
+            apply = apply_v5 if arm == "v5" else compass_apply
+            v = apply(plant, knob) if k < kill_at else {}
             if k >= kill_at:
                 plant.override = {}
                 restore_ok = restore_ok and _restored(plant, knob)
@@ -280,7 +283,7 @@ def run_bodies(bodies, arm, groups):
     """Run bodies on one 15 s clock. groups: lists of body indices, one governor per group (one group of all bodies is
     one governor over the whole stack; one group per body is a separate governor per body). arm native: no governor."""
     govs = []
-    if arm not in ("native", "compass"):
+    if arm not in ("native", "compass", "v5"):
         for grp in groups:
             g = Governor()
             if arm == "watch":
@@ -293,13 +296,14 @@ def run_bodies(bodies, arm, groups):
     for k in range(ORGANISM_STEPS):
         for b in bodies:
             b.couple()
-        if arm == "compass":
+        if arm in ("compass", "v5"):
+            apply = apply_v5 if arm == "v5" else compass_apply
             for b in bodies:
                 for p, knob in zip(b.plants, b.knobs):
                     if k >= kill_at:
                         p.override = {}
                         continue
-                    v = compass_apply(p, knob)
+                    v = apply(p, knob)
                     if v and v != last.get(id(p)):
                         writes += 1
                     last[id(p)] = v

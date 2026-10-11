@@ -3,73 +3,73 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Smoke and do-no-harm test for the Omni v5 compass law (realms/compass_arm_v5.py), additive beside frozen v3.
+"""Do-no-harm test for the Omni v5 compass law (realms/compass_arm_v5.py), the engine change that makes this tree omni-v5.
 
-Not part of verify.py --quick yet (the v5 engine is not frozen); run directly or under pytest. It proves the v5 module
-imports and runs in-repo on real presets, produces finite meters, and on a fixed seed does no harm to the modelled
-organism against native: work is not materially below native and energy is not above it."""
-import math
+The v5 law's default (V5CFG) must make the no-harm promise true: on a fixed seed, for EVERY muscle in the catalog, the v5
+arm uses no more energy than native, does no less work, and is in violation no more often; it hands every knob back to
+native on the kill (the dead-man lease); and it acts somewhere (it is not a silent no-op). The whole tower, as one
+organism, is no worse than native on energy and work. Run directly or under pytest.
+"""
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import importlib.util as _u                                   # noqa: E402
+import realms.harness as H                                   # noqa: E402
+from realms.compass_arm_v5 import V5CFG, apply_v5            # noqa: E402  (the in-engine v5 law and its default config)
 
-import realms.harness as H                                    # noqa: E402
-from tools.run_scale import rows_for, ORGS                    # noqa: E402
-
-# The v5 compass law lives OUT of the engine fingerprint scope (docs/omni_v5/) until the v5 freeze, so this checkout still
-# reads as omni-v3 (tools/omni_version.py). Load it by path from there.
-_V5 = ROOT / "docs" / "omni_v5" / "study" / "v5_law.py"
-_spec = _u.spec_from_file_location("omni_v5_law", _V5)
-_mod = _u.module_from_spec(_spec)
-_spec.loader.exec_module(_mod)
-compass_apply_v5, Cfg = _mod.compass_apply_v5, _mod.Cfg
-
-CFG = dict(target_free=False, est=2, learn_fall=0.1, hybrid=True, physics_memory=True,
-           motion_safe=True, band=True, drop_guard=True, hole_guard=True)
+SEED = 3000
+ETOL = 1e-6          # energy may not exceed native beyond rounding
+WTOL = 1e-4          # work may not fall below native beyond rounding
 
 
-def _run(rows, seed, arm, cfg):
-    b = H.Body(rows, seed)
-    kill_at = int(H.KILL_AT * H.ORGANISM_STEPS)
-    acted = False
-    for k in range(H.ORGANISM_STEPS):
-        b.couple()
-        if arm == "v5":
-            for p, knob in zip(b.plants, b.knobs):
-                if k >= kill_at:
-                    p.override = {}
-                    continue
-                compass_apply_v5(p, knob, cfg)
-                acted = acted or bool(p.override)
-        b.step()
-    for p in b.plants:
-        p.finalize()
-    return b.plants, acted
+def _muscle_harms(row):
+    nat = H.run_muscle_arm(row, SEED, "native")
+    v5 = H.run_muscle_arm(row, SEED, "v5")
+    harms = []
+    if v5["energy_j"] > nat["energy_j"] * (1 + ETOL) + 1e-9:
+        harms.append(f"energy +{v5['energy_j'] / nat['energy_j'] - 1:.4%}")
+    if nat["work"] > 0 and v5["work"] < nat["work"] * (1 - WTOL) - 1e-9:
+        harms.append(f"work {v5['work'] / nat['work'] - 1:.4%}")
+    if v5["viol"] / max(1, v5["steps"]) > nat["viol"] / max(1, nat["steps"]) + 1e-9:
+        harms.append("violations up")
+    if not v5["restore_ok"]:
+        harms.append("did not hand back on kill")
+    return harms, v5["writes"]
 
 
-def main(organisms=("1", "2"), seed=7000):
-    cfg = Cfg(**CFG)
-    for o in organisms:
-        rows = rows_for(ORGS[o][0], 1)
-        nat, _ = _run(rows, seed, "native", cfg)
-        v5, acted = _run(rows, seed, "v5", cfg)
-        assert all(math.isfinite(p.m["energy_j"]) and math.isfinite(p.m["work"]) for p in v5), "v5 produced non-finite meters"
-        ne = sum(p.m["energy_j"] for p in nat); e = sum(p.m["energy_j"] for p in v5)
-        nw = sum(p.m["work"] for p in nat); w = sum(p.m["work"] for p in v5)
-        assert e <= ne * (1 + 1e-6), f"{o}: v5 energy above native ({e:.1f} > {ne:.1f})"
-        assert w >= nw * (1 - 1e-4), f"{o}: v5 work materially below native ({w:.1f} < {nw:.1f})"
-        assert acted, f"{o}: v5 never acted"
-    return True
+def test_v5_default_does_no_harm_to_any_muscle():
+    rows = H.catalog()
+    bad, acted = [], 0
+    for row in rows:
+        harms, writes = _muscle_harms(row)
+        acted += int(writes > 0)
+        if harms:
+            bad.append(f"{row['muscle_id']} {row['family']}/{row['muscle']} ({row['knob']}): {', '.join(harms)}")
+    assert not bad, "v5 default harmed muscles vs native:\n" + "\n".join(bad[:30])
+    assert acted > 0, "v5 default never acted on any muscle (silent no-op)"
 
 
-def test_compass_arm_v5_no_harm():
-    assert main()
+def test_v5_tower_is_no_worse_than_native():
+    rows = H.catalog()
+    nat = H.run_organism_arm(rows, SEED, "native")
+    v5 = H.run_organism_arm(rows, SEED, "v5")
+    assert sum(v5["plants"][i]["energy_j"] for i in range(len(v5["plants"]))) <= \
+        sum(nat["plants"][i]["energy_j"] for i in range(len(nat["plants"]))) * (1 + 1e-6), "v5 tower energy above native"
+    assert sum(p["work"] for p in v5["plants"]) >= sum(p["work"] for p in nat["plants"]) * (1 - 1e-4), \
+        "v5 tower work below native"
+    assert v5["restore_ok"], "v5 tower did not hand every knob back on the kill"
+
+
+def test_v5_default_config_present():
+    # the engine default is the proven no-harm configuration, and apply_v5 uses it
+    assert V5CFG.power_cap is False and V5CFG.storage_shave is False, "no-harm default must hold the tradeoff knobs native"
+    assert callable(apply_v5)
 
 
 if __name__ == "__main__":
-    main()
+    test_v5_default_does_no_harm_to_any_muscle()
+    test_v5_tower_is_no_worse_than_native()
+    test_v5_default_config_present()
     print("test_compass_arm_v5: OK")
