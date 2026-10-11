@@ -43,19 +43,28 @@ SPEND, GIVE = "spend", "give back"
 
 
 class Muscle:
-    """One knob of a body: native, its notch, its cover, its two verdicts and, on a real system, its wire."""
+    """One knob of a body: native, its notch, its cover, its two verdicts and, on a real system, its wire. values: the
+    settings each direction's steps stand at, when they are not whole notches ({direction: [step 1, step 2, ...]}, a
+    card's park levels); kw: options for one direction's verdict ({direction: {...}}: coarse to fine, a gain to prove)."""
 
-    def __init__(self, name, native, notch, cover, wire=None, **verdict_kw):
+    def __init__(self, name, native, notch, cover, wire=None, values=None, kw=None, **verdict_kw):
         lo, hi = cover
         self.name, self.native, self.notch, self.lo, self.hi = name, native, notch, lo, hi
         self.wire = wire
-        kw = dict(verdict_kw)
-        kw.setdefault("incremental", True)
-        self.verdicts = {SPEND: Verdict(max_steps=max(0, int((hi - native) // notch)), **kw),
-                         GIVE: Verdict(max_steps=max(0, int((native - lo) // notch)), **kw)}
+        self.values = {d: list(v) for d, v in (values or {}).items()}
+        base = dict(verdict_kw)
+        base.setdefault("incremental", True)
+        self.verdicts = {}
+        for d, n in ((SPEND, int((hi - native) // notch)), (GIVE, int((native - lo) // notch))):
+            k = dict(base, **(kw or {}).get(d, {}))
+            self.verdicts[d] = Verdict(max_steps=max(0, len(self.values[d]) if d in self.values else n), **k)
         self.handed_over = False                         # someone else wrote the lever: it is theirs, the body stops
 
     def value_of(self, direction, step):
+        if step <= 0:
+            return self.native
+        if direction in self.values:
+            return self.values[direction][min(step, len(self.values[direction])) - 1]
         v = self.native + step * self.notch if direction == SPEND else self.native - step * self.notch
         return clamp(v, self.lo, self.hi)
 
