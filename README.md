@@ -37,6 +37,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-12 16:33 | grid | success | [38278139633](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38278139633) |
+| 2026-10-12 16:26 | kwok-scale | success | [38274411630](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38274411630) |
 | 2026-10-12 16:12 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized reps 11+62 arms native compass split no window 1440 | cancelled | [38269560979](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38269560979) |
 | 2026-10-12 16:12 | big-organism-detached stop omni-detached-38215293955 | success | [38275369568](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275369568) |
 | 2026-10-12 16:11 | big-organism-detached collect | failure | [38275112380](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275112380) |
@@ -45,8 +47,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226909980 | success | [38275426552](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275426552) |
 | 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226925699 | success | [38275403039](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275403039) |
 | 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226942200 | success | [38275418970](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275418970) |
-| 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226934488 | success | [38275410610](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275410610) |
-| 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226902418 | success | [38275394760](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275394760) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
