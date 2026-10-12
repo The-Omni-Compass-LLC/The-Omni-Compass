@@ -117,7 +117,8 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the start writes its own script; the machine clones the code itself
+        with: {sparse-checkout: scripts}
       - uses: azure/login@v2
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
       - name: Rent the machine
@@ -164,7 +165,10 @@ jobs:
             printf "fs.inotify.max_user_watches=524288\nfs.inotify.max_user_instances=512\n" | sudo tee /etc/sysctl.d/99-kind.conf >/dev/null && sudo sysctl -q --system
             curl -fsSLo kind https://github.com/kubernetes-sigs/kind/releases/latest/download/kind-linux-amd64 && sudo install kind /usr/local/bin/kind
             curl -fsSLo kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && sudo install kubectl /usr/local/bin/kubectl
-            git clone -q https://github.com/${{ github.repository }}.git omni && cd omni && git checkout -q '"$SHA"'
+            # the code the test runs, not the 82,000 result files or their history: a blobless clone, sparse
+            git clone -q --filter=blob:none --no-checkout https://github.com/${{ github.repository }}.git omni && cd omni \
+              && git sparse-checkout init --cone && git sparse-checkout set deploy scripts tools pilot fleet tuning omni_controller omnicompass realms hardware results/hardware \
+              && git checkout -q '"$SHA"'
             python3 -m venv .v && .v/bin/pip install -q -r requirements.txt'
       - name: Start every repetition, detached from this job
         run: |
