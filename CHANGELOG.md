@@ -2,6 +2,33 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-12 (late night): The seat, the receipts in their totality, the max written formally
+
+- **The seat** (`docs/THE_SEAT.md`, in the book after "What Omni-Compass Is"): Omni-Compass is the governor on top of the
+  muscles; the five systems named most often (IBM Turbonomic, Karpenter, NVIDIA's GPU power software, the Energy Aware
+  Runtime, the Cluster Autoscaler with the commercial layers above it) with source, kind and how Omni-Compass sits with
+  each; nine open-source pieces read from their own repositories (license, last change, kind, where each can run);
+  who owns Omni-Compass and on what terms it is seen. Read from the projects themselves: CruiseKube is under the Business
+  Source License (source-available, not open source); the Adaptive GPU Power Capping code carries no license; Climatik and
+  PEAKS are early.
+- **The receipts, in their totality** (`docs/THE_RECEIPTS.md`, at the head of "Proving It"): every result read together,
+  receipt by receipt, by evidence class and engine, with what each shows and what it does not; the decisive receipt still
+  to be produced is the chip's own energy meter on a real GPU.
+- **The max, formally** (`docs/FORMAL_V5.md`, in "The Mathematics"): the setting, the two arms, the definition of one
+  governor against a collection of tools, five properties the code guarantees (one wire; never fewer machines than
+  native asks for; native at its limit left alone; grants only out of the shared lines' room, a forecast bound; the
+  hand-back), the readings rule, what the runs measure, and the limits stated plainly. Its section 4 records why three
+  plants did worse inside the organisms under the climb and the next version that fixes them (built and tested on
+  development seeds: 19 plants worse in 400 organism runs before, 7 after, the gains kept), which enters the engine only
+  as a new version, the founder told first.
+- **The register** rows 79 to 87: Kepler as the shared meter, Goldilocks with the Vertical Pod Autoscaler, CruiseKube,
+  Climatik, the Kubernetes Power Manager, PEAKS, the HPDC '25 learned GPU power capping, NVIDIA's platform power manager
+  and the Energy Aware Runtime, each with Omni-Compass on top of it as the native.
+- **The wiring search** (`tools/wire_search.py`, `results/development/wiring/`, development seeds only): every muscle
+  through fourteen candidate cards in the official loop under a rule fixed before any result was read; 503 muscles gain
+  on the max alone, 670 on each muscle's own card, 427 on none (chiefly the 274 admission gates, which native already
+  holds fully open), none worse. Nothing in the engine changes; the cards enter it only as a new version.
+
 ## 2026-10-12 (night): Every workflow fetches the code, not the 25 GB archive; the capacity test
 
 - **Why the Azure runs stood still.** The archive of raw runs (`results/live/raw`) has grown to 25.5 GB in 81,867 files,

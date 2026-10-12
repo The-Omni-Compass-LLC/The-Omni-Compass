@@ -375,6 +375,7 @@ OUTLINE = [
      "Where Omni-Compass comes from: the closed circle, the four pieces, the compass, the basins and the reflex. The "
      "engineering in the rest of the book is this idea made exact."),
     ("What Omni-Compass Is", ("M", "What Omni-Compass Is")),
+    ("The Seat: One Governor over the Muscles", ("F", "docs/THE_SEAT.md")),
     ("The Unified Circle Principle", ("T", "The Unified Circle Principle")),
     ("The Four-Piece Engine", ("T", "The Four-Piece Engine")),
     ("The Compass", ("T", "The Compass")),
@@ -390,6 +391,7 @@ OUTLINE = [
     ("The Tracking Theorem", ("F", "docs/TRACKING_THEOREM.md")),
     ("The Conveyance Law", ("F", "docs/CONVEYANCE_LAW.md")),
     ("Formal Status of the Mathematics", ("F", "docs/FORMAL_STATUS.md")),
+    ("The Max, Formally: Definitions, Guarantees and Measures", ("F", "docs/FORMAL_V5.md")),
     ("The Mechanism of Action", ("F", "docs/MECHANISM_OF_ACTION.md")),
     ("The Engines and Their Audit", ("FS", ["docs/ENGINES.md", "docs/history/ENGINE_AUDIT.md"])),
     ("PART", "The Physics: the Compass and the Nervous System",
@@ -427,6 +429,7 @@ OUTLINE = [
     ("PART", "Proving It",
      "Paired runs, receipts, rules written before the runs, and every result to date with its evidence class.",
      "empirical_validation"),
+    ("The Receipts, in Their Totality", ("F", "docs/THE_RECEIPTS.md")),
     ("How to Read the Results", ("F", "docs/HOW_TO_READ_THE_RESULTS.md")),
     ("The Benefit Sheet: One Number per Benchmark", ("F", "docs/BENEFIT_SHEET.md")),
     ("The Dossier: Every Result in One Place", ("F", "docs/DOSSIER.md")),

@@ -4,6 +4,9 @@
 
 People who run these systems often see "autoscaling" everywhere and assume it all does the same thing. It does not.
 This page sets out, from public descriptions, what each system controls, and where Omni-Compass sits among them.
+The five systems named most often, nine open-source pieces read from their own repositories (license, kind, where
+each can run, its register row) and the formal distinction between one governor and a collection of tools:
+`docs/THE_SEAT.md`.
 
 **How to read it.** Borg and Twine are private to Google and Meta; Turbonomic is closed commercial software. None of
 them can be run here, so they are compared by what their makers have published (papers, documentation, product

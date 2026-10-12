@@ -463,6 +463,16 @@ Every muscle keeps its own control, and Omni-Compass sets what that control alre
 When Omni-Compass stops, every one of those values goes back to what it was before Omni-Compass acted: not to the last
 value it wrote, but to the value it read once, before its first write.
 
+**Where it sits among the systems already in use.** The autoscalers, the node provisioners, the GPU and CPU power
+managers and the commercial optimizers are muscles, or optimizers over a few kinds of muscle; Omni-Compass is the
+governor on top of them: one law that reads every muscle in a body and writes each one's own knob under the limits they
+share. Running several of those systems at once does not make one governor, because each still decides on its own
+reading. The five systems named most often (IBM Turbonomic, Karpenter, NVIDIA's GPU power software, the Energy Aware
+Runtime, the Cluster Autoscaler with the commercial layers above it), nine open-source pieces with their licenses and
+where each can be benchmarked, and who owns Omni-Compass and on what terms it is seen, are set out in *The Seat: One
+Governor over the Muscles* (`docs/THE_SEAT.md`); the distinction between one governor and a collection of tools is
+stated formally in *The Max, Formally* (`docs/FORMAL_V5.md`, Definition 2 and Proposition 1).
+
 ## 2. The Muscles, the Realms and the Six Organisms
 
 ### 2.1 The catalog
@@ -2399,6 +2409,11 @@ Omni's did not, and a queue kept short against a queue that grows is a large rat
 
 ## 16. Results to Date
 
+Every result below, read together in one place with what each shows and what it does not, by evidence class and
+engine, newest first: *The Receipts, in Their Totality* (`docs/THE_RECEIPTS.md`). The decisive receipt not yet
+produced is the physical one: the chip's own energy meter on a real GPU, on the current governor, on the same clock
+as the Kubernetes runs.
+
 Every result below is Omni-Compass **on top of** a native system against the same native system alone, with the same
 work in both arms, read by the three-run rule of section 15, on the engine named. Losses are in the tables beside the
 gains. The whole list, benchmark by benchmark with its native engine, its knob, its gauges and its file, is
@@ -2974,6 +2989,12 @@ redistribution, a hosted or managed service, incorporation into a product or ser
 results to build a competing product - requires a written Omni-Compass Enterprise License signed by The Omni-Compass
 LLC and paid for. All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. No patent or trademark license is granted for any other use. Contributions are accepted only on the
 terms in `.github/CONTRIBUTING.md`, which assign their rights to The Omni-Compass LLC.
+
+The copyright in Omni-Compass belongs to The Omni-Compass LLC. The source is visible under the Evaluation License,
+which is not an open-source license; seeing the source grants no right beyond it. The owner of a copyright may
+grant it under more than one license at once (the Evaluation License to everyone, a paid Enterprise License to a
+customer), may set the terms of each new version, and may assign the copyright; copies already received keep the
+terms they were received under. The license texts (`LICENSE`, `NOTICE`, `DISCLOSURES.md`) govern.
 
 ## 18. Python, C++ and the Seal
 
