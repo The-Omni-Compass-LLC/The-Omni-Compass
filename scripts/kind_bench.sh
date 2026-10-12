@@ -19,7 +19,12 @@
 #               Omni-Compass being there (its CPU on the shared runner, its API reads) plus run-to-run noise, never a
 #               decision. The run fails if one write reached the cluster.
 # The controller runs at the lowest CPU priority (nice 19) in every Omni arm: on a real cluster it runs on its own node,
-# here all seven kind nodes share one 4-core runner with the service being measured.
+# here all seven kind nodes share one 4-core runner with the service being measured. With the organism inside (ORGANISM
+# set) it runs at the organism's own priority instead (nice 0; amendment of 12 Oct): the modelled organism is the
+# heaviest process of the test rig on the runner, and a governor ranked below the rig is starved by the rig itself (the
+# four stacked at 100 copies: 47 of the governor's 60 decisions by the end of its window). The service is not touched
+# either way: it runs inside the kind nodes' containers, each its own cgroup, where a process's niceness on the runner
+# does not reach (niceness ranks a process only against the processes of its own cgroup).
 # Both arms: a real response-time probe times HTTP requests to php-apache every 5 s (latency.csv).
 # Load schedule: the load-generator replica count steps through LOAD_STEPS, each step DURATION/steps seconds,
 # identical in both arms. Results in $OUT_DIR: capture.csv (every 15 s), nodes timeline, Omni audit (omni arm).
@@ -36,6 +41,7 @@ DRY=""; [ "$ARM" = "watch" ] && DRY="--dry-run"
 # lowered to that value by the operator, no Omni-Compass; it shows what native needs to reach Omni-Compass's response times
 TUNE=""; [[ "$ARM" =~ ^native([0-9]+)$ ]] && TUNE="${BASH_REMATCH[1]}"
 NATIVE=""; { [ "$ARM" = "native" ] || [ -n "$TUNE" ]; } && NATIVE=1
+OMNI_NICE=19; [ -z "${ORGANISM:-}" ] || OMNI_NICE=0   # the governor's CPU priority (header): never below the rig beside it
 OUT_DIR="${OUT_DIR:-bench_$ARM}"; DURATION="${DURATION:-1200}"; WARMUP="${WARMUP:-120}"
 LOAD_STEPS="${LOAD_STEPS:-1 2 3 1 2 1}"
 export DRAIN_TIMEOUT="${DRAIN_TIMEOUT:-45s}"   # a drain blocked by the disruption budget gives up and the node stays in service
@@ -90,8 +96,20 @@ server_minor=$(kubectl version -o json | jq -r '.serverVersion.minor' | tr -cd '
   echo "metrics_server=$METRICS_SERVER_VERSION sha256=$METRICS_SERVER_SHA256"; echo "workers=$WORKERS"
 } | tee "$OUT_DIR/preflight.txt"
 if [ "$PLATFORM" = kind ]; then
-curl -fsSL "https://github.com/kubernetes-sigs/metrics-server/releases/download/${METRICS_SERVER_VERSION}/components.yaml" -o "$OUT_DIR/metrics-server-components.yaml"
-actual_sha=$(sha256sum "$OUT_DIR/metrics-server-components.yaml" | cut -d' ' -f1)
+# the pinned manifest, fetched once per machine (both arms of a repetition use the same file) and tried again with a pause
+# when GitHub refuses it (12 Oct: a 504 marked an arm invalid before its cluster was used); the SHA-256 check below
+# decides, as before
+ms_cache="${RUNNER_TEMP:-${TMPDIR:-/tmp}}/metrics-server-${METRICS_SERVER_VERSION}-components.yaml"
+if [ ! -s "$ms_cache" ] || [ "$(sha256sum "$ms_cache" | cut -d' ' -f1)" != "$METRICS_SERVER_SHA256" ]; then
+  for t in 1 2 3; do
+    curl -fsSL --retry 8 --retry-all-errors --retry-delay 15 --connect-timeout 20 --max-time 120 \
+      "https://github.com/kubernetes-sigs/metrics-server/releases/download/${METRICS_SERVER_VERSION}/components.yaml" -o "$ms_cache.part" \
+      && [ "$(sha256sum "$ms_cache.part" | cut -d' ' -f1)" = "$METRICS_SERVER_SHA256" ] && mv "$ms_cache.part" "$ms_cache" && break
+    echo "metrics-server manifest: not the pinned file yet (round $t)"; sleep 30
+  done
+fi
+cp "$ms_cache" "$OUT_DIR/metrics-server-components.yaml" 2>/dev/null || cp "$ms_cache.part" "$OUT_DIR/metrics-server-components.yaml" 2>/dev/null || true
+actual_sha=$(sha256sum "$OUT_DIR/metrics-server-components.yaml" 2>/dev/null | cut -d' ' -f1 || true)
 [ "$actual_sha" = "$METRICS_SERVER_SHA256" ] || { echo "metrics-server manifest SHA-256 mismatch: $actual_sha"; exit 1; }
 kubectl apply -f "$OUT_DIR/metrics-server-components.yaml"
 kubectl -n kube-system patch deployment metrics-server --type=json \
@@ -317,7 +335,7 @@ watch_pid=$!
 omni_pid=""
 # the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
 start_controller() {   # $1 decisions to make, $2 log file
-  nice -n 19 python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval 60 --floor-interval 5 --reflex-window-s 15 \
+  nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval 60 --floor-interval 5 --reflex-window-s 15 \
     --iterations "$1" --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
     --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
     --power-cmd "bash scripts/kind_power.sh" --site-limit-w "$SITE_LIMIT_W" \
@@ -325,6 +343,22 @@ start_controller() {   # $1 decisions to make, $2 log file
     --rollout-guard default/php-apache --sensed default/php-apache --latency-file "$OUT_DIR/latency.csv" --slo-ms "${SLO_MS:-500}" \
     --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" $STRICT $LAW ${CLOSURE:+--closure "$CLOSURE"} ${REPLICA_CEILING:+--replica-ceiling "$REPLICA_CEILING"} > "$2" 2>&1 &
   echo $!
+}
+# the window's governor is not a child of this shell (start_controller runs in a subshell), so `wait` cannot see it (12
+# Oct: "wait: pid ... is not a child of this shell"; a governor behind its cadence was still deciding at the reset). A
+# governor still running when the window has ended is stopped through the master switch (SIGTERM: it hands every
+# setting back and exits) and watched by its pid until it is gone, before any check reads the cluster
+stop_governors() {
+  local p i
+  for p in "$omni_pid" $(cat "$OUT_DIR/omni2.pid" 2>/dev/null); do
+    { [ -n "$p" ] && kill -0 "$p" 2>/dev/null; } || continue
+    echo "the governor (pid $p) was still deciding when the window ended: stopped through the master switch" | tee -a "$OUT_DIR/governor_end.txt"
+    kill -TERM "$p" 2>/dev/null || true
+    for i in $(seq 1 60); do kill -0 "$p" 2>/dev/null || break; sleep 1; done
+    if kill -0 "$p" 2>/dev/null; then
+      echo "the governor (pid $p) did not stop in 60 s: stopped outright" | tee -a "$OUT_DIR/governor_end.txt"; kill -KILL "$p" 2>/dev/null || true
+    fi
+  done
 }
 watchdog_pid=""
 if [ -z "$NATIVE" ]; then
@@ -351,7 +385,7 @@ if [ -n "${ROBUST:-}" ]; then
     # the second governor is started by the robustness script when its moment comes, with the same command line: the
     # function and what it reads are exported before the script starts
     export -f start_controller
-    export DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING MIN_NODES NODE_CUSHION SLO_MS
+    export DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE
   fi
   OUT_DIR="$OUT_DIR" DURATION="$DURATION" ROBUST="$ROBUST" OMNI_PID="$omni_pid" WORKERS="$WORKERS" HPA_RANGE="$HPA_RANGE" \
     WORKER_SEL="$WORKER_SEL" NATIVE="$NATIVE" bash scripts/kind_robust.sh > "$OUT_DIR/robust.out" 2>&1 &
@@ -377,7 +411,6 @@ kill "$watch_pid" 2>/dev/null || true; wait "$watch_pid" 2>/dev/null || true
 end_read() { local f="$1"; shift; for t in 1 2 3 4 5 6; do kubectl "$@" --request-timeout=20s > "$f" 2>>"$OUT_DIR/end_reads.err" && return 0; sleep 10; done
   echo "the API server did not answer: kubectl $*" >> "$OUT_DIR/end_reads.err"; }
 end_read "$OUT_DIR/pods_end.json" get pods -n default -l run=php-apache -o json
-[ -n "$omni_pid" ] && { wait "$omni_pid" || true; }
 if [ -n "$robust_pid" ]; then
   wait "$robust_pid" || true
   # the second governor of the kill scenario was started by the robustness script: wait for it to finish its decisions
@@ -399,6 +432,7 @@ if [ "$ARM" = "watch" ]; then
   executed=$(grep '"write"' "$OUT_DIR/audit.jsonl" | grep -c '"dry_run": false' || true)
   logged=$(grep -c '"write"' "$OUT_DIR/audit.jsonl" || true)
   echo "writes Omni would have made: $logged; writes executed: $executed" | tee "$OUT_DIR/omni_writes.txt"
+  stop_governors        # counted first: a stopped governor's hand-back is logged as writes (dry, none executed)
   cpu_limit=$(kubectl get pods -l run=php-apache -o jsonpath='{range .items[*]}{.spec.containers[0].resources.limits.cpu}{"\n"}{end}' | sort -u | tr '\n' ' ' | sed 's/ $//')
   target=$(hpa_cpu_target php-apache)
   range_now=$(kubectl get hpa php-apache -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')
@@ -412,6 +446,7 @@ elif [ -z "$NATIVE" ]; then
   omni_writes=$(grep -c '"write"' "$OUT_DIR/audit.jsonl" || true)
   echo "omni writes during the run: $omni_writes" | tee "$OUT_DIR/omni_writes.txt"
   [ "$omni_writes" -gt 0 ] || { echo "Omni made no write, so the reset would prove nothing"; exit 1; }
+  stop_governors        # no write of the window's governor can land after the reset is checked
   python -m omni_controller.controller --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --iterations 1 \
     --cap-deployments default/php-apache --rollout-guard default/php-apache \
     --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" --audit "$OUT_DIR/audit_kill.jsonl" --kill-file "$OUT_DIR/kill"
@@ -449,10 +484,28 @@ fi
 echo "rows captured: $(( $(wc -l < "$OUT_DIR/capture.csv") - 1 ))"
 ( cd "$OUT_DIR" && sha256sum $(ls -1 -p | grep -v '/$' | grep -v '^SHA256SUMS.txt$') > SHA256SUMS.txt )
 if [ -z "$NATIVE" ]; then
-  # Evidence discipline: the run counts only if the engine decided for the whole run.
-  decisions=$(grep -c '"decision"' "$OUT_DIR/audit.jsonl" || true); expected=$(( DURATION / 60 ))
+  # Evidence discipline: the run counts only if the engine decided for the whole run. Its decisions inside the measured
+  # window (window_start.txt to window_end.txt) are counted, never one made after the window ended (amendment of 12 Oct;
+  # before, every decision record up to the reset counted, the kill switch's own included), with the mean time between
+  # them (the cadence is one a minute)
+  dec=$(python - "$OUT_DIR/audit.jsonl" "$(cat "$OUT_DIR/window_start.txt")" "$(cat "$OUT_DIR/window_end.txt")" <<'PY' || echo "0 n/a 0"
+import json, sys
+ws, we = float(sys.argv[2]), float(sys.argv[3])
+t_all = []
+for line in open(sys.argv[1]):
+    try:
+        r = json.loads(line)
+    except ValueError:
+        continue                      # a line cut short by a governor stopped outright is not a decision
+    if isinstance(r, dict) and isinstance(r.get("decision"), dict):
+        t_all.append(float(r["time"]))
+t_in = [t for t in t_all if ws <= t <= we]
+print(len(t_in), f"{(t_in[-1] - t_in[0]) / (len(t_in) - 1):.1f}" if len(t_in) > 1 else "n/a", len(t_all))
+PY
+)
+  read -r decisions period all_decisions <<< "$dec"; expected=$(( DURATION / 60 ))
   errors=$(grep -c '"error"' "$OUT_DIR/audit.jsonl" || true)
-  echo "== controller: decisions $decisions of $expected, failed decisions or checks $errors"
+  echo "== controller: decisions inside the window $decisions of $expected (one every $period s; $all_decisions in all), failed decisions or checks $errors"
   echo "-- controller's own cost (CPU of the process and every command it ran): $(grep '"overhead"' "$OUT_DIR/audit.jsonl" | tail -n 1)"
   echo "-- my writes by muscle (count, first words of why)"
   jq -r 'select(.write) | .why // "?" | split(":")[0] + ": " + (split(":")[1] // "" | ltrimstr(" ") | split(" ")[0:3] | join(" "))' "$OUT_DIR/audit.jsonl" | sort | uniq -c | sort -rn | head -n 20 || true
@@ -479,7 +532,7 @@ for line in open(sys.argv[1]):
               f"queue {d.get('queue_ratio')} | U {d['U']:.3f} | blind {[k for k, v in a.get('senses', {}).get('blind', {}).items() if v]} | "
               f"latency age {a.get('senses', {}).get('latency_age_s')} s | proprioception {a.get('proprioception')}")
 PY
-  [ $(( decisions * 10 )) -ge $(( expected * 8 )) ] || { echo "INVALID RUN: the controller stopped early"; exit 1; }
+  [ $(( decisions * 10 )) -ge $(( expected * 8 )) ] || { echo "INVALID RUN: the controller made $decisions of its $expected decisions inside the window (under 80%)"; exit 1; }
   ! grep -q '"failsafe"' "$OUT_DIR/audit.jsonl" || { echo "INVALID RUN: the fail-safe handed control back to native"; exit 1; }
   if [ -n "$ADDONS" ]; then
     # the add-on test counts only if every move Omni-Compass made on the autoscaler reached KEDA whole

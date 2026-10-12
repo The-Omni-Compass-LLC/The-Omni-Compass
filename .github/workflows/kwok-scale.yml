@@ -31,8 +31,13 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt && sudo apt-get install -y time jq >/dev/null
-      - uses: helm/kind-action@v1
-        with: {install_only: true}
+      - uses: helm/kind-action@v1     # kind v0.31.0 (Kubernetes v1.35.0), as the grid; a refused download is tried again below
+        id: kind
+        continue-on-error: true
+        with: {install_only: true, version: v0.31.0, kubectl_version: v1.35.0}
+      - name: kind and kubectl again, if the first download was refused
+        if: steps.kind.outcome == 'failure'
+        run: bash scripts/kind_install.sh v0.31.0 v1.35.0
       - run: NODES=${{ matrix.nodes }} OUT=kwok-${{ matrix.nodes }} bash scripts/kwok_scale.sh
       - uses: actions/upload-artifact@v4
         if: always()

@@ -205,9 +205,12 @@ def main(argv=None):
                 if j is None:
                     break
                 left = a.deadline_min * 60.0 - (time.time() - t0)
-                if a.deadline_min and left < 1.25 * longest.get(j[0], 0.0):   # it would not finish: hand in what is done
+                # it would not finish: hand in what is done. A run's time is known once a run of its organism has finished;
+                # until then it starts (the job's own limit is the backstop), so a shard always hands in its first run
+                known = longest.get(j[0])
+                if a.deadline_min and known is not None and left < 1.25 * known:
                     print(f"deadline: {left / 60:.0f} min left, a run of {organism_name(j[0])} takes "
-                          f"{longest[j[0]] / 60:.0f}; no more runs started", flush=True)
+                          f"{known / 60:.0f}; no more runs started", flush=True)
                     stopped = True
                     break
                 running[ex.submit(job, j)] = j

@@ -148,6 +148,49 @@ class Conductor(unittest.TestCase):
             self.assertNotIn(d["title"], again)
         self.assertNotIn(500, cov.get(("six", 100, "1"), set()))
 
+    def test_protocol_one_runs_counted_in_no_square(self):
+        """Runs with the cluster inside from before the amendment of 12 Oct (no protocol in their names) count in no
+        square; the modelled runs are untouched by it."""
+        g = self.g
+        old = "six-kube x1 orgs stack reps 1+10 arms native compass split no window 960"
+        runs = [{"id": 1, "display_title": old, "conclusion": "success"},
+                {"id": 2, "display_title": g.six_title(1, "5", 0, 10), "conclusion": "success"}]
+        cov = g.coverage(runs, {"dispatches": [{"grid": "six-kube", "size": 1, "rep_first": 1, "reps": 10, "status": "kept"}]})
+        self.assertFalse(cov.get(("kube", 1, "stack")))
+        self.assertEqual(cov[("six", 1, "5")], set(range(10)))
+        runs.append({"id": 3, "display_title": g.kube_title(1, ["stack"], 1, 10, False, 960), "conclusion": None})
+        self.assertEqual(g.coverage(runs, {"dispatches": []})[("kube", 1, "stack")], set(range(1, 11)))
+
+    def test_failed_repetition_started_again_then_listed(self):
+        """A repetition whose job failed is started again, alone; after MAX_TRIES failures it is started no more and
+        listed for the report."""
+        g = self.g
+        title = g.kube_title(1, list(g.KUBE), 1, 10, False, 960)
+        runs = [{"id": 10, "display_title": title, "conclusion": "failure"}]
+        failed = {10: {("stack", 7)}}
+        cov = g.coverage(runs, {"dispatches": []}, failed)
+        self.assertNotIn(7, cov[("kube", 1, "stack")])
+        self.assertEqual(cov[("kube", 1, "tower")], set(range(1, 11)))
+        again = [d for d in g.next_dispatches(cov, caps={}) if d["grid"] == "six-kube" and d["size"] == 1 and d["rep_first"] <= 7]
+        self.assertEqual([(d["orgs"], d["rep_first"], d["reps"]) for d in again], [(["stack"], 7, 1)])
+        self.assertTrue(g.KUBE_NAME.match(again[0]["title"]))
+        for i in range(1, g.MAX_TRIES):                       # it fails again, each time in a run of its own
+            runs.append({"id": 10 + i, "display_title": g.kube_title(1, ["stack"], 7, 1, False, 960), "conclusion": "failure"})
+            failed[10 + i] = {("stack", 7)}
+        cov = g.coverage(runs, {"dispatches": []}, failed)
+        self.assertEqual(g.give_up(cov, runs, failed), {(1, "stack", 7): g.MAX_TRIES})
+        self.assertIn(7, cov[("kube", 1, "stack")])
+        self.assertFalse([d for d in g.next_dispatches(cov, caps={}) if d["grid"] == "six-kube" and d["size"] == 1
+                          and d["rep_first"] <= 7 < d["rep_first"] + d["reps"]])
+
+    def test_job_names_read_back(self):
+        g = self.g
+        m = g.JOB_NAME.match("run (stack, 1, 56, 960, native compass)")
+        self.assertEqual((m.group(1), int(m.group(2)), int(m.group(3))), ("stack", 1, 56))
+        m = g.JOB_NAME.match("run (compute_ai_cloud, 1000, 7, 7200, compass, -compass)")
+        self.assertEqual((m.group(1), int(m.group(2)), int(m.group(3))), ("compute_ai_cloud", 1000, 7))
+        self.assertIsNone(g.JOB_NAME.match("report"))
+
     def test_matrix_cuts_the_runs_asked(self):
         g = self.g
         m = g.matrix(100, ["1", "6"], 10, 90)["include"]
@@ -187,11 +230,27 @@ class RentedMachines(unittest.TestCase):
         first = g.azure_next({}, cap=10)[:3]
         runs = [{"display_title": b["title"], "conclusion": "success", "status": "completed", "created_at": "2026-10-12T09:00:00Z"}
                 for b in first]
-        cov, failing = g.azure_coverage(runs, {"dispatches": []})
+        cov, failing, billed = g.azure_coverage(runs, {"dispatches": []})
         self.assertFalse(failing)
-        self.assertAlmostEqual(g.azure_spent(cov), sum(b["usd"] for b in first), delta=0.05)
+        self.assertEqual(cov, billed)
+        self.assertAlmostEqual(g.azure_spent(billed), sum(b["usd"] for b in first), delta=0.05)
         again = {b["title"] for b in g.azure_next(cov, cap=10)}
         self.assertFalse(again & {b["title"] for b in first})
+
+    def test_protocol_one_machines_billed_not_counted(self):
+        """A machine with the cluster inside started before the amendment of 12 Oct is billed and counted in no square;
+        a modelled square counts its machines either way."""
+        g = self.g
+        runs = [{"display_title": "big-organism-detached start organism tower x1000 reps 1+4 window 10800", "conclusion": None,
+                 "created_at": "2026-10-12T09:00:00Z"},
+                {"display_title": "big-organism-detached start scale 6 x1000 reps 0+24 window 0", "conclusion": None,
+                 "created_at": "2026-10-12T09:00:00Z"}]
+        cov, _, billed = g.azure_coverage(runs, {"dispatches": []})
+        self.assertFalse(cov.get(("kube", 1000, "tower")))
+        self.assertEqual(billed[("kube", 1000, "tower")], {1, 2, 3, 4})
+        self.assertEqual(cov[("six", 1000, "6")], set(range(24)))
+        self.assertGreater(g.azure_spent(billed), g.azure_spent(cov))
+        self.assertEqual(g.azure_next(cov, cap=10)[0]["rep_first"], 1)    # the square starts again on protocol 2
 
 
 if __name__ == "__main__":

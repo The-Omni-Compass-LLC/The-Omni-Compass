@@ -2,6 +2,34 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-12: The grid with the real cluster inside, protocol 2 (the test rig amended; the engine unchanged)
+
+- **What failed, and where.** Of the first runs with the real cluster inside, three causes marked repetitions invalid or
+  ended jobs, all in the test rig, none in the engine (omni-v5, unchanged): the four stacked at 100 copies, repetition 3,
+  made 47 of its governor's 60 decisions by the end of its window (one every 78 s against one a minute), because the
+  modelled organism ran at normal CPU priority beside a governor at the lowest (nice 19), in the same cgroup, so the rig
+  outranked the governor; the bench's wait for the governor could not see it (started in a subshell), so a late governor
+  was still deciding when its decisions were counted; and GitHub refused two downloads (kind's checksum file, which ended
+  a job before either arm ran, and the metrics-server manifest, HTTP 504, which marked an arm invalid).
+- **Protocol 2** (`scripts/kind_bench.sh`, `docs/K8S_COMPASS_PREREGISTRATION.md`, carried in each run's name): with the
+  organism inside, the governor runs at the organism's own priority (nice 0), never below the rig; without it, nice 19 as
+  before. The decisions that count for validity are those inside the measured window (the 80% rule stands), with the
+  mean time between them shown. A governor still running when the window ends is stopped through the master switch and
+  watched until it is gone, before any check reads the cluster. The count, the stop and the retried downloads hold for
+  every kind test from this commit; the priority changes only where the organism runs beside the governor.
+- **Downloads tried again**: kind v0.31.0 (Kubernetes v1.35.0) and kubectl v1.35.0 are pinned at the versions every run
+  so far used, with a second, slower, checksum-checked install when the first is refused (`scripts/kind_install.sh`, in
+  every kind workflow); the metrics-server manifest is fetched once per machine and tried again; a kind cluster that fails
+  to come up is tried again twice. The rented machines install the same pinned versions (before: whatever was newest).
+- **Counting** (`scripts/dispatch_grid.py`): every square with the cluster inside is filled on protocol 2 alone. The
+  protocol 1 runs (100 repetitions of every organism at 1 and 10 copies, 10 at 100 and at 1,000, and the first ten of the
+  tower and the four stacked at 1,000 on rented machines) are kept, archived and shown beside, never pooled with protocol
+  2. A repetition whose job fails is started again, up to three times, and paired within one run (`tools/six_kube_report.py`);
+  one that fails three times is listed, never dropped. Every rented machine started counts against the budget.
+- **Cost**: about 1,340 jobs run again on GitHub (free for this public repository; some seven hours of its queue), and the
+  first ten repetitions of the two rented squares again, about $110 at list price.
+- `tools/run_scale.py`: a shard always starts its first run (its deadline check read a run time before one was known).
+
 ## 2026-10-12: The grid filled to 1,000 runs in every square, on the max
 
 - **Tonight's first dispatch was cut wrong and is replaced.** Its shards were sized from v3's run times; on the max a

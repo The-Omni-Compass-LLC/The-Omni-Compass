@@ -920,6 +920,53 @@ is a statement about the lever, not about the law. This run makes the lever big 
   (each machine runs two arms of 86,400 s one after the other, so about 2026-10-10 12:00 UTC, and by their 60-hour limit at the
   latest); until then the fleet cannot pass its own pre-flight, and that is the pre-flight doing its job.
 
+
+## The grid with the real cluster inside: protocol 2 (amendment, 2026-10-12, before the counted runs)
+
+The grid's runs with the real cluster inside (workflow `six-kube`, every organism at 1, 10, 100 and 1,000 copies, every
+size to 1,000 repetitions; `scripts/dispatch_grid.py`) began on the max at 06:56 UTC. By 15:00 UTC three causes had marked
+repetitions invalid or ended jobs, all in the test rig and none in the engine (omni-v5, unchanged):
+
+1. **The governor below the rig.** The four stacked at 100 copies, repetition 3 (job 114726933444): the governor made 47
+   of its 60 decisions by the end of its 3,600 s window, one every 78 s against its cadence of one a minute, and the run
+   was invalid by the rule above (80%). The governor runs at the lowest CPU priority (nice 19) since live set 11, so that
+   its own work never takes the service's place; the modelled organism, the heaviest process of the test rig on the
+   runner (186,800 muscles), ran at normal priority (nice 0) in the same cgroup, where niceness ranks processes against
+   each other: the rig outranked the governor and took its share. A second fault hid it: the bench's `wait` for the
+   governor could not see it (the governor is started in a subshell: "wait: pid ... is not a child of this shell"), so
+   the decisions were counted while a late governor was still deciding, and the job's own cleanup ended it.
+2. **A refused download of kind.** `helm/kind-action` got no checksum file from GitHub ("no properly formatted checksum
+   lines found"): the job ended before either arm ran.
+3. **A refused download of the metrics-server manifest** (HTTP 504): the arm was marked invalid before its cluster was
+   used; the other arm ran.
+
+The amendment, protocol 2, carried in each run's name (`... window <s> protocol 2`):
+
+- With the organism inside, the governor runs at the organism's own priority (nice 0): no part of the test rig outranks
+  it. Without the organism it stays at nice 19, as before. The service is not touched either way: it runs inside the
+  kind nodes' containers, each its own cgroup, where a process's niceness on the runner does not reach.
+- The decisions that count for validity are those inside the measured window (`window_start.txt` to `window_end.txt`),
+  with the mean time between them shown; before, every decision record up to the reset counted, the kill switch's own
+  included. The 80% rule stands. This rule, the governor's stop below and the downloads tried again hold for every run of
+  `scripts/kind_bench.sh` from the commit carrying this amendment (the live sets, the add-on and robustness tests too);
+  the governor's priority changes only where the organism runs beside it.
+- A governor still running when the window has ended is stopped through the master switch (it hands every setting back
+  and exits) and watched by its pid until it is gone, before any check reads the cluster.
+- kind v0.31.0 (whose own node image is Kubernetes v1.35.0) and kubectl v1.35.0 are pinned at the versions every run so
+  far used; a refused download is tried again with pauses and checked against its published SHA-256
+  (`scripts/kind_install.sh`); the metrics-server manifest likewise, once per machine, its pinned SHA-256 checked as
+  before; a kind cluster that fails to come up is tried again twice. The rented machines install the same pinned
+  versions (before: whatever was newest).
+
+Counting. Every square with the cluster inside is filled on protocol 2 alone. The runs of protocol 1 (before this
+amendment: 100 repetitions of every organism at 1 and at 10 copies, 10 at 100 and at 1,000, and the first ten repetitions
+of the tower and of the four stacked at 1,000 copies on rented machines) are kept as they stand, archived and shown
+beside as a check, never pooled with protocol 2. A repetition whose job fails is started again, up to three times, and
+is paired within one run (native and Omni from the same run's files, `tools/six_kube_report.py`); one that fails three
+times is listed, never dropped. The modelled grid (`six`) is not touched by this amendment. Cost: GitHub's machines are
+free for this public repository (about 1,340 jobs run again, some seven hours of its queue); the first ten repetitions of
+the two rented squares run again cost about $110 at list price, within the founder's budget.
+
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.

@@ -98,7 +98,10 @@ def organism_record(d):
 
 
 def collect(root, *more):
-    runs = {}
+    """{organism: {arm: {rep: gauges}}}. A repetition is paired within one run only (native and Omni from the same run's
+    files, run-<id>/six-<organism>-x<size>-<rep>[-arm]/bench-<arm>-<rep>): a repetition started again after a failed job
+    (scripts/dispatch_grid.py) takes the latest run where native and an Omni arm are both valid, never one arm of each."""
+    found = {}
     for d in sorted(x for r in (root, *more) for x in Path(r).rglob("bench-*-*")):
         if not d.is_dir() or (d / "INVALID").exists() or not (d / "capture.csv").exists():
             continue
@@ -110,7 +113,13 @@ def collect(root, *more):
         g.update(organism_gauges(rec))
         g["_restore_ok"] = rec.get("sim_restore_ok", True)
         sc = int(rec.get("scale", 1))
-        runs.setdefault(rec["organism"] if sc == 1 else f"{rec['organism']}@{sc}", {}).setdefault(arm, {})[rep] = g
+        org = rec["organism"] if sc == 1 else f"{rec['organism']}@{sc}"
+        found.setdefault((org, rep), {}).setdefault(str(d.parent.parent), {})[arm] = g
+    runs = {}
+    for (org, rep), by_run in found.items():
+        whole = [arms for _, arms in sorted(by_run.items()) if "native" in arms and len(arms) > 1]
+        for arm, g in (whole[-1] if whole else max(by_run.values(), key=len)).items():
+            runs.setdefault(org, {}).setdefault(arm, {})[rep] = g
     return runs
 
 

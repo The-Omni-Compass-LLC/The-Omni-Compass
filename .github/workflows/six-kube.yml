@@ -13,11 +13,13 @@ name: six-kube
 # on the window's clock, so the window is set long enough for the max's arm to make every step in time (a repetition
 # more than 5% late is marked off the clock). At 1,000 copies the two arms of a repetition together pass a runner's six
 # hours, so with split = yes each arm runs on its own runner (the repetitions average out the difference between runners);
-# the tower and the four stacked at 1,000 copies run on rented machines (big-organism-detached).
+# the tower and the four stacked at 1,000 copies run on rented machines (big-organism-detached). "protocol 2" in a run's
+# name: the test rig as amended on 12 Oct (scripts/kind_bench.sh: the governor never below the organism's CPU priority, its
+# decisions counted inside the window, refused downloads tried again); the grid counts these runs only.
 run-name: >-
   ${{ github.event_name != 'workflow_dispatch' && 'six-kube' ||
       inputs.what != 'runs' && 'six-kube: start every square of the grid' ||
-      format('six-kube x{0} orgs {1} reps {2}+{3} arms {4} split {5} window {6}', inputs.sizes, inputs.organisms,
+      format('six-kube x{0} orgs {1} reps {2}+{3} arms {4} split {5} window {6} protocol 2', inputs.sizes, inputs.organisms,
              inputs.rep_first, inputs.reps, inputs.arms, inputs.split, inputs.durations_s) }}
 on:
   workflow_dispatch:
@@ -88,8 +90,16 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
+      # kind and kubectl at the grid's versions (kind v0.31.0: Kubernetes v1.35.0); a download GitHub refuses is tried again
+      # below, slower and checksum-checked, never the end of the job (12 Oct: a refused checksum file ended a job before
+      # either arm ran)
       - uses: helm/kind-action@v1
-        with: {install_only: true}
+        id: kind
+        continue-on-error: true
+        with: {install_only: true, version: v0.31.0, kubectl_version: v1.35.0}
+      - name: kind and kubectl again, if the first download was refused
+        if: steps.kind.outcome == 'failure'
+        run: bash scripts/kind_install.sh v0.31.0 v1.35.0
       - run: bash scripts/kind_paired.sh
         env:
           REP: ${{ matrix.cell.rep }}

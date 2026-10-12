@@ -17,12 +17,14 @@ name: big-organism-detached
 # and deleted (nothing runs forever on the bill). Uses the AZURE_CREDENTIALS secret; nothing to do by hand. The
 # artifacts are archived with the code by archive-run (results/live/raw/run-<collect run id>/).
 # The commit the test runs is an input (default: the dispatching commit), so an older engine can be run again on the same
-# machine: the organism names must then be the ones that commit knows (v1: organism_656, stack_1226).
+# machine: the organism names must then be the ones that commit knows (v1: organism_656, stack_1226). A start on the
+# dispatching commit carries "protocol 2" in its name (the test rig as amended on 12 Oct, scripts/kind_bench.sh); the
+# grid's conductor counts only those in its squares with the cluster inside, and bills every machine started.
 run-name: >-
   ${{ github.event_name == 'schedule' && 'big-organism-detached collect' ||
       inputs.mode != 'start' && format('big-organism-detached {0} {1}', inputs.mode, inputs.group) ||
-      format('big-organism-detached start {0} {1} x{2} reps {3}+{4} window {5}', inputs.test, inputs.organisms, inputs.size,
-             inputs.rep_first, inputs.reps, inputs.duration_s) }}
+      format('big-organism-detached start {0} {1} x{2} reps {3}+{4} window {5}{6}', inputs.test, inputs.organisms, inputs.size,
+             inputs.rep_first, inputs.reps, inputs.duration_s, inputs.commit == '' && ' protocol 2' || '') }}
 on:
   workflow_dispatch:
     inputs:
@@ -163,12 +165,13 @@ jobs:
             done
             sudo usermod -aG docker omni
             printf "fs.inotify.max_user_watches=524288\nfs.inotify.max_user_instances=512\n" | sudo tee /etc/sysctl.d/99-kind.conf >/dev/null && sudo sysctl -q --system
-            curl -fsSLo kind https://github.com/kubernetes-sigs/kind/releases/latest/download/kind-linux-amd64 && sudo install kind /usr/local/bin/kind
-            curl -fsSLo kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && sudo install kubectl /usr/local/bin/kubectl
             # the code the test runs, not the 82,000 result files or their history: a blobless clone, sparse
             git clone -q --filter=blob:none --no-checkout https://github.com/${{ github.repository }}.git omni && cd omni \
               && git sparse-checkout init --cone && git sparse-checkout set deploy scripts tools pilot fleet tuning omni_controller omnicompass realms hardware results/hardware \
               && git checkout -q '"$SHA"'
+            # kind and kubectl at the same versions as the GitHub runs of the grid (kind v0.31.0: Kubernetes v1.35.0), checksums
+            # checked, a refused download tried again (scripts/kind_install.sh)
+            bash scripts/kind_install.sh v0.31.0 v1.35.0 /usr/local/bin
             python3 -m venv .v && .v/bin/pip install -q -r requirements.txt'
       - name: Start every repetition, detached from this job
         run: |

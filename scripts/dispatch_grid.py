@@ -79,10 +79,10 @@ NOT_HERE = {("six", 1000, "5"): "joined from the four realms' runs on the same s
                                 "bodies share nothing on the clock, and whole it needs 32 GB, past a GitHub machine",
             ("six", 1000, "6"): "on a rented Azure machine (big-organism-detached, test scale): one run takes about 6 "
                                 "hours and 15 GB, past a GitHub machine",
-            ("kube", 1000, "tower"): "on a rented Azure machine (big-organism-detached): one repetition takes about 17 "
-                                     "hours with the cluster inside",
-            ("kube", 1000, "stack"): "on a rented Azure machine (big-organism-detached): one repetition takes about 22 "
-                                     "hours and 32 GB with the cluster inside"}
+            ("kube", 1000, "tower"): "on a rented Azure machine (big-organism-detached): one repetition takes about 8.5 "
+                                     "hours with the cluster inside (two arms of a 10,800 s window)",
+            ("kube", 1000, "stack"): "on a rented Azure machine (big-organism-detached): one repetition takes about 14 "
+                                     "hours and a 64 GB machine with the cluster inside (two arms of a 19,800 s window)"}
 # with the real cluster inside, the organism steps on the window's clock (240 steps), so the window must be long enough
 # for the max's arm to make each step in time (tools/six_kube_report.py marks a repetition more than 5% late OFF THE
 # CLOCK): seconds per arm by size, and by organism where the default is too short
@@ -93,6 +93,13 @@ KUBE_SPLIT = {1000}                # sizes whose two arms run on separate runner
 # a size whose runs past the first CAP are held until its first runs' times are read back (the 1,000-copy shards are
 # cut from scaled figures; the first ten runs of each organism measure them before the rest are started)
 CAP = {("six", 1000): 10, ("kube", 1000): 10}
+# the test rig's protocol with the real cluster inside (scripts/kind_bench.sh), carried in each run's name. Protocol 2 (12
+# Oct): the governor at the organism's own CPU priority, never below the rig beside it; its decisions counted inside the
+# measured window; kind, kubectl and the metrics-server manifest tried again when a download is refused. The runs of
+# protocol 1 (before it: their names carry no protocol) are kept as they stand and counted in no square, so every square
+# with the cluster inside is filled on protocol 2 alone
+KUBE_PROTOCOL = "2"
+MAX_TRIES = 3                      # a repetition whose job failed this many times is started no more (the report lists it)
 
 
 # ------------------------------------------------------------------------------------------------- shard shapes
@@ -143,7 +150,9 @@ def kube_matrix(sizes, organisms, rep_first, reps, durations, split):
 
 # ------------------------------------------------------------------------------------------------- what is started
 SIX_NAME = re.compile(r"^six x(\d+) (\w+) orgs ([\d,]+) runs (\d+)\+(\d+)$")
-KUBE_NAME = re.compile(r"^six-kube x(\d+) orgs ([\w,]+) reps (\d+)\+(\d+) arms ([\w ]+?) split (\w+) window (\d+)$")
+KUBE_NAME = re.compile(r"^six-kube x(\d+) orgs ([\w,]+) reps (\d+)\+(\d+) arms ([\w ]+?) split (\w+) window (\d+)"
+                       r"(?: protocol (\w+))?$")
+JOB_NAME = re.compile(r"^run \((\w+), (\d+), (\d+), \d+, [\w ]+?(?:, -\w+)?\)$")   # six-kube's cell: organism, size, rep
 
 
 def six_title(size, org, first, n):
@@ -151,13 +160,16 @@ def six_title(size, org, first, n):
 
 
 def kube_title(size, orgs, r0, reps, split, window):
-    return f"six-kube x{size} orgs {','.join(orgs)} reps {r0}+{reps} arms native compass split {'yes' if split else 'no'} window {window}"
+    return (f"six-kube x{size} orgs {','.join(orgs)} reps {r0}+{reps} arms native compass split {'yes' if split else 'no'} "
+            f"window {window} protocol {KUBE_PROTOCOL}")
 
 
-def coverage(runs, manifest):
+def coverage(runs, manifest, failed=None):
     """Which runs of each square are started (in flight or finished, not cancelled): {("six", size, org): set of run
-    indices 0..999, ("kube", size, organism): set of repetitions 1..1000 with both arms}."""
-    cov = {}
+    indices 0..999, ("kube", size, organism): set of repetitions 1..1000 with both arms}. With the cluster inside only
+    runs of protocol KUBE_PROTOCOL count, and a repetition whose job failed counts as not started (failed: {run id: set of
+    (organism, rep)}, read from the runs' own job lists by failed_reps), so it is started again."""
+    cov, failed = {}, failed or {}
     add = lambda key, xs: cov.setdefault(key, set()).update(xs)
     for d in manifest.get("dispatches", []):
         if d.get("status") != "kept":
@@ -165,7 +177,7 @@ def coverage(runs, manifest):
         if d["grid"] == "six" and d.get("load", "normal") == LOAD:
             for o in d["orgs"]:
                 add(("six", d["size"], o), range(d["first"], d["first"] + d["runs"]))
-        elif d["grid"] == "six-kube":
+        elif d["grid"] == "six-kube" and str(d.get("protocol", "1")) == KUBE_PROTOCOL:
             for o in KUBE:
                 add(("kube", d["size"], o), range(d["rep_first"], d["rep_first"] + d["reps"]))
     for r in runs:
@@ -179,11 +191,23 @@ def coverage(runs, manifest):
                 add(("six", size, o), range(first, first + n))
             continue
         m = KUBE_NAME.match(t)
-        if m:
+        if m and m.group(8) == KUBE_PROTOCOL and r.get("conclusion") in (None, "success", "failure"):
             size, r0, n = int(m.group(1)), int(m.group(3)), int(m.group(4))
+            bad = failed.get(r.get("id"), set())
             for o in m.group(2).split(","):
-                add(("kube", size, o), range(r0, r0 + n))
+                add(("kube", size, o), [x for x in range(r0, r0 + n) if (o, x) not in bad])
     return cov
+
+
+def kube_failures(runs, failed):
+    """{(size, organism, rep): how many runs of protocol KUBE_PROTOCOL failed that repetition's job}."""
+    out = {}
+    for r in runs:
+        m = KUBE_NAME.match(r.get("display_title") or "")
+        if m and m.group(8) == KUBE_PROTOCOL:
+            for o, x in failed.get(r.get("id"), ()):
+                out[(int(m.group(1)), o, x)] = out.get((int(m.group(1)), o, x), 0) + 1
+    return out
 
 
 def gaps(have, lo, hi):
@@ -297,6 +321,57 @@ def grid_runs():
     return out
 
 
+def failed_reps(runs):
+    """{run id: set of (organism, rep)}: the repetitions whose job did not succeed, in every finished run of protocol
+    KUBE_PROTOCOL that failed. A finished run's jobs do not change, so each is read once per conductor (a file in the
+    runner's temporary folder); a list GitHub does not give now is read again at the next tick, its run counted as started
+    meanwhile (nothing is started twice)."""
+    path = Path(os.environ.get("RUNNER_TEMP") or "/tmp") / "omni_grid_failed_jobs.json"
+    try:
+        cache = json.loads(path.read_text())
+    except (OSError, ValueError):
+        cache = {}
+    out = {}
+    for r in runs:
+        m = KUBE_NAME.match(r.get("display_title") or "")
+        if not m or m.group(8) != KUBE_PROTOCOL or r.get("conclusion") != "failure":
+            continue
+        rid = str(r["id"])
+        if rid not in cache:
+            bad, page = set(), 1
+            try:
+                while True:
+                    j = api(f"repos/{REPO}/actions/runs/{rid}/jobs?filter=latest&per_page=100&page={page}")
+                    for x in j.get("jobs", []):
+                        mm = JOB_NAME.match(x.get("name") or "")
+                        if mm and x.get("conclusion") not in ("success", "skipped"):
+                            bad.add((mm.group(1), int(mm.group(3))))
+                    if len(j.get("jobs", [])) < 100:
+                        break
+                    page += 1
+            except (RuntimeError, urllib.error.URLError) as e:
+                print(f"run {rid}: jobs not readable now ({str(e)[:80]}); counted as started until the next tick", file=sys.stderr)
+                continue
+            cache[rid] = sorted(bad)
+        out[r["id"]] = {(o, int(x)) for o, x in cache[rid]}
+    try:
+        path.write_text(json.dumps(cache))
+    except OSError:
+        pass
+    return out
+
+
+def give_up(cov, runs, failed):
+    """The repetitions whose job failed MAX_TRIES times in runs of protocol KUBE_PROTOCOL: counted as started from now on
+    (never started again) and returned, {(size, organism, rep): failures}, for the report to name."""
+    out = {}
+    for (size, o, x), n in sorted(kube_failures(runs, failed).items()):
+        if n >= MAX_TRIES and x not in cov.get(("kube", size, o), set()):
+            cov.setdefault(("kube", size, o), set()).add(x)
+            out[(size, o, x)] = n
+    return out
+
+
 def jobs_in_flight():
     """(queued, running) jobs across every workflow of the repository right now."""
     queued = running = 0
@@ -353,7 +428,7 @@ def azure_hours(sq, reps):
     """A machine's hours for a batch: its calibration, then its repetitions, as many at once as it has workers."""
     a = AZURE[sq]
     return a["cal_h"] + math.ceil(reps / a["workers"]) * a["run_h"]
-AZURE_NAME = re.compile(r"^big-organism-detached start (\w+) (\w+) x(\d+) reps (\d+)\+(\d+) window (\d+)$")
+AZURE_NAME = re.compile(r"^big-organism-detached start (\w+) (\w+) x(\d+) reps (\d+)\+(\d+) window (\d+)(?: protocol (\w+))?$")
 BUDGET_USD = 5000                  # the founder's figure for the big squares on rented machines (12 Oct)
 AZURE_CAP = 10                     # repetitions per square started before the first ones' own times are read back
 
@@ -364,13 +439,18 @@ def azure_runs():
 
 
 def azure_coverage(runs, manifest):
-    """{square: set of repetitions (runs) started on a rented machine}, and the squares whose last start failed within
-    two hours (no machine of that kind to be had right now: tried again later)."""
-    cov, failing = {}, set()
+    """({square: set of repetitions (runs) started on a rented machine and counted in it}, the squares whose last start
+    failed within two hours (no machine of that kind to be had right now: tried again later), {square: every repetition
+    started on a rented machine}, for the bill). A square with the cluster inside counts the machines of protocol
+    KUBE_PROTOCOL only; the bill counts every machine started."""
+    cov, failing, billed = {}, set(), {}
     by = {(a["test"], a["org"]): k for k, a in AZURE.items()}
     for d in manifest.get("dispatches", []):
         if d["grid"] == "azure" and d.get("status") == "kept":
-            cov.setdefault(tuple(d["square"]), set()).update(range(d["rep_first"], d["rep_first"] + d["reps"]))
+            sq, xs = tuple(d["square"]), range(d["rep_first"], d["rep_first"] + d["reps"])
+            billed.setdefault(sq, set()).update(xs)
+            if sq[0] == "six" or str(d.get("protocol", "1")) == KUBE_PROTOCOL:
+                cov.setdefault(sq, set()).update(xs)
     now = time.time()
     for r in runs:
         m = AZURE_NAME.match(r.get("display_title") or "")
@@ -378,18 +458,20 @@ def azure_coverage(runs, manifest):
             continue
         sq, r0, n = by[(m.group(1), m.group(2))], int(m.group(4)), int(m.group(5))
         if r.get("conclusion") in (None, "success"):        # rented, or being rented
-            cov.setdefault(sq, set()).update(range(r0, r0 + n))
+            billed.setdefault(sq, set()).update(range(r0, r0 + n))
+            if sq[0] == "six" or m.group(7) == KUBE_PROTOCOL:
+                cov.setdefault(sq, set()).update(range(r0, r0 + n))
         elif r.get("conclusion") == "failure":
             t = calendar.timegm(time.strptime(r["created_at"], "%Y-%m-%dT%H:%M:%SZ"))
             if now - t < 2 * 3600:
                 failing.add(sq)
-    return cov, failing
+    return cov, failing, billed
 
 
-def azure_spent(cov):
+def azure_spent(billed):
     """The estimated bill of every machine started: its hours at list price (whole batches of the square's size)."""
     tot = 0.0
-    for k, v in cov.items():
+    for k, v in billed.items():
         if k in AZURE and v:
             full, rest = divmod(len(v), AZURE[k]["per"])
             tot += (full * azure_hours(k, AZURE[k]["per"]) + (azure_hours(k, rest) if rest else 0.0)) * AZURE[k]["usd_h"]
@@ -411,7 +493,8 @@ def azure_next(cov, cap=AZURE_CAP):
                     continue
                 r0, n = todo[0][0], min(a["per"], todo[0][1])
                 out.append({"square": sq, "rep_first": r0, "reps": n, "usd": round(azure_hours(sq, n) * a["usd_h"], 2),
-                            "title": f"big-organism-detached start {a['test']} {a['org']} x{sq[1]} reps {r0}+{n} window {a['window']}"})
+                            "title": f"big-organism-detached start {a['test']} {a['org']} x{sq[1]} reps {r0}+{n} window "
+                                     f"{a['window']} protocol {KUBE_PROTOCOL}"})
                 cov.setdefault(sq, set()).update(range(r0, r0 + n))
                 pending = True
     return out
@@ -438,7 +521,7 @@ def squares(cov):
     return rows
 
 
-def report(cov, started, queued, running, target, out=sys.stdout):
+def report(cov, started, queued, running, target, out=sys.stdout, gave_up=None):
     names = {"1": "Compute / AI / Cloud", "2": "Physics / Robotics / Autonomous", "3": "Energy / Facility / Industrial",
              "4": "Distribution / Specialized", "5": "The four stacked", "6": "The whole tower"}
     print("| Size | Organism | Modelled: runs started of 1,000 | With the real cluster inside: runs started of 1,000 |", file=out)
@@ -451,6 +534,12 @@ def report(cov, started, queued, running, target, out=sys.stdout):
           f"{sum(d['jobs'] for d in started)} jobs.", file=out)
     for d in started:
         print(f"- {d['title']} ({d['jobs']} jobs, about {d['hours']} runner-hours)", file=out)
+    print(f"\nWith the cluster inside, only runs of protocol {KUBE_PROTOCOL} count (12 Oct: the governor never below the "
+          "organism's priority, its decisions counted inside the window); a repetition whose job failed is started again, up "
+          f"to {MAX_TRIES} times.", file=out)
+    for (size, o, x), n in sorted((gave_up or {}).items()):
+        print(f"- not started again: {o} at {size:,} copies, repetition {x} (its job failed {n} times; listed, never "
+              "dropped silently)", file=out)
 
 
 def main(argv=None):
@@ -484,8 +573,8 @@ def main(argv=None):
     if a.what == "azure-tick":
         manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {"dispatches": []}
         zr = azure_runs()
-        cov, failing = azure_coverage(zr, manifest)
-        spent, started, why = azure_spent(cov), [], "every batch is started"
+        cov, failing, billed = azure_coverage(zr, manifest)
+        spent, started, why = azure_spent(billed), [], "every batch is started"
         # a start still waiting for a runner has no machine yet: it counts as one, so the quota is never asked twice
         waiting = sum(1 for r in zr if r.get("status") in ("queued", "waiting", "pending", "requested")
                       and AZURE_NAME.match(r.get("display_title") or ""))
@@ -540,10 +629,12 @@ def main(argv=None):
 
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {"dispatches": []}
     runs = [] if getattr(a, "offline", False) else grid_runs()
-    cov = coverage(runs, manifest)
+    failed = failed_reps(runs) if runs else {}
+    cov = coverage(runs, manifest, failed)
+    gave_up = give_up(cov, runs, failed)
     todo = next_dispatches(cov)
     if a.what == "plan":
-        report(cov, [], 0, 0, 0)
+        report(cov, [], 0, 0, 0, gave_up=gave_up)
         left_jobs = sum(d["jobs"] for d in next_dispatches(cov, caps={}))
         left_h = sum(d["hours"] for d in next_dispatches(cov, caps={}))
         print(f"\nStill to start on GitHub: {left_jobs:,} jobs, about {left_h:,.0f} runner-hours "
@@ -573,7 +664,7 @@ def main(argv=None):
     with (open(summary, "a") if summary else contextlib.nullcontext(sys.stdout)) as out:
         print("## The grid on the max: every square to 1,000 runs" + (" (dry run: nothing started)" if a.dry else ""), file=out)
         print("", file=out)
-        report(cov, started, queued, running, target, out)
+        report(cov, started, queued, running, target, out, gave_up=gave_up)
     return 0
 
 

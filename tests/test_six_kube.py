@@ -55,6 +55,31 @@ class SixKube(unittest.TestCase):
             (d / "organism.json.gz").unlink()
             self.assertIsNone(six_kube_report.organism_record(d))
 
+    def test_repetition_paired_within_one_run(self):
+        """A repetition started again after a failed job is paired within one run: the latest run where native and Omni
+        are both valid, never native from one run and Omni from another."""
+        from tools import six_kube_report as r
+        saved = r.arm_gauges, r.organism_record, r.organism_gauges
+        try:
+            r.organism_record = lambda d: {"organism": "stack", "scale": 1, "src": d.parent.parent.name}
+            r.organism_gauges = lambda rec: {"src": rec["src"]}
+            r.arm_gauges = lambda d: {}
+            with tempfile.TemporaryDirectory() as t:
+                def arm(run, arm, rep, invalid=False):
+                    d = Path(t) / run / f"six-stack-x1-{rep}" / f"bench-{arm}-{rep}"
+                    d.mkdir(parents=True); (d / "capture.csv").write_text("")
+                    if invalid:
+                        (d / "INVALID").write_text("x")
+                arm("run-1", "native", 7); arm("run-1", "compass", 7, invalid=True)    # the first try: Omni's arm failed
+                arm("run-2", "native", 7); arm("run-2", "compass", 7)                  # the second: both valid
+                arm("run-3", "native", 7); arm("run-3", "compass", 7, invalid=True)    # a third, failed again
+                arm("run-1", "native", 8); arm("run-1", "compass", 8)
+                runs = r.collect(t)
+                self.assertEqual((runs["stack"]["native"]["7"]["src"], runs["stack"]["compass"]["7"]["src"]), ("run-2", "run-2"))
+                self.assertEqual((runs["stack"]["native"]["8"]["src"], runs["stack"]["compass"]["8"]["src"]), ("run-1", "run-1"))
+        finally:
+            r.arm_gauges, r.organism_record, r.organism_gauges = saved
+
 
 if __name__ == "__main__":
     unittest.main()
