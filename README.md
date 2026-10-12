@@ -37,16 +37,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-12 11:36 | six x1000 line orgs 3 runs 0+10 | success | [38226868824](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38226868824) |
-| 2026-10-12 11:36 | six x1000 line orgs 2 runs 0+10 | success | [38226862198](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38226862198) |
-| 2026-10-12 11:36 | six: start every square of the grid | success | [38230939637](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38230939637) |
-| 2026-10-12 11:36 | live-kind-levers | success | [38230871836](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38230871836) |
-| 2026-10-12 11:16 | cpu-power | success | [38230829469](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38230829469) |
-| 2026-10-12 09:36 | v5-all-benchmarks | success | [38230268203](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38230268203) |
-| 2026-10-12 09:36 | big-organism-detached start organism tower x1000 reps 4+4 window 10800 | success | [38226894511](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38226894511) |
-| 2026-10-12 09:35 | kwok-scale | success | [38228924282](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38228924282) |
-| 2026-10-12 09:34 | big-organism-detached start organism stack x1000 reps 1+3 window 19800 | success | [38226902418](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38226902418) |
-| 2026-10-12 09:31 | big-organism-detached stop omni-detached-38196394948 | success | [38230259893](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38230259893) |
+| 2026-10-12 16:12 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized reps 11+62 arms native compass split no window 1440 | cancelled | [38269560979](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38269560979) |
+| 2026-10-12 16:12 | big-organism-detached stop omni-detached-38215293955 | success | [38275369568](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275369568) |
+| 2026-10-12 16:11 | big-organism-detached collect | failure | [38275112380](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275112380) |
+| 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226917314 | success | [38275386698](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275386698) |
+| 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226894511 | success | [38275377878](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275377878) |
+| 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226909980 | success | [38275426552](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275426552) |
+| 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226925699 | success | [38275403039](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275403039) |
+| 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226942200 | success | [38275418970](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275418970) |
+| 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226934488 | success | [38275410610](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275410610) |
+| 2026-10-12 16:11 | big-organism-detached stop omni-detached-38226902418 | success | [38275394760](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38275394760) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
