@@ -19,8 +19,11 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
   (additive; v3's arms are byte-unchanged, so v3's stored results stand). The checkout reads **omni-v5**
   (`tools/omni_version.py`, `OMNI_V5.json`); v1, v2 and v3 stay frozen for their results. While v5 is in development its
   fingerprint is re-declared on each engine change, and no v5 result is published until the freeze. Do-no-harm is proven
-  on every muscle by `tests/test_compass_arm_v5.py`: the levers that trade service or output for energy (power cap,
-  battery shave, generation setpoint) stay native in the no-harm default and move only on the Max/service dial.
+  on every muscle by `tests/test_compass_arm_v5.py`. Re-declared on 12 October: the blanket gates of the first v5 engine
+  (every generating unit's loop, every power cap, every inverter held native) are replaced by physics floors (the loop
+  reach, the cooling headroom's fall read ahead, the latency floor, the power cap only where a pool's line outlasts a
+  decision, a cloud pool's machine hand-back left to its autoscaler); the gate on generating units alone had thrown away
+  almost all of v5's saving (`docs/OMNI_V5.md`, the amendment).
 - **Stage 9 — DONE (first wave).** The v5 catalog `realms/catalog_v5.csv`: 1,002 muscles in 65 families (v3's 945 plus
   Linux Kernel & OS Control, Serverless & FaaS, Virtualization & Hypervisor, Content Delivery & Edge Cache, Gut, Skin). The
   official v5 table: `results/realms_v5/REALMS_V5.md`, all six organisms superior within guardrails, 0 of 1,002 worse.

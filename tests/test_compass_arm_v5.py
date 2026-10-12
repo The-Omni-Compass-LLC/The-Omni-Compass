@@ -63,13 +63,37 @@ def test_v5_tower_is_no_worse_than_native():
 
 
 def test_v5_default_config_present():
-    # the engine default is the proven no-harm configuration, and apply_v5 uses it
-    assert V5CFG.power_cap is False and V5CFG.storage_shave is False, "no-harm default must hold the tradeoff knobs native"
+    # the engine default is the no-harm configuration, and apply_v5 uses it: every process loop free under its own reach,
+    # the power cap only where a pool's response line outlasts a decision, the battery shave and a cloud pool's machine
+    # hand-back held native
+    assert V5CFG.loop_reach is True, "a process loop's setpoint must be held by its own reach"
+    assert V5CFG.storage_shave is False, "the battery shave trades round-trip energy for service: native in the default"
+    assert V5CFG.ca_release is False, "a cloud pool's machine hand-back is permanent: the autoscaler's own in the default"
     assert callable(apply_v5)
+
+
+def test_v5_power_cap_only_on_long_line_pools():
+    # a pool whose response line is shorter than one decision keeps its own power cap; a batch pool's cap may move
+    from realms.compass_arm_v5 import lever_v5
+    rows = {r["muscle_id"]: r for r in H.catalog(str(ROOT / "realms" / "catalog_v5.csv"))}
+    interactive = H.make_plant(rows["130"], SEED)          # gpu_power_limit: a 2 s line, 15 s decisions
+    batch = H.make_plant(rows["1070"], SEED)               # node_power_saving on a batch queue: a 300 s line
+    assert lever_v5(interactive, "power", V5CFG) is None, "an interactive pool's cap must stay native"
+    assert lever_v5(batch, "power", V5CFG) is not None, "a batch pool's cap is free under the drop and latency floors"
+
+
+def test_v5_every_generation_loop_is_free():
+    # no blanket gate: a generating unit's steam/speed/gate loop moves inside its band like any loop, held by its reach
+    from realms.compass_arm_v5 import lever_v5
+    rows = {r["muscle_id"]: r for r in H.catalog(str(ROOT / "realms" / "catalog_v5.csv"))}
+    turbine = H.make_plant(rows["2121"], SEED)             # boiler_steam_pressure_setpoint
+    assert lever_v5(turbine, "setpoint", V5CFG) is not None
 
 
 if __name__ == "__main__":
     test_v5_default_does_no_harm_to_any_muscle()
     test_v5_tower_is_no_worse_than_native()
     test_v5_default_config_present()
+    test_v5_power_cap_only_on_long_line_pools()
+    test_v5_every_generation_loop_is_free()
     print("test_compass_arm_v5: OK")

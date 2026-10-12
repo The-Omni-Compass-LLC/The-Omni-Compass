@@ -24,13 +24,28 @@ Two math-only guardrails, and otherwise free arms:
 
 - **The edge** — a per-knob cushion that widens at once when service climbs and narrows slowly when it falls
   (`cushion = climb × reaction + z × wobble`), so nothing riding its own limit falls off.
-- **The centre / the hole** — a machine is handed back only when what is left covers the recent peak, and a cooled zone is
-  eased only by the degrees its cooling can still recover, so nothing drops into a pit it cannot climb out of.
+- **The centre / the hole** — nothing is eased into a pit it cannot climb out of. A cooled zone is eased only by the
+  degrees its cooling can still recover (the Lindley reach), and not at all while its cooling headroom is falling toward
+  empty faster than the cooling can answer. A process loop's setpoint never sits closer to its band's edge than the
+  loop's own largest swing toward that edge (the loop reach, read from the historian's low and high over each decision,
+  carried ahead for a slow loop). A serving pool is never capped below the largest jump in demand it has shown (the drop
+  floor) nor so far that a burst would push its responses over the line where native's would not (the latency floor).
+  And nothing permanent: a machine handed back to a cloud is the cluster autoscaler's own decision, because the
+  autoscaler shrinks from wherever it is left, so an early hand-back would leave the pool a machine short of native for
+  good.
 
-Every other knob is free to move both ways inside its physical cover, and **a knob stays native wherever the law cannot
-improve it without harm.** In the no-harm default (`V5CFG`) the power cap, the battery peak-shave and a generation
-setpoint stay native — each trades service or output for energy, so each belongs to a **Max / service dial**, not the
-"nothing worse" default. The energy saving of a power cap is proven on the **metered GPU** (class P), never on the model.
+Every other knob is free to move both ways inside its physical cover, generating units included (a unit's steam,
+speed or gate loop eased inside its band serves the same load with less effort), and **a knob stays native only where its
+own physics says moving it cannot help without harm**: an interactive pool's power cap (its response line is shorter
+than one decision, so a cap's one decision of slower service cannot be seen and undone inside the line; the metered GPU,
+class P, is where that cap is proven), a battery's peak-shave (round-trip energy bought for service), and a cloud pool's
+machine hand-back. A batch queue's, a training job's or a terminal's power cap is free under the drop and latency floors.
+
+**Amendment, 12 October.** The first v5 table (commit `c0e80a852`, the whole tower +0.0%) ran an engine that held every
+generating unit's loop, every power cap and every inverter native by blanket gates. The gate on generating units alone
+threw away almost all of what v5 saves: on the tower, 1.09% with it off against 0.04% with it on, on development seeds.
+v5 was re-declared with the gates replaced by the physics floors above, developed on seeds 7100-7209 only, and the
+preregistered seeds 3000-3009 were run again unchanged.
 
 ## The no-harm proof (modelled, class S)
 

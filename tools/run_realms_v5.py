@@ -9,11 +9,13 @@
   python3 tools/run_realms_v5.py --seeds 0 1 --out /tmp/realms5-dev   # a look on development seeds (never reported)
   python3 tools/run_realms_v5.py --catalog realms/catalog.csv         # the v3 muscle set (945) on the v5 law, for comparison
 
-Every muscle alone, native against the v5 law (realms/compass_arm_v5.py, the engine's default V5CFG), then the five
-organisms. The v5 law carries the two math-only guardrails (the edge, the centre/hole) and holds a knob native wherever
-it cannot improve it without harm (the no-harm default: power caps, battery shave and generation setpoints stay native;
-those are a Max/service dial, and the metered GPU, class P, is where power is proven). Writes MUSCLES_V5.csv, REALMS_V5.json,
-REALMS_V5.md, RUN.json, SHA256SUMS.txt. Evidence class S (modelled). The preregistered seeds run only on committed code.
+Every muscle alone, native against the v5 law (realms/compass_arm_v5.py, the engine's default V5CFG), then the six
+organisms (the four realms, the four stacked with every shared muscle in each, the whole tower), each with native, the v5
+law and the v3 law (realms/compass_arm.py) on the same seeds, and every plant inside each organism checked for any work
+lost or any extra time over its line. The v5 law carries the two math-only guardrails (the edge, the centre/hole) and holds
+a knob native only where its own physics says moving it cannot help without harm (an interactive pool's power cap, a
+battery's shave, a cloud pool's machine hand-back). Writes MUSCLES_V5.csv, REALMS_V5.json, REALMS_V5.md, RUN.json,
+SHA256SUMS.txt. Evidence class S (modelled). The preregistered seeds run only on committed code.
 """
 import argparse, csv, hashlib, json, os, subprocess, sys, time
 from collections import Counter, defaultdict
@@ -29,13 +31,14 @@ except ImportError:
     from tools.legal import stamp as _legal_stamp  # pragma: no cover
 
 from realms.harness import (catalog, run_muscle_arm, run_organism_arm, paired, paired_organism, label, summarize,
-                            TOWER)
+                            TOWER, STACK)
 
 PREREG_SEEDS = list(range(3000, 3010))
 REALMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized"]
 NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
          "energy_facility_industrial": "Energy / Facility / Industrial",
-         "distribution_specialized": "Distribution / Specialized", TOWER: "The whole tower, every muscle once"}
+         "distribution_specialized": "Distribution / Specialized", STACK: "The four stacked, every shared muscle in each",
+         TOWER: "The whole tower, every muscle once"}
 LABELS = ["SUPERIOR WITHIN GUARDRAILS", "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF", "NONINFERIOR / INCONCLUSIVE",
           "NOT ESTABLISHED", "WORSE", "INVALID"]
 # the v5 law and the files it stands on; the engine fingerprint is tools/omni_version.py (OMNI_V5.json)
@@ -66,11 +69,25 @@ def muscle_job(args):
             "native_viol_share": sum(n["viol"] / n["steps"] for n in nat) / len(nat)}
 
 
+def plant_harms(arm, nat, ids):
+    """Every plant inside the organism that did less work than native or spent more decisions over its line."""
+    out = []
+    for i, (a, n) in enumerate(zip(arm["plants"], nat["plants"])):
+        dw = a["work"] / n["work"] - 1.0 if n["work"] > 0 else 0.0
+        dv = a["viol"] - n["viol"]
+        if dw < -1e-9 or dv > 0:
+            out.append([ids[i], dw, dv])
+    return out
+
+
 def organism_job(args):
     name, rows, seed = args
+    ids = [r["muscle_id"] for r in rows]
     nat = run_organism_arm(rows, seed, "native")
     v5 = run_organism_arm(rows, seed, "v5")
-    return name, seed, {"native": nat, "v5": v5, "restore_ok": v5["restore_ok"]}
+    v3 = run_organism_arm(rows, seed, "compass")
+    return name, seed, {"v5": paired_organism(v5, nat), "v3": paired_organism(v3, nat), "restore_ok": v5["restore_ok"],
+                        "harms_v5": plant_harms(v5, nat, ids), "harms_v3": plant_harms(v3, nat, ids)}
 
 
 def fmt(m, scale=100.0, unit="%"):
@@ -90,23 +107,53 @@ def write_md(out, res, orgs, run):
     w("The v5 law carries two math-only guardrails: the **edge** (a per-knob cushion from how fast service has climbed "
       "and how far it wobbles, so nothing riding its limit falls off) and the **centre/hole** (a machine or a cooled zone "
       "is eased only while it can still climb back). Otherwise every knob is free, and a knob stays native wherever the "
-      "law cannot improve it without harm. In this no-harm default the power cap, the battery shave and the generation "
-      "setpoint stay native (they trade service or output for energy); they are a Max/service dial, and power is proven on "
-      "the metered GPU (class P), not here.")
+      "law cannot improve it without harm. Every process loop moves inside its band, generating units included, but never "
+      "closer to its band's edge than its own largest swing toward that edge (the loop reach); a cooled zone never warmer "
+      "than its cooling can recover, nor while its cooling headroom is falling toward empty; a power cap only on a pool whose "
+      "response line outlasts one decision (an interactive pool's cap is proven on the metered GPU, class P, not here), never "
+      "below the largest jump in demand nor past the line; the battery shave and a cloud pool's machine hand-back held native "
+      "(round-trip energy bought for service; a hand-back the autoscaler never undoes).")
+    w("")
+    w("Amendment (12 Oct): this table replaces the first v5 table (commit `c0e80a852`, the whole tower +0.0%). That engine "
+      "held every generating unit's loop, every power cap and every inverter native by blanket gates, which threw away "
+      "most of what v5 saves. v5 was re-declared with those gates replaced by physics floors (the loop reach, the cooling "
+      "headroom's fall read ahead, the latency floor, the power cap only where a pool's line outlasts a decision, a cloud "
+      "pool's machine hand-back left to its autoscaler), developed on seeds 7100-7209 only; the preregistered seeds "
+      "3000-3009 are run again unchanged.")
     w("")
     w("Primary outcome: work per energy, v5 against native, with its 95% interval over seeds. Guardrails: work not lower "
       "by more than 1%, share of periods in violation not higher by more than 1 percentage point. Labels by rule. These "
       "are models; a model's energy is not a meter's, and a plant written by the same people who wrote the law is not an "
       "independent test. What a row shows is whether the v5 law, applied to that knob, helps or hurts the model.")
     w("")
-    w("## The five organisms")
+    w("## The six organisms")
     w("")
-    w("| Organism | Muscles | Label | Work per energy | Work | Energy | Violations (pp) | Valid |")
-    w("|---|---:|---|---:|---:|---:|---:|---|")
-    for name in [n for n in REALMS + [TOWER] if n in orgs]:
-        o = orgs[name]; s = o["summary"]
+    w("Native, the v5 law and the v3 law on the same seeds. Energy saved is native's energy minus the arm's, as a share of "
+      "native's (95% interval over seeds); times v3 is v5's saving over v3's.")
+    w("")
+    w("| Organism | Muscles | Label | Work per energy | Work | Energy saved, v5 | Energy saved, v3 | Times v3 | "
+      "Violations (pp) | Valid |")
+    w("|---|---:|---|---:|---:|---:|---:|---:|---:|---|")
+    for name in [n for n in REALMS + [STACK, TOWER] if n in orgs]:
+        o = orgs[name]; s = o["summary"]; s3 = o["v3"]["summary"]
+        e5, e3 = -s["energy"][0], -s3["energy"][0]
+        saved = lambda m: f"{-m[0] * 100:.2f}% ({-m[2] * 100:.2f} to {-m[1] * 100:.2f})"
+        times = f"{e5 / e3:.1f}x" if e3 > 0 else "n/a"
         w(f"| {NAMES[name]} | {o['n']} | **{o['label']}** | {fmt(s['primary'])} | {fmt(s['work'])} | "
-          f"{fmt(s['energy'])} | {fmt(s['viol_pp'], 1.0, '')} | {'yes' if o['valid'] else 'NO'} |")
+          f"{saved(s['energy'])} | {saved(s3['energy'])} | {times} | {fmt(s['viol_pp'], 1.0, '')} | "
+          f"{'yes' if o['valid'] else 'NO'} |")
+    w("")
+    w("## Inside the organisms: every plant that did worse than native")
+    w("")
+    w("A stricter look than the organism's total: every plant inside each organism, over all seeds, that did less work "
+      "than native or spent more decisions over its own line, for v5 and for v3. Reported whatever it shows.")
+    w("")
+    w("| Organism | Plants | Plants worse, v5 | Plants worse, v3 | The v5 plants (work change, extra decisions over the line, all seeds) |")
+    w("|---|---:|---:|---:|---|")
+    for name in [n for n in REALMS + [STACK, TOWER] if n in orgs]:
+        o = orgs[name]; h5, h3 = o["plants_worse"]["v5"], o["plants_worse"]["v3"]
+        lst = "; ".join(f"{mid} ({v[0] * 100:+.3f}%, {v[1]:+d})" for mid, v in sorted(h5.items(), key=lambda kv: kv[1][0])) or "none"
+        w(f"| {NAMES[name]} | {o['n']} | {len(h5)} | {len(h3)} | {lst} |")
     w("")
     w("## Every muscle alone, by home realm")
     w("")
@@ -177,6 +224,7 @@ def main(argv=None):
         res = list(ex.map(muscle_job, [(r, a.seeds) for r in rows], chunksize=4))
         print(f"muscles: {len(res)} in {time.time() - t0:.0f} s", flush=True)
         groups = {realm: [r for r in rows if realm in r["realms"].split(";")] for realm in REALMS}
+        groups[STACK] = [dict(r, muscle_id=f"{r['muscle_id']}@{realm}") for realm in REALMS for r in groups[realm]]
         groups[TOWER] = rows
         jobs = [(name, rs, s) for name, rs in groups.items() if rs for s in a.seeds]
         raw = defaultdict(dict)
@@ -187,9 +235,20 @@ def main(argv=None):
     for name, by_seed in raw.items():
         runs = [by_seed[s] for s in a.seeds]
         valid = all(o["restore_ok"] for o in runs)
-        per = [paired_organism(o["v5"], o["native"]) for o in runs]
+        per = [o["v5"] for o in runs]
+        per3 = [o["v3"] for o in runs]
+        harms = {}
+        for arm in ("v5", "v3"):
+            agg = defaultdict(lambda: [0.0, 0, 0])
+            for o in runs:
+                for mid, dw, dv in o["harms_" + arm]:
+                    agg[mid][0] += dw / len(runs)
+                    agg[mid][1] += dv
+                    agg[mid][2] += 1
+            harms[arm] = {mid: v for mid, v in agg.items() if v[0] < -1e-9 or v[1] > 0}
         orgs[name] = {"n": len(groups[name]), "valid": valid, "label": label(per, valid), "summary": summarize(per),
-                      "per_seed": per}
+                      "per_seed": per, "v3": {"label": label(per3, True), "summary": summarize(per3), "per_seed": per3},
+                      "plants_worse": harms}
     run["elapsed_s"] = round(time.time() - t0)
     with (out / "MUSCLES_V5.csv").open("w", newline="") as f:
         cols = ["muscle_id", "family", "muscle", "realm", "template", "preset", "knob", "label", "primary", "primary_lo",

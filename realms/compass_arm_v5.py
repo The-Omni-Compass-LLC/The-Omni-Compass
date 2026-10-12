@@ -16,15 +16,15 @@
 #                             takes to act) + z x wobble (the service's own spread lately)
 #                 widened at once when the need rises, narrowed slowly when it falls; past 1 - climb x reaction the
 #                 law fails up at once (the wall moves with the cushion too)
-#   the hole      a machine is handed back only when what is left covers the recent peak (release_safe), so the plant
-#                 can always climb back out
+#   the hole      nothing is eased into a pit it cannot climb out of: a cooled zone never warmer than its cooling can
+#                 recover (the Lindley reach), a process loop's setpoint never closer to its band's edge than the loop's
+#                 own largest swing toward that edge (the loop reach), a serving pool never capped below the largest jump
+#                 in demand it has shown; and nothing permanent: a machine handed back to a cloud is the cluster
+#                 autoscaler's own decision (it shrinks from wherever it is left, so an early hand-back would leave the
+#                 pool a machine short of native for good)
 from __future__ import annotations
 
 import math
-
-# Generation process loops: their work IS their output at the setpoint, so easing the setpoint curtails it. The no-harm
-# default holds these native (the energy edge only ever eases a setpoint, which would cut a generator's output).
-GEN_PRESETS = {"inverter", "turbine"}
 
 from omnicompass.compass_law import Band, CompassLaw
 from .compass_arm import (UP, DOWN, RELEASE, clamp, position, release_safe, capping_saves, effort_cap_saves,
@@ -36,13 +36,18 @@ class Cfg:
                  memory=0.0, target_free=True, est=1, snap=True, learn_fall=0.0, fall_decay=0.9995, hybrid=False,
                  base_center=0.5, base_wall=0.95, headroom=False, physics_memory=False, motion_safe=False,
                  motion_q=0.999, burst_window=20, hole_guard=False, drop_guard=False, jump0=1.0, band=False,
-                 hole_floor=True, precool=False, storage_shave=False, power_cap=False):
+                 hole_floor=True, precool=False, storage_shave=False, power_cap=False, loop_reach=False,
+                 ca_release=False):
+        self.loop_reach = loop_reach          # a process loop's setpoint never closer to its band's calm-side edge than the
+                                              # loop's own largest swing toward that edge leaves room for (loop_clamp)
+        self.ca_release = ca_release          # a machine pool under a cluster autoscaler: Omni may hand a machine back
+                                              # (off in the default: the autoscaler shrinks from wherever it is left, so an
+                                              # early hand-back is permanent; the reflex rule: nothing permanent)
         self.storage_shave = storage_shave    # battery peak-shaving (discharge to hold an import limit) costs round-trip
                                               # energy, so it is a service<->energy tradeoff, off in the no-harm default;
                                               # a service/Max dial turns it on. Off: the storage setpoint stays native.
-        self.power_cap = power_cap            # a power cap on a serving pool trades latency for energy on a spike (it cannot
-                                              # guarantee no miss), so off in the no-harm default; the real energy proof for
-                                              # power is the metered GPU (class P), and a Max/service dial turns it on.
+        self.power_cap = power_cap            # a power cap on a serving pool whose response line is longer than one decision
+                                              # (lever_v5); an interactive pool's cap stays native either way
         self.hole_floor = hole_floor          # the hole guard never below the earlier law's balance point (hybrid)
         self.precool = precool                # a cooled zone may also sit warm while its headroom can pull it back in time
         self.band = band                      # a process loop's margin read against its band's edge, not its setpoint
@@ -99,9 +104,14 @@ def lever_v5(plant, knob, cfg):
         return None
     if t == "compute_pool":
         if knob == "power":
-            return ("power", 1.0, 0.4, 1.0, 1) if (cfg.power_cap and capping_saves(plant)) else None
+            # a pool whose response line is shorter than one decision (an interactive GPU or CPU, a radio, a switch) cannot
+            # have a cap's one decision of slower service seen and undone inside its line, so its cap stays native (the
+            # metered GPU, class P, is where an interactive cap is proven); a pool whose line is longer than a decision
+            # (a batch queue, a training job, a terminal's moves) absorbs it, held by the drop and latency floors
+            ok = cfg.power_cap and capping_saves(plant) and P["slo_s"] >= P["dt"]
+            return ("power", 1.0, 0.4, 1.0, 1) if ok else None
         if P.get("ca"):
-            return ("release", None, 0, 0, 0)
+            return ("release", None, 0, 0, 0) if cfg.ca_release else None
         # the autoscaler's target, free both ways: lower is more machines, higher is fewer, never past target_hi
         if not cfg.target_free:
             return None
@@ -122,11 +132,6 @@ def lever_v5(plant, knob, cfg):
         return ("capacity", 1.0, 0.4, 1.0, 1) if speed_slack(plant) else None
     if t == "process_loop":
         if knob == "setpoint":
-            # a generation loop (a renewable inverter, a power turbine) makes its output at its setpoint; easing the
-            # setpoint toward the band's calm end curtails that output (work lost), so it stays native in the no-harm
-            # default. A consumption/control loop eases to save effort at the same service: it may move.
-            if getattr(plant, "preset", "") in GEN_PRESETS:
-                return None
             lo, hi = min(P["sp"], P["calm"]), max(P["sp"], P["calm"])
             return ("setpoint", P["sp"], lo, hi, 1 if P["sp"] > P["calm"] else -1)
         if knob == "power":
@@ -368,6 +373,36 @@ def drop_floor(plant, cfg) -> float:
     return min(surplus, burst)
 
 
+def latency_floor(plant, cfg) -> float:
+    """The lowest power cap that keeps a serving pool's response time inside its line through a burst whenever native's
+    would stay inside it (read after drop_floor, which keeps the pool's arrival history and its largest jump). A cap acts
+    until the next decision: if the burst (the latest arrivals after the largest jump this pool has shown) outruns the
+    capped capacity, the work the cap held back waits behind everything native itself would queue until its new machines
+    start (startup_steps), and every request is served a little slower. At most, one capped decision leaves behind all the
+    capacity it took away, whatever the burst. The cap is allowed only while that extra wait fits in the room native's own
+    worst response time in the burst leaves under the line; where native itself would be late, nothing is capped."""
+    P = plant.P
+    hist = getattr(plant, "_v5_lam", None)
+    if not hist or plant.drop_share > 0.0:
+        return 1.0
+    dt, n, S, slo = P["dt"], max(plant.n, 1), max(1, int(P["startup_steps"])), P["slo_s"]
+    mu1 = plant.mu(1.0)
+    lam_b = hist[-1] * (1.0 + plant._v5_jump)
+    grow = max(0.0, lam_b * dt - n * mu1 * dt)                       # native's own queue growth per decision in the burst
+    room = slo - ((plant.Q + plant.H + grow * S) / (n * mu1) + 1.0 / mu1)
+    if room <= 0.0:
+        return 1.0
+    c = 0.4
+    while c < 1.0:
+        mu_c = plant.mu(c)
+        held = n * (mu1 - mu_c) * dt                                  # the most one capped decision can leave behind:
+                                                                       # all the capacity it took away (any burst)
+        if held / (n * mu1) + (1.0 / mu_c - 1.0 / mu1) <= room:
+            return c
+        c = min(1.0, c + 0.02)
+    return 1.0
+
+
 # How far a wandering load runs over its line: the 99.9% quantile, over one hour of decisions, of the deepest excursion
 # R = max(0, R - (k + x)) of a load whose spare capacity wanders as a standardized AR(phi) process x with mean k spreads
 # (Lindley's recursion: the spare capacity pulls the excursion back, its shortfall pushes it on). In spreads x decisions.
@@ -436,8 +471,21 @@ def cooling_hole_ceiling(plant, cfg, native: float) -> float:
     st["c"] = (1.0 - a) * st["c"] + a * (h - st["m"]) * (st["last"] - st["m"])     # lag-one covariance
     st["dv"] = (1.0 - a) * st["dv"] + a * d * d
     st["last"] = h
+    hh = st.setdefault("hh", [])                                    # the headroom's recent readings, for its trend
+    hh.append(h)
+    if len(hh) > cfg.window:
+        hh.pop(0)
     if h > 0.0:
         st["track"] = max(st["track"], plant.T - plant.setpoint())  # the loop's own overshoot while it had headroom
+    if len(hh) > 1:
+        # the headroom read ahead: falling at its present rate (the steeper of the fall over the window and over the
+        # cooling's own answer time), would it run out before the cooling could pull the zone back? Then the zone goes
+        # into that hole at the operator's own temperature, never warmer: the setpoint is native until the fall stops
+        react = reaction_steps(plant)
+        r = max(1, min(len(hh) - 1, int(math.ceil(react))))
+        fall = max(0.0, (hh[0] - hh[-1]) / (len(hh) - 1), (hh[-1 - r] - hh[-1]) / r)
+        if h - fall * react <= 0.0:
+            return native
     hi = max(P["stress"], P["calm"])
     # never behind what came before: the earlier law's own balance point (the zone held at the middle of its band) stays
     # allowed from the first decision; only the degrees beyond it must be proven by the reach
@@ -487,6 +535,62 @@ def band_position(plant) -> float:
     to the edge shrinks; this is the margin itself."""
     P = plant.P
     return plant.dev + abs(plant.setpoint() - P["mid"]) / P["half"]
+
+
+def loop_reach(plant, cfg, calm_low: bool):
+    """How far this loop's disturbance pushes it off its setpoint toward the band's calm-side edge, in half-bands, from
+    everything the brain has seen (the historian's low, or high, over each decision: a swing toward the band's middle
+    cannot take the loop out, so it is not counted). The larger of the deepest such swing seen and its mean plus z
+    spreads, the spread never below what the step-to-step swing implies over the swing's own correlation time (the reading
+    the cooling hole guard uses). A loop slower than one decision is also read ahead: its swing now, carried on at its
+    present climb (the steeper of the climb over the window and over the loop's own answer time) for as long as the loop
+    takes to answer once its setpoint goes back. None until the brain has a window of readings."""
+    d = plant.dev_dn if calm_low else plant.dev_up
+    st = getattr(plant, "_v5_ls", None)
+    if st is None:
+        st = plant._v5_ls = {"n": 0, "m": d, "v": 0.0, "dv": 0.0, "last": d, "c": 0.0, "peak": 0.0, "h": []}
+    st["n"] += 1
+    n = st["n"]
+    a = 1.0 / n                                                     # every reading kept: the whole memory
+    dd = d - st["last"]
+    dm = d - st["m"]
+    st["m"] += a * dm
+    st["v"] = (1.0 - a) * (st["v"] + a * dm * dm)
+    st["c"] = (1.0 - a) * st["c"] + a * (d - st["m"]) * (st["last"] - st["m"])     # lag-one covariance
+    st["dv"] = (1.0 - a) * st["dv"] + a * dd * dd
+    st["last"] = d
+    st["peak"] = max(st["peak"], d)
+    h = st["h"]
+    h.append(d)
+    if len(h) > cfg.window:
+        h.pop(0)
+    if n < cfg.window:
+        return None
+    phi = clamp(st["c"] / st["v"], 0.0, 0.999) if st["v"] > 1e-12 else 0.0
+    tc = max(float(cfg.window), 1.0 / (1.0 - phi))                   # the swing's correlation time, in decisions
+    sd = max(math.sqrt(st["v"]), math.sqrt(st["dv"]) * math.sqrt(tc / 2.0), 1e-9)
+    reach = max(st["peak"], st["m"] + cfg.z * sd)
+    P = plant.P
+    answer = (P.get("tau", 0.0) + P.get("theta", 0.0)) / P["dt"]       # decisions the loop takes to answer its setpoint
+    if answer > 1.0:
+        r = max(1, min(len(h) - 1, int(math.ceil(answer))))
+        climb = max(0.0, (h[-1] - h[0]) / (len(h) - 1), (h[-1] - h[-1 - r]) / r)
+        reach = max(reach, d + climb * answer)
+    return reach
+
+
+def loop_clamp(plant, cfg, x: float, native: float) -> float:
+    """The setpoint never sits closer to its band's calm-side edge than the loop's own reach leaves room for: at most
+    (1 - reach) half-bands from the band's middle, and native once that room is gone. Before the brain has a window of
+    readings the band reading alone holds the loop (the earlier law's own behaviour, as the hole guard allows)."""
+    P = plant.P
+    reach = loop_reach(plant, cfg, P["calm"] < P["mid"])
+    if reach is None:
+        return x
+    room = (1.0 - reach) * P["half"]
+    if room <= abs(native - P["mid"]):
+        return native
+    return clamp(x, P["mid"] - room, P["mid"] + room)
 
 
 def raw_position(plant) -> float:
@@ -595,25 +699,32 @@ def compass_apply_v5(plant, knob, cfg, dt=1.0, tau=3.0):
             # the energy edge: away from the wall nothing is spent beyond native (native is always free)
             x = min(x, native) if sign > 0 else max(x, native)
     if cfg.drop_guard and plant.template == "compute_pool" and key == "power":
-        x = max(x, drop_floor(plant, cfg))
+        x = max(x, drop_floor(plant, cfg))                             # no request turned away (keeps the history)
+        x = max(x, latency_floor(plant, cfg))                          # no response pushed over the line
     if cfg.hole_guard and plant.template == "thermal_zone" and key == "setpoint":
         x = min(x, cooling_hole_ceiling(plant, cfg, native))
     if cfg.motion_safe and plant.template == "motion_axis":
         # the edge read from the axis's own physics, at once: never slower than its queue and the next decision's burst
         # allow, never weaker than its next move needs
         x = max(x, safe_speed(plant, cfg, lo) if key == "capacity" else effort_floor(plant))
+    if cfg.loop_reach and plant.template == "process_loop" and key == "setpoint":
+        x = loop_clamp(plant, cfg, x, native)
     plant._v5_x = x
     plant.override = {} if abs(x - native) < 1e-9 else {key: x}
     return plant.override
 
 
-# The engine's default v5 configuration: the proven no-harm setting (every muscle equal or better than native on the
-# modelled organism, all six, twelve seeds). target_free both ways on the autoscaler; the step-to-step estimator; a fall
-# while Omni held back raises that plant's cushion floor; the hybrid never behind the earlier law; each plant remembers its
-# own physics; motion speed/effort never below what the axis needs; a process loop read against its band's edge; a
-# request-pool never capped below the largest demand jump; a cooled zone never warmer than its cooling can recover.
+# The engine's default v5 configuration: the no-harm setting (every muscle equal or better than native on the modelled
+# plants). The autoscaler's target held at the operator's; the step-to-step estimator; a fall while Omni held back raises
+# that plant's cushion floor; the hybrid never behind the earlier law; each plant remembers its own physics; motion speed
+# and effort never below what the axis needs; a process loop read against its band's edge, its setpoint never closer to
+# that edge than its own largest swing (every loop free, generators included: a generating unit's steam, speed or gate loop
+# eased inside its band serves the same load); a request pool never capped below the largest demand jump; a cooled zone
+# never warmer than its cooling can recover; a power cap only on a pool whose response line outlasts a decision, never
+# below the largest demand jump or past the line; the battery shave (round-trip energy for service) and a cloud machine
+# pool's hand-back held native.
 V5CFG = Cfg(target_free=False, est=2, learn_fall=0.1, hybrid=True, physics_memory=True, motion_safe=True, band=True,
-            drop_guard=True, hole_guard=True)
+            drop_guard=True, hole_guard=True, loop_reach=True, power_cap=True)
 
 
 def apply_v5(plant, knob):

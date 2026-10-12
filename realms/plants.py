@@ -744,6 +744,8 @@ class ProcessLoop(Plant):
         self.s = 1.0
         self.umax_eff = P["u_max"]
         self.u_avg, self.dev, self.drift = (P["sp"] + P["d_mean"]) / P["K"], 0.0, 0.0
+        self.dev_dn = self.dev_up = 0.0     # the historian's low and high over the decision: how far below and above its
+                                            # setpoint the loop went, in half-bands (read by the v5 law; native never reads it)
         self.nominal_w = P["p_max_w"] * (((P["sp"] + P["d_mean"]) / P["K"]) / P["u_max"]) ** P["aff"]
 
     def setpoint(self):
@@ -782,7 +784,7 @@ class ProcessLoop(Plant):
         umax = self.umax_eff = P["u_max"] * self.s * self.override.get("power", 1.0) ** (1.0 / P["aff"])
         frac = 0.9 if self.override.get("admission", 1.0) < 0.5 else 1.0
         dk = self.d[k] * frac
-        e = u_sum = dev = 0.0
+        e = u_sum = dev = dn = up = 0.0
         out = False
         for _ in range(sub):
             err = sp - self.y
@@ -797,6 +799,8 @@ class ProcessLoop(Plant):
             u_sum += u
             dv = abs(self.y - P["mid"]) / P["half"]
             dev = max(dev, abs(self.y - sp) / P["half"])
+            dn = max(dn, (sp - self.y) / P["half"])
+            up = max(up, (self.y - sp) / P["half"])
             if dv > 1.0:
                 out = True
             else:
@@ -806,6 +810,7 @@ class ProcessLoop(Plant):
         self.record(out)
         self.power_w = e / P["dt"]
         self.u_avg, self.dev = u_sum / sub, dev
+        self.dev_dn, self.dev_up = dn, up
         self.drift = abs(self.d[k] - self.d[k - 1]) / max(P["d_mean"], 1e-9) if k else 0.0
         self.k += 1
 

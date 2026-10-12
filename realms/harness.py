@@ -80,7 +80,6 @@ def seed_for(muscle_id: str, seed: int) -> int:
 def make_plant(row, seed, organism=False):
     steps = ORGANISM_STEPS if organism else STEPS_SINGLE[row["template"]]
     p = TEMPLATES[row["template"]](params_for(row, organism), seed_for(row["muscle_id"], seed), steps)
-    p.preset = row["preset"]                  # the plant's preset (the v5 law reads it to hold generation loops native)
     if row["template"] == "compute_pool" and not organism:
         p.budget_w = 1.25 * native_mean_power(row)
     return p
