@@ -159,5 +159,40 @@ class Conductor(unittest.TestCase):
         self.assertEqual(len({f"{c['rep']}{c['tag']}" for c in cells}), 4)        # one artifact name per arm
 
 
+class RentedMachines(unittest.TestCase):
+    """The biggest squares on rented machines: never two machines on one repetition, none past the cap before the first
+    times are read back, and the budget counts every machine started."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+        import dispatch_grid
+        cls.g = dispatch_grid
+
+    def test_batches_do_not_overlap_and_respect_the_cap(self):
+        g = self.g
+        for cap in (10, 0):
+            seen = {}
+            for b in g.azure_next({}, cap=cap):
+                r = set(range(b["rep_first"], b["rep_first"] + b["reps"]))
+                s = seen.setdefault(b["square"], set())
+                self.assertFalse(s & r)
+                s.update(r)
+                self.assertLessEqual(b["reps"], g.AZURE[b["square"]]["per"])
+            for sq, s in seen.items():
+                self.assertEqual(len(s), cap or 1000, sq)
+
+    def test_started_machines_read_back_and_counted_in_the_budget(self):
+        g = self.g
+        first = g.azure_next({}, cap=10)[:3]
+        runs = [{"display_title": b["title"], "conclusion": "success", "status": "completed", "created_at": "2026-10-12T09:00:00Z"}
+                for b in first]
+        cov, failing = g.azure_coverage(runs, {"dispatches": []})
+        self.assertFalse(failing)
+        self.assertAlmostEqual(g.azure_spent(cov), sum(b["usd"] for b in first), delta=0.05)
+        again = {b["title"] for b in g.azure_next(cov, cap=10)}
+        self.assertFalse(again & {b["title"] for b in first})
+
+
 if __name__ == "__main__":
     unittest.main()

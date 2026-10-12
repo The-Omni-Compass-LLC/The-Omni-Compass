@@ -28,6 +28,7 @@ Where a square cannot run on GitHub at all, it says where it runs instead (NOT_H
 from __future__ import annotations
 
 import argparse
+import calendar
 import contextlib
 import json
 import math
@@ -333,6 +334,98 @@ def dispatch(d, ref):
     api(f"repos/{REPO}/actions/workflows/{wf}/dispatches", method="POST", data={"ref": ref, "inputs": inputs})
 
 
+# ------------------------------------------------------------------------------------------------- rented machines
+# The squares too big for a GitHub machine run on rented Azure machines (big-organism-detached), each machine a batch of
+# repetitions (runs, for the modelled tower) one after another: the machine asked for (the start job falls back through
+# the sizes it may rent), machine-hours per repetition and list price (eastus, Linux, pay as you go), and the window that
+# keeps the organism's clock with the cluster inside (the max steps the tower at 1,000 copies in about 33 s, the four
+# stacked in about 60 s, on Azure's v7 machines). Machines are started up to the number the quota holds and never past
+# the budget the founder set; the estimate of every machine started counts against it.
+AZURE = {("kube", 1000, "tower"): {"test": "organism", "org": "tower", "per": 4, "window": 10800, "vm": "Standard_D8as_v7",
+                                   "run_h": 8.5, "workers": 1, "cal_h": 0.0, "usd_h": 0.45},
+         ("kube", 1000, "stack"): {"test": "organism", "org": "stack", "per": 3, "window": 19800, "vm": "Standard_E8as_v7",
+                                   "run_h": 14.0, "workers": 1, "cal_h": 0.0, "usd_h": 0.52},
+         ("six", 1000, "6"): {"test": "scale", "org": "6", "per": 24, "window": 0, "vm": "Standard_E8as_v7", "run_h": 3.6,
+                              "workers": 3, "cal_h": 1.0, "usd_h": 0.52}}
+
+
+def azure_hours(sq, reps):
+    """A machine's hours for a batch: its calibration, then its repetitions, as many at once as it has workers."""
+    a = AZURE[sq]
+    return a["cal_h"] + math.ceil(reps / a["workers"]) * a["run_h"]
+AZURE_NAME = re.compile(r"^big-organism-detached start (\w+) (\w+) x(\d+) reps (\d+)\+(\d+) window (\d+)$")
+BUDGET_USD = 5000                  # the founder's figure for the big squares on rented machines (12 Oct)
+AZURE_CAP = 10                     # repetitions per square started before the first ones' own times are read back
+
+
+def azure_runs():
+    d = api(f"repos/{REPO}/actions/workflows/big-organism-detached.yml/runs?per_page=100&created=>={SINCE}")
+    return d.get("workflow_runs", [])
+
+
+def azure_coverage(runs, manifest):
+    """{square: set of repetitions (runs) started on a rented machine}, and the squares whose last start failed within
+    two hours (no machine of that kind to be had right now: tried again later)."""
+    cov, failing = {}, set()
+    by = {(a["test"], a["org"]): k for k, a in AZURE.items()}
+    for d in manifest.get("dispatches", []):
+        if d["grid"] == "azure" and d.get("status") == "kept":
+            cov.setdefault(tuple(d["square"]), set()).update(range(d["rep_first"], d["rep_first"] + d["reps"]))
+    now = time.time()
+    for r in runs:
+        m = AZURE_NAME.match(r.get("display_title") or "")
+        if not m or (m.group(1), m.group(2)) not in by:
+            continue
+        sq, r0, n = by[(m.group(1), m.group(2))], int(m.group(4)), int(m.group(5))
+        if r.get("conclusion") in (None, "success"):        # rented, or being rented
+            cov.setdefault(sq, set()).update(range(r0, r0 + n))
+        elif r.get("conclusion") == "failure":
+            t = calendar.timegm(time.strptime(r["created_at"], "%Y-%m-%dT%H:%M:%SZ"))
+            if now - t < 2 * 3600:
+                failing.add(sq)
+    return cov, failing
+
+
+def azure_spent(cov):
+    """The estimated bill of every machine started: its hours at list price (whole batches of the square's size)."""
+    tot = 0.0
+    for k, v in cov.items():
+        if k in AZURE and v:
+            full, rest = divmod(len(v), AZURE[k]["per"])
+            tot += (full * azure_hours(k, AZURE[k]["per"]) + (azure_hours(k, rest) if rest else 0.0)) * AZURE[k]["usd_h"]
+    return tot
+
+
+def azure_next(cov, cap=AZURE_CAP):
+    """Machine batches still to start, tier by tier (10, 100, 1,000), the squares in turn within a tier, none past the
+    cap until the first repetitions' own times are read back."""
+    out, cov = [], {k: set(v) for k, v in cov.items()}
+    for tier in sorted({min(t, cap or RUNS) for t in TIERS}):
+        pending = True
+        while pending:
+            pending = False
+            for sq, a in AZURE.items():
+                lo = 0 if sq[0] == "six" else 1
+                todo = gaps(cov.get(sq, set()), lo, lo + tier)
+                if not todo:
+                    continue
+                r0, n = todo[0][0], min(a["per"], todo[0][1])
+                out.append({"square": sq, "rep_first": r0, "reps": n, "usd": round(azure_hours(sq, n) * a["usd_h"], 2),
+                            "title": f"big-organism-detached start {a['test']} {a['org']} x{sq[1]} reps {r0}+{n} window {a['window']}"})
+                cov.setdefault(sq, set()).update(range(r0, r0 + n))
+                pending = True
+    return out
+
+
+def azure_start(b, ref):
+    a = AZURE[b["square"]]
+    hours = azure_hours(b["square"], b["reps"])
+    inputs = {"mode": "start", "test": a["test"], "organisms": a["org"], "size": str(b["square"][1]), "reps": str(b["reps"]),
+              "rep_first": str(b["rep_first"]), "duration_s": str(a["window"]), "vm_size": a["vm"], "location": "eastus",
+              "max_hours": str(int(hours * 1.3 + 6))}
+    api(f"repos/{REPO}/actions/workflows/big-organism-detached.yml/dispatches", method="POST", data={"ref": ref, "inputs": inputs})
+
+
 def squares(cov):
     """The 96 squares by organism and size: runs started of 1,000 (modelled; with the cluster inside)."""
     rows = []
@@ -380,7 +473,52 @@ def main(argv=None):
     k.add_argument("--sizes", required=True); k.add_argument("--organisms", default=",".join(KUBE))
     k.add_argument("--reps", required=True); k.add_argument("--rep-first", type=int, default=1)
     k.add_argument("--durations", required=True); k.add_argument("--split", default="no")
+    z = sub.add_parser("azure-tick", help="the biggest squares on rented machines, within the quota and the budget")
+    z.add_argument("--ref", default=os.environ.get("GITHUB_REF_NAME", "main"))
+    z.add_argument("--machines-now", type=int, required=True, help="rented machines standing now (az group list)")
+    z.add_argument("--max-machines", type=int, default=6, help="machines the quota holds at once")
+    z.add_argument("--budget", type=float, default=BUDGET_USD)
+    z.add_argument("--dry", action="store_true")
     a = ap.parse_args(argv)
+
+    if a.what == "azure-tick":
+        manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {"dispatches": []}
+        zr = azure_runs()
+        cov, failing = azure_coverage(zr, manifest)
+        spent, started, why = azure_spent(cov), [], "every batch is started"
+        # a start still waiting for a runner has no machine yet: it counts as one, so the quota is never asked twice
+        waiting = sum(1 for r in zr if r.get("status") in ("queued", "waiting", "pending", "requested")
+                      and AZURE_NAME.match(r.get("display_title") or ""))
+        if engine() != ENGINE:
+            why = f"this checkout is not {ENGINE}"
+        else:
+            now = a.machines_now + waiting
+            for b in azure_next(cov):
+                if b["square"] in failing:
+                    continue
+                if now >= a.max_machines:
+                    why = f"the quota's {a.max_machines} machines are all running"; break
+                if spent + b["usd"] > a.budget:
+                    why = f"the budget: ${spent:,.0f} of ${a.budget:,.0f} committed, the next machine would pass it"; break
+                if not a.dry:
+                    azure_start(b, a.ref); time.sleep(3)
+                started.append(b); spent += b["usd"]; now += 1
+        summary = os.environ.get("GITHUB_STEP_SUMMARY")
+        with (open(summary, "a") if summary else contextlib.nullcontext(sys.stdout)) as out:
+            print("## The biggest squares on rented machines" + (" (dry run)" if a.dry else ""), file=out)
+            print("", file=out)
+            for sq, al in AZURE.items():
+                n = len({x for x in cov.get(sq, ()) if (x >= 1 if sq[0] == "kube" else x >= 0)})
+                print(f"- {'with the cluster inside' if sq[0] == 'kube' else 'modelled'}, {al['org']} at {sq[1]:,} copies: "
+                      f"{n:,} of 1,000 started" + (" (its last start found no machine; tried again later)" if sq in failing else ""), file=out)
+            print(f"\nStarted now: {len(started)} machines; estimated bill of every machine started ${spent:,.0f} of the "
+                  f"${a.budget:,.0f} budget; stopped because {why}.", file=out)
+            for b in started:
+                print(f"- {b['title']} (about ${b['usd']:,.0f})", file=out)
+        for b in started:
+            print(f"started: {b['title']} (about ${b['usd']:,.0f})")
+        print(f"estimated bill committed ${spent:,.0f} of ${a.budget:,.0f}; {why}")
+        return 0
 
     if a.what == "matrix":
         js = lambda s: json.loads(s) if s.strip().startswith("{") else ({} if not s.strip() else None)
@@ -428,6 +566,9 @@ def main(argv=None):
             time.sleep(2)
         started.append(d)
         inflight += d["jobs"]
+    for d in started:
+        print(f"started: {d['title']} ({d['jobs']} jobs)")
+    print(f"jobs now {running} running, {queued} queued; target {target}")
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     with (open(summary, "a") if summary else contextlib.nullcontext(sys.stdout)) as out:
         print("## The grid on the max: every square to 1,000 runs" + (" (dry run: nothing started)" if a.dry else ""), file=out)

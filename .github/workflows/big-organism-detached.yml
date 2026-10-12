@@ -127,8 +127,10 @@ jobs:
           ok=""
           # the sizes tried after the one asked: 8 vCPUs and 32 GB for the organisms with the cluster inside; 64 GB first where
           # the test needs it (the modelled tower at 1,000 copies, 15 GB a worker; the four stacked with the cluster inside)
-          more="Standard_D8as_v4 Standard_D8s_v4 Standard_D8as_v7 Standard_D8ads_v7 Standard_D8s_v7 Standard_D8as_v6 Standard_D8s_v5 Standard_D8as_v5 Standard_D8ls_v7 Standard_E4as_v7 Standard_B8as_v2"
-          case "$TEST:$ORGS" in scale:*|organism:stack) more="Standard_E8as_v7 Standard_E8s_v7 Standard_E8as_v6 Standard_E8as_v5 Standard_E8s_v5 Standard_E8ads_v5 Standard_E8as_v4 Standard_E8s_v4";; esac
+          # (the families eastus allows this subscription, one 8-vCPU machine each under its 10-vCPU allowance: the survey of
+          # 12 Oct; sizes with 2 GB a vCPU are left out, too small for an organism at 1,000 copies with the cluster inside)
+          more="Standard_D8as_v7 Standard_D8ads_v7 Standard_D8s_v7 Standard_D8ds_v7 Standard_D8as_v6 Standard_D8ads_v6 Standard_D8s_v6 Standard_D8ds_v6 Standard_D8ns_v6 Standard_D8nds_v6 Standard_D8as_v4 Standard_D8s_v4 Standard_D8ds_v4 Standard_D8d_v4 Standard_D8_v4 Standard_D8s_v3 Standard_D8_v3"
+          case "$TEST:$ORGS" in scale:*|organism:stack) more="Standard_E8as_v7 Standard_E8ads_v7 Standard_E8s_v7 Standard_E8ds_v7 Standard_E8s_v6 Standard_E8ds_v6 Standard_E8ns_v6 Standard_E8nds_v6";; esac
           for sz in "$SIZE" $more; do
             if az vm create -g "$RG" -n big --image Ubuntu2204 --size "$sz" --admin-username omni \
                  --generate-ssh-keys --public-ip-sku Standard --os-disk-size-gb 128 -o none 2> err.txt; then

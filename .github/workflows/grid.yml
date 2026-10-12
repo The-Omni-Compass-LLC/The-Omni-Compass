@@ -19,6 +19,8 @@ on:
     inputs:
       grid: {description: "all, six (modelled) or six-kube (the real cluster inside)", default: "all"}
       dry_run: {description: "yes: say what would start, start nothing", default: "no"}
+      max_machines: {description: "Rented Azure machines at once for the biggest squares (what the quota holds: eastus allows 200 vCPUs, one 8-vCPU machine per family)", default: "20"}
+      budget_usd: {description: "The most the rented machines may be committed to, in dollars, estimated at list price (the founder's figure)", default: "5000"}
 permissions:
   actions: write
   contents: read
@@ -29,6 +31,8 @@ jobs:
   tick:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      HAVE_AZURE: ${{ secrets.AZURE_CREDENTIALS != '' }}
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -38,6 +42,19 @@ jobs:
         env: {GITHUB_TOKEN: "${{ github.token }}"}
         run: |
           python3 scripts/dispatch_grid.py tick --grid "${{ github.event.inputs.grid || 'all' }}" --ref "${{ github.ref_name }}" \
+            $([ "${{ github.event.inputs.dry_run }}" = yes ] && echo --dry)
+      # the squares too big for a GitHub machine: rented Azure machines (big-organism-detached), up to what the quota holds
+      # and never past the budget; nothing is rented without the AZURE_CREDENTIALS secret
+      - uses: azure/login@v2
+        if: env.HAVE_AZURE == 'true' && (github.event.inputs.grid || 'all') == 'all'
+        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+      - name: The biggest squares on rented machines
+        if: env.HAVE_AZURE == 'true' && (github.event.inputs.grid || 'all') == 'all'
+        env: {GITHUB_TOKEN: "${{ github.token }}"}
+        run: |
+          now=$(az group list --tag omni-detached=1 --query "length(@)" -o tsv)
+          python3 scripts/dispatch_grid.py azure-tick --ref "${{ github.ref_name }}" --machines-now "${now:-0}" \
+            --max-machines "${{ github.event.inputs.max_machines || '20' }}" --budget "${{ github.event.inputs.budget_usd || '5000' }}" \
             $([ "${{ github.event.inputs.dry_run }}" = yes ] && echo --dry)
       - name: Legal notice at the end of this job's report
         if: always()
