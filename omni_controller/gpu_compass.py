@@ -26,7 +26,10 @@ Every decision (--interval seconds):
             service_ms, the wait in the queue left out) is compared: at most --allow slower and the step is allowed,
             slower than that and it is refused and not tried again for --verdict-recheck decisions. Where no step
             passes, the ceiling stays at the top: the card runs as it does alone
-  law       down gain 0.0125, the compass's center at 0.4, the speed floor at the card's own busy clock (amendment 8)
+  law       down gain 0.0125, the compass's center at the v5 edge (omnicompass/edge.py: 1 - (climb x reaction + 3.09 x
+            wobble) of the card's own response-time position, never below 0.4 unless a line crossed while the ceiling was
+            held under the top has taught it otherwise; the wall moves out with the reaction part), the speed floor at the
+            card's own busy clock (amendment 8)
   steady    while the card is saturated against its own power limit (work waiting and the draw at the limit), the
             firmware boosts a step, hits the limit and is knocked back: a sawtooth. The ceiling is then held at the
             card's own busy clock under that limit (what the sawtooth averages to), so the same watts serve the work
@@ -142,6 +145,9 @@ class GpuCompass:
         self.svc_t = None                  # elapsed_seconds of the last request whose service time the verdict has seen
         self.brain = CompassLaw(Band(0.0, 1.0, center=self.prof["center"]), dt=a.interval, tau=2.0 * a.interval, kp=1.0, smooth=0.3)
         self.brain.kd *= 3.0
+        # the v5 edge: the clock ceiling answers within the compass's own damping time (2 decisions)
+        from omnicompass.edge import Edge
+        self.edge = Edge(react=2.0)
         self.audit({"snapshot": {str(self.g): {"limit_w": self.start, "min_limit_w": s[self.g]["min"],
                                                "enforced_w": s[self.g]["enforced"] if self.enforced_ok else None,
                                                "clock_top_mhz": self.top,
@@ -262,6 +268,15 @@ class GpuCompass:
         # the verdict: the card's own time on the requests since the last decision, at the step the ceiling stood at;
         # then the deepest step the compass may use now, or the step a trial needs
         self.verdict.observe(self.service_costs())
+        if p is not None:
+            # the v5 edge: past the line while the ceiling was held under the top teaches the cushion a floor; then the
+            # balance point and the wall move with the card's own climb and wobble
+            if p >= 1.0 and self.written_ceiling < self.top:
+                self.edge.learn_fall(0.1)
+            center = self.edge.update(p)
+            base = self.prof["center"] if self.edge.floor <= 0.0 else 0.0
+            self.brain.band.center = min(0.995, max(0.0, max(base, center)))
+            self.brain.band.cushion = min(0.05, max(0.005, self.edge.react_part))
         calm = p is not None and p < self.brain.band.wall_high and not saturated
         deepest, trial, ev = self.verdict.tick(calm)
         if ev:
@@ -314,6 +329,7 @@ class GpuCompass:
                    "util": r["util"], "draw_w": r["draw"], "temp_c": r["temp"], "limit_w": r["limit"],
                    "enforced_w": r["enforced"], "clock_mhz": r["clock_mhz"], "throttle": (thr or {}).get(g)},
                "position": None if p is None else round(p, 4), "velocity": round(self.brain.v, 4),
+               "center": round(self.brain.band.center, 4), "wall": round(self.brain.band.wall_high, 4),
                "latency_p95_ms": None if not ls else ls.get("p95"),
                "ceiling_mhz": round(ceiling), "want_w": int(lid), "decided_by": who,
                "native_busy_clock_mhz": n_clk, "native_busy_draw_w": n_draw,

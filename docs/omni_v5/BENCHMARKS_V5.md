@@ -12,11 +12,13 @@ secrets are in place (a missing secret is reported and skipped, never billed). C
 - **The v5 law runs today in the modelled realms** (`tools/run_realms_v5.py`, workflow `realms-v5`): 1,002 muscles in 65
   families, all six organisms *superior within guardrails*, **0 muscles worse than native**; the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times)
   (`results/realms_v5/REALMS_V5.md`). Evidence class **S** (modelled): a model is not proof.
-- **Every live benchmark** (real Kubernetes, the GPU, the databases, the clouds) runs the **live controllers**, which still
-  carry the **v3 live law** inside the omni-v5 tree. The v5 law is ported into the live controllers and the live organism
-  runners as stages 6–11 of `docs/omni_v5/BUILD_STAGES.md`; until then a live run on this branch measures the live law v3
-  already measured, and it is labelled that way, never as a v5 result. After the port, every live benchmark is rerun on
-  v5, A/B/C, and the founder hears each result before it goes up.
+- **Every live benchmark** (real Kubernetes, the GPU, the clouds, the six organisms with a real cluster or card inside)
+  now runs v5: the live Kubernetes controller's compass law and the GPU governor hold their balance point at the v5 edge
+  (`omnicompass/edge.py`, the same code the modelled law uses), with their own measured guards (the verdict on every
+  machine given back or clock step taken, the release gate, the shields); the six organisms with a real cluster or card
+  inside run the v5 law on the v5 catalog, and their four stacked keep each realm's own body. Each live benchmark is
+  rerun on v5, A/B/C, and the founder hears each result before it goes up. The databases' own adapters (PostgreSQL,
+  MySQL, MongoDB, Redis, Kafka) keep their live laws until their own v5 port (stage 11).
 
 ## A. The v5 law, modelled (free, on GitHub)
 

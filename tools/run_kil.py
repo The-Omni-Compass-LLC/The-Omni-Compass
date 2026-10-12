@@ -46,9 +46,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import Body, KILL_AT  # noqa: E402
-from realms.compass_arm import compass_apply  # noqa: E402
+from realms.compass_arm_v5 import apply_v5  # noqa: E402  (the engine's law, omni-v5)
 from realms.presets import ORGANISM_STEPS  # noqa: E402
-from tools.run_hil import groups, NAMES, SEED0  # noqa: E402
+from tools.run_hil import groups, bodies_for, NAMES, SEED0  # noqa: E402
 
 OMNI_ARMS = ("omni", "compass", "strict")
 
@@ -100,8 +100,8 @@ def main(argv=None):
     ap.add_argument("--dry", action="store_true", help="do not call kubectl (tests)")
     a = ap.parse_args(argv)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
-    rows = groups(a.scale)[a.organism]
-    body = Body(rows, a.seed)
+    bodies = bodies_for(a.organism, a.scale, a.seed)
+    body = bodies[0]                                               # the body the cluster lives in
     trace = demand_trace(body)
     reps = replicas_of(trace, a.load_max)
     omni = a.arm in OMNI_ARMS
@@ -135,17 +135,20 @@ def main(argv=None):
                         pass
                     time.sleep(5)
             set_r = reps[k]
-        body.couple()
+        for b in bodies:
+            b.couple()
         if omni:
-            for p, knob in zip(body.plants, body.knobs):
-                if k >= kill_at:
-                    p.override = {}
-                    continue
-                v = compass_apply(p, knob)
-                if v and v != last.get(id(p)):
-                    writes += 1
-                last[id(p)] = v
-        body.step()
+            for b in bodies:
+                for p, knob in zip(b.plants, b.knobs):
+                    if k >= kill_at:
+                        p.override = {}
+                        continue
+                    v = apply_v5(p, knob)
+                    if v and v != last.get(id(p)):
+                        writes += 1
+                    last[id(p)] = v
+        for b in bodies:
+            b.step()
         w = cluster_w(out / "capture.csv", nominal_cluster or 0.0)
         if nominal_cluster is None and w:
             nominal_cluster = w
@@ -155,18 +158,19 @@ def main(argv=None):
         if wait > 0:
             time.sleep(wait)
     restore_ok = True
-    for p in body.plants:
+    plants = [p for b in bodies for p in b.plants]
+    for p in plants:
         p.finalize()
         restore_ok = restore_ok and (not omni or p.override == {})
     rec = {"organism": a.organism, "name": NAMES[a.organism], "arm": a.arm, "omni": omni, "seed": a.seed,
-           "muscles": len(rows), "scale": a.scale, "steps": ORGANISM_STEPS, "step_s": step_s, "load_max": a.load_max,
+           "muscles": len(plants), "scale": a.scale, "steps": ORGANISM_STEPS, "step_s": step_s, "load_max": a.load_max,
            "demand": trace, "replicas": reps, "cluster_w": seen_w, "sim_writes": writes, "sim_restore_ok": restore_ok,
-           "plants": [dict(p.m) for p in body.plants], "wall_s": round(time.time() - t0, 1)}
+           "plants": [dict(p.m) for p in plants], "wall_s": round(time.time() - t0, 1)}
     (out / "organism.json").write_text(json.dumps(rec) + "\n")
     behind = max(0.0, time.time() - t0 - a.duration)
     rec["behind_s"] = round(behind, 1)
     (out / "organism.json").write_text(json.dumps(rec) + "\n")
-    print(f"{NAMES[a.organism]} x{a.scale}, arm {a.arm}: behind the window by {behind:.0f} s; {len(rows)} muscles, {ORGANISM_STEPS} steps of {step_s:.2f} s, "
+    print(f"{NAMES[a.organism]} x{a.scale}, arm {a.arm}: behind the window by {behind:.0f} s; {len(plants)} muscles, {ORGANISM_STEPS} steps of {step_s:.2f} s, "
           f"replicas {min(reps)}..{max(reps)}, simulated writes {writes}, handed back {restore_ok}")
     return 0 if restore_ok else 2
 

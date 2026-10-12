@@ -11,7 +11,10 @@ Laws (--law)
   governor  (default) the engine's allocation law sets the HPA target (rho*) and the closure law or the governor sizes the pool
   compass      the compass law (omnicompass/compass_law.py) holds the service in its band, read as the GPU compass reads it: the mean
             response time of the latency window between the bare service time (a tenth of --slo-ms) and --slo-ms, held at
-            --compass-center (0.4); p95 at or past the SLO, a blind sense or pods waiting for a place read as past the wall. Its push and pull move two levers: each HPA's CPU target inside its cover (from 60% of the
+            the v5 edge (omnicompass/edge.py): the balance point moves with the service's own risk, 1 - (climb x reaction +
+            3.09 x wobble), never below --compass-center (0.4, the earlier law's own point) unless a breach while machines
+            were given back has taught it otherwise, and the wall moves out with the reaction part of that cushion; p95 at
+            or past the SLO, a blind sense or pods waiting for a place read as past the wall. Its push and pull move two levers: each HPA's CPU target inside its cover (from 60% of the
             operator's target up to the operator's own, never tighter than native, so it only ever adds pods and gives them
             back) and the node pool (one machine back only while the force is clearly down, the position below the center
             and the nervous system's release gate open; past the 0.95 wall, one machine up at once). The verdict
@@ -260,12 +263,18 @@ class Controller:
         self.reflex = {}               # (ns, name) -> replica floor the pod reflex holds while the queue says it is needed
         self.pod_cap = {}              # (ns, name) -> request / limit share: what the HPA's target means in queue terms
         self.compass_law = None
+        self.edge = None
         if getattr(a, "law", "governor") == "compass":
             from omnicompass.compass_law import Band, CompassLaw
             # one decision every --interval s; the service follows a target in about one HPA sync plus a pod start (tau)
             self.compass_law = CompassLaw(Band(0.0, 1.0, center=getattr(a, "compass_center", 0.4)), dt=a.interval,
                              tau=getattr(a, "compass_tau", 60.0), kp=1.0, smooth=0.3)
             self.compass_law.kd *= 3.0                    # the same push as on every realm muscle (realms/compass_arm.py)
+            # the v5 edge: the knob's reaction is the time the service takes to follow it (one HPA sync and a pod start,
+            # --compass-tau), in decisions
+            from omnicompass.edge import Edge
+            self.edge = Edge(react=getattr(a, "compass_tau", 60.0) / a.interval)
+            self.edge_base = getattr(a, "compass_center", 0.4)
             from omnicompass.verdict import Verdict
             self.verdict = Verdict(tolerance=getattr(a, "allow", 0.02), min_samples=getattr(a, "verdict_samples", 200),
                                    probe_every=getattr(a, "verdict_every", 10), recheck=getattr(a, "verdict_recheck", 120),
@@ -665,6 +674,16 @@ class Controller:
                 pos = max(0.0, (mean - bare) / (slo - bare))
             if blind.get("latency", False) or s["pending"] > 0 or (p95 is not None and slo > 0 and p95 >= slo):
                 pos = 1.0
+            if self.edge is not None:
+                # the v5 edge: a breach while machines are given back teaches the cushion a floor; then the balance point
+                # and the wall move with the service's own climb and wobble (never behind the earlier law's own point
+                # unless that lesson says so)
+                if breach_now and self.n_native is not None and n < self.n_native:
+                    self.edge.learn_fall(0.1)
+                center = self.edge.update(pos)
+                base = self.edge_base if self.edge.floor <= 0.0 else 0.0
+                self.compass_law.band.center = min(0.995, max(0.0, max(base, center)))
+                self.compass_law.band.cushion = min(0.05, max(0.005, self.edge.react_part))
             F = self.compass_law.force(pos)
             # the verdict: the response times of the requests served since the last decision, at the machines the pool
             # stood at; then how many machines may be given back at all (or the count a trial needs)
@@ -686,6 +705,7 @@ class Controller:
                 rec_n = max(floor, n)
             rec_n = max(self.a.min_nodes, min(self.a.max_nodes, rec_n))
             compass_rec = {"position": round(self.compass_law.p, 4), "velocity": round(self.compass_law.v, 4), "force": round(F, 4),
+                        "center": round(self.compass_law.band.center, 4), "wall": round(self.compass_law.band.wall_high, 4),
                         "verdict_state": self.verdict.state, "machines_given_back_allowed": self.verdict.allowed}
         scaling_up = any(int(h.get("status", {}).get("desiredReplicas", 0) or 0) > int(h.get("status", {}).get("currentReplicas", 0) or 0)
                          for h in s["hpas"])
@@ -888,7 +908,8 @@ def parser():
     ap.add_argument("--max-node-step", type=int, default=2)
     ap.add_argument("--min-target-change", type=int, default=3)
     ap.add_argument("--law", choices=["governor", "compass"], default="governor",
-                    help="governor (default): the engine's allocation law; compass: the compass law on the HPA target and the node pool")
+                    help="governor (default): the engine's allocation law; compass: the compass law at the v5 edge on the HPA "
+                         "target and the node pool")
     ap.add_argument("--allow", type=float, default=0.02, help="the most a machine given back may add to the response time")
     ap.add_argument("--verdict-samples", type=int, default=200, help="requests measured before and after a machine is given back on trial")
     ap.add_argument("--verdict-every", type=int, default=10, help="decisions between trials")

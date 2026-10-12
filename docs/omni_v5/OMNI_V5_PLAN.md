@@ -112,8 +112,9 @@ bloodline); every result names its seed; seeds can be crossed.
 - **v5 MAX/dial/wear/immune shown in a quick model (class S, not proof; the Max dial, with its tradeoffs)**
   (`docs/omni_v5/study/`): +14% load at equal quality, −23% misses at 2×, dial
   tradeoff, Arrhenius wear, specific immune quarantine with 0 false positives.
-- **NOT built yet:** the v5 law inside the live controllers and live organism runners (stages 6–11; until then a live
-  benchmark measures the v3 live law); sleep/wake floor on every muscle; outside watcher + monitor panel; physical switch; stacked levels;
+- **Built 12 Oct:** the v5 edge inside the live Kubernetes controller and the GPU governor, and the v5 law in the six
+  organisms with a real cluster or card inside. **NOT built yet:** the databases' adapters on v5 (stage 11); sleep/wake
+  floor on every muscle; outside watcher + monitor panel; physical switch; stacked levels;
   combined GPU+k8s+cloud+data-center organism; full early-warning on every muscle.
 - **Build order on GO:** (1) wiring map per body part; (2) v5 engine = edge+centre+health+immune+dial+seed, both open
   harms (data-hall precool, robot-joint lateness) at zero; (3) modelled test all organisms + combined, 4 dial settings,
@@ -454,8 +455,9 @@ The map is `docs/omni_v5/BENCHMARKS_V5.md`; one button starts them all (`.github
   AMD GPUs (`scripts/apu_run.sh`).
 - **The clouds:** **Azure AKS**, **Google GKE**, **Amazon EKS** (the same paired design, the bill counted every 15 s at
   list price), and the big organisms on a rented Azure machine.
-- The plain truth: the live benchmarks run the live controllers, which carry the v3 live law until v5 is ported into them
-  (`docs/omni_v5/BUILD_STAGES.md`, stages 6–11); only after that port is a live run a v5 result.
+- The plain truth: the live Kubernetes controller, the GPU governor and the six organisms with a real cluster or card
+  inside run v5 (the v5 edge, `omnicompass/edge.py`); the databases' adapters keep their live laws until their own port
+  (`docs/omni_v5/BUILD_STAGES.md`, stage 11).
 
 ## 28. The babysitting tax — one screen, counted as a benefit
 A thousand muscles can mean a thousand dashboards and an engineer babysitting each. Omni collapses that to one screen of

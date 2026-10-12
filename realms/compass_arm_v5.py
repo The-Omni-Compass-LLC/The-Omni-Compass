@@ -27,6 +27,7 @@ from __future__ import annotations
 import math
 
 from omnicompass.compass_law import Band, CompassLaw
+from omnicompass.edge import Edge as _CoreEdge, physics_memory
 from .compass_arm import (UP, DOWN, RELEASE, clamp, position, release_safe, capping_saves, effort_cap_saves,
                          speed_slack)
 
@@ -154,57 +155,17 @@ def memory_horizon(plant) -> float:
     return 1.0
 
 
-class Edge:
-    def __init__(self, plant, cfg, key=None):
-        self.cfg = cfg
-        self.react = reaction_steps(plant, key) * cfg.react_mult
-        self.mem = cfg.memory
-        if cfg.physics_memory:
-            hz = memory_horizon(plant)
-            self.mem = (1.0 - 1.0 / hz) if hz > cfg.window else 0.0
-        self.hist = []
-        self.cushion = 1.0 - cfg.start
-        self.react_part = 0.05
-        self.climb_mem = 0.0
-        self.wob_mem = 0.0
-        self.floor = 0.0                                                # learned from a fall: the least cushion this plant needs
+class Edge(_CoreEdge):
+    """The v5 edge (omnicompass/edge.py) for one plant's knob: the knob's own reaction, and, with physics memory, its
+    risks kept as long as the plant's own slowest physics carries them."""
 
-    def update(self, p):
-        c = self.cfg
-        self.hist.append(min(p, 1.0))
-        if len(self.hist) > c.window + 1:
-            self.hist.pop(0)
-        h = self.hist
-        if len(h) >= 3 and c.est == 2:
-            r = max(1, int(round(self.react)))
-            d = [b - a for a, b in zip(h, h[1:])]
-            md = sum(d) / len(d)
-            wob = math.sqrt(sum((x - md) ** 2 for x in d) / max(1, len(d) - 1)) / math.sqrt(2.0)
-            if r < len(h):
-                rise = max(h[i + r] - h[i] for i in range(len(h) - r))
-            else:
-                rise = max(0.0, max(d)) * r                           # longer than the window: the steepest climb, extrapolated
-            climb = max(0.0, rise) / r                                # per decision, so climb x reaction is the rise
-        elif len(h) >= 3:
-            climb = max(max(0.0, b - a) for a, b in zip(h, h[1:]))
-            m = sum(h) / len(h)
-            wob = math.sqrt(sum((x - m) ** 2 for x in h) / (len(h) - 1))
-        else:
-            climb, wob = 0.05, 0.05
-        if self.mem > 0:
-            # held longer: the worst climb and spread this plant has shown, forgotten slowly
-            self.climb_mem = max(climb, self.climb_mem * self.mem)
-            self.wob_mem = max(wob, self.wob_mem * self.mem)
-            climb, wob = self.climb_mem, self.wob_mem
-        react_part = min(1.0, climb * self.react)
-        need = min(1.0, max(react_part + c.z * wob, self.floor))
-        self.floor *= c.fall_decay
-        if need >= self.cushion:
-            self.cushion = need                                       # widen at once
-        else:
-            self.cushion = max(need, self.cushion * (1.0 - c.narrow))  # narrow slowly
-        self.react_part = max(0.005, react_part)
-        return 1.0 - self.cushion
+    def __init__(self, plant, cfg, key=None):
+        mem = cfg.memory
+        if cfg.physics_memory:
+            mem = physics_memory(memory_horizon(plant), cfg.window)
+        super().__init__(reaction_steps(plant, key) * cfg.react_mult, z=cfg.z, window=cfg.window, narrow=cfg.narrow,
+                         start=cfg.start, memory=mem, fall_decay=cfg.fall_decay, est=cfg.est)
+        self.cfg = cfg
 
 
 def deadline_share(plant) -> float:

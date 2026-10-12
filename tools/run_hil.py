@@ -54,7 +54,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import catalog, Body, KILL_AT, T95, label  # noqa: E402
-from realms.compass_arm import compass_apply  # noqa: E402
+from realms.compass_arm_v5 import apply_v5  # noqa: E402  (the engine's law, omni-v5)
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
 
@@ -100,14 +100,29 @@ def last_draw(path, fallback):
         return fallback
 
 
+CATALOG = str(ROOT / "realms" / "catalog_v5.csv")             # the v5 muscle set
+
+
 def groups(scale=1):
-    rows = catalog()
+    """Each organism's muscles. The four stacked are each realm's own muscles side by side (every shared muscle in each,
+    with the same id it has in its own realm, so its native is identical there); bodies_for builds their four bodies."""
+    rows = catalog(CATALOG)
     g = {r: [x for x in rows if r in x["realms"].split(";")] for r in REALMS}
-    g[STACK] = [dict(r, muscle_id=f"{r['muscle_id']}@{realm}") for realm in REALMS for r in g[realm]]
+    g[STACK] = [x for realm in REALMS for x in g[realm]]
     g[TOWER] = rows
     # scale copies of each organism on one clock, each copy its own seeds (as tools/run_scale.py)
     return {k: [dict(r, muscle_id=r["muscle_id"] + (f"~{c}" if c else "")) for c in range(scale) for r in v]
             for k, v in g.items()}
+
+
+def bodies_for(name, scale, seed, rows=None):
+    """The organism's bodies on one clock: the four stacked keep each realm's own body, so every muscle runs exactly the
+    native of its own realm, plant by plant; every other organism is one body. The real cluster or card lives in the
+    first body (the Compute realm's in the stack)."""
+    if organism_name(name) == STACK:
+        g = groups(scale)
+        return [Body(g[realm], seed) for realm in REALMS]
+    return [Body(rows if rows is not None else groups(scale)[name], seed)]
 
 
 def per_muscle_step_s():
@@ -118,15 +133,16 @@ def per_muscle_step_s():
     for _ in range(5):
         body.couple()
         for p, knob in zip(body.plants, body.knobs):
-            compass_apply(p, knob)
+            apply_v5(p, knob)
         body.step()
     return (time.time() - t) / 5 / len(rows)
 
 
-def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
+def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None, scale=1):
     step_s = step_s or a.step_s
     d.mkdir(parents=True, exist_ok=True)
-    body = Body(rows, seed)
+    bodies = bodies_for(name, scale, seed, rows)
+    body = bodies[0]                                              # the body the card lives in
     for f in ("kill",):
         (d / f).unlink(missing_ok=True)
     smi(a, "-i", str(a.gpu), "-rgc")
@@ -153,25 +169,29 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
     t0 = time.time()
     draw = 0.0
     for k in range(ORGANISM_STEPS):
-        body.couple()
+        for b in bodies:
+            b.couple()
         if arm == "omni":
             if k == kill_at:
                 (d / "kill").touch()                              # the card's governor hands both wires back
-            for p, knob in zip(body.plants, body.knobs):
-                if k >= kill_at:
-                    p.override = {}
-                    continue
-                v = compass_apply(p, knob)
-                if v and v != last.get(id(p)):
-                    writes += 1
-                last[id(p)] = v
-        body.step()
+            for b in bodies:
+                for p, knob in zip(b.plants, b.knobs):
+                    if k >= kill_at:
+                        p.override = {}
+                        continue
+                    v = apply_v5(p, knob)
+                    if v and v != last.get(id(p)):
+                        writes += 1
+                    last[id(p)] = v
+        for b in bodies:
+            b.step()
         draw = last_draw(d / "smi.csv", draw)
         body.src_w += draw; body.sz_w += draw; body.all_w += draw      # the card's watts in the organism
         wait = t0 + (k + 1) * step_s - time.time()
         if wait > 0:
             time.sleep(wait)
-    for p in body.plants:
+    plants = [p for b in bodies for p in b.plants]
+    for p in plants:
         p.finalize()
         restore_ok = restore_ok and (arm != "omni" or p.override == {})
     work.wait()
@@ -187,8 +207,8 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None):
     summ = json.loads((d / "summary.json").read_text()) if (d / "summary.json").exists() else {}
     lat = sorted(float(x.split(",")[1]) for x in list(open(d / "latency.csv"))[1:] if x.strip()) if (d / "latency.csv").exists() else []
     over = 100.0 * sum(1 for x in lat if x > slo_ms) / len(lat) if lat else 0.0      # the card's time over its line
-    rec = {"organism": name, "arm": arm, "seed": seed, "muscles": len(rows), "step_s": step_s,
-           "plants": [dict(p.m) for p in body.plants], "sim_writes": writes, "sim_restore_ok": restore_ok,
+    rec = {"organism": name, "arm": arm, "seed": seed, "muscles": len(plants), "step_s": step_s,
+           "plants": [dict(p.m) for p in plants], "sim_writes": writes, "sim_restore_ok": restore_ok,
            "card": {"energy_j": joules, "samples": samples, "served": summ.get("served", 0),
                     "not_served": summ.get("not_served", summ.get("requests", 0) - summ.get("served", 0)),
                     "p95_ms": lat[int(0.95 * (len(lat) - 1))] if lat else None, "over_line_pct": over, "limit_start_w": w0, "limit_end_w": w1,
@@ -336,7 +356,7 @@ def main(argv=None):
                     print(f"== size {sc}x, rep {rep + 1}, {NAMES[name]}, arm {arm} (step {steps_of[sc][name]} s)", flush=True)
                     res.setdefault((sc, name), {}).setdefault(rep, {})[arm] = run_arm(
                         a, name, g[name], seed, arm, a.out / f"size-{sc}" / f"rep-{rep + 1}" / name / arm, slo_ms, start_w,
-                        steps_of[sc][name])
+                        steps_of[sc][name], scale=sc)
     problems = []
     for (sc, name), reps in res.items():
         for rep, arms in reps.items():
