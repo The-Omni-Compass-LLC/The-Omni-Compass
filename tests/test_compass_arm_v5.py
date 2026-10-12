@@ -145,6 +145,66 @@ def test_walk_back_is_gradual_and_complete():
     assert all(b >= a - 1e-12 for a, b in zip(seen, seen[1:])), "the walk back moves one way, toward native"
 
 
+
+def test_room_twins_equal_native_when_the_max_writes_nothing():
+    # V8's sense: with every knob left at native, each room's twin is the room itself, to the last digit, every decision
+    # (the twin starts from the body's own reading of its sources, nominal before the first step)
+    rows = [r for r in H.catalog(CAT) if "physics_robotics_autonomous" in r["realms"].split(";")]
+    for load in ("climb", "line"):
+        b = H.scale_load(H.Body(rows, SEED), load)
+        bone = L.Bone(b, L.V5CFG)
+        assert bone.room_twins, "every room has a twin"
+        for k in range(12):
+            b.couple()
+            bone.advance_twin()
+            for p in b.plants:
+                p.override = {}
+            b.step()
+            for i, tw in bone.room_twins.items():
+                assert b.plants[i].T == tw.T and b.plants[i].power_w == tw.power_w, f"room {rows[i]['muscle_id']} at {k}"
+
+
+def test_battery_forecast_starts_at_its_first_reading():
+    # V13: the jump from a plant's initial values to its first reading is no climb of its line (it once locked every
+    # battery's timed discharge for the whole run)
+    rows = {r["muscle_id"]: r for r in H.catalog(CAT)}
+    site = H.make_plant(rows["530"], SEED)                   # a rack's power cap on a UPS
+    for _ in range(3):
+        L.max_hold(site, L.V5CFG, "power")
+        site.step()
+    st = site._mx_s
+    assert st["rise"] < 0.5 * site.P["p_lim_w"], "the first reading was taken as a climb of the line"
+
+
+def test_battery_holds_only_after_reading_its_line():
+    # V12: a battery wired by its power holds nothing until it has read its line for a window, then holds only while the
+    # line has room
+    rows = {r["muscle_id"]: r for r in H.catalog(CAT)}
+    site = H.make_plant(rows["530"], SEED)
+    for k in range(L.V5CFG.window + 2):
+        ov = L.max_hold(site, L.V5CFG, "power")
+        if k <= L.V5CFG.window:
+            assert ov == {}, f"held at decision {k}, before the line was read for a window"
+        site.override = ov
+        site.step()
+
+
+def test_heat_debt_only_for_rooms_that_cannot_cure_themselves():
+    # V11: a room wired by its setpoint, its cooling not flat out, cures itself (no debt); the same room wired by a power
+    # gate, warmer than its twin, puts a debt on the body
+    rows = [r for r in H.catalog(CAT) if "energy_facility_industrial" in r["realms"].split(";")]
+    b = H.scale_load(H.Body(rows, SEED), "climb")
+    bone = L.Bone(b, L.V5CFG)
+    b.couple()
+    bone.advance_twin()
+    i, tw = next((i, tw) for i, tw in bone.room_twins.items() if b.knobs[i] == "setpoint")
+    tw.T_read = b.plants[i].T - 0.5                         # the room reads half a degree warmer than native's
+    z = b.plants[i]
+    assert z.qc_cmd_avg < z.units_on * z.P["q_unit_w"], "the room's cooling has room to cool it"
+    assert L.heat_debt(b, bone) == 0.0, "a room that can cure itself put a debt on the body"
+    b.knobs[i] = "power"
+    assert L.heat_debt(b, bone) > 0.0, "a room that cannot cure itself puts no debt on the body"
+
 if __name__ == "__main__":
     test_max_does_no_harm_to_any_muscle_alone()
     test_max_does_no_harm_with_work_waiting_in_line()
@@ -155,4 +215,8 @@ if __name__ == "__main__":
     test_bone_never_leaves_a_pool_below_its_twin()
     test_tower_max_does_no_less_work_and_hands_back()
     test_walk_back_is_gradual_and_complete()
+    test_room_twins_equal_native_when_the_max_writes_nothing()
+    test_battery_forecast_starts_at_its_first_reading()
+    test_battery_holds_only_after_reading_its_line()
+    test_heat_debt_only_for_rooms_that_cannot_cure_themselves()
     print("test_compass_arm_v5: OK")

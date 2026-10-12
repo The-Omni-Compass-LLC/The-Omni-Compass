@@ -533,6 +533,8 @@ class ThermalZone(Plant):
         staged = int(clamp(math.ceil(self.qc_cmd_avg / (0.8 * P["q_unit_w"]) - 1e-9), 1, P["units"]))
         if self.override.get("release"):
             staged = min(staged, self.units_on - 1)                # one unit per decision
+        if "units_min" in self.override:                          # ahead of the heat: units held on before the
+            staged = max(staged, int(self.override["units_min"]))  # staging asks for them (the knob both ways)
         self.units_on = int(clamp(staged, 1, P["units"]))
         self.k += 1
 

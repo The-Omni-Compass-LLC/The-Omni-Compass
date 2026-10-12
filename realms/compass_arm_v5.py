@@ -673,20 +673,36 @@ def max_hold(plant, cfg, key):
     """A battery site's knob for the most work held inside its line: the charge kept for the line, and only the draw
     that would cross the line taken from it. The draw is forecast from the brain's own readings: the last decision's net
     draw, plus its latest rise, plus line_z of its step-to-step wobbles. A UPS lends only the charge above its outage
-    floor (its band's stress end); any other site, down to its band's stress end."""
+    floor (its band's stress end); any other site, down to its band's stress end. A battery wired by its power holds its
+    charge while the line has room and gives native's full power once the line could need it (nothing locked: the
+    discharge timed for the line)."""
     P = plant.P
     st = getattr(plant, "_mx_s", None)
-    if st is None:
-        st = plant._mx_s = {"last": plant.net, "n": 0, "dv": 0.0}
-    d = plant.net - st["last"]
-    st["last"] = plant.net
-    if plant.k > 0:
+    if st is None or plant.k <= 1 and st["n"] == 0:
+        # the forecast starts at the site's first reading: before its first step a plant shows its initial values (no
+        # draw at all), and the jump from them to the first reading is no climb of the line
+        st = plant._mx_s = {"last": plant.net, "n": 0, "dv": 0.0, "rise": 0.0}
+        if plant.k < 1:
+            st["last"] = None
+    d = plant.net - st["last"] if st["last"] is not None else 0.0
+    if st["last"] is not None and plant.k > 1:
         st["n"] += 1
         a = 1.0 / st["n"]
         st["dv"] = (1.0 - a) * st["dv"] + a * d * d
+        st["rise"] = max(st["rise"], d)
+    st["last"] = plant.net
     fore = plant.net + max(0.0, d) + cfg.line_z * math.sqrt(st["dv"])
     over = max(0.0, fore - P["p_lim_w"])                         # the draw that would cross the line this decision
     floor = P["stress"]
+    if key == "power":
+        # nothing locked: the battery's discharge timed for the line. While the line has room even after the largest
+        # climb it has shown (and line_z of its wobbles, and a twentieth of the line), the charge is held: nothing is
+        # spent, charging stays free; once the line could need it, the full power native gives. The charge native spends
+        # early is still there when the line needs it
+        if plant.net <= 0.0 or st["n"] < cfg.window:
+            return {}                                                # nothing to hold, or the line not yet read for a window
+        room = max(cfg.line_z * math.sqrt(st["dv"]), st["rise"], 0.05 * P["p_lim_w"])
+        return {} if fore + room >= P["p_lim_w"] else {"power": 0.0}
     if key == "setpoint":
         E, sq = P["e_wh"] * 3600.0, math.sqrt(P["eta_rt"])
         dt = P["dt"]
@@ -697,6 +713,17 @@ def max_hold(plant, cfg, key):
     # the ceiling the battery defends (the capacity knob): the line less the forecast's own margin
     cap = clamp(1.0 - (fore - plant.net) / P["p_lim_w"], 0.5, 1.0)
     return {"capacity": cap}
+
+
+def max_units(plant, cfg):
+    """A room's cooling units (its capacity knob, both ways): one more unit held on than its staging asks for while the
+    room is at risk (its load read ahead, or its degrees in hand, as max_cool reads them); the staging's own otherwise."""
+    P = plant.P
+    native = P["t_set"]
+    x = max_cool(plant, cfg)
+    if x >= native - 1e-9 or plant.units_on >= P["units"]:
+        return {}
+    return {"units_min": float(plant.units_on + 1)}
 
 
 def machines(pool) -> int:
@@ -774,8 +801,10 @@ def max_apply(plant, knob, cfg, twin=None):
         ov = {"setpoint": a["x"]}
     elif a is not None and t == "motion_axis":
         ov = {"capacity": a["s"]}
-    elif t == "energy_storage" and knob in ("setpoint", "capacity"):
+    elif t == "energy_storage" and knob in ("setpoint", "capacity", "power"):
         ov = max_hold(plant, cfg, knob)
+    elif t == "thermal_zone" and knob == "capacity":
+        ov = max_units(plant, cfg)
     plant.override = ov
     return ov
 
@@ -789,29 +818,48 @@ class Bone:
     brain added go back at once, never below what the pool's twin runs (the brain's model of native: the same pool under
     its own autoscaler alone, on the same arrivals), so a pool never has fewer machines than native and the lines never
     carry more of this brain's power than they have room for. Nothing is taken from one muscle to give to another: the
-    max never shaves (the tune-down does that, on the dial)."""
+    max never shaves (the tune-down does that, on the dial).
+
+    A battery's charge counts as room on its line only while it lasts: a site whose battery covers its draw now, but
+    whose charge above its floor runs out before power granted now could be handed back, has as room only its line less
+    its whole draw (the line a decision later carries all of it). And every room wired by its setpoint has a twin too:
+    the same room under its operator's setpoint, warmed by native's heat (each pool's twin in place of the pool, every
+    other source as it is), so the brain knows the temperature native would leave it at and never leaves it warmer."""
 
     def __init__(self, body, cfg):
         self.body, self.cfg = body, cfg
         self.st = {}
         self.twins = {}
+        self.room_twins = {}
+        from .harness import make_plant, scale_load_plant
+        from .plants import pack
         for i, (p, r) in enumerate(zip(body.plants, body.rows)):
-            if p.template == "compute_pool" and r["knob"] not in ("power", "admission"):
-                from .harness import make_plant
-                from .plants import pack
-                self.twins[i] = pack(make_plant(r, body.seed, organism=True))
+            pool = p.template == "compute_pool" and r["knob"] not in ("power", "admission")
+            if pool or p.template == "thermal_zone":                  # every room: the brain's sense of native
+                tw = pack(make_plant(r, body.seed, organism=True))
                 if getattr(body, "load", None) is not None:
-                    from .harness import scale_load_plant
-                    scale_load_plant(self.twins[i], body.load)
+                    scale_load_plant(tw, body.load)
+                (self.twins if pool else self.room_twins)[i] = tw
+        zi = [i for i, p in enumerate(body.plants) if p.template == "thermal_zone"]
+        self._heat_of = {i: kh for i, kh in zip(zi, body.k_heat)}       # each room's heat per W of the body's sources
 
     def advance_twin(self):
         """Step every twin one decision (each decides on the same arrivals native sees). First, the power the max's own
         machines added over their twins in the decision just metered: the lines' readings carry it, and it is this brain's
-        step, not the line's own wobble, so the forecast is kept on the line without it."""
+        step, not the line's own wobble, so the forecast is kept on the line without it. Each room's twin is warmed by
+        native's sources over the same decision: each pool's twin in place of the pool, every other source as it is."""
         b = self.body
         self.extra_w = sum(max(0, machines(b.plants[i]) - machines(tw)) * b.plants[i].P["p_idle"]
                            for i, tw in self.twins.items())
+        # native's source power: the body's own reading with each pool's power replaced by its twin's (before the first
+        # step the body reads its sources' nominal power, and so does native)
+        native_src = b.src_w + sum(tw.power_w - b.plants[i].power_w for i, tw in self.twins.items())
         for tw in self.twins.values():
+            tw.step()
+        n_z = max(1, len(b.zones))
+        for i, tw in self.room_twins.items():
+            tw.ext = {"heat_w": self._heat_of[i] * native_src / n_z}
+            tw.T_read = tw.T                                         # its temperature when the real room is read
             tw.step()
 
     def _ahead(self, key, x, prior):
@@ -843,17 +891,25 @@ class Bone:
             g = kl / n_st                                            # site draw per W of the body's power
             if g <= 0:
                 continue
+            E, sq = P["e_wh"] * 3600.0, math.sqrt(P["eta_rt"])
             clip = 0.0
+            floor = s.override.get("setpoint", P["reserve"])
             if getattr(s, "override_kind", None) == "clip":
-                E, sq = P["e_wh"] * 3600.0, math.sqrt(P["eta_rt"])
                 clip = min(P["p_batt_w"], max(0.0, s.soc - P["stress"]) * E * sq / P["dt"])
-            self._all.append((P["p_lim_w"] + clip - s.imp, self._ahead(id(s), s.imp - g * own, 0.05 * P["p_lim_w"]), g))
+                floor = min(floor, P["stress"])
+            cover = max(0.0, s.net - s.imp)                          # what the battery covers of the site's draw now
+            lasts = max(0.0, s.soc - floor) * E * sq / (cover * P["dt"]) if cover > 0.0 else math.inf   # decisions
+            # the site's whole draw climbs on its own while the battery covers it (the import then reads nothing): its
+            # climb is read too, for the moment the battery stops covering
+            up_net = self._ahead(("net", id(s)), s.net - g * own, 0.05 * P["p_lim_w"])
+            self._all.append((P["p_lim_w"] + clip - s.imp, self._ahead(id(s), s.imp - g * own, 0.05 * P["p_lim_w"]), g,
+                              P["p_lim_w"] - s.net, lasts, up_net))
             if s.deferred_j > 0.0:
                 # flexible load waiting at the site (held over, or the line): its catch-up has the connection's room first,
                 # and the body may add only what the catch-up leaves (else every W added is a W of waiting work not done)
                 base = s.net - getattr(s, "catch", 0.0)              # the site's draw before its catch-up
                 self._all.append((CATCH_UP * P["p_lim_w"] - base - s.deferred_j / P["dt"],
-                                  self._ahead(("catch", id(s)), base - g * own, 0.05 * P["p_lim_w"]), g))
+                                  self._ahead(("catch", id(s)), base - g * own, 0.05 * P["p_lim_w"]), g, None, math.inf, 0.0))
         n_z = max(1, len(b.zones))
         for zn, kh in zip(b.zones, b.k_heat):
             P = zn.P
@@ -871,11 +927,25 @@ class Bone:
     def room_for(self, reach):
         """(room for machines, room for cooling) over reach decisions: each line's gap less its one-decision climb grown
         as the square root of the reach (its wobbles add up like a random walk). A machine that takes reach decisions to
-        start is started only if the lines can still carry it when it is ready: one started and cancelled burns its start."""
+        start is started only if the lines can still carry it when it is ready: one started and cancelled burns its start.
+        A battery whose charge runs out before power granted now could be off its line (reach, the decision its line
+        takes to show it, and the body's cooling tail, TAIL) leaves its line only the line less the site's whole draw, read
+        at the draw's own climb."""
         f = math.sqrt(max(1, reach))
-        r_all = min([(gap - f * up) / g for gap, up, g in self._all], default=math.inf)
+        r_all = math.inf
+        for gap, up, g, after, lasts, up_net in self._all:
+            if after is not None and lasts < reach + 1 + TAIL:
+                # the battery stops covering before power granted now, and the cooling its heat calls for, is off the line:
+                # the line then carries the site's whole draw, climbing at the draw's own pace
+                r_all = min(r_all, (min(gap, after) - f * max(up, up_net)) / g)
+            else:
+                r_all = min(r_all, (gap - f * up) / g)
         r_src = min([(gap - f * up) / h for gap, up, h in self._src], default=math.inf)
         return min(r_src, r_all), r_all
+
+
+TAIL = 2   # decisions the body's power stays on its lines after machines are handed back: their heat reaches the rooms a
+           # decision later, and the rooms' cooling answers over its own averaging, one more
 
 
 def _units(room: float, unit: float, cap: int) -> int:
@@ -885,35 +955,100 @@ def _units(room: float, unit: float, cap: int) -> int:
     return max(0, min(cap, int(room // unit)))
 
 
+def walk_room(p):
+    """A room's pull-down handed back as the pedal is lifted: toward the operator's setpoint over the cooling's own
+    reaction time, never snapped (a setpoint snapped back kicks the room's own controller, which then overshoots warm
+    of where native would have it)."""
+    x = p.override.get("setpoint") if p.override else None
+    native = p.P["t_set"]
+    if x is None:
+        return {}
+    step = (native - min(p.P["stress"], p.P["calm"])) / max(1.0, reaction_steps(p))
+    x = min(native, x + max(step, 1e-9))
+    return {} if x >= native - 1e-9 else {"setpoint": x}
+
+
+def queue_need(p):
+    """The machines a pool's queue and its latest arrivals need now: never handed back while they are needed."""
+    lam = p.lam[p.k - 1] if p.k > 0 else 0.0
+    return int(math.ceil((lam + p.Q / p.P["dt"]) / max(p.mu(1.0), 1e-9) - 1e-9))
+
+
+def room_guard(body, bone):
+    """Never warmer than native: a room warmer than its twin (the same room under its operator's settings and native's
+    heat) is cured by its own knob where it has one: a room wired by its setpoint is cooled by the difference. A room
+    whose own knob cannot cool it (its cooling units, a power or admission gate, or cooling already flat out) is cured by
+    the body: its heat debt is handed back by the pools (heat_debt, max_body_step)."""
+    for i, tw in bone.room_twins.items():
+        p = body.plants[i]
+        excess = p.T - getattr(tw, "T_read", tw.T)
+        if excess <= 1e-9:
+            continue
+        knob = body.knobs[i]
+        if knob == "setpoint":
+            native = p.P["t_set"]
+            x = max(min(p.P["stress"], p.P["calm"]), min(p.override.get("setpoint", native), native - excess))
+            p.override = {"setpoint": x}
+
+
+def heat_debt(body, bone):
+    """The body's power (W) that would carry, over one decision, the heat by which the rooms that cannot cure themselves
+    stand warmer than their twins: a room wired by its cooling units or a power or admission gate, or any room whose
+    cooling is already flat out (its own knob cannot cool it further). The pools hand it back (the other muscles kick
+    in): the max's added machines go back until no such room is warmer than native's."""
+    debt = 0.0
+    n_z = max(1, len(body.zones))
+    for i, tw in bone.room_twins.items():
+        p = body.plants[i]
+        excess = p.T - getattr(tw, "T_read", tw.T)
+        if excess <= 1e-9:
+            continue
+        P = p.P
+        flat_out = p.qc_cmd_avg >= p.units_on * P["q_unit_w"] * p.override.get("power", 1.0) - 1e-9
+        if body.knobs[i] == "setpoint" and not flat_out:
+            continue
+        h = bone._heat_of[i] / n_z                                   # room heat per W of the body's sources
+        if h > 0:
+            debt = max(debt, excess * P["c_j_k"] / P["dt"] / h)
+    return debt
+
+
 def max_body_step(body, cfg, bone):
-    """One decision of the max over one body: every battery that can clips its own line, and the machines and cooling
-    the muscles ask for are granted out of the room the bone has left; with no room, what this brain added goes back at
-    once, never below what the twin runs. Every other muscle is wired, watched and native."""
+    """One decision of the max over one body: every battery that can clips its own line or times its discharge for it,
+    and the machines and cooling the muscles ask for are granted out of the room the bone has left; with no room, or
+    while a room that cannot cure itself stands warmer than native's (its heat debt), what this brain added goes back at
+    once, never below what the twin runs nor what a pool's queue needs, and a room's pull-down is walked back, never
+    snapped. A room is pulled down only if the bone can carry it for the cooling's own reaction time, and no room wired by
+    its setpoint is left warmer than its twin. Every other muscle is wired, watched and native."""
     asks = []
     for i, (p, knob) in enumerate(zip(body.plants, body.knobs)):
         t = p.template
         p.override_kind = None
-        if t == "energy_storage" and knob in ("setpoint", "capacity"):
+        if t == "energy_storage" and knob in ("setpoint", "capacity", "power"):
             p.override = max_hold(p, cfg, knob)
-            p.override_kind = "clip"
+            p.override_kind = "clip" if knob in ("setpoint", "capacity") else knob
             continue
         a = max_ask(p, knob, cfg, bone.twins.get(i))
         if a is None:
-            p.override = {}
+            p.override = walk_room(p) if t == "thermal_zone" and knob == "setpoint" else {}
             continue
         asks.append((p, a))
     r_src, r_all = bone.room()
+    debt = heat_debt(body, bone)
+    if debt > 0.0:
+        r_src = min(r_src, -debt)                                    # a room that cannot cure itself: the pools give back
     if r_src < 0.0 or r_all < 0.0:
         # no room on a line: what this brain added goes back, as much as the shortfall needs (the pools holding the most
         # extra machines first, and in each the machines started last), never below a pool's twin (nothing native has is
-        # taken); the machines that fit stay, held where they are. No room is cooled below the operator's setpoint until
-        # the bone has room again
+        # taken) nor below what its queue needs (a machine taken from a queue leaves its work waiting); the machines that
+        # fit stay, held where they are. No room is pulled further below the operator's setpoint until the bone has room
+        # again: its pull-down is walked back
         short = -min(r_src, r_all)                                   # W of the body's power to give back
         for p, a in sorted(asks, key=lambda pa: -(pa[1].get("cur", 0) - pa[1].get("base", 0))):
             if a["line"] != "src":
-                p.override = {}                                      # rooms and axes: the everyday setting
+                p.override = walk_room(p) if a["line"] == "zone" else {}   # rooms walked back; axes: the everyday setting
                 continue
-            base = max(a["base"], int(p.P["n_min"]))
+            base = max(a["base"], int(p.P["n_min"]), min(a["cur"], queue_need(p)))
             extra = max(0, a["cur"] - base)
             give = min(extra, int(math.ceil(short / a["unit_w"] - 1e-9))) if short > 0.0 else 0
             short -= give * a["unit_w"]
@@ -925,6 +1060,7 @@ def max_body_step(body, cfg, bone):
                 p.override = ({"floor": float(base), "cap": float(base)} if extra else
                               ({"floor": float(base)} if base > p.P["n_min"] else {}))
                 p._mx_guard = True
+        room_guard(body, bone)
         return
     # pools by their shortfall first, then the rooms' pull-downs (cooling ahead of the heat protects every plant in the room)
     order = {"src": 0, "zone": 1, "axis": 2}
@@ -954,11 +1090,21 @@ def max_body_step(body, cfg, bone):
             # rooms and UPS lines already at their own limits (in the development runs its peak gave the body nothing
             # and crossed neighbours at their limits). Its peak is for an axis alone, with its own power and heat
             p.override = {}
-        elif a["cost"] <= r_all:
-            p.override = {"setpoint": a["x"]}
-            r_all -= a["cost"]
         else:
-            p.override = {}                                          # the pull-down waits for room
+            ok = a["cost"] <= r_all
+            if ok and not p.override.get("setpoint"):
+                # a new pull-down only if the bone can carry it for the cooling's own reaction time: one granted and taken
+                # back a decision later kicks the room's own controller and leaves it warm of native
+                reach = int(math.ceil(reaction_steps(p)))
+                if reach not in far:
+                    far[reach] = bone.room_for(reach)
+                ok = a["cost"] <= far[reach][1] - used
+            if ok:
+                p.override = {"setpoint": a["x"]}
+                r_all -= a["cost"]
+            else:
+                p.override = walk_room(p)                            # the pull-down waits for room, walked back
+    room_guard(body, bone)
 
 
 def compass_apply_v5(plant, knob, cfg, dt=1.0, tau=3.0):
