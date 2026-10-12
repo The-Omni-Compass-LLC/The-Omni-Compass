@@ -559,7 +559,7 @@ def main(argv=None):
     for d in todo:
         if a.grid != "all" and d["grid"] != a.grid:
             continue
-        if len(started) >= a.max_dispatches or inflight + d["jobs"] > target:
+        if len(started) >= a.max_dispatches or inflight >= target:   # a dispatch bigger than the margin still starts
             break
         if not a.dry:
             dispatch(d, a.ref)
