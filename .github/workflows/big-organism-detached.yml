@@ -18,10 +18,15 @@ name: big-organism-detached
 # artifacts are archived with the code by archive-run (results/live/raw/run-<collect run id>/).
 # The commit the test runs is an input (default: the dispatching commit), so an older engine can be run again on the same
 # machine: the organism names must then be the ones that commit knows (v1: organism_656, stack_1226).
+run-name: >-
+  ${{ github.event_name == 'schedule' && 'big-organism-detached collect' ||
+      inputs.mode != 'start' && format('big-organism-detached {0} {1}', inputs.mode, inputs.group) ||
+      format('big-organism-detached start {0} {1} x{2} reps {3}+{4} window {5}', inputs.test, inputs.organisms, inputs.size,
+             inputs.rep_first, inputs.reps, inputs.duration_s) }}
 on:
   workflow_dispatch:
     inputs:
-      mode: {description: "start (rent and start), collect (look at every running machine now) or survey (which 8-vCPU sizes this subscription may rent, region by region, and each region's quota; rents nothing)", default: "start"}
+      mode: {description: "start (rent and start), collect (look at every running machine now), stop (collect the machine of group now as it stands and delete it) or survey (which 8-vCPU sizes this subscription may rent, region by region, and each region's quota; rents nothing)", default: "start"}
       organisms: {description: "Organisms, comma separated (start)", default: "stack"}
       size: {description: "Copies of each organism on one clock (start)", default: "1000"}
       reps: {description: "Paired repetitions per organism (start)", default: "3"}
@@ -209,7 +214,7 @@ jobs:
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   collect:
-    if: github.event_name == 'schedule' || github.event.inputs.mode == 'collect'
+    if: github.event_name == 'schedule' || github.event.inputs.mode == 'collect' || (github.event.inputs.mode == 'stop' && github.event.inputs.group != '')
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
@@ -247,7 +252,7 @@ jobs:
             # without the log: the arms started, the paired script's last line, the organism's own last lines, the load
             echo "$state" | tail -n +3 | grep -v "^$" | head -8 | while IFS= read -r l; do echo "::notice::$RG: ${l:0:300}"; done
             if ! echo "$state" | grep -q ALL_DONE; then
-              if [ "$age_h" -lt "$max_h_rg" ]; then
+              if [ "$age_h" -lt "$max_h_rg" ] && [ "${{ github.event.inputs.mode }}" != stop ]; then
                 echo "::notice::$RG running ${age_h} h (limit ${max_h_rg} h): $(echo "$state" | head -1 | sed 's/^$/no cell finished yet/') finished; left alone"; continue
               fi
               echo "::warning::$RG is ${age_h} h old (limit ${max_h_rg} h): collected as it stands and deleted"
