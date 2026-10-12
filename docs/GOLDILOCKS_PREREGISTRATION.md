@@ -50,8 +50,14 @@ running through the measured window, recommending, as they do in service.
    request (the operator's 200m request and 500m limit in `deploy/kind/demo.yaml`: limit = target x 500/200); the memory
    request at the target (the container has no memory limit to keep). The deployment is rolled out and the warm-up
    begins.
-3. The recommendation, what was applied and the learning schedule are written to every run's `addons.txt`,
-   `goldilocks_recommendation.json` and `goldilocks_apply.json`; the VPA as the window left it to `vpa_end.json`.
+3. One recommendation for both arms of a repetition: each arm runs the same learning load (so both have the same
+   warm-up), and the operator applies the recommendation learned in the repetition's first arm to both (the order of the
+   arms rotates by repetition). Two short learnings differ by about a tenth on their own (the wiring run of 12 October,
+   run 38303511766: 203m in one arm, 182m in the other), and two arms serving with different requests would not be the
+   same native. Each arm's own learning is kept beside it.
+4. The recommendation, what was applied and the learning schedule are written to every run's `addons.txt`,
+   `goldilocks_recommendation.json` (applied), `goldilocks_own_recommendation.json` (the arm's own learning) and
+   `goldilocks_apply.json`; the VPA as the window left it to `vpa_end.json`.
 
 ## The workload and the measure
 
@@ -73,8 +79,8 @@ operator's settings) is invalid, kept in the raw files and not counted.
 
 ## Known limits, said before the result
 
-- The recommendation is learned over ten minutes of this load, not the days an operator would give it; both arms get the
-  same recommendation, learned the same way, so the comparison is fair, and the recommendation itself is shown.
+- The recommendation is learned over ten minutes of this load, not the days an operator would give it; both arms of a
+  repetition serve with the same recommendation, so the comparison is fair, and the recommendation itself is shown.
 - On kind there is no node autoscaler for native (no cloud to add or remove machines), so native keeps all six workers in
   service; Omni-Compass's machine and energy gauges are measured against that.
 - The VPA in a live mode (Auto, or in place) is not this test: Goldilocks ships recommendation mode, and a VPA changing CPU

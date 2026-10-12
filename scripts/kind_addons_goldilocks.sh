@@ -114,7 +114,17 @@ for i in $(seq 1 60); do
 done
 [ -n "${rec:-}" ] || { echo "the VPA gave no recommendation for php-apache"; kubectl get vpa "$VPA_NAME" -o yaml; \
   kubectl -n kube-system logs deployment/vpa-recommender --tail=60; exit 1; }
-echo "$rec" | jq . > "$OUT_DIR/goldilocks_recommendation.json"
+echo "$rec" | jq . > "$OUT_DIR/goldilocks_own_recommendation.json"
+# one recommendation for both arms of a repetition: each arm runs the same learning load (the same warm-up), but the
+# operator applies the recommendation the repetition's first arm learned to both, so the two arms serve with the same
+# requests (two short learnings differ by about a tenth on their own: 203m and 182m in the wiring run of 12 October)
+shared="${GOLDILOCKS_SHARED:-goldilocks-recommendation-rep${REP:-0}.json}"
+if [ -s "$shared" ]; then
+  cp "$shared" "$OUT_DIR/goldilocks_recommendation.json"; origin="the repetition's first arm (its own learning shown beside)"
+else
+  cp "$OUT_DIR/goldilocks_own_recommendation.json" "$shared"; cp "$shared" "$OUT_DIR/goldilocks_recommendation.json"
+  origin="this arm, the repetition's first"
+fi
 # the operator's rule (tools/goldilocks_apply.py): each request at the target, each limit in its proportion to its request
 python tools/goldilocks_apply.py "$OUT_DIR/goldilocks_recommendation.json" "$OUT_DIR/goldilocks_apply.json"
 req=$(jq -r .cpu_request_m "$OUT_DIR/goldilocks_apply.json"); lim=$(jq -r .cpu_limit_m "$OUT_DIR/goldilocks_apply.json")
@@ -127,7 +137,8 @@ now=$(kubectl get deployment php-apache -o json | jq -c '.spec.template.spec.con
 # the limit as the API server keeps it (it writes 1000m as "1"): what every reset check reads back from the pods
 echo "$now" | jq -r '.limits.cpu' > "$OUT_DIR/goldilocks_limit.txt"
 [ -s "$OUT_DIR/goldilocks_limit.txt" ] && [ "$(cat "$OUT_DIR/goldilocks_limit.txt")" != null ] || { echo "php-apache has no CPU limit after the recommendation"; exit 1; }
-{ echo "recommendation (php-apache): $(jq -c '{target, lowerBound, upperBound}' "$OUT_DIR/goldilocks_recommendation.json")"
+{ echo "recommendation (php-apache): $(jq -c '{target, lowerBound, upperBound}' "$OUT_DIR/goldilocks_recommendation.json"), learned in $origin"
+  echo "this arm's own learning: $(jq -c '{target}' "$OUT_DIR/goldilocks_own_recommendation.json")"
   echo "applied (the operator, as the VPA applies one): $now"
   echo "learning: ${LEARN} s through the load steps ${steps[*]}"
 } | tee -a "$OUT_DIR/addons.txt"
