@@ -816,13 +816,13 @@
 - The fifth and sixth v1 A/B/C tables: all four in one run (`results/live/V1_ALL_FOUR.md`, runs 37384945573, 37385646550,
   37394444337) and wandering demand (`results/live/V1_WANDERING.md`, runs 37384942870, 37385643291, 37394436586). All
   four: work inside the response line +48.4%, +44.7%, +42.1% (18.6 → 27.6 requests a second in A), p95 −57 to −63%,
-  time over the line −39 to −43%, failed requests −12 to −13%, every one better in all three of our runs in all three runs; machines and
+  time over the line −39 to −43%, failed requests −12 to −13%, every one better in all three of our runs; machines and
   energy no difference beyond the noise. Wandering: p95 −56 to −60%, time over the line −37 to −44%, failed requests −12
   to −13%, better in all three of our runs; machines no difference; the declared energy models −0.3 to −0.8%, lower in all three of our runs. All six
   Kubernetes tests now have their three v1 runs; the README's result table is the v1 readings.
 - The fourth v1 A/B/C table, the batch queue (`results/live/V1_BATCH.md`, runs 37385637932, 37385654462, 37394452486):
   machines in service −15 to −24%, machines after the queue is done −26 to −36%, standby-model energy −11 to −17% and
-  mean response −11 to −13%, every one better in all three of our runs in all three runs; the queue finished 0.7-0.9% later, clear of
+  mean response −11 to −13%, every one better in all three of our runs; the queue finished 0.7-0.9% later, clear of
   the noise in two runs and inside it in one, so that row reads no difference beyond the noise in 1 of 3 runs; p95 and
   the idle-power energy model no difference beyond the noise. The three-run tool now reads the batch queue's finish
   time and machines-after, and a real cloud's bill, as lower-is-better (one row had read "lower in all three of our runs").
@@ -841,7 +841,7 @@
   (`tools/confirm_abc.py`, `tools/citylearn_abc.py`), `omni_version.py` refuses an empty commit, and the test asserts it.
 - The third v1 A/B/C table, steady load (`results/live/V1_STEADY.md`, runs 37384939815, 37385640601, 37391296025, all
   on the v1 fingerprint): mean response −47 to −51%, p95 −65 to −69%, time over the line −98 to −99%, machines in service
-  −1.5 to −3.4%, standby-model energy −1.0 to −2.9%, every one better in all three of our runs in all three runs; the idle-power energy
+  −1.5 to −3.4%, standby-model energy −1.0 to −2.9%, every one better in all three of our runs; the idle-power energy
   model reads no difference beyond the noise in 2 of 3; failed requests zero in both arms. Three of the six Kubernetes
   tests now have their three runs: steady and faults better in all three of our runs, fairness no difference beyond the noise.
 - CityLearn's A/B/C table by rule (`tools/citylearn_abc.py`; `tests/test_citylearn_abc.py`, run by `verify.py`). CityLearn is a

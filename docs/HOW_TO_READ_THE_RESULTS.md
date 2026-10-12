@@ -169,7 +169,7 @@ the rows behind a number, and read their Reading column, never the sign alone. T
 
 ## Wire in, or watch (`docs/WIRING_VERDICTS.md`)
 
-One of three words per knob, by one rule from the tables above. **Write**: a gauge better in all three of our runs over all three runs
+One of three words per knob, by one rule from the tables above. **Write**: a gauge better in all three of our runs
 and none worse in all three of our runs; Omni holds the knob. **Watch**: nothing better in all three of our runs; the knob stays native and Omni only
 reads it (one wire out, no wire in), and a loss in all three of our runs is named with its cause. **Operator's choice**: gains and losses both the same in all three of our runs, a trade, shown with both readings of the index. Rows marked "shown, not judged" never count. A modelled
 muscle takes its word from its label: superior is write, a tradeoff label is the operator's choice, the rest is watch. The

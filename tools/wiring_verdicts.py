@@ -644,9 +644,9 @@ def main(check=False):
          "by a bare sign: a gauge that fell when falling is good reads **cut** (less waiting, fewer machines, less energy, less memory), one "
          "that rose when rising is good reads **up**, and each carries **good** or **cost**. In the result tables the same change keeps its raw "
          "sign (a cut reads minus there), with the Reading column beside it saying which way is good. A knob reads:", "",
-         "- **write**: at least one gauge better in all three of our runs over all three runs and none worse in all three of our runs. Omni holds the knob.",
-         "- **watch**: nothing better in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a gauge is the same in all three of our runs "
-         "worse, the loss is named and its cause given below. Where the runs disagree, nothing is settled and the knob stays native until it is.",
+         "- **write**: at least one gauge better in all three of our runs and none worse in all three of our runs. Omni holds the knob.",
+         "- **watch**: nothing better in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a gauge is worse in all three of our runs, "
+         "the loss is named and its cause given below. Where the runs disagree, nothing is settled and the knob stays native until it is.",
          "- **operator's choice**: gains and losses both the same in all three of our runs, a trade. Both readings of the Omni index are shown where the test is in it "
          "(the resource reading, the preregistered headline, and the service reading, work and speed alone), and the side that pays is named. "
          "The operator who wants the gain and can pay the cost wires in; every other operator watches.", "",

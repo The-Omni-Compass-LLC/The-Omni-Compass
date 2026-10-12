@@ -545,7 +545,7 @@ loss in all three of our runs in work or speed counts against Omni in both readi
 **The wiring verdicts, declared 2026-10-09 (a reading of the tables, not a change to any rule).** The founder's order of
 the same day: Omni need not be wired into every muscle; where it cannot beat native, the muscle stays native and Omni only
 reads it, one wire out and no wire in. `tools/wiring_verdicts.py` reads every three-run table, the simulator tables, the
-realms table and the organism tables by one rule into three words per knob and case: **write** (a judged gauge better in all three of our runs over all three runs, none worse in all three of our runs), **watch** (nothing better in all three of our runs, whether inside the noise, the runs
+realms table and the organism tables by one rule into three words per knob and case: **write** (a judged gauge better in all three of our runs, none worse in all three of our runs), **watch** (nothing better in all three of our runs, whether inside the noise, the runs
 disagreeing, or a loss with nothing against it) and **operator's choice** (gains and losses both the same in all three of our runs, shown with both
 readings of the index). Rows shown and not judged never count. Nothing is typed in, and `verify.py` fails if the page
 (`docs/WIRING_VERDICTS.md`) differs from what the tables give. The verdicts change what an operator connects, never the

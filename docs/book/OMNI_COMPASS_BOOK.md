@@ -5124,7 +5124,7 @@ the rows behind a number, and read their Reading column, never the sign alone. T
 
 ### Wire in, or watch (`docs/WIRING_VERDICTS.md`)
 
-One of three words per knob, by one rule from the tables above. **Write**: a gauge better in all three of our runs over all three runs
+One of three words per knob, by one rule from the tables above. **Write**: a gauge better in all three of our runs
 and none worse in all three of our runs; Omni holds the knob. **Watch**: nothing better in all three of our runs; the knob stays native and Omni only
 reads it (one wire out, no wire in), and a loss in all three of our runs is named with its cause. **Operator's choice**: gains and losses both the same in all three of our runs, a trade, shown with both readings of the index. Rows marked "shown, not judged" never count. A modelled
 muscle takes its word from its label: superior is write, a tradeoff label is the operator's choice, the rest is watch. The
@@ -5595,7 +5595,7 @@ start from the same fresh cluster, run for 900 s after a 120 s warm-up, and end 
   runs (min-max onto 1 to 8 generators, one step a bin, 24 steps of 108 s), and everything else was the wandering test's. p95
   fell 64% to 67%, p99 60% to 62%, the mean 51% to 53%, time over the line 81% to 82%, failed requests 11% to 18%, machines in
   service 7% to 9%, HPA replicas 4% to 8%, the standby-model energy 5% to 7% and the idle-power model 0.3% to 0.4%, all
-  better in all three of our runs in three runs of ten pairs; no pod was ever without a machine. The machines row is the same in all three of our runs here, where the
+  better in all three of our runs (ten pairs each); no pod was ever without a machine. The machines row is the same in all three of our runs here, where the
   wandering test's was inside the noise, because the trace has a long quiet stretch (six hours at two generators) in which
   machines are given back and our own schedule had none.
 - **On top of Kubernetes with its add-ons** (`V3_KEDA_CPU_REQUESTS.md`, `V3_KEDA_REQUESTS.md`,
@@ -5964,7 +5964,7 @@ not be wired into every muscle. Where it cannot beat the native controller on th
 itself and Omni only reads it, one wire out and no wire in. `tools/wiring_verdicts.py` applies that principle to every
 published result and prints the page `docs/WIRING_VERDICTS.md` (one row per knob and per muscle in
 `results/WIRING_VERDICTS.csv`; `verify.py` fails if the page differs from what the tables give). The rule is the same for
-every table: a knob reads **write** where at least one judged gauge is better in all three of our runs over all three runs and none is
+every table: a knob reads **write** where at least one judged gauge is better in all three of our runs and none is
 worse in all three of our runs; **watch** where nothing is better in all three of our runs, whether the rows are inside the noise, the runs disagree, or
 a gauge is worse in all three of our runs with nothing against it (the loss is then named with its cause); and **operator's choice** where
 gains and losses are both the same in all three of our runs, a trade shown with both readings of the index. A modelled muscle takes its word from
@@ -6116,7 +6116,7 @@ Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own
 
 Every judged gauge of a table counts (rows marked "shown, not judged" never do). Every change on this page is said in words, never by a bare sign: a gauge that fell when falling is good reads **cut** (less waiting, fewer machines, less energy, less memory), one that rose when rising is good reads **up**, and each carries **good** or **cost**. In the result tables the same change keeps its raw sign (a cut reads minus there), with the Reading column beside it saying which way is good. A knob reads:
 
-- **write**: at least one gauge better in all three of our runs over all three runs and none worse in all three of our runs. Omni holds the knob.
+- **write**: at least one gauge better in all three of our runs and none worse in all three of our runs. Omni holds the knob.
 - **watch**: nothing better in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a gauge is worse in all three of our runs, the loss is named and its cause given below. Where the runs disagree, nothing is settled and the knob stays native until it is.
 - **operator's choice**: gains and losses both the same in all three of our runs, a trade. Both readings of the Omni index are shown where the test is in it (the resource reading, the preregistered headline, and the service reading, work and speed alone), and the side that pays is named. The operator who wants the gain and can pay the cost wires in; every other operator watches.
 
@@ -8102,7 +8102,7 @@ loss in all three of our runs in work or speed counts against Omni in both readi
 **The wiring verdicts, declared 2026-10-09 (a reading of the tables, not a change to any rule).** The founder's order of
 the same day: Omni need not be wired into every muscle; where it cannot beat native, the muscle stays native and Omni only
 reads it, one wire out and no wire in. `tools/wiring_verdicts.py` reads every three-run table, the simulator tables, the
-realms table and the organism tables by one rule into three words per knob and case: **write** (a judged gauge better in all three of our runs over all three runs, none worse in all three of our runs), **watch** (nothing better in all three of our runs, whether inside the noise, the runs
+realms table and the organism tables by one rule into three words per knob and case: **write** (a judged gauge better in all three of our runs, none worse in all three of our runs), **watch** (nothing better in all three of our runs, whether inside the noise, the runs
 disagreeing, or a loss with nothing against it) and **operator's choice** (gains and losses both the same in all three of our runs, shown with both
 readings of the index). Rows shown and not judged never count. Nothing is typed in, and `verify.py` fails if the page
 (`docs/WIRING_VERDICTS.md`) differs from what the tables give. The verdicts change what an operator connects, never the
@@ -10065,7 +10065,7 @@ do not yet exist, the row says what will supply them.
 | Kubernetes: machines in service | −1.5% to −2.9% at steady load, **−19% to −23%** on the batch queue, better in all three of our runs; inside the noise on the other tests | L | "Why so little?" Because the verdict kept every machine whose removal made requests slower in the paired trial. Earlier engines without that check parked 29% to 36% of the machines and paid for it in response time; the frozen engine puts service first. kind has no node autoscaler, so parked machines stay powered: the saving is machine-hours, not watts |
 | Kubernetes: energy | the standby model, −11% to −14% on the batch queue and −5% to −7% under the Google trace, inside the noise elsewhere | L, modelled | "Is it a meter?" No. The machines are containers; energy is a declared formula (a parked worker at 25 W standby), stated as a model on every line |
 | Kubernetes: fairness beside a noisy neighbour | no difference beyond the noise on every row, the neighbour's included | L | "Does it hurt the other tenant?" Not measurably, in three runs of ten pairs |
-| Kubernetes under a public day of demand (the Google cluster trace of 2011): the 95th percentile; machines in service | **64% to 67% faster**; machines **−7% to −9%**, better in all three of our runs in three runs; failed requests −11% to −18% | L | "Whose demand shape?" Google's, from a published trace, turned into the schedule by a rule written before the runs and receipted with every part's SHA-256 |
+| Kubernetes under a public day of demand (the Google cluster trace of 2011): the 95th percentile; machines in service | **64% to 67% faster**; machines **−7% to −9%**, better in all three of our runs; failed requests −11% to −18% | L | "Whose demand shape?" Google's, from a published trace, turned into the schedule by a rule written before the runs and receipted with every part's SHA-256 |
 | Database behind its pooler: connections held open | **−6% to −11%** on the read-only workload, better in all three of our runs (the set of 10 October, the brain's verdict on the pool); the slow write workload's add refused | L | "What did it cost?" Nothing the same in all three of our runs: work, latency and host CPU inside the noise on all three workloads; the earlier sets' larger savings, and their costs, are whole in the history |
 | Message broker: work inside the 500 ms line; the 95th percentile | on the set of 10 October exactly nothing: every spend trial was abandoned before it was judged and the group stayed at the operator's two consumers; the earlier set's +16% to +21% and 1.6 s → 9 to 14 ms, bought with 6 to 8 consumers, is whole in the history | L | "Why nothing?" Our trial rule ended a spend trial on the calm the spend produced; amended as amendment 3, the next set running |
 | Database's storage-engine cache (MongoDB under YCSB): the cache size held | **−3% to −13% on f**, better in all three of our runs (the set of 10 October, the brain's verdict on the cache); b, c and burst inside the noise | L | "What did it cost?" Nothing the same in all three of our runs: work, p95, p99, mean latency and host CPU inside the noise on all four workloads, no failed operation |

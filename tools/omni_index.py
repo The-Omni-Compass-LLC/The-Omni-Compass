@@ -41,7 +41,7 @@ LIVE = ROOT / "results" / "live"
 # The three-run tables (tools/confirm_abc.py, docs/OMNI_V1.md, docs/OMNI_V3.md): each test's three runs on the frozen engine, every row with
 # its reading by rule. (category, test, file, {measure: row key}, work). work: "equal" (the same fixed-rate work was sent
 # to both arms and none failed: ratio 1), "capacity" (the capacity row of that table), or None (not taken). A measure
-# counts only as its reading allows: better or WORSE in all three of our runs over all three runs gives the geometric mean of
+# counts only as its reading allows: better or WORSE in all three of our runs gives the geometric mean of
 # the three runs' ratios; no difference beyond the noise, same, or the runs disagree gives exactly 1 (nothing is claimed
 # either way). Azure's billed runs and the six organisms join the index when their v1 tables land.
 P95 = "response time (ms), 95th percentile"
