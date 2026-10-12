@@ -37,12 +37,12 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-12 08:46 | kwok-scale | success | [38223766287](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38223766287) |
+| 2026-10-12 08:36 | big-organism-detached | success | [38222527215](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38222527215) |
 | 2026-10-12 08:32 | big-organism-detached stop omni-detached-38215301870 | success | [38224087068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38224087068) |
 | 2026-10-12 08:30 | grid | success | [38223887315](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38223887315) |
 | 2026-10-12 08:05 | six | cancelled | [38215037461](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215037461) |
 | 2026-10-12 07:52 | six-kube | cancelled | [38215254405](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215254405) |
-| 2026-10-12 07:42 | big-organism-detached | success | [38215301870](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215301870) |
-| 2026-10-12 07:30 | kwok-scale | success | [38215897994](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215897994) |
 | 2026-10-12 07:20 | pandapower | success | [38195443976](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195443976) |
 | 2026-10-12 06:27 | aks-metered | cancelled | [38196380124](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38196380124) |
 | 2026-10-12 04:49 | ycsb | success | [38195483021](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195483021) |
