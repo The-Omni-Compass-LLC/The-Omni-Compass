@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-> **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: confirm the installation with section 8.5 of the manual (*Wired right or wired wrong*).
+> **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: check the installation with section 8.5 of the manual (*Wired right or wired wrong*).
 
 > **Which knobs to wire in at all:** `docs/WIRING_VERDICTS.md` gives every knob in every published result one of three
 > words from the tables themselves: **write** (wire both ways), **watch** (wire out only: Omni reads, the native controller
@@ -233,7 +233,7 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
    back to back on the same machines, order rotated, at least 5 times (10 for a result you publish).
    `scripts/kind_paired.sh` and `tools/live_reps.py` do this and print each gauge with its 95% interval. A change is
    proven only when its interval excludes zero.
-2. **The switch drill,** after every run: turn Omni-Compass OFF, confirm every setting is back at its recorded
+2. **The switch drill,** after every run: turn Omni-Compass OFF, check every setting is back at its recorded
    original and no `omnicompass.io/*` annotation remains, turn it ON.
 3. **Read the results** with `docs/METRICS_CATALOG.md`: every gauge says whether it is measured or modelled.
 
@@ -260,7 +260,7 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | Claim | Evidence | Kind |
 |---|---|---|
 | On real Kubernetes, Omni v1, three runs of ten pairs each: more work inside the response line (+42% to +48%), p95 −57% to −69%, machines fewer where a paired trial allowed it (steady −1.5% to −3.4%, batch −15% to −24%) | `results/live/V1_ALL_FOUR.md`, `V1_STEADY.md`, `V1_WANDERING.md`, `V1_FAULTS.md`, `V1_BATCH.md`, `V1_FAIRNESS.md` | measured on kind; read by the three-run rule (`docs/OMNI_V1.md`) |
-| On a real database, Omni v3: 61% to 72% fewer connections held open for the same work and latency, at +14% to +28% host CPU-seconds (confirmed worse, reported) | `results/live/V3_PGBENCH.md` | measured on GitHub's machines |
+| On a real database, Omni v3: 61% to 72% fewer connections held open for the same work and latency, at +14% to +28% host CPU-seconds (worse in all three of our runs, reported) | `results/live/V3_PGBENCH.md` | measured on GitHub's machines |
 | On Azure's bill, 4 workers: no difference beyond the noise on any gauge (the fleet is too small for the lever) | `results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md` | a real bill |
 | Energy on Kubernetes | declared model on kind, no meter | modelled |
 | GPU: more work per energy within the speed guardrail | earlier card controller, obsolete; rerun on rented cards pending | hardware meter |

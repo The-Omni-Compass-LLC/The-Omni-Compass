@@ -1,8 +1,10 @@
-# YCSB on MongoDB, a database's operator-set cache size: the A/B/C confirmation
+# YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-MongoDB as shipped with the operator's WiredTiger cache (512 MB) is native; omni is the compass law on the cache size through the server's own console inside [256, 2,048] MB, holding the server's own mean read latency at 40% of the 1 ms line(`docs/YCSB_PREREGISTRATION.md`). YCSB's published core workloads ask for records from a key space that steps through the cache and past it, the same operations in both arms. Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **confirmed better** or **confirmed WORSE**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed operations: any increase in any run is WORSE. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every row is shown, losses included.
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+MongoDB as shipped with the operator's WiredTiger cache (512 MB) is native; omni is the compass law on the cache size through the server's own console inside [256, 2,048] MB, holding the server's own mean read latency at 40% of the 1 ms line(`docs/YCSB_PREREGISTRATION.md`). YCSB's published core workloads ask for records from a key space that steps through the cache and past it, the same operations in both arms. Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **better** or **WORSE in all three of our runs**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed operations: any increase in any run is WORSE. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every row is shown, losses included.
 
 | Run | GitHub run | Commit | Engine | Workloads |
 |---|---|---|---|---:|
@@ -70,8 +72,8 @@ MongoDB 8.0.32, YCSB 0.17.0; 3,000 operations a second offered from 32 threads; 
 | latency, 99th percentile (ms) | 0.559 | 0.565 | +1.2% (+0.2 to +2.2) | +2.6% (+0.5 to +4.6) | +1.2% (-4.5 to +6.8) | no difference beyond the noise (1 of 3 runs) |
 | latency, mean (ms) | 0.219 | 0.223 | +1.4% (-1.6 to +4.5) | -0.1% (-3.2 to +3.0) | +0.8% (-0.6 to +2.1) | no difference beyond the noise (3 of 3 runs) |
 | failed operations | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| cache size held, mean (MB; the knob, the resource) | 512.0 | 451.9 | -11.7% (-11.8 to -11.6) | -12.5% (-14.9 to -10.2) | -10.0% (-16.3 to -3.7) | **confirmed better** |
-| bytes in the cache, mean (MB) | 407.6 | 354.9 | -12.9% (-15.0 to -10.9) | -13.4% (-15.7 to -11.1) | -10.0% (-14.1 to -5.9) | **confirmed better** |
+| cache size held, mean (MB; the knob, the resource) | 512.0 | 451.9 | -11.7% (-11.8 to -11.6) | -12.5% (-14.9 to -10.2) | -10.0% (-16.3 to -3.7) | **better in all three of our runs** |
+| bytes in the cache, mean (MB) | 407.6 | 354.9 | -12.9% (-15.0 to -10.9) | -13.4% (-15.7 to -11.1) | -10.0% (-14.1 to -5.9) | **better in all three of our runs** |
 | pages read into the cache (misses) | 275,598 | 299,411 | +8.6% (-10.0 to +27.3) | +8.0% (-3.1 to +19.0) | +4.5% (-29.3 to +38.3) | shown, not judged |
 | host CPU busy (share of the run) | 0.182 | 0.172 | -5.5% (-38.1 to +27.1) | -1.2% (-31.7 to +29.3) | -2.1% (-117.6 to +113.5) | no difference beyond the noise (3 of 3 runs) |
 | host CPU-seconds | 124.7 | 115.8 | -7.2% (-44.7 to +30.4) | -1.2% (-38.2 to +35.7) | -3.0% (-136.0 to +130.0) | no difference beyond the noise (3 of 3 runs) |
@@ -118,8 +120,8 @@ MongoDB 8.0.32, YCSB 0.17.0; 3,000 operations a second offered from 32 threads; 
 | latency, 99th percentile (ms) | 0.635 | 0.629 | -1.0% (-3.0 to +1.0) | -0.1% (-1.2 to +1.1) | -0.6% (-1.3 to +0.0) | no difference beyond the noise (3 of 3 runs) |
 | latency, mean (ms) | 0.254 | 0.251 | -1.2% (-5.3 to +2.9) | +0.8% (+0.2 to +1.3) | -1.0% (-3.5 to +1.5) | no difference beyond the noise (2 of 3 runs) |
 | failed operations | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| cache size held, mean (MB; the knob, the resource) | 512.0 | 443.9 | -13.3% (-15.7 to -10.9) | -14.7% (-20.0 to -9.4) | -12.8% (-15.2 to -10.3) | **confirmed better** |
-| bytes in the cache, mean (MB) | 417.2 | 363.7 | -12.8% (-14.3 to -11.3) | -14.2% (-19.5 to -8.9) | -12.1% (-14.1 to -10.2) | **confirmed better** |
+| cache size held, mean (MB; the knob, the resource) | 512.0 | 443.9 | -13.3% (-15.7 to -10.9) | -14.7% (-20.0 to -9.4) | -12.8% (-15.2 to -10.3) | **better in all three of our runs** |
+| bytes in the cache, mean (MB) | 417.2 | 363.7 | -12.8% (-14.3 to -11.3) | -14.2% (-19.5 to -8.9) | -12.1% (-14.1 to -10.2) | **better in all three of our runs** |
 | pages read into the cache (misses) | 677,539 | 785,502 | +15.9% (+11.3 to +20.6) | +16.8% (+11.4 to +22.3) | +14.7% (+11.9 to +17.5) | shown, not judged |
 | host CPU busy (share of the run) | 0.28 | 0.279 | -0.4% (-7.0 to +6.1) | -0.3% (-20.8 to +20.2) | -0.7% (-8.8 to +7.5) | no difference beyond the noise (3 of 3 runs) |
 | host CPU-seconds | 472.9 | 470.9 | -0.4% (-9.6 to +8.7) | -0.7% (-26.8 to +25.4) | -0.7% (-11.5 to +10.2) | no difference beyond the noise (3 of 3 runs) |
@@ -130,7 +132,7 @@ The cache size handed back to the operator's and read back at the end of every o
 
 The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 448 to 512 (2 trials, 1 allowed, 1 refused); acting: 384 to 512 (2 trials, 2 allowed, 0 refused); acting: 384 to 512 (2 trials, 2 allowed, 0 refused); run B: acting: 384 to 512 (3 trials, 2 allowed, 0 refused); acting: 448 to 512 (3 trials, 1 allowed, 1 refused); acting: 384 to 512 (3 trials, 2 allowed, 0 refused); run C: acting: 448 to 512 (2 trials, 1 allowed, 1 refused); acting: 448 to 512 (2 trials, 1 allowed, 1 refused); acting: 384 to 512 (2 trials, 2 allowed, 0 refused).
 
-**Across 4 untouched workloads: 4 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree.**
+**Across 4 untouched workloads: 4 gauge-rows better in all three of our runs, 0 worse in all three of our runs, 0 where the runs disagree.**
 
 ---
 

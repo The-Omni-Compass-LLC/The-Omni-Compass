@@ -6,7 +6,7 @@
 """The robustness test's readings (tools/live_reps.py, docs/ROBUSTNESS_PREREGISTRATION.md) without a cluster: the kill and
 hand-back marks are read from robust.log, the 120 s after the kill are compared in both arms from the probe's own records,
 the governor's memory ratio comes from the process-table samples, a hand-back past the allowance or a memory growth past
-the limit reads WORSE, and the three-run rows read confirmed only when every run's every repetition was handed back."""
+the limit reads WORSE, and the three-run rows read the same in all three of our runs only when every run's every repetition was handed back."""
 import json
 import sys
 import tempfile
@@ -83,13 +83,13 @@ def main():
         arm(root, "compass", 3, t0, 360, None)
         _, s = R.robust_table(root, ["native", "compass"])
         assert s["compass"]["never_handed_back"] == 1 and s["compass"]["handed_back_s_max"] == float("inf")
-        # the three-run rows: confirmed only when every run was handed back within the allowance everywhere
+        # the three-run rows: the same in all three of our runs only when every run was handed back within the allowance everywhere
         good = {"compass": {"repetitions": 10, "kill_repetitions": 10, "handed_back_within_allowance_all": True, "handed_back_s_mean": 11.0, "handed_back_s_max": 18.0,
                             "never_handed_back": 0, "second_governor_all": True, "memory_ratio_max": 1.03, "allowance_s": 60.0, "memory_limit": 1.25}}
         bad = {"compass": dict(good["compass"], handed_back_within_allowance_all=False, handed_back_s_max=95.0, memory_ratio_max=1.40)}
         runs = [("1", {}, 10, good), ("2", {}, 10, good), ("3", {}, 10, good)]
         lines, rows = C.robust_rows(runs)
-        assert len(lines) == 3 and "confirmed: handed back" in lines[0] and "no leak" in lines[2]
+        assert len(lines) == 3 and "handed back within the allowance in every repetition, in all three of our runs" in lines[0] and "no leak" in lines[2]
         lines, rows = C.robust_rows([("1", {}, 10, good), ("2", {}, 10, bad), ("3", {}, 10, good)])
         assert "WORSE" in lines[0] and "a leak" in lines[2]
         assert C.robust_rows([("1", {}, 10, good), ("2", {}, 10, None), ("3", {}, 10, good)]) == ([], {}), "a run without the block makes no robustness rows"
@@ -127,13 +127,13 @@ def main():
                                decision_time_ratio_max=1.8, handed_back_end_all=False)}
         lines, rows = C.robust_rows([("1", {}, 3, good), ("2", {}, 3, good), ("3", {}, 3, good)])
         assert len(lines) == 5 and "no leak" in lines[0] and "valid (every repetition" in lines[1] and "none in any repetition" in lines[2] \
-            and "no growth" in lines[3] and "confirmed: every setting handed back" in lines[4], lines
+            and "no growth" in lines[3] and "every setting handed back at the end of every repetition, in all three of our runs" in lines[4], lines
         lines, rows = C.robust_rows([("1", {}, 3, good), ("2", {}, 3, bad), ("3", {}, 3, good)])
         assert "INVALID" in lines[1] and "shown, not judged: API 500" in lines[2] and "WORSE" not in lines[2] and "grew by more than half" in lines[3] \
             and "not handed back at the end" in lines[4], lines
     print("PASS  robustness readings: the kill and hand-back marks, the 120 s after the kill in both arms, the memory ratio; a late hand-back, a leak or a missing "
           "second governor reads WORSE; the long run's decisions of expected, failed decisions, decision-time growth and hand-back at the end; "
-          "the three-run rows confirm only when every run's every repetition was handed back within the allowance")
+          "the three-run rows read the same in all three of our runs only when every run's every repetition was handed back within the allowance")
 
 
 if __name__ == "__main__":

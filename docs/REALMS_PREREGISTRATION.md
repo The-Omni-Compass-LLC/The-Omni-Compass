@@ -4,7 +4,7 @@
 
 Round 3 is the current one: its section at the end changes only how the realms are made up. Round 2's section
 replaced round 1's Omni layer. Round 1 below is kept as it
-was frozen. Each round was written and committed before its confirmation seeds were run. Evidence class **S**: every number the run produces
+was frozen. Each round was written and committed before its counted seeds were run. Evidence class **S**: every number the run produces
 comes from a declared model. Nothing here is a meter, and nothing here is evidence about a real machine.
 
 ## Question
@@ -55,7 +55,7 @@ One governor reads the organism's aggregate, and its one directive sets every mu
 
 ## Seeds and repetitions
 
-Confirmation seeds 1000 to 1009: ten paired seeds per muscle and per organism. Development used seeds 0 and 1 only.
+Counted seeds 1000 to 1009: ten paired seeds per muscle and per organism. Development used seeds 0 and 1 only.
 Nothing from development seeds is reported.
 
 ## Outcomes
@@ -100,11 +100,11 @@ Per muscle and organism:
 - the fixed-setpoint comparison where it applies.
 
 Per run: the commit, the seeds, and the fingerprints of the catalog, the engine, the governor and the whole frozen
-tree (`RUN.json`, `SHA256SUMS.txt`). The confirmation refuses to run on uncommitted code.
+tree (`RUN.json`, `SHA256SUMS.txt`). The counted run refuses to run on uncommitted code.
 
 ## Changes made on the development seeds, before this freeze
 
-The development runs found bugs and sizing faults. Each was fixed before the confirmation seeds were run:
+The development runs found bugs and sizing faults. Each was fixed before the counted seeds were run:
 
 - **The admission knob was inverted**: it admitted only what cleared the service target while change was permitted.
   Fixed to the declared rule.
@@ -138,7 +138,7 @@ for Omni before and after them.
   family share the family's plant model at different sizes, through different knobs.
 - **The plant code is Python only.** The governor's C++ twin is unchanged; a C++ twin of the plants is open.
 
-## Round 2 (2026-10-01, after round 1's results; before any round-2 confirmation seed)
+## Round 2 (2026-10-01, after round 1's results; before any round-2 counted seed)
 
 Round 1 (seeds 1000-1009) labelled all five organisms WORSE. Reading the result against the shipped controller
 (`omni_controller/controller.py`, `omni_controller/muscles.py`, `omnicompass/nervous_system.py`) showed that round 1's
@@ -168,7 +168,7 @@ label rule and the invalidity rules.
 - **Round 2 seeds:** 2000 to 2009. Development of round 2 used seeds 0 and 1 only, never reported.
 - **Results:** `results/realms/` (round 1 in `results/realms/round1/`). Both rounds are cited together.
 
-## Round 3 (2026-10-02, after round 2's results; before any round-3 confirmation seed)
+## Round 3 (2026-10-02, after round 2's results; before any round-3 counted seed)
 
 Only the make-up of the realm organisms changes. The plants, the Omni layer, the outcomes, the guardrails, the label
 rule and the invalidity rules are round 2's, unchanged.
@@ -266,7 +266,7 @@ The step is 2 s of wall clock wherever the simulation keeps up. A size whose ste
 240 steps, so the card and the stacks stay on one clock. The step of every size is in the receipt. At 1,000 copies the
 card is one muscle among hundreds of thousands, so its watts are a small share of the organism's; that is the
 arithmetic of one card in a large stack, and the card's own meter is reported apart from the stacks. Everything else is
-as round 5. The two GPU confirmations now run before this stage, so the most important results are in hand first.
+as round 5. The two GPU counted runs now run before this stage, so the most important results are in hand first.
 
 ## Round 6 receipts and the one rule (2026-10-03)
 

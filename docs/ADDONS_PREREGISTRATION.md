@@ -44,8 +44,8 @@ mean difference and its 95% interval.
 
 - A gauge whose 95% interval of the paired difference is clear of zero is a difference in this run; one whose interval
   includes zero is no difference beyond the noise, and that is the result.
-- One run (A) is a first reading. A confirmed reading needs runs B and C on the same commit (`tools/confirm_abc.py`):
-  confirmed better or worse, no difference beyond the noise, or the runs disagree.
+- One run (A) is a first reading. A reading the same in all three of our runs needs runs B and C on the same commit (`tools/confirm_abc.py`):
+  better or worse in all three of our runs, no difference beyond the noise, or the runs disagree.
 - Response times are class L (measured on live software). Machines in service are counted live; the watts are the
   declared model (class S), as in every kind set.
 
@@ -68,15 +68,15 @@ both) and [`V3_KEDA_REQUESTS.md`](../results/live/V3_KEDA_REQUESTS.md) (setup ht
 
 | Gauge | Setup both: KEDA on the CPU target and the requests in flight | Setup http: KEDA's HTTP add-on on the requests in flight |
 |---|---|---|
-| Response time, 95th percentile | **−51% to −53%, confirmed better** | **−73% to −76%, confirmed better** |
-| Response time, mean | −36% to −39%, confirmed better | −59% (−58.7% to −59.3%), confirmed better |
-| Response time, 99th percentile | −60% to −62%, confirmed better | −70% to −72%, confirmed better |
-| Time over the response line | −97% to −100%, confirmed better | −96% to −97%, confirmed better |
+| Response time, 95th percentile | **−51% to −53%, better in all three of our runs** | **−73% to −76%, better in all three of our runs** |
+| Response time, mean | −36% to −39%, better in all three of our runs | −59% (−58.7% to −59.3%), better in all three of our runs |
+| Response time, 99th percentile | −60% to −62%, better in all three of our runs | −70% to −72%, better in all three of our runs |
+| Time over the response line | −97% to −100%, better in all three of our runs | −96% to −97%, better in all three of our runs |
 | Failed requests | no difference beyond the noise (none in either arm in B and C) | no difference beyond the noise |
-| Worker nodes in service | −0.6% to −0.7%, no difference beyond the noise in 2 of 3 runs | **−5.9% to −7.8%, confirmed better** |
-| Node-hours | −0.4% to −0.9%, no difference beyond the noise in 1 of 3 runs | −5.8% to −8.2%, confirmed better |
-| HPA replicas (set by KEDA) | +0.3% to +3.1%, no difference beyond the noise in 2 of 3 runs | −13.7% to −14.5%, confirmed better |
-| Energy, parked workers still on at idle power (declared model, class S) | **+1.0% to +1.6%, confirmed WORSE** | **+1.4% to +2.6%, confirmed WORSE** |
+| Worker nodes in service | −0.6% to −0.7%, no difference beyond the noise in 2 of 3 runs | **−5.9% to −7.8%, better in all three of our runs** |
+| Node-hours | −0.4% to −0.9%, no difference beyond the noise in 1 of 3 runs | −5.8% to −8.2%, better in all three of our runs |
+| HPA replicas (set by KEDA) | +0.3% to +3.1%, no difference beyond the noise in 2 of 3 runs | −13.7% to −14.5%, better in all three of our runs |
+| Energy, parked workers still on at idle power (declared model, class S) | **+1.0% to +1.6%, WORSE in all three of our runs** | **+1.4% to +2.6%, WORSE in all three of our runs** |
 | Energy, parked workers at 25 W standby (declared model, class S) | +0.5% to +1.2%, no difference beyond the noise in 1 of 3 runs | −1.6% to −4.2%, no difference beyond the noise in 1 of 3 runs |
 | CPU used by the service (shown, not judged) | +24% to +32% | +45% to +54% |
 | Energy per core-hour of the service's CPU (shown, not judged) | −18% to −23% | −33% to −36% |
@@ -86,7 +86,7 @@ every run of both setups, and with the HTTP add-on alone it also ran on 6% to 8%
 counted with every parked worker still drawing idle power: 1% to 3% more. The load is closed-loop (each client sends its
 next request when the last one returns), so faster answers bring more requests: the service's CPU, which php-apache spends
 in a fixed amount per request, rose 24% to 54%, and the modelled watts rose with it, while the energy per core-hour fell 18%
-to 36%. The total stands as a confirmed loss, counted against Omni-Compass in the index; the work itself is not counted by
+to 36%. The total stands as a loss in all three of our runs, counted against Omni-Compass in the index; the work itself is not counted by
 this test, so the claim "more work for the energy" is shown, not judged.
 
 **Declared for the next run of this test (on Omni v4), before it runs:** the load generator counts the requests it

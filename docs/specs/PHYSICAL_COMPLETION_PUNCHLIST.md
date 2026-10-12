@@ -28,7 +28,7 @@ Do not alter the eight-line core, canonical C++ twin, frozen Python/C++ parity p
 `OMNI_CLAIM_MODE=LIVE_GATE` exists only to reproduce the historical Set-22 architecture for controlled A/B diagnosis: evolve with `u=0`, then calculate a post-evolve command used only as a gate. Results from this mode must be labeled compatibility evidence, never current-governor evidence.
 
 ## Physical GPU completion
-Run preflight, then smoke, then confirmation. Keep failures. Confirmation must preserve Native/Watch/Omni arms, frozen work unit, SLO, GPU identity, driver, requested/enforced limits, clock-event reasons, device energy, integrated draw cross-check, RAPL package energy, Omni CPU seconds, write counts, restoration and optional independent wall energy.
+Run preflight, then smoke, then the counted run. Keep failures. The counted run must preserve Native/Watch/Omni arms, frozen work unit, SLO, GPU identity, driver, requested/enforced limits, clock-event reasons, device energy, integrated draw cross-check, RAPL package energy, Omni CPU seconds, write counts, restoration and optional independent wall energy.
 
 The run is invalid if Watch writes, restoration fails, required authority readback is unavailable, frozen code changes, a foreign compute process occupies the selected GPU, or the experiment violates its preregistered conditions. Thermal or hardware-power-brake evidence must not be credited as an Omni efficiency mechanism.
 
@@ -47,7 +47,7 @@ A physical completion claim requires a sealed physical GPU result plus a current
 This living document is synchronized to XPASS25. Historical receipts and prior-run artifacts remain frozen and are not rewritten. The canonical six-state/eight-line CLAIM1 core, held-u law, C++ core, GPU writer/watchdog, causal evidence gate, and physical evidence contracts are unchanged from XPASS15.
 
 
-Open external evidence remains: 500-scenario confirmation, Kind CLAIM1-23, and physical NVIDIA. Simulation results are not physical meter results or proprietary-product executions.
+Open external evidence remains: 500-scenario counted run, Kind CLAIM1-23, and physical NVIDIA. Simulation results are not physical meter results or proprietary-product executions.
 
 ---
 

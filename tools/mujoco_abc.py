@@ -5,7 +5,7 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for the robot arms (docs/OMNI_V1.md, docs/ROBOTICS_PREREGISTRATION.md): each robot run three times as
 separate GitHub runs on the same frozen engine (tools/run_mujoco.py). MuJoCo is deterministic, so the runs must give the
-same numbers: a gauge reads confirmed better or confirmed WORSE by its sign when all three runs agree, same when the
+same numbers: a gauge reads better or WORSE in all three of our runs by its sign when all three runs agree, same when the
 change is under one part in a million, and "the runs differ" when they do not reproduce. A robot whose paired physics
 trial left the override native is listed as "nothing for Omni to move"; a robot whose own servo cannot do the task is
 listed with the runner's reason. Every row is reported, losses included.
@@ -21,6 +21,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
+from tools.readings import with_own_runs  # noqa: E402  (every table says whose runs these are)
 from tools.run_mujoco import GAUGES
 
 SAME_REL = 1e-6
@@ -66,7 +67,7 @@ def verdict(recs, k, direction):
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    return "**confirmed WORSE**" if signs == {1} else "**confirmed better**"
+    return "**WORSE in all three of our runs**" if signs == {1} else "**better in all three of our runs**"
 
 
 def engine(run):
@@ -93,12 +94,12 @@ def main(argv=None):
     ap.add_argument("a"); ap.add_argument("b"); ap.add_argument("c"); ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     runs = [load(d) for d in (a.a, a.b, a.c)]
-    L = ["# Robot arms, MuJoCo Menagerie: the A/B/C confirmation (Omni v1)", "",
+    L = ["# Robot arms, MuJoCo Menagerie: the A/B/C three-run table (Omni v1)", "",
          "MuJoCo (Google DeepMind) integrates each arm; MuJoCo Menagerie supplies the robot as its maker describes it, with the "
          "position servos it ships with as native. Omni sits on top of that servo on one knob, the speed override, inside the "
          "task's takt (`docs/ROBOTICS_PREREGISTRATION.md`). Energy is a declared model from MuJoCo's own torques and velocities, "
          "the same in both arms, with the standing draw charged for the whole takt. Three separate GitHub runs on the same frozen "
-         "engine: MuJoCo is deterministic, so a gauge reads **confirmed better** or **confirmed WORSE** when all three runs give "
+         "engine: MuJoCo is deterministic, so a gauge reads **better** or **WORSE in all three of our runs** when all three runs give "
          "the same sign, **same** under one part in a million, and **the runs differ** when they do not reproduce. A robot whose "
          "paired physics trial found a slower cycle no cheaper is listed as nothing for Omni to move. Every row is shown, losses "
          "included.", "",
@@ -116,7 +117,7 @@ def main(argv=None):
     if len({r for r, _ in runs}) < 3:
         off.append("A, B and C must be three separate runs")
     if off:
-        L[2:2] = [f"**Not a v1 confirmation: {'; '.join(off)}.**", ""]
+        L[2:2] = [f"**Not one engine's three runs: {'; '.join(off)}.**", ""]
     robots = sorted(set().union(*(set(r) for _, r in runs)))
     tally = {}; idle = []; broken = []
     L += ["", "## Robots where Omni moved the override", ""]
@@ -140,13 +141,13 @@ def main(argv=None):
             L.append(f"| {name} | {r0['native'][k]:.4g} | {r0['omni'][k]:.4g} | {pct(change(recs[0], k), k)} | {pct(change(recs[1], k), k)} | "
                      f"{pct(change(recs[2], k), k)} | {v} |")
         L.append("")
-    L += ["## Across the robots Omni moved", "", "| Gauge | Confirmed better | Confirmed worse | Same | The runs differ |", "|---|---:|---|---:|---:|"]
+    L += ["## Across the robots Omni moved", "", "| Gauge | Better in all three of our runs | Worse in all three of our runs | Same | The runs differ |", "|---|---:|---|---:|---:|"]
     for k, name, direction in GAUGES:
         t = tally.get(k)
         if not t:
             continue
-        w = t.get("**confirmed WORSE**", [])
-        L.append(f"| {name} | {len(t.get('**confirmed better**', []))} | {len(w)}{' (' + ', '.join(w) + ')' if w else ''} | {len(t.get('same', []))} | "
+        w = t.get("**WORSE in all three of our runs**", [])
+        L.append(f"| {name} | {len(t.get('**better in all three of our runs**', []))} | {len(w)}{' (' + ', '.join(w) + ')' if w else ''} | {len(t.get('same', []))} | "
                  f"{len(t.get('**the runs differ**', []))} |")
     L += ["", "## Robots where the paired trial left the override native: nothing for Omni to move", "",
           "In native mode, before the counted cycles, one cycle at full speed and one at override 0.8 showed a slower cycle no "
@@ -161,10 +162,10 @@ def main(argv=None):
     for rb, e in broken:
         L.append(f"| {rb} | `{e}` |")
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text("\n".join(_legal_stamp(L)) + "\n")
-    nb = sum(len(t.get("**confirmed better**", [])) for t in tally.values()); nw = sum(len(t.get("**confirmed WORSE**", [])) for t in tally.values())
+    out.write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
+    nb = sum(len(t.get("**better in all three of our runs**", [])) for t in tally.values()); nw = sum(len(t.get("**WORSE in all three of our runs**", [])) for t in tally.values())
     nd = sum(len(t.get("**the runs differ**", [])) for t in tally.values())
-    print(f"{out}: {len(robots) - len(idle) - len(broken)} robots moved ({nb} gauge-rows confirmed better, {nw} confirmed worse, {nd} where the runs differ), "
+    print(f"{out}: {len(robots) - len(idle) - len(broken)} robots moved ({nb} gauge-rows better in all three of our runs, {nw} worse in all three of our runs, {nd} where the runs differ), "
           f"{len(idle)} nothing to move, {len(broken)} could not run")
     return 0
 

@@ -99,7 +99,7 @@ Each workload gets its own native calibration of the base rate, by the rule abov
 
 Each workload: **three paired repetitions** (native and omni, alternating order) in one GitHub Actions job; the
 paired difference's 95% interval over the repetitions decides whether a change is beyond the noise within that run.
-Three separate runs on the frozen engine (A, B, C); the three-run table reads confirmed better or confirmed worse when
+Three separate runs on the frozen engine (A, B, C); the three-run table reads better or worse in all three of our runs when
 the sign holds and every run's interval is clear of zero, no difference beyond the noise when a run's interval includes
 zero, the runs disagree when clear runs point different ways. Two workloads run at a time, so the other benchmarks keep
 their runners.
@@ -116,7 +116,7 @@ show, that row included.
 
 ## Amendment 4 (2026-10-10 13:05 UTC, after the first counted set on amendment 3, before the next): a spend trial runs to its samples
 
-The first counted set on the brain's verdict (runs 38013313943, 38013319893, 38013324861; the table `results/live/V3_PGBENCH.md`) landed at midday on 10 October. What it showed about the trials: the trials were judged on this stack (10 to 28 trials an arm, 3 to 7 allowed, 2 to 4 refused, few abandoned), the pool was given back on `select` (connections held open −6% to −11%, confirmed better) and the add above the operator's 20 on `simple_update` was refused as expected, with every other gauge inside the noise.
+The first counted set on the brain's verdict (runs 38013313943, 38013319893, 38013324861; the table `results/live/V3_PGBENCH.md`) landed at midday on 10 October. What it showed about the trials: the trials were judged on this stack (10 to 28 trials an arm, 3 to 7 allowed, 2 to 4 refused, few abandoned), the pool was given back on `select` (connections held open −6% to −11%, better in all three of our runs) and the add above the operator's 20 on `simple_update` was refused as expected, with every other gauge inside the noise.
 
 **The cause is ours.** Amendment 3 ended a trial when the service swung to the other direction's condition: a give-back trial when the service left calm (the engine's own rule, kept), and a spend trial when the service turned calm. A spend that works calms the service within seconds, so a spend trial could never reach its samples: every successful spend ended its own trial unjudged. Nothing in the stack and nothing in the engine did this; the engine's verdict ends a trial when the condition it is given ends, and we gave it the wrong condition for spending. Found on the first set, corrected before the second, declared here.
 
@@ -198,14 +198,14 @@ The three untouched workloads, three separate GitHub runs, three paired repetiti
 
 | Workload | Connections held open (the machines) | Host CPU-seconds | Work inside the line, throughput, p50, p95, p99 |
 |---|---|---|---|
-| `select` | 19.3 → 7.5, **confirmed better** (−61% to −63% in the three runs) | **confirmed worse** (+14% to +27%) | no difference beyond the noise (3 of 3 runs) |
-| `simple_update` | **the runs disagree** (+12% in one run, −34% and −35% in two) | **confirmed worse** (+18% to +28%) | no difference beyond the noise (2 or 3 of 3 runs) |
-| `tpcb_hot` | 19.4 → 6.0, **confirmed better** (−69% to −72%) | **confirmed worse** (+15% to +25%) | no difference beyond the noise (2 or 3 of 3 runs) |
+| `select` | 19.3 → 7.5, **better in all three of our runs** (−61% to −63% in the three runs) | **worse in all three of our runs** (+14% to +27%) | no difference beyond the noise (3 of 3 runs) |
+| `simple_update` | **the runs disagree** (+12% in one run, −34% and −35% in two) | **worse in all three of our runs** (+18% to +28%) | no difference beyond the noise (2 or 3 of 3 runs) |
+| `tpcb_hot` | 19.4 → 6.0, **better in all three of our runs** (−69% to −72%) | **worse in all three of our runs** (+15% to +25%) | no difference beyond the noise (2 or 3 of 3 runs) |
 
 Failed transactions 0 and 0 in every run; the knob handed back and read back in every arm. Read: with the amended
 reading the read-only collapse of the first run did not recur (work inside the line and throughput within the noise of
 native's in all three runs), and Omni held a third of the connections open for the same work. The cost is real and
-confirmed: the host spent 14% to 28% more CPU, which is PgBouncer queuing clients behind a smaller pool. The latencies
+the same in all three of our runs: the host spent 14% to 28% more CPU, which is PgBouncer queuing clients behind a smaller pool. The latencies
 cannot be told apart on GitHub's shared runner, where native's own p95 moved from 3 ms to 3 s between repetitions; that
 is the runner, and it is said so. Nothing in the rule changes after these runs.
 
@@ -218,7 +218,7 @@ explanation written without a measurement, and the measurement shows it was wron
 **The question.** The founder asked for every cost in the counted tables to be traced to its mechanism and removed where
 the mechanism is ours, with the engine locked (Omni v3; `tools/omni_version.py` prints omni-v3 before and after this
 amendment: `tools/run_pgbench.py` is a harness, outside the engine's fingerprint). Two rows of `V3_PGBENCH.md` are costs:
-**host CPU +14% to +28%, confirmed worse on all three workloads**, and **median latency +15% to +17%, confirmed worse on
+**host CPU +14% to +28%, worse in all three of our runs on all three workloads**, and **median latency +15% to +17%, worse in all three of our runs on
 `select` and `tpcb_hot`** (the p95 moved from 2.7 ms to 143 ms on `select` as a point estimate, inside the noise only
 because one repetition read 367 ms and another 17 ms).
 
@@ -329,9 +329,9 @@ arm reads NO on the hand-back line and says why.
 **What is expected, said before the runs.** The host CPU rows should come down to the noise, because the cost was ours; the
 median and p95 rows should come back toward native's, because the pool is no longer shrunk into a queue; the connections
 held open should still fall, by much less than the 61% to 72% of the first set (the local pairs say 9% to 27%), because the
-pool is now taken only from idle servers and given back the moment anyone waits. If the CPU rows stay confirmed worse after
+pool is now taken only from idle servers and given back the moment anyone waits. If the CPU rows stay worse in all three of our runs after
 this, the cost is the pooler's or the database's after all and the next amendment is not ours to make; if the connections
-row loses its confirmation, that is the result; if the tail rows read confirmed worse over three runs, the probing itself
+row is no longer the same in all three of our runs, that is the result; if the tail rows read worse in all three of our runs over three runs, the probing itself
 costs service and the rule is not good enough, and that too is the result.
 
 **The second counted set (A2, B2, C2)** runs on this harness, the same inputs as the first (the three untouched workloads,
@@ -351,8 +351,8 @@ repetitions each; the table by rule is `results/live/V3_PGBENCH.md` (`tools/pgbe
 kept whole in `docs/history/V3_PGBENCH_set1.md`.
 
 **The two costs are gone.** Host CPU reads inside the noise on all three workloads (`select` −3.2%, +0.9%, +2.8%;
-`simple_update` +1.6% to +2.7%; `tpcb_hot` +2.4% to +6.1%; the first set read +14% to +28%, confirmed worse). The median
-latency reads inside the noise on all three (`select` −3.8%, +0.9%, +0.7%; the first set read +15% to +17%, confirmed worse
+`simple_update` +1.6% to +2.7%; `tpcb_hot` +2.4% to +6.1%; the first set read +14% to +28%, worse in all three of our runs). The median
+latency reads inside the noise on all three (`select` −3.8%, +0.9%, +0.7%; the first set read +15% to +17%, worse in all three of our runs
 on `select` and `tpcb_hot`). The harness's own CPU, now in the table, is 0.4 to 2.5 CPU-seconds an arm with the sampler
 included, the brain's share about half a second; every arm made one console login; no arm reported a controller fault; every
 pool was handed back and read back.
@@ -360,12 +360,12 @@ pool was handed back and read back.
 **What the governor did, workload by workload.**
 
 - `select`: the pool moved between 2 and 20 (170 to 193 take-backs and 29 to 41 queue-line adds an arm, no force add), mean
-  13 to 15. **Connections held open 19.3 → 11.9, −36% to −38%, confirmed better** (the first set's −61% to −63% was bought
+  13 to 15. **Connections held open 19.3 → 11.9, −36% to −38%, better in all three of our runs** (the first set's −61% to −63% was bought
   with the queue). Work and throughput equal; p95 inside the noise (−12%, +23%, +18%); p99 and mean inside the noise by the
   rule (one run's interval across zero) but worse as point estimates in two runs (p99 +30% and +175%, mean +16% and +46%):
   the probing of the knee shows in the tails and reads inside the noise by the rule. It is in the table.
 - `simple_update`: the force rule of amendment 1 ("slow, clients waiting for a server: add") fired 4 to 15 times an arm and
-  took the pool to 33 to 38 at its peak. **Connections most at once 20 → 36, +72% to +80%, confirmed WORSE** (the first set
+  took the pool to 33 to 38 at its peak. **Connections most at once 20 → 36, +72% to +80%, WORSE in all three of our runs** (the first set
   read the same, +80%); connections held open +8% to +10%, two runs inside the noise; work, latencies and CPU inside the
   noise. Nothing was bought for the connections added. This cost is not the queue line's and not the console's: it is the
   add rule of amendment 1 buying servers above the operator's setting on a slow write workload, and it stands as written.
@@ -373,18 +373,18 @@ pool was handed back and read back.
   to 19 times an arm and the pool stood near 20 (native's own p95 was 2.4 s on that runner); in B and C it never fired and
   the pool went down to the queue line. Latencies, work and CPU inside the noise.
 
-**Read.** 1 gauge-row confirmed better, 1 confirmed worse, 1 where the runs disagree. The category enters the index at
+**Read.** 1 gauge-row better in all three of our runs, 1 worse in all three of our runs, 1 where the runs disagree. The category enters the index at
 **+4.0%** (the first set's +14.2% was the connections saving bought with the CPU and the queue the amendment removed). Said
 in the founder's words: `select` is a yes with no cost, a third fewer connections and nothing worse; `simple_update` is a no,
 more connections at the peak and nothing bought; `tpcb_hot` shows no settled value. What was expected before the runs came
 true in three parts of four: the CPU rows came down to the noise, the median came back, the connections saving fell to a
-third; the fourth, that the tail rows might read confirmed worse, did not happen, and the point estimates say the probing
+third; the fourth, that the tail rows might read worse in all three of our runs, did not happen, and the point estimates say the probing
 costs something in the tail that three runs could not settle.
 
 ## Amendment 3 (2026-10-09, declared before any run on it): the brain's own verdict on the pool
 
 **Why, and when.** Written after the second counted set was read (the section above: `select` −36% to −38% connections with nothing
-worse; `simple_update` connections most at once +72% to +80% confirmed worse with nothing bought; `tpcb_hot` the runs disagree), at
+worse; `simple_update` connections most at once +72% to +80% worse in all three of our runs with nothing bought; `tpcb_hot` the runs disagree), at
 the founder's order of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it pays stays native and Omni
 only reads it. The brain must decide that on the muscle itself, in real time, by a measurement.
 
@@ -414,7 +414,7 @@ runs execute.
 **Expected before the runs.** `select`: connections given back one a trial while calm, −20% to −35% held open, less than the second
 set's −36% to −38%, with work, latency and CPU inside the noise. `simple_update`: the add above the operator's 20 is tried once and
 refused (a server more buys nothing on a workload the disk bounds), so connections most at once read 20 in both arms and every
-gauge inside the noise: the confirmed loss of the second set is gone because the brain refused the move, not because the table
+gauge inside the noise: the loss in all three of our runs of the second set is gone because the brain refused the move, not because the table
 was changed. `tpcb_hot`: inside the noise or a smaller saving. The second counted set stays in `docs/history` as the result of
 the rule before this amendment.
 

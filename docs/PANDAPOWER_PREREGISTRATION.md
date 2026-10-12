@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Frozen 2026-10-05, before any confirmation grid was run. The tool is `tools/run_pandapower.py`, and the workflow is
+Frozen 2026-10-05, before any counted grid was run. The tool is `tools/run_pandapower.py`, and the workflow is
 `.github/workflows/pandapower.yml`.
 
 ## What is someone else's
@@ -55,9 +55,9 @@ The run is made with two load models:
   declared here.
 - **Constant power:** SimBench as shipped. Only losses can change.
 
-## Confirmation grids (untouched)
+## Counted grids (untouched)
 
-The confirmation grids are the SimBench medium-voltage grids rural, semiurb, urban and comm, in scenarios 0, 1 and 2
+The counted grids are the SimBench medium-voltage grids rural, semiurb, urban and comm, in scenarios 0, 1 and 2
 (today, and two future scenarios with more solar), minus the tuning grid. All of them are hourly (every 4th quarter
 hour), for a full year, with both load models.
 
@@ -77,7 +77,7 @@ transformer, the hand-back included. Native SimBench grids barely tap, about 4 a
 is reported as measured, next to the energy, never hidden. For scale, a substation tap changer is built for hundreds of
 thousands of operations.
 
-## The wiring check, before any confirmation grid is read (2026-10-05)
+## The wiring check, before any counted grid is read (2026-10-05)
 
 Written after the tuning grid and before any untouched grid's result was looked at, as the founder asked: if Omni comes
 out behind, the first suspect is our own wiring, not Omni. Three things were checked on the runner (`tools/run_pandapower.py`)

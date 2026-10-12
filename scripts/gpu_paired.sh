@@ -76,7 +76,7 @@ for f in clocks_event_reasons.active clocks_throttle_reasons.active; do
 done
 echo "$SMI_FIELDS" > "$OUT/smi_fields.txt"
 # the declared envelope (the buyer's box): lowest watts and response-time target, declared before any trial. The
-# highest watts are the snapshot limit. A confirmation run refuses to start without it.
+# highest watts are the snapshot limit. A counted run refuses to start without it.
 ENV_FLOOR_W=0
 if [ -n "${ENVELOPE:-}" ]; then
   [ -r "$ENVELOPE" ] || { echo "ENVELOPE file $ENVELOPE unreadable"; exit 1; }
@@ -87,7 +87,7 @@ if [ -n "${ENVELOPE:-}" ]; then
   cp "$ENVELOPE" "$OUT/envelope.json"
   if [ "${ENV_SLO%.*}" != "0" ] && [ -z "${SLO_MS:-}" ]; then SLO_MS="$ENV_SLO"; fi
 elif [ "$PHASE" = "confirm" ]; then
-  echo "confirmation refuses to start without a declared envelope: ENVELOPE=file.json with power_min_w (and slo_ms)"; exit 1
+  echo "counted run refuses to start without a declared envelope: ENVELOPE=file.json with power_min_w (and slo_ms)"; exit 1
 fi
 for g in "${CARDS[@]}"; do
   MGMT=$($SMI -i "$g" --query-gpu=power.management --format=csv,noheader,nounits 2>/dev/null | tr -d ' ' || true)
@@ -133,7 +133,7 @@ EOF
 }
 freeze "$OUT/FREEZE.json"
 if [ "$PHASE" = "confirm" ] && grep -q '"dirty": true' "$OUT/FREEZE.json"; then
-  echo "confirmation phase refuses uncommitted Omni code: commit it first, then run (FREEZE.json lists the files)"; exit 1
+  echo "counted phase refuses uncommitted Omni code: commit it first, then run (FREEZE.json lists the files)"; exit 1
 fi
 
 if [ -n "${WALL_METER:-}" ]; then

@@ -3,9 +3,9 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The A/B/C confirmation table (docs/OMNI_V1.md): one v1 benchmark run three times as separate GitHub runs on the same
+"""The A/B/C three-run table (docs/OMNI_V1.md): one v1 benchmark run three times as separate GitHub runs on the same
 frozen engine, A the result, B and C the replications. Every judged row gets one of three readings, all three runs shown:
-confirmed better or confirmed WORSE when all three runs move the same way and each run's 95% interval of the paired
+better or WORSE in all three of our runs when all three runs move the same way and each run's 95% interval of the paired
 difference (omni minus native) is clear of zero; no difference beyond the noise when a run's interval includes zero
 (native and omni could not be told apart on that measure, which is itself the result, with the count of such runs); the
 runs disagree when runs clear of the noise point different ways (the test itself is then unstable, and is looked into).
@@ -15,7 +15,7 @@ Usage: python tools/confirm_abc.py "TITLE" A_DIR B_DIR C_DIR --out results/live/
   inside an add-on run (results/live/raw/addons-run-<id>/<setup>/); its engine is checked."""
 from __future__ import annotations
 
-import argparse, json, subprocess, sys
+import argparse, json, re, subprocess, sys
 from pathlib import Path
 
 try:                                                       # the legal notice every generated report carries
@@ -24,6 +24,7 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from pilot.bench_report import LOWER_BETTER
+from tools.readings import IN_ALL_THREE, OWN_RUNS  # noqa: E402
 from tools.live_reps import BATCH, BILL, KEYS, LABEL, NEUTRAL, ROBUST, SAME_REL
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
@@ -46,13 +47,13 @@ def robust_rows(runs):
     kill = all(b.get("kill_repetitions") for b in blocks)
     if kill:
         ok = all(b.get("handed_back_within_allowance_all") for b in blocks)
-        v = "**confirmed: handed back within the allowance in every repetition of every run**" if ok else "**WORSE: a repetition was not handed back within the allowance**"
+        v = "**handed back within the allowance in every repetition, in all three of our runs**" if ok else "**WORSE: a repetition was not handed back within the allowance**"
         cells = [f"{'yes' if b['handed_back_within_allowance_all'] else 'NO'} ({b['kill_repetitions']} reps; mean {b['handed_back_s_mean']:.0f} s, max {b['handed_back_s_max']:.0f} s"
                  + (f", never: {b['never_handed_back']}" if b.get('never_handed_back') else "") + ")" if b['handed_back_s_mean'] is not None else f"NO (never handed back in {b['never_handed_back']} reps)" for b in blocks]
         k = f"robust: every setting back at the operator's within {blocks[0]['allowance_s']:.0f} s of the kill, every repetition (the governor killed outright; the watchdog's hand-back)"
         L.append(f"| {k} | {cells[0]} | {cells[1]} | {cells[2]} | {v} |"); rows[k] = {"reading": v.strip("*"), "runs": blocks}
         sg = all(b.get("second_governor_all") for b in blocks)
-        v2 = "**confirmed**" if sg else "**WORSE**"
+        v2 = "**the same in all three of our runs**" if sg else "**WORSE**"
         k2 = "robust: a second governor started after the hand-back and governed to the end, every repetition"
         L.append(f"| {k2} | {'yes' if blocks[0]['second_governor_all'] else 'NO'} | {'yes' if blocks[1]['second_governor_all'] else 'NO'} | {'yes' if blocks[2]['second_governor_all'] else 'NO'} | {v2} |")
         rows[k2] = {"reading": v2.strip("*"), "runs": [b.get("second_governor_all") for b in blocks]}
@@ -89,7 +90,7 @@ def robust_rows(runs):
             rows[k6] = {"reading": v6.strip("*"), "runs": [b["decision_time_ratio_max"] for b in blocks]}
         if all(b.get("handed_back_end_all") is not None for b in blocks):
             ok = all(b["handed_back_end_all"] for b in blocks)
-            v7 = "**confirmed: every setting handed back at the end of every repetition**" if ok else "**WORSE: a repetition was not handed back at the end**"
+            v7 = "**every setting handed back at the end of every repetition, in all three of our runs**" if ok else "**WORSE: a repetition was not handed back at the end**"
             k7 = "robust: every setting handed back at the end and read back at the operator's, no record left, every repetition"
             L.append(f"| {k7} | {'yes' if blocks[0]['handed_back_end_all'] else 'NO'} | {'yes' if blocks[1]['handed_back_end_all'] else 'NO'} | {'yes' if blocks[2]['handed_back_end_all'] else 'NO'} | {v7} |")
             rows[k7] = {"reading": v7.strip("*"), "runs": [b["handed_back_end_all"] for b in blocks]}
@@ -136,14 +137,14 @@ def verdict(k, rs):
         return "same"
     signs = [(r["diff"] > 0) - (r["diff"] < 0) for r in rs]
     # a run of one pair has no interval (the 24-hour robustness run: one pair a rented machine): three such runs are read by
-    # their signs alone and said to be single pairs, never a confirmation
+    # their signs alone and said to be single pairs, never read as the same in all three of our runs
     single = [any(isinstance(x, float) and x != x for x in r["ci95"]) for r in rs]
     if all(single):
         if len(set(signs)) > 1:
             return "single pairs point different ways (one pair a run, no interval)"
         lower = signs[0] == -1
         word = ("better" if lower else "WORSE") if k in LOWER else (("WORSE" if lower else "better") if k in HIGHER_BETTER else ("lower" if lower else "higher"))
-        return f"three single pairs agree: {word} (one pair a run, no interval: not a confirmation)"
+        return f"three single pairs agree: {word} (one pair a run, no interval, so the noise cannot be judged)"
     clear = [r["ci95"][0] > 0 or r["ci95"][1] < 0 for r in rs]
     if len({s for s, c in zip(signs, clear) if c}) > 1:
         return "**the runs disagree**"
@@ -152,10 +153,10 @@ def verdict(k, rs):
         return "no difference beyond the noise (all three runs)" if n == len(rs) else f"no difference beyond the noise in {n} of {len(rs)} runs"
     lower = signs[0] == -1
     if k in LOWER:
-        return "**confirmed better**" if lower else "**confirmed WORSE**"
+        return "**better in all three of our runs**" if lower else "**WORSE in all three of our runs**"
     if k in HIGHER_BETTER:
-        return "**confirmed WORSE**" if lower else "**confirmed better**"
-    return f"confirmed {'lower' if lower else 'higher'}"
+        return "**WORSE in all three of our runs**" if lower else "**better in all three of our runs**"
+    return f"{'lower' if lower else 'higher'} {IN_ALL_THREE}"
 
 
 def engine(run):
@@ -178,14 +179,15 @@ def main(argv=None):
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     runs = [load(d) for d in (a.a, a.b, a.c)]
-    L = [f"# {a.title}: the A/B/C confirmation (Omni v1)", "",
+    title = re.sub(r":\s*the A/B/C (?:confirmation|three-run table) \(Omni v\d\)\s*$", "", a.title)   # never twice
+    L = [f"# {title}: the A/B/C three-run table (Omni v1)", "",
          "Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C "
          "are the replications. Each cell is omni against native, the paired change in percent of native with its 95% "
-         "interval. Every judged row gets one of three readings. **Confirmed better** or **confirmed WORSE**: all three "
+         "interval. Every judged row gets one of three readings. **Better** or **WORSE in all three of our runs**: all three "
          "runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs "
          "counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the "
          "result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable "
-         "there. Every row is shown, losses included.", "",
+         "there. Every row is shown, losses included.", "", OWN_RUNS, "",
          "| Run | GitHub run | Commit | Engine | Paired repetitions |", "|---|---|---|---|---:|"]
     off, meta = [], []
     for tag, (run, _, n, _) in zip("ABC", runs):
@@ -203,7 +205,7 @@ def main(argv=None):
     if len({m["engine"].split(" ")[0] for m in meta}) > 1:
         off.append("A, B and C are not all on the same engine: " + ", ".join(m["engine"].split(" ")[0] for m in meta))
     if off:
-        L[2:2] = [f"**Not a v1 confirmation: {'; '.join(off)}.** The readings below compare runs on different engines.", ""]
+        L[2:2] = [f"**Not one engine's three runs: {'; '.join(off)}.** The readings below compare runs on different engines.", ""]
     L += ["", "| Measure | A | B | C | Reading |", "|---|---|---|---|---|"]
     tally, rows = {}, {}
     for k in [CAPACITY] + KEYS:

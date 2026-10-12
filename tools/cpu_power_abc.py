@@ -20,6 +20,7 @@ except ImportError:
     import pathlib as _p; sys.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.readings import with_own_runs  # noqa: E402  (every table says whose runs these are)
 from tools.run_cpu_power import GAUGES, SAME_REL, paired  # noqa: E402
 from tools.knob_verdict import summarize  # noqa: E402
 
@@ -56,7 +57,7 @@ def verdict(rs, direction):
     if direction == "shown":
         return "shown, not judged"
     if direction == "never more":
-        return "**confirmed WORSE**" if any(r["diff"] > 0 for r in rs) else ("same" if all(abs(r["diff"]) <= 1e-12 for r in rs) else "**confirmed better**")
+        return "**WORSE in all three of our runs**" if any(r["diff"] > 0 for r in rs) else ("same" if all(abs(r["diff"]) <= 1e-12 for r in rs) else "**better in all three of our runs**")
     if all(abs(r["diff"]) <= SAME_REL * max(abs(r["native"]), 1e-12) for r in rs):
         return "same"
     clear = [r for r in rs if r["significant"]]
@@ -67,7 +68,7 @@ def verdict(rs, direction):
         n = len(rs) - len(clear)
         return f"no difference beyond the noise ({n} of {len(rs)} runs)"
     better = (rs[0]["diff"] > 0) == (direction == "higher")
-    return "**confirmed better**" if better else "**confirmed WORSE**"
+    return "**better in all three of our runs**" if better else "**WORSE in all three of our runs**"
 
 
 def cell(r, key):
@@ -90,12 +91,12 @@ def main(argv=None):
     a = ap.parse_args(argv)
     runs = [load(d) for d in a.dirs]
     eng = [engine(d) for d in a.dirs]
-    L = ["# CPU power, the Linux kernel's own frequency governor under the processor's meter: the A/B/C confirmation", "",
+    L = ["# CPU power, the Linux kernel's own frequency governor under the processor's meter: the A/B/C three-run table", "",
          "The machine as it runs is native: the kernel's frequency governor as shipped under the operator's ceiling, the top clock. Omni is "
          "the compass law on the ceiling through the kernel's own interface inside [half the top, the top], holding the service's own request "
          "latency at 40% of the 20 ms line, every notch down allowed only by a paired trial on the machine itself under the declared objective "
          "(`docs/CPU_POWER_PREREGISTRATION.md`). Each run holds its paired repetitions; the paired difference's 95% interval within a run, and "
-         "the same sign with every interval clear of zero across the three runs, make a reading **confirmed better** or **confirmed WORSE**; a "
+         "the same sign with every interval clear of zero across the three runs, make a reading **better** or **WORSE in all three of our runs**; a "
          "run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different "
          "ways read **the runs disagree**. Failed requests: any increase in any run is WORSE. Energy is the processor's own meter (RAPL, class P, "
          "the processor's calibrated counter); the whole machine at the wall where a plug was fitted. The tuning workload is shown and not "
@@ -148,8 +149,8 @@ def main(argv=None):
                   + "; ".join(f"run {t}: {summarize(vs)}" for t, vs in vr.items() if vs) + "."]
             out.setdefault("verdicts", {})[wl] = {t: [{k: v.get(k) for k in ("objective", "state", "give_back_allowed_steps", "allowed_low", "allowed_high", "counts")} for v in vs] for t, vs in vr.items()}
     n_wl = sum(1 for w in wls if not any((r.get(w) or {}).get("tuning") for _, r in runs))
-    L += ["", f"**Across {n_wl} untouched workloads: {better} gauge-rows confirmed better, {worse} confirmed worse, {disagree} where the runs disagree.**"]
-    Path(a.out).write_text("\n".join(_legal_stamp(L)) + "\n")
+    L += ["", f"**Across {n_wl} untouched workloads: {better} gauge-rows better in all three of our runs, {worse} worse in all three of our runs, {disagree} where the runs disagree.**"]
+    Path(a.out).write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
     Path(a.out).with_suffix(".json").write_text(json.dumps(out, indent=1))
     print(f"{a.out}: {n_wl} untouched workloads; {better} better, {worse} worse, {disagree} disagree")
     return 0

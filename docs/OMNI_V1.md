@@ -71,13 +71,13 @@ result is run again on it. No result is ever read across versions.
 | The 656 muscles and six organisms, modelled (`results/realms/`) | `9c5d417` | **yes** | **A, B, C done**: runs 37359815637's realms check, 37385660330 and 37393204931 each reproduced the published table byte for byte (a deterministic model: reproduced in 3 of 3) |
 | The organisms at 1 / 10 / 100 / 1,000 copies, modelled (`results/scale/v1/GRID.md`) | `a8548b6` | no | to run after the six-kube queue clears |
 | CityLearn, every district | `ac39b16` | no | **A, B, C done: [`V1_CITYLEARN.md`](../results/live/V1_CITYLEARN.md)** (runs 37384954241, 37393198549, 37399402398): 11 districts with batteries, every score reproduced in 3 of 3 except the comfort score, which CityLearn itself varies between runs; 3 districts with nothing to move; 8 CityLearn cannot run |
-| Power grid, pandapower and SimBench | `8eab01c` | **yes** | **A, B, C done: [`V1_PANDAPOWER.md`](../results/live/V1_PANDAPOWER.md)** (runs 37377029333, 37397142210, 37412578757; 11 untouched grids, both load models, every gauge reproduced in 3 of 3): with ZIP loads the energy the loads drew is confirmed better in all 11 grids (−1.3% to −1.5%) and the net import in all 11; losses confirmed better in 7 and worse in 4 (the rural and semi-urban grids with their own generation, +0.6% to +1.5%); tap operations fewer in 10 grids, 4 → 8 a year in one rural grid (confirmed worse, the declared cost); no grid ever more often outside its band, 2 less often |
-| Robot arms, MuJoCo Menagerie (`docs/ROBOTICS_PREREGISTRATION.md`) | new on v1 | **yes** | **A, B, C done: [`V1_MUJOCO.md`](../results/live/V1_MUJOCO.md) (UR5e, iiwa 14, Gen3) and [`V1_MUJOCO_PANDA.md`](../results/live/V1_MUJOCO_PANDA.md) (the tuning robot)**: reproduced in 3 of 3; where Omni moved (Gen3, Panda) the arm hit its points more accurately with less force on its motors inside the same takt: peak torque −29% and −10%, tracking error −21% on both, energy per takt −0.8% and −0.5%, all confirmed better; the Panda's copper loss +14% confirmed worse; UR5e and iiwa left native by the paired physics trial, nothing for Omni to move |
+| Power grid, pandapower and SimBench | `8eab01c` | **yes** | **A, B, C done: [`V1_PANDAPOWER.md`](../results/live/V1_PANDAPOWER.md)** (runs 37377029333, 37397142210, 37412578757; 11 untouched grids, both load models, every gauge reproduced in 3 of 3): with ZIP loads the energy the loads drew is better in all three of our runs in all 11 grids (−1.3% to −1.5%) and the net import in all 11; losses better in all three of our runs in 7 and worse in 4 (the rural and semi-urban grids with their own generation, +0.6% to +1.5%); tap operations fewer in 10 grids, 4 → 8 a year in one rural grid (worse in all three of our runs, the declared cost); no grid ever more often outside its band, 2 less often |
+| Robot arms, MuJoCo Menagerie (`docs/ROBOTICS_PREREGISTRATION.md`) | new on v1 | **yes** | **A, B, C done: [`V1_MUJOCO.md`](../results/live/V1_MUJOCO.md) (UR5e, iiwa 14, Gen3) and [`V1_MUJOCO_PANDA.md`](../results/live/V1_MUJOCO_PANDA.md) (the tuning robot)**: reproduced in 3 of 3; where Omni moved (Gen3, Panda) the arm hit its points more accurately with less force on its motors inside the same takt: peak torque −29% and −10%, tracking error −21% on both, energy per takt −0.8% and −0.5%, all better in all three of our runs; the Panda's copper loss +14% worse in all three of our runs; UR5e and iiwa left native by the paired physics trial, nothing for Omni to move |
 | Databases: PostgreSQL behind PgBouncer, pgbench (`docs/POSTGRES_PREREGISTRATION.md`) | new on v1 | **yes** | preregistered 2026-10-06; the tuning workload runs first, then the three untouched workloads, A, B and C (workflow `pgbench`) |
 | GPU, one card and the card in the organisms | earlier card controller | no | new runs on real cards (founder) |
 | Muscle studies, power budgets, PlanetLab fleet, tower off and on | September engines | no | marked old |
 
-## How each result is confirmed
+## How each result is read across three runs
 
 Every v1 benchmark runs three times, as separate GitHub Actions runs on the same frozen bytes:
 
@@ -86,7 +86,7 @@ Every v1 benchmark runs three times, as separate GitHub Actions runs on the same
 
 Every judged row gets one of three readings, and all three runs are shown beside it:
 
-- **Confirmed better** or **confirmed worse**: the same sign in all three runs, each with its 95% interval clear of zero.
+- **Better** or **worse in all three of our runs**: the same sign in all three runs, each with its 95% interval clear of zero.
 - **No difference beyond the noise**: in at least one run the interval includes zero, so native and omni could not be
   told apart on that measure. That is the result, stated as such, with the count of runs it holds in.
 - **The runs disagree**: runs clear of the noise point different ways. The test itself is then unstable on that measure,
@@ -103,7 +103,7 @@ python3 tools/confirm_abc.py "Steady load" results/live/raw/run-<A> results/live
 
 It checks each run's commit against the v1 fingerprint, and heads the table with a warning if any run is not v1 or if the
 three are not separate runs. CityLearn has its own table (`tools/citylearn_abc.py`): the simulator is deterministic, so
-its three runs must reproduce each other, and a score reads confirmed better or worse by its sign when they do, same under
+its three runs must reproduce each other, and a score reads better or worse in all three of our runs by its sign when they do, same under
 one part in a million, and "the runs differ" when they do not; a district with no electric battery is listed as nothing
 for Omni to move, and a district CityLearn cannot run is listed with CityLearn's own error. `tests/test_confirm_abc.py`, run by `verify.py`, proves the rule: an interval over zero
 reads no difference beyond the noise, a flipped sign clear of the noise reads disagreement, a rounding-level change reads

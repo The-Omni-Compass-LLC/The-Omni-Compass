@@ -356,7 +356,7 @@ def main():
     from tests import test_staging_order
     test_staging_order.main(); check("staging order through the real actuator: the emptiest idles first, the warmest wakes first, two always in service (the floor), every machine usable, no pod moved", True)
     from tests import test_confirm_abc
-    test_confirm_abc.main(); check("A/B/C confirmation rule: confirmed only with the same sign and every 95% interval clear of zero in all three runs", True)
+    test_confirm_abc.main(); check("A/B/C three-run table rule: better or worse in all three of our runs only with the same sign and every 95% interval clear of zero in all three runs", True)
     from tests import test_run_mujoco, test_mujoco_abc
     test_run_mujoco.main(); check("robot runner: the arm's own servo sets the planned speed, the paired physics trial decides whether Omni moves, "
                                   "standing draw per takt in both arms, the override inside its guards and handed back, no cycle over the takt, deterministic", True)
@@ -364,7 +364,7 @@ def main():
     from tests import test_pandapower_abc
     test_pandapower_abc.main(); check("power-grid A/B/C rule: a deterministic simulator's runs must reproduce; any added violation and every extra tap read WORSE", True)
     from tests import test_pgbench_abc
-    test_pgbench_abc.main(); check("database A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero "
+    test_pgbench_abc.main(); check("database A/B/C rule: better or worse in all three of our runs only with the same sign and every interval clear of zero in all three runs; an interval over zero "
                                    "reads no difference beyond the noise with its count; any added failed transaction is WORSE; the pool size is shown", True)
     from tests import test_run_swarm, test_swarm_abc
     test_run_swarm.main(); check("swarm runner: the task keeps the fleet apart, every mission inside its deadline under a perfect autopilot, the cruise override "
@@ -374,12 +374,12 @@ def main():
     from tests import test_run_kafka, test_kafka_abc
     test_run_kafka.main(); check("Kafka runner: slow with messages waiting adds consumers, calm gives back one idle consumer after the dwell and only with nothing "
                                  "waiting, the wall starts every consumer at once, the cover holds; the group's own reading; the paired reading; the service time as CPU", True)
-    test_kafka_abc.main(); check("Kafka A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
+    test_kafka_abc.main(); check("Kafka A/B/C rule: better or worse in all three of our runs only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
                                  "no difference beyond the noise with its count; any lost message is WORSE; the tuning workload is shown and not counted", True)
     from tests import test_run_ycsb, test_ycsb_abc
     test_run_ycsb.main(); check("YCSB runner: slow reads with the cache full and missing grow the cache by notches, calm with misses under 1% of requests gives one back after the dwell, the wall "
                                 "adds a quarter of the cover, the cover holds; the plug snapshots, reads back, stops for another writer and restores; the paired reading", True)
-    test_ycsb_abc.main(); check("YCSB A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
+    test_ycsb_abc.main(); check("YCSB A/B/C rule: better or worse in all three of our runs only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
                                 "no difference beyond the noise with the count; clear runs pointing different ways read as a disagreement", True)
     from tests import test_run_sysbench, test_sysbench_abc
     test_run_sysbench.main(); check("sysbench runner: slow statements with the pool full and missing grow the pool by chunks, calm with misses under 1% of reads gives one back after "
@@ -391,11 +391,11 @@ def main():
                                       "rounding, one step a bin toward the level, parts read until the day is covered, every part named with its SHA-256", True)
     from tests import test_robust
     test_robust.main(); check("robustness readings: the kill and hand-back marks, the 120 s after the kill in both arms, the governor's memory ratio; a late hand-back, "
-                              "a leak or a missing second governor reads WORSE; the three-run rows confirm only when every repetition of every run was handed back", True)
+                              "a leak or a missing second governor reads WORSE; the three-run rows read the same in all three of our runs only when every repetition of every run was handed back", True)
     from tests import test_run_redis, test_redis_abc
     test_run_redis.main(); check("Redis runner: misses with the cache full grow the ceiling by notches, calm with nothing evicted gives one back, the wall adds a quarter "
                                  "of the cover, the cover holds; the plug snapshots, reads back, stops for another writer and restores; a seeded working set; the paired reading", True)
-    test_redis_abc.main(); check("Redis A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
+    test_redis_abc.main(); check("Redis A/B/C rule: better or worse in all three of our runs only with the same sign and every interval clear of zero in all three runs; an interval over zero reads "
                                  "no difference beyond the noise with its count; any failed request is WORSE; the tuning workload is shown and not counted", True)
     from tests import test_omni_version
     test_omni_version.main(); check("engine fingerprints: this checkout is one declared version; a commit before a runner was written reads as that version "

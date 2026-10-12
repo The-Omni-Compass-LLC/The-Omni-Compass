@@ -127,7 +127,7 @@ Answers reference the Claims Register (C-numbers) and the Technical Manual.
 
 ## Engineering
 **Does the mathematics hold?** Equations (1) to (8), Propositions 1 to 3 and their proofs are in Manual Chapters 2 and 3. The 500/500 CONVEY/CERT result is a property of the controller (Proposition 3), shown by counterfactuals: the controller aimed at the wrong basin also scores {CORE['wrong_target']['convey5']}/500.
-**Is Python the same as C++?** Yes (C1, C2). The verifier also builds a deliberately mutated C++ governor and confirms the parity test rejects it.
+**Is Python the same as C++?** Yes (C1, C2). The verifier also builds a deliberately mutated C++ governor and checks that the parity test rejects it.
 **Can every number be reproduced?** `python verify.py` rebuilds the C++, reruns parity, reruns the 100,000,000-decision soak and compares it with the recorded result, replays held-out scenarios and checks the pre-registered SHA-256 hashes (program fingerprints are additionally checked when the Python version matches the recorded one).
 
 ## Operations

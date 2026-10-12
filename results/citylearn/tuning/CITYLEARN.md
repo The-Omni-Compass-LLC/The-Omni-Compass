@@ -4,7 +4,7 @@
 
 CityLearn (see each district file) (Intelligent Environments Lab, University of Texas at Austin; MIT license): an independent simulator of real buildings from measured data, with its own controllers and its own scoring. Native: CityLearn's rule-based battery controller (BasicRBC). Omni: the same controller with the compass law on top of its battery commands (gain 0.5, response 1.0 h, glide 0.05 an hour, band from the past week's district draw, handed back at 90% of the year). Every number is CityLearn's own score: the controller over no battery at all, lower is better for every row. Evidence class: an independent recognized simulator (not our model).
 
-## citylearn_challenge_2022_phase_1 (the tuning district: not counted in the confirmation): 5 buildings, 8,760 hours
+## citylearn_challenge_2022_phase_1 (the tuning district: not counted in the counted run): 5 buildings, 8,760 hours
 
 Omni-Compass moved the commands in 7,859 hours; every command handed back at 90%: yes.
 

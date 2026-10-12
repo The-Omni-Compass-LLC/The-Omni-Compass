@@ -2,6 +2,8 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
 Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `b8630e583`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ## 1. The mechanism, and proof that it is the one that ran
@@ -21,19 +23,19 @@ The engine is the founder's eight-line equation, integrated by RK4 with the boun
 
 ## 2. Real Kubernetes, Omni v3, every test three times (evidence class L)
 
-Seven tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **confirmed better** or **confirmed worse** only when all three runs move the same way with every 95% interval clear of zero; otherwise it reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and read back. Steady runs: A 38013195851 (omni-v3); B 38013200499 (omni-v3); C 38013204648 (omni-v3); the other tests' runs are named in their tables.
+Seven tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **better** or **worse in all three of our runs** only when all three runs move the same way with every 95% interval clear of zero; otherwise it reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and read back. Steady runs: A 38013195851 (omni-v3); B 38013200499 (omni-v3); C 38013204648 (omni-v3); the other tests' runs are named in their tables.
 
 ![Kubernetes on v3](dossier/k8s_v3.png)
 
 | Test | Work | Response time (p95; the batch queue's mean) | Machines in service | Energy (declared model) | Failed requests | Table |
 |---|---|---|---|---|---|---|
-| Steady work in steps | equal by design | **-66% to -64%, confirmed better** | **-2% to -2%, confirmed better** | **-2% to -1%, confirmed better** | same | `results/live/V3_STEADY.md` |
-| Demand that wanders | not taken | **-64% to -56%, confirmed better** | no difference beyond the noise | no difference beyond the noise | **-13% to -12%, confirmed better** | `results/live/V3_WANDERING.md` |
-| All four in one run | **+54% to +68%, confirmed better** | **-62% to -57%, confirmed better** | no difference beyond the noise | no difference beyond the noise | **-14% to -11%, confirmed better** | `results/live/V3_ALL_FOUR.md` |
+| Steady work in steps | equal by design | **-66% to -64%, better in all three of our runs** | **-2% to -2%, better in all three of our runs** | **-2% to -1%, better in all three of our runs** | same | `results/live/V3_STEADY.md` |
+| Demand that wanders | not taken | **-64% to -56%, better in all three of our runs** | no difference beyond the noise | no difference beyond the noise | **-13% to -12%, better in all three of our runs** | `results/live/V3_WANDERING.md` |
+| All four in one run | **+54% to +68%, better in all three of our runs** | **-62% to -57%, better in all three of our runs** | no difference beyond the noise | no difference beyond the noise | **-14% to -11%, better in all three of our runs** | `results/live/V3_ALL_FOUR.md` |
 | Fairness, a noisy neighbour | not taken | no difference beyond the noise | same | no difference beyond the noise | no difference beyond the noise | `results/live/V3_FAIRNESS.md` |
-| Faults: machine down, spike, runaway pod, blind probe | not taken | **-63% to -58%, confirmed better** | no difference beyond the noise | no difference beyond the noise | **-18% to -14%, confirmed better** | `results/live/V3_FAULTS.md` |
-| A queue of batch jobs | not taken | **-13% to -11%, confirmed better** | **-20% to -16%, confirmed better** | **-14% to -11%, confirmed better** | no difference beyond the noise | `results/live/V3_BATCH.md` |
-| A public day of demand: the Google cluster trace of 2011, replayed one step at a time | not taken | **-66% to -64%, confirmed better** | **-9% to -7%, confirmed better** | **-7% to -5%, confirmed better** | **-18% to -11%, confirmed better** | `results/live/V3_TRACE_GOOGLE2011.md` |
+| Faults: machine down, spike, runaway pod, blind probe | not taken | **-63% to -58%, better in all three of our runs** | no difference beyond the noise | no difference beyond the noise | **-18% to -14%, better in all three of our runs** | `results/live/V3_FAULTS.md` |
+| A queue of batch jobs | not taken | **-13% to -11%, better in all three of our runs** | **-20% to -16%, better in all three of our runs** | **-14% to -11%, better in all three of our runs** | no difference beyond the noise | `results/live/V3_BATCH.md` |
+| A public day of demand: the Google cluster trace of 2011, replayed one step at a time | not taken | **-66% to -64%, better in all three of our runs** | **-9% to -7%, better in all three of our runs** | **-7% to -5%, better in all three of our runs** | **-18% to -11%, better in all three of our runs** | `results/live/V3_TRACE_GOOGLE2011.md` |
 
 Energy on kind is a declared model: the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill. Omni-Compass gives a machine back only after a paired trial shows the service no slower without it (the verdict, `omnicompass/verdict.py`); on these clusters one machine fewer made requests 30-45% slower in most trials, so the machines stayed and were spent on speed and work. The v1 tables (`results/live/V1_*.md`, `docs/OMNI_V1.md`) read the same; the sets before v1 are in `docs/history/`.
 
@@ -45,7 +47,7 @@ PostgreSQL 16 as shipped behind PgBouncer's shipped pool of 20 is native; omni i
 |---|---|---|---|---|
 | `select` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
 | `simple_update` | no difference beyond the noise | no difference beyond the noise | the runs disagree | no difference beyond the noise |
-| `tpcb_hot` | no difference beyond the noise | no difference beyond the noise | **-13% to -7%, confirmed better** | no difference beyond the noise |
+| `tpcb_hot` | no difference beyond the noise | no difference beyond the noise | **-13% to -7%, better in all three of our runs** | no difference beyond the noise |
 
 The compass takes connections back only while the pooler's clients wait for one under 1% of the time and gives them back the moment anyone waits (amendment 2 of `docs/POSTGRES_PREREGISTRATION.md`, 8 October: the first counted set's CPU cost was measured and traced to the harness's own psql launches, not to the pooler, and its first table is kept whole in `docs/history/V3_PGBENCH_set1.md`). Where it reads a saving it is connections held open for the same work with the host's CPU inside the noise; where the add rule buys connections above the operator's setting on a slow write workload, that reads worse and is counted against Omni in the index. Table: `results/live/V3_PGBENCH.md`.
 
@@ -55,12 +57,12 @@ Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer 
 
 | Workload | Work inside the 500 ms line | End-to-end p95 | Consumers running (the resource held) | Host CPU-seconds (the compass's own cost) |
 |---|---|---|---|---|
-| `tuning` (tuning, shown, not counted) | no difference beyond the noise | no difference beyond the noise | **-0% to -0%, confirmed better** | no difference beyond the noise |
-| `burst` | no difference beyond the noise | no difference beyond the noise | **-1% to -1%, confirmed better** | no difference beyond the noise |
+| `tuning` (tuning, shown, not counted) | no difference beyond the noise | no difference beyond the noise | **-0% to -0%, better in all three of our runs** | no difference beyond the noise |
+| `burst` | no difference beyond the noise | no difference beyond the noise | **-1% to -1%, better in all three of our runs** | no difference beyond the noise |
 | `heavy` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
 | `light` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
 
-Native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5% waited about 1.6 s; Omni added consumers while messages waited and gave them back when the queue was empty, so its slowest 5% waited 9 to 14 ms, at the cost of three to four times the consumers running, confirmed worse and counted against Omni in the index. No message was lost in any arm; every count was handed back. Table: `results/live/V3_KAFKA.md`.
+Native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5% waited about 1.6 s; Omni added consumers while messages waited and gave them back when the queue was empty, so its slowest 5% waited 9 to 14 ms, at the cost of three to four times the consumers running, worse in all three of our runs and counted against Omni in the index. No message was lost in any arm; every count was handed back. Table: `results/live/V3_KAFKA.md`.
 
 ## 3c. A real cache: Redis, the operator's memory ceiling, Omni v3, three runs (evidence class L)
 
@@ -68,7 +70,7 @@ Redis as Ubuntu ships it with the operator's 64 MB ceiling and allkeys-lru is na
 
 | Workload | Work inside the 2 ms line | Cache hit rate | p95 | Memory ceiling held, MB (the resource held) | Host CPU-seconds |
 |---|---|---|---|---|---|
-| `tuning` (tuning, shown, not counted) | **+4% to +5%, confirmed better** | **+4% to +5%, confirmed better** | no difference beyond the noise | **+19% to +26%, confirmed WORSE** | no difference beyond the noise |
+| `tuning` (tuning, shown, not counted) | **+4% to +5%, better in all three of our runs** | **+4% to +5%, better in all three of our runs** | no difference beyond the noise | **+19% to +26%, WORSE in all three of our runs** | no difference beyond the noise |
 | `burst` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
 | `large` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
 | `small` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise |
@@ -83,11 +85,11 @@ MongoDB 8.0 as its publisher ships it with the operator's WiredTiger cache of 51
 |---|---|---|---|---|---|
 | `tuning` (tuning, shown, not counted) | no difference beyond the noise | the runs disagree | no difference beyond the noise | shown, not judged | no difference beyond the noise |
 | `b` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
-| `burst` | no difference beyond the noise | no difference beyond the noise | **-13% to -10%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `burst` | no difference beyond the noise | no difference beyond the noise | **-13% to -10%, better in all three of our runs** | shown, not judged | no difference beyond the noise |
 | `c` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
-| `f` | no difference beyond the noise | no difference beyond the noise | **-15% to -13%, confirmed better** | shown, not judged | no difference beyond the noise |
+| `f` | no difference beyond the noise | no difference beyond the noise | **-15% to -13%, better in all three of our runs** | shown, not judged | no difference beyond the noise |
 
-On this machine the data files sit in the operating system's page cache as well, so a storage-engine miss is a read from memory, not a disk, as disclosed before the run: the result is memory given back at no measurable cost in work inside the line, p95 or CPU, with one confirmed loss, the mean latency on the burst workload. Table: `results/live/V3_YCSB.md`.
+On this machine the data files sit in the operating system's page cache as well, so a storage-engine miss is a read from memory, not a disk, as disclosed before the run: the result is memory given back at no measurable cost in work inside the line, p95 or CPU, with one loss in all three of our runs, the mean latency on the burst workload. Table: `results/live/V3_YCSB.md`.
 
 ## 3e. A real database's buffer pool: MySQL under sysbench, the operator's InnoDB pool size, Omni v3, three runs (evidence class L)
 
@@ -101,7 +103,7 @@ MySQL 8.0 as Ubuntu ships it with the operator's 512 MB InnoDB buffer pool is na
 | `read_write` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
 | `update_index` | no difference beyond the noise | no difference beyond the noise | no difference beyond the noise | shown, not judged | no difference beyond the noise |
 
-The third counted set, on amendment 2 (the pool grows only while it is missing): the pool held −49% to −56% on burst, confirmed better, with work, latency and CPU inside the noise; on read_write the pages held read +44% to +52%, confirmed worse, with the host's CPU −4% to −6%, confirmed better, a trade counted both ways in the index; read_only inside the noise and update_index disagreeing; the pool handed back on all 45 omni arms. The second counted set (the pool −67% on burst and −50% to −56% on read_only, read_write's pages held +53% to +70% worse) is kept whole in `docs/history/V3_SYSBENCH_set2.md`; the first counted set (every row inside the noise; 15 of 45 arms not handed back because the plug's restore was issued while the server was still withdrawing the blocks of a shrink, which MySQL ignores; the plug fixed and the fix declared) is kept whole in `docs/history/V3_SYSBENCH_set1.md`. The update_index work-inside-the-line row counts almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line) and is disclosed. Table: `results/live/V3_SYSBENCH.md`.
+The third counted set, on amendment 2 (the pool grows only while it is missing): the pool held −49% to −56% on burst, better in all three of our runs, with work, latency and CPU inside the noise; on read_write the pages held read +44% to +52%, worse in all three of our runs, with the host's CPU −4% to −6%, better in all three of our runs, a trade counted both ways in the index; read_only inside the noise and update_index disagreeing; the pool handed back on all 45 omni arms. The second counted set (the pool −67% on burst and −50% to −56% on read_only, read_write's pages held +53% to +70% worse) is kept whole in `docs/history/V3_SYSBENCH_set2.md`; the first counted set (every row inside the noise; 15 of 45 arms not handed back because the plug's restore was issued while the server was still withdrawing the blocks of a shrink, which MySQL ignores; the plug fixed and the fix declared) is kept whole in `docs/history/V3_SYSBENCH_set1.md`. The update_index work-inside-the-line row counts almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line) and is disclosed. Table: `results/live/V3_SYSBENCH.md`.
 
 ## 4. The bill on a real cloud: Azure Kubernetes Service, Omni v1 (evidence class L, a metered bill)
 
@@ -148,7 +150,7 @@ The catalog (`realms/catalog.csv`): 945 muscles in 59 families, 430 in Compute /
 | Harness | What it proves | Receipt |
 |---|---|---|
 | `scripts/kind_paired.sh`, `tools/live_reps.py`, workflow `benchmark-reps` | native against Omni on real Kubernetes, paired on one runner, the reset checked | `results/live/raw/run-*/live-reps/` |
-| `tools/confirm_abc.py` (and `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | three separate runs read by one rule: confirmed better, confirmed worse, no difference beyond the noise, the runs disagree; each run's engine checked against the fingerprint | `results/live/V3_*.md`, `V1_*.md` |
+| `tools/confirm_abc.py` (and `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | three separate runs read by one rule: better in all three of our runs, worse in all three of our runs, no difference beyond the noise, the runs disagree; each run's engine checked against the fingerprint | `results/live/V3_*.md`, `V1_*.md` |
 | `tools/omni_version.py` | which frozen engine a checkout or any result's commit carries | `OMNI_V1.json`, `OMNI_V2.json`, `OMNI_V3.json` |
 | `scripts/aks_paired.sh`, workflow `aks-metered` | the same on Azure's managed Kubernetes, Azure's own bill, a fresh cluster per arm, the fleet pre-flighted against the subscription's allowances | `results/live/V1_AKS_*.md` |
 | `tools/run_kil.py`, workflows `six-kube`, `big-organism`, `big-organism-detached`; `tools/six_kube_report.py` | the six organisms with a real cluster inside at 1 to 1,000 copies, on GitHub and on a rented machine; the clock rule | `results/live/V1_SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V1_BIG_ORGANISM.md` |
@@ -160,7 +162,7 @@ The catalog (`realms/catalog.csv`): 945 muscles in 59 families, 430 in Compute /
 | `tools/run_realms.py`, workflow `realms` | every muscle alone and every organism whole | `results/realms/REALMS.md` |
 | `tools/run_pandapower.py`, `run_mujoco.py`, `run_citylearn.py` | Omni on top of an independent simulator's own controller | `results/live/V3_PANDAPOWER.md`, `V3_MUJOCO.md`, `V3_CITYLEARN.md` |
 | `tools/omni_index.py` | the one combined number, read only from the three-run tables | `results/OMNI_INDEX.md` |
-| `scripts/gpu_rented_run.sh`, `tools/gpu_wire_check.py` | one command on a rented card: wire check, smoke, the organisms with the card inside, the preregistered confirmation | the founder's runs, to come |
+| `scripts/gpu_rented_run.sh`, `tools/gpu_wire_check.py` | one command on a rented card: wire check, smoke, the organisms with the card inside, the preregistered counted run | the founder's runs, to come |
 | workflow `archive-run` | every finished run's files copied with the code, one SHA-256 manifest per repetition | `results/live/raw/run-<id>/` |
 | `verify.py`, `tools/release_manifest.py` | everything above re-runs and checks itself; the manifest fingerprints the result | `results/VERIFY_RECEIPT.txt`, `RELEASE_MANIFEST.json` |
 

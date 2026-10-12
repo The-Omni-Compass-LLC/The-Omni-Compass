@@ -11,7 +11,7 @@
 #   sudo CARDS8=1 bash scripts/apu_run.sh     every chip on the machine at once (scripts/gpu_8card.sh)
 #
 # The same preregistered protocol as the NVIDIA card (docs/GPU_PREREGISTRATION.md): wire check, envelope, smoke, the two
-# confirmations (compute and AI token generation), the operator's power cap underneath, the fault drill, the six
+# counted runs (compute and AI token generation), the operator's power cap underneath, the fault drill, the six
 # organisms at 1, 10, 100 and 1,000 copies with the chip inside, and AI serving. The card's two wires are answered by
 # AMD's amd-smi through scripts/apu/nvidia-smi; on an APU the meter is the package's power (CPU and GPU together, the
 # power its owner pays for). The adapter has not yet run on an AMD chip: the wire check in step 1 counts nothing unless

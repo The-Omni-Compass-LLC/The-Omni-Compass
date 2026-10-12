@@ -528,7 +528,7 @@ beside it, never inside it. Computed by `tools/omni_index.py` from each test's o
 **The service reading, a second reading declared 2026-10-09 (the first unchanged).** The founder asked what a cache is
 for. Redis is bought for speed and spends memory to deliver it; the index above counts that memory as a cost at the same
 weight as the speed it buys, so the Redis category reads −24.9% while its work inside the line and its hit rate read
-confirmed better in every run. The question is fair, and the answer is a second reading beside the first, never a change
+better in all three of our runs in every run. The question is fair, and the answer is a second reading beside the first, never a change
 to the first: the same tests, the same three-run rule, scored on the service the stack is bought for, **work and speed
 only**, with the resources it spent or saved (machines, energy, memory, connections, consumers) shown beside it and not
 scored. It is computed for every test alike by the same tool (`service_pct`, `service_headline_pct`), never for one
@@ -540,14 +540,13 @@ resource reading carries the gain. On the day it was declared the service readin
 reading's +20.5% (Kubernetes +83.2%, Kafka +1,192.8%, Redis +8.8%, the three database stacks exactly nothing; on the sets of
 10 October, the brain's verdict on every stack knob, the two readings stand at +10.7% and +4.8%); Kafka's
 hundredfold speed ratio is why the service headline is large, and the category table is where a reader sees it. A
-confirmed loss in work or speed counts against Omni in both readings; neither hides one.
+loss in all three of our runs in work or speed counts against Omni in both readings; neither hides one.
 
 **The wiring verdicts, declared 2026-10-09 (a reading of the tables, not a change to any rule).** The founder's order of
 the same day: Omni need not be wired into every muscle; where it cannot beat native, the muscle stays native and Omni only
 reads it, one wire out and no wire in. `tools/wiring_verdicts.py` reads every three-run table, the simulator tables, the
-realms table and the organism tables by one rule into three words per knob and case: **write** (a judged gauge confirmed
-better over all three runs, none confirmed worse), **watch** (nothing confirmed better, whether inside the noise, the runs
-disagreeing, or a loss with nothing against it) and **operator's choice** (gains and losses both confirmed, shown with both
+realms table and the organism tables by one rule into three words per knob and case: **write** (a judged gauge better in all three of our runs over all three runs, none worse in all three of our runs), **watch** (nothing better in all three of our runs, whether inside the noise, the runs
+disagreeing, or a loss with nothing against it) and **operator's choice** (gains and losses both the same in all three of our runs, shown with both
 readings of the index). Rows shown and not judged never count. Nothing is typed in, and `verify.py` fails if the page
 (`docs/WIRING_VERDICTS.md`) differs from what the tables give. The verdicts change what an operator connects, never the
 engine (Omni v3) or any rule written here, and every test on this page is read as before.

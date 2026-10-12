@@ -31,6 +31,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 import sys; sys.path.insert(0, str(ROOT))  # noqa: E402
+from tools.readings import judged, with_own_runs  # noqa: E402
 from realms.harness import STACK, TOWER, ORGANISM_ALIAS, organism_sizes  # noqa: E402
 OUT = ROOT / "docs" / "DOSSIER.md"
 FIG = ROOT / "docs" / "dossier"
@@ -173,7 +174,7 @@ def main():
         if row is None:
             return "not taken"
         p = pct_runs(row); rd = row["reading"]
-        if rd.startswith("confirmed"):
+        if judged(rd):
             return f"**{min(p):+.0f}% to {max(p):+.0f}%, {rd}**"
         if rd == "same":
             return "same"
@@ -200,8 +201,8 @@ def main():
     L += ["## 2. Real Kubernetes, Omni v3, every test three times (evidence class L)", "",
           f"{NUM} tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the "
           "replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a "
-          "fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **confirmed better** or "
-          "**confirmed worse** only when all three runs move the same way with every 95% interval clear of zero; otherwise it "
+          "fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **better in all three of our runs** or "
+          "**worse in all three of our runs** only when all three runs move the same way with every 95% interval clear of zero; otherwise it "
           "reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and "
           f"read back. Steady runs: {runs_line}; the other tests' runs are named in their tables.", "",
           "![Kubernetes on v3](dossier/k8s_v3.png)", "",
@@ -247,7 +248,7 @@ def main():
          ("work_inside_line_mps", "p95_ms", "consumers_mean", "cpu_seconds"),
          "Native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5% waited "
          "about 1.6 s; Omni added consumers while messages waited and gave them back when the queue was empty, so its slowest 5% waited "
-         "9 to 14 ms, at the cost of three to four times the consumers running, confirmed worse and counted against Omni in the index. "
+         "9 to 14 ms, at the cost of three to four times the consumers running, worse in all three of our runs and counted against Omni in the index. "
          "No message was lost in any arm; every count was handed back. Table: `results/live/V3_KAFKA.md`."),
         ("V3_REDIS.json", "## 3c. A real cache: Redis, the operator's memory ceiling, Omni v3, three runs (evidence class L)",
          "Redis as Ubuntu ships it with the operator's 64 MB ceiling and allkeys-lru is native; omni is the compass law on one knob, the "
@@ -270,7 +271,7 @@ def main():
          ("work_inside_line_ops", "p95_ms", "cache_mb_mean", "pages_read", "cpu_seconds"),
          "On this machine the data files sit in the operating system's page cache as well, so a storage-engine miss is a read from memory, "
          "not a disk, as disclosed before the run: the result is memory given back at no measurable cost in work inside the line, p95 or "
-         "CPU, with one confirmed loss, the mean latency on the burst workload. Table: `results/live/V3_YCSB.md`."),
+         "CPU, with one loss in all three of our runs, the mean latency on the burst workload. Table: `results/live/V3_YCSB.md`."),
         ("V3_SYSBENCH.json", "## 3e. A real database's buffer pool: MySQL under sysbench, the operator's InnoDB pool size, Omni v3, three runs (evidence class L)",
          "MySQL 8.0 as Ubuntu ships it with the operator's 512 MB InnoDB buffer pool is native; omni is the compass law on one knob, the pool "
          "size, inside the cover [128, 2,048] MB in the server's own 128 MB chunks through its own console, growing only while the pool is full "
@@ -280,9 +281,9 @@ def main():
          "not counted.",
          "| Workload | Work inside the line | p95 | Buffer pool held, MB (the resource held) | Pages read from disk | Host CPU-seconds |",
          ("work_inside_line_tps", "p95_ms", "pool_mb_mean", "disk_reads", "cpu_seconds"),
-         "The third counted set, on amendment 2 (the pool grows only while it is missing): the pool held −49% to −56% on burst, confirmed better, "
-         "with work, latency and CPU inside the noise; on read_write the pages held read +44% to +52%, confirmed worse, with the host's CPU −4% to "
-         "−6%, confirmed better, a trade counted both ways in the index; read_only inside the noise and update_index disagreeing; the pool handed "
+         "The third counted set, on amendment 2 (the pool grows only while it is missing): the pool held −49% to −56% on burst, better in all three of our runs, "
+         "with work, latency and CPU inside the noise; on read_write the pages held read +44% to +52%, worse in all three of our runs, with the host's CPU −4% to "
+         "−6%, better in all three of our runs, a trade counted both ways in the index; read_only inside the noise and update_index disagreeing; the pool handed "
          "back on all 45 omni arms. The second counted set (the pool −67% on burst and −50% to −56% on read_only, read_write's pages held +53% to "
          "+70% worse) is kept whole in `docs/history/V3_SYSBENCH_set2.md`; the first counted set "
          "(every row inside the noise; 15 of 45 arms not handed back because the plug's restore was issued while the server was still "
@@ -406,7 +407,7 @@ def main():
     # ------------------------------------------------------------------ 7. Harnesses and receipts
     L += ["## 7. Harnesses and receipts", "", "| Harness | What it proves | Receipt |", "|---|---|---|",
           "| `scripts/kind_paired.sh`, `tools/live_reps.py`, workflow `benchmark-reps` | native against Omni on real Kubernetes, paired on one runner, the reset checked | `results/live/raw/run-*/live-reps/` |",
-          "| `tools/confirm_abc.py` (and `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | three separate runs read by one rule: confirmed better, confirmed worse, no difference beyond the noise, the runs disagree; each run's engine checked against the fingerprint | `results/live/V3_*.md`, `V1_*.md` |",
+          "| `tools/confirm_abc.py` (and `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | three separate runs read by one rule: better in all three of our runs, worse in all three of our runs, no difference beyond the noise, the runs disagree; each run's engine checked against the fingerprint | `results/live/V3_*.md`, `V1_*.md` |",
           "| `tools/omni_version.py` | which frozen engine a checkout or any result's commit carries | `OMNI_V1.json`, `OMNI_V2.json`, `OMNI_V3.json` |",
           "| `scripts/aks_paired.sh`, workflow `aks-metered` | the same on Azure's managed Kubernetes, Azure's own bill, a fresh cluster per arm, the fleet pre-flighted against the subscription's allowances | `results/live/V1_AKS_*.md` |",
           "| `tools/run_kil.py`, workflows `six-kube`, `big-organism`, `big-organism-detached`; `tools/six_kube_report.py` | the six organisms with a real cluster inside at 1 to 1,000 copies, on GitHub and on a rented machine; the clock rule | `results/live/V1_SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V1_BIG_ORGANISM.md` |",
@@ -418,7 +419,7 @@ def main():
           "| `tools/run_realms.py`, workflow `realms` | every muscle alone and every organism whole | `results/realms/REALMS.md` |",
           "| `tools/run_pandapower.py`, `run_mujoco.py`, `run_citylearn.py` | Omni on top of an independent simulator's own controller | `results/live/V3_PANDAPOWER.md`, `V3_MUJOCO.md`, `V3_CITYLEARN.md` |",
           "| `tools/omni_index.py` | the one combined number, read only from the three-run tables | `results/OMNI_INDEX.md` |",
-          "| `scripts/gpu_rented_run.sh`, `tools/gpu_wire_check.py` | one command on a rented card: wire check, smoke, the organisms with the card inside, the preregistered confirmation | the founder's runs, to come |",
+          "| `scripts/gpu_rented_run.sh`, `tools/gpu_wire_check.py` | one command on a rented card: wire check, smoke, the organisms with the card inside, the preregistered counted run | the founder's runs, to come |",
           "| workflow `archive-run` | every finished run's files copied with the code, one SHA-256 manifest per repetition | `results/live/raw/run-<id>/` |",
           "| `verify.py`, `tools/release_manifest.py` | everything above re-runs and checks itself; the manifest fingerprints the result | `results/VERIFY_RECEIPT.txt`, `RELEASE_MANIFEST.json` |", "",
           "The rules for each run were written and committed before it ran (`docs/*_PREREGISTRATION.md`); every row is reported, "
@@ -435,7 +436,7 @@ def main():
           "- The queue in `docs/REGISTER.md` section 4 (drone swarms on gym-pybullet-drones and Kafka done; Redis running): PX4 and "
           "ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and "
           "GMAT, RocketPy, Cantera.", ""]
-    OUT.write_text("\n".join(_legal_stamp(L)) + "\n", encoding="utf-8")
+    OUT.write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n", encoding="utf-8")
     print(OUT)
 
 

@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-> **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: confirm the installation with section 8.5 of the manual (*Wired right or wired wrong*).
+> **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: check the installation with section 8.5 of the manual (*Wired right or wired wrong*).
 
 There are three ways to get real-machine numbers:
 - **Your own tower:** a machine you control, with a smart plug measuring the whole machine at the wall (section A).
@@ -92,9 +92,9 @@ It runs, in order, and stops at the first failure:
 1. the machine check (one copy only, nothing else on the card, the card's default limit and clock range restored);
 2. the **wire check**, which must end `WIRED RIGHT` (manual, section 8.4);
 3. the smoke test, about 40 minutes, never counted;
-4. the preregistered confirmation on compute-bound work: 10 repetitions × native / watch / Omni, 600 s each, about
+4. the preregistered counted run on compute-bound work: 10 repetitions × native / watch / Omni, 600 s each, about
    6 hours;
-5. the second preregistered confirmation on AI token generation (memory-bound), the same design, about 6 hours
+5. the second preregistered counted run on AI token generation (memory-bound), the same design, about 6 hours
    (`SKIP_DECODE=1` skips it); each is its own result, never pooled. Both are packed into one file as soon as they
    finish: `results/gpu/omni-gpu-<stamp>-confirmations.tar.gz`;
 6. **an operator's power cap underneath** (70% of the card's default limit): the cap alone vs the cap with
@@ -143,15 +143,14 @@ sudo nohup bash scripts/gpu_8card.sh > run8.log 2>&1 &
 tail -f run8.log
 ```
 
-Each card: wire check, envelope, smoke, the compute confirmation, the AI token generation confirmation, the operator's
+Each card: wire check, envelope, smoke, the compute counted run, the AI token generation counted run, the operator's
 power cap underneath (about 15 to 16 hours, all cards together). Then the fault drill once on card 0, with every other
 card idle. Then one pooled table per workload (every repetition of every card, each paired within its own card: 80
-repetitions per workload on 8 cards) and each card's own table. `SKIP_DECODE=1 SKIP_CAP=1` runs the compute
-confirmation alone, about 6.5 hours. **Every 8-GPU run has a hard time budget** (`MAX_HOURS`; by default 10.5 hours with `POOLED=1`, 4 with `FAST=1`, 26
+repetitions per workload on 8 cards) and each card's own table. `SKIP_DECODE=1 SKIP_CAP=1` runs the compute counted run alone, about 6.5 hours. **Every 8-GPU run has a hard time budget** (`MAX_HOURS`; by default 10.5 hours with `POOLED=1`, 4 with `FAST=1`, 26
 for the whole design): at the budget the master switch hands every card back, the stages still running stop, and what
 finished is packed and printed as the file to send back. Lambda bills until the instance is terminated, so terminate it
 when that line appears. **`sudo POOLED=1 nohup bash scripts/gpu_8card.sh &` runs every stage with the repetitions pooled across the cards
-(3 per card per confirmation, 24 per test on 8 cards; 2 per power cap load; 1 per organism size), about 9 to 10 hours.**
+(3 per card per counted run, 24 per test on 8 cards; 2 per power cap load; 1 per organism size), about 9 to 10 hours.**
 `sudo FAST=1 nohup bash scripts/gpu_8card.sh > run8.log 2>&1 &` is a short
 look, about 3.5 hours: 3 repetitions per card (24 on 8 cards), then one model across every card; it leaves AI token
 generation, the power cap and the whole stacks out, so it is never the result to show. Last, the whole server as one: a language model (Qwen2.5-7B-Instruct, open)

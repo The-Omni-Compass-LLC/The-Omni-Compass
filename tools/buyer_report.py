@@ -85,7 +85,7 @@ def main():
     # --- C
     gl, cf, pl = J("tuning/GLOBAL_LEAGUE.json"), J("tuning/CONFIRMATORY.json"), J("tuning/PLANETLAB_LEAGUE.json")
     if cf:
-        w("## C: Omni-Compass alone, one global setting, confirmatory run")
+        w("## C: Omni-Compass alone, one global setting, held-out run")
         w("")
         w(f"- **Setting:** one global setting for every workload, frozen by SHA-256 before the run "
           f"({cf['preregistration_sha256'][:16]}).")
@@ -173,7 +173,7 @@ def main():
     w("")
     if cc:
         t = cc["tally"]
-        w(f"**Coordination, confirmatory on fresh seeds {cc['seeds'][0]}-{cc['seeds'][1]}** (frozen first in "
+        w(f"**Coordination, held out on fresh seeds {cc['seeds'][0]}-{cc['seeds'][1]}** (frozen first in "
           f"`tuning/COORD_PREREGISTRATION.json`, same 364 cells, same Holm rule): {t.get('better', 0)} better, "
           f"{t.get('equal', 0)} equal, {t.get('worse', 0)} worse.")
         w("")

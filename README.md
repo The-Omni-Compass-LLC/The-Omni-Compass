@@ -16,7 +16,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 
 <!-- front-page:status:begin -->
 - **Engine on main:** omni-v3, fingerprint `b53d05449ee04c4b` (40 files); package 0.3.0. Omni v4 (the reflex rule on every wire) is designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md) and not yet built; every result runs again on it when it is.
-- **The Omni index now:** +5.2% on the resource reading (work, speed, machines and energy) and +12.5% on the service reading (work and speed), real machines, every test confirmed three times ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+- **The Omni index now:** +5.2% on the resource reading (work, speed, machines and energy) and +12.5% on the service reading (work and speed), real machines, every test the same in all three of our runs ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 <!-- front-page:status:end -->
 
 **Tables the repository rebuilt by itself** (the five live products, each from its three newest runs on one engine):
@@ -36,8 +36,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-11 01:57 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C confirmation (Omni v3)](results/live/V3_KEDA_REQUESTS.md) |  |
-| 2026-10-11 01:57 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C confirmation (Omni v3)](results/live/V3_KEDA_CPU_REQUESTS.md) |  |
+| 2026-10-11 01:57 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v3)](results/live/V3_KEDA_REQUESTS.md) |  |
+| 2026-10-11 01:57 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v3)](results/live/V3_KEDA_CPU_REQUESTS.md) |  |
 | 2026-10-11 01:57 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-11 00:21 | [Public demand traces, turned into load schedules](results/traces/README.md) |  |
 | 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/fresh/RESULT.md) |  |
@@ -72,11 +72,11 @@ autoscaler; omni is Omni-Compass on top of that same stack, its moves carried to
 
 | | KEDA on CPU and requests | KEDA's HTTP add-on |
 |---|---|---|
-| **Response time, 95th percentile** | **−51% to −53%, confirmed better** | **−73% to −76%, confirmed better** |
-| **Time over the response line** | −97% to −100%, confirmed better | −96% to −97%, confirmed better |
-| **Worker nodes in service** | no difference beyond the noise | **−5.9% to −7.8%, confirmed better** |
+| **Response time, 95th percentile** | **−51% to −53%, better in all three of our runs** | **−73% to −76%, better in all three of our runs** |
+| **Time over the response line** | −97% to −100%, better in all three of our runs | −96% to −97%, better in all three of our runs |
+| **Worker nodes in service** | no difference beyond the noise | **−5.9% to −7.8%, better in all three of our runs** |
 | **Failed requests** | no difference beyond the noise | no difference beyond the noise |
-| **Energy, parked workers still on at idle power** (declared model) | **+1.0% to +1.6%, confirmed WORSE** | **+1.4% to +2.6%, confirmed WORSE** |
+| **Energy, parked workers still on at idle power** (declared model) | **+1.0% to +1.6%, WORSE in all three of our runs** | **+1.4% to +2.6%, WORSE in all three of our runs** |
 | Service CPU, i.e. work put through by the closed-loop load (shown, not judged) | +24% to +32% | +45% to +54% |
 
 The energy loss stands and counts against Omni-Compass in the index. Faster answers drew more requests from the
@@ -87,7 +87,7 @@ counts requests served directly. It also gives native a node autoscaler: Karpent
 
 Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v3**, the frozen and
 fingerprinted engine ([`docs/OMNI_V3.md`](docs/OMNI_V3.md): v1's law and controllers byte for byte, the muscle catalog grown to 945 and a do-no-harm gate on speed knobs; the v1 tables, [`docs/OMNI_V1.md`](docs/OMNI_V1.md), read the same and stay as the first engine's record). Every test ran three times as separate GitHub runs (A the
-result, B and C the replications); a reading below is **confirmed** only when it holds in all three runs with every 95%
+result, B and C the replications); a reading below is **the same in all three of our runs** only when it holds in all three runs with every 95%
 interval clear of zero, and otherwise reads no difference beyond the noise. The six tables:
 [`V3_ALL_FOUR`](results/live/V3_ALL_FOUR.md), [`V3_STEADY`](results/live/V3_STEADY.md),
 [`V3_WANDERING`](results/live/V3_WANDERING.md), [`V3_FAULTS`](results/live/V3_FAULTS.md),
@@ -95,11 +95,11 @@ interval clear of zero, and otherwise reads no difference beyond the noise. The 
 
 | | native (run A) | omni (run A) | Reading over the three runs |
 |---|---:|---:|---|
-| **Work handled inside the response line** (all four in one run) | 21.0 req/s | **31.2 req/s** | **+35% to +49% more work on the same machines, confirmed better** |
-| **Response time, 95th percentile** (steady, wandering, all four, faults) | 321-820 ms | 111-306 ms | **−47% to −66% in every run of all four tests, confirmed better** |
-| **Failed requests** (wandering, all four) | 8.9-12.3% | 7.7-10.9% | **−9% to −14%, confirmed better**; zero in both arms at steady load; under faults lower in all three, clear of the noise in one |
-| **Machines in service** | 6 | 5.90 (steady), 4.89 (batch) | steady **−1.5% to −2.9%** and batch **−19% to −23%, confirmed better**; the other tests no difference beyond the noise |
-| **Energy** (a declared model: on kind the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill) | | | standby model confirmed lower in steady (−1.3% to −2.1%) and batch (−13% to −16%); elsewhere no difference beyond the noise |
+| **Work handled inside the response line** (all four in one run) | 21.0 req/s | **31.2 req/s** | **+35% to +49% more work on the same machines, better in all three of our runs** |
+| **Response time, 95th percentile** (steady, wandering, all four, faults) | 321-820 ms | 111-306 ms | **−47% to −66% in every run of all four tests, better in all three of our runs** |
+| **Failed requests** (wandering, all four) | 8.9-12.3% | 7.7-10.9% | **−9% to −14%, better in all three of our runs**; zero in both arms at steady load; under faults lower in all three, clear of the noise in one |
+| **Machines in service** | 6 | 5.90 (steady), 4.89 (batch) | steady **−1.5% to −2.9%** and batch **−19% to −23%, better in all three of our runs**; the other tests no difference beyond the noise |
+| **Energy** (a declared model: on kind the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill) | | | standby model lower in all three of our runs in steady (−1.3% to −2.1%) and batch (−13% to −16%); elsewhere no difference beyond the noise |
 | **A noisy neighbour on the same workers** (fairness) | | | no difference beyond the noise on every row, the neighbour's own service included: Omni neither helps nor hurts |
 | **Pods left with no machine to take them** | 0 | 0 | same, in every test |
 
@@ -161,7 +161,7 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **Omni v3, v2 and v1: the frozen engines, fingerprinted; which version every result ran on; how each is confirmed three times** | [`docs/OMNI_V3.md`](docs/OMNI_V3.md), [`docs/OMNI_V2.md`](docs/OMNI_V2.md), [`docs/OMNI_V1.md`](docs/OMNI_V1.md), `python3 tools/omni_version.py` |
+| **Omni v3, v2 and v1: the frozen engines, fingerprinted; which version every result ran on; how each is the same in all three of our runs** | [`docs/OMNI_V3.md`](docs/OMNI_V3.md), [`docs/OMNI_V2.md`](docs/OMNI_V2.md), [`docs/OMNI_V1.md`](docs/OMNI_V1.md), `python3 tools/omni_version.py` |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | The method, written before each run | [`docs/K8S_COMPASS_PREREGISTRATION.md`](docs/K8S_COMPASS_PREREGISTRATION.md), [`docs/GPU_PREREGISTRATION.md`](docs/GPU_PREREGISTRATION.md), [`docs/REALMS_PREREGISTRATION.md`](docs/REALMS_PREREGISTRATION.md) |

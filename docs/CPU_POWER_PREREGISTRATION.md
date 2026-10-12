@@ -73,7 +73,7 @@ compass moves it by its own law inside the allowance. Every trial, allowance, re
   about 10 ms and the governor, not the line, decides what is possible; the line binds only when the queue builds.
 - Three paired repetitions a run, native and omni alternating in order by repetition; each repetition's requests are the
   same in both arms. Three runs, A, B and C, on the same machine or on three machines of one kind, read by the three-run rule
-  (`docs/OMNI_V1.md`): confirmed better, confirmed worse, no difference beyond the noise (with the count), or the runs
+  (`docs/OMNI_V1.md`): better in all three of our runs, worse in all three of our runs, no difference beyond the noise (with the count), or the runs
   disagree. Never "not confirmed".
 
 ## 5. The gauges
@@ -142,7 +142,7 @@ A plug on the wall socket (a Shelly or Tasmota plug, $20 to $30) adds the whole 
   the line unchanged.
 - **Under the per-work objective**: notches are allowed down toward where the line binds at steps 6 to 8: energy −10% to
   −30% at the low steps, latency up but inside the line, no failed request; p95 and mean worse as point estimates and
-  perhaps confirmed worse, a trade shown with both readings.
+  perhaps worse in all three of our runs, a trade shown with both readings.
 - In both: the ceiling returns to the top under the bursts (fail up) and is handed back at the end of every arm; the
   wandering schedule shows the ceiling following the demand.
 

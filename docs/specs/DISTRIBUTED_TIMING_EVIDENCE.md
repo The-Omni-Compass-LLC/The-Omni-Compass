@@ -7,7 +7,7 @@
 
 ## Scope
 
-This document defines the optional timing layer for experiments whose receipts originate on more than one hardware clock. It is not part of the single-node GPU power-cap confirmation.
+This document defines the optional timing layer for experiments whose receipts originate on more than one hardware clock. It is not part of the single-node GPU power-cap counted run.
 
 ## PCIe PTM
 

@@ -87,7 +87,7 @@ real software, no meter).
 
 Each workload: three paired repetitions in one GitHub Actions job, order alternating, the per-request records, the
 audit and the server log archived with the code. Three separate runs on the frozen engine (A, B, C); the table
-(`tools/redis_abc.py`) reads confirmed better or WORSE when all three runs move the same way with every 95% interval
+(`tools/redis_abc.py`) reads better in all three of our runs or WORSE when all three runs move the same way with every 95% interval
 clear of zero, no difference beyond the noise when a run's interval includes zero, and the runs disagree when clear runs
 point different ways. `tests/test_run_redis.py` and `tests/test_redis_abc.py`, run by `verify.py`, prove the rules
 without a Redis.
@@ -110,7 +110,7 @@ Three short repetitions (10 s a notch) on the development machine shaped the rul
 ## Amendment 2 (2026-10-09, declared before any run on it): the brain's own verdict on the ceiling
 
 **Why, and when.** Written after the first counted set was read (`results/live/V3_REDIS.md`: work inside the line +14% to +27%,
-the hit rate up, the ceiling held 64 → 200 to 300 MB confirmed worse, the index's resource reading −24.9%), at the founder's order
+the hit rate up, the ceiling held 64 → 200 to 300 MB worse in all three of our runs, the index's resource reading −24.9%), at the founder's order
 of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it pays stays native and Omni only reads it.
 The brain must decide that on the muscle itself, in real time, by a measurement, not by a table after the fact.
 

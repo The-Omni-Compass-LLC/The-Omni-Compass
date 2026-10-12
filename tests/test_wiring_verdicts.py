@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The wiring verdicts (tools/wiring_verdicts.py): one of three words per knob, by one rule, from the tables themselves.
-write where something is confirmed better and nothing confirmed worse; watch where nothing is confirmed better; the
+write where something is better in all three of our runs and nothing worse in all three of our runs; watch where nothing is better in all three of our runs; the
 operator's choice where both are. Rows shown and not judged never count."""
 import sys
 import unittest
@@ -23,8 +23,8 @@ class TheRule(unittest.TestCase):
         self.assertEqual(wv.verdict(2, 1), wv.CHOICE)           # a trade is the operator's
 
     def test_every_reading_the_tables_use_is_classified(self):
-        self.assertEqual(wv.classify("confirmed better"), "better")
-        self.assertEqual(wv.classify("**confirmed WORSE**"), "worse")
+        self.assertEqual(wv.classify("better in all three of our runs"), "better")
+        self.assertEqual(wv.classify("**WORSE in all three of our runs**"), "worse")
         self.assertEqual(wv.classify("no difference beyond the noise (2 of 3 runs)"), "noise")
         self.assertEqual(wv.classify("no difference beyond the noise in 1 of 3 runs"), "noise")
         self.assertEqual(wv.classify("the runs disagree"), "disagree")
@@ -37,7 +37,7 @@ class TheRule(unittest.TestCase):
 
     def test_unjudged_rows_never_count(self):
         rows = {"a": {"reading": "shown, not judged", "runs": [{"native": 1.0, "omni": 2.0}]},
-                "b": {"reading": "confirmed better", "runs": [{"native": 100.0, "omni": 50.0}, {"native": 100.0, "omni": 48.0}]}}
+                "b": {"reading": "better in all three of our runs", "runs": [{"native": 100.0, "omni": 50.0}, {"native": 100.0, "omni": 48.0}]}}
         j = wv.judge_rows(rows, {"b": "p95"})
         self.assertEqual([x[1] for x in j["better"]], ["p95"])
         self.assertEqual(j["better"][0][2], "-52% to -50%")
@@ -51,9 +51,9 @@ class TheRule(unittest.TestCase):
 
     def test_a_simulator_table_is_read_by_its_reading_column(self):
         rows = [["Gauge", "native (A)", "omni (A)", "A", "B", "C", "Reading"],
-                ["energy (J)", "482.3", "478.3", "-0.82%", "-0.82%", "-0.82%", "**confirmed better**"],
+                ["energy (J)", "482.3", "478.3", "-0.82%", "-0.82%", "-0.82%", "**better in all three of our runs**"],
                 ["cycle time (s)", "8.01", "10.21", "+27.47%", "+27.47%", "+27.47%", "shown, not judged"],
-                ["losses (MWh)", "730", "736", "+0.76%", "+0.76%", "+0.80%", "**confirmed WORSE**"],
+                ["losses (MWh)", "730", "736", "+0.76%", "+0.76%", "+0.80%", "**WORSE in all three of our runs**"],
                 ["bus-steps", "0", "0", "+0.0e+00", "+0.0e+00", "+0.0e+00", "same"]]
         j = wv.sim_rows_judged(rows)
         self.assertEqual([x[1] for x in j["better"]], ["energy"])

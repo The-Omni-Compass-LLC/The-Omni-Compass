@@ -21,7 +21,7 @@ duplicate kept (1,716) · 6 the whole tower, every muscle once (945). (Omni v2; 
 
 ## How to run each benchmark
 
-**Real card + the six organisms with the card inside + card confirmation (Lambda, about 12 hours, one command):**
+**Real card + the six organisms with the card inside + card's counted run (Lambda, about 12 hours, one command):**
 ```
 sudo pkill -f gpu_
 cd ~/the-omni-compass
@@ -29,7 +29,7 @@ git pull
 sudo nohup bash scripts/gpu_rented_run.sh > run.log 2>&1 &
 tail -f run.log
 ```
-It runs: wire check -> card smoke -> six organisms with the card inside (`tools/run_hil.py`) -> card confirmation, and
+It runs: wire check -> card smoke -> six organisms with the card inside (`tools/run_hil.py`) -> card's counted run, and
 ends with `send this one file back: results/gpu/omni-gpu-<stamp>.tar.gz`. Finished when `pgrep -f gpu_rented_run`
 prints nothing. Upload that file to GitHub, then terminate the Lambda machine.
 

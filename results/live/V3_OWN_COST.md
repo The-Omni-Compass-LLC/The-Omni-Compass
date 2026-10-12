@@ -2,6 +2,8 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
 Omni-Compass's own CPU: the seconds its process and every command it ran spent on the CPU over the measured window, as a share of one core, from the `overhead` record every omni arm's audit carries (`omni_controller/controller.py`, written at exit), with the host's core count beside it. Native runs no governor: its cost is zero by construction. The organisms are the six with the real cluster inside (`tools/run_kil.py`); the governor's cost is the cost of governing the real cluster, which does not grow with the organism around it. Each run is shown under the engine its commit carries, and nothing is read across engines (`docs/ROBUSTNESS_PREREGISTRATION.md`, scenario 3). Shown, not judged.
 
 ## Run 37501769448 (`33b15ebb41ed`, omni-v3 (digest b53d05449ee04c4b, 40 files))

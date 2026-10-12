@@ -1,8 +1,10 @@
-# Robustness: the governor killed outright mid-run (the lease), real Kubernetes, 10 pairs: the A/B/C confirmation (Omni v3): the A/B/C confirmation (Omni v3)
+# Robustness: the governor killed outright mid-run (the lease), real Kubernetes, 10 pairs: the A/B/C three-run table (Omni v3)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **Confirmed better** or **confirmed WORSE**: all three runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, losses included.
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **Better** or **WORSE in all three of our runs**: all three runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, losses included.
 
 | Run | GitHub run | Commit | Engine | Paired repetitions |
 |---|---|---|---|---:|
@@ -16,10 +18,10 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 | node-hours | +0.0% (-0.3 to +0.4) | -0.1% (-0.3 to +0.2) | +0.0% (-0.4 to +0.5) | no difference beyond the noise (all three runs) |
 | energy, parked workers still on at idle power (Wh, declared model) | -0.2% (-0.7 to +0.3) | -0.3% (-0.6 to -0.0) | -0.2% (-0.5 to +0.2) | no difference beyond the noise in 2 of 3 runs |
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | -0.2% (-0.7 to +0.3) | -0.3% (-0.6 to -0.0) | -0.2% (-0.5 to +0.2) | no difference beyond the noise in 2 of 3 runs |
-| response time (ms), mean | -39.2% (-59.6 to -18.9) | -33.3% (-51.8 to -14.8) | -39.5% (-57.1 to -21.9) | **confirmed better** |
-| response time (ms), 95th percentile | -48.3% (-90.3 to -6.4) | -26.5% (-50.5 to -2.6) | -41.8% (-62.0 to -21.6) | **confirmed better** |
+| response time (ms), mean | -39.2% (-59.6 to -18.9) | -33.3% (-51.8 to -14.8) | -39.5% (-57.1 to -21.9) | **better in all three of our runs** |
+| response time (ms), 95th percentile | -48.3% (-90.3 to -6.4) | -26.5% (-50.5 to -2.6) | -41.8% (-62.0 to -21.6) | **better in all three of our runs** |
 | response time (ms), 99th percentile | -16.2% (-61.8 to +29.5) | -8.4% (-47.3 to +30.5) | -16.7% (-50.7 to +17.2) | no difference beyond the noise (all three runs) |
-| time over the response line (% of samples) | -36.0% (-50.8 to -21.3) | -35.6% (-52.5 to -18.8) | -32.4% (-46.0 to -18.8) | **confirmed better** |
+| time over the response line (% of samples) | -36.0% (-50.8 to -21.3) | -35.6% (-52.5 to -18.8) | -32.4% (-46.0 to -18.8) | **better in all three of our runs** |
 | failed requests (%) | -9.4% (-23.2 to +4.4) | -14.3% (-26.1 to -2.5) | -8.6% (-16.1 to -1.0) | no difference beyond the noise in 1 of 3 runs |
 | pods with no machine to take them (unschedulable) | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
 | time pods had no machine to take them, pod-minutes | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
@@ -37,10 +39,10 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 | host cores (the real machine under kind) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | shown, not judged |
 | robust: failed requests in the 120 s after the kill (%) | +0.7% (-18.2 to +19.6) | -5.5% (-24.0 to +12.9) | -0.9% (-16.6 to +14.8) | no difference beyond the noise (all three runs) |
 | robust: time over the line in the 120 s after the kill (% of samples) | -1.0% (-8.4 to +6.3) | -3.0% (-9.4 to +3.4) | -1.8% (-8.5 to +5.0) | no difference beyond the noise (all three runs) |
-| robust: every setting back at the operator's within 60 s of the kill, every repetition (the governor killed outright; the watchdog's hand-back) | yes (10 reps; mean 9 s, max 10 s) | yes (10 reps; mean 9 s, max 10 s) | yes (10 reps; mean 9 s, max 11 s) | **confirmed: handed back within the allowance in every repetition of every run** |
-| robust: a second governor started after the hand-back and governed to the end, every repetition | yes | yes | yes | **confirmed** |
+| robust: every setting back at the operator's within 60 s of the kill, every repetition (the governor killed outright; the watchdog's hand-back) | yes (10 reps; mean 9 s, max 10 s) | yes (10 reps; mean 9 s, max 10 s) | yes (10 reps; mean 9 s, max 11 s) | **handed back within the allowance in every repetition, in all three of our runs** |
+| robust: a second governor started after the hand-back and governed to the end, every repetition | yes | yes | yes | **the same in all three of our runs** |
 
-Readings: 3 confirmed better, 1 confirmed, 1 confirmed: handed back within the allowance in every repetition of every run, 6 no difference beyond the noise (all three runs), 1 no difference beyond the noise in 1 of 3 runs, 4 no difference beyond the noise in 2 of 3 runs, 3 same, 8 shown, not judged.
+Readings: 3 better in all three of our runs, 1 the same in all three of our runs, 1 handed back within the allowance in every repetition, in all three of our runs, 6 no difference beyond the noise (all three runs), 1 no difference beyond the noise in 1 of 3 runs, 4 no difference beyond the noise in 2 of 3 runs, 3 same, 8 shown, not judged.
 
 ---
 

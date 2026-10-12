@@ -15,11 +15,11 @@ native, the muscle stays native; we only wire out of it".
 
 The rule, the same for every table (every judged gauge counts; "shown, not judged" rows never do):
 
-  write               at least one gauge confirmed better and none confirmed worse: Omni holds the knob
-  watch               nothing confirmed better: the knob stays native and Omni only reads it. Where a gauge is
-                      confirmed worse the loss is named and its cause given; where the runs disagree, nothing is
+  write               at least one gauge better in all three of our runs and none worse in all three of our runs: Omni holds the knob
+  watch               nothing better in all three of our runs: the knob stays native and Omni only reads it. Where a gauge is
+                      worse in all three of our runs the loss is named and its cause given; where the runs disagree, nothing is
                       settled and the knob stays native until it is
-  operator's choice   gains and losses both confirmed: a trade. Both readings of the Omni index are printed where the
+  operator's choice   gains and losses both the same in all three of our runs: a trade. Both readings of the Omni index are printed where the
                       test is in it (the resource reading, the preregistered headline; the service reading, work and
                       speed alone) and the side that pays is named. The operator who wants the gain and can pay the
                       cost wires in; every other operator watches
@@ -45,6 +45,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
+from tools.readings import with_own_runs  # noqa: E402
 from tools import omni_index                                       # noqa: E402
 
 LIVE = ROOT / "results" / "live"
@@ -59,9 +60,9 @@ UNJUDGED = "shown, not judged"
 def classify(reading):
     """A table's reading in one word: better, worse, noise, disagree, same, unjudged."""
     r = (reading or "").strip().strip("*").lower()
-    if r.startswith("confirmed better"):
+    if r.startswith("better in all three of our runs") or r.startswith("confirmed better"):   # an older table says "confirmed"
         return "better"
-    if r.startswith("confirmed worse"):
+    if r.startswith("worse in all three of our runs") or r.startswith("confirmed worse"):
         return "worse"
     if r.startswith("no difference"):
         return "noise"
@@ -75,7 +76,7 @@ def classify(reading):
 
 
 def verdict(better, worse):
-    """The three words. better, worse: how many judged gauges were confirmed each way."""
+    """The three words. better, worse: how many judged gauges moved each way in all three of our runs."""
     if better and not worse:
         return WRITE
     if better and worse:
@@ -149,7 +150,7 @@ WORKLOAD_STACKS = [
 ]
 STACK_SHORT = {"V3_PGBENCH.json": "PostgreSQL", "V3_KAFKA.json": "Kafka", "V3_REDIS.json": "Redis", "V3_YCSB.json": "MongoDB", "V3_SYSBENCH.json": "MySQL"}
 
-# Why each confirmed loss happened, read from the preregistration that carries the result (the file is named so a reader
+# Why each loss in all three of our runs happened, read from the preregistration that carries the result (the file is named so a reader
 # can check the words against the record). Keyed by (file, workload or test, gauge key); a key of "*" matches any case.
 WHY = {
     ("V3_KAFKA.json", "*", "consumers_mean"): "the knob itself: Omni adds consumers while messages wait and the queue is kept short; the consumers running are the price, declared in advance as the cost that reads worse (`docs/KAFKA_PREREGISTRATION.md`, the gauges)",
@@ -159,7 +160,7 @@ WHY = {
     ("V3_REDIS.json", "*", "maxmemory_mb_mean"): "the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the cost that reads worse (`docs/REDIS_PREREGISTRATION.md`, the gauges)",
     ("V3_REDIS.json", "*", "used_mb_mean"): "the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held",
     ("V3_PGBENCH.json", "simple_update", "servers_alive_max"): "amendment 1's add rule (\"slow, clients waiting for a server: add\") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch",
-    ("V3_SYSBENCH.json", "read_write", "pool_used_mb_mean"): "memory bought on real misses: a written working set keeps the pool missing above one percent, so the growth gate lets the pool grow to 1.1 to 1.6 GB in the wide notches; the host's CPU fell 4% to 6% for it, confirmed better, and latency did not move (`docs/MYSQL_PREREGISTRATION.md`, the third set)",
+    ("V3_SYSBENCH.json", "read_write", "pool_used_mb_mean"): "memory bought on real misses: a written working set keeps the pool missing above one percent, so the growth gate lets the pool grow to 1.1 to 1.6 GB in the wide notches; the host's CPU fell 4% to 6% for it, better in all three of our runs, and latency did not move (`docs/MYSQL_PREREGISTRATION.md`, the third set)",
 }
 DECLARED_COST = {"V3_KAFKA.json": "consumers", "V3_REDIS.json": "memory"}
 
@@ -254,13 +255,13 @@ def fmt_list(items, n=4, cls=None, tag=False):
 
 def k8s_why(f, j, v):
     if v == WRITE:
-        return (f"confirmed better on {len(j['better'])} gauges, nothing confirmed worse"
+        return (f"better in all three of our runs on {len(j['better'])} gauges, nothing worse in all three of our runs"
                 + (f"; {len(j['noise'])} gauges inside the noise" if j["noise"] else "") + ". Omni holds the knob")
     if v == WATCH and not j["worse"]:
         return (f"every judged gauge inside the noise or the same ({len(j['noise'])} inside the noise, {len(j['same'])} the same), the neighbour's "
                 f"own rows included: Omni neither helped nor hurt beside a noisy neighbour, so under this demand there is nothing to earn and nothing "
                 f"lost. The same knob writes under the other six demands")
-    return f"confirmed better on {fmt_list(j['better'])}; confirmed worse on {fmt_list(j['worse'])}"
+    return f"better in all three of our runs on {fmt_list(j['better'])}; worse in all three of our runs on {fmt_list(j['worse'])}"
 
 
 def stack_why(f, wl, j, v, res, svc):
@@ -269,7 +270,7 @@ def stack_why(f, wl, j, v, res, svc):
     if j["disagree"]:
         parts.append(f"the runs disagree on {', '.join(f'{nm} ({rg})' for _, nm, rg, _ in j['disagree'][:3])}")
     if not j["better"] and not j["worse"]:
-        parts.append(f"nothing confirmed either way ({len(j['noise'])} gauges inside the noise" + (f", {len(j['same'])} the same" if j["same"] else "") + ")")
+        parts.append(f"nothing moved the same way in all three of our runs ({len(j['noise'])} gauges inside the noise" + (f", {len(j['same'])} the same" if j["same"] else "") + ")")
     s = ("; ".join(parts) + ".") if parts else ""
     causes = []
     for k, nm, rg, _ in j["worse"]:
@@ -336,7 +337,7 @@ SIM_WHY = {
                  "not served and the comfort rows move, where in the county neighbourhoods they read the same: the compass steers the batteries from the district's "
                  "electricity reading alone (one wire, one muscle, `docs/CITYLEARN_PREREGISTRATION.md`), flattening the draw it sees, and in "
                  "these districts that leaves less in the batteries for the hours that count against the bill, the hour-to-hour ramping and "
-                 "the energy not served. The bill, what the battery is bought to lower, is confirmed worse here by 0.2% to 0.4%, so for the "
+                 "the energy not served. The bill, what the battery is bought to lower, is worse in all three of our runs here by 0.2% to 0.4%, so for the "
                  "operator who pays the bill this is a watch. The cause is a reading of the tables, not yet tested on its own"),
         "monthly": "the monthly load factor moved by a tenth of a percent against a bill 8.6% lower and 14.7% less electricity bought"},
     "V3_MUJOCO.md": {
@@ -448,7 +449,7 @@ def sim_why(f, name, j, v):
     if j["disagree"]:
         parts.append(f"the runs differ on {', '.join(f'{nm} ({rg})' for _, nm, rg, _ in j['disagree'][:3])}")
     if not j["better"] and not j["worse"]:
-        parts.append("nothing confirmed either way")
+        parts.append("nothing moved the same way in all three of our runs")
     s = ("; ".join(parts) + ".") if parts else ""
     why = SIM_SHORT.get(f, {})
     if f == "V3_PANDAPOWER.md" and j["worse"]:
@@ -643,10 +644,10 @@ def main(check=False):
          "by a bare sign: a gauge that fell when falling is good reads **cut** (less waiting, fewer machines, less energy, less memory), one "
          "that rose when rising is good reads **up**, and each carries **good** or **cost**. In the result tables the same change keeps its raw "
          "sign (a cut reads minus there), with the Reading column beside it saying which way is good. A knob reads:", "",
-         "- **write**: at least one gauge confirmed better over all three runs and none confirmed worse. Omni holds the knob.",
-         "- **watch**: nothing confirmed better. The knob stays native; Omni reads it and writes nothing. Where a gauge is confirmed "
+         "- **write**: at least one gauge better in all three of our runs over all three runs and none worse in all three of our runs. Omni holds the knob.",
+         "- **watch**: nothing better in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a gauge is the same in all three of our runs "
          "worse, the loss is named and its cause given below. Where the runs disagree, nothing is settled and the knob stays native until it is.",
-         "- **operator's choice**: gains and losses both confirmed, a trade. Both readings of the Omni index are shown where the test is in it "
+         "- **operator's choice**: gains and losses both the same in all three of our runs, a trade. Both readings of the Omni index are shown where the test is in it "
          "(the resource reading, the preregistered headline, and the service reading, work and speed alone), and the side that pays is named. "
          "The operator who wants the gain and can pay the cost wires in; every other operator watches.", "",
          "A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes its verdict from its label by rule: SUPERIOR WITHIN "
@@ -670,7 +671,7 @@ def main(check=False):
           "of `results/OMNI_INDEX.md` for that test, where it has one.", ""]
     L += ["### Real Kubernetes: one knob under seven demands", "",
           f"The knob: {K8S_KNOB}, on top of the Horizontal Pod Autoscaler (kind clusters on GitHub, ten pairs a run).", "",
-          "| Demand | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
+          "| Demand | Better in all three of our runs | Worse in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
     for x in [c for c in real if c["kind"] == "real knob" and "Kubernetes" in c["domain"]]:
         j = x["judged"]
         L.append(f"| {x['case']} | {esc(fmt_list(j['better'], 12, 'better')) or 'none'} | {esc(fmt_list(j['worse'], 12, 'worse')) or 'none'} | **{x['verdict']}** | "
@@ -681,7 +682,7 @@ def main(check=False):
         if not rows:
             continue
         L += [f"### {cat}", "", f"The knob: {knob}.", "",
-              "| Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
+              "| Workload | Better in all three of our runs | Worse in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
         for x in rows:
             j = x["judged"]
             L.append(f"| {x['case']} | {esc(fmt_list(j['better'], 12, 'better')) or 'none'} | {esc(fmt_list(j['worse'], 12, 'worse')) or 'none'} | "
@@ -689,8 +690,8 @@ def main(check=False):
         L.append("")
 
     # every negative
-    L += ["## Every confirmed loss on a real stack, and why", "",
-          "The founder's question was where the negatives are and why each is there. Every gauge confirmed worse on a real stack, with its cause "
+    L += ["## Every loss in all three of our runs on a real stack, and why", "",
+          "The founder's question was where the negatives are and why each is there. Every gauge worse in all three of our runs on a real stack, with its cause "
           "read from the preregistration that carries the result:", ""]
     groups = collections.OrderedDict()
     for x in real:
@@ -719,7 +720,7 @@ def main(check=False):
     L += ["", "What the losses have in common: every one is a resource spent to buy the service the knob exists for (consumers and the CPU "
           "they poll with, memory, pages, connections), and each was declared in advance in its preregistration as the cost that would read worse, or found "
           "on the first counted set and disclosed. None is a service loss: on no real stack did work inside the line, p95 or failed requests "
-          "read confirmed worse. Where the resource was spent and nothing was bought (PostgreSQL's `simple_update`), the verdict is watch; where "
+          "read worse in all three of our runs. Where the resource was spent and nothing was bought (PostgreSQL's `simple_update`), the verdict is watch; where "
           "it bought service, the verdict is the operator's, and both index readings say what the trade is worth.", ""]
 
     # the simulators
@@ -729,7 +730,7 @@ def main(check=False):
         if not rows:
             continue
         L += [f"### {domain}", "", f"The knob: {knob}.", "",
-              "| Case | Confirmed better | Confirmed worse | Verdict | Why | Source |", "|---|---|---|---|---|---|"]
+              "| Case | Better in all three of our runs | Worse in all three of our runs | Verdict | Why | Source |", "|---|---|---|---|---|---|"]
         for x in rows:
             j = x["judged"]
             b = esc(fmt_list(j["better"], 12, "better")) if j else ""
@@ -880,12 +881,12 @@ def main(check=False):
           "latency / work) or energy per request inside the line | give back only (the ceiling cannot go above the top; the top always free) | "
           "outside the engine; built 10 October, waiting for a machine on the metal, no run yet |", ""]
 
-    md = "\n".join(legal_stamp(L)) + "\n"
+    md = "\n".join(legal_stamp(with_own_runs(L))) + "\n"
 
     # the CSV
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator="\n")
-    w.writerow(["kind", "domain", "knob", "case", "counted", "confirmed_better", "confirmed_worse", "inside_the_noise", "runs_disagree",
+    w.writerow(["kind", "domain", "knob", "case", "counted", "better_all_three", "worse_all_three", "inside_the_noise", "runs_disagree",
                 "verdict", "index_resource_pct", "index_service_pct", "why", "source"])
     for x in all_cases:
         j = x["judged"]

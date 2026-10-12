@@ -73,10 +73,9 @@ result is run again on it.
 | Databases (PostgreSQL behind PgBouncer) | none | tuning run done (37420052827, not counted; register row 30); the untouched workloads running, then A, B, C |
 | GPU, one card and the card in the organisms | none on v1 | the founder's rerun on Lambda, on v2 |
 
-## How each result is confirmed
+## How each result is read across three runs
 
-Exactly as v1: three separate GitHub runs on the same frozen bytes; every judged row reads confirmed better, confirmed
-worse, no difference beyond the noise (with the count of runs), or the runs disagree; every row is reported, losses
+Exactly as v1: three separate GitHub runs on the same frozen bytes; every judged row reads better in all three of our runs, worse in all three of our runs, no difference beyond the noise (with the count of runs), or the runs disagree; every row is reported, losses
 included; the tables are made by rule (`tools/confirm_abc.py`, `tools/citylearn_abc.py`, `tools/pandapower_abc.py`,
 `tools/mujoco_abc.py`), each checking every run's commit against the fingerprints and refusing to mix engines.
 

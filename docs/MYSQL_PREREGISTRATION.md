@@ -122,7 +122,7 @@ Memory held is the resource this benchmark trades; no energy is claimed beyond t
 
 Each workload: three paired repetitions in one GitHub Actions job, order alternating, sysbench's own output for every notch, the
 audit and the server's error log archived with the code. Three separate runs on the frozen engine (A, B, C); the table
-(`tools/sysbench_abc.py`) reads confirmed better or WORSE when all three runs move the same way with every 95% interval clear of
+(`tools/sysbench_abc.py`) reads better in all three of our runs or WORSE when all three runs move the same way with every 95% interval clear of
 zero, no difference beyond the noise when a run's interval includes zero, and the runs disagree when clear runs point different
 ways. `tests/test_run_sysbench.py` and `tests/test_sysbench_abc.py`, run by `verify.py`, prove the rules without a server.
 
@@ -142,7 +142,7 @@ result is recorded here when it has run, and it is not counted.
   for the knob to do and would read as a free memory saving, which is not the question. The same fault the YCSB test met
   in its zipfian draw, met here in sysbench's. The one change, made here before any counted run: **rows are drawn
   uniformly over the tables in use** (`--rand-type=uniform`), so the working set is the tables in use; the scripts' operation
-  mixes stay as shipped. A second smoke run follows; the statement line is confirmed or changed here on its figures before
+  mixes stay as shipped. A second smoke run follows; the statement line is kept or changed here on its figures before
   the counted runs. Nothing in the rules, the gauges or the workloads changed.
 - **Second smoke run (37748144365, 08:10 UTC): the working set reached the pool, and the figures set the line.** With the
   uniform draw native's pages holding data reached 493 MB of 512 MB from the second notch on and stayed there, and its pages
@@ -199,11 +199,10 @@ result is recorded here when it has run, and it is not counted.
 ## The first counted set (runs A, B and C of 2026-10-08): the result, a hand-back finding, and the amendment it forces
 
 **The result, every row.** Runs 37757840760, 37757850988 and 37757861572, commit `23f6ca4c`, Omni v3, each run five workloads of
-three paired repetitions (`results/live/V3_SYSBENCH.md`). On the four untouched workloads **no gauge-row is confirmed better or
-confirmed worse and none disagrees**: work inside the line, throughput, p95, p99, mean, CPU and the pool held are all inside the
+three paired repetitions (`results/live/V3_SYSBENCH.md`). On the four untouched workloads **no gauge-row is better or worse in all three of our runs and none disagrees**: work inside the line, throughput, p95, p99, mean, CPU and the pool held are all inside the
 noise in every run or in two of three (the pool held read −45% to −71% on burst, −4% to −36% on read_only, +38% to +84% on
 read_write and +7% to +29% on update_index as the runs' point estimates, with at most one run of three clear of zero on any
-workload, so the three-run rule confirms none of them); no error in any arm. The compass moved the pool 3 to 26 times an arm and never met another writer. The tuning workload
+workload, so none of them is the same in all three of our runs); no error in any arm. The compass moved the pool 3 to 26 times an arm and never met another writer. The tuning workload
 read the same. Two readings in that table need the explanation a referee would ask for, and both are given here, not in the
 table's favour.
 
@@ -237,20 +236,19 @@ workloads of three paired repetitions each, on the amended plug (`results/live/V
 whole in `docs/history/V3_SYSBENCH_set1.md`). **The pool handed back and read back on all 45 omni arms.** On the four untouched
 workloads:
 
-- **burst:** the pool held **−67% in all three runs, confirmed better** (512 → 170 MB), the pages holding data −66%, confirmed
-  better; work inside the line, throughput, p95, p99 and host CPU inside the noise; misses from disk about double (shown);
+- **burst:** the pool held **−67% in all three runs, better in all three of our runs** (512 → 170 MB), the pages holding data −66%, better in all three of our runs; work inside the line, throughput, p95, p99 and host CPU inside the noise; misses from disk about double (shown);
   three writes an arm.
-- **read_only:** the pool held **−50% to −56%, confirmed better** (512 → 258 MB), the pages holding data −50% to −54%,
-  confirmed better; work, latency and CPU inside the noise; misses +123% to +142% (shown).
+- **read_only:** the pool held **−50% to −56%, better in all three of our runs** (512 → 258 MB), the pages holding data −50% to −54%,
+  better in all three of our runs; work, latency and CPU inside the noise; misses +123% to +142% (shown).
 - **read_write:** the compass bought pool for the written working set: the pool held +59% to +79% as point estimates, one run
-  clear of zero (no difference beyond the noise in 2 of 3), and **the pages holding data +53% to +70%, confirmed WORSE**; p95
+  clear of zero (no difference beyond the noise in 2 of 3), and **the pages holding data +53% to +70%, WORSE in all three of our runs**; p95
   −11% to −18% and host CPU −4% to −5% as point estimates, inside the noise in two runs; misses −40% to −47% (shown); work
   inside the line inside the noise.
 - **update_index:** every row inside the noise (run A2's omni arm used 78% more host CPU than its native arm, with an
   interval of −59% to +215%; the other two runs read −1%); the "inside the line" row counts almost nothing in either arm, as
   disclosed below.
 
-No error in any arm; no other writer seen. **4 gauge-rows confirmed better, 1 confirmed worse, 0 where the runs disagree.**
+No error in any arm; no other writer seen. **4 gauge-rows better in all three of our runs, 1 worse in all three of our runs, 0 where the runs disagree.**
 The category enters the index at +12.2% (the first set had entered at +0.0%), the headline moving from +21.2% to +23.5%.
 What the two sets together say: the knob does what the law asks on read-mostly working sets that fit in less pool than the
 operator gave (the memory is given back, with no measurable cost in work, latency or CPU on these runners, where the data
@@ -271,7 +269,7 @@ sets are read on the same line; a line set from the client's own round trip is a
 **The question.** The founder asked for every cost in the counted tables to be traced to its mechanism and removed where the
 mechanism is ours, with the engine locked (Omni v3; `tools/run_sysbench.py` is a harness outside the engine's fingerprint, and
 `tools/omni_version.py` prints omni-v3 before and after this amendment). The one cost in `V3_SYSBENCH.md` is **read_write: the
-pages holding data +53% to +70%, confirmed WORSE** (the pool held +59% to +79% as point estimates), with nothing bought for it
+pages holding data +53% to +70%, WORSE in all three of our runs** (the pool held +59% to +79% as point estimates), with nothing bought for it
 beyond the noise (p95 −11% to −18%, two runs inside the noise).
 
 **The mechanism, read from the second set's own audits** (`results/live/raw/run-37770617236`, `-37770620582`, `-37770624805`,
@@ -312,8 +310,8 @@ nothing grown; a second with no read request: nothing taken; the two gates share
 
 **What is expected, said before the runs.** The replay above cannot predict the pool's path, because a chunk not bought changes
 the misses that follow; it says only which decisions the gate would have refused. On read_write the pages-holding-data row
-should move toward native's, and may or may not leave "confirmed worse": 46 of its 82 grows came at one percent or more and
-stay allowed. If it stays confirmed worse, the remaining growth is on real misses, the trade is the knob's, and the table says
+should move toward native's, and may or may not leave "worse in all three of our runs": 46 of its 82 grows came at one percent or more and
+stay allowed. If it stays worse in all three of our runs, the remaining growth is on real misses, the trade is the knob's, and the table says
 so. The read-mostly workloads should read as before (3 of 36 and 1 of 17 grows refused). The tuning workload's two refused grows
 are shown and not counted, as always.
 
@@ -332,7 +330,7 @@ Runs 37858501997, 37858505059 and 37858509109, commit `310cf318`, Omni v3, five 
 table by rule is `results/live/V3_SYSBENCH.md`, and the second set's table is kept whole in `docs/history/V3_SYSBENCH_set2.md`
 beside the first set's.
 
-- **burst**: the pool held **−49% to −56%** and the pages holding data −52% to −57%, **confirmed better** (the second set read
+- **burst**: the pool held **−49% to −56%** and the pages holding data −52% to −57%, **better in all three of our runs** (the second set read
   −67%); work, latencies and CPU inside the noise.
 - **read_only**: every row inside the noise. The pool held read +1%, −25% and +1% as the runs' means, with intervals of ±40
   to ±80 points: the second set's −50% to −56% is not reproduced. The audits say why. In the second set the very first
@@ -343,8 +341,8 @@ beside the first set's.
   chunks back once misses fall under one percent, and by then the notches of two to six tables have arrived, so the pool is
   bought back on real misses (4 to 12 grows an arm in six of the nine arms). The second set's read_only saving was in part the
   cold-start artefact the MongoDB amendment names, and it is gone with it; what remains is inside the noise.
-- **read_write**: the pages holding data **+44% to +52%, confirmed WORSE** (the second set read +53% to +70%); **host CPU −4% to
-  −6%, confirmed better**, new; the pool held +59%, +62% and +63% as means with one run's interval across zero (inside the
+- **read_write**: the pages holding data **+44% to +52%, WORSE in all three of our runs** (the second set read +53% to +70%); **host CPU −4% to
+  −6%, better in all three of our runs**, new; the pool held +59%, +62% and +63% as means with one run's interval across zero (inside the
   noise by the rule); p95 −13%, −24%, +2% and work inside the noise. The growth gate refused 0 to 6 grows an arm; the grows at
   one to five percent of misses stayed allowed, as the replay above said they would, and the pool still grew to 1.1 to 1.6 GB
   in the wide notches. The row stands as a trade: memory bought on real misses, CPU saved, latency unchanged.
@@ -352,17 +350,17 @@ beside the first set's.
 - **tuning**: shown and not counted, as always.
 - Every pool handed back and read back in every arm; no error; no controller fault.
 
-**Read.** 4 gauge-rows confirmed better, 1 confirmed worse, 1 where the runs disagree. The category enters the index at
+**Read.** 4 gauge-rows better in all three of our runs, 1 worse in all three of our runs, 1 where the runs disagree. The category enters the index at
 **+5.2%** (the second set's +12.2% included the read_only saving that was in part the artefact). Said in the founder's words:
 burst is a yes with no cost (half the memory, nothing worse); read_write is a trade (more memory, less CPU; the index nets it
 at about +1%); read_only and update_index show no settled value. The expectation written before the runs held: the read_write
-memory row moved toward native and stayed confirmed worse on real misses, and the read-mostly workloads were not meant to
+memory row moved toward native and stayed worse in all three of our runs on real misses, and the read-mostly workloads were not meant to
 change, but read_only did, for the reason given, and that is the result.
 
 ## Amendment 3 (2026-10-09, declared before any run on it): the brain's own verdict on the pool
 
 **Why, and when.** Written after the third counted set was read (the section above: `burst` pool −49% to −56% with nothing worse;
-`read_write` pages holding data +44% to +52% confirmed worse with CPU −4% to −6% better; `read_only` inside the noise; `update_index`
+`read_write` pages holding data +44% to +52% worse in all three of our runs with CPU −4% to −6% better; `read_only` inside the noise; `update_index`
 the runs disagree), at the founder's order of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it
 pays stays native and Omni only reads it. The brain must decide that on the muscle itself, in real time, by a measurement.
 
@@ -404,7 +402,7 @@ dispatched with `workloads=all`, `reps=3`, `step_s=30`, the resource objective: 
 
 ## Amendment 4 (2026-10-10 13:05 UTC, after the first counted set on amendment 3, before the next): a spend trial runs to its samples
 
-The first counted set on the brain's verdict (runs 38013329351, 38013334121, 38013338730; the table `results/live/V3_SYSBENCH.md`) landed at midday on 10 October. What it showed about the trials: the give-back trials were judged (the pool held −10% to −20% on `burst` and `read_only`, confirmed better, read_write and update_index left native or one chunk given back) but the grow trials were mostly abandoned (for example 15 trials, 2 allowed, 0 refused, 13 abandoned on an arm): a chunk added while the pool was missing cut the misses within seconds, the service turned calm, and the trial ended unjudged.
+The first counted set on the brain's verdict (runs 38013329351, 38013334121, 38013338730; the table `results/live/V3_SYSBENCH.md`) landed at midday on 10 October. What it showed about the trials: the give-back trials were judged (the pool held −10% to −20% on `burst` and `read_only`, better in all three of our runs, read_write and update_index left native or one chunk given back) but the grow trials were mostly abandoned (for example 15 trials, 2 allowed, 0 refused, 13 abandoned on an arm): a chunk added while the pool was missing cut the misses within seconds, the service turned calm, and the trial ended unjudged.
 
 **The cause is ours.** Amendment 3 ended a trial when the service swung to the other direction's condition: a give-back trial when the service left calm (the engine's own rule, kept), and a spend trial when the service turned calm. A spend that works calms the service within seconds, so a spend trial could never reach its samples: every successful spend ended its own trial unjudged. Nothing in the stack and nothing in the engine did this; the engine's verdict ends a trial when the condition it is given ends, and we gave it the wrong condition for spending. Found on the first set, corrected before the second, declared here.
 

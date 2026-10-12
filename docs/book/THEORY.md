@@ -435,7 +435,7 @@ or a crash - is the cost Omni-Compass removes by holding the knobs and returning
 measurement as a saving S = G / (1 + G) in resources: a third more work is a quarter off the bill (manual, section 3.4).
 Across every real stack the one number is the Omni index (`results/OMNI_INDEX.md`): each test's work, speed, machines and
 energy as ratios, combined by geometric means so that a gain and an equal loss cancel exactly, each real category weighed
-the same, and only rows confirmed in three separate runs counted. The index is honest in both directions by construction.
+the same, and only rows the same in all three of our runs counted. The index is honest in both directions by construction.
 As this edition is written it reads +30.2%: real Kubernetes +25.5%, the database +14.2%, messaging +166.9%, and the cache
 −24.9%, the last negative because the memory the governor holds for a wide working set is the resource it trades and
 reads worse by rule, even as the cache's work and hit rate read better. A buyer reads the category that matches their

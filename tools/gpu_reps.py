@@ -25,7 +25,7 @@ The result label is chosen by rule (label()), never by hand. A meter that was no
 The run is INVALID (exit 2) when: a native or watch arm saw a power limit (or enforced limit) other than the one read at
 start, the watch arm executed a write, an arm ended with a limit that differs from the start (the reset did not
 restore), a governor exited nonzero (a refused write, a refused start), a write was refused, Omni's frozen files
-changed, a confirmation ran on uncommitted code, or smoke and confirmation repetitions were mixed.
+changed, a counted run ran on uncommitted code, or smoke and counted repetitions were mixed.
 Usage: python tools/gpu_reps.py RUN_DIR   (RUN_DIR holds rep-<n>/<arm>/)  ->  RUN_DIR/GPU_REPS.md, RUN_DIR/GPU_REPS.json"""
 from __future__ import annotations
 
@@ -414,9 +414,9 @@ def main(root):
     if fz and any(x["files"] != fz[0]["files"] for x in fz):
         problems.append("Omni changed during the run: the frozen file hashes differ between the start, the end, or the machines")
     if fz and fz[0].get("phase") == "confirm" and fz[0].get("dirty"):
-        problems.append("confirmation run on uncommitted Omni code")
+        problems.append("counted run on uncommitted Omni code")
     if len({x.get("phase") for x in fz}) > 1:
-        problems.append("smoke and confirmation repetitions mixed: smoke data never enter the confirmation")
+        problems.append("smoke and counted repetitions mixed: smoke data never enter the counted run")
     out = {"freeze": fz[0] if fz else None, "receipt": receipt, "start_limit_w": start, "checks": checks, "problems": problems, "means": {}, "paired": {}}
     names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni"}
     cols = [a for a in ("native", "watch", "omni") if a in runs]

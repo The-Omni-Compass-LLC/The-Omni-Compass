@@ -57,7 +57,7 @@ id `29d9808dfb8f…`; the printed configuration `printed_eight_line`, id `cd333d
 
 | Class | Statement | Where |
 |---|---|---|
-| P | First real-GPU confirmation, NVIDIA A10 (Lambda), 10 paired repetitions, the card's own meter: work per energy +3.6% (+2.7 to +4.5, proven), GPU energy −3.5%, same requests, none lost; wire check 7 of 7, every write read back, every arm restored. | `results/gpu/run-20261002T082232Z/GPU_REPS.md` |
+| P | First real-GPU counted run, NVIDIA A10 (Lambda), 10 paired repetitions, the card's own meter: work per energy +3.6% (+2.7 to +4.5, proven), GPU energy −3.5%, same requests, none lost; wire check 7 of 7, every write read back, every arm restored. | `results/gpu/run-20261002T082232Z/GPU_REPS.md` |
 | L | Set 25 (commit `6fa7a97`), real Kubernetes, 10 paired repetitions: machines in service −32.3%, p95 −57.3%, 0 failed requests, total CPU including Omni's own −0.6% (not proven). | `results/live/LIVE_REPS_25.md` |
 | L | Set 26 (commit `e7f920d`), real Kubernetes, 10 paired repetitions, three arms: the allocation law machines −35.8%, p95 −55.4%; **the compass law in the live controller machines −17.2%, p95 −64.8%**, 0 failed requests, label by the preregistered rule *better on machines within the band*. | `results/live/LIVE_REPS_26.md` |
 | L | Set 27 (commit `d46c959`), real Kubernetes, 10 paired repetitions, three arms: the allocation law machines −36.6%, p95 −53.1%; **the compass law aligned with the GPU governor machines −15.9%, p95 −65.5%, p99 −72.6%**, 0 failed requests, label by the preregistered rule *better on machines within the band*. | `results/live/LIVE_REPS_27.md` |

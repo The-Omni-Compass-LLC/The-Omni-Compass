@@ -1,8 +1,10 @@
-# Robot arms, MuJoCo Menagerie: the A/B/C confirmation (Omni v1)
+# Robot arms, MuJoCo Menagerie: the A/B/C three-run table (Omni v1)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-MuJoCo (Google DeepMind) integrates each arm; MuJoCo Menagerie supplies the robot as its maker describes it, with the position servos it ships with as native. Omni sits on top of that servo on one knob, the speed override, inside the task's takt (`docs/ROBOTICS_PREREGISTRATION.md`). Energy is a declared model from MuJoCo's own torques and velocities, the same in both arms, with the standing draw charged for the whole takt. Three separate GitHub runs on the same frozen engine: MuJoCo is deterministic, so a gauge reads **confirmed better** or **confirmed WORSE** when all three runs give the same sign, **same** under one part in a million, and **the runs differ** when they do not reproduce. A robot whose paired physics trial found a slower cycle no cheaper is listed as nothing for Omni to move. Every row is shown, losses included.
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+MuJoCo (Google DeepMind) integrates each arm; MuJoCo Menagerie supplies the robot as its maker describes it, with the position servos it ships with as native. Omni sits on top of that servo on one knob, the speed override, inside the task's takt (`docs/ROBOTICS_PREREGISTRATION.md`). Energy is a declared model from MuJoCo's own torques and velocities, the same in both arms, with the standing draw charged for the whole takt. Three separate GitHub runs on the same frozen engine: MuJoCo is deterministic, so a gauge reads **better** or **WORSE in all three of our runs** when all three runs give the same sign, **same** under one part in a million, and **the runs differ** when they do not reproduce. A robot whose paired physics trial found a slower cycle no cheaper is listed as nothing for Omni to move. Every row is shown, losses included.
 
 | Run | GitHub run | Commit | Engine | Robots in the run |
 |---|---|---|---|---:|
@@ -16,21 +18,21 @@ MuJoCo (Google DeepMind) integrates each arm; MuJoCo Menagerie supplies the robo
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per takt (J, declared model: motion plus the standing draw for the whole takt) | 482.3 | 478.3 | -0.82% | -0.82% | -0.82% | **confirmed better** |
-| copper loss per cycle (J, declared model) | 13.68 | 12.14 | -11.27% | -11.27% | -11.27% | **confirmed better** |
-| mechanical work per cycle (J) | 36.6 | 34.17 | -6.62% | -6.62% | -6.62% | **confirmed better** |
+| energy per takt (J, declared model: motion plus the standing draw for the whole takt) | 482.3 | 478.3 | -0.82% | -0.82% | -0.82% | **better in all three of our runs** |
+| copper loss per cycle (J, declared model) | 13.68 | 12.14 | -11.27% | -11.27% | -11.27% | **better in all three of our runs** |
+| mechanical work per cycle (J) | 36.6 | 34.17 | -6.62% | -6.62% | -6.62% | **better in all three of our runs** |
 | standing draw per takt (J, declared model; the same in both arms) | 432 | 432 | +0.00% | +0.00% | +0.00% | same |
-| peak joint torque (N m) | 21.74 | 15.52 | -28.63% | -28.63% | -28.63% | **confirmed better** |
-| mean |torque| (N m) | 2.687 | 2.338 | -13.01% | -13.01% | -13.01% | **confirmed better** |
+| peak joint torque (N m) | 21.74 | 15.52 | -28.63% | -28.63% | -28.63% | **better in all three of our runs** |
+| mean |torque| (N m) | 2.687 | 2.338 | -13.01% | -13.01% | -13.01% | **better in all three of our runs** |
 | cycle time (s) | 8.01 | 10.21 | +27.47% | +27.47% | +27.47% | shown, not judged |
 | cycles over the time line (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
-| tracking error, RMS (rad) | 0.01707 | 0.01344 | -21.28% | -21.28% | -21.28% | **confirmed better** |
-| end-point error at the waypoints (rad) | 0.002418 | 0.002153 | -10.97% | -10.97% | -10.97% | **confirmed better** |
+| tracking error, RMS (rad) | 0.01707 | 0.01344 | -21.28% | -21.28% | -21.28% | **better in all three of our runs** |
+| end-point error at the waypoints (rad) | 0.002418 | 0.002153 | -10.97% | -10.97% | -10.97% | **better in all three of our runs** |
 | speed override, mean | 1 | 0.7839 | -21.61% | -21.61% | -21.61% | shown, not judged |
 
 ## Across the robots Omni moved
 
-| Gauge | Confirmed better | Confirmed worse | Same | The runs differ |
+| Gauge | Better in all three of our runs | Worse in all three of our runs | Same | The runs differ |
 |---|---:|---|---:|---:|
 | energy per takt (J, declared model: motion plus the standing draw for the whole takt) | 1 | 0 | 0 | 0 |
 | copper loss per cycle (J, declared model) | 1 | 0 | 0 | 0 |

@@ -98,7 +98,7 @@ reproduce each other; a gauge that does not reads "the runs differ", which is a 
 ## Runs
 
 Each cell is one GitHub Actions job, native and omni on the same missions, its JSON and per-mission records archived with the
-code. Three separate runs on the frozen engine (A, B, C); the table (`tools/swarm_abc.py`) reads confirmed better or
+code. Three separate runs on the frozen engine (A, B, C); the table (`tools/swarm_abc.py`) reads better in all three of our runs or
 WORSE by each gauge's own direction when the runs reproduce, same under one part in a million, and "the runs differ" when
 they do not. `tests/test_run_swarm.py` and `tests/test_swarm_abc.py`, run by `verify.py`, prove the rules without the
 simulator: the task keeps the fleet apart, a perfect autopilot finishes every mission inside its deadline, the override

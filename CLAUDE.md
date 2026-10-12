@@ -36,10 +36,13 @@ the founder overrides one in the conversation.
   1.0, never as a second product.
 - Any change to a rule, gain, guard, preset or muscle makes **the next version**, and every result is run again on it. Never read a result across
   versions. Never change the engine without telling the founder first.
-- Confirmation: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
-  readings: confirmed better or confirmed worse (the same sign in all three, every 95% interval clear of zero); no
+- Three runs: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
+  readings: better or worse in all three of our runs (the same sign in all three, every 95% interval clear of zero); no
   difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
-  pointing different ways: the test is unstable there, look into it). Never write "not confirmed".
+  pointing different ways: the test is unstable there, look into it). Never write "confirmed" or "not confirmed"
+  (the founder's order of 11 October: nobody outside approved these results); every three-run table says "Run and
+  scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results."
+  (`tools/readings.py`).
 - Evidence classes: P (physical meter), L (live software), S (our own models). Never present S as proof.
 
 ## The six organisms and the grid

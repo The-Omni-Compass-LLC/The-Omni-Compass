@@ -3,7 +3,7 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The Redis A/B/C rule (tools/redis_abc.py): confirmed only with the same sign and every interval clear of zero in all three
+"""The Redis A/B/C rule (tools/redis_abc.py): better or worse in all three of our runs only with the same sign and every interval clear of zero in all three
 runs; an interval over zero reads no difference beyond the noise with its count; clear runs pointing different ways read
 the runs disagree; any failed request is WORSE; the knob's moves are shown; the tuning workload is shown and not counted."""
 import json
@@ -36,13 +36,13 @@ def rec(name, tuning=False, **omni):
 
 
 def main():
-    assert M.verdict([pr(-20, -30, -10)] * 3, "lower") == "**confirmed better**"
-    assert M.verdict([pr(+3, +1, +5)] * 3, "lower") == "**confirmed WORSE**", "more consumers held reads WORSE"
-    assert M.verdict([pr(+3, +1, +5)] * 3, "higher") == "**confirmed better**"
+    assert M.verdict([pr(-20, -30, -10)] * 3, "lower") == "**better in all three of our runs**"
+    assert M.verdict([pr(+3, +1, +5)] * 3, "lower") == "**WORSE in all three of our runs**", "more consumers held reads WORSE"
+    assert M.verdict([pr(+3, +1, +5)] * 3, "higher") == "**better in all three of our runs**"
     assert M.verdict([pr(-20, -30, -10), pr(-20, -30, -10), pr(-2, -10, +6)], "lower") == "no difference beyond the noise (1 of 3 runs)"
     assert M.verdict([pr(-20, -30, -10), pr(+20, +10, +30), pr(-20, -30, -10)], "lower") == "**the runs disagree**"
     assert M.verdict([pr(0, -1, 1, native=0)] * 3, "never more") == "same"
-    assert M.verdict([pr(0, -1, 1, native=0), pr(1, 0, 2, native=0), pr(0, -1, 1, native=0)], "never more") == "**confirmed WORSE**", "a failed request in any run is WORSE"
+    assert M.verdict([pr(0, -1, 1, native=0), pr(1, 0, 2, native=0), pr(0, -1, 1, native=0)], "never more") == "**WORSE in all three of our runs**", "a failed request in any run is WORSE"
     assert M.verdict([pr(1, 0, 2)] * 3, "shown") == "shown, not judged"
     with tempfile.TemporaryDirectory() as t:
         dirs = []
@@ -56,9 +56,9 @@ def main():
         txt = out.read_text()
         assert "## small" in txt and "## tuning" in txt and "shown and not counted" in txt
         assert "Across 1 untouched workloads" in txt, "the tuning workload is not counted"
-        assert "| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 150.0 |" in txt and "confirmed WORSE" in txt
-        assert json.loads(out.with_suffix(".json").read_text())["workloads"]["small"]["p95_ms"]["reading"] == "confirmed better"
-    print("PASS  Redis A/B/C rule: confirmed only with the same sign and every interval clear of zero in all three runs; an interval over zero "
+        assert "| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 150.0 |" in txt and "WORSE in all three of our runs" in txt
+        assert json.loads(out.with_suffix(".json").read_text())["workloads"]["small"]["p95_ms"]["reading"] == "better in all three of our runs"
+    print("PASS  Redis A/B/C rule: better or worse in all three of our runs only with the same sign and every interval clear of zero in all three runs; an interval over zero "
           "reads no difference beyond the noise with its count; any failed request is WORSE; more memory held reads WORSE; the tuning workload is not counted")
 
 

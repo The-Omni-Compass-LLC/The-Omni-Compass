@@ -41,9 +41,9 @@ This is the whole repository at the commit named in `STATE_OF_PLAY_COMMIT.txt`. 
 |---|---|---|
 | **B (Omni on top of each platform):** 0 losing cells on held-out scenarios; strictly better on 27 of 28 platform-workload pairs | simulation, pre-registered | `tuning/B_FIX.json`, `tuning/B_TONE_HELDOUT.json` |
 | **Four-cluster sites:** B 0 losses on all 7 platforms; C 0 losses vs GKE, AKS/Karpenter, CAST AI, Spot | simulation, held-out | `tuning/SITE_LEAGUE.json` |
-| **C (Omni alone), one global setting, 400 never-used scenarios:** 153 better / 174 equal / 37 worse of 364 cells (Holm-corrected) | simulation, confirmatory | `tuning/CONFIRMATORY.json` |
-| **C with nervous-system coordination, 400 fresh scenarios:** 151 / 173 / 40 | simulation, confirmatory | `tuning/CONFIRMATORY_COORD.json` |
-| **Controllers fighting each other:** lowest of all 8 systems on web (0.07 per day) and four-cluster sites (0.56 per day) | simulation, confirmatory | same file |
+| **C (Omni alone), one global setting, 400 never-used scenarios:** 153 better / 174 equal / 37 worse of 364 cells (Holm-corrected) | simulation, held-out | `tuning/CONFIRMATORY.json` |
+| **C with nervous-system coordination, 400 fresh scenarios:** 151 / 173 / 40 | simulation, held-out | `tuning/CONFIRMATORY_COORD.json` |
+| **Controllers fighting each other:** lowest of all 8 systems on web (0.07 per day) and four-cluster sites (0.56 per day) | simulation, held-out | same file |
 | **Real demand, 1,052 recorded PlanetLab machines:** 0 losing cells of 91 | simulation on real traces | `tuning/PLANETLAB_LEAGUE.json` |
 | **Faults** (machines dying, spikes, crash loops, noisy neighbours): fewest pages to a human, fastest recovery | simulation, 500 runs per workload | `results/protocol/` |
 | **GPU power law** (engine cap over the MLPerf-measured performance law), against native at equal work: energy -27% to -33%, time over the heat limit -73% to -78% | simulation, held-out | `results/hardware/SUMMARY_HELDOUT.json` |
@@ -123,14 +123,14 @@ locally at this commit.
 
 ## In one paragraph (2026-10-06, Omni v1)
 
-**Omni v1, confirmed three times.** On real Kubernetes, every test ran three times as separate GitHub runs on the frozen
+**Omni v1, the same in all three of our runs.** On real Kubernetes, every test ran three times as separate GitHub runs on the frozen
 engine, ten pairs each (`docs/OMNI_V1.md`, the six `results/live/V1_*.md` tables). Work inside the response line **+42%
-to +48%** in all three runs of the all-four test (18.6 → 27.6 requests a second in run A), confirmed better; the 95th
-percentile **−57% to −69%** in every run of the steady, wandering, all-four and fault tests, confirmed better; failed
-requests −12% to −13% where load swings, confirmed better; machines −1.5% to −3.4% at steady load and −15% to −24% on
-the batch queue, confirmed better, no difference beyond the noise elsewhere; energy a declared model (kind never powers a
+to +48%** in all three runs of the all-four test (18.6 → 27.6 requests a second in run A), better in all three of our runs; the 95th
+percentile **−57% to −69%** in every run of the steady, wandering, all-four and fault tests, better in all three of our runs; failed
+requests −12% to −13% where load swings, better in all three of our runs; machines −1.5% to −3.4% at steady load and −15% to −24% on
+the batch queue, better in all three of our runs, no difference beyond the noise elsewhere; energy a declared model (kind never powers a
 machine down); beside a noisy neighbour, no difference beyond the noise on every row. **The Omni index on v1: +26.2%**
-on real Kubernetes (`results/OMNI_INDEX.md`; only rows confirmed in all three runs count, a row inside the noise counts
+on real Kubernetes (`results/OMNI_INDEX.md`; only rows the same in all three of our runs count, a row inside the noise counts
 as zero; Azure and the card join when their v1 runs land). The paragraph below is the earlier engine's reading, kept as
 the record it was.
 
@@ -146,8 +146,8 @@ check parked 29-36%: `docs/history/`). All of it together, real machines only: *
 (`results/OMNI_INDEX.md`).
 
 **Omni v1** (`docs/OMNI_V1.md`): the engine is frozen and fingerprinted (`OMNI_V1.json`), and every test above runs
-three times on it, as separate GitHub runs (A the result, B and C the replications); each table reads confirmed better,
-confirmed worse, no difference beyond the noise, or the runs disagree, and replaces the earlier engine's table as it
+three times on it, as separate GitHub runs (A the result, B and C the replications); each table reads better in all three of our runs,
+worse in all three of our runs, no difference beyond the noise, or the runs disagree, and replaces the earlier engine's table as it
 lands. Running on v1 now: the Kubernetes suite three times, the batch test, the six organisms at 1, 10, 100 and 1,000
 copies with the real cluster inside, the big organisms on rented Azure machines, the Azure steady and burst bill tests,
 CityLearn, and the power grid.
@@ -246,7 +246,7 @@ center 0.4), against native and the allocation law (`docs/K8S_COMPASS_PREREGISTR
 
 ### Measured on a real GPU: the card's own meter (evidence class P)
 
-**First confirmation, NVIDIA A10 on Lambda, 2026-10-02** (`results/gpu/run-20261002T082232Z/GPU_REPS.md`, 10 paired
+**First counted run, NVIDIA A10 on Lambda, 2026-10-02** (`results/gpu/run-20261002T082232Z/GPU_REPS.md`, 10 paired
 repetitions × native / watch / Omni, 600 s each, frozen at commit `c908054`, checksums verified). Wire check 7 of 7;
 2,144 writes, none refused, every one read back, every arm ended at the start limit; watch equal to native.
 

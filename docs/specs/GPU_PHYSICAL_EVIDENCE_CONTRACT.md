@@ -32,7 +32,7 @@ A command is not an effect. `requested != enforced` is an authority discrepancy.
 **Omni:** the identical frozen workload runs while the canonical governor receives bounded write authority. `nvidia-smi -pl` remains the sole experiment power-limit writer. DCGM/NVML are observers.
 
 ## Required preflight
-`tools/gpu_physical_preflight.py` produces `PHYSICAL_PREFLIGHT.json`. Confirmation requires:
+`tools/gpu_physical_preflight.py` produces `PHYSICAL_PREFLIGHT.json`. A counted run requires:
 
 - NVIDIA GPU identity and UUID;
 - persistence enabled;
@@ -77,7 +77,7 @@ Before a qualifying hardware folder exists, the correct status is **PHYSICAL GPU
 This living document is synchronized to XPASS25. Historical receipts and prior-run artifacts remain frozen and are not rewritten. The canonical six-state/eight-line CLAIM1 core, held-u law, C++ core, GPU writer/watchdog, causal evidence gate, and physical evidence contracts are unchanged from XPASS15.
 
 
-Open external evidence remains: 500-scenario confirmation, Kind CLAIM1-23, and physical NVIDIA. Simulation results are not physical meter results or proprietary-product executions.
+Open external evidence remains: 500-scenario counted run, Kind CLAIM1-23, and physical NVIDIA. Simulation results are not physical meter results or proprietary-product executions.
 
 ---
 

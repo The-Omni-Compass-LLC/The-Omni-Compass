@@ -95,10 +95,10 @@ Energy on kind is a declared model, not a meter: kind keeps every machine powere
 ## The three-run tables (`results/live/V1_<TEST>.md`, `V3_<TEST>.md`)
 
 Every benchmark since the engine was frozen runs three separate times, A, B and C, on the same bytes, and the table
-shows all three beside each gauge. Read the last column first: **confirmed better** or **confirmed worse** (the same sign
+shows all three beside each gauge. Read the last column first: **better** or **worse in all three of our runs** (the same sign
 in all three, every interval clear of zero), **no difference beyond the noise** (an interval over zero in at least one
-run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "not
-confirmed". The `V1_` or `V3_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
+run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "confirmed" or "not
+confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V1_` or `V3_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
 a table never mixes engines, and a reading is never carried from one engine to another. Losses are in the table beside
 the gains: the database's host CPU-seconds, the grid's losses in four grids, the Panda's copper, CityLearn's bill.
 
@@ -160,7 +160,7 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
 whether each is good depends on the gauge. The benefit sheet turns every one the same way round: **plus is always good for
 Omni, minus is always bad**, whatever the gauge measures, and the number carries its word, **gain**, **loss** or
-**nothing**. Beside it every confirmed change is written out in words, never as a bare sign: a gauge that fell when
+**nothing**. Beside it every change the same in all three of our runs is written out in words, never as a bare sign: a gauge that fell when
 falling is good reads **cut** (less waiting, fewer machines, less energy, less memory, fewer failures), a gauge that rose
 when rising is good reads **up**, and each carries **good** or **cost**. So "p95 cut 65%: good" and "memory ceiling held up
 215%: cost" cannot be misread against a table that shows the same changes as "-65%" and "+215%". One number per benchmark,
@@ -169,10 +169,9 @@ the rows behind a number, and read their Reading column, never the sign alone. T
 
 ## Wire in, or watch (`docs/WIRING_VERDICTS.md`)
 
-One of three words per knob, by one rule from the tables above. **Write**: a gauge confirmed better over all three runs
-and none confirmed worse; Omni holds the knob. **Watch**: nothing confirmed better; the knob stays native and Omni only
-reads it (one wire out, no wire in), and a confirmed loss is named with its cause. **Operator's choice**: gains and losses
-both confirmed, a trade, shown with both readings of the index. Rows marked "shown, not judged" never count. A modelled
+One of three words per knob, by one rule from the tables above. **Write**: a gauge better in all three of our runs over all three runs
+and none worse in all three of our runs; Omni holds the knob. **Watch**: nothing better in all three of our runs; the knob stays native and Omni only
+reads it (one wire out, no wire in), and a loss in all three of our runs is named with its cause. **Operator's choice**: gains and losses both the same in all three of our runs, a trade, shown with both readings of the index. Rows marked "shown, not judged" never count. A modelled
 muscle takes its word from its label: superior is write, a tradeoff label is the operator's choice, the rest is watch. The
 CSV beside the page (`results/WIRING_VERDICTS.csv`) has one row per knob and per muscle.
 

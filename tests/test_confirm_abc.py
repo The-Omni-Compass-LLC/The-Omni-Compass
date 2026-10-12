@@ -3,7 +3,7 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The A/B/C confirmation rule (tools/confirm_abc.py, docs/OMNI_V1.md): confirmed better or WORSE only when all three
+"""The A/B/C three-run table rule (tools/confirm_abc.py, docs/OMNI_V1.md): better in all three of our runs or WORSE only when all three
 runs move the same way with every 95% interval clear of zero; an interval that includes zero reads no difference beyond
 the noise, with the count of such runs; runs clear of the noise that point different ways read as a disagreement; a
 rounding-level change reads same; unjudged rows stay unjudged."""
@@ -24,8 +24,8 @@ def r(native, diff, lo, hi):
 
 def main():
     better = r(300, -150, -200, -100)
-    assert C.verdict(P95, [better] * 3) == "**confirmed better**"
-    assert C.verdict(P95, [r(300, 30, 10, 50)] * 3) == "**confirmed WORSE**", "a loss in all three is shown as WORSE"
+    assert C.verdict(P95, [better] * 3) == "**better in all three of our runs**"
+    assert C.verdict(P95, [r(300, 30, 10, 50)] * 3) == "**WORSE in all three of our runs**", "a loss in all three is shown as WORSE"
     assert C.verdict(P95, [better, better, r(300, -20, -60, 5)]) == "no difference beyond the noise in 1 of 3 runs", "one interval crosses zero"
     assert C.verdict(P95, [r(300, -5, -40, 30), r(300, 8, -20, 36), r(300, -2, -30, 26)]) == "no difference beyond the noise (all three runs)"
     assert C.verdict(P95, [better, better, r(300, 40, 10, 70)]) == "**the runs disagree**", "one run flips the sign, clear of the noise"
@@ -36,9 +36,9 @@ def main():
     # one pair a run (the 24-hour robustness run on rented machines): no interval, read by sign alone, never a confirmation
     nan = float("nan")
     single = {"native": 300.0, "omni": 150.0, "diff": -150.0, "ci95": [nan, nan], "significant": False}
-    assert C.verdict(P95, [single] * 3) == "three single pairs agree: better (one pair a run, no interval: not a confirmation)"
+    assert C.verdict(P95, [single] * 3) == "three single pairs agree: better (one pair a run, no interval, so the noise cannot be judged)"
     assert C.verdict(P95, [single, single, dict(single, diff=20.0, omni=320.0)]) == "single pairs point different ways (one pair a run, no interval)"
-    assert "WORSE" in C.verdict(C.CAPACITY, [single] * 3), "less work inside the line from three single pairs reads worse, and still not a confirmation"
+    assert "WORSE" in C.verdict(C.CAPACITY, [single] * 3), "less work inside the line from three single pairs reads worse, and still not a reading of all three of our runs"
     assert C.cell(better) == "-50.0% (-66.7 to -33.3)"
     with tempfile.TemporaryDirectory() as t:
         d = Path(t) / "run-123" / "live-reps"; d.mkdir(parents=True)
@@ -47,18 +47,18 @@ def main():
         run, paired, n, _ = C.load(d.parent)
         assert (run, n, paired[P95]["diff"]) == ("123", 2, -150), (run, n)
     assert C.engine("1")[1] == "unknown", "a run whose commit cannot be read is never called v1 (GitHub's gh prints nothing for it)"
-    assert C.verdict(C.CAPACITY, [r(18.6, 9.0, 6.0, 12.0)] * 3) == "**confirmed better**", "more work inside the line is better"
-    assert C.verdict(C.CAPACITY, [r(18.6, -3.0, -5.0, -1.0)] * 3) == "**confirmed WORSE**"
-    assert C.verdict("batch: worker machines in service after the queue finished, mean", [r(6.0, -2.0, -2.5, -1.5)] * 3) == "**confirmed better**"
-    assert C.verdict("batch: queue finished (s)", [r(575.0, 5.0, 2.0, 8.0)] * 3) == "**confirmed WORSE**", "a later finish is worse"
-    assert C.verdict("compute bill at list price ($)", [r(1.0, -0.1, -0.15, -0.05)] * 3) == "**confirmed better**", "a smaller bill is better"
+    assert C.verdict(C.CAPACITY, [r(18.6, 9.0, 6.0, 12.0)] * 3) == "**better in all three of our runs**", "more work inside the line is better"
+    assert C.verdict(C.CAPACITY, [r(18.6, -3.0, -5.0, -1.0)] * 3) == "**WORSE in all three of our runs**"
+    assert C.verdict("batch: worker machines in service after the queue finished, mean", [r(6.0, -2.0, -2.5, -1.5)] * 3) == "**better in all three of our runs**"
+    assert C.verdict("batch: queue finished (s)", [r(575.0, 5.0, 2.0, 8.0)] * 3) == "**WORSE in all three of our runs**", "a later finish is worse"
+    assert C.verdict("compute bill at list price ($)", [r(1.0, -0.1, -0.15, -0.05)] * 3) == "**better in all three of our runs**", "a smaller bill is better"
     with tempfile.TemporaryDirectory() as t:
         d = Path(t) / "run-124" / "live-reps"; d.mkdir(parents=True)
         (d / "LIVE_REPS.json").write_text(json.dumps({"repetitions": {"native": ["1"], "compass": ["1"]}, "means": {}, "paired": {"compass": {}},
                                                        "capacity": {"native": {"capacity_rps": 18.6}, "compass": {"capacity_rps": 27.6, "change_pct": 48.4, "ci95": [6.0, 12.0]}}}))
         _, paired, _, _ = C.load(d.parent)
         assert paired[C.CAPACITY]["diff"] == 9.0 and paired[C.CAPACITY]["significant"], "the capacity block becomes a judged row"
-    print("PASS  A/B/C confirmation rule: confirmed only with the same sign and every interval clear of zero in all three; "
+    print("PASS  A/B/C three-run table rule: better or worse in all three of our runs only with the same sign and every interval clear of zero in all three; "
           "an interval over zero reads no difference beyond the noise; clear runs pointing different ways read as a disagreement")
 
 

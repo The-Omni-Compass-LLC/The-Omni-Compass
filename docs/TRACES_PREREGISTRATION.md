@@ -53,7 +53,7 @@ the steps in the receipt. Nothing in this table was changed after the runs were 
 - **Gauges**, native + Omni against native, paired with the 95% interval and read in words: time over the 500 ms line,
   failed requests, p95 and p99 response time, worker machines in service, energy (the declared model; on kind it is not a
   meter), CPU with Omni's own, pods started. No capacity is read (the load does not only rise).
-- **Readings**: the three-run rule (`tools/confirm_abc.py`): confirmed better or confirmed WORSE when all three runs move
+- **Readings**: the three-run rule (`tools/confirm_abc.py`): better or WORSE in all three of our runs when all three runs move
   the same way with every interval clear of zero; no difference beyond the noise when a run's interval includes zero (with
   the count of such runs); the runs disagree when clear runs point different ways. Every row shown, losses included.
 - **Table**: written beside the six tests' tables in `results/live/`, named for the trace (V3_TRACE_GOOGLE2011). The test enters the Omni index's Kubernetes category beside the six
@@ -77,23 +77,23 @@ above, identical in both arms. Native + Omni against native, three runs, the thr
 
 | Gauge | A | B | C | Reading |
 |---|---|---|---|---|
-| response time, 95th percentile | −65% | −68% | −71% | **confirmed better** |
-| response time, 99th percentile | −49% | −61% | −61% | **confirmed better** |
-| response time, mean | −51% | −53% | −55% | **confirmed better** |
-| time over the 500 ms line | −81% | −82% | −84% | **confirmed better** |
-| failed requests | −13% | −8% | −17% | **confirmed better** |
-| worker machines in service, mean | −9.5% | −5.9% | −6.1% | **confirmed better** |
-| HPA replicas, mean | −6.3% | −4.8% | −6.2% | **confirmed better** |
-| energy, 25 W standby model | −6.7% | −4.3% | −4.6% | **confirmed better** |
+| response time, 95th percentile | −65% | −68% | −71% | **better in all three of our runs** |
+| response time, 99th percentile | −49% | −61% | −61% | **better in all three of our runs** |
+| response time, mean | −51% | −53% | −55% | **better in all three of our runs** |
+| time over the 500 ms line | −81% | −82% | −84% | **better in all three of our runs** |
+| failed requests | −13% | −8% | −17% | **better in all three of our runs** |
+| worker machines in service, mean | −9.5% | −5.9% | −6.1% | **better in all three of our runs** |
+| HPA replicas, mean | −6.3% | −4.8% | −6.2% | **better in all three of our runs** |
+| energy, 25 W standby model | −6.7% | −4.3% | −4.6% | **better in all three of our runs** |
 | energy, idle-power model | −0.2% | −0.4% | −0.5% | no difference beyond the noise in 1 of 3 runs |
 | pods started | +23% | +27% | +35% | no difference beyond the noise in 1 of 3 runs |
 | pod start wait | inside the noise | inside the noise | inside the noise | no difference beyond the noise |
 | pods with no machine to take them | 0 in both arms | 0 | 0 | same |
 
-**9 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree.** Shown and not judged: CPU used with
+**9 gauge-rows better in all three of our runs, 0 worse in all three of our runs, 0 where the runs disagree.** Shown and not judged: CPU used with
 Omni's own −3.7% to −4.5% (Omni's own CPU about 0.0095 of a core), host CPU busy −3% to −4%, utilisation +0.4% to +3.8%.
 Read against the wandering test (our own schedule: p95 −57% to −63%, machines inside the noise): under a day somebody else
-measured the governor read the same way on service and did better on machines (−6% to −10%, confirmed, where the wandering
+measured the governor read the same way on service and did better on machines (−6% to −10%, the same in all three of our runs, where the wandering
 test's machines row was inside the noise), because the trace's long quiet stretch (hours 8 to 14 at two generators) is
 where machines are given back and the wandering schedule has no such stretch. The one row that leans the other way, more
 pods started (+23% to +35% as point estimates, one run's interval across zero), is the price of following demand up and

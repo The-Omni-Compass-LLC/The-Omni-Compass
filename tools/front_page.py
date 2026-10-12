@@ -274,7 +274,7 @@ def status_lines(root: Path = ROOT) -> list[str]:
         idx = json.loads(ix.read_text(encoding="utf-8"))
         out.append(f"- **The Omni index now:** {idx['headline_pct']:+.1f}% on the resource reading (work, speed, machines and "
                    f"energy) and {idx['service_headline_pct']:+.1f}% on the service reading (work and speed), real machines, "
-                   "every test confirmed three times ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).")
+                   "every test the same in all three of our runs ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).")
     return out
 
 

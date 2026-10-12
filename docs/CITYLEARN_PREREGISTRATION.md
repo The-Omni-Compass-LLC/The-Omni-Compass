@@ -1,4 +1,4 @@
-# Omni-Compass on top of CityLearn's own controller: written before the confirmation run
+# Omni-Compass on top of CityLearn's own controller: written before the counted run
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
@@ -36,9 +36,9 @@ On the tuning district only, `citylearn_challenge_2022_phase_1` (5 buildings):
 
 (Change against native; CityLearn's own scores, lower is better.) Frozen: gain 0.5, response 1 hour, glide 0.05 an
 hour: the setting at which every score was better than native on the tuning district. The tuning district is not
-counted in the confirmation.
+counted in the counted run.
 
-## The confirmation (untouched districts)
+## The counted run (untouched districts)
 
 Every other CityLearn district that runs with the native controller: `citylearn_challenge_2022_phase_2`,
 `citylearn_challenge_2022_phase_3`, `citylearn_challenge_2022_phase_all`, `citylearn_challenge_2021`,

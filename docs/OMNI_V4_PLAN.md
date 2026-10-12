@@ -47,7 +47,7 @@ and the work order. The founder gave the word on 10 October 2026.
     a physical meter is class P. "Simulation" stays only in the license's own phrase and in the names of third-party simulators.
 12. **Reports.** We build every table, receipt and reading from the raw files with our own code; GitHub runs the jobs and stores
     the files; the raw files are archived with checksums. Every row is shown, always, native and Omni, plus or minus. A row that
-    comes out confirmed worse is a bug report against our own wiring: fix the wiring, run again, the rerun becomes the result of
+    comes out worse in all three of our runs is a bug report against our own wiring: fix the wiring, run again, the rerun becomes the result of
     record, the earlier set stays in `docs/history`. No row is ever dropped.
 13. **The card and the two clouds** are written onto the same mechanism before they run: the same probe first, snapshot once, wire
     owned by the brain, reflex rule, body judgement, three runs, receipts, archive. The GPU controllers are inside the engine and

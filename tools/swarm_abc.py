@@ -8,7 +8,7 @@
 times as separate GitHub runs on the same frozen engine (tools/run_swarm.py). PyBullet is deterministic for a fixed step,
 so the runs must give the same numbers to within one part in a thousand (PyBullet's floating point differs by that much
 from one GitHub machine to the next; amendment 1 of the preregistration, made after the first A, B, C were seen and said
-so): a gauge reads confirmed better or confirmed WORSE by its sign when all three runs agree, same when the change is
+so): a gauge reads better or WORSE in all three of our runs by its sign when all three runs agree, same when the change is
 under one part in a million, and "the runs differ" when they do not reproduce. A cell whose
 paired physics trial left the cruise native is listed as "nothing for Omni to move"; a cell with a collision in either arm
 is void and listed as such. Every row is reported, losses included.
@@ -24,6 +24,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
+from tools.readings import with_own_runs  # noqa: E402  (every table says whose runs these are)
 from tools.run_swarm import GAUGES, TRIAL_OVERRIDE
 
 SAME_REL = 1e-6
@@ -73,8 +74,8 @@ def verdict(recs, k, direction):
         return "**the runs differ**"
     up = signs == {1}
     if direction in ("lower", "never more"):
-        return "**confirmed WORSE**" if up else "**confirmed better**"
-    return "**confirmed better**" if up else "**confirmed WORSE**"          # higher, never less
+        return "**WORSE in all three of our runs**" if up else "**better in all three of our runs**"
+    return "**better in all three of our runs**" if up else "**WORSE in all three of our runs**"          # higher, never less
 
 
 def engine(run):
@@ -101,14 +102,14 @@ def main(argv=None):
     ap.add_argument("a"); ap.add_argument("b"); ap.add_argument("c"); ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     runs = [load(d) for d in (a.a, a.b, a.c)]
-    L = ["# Drone swarms, gym-pybullet-drones: the A/B/C confirmation (Omni v3)", "",
+    L = ["# Drone swarms, gym-pybullet-drones: the A/B/C three-run table (Omni v3)", "",
          "gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadrotor and flies it with the position "
          "controller it ships with; that autopilot at the planner's cruise is native. Omni sits on top of it on one knob, the "
          "cruise override, inside the autopilot's own limits, spending tracking slack as speed (`docs/SWARM_PREREGISTRATION.md`). "
          "Energy is a declared model from the simulator's own motor constants, the same in both arms, with the avionics draw "
          "charged over the whole fleet window. Three separate GitHub runs on the same frozen engine: PyBullet reproduces to about one "
          "part in a thousand across GitHub's machines (disclosed in the preregistration's amendment 1, made after the first three runs "
-         "were seen), so a gauge reads **confirmed better** or **confirmed WORSE** when all three runs reproduce to that tolerance and "
+         "were seen), so a gauge reads **better** or **WORSE in all three of our runs** when all three runs reproduce to that tolerance and "
          "give the same sign, **same** under one part in a million, and **the runs differ** when they do not reproduce. A cell whose paired physics trial found a faster "
          "mission no cheaper, or not inside the safe tracking error, is listed as nothing for Omni to move; a cell with a "
          "collision in either arm is void. Every row is shown, losses included.", "",
@@ -125,7 +126,7 @@ def main(argv=None):
     if len({r for r, _ in runs}) < 3:
         off.append("A, B and C must be three separate runs")
     if off:
-        L[2:2] = [f"**Not a confirmation on one frozen engine: {'; '.join(off)}.**", ""]
+        L[2:2] = [f"**Not three runs on one frozen engine: {'; '.join(off)}.**", ""]
     cells = sorted(set().union(*(set(r) for _, r in runs)), key=lambda c: (c != "tuning", c))
     tally = {}; idle = []; void = []
     L += ["", "## Cells where Omni moved the cruise", ""]
@@ -151,13 +152,13 @@ def main(argv=None):
             L.append(f"| {name} | {r0['native'][k]:.4g} | {r0['omni'][k]:.4g} | {pct(change(recs[0], k), k)} | {pct(change(recs[1], k), k)} | "
                      f"{pct(change(recs[2], k), k)} | {v} |")
         L.append("")
-    L += ["## Across the untouched cells Omni moved", "", "| Gauge | Confirmed better | Confirmed worse | Same | The runs differ |", "|---|---:|---|---:|---:|"]
+    L += ["## Across the untouched cells Omni moved", "", "| Gauge | Better in all three of our runs | Worse in all three of our runs | Same | The runs differ |", "|---|---:|---|---:|---:|"]
     for k, name, direction in GAUGES:
         t = tally.get(k)
         if not t:
             continue
-        w = t.get("**confirmed WORSE**", [])
-        L.append(f"| {name} | {len(t.get('**confirmed better**', []))} | {len(w)}{' (' + ', '.join(w) + ')' if w else ''} | {len(t.get('same', []))} | "
+        w = t.get("**WORSE in all three of our runs**", [])
+        L.append(f"| {name} | {len(t.get('**better in all three of our runs**', []))} | {len(w)}{' (' + ', '.join(w) + ')' if w else ''} | {len(t.get('same', []))} | "
                  f"{len(t.get('**the runs differ**', []))} |")
     L += ["", "## Cells where the paired trial left the cruise native: nothing for Omni to move", "",
           f"In native mode, before the counted missions, one mission at the planner's cruise and one at {TRIAL_OVERRIDE} x showed a faster "
@@ -172,10 +173,10 @@ def main(argv=None):
     for c, e in void:
         L.append(f"| {c} | {e} |")
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text("\n".join(_legal_stamp(L)) + "\n")
-    nb = sum(len(t.get("**confirmed better**", [])) for t in tally.values()); nw = sum(len(t.get("**confirmed WORSE**", [])) for t in tally.values())
+    out.write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
+    nb = sum(len(t.get("**better in all three of our runs**", [])) for t in tally.values()); nw = sum(len(t.get("**WORSE in all three of our runs**", [])) for t in tally.values())
     nd = sum(len(t.get("**the runs differ**", [])) for t in tally.values())
-    print(f"{out}: {len(cells) - len(idle) - len(void)} cells moved ({nb} gauge-rows confirmed better, {nw} confirmed worse, {nd} where the runs differ, "
+    print(f"{out}: {len(cells) - len(idle) - len(void)} cells moved ({nb} gauge-rows better in all three of our runs, {nw} worse in all three of our runs, {nd} where the runs differ, "
           f"the tuning cell shown and not counted), {len(idle)} nothing to move, {len(void)} void")
     return 0
 

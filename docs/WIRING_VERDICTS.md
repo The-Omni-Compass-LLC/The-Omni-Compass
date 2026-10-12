@@ -2,6 +2,8 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
 Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired measurement shows the muscle no worse for it. Where the measurement shows nothing, or shows a loss, the muscle stays native and Omni only watches it: one wire out, no wire in. This is not a new rule. It is what the engine does on the muscle itself before it moves anything (`omnicompass/verdict.py`: the paired trial, and the verdict **left native** where no step is allowed), and it is the watch arm of every realms run (`docs/REALMS_PREREGISTRATION.md`: the governor reads every period and writes nothing). This page applies the same principle to every published result, one verdict per knob, so that an operator can see which knobs earn a wire in and which stay native. The founder's order of 9 October 2026: where Omni cannot beat native, the muscle lives by itself; we only wire out of it.
 
 Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1037 rows, the 945 modelled muscles included one by one).
@@ -10,9 +12,9 @@ Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own
 
 Every judged gauge of a table counts (rows marked "shown, not judged" never do). Every change on this page is said in words, never by a bare sign: a gauge that fell when falling is good reads **cut** (less waiting, fewer machines, less energy, less memory), one that rose when rising is good reads **up**, and each carries **good** or **cost**. In the result tables the same change keeps its raw sign (a cut reads minus there), with the Reading column beside it saying which way is good. A knob reads:
 
-- **write**: at least one gauge confirmed better over all three runs and none confirmed worse. Omni holds the knob.
-- **watch**: nothing confirmed better. The knob stays native; Omni reads it and writes nothing. Where a gauge is confirmed worse, the loss is named and its cause given below. Where the runs disagree, nothing is settled and the knob stays native until it is.
-- **operator's choice**: gains and losses both confirmed, a trade. Both readings of the Omni index are shown where the test is in it (the resource reading, the preregistered headline, and the service reading, work and speed alone), and the side that pays is named. The operator who wants the gain and can pay the cost wires in; every other operator watches.
+- **write**: at least one gauge better in all three of our runs over all three runs and none worse in all three of our runs. Omni holds the knob.
+- **watch**: nothing better in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a gauge is worse in all three of our runs, the loss is named and its cause given below. Where the runs disagree, nothing is settled and the knob stays native until it is.
+- **operator's choice**: gains and losses both the same in all three of our runs, a trade. Both readings of the Omni index are shown where the test is in it (the resource reading, the preregistered headline, and the service reading, work and speed alone), and the side that pays is named. The operator who wants the gain and can pay the cost wires in; every other operator watches.
 
 A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes its verdict from its label by rule: SUPERIOR WITHIN GUARDRAILS is write; ENERGY IMPROVEMENT WITH SERVICE TRADEOFF and SERVICE IMPROVEMENT WITH ENERGY TRADEOFF are operator's choice; NONINFERIOR / INCONCLUSIVE, NOT ESTABLISHED and WORSE are watch.
 
@@ -35,25 +37,25 @@ The reading of every judged gauge is in the test's own table (the Source column)
 
 The knob: the autoscaler's replicas, the floor and the machines, on top of the Horizontal Pod Autoscaler (kind clusters on GitHub, ten pairs a run).
 
-| Demand | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |
+| Demand | Better in all three of our runs | Worse in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| steady work | machines cut 1.7% to 2.0%, machine-hours cut 1.7% to 2.0%, standby-model energy cut 1.3% to 1.8%, mean response cut 47% to 48%, p95 cut 64% to 66%, p99 cut 69% to 73%, time over the line cut 97% to 99% | none | **write** | +30.5% | +68.8% | confirmed better on 7 gauges, nothing confirmed worse; 5 gauges inside the noise. Omni holds the knob | `results/live/V3_STEADY.md` |
-| demand that wanders | parked-worker energy cut 0.1% to 0.4%, mean response cut 45% to 50%, p95 cut 56% to 64%, time over the line cut 36% to 42%, failed requests cut 12% to 13% | none | **write** | +37.0% | +156.5% | confirmed better on 5 gauges, nothing confirmed worse; 8 gauges inside the noise. Omni holds the knob | `results/live/V3_WANDERING.md` |
-| all four at once | work inside the line up 54% to 68%, mean response cut 43% to 48%, p95 cut 57% to 62%, time over the line cut 38% to 41%, failed requests cut 11% to 14% | none | **write** | +41.7% | +100.9% | confirmed better on 5 gauges, nothing confirmed worse; 9 gauges inside the noise. Omni holds the knob | `results/live/V3_ALL_FOUR.md` |
+| steady work | machines cut 1.7% to 2.0%, machine-hours cut 1.7% to 2.0%, standby-model energy cut 1.3% to 1.8%, mean response cut 47% to 48%, p95 cut 64% to 66%, p99 cut 69% to 73%, time over the line cut 97% to 99% | none | **write** | +30.5% | +68.8% | better in all three of our runs on 7 gauges, nothing worse in all three of our runs; 5 gauges inside the noise. Omni holds the knob | `results/live/V3_STEADY.md` |
+| demand that wanders | parked-worker energy cut 0.1% to 0.4%, mean response cut 45% to 50%, p95 cut 56% to 64%, time over the line cut 36% to 42%, failed requests cut 12% to 13% | none | **write** | +37.0% | +156.5% | better in all three of our runs on 5 gauges, nothing worse in all three of our runs; 8 gauges inside the noise. Omni holds the knob | `results/live/V3_WANDERING.md` |
+| all four at once | work inside the line up 54% to 68%, mean response cut 43% to 48%, p95 cut 57% to 62%, time over the line cut 38% to 41%, failed requests cut 11% to 14% | none | **write** | +41.7% | +100.9% | better in all three of our runs on 5 gauges, nothing worse in all three of our runs; 9 gauges inside the noise. Omni holds the knob | `results/live/V3_ALL_FOUR.md` |
 | a noisy neighbour | none | none | **watch** | +0.0% | +0.0% | every judged gauge inside the noise or the same (16 inside the noise, 3 the same), the neighbour's own rows included: Omni neither helped nor hurt beside a noisy neighbour, so under this demand there is nothing to earn and nothing lost. The same knob writes under the other six demands | `results/live/V3_FAIRNESS.md` |
-| faults | mean response cut 34% to 51%, p95 cut 58% to 63%, time over the line cut 27% to 43%, failed requests cut 14% to 18% | none | **write** | +36.6% | +154.8% | confirmed better on 4 gauges, nothing confirmed worse; 9 gauges inside the noise. Omni holds the knob | `results/live/V3_FAULTS.md` |
-| a queue of jobs | machines cut 16% to 20%, machine-hours cut 16% to 20%, standby-model energy cut 11% to 14%, mean response cut 11% to 13%, machines after the queue cut 26% to 33% | none | **write** | +16.5% | +14.1% | confirmed better on 5 gauges, nothing confirmed worse; 10 gauges inside the noise. Omni holds the knob | `results/live/V3_BATCH.md` |
-| a public day of demand (Google 2011) | machines cut 7.3% to 9.2%, machine-hours cut 7.4% to 9.2%, parked-worker energy cut 0.3% to 0.4%, standby-model energy cut 5.3% to 6.7%, mean response cut 51% to 53%, p95 cut 64% to 66%, p99 cut 60% to 62%, time over the line cut 81% to 82%, failed requests cut 11% to 18%, replicas cut 3.8% to 8.3% | none | **write** | +46.4% | +187.5% | confirmed better on 10 gauges, nothing confirmed worse; 3 gauges inside the noise. Omni holds the knob | `results/live/V3_TRACE_GOOGLE2011.md` |
-| With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | mean response cut 36% to 38%, p95 cut 51% to 53%, p99 cut 60% to 62%, time over the line cut 97% to 100% | parked-worker energy up 1.0% to 1.6% | **operator's choice** | +27.5% | +110.1% | confirmed better on mean response cut 36% to 38%, p95 cut 51% to 53%, p99 cut 60% to 62%, time over the line cut 97% to 100%; confirmed worse on parked-worker energy up 1.0% to 1.6% | `results/live/V3_KEDA_CPU_REQUESTS.md` |
-| With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | machines cut 5.9% to 7.8%, machine-hours cut 5.8% to 8.2%, mean response cut 59%, p95 cut 73% to 76%, p99 cut 70% to 72%, time over the line cut 96% to 97%, replicas cut 14% | parked-worker energy up 1.4% to 2.6% | **operator's choice** | +59.5% | +284.1% | confirmed better on machines cut 5.9% to 7.8%, machine-hours cut 5.8% to 8.2%, mean response cut 59%, p95 cut 73% to 76% and 3 more; confirmed worse on parked-worker energy up 1.4% to 2.6% | `results/live/V3_KEDA_REQUESTS.md` |
+| faults | mean response cut 34% to 51%, p95 cut 58% to 63%, time over the line cut 27% to 43%, failed requests cut 14% to 18% | none | **write** | +36.6% | +154.8% | better in all three of our runs on 4 gauges, nothing worse in all three of our runs; 9 gauges inside the noise. Omni holds the knob | `results/live/V3_FAULTS.md` |
+| a queue of jobs | machines cut 16% to 20%, machine-hours cut 16% to 20%, standby-model energy cut 11% to 14%, mean response cut 11% to 13%, machines after the queue cut 26% to 33% | none | **write** | +16.5% | +14.1% | better in all three of our runs on 5 gauges, nothing worse in all three of our runs; 10 gauges inside the noise. Omni holds the knob | `results/live/V3_BATCH.md` |
+| a public day of demand (Google 2011) | machines cut 7.3% to 9.2%, machine-hours cut 7.4% to 9.2%, parked-worker energy cut 0.3% to 0.4%, standby-model energy cut 5.3% to 6.7%, mean response cut 51% to 53%, p95 cut 64% to 66%, p99 cut 60% to 62%, time over the line cut 81% to 82%, failed requests cut 11% to 18%, replicas cut 3.8% to 8.3% | none | **write** | +46.4% | +187.5% | better in all three of our runs on 10 gauges, nothing worse in all three of our runs; 3 gauges inside the noise. Omni holds the knob | `results/live/V3_TRACE_GOOGLE2011.md` |
+| With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | mean response cut 36% to 38%, p95 cut 51% to 53%, p99 cut 60% to 62%, time over the line cut 97% to 100% | parked-worker energy up 1.0% to 1.6% | **operator's choice** | +27.5% | +110.1% | better in all three of our runs on mean response cut 36% to 38%, p95 cut 51% to 53%, p99 cut 60% to 62%, time over the line cut 97% to 100%; worse in all three of our runs on parked-worker energy up 1.0% to 1.6% | `results/live/V3_KEDA_CPU_REQUESTS.md` |
+| With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | machines cut 5.9% to 7.8%, machine-hours cut 5.8% to 8.2%, mean response cut 59%, p95 cut 73% to 76%, p99 cut 70% to 72%, time over the line cut 96% to 97%, replicas cut 14% | parked-worker energy up 1.4% to 2.6% | **operator's choice** | +59.5% | +284.1% | better in all three of our runs on machines cut 5.9% to 7.8%, machine-hours cut 5.8% to 8.2%, mean response cut 59%, p95 cut 73% to 76% and 3 more; worse in all three of our runs on parked-worker energy up 1.4% to 2.6% | `results/live/V3_KEDA_REQUESTS.md` |
 
 ### Real database (PostgreSQL behind PgBouncer, GitHub)
 
 The knob: the pooler's pool size (server connections).
 
-| Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |
+| Workload | Better in all three of our runs | Worse in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| select | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_PGBENCH.md` |
+| select | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_PGBENCH.md` |
 | simple_update | none | connections most at once up 8% to 12% | **watch** | +0.0% | +0.0% | the runs disagree on connections held open (-4.0% to +2.2%). Why: connections most at once up 8% to 12%: cost, because amendment 1's add rule ("slow, clients waiting for a server: add") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch. | `results/live/V3_PGBENCH.md` |
 | tpcb_hot | connections held open cut 7% to 13% | none | **write** | +2.8% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_PGBENCH.md` |
 
@@ -61,56 +63,56 @@ The knob: the pooler's pool size (server connections).
 
 The knob: the consumer group's size.
 
-| Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |
+| Workload | Better in all three of our runs | Worse in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
 | tuning (tuning workload: shown, never counted) | consumers running cut 0.3% | none | **write** (not counted) |  |  |  Nothing worse: Omni holds the knob. | `results/live/V3_KAFKA.md` |
 | burst | consumers running cut 0.8% | none | **write** | +0.2% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_KAFKA.md` |
-| heavy | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (13 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_KAFKA.md` |
-| light | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (13 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_KAFKA.md` |
+| heavy | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (13 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_KAFKA.md` |
+| light | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (13 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_KAFKA.md` |
 
 ### Real cache (Redis, GitHub)
 
 The knob: the cache's memory ceiling.
 
-| Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |
+| Workload | Better in all three of our runs | Worse in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
 | tuning (tuning workload: shown, never counted) | work inside the line up 4.4% to 4.9%, hit rate up 4.4% to 5.0%, mean cut 14% to 16% | memory ceiling held up 19% to 26%, memory used up 16% to 21% | **operator's choice** (not counted) |  |  | Why: memory ceiling held up 19% to 26%: cost, because the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the cost that reads worse (`docs/REDIS_PREREGISTRATION.md`, the gauges); memory used up 16% to 21%: cost, because the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held. | `results/live/V3_REDIS.md` |
-| burst | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_REDIS.md` |
-| large | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (10 gauges inside the noise, 2 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_REDIS.md` |
-| small | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_REDIS.md` |
+| burst | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_REDIS.md` |
+| large | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (10 gauges inside the noise, 2 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_REDIS.md` |
+| small | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_REDIS.md` |
 
 ### Real database cache (MongoDB under YCSB, GitHub)
 
 The knob: the storage engine's cache size.
 
-| Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |
+| Workload | Better in all three of our runs | Worse in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | the runs disagree on p95 (-0.3% to +2.1%); nothing confirmed either way (9 gauges inside the noise, 1 the same). Nothing is settled here, so the knob stays native until three runs agree. | `results/live/V3_YCSB.md` |
-| b | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (10 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_YCSB.md` |
+| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | the runs disagree on p95 (-0.3% to +2.1%); nothing moved the same way in all three of our runs (9 gauges inside the noise, 1 the same). Nothing is settled here, so the knob stays native until three runs agree. | `results/live/V3_YCSB.md` |
+| b | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (10 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_YCSB.md` |
 | burst | cache size held cut 10% to 13%, cache in use cut 10% to 13% | none | **write** | +3.1% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_YCSB.md` |
-| c | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (10 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_YCSB.md` |
+| c | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (10 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_YCSB.md` |
 | f | cache size held cut 13% to 15%, cache in use cut 12% to 14% | none | **write** | +3.7% | +0.0% |  Nothing worse: Omni holds the knob. | `results/live/V3_YCSB.md` |
 
 ### Real database buffer pool (MySQL under sysbench, GitHub)
 
 The knob: the buffer pool's size.
 
-| Workload | Confirmed better | Confirmed worse | Verdict | Index: resource | Index: service | Why | Source |
+| Workload | Better in all three of our runs | Worse in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
-| burst | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
-| read_only | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
-| read_write | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
-| update_index | none | none | **watch** | +0.0% | +0.0% | nothing confirmed either way (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
+| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | nothing moved the same way in all three of our runs (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
+| burst | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
+| read_only | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
+| read_write | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
+| update_index | none | none | **watch** | +0.0% | +0.0% | nothing moved the same way in all three of our runs (11 gauges inside the noise, 1 the same). Nothing to earn under this workload, nothing lost: the knob stays native and Omni reads it. | `results/live/V3_SYSBENCH.md` |
 
-## Every confirmed loss on a real stack, and why
+## Every loss in all three of our runs on a real stack, and why
 
-The founder's question was where the negatives are and why each is there. Every gauge confirmed worse on a real stack, with its cause read from the preregistration that carries the result:
+The founder's question was where the negatives are and why each is there. Every gauge worse in all three of our runs on a real stack, with its cause read from the preregistration that carries the result:
 
 - **Kubernetes, parked-worker energy: With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.0% to 1.6%, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.4% to 2.6%, a cost** (157.2 / 159.1 → 159.4 to 161.4 in run A). See the table. Verdict: **operator's choice** on every workload named.
 - **PostgreSQL, connections most at once: simple_update up 8% to 12%, a cost** (20 → 21.67 in run A). Amendment 1's add rule ("slow, clients waiting for a server: add") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch. Verdict: **watch**.
 
-What the losses have in common: every one is a resource spent to buy the service the knob exists for (consumers and the CPU they poll with, memory, pages, connections), and each was declared in advance in its preregistration as the cost that would read worse, or found on the first counted set and disclosed. None is a service loss: on no real stack did work inside the line, p95 or failed requests read confirmed worse. Where the resource was spent and nothing was bought (PostgreSQL's `simple_update`), the verdict is watch; where it bought service, the verdict is the operator's, and both index readings say what the trade is worth.
+What the losses have in common: every one is a resource spent to buy the service the knob exists for (consumers and the CPU they poll with, memory, pages, connections), and each was declared in advance in its preregistration as the cost that would read worse, or found on the first counted set and disclosed. None is a service loss: on no real stack did work inside the line, p95 or failed requests read worse in all three of our runs. Where the resource was spent and nothing was bought (PostgreSQL's `simple_update`), the verdict is watch; where it bought service, the verdict is the operator's, and both index readings say what the trade is worth.
 
 ## The independent simulators (evidence class S: deterministic models with their own native controllers)
 
@@ -118,7 +120,7 @@ What the losses have in common: every one is a resource spent to buy the service
 
 The knob: the servo's speed override inside the takt.
 
-| Case | Confirmed better | Confirmed worse | Verdict | Why | Source |
+| Case | Better in all three of our runs | Worse in all three of our runs | Verdict | Why | Source |
 |---|---|---|---|---|---|
 | kinova_gen3 | energy per takt cut 0.8%, copper loss per cycle cut 11%, mechanical work per cycle cut 6.6%, peak joint torque cut 29%, tracking error, RMS cut 21%, end-point error at the waypoints cut 11% | none | **write** | Nothing worse: the same job inside the same takt, hit more accurately with less force; the cycle is slower inside the takt (shown, not judged). | `results/live/V3_MUJOCO.md` |
 | kuka_iiwa_14 | none | none | **watch** | The engine's own verdict: one cycle at full speed and one at override 0.8, in native mode before the counted cycles, showed a slower cycle no cheaper on the robot's own figures (the gravity-holding torque is paid for longer), so the override was left at 1.0 and both arms are the same (`omnicompass/verdict.py`, left native). The trial's figures: 3157.3 J at full speed against 3757.3 J at the trial speed, reproduced over A, B, C: yes | `results/live/V3_MUJOCO.md` |
@@ -128,7 +130,7 @@ The knob: the servo's speed override inside the takt.
 
 The knob: the substation's voltage setpoint, one tap at a time.
 
-| Case | Confirmed better | Confirmed worse | Verdict | Why | Source |
+| Case | Better in all three of our runs | Worse in all three of our runs | Verdict | Why | Source |
 |---|---|---|---|---|---|
 | 1-MV-comm--0-sw (ZIP loads) | energy the loads drew cut 1.5%, line and transformer losses cut 1.0%, net import from the upstream grid cut 2.9%, tap operations cut 34% | none | **write** | Nothing worse: Omni holds the knob. | `results/live/V3_PANDAPOWER.md` |
 | 1-MV-comm--1-sw (ZIP loads) | energy the loads drew cut 1.4%, line and transformer losses cut 0.8%, net import from the upstream grid cut 15%, tap operations cut 36% | none | **write** | Nothing worse: Omni holds the knob. | `results/live/V3_PANDAPOWER.md` |
@@ -159,7 +161,7 @@ The knob: the substation's voltage setpoint, one tap at a time.
 
 The knob: the electric batteries' charge and discharge commands.
 
-| Case | Confirmed better | Confirmed worse | Verdict | Why | Source |
+| Case | Better in all three of our runs | Worse in all three of our runs | Verdict | Why | Source |
 |---|---|---|---|---|---|
 | ca_alameda_county_neighborhood | electricity bought cut 5.9%, daily peak draw cut 3.6%, highest peak cut 3.0%, ramping cut 3.9%, daily load unevenness cut 1.0%, monthly load unevenness cut 0.7%, distance from zero net energy cut 0.1% | none | **write** | Nothing worse: Omni holds the knob. | `results/live/V3_CITYLEARN.md` |
 | citylearn_challenge_2022_phase_all_robustness | electricity bill cut 8.6%, electricity bought cut 15%, carbon cut 12%, daily peak draw cut 14%, highest peak cut 2.7%, ramping cut 7.2%, daily load unevenness cut 2.9%, distance from zero net energy cut 6.1% | monthly load unevenness up 0.1% | **operator's choice** | Why: the monthly load factor moved by a tenth of a percent against a bill 8.6% lower. | `results/live/V3_CITYLEARN.md` |
@@ -176,13 +178,13 @@ The knob: the electric batteries' charge and discharge commands.
 | quebec_neighborhood_with_demand_response_set_points |  |  | **no knob** | no electric battery in the district (20 buildings, 0 water tanks left native): there is nothing for Omni to hold, so there is nothing to decide; any difference between the arms is CityLearn's own run-to-run variation (scores that differ in A: time uncomfortable +0.09%; reproduced: no) | `results/live/V3_CITYLEARN.md` |
 | quebec_neighborhood_without_demand_response_set_points |  |  | **no knob** | no electric battery in the district (20 buildings, 0 water tanks left native): there is nothing for Omni to hold, so there is nothing to decide; any difference between the arms is CityLearn's own run-to-run variation (scores that differ in A: time uncomfortable +0.18%; reproduced: no) | `results/live/V3_CITYLEARN.md` |
 
-**Why the 2023 districts read worse on the bill.** The seven 2023 challenge districts are small (3 to 6 buildings) and short (720 to 2,208 hours), and in them the energy not served and the comfort rows move, where in the county neighbourhoods they read the same: the compass steers the batteries from the district's electricity reading alone (one wire, one muscle, `docs/CITYLEARN_PREREGISTRATION.md`), flattening the draw it sees, and in these districts that leaves less in the batteries for the hours that count against the bill, the hour-to-hour ramping and the energy not served. The bill, what the battery is bought to lower, is confirmed worse here by 0.2% to 0.4%, so for the operator who pays the bill this is a watch. The cause is a reading of the tables, not yet tested on its own.
+**Why the 2023 districts read worse on the bill.** The seven 2023 challenge districts are small (3 to 6 buildings) and short (720 to 2,208 hours), and in them the energy not served and the comfort rows move, where in the county neighbourhoods they read the same: the compass steers the batteries from the district's electricity reading alone (one wire, one muscle, `docs/CITYLEARN_PREREGISTRATION.md`), flattening the draw it sees, and in these districts that leaves less in the batteries for the hours that count against the bill, the hour-to-hour ramping and the energy not served. The bill, what the battery is bought to lower, is worse in all three of our runs here by 0.2% to 0.4%, so for the operator who pays the bill this is a watch. The cause is a reading of the tables, not yet tested on its own.
 
 ### Drone swarms (gym-pybullet-drones, University of Toronto)
 
 The knob: the autopilot's cruise override.
 
-| Case | Confirmed better | Confirmed worse | Verdict | Why | Source |
+| Case | Better in all three of our runs | Worse in all three of our runs | Verdict | Why | Source |
 |---|---|---|---|---|---|
 | tuning (the tuning swarm: shown, never counted) | energy per mission cut 16%, fleet energy over the window cut 16%, missions per charge at the autopilot's reserve up 19% | none | **write** (not counted) | the runs differ on closest two drones ever came (-51% to -45%), tracking error, RMS (+88% to +91%), cruise override, mean (+49%). Nothing worse: the tracking error is spent inside the compass's band (shown, the runs differ on its exact figure) and no safety gauge moved. | `results/live/V3_SWARM.md` |
 | long | energy per mission cut 20%, fleet energy over the window cut 20%, missions per charge at the autopilot's reserve up 25% | none | **write** | the runs differ on closest two drones ever came (-5.7% to -1.5%), tracking error, RMS (+92% to +93%), cruise override, mean (+52%). Nothing worse: the tracking error is spent inside the compass's band (shown, the runs differ on its exact figure) and no safety gauge moved. | `results/live/V3_SWARM.md` |

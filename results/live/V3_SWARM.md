@@ -1,8 +1,10 @@
-# Drone swarms, gym-pybullet-drones: the A/B/C confirmation (Omni v3)
+# Drone swarms, gym-pybullet-drones: the A/B/C three-run table (Omni v3)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadrotor and flies it with the position controller it ships with; that autopilot at the planner's cruise is native. Omni sits on top of it on one knob, the cruise override, inside the autopilot's own limits, spending tracking slack as speed (`docs/SWARM_PREREGISTRATION.md`). Energy is a declared model from the simulator's own motor constants, the same in both arms, with the avionics draw charged over the whole fleet window. Three separate GitHub runs on the same frozen engine: PyBullet reproduces to about one part in a thousand across GitHub's machines (disclosed in the preregistration's amendment 1, made after the first three runs were seen), so a gauge reads **confirmed better** or **confirmed WORSE** when all three runs reproduce to that tolerance and give the same sign, **same** under one part in a million, and **the runs differ** when they do not reproduce. A cell whose paired physics trial found a faster mission no cheaper, or not inside the safe tracking error, is listed as nothing for Omni to move; a cell with a collision in either arm is void. Every row is shown, losses included.
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadrotor and flies it with the position controller it ships with; that autopilot at the planner's cruise is native. Omni sits on top of it on one knob, the cruise override, inside the autopilot's own limits, spending tracking slack as speed (`docs/SWARM_PREREGISTRATION.md`). Energy is a declared model from the simulator's own motor constants, the same in both arms, with the avionics draw charged over the whole fleet window. Three separate GitHub runs on the same frozen engine: PyBullet reproduces to about one part in a thousand across GitHub's machines (disclosed in the preregistration's amendment 1, made after the first three runs were seen), so a gauge reads **better** or **WORSE in all three of our runs** when all three runs reproduce to that tolerance and give the same sign, **same** under one part in a million, and **the runs differ** when they do not reproduce. A cell whose paired physics trial found a faster mission no cheaper, or not inside the safe tracking error, is listed as nothing for Omni to move; a cell with a collision in either arm is void. Every row is shown, losses included.
 
 | Run | GitHub run | Commit | Engine | Cells in the run |
 |---|---|---|---|---:|
@@ -16,9 +18,9 @@ gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadr
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per mission (J, declared model: motors and avionics over the fleet window) | 456.3 | 384.3 | -15.77% | -15.77% | -15.83% | **confirmed better** |
-| fleet energy over the window (J, declared model) | 9125 | 7686 | -15.77% | -15.77% | -15.83% | **confirmed better** |
-| missions per charge at the autopilot's reserve | 5.839 | 6.932 | +18.72% | +18.72% | +18.80% | **confirmed better** |
+| energy per mission (J, declared model: motors and avionics over the fleet window) | 456.3 | 384.3 | -15.77% | -15.77% | -15.83% | **better in all three of our runs** |
+| fleet energy over the window (J, declared model) | 9125 | 7686 | -15.77% | -15.77% | -15.83% | **better in all three of our runs** |
+| missions per charge at the autopilot's reserve | 5.839 | 6.932 | +18.72% | +18.72% | +18.80% | **better in all three of our runs** |
 | missions over their deadline (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | drones that broke the battery reserve | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | control ticks with two drones under half the keep-out apart (near misses) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
@@ -32,9 +34,9 @@ gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadr
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per mission (J, declared model: motors and avionics over the fleet window) | 548.4 | 439.6 | -19.84% | -19.79% | -19.79% | **confirmed better** |
-| fleet energy over the window (J, declared model) | 4.387e+04 | 3.517e+04 | -19.84% | -19.79% | -19.79% | **confirmed better** |
-| missions per charge at the autopilot's reserve | 4.858 | 6.06 | +24.76% | +24.67% | +24.67% | **confirmed better** |
+| energy per mission (J, declared model: motors and avionics over the fleet window) | 548.4 | 439.6 | -19.84% | -19.79% | -19.79% | **better in all three of our runs** |
+| fleet energy over the window (J, declared model) | 4.387e+04 | 3.517e+04 | -19.84% | -19.79% | -19.79% | **better in all three of our runs** |
+| missions per charge at the autopilot's reserve | 4.858 | 6.06 | +24.76% | +24.67% | +24.67% | **better in all three of our runs** |
 | missions over their deadline (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | drones that broke the battery reserve | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | control ticks with two drones under half the keep-out apart (near misses) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
@@ -48,9 +50,9 @@ gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadr
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per mission (J, declared model: motors and avionics over the fleet window) | 499.3 | 410.3 | -17.82% | -17.79% | -17.79% | **confirmed better** |
-| fleet energy over the window (J, declared model) | 3.994e+04 | 3.282e+04 | -17.82% | -17.79% | -17.79% | **confirmed better** |
-| missions per charge at the autopilot's reserve | 5.336 | 6.493 | +21.68% | +21.64% | +21.64% | **confirmed better** |
+| energy per mission (J, declared model: motors and avionics over the fleet window) | 499.3 | 410.3 | -17.82% | -17.79% | -17.79% | **better in all three of our runs** |
+| fleet energy over the window (J, declared model) | 3.994e+04 | 3.282e+04 | -17.82% | -17.79% | -17.79% | **better in all three of our runs** |
+| missions per charge at the autopilot's reserve | 5.336 | 6.493 | +21.68% | +21.64% | +21.64% | **better in all three of our runs** |
 | missions over their deadline (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | drones that broke the battery reserve | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | control ticks with two drones under half the keep-out apart (near misses) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
@@ -64,9 +66,9 @@ gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadr
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per mission (J, declared model: motors and avionics over the fleet window) | 337.7 | 312.6 | -7.42% | -7.43% | -7.42% | **confirmed better** |
-| fleet energy over the window (J, declared model) | 2.702e+04 | 2.501e+04 | -7.42% | -7.43% | -7.42% | **confirmed better** |
-| missions per charge at the autopilot's reserve | 7.888 | 8.521 | +8.02% | +8.03% | +8.02% | **confirmed better** |
+| energy per mission (J, declared model: motors and avionics over the fleet window) | 337.7 | 312.6 | -7.42% | -7.43% | -7.42% | **better in all three of our runs** |
+| fleet energy over the window (J, declared model) | 2.702e+04 | 2.501e+04 | -7.42% | -7.43% | -7.42% | **better in all three of our runs** |
+| missions per charge at the autopilot's reserve | 7.888 | 8.521 | +8.02% | +8.03% | +8.02% | **better in all three of our runs** |
 | missions over their deadline (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | drones that broke the battery reserve | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
 | control ticks with two drones under half the keep-out apart (near misses) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
@@ -78,7 +80,7 @@ gym-pybullet-drones (University of Toronto) integrates every Crazyflie 2.x quadr
 
 ## Across the untouched cells Omni moved
 
-| Gauge | Confirmed better | Confirmed worse | Same | The runs differ |
+| Gauge | Better in all three of our runs | Worse in all three of our runs | Same | The runs differ |
 |---|---:|---|---:|---:|
 | energy per mission (J, declared model: motors and avionics over the fleet window) | 3 | 0 | 0 | 0 |
 | fleet energy over the window (J, declared model) | 3 | 0 | 0 | 0 |

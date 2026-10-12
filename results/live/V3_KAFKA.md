@@ -1,8 +1,10 @@
-# Kafka, a consumer group's operator-set size: the A/B/C confirmation
+# Kafka, a consumer group's operator-set size: the A/B/C three-run table
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer group at the operator's count is native; omni is the compass law on the consumer count inside [1, 8], holding the group's own end-to-end latency at 40% of the 500 ms line (`docs/KAFKA_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **confirmed better** or **confirmed WORSE**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Lost messages: any increase in any run is WORSE. The tuning workload is shown and not counted. Every row is shown, losses included. The host's CPU-seconds are measured on GitHub's shared runner, the compass's own cost included; no energy is claimed beyond them.
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer group at the operator's count is native; omni is the compass law on the consumer count inside [1, 8], holding the group's own end-to-end latency at 40% of the 500 ms line (`docs/KAFKA_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **better** or **WORSE in all three of our runs**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Lost messages: any increase in any run is WORSE. The tuning workload is shown and not counted. Every row is shown, losses included. The host's CPU-seconds are measured on GitHub's shared runner, the compass's own cost included; no energy is claimed beyond them.
 
 | Run | GitHub run | Commit | Engine | Workloads |
 |---|---|---|---|---:|
@@ -25,7 +27,7 @@ Native capacity with the operator's 2 consumers, per run: 976, 975, 983 messages
 | consumer lag, most messages waiting at once | 1,708 | 1,738 | +1.8% (-4.1 to +7.6) | +2.8% (-4.9 to +10.4) | +0.7% (-5.2 to +6.6) | no difference beyond the noise (3 of 3 runs) |
 | consumer lag, mean messages waiting | 147.2 | 150.3 | +2.1% (-6.7 to +10.9) | +4.2% (-7.0 to +15.4) | +1.3% (-5.5 to +8.1) | no difference beyond the noise (3 of 3 runs) |
 | messages produced and never consumed | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| consumers running, mean (the resources held) | 2 | 1.99 | -0.3% (-0.3 to -0.3) | -0.3% (-0.3 to -0.3) | -0.3% (-0.3 to -0.3) | **confirmed better** |
+| consumers running, mean (the resources held) | 2 | 1.99 | -0.3% (-0.3 to -0.3) | -0.3% (-0.3 to -0.3) | -0.3% (-0.3 to -0.3) | **better in all three of our runs** |
 | consumers running, most at once | 2 | 2 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | same |
 | host CPU busy (share of the run) | 0.318 | 0.319 | +0.1% (-3.9 to +4.1) | -0.3% (-7.2 to +6.7) | -0.6% (-2.6 to +1.3) | no difference beyond the noise (3 of 3 runs) |
 | host CPU-seconds | 552.5 | 554.5 | +0.4% (-4.1 to +4.8) | -0.2% (-7.2 to +6.7) | -0.5% (-2.7 to +1.7) | no difference beyond the noise (3 of 3 runs) |
@@ -51,7 +53,7 @@ Native capacity with the operator's 2 consumers, per run: 975, 975, 973 messages
 | consumer lag, most messages waiting at once | 1,650 | 1,644 | -0.3% (-4.2 to +3.5) | -0.6% (-1.1 to -0.1) | -0.6% (-9.1 to +8.0) | no difference beyond the noise (2 of 3 runs) |
 | consumer lag, mean messages waiting | 166.3 | 166.1 | -0.1% (-3.4 to +3.1) | +0.9% (-0.4 to +2.2) | -2.1% (-9.1 to +4.9) | no difference beyond the noise (3 of 3 runs) |
 | messages produced and never consumed | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| consumers running, mean (the resources held) | 2 | 1.98 | -0.8% (-0.8 to -0.8) | -0.8% (-0.8 to -0.8) | -0.8% (-0.8 to -0.8) | **confirmed better** |
+| consumers running, mean (the resources held) | 2 | 1.98 | -0.8% (-0.8 to -0.8) | -0.8% (-0.8 to -0.8) | -0.8% (-0.8 to -0.8) | **better in all three of our runs** |
 | consumers running, most at once | 2 | 2 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | same |
 | host CPU busy (share of the run) | 0.295 | 0.292 | -1.0% (-6.8 to +4.8) | -0.3% (-6.1 to +5.5) | -1.3% (-8.5 to +5.9) | no difference beyond the noise (3 of 3 runs) |
 | host CPU-seconds | 206.5 | 204.5 | -1.0% (-6.7 to +4.7) | -0.3% (-6.1 to +5.5) | -1.3% (-8.6 to +5.9) | no difference beyond the noise (3 of 3 runs) |
@@ -114,7 +116,7 @@ The consumer count handed back to the operator's and read back at the end of eve
 
 The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: left native (2 trials, 0 allowed, 0 refused); acting: 2 to 3 (3 trials, 1 allowed, 0 refused); acting: 2 to 3 (3 trials, 1 allowed, 0 refused); run B: left native (2 trials, 0 allowed, 0 refused); left native (2 trials, 0 allowed, 0 refused); left native (2 trials, 0 allowed, 0 refused); run C: left native (2 trials, 0 allowed, 0 refused); left native (2 trials, 0 allowed, 0 refused); left native (2 trials, 0 allowed, 0 refused).
 
-**Across 3 untouched workloads: 1 gauge-rows confirmed better, 0 confirmed worse, 0 where the runs disagree.**
+**Across 3 untouched workloads: 1 gauge-rows better in all three of our runs, 0 worse in all three of our runs, 0 where the runs disagree.**
 
 ---
 

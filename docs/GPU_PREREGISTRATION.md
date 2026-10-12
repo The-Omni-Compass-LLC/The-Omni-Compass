@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Written before any hardware trial. The confirmation run (`PHASE=confirm`) hashes this file with the code in
+Written before any hardware trial. The counted run (`PHASE=confirm`) hashes this file with the code in
 `FREEZE.json`; a change to either after the run starts invalidates it.
 
 ## Question
@@ -11,7 +11,7 @@ On one NVIDIA GPU serving a fixed, seeded request stream, does Omni-Compass hold
 successful work done per joule measured by the device, compared with the device left at its own limit?
 
 Fixed here, before any smoke trial:
-- the number of confirmation repetitions (10);
+- the number of counted repetitions (10);
 - the primary outcome;
 - the guardrails;
 - the analysis.
@@ -21,17 +21,17 @@ Nothing seen in smoke may change them.
 ## Two phases
 
 1. **Smoke** (`PHASE=smoke`, any number of repetitions). Its purpose is to find faults in the harness, and to see
-   whether the effect is large enough to be worth confirming. Smoke results are not published and are never
+   whether the effect is large enough to be worth a counted run. Smoke results are not published and are never
    reported as the result. After smoke, Omni's code may change.
-2. **Confirmation** (`PHASE=confirm`). Omni's code is committed and frozen before the first trial. The script refuses
+2. **The counted run** (`PHASE=confirm`). Omni's code is committed and frozen before the first trial. The script refuses
    to run if any frozen file has uncommitted changes, and the table marks the run invalid if a frozen file changes
-   during it. No inspection, tuning or rerun between confirmation trials. If the confirmation fails, it is reported
-   as failed; a new confirmation needs a new commit and a new run, and both runs are reported.
+   during it. No inspection, tuning or rerun between counted trials. If the counted run fails, it is reported
+   as failed; a new counted run needs a new commit and a new run, and both runs are reported.
 
 ## Design
 
 - **Arms:** native (no Omni), watch (Omni runs, may not write), omni (Omni writes the GPU power limit).
-- **Repetitions:** 10 in confirmation, each with all three arms back to back, order rotated. Repetitions may run on
+- **Repetitions:** 10 in the counted run, each with all three arms back to back, order rotated. Repetitions may run on
   separate machines of one GPU type (`REP_ONLY`, the GitHub workflow); the three arms of a repetition always share
   one machine, so every comparison is paired within a machine.
 - **Per arm:** 60 s idle, then the pinned workload for 600 s plus 30 s drain.
@@ -70,7 +70,7 @@ Nothing seen in smoke may change them.
 - **Watch against native:** reported as the cost of Omni being present. If watch differs from native on the primary
   outcome as much as omni does, the effect is not attributed to Omni's authority.
 
-## Amendment 1 (2026-09-28, before any hardware trial; no smoke or confirmation data exist)
+## Amendment 1 (2026-09-28, before any hardware trial; no smoke or counted data exist)
 
 Added before any data, to make the chain from engine to plant identifiable. The question, the arms, the primary
 outcome, the repetitions, and the two guardrails above are unchanged.
@@ -92,8 +92,7 @@ outcome, the repetitions, and the two guardrails above are unchanged.
   The bench samples enforced.power.limit where the driver reports it. The governor senses the enforced limit and reads
   back every write at once; it never writes clock locks.
 - **Also invalid:** a native or watch arm whose enforced limit differs from the snapshot; a governor that exits
-  nonzero (a refused start, or a write the device refused — that write ends the arm); smoke and confirmation
-  repetitions mixed in one table.
+  nonzero (a refused start, or a write the device refused — that write ends the arm); smoke and counted repetitions mixed in one table.
 - **Three receipts, kept apart.** A (governor, `audit.jsonl` decisions): telemetry consumed; the six-state reading
   (history-dependent, `state_observed`); the memoryless state the telemetry alone points to (`state_measured`); the
   U-channel command u evaluated on the evolved state (`u_push`); admissibility; requested and granted authority; shield
@@ -113,8 +112,8 @@ outcome, the repetitions, and the two guardrails above are unchanged.
     (0.01–0.03, 0.03–0.1, ≥ 0.1);
   - energy of the rest of the machine = wall − GPU − CPU package, only when all three meters measured the arm. A
     missing meter prints UNAVAILABLE, never a modelled substitute.
-- **Smoke never enters confirmation.** A smoke run that changes any code or parameter is followed by: repair, the
-  tests, a new freeze, and a confirmation collected from zero.
+- **Smoke never enters the counted run.** A smoke run that changes any code or parameter is followed by: repair, the
+  tests, a new freeze, and a counted run collected from zero.
 
 ## The run is invalid, and reported as invalid, if
 
@@ -122,7 +121,7 @@ outcome, the repetitions, and the two guardrails above are unchanged.
 - a native or watch arm sees a power limit other than the snapshot;
 - any arm ends at a limit other than the snapshot (the reset failed);
 - Omni's frozen files change during the run;
-- the confirmation runs on uncommitted code.
+- the counted runs on uncommitted code.
 
 ## Recorded for every Omni decision
 
@@ -135,7 +134,7 @@ Every decision is logged in `audit.jsonl`:
 - whether change was admissible, the requested and granted authority, and which shield bound decided the limit;
 - the limit written, and the requests served in the window.
 
-## Amendment 2 (2026-09-28, before any hardware trial; no smoke or confirmation data exist)
+## Amendment 2 (2026-09-28, before any hardware trial; no smoke or counted data exist)
 
 Unchanged:
 - the question;
@@ -169,10 +168,10 @@ Unchanged:
 - **Card health (descriptive).** Uncorrected and corrected ECC error counts, and pages pending retirement, are read at
   both ends of each arm.
 - **Workload plug.** Any workload may be served through `WORKLOAD_CMD` if it writes the pinned workload's files. It
-  needs its own response-time target (`SLO_MS`). The command is recorded in the receipt. A confirmation names its
+  needs its own response-time target (`SLO_MS`). The command is recorded in the receipt. A counted run names its
   workload before the first trial.
 
-## Amendment 3 (2026-10-01, before any hardware trial; no smoke or confirmation data exist)
+## Amendment 3 (2026-10-01, before any hardware trial; no smoke or counted data exist)
 
 No GPU job has ever been given a machine (every gpu-bench run so far waited in the queue and was cancelled), so no
 trial data exist. Unchanged:
@@ -190,7 +189,7 @@ trial data exist. Unchanged:
   - optionally `slo_ms`, the response-time target; without it the target comes from calibration (10 bare service
     times), as before.
   - The bench refuses an envelope whose floor lies outside [device minimum, starting limit].
-  - **The confirmation refuses to start without a declared envelope** (`scripts/gpu_paired.sh`, `ENVELOPE`).
+  - **The counted run refuses to start without a declared envelope** (`scripts/gpu_paired.sh`, `ENVELOPE`).
 - **Envelope floor.** The governor never sets the limit under `power_min_w` (`--floor-w`). When the floor is what
   lifted a write, the decision record names it (`decided_by`: envelope_floor), so no saving below the floor can be
   credited to the engine.
@@ -203,7 +202,7 @@ trial data exist. Unchanged:
   narrow (for example a 70 W card that accepts 60–70 W), the envelope is that narrow range; the result is reported for
   that card and range and not extrapolated to wider cards.
 
-## Amendment 4 (2026-10-02, after an invalid smoke; no confirmation data exist)
+## Amendment 4 (2026-10-02, after an invalid smoke; no counted data exist)
 
 The first smoke on a rented A10 (results/gpu/smoke-20261002T032459Z, never counted) was invalid by rule: two copies of
 `scripts/gpu_rented_run.sh` had been started on the same machine, so both benches wrote the same card's power limit.
@@ -228,7 +227,7 @@ unchanged.
   floor and never over the start limit. The service is read as one position between calm and the response-time line
   (the worse of p95 and utilization above half) and pulled to the middle; past 95% both wires go to full at once
   (fail up). The card's firmware keeps its own control; Omni sets only those two values. The earlier power-limit-only
-  governor stays available (`OMNI_ENGINE=one_wire`) and is not the confirmation's arm.
+  governor stays available (`OMNI_ENGINE=one_wire`) and is not the counted run's arm.
 - **Why, before the run:** on a modelled card (`results/sim/gpu_two_wire/`, evidence class S, seeds never used while
   tuning) the one-wire governor gave +0.1% work per energy and the two-wire engine +9.0%. That is a model; this run
   is the card's own meter.
@@ -247,9 +246,9 @@ unchanged.
   ceiling at the clock the busy card actually runs (a ceiling above it holds nothing), and its clock cover is 35% of
   the top clock to the top. No trial had run.
 
-## Amendment 6 (2026-10-02, after the first confirmation and before any further trial)
+## Amendment 6 (2026-10-02, after the first counted run and before any further trial)
 
-**What the first confirmation showed** (A10, commit `c908054`, `results/gpu/run-20261002T082232Z/`): work per energy
+**What the first counted run showed** (A10, commit `c908054`, `results/gpu/run-20261002T082232Z/`): work per energy
 +3.6% (+2.7% to +4.5%, proven), the same requests served, no request lost, but the 95th-percentile response time
 +58.5% (510 to 809 ms), so the response-time guardrail failed and the label by rule was ENERGY IMPROVEMENT WITH
 SERVICE TRADEOFF. It stands as the result of that run.
@@ -280,14 +279,14 @@ rules are unchanged):
 
 ## Amendment 7 (2026-10-02, before any further trial)
 
-The outcomes, arms, guardrails, analysis and validity rules are unchanged. The Omni arm of the confirmation runs the
+The outcomes, arms, guardrails, analysis and validity rules are unchanged. The Omni arm of the counted runs the
 **service** profile.
 
 - **Two profiles, one switch** (`--profile`, `omni_controller/gpu_compass.py`; the same in `realms/gpu_card.py`):
-  - **service**, the default and the confirmation's arm: down gain 0.0125, the compass's center at 0.4, the speed floor 3%
+  - **service**, the default and the counted run's arm: down gain 0.0125, the compass's center at 0.4, the speed floor 3%
     above the card's own busy clock;
   - **batch**: down gain 0.015, center 0.5, the floor at the card's own busy clock, for work nobody waits on answer by
-    answer. It may be run as a separate, declared confirmation (`OMNI_ARGS="--profile batch"`) and is reported as its
+    answer. It may be run as a separate, declared counted run (`OMNI_ARGS="--profile batch"`) and is reported as its
     own result, never pooled with service.
 - **How service was chosen, on the model, before the trial** (20 paired seeds, 5000-5009 and 5100-5109; ratios
   summarised as the geometric mean of the per-seed ratios): down gains 0.01, 0.0125, 0.015, 0.0175 and 0.02 alone, and
@@ -327,7 +326,7 @@ The outcomes, arms, guardrails, analysis and validity rules are unchanged, excep
   - 2% is the smallest allowance that saves energy, and it is below what a person or a service contract can notice.
 - **A second workload, AI token generation** (`tools/gpu_workload.py --kind decode`): fp16 matrix-times-vector over
   1 GiB of weights per pass, batch one, so each pass streams every weight from memory, as token generation does. It runs
-  as a second confirmation of the same design (10 repetitions × 3 arms × 600 s) after the compute-bound one
+  as a second counted run of the same design (10 repetitions × 3 arms × 600 s) after the compute-bound one
   (`scripts/gpu_rented_run.sh`; `SKIP_DECODE=1` skips it). It is labelled by the same rule and reported as its own
   result, never pooled.
 - **Every comparison is a base alone against the same base with Omni on top.** The model's report
@@ -347,7 +346,7 @@ The outcomes, arms, guardrails, analysis and validity rules are unchanged, excep
 
 ## Amendment 9 (2026-10-03, before any trial on this code)
 
-Everything in amendment 8 stands. Four additions, each run by `scripts/gpu_rented_run.sh` after the two confirmations
+Everything in amendment 8 stands. Four additions, each run by `scripts/gpu_rented_run.sh` after the two counted runs
 and each reported as its own result:
 
 1. **Steady under the limit** (`omni_controller/gpu_compass.py`, the same in `realms/gpu_card.py`). While the card is
@@ -378,8 +377,7 @@ and each reported as its own result:
 ## Amendment 10 (2026-10-03, before any trial on several cards)
 
 Everything in amendments 8 and 9 stands. **Several cards in one server** (`scripts/gpu_8card.sh`): every card runs
-`scripts/gpu_rented_run.sh` at the same time, each on its own card with its own wire check, envelope, smoke, the two
-confirmations and the power cap underneath, on the same committed code. Card i starts its arm rotation i steps later
+`scripts/gpu_rented_run.sh` at the same time, each on its own card with its own wire check, envelope, smoke, the two counted runs and the power cap underneath, on the same committed code. Card i starts its arm rotation i steps later
 (`ROT_OFFSET`), so no arm always meets the same neighbours. Each repetition stays paired within its own card (its three
 arms on one card); the pooled table per workload holds every card's repetitions (card c, repetition r is pooled as
 repetition 100(c+1)+r) and is labelled by the same rule. Each card's own table is reported beside it; a card whose
@@ -390,7 +388,7 @@ the energy is every card's summed; 5 repetitions × 3 arms × 300 s, labelled by
 repetition's own receipt).
 
 **The short design** (`FAST=1`, written before any trial on several cards): each card runs one smoke round and 3
-repetitions of the compute confirmation (24 paired repetitions on 8 cards, pooled and labelled by the same rule, each
+repetitions of the compute counted run (24 paired repetitions on 8 cards, pooled and labelled by the same rule, each
 card's own table reported beside it), then one model across every card with 3 repetitions. AI token generation and the
 power cap underneath are measured on the one-card machine (amendment 9) and are not repeated here.
 
@@ -400,8 +398,8 @@ adaptive step), each organism on its own card at the same time (organism i on ca
 organisms, the next organism waits for a card). Each organism's receipt is its own; nothing is pooled across organisms.
 
 **The pooled design** (`POOLED=1`, written before any trial on several cards): every stage of the whole design, with
-the repetitions pooled across the cards. Each card runs one smoke round; 3 repetitions of the compute confirmation and
-3 of the AI token generation confirmation (24 paired repetitions per test on 8 cards, pooled and labelled by the same
+the repetitions pooled across the cards. Each card runs one smoke round; 3 repetitions of the compute counted run and
+3 of the AI token generation counted run (24 paired repetitions per test on 8 cards, pooled and labelled by the same
 rule, each card's own table beside it); 2 repetitions of each power cap load (16 per load); the six organisms with the
 card inside, one repetition per size, each organism on its own card; then one model across every card, 3 repetitions;
 the fault drill once. Arm durations are those of the whole design.

@@ -89,7 +89,7 @@ the power budget are designed (`docs/DOMAIN_MAP.md`, "on-site batteries") and no
 | Every arm ended at its start setting (the reset restored it) | GPU bench, live Kubernetes switch drill | measured |
 | Invariant violations (all, and excluding power) | stack benchmark | modelled |
 | Security violations, contradictions, pages | stack benchmark | modelled |
-| Freeze check: code hashes at start and end (confirmation runs) | GPU bench (`FREEZE.json`, `FREEZE_END.json`) | measured |
+| Freeze check: code hashes at start and end (counted runs) | GPU bench (`FREEZE.json`, `FREEZE_END.json`) | measured |
 | SHA-256 of every raw file | every live run | measured |
 | The seal: every Python/C++ twin unchanged since proven equal | `results/SEAL.json`, `verify.py` | checked on every build |
 

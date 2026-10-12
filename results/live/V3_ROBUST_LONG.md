@@ -1,8 +1,10 @@
-# Robustness: the long run, 7,200 s an arm, the governor's memory and decisions watched: the A/B/C confirmation (Omni v3): the A/B/C confirmation (Omni v3)
+# Robustness: the long run, 7,200 s an arm, the governor's memory and decisions watched: the A/B/C three-run table (Omni v3)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **Confirmed better** or **confirmed WORSE**: all three runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, losses included.
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **Better** or **WORSE in all three of our runs**: all three runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, losses included.
 
 | Run | GitHub run | Commit | Engine | Paired repetitions |
 |---|---|---|---|---:|
@@ -39,9 +41,9 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 | robust: decisions made, the fewest repetition's share of the count the configured interval predicts for the window (120) | 97.5% | 97.5% | 97.5% | valid (every repetition at 95% of the expected or more) |
 | robust: failed decisions over the whole window (the governor could not read the cluster that second), with the API's own reason | 1 | 3 | 5 | shown, not judged: API 500 for apis/autoscaling/v2/horizontalpodautoscalers; the governor held and resumed |
 | robust: the governor's decision time, mean of the last hour over the first (the gap between decisions less the configured interval), the most over the repetitions | 1.15 | 1.27 | 1.30 | no growth beyond the limit (every repetition under 1.5) |
-| robust: every setting handed back at the end and read back at the operator's, no record left, every repetition | yes | yes | yes | **confirmed: every setting handed back at the end of every repetition** |
+| robust: every setting handed back at the end and read back at the operator's, no record left, every repetition | yes | yes | yes | **every setting handed back at the end of every repetition, in all three of our runs** |
 
-Readings: 1 confirmed: every setting handed back at the end of every repetition, 8 no difference beyond the noise (all three runs), 5 no difference beyond the noise in 2 of 3 runs, 1 no growth beyond the limit (every repetition under 1.5), 1 no leak (every repetition under 1.25), 2 same, 8 shown, not judged, 1 shown, not judged: API 500 for apis/autoscaling/v2/horizontalpodautoscalers; the governor held and resumed, 1 valid (every repetition at 95% of the expected or more).
+Readings: 1 every setting handed back at the end of every repetition, in all three of our runs, 8 no difference beyond the noise (all three runs), 5 no difference beyond the noise in 2 of 3 runs, 1 no growth beyond the limit (every repetition under 1.5), 1 no leak (every repetition under 1.25), 2 same, 8 shown, not judged, 1 shown, not judged: API 500 for apis/autoscaling/v2/horizontalpodautoscalers; the governor held and resumed, 1 valid (every repetition at 95% of the expected or more).
 
 ---
 

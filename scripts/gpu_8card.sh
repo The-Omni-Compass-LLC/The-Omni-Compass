@@ -11,7 +11,7 @@
 #   sudo FAST=1 bash scripts/gpu_8card.sh     the short design, about 3.5 hours (what only a full server shows)
 #
 # Every card on the machine runs the whole card test at the same time (scripts/gpu_rented_run.sh with GPU=<card>): its
-# own wire check, envelope, smoke, the two preregistered confirmations (compute and AI token generation) and the
+# own wire check, envelope, smoke, the two preregistered counted runs (compute and AI token generation) and the
 # operator's power cap underneath, each card its own firmware alone against the firmware with Omni-Compass on top, on
 # the same committed code. The cards share one machine, its power supply, its cooling and its neighbours' heat, as in a
 # real server. Each card starts its arm rotation one step later than the card before it, so at any moment some cards
@@ -32,16 +32,16 @@ SMI="${NVIDIA_SMI:-nvidia-smi}"; PY="${PYTHON:-python3}"
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 if [ -n "${POOLED:-}" ]; then
   # every stage of the whole design, with the repetitions pooled across the cards (amendment 10): each card 3
-  # repetitions of each confirmation (24 paired repetitions per test on 8 cards, pooled, against 10 on one card), 2 of
+  # repetitions of each counted run (24 paired repetitions per test on 8 cards, pooled, against 10 on one card), 2 of
   # each power cap load, one smoke round, the six organisms one repetition per size on their own card, and the model
   # across every card 3 times. Nothing is skipped
   export SMOKE_REPS="${SMOKE_REPS:-1}" REPS_CONFIRM="${REPS_CONFIRM:-3}" REPS_CAP="${REPS_CAP:-2}" \
          HIL_REPS_BY_SCALE="${HIL_REPS_BY_SCALE:-1,1,1,1}" REPS_LLM="${REPS_LLM:-3}"
-  echo "== POOLED: every stage; 3 repetitions per card per confirmation, 2 per power cap load, 1 per organism size"
+  echo "== POOLED: every stage; 3 repetitions per card per counted run, 2 per power cap load, 1 per organism size"
 fi
 if [ -n "${FAST:-}" ]; then
   # the short design (amendment 10): what only a full server shows, about 3.5 hours. Each card 3 repetitions of the
-  # compute confirmation (24 paired repetitions on 8 cards, pooled), one smoke round, one model across every card with
+  # compute counted run (24 paired repetitions on 8 cards, pooled), one smoke round, one model across every card with
   # 3 repetitions. AI token generation and the power cap underneath are measured on the one-card machine
   export SMOKE_REPS="${SMOKE_REPS:-1}" REPS_CONFIRM="${REPS_CONFIRM:-3}" SKIP_DECODE="${SKIP_DECODE:-1}" \
          SKIP_CAP="${SKIP_CAP:-1}" REPS_LLM="${REPS_LLM:-3}" SKIP_HIL="${SKIP_HIL:-1}"

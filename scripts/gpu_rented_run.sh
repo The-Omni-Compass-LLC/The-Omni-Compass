@@ -13,9 +13,9 @@
 # 2. declares the envelope before any trial (docs/GPU_PREREGISTRATION.md, amendment 3): lowest watts =
 #    max(device minimum, 70% of the limit read now), unless ENVELOPE=file.json is given;
 # 3. smoke: 3 repetitions x 3 arms x 180 s (about 40 minutes). It checks the wiring on real hardware. It never counts;
-# 4. if smoke is valid: the preregistered confirmation, 10 repetitions x 3 arms x 600 s (about 6 hours), on the same
+# 4. if smoke is valid: the preregistered counted run, 10 repetitions x 3 arms x 600 s (about 6 hours), on the same
 #    committed code (STOP_AFTER_SMOKE=1 stops after step 3), on the pinned compute-bound workload (matrix products);
-# 5. the second preregistered confirmation, the same 10 x 3 x 600 s on AI token generation (the decode workload:
+# 5. the second preregistered counted run, the same 10 x 3 x 600 s on AI token generation (the decode workload:
 #    every weight streamed from memory once per pass, batch one), about 6 hours more (SKIP_DECODE=1 skips it). Each
 #    workload is its own result, never pooled;
 # 6. an operator's power cap underneath (70% of the default limit): the cap alone vs the cap with Omni-Compass on top,
@@ -56,7 +56,7 @@ $PY -c "import torch, sys; sys.exit(0 if torch.cuda.is_available() else 1)" 2>/d
 # run as root on a clone the login user owns, so git is told the directory is safe; unreadable git refuses the run
 GITST=$(git -c safe.directory='*' status --porcelain -- omni_controller omnicompass tools scripts docs/GPU_PREREGISTRATION.md) \
   || { echo "git cannot read this clone: run from a fresh git clone of the repository"; exit 1; }
-[ -z "$GITST" ] || { echo "the code has local changes: the confirmation runs only on committed code (git stash, or a fresh clone)"; exit 1; }
+[ -z "$GITST" ] || { echo "the code has local changes: the counted runs only on committed code (git stash, or a fresh clone)"; exit 1; }
 echo "code: commit $(git -c safe.directory='*' rev-parse --short HEAD), unchanged"
 
 echo "== wire check (both wires follow, read back and go home; nothing runs if this fails)"
@@ -77,7 +77,7 @@ smoke_rc=$?
 set -e
 PACK=("results/gpu/smoke-$STAMP" "$ENVELOPE" "results/gpu/wirecheck-$STAMP.txt")
 if [ "$smoke_rc" != 0 ]; then
-  echo "SMOKE INVALID (exit $smoke_rc): the wiring needs a fix before any confirmation. Send the packed file back."
+  echo "SMOKE INVALID (exit $smoke_rc): the wiring needs a fix before any counted run. Send the packed file back."
 elif [ -n "${STOP_AFTER_SMOKE:-}" ]; then
   echo "smoke valid; stopping as asked (STOP_AFTER_SMOKE)."
 else
@@ -90,7 +90,7 @@ else
   $PY -c "import json,sys; h=json.load(open(sys.argv[1])).get('headline',{}); print('RESULT, BY RULE (compute-bound):', h.get('verdict','(no verdict)'))" \
     "results/gpu/run-$STAMP/GPU_REPS.json" 2>/dev/null || echo "no table produced (exit $confirm_rc)"
   if [ -z "${SKIP_DECODE:-}" ]; then
-    echo "== second confirmation: AI token generation (preregistered: 10 repetitions, 600 s per arm, frozen code)"
+    echo "== second counted run: AI token generation (preregistered: 10 repetitions, 600 s per arm, frozen code)"
     set +e
     PHASE=confirm WORKLOAD_ARGS="--kind decode" OUT="results/gpu/run-$STAMP-decode" bash scripts/gpu_paired.sh
     decode_rc=$?
@@ -100,7 +100,7 @@ else
       "results/gpu/run-$STAMP-decode/GPU_REPS.json" 2>/dev/null || echo "no table produced (exit $decode_rc)"
   fi
   tar czf "results/gpu/omni-gpu-$STAMP-confirmations.tar.gz" "${PACK[@]}"
-  echo "== both confirmations packed (send this now if you like): results/gpu/omni-gpu-$STAMP-confirmations.tar.gz"
+  echo "== both counted runs packed (send this now if you like): results/gpu/omni-gpu-$STAMP-confirmations.tar.gz"
   # an operator's power cap underneath (the envelope's lowest watts, 70% of the default limit): the cap alone against
   # the cap with Omni-Compass on top, at the usual load and then fully loaded (more work from the same watts)
   CAP=$($PY -c "import json,sys; print(int(float(json.load(open(sys.argv[1]))['power_min_w'])))" "$ENVELOPE")

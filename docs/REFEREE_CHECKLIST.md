@@ -55,7 +55,7 @@ checklists for experimental computer science (code, data, seeds, environment, st
 | Requirement | Where it is met | Status |
 |---|---|---|
 | Uncertainty on every number | paired differences with t-based 95% intervals (`tools/live_reps.py`, `tools/gpu_reps.py`, `realms/harness.py`) | met |
-| Enough repetitions | 10 paired repetitions per Kubernetes set; 10 per GPU confirmation; up to 1,000 runs per grid cell | met |
+| Enough repetitions | 10 paired repetitions per Kubernetes set; 10 per GPU counted run; up to 1,000 runs per grid cell | met |
 | Many measures compared at once | every measure is shown with its interval; labels use preregistered primary measures and guardrails, not the best of many | met; a family-wise correction is not applied and is disclosed here |
 | The noise between identical arms measured | the watch arm on the GPU; repeated sets on Kubernetes | met |
 

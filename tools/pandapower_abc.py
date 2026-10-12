@@ -5,7 +5,7 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for the power grid (docs/OMNI_V1.md): the untouched SimBench grids run three times as separate GitHub
 runs on the same frozen engine (tools/run_pandapower.py), both load models each. pandapower is deterministic, so the three
-runs must give the same numbers: a gauge reads confirmed better or confirmed WORSE by its sign when all three agree, same
+runs must give the same numbers: a gauge reads better or WORSE in all three of our runs by its sign when all three agree, same
 when the change is under one part in a million, and "the runs differ" when they do not reproduce, which is a finding about
 the simulator or the harness and is said so. Directions are the preregistration's (docs/PANDAPOWER_PREREGISTRATION.md):
 energy drawn, losses and net import lower is better; any increase in bus-steps outside 0.95-1.05 is WORSE; tap operations
@@ -22,6 +22,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
+from tools.readings import with_own_runs  # noqa: E402  (every table says whose runs these are)
 
 SAME_REL = 1e-6          # a change under one part in a million of the value reads "same" (amendment 11)
 REPRO_REL = 1e-9         # two runs of a deterministic simulator agree to this, or they did not reproduce
@@ -80,8 +81,8 @@ def verdict(recs, model, k, direction):
     if len(signs) > 1:
         return "**the runs differ**"
     if direction == "never more":
-        return "**confirmed WORSE**" if signs == {1} else "**confirmed better**"
-    return "**confirmed WORSE**" if signs == {1} else "**confirmed better**"
+        return "**WORSE in all three of our runs**" if signs == {1} else "**better in all three of our runs**"
+    return "**WORSE in all three of our runs**" if signs == {1} else "**better in all three of our runs**"
 
 
 def engine(run):
@@ -109,13 +110,13 @@ def main(argv=None):
     ap.add_argument("a"); ap.add_argument("b"); ap.add_argument("c"); ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     runs = [load(d) for d in (a.a, a.b, a.c)]
-    L = ["# The power grid, every untouched SimBench grid: the A/B/C confirmation (Omni v1)", "",
+    L = ["# The power grid, every untouched SimBench grid: the A/B/C three-run table (Omni v1)", "",
          "pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench benchmark grids: an independent, "
          "deterministic grid simulator with the grid's own voltage control as native. Omni sits on top of it, moving the "
          "substation setpoint one whole tap at a time under the frozen rules (`docs/PANDAPOWER_PREREGISTRATION.md`). The same "
          "grids ran three times as separate GitHub runs on the same frozen engine, a full year each, both load models. Because "
-         "the simulator is deterministic, the runs must reproduce each other: a gauge reads **confirmed better** or "
-         "**confirmed WORSE** when all three runs give the same sign, **same** when the change is under one part in a million, "
+         "the simulator is deterministic, the runs must reproduce each other: a gauge reads **better in all three of our runs** or "
+         "**WORSE in all three of our runs** when all three runs give the same sign, **same** when the change is under one part in a million, "
          "and **the runs differ** when they do not reproduce. Energy drawn, losses and import: lower is better. Bus-steps outside "
          "0.95-1.05: any increase is WORSE. Tap operations: lower is better, and more of them was declared in advance as Omni's "
          "expected cost. Every row is shown, losses included.", "",
@@ -133,7 +134,7 @@ def main(argv=None):
     if len({r for r, _ in runs}) < 3:
         off.append("A, B and C must be three separate runs")
     if off:
-        L[2:2] = [f"**Not a v1 confirmation: {'; '.join(off)}.**", ""]
+        L[2:2] = [f"**Not one engine's three runs: {'; '.join(off)}.**", ""]
     grids = sorted(set().union(*(set(r) for _, r in runs)))
     tally = {}
     for model, title in MODELS:
@@ -160,20 +161,20 @@ def main(argv=None):
                          f"{pct(change(recs[2], model, k), k)} | {v} |")
             L.append("")
     L += ["## Across the grids", "", "A grid counts only when all three runs agree.", "",
-          "| Load model | Gauge | Confirmed better | Confirmed worse | Same | The runs differ |", "|---|---|---:|---|---:|---:|"]
+          "| Load model | Gauge | Better in all three of our runs | Worse in all three of our runs | Same | The runs differ |", "|---|---|---:|---|---:|---:|"]
     for model, title in MODELS:
         for k, name, direction in GAUGES:
             t = tally.get((model, k))
             if not t:
                 continue
-            w = t.get("**confirmed WORSE**", [])
-            L.append(f"| {title.split(' (')[0]} | {name} | {len(t.get('**confirmed better**', []))} | {len(w)}{' (' + ', '.join(w) + ')' if w else ''} | "
+            w = t.get("**WORSE in all three of our runs**", [])
+            L.append(f"| {title.split(' (')[0]} | {name} | {len(t.get('**better in all three of our runs**', []))} | {len(w)}{' (' + ', '.join(w) + ')' if w else ''} | "
                      f"{len(t.get('same', []))} | {len(t.get('**the runs differ**', []))} |")
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text("\n".join(_legal_stamp(L)) + "\n")
-    nb = sum(len(t.get("**confirmed better**", [])) for t in tally.values()); nw = sum(len(t.get("**confirmed WORSE**", [])) for t in tally.values())
+    out.write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
+    nb = sum(len(t.get("**better in all three of our runs**", [])) for t in tally.values()); nw = sum(len(t.get("**WORSE in all three of our runs**", [])) for t in tally.values())
     nd = sum(len(t.get("**the runs differ**", [])) for t in tally.values())
-    print(f"{out}: {len(grids)} grids; {nb} gauge-rows confirmed better, {nw} confirmed worse, {nd} where the runs differ")
+    print(f"{out}: {len(grids)} grids; {nb} gauge-rows better in all three of our runs, {nw} worse in all three of our runs, {nd} where the runs differ")
     return 0
 
 

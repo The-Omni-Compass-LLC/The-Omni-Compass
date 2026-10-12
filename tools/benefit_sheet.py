@@ -14,14 +14,13 @@ their raw signs (a response time that fell reads "-65%" there); this sheet turns
 How the number is made, the same rule as the Omni index (tools/omni_index.py):
 
   every judged gauge becomes a ratio oriented so that above 1 is good for Omni (native / omni for a gauge where lower is
-  better, omni / native where higher is better); a gauge counts only where its reading is confirmed over all three runs,
+  better, omni / native where higher is better); a gauge counts only where its reading is the same in all three of our runs,
   anything else (inside the noise, the same, the runs disagree) counts as exactly 1; the number is the geometric mean of
   those ratios, minus one, in percent. For the tests inside the index the number IS the index's own resource reading of
   that test; for a stack with several workloads the stack's number is its index category. For the simulators and the
   organisms, which the index does not score, the same arithmetic runs over every judged gauge of their tables.
 
-  "Benefit?" reads yes (a confirmed gain, no confirmed loss), no (a confirmed loss, no confirmed gain), none (nothing
-  confirmed either way) or trade (gains and losses both; the number says which way the trade nets by this scoring).
+  "Benefit?" reads yes (a gain in all three of our runs, no loss in all three of our runs), no (a loss in all three of our runs, no gain in all three of our runs), none (nothing moved the same way in all three of our runs) or trade (gains and losses both; the number says which way the trade nets by this scoring).
 
   python3 tools/benefit_sheet.py            ->  docs/BENEFIT_SHEET.md, results/BENEFIT_SHEET.json
   python3 tools/benefit_sheet.py --check    ->  exit 1 if the committed files differ from what the tables give
@@ -38,6 +37,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
+from tools.readings import with_own_runs  # noqa: E402
 from tools import omni_index                                       # noqa: E402
 from tools import wiring_verdicts as wv                            # noqa: E402
 
@@ -73,7 +73,7 @@ def fmt_pct_words(x):
 
 
 def in_words(items):
-    """Every confirmed change of a benchmark in words, grouped by gauge: (name, class, range) -> 'p95 cut 65% to 71%: good'.
+    """Every change the same in all three of our runs of a benchmark in words, grouped by gauge: (name, class, range) -> 'p95 cut 65% to 71%: good'.
     A gauge that fell when falling is good reads cut; one that rose when rising is good reads up; each carries good or cost."""
     groups = {}
     for name, cls, rg in items:
@@ -88,7 +88,7 @@ def in_words(items):
         m = f(mags[0]) if f(mags[0]) == f(mags[-1]) else f"{f(mags[0])} to {f(mags[-1])}"
         v = ("cut" if fell else "up") if cls == "better" else ("down" if fell else "up")
         out.append(f"{name} {v} {m}: {'good' if cls == 'better' else 'cost'}")
-    return "; ".join(out) if out else "nothing confirmed either way"
+    return "; ".join(out) if out else "nothing moved the same way in all three of our runs"
 
 
 def benefit_word(better, worse):
@@ -199,8 +199,8 @@ def from_abc_table(fname, name, what):
 
 # ------------------------------------------------------------------------------------- the simulators (markdown)
 def sim_case_ratio(rows):
-    """One case's oriented ratio from a simulator table's rows: confirmed gauges only, the direction read from the reading
-    and the sign of the change (a confirmed better that fell is a lower-is-better gauge)."""
+    """One case's oriented ratio from a simulator table's rows: gauges the same in all three of our runs only, the direction read from the reading
+    and the sign of the change (a better in all three of our runs that fell is a lower-is-better gauge)."""
     head = rows[0]; ridx = len(head) - 1
     abc = [i for i, h in enumerate(head) if h in ("A", "B", "C")]
     ratios, better, worse = [], 0, 0
@@ -307,7 +307,7 @@ def from_realms():
     better = int(clear and prim[0] > 0); worse = int(clear and prim[0] < 0)
     return {"date": updated(ROOT / "results" / "realms" / "REALMS.md"), "benchmark": "The 945 modelled muscles as one tower, every muscle written at once",
             "benefit": benefit_word(better, worse), "pct": 100 * prim[0] if clear else 0.0, "better": better, "worse": worse,
-            "words": (f"work per energy up {100 * prim[0]:.1f}%: good" if clear and prim[0] > 0 else f"work per energy down {abs(100 * prim[0]):.1f}%: cost" if clear else "nothing confirmed either way"),
+            "words": (f"work per energy up {100 * prim[0]:.1f}%: good" if clear and prim[0] > 0 else f"work per energy down {abs(100 * prim[0]):.1f}%: cost" if clear else "nothing moved the same way in all three of our runs"),
             "what": "the tower's work per energy over ten paired seeds; a model, evidence class S", "file": "results/realms/REALMS.md"}
 
 
@@ -357,22 +357,22 @@ def main(check=False):
          "The founder's order of 9 October 2026: next to every benchmark, say whether Omni-Compass was a benefit and by how much, in "
          "one number whose sign always means the same thing, and say every change in words so that nobody has to work out which way a "
          "gauge points. **On this sheet plus is good for Omni and minus is bad, whatever the gauge measures.** The number carries its "
-         "word: **gain**, **loss** or **nothing**. Beside it every confirmed change is written out: a gauge that fell when falling is good "
+         "word: **gain**, **loss** or **nothing**. Beside it every change the same in all three of our runs is written out: a gauge that fell when falling is good "
          "reads **cut** (less waiting, fewer machines, less energy, less memory, fewer failures), a gauge that rose when rising is good "
          "reads **up**, and each one carries **good** or **cost**. So \"p95 cut 65%: good\" and \"memory ceiling held up 215%: cost\" "
          "cannot be misread.", "",
          "The result tables (the files in the last column) keep every change with its raw sign: a response time that fell reads \"-65%\" "
          "there, and whether a fall is good is said in the Reading column beside it. Read the words here, not the bare signs there.", "",
          "The number is the Omni index's rule (`results/OMNI_INDEX.md`): each judged gauge becomes a ratio oriented so that above one is "
-         "good for Omni; it counts only where confirmed over all three runs, anything else counts as exactly one; the number is the "
+         "good for Omni; it counts only where the same in all three of our runs, anything else counts as exactly one; the number is the "
          "geometric mean of the ratios, minus one, in percent. For the tests inside the index the number is the index's own resource "
          "reading of that test; for a stack with several workloads it is the stack's index category; for the simulators and the "
          "organisms the same arithmetic runs over every judged gauge of their tables. Built from the tables by `tools/benefit_sheet.py`, "
          "checked by `verify.py`.", "",
-         "**Benefit?** reads **yes** (confirmed gains, no confirmed loss), **no** (a confirmed loss, no confirmed gain), **none** "
-         "(nothing confirmed either way) or **trade** (gains and losses both; the number says which way the trade nets by this "
+         "**Benefit?** reads **yes** (gains in all three of our runs, no loss in all three of our runs), **no** (a loss in all three of our runs, no gain in all three of our runs), **none** "
+         "(nothing moved the same way in all three of our runs) or **trade** (gains and losses both; the number says which way the trade nets by this "
          "scoring, and the wiring page `docs/WIRING_VERDICTS.md` says what pays for what).", "",
-         "| Date | Benchmark | Benefit? | How much | Every confirmed change, in words | Table |",
+         "| Date | Benchmark | Benefit? | How much | Every change the same in all three of our runs, in words | Table |",
          "|---|---|---|---:|---|---|"]
     for r in rows:
         L.append(f"| {r['date']} | {r['benchmark']} | **{r['benefit']}** | **{fmt_pct_words(r['pct'])}** | {r.get('words', '')} | `{r['file']}` |")
@@ -386,7 +386,7 @@ def main(check=False):
           "- **The governor's own cost** (`results/live/V3_OWN_COST.md`): 0.6% to 1.3% of one core at every size; a cost shown, not a benchmark against native.",
           "- **The card (NVIDIA)**: every earlier result is obsolete; the current governor has not run on a real card.",
           "- **The index's second reading** (service alone, `results/OMNI_INDEX.md`): a second true number for the same tests, not repeated here; this sheet carries the preregistered one.", ""]
-    md = "\n".join(legal_stamp(L)) + "\n"
+    md = "\n".join(legal_stamp(with_own_runs(L))) + "\n"
     js = json.dumps({"rows": rows}, indent=1) + "\n"
     if check:
         bad = [str(p.relative_to(ROOT)) for p, text in ((OUT_MD, md), (OUT_JSON, js)) if not p.exists() or p.read_text() != text]

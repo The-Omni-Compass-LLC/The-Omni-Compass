@@ -8,7 +8,7 @@ whether it drifts or leaks over hours, and of what it costs to run. Native is th
 Kubernetes test (`docs/K8S_COMPASS_PREREGISTRATION.md`); omni is the compass law on the HPA target and the machines,
 frozen as Omni v3. **No engine file changes for this benchmark**: the harness (`scripts/kind_bench.sh`, `tools/live_reps.py`,
 `tools/omni_switch.py`) is extended; `omni_controller/`, `omnicompass/` and `realms/` are the v3 bytes, which
-`tools/omni_version.py` confirms on every run. The readings are the three-run readings of `docs/OMNI_V1.md`; every row is
+`tools/omni_version.py` checks on every run. The readings are the three-run readings of `docs/OMNI_V1.md`; every row is
 reported, losses included.
 
 ## Why this benchmark
@@ -113,7 +113,7 @@ the scenarios, the gauges, the allowance or the limits changed. The smoke run is
 
 `results/live/V3_ROBUST_KILL.md`: every setting back at the operator's 7 to 11 s after the kill in 30 of 30 repetitions
 (mean 9 s), a second governor to the end in every one, the 120 s after the kill no difference beyond the noise against
-native in all three runs, the whole window confirmed better on mean response, p95, time over the line and failed requests,
+native in all three runs, the whole window better in all three of our runs on mean response, p95, time over the line and failed requests,
 machines and energy inside the noise. The memory ratio is not reported for this scenario, as declared: its window is
 shorter than twenty minutes. Nothing in the rules changed between the smoke run and the counted runs.
 
@@ -130,7 +130,7 @@ blind-means-hold rule requires; shown with their reason, as declared, and not ju
 consecutive decisions less the 60 s the governor sleeps, mean of the last hour over the first: at most 1.20, 1.14 and 1.07,
 under the limit of a half: no slowing. **Every setting handed back at the end** and read back at the operator's, no record
 left, in every repetition of every run. The whole window's gauges: machines, node-hours and both energy models no
-difference beyond the noise in all three runs; mean response, p95, p99 and time over the line read confirmed better in run
+difference beyond the noise in all three runs; mean response, p95, p99 and time over the line read better in all three of our runs in run
 A and inside the noise in B and C, so **no difference beyond the noise in 2 of 3 runs** (three pairs give wide intervals,
 as the gauges' own direction says they would); failed requests no difference in all three; HPA replicas, pods started and
 pod start wait inside the noise. The governor's own CPU read 0.008 to 0.010 of a core. Readings: 9 no difference beyond the
@@ -157,7 +157,7 @@ first and last ten minutes (a quarter), the decisions made against the 1,440 the
 shown with their reasons, the decision time's last hour against its first (a half), every setting handed back at the end,
 and the whole window's gauges. What is different, and said here: with one pair a machine there is no within-run interval, so
 the paired rows read as single differences and the three-run rule alone judges them (the same sign in all three machines
-with no interval is "three machines agree", not "confirmed", and the table will say which); the robustness rows (memory,
+with no interval is "three machines agree", never "the same in all three of our runs", and the table will say which); the robustness rows (memory,
 decisions, decision time, hand-back) are single readings per machine and are judged against their thresholds as declared.
 Cost: three machines for about 50 hours, about $25 at list price, declared here before the dispatch; nothing in the engine
 changes (`tools/omni_version.py` on the commit).

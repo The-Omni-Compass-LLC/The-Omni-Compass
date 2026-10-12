@@ -26,9 +26,9 @@ class TheSheet(unittest.TestCase):
 
     def test_a_fall_in_a_lower_is_better_gauge_reads_plus(self):
         rows = [["Gauge", "native (A)", "omni (A)", "A", "B", "C", "Reading"],
-                ["energy (J)", "100", "80", "-20.0%", "-20.0%", "-20.0%", "**confirmed better**"],
-                ["work (units)", "100", "110", "+10.0%", "+10.0%", "+10.0%", "**confirmed better**"],
-                ["taps", "4", "8", "+100.0%", "+100.0%", "+100.0%", "**confirmed WORSE**"],
+                ["energy (J)", "100", "80", "-20.0%", "-20.0%", "-20.0%", "**better in all three of our runs**"],
+                ["work (units)", "100", "110", "+10.0%", "+10.0%", "+10.0%", "**better in all three of our runs**"],
+                ["taps", "4", "8", "+100.0%", "+100.0%", "+100.0%", "**WORSE in all three of our runs**"],
                 ["noise", "1", "1", "+1.0%", "-1.0%", "+0.5%", "no difference beyond the noise (3 of 3 runs)"]]
         r, better, worse = bs.sim_case_ratio(rows)
         self.assertEqual((better, worse), (2, 1))
