@@ -55,6 +55,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import catalog, Body, KILL_AT, T95, label  # noqa: E402
 from realms.compass_arm_v5 import apply_v5  # noqa: E402  (the engine's law, omni-v5)
+from realms.harness import omni_bones, omni_step  # noqa: E402  (the max with its bone, the lease's walk back)
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
 
@@ -168,21 +169,14 @@ def run_arm(a, name, rows, seed, arm, d, slo_ms, start_w, step_s=None, scale=1):
     last = {}
     t0 = time.time()
     draw = 0.0
+    bones = omni_bones(bodies) if arm == "omni" else []
     for k in range(ORGANISM_STEPS):
         for b in bodies:
             b.couple()
         if arm == "omni":
             if k == kill_at:
                 (d / "kill").touch()                              # the card's governor hands both wires back
-            for b in bodies:
-                for p, knob in zip(b.plants, b.knobs):
-                    if k >= kill_at:
-                        p.override = {}
-                        continue
-                    v = apply_v5(p, knob)
-                    if v and v != last.get(id(p)):
-                        writes += 1
-                    last[id(p)] = v
+            writes += omni_step(bodies, bones, k, kill_at)        # the max with its bone; after the kill the walk back
         for b in bodies:
             b.step()
         draw = last_draw(d / "smi.csv", draw)

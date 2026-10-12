@@ -5,7 +5,7 @@
 
 Its purpose is security: if anything gets into Omni-Compass's brain and tries to drive a system for its own ends, or
 anything rogue happens, one switch in a human hand turns Omni-Compass's governing off everywhere at once. It is not
-the reset (the brake held to the floor at the end of a run, which hands one governor's settings back).
+the reset (the one pedal lifted all the way at the end of a run, which hands one governor's settings back).
 
 Every Omni-Compass governor on a machine (the Kubernetes controller, the GPU governors, any muscle they drive) obeys one
 switch, in a human hand:

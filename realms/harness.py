@@ -33,15 +33,54 @@ from omnicompass.adapter import Governor, OBSERVE
 from omnicompass.nervous_system import from_governor
 from .plants import TEMPLATES, ThermalZone, EnergyStorage, pack
 from .compass_arm import compass_apply
-from .compass_arm_v5 import apply_v5          # the v5 law arm (additive; this file's v5 branches are what make the tree omni-v5)
+from .compass_arm_v5 import apply_v5, apply_v5_save, max_apply, max_body_step, Bone, V5CFG   # the v5 law: the max
+                                                     # (arm v5, the default) and the tune-down (arm v5save)
 from .presets import STEPS_SINGLE, ORGANISM_STEPS, CAL_SEED, params_for
 
 ROOT = Path(__file__).resolve().parents[1]
+LAWS = {"compass": compass_apply, "v5": lambda p, k: max_apply(p, k, V5CFG), "v5save": apply_v5_save}
 ARMS = ("native", "watch", "compass")   # native; Omni watching (writes nothing); the compass law on top (amendment, 2026-10-05)
 # for a setpoint muscle, a fourth arm: the native controller with the setpoint simply fixed at the band's calm end.
 # It shows how much of any Omni result on that muscle the band alone would give, with no governor.
 FIXED = "fixed_calm"
-KILL_AT = 0.9
+KILL_AT = 0.8
+WALK = 24         # decisions over which the lease walks every setting back to native after the brain goes silent (the
+                  # plug's own reflex: a room warmed or a loop eased is brought back slowly enough that the body repays it
+                  # without a jump its lines must absorb at once); the security kill switch stays instant. The run keeps
+                  # going native after the walk, so every setting is proven back at the operator's before it ends
+CLIMB = (1, 2, 3, 2, 3, 4, 5, 6, 5, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 4, 3, 2, 1, 2, 1)
+# the climb: the load steps by one, up and down (1 2 3 2 3 4 ...), level 4 is the organism's own normal load and level
+# 8 twice it; every muscle's work demand follows it (requests, the rooms' IT heat, the axes' tasks, the loops' demand),
+# so the organism is pushed past what native can carry and the most each arm can do shows. A site's own base load stays
+# its own: the climb reaches it through the body's power swing on its line
+
+
+def climb_level(k: int, steps: int) -> float:
+    """The climb's load multiplier at decision k of steps (level / 4)."""
+    return CLIMB[min(len(CLIMB) - 1, k * len(CLIMB) // steps)] / 4.0
+
+
+def scale_load_plant(p, profile="climb"):
+    """Put the climb on one plant's work demand (in place)."""
+    steps = ORGANISM_STEPS
+    m = [climb_level(k, steps) for k in range(steps)] if profile == "climb" else [float(profile)] * steps
+    if p.template == "compute_pool":
+        p.lam = [x * m[k] for k, x in enumerate(p.lam)]
+    elif p.template == "thermal_zone":
+        p.qit = [x * m[k] for k, x in enumerate(p.qit)]
+    elif p.template == "motion_axis":
+        p.arrivals = [int(round(x * m[k])) for k, x in enumerate(p.arrivals)]
+    elif p.template == "process_loop":
+        p.d = [x * m[k] for k, x in enumerate(p.d)]
+    return p
+
+
+def scale_load(body, profile="climb"):
+    """Put the climb on a body's work demand (in place; every arm of a seed gets the same climb)."""
+    body.load = profile
+    for p in body.plants:
+        scale_load_plant(p, profile)
+    return body
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228,
        11: 2.201, 12: 2.179, 13: 2.160, 14: 2.145, 15: 2.131, 19: 2.093, 29: 2.045}
 
@@ -129,6 +168,36 @@ def _restored(plant, knob):
     return plant.override == {}
 
 
+def _native_of(plant, key):
+    """The operator's own value of an override key (what the snapshot holds); None: the key has no setting of its own
+    (a floor, a release, a paced job, a battery's clip ceiling) and is simply let go."""
+    P, t = plant.P, plant.template
+    if key == "target":
+        return P["target"]
+    if key == "setpoint":
+        return P["t_set"] if t == "thermal_zone" else P["reserve"] if t == "energy_storage" else P["sp"]
+    if key in ("power",) or (key == "capacity" and t in ("motion_axis", "process_loop")):
+        return 1.0
+    if key == "floor":
+        return float(P["n_min"])          # a floor walks down to the pool's least machines (the autoscaler governs)
+    return None
+
+
+def walk_back(plant, left):
+    """One decision of the lease's walk back to native: every setting moves 1/left of the way to the operator's own;
+    a key with no setting of its own is let go. left = 1 is the last step: everything native."""
+    out = {}
+    for key, x in plant.override.items():
+        nat = _native_of(plant, key)
+        if nat is None or left <= 1:
+            continue
+        y = x + (nat - x) / left
+        if abs(y - nat) > 1e-9:
+            out[key] = y
+    plant.override = out
+    return out
+
+
 PACE_HIGH, PACE_LOW, PACE_HEAT = 0.95, 0.8, 0.96             # the live batch_pace defaults (omni_controller/muscles.py)
 
 
@@ -165,22 +234,29 @@ def run_muscle_arm(row, seed, arm):
             plant.step()
         plant.finalize()
         return dict(plant.m, writes=0, after_kill_writes=0, restore_ok=True)
-    g = None if arm in ("native", FIXED, "compass", "v5") else Governor()
+    g = None if arm in ("native", FIXED, "compass", "v5", "v5save") else Governor()
     if arm == "watch":
         g.set_mode(OBSERVE)
     kill_at = int(KILL_AT * plant.steps)
     writes = after_kill_writes = 0
     last = None
     restore_ok = True
+    twin = make_plant(row, seed) if arm == "v5" else None            # the brain's model of native (the max's floor)
     for k in range(plant.steps):
-        if arm in ("compass", "v5"):
-            apply = apply_v5 if arm == "v5" else compass_apply
-            v = apply(plant, knob) if k < kill_at else {}
-            if k >= kill_at:
-                plant.override = {}
-                restore_ok = restore_ok and _restored(plant, knob)
-            elif v and v != last:
-                writes += 1
+        if arm in ("compass", "v5", "v5save"):
+            apply = LAWS[arm]
+            if k < kill_at:
+                if twin is not None:
+                    twin.step()
+                    v = max_apply(plant, knob, V5CFG, twin)
+                else:
+                    v = apply(plant, knob)
+                if v and v != last:
+                    writes += 1
+            else:
+                v = walk_back(plant, kill_at + WALK - k)
+                if k >= kill_at + WALK - 1:
+                    restore_ok = restore_ok and _restored(plant, knob)
             last = v
         elif g is not None:
             obs = plant.observe()
@@ -222,7 +298,8 @@ class Body:
     every other plant reports."""
 
     def __init__(self, rows, seed, nominal="calibrated"):
-        self.rows = rows
+        self.rows, self.seed, self.nominal = rows, seed, nominal
+        self.load = None                     # the load profile put on the body's work demand (None: its own)
         # the calibration run first, then this body: one organism in memory at a time (1,000 copies of the four stacked
         # is 1.2 million plants). Each plant is packed as it is made (plants.pack): the same numbers, a quarter of the room
         cal = calibrate_organism(rows) if nominal == "calibrated" else None
@@ -278,11 +355,32 @@ def aggregate(bodies):
     return agg
 
 
+def omni_bones(bodies):
+    """The max's skeleton for each body (realms/compass_arm_v5.py, Bone), with its pools' twins."""
+    return [Bone(b, V5CFG) for b in bodies]
+
+
+def omni_step(bodies, bones, k, kill_at):
+    """One decision of the engine's default brain over bodies: the max with each body's bone before the kill, the lease's
+    walk back to native after it. Returns the plants whose setting changed (for the write count)."""
+    changed = 0
+    for bi, b in enumerate(bodies):
+        if k >= kill_at:
+            for p in b.plants:
+                walk_back(p, kill_at + WALK - k)
+            continue
+        before = [dict(p.override) for p in b.plants]
+        bones[bi].advance_twin()
+        max_body_step(b, V5CFG, bones[bi])
+        changed += sum(1 for p, o in zip(b.plants, before) if p.override and p.override != o)
+    return changed
+
+
 def run_bodies(bodies, arm, groups):
     """Run bodies on one 15 s clock. groups: lists of body indices, one governor per group (one group of all bodies is
     one governor over the whole stack; one group per body is a separate governor per body). arm native: no governor."""
     govs = []
-    if arm not in ("native", "compass", "v5"):
+    if arm not in ("native", "compass", "v5", "v5save"):
         for grp in groups:
             g = Governor()
             if arm == "watch":
@@ -292,16 +390,31 @@ def run_bodies(bodies, arm, groups):
     writes = after_kill_writes = 0
     restore_ok = True
     last = {}
+    bones, twins = [], []
+    if arm == "v5":
+        bones = [Bone(b, V5CFG) for b in bodies]                       # each body's skeleton, with its pools' twins
     for k in range(ORGANISM_STEPS):
         for b in bodies:
             b.couple()
-        if arm in ("compass", "v5"):
-            apply = apply_v5 if arm == "v5" else compass_apply
-            for b in bodies:
+        if arm in ("compass", "v5", "v5save"):
+            apply = LAWS[arm]
+            for bi, b in enumerate(bodies):
+                if k >= kill_at:
+                    for p in b.plants:
+                        walk_back(p, kill_at + WALK - k)
+                        if k >= kill_at + WALK - 1:
+                            restore_ok = restore_ok and _restored(p, None)
+                    continue
+                if arm == "v5":
+                    bones[bi].advance_twin()
+                    max_body_step(b, V5CFG, bones[bi])                 # the max: one body, its bone, its spare shared
+                    for p in b.plants:
+                        v = p.override
+                        if v and v != last.get(id(p)):
+                            writes += 1
+                        last[id(p)] = dict(v)
+                    continue
                 for p, knob in zip(b.plants, b.knobs):
-                    if k >= kill_at:
-                        p.override = {}
-                        continue
                     v = apply(p, knob)
                     if v and v != last.get(id(p)):
                         writes += 1
@@ -327,6 +440,9 @@ def run_bodies(bodies, arm, groups):
                         restore_ok = restore_ok and _restored(p, knob)
         for b in bodies:
             b.step()
+        for tw in twins:
+            tw.couple()
+            tw.step()
     for b in bodies:
         for p in b.plants:
             p.finalize()
@@ -335,8 +451,11 @@ def run_bodies(bodies, arm, groups):
             "mean_power": [x / ORGANISM_STEPS for b in bodies for x in b.psum]}
 
 
-def run_organism_arm(rows, seed, arm, nominal="calibrated"):
-    return run_bodies([Body(rows, seed, nominal)], arm, [[0]])
+def run_organism_arm(rows, seed, arm, nominal="calibrated", load=None):
+    b = Body(rows, seed, nominal)
+    if load is not None:
+        scale_load(b, load)
+    return run_bodies([b], arm, [[0]])
 
 
 def run_organism(rows, seed) -> Dict:

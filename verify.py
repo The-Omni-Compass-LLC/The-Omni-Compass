@@ -309,9 +309,10 @@ def main():
     from tests import test_apu_shim
     test_apu_shim.main(); check("AMD chip wires (scripts/apu/nvidia-smi through amd-smi): power wire, readings in order, card list, clock wire refused cleanly, an unknown command refused", True)
     from tests import test_compass_arm_v5 as _v5
-    _v5.test_v5_default_does_no_harm_to_any_muscle(); _v5.test_v5_tower_is_no_worse_than_native(); _v5.test_v5_default_config_present()
-    _v5.test_v5_power_cap_only_on_long_line_pools(); _v5.test_v5_every_generation_loop_is_free()
-    check("the v5 law does no harm (realms/compass_arm_v5.py, V5CFG): on every one of the v5 catalog's muscles no more energy, no less work, no more violations than native, every knob handed back on the kill; the whole tower no worse; every generating loop free under its reach, an interactive pool's power cap native", True)
+    _v5.test_max_does_no_harm_to_any_muscle_alone(); _v5.test_save_dial_does_no_harm_to_any_muscle_alone()
+    _v5.test_max_is_the_default_and_never_shaves(); _v5.test_bone_never_leaves_a_pool_below_its_twin()
+    _v5.test_tower_max_does_no_less_work_and_hands_back(); _v5.test_walk_back_is_gradual_and_complete()
+    check("the v5 law at the max (realms/compass_arm_v5.py, V5CFG): every one of the v5 catalog's muscles alone does no less work and is over its line no more often than native, every knob handed back by the lease's walk; inside an organism the bone never leaves a pool below its twin; the tune-down (V5SAVE) no more energy, no less work, no more misses; the max never shaves", True)
     from tests import test_lambda_gpu
     test_lambda_gpu.test_lambda_launcher_end_to_end()
     check("the Lambda launcher (scripts/lambda_gpu.py) against a stand-in API: prices first, refuses over the ceiling or with nothing free, rents where a machine is free, waits until it runs, gives it back, never prints the key", True)
@@ -353,8 +354,8 @@ def main():
     test_failsafe.main(); check("no automated fallback: failed decisions are skipped; only the human switch turns the whole harness off and on", True)
     from tests import test_compass_arm
     test_compass_arm.main(); check("compass arm on every realm muscle: one compass per muscle, its state kept from one decision to the next", True)
-    from tests import test_cruise_brake
-    test_cruise_brake.main(); check("cruise and the emergency brake: every machine in service while work waits, straight to the floor at zero demand, never below it", True)
+    from tests import test_cruise_idle
+    test_cruise_idle.main(); check("cruise and idle (one pedal lifted all the way): every machine in service while work waits, straight to the breathing floor at zero demand, never below it", True)
     from tests import test_staging_order
     test_staging_order.main(); check("staging order through the real actuator: the emptiest idles first, the warmest wakes first, two always in service (the floor), every machine usable, no pod moved", True)
     from tests import test_confirm_abc

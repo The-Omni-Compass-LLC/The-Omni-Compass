@@ -3,7 +3,7 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Cruise and the emergency brake (rules 7 and 8), through the live controller against the fake kubectl: work waiting
+"""Cruise and idle, the one pedal lifted all the way (rules 7 and 8), through the live controller against the fake kubectl: work waiting
 for a place two decisions in a row puts every machine in service, and they stay until the line has been empty two
 decisions; with nothing waiting and the sensed service's demand at zero the machines go straight to the floor (two) in
 one move, never below it."""
@@ -55,18 +55,18 @@ def main():
     c.step(); assert c.cruise, "cruise ends only after the line has been empty two decisions"
     c.step(); assert not c.cruise and events("cruise")[-1] == "off", events("cruise")
 
-    # the emergency brake: nothing waiting, the service's demand at zero: straight to the floor, never below it
+    # idle: nothing waiting, the service's demand at zero: straight to the breathing floor, never below it
     cluster(t, pending=0, util=0, replicas=1, used="50m")
     for _ in range(40):
         c.step()
-        if events("emergency_brake"):
+        if events("idle_floor"):
             break
-    eb = events("emergency_brake")
-    assert eb, "the emergency brake never engaged at zero demand"
+    eb = events("idle_floor")
+    assert eb, "the pool never went to its idle floor at zero demand"
     assert eb[0]["to"] == 2 and eb[0]["from"] > 2, eb
     assert all(n >= 2 for n in sizes()), sizes()
     # idle as a served service really stands (amendment 9): one pod, its floor, a probe keeping it at 10% of a 50% target
-    def brakes(util, replicas):
+    def idles(util, replicas):
         t2 = tempfile.mkdtemp()
         a2 = parser().parse_args(["--kubectl", FAKE, "--mode", "nodepool", "--interval", "0", "--min-nodes", "2", "--max-nodes", "6",
                                   "--audit", str(Path(t2) / "audit.jsonl"), "--kill-file", str(Path(t2) / "kill"),
@@ -75,15 +75,15 @@ def main():
         cluster(t2, pending=0, util=util, replicas=replicas, used="200m")
         for _ in range(40):
             c2.step()
-        return [json.loads(l)["emergency_brake"] for l in (Path(t2) / "audit.jsonl").read_text().splitlines()
-                if "emergency_brake" in json.loads(l)]
-    idle = brakes(10, 1)
-    assert idle and idle[0]["to"] == 2 and idle[0]["at_idle"], "the brake did not engage with the service idle at its floor"
-    assert not brakes(10, 3), "the brake engaged with the service above its floor"
-    assert not brakes(40, 1), "the brake engaged with the service busy at its floor (40% of a 50% target)"
-    print(f"cruise: on after two decisions with work waiting, off after two with the line empty; emergency brake: "
+        return [json.loads(l)["idle_floor"] for l in (Path(t2) / "audit.jsonl").read_text().splitlines()
+                if "idle_floor" in json.loads(l)]
+    idle = idles(10, 1)
+    assert idle and idle[0]["to"] == 2 and idle[0]["at_idle"], "the pool did not idle with the service idle at its floor"
+    assert not idles(10, 3), "the pool idled with the service above its floor"
+    assert not idles(40, 1), "the pool idled with the service busy at its floor (40% of a 50% target)"
+    print(f"cruise: on after two decisions with work waiting, off after two with the line empty; idle: "
           f"{eb[0]['from']} -> {eb[0]['to']} machines in one move at zero demand, never below the floor")
-    print("PASS test_cruise_brake")
+    print("PASS test_cruise_idle")
 
 
 if __name__ == "__main__":

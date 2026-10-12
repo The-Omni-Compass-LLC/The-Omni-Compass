@@ -279,6 +279,11 @@ class GpuCompass:
             self.brain.band.cushion = min(0.05, max(0.005, self.edge.react_part))
         calm = p is not None and p < self.brain.band.wall_high and not saturated
         deepest, trial, ev = self.verdict.tick(calm)
+        if getattr(self.a, "dial", "max") == "max":
+            # the max: the card's own clock ceiling stays at the top while it serves (its firmware boosts to its own power
+            # limit: native already runs it flat out), so no step below the top is tried; the steady hold under an
+            # operator's cap (no knock-backs) and fail up still apply
+            deepest, trial = 0, False
         if ev:
             self.audit({"verdict": ev, "state": self.verdict.state, "deepest_step": self.verdict.allowed})
         at_limit = r is not None and r["draw"] >= 0.97 * r["limit"]
@@ -374,6 +379,9 @@ class GpuCompass:
 def parser():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--mode", choices=["watch", "cap"], default="watch")
+    ap.add_argument("--dial", choices=["max", "save"], default=os.environ.get("OMNI_DIAL", "max"),
+                    help="max (default): the clock ceiling never stepped below the top while the card serves; save: the "
+                         "tune-down (the verdict's steps below the top where the card's time on a request allows)")
     ap.add_argument("--gpus", default="0")
     ap.add_argument("--smi", default=os.environ.get("NVIDIA_SMI", "nvidia-smi"))
     ap.add_argument("--interval", type=float, default=2.0)

@@ -46,7 +46,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import Body, KILL_AT  # noqa: E402
-from realms.compass_arm_v5 import apply_v5  # noqa: E402  (the engine's law, omni-v5)
+from realms.harness import omni_bones, omni_step, WALK  # noqa: E402  (the engine's default brain, the max, omni-v5)
 from realms.presets import ORGANISM_STEPS  # noqa: E402
 from tools.run_hil import groups, bodies_for, NAMES, SEED0  # noqa: E402
 
@@ -121,6 +121,7 @@ def main(argv=None):
     t0 = time.time()
     nominal_cluster = None
     writes, last, set_r, seen_w = 0, {}, None, []
+    bones = omni_bones(bodies) if omni else []
     log = open(out / "load_schedule.log", "a")
     for k in range(ORGANISM_STEPS):
         if reps[k] != set_r:
@@ -138,15 +139,7 @@ def main(argv=None):
         for b in bodies:
             b.couple()
         if omni:
-            for b in bodies:
-                for p, knob in zip(b.plants, b.knobs):
-                    if k >= kill_at:
-                        p.override = {}
-                        continue
-                    v = apply_v5(p, knob)
-                    if v and v != last.get(id(p)):
-                        writes += 1
-                    last[id(p)] = v
+            writes += omni_step(bodies, bones, k, kill_at)       # the max with its bone; after the kill the lease walks back
         for b in bodies:
             b.step()
         w = cluster_w(out / "capture.csv", nominal_cluster or 0.0)

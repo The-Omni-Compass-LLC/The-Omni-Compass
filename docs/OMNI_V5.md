@@ -6,6 +6,41 @@
 (`tools/omni_version.py`); `python3 tools/omni_version.py` prints `omni-v5` on this checkout. v1, v2 and v3 stay frozen,
 each kept for its own results; no result is ever read across versions.
 
+## The default brain: the max (12 October)
+
+The founder's order of 12 October: "We're going to show a benchmark that shows it to the max. And we're going to show
+one native... anybody can tune it from the max down." v5's default (`V5CFG`) is therefore **the max**: every muscle
+pushed toward its own limit for the most work, faster, never past its limit and never below native. The energy that
+takes is reported as **power given**, beside the work and the speed it bought; the max never shaves (nothing is taken
+from one muscle to give to another). The dial turns it down: **the tune-down** (`V5SAVE`, the save setting described
+below) is native's work on the least energy, kept and tested on every muscle.
+
+- **A pool** gets the machines its forecast needs before the rush lands: the recent peak arrivals widened by the largest
+  rise the pool has shown within one machine start, at 95% utilisation, through a floor under its own autoscaler, never
+  fewer than its **twin** runs (the brain's model of native: the same pool under its own autoscaler alone, on the same
+  arrivals). Its power cap and admission stay native: full clock, every request admitted.
+- **A room** is cooled ahead of the heat as it nears its limit or its cooling nears flat out, never warmer than native.
+- **A battery site** clips its line from its charge, native plus: the operator's own reserve while nothing would cross,
+  and below it, down to its band's floor, exactly the draw that would cross; a UPS lends only the charge above its outage
+  floor.
+- **A motion axis or a process loop** native already runs flat out (full speed, full actuator): wired, watched, native.
+- **The bone.** Inside an organism the body's lines (each site's grid line, each room's cooling) are loaded by the whole
+  body, so the max grants machines and cooling only out of the room the most loaded line has left, one decision ahead
+  (its latest reading plus the larger of 3.09 of its own wobbles and the largest single climb it has shown). With no room,
+  every pool goes at once to exactly its twin's machines (a floor and a ceiling, its maxReplicas, at native's count).
+- **One pedal, no brake.** Push for more, lift off for less; lifting hands the setting back toward native. At idle the
+  pool lifts all the way to its breathing floor (two machines) and wakes straight to the work. **The lease**: at 80% of
+  every modelled run the brain is cut and the plug walks every setting back to native over 24 decisions (no jump the body
+  must absorb at once); the security kill switch is instant.
+- **The live controllers** carry the same dial (`--dial max`, the default): the Kubernetes controller holds the service
+  well inside its line (the compass at 0.3) and never gives back a machine the cluster had on its own; the GPU compass
+  keeps the card's clock ceiling at the top while it serves (the card already runs flat out on its own power limit).
+
+The organisms run the hour around each battery site's daily peak, where the UPS lines carry most of their rating: there
+the bone is tight and the max gives only what the lines can carry. Every muscle alone has no body around it, so the max
+gives it everything its own limits allow. `results/realms_v5/REALMS_V5.md` shows both, and the climb (the load stepping
+1 2 3 2 3 4 ..., up to twice the organism's own) where native breaks first.
+
 ## What v5 is
 
 v5 is **a combination of everything**: it takes v3's proven engine (its live controllers, its realms and organisms, its

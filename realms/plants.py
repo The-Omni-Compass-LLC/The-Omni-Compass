@@ -402,6 +402,10 @@ class ComputePool(Plant):
         want = self.cluster_autoscaler(util, mu) if P.get("ca") else self.hpa(util)
         if self.override.get("release"):
             want = min(want, total - 1)                            # one machine per decision
+        if "floor" in self.override:                               # a floor under the autoscaler: machines started
+            want = max(want, int(self.override["floor"]))          # before the rush (it only ever adds)
+        if "cap" in self.override:                                 # a ceiling over it (its maxReplicas): the
+            want = min(want, int(self.override["cap"]))            # machines handed back at once, to the count set
         want = int(clamp(want, P["n_min"], P["n_max"]))
         if want > total:
             self.pending += [k + P["startup_steps"]] * min(want - total, max(4, total))
@@ -594,7 +598,8 @@ class EnergyStorage(Plant):
             d = min(net, pmax, max(0.0, self.soc - reserve) * self.E * sq / dt)
             if "capacity" in self.override:
                 thr = self.override["capacity"] * P["p_lim_w"]
-                d += max(0.0, min(net - d - thr, pmax - d, self.soc * self.E * sq / dt - d))
+                low = P["stress"] if P.get("backup") else 0.0      # a UPS never below its outage floor
+                d += max(0.0, min(net - d - thr, pmax - d, max(0.0, self.soc - low) * self.E * sq / dt - d))
             self.soc -= d * dt / (self.E * sq)
             imp = net - d
         self.m["work"] += served_own * dt

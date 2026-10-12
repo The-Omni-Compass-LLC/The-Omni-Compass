@@ -38,7 +38,12 @@ class Cfg:
                  base_center=0.5, base_wall=0.95, headroom=False, physics_memory=False, motion_safe=False,
                  motion_q=0.999, burst_window=20, hole_guard=False, drop_guard=False, jump0=1.0, band=False,
                  hole_floor=True, precool=False, storage_shave=False, power_cap=False, loop_reach=False,
-                 ca_release=False):
+                 ca_release=False, dial="save", edge_util=0.95, line_z=3.09):
+        self.dial = dial                      # "max" (the default brain: every muscle pushed to its own limit for the most
+                                              # work, the energy that takes shown as power given) or "save" (the tune-down:
+                                              # the least energy for native's work)
+        self.edge_util = edge_util            # max: how full a machine pool runs on the forecast before it calls for more
+        self.line_z = line_z                  # max: the wobbles of margin a battery keeps its site's draw under its line
         self.loop_reach = loop_reach          # a process loop's setpoint never closer to its band's calm-side edge than the
                                               # loop's own largest swing toward that edge leaves room for (loop_clamp)
         self.ca_release = ca_release          # a machine pool under a cluster autoscaler: Omni may hand a machine back
@@ -581,7 +586,281 @@ def raw_position(plant) -> float:
     return p
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# MAX, the work edge: the default brain (the founder's orders of 11 and 12 October). Every muscle is pushed toward its
+# own limit to do the most work, faster; never past its limit and never below native (native's own setting is always one
+# of the brain's choices, so a muscle native already runs flat out stays native, wired and watched). The energy that
+# takes is reported as power given, beside the work and the speed it bought. One pedal: push for more, lift off for
+# less, and lifting hands the setting back toward native.
+#
+#   compute pool   the machines the forecast needs are started before the rush lands: the recent peak arrivals widened
+#                  by the largest rise this pool has shown within one machine start, plus the standing queue, at the edge
+#                  utilisation. The HPA target is lowered just enough that the operator's own autoscaler starts them (a
+#                  machine pool: a floor under its cluster autoscaler). Never fewer machines than native would keep; the
+#                  power cap and admission stay native (full clock, every request admitted)
+#   cooled zone    cooled ahead of the heat: the setpoint goes from the operator's toward the band's cold end as the
+#                  room nears its limit or its cooling nears flat out, both read ahead by the cooling's own answer time;
+#                  never warmer than native
+#   battery site   the charge is held for the line instead of spent on the first minutes of load, and only the draw
+#                  that would cross the site's line (the forecast draw plus line_z of its step-to-step wobbles) is taken
+#                  from it; a UPS lends only the charge above its outage floor (its band's stress end), never below it
+#   motion axis    native: full speed and effort, native already runs it flat out
+#   process loop   native: the full actuator, native already runs it flat out
+def max_pool_want(plant, cfg) -> int:
+    """The machines a pool needs when a machine started now is ready: the recent peak arrivals (what the brain counted,
+    never the decision still to come) widened by the largest rise this pool has shown within one machine start (at
+    first, the room its operator's own target leaves: 1/target - 1), plus the standing queue, at the edge utilisation."""
+    P = plant.P
+    k = plant.k
+    S = max(1, int(P["startup_steps"]))
+    st = getattr(plant, "_mx", None)
+    if st is None:
+        st = plant._mx = {"lam": [], "rise": max(0.0, 1.0 / P["target"] - 1.0)}
+    h = st["lam"]
+    if k > 0:
+        a = plant.lam[k - 1]
+        if len(h) > 0:
+            lo = min(h[-S:])
+            if lo > 0.0:
+                st["rise"] = max(st["rise"], a / lo - 1.0)
+        h.append(a)
+        if len(h) > max(cfg.window, S + 1):
+            h.pop(0)
+    if not h:
+        return int(P["n_min"])
+    fore = max(h) * (1.0 + st["rise"])
+    need = (fore + plant.Q / P["dt"]) / (plant.mu(1.0) * cfg.edge_util)
+    return int(clamp(math.ceil(need - 1e-9), P["n_min"], P["n_max"]))
+
+
+def max_cool(plant, cfg) -> float:
+    """A cooled zone's setpoint for the most work: the operator's, moved toward the band's cold end as the room nears its
+    limit or its cooling nears flat out. The cooling's load is read from the room's own energy balance (the cooling
+    delivered plus what the room's mass stored) against its installed capacity, carried ahead at its present climb for the
+    cooling's own answer time; heat that outruns the cooling is carried by the degrees the room already has in hand."""
+    P = plant.P
+    native = P["t_set"]
+    cold = min(P["stress"], P["calm"])
+    Q = P["units"] * P["q_unit_w"]
+    t_prev = getattr(plant, "_mx_T", plant.T)
+    plant._mx_T = plant.T
+    load = (plant.qc_avg + P["c_j_k"] * (plant.T - t_prev) / P["dt"]) / max(Q, 1e-9)
+    hist = getattr(plant, "_mx_q", None)
+    if hist is None:
+        hist = plant._mx_q = []
+    hist.append(load)
+    if len(hist) > cfg.window:
+        hist.pop(0)
+    react = reaction_steps(plant)
+    climb = 0.0
+    if len(hist) > 1:
+        r = max(1, min(len(hist) - 1, int(math.ceil(react))))
+        climb = max(0.0, (hist[-1] - hist[0]) / (len(hist) - 1), (hist[-1] - hist[-1 - r]) / r)
+    ahead = load + climb * react
+    room = (plant.T - cold) / max(P["t_limit"] - cold, 1e-9)
+    risk = max(clamp((ahead - 0.8) / 0.2, 0.0, 1.0), clamp((room - 0.6) / 0.3, 0.0, 1.0))
+    return min(native, native - (native - cold) * risk)
+
+
+def max_hold(plant, cfg, key):
+    """A battery site's knob for the most work held inside its line: the charge kept for the line, and only the draw
+    that would cross the line taken from it. The draw is forecast from the brain's own readings: the last decision's net
+    draw, plus its latest rise, plus line_z of its step-to-step wobbles. A UPS lends only the charge above its outage
+    floor (its band's stress end); any other site, down to its band's stress end."""
+    P = plant.P
+    st = getattr(plant, "_mx_s", None)
+    if st is None:
+        st = plant._mx_s = {"last": plant.net, "n": 0, "dv": 0.0}
+    d = plant.net - st["last"]
+    st["last"] = plant.net
+    if plant.k > 0:
+        st["n"] += 1
+        a = 1.0 / st["n"]
+        st["dv"] = (1.0 - a) * st["dv"] + a * d * d
+    fore = plant.net + max(0.0, d) + cfg.line_z * math.sqrt(st["dv"])
+    over = max(0.0, fore - P["p_lim_w"])                         # the draw that would cross the line this decision
+    floor = P["stress"]
+    if key == "setpoint":
+        E, sq = P["e_wh"] * 3600.0, math.sqrt(P["eta_rt"])
+        dt = P["dt"]
+        # native plus: the operator's own reserve while nothing would cross the line (the site's own use of its
+        # battery is native's), and below it, down to the floor, exactly the draw that would cross
+        r = clamp(plant.soc - over * dt / (E * sq), floor, P["reserve"])
+        return {} if abs(r - P["reserve"]) < 1e-12 else {"setpoint": r}
+    # the ceiling the battery defends (the capacity knob): the line less the forecast's own margin
+    cap = clamp(1.0 - (fore - plant.net) / P["p_lim_w"], 0.5, 1.0)
+    return {"capacity": cap}
+
+
+def machines(pool) -> int:
+    """A pool's machines in service and starting."""
+    return pool.n + len(pool.pending)
+
+
+def max_ask(plant, knob, cfg, twin=None):
+    """What a muscle asks for the most work this decision. A pool: the machines its forecast needs, never fewer than its
+    twin (the brain's model of native: the same plant under its own autoscaler alone, on the same arrivals) runs now. A
+    cooled zone at risk: a colder setpoint and the most its pull-down can add. None: the muscle asks nothing (it holds
+    native, a donor's spare or a battery's own line)."""
+    P, t = plant.P, plant.template
+    if t == "compute_pool" and knob not in ("power", "admission"):
+        base = machines(twin) if twin is not None else int(P["n_min"])
+        want = max(max_pool_want(plant, cfg), base)
+        return {"want": want, "base": base, "cur": machines(plant), "held": int(plant.override.get("floor", 0)),
+                "unit_w": P["p_idle"], "line": "src"}
+    if t == "thermal_zone" and knob == "setpoint":
+        x = max_cool(plant, cfg)
+        if x >= P["t_set"] - 1e-9:
+            return None
+        cop = plant.cop(x, plant.tout[min(plant.k, plant.steps - 1)])
+        cost = max(0.0, P["units"] * P["q_unit_w"] - plant.qc_avg) / cop   # the most the pull-down can add
+        return {"x": x, "cost": cost, "line": "zone"}
+    return None
+
+
+def max_apply(plant, knob, cfg, twin=None):
+    """The max for a muscle alone (no body around it to share with): a pool's machines started before the rush and
+    never fewer than its twin runs, a room cooled ahead of the heat, a battery's line clipped from its charge; every
+    other knob native."""
+    P, t = plant.P, plant.template
+    ov = {}
+    a = max_ask(plant, knob, cfg, twin)
+    if a is not None and t == "compute_pool":
+        ov = {"floor": float(a["want"])} if a["want"] > P["n_min"] else {}
+    elif a is not None and t == "thermal_zone":
+        ov = {"setpoint": a["x"]}
+    elif t == "energy_storage" and knob in ("setpoint", "capacity"):
+        ov = max_hold(plant, cfg, knob)
+    plant.override = ov
+    return ov
+
+
+class Bone:
+    """The body's skeleton for the max: the lines every muscle stands on. A battery site's grid line and a room's
+    cooling are loaded by the whole body (the body's power swing is load on every site, the machines' power is heat in
+    every room), so no muscle may take power the bone cannot carry: what the max adds is granted only out of the room the
+    most loaded line has left, read one decision ahead (the line's latest reading plus line_z of its own step-to-step
+    wobbles; a battery that clips its own line counts the power it can still clip). With no room, the machines this
+    brain added go back at once, never below what the pool's twin runs (the brain's model of native: the same pool under
+    its own autoscaler alone, on the same arrivals), so a pool never has fewer machines than native and the lines never
+    carry more of this brain's power than they have room for. Nothing is taken from one muscle to give to another: the
+    max never shaves (the tune-down does that, on the dial)."""
+
+    def __init__(self, body, cfg):
+        self.body, self.cfg = body, cfg
+        self.st = {}
+        self.twins = {}
+        for i, (p, r) in enumerate(zip(body.plants, body.rows)):
+            if p.template == "compute_pool" and r["knob"] not in ("power", "admission"):
+                from .harness import make_plant
+                from .plants import pack
+                self.twins[i] = pack(make_plant(r, body.seed, organism=True))
+                if getattr(body, "load", None) is not None:
+                    from .harness import scale_load_plant
+                    scale_load_plant(self.twins[i], body.load)
+
+    def advance_twin(self):
+        """Step every twin one decision (each decides on the same arrivals native sees)."""
+        for tw in self.twins.values():
+            tw.step()
+
+    def _ahead(self, key, x, prior):
+        """How far a line's reading can climb in one decision, from everything the brain has seen of it: the larger of
+        line_z of its step-to-step wobbles and the largest single climb it has shown (never forgotten: a line that once
+        jumped can jump again), and never less than the prior (a twentieth of the line) until it has shown more."""
+        st = self.st.get(key)
+        if st is None:
+            st = self.st[key] = {"last": x, "n": 0, "dv": 0.0, "rise": 0.0}
+            return prior
+        d = x - st["last"]
+        st["last"] = x
+        st["n"] += 1
+        a = 1.0 / st["n"]
+        st["dv"] = (1.0 - a) * st["dv"] + a * d * d
+        st["rise"] = max(st["rise"], d)
+        return max(self.cfg.line_z * math.sqrt(st["dv"]), st["rise"], prior)
+
+    def room(self):
+        """(room for machines, room for cooling): the W the body may still add, one decision ahead."""
+        b = self.body
+        r_src = r_all = math.inf
+        n_st = max(1, len(b.stores))
+        for s, kl in zip(b.stores, b.k_load):
+            P = s.P
+            g = kl / n_st                                            # site draw per W of the body's power
+            clip = 0.0
+            if getattr(s, "override_kind", None) == "clip":
+                E, sq = P["e_wh"] * 3600.0, math.sqrt(P["eta_rt"])
+                clip = min(P["p_batt_w"], max(0.0, s.soc - P["stress"]) * E * sq / P["dt"])
+            margin = P["p_lim_w"] + clip - (s.imp + self._ahead(id(s), s.imp, 0.05 * P["p_lim_w"]))
+            r_all = min(r_all, margin / g if g > 0 else math.inf)
+        n_z = max(1, len(b.zones))
+        for zn, kh in zip(b.zones, b.k_heat):
+            P = zn.P
+            h = kh / n_z                                             # room heat per W of the body's machine power
+            Q = P["units"] * P["q_unit_w"]
+            margin = Q - (zn.qc_cmd_avg + self._ahead(id(zn), zn.qc_cmd_avg, 0.05 * Q))
+            r_src = min(r_src, margin / h if h > 0 else math.inf)
+        return min(r_src, r_all), r_all
+
+
+def _units(room: float, unit: float, cap: int) -> int:
+    """How many units of unit W fit in room W (cap when the room is unbounded)."""
+    if not math.isfinite(room):
+        return cap
+    return max(0, min(cap, int(room // unit)))
+
+
+def max_body_step(body, cfg, bone):
+    """One decision of the max over one body: every battery that can clips its own line, and the machines and cooling
+    the muscles ask for are granted out of the room the bone has left; with no room, what this brain added goes back at
+    once, never below what the twin runs. Every other muscle is wired, watched and native."""
+    asks = []
+    for i, (p, knob) in enumerate(zip(body.plants, body.knobs)):
+        t = p.template
+        p.override_kind = None
+        if t == "energy_storage" and knob in ("setpoint", "capacity"):
+            p.override = max_hold(p, cfg, knob)
+            p.override_kind = "clip"
+            continue
+        a = max_ask(p, knob, cfg, bone.twins.get(i))
+        if a is None:
+            p.override = {}
+            continue
+        asks.append((p, a))
+    r_src, r_all = bone.room()
+    if r_src < 0.0 or r_all < 0.0:
+        # no room on a line: every pool goes to exactly its twin's machines at once (floor and ceiling both at native's
+        # count: what this brain added is handed back, nothing native has is taken), and no room is cooled below the
+        # operator's setpoint, until the bone has room again
+        for p, a in asks:
+            if a["line"] == "src":
+                base = float(max(a["base"], p.P["n_min"]))
+                extra = a["cur"] > a["base"]
+                p.override = ({"floor": base, "cap": base} if extra else
+                              ({"floor": base} if base > p.P["n_min"] else {}))
+            else:
+                p.override = {}
+        return
+    for p, a in sorted(asks, key=lambda pa: -(pa[1].get("want", 0) - max(pa[1].get("cur", 0), pa[1].get("base", 0)))):
+        if a["line"] == "src":
+            now = max(a["cur"], a["base"])
+            add = max(0, a["want"] - now)
+            can = min(_units(r_src, a["unit_w"], add), _units(r_all, a["unit_w"], add)) if add else 0
+            floor = max(now + can if add else a["want"], a["base"])
+            r_src -= can * a["unit_w"]
+            r_all -= can * a["unit_w"]
+            p.override = {"floor": float(floor)} if floor > p.P["n_min"] else {}
+        elif a["cost"] <= r_all:
+            p.override = {"setpoint": a["x"]}
+            r_all -= a["cost"]
+        else:
+            p.override = {}                                          # the pull-down waits for room
+
+
 def compass_apply_v5(plant, knob, cfg, dt=1.0, tau=3.0):
+    if cfg.dial == "max":
+        return max_apply(plant, knob, cfg)
     lv = lever_v5(plant, knob, cfg)
     if lv is None:
         plant.override = {}
@@ -684,19 +963,28 @@ def compass_apply_v5(plant, knob, cfg, dt=1.0, tau=3.0):
     return plant.override
 
 
-# The engine's default v5 configuration: the no-harm setting (every muscle equal or better than native on the modelled
-# plants). The autoscaler's target held at the operator's; the step-to-step estimator; a fall while Omni held back raises
-# that plant's cushion floor; the hybrid never behind the earlier law; each plant remembers its own physics; motion speed
-# and effort never below what the axis needs; a process loop read against its band's edge, its setpoint never closer to
-# that edge than its own largest swing (every loop free, generators included: a generating unit's steam, speed or gate loop
-# eased inside its band serves the same load); a request pool never capped below the largest demand jump; a cooled zone
-# never warmer than its cooling can recover; a power cap only on a pool whose response line outlasts a decision, never
-# below the largest demand jump or past the line; the battery shave (round-trip energy for service) and a cloud machine
-# pool's hand-back held native.
-V5CFG = Cfg(target_free=False, est=2, learn_fall=0.1, hybrid=True, physics_memory=True, motion_safe=True, band=True,
-            drop_guard=True, hole_guard=True, loop_reach=True, power_cap=True)
+# The tune-down setting (the dial turned from the max down to save): native's work on the least energy, every muscle equal
+# or better than native on the modelled plants. The autoscaler's target held at the operator's; the step-to-step
+# estimator; a fall while Omni held back raises that plant's cushion floor; the hybrid never behind the earlier law; each
+# plant remembers its own physics; motion speed and effort never below what the axis needs; a process loop read against
+# its band's edge, its setpoint never closer to that edge than its own largest swing (generators included); a request pool
+# never capped below the largest demand jump; a cooled zone never warmer than its cooling can recover; a power cap only on
+# a pool whose response line outlasts a decision, never below the largest demand jump or past the line; the battery shave
+# and a cloud machine pool's hand-back held native.
+V5SAVE = Cfg(dial="save", target_free=False, est=2, learn_fall=0.1, hybrid=True, physics_memory=True, motion_safe=True,
+             band=True, drop_guard=True, hole_guard=True, loop_reach=True, power_cap=True)
+
+# The engine's default: the max (the founder's order of 12 October: "We're going to show a benchmark that shows it to the
+# max. And we're going to show one native... anybody can tune it from the max down"). Every muscle pushed to its own limit
+# for the most work, faster; the energy that takes is power given.
+V5CFG = Cfg(dial="max", window=20, edge_util=0.95, line_z=3.09)
 
 
 def apply_v5(plant, knob):
-    """compass_apply_v5 with the engine's default v5 configuration (V5CFG)."""
+    """compass_apply_v5 with the engine's default v5 configuration (V5CFG, the max)."""
     return compass_apply_v5(plant, knob, V5CFG)
+
+
+def apply_v5_save(plant, knob):
+    """compass_apply_v5 turned down to save (V5SAVE)."""
+    return compass_apply_v5(plant, knob, V5SAVE)

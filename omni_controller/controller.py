@@ -10,11 +10,13 @@ Modes
 Laws (--law)
   governor  (default) the engine's allocation law sets the HPA target (rho*) and the closure law or the governor sizes the pool
   compass      the compass law (omnicompass/compass_law.py) holds the service in its band, read as the GPU compass reads it: the mean
-            response time of the latency window between the bare service time (a tenth of --slo-ms) and --slo-ms, held at
-            the v5 edge (omnicompass/edge.py): the balance point moves with the service's own risk, 1 - (climb x reaction +
-            3.09 x wobble), never below --compass-center (0.4, the earlier law's own point) unless a breach while machines
-            were given back has taught it otherwise, and the wall moves out with the reaction part of that cushion; p95 at
-            or past the SLO, a blind sense or pods waiting for a place read as past the wall. Its push and pull move two levers: each HPA's CPU target inside its cover (from 60% of the
+            response time of the latency window between the bare service time (a tenth of --slo-ms) and --slo-ms. At the
+            max (--dial max, the default) the balance point stands at --compass-center (0.3: well inside the line, so every
+            rush finds its pods already there) and no machine the cluster had on its own is ever given back; at the
+            tune-down (--dial save) it is held at the v5 edge (omnicompass/edge.py: the balance point moves with the
+            service's own risk, 1 - (climb x reaction + 3.09 x wobble), never below 0.4 unless a breach while machines were
+            given back has taught it otherwise) and the verdict below gives machines back; p95 at or past the SLO, a blind
+            sense or pods waiting for a place read as past the wall. Its push and pull move two levers: each HPA's CPU target inside its cover (from 60% of the
             operator's target up to the operator's own, never tighter than native, so it only ever adds pods and gives them
             back) and the node pool (one machine back only while the force is clearly down, the position below the center
             and the nervous system's release gate open; past the 0.95 wall, one machine up at once). The verdict
@@ -264,17 +266,25 @@ class Controller:
         self.pod_cap = {}              # (ns, name) -> request / limit share: what the HPA's target means in queue terms
         self.compass_law = None
         self.edge = None
+        self.dial = getattr(a, "dial", "max")
         if getattr(a, "law", "governor") == "compass":
             from omnicompass.compass_law import Band, CompassLaw
+            # the max (the default dial): the service held well inside its line (the compass's balance point at
+            # --compass-center, 0.3 at the max: more room than the line, so every rush finds pods already there), no
+            # machine ever given back below what the cluster ran on its own; the tune-down (--dial save): the v5 edge
+            # moves the balance point toward the line and the verdict gives machines back where the response time allows
+            center = getattr(a, "compass_center", None)
+            if center is None:
+                center = 0.3 if self.dial == "max" else 0.4
             # one decision every --interval s; the service follows a target in about one HPA sync plus a pod start (tau)
-            self.compass_law = CompassLaw(Band(0.0, 1.0, center=getattr(a, "compass_center", 0.4)), dt=a.interval,
+            self.compass_law = CompassLaw(Band(0.0, 1.0, center=center), dt=a.interval,
                              tau=getattr(a, "compass_tau", 60.0), kp=1.0, smooth=0.3)
             self.compass_law.kd *= 3.0                    # the same push as on every realm muscle (realms/compass_arm.py)
-            # the v5 edge: the knob's reaction is the time the service takes to follow it (one HPA sync and a pod start,
-            # --compass-tau), in decisions
+            # the v5 edge (the tune-down only): the knob's reaction is the time the service takes to follow it (one HPA
+            # sync and a pod start, --compass-tau), in decisions
             from omnicompass.edge import Edge
-            self.edge = Edge(react=getattr(a, "compass_tau", 60.0) / a.interval)
-            self.edge_base = getattr(a, "compass_center", 0.4)
+            self.edge = Edge(react=getattr(a, "compass_tau", 60.0) / a.interval) if self.dial == "save" else None
+            self.edge_base = center
             from omnicompass.verdict import Verdict
             self.verdict = Verdict(tolerance=getattr(a, "allow", 0.02), min_samples=getattr(a, "verdict_samples", 200),
                                    probe_every=getattr(a, "verdict_every", 10), recheck=getattr(a, "verdict_recheck", 120),
@@ -692,6 +702,8 @@ class Controller:
             self.verdict.observe(self._new_latencies())
             calm = self.compass_law.p < self.compass_law.band.wall_high and s["pending"] == 0 and not breach_now
             deepest, trial, ev = self.verdict.tick(calm)
+            if self.dial == "max":
+                deepest, trial = 0, False          # the max never gives back a machine the cluster had on its own
             if ev:
                 self.audit({"verdict": ev, "state": self.verdict.state, "machines_given_back_allowed": self.verdict.allowed,
                             "machines_native": self.n_native})
@@ -730,9 +742,10 @@ class Controller:
                     self.audit({"cruise": "off", "pending": s["pending"]})
             if self.cruise:
                 rec_n = self.a.max_nodes
-        # the emergency brake (rule 8): nothing waiting, no breach, and the sensed services' demand at zero: straight to
-        # the floor in one move. Every check of the release gate still holds except one machine per decision
-        eb = float(getattr(self.a, "brake_demand", 0.05) or 0)
+        # idle (rule 8: one pedal, lifted all the way): nothing waiting, no breach, and the sensed services' demand at
+        # zero: straight to the breathing floor in one move (the body idles, never at zero, and wakes straight to the
+        # work when it comes). Every check of the release gate still holds except one machine per decision
+        eb = float(getattr(self.a, "idle_demand", 0.05) or 0)
         if eb > 0 and self.a.mode == "nodepool" and not self.cruise and rec_n > self.a.min_nodes and s["pending"] == 0 \
                 and not breach_now and not scaling_up:
             sensed = [h for h in s["hpas"] if self._sensed(h)]
@@ -746,7 +759,7 @@ class Controller:
                 while low < rec_n and s["used_m"] / max(low * per_node, 1e-9) > rho:
                     low += 1
                 if low < rec_n:
-                    self.audit({"emergency_brake": {"from": rec_n, "to": low, "demand": round(max(dem), 3), "at_idle": idle}})
+                    self.audit({"idle_floor": {"from": rec_n, "to": low, "demand": round(max(dem), 3), "at_idle": idle}})
                     rec_n = low
         out = self.audit({"authority": {"calm": round(auth["scalars"]["calm"], 3), "execute": auth["execute"],
                                         "contract": {o: v.get("contract") for o, v in auth["organs"].items()},
@@ -896,9 +909,10 @@ def parser():
     ap.add_argument("--cruise-after", type=int, default=int(os.environ.get("CRUISE_AFTER", 2)),
                     help="decisions in a row with work waiting for a place before cruise puts every machine in service "
                          "(and decisions with the line empty before it ends); 0 turns cruise off")
-    ap.add_argument("--brake-demand", type=float, default=float(os.environ.get("BRAKE_DEMAND", 0.05)),
-                    help="demand (CPU in units of one pod's request) at or under which, nothing waiting and no breach, "
-                         "the emergency brake takes the machines straight to the floor; 0 turns it off")
+    ap.add_argument("--idle-demand", "--brake-demand", dest="idle_demand", type=float,
+                    default=float(os.environ.get("IDLE_DEMAND", os.environ.get("BRAKE_DEMAND", 0.05))),
+                    help="the sensed services' demand (in pods' worth of CPU) at or under which the pool idles: the "
+                         "machines go straight to the breathing floor (one pedal lifted all the way); 0 turns it off")
     ap.add_argument("--coast-step", type=int, default=int(os.environ.get("COAST_STEP", 25)),
                     help="the most the HPA target may ease toward fewer pods in one autoscaler window (points of "
                          "utilisation; 0: no limit). Adding pods is never limited")
@@ -915,8 +929,12 @@ def parser():
     ap.add_argument("--verdict-every", type=int, default=10, help="decisions between trials")
     ap.add_argument("--verdict-recheck", type=int, default=120, help="decisions before a refused machine is tried again")
     ap.add_argument("--compass-tau", type=float, default=60.0, help="seconds the service takes to follow a lever (the compass's damping)")
-    ap.add_argument("--compass-center", type=float, default=0.4,
-                    help="where the compass holds the service (0 the bare service time, 1 the SLO); 0.4, as the GPU governor")
+    ap.add_argument("--compass-center", type=float, default=None,
+                    help="where the compass holds the service (0 the bare service time, 1 the SLO); default 0.3 at the max, "
+                         "0.4 at the tune-down")
+    ap.add_argument("--dial", choices=["max", "save"], default=os.environ.get("OMNI_DIAL", "max"),
+                    help="max (default): the most work, faster, never a machine given back below the cluster's own; save: "
+                         "the tune-down (the v5 edge toward the line, machines given back where the response time allows)")
     ap.add_argument("--replica-ceiling", type=int, default=0,
                     help="the most replicas the operator lets Omni-Compass raise a sensed HPA's cap to while it binds "
                          "(compass law; 0, the default: the operator's cap is never moved)")
