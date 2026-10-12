@@ -11,9 +11,10 @@ name: six-kube
 on:
   workflow_dispatch:
     inputs:
-      reps: {description: "Paired repetitions per organism at each size, in the order of sizes", default: "5,5,3"}
-      sizes: {description: "Copies of each organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "10,100,1000"}
-      durations_s: {description: "Measured seconds per arm at each size (240 organism steps; a bigger organism needs a longer step)", default: "960,1440,2880"}
+      reps: {description: "Paired repetitions per organism at each size, in the order of sizes", default: "10,10,10,10"}
+      rep_first: {description: "The first repetition of this dispatch (1-based), so 1,000 runs per square can be cut into dispatches under GitHub's 256 jobs", default: "1"}
+      sizes: {description: "Copies of each organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "1,10,100,1000"}
+      durations_s: {description: "Measured seconds per arm at each size (240 organism steps; a bigger organism needs a longer step)", default: "960,960,1440,2880"}
       arms: {description: "Arms, in rotation order", default: "native compass"}
       load_max: {description: "Load-generator replicas at each organism's peak demand", default: "6"}
       loadgen: {description: "closed (waits for answers) or open (fixed rate, equal work)", default: "open"}
@@ -30,13 +31,14 @@ jobs:
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import json
-          sizes = [int(x) for x in "${{ github.event.inputs.sizes || '10,100,1000' }}".split(",")]
-          reps = [int(x) for x in "${{ github.event.inputs.reps || '5,5,3' }}".split(",")]
-          durs = [int(x) for x in "${{ github.event.inputs.durations_s || '960,1440,2880' }}".split(",")]
+          sizes = [int(x) for x in "${{ github.event.inputs.sizes || '1,10,100,1000' }}".split(",")]
+          reps = [int(x) for x in "${{ github.event.inputs.reps || '10,10,10,10' }}".split(",")]
+          r0 = int("${{ github.event.inputs.rep_first || '1' }}")
+          durs = [int(x) for x in "${{ github.event.inputs.durations_s || '960,960,1440,2880' }}".split(",")]
           orgs = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
                   "tower", "stack"]
           cells = [{"organism": o, "size": sz, "rep": r, "duration": durs[min(i, len(durs) - 1)]}
-                   for i, sz in enumerate(sizes) for o in orgs for r in range(1, reps[min(i, len(reps) - 1)] + 1)]
+                   for i, sz in enumerate(sizes) for o in orgs for r in range(r0, r0 + reps[min(i, len(reps) - 1)])]
           print("cells=" + json.dumps(cells))
           PY
       - name: Legal notice at the end of this job's report
@@ -46,7 +48,7 @@ jobs:
     needs: plan
     strategy:
       fail-fast: false
-      max-parallel: 16   # 20 runners on this plan: 4 stay free for Azure and the big organisms (one job each)
+      max-parallel: 64   # GitHub ran 86 of this repository's jobs at once on 12 Oct; several dispatches share the rest
       matrix:
         cell: "${{ fromJSON(needs.plan.outputs.cells) }}"
     runs-on: ubuntu-latest

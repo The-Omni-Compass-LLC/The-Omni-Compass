@@ -65,14 +65,20 @@ PRESETS = {
                      pv_w=200e3, p_lim_w=450e3, reserve=0.2, calm=0.5, stress=0.1, flex=0.10, soc0=0.5,
                      start_h=0.0, noise=0.04),
     # motion_axis ---------------------------------------------------------------------------------------------
+    # s_peak (Omni v5, the max): the axis's own peak speed against the everyday setting native runs (v_max, a_max are
+    # the everyday profile), the head the machine itself has above it. A joint's programmed speed and a multirotor's
+    # default speed sit below what the drive and the airframe can do (1.25); a road vehicle's everyday acceleration below
+    # its drive's peak (1.25); a ship's service speed below its engine's maximum continuous rating (1.15). None where the
+    # everyday setting is the limit itself: a reaction wheel's saturation, a train's line speed, an elevator's rated
+    # speed under its overspeed governor (s_peak absent: 1.0, native already at the limit). Native never reads it.
     "robot_joint": dict(dt_dec=1.0, dt=0.004, J=0.05, b=0.02, kt=0.5, R=0.8, tau_max=12.0, p_idle=20.0, D=1.5,
                         v_max=3.0, a_max=15.0, dwell=0.2, tol=0.01, e_max=0.05, c_th=300.0, r_th=1.2, t_amb=30.0,
                         t_lim=90.0, kp=400.0, kd=8.0, ki=100.0, i_max=0.05, task_rate=0.6, dist=2.0,
-                        load_bias=0.0, regen=0.0, deadline_s=30.0),
+                        load_bias=0.0, regen=0.0, deadline_s=30.0, s_peak=1.25),
     "flight_axis": dict(dt_dec=2.0, dt=0.01, J=2.0, b=0.5, kt=0.53, R=0.15, tau_max=40.0, p_idle=30.0, D=10.0,
                         v_max=3.0, a_max=2.0, dwell=2.0, tol=0.1, e_max=0.5, c_th=400.0, r_th=0.2, t_amb=25.0,
                         t_lim=80.0, kp=30.0, kd=12.0, ki=10.0, i_max=0.5, task_rate=0.05, dist=4.0,
-                        load_bias=19.6, regen=0.0, deadline_s=120.0),
+                        load_bias=19.6, regen=0.0, deadline_s=120.0, s_peak=1.25),
     "reaction_wheel": dict(dt_dec=10.0, dt=0.02, J=50.0, b=0.01, kt=0.05, R=2.0, tau_max=0.2, p_idle=5.0, D=0.5,
                            v_max=0.02, a_max=0.004, dwell=5.0, tol=0.002, e_max=0.01, c_th=100.0, r_th=5.0,
                            t_amb=20.0, t_lim=70.0, kp=12.5, kd=40.0, ki=0.5, i_max=0.01, task_rate=0.01,
@@ -80,7 +86,7 @@ PRESETS = {
     "ev_traction": dict(dt_dec=5.0, dt=0.02, J=1600.0, b=25.0, kt=40.0, R=0.05, tau_max=6000.0, p_idle=300.0,
                         D=400.0, v_max=14.0, a_max=2.0, dwell=10.0, tol=1.0, e_max=3.0, c_th=5000.0, r_th=0.05,
                         t_amb=25.0, t_lim=120.0, kp=800.0, kd=1800.0, ki=20.0, i_max=5.0, task_rate=1.0 / 60.0,
-                        dist=300.0, load_bias=0.0, regen=0.6, deadline_s=300.0),
+                        dist=300.0, load_bias=0.0, regen=0.6, deadline_s=300.0, s_peak=1.25),
     # process_loop --------------------------------------------------------------------------------------------
     "process": dict(dt=10.0, sub=10, tau=120.0, K=1.0, theta=5.0, sp=0.6, mid=0.6, half=0.2, calm=0.5, stress=0.6,
                     u_max=2.0, aff=3.0, p_max_w=30e3, kp=2.0, ki=0.02, d_mean=0.3, d_amp=0.3, noise=0.02),
@@ -139,7 +145,7 @@ PRESETS = {
                               p_idle=50000.0, D=200.0, v_max=10.0, a_max=0.05, dwell=30.0, tol=2.0, e_max=5.0,
                               c_th=50000.0, r_th=0.002, t_amb=30.0, t_lim=120.0, kp=25000.0, kd=56000.0, ki=100.0,
                               i_max=50.0, task_rate=1.0 / 300.0, dist=50000.0, load_bias=10000.0, regen=0.0,
-                              deadline_s=1200.0),
+                              deadline_s=1200.0, s_peak=1.15),
     # motion_axis: an elevator hoist (a stiff position loop, a counterweighted load, regeneration on the way down)
     "elevator_hoist": dict(dt_dec=1.0, dt=0.005, J=20.0, b=2.0, kt=8.0, R=0.3, tau_max=2500.0, p_idle=300.0, D=60.0,
                            v_max=8.0, a_max=1.5, dwell=8.0, tol=0.02, e_max=0.2, c_th=2000.0, r_th=0.3, t_amb=30.0,

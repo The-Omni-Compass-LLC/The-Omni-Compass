@@ -16,22 +16,48 @@ from one muscle to give to another). The dial turns it down: **the tune-down** (
 below) is native's work on the least energy, kept and tested on every muscle.
 
 - **A pool** gets the machines its forecast needs before the rush lands: the recent peak arrivals widened by the largest
-  rise the pool has shown within one machine start, at 95% utilisation, through a floor under its own autoscaler, never
-  fewer than its **twin** runs (the brain's model of native: the same pool under its own autoscaler alone, on the same
-  arrivals). Its power cap and admission stay native: full clock, every request admitted.
+  rise the pool has shown within one machine start, at 95% utilisation, plus any **work waiting in line** cleared within
+  one machine start, through a floor under its own autoscaler, never fewer than its **twin** runs (the brain's model of
+  native: the same pool under its own autoscaler alone, on the same arrivals). The machines it added and no longer needs
+  go back at once (a ceiling at the larger of its need and its twin's count; the autoscaler's own scale-down would hold
+  them for its window). Its power cap and admission stay native: full clock, every request admitted.
 - **A room** is cooled ahead of the heat as it nears its limit or its cooling nears flat out, never warmer than native.
 - **A battery site** clips its line from its charge, native plus: the operator's own reserve while nothing would cross,
   and below it, down to its band's floor, exactly the draw that would cross; a UPS lends only the charge above its outage
   floor.
-- **A motion axis or a process loop** native already runs flat out (full speed, full actuator): wired, watched, native.
-- **The bone.** Inside an organism the body's lines (each site's grid line, each room's cooling) are loaded by the whole
-  body, so the max grants machines and cooling only out of the room the most loaded line has left, one decision ahead
-  (its latest reading plus the larger of 3.09 of its own wobbles and the largest single climb it has shown). With no room,
-  every pool goes at once to exactly its twin's machines (a floor and a ceiling, its maxReplicas, at native's count).
+- **A motion axis alone**, while tasks are waiting, runs at **its own peak speed** (`s_peak`, `realms/presets.py`: the
+  head the machine itself has above the everyday profile native runs: a joint's drive and a multirotor's airframe 1.25, a
+  road vehicle's drive 1.25, a ship's engine to its maximum continuous rating 1.15), never past it, back to the everyday
+  setting at once when its motor passes 80% of its heat rise or its tracking error passes half its line. A reaction
+  wheel's saturation, a train's line speed and an elevator's overspeed governor are their limits: those stay native.
+  Inside a body an axis keeps its everyday speed (see the bone). Torque (effort) limits stay native: in these models a
+  higher one changes nothing.
+- **A process loop** native already runs flat out (the full actuator): wired, watched, native.
+- **At its limit on native.** Every power limit at full, every admission gate open, a loop's actuator at its full range:
+  native already runs these at the top of their range, the max writes nothing, and the tables say so in those words
+  (`native_at_limit`).
+- **The bone.** Inside an organism the body's lines (each site's grid line, each room's cooling and its degrees to its
+  limit) are loaded by the whole body, so the max grants machines and cooling only out of the room the most loaded line
+  has left, one decision ahead (its latest reading plus the larger of 3.09 of its own wobbles and the largest single climb
+  it has shown, counted on the line without the max's own machines: its own steps are not the line's wobble). A machine
+  is started only if the lines can still carry it when it is ready (the climb grown by the square root of its start time:
+  one started and then cancelled only burns its start). A site with flexible load waiting gives its catch-up the room
+  first. With no room, what the max added goes back, as much as the shortfall needs, the pools with the most extra first
+  and the machines started last first, never below a pool's twin. An axis inside a body keeps its everyday speed: at the
+  peak hour the organisms run, the bone almost never has room for its worst case, and in the development runs its peak
+  gave the body nothing while its changed rhythm crossed neighbours at their own limits.
 - **One pedal, no brake.** Push for more, lift off for less; lifting hands the setting back toward native. At idle the
   pool lifts all the way to its breathing floor (two machines) and wakes straight to the work. **The lease**: at 80% of
   every modelled run the brain is cut and the plug walks every setting back to native over 24 decisions (no jump the body
-  must absorb at once); the security kill switch is instant.
+  must absorb at once); a floor that only held a pool at its twin's count adds nothing to walk back and is let go at once
+  (a walking floor would hold machines native had already released). The security kill switch is instant.
+- **Wear** is metered beside the work, never judged: a pool's machine-hours, a room's cooling unit-hours, a battery's kWh
+  cycled, an axis's motor heat (degree-hours above ambient), a loop's actuator duty-hours.
+- **Three loads**, fixed before the preregistered run (seeds 3000-3009): each organism's own load, **the climb** (the load
+  stepping 1 2 3 2 3 4 ..., up to twice its own), and **the line** (`LINE` in `realms/harness.py`: work already waiting
+  when the run starts, a quarter of the work the run itself brings; a pool's jobs, an axis's tasks, a site's held-over
+  flexible load; a room's heat and a loop's demand cannot wait and have none). Every muscle alone runs its own load and
+  the line; the organisms run all three. Speed is judged where there is a line: the arm that clears it sooner is faster.
 - **The live controllers** carry the same dial (`--dial max`, the default): the Kubernetes controller holds the service
   well inside its line (the compass at 0.3) and never gives back a machine the cluster had on its own; the GPU compass
   keeps the card's clock ceiling at the top while it serves (the card already runs flat out on its own power limit).

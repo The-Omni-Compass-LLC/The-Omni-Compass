@@ -55,14 +55,40 @@ CLIMB = (1, 2, 3, 2, 3, 4, 5, 6, 5, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 4, 3, 2, 1, 2,
 # its own: the climb reaches it through the body's power swing on its line
 
 
+LINE = 0.25       # the line: work already waiting when the run starts, a quarter of the work the run itself brings (the
+                  # founder's order of 12 October: work waiting in line, so the most each arm can clear shows). A pool's
+                  # line is jobs submitted before the start (its machines take them from what the requests leave them),
+                  # an axis's is tasks queued, a site's is flexible load held over; a room's heat and a loop's demand
+                  # cannot wait, so they have none. Both arms of a seed start with the same line. Fixed before any
+                  # preregistered run (docs/OMNI_V5.md, the max)
+
+
 def climb_level(k: int, steps: int) -> float:
     """The climb's load multiplier at decision k of steps (level / 4)."""
     return CLIMB[min(len(CLIMB) - 1, k * len(CLIMB) // steps)] / 4.0
 
 
+def put_line(p):
+    """Put the line on one plant (in place): a quarter of its own run's work, waiting when the run starts."""
+    P = p.P
+    if p.template == "compute_pool":
+        p.B = p.line0 = LINE * sum(p.lam) * P["dt"]
+    elif p.template == "motion_axis":
+        n = int(round(LINE * sum(p.arrivals)))
+        p.backlog += n
+        p.waits = [0.0] * n + p.waits
+        p.line_n = n
+    elif p.template == "energy_storage":
+        p.line_e = LINE * P["flex"] * sum(p.load) * P["dt"]
+        p.deferred_j += p.line_e
+    return p
+
+
 def scale_load_plant(p, profile="climb"):
-    """Put the climb on one plant's work demand (in place)."""
-    steps = ORGANISM_STEPS
+    """Put a load on one plant's work demand (in place): the climb, the line, or a constant multiple."""
+    if profile == "line":
+        return put_line(p)
+    steps = p.steps
     m = [climb_level(k, steps) for k in range(steps)] if profile == "climb" else [float(profile)] * steps
     if p.template == "compute_pool":
         p.lam = [x * m[k] for k, x in enumerate(p.lam)]
@@ -76,7 +102,7 @@ def scale_load_plant(p, profile="climb"):
 
 
 def scale_load(body, profile="climb"):
-    """Put the climb on a body's work demand (in place; every arm of a seed gets the same climb)."""
+    """Put a load on a body's work demand (in place; every arm of a seed gets the same load)."""
     body.load = profile
     for p in body.plants:
         scale_load_plant(p, profile)
@@ -191,6 +217,9 @@ def walk_back(plant, left):
         nat = _native_of(plant, key)
         if nat is None or left <= 1:
             continue
+        if key == "floor" and getattr(plant, "_mx_guard", False):
+            continue        # a floor that only held the pool at native's own count (it added nothing) is let go at once:
+                            # the autoscaler has the pool, and a walking floor would hold machines native has released
         y = x + (nat - x) / left
         if abs(y - nat) > 1e-9:
             out[key] = y
@@ -225,8 +254,21 @@ def pace(paced_plants, obs, auth):
                 return
 
 
-def run_muscle_arm(row, seed, arm):
+def line_left(plant):
+    """The share of a plant's line still waiting at the end (0: cleared; None: the plant had no line)."""
+    if getattr(plant, "line_n", 0):
+        return max(0, plant.line_n - plant.line_done) / plant.line_n
+    if getattr(plant, "line_e", 0.0):
+        return max(0.0, plant.deferred_j) / plant.line_e
+    if plant.template == "compute_pool" and getattr(plant, "line0", 0.0):
+        return plant.B / plant.line0
+    return None
+
+
+def run_muscle_arm(row, seed, arm, load=None):
     plant = make_plant(row, seed)
+    if load is not None:
+        scale_load_plant(plant, load)
     knob = row["knob"]
     if arm == FIXED:
         for k in range(plant.steps):
@@ -242,6 +284,8 @@ def run_muscle_arm(row, seed, arm):
     last = None
     restore_ok = True
     twin = make_plant(row, seed) if arm == "v5" else None            # the brain's model of native (the max's floor)
+    if twin is not None and load is not None:
+        scale_load_plant(twin, load)
     for k in range(plant.steps):
         if arm in ("compass", "v5", "v5save"):
             apply = LAWS[arm]
@@ -279,6 +323,9 @@ def run_muscle_arm(row, seed, arm):
     plant.finalize()
     m = dict(plant.m)
     m.update(writes=writes, after_kill_writes=after_kill_writes, restore_ok=restore_ok and after_kill_writes == 0)
+    left = line_left(plant)
+    if left is not None:                     # the line: the decision it was cleared at (the run's length if it was not)
+        m.update(line_left=left, line_k=plant.line_k if plant.line_k is not None else plant.steps)
     return m
 
 

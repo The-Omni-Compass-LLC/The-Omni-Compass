@@ -27,9 +27,9 @@ WTOL = 1e-4          # work may not fall below native beyond rounding
 CAT = str(ROOT / "realms" / "catalog_v5.csv")
 
 
-def _harms(row, arm):
-    nat = H.run_muscle_arm(row, SEED, "native")
-    got = H.run_muscle_arm(row, SEED, arm)
+def _harms(row, arm, load=None):
+    nat = H.run_muscle_arm(row, SEED, "native", load)
+    got = H.run_muscle_arm(row, SEED, arm, load)
     harms = []
     if arm == "v5save" and got["energy_j"] > nat["energy_j"] * (1 + ETOL) + 1e-9:
         harms.append(f"energy +{got['energy_j'] / nat['energy_j'] - 1:.4%}")
@@ -39,13 +39,17 @@ def _harms(row, arm):
         harms.append(f"over the line {got['viol'] - nat['viol']:+d}")
     if not got["restore_ok"]:
         harms.append("not handed back by the lease")
+    if "line_k" in nat and got["line_k"] > nat["line_k"]:
+        harms.append(f"the line cleared later ({nat['line_k']} -> {got['line_k']})")
     return harms, got["writes"]
 
 
-def _all_muscles(arm):
+def _all_muscles(arm, load=None, templates=None):
     bad, acted = [], 0
     for row in H.catalog(CAT):
-        harms, writes = _harms(row, arm)
+        if templates and row["template"] not in templates:
+            continue
+        harms, writes = _harms(row, arm, load)
         acted += int(writes > 0)
         if harms:
             bad.append(f"{row['muscle_id']} {row['family']}/{row['muscle']} ({row['knob']}): {', '.join(harms)}")
@@ -56,6 +60,37 @@ def test_max_does_no_harm_to_any_muscle_alone():
     bad, acted = _all_muscles("v5")
     assert not bad, "the max harmed muscles vs native:\n" + "\n".join(bad[:30])
     assert acted > 0, "the max never acted on any muscle (silent no-op)"
+
+
+def test_max_does_no_harm_with_work_waiting_in_line():
+    # every plant with a line (pools, axes, battery sites) starts with the same work waiting in both arms: the max does
+    # no less work, is over its line no more often and clears the line no later than native, and it clears some sooner
+    bad, acted = _all_muscles("v5", "line", ("compute_pool", "motion_axis", "energy_storage"))
+    assert not bad, "the max harmed muscles with work waiting in line:\n" + "\n".join(bad[:30])
+    rows = {r["muscle_id"]: r for r in H.catalog(CAT)}
+    nat = H.run_muscle_arm(rows["161"], SEED, "native", "line")      # an inference pool's replicas
+    mx = H.run_muscle_arm(rows["161"], SEED, "v5", "line")
+    assert mx["line_k"] < nat["line_k"] and mx["line_left"] == 0.0, "the max clears an inference pool's line sooner"
+
+
+def test_axis_peak_only_where_the_machine_has_one_and_handed_back():
+    rows = {r["muscle_id"]: r for r in H.catalog(CAT)}
+    joint = H.scale_load_plant(H.make_plant(rows["433"], SEED), "line")   # a robot joint: a drive peak above its profile
+    assert L.max_apply(joint, "capacity", L.V5CFG) == {"capacity": joint.P["s_peak"]}
+    wheel = H.scale_load_plant(H.make_plant(rows["497"], SEED), "line")   # a reaction wheel: its limit is its setting
+    assert L.max_apply(wheel, "capacity", L.V5CFG) == {}
+    got = H.run_muscle_arm(rows["433"], SEED, "v5", "line")
+    assert got["writes"] > 0 and got["restore_ok"], "the joint's peak is used and handed back by the lease"
+    assert L.native_at_limit("motion_axis", "power") and not L.native_at_limit("compute_pool", "capacity")
+
+
+def test_guard_floor_let_go_at_once_at_the_kill():
+    rows = {r["muscle_id"]: r for r in H.catalog(CAT)}
+    pool = H.make_plant(rows["161"], SEED)
+    pool.override, pool._mx_guard = {"floor": 9.0}, True                # held only at the twin's count
+    assert H.walk_back(pool, H.WALK) == {}
+    pool.override, pool._mx_guard = {"floor": 9.0}, False               # machines the max added walk back
+    assert 0 < H.walk_back(pool, H.WALK)["floor"] < 9.0
 
 
 def test_save_dial_does_no_harm_to_any_muscle_alone():
@@ -112,6 +147,9 @@ def test_walk_back_is_gradual_and_complete():
 
 if __name__ == "__main__":
     test_max_does_no_harm_to_any_muscle_alone()
+    test_max_does_no_harm_with_work_waiting_in_line()
+    test_axis_peak_only_where_the_machine_has_one_and_handed_back()
+    test_guard_floor_let_go_at_once_at_the_kill()
     test_save_dial_does_no_harm_to_any_muscle_alone()
     test_max_is_the_default_and_never_shaves()
     test_bone_never_leaves_a_pool_below_its_twin()

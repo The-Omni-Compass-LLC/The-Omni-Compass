@@ -20,9 +20,13 @@ limit and never below native; the energy that takes is shown as power given. Thr
                           rooms have room for
   the climb               the same organisms with their work demand stepping by one, up and down (1 2 3 2 3 4 ..., level
                           4 their own load, level 8 twice it): past what native can carry, so the most each arm can do shows
+  the line                work waiting in line when the run starts (realms/harness.py, LINE: a quarter of the run's own
+                          work), for every muscle alone and every organism: the arm that clears it sooner is faster
 
-Judged on work and on time over the line (misses); energy is shown, as power given, beside the work it bought. Every plant
-inside each organism that did less work or spent more decisions over its line than native is listed, whatever it shows.
+Judged on work, on speed (the line cleared sooner) and on time over the line (misses); energy is shown, as power given,
+beside the work it bought. A muscle whose knob native already runs at the top of its range is labelled at its limit on
+native. Every plant inside each organism that did less work or spent more decisions over its line than native is listed,
+whatever it shows.
 Writes MUSCLES_V5.csv, REALMS_V5.json, REALMS_V5.md, RUN.json, SHA256SUMS.txt. Evidence class S (modelled). The
 preregistered seeds run only on committed code.
 """
@@ -40,7 +44,9 @@ except ImportError:
     from tools.legal import stamp as _legal_stamp  # pragma: no cover
 
 from realms.harness import (catalog, run_muscle_arm, run_bodies, Body, paired, paired_organism, interval, scale_load,
-                            TOWER, STACK, KILL_AT, WALK)
+                            TOWER, STACK, KILL_AT, WALK, LINE)
+from realms.compass_arm_v5 import native_at_limit
+from realms.presets import PRESETS
 
 PREREG_SEEDS = list(range(3000, 3010))
 REALMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized"]
@@ -48,8 +54,12 @@ NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomou
          "energy_facility_industrial": "Energy / Facility / Industrial",
          "distribution_specialized": "Distribution / Specialized", STACK: "The four stacked, every shared muscle in each",
          TOWER: "The whole tower, every muscle once"}
-LABELS = ["MORE WORK AND FEWER MISSES", "MORE WORK", "FEWER MISSES", "SAME AS NATIVE", "MIXED", "WORSE", "INVALID"]
-LOADS = {"normal": "the organism's own load", "climb": "the climb (1 2 3 2 3 4 ..., level 4 = own load, 8 = twice it)"}
+GAINS = ["MORE WORK", "FASTER", "FEWER MISSES"]
+KINDS = ["BETTER", "SAME AS NATIVE", "AT ITS LIMIT ON NATIVE", "MIXED", "WORSE", "INVALID"]
+LOADS = {"normal": "the organism's own load", "climb": "the climb (1 2 3 2 3 4 ..., level 4 = own load, 8 = twice it)",
+         "line": f"work waiting in line (a {LINE:.0%} share of the run's own work waiting when it starts)"}
+MUSCLE_LOADS = {"normal": "its own load", "line": f"work waiting in line ({LINE:.0%} of the run's own work at the start)"}
+ORGANISM_LOADS = ["normal", "climb", "line"]
 # the engine and the files it stands on; the engine fingerprint is tools/omni_version.py (OMNI_V5.json)
 FROZEN = ["realms", "omnicompass", "tools/run_realms_v5.py"]
 
@@ -65,48 +75,98 @@ def tree_sha(paths):
     return h.hexdigest()
 
 
-def label_max(per_seed, valid=True):
-    """The max's label by rule, judged on work and on time over the line (95% intervals over seeds):
-      MORE WORK AND FEWER MISSES   both clear of zero the right way
-      MORE WORK / FEWER MISSES     one clear the right way, the other not clear the wrong way
-      SAME AS NATIVE               neither clear of zero (no difference beyond the noise)
-      MIXED                        one clear the right way, the other clear the wrong way
-      WORSE                        one clear the wrong way and nothing clear the right way
-      INVALID                      a knob not handed back to native by the lease"""
-    if not valid:
-        return "INVALID"
+def gains_losses(per_seed):
+    """What the max did against native, by rule (95% intervals over seeds, each clear of zero): more work (or less),
+    faster (the line cleared sooner, or later; only where there is a line) and fewer misses (or more)."""
     w = interval([c["work"] for c in per_seed])
     v = interval([c["viol_pp"] for c in per_seed])
-    more, less = w[1] > 1e-12, w[2] < -1e-12
-    fewer, extra = v[2] < -1e-12, v[1] > 1e-12
-    good, bad = more or fewer, less or extra
-    if bad:
-        return "MIXED" if good else "WORSE"
-    if more and fewer:
-        return "MORE WORK AND FEWER MISSES"
-    if more:
-        return "MORE WORK"
-    if fewer:
-        return "FEWER MISSES"
-    return "SAME AS NATIVE"
+    gains = {"MORE WORK": w[1] > 1e-12, "FEWER MISSES": v[2] < -1e-12}
+    losses = {"LESS WORK": w[2] < -1e-12, "MORE MISSES": v[1] > 1e-12}
+    if all("speed" in c for c in per_seed):
+        s = interval([c["speed"] for c in per_seed])
+        gains["FASTER"], losses["SLOWER"] = s[2] < -1e-12, s[1] > 1e-12
+    return [g for g in GAINS if gains.get(g)], [l for l, x in losses.items() if x]
+
+
+def label_max(per_seed, valid=True, at_limit=False):
+    """The max's label by rule:
+      the gains, joined (MORE WORK + FASTER + FEWER MISSES, or any of them)   at least one gain and no loss: BETTER
+      SAME AS NATIVE           no difference beyond the noise
+      AT ITS LIMIT ON NATIVE   no difference, and native already runs the knob at the top of its range (the max wrote
+                               nothing: there is nothing above native to give it)
+      MIXED                    a gain and a loss
+      WORSE                    a loss and no gain
+      INVALID                  a knob not handed back to native by the lease"""
+    if not valid:
+        return "INVALID"
+    gains, losses = gains_losses(per_seed)
+    if losses:
+        return "MIXED" if gains else "WORSE"
+    if gains:
+        return " + ".join(gains)
+    return "AT ITS LIMIT ON NATIVE" if at_limit else "SAME AS NATIVE"
+
+
+def kind_of(label):
+    return "BETTER" if label not in KINDS else label
 
 
 def summarize(per_seed):
     return {k: interval([c[k] for c in per_seed]) for k in ("primary", "work", "energy", "viol_pp")}
 
 
-def muscle_job(args):
-    """Native against the max, per muscle, over the seeds. valid: the lease hands every knob back to native after the
-    brain goes silent, proven each seed."""
-    row, seeds = args
-    nat = [run_muscle_arm(row, s, "native") for s in seeds]
-    mx = [run_muscle_arm(row, s, "v5") for s in seeds]
+def decision_s(row):
+    """The length of one decision of a muscle alone, in seconds (its plant's own natural clock)."""
+    P = PRESETS[row["preset"]]
+    return P.get("dt_dec", P.get("dt", 1.0))
+
+
+def muscle_load(row, seeds, load):
+    """Native against the max for one muscle under one load, over the seeds. valid: the lease hands every knob back to
+    native after the brain goes silent, proven each seed. Under the line, speed is how long the line took to clear,
+    omni against native (negative: faster)."""
+    arg = None if load == "normal" else load
+    nat = [run_muscle_arm(row, s, "native", arg) for s in seeds]
+    mx = [run_muscle_arm(row, s, "v5", arg) for s in seeds]
     valid = all(r["restore_ok"] for r in mx)
     per = [paired(a, n) for a, n in zip(mx, nat)]
-    return {"row": row, "valid": valid, "label": label_max(per, valid), "summary": summarize(per), "per_seed": per,
-            "writes": sum(r["writes"] for r in mx) / len(mx),
-            "native_viol_share": sum(n["viol"] / n["steps"] for n in nat) / len(nat),
-            "viol_native": sum(n["viol"] for n in nat), "viol_max": sum(m["viol"] for m in mx)}
+    wear = [a["wear"] / n["wear"] - 1.0 for a, n in zip(mx, nat) if n["wear"] > 0]   # shown beside the work, never judged
+    line = None
+    if all("line_k" in n for n in nat):
+        for c, a, n in zip(per, mx, nat):
+            c["speed"] = (a["line_k"] + 1) / (n["line_k"] + 1) - 1.0
+        dmin = decision_s(row) / 60.0
+        line = [sum(n["line_k"] + 1 for n in nat) / len(nat) * dmin, sum(a["line_k"] + 1 for a in mx) / len(mx) * dmin,
+                sum(n["line_left"] for n in nat) / len(nat), sum(a["line_left"] for a in mx) / len(mx)]
+    writes = sum(r["writes"] for r in mx) / len(mx)
+    at_limit = writes == 0 and native_at_limit(row["template"], row["knob"])
+    return {"valid": valid, "label": label_max(per, valid, at_limit), "summary": summarize(per), "per_seed": per,
+            "writes": writes, "native_viol_share": sum(n["viol"] / n["steps"] for n in nat) / len(nat),
+            "viol_native": sum(n["viol"] for n in nat), "viol_max": sum(m["viol"] for m in mx),
+            "steps": sum(n["steps"] for n in nat), "line": line,
+            "wear": sum(wear) / len(wear) if wear else 0.0}
+
+
+def muscle_job(args):
+    """Every load of one muscle, and its label over all of them: a gain under any load and a loss under none is better."""
+    row, seeds = args
+    by = {load: muscle_load(row, seeds, load) for load in MUSCLE_LOADS}
+    valid = all(o["valid"] for o in by.values())
+    gains, losses = set(), set()
+    for o in by.values():
+        g, l = gains_losses(o["per_seed"])
+        gains.update(g); losses.update(l)
+    if not valid:
+        label = "INVALID"
+    elif losses:
+        label = "MIXED" if gains else "WORSE"
+    elif gains:
+        label = " + ".join(g for g in GAINS if g in gains)
+    else:
+        label = ("AT ITS LIMIT ON NATIVE" if all(o["label"] == "AT ITS LIMIT ON NATIVE" for o in by.values())
+                 else "SAME AS NATIVE")
+    return {"row": row, "valid": valid, "label": label, "loads": by,
+            "writes": max(o["writes"] for o in by.values())}
 
 
 def plant_harms(arm, nat, ids):
@@ -141,9 +201,11 @@ def organism_job(args):
     nat = organism_run(name, rows, seed, "native", load)
     mx = organism_run(name, rows, seed, "v5", load)
     vn = sum(p["viol"] for p in nat["plants"]); vm = sum(p["viol"] for p in mx["plants"])
+    wear = [a["wear"] / n["wear"] - 1.0 for a, n in zip(mx["plants"], nat["plants"]) if n["wear"] > 0]
     return name, seed, load, {"max": paired_organism(mx, nat), "restore_ok": mx["restore_ok"],
                               "harms": plant_harms(mx, nat, ids), "viol_native": vn, "viol_max": vm,
-                              "steps": sum(p["steps"] for p in nat["plants"])}
+                              "steps": sum(p["steps"] for p in nat["plants"]),
+                              "wear": sum(wear) / len(wear) if wear else 0.0}
 
 
 def fmt(m, scale=100.0, unit="%"):
@@ -171,23 +233,34 @@ def write_md(out, res, orgs, run):
       "start, at 95% utilisation), never fewer than its twin runs (the brain's model of native: the same pool under its "
       "own autoscaler alone, on the same arrivals); a room is cooled ahead of the heat as it nears its limit or its cooling "
       "nears flat out; a battery's line is clipped from its charge, a UPS lending only the charge above its outage floor. "
-      "A muscle native already runs flat out (full clock, full speed, full actuator) is wired, watched and native: there "
-      "is nothing above native to give it. Nothing is taken from one muscle to give to another; the max never shaves. "
-      "The energy the max takes is reported as **power given**, beside the work and the speed it bought.")
+      "Work waiting in line is cleared within one machine start, and the machines it no longer needs go back at once (never "
+      "below the twin). A muscle native already runs flat out (full clock, full speed, full actuator, nothing turned "
+      "away) is wired, watched and native: there is nothing above native to give it. Nothing is taken from one muscle to "
+      "give to another; the max never shaves. The energy the max takes is reported as **power given**, beside the work "
+      "and the speed it bought.")
+    w("")
+    w(f"**The line.** Under the line load, every plant starts with work already waiting, a {LINE:.0%} share of the work its "
+      "own run brings: a pool's jobs submitted before the start (its machines take them from what the requests leave "
+      "them), an axis's tasks queued, a site's flexible load held over. A room's heat and a loop's demand cannot wait, so "
+      "they have none. Both arms start with the same line; the one that clears it sooner is **faster**.")
     w("")
     w("**The bone.** Inside an organism the max may give only the power the body can carry: a site's grid line and a "
       "room's cooling are loaded by the whole body (the machines' power is heat in every room, the body's power swing is "
       "load on every site's line), so machines and cooling are granted out of the room the most loaded line has left, "
       "read one decision ahead (its latest reading plus the larger of 3.09 of its own step-to-step wobbles and the largest "
-      "single climb it has shown). With no room, every pool goes at once to exactly its twin's machines (a floor and a "
-      "ceiling at native's count: what the max added goes back, nothing native has is taken). The organisms run the hour "
-      "around each battery site's daily peak, where the UPS lines carry most of their rating: the bone is tight there, "
-      "and the max gives only what it can carry.")
+      "single climb it has shown, the wobbles counted on the line without the max's own machines: its own steps are not "
+      "the line's). A site with flexible load waiting gives its catch-up the room first. With no room, what the max added "
+      "goes back, as much as the shortfall needs (the pools holding the most extra machines first, the machines started "
+      "last first), never below a pool's twin: nothing native has is taken. The organisms run the hour around each "
+      "battery site's daily peak, where the UPS lines carry most of their rating: the bone is tight there, and the max "
+      "gives only what it can carry.")
     w("")
     w(f"**The lease.** At {int(KILL_AT * 100)}% of every run the brain is cut; the plug walks every setting back to "
       f"native over {WALK} decisions (a jump the body would have to absorb at once is the swing the founder ordered "
       "gone), and the run goes on native until it ends; every knob must be back at the operator's own before then "
-      "(valid). The security kill switch is instant (`omnicompass/master.py`).")
+      "(valid). A floor that only held a pool at its twin's count adds nothing to walk back and is let go at once (a "
+      "walking floor would hold machines native had already released). The security kill switch is instant "
+      "(`omnicompass/master.py`).")
     w("")
     w("These are models; a model's energy is not a meter's, and a plant written by the same people who wrote the law is not "
       "an independent test. What a row shows is whether the max, applied to that knob, helps or hurts the model.")
@@ -197,14 +270,17 @@ def write_md(out, res, orgs, run):
         w("")
         w("Work: the mean over the organism's plants of each plant's work against native's. Misses: the share of plant "
           "decisions over their line, native → omni (the change in misses). Power given: the organism's energy against "
-          "native's. 95% intervals over seeds.")
+          "native's. Wear: the mean over its plants of each plant's wear against native's (machine-hours, cooling "
+          "unit-hours, battery throughput, motor heat, actuator duty), shown beside the work, never judged. 95% intervals "
+          "over seeds.")
         w("")
-        w("| Organism | Muscles | Label | Work | Misses, native → omni | Misses (pp) | Power given | Work per energy | Valid |")
-        w("|---|---:|---|---:|---|---:|---:|---:|---|")
+        w("| Organism | Muscles | Label | Work | Misses, native → omni | Misses (pp) | Power given | Wear | Work per energy | Valid |")
+        w("|---|---:|---|---:|---|---:|---:|---:|---:|---|")
         for name in [n for n in REALMS + [STACK, TOWER] if n in orgs[load]]:
             o = orgs[load][name]; s = o["summary"]
             w(f"| {NAMES[name]} | {o['n']} | **{o['label']}** | {fmt(s['work'], 100.0)} | {misses_line(o['totals'])} | "
-              f"{fmt(s['viol_pp'], 1.0, '')} | {fmt(s['energy'])} | {fmt(s['primary'])} | {'yes' if o['valid'] else 'NO'} |")
+              f"{fmt(s['viol_pp'], 1.0, '')} | {fmt(s['energy'])} | {o['wear'] * 100:+.2f}% | {fmt(s['primary'])} | "
+              f"{'yes' if o['valid'] else 'NO'} |")
         w("")
     w("## Inside the organisms: every plant that did worse than native")
     w("")
@@ -221,51 +297,77 @@ def write_md(out, res, orgs, run):
     w("")
     w("## Every muscle alone, by home realm")
     w("")
-    w("| Realm | Muscles | " + " | ".join(LABELS) + " |")
-    w("|---|---:|" + "---:|" * len(LABELS))
+    w(f"Each muscle runs under {len(MUSCLE_LOADS)} loads, " + " and ".join(f"{v} ({k})" for k, v in MUSCLE_LOADS.items())
+      + ". **Better**: at least one gain beyond the noise under some load (more work, faster: the line cleared sooner, "
+      "fewer misses) and no loss under any. **At its limit on native**: native already runs the knob at the top of its "
+      "range (full clock, full speed, full torque, full battery power, nothing paced or turned away), so the max has "
+      "nothing above native to give it and writes nothing. **Same as native**: the max acted or could, and the result is "
+      "no different beyond the noise (native already did all the work that came and was almost never over its line).")
+    w("")
+    w("| Realm | Muscles | Better | of them: more work | faster | fewer misses | Same as native | At its limit on native | Mixed | Worse | Invalid |")
+    w("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
+
+    def count_row(rs):
+        c = Counter(kind_of(r["label"]) for r in rs)
+        g = [sum(1 for r in rs if kind_of(r["label"]) == "BETTER" and x in r["label"]) for x in GAINS]
+        return [len(rs), c.get("BETTER", 0), *g, c.get("SAME AS NATIVE", 0), c.get("AT ITS LIMIT ON NATIVE", 0),
+                c.get("MIXED", 0), c.get("WORSE", 0), c.get("INVALID", 0)]
     for realm in REALMS:
-        rs = [r for r in res if r["row"]["realm"] == realm]
-        c = Counter(r["label"] for r in rs)
-        w(f"| {NAMES[realm]} | {len(rs)} | " + " | ".join(str(c.get(l, 0)) for l in LABELS) + " |")
-    c = Counter(r["label"] for r in res)
-    w(f"| **All** | {len(res)} | " + " | ".join(f"**{c.get(l, 0)}**" for l in LABELS) + " |")
+        w(f"| {NAMES[realm]} | " + " | ".join(str(x) for x in count_row([r for r in res if r["row"]["realm"] == realm])) + " |")
+    w("| **All** | " + " | ".join(f"**{x}**" for x in count_row(res)) + " |")
     w("")
-    w("## Every muscle alone, by kind of plant and knob")
-    w("")
-    w("| Plant | Knob | Muscles | Omni acts on | Misses, native → omni | Work | Power given |")
-    w("|---|---|---:|---:|---|---:|---:|")
-    groups = defaultdict(list)
-    for r in res:
-        groups[(r["row"]["template"], r["row"]["knob"])].append(r)
-    for (t, k), rs in sorted(groups.items()):
-        steps = sum(len(r["per_seed"]) for r in rs)
-        vn = sum(r["viol_native"] for r in rs); vm = sum(r["viol_max"] for r in rs)
-        share = lambda v: 100.0 * v / max(1, sum(r["steps_total"] for r in rs))
-        wk = sum(r["summary"]["work"][0] for r in rs) / len(rs)
-        en = sum(r["summary"]["energy"][0] for r in rs) / len(rs)
-        w(f"| {t} | {k} | {len(rs)} | {sum(1 for r in rs if r['writes'] > 0)} | {share(vn):.2f}% → {share(vm):.2f}% | "
-          f"{wk * 100:+.3f}% | {en * 100:+.2f}% |")
-    w("")
+    for load, what in MUSCLE_LOADS.items():
+        w(f"## Every muscle alone under {what}, by kind of plant and knob")
+        w("")
+        w("Misses: the share of decisions over the line, native → omni. Line: minutes to clear the work waiting at the "
+          "start, native → omni (and the share still waiting at the end, where it did not clear). Power given: energy "
+          "against native's.")
+        w("")
+        w("| Plant | Knob | Muscles | Omni acts on | Better | At its limit on native | Misses, native → omni | Work | Line, native → omni | Power given | Wear |")
+        w("|---|---|---:|---:|---:|---:|---|---:|---|---:|---:|")
+        groups = defaultdict(list)
+        for r in res:
+            groups[(r["row"]["template"], r["row"]["knob"])].append(r)
+        for (t, k), rs in sorted(groups.items()):
+            os_ = [r["loads"][load] for r in rs]
+            vn = sum(o["viol_native"] for o in os_); vm = sum(o["viol_max"] for o in os_)
+            st = max(1, sum(o["steps"] for o in os_))
+            wk = sum(o["summary"]["work"][0] for o in os_) / len(os_)
+            en = sum(o["summary"]["energy"][0] for o in os_) / len(os_)
+            lines = [o["line"] for o in os_ if o["line"]]
+            if lines:
+                ln = (f"{sum(x[0] for x in lines) / len(lines):.1f} → {sum(x[1] for x in lines) / len(lines):.1f} min"
+                      + (f" ({sum(x[2] for x in lines) / len(lines):.0%} → {sum(x[3] for x in lines) / len(lines):.0%} left)"
+                         if any(x[2] > 0 or x[3] > 0 for x in lines) else ""))
+            else:
+                ln = "no line"
+            better = sum(1 for o in os_ if kind_of(o["label"]) == "BETTER")
+            lim = sum(1 for o in os_ if o["label"] == "AT ITS LIMIT ON NATIVE")
+            w(f"| {t} | {k} | {len(rs)} | {sum(1 for o in os_ if o['writes'] > 0)} | {better} | {lim} | "
+              f"{100.0 * vn / st:.2f}% → {100.0 * vm / st:.2f}% | {wk * 100:+.3f}% | {ln} | {en * 100:+.2f}% | "
+              f"{sum(o['wear'] for o in os_) / len(os_) * 100:+.2f}% |")
+        w("")
     w("## No-harm check")
     w("")
     worse = [r for r in res if r["label"] in ("WORSE", "MIXED")]
     acted = sum(1 for r in res if r["writes"] > 0)
-    w(f"- Omni acts on **{acted}** of {len(res)} muscles alone; the rest are wired and watched and held native (native "
-      "already runs them flat out, or their knob gives nothing above native).")
-    w(f"- Muscles alone labelled **WORSE** or **MIXED**: **{len(worse)}**"
+    lim = sum(1 for r in res if r["label"] == "AT ITS LIMIT ON NATIVE")
+    w(f"- Omni acts on **{acted}** of {len(res)} muscles alone. **{lim}** are at their limit on native (the knob is "
+      "already at the top of its range); the rest it could act on show nothing beyond the noise to gain.")
+    w(f"- Muscles alone labelled **WORSE** or **MIXED** under any load: **{len(worse)}**"
       + ("." if not worse else ": " + ", ".join(f"{r['row']['muscle']} ({r['row']['knob']}, {r['label']})" for r in worse) + "."))
     w("- The lease hands every knob back to native before each run ends: "
-      f"{sum(1 for r in res if r['valid'])} of {len(res)} muscles; "
+      f"{sum(1 for r in res if r['valid'])} of {len(res)} muscles under every load; "
       + ", ".join(f"{sum(1 for o in orgs[load].values() if o['valid'])} of {len(orgs[load])} organisms under {load}"
                   for load in run["loads"]) + ".")
     w("")
-    w("## Largest changes (muscles alone, by mean change in misses)")
+    w("## Largest changes (muscles alone, own load, by mean change in misses)")
     w("")
-    srt = sorted(res, key=lambda r: r["summary"]["viol_pp"][0])
-    w("| Muscle | Family | Knob | Label | Misses (pp) | Work | Power given |")
+    srt = sorted(res, key=lambda r: r["loads"]["normal"]["summary"]["viol_pp"][0])
+    w("| Muscle | Family | Knob | Label (all loads) | Misses (pp) | Work | Power given |")
     w("|---|---|---|---|---:|---:|---:|")
     for r in srt[:10] + srt[-10:][::-1]:
-        s = r["summary"]
+        s = r["loads"]["normal"]["summary"]
         w(f"| {r['row']['muscle']} | {r['row']['family']} | {r['row']['knob']} | {r['label']} | {fmt(s['viol_pp'], 1.0, '')} | "
           f"{fmt(s['work'])} | {fmt(s['energy'])} |")
     w("")
@@ -280,12 +382,12 @@ def main(argv=None):
     ap.add_argument("--out", default=str(ROOT / "results" / "realms_v5"))
     ap.add_argument("--catalog", default=str(ROOT / "realms" / "catalog_v5.csv"))   # the v5 muscle set (1,097)
     ap.add_argument("--workers", type=int, default=os.cpu_count() or 2)
-    ap.add_argument("--loads", default="normal,climb", help="organism loads, comma separated (normal, climb)")
+    ap.add_argument("--loads", default=",".join(ORGANISM_LOADS), help="organism loads, comma separated (normal, climb, line)")
     ap.add_argument("--limit", type=int, default=0, help="first N muscles only (a look; never reported)")
     a = ap.parse_args(argv)
     loads = [x for x in a.loads.split(",") if x]
     prereg = (a.seeds == PREREG_SEEDS and not a.limit and a.catalog == str(ROOT / "realms" / "catalog_v5.csv")
-              and loads == ["normal", "climb"])
+              and loads == ORGANISM_LOADS)
     dirty = subprocess.run(["git", "status", "--porcelain", "--"] + FROZEN, cwd=ROOT, capture_output=True,
                            text=True).stdout.strip()
     if prereg and dirty:
@@ -300,7 +402,7 @@ def main(argv=None):
                     if p.is_file() and p.suffix in (".py", ".csv", ".json")]
     run = {"started": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()), "commit": commit, "seeds": a.seeds,
            "preregistered": prereg, "dirty": bool(dirty), "muscles": len(rows), "engine": "omni-v5", "dial": "max",
-           "loads": loads, "kill_at": KILL_AT, "walk": WALK,
+           "loads": loads, "muscle_loads": list(MUSCLE_LOADS), "line": LINE, "kill_at": KILL_AT, "walk": WALK,
            "catalog": str(Path(a.catalog).relative_to(ROOT)) if Path(a.catalog).is_absolute() else a.catalog,
            "frozen_tree_sha256": tree_sha(frozen_files + ["tools/run_realms_v5.py"]),
            "law_sha256": sha(ROOT / "realms" / "compass_arm_v5.py")}
@@ -316,12 +418,6 @@ def main(argv=None):
         for name, seed, load, o in ex.map(organism_job, jobs):
             raw[load][name][seed] = o
     print(f"organisms done in {time.time() - t0:.0f} s", flush=True)
-    for r in res:
-        r["steps_total"] = 0
-    # the steps each muscle alone ran (for the share of decisions over the line in the plant/knob table)
-    from realms.presets import STEPS_SINGLE
-    for r in res:
-        r["steps_total"] = STEPS_SINGLE[r["row"]["template"]] * len(a.seeds)
     orgs = {}
     for load, by_name in raw.items():
         orgs[load] = {}
@@ -339,21 +435,25 @@ def main(argv=None):
             orgs[load][name] = {"n": sum(len(g) for g in groups[name]) if name == STACK else len(groups[name]),
                                 "valid": valid, "label": label_max(per, valid), "summary": summarize(per),
                                 "per_seed": per, "plants_worse": harms,
+                                "wear": sum(o["wear"] for o in runs) / len(runs),
                                 "totals": {"viol_native": sum(o["viol_native"] for o in runs),
                                            "viol_max": sum(o["viol_max"] for o in runs),
                                            "steps": sum(o["steps"] for o in runs)}}
     run["elapsed_s"] = round(time.time() - t0)
     with (out / "MUSCLES_V5.csv").open("w", newline="") as f:
-        cols = ["muscle_id", "family", "muscle", "realm", "template", "preset", "knob", "label", "work", "work_lo",
-                "work_hi", "viol_pp", "viol_pp_lo", "viol_pp_hi", "power_given", "work_per_energy", "writes_per_run",
-                "native_viol_share", "valid"]
+        cols = ["muscle_id", "family", "muscle", "realm", "template", "preset", "knob", "label_all_loads", "load", "label",
+                "work", "work_lo", "work_hi", "viol_pp", "viol_pp_lo", "viol_pp_hi", "line_native_min", "line_omni_min",
+                "power_given", "wear", "work_per_energy", "writes_per_run", "native_viol_share", "valid"]
         wr = csv.writer(f); wr.writerow(cols)
         for r in res:
-            s, row = r["summary"], r["row"]
-            wr.writerow([row["muscle_id"], row["family"], row["muscle"], row["realm"], row["template"], row["preset"],
-                         row["knob"], r["label"], *(f"{x:.5f}" for x in s["work"]), *(f"{x:.3f}" for x in s["viol_pp"]),
-                         f"{s['energy'][0]:.5f}", f"{s['primary'][0]:.5f}", f"{r['writes']:.1f}",
-                         f"{r['native_viol_share']:.4f}", r["valid"]])
+            row = r["row"]
+            for load, o in r["loads"].items():
+                s, ln = o["summary"], o["line"]
+                wr.writerow([row["muscle_id"], row["family"], row["muscle"], row["realm"], row["template"], row["preset"],
+                             row["knob"], r["label"], load, o["label"], *(f"{x:.5f}" for x in s["work"]),
+                             *(f"{x:.3f}" for x in s["viol_pp"]), *((f"{ln[0]:.2f}", f"{ln[1]:.2f}") if ln else ("", "")),
+                             f"{s['energy'][0]:.5f}", f"{o['wear']:.5f}", f"{s['primary'][0]:.5f}", f"{o['writes']:.1f}",
+                             f"{o['native_viol_share']:.4f}", o["valid"]])
     (out / "REALMS_V5.json").write_text(json.dumps({"run": run, "organisms": orgs, "muscles": res}, indent=1) + "\n")
     (out / "RUN.json").write_text(json.dumps(run, indent=1) + "\n")
     write_md(out, res, orgs, run)

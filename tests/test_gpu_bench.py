@@ -441,8 +441,10 @@ def several_cards():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "gpu_workload.py"), "calibrate", "--out", str(d), "--sim",
                         "--calib", "5", "--target-ms", "20"], cwd=ROOT, capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr
+    # the dial turned to save: the tune-down writes each card's wires, so one governor per card writing and handing back
+    # is exercised (at the max a serving card stays at its own top, native already flat out, and nothing is written)
     env = dict(os.environ, NVIDIA_SMI=SMI, SIM="1", GPU="0,1,2", REPS="2", DURATION="5", DRAIN="1", COOLDOWN="0",
-               INTERVAL="1", SLO_MS="200", OUT=str(d / "run"), OMNI_MASTER_OFF=str(d / "OFF"),
+               INTERVAL="1", SLO_MS="200", OUT=str(d / "run"), OMNI_MASTER_OFF=str(d / "OFF"), OMNI_DIAL="save",
                WORKLOAD_CMD=f"{sys.executable} tools/gpu_workload.py run --calib-file {d}/calib.json --out $OUT_DIR --sim "
                             "--duration $DURATION --drain $DRAIN")
     r = subprocess.run(["bash", str(ROOT / "scripts" / "gpu_paired.sh")], cwd=ROOT, env=env, capture_output=True, text=True, timeout=600)

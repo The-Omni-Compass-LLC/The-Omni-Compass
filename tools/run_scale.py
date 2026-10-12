@@ -45,7 +45,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import (catalog, run_organism_arm, run_bodies, Body, paired_organism, summarize, label, STACK,  # noqa: E402
-                            TOWER, organism_name)
+                            TOWER, organism_name, scale_load, LINE)
+from tools.run_realms_v5 import label_max  # noqa: E402  the max's label (work, misses), the v5 arm's rule
 
 ARM, CATALOG, STACK_MODE = "compass", None, "body"       # set by main() (and passed to each worker)
 CATALOGS = {"compass": str(ROOT / "realms" / "catalog.csv"), "v5": str(ROOT / "realms" / "catalog_v5.csv")}
@@ -69,22 +70,40 @@ def rows_for(key, scale, cat=None):
     return [dict(r, muscle_id=r["muscle_id"] + (f"~{c}" if c else "")) for c in range(scale) for r in base]
 
 
-def run_arm(key, scale, seed, arm, cat, stack_mode):
+LOADS = {"normal": "its own load", "climb": "the climb (1 2 3 2 3 4 ..., level 4 = own load, 8 = twice it)",
+         "line": f"work waiting in line ({LINE:.0%} of the run's own work at the start)"}
+
+
+def run_arm(key, scale, seed, arm, cat, stack_mode, load="normal"):
     if organism_name(key) == STACK and stack_mode == "realms":
         bodies = [Body(rows_for(realm, scale, cat), seed) for realm in REALMS]
-        return run_bodies(bodies, arm, [list(range(len(bodies)))])
-    return run_organism_arm(rows_for(key, scale, cat), seed, arm)
+    else:
+        bodies = [Body(rows_for(key, scale, cat), seed)]
+    if load != "normal":
+        for b in bodies:
+            scale_load(b, load)
+    return run_bodies(bodies, arm, [list(range(len(bodies)))])
 
 
 def job(args):
-    key, scale, seed, arm, cat, stack_mode = args
-    nat = run_arm(key, scale, seed, "native", cat, stack_mode)
-    om = run_arm(key, scale, seed, arm, cat, stack_mode)
+    key, scale, seed, arm, cat, stack_mode, load = args
+    nat = run_arm(key, scale, seed, "native", cat, stack_mode, load)
+    om = run_arm(key, scale, seed, arm, cat, stack_mode, load)
     c = paired_organism(om, nat)
     c["restore_ok"] = om["restore_ok"]
     c["energy_native_j"] = sum(p["energy_j"] for p in nat["plants"])
     c["energy_omni_j"] = sum(p["energy_j"] for p in om["plants"])
+    c["misses_native"] = sum(p["viol"] for p in nat["plants"])
+    c["misses_omni"] = sum(p["viol"] for p in om["plants"])
+    c["decisions"] = sum(p["steps"] for p in nat["plants"])
+    wear = [a["wear"] / n["wear"] - 1.0 for a, n in zip(om["plants"], nat["plants"]) if n.get("wear", 0) > 0]
+    c["wear"] = sum(wear) / len(wear) if wear else 0.0
     return key, seed, c
+
+
+def label_for(arm, per, valid):
+    """The arm's own label: the max's (work and misses) for v5, the round-3 rule (work per energy) for v3's grid."""
+    return label_max(per, valid) if arm == "v5" else label(per, valid=valid)
 
 
 def main(argv=None):
@@ -100,12 +119,14 @@ def main(argv=None):
     ap.add_argument("--catalog", default="", help="a muscle catalog (default: the arm's own)")
     ap.add_argument("--stack", choices=("realms", "body"), default="",
                     help="the four stacked: each realm's own body (v5 default) or one body (v3's stored grid)")
+    ap.add_argument("--load", choices=tuple(LOADS), default="normal",
+                    help="the organisms' work demand: their own, the climb, or work waiting in line (realms/harness.py)")
     a = ap.parse_args(argv)
     cat = a.catalog or CATALOGS[a.arm]
     stack_mode = a.stack or ("realms" if a.arm == "v5" else "body")
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     keys = [ORGS[k][0] for k in a.organisms.split(",")]
-    jobs = [(k, a.scale, SEED0 + a.first + i, a.arm, cat, stack_mode) for i in range(a.runs) for k in keys]
+    jobs = [(k, a.scale, SEED0 + a.first + i, a.arm, cat, stack_mode, a.load) for i in range(a.runs) for k in keys]
     t0 = time.time()
     res = {k: {} for k in keys}
     with ProcessPoolExecutor(a.workers) as ex:
@@ -115,7 +136,7 @@ def main(argv=None):
                 print(f"{n}/{len(jobs)} done, {time.time() - t0:.0f} s", flush=True)
     commit = subprocess.run(["git", "-c", "safe.directory=*", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     names = {v[0]: v[1] for v in ORGS.values()}
-    L = [f"# Six organisms, {a.runs} runs, {a.scale}x size", "",
+    L = [f"# Six organisms, {a.runs} runs, {a.scale}x size, {LOADS[a.load]}", "",
          f"Evidence class **S** (models). Commit `{commit[:12]}`, seeds {SEED0}-{SEED0 + a.runs - 1}, {a.scale} cop{'y' if a.scale == 1 else 'ies'} "
          f"of each organism on one clock, {time.time() - t0:.0f} s on {a.workers} workers. Native: each organism's own "
          "controllers. Omni: " + ("the v5 law on every muscle (`realms/compass_arm_v5.py`, engine omni-v5)" if a.arm == "v5" else
@@ -125,7 +146,7 @@ def main(argv=None):
          + ". Harness `tools/run_scale.py`.", "",
          "Band first (the founder's rule): no win unless the time over the service line is no higher than native's "
          "(violations, mean over runs, at or under 0 pp).", "",
-         "| # | Organism | Muscles | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |",
+         "| # | Organism | Muscles | Label | Band first | Work | Misses (pp) | Power given | Work per energy | Knobs handed back |",
          "|---|---|---:|---|---|---:|---:|---:|---:|---|"]
     summary = {}
     for num, (k, nm) in ORGS.items():
@@ -133,15 +154,15 @@ def main(argv=None):
             continue
         per = [res[k][s] for s in sorted(res[k])]
         sm = summarize(per)
-        lab = label(per, valid=all(c["restore_ok"] for c in per))
+        lab = label_for(a.arm, per, all(c["restore_ok"] for c in per))
         summary[k] = {"label": lab, **{q: list(v) for q, v in sm.items()}, "runs": len(per)}
         f = lambda q, s=100.0, u="%": f"{s * sm[q][0]:+.3f}{u} ({s * sm[q][1]:+.3f} to {s * sm[q][2]:+.3f})"
         band = "held" if sm["viol_pp"][0] <= 0.0 else "NOT held"
         summary[k]["band_first"] = band
-        L.append(f"| {num} | {nm} | {sum(len(rows_for(r, a.scale, cat)) for r in REALMS) if organism_name(k) == STACK else len(rows_for(k, a.scale, cat))} | **{lab}** | {band} | {f('primary')} | {f('work')} | {f('energy')} | "
-                 f"{f('viol_pp', 1.0, '')} | {all(c['restore_ok'] for c in per)} |")
+        L.append(f"| {num} | {nm} | {sum(len(rows_for(r, a.scale, cat)) for r in REALMS) if organism_name(k) == STACK else len(rows_for(k, a.scale, cat))} | **{lab}** | {band} | {f('work')} | "
+                 f"{f('viol_pp', 1.0, '')} | {f('energy')} | {f('primary')} | {all(c['restore_ok'] for c in per)} |")
     (out / "SCALE.md").write_text("\n".join(_legal_stamp(L)) + "\n")
-    (out / "SCALE.json").write_text(json.dumps({"runs": a.runs, "scale": a.scale, "commit": commit, "arm": a.arm,
+    (out / "SCALE.json").write_text(json.dumps({"runs": a.runs, "scale": a.scale, "commit": commit, "arm": a.arm, "load": a.load,
                                                 "catalog": str(Path(cat).relative_to(ROOT)), "stack": stack_mode, "summary": summary,
                                                 "per_run": {k: {str(s): c for s, c in v.items()} for k, v in res.items()}}) + "\n")
     print("\n".join(L))

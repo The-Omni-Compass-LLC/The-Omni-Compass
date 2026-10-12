@@ -61,6 +61,7 @@ from typing import Dict, Optional
 
 KNOBS = ("capacity", "setpoint", "power", "admission")
 RELEASE_WINDOW, RELEASE_FRAC = 2, 0.7
+CATCH_UP = 0.8      # a site catches its held-over flexible load up while its draw is under this share of its connection
 
 
 def clamp(v, lo, hi):
@@ -227,7 +228,10 @@ class Plant:
         self.k = 0
         self.override: Dict[str, float] = {}
         self.ext: Dict[str, float] = {}
-        self.m = {"work": 0.0, "energy_j": 0.0, "viol": 0, "steps": 0}
+        self.m = {"work": 0.0, "energy_j": 0.0, "viol": 0, "steps": 0, "wear": 0.0}
+        # wear (Omni v5, the max: shown beside the work, never judged): what running harder costs the machine itself, in
+        # the plant's own unit: a pool's machine-hours, a room's cooling unit-hours, a battery's kWh cycled through it,
+        # an axis's motor heat (degree-hours above ambient), a loop's actuator duty-hours
         self.power_w = 0.0
         self.vhist = []
         self.paced = False          # an admission muscle's work suspended by batch pacing (set by the harness)
@@ -288,6 +292,9 @@ class ComputePool(Plant):
         self.unneeded = 0
         self.omni_t, self.omni_t_k = None, 0
         self.ahist = []
+        self.B = 0.0                # work waiting in line (the 'line' load, realms/harness.py: jobs already submitted
+        self.line_k = None          # when the run starts); the machines take it from what the requests leave them, and
+                                    # line_k is the decision the line was cleared at
         self.nominal_w = P["lam0"] / (P["mu"] * P["target"]) * (P["p_idle"] + P["target"] * P["p_dyn"])
         self.budget_w = 1.5 * self.nominal_w
 
@@ -354,7 +361,7 @@ class ComputePool(Plant):
         under 50% utilised) for the unneeded time (Cluster Autoscaler defaults: 0.5, 10 minutes)."""
         P = self.P
         total = self.n + len(self.pending)
-        if self.Q > 0.0 and util >= 0.99:
+        if (self.Q > 0.0 or self.B > 0.0) and util >= 0.99:
             self.unneeded = 0
             return max(total, math.ceil(self.lam[self.k] / (mu * 0.9)))
         if self.n > P["n_min"] and not self.pending and util * self.n / (self.n - 1) < 0.5:
@@ -386,12 +393,19 @@ class ComputePool(Plant):
         drop = A - adm
         served = min(self.Q + adm, C)
         self.Q += adm - served
-        util = served / C if C > 0 else 1.0
+        took = 0.0
+        if self.B > 0.0:                                           # the line: what the requests leave the machines
+            took = min(self.B, C - served)
+            self.B -= took
+            if self.B <= 1e-9:
+                self.B, self.line_k = 0.0, k
+        util = (served + took) / C if C > 0 else 1.0
         W = (self.Q + self.H) / max(self.n * mu, 1e-9) + 1.0 / mu
         p = self.n * (P["p_idle"] + P["p_dyn"] * cap * util) + len(self.pending) * P["p_idle"]
-        self.m["work"] += served
+        self.m["work"] += served + took
         self.m["energy_j"] += p * dt
         self.m["steps"] += 1
+        self.m["wear"] += (self.n + len(self.pending)) * dt / 3600.0
         self.record(W > P["slo_s"] or drop > 1e-9)
         self.drop_share = drop / max(A, 1e-9) if A > 0 else 0.0
         self.power_w, self.util, self.W = p, util, W
@@ -511,6 +525,7 @@ class ThermalZone(Plant):
                 self.m["work"] += q_own * dts
         self.m["energy_j"] += e
         self.m["steps"] += 1
+        self.m["wear"] += self.units_on * P["dt"] / 3600.0
         self.record(hot)
         self.power_w = e / P["dt"]
         self.qc_avg, self.qc_cmd_avg = qc_sum / sub, cmd_sum / sub
@@ -540,6 +555,8 @@ class EnergyStorage(Plant):
             self.pv.append(P["pv_w"] * sun * clamp(0.85 + cloud[k], 0.2, 1.0))
         self.soc = self.soc0 = P["soc0"]
         self.deferred_j = 0.0
+        self.line_e, self.line_k = 0.0, None    # flexible energy waiting in line when the run starts (the 'line' load)
+                                                # and the decision it was all served at
         self.imp, self.net, self.drift = 0.0, 0.0, 0.0
         self.E = P["e_wh"] * 3600.0
         self.nominal_w = max(P["load_w"] - 0.32 * P["pv_w"], 0.2 * P["load_w"])
@@ -580,12 +597,16 @@ class EnergyStorage(Plant):
             self.deferred_j += defer * dt
             L -= defer
             served_own = L_own - defer
+            self.catch = 0.0
         else:                                                      # catch up while the connection has room
-            room = max(0.0, 0.8 * P["p_lim_w"] - (L - pv))
+            room = max(0.0, CATCH_UP * P["p_lim_w"] - (L - pv))
             s = min(self.deferred_j / dt, room)
             self.deferred_j -= s * dt
             L += s
             served_own = L_own + s
+            self.catch = s                                         # (what this decision caught up, W)
+            if self.line_e and self.line_k is None and self.deferred_j <= 1e-6:
+                self.line_k = k
         net = L - pv
         reserve = self.override.get("setpoint", P["reserve"])
         pmax = P["p_batt_w"] * self.override.get("power", 1.0)
@@ -594,6 +615,7 @@ class EnergyStorage(Plant):
             ch = min(-net, pmax, (1.0 - self.soc) * self.E / (dt * sq))
             self.soc += ch * dt * sq / self.E
             imp = 0.0
+            self.m["wear"] += ch * dt / 3.6e6
         else:
             d = min(net, pmax, max(0.0, self.soc - reserve) * self.E * sq / dt)
             if "capacity" in self.override:
@@ -602,6 +624,7 @@ class EnergyStorage(Plant):
                 d += max(0.0, min(net - d - thr, pmax - d, max(0.0, self.soc - low) * self.E * sq / dt - d))
             self.soc -= d * dt / (self.E * sq)
             imp = net - d
+            self.m["wear"] += d * dt / 3.6e6
         self.m["work"] += served_own * dt
         self.m["energy_j"] += (imp - ext) * dt                     # the external load is metered where it is drawn
         self.m["steps"] += 1
@@ -639,6 +662,8 @@ class MotionAxis(Plant):
         self.theta = self.omega = self.integ = 0.0
         self.Tm = P["t_amb"]
         self.backlog, self.waits = 0, []
+        self.line_n = self.line_done = 0    # tasks waiting in line when the run starts (the 'line' load), how many of
+        self.line_k = None                  # them are done, and the decision the last one was finished at
         self.move = None
         self.dwell = 0.0
         self.pos = 0.0
@@ -715,13 +740,18 @@ class MotionAxis(Plant):
          mv_start, mv_sgn, e, err_max, tau_peak, hot, done) = out
         self.move = {"t": mv_t, "v": mv_v, "a": mv_a, "T": mv_T, "start": mv_start, "sgn": mv_sgn} if mv_on else None
         del self.waits[:done]                                      # the finished moves are the oldest waiting tasks
+        if self.line_n and self.line_k is None:                    # (the line's tasks are the oldest of all)
+            self.line_done += done
+            if self.line_done >= self.line_n:
+                self.line_k = k
         self.waits = [w + P["dt_dec"] for w in self.waits]
         late = bool(self.waits) and self.waits[0] > P["deadline_s"]
         self.m["work"] += done
         self.m["energy_j"] += e
         self.m["steps"] += 1
+        self.m["wear"] += max(0.0, self.Tm - P["t_amb"]) * P["dt_dec"] / 3600.0
         self.record(err_max > P["e_max"] or hot or late)
-        self.tau_peak = tau_peak
+        self.tau_peak, self.err_max = tau_peak, err_max
         self.power_w = e / P["dt_dec"]
         self.drift = abs(self.tau_d[k] - self.tau_d[k - 1]) / P["tau_max"] if k else 0.0
         self.k += 1
@@ -812,6 +842,7 @@ class ProcessLoop(Plant):
                 self.m["work"] += dk * dts
         self.m["energy_j"] += e
         self.m["steps"] += 1
+        self.m["wear"] += (u_sum / sub) / P["u_max"] * P["dt"] / 3600.0
         self.record(out)
         self.power_w = e / P["dt"]
         self.u_avg, self.dev = u_sum / sub, dev
