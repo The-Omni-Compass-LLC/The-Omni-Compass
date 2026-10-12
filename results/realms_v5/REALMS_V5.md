@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Evidence class **S** (modelled). Run 2026-10-12 00:35 UTC, commit `75317cb11309`, seeds 3000-3009 (10 paired seeds per muscle and per organism), catalog `realms/catalog_v5.csv`. The engine is **omni-v5** (`tools/omni_version.py`, `OMNI_V5.json`): the v5 compass law `realms/compass_arm_v5.py` at its default `V5CFG`, on top of each plant's own native controller. Harness `realms/`.
+Evidence class **S** (modelled). Run 2026-10-12 00:53 UTC, commit `2cac744e64cf`, seeds 3000-3009 (10 paired seeds per muscle and per organism), catalog `realms/catalog_v5.csv`. The engine is **omni-v5** (`tools/omni_version.py`, `OMNI_V5.json`): the v5 compass law `realms/compass_arm_v5.py` at its default `V5CFG`, on top of each plant's own native controller. Harness `realms/`.
 
 The v5 law carries two math-only guardrails: the **edge** (a per-knob cushion from how fast service has climbed and how far it wobbles, so nothing riding its limit falls off) and the **centre/hole** (a machine or a cooled zone is eased only while it can still climb back). Otherwise every knob is free, and a knob stays native wherever the law cannot improve it without harm. Every process loop moves inside its band, generating units included, but never closer to its band's edge than its own largest swing toward that edge (the loop reach); a cooled zone never warmer than its cooling can recover, nor while its cooling headroom is falling toward empty; a power cap only on a pool whose response line outlasts one decision (an interactive pool's cap is proven on the metered GPU, class P, not here), never below the largest jump in demand nor past the line; the battery shave and a cloud pool's machine hand-back held native (round-trip energy bought for service; a hand-back the autoscaler never undoes).
 
@@ -12,7 +12,7 @@ Primary outcome: work per energy, v5 against native, with its 95% interval over 
 
 ## The six organisms
 
-Native, the v5 law and the v3 law on the same seeds. Energy saved is native's energy minus the arm's, as a share of native's (95% interval over seeds); times v3 is v5's saving over v3's.
+Native, the v5 law and the v3 law on the same seeds. Energy saved is native's energy minus the arm's, as a share of native's (95% interval over seeds); times v3 is v5's saving over v3's. The four stacked keep each realm's own body on one clock, so every muscle in the stack runs exactly the native it runs in its own realm, plant by plant: the native is identical in all six.
 
 | Organism | Muscles | Label | Work per energy | Work | Energy saved, v5 | Energy saved, v3 | Times v3 | Violations (pp) | Valid |
 |---|---:|---|---:|---:|---:|---:|---:|---:|---|
@@ -20,7 +20,7 @@ Native, the v5 law and the v3 law on the same seeds. Energy saved is native's en
 | Physics / Robotics / Autonomous | 376 | **SUPERIOR WITHIN GUARDRAILS** | +0.1% (+0.1 to +0.1) | +0.0% (+0.0 to +0.0) | 0.08% (0.07 to 0.09) | 0.06% (0.05 to 0.08) | 1.2x | -0.0 (-0.0 to -0.0) | yes |
 | Energy / Facility / Industrial | 470 | **SUPERIOR WITHIN GUARDRAILS** | +1.0% (+1.0 to +1.1) | +0.0% (-0.0 to +0.0) | 1.00% (0.94 to 1.05) | 0.33% (0.23 to 0.42) | 3.0x | -0.0 (-0.0 to -0.0) | yes |
 | Distribution / Specialized | 446 | **SUPERIOR WITHIN GUARDRAILS** | +0.3% (+0.2 to +0.3) | +0.0% (-0.0 to +0.0) | 0.27% (0.22 to 0.33) | 0.17% (0.15 to 0.20) | 1.6x | -0.0 (-0.0 to -0.0) | yes |
-| The four stacked, every shared muscle in each | 1773 | **SUPERIOR WITHIN GUARDRAILS** | +1.0% (+0.9 to +1.0) | +0.0% (-0.0 to +0.0) | 0.96% (0.92 to 1.00) | 0.36% (0.30 to 0.41) | 2.7x | -0.0 (-0.0 to -0.0) | yes |
+| The four stacked, every shared muscle in each | 1773 | **SUPERIOR WITHIN GUARDRAILS** | +1.0% (+0.9 to +1.1) | +0.0% (-0.0 to +0.0) | 0.99% (0.94 to 1.05) | 0.33% (0.23 to 0.42) | 3.0x | -0.0 (-0.0 to -0.0) | yes |
 | The whole tower, every muscle once | 1002 | **SUPERIOR WITHIN GUARDRAILS** | +1.0% (+0.9 to +1.1) | +0.0% (-0.0 to +0.0) | 0.99% (0.94 to 1.05) | 0.33% (0.23 to 0.42) | 3.0x | -0.0 (-0.0 to -0.0) | yes |
 
 ## Inside the organisms: every plant that did worse than native
@@ -33,7 +33,7 @@ A stricter look than the organism's total: every plant inside each organism, ove
 | Physics / Robotics / Autonomous | 376 | 3 | 34 | 538 (+0.000%, +1); 541 (+0.000%, +1); 530 (+0.000%, +1) |
 | Energy / Facility / Industrial | 470 | 1 | 13 | 531 (+0.000%, +1) |
 | Distribution / Specialized | 446 | 1 | 15 | 1111 (+0.000%, +1) |
-| The four stacked, every shared muscle in each | 1773 | 5 | 74 | 538@compute_ai_cloud (+0.000%, +1); 537@energy_facility_industrial (+0.000%, +1); 540@compute_ai_cloud (+0.000%, +1); 572@energy_facility_industrial (+0.000%, +1); 529@distribution_specialized (+0.000%, +1) |
+| The four stacked, every shared muscle in each | 1773 | 8 | 80 | 541@compute_ai_cloud (+0.000%, +1); 538@physics_robotics_autonomous (+0.000%, +1); 539@compute_ai_cloud (+0.000%, +1); 1111@distribution_specialized (+0.000%, +1); 531@energy_facility_industrial (+0.000%, +1); 537@compute_ai_cloud (+0.000%, +1); 541@physics_robotics_autonomous (+0.000%, +1); 530@physics_robotics_autonomous (+0.000%, +1) |
 | The whole tower, every muscle once | 1002 | 1 | 27 | 531 (+0.000%, +1) |
 
 ## Every muscle alone, by home realm
