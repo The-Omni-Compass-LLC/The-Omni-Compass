@@ -315,6 +315,8 @@ def main():
     from tests import test_lambda_gpu
     test_lambda_gpu.test_lambda_launcher_end_to_end()
     check("the Lambda launcher (scripts/lambda_gpu.py) against a stand-in API: prices first, refuses over the ceiling or with nothing free, rents where a machine is free, waits until it runs, gives it back, never prints the key", True)
+    from tests import test_cloud_machine
+    test_cloud_machine.main(); check("the rented Google Cloud and Amazon machine (scripts/cloud_machine.py, cloud-organism.yml) against stand-ins for their tools: the price and the ceiling first, every machine labelled with its hour budget, a fresh key per job, always given back with its security group and key pair", True)
     from tests import test_cost_to_match
     test_cost_to_match.main(); check("cost to match: the cheapest native setting that reaches Omni-Compass's p95, its extra pods, CPU and machines", True)
     from tests import test_server_power

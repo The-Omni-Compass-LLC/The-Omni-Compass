@@ -18,6 +18,13 @@
   one while Omni runs. A strict guard on the body's shared power lines was built and measured on development seeds: it
   removes them and almost all of the saving where those lines run full (Compute / AI / Cloud 0.47% to 0.01%). Held for
   the founder's decision; nothing in the engine changed for it.
+- **Every cloud, the same tests**: Azure running on v5 (the 40-machine fleet, steady then burst; the whole tower and the four
+  stacked at 1,000 copies on rented machines). Google and Amazon get Azure's big-machine test too: `cloud-organism`
+  (`scripts/cloud_machine.py`, `scripts/organism_detached.sh`, `scripts/cloud_machine_watch.sh`; the price and a cost
+  ceiling first, every machine labelled with its hour budget, always given back; `tests/test_cloud_machine.py`, run by
+  `verify.py`), beside their Kubernetes bill tests (`gke-metered`, `eks-metered`). Setting each cloud up, click by click:
+  `docs/GOOGLE_SETUP.md`, `docs/AMAZON_SETUP.md` (and `docs/AZURE_SETUP.md`). The Google, Amazon, Lambda and one-button
+  workflows now register on the branch they are pushed to, so they can be started there.
 - **The three-run words** (the founder's order of 11 October): no table or page says a result is "confirmed", because
   nobody outside The Omni-Compass LLC has reviewed or approved these results. A reading is better or worse in all three
   of our runs, the same in all three, no difference beyond the noise, or the runs disagree; every three-run table, the

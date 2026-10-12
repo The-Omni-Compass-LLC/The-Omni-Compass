@@ -6,18 +6,18 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The whole stacks with the real card inside: one harness, one engine, one set of receipts.
 
-Each of six organisms (the four realms, the four stacked with every duplicate kept, and the whole tower,
-realms/catalog.csv) runs on one clock as in the realm
-harness, and the real GPU on this machine is wired into it as one more muscle of its NVIDIA GPU family (a spine family,
-so the card sits in every organism): the card serves the pinned request stream (tools/gpu_workload.py), its own
-power.draw is heat in the organism's thermal zones and load on its storage sites, and its meter and its requests are
-counted in the organism's receipt.
+Each of six organisms (the four realms, the four stacked, each realm keeping its own body so every muscle runs exactly
+its own realm's native, and the whole tower; the v5 catalog, realms/catalog_v5.csv) runs on one clock as in the realm
+harness, and the real GPU on this machine is wired into it as one more muscle of its GPU Hardware family (a spine family,
+so the card sits in every organism; in the four stacked, in the first body): the card serves the pinned request stream
+(tools/gpu_workload.py), its own power.draw is heat in the organism's thermal zones and load on its storage sites, and
+its meter and its requests are counted in the organism's receipt.
 
 Arms, the same organism, the same seed, the same request stream:
   native  the stacks' own controllers and the card's own firmware, no Omni
-  omni    one engine on everything: the compass law (omnicompass/compass_law.py) on every simulated muscle (realms/compass_arm.py)
-          and on the card's two wires (omni_controller/gpu_compass.py); at 90% of the arm every knob and both wires are
-          handed back, and the harness checks they were
+  omni    one engine on everything: the v5 law (realms/compass_arm_v5.py) on every simulated muscle and the v5 edge on the
+          card's two wires (omni_controller/gpu_compass.py, omnicompass/edge.py); at 90% of the arm every knob and both
+          wires are handed back, and the harness checks they were
 
 Sizes (--scales, default 1,10,100,1000): each organism is run as 1, 10, 100 and 1,000 copies governed together on one
 clock (1,000 copies of the whole tower is close to a million muscles), with the one real card inside as one more muscle. Each size

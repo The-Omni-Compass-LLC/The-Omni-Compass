@@ -17,8 +17,10 @@ on:
       gpu: {description: "The GPU benchmark on the GPU runner, billed per minute (yes/no; needs the gpu-t4 runner)", default: "no"}
       clouds: {description: "Metered Kubernetes clouds, comma-separated: aks,gke,eks (empty: none)", default: ""}
       big_organisms: {description: "The big organisms on a rented Azure machine (yes/no; needs AZURE_CREDENTIALS)", default: "no"}
+      big_machines: {description: "The same big-organism test on a rented Google or Amazon machine, comma-separated: gcp,aws (empty: none; needs that cloud's secrets; starts cloud-organism for real)", default: ""}
       lambda_gpu: {description: "The GPU on a rented Lambda machine: 8card or 1card (empty: none; needs the three LAMBDA_ secrets; starts lambda-gpu for real, pooled)", default: ""}
       dry_run: {description: "List what would start, start nothing (yes/no)", default: "no"}
+  push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
 permissions:
   actions: write
   contents: read
@@ -26,6 +28,7 @@ env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
   start:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -68,6 +71,17 @@ jobs:
             else
               echo "| $w | FAILED to start |" >> "$GITHUB_STEP_SUMMARY"; failed=$((failed + 1))
             fi
+            sleep 2
+          done
+          for c in $(echo "${{ github.event.inputs.big_machines }}" | tr ',' ' '); do
+            case "$c" in
+              gcp) have="$HAVE_GCP";; aws) have="$HAVE_AWS";; *) skipped="$skipped cloud-organism-$c(unknown cloud)"; continue;;
+            esac
+            if [ "$have" != true ]; then skipped="$skipped cloud-organism-$c(no $c secrets)"
+            elif [ "${{ github.event.inputs.dry_run }}" = yes ]; then echo "| cloud-organism ($c) | would start (dry run) |" >> "$GITHUB_STEP_SUMMARY"
+            elif gh workflow run cloud-organism.yml --ref "$REF" -f cloud="$c" -f dry_run=no; then
+              echo "| cloud-organism ($c: tower and stack at 1,000 copies) | yes |" >> "$GITHUB_STEP_SUMMARY"; started=$((started + 1))
+            else echo "| cloud-organism ($c) | FAILED to start |" >> "$GITHUB_STEP_SUMMARY"; failed=$((failed + 1)); fi
             sleep 2
           done
           LG="${{ github.event.inputs.lambda_gpu }}"

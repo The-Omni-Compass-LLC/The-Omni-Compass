@@ -106,17 +106,25 @@ founder hears what they say before anything goes up.
 | Azure (AKS) | native Kubernetes against Omni on top, the bill counted every 15 s at the list price | `aks-metered` | `AZURE_CREDENTIALS` | about $0.096 per worker-hour (Standard_D2s_v4) |
 | Google (GKE) | the same design on Google Kubernetes Engine | `gke-metered` | `GCP_CREDENTIALS`, `GCP_PROJECT` | about $0.067 per worker-hour (e2-standard-2) |
 | Amazon (EKS) | the same design on Elastic Kubernetes Service | `eks-metered` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | about $0.096 per worker-hour (m5.large), plus about $0.10 an hour per control plane |
-| Big organisms | the six organisms at 1,000 copies on a rented Azure machine | `big-organism`, `big-organism-detached` | `AZURE_CREDENTIALS` | the machine's rate |
+| Big organisms, Azure | the whole tower and the four stacked at 1,000 copies, the real cluster inside, on a rented 8-processor Azure machine | `big-organism`, `big-organism-detached` | `AZURE_CREDENTIALS` | about $0.35 an hour (Standard_D8as_v4), about $7 to $14 a machine |
+| Big organisms, Google | the same test on a rented Google machine | `cloud-organism`, cloud `gcp` | `GCP_CREDENTIALS`, `GCP_PROJECT` | about $0.27 an hour (e2-standard-8), at most about $10 for its 39-hour ceiling |
+| Big organisms, Amazon | the same test on a rented Amazon machine | `cloud-organism`, cloud `aws` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | about $0.38 an hour (m6i.2xlarge), at most about $15 for its 39-hour ceiling |
 
-The Google and Amazon runs are written to the AKS run's design (`scripts/gke_paired.sh`, `scripts/eks_paired.sh`) and have
-not yet run: their first repetition is a shakedown, and any arm that fails its own checks is marked INVALID and never
-counted. Each cluster is deleted when its arm ends, and every cluster a run made is deleted at its end whatever happens.
+The Google and Amazon runs are written to the AKS run's design (`scripts/gke_paired.sh`, `scripts/eks_paired.sh`; the big
+machine: `scripts/cloud_machine.py`, `scripts/organism_detached.sh`, the same test as Azure's) and have not yet run: their
+first repetition is a shakedown, and any arm that fails its own checks is marked INVALID and never counted. Each cluster
+is deleted when its arm ends, and every cluster a run made is deleted at its end whatever happens; a rented machine is
+given back when its test ends, at its hour ceiling, or at the end of its workflow whatever happens. Setting up each cloud,
+click by click: `docs/AZURE_SETUP.md`, `docs/GOOGLE_SETUP.md`, `docs/AMAZON_SETUP.md`. What runs where: the managed
+Kubernetes bill and the biggest organisms need a cloud; every other benchmark (robot arms, drones, buildings, the grid, the
+databases, the messaging, the modelled realms and the grid of organisms) runs on GitHub's own machines, the same code on
+every engine, free.
 
 ## E. How to start them
 
 1. GitHub → the repository → **Actions** → **v5-all-benchmarks** → **Run workflow** → choose the branch.
 2. Leave **free = yes** for everything on GitHub's machines. Type `aks,gke,eks` under **clouds** only once those secrets
-   are in place. **gpu = yes** only once the GPU runner exists. Type `8card` (or `1card`) under **lambda_gpu** only once
+   are in place, and `gcp,aws` under **big_machines** for the big organisms on Google's and Amazon's machines. **gpu = yes** only once the GPU runner exists. Type `8card` (or `1card`) under **lambda_gpu** only once
    the three Lambda secrets are in place; it starts the rented-machine run for real (pooled), so try `lambda-gpu` with its
    own dry run first.
 3. Each benchmark runs as its own workflow and writes its own table; nothing is published until the founder has heard it.

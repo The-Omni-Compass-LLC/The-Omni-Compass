@@ -21,14 +21,16 @@ on:
       region: {description: "Lambda region (empty: the first with a machine free)", default: ""}
       max_cost: {description: "Ceiling in US dollars for the hour budget plus one hour; above it nothing is rented", default: "400"}
       dry_run: {description: "Show the price and the plan, rent nothing (yes/no)", default: "yes"}
+  push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
 permissions:
   contents: read
-concurrency: {group: lambda-gpu, cancel-in-progress: false}
+concurrency: {group: "lambda-gpu-${{ github.event_name }}", cancel-in-progress: false}   # a push (which runs nothing) never takes a dispatch's place
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
   LAMBDA_API_KEY: ${{ secrets.LAMBDA_API_KEY }}
 jobs:
   launch:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     outputs:

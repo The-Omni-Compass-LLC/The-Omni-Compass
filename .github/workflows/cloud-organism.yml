@@ -1,0 +1,457 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: cloud-organism
+# The big-organism test on a rented Google Cloud or Amazon machine: the same test Azure runs in big-organism-detached.yml
+# (scripts/organism_detached.sh: every repetition of every organism, native against native with Omni-Compass on top, a fresh
+# six-worker kind cluster per arm, the organism at the asked size with the real cluster inside; or the robustness long
+# scenario). One button (Actions -> cloud-organism -> Run workflow): it shows the price first and rents nothing on a dry run
+# (the default). Otherwise it rents one 8-vCPU machine (scripts/cloud_machine.py), ships it the exact committed tree, starts
+# the test detached, watches it from GitHub in up to 7 chained jobs of about 5.7 hours, brings every cell back as this
+# run's artifacts, and always gives the machine back: when the last repetition ends, or at max_hours whatever happens, or
+# at the very end of this workflow if anything before failed. Secrets: GCP_CREDENTIALS and GCP_PROJECT (Google), or
+# AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY (Amazon): docs/GOOGLE_SETUP.md, docs/AMAZON_SETUP.md, click by click. A missing
+# secret is reported and nothing is rented. Nothing here publishes a result: the founder hears what it says first.
+on:
+  workflow_dispatch:
+    inputs:
+      cloud: {description: "gcp (Google Cloud) or aws (Amazon)", default: "gcp"}
+      organisms: {description: "Organisms, comma separated: compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower", default: "tower,stack"}
+      size: {description: "Copies of each organism on one clock (1, 10, 100, 1000)", default: "1000"}
+      reps: {description: "Paired repetitions per organism", default: "3"}
+      duration_s: {description: "Measured seconds per arm (240 organism steps)", default: "10800"}
+      machine_type: {description: "Machine type (empty: e2-standard-8 on Google, m6i.2xlarge on Amazon; 8 vCPU, 32 GiB, as Azure's)", default: ""}
+      where: {description: "Zone on Google (empty: us-central1-a) or region on Amazon (empty: us-east-1)", default: ""}
+      max_hours: {description: "Give the machine back after this many hours, finished or not (at most 39)", default: "39"}
+      test: {description: "organism (the organisms with the cluster inside) or robust (the robustness long scenario)", default: "organism"}
+      max_cost: {description: "Ceiling in US dollars for max_hours at list price; above it nothing is rented", default: "60"}
+      dry_run: {description: "Show the price and the plan, rent nothing (yes/no)", default: "yes"}
+  push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
+permissions:
+  contents: read
+concurrency: {group: "cloud-organism-${{ github.event.inputs.cloud || 'push' }}-${{ github.event_name }}", cancel-in-progress: false}
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+  CLOUD: ${{ github.event.inputs.cloud || 'gcp' }}
+  CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT }}
+jobs:
+  launch:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      launched: ${{ steps.go.outputs.launched }}
+      id: ${{ steps.go.outputs.id }}
+      deadline: ${{ steps.go.outputs.deadline }}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Are the cloud's secrets in place?
+        id: have
+        env:
+          GCP: ${{ secrets.GCP_CREDENTIALS != '' && secrets.GCP_PROJECT != '' }}
+          AWS: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+        run: |
+          case "$CLOUD" in
+            gcp) ok="$GCP"; need="GCP_CREDENTIALS and GCP_PROJECT (docs/GOOGLE_SETUP.md)";;
+            aws) ok="$AWS"; need="AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY (docs/AMAZON_SETUP.md)";;
+            *) ok=false; need="a cloud of gcp or aws";;
+          esac
+          echo "ok=$ok" >> "$GITHUB_OUTPUT"
+          [ "$ok" = true ] || echo "Secrets missing for $CLOUD: $need. Nothing rented." | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Log in to Google Cloud
+        if: env.CLOUD == 'gcp' && steps.have.outputs.ok == 'true'
+        uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - name: Google's command-line tool
+        if: env.CLOUD == 'gcp' && steps.have.outputs.ok == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Log in to Amazon
+        if: env.CLOUD == 'aws' && steps.have.outputs.ok == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.where || 'us-east-1' }}
+      - name: Rent, install, ship, start (or show the price on a dry run)
+        id: go
+        if: steps.have.outputs.ok == 'true'
+        env:
+          ORGS: ${{ github.event.inputs.organisms }}
+          SCALE: ${{ github.event.inputs.size }}
+          REPS: ${{ github.event.inputs.reps }}
+          DUR: ${{ github.event.inputs.duration_s }}
+          TYPE_IN: ${{ github.event.inputs.machine_type }}
+          WHERE_IN: ${{ github.event.inputs.where }}
+          MAXH: ${{ github.event.inputs.max_hours }}
+          TEST: ${{ github.event.inputs.test }}
+          MAX_COST: ${{ github.event.inputs.max_cost }}
+          DRY: ${{ github.event.inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          echo "launched=false" >> "$GITHUB_OUTPUT"
+          MAXH=$(python3 -c "print(min(39.0, float('${MAXH:-39}')))")
+          { echo "## The big-organism test on $CLOUD: $TEST, ${ORGS} at ${SCALE} copies, ${REPS} repetitions of ${DUR} s an arm, commit \`${GITHUB_SHA::12}\`"; echo; } >> "$GITHUB_STEP_SUMMARY"
+          set +e; python3 scripts/cloud_machine.py plan --cloud "$CLOUD" ${TYPE_IN:+--type "$TYPE_IN"} --hours "$MAXH" --max-cost "$MAX_COST" | tee plan.txt; rc=${PIPESTATUS[0]}; set -e
+          { echo '```'; cat plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          [ "$rc" = 0 ] || { echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; exit 0; }
+          if [ "$DRY" = yes ]; then echo "Dry run: nothing rented." >> "$GITHUB_STEP_SUMMARY"; exit 0; fi
+          ssh-keygen -q -t ed25519 -N "" -f key -C omni-launch
+          NAME="omni-detached-${GITHUB_RUN_ID}"
+          ID=$(python3 scripts/cloud_machine.py launch --cloud "$CLOUD" ${TYPE_IN:+--type "$TYPE_IN"} ${WHERE_IN:+--where "$WHERE_IN"} --name "$NAME" --pubkey key.pub --hours "$MAXH")
+          echo "id=$ID" >> "$GITHUB_OUTPUT"; echo "launched=true" >> "$GITHUB_OUTPUT"
+          DEADLINE=$(python3 -c "import time; print(int(time.time() + $MAXH * 3600))")
+          echo "deadline=$DEADLINE" >> "$GITHUB_OUTPUT"
+          echo "Rented \`$ID\`; given back by $(date -u -d @"$DEADLINE" '+%Y-%m-%d %H:%M') UTC at the latest." >> "$GITHUB_STEP_SUMMARY"
+          IP=$(python3 scripts/cloud_machine.py wait "$ID" --timeout 900)
+          U=$(python3 scripts/cloud_machine.py user "$ID")
+          SSH="ssh -i key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -o ServerAliveInterval=30 $U@$IP"
+          for i in $(seq 1 40); do $SSH true 2>/dev/null && break; sleep 15; done
+          $SSH 'set -e
+            for i in 1 2 3 4 5; do
+              if sudo apt-get update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq docker.io jq git python3-pip python3-venv curl >/dev/null; then break; fi
+              [ "$i" = 5 ] && exit 1; sleep 30
+            done
+            sudo usermod -aG docker "$USER"
+            printf "fs.inotify.max_user_watches=524288\nfs.inotify.max_user_instances=512\n" | sudo tee /etc/sysctl.d/99-kind.conf >/dev/null && sudo sysctl -q --system
+            curl -fsSLo kind https://github.com/kubernetes-sigs/kind/releases/latest/download/kind-linux-amd64 && sudo install kind /usr/local/bin/kind
+            curl -fsSLo kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && sudo install kubectl /usr/local/bin/kubectl'
+          git archive --format=tar.gz -o omni.tgz HEAD                    # the exact committed tree, nothing else
+          scp -i key -o StrictHostKeyChecking=accept-new omni.tgz "$U@$IP:omni.tgz"
+          $SSH "mkdir -p omni && tar xzf omni.tgz -C omni && echo $GITHUB_SHA > omni/COMMIT && cd omni && python3 -m venv .v && .v/bin/pip install -q -r requirements.txt"
+          # started in the background with every file handle redirected, as on Azure (nothing else left holding the session)
+          $SSH "cd omni && nohup setsid sg docker -c 'ORGS=$ORGS SCALE=$SCALE REPS=$REPS DUR=$DUR TEST=$TEST bash scripts/organism_detached.sh' > detached.log 2>&1 < /dev/null & disown; sleep 90; tail -n 5 detached.log; pgrep -af kind_paired >/dev/null && echo RUNNING || { echo '::error::the test is not running'; exit 1; }"
+          echo "Started; the watches below carry on until it is over." >> "$GITHUB_STEP_SUMMARY"
+          rm -f key key.pub
+      - name: Give the machine back if starting failed
+        if: failure() && steps.go.outputs.id != ''
+        run: python3 scripts/cloud_machine.py terminate "${{ steps.go.outputs.id }}"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
+  watch1:
+    # watch 1 of 7: about 5.7 hours each; each carries on where the one before stopped
+    needs: launch
+    if: always() && needs.launch.outputs.launched == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    outputs: {state: "${{ steps.w.outputs.state }}"}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Log in to Google Cloud
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - name: Google's command-line tool
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Log in to Amazon
+        if: env.CLOUD == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.where || 'us-east-1' }}
+      - name: Watch, fetch, give back
+        id: w
+        run: |
+          bash scripts/cloud_machine_watch.sh "${{ needs.launch.outputs.id }}" "${{ needs.launch.outputs.deadline }}" 340 out
+          echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
+      - name: The cells, as this run's artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: "cloud-organism-${{ github.job }}-${{ github.run_id }}", path: out, if-no-files-found: ignore, retention-days: 90}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
+  watch2:
+    # watch 2 of 7: about 5.7 hours each; each carries on where the one before stopped
+    needs: [launch, watch1]
+    if: always() && needs.launch.outputs.launched == 'true' && needs.watch1.result != 'skipped' && !contains('done deadline gone', needs.watch1.outputs.state || 'x')
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    outputs: {state: "${{ steps.w.outputs.state }}"}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Log in to Google Cloud
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - name: Google's command-line tool
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Log in to Amazon
+        if: env.CLOUD == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.where || 'us-east-1' }}
+      - name: Watch, fetch, give back
+        id: w
+        run: |
+          bash scripts/cloud_machine_watch.sh "${{ needs.launch.outputs.id }}" "${{ needs.launch.outputs.deadline }}" 340 out
+          echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
+      - name: The cells, as this run's artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: "cloud-organism-${{ github.job }}-${{ github.run_id }}", path: out, if-no-files-found: ignore, retention-days: 90}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
+  watch3:
+    # watch 3 of 7: about 5.7 hours each; each carries on where the one before stopped
+    needs: [launch, watch2]
+    if: always() && needs.launch.outputs.launched == 'true' && needs.watch2.result != 'skipped' && !contains('done deadline gone', needs.watch2.outputs.state || 'x')
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    outputs: {state: "${{ steps.w.outputs.state }}"}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Log in to Google Cloud
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - name: Google's command-line tool
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Log in to Amazon
+        if: env.CLOUD == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.where || 'us-east-1' }}
+      - name: Watch, fetch, give back
+        id: w
+        run: |
+          bash scripts/cloud_machine_watch.sh "${{ needs.launch.outputs.id }}" "${{ needs.launch.outputs.deadline }}" 340 out
+          echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
+      - name: The cells, as this run's artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: "cloud-organism-${{ github.job }}-${{ github.run_id }}", path: out, if-no-files-found: ignore, retention-days: 90}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
+  watch4:
+    # watch 4 of 7: about 5.7 hours each; each carries on where the one before stopped
+    needs: [launch, watch3]
+    if: always() && needs.launch.outputs.launched == 'true' && needs.watch3.result != 'skipped' && !contains('done deadline gone', needs.watch3.outputs.state || 'x')
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    outputs: {state: "${{ steps.w.outputs.state }}"}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Log in to Google Cloud
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - name: Google's command-line tool
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Log in to Amazon
+        if: env.CLOUD == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.where || 'us-east-1' }}
+      - name: Watch, fetch, give back
+        id: w
+        run: |
+          bash scripts/cloud_machine_watch.sh "${{ needs.launch.outputs.id }}" "${{ needs.launch.outputs.deadline }}" 340 out
+          echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
+      - name: The cells, as this run's artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: "cloud-organism-${{ github.job }}-${{ github.run_id }}", path: out, if-no-files-found: ignore, retention-days: 90}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
+  watch5:
+    # watch 5 of 7: about 5.7 hours each; each carries on where the one before stopped
+    needs: [launch, watch4]
+    if: always() && needs.launch.outputs.launched == 'true' && needs.watch4.result != 'skipped' && !contains('done deadline gone', needs.watch4.outputs.state || 'x')
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    outputs: {state: "${{ steps.w.outputs.state }}"}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Log in to Google Cloud
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - name: Google's command-line tool
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Log in to Amazon
+        if: env.CLOUD == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.where || 'us-east-1' }}
+      - name: Watch, fetch, give back
+        id: w
+        run: |
+          bash scripts/cloud_machine_watch.sh "${{ needs.launch.outputs.id }}" "${{ needs.launch.outputs.deadline }}" 340 out
+          echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
+      - name: The cells, as this run's artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: "cloud-organism-${{ github.job }}-${{ github.run_id }}", path: out, if-no-files-found: ignore, retention-days: 90}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
+  watch6:
+    # watch 6 of 7: about 5.7 hours each; each carries on where the one before stopped
+    needs: [launch, watch5]
+    if: always() && needs.launch.outputs.launched == 'true' && needs.watch5.result != 'skipped' && !contains('done deadline gone', needs.watch5.outputs.state || 'x')
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    outputs: {state: "${{ steps.w.outputs.state }}"}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Log in to Google Cloud
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - name: Google's command-line tool
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Log in to Amazon
+        if: env.CLOUD == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.where || 'us-east-1' }}
+      - name: Watch, fetch, give back
+        id: w
+        run: |
+          bash scripts/cloud_machine_watch.sh "${{ needs.launch.outputs.id }}" "${{ needs.launch.outputs.deadline }}" 340 out
+          echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
+      - name: The cells, as this run's artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: "cloud-organism-${{ github.job }}-${{ github.run_id }}", path: out, if-no-files-found: ignore, retention-days: 90}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
+  watch7:
+    # watch 7 of 7: about 5.7 hours each; each carries on where the one before stopped
+    needs: [launch, watch6]
+    if: always() && needs.launch.outputs.launched == 'true' && needs.watch6.result != 'skipped' && !contains('done deadline gone', needs.watch6.outputs.state || 'x')
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    outputs: {state: "${{ steps.w.outputs.state }}"}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Log in to Google Cloud
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - name: Google's command-line tool
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Log in to Amazon
+        if: env.CLOUD == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.where || 'us-east-1' }}
+      - name: Watch, fetch, give back
+        id: w
+        run: |
+          bash scripts/cloud_machine_watch.sh "${{ needs.launch.outputs.id }}" "${{ needs.launch.outputs.deadline }}" 340 out
+          echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
+      - name: The cells, as this run's artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: "cloud-organism-${{ github.job }}-${{ github.run_id }}", path: out, if-no-files-found: ignore, retention-days: 90}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
+  give-back:
+    # whatever happened above: the machine is given back (nothing runs on the bill after this workflow)
+    needs: [launch, watch1, watch2, watch3, watch4, watch5, watch6, watch7]
+    if: always() && needs.launch.outputs.launched == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+      - name: Log in to Google Cloud
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/auth@v2
+        with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
+      - name: Google's command-line tool
+        if: env.CLOUD == 'gcp'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Log in to Amazon
+        if: env.CLOUD == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.where || 'us-east-1' }}
+      - name: Give the machine back
+        run: |
+          python3 scripts/cloud_machine.py terminate "${{ needs.launch.outputs.id }}" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
