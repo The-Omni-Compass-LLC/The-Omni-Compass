@@ -40,11 +40,13 @@ jobs:
           set -e
           mkdir -p parts
           for r in $(echo "$RUNS" | tr ',' ' '); do
-            gh run download "$r" --repo "$GITHUB_REPOSITORY" --pattern 'part-*' --dir "parts/$r" || echo "::warning::run $r: no shards downloaded"
+            # six.yml's shards (part-*), and the rented machines' cells (big-organism-detached's collect: detached-cells)
+            gh run download "$r" --repo "$GITHUB_REPOSITORY" --pattern 'part-*' --pattern 'detached-cells' --dir "parts/$r" \
+              || echo "::warning::run $r: no shards downloaded"
           done
           find parts -name SCALE.json | wc -l
       - name: Pooled into one receipt
-        run: python3 tools/pool_scale.py "SIX_${{ github.event.inputs.label }}.md" "parts/*/*/SCALE.json" | tee -a "$GITHUB_STEP_SUMMARY"
+        run: python3 tools/pool_scale.py "SIX_${{ github.event.inputs.label }}.md" "parts/**/SCALE.json" | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with: {name: "six-pooled-${{ github.event.inputs.label }}", path: "SIX_*"}
       - name: Legal files beside the files this run hands out

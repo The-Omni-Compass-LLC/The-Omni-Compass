@@ -24,7 +24,7 @@ from realms.harness import STACK, organism_name  # noqa: E402
 
 
 def main(out, *paths):
-    files = [p for g in paths for p in glob.glob(g)]
+    files = sorted({p for g in paths for p in glob.glob(g, recursive=True)})
     per, scale, commits, arms, loads, engines, scales = {}, None, set(), set(), set(), set(), set()
     cat, stack = None, "body"
     for f in files:

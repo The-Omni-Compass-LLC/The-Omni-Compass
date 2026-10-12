@@ -30,7 +30,8 @@ on:
       vm_size: {description: "Azure machine size (start); Standard_D8as_v4 is the size eastus granted on 2026-10-05", default: "Standard_D8as_v4"}
       location: {description: "Azure region (start). Survey of 2026-10-06: eastus allows 32 vCPUs and the v4 sizes; every other region allows 10 vCPUs and only the v5 to v7 sizes (the sizes tried fall back to v7)", default: "eastus"}
       max_hours: {description: "Collect and delete a machine older than this, finished or not (start: stored on the machine's group; collect: the default for machines without one)", default: "40"}
-      test: {description: "organism (the organisms with the cluster inside, above) or robust (the robustness long scenario, docs/ROBUSTNESS_PREREGISTRATION.md: the governor's memory and decisions over duration_s an arm, the wandering schedule repeated; the 24-hour run)", default: "organism"}
+      test: {description: "organism (the organisms with the cluster inside, above), scale (the modelled organisms, tools/run_scale.py, on the max with work waiting in line: organisms is a number 1-6, reps the runs, rep_first the first run, 0-based; for the grid's squares too big for a GitHub machine) or robust (the robustness long scenario, docs/ROBUSTNESS_PREREGISTRATION.md: the governor's memory and decisions over duration_s an arm, the wandering schedule repeated; the 24-hour run)", default: "organism"}
+      rep_first: {description: "The first repetition on this machine (1-based; scale: the first run, 0-based), so many machines fill one square without two running the same repetition", default: "1"}
       group: {description: "collect: look at this resource group only (omni-detached-<run id>); empty = every tagged machine", default: ""}
   schedule:
     - cron: "41 */2 * * *"       # collect: a look at every tagged machine; nothing to do when none is running
@@ -107,6 +108,7 @@ jobs:
       SHA: ${{ github.event.inputs.commit || github.sha }}
       TEST: ${{ github.event.inputs.test || 'organism' }}
       MAXH: ${{ github.event.inputs.max_hours || '40' }}
+      R0: ${{ github.event.inputs.rep_first || '1' }}
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -116,9 +118,13 @@ jobs:
       - name: Rent the machine
         run: |
           az group create -n "$RG" -l "$LOC" -o none \
-            --tags omni-detached=1 "organisms=$ORGS" "size=$SCALE" "reps=$REPS" "sha=$SHA" "started=$(date -u +%s)" "run=${{ github.run_id }}" "test=$TEST" "max_hours=$MAXH"
+            --tags omni-detached=1 "organisms=$ORGS" "size=$SCALE" "reps=$REPS" "rep_first=$R0" "sha=$SHA" "started=$(date -u +%s)" "run=${{ github.run_id }}" "test=$TEST" "max_hours=$MAXH"
           ok=""
-          for sz in "$SIZE" Standard_D8as_v4 Standard_D8s_v4 Standard_D8as_v7 Standard_D8s_v7 Standard_D8ls_v7 Standard_E4as_v7 Standard_B8as_v2; do
+          # the sizes tried after the one asked: 8 vCPUs and 32 GB for the organisms with the cluster inside; 64 GB first where
+          # the test needs it (the modelled tower at 1,000 copies, 15 GB a worker; the four stacked with the cluster inside)
+          more="Standard_D8as_v4 Standard_D8s_v4 Standard_D8as_v7 Standard_D8ads_v7 Standard_D8s_v7 Standard_D8as_v6 Standard_D8s_v5 Standard_D8as_v5 Standard_D8ls_v7 Standard_E4as_v7 Standard_B8as_v2"
+          case "$TEST:$ORGS" in scale:*|organism:stack) more="Standard_E8as_v7 Standard_E8s_v7 Standard_E8as_v6 Standard_E8as_v5 Standard_E8s_v5 Standard_E8ads_v5 Standard_E8as_v4 Standard_E8s_v4";; esac
+          for sz in "$SIZE" $more; do
             if az vm create -g "$RG" -n big --image Ubuntu2204 --size "$sz" --admin-username omni \
                  --generate-ssh-keys --public-ip-sku Standard --os-disk-size-gb 128 -o none 2> err.txt; then
               ok="$sz"; echo "::notice::rented $sz in $LOC"; break
@@ -165,18 +171,27 @@ jobs:
           export PATH=\$PWD/.v/bin:\$PATH ARMS="native compass" DURATION=$DUR ORGANISM_SCALE=$SCALE LOAD_MAX=6 LOADGEN=open
           export CLOSURE=tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
           mkdir -p cells
-          if [ "$TEST" = robust ]; then
+          if [ "$TEST" = scale ]; then
+            # the modelled organism: runs R0 .. R0+REPS-1 on the max with work waiting in line, as many workers as the memory
+            # holds (15 GB each for the tower at 1,000 copies), each run kept as it finishes; one cell, part-<organism>-<first>
+            cell="part-$ORGS-$R0"; echo "\$(date -u +%FT%TZ) start \$cell"
+            gb=\$(awk '/MemTotal/ {print int(\$2/1048576)}' /proc/meminfo)
+            w=\$(python3 -c "import os; print(max(1, min(os.cpu_count(), $REPS, int(\$gb * 0.85 / (15.0 * $SCALE / 1000)))))")
+            python3 tools/run_scale.py --runs $REPS --first $R0 --scale $SCALE --organisms $ORGS --out "cells/\$cell" --workers "\$w" \
+              --arm v5 --load line > "run-\$cell.log" 2>&1; code=\$?
+            mv "run-\$cell.log" "cells/\$cell/run.log"; echo "\$code" > "cells/\$cell/run.exit"; echo "\$(date -u +%FT%TZ) end \$cell exit \$code"
+          elif [ "$TEST" = robust ]; then
             w="1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1"; s=""
             for i in \$(seq 1 $((DUR / 900))); do s="\$s \$w"; done
             export ROBUST=long LOAD_STEPS_IN="\${s# }"
-            for rep in \$(seq 1 $REPS); do
+            for rep in \$(seq $R0 $((R0 + REPS - 1))); do
               cell="robust-long-x$DUR-\$rep"; echo "\$(date -u +%FT%TZ) start \$cell"
               REP=\$rep bash scripts/kind_paired.sh > "paired-\$cell.log" 2>&1; code=\$?
               mkdir -p "cells/\$cell" && mv bench-*-"\$rep" "cells/\$cell/" 2>/dev/null; mv "paired-\$cell.log" "cells/\$cell/paired.log"
               echo "\$code" > "cells/\$cell/paired.exit"; echo "\$(date -u +%FT%TZ) end \$cell exit \$code"
             done
           else
-          for rep in \$(seq 1 $REPS); do for org in \$(echo "$ORGS" | tr , ' '); do
+          for rep in \$(seq $R0 $((R0 + REPS - 1))); do for org in \$(echo "$ORGS" | tr , ' '); do
             cell="six-\$org-x$SCALE-\$rep"; echo "\$(date -u +%FT%TZ) start \$cell"
             ORGANISM=\$org REP=\$rep bash scripts/kind_paired.sh > "paired-\$cell.log" 2>&1; code=\$?
             mkdir -p "cells/\$cell" && mv bench-*-"\$rep" "cells/\$cell/" 2>/dev/null; mv "paired-\$cell.log" "cells/\$cell/paired.log"
@@ -188,8 +203,8 @@ jobs:
           scp -o StrictHostKeyChecking=no run_all.sh omni@$IP:omni/run_all.sh
           # the test is started in the background with every file handle redirected, and nothing else is put in the
           # background with it (an "a && b &" list would leave a shell holding this ssh session open until the test ends)
-          ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni; nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat detached.log; echo "--- paired log"; tail -5 paired-*.log 2>/dev/null; pgrep -af kind_paired >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
-          echo "::notice::$RG in $LOC: test $TEST, $ORGS at $SCALE copies, $REPS repetitions of $DUR s an arm, commit $SHA, collected and deleted after $MAXH h at the latest; collect looks at it every two hours"
+          ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni; nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat detached.log; echo "--- paired log"; tail -5 paired-*.log run-*.log 2>/dev/null; pgrep -af "kind_paired|run_scale" >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
+          echo "::notice::$RG in $LOC: test $TEST, $ORGS at $SCALE copies, $REPS repetitions from $R0 (of $DUR s an arm with the cluster inside), commit $SHA, collected and deleted after $MAXH h at the latest; collect looks at it every two hours"
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -241,7 +256,7 @@ jobs:
             scp -i k -o StrictHostKeyChecking=no -r "omni@$ip:omni/cells/*" out/ || true
             scp -i k -o StrictHostKeyChecking=no "omni@$ip:omni/detached.log" "out/detached-$RG.log" || true
             { $S 'free -g; df -h /'; echo "$tags"; } > "out/machine-$RG.txt" 2>&1 || true
-            for c in out/six-* out/robust-*; do [ -d "$c" ] && echo "::notice::$(basename "$c"): exit $(cat "$c/paired.exit" 2>/dev/null || echo missing), $(find "$c" -type f | wc -l) files"; done
+            for c in out/six-* out/robust-* out/part-*; do [ -d "$c" ] && echo "::notice::$(basename "$c"): exit $(cat "$c/paired.exit" "$c/run.exit" 2>/dev/null || echo missing), $(find "$c" -type f | wc -l) files"; done
             az group delete -n "$RG" --yes --no-wait || true; any=1
           done
           echo "any=$any" >> "$GITHUB_OUTPUT"
@@ -250,8 +265,8 @@ jobs:
         id: cells
         if: steps.look.outputs.any == '1'
         run: |
-          i=0; for c in out/six-* out/robust-*; do [ -d "$c" ] || continue; i=$((i + 1)); echo "c$i=$(basename "$c")" >> "$GITHUB_OUTPUT"; done
-          [ "$i" -le 6 ] || echo "::warning::$i cells collected, only the first six are published as artifacts; the rest are in detached-machines"
+          i=0; for c in out/six-* out/robust-* out/part-*; do [ -d "$c" ] || continue; i=$((i + 1)); echo "c$i=$(basename "$c")" >> "$GITHUB_OUTPUT"; done
+          [ "$i" -le 6 ] || echo "::notice::$i cells collected: the first six are also published one by one; every cell is in detached-cells"
       - uses: actions/upload-artifact@v4
         if: steps.cells.outputs.c1 != ''
         with: {name: "${{ steps.cells.outputs.c1 }}", path: "out/${{ steps.cells.outputs.c1 }}", if-no-files-found: ignore}
@@ -273,6 +288,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: steps.look.outputs.any == '1'
         with: {name: "detached-machines", path: "out/*.log\nout/*.txt\nout/unfinished\nout/six-*[7-9]\n!out/six-*-[1-6]", if-no-files-found: ignore}
+      - uses: actions/upload-artifact@v4      # every cell collected in one (six-pool and six_kube_report read it whole)
+        if: steps.look.outputs.any == '1'
+        with: {name: "detached-cells", path: "out/", if-no-files-found: ignore}
       - name: Legal files beside the files this run hands out
         if: always()
         uses: actions/checkout@v4
