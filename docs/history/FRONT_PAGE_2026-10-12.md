@@ -5,8 +5,8 @@
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
 The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report and printout
-of any part of Omni-Compass carries the notice above, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and
-[`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
+of any part of Omni-Compass carries the notice above, [`LICENSE`](../../LICENSE), [`NOTICE`](../../NOTICE) and
+[`DISCLOSURES.md`](../../DISCLOSURES.md) unchanged.
 
 ## Latest, newest first
 
@@ -15,8 +15,8 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v3, fingerprint `b53d05449ee04c4b` (40 files); package 0.3.0. Omni v4 (the reflex rule on every wire) is designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md) and not yet built; every result runs again on it when it is.
-- **The Omni index now:** +5.2% on the resource reading (work, speed, machines and energy) and +12.5% on the service reading (work and speed), real machines, every test the same in all three of our runs ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+- **Engine on main:** omni-v3, fingerprint `b53d05449ee04c4b` (40 files); package 0.3.0. Omni v4 (the reflex rule on every wire) is designed in [`docs/OMNI_V4_PLAN.md`](../../docs/OMNI_V4_PLAN.md) and not yet built; every result runs again on it when it is.
+- **The Omni index now:** +5.2% on the resource reading (work, speed, machines and energy) and +12.5% on the service reading (work and speed), real machines, every test the same in all three of our runs ([`results/OMNI_INDEX.md`](../../results/OMNI_INDEX.md)).
 <!-- front-page:status:end -->
 
 **Tables the repository rebuilt by itself** (the five live products, each from its three newest runs on one engine):
@@ -36,16 +36,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-11 01:57 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v3)](results/live/V3_KEDA_REQUESTS.md) |  |
-| 2026-10-11 01:57 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v3)](results/live/V3_KEDA_CPU_REQUESTS.md) |  |
-| 2026-10-11 01:57 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-11 00:21 | [Public demand traces, turned into load schedules](results/traces/README.md) |  |
-| 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/fresh/RESULT.md) |  |
-| 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/RESULT.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)](results/scale/v1/receipts/round6-1x.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 10x size, up to 1000 runs (pooled from 60 shards)](results/scale/v1/receipts/round6-10x.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 100x size, up to 1000 runs (pooled from 240 shards)](results/scale/v1/receipts/round6-100x.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 1000x size, up to 10 runs (pooled from organism-sized shards)](results/scale/v1/receipts/round6-1000x.md) |  |
+| 2026-10-11 01:57 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v3)](../../results/live/V3_KEDA_REQUESTS.md) |  |
+| 2026-10-11 01:57 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v3)](../../results/live/V3_KEDA_CPU_REQUESTS.md) |  |
+| 2026-10-11 01:57 | [The Omni index: more for the same, or the same for less](../../results/OMNI_INDEX.md) |  |
+| 2026-10-11 00:21 | [Public demand traces, turned into load schedules](../../results/traces/README.md) |  |
+| 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](../../results/sim/gpu_two_wire/fresh/RESULT.md) |  |
+| 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](../../results/sim/gpu_two_wire/RESULT.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)](../../results/scale/v1/receipts/round6-1x.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 10x size, up to 1000 runs (pooled from 60 shards)](../../results/scale/v1/receipts/round6-10x.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 100x size, up to 1000 runs (pooled from 240 shards)](../../results/scale/v1/receipts/round6-100x.md) |  |
+| 2026-10-11 00:21 | [Six organisms at 1000x size, up to 10 runs (pooled from organism-sized shards)](../../results/scale/v1/receipts/round6-1000x.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -66,9 +66,9 @@ replaces native; every comparison is native against omni.
 Native here is Kubernetes as clusters run it, with **KEDA 2.21** and its **HTTP add-on 0.16** owning the service's
 autoscaler; omni is Omni-Compass on top of that same stack, its moves carried to KEDA through the plug
 (`scripts/kubectl_keda.py`). Ten paired runs per setup, three separate GitHub runs, engine omni-v3, every row shown
-([`docs/ADDONS_PREREGISTRATION.md`](docs/ADDONS_PREREGISTRATION.md), declared before the first run). Tables:
-[`V3_KEDA_CPU_REQUESTS`](results/live/V3_KEDA_CPU_REQUESTS.md) (KEDA on the CPU target and the requests in flight) and
-[`V3_KEDA_REQUESTS`](results/live/V3_KEDA_REQUESTS.md) (the HTTP add-on on the requests in flight alone).
+([`docs/ADDONS_PREREGISTRATION.md`](../../docs/ADDONS_PREREGISTRATION.md), declared before the first run). Tables:
+[`V3_KEDA_CPU_REQUESTS`](../../results/live/V3_KEDA_CPU_REQUESTS.md) (KEDA on the CPU target and the requests in flight) and
+[`V3_KEDA_REQUESTS`](../../results/live/V3_KEDA_REQUESTS.md) (the HTTP add-on on the requests in flight alone).
 
 | | KEDA on CPU and requests | KEDA's HTTP add-on |
 |---|---|---|
@@ -86,12 +86,12 @@ counts requests served directly. It also gives native a node autoscaler: Karpent
 ## The result on real Kubernetes
 
 Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v3**, the frozen and
-fingerprinted engine ([`docs/OMNI_V3.md`](docs/OMNI_V3.md): v1's law and controllers byte for byte, the muscle catalog grown to 945 and a do-no-harm gate on speed knobs; the v1 tables, [`docs/OMNI_V1.md`](docs/OMNI_V1.md), read the same and stay as the first engine's record). Every test ran three times as separate GitHub runs (A the
+fingerprinted engine ([`docs/OMNI_V3.md`](../../docs/OMNI_V3.md): v1's law and controllers byte for byte, the muscle catalog grown to 945 and a do-no-harm gate on speed knobs; the v1 tables, [`docs/OMNI_V1.md`](../../docs/OMNI_V1.md), read the same and stay as the first engine's record). Every test ran three times as separate GitHub runs (A the
 result, B and C the replications); a reading below is **the same in all three of our runs** only when it holds in all three runs with every 95%
 interval clear of zero, and otherwise reads no difference beyond the noise. The six tables:
-[`V3_ALL_FOUR`](results/live/V3_ALL_FOUR.md), [`V3_STEADY`](results/live/V3_STEADY.md),
-[`V3_WANDERING`](results/live/V3_WANDERING.md), [`V3_FAULTS`](results/live/V3_FAULTS.md),
-[`V3_BATCH`](results/live/V3_BATCH.md), [`V3_FAIRNESS`](results/live/V3_FAIRNESS.md).
+[`V3_ALL_FOUR`](../../results/live/V3_ALL_FOUR.md), [`V3_STEADY`](../../results/live/V3_STEADY.md),
+[`V3_WANDERING`](../../results/live/V3_WANDERING.md), [`V3_FAULTS`](../../results/live/V3_FAULTS.md),
+[`V3_BATCH`](../../results/live/V3_BATCH.md), [`V3_FAIRNESS`](../../results/live/V3_FAIRNESS.md).
 
 | | native (run A) | omni (run A) | Reading over the three runs |
 |---|---:|---:|---|
@@ -109,20 +109,20 @@ speed and work. Earlier engines without that check parked 29-36% of the machines
 puts work and speed first.
 
 **Not yet shown**, stated as plainly as the gains: an energy or cloud-bill saving on real machines (Azure's bill did not
-move on the earlier engines, [`AKS_BILL`](results/live/AKS_BILL.md) and [`V1_AKS_STEADY`](results/live/V1_AKS_STEADY.md):
+move on the earlier engines, [`AKS_BILL`](../../results/live/AKS_BILL.md) and [`V1_AKS_STEADY`](../../results/live/V1_AKS_STEADY.md):
 every gauge inside the noise), and the current card governor on a real GPU (the one real-card run, on a governor since
 replaced, saved 1.6-3.5% of the card's energy and made its 95th percentile 43-84% slower:
-[`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)). The five live products, the index and every row,
-losses included, are in [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md), [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md)
-and [`docs/WIRING_VERDICTS.md`](docs/WIRING_VERDICTS.md), each rebuilt from the tables by the repository itself.
+[`HIL_RESCORED`](../../results/hil/run-20261002T082232Z/HIL_RESCORED.md)). The five live products, the index and every row,
+losses included, are in [`results/OMNI_INDEX.md`](../../results/OMNI_INDEX.md), [`docs/BENEFIT_SHEET.md`](../../docs/BENEFIT_SHEET.md)
+and [`docs/WIRING_VERDICTS.md`](../../docs/WIRING_VERDICTS.md), each rebuilt from the tables by the repository itself.
 
 ## The manual: the book for the people who wire it
 
-[`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf) is Omni-Compass as a printed book, built from the
+[`docs/OMNI_COMPASS_MANUAL.pdf`](../../docs/OMNI_COMPASS_MANUAL.pdf) is Omni-Compass as a printed book, built from the
 repository whenever it changes (`docs/book/build_book.py`): front matter with the card for the glove box, the theory of
 the mechanism, the wiring instructions level by level and stack by stack (Kubernetes, databases, message brokers, caches,
 GPUs, the processor itself, the data center under the servers, robots and drones), operating it, proving it, and back
-matter. Its text is [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md). It is written for the CTO who decides,
+matter. Its text is [`docs/OMNI_COMPASS_MANUAL.md`](../../docs/OMNI_COMPASS_MANUAL.md). It is written for the CTO who decides,
 the engineer who wires, the operator who runs a data center, and the auditor who checks.
 
 ## What is real and what is a model
@@ -141,8 +141,8 @@ the meters of each muscle (response time, utilisation, power, heat), holds each 
 its band with one bounded law, and hands every setting back the moment it stops. As demand rises, the warm machines
 take it first; as it falls, the emptiest machine idles first, powered and ready, never switched off, and never below a floor of two (idle). The reset hands every setting back at
 the end of a run; the kill switch, a separate security switch, turns Omni-Compass off everywhere at once. The law, its
-proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.md),
-[`docs/TRACKING_THEOREM.md`](docs/TRACKING_THEOREM.md), [`docs/CONVEYANCE_LAW.md`](docs/CONVEYANCE_LAW.md).
+proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](../../docs/MECHANISM_OF_ACTION.md),
+[`docs/TRACKING_THEOREM.md`](../../docs/TRACKING_THEOREM.md), [`docs/CONVEYANCE_LAW.md`](../../docs/CONVEYANCE_LAW.md).
 
 ## Check it yourself
 
@@ -159,18 +159,18 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 
 | For | Read |
 |---|---|
-| **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
-| **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **Omni v3, v2 and v1: the frozen engines, fingerprinted; which version every result ran on; how each is the same in all three of our runs** | [`docs/OMNI_V3.md`](docs/OMNI_V3.md), [`docs/OMNI_V2.md`](docs/OMNI_V2.md), [`docs/OMNI_V1.md`](docs/OMNI_V1.md), `python3 tools/omni_version.py` |
-| Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
-| How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
-| The method, written before each run | [`docs/K8S_COMPASS_PREREGISTRATION.md`](docs/K8S_COMPASS_PREREGISTRATION.md), [`docs/GPU_PREREGISTRATION.md`](docs/GPU_PREREGISTRATION.md), [`docs/REALMS_PREREGISTRATION.md`](docs/REALMS_PREREGISTRATION.md) |
-| A referee's checklist | [`docs/REFEREE_CHECKLIST.md`](docs/REFEREE_CHECKLIST.md) |
-| Every claim with its evidence class, losses kept | [`docs/EVIDENCE_LEDGER.md`](docs/EVIDENCE_LEDGER.md), [`docs/CLAIMS_REGISTER.md`](docs/CLAIMS_REGISTER.md) |
-| Due diligence | [`docs/DUE_DILIGENCE.md`](docs/DUE_DILIGENCE.md) |
-| The manual (wiring, operating, every result) | [`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf), [`docs/INTEGRATION_MANUAL.md`](docs/INTEGRATION_MANUAL.md) |
-| The 945 muscles | [`docs/MUSCLE_CATALOG.md`](docs/MUSCLE_CATALOG.md) |
-| Every command on one page | [`docs/HANDOFF.md`](docs/HANDOFF.md) |
+| **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](../../docs/REGISTER.md) |
+| **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](../../docs/PROOF_PROGRAM.md) |
+| **Omni v3, v2 and v1: the frozen engines, fingerprinted; which version every result ran on; how each is the same in all three of our runs** | [`docs/OMNI_V3.md`](../../docs/OMNI_V3.md), [`docs/OMNI_V2.md`](../../docs/OMNI_V2.md), [`docs/OMNI_V1.md`](../../docs/OMNI_V1.md), `python3 tools/omni_version.py` |
+| Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](../../docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](../../results/OMNI_INDEX.md) |
+| How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](../../docs/HOW_TO_READ_THE_RESULTS.md) |
+| The method, written before each run | [`docs/K8S_COMPASS_PREREGISTRATION.md`](../../docs/K8S_COMPASS_PREREGISTRATION.md), [`docs/GPU_PREREGISTRATION.md`](../../docs/GPU_PREREGISTRATION.md), [`docs/REALMS_PREREGISTRATION.md`](../../docs/REALMS_PREREGISTRATION.md) |
+| A referee's checklist | [`docs/REFEREE_CHECKLIST.md`](../../docs/REFEREE_CHECKLIST.md) |
+| Every claim with its evidence class, losses kept | [`docs/EVIDENCE_LEDGER.md`](../../docs/EVIDENCE_LEDGER.md), [`docs/CLAIMS_REGISTER.md`](../../docs/CLAIMS_REGISTER.md) |
+| Due diligence | [`docs/DUE_DILIGENCE.md`](../../docs/DUE_DILIGENCE.md) |
+| The manual (wiring, operating, every result) | [`docs/OMNI_COMPASS_MANUAL.pdf`](../../docs/OMNI_COMPASS_MANUAL.pdf), [`docs/INTEGRATION_MANUAL.md`](../../docs/INTEGRATION_MANUAL.md) |
+| The 945 muscles | [`docs/MUSCLE_CATALOG.md`](../../docs/MUSCLE_CATALOG.md) |
+| Every command on one page | [`docs/HANDOFF.md`](../../docs/HANDOFF.md) |
 
 ## Repository
 
@@ -209,14 +209,14 @@ trademark license is granted for any other use.
 
 | File | What it says |
 |---|---|
-| [`LICENSE`](LICENSE) | evaluation and simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
-| [`NOTICE`](NOTICE) | copyright, the US filings notice, third-party notices |
-| [`PATENTS.md`](PATENTS.md) | the nonprovisional utility patent application "The Omni-Compass" filed in the United States (title, inventor, date; the number is withheld on purpose); no patent license is granted |
-| [`TRADEMARKS.md`](TRADEMARKS.md) | the Omni-Compass marks; trademark applications filed in the United States |
-| [`DISCLOSURES.md`](DISCLOSURES.md) | every declaration, disclosure and disclaimer, made once |
-| [`LICENSING_FAQ.md`](LICENSING_FAQ.md) | licensing in plain answers |
-| [`.github/CLA.md`](.github/CLA.md) | contributions are assigned to The Omni-Compass LLC |
-| [`REUSE.toml`](REUSE.toml), [`sbom/`](sbom), [`.fossa.yml`](.fossa.yml) | machine-readable license declarations for scanners |
+| [`LICENSE`](../../LICENSE) | evaluation and simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
+| [`NOTICE`](../../NOTICE) | copyright, the US filings notice, third-party notices |
+| [`PATENTS.md`](../../PATENTS.md) | the nonprovisional utility patent application "The Omni-Compass" filed in the United States (title, inventor, date; the number is withheld on purpose); no patent license is granted |
+| [`TRADEMARKS.md`](../../TRADEMARKS.md) | the Omni-Compass marks; trademark applications filed in the United States |
+| [`DISCLOSURES.md`](../../DISCLOSURES.md) | every declaration, disclosure and disclaimer, made once |
+| [`LICENSING_FAQ.md`](../../LICENSING_FAQ.md) | licensing in plain answers |
+| [`.github/CLA.md`](../../.github/CLA.md) | contributions are assigned to The Omni-Compass LLC |
+| [`REUSE.toml`](../../REUSE.toml), [`sbom/`](../../sbom), [`.fossa.yml`](../../.fossa.yml) | machine-readable license declarations for scanners |
 
 ---
 
