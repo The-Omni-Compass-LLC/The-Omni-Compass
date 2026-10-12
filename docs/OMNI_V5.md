@@ -61,14 +61,18 @@ threw away almost all of what v5 saves: on the tower, 1.09% with it off against 
 v5 was re-declared with the gates replaced by the physics floors above, developed on seeds 7100-7209 only, and the
 preregistered seeds 3000-3009 were run again unchanged.
 
+**Amendment 2, 12 October.** The catalog's second wave (95 muscles, five new families and additions to seven) took it to
+1,097 muscles in 70 families; the engine's law is unchanged, its fingerprint re-declared because the catalog is part of
+it. Developed on seeds 7100-7109 only (0 of 1,097 worse, all six organisms superior); the preregistered seeds 3000-3009
+were run again unchanged on commit `04d9eb3b3`, with the same savings on the whole tower, the four stacked and Energy /
+Facility (3.0 times v3's).
+
 ## The no-harm proof (modelled, class S)
 
 On a fixed seed, for **every** muscle in the catalog, the v5 default uses no more energy than native, does no less work,
 and is in violation no more often; it hands every knob back to native on the kill (the dead-man lease); and it acts where
 it helps. The whole tower is no worse than native on energy and work. On the preregistered seeds the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times), all six
-organisms superior within guardrails. Inside the organisms v5 leaves 1 to 3 plants per organism (8 in the four stacked, which are the four realms together) one decision over their
-line, all of them UPS or distribution plants it never touches (the body's power swing reaches them), against v3's 13 to
-74; holding the body's shared power lines as one gauge is the next engine item. This is checked in
+organisms superior within guardrails, 0 of 1,097 muscles worse than native. Inside the organisms v5 leaves 1 to 3 plants per organism (8 in the four stacked, which are the four realms together) one decision over their line in one of the ten seeds, all of them UPS or power-distribution plants it never touches (the body's power swing reaches them), against v3's 13 to 35 (83 in the four stacked). Seven of the eight come in the decisions right after the safety cutoff, when every knob is handed back to native at once and the body pays back what Omni saved (warmer rooms cool back down, eased loops return); one comes while Omni runs (a UPS line 40 W over its 211,436 W limit, where native sat 9 W under it, as a computer pool caught up on held work). A strict guard on the body's shared power lines removes them, but on development seeds it also removes almost all of the saving in a body whose UPS lines run at their limit (Compute / AI / Cloud 0.47% to 0.01%; native itself is over those lines in 4% to 15% of decisions); that trade is held for the founder's decision. This is checked in
 `tests/test_compass_arm_v5.py` and run in full by `tools/run_realms_v5.py` (`results/realms_v5/`). Models are class S: a
 model's energy is not a meter's, and a plant written by the same people who wrote the law is not an independent test.
 

@@ -24,11 +24,15 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
   reach, the cooling headroom's fall read ahead, the latency floor, the power cap only where a pool's line outlasts a
   decision, a cloud pool's machine hand-back left to its autoscaler); the gate on generating units alone had thrown away
   almost all of v5's saving (`docs/OMNI_V5.md`, the amendment).
-- **Stage 9 — DONE (first wave).** The v5 catalog `realms/catalog_v5.csv`: 1,002 muscles in 65 families (v3's 945 plus
-  Linux Kernel & OS Control, Serverless & FaaS, Virtualization & Hypervisor, Content Delivery & Edge Cache, Gut, Skin). The
-  official v5 table: `results/realms_v5/REALMS_V5.md`, all six organisms superior within guardrails, 0 of 1,002 worse;
+- **Stage 9 — DONE (two waves).** The v5 catalog `realms/catalog_v5.csv`: 1,097 muscles in 70 families (v3's 945 plus
+  Linux Kernel & OS Control, Serverless & FaaS, Virtualization & Hypervisor, Content Delivery & Edge Cache, Gut, Skin; then
+  Financial Markets & Trading, Media Streaming & CDN, Game Servers, Blockchain & Ledger Nodes, CI/CD & Build Farms and
+  additions to seven families). The official v5 table: `results/realms_v5/REALMS_V5.md`, all six organisms superior
+  within guardrails, 0 of 1,097 worse;
   the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times). Inside the organisms v5 leaves 1 to 3 plants per organism (8 in the four stacked, which are the four realms together) one decision over their line (all of them UPS or
-  distribution plants it never touches, moved by the body's power swing), against v3's 13 to 34 (80 in the four stacked).
+  distribution plants it never touches, moved by the body's power swing), against v3's 13 to 35 (83 in the four stacked);
+  seven of the eight right after the safety cutoff (the hand-back), one while Omni runs; the strict body guard and its
+  cost are measured and held for the founder (`docs/OMNI_V5.md`).
 - **Benchmarks — written.** Google GKE and Amazon EKS paired runs, the AMD APU adapter, the realms-v5 workflow and one
   button for every benchmark (`docs/omni_v5/BENCHMARKS_V5.md`). The live benchmarks measure the v5 law only after stages
   6–11 port it into the live controllers.
@@ -61,7 +65,7 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
    skeleton limit caps every muscle on it; blood = data+power vital; heart = loop clock (arrhythmia watch); skin =
    perimeter; senses = external forecasts feeding anticipation. Test: a bone fracture fails muscles over; a blood/heart
    stall is a vital alarm. Accept: shared edges honoured; vitals watched.
-9. **The new muscle families → catalog past 1,000 (first wave DONE: 1,002).** Files: `realms/presets.py`, `realms/catalog.csv`,
+9. **The new muscle families → catalog past 1,000 (DONE: 1,097 in two waves).** Files: `realms/presets.py`, `realms/catalog.csv`,
    `docs/REGISTER.md`, `docs/MUSCLE_CATALOG.md`. Add: Serverless/FaaS, Virtualization/hypervisor, Network fabric/SDN/LB/
    CDN, Gut/data-plane controls, Skin/perimeter. Test: catalog loads, each new muscle read-write-read-back. Accept:
    distinct count locked (~1,005–1,065); AI Training stays family 2, AI Inference family 1.

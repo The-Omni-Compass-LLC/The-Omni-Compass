@@ -460,7 +460,7 @@ Robotics / Autonomous 394, Energy / Facility / Industrial 470, Distribution / Sp
 the 257-muscle spine counted in each) is **1,868** on v5 (v3: 1,716). The "1,000" elsewhere in the docs is the
 1,000-**copy** scale, not a muscle count.
 The do-no-harm check runs on all 1,097 (`tests/test_compass_arm_v5.py`); the official table is
-`results/realms_v5/REALMS_V5.md` (all six organisms superior within guardrails, 0 of 1,002 worse than native; the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times)). More
+`results/realms_v5/REALMS_V5.md` (all six organisms superior within guardrails, 0 of 1,097 worse than native; the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times)). More
 families — the SDN/load-balancer fabric beyond routing, more of the body's vitals — raise the count again when built.
 
 ## 27. The benchmark program — every run, nothing left out

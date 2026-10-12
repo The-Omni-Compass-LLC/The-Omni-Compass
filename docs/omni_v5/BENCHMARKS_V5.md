@@ -9,7 +9,7 @@ secrets are in place (a missing secret is reported and skipped, never billed). C
 
 ## First, the plain truth about which law each benchmark runs today
 
-- **The v5 law runs today in the modelled realms** (`tools/run_realms_v5.py`, workflow `realms-v5`): 1,002 muscles in 65
+- **The v5 law runs today in the modelled realms** (`tools/run_realms_v5.py`, workflow `realms-v5`): 1,097 muscles in 70
   families, all six organisms *superior within guardrails*, **0 muscles worse than native**; the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times)
   (`results/realms_v5/REALMS_V5.md`). Evidence class **S** (modelled): a model is not proof.
 - **Every live benchmark** (real Kubernetes, the GPU, the clouds, the six organisms with a real cluster or card inside)
@@ -24,7 +24,7 @@ secrets are in place (a missing secret is reported and skipped, never billed). C
 
 | Benchmark | What it measures | Workflow | Cost |
 |---|---|---|---|
-| Realms on v5 | every one of the 1,002 muscles alone and the six organisms, native vs the v5 law, seeds 3000–3009, the no-harm check | `realms-v5` | free |
+| Realms on v5 | every one of the 1,097 muscles alone and the six organisms, native vs the v5 law, seeds 3000–3009, the no-harm check | `realms-v5` | free |
 
 ## B. Free benchmarks on GitHub's own machines (23, all started by the button)
 
@@ -57,7 +57,7 @@ secrets are in place (a missing secret is reported and skipped, never billed). C
 | Benchmark | What it measures | How it runs | Cost (check prices on the day) |
 |---|---|---|---|
 | GitHub GPU | native / watch / Omni on a real NVIDIA T4, energy from the card's own meter | `gpu-bench` (needs the `gpu-t4` runner) | billed per minute |
-| One chip, the whole test | wire check, envelope, smoke, two preregistered confirmations (compute, AI token generation), the operator's power cap underneath, the fault drill, AI serving (vLLM) | `scripts/gpu_rented_run.sh` on a rented card (`docs/GPU_RUN_GUIDE.md`, C) | one A10 is about $0.75 an hour; the whole test is about 45 hours |
+| One chip, the whole test | wire check, envelope, smoke, two preregistered counted runs (compute, AI token generation), the operator's power cap underneath, the fault drill, AI serving (vLLM) | `scripts/gpu_rented_run.sh` on a rented card (`docs/GPU_RUN_GUIDE.md`, C) | one A10 is about $0.75 an hour; the whole test is about 45 hours |
 | The 1,000 copies | the six organisms at 1, 10, 100 and **1,000** copies on one clock with the real card inside | step 8 of the one-chip and eight-chip runs (`tools/run_hil.py`) | inside the runs above |
 | Eight chips | every card of one server at once, sharing its power and cooling, then one language model across all eight | `scripts/gpu_8card.sh` (`docs/GPU_RUN_GUIDE.md`, D), or one button: `lambda-gpu` (below) | 8×A100 about $14 an hour, 8×H100 about $24; full design 17–18 h, pooled 9–10 h, fast 3.5 h |
 | AMD APU / AMD GPU | the same preregistered protocol on an AMD chip; on an APU the package's power (CPU and GPU together) | `scripts/apu_run.sh` (AMD's `amd-smi` through `scripts/apu/nvidia-smi`; checked by `tests/test_apu_shim.py`) | the machine's rate |
@@ -80,7 +80,7 @@ the watch is `scripts/lambda_gpu_watch.sh`.
 | `8card` `pooled` (default) | every stage, repetitions pooled across the cards | 10.5 h (11.5 h) | about $165 at most |
 | `8card` `fast` | what only a full server shows | 4 h (5 h) | about $72 at most |
 | `8card` `full` | the whole design | 26 h (27 h) | about $387 at most |
-| `1card` `fast` | the compute confirmation on one A10 | 8 h (9 h) | one A10 about $0.75 an hour: about $7 |
+| `1card` `fast` | the compute counted run on one A10 | 8 h (9 h) | one A10 about $0.75 an hour: about $7 |
 | `1card` `full` | the whole one-card test | 32 h (33 h) | about $25 |
 
 The price shown by the dry run is Lambda's own, read at that moment; the table above is an example. GitHub's own minutes
