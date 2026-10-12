@@ -249,8 +249,11 @@ def safe_speed(plant, cfg, lo: float) -> float:
         reaction time is the whole move, and every task arriving meanwhile would wait behind it);
       a queue is never slowed (every task behind the move would finish later);
       the tasks waiting now and the most that can arrive in the next decision (the motion_q share of a Poisson count at the
-        recent peak rate) are all finished inside the deadline even if the whole burst arrives at once.
-    1.0 is native (full speed)."""
+        recent peak rate) are all finished inside the deadline even if the whole burst arrives at once;
+      and the wake forecast over a whole deadline (the most that can arrive in one deadline at the recent peak rate) is
+        finished inside that deadline at the slowed speed, so the axis always goes idle again and a delay is recovered
+        before a later rush could make it permanent (an axis one task behind native in a rush stays behind it).
+    1.0 is native (full speed): when work comes, the axis wakes straight to it."""
     P = plant.P
     dt = P["dt_dec"]
     hist = getattr(plant, "_v5_arr", None)
@@ -267,9 +270,15 @@ def safe_speed(plant, cfg, lo: float) -> float:
     burst = plant.backlog + poisson_hi(lam * dt, cfg.motion_q)
     w0 = plant.waits[0] if plant.waits else 0.0
     room = P["deadline_s"] - w0
+    # the wake forecast over a whole deadline: the motion_q share of the tasks that can arrive in one deadline at the recent
+    # peak rate. A slowed axis must still finish all of them inside that deadline, so it always goes idle again and any
+    # delay is recovered before a later rush could make it permanent (a task one behind native in a rush stays behind)
+    H = P["deadline_s"]
+    n_h = poisson_hi(lam * H, cfg.motion_q)
     s = lo
     while s < 1.0:
-        if plant.move_time(s) + P["dwell"] <= dt and serve_time(plant, burst, s) <= room:
+        cycle = plant.move_time(s) + P["dwell"]
+        if cycle <= dt and serve_time(plant, burst, s) <= room and n_h * cycle <= H:
             return s
         s = min(1.0, s + 0.02)
     return 1.0

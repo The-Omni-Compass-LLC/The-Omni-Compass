@@ -118,8 +118,9 @@ def write_md(out, res, orgs, run):
       "held every generating unit's loop, every power cap and every inverter native by blanket gates, which threw away "
       "most of what v5 saves. v5 was re-declared with those gates replaced by physics floors (the loop reach, the cooling "
       "headroom's fall read ahead, the latency floor, the power cap only where a pool's line outlasts a decision, a cloud "
-      "pool's machine hand-back left to its autoscaler), developed on seeds 7100-7209 only; the preregistered seeds "
-      "3000-3009 are run again unchanged.")
+      "pool's machine hand-back left to its autoscaler, a motion axis slowed only while the wake forecast over a whole "
+      "deadline still finishes inside it), developed on seeds 7100-7209 only; the preregistered seeds 3000-3009 are run "
+      "again unchanged.")
     w("")
     w("Primary outcome: work per energy, v5 against native, with its 95% interval over seeds. Guardrails: work not lower "
       "by more than 1%, share of periods in violation not higher by more than 1 percentage point. Labels by rule. These "
@@ -146,7 +147,10 @@ def write_md(out, res, orgs, run):
     w("## Inside the organisms: every plant that did worse than native")
     w("")
     w("A stricter look than the organism's total: every plant inside each organism, over all seeds, that did less work "
-      "than native or spent more decisions over its own line, for v5 and for v3. Reported whatever it shows.")
+      "than native or spent more decisions over its own line, for v5 and for v3. Reported whatever it shows. A plant can do "
+      "worse without Omni ever touching it: the body couples its plants (heat into rooms, the body's power swing onto its "
+      "UPS and distribution), so a move on one muscle reaches the others. Holding the body's shared lines (its UPS and "
+      "distribution) as one gauge every move answers to is the next engine item.")
     w("")
     w("| Organism | Plants | Plants worse, v5 | Plants worse, v3 | The v5 plants (work change, extra decisions over the line, all seeds) |")
     w("|---|---:|---:|---:|---|")

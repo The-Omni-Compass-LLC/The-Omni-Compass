@@ -32,7 +32,10 @@ Two math-only guardrails, and otherwise free arms:
   floor) nor so far that a burst would push its responses over the line where native's would not (the latency floor).
   And nothing permanent: a machine handed back to a cloud is the cluster autoscaler's own decision, because the
   autoscaler shrinks from wherever it is left, so an early hand-back would leave the pool a machine short of native for
-  good.
+  good; and a motion axis is slowed only while the wake forecast over a whole deadline (the most that can arrive in one
+  deadline at the recent peak rate) still finishes inside that deadline at the slowed speed, so a delay is always
+  recovered before a later rush could make it permanent. When work comes, every muscle wakes straight to the level the
+  work needs (the founder's rule: from idle straight to 99, never past 100).
 
 Every other knob is free to move both ways inside its physical cover, generating units included (a unit's steam,
 speed or gate loop eased inside its band serves the same load with less effort), and **a knob stays native only where its
