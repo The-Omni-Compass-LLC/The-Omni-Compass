@@ -4,13 +4,13 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: grid
-# The conductor of the 96-square grid on the max (scripts/dispatch_grid.py). Every 15 minutes it reads which runs of every
-# square are started, from the runs' own names, and starts the next ones (the 10-run squares of every size first, then
-# 100, then 1,000) until the repository's queued and running jobs reach what GitHub is running now plus a margin; so every
-# runner GitHub gives this repository is busy and the queue never holds more than the margin (other workflows still get a
-# runner within minutes). The squares too big for a GitHub machine go to rented Azure machines, up to what the quota holds
-# and never past the budget. It never starts a run twice and never starts a run on another engine; when every square is
-# started it starts nothing. One job ticks every 15 minutes for five hours, then starts the next job (GitHub's own
+# The conductor of the grid on the max (scripts/dispatch_grid.py): the six organisms at 1, 10 and 100 copies, each to 100
+# runs (1, 10 and 100 only, the founder's order of 12 October), modelled and with the real cluster inside. Every 15
+# minutes it reads which runs of every square are started, from the runs' own names, and starts the next ones (the 10-run
+# squares of every size first, then 100) until the repository's queued and running jobs reach what GitHub is running now
+# plus a margin; so every runner GitHub gives this repository is busy and the queue never holds more than the margin
+# (other workflows still get a runner within minutes). Every square runs on GitHub's own machines; nothing is rented. It
+# never starts a run twice and never starts a run on another engine; when every square is started it starts nothing. One job ticks every 15 minutes for five hours, then starts the next job (GitHub's own
 # schedule here is delayed by hours under load; the schedule below only restarts the chain if it ever breaks, and two
 # conductors never run at once). To stop the grid: Actions -> grid -> "..." -> Disable workflow (and cancel the six and
 # six-kube runs in flight). Started by hand it ticks at once; dry_run says what it would start, once.
@@ -21,8 +21,6 @@ on:
     inputs:
       grid: {description: "all, six (modelled) or six-kube (the real cluster inside)", default: "all"}
       dry_run: {description: "yes: say once what would start, start nothing", default: "no"}
-      max_machines: {description: "Rented Azure machines at once for the biggest squares (what the quota holds: eastus allows 200 vCPUs, one 8-vCPU machine per family)", default: "20"}
-      budget_usd: {description: "The most the rented machines may be committed to, in dollars, estimated at list price (the founder's figure)", default: "5000"}
 permissions:
   actions: write
   contents: read
@@ -34,34 +32,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 340
     env:
-      HAVE_AZURE: ${{ secrets.AZURE_CREDENTIALS != '' }}
       GRID: ${{ github.event.inputs.grid || 'all' }}
       DRY: ${{ github.event.inputs.dry_run || 'no' }}
-      MAXM: ${{ github.event.inputs.max_machines || '20' }}
-      BUDGET: ${{ github.event.inputs.budget_usd || '5000' }}
       GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
         with: {sparse-checkout: "scripts\nresults/grid_v5\ntools\nrealms\nomnicompass\nomni_controller"}
-      # nothing is rented without the AZURE_CREDENTIALS secret
-      - uses: azure/login@v2
-        if: env.HAVE_AZURE == 'true' && env.GRID == 'all'
-        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
       - name: Start the squares' next runs, every 15 minutes for five hours
         run: |
           rounds=18; [ "$DRY" = yes ] && rounds=1      # 18 ticks 15 minutes apart: under the job's 340 minutes
           for i in $(seq 1 $rounds); do
             echo "== tick $i of $rounds at $(date -u +%H:%M) UTC"
             python3 scripts/dispatch_grid.py tick --grid "$GRID" --ref "${{ github.ref_name }}" $([ "$DRY" = yes ] && echo --dry) \
-              || echo "::warning::tick $i: the GitHub part stopped (tried again next tick)"
-            if [ "$HAVE_AZURE" = true ] && [ "$GRID" = all ]; then
-              now=$(az group list --tag omni-detached=1 --query "length(@)" -o tsv 2>/dev/null || echo 0)
-              python3 scripts/dispatch_grid.py azure-tick --ref "${{ github.ref_name }}" --machines-now "${now:-0}" \
-                --max-machines "$MAXM" --budget "$BUDGET" $([ "$DRY" = yes ] && echo --dry) \
-                || echo "::warning::tick $i: the rented-machine part stopped (tried again next tick)"
-            fi
+              || echo "::warning::tick $i: the conductor stopped (tried again next tick)"
             if [ "$i" -lt "$rounds" ]; then sleep 900; fi
           done
       - name: The next conductor (one at a time; it waits for this one to end)
@@ -79,7 +64,7 @@ jobs:
           if [ "$waiting" = 0 ]; then
             curl -fsS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/grid.yml/dispatches" \
-              -d "{\"ref\": \"${{ github.ref_name }}\", \"inputs\": {\"grid\": \"$GRID\", \"max_machines\": \"$MAXM\", \"budget_usd\": \"$BUDGET\"}}" \
+              -d "{\"ref\": \"${{ github.ref_name }}\", \"inputs\": {\"grid\": \"$GRID\"}}" \
               && echo "the next conductor is started"
           else
             echo "a conductor is already waiting: it carries on"

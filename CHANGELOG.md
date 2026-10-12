@@ -2,6 +2,17 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-12 (evening): The grid is 1, 10 and 100 only, the founder's order
+
+- **No 1,000s.** Every organism runs at 1, 10 and 100 copies, each to 100 runs: 54 squares, native and Omni side by side,
+  modelled and with the real cluster inside (`scripts/dispatch_grid.py`, `grid.yml`, `six.yml`, `six-kube.yml`,
+  `tools/pool_scale.py`). The 1,000-copy squares and the 1,000-run blocks are gone, to cut the time and the bill.
+- **Nothing is rented for the grid.** Every square fits GitHub's own machines, so the conductor's rented-machine part is
+  removed (it existed only for the 1,000-copy squares) and the eight Azure machines that ran them are stopped. The runs
+  made at 1,000 before the order are kept as recorded and counted in no square.
+- **Time**: the modelled grid is fully started (1 and 10 copies done, 100 copies running); the grid with the real
+  cluster inside needs 1,800 jobs, about 12 hours on GitHub's machines, free for this public repository.
+
 ## 2026-10-12: The grid with the real cluster inside, protocol 2 (the test rig amended; the engine unchanged)
 
 - **What failed, and where.** Of the first runs with the real cluster inside, three causes marked repetitions invalid or

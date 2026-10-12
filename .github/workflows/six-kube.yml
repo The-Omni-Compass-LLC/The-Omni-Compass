@@ -8,12 +8,11 @@ name: six-kube
 # four stacked, each native against native with Omni-Compass on top (the max), paired on one runner per repetition, each
 # arm on a fresh six-worker kind cluster (scripts/kind_paired.sh). Six organisms times two arms: twelve columns, one report
 # (tools/six_kube_report.py -> SIX_KUBE.md). Started with its defaults (Actions -> six-kube -> Run workflow), it starts
-# the whole grid: every organism at 1, 10, 100 and 1,000 copies, every size to 1,000 repetitions (scripts/dispatch_grid.py,
-# kept going by grid.yml until every square is full). Started with what = runs, it runs one dispatch. The organism steps
-# on the window's clock, so the window is set long enough for the max's arm to make every step in time (a repetition
-# more than 5% late is marked off the clock). At 1,000 copies the two arms of a repetition together pass a runner's six
-# hours, so with split = yes each arm runs on its own runner (the repetitions average out the difference between runners);
-# the tower and the four stacked at 1,000 copies run on rented machines (big-organism-detached). "protocol 2" in a run's
+# the whole grid: every organism at 1, 10 and 100 copies, every size to 100 repetitions (1, 10 and 100 only, the founder's
+# order of 12 October; scripts/dispatch_grid.py, kept going by grid.yml until every square is full). Started with what =
+# runs, it runs one dispatch. The organism steps on the window's clock, so the window is set long enough for the max's arm
+# to make every step in time (a repetition more than 5% late is marked off the clock). With split = yes each arm of a
+# repetition runs on its own runner (for a window too long for both on one; the grid never needs it). "protocol 2" in a run's
 # name: the test rig as amended on 12 Oct (scripts/kind_bench.sh: the governor never below the organism's CPU priority, its
 # decisions counted inside the window, refused downloads tried again); the grid counts these runs only.
 run-name: >-
@@ -24,14 +23,14 @@ run-name: >-
 on:
   workflow_dispatch:
     inputs:
-      what: {description: "grid (start every square of the whole grid, every size to 1,000 repetitions) or runs (only the repetitions below)", default: "grid"}
-      sizes: {description: "runs: copies of each organism on one clock, the real cluster inside (1, 10, 100, 1000; comma-separated)", default: "1"}
+      what: {description: "grid (start every square of the whole grid: 1, 10 and 100 copies, every size to 100 repetitions) or runs (only the repetitions below)", default: "grid"}
+      sizes: {description: "runs: copies of each organism on one clock, the real cluster inside (1, 10, 100; comma-separated)", default: "1"}
       organisms: {description: "runs: organisms, comma-separated (compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower)", default: "compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower"}
       reps: {description: "runs: paired repetitions of each organism (one number, or one per size)", default: "10"}
-      rep_first: {description: "runs: the first repetition (1-based), so 1,000 repetitions per square can be cut into dispatches under GitHub's 256 jobs", default: "1"}
+      rep_first: {description: "runs: the first repetition (1-based), so a square's repetitions can be cut into dispatches under GitHub's 256 jobs", default: "1"}
       durations_s: {description: "runs: measured seconds per arm (240 organism steps; one number, or one per size)", default: "960"}
       arms: {description: "Arms, in rotation order", default: "native compass"}
-      split: {description: "runs: yes = each arm of a repetition on its own runner (for the 1,000-copy size); no = both on one runner", default: "no"}
+      split: {description: "runs: yes = each arm of a repetition on its own runner (a window too long for both on one); no = both on one runner", default: "no"}
       load_max: {description: "Load-generator replicas at each organism's peak demand", default: "6"}
       loadgen: {description: "closed (waits for answers) or open (fixed rate, equal work)", default: "open"}
 permissions:

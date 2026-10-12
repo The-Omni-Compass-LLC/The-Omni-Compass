@@ -967,6 +967,11 @@ times is listed, never dropped. The modelled grid (`six`) is not touched by this
 free for this public repository (about 1,340 jobs run again, some seven hours of its queue); the first ten repetitions of
 the two rented squares run again cost about $110 at list price, within the founder's budget.
 
+**The founder's order, 12 October evening: 1, 10 and 100 only.** The grid with the real cluster inside is every organism
+at 1, 10 and 100 copies, each to 100 repetitions; no 1,000 copies and no 1,000 repetitions, to cut the time and the bill.
+Every square runs on GitHub's own machines; the rented machines of the 1,000-copy squares are stopped and their
+repetitions (protocol 1) are kept as recorded, counted in no square. Protocol 2 and the counting rules above stand.
+
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.

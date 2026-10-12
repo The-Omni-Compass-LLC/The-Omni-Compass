@@ -61,13 +61,13 @@ def main(out, *paths):
                        else len(rows_for(k, scale, cat)))
     L = [f"# Six organisms at {scale}x size, {LOADS[load]}, up to {total} runs (pooled from {len(files)} shards)", "",
          f"Evidence class **S** (models). Engine {', '.join(known) or 'not recorded'}, commit(s) {', '.join(sorted(commits))}. "
-         f"Native: each organism's own controllers. Omni: {law}. Each block is the first N runs (seeds {SEED0} on), so 1, 10, "
-         "100 and 1,000 are nested; a block short of a run says so (Runs column: finished of the block). Band first: no win "
+         f"Native: each organism's own controllers. Omni: {law}. Each block is the first N runs (seeds {SEED0} on), so 1, 10 "
+         "and 100 are nested; a block short of a run says so (Runs column: finished of the block). Band first: no win "
          "unless the time over the service line is no higher than native's."
          + (f" The four stacked: {n_joined} of its runs are the four realms' runs on the same seeds joined plant for plant "
             "(its four bodies share nothing on the clock; equal to running it whole, to rounding)." if n_joined else ""), ""]
     summ = {}
-    for n in [x for x in (1, 10, 100, 1000) if x <= max(total, 1)]:
+    for n in [x for x in (1, 10, 100) if x <= max(total, 1)]:      # 1, 10 and 100 runs only (the founder's order, 12 Oct)
         L += [f"## {n} run{'s' if n > 1 else ''}", "",
               "| # | Organism | Muscles | Runs | Label | Band first | Work | Misses (pp) | Power given | Work per energy | Knobs handed back |",
               "|---|---|---:|---:|---|---|---:|---:|---:|---:|---|"]
