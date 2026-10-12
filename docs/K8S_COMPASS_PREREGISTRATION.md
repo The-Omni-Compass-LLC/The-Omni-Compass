@@ -713,7 +713,7 @@ idle), and two more for work that comes as a pile:
   services' demand at or under 0.05 of one pod's request (`--brake-demand`): the machines go straight to the floor
   (two) in one move. Every check of the release gate still holds (every sense live, the last command landed, the
   machines left at or under the utilisation target) except one machine per decision. Never below the floor.
-- Tested through the live controller: `tests/test_cruise_brake.py` (in `verify.py`).
+- Tested through the live controller: `tests/test_cruise_idle.py` (in `verify.py`).
 
 **The batch test:** a queue of jobs on the six-worker kind cluster (`WORKLOAD=batch`, `deploy/kind/batch-jobs.yaml`):
 one Kubernetes Job of 240 pods, 60 at a time (more than the workers hold, so work waits for a place), each hashing
@@ -752,8 +752,8 @@ probe alone keeps one pod at about 10% of its request, which reads as demand 0.1
 also counts a service as idle when its autoscaler stands at its least pods (`minReplicas`), wants no more, and runs at
 no more than half its target utilisation. Every other condition of rule 8 holds as before: nothing waiting, no breach,
 nothing scaling up, the release gate, every sense live, the last command landed, and the machines left carrying what
-runs now under the utilisation target. Test: `tests/test_cruise_brake.py` (it brakes at the idle floor, and it does not
-brake above the floor or busy at it).
+runs now under the utilisation target. Test: `tests/test_cruise_idle.py` (it lifts to the idle floor, and it does not
+lift there above the floor or while busy).
 
 Effect on what was already measured: none. The steady, fault, fairness, wandering and all-four runs on the frozen engine
 had the service at one pod with nothing waiting in 0 of 5,102 readings, so the amended rule could not have fired in any

@@ -2,6 +2,29 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-12: Omni v5 at the max: every muscle at its own limit, work waiting in line, wear beside the work
+
+- **The max is the default brain** (`realms/compass_arm_v5.py`, `V5CFG`; commits `8872db382`, `07a088433`): every
+  muscle pushed to its own limit for the most work, never past it and never below native; the energy it takes is power
+  given, shown beside the work, the speed and the wear. The tune-down (`V5SAVE`) is a position on the dial.
+- **Work waiting in line** (`LINE`, a quarter of the run's own work at the start) for every muscle alone and every
+  organism, beside the organism's own load and the climb; speed is judged where there is a line.
+- **Axes at their own peak** (`s_peak`): joints, multirotors and road drives 1.25, a ship's engine 1.15; a reaction
+  wheel, a train's line speed and an elevator's governor stay at their limit. Inside a body an axis keeps its everyday
+  speed.
+- **The bone and the lease** measured more finely: the forecast without the max's own machines, a room's degrees as a
+  line, the catch-up of waiting flexible load first, machines started only when the lines carry them until ready, a
+  measured hand-back; a floor that only held native's count let go at once at the kill.
+- **The official table** (seeds 3000-3009, commit `07a088433`, `results/realms_v5/REALMS_V5.md`): of 1,097 muscles alone,
+  504 better (489 clear the waiting line sooner, 385 over their line less often, 32 more work), 438 at their limit on
+  native, 155 the same as native, 0 worse. All six organisms better than native under all three loads. Under the climb,
+  3 of 1,868 plants inside the organisms did worse (two server rooms 0.08% and 0.03% less work, one UPS once more over
+  its line in 2,400 decisions); none under the own load or the line.
+- **The front page** shows the engine that stands only (`tools/front_page.py`); the v3 front page is kept whole in
+  `docs/history/FRONT_PAGE_2026-10-12.md`. The muscle catalog chapter is rebuilt from the v5 catalog with the max's words.
+- **The grid** (`scripts/dispatch_grid.py`, `six.yml` with a load, `six-pool.yml`) is wired for the 96 squares under the
+  line; the runs started on the earlier v5 brain were cancelled (their engine no longer stands).
+
 ## 2026-10-12: Omni v5 (branch v5): the live controllers, 1,097 muscles, the three-run words
 
 - **The v5 law in the live controllers** (commit `403841c21`): the Kubernetes controller's compass law and the GPU

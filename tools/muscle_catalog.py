@@ -5,7 +5,8 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The catalog of the muscles, explained: what each is for, what Omni-Compass reads and writes on it, how it is
-wired, and which organisms it belongs to. Read from realms/catalog.csv; writes docs/MUSCLE_CATALOG.md.
+wired, and which organisms it belongs to. Read from realms/catalog_v5.csv (the engine that stands, omni-v5, at its
+default, the max); writes docs/MUSCLE_CATALOG.md.
 
     python3 tools/muscle_catalog.py
 """
@@ -19,8 +20,11 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp, TOP as _LEGAL_TOP
 from collections import OrderedDict
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from realms.presets import PRESETS  # noqa: E402  (an axis's own peak speed, s_peak)
 OUT = ROOT / "docs" / "MUSCLE_CATALOG.md"
 REALMS = OrderedDict([("compute_ai_cloud", "Compute / AI / Cloud"), ("physics_robotics_autonomous", "Physics / Robotics / Autonomous"),
                       ("energy_facility_industrial", "Energy / Facility / Industrial"), ("distribution_specialized", "Distribution / Specialized")])
@@ -45,11 +49,41 @@ TEMPLATE = {
                      "its setpoint within its safe band, its actuator range, or its power share"),
 }
 KNOB = {
-    "capacity": "**capacity**: how much of the machine is in service (replicas, instances, units, speed). Omni-Compass writes it.",
-    "admission": "**admission**: what is let in (queues, rate limits, admission control). Omni-Compass reads it and leaves it to its own controller in the current law; it is counted, never written.",
-    "power": "**power**: the power share or limit the machine may draw. Omni-Compass writes it inside its cover.",
-    "setpoint": "**setpoint**: the target the machine's own loop holds (a temperature, a reserve, a process value). Omni-Compass moves it inside its safe band.",
+    "capacity": "**capacity**: how much of the machine is in service (replicas, instances, units, speed). At the max Omni-Compass pushes it to the machine's own limit for the most work, never past it and never below native.",
+    "admission": "**admission**: what is let in (queues, rate limits, admission control). Native already lets everything in: the knob is at its limit on native, and Omni-Compass reads it and leaves it native.",
+    "power": "**power**: the power share or limit the machine may draw. Native already runs it at full: at its limit on native, read and left native.",
+    "setpoint": "**setpoint**: the target the machine's own loop holds (a temperature, a reserve, a process value). At the max a room is cooled ahead of the heat and a battery's charge is held for its line, inside the safe band, never worse than native.",
 }
+
+
+def does(r):
+    """What the max does with one muscle (realms/compass_arm_v5.py)."""
+    t, k = r["template"], r["knob"]
+    if k == "admission":
+        return "at its limit on native (nothing paced or turned away): read and left native"
+    if t == "compute_pool":
+        if k == "power":
+            return "at its limit on native (the full clock): read and left native"
+        return ("starts the machines the forecast needs before the rush lands and clears work waiting in line within one "
+                "machine start, never fewer than native runs; hands back what it no longer needs at once")
+    if t == "thermal_zone":
+        return {"setpoint": "cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native",
+                "capacity": "left to its own staging (native already has the cooling it needs: nothing to win)",
+                "power": "at its limit on native (the site envelope at full): read and left native"}[k]
+    if t == "energy_storage":
+        if k == "power":
+            return "at its limit on native (full battery power): read and left native"
+        return "holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor"
+    if t == "motion_axis":
+        if k == "power":
+            return "at its limit on native (full torque): read and left native"
+        if PRESETS.get(r["preset"], {}).get("s_peak", 1.0) > 1.0:
+            return ("its own peak speed while tasks wait, back to its everyday speed near its heat limit or when its "
+                    "tracking strains (alone; inside a body, its everyday speed)")
+        return "at its limit on native (its everyday speed is the machine's limit): read and left native"
+    if k == "setpoint":
+        return "left native: native already holds it inside its band (nothing to win)"
+    return "at its limit on native (the full actuator): read and left native"
 # the class of machine each preset stands for (realms/presets.py), and how such a muscle is reached in a real stack
 PRESET = {
     "server": ("an application service on servers or pods", "the Kubernetes API (HPA target and floor, pod resize)"),
@@ -102,16 +136,18 @@ def nice(m):
 
 
 def main():
-    rows = list(csv.DictReader(open(ROOT / "realms" / "catalog.csv", encoding="utf-8")))
+    rows = list(csv.DictReader(open(ROOT / "realms" / "catalog_v5.csv", encoding="utf-8")))
     spine = [r for r in rows if len(r["realms"].split(";")) == 4]
     counts = {k: sum(1 for r in rows if k in r["realms"].split(";")) for k in REALMS}
     L = [f"# The {len(rows)} Muscles: What Each Is For, and How It Is Wired", "", BANNER, "",
          "A **muscle** is one setting on one machine that already has its own control: a replica target, a node pool's size, "
          "a GPU's clock ceiling, a chiller's setpoint, a battery's reserve, a joint's effort. Omni-Compass does not replace "
-         "that control. It reads the machine's meters, computes one bounded force with the compass law, and moves the setting "
-         "the machine already accepts, through a plug that reads the setting once before the first write, reads back every "
-         "write, steps aside if another controller moves it, and puts it back at the end.", "",
-         f"This chapter lists all {len(rows)} muscles of the catalog (`realms/catalog.csv`). For each one it says what kind of machine "
+         "that control. It reads the machine's meters and, at its default, the max, moves the setting the machine already "
+         "accepts toward the machine's own limit for the most work, never past it and never below native, through a plug "
+         "that reads the setting once before the first write, reads back every write, steps aside if another controller "
+         "moves it, and walks it back to native at the end. A knob native already runs at the top of its range is at its "
+         "limit on native and is left there.", "",
+         f"This chapter lists all {len(rows)} muscles of the catalog (`realms/catalog_v5.csv`, engine omni-v5). For each one it says what kind of machine "
          "it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is "
          "reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of "
          "these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels "
@@ -151,12 +187,8 @@ def main():
                     "| # | Muscle | Knob | What Omni-Compass does with it | Organisms |", "|---:|---|---|---|---|"]
             for r in sorted(rs, key=lambda r: (not r["muscle_id"].isdigit(), int("".join(c for c in r["muscle_id"] if c.isdigit()) or 0))):
                 k = r["knob"]
-                does = {"capacity": "holds it so the service sits in the middle of its band; more at once past the wall; gives back one unit at a time through the release gate",
-                        "admission": "reads it; left to its own controller",
-                        "power": "holds the power share inside its cover; full at once past the wall",
-                        "setpoint": "moves the setpoint inside its safe band toward the calm end while the service has room; back toward stress at once when it does not"}[k]
                 org = "all four realms" if len(r["realms"].split(";")) == 4 else ", ".join(REALMS[x].split(" / ")[0] for x in r["realms"].split(";"))
-                out.append(f"| {r['muscle_id']} | {nice(r['muscle'])} | {k} | {does} | {org}; stack; tower |")
+                out.append(f"| {r['muscle_id']} | {nice(r['muscle'])} | {k} | {does(r)} | {org}; stack; tower |")
             out.append("")
         return out
 

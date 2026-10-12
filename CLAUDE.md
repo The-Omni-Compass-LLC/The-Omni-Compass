@@ -15,22 +15,30 @@ the founder overrides one in the conversation.
 - **Do no harm.** Omni must never make anything worse. Where it can't improve a knob, that knob stays native. The 2%
   verdict (`omnicompass/verdict.py`) is the engine's trigger, not a stamp on a report. Gains are uncapped.
 - Headline: more work, faster, on fewer machines, with less energy. One combined number: the Omni index.
+- **The max is the default brain** (12 October): every muscle runs at its own limit, never past it and never below
+  native; it rides the edge, not the middle. "We're never looking to shave energy": the energy it takes is **power
+  given**, shown beside the work, the speed and the wear it bought, never called a loss; the max never takes from one
+  muscle to give to another. Results are judged on work, speed, misses and failures. Anyone can tune it down from the
+  max (the dial: the tune-down, `V5SAVE`). A knob native already runs at the top of its range is "at its limit on native".
 - The word is **compass**, never "bowl". The law is `omnicompass/compass_law.py` (`CompassLaw`): a band with 5%
-  cushions, pushed to the middle by two antagonist forces, smooth (tanh), not hammering.
+  cushions, two antagonist forces, smooth (tanh), not hammering.
 - Wiring is a two-way plug, one wire in and one wire out. The brain does the math. The knob is restored to the snapshot
   taken once, at the start.
-- Pedals and modes: idle (no gas, no brake), gas (ramp up), brake (ramp down to idle), reset (brake to the floor:
-  everything back to native), cruise (a known queue waiting), autopilot / watching / off. The **kill switch** is
-  separate, for security only (`omnicompass/master.py`, `tools/omni_switch.py`).
+- **One pedal, no brake** (12 October), like an electric car: push for more, lift off for less; lifting hands the
+  setting back toward native; idle is the pedal lifted all the way; reset hands everything back to native; cruise (a
+  known queue waiting), autopilot / watching / off. After a crash the plug walks every setting back to native gradually
+  (the lease); the **kill switch** is separate, for security only, and instant (`omnicompass/master.py`,
+  `tools/omni_switch.py`). The word "brake" is not used.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine is frozen: Omni v3 (v2 and v1 kept for their results)
+## The engine: Omni v5 at the max (v3, v2 and v1 kept for their results)
 
-- `OMNI_V3.json` and `docs/OMNI_V3.md` (v3 = v2 plus the slack gate on speed knobs and the marine preset); `OMNI_V2.json`
-  (v2 = v1's law, controllers and runners byte for byte, plus the 945-muscle catalog and its thirteen new presets) and
-  `OMNI_V1.json` stay for their results. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v3,
-  omni-v2, omni-v1, or what differs.
+- `OMNI_V5.json` and `docs/OMNI_V5.md`: the max (`realms/compass_arm_v5.py`, `V5CFG`) on the 1,097-muscle catalog, the
+  bone inside every organism, the lease's walk back, the tune-down on the dial. v5 is re-declared on every engine change
+  while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v5, omni-v3, omni-v2,
+  omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
   1.0, never as a second product.
@@ -47,13 +55,17 @@ the founder overrides one in the conversation.
 
 ## The six organisms and the grid
 
-- Omni v2 (6 Oct): four realms (Compute/AI/Cloud 430, Physics/Robotics/Autonomous 376, Energy/Facility/Industrial 470,
-  Distribution/Specialized 440), the whole tower (945 distinct muscles in 59 families), and the four stacked (1,716). They share
-  a spine of 257 muscles. v1 was 345/262/282/337, 656 and 1,226 with a spine of 190; its results stay v1 results.
+- Omni v5 (12 Oct): four realms (Compute/AI/Cloud 530, Physics/Robotics/Autonomous 394, Energy/Facility/Industrial 470,
+  Distribution/Specialized 474), the whole tower (1,097 distinct muscles in 70 families), and the four stacked (1,868).
+  They share a spine of 257 muscles. v2/v3 were 430/376/470/440, 945 and 1,716; v1 was 345/262/282/337, 656 and 1,226
+  with a spine of 190; their results stay theirs.
 - The organisms are named `tower` and `stack` in code and workflows (never by a count); the old names `organism_656` and
   `stack_1226` are read as aliases.
-- Each organism runs native and omni at 1, 10, 100 and 1,000 copies × 1, 10, 100 and 1,000 runs: 96 squares, with both
-  values shown in every square. 1,000 is the maximum.
+- The grid: each organism runs native and omni at 1, 10, 100 and 1,000 clustered copies (one organism, ten of the
+  same organism, a hundred, a thousand) × 1, 10, 100 and 1,000 runs: 96 squares, with both values shown in every square.
+  1,000 is the maximum. Every grid button starts all four sizes × all four run counts and uses every runner GitHub gives.
+- Three loads: each organism's own load, the climb (the load stepping by one, 1 2 3 2 3 4 …) and work waiting in line
+  (`LINE`, `realms/harness.py`); every muscle alone runs its own load and the line.
 - Benchmark breadth: every domain that can be benchmarked defensibly (`docs/REGISTER.md`), with Omni on top of that
   domain's own native controller, one or two at a time.
 - GPU: all old GPU results are obsolete. The founder reruns them on Lambda. Never spend GPU money before the CPU side

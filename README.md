@@ -15,20 +15,13 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v3, fingerprint `b53d05449ee04c4b` (40 files); package 0.3.0. Omni v4 (the reflex rule on every wire) is designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md) and not yet built; every result runs again on it when it is.
-- **The Omni index now:** +5.2% on the resource reading (work, speed, machines and energy) and +12.5% on the service reading (work and speed), real machines, every test the same in all three of our runs ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+- **Engine on main:** omni-v5, fingerprint `8d4f91f0dabbc9fd` (43 files); package 0.5.0. Its default brain is **the max**: every muscle pushed to its own limit, never past it and never below native, the energy it takes shown as power given beside the work and the wear; the dial turns it down ([`docs/OMNI_V5.md`](docs/OMNI_V5.md)).
 <!-- front-page:status:end -->
 
-**Tables the repository rebuilt by itself** (the five live products, each from its three newest runs on one engine):
+**Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- 2026-10-10 16:50 UTC: `V3_YCSB` rebuilt from runs 38054777807, 38054782696, 38054787517 (ycsb, the resource objective, omni-v3): 4 untouched workloads; 4 better, 0 worse, 0 disagree
-- 2026-10-10 16:50 UTC: `V3_SYSBENCH` rebuilt from runs 38054765202, 38054768832, 38054773573 (sysbench, the resource objective, omni-v3): 4 untouched workloads; 0 better, 0 worse, 0 disagree
-- 2026-10-10 16:50 UTC: `V3_REDIS_SERVICE` rebuilt from runs 38054791688, 38054795871, 38054800068 (redis, the service objective, omni-v3): 3 untouched workloads; 5 better, 2 worse, 0 disagree
-- 2026-10-10 16:50 UTC: `V3_REDIS` rebuilt from runs 38054731163, 38054735302, 38054739168 (redis, the resource objective, omni-v3): 3 untouched workloads; 0 better, 0 worse, 0 disagree
-- 2026-10-10 16:50 UTC: `V3_PGBENCH` rebuilt from runs 38054754511, 38054758150, 38054761503 (pgbench, the resource objective, omni-v3): 3 workloads; 1 better, 1 worse, 1 disagree
-- 2026-10-10 16:50 UTC: `V3_KAFKA_SERVICE` rebuilt from runs 38054804459, 38054808912, 38054812962 (kafka, the service objective, omni-v3): 3 untouched workloads; 1 better, 0 worse, 0 disagree
-- 2026-10-10 16:50 UTC: `V3_KAFKA` rebuilt from runs 38054742933, 38054746778, 38054750788 (kafka, the resource objective, omni-v3): 3 untouched workloads; 1 better, 0 worse, 0 disagree
+- 2026-10-12: the realms on Omni v5 at the max, the preregistered seeds 3000-3009: every muscle alone under its own load and with work waiting in line, the six organisms under their own load, the climb and the line ([`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md))
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -36,16 +29,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-11 01:57 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v3)](results/live/V3_KEDA_REQUESTS.md) |  |
-| 2026-10-11 01:57 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v3)](results/live/V3_KEDA_CPU_REQUESTS.md) |  |
-| 2026-10-11 01:57 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-11 00:21 | [Public demand traces, turned into load schedules](results/traces/README.md) |  |
-| 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/fresh/RESULT.md) |  |
-| 2026-10-11 00:21 | [The GPU card in simulation: each base alone, and with Omni-Compass on top](results/sim/gpu_two_wire/RESULT.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 1x size, up to 1000 runs (pooled from 60 shards)](results/scale/v1/receipts/round6-1x.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 10x size, up to 1000 runs (pooled from 60 shards)](results/scale/v1/receipts/round6-10x.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 100x size, up to 1000 runs (pooled from 240 shards)](results/scale/v1/receipts/round6-100x.md) |  |
-| 2026-10-11 00:21 | [Six organisms at 1000x size, up to 10 runs (pooled from organism-sized shards)](results/scale/v1/receipts/round6-1000x.md) |  |
+| 2026-10-12 06:13 | [The realms on Omni v5 at the max: 1097 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -53,68 +37,58 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-11 19:10 | big-organism-detached | success | [38166860881](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38166860881) |
-| 2026-10-11 05:36 | kwok-scale | success | [38114535386](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38114535386) |
-| 2026-10-11 01:29 | kind-addons | success | [38099656930](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38099656930) |
+| 2026-10-12 04:49 | ycsb | success | [38195483021](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195483021) |
+| 2026-10-12 04:23 | sysbench | success | [38195479426](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195479426) |
+| 2026-10-12 03:57 | pgbench | success | [38195447950](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195447950) |
+| 2026-10-12 03:56 | redis | success | [38195460074](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195460074) |
+| 2026-10-12 03:51 | six | success | [38195468496](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195468496) |
+| 2026-10-12 03:28 | robustness | success | [38195464372](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195464372) |
+| 2026-10-12 03:12 | kwok-scale | success | [38197840045](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38197840045) |
+| 2026-10-12 03:02 | kind-addons | success | [38195417987](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195417987) |
+| 2026-10-12 02:57 | live-kind-full | success | [38195429021](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195429021) |
+| 2026-10-12 02:56 | live-kind | success | [38195425607](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195425607) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## Newest result: on top of Kubernetes with its add-ons (KEDA)
+## Newest result: the max, on every muscle and six organisms (Omni v5)
 
-Native here is Kubernetes as clusters run it, with **KEDA 2.21** and its **HTTP add-on 0.16** owning the service's
-autoscaler; omni is Omni-Compass on top of that same stack, its moves carried to KEDA through the plug
-(`scripts/kubectl_keda.py`). Ten paired runs per setup, three separate GitHub runs, engine omni-v3, every row shown
-([`docs/ADDONS_PREREGISTRATION.md`](docs/ADDONS_PREREGISTRATION.md), declared before the first run). Tables:
-[`V3_KEDA_CPU_REQUESTS`](results/live/V3_KEDA_CPU_REQUESTS.md) (KEDA on the CPU target and the requests in flight) and
-[`V3_KEDA_REQUESTS`](results/live/V3_KEDA_REQUESTS.md) (the HTTP add-on on the requests in flight alone).
+Omni v5 at its default, **the max**: every muscle pushed to its own limit, never past it and never below native, on
+top of each plant's own native controller. Preregistered seeds 3000-3009, ten paired runs per muscle, per organism and
+per load, commit `07a0884339fb`, engine omni-v5 (fingerprint `8d4f91f0dabbc9fd`). Evidence class **S**: modelled
+plants, not meters. Every row, losses included: [`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md).
 
-| | KEDA on CPU and requests | KEDA's HTTP add-on |
-|---|---|---|
-| **Response time, 95th percentile** | **−51% to −53%, better in all three of our runs** | **−73% to −76%, better in all three of our runs** |
-| **Time over the response line** | −97% to −100%, better in all three of our runs | −96% to −97%, better in all three of our runs |
-| **Worker nodes in service** | no difference beyond the noise | **−5.9% to −7.8%, better in all three of our runs** |
-| **Failed requests** | no difference beyond the noise | no difference beyond the noise |
-| **Energy, parked workers still on at idle power** (declared model) | **+1.0% to +1.6%, WORSE in all three of our runs** | **+1.4% to +2.6%, WORSE in all three of our runs** |
-| Service CPU, i.e. work put through by the closed-loop load (shown, not judged) | +24% to +32% | +45% to +54% |
+**Every muscle alone (1,097), under its own load and with work waiting in line:**
 
-The energy loss stands and counts against Omni-Compass in the index. Faster answers drew more requests from the
-closed-loop load, so the service burned 24% to 54% more CPU while the energy per core-hour fell 18% to 36%. The next run
-counts requests served directly. It also gives native a node autoscaler: Karpenter, on Azure.
+| Reading | Muscles |
+|---|---:|
+| **Better** (a gain beyond the noise and no loss under either load) | **504** |
+| of them: clear the waiting line sooner | 489 |
+| of them: over their line less often | 385 |
+| of them: more work | 32 |
+| At its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 438 |
+| The same as native (no difference beyond the noise: native already did all the work that came) | 155 |
+| **Worse or mixed** | **0** |
 
-## The result on real Kubernetes
+| Kind | With work waiting in line | Power given | Wear |
+|---|---|---:|---:|
+| Compute pools (454) | line cleared in **7.8 min instead of 17.0**; over the line 1.40% → 0.40% of the time | +21% | machine-hours +43% |
+| Motion axes at their own peak speed (37) | over the line 12.1% → 8.3% of the time; work +0.7% | +1.4% | motor heat +3.9% |
+| Battery sites (21) | over the line 13.4% → 12.2% (peak ceiling) and 17.1% → 15.9% (reserve) | +0.2% | battery kWh cycled +21% to +42% |
 
-Omni-Compass on top of native Kubernetes, real clusters, ten paired runs per test, on **Omni v3**, the frozen and
-fingerprinted engine ([`docs/OMNI_V3.md`](docs/OMNI_V3.md): v1's law and controllers byte for byte, the muscle catalog grown to 945 and a do-no-harm gate on speed knobs; the v1 tables, [`docs/OMNI_V1.md`](docs/OMNI_V1.md), read the same and stay as the first engine's record). Every test ran three times as separate GitHub runs (A the
-result, B and C the replications); a reading below is **the same in all three of our runs** only when it holds in all three runs with every 95%
-interval clear of zero, and otherwise reads no difference beyond the noise. The six tables:
-[`V3_ALL_FOUR`](results/live/V3_ALL_FOUR.md), [`V3_STEADY`](results/live/V3_STEADY.md),
-[`V3_WANDERING`](results/live/V3_WANDERING.md), [`V3_FAULTS`](results/live/V3_FAULTS.md),
-[`V3_BATCH`](results/live/V3_BATCH.md), [`V3_FAIRNESS`](results/live/V3_FAIRNESS.md).
+**The six organisms** (every plant coupled on one clock, the hour around each battery site's daily peak): **better than
+native under all three loads**, the bone granting only the power the body's lines can carry.
 
-| | native (run A) | omni (run A) | Reading over the three runs |
-|---|---:|---:|---|
-| **Work handled inside the response line** (all four in one run) | 21.0 req/s | **31.2 req/s** | **+35% to +49% more work on the same machines, better in all three of our runs** |
-| **Response time, 95th percentile** (steady, wandering, all four, faults) | 321-820 ms | 111-306 ms | **−47% to −66% in every run of all four tests, better in all three of our runs** |
-| **Failed requests** (wandering, all four) | 8.9-12.3% | 7.7-10.9% | **−9% to −14%, better in all three of our runs**; zero in both arms at steady load; under faults lower in all three, clear of the noise in one |
-| **Machines in service** | 6 | 5.90 (steady), 4.89 (batch) | steady **−1.5% to −2.9%** and batch **−19% to −23%, better in all three of our runs**; the other tests no difference beyond the noise |
-| **Energy** (a declared model: on kind the machines are containers on one runner, so a machine out of service saves modelled watts, not a metered bill) | | | standby model lower in all three of our runs in steady (−1.3% to −2.1%) and batch (−13% to −16%); elsewhere no difference beyond the noise |
-| **A noisy neighbour on the same workers** (fairness) | | | no difference beyond the noise on every row, the neighbour's own service included: Omni neither helps nor hurts |
-| **Pods left with no machine to take them** | 0 | 0 | same, in every test |
+| Load | Over the line, change | Work | Power given |
+|---|---|---|---:|
+| Own load | −0.1% to −0.7% in every organism | equal | up to +0.07% |
+| The climb (1 2 3 2 3 4 ..., up to twice its own) | −2.1% compute and distribution, −1.2% the four stacked, −1.1% physics; energy and the tower −0.0% | more work in four of six | up to +0.08% |
+| Work waiting in line | −0.1% to −2.1% in every organism | equal | up to +0.07% |
 
-Omni gives a machine back only after a paired trial shows the service is no slower without it (the verdict). On these
-clusters one machine fewer made each request 30-45% slower in most trials, so Omni kept the machines and spent them on
-speed and work. Earlier engines without that check parked 29-36% of the machines (`docs/history/`); the frozen engine
-puts work and speed first.
-
-**Not yet shown**, stated as plainly as the gains: an energy or cloud-bill saving on real machines (Azure's bill did not
-move on the earlier engines, [`AKS_BILL`](results/live/AKS_BILL.md) and [`V1_AKS_STEADY`](results/live/V1_AKS_STEADY.md):
-every gauge inside the noise), and the current card governor on a real GPU (the one real-card run, on a governor since
-replaced, saved 1.6-3.5% of the card's energy and made its 95th percentile 43-84% slower:
-[`HIL_RESCORED`](results/hil/run-20261002T082232Z/HIL_RESCORED.md)). The five live products, the index and every row,
-losses included, are in [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md), [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md)
-and [`docs/WIRING_VERDICTS.md`](docs/WIRING_VERDICTS.md), each rebuilt from the tables by the repository itself.
+Inside the organisms, stated as plainly as the gains: under the climb, 3 of 1,868 plants did worse than native: two
+server rooms lost 0.08% and 0.03% of their work, and one UPS went over its line once more in 2,400 decisions. Under the
+own load and the line, none. The lease handed every knob back to native in every run.
 
 ## The manual: the book for the people who wire it
 
@@ -132,15 +106,20 @@ the engineer who wires, the operator who runs a data center, and the auditor who
 | Real Kubernetes on GitHub | Kubernetes itself (API server, scheduler, its own autoscaler), a real web service, real requests, real response times and CPU. The machines are containers on one runner; energy there is a declared formula, not a meter | L |
 | Real cloud, Azure AKS | All of the above on real Azure machines, Azure's own autoscaler, Azure's billed machine count | L |
 | Real card, NVIDIA A10 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. The first run (2026-10-02) used a card controller since replaced (it answered slower); the current controller's run is next | P |
-| The 945 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
+| The 1,097 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
 
 ## How it works
 
 Omni-Compass is a supervisory governor. It does not replace your autoscaler or your firmware: it sits on top, reads
-the meters of each muscle (response time, utilisation, power, heat), holds each muscle's own setting in the middle of
-its band with one bounded law, and hands every setting back the moment it stops. As demand rises, the warm machines
-take it first; as it falls, the emptiest machine idles first, powered and ready, never switched off, and never below a floor of two (idle). The reset hands every setting back at
-the end of a run; the kill switch, a separate security switch, turns Omni-Compass off everywhere at once. The law, its
+the meters of each muscle (response time, utilisation, power, heat), and by default runs **at the max**: every muscle
+pushed to its own limit, never past it and never below native, riding the edge of its band, not the middle. It starts
+machines before the rush lands and clears work waiting in line, cools a room ahead of the heat, holds a battery's
+charge for the line, and runs an axis at its own peak while tasks wait. The energy that takes is **power given**, shown
+beside the work, the speed and the wear it bought; inside a body (an organism) it gives only what the body's lines can
+carry. One pedal, no brake: push for more, lift off for less, and lifting hands the setting back toward native; at idle
+the pool lifts to its floor of two machines, powered and ready. If Omni-Compass stops, the plug walks every setting back
+to native; the kill switch, a separate security switch, turns it off everywhere at once. Anyone can tune it down from
+the max on the dial. The law, its
 proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.md),
 [`docs/TRACKING_THEOREM.md`](docs/TRACKING_THEOREM.md), [`docs/CONVEYANCE_LAW.md`](docs/CONVEYANCE_LAW.md).
 
@@ -161,7 +140,7 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **Omni v3, v2 and v1: the frozen engines, fingerprinted; which version every result ran on; how each is the same in all three of our runs** | [`docs/OMNI_V3.md`](docs/OMNI_V3.md), [`docs/OMNI_V2.md`](docs/OMNI_V2.md), [`docs/OMNI_V1.md`](docs/OMNI_V1.md), `python3 tools/omni_version.py` |
+| **Omni v5 at the max: the engine that stands, fingerprinted; the max, the bone, the lease, the dial** | [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines, v3, v2 and v1, stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | The method, written before each run | [`docs/K8S_COMPASS_PREREGISTRATION.md`](docs/K8S_COMPASS_PREREGISTRATION.md), [`docs/GPU_PREREGISTRATION.md`](docs/GPU_PREREGISTRATION.md), [`docs/REALMS_PREREGISTRATION.md`](docs/REALMS_PREREGISTRATION.md) |
@@ -169,7 +148,7 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 | Every claim with its evidence class, losses kept | [`docs/EVIDENCE_LEDGER.md`](docs/EVIDENCE_LEDGER.md), [`docs/CLAIMS_REGISTER.md`](docs/CLAIMS_REGISTER.md) |
 | Due diligence | [`docs/DUE_DILIGENCE.md`](docs/DUE_DILIGENCE.md) |
 | The manual (wiring, operating, every result) | [`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf), [`docs/INTEGRATION_MANUAL.md`](docs/INTEGRATION_MANUAL.md) |
-| The 945 muscles | [`docs/MUSCLE_CATALOG.md`](docs/MUSCLE_CATALOG.md) |
+| The 1,097 muscles | [`docs/MUSCLE_CATALOG.md`](docs/MUSCLE_CATALOG.md), [`realms/catalog_v5.csv`](realms/catalog_v5.csv) |
 | Every command on one page | [`docs/HANDOFF.md`](docs/HANDOFF.md) |
 
 ## Repository
@@ -179,7 +158,7 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 | `omnicompass/` | The engine (`core.py`), the compass law (`compass_law.py`), the verdict, the shield, the master switch |
 | `omni_controller/` | The live controllers: Kubernetes (`controller.py`) and the card (`gpu_compass.py`) |
 | `cpp/` | The C++ twins, sealed equal to the Python laws |
-| `realms/` | The 945-muscle catalogue and its models (Omni v2) |
+| `realms/` | The 1,097-muscle catalogue, its models and the v5 law at the max (`compass_arm_v5.py`) |
 | `scripts/`, `deploy/`, `.github/workflows/` | The benchmarks: kind, AKS, the card, eight cards |
 | `tools/` | Report builders, the Omni index, the layout check |
 | `results/` | Every result with its raw files and digests |

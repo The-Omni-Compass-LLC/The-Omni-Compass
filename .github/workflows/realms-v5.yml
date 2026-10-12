@@ -31,7 +31,7 @@ jobs:
         run: python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
       - name: The max does no harm to any muscle alone; the tune-down keeps its own promise (tests/test_compass_arm_v5.py)
         run: python3 tests/test_compass_arm_v5.py
-      - name: Every muscle alone and the six organisms at the max, own load and climb (seeds 3000-3009)
+      - name: Every muscle alone and the six organisms at the max, own load, the climb and the line (seeds 3000-3009)
         run: python3 tools/run_realms_v5.py --out realms5-out
       - name: Same table as the one published, and no muscle worse than native
         run: |
@@ -39,8 +39,9 @@ jobs:
           python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import csv, json, sys
           a = list(csv.DictReader(open("realms5-out/MUSCLES_V5.csv")))
-          worse = [x["muscle"] for x in a if x["label"] in ("WORSE", "MIXED")]
-          print(f"no-harm: {len(a)} muscles, {len(worse)} worse than native" + (": " + ", ".join(worse) if worse else ""))
+          muscles = {x["muscle_id"]: x for x in a}                 # one row per muscle and load; its label over all loads
+          worse = sorted({x["muscle"] for x in a if x.get("label_all_loads", x["label"]) in ("WORSE", "MIXED")})
+          print(f"no-harm: {len(muscles)} muscles, {len(worse)} worse than native under any load" + (": " + ", ".join(worse) if worse else ""))
           try:
               b = list(csv.DictReader(open("results/realms_v5/MUSCLES_V5.csv")))
               mine, pub = json.load(open("realms5-out/RUN.json")), json.load(open("results/realms_v5/RUN.json"))

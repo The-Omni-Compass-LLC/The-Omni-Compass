@@ -171,6 +171,13 @@ def plan(root: Path = ROOT):
     return out
 
 
+def engine_now(root: Path = ROOT) -> str:
+    """The engine that stands in this checkout (tools/omni_version.py): omni-v5, or unversioned."""
+    sys.path.insert(0, str(root))
+    from tools import omni_version as ov
+    return ov.version_of(ov.engine_files()) or "unversioned"
+
+
 def next_history_name(name: str, history: Path = HISTORY):
     n = 1 + len(list(history.glob(f"{name}_set*.md")))
     return history / f"{name}_set{n}.md"
@@ -203,8 +210,9 @@ def apply(items, root: Path = ROOT):
         summary = _plain_summary((r.stdout.strip().splitlines() or [""])[-1])
         state[name] = {"runs": it["runs"], "built": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
                        "engine": it["engine"], "objective": it["objective"], "summary": summary}
-        lines.append(f"- {state[name]['built']}: `{name}` rebuilt from runs {it['runs'][0]}, {it['runs'][1]}, {it['runs'][2]}"
-                     f" ({it['product']}, the {it['objective']} objective, {it['engine']}): {summary}")
+        if it["engine"] == engine_now(root):              # the front page shows the engine that stands; an older engine's
+            lines.append(f"- {state[name]['built']}: `{name}` rebuilt from runs {it['runs'][0]}, {it['runs'][1]}, "  # table
+                         f"{it['runs'][2]} ({it['product']}, the {it['objective']} objective, {it['engine']}): {summary}")
     if items:
         STATE.write_text(json.dumps(state, indent=1, sort_keys=True) + "\n", encoding="utf-8")
         for tool in AFTER:
@@ -262,26 +270,41 @@ def status_lines(root: Path = ROOT) -> list[str]:
     files = ov.engine_files()
     v, d = ov.version_of(files), ov.digest(files)[:16]
     pkg = re.search(r'^version = "([^"]+)"', (root / "pyproject.toml").read_text(encoding="utf-8"), re.M)
-    if (root / "OMNI_V4.json").exists():
-        nxt = "Omni v4 is built: every result is being run again on it."
-    else:
-        nxt = ("Omni v4 (the reflex rule on every wire) is designed in [`docs/OMNI_V4_PLAN.md`](docs/OMNI_V4_PLAN.md) and not "
-               "yet built; every result runs again on it when it is.")
+    nxt = ("Its default brain is **the max**: every muscle pushed to its own limit, never past it and never below native, "
+           "the energy it takes shown as power given beside the work and the wear; the dial turns it down "
+           "([`docs/OMNI_V5.md`](docs/OMNI_V5.md)).") if v == "omni-v5" else ""
     out = [f"- **Engine on main:** {v or 'unversioned (it differs from every frozen engine)'}, fingerprint `{d}` "
-           f"({len(files)} files); package {pkg.group(1) if pkg else 'unknown'}. {nxt}"]
+           f"({len(files)} files); package {pkg.group(1) if pkg else 'unknown'}. {nxt}".rstrip()]
     ix = root / "results" / "OMNI_INDEX.json"
     if ix.exists():
         idx = json.loads(ix.read_text(encoding="utf-8"))
-        out.append(f"- **The Omni index now:** {idx['headline_pct']:+.1f}% on the resource reading (work, speed, machines and "
-                   f"energy) and {idx['service_headline_pct']:+.1f}% on the service reading (work and speed), real machines, "
-                   "every test the same in all three of our runs ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).")
+        if idx.get("engine") == v:                          # only an index built on the engine that stands (no older one up front)
+            out.append(f"- **The Omni index now:** {idx['headline_pct']:+.1f}% on the resource reading (work, speed, machines "
+                       f"and energy) and {idx['service_headline_pct']:+.1f}% on the service reading (work and speed), real "
+                       "machines, every test the same in all three of our runs ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).")
     return out
+
+
+OLD_ENGINE = re.compile(r"(^|/)(V[0-4]_[^/]*\.md$|v[0-4][-_/])")
+ENGINE_NOW = re.compile(r"omni-v5|Omni v5")
+
+
+def current_table(p: str, root: Path = ROOT) -> bool:
+    """A table of the engine that stands: it says it ran on omni-v5, and it is not named for or filed under an older
+    engine (V1_, V3_, v3-...); the older tables stay in the repository as the road to 1.0, never in front."""
+    if OLD_ENGINE.search(p):
+        return False
+    try:
+        return bool(ENGINE_NOW.search((root / p).read_text(encoding="utf-8", errors="ignore")[:4000]))
+    except OSError:
+        return False
 
 
 def table_lines(root: Path = ROOT, n: int = 10) -> list[str]:
     """Every result table, newest first by the time it last changed (now, for one changed and not yet committed)."""
     present = [p for p in _git("ls-files", "--", "results", root=root).splitlines()
-               if p.endswith(".md") and not p.startswith(("results/live/raw/", "results/external_review/"))]
+               if p.endswith(".md") and not p.startswith(("results/live/raw/", "results/external_review/"))
+               and current_table(p, root)]
     present = [p for p in present if (root / p).is_file()]
     when = {}
     changed = {ln[3:].strip() for ln in _git("status", "--porcelain", "--", "results", root=root).splitlines() if len(ln) > 3}
