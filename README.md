@@ -37,16 +37,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-12 08:32 | big-organism-detached stop omni-detached-38215301870 | success | [38224087068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38224087068) |
+| 2026-10-12 08:30 | grid | success | [38223887315](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38223887315) |
+| 2026-10-12 08:05 | six | cancelled | [38215037461](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215037461) |
+| 2026-10-12 07:52 | six-kube | cancelled | [38215254405](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215254405) |
 | 2026-10-12 07:42 | big-organism-detached | success | [38215301870](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215301870) |
 | 2026-10-12 07:30 | kwok-scale | success | [38215897994](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215897994) |
 | 2026-10-12 07:20 | pandapower | success | [38195443976](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195443976) |
 | 2026-10-12 06:27 | aks-metered | cancelled | [38196380124](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38196380124) |
-| 2026-10-12 06:18 | six-kube | cancelled | [38195472095](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195472095) |
-| 2026-10-12 06:17 | six | cancelled | [38197859756](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38197859756) |
 | 2026-10-12 04:49 | ycsb | success | [38195483021](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195483021) |
 | 2026-10-12 04:23 | sysbench | success | [38195479426](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195479426) |
-| 2026-10-12 03:57 | pgbench | success | [38195447950](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195447950) |
-| 2026-10-12 03:57 | kafka | success | [38195413961](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195413961) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
