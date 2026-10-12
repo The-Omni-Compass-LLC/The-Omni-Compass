@@ -40,7 +40,7 @@ def _muscle_harms(row):
 
 
 def test_v5_default_does_no_harm_to_any_muscle():
-    rows = H.catalog(str(ROOT / "realms" / "catalog_v5.csv"))   # the v5 muscle set (1,002)
+    rows = H.catalog(str(ROOT / "realms" / "catalog_v5.csv"))   # the v5 muscle set (1,097)
     bad, acted = [], 0
     for row in rows:
         harms, writes = _muscle_harms(row)

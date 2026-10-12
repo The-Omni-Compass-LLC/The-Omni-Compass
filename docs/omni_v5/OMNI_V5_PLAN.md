@@ -105,7 +105,7 @@ bloodline); every result names its seed; seeds can be crossed.
 
 ## 10. State & build order
 - **Pushed:** v3 (main). v4 (own branch). v5 on branch v5: declared omni-v5 with the v5 law in the engine, the
-  1,002-muscle catalog, the official v5 realms table (0 of 1,002 worse than native) and the benchmark code for every
+  1,097-muscle catalog, the official v5 realms table (0 of 1,097 worse than native) and the benchmark code for every
   platform (§26, §27).
 - **v5 SAVE shown in the model (class S, not proof; 12 fresh runs, 6 organisms):** beats every version + native on energy & misses; work = native; the
   one exception Physics vs v1/v2 energy is inside the noise and v1/v2 bought it with late trains/ships.
@@ -427,25 +427,45 @@ Body map, now complete, before the repo is locked:
   registry, the connectors + one pane + self-wiring. Safety-of-life stays watch-only. With these the body is complete to
   lock and build against; the muscle catalog was already complete.
 
-## 26. The count — 1,002 muscles in 65 families on v5 (built)
-Repo truth on branch v5: v5's catalog (`realms/catalog_v5.csv`) is **1,002 distinct muscles in 65 families** — v3's 945 in
-59 families (`realms/catalog.csv`, frozen for v3's results) plus **57 new muscles in six new families**:
+## 26. The count — 1,097 muscles in 70 families on v5 (built)
+Repo truth on branch v5: v5's catalog (`realms/catalog_v5.csv`) is **1,097 distinct muscles in 70 families** — v3's 945 in
+59 families (`realms/catalog.csv`, frozen for v3's results) plus two waves. The first wave, **57 new muscles in six new
+families**:
 - **Linux Kernel & OS Control** (20): cgroup CPU weight, CPU quota and memory.high; the CFS scheduler's latency; the
   cpufreq/DVFS governor; C-states; transparent hugepages and the hugepage pool; the I/O scheduler's depth and the block
   queue; NUMA balancing; dirty-ratio writeback; swappiness; zswap; page-cache reclaim; KSM; irqbalance; TCP buffers;
   receive coalescing; the CoDel queue target.
 - **Serverless & Functions (FaaS)** (9), **Virtualization & Hypervisor** (9), **Content Delivery & Edge Cache** (6),
   **Gut: Data-plane Intake & Waste** (8), **Skin: Perimeter & Admission** (5).
+The second wave (12 October), **95 muscles**: five new families, **Financial Markets & Trading Systems** (14: matching
+engine threads, order gateways and their admission, pre-trade risk workers, market-data fan-out and conflation, FIX
+heartbeats, kernel-bypass poll cores, the tick store, settlement, the end-of-day risk batch, the colocation rack's
+cooling), **Media Streaming & CDN** (14: the bitrate ladder, the player's buffer, transcoder pools and their clocks and
+batch power, packagers, origin shields, edge TTLs, segment length, request coalescing, DRM licence servers),
+**Game Servers & Real-Time Interactive** (12: Agones fleet buffer, minimum and maximum, tick rate, players per server,
+matchmaking admission and wait window, relays, voice mixers, the game node pool, replay renders, cloud-gaming clocks),
+**Blockchain & Ledger Nodes** (10: a node's database cache, mempool, peers, script-validation threads, block relay, the
+RPC queue, the UTXO cache flush, indexers, the archive tier, the validator host's power profile; never a consensus rule),
+**CI/CD & Build Farms** (10: runner scale sets, build concurrency, build cache, test shards, job admission, artifact
+retention, build nodes' clock, remote execution, the warm runner pool); and additions to seven families: security engines
+(6, in Reliability, Security & Recovery: an IDS's capture threads, ring buffer and rule groups, a web firewall's
+inspection workers, a SIEM's ingest, endpoint scan scheduling), MQTT brokers (4, Messaging & Streaming), DNS and mail
+caches (4, Runtime & Application), ROS 2, humanoids and manipulators (8, Robotics Motion Control), warehouse robot fleets
+(2), PX4 and ArduPilot drones and swarm spacing (8, Aviation & Autonomous Flight), and edge sites (3, Cross-Cluster,
+Multi-Region & Edge). The GPU family is named for the hardware (**GPU Hardware**), and the eight audited families carry
+numbers 64 to 71 like every other family.
 Each is a distinct real-world knob, modelled on the matching plant template, as v3's 945 already share five templates; AI
-Inference and AI Training stay the two biggest compute families. The stack (all four realms, the 257-muscle spine counted
-in each) is **1,773** on v5 (v3: 1,716). The "1,000" elsewhere in the docs is the 1,000-**copy** scale, not a muscle count.
-The do-no-harm check runs on all 1,002 (`tests/test_compass_arm_v5.py`); the official table is
+Inference and AI Training stay the two biggest compute families. The organisms on v5: Compute / AI / Cloud 530, Physics /
+Robotics / Autonomous 394, Energy / Facility / Industrial 470, Distribution / Specialized 474; the stack (all four realms,
+the 257-muscle spine counted in each) is **1,868** on v5 (v3: 1,716). The "1,000" elsewhere in the docs is the
+1,000-**copy** scale, not a muscle count.
+The do-no-harm check runs on all 1,097 (`tests/test_compass_arm_v5.py`); the official table is
 `results/realms_v5/REALMS_V5.md` (all six organisms superior within guardrails, 0 of 1,002 worse than native; the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times)). More
 families — the SDN/load-balancer fabric beyond routing, more of the body's vitals — raise the count again when built.
 
 ## 27. The benchmark program — every run, nothing left out
 The map is `docs/omni_v5/BENCHMARKS_V5.md`; one button starts them all (`.github/workflows/v5-all-benchmarks.yml`).
-- **The v5 law, modelled:** `realms-v5` — all 1,002 muscles and the six organisms, with the no-harm check.
+- **The v5 law, modelled:** `realms-v5` — all 1,097 muscles and the six organisms, with the no-harm check.
 - **23 free benchmarks on GitHub's machines:** Kubernetes (steady, every lever, full, shadow, add-ons, 50/500/1,000 nodes),
   the six organisms at 1, 10, 100 and 1,000 copies with and without the real cluster inside, the v3 table, CPU power,
   PostgreSQL, MySQL, MongoDB, Redis, Kafka, buildings and grid (CityLearn), the power grid (pandapower), robot arms
