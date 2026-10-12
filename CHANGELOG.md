@@ -2,6 +2,22 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-12 (night): Goldilocks built as a benchmark; the capacity test's rates; the last 1,000s removed
+
+- **Goldilocks with the Vertical Pod Autoscaler** (register row 80, the first of the founder's nine open-source pieces
+  built as a benchmark): `scripts/kind_addons_goldilocks.sh` installs the VPA 1.7.1 recommender and Goldilocks 4.16.2
+  (every file SHA-256 pinned, every pod on the control plane), lets the recommender learn the service while the load runs
+  the benchmark's own steps, and applies the recommendation as the VPA applies one (`tools/goldilocks_apply.py`); native
+  and Omni-Compass on top are then measured on the same rightsized service (`ADDONS=goldilocks` in
+  `scripts/kind_bench.sh`, workflow `kind-goldilocks`, preregistration `docs/GOLDILOCKS_PREREGISTRATION.md`, tests in
+  `tests/test_goldilocks.py`). The KEDA checks in `kind_bench.sh` now key on KEDA alone, and every reset check reads the
+  operator's own CPU limit back, whatever it is.
+- **The capacity test's rates** (amendment 1 of `docs/CAPACITY_PREREGISTRATION.md`, from the tuning case, before run A):
+  two cores serve about 10 requests a second within the line, so the counted rates are eight steps of 150 s, 4 6 8 10 12
+  14 16 20 requests a second; nothing else changes.
+- **No 1,000s anywhere** (the founder's order of 12 October): the KWOK scale test runs 10 and 100 nodes, the organism
+  ladder 100 runs at 1x, 10x and 100x, and the dossier's open items say the grid stops at 100.
+
 ## 2026-10-12 (late night): The seat, the receipts in their totality, the max written formally
 
 - **The seat** (`docs/THE_SEAT.md`, in the book after "What Omni-Compass Is"): Omni-Compass is the governor on top of the

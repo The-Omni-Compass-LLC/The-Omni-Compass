@@ -431,8 +431,8 @@ def main():
           "to show one machine must; the 40-worker fleet runs are the test of that.",
           "- The real card on the current governor: every earlier card result ran on a controller since replaced and is obsolete; "
           "the one-card, card-inside-the-organisms and eight-card runs are the founder's, on rented cards, at one named commit.",
-          "- The four stacked and the tower at 1,000 copies with the real cluster inside on v3 (the stack runs on a rented machine).",
-          "- 100 and 1,000 runs at 1,000 copies (beyond the machines available).",
+          "- The grid stops at 100 copies and 100 runs (the founder's order of 12 October, to cut the time and the bill): no 1,000 "
+          "copies and no 1,000 runs are run on any engine from that day; the v3 cells at 1,000 above stand as they were run.",
           "- The queue in `docs/REGISTER.md` section 4 (drone swarms on gym-pybullet-drones and Kafka done; Redis running): PX4 and "
           "ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and "
           "GMAT, RocketPy, Cantera.", ""]

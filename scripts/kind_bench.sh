@@ -65,17 +65,22 @@ if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"
 # ADDONS=keda, the add-on test: in every arm KEDA and its HTTP add-on own the service's autoscaler (scripts/kind_addons.sh;
 # ADDONS_PROFILE=both: the CPU target and the live requests in flight, the default; http: the requests in flight alone),
 # the load and the probe enter through the add-on's interceptor, and Omni-Compass's autoscaler moves reach KEDA's
-# ScaledObject through the plug (scripts/kubectl_keda.py). Empty (the default): every other set, unchanged
+# ScaledObject through the plug (scripts/kubectl_keda.py). ADDONS=goldilocks (register row 80): in every arm the service's
+# requests are set as an operator sets them with Goldilocks and the VPA's recommender, learned while the load runs its own
+# steps and applied before the warm-up (scripts/kind_addons_goldilocks.sh); the HPA, the load and the probe are unchanged,
+# and Omni-Compass's moves are its own, on top. Empty (the default): every other set, unchanged
 ADDONS="${ADDONS:-}"
-case "$ADDONS" in ""|keda) ;; *) echo "ADDONS must be empty or keda (got $ADDONS)"; exit 1;; esac
+case "$ADDONS" in ""|keda|goldilocks) ;; *) echo "ADDONS must be empty, keda or goldilocks (got $ADDONS)"; exit 1;; esac
+KEDA=""; [ "$ADDONS" = keda ] && KEDA=1
 if [ -n "$ADDONS" ]; then
-  { [ -z "${TWO_APP:-}" ] && [ "$PLATFORM" = kind ] && [ -z "$TUNE" ]; } || { echo "ADDONS=keda runs on kind, with one app and the operator's own target"; exit 1; }
+  { [ -z "${TWO_APP:-}" ] && [ "$PLATFORM" = kind ] && [ -z "$TUNE" ]; } || { echo "ADDONS=$ADDONS runs on kind, with one app and the operator's own target"; exit 1; }
 fi
+EXPECT_LIMIT=500m   # the operator's CPU limit on php-apache (deploy/kind/demo.yaml); with Goldilocks, the one its recommendation set
 # the CPU target the HPA holds when nothing has moved it, and how it is read: metrics[0] as demo.yaml writes it; KEDA lists
 # the requests-in-flight metric first, so with the add-on it is found by name, and profile http has none
-EXPECT_TARGET=50; [ -n "$ADDONS" ] && [ "${ADDONS_PROFILE:-both}" = http ] && EXPECT_TARGET=""
+EXPECT_TARGET=50; [ -n "$KEDA" ] && [ "${ADDONS_PROFILE:-both}" = http ] && EXPECT_TARGET=""
 hpa_cpu_target() {
-  if [ -n "$ADDONS" ]; then
+  if [ -n "$KEDA" ]; then
     kubectl get hpa "$1" -o json | jq -r '[.spec.metrics[] | select(.type == "Resource" and .resource.name == "cpu") | .resource.target.averageUtilization][0] // empty'
   else
     kubectl get hpa "$1" -o jsonpath='{.spec.metrics[0].resource.target.averageUtilization}'
@@ -158,10 +163,14 @@ if [ -n "$TUNE" ]; then
 fi
 kubectl apply -f deploy/kind/bench-serving.yaml
 kubectl rollout status deployment/php-apache --timeout=300s
-if [ -n "$ADDONS" ]; then
+if [ -n "$KEDA" ]; then
   # the add-on native, installed the same way in every arm before the arms are told apart
   OUT_DIR="$OUT_DIR" bash scripts/kind_addons.sh
   echo "addons=$ADDONS profile=${ADDONS_PROFILE:-both} (addons.txt)" | tee -a "$OUT_DIR/preflight.txt"
+elif [ "$ADDONS" = goldilocks ]; then
+  # Goldilocks and the VPA's recommender installed the same way in every arm; the recommendation is learned and applied
+  # once the load runs (below), before the warm-up
+  OUT_DIR="$OUT_DIR" PHASE=install bash scripts/kind_addons_goldilocks.sh
 fi
 if [ -n "${TWO_APP:-}" ]; then
   # the fairness test: a noisy neighbour on the same workers, its own HPA, its own surging load (deploy/kind/noisy.yaml)
@@ -178,11 +187,11 @@ if [ "$PLATFORM" = aks ]; then
 else
 EDGE_IP=$(kubectl get nodes -l node-role.kubernetes.io/control-plane -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
 PROBE_URL="http://${EDGE_IP}:30080/"
-[ -z "$ADDONS" ] || PROBE_URL="http://${EDGE_IP}:30090/"   # the add-on's interceptor, where the load enters too
+[ -z "$KEDA" ] || PROBE_URL="http://${EDGE_IP}:30090/"   # the add-on's interceptor, where the load enters too
 fi
 for i in $(seq 1 30); do curl -fsS -m 5 "$PROBE_URL" >/dev/null && break; sleep 2; done
 curl -fsS -m 5 "$PROBE_URL" >/dev/null || { echo "serving path $PROBE_URL not reachable"; exit 1; }
-if [ -n "$ADDONS" ]; then
+if [ -n "$KEDA" ]; then
   echo "probe_url=$PROBE_URL (the add-on's interceptor, NodePort on the control plane, on to php-apache)" | tee -a "$OUT_DIR/preflight.txt"
 else
 echo "probe_url=$PROBE_URL (Service via kube-proxy on the control plane)" | tee -a "$OUT_DIR/preflight.txt"
@@ -199,7 +208,7 @@ if [ "$LOADGEN" = meter ]; then
   sed -e "s#RATE_STEPS_VALUE#$RATE_STEPS#" -e "s#DURATION_VALUE#$DURATION#" -e "s#SLO_MS_VALUE#${SLO_MS:-500}#" \
     deploy/kind/loadgen-meter.yaml > "$OUT_DIR/loadgen-meter.yaml"
 fi
-if [ -n "$ADDONS" ]; then
+if [ -n "$KEDA" ]; then
   # the same load generator, its requests sent through the add-on's interceptor, which counts them for the scaler
   lg=deploy/kind/loadgen.yaml; [ "$LOADGEN" = "open" ] && lg=deploy/kind/loadgen-open.yaml
   sed 's#http://php-apache #http://keda-add-ons-http-interceptor-proxy.keda:8080/ #' "$lg" > "$OUT_DIR/loadgen.yaml"
@@ -223,11 +232,20 @@ if ! kubectl rollout status deployment/load-generator --timeout=300s; then
     > "$OUT_DIR/loadgen_failed.txt" 2>&1; tail -40 "$OUT_DIR/loadgen_failed.txt"; exit 1
 fi
 for i in $(seq 1 30); do kubectl top nodes >/dev/null 2>&1 && break; sleep 10; done
+if [ "$ADDONS" = goldilocks ]; then
+  # Goldilocks learns the service while the load runs its own steps, and the operator applies its recommendation; the
+  # same in every arm, before the arms are told apart (Omni-Compass is not started yet)
+  OUT_DIR="$OUT_DIR" PHASE=learn LOAD_STEPS="$LOAD_STEPS" bash scripts/kind_addons_goldilocks.sh
+  EXPECT_LIMIT=$(cat "$OUT_DIR/goldilocks_limit.txt")
+  echo "addons=goldilocks: requests from Goldilocks's recommendation, CPU limit $EXPECT_LIMIT (addons.txt)" | tee -a "$OUT_DIR/preflight.txt"
+fi
 hpa_count=$(kubectl get hpa -A -o json | jq '.items | length')
 want_hpa=1; [ -z "${TWO_APP:-}" ] || want_hpa=2
 [ "$hpa_count" = "$want_hpa" ] || { echo "expected exactly $want_hpa HPA, found $hpa_count"; exit 1; }
-if [ -n "$ADDONS" ]; then   # the add-on's own pods, all on the control plane (scripts/kind_addons.sh checks where)
+if [ -n "$KEDA" ]; then   # the add-on's own pods, all on the control plane (scripts/kind_addons.sh checks where)
   foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","keda") | not)] | length')
+elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's controller; the VPA's recommender is in kube-system (both on the control plane)
+  foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","goldilocks") | not)] | length')
 else
 foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") | not)] | length')
 fi
@@ -235,7 +253,7 @@ fi
 if [ -z "$NATIVE" ]; then
   kubectl apply -f deploy/kind/rbac-omni.yaml
   [ -z "${TWO_APP:-}" ] || kubectl apply -f deploy/kind/rbac-omni-noisy.yaml
-  [ -z "$ADDONS" ] || kubectl apply -f deploy/kind/rbac-omni-keda.yaml
+  [ -z "$KEDA" ] || kubectl apply -f deploy/kind/rbac-omni-keda.yaml
   SA="system:serviceaccount:omni-compass:omni-compass"
   can() { kubectl auth can-i "$@" --as="$SA"; }
   {
@@ -248,7 +266,7 @@ if [ -z "$NATIVE" ]; then
     echo "get pods/resize (power cap reads before it writes): $(can get pods --subresource=resize -n default)"
     echo "patch deployment/php-apache (rollout guard, cap record): $(can patch deployment/php-apache -n default)"
     echo "get configmap/omni-security (security afferent): $(can get configmap/omni-security -n default)"
-    [ -z "$ADDONS" ] || echo "patch scaledobject/php-apache (the add-on's knob: KEDA rebuilds the HPA from it): $(can patch scaledobjects.keda.sh/php-apache -n default)"
+    [ -z "$KEDA" ] || echo "patch scaledobject/php-apache (the add-on's knob: KEDA rebuilds the HPA from it): $(can patch scaledobjects.keda.sh/php-apache -n default)"
     echo "== cannot"
     echo "delete nodes: $(can delete nodes)"
     echo "create pods: $(can create pods -n default)"
@@ -260,14 +278,16 @@ if [ -z "$NATIVE" ]; then
     echo "get secrets (any namespace): $(can get secrets -A)"
     echo "create namespaces: $(can create namespaces)"
     echo "patch configmap/omni-security: $(can patch configmap/omni-security -n default)"
-    [ -z "$ADDONS" ] || echo "delete scaledobject/php-apache: $(can delete scaledobjects.keda.sh/php-apache -n default)"
-    [ -z "$ADDONS" ] || echo "patch scaledobjects in keda (the add-on's own): $(can patch scaledobjects.keda.sh -n keda)"
-    [ -z "$ADDONS" ] || echo "patch deployments in keda (the add-on itself): $(can patch deployments -n keda)"
+    [ -z "$KEDA" ] || echo "delete scaledobject/php-apache: $(can delete scaledobjects.keda.sh/php-apache -n default)"
+    [ -z "$KEDA" ] || echo "patch scaledobjects in keda (the add-on's own): $(can patch scaledobjects.keda.sh -n keda)"
+    [ -z "$KEDA" ] || echo "patch deployments in keda (the add-on itself): $(can patch deployments -n keda)"
+    [ "$ADDONS" != goldilocks ] || echo "patch verticalpodautoscalers (Goldilocks's VPA: its recommendation is the operator's): $(can patch verticalpodautoscalers.autoscaling.k8s.io -n default)"
+    [ "$ADDONS" != goldilocks ] || echo "patch deployments in goldilocks (Goldilocks itself): $(can patch deployments -n goldilocks)"
   } | tee "$OUT_DIR/rbac_omni.txt"
   ! sed -n '/== can/,/== cannot/p' "$OUT_DIR/rbac_omni.txt" | grep -q ": no$" || { echo "Omni identity is missing a permission it needs"; exit 1; }
   ! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_omni.txt" | grep -q ": yes$" || { echo "Omni identity has a permission it must not have"; exit 1; }
   export KUBECTL="$(pwd)/scripts/kubectl_omni.sh"
-  if [ -n "$ADDONS" ]; then
+  if [ -n "$KEDA" ]; then
     # the plug: the same service account underneath; the HPA moves carried to the ScaledObject KEDA builds the HPA from
     export OMNI_KUBECTL="$KUBECTL" KUBECTL="$(pwd)/scripts/kubectl_keda.py" OMNI_PLUG_LOG="$(cd "$OUT_DIR" && pwd)/plug_keda.jsonl"
   fi
@@ -470,11 +490,15 @@ if [ "$LOADGEN" = meter ]; then
 fi
 end_read "$OUT_DIR/nodes_end.txt" get nodes -o wide
 end_read "$OUT_DIR/hpa_end.json" get hpa php-apache -o json
-if [ -n "$ADDONS" ]; then   # the add-on's own record of the window: its ScaledObject and the last words of each part
+if [ -n "$KEDA" ]; then   # the add-on's own record of the window: its ScaledObject and the last words of each part
   end_read "$OUT_DIR/scaledobject_end.json" get scaledobject php-apache -o json
   for d in keda-operator keda-add-ons-http-scaler keda-add-ons-http-interceptor; do
     kubectl -n keda logs deployment/"$d" --tail=300 --request-timeout=20s > "$OUT_DIR/$d.log" 2>&1 || true
   done
+elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's VPA as the window left it (its recommendation, still in mode Off)
+  end_read "$OUT_DIR/vpa_end.json" get vpa goldilocks-php-apache -o json
+  kubectl -n goldilocks logs deployment/goldilocks-controller --tail=300 --request-timeout=20s > "$OUT_DIR/goldilocks-controller.log" 2>&1 || true
+  kubectl -n kube-system logs deployment/vpa-recommender --tail=300 --request-timeout=20s > "$OUT_DIR/vpa-recommender.log" 2>&1 || true
 fi
 
 if [ "$ARM" = "watch" ]; then
@@ -489,7 +513,7 @@ if [ "$ARM" = "watch" ]; then
   back=$(kubectl get nodes -l "$WORKER_SEL" -o json | jq '[.items[] | select(.spec.unschedulable != true and (any(.spec.taints[]?; .key == "omnicompass.io/idle") | not))] | length')
   echo "cluster after the run: target $target, range $range_now, CPU limits $cpu_limit, workers $back of $WORKERS" | tee "$OUT_DIR/kill_switch.txt"
   exist=$(kubectl get nodes -l "$WORKER_SEL" --no-headers | wc -l); [ "$PLATFORM" = aks ] || exist="$WORKERS"
-  test "$executed" = "0" && test "$target" = "$EXPECT_TARGET" && test "$range_now" = "$HPA_RANGE" && test "$cpu_limit" = "500m" && test "$back" = "$exist"
+  test "$executed" = "0" && test "$target" = "$EXPECT_TARGET" && test "$range_now" = "$HPA_RANGE" && test "$cpu_limit" = "$EXPECT_LIMIT" && test "$back" = "$exist"
 elif [ -z "$NATIVE" ]; then
   echo "== reset"
   touch "$OUT_DIR/kill"
@@ -502,7 +526,7 @@ elif [ -z "$NATIVE" ]; then
     --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" --audit "$OUT_DIR/audit_kill.jsonl" --kill-file "$OUT_DIR/kill"
   cpu_limit=$(kubectl get pods -l run=php-apache -o jsonpath='{range .items[*]}{.spec.containers[0].resources.limits.cpu}{"\n"}{end}' | sort -u | tr '\n' ' ' | sed 's/ $//')
   echo "pod CPU limits after kill: $cpu_limit" | tee -a "$OUT_DIR/kill_switch.txt"
-  if [ -n "$ADDONS" ]; then   # KEDA rebuilds the HPA from its ScaledObject: the operator's settings must show on the HPA
+  if [ -n "$KEDA" ]; then   # KEDA rebuilds the HPA from its ScaledObject: the operator's settings must show on the HPA
     for i in $(seq 1 15); do
       [ "$(hpa_cpu_target php-apache)" = "$EXPECT_TARGET" ] && [ "$(kubectl get hpa php-apache -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')" = "$HPA_RANGE" ] && break
       sleep 2
@@ -515,7 +539,7 @@ elif [ -z "$NATIVE" ]; then
   back=$(kubectl get nodes -l "$WORKER_SEL" -o json | jq '[.items[] | select(.spec.unschedulable != true and (any(.spec.taints[]?; .key == "omnicompass.io/idle") | not))] | length')
   { echo "restored target: $restored"; echo "workers in service: $back of $WORKERS"; } | tee "$OUT_DIR/kill_switch.txt"
   leftover=$(kubectl get hpa php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))'; kubectl get deployment php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')
-  if [ -n "$ADDONS" ]; then   # the add-on's ScaledObject: the operator's own settings back, and no record left on it either
+  if [ -n "$KEDA" ]; then   # the add-on's ScaledObject: the operator's own settings back, and no record left on it either
     leftover="$leftover$(kubectl get scaledobject php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')"
     so_now=$(kubectl get scaledobject php-apache -o json | jq -c '{min: .spec.minReplicaCount, max: .spec.maxReplicaCount, cpu: ([.spec.triggers[] | select(.type == "cpu") | .metadata.value][0] // "")}')
     so_want=$(jq -cn --argjson max "${HPA_MAX:-10}" --arg cpu "$EXPECT_TARGET" '{min: 1, max: $max, cpu: $cpu}')
@@ -528,7 +552,7 @@ elif [ -z "$NATIVE" ]; then
     echo "noisy neighbour's restored target: $n_restored" | tee -a "$OUT_DIR/kill_switch.txt"; test "$n_restored" = "50"
   fi
   exist=$(kubectl get nodes -l "$WORKER_SEL" --no-headers | wc -l); [ "$PLATFORM" = aks ] || exist="$WORKERS"
-  test "$restored" = "$EXPECT_TARGET" && test "$back" = "$exist" && test "$cpu_limit" = "500m" && test -z "$leftover"
+  test "$restored" = "$EXPECT_TARGET" && test "$back" = "$exist" && test "$cpu_limit" = "$EXPECT_LIMIT" && test -z "$leftover"
 fi
 [ -n "$watchdog_pid" ] && { kill "$watchdog_pid" 2>/dev/null || true; }
 echo "rows captured: $(( $(wc -l < "$OUT_DIR/capture.csv") - 1 ))"
@@ -584,7 +608,7 @@ for line in open(sys.argv[1]):
 PY
   [ $(( decisions * 10 )) -ge $(( expected * 8 )) ] || { echo "INVALID RUN: the controller made $decisions of its $expected decisions inside the window (under 80%)"; exit 1; }
   ! grep -q '"failsafe"' "$OUT_DIR/audit.jsonl" || { echo "INVALID RUN: the fail-safe handed control back to native"; exit 1; }
-  if [ -n "$ADDONS" ]; then
+  if [ -n "$KEDA" ]; then
     # the add-on test counts only if every move Omni-Compass made on the autoscaler reached KEDA whole
     pl="$OUT_DIR/plug_keda.jsonl"
     echo "-- the plug: $(grep -c '"hpa_shows"' "$pl" 2>/dev/null || true) writes carried to the add-on's ScaledObject," \

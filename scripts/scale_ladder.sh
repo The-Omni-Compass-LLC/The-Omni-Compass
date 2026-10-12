@@ -5,14 +5,14 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # The six organisms up the ladder of runs and sizes, on every core of this machine (tools/run_scale.py). Each rung
-# writes results/scale/r<runs>-x<scale>/SCALE.md and is packed at the end. The grid tops out at 1,000 runs and 1,000x:
-# by default 1,000 runs at 1x, 10x and 100x, and 100 runs at 1,000x (each receipt also shows the first 1, 10 and 100
-# runs). Override: RUNGS="1000:1 1000:10".
+# writes results/scale/r<runs>-x<scale>/SCALE.md and is packed at the end. 1, 10 and 100 only (the founder's order of
+# 12 October): by default 100 runs at 1x, 10x and 100x (each receipt also shows the first 1 and 10 runs).
+# Override: RUNGS="100:1 100:10".
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY="${PYTHON:-python3}"
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
-RUNGS="${RUNGS:-1000:1 1000:10 1000:100 100:1000}"
+RUNGS="${RUNGS:-100:1 100:10 100:100}"
 DIRS=()
 for r in $RUNGS; do
   runs=${r%%:*}; scale=${r##*:}

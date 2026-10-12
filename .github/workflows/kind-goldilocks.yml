@@ -1,0 +1,146 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: kind-goldilocks
+# Goldilocks (register row 80; docs/GOLDILOCKS_PREREGISTRATION.md): native is the service rightsized the way operators do
+# it with Goldilocks and the Vertical Pod Autoscaler's recommender (the recommendation learned while the load runs its own
+# steps, then applied as the VPA applies one), with the HPA as in every set; Omni-Compass runs on top of that
+# (scripts/kind_addons_goldilocks.sh, ADDONS=goldilocks in scripts/kind_bench.sh). The arms are paired on one runner as in
+# benchmark-reps (scripts/kind_paired.sh), each on a fresh six-worker kind cluster, the order rotated by repetition:
+# native, and compass (Omni-Compass on top of the same). Started by hand, or by a pushed commit whose message contains
+# [goldilocks]; [smoke] makes it one short repetition (360 s, 240 s of learning) to prove the wiring. Every run's raw files
+# and table are committed back to the branch it ran on (results/live/raw/goldilocks-run-<id>/); the three-run table is
+# built from them by tools/confirm_abc.py, and the founder hears what a set of three says before its table goes up.
+on:
+  workflow_dispatch:
+    inputs:
+      duration_s: {description: "Measured seconds per run", default: "900"}
+      learn_s: {description: "Seconds Goldilocks learns the service before the arms are told apart", default: "600"}
+      reps: {description: "Repetitions, as a JSON list", default: "[1,2,3,4,5,6,7,8,9,10]"}
+  push:
+permissions:
+  contents: write
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  run:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[goldilocks]')
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        rep: ${{ fromJSON(github.event.inputs.reps || (contains(github.event.head_commit.message, '[smoke]') && '[1]' || '[1,2,3,4,5,6,7,8,9,10]')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4   # the archived raw runs (25 GB) stay out: the run reads none of them
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: helm/kind-action@v1     # kind v0.31.0 (Kubernetes v1.35.0), as the grid; a refused download is tried again below
+        id: kind
+        continue-on-error: true
+        with: {install_only: true, version: v0.31.0, kubectl_version: v1.35.0}
+      - name: kind and kubectl again, if the first download was refused
+        if: steps.kind.outcome == 'failure'
+        run: bash scripts/kind_install.sh v0.31.0 v1.35.0
+      - run: bash scripts/kind_paired.sh
+        env:
+          REP: ${{ matrix.rep }}
+          ARMS: native compass
+          ADDONS: goldilocks
+          GOLDILOCKS_LEARN: ${{ github.event.inputs.learn_s || (contains(github.event.head_commit.message, '[smoke]') && '240' || '600') }}
+          DURATION: ${{ github.event.inputs.duration_s || (contains(github.event.head_commit.message, '[smoke]') && '360' || '900') }}
+          WARMUP: ${{ contains(github.event.head_commit.message, '[smoke]') && '60' || '120' }}
+          CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+          LOADGEN: closed
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "goldilocks-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}"}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  aggregate:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4   # the branch, to commit the results back; the archived raw runs (25 GB) stay out
+        with:
+          ref: "${{ github.ref_name }}"
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with: {pattern: "goldilocks-*", path: reps-goldilocks, merge-multiple: true}
+      - name: The table
+        run: |
+          [ -d reps-goldilocks ] || { echo "no repetition handed in its files" | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; }
+          ls reps-goldilocks
+          python tools/live_reps.py reps-goldilocks || { echo "no table (every run invalid?)" | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; }
+          { echo "## Native rightsized with Goldilocks and the VPA's recommender; omni is Omni-Compass on top of the same"; echo; cat reps-goldilocks/LIVE_REPS.md; echo; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: goldilocks-reps, path: "reps-goldilocks/LIVE_REPS.*"}
+      - name: The results, committed back to the branch the run ran on
+        if: always()
+        run: |
+          [ -d reps-goldilocks ] || exit 0
+          d="results/live/raw/goldilocks-run-${{ github.run_id }}"
+          mkdir -p "$d"
+          cp -r reps-goldilocks/. "$d/"
+          ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add --sparse "$d"
+          git commit -q -m "Goldilocks test, run ${{ github.run_id }}: raw files and table"
+          for i in 1 2 3 4 5 6; do
+            git push origin "HEAD:${{ github.ref_name }}" && exit 0
+            sleep $((i * 5)); git pull --rebase -q origin "${{ github.ref_name }}" || true
+          done
+          echo "::error::the results could not be pushed after six attempts"; exit 1
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

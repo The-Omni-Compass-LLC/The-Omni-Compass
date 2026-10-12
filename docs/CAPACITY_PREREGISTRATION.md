@@ -41,6 +41,23 @@ work. This test makes the load rise past what the cap can serve, so that complet
   run A: six steps rising from below what one core serves to above what three cores serve. The tuning case is not
   counted.
 
+## Amendment 1 (12 October 2026, after the tuning case, before run A)
+
+The tuning case (run 38280712498, the 2-core cap, one repetition, rates 5 10 20 30 40 60, not counted; its files in
+`results/live/raw/capacity-run-38280712498/`) showed where the cap saturates, in both arms alike:
+
+| Rate (requests a second) | 5 | 10 | 20 | 30 | 40 | 60 |
+|---|---:|---:|---:|---:|---:|---:|
+| Answered within the line, native | 100% | 90.7% | 1.4% | 0% | 0% | 0% |
+| Answered within the line, Omni on top | 99.7% | 93.6% | 1.0% | 0% | 0% | 0% |
+
+Two cores serve about 10 requests a second within the line (a request costs about 0.2 core-seconds of php-apache's CPU),
+so one core serves about 5 and three cores about 15, and past the cap the service fails outright (87% of the 20-a-second
+step failed). Steps of 5 then 10 then 20 can only say "5" for every cap from 1 to 3 cores, so the counted rates are set
+finer, from below what one core serves to above what three cores serve, **eight steps of 150 s: 4 6 8 10 12 14 16 20**
+requests a second (the workflow's default from this amendment on). Nothing else changes: the caps, the limits, the
+window, the repetitions and the readings are as written above.
+
 ## Measures (the same limits in both arms)
 
 - **Completed work**: the requests answered within the line over the whole window (`work_meter.json`, `total.in_time`).
