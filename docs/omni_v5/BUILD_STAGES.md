@@ -26,7 +26,9 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
   almost all of v5's saving (`docs/OMNI_V5.md`, the amendment).
 - **Stage 9 — DONE (first wave).** The v5 catalog `realms/catalog_v5.csv`: 1,002 muscles in 65 families (v3's 945 plus
   Linux Kernel & OS Control, Serverless & FaaS, Virtualization & Hypervisor, Content Delivery & Edge Cache, Gut, Skin). The
-  official v5 table: `results/realms_v5/REALMS_V5.md`, all six organisms superior within guardrails, 0 of 1,002 worse.
+  official v5 table: `results/realms_v5/REALMS_V5.md`, all six organisms superior within guardrails, 0 of 1,002 worse;
+  the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.96% against 0.36% (2.7 times), Energy / Facility 1.00% against 0.33% (3.0 times). Inside the organisms v5 leaves 1 to 5 plants per organism one decision over their line (all of them UPS or
+  distribution plants it never touches, moved by the body's power swing), against v3's 13 to 74.
 - **Benchmarks — written.** Google GKE and Amazon EKS paired runs, the AMD APU adapter, the realms-v5 workflow and one
   button for every benchmark (`docs/omni_v5/BENCHMARKS_V5.md`). The live benchmarks measure the v5 law only after stages
   6–11 port it into the live controllers.

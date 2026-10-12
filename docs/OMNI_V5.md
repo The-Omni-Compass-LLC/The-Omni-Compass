@@ -54,7 +54,10 @@ preregistered seeds 3000-3009 were run again unchanged.
 
 On a fixed seed, for **every** muscle in the catalog, the v5 default uses no more energy than native, does no less work,
 and is in violation no more often; it hands every knob back to native on the kill (the dead-man lease); and it acts where
-it helps. The whole tower is no worse than native on energy and work. This is checked in
+it helps. The whole tower is no worse than native on energy and work. On the preregistered seeds the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.96% against 0.36% (2.7 times), Energy / Facility 1.00% against 0.33% (3.0 times), all six
+organisms superior within guardrails. Inside the organisms v5 leaves 1 to 5 plants per organism one decision over their
+line, all of them UPS or distribution plants it never touches (the body's power swing reaches them), against v3's 13 to
+74; holding the body's shared power lines as one gauge is the next engine item. This is checked in
 `tests/test_compass_arm_v5.py` and run in full by `tools/run_realms_v5.py` (`results/realms_v5/`). Models are class S: a
 model's energy is not a meter's, and a plant written by the same people who wrote the law is not an independent test.
 

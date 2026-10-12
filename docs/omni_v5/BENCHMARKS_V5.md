@@ -10,7 +10,7 @@ secrets are in place (a missing secret is reported and skipped, never billed). C
 ## First, the plain truth about which law each benchmark runs today
 
 - **The v5 law runs today in the modelled realms** (`tools/run_realms_v5.py`, workflow `realms-v5`): 1,002 muscles in 65
-  families, all six organisms *superior within guardrails*, **0 muscles worse than native**
+  families, all six organisms *superior within guardrails*, **0 muscles worse than native**; the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.96% against 0.36% (2.7 times), Energy / Facility 1.00% against 0.33% (3.0 times)
   (`results/realms_v5/REALMS_V5.md`). Evidence class **S** (modelled): a model is not proof.
 - **Every live benchmark** (real Kubernetes, the GPU, the databases, the clouds) runs the **live controllers**, which still
   carry the **v3 live law** inside the omni-v5 tree. The v5 law is ported into the live controllers and the live organism
