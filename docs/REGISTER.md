@@ -14,9 +14,9 @@ on hardware or a go), **next** (being built now), **queued** (in the order of se
 marked **run again 10 October** read the new set; the tables they supersede are whole in `docs/history`. Run by run, with inputs,
 times, ids and what landed: `docs/RERUN_2026-10-10.md`.
 
-Last updated 2026-10-09.
+Last updated 2026-10-12.
 
-## 1. Every muscle wired (945 muscles, 59 families, four realms and the shared spine of 257; v1 had 656 in 46)
+## 1. Every muscle wired (1,107 muscles, 70 families, four realms and the shared spine of 267, Omni v5; v2 and v3 had 945 in 59, v1 656 in 46)
 
 A muscle is one knob on one real system that Omni-Compass may move inside its cover: **capacity** (how many machines,
 replicas or units), **setpoint** (a temperature, voltage, pressure or speed), **power** (a power or effort cap), or
@@ -28,75 +28,89 @@ kind of system until it is measured live.
 |---:|---|---|---:|---|---|
 | 1 | Compute / AI / Cloud | AI Inference Serving | 24 | compute_pool/gpu | capacity 13, admission 8, setpoint 2, power 1 |
 | 2 | Compute / AI / Cloud | AI Training | 18 | compute_pool/gpu_batch | capacity 15, setpoint 1, admission 1, power 1 |
-| 3 | Compute / AI / Cloud | Cloud VM & Capacity | 21 | compute_pool/node | capacity 19, setpoint 1, admission 1 |
-| 4 | Compute / AI / Cloud | Container Resources | 23 | compute_pool/server | capacity 17, setpoint 3, admission 3 |
-| 5 | Compute / AI / Cloud | Cross-Cluster, Multi-Region & Edge | 15 | compute_pool/node | capacity 9, admission 6 |
-| 6 | Compute / AI / Cloud | DPU SmartNIC & Programmable IO | 12 | compute_pool/fabric | capacity 10, admission 2 |
-| 7 | Compute / AI / Cloud | Distributed Cluster Managers | 15 | compute_pool/batch | capacity 8, admission 7 |
-| 8 | Compute / AI / Cloud | GPU Fabric & RDMA | 18 | compute_pool/fabric | capacity 14, admission 4 |
-| 9 | Compute / AI / Cloud | HPC & Distributed Compute | 19 | compute_pool/batch | capacity 10, admission 6, power 2, setpoint 1 |
-| 10 | Compute / AI / Cloud | Host CPU & Memory | 23 | compute_pool/cpu_host | power 12, capacity 10, admission 1 |
-| 11 | Compute / AI / Cloud | Kubernetes Dynamic Device Allocation | 8 | compute_pool/gpu | capacity 6, admission 1, setpoint 1 |
-| 12 | Compute / AI / Cloud | Kubernetes Placement & Scheduling | 20 | compute_pool/server | capacity 13, admission 5, setpoint 2 |
-| 13 | Compute / AI / Cloud | Kubernetes Workload Scaling | 31 | compute_pool/server | capacity 17, admission 8, setpoint 6 |
-| 14 | Compute / AI / Cloud | NVIDIA GPU Hardware | 19 | compute_pool/gpu | capacity 10, power 6, admission 2, setpoint 1 |
-| 15 | Compute / AI / Cloud | Node Fleet & Karpenter-Class Control | 24 | compute_pool/node | capacity 18, admission 5, setpoint 1 |
-| 16 | Compute / AI / Cloud | OpenShift & Machine API | 9 | compute_pool/node | capacity 5, admission 4 |
-| 17 | Compute / AI / Cloud | Quantum Computing Control Simulation | 16 | compute_pool/qpu | capacity 10, admission 4, setpoint 1, power 1 |
-| 18 | Compute / AI / Cloud | Work Admission & Demand Shaping | 19 | compute_pool/server | admission 19 |
-| 19 | Physics / Robotics / Autonomous | Automotive EV & Mobile Powertrain | 14 | motion_axis/ev_traction | power 11, admission 2, capacity 1 |
-| 20 | Physics / Robotics / Autonomous | Aviation & Autonomous Flight | 20 | motion_axis/flight_axis | admission 9, capacity 7, power 4 |
-| 21 | Physics / Robotics / Autonomous | Elevators & Vertical Transport (v2) | 12 | motion_axis/elevator_hoist | admission 7, capacity 3, power 2 |
-| 22 | Physics / Robotics / Autonomous | Marine Propulsion & Vessel Automation (v2) | 12 | motion_axis/marine_propulsion | capacity 5, power 5, admission 2 |
-| 23 | Physics / Robotics / Autonomous | Rail Traction & Train Control (v2) | 14 | motion_axis/rail_traction | power 6, capacity 4, admission 4 |
-| 24 | Physics / Robotics / Autonomous | Robotics Fleet & Warehouse Automation | 15 | compute_pool/robot_fleet | capacity 12, admission 3 |
-| 25 | Physics / Robotics / Autonomous | Robotics Motion Control | 18 | motion_axis/robot_joint | capacity 14, power 4 |
-| 26 | Physics / Robotics / Autonomous | Spacecraft & Flight Software | 14 | motion_axis/reaction_wheel | admission 6, power 4, capacity 4 |
-| 27 | Energy / Facility / Industrial | Agriculture & Irrigation (v2) | 14 | process_loop/irrigation | setpoint 10, capacity 2, power 1, admission 1 |
-| 28 | Energy / Facility / Industrial | Building & Critical Environment HVAC | 15 | thermal_zone/building | capacity 6, setpoint 5, admission 3, power 1 |
-| 29 | Energy / Facility / Industrial | Cooling, Chillers & Thermodynamics | 18 | thermal_zone/data_hall | capacity 8, setpoint 6, power 2, admission 2 |
-| 30 | Energy / Facility / Industrial | District Heating & Cooling (v2) | 13 | process_loop/district_heat | setpoint 7, capacity 3, admission 2, power 1 |
-| 31 | Energy / Facility / Industrial | Energy Storage & Microgrid | 19 | energy_storage/microgrid | power 10, capacity 4, setpoint 3, admission 2 |
-| 32 | Energy / Facility / Industrial | Facility & Grid Optimization | 15 | energy_storage/facility | power 5, admission 5, capacity 4, setpoint 1 |
-| 33 | Energy / Facility / Industrial | Grid Transmission & Distribution | 12 | process_loop/feeder_voltage | setpoint 4, admission 4, capacity 2, power 2 |
-| 34 | Energy / Facility / Industrial | Healthcare Critical Environments (v2) | 13 | thermal_zone/hospital | setpoint 7, capacity 3, admission 2, power 1 |
-| 35 | Energy / Facility / Industrial | Industrial PLC & Process Automation | 18 | process_loop/process | capacity 8, setpoint 6, admission 3, power 1 |
-| 36 | Energy / Facility / Industrial | Mining & Mineral Processing (v2) | 14 | process_loop/mill | setpoint 8, power 2, capacity 2, admission 2 |
-| 37 | Energy / Facility / Industrial | Oil & Gas Pipelines (v2) | 14 | process_loop/pipeline | setpoint 8, admission 3, capacity 2, power 1 |
-| 38 | Energy / Facility / Industrial | PDU, UPS & Electrical Distribution | 18 | energy_storage/ups | power 8, capacity 5, admission 3, setpoint 2 |
-| 39 | Energy / Facility / Industrial | Pharmaceutical & Food Manufacturing (v2) | 14 | process_loop/batch_reactor | setpoint 10, admission 4 |
-| 40 | Energy / Facility / Industrial | Power Generation & Turbine Control (v2) | 14 | process_loop/turbine | setpoint 10, capacity 2, admission 2 |
-| 41 | Energy / Facility / Industrial | Renewable Generation & Inverter Control (v2) | 13 | process_loop/inverter | setpoint 6, capacity 3, admission 3, power 1 |
-| 42 | Energy / Facility / Industrial | Semiconductor Fab & Precision Manufacturing | 13 | process_loop/chamber | capacity 6, admission 4, setpoint 2, power 1 |
-| 43 | Energy / Facility / Industrial | Water Wastewater & Pumping | 12 | process_loop/water | admission 5, setpoint 4, power 2, capacity 1 |
-| 44 | Distribution / Specialized | Cache & Memory Services | 16 | compute_pool/server | capacity 11, admission 4, setpoint 1 |
-| 45 | Distribution / Specialized | Commerce & Payment Systems | 15 | compute_pool/commerce | admission 8, capacity 5, setpoint 2 |
-| 46 | Distribution / Specialized | Data Analytics & ETL | 15 | compute_pool/batch | capacity 9, admission 4, setpoint 2 |
-| 47 | Distribution / Specialized | Database & Transactions | 19 | compute_pool/database | capacity 14, admission 5 |
-| 48 | Distribution / Specialized | Medical Imaging & Clinical Systems (v2) | 12 | compute_pool/clinical | admission 9, capacity 2, setpoint 1 |
-| 49 | Distribution / Specialized | Messaging & Streaming | 18 | compute_pool/server | capacity 11, admission 7 |
-| 50 | Distribution / Specialized | Network Routing & Switching | 19 | compute_pool/network | capacity 9, admission 6, setpoint 3, power 1 |
-| 51 | Distribution / Specialized | Observability & Telemetry | 9 | compute_pool/server | capacity 4, admission 3, setpoint 2 |
-| 52 | Distribution / Specialized | Ports & Maritime Logistics (v2) | 12 | compute_pool/port | capacity 5, admission 5, power 1, setpoint 1 |
-| 53 | Distribution / Specialized | Reliability, Security & Recovery | 12 | compute_pool/server | capacity 6, admission 6 |
-| 54 | Distribution / Specialized | Runtime & Application | 17 | compute_pool/server | capacity 12, admission 5 |
-| 55 | Distribution / Specialized | Search, Indexing & Vector DB | 16 | compute_pool/server | capacity 10, admission 6 |
-| 56 | Distribution / Specialized | Service Mesh & API Reliability | 16 | compute_pool/server | admission 7, capacity 7, setpoint 2 |
-| 57 | Distribution / Specialized | Storage Block/File/Object | 20 | compute_pool/storage | capacity 17, admission 2, power 1 |
-| 58 | Distribution / Specialized | Telecom RAN & Edge Radio | 12 | compute_pool/ran | capacity 7, admission 3, setpoint 1, power 1 |
-| 59 | Distribution / Specialized | Workflow, Logistics & Fulfillment | 15 | compute_pool/workflow | capacity 10, admission 5 |
+| 3 | Compute / AI / Cloud | Blockchain & Ledger Nodes (v5) | 10 | compute_pool/storage | capacity 5, setpoint 2, admission 2, power 1 |
+| 4 | Compute / AI / Cloud | CI/CD & Build Farms (v5) | 10 | compute_pool/batch | capacity 6, admission 2, setpoint 1, power 1 |
+| 5 | Compute / AI / Cloud | Cloud VM & Capacity | 21 | compute_pool/node | capacity 19, setpoint 1, admission 1 |
+| 6 | Compute / AI / Cloud | Container Resources | 25 | compute_pool/server | capacity 19, setpoint 3, admission 3 |
+| 7 | Compute / AI / Cloud | Cross-Cluster, Multi-Region & Edge | 18 | compute_pool/node | capacity 10, admission 6, power 1, setpoint 1 |
+| 8 | Compute / AI / Cloud | DPU SmartNIC & Programmable IO | 12 | compute_pool/fabric | capacity 10, admission 2 |
+| 9 | Compute / AI / Cloud | Distributed Cluster Managers | 15 | compute_pool/batch | capacity 8, admission 7 |
+| 10 | Compute / AI / Cloud | GPU Fabric & RDMA | 18 | compute_pool/fabric | capacity 14, admission 4 |
+| 11 | Compute / AI / Cloud | GPU Hardware (v5) | 22 | compute_pool/gpu | capacity 10, power 9, admission 2, setpoint 1 |
+| 12 | Compute / AI / Cloud | Game Servers & Real-Time Interactive (v5) | 12 | compute_pool/server | capacity 7, setpoint 2, admission 2, power 1 |
+| 13 | Compute / AI / Cloud | Gut: Data-plane Intake & Waste (v5) | 8 | process_loop/process | capacity 4, setpoint 3, admission 1 |
+| 14 | Compute / AI / Cloud | HPC & Distributed Compute | 19 | compute_pool/batch | capacity 10, admission 6, power 2, setpoint 1 |
+| 15 | Compute / AI / Cloud | Host CPU & Memory | 26 | compute_pool/cpu_host | power 14, capacity 10, admission 2 |
+| 16 | Compute / AI / Cloud | Kubernetes Dynamic Device Allocation | 8 | compute_pool/gpu | capacity 6, admission 1, setpoint 1 |
+| 17 | Compute / AI / Cloud | Kubernetes Placement & Scheduling | 21 | compute_pool/server | capacity 14, admission 5, setpoint 2 |
+| 18 | Compute / AI / Cloud | Kubernetes Workload Scaling | 32 | compute_pool/server | capacity 17, admission 8, setpoint 7 |
+| 19 | Compute / AI / Cloud | Linux Kernel & OS Control (v5) | 20 | process_loop/process | capacity 10, setpoint 8, power 2 |
+| 20 | Compute / AI / Cloud | Media Streaming & CDN (v5) | 14 | process_loop/process | setpoint 5, capacity 5, power 2, admission 2 |
+| 21 | Compute / AI / Cloud | Node Fleet & Karpenter-Class Control | 24 | compute_pool/node | capacity 18, admission 5, setpoint 1 |
+| 22 | Compute / AI / Cloud | OpenShift & Machine API | 9 | compute_pool/node | capacity 5, admission 4 |
+| 23 | Compute / AI / Cloud | Quantum Computing Control Simulation | 16 | compute_pool/qpu | capacity 10, admission 4, setpoint 1, power 1 |
+| 24 | Compute / AI / Cloud | Serverless & Functions (FaaS) (v5) | 9 | compute_pool/server | capacity 6, admission 2, setpoint 1 |
+| 25 | Compute / AI / Cloud | Skin: Perimeter & Admission (v5) | 5 | compute_pool/network | admission 3, capacity 2 |
+| 26 | Compute / AI / Cloud | Virtualization & Hypervisor (v5) | 9 | compute_pool/cpu_host | capacity 7, admission 1, setpoint 1 |
+| 27 | Compute / AI / Cloud | Work Admission & Demand Shaping | 19 | compute_pool/server | admission 19 |
+| 28 | Physics / Robotics / Autonomous | Automotive EV & Mobile Powertrain | 14 | motion_axis/ev_traction | power 11, admission 2, capacity 1 |
+| 29 | Physics / Robotics / Autonomous | Aviation & Autonomous Flight | 28 | motion_axis/flight_axis | capacity 13, admission 9, power 5, setpoint 1 |
+| 30 | Physics / Robotics / Autonomous | Elevators & Vertical Transport (v2) | 12 | motion_axis/elevator_hoist | admission 7, capacity 3, power 2 |
+| 31 | Physics / Robotics / Autonomous | Marine Propulsion & Vessel Automation (v2) | 12 | motion_axis/marine_propulsion | capacity 5, power 5, admission 2 |
+| 32 | Physics / Robotics / Autonomous | Rail Traction & Train Control (v2) | 14 | motion_axis/rail_traction | power 6, capacity 4, admission 4 |
+| 33 | Physics / Robotics / Autonomous | Robotics Fleet & Warehouse Automation | 17 | compute_pool/robot_fleet | capacity 13, admission 3, setpoint 1 |
+| 34 | Physics / Robotics / Autonomous | Robotics Motion Control | 26 | motion_axis/robot_joint | capacity 19, power 5, setpoint 2 |
+| 35 | Physics / Robotics / Autonomous | Spacecraft & Flight Software | 14 | motion_axis/reaction_wheel | admission 6, power 4, capacity 4 |
+| 36 | Energy / Facility / Industrial | Agriculture & Irrigation (v2) | 14 | process_loop/irrigation | setpoint 10, capacity 2, power 1, admission 1 |
+| 37 | Energy / Facility / Industrial | Building & Critical Environment HVAC | 15 | thermal_zone/building | capacity 6, setpoint 5, admission 3, power 1 |
+| 38 | Energy / Facility / Industrial | Cooling, Chillers & Thermodynamics | 18 | thermal_zone/data_hall | capacity 8, setpoint 6, power 2, admission 2 |
+| 39 | Energy / Facility / Industrial | District Heating & Cooling (v2) | 13 | process_loop/district_heat | setpoint 7, capacity 3, admission 2, power 1 |
+| 40 | Energy / Facility / Industrial | Energy Storage & Microgrid | 19 | energy_storage/microgrid | power 10, capacity 4, setpoint 3, admission 2 |
+| 41 | Energy / Facility / Industrial | Facility & Grid Optimization | 15 | energy_storage/facility | power 5, admission 5, capacity 4, setpoint 1 |
+| 42 | Energy / Facility / Industrial | Grid Transmission & Distribution | 12 | process_loop/feeder_voltage | setpoint 4, admission 4, capacity 2, power 2 |
+| 43 | Energy / Facility / Industrial | Healthcare Critical Environments (v2) | 13 | thermal_zone/hospital | setpoint 7, capacity 3, admission 2, power 1 |
+| 44 | Energy / Facility / Industrial | Industrial PLC & Process Automation | 18 | process_loop/process | capacity 8, setpoint 6, admission 3, power 1 |
+| 45 | Energy / Facility / Industrial | Mining & Mineral Processing (v2) | 14 | process_loop/mill | setpoint 8, power 2, capacity 2, admission 2 |
+| 46 | Energy / Facility / Industrial | Oil & Gas Pipelines (v2) | 14 | process_loop/pipeline | setpoint 8, admission 3, capacity 2, power 1 |
+| 47 | Energy / Facility / Industrial | PDU, UPS & Electrical Distribution | 18 | energy_storage/ups | power 8, capacity 5, admission 3, setpoint 2 |
+| 48 | Energy / Facility / Industrial | Pharmaceutical & Food Manufacturing (v2) | 14 | process_loop/batch_reactor | setpoint 10, admission 4 |
+| 49 | Energy / Facility / Industrial | Power Generation & Turbine Control (v2) | 14 | process_loop/turbine | setpoint 10, capacity 2, admission 2 |
+| 50 | Energy / Facility / Industrial | Renewable Generation & Inverter Control (v2) | 13 | process_loop/inverter | setpoint 6, capacity 3, admission 3, power 1 |
+| 51 | Energy / Facility / Industrial | Semiconductor Fab & Precision Manufacturing | 13 | process_loop/chamber | capacity 6, admission 4, setpoint 2, power 1 |
+| 52 | Energy / Facility / Industrial | Water Wastewater & Pumping | 12 | process_loop/water | admission 5, setpoint 4, power 2, capacity 1 |
+| 53 | Distribution / Specialized | Cache & Memory Services | 16 | compute_pool/server | capacity 11, admission 4, setpoint 1 |
+| 54 | Distribution / Specialized | Commerce & Payment Systems | 15 | compute_pool/commerce | admission 8, capacity 5, setpoint 2 |
+| 55 | Distribution / Specialized | Content Delivery & Edge Cache (v5) | 6 | process_loop/process | capacity 3, setpoint 2, admission 1 |
+| 56 | Distribution / Specialized | Data Analytics & ETL | 15 | compute_pool/batch | capacity 9, admission 4, setpoint 2 |
+| 57 | Distribution / Specialized | Database & Transactions | 19 | compute_pool/database | capacity 14, admission 5 |
+| 58 | Distribution / Specialized | Financial Markets & Trading Systems (v5) | 14 | compute_pool/server | capacity 7, setpoint 4, power 2, admission 1 |
+| 59 | Distribution / Specialized | Medical Imaging & Clinical Systems (v2) | 12 | compute_pool/clinical | admission 9, capacity 2, setpoint 1 |
+| 60 | Distribution / Specialized | Messaging & Streaming | 22 | compute_pool/server | capacity 13, admission 7, setpoint 2 |
+| 61 | Distribution / Specialized | Network Routing & Switching | 19 | compute_pool/network | capacity 9, admission 6, setpoint 3, power 1 |
+| 62 | Distribution / Specialized | Observability & Telemetry | 9 | compute_pool/server | capacity 4, admission 3, setpoint 2 |
+| 63 | Distribution / Specialized | Ports & Maritime Logistics (v2) | 12 | compute_pool/port | capacity 5, admission 5, power 1, setpoint 1 |
+| 64 | Distribution / Specialized | Reliability, Security & Recovery | 18 | compute_pool/server | capacity 9, admission 8, setpoint 1 |
+| 65 | Distribution / Specialized | Runtime & Application | 21 | compute_pool/server | capacity 14, admission 5, setpoint 2 |
+| 66 | Distribution / Specialized | Search, Indexing & Vector DB | 16 | compute_pool/server | capacity 10, admission 6 |
+| 67 | Distribution / Specialized | Service Mesh & API Reliability | 16 | compute_pool/server | admission 7, capacity 7, setpoint 2 |
+| 68 | Distribution / Specialized | Storage Block/File/Object | 20 | compute_pool/storage | capacity 17, admission 2, power 1 |
+| 69 | Distribution / Specialized | Telecom RAN & Edge Radio | 12 | compute_pool/ran | capacity 7, admission 3, setpoint 1, power 1 |
+| 70 | Distribution / Specialized | Workflow, Logistics & Fulfillment | 15 | compute_pool/workflow | capacity 10, admission 5 |
 
-**945 muscles in 59 families (Omni v2: the 656 of v1 byte for byte, 118 real controls the realm study had found that the tower lacked, and 171 in the thirteen families marked v2).** Every muscle by name, with its knob and what it is for: `realms/catalog.csv` and `docs/MUSCLE_CATALOG.md`; the sources of every added muscle: `docs/realm_study/TRUE_MUSCLES.csv` and `realms/wave4_families.csv`.
+**1,107 muscles in 70 families (Omni v5: v3's 945, then eleven new families marked v5 and muscles added to families already there, in three waves; the third wave, 12 October, is the founder's nine open-source pieces as ten muscles, each in the family its knob belongs to, `docs/THE_SEAT.md`).** Every muscle by name, with its knob and what it is for: `realms/catalog_v5.csv` and `docs/MUSCLE_CATALOG.md`; v3's catalog of 945 (`realms/catalog.csv`) stays frozen for v3's results; the sources of every added muscle: `docs/realm_study/TRUE_MUSCLES.csv`, `realms/wave4_families.csv` and `docs/OMNI_V5.md`.
 
-How they are proven so far: every muscle alone, and every organism whole, on its model (`results/realms/REALMS.md`, Omni
-v3, seeds 3000 to 3009): **124 superior within guardrails, 9 energy improvement with a service tradeoff, 4 service
-improvement with an energy tradeoff, 807 noninferior, 1 not established, 0 worse; all five organisms superior within
-guardrails.** Evidence class S: a model, not a meter. The live rows of section 2 are where muscles meet real systems.
+How they are proven so far: every muscle alone, and every organism whole, on its model (`results/realms_v5/REALMS_V5.md`,
+Omni v5, digest 9be48445, preregistered seeds 3000 to 3009, each organism's own load, the climb and work waiting in line):
+**517 better, 421 at their limit on native, 169 no difference beyond the noise, 0 worse; every organism better under all
+three loads, and 0 plants worse inside any organism.** On v3 (`results/realms/REALMS.md`, seeds 3000 to 3009): 124 superior
+within guardrails, 9 energy improvement with a service tradeoff, 4 service improvement with an energy tradeoff, 807
+noninferior, 1 not established, 0 worse. Evidence class S: a model, not a meter. The live rows of section 2 are where
+muscles meet real systems.
 
 **Which knobs earn a wire in** (`docs/WIRING_VERDICTS.md`, `tools/wiring_verdicts.py`, declared 9 October at the founder's
 order that Omni need not be wired into every muscle): every table on this page is read by one rule into one of three words
 per knob, **write** (a gauge better in all three of our runs, none worse in all three of our runs: Omni holds the knob), **watch** (nothing better in all three of our runs: the muscle stays native and Omni only reads it, one wire out and no wire in) or **operator's choice** (a trade). On
-the real stacks 12 of 24 knob-cases write, 7 are trades and 5 watch; of the 945 modelled muscles 124 write, 13 are trades and
+the real stacks 12 of 24 knob-cases write, 7 are trades and 5 watch; of v3's 945 modelled muscles 124 write, 13 are trades and
 808 watch, 746 of them because they never wrote at all. Every loss in all three of our runs is listed there with its cause. Since the evening of
 9 October the same verdict runs live inside the five database, messaging and cache harnesses (the brain's own trial on the knob
 before it writes, `tools/knob_verdict.py`; the amendment in each preregistration); the counted runs on it were dispatched on 10 October

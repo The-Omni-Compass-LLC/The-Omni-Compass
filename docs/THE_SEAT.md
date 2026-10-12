@@ -76,6 +76,18 @@ Order (one or two at a time): Goldilocks with the Vertical Pod Autoscaler, and K
 machines first; CruiseKube next under its license's evaluation terms; the GPU and platform power pieces in the Lambda
 kit; EAR and the processor power managers on bare metal when a machine with power registers is rented.
 
+Built so far: **Goldilocks** (register row 80; `scripts/kind_addons_goldilocks.sh`, workflow `kind-goldilocks`,
+`docs/GOLDILOCKS_PREREGISTRATION.md`), its wiring run passed end to end on 12 October and its three runs follow on the
+engine that stands.
+
+**As muscles in the organisms** (the founder's order of 12 October: "expand my organisms"): each of the nine is also a
+muscle of the catalog (`realms/catalog_v5.csv`, ids 2172 to 2181), modelled on the plant its knob turns and placed in the
+spine family that knob belongs to, so each is in all four realms, the four stacked and the whole tower: Kepler's energy
+reading driving a pool's target, Climatik's inference power cap, EAR's CPU frequency policy and global energy budget,
+CruiseKube's and Goldilocks's request rightsizing, the Kubernetes Power Manager's core profiles, PEAKS's power-aware
+placement, the learned GPU power cap and NVIDIA's platform power budget. A model of a knob is not the project itself
+(class S); the project's own benchmark is the live test of it.
+
 ## 4. Who owns Omni-Compass, and on what terms it is seen
 
 - **The copyright in Omni-Compass belongs to The Omni-Compass LLC.** Contributions are accepted only on the terms of

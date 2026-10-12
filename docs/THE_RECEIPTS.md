@@ -31,12 +31,12 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
 4. **Everything handed back (L, v3).** The governor killed outright at 40% of the window: every setting back with the
    operator's within 11 seconds (9 on average), in 30 of 30 repetitions; the long run (two hours an arm): no leak, every decision
    valid, no slowing.
-5. **On our own models, nothing worse alone (S, v5).** Of the 1,097 muscles of the catalog, each alone on the
-   preregistered seeds under its own load and under work waiting in line: 504 better, 438 at their limit on native (the
-   max writes nothing to them), 155 no difference beyond the noise, none worse and none mixed. Inside the six organisms
-   every organism is better as a whole; under the climb (the load stepping up to twice its own), 3 plants of 1,868 did
-   worse on those seeds (two rooms −0.083% and −0.032% of their work; one UPS gate one decision more over its line). Their
-   causes are found and fixed in the next version (`docs/FORMAL_V5.md`, section 4).
+5. **On our own models, nothing worse, alone or inside a body (S, v5).** Of the 1,107 muscles of the catalog (the
+   founder's nine open-source pieces among them), each alone on the preregistered seeds under its own load and under work
+   waiting in line: 517 better, 421 at their limit on native (the max writes nothing to them), 169 no difference beyond the
+   noise, none worse and none mixed. Inside the six organisms every organism is better as a whole under all three loads,
+   and not one plant is worse than native in any organism under any load (the engine before left 3 of 1,868 under the
+   climb; the living body that cures them is `docs/FORMAL_V5.md`, section 4).
 6. **What is not yet shown.** No energy saving on a real chip: the physical receipt (P), the GPU's own meter on the
    current governor, on the same clock as the Kubernetes runs, is the decisive one still to be produced; every earlier
    card result ran on a controller since replaced and is obsolete. No cloud-bill saving: Azure's bill on four workers
@@ -76,7 +76,7 @@ zero; "noise" means an interval includes zero.
 
 | Test | Engine | Reading | File |
 |---|---|---|---|
-| The 1,097 muscles and the six organisms, preregistered seeds | v5 | 504 better, 438 at their limit on native, 155 noise, 0 worse; every organism better; 3 plants of 1,868 worse under the climb | `results/realms_v5/REALMS_V5.md` |
+| The 1,107 muscles and the six organisms, preregistered seeds | v5 (digest 9be48445) | 517 better, 421 at their limit on native, 169 noise, 0 worse; every organism better under all three loads; 0 plants worse in any organism under any load | `results/realms_v5/REALMS_V5.md` |
 | Power grids: 11 SimBench grids in pandapower | v3 | energy drawn and net import better in all 11; losses better in 7, worse in 4; tap operations fewer in 10, more in 1 | `results/live/V3_PANDAPOWER.md` |
 | CityLearn districts | v3 | electricity bought, peak and unevenness better in all 11 battery districts; the bill worse in 7, ramping worse in 7 | `results/live/V3_CITYLEARN.md` |
 | Robot arms, MuJoCo Menagerie | v3 | Gen3 and Panda peak torque −29% and −10%, tracking error −21%; the Panda's copper +14% worse; UR5e and iiwa left native | `results/live/V3_MUJOCO.md` |

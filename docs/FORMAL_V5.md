@@ -106,54 +106,78 @@ noise"; clear intervals of opposite signs read "the runs disagree" (`tools/readi
 
 ## 3. What the runs measure (classes S, L, P)
 
-- **S, the muscles alone, 1,097 muscles, preregistered seeds 3000-3009, both loads** (`results/realms_v5/`): 504
-  better, 438 at their limit on native (V3: the max writes nothing), 155 no difference beyond the noise, **0 worse,
-  0 mixed**.
-- **S, inside the organisms, the same seeds, three loads**: every organism better as a whole; under the climb
-  (the load stepping 1 2 3 2 3 4 ... to twice its own), 3 plants of the 1,868 in the four stacked did worse than
-  native on these seeds: two rooms (−0.083% and −0.032% of their work) and one UPS gate (one decision more over its
-  line). Every row is reported in `results/realms_v5/REALMS_V5.md`.
+- **S, the muscles alone, 1,107 muscles, preregistered seeds 3000-3009, both loads** (`results/realms_v5/`, commit
+  `44aceb48ea30`, digest `9be48445438943c2`): 517 better, 421 at their limit on native (V3: the max writes nothing),
+  169 no difference beyond the noise, **0 worse, 0 mixed**.
+- **S, inside the organisms, the same seeds, three loads**: every organism better as a whole under every load, and
+  **0 plants worse** in every organism under every load (0 of the 1,908 in the four stacked). Misses (the share of
+  plant decisions over their line) fall 1.6% to 6.4% under each organism's own load, 0.9% to 3.5% under the climb (the
+  load stepping 1 2 3 2 3 4 ... to twice its own) and 1.0% to 7.2% with work waiting in line, against 0.1% to 0.7%,
+  0.0% to 2.1% and 0.1% to 2.1% for the engine before (digest `8d4f91f0`), which left 3 plants worse under the climb.
+  Every row is reported in `results/realms_v5/REALMS_V5.md`.
 - **L, real software**: `docs/THE_RECEIPTS.md`, receipt by receipt.
 - **P, a physical meter on a real chip**: not yet produced on the current governor (`docs/THE_SEAT.md`, section 5).
 
-## 4. Why the three plants did worse, and the next version (built, tested on development seeds, not yet the engine)
+## 4. The living body: why plants did worse, and the version that cures them (the engine since 12 October, night)
 
 Found on development seeds only (7100-7299), never on the preregistered ones. Under the climb, rooms and UPS lines
-reach their limits in both arms; a plant does worse when the Omni arm reaches the limit a moment sooner.
+reach their limits in both arms; a plant did worse when the Omni arm reached a limit a moment sooner, or when a sense
+the brain read was wrong. Each cause, and the property of the code that removes it:
 
-1. **A room snapped back.** A room cooled ahead of the heat for one decision, then returned at once to its operator's
-   setpoint when the lines ran short: the room's own PI loop overshot, leaving it about 0.007 °C warmer than native for
-   some twenty decisions; when its cooling later ran flat out, that difference was frozen in and the room crossed its
-   limit a few seconds sooner (−0.94% of that room's work on that seed).
-2. **A battery's charge counted as room after it ran out.** A UPS covering its site's whole draw shows its connection
-   empty; R counted the full connection as room, though the charge above the floor ran out the next decision, after
-   which the extra machines' power put the line 0.4% over while native sat at the limit.
-3. **Machines handed back while a queue needed them.** The pool did more work (+0.41%) than native, having admitted
-   requests native turned away, then took one decision longer to clear them after machines were handed back.
+1. **A room snapped back.** A room cooled ahead of the heat, then returned at once to its operator's setpoint when the
+   lines ran short: its own PI loop overshot warm of native, and once its cooling ran flat out the difference was frozen
+   in. *V9 (the pedal lifted, never snapped):* a pull-down is handed back toward the operator's setpoint over the
+   cooling's own reaction time. *V10 (no pull-down that cannot be held):* a new pull-down is granted only out of the room
+   the lines have for that reaction time.
+2. **A battery's charge counted as room after it ran out.** *V6:* a site whose battery covers its draw, but whose charge
+   above its floor runs out within r + 1 + T decisions (T = 2: the heat of machines handed back reaches the rooms a
+   decision later and their cooling answers over its own averaging, one more), has as room on its line only its limit
+   less its whole draw, read at the draw's own climb.
+3. **Machines handed back while a queue needed them.** *V7:* on a shortfall, a pool is never held below
+   ⌈(λ_{k−1} + Q_k / Δt) / μ⌉.
+4. **A room left warmer than native.** *V8:* every room has a twin: the same room under its operator's settings, warmed
+   by native's heat (the body's source power with each pool's power replaced by its twin's). A room wired by its
+   setpoint that reads warmer than its twin by e > 0 has its setpoint written at most t_set − e, unless its cooling is
+   already flat out.
+5. **A room that cannot cure itself.** *V11 (the body cures what a muscle cannot):* a room wired by its cooling units,
+   a power or an admission gate, or whose cooling is flat out, and that reads warmer than its twin by e > 0, puts a heat
+   debt e · C / (Δt · h) on the body (C its heat capacity, h its share of the body's source heat); the room the bone
+   grants is bounded by minus that debt, so the machines the max added go back until no such room is warmer than
+   native's.
+6. **A battery that never timed its discharge.** *V12:* a battery wired by its power holds its charge while its line has
+   room after the largest climb it has shown, line_z of its wobbles and a twentieth of its limit, and gives native's full
+   power once the line could need it; it holds nothing until it has read its line for a window of decisions (20).
+7. **A lock in the senses.** *V13 (a forecast starts at the first reading):* a plant shows its initial values before its
+   first step; the jump from them to the first reading was taken as the line's largest climb ("never forgotten") and
+   kept every battery's timed discharge shut for the whole run. Every forecast of a line now starts at the plant's first
+   real reading, and the bone reads nothing before the body's first step.
+8. **A twin that started wrong.** The body reads its sources at their nominal power before the first step; the room twins
+   read zero, so for the first ten or so decisions they ran up to 0.3 °C apart from native's rooms and the body cured
+   differences that did not exist. The twins now start from the body's own reading (V8, the definition above), and with
+   the max writing nothing every room twin equals its room to the last digit, every decision
+   (`tests/test_compass_arm_v5.py`).
 
-The next version adds, each as a property of the code:
+The battery's admission gate stays native: deferring a site's flexible load to keep its line clear left part of that
+work not caught up by the end of a run (work first).
 
-- **V6 (the battery's charge counts only while it lasts):** a site whose battery covers its draw, but whose charge
-  above its floor runs out within r + 1 decisions, has as room on its line only its limit less its whole draw.
-- **V7 (no machine taken from a queue that needs it):** on a shortfall, a pool is never held below
-  ⌈(λ_{k−1} + Q_k / Δt) / μ⌉, the machines its latest arrivals and its queue need.
-- **V8 (never warmer than native, for every room wired by its setpoint):** each such room has a twin warmed by native's
-  heat (each pool's twin in place of the pool, every other source as it is); when the room reads warmer than its twin
-  by e > 0, its setpoint is written at most t_set − e.
-- **V9 (the pedal lifted, never snapped):** a room's pull-down is handed back toward its operator's setpoint over the
-  cooling's own reaction time.
-- **V10 (no pull-down that cannot be held):** a new pull-down is granted only out of the room the lines have for the
-  cooling's own reaction time.
+Measured on development seeds 7100-7199, the four realms under the climb, 400 organism runs each way:
 
-Measured on development seeds 7100-7199, the four realms under the climb, 400 organism runs each way: plants worse
-**19 before, 7 after**; the organisms' gains kept (misses −0.104, −0.110, −0.005 and −0.137 percentage points against
-−0.109, −0.125, −0.005 and −0.144 before; work and lease unchanged). All seven left are plants whose own knob the max
-does not turn (two rooms wired by their power or cooling-unit gate; five UPS lines wired by power, capacity or
-admission): five UPS lines one decision over by about a watt at a moment native sat exactly on the limit, and two rooms
-that lost 0.28% and 0.39% of their work after the body's extra heat changed when their cooling staged a unit. Across the
-same runs, plants of those kinds did worse in 6 and better in 1 of about 13,000 plant-runs, while the plants the max
-does turn did better in about 13,000 and worse in 0. The next version enters the engine as a new version only, every
-result run again on it, the founder told first.
+| | Plants worse | Misses (pp), the four realms | Work, the four realms |
+|---|---:|---|---|
+| the engine before (omni-v5, 8d4f91f0) | 19 | −0.109, −0.125, −0.005, −0.144 | +0.0013%, +0.0016%, +0.0000%, +0.0022% |
+| V6-V10 only | 7 | −0.104, −0.110, −0.005, −0.137 | kept |
+| **this version (V6-V13)** | **0** | **−0.206, −0.187, −0.143, −0.212** | +0.0008%, +0.0010%, +0.0000%, +0.0016% |
+
+The misses fall about twice as far as before (in the Energy / Facility / Industrial body, from almost nothing to 0.14
+points), and no plant in any of the 400 runs did worse than native. The work gained is about two thirds of the version
+before: the heat debt hands back machines while a room that cannot cure itself is warmer than native's.
+
+One lock is left, said plainly: a line that once jumped (a battery that stopped covering its site) is read as able to
+jump that far again for the rest of the run, which keeps the max from adding machines on that line. Removing it (every
+line's climb read on the site's whole draw) roughly triples the misses removed on the same seeds (−0.34 points), but in
+36 of the 400 runs a machine pool whose queue sat at its limit then did more work and took one decision longer to clear
+it, which our decision count reads as worse. That is the next version's work, and it enters the engine only as a new
+version, every result run again on it, the founder told first.
 
 ## 5. Limits, stated plainly
 
@@ -162,8 +186,10 @@ result run again on it, the founder told first.
 - R is a forecast (V4). A climb no line has shown before can beat it within the one decision power takes to be handed
   back.
 - S results are our models. They are never presented as proof of a physical saving; the physical receipt is a P run.
-- The twin is exact for a pool (its law reads only its own inputs) and for a room's own physics; a room twin's heat is
-  native's estimated from the pools' twins, not measured.
+- The twin is exact for a pool (its law reads only its own inputs) and for a room (its heat is the body's own source
+  reading with each pool's power replaced by its twin's, so with the max writing nothing it equals the room to the last
+  digit); with the max writing, a room twin is native's room under native's heat as the brain reconstructs it, not a
+  meter.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 

@@ -1,10 +1,10 @@
-# The 1097 Muscles: What Each Is For, and How It Is Wired
+# The 1107 Muscles: What Each Is For, and How It Is Wired
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 A **muscle** is one setting on one machine that already has its own control: a replica target, a node pool's size, a GPU's clock ceiling, a chiller's setpoint, a battery's reserve, a joint's effort. Omni-Compass does not replace that control. It reads the machine's meters and, at its default, the max, moves the setting the machine already accepts toward the machine's own limit for the most work, never past it and never below native, through a plug that reads the setting once before the first write, reads back every write, steps aside if another controller moves it, and walks it back to native at the end. A knob native already runs at the top of its range is at its limit on native and is left there.
 
-This chapter lists all 1097 muscles of the catalog (`realms/catalog_v5.csv`, engine omni-v5). For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 8 and 9). See `DISCLOSURES.md`.
+This chapter lists all 1107 muscles of the catalog (`realms/catalog_v5.csv`, engine omni-v5). For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 8 and 9). See `DISCLOSURES.md`.
 
 ## How to read an entry
 
@@ -25,16 +25,16 @@ This chapter lists all 1097 muscles of the catalog (`realms/catalog_v5.csv`, eng
 | `motion_axis` | a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor | its tracking error and its load | its speed and effort share, or its power share |
 | `process_loop` | a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint | how far the process sits from its band | its setpoint within its safe band, its actuator range, or its power share |
 
-**The organisms.** The 1097 muscles build six organisms: each of the four realms (every muscle whose realm list includes it), the four stacked with every duplicate kept (1,868), and the whole tower with every muscle once (1097). A muscle of the shared spine sits in all four realms.
+**The organisms.** The 1107 muscles build six organisms: each of the four realms (every muscle whose realm list includes it), the four stacked with every duplicate kept (1,908), and the whole tower with every muscle once (1107). A muscle of the shared spine sits in all four realms.
 
 | Organism | Muscles |
 |---|---:|
-| Compute / AI / Cloud | 530 |
-| Physics / Robotics / Autonomous | 394 |
-| Energy / Facility / Industrial | 470 |
-| Distribution / Specialized | 474 |
-| The four stacked, every duplicate kept | 1,868 |
-| The whole tower, every muscle once | 1097 |
+| Compute / AI / Cloud | 540 |
+| Physics / Robotics / Autonomous | 404 |
+| Energy / Facility / Industrial | 480 |
+| Distribution / Specialized | 484 |
+| The four stacked, every duplicate kept | 1,908 |
+| The whole tower, every muscle once | 1107 |
 
 **How a muscle is reached in a real stack.** The class of machine decides the wire:
 
@@ -84,7 +84,7 @@ This chapter lists all 1097 muscles of the catalog (`realms/catalog_v5.csv`, eng
 
 Wires marked *modelled only* exist as plants in the benchmark and are not built for live use.
 
-## The shared spine: 257 muscles in all four realms
+## The shared spine: 267 muscles in all four realms
 
 The machines every realm stands on: servers, machines, GPUs and CPUs, network, storage, observability, security, cooling and electrical distribution. Each spine muscle is part of every realm's organism, counted once in the tower and four times in the stack.
 
@@ -116,7 +116,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1120 | predictive scaling | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1121 | instance refresh | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 
-### Container Resources (23 muscles)
+### Container Resources (25 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -145,8 +145,10 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1023 | memory protection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1024 | io latency target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1025 | freeze | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower |
+| 2176 | cruisekube request rightsizing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
+| 2177 | goldilocks vpa request recommendation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 
-### Host CPU & Memory (23 muscles)
+### Host CPU & Memory (26 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `cpu_host` (a CPU host whose clock and power can be set), reached through Linux cpufreq and RAPL. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -175,8 +177,11 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1112 | core packing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1115 | per pod cpu frequency range and c state access | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
 | 1116 | uncore frequency per node | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2174 | ear cpu frequency policy | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2175 | ear global energy budget | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower |
+| 2178 | k8s power manager core profile | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
 
-### Kubernetes Placement & Scheduling (20 muscles)
+### Kubernetes Placement & Scheduling (21 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -202,8 +207,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1027 | scheduler plugin weights | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1028 | scheduling gates | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower |
 | 1029 | cpu manager | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
+| 2179 | peaks power aware placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 
-### Kubernetes Workload Scaling (31 muscles)
+### Kubernetes Workload Scaling (32 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -240,8 +246,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1014 | unhealthy pod eviction policy | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower |
 | 1015 | graceful termination | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1016 | probes | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
+| 2172 | kepler energy target autoscaling | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 
-### GPU Hardware (19 muscles)
+### GPU Hardware (22 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -266,6 +273,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1045 | gpu temperature target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1117 | sync boost | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1118 | target clocks | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2173 | climatik inference power cap | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2180 | adaptive gpu power cap | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2181 | nvidia platform power budget | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
 
 ### Node Fleet & Karpenter-Class Control (24 muscles)
 
@@ -436,7 +446,7 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 | 1111 | priority aware capping throttle low priority first | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower |
 | 1113 | power oversubscription with prediction | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower |
 
-## Realm: Compute / AI / Cloud (273 muscles of its own, 530 in its organism with the spine)
+## Realm: Compute / AI / Cloud (273 muscles of its own, 540 in its organism with the spine)
 
 ### AI Inference Serving (24 muscles)
 
@@ -851,7 +861,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | V5-5116 | remote execution workers | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower |
 | V5-5117 | warm runner pool | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower |
 
-## Realm: Physics / Robotics / Autonomous (137 muscles of its own, 394 in its organism with the spine)
+## Realm: Physics / Robotics / Autonomous (137 muscles of its own, 404 in its organism with the spine)
 
 ### Automotive EV & Mobile Powertrain (14 muscles)
 
@@ -1046,7 +1056,7 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 | 2156 | brake test schedule | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower |
 | 2157 | fire recall mode | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower |
 
-## Realm: Energy / Facility / Industrial (213 muscles of its own, 470 in its organism with the spine)
+## Realm: Energy / Facility / Industrial (213 muscles of its own, 480 in its organism with the spine)
 
 ### Building & Critical Environment HVAC (15 muscles)
 
@@ -1366,7 +1376,7 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 | 2170 | refrigerant compressor authority | admission | at its limit on native (nothing paced or turned away): read and left native | Energy; stack; tower |
 | 2171 | batch hold quarantine | admission | at its limit on native (nothing paced or turned away): read and left native | Energy; stack; tower |
 
-## Realm: Distribution / Specialized (217 muscles of its own, 474 in its organism with the spine)
+## Realm: Distribution / Specialized (217 muscles of its own, 484 in its organism with the spine)
 
 ### Cache & Memory Services (16 muscles)
 

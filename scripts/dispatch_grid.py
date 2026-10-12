@@ -43,7 +43,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "results" / "grid_v5" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
-SINCE = "2026-10-12T06:00:00Z"     # the max's grid: runs started before belong to other engines or settings
+SINCE = "2026-10-12T22:10:00Z"     # the grid of omni-v5 as re-declared on 12 Oct at night (digest 9be48445): runs started
+                                   # before belong to other engines or settings (the manifest before: results/grid_v5/history)
 ENGINE = "omni-v5"                 # the engine whose grid this is (tools/omni_version.py)
 SIZES = (1, 10, 100)               # 1, 10 and 100 copies only (the founder's order, 12 Oct)
 RUNS = 100                         # every square to 100 runs: 1, 10 and 100 runs only (the founder's order, 12 Oct)

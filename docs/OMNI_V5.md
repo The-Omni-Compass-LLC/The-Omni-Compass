@@ -74,7 +74,7 @@ runners) and adds the **v5 compass law** (`realms/compass_arm_v5.py`) and its ar
 goal is to be equal to or better than native and every prior version on every measure, and never worse on any — *do no
 harm*.
 
-The v5 muscle catalog (`realms/catalog_v5.csv`) is **1,097 muscles in 70 families** — v3's 945, then a first wave of six
+The v5 muscle catalog (`realms/catalog_v5.csv`) is **1,107 muscles in 70 families** — v3's 945, then a first wave of six
 new families of real control points: **Linux Kernel & OS Control** (cgroups, the CFS scheduler, DVFS/cpufreq, transparent
 hugepages, the I/O scheduler, NUMA balancing, dirty-ratio writeback, swappiness, TCP buffers, …), **Serverless & Functions
 (FaaS)**, **Virtualization & Hypervisor**, **Content Delivery & Edge Cache**, **Gut** (data-plane intake and waste), and
@@ -88,9 +88,14 @@ firewall's inspection workers, a SIEM's ingest), MQTT brokers, DNS and mail cach
 manipulators, warehouse robot fleets, PX4 and ArduPilot drones and swarm spacing, and edge sites. The GPU family is named
 for the hardware, not one vendor (**GPU Hardware**), and the eight audited families carry numbers (64 to 71) like every
 other family. Each is a distinct real-world knob, modelled on the matching plant template, exactly as v3's 945 already
-share five templates. The organisms on v5: Compute / AI / Cloud 530, Physics / Robotics / Autonomous 394, Energy /
-Facility / Industrial 470, Distribution / Specialized 474, the four stacked 1,868, the whole tower 1,097; the spine all
-four realms share is 257. (v3's own catalog `realms/catalog.csv` stays 945, frozen for v3's results.)
+share five templates. A third wave (12 October, night) adds the founder's nine open-source pieces as ten muscles, each in
+the spine family its knob belongs to (`docs/THE_SEAT.md`): Kepler's energy reading driving a pool's target (Kubernetes
+Workload Scaling), Climatik's inference power cap, Adaptive GPU Power Capping and NVIDIA's platform power budget (GPU
+Hardware), EAR's CPU frequency policy and global energy budget and the Kubernetes Power Manager's core profiles (Host CPU &
+Memory), CruiseKube's and Goldilocks's request rightsizing (Container Resources) and PEAKS's power-aware placement
+(Kubernetes Placement & Scheduling). The organisms on v5: Compute / AI / Cloud 540, Physics / Robotics / Autonomous 404,
+Energy / Facility / Industrial 480, Distribution / Specialized 484, the four stacked 1,908, the whole tower 1,107; the spine
+all four realms share is 267. (v3's own catalog `realms/catalog.csv` stays 945, frozen for v3's results.)
 
 Two math-only guardrails, and otherwise free arms:
 
@@ -128,14 +133,30 @@ it. Developed on seeds 7100-7109 only (0 of 1,097 worse, all six organisms super
 were run again unchanged on commit `04d9eb3b3`, with the same savings on the whole tower, the four stacked and Energy /
 Facility (3.0 times v3's).
 
+**Amendment 3, 12 October (night): the living body.** The founder's order of 12 October: "whatever one muscle is having
+a problem, the other muscles kick in ... the brain and nervous system to activate its immune system ... nothing can be
+locked." The engine now carries, as properties of the code (`docs/FORMAL_V5.md`, section 4): a native twin of every room
+(the brain's sense of the temperature native would leave it at, exact by construction), the room's own knob curing it
+where it can and the body's heat debt handing back the max's machines where it cannot (V8, V11), every battery's charge
+counted as room only while it lasts and its discharge timed for its line (V6, V12), no machine taken from a queue that
+needs it (V7), a pull-down handed back gradually and granted only where it can be held (V9, V10), and every forecast
+starting at the plant's first reading (V13: a lock that kept every battery's timed discharge shut for the whole run, and
+a room twin that started wrong, both removed). The catalog's third wave took it to 1,107 muscles. Developed on seeds
+7100-7199 only: under the climb, plants worse inside the four realms fell from 19 to 0 in 400 organism runs while the
+misses fell about twice as far as before; on seeds 7100-7109 every muscle alone and the six organisms on all three loads
+showed 0 muscles and 0 plants worse. Fingerprint re-declared (digest `9be48445438943c2`); the preregistered seeds
+3000-3009 were run again unchanged.
+
 ## The no-harm proof (modelled, class S)
 
-On a fixed seed, for **every** muscle in the catalog, the v5 default uses no more energy than native, does no less work,
-and is in violation no more often; it hands every knob back to native on the kill (the dead-man lease); and it acts where
-it helps. The whole tower is no worse than native on energy and work. On the preregistered seeds the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times), all six
-organisms superior within guardrails, 0 of 1,097 muscles worse than native. Inside the organisms v5 leaves 1 to 3 plants per organism (8 in the four stacked, which are the four realms together) one decision over their line in one of the ten seeds, all of them UPS or power-distribution plants it never touches (the body's power swing reaches them), against v3's 13 to 35 (83 in the four stacked). Seven of the eight come in the decisions right after the safety cutoff, when every knob is handed back to native at once and the body pays back what Omni saved (warmer rooms cool back down, eased loops return); one comes while Omni runs (a UPS line 40 W over its 211,436 W limit, where native sat 9 W under it, as a computer pool caught up on held work). A strict guard on the body's shared power lines removes them, but on development seeds it also removes almost all of the saving in a body whose UPS lines run at their limit (Compute / AI / Cloud 0.47% to 0.01%; native itself is over those lines in 4% to 15% of decisions); that trade is held for the founder's decision. This is checked in
-`tests/test_compass_arm_v5.py` and run in full by `tools/run_realms_v5.py` (`results/realms_v5/`). Models are class S: a
-model's energy is not a meter's, and a plant written by the same people who wrote the law is not an independent test.
+On a fixed seed, for **every** muscle in the catalog, the v5 default does no less work than native, is over its line no
+more often, and hands every knob back to native on the kill (the dead-man lease); the energy it takes is power given,
+shown beside the work and the speed it bought. On the preregistered seeds 3000-3009 (commit `44aceb48ea30`, digest
+`9be48445438943c2`): **0 of 1,107 muscles worse or mixed** (517 better, 421 at their limit on native, 169 the same), every
+organism better than native under all three loads, and **not one plant worse inside any organism under any load** (the
+engine before left 3 of 1,868 under the climb). This is checked in `tests/test_compass_arm_v5.py` and run in full by
+`tools/run_realms_v5.py` (`results/realms_v5/`). Models are class S: a model's energy is not a meter's, and a plant written
+by the same people who wrote the law is not an independent test.
 
 ## In development
 

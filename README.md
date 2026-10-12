@@ -15,7 +15,7 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v5, fingerprint `8d4f91f0dabbc9fd` (43 files); package 0.5.0. Its default brain is **the max**: every muscle pushed to its own limit, never past it and never below native, the energy it takes shown as power given beside the work and the wear; the dial turns it down ([`docs/OMNI_V5.md`](docs/OMNI_V5.md)).
+- **Engine on main:** omni-v5, fingerprint `9be48445438943c2` (43 files); package 0.5.0. Its default brain is **the max**: every muscle pushed to its own limit, never past it and never below native, the energy it takes shown as power given beside the work and the wear; the dial turns it down ([`docs/OMNI_V5.md`](docs/OMNI_V5.md)).
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
@@ -29,7 +29,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-12 06:25 | [The realms on Omni v5 at the max: 1097 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
+| 2026-10-12 22:07 | [The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -52,43 +52,46 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## Newest result: the max, on every muscle and six organisms (Omni v5)
+## Newest result: the living body, on every muscle and six organisms (Omni v5, 12 October, night)
 
-Omni v5 at its default, **the max**: every muscle pushed to its own limit, never past it and never below native, on
-top of each plant's own native controller. Preregistered seeds 3000-3009, ten paired runs per muscle, per organism and
-per load, commit `07a0884339fb`, engine omni-v5 (fingerprint `8d4f91f0dabbc9fd`). Evidence class **S**: modelled
-plants, not meters. Every row, losses included: [`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md).
+Omni v5 at its default, **the max**, now with **the living body**: every muscle pushed to its own limit, never past it
+and never below native, on top of each plant's own native controller, and the body curing what one muscle cannot (a
+native twin of every room, the body's heat debt, every battery's discharge timed for its line, nothing locked:
+[`docs/FORMAL_V5.md`](docs/FORMAL_V5.md), section 4). The catalog carries the founder's nine open-source pieces as
+muscles (Kepler, Climatik, EAR, CruiseKube, Goldilocks, the Kubernetes Power Manager, PEAKS, Adaptive GPU Power Capping,
+NVIDIA's platform power manager). Preregistered seeds 3000-3009, ten paired runs per muscle, per organism and per load,
+commit `44aceb48ea30`, engine omni-v5 (fingerprint `9be48445438943c2`). Evidence class **S**: modelled plants, not
+meters. Every row, losses included: [`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md).
 
-**Every muscle alone (1,097), under its own load and with work waiting in line:**
+**Every muscle alone (1,107), under its own load and with work waiting in line:**
 
 | Reading | Muscles |
 |---|---:|
-| **Better** (a gain beyond the noise and no loss under either load) | **504** |
-| of them: clear the waiting line sooner | 489 |
-| of them: over their line less often | 385 |
+| **Better** (a gain beyond the noise and no loss under either load) | **517** |
+| of them: clear the waiting line sooner | 493 |
+| of them: over their line less often | 398 |
 | of them: more work | 32 |
-| At its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 438 |
-| The same as native (no difference beyond the noise: native already did all the work that came) | 155 |
+| At its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 |
+| The same as native (no difference beyond the noise: native already did all the work that came) | 169 |
 | **Worse or mixed** | **0** |
 
 | Kind | With work waiting in line | Power given | Wear |
 |---|---|---:|---:|
-| Compute pools (454) | line cleared in **7.8 min instead of 17.0**; over the line 1.40% → 0.40% of the time | +21% | machine-hours +43% |
+| Compute pools (458) | line cleared in **7.8 min instead of 16.9**; over the line 1.40% → 0.40% of the time | +21% | machine-hours +43% |
 | Motion axes at their own peak speed (37) | over the line 12.1% → 8.3% of the time; work +0.7% | +1.4% | motor heat +3.9% |
-| Battery sites (21) | over the line 13.4% → 12.2% (peak ceiling) and 17.1% → 15.9% (reserve) | +0.2% | battery kWh cycled +21% to +42% |
+| Battery sites (44) | over the line 13.4% → 9.9% (peak ceiling), 17.1% → 15.0% (reserve), 14.7% → 14.5% (discharge timed for the line) | up to +0.2% | battery kWh cycled −0.6% to +42% |
 
 **The six organisms** (every plant coupled on one clock, the hour around each battery site's daily peak): **better than
-native under all three loads**, the bone granting only the power the body's lines can carry.
+native under all three loads, and not one plant worse**: 0 of 1,908 in the four stacked, 0 in every other organism,
+under every load (the engine before left 3 under the climb).
 
-| Load | Over the line, change | Work | Power given |
-|---|---|---|---:|
-| Own load | −0.1% to −0.7% in every organism | equal | up to +0.07% |
-| The climb (1 2 3 2 3 4 ..., up to twice its own) | −2.1% compute and distribution, −1.2% the four stacked, −1.1% physics; energy and the tower −0.0% | more work in four of six | up to +0.08% |
-| Work waiting in line | −0.1% to −2.1% in every organism | equal | up to +0.07% |
+| Load | Over the line, change (this engine) | The engine before | Work | Power given |
+|---|---|---|---|---:|
+| Own load | −1.6% to −6.4% in every organism | −0.1% to −0.7% | equal | up to +0.06% |
+| The climb (1 2 3 2 3 4 ..., up to twice its own) | −3.5% compute, −3.1% distribution, −2.4% the four stacked, −1.8% physics, −1.7% energy, −0.9% the tower | −2.1% to −0.0%; energy and the tower −0.0% | more work in four of six | up to +0.07% |
+| Work waiting in line | −1.0% to −7.2% in every organism | −0.1% to −2.1% | equal | up to +0.07% |
 
-Inside the organisms, stated as plainly as the gains: under the climb, 3 of 1,868 plants did worse than native: two
-server rooms lost 0.08% and 0.03% of their work, and one UPS went over its line once more in 2,400 decisions. Under the
-own load and the line, none. The lease handed every knob back to native in every run.
+The lease handed every knob back to native in every run.
 
 ## The manual: the book for the people who wire it
 
@@ -106,7 +109,7 @@ the engineer who wires, the operator who runs a data center, and the auditor who
 | Real Kubernetes on GitHub | Kubernetes itself (API server, scheduler, its own autoscaler), a real web service, real requests, real response times and CPU. The machines are containers on one runner; energy there is a declared formula, not a meter | L |
 | Real cloud, Azure AKS | All of the above on real Azure machines, Azure's own autoscaler, Azure's billed machine count | L |
 | Real card, NVIDIA A10 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. The first run (2026-10-02) used a card controller since replaced (it answered slower); the current controller's run is next | P |
-| The 1,097 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
+| The 1,107 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
 
 ## How it works
 
@@ -148,7 +151,7 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 | Every claim with its evidence class, losses kept | [`docs/EVIDENCE_LEDGER.md`](docs/EVIDENCE_LEDGER.md), [`docs/CLAIMS_REGISTER.md`](docs/CLAIMS_REGISTER.md) |
 | Due diligence | [`docs/DUE_DILIGENCE.md`](docs/DUE_DILIGENCE.md) |
 | The manual (wiring, operating, every result) | [`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf), [`docs/INTEGRATION_MANUAL.md`](docs/INTEGRATION_MANUAL.md) |
-| The 1,097 muscles | [`docs/MUSCLE_CATALOG.md`](docs/MUSCLE_CATALOG.md), [`realms/catalog_v5.csv`](realms/catalog_v5.csv) |
+| The 1,107 muscles | [`docs/MUSCLE_CATALOG.md`](docs/MUSCLE_CATALOG.md), [`realms/catalog_v5.csv`](realms/catalog_v5.csv) |
 | Every command on one page | [`docs/HANDOFF.md`](docs/HANDOFF.md) |
 
 ## Repository
@@ -158,7 +161,7 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 | `omnicompass/` | The engine (`core.py`), the compass law (`compass_law.py`), the verdict, the shield, the master switch |
 | `omni_controller/` | The live controllers: Kubernetes (`controller.py`) and the card (`gpu_compass.py`) |
 | `cpp/` | The C++ twins, sealed equal to the Python laws |
-| `realms/` | The 1,097-muscle catalogue, its models and the v5 law at the max (`compass_arm_v5.py`) |
+| `realms/` | The 1,107-muscle catalogue, its models and the v5 law at the max (`compass_arm_v5.py`) |
 | `scripts/`, `deploy/`, `.github/workflows/` | The benchmarks: kind, AKS, the card, eight cards |
 | `tools/` | Report builders, the Omni index, the layout check |
 | `results/` | Every result with its raw files and digests |

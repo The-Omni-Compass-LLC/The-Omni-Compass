@@ -70,7 +70,7 @@ Founder, The Omni-Compass LLC
 | Site reliability engineer, on call | The Quick Reference card; section 11 (the three ways a governor stops, and what each leaves behind); section 8.5 (wired right or wired wrong); section 7.3 (blind means hold); Appendix E |
 | Security and compliance | Section 11 (the master switch, the kill file and the lease); section 12 (least privilege, supply chain, the audit log); `SECURITY.md`; `DISCLOSURES.md`, sections 4 and 5 |
 | Procurement and counsel | `LICENSE`, `NOTICE`, `PATENTS.md`, `TRADEMARKS.md`, `DISCLOSURES.md`, `LICENSING_FAQ.md`; section 17 (license and commercial terms) |
-| Anyone who wants the whole list | `docs/REGISTER.md`: every muscle wired (945, by family), every benchmark run on every platform (Kubernetes, Azure AKS, GPU, CPU, UPS and batteries, buildings, power grids, robotics) with its result and file, and every open benchmark still to run, in order |
+| Anyone who wants the whole list | `docs/REGISTER.md`: every muscle wired (1,107 in v5, by family), every benchmark run on every platform (Kubernetes, Azure AKS, GPU, CPU, UPS and batteries, buildings, power grids, robotics) with its result and file, and every open benchmark still to run, in order |
 
 **Conventions.** `code` is a command, file or switch exactly as typed. "Native" means your system as it runs today,
 without Omni-Compass. "Omni" (the second arm of every benchmark) means that same native system with Omni-Compass on top
@@ -477,8 +477,9 @@ stated formally in *The Max, Formally* (`docs/FORMAL_V5.md`, Definition 2 and Pr
 
 ### 2.1 The catalog
 
-The catalog (`realms/catalog.csv`) lists **945 distinct muscles in 59 families** (Omni v2 and v3; v1 listed 656 in 46),
-each with its family, its plant model and its knob. A muscle is anything with a meter and a setting: a compute pool and
+The catalog of Omni v5 (`realms/catalog_v5.csv`) lists **1,107 distinct muscles in 70 families** (v2 and v3 listed 945 in
+59, `realms/catalog.csv`, frozen for their results; v1 listed 656 in 46), each with its family, its plant model and its
+knob. A muscle is anything with a meter and a setting: a compute pool and
 its machine count, a GPU and its clock ceiling, a chiller and its setpoint, a battery and its reserve, a feeder and its
 tap, a robot joint and its speed limit, a pump and its flow. Each muscle carries a declared plant model, the simplest
 physics that reproduces how its meter follows its knob, and a native controller of its own, which is what the muscle does
@@ -488,12 +489,15 @@ controllers, and a verification, de-duplication and mapping pass. The register (
 every family with its muscle count and the kinds of knob it carries, so a reader can see at a glance what the modelled
 realms contain and what they do not.
 
-The fifty-nine families, by realm, are these. **Compute, AI and cloud** (eighteen): AI inference serving, AI training,
-cloud virtual machines and capacity, container resources, cross-cluster and edge placement, DPU and programmable IO,
-distributed cluster managers, GPU fabric and RDMA, HPC and distributed compute, host CPU and memory, Kubernetes dynamic
-device allocation, Kubernetes placement and scheduling, Kubernetes workload scaling (the largest family, 31 muscles),
-NVIDIA GPU hardware, node fleets and Karpenter-class control, OpenShift and the Machine API, quantum computing control
-(modelled), and work admission and demand shaping. **Physics, robotics and autonomous** (eight): automotive EV and mobile
+The seventy families, by realm, are these. **Compute, AI and cloud** (twenty-seven): AI inference serving, AI training,
+blockchain and ledger nodes, CI/CD and build farms, cloud virtual machines and capacity, container resources,
+cross-cluster and edge placement, DPU and programmable IO, distributed cluster managers, game servers and real-time
+interaction, GPU fabric and RDMA, GPU hardware, HPC and distributed compute, host CPU and memory, Kubernetes dynamic
+device allocation, Kubernetes placement and scheduling, Kubernetes workload scaling (the largest family, 32 muscles),
+Linux kernel and operating-system control, media streaming, node fleets and Karpenter-class control, OpenShift and the
+Machine API, quantum computing control (modelled), serverless functions, virtualization and hypervisors, work admission
+and demand shaping, and the body's gut (data-plane intake and waste) and skin (perimeter and admission). **Physics,
+robotics and autonomous** (eight): automotive EV and mobile
 powertrains, aviation and autonomous flight, elevators and vertical transport, marine propulsion and vessel automation,
 rail traction and train control, robotics fleets and warehouse automation, robotics motion control, and spacecraft and
 flight software. **Energy, facility and industrial** (seventeen): agriculture and irrigation, building and
@@ -501,15 +505,21 @@ critical-environment HVAC, cooling and chillers, district heating and cooling, e
 and grid optimisation, grid transmission and distribution, healthcare critical environments, industrial PLCs and process
 automation, mining and mineral processing, oil and gas pipelines, PDUs, UPS and electrical distribution, pharmaceutical
 and food manufacturing, power generation and turbine control, renewable generation and inverter control, semiconductor
-fabs and precision manufacturing, and water and wastewater pumping. **Distribution and specialized** (sixteen): cache and
-memory services, commerce and payments, data analytics and ETL, databases and transactions, medical imaging and clinical
-systems, messaging and streaming, network routing and switching, observability and telemetry, ports and maritime
-logistics, reliability, security and recovery, runtimes and applications, search, indexing and vector databases, service
-meshes and API reliability, block, file and object storage, telecom radio access and edge radio, and workflow, logistics
-and fulfilment. Thirteen of these, marked "v2" in the register (the elevators, marine, rail, agriculture, district
-heating, healthcare, mining, pipelines, pharmaceutical and food, power generation, renewable generation, medical imaging
-and ports families), came with the second engine version; they, with the muscles added to the families that already
-existed, are the difference between the 656 muscles in 46 families of v1 and the 945 in 59 of v2 and v3.
+fabs and precision manufacturing, and water and wastewater pumping. **Distribution and specialized** (eighteen): cache
+and memory services, commerce and payments, content delivery and edge caches, data analytics and ETL, databases and
+transactions, financial markets and trading systems, medical imaging and clinical systems, messaging and streaming,
+network routing and switching, observability and telemetry, ports and maritime logistics, reliability, security and
+recovery, runtimes and applications, search, indexing and vector databases, service meshes and API reliability, block,
+file and object storage, telecom radio access and edge radio, and workflow, logistics and fulfilment. Thirteen of these,
+marked "v2" in the register (the elevators, marine, rail, agriculture, district heating, healthcare, mining, pipelines,
+pharmaceutical and food, power generation, renewable generation, medical imaging and ports families), came with the
+second engine version; they, with the muscles added to the families that already existed, are the difference between the
+656 muscles in 46 families of v1 and the 945 in 59 of v2 and v3. Eleven more came with v5 (the Linux kernel, serverless,
+virtualization, content delivery, gut and skin families in a first wave; financial markets, media streaming, game servers,
+blockchain nodes and build farms in a second), with muscles added to families already there; the founder's nine
+open-source pieces (Kepler, Climatik, EAR, CruiseKube, Goldilocks, the Kubernetes power manager, PEAKS, adaptive GPU power
+capping and NVIDIA's platform power budget) came on 12 October as ten muscles in the families their knobs belong to
+(`docs/OMNI_V5.md`, `docs/THE_SEAT.md`). The GPU family is named for the hardware, not one vendor.
 
 Every live benchmark in Part VI sits inside one of these families: the Kubernetes tests inside workload scaling and node
 fleets, PostgreSQL and MySQL inside databases and transactions, Redis and MongoDB's cache inside cache and memory
@@ -521,18 +531,21 @@ model for that family is the place to look.
 
 ### 2.2 The four realms and the spine
 
-The muscles fall into four realms. Every realm stands on the same **spine** of 257 muscles (Kubernetes, machines, GPUs
+The muscles fall into four realms. Every realm stands on the same **spine** of 267 muscles in v5 (Kubernetes, machines, GPUs
 and CPUs, network, storage, observability, security, cooling and electrical distribution), because every realm's work
 runs on computers that must be cooled and powered, plus its own domain muscles.
 
 | Organism | Muscles | What it is |
 |---|---:|---|
-| 1. Compute / AI / Cloud | 430 | clusters, GPUs, AI training and inference, cloud capacity |
-| 2. Physics / Robotics / Autonomous | 376 | joints, fleets, vehicles, flight and spacecraft axes |
-| 3. Energy / Facility / Industrial | 470 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
-| 4. Distribution / Specialized | 440 | networks, storage, databases, commerce, workflows, radio networks, clinical systems, ports |
-| 5. The four stacked, every duplicate kept | 1,716 | all four realms on one clock, the shared spine counted in each |
-| 6. The whole tower, every muscle once | 945 | every distinct muscle on one clock |
+| 1. Compute / AI / Cloud | 540 | clusters, GPUs, AI training and inference, cloud capacity, kernels, functions, media, games, ledgers, build farms |
+| 2. Physics / Robotics / Autonomous | 404 | joints, fleets, vehicles, flight and spacecraft axes |
+| 3. Energy / Facility / Industrial | 480 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
+| 4. Distribution / Specialized | 484 | networks, storage, databases, commerce, trading, content delivery, workflows, radio networks, clinical systems, ports |
+| 5. The four stacked, every duplicate kept | 1,908 | all four realms on one clock, the shared spine counted in each |
+| 6. The whole tower, every muscle once | 1,107 | every distinct muscle on one clock |
+
+These are the counts of Omni v5. On v2 and v3 the organisms were 430, 376, 470 and 440, the four stacked 1,716 and the
+tower 945; on v1 345, 262, 282 and 337, 1,226 and 656; each version's results stay with its own counts.
 
 The realms differ in what their domain muscles are and in how much slack their native controllers leave. Compute, AI and
 Cloud is clusters, cards, training and inference pools and cloud capacity, where the knobs are replica targets, machine
@@ -3141,7 +3154,7 @@ any one of the three can tell whether the files in front of them are the files t
 |---|---|
 | `omnicompass/` | the engine, governor, nervous system, shield, compass, conveyance law, the compass |
 | `omni_controller/` | the Kubernetes controller and muscles; the GPU governors (one and two wires) |
-| `realms/` | the 945-muscle catalog, the plant models, the realm harness, the compass on every muscle, the modelled card |
+| `realms/` | the 1,107-muscle catalog of v5 (`catalog_v5.csv`; v3's 945 in `catalog.csv`, frozen), the plant models, the realm harness, the compass on every muscle (the max, `compass_arm_v5.py`), the modelled card |
 | `tools/` | benchmarks, receipts, the wire check, the scale ladder, manifests, seals |
 | `scripts/` | one-command runs (GPU, Kubernetes, ladder) |
 | `deploy/` | container image, install and permission files |

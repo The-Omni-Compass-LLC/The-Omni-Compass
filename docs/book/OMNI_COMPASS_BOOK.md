@@ -465,6 +465,18 @@ Order (one or two at a time): Goldilocks with the Vertical Pod Autoscaler, and K
 machines first; CruiseKube next under its license's evaluation terms; the GPU and platform power pieces in the Lambda
 kit; EAR and the processor power managers on bare metal when a machine with power registers is rented.
 
+Built so far: **Goldilocks** (register row 80; `scripts/kind_addons_goldilocks.sh`, workflow `kind-goldilocks`,
+`docs/GOLDILOCKS_PREREGISTRATION.md`), its wiring run passed end to end on 12 October and its three runs follow on the
+engine that stands.
+
+**As muscles in the organisms** (the founder's order of 12 October: "expand my organisms"): each of the nine is also a
+muscle of the catalog (`realms/catalog_v5.csv`, ids 2172 to 2181), modelled on the plant its knob turns and placed in the
+spine family that knob belongs to, so each is in all four realms, the four stacked and the whole tower: Kepler's energy
+reading driving a pool's target, Climatik's inference power cap, EAR's CPU frequency policy and global energy budget,
+CruiseKube's and Goldilocks's request rightsizing, the Kubernetes Power Manager's core profiles, PEAKS's power-aware
+placement, the learned GPU power cap and NVIDIA's platform power budget. A model of a knob is not the project itself
+(class S); the project's own benchmark is the live test of it.
+
 ### 4. Who owns Omni-Compass, and on what terms it is seen
 
 - **The copyright in Omni-Compass belongs to The Omni-Compass LLC.** Contributions are accepted only on the terms of
@@ -1711,54 +1723,78 @@ noise"; clear intervals of opposite signs read "the runs disagree" (`tools/readi
 
 ### 3. What the runs measure (classes S, L, P)
 
-- **S, the muscles alone, 1,097 muscles, preregistered seeds 3000-3009, both loads** (`results/realms_v5/`): 504
-  better, 438 at their limit on native (V3: the max writes nothing), 155 no difference beyond the noise, **0 worse,
-  0 mixed**.
-- **S, inside the organisms, the same seeds, three loads**: every organism better as a whole; under the climb
-  (the load stepping 1 2 3 2 3 4 ... to twice its own), 3 plants of the 1,868 in the four stacked did worse than
-  native on these seeds: two rooms (−0.083% and −0.032% of their work) and one UPS gate (one decision more over its
-  line). Every row is reported in `results/realms_v5/REALMS_V5.md`.
+- **S, the muscles alone, 1,107 muscles, preregistered seeds 3000-3009, both loads** (`results/realms_v5/`, commit
+  `44aceb48ea30`, digest `9be48445438943c2`): 517 better, 421 at their limit on native (V3: the max writes nothing),
+  169 no difference beyond the noise, **0 worse, 0 mixed**.
+- **S, inside the organisms, the same seeds, three loads**: every organism better as a whole under every load, and
+  **0 plants worse** in every organism under every load (0 of the 1,908 in the four stacked). Misses (the share of
+  plant decisions over their line) fall 1.6% to 6.4% under each organism's own load, 0.9% to 3.5% under the climb (the
+  load stepping 1 2 3 2 3 4 ... to twice its own) and 1.0% to 7.2% with work waiting in line, against 0.1% to 0.7%,
+  0.0% to 2.1% and 0.1% to 2.1% for the engine before (digest `8d4f91f0`), which left 3 plants worse under the climb.
+  Every row is reported in `results/realms_v5/REALMS_V5.md`.
 - **L, real software**: `docs/THE_RECEIPTS.md`, receipt by receipt.
 - **P, a physical meter on a real chip**: not yet produced on the current governor (`docs/THE_SEAT.md`, section 5).
 
-### 4. Why the three plants did worse, and the next version (built, tested on development seeds, not yet the engine)
+### 4. The living body: why plants did worse, and the version that cures them (the engine since 12 October, night)
 
 Found on development seeds only (7100-7299), never on the preregistered ones. Under the climb, rooms and UPS lines
-reach their limits in both arms; a plant does worse when the Omni arm reaches the limit a moment sooner.
+reach their limits in both arms; a plant did worse when the Omni arm reached a limit a moment sooner, or when a sense
+the brain read was wrong. Each cause, and the property of the code that removes it:
 
-1. **A room snapped back.** A room cooled ahead of the heat for one decision, then returned at once to its operator's
-   setpoint when the lines ran short: the room's own PI loop overshot, leaving it about 0.007 °C warmer than native for
-   some twenty decisions; when its cooling later ran flat out, that difference was frozen in and the room crossed its
-   limit a few seconds sooner (−0.94% of that room's work on that seed).
-2. **A battery's charge counted as room after it ran out.** A UPS covering its site's whole draw shows its connection
-   empty; R counted the full connection as room, though the charge above the floor ran out the next decision, after
-   which the extra machines' power put the line 0.4% over while native sat at the limit.
-3. **Machines handed back while a queue needed them.** The pool did more work (+0.41%) than native, having admitted
-   requests native turned away, then took one decision longer to clear them after machines were handed back.
+1. **A room snapped back.** A room cooled ahead of the heat, then returned at once to its operator's setpoint when the
+   lines ran short: its own PI loop overshot warm of native, and once its cooling ran flat out the difference was frozen
+   in. *V9 (the pedal lifted, never snapped):* a pull-down is handed back toward the operator's setpoint over the
+   cooling's own reaction time. *V10 (no pull-down that cannot be held):* a new pull-down is granted only out of the room
+   the lines have for that reaction time.
+2. **A battery's charge counted as room after it ran out.** *V6:* a site whose battery covers its draw, but whose charge
+   above its floor runs out within r + 1 + T decisions (T = 2: the heat of machines handed back reaches the rooms a
+   decision later and their cooling answers over its own averaging, one more), has as room on its line only its limit
+   less its whole draw, read at the draw's own climb.
+3. **Machines handed back while a queue needed them.** *V7:* on a shortfall, a pool is never held below
+   ⌈(λ_{k−1} + Q_k / Δt) / μ⌉.
+4. **A room left warmer than native.** *V8:* every room has a twin: the same room under its operator's settings, warmed
+   by native's heat (the body's source power with each pool's power replaced by its twin's). A room wired by its
+   setpoint that reads warmer than its twin by e > 0 has its setpoint written at most t_set − e, unless its cooling is
+   already flat out.
+5. **A room that cannot cure itself.** *V11 (the body cures what a muscle cannot):* a room wired by its cooling units,
+   a power or an admission gate, or whose cooling is flat out, and that reads warmer than its twin by e > 0, puts a heat
+   debt e · C / (Δt · h) on the body (C its heat capacity, h its share of the body's source heat); the room the bone
+   grants is bounded by minus that debt, so the machines the max added go back until no such room is warmer than
+   native's.
+6. **A battery that never timed its discharge.** *V12:* a battery wired by its power holds its charge while its line has
+   room after the largest climb it has shown, line_z of its wobbles and a twentieth of its limit, and gives native's full
+   power once the line could need it; it holds nothing until it has read its line for a window of decisions (20).
+7. **A lock in the senses.** *V13 (a forecast starts at the first reading):* a plant shows its initial values before its
+   first step; the jump from them to the first reading was taken as the line's largest climb ("never forgotten") and
+   kept every battery's timed discharge shut for the whole run. Every forecast of a line now starts at the plant's first
+   real reading, and the bone reads nothing before the body's first step.
+8. **A twin that started wrong.** The body reads its sources at their nominal power before the first step; the room twins
+   read zero, so for the first ten or so decisions they ran up to 0.3 °C apart from native's rooms and the body cured
+   differences that did not exist. The twins now start from the body's own reading (V8, the definition above), and with
+   the max writing nothing every room twin equals its room to the last digit, every decision
+   (`tests/test_compass_arm_v5.py`).
 
-The next version adds, each as a property of the code:
+The battery's admission gate stays native: deferring a site's flexible load to keep its line clear left part of that
+work not caught up by the end of a run (work first).
 
-- **V6 (the battery's charge counts only while it lasts):** a site whose battery covers its draw, but whose charge
-  above its floor runs out within r + 1 decisions, has as room on its line only its limit less its whole draw.
-- **V7 (no machine taken from a queue that needs it):** on a shortfall, a pool is never held below
-  ⌈(λ_{k−1} + Q_k / Δt) / μ⌉, the machines its latest arrivals and its queue need.
-- **V8 (never warmer than native, for every room wired by its setpoint):** each such room has a twin warmed by native's
-  heat (each pool's twin in place of the pool, every other source as it is); when the room reads warmer than its twin
-  by e > 0, its setpoint is written at most t_set − e.
-- **V9 (the pedal lifted, never snapped):** a room's pull-down is handed back toward its operator's setpoint over the
-  cooling's own reaction time.
-- **V10 (no pull-down that cannot be held):** a new pull-down is granted only out of the room the lines have for the
-  cooling's own reaction time.
+Measured on development seeds 7100-7199, the four realms under the climb, 400 organism runs each way:
 
-Measured on development seeds 7100-7199, the four realms under the climb, 400 organism runs each way: plants worse
-**19 before, 7 after**; the organisms' gains kept (misses −0.104, −0.110, −0.005 and −0.137 percentage points against
-−0.109, −0.125, −0.005 and −0.144 before; work and lease unchanged). All seven left are plants whose own knob the max
-does not turn (two rooms wired by their power or cooling-unit gate; five UPS lines wired by power, capacity or
-admission): five UPS lines one decision over by about a watt at a moment native sat exactly on the limit, and two rooms
-that lost 0.28% and 0.39% of their work after the body's extra heat changed when their cooling staged a unit. Across the
-same runs, plants of those kinds did worse in 6 and better in 1 of about 13,000 plant-runs, while the plants the max
-does turn did better in about 13,000 and worse in 0. The next version enters the engine as a new version only, every
-result run again on it, the founder told first.
+| | Plants worse | Misses (pp), the four realms | Work, the four realms |
+|---|---:|---|---|
+| the engine before (omni-v5, 8d4f91f0) | 19 | −0.109, −0.125, −0.005, −0.144 | +0.0013%, +0.0016%, +0.0000%, +0.0022% |
+| V6-V10 only | 7 | −0.104, −0.110, −0.005, −0.137 | kept |
+| **this version (V6-V13)** | **0** | **−0.206, −0.187, −0.143, −0.212** | +0.0008%, +0.0010%, +0.0000%, +0.0016% |
+
+The misses fall about twice as far as before (in the Energy / Facility / Industrial body, from almost nothing to 0.14
+points), and no plant in any of the 400 runs did worse than native. The work gained is about two thirds of the version
+before: the heat debt hands back machines while a room that cannot cure itself is warmer than native's.
+
+One lock is left, said plainly: a line that once jumped (a battery that stopped covering its site) is read as able to
+jump that far again for the rest of the run, which keeps the max from adding machines on that line. Removing it (every
+line's climb read on the site's whole draw) roughly triples the misses removed on the same seeds (−0.34 points), but in
+36 of the 400 runs a machine pool whose queue sat at its limit then did more work and took one decision longer to clear
+it, which our decision count reads as worse. That is the next version's work, and it enters the engine only as a new
+version, every result run again on it, the founder told first.
 
 ### 5. Limits, stated plainly
 
@@ -1767,8 +1803,10 @@ result run again on it, the founder told first.
 - R is a forecast (V4). A climb no line has shown before can beat it within the one decision power takes to be handed
   back.
 - S results are our models. They are never presented as proof of a physical saving; the physical receipt is a P run.
-- The twin is exact for a pool (its law reads only its own inputs) and for a room's own physics; a room twin's heat is
-  native's estimated from the pools' twins, not measured.
+- The twin is exact for a pool (its law reads only its own inputs) and for a room (its heat is the body's own source
+  reading with each pool's power replaced by its twin's, so with the max writing nothing it equals the room to the last
+  digit); with the max writing, a room twin is native's room under native's heat as the brain reconstructs it, not a
+  meter.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
@@ -2630,8 +2668,9 @@ python k8s_controlplane/test_nervous.py
 
 ### 2.1 The catalog
 
-The catalog (`realms/catalog.csv`) lists **945 distinct muscles in 59 families** (Omni v2 and v3; v1 listed 656 in 46),
-each with its family, its plant model and its knob. A muscle is anything with a meter and a setting: a compute pool and
+The catalog of Omni v5 (`realms/catalog_v5.csv`) lists **1,107 distinct muscles in 70 families** (v2 and v3 listed 945 in
+59, `realms/catalog.csv`, frozen for their results; v1 listed 656 in 46), each with its family, its plant model and its
+knob. A muscle is anything with a meter and a setting: a compute pool and
 its machine count, a GPU and its clock ceiling, a chiller and its setpoint, a battery and its reserve, a feeder and its
 tap, a robot joint and its speed limit, a pump and its flow. Each muscle carries a declared plant model, the simplest
 physics that reproduces how its meter follows its knob, and a native controller of its own, which is what the muscle does
@@ -2641,12 +2680,15 @@ controllers, and a verification, de-duplication and mapping pass. The register (
 every family with its muscle count and the kinds of knob it carries, so a reader can see at a glance what the modelled
 realms contain and what they do not.
 
-The fifty-nine families, by realm, are these. **Compute, AI and cloud** (eighteen): AI inference serving, AI training,
-cloud virtual machines and capacity, container resources, cross-cluster and edge placement, DPU and programmable IO,
-distributed cluster managers, GPU fabric and RDMA, HPC and distributed compute, host CPU and memory, Kubernetes dynamic
-device allocation, Kubernetes placement and scheduling, Kubernetes workload scaling (the largest family, 31 muscles),
-NVIDIA GPU hardware, node fleets and Karpenter-class control, OpenShift and the Machine API, quantum computing control
-(modelled), and work admission and demand shaping. **Physics, robotics and autonomous** (eight): automotive EV and mobile
+The seventy families, by realm, are these. **Compute, AI and cloud** (twenty-seven): AI inference serving, AI training,
+blockchain and ledger nodes, CI/CD and build farms, cloud virtual machines and capacity, container resources,
+cross-cluster and edge placement, DPU and programmable IO, distributed cluster managers, game servers and real-time
+interaction, GPU fabric and RDMA, GPU hardware, HPC and distributed compute, host CPU and memory, Kubernetes dynamic
+device allocation, Kubernetes placement and scheduling, Kubernetes workload scaling (the largest family, 32 muscles),
+Linux kernel and operating-system control, media streaming, node fleets and Karpenter-class control, OpenShift and the
+Machine API, quantum computing control (modelled), serverless functions, virtualization and hypervisors, work admission
+and demand shaping, and the body's gut (data-plane intake and waste) and skin (perimeter and admission). **Physics,
+robotics and autonomous** (eight): automotive EV and mobile
 powertrains, aviation and autonomous flight, elevators and vertical transport, marine propulsion and vessel automation,
 rail traction and train control, robotics fleets and warehouse automation, robotics motion control, and spacecraft and
 flight software. **Energy, facility and industrial** (seventeen): agriculture and irrigation, building and
@@ -2654,15 +2696,21 @@ critical-environment HVAC, cooling and chillers, district heating and cooling, e
 and grid optimisation, grid transmission and distribution, healthcare critical environments, industrial PLCs and process
 automation, mining and mineral processing, oil and gas pipelines, PDUs, UPS and electrical distribution, pharmaceutical
 and food manufacturing, power generation and turbine control, renewable generation and inverter control, semiconductor
-fabs and precision manufacturing, and water and wastewater pumping. **Distribution and specialized** (sixteen): cache and
-memory services, commerce and payments, data analytics and ETL, databases and transactions, medical imaging and clinical
-systems, messaging and streaming, network routing and switching, observability and telemetry, ports and maritime
-logistics, reliability, security and recovery, runtimes and applications, search, indexing and vector databases, service
-meshes and API reliability, block, file and object storage, telecom radio access and edge radio, and workflow, logistics
-and fulfilment. Thirteen of these, marked "v2" in the register (the elevators, marine, rail, agriculture, district
-heating, healthcare, mining, pipelines, pharmaceutical and food, power generation, renewable generation, medical imaging
-and ports families), came with the second engine version; they, with the muscles added to the families that already
-existed, are the difference between the 656 muscles in 46 families of v1 and the 945 in 59 of v2 and v3.
+fabs and precision manufacturing, and water and wastewater pumping. **Distribution and specialized** (eighteen): cache
+and memory services, commerce and payments, content delivery and edge caches, data analytics and ETL, databases and
+transactions, financial markets and trading systems, medical imaging and clinical systems, messaging and streaming,
+network routing and switching, observability and telemetry, ports and maritime logistics, reliability, security and
+recovery, runtimes and applications, search, indexing and vector databases, service meshes and API reliability, block,
+file and object storage, telecom radio access and edge radio, and workflow, logistics and fulfilment. Thirteen of these,
+marked "v2" in the register (the elevators, marine, rail, agriculture, district heating, healthcare, mining, pipelines,
+pharmaceutical and food, power generation, renewable generation, medical imaging and ports families), came with the
+second engine version; they, with the muscles added to the families that already existed, are the difference between the
+656 muscles in 46 families of v1 and the 945 in 59 of v2 and v3. Eleven more came with v5 (the Linux kernel, serverless,
+virtualization, content delivery, gut and skin families in a first wave; financial markets, media streaming, game servers,
+blockchain nodes and build farms in a second), with muscles added to families already there; the founder's nine
+open-source pieces (Kepler, Climatik, EAR, CruiseKube, Goldilocks, the Kubernetes power manager, PEAKS, adaptive GPU power
+capping and NVIDIA's platform power budget) came on 12 October as ten muscles in the families their knobs belong to
+(`docs/OMNI_V5.md`, `docs/THE_SEAT.md`). The GPU family is named for the hardware, not one vendor.
 
 Every live benchmark in Part VI sits inside one of these families: the Kubernetes tests inside workload scaling and node
 fleets, PostgreSQL and MySQL inside databases and transactions, Redis and MongoDB's cache inside cache and memory
@@ -2674,18 +2722,21 @@ model for that family is the place to look.
 
 ### 2.2 The four realms and the spine
 
-The muscles fall into four realms. Every realm stands on the same **spine** of 257 muscles (Kubernetes, machines, GPUs
+The muscles fall into four realms. Every realm stands on the same **spine** of 267 muscles in v5 (Kubernetes, machines, GPUs
 and CPUs, network, storage, observability, security, cooling and electrical distribution), because every realm's work
 runs on computers that must be cooled and powered, plus its own domain muscles.
 
 | Organism | Muscles | What it is |
 |---|---:|---|
-| 1. Compute / AI / Cloud | 430 | clusters, GPUs, AI training and inference, cloud capacity |
-| 2. Physics / Robotics / Autonomous | 376 | joints, fleets, vehicles, flight and spacecraft axes |
-| 3. Energy / Facility / Industrial | 470 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
-| 4. Distribution / Specialized | 440 | networks, storage, databases, commerce, workflows, radio networks, clinical systems, ports |
-| 5. The four stacked, every duplicate kept | 1,716 | all four realms on one clock, the shared spine counted in each |
-| 6. The whole tower, every muscle once | 945 | every distinct muscle on one clock |
+| 1. Compute / AI / Cloud | 540 | clusters, GPUs, AI training and inference, cloud capacity, kernels, functions, media, games, ledgers, build farms |
+| 2. Physics / Robotics / Autonomous | 404 | joints, fleets, vehicles, flight and spacecraft axes |
+| 3. Energy / Facility / Industrial | 480 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
+| 4. Distribution / Specialized | 484 | networks, storage, databases, commerce, trading, content delivery, workflows, radio networks, clinical systems, ports |
+| 5. The four stacked, every duplicate kept | 1,908 | all four realms on one clock, the shared spine counted in each |
+| 6. The whole tower, every muscle once | 1,107 | every distinct muscle on one clock |
+
+These are the counts of Omni v5. On v2 and v3 the organisms were 430, 376, 470 and 440, the four stacked 1,716 and the
+tower 945; on v1 345, 262, 282 and 337, 1,226 and 656; each version's results stay with its own counts.
 
 The realms differ in what their domain muscles are and in how much slack their native controllers leave. Compute, AI and
 Cloud is clusters, cards, training and inference pools and cloud capacity, where the knobs are replica targets, machine
@@ -5273,12 +5324,12 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
 4. **Everything handed back (L, v3).** The governor killed outright at 40% of the window: every setting back with the
    operator's within 11 seconds (9 on average), in 30 of 30 repetitions; the long run (two hours an arm): no leak, every decision
    valid, no slowing.
-5. **On our own models, nothing worse alone (S, v5).** Of the 1,097 muscles of the catalog, each alone on the
-   preregistered seeds under its own load and under work waiting in line: 504 better, 438 at their limit on native (the
-   max writes nothing to them), 155 no difference beyond the noise, none worse and none mixed. Inside the six organisms
-   every organism is better as a whole; under the climb (the load stepping up to twice its own), 3 plants of 1,868 did
-   worse on those seeds (two rooms −0.083% and −0.032% of their work; one UPS gate one decision more over its line). Their
-   causes are found and fixed in the next version (`docs/FORMAL_V5.md`, section 4).
+5. **On our own models, nothing worse, alone or inside a body (S, v5).** Of the 1,107 muscles of the catalog (the
+   founder's nine open-source pieces among them), each alone on the preregistered seeds under its own load and under work
+   waiting in line: 517 better, 421 at their limit on native (the max writes nothing to them), 169 no difference beyond the
+   noise, none worse and none mixed. Inside the six organisms every organism is better as a whole under all three loads,
+   and not one plant is worse than native in any organism under any load (the engine before left 3 of 1,868 under the
+   climb; the living body that cures them is `docs/FORMAL_V5.md`, section 4).
 6. **What is not yet shown.** No energy saving on a real chip: the physical receipt (P), the GPU's own meter on the
    current governor, on the same clock as the Kubernetes runs, is the decisive one still to be produced; every earlier
    card result ran on a controller since replaced and is obsolete. No cloud-bill saving: Azure's bill on four workers
@@ -5318,7 +5369,7 @@ zero; "noise" means an interval includes zero.
 
 | Test | Engine | Reading | File |
 |---|---|---|---|
-| The 1,097 muscles and the six organisms, preregistered seeds | v5 | 504 better, 438 at their limit on native, 155 noise, 0 worse; every organism better; 3 plants of 1,868 worse under the climb | `results/realms_v5/REALMS_V5.md` |
+| The 1,107 muscles and the six organisms, preregistered seeds | v5 (digest 9be48445) | 517 better, 421 at their limit on native, 169 noise, 0 worse; every organism better under all three loads; 0 plants worse in any organism under any load | `results/realms_v5/REALMS_V5.md` |
 | Power grids: 11 SimBench grids in pandapower | v3 | energy drawn and net import better in all 11; losses better in 7, worse in 4; tap operations fewer in 10, more in 1 | `results/live/V3_PANDAPOWER.md` |
 | CityLearn districts | v3 | electricity bought, peak and unevenness better in all 11 battery districts; the bill worse in 7, ramping worse in 7 | `results/live/V3_CITYLEARN.md` |
 | Robot arms, MuJoCo Menagerie | v3 | Gen3 and Panda peak torque −29% and −10%, tracking error −21%; the Panda's copper +14% worse; UR5e and iiwa left native | `results/live/V3_MUJOCO.md` |
@@ -5610,13 +5661,13 @@ Where a row sums several workloads, grids, districts, cells or robots, each part
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `b8630e583`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `43565c5ec`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 1. The mechanism, and proof that it is the one that ran
 
 | Check | Result | Where |
 |---|---|---|
-| The whole repository re-runs and checks itself (`python3 verify.py`) | **see results/VERIFY_RECEIPT.txt** | `results/VERIFY_RECEIPT.txt` |
+| The whole repository re-runs and checks itself (`python3 verify.py`) | **PASS** | `results/VERIFY_RECEIPT.txt` |
 | The eight-line engine and its six states, fingerprinted (`omnicompass/core.py`) | sha256 `bd615f156169f679…` | `RELEASE_MANIFEST.json` |
 | Python and C++20 twins of every law, proven equal and sealed | seal intact: 9 Python/C++ twins | `results/SEAL.json` |
 | The mechanism's identity against the code | mechanism identity matches the code | `results/MECHANISM_IDENTITY.json` |
@@ -5629,7 +5680,7 @@ The engine is the founder's eight-line equation, integrated by RK4 with the boun
 
 ### 2. Real Kubernetes, Omni v3, every test three times (evidence class L)
 
-Seven tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **better** or **worse in all three of our runs** only when all three runs move the same way with every 95% interval clear of zero; otherwise it reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and read back. Steady runs: A 38013195851 (omni-v3); B 38013200499 (omni-v3); C 38013204648 (omni-v3); the other tests' runs are named in their tables.
+Seven tests, ten paired repetitions each, three separate GitHub runs on the frozen engine (A the result, B and C the replications): native Kubernetes (its HPA and scheduler) against the same Kubernetes with Omni-Compass on top, a fresh six-worker cluster per arm, order rotated, the same work sent to both arms. A row reads **better in all three of our runs** or **worse in all three of our runs** only when all three runs move the same way with every 95% interval clear of zero; otherwise it reads no difference beyond the noise, which is the result. Every Omni arm ends with every setting handed back and read back. Steady runs: A 38013195851 (omni-v3); B 38013200499 (omni-v3); C 38013204648 (omni-v3); the other tests' runs are named in their tables.
 
 ![Kubernetes on v3](dossier/k8s_v3.png)
 
@@ -5778,8 +5829,7 @@ The rules for each run were written and committed before it ran (`docs/*_PREREGI
 
 - A cloud-bill or energy saving on real machines: the 4-worker Azure fleet reads inside the noise, as a fleet too small to show one machine must; the 40-worker fleet runs are the test of that.
 - The real card on the current governor: every earlier card result ran on a controller since replaced and is obsolete; the one-card, card-inside-the-organisms and eight-card runs are the founder's, on rented cards, at one named commit.
-- The four stacked and the tower at 1,000 copies with the real cluster inside on v3 (the stack runs on a rented machine).
-- 100 and 1,000 runs at 1,000 copies (beyond the machines available).
+- The grid stops at 100 copies and 100 runs (the founder's order of 12 October, to cut the time and the bill): no 1,000 copies and no 1,000 runs are run on any engine from that day; the v3 cells at 1,000 above stand as they were run.
 - The queue in `docs/REGISTER.md` section 4 (drone swarms on gym-pybullet-drones and Kafka done; Redis running): PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera.
 
 ## 44. Paired Runs and Receipts on Your Own System
@@ -11633,7 +11683,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 |---|---|
 | `omnicompass/` | the engine, governor, nervous system, shield, compass, conveyance law, the compass |
 | `omni_controller/` | the Kubernetes controller and muscles; the GPU governors (one and two wires) |
-| `realms/` | the 945-muscle catalog, the plant models, the realm harness, the compass on every muscle, the modelled card |
+| `realms/` | the 1,107-muscle catalog of v5 (`catalog_v5.csv`; v3's 945 in `catalog.csv`, frozen), the plant models, the realm harness, the compass on every muscle (the max, `compass_arm_v5.py`), the modelled card |
 | `tools/` | benchmarks, receipts, the wire check, the scale ladder, manifests, seals |
 | `scripts/` | one-command runs (GPU, Kubernetes, ladder) |
 | `deploy/` | container image, install and permission files |
@@ -11866,7 +11916,7 @@ job printed it); `end_reads.err`, `pod_watch.err` and `capture.csv.errors` (empt
 
 A **muscle** is one setting on one machine that already has its own control: a replica target, a node pool's size, a GPU's clock ceiling, a chiller's setpoint, a battery's reserve, a joint's effort. Omni-Compass does not replace that control. It reads the machine's meters and, at its default, the max, moves the setting the machine already accepts toward the machine's own limit for the most work, never past it and never below native, through a plug that reads the setting once before the first write, reads back every write, steps aside if another controller moves it, and walks it back to native at the end. A knob native already runs at the top of its range is at its limit on native and is left there.
 
-This chapter lists all 1097 muscles of the catalog (`realms/catalog_v5.csv`, engine omni-v5). For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 8 and 9). See `DISCLOSURES.md`.
+This chapter lists all 1107 muscles of the catalog (`realms/catalog_v5.csv`, engine omni-v5). For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 8 and 9). See `DISCLOSURES.md`.
 
 ### How to read an entry
 
@@ -11887,16 +11937,16 @@ This chapter lists all 1097 muscles of the catalog (`realms/catalog_v5.csv`, eng
 | `motion_axis` | a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor | its tracking error and its load | its speed and effort share, or its power share |
 | `process_loop` | a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint | how far the process sits from its band | its setpoint within its safe band, its actuator range, or its power share |
 
-**The organisms.** The 1097 muscles build six organisms: each of the four realms (every muscle whose realm list includes it), the four stacked with every duplicate kept (1,868), and the whole tower with every muscle once (1097). A muscle of the shared spine sits in all four realms.
+**The organisms.** The 1107 muscles build six organisms: each of the four realms (every muscle whose realm list includes it), the four stacked with every duplicate kept (1,908), and the whole tower with every muscle once (1107). A muscle of the shared spine sits in all four realms.
 
 | Organism | Muscles |
 |---|---:|
-| Compute / AI / Cloud | 530 |
-| Physics / Robotics / Autonomous | 394 |
-| Energy / Facility / Industrial | 470 |
-| Distribution / Specialized | 474 |
-| The four stacked, every duplicate kept | 1,868 |
-| The whole tower, every muscle once | 1097 |
+| Compute / AI / Cloud | 540 |
+| Physics / Robotics / Autonomous | 404 |
+| Energy / Facility / Industrial | 480 |
+| Distribution / Specialized | 484 |
+| The four stacked, every duplicate kept | 1,908 |
+| The whole tower, every muscle once | 1107 |
 
 **How a muscle is reached in a real stack.** The class of machine decides the wire:
 
@@ -11946,7 +11996,7 @@ This chapter lists all 1097 muscles of the catalog (`realms/catalog_v5.csv`, eng
 
 Wires marked *modelled only* exist as plants in the benchmark and are not built for live use.
 
-### The shared spine: 257 muscles in all four realms
+### The shared spine: 267 muscles in all four realms
 
 The machines every realm stands on: servers, machines, GPUs and CPUs, network, storage, observability, security, cooling and electrical distribution. Each spine muscle is part of every realm's organism, counted once in the tower and four times in the stack.
 
@@ -11978,7 +12028,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1120 | predictive scaling | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1121 | instance refresh | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 
-#### Container Resources (23 muscles)
+#### Container Resources (25 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -12007,8 +12057,10 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1023 | memory protection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1024 | io latency target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1025 | freeze | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower |
+| 2176 | cruisekube request rightsizing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
+| 2177 | goldilocks vpa request recommendation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 
-#### Host CPU & Memory (23 muscles)
+#### Host CPU & Memory (26 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `cpu_host` (a CPU host whose clock and power can be set), reached through Linux cpufreq and RAPL. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -12037,8 +12089,11 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1112 | core packing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1115 | per pod cpu frequency range and c state access | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
 | 1116 | uncore frequency per node | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2174 | ear cpu frequency policy | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2175 | ear global energy budget | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower |
+| 2178 | k8s power manager core profile | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
 
-#### Kubernetes Placement & Scheduling (20 muscles)
+#### Kubernetes Placement & Scheduling (21 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -12064,8 +12119,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1027 | scheduler plugin weights | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1028 | scheduling gates | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower |
 | 1029 | cpu manager | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
+| 2179 | peaks power aware placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 
-#### Kubernetes Workload Scaling (31 muscles)
+#### Kubernetes Workload Scaling (32 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -12102,8 +12158,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1014 | unhealthy pod eviction policy | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower |
 | 1015 | graceful termination | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1016 | probes | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
+| 2172 | kepler energy target autoscaling | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 
-#### GPU Hardware (19 muscles)
+#### GPU Hardware (22 muscles)
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
@@ -12128,6 +12185,9 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | 1045 | gpu temperature target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1117 | sync boost | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower |
 | 1118 | target clocks | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2173 | climatik inference power cap | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2180 | adaptive gpu power cap | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
+| 2181 | nvidia platform power budget | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower |
 
 #### Node Fleet & Karpenter-Class Control (24 muscles)
 
@@ -12298,7 +12358,7 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 | 1111 | priority aware capping throttle low priority first | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower |
 | 1113 | power oversubscription with prediction | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower |
 
-### Realm: Compute / AI / Cloud (273 muscles of its own, 530 in its organism with the spine)
+### Realm: Compute / AI / Cloud (273 muscles of its own, 540 in its organism with the spine)
 
 #### AI Inference Serving (24 muscles)
 
@@ -12713,7 +12773,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 | V5-5116 | remote execution workers | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower |
 | V5-5117 | warm runner pool | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower |
 
-### Realm: Physics / Robotics / Autonomous (137 muscles of its own, 394 in its organism with the spine)
+### Realm: Physics / Robotics / Autonomous (137 muscles of its own, 404 in its organism with the spine)
 
 #### Automotive EV & Mobile Powertrain (14 muscles)
 
@@ -12908,7 +12968,7 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 | 2156 | brake test schedule | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower |
 | 2157 | fire recall mode | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower |
 
-### Realm: Energy / Facility / Industrial (213 muscles of its own, 470 in its organism with the spine)
+### Realm: Energy / Facility / Industrial (213 muscles of its own, 480 in its organism with the spine)
 
 #### Building & Critical Environment HVAC (15 muscles)
 
@@ -13228,7 +13288,7 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 | 2170 | refrigerant compressor authority | admission | at its limit on native (nothing paced or turned away): read and left native | Energy; stack; tower |
 | 2171 | batch hold quarantine | admission | at its limit on native (nothing paced or turned away): read and left native | Energy; stack; tower |
 
-### Realm: Distribution / Specialized (217 muscles of its own, 474 in its organism with the spine)
+### Realm: Distribution / Specialized (217 muscles of its own, 484 in its organism with the spine)
 
 #### Cache & Memory Services (16 muscles)
 

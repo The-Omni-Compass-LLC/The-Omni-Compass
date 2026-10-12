@@ -34,8 +34,10 @@ the founder overrides one in the conversation.
 
 ## The engine: Omni v5 at the max (v3, v2 and v1 kept for their results)
 
-- `OMNI_V5.json` and `docs/OMNI_V5.md`: the max (`realms/compass_arm_v5.py`, `V5CFG`) on the 1,097-muscle catalog, the
-  bone inside every organism, the lease's walk back, the tune-down on the dial. v5 is re-declared on every engine change
+- `OMNI_V5.json` and `docs/OMNI_V5.md`: the max (`realms/compass_arm_v5.py`, `V5CFG`) on the 1,107-muscle catalog, the
+  bone inside every organism with the living body's immune system (V6-V13, `docs/FORMAL_V5.md` section 4: native twins
+  of every room, the heat debt, batteries timed for their lines, nothing locked), the lease's walk back, the tune-down on
+  the dial. v5 is re-declared on every engine change
   while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
   never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v5, omni-v3, omni-v2,
   omni-v1, or what differs.
@@ -55,9 +57,11 @@ the founder overrides one in the conversation.
 
 ## The six organisms and the grid
 
-- Omni v5 (12 Oct): four realms (Compute/AI/Cloud 530, Physics/Robotics/Autonomous 394, Energy/Facility/Industrial 470,
-  Distribution/Specialized 474), the whole tower (1,097 distinct muscles in 70 families), and the four stacked (1,868).
-  They share a spine of 257 muscles. v2/v3 were 430/376/470/440, 945 and 1,716; v1 was 345/262/282/337, 656 and 1,226
+- Omni v5 (12 Oct, night): four realms (Compute/AI/Cloud 540, Physics/Robotics/Autonomous 404, Energy/Facility/Industrial
+  480, Distribution/Specialized 484), the whole tower (1,107 distinct muscles in 70 families, the founder's nine open-source
+  pieces among them: Kepler, Climatik, EAR, CruiseKube, Goldilocks, the Kubernetes Power Manager, PEAKS, Adaptive GPU
+  Power Capping, NVIDIA's platform power manager), and the four stacked (1,908). They share a spine of 267 muscles; the
+  1,097-muscle catalog of earlier the same day keeps its results. v2/v3 were 430/376/470/440, 945 and 1,716; v1 was 345/262/282/337, 656 and 1,226
   with a spine of 190; their results stay theirs.
 - The organisms are named `tower` and `stack` in code and workflows (never by a count); the old names `organism_656` and
   `stack_1226` are read as aliases.

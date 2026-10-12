@@ -2,6 +2,38 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-12 (midnight): Omni v5 re-declared: the living body, and the founder's nine open-source pieces as muscles
+
+- **The living body** (the founder's order of 12 October: whatever one muscle has a problem with, the others carry it, and
+  nothing is locked; `docs/FORMAL_V5.md` section 4, `realms/compass_arm_v5.py`). Eight causes of a plant doing worse
+  inside a body, found on development seeds only (7100-7299), and the property of the code that removes each: a
+  battery's charge counts as room on its line only while it lasts (V6); machines a queue needs are never handed back
+  (V7); every room has a twin, the same room under its operator's settings warmed by native's heat, equal to the room to
+  the last digit while the max writes nothing (V8); a pull-down is handed back over the cooling's own reaction time,
+  never snapped (V9), and granted only out of the room the lines have for that time (V10); a room that cannot cure
+  itself puts a heat debt on the body, which hands back machines until no such room is warmer than native's (V11); a
+  battery times its discharge after reading its line for a window (V12); and a forecast starts at the plant's first
+  reading (V13: the jump from a plant's initial values to its first reading had locked every battery's timed discharge
+  for the whole run). The battery's admission gate stays native: deferring a site's flexible load left work not caught up
+  by the end of a run (work first). Four tests added to `tests/test_compass_arm_v5.py`.
+- **The nine open-source pieces as muscles** (the catalog's third wave): Kepler, Climatik, EAR (two), CruiseKube,
+  Goldilocks, the Kubernetes power manager, PEAKS, adaptive GPU power capping and NVIDIA's platform power budget, ten
+  muscles (2172-2181), each in the spine family its knob belongs to. The catalog is 1,107 muscles in 70 families; the
+  organisms 540, 404, 480 and 484, the four stacked 1,908, the shared spine 267 (`docs/OMNI_V5.md`, `docs/REGISTER.md`
+  section 1, `docs/MUSCLE_CATALOG.md`, the manual's chapter 2).
+- **The engine re-declared**: omni-v5, digest `9be48445438943c2` (43 files, `OMNI_V5.json`); every result is run again on
+  it. The grid's manifest starts empty (`results/grid_v5/DISPATCHED.json`), the one before kept whole in
+  `results/grid_v5/history/DISPATCHED_omni-v5_8d4f91f0.json`, and the conductor counts runs only from the push.
+- **The official run** (preregistered seeds 3000-3009, commit `44aceb48`; class S): 0 of 1,107 muscles worse (517
+  better, 421 at their limit on native, 169 no difference beyond the noise); every organism better under all three
+  loads; **0 plants worse inside any organism** under any load, where the engine before left 3 worse under the climb.
+  Misses fall 1.6% to 6.4% under each organism's own load, 0.9% to 3.5% under the climb and 1.0% to 7.2% with work
+  waiting in line, against 0.1% to 0.7%, 0.0% to 2.1% and 0.1% to 2.1% before (`results/realms_v5/REALMS_V5.md`).
+- **One lock left, said plainly**: a line that once jumped is read as able to jump that far again for the rest of the
+  run. Removing it roughly triples the misses removed on development seeds, but in 36 of 400 runs a machine pool whose
+  queue sat at its limit then did more work and took one decision longer to clear it, which the decision count reads as
+  worse. That is the next version's work, told to the founder first.
+
 ## 2026-10-12 (night): Goldilocks built as a benchmark; the capacity test's rates; the last 1,000s removed
 
 - **Goldilocks with the Vertical Pod Autoscaler** (register row 80, the first of the founder's nine open-source pieces
