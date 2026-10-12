@@ -57,11 +57,45 @@ secrets are in place (a missing secret is reported and skipped, never billed). C
 | GitHub GPU | native / watch / Omni on a real NVIDIA T4, energy from the card's own meter | `gpu-bench` (needs the `gpu-t4` runner) | billed per minute |
 | One chip, the whole test | wire check, envelope, smoke, two preregistered confirmations (compute, AI token generation), the operator's power cap underneath, the fault drill, AI serving (vLLM) | `scripts/gpu_rented_run.sh` on a rented card (`docs/GPU_RUN_GUIDE.md`, C) | one A10 is about $0.75 an hour; the whole test is about 45 hours |
 | The 1,000 copies | the six organisms at 1, 10, 100 and **1,000** copies on one clock with the real card inside | step 8 of the one-chip and eight-chip runs (`tools/run_hil.py`) | inside the runs above |
-| Eight chips | every card of one server at once, sharing its power and cooling, then one language model across all eight | `scripts/gpu_8card.sh` (`docs/GPU_RUN_GUIDE.md`, D) | 8×A100 about $10 an hour, 8×H100 about $24; full design 17–18 h, pooled 9–10 h, fast 3.5 h |
+| Eight chips | every card of one server at once, sharing its power and cooling, then one language model across all eight | `scripts/gpu_8card.sh` (`docs/GPU_RUN_GUIDE.md`, D), or one button: `lambda-gpu` (below) | 8×A100 about $14 an hour, 8×H100 about $24; full design 17–18 h, pooled 9–10 h, fast 3.5 h |
 | AMD APU / AMD GPU | the same preregistered protocol on an AMD chip; on an APU the package's power (CPU and GPU together) | `scripts/apu_run.sh` (AMD's `amd-smi` through `scripts/apu/nvidia-smi`; checked by `tests/test_apu_shim.py`) | the machine's rate |
 
 The standing order holds: GPU money is spent only after the CPU side is done, on **one exact commit** the founder is given,
 with the click-by-click steps in `docs/GPU_RUN_GUIDE.md`.
+
+### The 8-GPU benchmark, one button (Lambda)
+
+The eight-chip run (and the one-chip test) can be started from GitHub without logging in to the machine. The workflow
+`lambda-gpu` rents one Lambda machine, ships it the exact committed tree, starts `scripts/gpu_8card.sh` (or
+`scripts/gpu_rented_run.sh`), watches it for up to 34 hours, brings every result file back as the run's artifact, and
+**always gives the machine back**: when the run prints its last line, at the hour budget plus one hour whatever happens,
+or at the very end of the workflow if anything before it failed. A dry run (the default) shows the price and rents
+nothing. The launcher is `scripts/lambda_gpu.py` (tested against a stand-in for Lambda's API, `tests/test_lambda_gpu.py`);
+the watch is `scripts/lambda_gpu_watch.sh`.
+
+| Mode | What runs | Hour budget (given back by) | 8×A100 at about $14 an hour |
+|---|---|---|---|
+| `8card` `pooled` (default) | every stage, repetitions pooled across the cards | 10.5 h (11.5 h) | about $165 at most |
+| `8card` `fast` | what only a full server shows | 4 h (5 h) | about $72 at most |
+| `8card` `full` | the whole design | 26 h (27 h) | about $387 at most |
+| `1card` `fast` | the compute confirmation on one A10 | 8 h (9 h) | one A10 about $0.75 an hour: about $7 |
+| `1card` `full` | the whole one-card test | 32 h (33 h) | about $25 |
+
+The price shown by the dry run is Lambda's own, read at that moment; the table above is an example. GitHub's own minutes
+for the watch are free on a public repository.
+
+**Click by click (once):**
+1. Lambda Cloud (cloud.lambda.ai) → **API keys** → **Generate API key** → copy it.
+2. Lambda Cloud → **SSH keys** → **Add SSH key** → **Generate a new key** → name it (for example `omni-key`) → save the
+   private key file it downloads.
+3. GitHub → the repository → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**, three
+   times: `LAMBDA_API_KEY` (the key from step 1), `LAMBDA_SSH_PRIVATE_KEY` (the whole private key file from step 2, opened
+   in a text editor and pasted), `LAMBDA_SSH_KEY_NAME` (the name from step 2, for example `omni-key`).
+
+**Every run:** GitHub → **Actions** → **lambda-gpu** → **Run workflow** → choose the branch → leave `dry_run` at `yes` the
+first time and press **Run workflow**: the run's page shows the price per hour, where a machine is free, and the most it
+can cost. To run for real, start it again with `dry_run` set to `no`. The results arrive as the run's artifacts; the
+founder hears what they say before anything goes up.
 
 ## D. The metered clouds — Azure, Google, Amazon
 
@@ -80,7 +114,9 @@ counted. Each cluster is deleted when its arm ends, and every cluster a run made
 
 1. GitHub → the repository → **Actions** → **v5-all-benchmarks** → **Run workflow** → choose the branch.
 2. Leave **free = yes** for everything on GitHub's machines. Type `aks,gke,eks` under **clouds** only once those secrets
-   are in place. **gpu = yes** only once the GPU runner exists.
+   are in place. **gpu = yes** only once the GPU runner exists. Type `8card` (or `1card`) under **lambda_gpu** only once
+   the three Lambda secrets are in place; it starts the rented-machine run for real (pooled), so try `lambda-gpu` with its
+   own dry run first.
 3. Each benchmark runs as its own workflow and writes its own table; nothing is published until the founder has heard it.
 
 © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only. Any commercialization or

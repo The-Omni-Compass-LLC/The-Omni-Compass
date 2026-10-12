@@ -30,8 +30,8 @@ try:
 except ImportError:
     from tools.legal import stamp as _legal_stamp  # pragma: no cover
 
-from realms.harness import (catalog, run_muscle_arm, run_organism_arm, paired, paired_organism, label, summarize,
-                            TOWER, STACK)
+from realms.harness import (catalog, run_muscle_arm, run_organism_arm, run_bodies, Body, paired, paired_organism,
+                            label, summarize, TOWER, STACK)
 
 PREREG_SEEDS = list(range(3000, 3010))
 REALMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized"]
@@ -80,12 +80,22 @@ def plant_harms(arm, nat, ids):
     return out
 
 
+def organism_run(name, rows, seed, arm):
+    """One organism, one arm. The four stacked keep each realm's own body on one clock, so every muscle in the stack runs
+    exactly the native it runs in its own realm, plant by plant (the founder's order: the native identical in all six)."""
+    if name == STACK:
+        bodies = [Body(rs, seed) for rs in rows]
+        return run_bodies(bodies, arm, [list(range(len(bodies)))])
+    return run_organism_arm(rows, seed, arm)
+
+
 def organism_job(args):
     name, rows, seed = args
-    ids = [r["muscle_id"] for r in rows]
-    nat = run_organism_arm(rows, seed, "native")
-    v5 = run_organism_arm(rows, seed, "v5")
-    v3 = run_organism_arm(rows, seed, "compass")
+    ids = ([f"{r['muscle_id']}@{realm}" for realm, rs in zip(REALMS, rows) for r in rs] if name == STACK
+           else [r["muscle_id"] for r in rows])
+    nat = organism_run(name, rows, seed, "native")
+    v5 = organism_run(name, rows, seed, "v5")
+    v3 = organism_run(name, rows, seed, "compass")
     return name, seed, {"v5": paired_organism(v5, nat), "v3": paired_organism(v3, nat), "restore_ok": v5["restore_ok"],
                         "harms_v5": plant_harms(v5, nat, ids), "harms_v3": plant_harms(v3, nat, ids)}
 
@@ -130,7 +140,9 @@ def write_md(out, res, orgs, run):
     w("## The six organisms")
     w("")
     w("Native, the v5 law and the v3 law on the same seeds. Energy saved is native's energy minus the arm's, as a share of "
-      "native's (95% interval over seeds); times v3 is v5's saving over v3's.")
+      "native's (95% interval over seeds); times v3 is v5's saving over v3's. The four stacked keep each realm's own body "
+      "on one clock, so every muscle in the stack runs exactly the native it runs in its own realm, plant by plant: the "
+      "native is identical in all six.")
     w("")
     w("| Organism | Muscles | Label | Work per energy | Work | Energy saved, v5 | Energy saved, v3 | Times v3 | "
       "Violations (pp) | Valid |")
@@ -228,7 +240,7 @@ def main(argv=None):
         res = list(ex.map(muscle_job, [(r, a.seeds) for r in rows], chunksize=4))
         print(f"muscles: {len(res)} in {time.time() - t0:.0f} s", flush=True)
         groups = {realm: [r for r in rows if realm in r["realms"].split(";")] for realm in REALMS}
-        groups[STACK] = [dict(r, muscle_id=f"{r['muscle_id']}@{realm}") for realm in REALMS for r in groups[realm]]
+        groups[STACK] = [groups[realm] for realm in REALMS]           # each realm's own body, the realm's own native
         groups[TOWER] = rows
         jobs = [(name, rs, s) for name, rs in groups.items() if rs for s in a.seeds]
         raw = defaultdict(dict)
@@ -250,7 +262,7 @@ def main(argv=None):
                     agg[mid][1] += dv
                     agg[mid][2] += 1
             harms[arm] = {mid: v for mid, v in agg.items() if v[0] < -1e-9 or v[1] > 0}
-        orgs[name] = {"n": len(groups[name]), "valid": valid, "label": label(per, valid), "summary": summarize(per),
+        orgs[name] = {"n": sum(len(g) for g in groups[name]) if name == STACK else len(groups[name]), "valid": valid, "label": label(per, valid), "summary": summarize(per),
                       "per_seed": per, "v3": {"label": label(per3, True), "summary": summarize(per3), "per_seed": per3},
                       "plants_worse": harms}
     run["elapsed_s"] = round(time.time() - t0)

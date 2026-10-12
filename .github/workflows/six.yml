@@ -5,7 +5,8 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: six
 # The six organisms, native and Omni (tools/run_scale.py): the four realms, the four stacked with every duplicate kept
-# and the whole tower. Each organism is split into shards on separate runners (10 by default); the
+# and the whole tower. The arm is the engine's v5 law on the v5 catalog by default (arm: v5; the four stacked keep each
+# realm's own body, so every muscle runs the native it runs in its own realm); arm: compass reruns v3's stored grid. Each organism is split into shards on separate runners (10 by default); the
 # shards are pooled into one receipt (tools/pool_scale.py). Total runs per organism = shards x runs_per_shard.
 # For the largest sizes, per_shard sets the runs per runner by organism (a runner's job ends at 6 hours; one run of the
 # four stacked at 1,000 copies takes 2 to 3), and runs the total: shards are cut so every organism reaches it.
@@ -20,6 +21,7 @@ on:
       workers: {description: "Processes per runner (fewer for the largest sizes, which need the memory); a number, or JSON by organism, e.g. {\"5\":1,\"6\":2}", default: "4"}
       per_shard: {description: "Optional: runs per runner by organism, as JSON, e.g. {\"1\":5,\"5\":2}; with it, runs is the total per organism", default: ""}
       runs: {description: "With per_shard: total paired runs per organism", default: "100"}
+      arm: {description: "v5 (the engine's law, the v5 catalog) or compass (the v3 law, v3's catalog, its stored grid)", default: "v5"}
   push:
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
@@ -77,7 +79,7 @@ jobs:
       - run: |
           python3 tools/run_scale.py --runs "${{ matrix.n }}" --first "${{ matrix.first }}" --scale "${{ github.event.inputs.scale || '1' }}" \
             --organisms "${{ matrix.org }}" --out "part-${{ matrix.org }}-${{ matrix.shard }}" \
-            --workers "${{ matrix.w }}"
+            --workers "${{ matrix.w }}" --arm "${{ github.event.inputs.arm || 'v5' }}"
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: "part-${{ matrix.org }}-${{ matrix.shard }}", path: "part-${{ matrix.org }}-${{ matrix.shard }}"}

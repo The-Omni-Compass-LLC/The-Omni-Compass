@@ -17,6 +17,7 @@ on:
       gpu: {description: "The GPU benchmark on the GPU runner, billed per minute (yes/no; needs the gpu-t4 runner)", default: "no"}
       clouds: {description: "Metered Kubernetes clouds, comma-separated: aks,gke,eks (empty: none)", default: ""}
       big_organisms: {description: "The big organisms on a rented Azure machine (yes/no; needs AZURE_CREDENTIALS)", default: "no"}
+      lambda_gpu: {description: "The GPU on a rented Lambda machine: 8card or 1card (empty: none; needs the three LAMBDA_ secrets; starts lambda-gpu for real, pooled)", default: ""}
       dry_run: {description: "List what would start, start nothing (yes/no)", default: "no"}
 permissions:
   actions: write
@@ -32,6 +33,7 @@ jobs:
       HAVE_AZURE: ${{ secrets.AZURE_CREDENTIALS != '' }}
       HAVE_GCP: ${{ secrets.GCP_CREDENTIALS != '' }}
       HAVE_AWS: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+      HAVE_LAMBDA: ${{ secrets.LAMBDA_API_KEY != '' && secrets.LAMBDA_SSH_PRIVATE_KEY != '' && secrets.LAMBDA_SSH_KEY_NAME != '' }}
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -68,6 +70,14 @@ jobs:
             fi
             sleep 2
           done
+          LG="${{ github.event.inputs.lambda_gpu }}"
+          if [ -n "$LG" ]; then
+            if [ "$HAVE_LAMBDA" != true ]; then skipped="$skipped lambda-gpu(no LAMBDA_ secrets)"
+            elif [ "${{ github.event.inputs.dry_run }}" = yes ]; then echo "| lambda-gpu ($LG) | would start (dry run) |" >> "$GITHUB_STEP_SUMMARY"
+            elif gh workflow run lambda-gpu.yml --ref "$REF" -f test="$LG" -f mode=pooled -f dry_run=no; then
+              echo "| lambda-gpu ($LG, pooled) | yes |" >> "$GITHUB_STEP_SUMMARY"; started=$((started + 1))
+            else echo "| lambda-gpu ($LG) | FAILED to start |" >> "$GITHUB_STEP_SUMMARY"; failed=$((failed + 1)); fi
+          fi
           for s in $skipped; do echo "| ${s%%(*} | skipped: ${s#*(} |" | sed 's/)|/|/; s/) |/ |/' >> "$GITHUB_STEP_SUMMARY"; done
           echo >> "$GITHUB_STEP_SUMMARY"
           echo "Started $started workflow(s); $failed failed to start. Each runs on its own; its table lands in its own run." >> "$GITHUB_STEP_SUMMARY"

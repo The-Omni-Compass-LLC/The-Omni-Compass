@@ -310,7 +310,11 @@ def main():
     test_apu_shim.main(); check("AMD chip wires (scripts/apu/nvidia-smi through amd-smi): power wire, readings in order, card list, clock wire refused cleanly, an unknown command refused", True)
     from tests import test_compass_arm_v5 as _v5
     _v5.test_v5_default_does_no_harm_to_any_muscle(); _v5.test_v5_tower_is_no_worse_than_native(); _v5.test_v5_default_config_present()
-    check("the v5 law does no harm (realms/compass_arm_v5.py, V5CFG): on every one of the v5 catalog's muscles no more energy, no less work, no more violations than native, every knob handed back on the kill; the whole tower no worse", True)
+    _v5.test_v5_power_cap_only_on_long_line_pools(); _v5.test_v5_every_generation_loop_is_free()
+    check("the v5 law does no harm (realms/compass_arm_v5.py, V5CFG): on every one of the v5 catalog's muscles no more energy, no less work, no more violations than native, every knob handed back on the kill; the whole tower no worse; every generating loop free under its reach, an interactive pool's power cap native", True)
+    from tests import test_lambda_gpu
+    test_lambda_gpu.test_lambda_launcher_end_to_end()
+    check("the Lambda launcher (scripts/lambda_gpu.py) against a stand-in API: prices first, refuses over the ceiling or with nothing free, rents where a machine is free, waits until it runs, gives it back, never prints the key", True)
     from tests import test_cost_to_match
     test_cost_to_match.main(); check("cost to match: the cheapest native setting that reaches Omni-Compass's p95, its extra pods, CPU and machines", True)
     from tests import test_server_power
