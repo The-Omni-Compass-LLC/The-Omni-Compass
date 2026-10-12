@@ -2,6 +2,23 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-12 (night): Every workflow fetches the code, not the 25 GB archive; the capacity test
+
+- **Why the Azure runs stood still.** The archive of raw runs (`results/live/raw`) has grown to 25.5 GB in 81,867 files,
+  more than a GitHub machine's free disk. Sixty-three checkouts in thirty workflows (among them Azure's managed
+  Kubernetes, `aks-metered.yml`) still fetched the whole tree, so they could not get past the checkout; the two Azure
+  runs started this evening were cancelled in their checkout, before any Azure machine was rented (nothing billed). Every
+  checkout now takes the code and everything else except that archive, as `verify.yml` and the grid already did; the
+  KWOK report no longer runs on a push that ran no KWOK test.
+- **1, 10 and 100 everywhere.** The rented-machine workflows (`big-organism.yml`, `big-organism-detached.yml`,
+  `cloud-organism.yml`) default to 100 copies, and every copies input reads 1, 10 or 100.
+- **The capacity test** (`docs/CAPACITY_PREREGISTRATION.md`, `capacity.yml`, `tools/capacity_report.py`,
+  `deploy/kind/loadgen-meter.yaml`): native, and Omni-Compass on top of native, held to the same resource cap (a quota on
+  the served app's CPU, enforced by the cluster) at 1, 1.5, 2 and 3 cores, under a load that rises past what the cap
+  can serve; a work meter counts every request (within the line, late, failed, never sent). One row per cap level with
+  its plain audit line: more work from the same cap, a loss reported as it stands, no difference beyond the noise, or
+  (when the cap was never reached) speed and not more work. The engine is unchanged.
+
 ## 2026-10-12 (evening): The grid is 1, 10 and 100 only, the founder's order
 
 - **No 1,000s.** Every organism runs at 1, 10 and 100 copies, each to 100 runs: 54 squares, native and Omni side by side,

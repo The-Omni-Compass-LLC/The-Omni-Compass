@@ -19,7 +19,7 @@ on:
     inputs:
       cloud: {description: "gcp (Google Cloud) or aws (Amazon)", default: "gcp"}
       organisms: {description: "Organisms, comma separated: compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower", default: "tower,stack"}
-      size: {description: "Copies of each organism on one clock (1, 10, 100, 1000)", default: "1000"}
+      size: {description: "Copies of each organism on one clock (1, 10 or 100: no 1,000s, the founder's order of 12 October)", default: "100"}
       reps: {description: "Paired repetitions per organism", default: "3"}
       duration_s: {description: "Measured seconds per arm (240 organism steps)", default: "10800"}
       machine_type: {description: "Machine type (empty: e2-standard-8 on Google, m6i.2xlarge on Amazon; 8 vCPU, 32 GiB, as Azure's)", default: ""}
@@ -48,7 +48,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - name: Are the cloud's secrets in place?
         id: have
         env:
@@ -143,7 +148,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - name: Log in to Google Cloud
         if: env.CLOUD == 'gcp'
         uses: google-github-actions/auth@v2
@@ -181,7 +191,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - name: Log in to Google Cloud
         if: env.CLOUD == 'gcp'
         uses: google-github-actions/auth@v2
@@ -219,7 +234,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - name: Log in to Google Cloud
         if: env.CLOUD == 'gcp'
         uses: google-github-actions/auth@v2
@@ -257,7 +277,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - name: Log in to Google Cloud
         if: env.CLOUD == 'gcp'
         uses: google-github-actions/auth@v2
@@ -295,7 +320,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - name: Log in to Google Cloud
         if: env.CLOUD == 'gcp'
         uses: google-github-actions/auth@v2
@@ -333,7 +363,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - name: Log in to Google Cloud
         if: env.CLOUD == 'gcp'
         uses: google-github-actions/auth@v2
@@ -371,7 +406,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - name: Log in to Google Cloud
         if: env.CLOUD == 'gcp'
         uses: google-github-actions/auth@v2
@@ -434,7 +474,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - name: Log in to Google Cloud
         if: env.CLOUD == 'gcp'
         uses: google-github-actions/auth@v2

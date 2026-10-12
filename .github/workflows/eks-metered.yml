@@ -26,7 +26,7 @@ on:
       hpa_max: {description: "The app's replica ceiling, the same in every arm (empty: the manifest's 10)", default: ""}
       organism: {description: "One of the six organisms with this cluster inside it (tools/run_kil.py): compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower; empty: the service alone", default: ""}
       load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
-      organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "1"}
+      organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10 or 100)", default: "1"}
   push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
 concurrency: {group: "eks-metered-${{ github.event_name }}", cancel-in-progress: false}   # a push (which runs nothing) never takes a dispatch's place
 env:
@@ -59,7 +59,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
@@ -110,7 +115,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt

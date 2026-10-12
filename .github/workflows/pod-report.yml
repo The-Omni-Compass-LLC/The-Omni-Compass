@@ -20,7 +20,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - uses: actions/download-artifact@v4
         with: {pattern: "paired-*", path: reps, merge-multiple: true, run-id: "${{ inputs.run_id }}", github-token: "${{ secrets.GITHUB_TOKEN }}"}
       - run: python3 tools/pod_report.py reps | tee pod_report.txt

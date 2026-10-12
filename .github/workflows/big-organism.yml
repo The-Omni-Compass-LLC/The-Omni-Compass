@@ -9,12 +9,13 @@ name: big-organism
 # list price about $0.38 an hour), runs the same paired test there (scripts/kind_paired.sh: native against native with
 # Omni-Compass on top, a fresh six-worker kind cluster per arm, the organism at 1,000 copies with the real cluster
 # inside), copies every file back, and deletes the machine and its resource group whatever happens. Uses the
-# AZURE_CREDENTIALS secret; nothing to do by hand.
+# AZURE_CREDENTIALS secret; nothing to do by hand. 1, 10 and 100 copies only (the founder's order of 12 October): no
+# 1,000-copy run is started, the default is 100, and the grid runs every square on GitHub's own machines.
 on:
   workflow_dispatch:
     inputs:
       organisms: {description: "Organisms, comma separated", default: "tower,stack"}
-      size: {description: "Copies of each organism on one clock", default: "1000"}
+      size: {description: "Copies of each organism on one clock (1, 10 or 100)", default: "100"}
       reps: {description: "Paired repetitions per organism", default: "3"}
       duration_s: {description: "Measured seconds per arm (240 organism steps)", default: "2880"}
       vm_size: {description: "Azure machine size", default: "Standard_D8s_v4"}
@@ -55,7 +56,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
       - uses: azure/login@v2
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
       - name: Rent the machine
@@ -91,7 +97,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 omni@$IP "cd omni && sg docker -c '
             export PATH=\$PWD/.v/bin:\$PATH REP=${{ matrix.cell.rep }} ARMS=\"native compass\" DURATION=${{ github.event.inputs.duration_s || '2880' }}
-            export ORGANISM=${{ matrix.cell.organism }} ORGANISM_SCALE=${{ github.event.inputs.size || '1000' }} LOAD_MAX=6 LOADGEN=open
+            export ORGANISM=${{ matrix.cell.organism }} ORGANISM_SCALE=${{ github.event.inputs.size || '100' }} LOAD_MAX=6 LOADGEN=open
             export CLOSURE=tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
             bash scripts/kind_paired.sh > paired.log 2>&1; echo \$? > paired.exit'" || true
           scp -o StrictHostKeyChecking=no "omni@$IP:omni/paired.log" "omni@$IP:omni/paired.exit" . 2>/dev/null || true
@@ -109,10 +115,10 @@ jobs:
           mkdir -p out && scp -o StrictHostKeyChecking=no -r "omni@$IP:omni/bench-*" out/ || true
           cp paired.log out/ 2>/dev/null || true
           ssh -o StrictHostKeyChecking=no omni@$IP 'free -g; df -h /' > out/machine.txt 2>&1 || true
-          echo "${{ matrix.cell.organism }} x${{ github.event.inputs.size || '1000' }} rep ${{ matrix.cell.rep }} on $SIZE" >> out/machine.txt
+          echo "${{ matrix.cell.organism }} x${{ github.event.inputs.size || '100' }} rep ${{ matrix.cell.rep }} on $SIZE" >> out/machine.txt
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: "six-${{ matrix.cell.organism }}-x${{ github.event.inputs.size || '1000' }}-${{ matrix.cell.rep }}", path: out}
+        with: {name: "six-${{ matrix.cell.organism }}-x${{ github.event.inputs.size || '100' }}-${{ matrix.cell.rep }}", path: out}
       - name: Delete the machine
         if: always()
         run: az group delete -n "$RG" --yes --no-wait || true

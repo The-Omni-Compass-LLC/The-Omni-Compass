@@ -15,7 +15,9 @@ name: big-organism-detached
 # cell (six-<organism>-x<size>-<rep>, the same shape as big-organism's), and deletes the machine and its resource group;
 # if not, it reports the progress and leaves the machine alone. A machine older than max_hours is collected as it is
 # and deleted (nothing runs forever on the bill). Uses the AZURE_CREDENTIALS secret; nothing to do by hand. The
-# artifacts are archived with the code by archive-run (results/live/raw/run-<collect run id>/).
+# artifacts are archived with the code by archive-run (results/live/raw/run-<collect run id>/). 1, 10 and 100 copies
+# only (the founder's order of 12 October): no 1,000-copy run is started, the default is 100, and the grid runs every
+# square on GitHub's own machines.
 # The commit the test runs is an input (default: the dispatching commit), so an older engine can be run again on the same
 # machine: the organism names must then be the ones that commit knows (v1: organism_656, stack_1226). A start on the
 # dispatching commit carries "protocol 2" in its name (the test rig as amended on 12 Oct, scripts/kind_bench.sh); the
@@ -30,7 +32,7 @@ on:
     inputs:
       mode: {description: "start (rent and start), collect (look at every running machine now), stop (collect the machine of group now as it stands and delete it) or survey (which 8-vCPU sizes this subscription may rent, region by region, and each region's quota; rents nothing)", default: "start"}
       organisms: {description: "Organisms, comma separated (start)", default: "stack"}
-      size: {description: "Copies of each organism on one clock (start)", default: "1000"}
+      size: {description: "Copies of each organism on one clock (start): 1, 10 or 100", default: "100"}
       reps: {description: "Paired repetitions per organism (start)", default: "3"}
       duration_s: {description: "Measured seconds per arm (240 organism steps) (start)", default: "2880"}
       commit: {description: "The commit to run (start); empty = this one", default: ""}
@@ -109,7 +111,7 @@ jobs:
       LOC: ${{ github.event.inputs.location || 'eastus' }}
       SIZE: ${{ github.event.inputs.vm_size || 'Standard_D8as_v4' }}
       ORGS: ${{ github.event.inputs.organisms || 'stack' }}
-      SCALE: ${{ github.event.inputs.size || '1000' }}
+      SCALE: ${{ github.event.inputs.size || '100' }}
       REPS: ${{ github.event.inputs.reps || '3' }}
       DUR: ${{ github.event.inputs.duration_s || '2880' }}
       SHA: ${{ github.event.inputs.commit || github.sha }}

@@ -1,0 +1,149 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: capacity
+# The capacity test (the founder's order of 12 October; docs/CAPACITY_PREREGISTRATION.md): native, and Omni-Compass on top
+# of native, held to the same resource cap (a quota on the served app's CPU, enforced by the cluster) at several cap
+# levels, under a load that rises past what the cap can serve; the work meter counts every request, so completed work is
+# a count. Both arms of a repetition on one runner, each on a fresh six-worker kind cluster, the order rotated
+# (scripts/kind_paired.sh). One job per cap level and repetition; the report (tools/capacity_report.py) writes one row per
+# cap level with its plain audit line, and what each step up in the cap gives each arm. Every run's raw files and table
+# are committed back to the branch it ran on (results/live/raw/capacity-run-<id>/); the three-run readings come from runs
+# A, B and C, and the founder hears what they say before a table goes up.
+run-name: >-
+  ${{ github.event_name != 'workflow_dispatch' && 'capacity' ||
+      format('capacity {0}: caps {1} reps {2} rates {3}', inputs.label, inputs.caps, inputs.reps, inputs.rate_steps) }}
+on:
+  workflow_dispatch:
+    inputs:
+      label: {description: "A, B or C (the three runs), or smoke (the tuning case, not counted)", default: "A"}
+      caps: {description: "Cap levels, millicores of the served app's CPU, as a JSON list", default: "[1000,1500,2000,3000]"}
+      reps: {description: "Repetitions per cap level, as a JSON list", default: "[1,2,3,4,5]"}
+      rate_steps: {description: "The work meter's rates, requests per second, rising, one per step", default: "5 10 20 30 40 60"}
+      duration_s: {description: "Measured seconds per arm", default: "1200"}
+      slo_ms: {description: "The response-time line, ms", default: "500"}
+  push:                    # registers the workflow on the branch it is pushed to; the jobs run only when started by hand
+permissions:
+  contents: write
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  run:
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      max-parallel: 40
+      matrix:
+        cap: ${{ fromJSON(github.event.inputs.caps) }}
+        rep: ${{ fromJSON(github.event.inputs.reps) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4      # the code the cluster and the controller need, not the 82,000 result files
+        with: {sparse-checkout: "deploy\nscripts\ntools\npilot\nfleet\ntuning\nomni_controller\nomnicompass\nrealms\nhardware\nresults/hardware"}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: helm/kind-action@v1     # kind v0.31.0 (Kubernetes v1.35.0), as the grid; a refused download is tried again below
+        id: kind
+        continue-on-error: true
+        with: {install_only: true, version: v0.31.0, kubectl_version: v1.35.0}
+      - name: kind and kubectl again, if the first download was refused
+        if: steps.kind.outcome == 'failure'
+        run: bash scripts/kind_install.sh v0.31.0 v1.35.0
+      - run: python tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
+      - run: bash scripts/kind_paired.sh
+        env:
+          REP: ${{ matrix.rep }}
+          ARMS: native compass
+          CAP_CPU_M: ${{ matrix.cap }}
+          LOADGEN: meter
+          RATE_STEPS: ${{ github.event.inputs.rate_steps }}
+          DURATION: ${{ github.event.inputs.duration_s }}
+          SLO_MS: ${{ github.event.inputs.slo_ms }}
+          CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: "cap-${{ matrix.cap }}-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}"}
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  report:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4   # the branch, to commit the results back; the archived raw runs stay out
+        with:
+          ref: "${{ github.ref_name }}"
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with: {pattern: "cap-*", path: caps}
+      - name: The table, one row per cap level
+        run: |
+          python tools/capacity_report.py caps --out caps/CAPACITY.md
+          { echo "## Capacity test, run ${{ github.event.inputs.label }} (rates ${{ github.event.inputs.rate_steps }} per second, line ${{ github.event.inputs.slo_ms }} ms)"; echo; cat caps/CAPACITY.md; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: capacity, path: "caps/CAPACITY.*"}
+      - name: The results, committed back to the branch the run ran on
+        if: always()
+        run: |
+          d="results/live/raw/capacity-run-${{ github.run_id }}"
+          mkdir -p "$d"
+          [ -d caps ] && cp -r caps/. "$d/"
+          printf 'label=%s\ncaps=%s\nreps=%s\nrate_steps=%s\nduration_s=%s\nslo_ms=%s\ncommit=%s\n' "${{ github.event.inputs.label }}" \
+            '${{ github.event.inputs.caps }}' '${{ github.event.inputs.reps }}' "${{ github.event.inputs.rate_steps }}" \
+            "${{ github.event.inputs.duration_s }}" "${{ github.event.inputs.slo_ms }}" "${{ github.sha }}" > "$d/RUN.txt"
+          ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add --sparse "$d"
+          git commit -q -m "Capacity test ${{ github.event.inputs.label }}, run ${{ github.run_id }}: raw files and table"
+          for i in 1 2 3 4 5 6; do
+            git push origin "HEAD:${{ github.ref_name }}" && exit 0
+            sleep $((i * 5)); git pull --rebase -q origin "${{ github.ref_name }}" || true
+          done
+          echo "::error::the results could not be pushed after six attempts"; exit 1
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

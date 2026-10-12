@@ -120,7 +120,31 @@ kubectl -n kube-system patch deployment coredns -p "$pin"
 kubectl -n kube-system rollout status deployment/metrics-server --timeout=300s
 kubectl -n kube-system rollout status deployment/coredns --timeout=300s
 fi   # AKS runs its own metrics-server and CoreDNS on the system pool
+if [ -n "${CAP_CPU_M:-}" ]; then
+  # the capacity test (docs/CAPACITY_PREREGISTRATION.md): the same resource cap in every arm, set by the cluster itself, not
+  # by either controller: a quota on the CPU limits of the served app's pods (CAP_CPU_M millicores in all), counted for the
+  # pods of one priority class, so the load generator and the probe are outside it. Neither arm can pass it: a new pod or
+  # a raised limit past it is refused by the API server
+  kubectl apply -f - <<YAML
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata: {name: omni-capped}
+value: 0
+globalDefault: false
+description: "the capacity test's cap counts the served app's pods only (the same in every arm)"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata: {name: omni-cap, namespace: default}
+spec:
+  hard: {limits.cpu: "${CAP_CPU_M}m"}
+  scopeSelector:
+    matchExpressions: [{scopeName: PriorityClass, operator: In, values: [omni-capped]}]
+YAML
+  echo "cap_cpu_m=$CAP_CPU_M (a quota on the served app's CPU limits, the same in every arm)" | tee -a "$OUT_DIR/preflight.txt"
+fi
 kubectl apply -f deploy/kind/demo.yaml
+[ -z "${CAP_CPU_M:-}" ] || kubectl patch deployment php-apache --type merge -p '{"spec":{"template":{"spec":{"priorityClassName":"omni-capped"}}}}' >/dev/null
 # a bigger fleet needs a higher replica ceiling or its machines stay empty (9 pods of 200m fit one 2-vCPU worker): the
 # ceiling scales with the fleet when HPA_MAX is set, the same in every arm; the restore checks below expect that range
 HPA_RANGE="1,${HPA_MAX:-10}"
@@ -164,14 +188,24 @@ else
 echo "probe_url=$PROBE_URL (Service via kube-proxy on the control plane)" | tee -a "$OUT_DIR/preflight.txt"
 fi
 kubectl create configmap omni-security --from-literal=hold=false --dry-run=client -o yaml | kubectl apply -f -
-# LOADGEN=closed (default, every set before 22): waits for each answer. LOADGEN=open: a fixed rate, the same work in every arm
+# LOADGEN=closed (default, every set before 22): waits for each answer. LOADGEN=open: a fixed rate, the same work in every arm.
+# LOADGEN=meter (the capacity test): one generator at the scheduled rates RATE_STEPS (requests per second), counting every
+# answer (within the line, late, failed, not sent: deploy/kind/loadgen-meter.yaml)
 LOADGEN="${LOADGEN:-closed}"
+if [ "$LOADGEN" = meter ]; then
+  { [ -z "$ADDONS" ] && [ "$PLATFORM" = kind ] && [ -z "${ORGANISM:-}" ] && [ "${WORKLOAD:-web}" = web ]; } \
+    || { echo "LOADGEN=meter runs on kind, alone (no add-on, organism or batch)"; exit 1; }
+  RATE_STEPS="${RATE_STEPS:?set RATE_STEPS (requests per second per step) for LOADGEN=meter}"
+  sed -e "s#RATE_STEPS_VALUE#$RATE_STEPS#" -e "s#DURATION_VALUE#$DURATION#" -e "s#SLO_MS_VALUE#${SLO_MS:-500}#" \
+    deploy/kind/loadgen-meter.yaml > "$OUT_DIR/loadgen-meter.yaml"
+fi
 if [ -n "$ADDONS" ]; then
   # the same load generator, its requests sent through the add-on's interceptor, which counts them for the scaler
   lg=deploy/kind/loadgen.yaml; [ "$LOADGEN" = "open" ] && lg=deploy/kind/loadgen-open.yaml
   sed 's#http://php-apache #http://keda-add-ons-http-interceptor-proxy.keda:8080/ #' "$lg" > "$OUT_DIR/loadgen.yaml"
   grep -q 'keda-add-ons-http-interceptor-proxy' "$OUT_DIR/loadgen.yaml" || { echo "the load generator was not routed through the add-on"; exit 1; }
   kubectl apply -f "$OUT_DIR/loadgen.yaml"
+elif [ "$LOADGEN" = "meter" ]; then kubectl apply -f "$OUT_DIR/loadgen-meter.yaml"
 elif [ "$LOADGEN" = "open" ]; then kubectl apply -f deploy/kind/loadgen-open.yaml; else kubectl apply -f deploy/kind/loadgen.yaml; fi
 if [ "$PLATFORM" = aks ]; then   # the load generator lives where kind keeps it, off the measured workers: the system pool
   # machine, found by the taint aks_paired.sh gives it (CriticalAddonsOnly) and pinned by its host name (no pool label
@@ -271,6 +305,13 @@ if [ "${WORKLOAD:-web}" = batch ]; then
   load_pid=$!
 elif [ -n "$kil_pid" ]; then
   load_pid=$kil_pid
+elif [ "$LOADGEN" = meter ]; then
+  # the work meter steps through its own rates from the moment the window opens (one pod, nothing scaled), the same
+  # rates in every arm; its warm-up requests are not counted
+  for t in 1 2 3 4 5 6; do kubectl exec deploy/load-generator --request-timeout=20s -- touch /tmp/go && break; sleep 5; done
+  echo "$(date -u +%H:%M:%S) work meter: rates $RATE_STEPS per second, $DURATION s, line ${SLO_MS:-500} ms" > "$OUT_DIR/load_schedule.log"
+  ( sleep "$DURATION" ) &
+  load_pid=$!
 else
 read -r -a steps <<< "$LOAD_STEPS"
 step_s=$(( DURATION / ${#steps[@]} ))
@@ -417,6 +458,15 @@ if [ -n "$robust_pid" ]; then
   if [ -f "$OUT_DIR/omni2.pid" ]; then
     p2=$(cat "$OUT_DIR/omni2.pid"); while kill -0 "$p2" 2>/dev/null; do sleep 2; done
   fi
+fi
+if [ "$LOADGEN" = meter ]; then
+  # the meter's final count (it prints it once its last requests have had their full time to answer)
+  for t in $(seq 1 30); do
+    kubectl logs deploy/load-generator --request-timeout=20s 2>/dev/null | grep '"final": true' | tail -1 > "$OUT_DIR/work_meter.json" || true
+    [ -s "$OUT_DIR/work_meter.json" ] && break; sleep 5
+  done
+  [ -s "$OUT_DIR/work_meter.json" ] || { echo "INVALID RUN: the work meter gave no final count"; exit 1; }
+  echo "work meter: $(jq -c .total "$OUT_DIR/work_meter.json")" | tee -a "$OUT_DIR/preflight.txt"
 fi
 end_read "$OUT_DIR/nodes_end.txt" get nodes -o wide
 end_read "$OUT_DIR/hpa_end.json" get hpa php-apache -o json
