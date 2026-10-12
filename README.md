@@ -53,8 +53,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-12 01:04 | kwok-scale | success | [38189507640](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38189507640) |
 | 2026-10-11 23:59 | big-organism-detached | success | [38186280679](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38186280679) |
-| 2026-10-11 23:44 | kwok-scale | success | [38184547172](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38184547172) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
