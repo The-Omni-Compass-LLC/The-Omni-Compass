@@ -212,6 +212,9 @@ jobs:
           # background with it (an "a && b &" list would leave a shell holding this ssh session open until the test ends)
           ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni; nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat detached.log; echo "--- paired log"; tail -5 paired-*.log run-*.log 2>/dev/null; pgrep -af "kind_paired|run_scale" >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
           echo "::notice::$RG in $LOC: test $TEST, $ORGS at $SCALE copies, $REPS repetitions from $R0 (of $DUR s an arm with the cluster inside), commit $SHA, collected and deleted after $MAXH h at the latest; collect looks at it every two hours"
+      - name: A start that failed after renting deletes its machine (nothing bills for a test that is not running)
+        if: failure()
+        run: az group delete -n "$RG" --yes --no-wait || true
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
