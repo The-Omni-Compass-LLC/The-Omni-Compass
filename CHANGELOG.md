@@ -2,6 +2,33 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-12: The grid filled to 1,000 runs in every square, on the max
+
+- **Tonight's first dispatch was cut wrong and is replaced.** Its shards were sized from v3's run times; on the max a
+  100-copy or 1,000-copy shard would have passed GitHub's six-hour job limit and handed in nothing, and with the cluster
+  inside the 100- and 1,000-copy organisms could not keep the window's clock. 27 of its 31 runs were cancelled before
+  any result (`results/grid_v5/DISPATCHED.json` says which); the 1-copy and 10-copy modelled squares (1,000 runs each)
+  and the first ten repetitions with the cluster inside at 1 and 10 copies are kept.
+- **Measured run times on the max** (work waiting in line): a paired run takes 7 to 29 s at 1 copy, 67 to 359 s at 10,
+  11 minutes (compute) and 30 minutes (the tower) at 100, and at 1,000 copies the compute realm steps in 17.5 s and holds
+  6.8 GB. Every shard is cut from these so it ends inside a runner's six hours and memory.
+- **The conductor** (`scripts/dispatch_grid.py`, `grid.yml` every 15 minutes, and the six and six-kube buttons with their
+  defaults): starts every run of every square not yet started, the 10-run squares of every size first, then 100, then
+  1,000; reads started runs back from their own names and never starts one twice; keeps the repository's jobs at what
+  GitHub runs plus a margin, so every runner is busy and other workflows still get one. The 1,000-copy shards are held at
+  their first ten runs until those runs' own times are read back.
+- **Nothing lost at a cutoff** (`tools/run_scale.py`): each run is written as it ends, with its plant sums, its own time
+  and its memory; a shard starts no run past its deadline. `tools/pool_scale.py` says when a block is short of a run
+  ("9 of 10"), and never pools across engines.
+- **The four stacked at 1,000 modelled copies** is the four realms' runs on the same seeds joined plant for plant: its
+  four bodies share nothing on the clock (each realm's own body, the founder's order), and whole it needs 30 GB, past a
+  GitHub machine; joined and run whole agree to rounding (`tests/test_run_scale.py`).
+- **Where a square cannot run on GitHub**: the tower at 1,000 modelled copies (about 6 hours and 15 GB a run) and the
+  tower and the four stacked at 1,000 copies with the cluster inside (about 17 and 22 hours a repetition) run on rented
+  Azure machines. With the cluster inside, the 100-copy tower and four stacked get 2,400 s and 3,600 s windows and the
+  1,000-copy realms 7,200 s, so the max keeps the organism's clock; at 1,000 copies each arm runs on its own runner.
+- **Jobs fetch only the code they run**: the whole tree (82,000 result files) took 16 of a shard's 20 minutes.
+
 ## 2026-10-12: Omni v5 at the max: every muscle at its own limit, work waiting in line, wear beside the work
 
 - **The max is the default brain** (`realms/compass_arm_v5.py`, `V5CFG`; commits `8872db382`, `07a088433`): every

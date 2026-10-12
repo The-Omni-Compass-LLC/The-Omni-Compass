@@ -5,42 +5,69 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: six-kube
 # The six organisms with the real Kubernetes cluster inside (tools/run_kil.py): the four realms, the whole tower and the
-# four stacked, each native against native with Omni-Compass on top (compass law), paired on one
-# runner per repetition, each arm on a fresh six-worker kind cluster (scripts/kind_paired.sh). Six organisms times two
-# arms: twelve columns, one report (tools/six_kube_report.py -> SIX_KUBE.md).
+# four stacked, each native against native with Omni-Compass on top (the max), paired on one runner per repetition, each
+# arm on a fresh six-worker kind cluster (scripts/kind_paired.sh). Six organisms times two arms: twelve columns, one report
+# (tools/six_kube_report.py -> SIX_KUBE.md). Started with its defaults (Actions -> six-kube -> Run workflow), it starts
+# the whole grid: every organism at 1, 10, 100 and 1,000 copies, every size to 1,000 repetitions (scripts/dispatch_grid.py,
+# kept going by grid.yml until every square is full). Started with what = runs, it runs one dispatch. The organism steps
+# on the window's clock, so the window is set long enough for the max's arm to make every step in time (a repetition
+# more than 5% late is marked off the clock). At 1,000 copies the two arms of a repetition together pass a runner's six
+# hours, so with split = yes each arm runs on its own runner (the repetitions average out the difference between runners);
+# the tower and the four stacked at 1,000 copies run on rented machines (big-organism-detached).
+run-name: >-
+  ${{ github.event_name != 'workflow_dispatch' && 'six-kube' ||
+      inputs.what != 'runs' && 'six-kube: start every square of the grid' ||
+      format('six-kube x{0} orgs {1} reps {2}+{3} arms {4} split {5} window {6}', inputs.sizes, inputs.organisms,
+             inputs.rep_first, inputs.reps, inputs.arms, inputs.split, inputs.durations_s) }}
 on:
   workflow_dispatch:
     inputs:
-      reps: {description: "Paired repetitions per organism at each size, in the order of sizes", default: "10,10,10,10"}
-      rep_first: {description: "The first repetition of this dispatch (1-based), so 1,000 runs per square can be cut into dispatches under GitHub's 256 jobs", default: "1"}
-      sizes: {description: "Copies of each organism on one clock, the real cluster inside (1, 10, 100, 1000)", default: "1,10,100,1000"}
-      durations_s: {description: "Measured seconds per arm at each size (240 organism steps; a bigger organism needs a longer step)", default: "960,960,1440,2880"}
+      what: {description: "grid (start every square of the whole grid, every size to 1,000 repetitions) or runs (only the repetitions below)", default: "grid"}
+      sizes: {description: "runs: copies of each organism on one clock, the real cluster inside (1, 10, 100, 1000; comma-separated)", default: "1"}
+      organisms: {description: "runs: organisms, comma-separated (compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower)", default: "compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower"}
+      reps: {description: "runs: paired repetitions of each organism (one number, or one per size)", default: "10"}
+      rep_first: {description: "runs: the first repetition (1-based), so 1,000 repetitions per square can be cut into dispatches under GitHub's 256 jobs", default: "1"}
+      durations_s: {description: "runs: measured seconds per arm (240 organism steps; one number, or one per size)", default: "960"}
       arms: {description: "Arms, in rotation order", default: "native compass"}
+      split: {description: "runs: yes = each arm of a repetition on its own runner (for the 1,000-copy size); no = both on one runner", default: "no"}
       load_max: {description: "Load-generator replicas at each organism's peak demand", default: "6"}
       loadgen: {description: "closed (waits for answers) or open (fixed rate, equal work)", default: "open"}
+permissions:
+  actions: write
+  contents: read
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
+  grid:
+    if: github.event.inputs.what != 'runs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with: {sparse-checkout: "scripts\nresults/grid_v5\ntools\nrealms\nomnicompass\nomni_controller"}
+      - name: Start every square with the cluster inside not yet started
+        env: {GITHUB_TOKEN: "${{ github.token }}"}
+        run: python3 scripts/dispatch_grid.py tick --grid six-kube --ref "${{ github.ref_name }}"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   plan:
+    if: github.event.inputs.what == 'runs'
     runs-on: ubuntu-latest
     outputs: {cells: "${{ steps.r.outputs.cells }}"}
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with: {sparse-checkout: scripts}
       - id: r
         run: |
-          python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json
-          sizes = [int(x) for x in "${{ github.event.inputs.sizes || '1,10,100,1000' }}".split(",")]
-          reps = [int(x) for x in "${{ github.event.inputs.reps || '10,10,10,10' }}".split(",")]
-          r0 = int("${{ github.event.inputs.rep_first || '1' }}")
-          durs = [int(x) for x in "${{ github.event.inputs.durations_s || '960,960,1440,2880' }}".split(",")]
-          orgs = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
-                  "tower", "stack"]
-          cells = [{"organism": o, "size": sz, "rep": r, "duration": durs[min(i, len(durs) - 1)]}
-                   for i, sz in enumerate(sizes) for o in orgs for r in range(r0, r0 + reps[min(i, len(reps) - 1)])]
-          print("cells=" + json.dumps(cells))
-          PY
+          echo "cells=$(python3 scripts/dispatch_grid.py kube-matrix --sizes "${{ github.event.inputs.sizes }}" \
+            --organisms "${{ github.event.inputs.organisms }}" --reps "${{ github.event.inputs.reps }}" \
+            --rep-first "${{ github.event.inputs.rep_first }}" --durations "${{ github.event.inputs.durations_s }}" \
+            --split "${{ github.event.inputs.split }}")" >> "$GITHUB_OUTPUT"
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -48,15 +75,16 @@ jobs:
     needs: plan
     strategy:
       fail-fast: false
-      max-parallel: 64   # GitHub ran 86 of this repository's jobs at once on 12 Oct; several dispatches share the rest
+      max-parallel: 256  # the conductor keeps the repository's jobs at what GitHub runs plus a margin (scripts/dispatch_grid.py)
       matrix:
         cell: "${{ fromJSON(needs.plan.outputs.cells) }}"
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 355
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # the code the cluster and the organism need, not the 82,000 result files
+        with: {sparse-checkout: "deploy\nscripts\ntools\npilot\nfleet\ntuning\nomni_controller\nomnicompass\nrealms\nhardware\nresults/hardware"}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
@@ -65,7 +93,7 @@ jobs:
       - run: bash scripts/kind_paired.sh
         env:
           REP: ${{ matrix.cell.rep }}
-          ARMS: ${{ github.event.inputs.arms || 'native compass' }}
+          ARMS: ${{ matrix.cell.arms }}
           DURATION: ${{ matrix.cell.duration }}
           ORGANISM: ${{ matrix.cell.organism }}
           ORGANISM_SCALE: ${{ matrix.cell.size }}
@@ -74,7 +102,7 @@ jobs:
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: "six-${{ matrix.cell.organism }}-x${{ matrix.cell.size }}-${{ matrix.cell.rep }}", path: "bench-*-${{ matrix.cell.rep }}"}
+        with: {name: "six-${{ matrix.cell.organism }}-x${{ matrix.cell.size }}-${{ matrix.cell.rep }}${{ matrix.cell.tag }}", path: "bench-*-${{ matrix.cell.rep }}"}
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -86,6 +114,7 @@ jobs:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
+        with: {sparse-checkout: "tools\npilot\nrealms\nomnicompass\nomni_controller\nfleet\nhardware\nresults/hardware"}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt

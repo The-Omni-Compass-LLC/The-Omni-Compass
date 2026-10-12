@@ -5,63 +5,73 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: six
 # The six organisms, native and Omni (tools/run_scale.py): the four realms, the four stacked with every duplicate kept
-# and the whole tower. The arm is the engine's v5 law on the v5 catalog by default (arm: v5; the four stacked keep each
-# realm's own body, so every muscle runs the native it runs in its own realm); arm: compass reruns v3's stored grid. Each organism is split into shards on separate runners (10 by default); the
-# shards are pooled into one receipt (tools/pool_scale.py). Total runs per organism = shards x runs_per_shard.
-# For the largest sizes, per_shard sets the runs per runner by organism (a runner's job ends at 6 hours; one run of the
-# four stacked at 1,000 copies takes 2 to 3), and runs the total: shards are cut so every organism reaches it.
-# Started by hand (Actions -> six -> Run workflow) or by a commit message containing [six].
+# and the whole tower, on the engine's v5 law at the max on the v5 catalog, with work waiting in line (the founder's
+# order). Started with its defaults (Actions -> six -> Run workflow), it starts the whole grid: every organism at 1, 10,
+# 100 and 1,000 copies, every size to 1,000 runs (scripts/dispatch_grid.py: the conductor starts the runs not yet started,
+# small squares first, and grid.yml keeps it going every 15 minutes until every square is full, using every runner GitHub
+# gives this repository). Started with what = runs, it runs one dispatch: the runs first .. first+runs-1 of the organisms
+# asked, at one size, cut into shards from the max's measured run times; each shard stops starting runs at its deadline
+# and hands in every run it finished. The shards are pooled into one receipt (tools/pool_scale.py); six-pool pools a
+# whole square from many dispatches.
+run-name: >-
+  ${{ github.event_name != 'workflow_dispatch' && 'six' ||
+      inputs.what != 'runs' && 'six: start every square of the grid' ||
+      format('six x{0} {1} orgs {2} runs {3}+{4}', inputs.scale, inputs.load, inputs.orgs, inputs.first, inputs.runs) }}
 on:
   workflow_dispatch:
     inputs:
-      runs_per_shard: {description: "Paired runs per shard (10 shards per organism)", default: "100"}
-      scale: {description: "Copies of each organism on one clock (1, 10, 100, ...)", default: "1"}
-      shards: {description: "Shard numbers, as a JSON list", default: "[0,1,2,3,4,5,6,7,8,9]"}
-      orgs: {description: "Organisms, as a JSON list of numbers 1-6", default: '["1","2","3","4","5","6"]'}
-      workers: {description: "Processes per runner (fewer for the largest sizes, which need the memory); a number, or JSON by organism, e.g. {\"5\":1,\"6\":2}", default: "4"}
-      per_shard: {description: "Optional: runs per runner by organism, as JSON, e.g. {\"1\":5,\"5\":2}; with it, runs is the total per organism", default: ""}
-      runs: {description: "With per_shard: total paired runs per organism", default: "100"}
-      first: {description: "With per_shard: the first run of this dispatch (0-based; runs first .. first+runs-1, seeds 7000+first on), so one square's 1,000 runs can be cut into dispatches under GitHub's 256 jobs", default: "0"}
+      what: {description: "grid (start every square of the whole grid, every size to 1,000 runs) or runs (only the runs below)", default: "grid"}
+      scale: {description: "runs: copies of each organism on one clock (1, 10, 100 or 1000)", default: "1"}
+      orgs: {description: "runs: organisms, comma-separated numbers 1-6", default: "1,2,3,4,5,6"}
+      first: {description: "runs: the first run (0-based; seeds 7000+first on, so the 1-, 10-, 100- and 1,000-run squares nest)", default: "0"}
+      runs: {description: "runs: how many runs of each organism", default: "1000"}
+      per_shard: {description: "runs: runs per runner by organism as JSON, e.g. {\"1\":64} (empty: cut from the measured run times)", default: ""}
+      workers: {description: "runs: processes per runner by organism as JSON, or one number (empty: from the measured memory)", default: ""}
       arm: {description: "v5 (the engine's law, the v5 catalog) or compass (the v3 law, v3's catalog, its stored grid)", default: "v5"}
-      load: {description: "The organisms' work demand: normal (their own), climb (1 2 3 2 3 4 ...) or line (work waiting in line)", default: "normal"}
+      load: {description: "The organisms' work demand: line (work waiting in line), normal (their own) or climb (1 2 3 2 3 4 ...)", default: "line"}
+      deadline_min: {description: "runs: a shard starts no run that would end after this many minutes (GitHub cuts a job at 360)", default: "320"}
   push:
+permissions:
+  actions: write
+  contents: read
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
+  grid:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.what != 'runs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with: {sparse-checkout: "scripts\nresults/grid_v5\ntools\nrealms\nomnicompass\nomni_controller"}
+      - name: Start every square of the modelled grid not yet started
+        env: {GITHUB_TOKEN: "${{ github.token }}"}
+        run: python3 scripts/dispatch_grid.py tick --grid six --ref "${{ github.ref_name }}"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   plan:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[six]')
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.what == 'runs') || contains(github.event.head_commit.message, '[six]')
     runs-on: ubuntu-latest
     outputs: {matrix: "${{ steps.p.outputs.matrix }}"}
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with: {sparse-checkout: scripts}
       - id: p
         env:
-          ORGS: ${{ github.event.inputs.orgs || '["1","2","3","4","5","6"]' }}
-          SHARDS: ${{ github.event.inputs.shards || '[0,1,2,3,4,5,6,7,8,9]' }}
-          N: ${{ github.event.inputs.runs_per_shard || '100' }}
-          PER: ${{ github.event.inputs.per_shard || '' }}
-          RUNS: ${{ github.event.inputs.runs || '100' }}
+          SCALE: ${{ github.event.inputs.scale || '1' }}
+          ORGS: ${{ github.event.inputs.orgs || '1,2,3,4,5,6' }}
           FIRST: ${{ github.event.inputs.first || '0' }}
-          W: ${{ github.event.inputs.workers || '4' }}
+          RUNS: ${{ github.event.inputs.runs || '100' }}
+          PER: ${{ github.event.inputs.per_shard || '' }}
+          W: ${{ github.event.inputs.workers || '' }}
         run: |
-          python3 - >> "$GITHUB_OUTPUT" <<'PY'
-          import json, os
-          orgs = json.loads(os.environ["ORGS"]); inc = []
-          if os.environ["PER"].strip():
-              per, total, f0 = json.loads(os.environ["PER"]), int(os.environ["RUNS"]), int(os.environ["FIRST"])
-              for o in orgs:
-                  n = int(per.get(o, per.get(str(o), 10)))
-                  inc += [{"org": o, "shard": f0 // n + i, "first": f0 + i * n, "n": min(n, total - i * n)}
-                          for i in range(-(-total // n))]
-          else:
-              n = int(os.environ["N"])
-              inc = [{"org": o, "shard": s, "first": s * n, "n": n} for o in orgs for s in json.loads(os.environ["SHARDS"])]
-          w = json.loads(os.environ["W"])
-          for x in inc:
-              x["w"] = int(w.get(x["org"], w.get(str(x["org"]), 1))) if isinstance(w, dict) else int(w)
-          print("matrix=" + json.dumps({"include": inc}))
-          PY
+          echo "matrix=$(python3 scripts/dispatch_grid.py matrix --scale "$SCALE" --orgs "$ORGS" --first "$FIRST" --runs "$RUNS" \
+            --per-shard "$PER" --workers "$W")" >> "$GITHUB_OUTPUT"
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -69,24 +79,28 @@ jobs:
     needs: plan
     strategy:
       fail-fast: false
-      max-parallel: 64   # GitHub ran 86 of this repository's jobs at once on 12 Oct; several dispatches share the rest
+      max-parallel: 256  # the conductor keeps the repository's jobs at what GitHub runs plus a margin (scripts/dispatch_grid.py)
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ubuntu-latest
     timeout-minutes: 355
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4      # only the code the run needs: the whole tree (82,000 result files) took 16 minutes
+        with: {sparse-checkout: "realms\ntools\nomnicompass\nomni_controller"}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
-      - run: |
+      - name: The runs (each kept as it finishes; none started past the deadline)
+        timeout-minutes: 340
+        run: |
           python3 tools/run_scale.py --runs "${{ matrix.n }}" --first "${{ matrix.first }}" --scale "${{ github.event.inputs.scale || '1' }}" \
-            --organisms "${{ matrix.org }}" --out "part-${{ matrix.org }}-${{ matrix.shard }}" \
-            --workers "${{ matrix.w }}" --arm "${{ github.event.inputs.arm || 'v5' }}" --load "${{ github.event.inputs.load || 'normal' }}"
+            --organisms "${{ matrix.org }}" --out "part-${{ matrix.org }}-${{ matrix.first }}" \
+            --workers "${{ matrix.w }}" --arm "${{ github.event.inputs.arm || 'v5' }}" --load "${{ github.event.inputs.load || 'line' }}" \
+            --deadline-min "${{ github.event.inputs.deadline_min || '320' }}"
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: "part-${{ matrix.org }}-${{ matrix.shard }}", path: "part-${{ matrix.org }}-${{ matrix.shard }}"}
+        with: {name: "part-${{ matrix.org }}-${{ matrix.first }}", path: "part-${{ matrix.org }}-${{ matrix.first }}", if-no-files-found: warn}
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -98,11 +112,12 @@ jobs:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
+        with: {sparse-checkout: "realms\ntools\nomnicompass\nomni_controller"}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
       - uses: actions/download-artifact@v4
-        with: {path: parts}
+        with: {path: parts, pattern: "part-*"}
       - run: python3 tools/pool_scale.py SIX.md "parts/*/SCALE.json" | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with: {name: six-receipts, path: "SIX.*"}

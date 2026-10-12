@@ -64,6 +64,14 @@ the founder overrides one in the conversation.
 - The grid: each organism runs native and omni at 1, 10, 100 and 1,000 clustered copies (one organism, ten of the
   same organism, a hundred, a thousand) × 1, 10, 100 and 1,000 runs: 96 squares, with both values shown in every square.
   1,000 is the maximum. Every grid button starts all four sizes × all four run counts and uses every runner GitHub gives.
+  The conductor (`scripts/dispatch_grid.py`, `grid.yml` every 15 minutes; the six and six-kube buttons with their
+  defaults) starts every run not yet started, reads started runs back from their names, never starts one twice, and keeps
+  the queue at what GitHub runs plus a margin. Shards are cut from measured run times; each stops at its deadline and
+  hands in every run it finished. Squares that cannot run on GitHub say where they run: the four stacked at 1,000
+  modelled copies is the four realms' runs joined plant for plant (its bodies share nothing; equal to rounding), the
+  tower at 1,000 modelled copies and the tower and four stacked at 1,000 with the cluster inside go to rented Azure
+  machines. With the cluster inside, the window is long enough for the max to keep the organism's clock; at 1,000
+  copies each arm of a repetition runs on its own runner.
 - Three loads: each organism's own load, the climb (the load stepping by one, 1 2 3 2 3 4 …) and work waiting in line
   (`LINE`, `realms/harness.py`); every muscle alone runs its own load and the line.
 - Benchmark breadth: every domain that can be benchmarked defensibly (`docs/REGISTER.md`), with Omni on top of that

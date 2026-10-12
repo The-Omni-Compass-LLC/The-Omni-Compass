@@ -19,56 +19,82 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import summarize  # noqa: E402
-from tools.run_scale import ORGS, REALMS, CATALOGS, LOADS, rows_for, label_for  # noqa: E402
+from tools.run_scale import ORGS, REALMS, CATALOGS, LOADS, SEED0, rows_for, label_for, joined  # noqa: E402
 from realms.harness import STACK, organism_name  # noqa: E402
 
 
 def main(out, *paths):
     files = [p for g in paths for p in glob.glob(g)]
-    per, scale, commits, arms, loads = {}, None, set(), set(), set()
+    per, scale, commits, arms, loads, engines, scales = {}, None, set(), set(), set(), set(), set()
     cat, stack = None, "body"
     for f in files:
         d = json.loads(Path(f).read_text())
-        scale = d["scale"]; commits.add(d["commit"][:12])
+        scale = d["scale"]; scales.add(scale); commits.add(d["commit"][:12])
         arms.add(d.get("arm", "compass")); stack = d.get("stack", "body"); loads.add(d.get("load", "normal"))
+        engines.add(d.get("engine", "not recorded"))
         cat = str(ROOT / d["catalog"]) if d.get("catalog") else None
         for k, runs in d["per_run"].items():
             per.setdefault(k, {}).update(runs)
-    total = max(len(v) for v in per.values())
     assert len(arms) == 1, f"shards from different arms cannot be pooled: {sorted(arms)}"
     assert len(loads) == 1, f"shards under different loads cannot be pooled: {sorted(loads)}"
+    assert len(scales) == 1, f"shards of different sizes cannot be pooled: {sorted(scales)}"
+    known = sorted(e for e in engines if e.startswith("omni-"))
+    assert len(known) <= 1, f"shards from different engines cannot be pooled: {known}"
     arm, load = arms.pop(), loads.pop()
+    # the four stacked in v5 are the four realms' own bodies side by side on the clock, sharing nothing: where it was too
+    # big to run as one (1,000 copies is 1.9 million modelled muscles, past one runner's memory), its run on a seed is the
+    # four realms' runs on that seed joined plant for plant (tools/run_scale.py joined(); equal to the direct run to
+    # rounding, tests/test_run_scale.py)
+    n_joined = 0
+    if arm == "v5" and stack == "realms" and all(r in per for r in REALMS):
+        st = per.setdefault(STACK, {})
+        for s in set.intersection(*(set(per[r]) for r in REALMS)) - set(st):
+            parts = [per[r][s] for r in REALMS]
+            if all("sums" in p for p in parts):
+                st[s] = joined(parts); n_joined += 1
+        if not st:
+            del per[STACK]
+    total = max(len(v) for v in per.values())
     law = ("the v5 law on every muscle (`realms/compass_arm_v5.py`, engine omni-v5)" if arm == "v5" else
            "the v3 compass law on every muscle (`realms/compass_arm.py`)")
     count = lambda k: (sum(len(rows_for(r, scale, cat)) for r in REALMS) if organism_name(k) == STACK and stack == "realms"
                        else len(rows_for(k, scale, cat)))
     L = [f"# Six organisms at {scale}x size, {LOADS[load]}, up to {total} runs (pooled from {len(files)} shards)", "",
-         f"Evidence class **S** (models). Commit(s) {', '.join(sorted(commits))}. Native: each organism's own controllers. "
-         f"Omni: {law}. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 "
-         "are nested. Band first: no win unless the time over the service line is no higher than native's.", ""]
+         f"Evidence class **S** (models). Engine {', '.join(known) or 'not recorded'}, commit(s) {', '.join(sorted(commits))}. "
+         f"Native: each organism's own controllers. Omni: {law}. Each block is the first N runs (seeds {SEED0} on), so 1, 10, "
+         "100 and 1,000 are nested; a block short of a run says so (Runs column: finished of the block). Band first: no win "
+         "unless the time over the service line is no higher than native's."
+         + (f" The four stacked: {n_joined} of its runs are the four realms' runs on the same seeds joined plant for plant "
+            "(its four bodies share nothing on the clock; equal to running it whole, to rounding)." if n_joined else ""), ""]
     summ = {}
-    for n in [x for x in (1, 10, 100, 1000) if x <= total]:
+    for n in [x for x in (1, 10, 100, 1000) if x <= max(total, 1)]:
         L += [f"## {n} run{'s' if n > 1 else ''}", "",
               "| # | Organism | Muscles | Runs | Label | Band first | Work | Misses (pp) | Power given | Work per energy | Knobs handed back |",
               "|---|---|---:|---:|---|---|---:|---:|---:|---:|---|"]
         for num, (k, nm) in ORGS.items():
             if k not in per:
                 continue
-            xs = [per[k][s] for s in sorted(per[k], key=int)][:n]
+            xs = [per[k][str(s)] for s in range(SEED0, SEED0 + n) if str(s) in per[k]]
+            if not xs:
+                continue
             ok = all(c["restore_ok"] for c in xs)
             if len(xs) >= 2:
                 sm = summarize(xs); lab = label_for(arm, xs, ok)
             else:
                 sm = {q: (xs[0][q], xs[0][q], xs[0][q]) for q in ("primary", "work", "energy", "viol_pp")}; lab = "ONE RUN (no label)"
             band = "held" if sm["viol_pp"][0] <= 0 else "NOT held"
-            summ.setdefault(str(n), {})[k] = {"runs": len(xs), "label": lab, "band_first": band, **{q: list(v) for q, v in sm.items()}}
+            summ.setdefault(str(n), {})[k] = {"runs": len(xs), "of": n, "label": lab, "band_first": band,
+                                              "joined": sum(1 for c in xs if c.get("joined_from")),
+                                              **{q: list(v) for q, v in sm.items()}}
             f = lambda q, s=100.0, u="%": f"{s * sm[q][0]:+.3f}{u}" + (f" ({s * sm[q][1]:+.3f} to {s * sm[q][2]:+.3f})" if len(xs) > 1 else "")
-            L.append(f"| {num} | {nm} | {count(k)} | {len(xs)} | **{lab}** | {band} | {f('work')} | {f('viol_pp', 1.0, '')} | "
+            runs = f"{len(xs)}" if len(xs) == n else f"{len(xs)} of {n}"
+            L.append(f"| {num} | {nm} | {count(k)} | {runs} | **{lab}** | {band} | {f('work')} | {f('viol_pp', 1.0, '')} | "
                      f"{f('energy')} | {f('primary')} | {ok} |")
         L.append("")
     Path(out).write_text("\n".join(_legal_stamp(L)) + "\n")
-    Path(out).with_suffix(".json").write_text(json.dumps({"scale": scale, "arm": arm, "load": load, "stack": stack, "summary": summ},
-                                                         indent=1) + "\n")
+    Path(out).with_suffix(".json").write_text(json.dumps({"scale": scale, "arm": arm, "load": load, "stack": stack,
+                                                          "engine": known[0] if known else None, "joined_stack_runs": n_joined,
+                                                          "summary": summ}, indent=1) + "\n")
     print("\n".join(L))
 
 
