@@ -37,6 +37,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-12 08:32 | big-organism-detached stop omni-detached-38215301870 | success | [38224087068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38224087068) |
+| 2026-10-12 08:30 | grid | success | [38223887315](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38223887315) |
 | 2026-10-12 08:05 | six | cancelled | [38215037461](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215037461) |
 | 2026-10-12 07:52 | six-kube | cancelled | [38215254405](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215254405) |
 | 2026-10-12 07:42 | big-organism-detached | success | [38215301870](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38215301870) |
@@ -45,8 +47,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-12 06:27 | aks-metered | cancelled | [38196380124](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38196380124) |
 | 2026-10-12 04:49 | ycsb | success | [38195483021](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195483021) |
 | 2026-10-12 04:23 | sysbench | success | [38195479426](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195479426) |
-| 2026-10-12 03:57 | pgbench | success | [38195447950](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195447950) |
-| 2026-10-12 03:57 | kafka | success | [38195413961](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38195413961) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
