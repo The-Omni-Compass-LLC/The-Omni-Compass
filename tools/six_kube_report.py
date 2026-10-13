@@ -142,9 +142,11 @@ def paired(runs_o, a, k):
             "better": bool(better), "neutral": k in NEUTRAL, "same": bool(same)}
 
 
-def main(root, *more, out=None):
+def main(root, *more, out=None, reps=None):
     root = Path(root)
     runs = collect(root, *more)
+    if reps:          # the grid's nested squares: the first N repetitions of every organism (1, 10 and 100 are nested)
+        runs = {o: {a: {r: g for r, g in by.items() if int(r) <= reps} for a, by in arms.items()} for o, arms in runs.items()}
     orgs = sorted(runs, key=lambda o: (scale_of(o), ORDER.index(organism_name(o.split("@")[0]))))
     keys = [k for k in CLUSTER + ORG if any(not math.isnan(g.get(k, math.nan)) for o in orgs for arms in runs[o].values()
                                              for g in arms.values())]
@@ -155,6 +157,8 @@ def main(root, *more, out=None):
          "controllers and Kubernetes alone. Omni: the compass law on every simulated muscle and the live controller on the "
          "cluster, handed back at 90% of the window. Cluster rows are measured on the real cluster (energy is the declared "
          "power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).", "",
+         *([f"Each square here is its first {reps} repetition{'s' if reps > 1 else ''} (repetitions 1 to {reps}; the grid's "
+            "1-, 10- and 100-repetition squares are nested).", ""] if reps else []),
          "How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column says in words whether it is "
          "better or worse. Lower is better for response times, time over the line, failed requests, pods started, "
          "replicas, machines, energy and the bill (less spent). Higher is better for the organism's work and work per "
@@ -235,5 +239,6 @@ def main(root, *more, out=None):
 if __name__ == "__main__":
     args = sys.argv[1:]
     out = args[args.index("--out") + 1] if "--out" in args else None
-    dirs = [a for i, a in enumerate(args) if a != "--out" and (i == 0 or args[i - 1] != "--out")]
-    sys.exit(main(dirs[0], *dirs[1:], out=out))
+    reps = int(args[args.index("--reps") + 1]) if "--reps" in args else None
+    dirs = [a for i, a in enumerate(args) if a not in ("--out", "--reps") and (i == 0 or args[i - 1] not in ("--out", "--reps"))]
+    sys.exit(main(dirs[0], *dirs[1:], out=out, reps=reps))

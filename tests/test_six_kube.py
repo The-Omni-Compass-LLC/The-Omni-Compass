@@ -80,6 +80,31 @@ class SixKube(unittest.TestCase):
         finally:
             r.arm_gauges, r.organism_record, r.organism_gauges = saved
 
+    def test_first_n_repetitions(self):
+        """The grid's nested squares: --reps N keeps the first N repetitions of every organism, nothing past them."""
+        import json as _json
+        from tools import six_kube_report as r
+        saved = r.arm_gauges, r.organism_record, r.organism_gauges
+        try:
+            r.organism_record = lambda d: {"organism": "stack", "scale": 1}
+            r.organism_gauges = lambda rec: {}
+            r.arm_gauges = lambda d: {"response time (ms), 95th percentile": 100.0 + int(d.name.rsplit("-", 1)[1]) * (d.name.startswith("bench-native") or -1)}
+            with tempfile.TemporaryDirectory() as t:
+                for rep in (1, 2, 3):
+                    for arm in ("native", "compass"):
+                        d = Path(t) / "run-9" / f"six-stack-x1-{rep}" / f"bench-{arm}-{rep}"
+                        d.mkdir(parents=True); (d / "capture.csv").write_text("")
+                counts = {}
+                for n in (1, 2, None):
+                    out = Path(t) / f"r{n}.md"
+                    r.main(t, out=str(out), reps=n)
+                    counts[n] = _json.loads(out.with_suffix(".json").read_text())["organisms"]["stack"]["repetitions"]
+                    if n:
+                        self.assertIn(f"its first {n} repetition", out.read_text())
+                self.assertEqual(counts, {1: 1, 2: 2, None: 3})
+        finally:
+            r.arm_gauges, r.organism_record, r.organism_gauges = saved
+
 
 if __name__ == "__main__":
     unittest.main()

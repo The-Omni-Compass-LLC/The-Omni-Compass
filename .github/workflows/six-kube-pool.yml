@@ -1,0 +1,88 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: six-kube-pool
+# The grid's squares with the real cluster inside, from many runs: a size's repetitions are cut into several six-kube.yml
+# dispatches, and a repetition whose job failed is started again in a later run (scripts/dispatch_grid.py). This workflow
+# downloads every cell of the runs it is given, each run in its own folder (a repetition is paired within one run, and
+# a repetition started again is taken from the latest run where native and Omni are both valid: tools/six_kube_report.py),
+# and writes the report three times, for the first 1, 10 and 100 repetitions of every square (nested). The cells stay on
+# GitHub (gigabytes at 100 copies); the reports are handed out and archived (.github/archive_request.txt).
+on:
+  workflow_dispatch:
+    inputs:
+      runs: {description: "six-kube.yml run ids, comma separated (one size; repetitions started again included)", required: true}
+      label: {description: "A name for the pooled reports (for example v5-x100)", default: "pooled"}
+  push:                    # registers the workflow on the branch it is pushed to; the job runs only when started by hand
+permissions:
+  contents: read
+  actions: read
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  pool:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4      # the code the report needs, not the archived result files
+        with: {sparse-checkout: "realms\ntools\nomnicompass\nomni_controller\npilot"}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - name: Every cell of the runs, each run in its own folder
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNS: ${{ github.event.inputs.runs }}
+        run: |
+          set -e
+          mkdir -p kube
+          for r in $(echo "$RUNS" | tr ',' ' '); do
+            gh run download "$r" --repo "$GITHUB_REPOSITORY" --pattern 'six-*' --dir "kube/run-$r" \
+              || echo "::warning::run $r: no cells downloaded"
+          done
+          echo "repetition folders: $(find kube -type d -name 'bench-*-*' | wc -l); disk: $(df -h . | tail -1)"
+      - name: The reports, the first 1, 10 and 100 repetitions of every square
+        env:
+          LABEL: ${{ github.event.inputs.label }}
+        run: |
+          for n in 1 10 100; do
+            python3 tools/six_kube_report.py kube --reps "$n" --out "SIX_KUBE_${LABEL}_r${n}.md" > /dev/null
+          done
+          cat "SIX_KUBE_${LABEL}_r100.md" >> "$GITHUB_STEP_SUMMARY"
+          ls -la SIX_KUBE_*
+      - uses: actions/upload-artifact@v4
+        with: {name: "six-kube-pooled-${{ github.event.inputs.label }}", path: "SIX_KUBE_*"}
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
