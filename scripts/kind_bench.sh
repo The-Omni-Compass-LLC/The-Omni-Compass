@@ -68,9 +68,27 @@ if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"
 # ScaledObject through the plug (scripts/kubectl_keda.py). ADDONS=goldilocks (register row 80): in every arm the service's
 # requests are set as an operator sets them with Goldilocks and the VPA's recommender, learned while the load runs its own
 # steps and applied before the warm-up (scripts/kind_addons_goldilocks.sh); the HPA, the load and the probe are unchanged,
-# and Omni-Compass's moves are its own, on top. Empty (the default): every other set, unchanged
+# and Omni-Compass's moves are its own, on top. CRUISEKUBE=1 (register row 81), with ADDONS=keda and ADDONS_PROFILE=http:
+# in every arm CruiseKube right-sizes the service itself, in place and at admission, from a Prometheus of its own, beside
+# KEDA's HTTP add-on scaling it on requests in flight (CruiseKube skips any workload whose HPA scales on CPU or memory, by
+# its own design), learning longer than its hour before the arms are told apart (scripts/kind_addons_cruisekube.sh);
+# Omni-Compass's moves are its own, on top, the CPU limit left to CruiseKube, which resizes it itself. Empty (the
+# default): every other set, unchanged
 ADDONS="${ADDONS:-}"
 case "$ADDONS" in ""|keda|goldilocks) ;; *) echo "ADDONS must be empty, keda or goldilocks (got $ADDONS)"; exit 1;; esac
+CRUISEKUBE="${CRUISEKUBE:-}"
+[ -z "$CRUISEKUBE" ] || { [ "$ADDONS" = keda ] && [ "${ADDONS_PROFILE:-both}" = http ]; } \
+  || { echo "CRUISEKUBE=1 runs beside KEDA's HTTP add-on alone (ADDONS=keda ADDONS_PROFILE=http): CruiseKube skips a service whose HPA scales on CPU"; exit 1; }
+# the power cap writes the service's CPU limit; with CruiseKube the limit is CruiseKube's own (it resizes the running
+# pods in place), so the cap is left out of that set and its reset checks read the operator's limit on the Deployment
+CAP_ARGS="--cap-deployments default/php-apache"; [ -z "$CRUISEKUBE" ] || CAP_ARGS=""
+limits_now() {   # the CPU limit the operator's record holds: the pods' own, or with CruiseKube the Deployment's template
+  if [ -n "$CRUISEKUBE" ]; then
+    kubectl get deployment php-apache -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}'
+  else
+    kubectl get pods -l run=php-apache -o jsonpath='{range .items[*]}{.spec.containers[0].resources.limits.cpu}{"\n"}{end}' | sort -u | tr '\n' ' ' | sed 's/ $//'
+  fi
+}
 KEDA=""; [ "$ADDONS" = keda ] && KEDA=1
 if [ -n "$ADDONS" ]; then
   { [ -z "${TWO_APP:-}" ] && [ "$PLATFORM" = kind ] && [ -z "$TUNE" ]; } || { echo "ADDONS=$ADDONS runs on kind, with one app and the operator's own target"; exit 1; }
@@ -172,6 +190,11 @@ elif [ "$ADDONS" = goldilocks ]; then
   # once the load runs (below), before the warm-up
   OUT_DIR="$OUT_DIR" PHASE=install bash scripts/kind_addons_goldilocks.sh
 fi
+if [ -n "$CRUISEKUBE" ]; then
+  # CruiseKube, its Prometheus and its exporters installed the same way in every arm, beside KEDA's HTTP add-on; it is
+  # put in Cruise mode on the service and learns once the load runs (below), before the warm-up
+  OUT_DIR="$OUT_DIR" PHASE=install bash scripts/kind_addons_cruisekube.sh
+fi
 if [ -n "${TWO_APP:-}" ]; then
   # the fairness test: a noisy neighbour on the same workers, its own HPA, its own surging load (deploy/kind/noisy.yaml)
   kubectl apply -f deploy/kind/noisy.yaml
@@ -239,11 +262,19 @@ if [ "$ADDONS" = goldilocks ]; then
   EXPECT_LIMIT=$(cat "$OUT_DIR/goldilocks_limit.txt")
   echo "addons=goldilocks: requests from Goldilocks's recommendation, CPU limit $EXPECT_LIMIT (addons.txt)" | tee -a "$OUT_DIR/preflight.txt"
 fi
+if [ -n "$CRUISEKUBE" ]; then
+  # CruiseKube in Cruise mode on the service, learning while the load runs its own steps until it has applied a change;
+  # the same in every arm, before the arms are told apart (Omni-Compass is not started yet)
+  OUT_DIR="$OUT_DIR" PHASE=learn LOAD_STEPS="$LOAD_STEPS" bash scripts/kind_addons_cruisekube.sh
+  echo "cruisekube: Cruise mode on the service, a change applied before the window (addons.txt)" | tee -a "$OUT_DIR/preflight.txt"
+fi
 hpa_count=$(kubectl get hpa -A -o json | jq '.items | length')
 want_hpa=1; [ -z "${TWO_APP:-}" ] || want_hpa=2
 [ "$hpa_count" = "$want_hpa" ] || { echo "expected exactly $want_hpa HPA, found $hpa_count"; exit 1; }
-if [ -n "$KEDA" ]; then   # the add-on's own pods, all on the control plane (scripts/kind_addons.sh checks where)
-  foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","keda") | not)] | length')
+if [ -n "$KEDA" ]; then   # the add-on's own pods, all on the control plane (scripts/kind_addons.sh checks where); with
+  # CruiseKube beside it, CruiseKube's, its PostgreSQL's and its metrics' too (scripts/kind_addons_cruisekube.sh checks where)
+  ck=false; [ -z "$CRUISEKUBE" ] || ck=true
+  foreign=$(kubectl get pods -A -o json | jq --argjson ck "$ck" '[.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","keda") or ($ck and IN("cruisekube-system","cruisekube-metrics"))) | not)] | length')
 elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's controller; the VPA's recommender is in kube-system (both on the control plane)
   foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","goldilocks") | not)] | length')
 else
@@ -283,6 +314,8 @@ if [ -z "$NATIVE" ]; then
     [ -z "$KEDA" ] || echo "patch deployments in keda (the add-on itself): $(can patch deployments -n keda)"
     [ "$ADDONS" != goldilocks ] || echo "patch verticalpodautoscalers (Goldilocks's VPA: its recommendation is the operator's): $(can patch verticalpodautoscalers.autoscaling.k8s.io -n default)"
     [ "$ADDONS" != goldilocks ] || echo "patch deployments in goldilocks (Goldilocks itself): $(can patch deployments -n goldilocks)"
+    [ -z "$CRUISEKUBE" ] || echo "patch deployments in cruisekube-system (CruiseKube itself): $(can patch deployments -n cruisekube-system)"
+    [ -z "$CRUISEKUBE" ] || echo "get secrets in cruisekube-system (CruiseKube's database): $(can get secrets -n cruisekube-system)"
   } | tee "$OUT_DIR/rbac_omni.txt"
   ! sed -n '/== can/,/== cannot/p' "$OUT_DIR/rbac_omni.txt" | grep -q ": no$" || { echo "Omni identity is missing a permission it needs"; exit 1; }
   ! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_omni.txt" | grep -q ": yes$" || { echo "Omni identity has a permission it must not have"; exit 1; }
@@ -400,7 +433,7 @@ start_controller() {   # $1 decisions to make, $2 log file
     --iterations "$1" --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
     --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
     --power-cmd "bash scripts/kind_power.sh" --site-limit-w "$SITE_LIMIT_W" \
-    --cap-deployments default/php-apache --thermal-model --security-configmap default/omni-security \
+    $CAP_ARGS --thermal-model --security-configmap default/omni-security \
     --rollout-guard default/php-apache --sensed default/php-apache --latency-file "$OUT_DIR/latency.csv" --slo-ms "${SLO_MS:-500}" \
     --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" $STRICT $LAW ${CLOSURE:+--closure "$CLOSURE"} ${REPLICA_CEILING:+--replica-ceiling "$REPLICA_CEILING"} > "$2" 2>&1 &
   echo $!
@@ -500,6 +533,10 @@ elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's VPA as the window left it
   kubectl -n goldilocks logs deployment/goldilocks-controller --tail=300 --request-timeout=20s > "$OUT_DIR/goldilocks-controller.log" 2>&1 || true
   kubectl -n kube-system logs deployment/vpa-recommender --tail=300 --request-timeout=20s > "$OUT_DIR/vpa-recommender.log" 2>&1 || true
 fi
+if [ -n "$CRUISEKUBE" ]; then   # CruiseKube's own record of the window: its audit events, its workload view, its logs
+  OUT_DIR="$OUT_DIR" PHASE=end bash scripts/kind_addons_cruisekube.sh || true
+  end_read "$OUT_DIR/cruisekube_resources_end.json" get pods -n default -l run=php-apache -o json
+fi
 
 if [ "$ARM" = "watch" ]; then
   echo "== watch arm: nothing may have reached the cluster"
@@ -507,7 +544,7 @@ if [ "$ARM" = "watch" ]; then
   logged=$(grep -c '"write"' "$OUT_DIR/audit.jsonl" || true)
   echo "writes Omni would have made: $logged; writes executed: $executed" | tee "$OUT_DIR/omni_writes.txt"
   stop_governors        # counted first: a stopped governor's hand-back is logged as writes (dry, none executed)
-  cpu_limit=$(kubectl get pods -l run=php-apache -o jsonpath='{range .items[*]}{.spec.containers[0].resources.limits.cpu}{"\n"}{end}' | sort -u | tr '\n' ' ' | sed 's/ $//')
+  cpu_limit=$(limits_now)
   target=$(hpa_cpu_target php-apache)
   range_now=$(kubectl get hpa php-apache -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')
   back=$(kubectl get nodes -l "$WORKER_SEL" -o json | jq '[.items[] | select(.spec.unschedulable != true and (any(.spec.taints[]?; .key == "omnicompass.io/idle") | not))] | length')
@@ -522,10 +559,11 @@ elif [ -z "$NATIVE" ]; then
   [ "$omni_writes" -gt 0 ] || { echo "Omni made no write, so the reset would prove nothing"; exit 1; }
   stop_governors        # no write of the window's governor can land after the reset is checked
   python -m omni_controller.controller --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --iterations 1 \
-    --cap-deployments default/php-apache --rollout-guard default/php-apache \
+    $CAP_ARGS --rollout-guard default/php-apache \
     --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" --audit "$OUT_DIR/audit_kill.jsonl" --kill-file "$OUT_DIR/kill"
-  cpu_limit=$(kubectl get pods -l run=php-apache -o jsonpath='{range .items[*]}{.spec.containers[0].resources.limits.cpu}{"\n"}{end}' | sort -u | tr '\n' ' ' | sed 's/ $//')
-  echo "pod CPU limits after kill: $cpu_limit" | tee -a "$OUT_DIR/kill_switch.txt"
+  cpu_limit=$(limits_now)
+  if [ -n "$CAP_ARGS" ]; then echo "pod CPU limits after kill: $cpu_limit" | tee -a "$OUT_DIR/kill_switch.txt"
+  else echo "the operator's CPU limit on the Deployment after kill: $cpu_limit (CruiseKube owns the pods' own)" | tee -a "$OUT_DIR/kill_switch.txt"; fi
   if [ -n "$KEDA" ]; then   # KEDA rebuilds the HPA from its ScaledObject: the operator's settings must show on the HPA
     for i in $(seq 1 15); do
       [ "$(hpa_cpu_target php-apache)" = "$EXPECT_TARGET" ] && [ "$(kubectl get hpa php-apache -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')" = "$HPA_RANGE" ] && break

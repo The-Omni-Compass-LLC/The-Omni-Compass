@@ -1,0 +1,119 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The metrics CruiseKube reads (scripts/kind_addons_cruisekube.sh; register row 81), the same in every arm: node-exporter
+# on every node and a Prometheus of its own on the control plane, scraping the three jobs CruiseKube's queries name
+# (job="kube-state-metrics", job="node-exporter", and the kubelet's cAdvisor as job="kubelet"), each series labelled with
+# its node, as CruiseKube's documentation asks of a dedicated Prometheus. Pinned images; nothing here is read by
+# Omni-Compass, and nothing here writes anything.
+apiVersion: v1
+kind: Namespace
+metadata: {name: cruisekube-metrics}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata: {name: node-exporter, namespace: cruisekube-metrics}
+spec:
+  selector: {matchLabels: {app: node-exporter}}
+  template:
+    metadata: {labels: {app: node-exporter}}
+    spec:
+      hostNetwork: true
+      hostPID: true
+      tolerations: [{operator: Exists}]          # one on every node, the control plane included
+      containers:
+        - name: node-exporter
+          image: quay.io/prometheus/node-exporter:v1.12.0
+          args: ["--path.procfs=/host/proc", "--path.sysfs=/host/sys", "--path.rootfs=/host/root",
+                 "--web.listen-address=:9100", "--collector.pressure"]
+          ports: [{name: metrics, containerPort: 9100}]
+          resources: {requests: {cpu: 10m, memory: 32Mi}, limits: {cpu: 100m, memory: 96Mi}}
+          volumeMounts:
+            - {name: proc, mountPath: /host/proc, readOnly: true}
+            - {name: sys, mountPath: /host/sys, readOnly: true}
+            - {name: root, mountPath: /host/root, readOnly: true, mountPropagation: HostToContainer}
+      volumes:
+        - {name: proc, hostPath: {path: /proc}}
+        - {name: sys, hostPath: {path: /sys}}
+        - {name: root, hostPath: {path: /}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: prometheus, namespace: cruisekube-metrics}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: {name: cruisekube-prometheus}
+rules:
+  - apiGroups: [""]
+    resources: [nodes, nodes/metrics, services, endpoints, pods]
+    verbs: [get, list, watch]
+  - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: cruisekube-prometheus}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: cruisekube-prometheus}
+subjects: [{kind: ServiceAccount, name: prometheus, namespace: cruisekube-metrics}]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: prometheus, namespace: cruisekube-metrics}
+data:
+  prometheus.yml: |
+    global: {scrape_interval: 15s, evaluation_interval: 15s}
+    scrape_configs:
+      - job_name: kube-state-metrics
+        static_configs: [{targets: ["kube-state-metrics.kube-system.svc:8080"]}]
+      - job_name: node-exporter
+        kubernetes_sd_configs: [{role: pod, namespaces: {names: [cruisekube-metrics]}}]
+        relabel_configs:
+          - {source_labels: [__meta_kubernetes_pod_label_app], regex: node-exporter, action: keep}
+          - {source_labels: [__meta_kubernetes_pod_node_name], target_label: node}
+          - {source_labels: [__meta_kubernetes_pod_node_name], target_label: instance}
+      - job_name: kubelet
+        scheme: https
+        metrics_path: /metrics/cadvisor
+        kubernetes_sd_configs: [{role: node}]
+        tls_config: {insecure_skip_verify: true}
+        authorization: {credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token}
+        relabel_configs:
+          - {source_labels: [__meta_kubernetes_node_name], target_label: node}
+          - {source_labels: [__meta_kubernetes_node_name], target_label: instance}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: prometheus, namespace: cruisekube-metrics}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: prometheus}}
+  template:
+    metadata: {labels: {app: prometheus}}
+    spec:
+      serviceAccountName: prometheus
+      nodeSelector: {node-role.kubernetes.io/control-plane: ""}
+      tolerations: [{key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}]
+      containers:
+        - name: prometheus
+          image: quay.io/prometheus/prometheus:v3.10.0
+          args: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus",
+                 "--storage.tsdb.retention.time=2d", "--web.listen-address=:9090"]
+          ports: [{name: web, containerPort: 9090}]
+          resources: {requests: {cpu: 100m, memory: 256Mi}, limits: {cpu: "1", memory: 1Gi}}
+          readinessProbe: {httpGet: {path: /-/ready, port: 9090}, periodSeconds: 10}
+          volumeMounts:
+            - {name: config, mountPath: /etc/prometheus}
+            - {name: data, mountPath: /prometheus}
+      volumes:
+        - {name: config, configMap: {name: prometheus}}
+        - {name: data, emptyDir: {}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: prometheus, namespace: cruisekube-metrics}
+spec:
+  selector: {app: prometheus}
+  ports: [{name: web, port: 9090, targetPort: 9090}]
