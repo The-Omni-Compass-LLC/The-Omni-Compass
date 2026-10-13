@@ -521,6 +521,19 @@ open-source pieces (Kepler, Climatik, EAR, CruiseKube, Goldilocks, the Kubernete
 capping and NVIDIA's platform power budget) came on 12 October as ten muscles in the families their knobs belong to
 (`docs/OMNI_V5.md`, `docs/THE_SEAT.md`). The GPU family is named for the hardware, not one vendor.
 
+**Every muscle its own card.** The brain is one, but since 13 October its settings are each muscle's own. A muscle's
+card holds the numbers the max uses for that muscle alone: how full a machine pool runs on its forecast before it calls
+for more and how many decisions of history it reads, how many wobbles of margin a battery keeps under its line and, for a
+battery wired by its power, how long it reads its line before it holds and how much of it it keeps clear. The cards were
+found by an automatic search over every muscle (`tools/tune_cards.py`), on development seeds only, today's global setting
+always one of the choices, and a card was kept only where it beat the global setting beyond the noise on two separate sets
+of seeds and was never worse than native on any seed under any load (never over its line more often, never less work,
+never its line cleared later): 364 muscles carry one (`realms/muscle_cards_v5.csv`, every card in plain words in the
+muscle catalog, the evidence in `results/cards_v5/CARDS.md`); the rest run the global setting. Inside a
+body, a battery wired by its power keeps the body's own margins on its line, because the line carries the whole body's
+swing, which the card chosen for the battery alone never saw. The formal statement is *The Max, Formally*
+(`docs/FORMAL_V5.md`, section 5).
+
 Every live benchmark in Part VI sits inside one of these families: the Kubernetes tests inside workload scaling and node
 fleets, PostgreSQL and MySQL inside databases and transactions, Redis and MongoDB's cache inside cache and memory
 services, Kafka inside messaging and streaming, the robot arms inside robotics motion control, the drones inside aviation
@@ -586,39 +599,43 @@ place on real software.
 
 ### 2.4 The grid of copies and runs
 
-Every organism runs at **1, 10, 100 and 1,000 copies** (that many instances of the organism on one clock, so the four
-stacked at 1,000 copies is 1.7 million modelled muscles) and at **1, 10, 100 and 1,000 paired runs** (that many
-native-and-omni pairs, each from its own seed): 96 cells in all, both arms shown in every cell. One thousand is the
-maximum in both directions. The grid as it stands (`results/scale/GRID.md`) is 84 of 90 judged cells on Omni v3; the six
-cells left, 100 and 1,000 runs at 1,000 copies, are beyond the machines available and are declared as such, not hidden.
-The reading at every size is the same to the digit, which is itself a finding about the law: it does not drift with scale.
+Every organism runs at **1, 10 and 100 copies** (that many instances of the organism on one clock, so the four stacked
+at 100 copies is about 190,000 modelled muscles) and at **1, 10 and 100 paired runs** (that many native-and-omni pairs,
+each from its own seed): the six organisms × three sizes × three run counts are 54 squares, run modelled and with the
+real cluster inside, both arms shown in every square. One hundred is the maximum in both directions (the founder's order
+of 12 October, to cut the time and the bill): no 1,000 copies and no 1,000 runs are run on any engine from that day, and
+the whole grid runs on GitHub's own machines, nothing rented for it (`scripts/dispatch_grid.py`, `results/grid_v5/`).
+The Omni v3 grid that went to 1,000 copies and 1,000 runs (`results/scale/GRID.md`) stands as it was run; its reading
+was the same to the digit at every size, which is itself a finding about the law: it does not drift with scale.
 
 The two axes answer two different questions, and a reader should keep them apart. **Copies** is the size of the body
-the one brain governs: at 1,000 copies of the four stacked, the law computes a force for 1.7 million muscles from one
+the one brain governs: at 100 copies of the four stacked, the law computes a force for about 190,000 muscles from one
 reading of one clock, and the question is whether it stays coherent, whether the decision time stays inside the decision
 period, and whether the cluster inside it (section 2.5) is still served on time. **Runs** is the number of independent
 paired trials, each from its own seed, and the question is statistical: how wide the interval of the paired difference is
-and whether it moves as the trials multiply. A cell at 1 copy and 1,000 runs tells a reader about the noise of the method;
-a cell at 1,000 copies and 1 run tells a reader about the scale of the brain; the cells on the diagonal tell both at once.
-Every cell shows the native value and the omni value side by side, never a change alone, because a change without its
-two ends cannot be checked against the organism's own records. The grid is rebuilt whole on every engine version, never
-patched cell by cell, so that no square carries a result from a different engine than its neighbours (section 15).
+and whether it moves as the trials multiply. A square at 1 copy and 100 runs tells a reader about the noise of the
+method; a square at 100 copies and 1 run tells a reader about the scale of the brain; the squares on the diagonal tell
+both at once. Every square shows the native value and the omni value side by side, never a change alone, because a
+change without its two ends cannot be checked against the organism's own records. The grid is rebuilt whole on every
+engine version, never patched square by square, so that no square carries a result from a different engine than its
+neighbours (section 15).
 
 ### 2.5 The organisms with a real cluster inside
 
 The modelled organisms are also run with a **real Kubernetes cluster inside** as one more muscle (`tools/run_kil.py`,
 workflows `six-kube`, `big-organism`, `big-organism-detached`): the organism's own compute demand drives a real load
 generator against a real service on a real cluster, and the cluster's watts come back into the organism as heat and load.
-At 1 to 100 copies this runs on GitHub's machines; at 1,000 copies it needs a rented machine and runs there, detached from
-the GitHub job that started it, for about seven hours a repetition. These runs are evidence class L for the cluster and S
-for the organism around it, and are labelled "L + S".
+At 1, 10 and 100 copies this runs on GitHub's machines, and no 1,000-copy run is started from 12 October; the Omni v3
+runs at 1,000 copies below needed a rented machine, detached from the GitHub job that started it, for about seven hours
+a repetition, and stand as they were run. These runs are evidence class L for the cluster and S for the organism around
+it, and are labelled "L + S".
 
-Two rules keep these runs honest, and both are written in the preregistration before the machine is rented. The first is
+Two rules keep these runs honest, and both are written in the preregistration before the run starts. The first is
 the **clock rule**. The organism must step on the measured window's clock: the row "organism behind its window" says how
 many seconds after the window its last step ended, and a repetition in which either arm ended more than 5% of the window
 late is marked **off the clock** in the organism's line, because its last steps saw a cluster whose load schedule had
-already ended. The row is shown and never judged; at 1,000 copies of the four stacked, both arms ended about 22 s behind
-a 10,800 s window, a fifth of one percent, and no repetition was off the clock. The second is the **hand-back at 90%**.
+already ended. The row is shown and never judged; in the Omni v3 run of the four stacked at 1,000 copies, both arms ended
+about 22 s behind a 10,800 s window, a fifth of one percent, and no repetition was off the clock. The second is the **hand-back at 90%**.
 Omni-Compass releases the cluster's knob at nine tenths of the window and the last tenth is run by native alone in both
 arms, so that every repetition ends with the proof that the knob was given back and that native resumed where it would
 have been.
@@ -3154,8 +3171,8 @@ any one of the three can tell whether the files in front of them are the files t
 |---|---|
 | `omnicompass/` | the engine, governor, nervous system, shield, compass, conveyance law, the compass |
 | `omni_controller/` | the Kubernetes controller and muscles; the GPU governors (one and two wires) |
-| `realms/` | the 1,107-muscle catalog of v5 (`catalog_v5.csv`; v3's 945 in `catalog.csv`, frozen), the plant models, the realm harness, the compass on every muscle (the max, `compass_arm_v5.py`), the modelled card |
-| `tools/` | benchmarks, receipts, the wire check, the scale ladder, manifests, seals |
+| `realms/` | the 1,107-muscle catalog of v5 (`catalog_v5.csv`; v3's 945 in `catalog.csv`, frozen), every muscle's own card (`muscle_cards_v5.csv`), the plant models, the realm harness, the compass on every muscle (the max, `compass_arm_v5.py`), the modelled card |
+| `tools/` | benchmarks, receipts, the wire check, the scale ladder, the card search (`tune_cards.py`), manifests, seals |
 | `scripts/` | one-command runs (GPU, Kubernetes, ladder) |
 | `deploy/` | container image, install and permission files |
 | `cpp/` | the C++20 twins |

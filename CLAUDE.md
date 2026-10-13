@@ -36,9 +36,11 @@ the founder overrides one in the conversation.
 
 - `OMNI_V5.json` and `docs/OMNI_V5.md`: the max (`realms/compass_arm_v5.py`, `V5CFG`) on the 1,107-muscle catalog, the
   bone inside every organism with the living body's immune system (V6-V13, `docs/FORMAL_V5.md` section 4: native twins
-  of every room, the heat debt, batteries timed for their lines, nothing locked), the lease's walk back, the tune-down on
-  the dial. v5 is re-declared on every engine change
-  while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
+  of every room, the heat debt, batteries timed for their lines, nothing locked), every muscle its own card
+  (`realms/muscle_cards_v5.csv`, 364 muscles, found by `tools/tune_cards.py` on development seeds only and kept only when
+  it wins twice and is never worse than native on any seed; inside a body a battery wired by its power keeps the body's
+  margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
+  every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
   never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v5, omni-v3, omni-v2,
   omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the

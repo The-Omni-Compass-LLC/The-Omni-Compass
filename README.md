@@ -15,7 +15,7 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v5, fingerprint `9be48445438943c2` (43 files); package 0.5.0. Its default brain is **the max**: every muscle pushed to its own limit, never past it and never below native, the energy it takes shown as power given beside the work and the wear; the dial turns it down ([`docs/OMNI_V5.md`](docs/OMNI_V5.md)).
+- **Engine on main:** omni-v5, fingerprint `5648f2902f1fae68` (44 files); package 0.5.0. Its default brain is **the max**: every muscle pushed to its own limit, never past it and never below native, the energy it takes shown as power given beside the work and the wear; the dial turns it down ([`docs/OMNI_V5.md`](docs/OMNI_V5.md)).
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
@@ -29,7 +29,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-12 22:22 | [The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
+| 2026-10-13 01:40 | [The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -52,46 +52,54 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## Newest result: the living body, on every muscle and six organisms (Omni v5, 12 October, night)
+## Newest result: every muscle its own card (Omni v5, 13 October)
 
-Omni v5 at its default, **the max**, now with **the living body**: every muscle pushed to its own limit, never past it
-and never below native, on top of each plant's own native controller, and the body curing what one muscle cannot (a
-native twin of every room, the body's heat debt, every battery's discharge timed for its line, nothing locked:
-[`docs/FORMAL_V5.md`](docs/FORMAL_V5.md), section 4). The catalog carries the founder's nine open-source pieces as
-muscles (Kepler, Climatik, EAR, CruiseKube, Goldilocks, the Kubernetes Power Manager, PEAKS, Adaptive GPU Power Capping,
-NVIDIA's platform power manager). Preregistered seeds 3000-3009, ten paired runs per muscle, per organism and per load,
-commit `44aceb48ea30`, engine omni-v5 (fingerprint `9be48445438943c2`). Evidence class **S**: modelled plants, not
-meters. Every row, losses included: [`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md).
+Omni v5 at its default, **the max**, with **the living body**, and now **every muscle its own card**: the brain is one,
+its settings each muscle's own. An automatic search over every muscle (development seeds only, today's global setting
+always one of the choices) found the settings that do each muscle the most good; a card enters the engine only if it won
+twice, on two separate sets of development seeds, and was never worse than native on any seed under any load (never over
+its line more often, never less work, never its line cleared later). 364 muscles carry a card of their own (333 machine
+pools, 31 batteries), each printed in plain words in the [muscle catalog](docs/MUSCLE_CATALOG.md); inside a body, a
+battery wired by its power keeps the body's own margin on its line ([`docs/FORMAL_V5.md`](docs/FORMAL_V5.md), section
+5). Preregistered seeds 3000-3009, ten paired runs per muscle,
+per organism and per load, commit `eea291501848`, engine omni-v5 (fingerprint `5648f2902f1fae68`). Evidence class
+**S**: modelled plants, not meters. Every row, losses included:
+[`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md).
 
 **Every muscle alone (1,107), under its own load and with work waiting in line:**
 
-| Reading | Muscles |
-|---|---:|
-| **Better** (a gain beyond the noise and no loss under either load) | **517** |
-| of them: clear the waiting line sooner | 493 |
-| of them: over their line less often | 398 |
-| of them: more work | 32 |
-| At its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 |
-| The same as native (no difference beyond the noise: native already did all the work that came) | 169 |
-| **Worse or mixed** | **0** |
+| Reading | Muscles | With one global setting |
+|---|---:|---:|
+| **Better** (a gain beyond the noise and no loss under either load) | **527** | 517 |
+| of them: clear the waiting line sooner | 493 | 493 |
+| of them: over their line less often | 409 | 398 |
+| of them: more work | 33 | 32 |
+| At its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 | 421 |
+| The same as native (no difference beyond the noise: native already did all the work that came) | 159 | 169 |
+| **Worse or mixed** | **0** | 0 |
 
-| Kind | With work waiting in line | Power given | Wear |
+| Kind | With work waiting in line (one global setting in brackets) | Power given | Wear |
 |---|---|---:|---:|
-| Compute pools (458) | line cleared in **7.8 min instead of 16.9**; over the line 1.40% → 0.40% of the time | +21% | machine-hours +43% |
-| Motion axes at their own peak speed (37) | over the line 12.1% → 8.3% of the time; work +0.7% | +1.4% | motor heat +3.9% |
-| Battery sites (44) | over the line 13.4% → 9.9% (peak ceiling), 17.1% → 15.0% (reserve), 14.7% → 14.5% (discharge timed for the line) | up to +0.2% | battery kWh cycled −0.6% to +42% |
+| Compute pools (458) | line cleared in **7.2 min instead of 16.9** (7.8); over the line 1.40% → 0.33% of the time (0.40%) | +33% (+21%) | machine-hours +68% (+43%) |
+| Battery sites (44) | over the line 13.4% → 7.6% (peak ceiling; 9.9%), 17.1% → 14.0% (reserve; 15.0%), 14.7% → 14.0% (discharge timed for the line; 14.5%) | up to +0.14% | battery kWh cycled −0.6% to +30% |
+| Motion axes at their own peak speed (37) | over the line 12.1% → 8.3% of the time; work +0.7% (no card beat the global setting) | +1.4% | motor heat +3.9% |
 
 **The six organisms** (every plant coupled on one clock, the hour around each battery site's daily peak): **better than
 native under all three loads, and not one plant worse**: 0 of 1,908 in the four stacked, 0 in every other organism,
-under every load (the engine before left 3 under the climb).
+under every load. Inside a body the cards remove more misses with less power given than one global setting did.
 
-| Load | Over the line, change (this engine) | The engine before | Work | Power given |
+| Load | Over the line, change (every muscle its own card) | One global setting | Work | Power given |
 |---|---|---|---|---:|
-| Own load | −1.6% to −6.4% in every organism | −0.1% to −0.7% | equal | up to +0.06% |
-| The climb (1 2 3 2 3 4 ..., up to twice its own) | −3.5% compute, −3.1% distribution, −2.4% the four stacked, −1.8% physics, −1.7% energy, −0.9% the tower | −2.1% to −0.0%; energy and the tower −0.0% | more work in four of six | up to +0.07% |
-| Work waiting in line | −1.0% to −7.2% in every organism | −0.1% to −2.1% | equal | up to +0.07% |
+| Own load | −1.9% to −7.5% in every organism | −1.6% to −6.4% | equal | up to +0.01% (was +0.06%) |
+| The climb (1 2 3 2 3 4 ..., up to twice its own) | −7.2% distribution, −7.0% compute, −4.8% the four stacked, −3.2% physics, −2.7% energy, −1.4% the tower | −0.9% to −3.5% | more work in four of six | up to +0.05% (was +0.07%) |
+| Work waiting in line | −1.1% to −8.3% in every organism | −1.0% to −7.2% | equal | up to +0.04% (was +0.07%) |
 
-The lease handed every knob back to native in every run.
+The lease handed every knob back to native in every run. Earlier tonight, on one global setting (fingerprint
+`9be48445`), GitHub reproduced the realms table exactly in runs A, B and C; the first Goldilocks run (Omni-Compass on top
+of a service rightsized by Goldilocks and the Vertical Pod Autoscaler, ten pairs) answered the 95th percentile in 133 ms
+instead of 331 and spent 99% less time over the line, for 2.3% more energy on the declared model; the first capacity run
+(the same CPU cap in both arms) showed no difference beyond the noise at any cap, where the cap itself blocks the one
+lever Omni-Compass has (more copies of the service). Each runs again, A, B and C, on this version.
 
 ## The manual: the book for the people who wire it
 

@@ -2,6 +2,42 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-13: Every muscle its own card (Omni v5 re-declared)
+
+- **The founder's question** (12 October, night): does every muscle have its own tuning, maxed to its own benefit,
+  instead of one global setting for a thousand muscles? It does. The brain stays one; its settings are now each muscle's
+  own: the engine reads every muscle's card from `realms/muscle_cards_v5.csv` (a machine pool's edge utilisation and
+  window, a battery's line margin and, wired by its power, its hold window and hold margin). A muscle without a card runs
+  the global setting; the tune-down never reads cards (`docs/FORMAL_V5.md` section 5, `docs/OMNI_V5.md` amendment 4).
+- **How the cards are found** (`tools/tune_cards.py`, development seeds only): every muscle whose settings can change what
+  the max does tries every candidate in a declared grid, today's global setting always among them; a card is kept only if
+  it beats the global setting beyond the noise on seeds 7100-7109 and again on seeds 7200-7209, is worse than it nowhere,
+  and is never worse than native on any of those seeds under any load (never over its line more often, never less work,
+  never its line cleared later). 409 of 550 searched muscles won once, 364 won twice and are the engine's cards (333
+  machine pools, 31 batteries); no axis setting beat the global one. A first set chosen by the mean over the seeds alone
+  (371 cards) was caught by the engine's own no-harm test before anything was pushed (an electrolyzer battery, one
+  decision over its line on one seed); the rule now checks every seed.
+- **V14, the body has the last word on a line it shares**: inside a body a battery wired by its power keeps the body's
+  margins on its line. In development the one plant worse than native the cards produced was exactly that battery.
+- **The official run** (preregistered seeds 3000-3009, commit `eea29150`, fingerprint `5648f2902f1fae68`, class S):
+  every muscle alone 527 better (517 with one global setting), 421 at their limit on native, 159 the same, 0 worse; inside
+  the six organisms 0 plants worse under every load; misses fall 1.9% to 7.5% (own load), 1.4% to 7.2% (the climb) and
+  1.1% to 8.3% (work waiting in line), against 1.6% to 6.4%, 0.9% to 3.5% and 1.0% to 7.2% with one global setting, with
+  less power given and less wear inside the bodies (`results/realms_v5/REALMS_V5.md`). Alone, a machine pool's card
+  spends more machines to clear its line sooner (power given +33% against +21%).
+- **Earlier tonight, on one global setting** (fingerprint `9be48445`): GitHub reproduced the realms table exactly in runs
+  A, B and C; the first Goldilocks run (ten pairs) answered the 95th percentile in 133 ms instead of 331 and spent 99%
+  less time over the line, for 2.3% more energy on the declared model; the first capacity run showed no difference beyond
+  the noise at any cap (the quota on the service's CPU refuses the extra copies that are Omni-Compass's one lever there).
+  Each runs again, A, B and C, on this version; the grid starts again on it (the manifest before kept in
+  `results/grid_v5/history/`).
+- The manual's muscle catalog prints every muscle's card in plain words; the evidence of the search is in
+  `results/cards_v5/`.
+- **No 1,000s anywhere** (the founder's order of 12 October): the GPU kit's organisms with the card inside run at 1, 10
+  and 100 copies (amendment 13 of `docs/GPU_PREREGISTRATION.md`; one card's whole test about 36 hours instead of 45), the
+  rented-machine grid script is removed, and the manual's grid chapter (54 squares), the benchmark map and the KWOK
+  workflow say 1, 10 and 100.
+
 ## 2026-10-12 (midnight): Omni v5 re-declared: the living body, and the founder's nine open-source pieces as muscles
 
 - **The living body** (the founder's order of 12 October: whatever one muscle has a problem with, the others carry it, and

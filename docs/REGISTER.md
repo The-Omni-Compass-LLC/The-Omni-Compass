@@ -100,8 +100,9 @@ kind of system until it is measured live.
 **1,107 muscles in 70 families (Omni v5: v3's 945, then eleven new families marked v5 and muscles added to families already there, in three waves; the third wave, 12 October, is the founder's nine open-source pieces as ten muscles, each in the family its knob belongs to, `docs/THE_SEAT.md`).** Every muscle by name, with its knob and what it is for: `realms/catalog_v5.csv` and `docs/MUSCLE_CATALOG.md`; v3's catalog of 945 (`realms/catalog.csv`) stays frozen for v3's results; the sources of every added muscle: `docs/realm_study/TRUE_MUSCLES.csv`, `realms/wave4_families.csv` and `docs/OMNI_V5.md`.
 
 How they are proven so far: every muscle alone, and every organism whole, on its model (`results/realms_v5/REALMS_V5.md`,
-Omni v5, digest 9be48445, preregistered seeds 3000 to 3009, each organism's own load, the climb and work waiting in line):
-**517 better, 421 at their limit on native, 169 no difference beyond the noise, 0 worse; every organism better under all
+Omni v5, digest 5648f290, every muscle its own card, preregistered seeds 3000 to 3009, each organism's own load, the climb
+and work waiting in line): **527 better, 421 at their limit on native, 159 no difference beyond the noise, 0 worse; every
+organism better under all
 three loads, and 0 plants worse inside any organism.** On v3 (`results/realms/REALMS.md`, seeds 3000 to 3009): 124 superior
 within guardrails, 9 energy improvement with a service tradeoff, 4 service improvement with an energy tradeoff, 807
 noninferior, 1 not established, 0 worse. Evidence class S: a model, not a meter. The live rows of section 2 are where

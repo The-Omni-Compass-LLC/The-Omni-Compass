@@ -147,14 +147,31 @@ misses fell about twice as far as before; on seeds 7100-7109 every muscle alone 
 showed 0 muscles and 0 plants worse. Fingerprint re-declared (digest `9be48445438943c2`); the preregistered seeds
 3000-3009 were run again unchanged.
 
+**Amendment 4, 13 October: every muscle its own card.** The founder's question of 12 October, night: does every muscle
+have its own tuning, maxed to its own benefit, instead of one global setting for a thousand muscles? The brain stays one;
+its settings are now each muscle's own (`docs/FORMAL_V5.md`, section 5). A muscle's card (`realms/muscle_cards_v5.csv`)
+holds what the max uses for it: a machine pool's edge utilisation and window, a battery's line margin and, wired by its
+power, its hold window and hold margin. The cards were found by an automatic search over every muscle whose settings can
+change what the max does (`tools/tune_cards.py`), on development seeds only, today's global setting always one of the
+choices, and kept only where the card beat the global setting beyond the noise on seeds 7100-7109 and again on seeds
+7200-7209 and never worse than native on any of their seeds under any load (never over its line more often, never less
+work, never its line cleared later): 364 muscles (333 machine pools, 31 batteries); every other muscle runs the global
+setting. Inside a body, a battery wired by its power keeps the body's margins on its line (V14: its card was
+chosen alone; the line carries the whole body's swing). In development, 360 organism runs on the two sets: 0 plants
+worse, the misses removed 1.7 times the global setting's. Fingerprint re-declared (digest `5648f2902f1fae68`, 44 files,
+the cards among them); the preregistered seeds were run again unchanged. Every card is printed in plain words in the
+muscle catalog (`docs/MUSCLE_CATALOG.md`).
+
 ## The no-harm proof (modelled, class S)
 
 On a fixed seed, for **every** muscle in the catalog, the v5 default does no less work than native, is over its line no
 more often, and hands every knob back to native on the kill (the dead-man lease); the energy it takes is power given,
-shown beside the work and the speed it bought. On the preregistered seeds 3000-3009 (commit `44aceb48ea30`, digest
-`9be48445438943c2`): **0 of 1,107 muscles worse or mixed** (517 better, 421 at their limit on native, 169 the same), every
-organism better than native under all three loads, and **not one plant worse inside any organism under any load** (the
-engine before left 3 of 1,868 under the climb). This is checked in `tests/test_compass_arm_v5.py` and run in full by
+shown beside the work and the speed it bought. On the preregistered seeds 3000-3009 (commit `eea291501848`, digest
+`5648f2902f1fae68`, every muscle its own card): **0 of 1,107 muscles worse or mixed** (527 better, 421 at their limit on
+native, 159 the same), every organism better than native under all three loads, and **not one plant worse inside any
+organism under any load**; the misses fall 1.9% to 7.5% under each organism's own load, 1.4% to 7.2% under the climb and
+1.1% to 8.3% with work waiting in line, against 1.6% to 6.4%, 0.9% to 3.5% and 1.0% to 7.2% with one global setting
+(digest `9be48445438943c2`), with less power given and less wear. This is checked in `tests/test_compass_arm_v5.py` and run in full by
 `tools/run_realms_v5.py` (`results/realms_v5/`). Models are class S: a model's energy is not a meter's, and a plant written
 by the same people who wrote the law is not an independent test.
 
