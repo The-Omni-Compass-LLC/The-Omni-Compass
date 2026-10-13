@@ -138,9 +138,9 @@ def table(gamma, nat, om):
     m, lo, hi = paired(nat, om, kj)
     base95 = statistics.mean(x[p95] for x in nat); _, _, hi95 = paired(nat, om, p95)
     guard = hi95 <= 0.10 * base95
-    word = "better, proven" if lo > 0 else "worse, proven" if hi < 0 else "not proven"
+    word = "more requests per kJ, proven" if lo > 0 else "fewer requests per kJ, proven" if hi < 0 else "not proven"
     if lo > 0 and not guard:
-        word = "better on energy, fails the service guardrail"
+        word = "more requests per kJ, fails the service guardrail"
     out += ["", f"Guardrail (preregistered): 95th-percentile response time not above +10%: "
                 f"{'held' if guard else 'FAILED'} (upper bound {100 * hi95 / base95:+.1f}%).",
             f"**Model verdict: {word}.**", ""]

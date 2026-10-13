@@ -27,9 +27,9 @@ live; **missing** = not built.
 
 ## Results of the build pass (held-out seeds 90001-90030, 30 per muscle, code frozen by SHA first)
 
-Omni-Compass against the strongest native tool in each muscle; + better, - worse, = tie / not significant.
+Omni-Compass against the strongest native tool in each muscle; + toward its aim, - away from its aim, = tie / not significant.
 
-| # | Muscle | Opponent (best native) | Better | Worse | Tie / n.s. |
+| # | Muscle | Opponent (best native) | Toward its aim | Away from its aim | Tie / n.s. |
 |---|---|---|---|---|---|
 | 1-2 | right-sizing | VPA in-place + HPA | CPU -3%, memory -11%, p99 -99%, reversals -84%, SLO minutes -57% | p95 +15%, OOM kills (few) | work done |
 | 5 | cold start | KEDA HTTP | p95 -75%, p99 -58%, delayed >1 s -71%, instance-hours -8% | cold-start count (x8) | |

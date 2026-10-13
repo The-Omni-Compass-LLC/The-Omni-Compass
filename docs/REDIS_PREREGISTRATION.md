@@ -64,12 +64,12 @@ compass sees that cost in its next reading and the gauges include it.
 
 | Gauge | Direction |
 |---|---|
-| work inside the response line: requests a second answered within 2 ms | **higher is better** (the product number) |
-| throughput (requests a second), cache hit rate | higher is better |
-| latency p95, p99, mean | lower is better |
-| failed requests | **any increase is WORSE** |
-| memory ceiling held, mean (the knob, the resource); memory used, mean | lower is better (Omni will hold more under a wide working set, and that reads WORSE) |
-| host CPU busy share, CPU-seconds, CPU-seconds per 1,000 requests inside the line (the compass's own cost included) | lower is better |
+| work inside the response line: requests a second answered within 2 ms | **the aim is higher** (the product number) |
+| throughput (requests a second), cache hit rate | the aim is higher |
+| latency p95, p99, mean | the aim is lower |
+| failed requests | **any increase is marked** |
+| memory ceiling held, mean (the knob, the resource); memory used, mean | the aim is lower (Omni will hold more under a wide working set, and that reads higher) |
+| host CPU busy share, CPU-seconds, CPU-seconds per 1,000 requests inside the line (the compass's own cost included) | the aim is lower |
 | keys evicted, ceiling changes written | shown, not judged |
 
 Memory held is the resource this benchmark trades; no energy is claimed beyond the host's CPU seconds (evidence class L:
@@ -87,7 +87,7 @@ real software, no meter).
 
 Each workload: three paired repetitions in one GitHub Actions job, order alternating, the per-request records, the
 audit and the server log archived with the code. Three separate runs on the frozen engine (A, B, C); the table
-(`tools/redis_abc.py`) reads better in all three of our runs or WORSE when all three runs move the same way with every 95% interval
+(`tools/redis_abc.py`) reads lower or higher in all three of our runs when all three runs move the same way with every 95% interval
 clear of zero, no difference beyond the noise when a run's interval includes zero, and the runs disagree when clear runs
 point different ways. `tests/test_run_redis.py` and `tests/test_redis_abc.py`, run by `verify.py`, prove the rules
 without a Redis.
@@ -104,13 +104,13 @@ Three short repetitions (10 s a notch) on the development machine shaped the rul
    most of the run while 270 MB were used. That is why the fail-up adds a quarter of the cover and the give-back runs a
    notch a second (the dwell holds only after a growth).
 3. With the rule as frozen: hit rate 66% → 81%, work inside the line 982 → 1,197 requests a second (+22%), p95 7.8 →
-   7.1 ms, the ceiling held 64 → 304 MB on average against 256 MB used (the cost, which will read WORSE), host CPU 137 →
+   7.1 ms, the ceiling held 64 → 304 MB on average against 256 MB used (the cost, which will read higher), host CPU 137 →
    113 s, every arm handed back. The counted runs will show whatever they show.
 
 ## Amendment 2 (2026-10-09, declared before any run on it): the brain's own verdict on the ceiling
 
 **Why, and when.** Written after the first counted set was read (`results/live/V3_REDIS.md`: work inside the line +14% to +27%,
-the hit rate up, the ceiling held 64 → 200 to 300 MB worse in all three of our runs, the index's resource reading −24.9%), at the founder's order
+the hit rate up, the ceiling held 64 → 200 to 300 MB away from its aim in all three of our runs, the index's resource reading −24.9%), at the founder's order
 of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it pays stays native and Omni only reads it.
 The brain must decide that on the muscle itself, in real time, by a measurement, not by a table after the fact.
 

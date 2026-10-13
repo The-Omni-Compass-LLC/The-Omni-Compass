@@ -109,13 +109,14 @@ def pod_starts(d):
             "time pods had no machine to take them, pod-minutes": float(sum(stuck)) / 60.0}
 
 
-LOWER_BETTER = {"worker nodes in service, mean", "node-hours", "power (W), mean", "power (W), peak", "energy (Wh)",
+AIM_LOWER = {   # gauges whose declared aim is lower (amounts waited, spent or held)
+               "worker nodes in service, mean", "node-hours", "power (W), mean", "power (W), peak", "energy (Wh)",
                 "energy, parked workers still on at idle power (Wh)",
                 "energy per core-hour (Wh)", "node-hours per core-hour", "time over the response line (% of samples)", "pending pods, pod-minutes", "pending pods, peak",
                 "HPA shortfall (desired > current), minutes", "HPA replicas, mean", "pods started", "pod start wait, total (s)",
                 "pod start wait, mean (s)", "pods with no machine to take them (unschedulable)", "time pods had no machine to take them, pod-minutes", "response time (ms), mean", "response time (ms), median",
                 "response time (ms), 95th percentile", "response time (ms), 99th percentile", "failed requests (%)"}
-HIGHER_BETTER = {"utilisation (used / allocatable)", "CPU used (cores), mean"}
+AIM_HIGHER = {"utilisation (used / allocatable)", "CPU used (cores), mean"}   # gauges whose declared aim is higher
 
 
 def latency(path):
@@ -165,12 +166,7 @@ def report(native_csv, omni_csv, audit=None, kill=None, block_minutes=2.0, idle_
     for k in gn:
         a, b = gn[k], go[k]
         ch = "" if k == "duration (min)" or a != a or b != b else (f"{100 * (b - a) / a:+.1f}%" if a else ("0" if b == 0 else "new"))
-        tag = ""
-        if ch and k in LOWER_BETTER and b != a:
-            tag = " better" if b < a else " worse"
-        elif ch and k in HIGHER_BETTER and b != a:
-            tag = " better" if b > a else " worse"
-        L.append(f"| {k} | {fmt(a)} | {fmt(b)} | {ch}{tag} |")
+        L.append(f"| {k} | {fmt(a)} | {fmt(b)} | {ch} |")
     B = blocks(N, block_minutes * 60, idle_w, dyn_w); Ob = blocks(O, block_minutes * 60, idle_w, dyn_w)
     L += ["", f"## Significance ({block_minutes:g}-minute blocks: native {len(B)}, omni {len(Ob)}; bootstrap 95% interval)", "",
           "| Metric | Native | Omni-Compass | Change | 95% CI of difference | Verdict |", "|---|---:|---:|---:|---|---|"]

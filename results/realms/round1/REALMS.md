@@ -12,15 +12,15 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 | Organism | Muscles | Label | Work per energy | Work | Energy | Violations (pp) | Valid |
 |---|---:|---|---:|---:|---:|---:|---|
-| Compute / AI / Cloud | 250 | **WORSE** | -2.6% (-3.2 to -2.1) | -0.0% (-0.1 to -0.0) | +2.7% (+2.1 to +3.2) | +0.2 (+0.1 to +0.3) | yes |
-| Physics / Robotics / Autonomous | 88 | **WORSE** | -2.6% (-3.0 to -2.2) | -0.0% (-0.0 to +0.0) | +2.7% (+2.2 to +3.1) | +1.8 (+1.7 to +2.0) | yes |
-| Energy / Facility / Industrial | 121 | **WORSE** | -1.2% (-1.4 to -0.9) | -1.9% (-2.2 to -1.7) | -0.7% (-0.8 to -0.7) | +2.2 (+2.0 to +2.5) | yes |
-| Distribution / Specialized | 197 | **WORSE** | -5.4% (-6.3 to -4.6) | +0.0% (-0.0 to +0.0) | +5.7% (+4.8 to +6.7) | -0.3 (-0.4 to -0.2) | yes |
-| The whole tower (656 muscles) | 656 | **WORSE** | -0.1% (-0.1 to -0.1) | -0.3% (-0.4 to -0.3) | -0.2% (-0.3 to -0.2) | +0.3 (+0.3 to +0.4) | yes |
+| Compute / AI / Cloud | 250 | **AWAY FROM ITS AIM** | -2.6% (-3.2 to -2.1) | -0.0% (-0.1 to -0.0) | +2.7% (+2.1 to +3.2) | +0.2 (+0.1 to +0.3) | yes |
+| Physics / Robotics / Autonomous | 88 | **AWAY FROM ITS AIM** | -2.6% (-3.0 to -2.2) | -0.0% (-0.0 to +0.0) | +2.7% (+2.2 to +3.1) | +1.8 (+1.7 to +2.0) | yes |
+| Energy / Facility / Industrial | 121 | **AWAY FROM ITS AIM** | -1.2% (-1.4 to -0.9) | -1.9% (-2.2 to -1.7) | -0.7% (-0.8 to -0.7) | +2.2 (+2.0 to +2.5) | yes |
+| Distribution / Specialized | 197 | **AWAY FROM ITS AIM** | -5.4% (-6.3 to -4.6) | +0.0% (-0.0 to +0.0) | +5.7% (+4.8 to +6.7) | -0.3 (-0.4 to -0.2) | yes |
+| The whole tower (656 muscles) | 656 | **AWAY FROM ITS AIM** | -0.1% (-0.1 to -0.1) | -0.3% (-0.4 to -0.3) | -0.2% (-0.3 to -0.2) | +0.3 (+0.3 to +0.4) | yes |
 
 ## Every muscle alone, by realm
 
-| Realm | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | WORSE | INVALID |
+| Realm | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Compute / AI / Cloud | 250 | 43 | 11 | 71 | 4 | 121 | 0 |
 | Physics / Robotics / Autonomous | 88 | 22 | 7 | 47 | 9 | 3 | 0 |
@@ -30,7 +30,7 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 ## By knob: what kind of authority Omni held
 
-| Knob | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | WORSE | INVALID | Median work per energy |
+| Knob | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID | Median work per energy |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | capacity | 344 | 60 | 2 | 36 | 18 | 228 | 0 | -10.9% |
 | setpoint | 55 | 26 | 20 | 6 | 3 | 0 | 0 | +3.3% |
@@ -43,7 +43,7 @@ For 55 of 55 setpoint muscles, a fixed setpoint at the calm end of the declared 
 
 ## By family
 
-| Realm | Family | Plant | Muscles | Superior | Tradeoff | Inconclusive | Not established | Worse | Invalid | Median work per energy |
+| Realm | Family | Plant | Muscles | Superior | Tradeoff | Inconclusive | Not established | Less work per energy | Invalid | Median work per energy |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | Compute / AI / Cloud | AI Inference Serving | compute_pool (gpu) | 16 | 1 | 1 | 6 | 0 | 8 | 0 | +0.0% |
 | Compute / AI / Cloud | AI Training | compute_pool (gpu_batch) | 16 | 15 | 0 | 1 | 0 | 0 | 0 | +6.6% |
@@ -106,16 +106,16 @@ For 55 of 55 setpoint muscles, a fixed setpoint at the calm end of the declared 
 | reservoir_level_target | Water Wastewater & Pumping | setpoint | SUPERIOR WITHIN GUARDRAILS | +12.9% (+11.8 to +14.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
 | valve_position_water | Water Wastewater & Pumping | setpoint | SUPERIOR WITHIN GUARDRAILS | +12.9% (+11.8 to +13.9) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
 | line_pressure_target | Water Wastewater & Pumping | setpoint | SUPERIOR WITHIN GUARDRAILS | +12.6% (+11.4 to +13.8) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| bandwidth_limit | Network Routing & Switching | capacity | WORSE | -38.3% (-50.2 to -26.4) | +0.0% (-0.0 to +0.0) | -0.1 (-0.4 to +0.3) |
-| object_replication | Storage Block/File/Object | capacity | WORSE | -36.2% (-46.8 to -25.6) | +0.0% (-0.0 to +0.0) | +0.1 (-0.4 to +0.7) |
-| throughput_limit | Storage Block/File/Object | capacity | WORSE | -33.9% (-41.4 to -26.5) | -0.0% (-0.0 to +0.0) | -0.1 (-0.8 to +0.5) |
-| snapshot_trigger | Storage Block/File/Object | capacity | WORSE | -33.9% (-41.6 to -26.2) | +0.0% (-0.0 to +0.0) | +0.4 (-0.0 to +0.9) |
-| building_demand_limit | Building & Critical Environment HVAC | power | WORSE | -32.6% (-55.1 to -10.2) | -35.2% (-59.0 to -11.3) | +25.3 (+8.3 to +42.3) |
-| backfill_rate | Storage Block/File/Object | capacity | WORSE | -31.7% (-41.8 to -21.5) | +0.0% (-0.0 to +0.0) | +0.6 (+0.2 to +0.9) |
-| erasure_code_profile | Storage Block/File/Object | capacity | WORSE | -30.6% (-42.1 to -19.0) | +0.0% (-0.0 to +0.0) | +0.3 (-0.1 to +0.8) |
-| rebalance | Storage Block/File/Object | capacity | WORSE | -30.2% (-41.7 to -18.8) | +0.0% (-0.0 to +0.0) | +0.2 (-0.2 to +0.5) |
-| recovery_rate | Storage Block/File/Object | capacity | WORSE | -29.8% (-44.0 to -15.6) | -0.0% (-0.0 to +0.0) | +0.3 (-0.4 to +0.9) |
-| iops_limit | Storage Block/File/Object | capacity | WORSE | -28.9% (-39.0 to -18.8) | -0.0% (-0.0 to +0.0) | +0.3 (-0.1 to +0.8) |
+| bandwidth_limit | Network Routing & Switching | capacity | LESS WORK PER ENERGY | -38.3% (-50.2 to -26.4) | +0.0% (-0.0 to +0.0) | -0.1 (-0.4 to +0.3) |
+| object_replication | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -36.2% (-46.8 to -25.6) | +0.0% (-0.0 to +0.0) | +0.1 (-0.4 to +0.7) |
+| throughput_limit | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -33.9% (-41.4 to -26.5) | -0.0% (-0.0 to +0.0) | -0.1 (-0.8 to +0.5) |
+| snapshot_trigger | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -33.9% (-41.6 to -26.2) | +0.0% (-0.0 to +0.0) | +0.4 (-0.0 to +0.9) |
+| building_demand_limit | Building & Critical Environment HVAC | power | LESS WORK PER ENERGY | -32.6% (-55.1 to -10.2) | -35.2% (-59.0 to -11.3) | +25.3 (+8.3 to +42.3) |
+| backfill_rate | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -31.7% (-41.8 to -21.5) | +0.0% (-0.0 to +0.0) | +0.6 (+0.2 to +0.9) |
+| erasure_code_profile | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -30.6% (-42.1 to -19.0) | +0.0% (-0.0 to +0.0) | +0.3 (-0.1 to +0.8) |
+| rebalance | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -30.2% (-41.7 to -18.8) | +0.0% (-0.0 to +0.0) | +0.2 (-0.2 to +0.5) |
+| recovery_rate | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -29.8% (-44.0 to -15.6) | -0.0% (-0.0 to +0.0) | +0.3 (-0.4 to +0.9) |
+| iops_limit | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -28.9% (-39.0 to -18.8) | -0.0% (-0.0 to +0.0) | +0.3 (-0.1 to +0.8) |
 
 ## Validity
 

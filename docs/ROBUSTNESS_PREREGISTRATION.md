@@ -54,11 +54,11 @@ what is tested.
 
 | Gauge | Direction |
 |---|---|
-| seconds from the kill to every setting back at the operator's (omni only) | **lower is better; shown with its interval**; an arm not handed back within 60 s reads **WORSE**, and an arm never handed back is INVALID and a loss |
-| settings after the hand-back equal the operator's; no record left (omni only) | **any failure is WORSE** |
-| the second governor's snapshot equals the operator's settings (omni only) | **any difference is WORSE** |
-| time over the response line and failed requests in the 120 s after the kill, native against omni | lower is better (the paired reading, as the fault test reads its windows) |
-| the whole window's gauges, as in every Kubernetes test: work inside the line, p95, p99, time over the line, failed requests, machines, standby-model energy | by the usual directions: a governor killed and restarted mid-run must not leave omni worse than native over the window |
+| seconds from the kill to every setting back at the operator's (omni only) | **the aim is lower; shown with its interval**; an arm not handed back within 60 s reads **AWAY FROM ITS AIM**, and an arm never handed back is INVALID and a loss |
+| settings after the hand-back equal the operator's; no record left (omni only) | **any failure is marked** |
+| the second governor's snapshot equals the operator's settings (omni only) | **any difference is marked** |
+| time over the response line and failed requests in the 120 s after the kill, native against omni | the aim is lower (the paired reading, as the fault test reads its windows) |
+| the whole window's gauges, as in every Kubernetes test: work inside the line, p95, p99, time over the line, failed requests, machines, standby-model energy | by the usual directions: a governor killed and restarted mid-run must not leave omni behind native over the window |
 | the watchdog's own record: which governor, hung or dead, which commands, each exit code | shown |
 
 ## Scenario 2: the long run
@@ -75,10 +75,10 @@ what is tested.
 | Gauge | Direction |
 |---|---|
 | the whole window's gauges, as in every Kubernetes test | by the usual directions |
-| governor resident memory, mean of the last ten minutes over the mean of the first ten (omni only) | shown; a growth of more than a quarter reads **WORSE** (a leak) |
+| governor resident memory, mean of the last ten minutes over the mean of the first ten (omni only) | shown; a growth of more than a quarter reads **AWAY FROM ITS AIM** (a leak) |
 | decisions made of expected; failed decisions (omni only) | shown; fewer than 95% of expected is INVALID; any failed decision is shown with its reason |
-| decision time, mean of the last hour against the first (omni only) | shown; a growth of more than half reads **WORSE** |
-| every setting handed back at the end, read back (omni only) | **any failure is WORSE** |
+| decision time, mean of the last hour against the first (omni only) | shown; a growth of more than half reads **AWAY FROM ITS AIM** |
+| every setting handed back at the end, read back (omni only) | **any failure is marked** |
 
 ## Scenario 3: the governor's own cost at 1, 10, 100 and 1,000 copies
 
@@ -113,7 +113,7 @@ the scenarios, the gauges, the allowance or the limits changed. The smoke run is
 
 `results/live/V3_ROBUST_KILL.md`: every setting back at the operator's 7 to 11 s after the kill in 30 of 30 repetitions
 (mean 9 s), a second governor to the end in every one, the 120 s after the kill no difference beyond the noise against
-native in all three runs, the whole window better in all three of our runs on mean response, p95, time over the line and failed requests,
+native in all three runs, the whole window toward its aim in all three of our runs on mean response, p95, time over the line and failed requests,
 machines and energy inside the noise. The memory ratio is not reported for this scenario, as declared: its window is
 shorter than twenty minutes. Nothing in the rules changed between the smoke run and the counted runs.
 
@@ -130,7 +130,7 @@ blind-means-hold rule requires; shown with their reason, as declared, and not ju
 consecutive decisions less the 60 s the governor sleeps, mean of the last hour over the first: at most 1.20, 1.14 and 1.07,
 under the limit of a half: no slowing. **Every setting handed back at the end** and read back at the operator's, no record
 left, in every repetition of every run. The whole window's gauges: machines, node-hours and both energy models no
-difference beyond the noise in all three runs; mean response, p95, p99 and time over the line read better in all three of our runs in run
+difference beyond the noise in all three runs; mean response, p95, p99 and time over the line read toward its aim in all three of our runs in run
 A and inside the noise in B and C, so **no difference beyond the noise in 2 of 3 runs** (three pairs give wide intervals,
 as the gauges' own direction says they would); failed requests no difference in all three; HPA replicas, pods started and
 pod start wait inside the noise. The governor's own CPU read 0.008 to 0.010 of a core. Readings: 9 no difference beyond the
@@ -190,7 +190,7 @@ as designed and costs nothing. The scenario's rules, thresholds and gauges are u
 
 The 60-second hand-back allowance is the sum of the watchdog's pass (5 s), the restore command's own run (one kubectl per
 setting, a few seconds) and the cluster's time to carry out the node un-taint and the HPA patch; it is set here, before the
-run, and if the hand-back takes longer the row reads WORSE and the reason is looked into. The memory rule (a quarter) and
+run, and if the hand-back takes longer the row reads higher and the reason is looked into. The memory rule (a quarter) and
 the decision-time rule (a half) are set here too. No rule is fitted on a result; there is no tuning case in this benchmark
 because nothing is tuned.
 

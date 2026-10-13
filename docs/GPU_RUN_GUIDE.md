@@ -197,10 +197,10 @@ A table from the GPU's own power meter:
 - the preregistered primary result: work per energy, in requests served per kilojoule, with its 95% interval.
 
 It ends with one verdict line, one of:
-- **better, proven**;
-- **worse, proven**;
+- **toward its aim, proven**;
+- **away from its aim, proven**;
 - **not proven**;
-- **better on energy, fails the service guardrail**.
+- **more requests per kJ, fails the service guardrail**.
 
 Whatever it says is the answer, and it is the first number in this project that Omni-Compass's own code did not
 compute.

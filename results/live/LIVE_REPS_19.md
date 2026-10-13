@@ -13,26 +13,26 @@ Kubernetes v1.35.0 with 1 control plane and 6 workers, metrics-server v0.9.0.
 - **Machines:** a machine I idle is marked prefer-not, and the one with the least work goes first.
 - **Pods:** the autoscaler alone makes and removes them; my pod reflex gauges and writes nothing.
 
-A change is significant when its paired 95% interval excludes zero. Lower response time is better.
+A change is significant when its paired 95% interval excludes zero. Lower response time moved toward its aim.
 
 ## The two columns
 
 | Gauge | Native | Me on top | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| workers in service, mean | 6 | 5.118 | −14.7% | −1.251 to −0.514 | better, significant |
-| node-hours | 1.519 | 1.298 | −14.5% | −0.3156 to −0.1254 | better, significant |
-| energy (Wh) | 158.7 | 143.9 | −9.3% | −22.87 to −6.793 | better, significant |
-| energy per unit of work (Wh per core-hour) | 754.6 | 578.8 | −23.3% | −197.2 to −154.4 | better, significant |
-| work done (CPU used, cores) | 0.8351 | 0.9923 | +18.8% | +0.05349 to +0.2608 | better, significant |
-| utilisation (used / allocatable) | 0.0348 | 0.04832 | +38.9% | +0.01034 to +0.01672 | better, significant |
-| replicas, mean | 8.726 | 5.49 | −37.1% | −4.044 to −2.428 | better, significant |
-| response time, mean (ms) | 91.51 | 60.92 | −33.4% | −55.51 to −5.661 | better, significant |
-| response time, 95th percentile (ms) | 201.5 | 92.49 | −54.1% | −147.8 to −70.16 | better, significant |
-| response time, 99th percentile (ms) | 297.1 | 110.1 | −63.0% | −237.5 to −136.6 | better, significant |
+| workers in service, mean | 6 | 5.118 | −14.7% | −1.251 to −0.514 | lower, significant |
+| node-hours | 1.519 | 1.298 | −14.5% | −0.3156 to −0.1254 | lower, significant |
+| energy (Wh) | 158.7 | 143.9 | −9.3% | −22.87 to −6.793 | lower, significant |
+| energy per unit of work (Wh per core-hour) | 754.6 | 578.8 | −23.3% | −197.2 to −154.4 | lower, significant |
+| work done (CPU used, cores) | 0.8351 | 0.9923 | +18.8% | +0.05349 to +0.2608 | higher, significant |
+| utilisation (used / allocatable) | 0.0348 | 0.04832 | +38.9% | +0.01034 to +0.01672 | higher, significant |
+| replicas, mean | 8.726 | 5.49 | −37.1% | −4.044 to −2.428 | lower, significant |
+| response time, mean (ms) | 91.51 | 60.92 | −33.4% | −55.51 to −5.661 | lower, significant |
+| response time, 95th percentile (ms) | 201.5 | 92.49 | −54.1% | −147.8 to −70.16 | lower, significant |
+| response time, 99th percentile (ms) | 297.1 | 110.1 | −63.0% | −237.5 to −136.6 | lower, significant |
 | failed requests (%) | 0 | 0 | 0 | 0 to 0 | equal |
-| pods not yet running, pod-minutes | 0.2633 | 0.16 | −39.2% | −0.6034 to +0.3968 | better, not significant |
+| pods not yet running, pod-minutes | 0.2633 | 0.16 | −39.2% | −0.6034 to +0.3968 | lower, not significant |
 
-Every gauge is better than native or equal to it. Ten of the twelve are better and significant. Failed requests are
+Every gauge is ahead of native or equal to it. Ten of the twelve moved toward their aims and significant. Failed requests are
 zero in both columns. Pods not yet running is lower than native but not significant.
 
 ## The trail, repetition by repetition

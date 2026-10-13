@@ -4,7 +4,7 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-PostgreSQL as shipped behind PgBouncer's shipped pool of 20 is native; omni is the compass law on the pool size through PgBouncer's own console (`docs/POSTGRES_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **better** or **WORSE in all three of our runs**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed transactions: any increase in any run is WORSE. Every row is shown, losses included. The host's CPU-seconds are measured on GitHub's shared runner; no energy is claimed.
+PostgreSQL as shipped behind PgBouncer's shipped pool of 20 is native; omni is the compass law on the pool size through PgBouncer's own console (`docs/POSTGRES_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **lower** or **higher in all three of our runs**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed transactions: any increase in any run is marked. Every row is shown, losses included. The host's CPU-seconds are measured on GitHub's shared runner; no energy is claimed.
 
 | Run | GitHub run | Commit | Engine | Workloads |
 |---|---|---|---|---:|
@@ -51,7 +51,7 @@ Native capacity, unlimited, per run: 3,754, 4,448, 7,385 tps; steps [1, 2, 3, 2,
 | latency, mean (ms) | 6.5 | 6.1 | -6.1% (-39.2 to +27.0) | -64.2% (-296.7 to +168.3) | +6.5% (-25.1 to +38.0) | no difference beyond the noise (3 of 3 runs) |
 | failed transactions | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
 | server connections alive, mean (the machines) | 20.0 | 19.2 | -4.0% (-5.1 to -2.8) | +2.2% (+0.8 to +3.6) | -3.5% (-6.5 to -0.6) | **the runs disagree** |
-| server connections alive, most at once | 20.0 | 21.7 | +8.3% (+1.2 to +15.5) | +11.7% (+4.5 to +18.8) | +11.7% (+4.5 to +18.8) | **WORSE in all three of our runs** |
+| server connections alive, most at once | 20.0 | 21.7 | +8.3% (+1.2 to +15.5) | +11.7% (+4.5 to +18.8) | +11.7% (+4.5 to +18.8) | **higher in all three of our runs** |
 | host CPU busy (share of the run) | 0.336 | 0.336 | +0.0% (-1.0 to +1.0) | +2.1% (-8.6 to +12.8) | +0.1% (-2.2 to +2.4) | no difference beyond the noise (3 of 3 runs) |
 | host CPU-seconds | 506.2 | 506.2 | +0.0% (-1.2 to +1.2) | +1.5% (-7.5 to +10.4) | +0.1% (-2.1 to +2.4) | no difference beyond the noise (3 of 3 runs) |
 | host CPU-seconds per 1,000 transactions inside the line | 0.698 | 0.698 | -0.1% (-2.2 to +2.0) | -17.8% (-63.1 to +27.5) | +0.6% (-2.1 to +3.3) | no difference beyond the noise (3 of 3 runs) |
@@ -75,7 +75,7 @@ Native capacity, unlimited, per run: 1,922, 1,867, 3,130 tps; steps [1, 2, 3, 2,
 | latency, median (ms) | 1.87 | 1.87 | -0.1% (-0.7 to +0.6) | -1.4% (-6.7 to +3.8) | -0.3% (-2.1 to +1.5) | no difference beyond the noise (3 of 3 runs) |
 | latency, mean (ms) | 2.39 | 2.49 | +4.2% (-5.4 to +13.9) | -0.4% (-20.1 to +19.2) | -9.6% (-102.2 to +83.1) | no difference beyond the noise (3 of 3 runs) |
 | failed transactions | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| server connections alive, mean (the machines) | 19.5 | 16.9 | -13.4% (-26.9 to -0.0) | -7.0% (-12.4 to -1.5) | -11.0% (-22.0 to -0.0) | **better in all three of our runs** |
+| server connections alive, mean (the machines) | 19.5 | 16.9 | -13.4% (-26.9 to -0.0) | -7.0% (-12.4 to -1.5) | -11.0% (-22.0 to -0.0) | **lower in all three of our runs** |
 | server connections alive, most at once | 20.0 | 20.0 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +1.7% (-5.5 to +8.8) | no difference beyond the noise (3 of 3 runs) |
 | host CPU busy (share of the run) | 0.231 | 0.231 | +0.2% (-1.0 to +1.3) | -1.9% (-8.1 to +4.4) | +0.0% (-2.6 to +2.6) | no difference beyond the noise (3 of 3 runs) |
 | host CPU-seconds | 359.4 | 360.1 | +0.2% (-1.0 to +1.4) | -1.9% (-8.3 to +4.5) | +0.1% (-2.5 to +2.6) | no difference beyond the noise (3 of 3 runs) |
@@ -87,7 +87,7 @@ The knob handed back and read back at the end of every omni arm in every run: ye
 
 The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 9 to 20 (14 trials, 11 allowed, 3 refused); acting: 10 to 20 (14 trials, 10 allowed, 3 refused); run B: acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused); run C: acting: 14 to 20 (11 trials, 6 allowed, 4 refused); acting: 18 to 20 (11 trials, 2 allowed, 7 refused); acting: 17 to 20 (9 trials, 3 allowed, 5 refused).
 
-**Across 3 workloads: 1 gauge-rows better in all three of our runs, 1 worse in all three of our runs, 1 where the runs disagree.**
+**Across 3 workloads: 1 gauge-rows toward its aim in all three of our runs, 1 away from its aim in all three of our runs, 1 where the runs disagree.**
 
 ---
 

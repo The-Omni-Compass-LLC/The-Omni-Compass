@@ -125,7 +125,7 @@ kubectl -n omni-compass logs deploy/omni-compass -f
 
 Your HPAs keep scaling as before. Omni-Compass sets their targets and raises floors ahead of bursts.
 
-**Pass condition:** p95, p99 and failed requests no worse than your own, over paired runs (section 6).
+**Pass condition:** p95, p99 and failed requests never behind than your own, over paired runs (section 6).
 
 ### Level 3. The machines
 1. Grant `patch nodes` and `patch pods` (`deploy/kind/rbac-omni.yaml`).
@@ -141,7 +141,7 @@ Your HPAs keep scaling as before. Omni-Compass sets their targets and raises flo
 A machine is given back only when every sense is live, the last order landed, pods are not scaling up, nothing waits
 for a place, and the remaining machines stay inside the band.
 
-**Pass condition:** fewer machines in service and less energy, with no service gauge worse.
+**Pass condition:** fewer machines in service and less energy, with no service gauge away from its aim.
 
 ### Level 4. Omni-Compass decides; Kubernetes is the muscle
 Add `--strict-replicas`: Omni-Compass decides each service's replica floor and when to shrink; your HPA stays as the
@@ -189,7 +189,7 @@ The CPU frequency ceiling follows the engine's cap inside the nervous system's e
 policy's recorded maximum back exactly. GPUs can be wired the same way from the controller:
 `--gpu-query-cmd "nvidia-smi --query-gpu=power.draw,temperature.gpu --format=csv,noheader,nounits" --gpu-power-cmd "nvidia-smi -pl {w}" --gpu-max-w <max>`.
 
-**Pass condition:** energy per unit of work down, no service gauge worse.
+**Pass condition:** energy per unit of work down, no service gauge away from its aim.
 
 ### Level 7. Site power, cooling, batteries
 | Organ | Switch | Status |
@@ -260,7 +260,7 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | Claim | Evidence | Kind |
 |---|---|---|
 | On real Kubernetes, Omni v1, three runs of ten pairs each: more work inside the response line (+42% to +48%), p95 −57% to −69%, machines fewer where a paired trial allowed it (steady −1.5% to −3.4%, batch −15% to −24%) | `results/live/V1_ALL_FOUR.md`, `V1_STEADY.md`, `V1_WANDERING.md`, `V1_FAULTS.md`, `V1_BATCH.md`, `V1_FAIRNESS.md` | measured on kind; read by the three-run rule (`docs/OMNI_V1.md`) |
-| On a real database, Omni v3: 61% to 72% fewer connections held open for the same work and latency, at +14% to +28% host CPU-seconds (worse in all three of our runs, reported) | `results/live/V3_PGBENCH.md` | measured on GitHub's machines |
+| On a real database, Omni v3: 61% to 72% fewer connections held open for the same work and latency, at +14% to +28% host CPU-seconds (away from its aim in all three of our runs, reported) | `results/live/V3_PGBENCH.md` | measured on GitHub's machines |
 | On Azure's bill, 4 workers: no difference beyond the noise on any gauge (the fleet is too small for the lever) | `results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md` | a real bill |
 | Energy on Kubernetes | declared model on kind, no meter | modelled |
 | GPU: more work per energy within the speed guardrail | earlier card controller, obsolete; rerun on rented cards pending | hardware meter |

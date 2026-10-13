@@ -290,12 +290,12 @@ muscle has shown that a move can pay, and then only by trial.
 
 ## One body, one brain, one tick
 
-A muscle judged alone can be made better by making its neighbour worse: a cache that takes memory from the database beside
+A muscle judged alone can be moved toward its aim by pushing its neighbour away from its own: a cache that takes memory from the database beside
 it, a consumer that takes processor time from the service it feeds. So the brain reads the whole body first, every
 muscle's state, every service's speed and work, the host's processor, memory and energy where a meter exists, and judges
 the body's cost: the Omni index's own arithmetic over all the work, all the speed, all the machines and all the resources.
-On top of the body's total stands a guard for every part. A step is refused if any one service got worse beyond its cushion,
-even when the total improved. Making one thing best by making another worse is refused by rule, not by luck.
+On top of the body's total stands a guard for every part. A step is refused if any one service moved away from its aim beyond its cushion,
+even when the total improved. Pushing one thing away from its aim to move another toward its own is refused by rule, not by luck.
 
 ## One trial at a time, nothing permanent, the wall belongs to the body
 
@@ -354,7 +354,7 @@ was made on: it was frozen as Omni v1 on 5 October 2026 with its proofs untouche
 and given one gate as v3, the slack gate on speed knobs, after the v2 realms read a service tradeoff on the Physics realm
 and the tower. That gate is the closed circle applied to a muscle's physics: an axis that is busy more than half the time
 at full speed has no slack to spend, and a law that spent it anyway would be spending energy for nothing; with the gate,
-every organism reads superior within its guardrails and zero muscles read worse (`results/realms/REALMS.md`). On real
+every organism reads superior within its guardrails and zero muscles read away from its aim (`results/realms/REALMS.md`). On real
 software the same law, read through the plug and the read-back, is the law of the Kubernetes, database, broker and cache
 tables, with their gains and their losses. The first opening, the basin's negative side, remains open and documented: it
 would be a new version with its own proof, and no result depends on it.
@@ -438,7 +438,7 @@ energy as ratios, combined by geometric means so that a gain and an equal loss c
 the same, and only rows the same in all three of our runs counted. The index is honest in both directions by construction.
 As this edition is written it reads +30.2%: real Kubernetes +25.5%, the database +14.2%, messaging +166.9%, and the cache
 −24.9%, the last negative because the memory the governor holds for a wide working set is the resource it trades and
-reads worse by rule, even as the cache's work and hit rate read better. A buyer reads the category that matches their
+reads away from its aim by rule, even as the cache's work and hit rate read toward its aim. A buyer reads the category that matches their
 stack, and reads its losses in the same table as its gains.
 
 **What a receipt is not.** A receipt is not a forecast. It is the measured difference between two arms on one system at

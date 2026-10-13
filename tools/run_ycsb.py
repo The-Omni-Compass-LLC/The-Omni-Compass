@@ -417,15 +417,13 @@ def paired(reps, key, direction):
     if direction == "shown":
         reading = "shown, not judged"
     elif direction == "never more" and any(x > 0 for x in d):
-        reading = "**WORSE**"
+        reading = "**higher in a repetition**"
     elif same:
         reading = "same"
     elif not clear:
         reading = "no difference beyond the noise"
-    elif direction == "never more":
-        reading = "better"
     else:
-        reading = "better" if (mean > 0) == (direction == "higher") else "**WORSE**"
+        reading = "lower" if mean < 0 else "higher"                # which way it went; the gauge's aim is the reader's
     return {"native": nat, "omni": om, "diff": mean, "ci95": [lo, hi], "n": n, "significant": clear, "reading": reading}
 
 

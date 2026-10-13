@@ -20,8 +20,8 @@ and the work order. The founder gave the word on 10 October 2026.
 3. **Collective processing.** One body, one brain, one tick a second. Read everything first: every muscle's state, every service's
    speed and work, the host's CPU, memory and energy where a meter exists. Then decide. The cost the brain judges is the body's
    cost (all the work, all the speed, all the machines, all the resources: the Omni index's own arithmetic), never one muscle's.
-4. **Hurt nothing anywhere.** On top of the body's cost, a guard for every part: a step is refused if any one service got worse
-   beyond its cushion even when the body's total improved. Making one thing best by making another thing worse is refused by rule.
+4. **Hurt nothing anywhere.** On top of the body's cost, a guard for every part: a step is refused if any one service moved away from its aim
+   beyond its cushion even when the body's total improved. Pushing one thing away from its aim to move another toward its own is refused by rule.
 5. **One trial at a time inside a body.** If two muscles move together the brain cannot tell which one caused the reaction. The
    body grants one new trial at a time, to the muscle asking loudest whose own condition holds. Every other muscle keeps acting
    inside what it has already proven. Nothing is frozen; only new trials wait their turn.
@@ -32,7 +32,7 @@ and the work order. The founder gave the word on 10 October 2026.
    to brake across the body: the law's brake, not a reset.
 8. **Everything is wired.** Every muscle gets both wires, always. Staying native is the brain's live decision every second, from the
    muscle's own state, the whole system's state and the law's force. It is never a one-time verdict from one run, and nothing is
-   unwired because of one reading. The order of 9 October ("where a run reads native better, leave the knob native and watch
+   unwired because of one reading. The order of 9 October ("where a run reads native ahead, leave the knob native and watch
    first") is replaced by this one: the watching is the brain's own job each second.
 9. **Six organisms.** (1) Compute / AI / Cloud, 430; (2) Physics / Robotics / Autonomous, 376; (3) Energy / Facility / Industrial,
    470; (4) Distribution / Specialized, 440; (5) all realms stacked together, every muscle used in every realm, 1,716; (6) the whole
@@ -47,7 +47,7 @@ and the work order. The founder gave the word on 10 October 2026.
     a physical meter is class P. "Simulation" stays only in the license's own phrase and in the names of third-party simulators.
 12. **Reports.** We build every table, receipt and reading from the raw files with our own code; GitHub runs the jobs and stores
     the files; the raw files are archived with checksums. Every row is shown, always, native and Omni, plus or minus. A row that
-    comes out worse in all three of our runs is a bug report against our own wiring: fix the wiring, run again, the rerun becomes the result of
+    comes out away from its aim in all three of our runs is a bug report against our own wiring: fix the wiring, run again, the rerun becomes the result of
     record, the earlier set stays in `docs/history`. No row is ever dropped.
 13. **The card and the two clouds** are written onto the same mechanism before they run: the same probe first, snapshot once, wire
     owned by the brain, reflex rule, body judgement, three runs, receipts, archive. The GPU controllers are inside the engine and
@@ -204,7 +204,7 @@ one of the three lists, or it is a gap and gets a row.
 ## 6. What is expected
 
 The 124 superior muscles of the realms table keep their wire in; the 13 trades read as watch (the trial refuses them); the
-noninferior muscles stay watch; no muscle reads WORSE, by construction. Kafka's queue gain returns at a fraction of the earlier
+noninferior muscles stay watch; no muscle reads higher, by construction. Kafka's queue gain returns at a fraction of the earlier
 consumers once the trial judges the queue by the queue; Redis buys only the memory that pays; the three databases give back what
 proves to pay and lose nothing. The organisms' work per energy is expected unchanged or slightly lower (the trades no longer
 contribute their energy saving), with time in violation no higher than native's everywhere.

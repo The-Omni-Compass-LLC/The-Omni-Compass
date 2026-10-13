@@ -79,12 +79,40 @@ def model_cell(s):
     return f"{lab}: misses {m:+.3f} pp, work {w:+.3f}%, power given {e:+.3f}% ({s['runs']} of {s['of']} runs)"
 
 
+SHOWN = {"host CPU busy, the real machine under kind (%)", "organism behind its window (s)"}   # tools/six_kube_report.py
+
+
+def directions(o):
+    """A square's gauges by the way they went against native, from its rows (never from a reading's words): (lower, higher,
+    inside the noise). A gauge counts when it is judged (not shown-only, not the same to rounding) and its 95% interval is
+    clear of zero."""
+    lower, higher, noise = [], [], 0
+    for k, v in (o.get("rows") or {}).items():
+        if v.get("neutral") or k in SHOWN or v.get("same"):
+            continue
+        if v.get("n", 0) > 1 and (v["lo"] > 0 or v["hi"] < 0):
+            (lower if v["diff"] < 0 else higher).append(k)
+        else:
+            noise += 1
+    return lower, higher, noise
+
+
+def kube_verdict(o):
+    """The square's line in the direction words, with the report's own facts kept (off the clock, invalid)."""
+    if o["repetitions"] < 2:
+        return "ONE REPETITION"
+    lower, higher, noise = directions(o)
+    facts = "".join("; " + f for f in re.findall(r"; ((?:OFF THE CLOCK|INVALID)[^;]*)", o["verdict"]))   # kept as recorded
+    return (f"lower on {len(lower)}" + (f" ({'; '.join(lower)})" if lower else "") + f", higher on {len(higher)}"
+            + (f" ({'; '.join(higher)})" if higher else "") + f", inside the noise on {noise}" + facts)
+
+
 def kube_cell(o):
     if not o:
         return "not in the report"
-    if o["verdict"].startswith("ONE REPETITION"):
-        return o["verdict"]
-    return f"{o['repetitions']} repetitions: {o['verdict']}"
+    if o["repetitions"] < 2:
+        return "ONE REPETITION"
+    return f"{o['repetitions']} repetitions: {kube_verdict(o)}"
 
 
 def kube_key(org, size):
@@ -96,14 +124,48 @@ def rng(xs):
     return lo if lo == hi else f"{lo} to {hi}"
 
 
-WORSE = re.compile(r"worse on (\d+)(?: \((.*)\))?, inside the noise on")
+HOST, FAILED, SVC_CPU = ("host CPU busy, the real machine under kind (%)", "failed requests (%)",
+                         "CPU used with Omni's own (cores), mean")
 
 
-def worse_gauges(verdict):
-    """The gauges a square's verdict reads worse, in its own words (tools/six_kube_report.py: "better on 3, worse on 2
-    (a; b), inside the noise on 6"); None for a verdict with no such count (one repetition)."""
-    m = WORSE.search(verdict)
-    return None if not m else (m.group(2).split("; ") if m.group(2) else [])
+def machine_note(kub):
+    """The test machine at each size, from native's own rows (the most repetitions each size has): how busy the machine
+    under the cluster was, native's own failed requests, the cluster's CPU in Omni's arm against native, the repetitions
+    off the window's clock. At the size where the machine runs out, the squares read the machine, not the governor."""
+    by_size = {}
+    for (size, n), (rep, _, _) in kub.items():
+        if size not in by_size or int(n) > int(by_size[size][0]):
+            by_size[size] = (n, rep)
+    rng_ = lambda xs, f="{:.0f}": (f.format(min(xs)) if f.format(min(xs)) == f.format(max(xs)) else f"{f.format(min(xs))} to {f.format(max(xs))}")
+    rows_ = []
+    for size in sorted(by_size):
+        n, rep = by_size[size]
+        orgs = (rep.get("organisms") or {}).values()
+        host = [o["rows"][HOST]["native"] for o in orgs if HOST in o.get("rows", {})]
+        fail = [o["rows"][FAILED]["native"] for o in orgs if FAILED in o.get("rows", {})]
+        cpu = [o["rows"][SVC_CPU]["pct"] for o in orgs if SVC_CPU in o.get("rows", {})]
+        off = [(name_of_square(k), re.search(r"OFF THE CLOCK in (\d+) of (\d+)", o["verdict"])) for k, o in (rep.get("organisms") or {}).items()]
+        off = [f"{nm} {m.group(1)} of {m.group(2)}" for nm, m in off if m]
+        if host and fail and cpu:
+            rows_.append(f"| {copies(size)} ({n} repetitions) | {rng_(host)}% | {rng_(fail)}% | {rng_(cpu, '{:+.1f}')}% | "
+                         f"{', '.join(off) or 'none'} |")
+    if not rows_:
+        return []
+    return ["### The test machine at each size", "",
+            "Native's own numbers on GitHub's four-core machine, which runs the real cluster, the model of the organism and, "
+            "in Omni-Compass's arm, Omni-Compass's math for every modelled muscle, all at once:", "",
+            "| Size | Machine busy (native) | Failed requests (native) | The cluster's CPU, Omni-Compass's arm against native | Off the window's clock |",
+            "|---|---:|---:|---:|---|", *rows_, "",
+            "The load is the same at every size; what grows with the copies is the model on the same four cores. Where the "
+            "machine runs out, native's own failed requests rise with it, the cluster gets less CPU in the arm whose model "
+            "also carries Omni-Compass's math, and the largest organisms fall behind the window's clock, so their last steps "
+            "no longer follow the scheduled load: those squares read the test machine's limit, not Omni-Compass governing a "
+            "cluster. They run again on the rewired test, the model on cores of its own.", ""]
+
+
+def name_of_square(k):
+    org = k.split("@")[0]
+    return NAMES.get(org, org)
 
 
 def across(data):
@@ -120,14 +182,12 @@ def across(data):
                      + f"; work {rng([100 * s['work'][0] for s in sq])}; power given {rng(pg)}")
     ks = [o for cells in data["kube"].values() for o in cells.values() if o]
     if ks:
-        judged = [w for o in ks if (w := worse_gauges(o["verdict"])) is not None]
-        single = sum(1 for o in ks if o["verdict"].startswith("ONE REPETITION"))
-        by = Counter(g for w in judged for g in w)
-        other = len(ks) - len(judged) - single
-        parts.append(f"with the cluster inside, {len(ks)} squares: {single} single repetitions (no reading)"
-                     + (f", {other} with a verdict of another form" if other else "")
-                     + f"; of the {len(judged)} of 10 and 100 repetitions, worse on no gauge in {sum(1 for w in judged if not w)}"
-                     + (", the gauges read worse: " + ", ".join(f'"{g}" in {c}' for g, c in by.most_common()) if by else "")
+        judged = [o for o in ks if o["repetitions"] >= 2]
+        lo, hi = Counter(g for o in judged for g in o["lower"]), Counter(g for o in judged for g in o["higher"])
+        gauges = sorted(set(lo) | set(hi), key=lambda g: (-(lo[g] + hi[g]), g))
+        parts.append(f"with the cluster inside, {len(ks)} squares: {len(ks) - len(judged)} single repetitions (no reading); "
+                     f"of the {len(judged)} of 10 and 100 repetitions, by gauge: "
+                     + (", ".join(f'"{g}" lower in {lo[g]}, higher in {hi[g]}' for g in gauges) or "no gauge clear of the noise")
                      + f"; off the clock in {sum(1 for o in ks if 'OFF THE CLOCK' in o['verdict'])}"
                      + f"; invalid in {sum(1 for o in ks if 'INVALID' in o['verdict'])}")
     return "**Across the grid: " + ("; ".join(parts) or "no squares") + ".**"
@@ -171,14 +231,14 @@ def main(argv=None):
               "Pooled reports: " + ", ".join(f"{copies(s)}: run {r}" for s, r in sorted({(s, r) for (s, _), (_, r, _) in kub.items()}))
               + ". Every gauge of every square, with its interval: " + ", ".join(link(kub[k][2], od) for k in sorted(kub, key=lambda k: (k[0], int(k[1]))))
               + ".", "",
-              "How to read a square with the cluster inside: the report's own verdict (`tools/six_kube_report.py`) over its judged "
-              "gauges, the cluster's response times, time over the response line, failed requests, pods started, replicas, "
-              "machines and declared energy, and the organism's work, energy, work per energy and time over its line; a gauge "
-              "counts better or worse only when its 95% interval is clear of zero, and the rest are inside the noise. That "
-              "report judges the organism's modelled energy and its work per energy as lower-better, as it did before the max; "
-              "the modelled receipts above show the same energy as the power given, beside the work. OFF THE CLOCK marks the "
-              "repetitions where the organism ended more than 5% of the window late, its last steps seeing a cluster whose load "
-              "schedule had ended: the runner could not step that many muscles in time.", ""]
+              "How to read a square with the cluster inside: which gauges came out lower and which higher than native, each "
+              "only when its 95% interval is clear of zero (the rest are inside the noise), read from the report's own rows "
+              "(`tools/six_kube_report.py`): the cluster's response times, time over the response line, failed requests, "
+              "pods started, replicas, machines and declared energy, and the organism's work, energy, work per energy and "
+              "time over its line. The organism's modelled energy is the power given; the modelled receipts above show it "
+              "beside the work. OFF THE CLOCK marks the repetitions where the organism ended more than 5% of the window late, "
+              "its last steps seeing a cluster whose load schedule had ended: the runner could not step that many muscles in "
+              "time.", ""]
         for size in SIZES:
             L += [f"### {copies(size)}", "", "| Organism | 1 run | 10 runs | 100 runs |", "|---|---|---|---|"]
             for org in ORGS:
@@ -186,10 +246,14 @@ def main(argv=None):
                 for n in RUNS:
                     rep = kub.get((size, n), (None,))[0]
                     o = ((rep or {}).get("organisms") or {}).get(kube_key(org, size))
-                    data["kube"].setdefault(f"{org}@{size}", {})[n] = o and {"repetitions": o["repetitions"], "verdict": o["verdict"]}
+                    data["kube"].setdefault(f"{org}@{size}", {})[n] = o and {
+                        "repetitions": o["repetitions"], "verdict": kube_verdict(o), "recorded_verdict": o["verdict"],
+                        "lower": directions(o)[0], "higher": directions(o)[1], "rows": o.get("rows") or {}}
                     cells.append(kube_cell(o))
                 L.append(f"| {NAMES[org]} | " + " | ".join(cells) + " |")
             L.append("")
+    if kub:
+        L += machine_note(kub)
     L[top:top] = [across(data), ""]
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(stamp(L)) + "\n", encoding="utf-8")

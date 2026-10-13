@@ -26,7 +26,7 @@ Governor settings: headroom 0.3, min_share 0.7, util_gate 0.5, util_band 0.1, in
 | power-limit writes | 0 | 17.5 | n/a | +14.28 to +20.72 |
 
 Guardrail (preregistered): 95th-percentile response time not above +10%: held (upper bound +1.4%).
-**Model verdict: better, proven.**
+**Model verdict: toward its aim, proven.**
 
 ### Card model gamma 1.5 (near its voltage floor)
 
@@ -47,7 +47,7 @@ Guardrail (preregistered): 95th-percentile response time not above +10%: held (u
 | power-limit writes | 0 | 36.1 | n/a | +29.57 to +42.63 |
 
 Guardrail (preregistered): 95th-percentile response time not above +10%: held (upper bound +4.7%).
-**Model verdict: better, proven.**
+**Model verdict: toward its aim, proven.**
 
 ---
 

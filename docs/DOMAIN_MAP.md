@@ -122,7 +122,7 @@ Omni-Compass can be the boundary layer AI runs inside. It cannot be the thing th
 | Heat and cooling limits | govern IT load and cooling plant together | Direct |
 | Grid connection limits for new data centres | power smoothing, demand response, stay under contracted power | Direct |
 | Carbon reporting and reduction | carbon-aware placement and timing, measured energy | Direct |
-| On-call burnout and alert fatigue | hold the levers people turn at night; fewer, better alerts | Direct |
+| On-call burnout and alert fatigue | hold the levers people turn at night; fewer alerts, each one meaning something | Direct |
 | Autoscalers fighting each other | single authority | Direct (proven in simulation) |
 | Latency and SLO breaches under load | headroom governance, fast scheduling floor | Direct |
 | Noisy neighbours, unfair tenants | quotas and growth permissions | Direct |

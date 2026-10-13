@@ -80,7 +80,7 @@ Nothing from development seeds is reported.
   - ENERGY IMPROVEMENT WITH SERVICE TRADEOFF;
   - NONINFERIOR / INCONCLUSIVE;
   - NOT ESTABLISHED;
-  - WORSE;
+  - LESS WORK PER ENERGY;
   - INVALID.
 
 ## Invalid
@@ -140,7 +140,7 @@ for Omni before and after them.
 
 ## Round 2 (2026-10-01, after round 1's results; before any round-2 counted seed)
 
-Round 1 (seeds 1000-1009) labelled all five organisms WORSE. Reading the result against the shipped controller
+Round 1 (seeds 1000-1009) labelled all five organisms LESS WORK PER ENERGY. Reading the result against the shipped controller
 (`omni_controller/controller.py`, `omni_controller/muscles.py`, `omnicompass/nervous_system.py`) showed that round 1's
 Omni layer was not the Omni that runs on Kubernetes. Round 1 is kept unchanged in `results/realms/round1/`, with a note
 saying why it is superseded. Round 2 changes only how Omni commands a knob, the native machine-pool scaler and the
@@ -324,7 +324,7 @@ published until now describe the allocation law and stay as first measured in `d
 
 ## Amendment (2026-10-05): four levers bounded by their physics, and the mirror label (written after the compass table was seen)
 
-Disclosed: written after the first compass-law table (nine muscles WORSE) was seen. Each change follows from the muscle's
+Disclosed: written after the first compass-law table (nine muscles LESS WORK PER ENERGY) was seen. Each change follows from the muscle's
 own model (`docs/MECHANISM_OF_ACTION.md` 9.6), applies to every muscle of its kind, and is tested:
 1. Cooling power is native. A cap moves heat removal later, never away, and stages more units.
 2. A battery's reserve is spent only at the connection's wall, and only when the battery can cover the excess. Below

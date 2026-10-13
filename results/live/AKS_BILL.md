@@ -12,7 +12,7 @@ Repetition 2 lost an arm and is excluded, as preregistered; four paired repetiti
 control-plane selector kept beside the AKS one) and are not results. Evidence class **L**, the bill **metered** (Azure's
 own count of machines every 15 s, priced at list).
 
-**Result. No difference in the bill, either way, and no measure significantly worse.** Native 0.615 machine-hours
+**Result. No difference in the bill, either way, and no measure significantly away from its aim.** Native 0.615 machine-hours
 (USD 0.059 a 15-minute window); with the allocation law −0.6%, with the compass law +0.8%, intervals across zero. Azure's own
 autoscaler already ran this workload on about 1.86 workers out of 4: on a real cloud with a node autoscaler underneath,
 this light workload leaves Omni-Compass no machine to give back. The machine savings measured on kind (where the native
@@ -38,7 +38,7 @@ record. Four repetitions with wide intervals: no saving shown, none excluded at 
 | Omni's own CPU (cores), mean | 0 | 0.01315 | +0.0132 (native is 0) | +0.01226 to +0.01404 | yes, more |
 | CPU used with Omni's own (cores), mean | 1.673 | 1.74 | +4.0% | -0.0838 to +0.2176 | no |
 | energy per core-hour (Wh, the 25 W standby model) | 197.5 | 187.1 | -5.3% | -34.39 to +13.55 | no |
-| HPA replicas, mean | 9.474 | 9.125 | -3.7% | -0.6744 to -0.02221 | yes, better |
+| HPA replicas, mean | 9.474 | 9.125 | -3.7% | -0.6744 to -0.02221 | yes, lower |
 | pods started | 6 | 6.5 | +8.3% | -4.093 to +5.093 | no |
 | pod start wait, total (s) | 211.8 | 282 | +33.2% | -161.3 to +301.8 | no |
 | pod start wait, mean (s) | 36.28 | 45.63 | +25.8% | -41.2 to +59.89 | no |

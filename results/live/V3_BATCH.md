@@ -4,7 +4,7 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **Better** or **WORSE in all three of our runs**: all three runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, losses included.
+Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **Toward its aims** or **away from its aim in all three of our runs**: all three runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, losses included.
 
 | Run | GitHub run | Commit | Engine | Paired repetitions |
 |---|---|---|---|---:|
@@ -14,11 +14,11 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
-| worker nodes in service, mean | -17.4% (-24.6 to -10.3) | -20.0% (-26.2 to -13.8) | -15.7% (-19.6 to -11.8) | **better in all three of our runs** |
-| node-hours | -17.6% (-24.7 to -10.5) | -20.0% (-26.1 to -13.9) | -15.8% (-19.8 to -11.8) | **better in all three of our runs** |
+| worker nodes in service, mean | -17.4% (-24.6 to -10.3) | -20.0% (-26.2 to -13.8) | -15.7% (-19.6 to -11.8) | **lower in all three of our runs** |
+| node-hours | -17.6% (-24.7 to -10.5) | -20.0% (-26.1 to -13.9) | -15.8% (-19.8 to -11.8) | **lower in all three of our runs** |
 | energy, parked workers still on at idle power (Wh, declared model) | -0.2% (-0.7 to +0.2) | +0.0% (-0.3 to +0.4) | +0.1% (-0.3 to +0.5) | no difference beyond the noise (all three runs) |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | -12.2% (-17.3 to -7.2) | -13.8% (-17.9 to -9.6) | -10.8% (-13.7 to -7.8) | **better in all three of our runs** |
-| response time (ms), mean | -13.1% (-15.3 to -11.0) | -11.2% (-14.9 to -7.5) | -12.6% (-15.3 to -10.0) | **better in all three of our runs** |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | -12.2% (-17.3 to -7.2) | -13.8% (-17.9 to -9.6) | -10.8% (-13.7 to -7.8) | **lower in all three of our runs** |
+| response time (ms), mean | -13.1% (-15.3 to -11.0) | -11.2% (-14.9 to -7.5) | -12.6% (-15.3 to -10.0) | **lower in all three of our runs** |
 | response time (ms), 95th percentile | -2.4% (-5.3 to +0.5) | +0.2% (-4.7 to +5.1) | -1.9% (-5.0 to +1.2) | no difference beyond the noise (all three runs) |
 | response time (ms), 99th percentile | -1.9% (-6.4 to +2.6) | +0.3% (-3.0 to +3.5) | -1.4% (-4.4 to +1.5) | no difference beyond the noise (all three runs) |
 | time over the response line (% of samples) | -4.0% (-6.6 to -1.3) | -3.7% (-5.9 to -1.6) | -3.0% (-7.1 to +1.2) | no difference beyond the noise in 1 of 3 runs |
@@ -38,9 +38,9 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 | host CPU busy, the real machine under kind (%) | +1.7% (+1.0 to +2.5) | +1.5% (+0.9 to +2.2) | +1.9% (+0.9 to +2.9) | shown, not judged |
 | host cores (the real machine under kind) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | shown, not judged |
 | batch: queue finished (s) | +0.3% (-0.7 to +1.2) | +0.3% (-0.8 to +1.4) | +0.5% (-0.6 to +1.6) | no difference beyond the noise (all three runs) |
-| batch: worker machines in service after the queue finished, mean | -27.3% (-36.5 to -18.2) | -32.5% (-40.5 to -24.5) | -25.7% (-31.3 to -20.1) | **better in all three of our runs** |
+| batch: worker machines in service after the queue finished, mean | -27.3% (-36.5 to -18.2) | -32.5% (-40.5 to -24.5) | -25.7% (-31.3 to -20.1) | **lower in all three of our runs** |
 
-Readings: 5 better in all three of our runs, 9 no difference beyond the noise (all three runs), 1 no difference beyond the noise in 1 of 3 runs, 2 same, 8 shown, not judged.
+Readings: 5 toward its aim in all three of our runs, 9 no difference beyond the noise (all three runs), 1 no difference beyond the noise in 1 of 3 runs, 2 same, 8 shown, not judged.
 
 ---
 

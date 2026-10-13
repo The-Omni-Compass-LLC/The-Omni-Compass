@@ -189,7 +189,7 @@ are sourced.
    `docs/TRACKING_THEOREM.md`).
 3. **Run native against Omni on the same membership for each realm.** Compute is the one GitHub can host for real;
    the other three are modelled until their hosts exist.
-4. **Aim the chip at about 5% more finished work on the same bill**, cap unchanged and temperature no worse, or at
+4. **Aim the chip at about 5% more finished work on the same bill**, cap unchanged and temperature never behind, or at
    fewer joules for the same work. The buyer chooses, and the receipt prints which.
 
 ---

@@ -45,10 +45,10 @@ declared standby power, which needs a node autoscaler that really removes the ma
 | node-hours | 1.494 | 1.493 | -0.1% | -0.01325 to +0.01013 | no |
 | energy, parked workers still on at idle power (Wh, declared model) | 166.2 | 166.1 | -0.1% | -1.088 to +0.8808 | no |
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 164.6 | 164.2 | -0.2% | -1.522 to +0.7814 | no |
-| response time (ms), mean | 212.1 | 139 | -34.5% | -131.9 to -14.23 | yes, better |
-| response time (ms), 95th percentile | 367.6 | 146.8 | -60.1% | -294.6 to -146.9 | yes, better |
+| response time (ms), mean | 212.1 | 139 | -34.5% | -131.9 to -14.23 | yes, lower |
+| response time (ms), 95th percentile | 367.6 | 146.8 | -60.1% | -294.6 to -146.9 | yes, lower |
 | response time (ms), 99th percentile | 1361 | 1155 | -15.1% | -971.8 to +560.1 | no |
-| time over the response line (% of samples) | 8.001 | 6.195 | -22.6% | -3.147 to -0.4666 | yes, better |
+| time over the response line (% of samples) | 8.001 | 6.195 | -22.6% | -3.147 to -0.4666 | yes, lower |
 | failed requests (%) | 5.352 | 4.815 | -10.0% | -1.216 to +0.143 | no |
 | pods with no machine to take them (unschedulable) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
 | time pods had no machine to take them, pod-minutes | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
@@ -67,7 +67,7 @@ declared standby power, which needs a node autoscaler that really removes the ma
 
 ## The fault test: the same faults at the same moments in every arm
 
-Time to recover: from the fault's start until responses stay under the line for 30 seconds straight (at most 300 s). Over the line: the share of response samples over the line or failed in the 300 seconds after the fault. Paired means over the repetitions; lower is better in both.
+Time to recover: from the fault's start until responses stay under the line for 30 seconds straight (at most 300 s). Over the line: the share of response samples over the line or failed in the 300 seconds after the fault. Paired means over the repetitions; the aim is lower in both.
 
 | Fault | Arm | Time to recover (s) | Over the line (%) | Change in recovery against native |
 |---|---|---:|---:|---:|

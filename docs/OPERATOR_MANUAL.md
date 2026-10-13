@@ -245,7 +245,7 @@ Your HPAs keep scaling. My pod reflex raises floors ahead of the CPU averages.
 - Apart from that, I only tighten, never loosen.
 - While response time is over your target, and for three decisions after, your own target stands.
 
-**Pass condition.** p95, p99 and failed requests no worse than native.
+**Pass condition.** p95, p99 and failed requests never behind native.
 
 ### Step 4. Give me the machines
 1. Grant `patch nodes` and `patch pods` for the first-to-go mark (`deploy/kind/rbac-omni.yaml`).
@@ -265,7 +265,7 @@ I give a machine back only when all of these hold:
 - nothing is waiting for a place;
 - the machines that remain stay inside Ω.
 
-**Pass condition.** Fewer machines in service and less energy, with no service gauge worse.
+**Pass condition.** Fewer machines in service and less energy, with no service gauge away from its aim.
 
 ### Step 5. Let me decide alone (Kubernetes as the muscle only)
 Add `--strict-replicas`:
@@ -284,7 +284,7 @@ Add `--strict-replicas`:
 | Power and cooling | `--power-cmd "<prints site watts>" --site-limit-w <limit> --cooling-cmd "<sets {c}>"` |
 | Batch and rollouts | `--batch --batch-pace --rollout-guard <ns/deployment>` |
 
-**Pass condition.** Energy per unit of work down, with no service gauge worse.
+**Pass condition.** Energy per unit of work down, with no service gauge away from its aim.
 
 ### Step 7. The switch drill, at every step
 1. Turn me OFF.

@@ -41,15 +41,15 @@ declared standby power, which needs a node autoscaler that really removes the ma
 
 | Gauge | native | omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
-| worker nodes in service, mean | 6 | 5.933 | -1.1% | -0.1301 to -0.003607 | yes, better |
-| node-hours | 4.51 | 4.462 | -1.1% | -0.09388 to -0.001734 | yes, better |
-| energy, parked workers still on at idle power (Wh, declared model) | 514.4 | 513.2 | -0.2% | -2.14 to -0.143 | yes, better |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 514.4 | 509.5 | -1.0% | -8.426 to -1.403 | yes, better |
-| response time (ms), mean | 268.5 | 150.7 | -43.9% | -151.7 to -83.89 | yes, better |
-| response time (ms), 95th percentile | 741.1 | 273.1 | -63.1% | -625.9 to -310.1 | yes, better |
+| worker nodes in service, mean | 6 | 5.933 | -1.1% | -0.1301 to -0.003607 | yes, lower |
+| node-hours | 4.51 | 4.462 | -1.1% | -0.09388 to -0.001734 | yes, lower |
+| energy, parked workers still on at idle power (Wh, declared model) | 514.4 | 513.2 | -0.2% | -2.14 to -0.143 | yes, lower |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 514.4 | 509.5 | -1.0% | -8.426 to -1.403 | yes, lower |
+| response time (ms), mean | 268.5 | 150.7 | -43.9% | -151.7 to -83.89 | yes, lower |
+| response time (ms), 95th percentile | 741.1 | 273.1 | -63.1% | -625.9 to -310.1 | yes, lower |
 | response time (ms), 99th percentile | 2544 | 2031 | -20.2% | -1483 to +457.3 | no |
-| time over the response line (% of samples) | 17.88 | 10.61 | -40.7% | -10.26 to -4.292 | yes, better |
-| failed requests (%) | 9.856 | 8.632 | -12.4% | -1.913 to -0.5334 | yes, better |
+| time over the response line (% of samples) | 17.88 | 10.61 | -40.7% | -10.26 to -4.292 | yes, lower |
+| failed requests (%) | 9.856 | 8.632 | -12.4% | -1.913 to -0.5334 | yes, lower |
 | pods with no machine to take them (unschedulable) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
 | time pods had no machine to take them, pod-minutes | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
 | pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.3683 | 0.48 | +30.3% | -0.1365 to +0.3598 | no |
@@ -58,7 +58,7 @@ declared standby power, which needs a node autoscaler that really removes the ma
 | Omni's own CPU (cores), mean | 0 | 0.00858 | +0.00858 (native is 0) | +0.00729 to +0.00987 | yes, more |
 | CPU used with Omni's own (cores), mean | 2.37 | 2.322 | -2.0% | -0.06302 to -0.03162 | yes, less |
 | energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 313.8 | 320 | +2.0% | +2.475 to +9.981 | yes, more |
-| HPA replicas, mean | 9.491 | 9.075 | -4.4% | -0.7764 to -0.05564 | yes, better |
+| HPA replicas, mean | 9.491 | 9.075 | -4.4% | -0.7764 to -0.05564 | yes, lower |
 | pods started | 4.5 | 4.9 | +8.9% | -0.5656 to +1.366 | no |
 | pod start wait, total (s) | 14.6 | 15.5 | +6.2% | -6.161 to +7.961 | no |
 | pod start wait, mean (s) | 2.69 | 2.781 | +3.4% | -0.8044 to +0.9873 | no |

@@ -53,7 +53,7 @@ class CapacityReport(unittest.TestCase):
             d = json.loads(out.with_suffix(".json").read_text())
             one, four = d["rows"]
             self.assertEqual((one["cap_m"], one["pairs"], four["cap_m"]), (1000, 3, 4000))
-            self.assertEqual(one["work_reading"], "better")
+            self.assertEqual(one["work_reading"], "higher")
             self.assertEqual((one["capacity_native"], one["capacity_omni"]), (20.0, 40.0))
             self.assertIn("more work from the same cap", one["audit"])
             self.assertIn("never reached", four["audit"])
@@ -101,8 +101,8 @@ class CapacityThreeRuns(unittest.TestCase):
             out = Path(t) / "V5_CAPACITY.md"
             ca.main([str(r) for r in runs] + ["--out", str(out)])
             rows = json.loads(out.with_suffix(".json").read_text())["rows"]
-            self.assertEqual(rows["1000:work"]["reading"], "better in all three of our runs")
-            self.assertEqual(rows["1000:capacity"]["reading"], "better in all three of our runs")
+            self.assertEqual(rows["1000:work"]["reading"], "higher in all three of our runs")
+            self.assertEqual(rows["1000:capacity"]["reading"], "higher in all three of our runs")
             self.assertEqual(rows["2000:work"]["reading"], "no difference beyond the noise in 2 of 3 runs")
             self.assertEqual(rows["2000:capacity"]["reading"], "same")
             text = out.read_text()

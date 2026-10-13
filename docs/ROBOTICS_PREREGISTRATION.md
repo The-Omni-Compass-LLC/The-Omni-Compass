@@ -69,13 +69,13 @@ torques and velocities, and said to be a model wherever it is printed (evidence 
 The unit is **energy per takt**: motion plus the standing draw for the takt. The standing draw is identical in both
 arms, so it cannot favour either; it does make every percentage smaller than the motion-only figure, which is also shown.
 
-## Readings (lower is better unless said)
+## Readings (the aim is lower unless said)
 
 | Metric | Direction |
 |---|---|
-| energy per takt (declared model), copper loss, mechanical work, peak joint torque, mean |torque| | lower is better |
-| cycles over the takt (share) | **any increase is WORSE** |
-| tracking error (RMS joint error against the trajectory), end-point error at each waypoint | **any increase is WORSE** |
+| energy per takt (declared model), copper loss, mechanical work, peak joint torque, mean |torque| | the aim is lower |
+| cycles over the takt (share) | **any increase is marked** |
+| tracking error (RMS joint error against the trajectory), end-point error at each waypoint | **any increase is marked** |
 | cycle time, speed override | shown, not judged |
 
 A change under one part in a million reads "same".
@@ -91,7 +91,7 @@ A change under one part in a million reads "same".
 
 Each robot: 10 cycles per arm in one GitHub Actions job (MuJoCo is deterministic for a fixed timestep, so the cycles
 are identical and ten is a check, not a sample), the per-cycle record archived with the code. Three separate runs on
-the frozen engine (A, B, C); the table (`tools/mujoco_abc.py`) reads better in all three of our runs or WORSE by sign when the runs
+the frozen engine (A, B, C); the table (`tools/mujoco_abc.py`) reads lower or higher in all three of our runs by sign when the runs
 reproduce, same under one part in a million, and "the runs differ" when they do not.
 
 ## What the first smoke already showed, said before the counted runs

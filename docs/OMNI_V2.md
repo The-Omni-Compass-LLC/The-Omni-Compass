@@ -63,7 +63,7 @@ result is run again on it.
 
 | Result | v1 | v2 |
 |---|---|---|
-| The muscles and six organisms, modelled | A, B, C done, reproduced byte for byte ([`results/realms/v1/REALMS.md`](../results/realms/v1/REALMS.md)) | **A, B, C done** (runs 37422832244, 37422840154, 37422847697; reproduced to the last digit in 3 of 3): [`results/realms/REALMS.md`](../results/realms/REALMS.md); 945 muscles, 0 worse; Physics and the whole tower read energy improvement with a service tradeoff, carried by three rail traction speed muscles (see the register, row 24) |
+| The muscles and six organisms, modelled | A, B, C done, reproduced byte for byte ([`results/realms/v1/REALMS.md`](../results/realms/v1/REALMS.md)) | **A, B, C done** (runs 37422832244, 37422840154, 37422847697; reproduced to the last digit in 3 of 3): [`results/realms/REALMS.md`](../results/realms/REALMS.md); 945 muscles, 0 away from their aims; Physics and the whole tower read energy improvement with a service tradeoff, carried by three rail traction speed muscles (see the register, row 24) |
 | The organisms at 1 / 10 / 100 / 1,000 copies (v1: `results/scale/v1/GRID.md`) | partly (1,000x at 100 and 1,000 runs beyond the machines) | **to run** (workflow `six`) |
 | Kubernetes: the six organisms with the real cluster inside | running (37359815637) | **to run** (workflow `six-kube`) |
 | Kubernetes: the big organisms on Azure | running (37359820055) | **to run after** |
@@ -75,7 +75,7 @@ result is run again on it.
 
 ## How each result is read across three runs
 
-Exactly as v1: three separate GitHub runs on the same frozen bytes; every judged row reads better in all three of our runs, worse in all three of our runs, no difference beyond the noise (with the count of runs), or the runs disagree; every row is reported, losses
+Exactly as v1: three separate GitHub runs on the same frozen bytes; every judged row reads toward its aim in all three of our runs, away from its aim in all three of our runs, no difference beyond the noise (with the count of runs), or the runs disagree; every row is reported, losses
 included; the tables are made by rule (`tools/confirm_abc.py`, `tools/citylearn_abc.py`, `tools/pandapower_abc.py`,
 `tools/mujoco_abc.py`), each checking every run's commit against the fingerprints and refusing to mix engines.
 

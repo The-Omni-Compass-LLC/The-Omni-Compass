@@ -80,12 +80,12 @@ whose data does not fit in memory, and the result will say what it is.
 
 | Gauge | Direction |
 |---|---|
-| work inside the response line: operations a second answered within 1 ms (YCSB's own client-side latency) | **higher is better** (the product number) |
-| throughput (operations a second) | higher is better |
-| latency p95, p99, mean | lower is better |
-| failed operations (YCSB's own count) | **any increase is WORSE** |
-| cache size held, mean (the knob, the resource); bytes in the cache, mean | lower is better (Omni will hold more under a wide working set, and that reads WORSE) |
-| host CPU busy share, CPU-seconds, CPU-seconds per 1,000 operations inside the line (the compass's own cost included) | lower is better |
+| work inside the response line: operations a second answered within 1 ms (YCSB's own client-side latency) | **the aim is higher** (the product number) |
+| throughput (operations a second) | the aim is higher |
+| latency p95, p99, mean | the aim is lower |
+| failed operations (YCSB's own count) | **any increase is marked** |
+| cache size held, mean (the knob, the resource); bytes in the cache, mean | the aim is lower (Omni will hold more under a wide working set, and that reads higher) |
+| host CPU busy share, CPU-seconds, CPU-seconds per 1,000 operations inside the line (the compass's own cost included) | the aim is lower |
 | pages read into the cache (misses), cache size changes written | shown, not judged |
 
 Memory held is the resource this benchmark trades; no energy is claimed beyond the host's CPU seconds (evidence class L).
@@ -102,7 +102,7 @@ Memory held is the resource this benchmark trades; no energy is claimed beyond t
 
 Each workload: three paired repetitions in one GitHub Actions job, order alternating, YCSB's per-operation records, the audit
 and the server log archived with the code (raw files over 20 MB are left out of the artifact; their gauges are in the arm's
-record). Three separate runs on the frozen engine (A, B, C); the table (`tools/ycsb_abc.py`) reads better in all three of our runs or WORSE
+record). Three separate runs on the frozen engine (A, B, C); the table (`tools/ycsb_abc.py`) reads lower or higher in all three of our runs
 when all three runs move the same way with every 95% interval clear of zero, no difference beyond the noise when a run's interval
 includes zero, and the runs disagree when clear runs point different ways. `tests/test_run_ycsb.py` and `tests/test_ycsb_abc.py`,
 run by `verify.py`, prove the rules without a server.
@@ -159,14 +159,14 @@ result is recorded here when it has run, and it is not counted.
 
 `results/live/V3_YCSB.md` (`tools/ycsb_abc.py`), all three runs at commit `7ee471b4` on Omni v3, three paired repetitions a
 run. On the four untouched workloads: the **cache size held** fell by about half on c (512 to about 259 MB, −49% in every
-run) and on burst (−41% to −49%), and by 13% to 37% on f, **better in all three of our runs**; on b it fell 27% to 50% but run A's interval
+run) and on burst (−41% to −49%), and by 13% to 37% on f, **toward its aim in all three of our runs**; on b it fell 27% to 50% but run A's interval
 included zero, so the row reads **no difference beyond the noise (1 of 3 runs)**, and that is the result there. **Work
 inside the 1 ms line, p95 and p99 read inside the noise on all four** (work between −2.7% and +1.1%, every interval over
 zero); **no operation failed** in any arm; **host CPU-seconds inside the noise on all four** (c read +12% to +15% with every
 interval over zero); pages read into the cache rose 14% to 58% (shown, not judged: the misses the smaller cache costs); and
-the **mean latency on burst read +2.2% to +3.7% in all three runs, clear of zero: WORSE in all three of our runs**, the one loss, which
+the **mean latency on burst read +2.2% to +3.7% in all three runs, clear of zero: away from its aim in all three of our runs**, the one loss, which
 stands. Every cache size was handed back to the operator's 512 MB and read back in every arm of every run. 6 gauge-rows
-better in all three of our runs, 1 worse in all three of our runs, 0 where the runs disagree. The tuning workload, shown and not counted, read the same
+toward its aim in all three of our runs, 1 away from its aim in all three of our runs, 0 where the runs disagree. The tuning workload, shown and not counted, read the same
 way (the cache 12% to 15% smaller, the same in all three of our runs; everything else inside the noise).
 
 What the result means, within the disclosure made above before any run: on this machine the data files sit in the
@@ -182,7 +182,7 @@ the cache given back is its gain, and the mean-latency loss, not an index column
 **The question.** The founder asked for every cost in the counted tables to be traced to its mechanism and removed where the
 mechanism is ours, with the engine locked (Omni v3; `tools/run_ycsb.py` is a harness outside the engine's fingerprint, and
 `tools/omni_version.py` prints omni-v3 before and after this amendment). The one cost in `V3_YCSB.md` is **burst: the mean
-latency +2.2% to +3.7%, WORSE in all three of our runs**.
+latency +2.2% to +3.7%, away from its aim in all three of our runs**.
 
 **The mechanism, read from the counted runs' own audits** (`results/live/raw/run-37727968670`, `-37727976107`, `-37727983746`,
 every omni arm's `audit.jsonl`). The give-back rule was "calm, and no page evicted in the last second". A cache that is
@@ -241,13 +241,13 @@ Runs 37858512907, 37858515717 and 37858519010, commit `310cf318`, Omni v3, five 
 table by rule is `results/live/V3_YCSB.md`, and the first set's table is kept whole in `docs/history/V3_YCSB_set1.md`.
 
 **The cache given back is smaller, and it is real.** Cache size held: **b −28% to −36%, burst −21% to −26%, c −24% in all three
-runs, f −28% to −36%, all better in all three of our runs**, and the bytes in the cache the same. The cache settled between 330 and 405 MB,
+runs, f −28% to −36%, all toward its aim in all three of our runs**, and the bytes in the cache the same. The cache settled between 330 and 405 MB,
 where the gate found the working set, instead of the first set's floor of 256 MB; the knob moved two or three times an arm
 instead of four or five. **The cost is gone:** the mean latency reads inside the noise on all four workloads (burst +1.4%,
-+1.1%, −8.2%, where the first set read +2% to +4% worse in all three of our runs; c +2.3%, +2.3%, +1.1% with one run across zero); work
++1.1%, −8.2%, where the first set read +2% to +4% away from its aim in all three of our runs; c +2.3%, +2.3%, +1.1% with one run across zero); work
 inside the 1 ms line, p95, p99 and host CPU inside the noise on all four; no operation failed; pages read into the cache
 +12% to +44% (shown, not judged: the misses a smaller cache costs, served from the page cache); every cache handed back and
-read back. **8 gauge-rows better in all three of our runs, 0 worse in all three of our runs, 0 where the runs disagree.** The tuning workload, shown and
+read back. **8 gauge-rows toward its aim in all three of our runs, 0 away from its aim in all three of our runs, 0 where the runs disagree.** The tuning workload, shown and
 not counted, read the same way (the cache −20% to −24%, the same in all three of our runs; everything else inside the noise).
 
 **Read.** The expectation written before the runs, that the memory rows might fall to the noise, did not come true: a quarter
@@ -259,7 +259,7 @@ memory read, and the same knob on a disk-bound store is not answered here.
 ## Amendment 2 (2026-10-09, declared before any run on it): the brain's own verdict on the cache
 
 **Why, and when.** Written after the second counted set was read (the section above: the cache −21% to −36% on all four workloads,
-nothing worse), at the founder's order of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it pays
+nothing away from its aim), at the founder's order of 9 October: Omni need not be wired into every muscle; a knob that cannot prove it pays
 stays native and Omni only reads it. The brain must decide that on the muscle itself, in real time, by a measurement, and the
 same rule must stand on every live knob, the ones that win included.
 
@@ -299,7 +299,7 @@ dispatched with `workloads=all`, `reps=3`, `step_s=30`, the resource objective: 
 
 ## Amendment 3 (2026-10-10 13:05 UTC, after the first counted set on amendment 2, before the next): a spend trial runs to its samples
 
-The first counted set on the brain's verdict (runs 38013343689, 38013348512, 38013353044; the table `results/live/V3_YCSB.md`) landed at midday on 10 October. What it showed about the trials: the trials were judged on this stack (2 or 3 trials an arm, 1 or 2 allowed, 0 or 1 refused, at most 1 abandoned) and the cache size held fell 3% to 13% on `workloadb` and `burst`, better in all three of our runs, with every other gauge inside the noise.
+The first counted set on the brain's verdict (runs 38013343689, 38013348512, 38013353044; the table `results/live/V3_YCSB.md`) landed at midday on 10 October. What it showed about the trials: the trials were judged on this stack (2 or 3 trials an arm, 1 or 2 allowed, 0 or 1 refused, at most 1 abandoned) and the cache size held fell 3% to 13% on `workloadb` and `burst`, toward its aim in all three of our runs, with every other gauge inside the noise.
 
 **The cause is ours.** Amendment 2 ended a trial when the service swung to the other direction's condition: a give-back trial when the service left calm (the engine's own rule, kept), and a spend trial when the service turned calm. A spend that works calms the service within seconds, so a spend trial could never reach its samples: every successful spend ended its own trial unjudged. Nothing in the stack and nothing in the engine did this; the engine's verdict ends a trial when the condition it is given ends, and we gave it the wrong condition for spending. Found on the first set, corrected before the second, declared here.
 

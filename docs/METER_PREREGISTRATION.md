@@ -34,8 +34,8 @@ Omni-Compass.
 
 ## How it is read
 
-- **Judged**: "energy, the machine's own meter over the window (Wh; the processor's RAPL counters, class P)", lower is
-  better, by the rule of every gauge: the paired mean difference and its 95% interval, and over three runs (A, B, C on
+- **Judged**: "energy, the machine's own meter over the window (Wh; the processor's RAPL counters, class P)", the aim
+  is lower, by the rule of every gauge: the paired mean difference and its 95% interval, and over three runs (A, B, C on
   one commit) the three readings of `tools/confirm_abc.py`. Every other gauge of `tools/live_reps.py` is reported as in
   every set, losses included; the declared-model energy rows stay beside the meter.
 - **Shown, never judged**: Kepler's reading of the same counters (a cross-check of the meter) and the energy Kepler

@@ -35,7 +35,7 @@ Changes since set 7:
 | response time (ms), 95th percentile | 378.9 | 449.3 | +18.6% | -119.4 to +260.2 | no |
 | response time (ms), 99th percentile | 517.6 | 626.5 | +21.0% | -113.9 to +331.6 | no |
 | failed requests (%) | 0 | 0.02667 | +0.0267 (native is 0) | -0.04736 to +0.1007 | no |
-| pending pods, pod-minutes | 0.71 | 0.3867 | -45.5% | -0.6121 to -0.03455 | yes, better |
+| pending pods, pod-minutes | 0.71 | 0.3867 | -45.5% | -0.6121 to -0.03455 | yes, lower |
 | utilisation (used / allocatable) | 0.07394 | 0.0891 | +20.5% | -0.01632 to +0.04665 | no |
 
 ## Reading

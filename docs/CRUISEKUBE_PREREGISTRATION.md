@@ -9,7 +9,7 @@ Kubernetes set stays as it is; this is a new set beside them.
 ## The question
 
 When the service's CPU and memory are right-sized live by CruiseKube (TrueFoundry), on the running pods and at admission,
-does Omni-Compass on top still make the service faster, use fewer machines or less energy, without making anything worse?
+does Omni-Compass on top still make the service faster, use fewer machines or less energy, without moving anything away from its aim?
 
 ## What CruiseKube is, and so what native is
 
@@ -99,7 +99,7 @@ CruiseKube's hour shortened to none, 1,500 s of learning and a 360 s window. It 
 
 - A gauge whose 95% interval of the paired difference is clear of zero is a difference in this run; one whose interval
   includes zero is no difference beyond the noise, and that is the result.
-- Three separate runs on the same commit, A, B and C (`tools/confirm_abc.py`): better or worse in all three of our runs,
+- Three separate runs on the same commit, A, B and C (`tools/confirm_abc.py`): lower or higher in all three of our runs,
   no difference beyond the noise, or the runs disagree. The founder hears what the three say before the table goes up.
 - Response times and failed requests are class L (measured on live software). Machines in service are counted live; the
   watts are the declared model (class S), as in every kind set.

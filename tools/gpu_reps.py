@@ -352,13 +352,13 @@ def label(prim, g_served, g_p95, g_lost, valid, observation=None):
     either way, the effect cannot be credited to Omni's authority and no omni result is published."""
     if not valid:
         return "INVALID"
-    if observation in ("better, proven", "worse, proven"):
+    if observation in ("toward its aim, proven", "away from its aim, proven"):
         return "NOT ATTRIBUTABLE: WATCH DIFFERS FROM NATIVE"
     ok = g_served and g_p95 and g_lost
-    if prim == "better, proven":
+    if prim == "toward its aim, proven":
         return "SUPERIOR WITHIN GUARDRAILS" if ok else "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
-    if prim == "worse, proven":
-        return "WORSE"
+    if prim == "away from its aim, proven":
+        return "AWAY FROM ITS AIM"
     return "NONINFERIOR / INCONCLUSIVE" if ok else "NOT ESTABLISHED"
 
 
@@ -367,9 +367,9 @@ def verdict(k, mean, half, n):
         return "not proven (too few repetitions)"
     if abs(mean) < 1e-12 and half < 1e-12:
         return "equal"
-    better = (mean < 0) == (k in LOWER)
+    toward = (mean < 0) == (k in LOWER)                     # LOWER: the gauges whose declared aim is lower
     proven = mean - half > 0 or mean + half < 0
-    return ("better" if better else "worse") + (", proven" if proven else ", not proven")
+    return ("toward its aim" if toward else "away from its aim") + (", proven" if proven else ", not proven")
 
 
 def main(root):

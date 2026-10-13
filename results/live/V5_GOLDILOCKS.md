@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **Better** or **WORSE in all three of our runs**: all three runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, losses included.
+Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **Toward its aims** or **away from its aim in all three of our runs**: all three runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, losses included.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
@@ -16,12 +16,12 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 |---|---|---|---|---|
 | worker nodes in service, mean | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | +0.0% (+0.0 to +0.0) | same |
 | node-hours | -0.0% (-0.5 to +0.5) | +0.1% (-0.4 to +0.5) | +0.3% (-0.0 to +0.7) | no difference beyond the noise (all three runs) |
-| energy, parked workers still on at idle power (Wh, declared model) | +2.1% (+1.6 to +2.6) | +1.9% (+1.3 to +2.5) | +2.6% (+2.2 to +3.0) | **WORSE in all three of our runs** |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | +2.1% (+1.6 to +2.6) | +1.9% (+1.3 to +2.5) | +2.6% (+2.2 to +3.0) | **WORSE in all three of our runs** |
-| response time (ms), mean | -47.5% (-56.5 to -38.5) | -43.5% (-58.2 to -28.8) | -46.6% (-55.7 to -37.6) | **better in all three of our runs** |
-| response time (ms), 95th percentile | -62.1% (-71.6 to -52.5) | -58.6% (-70.3 to -46.8) | -58.6% (-67.5 to -49.7) | **better in all three of our runs** |
-| response time (ms), 99th percentile | -69.0% (-80.7 to -57.2) | -68.0% (-82.8 to -53.1) | -67.7% (-76.4 to -59.1) | **better in all three of our runs** |
-| time over the response line (% of samples) | -98.7% (-179.7 to -17.7) | -100.0% (-173.0 to -27.0) | -100.0% (-143.6 to -56.4) | **better in all three of our runs** |
+| energy, parked workers still on at idle power (Wh, declared model) | +2.1% (+1.6 to +2.6) | +1.9% (+1.3 to +2.5) | +2.6% (+2.2 to +3.0) | **higher in all three of our runs** |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | +2.1% (+1.6 to +2.6) | +1.9% (+1.3 to +2.5) | +2.6% (+2.2 to +3.0) | **higher in all three of our runs** |
+| response time (ms), mean | -47.5% (-56.5 to -38.5) | -43.5% (-58.2 to -28.8) | -46.6% (-55.7 to -37.6) | **lower in all three of our runs** |
+| response time (ms), 95th percentile | -62.1% (-71.6 to -52.5) | -58.6% (-70.3 to -46.8) | -58.6% (-67.5 to -49.7) | **lower in all three of our runs** |
+| response time (ms), 99th percentile | -69.0% (-80.7 to -57.2) | -68.0% (-82.8 to -53.1) | -67.7% (-76.4 to -59.1) | **lower in all three of our runs** |
+| time over the response line (% of samples) | -98.7% (-179.7 to -17.7) | -100.0% (-173.0 to -27.0) | -100.0% (-143.6 to -56.4) | **lower in all three of our runs** |
 | failed requests (%) | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
 | pods with no machine to take them (unschedulable) | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
 | time pods had no machine to take them, pod-minutes | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
@@ -38,7 +38,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 | host CPU busy, the real machine under kind (%) | +40.4% (+32.4 to +48.5) | +36.0% (+25.9 to +46.2) | +42.8% (+36.2 to +49.3) | shown, not judged |
 | host cores (the real machine under kind) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | shown, not judged |
 
-Readings: 2 WORSE in all three of our runs, 4 better in all three of our runs, 3 no difference beyond the noise (all three runs), 2 no difference beyond the noise in 2 of 3 runs, 4 same, 8 shown, not judged.
+Readings: 2 away from its aim in all three of our runs, 4 toward its aim in all three of our runs, 3 no difference beyond the noise (all three runs), 2 no difference beyond the noise in 2 of 3 runs, 4 same, 8 shown, not judged.
 
 ---
 

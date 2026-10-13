@@ -31,14 +31,14 @@ def main():
     capture(t / "bad.csv", 12, 4, pending_rate=0.3)
     capture(t / "base_p.csv", 20, 5, power=True); capture(t / "omni_p.csv", 12, 6, power=True)
     r = score(["--baseline", str(t / "base.csv"), "--omni", str(t / "omni.csv"), "--idle-w", "200", "--dyn-w", "350"])["metrics"]
-    assert r["node_hours_per_core_hour"]["verdict"] == "better" and r["kwh_per_core_hour"]["verdict"] == "better"
-    assert r["utilisation"]["verdict"] == "better" and r["pending_pod_minutes_per_hour"]["verdict"] == "no significant difference"
+    assert r["node_hours_per_core_hour"]["verdict"] == "toward its aim" and r["kwh_per_core_hour"]["verdict"] == "toward its aim"
+    assert r["utilisation"]["verdict"] == "toward its aim" and r["pending_pod_minutes_per_hour"]["verdict"] == "no significant difference"
     s = score(["--baseline", str(t / "base.csv"), "--omni", str(t / "same.csv"), "--idle-w", "200", "--dyn-w", "350"])["metrics"]
     assert all(v["verdict"] == "no significant difference" for k, v in s.items() if k != "pending_pod_minutes_per_hour"), s
     b = score(["--baseline", str(t / "base.csv"), "--omni", str(t / "bad.csv")])["metrics"]
-    assert b["pending_pod_minutes_per_hour"]["verdict"] == "worse" and b["hpa_shortfall_minutes_per_hour"]["verdict"] == "worse"
+    assert b["pending_pod_minutes_per_hour"]["verdict"] == "away from its aim" and b["hpa_shortfall_minutes_per_hour"]["verdict"] == "away from its aim"
     p = score(["--baseline", str(t / "base_p.csv"), "--omni", str(t / "omni_p.csv")])["metrics"]
-    assert p["kwh_per_core_hour"]["verdict"] == "better"
+    assert p["kwh_per_core_hour"]["verdict"] == "toward its aim"
     print("pilot score: gain detected; identical clusters show no significant difference; service regression detected; measured power used")
     print("PASS test_pilot_score")
 

@@ -15,8 +15,9 @@ Two kinds of rows, kept apart:
                energy from the declared power model; on AKS the bill from Azure's own count of machines)
   the organism the simulated stacks around it (evidence S, models): work, energy, time over the line
 
-Each organism's line names what came out better and what came out worse than native, by any amount, and which of
-those are inside the noise (the interval crosses zero). CPU and host load are shown, not judged. No line is drawn.
+Each organism's line names which gauges came out lower and which higher than native, by any amount, and which of those
+are inside the noise (the interval crosses zero), in direction words only (the founder's order of 13 October: the reader
+judges). CPU and host load are shown, not judged. No line is drawn.
 
   python3 tools/six_kube_report.py DIR [DIR ...] [--out FILE.md]   ->  DIR/SIX_KUBE.md and .json (the first DIR), or FILE.md and
   FILE.json; several DIRs when one benchmark's cells were archived from more than one run (the big organisms: the tower from
@@ -40,7 +41,7 @@ sys.path.insert(0, str(ROOT))
 from tools.live_reps import arm_rep, arm_gauges, T95, LABEL, NEUTRAL, SAME_REL  # noqa: E402
 from tools.run_hil import NAMES, REALMS  # noqa: E402
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
-from pilot.bench_report import LOWER_BETTER  # noqa: E402
+from pilot.bench_report import AIM_LOWER  # noqa: E402
 
 ORDER = list(REALMS) + [TOWER, STACK]
 OMNI = ("compass", "omni")
@@ -57,8 +58,8 @@ OFF_CLOCK_SHARE = 0.05
 SHOWN = {"host CPU busy, the real machine under kind (%)", BEHIND}
 SAVING = {"energy, parked workers still on at idle power (Wh)", "energy (Wh)", "organism energy (J)",
           "machines billed, machine-hours", "compute bill at list price ($)"}
-HIGHER_BETTER = {"organism work", "organism work per energy"}
-LOWER = set(LOWER_BETTER) | {"organism energy (J)", "organism time over the line (% of steps)",
+AIM_HIGHER = {"organism work", "organism work per energy"}
+LOWER = set(AIM_LOWER) | {"organism energy (J)", "organism time over the line (% of steps)",
                              "machines billed, machine-hours", "compute bill at list price ($)"}
 
 
@@ -136,10 +137,12 @@ def paired(runs_o, a, k):
     else:
         h = math.nan
     pct = 100.0 * m / abs(nb) if abs(nb) > 1e-12 else math.nan
-    better = (m > 0) if k in HIGHER_BETTER else (m < 0)
+    toward = (m > 0) if k in AIM_HIGHER else (m < 0)
     same = abs(m) <= SAME_REL * max(abs(nb), 1e-12)   # under one part in a million of the value is rounding: the same
+    # toward_aim: the gauge moved toward its declared aim (more work done; less waited, spent or held), for the tools that
+    # score the headline (the wiring verdicts, the benefit sheet); the page itself says only lower or higher
     return {"n": len(d), "native": nb, "omni": nb + m, "diff": m, "lo": m - h, "hi": m + h, "pct": pct,
-            "better": bool(better), "neutral": k in NEUTRAL, "same": bool(same)}
+            "toward_aim": bool(toward), "lower": bool(m < 0), "neutral": k in NEUTRAL, "same": bool(same)}
 
 
 def main(root, *more, out=None, reps=None):
@@ -159,10 +162,11 @@ def main(root, *more, out=None, reps=None):
          "power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).", "",
          *([f"Each square here is its first {reps} repetition{'s' if reps > 1 else ''} (repetitions 1 to {reps}; the grid's "
             "1-, 10- and 100-repetition squares are nested).", ""] if reps else []),
-         "How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column says in words whether it is "
-         "better or worse. Lower is better for response times, time over the line, failed requests, pods started, "
-         "replicas, machines, energy and the bill (less spent). Higher is better for the organism's work and work per "
-         "energy. A change whose interval crosses zero is marked inside the noise. The organism must keep the window's clock: "
+         "How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column "
+         "says which way the number went, lower or higher; whether that serves the system is the reader's to judge (response "
+         "times, time over the line, failed requests, pods started, replicas, machines, energy and the bill are amounts waited "
+         "or spent; the organism's work and work per energy are amounts done). A change whose interval crosses zero is marked "
+         "inside the noise. The organism must keep the window's clock: "
          "the row \"organism behind its window\" says how long after the window its last step ended (0 is on the clock), and a "
          "repetition where either arm ended more than 5% of the window late is marked OFF THE CLOCK in the organism's line, "
          "because its last steps saw a cluster whose load schedule had already ended.", "",
@@ -198,10 +202,11 @@ def main(root, *more, out=None, reps=None):
         off = sorted({r for a in ("native", arm) for r, g in runs[o][a].items()
                       if r in pairs and g.get("_window_s") and g.get(BEHIND, 0.0) > OFF_CLOCK_SHARE * g["_window_s"]})
         worst = max((g.get(BEHIND, 0.0) for a in ("native", arm) for r, g in runs[o][a].items() if r in pairs), default=0.0)
-        better = [LABEL.get(k, k) for k, v in judged.items() if v["better"] and sure(v)]
-        worse = [LABEL.get(k, k) for k, v in judged.items() if not v["better"] and sure(v)]
+        lower = [LABEL.get(k, k) for k, v in judged.items() if v["diff"] < 0 and sure(v)]
+        higher = [LABEL.get(k, k) for k, v in judged.items() if v["diff"] > 0 and sure(v)]
         noise = [LABEL.get(k, k) for k, v in judged.items() if not sure(v)]
-        verdict = (f"better on {len(better)}, worse on {len(worse)}" + (f" ({'; '.join(worse)})" if worse else "")
+        verdict = (f"lower on {len(lower)}" + (f" ({'; '.join(lower)})" if lower else "")
+                   + f", higher on {len(higher)}" + (f" ({'; '.join(higher)})" if higher else "")
                    + f", inside the noise on {len(noise)}") if n >= 2 else "ONE REPETITION"
         if not restored:
             verdict += "; INVALID: a simulated knob was not handed back"
@@ -218,12 +223,12 @@ def main(root, *more, out=None, reps=None):
             if k == BEHIND:
                 rd = "shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock)"
             elif v["neutral"] or k in SHOWN:
-                rd = "shown, not judged (more or less is not better by itself)"
+                rd = "shown, not judged"
             elif v["same"]:
                 rd = "same" if v["diff"] == 0.0 else "same (under one part in a million)"
             else:
                 sure = v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
-                rd = ("better" if v["better"] else "WORSE") + ("" if sure else " (inside the noise)")
+                rd = ("lower" if v["diff"] < 0 else "higher") + ("" if sure else " (inside the noise)")
             L.append(f"| {LABEL.get(k, k)} | {v['native']:.4g} | {v['omni']:.4g} | {ch} | {ci} | {rd} |")
         L.append("")
     missing = [o for o in ORDER if not any(organism_name(k.split("@")[0]) == o for k in runs)]

@@ -105,7 +105,7 @@ bloodline); every result names its seed; seeds can be crossed.
 
 ## 10. State & build order
 - **Pushed:** v3 (main). v4 (own branch). v5 on branch v5: declared omni-v5 with the v5 law in the engine, the
-  1,097-muscle catalog, the official v5 realms table (0 of 1,097 worse than native) and the benchmark code for every
+  1,097-muscle catalog, the official v5 realms table (0 of 1,097 behind native) and the benchmark code for every
   platform (§26, §27).
 - **v5 SAVE shown in the model (class S, not proof; 12 fresh runs, 6 organisms):** beats every version + native on energy & misses; work = native; the
   one exception Physics vs v1/v2 energy is inside the noise and v1/v2 bought it with late trains/ships.
@@ -314,14 +314,14 @@ The organism is half living, half machine, so repair has two kinds, and the manu
 ## 20. They are muscles, not competitors (the framing correction)
 Every "serious player" named in a competitive scan — Karpenter, KEDA, VPA, Oracle Autonomous DB, a data-center cooling AI,
 MPC in industry, Autobidder, a chip power manager — is a **native controller**, i.e. a muscle's own reflex. Omni-Compass is
-never standalone and never their rival; it is the **supervisory governor that sits on top of each of them** and makes each
-better than it is on its own. So they are not competitors to the governor — they are the muscles the governor governs. The
+never standalone and never their rival; it is the **supervisory governor that sits on top of each of them** and moves each
+further toward its aims than it goes on its own. So they are not competitors to the governor — they are the muscles the governor governs. The
 only thing that could be a true competitor is another governor-on-top-of-all-natives across every domain, and none is known.
 - **What Omni adds on top = whatever the native left on the table.** On a plain native (fixed HPA target, static power cap,
   a fixed setpoint) there is a lot untapped, so Omni adds a lot. On an already-smart native (a tuned cooling AI, a good
   autoscaler) there is less untapped, so Omni adds less — **and by Do No Harm, where it cannot improve a knob it stays
   native, never below it.** The gain is never negative; it is only ever "how much was left to take."
-- This is the honest completion of "Omni makes everything better than native": better or equal, on every muscle, on top of
+- This is the honest completion of "Omni makes everything ahead of native": ahead or equal, on every muscle, on top of
   whatever native is there — dumb or smart. The headline number is bigger on the dumb ones; the guarantee holds on all.
 
 ## 21. Wire everything, watch everything — push a signal only where it helps (corrected)
@@ -334,7 +334,7 @@ So the wire must already be there, watching, the instant that muscle is hit.
   at full rate (one eye open), and the moment bad input or a fault makes that muscle need help, the wire is already live
   and Omni acts.
 - So: **wire all, watch all, act where it pays.** Do-No-Harm and low overhead come from withholding the *signal* on
-  no-gain muscles, never from un-wiring them. "Never worse than native" is kept because a watched-but-silent muscle runs
+  no-gain muscles, never from un-wiring them. "Never behind native" is kept because a watched-but-silent muscle runs
   exactly native until the instant Omni has a reason to move it.
 
 ## 22. What is really open to benchmark ON TOP OF (honest source map — so we never claim a closed scalp we didn't take)
@@ -364,7 +364,7 @@ live signal. This is why the whole thing is a **comprehension / convergence cont
 (reads and understands the real state), converges (moves toward the edge without crossing it), and controls from the core
 plane over every native muscle — breathing at every step, assuming nothing.
 - Consequence for the results: a gain is only ever counted from a *measured* return, never from an intended action. This
-  is also what keeps "never worse than native" honest — a move that didn't land, or landed wrong, is caught by its own
+  is also what keeps "never behind native" honest — a move that didn't land, or landed wrong, is caught by its own
   return signal and undone, not booked as a win.
 
 ## 24. Distributed body — local reflexes, muscle identity, anticipation, signal speed (so it scales and never waits)
@@ -460,7 +460,7 @@ Robotics / Autonomous 394, Energy / Facility / Industrial 470, Distribution / Sp
 the 257-muscle spine counted in each) is **1,868** on v5 (v3: 1,716). The "1,000" elsewhere in the docs is the
 1,000-**copy** scale, not a muscle count.
 The do-no-harm check runs on all 1,097 (`tests/test_compass_arm_v5.py`); the official table is
-`results/realms_v5/REALMS_V5.md` (all six organisms superior within guardrails, 0 of 1,097 worse than native; the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times)). More
+`results/realms_v5/REALMS_V5.md` (all six organisms superior within guardrails, 0 of 1,097 behind native; the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times)). More
 families — the SDN/load-balancer fabric beyond routing, more of the body's vitals — raise the count again when built.
 
 ## 27. The benchmark program — every run, nothing left out

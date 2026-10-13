@@ -66,7 +66,7 @@ kubectl -n omni-compass patch deploy omni-compass --type=json -p \
 **The SLO reflex.** Add `--latency-file` and `--slo-ms`, and the target is never tighter than native while the SLO is
 breached.
 
-**Pass condition.** Latency no worse than native, and fewer pod-hours.
+**Pass condition.** Latency never behind native, and fewer pod-hours.
 
 ## 3. Node pool: Omni-Compass sizes the node pool
 **Add permissions.** `patch nodes`, `create pods/eviction` (`deploy/kind/rbac-omni.yaml` is the tested example).

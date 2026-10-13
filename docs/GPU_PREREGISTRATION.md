@@ -57,15 +57,15 @@ Nothing seen in smoke may change them.
 - **Primary comparison:** omni against native, paired by repetition. Report the mean difference with a two-sided t
   95% interval.
 - **Result:**
-  - The result is *proven better* if the interval lies entirely above zero.
-  - It is *proven worse* if the interval lies entirely below zero.
+  - The result is *proven toward its aim* if the interval lies entirely above zero.
+  - It is *proven away from its aim* if the interval lies entirely below zero.
   - Otherwise it is *not proven*.
-- **Guardrails, fixed now:** a better primary result counts only if Omni did not buy it with the work. Both
+- **Guardrails, fixed now:** a primary result toward its aim counts only if Omni did not buy it with the work. Both
   guardrails must hold:
   - **Requests served:** the 95% interval of (omni − native) must not reach below −1% of native.
   - **95th-percentile response time:** the interval must not reach above +10% of native.
 
-  If a guardrail fails, the verdict is *better on energy, fails the service guardrail*. That is a different product
+  If a guardrail fails, the verdict is *more requests per kJ, fails the service guardrail*. That is a different product
   and is reported as such.
 - **Watch against native:** reported as the cost of Omni being present. If watch differs from native on the primary
   outcome as much as omni does, the effect is not attributed to Omni's authority.
@@ -81,11 +81,11 @@ outcome, the repetitions, and the two guardrails above are unchanged.
 - **Third guardrail, errors:** the 95% interval of (omni − native) requests *not* served must not reach above +1% of
   native requests served.
 - **Result label, by rule, never by hand** (`tools/gpu_reps.py`, `label()`):
-  - primary proven better, all three guardrails held: **SUPERIOR WITHIN GUARDRAILS**;
-  - primary proven better, a guardrail failed: **ENERGY IMPROVEMENT WITH SERVICE TRADEOFF**;
+  - primary proven toward its aim, all three guardrails held: **SUPERIOR WITHIN GUARDRAILS**;
+  - primary proven toward its aim, a guardrail failed: **ENERGY IMPROVEMENT WITH SERVICE TRADEOFF**;
   - primary not proven, all guardrails held: **NONINFERIOR / INCONCLUSIVE**;
   - primary not proven, a guardrail failed: **NOT ESTABLISHED**;
-  - primary proven worse: **WORSE**;
+  - primary proven away from its aim: **AWAY FROM ITS AIM**;
   - any invalidity below: **INVALID**.
 - **The card obeys enforced.power.limit.** The snapshot records power.limit, enforced.power.limit, default, min and
   max limits, persistence mode and power management. The bench refuses to start unless power management is Enabled.
@@ -225,7 +225,7 @@ unchanged.
   ceiling (`nvidia-smi -lgc`, reset with `-rgc`; cover 35% of the top clock to the top), which sets how high the card's own boost may climb, and the power
   limit (`-pl`), the lid at what a fully busy card draws at that ceiling plus 10%, never under the declared envelope
   floor and never over the start limit. The service is read as one position between calm and the response-time line
-  (the worse of p95 and utilization above half) and pulled to the middle; past 95% both wires go to full at once
+  (the larger of p95 and utilization above half) and pulled to the middle; past 95% both wires go to full at once
   (fail up). The card's firmware keeps its own control; Omni sets only those two values. The earlier power-limit-only
   governor stays available (`OMNI_ENGINE=one_wire`) and is not the counted run's arm.
 - **Why, before the run:** on a modelled card (`results/sim/gpu_two_wire/`, evidence class S, seeds never used while
@@ -307,7 +307,7 @@ The outcomes, arms, guardrails, analysis and validity rules are unchanged. The O
 
 The outcomes, arms, guardrails, analysis and validity rules are unchanged, except as stated here.
 
-- **Omni-Compass moves the card only where it measures that the card is no worse for it** (`omnicompass/verdict.py`, in
+- **Omni-Compass moves the card only where it measures that the card is never behind for it** (`omnicompass/verdict.py`, in
   `omni_controller/gpu_compass.py` and `realms/gpu_card.py`). While the service is calm, the governor runs a paired trial:
   - first the ceiling at the top until 30 requests are measured;
   - then one 15 MHz step past the deepest step already allowed, until 30 more are measured.
@@ -421,10 +421,10 @@ From this amendment the card harness measures what it never counted:
 
 - the card's time over the line (requests slower than the line, ten bare service times, percent of requests) and its
   95th percentile, each paired against native;
-- each row keeps its preregistered label and names, beside it, every measure that came out worse than native by any
-  amount, so what Omni costs is read beside what it gains; every change is read in words (better or WORSE, and what it
+- each row keeps its preregistered label and names, beside it, every measure that came out behind native by any
+  amount, so what Omni costs is read beside what it gains; every change is read in words (lower or higher, and what it
   means); no new line is drawn. The 2% bound stays where the founder set it: inside the engine, as the trigger of the
-  verdict (`omnicompass/verdict.py`: a knob moves only where a paired trial shows the muscle at most 2% worse);
+  verdict (`omnicompass/verdict.py`: a knob moves only where a paired trial shows the muscle at most 2% away from its aim);
 - the stacks' own label (`realms/harness.py label`) puts the band first: its guardrail is the mean time over the line
   at or under native's, where it was the upper end of the interval under +1 point;
 - at one copy, each organism runs 5 paired repetitions (was 3), so an energy change of 1-3% on the card's own meter
@@ -439,7 +439,7 @@ operator's. A machine went back with no headroom (the next burst waits for a boo
 covers the recent peak at 0.6 of the release level. Each alone leaves the stacks late more often; together they are late
 less often. The headroom is the least that keeps every seed un-late (`results/realms/RELEASE_MARGIN_SWEEP.md`).
 
-Every report reads each change in words (better or WORSE, and what it means), so a sign is never read alone.
+Every report reads each change in words (lower or higher, and what it means), so a sign is never read alone.
 
 ## Amendment 12 (2026-10-05, before any trial on this code)
 

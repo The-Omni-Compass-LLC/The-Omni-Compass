@@ -28,7 +28,7 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
   Linux Kernel & OS Control, Serverless & FaaS, Virtualization & Hypervisor, Content Delivery & Edge Cache, Gut, Skin; then
   Financial Markets & Trading, Media Streaming & CDN, Game Servers, Blockchain & Ledger Nodes, CI/CD & Build Farms and
   additions to seven families). The official v5 table: `results/realms_v5/REALMS_V5.md`, all six organisms superior
-  within guardrails, 0 of 1,097 worse;
+  within guardrails, 0 of 1,097 away from their aims;
   the whole tower saves 0.99% of its energy against v3's 0.33% on the same seeds (3.0 times), the four stacked 0.99% against 0.33% (3.0 times), Energy / Facility 1.00% against 0.33% (3.0 times). Inside the organisms v5 leaves 1 to 3 plants per organism (8 in the four stacked, which are the four realms together) one decision over their line (all of them UPS or
   distribution plants it never touches, moved by the body's power swing), against v3's 13 to 35 (83 in the four stacked);
   seven of the eight right after the safety cutoff (the hand-back), one while Omni runs; the strict body guard and its
@@ -41,11 +41,11 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
 2. **Edge & centre as the only two guards, generalised off the toy presets.** Files: realms/compass_arm_v5.py,
    `omnicompass/compass_law.py` (band/cushion read-back). Math: cushion = climb×reaction + z·wobble per knob; centre =
    release_safe + Lindley hole. Test: no muscle over its edge, none stuck in a hole, across all 59 families × seeds.
-   Accept: 0 muscles worse than native on misses at equal work. Rerun: six organisms, 12 seeds, both hours.
+   Accept: 0 muscles behind native on misses at equal work. Rerun: six organisms, 12 seeds, both hours.
 3. **Max mode + the dial (Save→Balanced→Edge→Sprint) + the bill.** Files: new omnicompass/dial.py,
    realms/compass_arm_v5.py, `tools/run_scale.py` (a `--dial` arm, a load sweep). Math: run each pool to its edge
    utilisation + pre-warm; bill = work − energy − wear − risk. Test: at equal service quality v5 carries ≥ native load;
-   at 2× load misses ≤ native. Accept: +work shown with its wear/energy bill, never worse than native. Rerun: the Max
+   at 2× load misses ≤ native. Accept: +work shown with its wear/energy bill, never behind native. Rerun: the Max
    sweep on six organisms.
 4. **Wear / health gauges + the life rule.** Files: new omnicompass/wear.py. Math: Arrhenius (silicon), Coffin–Manson
    (thermal cycles), battery cycle+calendar, motor/fan. Test: no part aged faster per unit work than native unless the

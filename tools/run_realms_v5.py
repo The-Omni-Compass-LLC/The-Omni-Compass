@@ -55,7 +55,9 @@ NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomou
          "distribution_specialized": "Distribution / Specialized", STACK: "The four stacked, every shared muscle in each",
          TOWER: "The whole tower, every muscle once"}
 GAINS = ["MORE WORK", "FASTER", "FEWER MISSES"]
-KINDS = ["BETTER", "SAME AS NATIVE", "AT ITS LIMIT ON NATIVE", "MIXED", "WORSE", "INVALID"]
+TOWARD, BOTH, AWAY = "TOWARD ITS AIMS", "BOTH WAYS", "AWAY FROM ITS AIMS"   # its aims: more work, faster, fewer misses
+KINDS = [TOWARD, "SAME AS NATIVE", "AT ITS LIMIT ON NATIVE", BOTH, AWAY, "INVALID"]
+RECORDED = {"MIXED": BOTH, "WORSE": AWAY}   # the same kinds in the results written before 13 October, read as they were written
 LOADS = {"normal": "the organism's own load", "climb": "the climb (1 2 3 2 3 4 ..., level 4 = own load, 8 = twice it)",
          "line": f"work waiting in line (a {LINE:.0%} share of the run's own work waiting when it starts)"}
 MUSCLE_LOADS = {"normal": "its own load", "line": f"work waiting in line ({LINE:.0%} of the run's own work at the start)"}
@@ -89,26 +91,28 @@ def gains_losses(per_seed):
 
 
 def label_max(per_seed, valid=True, at_limit=False):
-    """The max's label by rule:
-      the gains, joined (MORE WORK + FASTER + FEWER MISSES, or any of them)   at least one gain and no loss: BETTER
+    """The max's label by rule, against the muscle's three aims (more work, its line cleared sooner, fewer misses):
+      the gains, joined (MORE WORK + FASTER + FEWER MISSES, or any of them)   at least one toward its aim and none away:
+                               kind TOWARD ITS AIMS
       SAME AS NATIVE           no difference beyond the noise
       AT ITS LIMIT ON NATIVE   no difference, and native already runs the knob at the top of its range (the max wrote
                                nothing: there is nothing above native to give it)
-      MIXED                    a gain and a loss
-      WORSE                    a loss and no gain
+      BOTH WAYS                one toward its aim and one away (less work, slower or more misses)
+      AWAY FROM ITS AIMS       one away and none toward
       INVALID                  a knob not handed back to native by the lease"""
     if not valid:
         return "INVALID"
     gains, losses = gains_losses(per_seed)
     if losses:
-        return "MIXED" if gains else "WORSE"
+        return BOTH if gains else AWAY
     if gains:
         return " + ".join(gains)
     return "AT ITS LIMIT ON NATIVE" if at_limit else "SAME AS NATIVE"
 
 
 def kind_of(label):
-    return "BETTER" if label not in KINDS else label
+    label = RECORDED.get(label, label)
+    return TOWARD if label not in KINDS else label
 
 
 def summarize(per_seed):
@@ -148,7 +152,8 @@ def muscle_load(row, seeds, load):
 
 
 def muscle_job(args):
-    """Every load of one muscle, and its label over all of them: a gain under any load and a loss under none is better."""
+    """Every load of one muscle, and its label over all of them: toward its aims under some load and away under none is
+    TOWARD ITS AIMS."""
     row, seeds = args
     by = {load: muscle_load(row, seeds, load) for load in MUSCLE_LOADS}
     valid = all(o["valid"] for o in by.values())
@@ -159,7 +164,7 @@ def muscle_job(args):
     if not valid:
         label = "INVALID"
     elif losses:
-        label = "MIXED" if gains else "WORSE"
+        label = BOTH if gains else AWAY
     elif gains:
         label = " + ".join(g for g in GAINS if g in gains)
     else:
@@ -282,36 +287,37 @@ def write_md(out, res, orgs, run):
               f"{fmt(s['viol_pp'], 1.0, '')} | {fmt(s['energy'])} | {o['wear'] * 100:+.2f}% | {fmt(s['primary'])} | "
               f"{'yes' if o['valid'] else 'NO'} |")
         w("")
-    w("## Inside the organisms: every plant that did worse than native")
+    w("## Inside the organisms: every plant that did less work than native or missed its line more often")
     w("")
     w("A stricter look than an organism's total: every plant inside each organism, over all seeds, that did less work "
       "than native or spent more decisions over its own line, under each load. Reported whatever it shows.")
     w("")
-    w("| Load | Organism | Plants | Plants worse | The plants (work change, extra decisions over the line, all seeds) |")
+    w("| Load | Organism | Plants | Plants with less work or more misses | The plants (work change, extra decisions over the line, all seeds) |")
     w("|---|---|---:|---:|---|")
     for load in run["loads"]:
         for name in [n for n in REALMS + [STACK, TOWER] if n in orgs[load]]:
-            o = orgs[load][name]; h = o["plants_worse"]
+            o = orgs[load][name]; h = o.get("plants_flagged", o.get("plants_worse", {}))   # the older results' field, read as written
             lst = "; ".join(f"{mid} ({v[0] * 100:+.3f}%, {v[1]:+d})" for mid, v in sorted(h.items(), key=lambda kv: kv[1][0])) or "none"
             w(f"| {load} | {NAMES[name]} | {o['n']} | {len(h)} | {lst} |")
     w("")
     w("## Every muscle alone, by home realm")
     w("")
     w(f"Each muscle runs under {len(MUSCLE_LOADS)} loads, " + " and ".join(f"{v} ({k})" for k, v in MUSCLE_LOADS.items())
-      + ". **Better**: at least one gain beyond the noise under some load (more work, faster: the line cleared sooner, "
-      "fewer misses) and no loss under any. **At its limit on native**: native already runs the knob at the top of its "
+      + ". **Toward its aims**: at least one of its three aims moved beyond the noise under some load (more work, faster: "
+      "the line cleared sooner, fewer misses) and none the other way under any. **Both ways**: one toward its aim and one "
+      "away (less work, slower or more misses). **Away from its aims**: one away and none toward. **At its limit on native**: native already runs the knob at the top of its "
       "range (full clock, full speed, full torque, full battery power, nothing paced or turned away), so the max has "
       "nothing above native to give it and writes nothing. **Same as native**: the max acted or could, and the result is "
       "no different beyond the noise (native already did all the work that came and was almost never over its line).")
     w("")
-    w("| Realm | Muscles | Better | of them: more work | faster | fewer misses | Same as native | At its limit on native | Mixed | Worse | Invalid |")
+    w("| Realm | Muscles | Toward its aims | of them: more work | faster | fewer misses | Same as native | At its limit on native | Both ways | Away from its aims | Invalid |")
     w("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
 
     def count_row(rs):
         c = Counter(kind_of(r["label"]) for r in rs)
-        g = [sum(1 for r in rs if kind_of(r["label"]) == "BETTER" and x in r["label"]) for x in GAINS]
-        return [len(rs), c.get("BETTER", 0), *g, c.get("SAME AS NATIVE", 0), c.get("AT ITS LIMIT ON NATIVE", 0),
-                c.get("MIXED", 0), c.get("WORSE", 0), c.get("INVALID", 0)]
+        g = [sum(1 for r in rs if kind_of(r["label"]) == TOWARD and x in r["label"]) for x in GAINS]
+        return [len(rs), c.get(TOWARD, 0), *g, c.get("SAME AS NATIVE", 0), c.get("AT ITS LIMIT ON NATIVE", 0),
+                c.get(BOTH, 0), c.get(AWAY, 0), c.get("INVALID", 0)]
     for realm in REALMS:
         w(f"| {NAMES[realm]} | " + " | ".join(str(x) for x in count_row([r for r in res if r["row"]["realm"] == realm])) + " |")
     w("| **All** | " + " | ".join(f"**{x}**" for x in count_row(res)) + " |")
@@ -323,7 +329,7 @@ def write_md(out, res, orgs, run):
           "start, native → omni (and the share still waiting at the end, where it did not clear). Power given: energy "
           "against native's.")
         w("")
-        w("| Plant | Knob | Muscles | Omni acts on | Better | At its limit on native | Misses, native → omni | Work | Line, native → omni | Power given | Wear |")
+        w("| Plant | Knob | Muscles | Omni acts on | Toward its aims | At its limit on native | Misses, native → omni | Work | Line, native → omni | Power given | Wear |")
         w("|---|---|---:|---:|---:|---:|---|---:|---|---:|---:|")
         groups = defaultdict(list)
         for r in res:
@@ -341,21 +347,21 @@ def write_md(out, res, orgs, run):
                          if any(x[2] > 0 or x[3] > 0 for x in lines) else ""))
             else:
                 ln = "no line"
-            better = sum(1 for o in os_ if kind_of(o["label"]) == "BETTER")
+            toward = sum(1 for o in os_ if kind_of(o["label"]) == TOWARD)
             lim = sum(1 for o in os_ if o["label"] == "AT ITS LIMIT ON NATIVE")
-            w(f"| {t} | {k} | {len(rs)} | {sum(1 for o in os_ if o['writes'] > 0)} | {better} | {lim} | "
+            w(f"| {t} | {k} | {len(rs)} | {sum(1 for o in os_ if o['writes'] > 0)} | {toward} | {lim} | "
               f"{100.0 * vn / st:.2f}% → {100.0 * vm / st:.2f}% | {wk * 100:+.3f}% | {ln} | {en * 100:+.2f}% | "
               f"{sum(o['wear'] for o in os_) / len(os_) * 100:+.2f}% |")
         w("")
     w("## No-harm check")
     w("")
-    worse = [r for r in res if r["label"] in ("WORSE", "MIXED")]
+    away = [r for r in res if kind_of(r["label"]) in (AWAY, BOTH)]
     acted = sum(1 for r in res if r["writes"] > 0)
     lim = sum(1 for r in res if r["label"] == "AT ITS LIMIT ON NATIVE")
     w(f"- Omni acts on **{acted}** of {len(res)} muscles alone. **{lim}** are at their limit on native (the knob is "
       "already at the top of its range); the rest it could act on show nothing beyond the noise to gain.")
-    w(f"- Muscles alone labelled **WORSE** or **MIXED** under any load: **{len(worse)}**"
-      + ("." if not worse else ": " + ", ".join(f"{r['row']['muscle']} ({r['row']['knob']}, {r['label']})" for r in worse) + "."))
+    w(f"- Muscles alone labelled **away from its aims** or **both ways** under any load: **{len(away)}**"
+      + ("." if not away else ": " + ", ".join(f"{r['row']['muscle']} ({r['row']['knob']}, {kind_of(r['label']).lower()})" for r in away) + "."))
     w("- The lease hands every knob back to native before each run ends: "
       f"{sum(1 for r in res if r['valid'])} of {len(res)} muscles under every load; "
       + ", ".join(f"{sum(1 for o in orgs[load].values() if o['valid'])} of {len(orgs[load])} organisms under {load}"
@@ -434,7 +440,7 @@ def main(argv=None):
             harms = {mid: v for mid, v in agg.items() if v[0] < -1e-9 or v[1] > 0}
             orgs[load][name] = {"n": sum(len(g) for g in groups[name]) if name == STACK else len(groups[name]),
                                 "valid": valid, "label": label_max(per, valid), "summary": summarize(per),
-                                "per_seed": per, "plants_worse": harms,
+                                "per_seed": per, "plants_flagged": harms,
                                 "wear": sum(o["wear"] for o in runs) / len(runs),
                                 "totals": {"viol_native": sum(o["viol_native"] for o in runs),
                                            "viol_max": sum(o["viol_max"] for o in runs),

@@ -35,11 +35,11 @@ no proven CPU saving.
 
 | Gauge | Native | Omni on top | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| response time (ms), mean | 179.9 | 98.4 | −45.3% | −99.0 to −64.0 | better, proven |
-| response time (ms), 95th percentile | 407.9 | 158.8 | **−61.1%** | −298.3 to −199.9 | better, proven |
-| response time (ms), 99th percentile | 639.4 | 245.1 | −61.7% | −476.4 to −312.3 | better, proven |
+| response time (ms), mean | 179.9 | 98.4 | −45.3% | −99.0 to −64.0 | lower, proven |
+| response time (ms), 95th percentile | 407.9 | 158.8 | **−61.1%** | −298.3 to −199.9 | lower, proven |
+| response time (ms), 99th percentile | 639.4 | 245.1 | −61.7% | −476.4 to −312.3 | lower, proven |
 | failed requests (%) | 0 | 0 | 0 | 0 to 0 | equal |
-| pending pods, pod-minutes | 0.265 | 0.025 | −90.6% | −0.43 to −0.05 | better, proven |
+| pending pods, pod-minutes | 0.265 | 0.025 | −90.6% | −0.43 to −0.05 | lower, proven |
 | HPA replicas, mean | 8.93 | 6.91 | −22.7% | −2.70 to −1.35 | fewer, proven |
 | worker nodes in service, mean | 6 | 4.14 | −31.0% | −2.26 to −1.47 | fewer, proven (all stayed powered) |
 | pods started | 3.6 | 3.0 | −16.7% | −2.66 to +1.46 | not proven |

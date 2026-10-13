@@ -7,9 +7,9 @@
 """The A/B/C table for the sysbench on MySQL benchmark (docs/OMNI_V1.md's readings, docs/MYSQL_PREREGISTRATION.md): the untouched
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_sysbench.py), each run holding three
 paired repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions gives a 95%
-interval; across the three runs a gauge reads better or WORSE in all three of our runs when all three move the same way with every
+interval; across the three runs a gauge reads lower or higher in all three of our runs when all three move the same way with every
 interval clear of zero, no difference beyond the noise when a run's interval includes zero (with the count of such runs), and
-the runs disagree when runs clear of the noise point different ways. Errors: any increase in any run is WORSE. The knob's moves
+the runs disagree when runs clear of the noise point different ways. Errors: any rise in any run reads **higher in at least one of our runs**. The knob's moves
 are shown, never judged. The tuning workload is shown and not counted. Every row is reported, losses included; no energy is
 claimed beyond the host's CPU seconds.
 Usage: python tools/sysbench_abc.py A_DIR B_DIR C_DIR --out results/live/V3_SYSBENCH.md
@@ -24,7 +24,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, aim_of, Tally  # noqa: E402  (every table says whose runs these are)
 from tools.run_sysbench import GAUGES, SAME_REL, paired, resizing  # noqa: E402
 from tools.knob_verdict import summarize  # noqa: E402
 from tools.ycsb_abc import cell, fmt, verdict  # noqa: E402  (the same three-run rule and cells as the other stores)
@@ -69,8 +69,8 @@ def main(argv=None):
          f"statement latency at 40% of the {r00['line_stmt_ms']:g} ms statement line (`docs/MYSQL_PREREGISTRATION.md`). sysbench's published OLTP workloads "
          "ask for rows from a set of tables that steps through the pool and past it, the same transactions in both arms. Each run holds three paired "
          "repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a "
-         "reading **better** or **WORSE in all three of our runs**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of "
-         "such runs); clear runs pointing different ways read **the runs disagree**. Errors: any increase in any run is WORSE. Memory held is the resource; the "
+         "reading **lower** or **higher in all three of our runs** (which way the number went against native; the reader judges it); a run whose interval includes zero reads **no difference beyond the noise** (with the count of "
+         "such runs); clear runs pointing different ways read **the runs disagree**. Errors: any rise in any run reads **higher in at least one of our runs**. Memory held is the resource; the "
          "host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning "
          "workload is shown and not counted. Every row is shown, losses included.", "",
          "| Run | GitHub run | Commit | Engine | Workloads |", "|---|---|---|---|---:|"]
@@ -86,7 +86,7 @@ def main(argv=None):
     if off:
         L += ["", "> **Warning:** " + "; ".join(off) + "."]
     wls = sorted(set().union(*[set(r) for _, r in runs]), key=lambda w: (w != "tuning", w))
-    better = worse = disagree = 0
+    tally = Tally()
     out = {"runs": [{"tag": t, "run": r, "commit": s, "engine": v} for t, (r, _), (s, v) in zip("ABC", runs, eng)], "workloads": {}}
     for wl in wls:
         recs = [r.get(wl) for _, r in runs]
@@ -104,10 +104,10 @@ def main(argv=None):
             rs = [r["paired"].get(k) for r in recs]
             v = verdict(rs, dr)
             if not tuning:
-                better += "better" in v; worse += "WORSE" in v; disagree += "disagree" in v
+                tally.add(v, dr)
             nat = fmt(rs[0]["native"]) if rs[0] else "n/a"; om = fmt(rs[0]["omni"]) if rs[0] else "n/a"
             L.append(f"| {label} | {nat} | {om} | " + " | ".join(cell(r, k) for r in rs) + f" | {v} |")
-            out["workloads"][wl][k] = {"reading": v.strip("*"), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
+            out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
         arms = [x["omni"] for r in recs for x in r["reps"]]
         not_hb = [x for x in arms if not x.get("handed_back")]
         receipts = any("restore" in x for x in arms)
@@ -127,10 +127,10 @@ def main(argv=None):
                   + "; ".join(f"run {t}: {summarize(vs)}" for t, vs in vr.items() if vs) + "."]
             out.setdefault("verdicts", {})[wl] = {t: [{k: v.get(k) for k in ("objective", "state", "spend_allowed_steps", "give_back_allowed_steps", "allowed_low", "allowed_high", "counts")} for v in vs] for t, vs in vr.items()}
     n_wl = sum(1 for w in wls if not any((r.get(w) or {}).get("tuning") for _, r in runs))
-    L += ["", f"**Across {n_wl} untouched workloads: {better} gauge-rows better in all three of our runs, {worse} worse in all three of our runs, {disagree} where the runs disagree.**"]
+    L += ["", tally.sentence(n_wl, "untouched workloads")]
     Path(a.out).write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
     Path(a.out).with_suffix(".json").write_text(json.dumps(out, indent=1))
-    print(f"{a.out}: {n_wl} untouched workloads; {better} better, {worse} worse, {disagree} disagree")
+    print(f"{a.out}: {n_wl} untouched workloads; {tally.toward} toward the aim, {tally.away} away, {tally.disagree} disagree")
     return 0
 
 

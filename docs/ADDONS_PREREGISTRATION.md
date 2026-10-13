@@ -9,8 +9,8 @@ that. Every earlier Kubernetes set stays as it is; this is a new set beside them
 ## The question
 
 With KEDA, the event-driven autoscaler most clusters add to Kubernetes, and its HTTP add-on owning the service's
-autoscaler, does Omni-Compass on top still make the service faster, use fewer machines or less energy, without making
-anything worse?
+autoscaler, does Omni-Compass on top still make the service faster, use fewer machines or less energy, without moving
+anything away from its aim?
 
 ## The arms (two, as always)
 
@@ -45,7 +45,7 @@ mean difference and its 95% interval.
 - A gauge whose 95% interval of the paired difference is clear of zero is a difference in this run; one whose interval
   includes zero is no difference beyond the noise, and that is the result.
 - One run (A) is a first reading. A reading the same in all three of our runs needs runs B and C on the same commit (`tools/confirm_abc.py`):
-  better or worse in all three of our runs, no difference beyond the noise, or the runs disagree.
+  lower or higher in all three of our runs, no difference beyond the noise, or the runs disagree.
 - Response times are class L (measured on live software). Machines in service are counted live; the watts are the
   declared model (class S), as in every kind set.
 
@@ -68,15 +68,15 @@ both) and [`V3_KEDA_REQUESTS.md`](../results/live/V3_KEDA_REQUESTS.md) (setup ht
 
 | Gauge | Setup both: KEDA on the CPU target and the requests in flight | Setup http: KEDA's HTTP add-on on the requests in flight |
 |---|---|---|
-| Response time, 95th percentile | **−51% to −53%, better in all three of our runs** | **−73% to −76%, better in all three of our runs** |
-| Response time, mean | −36% to −39%, better in all three of our runs | −59% (−58.7% to −59.3%), better in all three of our runs |
-| Response time, 99th percentile | −60% to −62%, better in all three of our runs | −70% to −72%, better in all three of our runs |
-| Time over the response line | −97% to −100%, better in all three of our runs | −96% to −97%, better in all three of our runs |
+| Response time, 95th percentile | **−51% to −53%, toward its aim in all three of our runs** | **−73% to −76%, toward its aim in all three of our runs** |
+| Response time, mean | −36% to −39%, toward its aim in all three of our runs | −59% (−58.7% to −59.3%), toward its aim in all three of our runs |
+| Response time, 99th percentile | −60% to −62%, toward its aim in all three of our runs | −70% to −72%, toward its aim in all three of our runs |
+| Time over the response line | −97% to −100%, toward its aim in all three of our runs | −96% to −97%, toward its aim in all three of our runs |
 | Failed requests | no difference beyond the noise (none in either arm in B and C) | no difference beyond the noise |
-| Worker nodes in service | −0.6% to −0.7%, no difference beyond the noise in 2 of 3 runs | **−5.9% to −7.8%, better in all three of our runs** |
-| Node-hours | −0.4% to −0.9%, no difference beyond the noise in 1 of 3 runs | −5.8% to −8.2%, better in all three of our runs |
-| HPA replicas (set by KEDA) | +0.3% to +3.1%, no difference beyond the noise in 2 of 3 runs | −13.7% to −14.5%, better in all three of our runs |
-| Energy, parked workers still on at idle power (declared model, class S) | **+1.0% to +1.6%, WORSE in all three of our runs** | **+1.4% to +2.6%, WORSE in all three of our runs** |
+| Worker nodes in service | −0.6% to −0.7%, no difference beyond the noise in 2 of 3 runs | **−5.9% to −7.8%, toward its aim in all three of our runs** |
+| Node-hours | −0.4% to −0.9%, no difference beyond the noise in 1 of 3 runs | −5.8% to −8.2%, toward its aim in all three of our runs |
+| HPA replicas (set by KEDA) | +0.3% to +3.1%, no difference beyond the noise in 2 of 3 runs | −13.7% to −14.5%, toward its aim in all three of our runs |
+| Energy, parked workers still on at idle power (declared model, class S) | **+1.0% to +1.6%, away from its aim in all three of our runs** | **+1.4% to +2.6%, away from its aim in all three of our runs** |
 | Energy, parked workers at 25 W standby (declared model, class S) | +0.5% to +1.2%, no difference beyond the noise in 1 of 3 runs | −1.6% to −4.2%, no difference beyond the noise in 1 of 3 runs |
 | CPU used by the service (shown, not judged) | +24% to +32% | +45% to +54% |
 | Energy per core-hour of the service's CPU (shown, not judged) | −18% to −23% | −33% to −36% |

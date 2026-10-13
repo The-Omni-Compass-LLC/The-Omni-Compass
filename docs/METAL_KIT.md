@@ -78,8 +78,8 @@ C, cancel or delete the server on the provider's site so it stops billing.
 ## What comes back
 
 Each file holds every repetition's raw files, the run's table (`LIVE_REPS.md`) and SHA-256 sums. The three runs make the
-three-run table with `tools/confirm_abc.py`: the machine's own energy reading judged like every other gauge (better or
-worse in all three of our runs, no difference beyond the noise, or the runs disagree), Kepler's readings shown beside it.
+three-run table with `tools/confirm_abc.py`: the machine's own energy reading judged like every other gauge (lower or
+higher in all three of our runs, no difference beyond the noise, or the runs disagree), Kepler's readings shown beside it.
 
 ---
 

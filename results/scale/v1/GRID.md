@@ -12,7 +12,7 @@ Sources:
 - 1,000 runs at 1,000 clusters is not run: about 6,000 machine-hours, beyond the machines available.
 - 100 runs at 1,000 clusters is not run yet: about 650 runner-hours (one run of the four stacked at 1,000 copies takes 2 to 3 hours); the 1-run and 10-run cells at 1,000 clusters are complete.
 
-## Work per energy, with Omni-Compass on top against native (higher is better)
+## Work per energy, with Omni-Compass on top against native (the aim is higher)
 
 | Organism (muscles) | 1x, 1 run | 1x, 10 runs | 1x, 100 runs | 1x, 1000 runs | 10x, 1 run | 10x, 10 runs | 10x, 100 runs | 10x, 1000 runs | 100x, 1 run | 100x, 10 runs | 100x, 100 runs | 100x, 1000 runs | 1000x, 1 run | 1000x, 10 runs | 1000x, 100 runs | 1000x, 1000 runs |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -23,7 +23,7 @@ Sources:
 | The four stacked, duplicates kept (1226) | +0.152% | +0.153% | +0.154% | +0.154% | +0.159% | +0.156% | +0.156% | +0.156% | +0.153% | +0.153% | +0.153% | +0.153% | +0.154% | +0.154% | not run yet | not run |
 | The whole tower, every muscle once (656) | +0.195% | +0.196% | +0.195% | +0.194% | +0.187% | +0.186% | +0.185% | +0.185% | +0.181% | +0.180% | +0.180% | +0.180% | +0.182% | +0.182% | not run yet | not run |
 
-## Energy, with Omni-Compass on top against native (lower is better)
+## Energy, with Omni-Compass on top against native (the aim is lower)
 
 | Organism (muscles) | 1x, 1 run | 1x, 10 runs | 1x, 100 runs | 1x, 1000 runs | 10x, 1 run | 10x, 10 runs | 10x, 100 runs | 10x, 1000 runs | 100x, 1 run | 100x, 10 runs | 100x, 100 runs | 100x, 1000 runs | 1000x, 1 run | 1000x, 10 runs | 1000x, 100 runs | 1000x, 1000 runs |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -34,7 +34,7 @@ Sources:
 | The four stacked, duplicates kept (1226) | -0.151% | -0.153% | -0.154% | -0.154% | -0.158% | -0.156% | -0.156% | -0.156% | -0.153% | -0.153% | -0.153% | -0.153% | -0.154% | -0.154% | not run yet | not run |
 | The whole tower, every muscle once (656) | -0.197% | -0.196% | -0.194% | -0.194% | -0.186% | -0.186% | -0.185% | -0.185% | -0.180% | -0.180% | -0.180% | -0.180% | -0.181% | -0.181% | not run yet | not run |
 
-## Time over the service line, with Omni-Compass on top minus native (percentage points) (lower is better; band first holds where it is at or under 0)
+## Time over the service line, with Omni-Compass on top minus native (percentage points) (the aim is lower; band first holds where it is at or under 0)
 
 | Organism (muscles) | 1x, 1 run | 1x, 10 runs | 1x, 100 runs | 1x, 1000 runs | 10x, 1 run | 10x, 10 runs | 10x, 100 runs | 10x, 1000 runs | 100x, 1 run | 100x, 10 runs | 100x, 100 runs | 100x, 1000 runs | 1000x, 1 run | 1000x, 10 runs | 1000x, 100 runs | 1000x, 1000 runs |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|

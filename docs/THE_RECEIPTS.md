@@ -20,22 +20,22 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
    Read together: the governor turns capacity the native controller leaves unused into service, on the same machines.
 2. **The same service on less, where less is enough (L, v3).** PostgreSQL held 6% to 11% fewer connections open on
    `select`, MySQL's buffer pool 10% to 20% less on `read_write`, MongoDB's cache 3% to 13% less on `f`, each at the same
-   service, each better in all three runs, every other workload inside the noise; machines 1.7% to 2.0% fewer at steady
+   service, each toward its aim in all three runs, every other workload inside the noise; machines 1.7% to 2.0% fewer at steady
    load, 16% to 20% fewer on a batch queue (26% to 33% after it), 7% to 9% fewer under the Google trace of 2011, 5.9% to
    7.8% fewer on top of KEDA's HTTP add-on.
 3. **What it cost, shown beside it.** On top of KEDA, the energy of workers left on at idle power (a declared model)
-   rose 1.0% to 2.6%, worse in all three runs, in both setups: power given for the faster service. Kafka and Redis read
+   rose 1.0% to 2.6%, away from its aim in all three runs, in both setups: power given for the faster service. Kafka and Redis read
    nothing at all in their sets of 10 October, because the rule of that day ended every spend trial before it could be
    judged; that was our wiring, amended the same day (amendment 3), and the sets on it are the result of record when
    they land.
 4. **Everything handed back (L, v3).** The governor killed outright at 40% of the window: every setting back with the
    operator's within 11 seconds (9 on average), in 30 of 30 repetitions; the long run (two hours an arm): no leak, every decision
    valid, no slowing.
-5. **On our own models, nothing worse, alone or inside a body (S, v5).** Of the 1,107 muscles of the catalog (the
+5. **On our own models, nothing away from its aim, alone or inside a body (S, v5).** Of the 1,107 muscles of the catalog (the
    founder's nine open-source pieces among them), each alone on the preregistered seeds under its own load and under work
-   waiting in line: 527 better, 421 at their limit on native (the max writes nothing to them), 159 no difference beyond the
-   noise, none worse and none mixed. Inside the six organisms every organism is better as a whole under all three loads,
-   and not one plant is worse than native in any organism under any load (the living body is `docs/FORMAL_V5.md`,
+   waiting in line: 527 toward their aims, 421 at their limit on native (the max writes nothing to them), 159 no difference beyond the
+   noise, none away from its aim and none mixed. Inside the six organisms every organism moved toward its aim as a whole under all three loads,
+   and not one plant is behind native in any organism under any load (the living body is `docs/FORMAL_V5.md`,
    section 4; every muscle its own card, which removes more misses than one global setting with less power given, is
    section 5).
 6. **What is not yet shown.** No energy saving on a real chip: the physical receipt (P), the GPU's own meter on the
@@ -55,20 +55,20 @@ zero; "noise" means an interval includes zero.
 
 | Test | Engine | Native | What moved | Reading | It shows | It does not show | File |
 |---|---|---|---|---|---|---|---|
-| On top of Goldilocks and the VPA's recommender | v5 | the service rightsized by Goldilocks 4.16.2 (the VPA 1.7.1 recommender), HPA | response mean −44% to −48%; p95 −59% to −62%; p99 −68% to −69%; time over the line −99% to −100%; energy +1.9% to +2.6% (model) | response times better in all three; energy worse in all three (model: the power given); machines the same | a faster service on top of a rightsized one, on the same machines | a measured energy saving (the model shows 2% to 3% more, for about 40% more CPU work done) | `results/live/V5_GOLDILOCKS.md` |
+| On top of Goldilocks and the VPA's recommender | v5 | the service rightsized by Goldilocks 4.16.2 (the VPA 1.7.1 recommender), HPA | response mean −44% to −48%; p95 −59% to −62%; p99 −68% to −69%; time over the line −99% to −100%; energy +1.9% to +2.6% (model) | response times toward its aim in all three; energy away from its aim in all three (model: the power given); machines the same | a faster service on top of a rightsized one, on the same machines | a measured energy saving (the model shows 2% to 3% more, for about 40% more CPU work done) | `results/live/V5_GOLDILOCKS.md` |
 | Capacity at a fixed cap (four cap levels, rising load) | v5 | Kubernetes HPA under a CPU quota | nothing judged | noise at every cap in all three runs (one run at 2 cores −1.8% completed work, the other two noise) | no harm under a cap | more work under the cap: the quota blocks Omni-Compass's one lever there, more copies of the service | `results/live/V5_CAPACITY.md` |
-| On top of KEDA's HTTP add-on | v3 | KEDA 2.21, HTTP add-on 0.16 | p95 −73% to −76%; machines −5.9% to −7.8%; idle-power energy +1.0% to +2.6% | p95 and machines better in all three; energy worse in all three (model) | faster service and fewer machines on top of a second autoscaler | a measured energy saving (the energy is a model) | `results/live/V3_KEDA_REQUESTS.md` |
-| On top of KEDA on CPU and requests | v3 | KEDA 2.21 | p95 −51% to −53%; idle-power energy worse | as above | as above | as above | `results/live/V3_KEDA_CPU_REQUESTS.md` |
-| The Google cluster trace of 2011, replayed | v3 | HPA | p95 −64% to −67%; failed requests −11% to −18%; machines −7% to −9% | better in all three | a public day of real demand served faster on fewer machines | a cloud bill | `results/live/V3_TRACE_GOOGLE2011.md` |
-| All four at once | v3 | HPA | work inside the line +54% to +68%; p95 −57% to −63% | better in all three | more work in time on the same machines | energy (inside the noise, model) | `results/live/V3_ALL_FOUR.md` |
-| Steady work in steps | v3 | HPA | p95 −64% to −66%; machines −1.7% to −2.0% | better in all three | a faster tail on fewer machines | a measured energy saving (model −1.3% to −1.8%) | `results/live/V3_STEADY.md` |
-| Demand that wanders | v3 | HPA | p95 −57% to −64%; failed requests −12% to −13% | better in all three | service held as demand moves | machines (noise) | `results/live/V3_WANDERING.md` |
-| Faults: a machine down, a spike, a runaway pod, a blind probe | v3 | HPA | p95 −58% to −63%; failed requests −14% to −18% | better in all three | service held through faults | machines (noise) | `results/live/V3_FAULTS.md` |
-| A queue of batch jobs | v3 | Jobs and HPA | machines −16% to −20% (−26% to −33% after the queue); standby-model energy −11% to −14%; queue finish noise | better in all three | the same queue on fewer machines | a measured energy saving (model) | `results/live/V3_BATCH.md` |
+| On top of KEDA's HTTP add-on | v3 | KEDA 2.21, HTTP add-on 0.16 | p95 −73% to −76%; machines −5.9% to −7.8%; idle-power energy +1.0% to +2.6% | p95 and machines toward its aim in all three; energy away from its aim in all three (model) | faster service and fewer machines on top of a second autoscaler | a measured energy saving (the energy is a model) | `results/live/V3_KEDA_REQUESTS.md` |
+| On top of KEDA on CPU and requests | v3 | KEDA 2.21 | p95 −51% to −53%; idle-power energy higher | as above | as above | as above | `results/live/V3_KEDA_CPU_REQUESTS.md` |
+| The Google cluster trace of 2011, replayed | v3 | HPA | p95 −64% to −67%; failed requests −11% to −18%; machines −7% to −9% | toward its aim in all three | a public day of real demand served faster on fewer machines | a cloud bill | `results/live/V3_TRACE_GOOGLE2011.md` |
+| All four at once | v3 | HPA | work inside the line +54% to +68%; p95 −57% to −63% | toward its aim in all three | more work in time on the same machines | energy (inside the noise, model) | `results/live/V3_ALL_FOUR.md` |
+| Steady work in steps | v3 | HPA | p95 −64% to −66%; machines −1.7% to −2.0% | toward its aim in all three | a faster tail on fewer machines | a measured energy saving (model −1.3% to −1.8%) | `results/live/V3_STEADY.md` |
+| Demand that wanders | v3 | HPA | p95 −57% to −64%; failed requests −12% to −13% | toward its aim in all three | service held as demand moves | machines (noise) | `results/live/V3_WANDERING.md` |
+| Faults: a machine down, a spike, a runaway pod, a blind probe | v3 | HPA | p95 −58% to −63%; failed requests −14% to −18% | toward its aim in all three | service held through faults | machines (noise) | `results/live/V3_FAULTS.md` |
+| A queue of batch jobs | v3 | Jobs and HPA | machines −16% to −20% (−26% to −33% after the queue); standby-model energy −11% to −14%; queue finish noise | toward its aim in all three | the same queue on fewer machines | a measured energy saving (model) | `results/live/V3_BATCH.md` |
 | A noisy neighbour | v3 | HPA | — | noise on every row | no harm beside a noisy neighbour | a gain there | `results/live/V3_FAIRNESS.md` |
-| PostgreSQL behind PgBouncer | v3 | the operator's pool of 20 | connections −6% to −11% on `select`; the add above 20 refused on `simple_update` | better in all three on `select`; the rest noise | memory given back at the same service, proved on the stack first | more throughput | `results/live/V3_PGBENCH.md` |
-| MySQL under sysbench | v3 | the operator's 512 MB buffer pool | pool −10% to −20% on `read_write` | better in all three; the rest noise | memory given back at the same service | more throughput | `results/live/V3_SYSBENCH.md` |
-| MongoDB under YCSB | v3 | the operator's 512 MB cache | cache −3% to −13% on `f` | better in all three; the rest noise | memory given back at the same service | more throughput | `results/live/V3_YCSB.md` |
+| PostgreSQL behind PgBouncer | v3 | the operator's pool of 20 | connections −6% to −11% on `select`; the add above 20 refused on `simple_update` | toward its aim in all three on `select`; the rest noise | memory given back at the same service, proved on the stack first | more throughput | `results/live/V3_PGBENCH.md` |
+| MySQL under sysbench | v3 | the operator's 512 MB buffer pool | pool −10% to −20% on `read_write` | toward its aim in all three; the rest noise | memory given back at the same service | more throughput | `results/live/V3_SYSBENCH.md` |
+| MongoDB under YCSB | v3 | the operator's 512 MB cache | cache −3% to −13% on `f` | toward its aim in all three; the rest noise | memory given back at the same service | more throughput | `results/live/V3_YCSB.md` |
 | Apache Kafka; Redis | v3 | the operator's settings | nothing judged | noise everywhere; every spend trial ended unjudged (our wiring, amendment 3) | no harm | a gain (none judged yet) | `results/live/V3_KAFKA.md`, `results/live/V3_REDIS.md` |
 | The governor killed at 40% of the window | v3 | HPA | every setting back within 11 s (9 on average), 30 of 30; the window's p95 −27% to −48% | held in every repetition | the hand-back works under a crash | — | `results/live/V3_ROBUST_KILL.md` |
 | The long run, two hours an arm | v3 | HPA | no leak; decisions valid; no slowing | held in every repetition | it runs for hours unchanged | — | `results/live/V3_ROBUST_LONG.md` |
@@ -79,11 +79,11 @@ zero; "noise" means an interval includes zero.
 
 | Test | Engine | Reading | File |
 |---|---|---|---|
-| The 1,107 muscles and the six organisms, preregistered seeds | v5 (digest 5648f290, every muscle its own card) | 527 better, 421 at their limit on native, 159 noise, 0 worse; every organism better under all three loads; 0 plants worse in any organism under any load | `results/realms_v5/REALMS_V5.md` |
-| Power grids: 11 SimBench grids in pandapower | v3 | energy drawn and net import better in all 11; losses better in 7, worse in 4; tap operations fewer in 10, more in 1 | `results/live/V3_PANDAPOWER.md` |
-| CityLearn districts | v3 | electricity bought, peak and unevenness better in all 11 battery districts; the bill worse in 7, ramping worse in 7 | `results/live/V3_CITYLEARN.md` |
-| Robot arms, MuJoCo Menagerie | v3 | Gen3 and Panda peak torque −29% and −10%, tracking error −21%; the Panda's copper +14% worse; UR5e and iiwa left native | `results/live/V3_MUJOCO.md` |
-| Drone swarms, 20 drones in three cells | v3 | energy a mission −7% to −20%, missions a charge +8% to +25%, better in all three; no late mission, reserve breach, near miss or collision | `results/live/V3_SWARM.md` |
+| The 1,107 muscles and the six organisms, preregistered seeds | v5 (digest 5648f290, every muscle its own card) | 527 toward their aims, 421 at their limit on native, 159 noise, 0 away from their aims; every organism with fewer misses under all three loads; 0 plants with less work or more misses in any organism under any load | `results/realms_v5/REALMS_V5.md` |
+| Power grids: 11 SimBench grids in pandapower | v3 | energy drawn and net import lower in all 11; losses lower in 7, away from its aim in 4; tap operations fewer in 10, more in 1 | `results/live/V3_PANDAPOWER.md` |
+| CityLearn districts | v3 | electricity bought, peak and unevenness lower in all 11 battery districts; the bill higher in 7, ramping higher in 7 | `results/live/V3_CITYLEARN.md` |
+| Robot arms, MuJoCo Menagerie | v3 | Gen3 and Panda peak torque −29% and −10%, tracking error −21%; the Panda's copper +14% higher; UR5e and iiwa left native | `results/live/V3_MUJOCO.md` |
+| Drone swarms, 20 drones in three cells | v3 | energy a mission −7% to −20%, missions a charge +8% to +25%, toward its aim in all three; no late mission, reserve breach, near miss or collision | `results/live/V3_SWARM.md` |
 
 ### A physical meter (P)
 

@@ -263,13 +263,11 @@ def report(res: dict, out: Path):
             if d == "shown":
                 rd = "shown"
             elif ch is None:
-                rd = "same" if b == a else ("WORSE" if b > a else "better")
+                rd = "same" if b == a else ("higher" if b > a else "lower")
             elif abs(ch) < 1e-6:
                 rd = "same"
-            elif d == "never more":
-                rd = "WORSE: more" if ch > 0 else "better"
             else:
-                rd = "WORSE" if ch > 0 else "better"
+                rd = "higher" if ch > 0 else "lower"            # which way it went; the gauge's aim is the reader's
             L.append(f"| {name} | {a:.4g} | {b:.4g} | {'' if ch is None else f'{100 * ch:+.2f}%'} | {rd} |")
         L.append("")
     (out / "MUJOCO.md").write_text("\n".join(_legal_stamp(L)) + "\n")

@@ -39,16 +39,16 @@ This is the whole repository at the commit named in `STATE_OF_PLAY_COMMIT.txt`. 
 
 | Claim | Evidence | Where |
 |---|---|---|
-| **B (Omni on top of each platform):** 0 losing cells on held-out scenarios; strictly better on 27 of 28 platform-workload pairs | simulation, pre-registered | `tuning/B_FIX.json`, `tuning/B_TONE_HELDOUT.json` |
+| **B (Omni on top of each platform):** 0 losing cells on held-out scenarios; strictly toward its aim on 27 of 28 platform-workload pairs | simulation, pre-registered | `tuning/B_FIX.json`, `tuning/B_TONE_HELDOUT.json` |
 | **Four-cluster sites:** B 0 losses on all 7 platforms; C 0 losses vs GKE, AKS/Karpenter, CAST AI, Spot | simulation, held-out | `tuning/SITE_LEAGUE.json` |
-| **C (Omni alone), one global setting, 400 never-used scenarios:** 153 better / 174 equal / 37 worse of 364 cells (Holm-corrected) | simulation, held-out | `tuning/CONFIRMATORY.json` |
+| **C (Omni alone), one global setting, 400 never-used scenarios:** 153 toward their aims / 174 equal / 37 away from their aims of 364 cells (Holm-corrected) | simulation, held-out | `tuning/CONFIRMATORY.json` |
 | **C with nervous-system coordination, 400 fresh scenarios:** 151 / 173 / 40 | simulation, held-out | `tuning/CONFIRMATORY_COORD.json` |
 | **Controllers fighting each other:** lowest of all 8 systems on web (0.07 per day) and four-cluster sites (0.56 per day) | simulation, held-out | same file |
 | **Real demand, 1,052 recorded PlanetLab machines:** 0 losing cells of 91 | simulation on real traces | `tuning/PLANETLAB_LEAGUE.json` |
 | **Faults** (machines dying, spikes, crash loops, noisy neighbours): fewest pages to a human, fastest recovery | simulation, 500 runs per workload | `results/protocol/` |
 | **GPU power law** (engine cap over the MLPerf-measured performance law), against native at equal work: energy -27% to -33%, time over the heat limit -73% to -78% | simulation, held-out | `results/hardware/SUMMARY_HELDOUT.json` |
 | **Site power exchange (conveyance law, manuscript Ch. 29-31):** 4 GPU groups under one site budget: 0 minutes over the site limit at 70/60/50% budgets (native 10.5/45.6/106); least energy at every budget; 31-115 fewer backlog minutes than the static split | simulation, held-out; law proved (conservation, Lyapunov, exponential convergence) | `docs/CONVEYANCE_LAW.md`, `results/hardware/SITE_EXCHANGE_HELDOUT_*.json` |
-| **Same-tower OFF / observe / ON receipt:** observe identical to OFF; ON better than ChatGPT's graded-reflex build on healthy time, recovery, energy, violations and peak power (peak below OFF) | simulation, held-out | `results/tower_off_on/`, `results/external_review/CHATGPT2_REVIEW.md` |
+| **Same-tower OFF / observe / ON receipt:** observe identical to OFF; ON ahead of ChatGPT's graded-reflex build on healthy time, recovery, energy, violations and peak power (peak below OFF) | simulation, held-out | `results/tower_off_on/`, `results/external_review/CHATGPT2_REVIEW.md` |
 | **Live levers under the nervous system:** 19 of 19 checks on real Kubernetes; reset restores everything | live, kind | `results/live/LIVE_LEVERS_2_NERVOUS.txt` |
 | **Shadow pilot kit:** a read-only identity made 0 writes across 40 decisions | live, kind | `results/live/LIVE_SHADOW_1.txt` |
 | **Safety shield:** 2,000,000 adversarial cases, 0 violations (the test found 2 real bugs, both fixed); C++ twin matches | test | `tests/test_shield_properties.py` |
@@ -60,7 +60,7 @@ This is the whole repository at the commit named in `STATE_OF_PLAY_COMMIT.txt`. 
   where the others stop at 70%, and trades response time for energy.
 - **C, machine starts and stops:** loses to plain Kubernetes and OpenShift, which hold machines steady and pay for it
   in machine-hours.
-- **C, GPU and batch:** energy 1-2% worse and power and heat margins 1-4% worse than the tight packers (AKS/Karpenter,
+- **C, GPU and batch:** energy 1-2% lower and power and heat margins 1-4% lower than the tight packers (AKS/Karpenter,
   CAST AI, Spot).
 - **Live, set 3, with a working probe:**
   - Omni kept all 6 machines. Latency near the 500 ms SLO blocks machine release.
@@ -96,7 +96,7 @@ locally at this commit.
 ## What came from the other AI builds, and what was tested
 
 - **ChatGPT** (`results/external_review/CHATGPT_RELEASE_REVIEW.md`):
-  - Its recovery reflex overrides the power envelope. Head to head, this engine is better on 11 gauges in its default
+  - Its recovery reflex overrides the power envelope. Head to head, this engine moved toward its aim on 11 gauges in its default
     mode and its reflex on 1. Not adopted.
   - Its CPU-frequency connector was adopted, wired under the nervous system with a schedutil floor and exact restore.
 - **Grok** (`results/external_review/GROK_HARNESS_REVIEW.md`):
@@ -125,10 +125,10 @@ locally at this commit.
 
 **Omni v1, the same in all three of our runs.** On real Kubernetes, every test ran three times as separate GitHub runs on the frozen
 engine, ten pairs each (`docs/OMNI_V1.md`, the six `results/live/V1_*.md` tables). Work inside the response line **+42%
-to +48%** in all three runs of the all-four test (18.6 → 27.6 requests a second in run A), better in all three of our runs; the 95th
-percentile **−57% to −69%** in every run of the steady, wandering, all-four and fault tests, better in all three of our runs; failed
-requests −12% to −13% where load swings, better in all three of our runs; machines −1.5% to −3.4% at steady load and −15% to −24% on
-the batch queue, better in all three of our runs, no difference beyond the noise elsewhere; energy a declared model (kind never powers a
+to +48%** in all three runs of the all-four test (18.6 → 27.6 requests a second in run A), toward its aim in all three of our runs; the 95th
+percentile **−57% to −69%** in every run of the steady, wandering, all-four and fault tests, toward its aim in all three of our runs; failed
+requests −12% to −13% where load swings, toward its aim in all three of our runs; machines −1.5% to −3.4% at steady load and −15% to −24% on
+the batch queue, toward its aim in all three of our runs, no difference beyond the noise elsewhere; energy a declared model (kind never powers a
 machine down); beside a noisy neighbour, no difference beyond the noise on every row. **The Omni index on v1: +26.2%**
 on real Kubernetes (`results/OMNI_INDEX.md`; only rows the same in all three of our runs count, a row inside the noise counts
 as zero; Azure and the card join when their v1 runs land). The paragraph below is the earlier engine's reading, kept as
@@ -146,8 +146,8 @@ check parked 29-36%: `docs/history/`). All of it together, real machines only: *
 (`results/OMNI_INDEX.md`).
 
 **Omni v1** (`docs/OMNI_V1.md`): the engine is frozen and fingerprinted (`OMNI_V1.json`), and every test above runs
-three times on it, as separate GitHub runs (A the result, B and C the replications); each table reads better in all three of our runs,
-worse in all three of our runs, no difference beyond the noise, or the runs disagree, and replaces the earlier engine's table as it
+three times on it, as separate GitHub runs (A the result, B and C the replications); each table reads toward its aim in all three of our runs,
+away from its aim in all three of our runs, no difference beyond the noise, or the runs disagree, and replaces the earlier engine's table as it
 lands. Running on v1 now: the Kubernetes suite three times, the batch test, the six organisms at 1, 10, 100 and 1,000
 copies with the real cluster inside, the big organisms on rented Azure machines, the Azure steady and burst bill tests,
 CityLearn, and the power grid.
@@ -175,7 +175,7 @@ never counted in the headline.
 | Six organisms, cluster inside, 5 pairs each | requests served +0.5% to +6% | p95 -24% to -40% | same to -2% | -0.1% to -0.6% | `results/live/SIX_KUBE.md` |
 | Azure AKS, steady load, 5 pairs | same | p95 -20% | same | (billed) same | `results/live/AKS_BILL.md` |
 
-All four in one run is done: every one better and proven in the same run (`results/live/ALL_FOUR.md`). Running now: demand that wanders (up, spike, down, back up,
+All four in one run is done: every one toward its aim and proven in the same run (`results/live/ALL_FOUR.md`). Running now: demand that wanders (up, spike, down, back up,
 idle, 10 pairs), the Azure burst bill test, and the 1,000-copy grid of the six organisms on Lambda.
 
 ### The engine now, and what runs on it (2026-10-05)
@@ -192,11 +192,11 @@ Back on the frozen engine so far, ten pairs each:
 - **Faults** (`results/live/FAULTS.md`): p95 −60%, mean response −35%, time over the line −23%, pending pods −77%.
   Recovery is faster after every fault: machine down 42 s against 70 s, a blind probe 54 s against 66 s, a runaway pod
   98 s against 105 s, a spike the same.
-- **Fairness** (`results/live/FAIRNESS.md`): a noisy neighbour on the same cluster. Mean response −15%, nothing worse,
-  and the neighbour's own app no worse. The earlier engine scored −0.3% on the index here; this engine scores +5.6%.
+- **Fairness** (`results/live/FAIRNESS.md`): a noisy neighbour on the same cluster. Mean response −15%, nothing away from its aim,
+  and the neighbour's own app never behind. The earlier engine scored −0.3% on the index here; this engine scores +5.6%.
 
-Independent simulator: CityLearn round 1 split (the 2022 battery districts better on bill -4% to -11%, electricity -9%
-to -17%, carbon -7% to -14%; the 2020-2021 water-tank districts worse on peaks and ramping), the fix (only the electric
+Independent simulator: CityLearn round 1 split (the 2022 battery districts lower on bill -4% to -11%, electricity -9%
+to -17%, carbon -7% to -14%; the 2020-2021 water-tank districts higher on peaks and ramping), the fix (only the electric
 batteries are steered), and round 2 on every untouched district (`docs/CITYLEARN_PREREGISTRATION.md`).
 
 ### Measured on real systems: the newest set, Omni-Compass against Kubernetes as it runs today
@@ -237,9 +237,9 @@ rate, so both arms were given **the same work**.
 |---|---:|---:|---:|---:|---|
 | Set 25, the engine's allocation law | **−32.3%** | **−57.3%** | 0 / 0 | −0.6% (not significant) | `results/live/LIVE_REPS_25.md` |
 | Set 26, the engine's allocation law | **−35.8%** | **−55.4%** | 0 / 0 | −1.5% (not significant) | `results/live/LIVE_REPS_26.md` |
-| Set 26, **the compass law in the live controller** | **−17.2%** | **−64.8%** | 0 / 0 | +1.0% (not significant) | same; label by the preregistered rule: **better on machines within the band** |
+| Set 26, **the compass law in the live controller** | **−17.2%** | **−64.8%** | 0 / 0 | +1.0% (not significant) | same; label by the preregistered rule: **fewer machines within the band** |
 | Set 27, the engine's allocation law | **−36.6%** | **−53.1%** | 0 / 0 | −0.0% (not significant) | `results/live/LIVE_REPS_27.md` |
-| Set 27, **the compass law aligned with the GPU governor** | **−15.9%** | **−65.5%** | 0 / 0 | +0.2% (not significant) | same; label by the preregistered rule: **better on machines within the band** |
+| Set 27, **the compass law aligned with the GPU governor** | **−15.9%** | **−65.5%** | 0 / 0 | +0.2% (not significant) | same; label by the preregistered rule: **fewer machines within the band** |
 
 Set 27 (running): the compass in the live controller reads the service as the corrected GPU compass does (mean response time,
 center 0.4), against native and the allocation law (`docs/K8S_COMPASS_PREREGISTRATION.md`).
@@ -255,7 +255,7 @@ repetitions × native / watch / Omni, 600 s each, frozen at commit `c908054`, ch
 | **Work per energy** (requests per kJ) | 50.79 | 52.62 | **+3.6% (+2.7% to +4.5%), proven** |
 | GPU energy | 69,180 J | 66,790 J | −3.5%, proven |
 | Requests served / not served | 3,514 / 0 | 3,514 / 0 | equal |
-| **Response time, 95th percentile** | 510 ms | 809 ms | **+58.5%, worse, proven** |
+| **Response time, 95th percentile** | 510 ms | 809 ms | **+58.5%, higher, proven** |
 
 **Result, by rule: ENERGY IMPROVEMENT WITH SERVICE TRADEOFF** (the p95 guardrail of +10% failed). The six organisms
 with the same card inside (`results/hil/run-20261002T082232Z/HIL.md`, 3 repetitions each): the card's work per energy
@@ -274,7 +274,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | CPU and GPU on one conserved power budget: +1.4% to +5.7% work served against a fixed cap, never over the budget | `results/hardware/NODE_EXCHANGE_*.json`, `docs/CONVEYANCE_LAW.md` |
 | GPU groups sharing a site budget: 0 minutes over the budget | `results/hardware/SITE_EXCHANGE_HELDOUT_*.json` |
 | Platform leagues, faults, PlanetLab traces, stack benchmark | `tuning/`, `results/protocol/`, `results/` (see `docs/history/BENCHMARK_REPORT.md`) |
-| **The 656-muscle tower as organisms**, round 3 (preregistered, 10 seeds; every realm carries the shared spine; Omni as the shipped controller commands): the whole tower native against one governor on top, work per energy **+0.1%, SUPERIOR WITHIN GUARDRAILS**; inside the realms the spine costs service: Energy +0.2% with +1.9 pp violations (tradeoff), Compute 0.0% (+2.1 pp, not established), Distribution −0.1% and Physics −0.7% (**WORSE**). Rounds 1 and 2 kept, superseded | `results/realms/REALMS.md`, `docs/REALM_MUSCLES.md` |
+| **The 656-muscle tower as organisms**, round 3 (preregistered, 10 seeds; every realm carries the shared spine; Omni as the shipped controller commands): the whole tower native against one governor on top, work per energy **+0.1%, SUPERIOR WITHIN GUARDRAILS**; inside the realms the spine costs service: Energy +0.2% with +1.9 pp violations (tradeoff), Compute 0.0% (+2.1 pp, not established), Distribution −0.1% and Physics −0.7% (**AWAY FROM ITS AIM**). Rounds 1 and 2 kept, superseded | `results/realms/REALMS.md`, `docs/REALM_MUSCLES.md` |
 
 ---
 

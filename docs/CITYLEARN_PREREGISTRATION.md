@@ -34,8 +34,8 @@ On the tuning district only, `citylearn_challenge_2022_phase_1` (5 buildings):
 | **... glide 0.05 an hour (frozen)** | **-10.5%** | **-17.8%** | **-14.7%** | **-11.9%** | **-1.4%** | **-4.4%** |
 | ... glide 0.03 an hour | -8.6% | -15.8% | -12.9% | -9.6% | -1.4% | -7.5% |
 
-(Change against native; CityLearn's own scores, lower is better.) Frozen: gain 0.5, response 1 hour, glide 0.05 an
-hour: the setting at which every score was better than native on the tuning district. The tuning district is not
+(Change against native; CityLearn's own scores, the aim is lower.) Frozen: gain 0.5, response 1 hour, glide 0.05 an
+hour: the setting at which every score was ahead of native on the tuning district. The tuning district is not
 counted in the counted run.
 
 ## The counted run (untouched districts)
@@ -44,8 +44,8 @@ Every other CityLearn district that runs with the native controller: `citylearn_
 `citylearn_challenge_2022_phase_3`, `citylearn_challenge_2022_phase_all`, `citylearn_challenge_2021`,
 `citylearn_challenge_2020_climate_zone_1` to `_4`, and `citylearn_challenge_2023_phase_1`. Each district is one
 deterministic year, native and native + Omni-Compass. Reported per district and across districts: every CityLearn
-score, native, native + Omni-Compass, the change, and read in words (better or worse), with the number of districts
-better and worse for each score. Workflow `citylearn`; the report is written to results/citylearn/CITYLEARN.md when it has run.
+score, native, native + Omni-Compass, the change, and read in words (lower or higher), with the number of districts
+lower and higher for each score. Workflow `citylearn`; the report is written to results/citylearn/CITYLEARN.md when it has run.
 
 ## Round 1 result, and the amendment written before round 2 (2026-10-05)
 
@@ -56,12 +56,12 @@ storage in the district:
 | Districts | Bill | Electricity bought | Carbon | Daily peak | Highest peak | Ramping |
 |---|---|---|---|---|---|---|
 | 2022 phases 2, 3 and all (electric batteries; 5, 7, 17 buildings) | -4.2% to -10.8% | -8.9% to -16.9% | -6.6% to -14.1% | -11.0% to -14.0% | -2.7% to +0.5% | -7.1% to +3.4% |
-| 2020 climate zones 1-4 and 2021 (cold and hot water tanks; 9 buildings) | the same | -0.0% to -0.8% | -0.5% to +0.1% | +5.5% to +11.5% (worse) | +10.4% to +28.1% (worse) | +23.5% to +31.4% (worse) |
-| 2023 phase 1 (720 hours, 3 buildings) | +0.3% | -0.1% | -0.8% | -4.6% | the same | +25.3% (worse) |
+| 2020 climate zones 1-4 and 2021 (cold and hot water tanks; 9 buildings) | the same | -0.0% to -0.8% | -0.5% to +0.1% | +5.5% to +11.5% (higher) | +10.4% to +28.1% (higher) | +23.5% to +31.4% (higher) |
+| 2023 phase 1 (720 hours, 3 buildings) | +0.3% | -0.1% | -0.8% | -4.6% | the same | +25.3% (higher) |
 
 The cause: the wiring pushed every storage command the same way from the district's electricity reading, the water
 tanks (cooling_storage, dhw_storage) included. A tank is a thermal muscle; moving when it charges by an electricity
-reading made the peaks worse.
+reading made the peaks higher.
 
 **Amendment (one wire, one muscle):** the compass steers only the electric batteries (`electrical_storage`) from the
 electricity reading; every water tank stays native (it would need its own wire and its own reading, the tank's
@@ -88,7 +88,7 @@ the controller, gain, response, glide and band are unchanged, and both arms see 
 ran to the end: Alameda County, Travis County, Chittenden County and the 2022 robustness district. Electricity bought
 was lower in all four (2.1-14.7%), the daily peak lower in all four (0.8-14.0%), and hour-to-hour ramping lower in all
 four (1.3-7.2%). The robustness district came out bill 8.6% lower, carbon 11.9% lower and daily peak 14.0% lower. Its
-monthly load unevenness was 0.11% higher, the one row worse than native, reported as measured. In the other three
+monthly load unevenness was 0.11% higher, the one row behind native, reported as measured. In the other three
 districts the bill and carbon came out the same. Five districts cannot be run by CityLearn's own rule-based controller in
 any arm: they need CityLearn's entity interface, which that controller refuses, or they carry an appliance action it
 does not know. Each is listed in the report with CityLearn's own message.

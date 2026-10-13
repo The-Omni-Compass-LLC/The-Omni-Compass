@@ -11,8 +11,8 @@ never read here.
             battery's line margin and window, an axis's heat head and strain) tries every candidate on the seeds, both of
             its loads; today's global setting is always one of them. A candidate is kept only if it beats the global
             setting beyond the noise on those seeds (fewer misses, more work or faster, each a 95% interval of the paired
-            difference clear of zero) and is worse than it nowhere, and is never worse than native: on no seed and under
-            no load over its line more often, doing less work or clearing its line later. Among those, the fewest misses,
+            difference clear of zero) and moves none of the three the other way against it, and never falls behind
+            native: on no seed and under no load over its line more often, doing less work or clearing its line later. Among those, the fewest misses,
             then the most work, then the fastest, then the least energy.
   confirm   each kept card against the global setting again, on other development seeds, under the same rule.
   write     the cards that won on both sets of seeds, into realms/muscle_cards_v5.csv (a muscle without a row runs the
@@ -98,7 +98,7 @@ def evaluate(row, params, seeds):
         gains.update(g)
         losses.update(l)
     valid = all(o["valid"] for o in by.values())
-    label = ("INVALID" if not valid else ("MIXED" if gains else "WORSE") if losses else
+    label = ("INVALID" if not valid else (RR.BOTH if gains else RR.AWAY) if losses else
              (" + ".join(g for g in RR.GAINS if g in gains) if gains else "SAME"))
     per = {ld: [{k: c.get(k) for k in ("work", "viol_pp", "speed", "energy")} for c in o["per_seed"]]
            for ld, o in by.items()}
@@ -110,21 +110,23 @@ def evaluate(row, params, seeds):
 
 
 def beats(c, d):
-    """Card c against the global setting d on the same seeds: (better somewhere beyond the noise, worse somewhere)."""
-    better = worse = False
+    """Card c against the global setting d on the same seeds: (toward an aim somewhere beyond the noise, away from one
+    somewhere); the aims: fewer misses, more work, faster."""
+    toward = away = False
     for ld in c["per"]:
         a, b = c["per"][ld], d["per"][ld]
         pairs = (("viol_pp", -1), ("work", 1)) + ((("speed", -1),) if all(x.get("speed") is not None for x in a + b)
                                                   else ())
-        for key, good in pairs:
+        for key, aim in pairs:
             m, lo, hi = H.interval([x[key] - y[key] for x, y in zip(a, b)])
-            better |= (hi < -1e-12) if good < 0 else (lo > 1e-12)
-            worse |= (lo > 1e-12) if good < 0 else (hi < -1e-12)
-    return better, worse
+            toward |= (hi < -1e-12) if aim < 0 else (lo > 1e-12)
+            away |= (lo > 1e-12) if aim < 0 else (hi < -1e-12)
+    return toward, away
 
 
 def score(c):
-    """Lower is better: the misses (summed over loads), then less work, then slower, then more energy."""
+    """The order the search keeps (lowest first): the misses (summed over loads), then less work, then slower, then more
+    energy."""
     s = [0.0, 0.0, 0.0, 0.0]
     for a in c["per"].values():
         n = len(a)
@@ -141,7 +143,7 @@ def _search_job(args):
     cands = [evaluate(row, p, seeds) for p in candidates(row, wide)]
     g = global_of(row)
     d = next(c for c in cands if c["params"] == g)
-    ok = [c for c in cands if c is not d and c["label"] not in ("WORSE", "MIXED", "INVALID") and c["seed_harms"] == 0]
+    ok = [c for c in cands if c is not d and RR.kind_of(c["label"]) not in (RR.AWAY, RR.BOTH, "INVALID") and c["seed_harms"] == 0]
     win = [c for c in ok if (lambda bw: bw[0] and not bw[1])(beats(c, d))]
     best = min(win, key=score) if win else None
     return {"muscle_id": row["muscle_id"], "muscle": row["muscle"], "template": row["template"], "knob": row["knob"],
@@ -153,10 +155,10 @@ def _confirm_job(args):
     row, card, seeds = args
     d = evaluate(row, global_of(row), seeds)
     c = evaluate(row, card, seeds)
-    better, worse = beats(c, d)
+    toward, away = beats(c, d)
     return {"muscle_id": row["muscle_id"], "card": card, "card_label": c["label"], "global_label": d["label"],
-            "better": better, "worse": worse, "seed_harms": c["seed_harms"],
-            "won": better and not worse and c["label"] not in ("WORSE", "MIXED", "INVALID") and c["seed_harms"] == 0}
+            "toward": toward, "away": away, "seed_harms": c["seed_harms"],
+            "won": toward and not away and RR.kind_of(c["label"]) not in (RR.AWAY, RR.BOTH, "INVALID") and c["seed_harms"] == 0}
 
 
 def _seeds(a):
@@ -188,7 +190,7 @@ def cmd_confirm(a):
     with ProcessPoolExecutor(a.workers) as ex:
         res = list(ex.map(_confirm_job, jobs, chunksize=2))
     json.dump({"seeds": seeds, "search": a.search, "muscles": res}, open(a.out, "w"), indent=1)
-    t = collections.Counter("won again" if r["won"] else ("worse than global" if r["worse"] else "same as global")
+    t = collections.Counter("won again" if r["won"] else ("away from the global setting's aims" if r["away"] else "same as global")
                             for r in res)
     print(dict(t))
 
@@ -281,9 +283,10 @@ def cmd_report(a):
          "The engine's cards (`realms/muscle_cards_v5.csv`) and how they were found (`tools/tune_cards.py`,",
          "`docs/FORMAL_V5.md` section 5). Development seeds only: chosen on seeds "
          f"{s['seeds'][0]}-{s['seeds'][-1]}, confirmed on seeds {c['seeds'][0]}-{c['seeds'][-1]}; the preregistered seeds",
-         "3000-3009 were never read. A card is kept only if it beat today's global setting beyond the noise on both sets,",
-         "was worse than it nowhere, and was never worse than native: on no seed of either set and under no load over its",
-         "line more often, doing less work or clearing its line later. Evidence class **S** (modelled).", "",
+         "3000-3009 were never read. A card is kept only if it moved the muscle beyond the noise toward its aims (fewer misses,",
+         "more work, faster) against today's global setting on both sets, moved none of them the other way, and never fell",
+         "behind native: on no seed of either set and under no load over its line more often, doing less work or clearing",
+         "its line later. Evidence class **S** (modelled).", "",
          "| Plant | Knob | Muscles searched | Won on the first seeds | Won again (the engine's cards) |",
          "|---|---|---:|---:|---:|"]
     tot = collections.Counter()
@@ -304,7 +307,7 @@ def cmd_report(a):
         md.append(f"- {t}, {key} ({glob.get(key, '')}): " + ", ".join(f"{v:g}: {n}" for v, n in sorted(cnt.items())))
     md += ["", "**Inside the six organisms** (every plant against native; misses: the share of plant decisions over their",
           "line, removed against native, in percentage points):", "",
-          "| Seeds | Load | Misses removed, global setting | Misses removed, cards | Plants worse, global / cards | "
+          "| Seeds | Load | Misses removed, global setting | Misses removed, cards | Plants with less work or more misses, global / cards | "
           "Power given, global / cards |", "|---|---|---:|---:|---:|---:|"]
     for f in ("organisms_7100.json", "organisms_7200.json"):
         seeds, agg = _org_rows(out / f)

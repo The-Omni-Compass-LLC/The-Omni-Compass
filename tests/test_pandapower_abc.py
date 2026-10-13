@@ -4,8 +4,8 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The power grid's A/B/C rule (tools/pandapower_abc.py, docs/OMNI_V1.md): a deterministic simulator, so the three runs must
-reproduce; a gauge reads better in all three of our runs or WORSE by its sign when they do, same under one part in a million, and "the
-runs differ" when they do not; any increase in voltage violations is WORSE; more tap operations is WORSE (the declared
+reproduce; a gauge reads lower or higher in all three of our runs by its sign when they do, same under one part in a million, and "the
+runs differ" when they do not; any increase in voltage violations reads higher; more tap operations reads higher (the declared
 cost); the shown-only gauges are never judged."""
 import json
 import sys
@@ -28,10 +28,10 @@ def rec(**omni):
 
 def main():
     same = rec(load_energy_mwh=56200.0, losses_mwh=548.0, tap_operations=8, violation_bus_share=1e-5, vmin=0.962)
-    assert P.verdict([same] * 3, "zip", "load_energy_mwh", "lower") == "**better in all three of our runs**"
-    assert P.verdict([same] * 3, "zip", "losses_mwh", "lower") == "**WORSE in all three of our runs**", "more losses in all three is shown as WORSE"
-    assert P.verdict([same] * 3, "zip", "tap_operations", "lower") == "**WORSE in all three of our runs**", "the declared cost still reads WORSE"
-    assert P.verdict([same] * 3, "zip", "violation_bus_share", "never more") == "**WORSE in all three of our runs**", "any increase in violations is WORSE"
+    assert P.verdict([same] * 3, "zip", "load_energy_mwh", "lower") == "**lower in all three of our runs**"
+    assert P.verdict([same] * 3, "zip", "losses_mwh", "lower") == "**higher in all three of our runs**", "more losses in all three reads higher"
+    assert P.verdict([same] * 3, "zip", "tap_operations", "lower") == "**higher in all three of our runs**", "the declared cost reads higher"
+    assert P.verdict([same] * 3, "zip", "violation_bus_share", "never more") == "**higher in all three of our runs**", "any increase in violations reads higher"
     assert P.verdict([same] * 3, "zip", "energy_in_mwh", "lower") == "same"
     assert P.verdict([same] * 3, "zip", "vmin", "shown") == "shown, not judged"
     other = rec(load_energy_mwh=56300.0, losses_mwh=548.0, tap_operations=8)
@@ -44,9 +44,9 @@ def main():
         out = Path(t) / "V1.md"
         assert P.main(dirs + ["--out", str(out)]) == 0
         txt = out.read_text()
-        assert "WORSE in all three of our runs" in txt and "better in all three of our runs" in txt and "Not one engine's three runs" in txt and "ZIP loads" in txt
+        assert "higher in all three of our runs" in txt and "lower in all three of our runs" in txt and "Not one engine's three runs" in txt and "ZIP loads" in txt
     print("PASS  power-grid A/B/C rule: reproduced runs read by sign, a run that differs is a finding, any added violation and "
-          "every extra tap read WORSE, shown-only gauges never judged")
+          "every extra tap read higher, shown-only gauges never judged")
 
 
 if __name__ == "__main__":

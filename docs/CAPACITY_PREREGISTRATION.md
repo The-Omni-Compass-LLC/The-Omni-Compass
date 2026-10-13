@@ -10,7 +10,7 @@ the max (`tools/omni_version.py`); nothing in the engine changes for this test.
 Omni-Compass does not have to cut energy or cost to help. It can use capacity the native controller leaves unused and
 turn it into more completed work. This test asks that directly: hold native and Omni-Compass on top of native to **the
 same resource cap**, at **several cap levels**, and at each level count the **work completed under the same latency and
-failure limits**. If Omni completes more at a given cap, it uses that capacity better; if both complete more as the cap
+failure limits**. If Omni completes more at a given cap, it does more with that capacity; if both complete more as the cap
 rises, the comparison shows which turns each added unit of capacity into more completed work.
 
 A run with a fixed offered load that both arms serve in full can show only faster service for that load. The KEDA
@@ -71,14 +71,14 @@ window, the repetitions and the readings are as written above.
 `tools/capacity_report.py` writes one row per cap level and one plain audit line under it:
 
 - the paired difference in completed work (Omni on top minus native, pairs within one job) with its 95% interval:
-  **better** (the interval above zero), **worse** (below zero), or **no difference beyond the noise** (the interval
+  **toward its aim** (the interval above zero), **away from its aim** (below zero), or **no difference beyond the noise** (the interval
   includes zero);
 - the same for capacity;
 - a row where both arms answered at least 99% of everything offered within the line never met its cap: it shows speed,
   not more work, and its audit line says so;
 - each step up in the cap: the completed work and the capacity each arm gains per added core.
 
-Across runs A, B and C every row gets one of the three readings of `tools/readings.py`: better or worse in all three of
+Across runs A, B and C every row gets one of the three readings of `tools/readings.py`: lower or higher in all three of
 our runs (the same sign in all three, every interval clear of zero), no difference beyond the noise, or the runs
 disagree. Every row is reported, losses included; a loss's cause is looked for in our own wiring, setup and scoring first.
 

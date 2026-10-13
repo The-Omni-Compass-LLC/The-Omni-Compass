@@ -53,7 +53,7 @@ KNOB = {
     "capacity": "**capacity**: how much of the machine is in service (replicas, instances, units, speed). At the max Omni-Compass pushes it to the machine's own limit for the most work, never past it and never below native.",
     "admission": "**admission**: what is let in (queues, rate limits, admission control). Native already lets everything in: the knob is at its limit on native, and Omni-Compass reads it and leaves it native.",
     "power": "**power**: the power share or limit the machine may draw. Native already runs it at full: at its limit on native, read and left native.",
-    "setpoint": "**setpoint**: the target the machine's own loop holds (a temperature, a reserve, a process value). At the max a room is cooled ahead of the heat and a battery's charge is held for its line, inside the safe band, never worse than native.",
+    "setpoint": "**setpoint**: the target the machine's own loop holds (a temperature, a reserve, a process value). At the max a room is cooled ahead of the heat and a battery's charge is held for its line, inside the safe band, never behind native on its line.",
 }
 
 
@@ -189,7 +189,7 @@ def main():
           "wired by its power, how long it reads its line before it holds and how much of it it keeps clear). The cards "
           "were found by an automatic search over every muscle on the development seeds, today's global setting always "
           "one of the choices, and kept only where the card beat the global setting beyond the noise on two separate sets "
-          "of seeds and was never worse than native on any seed under any load: never over its line more often, never less "
+          "of seeds and on no seed under any load fell behind native: never over its line more often, never less "
           "work, never its line cleared later (`tools/tune_cards.py`, `realms/muscle_cards_v5.csv`, "
           "`results/cards_v5/`). Inside a body, a battery wired by its power keeps the body's own margins on its line. "
           f"{len(cards)} muscles carry a card of their own; every other muscle runs the global setting (machines started "

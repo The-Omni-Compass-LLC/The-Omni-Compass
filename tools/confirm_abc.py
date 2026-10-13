@@ -5,8 +5,9 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C three-run table (docs/OMNI_V1.md): one v1 benchmark run three times as separate GitHub runs on the same
 frozen engine, A the result, B and C the replications. Every judged row gets one of three readings, all three runs shown:
-better or WORSE in all three of our runs when all three runs move the same way and each run's 95% interval of the paired
-difference (omni minus native) is clear of zero; no difference beyond the noise when a run's interval includes zero
+lower or higher in all three of our runs (the direction of the number against native; the reader judges it: the founder's
+order of 13 October) when all three runs move the same way and each run's 95% interval of the paired difference (omni
+minus native) is clear of zero; no difference beyond the noise when a run's interval includes zero
 (native and omni could not be told apart on that measure, which is itself the result, with the count of such runs); the
 runs disagree when runs clear of the noise point different ways (the test itself is then unstable, and is looked into).
 Rows that are shown but never judged (tools/live_reps.py NEUTRAL) stay unjudged. Every row is reported, losses included.
@@ -23,14 +24,15 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from pilot.bench_report import LOWER_BETTER
-from tools.readings import IN_ALL_THREE, OWN_RUNS  # noqa: E402
+from pilot.bench_report import AIM_LOWER
+from tools.readings import IN_ALL_THREE, OWN_RUNS, in_all_three, moved  # noqa: E402
 from tools.live_reps import BATCH, BILL, KEYS, LABEL, METER, NEUTRAL, ROBUST, SAME_REL
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
-CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge, higher is better)"
-HIGHER_BETTER = {CAPACITY}
-LOWER = LOWER_BETTER | BATCH | BILL | ROBUST | METER   # the batch queue's finish time and machines after it, a real cloud's bill, the 120 s after a kill: less is better
+CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge)"
+from tools.omni_index import CAPACITY as CAPACITY_RECORDED  # noqa: E402  (the same row's name in the tables written before 13 October)
+AIM_HIGHER = {CAPACITY, CAPACITY_RECORDED}
+LOWER = AIM_LOWER | BATCH | BILL | ROBUST | METER   # amounts waited or spent: the batch queue's finish, a real cloud's bill, the 120 s after a kill
 
 
 def robust_rows(runs):
@@ -47,20 +49,20 @@ def robust_rows(runs):
     kill = all(b.get("kill_repetitions") for b in blocks)
     if kill:
         ok = all(b.get("handed_back_within_allowance_all") for b in blocks)
-        v = "**handed back within the allowance in every repetition, in all three of our runs**" if ok else "**WORSE: a repetition was not handed back within the allowance**"
+        v = "**handed back within the allowance in every repetition, in all three of our runs**" if ok else "**not handed back within the allowance in a repetition**"
         cells = [f"{'yes' if b['handed_back_within_allowance_all'] else 'NO'} ({b['kill_repetitions']} reps; mean {b['handed_back_s_mean']:.0f} s, max {b['handed_back_s_max']:.0f} s"
                  + (f", never: {b['never_handed_back']}" if b.get('never_handed_back') else "") + ")" if b['handed_back_s_mean'] is not None else f"NO (never handed back in {b['never_handed_back']} reps)" for b in blocks]
         k = f"robust: every setting back at the operator's within {blocks[0]['allowance_s']:.0f} s of the kill, every repetition (the governor killed outright; the watchdog's hand-back)"
         L.append(f"| {k} | {cells[0]} | {cells[1]} | {cells[2]} | {v} |"); rows[k] = {"reading": v.strip("*"), "runs": blocks}
         sg = all(b.get("second_governor_all") for b in blocks)
-        v2 = "**the same in all three of our runs**" if sg else "**WORSE**"
+        v2 = "**the same in all three of our runs**" if sg else "**no second governor in a repetition**"
         k2 = "robust: a second governor started after the hand-back and governed to the end, every repetition"
         L.append(f"| {k2} | {'yes' if blocks[0]['second_governor_all'] else 'NO'} | {'yes' if blocks[1]['second_governor_all'] else 'NO'} | {'yes' if blocks[2]['second_governor_all'] else 'NO'} | {v2} |")
         rows[k2] = {"reading": v2.strip("*"), "runs": [b.get("second_governor_all") for b in blocks]}
     if all(b.get("memory_ratio_max") is not None for b in blocks):
         lim = blocks[0]["memory_limit"]
         leak = any(b["memory_ratio_max"] > lim for b in blocks)
-        v3 = "**WORSE: a leak (over the preregistered limit)**" if leak else f"no leak (every repetition under {lim})"
+        v3 = "**over the preregistered memory limit (a leak)**" if leak else f"no leak (every repetition under {lim})"
         k3 = "robust: governor resident memory, mean of the last ten minutes over the first ten, the most over the repetitions"
         L.append(f"| {k3} | {blocks[0]['memory_ratio_max']:.3f} | {blocks[1]['memory_ratio_max']:.3f} | {blocks[2]['memory_ratio_max']:.3f} | {v3} |")
         rows[k3] = {"reading": v3.strip("*"), "runs": [b["memory_ratio_max"] for b in blocks]}
@@ -83,14 +85,14 @@ def robust_rows(runs):
         rows[k5] = {"reading": v5, "runs": fails}
         if all(b.get("decision_time_ratio_max") is not None for b in blocks):
             g = blocks[0]["cycle_growth_limit"]
-            worse = any(b["decision_time_ratio_max"] > g for b in blocks)
-            v6 = "**WORSE: the decision time grew by more than half**" if worse else f"no growth beyond the limit (every repetition under {g})"
+            grew = any(b["decision_time_ratio_max"] > g for b in blocks)
+            v6 = "**the decision time grew by more than half**" if grew else f"no growth beyond the limit (every repetition under {g})"
             k6 = "robust: the governor's decision time, mean of the last hour over the first (the gap between decisions less the configured interval), the most over the repetitions"
             L.append(f"| {k6} | {blocks[0]['decision_time_ratio_max']:.2f} | {blocks[1]['decision_time_ratio_max']:.2f} | {blocks[2]['decision_time_ratio_max']:.2f} | {v6} |")
             rows[k6] = {"reading": v6.strip("*"), "runs": [b["decision_time_ratio_max"] for b in blocks]}
         if all(b.get("handed_back_end_all") is not None for b in blocks):
             ok = all(b["handed_back_end_all"] for b in blocks)
-            v7 = "**every setting handed back at the end of every repetition, in all three of our runs**" if ok else "**WORSE: a repetition was not handed back at the end**"
+            v7 = "**every setting handed back at the end of every repetition, in all three of our runs**" if ok else "**a repetition not handed back at the end**"
             k7 = "robust: every setting handed back at the end and read back at the operator's, no record left, every repetition"
             L.append(f"| {k7} | {'yes' if blocks[0]['handed_back_end_all'] else 'NO'} | {'yes' if blocks[1]['handed_back_end_all'] else 'NO'} | {'yes' if blocks[2]['handed_back_end_all'] else 'NO'} | {v7} |")
             rows[k7] = {"reading": v7.strip("*"), "runs": [b["handed_back_end_all"] for b in blocks]}
@@ -129,8 +131,8 @@ def cell(r):
 
 
 def verdict(k, rs):
-    """The row's reading over the three runs, by rule: better, worse, no difference the test can measure, or a
-    disagreement between runs. Every judged row gets exactly one."""
+    """The row's reading over the three runs, by rule: lower or higher in all three of our runs, no difference the test can
+    measure, or a disagreement between runs. Every judged row gets exactly one, in direction words only."""
     if k in NEUTRAL:
         return "shown, not judged"
     if all(abs(r["diff"]) <= SAME_REL * abs(r["native"]) for r in rs):
@@ -142,21 +144,14 @@ def verdict(k, rs):
     if all(single):
         if len(set(signs)) > 1:
             return "single pairs point different ways (one pair a run, no interval)"
-        lower = signs[0] == -1
-        word = ("better" if lower else "WORSE") if k in LOWER else (("WORSE" if lower else "better") if k in HIGHER_BETTER else ("lower" if lower else "higher"))
-        return f"three single pairs agree: {word} (one pair a run, no interval, so the noise cannot be judged)"
+        return f"three single pairs agree: {moved(signs[0] == -1)} (one pair a run, no interval, so the noise cannot be judged)"
     clear = [r["ci95"][0] > 0 or r["ci95"][1] < 0 for r in rs]
     if len({s for s, c in zip(signs, clear) if c}) > 1:
         return "**the runs disagree**"
     if not all(clear):
         n = sum(1 for c in clear if not c)
         return "no difference beyond the noise (all three runs)" if n == len(rs) else f"no difference beyond the noise in {n} of {len(rs)} runs"
-    lower = signs[0] == -1
-    if k in LOWER:
-        return "**better in all three of our runs**" if lower else "**WORSE in all three of our runs**"
-    if k in HIGHER_BETTER:
-        return "**WORSE in all three of our runs**" if lower else "**better in all three of our runs**"
-    return f"{'lower' if lower else 'higher'} {IN_ALL_THREE}"
+    return in_all_three(signs[0] == -1)
 
 
 def engine(run):
@@ -183,8 +178,9 @@ def main(argv=None):
     L = [f"# {title}: the A/B/C three-run table (Omni v1)", "",
          "Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C "
          "are the replications. Each cell is omni against native, the paired change in percent of native with its 95% "
-         "interval. Every judged row gets one of three readings. **Better** or **WORSE in all three of our runs**: all three "
-         "runs move the same way and every interval is clear of zero. **No difference beyond the noise**: in the runs "
+         "interval. Every judged row gets one of three readings. **Lower** or **higher in all three of our runs**: all three "
+         "runs move the same way and every interval is clear of zero; the reading says which way the number went, and the "
+         "reader judges it. **No difference beyond the noise**: in the runs "
          "counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the "
          "result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable "
          "there. Every row is shown, losses included.", "", OWN_RUNS, "",

@@ -46,13 +46,13 @@ earlier windows.
 
 ## Reading
 
-The same report and the same rules as the grid (`tools/six_kube_report.py`: a gauge better or worse only when its 95%
+The same report and the same rules as the grid (`tools/six_kube_report.py`: a gauge lower or higher only when its 95%
 interval is clear of zero). The grid page shows these squares beside the earlier ones, each with its window; the earlier
 squares stay exactly as they are.
 
-- If Omni-Compass's arm keeps the clock and the 95th and 99th percentiles are no longer worse beyond the noise, the
+- If Omni-Compass's arm keeps the clock and the 95th and 99th percentiles are no longer away from its aim beyond the noise, the
   slower tail was the shared runner (the window too short for this many muscles), and it is reported so.
-- If they stay worse, it is Omni-Compass's own computation competing with the service on one machine, and it is
+- If they stay higher, it is Omni-Compass's own computation competing with the service on one machine, and it is
   reported so.
 
 Cost: GitHub's own runners (no charge). Time: each repetition about 3.6 hours (the four stacked) and 2.6 hours (the whole

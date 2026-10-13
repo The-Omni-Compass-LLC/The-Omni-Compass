@@ -65,7 +65,7 @@ The **primary outcome** is work per energy: requests served per kilojoule the GP
    intervals — observation (watch − native), authority (omni − watch), total (omni − native). If an interval includes
    zero, it says **not proven**. The result label is chosen by rule (`docs/GPU_PREREGISTRATION.md`, amendment 1):
    SUPERIOR WITHIN GUARDRAILS, ENERGY IMPROVEMENT WITH SERVICE TRADEOFF, NONINFERIOR / INCONCLUSIVE, NOT ESTABLISHED,
-   WORSE, or INVALID. Also: actuator fidelity (receipt B), control effort and representation fidelity (receipt A). A
+   AWAY FROM ITS AIM, or INVALID. Also: actuator fidelity (receipt B), control effort and representation fidelity (receipt A). A
    meter that was not fitted prints UNAVAILABLE. The run folder holds every raw file and `SHA256SUMS.txt`.
 
 ## What Omni does on the GPU (omni_controller/gpu_governor.py)
@@ -101,7 +101,7 @@ undone. The card's own energy counter (NVML) and its ECC and retired-page counte
 
 ## Gauges
 
-| Gauge | From | Better |
+| Gauge | From | Its aim |
 |---|---|---|
 | **work per energy (served requests per kJ), primary** | requests served / GPU energy | higher |
 | energy, GPU (J) | power.draw integrated over the arm's window | lower |

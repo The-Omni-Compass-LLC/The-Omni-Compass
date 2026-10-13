@@ -49,7 +49,7 @@ declared standby power, which needs a node autoscaler that really removes the ma
 | node-hours | 1.513 | 1.514 | +0.1% | -0.001286 to +0.00362 | no |
 | energy, parked workers still on at idle power (Wh, declared model) | 172.1 | 171.9 | -0.1% | -0.5369 to +0.1619 | no |
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 172.1 | 171.9 | -0.1% | -0.5369 to +0.1619 | no |
-| response time (ms), mean | 514.5 | 437.4 | -15.0% | -117.7 to -36.47 | yes, better |
+| response time (ms), mean | 514.5 | 437.4 | -15.0% | -117.7 to -36.47 | yes, lower |
 | response time (ms), 95th percentile | 2326 | 1975 | -15.1% | -735.1 to +33.07 | no |
 | response time (ms), 99th percentile | 5205 | 5326 | +2.3% | -854.2 to +1097 | no |
 | time over the response line (% of samples) | 22.71 | 21 | -7.5% | -4.062 to +0.6462 | no |

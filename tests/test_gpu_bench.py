@@ -124,7 +124,7 @@ def bench():
     assert "Credit per write" in (d / "run" / "GPU_REPS.md").read_text()
     # the three contrasts and the receipts
     assert {"omni", "watch", "omni_vs_watch"} <= set(out["paired"]) and out["headline"]["verdict"] in (
-        "SUPERIOR WITHIN GUARDRAILS", "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF", "NONINFERIOR / INCONCLUSIVE", "NOT ESTABLISHED", "WORSE",
+        "SUPERIOR WITHIN GUARDRAILS", "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF", "NONINFERIOR / INCONCLUSIVE", "NOT ESTABLISHED", "AWAY FROM ITS AIM",
         "NOT ATTRIBUTABLE: WATCH DIFFERS FROM NATIVE")   # every label the rule can choose; 2 short repetitions pick any
     c1 = out["checks"]["omni"]["1"]
     assert c1["actuator"]["writes_ok"] > 0 and c1["actuator"]["restored_ok"] and c1["governor"]["decisions"] and c1["representation"]["pairs"]
@@ -359,12 +359,12 @@ def enforced():
     g.step()
     assert [x for x in recs(d / "a5.jsonl") if "decision" in x][0]["decision"]["0"]["telemetry"]["enforced_w"] == 300.0
     # result labels, by rule
-    assert label("better, proven", True, True, True, True) == "SUPERIOR WITHIN GUARDRAILS"
-    assert label("better, proven", True, False, True, True) == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
-    assert label("better, not proven", True, True, True, True) == "NONINFERIOR / INCONCLUSIVE"
-    assert label("worse, not proven", False, True, True, True) == "NOT ESTABLISHED"
-    assert label("worse, proven", True, True, True, True) == "WORSE"
-    assert label("better, proven", True, True, True, False) == "INVALID"
+    assert label("toward its aim, proven", True, True, True, True) == "SUPERIOR WITHIN GUARDRAILS"
+    assert label("toward its aim, proven", True, False, True, True) == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
+    assert label("toward its aim, not proven", True, True, True, True) == "NONINFERIOR / INCONCLUSIVE"
+    assert label("away from its aim, not proven", False, True, True, True) == "NOT ESTABLISHED"
+    assert label("away from its aim, proven", True, True, True, True) == "AWAY FROM ITS AIM"
+    assert label("toward its aim, proven", True, True, True, False) == "INVALID"
 
 
 def one_writer():

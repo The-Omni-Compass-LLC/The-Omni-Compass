@@ -20,7 +20,7 @@ except ImportError:
     import pathlib as _p; sys.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, stack_reading, aim_of, Tally  # noqa: E402  (every table says whose runs these are)
 from tools.run_cpu_power import GAUGES, SAME_REL, paired  # noqa: E402
 from tools.knob_verdict import summarize  # noqa: E402
 
@@ -52,23 +52,7 @@ def engine(run_dir):
 
 def verdict(rs, direction):
     """The three-run reading of one gauge, by rule, from its three within-run paired results."""
-    if any(r is None for r in rs):
-        return "no value"
-    if direction == "shown":
-        return "shown, not judged"
-    if direction == "never more":
-        return "**WORSE in all three of our runs**" if any(r["diff"] > 0 for r in rs) else ("same" if all(abs(r["diff"]) <= 1e-12 for r in rs) else "**better in all three of our runs**")
-    if all(abs(r["diff"]) <= SAME_REL * max(abs(r["native"]), 1e-12) for r in rs):
-        return "same"
-    clear = [r for r in rs if r["significant"]]
-    signs = {(r["diff"] > 0) - (r["diff"] < 0) for r in clear}
-    if len(signs) > 1:
-        return "**the runs disagree**"
-    if len(clear) < len(rs):
-        n = len(rs) - len(clear)
-        return f"no difference beyond the noise ({n} of {len(rs)} runs)"
-    better = (rs[0]["diff"] > 0) == (direction == "higher")
-    return "**better in all three of our runs**" if better else "**WORSE in all three of our runs**"
+    return stack_reading(rs, direction, SAME_REL)
 
 
 def cell(r, key):
@@ -96,9 +80,9 @@ def main(argv=None):
          "the compass law on the ceiling through the kernel's own interface inside [half the top, the top], holding the service's own request "
          "latency at 40% of the 20 ms line, every notch down allowed only by a paired trial on the machine itself under the declared objective "
          "(`docs/CPU_POWER_PREREGISTRATION.md`). Each run holds its paired repetitions; the paired difference's 95% interval within a run, and "
-         "the same sign with every interval clear of zero across the three runs, make a reading **better** or **WORSE in all three of our runs**; a "
+         "the same sign with every interval clear of zero across the three runs, make a reading **lower** or **higher in all three of our runs** (which way the number went against native; the reader judges it); a "
          "run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different "
-         "ways read **the runs disagree**. Failed requests: any increase in any run is WORSE. Energy is the processor's own meter (RAPL, class P, "
+         "ways read **the runs disagree**. Failed requests: any rise in any run reads **higher in at least one of our runs**. Energy is the processor's own meter (RAPL, class P, "
          "the processor's calibrated counter); the whole machine at the wall where a plug was fitted. The tuning workload is shown and not "
          "counted. Every row is shown, losses included.", "",
          "| Run | Run folder | Commit | Engine | Machine | Workloads |", "|---|---|---|---|---|---:|"]
@@ -117,7 +101,7 @@ def main(argv=None):
     if off:
         L += ["", "> **Warning:** " + "; ".join(off) + "."]
     wls = sorted(set().union(*[set(r) for _, r in runs]), key=lambda w: (w != "tuning", w))
-    better = worse = disagree = 0
+    tally = Tally()
     out = {"runs": [{"tag": t, "run": r, "commit": s, "engine": v} for t, (r, _), (s, v) in zip("ABC", runs, eng)], "workloads": {}}
     for wl in wls:
         recs = [r.get(wl) for _, r in runs]
@@ -136,10 +120,10 @@ def main(argv=None):
             rs = [r["paired"].get(k) for r in recs]
             v = verdict(rs, dr)
             if not tuning:
-                better += "better" in v; worse += "WORSE" in v; disagree += "disagree" in v
+                tally.add(v, dr)
             nat = fmt(rs[0]["native"]) if rs[0] else "n/a"; om = fmt(rs[0]["omni"]) if rs[0] else "n/a"
             L.append(f"| {label} | {nat} | {om} | " + " | ".join(cell(r, k) for r in rs) + f" | {v} |")
-            out["workloads"][wl][k] = {"reading": v.strip("*"), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
+            out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
         hb = all(all(x["omni"].get("handed_back") for x in r["reps"]) for r in recs)
         L += ["", f"The ceiling handed back to the operator's and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
         vr = {t: [x["omni"]["verdict"] for x in r["reps"] if x["omni"].get("verdict")] for t, r in zip("ABC", recs)}
@@ -149,10 +133,10 @@ def main(argv=None):
                   + "; ".join(f"run {t}: {summarize(vs)}" for t, vs in vr.items() if vs) + "."]
             out.setdefault("verdicts", {})[wl] = {t: [{k: v.get(k) for k in ("objective", "state", "give_back_allowed_steps", "allowed_low", "allowed_high", "counts")} for v in vs] for t, vs in vr.items()}
     n_wl = sum(1 for w in wls if not any((r.get(w) or {}).get("tuning") for _, r in runs))
-    L += ["", f"**Across {n_wl} untouched workloads: {better} gauge-rows better in all three of our runs, {worse} worse in all three of our runs, {disagree} where the runs disagree.**"]
+    L += ["", tally.sentence(n_wl, "untouched workloads")]
     Path(a.out).write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
     Path(a.out).with_suffix(".json").write_text(json.dumps(out, indent=1))
-    print(f"{a.out}: {n_wl} untouched workloads; {better} better, {worse} worse, {disagree} disagree")
+    print(f"{a.out}: {n_wl} untouched workloads; {tally.toward} toward the aim, {tally.away} away, {tally.disagree} disagree")
     return 0
 
 

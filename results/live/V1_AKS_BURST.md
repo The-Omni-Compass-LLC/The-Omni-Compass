@@ -49,7 +49,7 @@ measured window and priced at the list price per machine-hour. The energy rows r
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 179.7 | 184 | +2.4% | -0.8413 to +9.457 | no |
 | response time (ms), mean | 500.3 | 498.6 | -0.3% | -85.06 to +81.63 | no |
 | response time (ms), 95th percentile | 1090 | 1254 | +15.0% | -579.3 to +907.1 | no |
-| response time (ms), 99th percentile | 5975 | 3967 | -33.6% | -3672 to -344.7 | yes, better |
+| response time (ms), 99th percentile | 5975 | 3967 | -33.6% | -3672 to -344.7 | yes, lower |
 | time over the response line (% of samples) | 34.94 | 35 | +0.2% | -4.175 to +4.292 | no |
 | failed requests (%) | 22.27 | 15.58 | -30.0% | -18.74 to +5.363 | no |
 | pods with no machine to take them (unschedulable) | 2.6 | 1.8 | -30.8% | -3.491 to +1.891 | no |

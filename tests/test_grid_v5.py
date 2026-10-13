@@ -29,10 +29,19 @@ class Grid(unittest.TestCase):
             del summary["100"]["tower"]                                         # a square the receipt lacks
             (m / "SIX_v5-x10.json").write_text(json.dumps({"scale": 10, "summary": summary}))
             k = t / "run-222" / "six-kube-pooled-v5-x10"; k.mkdir(parents=True)
+            row = lambda diff, lo, hi, **kw: {"n": 10, "native": 100.0, "omni": 100.0 + diff, "diff": diff, "lo": lo, "hi": hi,
+                                              "pct": diff, "better": diff < 0, "neutral": False, "same": False, **kw}
+            p95, fail, energy = "response time (ms), 95th percentile", "failed requests (%)", "organism energy (J)"
+            host, cpu = "host CPU busy, the real machine under kind (%)", "CPU used with Omni's own (cores), mean"
             (k / "SIX_KUBE_v5-x10_r10.json").write_text(json.dumps({"organisms": {
-                "stack@10": {"arm": "compass", "repetitions": 10, "verdict": "better on 3, worse on 0, inside the noise on 9", "rows": {}},
-                "tower@10": {"arm": "compass", "repetitions": 10, "verdict": "better on 2, worse on 1 (energy), inside the noise "
-                             "on 9; OFF THE CLOCK in 2 of 10 repetitions", "rows": {}}}}))
+                # the recorded verdicts carry the old words: the page reads the rows, never those words, and keeps the facts
+                "stack@10": {"arm": "compass", "repetitions": 10, "verdict": "better on 1, worse on 0, inside the noise on 1",
+                             "rows": {p95: row(-30, -40, -20), fail: row(1, -2, 4), host: row(1, 0.5, 1.5, neutral=True),
+                                      cpu: row(-1.2, -2, -0.4, neutral=True)}},
+                "tower@10": {"arm": "compass", "repetitions": 10, "verdict": "better on 1, worse on 1 (organism energy (J)), inside "
+                             "the noise on 0; OFF THE CLOCK in 2 of 10 repetitions (late)",
+                             "rows": {p95: row(-10, -15, -5), energy: row(0.05, 0.04, 0.06), host: row(2, 1, 3, neutral=True),
+                                      cpu: row(-2.0, -3, -1, neutral=True)}}}}))
             out = t / "GRID.md"
             self.assertEqual(grid_v5.main(["--modelled", str(t / "run-111"), "--kube", str(t / "run-222"), "--out", str(out)]), 0)
             text = out.read_text()
@@ -40,18 +49,22 @@ class Grid(unittest.TestCase):
             self.assertIn("10 copies: run 222", text)
             self.assertIn("FEWER MISSES: misses -0.100 pp, work +0.000%, power given +0.050% (10 of 10 runs)", text)
             self.assertIn("not in the receipt", text)                            # the tower at 100 runs
-            self.assertIn("| 10 repetitions: better on 3, worse on 0, inside the noise on 9 |", text)
+            self.assertIn("| 10 repetitions: lower on 1 (response time (ms), 95th percentile), higher on 0, inside the noise on 1 |", text)
+            self.assertIn("10 repetitions: lower on 1 (response time (ms), 95th percentile), higher on 1 (organism energy (J)), "
+                          "inside the noise on 0; OFF THE CLOCK in 2 of 10 repetitions (late) |", text)
             self.assertIn("not in the report", text)
             # the one line the front page reads, counted from the squares (17 modelled: 11 of 10 and 100 runs, 6 single)
             self.assertIn("**Across the grid: modelled, 11 of 11 squares of 10 and 100 runs FEWER MISSES; the 6 single runs: "
                           "6 with fewer misses; work +0.000%; power given +0.050%; with the cluster "
-                          "inside, 2 squares: 0 single repetitions (no reading); of the 2 of 10 and 100 repetitions, worse on "
-                          "no gauge in 1, the gauges read worse: \"energy\" in 1; off the clock in 1; invalid in 0.**", text)
-            self.assertEqual(grid_v5.worse_gauges("better on 5, worse on 2 (HPA replicas, mean; response time (ms), 95th "
-                                                  "percentile), inside the noise on 2; OFF THE CLOCK in 1 of 100 repetitions"),
-                             ["HPA replicas, mean", "response time (ms), 95th percentile"])
-            self.assertEqual(grid_v5.worse_gauges("better on 4, worse on 0, inside the noise on 5"), [])
-            self.assertIsNone(grid_v5.worse_gauges("ONE REPETITION"))
+                          "inside, 2 squares: 0 single repetitions (no reading); of the 2 of 10 and 100 repetitions, by gauge: "
+                          "\"response time (ms), 95th percentile\" lower in 2, higher in 0, \"organism energy (J)\" lower in 0, "
+                          "higher in 1; off the clock in 1; invalid in 0.**", text)
+            # the test machine at each size, from native's own rows (the shown-only gauges)
+            self.assertIn("### The test machine at each size", text)
+            self.assertIn("| 10 copies (10 repetitions) | 100% | 100% | -2.0 to -1.2% | The whole tower 2 of 10 |", text)
+            # the page never says better or worse, whatever words the recorded verdicts carry
+            self.assertNotIn("better", text.lower())
+            self.assertNotIn("worse", text.lower())
             self.assertIn("No outside party has reviewed or approved these results.", text)
             # every receipt's page linked from the grid page's own folder (a relative link resolves from the page)
             self.assertIn("](run-111/six-pooled-v5-x10/SIX_v5-x10.md)", text)

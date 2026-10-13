@@ -71,7 +71,7 @@ gives it everything its own limits allow. `results/realms_v5/REALMS_V5.md` shows
 
 v5 is **a combination of everything**: it takes v3's proven engine (its live controllers, its realms and organisms, its
 runners) and adds the **v5 compass law** (`realms/compass_arm_v5.py`) and its arm in the harness (`realms/harness.py`). The
-goal is to be equal to or better than native and every prior version on every measure, and never worse on any — *do no
+goal is to be equal to or ahead of native and every prior version on every measure, and never behind on any — *do no
 harm*.
 
 The v5 muscle catalog (`realms/catalog_v5.csv`) is **1,107 muscles in 70 families** — v3's 945, then a first wave of six
@@ -129,7 +129,7 @@ preregistered seeds 3000-3009 were run again unchanged.
 
 **Amendment 2, 12 October.** The catalog's second wave (95 muscles, five new families and additions to seven) took it to
 1,097 muscles in 70 families; the engine's law is unchanged, its fingerprint re-declared because the catalog is part of
-it. Developed on seeds 7100-7109 only (0 of 1,097 worse, all six organisms superior); the preregistered seeds 3000-3009
+it. Developed on seeds 7100-7109 only (0 of 1,097 away from their aims, all six organisms superior); the preregistered seeds 3000-3009
 were run again unchanged on commit `04d9eb3b3`, with the same savings on the whole tower, the four stacked and Energy /
 Facility (3.0 times v3's).
 
@@ -142,9 +142,9 @@ counted as room only while it lasts and its discharge timed for its line (V6, V1
 needs it (V7), a pull-down handed back gradually and granted only where it can be held (V9, V10), and every forecast
 starting at the plant's first reading (V13: a lock that kept every battery's timed discharge shut for the whole run, and
 a room twin that started wrong, both removed). The catalog's third wave took it to 1,107 muscles. Developed on seeds
-7100-7199 only: under the climb, plants worse inside the four realms fell from 19 to 0 in 400 organism runs while the
+7100-7199 only: under the climb, plants with less work or more misses inside the four realms fell from 19 to 0 in 400 organism runs while the
 misses fell about twice as far as before; on seeds 7100-7109 every muscle alone and the six organisms on all three loads
-showed 0 muscles and 0 plants worse. Fingerprint re-declared (digest `9be48445438943c2`); the preregistered seeds
+showed 0 muscles and 0 plants with less work or more misses. Fingerprint re-declared (digest `9be48445438943c2`); the preregistered seeds
 3000-3009 were run again unchanged.
 
 **Amendment 4, 13 October: every muscle its own card.** The founder's question of 12 October, night: does every muscle
@@ -154,11 +154,11 @@ holds what the max uses for it: a machine pool's edge utilisation and window, a 
 power, its hold window and hold margin. The cards were found by an automatic search over every muscle whose settings can
 change what the max does (`tools/tune_cards.py`), on development seeds only, today's global setting always one of the
 choices, and kept only where the card beat the global setting beyond the noise on seeds 7100-7109 and again on seeds
-7200-7209 and never worse than native on any of their seeds under any load (never over its line more often, never less
+7200-7209 and never behind native on any of their seeds under any load (never over its line more often, never less
 work, never its line cleared later): 364 muscles (333 machine pools, 31 batteries); every other muscle runs the global
 setting. Inside a body, a battery wired by its power keeps the body's margins on its line (V14: its card was
-chosen alone; the line carries the whole body's swing). In development, 360 organism runs on the two sets: 0 plants
-worse, the misses removed 1.7 times the global setting's. Fingerprint re-declared (digest `5648f2902f1fae68`, 44 files,
+chosen alone; the line carries the whole body's swing). In development, 360 organism runs on the two sets: 0 plants with less
+work or more misses, the misses removed 1.7 times the global setting's. Fingerprint re-declared (digest `5648f2902f1fae68`, 44 files,
 the cards among them); the preregistered seeds were run again unchanged. Every card is printed in plain words in the
 muscle catalog (`docs/MUSCLE_CATALOG.md`).
 
@@ -167,8 +167,8 @@ muscle catalog (`docs/MUSCLE_CATALOG.md`).
 On a fixed seed, for **every** muscle in the catalog, the v5 default does no less work than native, is over its line no
 more often, and hands every knob back to native on the kill (the dead-man lease); the energy it takes is power given,
 shown beside the work and the speed it bought. On the preregistered seeds 3000-3009 (commit `eea291501848`, digest
-`5648f2902f1fae68`, every muscle its own card): **0 of 1,107 muscles worse or mixed** (527 better, 421 at their limit on
-native, 159 the same), every organism better than native under all three loads, and **not one plant worse inside any
+`5648f2902f1fae68`, every muscle its own card): **0 of 1,107 muscles away from their aims or mixed** (527 toward their aims, 421 at their limit on
+native, 159 the same), every organism ahead of native under all three loads, and **not one plant with less work or more misses inside any
 organism under any load**; the misses fall 1.9% to 7.5% under each organism's own load, 1.4% to 7.2% under the climb and
 1.1% to 8.3% with work waiting in line, against 1.6% to 6.4%, 0.9% to 3.5% and 1.0% to 7.2% with one global setting
 (digest `9be48445438943c2`), with less power given and less wear. This is checked in `tests/test_compass_arm_v5.py` and run in full by

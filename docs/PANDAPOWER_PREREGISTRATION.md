@@ -65,15 +65,15 @@ hour), for a full year, with both load models.
 
 | Metric | Direction |
 |---|---|
-| energy the loads drew, line and transformer losses, net import | lower is better |
-| bus-steps outside 0.95–1.05 | lower is better; any increase is WORSE |
-| tap operations | lower is better |
+| energy the loads drew, line and transformer losses, net import | the aim is lower |
+| bus-steps outside 0.95–1.05 | the aim is lower; any increase is marked |
+| tap operations | the aim is lower |
 
 Lowest and highest voltage, solar fed in and the mean setpoint are shown, not judged. A change smaller than one part in
 a million reads "same".
 
 **Tap operations are declared in advance as the expected cost.** Each Omni setpoint change is one tap on each substation
-transformer, the hand-back included. Native SimBench grids barely tap, about 4 a year, so the count will read WORSE. It
+transformer, the hand-back included. Native SimBench grids barely tap, about 4 a year, so the count will read higher. It
 is reported as measured, next to the energy, never hidden. For scale, a substation tap changer is built for hundreds of
 thousands of operations.
 
@@ -88,7 +88,7 @@ against pandapower's own grid data, and what was found is recorded here whether 
    and the size of the move are right, and nothing is clipped or ignored on the way. Both parallel transformers of the
    substation are controlled together and both are counted in the tap operations, so the count is not understated.
 2. **Native runs as a utility runs it.** The native arm is the grid exactly as SimBench ships it, with its own tap
-   position held for the year; it is not weakened to make Omni look better or worse.
+   position held for the year; it is not weakened to make Omni look lower or higher.
 3. **The simulator scores right.** The energy balance closes at every step (generation equals load plus losses plus net
    import, to about a billionth of a megawatt) once solar on a load bus was accounted as generation rather than a
    voltage-dependent load (that fix is in the runner and applies to both arms alike).

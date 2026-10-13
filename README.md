@@ -53,8 +53,8 @@ replaces native; every comparison is native against omni.
 Omni v5 at its default, **the max**, with **the living body**, and now **every muscle its own card**: the brain is one,
 its settings each muscle's own. An automatic search over every muscle (development seeds only, today's global setting
 always one of the choices) found the settings that do each muscle the most good; a card enters the engine only if it won
-twice, on two separate sets of development seeds, and was never worse than native on any seed under any load (never over
-its line more often, never less work, never its line cleared later). 364 muscles carry a card of their own (333 machine
+twice, on two separate sets of development seeds, and on no seed under any load was it over its line more often than
+native, did less work, or cleared its line later. 364 muscles carry a card of their own (333 machine
 pools, 31 batteries), each printed in plain words in the [muscle catalog](docs/MUSCLE_CATALOG.md); inside a body, a
 battery wired by its power keeps the body's own margin on its line ([`docs/FORMAL_V5.md`](docs/FORMAL_V5.md), section
 5). Preregistered seeds 3000-3009, ten paired runs per muscle,
@@ -66,13 +66,13 @@ per organism and per load, commit `eea291501848`, engine omni-v5 (fingerprint `5
 
 | Reading | Muscles | With one global setting |
 |---|---:|---:|
-| **Better** (a gain beyond the noise and no loss under either load) | **527** | 517 |
+| **Toward its aims** (more work, its line cleared sooner or fewer misses, beyond the noise, and none of the three the other way, under either load) | **527** | 517 |
 | of them: clear the waiting line sooner | 493 | 493 |
 | of them: over their line less often | 409 | 398 |
 | of them: more work | 33 | 32 |
 | At its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 | 421 |
 | The same as native (no difference beyond the noise: native already did all the work that came) | 159 | 169 |
-| **Worse or mixed** | **0** | 0 |
+| **Away from its aims, or both ways** | **0** | 0 |
 
 | Kind | With work waiting in line (one global setting in brackets) | Power given | Wear |
 |---|---|---:|---:|
@@ -80,9 +80,9 @@ per organism and per load, commit `eea291501848`, engine omni-v5 (fingerprint `5
 | Battery sites (44) | over the line 13.4% → 7.6% (peak ceiling; 9.9%), 17.1% → 14.0% (reserve; 15.0%), 14.7% → 14.0% (discharge timed for the line; 14.5%) | up to +0.14% | battery kWh cycled −0.6% to +30% |
 | Motion axes at their own peak speed (37) | over the line 12.1% → 8.3% of the time; work +0.7% (no card beat the global setting) | +1.4% | motor heat +3.9% |
 
-**The six organisms** (every plant coupled on one clock, the hour around each battery site's daily peak): **better than
-native under all three loads, and not one plant worse**: 0 of 1,908 in the four stacked, 0 in every other organism,
-under every load. Inside a body the cards remove more misses with less power given than one global setting did.
+**The six organisms** (every plant coupled on one clock, the hour around each battery site's daily peak): **fewer misses
+than native under all three loads, the same work or more, and not one plant with less work or more misses**: 0 of 1,908
+in the four stacked, 0 in every other organism, under every load. Inside a body the cards remove more misses with less power given than one global setting did.
 
 | Load | Over the line, change (every muscle its own card) | One global setting | Work | Power given |
 |---|---|---|---|---:|
@@ -95,18 +95,19 @@ clock, each at its first 1, 10 and 100 runs, with work waiting in line. **Modell
 in all 54 squares, the same work, the power given at most +0.065%. **With the real Kubernetes cluster inside** (the
 cluster measured, class L; the organism modelled): at 1 and 10 copies, in every square of 10 and 100 repetitions, the
 real service spent 12% to 59% less time over its response line, and its slowest 5% of responses were 24% to 56% faster
-(inside the noise in 2 of those 24 squares); at 100 copies it spent 8% to 13% less time over the line, but in the four
-stacked and the whole tower at 100 repetitions its slowest responses were slower (the 95th percentile 45% and 13.5%): on
-GitHub's four-core machine the model of 190,800 and 110,700 muscles, with Omni-Compass's law for each, shares the cores
-with the real cluster, and the four stacked fell behind the window's clock in 49 of 100 repetitions. Those two squares
-run again with a longer window ([`docs/GRID_LONG_WINDOW_PREREGISTRATION.md`](docs/GRID_LONG_WINDOW_PREREGISTRATION.md)).
-That report also reads as worse the organism's modelled energy (+0.06% at most, the power given) and, in 5 squares,
-0.2% to 0.6% more copies of the service.
+(inside the noise in 2 of those 24 squares). At 100 copies the test machine itself is the limit: GitHub's four-core
+machine carries the real cluster and the model of up to 190,800 muscles at once, and native alone kept its CPU 87% to 91%
+busy and failed 32% to 43% of requests. There the real service spent 8% to 13% less time over its line, and in the four
+stacked and the whole tower at 100 repetitions the 95th percentile of its responses read higher (45% and 13.5%), with the
+four stacked behind the window's clock in 49 of 100 repetitions. Those two squares run again with a longer window
+([`docs/GRID_LONG_WINDOW_PREREGISTRATION.md`](docs/GRID_LONG_WINDOW_PREREGISTRATION.md)), and the organism moves off the
+cluster's cores, the same in both arms, so the machine no longer sets the result. The same report reads the organism's
+modelled energy higher (+0.06% at most, the power given) and, in 5 squares, 0.2% to 0.6% more copies of the service.
 
 The lease handed every knob back to native in every run. On this version GitHub reproduced the realms table in runs A,
 B and C (2,214 rows, 0 differences). **Goldilocks**, three runs of ten pairs (Omni-Compass on top of a service
 rightsized by Goldilocks and the Vertical Pod Autoscaler's recommender; class L): the average response 44% to 48%
-faster, the slowest 5% of responses 59% to 62% faster, time over the response line down 99% to 100%, better in all three
+faster, the slowest 5% of responses 59% to 62% faster, time over the response line down 99% to 100%, lower in all three
 of our runs, on the same machines, for 1.9% to 2.6% more energy on the declared model, the power given
 ([`results/live/V5_GOLDILOCKS.md`](results/live/V5_GOLDILOCKS.md)). **The capacity test**, three runs (the same CPU cap
 in both arms, four cap levels): no difference beyond the noise at any cap, where the cap itself blocks the one lever

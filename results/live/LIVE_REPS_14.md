@@ -5,18 +5,18 @@
 Run: benchmark-reps 36346848307, commit 7d07754. Five paired repetitions (native, me on top, me alone back to back on
 one runner, order rotated), 15 minutes each, kind with 1 control plane and 6 workers.
 
-A change is significant when its paired 95% interval excludes zero. Lower response time is better.
+A change is significant when its paired 95% interval excludes zero. Lower response time moved toward its aim.
 
 | Gauge | Native | Me on top | Me alone |
 |---|---:|---:|---:|
-| response time, mean (ms) | 162.1 | 98.7 (−39.1%, better, significant) | 97.4 (−39.9%, better, significant) |
-| response time, 95th percentile (ms) | 328.5 | 152.3 (−53.6%, better, significant) | 150.7 (−54.1%, better, significant) |
-| response time, 99th percentile (ms) | 473.9 | 204.3 (−56.9%, better, significant) | 179.5 (−62.1%, better, significant) |
+| response time, mean (ms) | 162.1 | 98.7 (−39.1%, lower, significant) | 97.4 (−39.9%, lower, significant) |
+| response time, 95th percentile (ms) | 328.5 | 152.3 (−53.6%, lower, significant) | 150.7 (−54.1%, lower, significant) |
+| response time, 99th percentile (ms) | 473.9 | 204.3 (−56.9%, lower, significant) | 179.5 (−62.1%, lower, significant) |
 | failed requests (%) | 0 | 0 (equal) | 0 (equal) |
-| utilisation, work done (used / allocatable) | 0.0386 | 0.0529 (+36.8%, better, significant) | 0.0519 (+34.3%, better, significant) |
+| utilisation, work done (used / allocatable) | 0.0386 | 0.0529 (+36.8%, higher, significant) | 0.0519 (+34.3%, higher, significant) |
 | workers in service, mean | 6 | 6 (equal) | 6 (equal; the interval is a rounding artefact) |
-| node-hours | 1.516 | 1.515 (−0.1%, not significant) | 1.524 (+0.5%, worse, significant) |
-| energy (Wh) | 159.3 | 162.4 (+1.9%, worse, significant) | 163.2 (+2.4%, worse, significant) |
+| node-hours | 1.516 | 1.515 (−0.1%, not significant) | 1.524 (+0.5%, lower, significant) |
+| energy (Wh) | 159.3 | 162.4 (+1.9%, higher, significant) | 163.2 (+2.4%, higher, significant) |
 | pods not yet running, pod-minutes | 0.053 | 0.32 (+500%, not significant) | 0.107 (+100%, not significant) |
 
 **Useful work per unit of energy** (work done ÷ energy, from the means above, not itself paired-tested): +34% on top, +31% alone. The clients wait for

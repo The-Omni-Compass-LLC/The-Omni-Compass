@@ -85,10 +85,10 @@ def main():
          "- 1,000 runs at 1,000 clusters is not run: about 6,000 machine-hours, beyond the machines available.",
          "- 100 runs at 1,000 clusters is not run yet: about 650 runner-hours (one run of the four stacked at 1,000 copies "
          "takes 2 to 3 hours).", ""]
-    for k, title, note in (("wpe", "Work per energy, with Omni-Compass on top against native", "higher is better"),
-                           ("energy", "Energy, with Omni-Compass on top against native", "lower is better"),
+    for k, title, note in (("wpe", "Work per energy, with Omni-Compass on top against native", "higher means more work for each unit of energy"),
+                           ("energy", "Energy, with Omni-Compass on top against native", "the aim is lower"),
                            ("viol", "Time over the service line, with Omni-Compass on top minus native (percentage points)",
-                            "lower is better; band first holds where it is at or under 0"),
+                            "the aim is lower; band first holds where it is at or under 0"),
                            ("work", "Work done, with Omni-Compass on top against native", "equal is the guardrail"),
                            ("label", "Label by the preregistered rule", "chosen by code, never by hand")):
         L += [f"## {title} ({note})", "", head, rule]

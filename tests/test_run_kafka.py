@@ -44,11 +44,11 @@ def main():
     reps = [{"native": {"p95_ms": 400.0, "lost": 0, "consumers_mean": 2.0}, "omni": {"p95_ms": 20.0, "lost": 0, "consumers_mean": 5.0}},
             {"native": {"p95_ms": 420.0, "lost": 0, "consumers_mean": 2.0}, "omni": {"p95_ms": 25.0, "lost": 0, "consumers_mean": 5.5}},
             {"native": {"p95_ms": 390.0, "lost": 0, "consumers_mean": 2.0}, "omni": {"p95_ms": 15.0, "lost": 0, "consumers_mean": 4.5}}]
-    p = K.paired(reps, "p95_ms", "lower"); assert p["reading"] == "better" and p["significant"]
-    c = K.paired(reps, "consumers_mean", "lower"); assert c["reading"] == "**WORSE**", "more consumers held reads WORSE"
+    p = K.paired(reps, "p95_ms", "lower"); assert p["reading"] == "lower" and p["significant"]
+    c = K.paired(reps, "consumers_mean", "lower"); assert c["reading"] == "higher", "more consumers held reads higher"
     assert K.paired(reps, "lost", "never more")["reading"] == "same"
     reps[1]["omni"]["lost"] = 1
-    assert K.paired(reps, "lost", "never more")["reading"] == "**WORSE**", "a lost message in any repetition is WORSE"
+    assert K.paired(reps, "lost", "never more")["reading"] == "**higher in a repetition**", "a lost message in any repetition is marked"
     noisy = [{"native": {"x": 1.0}, "omni": {"x": 1.1}}, {"native": {"x": 1.0}, "omni": {"x": 0.9}}, {"native": {"x": 1.0}, "omni": {"x": 1.05}}]
     assert K.paired(noisy, "x", "lower")["reading"] == "no difference beyond the noise"
     # the service time is spent as CPU

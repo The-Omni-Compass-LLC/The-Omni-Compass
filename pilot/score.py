@@ -9,12 +9,12 @@ Compare a baseline capture (your normal autoscaling: a period before Omni-Compas
 Omni-Compass capture (a period or matched pool under the controller). Because traffic differs between periods and
 pools, efficiency is normalised by the work actually done (CPU core-hours used):
 
-  node-hours per used core-hour          lower is better
-  energy per used core-hour (kWh)        lower is better; measured from power_w if captured, otherwise modelled
+  node-hours per used core-hour          aim: lower
+  energy per used core-hour (kWh)        aim: lower; measured from power_w if captured, otherwise modelled
                                          from --idle-w / --dyn-w per node and utilisation
-  mean CPU utilisation (used / allocatable)   higher is better
-  pending-pod minutes per hour           service proxy, lower is better
-  HPA shortfall minutes per hour         minutes with desired replicas above current replicas, lower is better
+  mean CPU utilisation (used / allocatable)   higher means fuller machines
+  pending-pod minutes per hour           service proxy, aim: lower
+  HPA shortfall minutes per hour         minutes with desired replicas above current replicas, aim: lower
 
 Each capture is cut into blocks (default 60 minutes). Differences between the Omni-Compass and baseline block means are
 given with a bootstrap 95% interval over blocks; a verdict is stated only when the interval excludes zero.
@@ -80,7 +80,7 @@ def compare(base, omni, seed=12345, n=4000):
             continue
         diffs = c[rng.integers(0, len(c), (n, len(c)))].mean(1) - a[rng.integers(0, len(a), (n, len(a)))].mean(1)
         lo, hi = np.percentile(diffs, [2.5, 97.5]); d = float(c.mean() - a.mean())
-        verdict = ("better" if (hi < 0) == lower else "worse") if (hi < 0 or lo > 0) else "no significant difference"
+        verdict = ("toward its aim" if (hi < 0) == lower else "away from its aim") if (hi < 0 or lo > 0) else "no significant difference"
         out[m] = {"baseline": float(a.mean()), "omni": float(c.mean()), "difference": d,
                   "relative": d / a.mean() if a.mean() else float("nan"), "ci95": [float(lo), float(hi)], "verdict": verdict}
     return out

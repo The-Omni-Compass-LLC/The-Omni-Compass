@@ -13,7 +13,7 @@ omni is the same database, the same pooler and the same load, with the compass l
 one knob: the pooler's pool size, written through its own admin console (SET default_pool_size), inside the cover
 [2, 90]. The reading is the service time the pooler itself reports every second (transaction time plus the time clients
 waited for a server, per transaction), or the share of its clients queued for a server scaled to the line, whichever is
-worse (amendment 1), on a band from 0 to the response line. Past the wall the knob is handed back to
+larger (amendment 1), on a band from 0 to the response line. Past the wall the knob is handed back to
 the pooler's own setting at once (fail up). At the end it is handed back and read back.
 
 Load: pgbench at a fixed client count, rate-limited, the rate stepping one notch at a time (1 2 3 2 3 4 5 6 5 4 3 2 1 2
@@ -80,7 +80,7 @@ GIVEBACK_WAIT_SHARE = 0.01  # amendment 2: a server is taken back only while cli
 
 def service_reading(latency_s, waiting_share, line_s=LINE_MS / 1000.0):
     """The reading the compass sees (amendment 1, docs/POSTGRES_PREREGISTRATION.md): the pooler's service time per
-    transaction, or the share of its clients queued for a server scaled to the line, whichever is worse. A pool too small
+    transaction, or the share of its clients queued for a server scaled to the line, whichever is larger. A pool too small
     for the offered rate shows at the pooler as clients waiting, not as a long transaction: its own clock cannot see the
     backlog that piles up in the clients' schedules, and the first untouched run proved it."""
     return max(latency_s, waiting_share * line_s)
@@ -200,15 +200,13 @@ def paired(reps, key, direction):
     if direction == "shown":
         reading = "shown, not judged"
     elif direction == "never more" and any(x > 0 for x in d):
-        reading = "**WORSE**"                                     # any increase, in any repetition, whatever the noise
+        reading = "**higher in a repetition**"                                     # any increase, in any repetition, whatever the noise
     elif same:
         reading = "same"
     elif not clear:
         reading = "no difference beyond the noise"
-    elif direction == "never more":
-        reading = "better"
     else:
-        reading = "better" if (mean > 0) == (direction == "higher") else "**WORSE**"
+        reading = "lower" if mean < 0 else "higher"                # which way it went; the gauge's aim is the reader's
     return {"native": nat, "omni": om, "diff": mean, "ci95": [lo, hi], "n": n, "significant": clear, "reading": reading}
 
 

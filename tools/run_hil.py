@@ -244,28 +244,28 @@ def contrast(o, n):
             "all": {"primary": w_all / e_all - 1, "work": w_all - 1, "energy": e_all - 1, "viol_pp": 100 * v_all, "p95": p95}}
 
 
-# which way is better for each measure, in words, so a sign is never read on its own: more work per energy and more
-# work are better; less energy (less spent, a lower bill), less time over the line and a lower p95 (faster) are better
-BETTER_UP = {"primary": "more work per energy", "work": "more work"}
-BETTER_DOWN = {"energy": "less energy spent", "viol_pp": "late less often", "p95": "faster"}
-WORSE = {"primary": "less work per energy", "work": "less work", "energy": "more energy spent", "viol_pp": "late more often",
-         "p95": "slower"}
+# each measure's declared aim, in words, so a sign is never read on its own: work per energy and work aim higher; energy
+# (spent, a bill), time over the line and p95 aim lower
+AIM_UP = {"primary": "more work per energy", "work": "more work"}
+AIM_DOWN = {"energy": "less energy spent", "viol_pp": "late less often", "p95": "faster"}
+AWAY = {"primary": "less work per energy", "work": "less work", "energy": "more energy spent", "viol_pp": "late more often",
+        "p95": "slower"}
 
 
 def reading(k, v, eps=1e-9):
-    """A measure's change against native, read in words: better, worse or the same, and what that means."""
+    """A measure's change against native, read in words: what it means, toward its aim or away from it, or the same."""
     if abs(v) <= eps:
         return "(same)"
-    good = v > 0 if k in BETTER_UP else v < 0
-    return f"(better: {BETTER_UP.get(k) or BETTER_DOWN.get(k)})" if good else f"(WORSE: {WORSE[k]})"
+    toward = v > 0 if k in AIM_UP else v < 0
+    return f"({AIM_UP.get(k) or AIM_DOWN.get(k)})" if toward else f"({AWAY[k]})"
 
 
-def worse_on(xs):
-    """Every measure that is worse than native on the mean, by any amount, in words (no line drawn: the reader sees
-    what it costs beside what it gains)."""
+def away_on(xs):
+    """Every measure that moved away from its aim against native on the mean, by any amount, in words (no line drawn: the
+    reader sees what it takes beside what it gives)."""
     m = lambda k: sum(x[k] for x in xs) / len(xs)
-    return [f"{WORSE[k]} ({100 * m(k):+.2f}%)" if k != "viol_pp" else f"{WORSE[k]} ({m(k):+.2f} pp)"
-            for k in ("primary", "work", "energy", "p95", "viol_pp") if reading(k, m(k)).startswith("(WORSE")]
+    return [f"{AWAY[k]} ({100 * m(k):+.2f}%)" if k != "viol_pp" else f"{AWAY[k]} ({m(k):+.2f} pp)"
+            for k in ("primary", "work", "energy", "p95", "viol_pp") if reading(k, m(k)) == f"({AWAY[k]})"]
 
 
 def rescore(root):
@@ -285,7 +285,7 @@ def rescore(root):
         res.setdefault((size, r["organism"]), {}).setdefault(rep, {})[r["arm"]] = r
     L = [f"# The card run in full, from its own files (amendment 11)", "",
          f"Run `{root.name}`, commit `{str(meta.get('commit', ''))[:12]}`, line {slo} ms. Every measure from the run's "
-         "own files, the card's response times included; every measure worse than native is named.", "",
+         "own files, the card's response times included; every measure that moved away from its aim is named.", "",
          "| Size | Organism | Part | Repetitions | Label | Work per energy | Energy | Time over the line (pp) | p95 |",
          "|---:|---|---|---:|---|---:|---:|---:|---:|"]
     for (sc, name), reps in sorted(res.items()):
@@ -294,8 +294,8 @@ def rescore(root):
             continue
         for part, pname in (("sim", "stacks (model)"), ("card", "card (meter)"), ("all", "both")):
             xs = [p[part] for p in per]
-            bad = worse_on(xs)
-            lab = (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; worse on: " + ", ".join(bad)) if bad else "")
+            bad = away_on(xs)
+            lab = (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; away from its aims on: " + ", ".join(bad)) if bad else "")
             mm = lambda k: sum(x[k] for x in xs) / len(xs)
             L.append(f"| {sc}x | {NAMES[name]} | {pname} | {len(xs)} | {lab} | {100 * mm('primary'):+.2f}% | {100 * mm('energy'):+.2f}% | "
                      f"{mm('viol_pp'):+.2f} | {100 * mm('p95'):+.1f}% |")
@@ -374,11 +374,11 @@ def main(argv=None):
          "over plants of each plant's ratio; *both* counts the card as one more plant and adds its joules.", "",
          "## Omni against native, by organism (mean over repetitions, 95% interval when there are two or more)", "",
          "The label is the preregistered one (the primary outcome and its interval, the time over the line first); beside it, "
-         "every measure that came out worse than native, by any amount, is named, so what Omni costs is read beside what it gains.", "",
+         "every measure that moved away from its aim, by any amount, is named, so what Omni takes is read beside what it gives.", "",
          "How to read a row: each change is Omni against native on the same organism, seed and requests, and says in words "
-         "whether it is better or worse. More work per energy and more work are better. Less energy is better (less spent: "
-         "a lower power bill, or longer on the same supply). Less time over the line and a lower p95 are better (faster "
-         "answers). A minus sign is good on energy, lateness and p95, and bad on work.", "",
+         "what it means. Work per energy and work aim higher. Energy aims lower (less spent: a lower power bill, or longer on "
+         "the same supply). Time over the line and p95 aim lower (faster answers). A minus sign is toward the aim on energy, "
+         "lateness and p95, and away from it on work.", "",
          "| Size | Organism | Part | Label | Work per energy | Work | Energy | Time over the line (pp) | p95 |", "|---:|---|---|---|---:|---:|---:|---:|---:|"]
     out = {}
     for (sc, name) in res:
@@ -388,9 +388,9 @@ def main(argv=None):
         for part, pname in (("sim", "stacks (model)"), ("card", "card (meter)"), ("all", "both")):
             xs = [p[part] for p in per]
             m = {k: ci([x[k] for x in xs]) for k in ("primary", "work", "energy", "viol_pp", "p95")}
-            bad = worse_on(xs)
-            lab = (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; worse on: " + ", ".join(bad)) if bad else "")
-            out[key][part] = {"label": lab, "worse_on": bad, **{k: list(v) for k, v in m.items()}}
+            bad = away_on(xs)
+            lab = (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; away from its aims on: " + ", ".join(bad)) if bad else "")
+            out[key][part] = {"label": lab, "away_on": bad, **{k: list(v) for k, v in m.items()}}
             f = lambda k, s=100.0, u="%": (f"{s * m[k][0]:+.2f}{u}" + (f" ({s * m[k][1]:+.2f} to {s * m[k][2]:+.2f})" if len(xs) > 1 else "")
                                             + f" {reading(k, m[k][0])}")
             L.append(f"| {sc}x | {NAMES[name]} | {pname} | {lab} | {f('primary')} | {f('work')} | {f('energy')} | {f('viol_pp', 1.0, '')} | {f('p95')} |")

@@ -4,7 +4,7 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-Redis as shipped with the operator's memory ceiling (64 MB, allkeys-lru) is native; omni is the compass law on the ceiling through Redis's own console inside [16, 512] MB, holding the application's own request latency at 40% of the 2 ms line, a hit inside and a miss with its store trip outside (`docs/REDIS_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **better** or **WORSE in all three of our runs**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed requests: any increase in any run is WORSE. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every row is shown, losses included.
+Redis as shipped with the operator's memory ceiling (64 MB, allkeys-lru) is native; omni is the compass law on the ceiling through Redis's own console inside [16, 512] MB, holding the application's own request latency at 40% of the 2 ms line, a hit inside and a miss with its store trip outside (`docs/REDIS_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **lower** or **higher in all three of our runs**; a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed requests: any increase in any run is marked. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every row is shown, losses included.
 
 | Run | GitHub run | Commit | Engine | Workloads |
 |---|---|---|---|---:|
@@ -18,15 +18,15 @@ Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms sto
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (requests a second answered within the line) | 1,184 | 1,242 | +4.9% (+3.8 to +6.1) | +4.8% (+4.0 to +5.5) | +4.4% (+2.6 to +6.1) | **better in all three of our runs** |
+| work inside the response line (requests a second answered within the line) | 1,184 | 1,242 | +4.9% (+3.8 to +6.1) | +4.8% (+4.0 to +5.5) | +4.4% (+2.6 to +6.1) | **higher in all three of our runs** |
 | throughput (requests a second) | 1,500 | 1,500 | +0.0% (+0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | no difference beyond the noise (2 of 3 runs) |
-| cache hit rate | 0.79 | 0.829 | +5.0% (+3.8 to +6.1) | +4.8% (+4.0 to +5.5) | +4.4% (+2.6 to +6.1) | **better in all three of our runs** |
+| cache hit rate | 0.79 | 0.829 | +5.0% (+3.8 to +6.1) | +4.8% (+4.0 to +5.5) | +4.4% (+2.6 to +6.1) | **higher in all three of our runs** |
 | latency, 95th percentile (ms) | 5.75 | 5.74 | -0.2% (-0.3 to -0.0) | -0.2% (-2.4 to +1.9) | -0.1% (-0.3 to +0.1) | no difference beyond the noise (2 of 3 runs) |
 | latency, 99th percentile (ms) | 5.81 | 5.81 | -0.0% (-0.3 to +0.2) | +0.0% (-1.0 to +1.1) | +0.1% (-0.2 to +0.3) | no difference beyond the noise (3 of 3 runs) |
-| latency, mean (ms) | 1.35 | 1.13 | -16.0% (-20.1 to -11.9) | -15.9% (-18.7 to -13.1) | -14.0% (-20.1 to -8.0) | **better in all three of our runs** |
+| latency, mean (ms) | 1.35 | 1.13 | -16.0% (-20.1 to -11.9) | -15.9% (-18.7 to -13.1) | -14.0% (-20.1 to -8.0) | **lower in all three of our runs** |
 | failed requests | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | same |
-| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 80.4 | +25.7% (+8.4 to +43.0) | +23.3% (+14.2 to +32.4) | +19.2% (+6.8 to +31.5) | **WORSE in all three of our runs** |
-| memory used, mean (MB) | 61.2 | 73.8 | +20.7% (+7.9 to +33.5) | +19.5% (+16.2 to +22.9) | +16.3% (+4.5 to +28.1) | **WORSE in all three of our runs** |
+| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 80.4 | +25.7% (+8.4 to +43.0) | +23.3% (+14.2 to +32.4) | +19.2% (+6.8 to +31.5) | **higher in all three of our runs** |
+| memory used, mean (MB) | 61.2 | 73.8 | +20.7% (+7.9 to +33.5) | +19.5% (+16.2 to +22.9) | +16.3% (+4.5 to +28.1) | **higher in all three of our runs** |
 | keys evicted | 138,054 | 113,055 | -18.1% (-22.7 to -13.5) | -17.2% (-18.9 to -15.6) | -15.9% (-21.7 to -10.0) | shown, not judged |
 | host CPU busy (share of the run) | 0.127 | 0.117 | -7.9% (-32.7 to +16.9) | -12.4% (-29.9 to +5.2) | -8.1% (-32.7 to +16.5) | no difference beyond the noise (3 of 3 runs) |
 | host CPU-seconds | 212.6 | 195.2 | -8.2% (-36.6 to +20.2) | -13.4% (-31.6 to +4.7) | -8.6% (-37.0 to +19.8) | no difference beyond the noise (3 of 3 runs) |
@@ -112,7 +112,7 @@ The ceiling handed back to the operator's and read back at the end of every omni
 
 The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 56 to 72 (13 trials, 2 allowed, 1 refused); acting: 56 to 88 (15 trials, 4 allowed, 0 refused); acting: 56 to 80 (15 trials, 3 allowed, 1 refused); run B: acting: 56 to 88 (15 trials, 4 allowed, 0 refused); acting: 56 to 72 (12 trials, 2 allowed, 1 refused); acting: 56 to 80 (13 trials, 3 allowed, 0 refused); run C: acting: 64 to 88 (13 trials, 3 allowed, 1 refused); acting: 56 to 80 (12 trials, 3 allowed, 0 refused); acting: 56 to 80 (14 trials, 3 allowed, 0 refused).
 
-**Across 3 untouched workloads: 0 gauge-rows better in all three of our runs, 0 worse in all three of our runs, 0 where the runs disagree.**
+**Across 3 untouched workloads: 0 gauge-rows toward its aim in all three of our runs, 0 away from its aim in all three of our runs, 0 where the runs disagree.**
 
 ---
 

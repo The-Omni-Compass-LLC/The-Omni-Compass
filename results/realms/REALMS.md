@@ -20,7 +20,7 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 ## Every muscle alone, by home realm
 
-| Realm | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | WORSE | INVALID |
+| Realm | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Compute / AI / Cloud | 334 | 21 | 1 | 312 | 0 | 0 | 0 |
 | Physics / Robotics / Autonomous | 119 | 19 | 4 | 95 | 1 | 0 | 0 |
@@ -30,7 +30,7 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 ## By knob: what kind of authority Omni held
 
-| Knob | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | WORSE | INVALID | Median work per energy |
+| Knob | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID | Median work per energy |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | capacity | 454 | 19 | 0 | 434 | 1 | 0 | 0 | +0.0% |
 | setpoint | 134 | 82 | 4 | 44 | 0 | 0 | 0 | +1.2% |
@@ -43,7 +43,7 @@ For 132 of 134 setpoint muscles, a fixed setpoint at the calm end of the declare
 
 ## By family
 
-| Realm | Family | Plant | Muscles | Superior | Tradeoff | Inconclusive | Not established | Worse | Invalid | Median work per energy |
+| Realm | Family | Plant | Muscles | Superior | Tradeoff | Inconclusive | Not established | Less work per energy | Invalid | Median work per energy |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | Compute / AI / Cloud | AI Inference Serving | compute_pool (gpu) | 24 | 1 | 0 | 23 | 0 | 0 | 0 | +0.0% |
 | Compute / AI / Cloud | AI Training | compute_pool (gpu_batch) | 18 | 1 | 0 | 17 | 0 | 0 | 0 | +0.0% |

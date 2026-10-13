@@ -27,7 +27,7 @@ knob is fair. Nothing in the engine changes.
                    reading of the Omni index, cost = resource held x host CPU busy share x latency / work: a step passes only
                    if the service gained outweighs the resource and CPU spent, by the index's own arithmetic (a geometric mean
                    of the four ratios no lower than one is the same statement). Under the service objective cost = latency /
-                   work: the resources are shown and not judged. Lower is better; "no higher within the tolerance" passes,
+                   work: the resources are shown and not judged. The aim is the lower cost; "no higher within the tolerance" passes,
                    which is the engine's judge, so a step that buys nothing and costs nothing is allowed and a step that costs
                    more than it buys is refused.
   the hold         during a trial the knob stands at the phase's value whatever the compass asks: the reference at the
@@ -51,7 +51,7 @@ SPEND, GIVE = "spend", "give back"
 
 
 def sample_cost(objective, work, latency, resource, cpu_share):
-    """One second's cost under the objective, lower is better; None when nothing worked (nothing was measured).
+    """One second's cost under the objective (its aim: lower); None when nothing worked (nothing was measured).
 
     resource   the index's reading: resource x host CPU busy share x latency / work (declared 9 October)
     service    latency / work: the resources shown, not judged (declared 9 October)

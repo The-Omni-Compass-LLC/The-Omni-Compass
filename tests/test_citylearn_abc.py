@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The CityLearn A/B/C rule (tools/citylearn_abc.py, docs/OMNI_V1.md): a deterministic simulator, so the three runs must
-reproduce each other; a score reads better in all three of our runs or WORSE by its sign when they do, same under one part in a million,
+reproduce each other; a score reads lower or higher in all three of our runs by its sign when they do, same under one part in a million,
 and "the runs differ" when they do not; a district with no electric battery is listed as nothing for Omni to move, and a
 district CityLearn cannot run is listed with its error, never dropped."""
 import json
@@ -40,8 +40,8 @@ def write(root, run, districts):
 
 def main():
     same = rec(3, 0.98, 1.03)                               # cost 2% lower, daily peak 3% higher, every run alike
-    assert C.verdict([same] * 3, COST) == "**better in all three of our runs**"
-    assert C.verdict([same] * 3, PEAK) == "**WORSE in all three of our runs**", "a loss in all three is shown as WORSE"
+    assert C.verdict([same] * 3, COST) == "**lower in all three of our runs**"
+    assert C.verdict([same] * 3, PEAK) == "**higher in all three of our runs**", "a rise in all three reads higher"
     assert C.verdict([same] * 3, "carbon_emissions_total") == "same"
     other = rec(3, 0.98, 1.03); other["omni"]["kpis"][COST] = 0.97
     assert C.verdict([same, same, other], COST) == "**the runs differ**", "a run that does not reproduce is a finding"
@@ -55,7 +55,7 @@ def main():
         txt = out.read_text()
         assert "| d_nobat | 3 | 1 | none | yes |" in txt, "no battery: nothing for Omni to move"
         assert "| d_broken | `ValueError: needs interface='entity'` |" in txt, "a district CityLearn cannot run is listed"
-        assert "WORSE in all three of our runs" in txt and "better in all three of our runs" in txt and "Not one engine's three runs" in txt
+        assert "higher in all three of our runs" in txt and "lower in all three of our runs" in txt and "Not one engine's three runs" in txt
     print("PASS  CityLearn A/B/C rule: reproduced runs read by sign, a run that differs is a finding, no battery means nothing to move, "
           "a district CityLearn cannot run is listed")
 

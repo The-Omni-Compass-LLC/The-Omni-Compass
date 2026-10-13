@@ -77,11 +77,11 @@ def main():
     reps = [{"native": {"hit_rate": 0.70, "maxmemory_mb_mean": 64.0, "failed": 0}, "omni": {"hit_rate": 0.95, "maxmemory_mb_mean": 150.0, "failed": 0}},
             {"native": {"hit_rate": 0.71, "maxmemory_mb_mean": 64.0, "failed": 0}, "omni": {"hit_rate": 0.94, "maxmemory_mb_mean": 140.0, "failed": 0}},
             {"native": {"hit_rate": 0.69, "maxmemory_mb_mean": 64.0, "failed": 0}, "omni": {"hit_rate": 0.96, "maxmemory_mb_mean": 160.0, "failed": 0}}]
-    assert R.paired(reps, "hit_rate", "higher")["reading"] == "better"
-    assert R.paired(reps, "maxmemory_mb_mean", "lower")["reading"] == "**WORSE**", "more memory held reads WORSE"
+    assert R.paired(reps, "hit_rate", "higher")["reading"] == "higher"
+    assert R.paired(reps, "maxmemory_mb_mean", "lower")["reading"] == "higher", "more memory held reads higher"
     assert R.paired(reps, "failed", "never more")["reading"] == "same"
     reps[2]["omni"]["failed"] = 2
-    assert R.paired(reps, "failed", "never more")["reading"] == "**WORSE**"
+    assert R.paired(reps, "failed", "never more")["reading"] == "**higher in a repetition**"
     assert R.COVER_MB == (16, 512) and R.NATIVE_MB == 64 and R.LINE_MS == 2.0 and R.MISS_PENALTY_MS > R.LINE_MS, "a miss lies outside the line by construction"
     print("PASS  Redis runner: misses grow the ceiling by notches, calm with nothing evicted gives one back after the dwell, the wall puts the whole cover on, "
           "the cover holds; the plug snapshots, reads back, stops for another writer and restores; a seeded Zipf working set; the application's own reading; the paired reading")

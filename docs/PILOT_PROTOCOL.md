@@ -18,7 +18,7 @@ Run `python verify.py`. Pass criterion: VERIFICATION: PASS.
 ## Phase 2: Guarded control, one loop at a time (4 to 8 weeks)
 Order: power capping; node count (Cluster Autoscaler set to observe); replica count (HPA set to observe).
 - Each loop is handed over separately, with the reset tested at handover and at exit.
-- Pass criteria per loop, fixed in advance: SLO attainment not worse than the preceding shadow baseline at the agreed confidence level; zero shield invariant violations; energy per unit of completed work reported with confidence intervals.
+- Pass criteria per loop, fixed in advance: SLO attainment not below the preceding shadow baseline at the agreed confidence level; zero shield invariant violations; energy per unit of completed work reported with confidence intervals.
 - Exit: any criterion failed triggers the reset and returns the loop to its native controller.
 
 ## Scoring your own pilot

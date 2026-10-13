@@ -30,7 +30,7 @@ the first live set with the supervisory nervous system gating machine release.
 | response time (ms), 95th percentile | 431.4 | 463.2 | +7.4% | -105.7 to +169.4 | no |
 | response time (ms), 99th percentile | 568.9 | 629 | +10.6% | -155.4 to +275.7 | no |
 | failed requests (%) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
-| pending pods, pod-minutes | 0.3433 | 0.8033 | +134.0% | +0.05385 to +0.8661 | yes, worse |
+| pending pods, pod-minutes | 0.3433 | 0.8033 | +134.0% | +0.05385 to +0.8661 | yes, higher |
 | utilisation (used / allocatable) | 0.07676 | 0.06928 | -9.8% | -0.01814 to +0.003173 | no |
 
 ## Reading

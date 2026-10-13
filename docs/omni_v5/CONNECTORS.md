@@ -148,7 +148,7 @@ the wall; they act only when a tile changes color.
   live gauges (band position, edge, wobble, work, energy, wear, native-vs-Omni) and its decision log.
 - **Omni already acted.** On trouble Omni quarantines the muscle (off, or native) on its own; the tile is for the human to
   *see*, not to race. Omni keeps re-checking and brings the muscle back the moment it can safely help; if native stays
-  better, Omni leaves it native — Omni never needs to be in the loop when native serves the body better.
+  ahead, Omni leaves it native — Omni never needs to be in the loop when native serves the body as well or more.
 - **Human override on the same screen.** Each tile has a switch the engineers can throw themselves — force the muscle off,
   or force it native — without touching the machine. The physical master switch sits above all of it.
 - **The babysitting tax is a counted benefit.** The bill reports engineer-hours saved (one pane + auto-handling vs one

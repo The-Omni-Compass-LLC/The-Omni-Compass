@@ -6,7 +6,7 @@
 """The capacity test's A/B/C three-run table (docs/CAPACITY_PREREGISTRATION.md): the same test run three times as separate
 GitHub runs on the same engine, each run's own table built by tools/capacity_report.py (CAPACITY.json in each archived run,
 results/live/raw/capacity-run-<id>/). Each cap level gets two judged rows, completed work and capacity, each with the three
-readings every three-run table uses (tools/confirm_abc.py's rule: better or WORSE in all three of our runs, no difference
+readings every three-run table uses (tools/confirm_abc.py's rule: lower or higher in all three of our runs, no difference
 beyond the noise, or the runs disagree). Every row is shown, losses included.
 
   python3 tools/capacity_abc.py A_DIR B_DIR C_DIR --out results/live/V5_CAPACITY.md
@@ -24,7 +24,7 @@ from tools.confirm_abc import CAPACITY, cell, engine, verdict   # noqa: E402
 from tools.legal import stamp                                   # noqa: E402
 from tools.readings import OWN_RUNS                             # noqa: E402
 
-WORK = "completed work (requests answered within the line over the window; higher is better)"
+WORK = "completed work (requests answered within the line over the window)"
 
 
 def load(d):
@@ -55,7 +55,7 @@ def main(argv=None):
          "replications. The cap is a quota on the served app's CPU, the same in both arms and enforced by the cluster; the "
          "load rises step by step past what the cap can serve. Each cell is omni against native at one cap, the paired change "
          "with its 95% interval (completed work in percent of native; capacity in requests a second). Every judged row gets "
-         "one of three readings. **Better** or **WORSE in all three of our runs**: all three runs move the same way and every "
+         "one of three readings. **Lower** or **higher in all three of our runs**: all three runs move the same way and every "
          "interval is clear of zero. **No difference beyond the noise**: in the runs counted, the interval includes zero; that "
          "is the result. **The runs disagree**: runs clear of the noise point different ways. Every row is shown, losses "
          "included. Evidence class **L** (the real thing: a real Kubernetes cluster, real requests, every answer counted).", "",
@@ -75,7 +75,7 @@ def main(argv=None):
     for cap in caps:
         for key, label in (("work", WORK), ("capacity", CAPACITY)):
             rs = [pair(rows[cap], key) for _, _, rows in runs]
-            v = verdict(CAPACITY, rs)               # both measures: higher is better
+            v = verdict(CAPACITY, rs)               # the direction of the number, as every row
             tally[v] = tally.get(v, 0) + 1
             data[f"{cap}:{key}"] = {"reading": v.strip("*"), "runs": rs}
             cells = [cell(r) if key == "work" else f"{r['diff']:+.2f} req/s ({r['ci95'][0]:+.2f} to {r['ci95'][1]:+.2f})"

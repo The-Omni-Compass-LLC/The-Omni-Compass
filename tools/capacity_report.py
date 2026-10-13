@@ -118,9 +118,9 @@ def reading(lo, hi, n) -> str:
     if n < 2 or math.isnan(lo):
         return "one pair (no reading)"
     if lo > 0:
-        return "better"
+        return "higher"
     if hi < 0:
-        return "worse"
+        return "lower"
     return "no difference beyond the noise"
 
 
@@ -168,13 +168,13 @@ def audit(r) -> str:
     cap_line = (f" The highest load served within both limits: {r['capacity_native']:.1f} → {r['capacity_omni']:.1f} "
                 f"requests a second ({r['capacity_reading']}).")
     lim = f" Failed or never sent: {r['fail_native']:.1%} → {r['fail_omni']:.1%}."
-    if r["work_reading"] == "better":
+    if r["work_reading"] == "higher":
         return (f"At {cap}, Omni on top completed {r['work_diff']:,.0f} more requests within {r['slo_ms']:.0f} ms than "
                 f"native alone ({r['work_pct']:+.1f}%{iv}): more work from the same cap.{cap_line}{lim}")
-    if r["work_reading"] == "worse":
+    if r["work_reading"] == "lower":
         return (f"At {cap}, Omni on top completed {abs(r['work_diff']):,.0f} fewer requests within {r['slo_ms']:.0f} ms "
-                f"than native alone ({r['work_pct']:+.1f}%{iv}): a loss, reported as it stands, and its cause is looked "
-                f"for in our own wiring first.{cap_line}{lim}")
+                f"than native alone ({r['work_pct']:+.1f}%{iv}), reported as it stands, its cause looked for in our own "
+                f"wiring first.{cap_line}{lim}")
     return (f"At {cap}, the difference in completed work ({r['work_pct']:+.1f}%{iv}) is inside the noise: no difference "
             f"beyond the noise at this cap.{cap_line}{lim}")
 

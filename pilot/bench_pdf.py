@@ -40,9 +40,9 @@ def table(rows, width):
         if i % 2 == 0:
             style.append(("BACKGROUND", (0, i), (-1, i), colors.HexColor("#f2f5f8")))
         last = r[-1].lower()
-        if "better" in last:
+        if "toward" in last:
             style.append(("TEXTCOLOR", (-1, i), (-1, i), colors.HexColor("#1b7f3b")))
-        elif "worse" in last:
+        elif "away" in last:
             style.append(("TEXTCOLOR", (-1, i), (-1, i), colors.HexColor("#b3261e")))
     t.setStyle(TableStyle(style))
     return t

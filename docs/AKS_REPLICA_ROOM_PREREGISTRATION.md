@@ -29,14 +29,17 @@ price, every gauge reported. Two settings of their own, each labelled as such:
 
 | Setting | Load | Measured window | Native | Omni-Compass on top |
 |---|---|---:|---|---|
-| Steady with replica room | the steady load (the load generator's replica count fixed) | 900 s | the operator's cap of 10, never moved | the replica room granted up to 36 |
-| Burst with replica room | `1 6 1 8 1 6` | 1,800 s | the operator's cap of 10, never moved | the replica room granted up to 36 |
+| Steady with replica room | the steady load (the load generator's replica count fixed) | 900 s | the operator's cap of 10, never moved | the replica room, its ceiling read live |
+| Burst with replica room | `1 3 1 4 1 3`, the steps written on 5 October (amendment 11) | 1,800 s | the operator's cap of 10, never moved | the replica room, its ceiling read live |
 
-- **The ceiling.** 36 = 9 × 4: nine pods of 200m fit one 2-vCPU worker, so 36 is what the four work machines hold; the
-  lever cannot ask for a machine the fleet does not have.
-- **The burst steps.** `1 6 1 8 1 6` is the burst that amendment 11 (5 October) set aside because neither arm could
-  serve its peaks under a cap of 10. With the replica room granted, that is the question: whether Omni-Compass serves
-  what the operator's cap could not. The standard burst test stays at `1 3 1 4 1 3`.
+- **The ceiling, read live, never typed in** (correction of 13 October, before any run of this set: the first draft
+  named 36, nine pods of 200m on each of the four 2-vCPU work machines, a number written by us, and the founder's order
+  of 13 October is that a muscle runs from 1 up to one click under what the system itself can hold, read live). The
+  ceiling is what the work pool's machines can hold at the service's own request, read from the cluster as it runs,
+  one pod under it; the lever never asks for a machine the fleet does not have. Until the engine reads it live (the
+  next engine version), no run of this set starts.
+- **The burst steps.** `1 3 1 4 1 3`, the steps written on 5 October (amendment 11). The first draft of this page named
+  `1 6 1 8 1 6`, the burst amendment 11 set aside; we do not choose a benchmark's settings, so the written steps stand.
 - **The machines.** `Standard_D2_v4` (the Dv4 family: 2 vCPU and 8 GiB like `Standard_D2s_v4`, the same list price of
   $0.096 an hour), in eastus, so the set has its own 10-vCPU family allowance and runs beside the standard Azure sets
   (on `Standard_D2s_v4`) without sharing their quota or their queue. Both arms of a set run on the same family.
@@ -46,7 +49,7 @@ price, every gauge reported. Two settings of their own, each labelled as such:
 
 ## Reading
 
-Three separate runs of each setting, A, B and C (`tools/confirm_abc.py`), each row read as better or worse in all three
+Three separate runs of each setting, A, B and C (`tools/confirm_abc.py`), each row read as lower or higher in all three
 of our runs, no difference beyond the noise, or the runs disagree. The extra pods and machines the replica room takes
 are counted where they fall (HPA replicas, pods started, machine-hours, the bill), the power given, beside the response
 times, the time over the line and the failed requests they buy. These settings are reported beside the standard ones,

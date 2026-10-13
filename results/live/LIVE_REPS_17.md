@@ -6,20 +6,20 @@ Run: benchmark-reps 36356742965, commit 40c95af (two arms; prefer-not idle mark,
 terms, machines empty one at a time, pod reflex with S and R from the same window). Five paired repetitions, 15
 minutes each, kind with 1 control plane and 6 workers.
 
-A change is significant when its paired 95% interval excludes zero. Lower response time is better.
+A change is significant when its paired 95% interval excludes zero. Lower response time moved toward its aim.
 
 | Gauge | Native | Me on top | Verdict |
 |---|---:|---:|---|
-| workers in service, mean | 6 | 3.83 | −36.1%, better, significant |
-| node-hours | 1.519 | 0.968 | −36.3%, better, significant |
-| energy (Wh) | 159.6 | 120.7 | −24.4%, better, significant |
-| energy per unit of work (Wh per core-hour) | 679 | 415 | −38.9%, better, significant |
-| work done (CPU used, cores) | 0.929 | 1.151 | +23.9%, better, significant |
-| response time, mean (ms) | 161.6 | 116.4 | −28.0%, better, significant |
-| response time, 95th percentile (ms) | 323.6 | 212.2 | −34.4%, better, significant |
-| response time, 99th percentile (ms) | 457.9 | 306.5 | −33.1%, better, significant |
+| workers in service, mean | 6 | 3.83 | −36.1%, lower, significant |
+| node-hours | 1.519 | 0.968 | −36.3%, lower, significant |
+| energy (Wh) | 159.6 | 120.7 | −24.4%, lower, significant |
+| energy per unit of work (Wh per core-hour) | 679 | 415 | −38.9%, lower, significant |
+| work done (CPU used, cores) | 0.929 | 1.151 | +23.9%, higher, significant |
+| response time, mean (ms) | 161.6 | 116.4 | −28.0%, lower, significant |
+| response time, 95th percentile (ms) | 323.6 | 212.2 | −34.4%, lower, significant |
+| response time, 99th percentile (ms) | 457.9 | 306.5 | −33.1%, lower, significant |
 | failed requests (%) | 0 | 0 | equal |
-| pods not yet running, pod-minutes | 0.21 | 0.977 | +365%, worse, significant |
+| pods not yet running, pod-minutes | 0.21 | 0.977 | +365%, higher, significant |
 | replicas, mean | 8.91 | 9.18 | +3.0%, not significant |
 
 ## What the trail shows (repetition 1)

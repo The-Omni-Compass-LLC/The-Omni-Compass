@@ -46,7 +46,7 @@ Omni-Compass sits on top of a muscle that already works and moves its settings o
 measures that the muscle loses at most **2%** in any measure: work done, response time (median, p95 or p99), time over
 the service line, or the machine's own cost of running Omni-Compass. Where no move passes that test, Omni-Compass leaves
 the muscle exactly as it runs alone. On a live system the verdict (`omnicompass/verdict.py`) measures it with paired
-trials on the muscle itself before every step. Every result reports each measure, and where one is worse at all, by
+trials on the muscle itself before every step. Every result reports each measure, and where one moved away from its aim at all, by
 however little, the result says so and by how much.
 
 ## 4. The wiring declaration
@@ -62,7 +62,7 @@ Therefore:
 1. **It cannot be slapped on.** Every installation goes through the levels of the manual in order (chapter 9), starting
    read-only, and every writing level begins with the wire check (manual, section 8.4) and a watch arm that must equal
    native.
-2. **If your paired receipts differ from the published benchmarks in direction** (service worse, or no saving where one
+2. **If your paired receipts differ from the published benchmarks in direction** (service away from its aim, or no saving where one
    was shown), **the first presumption is wiring, not the law.** Confirm the installation with the checks in the
    manual's section 8.5 (*Wired right or wired wrong*) before drawing any conclusion about Omni-Compass.
 3. **This has happened to us, and is published.** On the first real card (NVIDIA A10, 2026-10-02) the governor read

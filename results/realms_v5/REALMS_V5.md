@@ -53,11 +53,11 @@ Work: the mean over the organism's plants of each plant's work against native's.
 | The four stacked, every shared muscle in each | 1908 | **FEWER MISSES** | +0.00% (+0.00 to +0.00) | 4.12% → 3.94% (−4.3%) | -0.18 (-0.19 to -0.16) | +0.00% (+0.00 to +0.00) | +0.22% | -0.00% (-0.00 to -0.00) | yes |
 | The whole tower, every muscle once | 1107 | **FEWER MISSES** | +0.00% (+0.00 to +0.00) | 4.62% → 4.57% (−1.1%) | -0.05 (-0.06 to -0.04) | +0.00% (+0.00 to +0.00) | +0.04% | -0.00% (-0.00 to -0.00) | yes |
 
-## Inside the organisms: every plant that did worse than native
+## Inside the organisms: every plant that did less work than native or missed its line more often
 
 A stricter look than an organism's total: every plant inside each organism, over all seeds, that did less work than native or spent more decisions over its own line, under each load. Reported whatever it shows.
 
-| Load | Organism | Plants | Plants worse | The plants (work change, extra decisions over the line, all seeds) |
+| Load | Organism | Plants | Plants with less work or more misses | The plants (work change, extra decisions over the line, all seeds) |
 |---|---|---:|---:|---|
 | normal | Compute / AI / Cloud | 540 | 0 | none |
 | normal | Physics / Robotics / Autonomous | 404 | 0 | none |
@@ -80,9 +80,9 @@ A stricter look than an organism's total: every plant inside each organism, over
 
 ## Every muscle alone, by home realm
 
-Each muscle runs under 2 loads, its own load (normal) and work waiting in line (25% of the run's own work at the start) (line). **Better**: at least one gain beyond the noise under some load (more work, faster: the line cleared sooner, fewer misses) and no loss under any. **At its limit on native**: native already runs the knob at the top of its range (full clock, full speed, full torque, full battery power, nothing paced or turned away), so the max has nothing above native to give it and writes nothing. **Same as native**: the max acted or could, and the result is no different beyond the noise (native already did all the work that came and was almost never over its line).
+Each muscle runs under 2 loads, its own load (normal) and work waiting in line (25% of the run's own work at the start) (line). **Toward its aims**: at least one of its three aims moved beyond the noise under some load (more work, faster: the line cleared sooner, fewer misses) and none the other way under any. **Both ways**: one toward its aim and one away (less work, slower or more misses). **Away from its aims**: one away and none toward. **At its limit on native**: native already runs the knob at the top of its range (full clock, full speed, full torque, full battery power, nothing paced or turned away), so the max has nothing above native to give it and writes nothing. **Same as native**: the max acted or could, and the result is no different beyond the noise (native already did all the work that came and was almost never over its line).
 
-| Realm | Muscles | Better | of them: more work | faster | fewer misses | Same as native | At its limit on native | Mixed | Worse | Invalid |
+| Realm | Muscles | Toward its aims | of them: more work | faster | fewer misses | Same as native | At its limit on native | Both ways | Away from its aims | Invalid |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Compute / AI / Cloud | 444 | 274 | 12 | 274 | 222 | 24 | 146 | 0 | 0 | 0 |
 | Physics / Robotics / Autonomous | 137 | 53 | 7 | 51 | 19 | 2 | 82 | 0 | 0 | 0 |
@@ -94,7 +94,7 @@ Each muscle runs under 2 loads, its own load (normal) and work waiting in line (
 
 Misses: the share of decisions over the line, native → omni. Line: minutes to clear the work waiting at the start, native → omni (and the share still waiting at the end, where it did not clear). Power given: energy against native's.
 
-| Plant | Knob | Muscles | Omni acts on | Better | At its limit on native | Misses, native → omni | Work | Line, native → omni | Power given | Wear |
+| Plant | Knob | Muscles | Omni acts on | Toward its aims | At its limit on native | Misses, native → omni | Work | Line, native → omni | Power given | Wear |
 |---|---|---:|---:|---:|---:|---|---:|---|---:|---:|
 | compute_pool | admission | 195 | 0 | 0 | 195 | 1.68% → 1.68% | +0.000% | no line | +0.00% | +0.00% |
 | compute_pool | capacity | 422 | 422 | 329 | 0 | 1.54% → 0.36% | +0.043% | no line | +36.67% | +75.63% |
@@ -120,7 +120,7 @@ Misses: the share of decisions over the line, native → omni. Line: minutes to 
 
 Misses: the share of decisions over the line, native → omni. Line: minutes to clear the work waiting at the start, native → omni (and the share still waiting at the end, where it did not clear). Power given: energy against native's.
 
-| Plant | Knob | Muscles | Omni acts on | Better | At its limit on native | Misses, native → omni | Work | Line, native → omni | Power given | Wear |
+| Plant | Knob | Muscles | Omni acts on | Toward its aims | At its limit on native | Misses, native → omni | Work | Line, native → omni | Power given | Wear |
 |---|---|---:|---:|---:|---:|---|---:|---|---:|---:|
 | compute_pool | admission | 195 | 0 | 0 | 195 | 1.53% → 1.53% | +0.000% | 13.9 → 13.9 min | +0.00% | +0.00% |
 | compute_pool | capacity | 422 | 422 | 422 | 0 | 1.40% → 0.33% | +0.030% | 16.9 → 7.2 min | +33.20% | +68.06% |
@@ -145,7 +145,7 @@ Misses: the share of decisions over the line, native → omni. Line: minutes to 
 ## No-harm check
 
 - Omni acts on **567** of 1107 muscles alone. **421** are at their limit on native (the knob is already at the top of its range); the rest it could act on show nothing beyond the noise to gain.
-- Muscles alone labelled **WORSE** or **MIXED** under any load: **0**.
+- Muscles alone labelled **away from its aims** or **both ways** under any load: **0**.
 - The lease hands every knob back to native before each run ends: 1107 of 1107 muscles under every load; 6 of 6 organisms under normal, 6 of 6 organisms under climb, 6 of 6 organisms under line.
 
 ## Largest changes (muscles alone, own load, by mean change in misses)

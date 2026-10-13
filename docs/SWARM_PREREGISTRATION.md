@@ -77,9 +77,9 @@ the battery over the energy per mission.
 
 | Gauge | Direction |
 |---|---|
-| energy per mission, fleet energy over the window (declared model) | lower is better |
-| missions per charge at the autopilot's reserve | **higher is better** (the product number) |
-| missions over their deadline (share), drones that broke the reserve, near misses (control ticks with two drones under 0.15 m apart) | **any increase is WORSE** |
+| energy per mission, fleet energy over the window (declared model) | the aim is lower |
+| missions per charge at the autopilot's reserve | **the aim is higher** (the product number) |
+| missions over their deadline (share), drones that broke the reserve, near misses (control ticks with two drones under 0.15 m apart) | **any increase is marked** |
 | collisions (two drones under two collision radii) | **zero in both arms, or the cell is void** |
 | closest two drones ever came, tracking error (the compass's reading), mission time, seconds airborne, cruise override | shown, not judged |
 
@@ -98,8 +98,8 @@ reproduce each other; a gauge that does not reads "the runs differ", which is a 
 ## Runs
 
 Each cell is one GitHub Actions job, native and omni on the same missions, its JSON and per-mission records archived with the
-code. Three separate runs on the frozen engine (A, B, C); the table (`tools/swarm_abc.py`) reads better in all three of our runs or
-WORSE by each gauge's own direction when the runs reproduce, same under one part in a million, and "the runs differ" when
+code. Three separate runs on the frozen engine (A, B, C); the table (`tools/swarm_abc.py`) reads toward its aim in all three of our runs or
+lower or higher by each gauge's own direction when the runs reproduce, same under one part in a million, and "the runs differ" when
 they do not. `tests/test_run_swarm.py` and `tests/test_swarm_abc.py`, run by `verify.py`, prove the rules without the
 simulator: the task keeps the fleet apart, a perfect autopilot finishes every mission inside its deadline, the override
 stays inside its guards and is handed back, the energy model is the declared formula.

@@ -12,7 +12,8 @@ the founder overrides one in the conversation.
   competitor to native.
 - Every benchmark has exactly two arms, **native** and **omni** (omni means Omni on top of native). There is no other
   arm and no other name.
-- **Do no harm.** Omni must never make anything worse. Where it can't improve a knob, that knob stays native. The 2%
+- **Do no harm.** Omni must never move a gauge away from its aim past native. Where it can't move a knob toward its aims,
+  that knob stays native. The 2%
   verdict (`omnicompass/verdict.py`) is the engine's trigger, not a stamp on a report. Gains are uncapped.
 - Headline: more work, faster, on fewer machines, with less energy. One combined number: the Omni index.
 - **The max is the default brain** (12 October): every muscle runs at its own limit, never past it and never below
@@ -38,7 +39,7 @@ the founder overrides one in the conversation.
   bone inside every organism with the living body's immune system (V6-V13, `docs/FORMAL_V5.md` section 4: native twins
   of every room, the heat debt, batteries timed for their lines, nothing locked), every muscle its own card
   (`realms/muscle_cards_v5.csv`, 364 muscles, found by `tools/tune_cards.py` on development seeds only and kept only when
-  it wins twice and is never worse than native on any seed; inside a body a battery wired by its power keeps the body's
+  it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
   never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v5, omni-v3, omni-v2,
@@ -49,7 +50,7 @@ the founder overrides one in the conversation.
 - Any change to a rule, gain, guard, preset or muscle makes **the next version**, and every result is run again on it. Never read a result across
   versions. Never change the engine without telling the founder first.
 - Three runs: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
-  readings: better or worse in all three of our runs (the same sign in all three, every 95% interval clear of zero); no
+  readings: lower or higher in all three of our runs (the same sign in all three, every 95% interval clear of zero); no
   difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
   pointing different ways: the test is unstable there, look into it). Never write "confirmed" or "not confirmed"
   (the founder's order of 11 October: nobody outside approved these results); every three-run table says "Run and
@@ -110,11 +111,29 @@ the founder overrides one in the conversation.
   report and export, and `--check` (run by `verify.py`) fails any push where a file lacks it. Engine files locked by a
   fingerprint take the new header only with the next engine version.
 
+## Orders of 13 October
+
+- No "better" and no "worse" anywhere: who sets the aim differs from one system to the next. A reading says which way a
+  number went against native, **lower** or **higher**; where a tool must score (the index, the benefit sheet, the wiring
+  page) it says **toward** or **away from** the gauge's declared aim (lower for an amount waited, spent or held, higher for
+  work done), and the reader judges (`tools/readings.py`). Old records stay as recorded, in `docs/history` and the
+  repository's history.
+- Every muscle runs from 1 up to one click under its own capacity, read live from the system, never a number written in
+  code: never below 1 (a pool's machines never below 2), no ceiling where the system can keep adding, and back down again;
+  guardrailed so no muscle overworks and hurts the organism, and the organism never hurts a muscle. Where the brain's own
+  math shares the machine, it counts in the body's load.
+- Omni's brain works for the organism, never for Omni: it decides what to push and pull so the whole system is the best it
+  can be, collectively, one body.
+- Never decide a benchmark's settings ourselves: the written ones stand (the Azure burst steps are `1 3 1 4 1 3`, 5
+  October). When a result comes in negative, find the cause and fix it at once, unasked; a test machine's limit is never
+  reported as Omni's result.
+
 ## Orders of 10 October (afternoon)
 
 - The reflex rule is the whole mechanism: a trial runs to its full measurement and is never ended by the calm it causes;
   the brain never forces, it reacts to what the system shows; one body, one brain, the body's cost judged, nothing anywhere
-  made worse to make one thing better; one trial at a time inside a body; nothing permanent; the wall belongs to the body.
+  pushed away from its aim to move one thing toward its own; one trial at a time inside a body; nothing permanent; the wall
+  belongs to the body.
   Written into the engine as **Omni v4** (`docs/OMNI_V4_PLAN.md`), every wire forced through it, every result rerun.
 - Everything is wired. Staying native is the brain's live decision every second, never a verdict from one run.
 - **Six organisms**, never five: the four realms, all realms stacked (1,716), the whole catalog once (945). The live

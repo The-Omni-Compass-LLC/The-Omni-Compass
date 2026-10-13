@@ -12,7 +12,7 @@ Sources:
 - 1,000 runs at 1,000 clusters is not run: about 6,000 machine-hours, beyond the machines available.
 - 100 runs at 1,000 clusters is not run yet: about 650 runner-hours (one run of the four stacked at 1,000 copies takes 2 to 3 hours).
 
-## Work per energy, with Omni-Compass on top against native (higher is better)
+## Work per energy, with Omni-Compass on top against native (the aim is higher)
 
 | Organism (muscles) | 1x, 1 run | 1x, 10 runs | 1x, 100 runs | 1x, 1000 runs | 10x, 1 run | 10x, 10 runs | 10x, 100 runs | 10x, 1000 runs | 100x, 1 run | 100x, 10 runs | 100x, 100 runs | 100x, 1000 runs | 1000x, 1 run | 1000x, 10 runs | 1000x, 100 runs | 1000x, 1000 runs |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -23,7 +23,7 @@ Sources:
 | The four stacked, duplicates kept (1716) | +0.401% | +0.393% | +0.368% | +0.354% | +0.375% | +0.366% | +0.361% | +0.362% | +0.368% | +0.364% | +0.364% | to run | +0.360% | +0.364% | not run yet | not run |
 | The whole tower, every muscle once (945) | +0.318% | +0.387% | +0.365% | +0.367% | +0.356% | +0.348% | +0.359% | +0.357% | +0.357% | +0.357% | +0.363% | to run | +0.359% | +0.364% | not run yet | not run |
 
-## Energy, with Omni-Compass on top against native (lower is better)
+## Energy, with Omni-Compass on top against native (the aim is lower)
 
 | Organism (muscles) | 1x, 1 run | 1x, 10 runs | 1x, 100 runs | 1x, 1000 runs | 10x, 1 run | 10x, 10 runs | 10x, 100 runs | 10x, 1000 runs | 100x, 1 run | 100x, 10 runs | 100x, 100 runs | 100x, 1000 runs | 1000x, 1 run | 1000x, 10 runs | 1000x, 100 runs | 1000x, 1000 runs |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -34,7 +34,7 @@ Sources:
 | The four stacked, duplicates kept (1716) | -0.399% | -0.391% | -0.366% | -0.353% | -0.373% | -0.364% | -0.360% | -0.361% | -0.367% | -0.363% | -0.363% | to run | -0.359% | -0.363% | not run yet | not run |
 | The whole tower, every muscle once (945) | -0.317% | -0.388% | -0.363% | -0.366% | -0.354% | -0.347% | -0.357% | -0.356% | -0.355% | -0.356% | -0.362% | to run | -0.358% | -0.363% | not run yet | not run |
 
-## Time over the service line, with Omni-Compass on top minus native (percentage points) (lower is better; band first holds where it is at or under 0)
+## Time over the service line, with Omni-Compass on top minus native (percentage points) (the aim is lower; band first holds where it is at or under 0)
 
 | Organism (muscles) | 1x, 1 run | 1x, 10 runs | 1x, 100 runs | 1x, 1000 runs | 10x, 1 run | 10x, 10 runs | 10x, 100 runs | 10x, 1000 runs | 100x, 1 run | 100x, 10 runs | 100x, 100 runs | 100x, 1000 runs | 1000x, 1 run | 1000x, 10 runs | 1000x, 100 runs | 1000x, 1000 runs |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|

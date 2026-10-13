@@ -81,11 +81,11 @@ def main():
     reps = [{"native": {"ops": 2900.0, "cache_mb_mean": 512.0, "failed": 0}, "omni": {"ops": 2950.0, "cache_mb_mean": 900.0, "failed": 0}},
             {"native": {"ops": 2910.0, "cache_mb_mean": 512.0, "failed": 0}, "omni": {"ops": 2955.0, "cache_mb_mean": 880.0, "failed": 0}},
             {"native": {"ops": 2890.0, "cache_mb_mean": 512.0, "failed": 0}, "omni": {"ops": 2945.0, "cache_mb_mean": 920.0, "failed": 0}}]
-    assert Y.paired(reps, "ops", "higher")["reading"] == "better"
-    assert Y.paired(reps, "cache_mb_mean", "lower")["reading"] == "**WORSE**", "more cache held reads WORSE"
+    assert Y.paired(reps, "ops", "higher")["reading"] == "higher"
+    assert Y.paired(reps, "cache_mb_mean", "lower")["reading"] == "higher", "more cache held reads higher"
     assert Y.paired(reps, "failed", "never more")["reading"] == "same"
     reps[1]["omni"]["failed"] = 1
-    assert Y.paired(reps, "failed", "never more")["reading"] == "**WORSE**"
+    assert Y.paired(reps, "failed", "never more")["reading"] == "**higher in a repetition**"
     assert Y.COVER_MB == (256, 2048) and Y.NATIVE_MB == 512 and lo <= Y.NATIVE_MB <= hi and len(Y.YCSB_SHA256) == 64
     print("PASS  YCSB runner: slow reads with the cache full and missing grow the cache by notches, calm with misses under 1% of requests gives one back after the dwell, the wall adds a quarter "
           "of the cover, the cover holds; the plug snapshots, reads back, stops for another writer and restores; the server's own reading; YCSB's records parsed; the paired reading")

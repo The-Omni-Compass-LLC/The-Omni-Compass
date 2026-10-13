@@ -101,16 +101,16 @@ every organism passed. ∎
 energy, and Omni_s − native_s (percentage points) for the share of decisions over the line. Over n seeds, the 95%
 interval is mean ± t_{0.975, n−1} · sd / √n. A gain or a loss is a row whose interval is clear of zero; otherwise the
 row reads no difference beyond the noise. Across runs A, B and C: the same sign in all three with every interval clear
-of zero reads "better (or worse) in all three of our runs"; an interval across zero reads "no difference beyond the
+of zero reads "lower (or higher) in all three of our runs"; an interval across zero reads "no difference beyond the
 noise"; clear intervals of opposite signs read "the runs disagree" (`tools/readings.py`, `tools/confirm_abc.py`).
 
 ## 3. What the runs measure (classes S, L, P)
 
 - **S, the muscles alone, 1,107 muscles, preregistered seeds 3000-3009, both loads** (`results/realms_v5/`, commit
-  `eea291501848`, digest `5648f2902f1fae68`, every muscle its own card, section 5): 527 better, 421 at their limit on
-  native (V3: the max writes nothing), 159 no difference beyond the noise, **0 worse, 0 mixed**.
-- **S, inside the organisms, the same seeds, three loads**: every organism better as a whole under every load, and
-  **0 plants worse** in every organism under every load (0 of the 1,908 in the four stacked). Misses (the share of
+  `eea291501848`, digest `5648f2902f1fae68`, every muscle its own card, section 5): 527 toward their aims, 421 at their limit on
+  native (V3: the max writes nothing), 159 no difference beyond the noise, **0 away from their aims, 0 mixed**.
+- **S, inside the organisms, the same seeds, three loads**: every organism with fewer misses as a whole under every load, and
+  **0 plants with less work or more misses** in every organism under every load (0 of the 1,908 in the four stacked). Misses (the share of
   plant decisions over their line) fall 1.9% to 7.5% under each organism's own load, 1.4% to 7.2% under the climb (the
   load stepping 1 2 3 2 3 4 ... to twice its own) and 1.1% to 8.3% with work waiting in line, against 1.6% to 6.4%,
   0.9% to 3.5% and 1.0% to 7.2% with one global setting for every muscle (digest `9be48445`, the same seeds), and the
@@ -119,10 +119,10 @@ noise"; clear intervals of opposite signs read "the runs disagree" (`tools/readi
 - **L, real software**: `docs/THE_RECEIPTS.md`, receipt by receipt.
 - **P, a physical meter on a real chip**: not yet produced on the current governor (`docs/THE_SEAT.md`, section 5).
 
-## 4. The living body: why plants did worse, and the version that cures them (the engine since 12 October, night)
+## 4. The living body: why plants moved away from its aim, and the version that cures them (the engine since 12 October, night)
 
 Found on development seeds only (7100-7299), never on the preregistered ones. Under the climb, rooms and UPS lines
-reach their limits in both arms; a plant did worse when the Omni arm reached a limit a moment sooner, or when a sense
+reach their limits in both arms; a plant moved away from its aim when the Omni arm reached a limit a moment sooner, or when a sense
 the brain read was wrong. Each cause, and the property of the code that removes it:
 
 1. **A room snapped back.** A room cooled ahead of the heat, then returned at once to its operator's setpoint when the
@@ -163,21 +163,21 @@ work not caught up by the end of a run (work first).
 
 Measured on development seeds 7100-7199, the four realms under the climb, 400 organism runs each way:
 
-| | Plants worse | Misses (pp), the four realms | Work, the four realms |
+| | Plants with less work or more misses | Misses (pp), the four realms | Work, the four realms |
 |---|---:|---|---|
 | the engine before (omni-v5, 8d4f91f0) | 19 | −0.109, −0.125, −0.005, −0.144 | +0.0013%, +0.0016%, +0.0000%, +0.0022% |
 | V6-V10 only | 7 | −0.104, −0.110, −0.005, −0.137 | kept |
 | **this version (V6-V13)** | **0** | **−0.206, −0.187, −0.143, −0.212** | +0.0008%, +0.0010%, +0.0000%, +0.0016% |
 
 The misses fall about twice as far as before (in the Energy / Facility / Industrial body, from almost nothing to 0.14
-points), and no plant in any of the 400 runs did worse than native. The work gained is about two thirds of the version
+points), and no plant in any of the 400 runs did behind native. The work gained is about two thirds of the version
 before: the heat debt hands back machines while a room that cannot cure itself is warmer than native's.
 
 One lock is left, said plainly: a line that once jumped (a battery that stopped covering its site) is read as able to
 jump that far again for the rest of the run, which keeps the max from adding machines on that line. Removing it (every
 line's climb read on the site's whole draw) roughly triples the misses removed on the same seeds (−0.34 points), but in
 36 of the 400 runs a machine pool whose queue sat at its limit then did more work and took one decision longer to clear
-it, which our decision count reads as worse. That is the next version's work, and it enters the engine only as a new
+it, which our decision count reads as away from its aim. That is the next version's work, and it enters the engine only as a new
 version, every result run again on it, the founder told first.
 
 ## 5. Every muscle its own card (the engine since 13 October)
@@ -198,7 +198,7 @@ own load and with work waiting in line; θ_0 is always among the candidates. Poo
 {10, 20, 40, 60}; batteries wired by their power: z ∈ {0, 0.5, 1, 2, 3.09} × hold window ∈ {3, 5, 10, 20} × hold margin
 ∈ {0, 0.02, 0.05, 0.10}; other batteries: z ∈ {0, 0.25, ..., 4}; axes: heat head × strain. A candidate is kept if it
 beats θ_0 beyond the noise on those seeds (fewer misses, more work or faster: a 95% interval of the paired difference clear
-of zero), is worse than θ_0 nowhere, and is never worse than native: on no seed and under no load over its line
+of zero), moved away from its aim than θ_0 nowhere, and is never behind native: on no seed and under no load over its line
 more often than native, doing less work or clearing its line later (the engine's own no-harm tests, seed by seed); among
 those, the fewest misses, then the most work, the fastest, the least energy. It is then run again against θ_0 on seeds 7200-7209 and enters the engine only
 if it wins there too: a card must win twice. The preregistered seeds 3000-3009 are never read by the search.
@@ -206,11 +206,11 @@ if it wins there too: a card must win twice. The preregistered seeds 3000-3009 a
 **V14 (the body has the last word on a line it shares).** Inside a body, a battery wired by its power keeps the body's
 margins on its line: its z and its hold margin are never slimmer than θ_0's; its own window stays. A card is chosen for
 the muscle alone, and a battery's line inside a body carries the whole body's swing, which the battery alone never saw:
-the one plant worse than native that the cards produced in development (a rack's power allocation, one extra decision
+the one plant behind native that the cards produced in development (a rack's power allocation, one extra decision
 over its line in the whole tower with work waiting, one seed of ten) was exactly that case, and V14 removes it.
 
 What the search found: 409 of the 550 searched muscles beat θ_0 on the first seeds; 364 won again on the second (45 fell
-back to the global setting, none worse); the engine's cards are those 364 (`realms/muscle_cards_v5.csv`: 333 machine
+back to the global setting, none away from its aim); the engine's cards are those 364 (`realms/muscle_cards_v5.csv`: 333 machine
 pools, 31 batteries). No axis setting beat the global one. A first set of cards was chosen by the mean over the seeds
 alone (371 cards); the engine's own no-harm test then caught one of them (an electrolyzer battery, one decision over its
 line on one seed), and the rule became the seed-by-seed one above. The cards are the ones it chose. A room alone and a process loop alone have nothing for a card
@@ -218,11 +218,11 @@ to fix (native almost never misses there), and the 421 knobs native already runs
 to give: their help comes from the body. Every card is printed in plain words in the muscle catalog
 (`docs/MUSCLE_CATALOG.md`).
 
-Inside the six organisms, on both development sets (360 organism runs, every plant against native): 0 plants worse, and
+Inside the six organisms, on both development sets (360 organism runs, every plant against native): 0 plants with less work or more misses, and
 the misses removed against native 1.7 times the global setting's over the three loads (1.2 times under each organism's
 own load, about 1.9 under the climb, 1.7 to 1.8 with work waiting in line):
 
-| Seeds | Own load: global → cards | The climb: global → cards | Work in line: global → cards | Plants worse |
+| Seeds | Own load: global → cards | The climb: global → cards | Work in line: global → cards | Plants with less work or more misses |
 |---|---|---|---|---:|
 | 7100-7109 (the cards chosen here) | 0.078 → 0.094 points | 0.153 → 0.293 points | 0.088 → 0.161 points | 0 |
 | 7200-7209 (the cards confirmed here) | 0.074 → 0.087 points | 0.145 → 0.282 points | 0.086 → 0.149 points | 0 |
@@ -234,7 +234,7 @@ is section 3.
 ## 6. Limits, stated plainly
 
 - A card is chosen for its muscle alone. Inside a body the bone shares the lines and V14 keeps a battery wired by its
-  power to the body's margins; the organisms were checked with every card on both development sets (0 plants worse)
+  power to the body's margins; the organisms were checked with every card on both development sets (0 plants with less work or more misses)
   and on the preregistered seeds (section 3), but a card is not tuned for the body it sits in.
 - Many machine pools chose the most aggressive edge the search offered (256 of 333 cards at 0.70): their own limit may
   lie further out. Searching further is the next version's work, a new version with every result run again.

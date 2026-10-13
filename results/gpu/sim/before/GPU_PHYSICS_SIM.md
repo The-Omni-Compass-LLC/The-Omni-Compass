@@ -26,7 +26,7 @@ Governor settings: headroom 0.3, min_share 0.0, util_gate 0.0, util_band 0.1, in
 | power-limit writes | 0 | 42.3 | n/a | +38.71 to +45.89 |
 
 Guardrail (preregistered): 95th-percentile response time not above +10%: FAILED (upper bound +36.6%).
-**Model verdict: better on energy, fails the service guardrail.**
+**Model verdict: more requests per kJ, fails the service guardrail.**
 
 ### Card model gamma 1.5 (near its voltage floor)
 
@@ -47,7 +47,7 @@ Guardrail (preregistered): 95th-percentile response time not above +10%: FAILED 
 | power-limit writes | 0 | 41.4 | n/a | +36.36 to +46.44 |
 
 Guardrail (preregistered): 95th-percentile response time not above +10%: FAILED (upper bound +85.3%).
-**Model verdict: better on energy, fails the service guardrail.**
+**Model verdict: more requests per kJ, fails the service guardrail.**
 
 ---
 

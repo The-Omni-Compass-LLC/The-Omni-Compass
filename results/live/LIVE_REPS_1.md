@@ -15,7 +15,7 @@ Node rows are valid. Kept here unedited as the record.
 | response time (ms), mean | 208 | 262.4 | +26.2% | -46.67 to +155.5 | no |
 | response time (ms), 95th percentile | 387.2 | 487.5 | +25.9% | -40.58 to +241 | no |
 | response time (ms), 99th percentile | 501.1 | 581.2 | +16.0% | -133.7 to +293.9 | no |
-| failed requests (%) | 0 | 66.49 | +0.0% | +18.09 to +114.9 | yes, worse |
+| failed requests (%) | 0 | 66.49 | +0.0% | +18.09 to +114.9 | yes, higher |
 | pending pods, pod-minutes | 0.3333 | 0.5933 | +78.0% | -0.5461 to +1.066 | no |
 | utilisation (used / allocatable) | 0.07224 | 0.08547 | +18.3% | -0.0137 to +0.04015 | no |
 

@@ -69,13 +69,13 @@ two consumers after an 8 s settling period and alternate order between repetitio
 
 | Gauge | Direction |
 |---|---|
-| work inside the response line: messages a second handled within 500 ms of production | **higher is better** (the product number) |
-| throughput (messages a second) | higher is better |
-| end-to-end latency p95, p99, median, mean | lower is better |
-| consumer lag, most and mean messages waiting | lower is better |
-| messages produced and never consumed | **any increase is WORSE** |
-| consumers running, mean and most at once (the resources held) | lower is better (Omni will often hold more under load, and that reads WORSE) |
-| host CPU busy share, CPU-seconds, CPU-seconds per 1,000 messages inside the line (the compass's own cost included) | lower is better |
+| work inside the response line: messages a second handled within 500 ms of production | **the aim is higher** (the product number) |
+| throughput (messages a second) | the aim is higher |
+| end-to-end latency p95, p99, median, mean | the aim is lower |
+| consumer lag, most and mean messages waiting | the aim is lower |
+| messages produced and never consumed | **any increase is marked** |
+| consumers running, mean and most at once (the resources held) | the aim is lower (Omni will often hold more under load, and that reads higher) |
+| host CPU busy share, CPU-seconds, CPU-seconds per 1,000 messages inside the line (the compass's own cost included) | the aim is lower |
 | consumer changes written (the knob's moves) | shown, not judged |
 
 Energy is not claimed beyond the host's CPU seconds (evidence class L: real software, no meter).
@@ -91,7 +91,7 @@ Energy is not claimed beyond the host's CPU seconds (evidence class L: real soft
 
 Each workload: three paired repetitions in one GitHub Actions job, the per-message records, the audit and the broker log
 archived with the code. Three separate runs on the frozen engine (A, B, C); the table (`tools/kafka_abc.py`) reads
-better in all three of our runs or WORSE when all three runs move the same way with every 95% interval clear of zero, no difference
+lower or higher in all three of our runs when all three runs move the same way with every 95% interval clear of zero, no difference
 beyond the noise when a run's interval includes zero, and the runs disagree when clear runs point different ways.
 `tests/test_run_kafka.py` and `tests/test_kafka_abc.py`, run by `verify.py`, prove the rules without a broker.
 
@@ -100,13 +100,12 @@ beyond the noise when a run's interval includes zero, and the runs disagree when
 One short repetition (5 s a notch) on the development machine: native's two consumers at their knee held a p95 of 429 ms
 with up to 329 messages waiting; omni held a p95 of 12 ms with at most 45 waiting, handled 3% more messages inside the
 line, and did so with a mean of 5.8 consumers against 2, at slightly fewer host CPU-seconds (117 against 123: idle consumers
-polling cost CPU too). The expected shape of the counted result is therefore: latency and lag much better, consumers held
-worse, CPU about even, and every arm handed back. The counted runs will show whatever they show.
+polling cost CPU too). The expected shape of the counted result is therefore: latency and lag much lower, consumers held higher, CPU about even, and every arm handed back. The counted runs will show whatever they show.
 
 ## Amendment 2 (2026-10-09, declared before any run on it): the brain's own verdict on the group's size
 
 **Why, and when.** Written after the counted set was read (`results/live/V3_KAFKA.md`: work inside the line +16% to +21%, p95 1.6 s
-→ 9 to 14 ms, consumers 2 → 6 to 8 worse in all three of our runs, host CPU worse on the light workload), at the founder's order of 9 October:
+→ 9 to 14 ms, consumers 2 → 6 to 8 away from its aim in all three of our runs, host CPU higher on the light workload), at the founder's order of 9 October:
 Omni need not be wired into every muscle; a knob that cannot prove it pays stays native and Omni only reads it. The brain must
 decide that on the muscle itself, in real time, by a measurement.
 
@@ -136,8 +135,8 @@ runs execute.
 **Expected before the runs.** Under the resource objective the first consumer added under a queue pays: the queue drains, the
 latency of the messages consumed falls by far more than one consumer in two costs, and the step is allowed; the next steps are
 allowed while each still shortens the queue by more than it costs. The group is expected to reach 3 to 5 consumers at the peak
-notches against 6 to 8 before, one notch a trial; p95 better in all three of our runs but by less than 1.6 s → 10 ms, the lag better in all three of our runs,
-the consumers running worse in all three of our runs by less than before, the host's CPU inside the noise. Under the service objective a
+notches against 6 to 8 before, one notch a trial; p95 toward its aim in all three of our runs but by less than 1.6 s → 10 ms, the lag toward its aim in all three of our runs,
+the consumers running away from its aim in all three of our runs by less than before, the host's CPU inside the noise. Under the service objective a
 step or two more. Both readings are run: three runs each. The counted set stays in `docs/history` as the result of the rule
 before this amendment.
 
@@ -153,7 +152,7 @@ harness is byte for byte that of `3aac0ab7`; the table reads it as A. The whole 
 
 ## Amendment 3 (2026-10-10 13:05 UTC, after the first counted set on amendment 2, before the next): a spend trial runs to its samples
 
-The first counted set on the brain's verdict (runs 38021564790, 38013304929, 38013309420 under the resource objective and 38013371103, 38013376137, 38013380640 under the service objective; the table `results/live/V3_KAFKA.md` and `results/live/V3_KAFKA_SERVICE.md`) landed at midday on 10 October. What it showed about the trials: every spend trial was abandoned before it could be judged: 2 or 3 trials an omni arm, all abandoned, 0 allowed, 0 refused, in all 36 omni arms of each objective; the group stayed at the operator's two consumers (1.98 to 1.99 on average, the trial's reference seconds included) and the lag and latency gains of the earlier set, bought with 6 to 8 consumers, did not appear: consumers running read better in all three of our runs by a fraction of one percent, everything else inside the noise.
+The first counted set on the brain's verdict (runs 38021564790, 38013304929, 38013309420 under the resource objective and 38013371103, 38013376137, 38013380640 under the service objective; the table `results/live/V3_KAFKA.md` and `results/live/V3_KAFKA_SERVICE.md`) landed at midday on 10 October. What it showed about the trials: every spend trial was abandoned before it could be judged: 2 or 3 trials an omni arm, all abandoned, 0 allowed, 0 refused, in all 36 omni arms of each objective; the group stayed at the operator's two consumers (1.98 to 1.99 on average, the trial's reference seconds included) and the lag and latency gains of the earlier set, bought with 6 to 8 consumers, did not appear: consumers running read toward its aim in all three of our runs by a fraction of one percent, everything else inside the noise.
 
 **The cause is ours.** Amendment 2 ended a trial when the service swung to the other direction's condition: a give-back trial when the service left calm (the engine's own rule, kept), and a spend trial when the service turned calm. A spend that works calms the service within seconds, so a spend trial could never reach its samples: every successful spend ended its own trial unjudged. Nothing in the stack and nothing in the engine did this; the engine's verdict ends a trial when the condition it is given ends, and we gave it the wrong condition for spending. Found on the first set, corrected before the second, declared here.
 

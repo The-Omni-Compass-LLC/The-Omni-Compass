@@ -41,14 +41,14 @@ declared standby power, which needs a node autoscaler that really removes the ma
 
 | Gauge | native | omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
-| worker nodes in service, mean | 6 | 5.887 | -1.9% | -0.164 to -0.06174 | yes, better |
-| node-hours | 1.518 | 1.491 | -1.8% | -0.0396 to -0.0144 | yes, better |
+| worker nodes in service, mean | 6 | 5.887 | -1.9% | -0.164 to -0.06174 | yes, lower |
+| node-hours | 1.518 | 1.491 | -1.8% | -0.0396 to -0.0144 | yes, lower |
 | energy, parked workers still on at idle power (Wh, declared model) | 159.3 | 159.1 | -0.1% | -0.6873 to +0.2697 | no |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 159.3 | 157 | -1.5% | -3.394 to -1.323 | yes, better |
-| response time (ms), mean | 143.8 | 76.55 | -46.8% | -92.07 to -42.51 | yes, better |
-| response time (ms), 95th percentile | 326.3 | 116.9 | -64.2% | -281.8 to -137 | yes, better |
-| response time (ms), 99th percentile | 516.7 | 168.5 | -67.4% | -464.4 to -232.1 | yes, better |
-| time over the response line (% of samples) | 1.915 | 0.01212 | -99.4% | -3.046 to -0.7601 | yes, better |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 159.3 | 157 | -1.5% | -3.394 to -1.323 | yes, lower |
+| response time (ms), mean | 143.8 | 76.55 | -46.8% | -92.07 to -42.51 | yes, lower |
+| response time (ms), 95th percentile | 326.3 | 116.9 | -64.2% | -281.8 to -137 | yes, lower |
+| response time (ms), 99th percentile | 516.7 | 168.5 | -67.4% | -464.4 to -232.1 | yes, lower |
+| time over the response line (% of samples) | 1.915 | 0.01212 | -99.4% | -3.046 to -0.7601 | yes, lower |
 | failed requests (%) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
 | pods with no machine to take them (unschedulable) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
 | time pods had no machine to take them, pod-minutes | 0 | 0 | +0 (native is 0) | +0 to +0 | no |

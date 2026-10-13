@@ -10,7 +10,7 @@ Kubernetes set stays as it is; this is a new set beside them.
 
 When the service's resource requests are set the way operators set them with Goldilocks (Fairwinds; Apache-2.0), from the
 recommendation of the Vertical Pod Autoscaler's own recommender (Kubernetes SIG Autoscaling; Apache-2.0), does
-Omni-Compass on top still make the service faster, use fewer machines or less energy, without making anything worse?
+Omni-Compass on top still make the service faster, use fewer machines or less energy, without moving anything away from its aim?
 
 ## What Goldilocks is, and so what native is
 
@@ -73,7 +73,7 @@ operator's settings) is invalid, kept in the raw files and not counted.
 - A gauge whose 95% interval of the paired difference is clear of zero is a difference in this run; one whose interval
   includes zero is no difference beyond the noise, and that is the result.
 - One run (A) is a first reading. A reading the same in all three of our runs needs runs B and C on the same commit
-  (`tools/confirm_abc.py`): better or worse in all three of our runs, no difference beyond the noise, or the runs disagree.
+  (`tools/confirm_abc.py`): lower or higher in all three of our runs, no difference beyond the noise, or the runs disagree.
 - Response times are class L (measured on live software). Machines in service are counted live; the watts are the
   declared model (class S), as in every kind set.
 

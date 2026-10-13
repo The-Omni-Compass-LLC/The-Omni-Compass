@@ -111,8 +111,8 @@ placement, the learned GPU power cap and NVIDIA's platform power budget. A model
 
 What is shown, and by which kind of evidence, is set out receipt by receipt in `docs/THE_RECEIPTS.md`. In one line:
 on real software (class L), Omni-Compass on top of native has given faster service and more work inside the response
-line on the same machines, and memory back on databases at the same service, with no row worse in all three runs on the
-real stacks; on our own models (class S) no muscle alone is worse than native.
+line on the same machines, and memory back on databases at the same service, with no row away from its aim in all three runs on the
+real stacks; on our own models (class S) no muscle alone is behind native.
 
 **The decisive receipt still to be produced is a physical one (class P): the chip's own energy meter on a real GPU,
 native against Omni-Compass on top, on the same clock and with the same membership as the Kubernetes runs.** Every

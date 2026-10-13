@@ -17,7 +17,7 @@ and not the "10% used" that kind's per-worker accounting shows.
 
 The lever stays in the controller as the operator's to grant (off by default, `--replica-ceiling 0`), because on a
 cluster whose machines do have room the cap can bind; it is not used in any setting reported as Omni-Compass's
-default, and by the one rule this setting is not labelled better.
+default, and by the one rule this setting is not labelled toward its aims.
 
 ## Capacity
 
@@ -31,14 +31,14 @@ default, and by the one rule this setting is not labelled better.
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
-| worker nodes in service, mean | 6 | 5.863 | -2.3% | -0.2597 to -0.01329 | yes, better |
-| node-hours | 2.683 | 2.621 | -2.3% | -0.113 to -0.0115 | yes, better |
+| worker nodes in service, mean | 6 | 5.863 | -2.3% | -0.2597 to -0.01329 | yes, lower |
+| node-hours | 2.683 | 2.621 | -2.3% | -0.113 to -0.0115 | yes, lower |
 | energy, parked workers still on at idle power (Wh, declared model) | 306.7 | 305.7 | -0.3% | -2.096 to +0.06092 | no |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 306.7 | 301.1 | -1.8% | -9.33 to -1.867 | yes, better |
-| response time (ms), mean | 334.4 | 209.7 | -37.3% | -155.6 to -93.73 | yes, better |
-| response time (ms), 95th percentile | 890.3 | 445.1 | -50.0% | -517.3 to -373.1 | yes, better |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 306.7 | 301.1 | -1.8% | -9.33 to -1.867 | yes, lower |
+| response time (ms), mean | 334.4 | 209.7 | -37.3% | -155.6 to -93.73 | yes, lower |
+| response time (ms), 95th percentile | 890.3 | 445.1 | -50.0% | -517.3 to -373.1 | yes, lower |
 | response time (ms), 99th percentile | 3305 | 3408 | +3.1% | -995 to +1202 | no |
-| time over the response line (% of samples) | 19.64 | 10.86 | -44.7% | -9.975 to -7.577 | yes, better |
+| time over the response line (% of samples) | 19.64 | 10.86 | -44.7% | -9.975 to -7.577 | yes, lower |
 | failed requests (%) | 6.893 | 6.613 | -4.1% | -0.5916 to +0.03216 | no |
 | pending pods, pod-minutes | 0.3533 | 1.597 | +351.9% | -0.2235 to +2.71 | no |
 | utilisation (used / allocatable) | 0.1003 | 0.1003 | -0.0% | -0.001908 to +0.001852 | no |
@@ -46,10 +46,10 @@ default, and by the one rule this setting is not labelled better.
 | Omni's own CPU (cores), mean | 0 | 0.01391 | +0.0139 (native is 0) | +0.0122 to +0.01562 | yes, more |
 | CPU used with Omni's own (cores), mean | 2.408 | 2.365 | -1.8% | -0.05498 to -0.0296 | yes, less |
 | energy per core-hour (Wh, the 25 W standby model) | 289.3 | 291.2 | +0.6% | -2.034 to +5.732 | no |
-| HPA replicas, mean | 9.243 | 16.49 | +78.4% | +4.263 to +10.23 | yes, worse |
-| pods started | 4.6 | 26.2 | +469.6% | +20.2 to +23 | yes, worse |
-| pod start wait, total (s) | 14.8 | 105.4 | +612.2% | +79.51 to +101.7 | yes, worse |
-| pod start wait, mean (s) | 2.955 | 4.017 | +35.9% | +0.1717 to +1.952 | yes, worse |
+| HPA replicas, mean | 9.243 | 16.49 | +78.4% | +4.263 to +10.23 | yes, higher |
+| pods started | 4.6 | 26.2 | +469.6% | +20.2 to +23 | yes, higher |
+| pod start wait, total (s) | 14.8 | 105.4 | +612.2% | +79.51 to +101.7 | yes, higher |
+| pod start wait, mean (s) | 2.955 | 4.017 | +35.9% | +0.1717 to +1.952 | yes, higher |
 | host CPU busy, the real machine under kind (%) | 69.36 | 68.7 | -0.9% | -1.179 to -0.1367 | yes, less |
 | host cores (the real machine under kind) | 4 | 4 | +0.0% | +0 to +0 | no |
 

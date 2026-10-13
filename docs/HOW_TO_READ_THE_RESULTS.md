@@ -17,8 +17,8 @@ follow it. Read the five ideas first, then go to the table you have in front of 
    ran this again and again, the true answer would land inside that range 95 times out of 100.
    - If the whole range is on one side of zero, the difference is **proven** (the table says "yes" or "significant").
    - If the range crosses zero, the difference is **not proven**: it could be noise.
-4. **Better is not always "up".** For energy, response time, failures, machines and time over the line, **lower is
-   better**, so a minus sign is good. For work per energy and work done, **higher is better**, so a plus sign is good.
+4. **The aim is not always "up".** For energy, response time, failures, machines and time over the line, **the aim
+   is lower**, so a minus sign is good. For work per energy and work done, **the aim is higher**, so a plus sign is good.
    Every table says which.
 5. **Evidence class.** Every result is marked with how it was measured:
    - **T**: a theorem;
@@ -31,7 +31,7 @@ follow it. Read the five ideas first, then go to the table you have in front of 
 
 ## The words in the tables
 
-| Word | What it means | Better is |
+| Word | What it means | Its aim |
 |---|---|---|
 | Work per energy | work done for each unit of energy (requests per kilojoule on a card) | higher |
 | Energy (J, Wh) | the energy used | lower |
@@ -55,8 +55,8 @@ One card, three arms, many repetitions:
 - **omni**: Omni-Compass on top, moving the card's clock ceiling and power limit.
 
 Read it in this order:
-1. **The verdict line** at the top, one of: *better, proven*; *worse, proven*; *not proven*; *better on energy, fails
-   the service guardrail*.
+1. **The verdict line** at the top, one of: *toward its aim, proven*; *away from its aim, proven*; *not proven*; *more requests per kJ,
+   fails the service guardrail*.
 2. **Work per energy** (requests per kilojoule): the headline. A plus sign with a range wholly above zero is a proven
    gain.
 3. **Requests served** must be equal in every arm. More energy saved by serving less work would be cheating; the bench
@@ -83,7 +83,7 @@ the start and at the end, which must be equal.
 
 Each set is 10 paired repetitions on a real Kubernetes cluster (kind): native Kubernetes (its HPA and scheduler)
 against the same Kubernetes with Omni-Compass on top. Read:
-1. **worker nodes in service** and **node-hours**: how many machines were kept busy. Minus is better.
+1. **worker nodes in service** and **node-hours**: how many machines were kept busy. Minus moved toward its aim.
 2. **response time p95 and p99**: minus is faster.
 3. **failed requests**: must be zero on both sides.
 4. **CPU used with Omni's own**: Omni-Compass's own cost included; "no" in the significant column means it costs
@@ -95,7 +95,7 @@ Energy on kind is a declared model, not a meter: kind keeps every machine powere
 ## The three-run tables (`results/live/V1_<TEST>.md`, `V3_<TEST>.md`)
 
 Every benchmark since the engine was frozen runs three separate times, A, B and C, on the same bytes, and the table
-shows all three beside each gauge. Read the last column first: **better** or **worse in all three of our runs** (the same sign
+shows all three beside each gauge. Read the last column first: **lower** or **higher in all three of our runs** (the same sign
 in all three, every interval clear of zero), **no difference beyond the noise** (an interval over zero in at least one
 run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "confirmed" or "not
 confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V1_` or `V3_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
@@ -109,11 +109,11 @@ carried. Then one section per **workload**: the tuning workload first, marked "s
 fitted on it, then the untouched workloads, which are the judged ones. Each section says what the workload is (value sizes,
 rates, steps) and what native's own capacity measured on that run, so the reader knows how hard native was pushed. The
 rows are the gauges with their direction in the name: the first row is always **work inside the response line**, the
-product number; then throughput, the latency percentiles, failures (any increase in any run is WORSE), **the resource
-held** (connections, consumers, the memory ceiling: lower is better, and Omni-Compass holds more of it wherever it bought
-a gain, so expect WORSE there), the host's CPU (the compass's own cost included), and the knob's moves (shown, not
+product number; then throughput, the latency percentiles, failures (any increase in any run is marked), **the resource
+held** (connections, consumers, the memory ceiling: the aim is lower, and Omni-Compass holds more of it wherever it bought
+a gain, so expect it higher there), the host's CPU (the compass's own cost included), and the knob's moves (shown, not
 judged). The last line of each section says whether every arm handed the knob back; the last line of the table counts the
-rows better, worse and disagreeing across the untouched workloads. The swarm table reads the same way with cells instead
+rows toward their aims, away from them and disagreeing across the untouched workloads. The swarm table reads the same way with cells instead
 of workloads, with collisions voiding a cell, and with a declared reproduction tolerance (one part in a thousand) because
 PyBullet does not reproduce to the bit across machines; its amendment says so.
 
@@ -136,7 +136,7 @@ pairing stands, the mark stays, and the remedy is a longer window for that size 
 
 ## The one number (`results/OMNI_INDEX.md`)
 
-Every measure is a ratio oriented so that above 1 is better for Omni-Compass on top of native: work, speed, machines,
+Every measure is a ratio oriented so that above 1 moved toward its aim for Omni-Compass on top of native: work, speed, machines,
 energy. A test's index is the geometric mean of its ratios, a category's of its tests, the headline of the real
 categories, each weighted the same. A measure enters only as its three-run reading allows; no difference beyond the
 noise enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
@@ -169,8 +169,8 @@ the rows behind a number, and read their Reading column, never the sign alone. T
 
 ## Wire in, or watch (`docs/WIRING_VERDICTS.md`)
 
-One of three words per knob, by one rule from the tables above. **Write**: a gauge better in all three of our runs
-and none worse in all three of our runs; Omni holds the knob. **Watch**: nothing better in all three of our runs; the knob stays native and Omni only
+One of three words per knob, by one rule from the tables above. **Write**: a gauge toward its aim in all three of our runs
+and none away from its aim in all three of our runs; Omni holds the knob. **Watch**: nothing toward its aim in all three of our runs; the knob stays native and Omni only
 reads it (one wire out, no wire in), and a loss in all three of our runs is named with its cause. **Operator's choice**: gains and losses both the same in all three of our runs, a trade, shown with both readings of the index. Rows marked "shown, not judged" never count. A modelled
 muscle takes its word from its label: superior is write, a tradeoff label is the operator's choice, the rest is watch. The
 CSV beside the page (`results/WIRING_VERDICTS.csv`) has one row per knob and per muscle.

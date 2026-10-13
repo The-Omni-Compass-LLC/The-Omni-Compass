@@ -151,8 +151,8 @@ def main():
     reps = [{"native": {"tps": 2900.0, "pool_mb_mean": 512.0, "failed": 0}, "omni": {"tps": 2950.0, "pool_mb_mean": 900.0, "failed": 0}},
             {"native": {"tps": 2910.0, "pool_mb_mean": 512.0, "failed": 0}, "omni": {"tps": 2955.0, "pool_mb_mean": 880.0, "failed": 0}},
             {"native": {"tps": 2890.0, "pool_mb_mean": 512.0, "failed": 0}, "omni": {"tps": 2945.0, "pool_mb_mean": 920.0, "failed": 0}}]
-    assert S.paired(reps, "tps", "higher")["reading"] == "better"
-    assert S.paired(reps, "pool_mb_mean", "lower")["reading"] == "**WORSE**", "more pool held reads WORSE"
+    assert S.paired(reps, "tps", "higher")["reading"] == "higher"
+    assert S.paired(reps, "pool_mb_mean", "lower")["reading"] == "higher", "more pool held reads higher"
     assert S.paired(reps, "failed", "never more")["reading"] == "same"
     assert S.COVER_MB == (128, 2048) and S.NATIVE_MB == 512 and lo <= S.NATIVE_MB <= hi and S.STEP_MB == S.CHUNK_MB == 128 and S.NATIVE_MB % S.CHUNK_MB == 0
     assert all(s_ >= 1 and r_ > 0 for _, s_, r_, _, _ in S.WORKLOADS.values()) and sum(1 for w in S.WORKLOADS.values() if w[4]) == 1, "one tuning workload"

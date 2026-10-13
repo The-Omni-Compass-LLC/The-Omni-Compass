@@ -35,22 +35,22 @@ their own CPU is 0 and the column equals their CPU used (0.9728, 0.9596, 0.9567)
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
-| worker nodes in service, mean | 6 | 4.131 | -31.2% | -2.343 to -1.395 | yes, better |
-| node-hours | 1.519 | 1.046 | -31.1% | -0.5923 to -0.3539 | yes, better |
-| energy, parked workers still on at idle power (Wh, declared model) | 160 | 159.5 | -0.3% | -0.9249 to -0.02437 | yes, better |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 160 | 124.1 | -22.5% | -44.7 to -27.22 | yes, better |
-| response time (ms), mean | 160.6 | 89.69 | -44.1% | -93.13 to -48.59 | yes, better |
-| response time (ms), 95th percentile | 360.9 | 149.4 | -58.6% | -275.1 to -147.9 | yes, better |
-| response time (ms), 99th percentile | 594.4 | 220.6 | -62.9% | -483.5 to -264.2 | yes, better |
+| worker nodes in service, mean | 6 | 4.131 | -31.2% | -2.343 to -1.395 | yes, lower |
+| node-hours | 1.519 | 1.046 | -31.1% | -0.5923 to -0.3539 | yes, lower |
+| energy, parked workers still on at idle power (Wh, declared model) | 160 | 159.5 | -0.3% | -0.9249 to -0.02437 | yes, lower |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 160 | 124.1 | -22.5% | -44.7 to -27.22 | yes, lower |
+| response time (ms), mean | 160.6 | 89.69 | -44.1% | -93.13 to -48.59 | yes, lower |
+| response time (ms), 95th percentile | 360.9 | 149.4 | -58.6% | -275.1 to -147.9 | yes, lower |
+| response time (ms), 99th percentile | 594.4 | 220.6 | -62.9% | -483.5 to -264.2 | yes, lower |
 | failed requests (%) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
 | pending pods, pod-minutes | 0.2617 | 0.185 | -29.3% | -0.4112 to +0.2579 | no |
 | utilisation (used / allocatable) | 0.04046 | 0.05391 | +33.3% | +0.008916 to +0.01799 | yes, more |
 | CPU used (cores), mean | 0.971 | 0.894 | -7.9% | -0.1053 to -0.04875 | yes, less |
 | Omni's own CPU (cores), mean | 0 | 0.01787 | +0.0179 (native is 0) | +0.01486 to +0.02088 | yes, more |
 | CPU used with Omni's own (cores), mean | 0.971 | 0.9118 | -6.1% | -0.08508 to -0.0332 | yes, less |
-| energy per core-hour (Wh, the 25 W standby model) | 708.9 | 580.3 | -18.2% | -211.9 to -45.44 | yes, better |
-| HPA replicas, mean | 8.521 | 6.484 | -23.9% | -3.069 to -1.003 | yes, better |
-| pods started | 4.7 | 2.5 | -46.8% | -3.142 to -1.258 | yes, better |
+| energy per core-hour (Wh, the 25 W standby model) | 708.9 | 580.3 | -18.2% | -211.9 to -45.44 | yes, lower |
+| HPA replicas, mean | 8.521 | 6.484 | -23.9% | -3.069 to -1.003 | yes, lower |
+| pods started | 4.7 | 2.5 | -46.8% | -3.142 to -1.258 | yes, lower |
 | pod start wait, total (s) | 13.1 | 8.4 | -35.9% | -12.84 to +3.442 | no |
 | pod start wait, mean (s) | 2.703 | 3.07 | +13.6% | -2.048 to +2.781 | no |
 
@@ -58,13 +58,13 @@ their own CPU is 0 and the column equals their CPU used (0.9728, 0.9596, 0.9567)
 
 | Gauge | Native | Omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
-| worker nodes in service, mean | 6 | 5.797 | -3.4% | -0.2802 to -0.1267 | yes, better |
-| node-hours | 1.519 | 1.469 | -3.3% | -0.06941 to -0.03032 | yes, better |
+| worker nodes in service, mean | 6 | 5.797 | -3.4% | -0.2802 to -0.1267 | yes, lower |
+| node-hours | 1.519 | 1.469 | -3.3% | -0.06941 to -0.03032 | yes, lower |
 | energy, parked workers still on at idle power (Wh, declared model) | 160 | 159.7 | -0.2% | -0.7275 to +0.1494 | no |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 160 | 155.9 | -2.6% | -5.595 to -2.713 | yes, better |
-| response time (ms), mean | 160.6 | 83.1 | -48.2% | -102.4 to -52.54 | yes, better |
-| response time (ms), 95th percentile | 360.9 | 123.5 | -65.8% | -305.9 to -168.8 | yes, better |
-| response time (ms), 99th percentile | 594.4 | 163.1 | -72.6% | -560.7 to -301.8 | yes, better |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 160 | 155.9 | -2.6% | -5.595 to -2.713 | yes, lower |
+| response time (ms), mean | 160.6 | 83.1 | -48.2% | -102.4 to -52.54 | yes, lower |
+| response time (ms), 95th percentile | 360.9 | 123.5 | -65.8% | -305.9 to -168.8 | yes, lower |
+| response time (ms), 99th percentile | 594.4 | 163.1 | -72.6% | -560.7 to -301.8 | yes, lower |
 | failed requests (%) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
 | pending pods, pod-minutes | 0.2617 | 0.235 | -10.2% | -0.2551 to +0.2018 | no |
 | utilisation (used / allocatable) | 0.04046 | 0.03978 | -1.7% | -0.002263 to +0.0009116 | no |
@@ -78,7 +78,7 @@ their own CPU is 0 and the column equals their CPU used (0.9728, 0.9596, 0.9567)
 | pod start wait, mean (s) | 2.703 | 2.278 | -15.7% | -1.33 to +0.4801 | no |
 
 Omni's own CPU is the controller's own cost, counted in the next row; it is the only row where native is 0 by
-construction. No measure in either Omni-Compass arm is significantly worse than native.
+construction. No measure in either Omni-Compass arm is significantly behind native.
 
 ---
 

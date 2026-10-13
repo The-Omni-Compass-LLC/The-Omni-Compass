@@ -15,7 +15,7 @@
 
 ## Quarantine from engineering proof
 - `math = reality`; simulation is not automatically deployment evidence.
-- blanket `20-70% better than existing methods`, `anything that exists`, `obsolete`, or billion-dollar technical conclusions unless a named matched benchmark supplies the evidence.
+- blanket `20-70% lower than existing methods`, `anything that exists`, `obsolete`, or billion-dollar technical conclusions unless a named matched benchmark supplies the evidence.
 - probability assignments for untested physics.
 - any implication that a diagram establishes control over healthcare, grids, vehicles, robotics, cloud, or other domains.
 - any statement that no external supervisor/fallback is permitted when a deployment safety case requires emergency stop, rollback, or independent shield. Safety mechanisms are not competing optimization authority.

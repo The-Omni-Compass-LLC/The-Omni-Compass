@@ -5,21 +5,21 @@
 Run: benchmark-reps 36351987055, commit 82d46a7. Five paired repetitions (native, me on top, me alone back to back on
 one runner, order rotated), 15 minutes each, kind with 1 control plane and 6 workers.
 
-A change is significant when its paired 95% interval excludes zero. Lower response time is better.
+A change is significant when its paired 95% interval excludes zero. Lower response time moved toward its aim.
 
 | Gauge | Native | Me on top | Me alone |
 |---|---:|---:|---:|
-| workers in service, mean | 6 | 3.87 (−35.5%, better, significant) | 6 (equal) |
-| node-hours | 1.516 | 0.980 (−35.3%, better, significant) | 1.519 (+0.2%, not significant) |
-| energy (Wh) | 159.2 | 121.9 (−23.4%, better, significant) | 162.5 (+2.1%, worse, significant) |
-| energy per unit of work (Wh per core-hour) | 683 | 413 (−39.5%, better, significant) | 520 (−24.0%, better, significant) |
-| work done (CPU used, cores) | 0.923 | 1.166 (+26.3%, better, significant) | 1.236 (+33.9%, better, significant) |
-| response time, mean (ms) | 153.9 | 110.6 (−28.2%, better, significant) | 94.2 (−38.8%, better, significant) |
-| response time, 95th percentile (ms) | 320.8 | 204.7 (−36.2%, better, significant) | 151.5 (−52.8%, better, significant) |
-| response time, 99th percentile (ms) | 475.4 | 293.3 (−38.3%, better, significant) | 185.5 (−61.0%, better, significant) |
+| workers in service, mean | 6 | 3.87 (−35.5%, lower, significant) | 6 (equal) |
+| node-hours | 1.516 | 0.980 (−35.3%, lower, significant) | 1.519 (+0.2%, not significant) |
+| energy (Wh) | 159.2 | 121.9 (−23.4%, lower, significant) | 162.5 (+2.1%, lower, significant) |
+| energy per unit of work (Wh per core-hour) | 683 | 413 (−39.5%, lower, significant) | 520 (−24.0%, lower, significant) |
+| work done (CPU used, cores) | 0.923 | 1.166 (+26.3%, higher, significant) | 1.236 (+33.9%, higher, significant) |
+| response time, mean (ms) | 153.9 | 110.6 (−28.2%, lower, significant) | 94.2 (−38.8%, lower, significant) |
+| response time, 95th percentile (ms) | 320.8 | 204.7 (−36.2%, lower, significant) | 151.5 (−52.8%, lower, significant) |
+| response time, 99th percentile (ms) | 475.4 | 293.3 (−38.3%, lower, significant) | 185.5 (−61.0%, lower, significant) |
 | failed requests (%) | 0 | 0 (equal) | 0 (equal) |
 | pods not yet running, pod-minutes | 0.16 | 0.94 (+488%, not significant) | 0.52 (+227%, not significant) |
-| replicas, mean | 8.94 | 9.22 (+3.1%, not significant) | 9.83 (+10.0%, worse, significant) |
+| replicas, mean | 8.94 | 9.22 (+3.1%, not significant) | 9.83 (+10.0%, higher, significant) |
 
 ## What the trail shows
 

@@ -16,7 +16,7 @@ except ImportError:
 from pathlib import Path
 import numpy as np
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from pilot.bench_report import gauges, latency, pod_starts, LOWER_BETTER
+from pilot.bench_report import gauges, latency, pod_starts
 
 SAME_REL = 1e-6   # a change under one part in a million of the value reads "same" (amendment 11)
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
@@ -44,7 +44,7 @@ METER = {"energy, the machine's own meter (Wh)"}
 KEPLER = {"energy, Kepler's reading of the machine's meter (Wh)", "energy Kepler attributes to the service's pods (Wh)"}
 KEYS[KEYS.index("energy (Wh)") + 1:KEYS.index("energy (Wh)") + 1] = sorted(METER) + sorted(KEPLER)
 ROBUST_MEMORY_LIMIT = 1.25   # a governor whose resident memory in the last ten minutes is more than a quarter above the first ten has a leak (preregistered)
-ROBUST_HANDBACK_S = 60.0     # every setting back at the operator's within this many seconds of the kill, or the repetition reads WORSE (preregistered)
+ROBUST_HANDBACK_S = 60.0     # every setting back at the operator's within this many seconds of the kill, or the repetition is marked (preregistered)
 
 
 LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked workers still on at idle power (Wh, declared model)",
@@ -56,7 +56,7 @@ LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked w
          "energy Kepler attributes to the service's pods (Wh)": "energy Kepler attributes to the service's pods (Wh; its split of the meter by each pod's CPU time: shown, not judged)"}
 NEUTRAL = {"CPU used (cores), mean", "utilisation (used / allocatable)", "Omni's own CPU (cores), mean",
            "CPU used with Omni's own (cores), mean", "energy per core-hour (Wh)", "pending pods, pod-minutes"} | HOST | KEPLER
-# more is not better or worse by itself. Energy per core-hour is energy over CPU used, and CPU used is not judged, so the
+# more or less is not judged by itself. Energy per core-hour is energy over CPU used, and CPU used is not judged, so the
 # ratio is not either. A pod pending in the snapshot is waiting for a machine or is a pod the autoscaler just created and
 # is starting; the judged gauge is the scheduler's own verdict that no machine would take it (amendment 10)
 NOTE = ["**Energy on kind is a declared model, not a meter.** Every worker stays powered and Ready in every arm; the first",
@@ -230,7 +230,7 @@ def robust_marks(d):
 
 ROBUST_INTERVAL_S = 60.0       # the governor's configured decision interval in the robustness runs (scripts/kind_bench.sh, --interval 60)
 ROBUST_DECISION_SHARE = 0.95   # fewer decisions than this share of the count the interval predicts reads INVALID (docs/ROBUSTNESS_PREREGISTRATION.md)
-ROBUST_CYCLE_GROWTH = 1.5      # the governor's decision time, last hour over the first: more than half again reads WORSE
+ROBUST_CYCLE_GROWTH = 1.5      # the governor's decision time, last hour over the first: more than half again is marked
 ROBUST_LONG_MIN_S = 6840.0     # the decision-time ratio needs a span of at least 95% of the 7,200 s window, so the first and last hours do not overlap
 
 
@@ -340,13 +340,13 @@ def robust_table(root, cols):
     L = ["## The robustness test: the governor killed outright, the lease, and the long run", "",
          f"In the kill scenario the governor receives SIGKILL at 40% of the window and the watchdog beside it must hand every setting back "
          f"from the lease it left; the harness asks the cluster every 2 s until the HPA target, the replica range, every CPU limit, every worker "
-         f"and the records are at the operator's. Preregistered: within {ROBUST_HANDBACK_S:.0f} s, or the repetition reads WORSE. A second governor "
+         f"and the records are at the operator's. Preregistered: within {ROBUST_HANDBACK_S:.0f} s, or the repetition is marked. A second governor "
          f"starts at 50% and governs to the end. The governor's resident memory is sampled from the process table; the mean of the last ten "
-         f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} reads WORSE (a leak). The 120 s after the kill mark are compared between the arms "
+         f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} is marked a leak. The 120 s after the kill mark are compared between the arms "
          "in the paired table above (`docs/ROBUSTNESS_PREREGISTRATION.md`). In the long run the governor's own audit gives its decisions against "
          f"the count its {ROBUST_INTERVAL_S:.0f} s interval predicts for the window (under {ROBUST_DECISION_SHARE:.0%} reads INVALID), its failed decisions, "
          f"and its decision time (the gap between decisions less the interval it sleeps), mean of the last hour over the first (over {ROBUST_CYCLE_GROWTH} "
-         "reads WORSE); the reset check at the end says whether every setting was handed back.", "",
+         "is marked); the reset check at the end says whether every setting was handed back.", "",
          "| Arm | Repetition | Mode | Seconds from the kill to every setting back | Within the allowance | Second governor | Watchdog hand-backs | Governor memory, last ten minutes / first ten | Decisions | Decisions of expected | Failed decisions | Decision time, last hour / first hour | Handed back at the end |",
          "|---|---:|---|---:|---|---|---:|---:|---:|---:|---:|---:|---|"]
     summary = {}
@@ -374,14 +374,14 @@ def robust_table(root, cols):
         for rep in sorted(reps, key=lambda x: int(x) if x.isdigit() else x):
             r = reps[rep]; h = r["handed_back_s"]
             hs = "" if r.get("mode") != "kill" else ("never" if h is None or h == float("inf") else f"{h:.0f}")
-            ok = "" if r.get("mode") != "kill" else ("**no: WORSE**" if (h is None or h > ROBUST_HANDBACK_S) else "yes")
-            sg = "" if r.get("mode") != "kill" else ("yes" if r["second_governor"] else "**no: WORSE**")
-            mr = "" if not r["memory"] else (f"{r['memory']['ratio']:.3f}" + ("" if r["memory"]["ratio"] <= ROBUST_MEMORY_LIMIT else " **(a leak: WORSE)**"))
+            ok = "" if r.get("mode") != "kill" else ("**no**" if (h is None or h > ROBUST_HANDBACK_S) else "yes")
+            sg = "" if r.get("mode") != "kill" else ("yes" if r["second_governor"] else "**no**")
+            mr = "" if not r["memory"] else (f"{r['memory']['ratio']:.3f}" + ("" if r["memory"]["ratio"] <= ROBUST_MEMORY_LIMIT else " **(a leak)**"))
             lg = r.get("long") or {}
             share = "" if lg.get("share") is None else (f"{lg['share']:.1%}" + ("" if lg["share"] >= ROBUST_DECISION_SHARE else " **(INVALID)**"))
             fl = "" if not lg else (str(lg["failed"]) + ("" if lg["failed"] == 0 else " (shown: " + "; ".join(lg.get("failed_reasons") or ["no reason recorded"]) + ")"))
-            dt = "" if lg.get("decision_time_ratio") is None else (f"{lg['decision_time_ratio']:.2f}" + ("" if lg["decision_time_ratio"] <= ROBUST_CYCLE_GROWTH else " **(WORSE)**"))
-            hb_end = "" if lg.get("handed_back_end") is None else ("yes" if lg["handed_back_end"] else "**no: WORSE**")
+            dt = "" if lg.get("decision_time_ratio") is None else (f"{lg['decision_time_ratio']:.2f}" + ("" if lg["decision_time_ratio"] <= ROBUST_CYCLE_GROWTH else " **(grew past the limit)**"))
+            hb_end = "" if lg.get("handed_back_end") is None else ("yes" if lg["handed_back_end"] else "**no**")
             L.append(f"| {dict(compass='omni').get(a, a)} | {rep} | {r.get('mode') or ''} | {hs} | {ok} | {sg} | {r['watchdog_records']} | {mr} | {r['decisions'] if r['decisions'] is not None else ''} | {share} | {fl} | {dt} | {hb_end} |")
     return L + [""], summary
 
@@ -465,7 +465,7 @@ def fault_table(root, cols):
     L = ["## The fault test: the same faults at the same moments in every arm", "",
          "Time to recover: from the fault's start until responses stay under the line for 30 seconds straight (at most 300 s). "
          "Over the line: the share of response samples over the line or failed in the 300 seconds after the fault. Paired "
-         "means over the repetitions; lower is better in both.", "",
+         "means over the repetitions; lower means a shorter time in both.", "",
          "| Fault | Arm | Time to recover (s) | Over the line (%) | Change in recovery against native |", "|---|---|---:|---:|---:|"]
     for f, _ in FAULTS:
         k = f.rstrip(":")
@@ -621,12 +621,11 @@ def main(root):
             # a change under one part in a million of the value is rounding, not a difference: read "same" (SAME_REL)
             same = abs(d.mean()) <= SAME_REL * max(abs(nb), 1e-12)
             sig = sig and not same
-            better = (d.mean() < 0) == (k in LOWER_BETTER or k in BILL or k in SECOND or k in BATCH or k in ROBUST or k in METER)
             ch = (ob - nb) / abs(nb) * 100 if abs(nb) > 1e-12 else None
             out["paired"][a][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
             ch_s = f"{ch:+.1f}%" if ch is not None else f"{ob - nb:+.3g} (native is 0)"
             L.append(f"| {LABEL.get(k, k)} | {nb:.4g} | {ob:.4g} | {ch_s} | {d.mean() - half:+.4g} to {d.mean() + half:+.4g} | "
-                     f"{'same (under one part in a million)' if same and d.mean() != 0 else (('yes, more' if d.mean() > 0 else 'yes, less') if k in NEUTRAL else ('yes, better' if better else 'yes, worse')) if sig else 'no'} |")
+                     f"{'same (under one part in a million)' if same and d.mean() != 0 else ('yes, higher' if d.mean() > 0 else 'yes, lower') if sig else 'no'} |")
         L.append("")
     if tuned and "native" in runs and any(a in runs for a in ("omni", "compass")):
         # the cost to match: native tuned harder by its operator (a lower HPA target, more pods) against native with

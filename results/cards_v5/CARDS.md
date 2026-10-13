@@ -4,9 +4,10 @@
 
 The engine's cards (`realms/muscle_cards_v5.csv`) and how they were found (`tools/tune_cards.py`,
 `docs/FORMAL_V5.md` section 5). Development seeds only: chosen on seeds 7100-7109, confirmed on seeds 7200-7209; the preregistered seeds
-3000-3009 were never read. A card is kept only if it beat today's global setting beyond the noise on both sets,
-was worse than it nowhere, and was never worse than native: on no seed of either set and under no load over its
-line more often, doing less work or clearing its line later. Evidence class **S** (modelled).
+3000-3009 were never read. A card is kept only if it moved the muscle beyond the noise toward its aims (fewer misses,
+more work, faster) against today's global setting on both sets, moved none of them the other way, and never fell
+behind native: on no seed of either set and under no load over its line more often, doing less work or clearing
+its line later. Evidence class **S** (modelled).
 
 | Plant | Knob | Muscles searched | Won on the first seeds | Won again (the engine's cards) |
 |---|---|---:|---:|---:|
@@ -29,7 +30,7 @@ line more often, doing less work or clearing its line later. Evidence class **S*
 **Inside the six organisms** (every plant against native; misses: the share of plant decisions over their
 line, removed against native, in percentage points):
 
-| Seeds | Load | Misses removed, global setting | Misses removed, cards | Plants worse, global / cards | Power given, global / cards |
+| Seeds | Load | Misses removed, global setting | Misses removed, cards | Plants with less work or more misses, global / cards | Power given, global / cards |
 |---|---|---:|---:|---:|---:|
 | 7100-7109 | normal | 0.078 | 0.094 | 0 / 0 | +0.000% / +0.000% |
 | 7100-7109 | climb | 0.153 | 0.293 | 0 / 0 | +0.000% / +0.000% |
