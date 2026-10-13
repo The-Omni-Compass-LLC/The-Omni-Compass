@@ -25,6 +25,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.presets import PRESETS  # noqa: E402  (an axis's own peak speed, s_peak)
+from realms.compass_arm_v5 import load_cards, V5CFG  # noqa: E402  (every muscle's own card)
 OUT = ROOT / "docs" / "MUSCLE_CATALOG.md"
 REALMS = OrderedDict([("compute_ai_cloud", "Compute / AI / Cloud"), ("physics_robotics_autonomous", "Physics / Robotics / Autonomous"),
                       ("energy_facility_industrial", "Energy / Facility / Industrial"), ("distribution_specialized", "Distribution / Specialized")])
@@ -131,12 +132,35 @@ PRESET = {
 }
 
 
+def card_text(c):
+    """A muscle's own card in plain words; "global" where it runs the global setting."""
+    if not c:
+        return "global"
+    parts = []
+    if "edge_util" in c:
+        parts.append(f"machines started at {c['edge_util'] * 100:.0f}% full")
+    if "window" in c:
+        parts.append(f"reads the last {c['window']} decisions")
+    if "line_z" in c:
+        parts.append(f"{c['line_z']:g} wobbles of margin on its line")
+    if "hold_window" in c:
+        parts.append(f"reads its line {c['hold_window']} decisions before it holds")
+    if "hold_margin" in c:
+        parts.append(f"keeps {c['hold_margin'] * 100:.0f}% of its line clear")
+    if "heat_head" in c:
+        parts.append(f"pushed under {c['heat_head'] * 100:.0f}% of its heat rise")
+    if "strain" in c:
+        parts.append(f"tracking under {c['strain'] * 100:.0f}% of its line")
+    return "; ".join(parts)
+
+
 def nice(m):
     return m.replace("_", " ")
 
 
 def main():
     rows = list(csv.DictReader(open(ROOT / "realms" / "catalog_v5.csv", encoding="utf-8")))
+    cards = load_cards()
     spine = [r for r in rows if len(r["realms"].split(";")) == 4]
     counts = {k: sum(1 for r in rows if k in r["realms"].split(";")) for k in REALMS}
     L = [f"# The {len(rows)} Muscles: What Each Is For, and How It Is Wired", "", BANNER, "",
@@ -158,6 +182,20 @@ def main():
          "lever:", "", "| Plant | What it is | What Omni-Compass reads | What Omni-Compass moves |", "|---|---|---|---|"]
     for k, (what, reads, moves) in TEMPLATE.items():
         L.append(f"| `{k}` | {what} | {reads} | {moves} |")
+    g = V5CFG
+    L += ["", "**Every muscle its own card.** The brain is one, its settings each muscle's own. A muscle's card holds the "
+          "settings the max uses for that muscle (a machine pool: how full it runs on its forecast before it calls for more, "
+          "and how many decisions of history it reads; a battery: how many wobbles of margin it keeps under its line, and, "
+          "wired by its power, how long it reads its line before it holds and how much of it it keeps clear). The cards "
+          "were found by an automatic search over every muscle on the development seeds, today's global setting always "
+          "one of the choices, and kept only where the card beat the global setting beyond the noise on two separate sets "
+          "of seeds and was never worse than native on any seed under any load: never over its line more often, never less "
+          "work, never its line cleared later (`tools/tune_cards.py`, `realms/muscle_cards_v5.csv`, "
+          "`results/cards_v5/`). Inside a body, a battery wired by its power keeps the body's own margins on its line. "
+          f"{len(cards)} muscles carry a card of their own; every other muscle runs the global setting (machines started "
+          f"at {g.edge_util * 100:.0f}% full, the last {g.window} decisions read, {g.line_z:g} wobbles of margin on a "
+          f"battery's line, {g.hold_margin * 100:.0f}% of it kept clear). Each muscle's card is in the last column of its "
+          "family's table.", ""]
     L += ["", f"**The organisms.** The {len(rows)} muscles build six organisms: each of the four realms (every muscle whose realm list "
           f"includes it), the four stacked with every duplicate kept ({sum(counts.values()):,}), and the whole tower with every muscle once ({len(rows)}). "
           "A muscle of the shared spine sits in all four realms.", "",
@@ -184,11 +222,13 @@ def main():
             out += [f"### {fam} ({len(rs)} muscles)", "",
                     f"Each is {what}; its class is `{p}` ({pw[0]}), reached through {pw[1]}. Omni-Compass reads "
                     f"{TEMPLATE[t][1]}. {home_note}", "",
-                    "| # | Muscle | Knob | What Omni-Compass does with it | Organisms |", "|---:|---|---|---|---|"]
+                    "| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |",
+                    "|---:|---|---|---|---|---|"]
             for r in sorted(rs, key=lambda r: (not r["muscle_id"].isdigit(), int("".join(c for c in r["muscle_id"] if c.isdigit()) or 0))):
                 k = r["knob"]
                 org = "all four realms" if len(r["realms"].split(";")) == 4 else ", ".join(REALMS[x].split(" / ")[0] for x in r["realms"].split(";"))
-                out.append(f"| {r['muscle_id']} | {nice(r['muscle'])} | {k} | {does(r)} | {org}; stack; tower |")
+                out.append(f"| {r['muscle_id']} | {nice(r['muscle'])} | {k} | {does(r)} | {org}; stack; tower | "
+                           f"{card_text(cards.get(r['muscle_id']))} |")
             out.append("")
         return out
 

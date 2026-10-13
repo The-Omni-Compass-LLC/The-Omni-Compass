@@ -205,6 +205,62 @@ def test_heat_debt_only_for_rooms_that_cannot_cure_themselves():
     b.knobs[i] = "power"
     assert L.heat_debt(b, bone) > 0.0, "a room that cannot cure itself puts no debt on the body"
 
+
+def _first(template, knob):
+    return next(r for r in H.catalog(CAT) if r["template"] == template and r["knob"] == knob)
+
+
+def test_without_a_card_a_muscle_runs_the_global_setting():
+    # the global setting is the one the engine had before cards: a battery reads its line for the window and keeps a
+    # twentieth of it clear; an axis is pushed under 80% of its heat rise and half its tracking line
+    g = L.V5CFG
+    assert g.hold_window is None and g.hold_margin == 0.05 and g.heat_head == L.HEAT_HEAD and g.strain == L.STRAIN
+    p = H.make_plant(_first("compute_pool", "capacity"), SEED)
+    p._card = None
+    assert L.card(p, g) is g and L.body_card(p, g, "capacity") is g
+
+
+def test_a_card_is_the_muscles_own_and_the_tune_down_never_reads_it():
+    p = H.make_plant(_first("compute_pool", "capacity"), SEED)
+    p._card = {"edge_util": 0.8, "window": 40}
+    c = L.card(p, L.V5CFG)
+    assert (c.edge_util, c.window) == (0.8, 40) and c.line_z == L.V5CFG.line_z, "the card over the brain's own settings"
+    assert L.card(p, L.V5CFG) is c, "the same card every decision"
+    assert L.card(p, L.V5SAVE) is L.V5SAVE, "the tune-down read a card"
+    for _ in range(30):
+        p.step()
+    assert L.max_pool_want(p, c) >= L.max_pool_want(p, L.V5CFG), "a slimmer edge asked for fewer machines"
+
+
+def test_a_battery_wired_by_its_power_keeps_the_bodys_margins_inside_a_body():
+    p = H.make_plant(_first("energy_storage", "power"), SEED)
+    p._card = {"line_z": 1.0, "hold_window": 5, "hold_margin": 0.0}
+    b = L.body_card(p, L.V5CFG, "power")
+    assert b.line_z == L.V5CFG.line_z and b.hold_margin == L.V5CFG.hold_margin, "slimmer than the body on its line"
+    assert b.hold_window == 5, "its own window"
+    alone = L.card(p, L.V5CFG)
+    assert alone.line_z == 1.0 and alone.hold_margin == 0.0, "alone, a battery runs its own card"
+    q = H.make_plant(_first("energy_storage", "capacity"), SEED)
+    q._card = {"line_z": 1.0}
+    assert L.body_card(q, L.V5CFG, "capacity").line_z == 1.0, "only a battery wired by its power is held to the body"
+
+
+def test_every_card_names_a_muscle_of_the_catalog_within_its_searched_range():
+    from tools import tune_cards as T
+    rows = {r["muscle_id"]: r for r in H.catalog(CAT)}
+    import csv
+    cards = []
+    if L.CARD_FILE.exists():
+        with open(L.CARD_FILE, newline="") as f:
+            cards = list(csv.DictReader(f))
+    for c in cards:
+        r = rows[c["muscle_id"]]
+        assert (c["template"], c["knob"]) == (r["template"], r["knob"]), c["muscle_id"]
+        own = {k: L.CARD_KEYS[k](v) for k, v in c.items() if k in L.CARD_KEYS and v.strip()}
+        assert own in T.candidates(r, wide=True), f"{c['muscle_id']}: a card outside the searched settings"
+        assert L.CARDS[c["muscle_id"]] == own, "the engine reads the file as written"
+
+
 if __name__ == "__main__":
     test_max_does_no_harm_to_any_muscle_alone()
     test_max_does_no_harm_with_work_waiting_in_line()
@@ -219,4 +275,8 @@ if __name__ == "__main__":
     test_battery_forecast_starts_at_its_first_reading()
     test_battery_holds_only_after_reading_its_line()
     test_heat_debt_only_for_rooms_that_cannot_cure_themselves()
+    test_without_a_card_a_muscle_runs_the_global_setting()
+    test_a_card_is_the_muscles_own_and_the_tune_down_never_reads_it()
+    test_a_battery_wired_by_its_power_keeps_the_bodys_margins_inside_a_body()
+    test_every_card_names_a_muscle_of_the_catalog_within_its_searched_range()
     print("test_compass_arm_v5: OK")

@@ -33,7 +33,7 @@ from omnicompass.adapter import Governor, OBSERVE
 from omnicompass.nervous_system import from_governor
 from .plants import TEMPLATES, ThermalZone, EnergyStorage, pack
 from .compass_arm import compass_apply
-from .compass_arm_v5 import apply_v5, apply_v5_save, max_apply, max_body_step, Bone, V5CFG   # the v5 law: the max
+from .compass_arm_v5 import apply_v5, apply_v5_save, max_apply, max_body_step, Bone, V5CFG, CARDS   # the v5 law: the max
                                                      # (arm v5, the default) and the tune-down (arm v5save)
 from .presets import STEPS_SINGLE, ORGANISM_STEPS, CAL_SEED, params_for
 
@@ -147,6 +147,7 @@ def make_plant(row, seed, organism=False):
     p = TEMPLATES[row["template"]](params_for(row, organism), seed_for(row["muscle_id"], seed), steps)
     if row["template"] == "compute_pool" and not organism:
         p.budget_w = 1.25 * native_mean_power(row)
+    p._card = CARDS.get(row["muscle_id"])        # the muscle's own settings for the max (none: the global setting)
     return p
 
 

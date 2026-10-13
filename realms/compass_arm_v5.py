@@ -24,7 +24,10 @@
 #                 pool a machine short of native for good)
 from __future__ import annotations
 
+import copy
+import csv
 import math
+from pathlib import Path
 
 from omnicompass.compass_law import Band, CompassLaw
 from omnicompass.edge import Edge as _CoreEdge, physics_memory
@@ -39,12 +42,18 @@ class Cfg:
                  base_center=0.5, base_wall=0.95, headroom=False, physics_memory=False, motion_safe=False,
                  motion_q=0.999, burst_window=20, hole_guard=False, drop_guard=False, jump0=1.0, band=False,
                  hole_floor=True, precool=False, storage_shave=False, power_cap=False, loop_reach=False,
-                 ca_release=False, dial="save", edge_util=0.95, line_z=3.09):
+                 ca_release=False, dial="save", edge_util=0.95, line_z=3.09, hold_window=None, hold_margin=0.05,
+                 heat_head=0.8, strain=0.5):
         self.dial = dial                      # "max" (the default brain: every muscle pushed to its own limit for the most
                                               # work, the energy that takes shown as power given) or "save" (the tune-down:
                                               # the least energy for native's work)
         self.edge_util = edge_util            # max: how full a machine pool runs on the forecast before it calls for more
         self.line_z = line_z                  # max: the wobbles of margin a battery keeps its site's draw under its line
+        self.hold_window = hold_window        # max: decisions a battery wired by its power reads its line before it holds
+                                              # anything (None: the window)
+        self.hold_margin = hold_margin        # max: the share of its line a battery wired by its power keeps clear at least
+        self.heat_head = heat_head            # max: an axis is pushed only while its motor is under this share of its heat rise
+        self.strain = strain                  # max: and its tracking error under this share of its line
         self.loop_reach = loop_reach          # a process loop's setpoint never closer to its band's calm-side edge than the
                                               # loop's own largest swing toward that edge leaves room for (loop_clamp)
         self.ca_release = ca_release          # a machine pool under a cluster autoscaler: Omni may hand a machine back
@@ -699,9 +708,10 @@ def max_hold(plant, cfg, key):
         # climb it has shown (and line_z of its wobbles, and a twentieth of the line), the charge is held: nothing is
         # spent, charging stays free; once the line could need it, the full power native gives. The charge native spends
         # early is still there when the line needs it
-        if plant.net <= 0.0 or st["n"] < cfg.window:
+        win = cfg.window if cfg.hold_window is None else cfg.hold_window
+        if plant.net <= 0.0 or st["n"] < win:
             return {}                                                # nothing to hold, or the line not yet read for a window
-        room = max(cfg.line_z * math.sqrt(st["dv"]), st["rise"], 0.05 * P["p_lim_w"])
+        room = max(cfg.line_z * math.sqrt(st["dv"]), st["rise"], cfg.hold_margin * P["p_lim_w"])
         return {} if fore + room >= P["p_lim_w"] else {"power": 0.0}
     if key == "setpoint":
         E, sq = P["e_wh"] * 3600.0, math.sqrt(P["eta_rt"])
@@ -732,7 +742,7 @@ def machines(pool) -> int:
 
 
 HEAT_HEAD, STRAIN = 0.8, 0.5     # an axis is pushed only while its motor is under 80% of its heat rise and its tracking
-                                 # error under half its line
+                                 # error under half its line (the global setting; a muscle's card may set its own)
 
 
 def max_speed(plant, cfg):
@@ -742,7 +752,7 @@ def max_speed(plant, cfg):
     peak = P.get("s_peak", 1.0)
     if peak <= 1.0 or plant.backlog <= 0:
         return None
-    if plant.Tm > P["t_amb"] + HEAT_HEAD * (P["t_lim"] - P["t_amb"]) or plant.err_max > STRAIN * P["e_max"]:
+    if plant.Tm > P["t_amb"] + cfg.heat_head * (P["t_lim"] - P["t_amb"]) or plant.err_max > cfg.strain * P["e_max"]:
         return None
     return peak
 
@@ -783,10 +793,70 @@ def max_ask(plant, knob, cfg, twin=None):
     return None
 
 
+# Every muscle its own card (the founder's question of 12 October, night: does every muscle have its own tuning, maxed to
+# its own benefit, instead of one global setting for a thousand muscles?). A muscle's card is the brain's settings for
+# that muscle alone (a pool's edge utilisation and window, a battery's line margin and window), found by an automatic
+# search over every muscle on the development seeds and kept only where it beats the global setting beyond the noise on
+# two separate sets of them and is never worse than native on any of their seeds under any load: never over its line more
+# often, never less work, never its line cleared later (tools/tune_cards.py; realms/muscle_cards_v5.csv). A muscle
+# without a card runs the global setting; the tune-down never reads cards.
+CARD_FILE = Path(__file__).with_name("muscle_cards_v5.csv")
+CARD_KEYS = {"edge_util": float, "window": int, "line_z": float, "hold_window": int, "hold_margin": float,
+             "heat_head": float, "strain": float}
+
+
+def load_cards(path=CARD_FILE) -> dict:
+    """{muscle_id: {setting: value}}: each muscle's own settings, an empty cell meaning the global one."""
+    if not Path(path).exists():
+        return {}
+    out = {}
+    with open(path, newline="") as f:
+        for row in csv.DictReader(f):
+            c = {k: cast(row[k]) for k, cast in CARD_KEYS.items() if row.get(k, "").strip()}
+            if c:
+                out[row["muscle_id"]] = c
+    return out
+
+
+CARDS = load_cards()
+
+
+def card(plant, cfg):
+    """The settings the max uses for this muscle: its own card over the brain's (the same brain, the muscle's own numbers
+    where it has them); the brain's own where it has none, and always under the tune-down."""
+    own = getattr(plant, "_card", None)
+    if not own or cfg.dial != "max":
+        return cfg
+    memo = getattr(plant, "_card_cfg", None)
+    if memo is None or memo[0] is not cfg:
+        c = copy.copy(cfg)
+        for k, v in own.items():
+            setattr(c, k, v)
+        plant._card_cfg = memo = (cfg, c)
+    return memo[1]
+
+
+def body_card(plant, cfg, knob):
+    """A muscle's card inside a body: its own, except that a battery wired by its power keeps the body's margins on its
+    line (its line_z and its hold margin never slimmer than the body's): the line carries the whole body's swing, which
+    the card, chosen for the battery alone, never saw. The body has the last word on a line it shares."""
+    c = card(plant, cfg)
+    if c is cfg or knob != "power":
+        return c
+    memo = getattr(plant, "_body_card", None)
+    if memo is None or memo[0] is not c:
+        b = copy.copy(c)
+        b.line_z = max(c.line_z, cfg.line_z)
+        b.hold_margin = max(c.hold_margin, cfg.hold_margin)
+        plant._body_card = memo = (c, b)
+    return memo[1]
+
+
 def max_apply(plant, knob, cfg, twin=None):
     """The max for a muscle alone (no body around it to share with): a pool's machines started before the rush and
     never fewer than its twin runs, a room cooled ahead of the heat, a battery's line clipped from its charge; every
-    other knob native."""
+    other knob native. The muscle's own card where it has one."""
+    cfg = card(plant, cfg)
     P, t = plant.P, plant.template
     ov = {}
     a = max_ask(plant, knob, cfg, twin)
@@ -1025,10 +1095,10 @@ def max_body_step(body, cfg, bone):
         t = p.template
         p.override_kind = None
         if t == "energy_storage" and knob in ("setpoint", "capacity", "power"):
-            p.override = max_hold(p, cfg, knob)
+            p.override = max_hold(p, body_card(p, cfg, knob), knob)
             p.override_kind = "clip" if knob in ("setpoint", "capacity") else knob
             continue
-        a = max_ask(p, knob, cfg, bone.twins.get(i))
+        a = max_ask(p, knob, card(p, cfg), bone.twins.get(i))
         if a is None:
             p.override = walk_room(p) if t == "thermal_zone" and knob == "setpoint" else {}
             continue
