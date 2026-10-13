@@ -33,7 +33,7 @@ Omni-Compass was tested with; it states no affiliation, endorsement or certifica
 
 ## Reporting misuse
 
-The Omni-Compass LLC, www.omni-compass.com.
+The Omni-Compass LLC, 1-888-339-9551 (1-888-DEX-YLL-1), www.omni-compass.com.
 
 ---
 

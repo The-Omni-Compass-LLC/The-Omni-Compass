@@ -4,7 +4,7 @@
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
-The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report and printout
+The Omni-Compass LLC · 1-888-339-9551 (1-888-DEX-YLL-1) · [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report and printout
 of any part of Omni-Compass carries the notice above, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and
 [`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
 

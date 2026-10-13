@@ -101,6 +101,42 @@ number and one word per benchmark) and the wiring page (for each knob: write, wa
    reported as the governor's result, and the test is rebuilt so the machine no longer decides it.
 6. **Every row is shown**, LOSS included. Nothing is cut from a table because it went against Omni-Compass.
 
+**How the brain tells GAIN from LOSS.** The governor does not read a plus or a minus sign as good or bad. Before it
+moves anything, every gauge it reads is declared with its aim, and the aim decides the word: for time waited, missed or
+failed (a response time, time over the line, failed requests) a fall is GAIN; for work done (work inside the line,
+throughput, missions flown) a rise is GAIN; for a resource spent or held (energy, machines, memory, a bill, wear) a fall is a
+cut, and a cut is GAIN, while a rise is power given, kept only when it buys work or speed shown beside it. Less energy for the
+same work is GAIN; more speed for the same machines is GAIN; more work for the same energy is GAIN. In the engine this is
+done in two places. The verdict (`omnicompass/verdict.py`) lets a muscle's setting move only between native and the deepest
+step a paired trial on that muscle has shown costs its own work nothing (each piece of work no slower, within the
+measurement's resolution); a step that costs more is undone at once and not tried again for a while, and where no step
+passes the muscle stays native, which is EVEN. Inside an organism, the body's guard (the reflex rule, `docs/FORMAL_V5.md`)
+then refuses any step that pushes another part of the body past its cushion, so no GAIN in one muscle is bought with a LOSS
+in another.
+
+**Wiring it: who, what, when, where, why and how.** Read this before the wiring chapters; a governor wired without it may
+run and still not be the mechanism.
+
+- **Why.** To get more work, faster, with fewer misses, from the machines and the energy already paid for, by letting one
+  brain move the settings native controllers already expose, in the direction each gauge's aim asks, and only while no
+  other gauge pays for it. If nothing can be gained, the purpose is met by leaving native alone.
+- **What.** Two things per muscle and nothing else: one wire in (the gauges that show the muscle's state and its work, read
+  live from the system, never typed into code) and one wire out (the one setting native already exposes to an operator, with
+  its hard range read from the system). The brain, the compass, the verdict and the lease are in the engine; the wiring
+  never re-implements them.
+- **Where.** On top of the native controller, never in place of it: on the autoscaler's target and ceiling, not on the
+  pods; on the pool's size, not on the queries; on the card's power limit, not on its firmware. Every muscle of the stack is
+  wired into the same brain, so the body is judged as one.
+- **Who.** The operator who owns the system grants each wire, decides which knobs Omni may write and which it only watches,
+  and keeps the kill switch. The governor writes only what it was granted; the native controller keeps doing its own job.
+- **When.** Watch first: the governor reads every wire and writes nothing until the wire check passes and paired runs on
+  the operator's own system show the receipt. Then one level at a time (the eight levels, Part IV). It reads and decides once
+  a second, all the time; staying native is a live decision, made again every second, never a setting left on.
+- **How.** The plug snapshots each setting once, at the start; the brain reads every gauge, places each muscle on its
+  compass, tries one step on one muscle at a time inside a body, keeps it only if the verdict shows a GAIN and no LOSS, and
+  hands every setting back to the snapshot on reset, on the lease after a crash, or at once on the kill switch. The proof is
+  the receipt: native and Omni on the same work, every gauge, three runs, every row shown.
+
 **What the end result is.** A system fully hooked up runs native exactly as before, with one governor reading every gauge
 of every muscle once a second and moving, muscle by muscle, only where a paired trial has shown a GAIN with no LOSS
 anywhere in the body; where it cannot help, the muscle stays native, which is EVEN, not a failure. The intended outcome,
@@ -272,7 +308,7 @@ it, read back, and the record removed.
 | a meter that is blind or late | nothing: blind means hold; it moves nothing it cannot see | section 7.3 |
 | your results point the other way from the published ones | presume the wiring first, not the law | `DISCLOSURES.md`, section 4 |
 
-**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, www.omni-compass.com.
+**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, 1-888-339-9551 (1-888-DEX-YLL-1), www.omni-compass.com.
 Security reports: the process in `SECURITY.md`, never a public issue.
 
 ## Executive Summary

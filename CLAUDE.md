@@ -143,6 +143,10 @@ the founder overrides one in the conversation.
   everything. Where a change made a result worse, the fix is made inside the newest engine and rerun.
 - **One cloud first** (13 October, night): Kubernetes on Azure is finished first; Google (GKE), Amazon (EKS) and the GPU
   chips (Lambda) are not run until the founder says the Azure Kubernetes results are where he needs them.
+- **The company's telephone** (13 October, night): 1-888-339-9551 (1-888-DEX-YLL-1), on every contact line where the
+  company is named for reaching it (README, LICENSE and its copy, NOTICE, Enterprise License, Trademarks, Licensing FAQ, Security,
+  Support, the manual's "Who to call", codemeta), always before the website, never inside the legal notice, which ends with
+  www.omni-compass.com. The founder's personal number is never written anywhere.
 - **A copy he can keep**: the manual's PDF and the whole repository as a downloadable zip, in parts, from a pushed commit,
   sent to the founder after each landed change.
 
