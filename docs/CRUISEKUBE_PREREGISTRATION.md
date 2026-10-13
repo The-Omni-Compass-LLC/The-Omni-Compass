@@ -114,6 +114,29 @@ CruiseKube's hour shortened to none, 1,500 s of learning and a 360 s window. It 
 - The CPU limit is not a knob in this set: CruiseKube owns it on the running pods, so the power cap, which writes it in
   other sets, stays out.
 
+## Amendment 1: the trial run read, the chart pinned, and a decided window with no write counted (13 October, before the counted runs)
+
+- **The trial ran end to end** (run 38412997261, never counted; its files in `results/live/raw/run-38412997261/`).
+  CruiseKube installed, learned and applied its own change to the service before the window in both arms. The chart's
+  archive SHA-256 was recorded in both arms, `a3c7fa8914d4c29f6c04999fea1fbbe83a6045270ac739ee02a357d14c034ecf`; it is
+  now pinned (`CK_CHART_SHA256` in `.github/workflows/kind-cruisekube.yml`), and a counted run whose chart differs stops.
+  The images CruiseKube's chart starts are recorded by digest in `cruisekube_pins.txt` (its PostgreSQL comes from the
+  chart's own `bitnami/postgresql:latest`; its digest is recorded in every run).
+- **What Omni-Compass did in the trial's window.** Its governor decided six times in the 360 s and made no write. The
+  service stayed well inside its line (the 95th percentile 133 to 199 ms against the 500 ms line); the authority over
+  the pods came once the system had calmed, from the third decision; and on top of CruiseKube, which owns the CPU limit,
+  and KEDA's HTTP add-on, which already scales at one request in flight per pod, nothing needed moving. The old rule of
+  the rig marked the window invalid (a window with no write proves nothing about the reset).
+- **The rule now** (`scripts/kind_bench.sh`, every set): staying native is the governor's own decision, made at every
+  step (the founder's order of 10 October). A window in which the governor recorded its decisions (at least one a
+  minute, each with its reasons in the audit) and made no write is valid and counts as it ran; the reset still checks
+  that every setting is the operator's; the table says in how many repetitions Omni-Compass stayed native
+  (`tools/live_reps.py`). A governor that recorded no decisions was not running, and that window is invalid.
+- **Nothing else changes**: the load (`1 2 3 1 2 1`, closed loop), 4,500 s of learning, 120 s warm-up, 900 s measured,
+  ten pairs a run, three runs. If Omni-Compass stays native throughout, the reading is no difference beyond the noise
+  with the count of windows it stayed native: on top of CruiseKube and KEDA at this load the service needed nothing
+  more, and Omni-Compass did no harm.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

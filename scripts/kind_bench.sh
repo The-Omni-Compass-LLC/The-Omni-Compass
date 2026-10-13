@@ -31,7 +31,9 @@
 # Evidence discipline (adopted from the ChatGPT-built harness, extended to every muscle): pinned, SHA-256-checked
 # metrics-server; preflight record of tool versions; clean-cluster check; Omni-Compass runs as a least-privilege service
 # account (deploy/kind/rbac-omni.yaml) with `kubectl auth can-i` receipts for what it can and cannot do; the run fails if
-# Omni made no write or if the reset leaves any record behind; SHA256SUMS.txt fingerprints every output file.
+# Omni's governor recorded no decisions or if the reset leaves any record behind (a window in which the governor decided
+# and made no write is valid: it stayed native, and the table counts such windows); SHA256SUMS.txt fingerprints every
+# output file.
 set -euo pipefail
 ARM="${ARM:?set ARM=native, ARM=watch (Omni watches, writes nothing), ARM=omni (B: Omni on top), ARM=compass (B with the compass law) or ARM=strict (C: Omni decides replicas and nodes)}"
 STRICT=""; [ "$ARM" = "strict" ] && STRICT="--strict-replicas"
@@ -584,7 +586,15 @@ elif [ -z "$NATIVE" ]; then
   touch "$OUT_DIR/kill"
   omni_writes=$(grep -c '"write"' "$OUT_DIR/audit.jsonl" || true)
   echo "omni writes during the run: $omni_writes" | tee "$OUT_DIR/omni_writes.txt"
-  [ "$omni_writes" -gt 0 ] || { echo "Omni made no write, so the reset would prove nothing"; exit 1; }
+  if [ "$omni_writes" -eq 0 ]; then
+    # staying native is the governor's own decision, made at every step (the founder's order of 10 October): a window
+    # with no write is valid when the governor recorded its decisions, each with its reasons in the audit, and the reset
+    # below still checks every setting is the operator's; a governor that recorded no decisions was not running
+    decisions=$(grep -c '"decision"' "$OUT_DIR/audit.jsonl" || true)
+    want=$(( DURATION / 60 - 1 )); [ "$want" -ge 1 ] || want=1
+    [ "$decisions" -ge "$want" ] || { echo "Omni made no write and recorded $decisions decisions (at least $want expected): the governor was not running"; exit 1; }
+    echo "Omni-Compass stayed native: $decisions decisions recorded, no write" | tee "$OUT_DIR/omni_stayed_native.txt"
+  fi
   stop_governors        # no write of the window's governor can land after the reset is checked
   python -m omni_controller.controller --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --iterations 1 \
     $CAP_ARGS --rollout-guard default/php-apache \

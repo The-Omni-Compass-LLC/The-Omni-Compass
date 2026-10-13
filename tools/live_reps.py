@@ -561,11 +561,13 @@ def capacity_table(root, cols):
 
 
 def main(root):
-    root = Path(root); runs = {}
+    root = Path(root); runs = {}; native_kept = {}
     for d in sorted(root.glob("bench-*-*")):
         _, arm, rep = arm_rep(d)
         if (d / "capture.csv").exists() and not (d / "INVALID").exists():
             runs.setdefault(arm, {})[rep] = arm_gauges(d)
+            if (d / "omni_stayed_native.txt").exists():      # the governor decided at every step and wrote nothing
+                native_kept.setdefault(arm, set()).add(rep)
     out = {"repetitions": {a: sorted(r) for a, r in runs.items()}, "means": {}, "paired": {}}
     for a, r in runs.items():
         out["means"][a] = {k: float(np.nanmean([g.get(k, np.nan) for g in r.values()])) for k in KEYS}
@@ -600,8 +602,14 @@ def main(root):
         title = {"watch": "omni, watching (dry run, writes nothing: the cost of being there)", "omni": "omni (allocation law, earlier sets)",
                  "compass": "omni (compass law): Omni-Compass on top of native, push and pull on the HPA target and the node pool",
                  "strict": "omni alone (not on top: earlier sets only)"}[a]
-        L += [f"## {title} vs native, {len(reps)} paired repetitions", "",
-              "| Gauge | native | omni | Change | 95% interval of the difference | Significant |", "|---|---:|---:|---:|---:|---|"]
+        kept = sorted(native_kept.get(a, set()) & set(reps), key=lambda r: int(r) if str(r).isdigit() else 0)
+        L += [f"## {title} vs native, {len(reps)} paired repetitions", ""]
+        if kept:
+            out.setdefault("stayed_native", {})[a] = kept           # beside the paired table, never inside it
+            L += [f"Omni-Compass stayed native in {len(kept)} of {len(reps)} repetitions (repetition{'s' if len(kept) > 1 else ''} "
+                  f"{', '.join(str(r) for r in kept)}): its governor decided at every step, each decision in the audit with its "
+                  "reasons, and made no write; those repetitions count as they ran.", ""]
+        L += ["| Gauge | native | omni | Change | 95% interval of the difference | Significant |", "|---|---:|---:|---:|---:|---|"]
         for k in KEYS:
             d = np.array([runs[a][r].get(k, np.nan) - runs["native"][r].get(k, np.nan) for r in reps], float)
             d = d[~np.isnan(d)]
