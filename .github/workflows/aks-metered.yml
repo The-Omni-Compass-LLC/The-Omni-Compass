@@ -9,6 +9,11 @@
 # One repetition at a time (a new subscription's core quota), each cluster deleted when its arm ends; the resource
 # group is deleted at the end whatever happens.
 name: aks-metered
+run-name: >-
+  ${{ format('aks-metered {0}{1}{2} {3} {4}', github.event.inputs.load_steps != '' && format('burst {0}', github.event.inputs.load_steps) || 'steady',
+     github.event.inputs.organism != '' && format(' organism {0} x{1}', github.event.inputs.organism, github.event.inputs.organism_scale) || '',
+     github.event.inputs.replica_ceiling != '' && format(' replica room {0}', github.event.inputs.replica_ceiling) || '',
+     github.event.inputs.location || 'eastus', github.event.inputs.worker_pools != '' && 'pools' || (github.event.inputs.vm_size || 'Standard_D2s_v4')) }}
 on:
   workflow_dispatch:
     inputs:
@@ -27,7 +32,13 @@ on:
       organism: {description: "One of the six organisms with this cluster inside it (tools/run_kil.py): compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower; empty: the service alone", default: ""}
       load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
       organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10 or 100)", default: "1"}
-concurrency: {group: aks-metered, cancel-in-progress: false}
+      replica_ceiling: {description: "Omni-Compass's replica room: the most replicas it may raise the app's cap to while the cap binds and the line is threatened, handed back once the demand holds still (the compass law; docs/AKS_REPLICA_ROOM_PREREGISTRATION.md); native keeps the operator's cap. 9 pods of 200m fit one 2-vCPU worker, so 9 x max_workers is what the fleet holds. Empty: the cap is the operator's and never moved", default: ""}
+# one Azure set at a time per machine family and region (each family has its own 10-vCPU allowance): the default family
+# (Standard_D2s_v4 in eastus, and every multi-pool fleet, which uses it too) keeps the one queue it always had; a set on
+# another family or in another region queues on its own and runs beside it
+concurrency:
+  group: "${{ format('aks-metered{0}', ((github.event.inputs.location || 'eastus') != 'eastus' || ((github.event.inputs.vm_size || 'Standard_D2s_v4') != 'Standard_D2s_v4' && github.event.inputs.worker_pools == '')) && format('-{0}-{1}', github.event.inputs.location || 'eastus', github.event.inputs.vm_size || 'Standard_D2s_v4') || '') }}"
+  cancel-in-progress: false
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
@@ -90,6 +101,7 @@ jobs:
           ORGANISM_SCALE: ${{ github.event.inputs.organism_scale || '1' }}
           AKS_MAX_NODES: ${{ github.event.inputs.max_workers || '4' }}
           HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
+          REPLICA_CEILING: ${{ github.event.inputs.replica_ceiling || '' }}
           AKS_WORKER_POOLS: ${{ github.event.inputs.worker_pools || '' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - if: always()
