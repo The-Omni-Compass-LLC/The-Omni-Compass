@@ -5,8 +5,12 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The CruiseKube test's wiring (docs/CRUISEKUBE_PREREGISTRATION.md): every download pinned, CruiseKube's usage reports off,
 the set beside KEDA's HTTP add-on alone, the CPU limit left to CruiseKube, and a run without an applied change invalid."""
+import hashlib
+import json
+import os
 import re
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -27,7 +31,7 @@ class Wiring(unittest.TestCase):
         fetched = re.findall(r'^\s*fetch "[^"]+" "[^"]+" "\$(\w+)"', s, re.M)
         self.assertEqual(len(fetched), 5)                          # kube-state-metrics' five standard files
         for var in fetched:
-            self.assertRegex(s, rf'(?m)^{var}="[0-9a-f]{{64}}"$')
+            self.assertRegex(s, rf'(?m)^{var}="\$\{{{var}:-[0-9a-f]{{64}}\}}"$')
         # the chart: a counted run needs its SHA-256; only a shakedown run may record one instead
         self.assertIn('CK_VERSION="${CK_VERSION:-0.3.4}"', s)
         self.assertIn('elif [ "${CRUISEKUBE_SHAKEDOWN:-}" != 1 ]; then', s)
@@ -83,6 +87,116 @@ class Wiring(unittest.TestCase):
                          ("keda", "http", "1", "native compass"))
         commit = next(s for s in w["jobs"]["aggregate"]["steps"] if "committed back" in s.get("name", ""))
         self.assertIn("github.event.inputs.shakedown != 'yes'", commit["if"])   # a shakedown run is never counted
+
+
+FAKE = ROOT / "tests" / "fake_cruisekube"
+
+
+def fake_env(t):
+    """The stand-ins first on the path (tests/fake_cruisekube: kubectl, helm, curl, sleep), every pin matched to the
+    stand-in downloads ("fake <name>"), a made-up powercap tree for the meter."""
+    env = dict(os.environ, PATH=f"{FAKE}:{os.environ['PATH']}", FAKE_CALLS=str(t / "calls.jsonl"),
+               FAKE_STATE=str(t / "state.json"), RUNNER_TEMP=str(t),
+               CK_CHART_SHA256=hashlib.sha256(b"a made-up chart\n").hexdigest())
+    sha = lambda name, extra="": hashlib.sha256(f"fake {name}\n{extra}".encode()).hexdigest()
+    for var, f in (("KSM_SHA256_CRB", "cluster-role-binding.yaml"), ("KSM_SHA256_CR", "cluster-role.yaml"),
+                   ("KSM_SHA256_DEPLOY", "deployment.yaml"), ("KSM_SHA256_SA", "service-account.yaml"),
+                   ("KSM_SHA256_SVC", "service.yaml"), ("KEPLER_SHA256_NAMESPACE", "namespace.yaml"),
+                   ("KEPLER_SHA256_RBAC", "rbac.yaml"), ("KEPLER_SHA256_CONFIGMAP", "configmap.yaml"),
+                   ("KEPLER_SHA256_SERVICE", "service.yaml")):
+        env[var] = sha(f)
+    env["KEPLER_SHA256_DAEMONSET"] = sha("daemonset.yaml", "        image: <KEPLER_IMAGE>\n        imagePullPolicy: Always\n")
+    z = t / "powercap" / "intel-rapl:0"
+    z.mkdir(parents=True)
+    (z / "name").write_text("package-0\n"); (z / "energy_uj").write_text("12345\n"); (z / "max_energy_range_uj").write_text("262143328850\n")
+    env["RAPL_ROOT"] = str(t / "powercap")
+    return env
+
+
+def calls(t):
+    return [json.loads(x) for x in (t / "calls.jsonl").read_text().splitlines()]
+
+
+class DryRun(unittest.TestCase):
+    """Each add-on script run end to end against the stand-ins: every command line, every jq filter and every branch a
+    real run takes, with no cluster and no network (both scripts' first GitHub trials stopped on lines a dry run catches)."""
+
+    def phase(self, script, out, env, phase, **extra):
+        r = subprocess.run(["bash", str(script)], cwd=ROOT, env=dict(env, OUT_DIR=str(out), PHASE=phase, **extra),
+                           capture_output=True, text=True, timeout=120)
+        self.assertEqual(r.returncode, 0, f"PHASE={phase}\n{r.stdout}\n{r.stderr}")
+        return r
+
+    def test_cruisekube_install_learn_end(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t); out = t / "bench-compass-1"; out.mkdir()
+            env = fake_env(t)
+            self.phase(ADDON, out, env, "install")
+            self.phase(ADDON, out, env, "learn", CRUISEKUBE_LEARN="0", LOAD_STEPS="1 2 3 1 2 1")
+            self.phase(ADDON, out, env, "end")
+            addons = (out / "addons.txt").read_text()
+            for want in ("cruisekube=0.3.4", "cruise mode on for Deployment:default:php-apache", "applied a change to the service"):
+                self.assertIn(want, addons)
+            pins = (out / "cruisekube_pins.txt").read_text()
+            self.assertIn("cruisekube_chart=0.3.4 sha256=" + env["CK_CHART_SHA256"], pins)
+            self.assertIn("@sha256:", pins)                                     # every image with its digest
+            c = calls(t)
+            self.assertGreaterEqual(sum(1 for x in c if x[:4] == ["kubectl", "get", "pods", "-A"]), 3)   # waited for the replaced pods
+            install = next(x for x in c if x[:2] == ["helm", "install"])
+            self.assertIn("deploy/kind/cruisekube-values.yaml", install)
+            post = next(x for x in c if x[0] == "curl" and any(a.endswith("/overrides") for a in x))
+            self.assertEqual(json.loads(post[post.index("-d") + 1]), {"enabled": True})
+            self.assertTrue(any(x[0] == "curl" and any("audit-events" in a and "minutes=600" in a for a in x) for x in c))
+            for f in ("cruisekube_workloads.json", "cruisekube_audit_start.json", "cruisekube_resources_start.json",
+                      "cruisekube_audit_end.json", "cruisekube_preflight.json", "cruisekube_settings.json"):
+                json.loads((out / f).read_text())
+
+    def test_a_pod_still_serving_on_a_worker_fails(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t); out = t / "bench-native-1"; out.mkdir()
+            env = fake_env(t)
+            # the replaced controller never finishes: the stand-in shows it on its worker in every list, not shutting down
+            (t / "state.json").write_text(json.dumps({"lists": 0, "stuck": True}))
+            script = (FAKE / "kubectl").read_text()
+            stuck = t / "fake"; stuck.mkdir()
+            (stuck / "kubectl").write_text(script.replace('if st["lists"] == 1:', 'if st["lists"] == 1 or st.get("stuck"):')
+                                           .replace('terminating=True),\n                  pod("cruisekube-system", "cruisekube-webhook-old"',
+                                                    'terminating=False),\n                  pod("cruisekube-system", "cruisekube-webhook-old"'))
+            (stuck / "kubectl").chmod(0o755)
+            env["PATH"] = f"{stuck}:{env['PATH']}"
+            r = subprocess.run(["bash", str(ADDON)], cwd=ROOT, env=dict(env, OUT_DIR=str(out), PHASE="install"),
+                               capture_output=True, text=True, timeout=120)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("add-on pods on a measured worker: cruisekube-system/cruisekube-controller-old", r.stdout)
+
+    def test_kepler_install_read_end(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t); out = t / "bench-native-1"; out.mkdir()
+            env = fake_env(t)
+            kepler = ROOT / "scripts/kind_addons_kepler.sh"
+            self.phase(kepler, out, env, "install")
+            self.phase(kepler, out, env, "read", TAG="start")
+            self.phase(kepler, out, env, "read", TAG="end")
+            self.phase(kepler, out, env, "end")
+            self.assertIn("kepler=v0.11.4 image=quay.io/sustainable_computing_io/kepler:v0.11.4", (out / "addons.txt").read_text())
+            for tag in ("start", "end"):
+                p = out / f"kepler_{tag}_omni-bench-control-plane.prom"
+                self.assertIn("kepler_node_cpu_joules_total", p.read_text())
+                self.assertNotIn("go_goroutines", p.read_text())               # Kepler's own lines only
+            (out / "window_start.txt").write_text("0\n"); (out / "window_end.txt").write_text("900\n")
+            from tools import live_reps
+            g = live_reps.meter(out)
+            self.assertGreater(g["energy, Kepler's reading of the machine's meter (Wh)"], 0)
+
+    def test_kepler_refuses_a_machine_without_a_meter(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t); out = t / "bench-native-1"; out.mkdir()
+            env = dict(fake_env(t), RAPL_ROOT=str(t / "nothing"))
+            r = subprocess.run(["bash", str(ROOT / "scripts/kind_addons_kepler.sh")], cwd=ROOT,
+                               env=dict(env, OUT_DIR=str(out), PHASE="install"), capture_output=True, text=True, timeout=60)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("no processor meter on this machine", r.stdout)
+            self.assertFalse(any(x[0] == "kubectl" for x in calls(t)) if (t / "calls.jsonl").exists() else False)
 
 
 if __name__ == "__main__":

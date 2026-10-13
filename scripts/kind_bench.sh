@@ -77,6 +77,13 @@ if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"
 ADDONS="${ADDONS:-}"
 case "$ADDONS" in ""|keda|goldilocks) ;; *) echo "ADDONS must be empty, keda or goldilocks (got $ADDONS)"; exit 1;; esac
 CRUISEKUBE="${CRUISEKUBE:-}"
+# METER=rapl: the machine's own meter beside the declared model, on a machine with the processor's RAPL counters (a
+# rented bare-metal machine: scripts/metal_kind_run.sh; register row 79): sampled every 2 s over the measured window
+# (tools/rapl.py, rapl.csv). KEPLER=1 adds Kepler, the shared meter, read at the window's opening and close
+# (scripts/kind_addons_kepler.sh). Neither is an arm: both read every arm the same way. Empty: no meter (every other set)
+METER="${METER:-}"; KEPLER="${KEPLER:-}"
+[ -z "$KEPLER" ] || METER=rapl
+case "$METER" in ""|rapl) ;; *) echo "METER must be empty or rapl (got $METER)"; exit 1;; esac
 [ -z "$CRUISEKUBE" ] || { [ "$ADDONS" = keda ] && [ "${ADDONS_PROFILE:-both}" = http ]; } \
   || { echo "CRUISEKUBE=1 runs beside KEDA's HTTP add-on alone (ADDONS=keda ADDONS_PROFILE=http): CruiseKube skips a service whose HPA scales on CPU"; exit 1; }
 # the power cap writes the service's CPU limit; with CruiseKube the limit is CruiseKube's own (it resizes the running
@@ -194,6 +201,14 @@ if [ -n "$CRUISEKUBE" ]; then
   # CruiseKube, its Prometheus and its exporters installed the same way in every arm, beside KEDA's HTTP add-on; it is
   # put in Cruise mode on the service and learns once the load runs (below), before the warm-up
   OUT_DIR="$OUT_DIR" PHASE=install bash scripts/kind_addons_cruisekube.sh
+fi
+if [ -n "$METER" ]; then
+  # the machine's own meter: there must be one (a virtual machine has none, and the run would say nothing new)
+  [ "$PLATFORM" = kind ] || { echo "METER=rapl reads the machine under a kind cluster"; exit 1; }
+  python3 tools/rapl.py probe > "$OUT_DIR/meter_probe.json" \
+    || { echo "no processor meter on this machine (tools/rapl.py probe; it needs root and bare metal)"; cat "$OUT_DIR/meter_probe.json"; exit 1; }
+  echo "meter=rapl counted=$(jq -c .counted "$OUT_DIR/meter_probe.json") virtualization=$(jq -r .virtualization "$OUT_DIR/meter_probe.json") kepler=${KEPLER:-0}" | tee -a "$OUT_DIR/preflight.txt"
+  [ -z "$KEPLER" ] || OUT_DIR="$OUT_DIR" PHASE=install bash scripts/kind_addons_kepler.sh
 fi
 if [ -n "${TWO_APP:-}" ]; then
   # the fairness test: a noisy neighbour on the same workers, its own HPA, its own surging load (deploy/kind/noisy.yaml)
@@ -403,6 +418,13 @@ if [ -n "${FAULTS:-}" ]; then
 fi
 # every start of a serving pod, timed exactly: the API server's own record of each pod from creation to Ready, streamed
 # for the whole measured window (pilot/bench_report.py pod_starts), in every arm alike
+rapl_pid=""
+if [ -n "$METER" ]; then   # the machine's own meter, from just before the window opens to just after it closes
+  python3 tools/rapl.py sample --out "$OUT_DIR/rapl.csv" --interval 2 > "$OUT_DIR/rapl_sampler.log" 2>&1 &
+  rapl_pid=$!; sleep 3
+  [ "$(wc -l < "$OUT_DIR/rapl.csv" 2>/dev/null || echo 0)" -ge 2 ] || { echo "the machine's meter did not start"; cat "$OUT_DIR/rapl_sampler.log"; exit 1; }
+  [ -z "$KEPLER" ] || OUT_DIR="$OUT_DIR" PHASE=read TAG=start bash scripts/kind_addons_kepler.sh
+fi
 date -u +%s > "$OUT_DIR/window_start.txt"
 meter_pid=""
 if [ "$PLATFORM" = aks ]; then
@@ -498,6 +520,11 @@ wait "$probe_pid" || true
 [ -n "$probe2_pid" ] && { wait "$probe2_pid" || true; }
 [ -n "$fault_pid" ] && { wait "$fault_pid" || true; }
 date -u +%s > "$OUT_DIR/window_end.txt"
+if [ -n "$rapl_pid" ]; then
+  [ -z "$KEPLER" ] || OUT_DIR="$OUT_DIR" PHASE=read TAG=end bash scripts/kind_addons_kepler.sh
+  sleep 3; kill "$rapl_pid" 2>/dev/null || true; wait "$rapl_pid" 2>/dev/null || true
+  python3 tools/rapl.py window "$OUT_DIR/rapl.csv" "$(cat "$OUT_DIR/window_start.txt")" "$(cat "$OUT_DIR/window_end.txt")" > "$OUT_DIR/rapl_window.json" || true
+fi
 [ -n "$meter_pid" ] && { kill "$meter_pid" 2>/dev/null || true; }
 [ -n "$host_pid" ] && { kill "$host_pid" 2>/dev/null || true; }
 kill "$watch_pid" 2>/dev/null || true; wait "$watch_pid" 2>/dev/null || true
@@ -537,6 +564,7 @@ if [ -n "$CRUISEKUBE" ]; then   # CruiseKube's own record of the window: its aud
   OUT_DIR="$OUT_DIR" PHASE=end bash scripts/kind_addons_cruisekube.sh || true
   end_read "$OUT_DIR/cruisekube_resources_end.json" get pods -n default -l run=php-apache -o json
 fi
+[ -z "$KEPLER" ] || { OUT_DIR="$OUT_DIR" PHASE=end bash scripts/kind_addons_kepler.sh || true; }
 
 if [ "$ARM" = "watch" ]; then
   echo "== watch arm: nothing may have reached the cluster"

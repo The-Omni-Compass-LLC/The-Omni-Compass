@@ -2,6 +2,20 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-13 (afternoon): the meter kit for Kepler; the CruiseKube trial runs; Azure steady run A
+
+- **The meter kit** (register row 79, the first of the founder's nine pieces; `docs/METER_PREREGISTRATION.md`,
+  `docs/METAL_KIT.md`): on a rented bare-metal machine, one command (`sudo bash scripts/metal_kind_run.sh`) runs the
+  standard Kubernetes set, native and Omni-Compass on top, ten paired repetitions, with the machine's own meter (the
+  processor's RAPL counters, packages and memory, `tools/rapl.py`) read every 2 s over each measured window and judged
+  like every gauge (class P), and Kepler 0.11.4 beside it (`scripts/kind_addons_kepler.sh`; shown, not judged). GitHub's
+  virtual machines have no meter, so the kit refuses them. About 8 hours a run; three runs make the result.
+- **CruiseKube's trial runs** (register row 81): the first two stopped on the harness's own lines (a placement check that
+  counted pods still shutting down; a filter's precedence), never on CruiseKube, which installed end to end both times.
+  Both fixed; the two add-on scripts now run end to end in the tests against stand-ins (`tests/fake_cruisekube`).
+- **Azure steady run A** (run 38339858727, five paired repetitions on the real AKS cluster, card version): no measure
+  differed beyond the noise in this run; Omni-Compass's own process used 0.014 cores. Runs B and C follow the burst run.
+
 ## 2026-10-13 (morning): Goldilocks and the capacity test, three runs each, on the card version
 
 - **Goldilocks** (register row 80; runs 38339821941, 38339828150, 38339834658 on commit `148565d2`, omni-v5 digest

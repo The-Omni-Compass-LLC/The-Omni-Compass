@@ -25,12 +25,12 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from pilot.bench_report import LOWER_BETTER
 from tools.readings import IN_ALL_THREE, OWN_RUNS  # noqa: E402
-from tools.live_reps import BATCH, BILL, KEYS, LABEL, NEUTRAL, ROBUST, SAME_REL
+from tools.live_reps import BATCH, BILL, KEYS, LABEL, METER, NEUTRAL, ROBUST, SAME_REL
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge, higher is better)"
 HIGHER_BETTER = {CAPACITY}
-LOWER = LOWER_BETTER | BATCH | BILL | ROBUST   # the batch queue's finish time and machines after it, a real cloud's bill, the 120 s after a kill: less is better
+LOWER = LOWER_BETTER | BATCH | BILL | ROBUST | METER   # the batch queue's finish time and machines after it, a real cloud's bill, the 120 s after a kill: less is better
 
 
 def robust_rows(runs):

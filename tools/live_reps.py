@@ -38,6 +38,11 @@ BATCH = {"batch: queue finished (s)", "batch: worker machines in service after t
 # the robustness test only (ROBUST=kill, scripts/kind_robust.sh): the same 120 s after the kill mark in both arms
 ROBUST = {"robust: time over the line in the 120 s after the kill (% of samples)", "robust: failed requests in the 120 s after the kill (%)"}
 KEYS += sorted(ROBUST)
+# the machine's own meter (METER=rapl, scripts/kind_bench.sh; a machine with the processor's RAPL counters only) beside
+# the declared model; and Kepler's readings of the same counters (KEPLER=1), shown beside it and never judged
+METER = {"energy, the machine's own meter (Wh)"}
+KEPLER = {"energy, Kepler's reading of the machine's meter (Wh)", "energy Kepler attributes to the service's pods (Wh)"}
+KEYS[KEYS.index("energy (Wh)") + 1:KEYS.index("energy (Wh)") + 1] = sorted(METER) + sorted(KEPLER)
 ROBUST_MEMORY_LIMIT = 1.25   # a governor whose resident memory in the last ten minutes is more than a quarter above the first ten has a leak (preregistered)
 ROBUST_HANDBACK_S = 60.0     # every setting back at the operator's within this many seconds of the kill, or the repetition reads WORSE (preregistered)
 
@@ -45,9 +50,12 @@ ROBUST_HANDBACK_S = 60.0     # every setting back at the operator's within this 
 LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked workers still on at idle power (Wh, declared model)",
          "energy (Wh)": "energy, parked workers at 25 W standby (Wh, declared model; kind never does this)",
          "energy per core-hour (Wh)": "energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged)",
-         "pending pods, pod-minutes": "pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged)"}
+         "pending pods, pod-minutes": "pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged)",
+         "energy, the machine's own meter (Wh)": "energy, the machine's own meter over the window (Wh; the processor's RAPL counters, class P)",
+         "energy, Kepler's reading of the machine's meter (Wh)": "energy, Kepler's reading of the same counters (Wh; Kepler 0.11.4: shown, not judged)",
+         "energy Kepler attributes to the service's pods (Wh)": "energy Kepler attributes to the service's pods (Wh; its split of the meter by each pod's CPU time: shown, not judged)"}
 NEUTRAL = {"CPU used (cores), mean", "utilisation (used / allocatable)", "Omni's own CPU (cores), mean",
-           "CPU used with Omni's own (cores), mean", "energy per core-hour (Wh)", "pending pods, pod-minutes"} | HOST
+           "CPU used with Omni's own (cores), mean", "energy per core-hour (Wh)", "pending pods, pod-minutes"} | HOST | KEPLER
 # more is not better or worse by itself. Energy per core-hour is energy over CPU used, and CPU used is not judged, so the
 # ratio is not either. A pod pending in the snapshot is waiting for a machine or is a pod the autoscaler just created and
 # is starting; the judged gauge is the scheduler's own verdict that no machine would take it (amendment 10)
@@ -113,6 +121,62 @@ def host_cpu(d):
         return {}
     return {"host CPU busy, the real machine under kind (%)": 100.0 * sum(float(x["busy"]) for x in r) / len(r),
             "host cores (the real machine under kind)": float(r[-1]["cores"])}
+
+
+def prom(path):
+    """A Prometheus text file (Kepler's metrics as read at a window mark): (name, labels, value) for every sample line."""
+    out = []
+    with open(path) as f:
+        lines = f.read().splitlines()
+    for line in lines:
+        m = re.match(r'^([a-zA-Z_:][a-zA-Z0-9_:]*)(?:\{(.*)\})?\s+(\S+)', line.strip())
+        if not m or line.startswith("#"):
+            continue
+        try:
+            out.append((m.group(1), dict(re.findall(r'(\w+)="((?:[^"\\]|\\.)*)"', m.group(2) or "")), float(m.group(3))))
+        except ValueError:
+            continue
+    return out
+
+
+def meter(d):
+    """The machine's own meter over the measured window (rapl.csv, scripts/kind_bench.sh METER=rapl; tools/rapl.py): the
+    processor's package and memory counters, sampled every 2 s from before the window opens to after it closes, read at
+    the window's two marks. Kepler (KEPLER=1, scripts/kind_addons_kepler.sh): its node counter on the control plane
+    (on kind every node reads the same machine) and its counters of the service's pods, from its reads at the two marks;
+    a pod gone before the close takes its share with it, so the second is a floor. Absent without a meter."""
+    from tools.rapl import window
+    g = {}
+    try:
+        t0 = float((d / "window_start.txt").read_text().split()[0]); t1 = float((d / "window_end.txt").read_text().split()[0])
+    except (OSError, ValueError, IndexError):
+        return g
+    if (d / "rapl.csv").exists():
+        w = window(str(d / "rapl.csv"), t0, t1)
+        if w.get("ok"):
+            g["energy, the machine's own meter (Wh)"] = w["wh"]
+    starts = {p.name[len("kepler_start_"):-len(".prom")]: p for p in d.glob("kepler_start_*.prom")}
+    ends = {p.name[len("kepler_end_"):-len(".prom")]: p for p in d.glob("kepler_end_*.prom")}
+    nodes = sorted(set(starts) & set(ends))
+    if nodes:
+        zones = ("package", "dram")
+        node_j = lambda p: sum(v for n, l, v in prom(p) if n == "kepler_node_cpu_joules_total" and l.get("zone") in zones)
+        cp = next((n for n in nodes if "control-plane" in n), nodes[0])
+        g["energy, Kepler's reading of the machine's meter (Wh)"] = (node_j(ends[cp]) - node_j(starts[cp])) / 3600.0
+
+        def pods_j(p):
+            r = {}
+            for n, l, v in prom(p):
+                if (n == "kepler_pod_cpu_joules_total" and l.get("zone") in zones and l.get("pod_namespace") == "default"
+                        and l.get("pod_name", "").startswith("php-apache-")):
+                    r[(l.get("pod_id"), l.get("zone"))] = r.get((l.get("pod_id"), l.get("zone")), 0.0) + v
+            return r
+        tot = 0.0
+        for n in nodes:
+            a, b = pods_j(starts[n]), pods_j(ends[n])
+            tot += sum(max(b[k] - a.get(k, 0.0), 0.0) for k in b)
+        g["energy Kepler attributes to the service's pods (Wh)"] = tot / 3600.0
+    return g
 
 
 def batch(d):
@@ -342,7 +406,7 @@ def arm_gauges(d):
         own = float("nan")
     g["Omni's own CPU (cores), mean"] = own
     g["CPU used with Omni's own (cores), mean"] = g.get("CPU used (cores), mean", float("nan")) + own
-    g.update(bill(d)); g.update(second_app(d)); g.update(batch(d))
+    g.update(bill(d)); g.update(second_app(d)); g.update(batch(d)); g.update(meter(d))
     return g
 
 
@@ -524,6 +588,10 @@ def main(root):
                   "Azure's cluster autoscaler deletes a machine once it is empty. Machine-hours are integrated every 15 s over the",
                   "measured window and priced at the list price per machine-hour. The energy rows remain the declared model.", ""]
                  if cloud else NOTE)
+    if any(not math.isnan(m.get("energy, the machine's own meter (Wh)", float("nan"))) for m in out["means"].values()):
+        L += ["**This run carries the machine's own meter.** The processor's RAPL counters (its packages and its memory) were",
+              "read every 2 s over the measured window: the energy the whole machine under the cluster drew, Omni-Compass's own",
+              "process included (evidence class P). The declared-model rows stay beside it; Kepler's rows read the same counters.", ""]
     for a in ("watch", "omni", "compass", "strict"):
         if a not in runs or "native" not in runs:
             continue
@@ -545,7 +613,7 @@ def main(root):
             # a change under one part in a million of the value is rounding, not a difference: read "same" (SAME_REL)
             same = abs(d.mean()) <= SAME_REL * max(abs(nb), 1e-12)
             sig = sig and not same
-            better = (d.mean() < 0) == (k in LOWER_BETTER or k in BILL or k in SECOND or k in BATCH or k in ROBUST)
+            better = (d.mean() < 0) == (k in LOWER_BETTER or k in BILL or k in SECOND or k in BATCH or k in ROBUST or k in METER)
             ch = (ob - nb) / abs(nb) * 100 if abs(nb) > 1e-12 else None
             out["paired"][a][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
             ch_s = f"{ch:+.1f}%" if ch is not None else f"{ob - nb:+.3g} (native is 0)"

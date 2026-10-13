@@ -39,11 +39,11 @@ CK_CHART="oci://tfy.jfrog.io/tfy-helm/cruisekube"
 CK_CHART_SHA256="${CK_CHART_SHA256:-}"      # the chart archive's SHA-256; empty only in a shakedown run, which records it
 KSM_VERSION="${KSM_VERSION:-v2.20.0}"
 KSM_RAW="https://raw.githubusercontent.com/kubernetes/kube-state-metrics/${KSM_VERSION}/examples/standard"
-KSM_SHA256_CRB="afd513a9dba5ffe1a4128e4f612788dcccc314fb58afaef7a627c506229570df"
-KSM_SHA256_CR="4447544443859be7f70deca48e4cb75d30b0b7da090cb9e914c9c08f97f7e62c"
-KSM_SHA256_DEPLOY="08d57682c0117bda50b8e894be1669001e49ce0ff3e60c11fccc6f56dfbc9f2e"
-KSM_SHA256_SA="91f24588ac4f8944b9211fccefdce9ee70434676e8a4a55a14d69bc7f68ae0a5"
-KSM_SHA256_SVC="efa9813fb6a6a2d11b509cf4f2eb0ab044935b4153b425e697d4b31c7f6f42a4"
+KSM_SHA256_CRB="${KSM_SHA256_CRB:-afd513a9dba5ffe1a4128e4f612788dcccc314fb58afaef7a627c506229570df}"
+KSM_SHA256_CR="${KSM_SHA256_CR:-4447544443859be7f70deca48e4cb75d30b0b7da090cb9e914c9c08f97f7e62c}"
+KSM_SHA256_DEPLOY="${KSM_SHA256_DEPLOY:-08d57682c0117bda50b8e894be1669001e49ce0ff3e60c11fccc6f56dfbc9f2e}"
+KSM_SHA256_SA="${KSM_SHA256_SA:-91f24588ac4f8944b9211fccefdce9ee70434676e8a4a55a14d69bc7f68ae0a5}"
+KSM_SHA256_SVC="${KSM_SHA256_SVC:-efa9813fb6a6a2d11b509cf4f2eb0ab044935b4153b425e697d4b31c7f6f42a4}"
 NS=cruisekube-system
 WORKLOAD_ID="Deployment:default:php-apache"  # CruiseKube's own key for a workload: kind, namespace and name
 API_PORT="${CRUISEKUBE_API_PORT:-18080}"
@@ -123,7 +123,7 @@ if [ "$PHASE" = install ]; then
   left=$(offpods true)
   [ -z "$left" ] || echo "still shutting down on a worker two minutes after the move: $left" | tee -a "$OUT_DIR/addons.txt"
   # every image the add-ons run, as the cluster resolved it (tag and digest), in the run's own record
-  kubectl get pods -A -o json | jq -r '.items[] | select(.metadata.namespace | IN("cruisekube-system","cruisekube-metrics") or (.metadata.name | startswith("kube-state-metrics"))) | .status.containerStatuses[]? | "\(.image) \(.imageID)"' \
+  kubectl get pods -A -o json | jq -r '.items[] | select((.metadata.namespace | IN("cruisekube-system","cruisekube-metrics")) or (.metadata.name | startswith("kube-state-metrics"))) | .status.containerStatuses[]? | "\(.image) \(.imageID)"' \
     | sort -u >> "$OUT_DIR/cruisekube_pins.txt"
   api_up || { echo "CruiseKube's API did not answer"; tail -20 "$OUT_DIR/cruisekube_port_forward.log"; exit 1; }
   # CruiseKube's own view of its inputs and its settings as they stand (its hour among them), in the run's record

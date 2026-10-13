@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+"""Stand-in kubectl for tests/test_cruisekube.py: a kind cluster with CruiseKube and its metrics installed. The first list
+of every pod still shows the controller's and the webhook's replaced pods shutting down on two workers, as a rollout
+leaves them; later lists show them gone. Every call is appended to $FAKE_CALLS; the count of pod lists is kept in
+$FAKE_STATE."""
+import json, os, sys
+args = sys.argv[1:]
+open(os.environ["FAKE_CALLS"], "a").write(json.dumps(["kubectl"] + args) + "\n")
+if "-f" in args and args[args.index("-f") + 1] == "-":
+    sys.stdin.read()          # kubectl apply -f - reads all it is given before it answers, as the real one does
+state = os.environ["FAKE_STATE"]
+st = json.load(open(state)) if os.path.exists(state) else {"lists": 0}
+
+
+def pod(ns, name, node, labels=None, terminating=False, image="quay.io/x/y:v1"):
+    p = {"metadata": {"namespace": ns, "name": name, "labels": labels or {}}, "spec": {"nodeName": node},
+         "status": {"phase": "Running", "containerStatuses": [{"image": image, "imageID": image + "@sha256:" + "0" * 64}]}}
+    if terminating:
+        p["metadata"]["deletionTimestamp"] = "2026-10-13T00:00:00Z"
+    return p
+
+
+cp, w1, w2 = "omni-bench-control-plane", "omni-bench-worker", "omni-bench-worker2"
+ns = args[args.index("-n") + 1] if "-n" in args else ""
+if args[:2] == ["get", "--raw"] and "/namespaces/kepler/pods/" in args[2]:
+    st["reads"] = st.get("reads", 0) + 1
+    json.dump(st, open(state, "w"))
+    j = 1000.0 * st["reads"]
+    print(f'kepler_node_cpu_joules_total{{node_name="{cp}",path="/host/sys",zone="package"}} {j}')
+    print(f'kepler_node_cpu_joules_total{{node_name="{cp}",path="/host/sys",zone="dram"}} {j / 10}')
+    print(f'kepler_pod_cpu_joules_total{{node_name="{w1}",pod_id="p1",pod_name="php-apache-1",pod_namespace="default",state="running",zone="package"}} {j / 4}')
+    print("go_goroutines 12")
+elif args[:2] == ["get", "nodes"]:
+    print("\n".join(f"{n} Ready" for n in (cp, w1, w2)))
+elif ns == "kepler" and "daemonset" in args and "-o" in args:
+    print("3")
+elif ns == "kepler" and "get" in args and "pods" in args and "-o" in args and args[args.index("-o") + 1] == "json":
+    print(json.dumps({"items": [pod("kepler", f"kepler-{i}", n, {"app.kubernetes.io/name": "kepler"},
+                                    image="quay.io/sustainable_computing_io/kepler:v0.11.4") for i, n in enumerate((cp, w1, w2))]}))
+elif ns == "kepler" and "get" in args and "pods" in args and "-o" in args and args[args.index("-o") + 1] == "name":
+    print("\n".join(f"pod/kepler-{i}" for i in range(3)))
+elif args[:3] == ["get", "pods", "-A"]:
+    st["lists"] += 1
+    json.dump(st, open(state, "w"))
+    items = [pod("cruisekube-system", "cruisekube-controller-new", cp), pod("cruisekube-system", "cruisekube-webhook-new", cp),
+             pod("cruisekube-system", "cruisekube-postgresql-0", cp),
+             pod("cruisekube-metrics", "node-exporter-a", w1, {"app": "node-exporter"}),
+             pod("cruisekube-metrics", "prometheus-0", cp, {"app": "prometheus"}),
+             pod("kube-system", "kube-state-metrics-new", cp, {"app.kubernetes.io/name": "kube-state-metrics"}),
+             pod("default", "php-apache-1", w1, {"run": "php-apache"})]
+    if st["lists"] == 1:
+        items += [pod("cruisekube-system", "cruisekube-controller-old", w1, terminating=True),
+                  pod("cruisekube-system", "cruisekube-webhook-old", w2, terminating=True)]
+    print(json.dumps({"items": items}))
+elif "get" in args and "pods" in args and "-o" in args and args[args.index("-o") + 1] == "json":
+    print(json.dumps({"items": [{"metadata": {"name": "php-apache-1"}, "spec": {"containers": [
+        {"name": "php-apache", "resources": {"requests": {"cpu": "120m"}, "limits": {"cpu": "4"}}}]}}]}))
+elif "create" in args and "namespace" in args:
+    print("apiVersion: v1\nkind: Namespace\nmetadata:\n  name: %s" % args[args.index("namespace") + 1])
+elif "logs" in args:
+    print("fake log line")
+elif "get" in args and "-o" in args and args[args.index("-o") + 1] == "wide":
+    print("NAME READY STATUS NODE")
+else:                     # apply, patch, rollout status, scale, port-forward: done
+    print("ok")
