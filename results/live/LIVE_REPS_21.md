@@ -12,22 +12,22 @@ order rotated, both arms of a repetition on one runner. The table was recomputed
 
 | Gauge | Native | Me on top | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| response time (ms), mean | 151.9 | 107.5 | −29.2% | −55.45 to −33.36 | lower, proven |
-| response time (ms), 95th percentile | 304.9 | 191.4 | −37.2% | −148.4 to −78.55 | lower, proven |
-| response time (ms), 99th percentile | 438.1 | 298.7 | −31.8% | −191.3 to −87.37 | lower, proven |
-| failed requests (%) | 0 | 0 | 0 | 0 to 0 | equal |
+| response time (ms), mean | 151.9 | 107.5 | −29.2% | −55.45 to −33.36 | GAIN, proven |
+| response time (ms), 95th percentile | 304.9 | 191.4 | −37.2% | −148.4 to −78.55 | GAIN, proven |
+| response time (ms), 99th percentile | 438.1 | 298.7 | −31.8% | −191.3 to −87.37 | GAIN, proven |
+| failed requests (%) | 0 | 0 | 0 | 0 to 0 | EVEN |
 | HPA replicas, mean | 8.942 | 7.844 | −12.3% | −1.616 to −0.581 | fewer, proven |
 | worker nodes in service, mean | 6 | 4.745 | −20.9% | −1.524 to −0.986 | fewer, proven (all stayed powered) |
 | CPU used by the app (cores), mean | 0.911 | 1.146 | +25.8% | +0.171 to +0.300 | more, proven |
-| pods started | 4.6 | 6.3 | +37.0% | −0.117 to +3.517 | not proven |
-| pod start wait, total (s) | 10.2 | 17 | +66.7% | −1.98 to +15.58 | not proven |
-| pending pods, pod-minutes | 0.105 | 0.355 | +238% | −0.074 to +0.574 | not proven |
+| pods started | 4.6 | 6.3 | +37.0% | −0.117 to +3.517 | EVEN, not proven |
+| pod start wait, total (s) | 10.2 | 17 | +66.7% | −1.98 to +15.58 | EVEN, not proven |
+| pending pods, pod-minutes | 0.105 | 0.355 | +238% | −0.074 to +0.574 | EVEN, not proven |
 
 ## Energy: a declared model, not a meter
 
 | Gauge | Native | Me on top | Change | 95% interval | Verdict |
 |---|---:|---:|---:|---:|---|
-| **energy, parked workers still on at idle power (Wh)**: what kind does | 159 | 161.9 | **+1.8%** | +2.13 to +3.65 | **higher, proven** |
+| **energy, parked workers still on at idle power (Wh)**: what kind does | 159 | 161.9 | **+1.8%** | +2.13 to +3.65 | **power given, proven** |
 | energy, parked workers at 25 W standby (Wh): needs a node autoscaler that removes the machine; this run has none | 159 | 138 | −13.2% | −26.16 to −15.72 | model only |
 
 ## Plainly

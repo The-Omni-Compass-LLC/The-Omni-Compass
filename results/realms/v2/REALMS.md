@@ -12,15 +12,15 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 | Organism | Muscles | Label | Work per energy | Work | Energy | Violations (pp) | Valid |
 |---|---:|---|---:|---:|---:|---:|---|
-| Compute / AI / Cloud | 430 | **SUPERIOR WITHIN GUARDRAILS** | +0.1% (+0.1 to +0.1) | +0.0% (-0.0 to +0.0) | -0.1% (-0.1 to -0.1) | -0.0 (-0.0 to -0.0) | yes |
-| Physics / Robotics / Autonomous | 376 | **ENERGY IMPROVEMENT WITH SERVICE TRADEOFF** | +0.1% (+0.0 to +0.3) | -0.0% (-0.0 to -0.0) | -0.2% (-0.3 to -0.1) | +0.0 (-0.0 to +0.0) | yes |
-| Energy / Facility / Industrial | 470 | **SUPERIOR WITHIN GUARDRAILS** | +0.3% (+0.2 to +0.4) | +0.0% (-0.0 to +0.0) | -0.3% (-0.4 to -0.2) | -0.0 (-0.0 to -0.0) | yes |
-| Distribution / Specialized | 440 | **SUPERIOR WITHIN GUARDRAILS** | +0.2% (+0.1 to +0.2) | +0.0% (-0.0 to +0.0) | -0.2% (-0.2 to -0.1) | -0.0 (-0.0 to -0.0) | yes |
-| The whole tower, every muscle once | 945 | **ENERGY IMPROVEMENT WITH SERVICE TRADEOFF** | +0.3% (+0.2 to +0.4) | -0.0% (-0.0 to -0.0) | -0.3% (-0.4 to -0.2) | +0.0 (+0.0 to +0.0) | yes |
+| Compute / AI / Cloud | 430 | **GAIN (within the guardrails)** | +0.1% (+0.1 to +0.1) | +0.0% (-0.0 to +0.0) | -0.1% (-0.1 to -0.1) | -0.0 (-0.0 to -0.0) | yes |
+| Physics / Robotics / Autonomous | 376 | **GAIN AND LOSS (energy cut, service traded for it)** | +0.1% (+0.0 to +0.3) | -0.0% (-0.0 to -0.0) | -0.2% (-0.3 to -0.1) | +0.0 (-0.0 to +0.0) | yes |
+| Energy / Facility / Industrial | 470 | **GAIN (within the guardrails)** | +0.3% (+0.2 to +0.4) | +0.0% (-0.0 to +0.0) | -0.3% (-0.4 to -0.2) | -0.0 (-0.0 to -0.0) | yes |
+| Distribution / Specialized | 440 | **GAIN (within the guardrails)** | +0.2% (+0.1 to +0.2) | +0.0% (-0.0 to +0.0) | -0.2% (-0.2 to -0.1) | -0.0 (-0.0 to -0.0) | yes |
+| The whole tower, every muscle once | 945 | **GAIN AND LOSS (energy cut, service traded for it)** | +0.3% (+0.2 to +0.4) | -0.0% (-0.0 to -0.0) | -0.3% (-0.4 to -0.2) | +0.0 (+0.0 to +0.0) | yes |
 
 ## Every muscle alone, by home realm
 
-| Realm | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID |
+| Realm | Muscles | GAIN (within the guardrails) | GAIN AND LOSS (energy cut, service traded for it) | EVEN (inside the noise, within the guardrails) | EVEN (not established: inside the noise, a guardrail crossed on the mean) | LESS WORK PER ENERGY | INVALID |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Compute / AI / Cloud | 334 | 21 | 1 | 312 | 0 | 0 | 0 |
 | Physics / Robotics / Autonomous | 119 | 21 | 10 | 81 | 7 | 0 | 0 |
@@ -30,7 +30,7 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 ## By knob: what kind of authority Omni held
 
-| Knob | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID | Median work per energy |
+| Knob | Muscles | GAIN (within the guardrails) | GAIN AND LOSS (energy cut, service traded for it) | EVEN (inside the noise, within the guardrails) | EVEN (not established: inside the noise, a guardrail crossed on the mean) | LESS WORK PER ENERGY | INVALID | Median work per energy |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | capacity | 454 | 21 | 6 | 420 | 7 | 0 | 0 | +0.0% |
 | setpoint | 134 | 82 | 4 | 44 | 0 | 0 | 0 | +1.2% |
@@ -109,26 +109,26 @@ For 132 of 134 setpoint muscles, a fixed setpoint at the calm end of the declare
 
 | Muscle | Family | Knob | Label | Work per energy | Work | Violations (pp) |
 |---|---|---|---|---:|---:|---:|
-| tank_level_target | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +33.6% (+31.6 to +35.5) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| temperature_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +32.3% (+30.5 to +34.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| pressure_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +32.0% (+30.0 to +34.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| furnace_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +31.9% (+30.1 to +33.6) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| valve_position | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +31.8% (+29.8 to +33.8) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| mass_flow_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +31.7% (+30.0 to +33.5) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| coasting_speed_target | Rail Traction & Train Control | capacity | NOT ESTABLISHED | +27.4% (-5.1 to +60.0) | -9.0% (-20.9 to +2.9) | +2.6 (-0.5 to +5.7) |
-| greenhouse_temperature_setpoint | Agriculture & Irrigation | setpoint | SUPERIOR WITHIN GUARDRAILS | +19.4% (+17.9 to +21.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| well_drawdown_level_target | Agriculture & Irrigation | setpoint | SUPERIOR WITHIN GUARDRAILS | +18.5% (+16.8 to +20.2) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| pivot_speed_setpoint | Agriculture & Irrigation | setpoint | SUPERIOR WITHIN GUARDRAILS | +18.2% (+16.6 to +19.9) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| hoist_speed_target | Elevators & Vertical Transport | capacity | NOT ESTABLISHED | -1.6% (-7.6 to +4.4) | -2.5% (-8.2 to +3.2) | +0.0 (+0.0 to +0.0) |
-| trim_target | Marine Propulsion & Vessel Automation | capacity | NOT ESTABLISHED | -1.3% (-6.1 to +3.5) | -2.0% (-6.5 to +2.5) | +0.0 (+0.0 to +0.0) |
-| engine_load_sharing_setpoint | Marine Propulsion & Vessel Automation | capacity | NOT ESTABLISHED | -1.1% (-7.4 to +5.3) | -2.5% (-8.2 to +3.2) | +0.0 (+0.0 to +0.0) |
-| battery_soc_reserve | Energy Storage & Microgrid | setpoint | SERVICE IMPROVEMENT WITH ENERGY TRADEOFF | -0.2% (-0.2 to -0.2) | +0.0% (+0.0 to +0.0) | -1.4 (-1.6 to -1.2) |
-| time_of_use_schedule | Energy Storage & Microgrid | setpoint | SERVICE IMPROVEMENT WITH ENERGY TRADEOFF | -0.2% (-0.2 to -0.2) | +0.0% (+0.0 to +0.0) | -1.4 (-1.5 to -1.3) |
-| microgrid_emergency_reserve | Energy Storage & Microgrid | setpoint | SERVICE IMPROVEMENT WITH ENERGY TRADEOFF | -0.2% (-0.2 to -0.2) | +0.0% (+0.0 to +0.0) | -1.4 (-1.5 to -1.3) |
-| pue_target | Facility & Grid Optimization | setpoint | SERVICE IMPROVEMENT WITH ENERGY TRADEOFF | -0.1% (-0.1 to -0.1) | +0.0% (+0.0 to +0.0) | -0.8 (-1.0 to -0.6) |
-| model_replicas | AI Inference Serving | capacity | NONINFERIOR / INCONCLUSIVE | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| model_route_weight | AI Inference Serving | setpoint | NONINFERIOR / INCONCLUSIVE | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| model_load | AI Inference Serving | capacity | NONINFERIOR / INCONCLUSIVE | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| tank_level_target | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +33.6% (+31.6 to +35.5) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| temperature_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +32.3% (+30.5 to +34.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| pressure_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +32.0% (+30.0 to +34.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| furnace_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +31.9% (+30.1 to +33.6) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| valve_position | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +31.8% (+29.8 to +33.8) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| mass_flow_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +31.7% (+30.0 to +33.5) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| coasting_speed_target | Rail Traction & Train Control | capacity | EVEN (not established: inside the noise, a guardrail crossed on the mean) | +27.4% (-5.1 to +60.0) | -9.0% (-20.9 to +2.9) | +2.6 (-0.5 to +5.7) |
+| greenhouse_temperature_setpoint | Agriculture & Irrigation | setpoint | GAIN (within the guardrails) | +19.4% (+17.9 to +21.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| well_drawdown_level_target | Agriculture & Irrigation | setpoint | GAIN (within the guardrails) | +18.5% (+16.8 to +20.2) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| pivot_speed_setpoint | Agriculture & Irrigation | setpoint | GAIN (within the guardrails) | +18.2% (+16.6 to +19.9) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| hoist_speed_target | Elevators & Vertical Transport | capacity | EVEN (not established: inside the noise, a guardrail crossed on the mean) | -1.6% (-7.6 to +4.4) | -2.5% (-8.2 to +3.2) | +0.0 (+0.0 to +0.0) |
+| trim_target | Marine Propulsion & Vessel Automation | capacity | EVEN (not established: inside the noise, a guardrail crossed on the mean) | -1.3% (-6.1 to +3.5) | -2.0% (-6.5 to +2.5) | +0.0 (+0.0 to +0.0) |
+| engine_load_sharing_setpoint | Marine Propulsion & Vessel Automation | capacity | EVEN (not established: inside the noise, a guardrail crossed on the mean) | -1.1% (-7.4 to +5.3) | -2.5% (-8.2 to +3.2) | +0.0 (+0.0 to +0.0) |
+| battery_soc_reserve | Energy Storage & Microgrid | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.2% (-0.2 to -0.2) | +0.0% (+0.0 to +0.0) | -1.4 (-1.6 to -1.2) |
+| time_of_use_schedule | Energy Storage & Microgrid | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.2% (-0.2 to -0.2) | +0.0% (+0.0 to +0.0) | -1.4 (-1.5 to -1.3) |
+| microgrid_emergency_reserve | Energy Storage & Microgrid | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.2% (-0.2 to -0.2) | +0.0% (+0.0 to +0.0) | -1.4 (-1.5 to -1.3) |
+| pue_target | Facility & Grid Optimization | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.1% (-0.1 to -0.1) | +0.0% (+0.0 to +0.0) | -0.8 (-1.0 to -0.6) |
+| model_replicas | AI Inference Serving | capacity | EVEN (inside the noise, within the guardrails) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| model_route_weight | AI Inference Serving | setpoint | EVEN (inside the noise, within the guardrails) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| model_load | AI Inference Serving | capacity | EVEN (inside the noise, within the guardrails) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
 
 ## Validity
 

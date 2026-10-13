@@ -411,7 +411,7 @@ for note in PRE.get("post_registration_notes", []):
 P(f"Development seeds: {', '.join(str(x) for x in PRE['development_seeds'])}. The allocation law, shield, baselines and benchmark code were "
   "frozen and their SHA-256 and program fingerprints recorded in results/PREREGISTRATION.json before the held-out seeds "
   f"{S1} and {S2} (500 scenarios each) were run. Paired 95% intervals are bootstrap intervals over scenarios (4,000 resamples). "
-  "A result is called better or worse only when the interval excludes zero.")
+  "A result is called GAIN or LOSS only when the interval excludes zero; otherwise it is EVEN.")
 
 # ------------------------------------------------------------------ 8
 P("8. Results", H1)
@@ -434,9 +434,9 @@ def verdict(sd, comp, mm, lower):
     if mm in ("machines_started", "machines_stopped"):
         return "count"
     r = pr(sd, comp, mm); lo, hi = r["ci95"]
-    if hi < 0: return "better" if lower else "worse"
-    if lo > 0: return "worse" if lower else "better"
-    return "n.s."
+    if hi < 0: return "GAIN" if lower else "LOSS"
+    if lo > 0: return "LOSS" if lower else "GAIN"
+    return "EVEN"
 
 for idx, sd in enumerate((S1, S2)):
     P(f"8.{idx + 1} Held-out seed {sd} (500 scenarios)", H2)
@@ -452,10 +452,10 @@ REFS = ("k8s_ref_50", "k8s_ref_60", "k8s_ref_70", "k8s_ref_80")
 sens = [("time_healthy", "Time healthy", False), ("recovery_minutes", "Recovery", True), ("sla_violation_physical", "Physical SLA", True),
         ("violation_backlog", "Backlog violation", True), ("availability", "Work completed", False), ("energy_kwh", "Energy", True),
         ("scale_reversals", "Reversals", True), ("machine_round_trips", "Round trips", True), ("thermal_travel", "Thermal travel", True)]
-T([["Measure", "power-protect better in", "throughput better in", "throughput worse in"]] +
-  [[lab, f"{sum(verdict(sd, 'omni_k8s_protect_vs_' + r, mm, lower) == 'better' for sd in (S1, S2) for r in REFS)}/8",
-    f"{sum(verdict(sd, 'omni_k8s_throughput_vs_' + r, mm, lower) == 'better' for sd in (S1, S2) for r in REFS)}/8",
-    f"{sum(verdict(sd, 'omni_k8s_throughput_vs_' + r, mm, lower) == 'worse' for sd in (S1, S2) for r in REFS)}/8"] for mm, lab, lower in sens],
+T([["Measure", "power-protect GAIN in", "throughput GAIN in", "throughput LOSS in"]] +
+  [[lab, f"{sum(verdict(sd, 'omni_k8s_protect_vs_' + r, mm, lower) == 'GAIN' for sd in (S1, S2) for r in REFS)}/8",
+    f"{sum(verdict(sd, 'omni_k8s_throughput_vs_' + r, mm, lower) == 'GAIN' for sd in (S1, S2) for r in REFS)}/8",
+    f"{sum(verdict(sd, 'omni_k8s_throughput_vs_' + r, mm, lower) == 'LOSS' for sd in (S1, S2) for r in REFS)}/8"] for mm, lab, lower in sens],
   [1.8 * inch, 1.6 * inch, 1.6 * inch, 1.6 * inch])
 P("Counts are over 2 seeds x 4 HPA targets. Human pages are not reported as a result: the governor issues no page actions by design.")
 
@@ -463,8 +463,8 @@ P("8.4 Primary endpoint and multiplicity", H2)
 P("Primary comparison: throughput mode vs the Kubernetes reference at HPA target 0.7. Primary metric: energy per run. Secondary metrics "
   "are tested with a paired sign-flip permutation test (10,000 permutations) and Holm-adjusted across all secondary metrics and both seeds "
   "(24 tests). The smallest attainable p-value is 1/10,001.")
-T([["Seed", "Energy difference (kWh)", "p", "Scenarios better"]] +
-  [[sd, f"{r['mean_delta']:+.2f}", f"{r['p']:.1e}", f"{r['better']}/{r['n']}"] for sd, r in MULT["primary"].items()],
+T([["Seed", "Energy difference (kWh)", "p", "Scenarios with energy cut"]] +
+  [[sd, f"{r['mean_delta']:+.2f}", f"{r['p']:.1e}", f"{r['cut']}/{r['n']}"] for sd, r in MULT["primary"].items()],
   [1.6 * inch, 1.8 * inch, 1.2 * inch, 1.6 * inch])
 T([["Seed", "Metric", "Difference", "Holm p", "Verdict"]] +
   [[t["seed"], t["metric"], f"{t['mean_delta']:+.4f}", f"{t['p_holm']:.1e}", t["verdict"]] for t in MULT["secondary"]],
@@ -670,7 +670,7 @@ for t in [
     "Wear: see Chapter 8 for scale direction reversals and machine round trips in each mode relative to the reference; power-protect mode reverses direction more often than the reference.",
     "Fleet harness: workloads are synthetic; the execution layer reproduces documented behaviour, not the upstream binaries; scheduling is fluid packing without affinity, disruption budgets or multi-zone placement; GPU throughput scales linearly with the power cap.",
     "Engine mechanism: the six-state engine contributes through the equation (2) release gate and the state-derived headroom; the governor's capacity sizing, power trimming and single authority remain rule-based.",
-    "Power-protect mode: backlog violations and work completed are worse than the reference, because the site power limit is enforced and the reference does not enforce it.",
+    "Power-protect mode: backlog violations and work completed are LOSS against the reference, because the site power limit is enforced and the reference does not enforce it.",
     "Baseline fidelity: the Kubernetes baseline is a documented-behaviour reference model; running the upstream Cluster Autoscaler, Karpenter, HPA and VPA controllers against the same scenarios is open.",
     "Power-protect constants were set by development tuning, not by constrained search; throughput constants come from a 110-trial random and local search and are not proven optimal.",
     "Multi-cluster, GPU-cluster and facility-level vessels are not yet built.",

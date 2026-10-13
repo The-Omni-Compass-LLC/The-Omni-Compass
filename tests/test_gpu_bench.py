@@ -359,12 +359,18 @@ def enforced():
     g.step()
     assert [x for x in recs(d / "a5.jsonl") if "decision" in x][0]["decision"]["0"]["telemetry"]["enforced_w"] == 300.0
     # result labels, by rule
-    assert label("toward its aim, proven", True, True, True, True) == "SUPERIOR WITHIN GUARDRAILS"
-    assert label("toward its aim, proven", True, False, True, True) == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
-    assert label("toward its aim, not proven", True, True, True, True) == "NONINFERIOR / INCONCLUSIVE"
-    assert label("away from its aim, not proven", False, True, True, True) == "NOT ESTABLISHED"
-    assert label("away from its aim, proven", True, True, True, True) == "AWAY FROM ITS AIM"
-    assert label("toward its aim, proven", True, True, True, False) == "INVALID"
+    assert label("GAIN, proven", True, True, True, True) == "SUPERIOR WITHIN GUARDRAILS"
+    assert label("GAIN, proven", True, False, True, True) == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
+    assert label("GAIN, not proven", True, True, True, True) == "NONINFERIOR / INCONCLUSIVE"
+    assert label("LOSS, not proven", False, True, True, True) == "NOT ESTABLISHED"
+    assert label("LOSS, proven", True, True, True, True) == "AWAY FROM ITS AIM"
+    assert label("GAIN, proven", True, True, True, False) == "INVALID"
+    assert label("GAIN, proven", True, True, True, True, "LOSS, proven") == "NOT ATTRIBUTABLE: WATCH DIFFERS FROM NATIVE"
+    from tools.gpu_reps import verdict
+    assert verdict("energy, GPU (J)", 5.0, 1.0, 10) == "power given, proven", "a card's energy up is power given, never a LOSS"
+    assert verdict("energy, GPU (J)", -5.0, 1.0, 10) == "GAIN, proven", "energy cut is a GAIN"
+    assert verdict("response time, 95th percentile (ms)", 5.0, 9.0, 10) == "LOSS, not proven"
+    assert verdict("work per energy (served requests per kJ)", 5.0, 1.0, 10) == "GAIN, proven"
 
 
 def one_writer():

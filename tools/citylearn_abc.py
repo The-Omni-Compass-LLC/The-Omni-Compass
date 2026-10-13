@@ -5,12 +5,13 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for CityLearn (docs/OMNI_V1.md): the same districts run three times as separate GitHub runs on the
 same frozen engine (tools/run_citylearn.py). CityLearn is a deterministic simulator, so the three runs must give the same
-numbers: a row reads lower or higher in all three of our runs when all three runs agree on the sign, same when the change is
-under one part in a million, and "the runs differ" when they do not reproduce each other, which is a finding about the
-simulator or the harness and is said so. A district with no electric battery gets nothing from Omni (the runner moves
+numbers: a row reads GAIN or LOSS in all three of our runs when all three runs agree on the sign (judged by what the score
+is for, never by its sign: CITYLEARN_AIMS; the electricity bought, the bill and the carbon are resources spent, so a fall is a
+cut, a GAIN, and a rise is power given), EVEN when the change is under one part in a million, and "the runs differ" when they
+do not reproduce each other, which is a finding about the simulator or the harness and is said so. A district with no electric battery gets nothing from Omni (the runner moves
 only `electrical_storage` commands; a water tank stays native), so it is listed as "nothing for Omni to move", and any
 native/omni difference in it is CityLearn's own run-to-run variation, never an Omni result. A district CityLearn cannot
-run is listed with CityLearn's own error. Every row is reported, losses included.
+run is listed with CityLearn's own error. Every row is reported, LOSS included.
 Usage: python tools/citylearn_abc.py A_DIR B_DIR C_DIR --out results/live/V1_CITYLEARN.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding citylearn-<district>/<district>.json"""
 from __future__ import annotations
@@ -23,8 +24,19 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, in_all_three, DETERMINISTIC_RULE, ACROSS_HEAD, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, in_all_three, EVEN_SAME, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
 from tools.run_citylearn import KPIS, WORDS as KPI_NAMES
+
+# What each CityLearn score is for. CityLearn aims every score lower; the electricity bought, the bill, the carbon and the
+# distance from zero net energy are amounts spent (a fall is a cut, a GAIN; a rise is power given, never a loss), while the
+# peaks, the swings, the unevenness, the energy not served and the time uncomfortable are the grid's and the occupants'
+# misses (a rise is a LOSS).
+CITYLEARN_AIMS = {"cost_total": "spent", "electricity_consumption_total": "spent", "carbon_emissions_total": "spent",
+                  "zero_net_energy": "spent"}
+
+
+def aim_of(k):
+    return CITYLEARN_AIMS.get(k, "lower")
 
 SAME_REL = 1e-6          # a change under one part in a million of the value reads "same" (amendment 11)
 REPRO_REL = 1e-9         # two runs of a deterministic simulator agree to this, or they did not reproduce
@@ -57,18 +69,19 @@ def reproduced(recs, k, arm):
 
 
 def verdict(recs, k):
-    """The score's reading over the three runs, by rule (every CityLearn score is one CityLearn itself aims lower)."""
+    """The score's reading over the three runs, by rule: GAIN, LOSS or power given in all three of our runs by what the score
+    is for (CITYLEARN_AIMS), EVEN, or the runs differ."""
     if not (reproduced(recs, k, "native") and reproduced(recs, k, "omni")):
         return "**the runs differ**"
     ch = [change(r, k) for r in recs]
     if any(c is None for c in ch):
         return "no value"
     if all(abs(c) <= SAME_REL for c in ch):
-        return "same"
+        return EVEN_SAME
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    return in_all_three(signs == {-1})
+    return in_all_three(signs == {-1}, aim_of(k))
 
 
 def engine(run):
@@ -99,11 +112,13 @@ def main(argv=None):
          "controller (BasicRBC) and its own scores; every score is one CityLearn itself aims lower. Native is that controller; omni is the "
          "same controller with the compass law on top of its electric battery commands only (`tools/run_citylearn.py`). The "
          "same districts ran three times as separate GitHub runs on the same frozen engine. Because the simulator is "
-         "deterministic, the runs must reproduce each other: a score reads **lower** or **higher in all three of our runs** (which "
-         "way the number went against native; the reader judges it) when all three runs give the same sign, **same** when the change is under one part in a million, and **the runs differ** "
-         "when they do not reproduce, which is a finding about the simulator or the harness and is said so. A district with "
-         "no electric battery gets nothing from Omni (a water tank stays native), so any native/omni difference in it is "
-         "CityLearn's own run-to-run variation, never an Omni result. Every row is shown, losses included.", "",
+         "deterministic, the runs must reproduce each other: a score reads **GAIN** or **LOSS in all three of our runs** when all "
+         "three runs give the same sign, judged by what the score is for and never by its sign: the electricity bought, the bill and "
+         "the carbon are amounts spent, so a fall is a cut, a GAIN, and a rise is **power given**; a rise in a peak, a swing, the "
+         "unevenness, the energy not served or the time uncomfortable is a LOSS. **EVEN, the same** when the change is under one part "
+         "in a million, and **the runs differ** when they do not reproduce, which is a finding about the simulator or the harness and "
+         "is said so. A district with no electric battery gets nothing from Omni (a water tank stays native), so any native/omni "
+         "difference in it is CityLearn's own run-to-run variation, never an Omni result. Every row is shown, LOSS included.", "",
          "| Run | GitHub run | Commit | Engine | Districts in the run |", "|---|---|---|---|---:|"]
     off = []; seen = []
     for tag, (run, recs) in zip("ABC", runs):
@@ -134,7 +149,7 @@ def main(argv=None):
     for d, recs in ran:
         n0 = recs[0]["native"]
         L += [f"### {d}: {n0['buildings']} buildings, {n0.get('batteries', 0)} batteries, {n0.get('thermal_stores_left_native', 0)} water tanks left native, "
-              f"{n0['steps']:,} hours", "", "| CityLearn score (CityLearn's aim: lower) | A | B | C | Reading |", "|---|---:|---:|---:|---|"]
+              f"{n0['steps']:,} hours", "", "| CityLearn score (CityLearn aims every score lower) | A | B | C | Reading |", "|---|---:|---:|---:|---|"]
         for k in KPIS:
             v = verdict(recs, k)
             if v == "no value":
@@ -143,12 +158,12 @@ def main(argv=None):
             L.append(f"| {KPI_NAMES.get(k, k)} (`{k}`) | {pct(change(recs[0], k))} | {pct(change(recs[1], k))} | {pct(change(recs[2], k))} | {v} |")
         L.append("")
     L += ["## Across the districts with batteries", "", "A district counts only when all three runs agree.", "",
-          f"| CityLearn score | {ACROSS_HEAD} |", "|---|---|---|---:|---:|"]
+          f"| CityLearn score | {ACROSS_HEAD} |", ACROSS_RULE]
     for k in KPIS:
         t = tally.get(k, {})
         if not t:
             continue
-        L.append(f"| {KPI_NAMES.get(k, k)} | {across_cells(t, 'lower')} |")
+        L.append(f"| {KPI_NAMES.get(k, k)} | {across_cells(t, aim_of(k))} |")
     L += ["", "## Districts with no electric battery: nothing for Omni to move", "",
           "The runner changes only `electrical_storage` commands, so in these districts omni applied nothing. Any difference "
           "between the arms is CityLearn's own run-to-run variation and says nothing about Omni; where the two arms agree, the "
@@ -165,8 +180,8 @@ def main(argv=None):
         L.append(f"| {d} | `{e}` |")
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
-    nb, nw, nd = across_counts(tally, lambda k: "lower")
-    print(f"{out}: {len(ran)} districts with batteries ({nb} score-rows toward CityLearn's aim in all three of our runs, {nw} away from it, {nd} where the runs differ), "
+    ng, nl, nv, nd = across_counts(tally, aim_of)
+    print(f"{out}: {len(ran)} districts with batteries ({ng} score-rows GAIN in all three of our runs, {nl} LOSS, {nv} power given, {nd} where the runs differ), "
           f"{len(idle)} with nothing to move, {len(not_run)} CityLearn cannot run")
     return 0
 

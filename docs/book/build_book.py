@@ -857,6 +857,8 @@ def build():
     for ln in plates_list:
         story.append(Paragraph(inline(re.match(r"!\[([^\]]*)\]", ln).group(1)), ParagraphStyle("pl", parent=BODY, alignment=TA_LEFT)))
     story += front_chapter(doc, "Foreword", MAN["Foreword"])
+    story += front_chapter(doc, "The key: GAIN, EVEN and LOSS", MAN["The key: GAIN, EVEN and LOSS"])
+    story += front_chapter(doc, "What You Are Looking At", MAN["What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report"])
     story += front_chapter(doc, "Preface", PREFACE.splitlines())
     story += front_chapter(doc, "Quick Reference: The Card for the Glove Box", MAN["Quick Reference: The Card for the Glove Box"])
     story += front_chapter(doc, "Executive Summary", MAN["Executive Summary"])
@@ -864,7 +866,7 @@ def build():
     md_parts = ["# THE OMNI-COMPASS MANUAL", "", BANNER_MD, "", EDITION, "", FILED, "",
                 "The printable book of this text, with its covers, plates, contents and appendices: "
                 "`docs/OMNI_COMPASS_MANUAL.pdf`. Built by `docs/book/build_book.py`.", ""]
-    for sec in ("Foreword", "Executive Summary"):
+    for sec in ("Foreword", "The key: GAIN, EVEN and LOSS", "What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report", "Executive Summary"):
         md_parts += [f"## {sec}", ""] + MAN[sec]
     md_parts += ["## Preface", ""] + PREFACE.splitlines()
     md_parts += ["", "## Quick Reference: The Card for the Glove Box", ""] + MAN["Quick Reference: The Card for the Glove Box"]

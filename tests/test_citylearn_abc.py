@@ -4,8 +4,9 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The CityLearn A/B/C rule (tools/citylearn_abc.py, docs/OMNI_V1.md): a deterministic simulator, so the three runs must
-reproduce each other; a score reads lower or higher in all three of our runs by its sign when they do, same under one part in a million,
-and "the runs differ" when they do not; a district with no electric battery is listed as nothing for Omni to move, and a
+reproduce each other; a score reads GAIN or LOSS in all three of our runs by what it is for when they do (the bill, the electricity
+bought and the carbon are amounts spent: a fall is a cut, a GAIN, a rise is power given; a peak that rose is a LOSS), EVEN under one
+part in a million, and "the runs differ" when they do not; a district with no electric battery is listed as nothing for Omni to move, and a
 district CityLearn cannot run is listed with its error, never dropped."""
 import json
 import sys
@@ -40,13 +41,13 @@ def write(root, run, districts):
 
 def main():
     same = rec(3, 0.98, 1.03)                               # cost 2% lower, daily peak 3% higher, every run alike
-    assert C.verdict([same] * 3, COST) == "**lower in all three of our runs**"
-    assert C.verdict([same] * 3, PEAK) == "**higher in all three of our runs**", "a rise in all three reads higher"
-    assert C.verdict([same] * 3, "carbon_emissions_total") == "same"
+    assert C.verdict([same] * 3, COST) == "**GAIN in all three of our runs**", "a bill cut is a GAIN"
+    assert C.verdict([same] * 3, PEAK) == "**LOSS in all three of our runs**", "a higher peak in all three is a LOSS"
+    assert C.verdict([same] * 3, "carbon_emissions_total") == "EVEN, the same"
     other = rec(3, 0.98, 1.03); other["omni"]["kpis"][COST] = 0.97
     assert C.verdict([same, same, other], COST) == "**the runs differ**", "a run that does not reproduce is a finding"
     tiny = rec(3, 1.0 + 1e-7, 1.0)
-    assert C.verdict([tiny] * 3, COST) == "same", "a change under one part in a million"
+    assert C.verdict([tiny] * 3, COST) == "EVEN, the same", "a change under one part in a million"
     with tempfile.TemporaryDirectory() as t:
         broken = {"native": {"error": "ValueError: needs interface='entity'"}, "omni": {"error": "ValueError: needs interface='entity'"}}
         dirs = [write(t, i, {"d_bat": same, "d_nobat": rec(0, 1.0, 1.0), "d_broken": broken}) for i in (1, 2, 3)]
@@ -55,8 +56,8 @@ def main():
         txt = out.read_text()
         assert "| d_nobat | 3 | 1 | none | yes |" in txt, "no battery: nothing for Omni to move"
         assert "| d_broken | `ValueError: needs interface='entity'` |" in txt, "a district CityLearn cannot run is listed"
-        assert "higher in all three of our runs" in txt and "lower in all three of our runs" in txt and "Not one engine's three runs" in txt
-    print("PASS  CityLearn A/B/C rule: reproduced runs read by sign, a run that differs is a finding, no battery means nothing to move, "
+        assert "LOSS in all three of our runs" in txt and "GAIN in all three of our runs" in txt and "Not one engine's three runs" in txt
+    print("PASS  CityLearn A/B/C rule: reproduced runs read GAIN, EVEN or LOSS by what each score is for, a run that differs is a finding, no battery means nothing to move, "
           "a district CityLearn cannot run is listed")
 
 

@@ -113,7 +113,7 @@ the scenarios, the gauges, the allowance or the limits changed. The smoke run is
 
 `results/live/V3_ROBUST_KILL.md`: every setting back at the operator's 7 to 11 s after the kill in 30 of 30 repetitions
 (mean 9 s), a second governor to the end in every one, the 120 s after the kill no difference beyond the noise against
-native in all three runs, the whole window toward its aim in all three of our runs on mean response, p95, time over the line and failed requests,
+native in all three runs, the whole window GAIN in all three of our runs on mean response, p95, time over the line and failed requests,
 machines and energy inside the noise. The memory ratio is not reported for this scenario, as declared: its window is
 shorter than twenty minutes. Nothing in the rules changed between the smoke run and the counted runs.
 
@@ -130,7 +130,7 @@ blind-means-hold rule requires; shown with their reason, as declared, and not ju
 consecutive decisions less the 60 s the governor sleeps, mean of the last hour over the first: at most 1.20, 1.14 and 1.07,
 under the limit of a half: no slowing. **Every setting handed back at the end** and read back at the operator's, no record
 left, in every repetition of every run. The whole window's gauges: machines, node-hours and both energy models no
-difference beyond the noise in all three runs; mean response, p95, p99 and time over the line read toward its aim in all three of our runs in run
+difference beyond the noise in all three runs; mean response, p95, p99 and time over the line read GAIN in all three of our runs in run
 A and inside the noise in B and C, so **no difference beyond the noise in 2 of 3 runs** (three pairs give wide intervals,
 as the gauges' own direction says they would); failed requests no difference in all three; HPA replicas, pods started and
 pod start wait inside the noise. The governor's own CPU read 0.008 to 0.010 of a core. Readings: 9 no difference beyond the

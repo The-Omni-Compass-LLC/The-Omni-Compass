@@ -17,6 +17,7 @@ from pathlib import Path
 import numpy as np
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from pilot.bench_report import gauges, latency, pod_starts
+from tools.readings import word as gel_word, aim as gel_aim  # noqa: E402  (the words every table uses)
 
 SAME_REL = 1e-6   # a change under one part in a million of the value reads "same" (amendment 11)
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
@@ -59,6 +60,15 @@ NEUTRAL = {"CPU used (cores), mean", "utilisation (used / allocatable)", "Omni's
 # more or less is not judged by itself. Energy per core-hour is energy over CPU used, and CPU used is not judged, so the
 # ratio is not either. A pod pending in the snapshot is waiting for a machine or is a pod the autoscaler just created and
 # is starting; the judged gauge is the scheduler's own verdict that no machine would take it (amendment 10)
+def sig_word(k, mean_diff):
+    """The significance column's word for a difference clear of the noise: GAIN, LOSS or power given by what the gauge is
+    for (tools/readings.py: every judged gauge here is time waited, missed or failed, or a resource spent); a gauge shown
+    and never judged says only which way it went."""
+    if k in NEUTRAL:
+        return f"yes, {'up' if mean_diff > 0 else 'down'} (shown, not judged)"
+    return f"yes: {gel_word(mean_diff < 0, gel_aim('lower', k))}"
+
+
 NOTE = ["**Energy on kind is a declared model, not a meter.** Every worker stays powered and Ready in every arm; the first",
         "energy row counts a parked worker at its full idle power, which is what kind does. The second counts it at the",
         "declared standby power, which needs a node autoscaler that really removes the machine; this run has none.", ""]
@@ -465,7 +475,7 @@ def fault_table(root, cols):
     L = ["## The fault test: the same faults at the same moments in every arm", "",
          "Time to recover: from the fault's start until responses stay under the line for 30 seconds straight (at most 300 s). "
          "Over the line: the share of response samples over the line or failed in the 300 seconds after the fault. Paired "
-         "means over the repetitions; lower means a shorter time in both.", "",
+         "means over the repetitions; a fall is a shorter time in both, a GAIN, and a rise a LOSS.", "",
          "| Fault | Arm | Time to recover (s) | Over the line (%) | Change in recovery against native |", "|---|---|---:|---:|---:|"]
     for f, _ in FAULTS:
         k = f.rstrip(":")
@@ -538,7 +548,7 @@ def capacity_table(root, cols):
     L = ["## The capacity test: the same machines, the load rising step by step", "",
          f"Each step adds one load generator ({rate:g} requests a second each). A run's capacity is the highest step at which "
          "no more than 5% of response samples are over the line or failed (and every lower step held too), the first 30 s "
-         "of each step left to settle. Paired over the repetitions; higher is more work from the same machines.", "",
+         "of each step left to settle. Paired over the repetitions; a rise is more work from the same machines, a GAIN.", "",
          "| Arm | Capacity (requests a second), mean | Change against native | 95% interval of the difference (requests a second) | Repetitions |",
          "|---|---:|---:|---:|---:|"]
     out = {}
@@ -625,7 +635,7 @@ def main(root):
             out["paired"][a][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
             ch_s = f"{ch:+.1f}%" if ch is not None else f"{ob - nb:+.3g} (native is 0)"
             L.append(f"| {LABEL.get(k, k)} | {nb:.4g} | {ob:.4g} | {ch_s} | {d.mean() - half:+.4g} to {d.mean() + half:+.4g} | "
-                     f"{'same (under one part in a million)' if same and d.mean() != 0 else ('yes, higher' if d.mean() > 0 else 'yes, lower') if sig else 'no'} |")
+                     f"{'EVEN, the same (under one part in a million)' if same and d.mean() != 0 else sig_word(k, d.mean()) if sig else 'no'} |")
         L.append("")
     if tuned and "native" in runs and any(a in runs for a in ("omni", "compass")):
         # the cost to match: native tuned harder by its operator (a lower HPA target, more pods) against native with

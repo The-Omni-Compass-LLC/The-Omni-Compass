@@ -11,7 +11,7 @@ each kept for its own results; no result is ever read across versions.
 The founder's order of 12 October: "We're going to show a benchmark that shows it to the max. And we're going to show
 one native... anybody can tune it from the max down." v5's default (`V5CFG`) is therefore **the max**: every muscle
 pushed toward its own limit for the most work, faster, never past its limit and never below native. The energy that
-takes is reported as **power given**, beside the work and the speed it bought; the max never shaves (nothing is taken
+takes is reported as **LOSS**, beside the work and the speed it bought; the max never shaves (nothing is taken
 from one muscle to give to another). The dial turns it down: **the tune-down** (`V5SAVE`, the save setting described
 below) is native's work on the least energy, kept and tested on every muscle.
 
@@ -129,7 +129,7 @@ preregistered seeds 3000-3009 were run again unchanged.
 
 **Amendment 2, 12 October.** The catalog's second wave (95 muscles, five new families and additions to seven) took it to
 1,097 muscles in 70 families; the engine's law is unchanged, its fingerprint re-declared because the catalog is part of
-it. Developed on seeds 7100-7109 only (0 of 1,097 away from their aims, all six organisms superior); the preregistered seeds 3000-3009
+it. Developed on seeds 7100-7109 only (0 of 1,097 LOSS or power given, all six organisms superior); the preregistered seeds 3000-3009
 were run again unchanged on commit `04d9eb3b3`, with the same savings on the whole tower, the four stacked and Energy /
 Facility (3.0 times v3's).
 
@@ -207,7 +207,7 @@ core, the law, the observation map, the governor, the time step and the shield u
 On a fixed seed, for **every** muscle in the catalog, the v5 default does no less work than native, is over its line no
 more often, and hands every knob back to native on the kill (the dead-man lease); the energy it takes is power given,
 shown beside the work and the speed it bought. On the preregistered seeds 3000-3009 (commit `eea291501848`, digest
-`5648f2902f1fae68`, every muscle its own card): **0 of 1,107 muscles away from their aims or mixed** (527 toward their aims, 421 at their limit on
+`5648f2902f1fae68`, every muscle its own card): **0 of 1,107 muscles LOSS or power given or mixed** (527 toward their aims, 421 at their limit on
 native, 159 the same), every organism ahead of native under all three loads, and **not one plant with less work or more misses inside any
 organism under any load**; the misses fall 1.9% to 7.5% under each organism's own load, 1.4% to 7.2% under the climb and
 1.1% to 8.3% with work waiting in line, against 1.6% to 6.4%, 0.9% to 3.5% and 1.0% to 7.2% with one global setting

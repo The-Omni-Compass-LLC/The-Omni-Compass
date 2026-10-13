@@ -4,7 +4,7 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-MuJoCo (Google DeepMind) integrates each arm; MuJoCo Menagerie supplies the robot as its maker describes it, with the position servos it ships with as native. Omni sits on top of that servo on one knob, the speed override, inside the task's takt (`docs/ROBOTICS_PREREGISTRATION.md`). Energy is a declared model from MuJoCo's own torques and velocities, the same in both arms, with the standing draw charged for the whole takt. Three separate GitHub runs on the same frozen engine: MuJoCo is deterministic, so a gauge reads **lower** or **higher in all three of our runs** when all three runs give the same sign, **same** under one part in a million, and **the runs differ** when they do not reproduce. A robot whose paired physics trial found a slower cycle no cheaper is listed as nothing for Omni to move. Every row is shown, losses included.
+MuJoCo (Google DeepMind) integrates each arm; MuJoCo Menagerie supplies the robot as its maker describes it, with the position servos it ships with as native. Omni sits on top of that servo on one knob, the speed override, inside the task's takt (`docs/ROBOTICS_PREREGISTRATION.md`). Energy is a declared model from MuJoCo's own torques and velocities, the same in both arms, with the standing draw charged for the whole takt. Three separate GitHub runs on the same frozen engine: MuJoCo is deterministic, so a gauge reads **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number (a resource spent that rose reads **power given**, never a loss; the key: `docs/HOW_TO_READ_THE_RESULTS.md`)) when all three runs give the same sign, **EVEN, the same** under one part in a million, and **the runs differ** when they do not reproduce. A robot whose paired physics trial found a slower cycle no cheaper is listed as nothing for Omni to move. Every row is shown, LOSS included.
 
 | Run | GitHub run | Commit | Engine | Robots in the run |
 |---|---|---|---|---:|
@@ -18,31 +18,31 @@ MuJoCo (Google DeepMind) integrates each arm; MuJoCo Menagerie supplies the robo
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| energy per takt (J, declared model: motion plus the standing draw for the whole takt) | 482.3 | 478.3 | -0.82% | -0.82% | -0.82% | **lower in all three of our runs** |
-| copper loss per cycle (J, declared model) | 13.68 | 12.14 | -11.27% | -11.27% | -11.27% | **lower in all three of our runs** |
-| mechanical work per cycle (J) | 36.6 | 34.17 | -6.62% | -6.62% | -6.62% | **lower in all three of our runs** |
-| standing draw per takt (J, declared model; the same in both arms) | 432 | 432 | +0.00% | +0.00% | +0.00% | same |
-| peak joint torque (N m) | 21.74 | 15.52 | -28.63% | -28.63% | -28.63% | **lower in all three of our runs** |
-| mean |torque| (N m) | 2.687 | 2.338 | -13.01% | -13.01% | -13.01% | **toward its aim in all three of our runs** |
+| energy per takt (J, declared model: motion plus the standing draw for the whole takt) | 482.3 | 478.3 | -0.82% | -0.82% | -0.82% | **GAIN in all three of our runs** |
+| copper heating per cycle (J, I²R, declared model) | 13.68 | 12.14 | -11.27% | -11.27% | -11.27% | **GAIN in all three of our runs** |
+| mechanical work per cycle (J) | 36.6 | 34.17 | -6.62% | -6.62% | -6.62% | **GAIN in all three of our runs** |
+| standing draw per takt (J, declared model; the same in both arms) | 432 | 432 | +0.00% | +0.00% | +0.00% | EVEN, the same |
+| peak joint torque (N m) | 21.74 | 15.52 | -28.63% | -28.63% | -28.63% | **GAIN in all three of our runs** |
+| mean |torque| (N m) | 2.687 | 2.338 | -13.01% | -13.01% | -13.01% | **GAIN in all three of our runs** |
 | cycle time (s) | 8.01 | 10.21 | +27.47% | +27.47% | +27.47% | shown, not judged |
-| cycles over the time line (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | same |
-| tracking error, RMS (rad) | 0.01707 | 0.01344 | -21.28% | -21.28% | -21.28% | **lower in all three of our runs** |
-| end-point error at the waypoints (rad) | 0.002418 | 0.002153 | -10.97% | -10.97% | -10.97% | **lower in all three of our runs** |
+| cycles over the time line (share) | 0 | 0 | +0.000 | +0.000 | +0.000 | EVEN, the same |
+| tracking error, RMS (rad) | 0.01707 | 0.01344 | -21.28% | -21.28% | -21.28% | **GAIN in all three of our runs** |
+| end-point error at the waypoints (rad) | 0.002418 | 0.002153 | -10.97% | -10.97% | -10.97% | **GAIN in all three of our runs** |
 | speed override, mean | 1 | 0.7839 | -21.61% | -21.61% | -21.61% | shown, not judged |
 
 ## Across the robots Omni moved
 
-| Gauge | Toward its aim in all three of our runs | away from its aim in all three of our runs | Same | The runs differ |
-|---|---:|---|---:|---:|
-| energy per takt (J, declared model: motion plus the standing draw for the whole takt) | 1 | 0 | 0 | 0 |
-| copper loss per cycle (J, declared model) | 1 | 0 | 0 | 0 |
-| mechanical work per cycle (J) | 1 | 0 | 0 | 0 |
-| standing draw per takt (J, declared model; the same in both arms) | 0 | 0 | 1 | 0 |
-| peak joint torque (N m) | 1 | 0 | 0 | 0 |
-| mean |torque| (N m) | 1 | 0 | 0 | 0 |
-| cycles over the time line (share) | 0 | 0 | 1 | 0 |
-| tracking error, RMS (rad) | 1 | 0 | 0 | 0 |
-| end-point error at the waypoints (rad) | 1 | 0 | 0 | 0 |
+| Gauge | GAIN in all three of our runs | LOSS in all three of our runs | Power given in all three of our runs | EVEN | The runs differ |
+|---|---:|---:|---:|---:|---:|
+| energy per takt (J, declared model: motion plus the standing draw for the whole takt) | 1 | 0 | 0 | 0 | 0 |
+| copper heating per cycle (J, I²R, declared model) | 1 | 0 | 0 | 0 | 0 |
+| mechanical work per cycle (J) | 1 | 0 | 0 | 0 | 0 |
+| standing draw per takt (J, declared model; the same in both arms) | 0 | 0 | 0 | 1 | 0 |
+| peak joint torque (N m) | 1 | 0 | 0 | 0 | 0 |
+| mean |torque| (N m) | 1 | 0 | 0 | 0 | 0 |
+| cycles over the time line (share) | 0 | 0 | 0 | 1 | 0 |
+| tracking error, RMS (rad) | 1 | 0 | 0 | 0 | 0 |
+| end-point error at the waypoints (rad) | 1 | 0 | 0 | 0 | 0 |
 
 ## Robots where the paired trial left the override native: nothing for Omni to move
 

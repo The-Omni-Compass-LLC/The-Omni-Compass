@@ -8,10 +8,11 @@
 times as separate GitHub runs on the same frozen engine (tools/run_swarm.py). PyBullet is deterministic for a fixed step,
 so the runs must give the same numbers to within one part in a thousand (PyBullet's floating point differs by that much
 from one GitHub machine to the next; amendment 1 of the preregistration, made after the first A, B, C were seen and said
-so): a gauge reads lower or higher in all three of our runs by its sign when all three runs agree, same when the change is
-under one part in a million, and "the runs differ" when they do not reproduce. A cell whose
-paired physics trial left the cruise native is listed as "nothing for Omni to move"; a cell with a collision in either arm
-is void and listed as such. Every row is reported, losses included.
+so): a gauge reads GAIN or LOSS in all three of our runs when all three runs agree on the sign (judged by what the gauge is
+for, never by its sign; energy is a resource spent, so a rise reads power given), EVEN when the change is under one part in a
+million, and "the runs differ" when they do not reproduce. A cell whose paired physics trial left the cruise native is listed
+as "nothing for Omni to move"; a cell with a collision in either arm is void and listed as such. Every row is reported, LOSS
+included.
 Usage: python tools/swarm_abc.py A_DIR B_DIR C_DIR --out results/live/V3_SWARM.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding swarm-<cell>/swarm-<cell>.json"""
 from __future__ import annotations
@@ -24,7 +25,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, in_all_three, DETERMINISTIC_RULE, ACROSS_HEAD, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, in_all_three, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
 from tools.run_swarm import GAUGES, TRIAL_OVERRIDE
 
 SAME_REL = 1e-6
@@ -59,21 +60,21 @@ def reproduced(recs, k):
 
 
 def verdict(recs, k, direction):
-    """Which way the gauge went in all three runs, lower or higher (its declared aim, lower, higher, never more or never less, is
-    kept for the count under the tables, never for the reading)."""
+    """The gauge's word over the three runs: GAIN, LOSS or power given in all three of our runs by what the gauge is for (its
+    declared aim: a resource spent, higher, never more or never less), EVEN, or the runs differ."""
     if not reproduced(recs, k):
         return "**the runs differ**"
     ch = [change(r, k) for r in recs]
     if any(c is None for c in ch):
         return "no value"
     if direction == "shown":
-        return "shown, not judged"
+        return SHOWN
     if all(abs(c) <= SAME_REL for c in ch):
-        return "same"
+        return EVEN_SAME
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    return in_all_three(signs == {-1})
+    return in_all_three(signs == {-1}, aim(direction, k))
 
 
 def engine(run):
@@ -107,10 +108,10 @@ def main(argv=None):
          "Energy is a declared model from the simulator's own motor constants, the same in both arms, with the avionics draw "
          "charged over the whole fleet window. Three separate GitHub runs on the same frozen engine: PyBullet reproduces to about one "
          "part in a thousand across GitHub's machines (disclosed in the preregistration's amendment 1, made after the first three runs "
-         "were seen), so a gauge reads **lower** or **higher in all three of our runs** (which way the number went against native; the "
-         "reader judges it) when all three runs reproduce to that tolerance and give the same sign, **same** under one part in a million, and **the runs differ** when they do not reproduce. A cell whose paired physics trial found a faster "
+         "were seen), so a gauge reads **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by its "
+         "sign; energy is a resource spent, so a rise reads **power given**) when all three runs reproduce to that tolerance and give the same sign, **EVEN, the same** under one part in a million, and **the runs differ** when they do not reproduce. A cell whose paired physics trial found a faster "
          "mission no cheaper, or not inside the safe tracking error, is listed as nothing for Omni to move; a cell with a "
-         "collision in either arm is void. Every row is shown, losses included.", "",
+         "collision in either arm is void. Every row is shown, LOSS included.", "",
          "| Run | GitHub run | Commit | Engine | Cells in the run |", "|---|---|---|---|---:|"]
     off = []; seen = []
     for tag, (run, recs) in zip("ABC", runs):
@@ -150,12 +151,12 @@ def main(argv=None):
             L.append(f"| {name} | {r0['native'][k]:.4g} | {r0['omni'][k]:.4g} | {pct(change(recs[0], k), k)} | {pct(change(recs[1], k), k)} | "
                      f"{pct(change(recs[2], k), k)} | {v} |")
         L.append("")
-    L += ["## Across the untouched cells Omni moved", "", f"| Gauge | {ACROSS_HEAD} |", "|---|---|---|---:|---:|"]
+    L += ["## Across the untouched cells Omni moved", "", f"| Gauge | {ACROSS_HEAD} |", ACROSS_RULE]
     for k, name, direction in GAUGES:
         t = tally.get(k)
         if not t:
             continue
-        L.append(f"| {name} | {across_cells(t, direction)} |")
+        L.append(f"| {name} | {across_cells(t, direction, k)} |")
     L += ["", "## Cells where the paired trial left the cruise native: nothing for Omni to move", "",
           f"In native mode, before the counted missions, one mission at the planner's cruise and one at {TRIAL_OVERRIDE} x showed a faster "
           "mission no cheaper on the simulator's own figures, or not inside the safe tracking error, so Omni left the cruise at the "
@@ -170,8 +171,8 @@ def main(argv=None):
         L.append(f"| {c} | {e} |")
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
-    nb, nw, nd = across_counts(tally, {k: d for k, _, d in GAUGES}.get)
-    print(f"{out}: {len(cells) - len(idle) - len(void)} cells moved ({nb} gauge-rows toward the gauge's declared aim in all three of our runs, {nw} away from it, {nd} where the runs differ, "
+    ng, nl, nv, nd = across_counts(tally, {k: d for k, _, d in GAUGES}.get)
+    print(f"{out}: {len(cells) - len(idle) - len(void)} cells moved ({ng} gauge-rows GAIN in all three of our runs, {nl} LOSS, {nv} power given, {nd} where the runs differ, "
           f"the tuning cell shown and not counted), {len(idle)} nothing to move, {len(void)} void")
     return 0
 

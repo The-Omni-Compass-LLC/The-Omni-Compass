@@ -6,8 +6,8 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The Omni index: one number for more for the same, or the same for less (docs/K8S_COMPASS_PREREGISTRATION.md).
 
-Every measure of every test is turned into a ratio oriented so that above 1 is toward the system's declared aim (more
-work, faster, fewer machines, less energy):
+Every measure of every test is turned into a ratio oriented so that above 1 is a GAIN against the system's declared aim
+(more work, faster, fewer machines, less energy; the words are tools/readings.py's):
 
   work      work with Omni / work native        (capacity, or requests served)
   speed     p95 native / p95 with Omni          (a lower response time is faster)
@@ -17,7 +17,9 @@ work, faster, fewer machines, less energy):
 A test's index is the geometric mean of its ratios, minus one, in percent. A category is the geometric mean of its
 tests; the headline is the geometric mean of the real categories, each weighted the same. The modelled muscles are
 shown beside the headline, never inside it. Every number is read from the test's own result file (SOURCES below names
-the file, the table and the row); nothing is typed in. A test that did not take a measure leaves it out.
+the file, the table and the row); nothing is typed in. A test that did not take a measure leaves it out. Below 1 is a
+LOSS for work and speed, and power given for machines and energy (a resource Omni put in, shown and counted, never called
+a loss).
 
   python3 tools/omni_index.py  ->  results/OMNI_INDEX.md, results/OMNI_INDEX.json
 """
@@ -34,7 +36,7 @@ import re
 import sys
 from pathlib import Path
 
-from tools.readings import judged, with_own_runs  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
+from tools.readings import judged, with_own_runs, classify, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
 
 ROOT = Path(__file__).resolve().parents[1]
 LIVE = ROOT / "results" / "live"
@@ -42,9 +44,9 @@ LIVE = ROOT / "results" / "live"
 # The three-run tables (tools/confirm_abc.py, docs/OMNI_V1.md, docs/OMNI_V3.md): each test's three runs on the frozen engine, every row with
 # its reading by rule. (category, test, file, {measure: row key}, work). work: "equal" (the same fixed-rate work was sent
 # to both arms and none failed: ratio 1), "capacity" (the capacity row of that table), or None (not taken). A measure
-# counts only as its reading allows: lower or higher in all three of our runs gives the geometric mean of
-# the three runs' ratios; no difference beyond the noise, same, or the runs disagree gives exactly 1 (nothing is claimed
-# either way). Azure's billed runs and the six organisms join the index when their v1 tables land.
+# counts only as its reading allows: GAIN, LOSS or power given in all three of our runs gives the geometric mean of
+# the three runs' ratios; EVEN (no difference beyond the noise, or the same) or the runs disagree gives exactly 1 (nothing
+# is claimed either way). Azure's billed runs and the six organisms join the index when their v1 tables land.
 P95 = "response time (ms), 95th percentile"
 MEAN = "response time (ms), mean"
 NODES = "worker nodes in service, mean"
@@ -79,7 +81,7 @@ REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer,
 # the workload tables (tools/pgbench_abc.py, kafka_abc.py, redis_abc.py): per untouched workload, work = the work inside the
 # line, speed = p95, machines = the resource held (connections to the database; consumers running; the cache's memory ceiling),
 # energy = the host's CPU seconds over the run (no meter on a GitHub runner; the CPU the compass itself burns is the declared
-# price, and a gauge away from its aim in all three of our runs there counts below 1). A table's tuning workload is shown in its own file and never counted.
+# price, and a rise in all three of our runs there is power given and counts below 1). A table's tuning workload is shown in its own file and never counted.
 WORKLOAD_TABLES = [
     ("Real database (PostgreSQL behind PgBouncer, GitHub)", "V3_PGBENCH.json", "pgbench `{wl}`: the pooler's pool size, three paired repetitions, three runs",
      {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "servers_alive_mean", "energy": "cpu_seconds"}),
@@ -111,7 +113,7 @@ def gmean(xs):
 
 def measure(row, m):
     """One measure's ratio over the three runs, as its reading allows: the same in all three of our runs gives the geometric mean
-    of the runs' ratios (a gauge away from its aim in all three of our runs counts below 1); anything else is exactly 1, nothing claimed."""
+    of the runs' ratios (a LOSS, or power given, in all three of our runs counts below 1); anything else is exactly 1, nothing claimed."""
     reading = row["reading"]
     rs = [ratio(m, r["native"], r["omni"]) for r in row["runs"]]
     g = gmean(rs) if judged(reading) and all(rs) else 1.0
@@ -174,7 +176,35 @@ SERVICE = {"work", "speed"}
 
 
 def pct(x):
-    return "" if x is None else f"{100 * (x - 1):+.1f}%"
+    if x is None:
+        return ""
+    v = 100 * (x - 1)
+    return f"{v:+.2f}%" if 0 < abs(v) < 0.05 else f"{v:+.1f}%"
+
+
+def word_of(measure_, ratio_):
+    """The word for a measure's ratio: above 1 is a GAIN; below 1 a LOSS for work and speed, and power given for machines
+    and energy (a resource put in); exactly 1 is EVEN."""
+    if ratio_ is None:
+        return ""
+    if ratio_ == 1.0:
+        return EVEN
+    if ratio_ > 1.0:
+        return GAIN
+    return GIVEN if measure_ in ("machines", "energy") else LOSS
+
+
+def index_word(x, service=None):
+    """The word for a combined number (a test's, a category's, the headline): a plus is a GAIN; a minus is a LOSS where the
+    service reading (work and speed) is below 1 too, and otherwise power given (the resources put in outweigh what they
+    bought on this reading); exactly 1 is EVEN."""
+    if x is None:
+        return ""
+    if x == 1.0:
+        return EVEN
+    if x > 1.0:
+        return GAIN
+    return LOSS if service is not None and service < 1.0 else GIVEN
 
 
 def main():
@@ -189,16 +219,17 @@ def main():
     head_s = gmean([cat_s[c] for c in REAL if c in cat_s and cat_s[c]])
     avg = lambda c, m: gmean([t["measures"][m]["ratio"] for t in cats[c] if m in t["measures"]])
     L = ["# The Omni index: more for the same, or the same for less", "",
-         "Every measure of every test is a ratio oriented so that above 1 is toward the system's declared aim with Omni-Compass on "
-         "top of native: work (more), speed (a lower response time), machines (fewer), energy (less). A test's index is the "
+         "Every measure of every test is a ratio oriented so that above 1 is a GAIN against the system's declared aim with Omni-Compass on "
+         "top of native: work (more), speed (a lower response time), machines (fewer: a cut), energy (less: a cut). Below 1 is a LOSS "
+         "for work and speed, and power given for machines and energy (the key: `docs/HOW_TO_READ_THE_RESULTS.md`). A test's index is the "
          "geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric "
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
          "Every number is read from the test's own three-run table (`results/live/V1_*.json` and `results/live/V3_*.json`, made by "
          "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/ycsb_abc.py` and `tools/sysbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
-         f"## Headline: Omni-Compass on top of native, real machines, the same in all three of our runs: **{pct(head)}** "
-         f"(more for the same, or the same for less, across work, speed, machines and energy)", "",
-         "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): lower or higher in all three of our runs "
-         "counts, as the geometric mean of the runs' ratios; no difference beyond the noise counts as exactly 1, so "
+         f"## Headline: Omni-Compass on top of native, real machines, the same in all three of our runs: **{pct(head)}, "
+         f"{index_word(head, head_s)}** (more for the same, or the same for less, across work, speed, machines and energy)", "",
+         "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
+         "runs counts, as the geometric mean of the runs' ratios; EVEN (no difference beyond the noise) counts as exactly 1, so "
          "nothing inside the noise is claimed either way. Real Kubernetes (Omni v3; the v1 tables read the same and stay in `docs/OMNI_V1.md`), the real database, "
          "real messaging, the real cache, the real database's storage-engine cache and the real database's buffer pool (Omni v3) are the real categories in; Azure and the card join as their three-run tables land. A category's "
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
@@ -208,29 +239,31 @@ def main():
          "|---|---:|---:|---:|---:|---:|---:|---:|"]
     for c in list(REAL) + ["Modelled muscles (evidence S)"]:
         if c in cats:
-            L.append(f"| {c} | **{pct(cat_g[c])}** | {pct(cat_s.get(c))} | {pct(avg(c, 'work'))} | {pct(avg(c, 'speed'))} | {pct(avg(c, 'machines'))} | "
-                     f"{pct(avg(c, 'energy'))} | {len(cats[c])} |")
+            L.append(f"| {c} | **{pct(cat_g[c])} {index_word(cat_g[c], cat_s.get(c))}** | {pct(cat_s.get(c))} {index_word(cat_s.get(c), cat_s.get(c))} | "
+                     f"{pct(avg(c, 'work'))} | {pct(avg(c, 'speed'))} | {pct(avg(c, 'machines'))} | {pct(avg(c, 'energy'))} | {len(cats[c])} |")
         elif c in PENDING:
             L.append(f"| {c} | pending | | | | | | {PENDING[c]} |")
-    L += ["", f"## The second reading, declared 2026-10-09: service alone, **{pct(head_s)}** (work and speed scored; machines and energy shown, not scored)", "",
-          "The founder asked what a cache is for. Redis is bought for speed and spends memory to deliver it; the index above counts "
-          "that memory at the same weight as the speed, so Redis reads −25% (away from the aims) while its work and hit rate read "
-          "higher in all three of our runs. The question is fair and the answer is a second reading, not a changed first one: the same tests, the "
+    L += ["", f"## The second reading, declared 2026-10-09: service alone, **{pct(head_s)}, {index_word(head_s, head_s)}** (work and speed scored; machines and energy shown, not scored)", "",
+          "The founder asked what a cache is for. Redis is bought for speed and spends memory to deliver it; when this reading was "
+          "declared, the index counted that memory at the same weight as the speed, so the Redis table of that day read −25% while "
+          "its work and hit rate were a GAIN in all three of our runs (the table that stands now, after the cost fixes of 9 to 10 "
+          "October, reads EVEN on every counted workload). The question is fair and the answer is a second reading, not a changed first one: the same tests, the "
           "same three-run rule, scored on the service the stack is bought for (work inside the line and the 95th percentile) with "
           "the resources it spent or saved shown beside it and not scored. It is computed for every test alike, never for one "
           "stack, and the preregistered reading above stays the headline. The two readings say different true things. Where the "
           "governor buys service with a resource (Redis's memory ceiling, Kafka's consumers) the service reading is higher and the "
           "resource reading says what it took; where it gives a resource back for the same service (the database pools and caches) "
-          "the service reading is nothing and the resource reading carries the move toward the aims. Kafka's speed ratio is a hundredfold (native's "
+          "the service reading is EVEN and the resource reading carries the cut, a GAIN. Kafka's speed ratio is a hundredfold (native's "
           "queue grew at nine tenths of its capacity by design), so the service reading leans on it; a reader who wants the number "
-          "without that lean has the category table, where each category is one row. Neither reading hides a move away from the "
-          "aims: less work or a slower response in all three of our runs counts below 1 in both.", ""]
-    L += ["", "Read: every column points the same way, plus is toward the system's declared aims. \"Fewer machines by +4%\" means Omni did the "
+          "without that lean has the category table, where each category is one row. Neither reading hides a LOSS: less work or a "
+          "slower response in all three of our runs counts below 1 in both.", ""]
+    L += ["", "Read: every column points the same way: a plus is a GAIN against the system's declared aims; a minus is a LOSS in the work "
+          "and speed columns, and power given in the machines and energy columns (more of the resource put in). \"Fewer machines by +4%\" means Omni did the "
           "same work on 4% fewer machine-hours; \"less energy by +3%\" means 3% less energy for the same work; \"faster by +95%\" means "
           "native's slowest-5% response is 1.95 times Omni's (Omni answers about twice as fast); \"more work by +45%\" means 45% more work "
           "inside the response line. The energy figure on GitHub's Kubernetes is a declared model, not a meter; the database's, the "
-          "messaging and the cache's energy columns are the host's CPU seconds (the compass's own CPU included, a rise in all three of our runs counted "
-          "below 1); their machines columns are the resource held: connections open to the database, consumers running, the cache's "
+          "messaging and the cache's energy columns are the host's CPU seconds (the compass's own CPU included; a rise in all three of our runs is "
+          "power given and counts below 1); their machines columns are the resource held: connections open to the database, consumers running, the cache's "
           "memory ceiling, the storage engine's cache size, the buffer pool's size; Azure's machines are its own billed count.",
           "", "## Every test", "",
           "| Category | Test | Index | Service reading | More work by | Faster by | Fewer machines by | Less energy by | Source |", "|---|---|---:|---:|---:|---:|---:|---:|---|"]
@@ -241,10 +274,13 @@ def main():
                 return "not taken"
             rd = m[k].get("reading", "")
             if judged(rd):
-                return pct(m[k]["ratio"])
-            return "equal" if rd.startswith("the same") else ("same" if rd == "same" else "no difference beyond the noise")
-        ix = "" if t["index_pct"] is None else f"{t['index_pct']:+.1f}%"
-        sx = "not taken" if t["service_pct"] is None else f"{t['service_pct']:+.1f}%"
+                return f"{pct(m[k]['ratio'])} {word_of(k, m[k]['ratio'])}"
+            if rd.startswith("the same fixed-rate work"):
+                return "EVEN (equal by design)"
+            c = classify(rd, "spent" if k in ("machines", "energy") else "higher" if k == "work" else "lower")
+            return {"same": "EVEN, the same", "noise": "EVEN, inside the noise", "disagree": "the runs disagree (counted as 1)"}.get(c, rd)
+        ix = "" if t["index_pct"] is None else f"{pct(1 + t['index_pct'] / 100)} {index_word(1 + t['index_pct'] / 100, None if t['service_pct'] is None else 1 + t['service_pct'] / 100)}"
+        sx = "not taken" if t["service_pct"] is None else f"{pct(1 + t['service_pct'] / 100)} {index_word(1 + t['service_pct'] / 100, 1 + t['service_pct'] / 100)}"
         L.append(f"| {t['category']} | {t['test']} | **{ix}** | {sx} | {cell('work')} | {cell('speed')} | {cell('machines')} | "
                  f"{cell('energy')} | `{t['source']}` |")
     (ROOT / "results" / "OMNI_INDEX.md").write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")

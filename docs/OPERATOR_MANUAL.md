@@ -265,7 +265,7 @@ I give a machine back only when all of these hold:
 - nothing is waiting for a place;
 - the machines that remain stay inside Ω.
 
-**Pass condition.** Fewer machines in service and less energy, with no service gauge away from its aim.
+**Pass condition.** Fewer machines in service and less energy, with no LOSS on any service gauge.
 
 ### Step 5. Let me decide alone (Kubernetes as the muscle only)
 Add `--strict-replicas`:
@@ -284,7 +284,7 @@ Add `--strict-replicas`:
 | Power and cooling | `--power-cmd "<prints site watts>" --site-limit-w <limit> --cooling-cmd "<sets {c}>"` |
 | Batch and rollouts | `--batch --batch-pace --rollout-guard <ns/deployment>` |
 
-**Pass condition.** Energy per unit of work down, with no service gauge away from its aim.
+**Pass condition.** Energy per unit of work down, with no LOSS on any service gauge.
 
 ### Step 7. The switch drill, at every step
 1. Turn me OFF.

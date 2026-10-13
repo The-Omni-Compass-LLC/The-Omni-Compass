@@ -14,6 +14,8 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from tools.readings import EVEN_NOISE, word, LOWER as AIM_LOWER, HIGHER as AIM_HIGHER, SPENT  # noqa: E402
 PRIMARY = "energy_kwh"
 SECONDARY = [("time_healthy", False), ("recovery_minutes", True), ("recovered", False), ("sla_violation_physical", True),
              ("violation_backlog", True), ("violation_power", True), ("violation_heat", True), ("availability", False),
@@ -44,23 +46,23 @@ def main(out=ROOT / "results" / "MULTIPLICITY.json"):
     res = {"primary": {}, "secondary": [], "method": __doc__.strip()}
     for sd in seeds:
         d = diffs(sd, PRIMARY)
-        res["primary"][str(sd)] = {"metric": PRIMARY, "mean_delta": float(d.mean()), "p": perm_p(d, rng), "better": int((d < 0).sum()), "n": len(d)}
+        res["primary"][str(sd)] = {"metric": PRIMARY, "mean_delta": float(d.mean()), "p": perm_p(d, rng), "cut": int((d < 0).sum()), "n": len(d)}
     tests = []
     for sd in seeds:
         for m, lower in SECONDARY:
             d = diffs(sd, m)
             tests.append({"seed": sd, "metric": m, "mean_delta": float(d.mean()), "p": perm_p(d, rng),
-                          "direction": ("better" if (d.mean() < 0) == lower else "worse") if d.mean() != 0 else "none"})
+                          "direction": word(d.mean() < 0, AIM_LOWER if lower else AIM_HIGHER) if d.mean() != 0 else "none"})
     order = sorted(range(len(tests)), key=lambda i: tests[i]["p"])
     k = len(tests); running = 0.0
     for rank, i in enumerate(order):
         running = max(running, min(1.0, (k - rank) * tests[i]["p"]))
         tests[i]["p_holm"] = running
-        tests[i]["verdict"] = tests[i]["direction"] if running < 0.05 else "not significant"
+        tests[i]["verdict"] = tests[i]["direction"] if running < 0.05 else EVEN_NOISE
     res["secondary"] = tests
     Path(out).write_text(json.dumps(res, indent=2))
     for sd, r in res["primary"].items():
-        print(f"primary seed {sd}: energy delta {r['mean_delta']:+.2f} kWh, p = {r['p']:.1e}, better in {r['better']}/{r['n']}")
+        print(f"primary seed {sd}: energy delta {r['mean_delta']:+.2f} kWh, p = {r['p']:.1e}, cut in {r['cut']}/{r['n']}")
     for t in tests:
         print(f"  {t['seed']} {t['metric']:30s} {t['mean_delta']:+9.4f}  p_holm {t['p_holm']:.1e}  {t['verdict']}")
 

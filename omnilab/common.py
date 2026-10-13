@@ -11,7 +11,7 @@ Every muscle is a simulation with three kinds of arm:
                    adapter.Governor) evolves on the muscle's observations; the muscle maps engine state to actions
   omni_no_engine   identical mapping with the engine's equations not evolved (Governor(evolve=False)): what the
                    mapping alone does, so the engine's own contribution is visible
-Nothing in omnicompass/ is changed. Gauges are per muscle; every gauge has a direction (lower or higher is better).
+Nothing in omnicompass/ is changed. Gauges are per muscle; every gauge has an aim (lower or higher); a move toward it is GAIN, away LOSS.
 """
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ from typing import Dict, List
 import numpy as np
 
 from omnicompass.adapter import Governor, mode_law, AUTOPILOT
+from tools.readings import GAIN, LOSS, EVEN_SAME, EVEN_NOISE  # noqa: E402
 
 
 class Engine:
@@ -82,7 +83,7 @@ def diurnal(rng, steps, per_day, mean, amp, bursts=0, burst_mag=1.0, burst_len=(
 
 
 def paired(native: List[Dict], omni: List[Dict], gauges: Dict[str, str], rng_seed: int = 7) -> Dict:
-    """Per gauge: means, relative change (positive = better), paired bootstrap 95% CI of the difference, verdict."""
+    """Per gauge: means, relative change (positive = toward the aim, GAIN), paired bootstrap 95% CI of the difference, verdict."""
     rng = np.random.default_rng(rng_seed); out = {}
     for g, direction in gauges.items():
         a = np.array([r[g] for r in native], float); b = np.array([r[g] for r in omni], float)
@@ -94,8 +95,8 @@ def paired(native: List[Dict], omni: List[Dict], gauges: Dict[str, str], rng_see
             rel = (ma - mb) / abs(ma) if direction == "lower" else (mb - ma) / abs(ma)
         else:
             rel = 0.0 if abs(mb) < 1e-12 else (-1.0 if direction == "lower" else 1.0)
-        better = (hi < 0) if direction == "lower" else (lo > 0)
-        worse = (lo > 0) if direction == "lower" else (hi < 0)
-        out[g] = {"native": ma, "omni": mb, "better_by": rel, "ci95": [lo, hi],
-                  "verdict": "better" if better else "worse" if worse else ("tie" if np.allclose(a, b) else "not significant")}
+        gain = (hi < 0) if direction == "lower" else (lo > 0)
+        loss = (lo > 0) if direction == "lower" else (hi < 0)
+        out[g] = {"native": ma, "omni": mb, "gain_by": rel, "ci95": [lo, hi],
+                  "verdict": GAIN if gain else LOSS if loss else (EVEN_SAME if np.allclose(a, b) else EVEN_NOISE)}
     return out

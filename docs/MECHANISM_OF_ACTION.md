@@ -208,7 +208,7 @@ when every term of the release gate holds:
 
 rho is the engine's utilisation target: after a machine goes back, what remains runs at or under rho. The verdict
 (section 7 of the GPU preregistration, `omnicompass/verdict.py`) allows a machine count below native only after a
-paired trial showed the service at that count at most 2% away from its aim than at the count before; that 2% is where the trigger
+paired trial showed the service at that count at most a 2% LOSS than at the count before; that 2% is where the trigger
 sits, inside the engine.
 
 **This is hysteresis by construction.** The up condition (p >= 0.95) and the down condition (p < 0.5 with F < -0.2)

@@ -2,6 +2,38 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-13 (late night): GAIN, EVEN and LOSS everywhere (words only; the engine, every number and every verdict unchanged)
+
+- **The founder's order of 13 October, evening**: "better, same and worse are going to be gain, even and loss, wherever
+  and ever, all over where it lives, where it used to live". Every judged reading in every table, page, report, program
+  output and the manual is now **GAIN**, **EVEN** or **LOSS**, decided by what the gauge is for and never by the sign of
+  its number. A resource spent or held that fell is a cut, a GAIN; one that rose is **power given**, never a loss.
+  Lower/higher-as-a-verdict and toward/away (the words of the morning's order) are retired with better/worse.
+- **The key** (G.A.I.N. Growth, Advantage, Improvement, Net-positive; E.V.E.N. Equalized, Verified baseline, Equilibrium,
+  Neutral; L.O.S.S. Leakage, Off-track, Setback, Subpar), disclosed and disclaimed, is written once in `tools/readings.py`
+  and stands word for word at the top of the README, `docs/HOW_TO_READ_THE_RESULTS.md` and the manual's front matter
+  (`python3 tools/readings.py --fix`; `verify.py` fails a page whose key differs). The manual's glossary carries the words.
+- **`python3 tools/summary.py`**: the whole summary straight after a pull (what Omni-Compass is, the key, the engine, the
+  index, every benchmark's number and word with its evidence class, the wiring counts, the realms, the grid), standard
+  library only; `--markdown` for a page. Tests: `tests/test_readings.py`, `tests/test_summary.py`.
+- Every table tool (Kubernetes, the databases, Kafka, Redis, MongoDB, MySQL, CPU power, the simulators, the per-run and
+  organism reports, the grid, the realms, the GPU and card reports, the pilot), the index, the wiring page, the benefit
+  sheet and the dossier write the new words; the recorded pages (`results/live/*.md`, the realms, the grid, the GPU and
+  card pages) were re-rendered or reworded row by row from each gauge's declared aim, numbers untouched, and their
+  checksum files updated. Raw machine records (JSON receipts, raw run folders) keep their recorded values; every reader
+  translates them. Two physics rows renamed: "energy dissipated in lines and transformers (MWh)", "copper heating per
+  cycle (J, I²R, declared model)". The index (+5.2% resource, +12.5% service), the 24 benefit-sheet numbers and the 1,037
+  wiring rows are identical to before.
+- **What the words now show plainly**: on the grid's cluster-inside half the organism's **work per energy reads LOSS in
+  22 of 36 squares** (energy given, no extra modelled work), and the 95th and 99th percentiles read LOSS in 2 squares
+  each (the 100-copy squares the machine limited); CityLearn (v1 and v3) reads LOSS on energy not served and time
+  uncomfortable in several districts. These rows were in the tables before under the older words; they are shown, and
+  their causes go to the next engine.
+- The dossier's database paragraphs were brought up to the current tables (they described earlier sets).
+- Removed: the three competitor-era report generators (abc_report, full_report, buyer_report in tools/) and
+  the three-way script (an "Omni alone" third arm; the result page moved to `docs/history/three_way/`). The fleet,
+  PlanetLab, multiplicity and lab modules print the new words; `results/MULTIPLICITY.json` regenerated, numbers identical.
+
 ## 2026-10-13 (night): Omni v5 re-declared (digest 6093b2b8): every muscle from 1 up to one click under its own capacity, read live
 
 - **The founder's order of 13 October**: every muscle runs from 1 up to one click under what the system itself can hold,

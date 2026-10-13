@@ -5,7 +5,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The three-run table for CPU power (docs/CPU_POWER_PREREGISTRATION.md): three separate runs of tools/run_cpu_power.py
-(A, B, C; on one machine, or three machines of one kind) read by the three-run rule, every row shown, losses included.
+(A, B, C; on one machine, or three machines of one kind) read by the three-run rule, every row shown, LOSS included.
 
   python3 tools/cpu_power_abc.py results/live/raw/<A> results/live/raw/<B> results/live/raw/<C> --out results/live/V3_CPU_POWER.md
 """
@@ -50,9 +50,10 @@ def engine(run_dir):
     return "", "unknown"
 
 
-def verdict(rs, direction):
-    """The three-run reading of one gauge, by rule, from its three within-run paired results."""
-    return stack_reading(rs, direction, SAME_REL)
+def verdict(rs, direction, key=None):
+    """The three-run reading of one gauge, by rule, from its three within-run paired results: GAIN, LOSS, power given,
+    EVEN or the runs disagree, by what the gauge is for (tools/readings.py)."""
+    return stack_reading(rs, direction, SAME_REL, key)
 
 
 def cell(r, key):
@@ -80,11 +81,11 @@ def main(argv=None):
          "the compass law on the ceiling through the kernel's own interface inside [half the top, the top], holding the service's own request "
          "latency at 40% of the 20 ms line, every notch down allowed only by a paired trial on the machine itself under the declared objective "
          "(`docs/CPU_POWER_PREREGISTRATION.md`). Each run holds its paired repetitions; the paired difference's 95% interval within a run, and "
-         "the same sign with every interval clear of zero across the three runs, make a reading **lower** or **higher in all three of our runs** (which way the number went against native; the reader judges it); a "
-         "run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); clear runs pointing different "
-         "ways read **the runs disagree**. Failed requests: any rise in any run reads **higher in at least one of our runs**. Energy is the processor's own meter (RAPL, class P, "
+         "the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a "
+         "run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different "
+         "ways read **the runs disagree**. Failed requests: any rise in any run reads **LOSS in at least one of our runs**. Energy is the processor's own meter (RAPL, class P, "
          "the processor's calibrated counter); the whole machine at the wall where a plug was fitted. The tuning workload is shown and not "
-         "counted. Every row is shown, losses included.", "",
+         "counted. Every row is shown, LOSS included.", "",
          "| Run | Run folder | Commit | Engine | Machine | Workloads |", "|---|---|---|---|---|---:|"]
     off = []
     for tag, (run, recs), (sha, ver) in zip("ABC", runs, eng):
@@ -118,12 +119,12 @@ def main(argv=None):
         out["workloads"][wl] = {}
         for k, label, dr in GAUGES:
             rs = [r["paired"].get(k) for r in recs]
-            v = verdict(rs, dr)
+            v = verdict(rs, dr, k)
             if not tuning:
-                tally.add(v, dr)
+                tally.add(v, dr, k)
             nat = fmt(rs[0]["native"]) if rs[0] else "n/a"; om = fmt(rs[0]["omni"]) if rs[0] else "n/a"
             L.append(f"| {label} | {nat} | {om} | " + " | ".join(cell(r, k) for r in rs) + f" | {v} |")
-            out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
+            out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr, k), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
         hb = all(all(x["omni"].get("handed_back") for x in r["reps"]) for r in recs)
         L += ["", f"The ceiling handed back to the operator's and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
         vr = {t: [x["omni"]["verdict"] for x in r["reps"] if x["omni"].get("verdict")] for t, r in zip("ABC", recs)}
@@ -136,7 +137,7 @@ def main(argv=None):
     L += ["", tally.sentence(n_wl, "untouched workloads")]
     Path(a.out).write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
     Path(a.out).with_suffix(".json").write_text(json.dumps(out, indent=1))
-    print(f"{a.out}: {n_wl} untouched workloads; {tally.toward} toward the aim, {tally.away} away, {tally.disagree} disagree")
+    print(f"{a.out}: {n_wl} untouched workloads; {tally.counts()}")
     return 0
 
 

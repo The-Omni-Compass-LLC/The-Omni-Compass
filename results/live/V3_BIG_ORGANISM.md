@@ -8,7 +8,7 @@ Source: GitHub Actions workflow `big-organism-detached`, two rented Azure machin
 
 Each organism runs on the measured window's clock with the cluster as one more muscle (`tools/run_kil.py`): its own compute demand drives the load generator, the cluster's watts are its heat and load. Native: the stacks' own controllers and Kubernetes alone. Omni: the compass law on every simulated muscle and the live controller on the cluster, handed back at 90% of the window. Cluster rows are measured on the real cluster (energy is the declared power model; the bill, where present, is Azure's own count of machines). Organism rows are models (evidence S).
 
-How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column says in words whether it is lower or higher. The aim is lower for response times, time over the line, failed requests, pods started, replicas, machines, energy and the bill (less spent). The aim is higher for the organism's work and work per energy. A change whose interval crosses zero is marked inside the noise. The organism must keep the window's clock: the row "organism behind its window" says how long after the window its last step ended (0 is on the clock), and a repetition where either arm ended more than 5% of the window late is marked OFF THE CLOCK in the organism's line, because its last steps saw a cluster whose load schedule had already ended.
+How to read it: every change is omni against native (omni is Omni-Compass on top of native), and the Reading column gives its word, GAIN, EVEN or LOSS, by what the gauge is for and never by its sign (a resource spent that rose reads **power given**, never a loss; the key: `docs/HOW_TO_READ_THE_RESULTS.md`). The aim is lower for response times, time over the line, failed requests, pods started, replicas, machines, energy and the bill (less spent). The aim is higher for the organism's work and work per energy. A change whose interval crosses zero is marked inside the noise. The organism must keep the window's clock: the row "organism behind its window" says how long after the window its last step ended (0 is on the clock), and a repetition where either arm ended more than 5% of the window late is marked OFF THE CLOCK in the organism's line, because its last steps saw a cluster whose load schedule had already ended.
 
 ## Twelve columns, mean over repetitions
 
@@ -39,21 +39,21 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 
 | Gauge | native | omni | Change | 95% interval of the difference | Reading |
 |---|---:|---:|---:|---:|---|
-| response time (ms), 95th percentile | 6690 | 160.2 | -97.6% | -6917 to -6143 | lower |
-| response time (ms), 99th percentile | 9068 | 186.7 | -97.9% | -9321 to -8442 | lower |
-| time over the response line (% of samples) | 76.04 | 0 | -100.0% | -77.3 to -74.77 | lower |
-| failed requests (%) | 4.76 | 0 | -100.0% | -5.743 to -3.777 | lower |
-| HPA replicas, mean | 9.965 | 9.969 | +0.0% | -0.009746 to +0.01694 | higher (inside the noise) |
-| pods started | 4 | 3.667 | -8.3% | -1.768 to +1.101 | lower (inside the noise) |
-| worker nodes in service, mean | 6 | 6 | +0.0% | -4.302e-16 to +3.983e-15 | same (under one part in a million) |
-| energy, parked workers still on at idle power (Wh, declared model) | 2041 | 2036 | -0.3% | -13.6 to +2.606 | lower (inside the noise) |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 2041 | 2036 | -0.3% | -13.6 to +2.606 | lower (inside the noise) |
-| CPU used with Omni's own (cores), mean | 4.514 | 4.4 | -2.5% | -0.2054 to -0.02198 | shown, not judged (more or less is not lower by itself) |
-| host CPU busy, the real machine under kind (%) | 67.63 | 66.84 | -1.2% | -1.794 to +0.2158 | shown, not judged (more or less is not lower by itself) |
-| organism work | 6.658e+13 | 6.658e+13 | -0.0% | -2.402e+08 to -2.402e+08 | lower |
-| organism energy (J) | 1.109e+16 | 1.105e+16 | -0.4% | -4.016e+13 to -4.016e+13 | lower |
-| organism time over the line (% of steps) | 2.736 | 2.728 | -0.3% | -0.007569 to -0.007569 | lower |
-| organism work per energy | 0.006004 | 0.006025 | +0.4% | +2.18e-05 to +2.18e-05 | higher |
+| response time (ms), 95th percentile | 6690 | 160.2 | -97.6% | -6917 to -6143 | GAIN |
+| response time (ms), 99th percentile | 9068 | 186.7 | -97.9% | -9321 to -8442 | GAIN |
+| time over the response line (% of samples) | 76.04 | 0 | -100.0% | -77.3 to -74.77 | GAIN |
+| failed requests (%) | 4.76 | 0 | -100.0% | -5.743 to -3.777 | GAIN |
+| HPA replicas, mean | 9.965 | 9.969 | +0.0% | -0.009746 to +0.01694 | EVEN, inside the noise (up) |
+| pods started | 4 | 3.667 | -8.3% | -1.768 to +1.101 | EVEN, inside the noise (cut) |
+| worker nodes in service, mean | 6 | 6 | +0.0% | -4.302e-16 to +3.983e-15 | EVEN, the same (under one part in a million) |
+| energy, parked workers still on at idle power (Wh, declared model) | 2041 | 2036 | -0.3% | -13.6 to +2.606 | EVEN, inside the noise (cut) |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 2041 | 2036 | -0.3% | -13.6 to +2.606 | EVEN, inside the noise (cut) |
+| CPU used with Omni's own (cores), mean | 4.514 | 4.4 | -2.5% | -0.2054 to -0.02198 | shown, not judged (more or less is neither GAIN nor LOSS by itself) |
+| host CPU busy, the real machine under kind (%) | 67.63 | 66.84 | -1.2% | -1.794 to +0.2158 | shown, not judged (more or less is neither GAIN nor LOSS by itself) |
+| organism work | 6.658e+13 | 6.658e+13 | -0.0% | -2.402e+08 to -2.402e+08 | LOSS |
+| organism energy (J) | 1.109e+16 | 1.105e+16 | -0.4% | -4.016e+13 to -4.016e+13 | GAIN |
+| organism time over the line (% of steps) | 2.736 | 2.728 | -0.3% | -0.007569 to -0.007569 | GAIN |
+| organism work per energy | 0.006004 | 0.006025 | +0.4% | +2.18e-05 to +2.18e-05 | GAIN |
 | organism behind its window (s) | 14.33 | 13.97 | -2.6% | -1.084 to +0.3505 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ### The four stacked, duplicates kept, 1,000 copies: toward their aims on 7, away from them on 1 (organism work), inside the noise on 3
@@ -62,21 +62,21 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 
 | Gauge | native | omni | Change | 95% interval of the difference | Reading |
 |---|---:|---:|---:|---:|---|
-| response time (ms), 95th percentile | 2882 | 150 | -94.8% | -3113 to -2351 | lower |
-| response time (ms), 99th percentile | 5405 | 165.2 | -96.9% | -5593 to -4887 | lower |
-| time over the response line (% of samples) | 50.99 | 0 | -100.0% | -55.2 to -46.78 | lower |
-| failed requests (%) | 0.1415 | 0 | -100.0% | -0.1485 to -0.1345 | lower |
-| HPA replicas, mean | 9.952 | 9.951 | -0.0% | -0.01433 to +0.01248 | lower (inside the noise) |
-| pods started | 5 | 5 | +0.0% | +0 to +0 | same |
-| worker nodes in service, mean | 6 | 6 | +0.0% | -1.318e-15 to +3.095e-15 | same (under one part in a million) |
-| energy, parked workers still on at idle power (Wh, declared model) | 2005 | 1992 | -0.6% | -26.58 to +2.121 | lower (inside the noise) |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 2005 | 1992 | -0.6% | -26.58 to +2.121 | lower (inside the noise) |
-| CPU used with Omni's own (cores), mean | 3.839 | 3.634 | -5.3% | -0.3784 to -0.03194 | shown, not judged (more or less is not lower by itself) |
-| host CPU busy, the real machine under kind (%) | 60.66 | 60.06 | -1.0% | -3.166 to +1.972 | shown, not judged (more or less is not lower by itself) |
-| organism work | 1.293e+14 | 1.293e+14 | -0.0% | -7.813e+08 to -7.813e+08 | lower |
-| organism energy (J) | 1.112e+16 | 1.107e+16 | -0.4% | -4.07e+13 to -4.07e+13 | lower |
-| organism time over the line (% of steps) | 2.585 | 2.567 | -0.7% | -0.01762 to -0.01762 | lower |
-| organism work per energy | 0.01163 | 0.01167 | +0.4% | +4.267e-05 to +4.267e-05 | higher |
+| response time (ms), 95th percentile | 2882 | 150 | -94.8% | -3113 to -2351 | GAIN |
+| response time (ms), 99th percentile | 5405 | 165.2 | -96.9% | -5593 to -4887 | GAIN |
+| time over the response line (% of samples) | 50.99 | 0 | -100.0% | -55.2 to -46.78 | GAIN |
+| failed requests (%) | 0.1415 | 0 | -100.0% | -0.1485 to -0.1345 | GAIN |
+| HPA replicas, mean | 9.952 | 9.951 | -0.0% | -0.01433 to +0.01248 | EVEN, inside the noise (cut) |
+| pods started | 5 | 5 | +0.0% | +0 to +0 | EVEN, the same |
+| worker nodes in service, mean | 6 | 6 | +0.0% | -1.318e-15 to +3.095e-15 | EVEN, the same (under one part in a million) |
+| energy, parked workers still on at idle power (Wh, declared model) | 2005 | 1992 | -0.6% | -26.58 to +2.121 | EVEN, inside the noise (cut) |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 2005 | 1992 | -0.6% | -26.58 to +2.121 | EVEN, inside the noise (cut) |
+| CPU used with Omni's own (cores), mean | 3.839 | 3.634 | -5.3% | -0.3784 to -0.03194 | shown, not judged (more or less is neither GAIN nor LOSS by itself) |
+| host CPU busy, the real machine under kind (%) | 60.66 | 60.06 | -1.0% | -3.166 to +1.972 | shown, not judged (more or less is neither GAIN nor LOSS by itself) |
+| organism work | 1.293e+14 | 1.293e+14 | -0.0% | -7.813e+08 to -7.813e+08 | LOSS |
+| organism energy (J) | 1.112e+16 | 1.107e+16 | -0.4% | -4.07e+13 to -4.07e+13 | GAIN |
+| organism time over the line (% of steps) | 2.585 | 2.567 | -0.7% | -0.01762 to -0.01762 | GAIN |
+| organism work per energy | 0.01163 | 0.01167 | +0.4% | +4.267e-05 to +4.267e-05 | GAIN |
 | organism behind its window (s) | 21.8 | 22.37 | +2.6% | -2.226 to +3.359 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ## Not in this run

@@ -18,14 +18,14 @@ from tools import run_sysbench as S
 
 def main():
     assert A.verdict is not None and A.cell is not None, "the same rule as the other stores"
-    assert {dr for _, _, dr in S.GAUGES} <= {"higher", "lower", "never more", "shown"}
+    assert {dr for _, _, dr in S.GAUGES} <= {"higher", "lower", "spent", "never more", "shown"}
     with tempfile.TemporaryDirectory() as t:
         d = Path(t) / "run-123" / "sysbench-tuning"; d.mkdir(parents=True)
         reps = [{"native": {"tps": 100.0, "pool_mb_mean": 512.0, "failed": 0, "handed_back": True},
                  "omni": {"tps": 101.0, "pool_mb_mean": 384.0, "failed": 0, "handed_back": True}}] * 3
         (d / "tuning.json").write_text(json.dumps({"workload": "tuning", "tuning": True, "reps": reps, "engine": {"commit": ""}}))
         run, recs = A.load(Path(t) / "run-123")
-        assert run == "123" and "tuning" in recs and recs["tuning"]["paired"]["pool_mb_mean"]["reading"] in ("lower", "higher", "no difference beyond the noise", "same")
+        assert run == "123" and "tuning" in recs and recs["tuning"]["paired"]["pool_mb_mean"]["reading"] in ("GAIN", "power given", "EVEN, no difference beyond the noise", "EVEN, the same")
         empty = Path(t) / "run-124"; empty.mkdir()
         try:
             A.load(empty); raise AssertionError("a folder without records must refuse")

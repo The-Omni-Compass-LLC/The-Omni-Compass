@@ -91,7 +91,7 @@ A change under one part in a million reads "same".
 
 Each robot: 10 cycles per arm in one GitHub Actions job (MuJoCo is deterministic for a fixed timestep, so the cycles
 are identical and ten is a check, not a sample), the per-cycle record archived with the code. Three separate runs on
-the frozen engine (A, B, C); the table (`tools/mujoco_abc.py`) reads lower or higher in all three of our runs by sign when the runs
+the frozen engine (A, B, C); the table (`tools/mujoco_abc.py`) reads GAIN or LOSS in all three of our runs (judged by what the gauge is for; a resource spent that rose reads power given) when the runs
 reproduce, same under one part in a million, and "the runs differ" when they do not.
 
 ## What the first smoke already showed, said before the counted runs

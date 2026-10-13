@@ -93,7 +93,7 @@ def main():
         lines, rows = C.robust_rows([("1", {}, 10, good), ("2", {}, 10, bad), ("3", {}, 10, good)])
         assert "not handed back within the allowance in a repetition" in lines[0] and "a leak" in lines[2]
         assert C.robust_rows([("1", {}, 10, good), ("2", {}, 10, None), ("3", {}, 10, good)]) == ([], {}), "a run without the block makes no robustness rows"
-        assert set(R.ROBUST) <= set(R.KEYS) and R.ROBUST <= C.LOWER
+        assert set(R.ROBUST) <= set(R.KEYS) and all(C.aim_of_row(k) == "lower" for k in R.ROBUST), "the 120 s after the kill is time over the line and failed requests: a rise is a LOSS"
     with tempfile.TemporaryDirectory() as t:
         # the long run: 7,200 s, decisions every 62 s (60 s interval + 2 s of the governor's own), the reset check at the end
         root = Path(t); t0 = 1_800_000_000.0

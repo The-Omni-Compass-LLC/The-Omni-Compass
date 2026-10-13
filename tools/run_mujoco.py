@@ -18,10 +18,11 @@ Before the counted cycles, one paired trial in native mode (a cycle at override 
 the robot's own figures whether a slower cycle costs less energy at all, standing draw included; if it does not, the
 override is left native for that robot and the result reads "nothing for Omni to move".
 Energy is a declared model, the same for both arms, from MuJoCo's own joint torques and velocities: mechanical work
-|torque x velocity|, copper loss torque^2 x C (C declared per robot), and a standing draw (declared per robot) drawn for
+|torque x velocity|, copper heating torque^2 x C (I²R, C declared per robot), and a standing draw (declared per robot) drawn for
 the whole takt (the time line), moving or waiting, as a robot on a line is: the unit is energy per takt. The planned speed
 is set per robot, before any Omni run, as the fastest at which the robot's own servo tracks the task within 0.05 rad. Every
-cycle's record is written; the report (MUJOCO.md) reads the preregistration's directions.
+cycle's record is written; the report (MUJOCO.md) gives each gauge its word by the preregistration's aims (GAIN, EVEN,
+LOSS, or power given for a resource spent that rose: tools/readings.py).
   python3 tools/run_mujoco.py --menagerie DIR --robots franka_emika_panda --cycles 100 --out out
   python3 tools/run_mujoco.py --report-only DIR --out DIR
 """
@@ -41,6 +42,7 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw, clamp
+from tools.readings import word as gel_word, aim as gel_aim, EVEN_SAME, SHOWN  # noqa: E402  (the words every table uses)
 
 CTRL_DT = 0.01            # the control tick (100 Hz)
 SEG_S = 2.0               # planned seconds per trajectory segment, the starting point of each robot's feasibility calibration
@@ -228,9 +230,9 @@ def run_robot(menagerie: Path, robot: str, cycles: int, out: Path):
     return rec
 
 
-GAUGES = [("energy_j", "energy per takt (J, declared model: motion plus the standing draw for the whole takt)", "lower"), ("copper_j", "copper loss per cycle (J, declared model)", "lower"),
-          ("mechanical_j", "mechanical work per cycle (J)", "lower"), ("standing_j", "standing draw per takt (J, declared model; the same in both arms)", "lower"),
-          ("peak_torque_nm", "peak joint torque (N m)", "lower"), ("mean_abs_torque_nm", "mean |torque| (N m)", "lower"),
+GAUGES = [("energy_j", "energy per takt (J, declared model: motion plus the standing draw for the whole takt)", "spent"), ("copper_j", "copper heating per cycle (J, I²R, declared model)", "spent"),
+          ("mechanical_j", "mechanical work per cycle (J)", "spent"), ("standing_j", "standing draw per takt (J, declared model; the same in both arms)", "spent"),
+          ("peak_torque_nm", "peak joint torque (N m)", "spent"), ("mean_abs_torque_nm", "mean |torque| (N m)", "spent"),
           ("cycle_s", "cycle time (s)", "shown"), ("over_line_share", "cycles over the time line (share)", "never more"),
           ("tracking_rms_rad", "tracking error, RMS (rad)", "never more"), ("waypoint_err_rad", "end-point error at the waypoints (rad)", "never more"),
           ("override_mean", "speed override, mean", "shown")]
@@ -242,7 +244,9 @@ def report(res: dict, out: Path):
          "position servos the model ships with. Native: that servo tracks a pick-and-place cycle at its planned speed. Omni: the "
          "same servo and trajectory with the compass law on the speed override, inside the cycle's time line "
          "(`docs/ROBOTICS_PREREGISTRATION.md`). Energy is a declared model from MuJoCo's own torques and velocities, the same in "
-         "both arms. Evidence class: S, our model on an independent simulator. Every row is shown, losses included.", ""]
+         "both arms. Evidence class: S, our model on an independent simulator. Each reading is GAIN, EVEN or LOSS by what the "
+         "gauge is for, never by its sign; energy, force and copper heating are resources spent, so a rise reads power given "
+         "(the key: `docs/HOW_TO_READ_THE_RESULTS.md`). Every row is shown, LOSS included.", ""]
     for robot, r in sorted(res.items()):
         if "error" in r:
             L += [f"## {robot}", "", f"could not run: `{r['error']}`", ""]; continue
@@ -261,13 +265,13 @@ def report(res: dict, out: Path):
             a, b = n[k], o[k]
             ch = (b - a) / abs(a) if a else None
             if d == "shown":
-                rd = "shown"
+                rd = SHOWN
             elif ch is None:
-                rd = "same" if b == a else ("higher" if b > a else "lower")
+                rd = EVEN_SAME if b == a else gel_word(b < a, gel_aim(d, k))
             elif abs(ch) < 1e-6:
-                rd = "same"
+                rd = EVEN_SAME
             else:
-                rd = "higher" if ch > 0 else "lower"            # which way it went; the gauge's aim is the reader's
+                rd = gel_word(ch < 0, gel_aim(d, k))            # the word by what the gauge is for, never by its sign
             L.append(f"| {name} | {a:.4g} | {b:.4g} | {'' if ch is None else f'{100 * ch:+.2f}%'} | {rd} |")
         L.append("")
     (out / "MUJOCO.md").write_text("\n".join(_legal_stamp(L)) + "\n")

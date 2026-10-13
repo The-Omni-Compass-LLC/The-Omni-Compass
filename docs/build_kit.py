@@ -31,10 +31,10 @@ def pr(sd, comp, k):
 def verdict(sd, comp, k, lower):
     r = pr(sd, comp, k); lo, hi = r["ci95"]
     if hi < 0:
-        return "better" if lower else "worse"
+        return "GAIN" if lower else "LOSS"
     if lo > 0:
-        return "worse" if lower else "better"
-    return "no significant difference"
+        return "LOSS" if lower else "GAIN"
+    return "EVEN, no difference beyond the noise"
 
 
 REFS = ("k8s_ref_50", "k8s_ref_60", "k8s_ref_70", "k8s_ref_80")
@@ -42,9 +42,9 @@ REFS = ("k8s_ref_50", "k8s_ref_60", "k8s_ref_70", "k8s_ref_80")
 
 def across(arm, k, lower=True):
     vs = [verdict(sd, f"{arm}_vs_{b}", k, lower) for sd in (S1, S2) for b in REFS]
-    n = sum(v == "better" for v in vs)
-    w = sum(v == "worse" for v in vs)
-    return f"better in {n}, worse in {w}, not significantly different in {len(vs) - n - w} of {len(vs)} seed-target combinations"
+    n = sum(v == "GAIN" for v in vs)
+    w = sum(v == "LOSS" for v in vs)
+    return f"GAIN in {n}, LOSS in {w}, EVEN (no difference beyond the noise) in {len(vs) - n - w} of {len(vs)} seed-target combinations"
 
 
 def both(arm, k, fmt, base="k8s_ref_70", lower=True):
@@ -56,7 +56,7 @@ pct = lambda v: f"{100 * v:.1f}%"; f1 = lambda v: f"{v:.1f}"; f2 = lambda v: f"{
 rate_bound = 3.0 / SOAK["decisions"]
 
 PRIMARY_TXT = "; ".join("seed %s: %+.2f kWh, p = %.1e" % (sd, r["mean_delta"], r["p"]) for sd, r in MULT["primary"].items())
-SECONDARY_TXT = "%d better, %d worse, %d not significant" % tuple(sum(t["verdict"] == v for t in MULT["secondary"]) for v in ("better", "worse", "not significant"))
+SECONDARY_TXT = "GAIN on %d, LOSS on %d, EVEN (no difference beyond the noise) on %d" % tuple(sum(t["verdict"].startswith(v) for t in MULT["secondary"]) for v in ("GAIN", "LOSS", "EVEN"))
 
 FS = json.loads((R / "fleet" / "heldout" / "SUMMARY.json").read_text())
 def _fl(v):
@@ -131,7 +131,7 @@ Answers reference the Claims Register (C-numbers) and the Technical Manual.
 **Can every number be reproduced?** `python verify.py` rebuilds the C++, reruns parity, reruns the 100,000,000-decision soak and compares it with the recorded result, replays held-out scenarios and checks the pre-registered SHA-256 hashes (program fingerprints are additionally checked when the Python version matches the recorded one).
 
 ## Operations
-**Better than what we run today?** Compared against a documented-behaviour reference model of Kubernetes autoscaling (HPA tolerance 0.1, 300 s scale-down stabilization, HPA targets 0.5 to 0.8; simplified Cluster Autoscaler with 10-minute unneeded time, 0.5 utilization threshold, 10-minute delay after scale-up): C8 to C12, including where Omni-Compass is worse. The reference model is not the upstream controllers (C12b); running the upstream controllers against the same scenarios is the next baseline step.
+**GAIN against what we run today?** Compared against a documented-behaviour reference model of Kubernetes autoscaling (HPA tolerance 0.1, 300 s scale-down stabilization, HPA targets 0.5 to 0.8; simplified Cluster Autoscaler with 10-minute unneeded time, 0.5 utilization threshold, 10-minute delay after scale-up): C8 to C12, including every LOSS. The reference model is not the upstream controllers (C12b); running the upstream controllers against the same scenarios is the next baseline step.
 **On real traffic?** Not yet. Results use a synthetic stack model. Replay of published production traces and the pilot protocol are the next evidence steps (C14).
 **What happens when it is wrong?** Observe mode changes nothing (C6). The reset returns control to the native managers at the next interval (omni_kill arm). The shield blocks actions that violate I1 to I5 (C7).
 **Will it wear hardware?** Machine start/stop cycles, power-cap travel and thermal travel are measured for every arm (C12, Manual Chapter 8).
@@ -170,7 +170,7 @@ Run `python verify.py`. Pass criterion: VERIFICATION: PASS.
 ## Phase 2: Guarded control, one loop at a time (4 to 8 weeks)
 Order: power capping; node count (Cluster Autoscaler set to observe); replica count (HPA set to observe).
 - Each loop is handed over separately, with the reset tested at handover and at exit.
-- Pass criteria per loop, fixed in advance: SLO attainment not worse than the preceding shadow baseline at the agreed confidence level; zero shield invariant violations; energy per unit of completed work reported with confidence intervals.
+- Pass criteria per loop, fixed in advance: SLO attainment no LOSS against the preceding shadow baseline at the agreed confidence level; zero shield invariant violations; energy per unit of completed work reported with confidence intervals.
 - Exit: any criterion failed triggers the reset and returns the loop to its native controller.
 
 ## Scoring your own pilot

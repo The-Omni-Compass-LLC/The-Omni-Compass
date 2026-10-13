@@ -46,10 +46,10 @@ def show(res):
     print(f"{res['muscle']}  ({len(res['seeds'])} seeds)")
     print(f"  {'gauge':20}" + "".join(f"{a[:16]:>17}" for a in arms))
     for g, direction in m.GAUGES.items():
-        print(f"  {g:20}" + "".join(f"{res['means'][a][g]:17.4g}" for a in arms) + f"   ({direction} better)")
+        print(f"  {g:20}" + "".join(f"{res['means'][a][g]:17.4g}" for a in arms) + f"   (aim: {direction})")
     for nat, v in res["vs"].items():
         o = v["omni"]
-        print(f"  omni vs {nat}: " + ", ".join(f"{g} {o[g]['better_by']*100:+.1f}% {o[g]['verdict'][0]}" for g in m.GAUGES))
+        print(f"  omni vs {nat}: " + ", ".join(f"{g} {o[g]['gain_by']*100:+.1f}% {o[g]['verdict']}" for g in m.GAUGES))
 
 
 if __name__ == "__main__":

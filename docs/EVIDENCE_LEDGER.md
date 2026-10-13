@@ -88,18 +88,18 @@ Nothing here is deleted when a later result looks different.
 | S | Two-wire GPU card, the profiles of amendment 7 (removed in amendment 8): service +5.3% work per energy with the median +14.8% slower; batch p95 +7.0% (−4.8 to +20.3). The governor before amendment 6 gave p95 +32.9% and +37.1%. | `docs/GPU_PREREGISTRATION.md`, history in git |
 | S | Six organisms, same runs: time over the service line **+0.19 to +0.27 pp higher in every cell**; band first is not held anywhere. | `results/scale/GRID.md` |
 | S | Round 6 law (HPA target held at the operator's own, machine release margin 0.6), 20 paired seeds per organism, before the grid rerun: work per energy +0.086% to +0.201%, time over the line −0.010 to −0.031 pp (ahead of native in all six), work unchanged within its interval, every knob handed back. | `docs/REALMS_PREREGISTRATION.md` (round 6) |
-| L | Set 21: modelled energy 1.8% **away from its aim** with every machine powered (the only honest energy row on kind). | `results/live/LIVE_REPS_21.md` |
-| S | Realm harness round 1 (superseded, kept): all five organisms **away from its aim** (whole tower −0.1%). Its Omni layer did not follow the shipped controller (no contraction authority or SLO reflex, the stack law in place of the HPA, request traffic paused, a site budget under native draw). | `results/realms/round1/` |
-| S | Realm harness round 2: the Physics / Robotics / Autonomous organism **lower** (−1.9%, violations +2.9 pp); the Compute organism's +2.5% costs +2.9 pp of service violations; 68 single muscles away from their aims, mostly batch pacing and cooling setpoints under the live cooling law. | `results/realms/REALMS.md` |
+| L | Set 21: modelled energy 1.8% **power given** with every machine powered (the only honest energy row on kind). | `results/live/LIVE_REPS_21.md` |
+| S | Realm harness round 1 (superseded, kept): all five organisms **LOSS** (whole tower −0.1%). Its Omni layer did not follow the shipped controller (no contraction authority or SLO reflex, the stack law in place of the HPA, request traffic paused, a site budget under native draw). | `results/realms/round1/` |
+| S | Realm harness round 2: the Physics / Robotics / Autonomous organism **LOSS** (−1.9%, violations +2.9 pp); the Compute organism's +2.5% costs +2.9 pp of service violations; 68 single muscles LOSS or power given, mostly batch pacing and cooling setpoints under the live cooling law. | `results/realms/REALMS.md` |
 | L | Set 22, equal work: no CPU saving once Omni's own CPU is counted (service −7.6%, controller +0.070 cores, together −0.9%, not proven); modelled energy unchanged (−0.1%). | `results/live/LIVE_REPS_22.md` |
 | L | Set 20: the "same work" reading was wrong; requests were +35%. | `results/live/LIVE_REPS_20.md` addendum |
 | L | Sets 1–2: machine savings **withdrawn** — a broken probe had blinded the latency sense. | `results/live/LIVE_REPS_PROBE_DEFECT.md` |
 | L | Set 3 with a working probe: Omni kept all 6 machines; no significant difference except more waiting pods. | `docs/HISTORY.md` |
 | L | Set 21: pending pod-minutes +238% (not proven); pod starts +37% (not proven). | `results/live/LIVE_REPS_21.md` |
-| S | GPU and batch: energy 1–2% **away from its aim**, power and heat margins 1–4% short of tight packers (AKS/Karpenter, CAST AI, Spot). | `docs/HISTORY.md` |
-| S | Machine round trips 1.1 → 1.7 per run (**away from its aim**) in 6 of 8 seed-target combinations. | C12 |
-| S | Power-protect mode: backlog violations 2.5% → 6.7% (**away from its aim**). | C12p |
-| S | Park strategy on PlanetLab shapes: energy +1.3% vs HPA+CA, +33.6% vs Karpenter-lite (**higher**). | C17 |
+| S | GPU and batch: energy 1–2% **power given**, power and heat margins 1–4% short of tight packers (AKS/Karpenter, CAST AI, Spot). | `docs/HISTORY.md` |
+| S | Machine round trips 1.1 → 1.7 per run (**LOSS**) in 6 of 8 seed-target combinations. | C12 |
+| S | Power-protect mode: backlog violations 2.5% → 6.7% (**LOSS**). | C12p |
+| S | Park strategy on PlanetLab shapes: energy +1.3% vs HPA+CA, +33.6% vs Karpenter-lite (**power given**). | C17 |
 | S | Typical response time about 20% slower than every platform in the web and four-cluster simulations. | `docs/HISTORY.md` |
 | S | GPU model: the engine without its guards breaks the p95 guardrail. | `results/gpu/sim/FINDINGS.md` |
 | S | The compass-stroke GPU variant was tried and not adopted. | same |

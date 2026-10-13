@@ -19,6 +19,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from fleet.harness import Workload, Pool, Cluster, Scenario, STEPS
 from fleet.sim import run, arms_for
+from tools.readings import GAIN, LOSS, GIVEN, EVEN_NOISE, word, LOWER as AIM_LOWER, HIGHER as AIM_HIGHER, SPENT  # noqa: E402
 
 
 def load_dir(d):
@@ -72,7 +73,8 @@ def main():
                 d = np.array([B[k] - A[k] for k in sorted(A)]); bs = d[rng.integers(0, len(d), (4000, len(d)))].mean(axis=1)
                 lo, hi = np.percentile(bs, [2.5, 97.5])
                 res.append({"metric": m, "delta": float(d.mean()), "ci95": [float(lo), float(hi)],
-                            "verdict": ("better" if (hi < 0) == lower else "worse") if (hi < 0 or lo > 0) else "not significant"})
+                            "verdict": word(hi < 0, SPENT if m == "energy_kwh" else (AIM_LOWER if lower else AIM_HIGHER))
+                                       if (hi < 0 or lo > 0) else EVEN_NOISE})
             paired[f"{cand}_vs_{base}"] = res
     summ = {"trace_dir": str(a.dir), "traces": len(traces), "scenarios": a.scenarios, "seed_base": a.seed_base, "means": means,
             "observe_identical": obs, "paired": paired}

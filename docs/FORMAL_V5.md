@@ -127,7 +127,7 @@ noise"; clear intervals of opposite signs read "the runs disagree" (`tools/readi
 
 - **S, the muscles alone, 1,107 muscles, preregistered seeds 3000-3009, both loads** (`results/realms_v5/`, commit
   `eea291501848`, digest `5648f2902f1fae68`, every muscle its own card, section 5): 527 toward their aims, 421 at their limit on
-  native (V3: the max writes nothing), 159 no difference beyond the noise, **0 away from their aims, 0 mixed**.
+  native (V3: the max writes nothing), 159 no difference beyond the noise, **0 LOSS or power given, 0 mixed**.
 - **S, inside the organisms, the same seeds, three loads**: every organism with fewer misses as a whole under every load, and
   **0 plants with less work or more misses** in every organism under every load (0 of the 1,908 in the four stacked). Misses (the share of
   plant decisions over their line) fall 1.9% to 7.5% under each organism's own load, 1.4% to 7.2% under the climb (the
@@ -138,10 +138,10 @@ noise"; clear intervals of opposite signs read "the runs disagree" (`tools/readi
 - **L, real software**: `docs/THE_RECEIPTS.md`, receipt by receipt.
 - **P, a physical meter on a real chip**: not yet produced on the current governor (`docs/THE_SEAT.md`, section 5).
 
-## 4. The living body: why plants moved away from its aim, and the version that cures them (the engine since 12 October, night)
+## 4. The living body: why plants read LOSS, and the version that cures them (the engine since 12 October, night)
 
 Found on development seeds only (7100-7299), never on the preregistered ones. Under the climb, rooms and UPS lines
-reach their limits in both arms; a plant moved away from its aim when the Omni arm reached a limit a moment sooner, or when a sense
+reach their limits in both arms; a plant read LOSS when the Omni arm reached a limit a moment sooner, or when a sense
 the brain read was wrong. Each cause, and the property of the code that removes it:
 
 1. **A room snapped back.** A room cooled ahead of the heat, then returned at once to its operator's setpoint when the
@@ -196,7 +196,7 @@ One lock is left, said plainly: a line that once jumped (a battery that stopped 
 jump that far again for the rest of the run, which keeps the max from adding machines on that line. Removing it (every
 line's climb read on the site's whole draw) roughly triples the misses removed on the same seeds (−0.34 points), but in
 36 of the 400 runs a machine pool whose queue sat at its limit then did more work and took one decision longer to clear
-it, which our decision count reads as away from its aim. That is the next version's work, and it enters the engine only as a new
+it, which our decision count reads as LOSS. That is the next version's work, and it enters the engine only as a new
 version, every result run again on it, the founder told first.
 
 ## 5. Every muscle its own card (the engine since 13 October)
@@ -217,7 +217,7 @@ own load and with work waiting in line; θ_0 is always among the candidates. Poo
 {10, 20, 40, 60}; batteries wired by their power: z ∈ {0, 0.5, 1, 2, 3.09} × hold window ∈ {3, 5, 10, 20} × hold margin
 ∈ {0, 0.02, 0.05, 0.10}; other batteries: z ∈ {0, 0.25, ..., 4}; axes: heat head × strain. A candidate is kept if it
 beats θ_0 beyond the noise on those seeds (fewer misses, more work or faster: a 95% interval of the paired difference clear
-of zero), moved away from its aim than θ_0 nowhere, and is never behind native: on no seed and under no load over its line
+of zero), read LOSS than θ_0 nowhere, and is never behind native: on no seed and under no load over its line
 more often than native, doing less work or clearing its line later (the engine's own no-harm tests, seed by seed); among
 those, the fewest misses, then the most work, the fastest, the least energy. It is then run again against θ_0 on seeds 7200-7209 and enters the engine only
 if it wins there too: a card must win twice. The preregistered seeds 3000-3009 are never read by the search.
@@ -229,7 +229,7 @@ the one plant behind native that the cards produced in development (a rack's pow
 over its line in the whole tower with work waiting, one seed of ten) was exactly that case, and V14 removes it.
 
 What the search found: 409 of the 550 searched muscles beat θ_0 on the first seeds; 364 won again on the second (45 fell
-back to the global setting, none away from its aim); the engine's cards are those 364 (`realms/muscle_cards_v5.csv`: 333 machine
+back to the global setting, none LOSS); the engine's cards are those 364 (`realms/muscle_cards_v5.csv`: 333 machine
 pools, 31 batteries). No axis setting beat the global one. A first set of cards was chosen by the mean over the seeds
 alone (371 cards); the engine's own no-harm test then caught one of them (an electrolyzer battery, one decision over its
 line on one seed), and the rule became the seed-by-seed one above. The cards are the ones it chose. A room alone and a process loop alone have nothing for a card

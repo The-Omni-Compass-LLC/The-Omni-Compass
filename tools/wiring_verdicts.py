@@ -7,7 +7,7 @@
 """Wire in, or watch: the verdict per knob, read from every result in the repository.
 
 Omni-Compass is wired OUT of every muscle (it reads every reading) and IN to a knob only where the paired measurement
-shows no gauge of the muscle moved away from its declared aim. The engine already does this on the muscle itself (omnicompass/verdict.py: the paired
+shows no gauge of the muscle read LOSS (or power given) against native. The engine already does this on the muscle itself (omnicompass/verdict.py: the paired
 trial, "left native" where no step is allowed; the realms' watch arm, which reads and writes nothing). This tool applies
 the same principle to every published result, one verdict per knob, so an operator can see which knobs earn a wire in
 and which stay native with Omni only reading them. The founder's order of 9 October 2026: "where Omni cannot beat
@@ -15,22 +15,22 @@ native, the muscle stays native; we only wire out of it".
 
 The rule, the same for every table (every judged gauge counts; "shown, not judged" rows never do):
 
-  write               at least one gauge toward its declared aim in all three of our runs and none away from it: Omni holds
-                      the knob
-  watch               nothing toward its aim in all three of our runs: the knob stays native and Omni only reads it. Where a
-                      gauge moved away from its aim in all three of our runs it is named and its cause given; where the runs
-                      disagree, nothing is settled and the knob stays native until it is
-  operator's choice   gains and losses both the same in all three of our runs: a trade. Both readings of the Omni index are printed where the
+  write               at least one gauge GAIN in all three of our runs and none LOSS or power given: Omni holds the knob
+  watch               no GAIN in all three of our runs: the knob stays native and Omni only reads it. Where a gauge read LOSS
+                      or power given in all three of our runs it is named and its cause given; where the runs disagree,
+                      nothing is settled and the knob stays native until it is
+  operator's choice   GAIN, and LOSS or power given, both the same in all three of our runs: a trade. Both readings of the Omni index are printed where the
                       test is in it (the resource reading, the preregistered headline; the service reading, work and
                       speed alone) and the side that pays is named. The operator who wants the gain and can pay the
                       cost wires in; every other operator watches
 
 Nothing is typed in: every verdict is computed from the test's own result file. Modelled muscles (the 945 on their
-plants) take their verdict from the realms' label by rule (SUPERIOR WITHIN GUARDRAILS: write; a tradeoff label:
-operator's choice; NONINFERIOR / INCONCLUSIVE, NOT ESTABLISHED and any other label: watch).
+plants) take their verdict from the realms' label by rule (GAIN within the guardrails: write; a trade, GAIN AND LOSS or
+GAIN with power given: operator's choice; EVEN, LOSS and any other label: watch).
 
-A gauge's declared aim is its preregistration's: lower for an amount waited, spent or held, higher for work done. The tables
-say only which way a number went (lower, higher); the aim turns that into toward or away, and the page says both.
+Every word is decided by what the gauge is for, never by the sign of its number (tools/readings.py, the key): time waited,
+missed or failed aims lower; work done aims higher; a resource spent or held (energy, machines, memory, connections,
+consumers, processor time) is spent, so a fall is a cut, a GAIN, and a rise is power given.
 
   python3 tools/wiring_verdicts.py            ->  docs/WIRING_VERDICTS.md, results/WIRING_VERDICTS.csv
   python3 tools/wiring_verdicts.py --check    ->  exit 1 if the committed files differ from what the tables give
@@ -49,9 +49,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import with_own_runs, row_toward, NEVER_MORE_UP  # noqa: E402
+from tools.readings import with_own_runs, row_gain, word as gel_word, aim as gel_aim, classify as gel_classify, labelled, LABEL_SHOWN  # noqa: E402
 from tools import omni_index                                       # noqa: E402
-from tools.grid_v5 import kube_verdict                             # noqa: E402  (a square's line in the direction words)
+from tools.grid_v5 import kube_verdict                             # noqa: E402  (a square's line in GAIN, EVEN and LOSS)
 
 LIVE = ROOT / "results" / "live"
 OUT_MD = ROOT / "docs" / "WIRING_VERDICTS.md"
@@ -62,40 +62,32 @@ UNJUDGED = "shown, not judged"
 
 
 # ------------------------------------------------------------------------------------------------------ the rule
-def classify(reading, lower_is_aim=None):
-    """A table's reading in one word for the scoring: toward (the gauge moved toward its declared aim in all three of our
-    runs), away (away from it), noise, disagree, same, unjudged. The tables written since 13 October say only which way a
-    number went (lower, higher); the gauge's aim (lower for an amount waited, spent or held, higher for work done) turns
-    that into the class. The older tables, kept as written, put the class itself in their words."""
-    r = (reading or "").strip().strip("*").lower()
-    for old, cls in (("better", "toward"), ("worse", "away")):          # an older table's words, kept as written
-        if r.startswith(f"{old} in all three of our runs") or r.startswith(f"confirmed {old}"):
-            return cls
-    for word, low in (("lower in all three of our runs", True), ("lower or the same in all three of our runs", True),
-                      ("higher in all three of our runs", False), (NEVER_MORE_UP, False)):
-        if r.startswith(word):
-            if lower_is_aim is None:
-                raise ValueError(f"the reading {reading!r} says a direction; its gauge's aim is needed to score it")
-            return "toward" if low == lower_is_aim else "away"
-    if r.startswith("no difference"):
-        return "noise"
-    if "disagree" in r or "differ" in r:
-        return "disagree"
-    if r.startswith("same"):
-        return "same"
-    if r.startswith("shown"):
-        return "unjudged"
-    raise ValueError(f"unknown reading: {reading!r}")
+CLASSES = ("gain", "loss", "given", "noise", "disagree", "same")
 
 
-def verdict(toward, away):
-    """The three words. toward, away: how many judged gauges moved toward their declared aim, and away from it, in all
-    three of our runs."""
-    if toward and not away:
+def classify(reading, aim=None):
+    """A table's reading in one word for the scoring: gain, loss, given (power given), noise, disagree, same or unjudged
+    (tools/readings.py reads every table's words; aim is the gauge's, needed for the direction words of 13 October)."""
+    return gel_classify(reading, aim)
+
+
+def empty():
+    return {c: [] for c in CLASSES}
+
+
+def verdict(gain, away):
+    """The three words. gain: how many judged gauges read GAIN in all three of our runs; away: how many read LOSS or power
+    given."""
+    if gain and not away:
         return WRITE
-    if toward and away:
+    if gain and away:
         return CHOICE
     return WATCH
+
+
+def away_of(j):
+    """The judged gauges that read LOSS or power given."""
+    return j["loss"] + j["given"]
 
 
 def pct_range(runs):
@@ -164,17 +156,34 @@ WORKLOAD_STACKS = [
 ]
 STACK_SHORT = {"V3_PGBENCH.json": "PostgreSQL", "V3_KAFKA.json": "Kafka", "V3_REDIS.json": "Redis", "V3_YCSB.json": "MongoDB", "V3_SYSBENCH.json": "MySQL"}
 
-# Why each gauge that moved away from its aim in all three of our runs did, read from the preregistration that carries the result (the file is named so a reader
-# can check the words against the record). Keyed by (file, workload or test, gauge key); a key of "*" matches any case.
+
+def _stack_directions():
+    """Every stack gauge's declared direction, from its runner (tools/run_*.py): the tables written before the gauges' aims
+    were stored beside their readings are read by these."""
+    out = {}
+    for name in ("run_pgbench", "run_kafka", "run_redis", "run_ycsb", "run_sysbench", "run_cpu_power"):
+        try:
+            mod = __import__(f"tools.{name}", fromlist=["GAUGES"])
+        except ImportError:
+            continue
+        for k, _, d in mod.GAUGES:
+            out.setdefault(k, d)
+    return out
+
+
+STACK_DIRECTIONS = _stack_directions()
+
+# Why each gauge that read LOSS or power given in all three of our runs did, read from the preregistration that carries the result (the file is named so a
+# reader can check the words against the record). Keyed by (file, workload or test, gauge key); a key of "*" matches any case.
 WHY = {
-    ("V3_KAFKA.json", "*", "consumers_mean"): "the knob itself: Omni adds consumers while messages wait and the queue is kept short; the consumers running are the price, declared in advance as the gauge expected to move away from its aim (`docs/KAFKA_PREREGISTRATION.md`, the gauges)",
+    ("V3_KAFKA.json", "*", "consumers_mean"): "the knob itself: Omni adds consumers while messages wait and the queue is kept short; the consumers running are the price, declared in advance as the gauge expected to rise: the power given (`docs/KAFKA_PREREGISTRATION.md`, the gauges)",
     ("V3_KAFKA.json", "*", "consumers_max"): "the same price at its peak: the group grown to the partition count while the burst is drained",
     ("V3_KAFKA.json", "*", "cpu_busy_share"): "more consumers polling cost the host CPU on the light workload, where the broker had slack; on the heavy and burst workloads the CPU is inside the noise",
     ("V3_KAFKA.json", "*", "cpu_seconds"): "the same CPU, counted over the run",
-    ("V3_REDIS.json", "*", "maxmemory_mb_mean"): "the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to move away from its aim (`docs/REDIS_PREREGISTRATION.md`, the gauges)",
+    ("V3_REDIS.json", "*", "maxmemory_mb_mean"): "the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to rise: the power given (`docs/REDIS_PREREGISTRATION.md`, the gauges)",
     ("V3_REDIS.json", "*", "used_mb_mean"): "the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held",
     ("V3_PGBENCH.json", "simple_update", "servers_alive_max"): "amendment 1's add rule (\"slow, clients waiting for a server: add\") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch",
-    ("V3_SYSBENCH.json", "read_write", "pool_used_mb_mean"): "memory bought on real misses: a written working set keeps the pool missing above one percent, so the growth gate lets the pool grow to 1.1 to 1.6 GB in the wide notches; the host's CPU fell 4% to 6% for it, lower in all three of our runs, and latency did not move (`docs/MYSQL_PREREGISTRATION.md`, the third set)",
+    ("V3_SYSBENCH.json", "read_write", "pool_used_mb_mean"): "memory bought on real misses: a written working set keeps the pool missing above one percent, so the growth gate lets the pool grow to 1.1 to 1.6 GB in the wide notches; the host's CPU was cut 4% to 6% for it, a GAIN in all three of our runs, and latency did not move (`docs/MYSQL_PREREGISTRATION.md`, the third set)",
 }
 DECLARED_COST = {"V3_KAFKA.json": "consumers", "V3_REDIS.json": "memory"}
 
@@ -189,16 +198,27 @@ def load_index():
     return out
 
 
+def row_aim(k, v):
+    """A row's aim: the table's own field where it carries one; else the generating tool's declared direction for the key
+    (the stacks' runners), the capacity row's (work done: higher), or time waited for every other Kubernetes row; a resource
+    spent or held is spent (tools/readings.py)."""
+    if v.get("aim"):
+        return gel_aim(v["aim"], k)
+    if "work inside the response line" in k:
+        return "higher"
+    return gel_aim(STACK_DIRECTIONS.get(k, "lower"), k)
+
+
 def judge_rows(rows, names, keys_order=None):
-    """rows: {gauge key: {"reading", "runs"}}. Returns the classified lists with their ranges."""
-    out = {"toward": [], "away": [], "noise": [], "disagree": [], "same": []}
+    """rows: {gauge key: {"reading", "runs"}}. Returns the classified lists with their ranges and each row's aim."""
+    out = empty()
     for k in (keys_order or rows):
         v = rows[k]
-        aim = v.get("aim") or ("higher" if "work inside the response line" in k else "lower")   # the table's own aim; the capacity row aims higher
-        c = classify(v["reading"], lower_is_aim=aim == "lower")
+        a = row_aim(k, v)
+        c = classify(v["reading"], a)
         if c == "unjudged":
             continue
-        out[c].append((k, names.get(k, k), pct_range(v["runs"]), v["runs"]))
+        out[c].append((k, names.get(k, k), pct_range(v["runs"]), v["runs"], a))
     return out
 
 
@@ -210,7 +230,7 @@ def real_stacks(index):
             continue
         d = json.loads(p.read_text())
         j = judge_rows(d["rows"], K8S_GAUGE)
-        v = verdict(len(j["toward"]), len(j["away"]))
+        v = verdict(len(j["gain"]), len(away_of(j)))
         res, svc = index.get((f, None), (None, None))
         why = k8s_why(f, j, v)
         cases.append({"kind": "real knob", "domain": "Real Kubernetes (GitHub, kind)", "knob": K8S_KNOB, "case": K8S_NAMES.get(f, name),
@@ -223,7 +243,7 @@ def real_stacks(index):
         d = json.loads(p.read_text())
         for wl, gauges in d["workloads"].items():
             j = judge_rows(gauges, names)
-            v = verdict(len(j["toward"]), len(j["away"]))
+            v = verdict(len(j["gain"]), len(away_of(j)))
             res, svc = index.get((f, wl), (None, None))
             cases.append({"kind": "real knob", "domain": cat, "knob": knob, "case": wl + (" (tuning workload: shown, never counted)" if wl == "tuning" else ""),
                           "counted": wl != "tuning", "judged": j, "verdict": v, "resource_pct": res, "service_pct": svc,
@@ -236,59 +256,72 @@ def magnitude(rg):
     """'-65% to -66%' -> '65% to 66%': the size of a change without its sign (the sign is said in words instead)."""
     nums = re.findall(r"[-+]?\d+(?:\.\d+)?%", rg or "")
     if not nums:
-        return rg or ""
+        return (rg or "").lstrip("+-−")                     # a count's change (no percent): its size, the sign said in words
     mags = sorted(abs(float(x.rstrip("%"))) for x in nums)
     f = (lambda x: f"{x:.0f}%") if mags[-1] >= 10 else (lambda x: f"{x:.1f}%")
     return f(mags[0]) if f(mags[0]) == f(mags[-1]) else f"{f(mags[0])} to {f(mags[-1])}"
 
 
-def verb(cls, rg):
-    """The direction of a change in a word, lower or higher (never good or bad: the reader judges)."""
-    nums = re.findall(r"[-+]?\d+(?:\.\d+)?%", rg or "")
-    fell = bool(nums) and nums[0].startswith("-")
+def verb(aim, rg):
+    """Which way a change went, in the plain verb beside its word: a fall is a cut where less is the aim (time waited, a
+    resource spent) and down where more is the aim (work done); a rise is up."""
+    fell = (rg or "").strip().startswith(("-", "−"))
     if rg == "from zero":
-        return "higher from zero"
-    return "lower" if fell else "higher"
+        return "up from zero"
+    if fell:
+        return "down" if aim in ("higher", "never less") else "cut"
+    return "up"
 
 
-def words(name, cls, rg, tag=True):
-    """'p95 lower 65% to 66%' or 'memory ceiling higher 205% to 215%'."""
-    v = verb(cls, rg); m = magnitude(rg)
-    return f"{name} {v}" + (f" {m}" if m and v != "higher from zero" else "")
+def words(name, aim, rg, tag=True):
+    """'p95 cut 65% to 66%' or 'memory ceiling up 205% to 215%'."""
+    v = verb(aim, rg); m = magnitude(rg)
+    return f"{name} {v}" + (f" {m}" if m and v != "up from zero" else "")
 
 
 def fmt_list(items, n=4, cls=None, tag=False):
-    """'p95 lower 65% to 66%, p99 lower 68% to 72%, ...' from classified items; cls names the class the items came from."""
-    s = [words(nm, cls or "toward", rg, tag) for _, nm, rg, _ in items[:n]]
+    """'p95 cut 65% to 66%, p99 cut 68% to 72%, ...' from classified items (each carries its gauge's aim)."""
+    s = [words(it[1], it[4] if len(it) > 4 else None, it[2], tag) for it in items[:n]]
     more = len(items) - n
     return ", ".join(s) + (f" and {more} more" if more > 0 else "")
 
 
+def away_cell(j, n=12):
+    """The LOSS and power-given gauges of a case, each named with its word."""
+    parts = []
+    if j["loss"]:
+        parts.append("LOSS: " + fmt_list(j["loss"], n))
+    if j["given"]:
+        parts.append("power given: " + fmt_list(j["given"], n))
+    return "; ".join(parts)
+
+
 def k8s_why(f, j, v):
     if v == WRITE:
-        return (f"{len(j['toward'])} gauges moved toward their aim in all three of our runs ({fmt_list(j['toward'])}), none away from it"
-                + (f"; {len(j['noise'])} gauges inside the noise" if j["noise"] else "") + ". Omni holds the knob")
-    if v == WATCH and not j["away"]:
-        return (f"every judged gauge inside the noise or the same ({len(j['noise'])} inside the noise, {len(j['same'])} the same), the neighbour's "
+        return (f"{len(j['gain'])} gauges GAIN in all three of our runs ({fmt_list(j['gain'])}), none LOSS or power given"
+                + (f"; {len(j['noise'])} gauges EVEN, inside the noise" if j["noise"] else "") + ". Omni holds the knob")
+    if v == WATCH and not away_of(j):
+        return (f"every judged gauge EVEN ({len(j['noise'])} inside the noise, {len(j['same'])} the same), the neighbour's "
                 f"own rows included: beside a noisy neighbour no gauge moved, so under this demand the knob has nothing to move. "
                 f"The same knob writes under the other six demands")
-    return (f"toward their aim in all three of our runs: {fmt_list(j['toward'])}; away from their aim in all three of our runs: "
-            f"{fmt_list(j['away'])}")
+    return (f"GAIN in all three of our runs: {fmt_list(j['gain'])}"
+            + (f"; LOSS in all three of our runs: {fmt_list(j['loss'])}" if j["loss"] else "")
+            + (f"; power given in all three of our runs: {fmt_list(j['given'])}" if j["given"] else ""))
 
 
 def stack_why(f, wl, j, v, res, svc):
     short = STACK_SHORT[f]
     parts = []
     if j["disagree"]:
-        parts.append(f"the runs disagree on {', '.join(f'{nm} ({rg})' for _, nm, rg, _ in j['disagree'][:3])}")
-    if not j["toward"] and not j["away"]:
-        parts.append(f"nothing moved the same way in all three of our runs ({len(j['noise'])} gauges inside the noise" + (f", {len(j['same'])} the same" if j["same"] else "") + ")")
+        parts.append(f"the runs disagree on {', '.join(f'{nm} ({rg})' for _, nm, rg, *_ in j['disagree'][:3])}")
+    if not j["gain"] and not away_of(j):
+        parts.append(f"everything EVEN in all three of our runs ({len(j['noise'])} gauges inside the noise" + (f", {len(j['same'])} the same" if j["same"] else "") + ")")
     s = ("; ".join(parts) + ".") if parts else ""
     causes = []
-    for k, nm, rg, _ in j["away"]:
+    for k, nm, rg, _, a in away_of(j):
         w = WHY.get((f, wl, k)) or WHY.get((f, "*", k))
         if w:
-            causes.append(f"{words(nm, 'away', rg)}, because {w}")
+            causes.append(f"{words(nm, a, rg)} ({gel_word(rg.startswith('-'), a)}), because {w}")
     if causes:
         s += " Why: " + "; ".join(causes) + "."
     s = s.strip()
@@ -303,14 +336,14 @@ def stack_why(f, wl, j, v, res, svc):
                       f"headline): the operator who runs {short} for its speed and has the {cost or 'resource'} wires in; the operator who counts the "
                       f"{cost or 'resource'} as the cost watches.")
             else:
-                s += (f" Under the index's own scoring the gain outweighs the loss by {res:+.1f}% (resource reading); the service reading is "
+                s += (f" Under the index's own scoring the GAIN outweighs what was given by {res:+.1f}% (resource reading); the service reading is "
                       f"{svc:+.1f}%: a small trade, the operator's to take or leave.")
-    if v == WATCH and j["disagree"] and not j["away"]:
+    if v == WATCH and j["disagree"] and not away_of(j):
         s += " Nothing is settled here, so the knob stays native until three runs agree."
-    if v == WATCH and not j["toward"] and not j["away"] and not j["disagree"]:
-        s += " Nothing moved under this workload: the knob stays native and Omni reads it."
+    if v == WATCH and not j["gain"] and not away_of(j) and not j["disagree"]:
+        s += " EVEN under this workload: the knob stays native and Omni reads it."
     if v == WRITE:
-        s += " Nothing moved away from its aim: Omni holds the knob."
+        s += " No LOSS and no power given: Omni holds the knob."
     return s
 
 
@@ -328,30 +361,30 @@ SIMS = [
      {"Cells where Omni moved the cruise": "moved", "Cells where the paired trial left the cruise native": "left_native", "Void cells": "void"}),
 ]
 SIM_SHORT = {
-    "V3_PANDAPOWER.md": {"losses_up": "losses: an exporting grid pays the lower voltage in line losses (the analysis under the table)",
+    "V3_PANDAPOWER.md": {"losses_up": "line heating: an exporting grid pays the lower voltage in energy dissipated in its lines (the analysis under the table)",
                          "taps_up": "taps: the declared cost on a grid that barely taps on its own (4 a year, doubled)",
-                         "import_up": "import: follows the losses, hundredths of a percent"},
+                         "import_up": "import: follows the line heating, hundredths of a percent"},
     "V3_CITYLEARN.md": {"2023": "the 2023 pattern: the bill, the ramping and the energy not served up, the electricity bought, the carbon and the daily peak down (the analysis under the table)",
-                        "monthly": "the monthly load factor moved by a tenth of a percent against a bill 8.6% lower"},
+                        "monthly": "the monthly load factor moved by a tenth of a percent against a bill cut 8.6%"},
 }
 SIM_WHY = {
     "V3_PANDAPOWER.md": {
-        "losses_up": ("the lower setpoint carries the grid's power at a lower voltage and therefore a higher current, and line losses rise with "
-                         "the square of the current. The four grids where losses rose are four of the five that export more than they import "
-                         "(net import negative: rural 1 and 2, semiurb 1 and 2); on the importing grids the loads' own draw falls with the "
-                         "voltage under ZIP loads and losses fall with it. Under constant-power loads the loads draw the same at any voltage, so "
-                         "the setpoint saves nothing on the loads and the exporting grids pay the losses with nothing bought"),
+        "losses_up": ("the lower setpoint carries the grid's power at a lower voltage and therefore a higher current, and the energy dissipated "
+                         "in the lines rises with the square of the current. The four grids where it rose are four of the five that export more "
+                         "than they import (net import negative: rural 1 and 2, semiurb 1 and 2); on the importing grids the loads' own draw falls "
+                         "with the voltage under ZIP loads and the line heating falls with it. Under constant-power loads the loads draw the same "
+                         "at any voltage, so the setpoint saves nothing on the loads and the exporting grids give the line heating with nothing bought"),
         "taps_up": ("tap operations, declared in advance as Omni's expected cost (`docs/PANDAPOWER_PREREGISTRATION.md`): this grid barely taps on "
                        "its own (4 a year), so Omni's moves double a very small count"),
-        "import_up": "the import follows the losses: the same loads, more lost on the lines, so hundredths of a percent less exported or more imported upstream"},
+        "import_up": "the import follows the line heating: the same loads, more dissipated on the lines, so hundredths of a percent less exported or more imported upstream"},
     "V3_CITYLEARN.md": {
         "2023": ("the seven 2023 challenge districts are small (3 to 6 buildings) and short (720 to 2,208 hours), and in them the energy "
                  "not served and the comfort rows move, where in the county neighbourhoods they read the same: the compass steers the batteries from the district's "
                  "electricity reading alone (one wire, one muscle, `docs/CITYLEARN_PREREGISTRATION.md`), flattening the draw it sees, and in "
                  "these districts that leaves less in the batteries for the hours that count against the bill, the hour-to-hour ramping and "
-                 "the energy not served. The bill, what the battery is bought to lower, is higher in all three of our runs here by 0.2% to 0.4%, so for the "
-                 "operator who pays the bill this is a watch. The cause is a reading of the tables, not yet tested on its own"),
-        "monthly": "the monthly load factor moved by a tenth of a percent against a bill 8.6% lower and 14.7% less electricity bought"},
+                 "the energy not served. The bill, what the battery is bought to lower, is up 0.2% to 0.4% in all three of our runs here (power given), so "
+                 "for the operator who pays the bill this is a watch. The cause is a reading of the tables, not yet tested on its own"),
+        "monthly": "the monthly load factor moved by a tenth of a percent against a bill cut 8.6% and the electricity bought cut 14.7%"},
     "V3_MUJOCO.md": {
         "left_native": ("the engine's own verdict: one cycle at full speed and one at override 0.8, in native mode before the counted cycles, "
                         "showed a slower cycle no cheaper on the robot's own figures (the gravity-holding torque is paid for longer), so the "
@@ -378,9 +411,14 @@ def parse_sim(path):
     return sections
 
 
+# the gauge names the simulators' tables used before the word LOSS became a reading (a physical term renamed, the same gauge)
+OLD_LABELS = {"line and transformer losses (MWh)": "energy dissipated in lines and transformers (MWh)",
+              "copper loss per cycle (J, declared model)": "copper heating per cycle (J, I²R, declared model)"}
+
+
 def sim_aims(f):
-    """{gauge label as the simulator's table writes it: True when its declared aim is lower}, from the simulator's own gauge
-    list (every CityLearn score is one CityLearn aims lower)."""
+    """{gauge label as the simulator's table writes it: its aim}, from the simulator's own gauge list (CityLearn's scores:
+    tools/citylearn_abc.py's aims)."""
     try:
         if f == "V3_MUJOCO.md":
             from tools.run_mujoco import GAUGES
@@ -389,18 +427,20 @@ def sim_aims(f):
         elif f == "V3_SWARM.md":
             from tools.swarm_abc import GAUGES
         elif f == "V3_CITYLEARN.md":
-            from tools.citylearn_abc import KPIS, KPI_NAMES
-            return {f"{KPI_NAMES.get(k, k)} (`{k}`)": True for k in KPIS}
+            from tools.citylearn_abc import KPIS, KPI_NAMES, aim_of as kpi_aim
+            return {f"{KPI_NAMES.get(k, k)} (`{k}`)": kpi_aim(k) for k in KPIS}
         else:
             return {}
     except ImportError:
         return {}
-    return {name: d not in ("higher", "never less") for _, name, d in GAUGES}
+    aims = {name: gel_aim(d, k) for k, name, d in GAUGES}
+    aims.update({old: aims[new] for old, new in OLD_LABELS.items() if new in aims})
+    return aims
 
 
 def sim_rows_judged(rows, aims=None):
     """Rows of a gauge table (header first) into classified items with the A/B/C range; aims: sim_aims() of the table."""
-    j = {"toward": [], "away": [], "noise": [], "disagree": [], "same": []}
+    j = empty()
     if not rows:
         return j
     head = rows[0]
@@ -409,7 +449,8 @@ def sim_rows_judged(rows, aims=None):
     for r in rows[1:]:
         if len(r) != len(head):
             continue
-        c = classify(r[ridx], lower_is_aim=aims.get(r[0]) if aims else None)
+        a = aims.get(r[0]) if aims else None
+        c = classify(r[ridx], a)
         if c == "unjudged":
             continue
         vals = []
@@ -428,7 +469,7 @@ def sim_rows_judged(rows, aims=None):
             rg = r[abc[0]] if abc else ""
         name = re.sub(r"\s*\(`[^`]*`\)\s*$", "", r[0])          # CityLearn: drop the score's code name
         name = re.sub(r"\s*\([^()]*\)\s*$", "", name) or name     # the unit or the note in brackets: the table has it
-        j[c].append((r[0], name, rg, None))
+        j[c].append((r[0], name, rg, None, a))
     return j
 
 
@@ -448,7 +489,7 @@ def sims():
                     name = sub["title"].split(":", 1)[0].strip()
                     j = sim_rows_judged(sub["rows"], sim_aims(f))
                     counted = not (f == "V3_SWARM.md" and name == "tuning")
-                    v = verdict(len(j["toward"]), len(j["away"]))
+                    v = verdict(len(j["gain"]), len(away_of(j)))
                     cases.append({"kind": "modelled simulator", "domain": domain, "knob": knob, "case": name + (f" ({tag})" if tag else "")
                                   + ("" if counted else " (the tuning swarm: shown, never counted)"),
                                   "counted": counted, "judged": j, "verdict": v, "resource_pct": None, "service_pct": None,
@@ -457,7 +498,7 @@ def sims():
                 for r in sec["table"][1:]:
                     if not r or not r[0]:
                         continue
-                    j = {"toward": [], "away": [], "noise": [], "disagree": [], "same": []}
+                    j = empty()
                     cases.append({"kind": "modelled simulator", "domain": domain, "knob": knob, "case": r[0], "counted": True, "judged": j,
                                   "verdict": WATCH, "resource_pct": None, "service_pct": None,
                                   "why": SIM_WHY[f]["left_native"][0].upper() + SIM_WHY[f]["left_native"][1:]
@@ -479,15 +520,15 @@ def sims():
 def sim_why(f, name, j, v):
     parts = []
     if j["disagree"]:
-        parts.append(f"the runs differ on {', '.join(f'{nm} ({rg})' for _, nm, rg, _ in j['disagree'][:3])}")
-    if not j["toward"] and not j["away"]:
-        parts.append("nothing moved the same way in all three of our runs")
+        parts.append(f"the runs differ on {', '.join(f'{nm} ({rg})' for _, nm, rg, *_ in j['disagree'][:3])}")
+    if not j["gain"] and not away_of(j):
+        parts.append("everything EVEN in all three of our runs")
     s = ("; ".join(parts) + ".") if parts else ""
     why = SIM_SHORT.get(f, {})
-    if f == "V3_PANDAPOWER.md" and j["away"]:
-        keys = [k for k, _, _, _ in j["away"]]
+    if f == "V3_PANDAPOWER.md" and away_of(j):
+        keys = [it[0] for it in away_of(j)]
         causes = []
-        if any("losses" in k for k in keys):
+        if any("losses" in k or "dissipated" in k for k in keys):
             causes.append(why["losses_up"])
         if any("tap" in k for k in keys):
             causes.append(why["taps_up"])
@@ -495,21 +536,21 @@ def sim_why(f, name, j, v):
             causes.append(why["import_up"])
         s = (s + " Why: " + "; ".join(causes) + ".").strip()
         if v == CHOICE:
-            s += " The operator who wants the loads' energy and the upstream import down wires in and accepts the line losses; the operator who runs the grid to its losses watches."
-    if f == "V3_CITYLEARN.md" and j["away"]:
+            s += " The operator who wants the loads' energy and the upstream import cut wires in and gives the line heating; the operator who runs the grid to its line heating watches."
+    if f == "V3_CITYLEARN.md" and away_of(j):
         if "2023" in name:
             s = (s + " Why: " + why["2023"] + ".").strip()
-        elif any("monthly" in k for k, _, _, _ in j["away"]):
+        elif any("monthly" in it[0] for it in away_of(j)):
             s = (s + " Why: " + why["monthly"] + ".").strip()
         if v == CHOICE and "2023" in name:
             s += " By rule a trade; by what the battery is for (the bill), a watch."
     s = s.strip()
     if f == "V3_SWARM.md" and v == WRITE:
-        s += " Nothing moved away from its aim: the tracking error is spent inside the compass's band (shown, the runs differ on its exact figure) and no safety gauge moved."
+        s += " No LOSS: the tracking error is spent inside the compass's band (shown, the runs differ on its exact figure) and no safety gauge moved."
     if f == "V3_MUJOCO.md" and v == WRITE:
-        s += " Nothing moved away from its aim: the same job inside the same takt, hit more accurately with less force; the cycle is slower inside the takt (shown, not judged)."
+        s += " No LOSS: the same job inside the same takt, hit more accurately with less force; the cycle is slower inside the takt (shown, not judged)."
     if v == WRITE and f in ("V3_PANDAPOWER.md", "V3_CITYLEARN.md"):
-        s += " Nothing moved away from its aim: Omni holds the knob."
+        s += " No LOSS and no power given: Omni holds the knob."
     return s.strip()
 
 
@@ -554,19 +595,19 @@ def muscles():
                     why += (f"; a fixed setpoint at the band's calm end gave {pct(fc_p)} within the same guardrails: the gain is the band's, and an "
                             f"operator may fix the setpoint instead of wiring in")
                 elif fc_label:
-                    why += (f"; a fixed setpoint at the calm end gave {pct(fc_p)} but broke the service guardrail ({fc_label.lower()}): the moving "
+                    why += (f"; a fixed setpoint at the calm end gave {pct(fc_p)} but broke the service guardrail ({labelled(fc_label)}): the moving "
                             f"hand is what keeps the service")
         elif label == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF":
             why = (f"work per energy {pct(p)} ({pct(lo)} to {pct(hi)}) but a service guardrail broke: work {pct(work)}, violations "
                    f"{viol:+.2f} pp (upper {viol_hi:+.2f}); energy saved at the service's expense: the operator's to take or leave")
         elif label == "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF":
-            why = (f"violations {viol:+.2f} pp (proven lower) at work per energy {pct(p)} ({pct(lo)} to {pct(hi)}): energy bought service "
+            why = (f"violations {viol:+.2f} pp (proven cut, a GAIN) at work per energy {pct(p)} ({pct(lo)} to {pct(hi)}): energy given for service "
                    f"(a battery's round trip, a plant held nearer its line); the operator's to take or leave")
         elif label == "NOT ESTABLISHED":
             why = (f"the interval is too wide to read ({pct(lo)} to {pct(hi)}) and a guardrail did not hold (work {pct(work)}): nothing is "
                    f"established, the knob stays native")
         else:
-            why = label.lower()
+            why = labelled(label)
         out.append({"kind": "modelled muscle", "domain": f"{REALM_NAMES.get(r['realm'], r['realm'])}: {r['family']}", "knob": r["knob"],
                     "case": r["muscle"], "counted": True, "judged": None, "verdict": v, "resource_pct": None, "service_pct": None,
                     "why": why, "source": "results/realms/MUSCLES.csv", "runs": [], "muscle": r, "label": label, "writes": w})
@@ -580,7 +621,7 @@ def organisms_modelled():
         p = o["summary"]["primary"]
         out.append({"kind": "modelled organism", "domain": REALM_NAMES.get(name, name), "knob": "every muscle of the organism, one governor",
                     "case": f"{o['n']} muscles", "counted": True, "judged": None, "verdict": LABEL_VERDICT.get(o["label"], WATCH), "resource_pct": None,
-                    "service_pct": None, "why": f"{o['label']}: work per energy {100 * p[0]:+.1f}% ({100 * p[1]:+.1f} to {100 * p[2]:+.1f}), "
+                    "service_pct": None, "why": f"{labelled(o['label'])}: work per energy {100 * p[0]:+.1f}% ({100 * p[1]:+.1f} to {100 * p[2]:+.1f}), "
                     f"work {100 * o['summary']['work'][0]:+.1f}%, energy {100 * o['summary']['energy'][0]:+.1f}%, violations "
                     f"{o['summary']['viol_pp'][0]:+.3f} pp; valid: {'yes' if o['valid'] else 'no'}",
                     "source": "results/realms/REALMS.md", "runs": [], "label": o["label"]})
@@ -603,19 +644,22 @@ def organisms_cluster():
             sure = lambda v: v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
             judged = {k: v for k, v in rows.items() if not v["neutral"] and not v["same"] and sure(v)}
             # the cluster's own gauges decide; the organism's modelled work and energy are judged muscle by muscle in the realms table
-            toward = [k for k, v in judged.items() if not k.startswith("organism") and row_toward(v)]
-            away = [k for k, v in judged.items() if not k.startswith("organism") and not row_toward(v)]
-            modelled_away = [k for k, v in judged.items() if k.startswith("organism") and not row_toward(v)]
-            v = verdict(len(toward), len(away))
+            gain = [k for k, v in judged.items() if not k.startswith("organism") and row_gain(v)]
+            away = [k for k, v in judged.items() if not k.startswith("organism") and not row_gain(v)]
+            modelled_away = [k for k, v in judged.items() if k.startswith("organism") and not row_gain(v)]
+            v = verdict(len(gain), len(away))
             named = lambda ks: ", ".join("%s %+.1f%%" % (K8S_GAUGE.get(k, k), rows[k]["pct"]) for k in ks)
-            why = (f"which way each gauge went: {kube_verdict(c)}. The cluster's gauges: {len(toward)} toward their aim"
-                   + (f" ({named(toward[:5])})" if toward else "")
-                   + f", {len(away)} away from it" + (f" ({named(away)})" if away else "") + ".")
+            given = [k for k in away if gel_aim("lower", k) == "spent"]
+            lost = [k for k in away if k not in given]
+            why = (f"each gauge's word: {kube_verdict(c)}. The cluster's gauges: {len(gain)} GAIN"
+                   + (f" ({named(gain[:5])})" if gain else "")
+                   + f", {len(lost)} LOSS" + (f" ({named(lost)})" if lost else "")
+                   + f", {len(given)} power given" + (f" ({named(given)})" if given else "") + ".")
             if modelled_away:
                 ow = rows.get("organism work")
                 why += (f" The organism's modelled {', '.join(k.replace('organism ', '') for k in modelled_away)}"
                         + (f" {ow['pct']:+.4f}% ({abs(ow['pct']) * 1e4:.0f} parts in a million, rounding level)" if ow and "organism work" in modelled_away else "")
-                        + ", away from its aim, is a model gauge judged muscle by muscle in the realms table and shown here beside the cluster's.")
+                        + " (LOSS or power given) is a model gauge judged muscle by muscle in the realms table and shown here beside the cluster's.")
             oe = rows.get("organism energy (J)")
             if oe:
                 why += f" The organism's modelled energy {oe['pct']:+.1f}%."
@@ -657,8 +701,8 @@ def main(check=False):
 
     L = ["# Wire in, or watch: the verdict per knob, from every result in the repository", "",
          "Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired "
-         "measurement shows no gauge of the muscle moved away from its declared aim. Where the measurement shows nothing, or shows a "
-         "gauge moved away from its aim, the muscle stays "
+         "measurement shows no gauge of the muscle read **LOSS** against native. Where the measurement shows nothing (**EVEN**), or shows "
+         "a LOSS, the muscle stays "
          "native and Omni only watches it: one wire out, no wire in. This is not a new rule. It is what the engine does on the muscle "
          "itself before it moves anything (`omnicompass/verdict.py`: the paired trial, and the verdict **left native** where no step is "
          "allowed), and it is the watch arm of every realms run (`docs/REALMS_PREREGISTRATION.md`: the governor reads every period and "
@@ -669,23 +713,23 @@ def main(check=False):
          "`verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` "
          f"({len(all_cases)} rows, the 945 modelled muscles included one by one).", "",
          "## The rule", "",
-         "Every judged gauge of a table counts (rows marked \"shown, not judged\" never do). The tables say only which way a "
-         "number went against native, **lower** or **higher**; who sets the aim differs from one system to the next, so this page "
-         "takes each gauge's aim from its preregistration (lower for an amount waited, spent or held: response times, failed "
-         "requests, machines, energy, memory, connections; higher for work done) and says, for every change, which way it went and "
-         "whether that is **toward** the gauge's aim or **away** from it. An operator whose aim differs reads the same rows the "
-         "other way. A knob reads:", "",
-         "- **write**: at least one gauge toward its aim in all three of our runs and none away from it. Omni holds the knob.",
-         "- **watch**: nothing toward its aim in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a "
-         "gauge moved away from its aim in all three of our runs, it is named and its cause given below. Where the runs disagree, nothing "
-         "is settled and the knob stays native until it is.",
-         "- **operator's choice**: gauges toward their aim and gauges away from it, both the same in all three of our runs: a trade. "
+         "Every judged gauge of a table counts (rows marked \"shown, not judged\" never do). Every reading is **GAIN**, **EVEN** or "
+         "**LOSS**, decided by what the gauge is for and never by the sign of its number (the key: `docs/HOW_TO_READ_THE_RESULTS.md`): "
+         "response times and failed requests are time waited, missed or failed, so a fall is GAIN; work done is GAIN when it rises; "
+         "machines, energy, memory, connections, consumers and processor time are resources spent, so a fall is a cut, a GAIN, and a "
+         "rise is **power given**, the price named beside what it bought. Each gauge's aim is its preregistration's; an operator whose "
+         "aim differs reads the same numbers the other way. A knob reads:", "",
+         "- **write**: at least one gauge GAIN in all three of our runs, and no LOSS and no power given. Omni holds the knob.",
+         "- **watch**: no GAIN in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a gauge read "
+         "LOSS or power given in all three of our runs, it is named and its cause given below. Where the runs disagree, nothing is "
+         "settled and the knob stays native until it is.",
+         "- **operator's choice**: GAIN, and LOSS or power given, both the same in all three of our runs: a trade. "
          "Both readings of the Omni index are shown where the test is in it (the resource reading, the preregistered headline, and "
          "the service reading, work and speed alone), and the side that pays is named. The operator who wants the gain and can pay "
          "the price wires in; every other operator watches.", "",
-         "A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes its verdict from its label by rule: SUPERIOR WITHIN "
-         "GUARDRAILS is write; ENERGY IMPROVEMENT WITH SERVICE TRADEOFF and SERVICE IMPROVEMENT WITH ENERGY TRADEOFF are operator's choice; "
-         "NONINFERIOR / INCONCLUSIVE, NOT ESTABLISHED and any other label are watch.", "",
+         "A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes its verdict from its label by rule: GAIN within "
+         "the guardrails is write; GAIN AND LOSS (energy cut, service traded for it) and GAIN with power given (service GAIN, "
+         "energy given for it) are operator's choice; EVEN (inside the noise, or not established), LOSS and any other label are watch.", "",
          "## The count", "",
          "| Where | Knobs or cases | Write | Operator's choice | Watch |", "|---|---:|---:|---:|---:|",
          f"| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | {rw + rc + rwa} | {rw} | {rc} | {rwa} |",
@@ -704,10 +748,10 @@ def main(check=False):
           "of `results/OMNI_INDEX.md` for that test, where it has one.", ""]
     L += ["### Real Kubernetes: one knob under seven demands", "",
           f"The knob: {K8S_KNOB}, on top of the Horizontal Pod Autoscaler (kind clusters on GitHub, ten pairs a run).", "",
-          "| Demand | Toward the aim in all three of our runs | Away from the aim in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
+          "| Demand | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
     for x in [c for c in real if c["kind"] == "real knob" and "Kubernetes" in c["domain"]]:
         j = x["judged"]
-        L.append(f"| {x['case']} | {esc(fmt_list(j['toward'], 12, 'toward')) or 'none'} | {esc(fmt_list(j['away'], 12, 'away')) or 'none'} | **{x['verdict']}** | "
+        L.append(f"| {x['case']} | {esc(fmt_list(j['gain'], 12)) or 'none'} | {esc(away_cell(j)) or 'none'} | **{x['verdict']}** | "
                  f"{pct_s(x['resource_pct'])} | {pct_s(x['service_pct'])} | {esc(x['why'])} | `{x['source']}` |")
     L.append("")
     for cat, f, knob, names in WORKLOAD_STACKS:
@@ -715,27 +759,28 @@ def main(check=False):
         if not rows:
             continue
         L += [f"### {cat}", "", f"The knob: {knob}.", "",
-              "| Workload | Toward the aim in all three of our runs | Away from the aim in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
+              "| Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
         for x in rows:
             j = x["judged"]
-            L.append(f"| {x['case']} | {esc(fmt_list(j['toward'], 12, 'toward')) or 'none'} | {esc(fmt_list(j['away'], 12, 'away')) or 'none'} | "
+            L.append(f"| {x['case']} | {esc(fmt_list(j['gain'], 12)) or 'none'} | {esc(away_cell(j)) or 'none'} | "
                      f"**{x['verdict']}**{'' if x['counted'] else ' (not counted)'} | {pct_s(x['resource_pct'])} | {pct_s(x['service_pct'])} | {esc(x['why'])} | `{x['source']}` |")
         L.append("")
 
     # every negative
-    L += ["## Every gauge that moved away from its aim in all three of our runs on a real stack, and why", "",
-          "The founder's question was where the negatives are and why each is there. Every gauge that moved away from its declared aim in all "
+    L += ["## Every LOSS and every power given in all three of our runs on a real stack, and why", "",
+          "The founder's question was where the negatives are and why each is there. Every gauge that read LOSS or power given in all "
           "three of our runs on a real stack, with its cause read from the preregistration that carries the result:", ""]
     groups = collections.OrderedDict()
     for x in real:
         if not x["counted"]:
             continue
         f = x["source"].rsplit("/", 1)[-1].replace(".md", ".json")
-        for k, nm, rg, runs in x["judged"]["away"]:
-            w = WHY.get((f, x.get("workload", "*"), k)) or WHY.get((f, "*", k)) or "see the table"
-            groups.setdefault((x.get("stack", "Kubernetes"), nm, w), []).append((x.get("workload", x["case"]), rg, runs, x["verdict"]))
-    for (stack, nm, w), items in groups.items():
-        cases = ", ".join(f"{wl} {verb('away', rg)} {magnitude(rg)}" for wl, rg, _, _ in items)
+        for cls in ("loss", "given"):
+            for k, nm, rg, runs, a in x["judged"][cls]:
+                w = WHY.get((f, x.get("workload", "*"), k)) or WHY.get((f, "*", k)) or "see the table"
+                groups.setdefault((x.get("stack", "Kubernetes"), nm, w, cls, a), []).append((x.get("workload", x["case"]), rg, runs, x["verdict"]))
+    for (stack, nm, w, cls, a), items in groups.items():
+        cases = ", ".join(f"{wl} {verb(a, rg)} {magnitude(rg)}" for wl, rg, _, _ in items)
         figs = []
         for _, _, runs, _ in items:
             n0, o0 = first(runs, "native"), first(runs, "omni")
@@ -746,16 +791,20 @@ def main(check=False):
             ns = sorted({f"{n:.4g}" for n, _ in figs}); os_ = sorted(f"{o:.4g}" for _, o in figs)
             fig = f" ({' / '.join(ns)} → {os_[0]}{' to ' + os_[-1] if len(os_) > 1 and os_[0] != os_[-1] else ''} in run A)"
         vs = sorted({v for _, _, _, v in items})
-        L.append(f"- **{stack}, {nm}: {cases}, away from its aim**{fig}. {w[0].upper() + w[1:]}. Verdict: **{' / '.join(vs)}**"
+        L.append(f"- **{stack}, {nm}: {cases}, {'LOSS' if cls == 'loss' else 'power given'}**{fig}. {w[0].upper() + w[1:]}. Verdict: **{' / '.join(vs)}**"
                  + (" on every workload named" if len(items) > 1 else "") + ".")
     if not groups:
         L.append("- none")
-    L += ["", "What these have in common: every one is a resource spent to buy the service the knob exists for (consumers and the CPU "
-          "they poll with, memory, pages, connections), and each was declared in advance in its preregistration as the gauge expected to move "
-          "away from its aim, or found on the first counted set and disclosed. None is a service gauge: on no real stack did work inside the "
-          "line, p95 or failed requests move away from their aim in all three of our runs. Where the resource was spent and nothing was bought "
-          "(PostgreSQL's `simple_update`), the verdict is watch; where it bought service, the verdict is the operator's, and both index readings "
-          "say what the trade is worth.", ""]
+    losses = [nm for (_, nm, _, cls, _) in groups if cls == "loss"]
+    L += ["", ("What these have in common: every one is power given, a resource spent to buy the service the knob exists for (consumers "
+               "and the CPU they poll with, memory, pages, connections), each declared in advance in its preregistration as the gauge "
+               "expected to rise, or found on the first counted set and disclosed. None is a LOSS: on no real stack did work inside the "
+               "line, p95 or failed requests read LOSS in all three of our runs. " if not losses else
+               f"{len(losses)} of these are a LOSS ({', '.join(sorted(set(losses)))}): each is named above with its cause, and each is a "
+               "fault to find and fix, our own wiring first. The rest are power given, a resource spent to buy the service the knob exists "
+               "for. ")
+          + "Where the resource was given and nothing was bought (PostgreSQL's `simple_update`), the verdict is watch; where it bought "
+          "service, the verdict is the operator's, and both index readings say what the trade is worth.", ""]
 
     # the simulators
     L += ["## The independent simulators (evidence class S: deterministic models with their own native controllers)", ""]
@@ -764,30 +813,31 @@ def main(check=False):
         if not rows:
             continue
         L += [f"### {domain}", "", f"The knob: {knob}.", "",
-              "| Case | Toward the aim in all three of our runs | Away from the aim in all three of our runs | Verdict | Why | Source |", "|---|---|---|---|---|---|"]
+              "| Case | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Why | Source |", "|---|---|---|---|---|---|"]
         for x in rows:
             j = x["judged"]
-            b = esc(fmt_list(j["toward"], 12, "toward")) if j else ""
-            w = esc(fmt_list(j["away"], 12, "away")) if j else ""
+            b = esc(fmt_list(j["gain"], 12)) if j else ""
+            w = esc(away_cell(j)) if j else ""
             L.append(f"| {x['case']} | {b or ('none' if j else '')} | {w or ('none' if j else '')} | **{x['verdict']}**"
                      f"{'' if x['counted'] or x['verdict'] == 'no knob' else ' (not counted)'} | {esc(x['why'])} | `{x['source']}` |")
         L.append("")
         if f == "V3_PANDAPOWER.md":
-            L += ["**Why the losses rose on four grids.** " + SIM_WHY[f]["losses_up"][0].upper() + SIM_WHY[f]["losses_up"][1:] + ". "
+            L += ["**Why the line heating rose on four grids (power given).** " + SIM_WHY[f]["losses_up"][0].upper() + SIM_WHY[f]["losses_up"][1:] + ". "
                   + SIM_WHY[f]["taps_up"][0].upper() + SIM_WHY[f]["taps_up"][1:] + ". The verdict on those four grids is the operator's: the "
-                  "loads' energy and the upstream import down against the lines' losses up; under constant-power loads on 1-MV-rural--1-sw, where "
-                  "nothing was bought, it is watch.", ""]
+                  "loads' energy and the upstream import cut (GAIN) against the lines' heating up (power given); under constant-power loads on "
+                  "1-MV-rural--1-sw, where nothing was bought, it is watch.", ""]
         if f == "V3_CITYLEARN.md":
-            L += ["**Why the bill reads higher in the 2023 districts.** " + SIM_WHY[f]["2023"][0].upper() + SIM_WHY[f]["2023"][1:] + ".", ""]
+            L += ["**Why the bill is up in the 2023 districts (power given), with the ramping and the energy not served (LOSS).** "
+                  + SIM_WHY[f]["2023"][0].upper() + SIM_WHY[f]["2023"][1:] + ".", ""]
 
     # the 945 muscles
     by_label = collections.Counter(x["label"] for x in mus)
     L += ["## The 945 modelled muscles, alone on their plants (evidence class S)", "",
           "Every muscle's own row, with its verdict and the reason, is in `results/WIRING_VERDICTS.csv`; the labels and intervals are the realms "
           "table's (`results/realms/REALMS.md`, `results/realms/MUSCLES.csv`; seeds 3000 to 3009, ten paired seeds a muscle).", "",
-          "| Label (by rule) | Muscles | Verdict |", "|---|---:|---|"]
+          "| Reading (the label by rule, its word first) | Muscles | Verdict |", "|---|---:|---|"]
     for lab, n in sorted(by_label.items(), key=lambda kv: -kv[1]):
-        L.append(f"| {lab} | {n} | **{LABEL_VERDICT[lab]}** |")
+        L.append(f"| {labelled(lab)} | {n} | **{LABEL_VERDICT[lab]}** |")
     L += ["", "### By knob", "", "| Knob | Muscles | Write | Operator's choice | Watch | Of the watch, wrote nothing in any run |", "|---|---:|---:|---:|---:|---:|"]
     for knob in ("capacity", "setpoint", "power", "admission"):
         ms = [x for x in mus if x["knob"] == knob]
@@ -810,8 +860,8 @@ def main(check=False):
     fc_trade = sum(1 for x in setp_sup if x["muscle"].get("fixed_calm_label") == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF")
     L += ["", "### Why the watch muscles are watch", "",
           f"- **{len(zero)} muscles wrote nothing in any run.** Their plants' native controllers held the reading inside the compass's band for the "
-          f"whole hour on every seed, so the law never left its cushion and had nothing to push. On these muscles Omni on top is native: nothing "
-          f"earned, nothing lost, and no wire in is needed. They are {collections.Counter(x['knob'] for x in zero)['capacity']} capacity knobs, "
+          f"whole hour on every seed, so the law never left its cushion and had nothing to push. On these muscles Omni on top is native, EVEN: "
+          f"nothing earned, nothing given, and no wire in is needed. They are {collections.Counter(x['knob'] for x in zero)['capacity']} capacity knobs, "
           f"{collections.Counter(x['knob'] for x in zero)['admission']} admission knobs, {collections.Counter(x['knob'] for x in zero)['power']} power "
           f"knobs and {collections.Counter(x['knob'] for x in zero)['setpoint']} setpoint knobs, "
           f"{collections.Counter(x['muscle']['template'] for x in zero)['compute_pool']} of them on the compute plant, whose native autoscaler and "
@@ -819,37 +869,37 @@ def main(check=False):
           f"- **All {len(adm)} admission muscles are watch**, and all wrote nothing: the admission knob is native while change is permitted, and "
           f"limits what is let in only while it is not (a power or heat stress; `docs/REALMS_PREREGISTRATION.md`). No run reached that state, "
           f"so the knob was never touched. This is the knob's design, not a failure: admission is a brake for an emergency the hour did not hold.",
-          f"- **{len(wrote)} muscles wrote and showed nothing**: their work per energy moved by at most "
+          f"- **{len(wrote)} muscles wrote and read EVEN**: their work per energy moved by at most "
           f"{100 * max(ffl(x['muscle']['primary']) or 0 for x in wrote):+.1f}% with an interval across zero. They are process loops, inverters, "
           f"chambers, mills and zones where the law moved the knob inside its band and the plant's output did not measurably follow. Watch, by rule.",
-          f"- **One muscle is not established** (Elevators & Vertical Transport, `hoist_speed_target`): the interval is too wide to read and the "
+          f"- **One muscle is EVEN, not established** (Elevators & Vertical Transport, `hoist_speed_target`): the interval is too wide to read and the "
           f"work guardrail did not hold. Watch, until a longer run decides it.", "",
           "### The trades, muscle by muscle", "",
-          "| Muscle | Family | Knob | Label | Work per energy | Work | Violations (pp) | Verdict |", "|---|---|---|---|---:|---:|---:|---|"]
+          "| Muscle | Family | Knob | Reading | Work per energy | Work | Violations (pp) | Verdict |", "|---|---|---|---|---:|---:|---:|---|"]
     for x in mus:
         if x["verdict"] == CHOICE or x["label"] == "NOT ESTABLISHED":
             m = x["muscle"]
-            L.append(f"| `{m['muscle']}` | {m['family']} | {m['knob']} | {m['label']} | {100 * ffl(m['primary']):+.2f}% ({100 * ffl(m['primary_lo']):+.2f} to "
+            L.append(f"| `{m['muscle']}` | {m['family']} | {m['knob']} | {labelled(m['label'])} | {100 * ffl(m['primary']):+.2f}% ({100 * ffl(m['primary_lo']):+.2f} to "
                      f"{100 * ffl(m['primary_hi']):+.2f}) | {100 * ffl(m['work']):+.2f}% | {ffl(m['viol_pp']):+.2f} | **{x['verdict']}** |")
-    L += ["", "The nine energy-for-service trades are the CPU's minimum clock (`cpufreq_min`), four spacecraft power knobs and four district heating "
-          "setpoints: energy saved at a measurable cost in work or in time in violation. The four service-for-energy trades are three microgrid "
-          "reserves and a facility's PUE target: time in violation proven lower at a small energy cost. Each is the operator's to take or leave; "
-          "none is wired in by default.", "",
+    L += ["", "The nine energy-for-service trades (GAIN AND LOSS) are the CPU's minimum clock (`cpufreq_min`), four spacecraft power knobs and four "
+          "district heating setpoints: energy cut at a measurable LOSS in work or in time in violation. The four service-for-energy trades (GAIN, "
+          "power given) are three microgrid reserves and a facility's PUE target: time in violation proven cut, a GAIN, for a little energy given. "
+          "Each is the operator's to take or leave; none is wired in by default.", "",
           "### The setpoint muscles, and what the band alone gives", "",
-          f"Of the {len(setp_sup)} setpoint muscles that read SUPERIOR, a fixed setpoint at the band's calm end (the `fixed_calm` arm, the native "
+          f"Of the {len(setp_sup)} setpoint muscles that read GAIN within the guardrails, a fixed setpoint at the band's calm end (the `fixed_calm` arm, the native "
           f"controller with the setpoint fixed, no governor) gave as much or more work per energy on every one. On {fc_sup} of them the fixed "
           f"setpoint also held the service guardrails, so the gain is the band's and an operator may simply fix the setpoint; on {fc_trade} the fixed "
-          f"setpoint broke the service guardrail (ENERGY IMPROVEMENT WITH SERVICE TRADEOFF), and there the governor's moving hand is what keeps the "
+          f"setpoint broke the service guardrail (GAIN AND LOSS: energy cut, service traded for it), and there the governor's moving hand is what keeps the "
           f"service while the energy is saved. The CSV says which is which, muscle by muscle.", ""]
 
     # the organisms
     L += ["## The organisms", "", "### The five modelled organisms (every muscle written at once, one governor)", "",
-          "| Organism | Muscles | Label | Verdict | Figures |", "|---|---:|---|---|---|"]
+          "| Organism | Muscles | Reading | Verdict | Figures |", "|---|---:|---|---|---|"]
     for x in org_m:
-        L.append(f"| {x['domain']} | {x['case']} | {x['label']} | **{x['verdict']}** | {esc(x['why'])} |")
+        L.append(f"| {x['domain']} | {x['case']} | {labelled(x['label'])} | **{x['verdict']}** | {esc(x['why'])} |")
     L += ["", "An organism's label is the whole's: every muscle written at once. The wiring an operator takes from this page is finer: the "
           "write muscles wired in, the trades chosen, the watch muscles left native with one wire out. The organism result says the whole, "
-          "written at once, moved no gauge away from its aim and some a little toward it; this page says which parts carried it.", "",
+          "written at once, read no LOSS and some small GAIN; this page says which parts carried it.", "",
           "### The organisms with the real cluster inside", "",
           f"The knob is the cluster's ({K8S_KNOB}), under the organism's own demand, with the modelled muscles around it. The cluster's gauges "
           "decide the verdict; the organism's modelled work and energy are shown beside them and are judged muscle by muscle above.", "",
@@ -860,7 +910,7 @@ def main(check=False):
     # not decided
     L += ["", "## Not decided here", "",
           "- **Azure's managed Kubernetes (the bill):** the two tables are on Omni v1 (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`) on a "
-          "4-worker fleet, where every gauge read no difference beyond the noise but the burst's p99 in one run. A fleet too small to show one "
+          "4-worker fleet, where every gauge read EVEN, no difference beyond the noise, but the burst's p99 in one run. A fleet too small to show one "
           "machine decides nothing; the fleet that can (`docs/K8S_COMPASS_PREREGISTRATION.md`, the fleet that can show one machine) decides this "
           "knob on v3 when it runs. Until then the verdict on Azure is watch, for want of a result rather than because of one.",
           "- **The card (NVIDIA, its own meter):** every earlier card result is obsolete; the current governor has not run on a real card. Nothing "
@@ -920,13 +970,14 @@ def main(check=False):
     # the CSV
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator="\n")
-    w.writerow(["kind", "domain", "knob", "case", "counted", "toward_aim_all_three", "away_from_aim_all_three", "inside_the_noise", "runs_disagree",
-                "verdict", "index_resource_pct", "index_service_pct", "why", "source"])
+    w.writerow(["kind", "domain", "knob", "case", "counted", "gain_all_three", "loss_all_three", "power_given_all_three", "even_inside_the_noise",
+                "runs_disagree", "verdict", "index_resource_pct", "index_service_pct", "why", "source"])
     for x in all_cases:
         j = x["judged"]
         w.writerow([x["kind"], x["domain"], x["knob"], x["case"], "yes" if x["counted"] else "no",
-                    "; ".join(words(nm, "toward", rg) for _, nm, rg, _ in j["toward"]) if j else "",
-                    "; ".join(words(nm, "away", rg) for _, nm, rg, _ in j["away"]) if j else "",
+                    "; ".join(words(it[1], it[4], it[2]) for it in j["gain"]) if j else "",
+                    "; ".join(words(it[1], it[4], it[2]) for it in j["loss"]) if j else "",
+                    "; ".join(words(it[1], it[4], it[2]) for it in j["given"]) if j else "",
                     len(j["noise"]) if j else "", len(j["disagree"]) if j else "",
                     x["verdict"], "" if x["resource_pct"] is None else f"{x['resource_pct']:.2f}",
                     "" if x["service_pct"] is None else f"{x['service_pct']:.2f}", x["why"], x["source"]])

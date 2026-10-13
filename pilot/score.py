@@ -17,7 +17,9 @@ pools, efficiency is normalised by the work actually done (CPU core-hours used):
   HPA shortfall minutes per hour         minutes with desired replicas above current replicas, aim: lower
 
 Each capture is cut into blocks (default 60 minutes). Differences between the Omni-Compass and baseline block means are
-given with a bootstrap 95% interval over blocks; a verdict is stated only when the interval excludes zero.
+given with a bootstrap 95% interval over blocks; a verdict is stated only when the interval excludes zero, in the words
+every table uses (tools/readings.py): GAIN toward the metric's aim; LOSS away from it; power given where a resource spent
+(machine-hours, energy) rose; EVEN, no significant difference, otherwise.
 
 python pilot/score.py --baseline baseline.csv --omni omni.csv [--idle-w 200 --dyn-w 350] [--block-minutes 60] [--out score.json]
 """
@@ -27,6 +29,7 @@ import numpy as np
 
 LOWER = {"node_hours_per_core_hour": True, "kwh_per_core_hour": True, "utilisation": False,
          "pending_pod_minutes_per_hour": True, "hpa_shortfall_minutes_per_hour": True}
+SPENT = {"node_hours_per_core_hour", "kwh_per_core_hour"}       # resources spent: a rise is power given, never a LOSS
 
 
 def load(path):
@@ -80,7 +83,8 @@ def compare(base, omni, seed=12345, n=4000):
             continue
         diffs = c[rng.integers(0, len(c), (n, len(c)))].mean(1) - a[rng.integers(0, len(a), (n, len(a)))].mean(1)
         lo, hi = np.percentile(diffs, [2.5, 97.5]); d = float(c.mean() - a.mean())
-        verdict = ("toward its aim" if (hi < 0) == lower else "away from its aim") if (hi < 0 or lo > 0) else "no significant difference"
+        verdict = (("GAIN" if (hi < 0) == lower else ("power given" if m in SPENT else "LOSS")) if (hi < 0 or lo > 0)
+                   else "EVEN, no significant difference")
         out[m] = {"baseline": float(a.mean()), "omni": float(c.mean()), "difference": d,
                   "relative": d / a.mean() if a.mean() else float("nan"), "ci95": [float(lo), float(hi)], "verdict": verdict}
     return out

@@ -49,7 +49,7 @@ measured window and priced at the list price per machine-hour. The energy rows r
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 179.7 | 184 | +2.4% | -0.8413 to +9.457 | no |
 | response time (ms), mean | 500.3 | 498.6 | -0.3% | -85.06 to +81.63 | no |
 | response time (ms), 95th percentile | 1090 | 1254 | +15.0% | -579.3 to +907.1 | no |
-| response time (ms), 99th percentile | 5975 | 3967 | -33.6% | -3672 to -344.7 | yes, lower |
+| response time (ms), 99th percentile | 5975 | 3967 | -33.6% | -3672 to -344.7 | yes: GAIN |
 | time over the response line (% of samples) | 34.94 | 35 | +0.2% | -4.175 to +4.292 | no |
 | failed requests (%) | 22.27 | 15.58 | -30.0% | -18.74 to +5.363 | no |
 | pods with no machine to take them (unschedulable) | 2.6 | 1.8 | -30.8% | -3.491 to +1.891 | no |
@@ -57,7 +57,7 @@ measured window and priced at the list price per machine-hour. The energy rows r
 | pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 5.733 | 3.357 | -41.5% | -7.642 to +2.889 | no |
 | utilisation (used / allocatable) | 0.5854 | 0.5845 | -0.2% | -0.025 to +0.02319 | no |
 | CPU used (cores), mean | 2.122 | 2.16 | +1.8% | -0.01065 to +0.08666 | no |
-| Omni's own CPU (cores), mean | 0 | 0.0099 | +0.0099 (native is 0) | +0.007312 to +0.01249 | yes, more |
+| Omni's own CPU (cores), mean | 0 | 0.0099 | +0.0099 (native is 0) | +0.007312 to +0.01249 | yes: power given |
 | CPU used with Omni's own (cores), mean | 2.122 | 2.17 | +2.3% | -0.002528 to +0.09834 | no |
 | energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 168.6 | 169.5 | +0.5% | -3.593 to +5.315 | no |
 | HPA replicas, mean | 9.702 | 9.701 | -0.0% | -0.09167 to +0.08921 | no |

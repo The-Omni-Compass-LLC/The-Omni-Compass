@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp                                   # noqa: E402
-from tools.readings import OWN_RUNS                             # noqa: E402
+from tools.readings import OWN_RUNS, GAIN, LOSS, GIVEN, word, aim, labelled   # noqa: E402  (the words every table uses)
 
 ORGS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
         "stack", "tower"]
@@ -75,36 +75,44 @@ def model_cell(s):
     if not s:
         return "not in the receipt"
     m, w, e = s["viol_pp"][0], 100 * s["work"][0], 100 * s["energy"][0]
-    lab = s["label"].replace("**", "")
+    lab = labelled(s["label"])
     return f"{lab}: misses {m:+.3f} pp, work {w:+.3f}%, power given {e:+.3f}% ({s['runs']} of {s['of']} runs)"
 
 
 SHOWN = {"host CPU busy, the real machine under kind (%)", "organism behind its window (s)"}   # tools/six_kube_report.py
+AIM_HIGHER = {"organism work", "organism work per energy"}                                       # tools/six_kube_report.py
+WORDS = (GAIN, LOSS, GIVEN)
+
+
+def aim_of(k):
+    """What a gauge of a square is for: work done aims higher; a resource spent or held is spent; the rest is time waited,
+    missed or failed (tools/readings.py)."""
+    return "higher" if k in AIM_HIGHER else aim("lower", k)
 
 
 def directions(o):
-    """A square's gauges by the way they went against native, from its rows (never from a reading's words): (lower, higher,
-    inside the noise). A gauge counts when it is judged (not shown-only, not the same to rounding) and its 95% interval is
-    clear of zero."""
-    lower, higher, noise = [], [], 0
+    """A square's gauges by their word against native, from its rows (never from a reading's words): ({GAIN: [...], LOSS:
+    [...], power given: [...]}, the count inside the noise). A gauge counts when it is judged (not shown-only, not the same to
+    rounding) and its 95% interval is clear of zero; its word is decided by what it is for, never by its sign."""
+    by, noise = {w: [] for w in WORDS}, 0
     for k, v in (o.get("rows") or {}).items():
         if v.get("neutral") or k in SHOWN or v.get("same"):
             continue
         if v.get("n", 0) > 1 and (v["lo"] > 0 or v["hi"] < 0):
-            (lower if v["diff"] < 0 else higher).append(k)
+            by[word(v["diff"] < 0, aim_of(k))].append(k)
         else:
             noise += 1
-    return lower, higher, noise
+    return by, noise
 
 
 def kube_verdict(o):
-    """The square's line in the direction words, with the report's own facts kept (off the clock, invalid)."""
+    """The square's line in GAIN, EVEN and LOSS, with the report's own facts kept (off the clock, invalid)."""
     if o["repetitions"] < 2:
         return "ONE REPETITION"
-    lower, higher, noise = directions(o)
+    by, noise = directions(o)
     facts = "".join("; " + f for f in re.findall(r"; ((?:OFF THE CLOCK|INVALID)[^;]*)", o["verdict"]))   # kept as recorded
-    return (f"lower on {len(lower)}" + (f" ({'; '.join(lower)})" if lower else "") + f", higher on {len(higher)}"
-            + (f" ({'; '.join(higher)})" if higher else "") + f", inside the noise on {noise}" + facts)
+    return (", ".join(f"{w} on {len(xs)}" + (f" ({'; '.join(xs)})" if xs else "") for w, xs in by.items())
+            + f", EVEN (inside the noise) on {noise}" + facts)
 
 
 def kube_cell(o):
@@ -171,7 +179,7 @@ def name_of_square(k):
 def across(data):
     """The grid in one line, counted from the squares themselves (the front page's reading of this table)."""
     sq = [s for cells in data["modelled"].values() for n, s in cells.items() if s]
-    labs = Counter(s["label"].replace("**", "") for s in sq if s["runs"] >= 2)
+    labs = Counter(labelled(s["label"]) for s in sq if s["runs"] >= 2)
     one = [s for s in sq if s["runs"] < 2]
     pg = [100 * s["energy"][0] for s in sq]
     parts = []
@@ -183,11 +191,13 @@ def across(data):
     ks = [o for cells in data["kube"].values() for o in cells.values() if o]
     if ks:
         judged = [o for o in ks if o["repetitions"] >= 2]
-        lo, hi = Counter(g for o in judged for g in o["lower"]), Counter(g for o in judged for g in o["higher"])
-        gauges = sorted(set(lo) | set(hi), key=lambda g: (-(lo[g] + hi[g]), g))
+        cnt = {w: Counter(g for o in judged for g in o[w]) for w in WORDS}
+        gauges = sorted(set().union(*cnt.values()), key=lambda g: (-sum(cnt[w][g] for w in WORDS), g))
+        away = lambda g: GIVEN if aim_of(g) == "spent" else LOSS        # the word a gauge reads when it moves away from its aim
         parts.append(f"with the cluster inside, {len(ks)} squares: {len(ks) - len(judged)} single repetitions (no reading); "
                      f"of the {len(judged)} of 10 and 100 repetitions, by gauge: "
-                     + (", ".join(f'"{g}" lower in {lo[g]}, higher in {hi[g]}' for g in gauges) or "no gauge clear of the noise")
+                     + (", ".join(f'"{g}" GAIN in {cnt[GAIN][g]}, {away(g)} in {cnt[away(g)][g]}' for g in gauges)
+                        or "no gauge clear of the noise")
                      + f"; off the clock in {sum(1 for o in ks if 'OFF THE CLOCK' in o['verdict'])}"
                      + f"; invalid in {sum(1 for o in ks if 'INVALID' in o['verdict'])}")
     return "**Across the grid: " + ("; ".join(parts) or "no squares") + ".**"
@@ -206,11 +216,12 @@ def main(argv=None):
          "Native against Omni-Compass on top of native, engine omni-v5 (digest 5648f290, every muscle its own card), work "
          "waiting in line in every organism. Each square is the pooled receipt's own reading; the 1-, 10- and 100-run "
          "squares of a size are nested (the first N runs). Every square is shown.", "",
-         "How to read a modelled square: its reading (one run carries no label; at 10 and 100 runs the receipt's own word), "
-         "then the change Omni-Compass made against native, averaged over the runs: misses, the share of time the plants "
-         "were over their own line, in percentage points (negative is fewer); work done, in percent; power given, the "
-         "energy the max took for it, in percent. A square with the cluster inside carries the report's verdict and the "
-         "repetitions it pooled.", "", OWN_RUNS, ""]
+         "How to read a modelled square: its reading, GAIN, EVEN or LOSS (one run carries no label; at 10 and 100 runs the "
+         "receipt's own label, its word first), then the change Omni-Compass made against native, averaged over the runs: "
+         "misses, the share of time the plants were over their own line, in percentage points (a minus is fewer misses, a "
+         "GAIN); work done, in percent; power given, the energy the max took for it, in percent (shown, never called a loss). "
+         "A square with the cluster inside carries the report's verdict and the repetitions it pooled. The key to the words: "
+         "`docs/HOW_TO_READ_THE_RESULTS.md`.", "", OWN_RUNS, ""]
     top = len(L)                                                 # the grid in one line goes here, once every square is read
     L += ["## Modelled (six.yml; evidence class S, our own models)", "",
           "Pooled receipts: " + ", ".join(f"{copies(s)}: run {mod[s][1]}" for s in sorted(mod)) + ". Every column of every "
@@ -231,12 +242,13 @@ def main(argv=None):
               "Pooled reports: " + ", ".join(f"{copies(s)}: run {r}" for s, r in sorted({(s, r) for (s, _), (_, r, _) in kub.items()}))
               + ". Every gauge of every square, with its interval: " + ", ".join(link(kub[k][2], od) for k in sorted(kub, key=lambda k: (k[0], int(k[1]))))
               + ".", "",
-              "How to read a square with the cluster inside: which gauges came out lower and which higher than native, each "
-              "only when its 95% interval is clear of zero (the rest are inside the noise), read from the report's own rows "
-              "(`tools/six_kube_report.py`): the cluster's response times, time over the response line, failed requests, "
-              "pods started, replicas, machines and declared energy, and the organism's work, energy, work per energy and "
-              "time over its line. The organism's modelled energy is the power given; the modelled receipts above show it "
-              "beside the work. OFF THE CLOCK marks the repetitions where the organism ended more than 5% of the window late, "
+              "How to read a square with the cluster inside: which gauges read GAIN, LOSS or power given against native, each "
+              "only when its 95% interval is clear of zero (the rest are EVEN, inside the noise), read from the report's own "
+              "rows (`tools/six_kube_report.py`) and judged by what each gauge is for, never by its sign: the cluster's response "
+              "times, time over the response line and failed requests are time waited, missed or failed; the organism's work and "
+              "work per energy are work done; pods started, replicas, machines, declared energy and the organism's energy are "
+              "resources spent, so a fall is a cut, a GAIN, and a rise is power given. The modelled receipts above show the power "
+              "given beside the work. OFF THE CLOCK marks the repetitions where the organism ended more than 5% of the window late, "
               "its last steps seeing a cluster whose load schedule had ended: the runner could not step that many muscles in "
               "time.", ""]
         for size in SIZES:
@@ -248,7 +260,7 @@ def main(argv=None):
                     o = ((rep or {}).get("organisms") or {}).get(kube_key(org, size))
                     data["kube"].setdefault(f"{org}@{size}", {})[n] = o and {
                         "repetitions": o["repetitions"], "verdict": kube_verdict(o), "recorded_verdict": o["verdict"],
-                        "lower": directions(o)[0], "higher": directions(o)[1], "rows": o.get("rows") or {}}
+                        **directions(o)[0], "rows": o.get("rows") or {}}
                     cells.append(kube_cell(o))
                 L.append(f"| {NAMES[org]} | " + " | ".join(cells) + " |")
             L.append("")

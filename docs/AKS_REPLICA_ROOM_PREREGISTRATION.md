@@ -50,7 +50,7 @@ price, every gauge reported. Two settings of their own, each labelled as such:
 
 ## Reading
 
-Three separate runs of each setting, A, B and C (`tools/confirm_abc.py`), each row read as lower or higher in all three
+Three separate runs of each setting, A, B and C (`tools/confirm_abc.py`), each row read as GAIN or LOSS in all three
 of our runs, no difference beyond the noise, or the runs disagree. The extra pods and machines the replica room takes
 are counted where they fall (HPA replicas, pods started, machine-hours, the bill), the power given, beside the response
 times, the time over the line and the failed requests they buy. These settings are reported beside the standard ones,

@@ -57,7 +57,7 @@ measured window and priced at the list price per machine-hour. The energy rows r
 | pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 6.337 | 6.55 | +3.4% | -1.521 to +1.947 | no |
 | utilisation (used / allocatable) | 0.4831 | 0.4675 | -3.2% | -0.107 to +0.07583 | no |
 | CPU used (cores), mean | 1.682 | 1.681 | -0.0% | -0.03797 to +0.03726 | no |
-| Omni's own CPU (cores), mean | 0 | 0.01446 | +0.0145 (native is 0) | +0.01296 to +0.01596 | yes, more |
+| Omni's own CPU (cores), mean | 0 | 0.01446 | +0.0145 (native is 0) | +0.01296 to +0.01596 | yes: power given |
 | CPU used with Omni's own (cores), mean | 1.682 | 1.696 | +0.8% | -0.02439 to +0.05261 | no |
 | energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 198 | 197.3 | -0.3% | -31.62 to +30.36 | no |
 | HPA replicas, mean | 9.294 | 9.564 | +2.9% | -0.1062 to +0.6459 | no |

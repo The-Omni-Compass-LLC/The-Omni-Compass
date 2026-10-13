@@ -9,14 +9,14 @@ A change is significant when its paired 95% interval excludes zero.
 
 | Gauge | Native | Me on top | Me alone |
 |---|---:|---:|---:|
-| workers in service, mean | 6 | 6 (equal) | 5.82 (−3.0%, not significant) |
-| energy (Wh) | 158.6 | 158.4 (−0.2%, not significant) | 155.2 (−2.2%, not significant) |
-| response time, mean (ms) | 112.8 | 112.1 (−0.6%, not significant) | 113.1 (+0.2%, not significant) |
-| response time, 95th percentile (ms) | 238.4 | 239.9 (+0.7%, not significant) | 239.2 (+0.4%, not significant) |
-| response time, 99th percentile (ms) | 373 | 362.6 (−2.8%, not significant) | 352.3 (−5.5%, not significant) |
+| workers in service, mean | 6 | 6 (EVEN) | 5.82 (−3.0%, EVEN, not significant) |
+| energy (Wh) | 158.6 | 158.4 (−0.2%, EVEN, not significant) | 155.2 (−2.2%, EVEN, not significant) |
+| response time, mean (ms) | 112.8 | 112.1 (−0.6%, EVEN, not significant) | 113.1 (+0.2%, EVEN, not significant) |
+| response time, 95th percentile (ms) | 238.4 | 239.9 (+0.7%, EVEN, not significant) | 239.2 (+0.4%, EVEN, not significant) |
+| response time, 99th percentile (ms) | 373 | 362.6 (−2.8%, EVEN, not significant) | 352.3 (−5.5%, EVEN, not significant) |
 | failed requests (%) | 0 | 0 | 0 |
-| pods not yet running, pod-minutes | 0.277 | 0.213 (−22.9%, not significant) | 0.200 (−27.7%, not significant) |
-| utilisation | 0.0353 | 0.0364 (+3.1%, significant) | 0.0376 (+6.6%, not significant) |
+| pods not yet running, pod-minutes | 0.277 | 0.213 (−22.9%, EVEN, not significant) | 0.200 (−27.7%, EVEN, not significant) |
+| utilisation | 0.0353 | 0.0364 (+3.1%, significant) | 0.0376 (+6.6%, EVEN, not significant) |
 
 ## What the trail shows
 

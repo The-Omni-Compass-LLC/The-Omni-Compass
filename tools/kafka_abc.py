@@ -7,10 +7,10 @@
 """The A/B/C table for the Kafka benchmark (docs/OMNI_V1.md's readings, docs/KAFKA_PREREGISTRATION.md): the untouched
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_kafka.py), each run holding three
 paired repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions gives a
-95% interval; across the three runs a gauge reads lower or higher in all three of our runs when all three move the same way with
-every interval clear of zero, no difference beyond the noise when a run's interval includes zero (with the count of such
-runs), and the runs disagree when runs clear of the noise point different ways. Lost messages: any rise in any run reads **higher in at least one of our runs**. The knob's moves are shown, never judged. The tuning workload is shown and not counted. Every row is reported,
-losses included; no energy is claimed beyond the host's CPU seconds.
+95% interval; across the three runs a gauge reads GAIN or LOSS in all three of our runs (by what it is for, never by its sign; a resource spent that rose reads power given) when all three move the same way with
+every interval clear of zero, EVEN, no difference beyond the noise, when a run's interval includes zero (with the count of such
+runs), and the runs disagree when runs clear of the noise point different ways. Lost messages: any rise in any run reads **LOSS in at least one of our runs**. The knob's moves are shown, never judged. The tuning workload is shown and not counted. Every row is reported,
+LOSS included; no energy is claimed beyond the host's CPU seconds.
 Usage: python tools/kafka_abc.py A_DIR B_DIR C_DIR --out results/live/V3_KAFKA.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding kafka-<workload>/.../<workload>.json"""
 from __future__ import annotations
@@ -53,9 +53,10 @@ def engine(run_dir):
     return "", "unknown"
 
 
-def verdict(rs, direction):
-    """The three-run reading of one gauge, by rule, from its three within-run paired results."""
-    return stack_reading(rs, direction, SAME_REL)
+def verdict(rs, direction, key=None):
+    """The three-run reading of one gauge, by rule, from its three within-run paired results: GAIN, LOSS, power given,
+    EVEN or the runs disagree, by what the gauge is for (tools/readings.py)."""
+    return stack_reading(rs, direction, SAME_REL, key)
 
 
 def cell(r, key):
@@ -82,10 +83,10 @@ def main(argv=None):
          "Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer group at the operator's count is native; "
          "omni is the compass law on the consumer count inside [1, 8], holding the group's own end-to-end latency at 40% of the 500 ms "
          "line (`docs/KAFKA_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a "
-         "run, and the same sign with every interval clear of zero across the three runs, make a reading **lower** or **higher in all three of our runs** "
-         "(which way the number went against native; the reader judges it); a run whose interval includes zero reads **no difference beyond the noise** (with the count of such runs); "
-         "clear runs pointing different ways read **the runs disagree**. Lost messages: any rise in any run reads **higher in at least one of our runs**. The tuning "
-         "workload is shown and not counted. Every row is shown, losses included. The host's CPU-seconds are measured on GitHub's shared "
+         "run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by its sign; a resource spent that rose reads **power given**) "
+         "a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); "
+         "clear runs pointing different ways read **the runs disagree**. Lost messages: any rise in any run reads **LOSS in at least one of our runs**. The tuning "
+         "workload is shown and not counted. Every row is shown, LOSS included. The host's CPU-seconds are measured on GitHub's shared "
          "runner, the compass's own cost included; no energy is claimed beyond them.", "",
          "| Run | GitHub run | Commit | Engine | Workloads |", "|---|---|---|---|---:|"]
     off = []
@@ -116,12 +117,12 @@ def main(argv=None):
         out["workloads"][wl] = {}
         for k, label, dr in GAUGES:
             rs = [r["paired"].get(k) for r in recs]
-            v = verdict(rs, dr)
+            v = verdict(rs, dr, k)
             if not tuning:
-                tally.add(v, dr)
+                tally.add(v, dr, k)
             nat = fmt(rs[0]["native"]) if rs[0] else "n/a"; om = fmt(rs[0]["omni"]) if rs[0] else "n/a"
             L.append(f"| {label} | {nat} | {om} | " + " | ".join(cell(r, k) for r in rs) + f" | {v} |")
-            out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
+            out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr, k), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
         hb = all(all(x["omni"].get("handed_back") for x in r["reps"]) for r in recs)
         L += ["", f"The consumer count handed back to the operator's and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
         vr = {t: [x["omni"]["verdict"] for x in r["reps"] if x["omni"].get("verdict")] for t, r in zip("ABC", recs)}
@@ -134,7 +135,7 @@ def main(argv=None):
     L += ["", tally.sentence(n_wl, "untouched workloads")]
     Path(a.out).write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
     Path(a.out).with_suffix(".json").write_text(json.dumps(out, indent=1))
-    print(f"{a.out}: {n_wl} untouched workloads; {tally.toward} toward the aim, {tally.away} away, {tally.disagree} disagree")
+    print(f"{a.out}: {n_wl} untouched workloads; {tally.counts()}")
     return 0
 
 

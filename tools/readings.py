@@ -3,183 +3,496 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The words every table uses (the founder's orders of 11 and 13 October).
+"""The words every table uses: GAIN, EVEN and LOSS (the founder's order of 13 October 2026, night).
+
+Better, same and worse became GAIN, EVEN and LOSS wherever they lived, and where they used to live. A reading is never
+decided by the plus or minus sign of its number: it is decided by what the gauge is for, its declared aim. A response time
+that fell is a GAIN; work that fell is a LOSS; a bill, an energy draw or a count of machines that fell is a cut, and a cut
+is a GAIN; a resource that rose to buy work or speed is power given (the founder's order of 12 October), shown beside what
+it bought and never called a loss. KEY says what each word means, letter by letter, and why it was chosen; it stands at
+the front of the manual, in the README, in docs/HOW_TO_READ_THE_RESULTS.md and in the summary anyone prints after pulling
+the repository (python3 tools/summary.py). This module is the one place the words are written.
 
 Nobody outside The Omni-Compass LLC has checked or approved these results, so no table says "confirmed": a reading that
-holds the same way in runs A, B and C, with every 95% interval clear of zero, says exactly that, "in all three of our
-runs". And a reading says only which way the number went against native, **lower** or **higher**, with the gauge named
-(13 October: who sets the goalposts differs from one system to the next), and the reader judges it. Every table carries OWN_RUNS. judged() tells a reader of a table (the Omni index, the dossier, the benefit
-sheet, the wiring verdicts) whether a row's reading counts, for tables written in these words and for the older tables
-in their own words (kept as they were written, the record).
-"""
+holds the same way in runs A, B and C, with every 95% interval clear of zero, says "in all three of our runs", and every
+table carries OWN_RUNS. classify() reads a reading in any words the repository has used (GAIN/EVEN/LOSS; lower and higher
+of 13 October; toward and away; better, worse and "confirmed" of the older tables) so every scorer reads every table alike.
 
+  python3 tools/readings.py --key      the key, as plain text
+  python3 tools/readings.py --check    exit 1 if a page that must carry the key does not carry it word for word
+  python3 tools/readings.py --fix      write the key into those pages, between its two markers
+"""
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+GAIN, EVEN, LOSS = "GAIN", "EVEN", "LOSS"
+GIVEN = "power given"                       # a resource spent or held rose: shown beside what it bought, never a LOSS
+DISAGREE = "the runs disagree"              # runs clear of the noise point different ways: the test is unstable there
+DIFFER = "**the runs differ**"              # a deterministic simulator's runs did not reproduce
+SHOWN = "shown, not judged"                 # declared in advance as shown only
 IN_ALL_THREE = "in all three of our runs"
 SAME_IN_ALL_THREE = "the same in all three of our runs"
 OWN_RUNS = ("Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. "
             "Preregistered means the rules were written down in our own repository before the runs; nothing was filed "
             "with any outside body.")
 
+# ------------------------------------------------------------------------------------------------- what a gauge is for
+# A gauge's declared aim, as each preregistration writes it:
+LOWER = "lower"              # an amount waited, missed or failed (a response time, time over the line): a fall is GAIN, a rise LOSS
+HIGHER = "higher"            # work done (work inside the line, throughput, a hit rate): a rise is GAIN, a fall LOSS
+SPENT = "spent"              # a resource spent or held (energy, machines, memory, processor time, a bill, wear): a fall is a
+                             # cut, and a cut is GAIN; a rise is power given
+NEVER_MORE = "never more"    # a count that must never rise (failed requests, lost messages): any rise in any run is LOSS
+NEVER_LESS = "never less"    # a count that must never fall
+SHOWN_AIM = "shown"          # shown, never judged
 
-LOWER, HIGHER = "lower", "higher"
+# The gauges of a resource spent or held, by the names the tables and the runners give them. A table written before this
+# module knew the word "spent" declared them "lower"; aim() reads them as spent wherever they are named.
+SPENT_GAUGES = frozenset({
+    # Kubernetes (tools/live_reps.py, pilot/bench_report.py)
+    "worker nodes in service, mean", "node-hours", "power (W), mean", "power (W), peak", "energy (Wh)",
+    "energy, parked workers still on at idle power (Wh)", "energy, the machine's own meter (Wh)", "node-hours per core-hour",
+    "HPA replicas, mean", "pods started", "batch: worker machines in service after the queue finished, mean",
+    "machines billed, machine-hours", "compute bill at list price ($)",
+    # the organisms with the cluster inside (tools/six_kube_report.py)
+    "organism energy (J)",
+    # the stacks (tools/run_*.py)
+    "servers_alive_mean", "servers_alive_max", "consumers_mean", "consumers_max", "maxmemory_mb_mean", "used_mb_mean",
+    "cache_mb_mean", "cache_used_mb_mean", "pool_mb_mean", "pool_used_mb_mean", "cpu_busy_share", "cpu_seconds",
+    "cpu_s_per_1k_inside", "energy_j", "power_w_mean", "j_per_1k_inside", "wall_j",
+    # the independent simulators (pandapower, MuJoCo, the swarms, CityLearn)
+    "load_energy_mwh", "losses_mwh", "energy_in_mwh", "tap_operations", "copper_j", "mechanical_j", "standing_j",
+    "peak_torque_nm", "mean_abs_torque_nm", "energy_per_mission_j", "fleet_energy_j", "cost_total",
+    "electricity_consumption_total", "carbon_emissions_total", "zero_net_energy",
+    # the Omni index's own measures
+    "machines", "energy",
+})
 
 
-def moved(lower: bool) -> str:
-    """Which way a number went against native, in the one pair of words every table uses."""
-    return LOWER if lower else HIGHER
+def aim(direction, key=None):
+    """A gauge's aim from its declared direction: LOWER, HIGHER, SPENT, NEVER_MORE, NEVER_LESS, or None (shown only). A
+    gauge declared "lower" whose name is a resource spent or held (SPENT_GAUGES) is SPENT."""
+    if direction in (None, SHOWN_AIM, "shown, not judged"):
+        return None
+    if direction == LOWER and key in SPENT_GAUGES:
+        return SPENT
+    return direction
 
 
-def in_all_three(lower: bool) -> str:
+aim_of = aim
+
+
+def word(fell: bool, aim_: str) -> str:
+    """The word for a number that went the same way in all three runs (fell, or rose), judged by the gauge's aim, never by
+    its sign: GAIN, LOSS, or power given."""
+    if aim_ in (HIGHER, NEVER_LESS):
+        return LOSS if fell else GAIN
+    if aim_ == SPENT:
+        return GAIN if fell else GIVEN
+    return GAIN if fell else LOSS                     # lower, never more
+
+
+def in_all_three(fell: bool, aim_: str) -> str:
     """The three-run reading of a number that went the same way in all three runs, every interval clear of zero."""
-    return f"**{moved(lower)} {IN_ALL_THREE}**"
+    return f"**{word(fell, aim_)} {IN_ALL_THREE}**"
 
 
-NEVER_MORE_UP = f"{HIGHER} in at least one of our runs"          # a count that should never rise (failed, lost, errors) rose
-NEVER_MORE_HELD = f"{LOWER} or the same {IN_ALL_THREE}"           # ... and did not rise in any run
+def cut_or_up(fell: bool) -> str:
+    """The plain verb for which way a number went, beside its word: cut or up."""
+    return "cut" if fell else "up"
+
+
+EVEN_SAME = f"{EVEN}, the same"                     # under one part in a million of the value (amendment 11), or exactly
+EVEN_NOISE = f"{EVEN}, no difference beyond the noise"
+
+
+def even_noise(detail: str = "") -> str:
+    """No difference beyond the noise: in the runs counted the interval includes zero, so native and Omni could not be told
+    apart on that gauge; that is the result. detail names the runs, '2 of 3 runs'."""
+    return f"{EVEN_NOISE} ({detail})" if detail else EVEN_NOISE
+
+
+NEVER_MORE_UP = f"{LOSS} in at least one of our runs"            # a count that must never rise rose in a run
+NEVER_MORE_HELD = f"{GAIN} or {EVEN} {IN_ALL_THREE}"              # ... and rose in none, and fell in at least one
 
 STACK_RULE = ("Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with "
-              "every interval clear of zero across the three runs, make a reading **lower** or **higher in all three of our runs** "
-              "(which way the number went against native; the reader judges it); a run whose interval includes zero reads **no "
-              "difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs "
-              "disagree**.")
+              "every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs**, "
+              "judged by what the gauge is for and never by its sign (a resource spent that rose reads **power given**, never a "
+              "loss); a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such "
+              "runs); clear runs pointing different ways read **the runs disagree**.")
 
 
 def never_more_rule(what: str) -> str:
-    """The rule sentence for a count that should never rise."""
+    """The rule sentence for a count that must never rise."""
     return f"{what}: any rise in any run reads **{NEVER_MORE_UP}**."
 
 
-def stack_reading(rs, direction, same_rel):
+def stack_reading(rs, direction, same_rel, key=None):
     """The three-run reading of one gauge of a stack's A/B/C table (PostgreSQL, Kafka, Redis, MongoDB, MySQL, the machine's
     frequency ceiling), from its three within-run paired results ({"native", "diff", "significant"}). direction is the
-    gauge's declared aim, "lower" or "higher", or "never more" (a count that should never rise: any rise in any run is
-    marked), or "shown" (shown, never judged). The reading says which way the number went; the reader judges it."""
+    gauge's declared aim (LOWER, HIGHER, SPENT, NEVER_MORE, or SHOWN_AIM); key is its name, for the resources declared
+    "lower" before the word "spent" was written."""
     if any(r is None for r in rs):
         return "no value"
-    if direction == "shown":
-        return "shown, not judged"
-    if direction == "never more":
+    a = aim(direction, key)
+    if a is None:
+        return SHOWN
+    if a == NEVER_MORE:
         if any(r["diff"] > 0 for r in rs):
             return f"**{NEVER_MORE_UP}**"
-        return "same" if all(abs(r["diff"]) <= 1e-12 for r in rs) else f"**{NEVER_MORE_HELD}**"
+        return EVEN_SAME if all(abs(r["diff"]) <= 1e-12 for r in rs) else f"**{NEVER_MORE_HELD}**"
     if all(abs(r["diff"]) <= same_rel * max(abs(r["native"]), 1e-12) for r in rs):
-        return "same"
+        return EVEN_SAME
     clear = [r for r in rs if r["significant"]]
     signs = {(r["diff"] > 0) - (r["diff"] < 0) for r in clear}
     if len(signs) > 1:
-        return "**the runs disagree**"
+        return f"**{DISAGREE}**"
     if len(clear) < len(rs):
-        return f"no difference beyond the noise ({len(rs) - len(clear)} of {len(rs)} runs)"
-    return in_all_three(rs[0]["diff"] < 0)
+        return even_noise(f"{len(rs) - len(clear)} of {len(rs)} runs")
+    return in_all_three(rs[0]["diff"] < 0, a)
 
 
-def aim_of(direction):
-    """A gauge's declared aim from its direction in a stack's gauge list: "lower", "higher", or None (shown only)."""
-    return None if direction == "shown" else (HIGHER if direction == "higher" else LOWER)
+# --------------------------------------------------------------------------------------------- reading any table's words
+_DIRECTION = (("lower or the same in all three of our runs", True), ("lower in all three of our runs", True),
+              ("higher in all three of our runs", False), ("higher in at least one of our runs", False),
+              ("higher in a repetition", False), ("confirmed lower", True), ("confirmed higher", False))
 
 
-class Tally:
-    """The count under a three-run table: judged rows that moved toward their gauge's declared aim, away from it, and rows
-    where the runs disagree."""
-
-    def __init__(self):
-        self.toward = self.away = self.disagree = 0
-
-    def add(self, reading, direction):
-        if "disagree" in (reading or ""):
-            self.disagree += 1
-        aim = aim_of(direction)
-        if aim is None:
-            return
-        t = toward_aim(reading, aim == LOWER)
-        self.toward += t is True
-        self.away += t is False
-
-    def sentence(self, n, what="workloads"):
-        return (f"**Across {n} {what}: {self.toward} gauge-rows moved toward the gauge's declared aim, {self.away} away from it, "
-                f"{self.disagree} where the runs disagree.**")
-
-
-DETERMINISTIC_RULE = ("a gauge reads **lower** or **higher in all three of our runs** (which way the number went against native; the "
-                      "reader judges it) when all three runs give the same sign")
-ACROSS_HEAD = "Lower in all three of our runs | Higher in all three of our runs | Same | The runs differ"
-DIFFER = "**the runs differ**"
-
-
-def aims_lower(direction) -> bool:
-    """A gauge's declared aim is lower unless its direction says higher (or never less)."""
-    return direction not in ("higher", "never less")
-
-
-def across_cells(t, direction) -> str:
-    """One gauge's cells under a deterministic simulator's three-run tables ({reading: [cases]}): how many cases read lower
-    and how many higher in all three of our runs, the cases named in the column away from the gauge's declared aim, then
-    the cases the same and the cases where the runs differ."""
-    lo, hi = t.get(in_all_three(True), []), t.get(in_all_three(False), [])
-    away = hi if aims_lower(direction) else lo
-    cell = lambda xs: f"{len(xs)}" + (f" ({', '.join(xs)})" if xs is away and xs else "")
-    return f"{cell(lo)} | {cell(hi)} | {len(t.get('same', []))} | {len(t.get(DIFFER, []))}"
-
-
-def across_counts(tally, direction_of):
-    """(toward, away, differ) over a simulator's tally ({key: {reading: [cases]}}): case-rows that moved toward their gauge's
-    declared aim in all three of our runs, away from it, and where the runs differ. direction_of(key) gives the gauge's
-    direction."""
-    toward = away = differ = 0
-    for k, t in tally.items():
-        lo, hi = len(t.get(in_all_three(True), [])), len(t.get(in_all_three(False), []))
-        low = aims_lower(direction_of(k))
-        toward += lo if low else hi
-        away += hi if low else lo
-        differ += len(t.get(DIFFER, []))
-    return toward, away, differ
-
-
-def in_direction_words(reading: str, diffs) -> str:
-    """A judged reading in the direction words, whatever words its table was written in: the older tables' words become
-    lower or higher by the sign of the run's own differences (a judged reading has the same sign in every run)."""
-    r = (reading or "").strip().strip("*")
-    if not judged(r) or r.lower().startswith((LOWER, HIGHER)):
-        return r
-    signs = {(d > 0) - (d < 0) for d in diffs if d is not None}
-    if signs == {-1}:
-        return f"{LOWER} {IN_ALL_THREE}"
-    if signs == {1}:
-        return f"{HIGHER} {IN_ALL_THREE}"
-    return r
-
-
-def row_toward(v) -> bool:
-    """Whether a row of an organism report (tools/six_kube_report.py) moved toward its gauge's declared aim: its field
-    toward_aim, or, in the receipts written before 13 October, the field they kept for the same thing."""
-    return bool(v["toward_aim"] if "toward_aim" in v else v.get("better"))
-
-
-def toward_aim(reading: str, lower_is_aim: bool):
-    """For the tools that score the headline (more work, faster, fewer machines, less energy): True when a judged reading
-    moved the gauge toward its declared aim, False when away from it, None when the reading is not judged. Reads the
-    direction words, and the older tables' words (kept as they were written)."""
-    if not judged(reading):
-        return None
-    r = (reading or "").strip().strip("*").lower()
-    if "better" in r:                       # an older table, kept as written
-        return True
-    if "worse" in r:
-        return False
-    if r.startswith(LOWER) or f"confirmed {LOWER}" in r:
-        return lower_is_aim
-    if r.startswith(HIGHER) or f"confirmed {HIGHER}" in r:
-        return not lower_is_aim
-    return None
+def classify(reading, aim_=None):
+    """A reading in one word for the scorers: "gain", "loss", "given", "noise", "same", "disagree" or "unjudged". Reads every
+    table's words: GAIN/EVEN/LOSS and power given; the direction words of 13 October (lower, higher; aim_ turns them into a
+    word, and is then required); toward and away from the aim; better, worse and "confirmed" of the older tables. A reading
+    that moved away from its aim on a resource spent (aim_ SPENT) is power given."""
+    r = (reading or "").strip().strip("*").strip()
+    lo = r.lower()
+    if not lo or lo.startswith(("shown", "no value", "not taken", "n/a")):
+        return "unjudged"
+    if lo.startswith(("gain or even", "gain")):
+        return "gain"
+    if lo.startswith("loss"):
+        return "loss"
+    if lo.startswith(GIVEN):
+        return "given"
+    if lo.startswith("even"):
+        return "noise" if "noise" in lo else "same"
+    if lo.startswith("no difference"):
+        return "noise"
+    if "disagree" in lo or "runs differ" in lo or "different ways" in lo:
+        return "disagree"
+    away = ("given" if aim_ == SPENT else "loss")
+    for old, cls in (("better", "gain"), ("worse", away), ("toward", "gain"), ("away", away)):   # older tables, kept as written
+        if lo.startswith(old) or lo.startswith(f"confirmed {old}") or lo.startswith(f"**{old}"):
+            return cls
+    for w, fell in _DIRECTION:
+        if lo.startswith(w):
+            if aim_ is None:
+                raise ValueError(f"the reading {reading!r} says a direction; its gauge's aim is needed to give it a word")
+            return {GAIN: "gain", LOSS: "loss", GIVEN: "given"}[word(fell, aim_)]
+    if lo.startswith("same"):
+        return "same"
+    # a receipt of its own kind (the robustness test's "the same in all three of our runs" for a hand-back held, "handed back
+    # within the allowance ..."): a fact about the governor, not a gauge against native; the caller decides what it is
+    raise ValueError(f"unknown reading: {reading!r}")
 
 
 def judged(reading: str) -> bool:
-    """A reading that holds the same way in all three runs, every interval clear of zero (lower or higher, the older
-    tables' words, or a robustness row held in every repetition of every run), or a count that should never rise and
-    rose in a run."""
+    """A reading that holds the same way in all three runs, every interval clear of zero (GAIN, LOSS or power given, or an
+    older table's words for the same), or a count that must never rise and rose in a run."""
     r = (reading or "").strip().strip("*").strip()
-    return r.startswith("confirmed") or IN_ALL_THREE in r or r.lower().startswith(NEVER_MORE_UP)
+    lo = r.lower()
+    return (lo.startswith("confirmed") or IN_ALL_THREE in r or lo.startswith(NEVER_MORE_UP.lower())
+            or lo.startswith("higher in at least one of our runs"))
+
+
+def toward_aim(reading: str, aim_):
+    """For the tools that score the headline: True when a judged reading moved the gauge toward its declared aim (GAIN),
+    False when away from it (LOSS or power given), None when it is not judged. aim_ may be True (the aim is lower) or False
+    (higher), the way the older scorers named it, or an aim word."""
+    if not judged(reading):
+        return None
+    a = {True: LOWER, False: HIGHER}.get(aim_, aim_) if isinstance(aim_, bool) else aim_
+    c = classify(reading, a)
+    return True if c == "gain" else False if c in ("loss", "given") else None
+
+
+def in_gel_words(reading: str, diffs, aim_) -> str:
+    """A judged reading in GAIN/EVEN/LOSS, whatever words its table was written in: a direction becomes its word by the
+    gauge's aim; an older table's better or worse becomes GAIN, LOSS or power given by the same aim (a judged reading has
+    the same sign in every run)."""
+    r = (reading or "").strip().strip("*")
+    if not judged(r):
+        return r
+    try:
+        c = classify(r, aim_)
+    except ValueError:
+        signs = {(d > 0) - (d < 0) for d in diffs if d is not None}
+        if len(signs) != 1 or aim_ is None:
+            return r
+        c = {GAIN: "gain", LOSS: "loss", GIVEN: "given"}[word(signs == {-1}, aim_)]
+    w = {"gain": GAIN, "loss": LOSS, "given": GIVEN}.get(c)
+    if w is None:
+        return r
+    return NEVER_MORE_UP if r.lower().startswith(("higher in at least one", NEVER_MORE_UP.lower())) else f"{w} {IN_ALL_THREE}"
+
+
+def row_gain(v) -> bool:
+    """Whether a row of an organism report (tools/six_kube_report.py) is a GAIN: its field gain, or, in the receipts written
+    before, the fields they kept for the same thing (toward_aim since 13 October, better before)."""
+    for k in ("gain", "toward_aim", "better"):
+        if k in v:
+            return bool(v[k])
+    return False
+
+
+row_toward = row_gain
+
+
+# ---------------------------------------------------------------------------------------- labels written by a rule
+GAIN_AND_LOSS = f"{GAIN} AND {LOSS}"        # a muscle with one aim toward and one away: both stand in the table
+GAIN_GIVEN = f"{GAIN}, {GIVEN}"             # service toward its aim, bought with a resource spent
+# The words for the labels the rules write (the realms of v5, tools/run_realms_v5.py; the engine harness's and the card
+# bench's preregistered labels, realms/harness.py and tools/gpu_reps.py, which keep their recorded wording until the
+# engine's next version), and for the names the older results used.
+LABEL_WORDS = {
+    "TOWARD ITS AIMS": GAIN, "BOTH WAYS": GAIN_AND_LOSS, "MIXED": GAIN_AND_LOSS, "AWAY FROM ITS AIMS": LOSS, "WORSE": LOSS,
+    "SAME AS NATIVE": EVEN, "AT ITS LIMIT ON NATIVE": EVEN,
+    "SUPERIOR WITHIN GUARDRAILS": GAIN, "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF": GAIN_AND_LOSS,
+    "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF": GAIN_GIVEN, "NONINFERIOR / INCONCLUSIVE": EVEN, "NOT ESTABLISHED": EVEN,
+    "AWAY FROM ITS AIM": LOSS, "INVALID": "INVALID",
+}
+GAIN_PARTS = ("MORE WORK", "FASTER", "FEWER MISSES", "LESS ENERGY")
+
+
+def gel_of_label(label):
+    """GAIN, EVEN, LOSS, GAIN AND LOSS, "GAIN, power given" or INVALID for a label a rule wrote; None if it is no label."""
+    lab = (label or "").replace("**", "").strip()
+    if lab in LABEL_WORDS:
+        return LABEL_WORDS[lab]
+    if lab in (GAIN, EVEN, LOSS, GAIN_AND_LOSS, GAIN_GIVEN):
+        return lab
+    parts = [x.strip() for x in lab.split("+")]
+    if lab and all(x in GAIN_PARTS for x in parts):        # the gains a muscle showed, joined: MORE WORK + FASTER ...
+        return GAIN
+    return None
+
+
+LABEL_SHOWN = {
+    "TOWARD ITS AIMS": GAIN, "BOTH WAYS": GAIN_AND_LOSS, "MIXED": GAIN_AND_LOSS, "AWAY FROM ITS AIMS": LOSS, "WORSE": LOSS,
+    "SAME AS NATIVE": f"{EVEN} (the same as native)", "AT ITS LIMIT ON NATIVE": f"{EVEN} (at its limit on native)",
+    "SUPERIOR WITHIN GUARDRAILS": f"{GAIN} (within the guardrails)",
+    "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF": f"{GAIN_AND_LOSS} (energy cut, service traded for it)",
+    "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF": f"{GAIN_GIVEN} (service GAIN, energy given for it)",
+    "NONINFERIOR / INCONCLUSIVE": f"{EVEN} (inside the noise, within the guardrails)",
+    "NOT ESTABLISHED": f"{EVEN} (not established: inside the noise, a guardrail crossed on the mean)",
+    "AWAY FROM ITS AIM": LOSS, "INVALID": "INVALID",
+}
+
+
+def labelled(label) -> str:
+    """A label as a table shows it, its word first: "GAIN (fewer misses)", "EVEN (at its limit on native)", "LOSS"."""
+    lab = (label or "").replace("**", "").strip()
+    if lab in LABEL_SHOWN:
+        return LABEL_SHOWN[lab]
+    w = gel_of_label(lab)
+    if w is None or w == lab:
+        return lab
+    return f"{w} ({lab.lower()})"
+
+
+# ------------------------------------------------------------------------------------- the count under a three-run table
+class Tally:
+    """The count under a three-run table: judged gauge-rows that read GAIN, LOSS and power given in all three of our runs,
+    rows that read EVEN, and rows where the runs disagree."""
+
+    def __init__(self):
+        self.gain = self.loss = self.given = self.even = self.disagree = 0
+
+    def add(self, reading, direction, key=None):
+        c = classify(reading, aim(direction, key))
+        self.gain += c == "gain"
+        self.loss += c == "loss"
+        self.given += c == "given"
+        self.even += c in ("noise", "same")
+        self.disagree += c == "disagree"
+
+    def sentence(self, n, what="workloads"):
+        return (f"**Across {n} {what}: {self.gain} gauge-rows GAIN in all three of our runs, {self.loss} LOSS, {self.given} "
+                f"power given, {self.even} EVEN, {self.disagree} where the runs disagree.**")
+
+    def counts(self):
+        return f"{self.gain} GAIN, {self.loss} LOSS, {self.given} power given, {self.even} EVEN, {self.disagree} disagree"
+
+
+DETERMINISTIC_RULE = ("a gauge reads **GAIN** or **LOSS in all three of our runs** when all three runs give the same sign, judged by "
+                      "what the gauge is for and never by its sign (a resource spent that rose reads **power given**)")
+ACROSS_HEAD = "GAIN in all three of our runs | LOSS in all three of our runs | Power given in all three of our runs | EVEN | The runs differ"
+ACROSS_RULE = "|---|---:|---:|---:|---:|---:|"
+
+
+def across_cells(t, direction=None, key=None) -> str:
+    """One gauge's cells under a deterministic simulator's three-run tables ({reading: [cases]}): how many cases read GAIN,
+    LOSS and power given in all three of our runs (the cases named where they read LOSS or power given), then the cases
+    EVEN and the cases where the runs differ."""
+    a = aim(direction, key)
+    by = {"gain": [], "loss": [], "given": [], "even": [], "disagree": []}
+    for reading, cases in t.items():
+        c = classify(reading, a)
+        by["even" if c in ("noise", "same") else c if c in by else "even"].extend(cases)
+    cell = lambda xs, named: f"{len(xs)}" + (f" ({', '.join(xs)})" if named and xs else "")
+    return (f"{cell(by['gain'], False)} | {cell(by['loss'], True)} | {cell(by['given'], True)} | {len(by['even'])} | "
+            f"{len(by['disagree'])}")
+
+
+def across_counts(tally, direction_of):
+    """(gain, loss, given, differ) over a simulator's tally ({gauge: {reading: [cases]}}): case-rows that read GAIN, LOSS
+    and power given in all three of our runs, and where the runs differ. direction_of(gauge) gives the gauge's direction."""
+    g = l_ = gv = d = 0
+    for k, t in tally.items():
+        a = aim(direction_of(k), k)
+        for reading, cases in t.items():
+            c = classify(reading, a)
+            g += len(cases) * (c == "gain"); l_ += len(cases) * (c == "loss"); gv += len(cases) * (c == "given")
+            d += len(cases) * (c == "disagree")
+    return g, l_, gv, d
 
 
 def with_own_runs(lines):
     """A table's lines with OWN_RUNS under its title (the legal notice is stamped around them afterwards)."""
     return list(lines[:1]) + ["", OWN_RUNS] + list(lines[1:])
+
+
+# ------------------------------------------------------------------------------------------------------------- the key
+KEY_TITLE = "The key: GAIN, EVEN and LOSS"
+KEY_BEGIN = "<!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->"
+KEY_END = "<!-- end of the key -->"
+LETTERS = (
+    (GAIN, "surplus and positive variance", (("G", "Growth", "asset appreciation"), ("A", "Advantage", "risk reduction"),
+                                             ("I", "Improvement", "margin expansion"), ("N", "Net-positive", "profitable outcome")),
+     "the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a "
+     "resource cut"),
+    (EVEN, "the break-even baseline: equilibrium", (("E", "Equalized", "zero variance"), ("V", "Verified baseline", "expected norm"),
+                                                    ("E", "Equilibrium", "balanced risk"), ("N", "Neutral", "no net change")),
+     "native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at "
+     "the top of its range is EVEN, at its limit on native"),
+    (LOSS, "actuarial deficit and exposure", (("L", "Leakage", "capital drain"), ("O", "Off-track", "adverse selection"),
+                                              ("S", "Setback", "claim liability"), ("S", "Subpar", "negative variance")),
+     "the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures"),
+)
+
+
+def key_lines():
+    """The key as Markdown lines (the manual's front matter, the README, the reading guide and the summary carry it)."""
+    L = [f"## {KEY_TITLE}", "",
+         "Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse "
+         "are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: "
+         "who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before "
+         "the runs.", "",
+         "| Word | What each letter stands for | Its sense in underwriting | What it means in a table |", "|---|---|---|---|"]
+    for w, sense, letters, meaning in LETTERS:
+        L.append(f"| **{w}** | " + "; ".join(f"**{a}** {b} ({c})" for a, b, c in letters) + f" | {sense} | {meaning} |")
+    L += ["", "How the sign of a number becomes a word:", "",
+          "- **Time waited, missed or failed** (a response time, time over the line, failed requests): a fall is GAIN, a rise is LOSS.",
+          "- **Work done** (work inside the line, throughput, a hit rate): a rise is GAIN, a fall is LOSS.",
+          "- **A resource spent or held** (energy, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and "
+          "a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is "
+          "always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides "
+          "every muscle's edge; it never shaves).",
+          "- So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).", "",
+          "Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN "
+          "GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: "
+          + "; ".join(f"{k} reads {v}" for k, v in LABEL_SHOWN.items() if k not in ("WORSE", "MIXED", "AWAY FROM ITS AIM", "INVALID"))
+          + ". A run that breaks its own validity checks reads INVALID and carries no word.", "",
+          "A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear "
+          "of zero: \"GAIN in all three of our runs\". The other readings are **EVEN, no difference beyond the noise** (in a run "
+          "the interval includes zero, so native and Omni could not be told apart: that is the result), **the runs disagree** "
+          "(clear runs pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge "
+          "declared in advance as shown only, such as the knob's own setting).", "",
+          "Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as "
+          "surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never "
+          "to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no "
+          "harm, so **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own "
+          "wiring first, then native's setup, then the scoring) and the test is run again.", "",
+          "Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention "
+          "for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or "
+          "insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs "
+          "measured against native under the declared aims, not a promise about any other system; every number stands beside "
+          "its word, so a reader can judge it by any other convention. " + OWN_RUNS]
+    return L
+
+
+def key_block():
+    """The key between its two markers, as a page carries it."""
+    return [KEY_BEGIN] + key_lines() + [KEY_END]
+
+
+def key_text() -> str:
+    """The key as plain text, for a terminal."""
+    out = []
+    for ln in key_lines():
+        if ln.startswith("|---"):
+            continue
+        if ln.startswith("| **"):
+            cells = [c.strip() for c in ln.strip("|").split("|")]
+            out += [f"{cells[0]}: {cells[1]}", f"    underwriting: {cells[2]}", f"    in a table: {cells[3]}"]
+            continue
+        if ln.startswith("| Word"):
+            continue
+        out.append(ln)
+    return re.sub(r"\*\*|`", "", "\n".join(out)).replace("## ", "")
+
+
+KEY_PAGES = ("README.md", "docs/HOW_TO_READ_THE_RESULTS.md", "docs/OMNI_COMPASS_MANUAL.md")
+
+
+def _with_key(text: str) -> str:
+    block = "\n".join(key_block())
+    if KEY_BEGIN in text and KEY_END in text:
+        a = text.index(KEY_BEGIN)
+        b = text.index(KEY_END) + len(KEY_END)
+        return text[:a] + block + text[b:]
+    return text
+
+
+def check_pages(root: Path = ROOT):
+    """The pages that must carry the key and do not carry it word for word."""
+    bad = []
+    for p in KEY_PAGES:
+        f = root / p
+        if not f.exists():
+            continue
+        t = f.read_text()
+        if KEY_BEGIN not in t or KEY_END not in t or _with_key(t) != t:
+            bad.append(p)
+    return bad
+
+
+def main(argv=None):
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("--key", action="store_true"); g.add_argument("--check", action="store_true"); g.add_argument("--fix", action="store_true")
+    a = ap.parse_args(argv)
+    if a.key:
+        print(key_text())
+        return 0
+    if a.fix:
+        for p in KEY_PAGES:
+            f = ROOT / p
+            if f.exists():
+                t = f.read_text(); n = _with_key(t)
+                if n != t:
+                    f.write_text(n); print(f"the key rewritten in {p}")
+        return 0
+    bad = check_pages()
+    for p in bad:
+        print(f"{p}: the key (between {KEY_BEGIN} and {KEY_END}) is missing or not word for word")
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

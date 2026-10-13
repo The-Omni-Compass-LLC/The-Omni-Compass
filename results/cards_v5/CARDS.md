@@ -4,10 +4,10 @@
 
 The engine's cards (`realms/muscle_cards_v5.csv`) and how they were found (`tools/tune_cards.py`,
 `docs/FORMAL_V5.md` section 5). Development seeds only: chosen on seeds 7100-7109, confirmed on seeds 7200-7209; the preregistered seeds
-3000-3009 were never read. A card is kept only if it moved the muscle beyond the noise toward its aims (fewer misses,
-more work, faster) against today's global setting on both sets, moved none of them the other way, and never fell
-behind native: on no seed of either set and under no load over its line more often, doing less work or clearing
-its line later. Evidence class **S** (modelled).
+3000-3009 were never read. A card is kept only if it read GAIN against today's global setting on both sets (fewer
+misses, more work or faster, beyond the noise), read LOSS on none of the three, and never fell behind native: on no
+seed of either set and under no load over its line more often, doing less work or clearing its line later (the key
+to the words: `docs/HOW_TO_READ_THE_RESULTS.md`). Evidence class **S** (modelled).
 
 | Plant | Knob | Muscles searched | Won on the first seeds | Won again (the engine's cards) |
 |---|---|---:|---:|---:|

@@ -12,7 +12,7 @@ Repetition 2 lost an arm and is excluded, as preregistered; four paired repetiti
 control-plane selector kept beside the AKS one) and are not results. Evidence class **L**, the bill **metered** (Azure's
 own count of machines every 15 s, priced at list).
 
-**Result. No difference in the bill, either way, and no measure significantly away from its aim.** Native 0.615 machine-hours
+**Result. No difference in the bill, either way, and no LOSS clear of the noise.** Native 0.615 machine-hours
 (USD 0.059 a 15-minute window); with the allocation law −0.6%, with the compass law +0.8%, intervals across zero. Azure's own
 autoscaler already ran this workload on about 1.86 workers out of 4: on a real cloud with a node autoscaler underneath,
 this light workload leaves Omni-Compass no machine to give back. The machine savings measured on kind (where the native
@@ -35,10 +35,10 @@ record. Four repetitions with wide intervals: no saving shown, none excluded at 
 | pending pods, pod-minutes | 4.867 | 5.733 | +17.8% | -4.707 to +6.44 | no |
 | utilisation (used / allocatable) | 0.476 | 0.5193 | +9.1% | -0.02881 to +0.1154 | no |
 | CPU used (cores), mean | 1.673 | 1.727 | +3.2% | -0.0967 to +0.2042 | no |
-| Omni's own CPU (cores), mean | 0 | 0.01315 | +0.0132 (native is 0) | +0.01226 to +0.01404 | yes, more |
+| Omni's own CPU (cores), mean | 0 | 0.01315 | +0.0132 (native is 0) | +0.01226 to +0.01404 | yes: power given |
 | CPU used with Omni's own (cores), mean | 1.673 | 1.74 | +4.0% | -0.0838 to +0.2176 | no |
 | energy per core-hour (Wh, the 25 W standby model) | 197.5 | 187.1 | -5.3% | -34.39 to +13.55 | no |
-| HPA replicas, mean | 9.474 | 9.125 | -3.7% | -0.6744 to -0.02221 | yes, lower |
+| HPA replicas, mean | 9.474 | 9.125 | -3.7% | -0.6744 to -0.02221 | yes: GAIN |
 | pods started | 6 | 6.5 | +8.3% | -4.093 to +5.093 | no |
 | pod start wait, total (s) | 211.8 | 282 | +33.2% | -161.3 to +301.8 | no |
 | pod start wait, mean (s) | 36.28 | 45.63 | +25.8% | -41.2 to +59.89 | no |
@@ -61,7 +61,7 @@ record. Four repetitions with wide intervals: no saving shown, none excluded at 
 | pending pods, pod-minutes | 4.867 | 5.171 | +6.3% | -7.794 to +8.402 | no |
 | utilisation (used / allocatable) | 0.476 | 0.4853 | +1.9% | -0.1359 to +0.1544 | no |
 | CPU used (cores), mean | 1.673 | 1.701 | +1.6% | -0.2966 to +0.3517 | no |
-| Omni's own CPU (cores), mean | 0 | 0.01367 | +0.0137 (native is 0) | +0.01187 to +0.01548 | yes, more |
+| Omni's own CPU (cores), mean | 0 | 0.01367 | +0.0137 (native is 0) | +0.01187 to +0.01548 | yes: power given |
 | CPU used with Omni's own (cores), mean | 1.673 | 1.715 | +2.5% | -0.2826 to +0.3651 | no |
 | energy per core-hour (Wh, the 25 W standby model) | 197.5 | 193.2 | -2.2% | -48.03 to +39.4 | no |
 | HPA replicas, mean | 9.474 | 9.465 | -0.1% | -0.4911 to +0.4746 | no |

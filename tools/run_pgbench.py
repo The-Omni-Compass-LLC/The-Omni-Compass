@@ -60,6 +60,7 @@ sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw, Plug, clamp  # noqa: E402
 from tools.legal import stamp as _legal_stamp  # noqa: E402
 from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 3: the brain's own verdict)
+from tools.readings import word as gel_word, aim as gel_aim, EVEN_SAME, EVEN_NOISE, SHOWN  # noqa: E402  (the words every table uses)
 
 # --- the frozen rule -----------------------------------------------------------------------------------------------
 LINE_MS = 50.0            # the response line: a transaction answered within 50 ms, lag included
@@ -100,11 +101,11 @@ GAUGES = [  # key, label, direction
     ("p50_ms", "latency, median (ms)", "lower"),
     ("mean_ms", "latency, mean (ms)", "lower"),
     ("failed", "failed transactions", "never more"),
-    ("servers_alive_mean", "server connections alive, mean (the machines)", "lower"),
-    ("servers_alive_max", "server connections alive, most at once", "lower"),
-    ("cpu_busy_share", "host CPU busy (share of the run)", "lower"),
-    ("cpu_seconds", "host CPU-seconds", "lower"),
-    ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 transactions inside the line", "lower"),
+    ("servers_alive_mean", "server connections alive, mean (the machines)", "spent"),
+    ("servers_alive_max", "server connections alive, most at once", "spent"),
+    ("cpu_busy_share", "host CPU busy (share of the run)", "spent"),
+    ("cpu_seconds", "host CPU-seconds", "spent"),
+    ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 transactions inside the line", "spent"),
     ("harness_cpu_seconds", "the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both; inside the host's)", "shown"),
     ("pool_mean", "pool size, mean (the knob)", "shown"),
 ]
@@ -198,15 +199,15 @@ def paired(reps, key, direction):
     same = abs(mean) <= SAME_REL * max(abs(nat), 1e-12)
     clear = n > 1 and (lo > 0 or hi < 0) and not same
     if direction == "shown":
-        reading = "shown, not judged"
+        reading = SHOWN
     elif direction == "never more" and any(x > 0 for x in d):
-        reading = "**higher in a repetition**"                                     # any increase, in any repetition, whatever the noise
+        reading = "**LOSS in a repetition**"                                     # any increase, in any repetition, whatever the noise
     elif same:
-        reading = "same"
+        reading = EVEN_SAME
     elif not clear:
-        reading = "no difference beyond the noise"
+        reading = EVEN_NOISE
     else:
-        reading = "lower" if mean < 0 else "higher"                # which way it went; the gauge's aim is the reader's
+        reading = gel_word(mean < 0, gel_aim(direction, key))      # the word by what the gauge is for, never by its sign
     return {"native": nat, "omni": om, "diff": mean, "ci95": [lo, hi], "n": n, "significant": clear, "reading": reading}
 
 

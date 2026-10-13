@@ -20,8 +20,8 @@ and the work order. The founder gave the word on 10 October 2026.
 3. **Collective processing.** One body, one brain, one tick a second. Read everything first: every muscle's state, every service's
    speed and work, the host's CPU, memory and energy where a meter exists. Then decide. The cost the brain judges is the body's
    cost (all the work, all the speed, all the machines, all the resources: the Omni index's own arithmetic), never one muscle's.
-4. **Hurt nothing anywhere.** On top of the body's cost, a guard for every part: a step is refused if any one service moved away from its aim
-   beyond its cushion even when the body's total improved. Pushing one thing away from its aim to move another toward its own is refused by rule.
+4. **Hurt nothing anywhere.** On top of the body's cost, a guard for every part: a step is refused if any one service read LOSS
+   beyond its cushion even when the body's total improved. Pushing one thing to a LOSS to move another toward its own is refused by rule.
 5. **One trial at a time inside a body.** If two muscles move together the brain cannot tell which one caused the reaction. The
    body grants one new trial at a time, to the muscle asking loudest whose own condition holds. Every other muscle keeps acting
    inside what it has already proven. Nothing is frozen; only new trials wait their turn.
@@ -47,7 +47,7 @@ and the work order. The founder gave the word on 10 October 2026.
     a physical meter is class P. "Simulation" stays only in the license's own phrase and in the names of third-party simulators.
 12. **Reports.** We build every table, receipt and reading from the raw files with our own code; GitHub runs the jobs and stores
     the files; the raw files are archived with checksums. Every row is shown, always, native and Omni, plus or minus. A row that
-    comes out away from its aim in all three of our runs is a bug report against our own wiring: fix the wiring, run again, the rerun becomes the result of
+    comes out LOSS in all three of our runs is a bug report against our own wiring: fix the wiring, run again, the rerun becomes the result of
     record, the earlier set stays in `docs/history`. No row is ever dropped.
 13. **The card and the two clouds** are written onto the same mechanism before they run: the same probe first, snapshot once, wire
     owned by the brain, reflex rule, body judgement, three runs, receipts, archive. The GPU controllers are inside the engine and

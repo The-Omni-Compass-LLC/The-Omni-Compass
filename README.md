@@ -8,6 +8,35 @@ The Omni-Compass LLC · [www.omni-compass.com](https://www.omni-compass.com). Ev
 of any part of Omni-Compass carries the notice above, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and
 [`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
 
+**The whole summary, straight after a pull:** `python3 tools/summary.py` (plain text) or `python3 tools/summary.py --markdown`. It prints what Omni-Compass is, the key below, and every headline result with its word and its evidence class, read from the result files in this repository.
+
+<!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
+## The key: GAIN, EVEN and LOSS
+
+Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
+
+| Word | What each letter stands for | Its sense in underwriting | What it means in a table |
+|---|---|---|---|
+| **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
+| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native |
+| **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
+
+How the sign of a number becomes a word:
+
+- **Time waited, missed or failed** (a response time, time over the line, failed requests): a fall is GAIN, a rise is LOSS.
+- **Work done** (work inside the line, throughput, a hit rate): a rise is GAIN, a fall is LOSS.
+- **A resource spent or held** (energy, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves).
+- So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
+
+Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
+
+A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear of zero: "GAIN in all three of our runs". The other readings are **EVEN, no difference beyond the noise** (in a run the interval includes zero, so native and Omni could not be told apart: that is the result), **the runs disagree** (clear runs pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such as the knob's own setting).
+
+Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, so **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
+
+Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+<!-- end of the key -->
+
 ## Latest, newest first
 
 Everything between the markers below is written by the repository itself (`tools/front_page.py`, run by
@@ -32,7 +61,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-13 18:06 | [The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
 | 2026-10-13 18:06 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v5)](results/live/V5_GOLDILOCKS.md) |  |
 | 2026-10-13 18:06 | [The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table (Omni v5)](results/live/V5_CAPACITY.md) |  |
-| 2026-10-13 18:06 | [The grid of the card version: six organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs](results/grid_v5/GRID.md) | Across the grid: modelled, 36 of 36 squares of 10 and 100 runs FEWER MISSES; the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" lower in 36, higher in 0, "time over the response line (% of samples)" lower in 36, higher in 0, "response time (ms), 95th percentile" lower in 26, higher in 2, "energy (Wh)" lower in 26, higher in 0, "energy, parked workers still on at idle power (Wh)" lower in 26, higher in 0, "organism energy (J)" lower in 0, higher in 22, "organism work per energy" lower in 22, higher in 0, "failed requests (%)" lower in 18, higher in 0, "response time (ms), 99th percentile" lower in 12, higher in 2, "HPA replicas, mean" lower in 4, higher in 5, "pods started" lower in 3, higher in 0; off the clock in 3; invalid in 0. |
+| 2026-10-13 18:06 | [The grid of the card version: six organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs](results/grid_v5/GRID.md) | Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0. |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -79,13 +108,13 @@ per organism and per load, commit `eea291501848`, engine omni-v5 (fingerprint `5
 
 | Reading | Muscles | With one global setting |
 |---|---:|---:|
-| **Toward its aims** (more work, its line cleared sooner or fewer misses, beyond the noise, and none of the three the other way, under either load) | **527** | 517 |
+| **GAIN** (more work, its line cleared sooner or fewer misses, beyond the noise, and no LOSS on any of the three, under either load) | **527** | 517 |
 | of them: clear the waiting line sooner | 493 | 493 |
 | of them: over their line less often | 409 | 398 |
 | of them: more work | 33 | 32 |
-| At its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 | 421 |
-| The same as native (no difference beyond the noise: native already did all the work that came) | 159 | 169 |
-| **Away from its aims, or both ways** | **0** | 0 |
+| EVEN, at its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 | 421 |
+| EVEN, the same as native (no difference beyond the noise: native already did all the work that came) | 159 | 169 |
+| **LOSS, or GAIN AND LOSS** | **0** | 0 |
 
 | Kind | With work waiting in line (one global setting in brackets) | Power given | Wear |
 |---|---|---:|---:|
@@ -111,19 +140,21 @@ real service spent 12% to 59% less time over its response line, and its slowest 
 (inside the noise in 2 of those 24 squares). At 100 copies the test machine itself is the limit: GitHub's four-core
 machine carries the real cluster and the model of up to 190,800 muscles at once, and native alone kept its CPU 87% to 91%
 busy and failed 32% to 43% of requests. There the real service spent 8% to 13% less time over its line, and in the four
-stacked and the whole tower at 100 repetitions the 95th percentile of its responses read higher (45% and 13.5%), with the
+stacked and the whole tower at 100 repetitions the 95th percentile of its responses read LOSS (up 45% and 13.5%), with the
 four stacked behind the window's clock in 49 of 100 repetitions. Those two squares are run again with a longer window
 ([`docs/GRID_LONG_WINDOW_PREREGISTRATION.md`](docs/GRID_LONG_WINDOW_PREREGISTRATION.md)), and on the new engine every
 square runs again with the organism on its own core (protocol 3), so the machine no longer sets the result. The same report reads the organism's
-modelled energy higher (+0.06% at most, the power given) and, in 5 squares, 0.2% to 0.6% more copies of the service.
+modelled energy up (+0.06% at most, power given), with no extra modelled work for it, so the organism's work per energy
+reads LOSS in 22 of the 36 squares of 10 and 100 repetitions; and, in 5 squares, 0.2% to 0.6% more copies of the service
+(power given).
 
 The lease handed every knob back to native in every run. On this version GitHub reproduced the realms table in runs A,
 B and C (2,214 rows, 0 differences). **Goldilocks**, three runs of ten pairs (Omni-Compass on top of a service
 rightsized by Goldilocks and the Vertical Pod Autoscaler's recommender; class L): the average response 44% to 48%
-faster, the slowest 5% of responses 59% to 62% faster, time over the response line down 99% to 100%, lower in all three
+faster, the slowest 5% of responses 59% to 62% faster, time over the response line down 99% to 100%, GAIN in all three
 of our runs, on the same machines, for 1.9% to 2.6% more energy on the declared model, the power given
 ([`results/live/V5_GOLDILOCKS.md`](results/live/V5_GOLDILOCKS.md)). **The capacity test**, three runs (the same CPU cap
-in both arms, four cap levels): no difference beyond the noise at any cap, where the cap itself blocks the one lever
+in both arms, four cap levels): EVEN, no difference beyond the noise at any cap, where the cap itself blocks the one lever
 Omni-Compass has there, more copies of the service ([`results/live/V5_CAPACITY.md`](results/live/V5_CAPACITY.md)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
@@ -151,7 +182,7 @@ Omni-Compass is a supervisory governor. It does not replace your autoscaler or y
 the meters of each muscle (response time, utilisation, power, heat), and by default runs **at the max**: every muscle
 pushed to its own limit, never past it and never below native, riding the edge of its band, not the middle. It starts
 machines before the rush lands and clears work waiting in line, cools a room ahead of the heat, holds a battery's
-charge for the line, and runs an axis at its own peak while tasks wait. The energy that takes is **power given**, shown
+charge for the line, and runs an axis at its own peak while tasks wait. The energy that takes is **LOSS**, shown
 beside the work, the speed and the wear it bought; inside a body (an organism) it gives only what the body's lines can
 carry. One pedal, no brake: push for more, lift off for less, and lifting hands the setting back toward native; at idle
 the pool lifts to its floor of two machines, powered and ready. If Omni-Compass stops, the plug walks every setting back

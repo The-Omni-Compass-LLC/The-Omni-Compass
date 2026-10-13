@@ -110,8 +110,8 @@ def evaluate(row, params, seeds):
 
 
 def beats(c, d):
-    """Card c against the global setting d on the same seeds: (toward an aim somewhere beyond the noise, away from one
-    somewhere); the aims: fewer misses, more work, faster."""
+    """Card c against the global setting d on the same seeds: (a GAIN somewhere beyond the noise, a LOSS somewhere); the
+    aims: fewer misses, more work, faster."""
     toward = away = False
     for ld in c["per"]:
         a, b = c["per"][ld], d["per"][ld]
@@ -190,7 +190,7 @@ def cmd_confirm(a):
     with ProcessPoolExecutor(a.workers) as ex:
         res = list(ex.map(_confirm_job, jobs, chunksize=2))
     json.dump({"seeds": seeds, "search": a.search, "muscles": res}, open(a.out, "w"), indent=1)
-    t = collections.Counter("won again" if r["won"] else ("away from the global setting's aims" if r["away"] else "same as global")
+    t = collections.Counter("won again" if r["won"] else ("LOSS against the global setting" if r["away"] else "EVEN with the global setting")
                             for r in res)
     print(dict(t))
 
@@ -283,10 +283,10 @@ def cmd_report(a):
          "The engine's cards (`realms/muscle_cards_v5.csv`) and how they were found (`tools/tune_cards.py`,",
          "`docs/FORMAL_V5.md` section 5). Development seeds only: chosen on seeds "
          f"{s['seeds'][0]}-{s['seeds'][-1]}, confirmed on seeds {c['seeds'][0]}-{c['seeds'][-1]}; the preregistered seeds",
-         "3000-3009 were never read. A card is kept only if it moved the muscle beyond the noise toward its aims (fewer misses,",
-         "more work, faster) against today's global setting on both sets, moved none of them the other way, and never fell",
-         "behind native: on no seed of either set and under no load over its line more often, doing less work or clearing",
-         "its line later. Evidence class **S** (modelled).", "",
+         "3000-3009 were never read. A card is kept only if it read GAIN against today's global setting on both sets (fewer",
+         "misses, more work or faster, beyond the noise), read LOSS on none of the three, and never fell behind native: on no",
+         "seed of either set and under no load over its line more often, doing less work or clearing its line later (the key",
+         "to the words: `docs/HOW_TO_READ_THE_RESULTS.md`). Evidence class **S** (modelled).", "",
          "| Plant | Knob | Muscles searched | Won on the first seeds | Won again (the engine's cards) |",
          "|---|---|---:|---:|---:|"]
     tot = collections.Counter()

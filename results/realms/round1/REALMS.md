@@ -12,15 +12,15 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 | Organism | Muscles | Label | Work per energy | Work | Energy | Violations (pp) | Valid |
 |---|---:|---|---:|---:|---:|---:|---|
-| Compute / AI / Cloud | 250 | **AWAY FROM ITS AIM** | -2.6% (-3.2 to -2.1) | -0.0% (-0.1 to -0.0) | +2.7% (+2.1 to +3.2) | +0.2 (+0.1 to +0.3) | yes |
-| Physics / Robotics / Autonomous | 88 | **AWAY FROM ITS AIM** | -2.6% (-3.0 to -2.2) | -0.0% (-0.0 to +0.0) | +2.7% (+2.2 to +3.1) | +1.8 (+1.7 to +2.0) | yes |
-| Energy / Facility / Industrial | 121 | **AWAY FROM ITS AIM** | -1.2% (-1.4 to -0.9) | -1.9% (-2.2 to -1.7) | -0.7% (-0.8 to -0.7) | +2.2 (+2.0 to +2.5) | yes |
-| Distribution / Specialized | 197 | **AWAY FROM ITS AIM** | -5.4% (-6.3 to -4.6) | +0.0% (-0.0 to +0.0) | +5.7% (+4.8 to +6.7) | -0.3 (-0.4 to -0.2) | yes |
-| The whole tower (656 muscles) | 656 | **AWAY FROM ITS AIM** | -0.1% (-0.1 to -0.1) | -0.3% (-0.4 to -0.3) | -0.2% (-0.3 to -0.2) | +0.3 (+0.3 to +0.4) | yes |
+| Compute / AI / Cloud | 250 | **LOSS** | -2.6% (-3.2 to -2.1) | -0.0% (-0.1 to -0.0) | +2.7% (+2.1 to +3.2) | +0.2 (+0.1 to +0.3) | yes |
+| Physics / Robotics / Autonomous | 88 | **LOSS** | -2.6% (-3.0 to -2.2) | -0.0% (-0.0 to +0.0) | +2.7% (+2.2 to +3.1) | +1.8 (+1.7 to +2.0) | yes |
+| Energy / Facility / Industrial | 121 | **LOSS** | -1.2% (-1.4 to -0.9) | -1.9% (-2.2 to -1.7) | -0.7% (-0.8 to -0.7) | +2.2 (+2.0 to +2.5) | yes |
+| Distribution / Specialized | 197 | **LOSS** | -5.4% (-6.3 to -4.6) | +0.0% (-0.0 to +0.0) | +5.7% (+4.8 to +6.7) | -0.3 (-0.4 to -0.2) | yes |
+| The whole tower (656 muscles) | 656 | **LOSS** | -0.1% (-0.1 to -0.1) | -0.3% (-0.4 to -0.3) | -0.2% (-0.3 to -0.2) | +0.3 (+0.3 to +0.4) | yes |
 
 ## Every muscle alone, by realm
 
-| Realm | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID |
+| Realm | Muscles | GAIN (within the guardrails) | GAIN AND LOSS (energy cut, service traded for it) | EVEN (inside the noise, within the guardrails) | EVEN (not established: inside the noise, a guardrail crossed on the mean) | LESS WORK PER ENERGY | INVALID |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Compute / AI / Cloud | 250 | 43 | 11 | 71 | 4 | 121 | 0 |
 | Physics / Robotics / Autonomous | 88 | 22 | 7 | 47 | 9 | 3 | 0 |
@@ -30,7 +30,7 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 ## By knob: what kind of authority Omni held
 
-| Knob | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID | Median work per energy |
+| Knob | Muscles | GAIN (within the guardrails) | GAIN AND LOSS (energy cut, service traded for it) | EVEN (inside the noise, within the guardrails) | EVEN (not established: inside the noise, a guardrail crossed on the mean) | LESS WORK PER ENERGY | INVALID | Median work per energy |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | capacity | 344 | 60 | 2 | 36 | 18 | 228 | 0 | -10.9% |
 | setpoint | 55 | 26 | 20 | 6 | 3 | 0 | 0 | +3.3% |
@@ -96,16 +96,16 @@ For 55 of 55 setpoint muscles, a fixed setpoint at the calm end of the declared 
 
 | Muscle | Family | Knob | Label | Work per energy | Work | Violations (pp) |
 |---|---|---|---|---:|---:|---:|
-| pressure_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +33.5% (+31.5 to +35.4) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| tank_level_target | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +32.7% (+30.3 to +35.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| valve_position | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +32.6% (+30.6 to +34.7) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| furnace_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +32.6% (+30.5 to +34.7) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| mass_flow_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +32.5% (+30.1 to +34.9) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| temperature_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +32.2% (+30.2 to +34.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| pulse_duration | Quantum Computing Control Simulation | setpoint | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | +13.1% (+12.0 to +14.3) | -0.0% (-0.0 to +0.0) | +0.6 (-0.1 to +1.4) |
-| reservoir_level_target | Water Wastewater & Pumping | setpoint | SUPERIOR WITHIN GUARDRAILS | +12.9% (+11.8 to +14.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| valve_position_water | Water Wastewater & Pumping | setpoint | SUPERIOR WITHIN GUARDRAILS | +12.9% (+11.8 to +13.9) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| line_pressure_target | Water Wastewater & Pumping | setpoint | SUPERIOR WITHIN GUARDRAILS | +12.6% (+11.4 to +13.8) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| pressure_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +33.5% (+31.5 to +35.4) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| tank_level_target | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +32.7% (+30.3 to +35.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| valve_position | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +32.6% (+30.6 to +34.7) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| furnace_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +32.6% (+30.5 to +34.7) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| mass_flow_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +32.5% (+30.1 to +34.9) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| temperature_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +32.2% (+30.2 to +34.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| pulse_duration | Quantum Computing Control Simulation | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +13.1% (+12.0 to +14.3) | -0.0% (-0.0 to +0.0) | +0.6 (-0.1 to +1.4) |
+| reservoir_level_target | Water Wastewater & Pumping | setpoint | GAIN (within the guardrails) | +12.9% (+11.8 to +14.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| valve_position_water | Water Wastewater & Pumping | setpoint | GAIN (within the guardrails) | +12.9% (+11.8 to +13.9) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| line_pressure_target | Water Wastewater & Pumping | setpoint | GAIN (within the guardrails) | +12.6% (+11.4 to +13.8) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
 | bandwidth_limit | Network Routing & Switching | capacity | LESS WORK PER ENERGY | -38.3% (-50.2 to -26.4) | +0.0% (-0.0 to +0.0) | -0.1 (-0.4 to +0.3) |
 | object_replication | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -36.2% (-46.8 to -25.6) | +0.0% (-0.0 to +0.0) | +0.1 (-0.4 to +0.7) |
 | throughput_limit | Storage Block/File/Object | capacity | LESS WORK PER ENERGY | -33.9% (-41.4 to -26.5) | -0.0% (-0.0 to +0.0) | -0.1 (-0.8 to +0.5) |

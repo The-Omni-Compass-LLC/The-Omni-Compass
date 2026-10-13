@@ -39,10 +39,10 @@ def table(rows, width):
     for i, r in enumerate(rows[1:], 1):
         if i % 2 == 0:
             style.append(("BACKGROUND", (0, i), (-1, i), colors.HexColor("#f2f5f8")))
-        last = r[-1].lower()
-        if "toward" in last:
+        last = r[-1]
+        if "GAIN" in last and "LOSS" not in last:                # the reading's word (tools/readings.py)
             style.append(("TEXTCOLOR", (-1, i), (-1, i), colors.HexColor("#1b7f3b")))
-        elif "away" in last:
+        elif "LOSS" in last:
             style.append(("TEXTCOLOR", (-1, i), (-1, i), colors.HexColor("#b3261e")))
     t.setStyle(TableStyle(style))
     return t

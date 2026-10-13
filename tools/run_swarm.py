@@ -24,7 +24,7 @@ own thrust and torque constants (torque = KM rpm^2, power = torque x angular spe
 efficiency, plus a declared avionics draw for every drone over the whole fleet window, flying or landed. The battery is
 the Crazyflie's (250 mAh at 3.7 V); the autopilot's own reserve rule (20% left at landing) decides a reserve breach.
 Collisions are read from the simulator: any two drones closer than two collision radii. A cell with a collision in
-either arm is void and says so. Every row is reported, losses included.
+either arm is void and says so. Every row is reported, LOSS included.
 
   python3 tools/run_swarm.py --cell tuning --out DIR        # the tuning swarm (5 drones, mixed distances)
   python3 tools/run_swarm.py --cell short --out DIR         # an untouched cell: short | mixed | long (20 drones)
@@ -83,8 +83,8 @@ CELLS = {
     "long": (20, 4, (8.0, 8.0), 13, False),
 }
 
-GAUGES = [("energy_per_mission_j", "energy per mission (J, declared model: motors and avionics over the fleet window)", "lower"),
-          ("fleet_energy_j", "fleet energy over the window (J, declared model)", "lower"),
+GAUGES = [("energy_per_mission_j", "energy per mission (J, declared model: motors and avionics over the fleet window)", "spent"),
+          ("fleet_energy_j", "fleet energy over the window (J, declared model)", "spent"),
           ("missions_per_charge", "missions per charge at the autopilot's reserve", "higher"),
           ("late_share", "missions over their deadline (share)", "never more"),
           ("reserve_breaches", "drones that broke the battery reserve", "never more"),

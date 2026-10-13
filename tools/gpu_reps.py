@@ -35,6 +35,7 @@ try:                                                       # the legal notice ev
     from tools.legal import stamp as _legal_stamp
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
+from tools.readings import word as gel_word, labelled, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (the words every table uses)
 from pathlib import Path
 
 U_AUTHORITY = 25.0          # omnicompass/core.py: the U-channel command's bound (saturation)
@@ -49,6 +50,9 @@ LOWER = {"energy, whole machine at the wall (J)", "energy, GPU (J)", "energy per
          "temperature, mean (C)", "requests not served", "response time, mean (ms)", "response time, 95th percentile (ms)",
          "response time, 99th percentile (ms)", "energy, CPU package (J)", "energy, rest of the machine (J)",
          "energy, DRAM (J)", "energy, platform psys (J)", "energy, GPU device counter (J)"}
+# the resources a card spends (energy, power and the heat they make): a fall is a cut, a GAIN; a rise is power given, never
+# a loss (tools/readings.py). Time waited and requests not served are LOSS when they rise; work and work per energy aim higher.
+SPENT = {k for k in LOWER if k.startswith(("energy", "power", "temperature"))}
 PRIMARY = "work per energy (served requests per kJ)"
 WALL = "work per wall energy (served requests per kJ, whole machine)"
 KEYS = [PRIMARY, WALL, "energy, whole machine at the wall (J)", "energy, GPU (J)", "energy per served request (J)", "power, GPU mean (W)", "requests served", "requests not served",
@@ -352,24 +356,26 @@ def label(prim, g_served, g_p95, g_lost, valid, observation=None):
     either way, the effect cannot be credited to Omni's authority and no omni result is published."""
     if not valid:
         return "INVALID"
-    if observation in ("toward its aim, proven", "away from its aim, proven"):
+    if (observation or "").endswith(", proven"):
         return "NOT ATTRIBUTABLE: WATCH DIFFERS FROM NATIVE"
     ok = g_served and g_p95 and g_lost
-    if prim == "toward its aim, proven":
+    if prim == f"{GAIN}, proven":
         return "SUPERIOR WITHIN GUARDRAILS" if ok else "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
-    if prim == "away from its aim, proven":
+    if prim in (f"{LOSS}, proven", f"{GIVEN}, proven"):
         return "AWAY FROM ITS AIM"
     return "NONINFERIOR / INCONCLUSIVE" if ok else "NOT ESTABLISHED"
 
 
 def verdict(k, mean, half, n):
+    """A gauge's word against the base, by what it is for (GAIN, LOSS, or power given for a resource spent that rose), and
+    whether its 95% interval clears zero (proven) or not; EVEN when it did not move."""
     if n < 2 or math.isnan(half):
         return "not proven (too few repetitions)"
     if abs(mean) < 1e-12 and half < 1e-12:
-        return "equal"
-    toward = (mean < 0) == (k in LOWER)                     # LOWER: the gauges whose declared aim is lower
+        return f"{EVEN}, the same"
+    aim = "spent" if k in SPENT else "lower" if k in LOWER else "higher"
     proven = mean - half > 0 or mean + half < 0
-    return ("toward its aim" if toward else "away from its aim") + (", proven" if proven else ", not proven")
+    return f"{gel_word(mean < 0, aim)}, " + ("proven" if proven else "not proven")
 
 
 def main(root):
@@ -490,7 +496,7 @@ def main(root):
               f"Authority (omni against watch): {av or 'n/a'}.",
               *([f"Whole machine at the wall (smart plug Omni never reads): {po[WALL]['verdict']}, "
                  f"{_f(po[WALL]['native'])} -> {_f(po[WALL]['omni'])} served requests per kJ."] if WALL in po else []),
-              f"**Result, by rule: {head}.**", ""]
+              f"**Result, by rule: {labelled(head)}.**", ""]
     L += receipt_lines(checks)
     crows, cby = credit(root, dirs)
     out["credit"] = {"writes": crows, "by_decider": cby}

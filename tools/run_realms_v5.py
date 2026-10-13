@@ -43,6 +43,7 @@ try:
 except ImportError:
     from tools.legal import stamp as _legal_stamp  # pragma: no cover
 
+from tools.readings import GAIN, LOSS, GAIN_AND_LOSS, labelled  # noqa: E402  (the words every table uses)
 from realms.harness import (catalog, run_muscle_arm, run_bodies, Body, paired, paired_organism, interval, scale_load,
                             TOWER, STACK, KILL_AT, WALK, LINE)
 from realms.compass_arm_v5 import native_at_limit
@@ -55,9 +56,13 @@ NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomou
          "distribution_specialized": "Distribution / Specialized", STACK: "The four stacked, every shared muscle in each",
          TOWER: "The whole tower, every muscle once"}
 GAINS = ["MORE WORK", "FASTER", "FEWER MISSES"]
-TOWARD, BOTH, AWAY = "TOWARD ITS AIMS", "BOTH WAYS", "AWAY FROM ITS AIMS"   # its aims: more work, faster, fewer misses
-KINDS = [TOWARD, "SAME AS NATIVE", "AT ITS LIMIT ON NATIVE", BOTH, AWAY, "INVALID"]
-RECORDED = {"MIXED": BOTH, "WORSE": AWAY}   # the same kinds in the results written before 13 October, read as they were written
+# The kinds, by the muscle's three aims (more work, faster, fewer misses), in the words every table uses (tools/readings.py):
+# GAIN (some aim toward and none away), EVEN (the same as native, or at its limit on native), GAIN AND LOSS, LOSS
+TOWARD, BOTH, AWAY = GAIN, GAIN_AND_LOSS, LOSS
+SAME, AT_LIMIT = "SAME AS NATIVE", "AT ITS LIMIT ON NATIVE"
+KINDS = [TOWARD, SAME, AT_LIMIT, BOTH, AWAY, "INVALID"]
+# the same kinds as the results written before (13 October and earlier) named them, read as they were written
+RECORDED = {"MIXED": BOTH, "WORSE": AWAY, "BOTH WAYS": BOTH, "AWAY FROM ITS AIMS": AWAY, "TOWARD ITS AIMS": TOWARD}
 LOADS = {"normal": "the organism's own load", "climb": "the climb (1 2 3 2 3 4 ..., level 4 = own load, 8 = twice it)",
          "line": f"work waiting in line (a {LINE:.0%} share of the run's own work waiting when it starts)"}
 MUSCLE_LOADS = {"normal": "its own load", "line": f"work waiting in line ({LINE:.0%} of the run's own work at the start)"}
@@ -93,12 +98,12 @@ def gains_losses(per_seed):
 def label_max(per_seed, valid=True, at_limit=False):
     """The max's label by rule, against the muscle's three aims (more work, its line cleared sooner, fewer misses):
       the gains, joined (MORE WORK + FASTER + FEWER MISSES, or any of them)   at least one toward its aim and none away:
-                               kind TOWARD ITS AIMS
-      SAME AS NATIVE           no difference beyond the noise
+                               kind GAIN
+      SAME AS NATIVE           no difference beyond the noise: EVEN
       AT ITS LIMIT ON NATIVE   no difference, and native already runs the knob at the top of its range (the max wrote
-                               nothing: there is nothing above native to give it)
-      BOTH WAYS                one toward its aim and one away (less work, slower or more misses)
-      AWAY FROM ITS AIMS       one away and none toward
+                               nothing: there is nothing above native to give it): EVEN
+      GAIN AND LOSS            one toward its aim and one away (less work, slower or more misses)
+      LOSS                     one away and none toward
       INVALID                  a knob not handed back to native by the lease"""
     if not valid:
         return "INVALID"
@@ -107,7 +112,7 @@ def label_max(per_seed, valid=True, at_limit=False):
         return BOTH if gains else AWAY
     if gains:
         return " + ".join(gains)
-    return "AT ITS LIMIT ON NATIVE" if at_limit else "SAME AS NATIVE"
+    return AT_LIMIT if at_limit else SAME
 
 
 def kind_of(label):
@@ -153,7 +158,7 @@ def muscle_load(row, seeds, load):
 
 def muscle_job(args):
     """Every load of one muscle, and its label over all of them: toward its aims under some load and away under none is
-    TOWARD ITS AIMS."""
+    GAIN."""
     row, seeds = args
     by = {load: muscle_load(row, seeds, load) for load in MUSCLE_LOADS}
     valid = all(o["valid"] for o in by.values())
@@ -168,8 +173,7 @@ def muscle_job(args):
     elif gains:
         label = " + ".join(g for g in GAINS if g in gains)
     else:
-        label = ("AT ITS LIMIT ON NATIVE" if all(o["label"] == "AT ITS LIMIT ON NATIVE" for o in by.values())
-                 else "SAME AS NATIVE")
+        label = AT_LIMIT if all(o["label"] == AT_LIMIT for o in by.values()) else SAME
     return {"row": row, "valid": valid, "label": label, "loads": by,
             "writes": max(o["writes"] for o in by.values())}
 
@@ -279,11 +283,11 @@ def write_md(out, res, orgs, run):
           "unit-hours, battery throughput, motor heat, actuator duty), shown beside the work, never judged. 95% intervals "
           "over seeds.")
         w("")
-        w("| Organism | Muscles | Label | Work | Misses, native → omni | Misses (pp) | Power given | Wear | Work per energy | Valid |")
+        w("| Organism | Muscles | Reading | Work | Misses, native → omni | Misses (pp) | Power given | Wear | Work per energy | Valid |")
         w("|---|---:|---|---:|---|---:|---:|---:|---:|---|")
         for name in [n for n in REALMS + [STACK, TOWER] if n in orgs[load]]:
             o = orgs[load][name]; s = o["summary"]
-            w(f"| {NAMES[name]} | {o['n']} | **{o['label']}** | {fmt(s['work'], 100.0)} | {misses_line(o['totals'])} | "
+            w(f"| {NAMES[name]} | {o['n']} | **{labelled(o['label'])}** | {fmt(s['work'], 100.0)} | {misses_line(o['totals'])} | "
               f"{fmt(s['viol_pp'], 1.0, '')} | {fmt(s['energy'])} | {o['wear'] * 100:+.2f}% | {fmt(s['primary'])} | "
               f"{'yes' if o['valid'] else 'NO'} |")
         w("")
@@ -303,20 +307,23 @@ def write_md(out, res, orgs, run):
     w("## Every muscle alone, by home realm")
     w("")
     w(f"Each muscle runs under {len(MUSCLE_LOADS)} loads, " + " and ".join(f"{v} ({k})" for k, v in MUSCLE_LOADS.items())
-      + ". **Toward its aims**: at least one of its three aims moved beyond the noise under some load (more work, faster: "
-      "the line cleared sooner, fewer misses) and none the other way under any. **Both ways**: one toward its aim and one "
-      "away (less work, slower or more misses). **Away from its aims**: one away and none toward. **At its limit on native**: native already runs the knob at the top of its "
-      "range (full clock, full speed, full torque, full battery power, nothing paced or turned away), so the max has "
-      "nothing above native to give it and writes nothing. **Same as native**: the max acted or could, and the result is "
-      "no different beyond the noise (native already did all the work that came and was almost never over its line).")
+      + ". Each muscle's word is judged by its three aims, never by the sign of a number (the key: "
+      "`docs/HOW_TO_READ_THE_RESULTS.md`). **GAIN**: at least one of its three aims moved beyond the noise under some load "
+      "(more work, faster: the line cleared sooner, fewer misses) and none the other way under any. **GAIN AND LOSS**: one "
+      "toward its aim and one away (less work, slower or more misses). **LOSS**: one away and none toward. **EVEN, at its "
+      "limit on native**: native already runs the knob at the top of its range (full clock, full speed, full torque, full "
+      "battery power, nothing paced or turned away), so the max has nothing above native to give it and writes nothing. "
+      "**EVEN, the same as native**: the max acted or could, and the result is no different beyond the noise (native "
+      "already did all the work that came and was almost never over its line). The energy the max takes is power given, "
+      "shown beside the work, never judged.")
     w("")
-    w("| Realm | Muscles | Toward its aims | of them: more work | faster | fewer misses | Same as native | At its limit on native | Both ways | Away from its aims | Invalid |")
+    w("| Realm | Muscles | GAIN | of them: more work | faster | fewer misses | EVEN, the same as native | EVEN, at its limit on native | GAIN AND LOSS | LOSS | Invalid |")
     w("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
 
     def count_row(rs):
         c = Counter(kind_of(r["label"]) for r in rs)
         g = [sum(1 for r in rs if kind_of(r["label"]) == TOWARD and x in r["label"]) for x in GAINS]
-        return [len(rs), c.get(TOWARD, 0), *g, c.get("SAME AS NATIVE", 0), c.get("AT ITS LIMIT ON NATIVE", 0),
+        return [len(rs), c.get(TOWARD, 0), *g, c.get(SAME, 0), c.get(AT_LIMIT, 0),
                 c.get(BOTH, 0), c.get(AWAY, 0), c.get("INVALID", 0)]
     for realm in REALMS:
         w(f"| {NAMES[realm]} | " + " | ".join(str(x) for x in count_row([r for r in res if r["row"]["realm"] == realm])) + " |")
@@ -329,7 +336,7 @@ def write_md(out, res, orgs, run):
           "start, native → omni (and the share still waiting at the end, where it did not clear). Power given: energy "
           "against native's.")
         w("")
-        w("| Plant | Knob | Muscles | Omni acts on | Toward its aims | At its limit on native | Misses, native → omni | Work | Line, native → omni | Power given | Wear |")
+        w("| Plant | Knob | Muscles | Omni acts on | GAIN | EVEN, at its limit on native | Misses, native → omni | Work | Line, native → omni | Power given | Wear |")
         w("|---|---|---:|---:|---:|---:|---|---:|---|---:|---:|")
         groups = defaultdict(list)
         for r in res:
@@ -348,7 +355,7 @@ def write_md(out, res, orgs, run):
             else:
                 ln = "no line"
             toward = sum(1 for o in os_ if kind_of(o["label"]) == TOWARD)
-            lim = sum(1 for o in os_ if o["label"] == "AT ITS LIMIT ON NATIVE")
+            lim = sum(1 for o in os_ if o["label"] == AT_LIMIT)
             w(f"| {t} | {k} | {len(rs)} | {sum(1 for o in os_ if o['writes'] > 0)} | {toward} | {lim} | "
               f"{100.0 * vn / st:.2f}% → {100.0 * vm / st:.2f}% | {wk * 100:+.3f}% | {ln} | {en * 100:+.2f}% | "
               f"{sum(o['wear'] for o in os_) / len(os_) * 100:+.2f}% |")
@@ -357,11 +364,11 @@ def write_md(out, res, orgs, run):
     w("")
     away = [r for r in res if kind_of(r["label"]) in (AWAY, BOTH)]
     acted = sum(1 for r in res if r["writes"] > 0)
-    lim = sum(1 for r in res if r["label"] == "AT ITS LIMIT ON NATIVE")
+    lim = sum(1 for r in res if r["label"] == AT_LIMIT)
     w(f"- Omni acts on **{acted}** of {len(res)} muscles alone. **{lim}** are at their limit on native (the knob is "
-      "already at the top of its range); the rest it could act on show nothing beyond the noise to gain.")
-    w(f"- Muscles alone labelled **away from its aims** or **both ways** under any load: **{len(away)}**"
-      + ("." if not away else ": " + ", ".join(f"{r['row']['muscle']} ({r['row']['knob']}, {kind_of(r['label']).lower()})" for r in away) + "."))
+      "already at the top of its range: EVEN); the rest it could act on show nothing beyond the noise to gain.")
+    w(f"- Muscles alone that read **LOSS** or **GAIN AND LOSS** under any load: **{len(away)}**"
+      + ("." if not away else ": " + ", ".join(f"{r['row']['muscle']} ({r['row']['knob']}, {kind_of(r['label'])})" for r in away) + "."))
     w("- The lease hands every knob back to native before each run ends: "
       f"{sum(1 for r in res if r['valid'])} of {len(res)} muscles under every load; "
       + ", ".join(f"{sum(1 for o in orgs[load].values() if o['valid'])} of {len(orgs[load])} organisms under {load}"

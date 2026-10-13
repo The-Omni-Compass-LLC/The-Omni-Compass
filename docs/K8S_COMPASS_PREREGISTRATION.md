@@ -140,7 +140,7 @@ including the share of response samples over the line (`pilot/bench_report.py`).
 
 **The fault test, first run** (run 37094604580, commit `a149d4e`; `results/live/FAULTS.md`). Omni-Compass on top
 recovered faster than native from every fault (allocation law: machine down −29%, runaway pod −35%, spike −7%; compass
-law: −14%, −17%, −6%), p95 −53% and −55%, p99 −27% (not significant) and −57%. One measure moved away from its aim: with the compass law,
+law: −14%, −17%, −6%), p95 −53% and −55%, p99 −27% (not significant) and −57%. One measure read LOSS: with the compass law,
 **HPA replicas +8.2%** (+0.41 to +0.99, significant), with CPU and machines unchanged and no energy saved, so outside
 the one rule (`DISCLOSURES.md`, section 3). The cause: past the wall the compass lowers the HPA target at once (more pods,
 the faster recovery), then handed the operator's target back step by step and held each step for the autoscaler's
@@ -153,7 +153,7 @@ held by the window. More pods only while the fault lasts. The re-run is the same
 rule (set 30 F); set 30 runs the same code without faults, to show nothing else moved.
 
 **Set 30 and set 30 F** (runs 37105047258 and 37105046042, commit `acc1c4e`; `results/live/LIVE_REPS_30.md`,
-`results/live/FAULTS_30.md`). Set 30, no faults: nothing significantly away from its aim in either arm; the compass law's machines
+`results/live/FAULTS_30.md`). Set 30, no faults: no LOSS clear of the noise in either arm; the compass law's machines
 −9.9%, p95 −64.9%, time over the line −98.7%, HPA replicas −32.2%, total CPU −6.5%. Set 30 F: recovery faster than native
 from every fault in both arms; the compass law's HPA replicas **+5.6%** (first run +8.2%), still significant, with CPU and
 machines unchanged. The allocation law, which recovers as fast or faster, held no extra pods (+2.0%, not significant).
@@ -167,8 +167,8 @@ Set 31 F is the same fault test, arms, load, duration and rule; set 31 the same 
 
 **Set 31 and set 31 F** (runs 37110007121 and 37110005322, commit `0a38e76`; `results/live/LIVE_REPS_31.md`,
 `results/live/FAULTS_31.md`). Set 31 F: the compass law's HPA replicas under faults **−1.1%** (not significant): the extra
-pods are gone. Nothing significantly away from its aim in either arm; recovery faster than native from every fault (compass law,
-machine down −49%). Set 31: nothing significantly away from its aim; the compass law's machines −10.4%, p95 −66.0%, p99 −73.0%, time over
+pods are gone. No LOSS clear of the noise in either arm; recovery faster than native from every fault (compass law,
+machine down −49%). Set 31: no LOSS clear of the noise; the compass law's machines −10.4%, p95 −66.0%, p99 −73.0%, time over
 the line −99.4%, HPA replicas −44.5%, pods started 0 against native's 4.3, total CPU −6.1%.
 
 ## The bill on a real cloud (written before its run)
@@ -196,7 +196,7 @@ back saves only a declared model's energy. On a real cloud the machine is delete
   this count.
 - **Outcomes.** Billed machine-hours and the bill (the aim is lower), and every gauge of sets 28 and 29 (response time,
   failures, pods waiting, CPU including Omni-Compass's own), paired against native with 95% intervals over 5
-  repetitions. Labelled by the one rule (`DISCLOSURES.md`, section 3): nothing more than 2% away from its aim, and only where the
+  repetitions. Labelled by the one rule (`DISCLOSURES.md`, section 3): no LOSS of more than 2%, and only where the
   bill or energy is saved.
 - **Housekeeping.** One repetition at a time; each cluster deleted when its arm ends, before the next is made; the
   resource group deleted at the end of every repetition whatever happens. It needs the repository secret
@@ -212,7 +212,7 @@ generators, 200 s a step, 1,600 measured seconds; `load_steps` in `benchmark-rep
 step at which no more than 5% of the response samples (every 5 s, through the Service) are over the line (500 ms) or
 failed, every lower step holding too, the first 30 s of each step left to settle (`tools/live_reps.py`, `capacity`).
 Reported: each arm's mean capacity in requests a second, its change against native and the 95% interval of the paired
-difference over 10 repetitions; every usual gauge beside it. Labelled by the one rule: nothing more than 2% away from its aim.
+difference over 10 repetitions; every usual gauge beside it. Labelled by the one rule: no LOSS of more than 2%.
 
 
 ## The fairness test (written before its run)
@@ -225,18 +225,18 @@ same HPA rule, whose own fixed-rate load surges in steps (0, 0, 6, 0, 6, 0 load 
 same moments in every arm). Each application's response time is probed through its own Service. Omni-Compass governs
 both HPAs (`deploy/kind/rbac-omni-noisy.yaml`: the second HPA and nothing else more). Reported: every usual gauge for
 php-apache, and the neighbour's p95, p99, time over the line and failed requests, each paired against native over 10
-repetitions with its 95% interval. The label is the one rule, applied to both applications: nothing more than 2% away from its aim
+repetitions with its 95% interval. The label is the one rule, applied to both applications: no LOSS of more than 2%
 for either.
 
 ## The capacity and fairness results, and the amendment they call for (2026-10-03 evening, before either is run again)
 
 **Capacity** (`results/live/CAPACITY.md`, run 37150909816): the compass law served 33.0 requests a second within the line
 against native's 24.6, **+34.1% (95% interval of the paired difference +6.2 to +10.6 requests a second)**, with
-response times about half of native's and fewer failures. One measure significantly away from its aim: pods started 7.3 against
+response times about half of native's and fewer failures. One measure significantly LOSS: pods started 7.3 against
 5.6 (+30.4%) while the mean HPA replicas were 26.9% lower: churn, not more pods. **Fairness**
 (`results/live/FAIRNESS.md`, run 37154210570): the neighbour unharmed under both laws; with the compass law php-apache's
 failed requests 3.89% to 4.90% (+0.12 to +1.90 points), pending pods and pod start wait higher, no machine saved. By the
-one rule neither result is labelled toward its aims. Both causes are read from the controller's code; both corrections are
+one rule neither result is labelled GAIN. Both causes are read from the controller's code; both corrections are
 stated here, as law, before the tests run again.
 
 **1. Only a sensed muscle moves (the fairness cause).** Let the probe measure the response time of the services in a
@@ -280,7 +280,7 @@ the operator's target. Labelled by the one rule. Every number, whatever it says,
 
 All three on commit `199f350`, 10 paired repetitions each, the design unchanged.
 
-- **Fault test, set 32 F** (`results/live/FAULTS_32.md`, run 37162459956): **no measure significantly away from its aim under
+- **Fault test, set 32 F** (`results/live/FAULTS_32.md`, run 37162459956): **no LOSS clear of the noise under
   either law.** The compass law recovers from a lost machine 58% faster and starts 34% fewer pods; the amendment left the
   fault behaviour of set 31 F intact.
 - **Fairness** (`results/live/FAIRNESS_2.md`, run 37162458834): **correction 1 holds.** With the compass law php-apache's
@@ -293,8 +293,8 @@ All three on commit `199f350`, 10 paired repetitions each, the design unchanged.
   starts** (5.1 against 3.8, +34.2%; before +30.4%): its premise, that the extra starts were pods removed and started
   again between steps, is not borne out. With the mean replicas lower, the reading the data support is pods started
   earlier on a rising load, the mechanism of the added capacity. Correction 2 stays (it removes no gain and added no
-  measure away from its aim); the pod-start rows stand as measured, and by the one rule neither the capacity nor the fairness arm
-  is labelled toward its aims while they do.
+  measure power given); the pod-start rows stand as measured, and by the one rule neither the capacity nor the fairness arm
+  is labelled GAIN while they do.
 
 ## The pod record, and the second amendment (2026-10-04, before the next runs)
 
@@ -363,17 +363,17 @@ commit `5d2e238` (rule 3 alone), so each rule's effect stays separable.
 
 `results/live/AMENDMENT_2_RUNS.md`, commit `5d2e238` (rule 3 alone), 10 paired repetitions each.
 
-- **Capacity: no measure significantly away from its aim under either law.** Compass law 24.6 against native's 17.4 requests a
+- **Capacity: no LOSS clear of the noise under either law.** Compass law 24.6 against native's 17.4 requests a
   second, +41.4% (+5.4 to +9.0); allocation law 25.2, +44.8% (+4.9 to +10.7). The compass law's pods started 5.7 against
   4.1, interval −0.64 to +3.84: no longer significant. Rule 3 removed the significant pod-start excess and lifted the
   allocation law's capacity from +0.0% to +44.8%.
-- **Faults: no measure significantly away from its aim under either law.**
-- **Fairness: the compass law, no measure significantly away from its aim for either application.** The allocation law: php-apache
+- **Faults: no LOSS clear of the noise under either law.**
+- **Fairness: the compass law, no LOSS clear of the noise for either application.** The allocation law: php-apache
   much lower, and the neighbour's failed requests **+0.74 points (+0.19 to +1.28), significant**. The allocation law
   conveys idle CPU to the service it senses; on machines shared with a surging neighbour that CPU is the neighbour's
-  headroom. The allocation law is not labelled toward its aims in this test.
+  headroom. The allocation law is not labelled GAIN in this test.
 
-**Standing after rule 3: the compass law is clean in all three tests** (no measure significantly away from its aim, capacity +41.4%).
+**Standing after rule 3: the compass law is clean in all three tests** (no LOSS clear of the noise, capacity +41.4%).
 Rule 4 (a lower target never held) runs next on commit `583c97f`, beside these, to see whether it adds capacity without
 costing a row.
 
@@ -400,21 +400,21 @@ are counted in the HPA replicas row, so the receipt shows what the capacity cost
 
 ## The third and fourth amendments, and the bill on a real cloud: results (2026-10-04)
 
-**Rule 4** (`results/live/AMENDMENT_3_RUNS.md`, commit `583c97f`): **the compass law has no measure more than 2% away from its aim in
-any of the three tests.** Capacity +48.1% (+5.7 to +9.9), nothing away from its aim; fairness, neither application away from its aim (energy
-per core-hour on the declared standby model +1.5%, inside the allowance); faults, nothing away from its aim, lost-machine recovery
-−61%. The allocation law: capacity +55.6%, nothing away from its aim; in fairness the neighbour no longer away from its aim. The first runs with
+**Rule 4** (`results/live/AMENDMENT_3_RUNS.md`, commit `583c97f`): **the compass law has no LOSS of more than 2% on any measure in
+any of the three tests.** Capacity +48.1% (+5.7 to +9.9), no LOSS; fairness, no LOSS for either application (energy
+per core-hour on the declared standby model +1.5%, inside the allowance); faults, no LOSS, lost-machine recovery
+−61%. The allocation law: capacity +55.6%, no LOSS; in fairness the neighbour no longer LOSS. The first runs with
 the real machine metered: a 4-core GitHub runner 48% to 70% busy, where kind's "used / allocatable" reads 0.07 to 0.10.
 
 **Rule 5, the replica lever** (`results/live/REPLICA_ROOM.md`, commit `2101c3d`, ceiling 30): the compass law served 24.6
 requests a second, the same as without the lever, with 78% more pods and 26 pod starts against native's 4.6, both
 significant. **The replica cap was not what limited the service; the machine doing the work was.** The lever stays,
 off by default, as the operator's to grant where machines have room; it is not part of Omni-Compass's default setting
-and this setting is not labelled toward its aims.
+and this setting is not labelled GAIN.
 
 **The bill on a real cloud** (`results/live/AKS_BILL.md`, run 37187059424, commit `5b2832f`, four paired repetitions):
 **no difference in the bill either way** (allocation law −0.6%, compass law +0.8%, intervals across zero) and no measure
-significantly away from its aim. Azure's own autoscaler already ran the workload on about 1.86 of 4 workers, so this light
+significantly power given. Azure's own autoscaler already ran the workload on about 1.86 of 4 workers, so this light
 workload leaves no machine to give back. The machine savings measured on kind, where native has no node autoscaler, do
 not carry to a cloud with one at this load; that is the reading of record. The preregistered size `Standard_D2s_v5` is
 not allowed in the subscription's region; `Standard_D2s_v4` (same 2 vCPU, 8 GiB and list price) was used. Three
@@ -430,7 +430,7 @@ native with Omni-Compass on top bill fewer machine-hours than native alone when 
 bill metered every 15 s, arms native / compass / omni rotated, five repetitions), with the open-loop load in bursts
 (`load_steps` 1 6 1 8 1 6, six steps over 1,800 measured seconds, the same steps in every arm). Reported: machine-hours
 and the bill at list price, paired against native with their 95% intervals, beside every service gauge. Labelled by the
-one rule: a lower bill counts only if nothing is more than 2% away from its aim.
+one rule: a lower bill counts only if nothing is a LOSS of more than 2%.
 
 
 ## The six organisms with the real cluster inside (written before its run, 2026-10-04)
@@ -463,7 +463,7 @@ seconds. Seed 6000 for every organism and arm.
 
 Reported in `SIX_KUBE.md` (`tools/six_kube_report.py`): twelve columns of means, then per organism every gauge paired
 against native with its 95% interval. Cluster rows are measured; organism rows are models (evidence S). Each organism is
-labelled by the one rule: no measure more than 2% away from its aim (CPU and host load shown, not judged), and a gain counts only
+labelled by the one rule: no LOSS of more than 2% on any measure (CPU and host load shown, not judged), and a gain counts only
 where energy or the bill is lower with an interval wholly below zero.
 
 
@@ -484,7 +484,7 @@ On the real cluster, in every organism, native + Omni was late less often and an
 | The whole tower (656) | 25.8% → 14.7% (lower, -43%, inside the noise) | 2,085 → 1,247 (lower, -40%, inside the noise) | 12.8% → 9.1% |
 | The four stacked (1,226) | 55.6% → 43.0% (lower, -23%) | 3,703 → 2,803 (lower, -24%) | 31.7% → 27.6% |
 
-No measure moved away from its aim beyond the noise in any organism. Energy (declared model) and CPU moved by under 3%, lower
+No measure read LOSS beyond the noise in any organism. Energy (declared model) and CPU moved by under 3%, lower
 with Omni in every organism. The modelled organisms around the cluster: work the same, energy 0.1-0.2% lower, time over
 the line 0.5-2% lower, in every organism (evidence S).
 
@@ -506,12 +506,12 @@ peak: the highest load step at which no more than 5% of response samples are ove
 lower step too). The fall is where machines are no longer needed and can be handed back. Over the whole window:
 p95 response time, worker machines in service, energy (declared model; on kind it is not a meter), CPU with Omni's own.
 
-Reported for each, native + Omni against native, paired, with the 95% interval and read in words (lower or higher):
+Reported for each, native + Omni against native, paired, with the 95% interval and read in words (GAIN, EVEN or LOSS):
 work (capacity, requests a second inside the line), speed (p95), machines (worker machines in service, mean), energy.
 
 ## The Omni index: one number for more for the same, or the same for less (written before its first use, 2026-10-04)
 
-Each measure is turned into a ratio oriented so that above 1 moved toward its aim for Omni-Compass:
+Each measure is turned into a ratio oriented so that above 1 is a GAIN for Omni-Compass:
 
 - work: work with Omni / work native (capacity, requests served, work done)
 - speed: p95 native / p95 with Omni (a lower response time is faster)
@@ -528,7 +528,7 @@ beside it, never inside it. Computed by `tools/omni_index.py` from each test's o
 **The service reading, a second reading declared 2026-10-09 (the first unchanged).** The founder asked what a cache is
 for. Redis is bought for speed and spends memory to deliver it; the index above counts that memory as a cost at the same
 weight as the speed it buys, so the Redis category reads −24.9% while its work inside the line and its hit rate read
-toward its aim in all three of our runs in every run. The question is fair, and the answer is a second reading beside the first, never a change
+GAIN in all three of our runs in every run. The question is fair, and the answer is a second reading beside the first, never a change
 to the first: the same tests, the same three-run rule, scored on the service the stack is bought for, **work and speed
 only**, with the resources it spent or saved (machines, energy, memory, connections, consumers) shown beside it and not
 scored. It is computed for every test alike by the same tool (`service_pct`, `service_headline_pct`), never for one
@@ -545,7 +545,7 @@ loss in all three of our runs in work or speed counts against Omni in both readi
 **The wiring verdicts, declared 2026-10-09 (a reading of the tables, not a change to any rule).** The founder's order of
 the same day: Omni need not be wired into every muscle; where it cannot beat native, the muscle stays native and Omni only
 reads it, one wire out and no wire in. `tools/wiring_verdicts.py` reads every three-run table, the simulator tables, the
-realms table and the organism tables by one rule into three words per knob and case: **write** (a judged gauge toward its aim in all three of our runs, none away from its aim in all three of our runs), **watch** (nothing toward its aim in all three of our runs, whether inside the noise, the runs
+realms table and the organism tables by one rule into three words per knob and case: **write** (a judged gauge GAIN in all three of our runs, none LOSS or power given in all three of our runs), **watch** (nothing GAIN in all three of our runs, whether inside the noise, the runs
 disagreeing, or a loss with nothing against it) and **operator's choice** (gains and losses both the same in all three of our runs, shown with both
 readings of the index). Rows shown and not judged never count. Nothing is typed in, and `verify.py` fails if the page
 (`docs/WIRING_VERDICTS.md`) differs from what the tables give. The verdicts change what an operator connects, never the
@@ -585,7 +585,7 @@ is as written above.
 Ten paired repetitions, every arm valid. **Work +29.3%** (capacity 24.6 to 31.8 requests a second inside the line,
 interval +5.4 to +9.0), **p95 -62.3%** (685.8 to 258.3 ms), time over the line -40.9%, failed requests -12.1%,
 **machines in service -3.6%**, **energy -0.3%** (declared model), CPU with Omni's own -1.9%: each proven. No measure
-away from its aim beyond the noise (pending pod-minutes +19.6% and pods started +4.0%, both inside the noise). This run's machine
+power given beyond the noise (pending pod-minutes +19.6% and pods started +4.0%, both inside the noise). This run's machine
 floor was one; the floor of two was adopted after it started. Report `results/live/ALL_FOUR.md`; raw files
 `results/live/raw/run-37226863122/`; the Omni index updated (`results/OMNI_INDEX.md`).
 
@@ -643,7 +643,7 @@ line 51% → 0, failed requests 0.14% → 0, machines 6 in both arms, both arms 
 repetitions over 25 hours (started by run 37756284680, collected by run 37945866426), p95 6,690 → 160 ms, p99 9,068 → 187
 ms, time over the line 76% → 0, failed requests 4.8% → 0, machines 6 in both arms, both arms 14 s behind the window. Every
 cluster row that moved is clear of zero with three pairs; the organisms' own model rows are shown beside them and never
-enter the index; the rounding-level model work loss reads away from its aim by rule in both. Six repetitions, six on the clock.
+enter the index; the rounding-level model work loss reads LOSS by rule in both. Six repetitions, six on the clock.
 
 
 ### The burst bill test on Azure: two native arms lost to the harness, and the fix (2026-10-05)
@@ -727,12 +727,12 @@ show in the machines held after it.
 
 Both tests ran again with nothing changed but the engine: ten pairs each, native and omni, order rotated.
 
-- The fault test (GitHub run 37262797634, `results/live/FAULTS.md`): toward its aim and proven on p95 (−60.1%), mean response
-  (−34.5%), time over the line (−22.6%) and pending pods (−76.5%). Nothing moved away from its aim beyond the noise. Recovery
+- The fault test (GitHub run 37262797634, `results/live/FAULTS.md`): a proven GAIN on p95 (−60.1%), mean response
+  (−34.5%), time over the line (−22.6%) and pending pods (−76.5%). No LOSS beyond the noise. Recovery
   after the fault, paired means: machine down 42 s against 70 s, a blind probe 54 s against 66 s, a runaway pod 98 s
   against 105 s, a spike 266 s against 267 s.
-- The fairness test (GitHub run 37262799317, `results/live/FAIRNESS.md`): toward its aim and proven on mean response (−15.0%).
-  Nothing moved away from its aim beyond the noise, the neighbour's app included.
+- The fairness test (GitHub run 37262799317, `results/live/FAIRNESS.md`): a proven GAIN on mean response (−15.0%).
+  No LOSS beyond the noise, the neighbour's app included.
 
 These replace the earlier engine's fault and fairness sections of `results/live/AMENDMENT_3_RUNS.md` in the Omni index.
 That file stays as first measured.
@@ -818,7 +818,7 @@ fixed code.
 The batch test on amendment 12 (GitHub run 37344765837, ten pairs, `results/live/BATCH.md`): machines in service -20.7%,
 -32.4% once the queue was done, energy -14.3% on the standby model, mean response -11.7%, all proven. The queue finished
 +1.1% later, inside the noise (it was +1.8% and proven before cruise stepped back). No pod was left without a machine.
-Nothing moved away from its aim beyond the noise.
+No LOSS beyond the noise.
 
 ## The fleet that can show one machine: Azure at 11 and 15 workers (written before its run, 2026-10-07)
 

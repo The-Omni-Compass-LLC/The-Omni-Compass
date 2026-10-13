@@ -315,7 +315,7 @@ The organism is half living, half machine, so repair has two kinds, and the manu
 Every "serious player" named in a competitive scan — Karpenter, KEDA, VPA, Oracle Autonomous DB, a data-center cooling AI,
 MPC in industry, Autobidder, a chip power manager — is a **native controller**, i.e. a muscle's own reflex. Omni-Compass is
 never standalone and never their rival; it is the **supervisory governor that sits on top of each of them** and moves each
-further toward its aims than it goes on its own. So they are not competitors to the governor — they are the muscles the governor governs. The
+to a larger GAIN than it reaches on its own. So they are not competitors to the governor — they are the muscles the governor governs. The
 only thing that could be a true competitor is another governor-on-top-of-all-natives across every domain, and none is known.
 - **What Omni adds on top = whatever the native left on the table.** On a plain native (fixed HPA target, static power cap,
   a fixed setpoint) there is a lot untapped, so Omni adds a lot. On an already-smart native (a tuned cooling AI, a good

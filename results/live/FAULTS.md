@@ -45,17 +45,17 @@ declared standby power, which needs a node autoscaler that really removes the ma
 | node-hours | 1.494 | 1.493 | -0.1% | -0.01325 to +0.01013 | no |
 | energy, parked workers still on at idle power (Wh, declared model) | 166.2 | 166.1 | -0.1% | -1.088 to +0.8808 | no |
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 164.6 | 164.2 | -0.2% | -1.522 to +0.7814 | no |
-| response time (ms), mean | 212.1 | 139 | -34.5% | -131.9 to -14.23 | yes, lower |
-| response time (ms), 95th percentile | 367.6 | 146.8 | -60.1% | -294.6 to -146.9 | yes, lower |
+| response time (ms), mean | 212.1 | 139 | -34.5% | -131.9 to -14.23 | yes: GAIN |
+| response time (ms), 95th percentile | 367.6 | 146.8 | -60.1% | -294.6 to -146.9 | yes: GAIN |
 | response time (ms), 99th percentile | 1361 | 1155 | -15.1% | -971.8 to +560.1 | no |
-| time over the response line (% of samples) | 8.001 | 6.195 | -22.6% | -3.147 to -0.4666 | yes, lower |
+| time over the response line (% of samples) | 8.001 | 6.195 | -22.6% | -3.147 to -0.4666 | yes: GAIN |
 | failed requests (%) | 5.352 | 4.815 | -10.0% | -1.216 to +0.143 | no |
 | pods with no machine to take them (unschedulable) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
 | time pods had no machine to take them, pod-minutes | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
-| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.7017 | 0.165 | -76.5% | -1.021 to -0.05228 | yes, less |
+| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.7017 | 0.165 | -76.5% | -1.021 to -0.05228 | yes, down (shown, not judged) |
 | utilisation (used / allocatable) | 0.07249 | 0.07105 | -2.0% | -0.003503 to +0.0006243 | no |
 | CPU used (cores), mean | 1.715 | 1.678 | -2.2% | -0.0862 to +0.01172 | no |
-| Omni's own CPU (cores), mean | 0 | 0.00975 | +0.00975 (native is 0) | +0.008975 to +0.01053 | yes, more |
+| Omni's own CPU (cores), mean | 0 | 0.00975 | +0.00975 (native is 0) | +0.008975 to +0.01053 | yes: power given |
 | CPU used with Omni's own (cores), mean | 1.715 | 1.688 | -1.6% | -0.07635 to +0.02138 | no |
 | energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 387.6 | 394 | +1.6% | -1.974 to +14.61 | no |
 | HPA replicas, mean | 8.873 | 9.107 | +2.6% | -0.05157 to +0.5198 | no |

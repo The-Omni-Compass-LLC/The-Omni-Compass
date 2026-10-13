@@ -48,6 +48,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
 from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 2: the brain's own verdict)
+from tools.readings import word as gel_word, aim as gel_aim, EVEN_SAME, EVEN_NOISE, SHOWN  # noqa: E402  (the words every table uses)
 
 BOOTSTRAP = os.environ.get("KAFKA_BOOTSTRAP", "localhost:9092")
 PARTITIONS = 8
@@ -83,11 +84,11 @@ GAUGES = [  # key, label, direction
     ("lag_max", "consumer lag, most messages waiting at once", "lower"),
     ("lag_mean", "consumer lag, mean messages waiting", "lower"),
     ("lost", "messages produced and never consumed", "never more"),
-    ("consumers_mean", "consumers running, mean (the resources held)", "lower"),
-    ("consumers_max", "consumers running, most at once", "lower"),
-    ("cpu_busy_share", "host CPU busy (share of the run)", "lower"),
-    ("cpu_seconds", "host CPU-seconds", "lower"),
-    ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 messages inside the line", "lower"),
+    ("consumers_mean", "consumers running, mean (the resources held)", "spent"),
+    ("consumers_max", "consumers running, most at once", "spent"),
+    ("cpu_busy_share", "host CPU busy (share of the run)", "spent"),
+    ("cpu_seconds", "host CPU-seconds", "spent"),
+    ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 messages inside the line", "spent"),
     ("rebalances", "consumer changes written (the knob's moves)", "shown"),
 ]
 
@@ -416,15 +417,15 @@ def paired(reps, key, direction):
     same = abs(mean) <= SAME_REL * max(abs(nat), 1e-12)
     clear = n > 1 and (lo > 0 or hi < 0) and not same
     if direction == "shown":
-        reading = "shown, not judged"
+        reading = SHOWN
     elif direction == "never more" and any(x > 0 for x in d):
-        reading = "**higher in a repetition**"
+        reading = "**LOSS in a repetition**"
     elif same:
-        reading = "same"
+        reading = EVEN_SAME
     elif not clear:
-        reading = "no difference beyond the noise"
+        reading = EVEN_NOISE
     else:
-        reading = "lower" if mean < 0 else "higher"                # which way it went; the gauge's aim is the reader's
+        reading = gel_word(mean < 0, gel_aim(direction, key))      # the word by what the gauge is for, never by its sign
     return {"native": nat, "omni": om, "diff": mean, "ci95": [lo, hi], "n": n, "significant": clear, "reading": reading}
 
 

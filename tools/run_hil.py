@@ -59,6 +59,7 @@ from realms.compass_arm_v5 import apply_v5  # noqa: E402  (the engine's law, omn
 from realms.harness import omni_bones, omni_step  # noqa: E402  (the max with its bone, the lease's walk back)
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
+from tools.readings import labelled, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (the words every table uses)
 
 REALMS = ("compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized")
 NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
@@ -244,28 +245,33 @@ def contrast(o, n):
             "all": {"primary": w_all / e_all - 1, "work": w_all - 1, "energy": e_all - 1, "viol_pp": 100 * v_all, "p95": p95}}
 
 
-# each measure's declared aim, in words, so a sign is never read on its own: work per energy and work aim higher; energy
-# (spent, a bill), time over the line and p95 aim lower
+# each measure's declared aim, in words, so a sign is never read on its own (tools/readings.py): work per energy and work aim
+# higher; energy is a resource spent (a cut is a GAIN, a rise is power given); time over the line and p95 aim lower
 AIM_UP = {"primary": "more work per energy", "work": "more work"}
 AIM_DOWN = {"energy": "less energy spent", "viol_pp": "late less often", "p95": "faster"}
 AWAY = {"primary": "less work per energy", "work": "less work", "energy": "more energy spent", "viol_pp": "late more often",
         "p95": "slower"}
 
 
+def away_word(k):
+    """The word a measure reads when it moves away from its aim: power given for the energy spent, LOSS for the rest."""
+    return GIVEN if k == "energy" else LOSS
+
+
 def reading(k, v, eps=1e-9):
-    """A measure's change against native, read in words: what it means, toward its aim or away from it, or the same."""
+    """A measure's change against native, read in words: its word (GAIN, LOSS, power given) and what it means, or EVEN."""
     if abs(v) <= eps:
-        return "(same)"
+        return f"({EVEN})"
     toward = v > 0 if k in AIM_UP else v < 0
-    return f"({AIM_UP.get(k) or AIM_DOWN.get(k)})" if toward else f"({AWAY[k]})"
+    return f"({GAIN}: {AIM_UP.get(k) or AIM_DOWN.get(k)})" if toward else f"({away_word(k)}: {AWAY[k]})"
 
 
 def away_on(xs):
-    """Every measure that moved away from its aim against native on the mean, by any amount, in words (no line drawn: the
+    """Every measure that read LOSS or power given against native on the mean, by any amount, in words (no line drawn: the
     reader sees what it takes beside what it gives)."""
     m = lambda k: sum(x[k] for x in xs) / len(xs)
-    return [f"{AWAY[k]} ({100 * m(k):+.2f}%)" if k != "viol_pp" else f"{AWAY[k]} ({m(k):+.2f} pp)"
-            for k in ("primary", "work", "energy", "p95", "viol_pp") if reading(k, m(k)) == f"({AWAY[k]})"]
+    return [f"{away_word(k)}: {AWAY[k]} ({100 * m(k):+.2f}%)" if k != "viol_pp" else f"{away_word(k)}: {AWAY[k]} ({m(k):+.2f} pp)"
+            for k in ("primary", "work", "energy", "p95", "viol_pp") if reading(k, m(k)) == f"({away_word(k)}: {AWAY[k]})"]
 
 
 def rescore(root):
@@ -285,8 +291,8 @@ def rescore(root):
         res.setdefault((size, r["organism"]), {}).setdefault(rep, {})[r["arm"]] = r
     L = [f"# The card run in full, from its own files (amendment 11)", "",
          f"Run `{root.name}`, commit `{str(meta.get('commit', ''))[:12]}`, line {slo} ms. Every measure from the run's "
-         "own files, the card's response times included; every measure that moved away from its aim is named.", "",
-         "| Size | Organism | Part | Repetitions | Label | Work per energy | Energy | Time over the line (pp) | p95 |",
+         "own files, the card's response times included; every measure that read LOSS or power given is named.", "",
+         "| Size | Organism | Part | Repetitions | Reading | Work per energy | Energy | Time over the line (pp) | p95 |",
          "|---:|---|---|---:|---|---:|---:|---:|---:|"]
     for (sc, name), reps in sorted(res.items()):
         per = [contrast(a["omni"], a["native"]) for a in reps.values() if "omni" in a and "native" in a]
@@ -295,7 +301,7 @@ def rescore(root):
         for part, pname in (("sim", "stacks (model)"), ("card", "card (meter)"), ("all", "both")):
             xs = [p[part] for p in per]
             bad = away_on(xs)
-            lab = (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; away from its aims on: " + ", ".join(bad)) if bad else "")
+            lab = (labelled(label(xs)) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; " + ", ".join(bad)) if bad else "")
             mm = lambda k: sum(x[k] for x in xs) / len(xs)
             L.append(f"| {sc}x | {NAMES[name]} | {pname} | {len(xs)} | {lab} | {100 * mm('primary'):+.2f}% | {100 * mm('energy'):+.2f}% | "
                      f"{mm('viol_pp'):+.2f} | {100 * mm('p95'):+.1f}% |")
@@ -373,13 +379,15 @@ def main(argv=None):
          "Work per energy: (work Omni / work native) / (energy Omni / energy native) - 1; for the stacks work is the mean "
          "over plants of each plant's ratio; *both* counts the card as one more plant and adds its joules.", "",
          "## Omni against native, by organism (mean over repetitions, 95% interval when there are two or more)", "",
-         "The label is the preregistered one (the primary outcome and its interval, the time over the line first); beside it, "
-         "every measure that moved away from its aim, by any amount, is named, so what Omni takes is read beside what it gives.", "",
-         "How to read a row: each change is Omni against native on the same organism, seed and requests, and says in words "
-         "what it means. Work per energy and work aim higher. Energy aims lower (less spent: a lower power bill, or longer on "
-         "the same supply). Time over the line and p95 aim lower (faster answers). A minus sign is toward the aim on energy, "
-         "lateness and p95, and away from it on work.", "",
-         "| Size | Organism | Part | Label | Work per energy | Work | Energy | Time over the line (pp) | p95 |", "|---:|---|---|---|---:|---:|---:|---:|---:|"]
+         "The reading is the preregistered label (the primary outcome and its interval, the time over the line first), its word "
+         "first; beside it, every measure that read LOSS or power given, by any amount, is named, so what Omni takes is read "
+         "beside what it gives.", "",
+         "How to read a row: each change is Omni against native on the same organism, seed and requests, and carries its word, "
+         "GAIN, EVEN or LOSS, by what the measure is for, never by its sign (the key: `docs/HOW_TO_READ_THE_RESULTS.md`). Work "
+         "per energy and work aim higher. Energy is a resource spent: a cut is a GAIN (a lower power bill, or longer on the same "
+         "supply), a rise is power given. Time over the line and p95 aim lower (faster answers). So a minus is a GAIN on energy, "
+         "lateness and p95, and a LOSS on work.", "",
+         "| Size | Organism | Part | Reading | Work per energy | Work | Energy | Time over the line (pp) | p95 |", "|---:|---|---|---|---:|---:|---:|---:|---:|"]
     out = {}
     for (sc, name) in res:
         per = [contrast(res[(sc, name)][r]["omni"], res[(sc, name)][r]["native"]) for r in sorted(res[(sc, name)])]
@@ -389,7 +397,7 @@ def main(argv=None):
             xs = [p[part] for p in per]
             m = {k: ci([x[k] for x in xs]) for k in ("primary", "work", "energy", "viol_pp", "p95")}
             bad = away_on(xs)
-            lab = (label(xs) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; away from its aims on: " + ", ".join(bad)) if bad else "")
+            lab = (labelled(label(xs)) if len(xs) >= 2 else "ONE REPETITION (no label)") + (("; " + ", ".join(bad)) if bad else "")
             out[key][part] = {"label": lab, "away_on": bad, **{k: list(v) for k, v in m.items()}}
             f = lambda k, s=100.0, u="%": (f"{s * m[k][0]:+.2f}{u}" + (f" ({s * m[k][1]:+.2f} to {s * m[k][2]:+.2f})" if len(xs) > 1 else "")
                                             + f" {reading(k, m[k][0])}")

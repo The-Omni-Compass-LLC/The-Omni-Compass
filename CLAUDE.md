@@ -12,7 +12,7 @@ the founder overrides one in the conversation.
   competitor to native.
 - Every benchmark has exactly two arms, **native** and **omni** (omni means Omni on top of native). There is no other
   arm and no other name.
-- **Do no harm.** Omni must never move a gauge away from its aim past native. Where it can't move a knob toward its aims,
+- **Do no harm.** Omni must never cause a LOSS against native. Where it can't bring a knob a GAIN,
   that knob stays native. The 2%
   verdict (`omnicompass/verdict.py`) is the engine's trigger, not a stamp on a report. Gains are uncapped.
 - Headline: more work, faster, on fewer machines, with less energy. One combined number: the Omni index.
@@ -50,8 +50,8 @@ the founder overrides one in the conversation.
 - Any change to a rule, gain, guard, preset or muscle makes **the next version**, and every result is run again on it. Never read a result across
   versions. Never change the engine without telling the founder first.
 - Three runs: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
-  readings: lower or higher in all three of our runs (the same sign in all three, every 95% interval clear of zero); no
-  difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
+  readings: GAIN or LOSS in all three of our runs (the same sign in all three, every 95% interval clear of zero, the word
+  set by the gauge's aim; a resource spent that rose is power given); EVEN, no difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
   pointing different ways: the test is unstable there, look into it). Never write "confirmed" or "not confirmed"
   (the founder's order of 11 October: nobody outside approved these results); every three-run table says "Run and
   scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results."
@@ -114,11 +114,18 @@ the founder overrides one in the conversation.
 
 ## Orders of 13 October
 
-- No "better" and no "worse" anywhere: who sets the aim differs from one system to the next. A reading says which way a
-  number went against native, **lower** or **higher**; where a tool must score (the index, the benefit sheet, the wiring
-  page) it says **toward** or **away from** the gauge's declared aim (lower for an amount waited, spent or held, higher for
-  work done), and the reader judges (`tools/readings.py`). Old records stay as recorded, in `docs/history` and the
-  repository's history.
+- **GAIN, EVEN, LOSS** (the founder's order of 13 October, evening: "better, same and worse are going to be gain, even and
+  loss, wherever and ever, all over where it lives, where it used to live"). Every judged reading, in every table, page,
+  report, program output and the manual, is GAIN, EVEN or LOSS, decided by what the gauge is for and never by the sign of
+  its number: time waited, missed or failed, a fall is GAIN; work done, a rise is GAIN; a resource spent or held, a fall
+  is a cut, a GAIN, and a rise is **power given**, never a loss. Better/worse, lower/higher-as-a-verdict and toward/away
+  are not used. The key (G.A.I.N. Growth, Advantage, Improvement, Net-positive; E.V.E.N. Equalized, Verified baseline,
+  Equilibrium, Neutral; L.O.S.S. Leakage, Off-track, Setback, Subpar), disclosed and disclaimed, is written once in
+  `tools/readings.py` and stands at the top of the README, `docs/HOW_TO_READ_THE_RESULTS.md` and the manual's front matter
+  (`python3 tools/readings.py --fix`; `--check` fails a page whose key differs). "Theoretically I should never see the word
+  loss": a LOSS row is never cut; its cause is found and fixed and the test rerun. `python3 tools/summary.py` prints the whole
+  summary straight after a pull. Raw machine records (JSON receipts, raw run folders) keep their recorded field values;
+  every page that shows them uses the words. Next: the words become the code that tells Omni how to move (the next engine).
 - Every muscle runs from 1 up to one click under its own capacity, read live from the system, never a number written in
   code: never below 1 (a pool's machines never below 2), no ceiling where the system can keep adding, and back down again;
   guardrailed so no muscle overworks and hurts the organism, and the organism never hurts a muscle. Where the brain's own
@@ -130,11 +137,20 @@ the founder overrides one in the conversation.
   October). When a result comes in negative, find the cause and fix it at once, unasked; a test machine's limit is never
   reported as Omni's result.
 
+- **Everything on the newest engine** (13 October, night): every benchmark runs again on the engine that stands, and its
+  result carries that engine's name. Nothing is shown or compared as "v3" once v5 stands: a v3 table is the road, in
+  `docs/history`, never a setting to go back to by name. More versions will follow (perhaps to v10); each one reruns
+  everything. Where a change made a result worse, the fix is made inside the newest engine and rerun.
+- **One cloud first** (13 October, night): Kubernetes on Azure is finished first; Google (GKE), Amazon (EKS) and the GPU
+  chips (Lambda) are not run until the founder says the Azure Kubernetes results are where he needs them.
+- **A copy he can keep**: the manual's PDF and the whole repository as a downloadable zip, in parts, from a pushed commit,
+  sent to the founder after each landed change.
+
 ## Orders of 10 October (afternoon)
 
 - The reflex rule is the whole mechanism: a trial runs to its full measurement and is never ended by the calm it causes;
   the brain never forces, it reacts to what the system shows; one body, one brain, the body's cost judged, nothing anywhere
-  pushed away from its aim to move one thing toward its own; one trial at a time inside a body; nothing permanent; the wall
+  pushed to a LOSS to move one thing to a GAIN; one trial at a time inside a body; nothing permanent; the wall
   belongs to the body.
   Written into the engine as **Omni v4** (`docs/OMNI_V4_PLAN.md`), every wire forced through it, every result rerun.
 - Everything is wired. Staying native is the brain's live decision every second, never a verdict from one run.

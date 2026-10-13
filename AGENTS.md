@@ -34,6 +34,9 @@ across engine versions.
 - Never present a modelled result as a measurement: class **P** is a physical meter, class **L** is live software (the real
   thing), class **S** is our own model.
 - Never leave out a row that went against Omni-Compass when you summarize a result.
+- Every judged reading is **GAIN**, **EVEN** or **LOSS**, set by what the gauge is for, never by its sign; a resource
+  spent that rose is **power given**, never a loss. Better/worse and toward/away are not used. The key is at the top of
+  `docs/HOW_TO_READ_THE_RESULTS.md`; `python3 tools/summary.py` prints the whole summary straight after a pull.
 - The notice closes with the filing sentence and the website, and nothing after it: "All patents, copyrights and
   trademarks filed in the USA. www.omni-compass.com"
 
@@ -43,7 +46,7 @@ across engine versions.
 - `docs/OMNI_COMPASS_MANUAL.md` and the printed book `docs/OMNI_COMPASS_MANUAL.pdf`: the theory of the mechanism and the
   wiring instructions, level by level and stack by stack.
 - `DISCLOSURES.md`, `LICENSE`, `NOTICE`, `PATENTS.md`, `TRADEMARKS.md`, `LICENSING_FAQ.md`: the terms.
-- `results/OMNI_INDEX.md`, `docs/DOSSIER.md`, `docs/WIRING_VERDICTS.md`: every result, losses included.
+- `results/OMNI_INDEX.md`, `docs/DOSSIER.md`, `docs/WIRING_VERDICTS.md`: every result, every LOSS included.
 - `python3 verify.py --quick`: the release checks; `python3 tools/legal.py --check`: the notice on every file.
 
 ---

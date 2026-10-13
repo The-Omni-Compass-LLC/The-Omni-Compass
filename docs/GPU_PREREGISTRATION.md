@@ -57,10 +57,10 @@ Nothing seen in smoke may change them.
 - **Primary comparison:** omni against native, paired by repetition. Report the mean difference with a two-sided t
   95% interval.
 - **Result:**
-  - The result is *proven toward its aim* if the interval lies entirely above zero.
-  - It is *proven away from its aim* if the interval lies entirely below zero.
+  - The result is *a proven GAIN* if the interval lies entirely above zero.
+  - It is *a a proven LOSS* if the interval lies entirely below zero.
   - Otherwise it is *not proven*.
-- **Guardrails, fixed now:** a primary result toward its aim counts only if Omni did not buy it with the work. Both
+- **Guardrails, fixed now:** a primary GAIN counts only if Omni did not buy it with the work. Both
   guardrails must hold:
   - **Requests served:** the 95% interval of (omni − native) must not reach below −1% of native.
   - **95th-percentile response time:** the interval must not reach above +10% of native.
@@ -81,11 +81,11 @@ outcome, the repetitions, and the two guardrails above are unchanged.
 - **Third guardrail, errors:** the 95% interval of (omni − native) requests *not* served must not reach above +1% of
   native requests served.
 - **Result label, by rule, never by hand** (`tools/gpu_reps.py`, `label()`):
-  - primary proven toward its aim, all three guardrails held: **SUPERIOR WITHIN GUARDRAILS**;
-  - primary proven toward its aim, a guardrail failed: **ENERGY IMPROVEMENT WITH SERVICE TRADEOFF**;
+  - primary a proven GAIN, all three guardrails held: **SUPERIOR WITHIN GUARDRAILS**;
+  - primary a proven GAIN, a guardrail failed: **ENERGY IMPROVEMENT WITH SERVICE TRADEOFF**;
   - primary not proven, all guardrails held: **NONINFERIOR / INCONCLUSIVE**;
   - primary not proven, a guardrail failed: **NOT ESTABLISHED**;
-  - primary proven away from its aim: **AWAY FROM ITS AIM**;
+  - primary a proven LOSS: **AWAY FROM ITS AIM**;
   - any invalidity below: **INVALID**.
 - **The card obeys enforced.power.limit.** The snapshot records power.limit, enforced.power.limit, default, min and
   max limits, persistence mode and power management. The bench refuses to start unless power management is Enabled.
@@ -422,9 +422,8 @@ From this amendment the card harness measures what it never counted:
 - the card's time over the line (requests slower than the line, ten bare service times, percent of requests) and its
   95th percentile, each paired against native;
 - each row keeps its preregistered label and names, beside it, every measure that came out behind native by any
-  amount, so what Omni costs is read beside what it gains; every change is read in words (lower or higher, and what it
-  means); no new line is drawn. The 2% bound stays where the founder set it: inside the engine, as the trigger of the
-  verdict (`omnicompass/verdict.py`: a knob moves only where a paired trial shows the muscle at most 2% away from its aim);
+  amount, so what Omni costs is read beside what it gains; every change is read in words (GAIN, EVEN or LOSS, and what it means); no new line is drawn. The 2% bound stays where the founder set it: inside the engine, as the trigger of the
+  verdict (`omnicompass/verdict.py`: a knob moves only where a paired trial shows the muscle at most a 2% LOSS);
 - the stacks' own label (`realms/harness.py label`) puts the band first: its guardrail is the mean time over the line
   at or under native's, where it was the upper end of the interval under +1 point;
 - at one copy, each organism runs 5 paired repetitions (was 3), so an energy change of 1-3% on the card's own meter
@@ -439,7 +438,7 @@ operator's. A machine went back with no headroom (the next burst waits for a boo
 covers the recent peak at 0.6 of the release level. Each alone leaves the stacks late more often; together they are late
 less often. The headroom is the least that keeps every seed un-late (`results/realms/RELEASE_MARGIN_SWEEP.md`).
 
-Every report reads each change in words (lower or higher, and what it means), so a sign is never read alone.
+Every report reads each change in words (GAIN, EVEN or LOSS, and what it means), so a sign is never read alone.
 
 ## Amendment 12 (2026-10-05, before any trial on this code)
 

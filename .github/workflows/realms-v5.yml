@@ -8,7 +8,7 @@ name: realms-v5
 # own machine: every muscle alone and the six organisms, at their own load and in the climb, native against Omni on top
 # (realms/compass_arm_v5.py, the max), on the preregistered seeds 3000-3009 (tools/run_realms_v5.py). Evidence class S
 # (modelled). The run is deterministic: every label must match the table committed in results/realms_v5/, every number
-# within 1e-3 or 0.5%, and no muscle alone may move away from its aims against native (the no-harm check). Started by hand (Actions -> realms-v5 -> Run workflow), by a commit message
+# within 1e-3 or 0.5%, and no muscle alone may read LOSS against native (the no-harm check). Started by hand (Actions -> realms-v5 -> Run workflow), by a commit message
 # containing [realms-v5], or by v5-all-benchmarks.yml.
 on:
   workflow_dispatch:
@@ -38,16 +38,16 @@ jobs:
         run: python3 tests/test_compass_arm_v5.py
       - name: Every muscle alone and the six organisms at the max, own load, the climb and the line (seeds 3000-3009)
         run: python3 tools/run_realms_v5.py --out realms5-out
-      - name: Same table as the one published, and no muscle away from its aims against native
+      - name: Same table as the one published, and no muscle with a LOSS against native
         run: |
           set -o pipefail
           python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import csv, json, sys
           a = list(csv.DictReader(open("realms5-out/MUSCLES_V5.csv")))
           muscles = {x["muscle_id"]: x for x in a}                 # one row per muscle and load; its label over all loads
-          # the labels of the table (tools/run_realms_v5.py), and the ones the tables written before 13 October used
-          away = sorted({x["muscle"] for x in a if x.get("label_all_loads", x["label"]) in ("AWAY FROM ITS AIMS", "BOTH WAYS", "WORSE", "MIXED")})
-          print(f"no-harm: {len(muscles)} muscles, {len(away)} away from their aims or both ways against native under any load" + (": " + ", ".join(away) if away else ""))
+          # the labels of the table (tools/run_realms_v5.py: LOSS, GAIN AND LOSS), and the ones the tables written before used
+          away = sorted({x["muscle"] for x in a if x.get("label_all_loads", x["label"]) in ("LOSS", "GAIN AND LOSS", "AWAY FROM ITS AIMS", "BOTH WAYS", "WORSE", "MIXED")})
+          print(f"no-harm: {len(muscles)} muscles, {len(away)} with a LOSS (LOSS or GAIN AND LOSS) against native under any load" + (": " + ", ".join(away) if away else ""))
           try:
               b = list(csv.DictReader(open("results/realms_v5/MUSCLES_V5.csv")))
               mine, pub = json.load(open("realms5-out/RUN.json")), json.load(open("results/realms_v5/RUN.json"))

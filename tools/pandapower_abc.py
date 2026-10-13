@@ -5,11 +5,12 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for the power grid (docs/OMNI_V1.md): the untouched SimBench grids run three times as separate GitHub
 runs on the same frozen engine (tools/run_pandapower.py), both load models each. pandapower is deterministic, so the three
-runs must give the same numbers: a gauge reads lower or higher in all three of our runs by its sign when all three agree, same
-when the change is under one part in a million, and "the runs differ" when they do not reproduce, which is a finding about
-the simulator or the harness and is said so. Directions are the preregistration's (docs/PANDAPOWER_PREREGISTRATION.md):
-energy drawn, losses and net import aim lower; any rise in bus-steps outside 0.95-1.05 is marked; tap operations
-aim lower and were declared in advance as Omni's expected cost. Every row is reported, losses included.
+runs must give the same numbers: a gauge reads GAIN or LOSS in all three of our runs when all three agree on the sign (judged
+by what the gauge is for, never by its sign; a resource spent that rose reads power given), EVEN when the change is under one
+part in a million, and "the runs differ" when they do not reproduce, which is a finding about the simulator or the harness and
+is said so. Aims are the preregistration's (docs/PANDAPOWER_PREREGISTRATION.md): energy drawn, the energy dissipated in lines
+and transformers, net import and tap operations are resources spent (a fall is a cut, a GAIN; tap operations were declared in
+advance as Omni's expected cost); any rise in bus-steps outside 0.95-1.05 is a LOSS. Every row is reported, LOSS included.
 Usage: python tools/pandapower_abc.py A_DIR B_DIR C_DIR --out results/live/V1_PANDAPOWER.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding pandapower-<grid>/<grid>.json"""
 from __future__ import annotations
@@ -22,14 +23,14 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, in_all_three, DETERMINISTIC_RULE, ACROSS_HEAD, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, in_all_three, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
 
 SAME_REL = 1e-6          # a change under one part in a million of the value reads "same" (amendment 11)
 REPRO_REL = 1e-9         # two runs of a deterministic simulator agree to this, or they did not reproduce
 MODELS = [("zip", "ZIP loads (40% Z, 30% I, 30% P)"), ("constant_power", "constant-power loads (SimBench as shipped)")]
-GAUGES = [("load_energy_mwh", "energy the loads drew (MWh)", "lower"), ("losses_mwh", "line and transformer losses (MWh)", "lower"),
-          ("energy_in_mwh", "net import from the upstream grid (MWh)", "lower"), ("violation_bus_share", "bus-steps outside 0.95-1.05 (share)", "never more"),
-          ("tap_operations", "tap operations (wear; declared cost)", "lower"), ("vmin", "lowest voltage seen (per unit)", "shown"),
+GAUGES = [("load_energy_mwh", "energy the loads drew (MWh)", "spent"), ("losses_mwh", "energy dissipated in lines and transformers (MWh)", "spent"),
+          ("energy_in_mwh", "net import from the upstream grid (MWh)", "spent"), ("violation_bus_share", "bus-steps outside 0.95-1.05 (share)", "never more"),
+          ("tap_operations", "tap operations (wear; declared cost)", "spent"), ("vmin", "lowest voltage seen (per unit)", "shown"),
           ("vmax", "highest voltage seen (per unit)", "shown")]
 
 
@@ -74,15 +75,13 @@ def verdict(recs, model, k, direction):
     if any(c is None for c in ch):
         return "no value"
     if direction == "shown":
-        return "shown, not judged"
+        return SHOWN
     if all(abs(c) <= SAME_REL for c in ch):
-        return "same"
+        return EVEN_SAME
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    if direction == "never more":
-        return in_all_three(signs == {-1})
-    return in_all_three(signs == {-1})
+    return in_all_three(signs == {-1}, aim(direction, k))
 
 
 def engine(run):
@@ -115,10 +114,10 @@ def main(argv=None):
          "deterministic grid simulator with the grid's own voltage control as native. Omni sits on top of it, moving the "
          "substation setpoint one whole tap at a time under the frozen rules (`docs/PANDAPOWER_PREREGISTRATION.md`). The same "
          "grids ran three times as separate GitHub runs on the same frozen engine, a full year each, both load models. Because "
-         "the simulator is deterministic, the runs must reproduce each other: " + DETERMINISTIC_RULE + ", **same** when the change is under one part in a million, "
-         "and **the runs differ** when they do not reproduce. Energy drawn, losses and import: the declared aim is lower. Bus-steps outside "
-         "0.95-1.05: any rise is marked. Tap operations: the declared aim is lower, and more of them was declared in advance as Omni's "
-         "expected cost. Every row is shown, losses included.", "",
+         "the simulator is deterministic, the runs must reproduce each other: " + DETERMINISTIC_RULE + ", **EVEN, the same** when the change is under one part in a million, "
+         "and **the runs differ** when they do not reproduce. Energy drawn, the energy dissipated in lines and transformers, net import "
+         "and tap operations are resources spent: a fall is a cut, a GAIN, and a rise is power given (more tap operations were declared "
+         "in advance as Omni's expected cost). Bus-steps outside 0.95-1.05: any rise is a LOSS. Every row is shown, LOSS included.", "",
          "| Run | GitHub run | Commit | Engine | Grids in the run |", "|---|---|---|---|---:|"]
     off = []; seen = []
     for tag, (run, recs) in zip("ABC", runs):
@@ -160,18 +159,18 @@ def main(argv=None):
                          f"{pct(change(recs[2], model, k), k)} | {v} |")
             L.append("")
     L += ["## Across the grids", "", "A grid counts only when all three runs agree.", "",
-          f"| Load model | Gauge | {ACROSS_HEAD} |", "|---|---|---|---|---:|---:|"]
+          f"| Load model | Gauge | {ACROSS_HEAD} |", "|---" + ACROSS_RULE]
     for model, title in MODELS:
         for k, name, direction in GAUGES:
             t = tally.get((model, k))
             if not t:
                 continue
-            L.append(f"| {title.split(' (')[0]} | {name} | {across_cells(t, direction)} |")
+            L.append(f"| {title.split(' (')[0]} | {name} | {across_cells(t, direction, k)} |")
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
     dirs = {k: d for k, _, d in GAUGES}
-    nb, nw, nd = across_counts(tally, lambda mk: dirs[mk[1]])
-    print(f"{out}: {len(grids)} grids; {nb} gauge-rows toward the gauge's declared aim in all three of our runs, {nw} away from it, {nd} where the runs differ")
+    ng, nl, nv, nd = across_counts(tally, lambda mk: dirs[mk[1]])
+    print(f"{out}: {len(grids)} grids; {ng} gauge-rows GAIN in all three of our runs, {nl} LOSS, {nv} power given, {nd} where the runs differ")
     return 0
 
 

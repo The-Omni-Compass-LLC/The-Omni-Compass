@@ -12,15 +12,15 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 | Organism | Muscles | Label | Work per energy | Work | Energy | Violations (pp) | Valid |
 |---|---:|---|---:|---:|---:|---:|---|
-| Compute / AI / Cloud | 250 | **ENERGY IMPROVEMENT WITH SERVICE TRADEOFF** | +2.5% (+2.3 to +2.7) | -0.2% (-0.2 to -0.2) | -2.6% (-2.8 to -2.4) | +2.9 (+2.7 to +3.0) | yes |
-| Physics / Robotics / Autonomous | 88 | **AWAY FROM ITS AIM** | -1.9% (-2.4 to -1.3) | -1.2% (-2.3 to -0.1) | +0.7% (-0.5 to +1.8) | +2.9 (+0.5 to +5.4) | yes |
-| Energy / Facility / Industrial | 121 | **SUPERIOR WITHIN GUARDRAILS** | +0.3% (+0.3 to +0.3) | +0.0% (+0.0 to +0.0) | -0.3% (-0.3 to -0.3) | -0.1 (-0.1 to +0.0) | yes |
-| Distribution / Specialized | 197 | **NONINFERIOR / INCONCLUSIVE** | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) | yes |
-| The whole tower (656 muscles) | 656 | **SUPERIOR WITHIN GUARDRAILS** | +0.1% (+0.1 to +0.1) | -0.1% (-0.1 to -0.0) | -0.2% (-0.2 to -0.2) | +0.7 (+0.5 to +0.8) | yes |
+| Compute / AI / Cloud | 250 | **GAIN AND LOSS (energy cut, service traded for it)** | +2.5% (+2.3 to +2.7) | -0.2% (-0.2 to -0.2) | -2.6% (-2.8 to -2.4) | +2.9 (+2.7 to +3.0) | yes |
+| Physics / Robotics / Autonomous | 88 | **LOSS** | -1.9% (-2.4 to -1.3) | -1.2% (-2.3 to -0.1) | +0.7% (-0.5 to +1.8) | +2.9 (+0.5 to +5.4) | yes |
+| Energy / Facility / Industrial | 121 | **GAIN (within the guardrails)** | +0.3% (+0.3 to +0.3) | +0.0% (+0.0 to +0.0) | -0.3% (-0.3 to -0.3) | -0.1 (-0.1 to +0.0) | yes |
+| Distribution / Specialized | 197 | **EVEN (inside the noise, within the guardrails)** | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) | yes |
+| The whole tower (656 muscles) | 656 | **GAIN (within the guardrails)** | +0.1% (+0.1 to +0.1) | -0.1% (-0.1 to -0.0) | -0.2% (-0.2 to -0.2) | +0.7 (+0.5 to +0.8) | yes |
 
 ## Every muscle alone, by realm
 
-| Realm | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID |
+| Realm | Muscles | GAIN (within the guardrails) | GAIN AND LOSS (energy cut, service traded for it) | EVEN (inside the noise, within the guardrails) | EVEN (not established: inside the noise, a guardrail crossed on the mean) | LESS WORK PER ENERGY | INVALID |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Compute / AI / Cloud | 250 | 14 | 43 | 174 | 0 | 19 | 0 |
 | Physics / Robotics / Autonomous | 88 | 16 | 10 | 47 | 5 | 10 | 0 |
@@ -30,7 +30,7 @@ These are models. A model's energy is not a meter's, and a plant written by the 
 
 ## By knob: what kind of authority Omni held
 
-| Knob | Muscles | SUPERIOR WITHIN GUARDRAILS | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | NONINFERIOR / INCONCLUSIVE | NOT ESTABLISHED | LESS WORK PER ENERGY | INVALID | Median work per energy |
+| Knob | Muscles | GAIN (within the guardrails) | GAIN AND LOSS (energy cut, service traded for it) | EVEN (inside the noise, within the guardrails) | EVEN (not established: inside the noise, a guardrail crossed on the mean) | LESS WORK PER ENERGY | INVALID | Median work per energy |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | capacity | 344 | 26 | 45 | 257 | 1 | 15 | 0 | +0.0% |
 | setpoint | 55 | 19 | 1 | 21 | 0 | 14 | 0 | +0.0% |
@@ -96,16 +96,16 @@ For 54 of 55 setpoint muscles, a fixed setpoint at the calm end of the declared 
 
 | Muscle | Family | Knob | Label | Work per energy | Work | Violations (pp) |
 |---|---|---|---|---:|---:|---:|
-| mass_flow_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +36.7% (+34.9 to +38.5) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| temperature_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +36.6% (+34.4 to +38.8) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| pressure_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +36.1% (+33.9 to +38.3) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| valve_position | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +35.3% (+33.2 to +37.4) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| tank_level_target | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +35.3% (+33.1 to +37.5) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| furnace_setpoint | Industrial PLC & Process Automation | setpoint | SUPERIOR WITHIN GUARDRAILS | +35.3% (+33.5 to +37.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
-| machine_remediation | OpenShift & Machine API | capacity | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | +20.8% (+14.2 to +27.3) | -2.1% (-2.7 to -1.4) | +22.1 (+19.6 to +24.6) |
-| boot_disk_class | Cloud VM & Capacity | capacity | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | +18.0% (+14.2 to +21.9) | -1.4% (-2.1 to -0.7) | +21.6 (+18.9 to +24.3) |
-| cross_cluster_replication | Cross-Cluster, Multi-Region & Edge | capacity | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | +17.7% (+12.1 to +23.2) | -1.3% (-1.8 to -0.7) | +19.0 (+16.5 to +21.5) |
-| nodepool_weight | Node Fleet & Karpenter-Class Control | setpoint | ENERGY IMPROVEMENT WITH SERVICE TRADEOFF | +17.3% (+12.5 to +22.1) | -1.5% (-2.1 to -0.9) | +21.0 (+18.8 to +23.2) |
+| mass_flow_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +36.7% (+34.9 to +38.5) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| temperature_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +36.6% (+34.4 to +38.8) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| pressure_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +36.1% (+33.9 to +38.3) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| valve_position | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +35.3% (+33.2 to +37.4) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| tank_level_target | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +35.3% (+33.1 to +37.5) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| furnace_setpoint | Industrial PLC & Process Automation | setpoint | GAIN (within the guardrails) | +35.3% (+33.5 to +37.1) | +0.0% (+0.0 to +0.0) | +0.0 (+0.0 to +0.0) |
+| machine_remediation | OpenShift & Machine API | capacity | GAIN AND LOSS (energy cut, service traded for it) | +20.8% (+14.2 to +27.3) | -2.1% (-2.7 to -1.4) | +22.1 (+19.6 to +24.6) |
+| boot_disk_class | Cloud VM & Capacity | capacity | GAIN AND LOSS (energy cut, service traded for it) | +18.0% (+14.2 to +21.9) | -1.4% (-2.1 to -0.7) | +21.6 (+18.9 to +24.3) |
+| cross_cluster_replication | Cross-Cluster, Multi-Region & Edge | capacity | GAIN AND LOSS (energy cut, service traded for it) | +17.7% (+12.1 to +23.2) | -1.3% (-1.8 to -0.7) | +19.0 (+16.5 to +21.5) |
+| nodepool_weight | Node Fleet & Karpenter-Class Control | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +17.3% (+12.5 to +22.1) | -1.5% (-2.1 to -0.9) | +21.0 (+18.8 to +23.2) |
 | dispatch_priority | Workflow, Logistics & Fulfillment | admission | LESS WORK PER ENERGY | -33.2% (-35.0 to -31.3) | -10.0% (-11.6 to -8.4) | +51.8 (+47.7 to +55.9) |
 | workflow_backoff | Workflow, Logistics & Fulfillment | admission | LESS WORK PER ENERGY | -32.9% (-34.3 to -31.5) | -9.8% (-11.2 to -8.4) | +56.6 (+52.3 to +60.9) |
 | workflow_retry | Workflow, Logistics & Fulfillment | admission | LESS WORK PER ENERGY | -30.0% (-32.5 to -27.4) | -21.1% (-23.4 to -18.7) | +59.8 (+54.4 to +65.2) |

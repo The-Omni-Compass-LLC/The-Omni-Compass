@@ -52,6 +52,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
 from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 2: the brain's own verdict)
+from tools.readings import word as gel_word, aim as gel_aim, EVEN_SAME, EVEN_NOISE, SHOWN  # noqa: E402  (the words every table uses)
 
 URL = os.environ.get("MONGO_URL", "mongodb://127.0.0.1:27017")
 DB = "ycsb"
@@ -98,12 +99,12 @@ GAUGES = [  # key, label, direction
     ("p99_ms", "latency, 99th percentile (ms)", "lower"),
     ("mean_ms", "latency, mean (ms)", "lower"),
     ("failed", "failed operations", "never more"),
-    ("cache_mb_mean", "cache size held, mean (MB; the knob, the resource)", "lower"),
-    ("cache_used_mb_mean", "bytes in the cache, mean (MB)", "lower"),
+    ("cache_mb_mean", "cache size held, mean (MB; the knob, the resource)", "spent"),
+    ("cache_used_mb_mean", "bytes in the cache, mean (MB)", "spent"),
     ("pages_read", "pages read into the cache (misses)", "shown"),
-    ("cpu_busy_share", "host CPU busy (share of the run)", "lower"),
-    ("cpu_seconds", "host CPU-seconds", "lower"),
-    ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 operations inside the line", "lower"),
+    ("cpu_busy_share", "host CPU busy (share of the run)", "spent"),
+    ("cpu_seconds", "host CPU-seconds", "spent"),
+    ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 operations inside the line", "spent"),
     ("writes", "cache size changes written (the knob's moves)", "shown"),
 ]
 
@@ -415,15 +416,15 @@ def paired(reps, key, direction):
     same = abs(mean) <= SAME_REL * max(abs(nat), 1e-12)
     clear = n > 1 and (lo > 0 or hi < 0) and not same
     if direction == "shown":
-        reading = "shown, not judged"
+        reading = SHOWN
     elif direction == "never more" and any(x > 0 for x in d):
-        reading = "**higher in a repetition**"
+        reading = "**LOSS in a repetition**"
     elif same:
-        reading = "same"
+        reading = EVEN_SAME
     elif not clear:
-        reading = "no difference beyond the noise"
+        reading = EVEN_NOISE
     else:
-        reading = "lower" if mean < 0 else "higher"                # which way it went; the gauge's aim is the reader's
+        reading = gel_word(mean < 0, gel_aim(direction, key))      # the word by what the gauge is for, never by its sign
     return {"native": nat, "omni": om, "diff": mean, "ci95": [lo, hi], "n": n, "significant": clear, "reading": reading}
 
 

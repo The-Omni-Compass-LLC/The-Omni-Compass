@@ -2,6 +2,33 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+<!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
+## The key: GAIN, EVEN and LOSS
+
+Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
+
+| Word | What each letter stands for | Its sense in underwriting | What it means in a table |
+|---|---|---|---|
+| **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
+| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native |
+| **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
+
+How the sign of a number becomes a word:
+
+- **Time waited, missed or failed** (a response time, time over the line, failed requests): a fall is GAIN, a rise is LOSS.
+- **Work done** (work inside the line, throughput, a hit rate): a rise is GAIN, a fall is LOSS.
+- **A resource spent or held** (energy, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves).
+- So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
+
+Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
+
+A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear of zero: "GAIN in all three of our runs". The other readings are **EVEN, no difference beyond the noise** (in a run the interval includes zero, so native and Omni could not be told apart: that is the result), **the runs disagree** (clear runs pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such as the knob's own setting).
+
+Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, so **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
+
+Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+<!-- end of the key -->
+
 This chapter teaches you to read every table Omni-Compass produces. You do not need to know Kubernetes or GPUs to
 follow it. Read the five ideas first, then go to the table you have in front of you.
 
@@ -17,9 +44,10 @@ follow it. Read the five ideas first, then go to the table you have in front of 
    ran this again and again, the true answer would land inside that range 95 times out of 100.
    - If the whole range is on one side of zero, the difference is **proven** (the table says "yes" or "significant").
    - If the range crosses zero, the difference is **not proven**: it could be noise.
-4. **The aim is not always "up".** For energy, response time, failures, machines and time over the line, **the aim
-   is lower**, so a minus sign is good. For work per energy and work done, **the aim is higher**, so a plus sign is good.
-   Every table says which.
+4. **The word, not the sign.** Every judged reading is GAIN, EVEN or LOSS (the key above). For response time,
+   failures and time over the line a fall is GAIN; for work and work per energy a rise is GAIN; for energy, machines
+   and every other resource spent or held a fall is a cut, a GAIN, and a rise is **power given**, never a loss.
+   Every table gives the word beside the number.
 5. **Evidence class.** Every result is marked with how it was measured:
    - **T**: a theorem;
    - **V**: verified in code;
@@ -55,7 +83,7 @@ One card, three arms, many repetitions:
 - **omni**: Omni-Compass on top, moving the card's clock ceiling and power limit.
 
 Read it in this order:
-1. **The verdict line** at the top, one of: *toward its aim, proven*; *away from its aim, proven*; *not proven*; *more requests per kJ,
+1. **The verdict line** at the top, one of: *GAIN, proven*; *LOSS, proven*; *not proven*; *more requests per kJ,
    fails the service guardrail*.
 2. **Work per energy** (requests per kilojoule): the headline. A plus sign with a range wholly above zero is a proven
    gain.
@@ -83,8 +111,8 @@ the start and at the end, which must be equal.
 
 Each set is 10 paired repetitions on a real Kubernetes cluster (kind): native Kubernetes (its HPA and scheduler)
 against the same Kubernetes with Omni-Compass on top. Read:
-1. **worker nodes in service** and **node-hours**: how many machines were kept busy. Minus moved toward its aim.
-2. **response time p95 and p99**: minus is faster.
+1. **worker nodes in service** and **node-hours**: how many machines were kept busy. A fall is GAIN.
+2. **response time p95 and p99**: a fall is GAIN (faster).
 3. **failed requests**: must be zero on both sides.
 4. **CPU used with Omni's own**: Omni-Compass's own cost included; "no" in the significant column means it costs
    nothing measurable overall.
@@ -95,12 +123,12 @@ Energy on kind is a declared model, not a meter: kind keeps every machine powere
 ## The three-run tables (`results/live/V1_<TEST>.md`, `V3_<TEST>.md`)
 
 Every benchmark since the engine was frozen runs three separate times, A, B and C, on the same bytes, and the table
-shows all three beside each gauge. Read the last column first: **lower** or **higher in all three of our runs** (the same sign
-in all three, every interval clear of zero), **no difference beyond the noise** (an interval over zero in at least one
+shows all three beside each gauge. Read the last column first: **GAIN** or **LOSS in all three of our runs** (the same sign
+in all three, every interval clear of zero; a resource spent that rose reads **power given**), **EVEN, no difference beyond the noise** (an interval over zero in at least one
 run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "confirmed" or "not
 confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V1_` or `V3_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
-a table never mixes engines, and a reading is never carried from one engine to another. Losses are in the table beside
-the gains: the database's host CPU-seconds, the grid's losses in four grids, the Panda's copper, CityLearn's bill.
+a table never mixes engines, and a reading is never carried from one engine to another. Every LOSS and every power given is in the table beside
+the GAINs: the database's host CPU-seconds, the grid's dissipated energy in four grids, the Panda's copper heating, CityLearn's bill (power given), CityLearn's energy not served and time uncomfortable (LOSS).
 
 ## The workload tables (`V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`, `V3_YCSB.md`) and the swarm table (`V3_SWARM.md`)
 
@@ -136,7 +164,7 @@ pairing stands, the mark stays, and the remedy is a longer window for that size 
 
 ## The one number (`results/OMNI_INDEX.md`)
 
-Every measure is a ratio oriented so that above 1 moved toward its aim for Omni-Compass on top of native: work, speed, machines,
+Every measure is a ratio oriented so that above 1 is a GAIN for Omni-Compass on top of native: work, speed, machines,
 energy. A test's index is the geometric mean of its ratios, a category's of its tests, the headline of the real
 categories, each weighted the same. A measure enters only as its three-run reading allows; no difference beyond the
 noise enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
@@ -155,23 +183,21 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 - **memory** is what it uses;
 - **master switch** must read "yes": everything handed back.
 
-## One number, one meaning of the sign (`docs/BENEFIT_SHEET.md`)
+## One number, one word (`docs/BENEFIT_SHEET.md`)
 
 In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
-the Reading column says which way the number went, **lower** or **higher**; who sets the aim differs from one system to the
-next, so no table judges (the founder's orders of 9 and 13 October). The benefit sheet turns every gauge the same way round
-against **its declared aim** (each preregistration's: lower for an amount waited, spent or held, higher for work done):
-**plus is toward the system's own aims, minus away from them**, whatever the gauge measures, and 0% is nothing beyond the
-noise. Beside it every change the same in all three of our runs is written out in words, never as a bare sign: "p95 lower
-65% (toward its aim)", "memory ceiling held higher 215% (away from its aim)", so neither can be misread against a table
-that shows the same changes as "-65%" and "+215%". One number per benchmark, by the index's own rule, with **yes**,
-**no**, **none** or **trade** beside it. Read that sheet first; read the tables for
+the Reading column gives its word, GAIN, EVEN or LOSS, by what the gauge is for (the key above). The benefit sheet turns
+every gauge the same way round against **its declared aim**: plus is a GAIN, minus a LOSS or power given, whatever the
+gauge measures, and 0% is EVEN, nothing beyond the noise. Beside it every change the same in all three of our runs is
+written out in words, never as a bare sign: "p95 cut 65% (GAIN)", "memory ceiling held up 215% (power given)", so
+neither can be misread against a table that shows the same changes as "-65%" and "+215%". One number per benchmark, by
+the index's own rule, with its word beside it. Read that sheet first; read the tables for
 the rows behind a number, and read their Reading column, never the sign alone. The wiring page uses the same words.
 
 ## Wire in, or watch (`docs/WIRING_VERDICTS.md`)
 
-One of three words per knob, by one rule from the tables above. **Write**: a gauge toward its aim in all three of our runs
-and none away from its aim in all three of our runs; Omni holds the knob. **Watch**: nothing toward its aim in all three of our runs; the knob stays native and Omni only
+One of three words per knob, by one rule from the tables above. **Write**: a gauge GAIN in all three of our runs
+and none LOSS or power given in all three of our runs; Omni holds the knob. **Watch**: nothing GAIN in all three of our runs; the knob stays native and Omni only
 reads it (one wire out, no wire in), and a loss in all three of our runs is named with its cause. **Operator's choice**: gains and losses both the same in all three of our runs, a trade, shown with both readings of the index. Rows marked "shown, not judged" never count. A modelled
 muscle takes its word from its label: superior is write, a tradeoff label is the operator's choice, the rest is watch. The
 CSV beside the page (`results/WIRING_VERDICTS.csv`) has one row per knob and per muscle.

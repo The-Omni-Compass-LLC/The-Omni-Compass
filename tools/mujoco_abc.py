@@ -5,10 +5,11 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for the robot arms (docs/OMNI_V1.md, docs/ROBOTICS_PREREGISTRATION.md): each robot run three times as
 separate GitHub runs on the same frozen engine (tools/run_mujoco.py). MuJoCo is deterministic, so the runs must give the
-same numbers: a gauge reads lower or higher in all three of our runs by its sign when all three runs agree, same when the
-change is under one part in a million, and "the runs differ" when they do not reproduce. A robot whose paired physics
-trial left the override native is listed as "nothing for Omni to move"; a robot whose own servo cannot do the task is
-listed with the runner's reason. Every row is reported, losses included.
+same numbers: a gauge reads GAIN or LOSS in all three of our runs when all three runs agree on the sign (judged by what the
+gauge is for, never by its sign; energy, force and copper heating are resources spent, so a rise reads power given), EVEN
+when the change is under one part in a million, and "the runs differ" when they do not reproduce. A robot whose paired
+physics trial left the override native is listed as "nothing for Omni to move"; a robot whose own servo cannot do the task
+is listed with the runner's reason. Every row is reported, LOSS included.
 Usage: python tools/mujoco_abc.py A_DIR B_DIR C_DIR --out results/live/V1_MUJOCO.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding mujoco-<robot>/<robot>.json"""
 from __future__ import annotations
@@ -21,7 +22,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, in_all_three, DETERMINISTIC_RULE, ACROSS_HEAD, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, in_all_three, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
 from tools.run_mujoco import GAUGES
 
 SAME_REL = 1e-6
@@ -61,13 +62,13 @@ def verdict(recs, k, direction):
     if any(c is None for c in ch):
         return "no value"
     if direction == "shown":
-        return "shown, not judged"
+        return SHOWN
     if all(abs(c) <= SAME_REL for c in ch):
-        return "same"
+        return EVEN_SAME
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    return in_all_three(signs == {-1})
+    return in_all_three(signs == {-1}, aim(direction, k))
 
 
 def engine(run):
@@ -99,8 +100,8 @@ def main(argv=None):
          "position servos it ships with as native. Omni sits on top of that servo on one knob, the speed override, inside the "
          "task's takt (`docs/ROBOTICS_PREREGISTRATION.md`). Energy is a declared model from MuJoCo's own torques and velocities, "
          "the same in both arms, with the standing draw charged for the whole takt. Three separate GitHub runs on the same frozen "
-         "engine: MuJoCo is deterministic, so " + DETERMINISTIC_RULE + ", **same** under one part in a million, and **the runs differ** when they do not reproduce. A robot whose "
-         "paired physics trial found a slower cycle no cheaper is listed as nothing for Omni to move. Every row is shown, losses "
+         "engine: MuJoCo is deterministic, so " + DETERMINISTIC_RULE + ", **EVEN, the same** under one part in a million, and **the runs differ** when they do not reproduce. A robot whose "
+         "paired physics trial found a slower cycle no cheaper is listed as nothing for Omni to move. Every row is shown, LOSS "
          "included.", "",
          "| Run | GitHub run | Commit | Engine | Robots in the run |", "|---|---|---|---|---:|"]
     off = []; seen = []
@@ -140,12 +141,12 @@ def main(argv=None):
             L.append(f"| {name} | {r0['native'][k]:.4g} | {r0['omni'][k]:.4g} | {pct(change(recs[0], k), k)} | {pct(change(recs[1], k), k)} | "
                      f"{pct(change(recs[2], k), k)} | {v} |")
         L.append("")
-    L += ["## Across the robots Omni moved", "", f"| Gauge | {ACROSS_HEAD} |", "|---|---|---|---:|---:|"]
+    L += ["## Across the robots Omni moved", "", f"| Gauge | {ACROSS_HEAD} |", ACROSS_RULE]
     for k, name, direction in GAUGES:
         t = tally.get(k)
         if not t:
             continue
-        L.append(f"| {name} | {across_cells(t, direction)} |")
+        L.append(f"| {name} | {across_cells(t, direction, k)} |")
     L += ["", "## Robots where the paired trial left the override native: nothing for Omni to move", "",
           "In native mode, before the counted cycles, one cycle at full speed and one at override 0.8 showed a slower cycle no "
           "cheaper on the robot's own figures (the gravity-holding torque is paid for longer), so Omni left the override at 1.0 "
@@ -160,8 +161,8 @@ def main(argv=None):
         L.append(f"| {rb} | `{e}` |")
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
-    nb, nw, nd = across_counts(tally, {k: d for k, _, d in GAUGES}.get)
-    print(f"{out}: {len(robots) - len(idle) - len(broken)} robots moved ({nb} gauge-rows toward the gauge's declared aim in all three of our runs, {nw} away from it, {nd} where the runs differ), "
+    ng, nl, nv, nd = across_counts(tally, {k: d for k, _, d in GAUGES}.get)
+    print(f"{out}: {len(robots) - len(idle) - len(broken)} robots moved ({ng} gauge-rows GAIN in all three of our runs, {nl} LOSS, {nv} power given, {nd} where the runs differ), "
           f"{len(idle)} nothing to move, {len(broken)} could not run")
     return 0
 

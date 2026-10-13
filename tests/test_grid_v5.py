@@ -47,24 +47,26 @@ class Grid(unittest.TestCase):
             text = out.read_text()
             self.assertIn("10 copies: run 111", text)
             self.assertIn("10 copies: run 222", text)
-            self.assertIn("FEWER MISSES: misses -0.100 pp, work +0.000%, power given +0.050% (10 of 10 runs)", text)
+            self.assertIn("GAIN (fewer misses): misses -0.100 pp, work +0.000%, power given +0.050% (10 of 10 runs)", text)
             self.assertIn("not in the receipt", text)                            # the tower at 100 runs
-            self.assertIn("| 10 repetitions: lower on 1 (response time (ms), 95th percentile), higher on 0, inside the noise on 1 |", text)
-            self.assertIn("10 repetitions: lower on 1 (response time (ms), 95th percentile), higher on 1 (organism energy (J)), "
-                          "inside the noise on 0; OFF THE CLOCK in 2 of 10 repetitions (late) |", text)
+            self.assertIn("| 10 repetitions: GAIN on 1 (response time (ms), 95th percentile), LOSS on 0, power given on 0, EVEN (inside the noise) on 1 |", text)
+            self.assertIn("10 repetitions: GAIN on 1 (response time (ms), 95th percentile), LOSS on 0, power given on 1 (organism energy (J)), "
+                          "EVEN (inside the noise) on 0; OFF THE CLOCK in 2 of 10 repetitions (late) |", text)
             self.assertIn("not in the report", text)
             # the one line the front page reads, counted from the squares (17 modelled: 11 of 10 and 100 runs, 6 single)
-            self.assertIn("**Across the grid: modelled, 11 of 11 squares of 10 and 100 runs FEWER MISSES; the 6 single runs: "
+            self.assertIn("**Across the grid: modelled, 11 of 11 squares of 10 and 100 runs GAIN (fewer misses); the 6 single runs: "
                           "6 with fewer misses; work +0.000%; power given +0.050%; with the cluster "
                           "inside, 2 squares: 0 single repetitions (no reading); of the 2 of 10 and 100 repetitions, by gauge: "
-                          "\"response time (ms), 95th percentile\" lower in 2, higher in 0, \"organism energy (J)\" lower in 0, "
-                          "higher in 1; off the clock in 1; invalid in 0.**", text)
+                          "\"response time (ms), 95th percentile\" GAIN in 2, LOSS in 0, \"organism energy (J)\" GAIN in 0, "
+                          "power given in 1; off the clock in 1; invalid in 0.**", text)
             # the test machine at each size, from native's own rows (the shown-only gauges)
             self.assertIn("### The test machine at each size", text)
             self.assertIn("| 10 copies (10 repetitions) | 100% | 100% | -2.0 to -1.2% | The whole tower 2 of 10 |", text)
-            # the page never says better or worse, whatever words the recorded verdicts carry
+            # the page never says better or worse, nor lower or higher as a reading, whatever words the recorded verdicts carry
             self.assertNotIn("better", text.lower())
             self.assertNotIn("worse", text.lower())
+            self.assertNotIn("lower on", text)
+            self.assertNotIn("higher on", text)
             self.assertIn("No outside party has reviewed or approved these results.", text)
             # every receipt's page linked from the grid page's own folder (a relative link resolves from the page)
             self.assertIn("](run-111/six-pooled-v5-x10/SIX_v5-x10.md)", text)

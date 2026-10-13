@@ -5,21 +5,21 @@
 Run: benchmark-reps 36351987055, commit 82d46a7. Five paired repetitions (native, me on top, me alone back to back on
 one runner, order rotated), 15 minutes each, kind with 1 control plane and 6 workers.
 
-A change is significant when its paired 95% interval excludes zero. Lower response time moved toward its aim.
+A change is significant when its paired 95% interval excludes zero. A response time that fell is GAIN.
 
 | Gauge | Native | Me on top | Me alone |
 |---|---:|---:|---:|
-| workers in service, mean | 6 | 3.87 (−35.5%, lower, significant) | 6 (equal) |
-| node-hours | 1.516 | 0.980 (−35.3%, lower, significant) | 1.519 (+0.2%, not significant) |
-| energy (Wh) | 159.2 | 121.9 (−23.4%, lower, significant) | 162.5 (+2.1%, lower, significant) |
-| energy per unit of work (Wh per core-hour) | 683 | 413 (−39.5%, lower, significant) | 520 (−24.0%, lower, significant) |
-| work done (CPU used, cores) | 0.923 | 1.166 (+26.3%, higher, significant) | 1.236 (+33.9%, higher, significant) |
-| response time, mean (ms) | 153.9 | 110.6 (−28.2%, lower, significant) | 94.2 (−38.8%, lower, significant) |
-| response time, 95th percentile (ms) | 320.8 | 204.7 (−36.2%, lower, significant) | 151.5 (−52.8%, lower, significant) |
-| response time, 99th percentile (ms) | 475.4 | 293.3 (−38.3%, lower, significant) | 185.5 (−61.0%, lower, significant) |
-| failed requests (%) | 0 | 0 (equal) | 0 (equal) |
-| pods not yet running, pod-minutes | 0.16 | 0.94 (+488%, not significant) | 0.52 (+227%, not significant) |
-| replicas, mean | 8.94 | 9.22 (+3.1%, not significant) | 9.83 (+10.0%, higher, significant) |
+| workers in service, mean | 6 | 3.87 (−35.5%, GAIN, significant) | 6 (EVEN) |
+| node-hours | 1.516 | 0.980 (−35.3%, GAIN, significant) | 1.519 (+0.2%, EVEN, not significant) |
+| energy (Wh) | 159.2 | 121.9 (−23.4%, GAIN, significant) | 162.5 (+2.1%, GAIN, significant) |
+| energy per unit of work (Wh per core-hour) | 683 | 413 (−39.5%, GAIN, significant) | 520 (−24.0%, GAIN, significant) |
+| work done (CPU used, cores) | 0.923 | 1.166 (+26.3%, GAIN, significant) | 1.236 (+33.9%, GAIN, significant) |
+| response time, mean (ms) | 153.9 | 110.6 (−28.2%, GAIN, significant) | 94.2 (−38.8%, GAIN, significant) |
+| response time, 95th percentile (ms) | 320.8 | 204.7 (−36.2%, GAIN, significant) | 151.5 (−52.8%, GAIN, significant) |
+| response time, 99th percentile (ms) | 475.4 | 293.3 (−38.3%, GAIN, significant) | 185.5 (−61.0%, GAIN, significant) |
+| failed requests (%) | 0 | 0 (EVEN) | 0 (EVEN) |
+| pods not yet running, pod-minutes | 0.16 | 0.94 (+488%, EVEN, not significant) | 0.52 (+227%, EVEN, not significant) |
+| replicas, mean | 8.94 | 9.22 (+3.1%, EVEN, not significant) | 9.83 (+10.0%, power given, significant) |
 
 ## What the trail shows
 

@@ -4,9 +4,9 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The drone swarms' A/B/C rule (tools/swarm_abc.py): a deterministic simulator, so the three runs must reproduce; a gauge
-reads lower or higher in all three of our runs by its sign when they do (each gauge's declared aim, lower, higher, never more or never
-less, kept for the count), same under one part in a million, "the runs differ" when they do not; a late mission, a reserve breach or a
-near miss added reads higher; a
+reads GAIN or LOSS in all three of our runs by what it is for when they do (energy is a resource spent: a rise reads power given),
+EVEN under one part in a million, "the runs differ" when they do not; a late mission, a reserve breach or a near miss added is a
+LOSS; a
 cell the paired trial left native is nothing for Omni to move; a cell with a collision is void; the tuning cell is shown
 and not counted."""
 import json
@@ -34,15 +34,15 @@ def rec(cell="mixed", moves=True, void=False, tuning=False, **omni):
 
 def main():
     moved = rec(energy_per_mission_j=380.0, fleet_energy_j=7700.0, missions_per_charge=7.0, tracking_rms_m=0.14, min_separation_m=0.18, override_mean=1.5, mission_s=15.0)
-    assert M.verdict([moved] * 3, "energy_per_mission_j", "lower") == "**lower in all three of our runs**"
-    assert M.verdict([moved] * 3, "missions_per_charge", "higher") == "**higher in all three of our runs**", "more missions a charge reads higher"
-    assert M.verdict([moved] * 3, "late_share", "never more") == "same"
+    assert M.verdict([moved] * 3, "energy_per_mission_j", "lower") == "**GAIN in all three of our runs**", "energy cut is a GAIN"
+    assert M.verdict([moved] * 3, "missions_per_charge", "higher") == "**GAIN in all three of our runs**", "more missions a charge is a GAIN"
+    assert M.verdict([moved] * 3, "late_share", "never more") == "EVEN, the same"
     assert M.verdict([moved] * 3, "min_separation_m", "shown") == "shown, not judged"
     more = rec(late_share=0.05, reserve_breaches=1, near_miss_ticks=3, missions_per_charge=5.0)
-    assert M.verdict([more] * 3, "late_share", "never more") == "**higher in all three of our runs**", "a late mission added reads higher"
-    assert M.verdict([more] * 3, "reserve_breaches", "never more") == "**higher in all three of our runs**"
-    assert M.verdict([more] * 3, "near_miss_ticks", "never more") == "**higher in all three of our runs**"
-    assert M.verdict([more] * 3, "missions_per_charge", "higher") == "**lower in all three of our runs**", "fewer missions a charge reads lower"
+    assert M.verdict([more] * 3, "late_share", "never more") == "**LOSS in all three of our runs**", "a late mission added is a LOSS"
+    assert M.verdict([more] * 3, "reserve_breaches", "never more") == "**LOSS in all three of our runs**"
+    assert M.verdict([more] * 3, "near_miss_ticks", "never more") == "**LOSS in all three of our runs**"
+    assert M.verdict([more] * 3, "missions_per_charge", "higher") == "**LOSS in all three of our runs**", "fewer missions a charge is a LOSS"
     other = rec(energy_per_mission_j=381.0)
     assert M.verdict([moved, moved, other], "energy_per_mission_j", "lower") == "**the runs differ**"
     with tempfile.TemporaryDirectory() as t:
@@ -56,14 +56,14 @@ def main():
         out = Path(t) / "V3.md"
         assert M.main(dirs + ["--out", str(out)]) == 0
         txt = out.read_text()
-        assert "### mixed" in txt and "### tuning" in txt and "lower in all three of our runs" in txt
+        assert "### mixed" in txt and "### tuning" in txt and "GAIN in all three of our runs" in txt
         assert "| short | 450.0 | 400.0 | yes |" in txt, "the cell the trial left native is listed as nothing to move"
         assert "| long | a collision in an arm" in txt, "a collision voids the cell"
         across = txt[txt.index("## Across the untouched cells"):txt.index("## Cells where the paired trial")]
-        assert "| energy per mission (J, declared model: motors and avionics over the fleet window) | 1 | 0 | 0 | 0 |" in across, "the tuning cell is not counted"
+        assert "| energy per mission (J, declared model: motors and avionics over the fleet window) | 1 | 0 | 0 | 0 | 0 |" in across, "the tuning cell is not counted"
         assert "Not three runs on one frozen engine" in txt
-    print("PASS  drone swarms A/B/C rule: reproduced runs read by each gauge's direction, a run that differs is a finding, a late mission, "
-          "a reserve breach or a near miss added reads higher, a cell left native is nothing to move, a collision voids the cell, the tuning cell is not counted")
+    print("PASS  drone swarms A/B/C rule: reproduced runs read GAIN, EVEN or LOSS by what each gauge is for, a run that differs is a finding, a late mission, "
+          "a reserve breach or a near miss added is a LOSS, a cell left native is nothing to move, a collision voids the cell, the tuning cell is not counted")
 
 
 if __name__ == "__main__":

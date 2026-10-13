@@ -34,6 +34,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp  # noqa: E402
 from tools.live_reps import T95  # noqa: E402
+from tools.readings import GAIN, LOSS, EVEN_NOISE  # noqa: E402  (the words every table uses)
 
 LATENCY_SHARE = 0.95      # a step keeps the latency limit when at least 95% of its requests are answered within the line
 FAIL_SHARE = 0.01         # and the failure limit when no more than 1% failed or were never sent
@@ -115,13 +116,15 @@ def paired(diffs):
 
 
 def reading(lo, hi, n) -> str:
+    """Completed work and capacity are work done, so their aim is higher: a rise clear of the noise is GAIN, a fall LOSS
+    (tools/readings.py)."""
     if n < 2 or math.isnan(lo):
         return "one pair (no reading)"
     if lo > 0:
-        return "higher"
+        return GAIN
     if hi < 0:
-        return "lower"
-    return "no difference beyond the noise"
+        return LOSS
+    return EVEN_NOISE
 
 
 def row(cap, prs):
@@ -168,15 +171,15 @@ def audit(r) -> str:
     cap_line = (f" The highest load served within both limits: {r['capacity_native']:.1f} → {r['capacity_omni']:.1f} "
                 f"requests a second ({r['capacity_reading']}).")
     lim = f" Failed or never sent: {r['fail_native']:.1%} → {r['fail_omni']:.1%}."
-    if r["work_reading"] == "higher":
+    if r["work_reading"] == GAIN:
         return (f"At {cap}, Omni on top completed {r['work_diff']:,.0f} more requests within {r['slo_ms']:.0f} ms than "
-                f"native alone ({r['work_pct']:+.1f}%{iv}): more work from the same cap.{cap_line}{lim}")
-    if r["work_reading"] == "lower":
+                f"native alone ({r['work_pct']:+.1f}%{iv}): a GAIN, more work from the same cap.{cap_line}{lim}")
+    if r["work_reading"] == LOSS:
         return (f"At {cap}, Omni on top completed {abs(r['work_diff']):,.0f} fewer requests within {r['slo_ms']:.0f} ms "
-                f"than native alone ({r['work_pct']:+.1f}%{iv}), reported as it stands, its cause looked for in our own "
-                f"wiring first.{cap_line}{lim}")
-    return (f"At {cap}, the difference in completed work ({r['work_pct']:+.1f}%{iv}) is inside the noise: no difference "
-            f"beyond the noise at this cap.{cap_line}{lim}")
+                f"than native alone ({r['work_pct']:+.1f}%{iv}): a LOSS, reported as it stands, its cause looked for in our "
+                f"own wiring first.{cap_line}{lim}")
+    return (f"At {cap}, the difference in completed work ({r['work_pct']:+.1f}%{iv}) is inside the noise: EVEN, no "
+            f"difference beyond the noise at this cap.{cap_line}{lim}")
 
 
 def steps_up(rows):
@@ -238,10 +241,12 @@ def main(argv=None):
           "add-on run of 12 October: CPU used +32%, 95th-percentile response -55%, the same six workers; faster service "
           "for the same work, not yet more completed work).",
           "- **The cap holds native back** (native leaves offered requests unanswered within the line): a higher count "
-          "for Omni on top at the same cap is more work from the same capacity.",
+          "for Omni on top at the same cap is more work from the same capacity, a GAIN.",
           "- **Each step up in the cap**: if both arms do more as the cap rises, the step table shows which turns each "
           "added core into more completed work.",
-          "- A loss is reported as it stands; its cause is looked for in our own wiring, setup and scoring first."]
+          "- Completed work and capacity are work done, so a rise is GAIN and a fall is LOSS; inside the noise is EVEN (the "
+          "key: `docs/HOW_TO_READ_THE_RESULTS.md`). A LOSS is reported as it stands; its cause is looked for in our own "
+          "wiring, setup and scoring first."]
     if left_out:
         L += ["", "Left out (listed, never dropped silently):", ""] + [f"- {x}" for x in left_out]
     L += ["", "Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results."]

@@ -71,16 +71,16 @@ window, the repetitions and the readings are as written above.
 `tools/capacity_report.py` writes one row per cap level and one plain audit line under it:
 
 - the paired difference in completed work (Omni on top minus native, pairs within one job) with its 95% interval:
-  **toward its aim** (the interval above zero), **away from its aim** (below zero), or **no difference beyond the noise** (the interval
+  **GAIN** (the interval on the side of the gauge's aim), **LOSS** (below zero), or **no difference beyond the noise** (the interval
   includes zero);
 - the same for capacity;
 - a row where both arms answered at least 99% of everything offered within the line never met its cap: it shows speed,
   not more work, and its audit line says so;
 - each step up in the cap: the completed work and the capacity each arm gains per added core.
 
-Across runs A, B and C every row gets one of the three readings of `tools/readings.py`: lower or higher in all three of
-our runs (the same sign in all three, every interval clear of zero), no difference beyond the noise, or the runs
-disagree. Every row is reported, losses included; a loss's cause is looked for in our own wiring, setup and scoring first.
+Across runs A, B and C every row gets one of the three readings of `tools/readings.py`: GAIN or LOSS in all three of
+our runs (the same sign in all three, every interval clear of zero, judged by the gauge's aim), EVEN (no difference beyond the noise), or the runs
+disagree. Every row is reported, LOSS included; a LOSS's cause is looked for in our own wiring, setup and scoring first.
 
 ## Validity
 

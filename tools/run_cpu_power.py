@@ -61,6 +61,7 @@ sys.path.insert(0, str(ROOT))
 from omnicompass import master  # noqa: E402
 from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
 from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402
+from tools.readings import word as gel_word, aim as gel_aim, EVEN_SAME, EVEN_NOISE, SHOWN  # noqa: E402  (the words every table uses)
 
 SYSFS_CPU = "/sys/devices/system/cpu"
 SYSFS_RAPL = "/sys/class/powercap"
@@ -95,10 +96,10 @@ GAUGES = [  # key, label, direction
     ("p99_ms", "latency, 99th percentile (ms)", "lower"),
     ("mean_ms", "latency, mean (ms)", "lower"),
     ("failed", "failed requests (not answered by the end of the arm)", "never more"),
-    ("energy_j", "energy, CPU package (J; the processor's own meter, the resource)", "lower"),
-    ("power_w_mean", "power, CPU package mean (W)", "lower"),
-    ("j_per_1k_inside", "energy per 1,000 requests inside the line (J)", "lower"),
-    ("wall_j", "energy, whole machine at the wall (J; where a plug is fitted)", "lower"),
+    ("energy_j", "energy, CPU package (J; the processor's own meter, the resource)", "spent"),
+    ("power_w_mean", "power, CPU package mean (W)", "spent"),
+    ("j_per_1k_inside", "energy per 1,000 requests inside the line (J)", "spent"),
+    ("wall_j", "energy, whole machine at the wall (J; where a plug is fitted)", "spent"),
     ("ceiling_mhz_mean", "frequency ceiling held, mean (MHz; the knob)", "shown"),
     ("freq_mhz_mean", "frequency run at, mean (MHz; the governor's own choice under the ceiling)", "shown"),
     ("cpu_busy_share", "CPU busy (share of the run)", "shown"),
@@ -630,15 +631,15 @@ def paired(reps, key, direction):
     same = abs(mean) <= SAME_REL * max(abs(nat), 1e-12)
     clear = n > 1 and (lo > 0 or hi < 0) and not same
     if direction == "shown":
-        reading = "shown, not judged"
+        reading = SHOWN
     elif direction == "never more" and any(x > 0 for x in d):
-        reading = "**higher in a repetition**"
+        reading = "**LOSS in a repetition**"
     elif same:
-        reading = "same"
+        reading = EVEN_SAME
     elif not clear:
-        reading = "no difference beyond the noise"
+        reading = EVEN_NOISE
     else:
-        reading = "lower" if mean < 0 else "higher"                # which way it went; the gauge's aim is the reader's
+        reading = gel_word(mean < 0, gel_aim(direction, key))      # the word by what the gauge is for, never by its sign
     return {"native": nat, "omni": om, "diff": mean, "ci95": [lo, hi], "n": n, "significant": clear, "reading": reading}
 
 

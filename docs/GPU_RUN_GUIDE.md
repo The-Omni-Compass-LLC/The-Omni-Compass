@@ -197,8 +197,8 @@ A table from the GPU's own power meter:
 - the preregistered primary result: work per energy, in requests served per kilojoule, with its 95% interval.
 
 It ends with one verdict line, one of:
-- **toward its aim, proven**;
-- **away from its aim, proven**;
+- **GAIN, proven**;
+- **LOSS, proven**;
 - **not proven**;
 - **more requests per kJ, fails the service guardrail**.
 

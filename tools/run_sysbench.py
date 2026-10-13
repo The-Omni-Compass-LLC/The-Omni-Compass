@@ -108,12 +108,12 @@ GAUGES = [  # key, label, direction
     ("p99_ms", "latency, 99th percentile (ms)", "lower"),
     ("mean_ms", "latency, mean (ms)", "lower"),
     ("failed", "errors (sysbench's ignored errors: deadlocks and retries)", "never more"),
-    ("pool_mb_mean", "buffer pool held, mean (MB; the knob, the resource)", "lower"),
-    ("pool_used_mb_mean", "pages holding data, mean (MB)", "lower"),
+    ("pool_mb_mean", "buffer pool held, mean (MB; the knob, the resource)", "spent"),
+    ("pool_used_mb_mean", "pages holding data, mean (MB)", "spent"),
     ("disk_reads", "pages read from disk into the pool (misses)", "shown"),
-    ("cpu_busy_share", "host CPU busy (share of the run)", "lower"),
-    ("cpu_seconds", "host CPU-seconds", "lower"),
-    ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 transactions inside the line", "lower"),
+    ("cpu_busy_share", "host CPU busy (share of the run)", "spent"),
+    ("cpu_seconds", "host CPU-seconds", "spent"),
+    ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 transactions inside the line", "spent"),
     ("writes", "buffer pool size changes written (the knob's moves)", "shown"),
 ]
 

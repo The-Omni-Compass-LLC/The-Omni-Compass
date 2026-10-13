@@ -5,19 +5,19 @@
 Run: benchmark-reps 36346848307, commit 7d07754. Five paired repetitions (native, me on top, me alone back to back on
 one runner, order rotated), 15 minutes each, kind with 1 control plane and 6 workers.
 
-A change is significant when its paired 95% interval excludes zero. Lower response time moved toward its aim.
+A change is significant when its paired 95% interval excludes zero. A response time that fell is GAIN.
 
 | Gauge | Native | Me on top | Me alone |
 |---|---:|---:|---:|
-| response time, mean (ms) | 162.1 | 98.7 (−39.1%, lower, significant) | 97.4 (−39.9%, lower, significant) |
-| response time, 95th percentile (ms) | 328.5 | 152.3 (−53.6%, lower, significant) | 150.7 (−54.1%, lower, significant) |
-| response time, 99th percentile (ms) | 473.9 | 204.3 (−56.9%, lower, significant) | 179.5 (−62.1%, lower, significant) |
-| failed requests (%) | 0 | 0 (equal) | 0 (equal) |
-| utilisation, work done (used / allocatable) | 0.0386 | 0.0529 (+36.8%, higher, significant) | 0.0519 (+34.3%, higher, significant) |
-| workers in service, mean | 6 | 6 (equal) | 6 (equal; the interval is a rounding artefact) |
-| node-hours | 1.516 | 1.515 (−0.1%, not significant) | 1.524 (+0.5%, lower, significant) |
-| energy (Wh) | 159.3 | 162.4 (+1.9%, higher, significant) | 163.2 (+2.4%, higher, significant) |
-| pods not yet running, pod-minutes | 0.053 | 0.32 (+500%, not significant) | 0.107 (+100%, not significant) |
+| response time, mean (ms) | 162.1 | 98.7 (−39.1%, GAIN, significant) | 97.4 (−39.9%, GAIN, significant) |
+| response time, 95th percentile (ms) | 328.5 | 152.3 (−53.6%, GAIN, significant) | 150.7 (−54.1%, GAIN, significant) |
+| response time, 99th percentile (ms) | 473.9 | 204.3 (−56.9%, GAIN, significant) | 179.5 (−62.1%, GAIN, significant) |
+| failed requests (%) | 0 | 0 (EVEN) | 0 (EVEN) |
+| utilisation, work done (used / allocatable) | 0.0386 | 0.0529 (+36.8%, GAIN, significant) | 0.0519 (+34.3%, GAIN, significant) |
+| workers in service, mean | 6 | 6 (EVEN) | 6 (equal; the interval is a rounding artefact) |
+| node-hours | 1.516 | 1.515 (−0.1%, EVEN, not significant) | 1.524 (+0.5%, GAIN, significant) |
+| energy (Wh) | 159.3 | 162.4 (+1.9%, power given, significant) | 163.2 (+2.4%, power given, significant) |
+| pods not yet running, pod-minutes | 0.053 | 0.32 (+500%, EVEN, not significant) | 0.107 (+100%, EVEN, not significant) |
 
 **Useful work per unit of energy** (work done ÷ energy, from the means above, not itself paired-tested): +34% on top, +31% alone. The clients wait for
 each answer before asking again, so faster answers bring more requests: 37% more work for 2% more energy.

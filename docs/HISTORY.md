@@ -39,9 +39,9 @@ This is the whole repository at the commit named in `STATE_OF_PLAY_COMMIT.txt`. 
 
 | Claim | Evidence | Where |
 |---|---|---|
-| **B (Omni on top of each platform):** 0 losing cells on held-out scenarios; strictly toward its aim on 27 of 28 platform-workload pairs | simulation, pre-registered | `tuning/B_FIX.json`, `tuning/B_TONE_HELDOUT.json` |
+| **B (Omni on top of each platform):** 0 losing cells on held-out scenarios; strictly GAIN on 27 of 28 platform-workload pairs | simulation, pre-registered | `tuning/B_FIX.json`, `tuning/B_TONE_HELDOUT.json` |
 | **Four-cluster sites:** B 0 losses on all 7 platforms; C 0 losses vs GKE, AKS/Karpenter, CAST AI, Spot | simulation, held-out | `tuning/SITE_LEAGUE.json` |
-| **C (Omni alone), one global setting, 400 never-used scenarios:** 153 toward their aims / 174 equal / 37 away from their aims of 364 cells (Holm-corrected) | simulation, held-out | `tuning/CONFIRMATORY.json` |
+| **C (Omni alone), one global setting, 400 never-used scenarios:** 153 toward their aims / 174 equal / 37 LOSS or power given of 364 cells (Holm-corrected) | simulation, held-out | `tuning/CONFIRMATORY.json` |
 | **C with nervous-system coordination, 400 fresh scenarios:** 151 / 173 / 40 | simulation, held-out | `tuning/CONFIRMATORY_COORD.json` |
 | **Controllers fighting each other:** lowest of all 8 systems on web (0.07 per day) and four-cluster sites (0.56 per day) | simulation, held-out | same file |
 | **Real demand, 1,052 recorded PlanetLab machines:** 0 losing cells of 91 | simulation on real traces | `tuning/PLANETLAB_LEAGUE.json` |
@@ -96,7 +96,7 @@ locally at this commit.
 ## What came from the other AI builds, and what was tested
 
 - **ChatGPT** (`results/external_review/CHATGPT_RELEASE_REVIEW.md`):
-  - Its recovery reflex overrides the power envelope. Head to head, this engine moved toward its aim on 11 gauges in its default
+  - Its recovery reflex overrides the power envelope. Head to head, this engine read GAIN on 11 gauges in its default
     mode and its reflex on 1. Not adopted.
   - Its CPU-frequency connector was adopted, wired under the nervous system with a schedutil floor and exact restore.
 - **Grok** (`results/external_review/GROK_HARNESS_REVIEW.md`):
@@ -125,10 +125,10 @@ locally at this commit.
 
 **Omni v1, the same in all three of our runs.** On real Kubernetes, every test ran three times as separate GitHub runs on the frozen
 engine, ten pairs each (`docs/OMNI_V1.md`, the six `results/live/V1_*.md` tables). Work inside the response line **+42%
-to +48%** in all three runs of the all-four test (18.6 → 27.6 requests a second in run A), toward its aim in all three of our runs; the 95th
-percentile **−57% to −69%** in every run of the steady, wandering, all-four and fault tests, toward its aim in all three of our runs; failed
-requests −12% to −13% where load swings, toward its aim in all three of our runs; machines −1.5% to −3.4% at steady load and −15% to −24% on
-the batch queue, toward its aim in all three of our runs, no difference beyond the noise elsewhere; energy a declared model (kind never powers a
+to +48%** in all three runs of the all-four test (18.6 → 27.6 requests a second in run A), GAIN in all three of our runs; the 95th
+percentile **−57% to −69%** in every run of the steady, wandering, all-four and fault tests, GAIN in all three of our runs; failed
+requests −12% to −13% where load swings, GAIN in all three of our runs; machines −1.5% to −3.4% at steady load and −15% to −24% on
+the batch queue, GAIN in all three of our runs, no difference beyond the noise elsewhere; energy a declared model (kind never powers a
 machine down); beside a noisy neighbour, no difference beyond the noise on every row. **The Omni index on v1: +26.2%**
 on real Kubernetes (`results/OMNI_INDEX.md`; only rows the same in all three of our runs count, a row inside the noise counts
 as zero; Azure and the card join when their v1 runs land). The paragraph below is the earlier engine's reading, kept as
@@ -146,8 +146,8 @@ check parked 29-36%: `docs/history/`). All of it together, real machines only: *
 (`results/OMNI_INDEX.md`).
 
 **Omni v1** (`docs/OMNI_V1.md`): the engine is frozen and fingerprinted (`OMNI_V1.json`), and every test above runs
-three times on it, as separate GitHub runs (A the result, B and C the replications); each table reads toward its aim in all three of our runs,
-away from its aim in all three of our runs, no difference beyond the noise, or the runs disagree, and replaces the earlier engine's table as it
+three times on it, as separate GitHub runs (A the result, B and C the replications); each table reads GAIN in all three of our runs,
+LOSS in all three of our runs, no difference beyond the noise, or the runs disagree, and replaces the earlier engine's table as it
 lands. Running on v1 now: the Kubernetes suite three times, the batch test, the six organisms at 1, 10, 100 and 1,000
 copies with the real cluster inside, the big organisms on rented Azure machines, the Azure steady and burst bill tests,
 CityLearn, and the power grid.
@@ -175,7 +175,7 @@ never counted in the headline.
 | Six organisms, cluster inside, 5 pairs each | requests served +0.5% to +6% | p95 -24% to -40% | same to -2% | -0.1% to -0.6% | `results/live/SIX_KUBE.md` |
 | Azure AKS, steady load, 5 pairs | same | p95 -20% | same | (billed) same | `results/live/AKS_BILL.md` |
 
-All four in one run is done: every one toward its aim and proven in the same run (`results/live/ALL_FOUR.md`). Running now: demand that wanders (up, spike, down, back up,
+All four in one run is done: every one a proven GAIN in the same run (`results/live/ALL_FOUR.md`). Running now: demand that wanders (up, spike, down, back up,
 idle, 10 pairs), the Azure burst bill test, and the 1,000-copy grid of the six organisms on Lambda.
 
 ### The engine now, and what runs on it (2026-10-05)
@@ -192,7 +192,7 @@ Back on the frozen engine so far, ten pairs each:
 - **Faults** (`results/live/FAULTS.md`): p95 −60%, mean response −35%, time over the line −23%, pending pods −77%.
   Recovery is faster after every fault: machine down 42 s against 70 s, a blind probe 54 s against 66 s, a runaway pod
   98 s against 105 s, a spike the same.
-- **Fairness** (`results/live/FAIRNESS.md`): a noisy neighbour on the same cluster. Mean response −15%, nothing away from its aim,
+- **Fairness** (`results/live/FAIRNESS.md`): a noisy neighbour on the same cluster. Mean response −15%, no LOSS,
   and the neighbour's own app never behind. The earlier engine scored −0.3% on the index here; this engine scores +5.6%.
 
 Independent simulator: CityLearn round 1 split (the 2022 battery districts lower on bill -4% to -11%, electricity -9%

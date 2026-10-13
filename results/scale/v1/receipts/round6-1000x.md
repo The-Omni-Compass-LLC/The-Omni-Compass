@@ -21,12 +21,12 @@ Source: GitHub Actions workflow `six`, run 37113091348 (#124), job `receipts` 11
 
 | # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
 |---|---|---:|---:|---|---|---:|---:|---:|---:|---|
-| 1 | Compute / AI / Cloud | 345000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.088% (+0.088 to +0.088) | -0.000% (-0.000 to -0.000) | -0.088% (-0.088 to -0.088) | -0.016 (-0.016 to -0.016) | True |
-| 2 | Physics / Robotics / Autonomous | 262000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.086% (+0.085 to +0.086) | -0.000% (-0.000 to -0.000) | -0.086% (-0.086 to -0.086) | -0.007 (-0.008 to -0.007) | True |
-| 3 | Energy / Facility / Industrial | 282000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.188% (+0.188 to +0.188) | +0.000% (-0.000 to +0.000) | -0.187% (-0.187 to -0.187) | -0.030 (-0.030 to -0.030) | True |
-| 4 | Distribution / Specialized | 337000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.084% (+0.083 to +0.084) | -0.000% (-0.000 to -0.000) | -0.084% (-0.084 to -0.083) | -0.016 (-0.016 to -0.016) | True |
-| 5 | The four stacked, duplicates kept | 1226000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.154% (+0.154 to +0.154) | -0.000% (-0.000 to -0.000) | -0.154% (-0.154 to -0.154) | -0.022 (-0.022 to -0.022) | True |
-| 6 | The whole tower, every muscle once | 656000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.182% (+0.182 to +0.182) | -0.000% (-0.000 to +0.000) | -0.181% (-0.181 to -0.181) | -0.007 (-0.007 to -0.007) | True |
+| 1 | Compute / AI / Cloud | 345000 | 10 | **GAIN (within the guardrails)** | held | +0.088% (+0.088 to +0.088) | -0.000% (-0.000 to -0.000) | -0.088% (-0.088 to -0.088) | -0.016 (-0.016 to -0.016) | True |
+| 2 | Physics / Robotics / Autonomous | 262000 | 10 | **GAIN (within the guardrails)** | held | +0.086% (+0.085 to +0.086) | -0.000% (-0.000 to -0.000) | -0.086% (-0.086 to -0.086) | -0.007 (-0.008 to -0.007) | True |
+| 3 | Energy / Facility / Industrial | 282000 | 10 | **GAIN (within the guardrails)** | held | +0.188% (+0.188 to +0.188) | +0.000% (-0.000 to +0.000) | -0.187% (-0.187 to -0.187) | -0.030 (-0.030 to -0.030) | True |
+| 4 | Distribution / Specialized | 337000 | 10 | **GAIN (within the guardrails)** | held | +0.084% (+0.083 to +0.084) | -0.000% (-0.000 to -0.000) | -0.084% (-0.084 to -0.083) | -0.016 (-0.016 to -0.016) | True |
+| 5 | The four stacked, duplicates kept | 1226000 | 10 | **GAIN (within the guardrails)** | held | +0.154% (+0.154 to +0.154) | -0.000% (-0.000 to -0.000) | -0.154% (-0.154 to -0.154) | -0.022 (-0.022 to -0.022) | True |
+| 6 | The whole tower, every muscle once | 656000 | 10 | **GAIN (within the guardrails)** | held | +0.182% (+0.182 to +0.182) | -0.000% (-0.000 to +0.000) | -0.181% (-0.181 to -0.181) | -0.007 (-0.007 to -0.007) | True |
 
 ---
 

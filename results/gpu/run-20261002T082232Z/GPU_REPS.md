@@ -107,8 +107,8 @@ Phase: **confirm**. Omni frozen at commit c908054053e9; file hashes in FREEZE.js
 
 Work per energy under Omni against native: 50.79 -> 52.62 served requests per kJ, difference +1.824 (95% interval +1.355 to +2.293).
 Guardrails: requests served held (not below -1%), 95th-percentile response time FAILED (not above +10%), requests not served held (not above +1% of native served).
-Observation (watch against native) on the same outcome: toward its aim, not proven. Authority (omni against watch): toward its aim, proven.
-**Result, by rule: ENERGY IMPROVEMENT WITH SERVICE TRADEOFF.**
+Observation (watch against native) on the same outcome: GAIN, not proven. Authority (omni against watch): GAIN, proven.
+**Result, by rule: GAIN AND LOSS (energy cut, service traded for it).**
 
 ## Actuator fidelity (receipt B: requested against read back from the device)
 
