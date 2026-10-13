@@ -105,8 +105,23 @@ if [ "$PHASE" = install ]; then
     kubectl -n "$NS" rollout status deployment/"$d" --timeout=300s
   done
   kubectl -n "$NS" get pods -o wide > "$OUT_DIR/cruisekube_pods.txt"
-  off=$(kubectl get pods -A -o json | jq -r '[.items[] | select((.metadata.namespace | IN("cruisekube-system","cruisekube-metrics")) and (.metadata.labels.app // "") != "node-exporter" and .status.phase == "Running") | select(.spec.nodeName | test("control-plane") | not) | .metadata.namespace + "/" + .metadata.name] | join(" ")')
+  # every add-on pod but node-exporter on the control plane: a pod the move replaced is given two minutes to finish
+  # shutting down on its worker, as a rollout leaves it, and a pod still serving on a worker fails the run
+  offpods() {   # $1 true: count pods shutting down too; false: only pods still serving
+    kubectl get pods -A -o json | jq -r --argjson terminating "$1" '[.items[]
+      | select((.metadata.namespace | IN("cruisekube-system","cruisekube-metrics"))
+               or (.metadata.namespace == "kube-system" and (.metadata.labels["app.kubernetes.io/name"] // "") == "kube-state-metrics"))
+      | select((.metadata.labels.app // "") != "node-exporter")
+      | select(.status.phase == "Running" or .status.phase == "Pending")
+      | select($terminating or .metadata.deletionTimestamp == null)
+      | select((.spec.nodeName // "") | test("control-plane") | not)
+      | .metadata.namespace + "/" + .metadata.name] | join(" ")'
+  }
+  for _ in $(seq 1 24); do [ -z "$(offpods true)" ] && break; sleep 5; done
+  off=$(offpods false)
   [ -z "$off" ] || { echo "add-on pods on a measured worker: $off"; exit 1; }
+  left=$(offpods true)
+  [ -z "$left" ] || echo "still shutting down on a worker two minutes after the move: $left" | tee -a "$OUT_DIR/addons.txt"
   # every image the add-ons run, as the cluster resolved it (tag and digest), in the run's own record
   kubectl get pods -A -o json | jq -r '.items[] | select(.metadata.namespace | IN("cruisekube-system","cruisekube-metrics") or (.metadata.name | startswith("kube-state-metrics"))) | .status.containerStatuses[]? | "\(.image) \(.imageID)"' \
     | sort -u >> "$OUT_DIR/cruisekube_pins.txt"
@@ -146,7 +161,7 @@ if [ "$PHASE" = learn ]; then
     kubectl scale deployment/load-generator --replicas="${steps[$(( i % ${#steps[@]} ))]}" >/dev/null
     sleep "$per"; i=$(( i + 1 ))
     api_up || true
-    if api "/audit-events/$WORKLOAD_ID" > "$OUT_DIR/cruisekube_audit_start.json" 2>/dev/null \
+    if api "/audit-events/$WORKLOAD_ID?minutes=600" > "$OUT_DIR/cruisekube_audit_start.json" 2>/dev/null \
        && [ "$(jq '[.events[]? | select((.category // "") | test("RECOMMENDATION_APPLIED|WEBHOOK_MUTATION"))] | length' "$OUT_DIR/cruisekube_audit_start.json" 2>/dev/null || echo 0)" -gt 0 ]; then
       applied=1
     fi
@@ -162,7 +177,7 @@ fi
 
 if [ "$PHASE" = end ]; then
   api_up || true
-  api "/audit-events/$WORKLOAD_ID" > "$OUT_DIR/cruisekube_audit_end.json" 2>>"$OUT_DIR/end_reads.err" || true
+  api "/audit-events/$WORKLOAD_ID?minutes=600" > "$OUT_DIR/cruisekube_audit_end.json" 2>>"$OUT_DIR/end_reads.err" || true
   api /workloads > "$OUT_DIR/cruisekube_workloads_end.json" 2>>"$OUT_DIR/end_reads.err" || true
   kubectl -n "$NS" logs deployment/cruisekube-controller --tail=400 --request-timeout=20s > "$OUT_DIR/cruisekube-controller.log" 2>&1 || true
   kubectl -n "$NS" logs deployment/cruisekube-webhook --tail=200 --request-timeout=20s > "$OUT_DIR/cruisekube-webhook.log" 2>&1 || true

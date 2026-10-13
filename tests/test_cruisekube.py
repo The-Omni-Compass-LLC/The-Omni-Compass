@@ -61,6 +61,13 @@ class Wiring(unittest.TestCase):
         for phase in ("install", "learn", "end"):
             self.assertIn(f"PHASE={phase} ", s[s.index('if [ -n "$CRUISEKUBE" ]'):])
 
+    def test_add_ons_on_the_control_plane(self):
+        s = ADDON.read_text()
+        self.assertIn('select($terminating or .metadata.deletionTimestamp == null)', s)   # a replaced pod may finish shutting down
+        self.assertIn('(.metadata.labels["app.kubernetes.io/name"] // "") == "kube-state-metrics"', s)
+        self.assertIn('[ -z "$off" ] || { echo "add-on pods on a measured worker: $off"; exit 1; }', s)
+        self.assertEqual(s.count('api "/audit-events/$WORKLOAD_ID?minutes=600"'), 2)       # the whole run, not the last hour
+
     def test_no_change_applied_is_invalid(self):
         s = ADDON.read_text()
         self.assertIn('[ -n "$applied" ] || { echo "INVALID RUN: CruiseKube made no change', s)
