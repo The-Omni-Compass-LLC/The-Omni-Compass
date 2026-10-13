@@ -8,7 +8,7 @@ name: realms-v5
 # own machine: every muscle alone and the six organisms, at their own load and in the climb, native against Omni on top
 # (realms/compass_arm_v5.py, the max), on the preregistered seeds 3000-3009 (tools/run_realms_v5.py). Evidence class S
 # (modelled). The run is deterministic: every label must match the table committed in results/realms_v5/, every number
-# within 1e-3 or 0.5%, and no muscle alone may be worse than native (the no-harm check). Started by hand (Actions -> realms-v5 -> Run workflow), by a commit message
+# within 1e-3 or 0.5%, and no muscle alone may move away from its aims against native (the no-harm check). Started by hand (Actions -> realms-v5 -> Run workflow), by a commit message
 # containing [realms-v5], or by v5-all-benchmarks.yml.
 on:
   workflow_dispatch:
@@ -38,15 +38,16 @@ jobs:
         run: python3 tests/test_compass_arm_v5.py
       - name: Every muscle alone and the six organisms at the max, own load, the climb and the line (seeds 3000-3009)
         run: python3 tools/run_realms_v5.py --out realms5-out
-      - name: Same table as the one published, and no muscle worse than native
+      - name: Same table as the one published, and no muscle away from its aims against native
         run: |
           set -o pipefail
           python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import csv, json, sys
           a = list(csv.DictReader(open("realms5-out/MUSCLES_V5.csv")))
           muscles = {x["muscle_id"]: x for x in a}                 # one row per muscle and load; its label over all loads
-          worse = sorted({x["muscle"] for x in a if x.get("label_all_loads", x["label"]) in ("WORSE", "MIXED")})
-          print(f"no-harm: {len(muscles)} muscles, {len(worse)} worse than native under any load" + (": " + ", ".join(worse) if worse else ""))
+          # the labels of the table (tools/run_realms_v5.py), and the ones the tables written before 13 October used
+          away = sorted({x["muscle"] for x in a if x.get("label_all_loads", x["label"]) in ("AWAY FROM ITS AIMS", "BOTH WAYS", "WORSE", "MIXED")})
+          print(f"no-harm: {len(muscles)} muscles, {len(away)} away from their aims or both ways against native under any load" + (": " + ", ".join(away) if away else ""))
           try:
               b = list(csv.DictReader(open("results/realms_v5/MUSCLES_V5.csv")))
               mine, pub = json.load(open("realms5-out/RUN.json")), json.load(open("results/realms_v5/RUN.json"))
@@ -54,7 +55,7 @@ jobs:
               b, mine, pub = [], {}, {}
           if len(b) != len(a) or mine.get("frozen_tree_sha256") != pub.get("frozen_tree_sha256"):
               print("::notice::the committed table is from another engine tree: nothing to compare yet; this run's table is the first on this tree")
-              sys.exit(1 if worse else 0)
+              sys.exit(1 if away else 0)
           bad = []
           for x, y in zip(a, b):
               for k in x:
@@ -68,7 +69,7 @@ jobs:
           print(f"published v5 table reproduced: {len(a)} muscles, {len(bad)} differences beyond 1e-3 (or 0.5%)")
           for d in bad[:40]:
               print("  differs:", d)
-          sys.exit(1 if (bad or worse) else 0)
+          sys.exit(1 if (bad or away) else 0)
           PY
       - name: Results summary
         if: always()

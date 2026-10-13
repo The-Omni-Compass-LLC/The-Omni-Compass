@@ -157,12 +157,13 @@ There is no third arm and no other name (section 1.1).
 |---|---|---|
 | Off (manual) | nothing; native runs alone | before installing, and whenever you choose |
 | Watching | reads every gauge and logs what it would do; writes nothing | the first level of every installation (level 1) |
-| Autopilot | idle, gas, brake and reset, by its law | after the watch level has passed |
-| Cruise | every machine in service while a known queue waits | batch work |
+| Autopilot | one pedal: push for more, lift off for less, idle (lifted all the way) and reset, by its law | after the watch level has passed |
+| Cruise | machines in service up to the pool's own top while a known queue waits | batch work |
 
-**The pedals.** *Idle*: no gas, no brake, the floor of two machines in service, ready for the next burst. *Gas*: capacity
-added at once as traffic climbs, never held back. *Brake*: capacity eased off a step at a time, never below idle. *Reset*:
-the brake held to the floor; every setting handed back to where native had it, read back, and the record removed.
+**One pedal**, like an electric car's. *Push*: capacity added at once as traffic climbs, never held back. *Lift off*:
+capacity eased off a step at a time, handed back toward native, never below idle. *Idle*: the pedal lifted all the way,
+the floor of two machines in service, ready for the next burst. *Reset*: every setting handed back to where native had
+it, read back, and the record removed.
 
 **The ways it stops, and what each leaves behind** (section 11).
 
@@ -282,24 +283,26 @@ seat. The vocabulary is used the same way everywhere in this repository (`docs/M
 - **Watching.** Omni-Compass reads every gauge and logs the decision it would take, and writes nothing. Any difference
   between a watching arm and native is the cost of its being there (its CPU, its reads) plus noise, never a decision; a
   watching arm that writes anything fails its run. Watching is the first level of every rollout (section 9).
-- **Autopilot.** The pedals: **idle** (no foot on the gas or the brake, calm traffic, the engine at its floor of two
-  machines in service, ready for the next burst), **gas** (traffic climbs and capacity is added at once, never held back),
-  **brake** (traffic falls and capacity is eased off a step at a time, never below idle), **reset** (the brake held to the
-  floor: every setting the governor ever wrote is handed back to where native had it, read back, and the record removed;
-  every benchmark arm ends with a reset and checks it).
-- **Cruise.** For work that comes as a pile: when pods have waited for a place for two decisions in a row, every machine
-  goes into service and stays there, without second-guessing, until the line has been empty for two decisions. In cruise
+- **Autopilot.** One pedal: **push** (traffic climbs and capacity is added at once, never held back), **lift off**
+  (traffic falls and capacity is eased off a step at a time, handed back toward native, never below idle), **idle** (the
+  pedal lifted all the way: calm traffic, the engine at its floor of two machines in service, ready for the next burst),
+  **reset** (every setting the governor ever wrote is handed back to where native had it, read back, and the record
+  removed; every benchmark arm ends with a reset and checks it).
+- **Cruise.** For work that comes as a pile: when pods have waited for a place for two decisions in a row, machines go
+  into service up to the pool's own top (read live: every machine of a fixed pool at once, a growing pool a step a
+  decision) and stay there, without second-guessing, until the line has been empty for two decisions. In cruise
   the governor also stops its five-second floor reads, because every machine is already in service and the reads would
   only cost CPU on the machines the queue is using.
-- **The emergency brake.** When the work is done and demand is at zero (the service at its autoscaler's own floor,
-  wanting no more, at half its target or less), straight to idle in one move, with every safety check still holding.
+- **Idle at once.** When the work is done and demand is at zero (the service at its autoscaler's own floor,
+  wanting no more, at half its target or less), the pedal is lifted all the way in one move, straight to idle, with every
+  safety check still holding.
 - **The kill switch.** Separate from all of the above, and for **security only**: one switch in a human hand
   (`python3 tools/omni_switch.py off`, `omnicompass/master.py`) turns Omni-Compass's governing off across the whole
   machine at once, for anything rogue, or for anyone trying to drive a system through Omni-Compass's brain. Every
   governor hands back and exits; none starts while the switch is off. The reset is the end of a run; the kill switch is
   the end of trust.
 
-The floor of two machines is an operator's number; the brake never takes a system below it, however hard it is pressed.
+The floor of two machines is an operator's number; lifting off never takes a system below it, however far the pedal is lifted.
 There is no ceiling: every machine the operator has is usable, and the protection is the band inside each machine.
 
 ### 1.4 Nothing is hardwired
@@ -826,7 +829,7 @@ time, granted to the muscle asking loudest whose own condition holds; every othe
 already proven, so nothing is frozen and only new trials wait their turn. Every allowed step is tried again on the recheck
 and pulled back when it stops paying, and a muscle at native is asked again whenever its signal returns: native is where the
 brain stands when it has not yet been shown a reason, never a verdict. And if any service reaches its line, the trial
-stops, that step is undone, and every force in the body turns to brake. The wall is the body's, not the muscle's.
+stops, that step is undone, and every force in the body lifts off. The wall is the body's, not the muscle's.
 
 ## Why this is the closed circle again
 
@@ -1718,6 +1721,25 @@ still be carried over its limit. Section 4 gives how often that happened.
 every seed (`restore_ok`); a muscle or organism that fails is labelled INVALID. In the official table every muscle and
 every organism passed. ∎
 
+**Property V6 (the live ranges: from 1 up to one click under the system's own capacity; amendment 5).** In the live
+Kubernetes controller, with n the machines in service, m the floor (two), T the machine lever's top and P the ready
+workers: T is the operator's `--max-nodes` where given; else P plus the room the cluster's own autoscaler publishes
+(the sum over node groups of maxSize less registered); else, where Omni-Compass resizes the pool with the operator's
+command, T = f − 1 for the smallest count f the pool's command has refused, and T = ∞ before any refusal; else T = P.
+Every machine count written lies in [m, T], moves at most the rate limit a decision (shield I5), and cruise writes
+min(T, n + step). The replica cap c of a sensed service never exceeds C = max(1, ⌊(A − Q)/r⌋ − 1), A the allocatable CPU
+of the ready workers and of the machines the system can still add (by T), or, where every node is a container on one
+machine (kind), that machine's CPU once; Q the requests of every other pod and r one pod's request: one pod under what
+the machines hold. At the max, every pod CPU limit written is ≥ the operator's own,
+and no frequency ceiling or GPU limit is written below its top; on the tune-down, a CPU limit is never written under the
+pod's request nor its use × (1 + headroom), and a GPU limit never under the card's own minimum. Proof:
+`Controller._machine_room`, `_max_nodes`, `_pool_command`, `_live_ceiling`, `Muscles.push`, `_power_cap`, `_hardware`
+and `convey` (`omni_controller/`); `tests/test_compass_controller.py`, `tests/test_omni_controller.py`,
+`tests/test_muscles.py`. ∎ *Limit, stated with it:* T = ∞ refuses no count in advance: machines are still added only by
+the controller's own rules (the scheduling floor while pods wait for a place, one more past the compass's wall, the
+governor's law, cruise while a queue waits), within the rate limit; the first refusal by the pool, or by the cloud's
+quota behind it, sets the top from then on.
+
 **Definition 5 (the readings).** For each seed s, the paired difference is d_s = Omni_s / native_s − 1 for work and
 energy, and Omni_s − native_s (percentage points) for the share of decisions over the line. Over n seeds, the 95%
 interval is mean ± t_{0.975, n−1} · sd / √n. A gain or a loss is a row whose interval is clear of zero; otherwise the
@@ -2015,7 +2037,7 @@ Each is testable in the existing harness against every platform in the league (t
 there.
 
 
-### The pedals: idle, gas, brake, reset, and the kill switch
+### One pedal: push, lift off, idle, reset, and the kill switch
 
 Omni-Compass drives a system the way a self-driving car drives itself: it feels, gauges and adjusts, with nobody in
 the seat. The words below are used the same way everywhere in this repository.
@@ -2025,21 +2047,21 @@ firmware, CityLearn's controller). **omni** is Omni-Compass on top of native: th
 governing it. Omni-Compass never runs instead of native, only on top of it, so every comparison is native against omni.
 
 **The modes.** Off (manual): Omni-Compass not driving, native runs alone. Watching: Omni-Compass reads every gauge and
-logs what it would do, and writes nothing. Autopilot: the pedals below. Cruise and the emergency brake: for work that
-comes as a pile.
+logs what it would do, and writes nothing. Autopilot: the one pedal below. Cruise and idle at once: for work that comes
+as a pile.
 
 | Term | Meaning | In the code |
 |---|---|---|
-| **Idle** | No foot on the gas or the brake: calm traffic, the engine running at its floor (two machines in service, ready) | `MIN_NODES`, the floor of the staging law (8.8) |
-| **Gas** | Ramping up: traffic climbs and capacity is added at once, never held back; the whole cluster can take work the instant it is needed | (8.3); a lower HPA target is never limited |
-| **Brake** | Ramping down: traffic falls and capacity is eased off a step at a time, never below idle | (8.4)-(8.5); coasting, rule 6 |
-| **Reset** | The brake held to the floor: every setting the governor ever wrote is handed back to where native had it, read back, and the record removed; the next run starts fresh. Every benchmark arm ends with one and checks it | the reset file (`--kill-file`, a name kept for compatibility), `Controller.restore` |
-| **Cruise** | A pile of work waiting for a place: every machine in service, held there without second-guessing, until the line has been empty for two decisions | rule 7, `--cruise-after` |
-| **Emergency brake** | The work is done and demand is at zero (the service at its least pods, wanting no more, at half its target or less): straight to idle (the floor) in one move, every safety check still holding | rule 8, `--brake-demand`, amendment 9 |
+| **Push** | Traffic climbs and capacity is added at once, never held back; the whole cluster can take work the instant it is needed | (8.3); a lower HPA target is never limited |
+| **Lift off** | Traffic falls and capacity is eased off a step at a time, handed back toward native, never below idle | (8.4)-(8.5); coasting, rule 6 |
+| **Idle** | The pedal lifted all the way: calm traffic, the engine running at its floor (two machines in service, ready) | `MIN_NODES`, the floor of the staging law (8.8) |
+| **Reset** | Every setting the governor ever wrote is handed back to where native had it, read back, and the record removed; the next run starts fresh. Every benchmark arm ends with one and checks it | the reset file (`--kill-file`, a name kept for compatibility), `Controller.restore` |
+| **Cruise** | A pile of work waiting for a place: machines in service up to the pool's own top, read live (a fixed pool's every machine at once, a growing pool a step a decision), held there without second-guessing, until the line has been empty for two decisions | rule 7, `--cruise-after` |
+| **Idle at once** | The work is done and demand is at zero (the service at its least pods, wanting no more, at half its target or less): the pedal lifted all the way in one move, straight to idle (the floor), every safety check still holding | rule 8, `--idle-demand`, amendment 9 |
 | **Kill switch** | Security only: one switch in a human hand that turns Omni-Compass's governing off across the whole system at once, for anything rogue or anyone trying to drive a system through Omni-Compass's brain | `omnicompass/master.py`, `tools/omni_switch.py off` |
 
-The fuel cut-off point (the floor) is a number the operator sets; the brake never takes the system below it, however
-hard it is pressed. Earlier dated records, and the sealed original engine files, call the reset a "kill switch"; they
+The floor is a number the operator sets; lifting off never takes the system below it, however far the pedal is
+lifted. Earlier dated records, and the sealed original engine files, call the reset a "kill switch"; they
 are kept word for word.
 
 ### 8. The staging law: machines on and off in order, with demand that moves
@@ -2139,16 +2161,17 @@ u_k the scaling-up flag, c the cruise count (`--cruise-after`, 2), M the machine
 
     cruise on      q_j > 0 for the last c decisions                                                   (9.3)
     cruise off     q_j = 0 and not u_j for the last c decisions                                       (9.4)
-    in cruise      n' = M; the service's autoscaler target held at the operator's own; the floor step
+    in cruise      n' = min(M, n + s), M the pool's own top read live, s the step; the service's autoscaler target held at the operator's own; the floor step
                    makes no read and no write                                                         (9.5)
-    emergency brake (not cruising) q = 0, no breach, not u, every sensed service idle or at demand
+    idle at once   (not cruising) q = 0, no breach, not u, every sensed service idle or at demand
                    <= b, the gate G (8.5) holds, every sense live, the last command landed:
                    n' = max(m, smallest n carrying the CPU in use at rho)                             (9.6)
     idle (a service at its floor)   I(h) := current = min = desired, and u_h <= target_h / 2          (9.7)
-    gas / brake / idle             (8.3) / (8.4)-(8.5) / (8.8)
+    push / lift off / idle         (8.3) / (8.4)-(8.5) / (8.8)
 
-**9.3 Why cruise steps back (9.5).** In cruise every machine is already in service, n = M, so the floor step's only
-action (raise n to the floor the waiting pods need) is empty: floor <= M = n. Its reads (every pod, every node, node
+**9.3 Why cruise steps back (9.5).** In cruise the machines climb to the pool's own top (a fixed pool's every machine
+at once, n = M; a growing pool a step a decision), so the floor step's only action (raise n to the floor the waiting pods
+need) adds nothing the climb does not already give: for a fixed pool floor <= M = n. Its reads (every pod, every node, node
 metrics, every HPA, each five seconds) carry no value of information, so removing them cannot change any action; they
 only cost CPU and API-server time on the machines the queue is using. The service's response time is also confounded
 in cruise: with a queue of other work holding the machines, a request waits on contended CPU, R = S / (1 - u_host), not on
@@ -2159,7 +2182,7 @@ five seconds.
 
 **9.4 Why idle is read from the autoscaler's floor (9.7).** A served service never reads zero: a health probe or a
 client's keep-alive keeps one pod at a few percent of its request. In the batch test, one pod at about 10% of its request
-read as demand 0.10, above b = 0.05, and the brake waited 15 minutes after the queue emptied. The autoscaler's own
+read as demand 0.10, above b = 0.05, and idle waited 15 minutes after the queue emptied. The autoscaler's own
 floor is the observable of "no demand beyond the minimum": the pods it keeps are its minimum, it wants no more, and they
 run under half the target. In the five frozen-engine web tests the service was never at its floor (0 of 5,102 readings),
 so (9.7) changes nothing there.
@@ -2432,7 +2455,7 @@ can see in the preregistration exactly which reading opens the gate and which cl
 
 The compass has two **profiles**, service (the default) and batch, which differ only in what the pedals do with a pile of
 work: in the service profile the law paces the slack; in the batch profile cruise puts every machine in service while
-work waits for a place and the emergency brake takes them straight to the floor when the queue is done (section 1.3).
+work waits for a place and idle takes them straight to the floor when the queue is done (section 1.3).
 Both are written out in the Kubernetes preregistration (`docs/K8S_COMPASS_PREREGISTRATION.md`, rules 7 and 8, amendment
 9), both ran in the batch test, and the result (section 16) is machines 19% to 23% fewer over the whole window and 29% to
 35% fewer after the queue finished, with the queue itself finishing no later beyond the noise.
@@ -2463,7 +2486,7 @@ what the muscle sends to itself and where it is at. Made into rules, it reads:
    at native is asked again whenever its signal returns. Native is where the brain stands when it has not yet been shown a
    reason, never a verdict.
 7. **The wall belongs to the body.** If any service reaches its line, the trial stops, that step is undone, and every force
-   in the body turns to brake: the law's brake, not a reset.
+   in the body lifts off: the law's own lift, not a reset.
 
 The trial itself keeps four rules, each learned from a measured run (`docs/OMNI_V4_PLAN.md`, section 4): samples count only
 once the muscle reports itself settled; a spend on a queue or a cache is judged by the muscle's own reading, with the
@@ -4068,7 +4091,7 @@ time a client spent behind its own schedule waiting to send, so its clock said c
 preregistration had said so in one line without drawing the consequence. Amendment 1, declared before any counted run,
 made the reading the larger of two: the pooler's service time, or the share of its clients queued for a server, so a pool
 too small for the offered rate shows at the pooler as clients waiting and the knob fails up to the operator's setting at
-once; and it held the dwell on the brake only, never on the gas. The counted runs are three new untouched runs on the
+once; and it held the dwell when lifting off only, never when pushing. The counted runs are three new untouched runs on the
 amended rule; the first run is not counted and is not hidden. The result the same in all three of our runs is a resource held, not speed, and its
 cost the same in all three of our runs is the host's CPU: the compass's own reads of the pooler's console every second are CPU the native pooler
 never spends, and they are counted against it.
@@ -4921,7 +4944,7 @@ compute.
 happens to a governed system in each of the three ways Omni-Compass can stop, because the answer is the same in all
 three: every setting at native, read back, with no record left.
 
-- **The reset** (the brake held to the floor) is the planned end of a run. The governor sees its reset file, hands every
+- **The reset** (every setting handed back to native) is the planned end of a run. The governor sees its reset file, hands every
   setting back in reverse order of power-up, reads each back, writes its last audit line and exits 0. Every benchmark arm
   ends with one and then checks the cluster from outside the governor: the HPA target at the operator's, the replica range
   as set, every pod's CPU limit at its shipped value, every worker back in service, no `omnicompass.io/` annotation left on
@@ -4954,8 +4977,8 @@ three: every setting at native, read back, with no record left.
 | `foreign_writer` | someone else changed a knob; Omni-Compass now observes only |
 | `restored ... ok: true` | the OFF switch put every setting back and read it back |
 | `"watchdog": "handed back"` (in the watchdog's own log) | a governor died or hung without handing back; the watchdog ran its recorded restore command; `ok` says whether every command exited 0 |
-| `cruise: on` / `cruise: off` | work waited for a place for two decisions: every machine in service; the line has been empty for two: cruise ends |
-| `emergency_brake` | the work is done and demand is at zero: straight to the floor in one move |
+| `cruise: on` / `cruise: off` | work waited for a place for two decisions: machines in service up to the pool's own top; the line has been empty for two: cruise ends |
+| `idle_floor` | the work is done and demand is at zero: the pedal lifted all the way, straight to the floor in one move |
 | `verdict_state: left native` | no step of the slow knob passed the paired trial: the knob is never moved on this muscle |
 | `shield_interventions` | the shield clipped a write to its bounds or its step limit; the count says how often |
 | `overhead` (the last line of the audit) | the governor's own CPU over the window: its process and every command it ran |
@@ -5641,13 +5664,14 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 ### One number, one meaning of the sign (`docs/BENEFIT_SHEET.md`)
 
 In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
-whether each is good depends on the gauge. The benefit sheet turns every one the same way round: **plus is always good for
-Omni, minus is always bad**, whatever the gauge measures, and the number carries its word, **gain**, **loss** or
-**nothing**. Beside it every change the same in all three of our runs is written out in words, never as a bare sign: a gauge that fell when
-falling is good reads **cut** (less waiting, fewer machines, less energy, less memory, fewer failures), a gauge that rose
-when rising is good reads **up**, and each carries **good** or **cost**. So "p95 cut 65%: good" and "memory ceiling held up
-215%: cost" cannot be misread against a table that shows the same changes as "-65%" and "+215%". One number per benchmark,
-by the index's own rule, with **yes**, **no**, **none** or **trade** beside it. Read that sheet first; read the tables for
+the Reading column says which way the number went, **lower** or **higher**; who sets the aim differs from one system to the
+next, so no table judges (the founder's orders of 9 and 13 October). The benefit sheet turns every gauge the same way round
+against **its declared aim** (each preregistration's: lower for an amount waited, spent or held, higher for work done):
+**plus is toward the system's own aims, minus away from them**, whatever the gauge measures, and 0% is nothing beyond the
+noise. Beside it every change the same in all three of our runs is written out in words, never as a bare sign: "p95 lower
+65% (toward its aim)", "memory ceiling held higher 215% (away from its aim)", so neither can be misread against a table
+that shows the same changes as "-65%" and "+215%". One number per benchmark, by the index's own rule, with **yes**,
+**no**, **none** or **trade** beside it. Read that sheet first; read the tables for
 the rows behind a number, and read their Reading column, never the sign alone. The wiring page uses the same words.
 
 ### Wire in, or watch (`docs/WIRING_VERDICTS.md`)
@@ -5995,12 +6019,13 @@ laid out the same way so that a reader of this manual can read it without learni
 
 
 **One number, one meaning of the sign.** In every table a change keeps its raw sign: a response time that fell reads
-"-65%", a cache that grew reads "+300%", and whether each is good depends on the gauge. The benefit sheet
-(`docs/BENEFIT_SHEET.md`, built from the tables by `tools/benefit_sheet.py` and checked by `verify.py`) turns every one the
-same way round, at the founder's order of 9 October 2026: **plus is always good for Omni-Compass, minus is always bad**,
-whatever the gauge measures. Less energy, fewer machines, less memory, a shorter wait and fewer failures all read plus
-there; 0% is nothing beyond the noise, and the number carries its word, gain, loss or nothing. Beside it every change the same in all three of our runs is written in words, never as a bare sign: a gauge that fell when falling is good reads **cut**, one that rose when
-rising is good reads **up**, and each carries **good** or **cost**, so "p95 cut 65%: good" cannot be misread against a
+"-65%", a cache that grew reads "+300%", and the Reading column beside it says which way the number went, **lower** or
+**higher**; who sets the aim differs from one system to the next, so no table judges (the founder's orders of 9 and 13
+October 2026). The benefit sheet (`docs/BENEFIT_SHEET.md`, built from the tables by `tools/benefit_sheet.py` and checked
+by `verify.py`) turns every gauge the same way round against **each gauge's declared aim** (each preregistration's: lower
+for an amount waited, spent or held, higher for work done): **plus is toward the system's own aims, minus away from
+them**, whatever the gauge measures, and 0% is nothing beyond the noise. Beside it every change the same in all three of
+our runs is written in words, never as a bare sign: "p95 lower 65% (toward its aim)", so it cannot be misread against a
 table that shows the same change as "-65%". One number per benchmark, by the index's own rule, with yes, no, none or trade
 beside it. The wiring page (section 16.6b) uses the same words. A reader who wants one figure for a benchmark reads that
 sheet; a reader who wants the rows behind it reads the table it names, and reads its Reading column, never the sign alone.
@@ -6115,7 +6140,7 @@ start from the same fresh cluster, run for 900 s after a 120 s warm-up, and end 
 - **Faults** (`V3_FAULTS.md`) asks: when a machine dies, traffic triples, a pod runs away and the probe goes blind, at
   the same moments in both arms, does the governor slow recovery? p95 fell 58% to 63%, the mean 34% to 51%, time
   over the line 27% to 43% and failed requests 14% to 18%, all toward its aim in all three of our runs; machines and energy inside the noise.
-- **A queue of batch jobs** (`V3_BATCH.md`) asks: when the work is a pile, does cruise and the emergency brake finish it
+- **A queue of batch jobs** (`V3_BATCH.md`) asks: when the work is a pile, do cruise and idle finish it
   no later and hand the machines back? Machines fell 16% to 20% over the window and 26% to 33% after the queue finished,
   the standby-model energy 11% to 14%, the mean response 11% to 13%, all toward its aim in all three of our runs; the queue finished no
   differently beyond the noise in all three runs (on v1 it had read 0.7% to 0.9% later, a loss that stayed in the record).
@@ -6441,7 +6466,7 @@ themselves, which is why every row is in its table.
 | **Real Kubernetes, steady work in steps** (10 pairs × 3 runs) | v1 | L | p95 **−65% to −69%** and time over the line toward its aim in all three of our runs; machines −1.5% to −3.4% toward its aim in all three of our runs; failed requests zero in both arms | `results/live/V1_STEADY.md` |
 | **Real Kubernetes, demand that wanders** (10 pairs × 3 runs) | v1 | L | p95 **−56% to −60%** toward its aim in all three of our runs; failed requests toward its aim in all three of our runs; modelled standby energy −0.4% to −0.8% lower in all three of our runs | `results/live/V1_WANDERING.md` |
 | **Real Kubernetes, faults** (a machine down, a spike, a runaway pod, a blind probe, 10 pairs × 3 runs) | v1 | L | p95 **−61% to −64%** toward its aim in all three of our runs; failed requests, machines and energy no difference beyond the noise | `results/live/V1_FAULTS.md` |
-| **Real Kubernetes, a queue of batch jobs** (cruise, then the emergency brake, 10 pairs × 3 runs) | v1 | L | machines **−15% to −24%** and modelled energy −11% to −17% toward its aim in all three of our runs; p95 no difference beyond the noise | `results/live/V1_BATCH.md` |
+| **Real Kubernetes, a queue of batch jobs** (cruise, then idle, 10 pairs × 3 runs) | v1 | L | machines **−15% to −24%** and modelled energy −11% to −17% toward its aim in all three of our runs; p95 no difference beyond the noise | `results/live/V1_BATCH.md` |
 | **Real Kubernetes, fairness** (a noisy neighbour on the same workers, 10 pairs × 3 runs) | v1 | L | no difference beyond the noise on every row: Omni-Compass neither helps nor hurts the neighbour | `results/live/V1_FAIRNESS.md` |
 | **The same six Kubernetes tests on v3** (10 pairs × 3 runs each) | v3 | L | the same readings as v1, the controllers being v1's bytes: all four work inside the line +35% to +49%, p95 −47% to −66% across steady, wandering, all four and faults, failed requests −9% to −14% where they occur, steady machines −1.5% to −2.9%, batch machines −19% to −23% and standby-model energy −13% to −16%, all toward its aim in all three of our runs; fairness no difference beyond the noise on every row | `results/live/V3_STEADY.md`, `V3_WANDERING.md`, `V3_ALL_FOUR.md`, `V3_FAIRNESS.md`, `V3_FAULTS.md`, `V3_BATCH.md` |
 | **Real Kubernetes under a public day of demand** (the Google cluster trace of 2011 replayed one step at a time, 10 pairs × 3 runs) | v3 | L | p95 **−65% to −71%**, p99 −49% to −61%, time over the line −81% to −84%, failed requests −8% to −17%, machines in service **−6% to −10%**, replicas −5% to −6%, standby-model energy −4% to −7%, all toward its aim in all three of our runs; pods started +23% to +35% as point estimates, inside the noise in one run; 9 rows toward their aims, 0 away from their aims | `results/live/V3_TRACE_GOOGLE2011.md` |
@@ -6514,7 +6539,7 @@ independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench gri
 costs line losses; the seven 2023 CityLearn districts, where the bill moved away from its aim) and 3 watch (two robots the engine itself
 left native, one grid where nothing was bought). Of the 945 modelled muscles, 124 write, 13 are trades and 808 watch; 746 of
 the 808 never wrote at all, because the native controller held the reading inside the band and the law never left its
-cushion, and all 255 admission muscles are among them, the admission knob being a brake for a stress the hour did not hold.
+cushion, and all 255 admission muscles are among them, the admission knob being a guard for a stress the hour did not hold.
 The 14 organism cells with the real cluster inside all write on the cluster's gauges. Nothing on the page changes the
 engine, which stays Omni v3; it changes what an operator connects.
 
@@ -9073,6 +9098,47 @@ at 1, 10 and 100 copies, each to 100 repetitions; no 1,000 copies and no 1,000 r
 Every square runs on GitHub's own machines; the rented machines of the 1,000-copy squares are stopped and their
 repetitions (protocol 1) are kept as recorded, counted in no square. Protocol 2 and the counting rules above stand.
 
+
+### The grid with the real cluster inside: protocol 3, and the live controller's ranges read live (amendment, 2026-10-13, before the counted runs)
+
+**What the card version's grid showed.** On the card version (omni-v5, digest `5648f290`, protocol 2) native's own
+numbers show the test machine running out as the copies grew: GitHub's four-core machine busy 69 to 75% at 1 copy, 82
+to 85% at 10 and 87 to 91% at 100; native's own failed requests 6 to 10%, 22 to 31% and 32 to 43%; the cluster's CPU in
+Omni-Compass's arm 0.7 to 1.7%, 1.2 to 2.5% and 4.0 to 7.0% under native's; and at 100 copies the four stacked off the
+window's clock in 49 of 100 repetitions, the tower in 1 of 100. The cause is the test rig, not the engine: the model of
+the organism (one process, at most one full core) and, in Omni-Compass's arm, Omni-Compass's math for every modelled
+muscle ran on the same four cores as the seven kind nodes, so the heavier the model, the less CPU the real cluster got,
+and more of it in Omni-Compass's arm, whose model also carries the math. The 100-copy squares measured the machine, not
+the governor; they stay as recorded and count in no square of the next grid.
+
+**Protocol 3**, carried in each run's name (`... window <s> protocol 3`):
+
+- **The rig's own cores.** With the organism inside on kind, the model runs on the runner's last core (`taskset`) and
+  the kind nodes on the others (`docker update --cpuset-cpus`), the same in both arms; the placement is written into
+  each arm's preflight (`scripts/kind_bench.sh`). The governor keeps the organism's own priority (protocol 2) and is not
+  placed. The cluster then has the same cores at every size and in both arms, and the model's weight shows only on its
+  own clock.
+- **The window from a measured step.** Before either arm, the heavier arm (Omni-Compass's: the model with the math for
+  every modelled muscle) is timed on the core it will run on, six steps (`tools/run_kil.py --calibrate`), and the window
+  is lengthened, never shortened, to 240 steps of its slowest measured step with a quarter to spare, rounded up to the
+  minute (`scripts/kind_paired.sh`). Both arms use the one window; the measurement is written into each arm's preflight.
+  The conductor's windows (`scripts/dispatch_grid.py`) stay the least a square is given.
+
+**The live controller's ranges, read live** (Omni v5 amendment 5, digest `6093b2b88aa911b9`; `docs/OMNI_V5.md`): the
+machine lever's top is the operator's `--max-nodes` where given, else every ready worker plus what the cluster's own
+autoscaler may still add, else (where Omni-Compass resizes the pool with the operator's command) one under the first
+count the pool refuses; cruise (rule 7) climbs toward that top one step a decision; the replica room (rule 5) is on by
+default, its ceiling what the machines can hold of the service's pods, one pod under it, read live (`--replica-ceiling
+N` the operator's own, 0 keeps the cap unmoved); at the max the power cap is never set under native (the capped pods get
+their machine's idle CPU, the frequency ceiling and the GPU limit stay at their top). The fourth amendment's text above
+stands as the record of what ran before.
+
+**Counting.** Every square with the cluster inside is filled again on protocol 3 and the new engine alone: six
+organisms at 1, 10 and 100 copies, each to 100 repetitions, on GitHub's own machines (free for this public repository);
+the runs of protocols 1 and 2 are kept as recorded, archived and shown in history, never pooled with protocol 3. The
+modelled grid (`six`) is run again on the new engine too (its numbers are expected to be identical: the modelled code is
+unchanged but for comments, headers and one label's name), because no result is read across engine versions.
+
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
@@ -9581,7 +9647,7 @@ and eight-card runs are the founder's, on rented cards, after the CPU and cloud 
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and still to run; the program to full size |
 | `results/live/V3_*.md`, `V1_*.md`, `results/live/raw/` | the three-run tables and every archived run's files |
 | `results/OMNI_INDEX.md` | the one combined number |
-| `docs/BENEFIT_SHEET.md` | one number per benchmark, plus always good for Omni and minus always bad, whatever the gauge measures; yes, no, none or trade beside it |
+| `docs/BENEFIT_SHEET.md` | one number per benchmark, plus always toward the system's own aims and minus away from them, whatever the gauge measures; yes, no, none or trade beside it |
 | `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | which knobs earn a wire in: write, watch or the operator's choice, per knob and per muscle, from every table, every loss with its cause |
 | `docs/INTEGRATION_MANUAL.md`, `docs/WIRING_GUIDE.md` | wiring it in yourself |
 | `docs/METRICS_CATALOG.md` | every gauge, and whether it is measured or modelled |
@@ -10502,9 +10568,9 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | Wire check | the test that proves every wire follows, reads back and returns before anything runs |
 | Work per energy | work done divided by energy used; the primary outcome |
 | Work inside the line | the requests, transactions or messages a second answered within the response line; the product number on every real stack |
-| Pedals | idle, gas, brake and reset: the governor's four ways of moving capacity under autopilot |
+| One pedal | push for more, lift off for less, idle (the pedal lifted all the way), reset (everything back to native): how the governor moves capacity under autopilot |
 | Cruise | every machine in service while work waits for a place, held without second-guessing until the line has been empty for two decisions |
-| Emergency brake | the work done and demand at zero: straight to the floor in one move, every safety check still holding |
+| Idle at once | the work done and demand at zero: the pedal lifted all the way in one move, every safety check still holding |
 | Kill switch | security only: one switch in a human hand that turns every governor on the machine off at once; never the reset |
 | Lease | the record every governor renews each decision; a lease older than its limit, or a dead process, makes the watchdog hand back for it |
 | Watchdog | the service beside the governors that hands back for any governor that died or hung without doing it itself |
@@ -10558,7 +10624,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | The grid of copies and runs | `python3 tools/grid.py` (reads `results/scale/receipts/`) |
 | The Omni index | `python3 tools/omni_index.py` |
 | Which knobs earn a wire in (write, watch, operator's choice) | `python3 tools/wiring_verdicts.py` (`--check` compares the page with the tables; `verify.py` runs it) |
-| One number per benchmark, plus always good for Omni | `python3 tools/benefit_sheet.py` (`--check` the same way; `verify.py` runs it) |
+| One number per benchmark, plus always toward the system's own aims | `python3 tools/benefit_sheet.py` (`--check` the same way; `verify.py` runs it) |
 | The database benchmark, one run | `python3 tools/run_pgbench.py --out <dir>` (workflow `pgbench`) |
 | The message broker, one run | `python3 tools/run_kafka.py --setup`, then `--workloads light,heavy,burst --out <dir>` (workflow `kafka`) |
 | The cache, one run | `python3 tools/run_redis.py --setup`, then `--workloads small,large,burst --out <dir>` (workflow `redis`) |
@@ -10600,7 +10666,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | `tools/omni_index.py`, `tools/dossier.py`, `tools/own_cost.py` | the one number from the tables; the dossier from the tables; the governor's own cost from the archived audits |
 | `tools/wiring_verdicts.py`, `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | the verdict per knob from every table: write, watch or the operator's choice, every loss with its cause; one row per knob and per muscle |
 | `tools/knob_verdict.py` | the brain's own verdict on a live knob, around the engine's `omnicompass/verdict.py`: watch first, one notch a trial, the allowance, the two objectives; used by the five live harnesses |
-| `tools/benefit_sheet.py`, `docs/BENEFIT_SHEET.md`, `results/BENEFIT_SHEET.json` | one number per benchmark from the tables, plus always good for Omni, with yes, no, none or trade beside it |
+| `tools/benefit_sheet.py`, `docs/BENEFIT_SHEET.md`, `results/BENEFIT_SHEET.json` | one number per benchmark from the tables, plus always toward the system's own aims, with yes, no, none or trade beside it |
 | `tools/legal.py` | the legal notice every generated report carries at its head and foot |
 | `docs/book/` | the builder of this manual's PDF (`build_book.py`) and the theory chapters bound into it |
 | `release/` | the copyright deposit and the release notes, printed at named commits |
