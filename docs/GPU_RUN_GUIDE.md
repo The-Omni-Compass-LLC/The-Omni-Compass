@@ -81,7 +81,7 @@ pip install -r requirements.txt
 nvidia-smi                 # should show your GPU
 ```
 
-## 4. The whole test, one command (about 45 hours)
+## 4. The whole test, one command (about 36 hours)
 
 ```bash
 sudo nohup bash scripts/gpu_rented_run.sh > run.log 2>&1 &
@@ -103,9 +103,10 @@ It runs, in order, and stops at the first failure:
 7. **the GPU fault drill**, about 10 minutes: the governor killed outright, the master switch pulled, the response
    feed blind; every check must pass (`SKIP_DRILL=1` skips it). Everything so far is then packed into
    `results/gpu/omni-gpu-<stamp>-partial.tar.gz`;
-8. the six organisms with this card inside, each as **1, 10, 100 and 1,000 copies** on one clock (3, 3, 2 and 1
-   repetitions), about 25 hours; the 1,000-copy stacks need a longer step than 2 s, measured on the machine and stated
-   in the receipt (`SKIP_HIL=1` skips this stage);
+8. the six organisms with this card inside, each as **1, 10 and 100 copies** on one clock (5, 3 and 2 repetitions;
+   no 1,000 copies, the founder's order of 12 October, amendment 13), at least 16 hours (60 paired repetitions, each arm
+   240 steps of 2 s); a size whose step needs longer than 2 s gets a longer step, measured on the machine and stated in
+   the receipt (`SKIP_HIL=1` skips this stage);
 9. **real AI serving** last: a small open language model served by vLLM, about 2 hours (`SKIP_LLM=1` skips it); if
    vLLM cannot install on the machine, the stage says so and nothing before it changes;
 10. one packed file: `== send this one file back: results/gpu/omni-gpu-<stamp>.tar.gz`, with the label each table chose
@@ -155,11 +156,10 @@ when that line appears. **`sudo POOLED=1 nohup bash scripts/gpu_8card.sh &` runs
 look, about 3.5 hours: 3 repetitions per card (24 on 8 cards), then one model across every card; it leaves AI token
 generation, the power cap and the whole stacks out, so it is never the result to show. Last, the whole server as one: a language model (Qwen2.5-7B-Instruct, open)
 served across every card at once by vLLM, one Omni-Compass governor per card, the server's total GPU energy, about
-2 hours (`SKIP_LLM=1` skips it). Before it, **the whole stacks with a real card inside**: the six organisms at 1, 10,
-100 and 1,000 copies, native and Omni, the full repetitions (3, 3, 2, 1 by size), each organism on its own card at
-the same time, so the stage that takes about 25 hours on one card takes the time of its longest organism (the four
-stacked, at 1,000 copies), about 4 to 6 hours (`SKIP_HIL=1` skips it). The whole design, every stage:
-about 22 to 24 hours. Progress: `tail -f results/gpu/8card-<stamp>/card-*.log`. At the end: `== send this one file back:
+2 hours (`SKIP_LLM=1` skips it). Before it, **the whole stacks with a real card inside**: the six organisms at 1, 10
+and 100 copies (no 1,000 copies, amendment 13), native and Omni, the full repetitions (5, 3, 2 by size), each organism on
+its own card at the same time, so the stage that takes at least 16 hours on one card takes the time of its longest
+organism, about 3 hours (`SKIP_HIL=1` skips it). The whole design, every stage: about 20 to 22 hours. Progress: `tail -f results/gpu/8card-<stamp>/card-*.log`. At the end: `== send this one file back:
 results/gpu/omni-8card-<stamp>.tar.gz`. The master switch (`sudo python3 tools/omni_switch.py off`) stops every card's
 governor at once.
 

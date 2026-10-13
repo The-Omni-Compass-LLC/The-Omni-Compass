@@ -19,9 +19,10 @@ Arms, the same organism, the same seed, the same request stream:
           card's two wires (omni_controller/gpu_compass.py, omnicompass/edge.py); at 90% of the arm every knob and both
           wires are handed back, and the harness checks they were
 
-Sizes (--scales, default 1,10,100,1000): each organism is run as 1, 10, 100 and 1,000 copies governed together on one
-clock (1,000 copies of the whole tower is close to a million muscles), with the one real card inside as one more muscle. Each size
-runs its own number of paired repetitions (--reps-by-scale, default 5,3,2,1; amendment 11 of docs/GPU_PREREGISTRATION.md).
+Sizes (--scales, default 1,10,100): each organism is run as 1, 10 and 100 copies governed together on one clock (100
+copies of the whole tower is about 110,000 muscles), with the one real card inside as one more muscle; no 1,000-copy
+size is run (the founder's order of 12 October; amendment 13 of docs/GPU_PREREGISTRATION.md). Each size runs its own
+number of paired repetitions (--reps-by-scale, default 5,3,2; amendment 11).
 
 Each organism step is --step-s seconds of wall clock (240 steps: 8 minutes at 2 s). A size whose simulated step takes
 longer than that gets a longer step, measured on this machine before the run (1.5 times the time the simulation needs
@@ -29,7 +30,7 @@ per muscle, times its muscles); the card's request stream runs for the same 240 
 on one clock. Every size's step is in the receipt. The simulated plants are evidence class S (models); the card's
 energy and requests are class P (its own meter). The receipt keeps them apart and also adds them up.
 
-  python3 tools/run_hil.py --out results/hil/run-STAMP [--scales 1,10,100,1000] [--reps-by-scale 5,3,2,1] [--sim]
+  python3 tools/run_hil.py --out results/hil/run-STAMP [--scales 1,10,100] [--reps-by-scale 5,3,2] [--sim]
   python3 tools/run_hil.py --rescore results/hil/run-STAMP      (a finished run reported in full from its own files)
 """
 from __future__ import annotations
@@ -309,8 +310,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", required=True)
     ap.add_argument("--reps", type=int, default=None, help="one number of repetitions for every size (overrides --reps-by-scale)")
-    ap.add_argument("--scales", default=os.environ.get("HIL_SCALES", "1,10,100,1000"))
-    ap.add_argument("--reps-by-scale", default=os.environ.get("HIL_REPS_BY_SCALE", "5,3,2,1"))
+    ap.add_argument("--scales", default=os.environ.get("HIL_SCALES", "1,10,100"))
+    ap.add_argument("--reps-by-scale", default=os.environ.get("HIL_REPS_BY_SCALE", "5,3,2"))
     ap.add_argument("--step-s", type=float, default=float(os.environ.get("HIL_STEP_S", 2.0)))
     ap.add_argument("--organisms", default=os.environ.get("HIL_ORGANISMS", ",".join(REALMS + (STACK, TOWER))))
     ap.add_argument("--gpu", type=int, default=int(os.environ.get("GPU", 0)))

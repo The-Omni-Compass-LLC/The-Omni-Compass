@@ -300,10 +300,12 @@ Same outputs: four organisms, two seeds each, at 1x to 3x, byte-identical before
 the four stacked at 1,000 copies needs about 9 GB. The re-run: 10 runs per organism at 1,000 copies (the 1-run and
 10-run cells); 100 runs at 1,000 copies follows when the runners allow it (about 650 runner-hours).
 
-The 100-run cells at 1,000 copies run on one rented machine (`scripts/grid_one_machine.sh`): every organism in turn,
-as many processes as the machine's cores and memory allow, the same seeds (7000 on), each finished organism saved at
-once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/v1/receipts/round6-1000x.md` in place of the
-1-run and 10-run receipt it contains.
+The 100-run cells at 1,000 copies run on one rented machine (the one-machine grid script, removed on 13 October):
+every organism in turn, as many processes as the machine's cores and memory allow, the same seeds (7000 on), each
+finished organism saved at once, one receipt at the end (`SIX-1000x.md`), saved as `results/scale/v1/receipts/round6-1000x.md` in place of the
+1-run and 10-run receipt it contains. From 12 October no 1,000-copy and no 1,000-run cell is started on any engine (the
+founder's order: 1, 10 and 100 only, the whole grid on GitHub's own machines, nothing rented for it); the rented-machine
+script is removed, and the cells already run at 1,000 copies stand as they were run.
 
 ---
 

@@ -304,7 +304,7 @@ if [ -n "${ORGANISM:-}" ]; then
 fi
 echo "== warm-up ${WARMUP}s (both arms)"; sleep "$WARMUP"
 if [ -n "$kil_pid" ]; then
-  # a large organism (100 or 1,000 copies) may take longer to build than the warm-up: the window opens when it is built
+  # a large organism (100 copies) may take longer to build than the warm-up: the window opens when it is built
   until [ -f "$OUT_DIR/organism.ready" ] || ! kill -0 "$kil_pid" 2>/dev/null; do sleep 5; done
   [ -f "$OUT_DIR/organism.ready" ] || { echo "INVALID RUN: the organism stopped before it was built"; tail -20 "$OUT_DIR/organism.log"; exit 1; }
   echo "organism built at epoch $(cat "$OUT_DIR/organism.ready"), scale ${ORGANISM_SCALE:-1}; window opens $(date -u +%s)" | tee -a "$OUT_DIR/preflight.txt"

@@ -22,7 +22,7 @@
 #
 # Last, the whole server as one: a language model served across every card at once (scripts/gpu_vllm.sh with GPU=all
 # cards: vLLM tensor parallel, one Omni-Compass governor per card, the server's total GPU energy), SKIP_LLM=1 skips it.
-# Then the whole stacks with a real card inside: the six organisms at 1x, 10x, 100x and 1,000x copies, full
+# Then the whole stacks with a real card inside: the six organisms at 1x, 10x and 100x copies (no 1,000x), full
 # repetitions, each organism on its own card at the same time (SKIP_HIL=1 skips it; HIL_ARGS passes options through).
 # CARDS (default: every card nvidia-smi lists), SKIP_DECODE=1, SKIP_CAP=1, SKIP_DRILL=1 as in gpu_rented_run.sh.
 set -uo pipefail
@@ -36,7 +36,7 @@ if [ -n "${POOLED:-}" ]; then
   # each power cap load, one smoke round, the six organisms one repetition per size on their own card, and the model
   # across every card 3 times. Nothing is skipped
   export SMOKE_REPS="${SMOKE_REPS:-1}" REPS_CONFIRM="${REPS_CONFIRM:-3}" REPS_CAP="${REPS_CAP:-2}" \
-         HIL_REPS_BY_SCALE="${HIL_REPS_BY_SCALE:-1,1,1,1}" REPS_LLM="${REPS_LLM:-3}"
+         HIL_REPS_BY_SCALE="${HIL_REPS_BY_SCALE:-1,1,1}" REPS_LLM="${REPS_LLM:-3}"
   echo "== POOLED: every stage; 3 repetitions per card per counted run, 2 per power cap load, 1 per organism size"
 fi
 if [ -n "${FAST:-}" ]; then
@@ -100,12 +100,12 @@ if [ -z "${SKIP_DRILL:-}" ] && ! timeup; then
 fi
 
 if [ -z "${SKIP_HIL:-}" ] && ! timeup; then
-  # the whole stacks with a real card inside (tools/run_hil.py), every organism at 1x, 10x, 100x and 1,000x copies,
-  # native and Omni, the full repetitions (3, 3, 2, 1 by size): each organism on its own card, all at once, so the
-  # stage that takes about 25 hours on one card takes the time of its longest organism
+  # the whole stacks with a real card inside (tools/run_hil.py), every organism at 1x, 10x and 100x copies (no 1,000
+  # copies, amendment 13), native and Omni, the full repetitions (5, 3, 2 by size): each organism on its own card, all
+  # at once, so the stage takes the time of its longest organism instead of every organism in turn
   read -r -a ORGS <<< "${HIL_ORGS:-compute_ai_cloud physics_robotics_autonomous energy_facility_industrial distribution_specialized stack tower}"
   H="results/hil/run-$STAMP-8card"; mkdir -p "$H"
-  echo "== the whole stacks with the card inside: ${#ORGS[@]} organisms, each on its own card, 1x to 1,000x"
+  echo "== the whole stacks with the card inside: ${#ORGS[@]} organisms, each on its own card, 1x to 100x"
   hpids=(); hcard=()
   for i in "${!ORGS[@]}"; do
     g="${C[$(( i % ${#C[@]} ))]}"

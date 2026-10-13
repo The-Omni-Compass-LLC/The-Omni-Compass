@@ -459,6 +459,16 @@ The card model with this amendment, 20 seeds (tuning and fresh). Under the cap: 
 5.8% faster, time over the line 1.3 and 1.0 points lower. On the firmware: energy 0.5-3.7% lower, p95 even. The median
 is 0.6-1.5% slower, inside the verdict's allowance (`results/sim/gpu_two_wire/`). The real card is the test.
 
+## Amendment 13 (2026-10-13, before any trial on this code)
+
+The founder's order of 12 October: 1, 10 and 100 only, to cut the time and the bill; no 1,000 copies and no 1,000 runs
+anywhere. The whole stacks with the card inside (`tools/run_hil.py`, step 8 of the one-card and eight-card runs) now run
+each organism at 1, 10 and 100 copies on one clock, with 5, 3 and 2 paired repetitions by size (amendment 11's numbers
+for those sizes); the 1,000-copy size is gone. On eight cards with the repetitions pooled (amendment 10), each card's
+organism runs once per size. Nothing else changes: the arms, the measures, the labels and the hand-back are as before.
+On one card the stage takes at least 16 hours (60 paired repetitions, each arm 240 steps of 2 s; a size whose step must
+be longer is measured on the machine and stated in the receipt), where it took about 25 with the 1,000 copies.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

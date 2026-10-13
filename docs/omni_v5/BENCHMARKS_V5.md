@@ -35,8 +35,8 @@ secrets are in place (a missing secret is reported and skipped, never billed). C
 | Kubernetes, full | the full Kubernetes set | `live-kind-full` |
 | Kubernetes, shadow | Omni watching only (writes nothing) beside native | `live-shadow` |
 | Kubernetes add-ons | Omni on top of KEDA and the other add-ons | `kind-addons` |
-| Kubernetes at scale | 50, 500 and 1,000 nodes (KWOK): decision time and correctness | `kwok-scale` |
-| Six organisms | the six organisms at 1, 10, 100 and 1,000 copies | `six` |
+| Kubernetes at scale | 10 and 100 nodes (KWOK): decision time and correctness | `kwok-scale` |
+| Six organisms | the six organisms at 1, 10 and 100 copies × 1, 10 and 100 runs | `six` |
 | Six organisms, cluster inside | the six organisms with the real cluster inside | `six-kube` |
 | Realms (v3 table) | v3's published 945-muscle table, reproduced | `realms` |
 | Benchmark protocol | the paired protocol and its repetitions | `benchmark`, `benchmark-reps` |
@@ -52,13 +52,13 @@ secrets are in place (a missing secret is reported and skipped, never billed). C
 | Drones | PX4 swarms | `swarm` |
 | Robustness | Omni killed mid-run (the lease hands back), the long run, Omni's own cost | `robustness` |
 
-## C. The GPU — one chip, the 1,000 copies, eight chips, the APU
+## C. The GPU — one chip, the organisms with the card inside, eight chips, the APU
 
 | Benchmark | What it measures | How it runs | Cost (check prices on the day) |
 |---|---|---|---|
 | GitHub GPU | native / watch / Omni on a real NVIDIA T4, energy from the card's own meter | `gpu-bench` (needs the `gpu-t4` runner) | billed per minute |
-| One chip, the whole test | wire check, envelope, smoke, two preregistered counted runs (compute, AI token generation), the operator's power cap underneath, the fault drill, AI serving (vLLM) | `scripts/gpu_rented_run.sh` on a rented card (`docs/GPU_RUN_GUIDE.md`, C) | one A10 is about $0.75 an hour; the whole test is about 45 hours |
-| The 1,000 copies | the six organisms at 1, 10, 100 and **1,000** copies on one clock with the real card inside | step 8 of the one-chip and eight-chip runs (`tools/run_hil.py`) | inside the runs above |
+| One chip, the whole test | wire check, envelope, smoke, two preregistered counted runs (compute, AI token generation), the operator's power cap underneath, the fault drill, AI serving (vLLM) | `scripts/gpu_rented_run.sh` on a rented card (`docs/GPU_RUN_GUIDE.md`, C) | one A10 is about $0.75 an hour; the whole test is about 36 hours |
+| The organisms with the card inside | the six organisms at 1, 10 and 100 copies on one clock with the real card inside (no 1,000 copies: the founder's order of 12 October) | step 8 of the one-chip and eight-chip runs (`tools/run_hil.py`) | inside the runs above |
 | Eight chips | every card of one server at once, sharing its power and cooling, then one language model across all eight | `scripts/gpu_8card.sh` (`docs/GPU_RUN_GUIDE.md`, D), or one button: `lambda-gpu` (below) | 8×A100 about $14 an hour, 8×H100 about $24; full design 17–18 h, pooled 9–10 h, fast 3.5 h |
 | AMD APU / AMD GPU | the same preregistered protocol on an AMD chip; on an APU the package's power (CPU and GPU together) | `scripts/apu_run.sh` (AMD's `amd-smi` through `scripts/apu/nvidia-smi`; checked by `tests/test_apu_shim.py`) | the machine's rate |
 
@@ -106,7 +106,7 @@ founder hears what they say before anything goes up.
 | Azure (AKS) | native Kubernetes against Omni on top, the bill counted every 15 s at the list price | `aks-metered` | `AZURE_CREDENTIALS` | about $0.096 per worker-hour (Standard_D2s_v4) |
 | Google (GKE) | the same design on Google Kubernetes Engine | `gke-metered` | `GCP_CREDENTIALS`, `GCP_PROJECT` | about $0.067 per worker-hour (e2-standard-2) |
 | Amazon (EKS) | the same design on Elastic Kubernetes Service | `eks-metered` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | about $0.096 per worker-hour (m5.large), plus about $0.10 an hour per control plane |
-| Big organisms, Azure | the whole tower and the four stacked at 1,000 copies, the real cluster inside, on a rented 8-processor Azure machine | `big-organism`, `big-organism-detached` | `AZURE_CREDENTIALS` | about $0.35 an hour (Standard_D8as_v4), about $7 to $14 a machine |
+| Big organisms, Azure | the whole tower and the four stacked at up to 100 copies (no 1,000 copies from 12 October; the grid runs every square on GitHub's own machines), the real cluster inside, on a rented 8-processor Azure machine | `big-organism`, `big-organism-detached` | `AZURE_CREDENTIALS` | about $0.35 an hour (Standard_D8as_v4), about $7 to $14 a machine |
 | Big organisms, Google | the same test on a rented Google machine | `cloud-organism`, cloud `gcp` | `GCP_CREDENTIALS`, `GCP_PROJECT` | about $0.27 an hour (e2-standard-8), at most about $10 for its 39-hour ceiling |
 | Big organisms, Amazon | the same test on a rented Amazon machine | `cloud-organism`, cloud `aws` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | about $0.38 an hour (m6i.2xlarge), at most about $15 for its 39-hour ceiling |
 
