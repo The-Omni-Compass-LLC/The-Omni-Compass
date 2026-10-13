@@ -40,6 +40,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-13 18:02 | six-kube x100 orgs tower reps 1+10 arms native compass split no window 3600 protocol 2 | success | [38423471888](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38423471888) |
 | 2026-10-13 17:16 | aks-metered steady replica room 36 eastus Standard_D2_v4 | cancelled | [38434939022](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38434939022) |
 | 2026-10-13 16:26 | big-organism-detached collect | success | [38430530544](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38430530544) |
 | 2026-10-13 15:39 | kind-cruisekube | failure | [38412997261](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38412997261) |
