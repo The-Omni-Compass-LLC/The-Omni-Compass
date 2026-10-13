@@ -29,10 +29,10 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-13 16:42 | [The grid of the card version: six organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs](results/grid_v5/GRID.md) | Across the grid: modelled, 36 of 36 squares of 10 and 100 runs FEWER MISSES; the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, worse on no gauge in 11, the gauges read worse: "organism energy (J)" in 22, "organism work per energy" in 22, "HPA replicas, mean" in 5, "response time (ms), 95th percentile" in 2, "response time (ms), 99th percentile" in 2; off the clock in 3; invalid in 0. |
-| 2026-10-13 05:31 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v5)](results/live/V5_GOLDILOCKS.md) |  |
-| 2026-10-13 05:31 | [The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table (Omni v5)](results/live/V5_CAPACITY.md) |  |
-| 2026-10-13 02:45 | [The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
+| 2026-10-13 18:06 | [The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
+| 2026-10-13 18:06 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v5)](results/live/V5_GOLDILOCKS.md) |  |
+| 2026-10-13 18:06 | [The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table (Omni v5)](results/live/V5_CAPACITY.md) |  |
+| 2026-10-13 18:06 | [The grid of the card version: six organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs](results/grid_v5/GRID.md) | Across the grid: modelled, 36 of 36 squares of 10 and 100 runs FEWER MISSES; the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" lower in 36, higher in 0, "time over the response line (% of samples)" lower in 36, higher in 0, "response time (ms), 95th percentile" lower in 26, higher in 2, "energy (Wh)" lower in 26, higher in 0, "energy, parked workers still on at idle power (Wh)" lower in 26, higher in 0, "organism energy (J)" lower in 0, higher in 22, "organism work per energy" lower in 22, higher in 0, "failed requests (%)" lower in 18, higher in 0, "response time (ms), 99th percentile" lower in 12, higher in 2, "HPA replicas, mean" lower in 4, higher in 5, "pods started" lower in 3, higher in 0; off the clock in 3; invalid in 0. |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -40,6 +40,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-13 18:02 | six-kube x100 orgs tower reps 1+10 arms native compass split no window 3600 protocol 2 | success | [38423471888](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38423471888) |
 | 2026-10-13 17:16 | aks-metered steady replica room 36 eastus Standard_D2_v4 | cancelled | [38434939022](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38434939022) |
 | 2026-10-13 16:26 | big-organism-detached collect | success | [38430530544](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38430530544) |
 | 2026-10-13 15:39 | kind-cruisekube | failure | [38412997261](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38412997261) |
