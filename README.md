@@ -58,10 +58,10 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-13 18:06 | [The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
-| 2026-10-13 18:06 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v5)](results/live/V5_GOLDILOCKS.md) |  |
-| 2026-10-13 18:06 | [The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table (Omni v5)](results/live/V5_CAPACITY.md) |  |
-| 2026-10-13 18:06 | [The grid of the card version: six organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs](results/grid_v5/GRID.md) | Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0. |
+| 2026-10-13 21:35 | [The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
+| 2026-10-13 21:35 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v5)](results/live/V5_GOLDILOCKS.md) |  |
+| 2026-10-13 21:35 | [The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table (Omni v5)](results/live/V5_CAPACITY.md) |  |
+| 2026-10-13 21:35 | [The grid of the card version: six organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs](results/grid_v5/GRID.md) | Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0. |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -69,10 +69,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-13 19:10 | six-kube x100 orgs stack reps 1+10 arms native compass split no window 5400 protocol 2 | success | [38423468578](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38423468578) |
-| 2026-10-13 18:02 | six-kube x100 orgs tower reps 1+10 arms native compass split no window 3600 protocol 2 | success | [38423471888](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38423471888) |
-| 2026-10-13 17:16 | aks-metered steady replica room 36 eastus Standard_D2_v4 | cancelled | [38434939022](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38434939022) |
-| 2026-10-13 16:26 | big-organism-detached collect | success | [38430530544](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38430530544) |
+| 2026-10-13 22:43 | big-organism-detached start organism tower x100 reps 5+3 window 2880 protocol 3 | success | [38476939068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476939068) |
+| 2026-10-13 22:37 | big-organism-detached start organism tower x100 reps 8+3 window 2880 protocol 3 | success | [38476947839](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476947839) |
+| 2026-10-13 22:33 | big-organism-detached start organism tower x100 reps 1+4 window 2880 protocol 3 | success | [38476930989](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476930989) |
+| 2026-10-13 22:30 | redis | cancelled | [38472891556](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472891556) |
+| 2026-10-13 22:29 | swarm | cancelled | [38473000707](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38473000707) |
+| 2026-10-13 22:29 | kafka | cancelled | [38472913779](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472913779) |
+| 2026-10-13 22:29 | pgbench | cancelled | [38472828551](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472828551) |
+| 2026-10-13 22:29 | citylearn | cancelled | [38472979619](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472979619) |
+| 2026-10-13 22:29 | sysbench | cancelled | [38472848288](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472848288) |
+| 2026-10-13 22:29 | robustness | cancelled | [38473044993](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38473044993) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
