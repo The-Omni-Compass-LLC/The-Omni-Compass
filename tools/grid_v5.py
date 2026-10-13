@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from collections import Counter
@@ -45,13 +46,18 @@ def where(f):
     return f.relative_to(ROOT).as_posix() if f.is_relative_to(ROOT) else f.name
 
 
+def link(md, out_dir):
+    """A link to a receipt's page from the grid page: the repository's name for it, and the path from the page's folder."""
+    return f"[`{where(md)}`]({Path(os.path.relpath(md, out_dir)).as_posix()})"
+
+
 def modelled(dirs):
     """{size: (receipt, run id, page)} from every SIX_v5-x<size>.json under the given folders."""
     out = {}
     for d in dirs:
         for f in Path(d).rglob("SIX_v5-x*.json"):
             rec = json.loads(f.read_text())
-            out[int(rec["scale"])] = (rec, run_of(f), where(f))
+            out[int(rec["scale"])] = (rec, run_of(f), f.resolve().with_suffix(".md"))
     return out
 
 
@@ -61,7 +67,7 @@ def kube(dirs):
     for d in dirs:
         for f in Path(d).rglob("SIX_KUBE_v5-x*_r*.json"):
             size, n = f.stem.split("-x", 1)[1].split("_r")
-            out[(int(size), n)] = (json.loads(f.read_text()), run_of(f), where(f))
+            out[(int(size), n)] = (json.loads(f.read_text()), run_of(f), f.resolve().with_suffix(".md"))
     return out
 
 
@@ -134,6 +140,8 @@ def main(argv=None):
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     mod, kub = modelled(a.modelled), kube(a.kube)
+    out = Path(a.out)
+    od = out.resolve().parent
     L = ["# The grid of the card version: six organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs", "",
          "Native against Omni-Compass on top of native, engine omni-v5 (digest 5648f290, every muscle its own card), work "
          "waiting in line in every organism. Each square is the pooled receipt's own reading; the 1-, 10- and 100-run "
@@ -146,7 +154,7 @@ def main(argv=None):
     top = len(L)                                                 # the grid in one line goes here, once every square is read
     L += ["## Modelled (six.yml; evidence class S, our own models)", "",
           "Pooled receipts: " + ", ".join(f"{copies(s)}: run {mod[s][1]}" for s in sorted(mod)) + ". Every column of every "
-          "square (the intervals, the band, the knobs handed back): " + ", ".join(f"[`{mod[s][2]}`]({mod[s][2]})" for s in sorted(mod))
+          "square (the intervals, the band, the knobs handed back): " + ", ".join(link(mod[s][2], od) for s in sorted(mod))
           + ".", ""]
     data = {"modelled": {}, "kube": {}}
     for size in SIZES:
@@ -161,7 +169,7 @@ def main(argv=None):
         L += ["## With the real Kubernetes cluster inside (six-kube.yml; the cluster measured, class L; the organism "
               "modelled, class S)", "",
               "Pooled reports: " + ", ".join(f"{copies(s)}: run {r}" for s, r in sorted({(s, r) for (s, _), (_, r, _) in kub.items()}))
-              + ". Every gauge of every square, with its interval: " + ", ".join(f"[`{kub[k][2]}`]({kub[k][2]})" for k in sorted(kub, key=lambda k: (k[0], int(k[1]))))
+              + ". Every gauge of every square, with its interval: " + ", ".join(link(kub[k][2], od) for k in sorted(kub, key=lambda k: (k[0], int(k[1]))))
               + ".", "",
               "How to read a square with the cluster inside: the report's own verdict (`tools/six_kube_report.py`) over its judged "
               "gauges, the cluster's response times, time over the response line, failed requests, pods started, replicas, "
@@ -183,7 +191,6 @@ def main(argv=None):
                 L.append(f"| {NAMES[org]} | " + " | ".join(cells) + " |")
             L.append("")
     L[top:top] = [across(data), ""]
-    out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(stamp(L)) + "\n", encoding="utf-8")
     out.with_suffix(".json").write_text(json.dumps(data, indent=1) + "\n")
