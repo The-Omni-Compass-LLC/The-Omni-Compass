@@ -2,6 +2,40 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-13 (late afternoon): the grid of the card version, both halves; the knobs that were left off
+
+- **The grid** (`results/grid_v5/GRID.md`, built by `tools/grid_v5.py` from the pooled receipts: six-pool runs
+  38413185368, 38413200224, 38413211812; six-kube-pool runs 38416329587, 38416341417, 38416354634): the six organisms at
+  1, 10 and 100 copies, each at its first 1, 10 and 100 runs, native against Omni-Compass on top. Modelled (class S):
+  fewer misses in all 54 squares (every square of 10 and 100 runs labelled FEWER MISSES), the same work, power given at
+  most +0.065%. With the real cluster inside (class L for the cluster): at 1 and 10 copies, in all 24 squares of 10 and
+  100 repetitions, 12% to 59% less time over the response line and the 95th percentile 24% to 56% faster (inside the
+  noise in 2); at 100 copies 8% to 13% less time over the line, but the four stacked and the whole tower at 100
+  repetitions read the 95th and 99th percentiles worse (+45% and +19%; +13.5% and +14%), the four stacked off the
+  window's clock in 49 of 100 repetitions; the report also reads the organism's modelled energy (+0.06% at most, the
+  power given) worse in 22 squares and 0.2% to 0.6% more copies of the service in 5. No square invalid; every knob
+  handed back.
+- **Those two squares again with a longer window** (`docs/GRID_LONG_WINDOW_PREREGISTRATION.md`, written before the
+  runs): the four stacked at 5,400 s (was 3,600), the whole tower at 3,600 s (was 2,400), everything else protocol 2;
+  pooled only among themselves, the earlier squares kept as they are.
+- **Azure with Omni-Compass's replica room** (`docs/AKS_REPLICA_ROOM_PREREGISTRATION.md`, written before the runs): the
+  steady run A read no difference because the service sat at its cap of 10 in both arms (over its line 30% of the time,
+  4.4% of requests failed) while Azure kept about 1.9 of 4 machines in service, and the replica room, Omni-Compass's own
+  lever for a cap that binds (in the engine since 4 October, off unless granted), was off. Two settings of their own,
+  three runs each: the steady test and the burst at `1 6 1 8 1 6`, native at the operator's cap of 10, Omni-Compass
+  granted the room up to 36 (what four machines hold), on `Standard_D2_v4` so they run beside the standard sets
+  (`aks-metered.yml`: the `replica_ceiling` input, one queue per machine family and region, a run name that says what
+  each run is). **Disclosed**: the burst run A on the card version (run 38339901189) was started at `1 6 1 8 1 6`, the
+  steps amendment 11 replaced on 5 October; it is reported as run at those steps, and the standard burst runs at
+  `1 3 1 4 1 3`.
+- **CruiseKube's third trial ran end to end** (run 38412997261, never counted): CruiseKube installed, learned and applied
+  its own change in both arms; its chart is now pinned (`a3c7fa89…`). In the trial's 360 s window Omni-Compass's governor
+  decided six times and made no write: the service stayed well inside its line (95th percentile 133 to 199 ms against
+  500 ms). **A decided window with no write now counts as it ran** (`scripts/kind_bench.sh`, every set; amendment 1 of
+  `docs/CRUISEKUBE_PREREGISTRATION.md`): staying native is the governor's own decision at every step (the founder's order
+  of 10 October); a governor that recorded no decisions was not running and its window is invalid; the table counts the
+  windows in which Omni-Compass stayed native (`tools/live_reps.py`, `tests/test_stayed_native.py`).
+
 ## 2026-10-13 (afternoon): the meter kit for Kepler; the CruiseKube trial runs; Azure steady run A
 
 - **The meter kit** (register row 79, the first of the founder's nine pieces; `docs/METER_PREREGISTRATION.md`,

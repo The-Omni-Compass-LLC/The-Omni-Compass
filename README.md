@@ -96,6 +96,19 @@ under every load. Inside a body the cards remove more misses with less power giv
 | The climb (1 2 3 2 3 4 ..., up to twice its own) | −7.2% distribution, −7.0% compute, −4.8% the four stacked, −3.2% physics, −2.7% energy, −1.4% the tower | −0.9% to −3.5% | more work in four of six | up to +0.05% (was +0.07%) |
 | Work waiting in line | −1.1% to −8.3% in every organism | −1.0% to −7.2% | equal | up to +0.04% (was +0.07%) |
 
+**The grid** ([`results/grid_v5/GRID.md`](results/grid_v5/GRID.md)): the six organisms at 1, 10 and 100 copies on one
+clock, each at its first 1, 10 and 100 runs, with work waiting in line. **Modelled** (class S): fewer misses than native
+in all 54 squares, the same work, the power given at most +0.065%. **With the real Kubernetes cluster inside** (the
+cluster measured, class L; the organism modelled): at 1 and 10 copies, in every square of 10 and 100 repetitions, the
+real service spent 12% to 59% less time over its response line, and its slowest 5% of responses were 24% to 56% faster
+(inside the noise in 2 of those 24 squares); at 100 copies it spent 8% to 13% less time over the line, but in the four
+stacked and the whole tower at 100 repetitions its slowest responses were slower (the 95th percentile 45% and 13.5%): on
+GitHub's four-core machine the model of 190,800 and 110,700 muscles, with Omni-Compass's law for each, shares the cores
+with the real cluster, and the four stacked fell behind the window's clock in 49 of 100 repetitions. Those two squares
+run again with a longer window ([`docs/GRID_LONG_WINDOW_PREREGISTRATION.md`](docs/GRID_LONG_WINDOW_PREREGISTRATION.md)).
+That report also reads as worse the organism's modelled energy (+0.06% at most, the power given) and, in 5 squares,
+0.2% to 0.6% more copies of the service.
+
 The lease handed every knob back to native in every run. On this version GitHub reproduced the realms table in runs A,
 B and C (2,214 rows, 0 differences). **Goldilocks**, three runs of ten pairs (Omni-Compass on top of a service
 rightsized by Goldilocks and the Vertical Pod Autoscaler's recommender; class L): the average response 44% to 48%
