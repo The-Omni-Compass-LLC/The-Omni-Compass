@@ -17,7 +17,14 @@
   no model and on a machine without the processor's power registers run only a fake development meter, so Kepler runs
   where the registers are, never on GitHub's virtual machines; PEAKS has a design and meeting notes, no scheduler to run;
   CruiseKube (non-production use granted by its license) skips any workload whose HPA scales on CPU or memory, as every
-  Kubernetes set here does, so its set pairs it with KEDA's HTTP add-on scaling on requests in flight; it is being built.
+  Kubernetes set here does, so its set pairs it with KEDA's HTTP add-on scaling on requests in flight.
+- **CruiseKube built and preregistered** (register row 81; `docs/CRUISEKUBE_PREREGISTRATION.md`, workflow
+  `kind-cruisekube`, `scripts/kind_addons_cruisekube.sh`, `tests/test_cruisekube.py`): native is KEDA's HTTP add-on
+  and CruiseKube 0.3.4 in Cruise mode on the service, right-sizing it live; omni is Omni-Compass on top (the replica
+  range through the plug, the node pool, the rollout guard; never the CPU limit, which CruiseKube owns). Every
+  download pinned, CruiseKube's usage reports off, each arm learning longer than CruiseKube's hour and starting only
+  once CruiseKube has applied a change. A trial run, never counted, records the chart's SHA-256 for the pin; then A,
+  B and C. The engine is unchanged (omni-v5, digest `5648f290`).
 
 ## 2026-10-13: Every muscle its own card (Omni v5 re-declared)
 

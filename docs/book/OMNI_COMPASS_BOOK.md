@@ -438,7 +438,7 @@ file in the repository, not a description of it.
 
 | Project | Repository | What it is, in its own words | License found | Last commit | Kind | Where it can run | Register |
 |---|---|---|---|---|---|---|---|
-| Kepler | `sustainable-computing-io/kepler` | "a Prometheus exporter that measures energy consumption metrics at the container, pod, and node level in Kubernetes clusters" | Apache-2.0 | 2026-10-12 | a meter, not a controller | GitHub's machines (no power registers there: its model estimates only), or a machine with RAPL | row 79 |
+| Kepler | `sustainable-computing-io/kepler` | "a Prometheus exporter that measures energy consumption metrics at the container, pod, and node level in Kubernetes clusters" | Apache-2.0 | 2026-10-12 | a meter, not a controller | a machine with the processor's power registers (RAPL); on GitHub's virtual machines Kepler 0.10 and later run only a fake development meter | row 79 |
 | Goldilocks | `FairwindsOps/goldilocks` | "a utility that can help you identify a starting point for resource requests and limits" (built on the Vertical Pod Autoscaler's recommender) | Apache-2.0 | 2026-09-18 | a recommendation tool over a muscle (VPA) | GitHub's machines (kind) | row 80 |
 | CruiseKube | `truefoundry/cruisekube` | "an intelligent Kubernetes resource optimization controller that automatically monitors, analyzes, and applies resource recommendations" | **Business Source License** (source-available, not open source) | 2026-08-06 | a rightsizing muscle | GitHub's machines (kind), for evaluation under its license | row 81 |
 | Climatik | `Climatik-Project/Climatik-Project` | a power-capping operator for Kubernetes (its README is the operator template, unfinished) | Apache-2.0 | 2024-09-10 | power-capping muscle, early stage | a machine with power control (GPU) | row 82 |
@@ -466,8 +466,12 @@ machines first; CruiseKube next under its license's evaluation terms; the GPU an
 kit; EAR and the processor power managers on bare metal when a machine with power registers is rented.
 
 Built so far: **Goldilocks** (register row 80; `scripts/kind_addons_goldilocks.sh`, workflow `kind-goldilocks`,
-`docs/GOLDILOCKS_PREREGISTRATION.md`), its wiring run passed end to end on 12 October and its three runs follow on the
-engine that stands.
+`docs/GOLDILOCKS_PREREGISTRATION.md`), run three times on the card version (`results/live/V5_GOLDILOCKS.md`): the
+service faster in all three of our runs, machines the same, 1.9% to 2.6% more energy on the declared model, every row
+shown. **CruiseKube** (register row 81; `scripts/kind_addons_cruisekube.sh`, workflow `kind-cruisekube`,
+`docs/CRUISEKUBE_PREREGISTRATION.md`), beside KEDA's HTTP add-on, since CruiseKube leaves alone a service whose
+autoscaler scales on CPU: a trial run proves the wiring and records its chart's SHA-256 for the pin, then three
+counted runs.
 
 **As muscles in the organisms** (the founder's order of 12 October: "expand my organisms"): each of the nine is also a
 muscle of the catalog (`realms/catalog_v5.csv`, ids 2172 to 2181), modelled on the plant its knob turns and placed in the
