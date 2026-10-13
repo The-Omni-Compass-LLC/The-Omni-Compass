@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The whole stacks with the real Kubernetes cluster inside: one organism, one clock, one engine.
 
 Started by scripts/kind_bench.sh when ORGANISM is set (kind on GitHub, or AKS on Azure). One of the six organisms of
@@ -83,6 +85,25 @@ def cluster_w(capture, fallback):
     return fallback
 
 
+def calibrate(organism, scale, seed, steps):
+    """Seconds per step of Omni-Compass's arm, the heavier of the two (the model and Omni-Compass's math for every
+    modelled muscle), on this machine: the organism built as the window builds it, then `steps` steps timed one by one."""
+    bodies = bodies_for(organism, scale, seed)
+    bones = omni_bones(bodies)
+    kill_at = int(KILL_AT * ORGANISM_STEPS)
+    took = []
+    for k in range(steps):
+        t = time.perf_counter()
+        for b in bodies:
+            b.couple()
+        omni_step(bodies, bones, k, kill_at)
+        for b in bodies:
+            b.step()
+        took.append(time.perf_counter() - t)
+    return {"organism": organism, "scale": scale, "steps": steps, "step_s_mean": sum(took) / len(took),
+            "step_s_max": max(took), "steps_in_window": ORGANISM_STEPS}
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--organism", required=True, choices=sorted(NAMES))
@@ -98,8 +119,14 @@ def main(argv=None):
                     help="load-generator replicas at the organism's peak demand (the operator's load, declared before the run)")
     ap.add_argument("--kubectl", default=os.environ.get("KUBECTL_ADMIN", "kubectl"))
     ap.add_argument("--dry", action="store_true", help="do not call kubectl (tests)")
+    ap.add_argument("--calibrate", type=int, default=0,
+                    help="time this many steps of Omni-Compass's arm (no cluster, no clock) and print the seconds per step "
+                         "as JSON: the window is set from it (scripts/kind_paired.sh)")
     a = ap.parse_args(argv)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    if a.calibrate:
+        print(json.dumps(calibrate(a.organism, a.scale, a.seed, a.calibrate)))
+        return 0
     bodies = bodies_for(a.organism, a.scale, a.seed)
     body = bodies[0]                                               # the body the cluster lives in
     trace = demand_trace(body)

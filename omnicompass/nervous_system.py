@@ -26,7 +26,7 @@ Authority per organ:
   envelope   for continuous organs, the allowed range:
                cpufreq ceiling (fraction of cpuinfo_max) in [1 - 0.35 calm, 1];
                GPU power limit (fraction of max) in [1 - 0.30 calm, 1];
-               site power cap in [0.65, 1];
+               site power cap in the living band of its own range (nothing fixed: the device's own floor and top);
                traffic-shift fraction in [0, 0.5 calm];
                cooling supply-air setpoint (C) in [18, 18 + 9 calm].
              Heat above 0.96 forces the frequency and GPU ceilings down to 1 - 0.35 x excess.
@@ -111,7 +111,7 @@ def authority(i: NervousInputs) -> Dict[str, Any]:
     cf_hi = 1.0 - 0.35 * excess if hot else 1.0; gp_hi = 1.0 - 0.35 * excess if hot else 1.0
     org["cpufreq"]["envelope"] = in_band(min(cf_lo, cf_hi), cf_hi)
     org["gpu"]["envelope"] = in_band(min(gp_lo, gp_hi), gp_hi)
-    org["power"]["envelope"] = in_band(0.65, 1.0)
+    org["power"]["envelope"] = in_band(0.0, 1.0)      # the device's own range, its last 5% at each end never spent
     # routing is an amount moved, not a level: it may move nothing, never more than the band's top
     org["routing"]["envelope"] = [0.0, min(BAND[1], 0.5 * calm) if not sec else 0.0]
     org["cooling"] = {"expand": True, "protective": True, "contract": calm >= 0.3 and seeing, "step": calm, "envelope": [18.0, 18.0 + 9.0 * calm]}

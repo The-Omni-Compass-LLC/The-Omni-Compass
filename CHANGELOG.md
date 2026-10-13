@@ -2,6 +2,33 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-13 (night): Omni v5 re-declared (digest 6093b2b8): every muscle from 1 up to one click under its own capacity, read live
+
+- **The founder's order of 13 October**: every muscle runs from 1 up to one click under what the system itself can hold,
+  read live and guardrailed, unbounded where the system can keep adding, never below 1, and back down; no muscle may
+  hurt the organism. Nothing in the live controllers is a top or floor written down for a muscle any more
+  (`docs/OMNI_V5.md`, amendment 5):
+  - machines: the operator's `--max-nodes` where given, else every ready worker plus the cluster autoscaler's own room,
+    else (Omni-Compass resizing the pool itself) one under the first count the pool refuses (before: a fixed 1,000);
+  - replicas: the replica room on by default, up to what the machines can hold of the service's pods, one pod under it,
+    a kind cluster's one host counted once (before: off unless an operator gave a number);
+  - the power cap at the max never under native: the capped pods get their machine's idle CPU, the frequency ceiling
+    and the GPU limit stay at their top (before: the governor's trim could reach 69.5% even at the max); the tune-down's
+    floor is the pod's own request and use, and the card's own minimum (before: a fixed 65%);
+  - GPU: the clock floor is the card's lowest supported clock (before: 35% of the top); the heat line one degree under
+    the card's own slowdown temperature where it reports it (before: 83 C for every card);
+  - batch admitted up to the compass's wall less one cushion (0.90; before: load 0.80); the nervous system's power
+    envelope is the band of the device's own range (before: from 0.65), its C++ twin re-proven equal and re-sealed.
+- **The 100-copy squares were the test machine, not the governor** (protocol 3, `docs/K8S_COMPASS_PREREGISTRATION.md`):
+  native's own failed requests rose from 6-10% at 1 copy to 32-43% at 100 as the model of the organism took the cluster's
+  cores. Now the model runs on the runner's last core and the kind nodes on the others, the same in both arms, and the
+  window is set from the heavier arm's step, measured before either arm (`tools/run_kil.py --calibrate`).
+- The engine's own files say which way a number went; the older label "WORSE" is "AWAY FROM ITS AIM" (the GPU
+  benchmark's own). The modelled organisms' code is unchanged but for comments, headers and that label.
+- The engine files the fingerprint locks carry the current legal header (the files whose bytes a preregistration or the
+  seal records keep theirs). Mechanism identity: the actuator part re-recorded, every other part unchanged.
+- Every result runs again on this engine: the grid (both halves, 54 squares), the live sets and the Azure sets.
+
 ## 2026-10-13 (evening): no "better" or "worse" anywhere; every reading says which way the number went
 
 - **The founder's order of 13 October**: who sets the aim differs from one system to the next, so no table, page or

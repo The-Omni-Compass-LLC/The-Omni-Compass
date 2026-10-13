@@ -5,8 +5,8 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # The Omni v5 compass law, in the engine (additive beside the frozen v3 law in realms/compass_arm.py). It is the engine
 # change that makes this tree omni-v5: two math-only guardrails (the edge, so nothing riding its limit falls off; the
-# centre/hole, so nothing drops into a pit it cannot climb out of), free arms otherwise, every move proven no worse than
-# native on the modelled organism. Run by the v5 arm in realms/harness.py and tools/run_realms_v5.py. Evidence class S.
+# centre/hole, so nothing drops into a pit it cannot climb out of), free arms otherwise, every move proven to harm nothing
+# native holds on the modelled organism. Run by the v5 arm in realms/harness.py and tools/run_realms_v5.py. Evidence class S.
 #
 #   free arms     every knob may move both ways inside its physical cover; the only exclusions are knobs whose own
 #                 physics says moving them cannot lower energy (a cooling cap, a battery's power cap, a backup reserve,
@@ -797,7 +797,7 @@ def max_ask(plant, knob, cfg, twin=None):
 # its own benefit, instead of one global setting for a thousand muscles?). A muscle's card is the brain's settings for
 # that muscle alone (a pool's edge utilisation and window, a battery's line margin and window), found by an automatic
 # search over every muscle on the development seeds and kept only where it beats the global setting beyond the noise on
-# two separate sets of them and is never worse than native on any of their seeds under any load: never over its line more
+# two separate sets of them and does no harm against native on any of their seeds under any load: never over its line more
 # often, never less work, never its line cleared later (tools/tune_cards.py; realms/muscle_cards_v5.csv). A muscle
 # without a card runs the global setting; the tune-down never reads cards.
 CARD_FILE = Path(__file__).with_name("muscle_cards_v5.csv")
@@ -1282,8 +1282,8 @@ def compass_apply_v5(plant, knob, cfg, dt=1.0, tau=3.0):
     return plant.override
 
 
-# The tune-down setting (the dial turned from the max down to save): native's work on the least energy, every muscle equal
-# or better than native on the modelled plants. The autoscaler's target held at the operator's; the step-to-step
+# The tune-down setting (the dial turned from the max down to save): native's work on the least energy, no muscle giving up
+# anything native holds on the modelled plants. The autoscaler's target held at the operator's; the step-to-step
 # estimator; a fall while Omni held back raises that plant's cushion floor; the hybrid never behind the earlier law; each
 # plant remembers its own physics; motion speed and effort never below what the axis needs; a process loop read against
 # its band's edge, its setpoint never closer to that edge than its own largest swing (generators included); a request pool

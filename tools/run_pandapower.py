@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Omni-Compass on top of a distribution grid's own voltage control, in pandapower (docs/PANDAPOWER_PREREGISTRATION.md).
 
 An independent, recognized simulator and data set: pandapower (Fraunhofer IEE and the University of Kassel; BSD) solves
@@ -181,7 +183,8 @@ def reading(k, n, o):
         return "shown"
     if abs(o - n) <= 1e-6 * max(abs(n), 1e-12):
         return "same"
-    return "better" if (o < n) == (k in LOWER) else "WORSE"
+    toward = (o < n) == (k in LOWER)                       # which way the number went, and whether toward its aim
+    return ("lower" if o < n else "higher") + (" (toward its aim)" if toward else " (away from its aim)")
 
 
 def report(res, out):

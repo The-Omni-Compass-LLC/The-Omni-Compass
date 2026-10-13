@@ -22,7 +22,7 @@
 import json, os, sys, tempfile, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from omni_controller.controller import Controller, parser, ANNOTATION
+from omni_controller.controller import Controller, parser, ANNOTATION, UNBOUNDED
 FAKE = str(ROOT / "tests" / "fake_cluster" / "kubectl")
 
 
@@ -139,17 +139,71 @@ def main():
     # own arithmetic asking for 18 (10 pods at 90% of a 50% target), the cap is raised to 18 (ceiling 30); calm and
     # steady again, the operator's 10 returns; the reset restores the range and leaves no record. Without a
     # ceiling the cap is never touched
-    def capped(ceiling):
+    def capped(ceiling, shape=None, more=()):
         t = tempfile.mkdtemp(); st = cluster(t); lat = probe(t, 600.0)
         S = json.loads(st.read_text()); hh = S["hpas"][0]
         hh["status"].update({"currentReplicas": 10, "desiredReplicas": 10}); hh["status"]["currentMetrics"][0]["resource"]["current"]["averageUtilization"] = 90
+        if shape:
+            shape(S)
         st.write_text(json.dumps(S))
-        extra = ("--replica-ceiling", str(ceiling)) if ceiling else ()
-        c, _ = controller(t, lat, *extra); c.step()
+        extra = ("--replica-ceiling", str(ceiling)) if ceiling is not None else ()
+        c, _ = controller(t, lat, *extra, *more); c.step()
         return t, st, c
     cap = lambda st: json.loads(st.read_text())["hpas"][0]["spec"]["maxReplicas"]
     t, st, c = capped(0)
-    assert cap(st) == 10, "no ceiling granted, yet the cap moved"
+    assert cap(st) == 10, "the operator kept the cap (--replica-ceiling 0), yet it moved"
+
+    # the ceiling read live (the default, the founder's rule of 13 October): what the machines can hold of this service's
+    # pods, one pod under it; the control plane never counts; the cluster autoscaler's own room counts
+    def web(alloc="4", workers=6, other_m=0, room=None):
+        def shape(S):
+            S["nodes"] = [{"metadata": {"name": f"n{i}"}, "status": {"allocatable": {"cpu": alloc}, "conditions": [{"type": "Ready", "status": "True"}]}}
+                          for i in range(workers)]
+            S["nodes"].append({"metadata": {"name": "cp", "labels": {"node-role.kubernetes.io/control-plane": ""}},
+                               "spec": {"taints": [{"key": "node-role.kubernetes.io/control-plane", "effect": "NoSchedule"}]},
+                               "status": {"allocatable": {"cpu": "64"}, "conditions": [{"type": "Ready", "status": "True"}]}})
+            S["hpas"][0]["spec"]["scaleTargetRef"] = {"kind": "Deployment", "name": "web"}
+            S["deployments"] = [{"metadata": {"name": "web", "namespace": "default"},
+                                 "spec": {"selector": {"matchLabels": {"app": "web"}}, "template": {"spec": {"containers": [
+                                     {"resources": {"requests": {"cpu": "200m"}}}]}}}}]
+            S["pods"] = [{"metadata": {"namespace": "default", "labels": {"app": "web"}}, "status": {"phase": "Running"},
+                          "spec": {"nodeName": f"n{i % workers}", "containers": [{"resources": {"requests": {"cpu": "200m"}}}]}} for i in range(10)]
+            if other_m:
+                S["pods"].append({"metadata": {"namespace": "kube-system", "labels": {"app": "other"}}, "status": {"phase": "Running"},
+                                  "spec": {"nodeName": "n0", "containers": [{"resources": {"requests": {"cpu": f"{other_m}m"}}}]}})
+            if room is not None:
+                S["configmaps"] = [{"metadata": {"name": "cluster-autoscaler-status"}, "data": {"status":
+                    "Cluster-wide:\n  Health: Healthy (ready=%d unready=0 registered=%d)\nNodeGroups:\n  Name: pool\n"
+                    "  Health: Healthy (ready=%d unready=0 registered=%d longUnregistered=0 cloudProviderTarget=%d (minSize=1, maxSize=%d))\n"
+                    % (workers, workers, workers, workers, workers, workers + room)}}]
+        return shape
+    # a pool Omni resizes with the operator's own command and no autoscaler reporting: no top until the pool refuses a count
+    t, st, c = capped(None, web())                                   # 24 cores, nothing else asks: the 18 asked for
+    hpa = lambda: json.loads(st.read_text())["hpas"][0]
+    assert cap(st) == 18, f"read live, no top: cap {cap(st)}, expected the 18 the autoscaler's arithmetic asks for"
+    assert c._live_ceiling(hpa()) > 10 ** 12 and c._max_nodes({"pool": 6, "nodes": 7}) == UNBOUNDED, "no top but what the pool refuses"
+    c.refused_at = 7                                                 # the pool refused a seventh machine: its top is six
+    assert c._live_ceiling(hpa()) == 24000 // 200 - 1 and c._max_nodes({"pool": 6, "nodes": 7}) == 6
+    c.a.node_scale_cmd = "python3 -c 'import sys; sys.exit(1)'"      # a refusal, read live from the command itself
+    c.refused_at = None
+    assert c._pool_command(9, 6, "test") is False and c.refused_at == 9 and c._max_nodes({"pool": 6, "nodes": 7}) == 8
+    assert any("refused" in json.loads(l) for l in (Path(t) / "audit.jsonl").read_text().splitlines())
+    t, st, c = capped(None, web(alloc="2", workers=2, other_m=1000), ("--max-nodes", "2"))   # the operator's pool of two:
+    assert cap(st) == 14, f"read live, room for 15: cap {cap(st)}, expected 14 (one pod under what the machines hold)"  # 15 pods, 14
+    # kind: every node a container on one machine, each reporting the whole host's CPU (4): the machine's 4 cores once,
+    # less 1 asked by others, 15 pods, one under: 14, whatever the node count or the room the pool may still show
+    def kind_nodes(S):
+        web(alloc="4", workers=6, other_m=1000)(S)
+        for n in S["nodes"]:
+            n.setdefault("spec", {})["providerID"] = f"kind://docker/omni-bench/{n['metadata']['name']}"
+    t, st, c = capped(None, kind_nodes)
+    assert c._live_ceiling(json.loads(st.read_text())["hpas"][0]) == (4000 - 1000) // 200 - 1 and cap(st) == 14, cap(st)
+    t, st, c = capped(None, web(alloc="2", workers=2, other_m=1000, room=2))   # the autoscaler may add 2 more: 35, one under: 34
+    assert cap(st) == 18, f"read live with the autoscaler's room: cap {cap(st)}, expected the 18 asked for"
+    assert c._live_ceiling(json.loads(st.read_text())["hpas"][0]) == (8000 - 1000) // 200 - 1
+    assert c._max_nodes({"pool": 2, "nodes": 3}) == 4, "the machine lever's top: 2 ready workers and 2 the autoscaler may add"
+    print("replica room read live: no top until the pool refuses one (then 119), 14 of 15 (one pod under), kind's one host "
+          "counted once, the autoscaler's room counted, the control plane never")
     t, st, c = capped(30)
     S = json.loads(st.read_text())
     assert cap(st) == 18, f"at the cap and breached: cap {cap(st)}, expected the 18 the autoscaler's arithmetic asks for"
@@ -170,7 +224,7 @@ def main():
     t, st, c = capped(30); (Path(t) / "kill").write_text("1"); c.step()
     S = json.loads(st.read_text())
     assert cap(st) == 10 and "omnicompass.io/original-replica-range" not in S["hpas"][0]["metadata"].get("annotations", {})
-    print(f"replica room: at the cap and breached, 10 -> {raised} (ceiling 30); calm and steady, back to 10; kill restores 10; no ceiling, never moved")
+    print(f"replica room: at the cap and breached, 10 -> {raised} (ceiling 30); calm and steady, back to 10; kill restores 10; ceiling 0, never moved")
 
     # two services on the same machines, the probe measuring one (--sensed default/web): a breach moves only the HPA
     # of the service the probe measures; the neighbour's HPA stays at the operator's own target

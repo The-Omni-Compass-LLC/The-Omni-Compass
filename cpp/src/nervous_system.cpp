@@ -47,7 +47,7 @@ Authority authority(const NervousInputs& i) {
   const double cf_hi = hot ? 1.0 - 0.35 * excess : 1.0, gp_hi = hot ? 1.0 - 0.35 * excess : 1.0;
   a.organs["cpufreq"].envelope = in_band(std::min(cf_lo, cf_hi), cf_hi); a.organs["cpufreq"].has_envelope = true;
   a.organs["gpu"].envelope = in_band(std::min(gp_lo, gp_hi), gp_hi); a.organs["gpu"].has_envelope = true;
-  a.organs["power"].envelope = in_band(0.65, 1.0); a.organs["power"].has_envelope = true;
+  a.organs["power"].envelope = in_band(0.0, 1.0); a.organs["power"].has_envelope = true;   // the device's own range
   // routing is an amount moved, not a level: it may move nothing, never more than the band's top
   a.organs["routing"].envelope = {0.0, !sec ? std::min(BAND_HI, 0.5 * calm) : 0.0}; a.organs["routing"].has_envelope = true;
   a.organs["cooling"] = Organ{true, calm >= 0.3 && seeing, calm, {18.0, 18.0 + 9.0 * calm}, true};

@@ -34,7 +34,7 @@ NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomou
          "energy_facility_industrial": "Energy / Facility / Industrial",
          "distribution_specialized": "Distribution / Specialized", TOWER: "The whole tower, every muscle once"}
 LABELS = ["SUPERIOR WITHIN GUARDRAILS", "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF", "NONINFERIOR / INCONCLUSIVE",
-          "NOT ESTABLISHED", "WORSE", "INVALID"]
+          "NOT ESTABLISHED", "AWAY FROM ITS AIM", "INVALID"]
 FROZEN = ["realms", "omnicompass", "tools/run_realms.py", "docs/REALMS_PREREGISTRATION.md"]
 
 

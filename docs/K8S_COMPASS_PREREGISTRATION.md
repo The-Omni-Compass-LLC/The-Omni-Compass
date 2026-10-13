@@ -972,6 +972,47 @@ at 1, 10 and 100 copies, each to 100 repetitions; no 1,000 copies and no 1,000 r
 Every square runs on GitHub's own machines; the rented machines of the 1,000-copy squares are stopped and their
 repetitions (protocol 1) are kept as recorded, counted in no square. Protocol 2 and the counting rules above stand.
 
+
+## The grid with the real cluster inside: protocol 3, and the live controller's ranges read live (amendment, 2026-10-13, before the counted runs)
+
+**What the card version's grid showed.** On the card version (omni-v5, digest `5648f290`, protocol 2) native's own
+numbers show the test machine running out as the copies grew: GitHub's four-core machine busy 69 to 75% at 1 copy, 82
+to 85% at 10 and 87 to 91% at 100; native's own failed requests 6 to 10%, 22 to 31% and 32 to 43%; the cluster's CPU in
+Omni-Compass's arm 0.7 to 1.7%, 1.2 to 2.5% and 4.0 to 7.0% under native's; and at 100 copies the four stacked off the
+window's clock in 49 of 100 repetitions, the tower in 1 of 100. The cause is the test rig, not the engine: the model of
+the organism (one process, at most one full core) and, in Omni-Compass's arm, Omni-Compass's math for every modelled
+muscle ran on the same four cores as the seven kind nodes, so the heavier the model, the less CPU the real cluster got,
+and more of it in Omni-Compass's arm, whose model also carries the math. The 100-copy squares measured the machine, not
+the governor; they stay as recorded and count in no square of the next grid.
+
+**Protocol 3**, carried in each run's name (`... window <s> protocol 3`):
+
+- **The rig's own cores.** With the organism inside on kind, the model runs on the runner's last core (`taskset`) and
+  the kind nodes on the others (`docker update --cpuset-cpus`), the same in both arms; the placement is written into
+  each arm's preflight (`scripts/kind_bench.sh`). The governor keeps the organism's own priority (protocol 2) and is not
+  placed. The cluster then has the same cores at every size and in both arms, and the model's weight shows only on its
+  own clock.
+- **The window from a measured step.** Before either arm, the heavier arm (Omni-Compass's: the model with the math for
+  every modelled muscle) is timed on the core it will run on, six steps (`tools/run_kil.py --calibrate`), and the window
+  is lengthened, never shortened, to 240 steps of its slowest measured step with a quarter to spare, rounded up to the
+  minute (`scripts/kind_paired.sh`). Both arms use the one window; the measurement is written into each arm's preflight.
+  The conductor's windows (`scripts/dispatch_grid.py`) stay the least a square is given.
+
+**The live controller's ranges, read live** (Omni v5 amendment 5, digest `6093b2b88aa911b9`; `docs/OMNI_V5.md`): the
+machine lever's top is the operator's `--max-nodes` where given, else every ready worker plus what the cluster's own
+autoscaler may still add, else (where Omni-Compass resizes the pool with the operator's command) one under the first
+count the pool refuses; cruise (rule 7) climbs toward that top one step a decision; the replica room (rule 5) is on by
+default, its ceiling what the machines can hold of the service's pods, one pod under it, read live (`--replica-ceiling
+N` the operator's own, 0 keeps the cap unmoved); at the max the power cap is never set under native (the capped pods get
+their machine's idle CPU, the frequency ceiling and the GPU limit stay at their top). The fourth amendment's text above
+stands as the record of what ran before.
+
+**Counting.** Every square with the cluster inside is filled again on protocol 3 and the new engine alone: six
+organisms at 1, 10 and 100 copies, each to 100 repetitions, on GitHub's own machines (free for this public repository);
+the runs of protocols 1 and 2 are kept as recorded, archived and shown in history, never pooled with protocol 3. The
+modelled grid (`six`) is run again on the new engine too (its numbers are expected to be identical: the modelled code is
+unchanged but for comments, headers and one label's name), because no result is read across engine versions.
+
 ---
 *Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.

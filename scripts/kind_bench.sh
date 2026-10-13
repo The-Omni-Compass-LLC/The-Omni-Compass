@@ -348,7 +348,28 @@ if [ -n "${ORGANISM:-}" ]; then
   # inside as one more muscle; its own compute demand sets the load generator (peak LOAD_MAX), the cluster's watts come
   # back as its heat and load. Built during the warm-up, it starts with the window; the same seed and demand in every arm
   echo "organism=$ORGANISM load_max=${LOAD_MAX:-6}" | tee -a "$OUT_DIR/preflight.txt"
-  python tools/run_kil.py --organism "$ORGANISM" --arm "$ARM" --duration "$DURATION" --out "$OUT_DIR" \
+  [ -z "${CALIBRATION:-}" ] || echo "window=${DURATION} calibration=${CALIBRATION}" | tee -a "$OUT_DIR/preflight.txt"
+  # the rig's own cores (protocol 3, 13 Oct): the model of the organism runs on the runner's last core and the kind nodes
+  # on the others, the same in both arms. The model is the rig's heaviest process and grows with its copies (in
+  # Omni-Compass's arm it also carries Omni-Compass's math for every modelled muscle); on cores shared with the cluster it
+  # took the cluster's CPU (the 100-copy squares of the card version: the machine 87 to 91% busy, native's own failed
+  # requests 32 to 43%, the cluster's CPU 4 to 7% lower in Omni-Compass's arm). Kept apart, the cluster has the same cores
+  # at every size and in both arms, and the model's weight shows only on its own clock (behind the window, off the clock)
+  PIN=""
+  ncpu=$(nproc)
+  if [ "$PLATFORM" = kind ] && [ "$ncpu" -ge 2 ] && command -v taskset >/dev/null 2>&1; then
+    org_cpu=$((ncpu - 1)); cluster_cpus="0-$((ncpu - 2))"; pinned=0
+    for node in $(kind get nodes --name "${KIND_CLUSTER:-omni-bench}" 2>/dev/null); do
+      docker update --cpuset-cpus "$cluster_cpus" "$node" >/dev/null && pinned=$((pinned + 1))
+    done
+    if [ "$pinned" -gt 0 ]; then
+      PIN="taskset -c $org_cpu"
+      echo "cores: the organism on core $org_cpu, the $pinned kind nodes on cores $cluster_cpus (of $ncpu)" | tee -a "$OUT_DIR/preflight.txt"
+    else
+      echo "cores: not separated (no kind node found to place)" | tee -a "$OUT_DIR/preflight.txt"
+    fi
+  fi
+  $PIN python tools/run_kil.py --organism "$ORGANISM" --arm "$ARM" --duration "$DURATION" --out "$OUT_DIR" \
     --scale "${ORGANISM_SCALE:-1}" --go-file "$OUT_DIR/organism.go" > "$OUT_DIR/organism.log" 2>&1 &
   kil_pid=$!
 fi

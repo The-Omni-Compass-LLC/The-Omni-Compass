@@ -51,6 +51,18 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
+## The engine now: every muscle from 1 up to one click under its own capacity, read live (Omni v5, 13 October, night)
+
+The founder's order of 13 October is now in the live controllers ([`docs/OMNI_V5.md`](docs/OMNI_V5.md), amendment 5;
+fingerprint `6093b2b88aa911b9`): no top or floor is a number we wrote down. Machines go up to what the cluster itself can
+add (its own autoscaler's room, or, where Omni-Compass resizes the pool, one under the first count the pool refuses;
+before: a fixed 1,000), and never below two; the service's replica cap may rise to what the machines can hold of its
+pods, one pod under it; at the max the power cap is never set under native (each machine's idle CPU goes to the work);
+the GPU's clock floor and heat line are the card's own. The test rig changed with it (protocol 3): the model of the
+organism runs on its own core, away from the real cluster's, the same in both arms, and the window is set from the
+heavier arm's measured step, so the 100-copy squares measure the governor, not the test machine. **Every result runs
+again on this engine**; the card version's results below stand as that version's record until the new runs replace them.
+
 ## Newest result: every muscle its own card (Omni v5, 13 October)
 
 Omni v5 at its default, **the max**, with **the living body**, and now **every muscle its own card**: the brain is one,
@@ -102,9 +114,9 @@ real service spent 12% to 59% less time over its response line, and its slowest 
 machine carries the real cluster and the model of up to 190,800 muscles at once, and native alone kept its CPU 87% to 91%
 busy and failed 32% to 43% of requests. There the real service spent 8% to 13% less time over its line, and in the four
 stacked and the whole tower at 100 repetitions the 95th percentile of its responses read higher (45% and 13.5%), with the
-four stacked behind the window's clock in 49 of 100 repetitions. Those two squares run again with a longer window
-([`docs/GRID_LONG_WINDOW_PREREGISTRATION.md`](docs/GRID_LONG_WINDOW_PREREGISTRATION.md)), and the organism moves off the
-cluster's cores, the same in both arms, so the machine no longer sets the result. The same report reads the organism's
+four stacked behind the window's clock in 49 of 100 repetitions. Those two squares are run again with a longer window
+([`docs/GRID_LONG_WINDOW_PREREGISTRATION.md`](docs/GRID_LONG_WINDOW_PREREGISTRATION.md)), and on the new engine every
+square runs again with the organism on its own core (protocol 3), so the machine no longer sets the result. The same report reads the organism's
 modelled energy higher (+0.06% at most, the power given) and, in 5 squares, 0.2% to 0.6% more copies of the service.
 
 The lease handed every knob back to native in every run. On this version GitHub reproduced the realms table in runs A,

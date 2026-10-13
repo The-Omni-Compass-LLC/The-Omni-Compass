@@ -516,7 +516,7 @@ def sim_why(f, name, j, v):
 # ------------------------------------------------------------------------------------- the 945 modelled muscles
 LABEL_VERDICT = {"SUPERIOR WITHIN GUARDRAILS": WRITE, "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF": CHOICE,
                  "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF": CHOICE, "NONINFERIOR / INCONCLUSIVE": WATCH, "NOT ESTABLISHED": WATCH,
-                 "INVALID": "invalid"}
+                 "AWAY FROM ITS AIM": WATCH, "INVALID": "invalid"}
 REALM_NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
                "energy_facility_industrial": "Energy / Facility / Industrial", "distribution_specialized": "Distribution / Specialized",
                "tower": "The whole tower, every muscle once"}

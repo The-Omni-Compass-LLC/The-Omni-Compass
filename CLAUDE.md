@@ -76,10 +76,11 @@ the founder overrides one in the conversation.
   (`scripts/dispatch_grid.py`, `grid.yml` every 15 minutes; the six and six-kube buttons with their defaults) starts every
   run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what
   GitHub runs plus a margin. Shards are cut from measured run times; each stops at its deadline and hands in every run it
-  finished. With the cluster inside only runs of protocol 2 count (12 Oct: the governor never below the organism's CPU
-  priority, its decisions counted inside the window); a repetition whose job fails runs again, up to three times, paired
-  within one run, and one that fails three times is listed. With the cluster inside, the window is long enough for the
-  max to keep the organism's clock.
+  finished. With the cluster inside only runs of protocol 3 count (12 Oct: the governor never below the organism's CPU
+  priority, its decisions counted inside the window; 13 Oct: the model of the organism on the runner's last core and the
+  kind nodes on the others, the same in both arms); a repetition whose job fails runs again, up to three times, paired
+  within one run, and one that fails three times is listed. With the cluster inside, the window is set from the heavier
+  arm's step, timed before either arm, so the max keeps the organism's clock.
 - Three loads: each organism's own load, the climb (the load stepping by one, 1 2 3 2 3 4 …) and work waiting in line
   (`LINE`, `realms/harness.py`); every muscle alone runs its own load and the line.
 - Benchmark breadth: every domain that can be benchmarked defensibly (`docs/REGISTER.md`), with Omni on top of that
@@ -121,7 +122,8 @@ the founder overrides one in the conversation.
 - Every muscle runs from 1 up to one click under its own capacity, read live from the system, never a number written in
   code: never below 1 (a pool's machines never below 2), no ceiling where the system can keep adding, and back down again;
   guardrailed so no muscle overworks and hurts the organism, and the organism never hurts a muscle. Where the brain's own
-  math shares the machine, it counts in the body's load.
+  math shares the machine, it counts in the body's load. Encoded in the live controllers as Omni v5 amendment 5 (digest
+  `6093b2b8`, `docs/OMNI_V5.md`): machines, replicas, the power cap, the GPU's clock floor and heat line, batch.
 - Omni's brain works for the organism, never for Omni: it decides what to push and pull so the whole system is the best it
   can be, collectively, one body.
 - Never decide a benchmark's settings ourselves: the written ones stand (the Azure burst steps are `1 3 1 4 1 3`, 5

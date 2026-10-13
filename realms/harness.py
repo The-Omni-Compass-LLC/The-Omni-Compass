@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Realm harness: every muscle native, watched and governed; every realm, and the whole tower, as one organism.
 
 Arms, all on the same seed (the same demand, weather, disturbances):
@@ -553,10 +555,11 @@ def label(per_seed, valid=True):
     guard = w[1] >= -0.01 and v[0] <= 0.0        # band first: time over the line no higher than native's (mean)
     if p[2] < 0:
         # the mirror of the energy tradeoff: less work per energy, but no work lost and the time over the line proven
-        # lower (the energy bought service; a battery's round trip is the usual price). Without that proof: worse
+        # lower (the energy bought service; a battery's round trip is the usual price). Without that proof: work per
+        # energy away from its aim, and nothing bought with it
         if w[1] >= -0.01 and v[2] < 0.0:
             return "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF"
-        return "WORSE"
+        return "AWAY FROM ITS AIM"
     if p[1] > 0:
         return "SUPERIOR WITHIN GUARDRAILS" if guard else "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
     return "NONINFERIOR / INCONCLUSIVE" if guard else "NOT ESTABLISHED"

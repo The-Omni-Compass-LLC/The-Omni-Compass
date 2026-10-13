@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Omni-Compass on one GPU through two wires: the compass law (omnicompass/compass_law.py) on a real card.
 
 The card keeps its own control: NVIDIA's firmware still boosts and still protects the chip. Omni holds two settings the
@@ -132,8 +134,10 @@ class GpuCompass:
         self.expect = self.start
         self.top = query_top_clock(a.smi, self.g) or s[self.g]["clock_mhz"]
         self.floor_w = max(float(a.floor_w or 0.0), s[self.g]["min"])
-        self.c_lo = a.clock_min_share * self.top
         self.c_floor = query_min_clock(a.smi, self.g)
+        # the clock ceiling's cover: the card's own lowest supported clock, read live (nothing fixed); an operator may set
+        # a share of the top instead (--clock-min-share)
+        self.c_lo = max(self.c_floor, a.clock_min_share * self.top)
         self.ceiling = self.top            # where the compass holds the ceiling (continuous)
         self.written_ceiling = self.top    # what the card was last told
         self.busy_clk, self.busy_draw = [], []    # the card on its own: busy clock and busy draw, ceiling at the top
@@ -394,7 +398,8 @@ def parser():
     ap.add_argument("--race-util", type=float, default=0.95, help="utilization at which work is waiting: race, never pace")
     ap.add_argument("--learn-samples", type=int, default=15, help="busy readings of the card on its own before the compass may lower anything")
     ap.add_argument("--floor-w", type=float, default=0.0, help="the declared envelope's lowest watts")
-    ap.add_argument("--clock-min-share", type=float, default=0.35, help="the clock ceiling's cover: lowest share of the top")
+    ap.add_argument("--clock-min-share", type=float, default=0.0,
+                    help="the clock ceiling's cover, as a share of the top; 0 (the default): the card's own lowest supported clock")
     ap.add_argument("--allow", type=float, default=0.02, help="the most a ceiling step may add to the card's own time on a request")
     ap.add_argument("--verdict-samples", type=int, default=30, help="requests measured at native and at the trial step")
     ap.add_argument("--verdict-every", type=int, default=8, help="decisions between trials")

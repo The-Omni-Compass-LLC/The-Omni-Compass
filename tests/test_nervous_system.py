@@ -6,15 +6,15 @@
 """Invariants of the supervisory nervous system (omnicompass/nervous_system.py) over random and adversarial states.
 N1 observe executes nothing; N2 kill leaves no authority; N3 a security hold lets no capacity organ expand (cooling is protective: more cooling adds no capacity); N4 more stress (S),
 more push, more unmet need (I_U) or a lower U never grants more contraction authority to any organ; N5 every envelope
-lies inside its hardware range (cpufreq and GPU ceilings in [0.65, 1], power cap [0.65, 1], shift [0, 0.5], cooling
-[18, 27]); N6 deterministic. Usage: python tests/test_nervous_system.py [cases]"""
+lies inside its hardware range (cpufreq and GPU ceilings in [0.65, 1], power cap in the living band of its own range
+[0.05, 0.95], shift [0, 0.5], cooling [18, 27]); N6 deterministic. Usage: python tests/test_nervous_system.py [cases]"""
 import random, sys
 from dataclasses import replace
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omnicompass.nervous_system import authority, NervousInputs
 
-RANGES = {"cpufreq": (0.65, 1.0), "gpu": (0.65, 1.0), "power": (0.65, 1.0), "routing": (0.0, 0.5), "cooling": (18.0, 27.0)}
+RANGES = {"cpufreq": (0.65, 1.0), "gpu": (0.65, 1.0), "power": (0.05, 0.95), "routing": (0.0, 0.5), "cooling": (18.0, 27.0)}
 
 
 def rnd(r):

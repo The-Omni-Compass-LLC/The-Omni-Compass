@@ -97,6 +97,25 @@ still be carried over its limit. Section 4 gives how often that happened.
 every seed (`restore_ok`); a muscle or organism that fails is labelled INVALID. In the official table every muscle and
 every organism passed. ∎
 
+**Property V6 (the live ranges: from 1 up to one click under the system's own capacity; amendment 5).** In the live
+Kubernetes controller, with n the machines in service, m the floor (two), T the machine lever's top and P the ready
+workers: T is the operator's `--max-nodes` where given; else P plus the room the cluster's own autoscaler publishes
+(the sum over node groups of maxSize less registered); else, where Omni-Compass resizes the pool with the operator's
+command, T = f − 1 for the smallest count f the pool's command has refused, and T = ∞ before any refusal; else T = P.
+Every machine count written lies in [m, T], moves at most the rate limit a decision (shield I5), and cruise writes
+min(T, n + step). The replica cap c of a sensed service never exceeds C = max(1, ⌊(A − Q)/r⌋ − 1), A the allocatable CPU
+of the ready workers and of the machines the system can still add (by T), or, where every node is a container on one
+machine (kind), that machine's CPU once; Q the requests of every other pod and r one pod's request: one pod under what
+the machines hold. At the max, every pod CPU limit written is ≥ the operator's own,
+and no frequency ceiling or GPU limit is written below its top; on the tune-down, a CPU limit is never written under the
+pod's request nor its use × (1 + headroom), and a GPU limit never under the card's own minimum. Proof:
+`Controller._machine_room`, `_max_nodes`, `_pool_command`, `_live_ceiling`, `Muscles.push`, `_power_cap`, `_hardware`
+and `convey` (`omni_controller/`); `tests/test_compass_controller.py`, `tests/test_omni_controller.py`,
+`tests/test_muscles.py`. ∎ *Limit, stated with it:* T = ∞ refuses no count in advance: machines are still added only by
+the controller's own rules (the scheduling floor while pods wait for a place, one more past the compass's wall, the
+governor's law, cruise while a queue waits), within the rate limit; the first refusal by the pool, or by the cloud's
+quota behind it, sets the top from then on.
+
 **Definition 5 (the readings).** For each seed s, the paired difference is d_s = Omni_s / native_s − 1 for work and
 energy, and Omni_s − native_s (percentage points) for the share of decisions over the line. Over n seeds, the 95%
 interval is mean ± t_{0.975, n−1} · sd / √n. A gain or a loss is a row whose interval is clear of zero; otherwise the

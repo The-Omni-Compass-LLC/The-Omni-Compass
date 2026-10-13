@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Omni-Compass on top of CityLearn's own controller: an independent, recognized simulator we did not write.
 
 CityLearn (Intelligent Environments Lab, University of Texas at Austin; github.com/intelligent-environments-lab/citylearn,
@@ -20,7 +22,7 @@ Arms, the same district, the same year, the same weather and loads:
           KILL_AT of the year Omni-Compass hands every command back to the native controller, and the file checks it did
 
 Scored by CityLearn's own evaluation (env.evaluate): every cost function as CityLearn defines it, each the controller's
-value over the value with no battery at all (lower is better for every one: cost, electricity, carbon, peaks, ramping,
+value over the value with no battery at all (the aim is lower for every one: cost, electricity, carbon, peaks, ramping,
 load factor). Nothing here is scored by Omni-Compass's own code.
 
   python3 tools/run_citylearn.py --datasets citylearn_challenge_2022_phase_all,... --out results/citylearn
@@ -141,7 +143,7 @@ def reading(native, omni):
         return "not scored"
     if abs(omni - native) < 1e-9:
         return "same"
-    return "better" if omni < native else "WORSE"
+    return "lower" if omni < native else "higher"
 
 
 def main(argv=None):
@@ -184,7 +186,7 @@ def main(argv=None):
          "Native: CityLearn's rule-based battery controller (BasicRBC). Omni: the same controller with the compass "
          f"law on top of its battery commands (gain {GAIN}, response {TAU} h, glide {SLEW} an hour, band from the past week's district draw, handed back at "
          f"{int(KILL_AT * 100)}% of the year). Every number is CityLearn's own score: the controller over no battery at "
-         "all, lower is better for every row. Evidence class: an independent recognized simulator (not our model).", ""]
+         "all, every row's aim is lower. Evidence class: an independent recognized simulator (not our model).", ""]
     for name, r in res.items():
         n, o = r["native"], r["omni"]
         if "error" in n or "error" in o:
@@ -196,7 +198,7 @@ def main(argv=None):
         L += [f"## {name}: {n['buildings']} buildings, {n['steps']:,} hours", "",
               f"Omni-Compass moved the commands in {o['moved_hours']:,} hours; every command handed back at "
               f"{int(KILL_AT * 100)}%: {'yes' if o['handed_back'] else 'NO'}.", "",
-              "| CityLearn score (over no battery; lower is better) | native | omni | Change | Reading |",
+              "| CityLearn score (over no battery; the aim is lower) | native | omni | Change | Reading |",
               "|---|---:|---:|---:|---|"]
         for x in KPIS:
             nv, ov = n["kpis"][x], o["kpis"][x]
@@ -205,11 +207,11 @@ def main(argv=None):
             ch = f"{100 * (ov - nv) / abs(nv):+.2f}%" if nv not in (None, 0) and ov is not None else ""
             rd = reading(nv, ov)
             L.append(f"| {WORDS[x]} (`{x}`) | {'' if nv is None else f'{nv:.4f}'} | {'' if ov is None else f'{ov:.4f}'} | {ch} | "
-                     f"{rd + (': less ' + WORDS[x] if rd == 'better' else ': more ' + WORDS[x] if rd == 'WORSE' else '')} |")
+                     f"{rd + (': less ' + WORDS[x] if rd == 'lower' else ': more ' + WORDS[x] if rd == 'higher' else '')} |")
         L.append("")
     L += ["## Across every district", "",
           "The tuning district is left out of this table.", "",
-          "| CityLearn score | Districts better | Districts worse | Mean change |", "|---|---:|---:|---:|"]
+          "| CityLearn score | Districts lower | Districts higher | Mean change |", "|---|---:|---:|---:|"]
     for x in KPIS:
         pairs = [(r["native"]["kpis"][x], r["omni"]["kpis"][x]) for nm, r in res.items() if nm != "citylearn_challenge_2022_phase_1"
                  and "kpis" in r["native"] and "kpis" in r["omni"]

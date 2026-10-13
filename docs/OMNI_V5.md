@@ -162,6 +162,46 @@ work or more misses, the misses removed 1.7 times the global setting's. Fingerpr
 the cards among them); the preregistered seeds were run again unchanged. Every card is printed in plain words in the
 muscle catalog (`docs/MUSCLE_CATALOG.md`).
 
+**Amendment 5, 13 October (evening): every muscle from 1 up to one click under its own capacity, read live.** The
+founder's order of 13 October: "you can write it in code ... to show one, two, whatever a muscle's capacity is able to
+handle, guardrailed and skimmed on its border, one click down probably, so it never goes beyond. And, of course, can all
+scale right back down. It can never go be less than one." No top or floor in the live controllers is a number written
+down for a muscle any more; each muscle reads its own from the system it runs on:
+
+- **Machines** (the Kubernetes controller): the top is the operator's own `--max-nodes` where given; else every ready
+  worker plus what the cluster's own autoscaler may still add (its published status); where Omni-Compass resizes the
+  pool with the operator's own command and no autoscaler reports, there is no top but the one the pool shows: one under
+  the first count it refuses, read from the command's own refusal. Before: a fixed 1,000. The floor stays the founder's
+  two machines, and cruise climbs toward the top one step a decision.
+- **Replicas** (the replica room): at the autoscaler's cap with the compass pressing, the cap rises to the replicas the
+  autoscaler's own arithmetic asks for, never past what the machines can hold of the service's pods, one pod under it,
+  read live (the allocatable CPU of every ready worker and of the machines the system can still add, less what every
+  other pod asks for); where every node is a container on one machine (kind), each reports the whole machine's CPU as its
+  own, so that machine's CPU counts once (on 4 October the room raised to 30 on kind served no more requests and ran 78%
+  more pods, `results/live/REPLICA_ROOM.md`: the cap was never kind's limit, the machine was); `--replica-ceiling N` is
+  the operator's own; 0 keeps the cap unmoved. Before: off unless the operator gave a number.
+- **The power cap at the max is never set under native**: each machine's idle CPU goes to the capped service's pods
+  (one click under the machine: its last 5% is never handed out, and no pod gets less than its operator gave it), and the
+  frequency ceiling and the GPU limit stay at their top. Before: the governor's trim to demand could set the pods' CPU
+  limit and the frequency ceiling as low as 69.5% even at the max (never on the sets with a response-time probe, where the
+  muscle already conveyed). The tune-down trims as before, with no fixed floor: the pod's own request and its use plus
+  headroom (before: a fixed 65%), and the card's own minimum power limit, read live.
+- **GPU**: the clock ceiling's floor is the card's own lowest supported clock (before: 35% of the top); one degree under
+  the card's own slowdown temperature reads as full heat where the card reports it (before: a fixed 83 C for every card).
+- **Batch**: held work is admitted while load and power stress are under the compass's wall less one cushion
+  (0.95 - 0.05 = 0.90, the nervous system's own admit gate; before: load 0.80).
+- **The nervous system's site power envelope** is the living band of the device's own range, [0.05, 0.95] (before:
+  [0.65, 0.95]); the C++ twin the same, re-proven equal value for value and re-sealed.
+- **Words**: the engine's own files say which way a number went (the founder's order of 13 October); the older result
+  label "WORSE" is "AWAY FROM ITS AIM", the GPU benchmark's own.
+
+The modelled organisms are unchanged: their code differs only in comments, file headers and that one label's name, so
+the 1,107 muscles, the cards and the max give the same numbers on the same seeds. The test rig with the real cluster
+inside changes beside the engine (protocol 3, `docs/K8S_COMPASS_PREREGISTRATION.md`): the model of the organism on the
+runner's last core and the kind nodes on the others, and the window set from the heavier arm's measured step.
+Fingerprint re-declared (digest `6093b2b88aa911b9`, 44 files); the mechanism identity's actuator part re-recorded (the
+core, the law, the observation map, the governor, the time step and the shield unchanged); every result runs again on it.
+
 ## The no-harm proof (modelled, class S)
 
 On a fixed seed, for **every** muscle in the catalog, the v5 default does no less work than native, is over its line no

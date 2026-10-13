@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
-# Omni-Compass Enterprise License. See LICENSE.
-"""The verdict: Omni-Compass moves a knob only where it measures that the muscle is no worse for it.
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+"""The verdict: Omni-Compass moves a knob only where it measures that the muscle loses nothing by it.
 
 Omni-Compass sits on top of a muscle that already works (a card's firmware, an autoscaler, a chiller's loop). It does not
 replace that muscle, and it has no reason to move the muscle's knob unless moving it costs the muscle nothing. The

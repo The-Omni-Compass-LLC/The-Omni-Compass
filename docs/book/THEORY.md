@@ -304,7 +304,7 @@ time, granted to the muscle asking loudest whose own condition holds; every othe
 already proven, so nothing is frozen and only new trials wait their turn. Every allowed step is tried again on the recheck
 and pulled back when it stops paying, and a muscle at native is asked again whenever its signal returns: native is where the
 brain stands when it has not yet been shown a reason, never a verdict. And if any service reaches its line, the trial
-stops, that step is undone, and every force in the body turns to brake. The wall is the body's, not the muscle's.
+stops, that step is undone, and every force in the body lifts off. The wall is the body's, not the muscle's.
 
 ## Why this is the closed circle again
 

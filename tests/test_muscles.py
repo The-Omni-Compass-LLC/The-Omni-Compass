@@ -3,11 +3,15 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Live muscles against the fake kubectl and fake hardware commands: power cap scales the CPU limit and the reset
-restores it; a security hold blocks any expansion; rollouts pause when change is not permitted, resume when it is, and a
-stuck rollout is undone when rollback is authorised; batch admits one held job only with headroom and never during a
-hold; the CPU-frequency and GPU power-limit connectors follow the cap and are restored by the reset; the heat sense
-follows the harness law and GPU temperature; observe mode writes nothing."""
+"""Live muscles against the fake kubectl and fake hardware commands: at the max (the default dial) the power cap is never
+set under native (each capped pod gets its machine's idle CPU, one click under the machine; the frequency ceiling and the
+GPU limit stay at their top, nothing written); on the tune-down the power cap scales the CPU limit, never under the pod's
+own request nor its use plus headroom (nothing fixed), and the reset restores it; a security hold blocks any expansion;
+rollouts pause when change is not permitted, resume when it is, and a stuck rollout is undone when rollback is
+authorised; batch admits one held job only with headroom and never during a hold; the CPU-frequency and GPU power-limit
+connectors follow the cap (never under the card's own minimum, read live) and are restored by the reset; the heat sense
+follows the harness law and GPU temperature (one degree under the card's own slowdown temperature when it reports it);
+observe mode writes nothing."""
 import json, os, sys, tempfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -55,9 +59,27 @@ def args(tmp, **kw):
 
 
 def main():
+    # the max (the default dial): a power cap under 1 from the governor sets nothing under native; each capped pod gets
+    # its machine's idle CPU instead (w0: 4 CPU, two serving pods, 0.95 x 4000 / 2 = 1900m), and the reset hands it back
     t = tempfile.mkdtemp(); p = state(t); a = args(t); rec = []
+    assert a.dial == "max" and a.cap_min == 0.0
     m = Muscles(Kube(FAKE, audit=rec.append), a, rec.append)
     obs = {"load_ratio": 0.3, "power_stress": 0.5, "security_block": 0.0}
+    m.push({"power_cap": 0.8, "change_permitted": True, "rollback_authorized": False}, obs)
+    assert cpu(p) == "1900m", cpu(p)
+    m.push({"power_cap": 0.3, "change_permitted": True, "rollback_authorized": False}, obs)
+    assert cpu(p) == "1900m", "the max never sets the limit under native, whatever cap the governor proposes"
+    m.restore(); assert cpu(p) == "500m"
+    hw0 = Path(t) / "hw0.log"
+    a0 = args(t, cpufreq_cmd=f"sh -c 'echo cpu {{khz}} >> {hw0}'", cpu_max_khz=3000000.0,
+              gpu_power_cmd=f"sh -c 'echo gpu {{w}} >> {hw0}'", gpu_max_w=300.0, cap_deployments="", rollout_guard="", batch=False)
+    m0 = Muscles(Kube(FAKE, audit=lambda r: r), a0, lambda r: r)
+    m0.push({"power_cap": 0.8, "change_permitted": True, "rollback_authorized": False}, obs); m0.restore()
+    assert not hw0.exists(), "at the max the frequency ceiling and the GPU limit stay at their top: nothing written"
+
+    # the tune-down (--dial save)
+    t = tempfile.mkdtemp(); p = state(t); a = args(t, dial="save"); rec = []
+    m = Muscles(Kube(FAKE, audit=rec.append), a, rec.append)
     m.push({"power_cap": 0.8, "change_permitted": True, "rollback_authorized": False}, obs)
     assert cpu(p) == "400m", cpu(p)
     assert next(d for d in load(p)["deployments"] if d["metadata"]["name"] == "web")["metadata"]["annotations"][CPU_ANN] == "500m"
@@ -78,20 +100,30 @@ def main():
     assert cpu(p) == "400m", "no expansion of the power cap during a security hold"
     assert [j["spec"]["suspend"] for j in load(p)["jobs"]] == before, "no batch admission during a hold"
     m.push({"power_cap": 0.3, "change_permitted": True, "rollback_authorized": False}, obs)
-    assert cpu(p) == "320m", "cap floor 0.65 of 500m, never below the request"
+    assert cpu(p) == "200m", "nothing fixed: the pod's own request (200m) is the floor"
     m.restore()
     assert cpu(p) == "500m" and CPU_ANN not in next(d for d in load(p)["deployments"] if d["metadata"]["name"] == "web")["metadata"]["annotations"]
 
     hw = Path(t) / "hw.log"
     a2 = args(t, cpufreq_cmd=f"sh -c 'echo cpu {{khz}} >> {hw}'", cpu_max_khz=3000000.0,
               gpu_power_cmd=f"sh -c 'echo gpu {{w}} >> {hw}'", gpu_max_w=300.0, gpu_query_cmd="echo 250,79",
-              rapl_cmd="echo 120.5", cap_deployments="", rollout_guard="", batch=False)
+              rapl_cmd="echo 120.5", cap_deployments="", rollout_guard="", batch=False, dial="save")
     m2 = Muscles(Kube(FAKE, audit=lambda r: r), a2, lambda r: r)
     o = m2.sense(0.5)
     assert o["cpu_watts"] == 120.5 and o["gpu_watts"] == 250 and abs(o["thermal"] - 79 / 83) < 1e-9, o
     m2.push({"power_cap": 0.8, "change_permitted": True, "rollback_authorized": False}, obs)
     m2.restore()
     assert hw.read_text().split("\n")[:4] == ["cpu 2400000", "gpu 240", "cpu 3000000", "gpu 300"], hw.read_text()
+    # the card's own figures, read live: its minimum limit floors the push (100 W, not 300 x 0.3 = 90 W), and one degree
+    # under its own slowdown temperature (90 C) is heat 1.0
+    hw2 = Path(t) / "hw2.log"
+    a3 = args(t, gpu_power_cmd=f"sh -c 'echo gpu {{w}} >> {hw2}'", gpu_max_w=300.0, gpu_query_cmd="echo 250,79,100,90",
+              cap_deployments="", rollout_guard="", batch=False, dial="save", thermal_model=False)
+    m3 = Muscles(Kube(FAKE, audit=lambda r: r), a3, lambda r: r)
+    o3 = m3.sense(0.5)
+    assert abs(o3["thermal"] - 79 / 89) < 1e-9 and m3.gpu_min_w == 100.0, o3
+    m3.push({"power_cap": 0.3, "change_permitted": True, "rollback_authorized": False}, obs)
+    assert hw2.read_text().split("\n")[0] == "gpu 100", hw2.read_text()
     th = Muscles(None, SimpleNamespace(thermal_model=True), None)
     x = th.sense(1.0)["thermal"]; assert abs(x - (0.86 * 0.32 + 0.14 * (0.34 + 0.62))) < 1e-12
 

@@ -158,13 +158,14 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 ## One number, one meaning of the sign (`docs/BENEFIT_SHEET.md`)
 
 In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
-whether each is good depends on the gauge. The benefit sheet turns every one the same way round: **plus is always good for
-Omni, minus is always bad**, whatever the gauge measures, and the number carries its word, **gain**, **loss** or
-**nothing**. Beside it every change the same in all three of our runs is written out in words, never as a bare sign: a gauge that fell when
-falling is good reads **cut** (less waiting, fewer machines, less energy, less memory, fewer failures), a gauge that rose
-when rising is good reads **up**, and each carries **good** or **cost**. So "p95 cut 65%: good" and "memory ceiling held up
-215%: cost" cannot be misread against a table that shows the same changes as "-65%" and "+215%". One number per benchmark,
-by the index's own rule, with **yes**, **no**, **none** or **trade** beside it. Read that sheet first; read the tables for
+the Reading column says which way the number went, **lower** or **higher**; who sets the aim differs from one system to the
+next, so no table judges (the founder's orders of 9 and 13 October). The benefit sheet turns every gauge the same way round
+against **its declared aim** (each preregistration's: lower for an amount waited, spent or held, higher for work done):
+**plus is toward the system's own aims, minus away from them**, whatever the gauge measures, and 0% is nothing beyond the
+noise. Beside it every change the same in all three of our runs is written out in words, never as a bare sign: "p95 lower
+65% (toward its aim)", "memory ceiling held higher 215% (away from its aim)", so neither can be misread against a table
+that shows the same changes as "-65%" and "+215%". One number per benchmark, by the index's own rule, with **yes**,
+**no**, **none** or **trade** beside it. Read that sheet first; read the tables for
 the rows behind a number, and read their Reading column, never the sign alone. The wiring page uses the same words.
 
 ## Wire in, or watch (`docs/WIRING_VERDICTS.md`)

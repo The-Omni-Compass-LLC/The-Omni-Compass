@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Omni-Compass live controller for a real Kubernetes cluster.
 
 Modes
@@ -38,7 +43,7 @@ Requires kubectl on PATH with access to the cluster (metrics-server for kubectl 
 """
 from __future__ import annotations
 
-import argparse, csv, json, math, os, shlex, subprocess, sys, time
+import argparse, csv, json, math, os, re, shlex, subprocess, sys, time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -196,9 +201,61 @@ def schedulable(n):
     return not closed(n) and not any(t.get("effect") == "NoSchedule" for t in spec.get("taints") or [])
 
 
+CP_ROLES = ("node-role.kubernetes.io/control-plane", "node-role.kubernetes.io/master")
+
+
+def is_ready(n):
+    return any(c["type"] == "Ready" and c["status"] == "True" for c in n["status"].get("conditions", []))
+
+
+def worker(n):
+    """A machine the services' pods may run on: not the control plane (its role label, or its role's NoSchedule taint)."""
+    labels = (n.get("metadata", {}) or {}).get("labels", {}) or {}
+    if any(r in labels for r in CP_ROLES):
+        return False
+    return not any(t.get("key") in CP_ROLES and t.get("effect") == "NoSchedule" for t in (n.get("spec", {}) or {}).get("taints") or [])
+
+
+UNBOUNDED = sys.maxsize   # no top but what the system itself refuses (the founder's rule of 13 October: from 1 up, unbounded)
+
+
+def one_host(nodes) -> bool:
+    """Nodes that are containers on one machine (kind: providerID kind://...): each reports the whole host's CPU as its
+    own, so the cluster's real CPU is one host's, not the sum (the replica room on kind, results/live/REPLICA_ROOM.md:
+    the cap raised to 30 served no more requests and ran 78% more pods)."""
+    return bool(nodes) and all(str((n.get("spec") or {}).get("providerID", "")).startswith("kind://") for n in nodes)
+
+
+def autoscaler_room(k):
+    """The machines the cluster's own autoscaler may still add, read live from its status (kube-system/
+    cluster-autoscaler-status: per node group, its maxSize less the machines registered); None where no autoscaler reports
+    (kind, a fixed pool, a pool Omni resizes with the operator's own command). The founder's rule of 13 October: a
+    muscle's top is what the system itself can hold, read live."""
+    try:
+        text = str(((k.get("get", "configmap", "cluster-autoscaler-status", "-n", "kube-system", "-o", "json") or {})
+                    .get("data", {}) or {}).get("status", ""))
+    except Exception:
+        return None
+    if not text.strip():
+        return None
+    room = 0
+    for line in text.splitlines():                                    # the plain format: one node group's health per line
+        m = re.search(r"registered=(\d+).*?maxSize=(\d+)", line)
+        if m:
+            room += max(0, int(m.group(2)) - int(m.group(1)))
+    if room == 0 and "maxSize:" in text:                              # the YAML format of newer autoscalers
+        for block in re.split(r"\n\s*-\s*name:", text)[1:]:
+            mx = re.search(r"maxSize:\s*(\d+)", block)
+            reg = re.search(r"registered:\s*\n\s*total:\s*(\d+)", block)
+            if mx and reg:
+                room += max(0, int(mx.group(1)) - int(reg.group(1)))
+    return room
+
+
 def snapshot(k: Kube, active_only: bool = False):
     nodes = k.get("get", "nodes", "-o", "json")["items"]
-    ready = [n for n in nodes if any(c["type"] == "Ready" and c["status"] == "True" for c in n["status"].get("conditions", []))]
+    ready = [n for n in nodes if is_ready(n)]
+    pool = sum(1 for n in ready if worker(n))                         # every ready worker, open or closed: the lever's pool
     pods = k.get("get", "pods", "-A", "-o", "json")["items"]
     if active_only:
         # in service: open to new work, or still carrying work (an idling worker keeps serving until its work is gone)
@@ -219,7 +276,8 @@ def snapshot(k: Kube, active_only: bool = False):
     used = sum(to_milli(line.split()[1]) for line in top.strip().splitlines()
                if line.strip() and (not active_only or line.split()[0] in names))
     hpas = k.get("get", "hpa", "-A", "-o", "json")["items"]
-    return {"nodes": len(ready), "open": open_n if active_only else len(ready), "alloc_m": alloc, "req_m": req, "used_m": used, "pending": pending, "hpas": hpas}
+    return {"nodes": len(ready), "open": open_n if active_only else len(ready), "alloc_m": alloc, "req_m": req, "used_m": used, "pending": pending, "hpas": hpas,
+            "pool": pool}
 
 
 def cpu_target(h):
@@ -239,6 +297,7 @@ class Controller:
         # the machine organ's own engine view: fed with machine-attributable pressure only (pods waiting for a place)
         self.gn = Governor(law=mode_law("fleet")); self.gn.set_mode(OBSERVE)
         self.rec_n = None
+        self.refused_at = None         # the first machine count the pool refused (its top, read live), if any
         self.changed = {}
         self.target_at = {}            # (ns, hpa) -> when I last set its target
         self.nodes_restored = False
@@ -350,16 +409,93 @@ class Controller:
             return False
         return bool(h) and now - h[0][0] >= 0.9 * win and max(d for _, d in h) <= (1.0 + DEMAND_RISE) * min(d for _, d in h)
 
+    def _machine_room(self, pool):
+        """The machines the system can still add to a pool of `pool` ready workers, read live: up to the operator's own
+        --max-nodes where given; else what the cluster's own autoscaler may add (its status); where Omni resizes the pool itself with the operator's command and no autoscaler
+        reports, no top but the one the pool shows: one under the first count it refused (none refused: unbounded);
+        otherwise none (a fixed pool)."""
+        if (self.a.max_nodes or 0) > 0:
+            return max(0, int(self.a.max_nodes) - pool)                  # the operator's own top
+        room = autoscaler_room(self.k)
+        if room is not None:
+            return room
+        if self.a.mode == "nodepool" and self.a.node_scale_cmd:
+            return UNBOUNDED if self.refused_at is None else max(0, self.refused_at - 1 - pool)
+        return 0
+
+    def _max_nodes(self, s):
+        """The machine lever's top, read live (the founder's rule of 13 October: from the floor up to what the system
+        itself holds, never a number written in code): the operator's --max-nodes where given; else every ready worker
+        the cluster has (the pool the lever opens and closes) plus the machines the system can still add."""
+        if (self.a.max_nodes or 0) > 0:
+            return int(self.a.max_nodes)
+        if "_top" not in s:                                               # read once a snapshot
+            pool = int(s.get("pool", s["nodes"]))
+            s["_top"] = max(int(self.a.min_nodes), min(UNBOUNDED, pool + self._machine_room(pool)))
+        return s["_top"]
+
+    def _pool_command(self, n, n_now, why, **extra):
+        """One node-pool command (the operator's own, --node-scale-cmd). A count the pool refuses is its top, read live:
+        the lever stays one under it from then on, and the decision goes on (nothing else is held back by it)."""
+        cmd = self.a.node_scale_cmd.format(n=n)
+        self.audit({"write": shlex.split(cmd), "why": why, "dry_run": self.a.dry_run, **extra})
+        if self.a.dry_run:
+            return True
+        try:
+            subprocess.run(shlex.split(cmd), check=True)
+            return True
+        except subprocess.CalledProcessError as e:
+            if n > n_now:
+                self.refused_at = n if self.refused_at is None else min(self.refused_at, n)
+            self.audit({"refused": {"nodes": n, "now": n_now, "code": e.returncode}, "why": why,
+                        "pool_top": None if self.refused_at is None else self.refused_at - 1})
+            return False
+
+    def _live_ceiling(self, h):
+        """The most replicas the machines can hold, one pod under it, read live: the allocatable CPU of every ready worker
+        (closed ones included: the machine lever opens them) and of the machines the system can still add, less the CPU
+        every other pod asks for, in units of one of this service's pods; where every node is a container on one machine
+        (kind), that machine's CPU once. None where it cannot be read."""
+        ref = (h.get("spec") or {}).get("scaleTargetRef") or {}
+        ns = h["metadata"]["namespace"]
+        if ref.get("kind") != "Deployment" or not ref.get("name"):
+            return None
+        try:
+            dep = self.k.get("get", "deployment", ref["name"], "-n", ns, "-o", "json")
+            nodes = [n for n in self.k.get("get", "nodes", "-o", "json")["items"] if is_ready(n) and worker(n)]
+            pods = self.k.get("get", "pods", "-A", "-o", "json")["items"]
+        except Exception:
+            return None
+        tpl = dep["spec"]["template"]["spec"]
+        req = sum(to_milli(c.get("resources", {}).get("requests", {}).get("cpu", "0")) for c in tpl.get("containers", []))
+        if req <= 0 or not nodes:
+            return None
+        if one_host(nodes):
+            # one machine under every node: its CPU once, and a node added on it adds none
+            alloc = max(to_milli(n["status"]["allocatable"]["cpu"]) for n in nodes)
+        else:
+            alloc = sum(to_milli(n["status"]["allocatable"]["cpu"]) for n in nodes)
+            alloc += self._machine_room(len(nodes)) * alloc / len(nodes)
+        sel = (dep["spec"].get("selector") or {}).get("matchLabels") or {}
+        names = {n["metadata"]["name"] for n in nodes}
+        mine = lambda p: p["metadata"].get("namespace") == ns and sel and all((p["metadata"].get("labels") or {}).get(k_) == v for k_, v in sel.items())
+        other = sum(to_milli(c.get("resources", {}).get("requests", {}).get("cpu", "0")) for p in pods
+                    if p["status"].get("phase") in ("Running", "Pending") and not mine(p)
+                    and (p["spec"].get("nodeName") in names or p["status"].get("phase") == "Pending")
+                    for c in p["spec"]["containers"])
+        return max(1, int((alloc - other) // req) - 1)
+
     def _replica_room(self, h, ns, name, win, obs, s):
-        """The HPA's replica cap as a lever, up to the ceiling the operator grants (--replica-ceiling; 0, the default:
-        the cap is the operator's and never moved). Only for a sensed service under the compass law. While the autoscaler
+        """The HPA's replica cap as a lever, up to what the machines can hold, one pod under it, read live (the
+        founder's rule of 13 October; --replica-ceiling N sets a ceiling of the operator's own, 0 keeps the operator's cap
+        unmoved). Only for a sensed service under the compass law. While the autoscaler
         stands at its cap and the compass is at or past its centre (or the line is breached), the cap is raised to the
         replicas the autoscaler's own arithmetic asks for, ceil(r x u / x), never past the ceiling; once the demand has
         held still for one window, the compass is under its centre, nothing breaches and that arithmetic fits the
         operator's own cap again, the cap returns to it. The operator's range is recorded before the first change, and
         the reset restores it."""
-        ceil_ = int(getattr(self.a, "replica_ceiling", 0) or 0)
-        if ceil_ <= 0 or self.compass_law is None:
+        given = int(getattr(self.a, "replica_ceiling", -1))
+        if given == 0 or self.compass_law is None:
             return
         spec = h.get("spec", {}); st = h.get("status", {}) or {}
         ann = h["metadata"].get("annotations", {}) or {}
@@ -370,7 +506,10 @@ class Controller:
             return
         need = int(math.ceil(100.0 * dem / float(tgt) - 1e-9))      # the replicas the autoscaler's arithmetic asks for
         pressed = self.compass_law.p >= self.compass_law.band.center or not obs["slo_clean"]
-        if cur >= cap and pressed and need > cap and cap < ceil_:
+        ceil_ = given if given > 0 else None
+        if cur >= cap and pressed and need > cap and ceil_ is None:
+            ceil_ = self._live_ceiling(h)                                 # read only when the cap binds and the compass presses
+        if cur >= cap and pressed and need > cap and ceil_ is not None and cap < ceil_:
             new = min(ceil_, need)
             if RANGE_ANN not in ann:
                 self.k.write(["annotate", "hpa", name, "-n", ns, "--overwrite", f"{RANGE_ANN}={lo0},{hi0}"], "replica room: record the operator's range")
@@ -586,14 +725,11 @@ class Controller:
         s = snapshot(self.k, getattr(self.a, "active_nodes_only", False))
         n = max(1, s["open"]); per_node = s["alloc_m"] / max(1, s["nodes"])
         floor = max(int(math.ceil(s["req_m"] * (1.0 + self.a.headroom) / per_node)) if s["req_m"] > 0 else self.a.min_nodes, int(math.ceil(s["used_m"] / per_node)))
-        floor = min(self.a.max_nodes, floor)
+        floor = min(self._max_nodes(s), floor)
         if s["pending"] > 0 and floor > n and floor > (self.rec_n or 0):
-            cmd = self.a.node_scale_cmd.format(n=floor)
-            self.audit({"write": shlex.split(cmd), "why": "scheduling floor (pending pods)", "dry_run": self.a.dry_run})
-            if not self.a.dry_run:
-                subprocess.run(shlex.split(cmd), check=True)
-            self.rec_n = floor
-            return floor
+            if self._pool_command(floor, n, "scheduling floor (pending pods)"):
+                self.rec_n = floor
+                return floor
         return None
 
     def step(self):
@@ -647,7 +783,7 @@ class Controller:
         self.g.nodes = self.rec_n; self.g.current_cap = 1.0
         d = self.g.step(obs, 0)
         floor = max(int(math.ceil(s["req_m"] * (1.0 + self.a.headroom) / per_node)) if s["req_m"] > 0 else self.a.min_nodes, int(math.ceil(s["used_m"] / per_node)))
-        rec_n = max(self.a.min_nodes, min(self.a.max_nodes, max(self.rec_n + int(d["node_delta"]), floor)))
+        rec_n = max(self.a.min_nodes, min(self._max_nodes(s), max(self.rec_n + int(d["node_delta"]), floor)))
         rho = max(0.5, min(0.95, float(d["demand"])))
         from omnicompass.nervous_system import from_governor, node_release_gate
         mode = "autopilot" if self.a.mode in ("target", "nodepool") else "observe"
@@ -667,8 +803,8 @@ class Controller:
             self.cl.observe(s["req_m"] / 1000.0)
             # the machine organ's own pressure (as its release gate): pods waiting and live breaches, not modelled heat
             # or the whole body's latency push, which a machine release does not cause
-            cl_n = self.cl.decide(n, per_node / 1000.0, self.gn.last_push, self.a.min_nodes, self.a.max_nodes)
-            rec_n = max(self.a.min_nodes, min(self.a.max_nodes, max(cl_n, floor)))
+            cl_n = self.cl.decide(n, per_node / 1000.0, self.gn.last_push, self.a.min_nodes, self._max_nodes(s))
+            rec_n = max(self.a.min_nodes, min(self._max_nodes(s), max(cl_n, floor)))
         compass_rec = None
         if self.compass_law is not None:
             # the service position in its compass, read as the GPU compass reads it (omni_controller/gpu_compass.py): the mean
@@ -715,7 +851,7 @@ class Controller:
                 rec_n = max(floor, n - 1)                                  # one back, if the verdict and the release gate agree
             else:
                 rec_n = max(floor, n)
-            rec_n = max(self.a.min_nodes, min(self.a.max_nodes, rec_n))
+            rec_n = max(self.a.min_nodes, min(self._max_nodes(s), rec_n))
             compass_rec = {"position": round(self.compass_law.p, 4), "velocity": round(self.compass_law.v, 4), "force": round(F, 4),
                         "center": round(self.compass_law.band.center, 4), "wall": round(self.compass_law.band.wall_high, 4),
                         "verdict_state": self.verdict.state, "machines_given_back_allowed": self.verdict.allowed}
@@ -741,7 +877,7 @@ class Controller:
                     self.cruise = False
                     self.audit({"cruise": "off", "pending": s["pending"]})
             if self.cruise:
-                rec_n = self.a.max_nodes
+                rec_n = min(self._max_nodes(s), n + max(1, int(self.a.max_node_step)))   # toward the top, a step a decision
         # idle (rule 8: one pedal, lifted all the way): nothing waiting, no breach, and the sensed services' demand at
         # zero: straight to the breathing floor in one move (the body idles, never at zero, and wakes straight to the
         # work when it comes). Every check of the release gate still holds except one machine per decision
@@ -879,15 +1015,12 @@ class Controller:
         if self.a.mode in ("target", "nodepool"):
             self.pod_reflex()
         if self.a.mode == "nodepool" and self.a.node_scale_cmd and rec_n != n:
-            cfg = SimpleNamespace(minimum_nodes=self.a.min_nodes, maximum_nodes=self.a.max_nodes)
+            cfg = SimpleNamespace(minimum_nodes=self.a.min_nodes, maximum_nodes=self._max_nodes(s))
             acts, hits = enforce([{"action": "nodes", "target": rec_n, "direction": 1 if rec_n > n else -1}],
                                  {"actual_nodes": n, "power_cap": 1.0}, {"power_stress": power_stress, "security_block": obs["security_block"]}, cfg,
                                  ShieldLimits(power_limit=1e9, max_node_step=max(self.a.max_node_step, floor - n)))
             for act in acts:
-                cmd = self.a.node_scale_cmd.format(n=int(act["target"]))
-                self.audit({"write": shlex.split(cmd), "why": "node pool size", "dry_run": self.a.dry_run, "shield_interventions": hits})
-                if not self.a.dry_run:
-                    subprocess.run(shlex.split(cmd), check=True)
+                if self._pool_command(int(act["target"]), n, "node pool size", shield_interventions=hits) and not self.a.dry_run:
                     self.cmd_nodes = int(act["target"])
         self.rec_n = rec_n
         return out
@@ -918,7 +1051,9 @@ def parser():
                          "utilisation; 0: no limit). Adding pods is never limited")
     ap.add_argument("--min-nodes", type=int, default=int(os.environ.get("MIN_NODES", 2)),
                     help="machines always in service, ready for the next burst (the founder's floor: two)")
-    ap.add_argument("--max-nodes", type=int, default=1000)
+    ap.add_argument("--max-nodes", type=int, default=0,
+                    help="the machine lever's top; 0, the default: read live, every ready worker plus what the cluster's "
+                         "autoscaler may still add")
     ap.add_argument("--max-node-step", type=int, default=2)
     ap.add_argument("--min-target-change", type=int, default=3)
     ap.add_argument("--law", choices=["governor", "compass"], default="governor",
@@ -935,9 +1070,10 @@ def parser():
     ap.add_argument("--dial", choices=["max", "save"], default=os.environ.get("OMNI_DIAL", "max"),
                     help="max (default): the most work, faster, never a machine given back below the cluster's own; save: "
                          "the tune-down (the v5 edge toward the line, machines given back where the response time allows)")
-    ap.add_argument("--replica-ceiling", type=int, default=0,
-                    help="the most replicas the operator lets Omni-Compass raise a sensed HPA's cap to while it binds "
-                         "(compass law; 0, the default: the operator's cap is never moved)")
+    ap.add_argument("--replica-ceiling", type=int, default=-1,
+                    help="the most replicas Omni-Compass may raise a sensed HPA's cap to while it binds (compass law): "
+                         "-1, the default, reads it live (what the machines can hold, one pod under); N, a ceiling of the "
+                         "operator's own; 0 keeps the operator's cap unmoved")
     ap.add_argument("--sensed", default="",
                     help="ns/deployment,... whose response time the --latency-file measures; only their HPAs are moved "
                          "(empty: every HPA, the single-service case)")

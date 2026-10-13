@@ -79,10 +79,12 @@ KUBE_WINDOW_ORG = {(100, "tower"): 2400, (100, "stack"): 3600}
 KUBE_BUILD = {1: 1, 10: 1, 100: 8}         # minutes to build the organism (calibration, plants, the max's bone)
 # the test rig's protocol with the real cluster inside (scripts/kind_bench.sh), carried in each run's name. Protocol 2 (12
 # Oct): the governor at the organism's own CPU priority, never below the rig beside it; its decisions counted inside the
-# measured window; kind, kubectl and the metrics-server manifest tried again when a download is refused. The runs of
-# protocol 1 (before it: their names carry no protocol) are kept as they stand and counted in no square, so every square
-# with the cluster inside is filled on protocol 2 alone
-KUBE_PROTOCOL = "2"
+# measured window; kind, kubectl and the metrics-server manifest tried again when a download is refused. Protocol 3 (13
+# Oct): the model of the organism on the runner's last core and the kind nodes on the others, the same in both arms; the
+# window lengthened (never shortened) from the heavier arm's step timed on that core before either arm. The runs of earlier
+# protocols are kept as they stand and counted in no square, so every square with the cluster inside is filled on
+# protocol 3 alone
+KUBE_PROTOCOL = "3"
 MAX_TRIES = 3                      # a repetition whose job failed this many times is started no more (the report lists it)
 
 
@@ -103,7 +105,8 @@ def kube_minutes(size, org, split):
     window."""
     win = KUBE_WINDOW_ORG.get((size, org), KUBE_WINDOW[size])
     arm = 6 + KUBE_BUILD[size] + 2 + win / 60.0 + 2
-    return arm if split else 2 * arm
+    cal = KUBE_BUILD[size] + 2                       # the heavier arm's step timed once a job, before its arms (protocol 3)
+    return arm + cal if split else 2 * arm + cal
 
 
 def matrix(scale, orgs, first, runs, per=None, workers=None):
@@ -410,8 +413,9 @@ def report(cov, started, queued, running, target, out=sys.stdout, gave_up=None):
     for d in started:
         print(f"- {d['title']} ({d['jobs']} jobs, about {d['hours']} runner-hours)", file=out)
     print(f"\nWith the cluster inside, only runs of protocol {KUBE_PROTOCOL} count (12 Oct: the governor never below the "
-          "organism's priority, its decisions counted inside the window); a repetition whose job failed is started again, up "
-          f"to {MAX_TRIES} times.", file=out)
+          "organism's priority, its decisions counted inside the window; 13 Oct: the model on its own core, the kind nodes on "
+          "the others, the window set from the heavier arm's measured step); a repetition whose job failed is started again, "
+          f"up to {MAX_TRIES} times.", file=out)
     for (size, o, x), n in sorted((gave_up or {}).items()):
         print(f"- not started again: {o} at {size:,} copies, repetition {x} (its job failed {n} times; listed, never "
               "dropped silently)", file=out)

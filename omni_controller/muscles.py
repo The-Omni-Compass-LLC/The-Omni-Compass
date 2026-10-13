@@ -1,24 +1,36 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Live muscles for the Kubernetes controller beyond HPA and nodes.
 
 Each muscle pulls (afferent) and pushes (efferent) through kubectl, records what it changed so the reset can hand
 the muscle back, and tags every write with its muscle name in the audit log.
 
-  power_cap   push: CPU limit of each running pod of the capped deployments = base limit x the governor's power cap,
-              resized in place (no restart; Linux CFS quota throttles the containers for real); pull: power from --power-cmd
+  power_cap   push: at the max (the default dial) the cap is never set under native: each machine's idle CPU is conveyed
+              to the capped deployments' running pods (convey: one click under the machine, its last 5% never handed out,
+              never under the operator's limit), and the frequency ceiling and the GPU limit stay at their top. The
+              tune-down (--dial save): CPU limit of each running pod = base limit x the governor's power cap, never under
+              the pod's own request nor its use plus headroom (nothing fixed), resized in place (no restart; Linux CFS
+              quota throttles the containers for real); pull: power from --power-cmd
   heat        pull: thermal state from the harness heat law driven by live power stress (modelled: kind has no thermometer)
   security    pull: ConfigMap key "hold" == "true" means a security hold; the shield then blocks every expansion
   rollout     push: pause a deployment's rollout while the governor does not permit change; resume it when it does;
               undo a rollout that has exceeded its progress deadline when the governor authorises rollback
-  batch       push: admit (unsuspend) held batch Jobs, one per decision, only when change is permitted and there is load
-              and power headroom; running Jobs are never suspended
+  batch       push: admit (unsuspend) held batch Jobs, one per decision, only when change is permitted and load and power
+              stress are under the compass's wall less one cushion (0.95 - 0.05: one click under, the nervous system's
+              own admit gate); running Jobs are never suspended
   latency     pull: 95th-percentile response time over the last --latency-window-s from --latency-file (CSV written by
               scripts/latency_probe.py); pressure max(0, p95 / --slo-ms - 1) enters the engine as queue pressure
   cpu_pstate  hardware connector. pull: --rapl-cmd prints package watts (e.g. from /sys/class/powercap/intel-rapl);
               push: --cpufreq-cmd with {khz}, the frequency ceiling = max frequency x power cap (e.g. writing
               scaling_max_freq with scripts/cpufreq_ceiling.sh {khz}, see hardware/SCHEDUTIL.md, or `cpupower frequency-set -u {khz}kHz`); kill runs it with the maximum frequency
-  gpu         hardware connector. pull: --gpu-query-cmd prints "watts,celsius" (e.g. `nvidia-smi
-              --query-gpu=power.draw,temperature.gpu --format=csv,noheader,nounits`); GPU temperature / --gpu-temp-limit
-              feeds the heat sense; push: --gpu-power-cmd with {w}, the power limit = max limit x power cap
+  gpu         hardware connector. pull: --gpu-query-cmd prints "watts,celsius[,min_watts[,slowdown_celsius]]" (e.g.
+              `nvidia-smi --query-gpu=power.draw,temperature.gpu,power.min_limit --format=csv,noheader,nounits` plus the
+              card's slowdown temperature): the card's own figures, read live. One degree under its own slowdown
+              temperature reads as heat 1.0 (--gpu-temp-limit only for a card that does not report it); push:
+              --gpu-power-cmd with {w}, the power limit = max limit x power cap, never under the card's own minimum
               (e.g. `nvidia-smi -pl {w}`); kill restores the maximum limit
   rightsize   push: each running pod's CPU *request* follows its measured use x (1 + headroom), resized in place through the
               pods/resize subresource (no restart); never above the limit, never below --rightsize-min-m; no decrease while
@@ -69,6 +81,12 @@ class Muscles:
         self.gain = {}       # (ns, deployment) -> mean conveyed CPU limit / operator's limit
         self.base = {}       # (ns, deployment) -> operator's CPU limit (millicores)
         self.thermal = 0.32  # harness initial thermal state
+        self.gpu_min_w = 0.0     # the card's own minimum power limit, read live (0 until the card reports it)
+        self.gpu_heat_c = 0.0    # one degree under the card's own slowdown temperature, read live (0: not reported)
+
+    def at_max(self):
+        """The max (the default dial): no level is ever set under what native runs."""
+        return getattr(self.a, "dial", "max") == "max"
 
     # ---- afferent ---------------------------------------------------------------------------------------------------
     def sense(self, power_stress):
@@ -81,9 +99,15 @@ class Muscles:
         if getattr(self.a, "gpu_query_cmd", ""):
             out = self._run_out(self.a.gpu_query_cmd)
             try:
-                w, t = [float(x) for x in out.split(",")[:2]]
+                vals = [float(x) for x in out.split(",")]
+                w, t = vals[:2]
                 o["gpu_watts"], o["gpu_celsius"] = w, t
-                o["thermal"] = max(o.get("thermal", 0.0), min(1.35, t / max(1.0, self.a.gpu_temp_limit)))
+                if len(vals) > 2 and vals[2] > 0:
+                    self.gpu_min_w = vals[2]                    # the card's own floor
+                if len(vals) > 3 and vals[3] > 1:
+                    self.gpu_heat_c = vals[3] - 1.0             # one degree under the card's own slowdown
+                limit = self.gpu_heat_c or self.a.gpu_temp_limit
+                o["thermal"] = max(o.get("thermal", 0.0), min(1.35, t / max(1.0, limit)))
             except ValueError:
                 pass
         lf = getattr(self.a, "latency_file", "")
@@ -125,8 +149,9 @@ class Muscles:
     def push(self, d, obs, killed=False):
         if killed:
             return
-        self._power_cap(float(d["power_cap"]), obs)
-        self._hardware(float(d["power_cap"]), obs)
+        cap = 1.0 if self.at_max() else float(d["power_cap"])     # the max: never under native
+        self._power_cap(cap, obs)
+        self._hardware(cap, obs)
         self._rollout(bool(d["change_permitted"]), bool(d["rollback_authorized"]))
         self._batch(bool(d["change_permitted"]), obs)
         for name, fn in (("rightsize", lambda: self._rightsize(obs)), ("coldstart", self._coldstart),
@@ -324,9 +349,10 @@ class Muscles:
         enforces it. The deployment template is not changed, so no rollout is triggered."""
         if not obs.get("slo_clean", True):
             cap = 1.0  # SLO reflex: no power capping while service is (or was just) over its response-time target
-        if getattr(self.a, "latency_file", ""):
+        if getattr(self.a, "latency_file", "") or self.at_max():
             # a request-served workload: its work is set by arrivals, not by the cap, so throttling it saves no energy
-            # (the same CPU-seconds run later) and only adds wait. The energy goes where the work is: convey()
+            # (the same CPU-seconds run later) and only adds wait. The energy goes where the work is: convey(). And at
+            # the max every capped pod gets its machine's idle CPU, never less than its operator gave it
             return self.convey(obs)
         for target in filter(None, getattr(self.a, "cap_deployments", "").split(",")):
             ns, name = ref(target)
@@ -451,7 +477,8 @@ class Muscles:
             lo, hi = self._envelope("cpufreq", [0.0, 1.0]); cap = min(max(cap, lo), hi)
             self._hw(self.a.cpufreq_cmd, self.a.cpu_max_khz * cap, f"cpu_pstate: frequency ceiling {int(self.a.cpu_max_khz * cap)} kHz (cap {cap:.3f})")
         if getattr(self.a, "gpu_power_cmd", "") and self.a.gpu_max_w:
-            self._hw(self.a.gpu_power_cmd, self.a.gpu_max_w * cap, f"gpu: power limit {int(self.a.gpu_max_w * cap)} W (cap {cap:.3f})")
+            w = max(self.gpu_min_w, self.a.gpu_max_w * cap)               # never under the card's own minimum
+            self._hw(self.a.gpu_power_cmd, w, f"gpu: power limit {int(w)} W (cap {cap:.3f})")
         self._last_cap = cap
 
     def _cpufreq_sysfs(self, cap, obs):
@@ -637,7 +664,9 @@ def latency_p95(path, window_s):
 
 def add_args(ap):
     ap.add_argument("--cap-deployments", default="", help="ns/name[,ns/name]: power_cap muscle scales their CPU limit")
-    ap.add_argument("--cap-min", type=float, default=0.65, help="lowest power cap applied (shield floor)")
+    ap.add_argument("--cap-min", type=float, default=0.0,
+                    help="lowest power cap the tune-down applies, a share of the operator's limit; 0 (the default): nothing "
+                         "fixed, the pod's own request and its use plus headroom are the floor")
     ap.add_argument("--cap-min-change-m", type=int, default=20, help="smallest CPU-limit change written, millicores")
     ap.add_argument("--cap-headroom", type=float, default=0.3, help="power cap never below pod CPU usage x (1 + headroom)")
     ap.add_argument("--latency-file", default="", help="probe CSV (elapsed_seconds,latency_ms,ok) for the latency afferent")
@@ -651,8 +680,10 @@ def add_args(ap):
     ap.add_argument("--security-configmap", default="", help="ns/name of a ConfigMap whose key 'hold' signals a security hold")
     ap.add_argument("--rollout-guard", default="", help="ns/name[,ns/name]: rollout muscle pauses, resumes, undoes")
     ap.add_argument("--batch", action="store_true", help="batch muscle: admit held Jobs labelled " + BATCH_LABEL)
-    ap.add_argument("--batch-load-max", type=float, default=0.8)
-    ap.add_argument("--batch-power-max", type=float, default=0.9)
+    ap.add_argument("--batch-load-max", type=float, default=0.9,
+                    help="admit held work only under this load: the compass's wall less one cushion (0.95 - 0.05)")
+    ap.add_argument("--batch-power-max", type=float, default=0.9,
+                    help="admit held work only under this power stress: the wall less one cushion, as the nervous system")
     ap.add_argument("--rapl-cmd", default="", help="cpu_pstate pull: prints CPU package watts")
     ap.add_argument("--cpufreq-cmd", default="", help="cpu_pstate push: command template with {khz}")
     ap.add_argument("--cpufreq-policy-root", default="", help="cpu_pstate push through sysfs policies (e.g. /sys/devices/system/cpu/cpufreq); exact restore on kill")
@@ -661,7 +692,9 @@ def add_args(ap):
     ap.add_argument("--gpu-query-cmd", default="", help="gpu pull: prints 'watts,celsius'")
     ap.add_argument("--gpu-power-cmd", default="", help="gpu push: command template with {w}")
     ap.add_argument("--gpu-max-w", type=float, default=0.0)
-    ap.add_argument("--gpu-temp-limit", type=float, default=83.0, help="GPU temperature treated as thermal 1.0")
+    ap.add_argument("--gpu-temp-limit", type=float, default=83.0,
+                    help="GPU temperature read as heat 1.0 when the card does not report its own slowdown temperature "
+                         "(--gpu-query-cmd's fourth field; then one degree under it)")
     ap.add_argument("--rightsize-deployments", default="", help="ns/name[,ns/name]: rightsize muscle sets pod CPU requests from use")
     ap.add_argument("--rightsize-headroom", type=float, default=0.3)
     ap.add_argument("--rightsize-min-m", type=int, default=50)

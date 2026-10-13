@@ -142,7 +142,7 @@ Each is testable in the existing harness against every platform in the league (t
 there.
 
 
-## The pedals: idle, gas, brake, reset, and the kill switch
+## One pedal: push, lift off, idle, reset, and the kill switch
 
 Omni-Compass drives a system the way a self-driving car drives itself: it feels, gauges and adjusts, with nobody in
 the seat. The words below are used the same way everywhere in this repository.
@@ -152,21 +152,21 @@ firmware, CityLearn's controller). **omni** is Omni-Compass on top of native: th
 governing it. Omni-Compass never runs instead of native, only on top of it, so every comparison is native against omni.
 
 **The modes.** Off (manual): Omni-Compass not driving, native runs alone. Watching: Omni-Compass reads every gauge and
-logs what it would do, and writes nothing. Autopilot: the pedals below. Cruise and the emergency brake: for work that
-comes as a pile.
+logs what it would do, and writes nothing. Autopilot: the one pedal below. Cruise and idle at once: for work that comes
+as a pile.
 
 | Term | Meaning | In the code |
 |---|---|---|
-| **Idle** | No foot on the gas or the brake: calm traffic, the engine running at its floor (two machines in service, ready) | `MIN_NODES`, the floor of the staging law (8.8) |
-| **Gas** | Ramping up: traffic climbs and capacity is added at once, never held back; the whole cluster can take work the instant it is needed | (8.3); a lower HPA target is never limited |
-| **Brake** | Ramping down: traffic falls and capacity is eased off a step at a time, never below idle | (8.4)-(8.5); coasting, rule 6 |
-| **Reset** | The brake held to the floor: every setting the governor ever wrote is handed back to where native had it, read back, and the record removed; the next run starts fresh. Every benchmark arm ends with one and checks it | the reset file (`--kill-file`, a name kept for compatibility), `Controller.restore` |
-| **Cruise** | A pile of work waiting for a place: every machine in service, held there without second-guessing, until the line has been empty for two decisions | rule 7, `--cruise-after` |
-| **Emergency brake** | The work is done and demand is at zero (the service at its least pods, wanting no more, at half its target or less): straight to idle (the floor) in one move, every safety check still holding | rule 8, `--brake-demand`, amendment 9 |
+| **Push** | Traffic climbs and capacity is added at once, never held back; the whole cluster can take work the instant it is needed | (8.3); a lower HPA target is never limited |
+| **Lift off** | Traffic falls and capacity is eased off a step at a time, handed back toward native, never below idle | (8.4)-(8.5); coasting, rule 6 |
+| **Idle** | The pedal lifted all the way: calm traffic, the engine running at its floor (two machines in service, ready) | `MIN_NODES`, the floor of the staging law (8.8) |
+| **Reset** | Every setting the governor ever wrote is handed back to where native had it, read back, and the record removed; the next run starts fresh. Every benchmark arm ends with one and checks it | the reset file (`--kill-file`, a name kept for compatibility), `Controller.restore` |
+| **Cruise** | A pile of work waiting for a place: machines in service up to the pool's own top, read live (a fixed pool's every machine at once, a growing pool a step a decision), held there without second-guessing, until the line has been empty for two decisions | rule 7, `--cruise-after` |
+| **Idle at once** | The work is done and demand is at zero (the service at its least pods, wanting no more, at half its target or less): the pedal lifted all the way in one move, straight to idle (the floor), every safety check still holding | rule 8, `--idle-demand`, amendment 9 |
 | **Kill switch** | Security only: one switch in a human hand that turns Omni-Compass's governing off across the whole system at once, for anything rogue or anyone trying to drive a system through Omni-Compass's brain | `omnicompass/master.py`, `tools/omni_switch.py off` |
 
-The fuel cut-off point (the floor) is a number the operator sets; the brake never takes the system below it, however
-hard it is pressed. Earlier dated records, and the sealed original engine files, call the reset a "kill switch"; they
+The floor is a number the operator sets; lifting off never takes the system below it, however far the pedal is
+lifted. Earlier dated records, and the sealed original engine files, call the reset a "kill switch"; they
 are kept word for word.
 
 ## 8. The staging law: machines on and off in order, with demand that moves
@@ -266,16 +266,17 @@ u_k the scaling-up flag, c the cruise count (`--cruise-after`, 2), M the machine
 
     cruise on      q_j > 0 for the last c decisions                                                   (9.3)
     cruise off     q_j = 0 and not u_j for the last c decisions                                       (9.4)
-    in cruise      n' = M; the service's autoscaler target held at the operator's own; the floor step
+    in cruise      n' = min(M, n + s), M the pool's own top read live, s the step; the service's autoscaler target held at the operator's own; the floor step
                    makes no read and no write                                                         (9.5)
-    emergency brake (not cruising) q = 0, no breach, not u, every sensed service idle or at demand
+    idle at once   (not cruising) q = 0, no breach, not u, every sensed service idle or at demand
                    <= b, the gate G (8.5) holds, every sense live, the last command landed:
                    n' = max(m, smallest n carrying the CPU in use at rho)                             (9.6)
     idle (a service at its floor)   I(h) := current = min = desired, and u_h <= target_h / 2          (9.7)
-    gas / brake / idle             (8.3) / (8.4)-(8.5) / (8.8)
+    push / lift off / idle         (8.3) / (8.4)-(8.5) / (8.8)
 
-**9.3 Why cruise steps back (9.5).** In cruise every machine is already in service, n = M, so the floor step's only
-action (raise n to the floor the waiting pods need) is empty: floor <= M = n. Its reads (every pod, every node, node
+**9.3 Why cruise steps back (9.5).** In cruise the machines climb to the pool's own top (a fixed pool's every machine
+at once, n = M; a growing pool a step a decision), so the floor step's only action (raise n to the floor the waiting pods
+need) adds nothing the climb does not already give: for a fixed pool floor <= M = n. Its reads (every pod, every node, node
 metrics, every HPA, each five seconds) carry no value of information, so removing them cannot change any action; they
 only cost CPU and API-server time on the machines the queue is using. The service's response time is also confounded
 in cruise: with a queue of other work holding the machines, a request waits on contended CPU, R = S / (1 - u_host), not on
@@ -286,7 +287,7 @@ five seconds.
 
 **9.4 Why idle is read from the autoscaler's floor (9.7).** A served service never reads zero: a health probe or a
 client's keep-alive keeps one pod at a few percent of its request. In the batch test, one pod at about 10% of its request
-read as demand 0.10, above b = 0.05, and the brake waited 15 minutes after the queue emptied. The autoscaler's own
+read as demand 0.10, above b = 0.05, and idle waited 15 minutes after the queue emptied. The autoscaler's own
 floor is the observable of "no demand beyond the minimum": the pods it keeps are its minimum, it wants no more, and they
 run under half the target. In the five frozen-engine web tests the service was never at its floor (0 of 5,102 readings),
 so (9.7) changes nothing there.

@@ -13,6 +13,21 @@ set -euo pipefail
 echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native omni}"
 [ -z "${LOAD_STEPS_IN:-}" ] || export LOAD_STEPS="$LOAD_STEPS_IN"   # the capacity test's rising steps (benchmark-reps input)
+# the window from a measured step (protocol 3, 13 Oct): with the organism inside, the heavier arm (the model with
+# Omni-Compass's math for every modelled muscle) is timed on the core it will run on (scripts/kind_bench.sh), before
+# either arm, and the window is lengthened, never shortened, so that arm makes its slowest step in time with a quarter
+# to spare. Both arms use the one window; the measurement is written into each arm's preflight
+if [ -n "${ORGANISM:-}" ] && [ "${PLATFORM:-kind}" = kind ]; then
+  ncpu=$(nproc); pin=""
+  [ "$ncpu" -ge 2 ] && command -v taskset >/dev/null 2>&1 && pin="taskset -c $((ncpu - 1))"
+  CALIBRATION=$($pin python tools/run_kil.py --organism "$ORGANISM" --arm compass --duration "${DURATION:-1200}" \
+                --out "calibration-$REP" --scale "${ORGANISM_SCALE:-1}" --calibrate "${CALIBRATE_STEPS:-6}" | tail -1)
+  need=$(python3 -c 'import json, math, sys
+c = json.loads(sys.argv[1]); print(int(math.ceil(c["steps_in_window"] * c["step_s_max"] * 1.25 / 60.0) * 60))' "$CALIBRATION")
+  echo "calibration: $CALIBRATION; window needed ${need} s, given ${DURATION:-1200} s"
+  if [ "$need" -gt "${DURATION:-1200}" ]; then export DURATION="$need"; fi
+  export CALIBRATION
+fi
 k=${#arms[@]}; off=$(( (REP - 1) % k ))
 order=( "${arms[@]:off}" "${arms[@]:0:off}" )
 echo "repetition $REP, order: ${order[*]}"

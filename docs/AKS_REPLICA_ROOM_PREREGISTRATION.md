@@ -36,8 +36,9 @@ price, every gauge reported. Two settings of their own, each labelled as such:
   named 36, nine pods of 200m on each of the four 2-vCPU work machines, a number written by us, and the founder's order
   of 13 October is that a muscle runs from 1 up to one click under what the system itself can hold, read live). The
   ceiling is what the work pool's machines can hold at the service's own request, read from the cluster as it runs,
-  one pod under it; the lever never asks for a machine the fleet does not have. Until the engine reads it live (the
-  next engine version), no run of this set starts.
+  one pod under it; the lever never asks for a machine the fleet does not have. The engine reads it live from Omni v5
+  amendment 5 (digest `6093b2b88aa911b9`): the replica room is on by default, its ceiling what the work pool's machines
+  and the cluster autoscaler's own room can hold, one pod under it. No run of this set started on an engine before it.
 - **The burst steps.** `1 3 1 4 1 3`, the steps written on 5 October (amendment 11). The first draft of this page named
   `1 6 1 8 1 6`, the burst amendment 11 set aside; we do not choose a benchmark's settings, so the written steps stand.
 - **The machines.** `Standard_D2_v4` (the Dv4 family: 2 vCPU and 8 GiB like `Standard_D2s_v4`, the same list price of
