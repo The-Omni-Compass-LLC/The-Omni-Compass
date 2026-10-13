@@ -15,7 +15,7 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v5, fingerprint `5648f2902f1fae68` (44 files); package 0.5.0. Its default brain is **the max**: every muscle pushed to its own limit, never past it and never below native, the energy it takes shown as power given beside the work and the wear; the dial turns it down ([`docs/OMNI_V5.md`](docs/OMNI_V5.md)).
+- **Engine on main:** omni-v5, fingerprint `6093b2b88aa911b9` (44 files); package 0.5.0. Its default brain is **the max**: every muscle pushed to its own limit, never past it and never below native, the energy it takes shown as power given beside the work and the wear; the dial turns it down ([`docs/OMNI_V5.md`](docs/OMNI_V5.md)).
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
@@ -43,9 +43,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-13 18:02 | six-kube x100 orgs tower reps 1+10 arms native compass split no window 3600 protocol 2 | success | [38423471888](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38423471888) |
 | 2026-10-13 17:16 | aks-metered steady replica room 36 eastus Standard_D2_v4 | cancelled | [38434939022](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38434939022) |
 | 2026-10-13 16:26 | big-organism-detached collect | success | [38430530544](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38430530544) |
-| 2026-10-13 15:39 | kind-cruisekube | failure | [38412997261](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38412997261) |
-| 2026-10-13 15:07 | six-kube-pool | success | [38416354634](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38416354634) |
-| 2026-10-13 14:26 | six-pool | success | [38413211812](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38413211812) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
