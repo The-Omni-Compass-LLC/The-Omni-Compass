@@ -2,6 +2,23 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-13 (morning): Goldilocks and the capacity test, three runs each, on the card version
+
+- **Goldilocks** (register row 80; runs 38339821941, 38339828150, 38339834658 on commit `148565d2`, omni-v5 digest
+  `5648f290`; `results/live/V5_GOLDILOCKS.md`, class L): the average response 44% to 48% faster, the 95th percentile 59%
+  to 62% faster, the 99th 68% to 69% faster, time over the response line down 99% to 100%, better in all three of our
+  runs; machines the same; no failed request in either arm; energy 1.9% to 2.6% more on the declared model, worse in all
+  three of our runs (the power given: about 40% more CPU work done for the faster service).
+- **The capacity test** (runs 38339841468, 38339847249, 38339853176; `results/live/V5_CAPACITY.md`, new three-run tool
+  `tools/capacity_abc.py`): no difference beyond the noise at any of the four caps in the three runs (one run at 2 cores
+  read 1.8% less completed work; the other two noise). The cap is a quota on the service's CPU and blocks the one lever
+  Omni-Compass has there, more copies of the service.
+- **The founder's nine pieces, checked against what each can run** (register rows 79 to 87): Kepler 0.10 and later carry
+  no model and on a machine without the processor's power registers run only a fake development meter, so Kepler runs
+  where the registers are, never on GitHub's virtual machines; PEAKS has a design and meeting notes, no scheduler to run;
+  CruiseKube (non-production use granted by its license) skips any workload whose HPA scales on CPU or memory, as every
+  Kubernetes set here does, so its set pairs it with KEDA's HTTP add-on scaling on requests in flight; it is being built.
+
 ## 2026-10-13: Every muscle its own card (Omni v5 re-declared)
 
 - **The founder's question** (12 October, night): does every muscle have its own tuning, maxed to its own benefit,

@@ -94,12 +94,15 @@ under every load. Inside a body the cards remove more misses with less power giv
 | The climb (1 2 3 2 3 4 ..., up to twice its own) | −7.2% distribution, −7.0% compute, −4.8% the four stacked, −3.2% physics, −2.7% energy, −1.4% the tower | −0.9% to −3.5% | more work in four of six | up to +0.05% (was +0.07%) |
 | Work waiting in line | −1.1% to −8.3% in every organism | −1.0% to −7.2% | equal | up to +0.04% (was +0.07%) |
 
-The lease handed every knob back to native in every run. Earlier tonight, on one global setting (fingerprint
-`9be48445`), GitHub reproduced the realms table exactly in runs A, B and C; the first Goldilocks run (Omni-Compass on top
-of a service rightsized by Goldilocks and the Vertical Pod Autoscaler, ten pairs) answered the 95th percentile in 133 ms
-instead of 331 and spent 99% less time over the line, for 2.3% more energy on the declared model; the first capacity run
-(the same CPU cap in both arms) showed no difference beyond the noise at any cap, where the cap itself blocks the one
-lever Omni-Compass has (more copies of the service). Each runs again, A, B and C, on this version.
+The lease handed every knob back to native in every run. On this version GitHub reproduced the realms table in runs A,
+B and C (2,214 rows, 0 differences). **Goldilocks**, three runs of ten pairs (Omni-Compass on top of a service
+rightsized by Goldilocks and the Vertical Pod Autoscaler's recommender; class L): the average response 44% to 48%
+faster, the slowest 5% of responses 59% to 62% faster, time over the response line down 99% to 100%, better in all three
+of our runs, on the same machines, for 1.9% to 2.6% more energy on the declared model, the power given
+([`results/live/V5_GOLDILOCKS.md`](results/live/V5_GOLDILOCKS.md)). **The capacity test**, three runs (the same CPU cap
+in both arms, four cap levels): no difference beyond the noise at any cap, where the cap itself blocks the one lever
+Omni-Compass has there, more copies of the service ([`results/live/V5_CAPACITY.md`](results/live/V5_CAPACITY.md)).
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 ## The manual: the book for the people who wire it
 

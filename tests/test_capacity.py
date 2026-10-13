@@ -74,5 +74,41 @@ class CapacityReport(unittest.TestCase):
         self.assertEqual(cr.capacity(rec), 10.0)       # 2% failed breaks the failure limit (1%)
 
 
+class CapacityThreeRuns(unittest.TestCase):
+    """tools/capacity_abc.py: three runs' tables read row by row with the three readings every three-run table uses."""
+
+    @staticmethod
+    def run_dir(root, run_id, label, work, capacity):
+        """One archived run: work[cap] and capacity[cap] are (difference, low, high) of omni against native."""
+        d = Path(root) / f"capacity-run-{run_id}"
+        d.mkdir(parents=True)
+        rows = [{"cap_m": cap, "pairs": 5, "work_native": 1000.0, "work_omni": 1000.0 + w[0], "work_diff": w[0],
+                 "work_lo": w[1], "work_hi": w[2], "capacity_native": 10.0, "capacity_omni": 10.0 + capacity[cap][0],
+                 "capacity_diff": capacity[cap][0], "capacity_lo": capacity[cap][1], "capacity_hi": capacity[cap][2]}
+                for cap, w in work.items()]
+        (d / "CAPACITY.json").write_text(json.dumps({"rows": rows}))
+        (d / "RUN.txt").write_text(f"label={label}\ncommit=0000000\n")
+        return d
+
+    def test_readings_by_cap(self):
+        from tools import capacity_abc as ca
+        with tempfile.TemporaryDirectory() as t:
+            runs = []
+            for i, (lab, w2) in enumerate((("A", (-24, -92, 44)), ("B", (-18, -34, -1)), ("C", (19, -22, 59)))):
+                runs.append(self.run_dir(t, 100 + i, lab,
+                                         {1000: (50, 10, 90), 2000: w2},             # 1 core: more work in all three
+                                         {1000: (1.0, 0.5, 1.5), 2000: (0.0, 0.0, 0.0)}))
+            out = Path(t) / "V5_CAPACITY.md"
+            ca.main([str(r) for r in runs] + ["--out", str(out)])
+            rows = json.loads(out.with_suffix(".json").read_text())["rows"]
+            self.assertEqual(rows["1000:work"]["reading"], "better in all three of our runs")
+            self.assertEqual(rows["1000:capacity"]["reading"], "better in all three of our runs")
+            self.assertEqual(rows["2000:work"]["reading"], "no difference beyond the noise in 2 of 3 runs")
+            self.assertEqual(rows["2000:capacity"]["reading"], "same")
+            text = out.read_text()
+            self.assertIn("No outside party has reviewed or approved these results.", text)
+            self.assertIn("www.omni-compass.com", text)
+
+
 if __name__ == "__main__":
     unittest.main()

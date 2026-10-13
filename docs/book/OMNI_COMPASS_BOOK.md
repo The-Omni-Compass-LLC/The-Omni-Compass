@@ -5409,8 +5409,9 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
    current governor, on the same clock as the Kubernetes runs, is the decisive one still to be produced; every earlier
    card result ran on a controller since replaced and is obsolete. No cloud-bill saving: Azure's bill on four workers
    read no difference beyond the noise (a fleet too small to give back one machine), and the larger fleet waits on
-   Azure's capacity. More completed work at one fixed resource cap: the capacity test was built on 12 October and its
-   tuning run made; its three counted runs come next.
+   Azure's capacity. More completed work at one fixed resource cap: the capacity test's three runs of 13 October read no
+   difference beyond the noise at any of its four caps; the cap is a quota on the service's CPU, and it blocks the one
+   lever Omni-Compass has there, more copies of the service.
 
 ### 2. Receipt by receipt
 
@@ -5421,7 +5422,8 @@ zero; "noise" means an interval includes zero.
 
 | Test | Engine | Native | What moved | Reading | It shows | It does not show | File |
 |---|---|---|---|---|---|---|---|
-| Capacity at a fixed cap (four cap levels, rising load) | v5 | Kubernetes HPA under a CPU quota | — | tuning run made 12 October (one cap, not counted); A, B, C next | — | anything yet | `docs/CAPACITY_PREREGISTRATION.md` |
+| On top of Goldilocks and the VPA's recommender | v5 | the service rightsized by Goldilocks 4.16.2 (the VPA 1.7.1 recommender), HPA | response mean −44% to −48%; p95 −59% to −62%; p99 −68% to −69%; time over the line −99% to −100%; energy +1.9% to +2.6% (model) | response times better in all three; energy worse in all three (model: the power given); machines the same | a faster service on top of a rightsized one, on the same machines | a measured energy saving (the model shows 2% to 3% more, for about 40% more CPU work done) | `results/live/V5_GOLDILOCKS.md` |
+| Capacity at a fixed cap (four cap levels, rising load) | v5 | Kubernetes HPA under a CPU quota | nothing judged | noise at every cap in all three runs (one run at 2 cores −1.8% completed work, the other two noise) | no harm under a cap | more work under the cap: the quota blocks Omni-Compass's one lever there, more copies of the service | `results/live/V5_CAPACITY.md` |
 | On top of KEDA's HTTP add-on | v3 | KEDA 2.21, HTTP add-on 0.16 | p95 −73% to −76%; machines −5.9% to −7.8%; idle-power energy +1.0% to +2.6% | p95 and machines better in all three; energy worse in all three (model) | faster service and fewer machines on top of a second autoscaler | a measured energy saving (the energy is a model) | `results/live/V3_KEDA_REQUESTS.md` |
 | On top of KEDA on CPU and requests | v3 | KEDA 2.21 | p95 −51% to −53%; idle-power energy worse | as above | as above | as above | `results/live/V3_KEDA_CPU_REQUESTS.md` |
 | The Google cluster trace of 2011, replayed | v3 | HPA | p95 −64% to −67%; failed requests −11% to −18%; machines −7% to −9% | better in all three | a public day of real demand served faster on fewer machines | a cloud bill | `results/live/V3_TRACE_GOOGLE2011.md` |
