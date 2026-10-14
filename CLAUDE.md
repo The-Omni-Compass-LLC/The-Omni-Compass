@@ -133,7 +133,8 @@ the founder overrides one in the conversation.
   checks its work (every write read back, every give-back on its own trial, every reason in its audit) and nobody has to
   react, because it acts before the line is crossed. In the cloud the aim is no alert minute at all (a minute over the
   line wakes a person): an alert minute in the omni arm is found and fixed, never accepted. The governor decides every
-  15 seconds in the cloud (`OMNI_INTERVAL=15`), its fast checks every 5; kind moves to 15 with the next engine version. Every Kubernetes and cloud receipt shows it in both arms: the
+  10 seconds in the cloud (`OMNI_INTERVAL=10`, six a minute, faster than native's 15-second check), its fast checks every 5;
+  kind moves to 10 with the next engine version. Every Kubernetes and cloud receipt shows it in both arms: the
   alert minutes (judged), the settings commands the governor wrote on its own and its additions made inside the line
   (shown) (`tools/live_reps.py`, `babysitting`); both manuals and the README say so.
 - **Two manuals** (the founder's orders of 14 October, evening and night), both kept in the repository until the founder

@@ -2707,8 +2707,8 @@ stack in this manual, so a referee can see that the "gains" differ only through 
 
 | Stack | Reading (the wire in) | Line | Center | Decision period | Response time | Cover of the knob |
 |---|---|---|---|---|---|---|
-| Kubernetes, the HPA target | the mean response time of the latency window | the operator's SLO (500 ms) | 0.4 | 15 s in the cloud, 60 s on kind | the pods' start time | [0.6 × the operator's target, the operator's target] |
-| Kubernetes, the machines | the same, through the release gate and the verdict | the same | 0.4 | 15 s in the cloud, 60 s on kind | a machine's wake | [the floor of 2, every machine] |
+| Kubernetes, the HPA target | the mean response time of the latency window | the operator's SLO (500 ms) | 0.4 | 10 s in the cloud, 60 s on kind | the pods' start time | [0.6 × the operator's target, the operator's target] |
+| Kubernetes, the machines | the same, through the release gate and the verdict | the same | 0.4 | 10 s in the cloud, 60 s on kind | a machine's wake | [the floor of 2, every machine] |
 | PgBouncer, the pool size | time in the server plus time waiting for one, per transaction | 50 ms | 0.4 | 1 s | 2 s | [2, PostgreSQL's limit minus 10] |
 | Kafka, the consumer count | the group's own end-to-end latency, mean of the last second | 500 ms | 0.4 | 1 s | 3 s (a rebalance) | [1, the topic's partitions] |
 | Redis, the memory ceiling | the application's request latency, mean of the last second | 2 ms | 0.4 | 1 s | 2 s | [16 MB, 512 MB] |
@@ -4413,7 +4413,7 @@ response time does not need, which a cloud stack shows in the quiet stretches be
 max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
-In the cloud the governor decides every 15 seconds (`OMNI_INTERVAL`, passed as `--interval`), four times a minute, and its
+In the cloud the governor decides every 10 seconds (`OMNI_INTERVAL`, passed as `--interval`), six times a minute, and its
 fast checks (the scheduling floor, the pod reflex, conveyance) run every 5 seconds; the law's damping follows from the
 decision period by its own formula (section 6), so nothing else changes with it.
 
@@ -9638,12 +9638,14 @@ here before any run at the tune-down; nothing else in the receipt or the reading
 
 No person touches a setting in either arm of any run; that is stated in every receipt beside the rows.
 
-### Four decisions a minute in the cloud, and two arms only (the founder's order, 2026-10-14, night, before any run at the tune-down)
+### Six decisions a minute in the cloud, and two arms only (the founder's orders, 2026-10-14, night, before any run at the tune-down)
 
-The founder's order of 14 October: the governor decides more than once a minute, every 15 seconds. From this order every
-Azure set runs the governor's full decision every 15 seconds (`OMNI_INTERVAL=15` in `aks-metered.yml`, passed to the
-governor as `--interval 15`; the decisions expected in a window are counted at that period), four a minute, in step with
-the HPA's and Azure's own 15-second sync; its fast checks (the scheduling floor, the pod reflex, conveyance) stay at 5
+The founder's orders of 14 October: the governor decides more than once a minute, first every 15 seconds, then, the same
+night and before any run, every 10 seconds, so that it moves faster than every native controller under it. From these
+orders every Azure set runs the governor's full decision every 10 seconds (`OMNI_INTERVAL=10` in `aks-metered.yml`, passed
+to the governor as `--interval 10`; the decisions expected in a window are counted at that period), six a minute, ahead of
+the HPA's own 15-second check (the processor meter it reads refreshes every 15 to 60 seconds; Azure's machine autoscaler
+looks every 10 seconds in these runs); its fast checks (the scheduling floor, the pod reflex, conveyance) stay at 5
 seconds, and the compass law's damping follows from the period by its own formula. The local (kind) benchmarks keep 60
 seconds until the next engine version, so that no running benchmark's A, B and C are split across two periods. The
 cloud's arms are native and Omni-Compass on top, nothing else (`ARMS` defaults to `native compass` in the workflow and in

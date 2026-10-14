@@ -472,8 +472,8 @@ fi
 kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json > "$OUT_DIR/pod_watch.json" 2>"$OUT_DIR/pod_watch.err" &
 watch_pid=$!
 omni_pid=""
-# the governor's full decision every OMNI_INTERVAL seconds (60 unless the run sets it; the cloud sets 15, the founder's
-# order of 14 October, night: four decisions a minute, in step with the autoscaler's own 15-second sync); its fast checks
+# the governor's full decision every OMNI_INTERVAL seconds (60 unless the run sets it; the cloud sets 10, the founder's
+# order of 14 October, night: six decisions a minute, faster than the autoscaler's own 15-second check); its fast checks
 # (the scheduling floor, the pod reflex, conveyance) every 5 s either way
 export OMNI_INTERVAL="${OMNI_INTERVAL:-60}"
 # the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
