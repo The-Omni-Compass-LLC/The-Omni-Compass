@@ -40,3 +40,45 @@ def test_sampler_resets_after_unreadable_sample(tmp_path):
     assert sampler.sample() is None
     stat.write_text("cpu 100 0 100 700 100 0 0 0 0 0\n")
     assert sampler.sample() is None
+
+def test_controller_uses_measured_host_share_for_kind_ceiling():
+    from types import SimpleNamespace
+    from omni_controller.controller import Controller
+
+    node = {
+        "metadata": {"name": "kind-worker"},
+        "spec": {"providerID": "kind://docker/kind-worker"},
+        "status": {
+            "conditions": [{"type": "Ready", "status": "True"}],
+            "allocatable": {"cpu": "4"},
+        },
+    }
+    deployment = {
+        "spec": {
+            "template": {"spec": {"containers": [
+                {"resources": {"requests": {"cpu": "100m"}}}
+            ]}},
+            "selector": {"matchLabels": {"app": "web"}},
+        }
+    }
+    class FakeKube:
+        def get(self, *args):
+            if args[1] == "deployment":
+                return deployment
+            if args[1] == "nodes":
+                return {"items": [node]}
+            if args[1] == "pods":
+                return {"items": []}
+            raise AssertionError(args)
+
+    ctl = Controller.__new__(Controller)
+    ctl.k = FakeKube()
+    ctl.host_cpu = SimpleNamespace(busy_share=0.80)
+    hpa = {
+        "metadata": {"namespace": "default"},
+        "status": {"currentReplicas": 10},
+        "spec": {"scaleTargetRef": {"kind": "Deployment", "name": "web"}},
+    }
+    assert ctl._live_ceiling(hpa) == 14
+    ctl.host_cpu.busy_share = None
+    assert ctl._live_ceiling(hpa) == 10
