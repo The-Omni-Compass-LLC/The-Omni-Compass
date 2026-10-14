@@ -76,8 +76,9 @@ made either way, because a saturated host can occur in production too.
   so the omni arm's alert minutes must read 0. Today the max halved the time over the line on Azure's steady load
   (30.3% to 14.6%, three repetitions of run 38455383137); the minute-by-minute record of that run says where the rest
   sits. The changes, inside the same bill: act on the climb as well as the level, early enough to cover the minutes a
-  new machine takes to join; decide every 5 seconds (done in the cloud from 14 October, everywhere with this version), the fast checks on their own
-  clock instead of between decisions (today a decision period at or under the checks' period skips them), and read the response time
+  new machine takes to join; decide every 5 seconds once every rule now counted in decisions counts in seconds (a give-back trial's phase, the breach
+  cool-down, cruise, the trial spacing; at 5 s today a trial would be abandoned and the bill could not fall), the fast
+  checks on their own clock instead of between decisions, and read the response time
   over a window short enough for the decision to see the climb (today the reading averages the last 60 seconds);
   give the serving pods the idle processor the machines already have. Where native is short of machines, the receipt says how many more keep the line.
 - **The chip at native's heat** (the founder's order of 14 October): on a GPU the gain is more work inside the chip at

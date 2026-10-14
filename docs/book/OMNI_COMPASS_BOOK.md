@@ -740,8 +740,9 @@ written down before the first counted run:
 
 Three settings are deliberately not on that list. The governor's decision period, its damping and how fast each muscle
 answers are the muscle's own declaration, read from the catalog or measured from the system at the start; an
-installation does not tune them (on a managed Kubernetes cluster in a cloud the declared decision period is 5 seconds,
-twelve decisions a minute, three times as fast as the autoscaler's own 15-second check, its fast checks every 2.5 seconds), and a receipt that needed them changed is a receipt to read as wiring first (section
+installation does not tune them (on a Kubernetes cluster the declared decision period is 60 seconds and the fast checks
+run every 5 seconds, three times as fast as the autoscaler's own 15-second check; a shorter decision period changes rules
+the governor counts in decisions, so it is not an installation setting), and a receipt that needed them changed is a receipt to read as wiring first (section
 4.5).
 
 ### 3.5 Profiles: service and batch
@@ -1197,10 +1198,9 @@ response time does not need, which a cloud stack shows in the quiet stretches be
 max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
-In the cloud the governor decides every 5 seconds (`OMNI_INTERVAL`, passed as `--interval`), twelve times a minute, and its
-fast checks (a machine for pods that wait, the idle processor to the serving pods) run every 2.5 seconds
-(`OMNI_FLOOR_INTERVAL`, passed as `--floor-interval`; the fast checks run between decisions, so their period is kept
-under the decision's); a pod's start and a
+In the cloud, as everywhere, the governor's fast checks (a machine for pods that wait, the idle processor to the serving
+pods) run every 5 seconds, three times as fast as the autoscaler's own 15-second check, and its full decision every 60
+seconds; a pod's start and a
 new machine's join are not shortened by deciding faster, so the governor acts on the reading while it climbs, before the
 line, and gives the running pods the processor the machine already has, which takes seconds and needs no new pod.
 

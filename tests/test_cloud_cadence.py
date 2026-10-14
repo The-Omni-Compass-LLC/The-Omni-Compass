@@ -3,9 +3,10 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The cloud's decision period (the founder's orders of 14 October, night): the governor decides every 5 s on Azure, never
-slower than the native controller's own 15-second check, and its fast checks (the scheduling floor, the pod reflex,
-conveyance on every third) still run between decisions, with conveyance no slower than at the 60-second decision."""
+"""The decision period (the founder's orders of 14 October, night: faster than every native controller, but only where it
+hurts nothing). The fast checks run every 5 s, three times as fast as the HPA's own 15-second check; the full decision
+stays at the tested 60 s, because the give-back trial counts its phase in decisions: at a period too short the phase ends
+before it has measured the response times it needs, every trial is abandoned, and no machine is ever given back."""
 import re
 import sys
 import unittest
@@ -13,6 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 NATIVE_CHECK_S = 15.0          # the HPA's own sync period on a managed cluster (fixed by the provider)
+PROBE_MAX_PER_S = 1.0          # scripts/latency_probe.py: 5 requests, then a 5 s pause: at most one response time a second
 
 
 def fast_checks_per_decision(interval, floor):
@@ -26,29 +28,41 @@ def fast_checks_per_decision(interval, floor):
     return n
 
 
-def convey_period(interval, floor):
-    """Conveyance runs on every third fast check (controller.py, floor_step)."""
-    n = fast_checks_per_decision(interval, floor)
-    return float("inf") if n == 0 else 3 * interval / n
+def trial_phase_s(interval):
+    """A give-back trial's phase in seconds: max_trial decisions (written in the controller) at this period."""
+    src = (ROOT / "omni_controller" / "controller.py").read_text()
+    return int(re.search(r"max_trial=(\d+)", src).group(1)) * interval
 
 
-class CloudCadence(unittest.TestCase):
+def samples_needed():
+    src = (ROOT / "omni_controller" / "controller.py").read_text()
+    return int(re.search(r'getattr\(a, "verdict_samples", (\d+)\)', src).group(1))
+
+
+def periods(env):
+    """The periods a run hands the governor: the run's own, else the rig's defaults (scripts/kind_bench.sh)."""
+    rig = (ROOT / "scripts" / "kind_bench.sh").read_text()
+    d_i = float(re.search(r'OMNI_INTERVAL="\$\{OMNI_INTERVAL:-([0-9.]+)\}"', rig).group(1))
+    d_f = float(re.search(r'OMNI_FLOOR_INTERVAL="\$\{OMNI_FLOOR_INTERVAL:-([0-9.]+)\}"', rig).group(1))
+    i = re.search(r"OMNI_INTERVAL: '([0-9.]+)'", env); f = re.search(r"OMNI_FLOOR_INTERVAL: '([0-9.]+)'", env)
+    return (float(i.group(1)) if i else d_i), (float(f.group(1)) if f else d_f)
+
+
+class DecisionPeriod(unittest.TestCase):
     def setUp(self):
-        y = (ROOT / ".github" / "workflows" / "aks-metered.yml").read_text()
-        self.interval = float(re.search(r"OMNI_INTERVAL: '([0-9.]+)'", y).group(1))
-        self.floor = float(re.search(r"OMNI_FLOOR_INTERVAL: '([0-9.]+)'", y).group(1))
+        self.interval, self.floor = periods((ROOT / ".github" / "workflows" / "aks-metered.yml").read_text())
 
-    def test_the_cloud_decides_every_five_seconds_never_slower_than_native(self):
-        self.assertEqual(self.interval, 5.0)
-        self.assertLessEqual(self.interval, NATIVE_CHECK_S)
-
-    def test_the_fast_checks_still_run_and_conveyance_is_no_slower_than_at_sixty_seconds(self):
-        self.assertLess(self.floor, self.interval)
+    def test_the_fast_checks_run_faster_than_native_and_between_every_decision(self):
+        self.assertLess(self.floor, NATIVE_CHECK_S)
         self.assertGreaterEqual(fast_checks_per_decision(self.interval, self.floor), 1)
-        self.assertLessEqual(convey_period(self.interval, self.floor), convey_period(60.0, 5.0))
-        # the trap the 2.5 s checks avoid: a 5 s decision with 5 s checks runs none, a 10 s decision conveys every 30 s
+
+    def test_a_give_back_trial_has_time_to_measure_what_it_needs(self):
+        need_s = samples_needed() / PROBE_MAX_PER_S
+        self.assertGreaterEqual(trial_phase_s(self.interval), need_s)
+        # the trap found before any run (14 October): at 5 s a phase lasts 100 s, every trial would be abandoned, the
+        # bill could never fall; and a 5 s decision with 5 s checks would run no fast check at all
+        self.assertLess(trial_phase_s(5.0), need_s)
         self.assertEqual(fast_checks_per_decision(5.0, 5.0), 0)
-        self.assertEqual(convey_period(10.0, 5.0), 30.0)
 
     def test_the_rig_passes_both_periods_to_the_governor(self):
         s = (ROOT / "scripts" / "kind_bench.sh").read_text()

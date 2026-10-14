@@ -14,13 +14,13 @@
   Appendix D), the metrics catalog and the README: in the cloud the bill is the gauge and is never raised (the tune-down
   with native's cap); the max belongs where the machines are paid for; no babysitting, and the rows that count it. Both
   PDFs rebuilt. No engine file changed.
-- **Twelve decisions a minute in the cloud** (the founder's orders of 14 October, night: 15 s, then 10 s, then 5 s, three
-  times as fast as the autoscaler's own 15-second check): `aks-metered.yml` sets `OMNI_INTERVAL=5` and
-  `OMNI_FLOOR_INTERVAL=2.5` (the fast checks run between decisions, so their period is kept under the decision's;
-  conveyance stays every 15 s); `scripts/kind_bench.sh` passes it to the governor as `--interval` (60 unless a run sets it) and counts
-  a window's decisions at that period. kind keeps 60 s until the next engine version. The
-  cloud's arms default to native and Omni-Compass on top in every cloud workflow and script. Preregistered before any run
-  at the tune-down.
+- **The decision period in the cloud** (the founder's orders of 14 October, night: faster than every native controller,
+  but only where it hurts nothing): read against the governor before any run, a shorter full-decision period changes four
+  rules counted in decisions (at 5 s a give-back trial's phase would last 100 s, too short for the 200 response times it
+  measures, so no machine would ever be given back and the bill could not fall). The cloud stays at the tested 60 s
+  decision with fast checks every 5 s (three times as fast as the HPA's 15 s); the rig accepts `OMNI_INTERVAL` and
+  `OMNI_FLOOR_INTERVAL`; the next version counts those rules in seconds. Written into the Kubernetes preregistration.
+  The cloud's arms default to native and Omni-Compass on top in every cloud workflow and script.
 - **Self-auditing, and no alert minute in the cloud** (the founder's words of 14 October, night): the governor audits
   itself (every write read back, every machine given back only after its own paired trial, every reason in its audit),
   and the cloud's aim is no alert minute at all; an alert minute in the omni arm is a LOSS of the aim, found and fixed.

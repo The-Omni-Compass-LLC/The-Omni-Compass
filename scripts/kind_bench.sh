@@ -472,11 +472,12 @@ fi
 kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json > "$OUT_DIR/pod_watch.json" 2>"$OUT_DIR/pod_watch.err" &
 watch_pid=$!
 omni_pid=""
-# the governor's full decision every OMNI_INTERVAL seconds (60 unless the run sets it; the cloud sets 5, the founder's
-# order of 14 October, night: twelve decisions a minute, three times as fast as the autoscaler's own 15-second check), and
-# its fast checks (the scheduling floor, the pod reflex, conveyance on every third) every OMNI_FLOOR_INTERVAL seconds (5
-# unless the run sets it; the cloud sets 2.5). The fast checks run only between decisions, so their period is kept under
-# the decision's: at a 5 s decision and 2.5 s checks, conveyance still comes every 15 s, as at a 60 s decision
+# the governor's full decision every OMNI_INTERVAL seconds and its fast checks (the scheduling floor, the pod reflex,
+# conveyance on every third) every OMNI_FLOOR_INTERVAL seconds: 60 and 5, the periods the engine was built and tested at.
+# Four of the governor's rules count in decisions (a give-back trial's 20-decision phase, the breach cool-down, cruise,
+# the trial spacing), so a shorter decision period changes them; it belongs to the next engine version, with those rules
+# in seconds (docs/K8S_COMPASS_PREREGISTRATION.md, "The decision period in the cloud"). The fast checks run only between
+# decisions, so their period must stay under the decision's
 export OMNI_INTERVAL="${OMNI_INTERVAL:-60}" OMNI_FLOOR_INTERVAL="${OMNI_FLOOR_INTERVAL:-5}"
 # the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
 start_controller() {   # $1 decisions to make, $2 log file

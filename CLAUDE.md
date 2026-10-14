@@ -132,10 +132,13 @@ the founder overrides one in the conversation.
   self-running, self-steering and self-auditing inside the system like a self-driving car: nobody turns a knob, nobody
   checks its work (every write read back, every give-back on its own trial, every reason in its audit) and nobody has to
   react, because it acts before the line is crossed. In the cloud the aim is no alert minute at all (a minute over the
-  line wakes a person): an alert minute in the omni arm is found and fixed, never accepted. The governor decides every
-  5 seconds in the cloud (`OMNI_INTERVAL=5`, twelve a minute, three times as fast as native's 15-second check), its fast
-  checks every 2.5 (`OMNI_FLOOR_INTERVAL`, kept under the decision's period, since they run between decisions); never
-  slower than the native controller's own check; kind moves to 5 with the next engine version. Every Kubernetes and cloud receipt shows it in both arms: the
+  line wakes a person): an alert minute in the omni arm is found and fixed, never accepted.
+- **Faster, but only where it hurts nothing** (the founder's words of 14 October, night). The governor is to move faster
+  than every native controller under it (asked: a decision every 15, then 10, then 5 seconds), and no change is made
+  until it is known to hurt nothing anywhere. Its fast checks already run every 5 s (native's pod autoscaler: 15 s); its
+  full decision stays at 60 s in every run, because four of its rules count in decisions (a give-back trial's 20-decision
+  phase would shrink to 100 s at 5 s and every trial would be abandoned, so the bill could never fall). The next engine
+  version counts them in seconds and puts the fast checks on their own clock; it is used only when a test shows no LOSS. Every Kubernetes and cloud receipt shows it in both arms: the
   alert minutes (judged), the settings commands the governor wrote on its own and its additions made inside the line
   (shown) (`tools/live_reps.py`, `babysitting`); both manuals and the README say so.
 - **Two manuals** (the founder's orders of 14 October, evening and night), both kept in the repository until the founder
