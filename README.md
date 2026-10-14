@@ -75,6 +75,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-14 18:53 | big-organism-detached collect | success | [38618995068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38618995068) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
