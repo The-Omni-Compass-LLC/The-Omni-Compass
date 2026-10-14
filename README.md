@@ -72,13 +72,13 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-13 22:43 | big-organism-detached start organism tower x100 reps 5+3 window 2880 protocol 3 | success | [38476939068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476939068) |
 | 2026-10-13 22:37 | big-organism-detached start organism tower x100 reps 8+3 window 2880 protocol 3 | success | [38476947839](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476947839) |
 | 2026-10-13 22:33 | big-organism-detached start organism tower x100 reps 1+4 window 2880 protocol 3 | success | [38476930989](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476930989) |
+| 2026-10-13 22:30 | benchmark-reps | cancelled | [38472692081](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472692081) |
+| 2026-10-13 22:30 | kind-addons | cancelled | [38472765216](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472765216) |
 | 2026-10-13 22:30 | redis | cancelled | [38472891556](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472891556) |
 | 2026-10-13 22:29 | swarm | cancelled | [38473000707](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38473000707) |
 | 2026-10-13 22:29 | kafka | cancelled | [38472913779](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472913779) |
 | 2026-10-13 22:29 | pgbench | cancelled | [38472828551](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472828551) |
 | 2026-10-13 22:29 | citylearn | cancelled | [38472979619](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472979619) |
-| 2026-10-13 22:29 | sysbench | cancelled | [38472848288](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472848288) |
-| 2026-10-13 22:29 | robustness | cancelled | [38473044993](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38473044993) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
