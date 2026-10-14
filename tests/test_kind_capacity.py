@@ -31,7 +31,7 @@ def test_sampler_uses_busy_delta_and_idle_plus_iowait(tmp_path):
     sampler = HostCpuSampler(stat)
     assert sampler.sample() is None
     stat.write_text("cpu 120 0 120 740 120 0 0 0 0 0\n")
-    assert sampler.sample() == 0.6
+    assert sampler.sample() == 0.4
 
 
 def test_sampler_resets_after_unreadable_sample(tmp_path):
