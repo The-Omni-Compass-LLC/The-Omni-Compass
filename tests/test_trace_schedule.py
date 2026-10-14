@@ -61,8 +61,20 @@ def main():
         rec2 = T.derive(cache, max_parts=1, fetch=fetch)
         assert not rec2["covered"] and sum(rec2["submits"]) == sum(k + 1 for k in range(12))
         json.dumps(rec)                                     # the receipt is plain JSON
+        # the same counts placed on 1..9 (the founder's words of 14 October): same rule, nothing downloaded, parts kept
+        r9 = T.remap(rec, 1, 9)
+        assert r9["submits"] == rec["submits"] and r9["parts"] == rec["parts"] and r9["load_max"] == 9
+        assert r9["levels_raw"] == T.levels(rec["submits"], 1, 9) and r9["levels_raw"][-1] == 9
+        assert r9["steps"] == T.one_step(r9["levels_raw"]) and r9["measured_s"] == 24 * 108
+        assert T.remap(rec, 1, 8)["steps"] == rec["steps"]  # the 1..8 schedule re-derives unchanged
+    # the repository's own 1..9 receipt is the Google day's counts on 1..9
+    here = Path(__file__).resolve().parents[1] / "results" / "traces"
+    g8, g9 = (json.loads((here / d / "schedule.json").read_text()) for d in ("google2011", "google2011_1to9"))
+    assert g9["submits"] == g8["submits"] and g9["steps"] == T.one_step(T.levels(g8["submits"], 1, 9)), g9["steps"]
+    assert (here / "google2011_1to9" / "LOAD_STEPS.txt").read_text().split() == [str(x) for x in g9["steps"]]
     print("PASS  public-trace schedule: submits counted per hour of the trace's first day only, min-max onto 1..8 with half-up "
-          "rounding, one step a bin toward the level, parts read until the day is covered, every part named with its SHA-256")
+          "rounding, one step a bin toward the level, parts read until the day is covered, every part named with its SHA-256; "
+          "the same counts re-placed on 1..9 by the same rule with nothing downloaded")
 
 
 if __name__ == "__main__":

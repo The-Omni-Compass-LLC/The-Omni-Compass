@@ -77,7 +77,10 @@ the founder overrides one in the conversation.
   run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what
   GitHub runs plus a margin; it starts nothing while an Azure run, a grid report or a verify waits for a runner (Azure
   first). It also releases the reruns of every benchmark on the engine that stands (`scripts/reruns.txt`; A of
-  every benchmark, then B, then C; a few a tick; read back by count, never started twice). Each tick runs the conductor's newest
+  every benchmark, then B, then C; a few a tick; read back by count, never started twice). It starts every Azure set from `scripts/azure_queue.txt` (A of every set, then B, then C; one at a time in each
+  machine family's queue; read back by its run's title, never started twice): the steady set, the bursts `1 6 1 8 1 6`
+  and `1 4 1 6 1 9`, and the real day (Google 2011) on 1 to 9 (the founder's words of 14 October; the load generator alone
+  reads a schedule, never the governor). Each tick runs the conductor's newest
   code (fetched from the branch). `peek` (`.github/workflows/peek.yml`) prints a running run's finished repetitions,
   paired, so a benchmark is looked at while it runs and a problem fixed before it ends. Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
   the cluster inside only runs of protocol 3 count (12 Oct: the governor never below the organism's CPU priority, its

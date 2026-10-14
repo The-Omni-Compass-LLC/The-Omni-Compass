@@ -2,6 +2,23 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-14: the Azure sets queue themselves; two more burst shapes, `1 4 1 6 1 9` and the real day on 1 to 9
+
+- **The Azure queue** (`scripts/azure_queue.txt`, read by the grid conductor every 15 minutes): every Azure set in
+  release order, A of every set, then B, then C; a set starts when its machine family's queue (region and machine size,
+  the workflow's own concurrency group) has nothing waiting or running, one a tick in each queue, and is read back by
+  its run's title since 13 October 19:00 UTC (a cancelled run counts for nothing), so nothing starts twice and nobody has
+  to be at the button between sets. Test added (`tests/test_run_scale.py`).
+- **Two more burst shapes** (the founder's words of 14 October; `docs/K8S_COMPASS_PREREGISTRATION.md`, last section,
+  written before any run): `1 4 1 6 1 9` (six steps over 1,800 s, after the `1 6 1 8 1 6` set in the Standard_D2_v4
+  queue), and the real day on 1 to 9, Google's public 2011 day placed on 1 to 9 by the same rule and stepped by the
+  founder's one-step rule for real traffic (`2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5`, 24 steps of 108 s, after
+  the steady set in the Standard_D2s_v4 queue; disclosed: the day touches 9 for one hour, so the stepped schedule peaks
+  at 7). Neither arm reads a schedule: the load generator alone steps through it.
+- `tools/trace_schedule.py --load-max N --counts-from DIR`: an already derived day re-placed on another range with
+  nothing downloaded, its parts and their SHA-256 carried over; receipt `results/traces/google2011_1to9/`. Test added.
+- CLAUDE.md: the conductor's line names the Azure queue.
+
 ## 2026-10-14: the Azure burst back at `1 6 1 8 1 6` (the founder's order)
 
 - The founder's order of 14 October: the burst runs at the steps first preregistered, `1 6 1 8 1 6`. Our amendment 11 of

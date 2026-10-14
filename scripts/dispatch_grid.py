@@ -100,6 +100,14 @@ RERUNS = ROOT / "scripts" / "reruns.txt"
 RERUN_SINCE = "2026-10-14T01:30:00Z"
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
+# Azure, the first cloud (the founder's order of 13 October), its sets following one another without a hand on the
+# button: scripts/azure_queue.txt lists every Azure set in release order, A of every line, then B, then C. A set starts
+# when its machine family's queue (its region and machine size, the workflow's own concurrency group) has no run waiting
+# or running, one a tick in each queue, and is read back by its run's title since AZURE_SINCE (a cancelled run counts for
+# nothing), so nothing is started twice and a set dispatched by hand counts as started
+AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
+AZURE_SINCE = "2026-10-13T19:00:00Z"
+AZURE_WF = "aks-metered.yml"
 FIRST = ("aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
          "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
 
@@ -451,6 +459,76 @@ def reruns_started(queue):
     return out
 
 
+def azure_title(kv):
+    """The title aks-metered.yml gives a run of these inputs (its run-name), so a started set is read back by it."""
+    loc = kv.get("location") or "eastus"
+    fam = "pools" if kv.get("worker_pools") else (kv.get("vm_size") or "Standard_D2s_v4")
+    what = f"burst {kv['load_steps']}" if kv.get("load_steps") else "steady"
+    org = f" organism {kv['organism']} x{kv.get('organism_scale') or '1'}" if kv.get("organism") else ""
+    room = f" replica room {kv['replica_ceiling']}" if kv.get("replica_ceiling") else ""
+    return f"aks-metered {what}{org}{room} {loc} {fam}"
+
+
+def azure_group(title):
+    """A run's machine family queue, (region, machine size or pools): the last two words of its title."""
+    w = (title or "").split()
+    return tuple(w[-2:]) if len(w) >= 2 else ("", "")
+
+
+def azure_queue(path=None):
+    """The Azure sets in release order: [(run, name, title, inputs)], A of every line, then B, then C."""
+    path = Path(path or AZURE_QUEUE)
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    entries = []
+    for ln in lines:
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        name, inputs = (ln.split("|") + [""])[:2]
+        kv = dict(x.split("=", 1) for x in inputs.split(";") if "=" in x)
+        entries.append((name.strip(), azure_title(kv), kv))
+    return [(run, n, t, kv) for run in "ABC" for n, t, kv in entries]
+
+
+def azure_to_start(queue, started, busy):
+    """The sets to start now: in each machine family queue not busy, its first set not yet started (the k-th line of a
+    title counts as started when started[title] >= k); at most one a queue."""
+    seen, taken, out = {}, set(), []
+    for item in queue:
+        t = item[2]
+        seen[t] = seen.get(t, 0) + 1
+        if seen[t] <= started.get(t, 0):
+            continue
+        g = azure_group(t)
+        if g in busy or g in taken:
+            taken.add(g)                                  # the queue's next set waits behind the one in front of it
+            continue
+        taken.add(g)
+        out.append(item)
+    return out
+
+
+def azure_runs():
+    """aks-metered.yml's runs since AZURE_SINCE: ({title: runs not cancelled}, {queues with a run waiting or running})."""
+    started, busy, page = {}, set(), 1
+    while page <= 5:
+        d = api(f"repos/{REPO}/actions/workflows/{AZURE_WF}/runs?created=>={AZURE_SINCE}&per_page=100&page={page}")
+        rs = d.get("workflow_runs", [])
+        for r in rs:
+            t = r.get("display_title") or ""
+            if r.get("conclusion") != "cancelled":
+                started[t] = started.get(t, 0) + 1
+            if r.get("status") in ("queued", "in_progress", "waiting", "pending", "requested"):
+                busy.add(azure_group(t))
+        if len(rs) < 100:
+            break
+        page += 1
+    return started, busy
+
+
 def dispatch(d, ref):
     if d["grid"] == "six":
         o = d["orgs"][0]
@@ -556,6 +634,19 @@ def main(argv=None):
     if eng != ENGINE:                                  # a grid belongs to one engine: never start its runs on another
         print(f"this checkout runs {eng}, the grid is {ENGINE}'s: nothing started (a new engine gets its own grid)")
         return 0
+    azure = []
+    queue = azure_queue()
+    if queue:
+        try:
+            for run, name, title, kv in azure_to_start(queue, *azure_runs()):
+                if not a.dry:
+                    api(f"repos/{REPO}/actions/workflows/{AZURE_WF}/dispatches", method="POST", data={"ref": a.ref, "inputs": kv})
+                    time.sleep(2)
+                azure.append(f"{name} {run}")
+        except (RuntimeError, urllib.error.URLError) as e:   # Azure is read again at the next tick
+            print(f"Azure queue not read ({str(e)[:120]}); tried again at the next tick", file=sys.stderr)
+    for x in azure:
+        print(f"Azure set started: {x}")
     queued, running, first = jobs_in_flight()
     target = max(a.floor, running + a.extra)
     inflight, started = queued + running, []
@@ -595,6 +686,8 @@ def main(argv=None):
         report(cov, started, queued, running, target, out, gave_up=gave_up, first=first)
         for r in reruns:
             print(f"- rerun started on the engine that stands: {r}", file=out)
+        for x in azure:
+            print(f"- Azure set started: {x}", file=out)
     return 0
 
 

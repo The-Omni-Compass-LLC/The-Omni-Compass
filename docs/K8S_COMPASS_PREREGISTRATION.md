@@ -1032,6 +1032,44 @@ Azure's autoscaler, the bill metered every 15 s, native against omni, then B and
 in October's first runs about 41% of requests failed in both arms, because the service's own autoscaler was pinned at
 its cap of 10 pods; the table shows what each arm served at the steps the founder set.
 
+## Two more burst shapes on Azure (the founder's words, 2026-10-14, written before any run of either)
+
+The founder's words of 14 October named two more shapes for the Azure burst: the steps `1 4 1 6 1 9`, and bursts that
+nobody picks, from 1 to 9. Both run beside the burst at `1 6 1 8 1 6`, each reported as its own setting, never in its
+place. Neither arm reads a schedule: the load generator alone steps through it (`scripts/kind_bench.sh`, the load
+generator's replica count set at each step), identically in both arms, and the governor sees only what the cluster
+shows (its processor use, the requests waiting, the response times), as in every burst run.
+
+| Setting | Load-generator replicas per step | Steps | Measured window | Machines (queue) |
+|---|---|---:|---:|---|
+| Burst `1 4 1 6 1 9` | `1 4 1 6 1 9` | 6 of 300 s | 1,800 s | four workers of Standard_D2_v4, eastus (after the `1 6 1 8 1 6` set, in its queue) |
+| The real day on 1 to 9 | `2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5` | 24 of 108 s | 2,592 s | four workers of Standard_D2s_v4, eastus (after the steady set, in its queue) |
+
+- **The real day on 1 to 9.** The 24 hourly counts of submitted jobs on the first day of Google's public 2011 cluster
+  trace, the counts already derived for the trace test (`results/traces/google2011/schedule.json`, every part named with
+  its SHA-256), placed on 1 to 9 by the same min-max rule with half-up rounding (`python3 tools/trace_schedule.py --out
+  results/traces/google2011_1to9 --load-max 9 --counts-from results/traces/google2011`; receipt
+  `results/traces/google2011_1to9/schedule.json`), then stepped by the founder's rule for real traffic, one step a bin
+  toward the trace's level, never skipping. The demand is the trace's, not ours. Disclosed: the day touches 9 for one
+  hour only (hour 21), and under the one-step rule the schedule climbs to 7 at most before the trace falls again; the
+  schedule is run as derived, not stretched to reach 9.
+- **Everything else as the burst bill test**: Azure Kubernetes Service with its own cluster autoscaler, a work pool of 1
+  to 4 machines, a fresh cluster for each arm, five paired repetitions with the arms' order rotated, the control plane on
+  the standard tier, the machines Azure bills counted every 15 s at the list price ($0.096 an hour for either size),
+  every gauge reported; native is Azure's autoscaler and the HPA alone, omni is Omni-Compass on top on the engine that
+  stands, its replica room read live (Omni v5 amendment 5).
+- **Reading.** Three separate runs of each setting, A, B and C (`tools/confirm_abc.py`); each row GAIN or LOSS in all
+  three of our runs, EVEN (no difference beyond the noise) or the runs disagree. Replicas, machines and the bill that
+  rise are power given, shown beside the response times, the time over the line and the failed requests they bought.
+- **Order and dispatch.** The grid conductor starts every Azure set from `scripts/azure_queue.txt`: A of every set, then
+  B, then C, one at a time in each machine family's queue, read back by its run's title, never started twice.
+- **Disclosed.** At `1 6 1 8 1 6` in October's first runs about 41% of requests failed in both arms with the
+  autoscaler pinned at its cap of 10 pods; a peak of 9 asks more of the four workers than 8 did. What each arm served at
+  each shape is in its table. Cost: about $4 to $6 a set of five at list price; three sets of each shape, about $30 for
+  both. Time: about nine hours a set.
+
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

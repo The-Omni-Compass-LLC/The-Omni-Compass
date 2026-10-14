@@ -21,7 +21,11 @@ published, by a rule written before the runs, and writes a receipt that lets any
   starts at its own level. Each bin is replayed as one step of 108 s (the wandering test's step), 24 steps, 2,592 s a day:
   a day in 43 minutes. The raw levels and the stepped schedule are both in the receipt.
 
-Usage: python tools/trace_schedule.py --out results/traces/google2011 [--cache DIR] [--max-parts 24]
+Usage: python tools/trace_schedule.py --out results/traces/google2011 [--cache DIR] [--max-parts 24] [--load-max 8]
+       python tools/trace_schedule.py --out results/traces/google2011_1to9 --load-max 9 --counts-from results/traces/google2011
+  --load-max sets the top of the load generator's range (the bottom stays 1); --counts-from takes the hourly counts from a
+  receipt already derived (its parts and their SHA-256 are carried over, nothing is downloaded) and places them on the new
+  range by the same rule.
   writes <out>/schedule.json (the receipt: source, parts, their SHA-256, the counts, the levels, the steps, the rule),
   <out>/LOAD_STEPS.txt (the one line the workflow takes as load_steps) and prints both. Needs the network for the
   download (about 0.8 MB a part, 16 parts for a day); a cache directory keeps the parts for re-derivation offline."""
@@ -123,15 +127,31 @@ def derive(cache: Path, max_parts=24, bins=BINS, start_s=TRACE_START_S, span_s=D
             "generated_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
 
 
+def remap(rec, lo=LOAD_MIN, hi=LOAD_MAX):
+    """A receipt's own counts placed on [lo, hi] by the same rule: the new levels, steps and range; the source, the parts
+    and their SHA-256 carried over, so the new schedule is re-derived from the same trace."""
+    raw = levels(rec["submits"], lo, hi); steps = one_step(raw)
+    out = dict(rec)
+    out.update({"levels_raw": raw, "steps": steps, "load_min": lo, "load_max": hi,
+                "measured_s": rec["step_s"] * len(steps), "remapped_from": rec.get("generated_utc"),
+                "generated_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")})
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", required=True, help="directory for schedule.json and LOAD_STEPS.txt")
     ap.add_argument("--cache", default=None, help="where the downloaded parts are kept (default: <out>/parts)")
     ap.add_argument("--max-parts", type=int, default=24)
+    ap.add_argument("--load-max", type=int, default=LOAD_MAX, help="the top of the load generator's range (default 8)")
+    ap.add_argument("--counts-from", default=None, help="a receipt directory already derived: its counts, no download")
     a = ap.parse_args(argv)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
-    cache = Path(a.cache) if a.cache else out / "parts"
-    rec = derive(cache, a.max_parts)
+    if a.counts_from:
+        rec = remap(json.loads((Path(a.counts_from) / "schedule.json").read_text()), LOAD_MIN, a.load_max)
+    else:
+        cache = Path(a.cache) if a.cache else out / "parts"
+        rec = derive(cache, a.max_parts, hi=a.load_max)
     (out / "schedule.json").write_text(json.dumps(rec, indent=1) + "\n")
     (out / "LOAD_STEPS.txt").write_text(" ".join(str(s) for s in rec["steps"]) + "\n")
     print(f"{len(rec['parts'])} parts, day covered: {rec['covered']}")

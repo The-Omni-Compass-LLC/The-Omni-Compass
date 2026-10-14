@@ -161,6 +161,29 @@ class Conductor(unittest.TestCase):
         self.assertEqual(g.reruns_to_start(q, {"w1.yml": 6, "w2.yml": 3}), [])
         self.assertTrue(g.rerun_queue(g.RERUNS))                      # the repository's own queue reads
 
+    def test_azure_sets_one_a_queue_a_then_b_then_c_never_twice(self):
+        g = self.g
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as f:
+            f.write("# a comment\nsteady|tier=standard\nburst x|load_steps=1 6 1 8 1 6;vm_size=Standard_D2_v4\n"
+                    "burst y|load_steps=1 4 1 6 1 9;vm_size=Standard_D2_v4\n")
+        q = g.azure_queue(f.name)
+        self.assertEqual(len(q), 9)
+        self.assertEqual(q[0][2], "aks-metered steady eastus Standard_D2s_v4")
+        self.assertEqual(q[1][2], "aks-metered burst 1 6 1 8 1 6 eastus Standard_D2_v4")
+        steady, x, y = q[0][2], q[1][2], q[2][2]
+        d2, d2s = ("eastus", "Standard_D2_v4"), ("eastus", "Standard_D2s_v4")
+        # steady A and burst x A started and both queues busy: nothing starts
+        self.assertEqual(g.azure_to_start(q, {steady: 1, x: 1}, {d2, d2s}), [])
+        # both queues free: burst y A in its queue (A of every line before any B), steady B in the other
+        self.assertEqual([(r, n) for r, n, _, _ in g.azure_to_start(q, {steady: 1, x: 1}, set())], [("A", "burst y"), ("B", "steady")])
+        # a busy queue holds its own next set and never lets a later one past it
+        self.assertEqual([(r, n) for r, n, _, _ in g.azure_to_start(q, {steady: 1, x: 1}, {d2})], [("B", "steady")])
+        # every set started: nothing more, ever
+        self.assertEqual(g.azure_to_start(q, {steady: 3, x: 3, y: 3}, set()), [])
+        self.assertEqual(g.azure_group("aks-metered burst 1 6 1 8 1 6 eastus Standard_D2_v4"), d2)
+        self.assertTrue(g.azure_queue(g.AZURE_QUEUE))                 # the repository's own queue reads
+
     def test_started_runs_read_back_and_not_started_again(self):
         g = self.g
         first = g.next_dispatches({})[:12]
