@@ -12,8 +12,8 @@ def test_host_saturation_blocks_scale_out():
 
 
 def test_measured_headroom_caps_scale_out_at_reserve():
-    # 4 cores, 70% busy and 10% reserved leaves 800m: eight 100m replicas.
-    assert kind_replica_ceiling(4000, 0, 100, 40, 0.70) == 48
+    # 8 cores, 80% busy and 10% reserved leaves 800m: eight 100m replicas.
+    assert kind_replica_ceiling(8000, 0, 100, 40, 0.80) == 48
 
 
 def test_request_capacity_remains_the_outer_ceiling():
