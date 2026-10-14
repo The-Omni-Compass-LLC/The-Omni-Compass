@@ -1019,6 +1019,19 @@ monetization of any part of Omni-Compass requires a signed, paid Omni-Compass En
 All rights reserved. See `LICENSE` and `NOTICE` at the root of this repository. All patents, copyrights and trademarks
 filed in the USA. www.omni-compass.com*
 
+
+## The burst back at `1 6 1 8 1 6` (the founder's order, 2026-10-14, before the counted runs)
+
+The founder's order of 14 October: the Azure burst runs at the steps first preregistered, `1 6 1 8 1 6`. Amendment 11
+(5 October) had set `1 3 1 4 1 3` after three repetitions at `1 6 1 8 1 6` were seen; that amendment was ours, written
+after the results, and it is withdrawn for every run from this date. The run on the card version's engine at
+`1 3 1 4 1 3` (run 38455393389) was stopped after its second repetition and part of its third; its repetitions stay in
+the record as runs of the withdrawn setting and are counted in no burst result. The burst starts again at
+`1 6 1 8 1 6` (run 38500160429): five repetitions, 1,800 measured seconds, four workers of Standard_D2_v4 in eastus under
+Azure's autoscaler, the bill metered every 15 s, native against omni, then B and C. Disclosed beside it: at these steps
+in October's first runs about 41% of requests failed in both arms, because the service's own autoscaler was pinned at
+its cap of 10 pods; the table shows what each arm served at the steps the founder set.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

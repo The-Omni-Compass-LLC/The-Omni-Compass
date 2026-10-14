@@ -45,6 +45,9 @@ jobs:
           rounds=18; [ "$DRY" = yes ] && rounds=1      # 18 ticks 15 minutes apart: under the job's 340 minutes
           for i in $(seq 1 $rounds); do
             echo "== tick $i of $rounds at $(date -u +%H:%M) UTC"
+            # each tick runs the conductor's newest code, so a fix to it takes effect within 15 minutes, not 5 hours
+            git fetch -q --depth=1 origin "${{ github.ref_name }}" && git checkout -q FETCH_HEAD -- scripts \
+              || echo "::warning::tick $i: the conductor's newest code was not fetched; this tick runs the code it has"
             python3 scripts/dispatch_grid.py tick --grid "$GRID" --ref "${{ github.ref_name }}" $([ "$DRY" = yes ] && echo --dry) \
               || echo "::warning::tick $i: the conductor stopped (tried again next tick)"
             if [ "$i" -lt "$rounds" ]; then sleep 900; fi

@@ -77,7 +77,9 @@ the founder overrides one in the conversation.
   run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what
   GitHub runs plus a margin; it starts nothing while an Azure run, a grid report or a verify waits for a runner (Azure
   first). It also releases the reruns of every benchmark on the engine that stands (`scripts/reruns.txt`; A of
-  every benchmark, then B, then C; a few a tick; read back by count, never started twice). Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
+  every benchmark, then B, then C; a few a tick; read back by count, never started twice). Each tick runs the conductor's newest
+  code (fetched from the branch). `peek` (`.github/workflows/peek.yml`) prints a running run's finished repetitions,
+  paired, so a benchmark is looked at while it runs and a problem fixed before it ends. Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
   the cluster inside only runs of protocol 3 count (12 Oct: the governor never below the organism's CPU priority, its
   decisions counted inside the window; 13 Oct: the model of the organism on the runner's last core and the kind nodes on
   the others, the same in both arms); a repetition whose job fails runs again, up to three times, paired within one run,
@@ -173,8 +175,8 @@ the founder overrides one in the conversation.
   `6093b2b8`, `docs/OMNI_V5.md`): machines, replicas, the power cap, the GPU's clock floor and heat line, batch.
 - Omni's brain works for the organism, never for Omni: it decides what to push and pull so the whole system is the best it
   can be, collectively, one body.
-- Never decide a benchmark's settings ourselves: the written ones stand (the Azure burst steps are `1 3 1 4 1 3`, 5
-  October). When a result comes in negative, find the cause and fix it at once, unasked; a test machine's limit is never
+- Never decide a benchmark's settings ourselves: the written ones stand (the Azure burst steps are `1 6 1 8 1 6`, as first
+  preregistered; the founder's order of 14 October withdrew our amendment of 5 October that had set `1 3 1 4 1 3`). When a result comes in negative, find the cause and fix it at once, unasked; a test machine's limit is never
   reported as Omni's result.
 
 - **Everything on the newest engine** (13 October, night): every benchmark runs again on the engine that stands, and its

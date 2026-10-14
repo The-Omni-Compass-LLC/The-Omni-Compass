@@ -2,6 +2,46 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-14: the Azure burst back at `1 6 1 8 1 6` (the founder's order)
+
+- The founder's order of 14 October: the burst runs at the steps first preregistered, `1 6 1 8 1 6`. Our amendment 11 of
+  5 October (`1 3 1 4 1 3`, written after the first results at `1 6 1 8 1 6` showed about 41% of requests failing in both
+  arms behind the service's cap of 10 pods) is withdrawn for every run from this date
+  (`docs/K8S_COMPASS_PREREGISTRATION.md`, last section; `docs/AKS_REPLICA_ROOM_PREREGISTRATION.md`). The burst run at
+  `1 3 1 4 1 3` on this engine (38455393389) was stopped after its second repetition and part of its third, its
+  repetitions kept as runs of the withdrawn setting and counted in no burst result; the burst started again at
+  `1 6 1 8 1 6` (run 38500160429), five repetitions, then B and C. CLAUDE.md says so.
+
+## 2026-10-14: a running benchmark can be looked at before it ends (peek); the conductor runs its newest code every tick
+
+- **`peek`** (`.github/workflows/peek.yml`; the founder's order of 14 October: look at a run while it goes and jump in
+  if something is wrong): given a run number, it downloads the repetitions that run has finished so far and prints their
+  paired table (native against Omni-Compass on top of native) in its log and report, with `tools/live_reps.py` for
+  Kubernetes and Azure or `tools/six_kube_report.py` for the organisms. It reads only; its table is a look, never a
+  result. The Azure job logs carry only the last ten lines of the Omni arm, so this is the way to see native beside it
+  before a run's last repetition. The grid conductor lets a waiting peek go first.
+- **The conductor runs its newest code every tick**: `grid.yml` runs eighteen ticks over five hours in one job and had
+  read the conductor's code once at its start, so the Azure-first hold and the rerun queue (pushed at 01:55 UTC) would
+  not have acted until about 05:35; each tick now fetches `scripts/` from the branch first, so a fix acts within 15
+  minutes. The conductor started before the fix was cancelled and started again on the pushed code.
+
+## 2026-10-14: the 100-copy LOSS found (replicas added on a saturated host) and its fix planned; the manual's organisms on the newest engine
+
+- **Protocol 3 at 100 copies** (the organism's model on its own core, ten paired repetitions each; runs 38464343379,
+  38462289297, 38462280620; omni-v5, digest `6093b2b8`): the whole tower's 95th percentile +47.7% (LOSS), the four
+  stacked +87.2% at the 95th and +32.1% at the 99th (LOSS), the four realms EVEN on every response time; time over the
+  line GAIN in the tower (-3.2%) and in Physics (-3.1%). The model's own processor time is ruled out as the cause. The
+  cause: the four-core machine was about 80% busy and failing about half its requests in both arms, and the max raised
+  the replicas 40% to 54% on nodes that could not grow, so the added pods crowded the same cores (host busy time +6.6%
+  to +12.9%).
+- **The fix, for the next version** (`docs/omni_v5/NEXT_VERSION_PLAN.md`, section 3): the replica muscle's live
+  capacity becomes the smaller of its autoscaler range and the headroom of the machines under it; where the nodes have
+  no headroom the max adds no replica. The founder is told before the version is declared; the eight-core Azure runs of
+  the tower at 100 copies show how much of the LOSS the small machine carries.
+- **The manual's organisms on the newest engine**: sections 2.4, 2.5 and 10.4 now describe the grid with the cluster
+  inside on omni-v5, protocol 3, the 100-copy finding and its fix, and the eight-core Azure runs; the earlier engines'
+  1,000-copy runs are pointed to in their own tables and never read across engines.
+
 ## 2026-10-14: the factory tune declared, the wiring disclaimer in capitals, the notice in every AI's instructions, the manual's standing block
 
 - **The factory tune** (`DISCLOSURES.md`, section 3; the README; the manual's notice): the engine is presented as The

@@ -33,15 +33,35 @@ muscles of their own (each is a setting the native system already exposes to its
 Each is added under the same rule as every muscle before it: tuned on development seeds only, kept only when it wins twice
 and never falls behind native on any seed, and placed in every realm that runs that domain.
 
-## 3. The whole tower at 100 copies
+## 3. The whole tower and the four stacked at 100 copies: the cause found, and the fix
 
 The long-window rerun on GitHub's four-core machine read the tower's 95th-percentile response time +45.9%, a LOSS (run
-38423471888), while time over the line read GAIN (-14.9%) and failed requests GAIN (-8.8%). The machine was 87 to 89% busy
-and Omni's arm made it 2.4% busier, its model 1.25 s further behind its clock. Two tests decide the cause before anything
-in the engine is changed for it: protocol 3 on GitHub (the model on its own core, runs 38464343379 and 38462289297) and the
-same tower at 100 copies on an eight-core Azure machine (three machines started 13 October, repetitions 1 to 10). If the
-LOSS goes with the machine, it is the test rig and is reported so; if it stays, its cause is found inside the engine and
-fixed there, never by going back to an older engine.
+38423471888). Protocol 3 then gave the organism's model its own core, ten paired repetitions each (runs 38464343379,
+38462289297, 38462280620; omni-v5, digest `6093b2b8`). The LOSS stayed, so the model's own processor time is not its cause:
+
+| At 100 copies | 95th percentile | 99th percentile | Time over the line | Failed requests | HPA replicas | Host CPU busy |
+|---|---|---|---|---|---|---|
+| The whole tower | +47.7%, LOSS | EVEN | -3.2%, GAIN | EVEN | +54% (power given) | 80.4% to 88.6% (+10.1%) |
+| The four stacked | +87.2%, LOSS | +32.1%, LOSS | EVEN | EVEN | +47% (power given) | +12.9% |
+| The four realms, each | EVEN | EVEN | GAIN in Physics (-3.1%), EVEN in three | EVEN | +40% to +54% | +6.6% to +11.7% |
+
+**The cause.** In both arms the four-core machine was already about 80% busy and the cluster was failing about half of
+its requests: the load at 100 copies is beyond what six kind nodes on four cores can serve. The max read the replica
+muscle's capacity from the autoscaler's own range and raised the replicas 40% to 54%; the nodes under them could not grow
+(kind has no machine autoscaler), so every added pod competed for the same four cores, the host's busy time rose 6.6% to
+12.9%, and the tail of the two largest organisms grew. More copies on a saturated host are not more capacity.
+
+**The fix, inside the newest engine** (the founder's rule of 13 October: every muscle up to one click under its own
+capacity, read live, and where the brain's own math shares the machine it counts in the body's load): the replica
+muscle's live capacity becomes the smaller of its autoscaler range and the headroom of the machines under it, read from
+the nodes' own allocatable and used processor (and, under kind, the host's busy share). Where the nodes have no headroom,
+the max adds no replica; where a machine autoscaler can add a node, the headroom includes the node it can add. The same
+read applies to every capacity muscle that shares a host. It is tested on development seeds and on the kind rig at 100
+copies before it is declared, and the founder is told before the version is declared.
+
+**Still to read.** The tower at 100 copies on three eight-core Azure machines (starts 38476930989, 38476939068,
+38476947839; about 04:00 to 05:30 UTC on 14 October) shows how much of the LOSS the four-core machine carries; the fix is
+made either way, because a saturated host can occur in production too.
 
 ## 4. Also in this version (announced earlier)
 
@@ -58,8 +78,8 @@ running now):
 | Where | The LOSS | What it shows | In this version |
 |---|---|---|---|
 | The grid with the cluster inside (`results/grid_v5/GRID.md`) | the organism's work per energy, in 21 of 36 squares of 10 and 100 repetitions | the max gave the organism power (its energy reads power given) and the work waiting in line was done either way, so each unit of work took more energy; the power bought fewer misses (time over the line reads GAIN in all 36) | the decision code counts the body's work per energy as a gauge of its own: a power step that buys no work and no fewer misses is undone; where it buys fewer misses, the step stays only while the body's work per energy stays EVEN, so the row reads EVEN or GAIN |
-| The four stacked at 100 copies, 100 repetitions | 95th and 99th percentile response time | the organism ran past its window in 49 of 100 repetitions (up to 635 s): GitHub's four-core machine could not step that many muscles in time | section 3: protocol 3 and the eight-core Azure machine decide whether it is the machine; if it stays, the cause is fixed in the engine |
-| The whole tower at 100 copies, 100 repetitions | 95th and 99th percentile response time | the same machine; the long-window rerun read +45.9% at the 95th percentile | section 3 |
+| The four stacked at 100 copies, 100 repetitions | 95th and 99th percentile response time | the organism ran past its window in 49 of 100 repetitions (up to 635 s): GitHub's four-core machine could not step that many muscles in time | section 3: the cause found (replicas added on a saturated host); the fix is the replica muscle's live headroom |
+| The whole tower at 100 copies, 100 repetitions | 95th and 99th percentile response time | the same machine; the long-window rerun read +45.9% at the 95th percentile | section 3: the same cause and fix |
 | CityLearn (`results/live/V1_CITYLEARN.md`, `V3_CITYLEARN.md`) | energy not served and time uncomfortable in several districts | older engines' tables; not yet run on omni-v5 | run on this version, A, B and C; a district that still reads LOSS has its cause found before the table goes up |
 
 ## 6. Order

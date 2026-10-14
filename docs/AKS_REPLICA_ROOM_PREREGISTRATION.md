@@ -67,6 +67,12 @@ hours a steady run and nine a burst run.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
+
+## The burst steps from 14 October
+
+The founder's order of 14 October withdrew amendment 11 of `docs/K8S_COMPASS_PREREGISTRATION.md`: every Azure burst from
+that date, this one included, runs at `1 6 1 8 1 6`, the steps first preregistered. The rest of this page stands.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

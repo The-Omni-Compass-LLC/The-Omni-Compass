@@ -3219,8 +3219,8 @@ each from its own seed): the six organisms × three sizes × three run counts ar
 real cluster inside, both arms shown in every square. One hundred is the maximum in both directions (the founder's order
 of 12 October, to cut the time and the bill): no 1,000 copies and no 1,000 runs are run on any engine from that day, and
 the whole grid runs on GitHub's own machines, nothing rented for it (`scripts/dispatch_grid.py`, `results/grid_v5/`).
-The Omni v3 grid that went to 1,000 copies and 1,000 runs (`results/scale/GRID.md`) stands as it was run; its reading
-was the same to the digit at every size, which is itself a finding about the law: it does not drift with scale.
+Earlier engines' grids, which went to 1,000 copies and 1,000 runs, stand as they were run in their own pages
+(`results/scale/`) and are never read across engines.
 
 The two axes answer two different questions, and a reader should keep them apart. **Copies** is the size of the body
 the one brain governs: at 100 copies of the four stacked, the law computes a force for about 190,000 muscles from one
@@ -3239,31 +3239,34 @@ neighbours (section 15).
 The modelled organisms are also run with a **real Kubernetes cluster inside** as one more muscle (`tools/run_kil.py`,
 workflows `six-kube`, `big-organism`, `big-organism-detached`): the organism's own compute demand drives a real load
 generator against a real service on a real cluster, and the cluster's watts come back into the organism as heat and load.
-At 1, 10 and 100 copies this runs on GitHub's machines, and no 1,000-copy run is started from 12 October; the Omni v3
-runs at 1,000 copies below needed a rented machine, detached from the GitHub job that started it, for about seven hours
-a repetition, and stand as they were run. These runs are evidence class L for the cluster and S for the organism around
-it, and are labelled "L + S".
+At 1, 10 and 100 copies this runs on GitHub's machines under protocol 3 (the organism's model on the runner's last
+core, the kind nodes on the others, the same in both arms; the window set from the heavier arm's step, timed before
+either arm), and the whole tower and the four stacked at 100 copies also run on eight-core Azure machines, detached from
+the GitHub job that starts them. No 1,000-copy run is started from 12 October. These runs are evidence class L for the
+cluster and S for the organism around it, and are labelled "L + S".
 
 Two rules keep these runs honest, and both are written in the preregistration before the run starts. The first is
 the **clock rule**. The organism must step on the measured window's clock: the row "organism behind its window" says how
 many seconds after the window its last step ended, and a repetition in which either arm ended more than 5% of the window
 late is marked **off the clock** in the organism's line, because its last steps saw a cluster whose load schedule had
-already ended. The row is shown and never judged; in the Omni v3 run of the four stacked at 1,000 copies, both arms ended
-about 22 s behind a 10,800 s window, a fifth of one percent, and no repetition was off the clock. The second is the **hand-back at 90%**.
+already ended. The row is shown and never judged; at 100 copies on the newest engine the tower's two arms ended 1.8 s and 2.4 s
+behind a 2,400 s window, a tenth of one percent, and no repetition was off the clock. The second is the **hand-back at 90%**.
 Omni-Compass releases the cluster's knob at nine tenths of the window and the last tenth is run by native alone in both
 arms, so that every repetition ends with the proof that the knob was given back and that native resumed where it would
 have been.
 
-The first such run on Omni v3 is in `results/live/V3_BIG_ORGANISM.md`: the four stacked at 1,000 copies, three paired
-repetitions on one rented eight-core machine over 29 hours, the cluster's slowest 5% of requests at 2,882 ms under native
-and 150 ms under omni, the time over the response line from 51% of samples to none, no failed request under omni, the
-same six machines in service in both arms and the energy inside the noise. The organism's own rows, which are models, show
-the work the same to one part in a million and read LOSS by the rule that any decrease the same in all three of our runs is a LOSS, however small;
-the row is in the table with that word on it. The whole tower at 1,000 copies, 945,000 modelled muscles on one clock, ran
-the same way on a second machine of the same type over 25 hours and landed on 9 October: the cluster's slowest 5% of
-requests at 6,690 ms under native and 160 ms under omni, the slowest 1% at 9,068 against 187 ms, time over the line from
-76% of samples to none, failed requests from 4.8% to none, all clear of zero with three pairs; machines, replicas and pods
-the same; energy inside the noise; both arms 14 s behind a 10,800 s window. The table holds both organisms side by side.
+**On the newest engine** (omni-v5), the grid with the cluster inside (`results/grid_v5/GRID.md`, the card version,
+digest `5648f290`) reads the cluster's time over the response line and the organism's time over the line GAIN in every
+square of 10 and 100 repetitions; the organism's work per energy reads LOSS in 21 of those 36 squares (power given that
+bought fewer misses, not more work), and the cluster's 95th and 99th percentiles read LOSS in two squares at 100 copies.
+Protocol 3 at 100 copies (digest `6093b2b8`, ten paired repetitions each; runs 38464343379, 38462289297, 38462280620)
+found the cause of those two: the tower's 95th percentile +47.7% and the four stacked's +87.2% (99th: +32.1%), on a
+four-core machine already about 80% busy and failing about half its requests in both arms, where the max added 40% to
+54% replicas that nodes unable to grow could not carry; the four realms read EVEN on every response time. The fix, the
+replica muscle's live headroom read from the machines under it, belongs to the next version
+(`docs/omni_v5/NEXT_VERSION_PLAN.md`, section 3), and the eight-core Azure runs show how much of the LOSS the small
+machine carries. Earlier engines' runs at 1,000 copies on rented machines stand as they were run, in their own tables
+(`results/live/V1_BIG_ORGANISM.md`, `results/live/V3_BIG_ORGANISM.md`), and are not read across engines.
 
 ### 2.6 The register
 
@@ -4486,18 +4489,18 @@ carries none of them, because they are models.
 
 ### 10.4 The big organisms on a rented machine
 
-The four stacked at 1,000 copies (1.7 million modelled muscles) with a real cluster inside takes more than GitHub's
-six-hour job limit per repetition, so it runs **detached** (`.github/workflows/big-organism-detached.yml`): `start`
-rents one Azure machine, installs the tools, starts every repetition of every organism under `nohup` and leaves the
-machine running on its own; `collect` (every two hours on the clock, or by hand) copies the files back when every
-repetition has finished, publishes one artifact per cell and deletes the machine; `survey` lists which machine sizes
-and quotas a subscription may rent, region by region, and rents nothing. A machine older than `max_hours` is collected
-as it is and deleted, so nothing runs forever on the bill. The commit to run is an input, so an older engine can be
-run again on the same machine. **The clock rule** (section 13) decides the window for each size on each machine: the
-first v3 machine stepped the stack in 31 s against a 12 s step and fell 4,628 s behind its window, so it was stopped,
-recorded, and started again with a 10,800 s window and 45 s steps. That second machine is the one that produced the
-result in section 2.5: three repetitions over 29 hours on one eight-core machine, both arms about 22 s behind a 10,800 s
-window, no repetition off the clock.
+The whole tower and the four stacked at 100 copies (about 110,700 and 190,800 modelled muscles) with a real cluster
+inside are also run on rented eight-core machines, **detached** (`.github/workflows/big-organism-detached.yml`), so that
+the cluster has more cores under it than GitHub's four-core runner gives: `start` rents one Azure machine, installs the
+tools, starts every repetition of every organism under `nohup` and leaves the machine running on its own; `collect`
+(every two hours on the clock, or by hand) copies the files back when every repetition has finished, publishes one
+artifact per cell and deletes the machine; `survey` lists which machine sizes and quotas a subscription may rent, region
+by region, and rents nothing. A machine older than `max_hours` is collected as it is and deleted, so nothing runs forever
+on the bill. The commit to run is an input, so a run is always tied to one engine. **The clock rule** (section 13) and
+protocol 3 decide the window for each size on each machine: the window is set from the heavier arm's step, timed on the
+machine before either arm, so the organism keeps its clock (the tower at 100 copies on 14 October: 2,880 s windows on
+three machines, ten repetitions in all; the stack follows on the same three machines). No 1,000-copy run is started from
+12 October; earlier engines' 1,000-copy runs on this workflow stand as they were run, in their own tables.
 
 The same workflow carries a second test. With the input `test=robust` the machine runs the robustness harness's long
 scenario instead of an organism (`scripts/kind_paired.sh` with `ROBUST=long`, exactly as the GitHub job runs it), with

@@ -101,7 +101,7 @@ RERUN_SINCE = "2026-10-14T01:30:00Z"
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 FIRST = ("aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
-         "eks-metered.yml", "verify.yml", "archive-run.yml")
+         "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
 
 
 # ------------------------------------------------------------------------------------------------- shard shapes
