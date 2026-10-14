@@ -83,6 +83,6 @@ def kind_replica_ceiling(
         return current
 
     reserve = min(0.95, max(0.0, float(reserve_share)))
-    headroom_m = max(0, int(alloc * (1.0 - reserve - host_busy_share)))
+    headroom_m = max(0, int(alloc * max(0.0, round(1.0 - reserve - host_busy_share, 12))))
     measured_ceiling = current + headroom_m // request
     return max(current, min(request_ceiling, measured_ceiling))
