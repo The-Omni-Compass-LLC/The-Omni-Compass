@@ -75,6 +75,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-14 01:59 | grid | cancelled | [38488920183](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38488920183) |
 | 2026-10-14 01:33 | big-organism-detached collect | success | [38495484752](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38495484752) |
 | 2026-10-13 22:43 | big-organism-detached start organism tower x100 reps 5+3 window 2880 protocol 3 | success | [38476939068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476939068) |
 | 2026-10-13 22:37 | big-organism-detached start organism tower x100 reps 8+3 window 2880 protocol 3 | success | [38476947839](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476947839) |
@@ -84,7 +85,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-13 22:30 | redis | cancelled | [38472891556](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472891556) |
 | 2026-10-13 22:29 | swarm | cancelled | [38473000707](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38473000707) |
 | 2026-10-13 22:29 | kafka | cancelled | [38472913779](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472913779) |
-| 2026-10-13 22:29 | pgbench | cancelled | [38472828551](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472828551) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
