@@ -740,7 +740,8 @@ written down before the first counted run:
 
 Three settings are deliberately not on that list. The governor's decision period, its damping and how fast each muscle
 answers are the muscle's own declaration, read from the catalog or measured from the system at the start; an
-installation does not tune them, and a receipt that needed them changed is a receipt to read as wiring first (section
+installation does not tune them (on a managed Kubernetes cluster in a cloud the declared decision period is 15 seconds,
+four decisions a minute in step with the autoscaler's own 15-second sync, its fast checks every 5 seconds), and a receipt that needed them changed is a receipt to read as wiring first (section
 4.5).
 
 ### 3.5 Profiles: service and batch
@@ -1196,6 +1197,10 @@ response time does not need, which a cloud stack shows in the quiet stretches be
 max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
+In the cloud the governor decides every 15 seconds (`OMNI_INTERVAL`, passed as `--interval`), four times a minute, and its
+fast checks (a machine for pods that wait, the idle processor to the serving pods) run every 5 seconds; a pod's start and a
+new machine's join are not shortened by deciding faster, so the governor acts on the reading while it climbs, before the
+line, and gives the running pods the processor the machine already has, which takes seconds and needs no new pod.
 
 ### 7.2 A database behind its connection pooler
 
@@ -1439,15 +1444,19 @@ paired receipts, this section is a wiring instruction, not a claim of savings.
 **On autopilot: why nobody babysits it.** Omni-Compass is an autopilot: a closed-loop supervisory controller that runs,
 steers and corrects itself inside the system it governs, as a self-driving car's controller does inside the car. Once
 the paired trial on a muscle has passed and the governor is set to govern, nobody turns a knob and nobody has to react.
-Every change is the governor's own, written to the audit with its reason, and the governor hands every setting back at
-the end. It holds the response time at the centre of its band, under the line, and acts as the reading approaches the
+Every change is the governor's own, and the governor audits itself: every write is read back from the system, every
+machine it gives back is kept only after its own paired trial shows the response time holds, every reading, decision and
+reason is in its audit, and it hands every setting back at the end; nobody has to check its work either. It holds the response time at the centre of its band, under the line, and acts as the reading approaches the
 line, so the correction lands before the line is crossed, not after a person is paged. What a native stack pays in
 people for the same service (an engineer watching dashboards, paged while the service is over its line, retuning an
 autoscaler's target or a node pool by hand) is the **babysitting tax**, and every Kubernetes and cloud receipt counts it
 in both arms: the **alert minutes** (whole minutes whose 95th percentile, failed requests counted over, was over the
 line: the minutes an on-call page would be open; judged, the aim lower), the **settings commands the governor wrote on
 its own**, and the **share of its additions decided while the service was still inside its line** (both shown, not
-judged). No person touches either arm of a paired run.
+judged). No person touches either arm of a paired run. The aim in the cloud is **no alert minute at all**: a minute over
+the line is a person woken, so an alert minute in the omni arm is a LOSS of the aim, its cause found and fixed and the
+test run again. Where native itself is short of machines (over its line on its own), the receipt says so beside the row:
+the same machines can be made to carry more, but no governor creates compute that the machines do not have.
 
 **The three ways a governor stops, and what each leaves behind.** A referee or an underwriter should know exactly what
 happens to a governed system in each of the three ways Omni-Compass can stop, because the answer is the same in all

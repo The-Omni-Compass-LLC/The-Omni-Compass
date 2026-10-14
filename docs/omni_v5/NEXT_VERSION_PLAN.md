@@ -72,6 +72,12 @@ made either way, because a saturated host can occur in production too.
   target never goes below the operator's and no machine is held above native's count, so the bill can only fall or
   stay; machines are given back where the verdict allows. Today's tune-down with native's replica cap still moves the
   HPA target inside the cap, so a burst can raise the bill. The max keeps its push where the machines are paid for.
+- **No alert minute in the cloud** (the founder's order of 14 October, night): a minute over the line wakes a person,
+  so the omni arm's alert minutes must read 0. Today the max halved the time over the line on Azure's steady load
+  (30.3% to 14.6%, three repetitions of run 38455383137); the minute-by-minute record of that run says where the rest
+  sits. The changes, inside the same bill: act on the climb as well as the level, early enough to cover the minutes a
+  new machine takes to join; decide every 15 seconds (done in the cloud from 14 October, everywhere with this version);
+  give the serving pods the idle processor the machines already have. Where native is short of machines, the receipt says how many more keep the line.
 - **The chip at native's heat** (the founder's order of 14 October): on a GPU the gain is more work inside the chip at
   native's own temperature, never hotter; the clock and power ceilings move only where the card's heat stays at or
   under native's.

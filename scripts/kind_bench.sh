@@ -472,9 +472,13 @@ fi
 kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json > "$OUT_DIR/pod_watch.json" 2>"$OUT_DIR/pod_watch.err" &
 watch_pid=$!
 omni_pid=""
+# the governor's full decision every OMNI_INTERVAL seconds (60 unless the run sets it; the cloud sets 15, the founder's
+# order of 14 October, night: four decisions a minute, in step with the autoscaler's own 15-second sync); its fast checks
+# (the scheduling floor, the pod reflex, conveyance) every 5 s either way
+export OMNI_INTERVAL="${OMNI_INTERVAL:-60}"
 # the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
 start_controller() {   # $1 decisions to make, $2 log file
-  nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval 60 --floor-interval 5 --reflex-window-s 15 \
+  nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval "$OMNI_INTERVAL" --floor-interval 5 --reflex-window-s 15 \
     --iterations "$1" --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
     --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
     --power-cmd "bash scripts/kind_power.sh" --site-limit-w "$SITE_LIMIT_W" \
@@ -509,7 +513,7 @@ if [ -z "$NATIVE" ]; then
     python tools/omni_switch.py watchdog --every 5 > "$OUT_DIR/watchdog.log" 2>&1 &
     watchdog_pid=$!
   fi
-  omni_pid=$(start_controller $(( DURATION / 60 )) "$OUT_DIR/controller.log")
+  omni_pid=$(start_controller $(( DURATION / OMNI_INTERVAL )) "$OUT_DIR/controller.log")
 else
   echo "== ARM native: Omni-Compass not running; Kubernetes alone"
 fi
@@ -612,7 +616,7 @@ elif [ -z "$NATIVE" ]; then
     # with no write is valid when the governor recorded its decisions, each with its reasons in the audit, and the reset
     # below still checks every setting is the operator's; a governor that recorded no decisions was not running
     decisions=$(grep -c '"decision"' "$OUT_DIR/audit.jsonl" || true)
-    want=$(( DURATION / 60 - 1 )); [ "$want" -ge 1 ] || want=1
+    want=$(( DURATION / OMNI_INTERVAL - 1 )); [ "$want" -ge 1 ] || want=1
     [ "$decisions" -ge "$want" ] || { echo "Omni made no write and recorded $decisions decisions (at least $want expected): the governor was not running"; exit 1; }
     echo "Omni-Compass stayed native: $decisions decisions recorded, no write" | tee "$OUT_DIR/omni_stayed_native.txt"
   fi
@@ -674,7 +678,7 @@ t_in = [t for t in t_all if ws <= t <= we]
 print(len(t_in), f"{(t_in[-1] - t_in[0]) / (len(t_in) - 1):.1f}" if len(t_in) > 1 else "n/a", len(t_all))
 PY
 )
-  read -r decisions period all_decisions <<< "$dec"; expected=$(( DURATION / 60 ))
+  read -r decisions period all_decisions <<< "$dec"; expected=$(( DURATION / OMNI_INTERVAL ))
   errors=$(grep -c '"error"' "$OUT_DIR/audit.jsonl" || true)
   echo "== controller: decisions inside the window $decisions of $expected (one every $period s; $all_decisions in all), failed decisions or checks $errors"
   echo "-- controller's own cost (CPU of the process and every command it ran): $(grep '"overhead"' "$OUT_DIR/audit.jsonl" | tail -n 1)"

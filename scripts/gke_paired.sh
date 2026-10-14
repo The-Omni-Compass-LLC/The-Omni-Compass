@@ -19,11 +19,11 @@
 # when its arm ends, before the next is made, so nothing keeps billing.
 # Written to the same design as the AKS run and not yet run on Google Cloud: its first repetition is a shakedown, and
 # any arm that fails its own checks is marked INVALID and never counted.
-# Usage: REP=n ARMS="native compass omni" GCP_PROJECT=... [GCP_ZONE=us-central1-a GKE_MACHINE=e2-standard-2
+# Usage: REP=n ARMS="native compass" GCP_PROJECT=... [GCP_ZONE=us-central1-a GKE_MACHINE=e2-standard-2
 #        GKE_MAX_NODES=4 RUN_ID=...] bash scripts/gke_paired.sh
 set -euo pipefail
 echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
-REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native compass omni}"
+REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native compass}"
 PROJECT="${GCP_PROJECT:?set GCP_PROJECT}"; ZONE="${GCP_ZONE:-us-central1-a}"; MACHINE="${GKE_MACHINE:-e2-standard-2}"
 MAX="${GKE_MAX_NODES:-4}"; RUNID="${RUN_ID:-local}"
 export AKS_MAX_NODES="$MAX" WORKER_SEL="omni-role=work"          # kind_bench.sh's managed-cluster mode reads these names

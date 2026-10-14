@@ -129,8 +129,11 @@ the founder overrides one in the conversation.
   failures must read EVEN or GAIN. The benefit of the max belongs where Omni-Compass sits in the engine before the cloud, or in the
   chip at its other end. Runs of the max in the cloud are stopped and kept as such, counted in no bill result.
 - **On autopilot: no babysitting tax** (the founder's words of 14 October, night). Omni-Compass is an autopilot,
-  self-running and self-steering inside the system like a self-driving car: nobody turns a knob and nobody has to
-  react, because it acts before the line is crossed. Every Kubernetes and cloud receipt shows it in both arms: the
+  self-running, self-steering and self-auditing inside the system like a self-driving car: nobody turns a knob, nobody
+  checks its work (every write read back, every give-back on its own trial, every reason in its audit) and nobody has to
+  react, because it acts before the line is crossed. In the cloud the aim is no alert minute at all (a minute over the
+  line wakes a person): an alert minute in the omni arm is found and fixed, never accepted. The governor decides every
+  15 seconds in the cloud (`OMNI_INTERVAL=15`), its fast checks every 5; kind moves to 15 with the next engine version. Every Kubernetes and cloud receipt shows it in both arms: the
   alert minutes (judged), the settings commands the governor wrote on its own and its additions made inside the line
   (shown) (`tools/live_reps.py`, `babysitting`); both manuals and the README say so.
 - **Two manuals** (the founder's orders of 14 October, evening and night), both kept in the repository until the founder

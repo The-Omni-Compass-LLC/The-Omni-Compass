@@ -94,7 +94,7 @@ jobs:
           [ "$code" = 0 ] || { echo "::error::repetition ${{ matrix.rep }} ended with exit $code"; exit "$code"; }
         env:
           REP: ${{ matrix.rep }}
-          ARMS: ${{ github.event.inputs.arms || 'native compass omni' }}
+          ARMS: ${{ github.event.inputs.arms || 'native compass' }}
           DURATION: ${{ github.event.inputs.duration_s || '900' }}
           LOADGEN: open
           LOAD_STEPS: ${{ github.event.inputs.load_steps || '' }}
@@ -105,6 +105,8 @@ jobs:
           HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
           REPLICA_CEILING: ${{ github.event.inputs.replica_ceiling || '' }}
           OMNI_DIAL: ${{ github.event.inputs.dial || 'save' }}
+          # the governor decides every 15 s in the cloud (the founder's order of 14 October, night), not once a minute
+          OMNI_INTERVAL: '15'
           AKS_WORKER_POOLS: ${{ github.event.inputs.worker_pools || '' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - if: always()

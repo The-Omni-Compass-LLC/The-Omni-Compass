@@ -14,6 +14,11 @@
   Appendix D), the metrics catalog and the README: in the cloud the bill is the gauge and is never raised (the tune-down
   with native's cap); the max belongs where the machines are paid for; no babysitting, and the rows that count it. Both
   PDFs rebuilt. No engine file changed.
+- **Self-auditing, and no alert minute in the cloud** (the founder's words of 14 October, night): the governor audits
+  itself (every write read back, every machine given back only after its own paired trial, every reason in its audit),
+  and the cloud's aim is no alert minute at all; an alert minute in the omni arm is a LOSS of the aim, found and fixed.
+  The next version's plan carries the changes that close the rest of the gap (the max halved the time over the line on
+  Azure's steady load, 30.3% to 14.6%).
 
 ## 2026-10-14: in the cloud, the bill at native's work: Omni-Compass on top at the tune-down with native's cap
 
