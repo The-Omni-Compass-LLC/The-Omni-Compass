@@ -15,7 +15,8 @@ it finds which runs of each square are already started (the dispatches named by 
 first night's runs), and starts the next ones (the 10-run squares of every size first, then 100) until the repository's
 queued and running jobs reach what GitHub is running now plus a margin. grid.yml runs it every 15 minutes; the six and
 six-kube buttons run it once when started with their defaults. Nothing is started twice: a started run is read back from
-its own name.
+its own name. Azure goes first (the founder's order of 13 October): while an Azure run, a grid run's report or the push's
+verify waits for a runner, the conductor starts nothing new, so that job is next in GitHub's queue.
 
 Shards are cut from run times measured on the max (12 Oct, work waiting in line, GitHub's own machines) so that no job
 nears GitHub's six-hour limit; each shard also stops starting runs at its deadline and hands in every run it finished.
@@ -87,6 +88,12 @@ KUBE_BUILD = {1: 1, 10: 1, 100: 8}         # minutes to build the organism (cali
 # protocol 3 alone
 KUBE_PROTOCOL = "3"
 MAX_TRIES = 3                      # a repetition whose job failed this many times is started no more (the report lists it)
+# the runs that go before the grid: Azure first (the founder's order of 13 October: Kubernetes on Azure is finished first),
+# the other clouds when he starts them, the push's verify and the archive of finished runs. While one of them waits for a
+# runner (or a grid run's report does), the conductor starts nothing new, so the job that waits is next in GitHub's queue
+# instead of behind the grid
+FIRST = ("aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
+         "eks-metered.yml", "verify.yml", "archive-run.yml")
 
 
 # ------------------------------------------------------------------------------------------------- shard shapes
@@ -355,26 +362,47 @@ def give_up(cov, runs, failed):
     return out
 
 
+def waits_for_a_runner(path, jobs):
+    """The runs that go before the grid (Azure first, the founder's order of 13 October; a grid run's report; the push's
+    verify): True when such a run has a job queued and none running, so it waits for a runner and not for its own
+    one-at-a-time matrix (aks-metered runs its repetitions one by one)."""
+    wf = (path or "").rsplit("/", 1)[-1]
+    open_ = [x for x in jobs if x["status"] in ("queued", "waiting", "pending", "requested")]
+    if not open_ or any(x["status"] == "in_progress" for x in jobs):
+        return False
+    if wf in FIRST:
+        return True
+    return wf in ("six.yml", "six-kube.yml") and any((x.get("name") or "").startswith("report") for x in open_)
+
+
 def jobs_in_flight():
-    """(queued, running) jobs across every workflow of the repository right now."""
+    """(queued, running, waiting first) jobs across every workflow of the repository right now; waiting first: the runs
+    that go before the grid and wait for a runner (waits_for_a_runner)."""
     queued = running = 0
+    first, seen = [], set()
     for st in ("queued", "in_progress", "waiting", "pending", "requested"):
         d = api(f"repos/{REPO}/actions/runs?status={st}&per_page=100")
         for r in d.get("workflow_runs", []):
-            page = 1
+            if r["id"] in seen:
+                continue
+            seen.add(r["id"])
+            page, jobs = 1, []
             while True:
                 try:
                     j = api(f"repos/{REPO}/actions/runs/{r['id']}/jobs?filter=latest&per_page=100&page={page}")
                 except (RuntimeError, urllib.error.URLError) as e:   # a run being cancelled can refuse its list
                     print(f"run {r['id']}: jobs not readable ({str(e)[:80]}); not counted", file=sys.stderr)
                     break
-                for x in j.get("jobs", []):
-                    queued += x["status"] in ("queued", "waiting", "pending", "requested")
-                    running += x["status"] == "in_progress"
+                jobs += j.get("jobs", [])
                 if len(j.get("jobs", [])) < 100:
                     break
                 page += 1
-    return queued, running
+            queued += sum(x["status"] in ("queued", "waiting", "pending", "requested") for x in jobs)
+            running += sum(x["status"] == "in_progress" for x in jobs)
+            if waits_for_a_runner(r.get("path"), jobs):
+                name, title = r.get("name") or "", r.get("display_title") or str(r["id"])
+                first.append(title if title.startswith(name) else f"{name}: {title}")
+    return queued, running, first
 
 
 def dispatch(d, ref):
@@ -402,7 +430,7 @@ def squares(cov):
     return rows
 
 
-def report(cov, started, queued, running, target, out=sys.stdout, gave_up=None):
+def report(cov, started, queued, running, target, out=sys.stdout, gave_up=None, first=()):
     names = {"1": "Compute / AI / Cloud", "2": "Physics / Robotics / Autonomous", "3": "Energy / Facility / Industrial",
              "4": "Distribution / Specialized", "5": "The four stacked", "6": "The whole tower"}
     print(f"| Size | Organism | Modelled: runs started of {RUNS} | With the real cluster inside: runs started of {RUNS} |", file=out)
@@ -411,6 +439,8 @@ def report(cov, started, queued, running, target, out=sys.stdout, gave_up=None):
         print(f"| {size:,} | {names[o]} | {six:,} | {kube:,} |", file=out)
     print(f"\nJobs now: {running} running, {queued} queued; target {target}. Started this time: {len(started)} dispatches, "
           f"{sum(d['jobs'] for d in started)} jobs.", file=out)
+    for t in first:
+        print(f"- held: {t} waits for a runner and goes before the grid", file=out)
     for d in started:
         print(f"- {d['title']} ({d['jobs']} jobs, about {d['hours']} runner-hours)", file=out)
     print(f"\nWith the cluster inside, only runs of protocol {KUBE_PROTOCOL} count (12 Oct: the governor never below the "
@@ -479,13 +509,15 @@ def main(argv=None):
     if eng != ENGINE:                                  # a grid belongs to one engine: never start its runs on another
         print(f"this checkout runs {eng}, the grid is {ENGINE}'s: nothing started (a new engine gets its own grid)")
         return 0
-    queued, running = jobs_in_flight()
+    queued, running, first = jobs_in_flight()
     target = max(a.floor, running + a.extra)
     inflight, started = queued + running, []
+    for t in first:
+        print(f"waits for a runner and goes first: {t}")
     for d in todo:
         if a.grid != "all" and d["grid"] != a.grid:
             continue
-        if len(started) >= a.max_dispatches or inflight >= target:   # a dispatch bigger than the margin still starts
+        if first or len(started) >= a.max_dispatches or inflight >= target:   # a dispatch bigger than the margin still starts
             break
         if not a.dry:
             dispatch(d, a.ref)
@@ -499,7 +531,7 @@ def main(argv=None):
     with (open(summary, "a") if summary else contextlib.nullcontext(sys.stdout)) as out:
         print("## The grid on the max: 1, 10 and 100 copies, every square to 100 runs" + (" (dry run: nothing started)" if a.dry else ""), file=out)
         print("", file=out)
-        report(cov, started, queued, running, target, out, gave_up=gave_up)
+        report(cov, started, queued, running, target, out, gave_up=gave_up, first=first)
     return 0
 
 

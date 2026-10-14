@@ -4,7 +4,7 @@
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
-The Omni-Compass LLC · 1-888-339-9551 (1-888-DEX-YLL-1) · [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report and printout
+The Omni-Compass LLC · Main office infrastructure · Toll-free direct 1-888-339-9551 · System route asset 1-888-DEX-YLL-1 · [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report and printout
 of any part of Omni-Compass carries the notice above, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and
 [`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
 
@@ -188,9 +188,9 @@ Omni-Compass is a supervisory governor. It does not replace your autoscaler or y
 the meters of each muscle (response time, utilisation, power, heat), and by default runs **at the max**: every muscle
 pushed to its own limit, never past it and never below native, riding the edge of its band, not the middle. It starts
 machines before the rush lands and clears work waiting in line, cools a room ahead of the heat, holds a battery's
-charge for the line, and runs an axis at its own peak while tasks wait. The energy that takes is **LOSS**, shown
+charge for the line, and runs an axis at its own peak while tasks wait. The energy that takes is **power given**, shown
 beside the work, the speed and the wear it bought; inside a body (an organism) it gives only what the body's lines can
-carry. One pedal, no brake: push for more, lift off for less, and lifting hands the setting back toward native; at idle
+carry. One pedal: push for more, lift off for less, and lifting hands the setting back toward native; at idle
 the pool lifts to its floor of two machines, powered and ready. If Omni-Compass stops, the plug walks every setting back
 to native; the kill switch, a separate security switch, turns it off everywhere at once. Anyone can tune it down from
 the max on the dial. The law, its
@@ -252,6 +252,19 @@ grid tap changer, voltage regulator, wind turbine pitch, pipeline compressor, wa
 autopilot, flight software, autonomous driving stack, 5G RAN scheduler, matching engine, game server fleet, build farm,
 ledger node, IDS workers, control theory, closed loop, two antagonist forces, tanh law, nervous system, muscles, realms,
 organisms, Omni index. The repository's GitHub topics (set by its owner from the About panel, with www.omni-compass.com as its website): `omni-compass`, `governor`, `supervisory-control`, `control-plane`, `control-core`, `control-engine`, `control-theory`, `control-systems`, `feedback-control`, `conveyance`, `machinery`, `autoscaling`, `kubernetes`, `gpu`, `data-center`, `energy-efficiency`, `power-management`, `smart-grid`, `robotics`, `industrial-automation`.
+
+## Contact
+
+The Omni-Compass LLC, main office infrastructure. Toll-free direct: **1-888-339-9551**. System route asset:
+**1-888-DEX-YLL-1**. [www.omni-compass.com](https://www.omni-compass.com)
+
+What the letters mean at Omni-Compass, read in order, the way the engine runs:
+
+| DEX | YLL | 1 |
+|---|---|---|
+| **Data Exchange**: the input. In software, data exchange is how one system's readings reach another. Here it is the two-way plug, one wire in and one wire out: the system's own readings come in, Omni-Compass's settings go out. | **Yield Limit Line**: the boundary. In engineering science, the yield limit is the most load a material can carry and still spring back unharmed; past it, the damage is permanent. Omni-Compass runs every muscle up to its own yield limit line, read live, and never past it. | **1**: the output. In code, 1 is true, the finished state; in science, 1 is unity, the whole. Here it is one closed loop: one body, one brain, every result read back and the next step decided from it. |
+
+Read as one sentence: Omni-Compass takes the system in through a Data Exchange (DEX), runs every setting up to its Yield Limit Line (YLL) and never past it, and closes it all into one loop (1). Science and software people read each part on sight.
 
 ## License
 

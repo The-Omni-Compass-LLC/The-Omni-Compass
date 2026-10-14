@@ -75,12 +75,13 @@ the founder overrides one in the conversation.
   button starts all three sizes × all three run counts and uses every runner GitHub gives. The conductor
   (`scripts/dispatch_grid.py`, `grid.yml` every 15 minutes; the six and six-kube buttons with their defaults) starts every
   run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what
-  GitHub runs plus a margin. Shards are cut from measured run times; each stops at its deadline and hands in every run it
-  finished. With the cluster inside only runs of protocol 3 count (12 Oct: the governor never below the organism's CPU
-  priority, its decisions counted inside the window; 13 Oct: the model of the organism on the runner's last core and the
-  kind nodes on the others, the same in both arms); a repetition whose job fails runs again, up to three times, paired
-  within one run, and one that fails three times is listed. With the cluster inside, the window is set from the heavier
-  arm's step, timed before either arm, so the max keeps the organism's clock.
+  GitHub runs plus a margin; it starts nothing while an Azure run, a grid report or a verify waits for a runner (Azure
+  first). Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
+  the cluster inside only runs of protocol 3 count (12 Oct: the governor never below the organism's CPU priority, its
+  decisions counted inside the window; 13 Oct: the model of the organism on the runner's last core and the kind nodes on
+  the others, the same in both arms); a repetition whose job fails runs again, up to three times, paired within one run,
+  and one that fails three times is listed. With the cluster inside, the window is set from the heavier arm's step,
+  timed before either arm, so the max keeps the organism's clock.
 - Three loads: each organism's own load, the climb (the load stepping by one, 1 2 3 2 3 4 …) and work waiting in line
   (`LINE`, `realms/harness.py`); every muscle alone runs its own load and the line.
 - Benchmark breadth: every domain that can be benchmarked defensibly (`docs/REGISTER.md`), with Omni on top of that
@@ -111,6 +112,29 @@ the founder overrides one in the conversation.
 - The notice is written once, in `tools/legal.py`; `python3 tools/legal.py --fix` puts it on every page, header, workflow
   report and export, and `--check` (run by `verify.py`) fails any push where a file lacks it. Engine files locked by a
   fingerprint take the new header only with the next engine version.
+
+## Orders of 14 October
+
+- **The manual carries no illustrations and no blank pages.** None of the founder's plates (his illustration images) go
+  in the manual: no cover art, no title-page rose, no plates, no List of Plates; no charts either. Every chapter starts on
+  the next page; a part's heading sits at the top of a page with its first chapter under it. The contents and page numbers
+  are rebuilt from the book itself (`docs/book/build_book.py`). The plates stay in `docs/book/plates/` as his property.
+- **Every fix realigns everything, on every push.** When code changes or a bug is fixed, everything that describes it is
+  brought up to it in the same push: the manual and its PDF, the README, the index, the tables, the plans and the
+  standing pages. Then the newest-engine material is scanned top to bottom for the retired words and the old ways
+  (better/worse, brake, bowl, "confirmed", "simulation" for our own models, standalone or competitor arms, 1,000 copies,
+  power given called a loss) and anything found is fixed before the push. Old material stays where it is.
+- **The founder hears where things stand** in every report: what is running, what landed, what reads GAIN, EVEN or LOSS,
+  and what is still on an older engine, in plain words.
+- **The founder's prompt rules** (his document "A.I. prompt rules"), as they apply here:
+  - Type: all text (body, tables, lists, code) at **11 pt or larger** on a line height of at least **1.5**; only running
+    heads, footers and page labels may be smaller, at 8 pt; headings scale up from the body.
+  - Prose that explains is written at a 10th-grade level: short active sentences, bold key terms, bullets. Formulas are
+    written in LaTeX (`$...$`, `$$...$$`) in the markdown.
+  - Before a document is finished, audit it like a referee: equation and theorem numbers, cross-references, undefined
+    symbols, repeated claims, and every claim backed by the text. No padding: every addition must earn its place.
+  - In chat: no greetings, no echoing the request, no sign-offs; no follow-up questions (decide and do it); do what can be
+    done without listing what can't. This never hides a result: every row, LOSS included, is still reported (Honesty).
 
 ## Orders of 13 October
 
@@ -143,10 +167,17 @@ the founder overrides one in the conversation.
   everything. Where a change made a result worse, the fix is made inside the newest engine and rerun.
 - **One cloud first** (13 October, night): Kubernetes on Azure is finished first; Google (GKE), Amazon (EKS) and the GPU
   chips (Lambda) are not run until the founder says the Azure Kubernetes results are where he needs them.
-- **The company's telephone** (13 October, night): 1-888-339-9551 (1-888-DEX-YLL-1), on every contact line where the
-  company is named for reaching it (README, LICENSE and its copy, NOTICE, Enterprise License, Trademarks, Licensing FAQ, Security,
-  Support, the manual's "Who to call", codemeta), always before the website, never inside the legal notice, which ends with
-  www.omni-compass.com. The founder's personal number is never written anywhere.
+- **The company's telephone** (13 October, night; wording of 14 October): "main office infrastructure, toll-free direct
+  1-888-339-9551, system route asset 1-888-DEX-YLL-1", on every contact line where the company is named for reaching it
+  (README, LICENSE and its copy, NOTICE, Enterprise License, Trademarks, Licensing FAQ, Security, Support, the manual's
+  "Who to call", codemeta), always before the website, never inside the legal notice, which ends with
+  www.omni-compass.com. The letters, read in order, are the company's own reading of how the engine runs (README "Contact",
+  the manual's "Who to call"): DEX, Data Exchange (the input, the two-way plug); YLL, Yield Limit Line (the boundary, every
+  muscle to its own limit and never past it, as a material is loaded to its yield limit and springs back unharmed); 1, one
+  closed loop (the output; in code 1 is true, in science 1 is unity; one body, one brain). The founder's order of 14
+  October: write it as the meaning, the way science and software people read it, wherever it fits in the manual; "years
+  of life lost" is written nowhere. The founder's
+  personal number is never written anywhere.
 - **A copy he can keep**: the manual's PDF and the whole repository as a downloadable zip, in parts, from a pushed commit,
   sent to the founder after each landed change.
 

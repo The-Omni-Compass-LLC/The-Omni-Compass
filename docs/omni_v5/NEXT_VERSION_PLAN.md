@@ -49,7 +49,20 @@ fixed there, never by going back to an older engine.
 - Micro steps inside each decision (fourth-order Runge-Kutta for the plants' motion, Monte Carlo over their uncertainty).
 - The body's hormones and immune system carried into every organism.
 
-## 5. Order
+## 5. Every LOSS that stands today, and what this version does about each
+
+The founder's order of 13 October: a LOSS row is never cut; its cause is found and fixed and the test run again. These are
+the LOSS rows on the newest tables (the grid page is the card version, digest `5648f290`; the grid on `6093b2b8` is
+running now):
+
+| Where | The LOSS | What it shows | In this version |
+|---|---|---|---|
+| The grid with the cluster inside (`results/grid_v5/GRID.md`) | the organism's work per energy, in 21 of 36 squares of 10 and 100 repetitions | the max gave the organism power (its energy reads power given) and the work waiting in line was done either way, so each unit of work took more energy; the power bought fewer misses (time over the line reads GAIN in all 36) | the decision code counts the body's work per energy as a gauge of its own: a power step that buys no work and no fewer misses is undone; where it buys fewer misses, the step stays only while the body's work per energy stays EVEN, so the row reads EVEN or GAIN |
+| The four stacked at 100 copies, 100 repetitions | 95th and 99th percentile response time | the organism ran past its window in 49 of 100 repetitions (up to 635 s): GitHub's four-core machine could not step that many muscles in time | section 3: protocol 3 and the eight-core Azure machine decide whether it is the machine; if it stays, the cause is fixed in the engine |
+| The whole tower at 100 copies, 100 repetitions | 95th and 99th percentile response time | the same machine; the long-window rerun read +45.9% at the 95th percentile | section 3 |
+| CityLearn (`results/live/V1_CITYLEARN.md`, `V3_CITYLEARN.md`) | energy not served and time uncomfortable in several districts | older engines' tables; not yet run on omni-v5 | run on this version, A, B and C; a district that still reads LOSS has its cause found before the table goes up |
+
+## 6. Order
 
 1. The runs on the current engine that answer section 3 finish and are read.
 2. The version is built and tested on development seeds; the founder is told what changed before it is declared.

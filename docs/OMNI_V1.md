@@ -86,7 +86,7 @@ Every v1 benchmark runs three times, as separate GitHub Actions runs on the same
 
 Every judged row gets one of three readings, and all three runs are shown beside it:
 
-- **GAIN** or **LOSS in all three of our runs** (a resource spent that rose reads **LOSS**, never a loss): the same sign in all three runs, each with its 95% interval clear of zero.
+- **GAIN** or **LOSS in all three of our runs** (a resource spent that rose reads **power given**, never a loss): the same sign in all three runs, each with its 95% interval clear of zero.
 - **No difference beyond the noise**: in at least one run the interval includes zero, so native and omni could not be
   told apart on that measure. That is the result, stated as such, with the count of runs it holds in.
 - **The runs disagree**: runs clear of the noise point different ways. The test itself is then unstable on that measure,

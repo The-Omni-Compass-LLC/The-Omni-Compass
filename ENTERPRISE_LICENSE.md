@@ -113,7 +113,7 @@ the signed agreement for the licensee and its scope.
 
 ## 12. How to obtain one
 
-The Omni-Compass LLC, 1-888-339-9551 (1-888-DEX-YLL-1), www.omni-compass.com. A license starts with an evaluation on the licensee's own systems
+The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com. A license starts with an evaluation on the licensee's own systems
 (`LICENSE`, section 1.4): watch mode, the wire check, and paired receipts on its own load.
 
 ---

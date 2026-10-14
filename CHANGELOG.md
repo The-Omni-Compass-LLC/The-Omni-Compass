@@ -2,6 +2,43 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-14: the manual without illustrations or blank pages, every line of text at 11 pt
+
+- **No illustrations** (the founder's order of 14 October): the founder's plates are out of the manual: the cover art,
+  the title-page rose, the nineteen plates, the List of Plates and the back cover; the dossier's charts are left out of
+  the book too. The plates stay in `docs/book/plates/` as the founder's property; their links are gone from
+  `docs/book/THEORY.md` and `docs/book/DECLARATION.md`.
+- **No blank pages**: chapters no longer wait for a right-hand page; every chapter starts on the next page, and a part's
+  heading sits at the top of a page with its first chapter under it. The contents and every page number are rebuilt
+  from the book itself, and every page but the title page carries its number and the footer.
+- **Type, by the founder's prompt rules**: body text, tables, lists, code, notes, captions and the contents at 11 pt
+  (the body was 10.5 pt, tables 7 to 8.3 pt, code 6.7 to 7.6 pt) on a 16.5 pt line (1.5); headings scaled up (26, 16
+  and 13 pt); only the running heads and footers are smaller, at 8 pt. A table row taller than a page now breaks across
+  pages. The book ends with the full notice, as it begins.
+- The rules are in `CLAUDE.md` (Orders of 14 October).
+
+## 2026-10-14: the company's telephone in the founder's wording, and what its letters mean
+
+- Every contact line now reads, in the founder's words: The Omni-Compass LLC, **main office infrastructure, toll-free
+  direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1**, before the website (README, LICENSE and its copy, NOTICE,
+  the Enterprise License, Trademarks, the Licensing FAQ, Security, Support, the manual's "Who to call"). The legal notice
+  still ends with www.omni-compass.com and nothing after it.
+- The README's new "Contact" section and the manual's "Who to call" show what the letters mean at Omni-Compass, read in
+  order as the engine runs: **DEX**, Data Exchange (the input: the two-way plug, readings in, settings out); **YLL**,
+  Yield Limit Line (the boundary: every muscle up to its own limit line and never past it, as an engineer loads a
+  material up to its yield limit, the most it carries and still springs back unharmed); **1**, one closed loop (the
+  output: in code 1 is true, in science 1 is unity; one body, one brain). The manual's glossary carries DEX-YLL-1 and
+  the yield limit line.
+
+## 2026-10-14: Azure goes first on GitHub's machines (the grid conductor; the engine unchanged)
+
+- The founder's order of 13 October: Kubernetes on Azure is finished first. Its runs drive Azure from GitHub's machines,
+  and on the night of 13 October an Azure repetition waited more than an hour behind about 140 grid jobs, the 100-copy
+  reports behind them too. The grid's conductor (`scripts/dispatch_grid.py`) now starts nothing new while an Azure run
+  (or, later, a Google or Amazon run), a grid run's report, a push's verify or the archive of finished runs waits for a
+  runner, so that job is next in GitHub's queue. A run that waits only for its own one-at-a-time matrix (the AKS
+  repetitions run one by one) does not hold the grid. Each conductor report names what it held. Test: `tests/test_run_scale.py`.
+
 ## 2026-10-13 (late night): GAIN, EVEN and LOSS everywhere (words only; the engine, every number and every verdict unchanged)
 
 - **The founder's order of 13 October, evening**: "better, same and worse are going to be gain, even and loss, wherever

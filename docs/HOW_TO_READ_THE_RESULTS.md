@@ -51,7 +51,7 @@ follow it. Read the five ideas first, then go to the table you have in front of 
 5. **Evidence class.** Every result is marked with how it was measured:
    - **T**: a theorem;
    - **V**: verified in code;
-   - **S**: a model (simulation);
+   - **S**: our own model (modelled);
    - **L**: live software (real Kubernetes);
    - **P**: a physical meter (a real card's own power meter).
 
@@ -100,7 +100,7 @@ token generation (memory-bound work).
 
 The real card is wired into each of the six organisms (the four realms, the four stacked, the whole tower) at four
 sizes (1, 10, 100 and 1,000 copies). Each row is one size, one organism and one part:
-- **stacks (model)**: the simulated machines (evidence S);
+- **stacks (model)**: the modelled machines (evidence S);
 - **card (meter)**: the real card, its own meter (evidence P);
 - **both**: the two added together.
 

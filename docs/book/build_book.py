@@ -8,8 +8,10 @@
 
 The book is assembled from the theory chapters in docs/book/, the manual, the repository's documents, the muscle
 catalog and the source of the engine, in the order set in OUTLINE below. US Letter, mirrored margins for binding,
-parts and chapters open on a right-hand page, running heads, roman numerals in the front matter, a contents with page
-numbers, PDF bookmarks, the founder's plates, and a full-bleed front and back cover.
+running heads, roman numerals in the front matter, a contents with page
+numbers and PDF bookmarks. No illustrations and no blank pages (the founder's order of 14 October): every chapter
+starts on the next page. Type (the founder's prompt rules): body text, tables, lists and code at 11 pt on a 1.5 line
+height, headings scaled up from it; only the running heads and footers are smaller, at 8 pt.
 
     python3 docs/book/build_book.py
 """
@@ -28,13 +30,12 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont as RLFont
-from reportlab.platypus import (BaseDocTemplate, CondPageBreak, Flowable, Frame, Image, KeepTogether, NextPageTemplate,
-                                PageBreak, PageTemplate, Paragraph, Preformatted, Spacer, Table, TableStyle)
+from reportlab.platypus import (BaseDocTemplate, CondPageBreak, Flowable, Frame, PageBreak, PageTemplate, Paragraph,
+                                Preformatted, Spacer, Table, TableStyle)
 from reportlab.platypus.tableofcontents import TableOfContents
 
 ROOT = Path(__file__).resolve().parents[2]
 BOOK = ROOT / "docs" / "book"
-PLATES = BOOK / "plates"
 OUT_PDF = ROOT / "docs" / "OMNI_COMPASS_MANUAL.pdf"
 OUT_MD = BOOK / "OMNI_COMPASS_BOOK.md"
 EDITION = "October 2026"
@@ -70,22 +71,26 @@ FW, FH = PW - INNER - OUTER, PH - TOP - BOTTOM
 NAVY, GOLD, INK, GREY = colors.HexColor("#0b1f3a"), colors.HexColor("#a8801f"), colors.HexColor("#1a1a1a"), colors.HexColor("#666666")
 RULE = colors.HexColor("#c9b27a")
 
-BODY = ParagraphStyle("body", fontName="Serif", fontSize=10.5, leading=14.2, alignment=TA_JUSTIFY, spaceAfter=6, textColor=INK)
-CELL = ParagraphStyle("cell", fontName="Serif", fontSize=8.3, leading=10.2, textColor=INK)
-CELLH = ParagraphStyle("cellh", parent=CELL, fontName="Sans-Bold", fontSize=8, textColor=colors.white)
-CODE = ParagraphStyle("code", fontName="Mono", fontSize=7.6, leading=9.6, textColor=INK)
-SRC = ParagraphStyle("src", fontName="Mono", fontSize=6.7, leading=8.1, textColor=INK)
-NOTE = ParagraphStyle("note", parent=BODY, fontSize=9.8, leading=13, leftIndent=10, rightIndent=10, borderColor=RULE,
-                      borderWidth=0.8, borderPadding=7, backColor=colors.HexColor("#faf6ec"), spaceBefore=6, spaceAfter=10)
-H1 = ParagraphStyle("h1", fontName="Serif-Bold", fontSize=25, leading=30, textColor=NAVY, spaceAfter=6)
-H2 = ParagraphStyle("h2", fontName="Serif-Bold", fontSize=14.5, leading=18, textColor=NAVY, spaceBefore=12, spaceAfter=6, keepWithNext=1)
-H3 = ParagraphStyle("h3", fontName="Serif-BoldItalic", fontSize=11.8, leading=15, textColor=NAVY, spaceBefore=8, spaceAfter=4, keepWithNext=1)
-KICK = ParagraphStyle("kick", fontName="Sans-Bold", fontSize=10, leading=12, textColor=GOLD, spaceAfter=6)
-CAP = ParagraphStyle("cap", fontName="Serif-Italic", fontSize=9.5, leading=12, alignment=TA_CENTER, textColor=GREY)
+PT, LEAD = 11, 16.5                 # the founder's prompt rules: 11 pt or larger for all text, a 1.5 line height
+SMALL = 8                           # running heads and footers only
+BODY = ParagraphStyle("body", fontName="Serif", fontSize=PT, leading=LEAD, alignment=TA_JUSTIFY, spaceAfter=7, textColor=INK,
+                      bulletFontName="Serif", bulletFontSize=PT)        # list bullets and numbers at 11 pt too
+CELL = ParagraphStyle("cell", fontName="Serif", fontSize=PT, leading=LEAD, textColor=INK)
+CELLH = ParagraphStyle("cellh", parent=CELL, fontName="Sans-Bold", fontSize=PT, textColor=colors.white)
+CODE = ParagraphStyle("code", fontName="Mono", fontSize=PT, leading=LEAD, textColor=INK)
+SRC = CODE
+NOTE = ParagraphStyle("note", parent=BODY, leftIndent=10, rightIndent=10, borderColor=RULE, borderWidth=0.8, borderPadding=7,
+                      backColor=colors.HexColor("#faf6ec"), spaceBefore=7, spaceAfter=11)
+H1 = ParagraphStyle("h1", fontName="Serif-Bold", fontSize=26, leading=34, textColor=NAVY, spaceAfter=7)
+H2 = ParagraphStyle("h2", fontName="Serif-Bold", fontSize=16, leading=22, textColor=NAVY, spaceBefore=13, spaceAfter=7, keepWithNext=1)
+H3 = ParagraphStyle("h3", fontName="Serif-BoldItalic", fontSize=13, leading=19, textColor=NAVY, spaceBefore=9, spaceAfter=5, keepWithNext=1)
+KICK = ParagraphStyle("kick", fontName="Sans-Bold", fontSize=PT, leading=LEAD, textColor=GOLD, spaceAfter=6)
+CAP = ParagraphStyle("cap", fontName="Serif-Italic", fontSize=PT, leading=LEAD, alignment=TA_CENTER, textColor=GREY)
 CENTER = ParagraphStyle("center", parent=BODY, alignment=TA_CENTER)
-TOC1 = ParagraphStyle("toc1", fontName="Serif-Bold", fontSize=11, leading=15, leftIndent=0, spaceBefore=7, textColor=NAVY)
-TOC2 = ParagraphStyle("toc2", fontName="Serif", fontSize=10, leading=13, leftIndent=18, firstLineIndent=0)
-TOC3 = ParagraphStyle("toc3", fontName="Serif", fontSize=9, leading=11.5, leftIndent=36, textColor=GREY)
+TOC1 = ParagraphStyle("toc1", fontName="Serif-Bold", fontSize=12, leading=18, leftIndent=0, spaceBefore=7, textColor=NAVY)
+TOC2 = ParagraphStyle("toc2", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=18, firstLineIndent=0)
+TOC3 = ParagraphStyle("toc3", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=36, textColor=GREY)
+CODE_WIDTH = 70                     # characters of 11 pt mono that fit the frame inside a code block's padding
 
 # ---------------------------------------------------------------- text cleaning
 AI_WORDS = re.compile(r"\b(grok|chatgpt|claude|gemini|anthropic|openai|xai|copilot|same assistant|other AI builds?)\b", re.I)
@@ -141,7 +146,7 @@ def inline(t: str) -> str:
     t = re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?!\w)", r"<i>\1</i>", t)
     t = re.sub(r"(?<![\w_])_(?![\s_])([^_]+?)(?<![\s_])_(?![\w_])", r"<i>\1</i>", t)
     t = glyphs(t, SERIF_CMAP)
-    return re.sub(r"\x00(\d+)\x00", lambda m: '<font name="Mono" size="8.6">' + glyphs(codes[int(m.group(1))], MONO_CMAP) + "</font>", t)
+    return re.sub(r"\x00(\d+)\x00", lambda m: f'<font name="Mono" size="{PT}">' + glyphs(codes[int(m.group(1))], MONO_CMAP) + "</font>", t)
 
 
 # ---------------------------------------------------------------- flowables
@@ -176,28 +181,10 @@ class GoldRule(Flowable):
         self.canv.line(0, self.space / 2, self.width, self.space / 2)
 
 
-def plate(path: Path, caption: str):
-    from PIL import Image as PIL
-    w, h = PIL.open(path).size
-    maxh = FH - 40
-    s = min(FW / w, maxh / h)
-    img = Image(str(path), w * s, h * s)
-    return [CondPageBreak(FH), img, Spacer(1, 6), Paragraph(inline(caption), CAP), PageBreak()]
-
-
-def figure(path: Path, caption: str):
-    """A chart inside the text: the frame's width, kept with its caption."""
-    from PIL import Image as PIL
-    w, h = PIL.open(path).size
-    s = FW / w
-    return [KeepTogether([Image(str(path), w * s, h * s), Spacer(1, 3), Paragraph(inline(caption), CAP)]), Spacer(1, 8)]
-
-
 def table(rows_txt, small=False):
     n = max(len(r) for r in rows_txt)
     rows_txt = [r + [""] * (n - len(r)) for r in rows_txt]
-    cs = ParagraphStyle("c2", parent=CELL, fontSize=7.4, leading=9) if small or n > 6 else CELL
-    hs = ParagraphStyle("h2c", parent=CELLH, fontSize=7.2) if small or n > 6 else CELLH
+    cs, hs = CELL, CELLH                     # 11 pt in every table, however many columns
     lens = [max(min(len(re.sub(r"[`*]", "", r[j])), 60) for r in rows_txt) for j in range(n)]
     weights = [max(4.0, x) ** 0.85 for x in lens]
     tot = sum(weights)
@@ -211,7 +198,7 @@ def table(rows_txt, small=False):
         big = sum(w for k, w in enumerate(widths) if k not in short)
         widths = [floor if k in short else w - extra * w / big for k, w in enumerate(widths)]
     data = [[Paragraph(inline(c), hs if k == 0 else cs) for c in r] for k, r in enumerate(rows_txt)]
-    t = Table(data, colWidths=widths, repeatRows=1, hAlign="LEFT")
+    t = Table(data, colWidths=widths, repeatRows=1, hAlign="LEFT", splitInRow=1)   # a row taller than a page breaks across it
     t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#b8b8b8")),
                            ("BACKGROUND", (0, 0), (-1, 0), NAVY),
                            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f4f1ea")]),
@@ -231,7 +218,7 @@ def wrap_code(lines, width):
     return out
 
 
-def code_block(lines, style=CODE, width=104):
+def code_block(lines, style=CODE, width=CODE_WIDTH):
     """A shaded code block, cut into page-sized pieces so that long listings flow across pages."""
     lines = wrap_code(lines, width)
     per = 28
@@ -267,10 +254,8 @@ def md_flow(lines, shift=0, story=None, strip=False):
             while buf and not buf[-1].strip():
                 buf.pop()
             story += code_block(buf); story.append(Spacer(1, 6)); continue
-        m = re.match(r"^!\[([^\]]*)\]\(([^)]+)\)\s*$", ln)
-        if m:
-            src = BOOK / m.group(2) if (BOOK / m.group(2)).exists() else ROOT / "docs" / m.group(2)
-            story += figure(src, m.group(1)) if src.suffix == ".png" else plate(src, m.group(1)); i += 1; continue
+        if re.match(r"^!\[([^\]]*)\]\(([^)]+)\)\s*$", ln):    # no images in the book (14 October)
+            i += 1; continue
         if ln.startswith("|"):
             rows = []
             while i < len(lines) and lines[i].startswith("|"):
@@ -283,13 +268,6 @@ def md_flow(lines, shift=0, story=None, strip=False):
             continue
         m = re.match(r"^(#{1,6}) (.*)", ln)
         if m:
-            j = i + 1                                   # a plate right under a heading goes before it
-            while j < len(lines) and (not lines[j].strip() or lines[j].startswith("![")):
-                pm = re.match(r"^!\[([^\]]*)\]\(([^)]+)\)\s*$", lines[j])
-                if pm:
-                    story += plate(BOOK / pm.group(2), pm.group(1))
-                j += 1
-            lines = lines[:i + 1] + lines[j:] if j > i + 1 else lines
             lvl = max(2, min(3, len(m.group(1)) - shift + 1))
             txt = m.group(2).strip()
             if strip:                                   # the manual's own numbers give way to the book's
@@ -427,8 +405,7 @@ OUTLINE = [
     ("Maintenance, Upgrades and Security", ("M", "Maintenance, Upgrades and Security")),
     ("The Operator Manual", ("F", "docs/OPERATOR_MANUAL.md")),
     ("PART", "Proving It",
-     "Paired runs, receipts, rules written before the runs, and every result to date with its evidence class.",
-     "empirical_validation"),
+     "Paired runs, receipts, rules written before the runs, and every result to date with its evidence class."),
     ("The Receipts, in Their Totality", ("F", "docs/THE_RECEIPTS.md")),
     ("How to Read the Results", ("F", "docs/HOW_TO_READ_THE_RESULTS.md")),
     ("The Benefit Sheet: One Number per Benchmark", ("F", "docs/BENEFIT_SHEET.md")),
@@ -482,7 +459,7 @@ for m in re.finditer(r"^## (\d+)\. (.*)$", read("docs/OMNI_COMPASS_MANUAL.md"), 
 def source_listing(rel):
     lines = read(rel).splitlines()
     return [Heading(inline(f"`{rel}`"), H2, 2, toc_text=rel), Paragraph(inline(f"{len(lines)} lines."), CAP), Spacer(1, 4),
-            *code_block(lines, SRC, 118), Spacer(1, 10)]
+            *code_block(lines, SRC), Spacer(1, 10)]
 
 
 def catalog_flow():
@@ -505,12 +482,11 @@ def catalog_flow():
     for r in sorted(rows, key=lambda r: (not r["muscle_id"].isdigit(), int(re.sub(r"\D", "", r["muscle_id"]) or 0))):
         data.append([r["muscle_id"], r["family"], r["muscle"].replace("_", " "),
                      ", ".join(short.get(x, x) for x in r["realms"].split(";")), r["template"].replace("_", " "), r["knob"]])
-    t = Table([[Paragraph(inline(c), ParagraphStyle("cc", parent=CELL, fontSize=7, leading=8.4) if k else
-                          ParagraphStyle("ch", parent=CELLH, fontSize=7)) for c in row] for k, row in enumerate(data)],
-              colWidths=[0.07 * FW, 0.27 * FW, 0.25 * FW, 0.17 * FW, 0.14 * FW, 0.10 * FW], repeatRows=1)
+    t = Table([[Paragraph(inline(c), CELL if k else CELLH) for c in row] for k, row in enumerate(data)],
+              colWidths=[0.07 * FW, 0.27 * FW, 0.25 * FW, 0.17 * FW, 0.14 * FW, 0.10 * FW], repeatRows=1, splitInRow=1)
     t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#c0c0c0")), ("BACKGROUND", (0, 0), (-1, 0), NAVY),
                            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f4f1ea")]),
-                           ("TOPPADDING", (0, 0), (-1, -1), 1.2), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.2),
+                           ("TOPPADDING", (0, 0), (-1, -1), 2.5), ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
                            ("VALIGN", (0, 0), (-1, -1), "TOP")]))
     story.append(t)
     return story
@@ -532,11 +508,13 @@ def special(name):
     if name == "license":
         lines = [ln for ln in read("LICENSE").splitlines()]
         return [Paragraph(inline("The license under which this book and the software are made available, as it stands in "
-                                 "the file `LICENSE` at the root of the repository."), BODY), *code_block(lines, CODE, 104)]
+                                 "the file `LICENSE` at the root of the repository."), BODY), *code_block(lines, CODE)]
     if name == "contact":
         return md_flow([
             "Licensing, pilots, evaluations and the Omni-Compass Enterprise License:", "",
-            "**The Omni-Compass LLC**", "", "Owner and developer: AJ Dubra", "", "www.omni-compass.com", "",
+            "**The Omni-Compass LLC**", "", "Owner and developer: AJ Dubra", "",
+            "Main office infrastructure: toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1", "",
+            "www.omni-compass.com", "",
             "Repository: github.com/The-Omni-Compass-LLC/The-Omni-Compass", "",
             "Any use beyond evaluation and simulation requires a signed, paid Omni-Compass Enterprise License. "
             "Write to The Omni-Compass LLC before any production use."])
@@ -594,20 +572,14 @@ class Book(BaseDocTemplate):
         self.body_start = None
         self.chapter = ""
         self.part = ""
-        self.no_head = set()
+        self.no_head, self.bare = set(), set()
         self.frame = Frame(INNER, BOTTOM, FW, FH, id="f", leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
-        full = Frame(0, 0, PW, PH, id="full", leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
-        self.addPageTemplates([
-            PageTemplate("cover", [full], onPage=self.cover),
-            PageTemplate("body", [self.frame], onPage=self.mirror, onPageEnd=self.decorate),
-            PageTemplate("back", [Frame(0, 0, PW, PH, id="full2", leftPadding=0, rightPadding=0, topPadding=0,
-                                        bottomPadding=0)], onPage=self.back),
-        ])
+        self.addPageTemplates([PageTemplate("body", [self.frame], onPage=self.mirror, onPageEnd=self.decorate)])
         self.in_part = False
         self._hseq = 0
 
     def beforeDocument(self):
-        self.body_start, self.chapter, self.no_head, self.in_part, self._hseq = None, "", set(), False, 0
+        self.body_start, self.chapter, self.no_head, self.bare, self.in_part, self._hseq = None, "", set(), set(), False, 0
 
     # mirrored margins: odd pages are right-hand pages, the gutter is on the inside
     def mirror(self, c, d):
@@ -626,46 +598,31 @@ class Book(BaseDocTemplate):
 
     def decorate(self, c, d):
         p = d.page
-        if p in self.no_head:
+        if p in self.bare:                  # the title page carries nothing but itself
             return
         c.saveState()
         right = p % 2 == 1
         x0, x1 = (INNER, PW - OUTER) if right else (OUTER, PW - INNER)
-        if self.body_start is not None and p >= self.body_start and self.chapter:
-            c.setFont("Sans", 7.8); c.setFillColor(GREY)
+        if self.body_start is not None and p >= self.body_start and self.chapter and p not in self.no_head:
+            c.setFont("Sans", SMALL); c.setFillColor(GREY)
             if right:
                 c.drawRightString(x1, PH - 0.6 * inch, self.chapter.upper()[:90])
             else:
                 c.drawString(x0, PH - 0.6 * inch, "THE OMNI-COMPASS MANUAL")
             c.setStrokeColor(RULE); c.setLineWidth(0.5); c.line(x0, PH - 0.66 * inch, x1, PH - 0.66 * inch)
-        c.setFont("Serif", 9.5); c.setFillColor(INK)
-        lab = self.label(p)
-        (c.drawRightString if right else c.drawString)(x1 if right else x0, 0.55 * inch, lab)
-        c.setFont("Serif-Italic", 6.3); c.setFillColor(GREY)
-        c.drawCentredString((x0 + x1) / 2, 0.55 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and "
+        # the foot of every page: the notice in two centered lines, the website alone and centered on the bottom line,
+        # the page number in the bottom outside corner (left on a left-hand page, right on a right-hand page)
+        mid = (x0 + x1) / 2
+        c.setFont("Serif-Italic", SMALL); c.setFillColor(GREY)
+        c.drawCentredString(mid, 0.64 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and "
                             "simulation use only.")
-        c.drawCentredString((x0 + x1) / 2, 0.43 * inch, "All patents, copyrights and trademarks filed in the USA. "
-                            "www.omni-compass.com")
+        c.drawCentredString(mid, 0.51 * inch, "All patents, copyrights and trademarks filed in the USA.")
+        c.setFont("Serif-Bold", 9); c.setFillColor(NAVY)
+        c.drawCentredString(mid, 0.35 * inch, "www.omni-compass.com")
+        c.setFont("Serif", 10); c.setFillColor(INK)
+        lab = self.label(p)
+        (c.drawRightString if right else c.drawString)(x1 if right else x0, 0.35 * inch, lab)
         c.restoreState()
-
-    def cover(self, c, d):
-        c.setFillColor(colors.HexColor("#03040a")); c.rect(0, 0, PW, PH, fill=1, stroke=0)
-        img = PLATES / "cover.jpg"; w, h = 1024, 1536; s = PH / h
-        c.drawImage(str(img), (PW - w * s) / 2, 0, w * s, PH)
-
-    def back(self, c, d):
-        if d.page % 2:                       # the back cover is a left-hand page; an odd page here is the blank before it
-            return
-        c.setFillColor(colors.HexColor("#03040a")); c.rect(0, 0, PW, PH, fill=1, stroke=0)
-        img = PLATES / "back_cover.jpg"; w, h = 1024, 1536; s = (PH - 0.9 * inch) / h
-        c.drawImage(str(img), (PW - w * s) / 2, 0.9 * inch, w * s, h * s)
-        c.setFillColor(colors.HexColor("#d9c79a")); c.setFont("Serif-Bold", 11)
-        c.drawCentredString(PW / 2, 0.55 * inch, "THE OMNI-COMPASS LLC  ·  www.omni-compass.com")
-        c.setFont("Serif", 7.5)
-        c.drawCentredString(PW / 2, 0.38 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation "
-                            "use only; all other use requires a signed,")
-        c.drawCentredString(PW / 2, 0.24 * inch, "paid Omni-Compass Enterprise License. All patents, copyrights and trademarks "
-                            "filed in the USA. www.omni-compass.com")
 
     def afterFlowable(self, f):
         if isinstance(f, Marker):
@@ -673,6 +630,8 @@ class Book(BaseDocTemplate):
                 self.body_start = self.final_body_start = self.page
             elif f.kind == "nohead":
                 self.no_head.add(self.page)
+            elif f.kind == "bare":
+                self.bare.add(self.page)
             elif f.kind == "chapter":
                 self.chapter = f.kw["title"]
                 if f.kw.get("opener"):
@@ -706,61 +665,28 @@ def roman(n):
     return out
 
 
-def recto(doc):
-    return [PageBreak(), _ToRecto(doc)]
-
-
-class _ToRecto(Flowable):
-    def __init__(self, doc, even=False):
-        super().__init__(); self.doc = doc; self.want = 0 if even else 1
-
-    def wrap(self, aw, ah):
-        if self.doc.page % 2 != self.want:
-            self.doc.no_head.add(self.doc.page)
-            return aw, ah + 1          # does not fit: forces a page break, leaving this page blank
-        return 0, 0
-
-    def split(self, aw, ah):
-        if self.doc.page % 2 != self.want:
-            return [_Blank(), PageBreak()]
-        return []
-
-    def draw(self):
-        pass
-
-
-class _Blank(Flowable):
-    def wrap(self, *a):
-        return 0, 0
-
-    def draw(self):
-        pass
+def new_page():
+    """The next page, unless this one is still empty: never a blank page."""
+    return [CondPageBreak(FH - 2)]
 
 
 def front_matter(doc):
     s = []
-    # cover, then the inside of the cover left blank
-    s += [NextPageTemplate("body"), Spacer(1, 1), PageBreak(), Marker("nohead"), Spacer(1, 1), PageBreak()]
-    # half title
-    s += [Marker("nohead"), Spacer(1, 2.6 * inch), Paragraph("THE OMNI-COMPASS MANUAL", ParagraphStyle(
-        "ht", fontName="Serif-Bold", fontSize=22, leading=28, alignment=TA_CENTER, textColor=NAVY)), PageBreak()]
-    s += [Marker("nohead"), Spacer(1, 1), PageBreak()]
     # title page
     big = ParagraphStyle("tt", fontName="Serif-Bold", fontSize=34, leading=40, alignment=TA_CENTER, textColor=NAVY)
     sub = ParagraphStyle("st", fontName="Serif-Italic", fontSize=15, leading=20, alignment=TA_CENTER, textColor=INK)
-    s += [Marker("nohead"), Spacer(1, 1.3 * inch), Paragraph("THE OMNI-COMPASS", big), Paragraph("MANUAL", big),
+    s += [Marker("bare"), Spacer(1, 1.6 * inch), Paragraph("THE OMNI-COMPASS", big), Paragraph("MANUAL", big),
           Spacer(1, 14), GoldRule(FW, 1.5, 14),
           Paragraph("The Governor of Everything:<br/>Its Philosophy, Its Mathematics, Its Physics,<br/>and How to Wire It "
-                    "onto Your Stack", sub), Spacer(1, 0.4 * inch),
-          Image(str(PLATES / "compass_rose.jpg"), 2.3 * inch, 2.3 * inch * 1536 / 1024), Spacer(1, 0.35 * inch),
+                    "onto Your Stack", sub), Spacer(1, 1.2 * inch),
           Paragraph("AJ Dubra", ParagraphStyle("au", fontName="Serif-Bold", fontSize=14, alignment=TA_CENTER, leading=18)),
           Paragraph("Owner and Developer", CENTER), Spacer(1, 0.3 * inch),
           Paragraph("THE OMNI-COMPASS LLC", ParagraphStyle("pub", fontName="Sans-Bold", fontSize=11, alignment=TA_CENTER,
                                                            textColor=GOLD, leading=14)),
           Paragraph(EDITION, CENTER), PageBreak()]
     # copyright page
-    cp = ParagraphStyle("cp", parent=BODY, fontSize=8.8, leading=11.6, alignment=TA_LEFT, spaceAfter=7)
-    s += [Marker("nohead"), Spacer(1, 2.2 * inch)]
+    cp = ParagraphStyle("cp", parent=BODY, alignment=TA_LEFT, spaceAfter=7)
+    s += [Marker("nohead"), Spacer(1, 0.2 * inch)]
     for t in [
         "<b>The Omni-Compass Manual</b><br/>The Governor of Everything: Its Philosophy, Its Mathematics, Its Physics, and "
         "How to Wire It onto Your Stack<br/>" + EDITION,
@@ -785,9 +711,8 @@ def front_matter(doc):
         "is a statement about the software it ran on; only a hardware meter speaks for hardware. Nothing in this book "
         "is a promise of a particular saving on a particular system: the only number that applies to a system is the "
         "one its own paired runs produce, on its own receipt.",
-        "Front cover: the Omni-Compass identity plate. Back cover: the Omni-Compass unified control authority. Plates "
-        "1 to 19: the founder's plates of the theory.",
-        "Set in Liberation Serif and DejaVu Sans Mono. Built from the repository by <font name='Mono' size='8'>"
+        "Set in Liberation Serif and DejaVu Sans Mono, the text at 11 pt on a 16.5 pt line. Built from the repository "
+        "by <font name='Mono' size='11'>"
         "docs/book/build_book.py</font>; the book and the code change in the same commit.",
         "The Omni-Compass LLC · www.omni-compass.com"]:
         s.append(Paragraph(t, cp))
@@ -795,15 +720,15 @@ def front_matter(doc):
     return s
 
 
-def chapter_opener(num, title, kicker=None):
+def chapter_opener(num, title, kicker=None, top=0.9 * inch):
     k = kicker or f"CHAPTER {num}"
-    return [Marker("chapter", title=title, opener=True), Spacer(1, 0.9 * inch), Paragraph(k, KICK),
+    return [Marker("chapter", title=title, opener=True), Spacer(1, top), Paragraph(k, KICK),
             Heading(inline(title), H1, 1, toc_text=(f"{num}. {title}" if num else title), kind="chapter"),
             GoldRule(FW, 1.2, 16), Spacer(1, 6)]
 
 
 def front_chapter(doc, title, lines):
-    return recto(doc) + [Marker("chapter", title=title, opener=True), Spacer(1, 0.9 * inch),
+    return new_page() + [Marker("chapter", title=title, opener=True), Spacer(1, 0.9 * inch),
                          Heading(inline(title), H1, 1, kind="chapter"), GoldRule(FW, 1.2, 16)] + md_flow(renumber(lines), shift=2, strip=True)
 
 
@@ -815,7 +740,7 @@ The book is in eight parts, and it can be read in two ways.
 
 | You are | Read |
 |---|---|
-| CEO, board member, investor | the Foreword, the Executive Summary, Part One, the Results to Date, and Part Eight |
+| CEO, board member, investor | the Foreword, the Prelude, the Introduction, the Executive Summary, Part One, the Results to Date, and Part Eight |
 | CTO, architect, head of platform | Parts One to Four, then the eight wiring levels in Part Five, then Part Seven |
 | The engineer wiring it | everything, in order. Do not skip the wire check or the watch level |
 | Data-center, facility or energy operator | the Quick Reference card, Part One's chapter on the reflex, Part Five (levels five to seven, the processor and the data center under the servers), Part Six |
@@ -837,11 +762,19 @@ is value, the license, the seal and the history.
 without Omni-Compass. "Muscle" means any machine, service or controller Omni-Compass can read and set. "Knob" or
 "lever" is one setting on a muscle. "The band" is a knob's or a service reading's safe range. A step that writes to a
 system is marked **WRITES**. Every result carries its evidence class: T for a theorem, V for verification of the code,
-S for simulation, L for live software, P for a physical meter.
+S for our own models (modelled), L for live software, P for a physical meter.
 
 Some chapters gather documents that were written as the work went on, each at the moment its result came in. They
 are kept as they were written, because the record of how a result was reached is part of the proof. Where two
 chapters give different figures for the same thing, the later run and the State of Play govern."""
+
+
+def preface_lines():
+    """The book's preface: how the book reads, then the standards every page keeps (from the manual's preface)."""
+    man = MAN["Preface: How to Use This Manual"]
+    a = next(k for k, ln in enumerate(man) if ln.startswith("**The standards every page"))
+    b = next(k for k, ln in enumerate(man) if ln.startswith("**How this manual is organised."))
+    return PREFACE.splitlines() + [""] + man[a:b]
 
 
 def build():
@@ -849,78 +782,82 @@ def build():
     story = front_matter(doc)
     # contents
     toc = TableOfContents(levelStyles=[TOC1, TOC2, TOC3], dotsMinLevel=1, formatter=doc.toc_label)
-    story += recto(doc) + [Marker("nohead"), Spacer(1, 0.5 * inch), Paragraph("Contents", H1), GoldRule(FW, 1.2, 16), toc]
-    plates_list = [ln for ln in ((BOOK / "THEORY.md").read_text() + (BOOK / "DECLARATION.md").read_text()).splitlines()
-                   if ln.startswith("![")]
-    plates_list.append("![Plate 19. Empirical validation, experimental pathways, and the discipline of proof](plates/empirical_validation.jpg)")
-    story += recto(doc) + [Marker("nohead"), Spacer(1, 0.5 * inch), Paragraph("List of Plates", H1), GoldRule(FW, 1.2, 16)]
-    for ln in plates_list:
-        story.append(Paragraph(inline(re.match(r"!\[([^\]]*)\]", ln).group(1)), ParagraphStyle("pl", parent=BODY, alignment=TA_LEFT)))
+    story += new_page() + [Marker("nohead"), Spacer(1, 0.5 * inch), Paragraph("Contents", H1), GoldRule(FW, 1.2, 16), toc]
+    # the front matter, in full chapters, before a word about wiring (the founder's order of 14 October): the foreword,
+    # the preface, the prelude and the introduction, then the key, what a hooked-up system looks like, the card, the summary
     story += front_chapter(doc, "Foreword", MAN["Foreword"])
+    story += front_chapter(doc, "Preface", preface_lines())
+    story += front_chapter(doc, "Prelude: A Night on the Cluster", MAN["Prelude: A Night on the Cluster"])
+    story += front_chapter(doc, "Introduction: The Problem, the Idea and the Promise",
+                           MAN["Introduction: The Problem, the Idea and the Promise"])
     story += front_chapter(doc, "The key: GAIN, EVEN and LOSS", MAN["The key: GAIN, EVEN and LOSS"])
     story += front_chapter(doc, "What You Are Looking At", MAN["What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report"])
-    story += front_chapter(doc, "Preface", PREFACE.splitlines())
     story += front_chapter(doc, "Quick Reference: The Card for the Glove Box", MAN["Quick Reference: The Card for the Glove Box"])
     story += front_chapter(doc, "Executive Summary", MAN["Executive Summary"])
     story += front_chapter(doc, "Disclosures, Declarations and Disclaimers", doc_body("DISCLOSURES.md")[1])
     md_parts = ["# THE OMNI-COMPASS MANUAL", "", BANNER_MD, "", EDITION, "", FILED, "",
-                "The printable book of this text, with its covers, plates, contents and appendices: "
+                "The printable book of this text, with its contents and appendices: "
                 "`docs/OMNI_COMPASS_MANUAL.pdf`. Built by `docs/book/build_book.py`.", ""]
-    for sec in ("Foreword", "The key: GAIN, EVEN and LOSS", "What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report", "Executive Summary"):
-        md_parts += [f"## {sec}", ""] + MAN[sec]
-    md_parts += ["## Preface", ""] + PREFACE.splitlines()
-    md_parts += ["", "## Quick Reference: The Card for the Glove Box", ""] + MAN["Quick Reference: The Card for the Glove Box"]
+    md_parts += ["## Foreword", ""] + MAN["Foreword"] + ["## Preface", ""] + preface_lines() + [""]
+    for sec in ("Prelude: A Night on the Cluster", "Introduction: The Problem, the Idea and the Promise",
+                "The key: GAIN, EVEN and LOSS", "What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report",
+                "Quick Reference: The Card for the Glove Box", "Executive Summary"):
+        md_parts += [f"## {sec}", ""] + MAN[sec] + [""]
 
     part_no = 0
     words = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
-    first = True
+    first, after_part = True, False
     for item in OUTLINE:
         if item[0] == "PART":
             title, blurb = item[1], item[2]
-            story += recto(doc)
+            story += new_page()
             if first:
                 story.append(Marker("body")); first = False
-            story += [Marker("nohead"), Marker("chapter", title=title, opener=True), Spacer(1, 2.4 * inch),
+            story += [Marker("nohead"), Marker("chapter", title=title, opener=True), Spacer(1, 0.3 * inch),
                       Paragraph(f"PART {words[part_no].upper()}", ParagraphStyle("pk", fontName="Sans-Bold", fontSize=13,
                                 alignment=TA_CENTER, textColor=GOLD, leading=16)), Spacer(1, 10),
                       Heading(inline(title), ParagraphStyle("pt", fontName="Serif-Bold", fontSize=30, leading=36,
                               alignment=TA_CENTER, textColor=NAVY), 1, toc_text=f"Part {words[part_no]}. {title}", kind="part"),
                       Spacer(1, 12), GoldRule(FW, 1.5, 14), Spacer(1, 10),
                       Paragraph(inline(blurb), ParagraphStyle("pb", parent=BODY, fontName="Serif-Italic", fontSize=12,
-                                leading=17, alignment=TA_CENTER, leftIndent=40, rightIndent=40))]
+                                leading=18, alignment=TA_CENTER, leftIndent=40, rightIndent=40))]
             md_parts += ["", f"# Part {words[part_no]}. {title}", "", f"*{blurb}*", ""]
-            if len(item) > 3:
-                story += [PageBreak()] + plate(PLATES / f"{item[3]}.jpg",
-                                               "Plate 19. Empirical validation, experimental pathways, and the discipline of proof")[1:-1]
             part_no += 1
+            after_part = True
             continue
         if item[0] == "BACK":
-            story += recto(doc) + [Marker("nohead"), Marker("chapter", title="Back Matter", opener=True),
-                                   Spacer(1, 3.0 * inch),
+            story += new_page() + [Marker("nohead"), Marker("chapter", title="Back Matter", opener=True),
+                                   Spacer(1, 0.3 * inch),
                                    Heading("Back Matter", ParagraphStyle("bm", fontName="Serif-Bold", fontSize=30, leading=36,
                                            alignment=TA_CENTER, textColor=NAVY), 1, toc_text="Back Matter", kind="part"),
                                    GoldRule(FW, 1.5, 14)]
             md_parts += ["", "# Back Matter", ""]
+            after_part = True
             continue
         title, src = item
         num = CHAPNUM.get(title)
         flow = chapter_flow(src)
-        lead = []
-        while flow and isinstance(flow[0], CondPageBreak):      # a plate that opens the chapter faces its first page
-            lead += flow[1:4] + [PageBreak()]; flow = flow[5:]
-        story += [PageBreak(), Marker("chapter", title=title)] + lead
-        story += chapter_opener(num, title, None if num else ("APPENDIX" if title.startswith("Appendix") else "BACK MATTER"))
+        story += ([] if after_part else [PageBreak()]) + [Marker("chapter", title=title)]
+        story += chapter_opener(num, title, None if num else ("APPENDIX" if title.startswith("Appendix") else "BACK MATTER"),
+                                top=0.25 * inch if after_part else 0.9 * inch)
         story += flow
+        after_part = False
         md_parts += ["", f"## {str(num) + '. ' if num else ''}{title}", ""]
         md_parts += md_text(src)
-    # back cover on an even page
-    story += [NextPageTemplate("back"), PageBreak(), _ToRecto(doc, even=True), Spacer(1, 1)]
+    # the notice at the end of the book, as at its start
+    story += [Spacer(1, 24), GoldRule(FW, 1.2, 14),
+              Paragraph(inline(BANNER_MD[2:]), ParagraphStyle("end", parent=BODY, alignment=TA_LEFT))]
     doc.multiBuild(story)
     OUT_MD.write_text(normalize_markdown("\n".join(md_parts) + "\n")[0], encoding="utf-8")   # the notice on top and at the end
     print(OUT_PDF, doc.page, "pages")
 
 
 def md_text(src):
+    """The book's one-file text for a chapter, without images (14 October)."""
+    return [ln for ln in _md_text(src) if not re.match(r"^!\[[^\]]*\]\([^)]+\)\s*$", ln)]
+
+
+def _md_text(src):
     kind, key = src
     if kind == "T":
         return THEORY[key]
@@ -945,7 +882,8 @@ def md_text(src):
         if key == "license":
             return ["The license is the file `LICENSE`."]
         if key == "contact":
-            return ["The Omni-Compass LLC. Owner and developer: AJ Dubra. www.omni-compass.com"]
+            return ["The Omni-Compass LLC. Owner and developer: AJ Dubra. Main office infrastructure: toll-free direct "
+                    "1-888-339-9551, system route asset 1-888-DEX-YLL-1. www.omni-compass.com"]
     return []
 
 

@@ -57,7 +57,7 @@ is published (`LICENSE`, section 9). A signed Enterprise License governs its own
 venue in the Delaware state courts and the United States District Court for the District of Delaware (`LICENSE`,
 section 19). The Omni-Compass LLC is based in Florida.
 
-**Who do I contact?** The Omni-Compass LLC, 1-888-339-9551 (1-888-DEX-YLL-1), www.omni-compass.com.
+**Who do I contact?** The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
 
 ---
 

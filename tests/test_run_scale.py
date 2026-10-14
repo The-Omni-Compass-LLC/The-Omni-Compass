@@ -133,6 +133,19 @@ class Conductor(unittest.TestCase):
             for k in g.KUBE:
                 self.assertLess(g.kube_minutes(size, k, False), 330, (size, k))
 
+    def test_azure_and_reports_go_before_the_grid(self):
+        g = self.g
+        q, run, done = {"status": "queued"}, {"status": "in_progress"}, {"status": "completed"}
+        aks = ".github/workflows/aks-metered.yml"
+        self.assertTrue(g.waits_for_a_runner(aks, [done, done, q, q]))          # the next repetition waits for a runner
+        self.assertFalse(g.waits_for_a_runner(aks, [done, run, q, q]))          # one at a time: waits for its own matrix
+        self.assertTrue(g.waits_for_a_runner(".github/workflows/six-kube.yml",
+                                             [dict(done, name="run (tower, 100, 1)"), dict(q, name="report")]))
+        self.assertFalse(g.waits_for_a_runner(".github/workflows/six-kube.yml", [dict(q, name="run (tower, 100, 2)")]))
+        self.assertFalse(g.waits_for_a_runner(".github/workflows/benchmark-reps.yml", [q]))
+        self.assertIn("verify.yml", g.FIRST)
+        self.assertIn("archive-run.yml", g.FIRST)
+
     def test_started_runs_read_back_and_not_started_again(self):
         g = self.g
         first = g.next_dispatches({})[:12]

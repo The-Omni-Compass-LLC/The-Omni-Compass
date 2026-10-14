@@ -167,21 +167,63 @@ declaration, disclosure and disclaimer is made once, in `DISCLOSURES.md`, and go
 
 I built Omni-Compass to sit on top of what already exists. Kubernetes, the GPU driver, the building controller, the
 battery inverter, the robot's servo loop: those are muscles, and they are good muscles. What none of them has is one
-brain that reads all of them at once, holds each of them in the middle of its safe range, and puts every setting back
-exactly where it found it when it stops. That brain is Omni-Compass.
+brain that reads all of them at once, holds each of them inside its safe range, and puts every setting back exactly
+where it found it when it stops. That brain is Omni-Compass.
 
-This manual is the whole of it: what the governor is, the mathematics it runs on, how its nervous system reads and
-writes, how it is wired to each kind of machine, how to turn it on one level at a time, how to switch it off, and how
-to prove on your own system what it does. Keep it with the code. When the code changes, this manual changes in the same
-commit.
+**Every machine already has a controller.** Kubernetes has its autoscaler. A graphics card has its firmware. A building
+has its thermostat loop, a battery has its charge controller, a power grid has its tap changers, and a robot has its
+servo. Engineers spent decades making these controllers safe, and they are. But each one was built to watch one thing
+and to protect that one thing. None of them sees the whole body. None of them knows that the cooling loop is holding
+back the processor, or that the autoscaler is adding machines the database cannot feed. So each one plays it safe in
+the middle of its range, because playing it safe is its whole job. The headroom between the middle and the edge is
+paid for every hour and almost never used.
+
+**That gap is what I set out to close.** Omni-Compass is a **supervisory governor**: one brain over the muscles you
+already run. It never replaces them and it never competes with them. It reads them, it decides, and it writes one
+setting at a time through a two-way plug: one wire in, one wire out. Before it writes anything, it takes a snapshot.
+When it stops, every setting goes back to that snapshot.
+
+**Why a compass.** A compass always points home. Every muscle has a safe band, and the compass holds the muscle inside
+that band, with a cushion of 5% at each edge. It works with two forces that pull against each other, one toward more
+and one toward less, and it moves smoothly, never hammering. A system that is closed, bounded and pulled toward a
+center cannot run away. That one idea is the root of the whole engine, and the first part of this book explains it.
+
+**The rule I will not bend: do no harm.** Omni-Compass must never leave a system worse than its own native controller
+left it. Where it cannot bring a muscle a gain, that muscle stays native. This is not a promise on paper. It is a
+trigger in the code (`omnicompass/verdict.py`), checked on the muscle itself, step after step. A step that costs the
+muscle more for each piece of work is undone.
+
+**The max is the default.** Most tuning tools try to shave a little off. Omni-Compass rides the edge instead: every
+muscle runs up to its own limit, read live from the system, never past it and never below what native gives. The energy
+it takes to do more work is **power given**, shown beside the work, the speed and the wear it bought. It is never
+called a loss. Anyone can turn the dial down from the max. Nobody has to.
+
+**One pedal.** I wanted it to drive like an electric car. Push the pedal for more, lift off for less. Lift off all the
+way and the settings drift back toward native. Reset hands everything back. If the governor ever crashes, its lease runs
+out and the plug walks every setting home, step by step. The kill switch is separate and instant, and it exists for
+security, not for daily driving.
+
+**How I want it judged.** Every benchmark in this book has exactly two arms: native, and Omni-Compass on top of native.
+There is no third arm and no other name. Every result was run three separate times, under rules written down before
+the first run, and every row is shown, losses included. Each reading is one word, **GAIN**, **EVEN** or **LOSS**,
+decided by what the gauge is for. A result from our own model is labeled as a model; a result from live software is
+labeled as live software; only a meter speaks for hardware. Where we lost, the book says so, and we went to find out
+why. Nobody outside The Omni-Compass LLC has reviewed or approved these results, and every table says that too.
+
+**What this book holds.** This manual is the whole of it: what the governor is, the mathematics it runs on, how its
+nervous system reads and writes, how it is wired to each kind of machine, how to turn it on one level at a time, how to
+switch it off, and how to prove on your own system what it does. Keep it with the code. When the code changes, this
+manual changes in the same commit.
 
 **On this edition.** This edition is written for the referee and the underwriter as much as for the engineer. Every
-result in it was run three separate times on a frozen, fingerprinted engine, under rules written before the first run, and
-is reported with every loss beside every gain. Where a number is from a model it says so; where a test could not see an
-effect it says so; where something has not been shown it says so, in its own section. The questions a careful reader will
-ask are asked here first, in section 3.5 beside each result and in section 16.7 as a list, and answered where an answer
-exists. Nothing in this manual asks to be believed on our word: every table names the runs it was made from, every run's
-raw files are in the repository, and every table can be rebuilt from them by the tool it names.
+result in it was run three separate times on a frozen, fingerprinted engine, under rules written before the first run,
+and is reported with every loss beside every gain. Where a number is from a model it says so; where a test could not
+see an effect it says so; where something has not been shown it says so, in its own section. Nothing in this manual asks
+to be believed on our word: every table names the runs it was made from, every run's raw files are in the repository,
+and every table can be rebuilt from them by the tool it names.
+
+**Where to begin.** Read the front matter first. It tells you what you are looking at before it asks you to touch
+anything. Then wire it one level at a time, watch it before you let it write, and judge it by your own receipts.
 
 **AJ Dubra**
 Founder, The Omni-Compass LLC
@@ -228,7 +270,7 @@ will find, the following discipline throughout, because it is the discipline the
    When Omni-Compass loses, the first suspect is our own wiring, native setup or scoring; when that is fixed, the test is
    run again and the loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut.
 5. **Nothing read across engines.** The engine is frozen and fingerprinted (`OMNI_V1.json`, `OMNI_V2.json`,
-   `OMNI_V3.json`). Any change to a rule, gain, guard, preset or muscle makes the next version, and every result is run
+   `OMNI_V3.json`, `OMNI_V5.json`). Any change to a rule, gain, guard, preset or muscle makes the next version, and every result is run
    again on it. Every table made by rule checks the engine of each run it reads and refuses to mix them.
 6. **The raw files live with the code.** Every finished run's files are copied into `results/live/raw/run-<id>/` with one
    SHA-256 manifest per repetition, and every table names the runs and the commit it was made from. Anyone with the
@@ -249,6 +291,146 @@ maintenance. Part VI is proof: paired runs and receipts, evidence classes, the f
 the Omni index, and every result to date with its losses, followed by the threats to validity we state ourselves and the
 open program. Part VII is the code, the C++ twins and the license. The back matter holds the glossary, every command,
 the file map, the equations in full, the metrics, troubleshooting and the evidence map.
+
+## Prelude: A Night on the Cluster
+
+This is a story, not a result. It follows one night on one cluster to show, in plain order, what each part of this
+book does. The shop, the times and the settings are made up for the story. The measured results are in the chapters
+on proof, each with its evidence class.
+
+**9:00 p.m. The shop is quiet.** An online store runs on Kubernetes. Its native controllers are the ones almost
+everybody uses. The Horizontal Pod Autoscaler watches the average processor load and adds copies of the web service
+(pods) when that load passes its target. The cluster autoscaler adds machines when the pods no longer fit. A careful
+engineer picked their settings months ago, for the worst day she could imagine, and she picked them well. Tonight the
+cluster runs on its floor of two machines, and every customer gets an answer in a blink.
+
+**A week earlier, Omni-Compass went on in watch mode.** For seven days it read every gauge and wrote nothing. It
+learned how fast each pod starts, how the response time moves when the load moves, and where each setting's safe band
+lies. Then the team ran the wire check: every reading came from the place it claimed, every lever moved the thing it
+claimed, and every write was read back. Only then did they turn it to govern. Every setting it would touch was saved in
+a snapshot first.
+
+**9:40 p.m. The sale starts.** In two minutes the requests double. The native autoscaler does exactly what it was
+built to do, but it is built to wait: it needs the average load to climb, then it needs a decision, then each new pod
+needs time to start. While it waits, customers wait. With Omni-Compass on top, the compass sees the response time slide
+toward the edge of its band and into the cushion. It pushes. It raises the autoscaler's floor of pods, a setting the
+autoscaler already respects, so new pods start before the average catches up. It does not fight the autoscaler and it
+does not go around it. It moves one setting, through the plug, and reads it back.
+
+**10:15 p.m. The database starts to strain.** More web pods mean more connections to the database, and the database
+has a limit of its own. A controller that watches only the web service would keep adding pods and make the jam worse.
+Omni-Compass sees the whole body. One body, one brain: before it takes the next step for the web service, it checks
+what that step would do to every other part. The step that would push the database past its own cushion is refused.
+Nothing is pushed into a loss to buy a gain somewhere else. The web service holds where the database can still keep up,
+and the queue drains instead of growing.
+
+**11:30 p.m. The rush fades.** The pedal lifts. Omni-Compass does not drop everything at once, because a sudden drop is
+how systems stumble. It eases each setting back toward native along a smooth curve. The extra machines go away as the
+work goes away. The energy the cluster used during the rush shows up in the report as power given, beside the work it
+bought and the minutes customers did not spend waiting.
+
+**1:00 a.m. Idle.** The pedal is lifted all the way. The cluster sits on its floor of two machines again, exactly
+where the engineer left it. Omni-Compass keeps reading every second. Staying native is its live decision, made again
+each second, not a verdict from some earlier run.
+
+**3:12 a.m. Something breaks.** An upgrade restarts the machine that runs the governor, and Omni-Compass stops in the
+middle of its work. Nobody is awake. Nothing bad happens. The governor's lease runs out, and the plug walks every
+setting back to its snapshot, step by step. The native controllers keep running as they always have, because they never
+stopped. When the governor comes back, it starts from what it reads, not from what it remembers.
+
+**7:00 a.m. The morning report.** On a live system, the proof does not come from a feeling that the night went well.
+It comes from paired runs: the same work, run once on native and once with Omni-Compass on top, and compared gauge by
+gauge. Every gauge gets one word. Time waited that fell reads **GAIN**. Work done that rose reads **GAIN**. A difference
+inside the noise reads **EVEN**, and the report says so plainly. A gauge that moved the wrong way reads **LOSS**, and it
+stays in the report until its cause is found and fixed. The energy spent on extra work reads **power given**, never a
+loss.
+
+**What the night shows.** Every part of that night is a chapter of this book:
+
+- the watch mode and the wire check are in the chapters on wiring, level by level;
+- the band, the cushions and the two forces are in the chapters on the compass;
+- one body, one brain is the reflex rule, in the first part;
+- the snapshot, the lease and the kill switch are in the chapters on operating it;
+- the paired runs and the three words are in the chapters on proof.
+
+Read the rest of the front matter before you touch a wire. It tells you what you are looking at and how to read
+what it tells you.
+
+## Introduction: The Problem, the Idea and the Promise
+
+**The problem.** Every computer system, and almost every modern machine, is run by many small controllers. Each one
+was tuned alone, by a different team, for a different worst day. The autoscaler does not know about the cooling. The
+cooling does not know about the batteries. The database's memory setting does not know how many web servers are about
+to arrive. Each controller keeps its own number safe, and that is all it was asked to do.
+
+The result is a system that is safe but slow to answer and quick to waste. It shows up in three ways:
+
+- **Waiting.** Work piles up while a controller reacts late. An autoscaler that waits for the average load to climb
+  adds machines after the customers are already in line.
+- **Waste.** Settings chosen for the worst day stay in place on every other day. Machines stay on "just in case," and
+  limits sit far below what the hardware can safely do.
+- **Blind spots.** One controller fixes its own number by pushing a problem onto another. More web servers can mean a
+  jammed database. More cooling can mean a power line near its limit.
+
+Engineers fill these gaps by hand, with fixed settings and long runbooks. That works, but it leaves the headroom
+between the safe middle and the safe edge unused almost all of the time.
+
+**The idea.** Put one supervisory brain on top of the controllers you already run. Let it read every gauge, hold each
+setting inside its safe band, push toward the edge where the push buys real work, and pull back before any edge is
+reached. That brain is Omni-Compass. It works in four steps, every second:
+
+1. **Read.** It reads each muscle's own gauges through the plug: load, response time, temperature, power, queue length.
+2. **Decide.** The compass law places each reading in its band, from calm to the line, and sets the push and the pull.
+3. **Write.** It writes one setting through the plug and reads it back to be sure the write landed.
+4. **Check.** The verdict compares the muscle with and without the step; the body guard checks every other part. A
+   step that costs more than it buys is undone.
+
+**What Omni-Compass is not.**
+
+- It is **not a replacement** for your controllers. Native keeps running underneath, always. Omni-Compass only moves
+  settings that native already exposes and respects.
+- It is **not a black box**. Every decision is written to a log, with the reading that caused it and the setting it
+  changed.
+- It is **not a one-time tuning script**. It decides again every second, and staying native is one of its decisions.
+- It is **not a cost-cutter first**. It gives power where the power buys work or speed, and it shows that power beside
+  what it bought.
+
+**The promise, in three parts.**
+
+1. **Do no harm.** A step stays only where the muscle is no worse for it, measured on the muscle itself. Where
+   Omni-Compass cannot bring a gain, the muscle stays native.
+2. **Everything comes back.** Every setting is saved before the first write and restored when Omni-Compass stops. If
+   the governor crashes, its lease runs out and the settings walk home on their own. A separate kill switch stops
+   everything at once.
+3. **Every claim is checked.** Each benchmark compares two arms, native and Omni-Compass on top of native, on the same
+   machines with the same work. Each runs three separate times. Each reading is one word, GAIN, EVEN or LOSS, decided
+   by what the gauge is for. Each result carries its evidence class: **P** for a physical meter, **L** for live
+   software, **S** for our own models. A model is never shown as proof of hardware.
+
+**What it governs.** The catalog names 1,107 muscles in 70 families, the settings that operators everywhere already
+turn by hand: machine pools and replicas, power caps and clock limits, cache sizes and connection pools, cooling
+setpoints and battery reserves, robot speeds and drone-swarm settings, and many more. They are grouped into four realms
+(compute, AI and cloud; physics, robotics and autonomy; energy, facility and industry; distribution and specialized
+systems) and run together as six organisms, from one realm alone up to the whole tower at once. The muscles in the
+catalog are modelled (class S). The real controllers it has been run on top of, such as Kubernetes and the databases,
+are live software (class L). The chapter that follows the key, "What You Are Looking At," shows which is which.
+
+**What you need before you wire it.**
+
+- **A license for any use beyond evaluation.** Production use requires a signed, paid Omni-Compass Enterprise License.
+- **Read access first.** Omni-Compass starts in watch mode: it reads and computes, and writes nothing.
+- **The wire check.** Every reading must come from where it claims, every lever must move what it claims, and every
+  write must read back. Nothing writes until the check passes.
+- **Your own service line.** The response time or other limit your service must meet comes from your own service
+  objectives, not from ours.
+- **Paired runs on your own system.** The only number that applies to your system is the one your own paired runs
+  produce, on your own receipt.
+
+**How to read what follows.** Next comes the key to the three words, then "What You Are Looking At," which shows what a
+hooked-up system looks like and how to read its report. The Quick Reference card is the page to keep beside the system.
+The Executive Summary gives the results in brief, and the Disclosures make every declaration once. After that the book
+turns to the theory, the mathematics, the physics, the body, and only then to the wiring, the operation and the proof.
+Read in that order, nothing in the wiring chapters should surprise you.
 
 ## Quick Reference: The Card for the Glove Box
 
@@ -308,8 +490,16 @@ it, read back, and the record removed.
 | a meter that is blind or late | nothing: blind means hold; it moves nothing it cannot see | section 7.3 |
 | your results point the other way from the published ones | presume the wiring first, not the law | `DISCLOSURES.md`, section 4 |
 
-**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, 1-888-339-9551 (1-888-DEX-YLL-1), www.omni-compass.com.
+**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
 Security reports: the process in `SECURITY.md`, never a public issue.
+
+**What the letters of the number mean.** Read in order, DEX-YLL-1 is the way the engine runs:
+
+| DEX | YLL | 1 |
+|---|---|---|
+| **Data Exchange**: the input. In software, data exchange is how one system's readings reach another. Here it is the two-way plug, one wire in and one wire out: the system's own readings come in, Omni-Compass's settings go out. | **Yield Limit Line**: the boundary. In engineering science, the yield limit is the most load a material can carry and still spring back unharmed; past it, the damage is permanent. Omni-Compass runs every muscle up to its own yield limit line, read live, and never past it. | **1**: the output. In code, 1 is true, the finished state; in science, 1 is unity, the whole. Here it is one closed loop: one body, one brain, every result read back and the next step decided from it. |
+
+Read as one sentence: Omni-Compass takes the system in through a Data Exchange (DEX), runs every setting up to its Yield Limit Line (YLL) and never past it, and closes it all into one loop (1). Science and software people read each part on sight.
 
 ## Executive Summary
 
@@ -381,7 +571,9 @@ written before the run, counted only when all three of our runs agree, and repor
 
 ## Table of Contents
 
-**Front Matter** - Notice and Disclaimer; Foreword; Preface; Quick Reference: The Card for the Glove Box; Executive Summary
+**Front Matter** - The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
+Prelude: A Night on the Cluster; Introduction: The Problem, the Idea and the Promise; Quick Reference: The Card for the
+Glove Box; Executive Summary
 
 **Part I - The Governor**
 1. What Omni-Compass Is
@@ -2527,7 +2719,7 @@ fingerprint and heads itself with a warning if any run is not the engine it clai
 **The three-run rule.** Every benchmark runs as **A, B and C**, three separate GitHub runs on the same frozen bytes.
 Every judged row gets one of three readings, and all three runs are shown beside it:
 
-- **GAIN** or **LOSS in all three of our runs** (a resource spent that rose reads **LOSS**, never a loss): the same sign in all three runs, each with its 95% interval clear of
+- **GAIN** or **LOSS in all three of our runs** (a resource spent that rose reads **power given**, never a loss): the same sign in all three runs, each with its 95% interval clear of
   zero.
 - **No difference beyond the noise**: in at least one run the interval includes zero, so native and omni could not be
   told apart on that measure. That is the result, stated as such, with the count of runs it holds in.
@@ -3215,6 +3407,7 @@ any one of the three can tell whether the files in front of them are the files t
 | Power given | a resource spent or held that rose: what Omni put in to buy the work and speed beside it; shown, never called a loss |
 | Cover | a knob's hard range; every write is clipped to it |
 | Cushion | the 5% at each edge of the compass, 10% in all |
+| DEX-YLL-1 | the company's number, 1-888-DEX-YLL-1, read in order as the engine runs: DEX, Data Exchange (the input, the two-way plug); YLL, Yield Limit Line (the boundary: every muscle up to its own yield limit, never past it); 1, one closed loop (the output; in code 1 is true, in science 1 is unity) |
 | Fail up | the return to full capacity the moment service crosses the wall or a sense goes blind |
 | Governor | the process that reads, decides and writes; Omni-Compass |
 | Muscle | any machine, service or controller Omni-Compass reads and sets |
@@ -3228,6 +3421,7 @@ any one of the three can tell whether the files in front of them are the files t
 | Pool (Azure) | one machine family under Azure's autoscaler with its own ceiling; several pools make the fleet |
 | Profile | a named set of the compass's settings for one kind of work: service (the default) or batch |
 | Race | full speed at once while work waits, so a burst is never served slowly |
+| Yield limit line | a muscle's own limit, read live: Omni-Compass takes it right up to the line and never past it, as an engineer loads a material up to its yield limit, the most it carries and still springs back unharmed |
 | Speed floor | the clock a card reaches on its own while busy, learned from its own meter; the governor never sets the ceiling under it |
 | Receipt | the paired record of native against Omni-Compass for one run |
 | Snapshot | a knob's value read once before the first write; the restore point |

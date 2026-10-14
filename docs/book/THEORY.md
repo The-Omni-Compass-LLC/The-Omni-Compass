@@ -2,8 +2,6 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-![Plate 1. The Unified Circle Principle](plates/unified_circle_principle.jpg)
-
 Omni-Compass begins with one idea: a system that is closed, bounded and pulled toward a center cannot run away, and
 everything it does is a return. I call this the closed circle. This chapter states the principle as I hold it, in its
 mathematical form, and then says plainly which parts of it the software uses and which parts belong to the wider theory
@@ -36,8 +34,6 @@ when I say that a closed circle holds the answer to every question that can be p
 
 ## Closure, admissibility, boundedness
 
-![Plate 2. Closed-circle structural architecture of the unified law](plates/closed_circle_architecture.jpg)
-
 The theory sets five requirements on any law that claims to close the circle:
 
 | Requirement | Meaning | In the engine |
@@ -50,9 +46,6 @@ The theory sets five requirements on any law that claims to close the circle:
 
 ## The closed circle tested
 
-![Plate 3. The closed circle tested](plates/closed_circle_tested.jpg)
-
-
 The canonical evolution law has four parts: deviation is damped nonlinearly and coupled to alignment and to the basin;
 alignment relaxes toward unity and responds to deviation; the basin's curvature evolves with internal structure; damping
 absorbs excess growth and redistributes energy. Bounded random noise is permitted; divergence is not. A cycle is
@@ -61,9 +54,6 @@ advances stepwise under a stable numerical integrator with boundedness checks. U
 always the same three checks: no divergence, bounded, recurring.
 
 ## Symmetry and conservation in the closed circle
-
-![Plate 4. Symmetry principles and conservation laws in the closed circle](plates/symmetry_conservation.jpg)
-
 
 Every conservation law is the shadow of a symmetry (Noether). The closed circle carries four:
 
@@ -80,9 +70,6 @@ conservation, and cross-scale invariance (scale-independent patterns).
 
 ## Scale invariance
 
-![Plate 5. Scale invariance and structural universality](plates/scale_invariance.jpg)
-
-
 The theory claims that one bounded nonlinear action has the same form at every scale: cosmological (curvature
 geometry, compression and expansion, thermodynamic cycling), galactic (rotation curves, mass-energy distribution),
 stellar (gravitational compression, fusion equilibrium, radiative transport), atomic (electron displacement, orbital
@@ -93,18 +80,12 @@ flow alignment, S the structural curvature or basin geometry, B the redistributi
 
 ## The lineage of unification
 
-![Plate 6. The lineage of unification](plates/lineage_of_unification.jpg)
-
-
 Each step in the history of physics unified two things that had been separate: geometry formalized structure; motion
 was unified across earth and sky; astronomy revealed recurrence; fields replaced action at a distance; curvature unified
 gravity, though singularities remained; symmetry came to govern the quantum realm. The closed circle is offered as the
 next step: unity without divergence, a single bounded law with no singularity and no runaway.
 
 ## What is tested and what is theory
-
-![Plate 7. A candidate for a closed, unified law](plates/candidate_closed_law.jpg)
-
 
 The software uses the engineering core of this principle, and every part of that core is checked:
 
@@ -119,9 +100,6 @@ action - are the theory from which Omni-Compass was built. They are stated here 
 the design comes from. They are not claims that the software has measured, and no result in this book depends on them.
 
 # The Four-Piece Engine
-
-![Plate 8. The Omni-Compass Grand Theory: the four pieces](plates/grand_theory.jpg)
-
 
 The engine is built in four pieces, stacked like the stages of a press, each feeding the next:
 
@@ -145,22 +123,11 @@ coherent, bounded, admissible, stable - one law, one return, one cycle.
 | 3. Coherence evolution | gauge field theory; fluid dynamics; field theory; discrete mathematics; solid-state physics; plasma physics |
 | 4. Complex systems and integration | astrophysics; consciousness and information integration; biological systems and self-organization; universal mathematical structure; systems theory and complex adaptive systems; the unified Omni-Compass domain (the unified admissible state) |
 
-![Plate 9. The unified container of all reality: 24 domains, four-piece engine, one closure law](plates/four_piece_engine.jpg)
-
-![Plate 10. The four quadrants and the compression process](plates/unified_container.jpg)
-
-![Plate 11. The closure law and the closed-circle engine](plates/closure_law.jpg)
-
 **In the software,** the four pieces appear as the engine's state equations (piece 1: deviation, alignment, memory and
 basin), the basin potential and its flow (piece 2), the bath that absorbs and redistributes (piece 3), and the one
 governor that couples every muscle to one law with no outside authority (piece 4).
 
 # The Compass
-
-![Plate 12. The Omni-Compass rose](plates/compass_rose.jpg)
-
-![Plate 13. The Omni-Compass Principle](plates/omni_compass_principle.jpg)
-
 
 The Omni-Compass rose is the whole mechanism drawn as one picture.
 
@@ -201,9 +168,6 @@ wave function of the eigenvalue equation.
 
 ## Geometric funneling and basin formation
 
-![Plate 14. Geometric funneling and basin formation](plates/geometric_funneling.jpg)
-
-
 A basin forms in three stages. While the driving tension T is low, curvature is weak and there is no dominant basin:
 flows spread outward. As T increases, curvature concentrates and a positive feedback loop begins. Then a stable
 geometric funnel forms: self-reinforcing curvature, finite depth, bounded deviation, with the boundary abs(E) <= E_max
@@ -228,9 +192,6 @@ time spent past the service line, because the lower wall pushed capacity away wh
 The upper wall alone remains a candidate.
 
 ## The dual-basin engine
-
-![Plate 15. The Omni-Compass dual-basin engine](plates/black_hole_engine.jpg)
-
 
 The dual-basin engine is a recursive transform with five stages:
 
@@ -323,11 +284,6 @@ them. Because that changes the engine, v4 carries its own fingerprint, the packa
 this book is run again on it. No result is read across engines.
 
 # Closing the Circle in the Engine
-
-![Plate 16. Mathematical integration](plates/mathematical_integration.jpg)
-
-![Plate 17. The engine core: the governing law in motion](plates/engine_core.jpg)
-
 
 Each state of the engine was checked against the closed-circle conditions:
 

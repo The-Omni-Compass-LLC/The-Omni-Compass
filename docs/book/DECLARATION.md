@@ -50,8 +50,6 @@ the basin. Whatever the engine reaches, it reaches by the flow of its own equati
 
 ## The symbol chart
 
-![Plate 18. The equation form and the symbol chart](plates/equation_chart.jpg)
-
 | Symbol | Meaning |
 |---|---|
 | E | Error, the misalignment energy |

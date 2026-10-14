@@ -46,7 +46,7 @@ below) is native's work on the least energy, kept and tested on every muscle.
   and the machines started last first, never below a pool's twin. An axis inside a body keeps its everyday speed: at the
   peak hour the organisms run, the bone almost never has room for its worst case, and in the development runs its peak
   gave the body nothing while its changed rhythm crossed neighbours at their own limits.
-- **One pedal, no brake.** Push for more, lift off for less; lifting hands the setting back toward native. At idle the
+- **One pedal.** Push for more, lift off for less; lifting hands the setting back toward native. At idle the
   pool lifts all the way to its breathing floor (two machines) and wakes straight to the work. **The lease**: at 80% of
   every modelled run the brain is cut and the plug walks every setting back to native over 24 decisions (no jump the body
   must absorb at once); a floor that only held a pool at its twin's count adds nothing to walk back and is let go at once
