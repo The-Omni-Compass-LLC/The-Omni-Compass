@@ -472,13 +472,15 @@ fi
 kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json > "$OUT_DIR/pod_watch.json" 2>"$OUT_DIR/pod_watch.err" &
 watch_pid=$!
 omni_pid=""
-# the governor's full decision every OMNI_INTERVAL seconds (60 unless the run sets it; the cloud sets 10, the founder's
-# order of 14 October, night: six decisions a minute, faster than the autoscaler's own 15-second check); its fast checks
-# (the scheduling floor, the pod reflex, conveyance) every 5 s either way
-export OMNI_INTERVAL="${OMNI_INTERVAL:-60}"
+# the governor's full decision every OMNI_INTERVAL seconds (60 unless the run sets it; the cloud sets 5, the founder's
+# order of 14 October, night: twelve decisions a minute, three times as fast as the autoscaler's own 15-second check), and
+# its fast checks (the scheduling floor, the pod reflex, conveyance on every third) every OMNI_FLOOR_INTERVAL seconds (5
+# unless the run sets it; the cloud sets 2.5). The fast checks run only between decisions, so their period is kept under
+# the decision's: at a 5 s decision and 2.5 s checks, conveyance still comes every 15 s, as at a 60 s decision
+export OMNI_INTERVAL="${OMNI_INTERVAL:-60}" OMNI_FLOOR_INTERVAL="${OMNI_FLOOR_INTERVAL:-5}"
 # the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
 start_controller() {   # $1 decisions to make, $2 log file
-  nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval "$OMNI_INTERVAL" --floor-interval 5 --reflex-window-s 15 \
+  nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval "$OMNI_INTERVAL" --floor-interval "$OMNI_FLOOR_INTERVAL" --reflex-window-s 15 \
     --iterations "$1" --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
     --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
     --power-cmd "bash scripts/kind_power.sh" --site-limit-w "$SITE_LIMIT_W" \
@@ -616,7 +618,7 @@ elif [ -z "$NATIVE" ]; then
     # with no write is valid when the governor recorded its decisions, each with its reasons in the audit, and the reset
     # below still checks every setting is the operator's; a governor that recorded no decisions was not running
     decisions=$(grep -c '"decision"' "$OUT_DIR/audit.jsonl" || true)
-    want=$(( DURATION / OMNI_INTERVAL - 1 )); [ "$want" -ge 1 ] || want=1
+    want=$(( DURATION / 60 - 1 )); [ "$want" -ge 1 ] || want=1
     [ "$decisions" -ge "$want" ] || { echo "Omni made no write and recorded $decisions decisions (at least $want expected): the governor was not running"; exit 1; }
     echo "Omni-Compass stayed native: $decisions decisions recorded, no write" | tee "$OUT_DIR/omni_stayed_native.txt"
   fi

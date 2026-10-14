@@ -1117,15 +1117,18 @@ here before any run at the tune-down; nothing else in the receipt or the reading
 
 No person touches a setting in either arm of any run; that is stated in every receipt beside the rows.
 
-## Six decisions a minute in the cloud, and two arms only (the founder's orders, 2026-10-14, night, before any run at the tune-down)
+## Twelve decisions a minute in the cloud, and two arms only (the founder's orders, 2026-10-14, night, before any run at the tune-down)
 
-The founder's orders of 14 October: the governor decides more than once a minute, first every 15 seconds, then, the same
-night and before any run, every 10 seconds, so that it moves faster than every native controller under it. From these
-orders every Azure set runs the governor's full decision every 10 seconds (`OMNI_INTERVAL=10` in `aks-metered.yml`, passed
-to the governor as `--interval 10`; the decisions expected in a window are counted at that period), six a minute, ahead of
-the HPA's own 15-second check (the processor meter it reads refreshes every 15 to 60 seconds; Azure's machine autoscaler
-looks every 10 seconds in these runs); its fast checks (the scheduling floor, the pod reflex, conveyance) stay at 5
-seconds, and the compass law's damping follows from the period by its own formula. The local (kind) benchmarks keep 60
+The founder's orders of 14 October: the governor decides more than once a minute, first every 15 seconds, then 10, then,
+the same night and before any run, every 5 seconds, so that it moves faster than every native controller under it. From
+these orders every Azure set runs the governor's full decision every 5 seconds (`OMNI_INTERVAL=5` in `aks-metered.yml`,
+passed to the governor as `--interval 5`; the decisions inside a window are counted at that period, and a window in which
+the governor made no write still needs at least one decision a minute to count, as before), twelve a minute, three times
+as fast as the HPA's own 15-second check (the processor meter it reads refreshes every 15 to 60 seconds; Azure's machine autoscaler
+looks every 10 seconds in these runs); its fast checks (the scheduling floor, the pod reflex, conveyance on every third) run every 2.5
+seconds (`OMNI_FLOOR_INTERVAL=2.5`, `--floor-interval 2.5`): they run only between decisions, so at a 5-second decision
+with 5-second checks none would run, and at 10 seconds conveyance would have come every 30 seconds instead of every 15;
+at 2.5 seconds it comes every 15 seconds, as at the 60-second decision, and the compass law's damping follows from the period by its own formula. The local (kind) benchmarks keep 60
 seconds until the next engine version, so that no running benchmark's A, B and C are split across two periods. The
 cloud's arms are native and Omni-Compass on top, nothing else (`ARMS` defaults to `native compass` in the workflow and in
 every cloud script); the steady run of the max had run those two.

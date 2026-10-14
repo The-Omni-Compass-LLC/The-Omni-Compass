@@ -14,9 +14,11 @@
   Appendix D), the metrics catalog and the README: in the cloud the bill is the gauge and is never raised (the tune-down
   with native's cap); the max belongs where the machines are paid for; no babysitting, and the rows that count it. Both
   PDFs rebuilt. No engine file changed.
-- **Six decisions a minute in the cloud** (the founder's orders of 14 October, night: first 15 s, then 10 s, faster than
-  the autoscaler's own 15-second check): `aks-metered.yml` sets `OMNI_INTERVAL=10`; `scripts/kind_bench.sh` passes it to the governor as `--interval` (60 unless a run sets it) and counts
-  a window's decisions at that period; the fast checks stay at 5 s. kind keeps 60 s until the next engine version. The
+- **Twelve decisions a minute in the cloud** (the founder's orders of 14 October, night: 15 s, then 10 s, then 5 s, three
+  times as fast as the autoscaler's own 15-second check): `aks-metered.yml` sets `OMNI_INTERVAL=5` and
+  `OMNI_FLOOR_INTERVAL=2.5` (the fast checks run between decisions, so their period is kept under the decision's;
+  conveyance stays every 15 s); `scripts/kind_bench.sh` passes it to the governor as `--interval` (60 unless a run sets it) and counts
+  a window's decisions at that period. kind keeps 60 s until the next engine version. The
   cloud's arms default to native and Omni-Compass on top in every cloud workflow and script. Preregistered before any run
   at the tune-down.
 - **Self-auditing, and no alert minute in the cloud** (the founder's words of 14 October, night): the governor audits

@@ -105,9 +105,10 @@ jobs:
           HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
           REPLICA_CEILING: ${{ github.event.inputs.replica_ceiling || '' }}
           OMNI_DIAL: ${{ github.event.inputs.dial || 'save' }}
-          # the governor decides every 10 s in the cloud, six times a minute, ahead of the autoscaler's own 15-second check
-          # (the founder's order of 14 October, night), not once a minute
-          OMNI_INTERVAL: '10'
+          # the governor decides every 5 s in the cloud, twelve times a minute, three times as fast as the autoscaler's own
+          # 15-second check, and runs its fast checks every 2.5 s (the founder's order of 14 October, night)
+          OMNI_INTERVAL: '5'
+          OMNI_FLOOR_INTERVAL: '2.5'
           AKS_WORKER_POOLS: ${{ github.event.inputs.worker_pools || '' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - if: always()
