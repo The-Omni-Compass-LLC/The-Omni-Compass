@@ -1124,12 +1124,18 @@ then 10, then 5 seconds a decision were asked the same night), and a change is m
 nothing anywhere. Read against the governor before any run, a faster decision period is not a free setting today: four
 of its rules count in decisions, not in seconds, and every one of them would change with the period:
 
-| Rule (counted in decisions) | At 60 s (as built and tested) | At 5 s |
-|---|---|---|
-| a trial of giving one machine back (`max_trial`, 20 decisions a phase, written in the engine) | 20 minutes a phase, time to measure the 200 response times it needs | 100 seconds, while the probe gives at most one response time a second: every trial would be abandoned for too little work, no machine would ever be given back, and the bill could not fall |
-| the cool-down after a breach (`--slo-clear`, 3 decisions) | nothing given back for 3 minutes | 15 seconds |
-| cruise (`--cruise-after`, 2 decisions) | work waiting for 2 minutes | 10 seconds |
-| the spacing of trials and the wait after a refusal (`--verdict-every` 10, `--verdict-recheck` 120) | 10 minutes; 2 hours | 50 seconds; 10 minutes |
+| Rule (counted in decisions) | At 60 s (as built and tested) | At 15 s (native's own check) | At 5 s |
+|---|---|---|---|
+| a trial of giving one machine back (`max_trial`, 20 decisions a phase, written in the engine) | 20 minutes a phase, time to measure the 200 response times it needs | 5 minutes, barely the time those 200 take at the probe's rate | 100 seconds, while the probe gives at most one response time a second: every trial would be abandoned for too little work, no machine would ever be given back, and the bill could not fall |
+| the cool-down after a breach (3 decisions, written in the engine) | nothing given back for 3 minutes | 45 seconds | 15 seconds |
+| cruise (`--cruise-after`, 2 decisions) | work waiting for 2 minutes | 30 seconds | 10 seconds |
+| the spacing of trials and the wait after a refusal (`--verdict-every` 10, `--verdict-recheck` 120) | 10 minutes; 2 hours | 150 seconds; 30 minutes | 50 seconds; 10 minutes |
+
+Two of the four are written in the engine and have no setting, so no run can keep them at their tested seconds at any
+period but 60: at native's own 15 seconds a machine would be given back after a trial a quarter as long, and given back
+again 45 seconds after a breach instead of 3 minutes, which is the risk of a person woken that the cloud exists to rule
+out. Native's own checks are never slowed by any of this: the HPA keeps its 15-second check and Azure's autoscaler its
+10 seconds underneath, whatever Omni-Compass's period.
 
 So every Azure set runs at the period the engine was built and tested at: the full decision every 60 seconds, the fast
 checks (the scheduling floor, the pod reflex, conveyance on every third, run between decisions) every 5
@@ -1137,7 +1143,7 @@ seconds, three times as fast as the HPA's own 15-second check. The rig accepts o
 `OMNI_FLOOR_INTERVAL`, passed as `--interval` and `--floor-interval`), and a window in which the governor made no write
 needs at least one decision a minute to count, whatever the period. The faster decision belongs to the next engine
 version, with every rule above counted in seconds and the fast checks on their own clock, and is used only once a test
-shows it reads no LOSS on any gauge anywhere. The cloud's arms are native and Omni-Compass on top, nothing else (`ARMS`
+shows it reads no LOSS on any gauge anywhere; until then the order holds as the founder put it: native's speed at least, faster only where it hurts nothing. The cloud's arms are native and Omni-Compass on top, nothing else (`ARMS`
 defaults to `native compass` in the workflow and in every cloud script); the steady run of the max had run those two.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.

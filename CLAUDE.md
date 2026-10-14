@@ -137,8 +137,10 @@ the founder overrides one in the conversation.
   than every native controller under it (asked: a decision every 15, then 10, then 5 seconds), and no change is made
   until it is known to hurt nothing anywhere. Its fast checks already run every 5 s (native's pod autoscaler: 15 s); its
   full decision stays at 60 s in every run, because four of its rules count in decisions (a give-back trial's 20-decision
-  phase would shrink to 100 s at 5 s and every trial would be abandoned, so the bill could never fall). The next engine
-  version counts them in seconds and puts the fast checks on their own clock; it is used only when a test shows no LOSS. Every Kubernetes and cloud receipt shows it in both arms: the
+  phase would shrink to 100 s at 5 s and every trial would be abandoned, so the bill could never fall; at 15 s the phase is
+  5 minutes and the wait after a breach 45 s instead of 3 minutes, and both are written in the engine). Native's own
+  15-second check runs underneath untouched. The next engine version counts those rules in seconds and puts the fast
+  checks on their own clock; it is used only when a test shows no LOSS. Every Kubernetes and cloud receipt shows it in both arms: the
   alert minutes (judged), the settings commands the governor wrote on its own and its additions made inside the line
   (shown) (`tools/live_reps.py`, `babysitting`); both manuals and the README say so.
 - **Two manuals** (the founder's orders of 14 October, evening and night), both kept in the repository until the founder
