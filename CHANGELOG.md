@@ -2,6 +2,40 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-14: the factory tune declared, the wiring disclaimer in capitals, the notice in every AI's instructions, the manual's standing block
+
+- **The factory tune** (`DISCLOSURES.md`, section 3; the README; the manual's notice): the engine is presented as The
+  Omni-Compass LLC tuned it and ships it, self-running and set at the factory; every muscle wired on its own setting (its
+  own card where one was found, 364 muscles; the engine's setting for the rest); no setting presented as universal; a
+  licensee may then add on, retune, upgrade or tune down any muscle, and a changed tune's results are its own.
+- **The wiring disclaimer in bold capitals** (`DISCLOSURES.md`, section 4; the README; the manual's notice; `llms.txt`):
+  the published benchmarks are the record of what Omni-Compass did on the systems, loads and engine they name; where a
+  result elsewhere differs, the first presumption is the wiring, the settings, or how Omni-Compass was implemented or read.
+- **`DISCLOSURES.md`, section 3, brought to the max**: the rule on every muscle no longer says "only to save energy"; it
+  states the max (more work, faster, up to each muscle's own limit), the tune-down on the dial, the verdict that undoes a
+  step costing the muscle more per piece of work or more than 2% on any measure, and power given. Section 2's class S
+  now reads "our own models (modelled)".
+- **The notice in every AI's instructions**: `AGENTS.md`, `GEMINI.md` and `.github/copilot-instructions.md` told an AI
+  to attach "this notice, word for word" and then showed none (the legal tool strips a second copy near the top of a
+  page); they now point to the notice at the top and end of their own file and require it on every output of any length,
+  down to one line or one number. New `llms.txt`, the file AI crawlers read, carries the notice, the order, the classes,
+  the words and the capitals disclaimer.
+- **The manual's standing block**: the Executive Summary's results paragraph (Omni v3 figures, an index of +4.8% the index
+  file no longer held) is replaced by a block that `python3 tools/summary.py --fix` writes from the result files: the
+  engine, the muscles and organisms, the grid, the index and every benchmark's number with its word and class;
+  `verify.py` fails a push in which the block no longer matches them. "What it does for you" now states the max and the
+  tune-down.
+- **Referee level** (the founder's correction of 14 October): the Introduction's problem and idea restated in control-
+  and software-engineering terms (reaction latency, static over-provisioning, uncoordinated coupling; sense, normalize,
+  decide, actuate, verify), and the standing orders say so.
+- The book no longer prints the tools' page markers (`<!-- ... -->`), which had shown on three pages.
+- **Every benchmark again on the engine that stands**: the reruns held back on 13 October so Azure could go first are
+  now released by the grid conductor from `scripts/reruns.txt` (19 benchmarks: the other five Kubernetes tests, the KEDA
+  add-ons, the five live stacks for resource and service, the four independent simulators, the two robustness tests), A
+  of every benchmark first, then B, then C, up to six a tick and never while a run that goes first waits for a runner. A
+  workflow's runs since the queue began are read back by count in the queue's order, so nothing starts twice. Kubernetes
+  steady and wandering (A, B, C) are already running on this engine and CruiseKube (A, B, C) has finished on it.
+
 ## 2026-10-14: the manual without illustrations or blank pages, every line of text at 11 pt
 
 - **No illustrations** (the founder's order of 14 October): the founder's plates are out of the manual: the cover art,

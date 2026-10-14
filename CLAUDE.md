@@ -76,7 +76,8 @@ the founder overrides one in the conversation.
   (`scripts/dispatch_grid.py`, `grid.yml` every 15 minutes; the six and six-kube buttons with their defaults) starts every
   run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what
   GitHub runs plus a margin; it starts nothing while an Azure run, a grid report or a verify waits for a runner (Azure
-  first). Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
+  first). It also releases the reruns of every benchmark on the engine that stands (`scripts/reruns.txt`; A of
+  every benchmark, then B, then C; a few a tick; read back by count, never started twice). Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
   the cluster inside only runs of protocol 3 count (12 Oct: the governor never below the organism's CPU priority, its
   decisions counted inside the window; 13 Oct: the model of the organism on the runner's last core and the kind nodes on
   the others, the same in both arms); a repetition whose job fails runs again, up to three times, paired within one run,
@@ -124,12 +125,27 @@ the founder overrides one in the conversation.
   standing pages. Then the newest-engine material is scanned top to bottom for the retired words and the old ways
   (better/worse, brake, bowl, "confirmed", "simulation" for our own models, standalone or competitor arms, 1,000 copies,
   power given called a loss) and anything found is fixed before the push. Old material stays where it is.
+- **The factory tune** is declared and disclosed (`DISCLOSURES.md`, section 3; the README; the manual's notice): the engine
+  is presented as the owner tuned it and ships it, self-running, set at the factory; every muscle wired on its own setting
+  (its card, or the engine's setting); no setting universal; any licensee may then add on, retune, upgrade or tune down
+  any muscle, and a changed tune's results are its own.
+- **The wiring disclaimer in bold capitals** (`DISCLOSURES.md`, section 4; the README; the manual's notice; `llms.txt`):
+  the published benchmarks are the record of what Omni-Compass did on the systems, loads and engine they name; where a
+  result elsewhere differs, the first presumption is the wiring, the settings, or how Omni-Compass was implemented or read.
+- **The notice travels with every output.** No code can force an outside AI to print it, so it is placed in everything
+  they read: the top and end of every file, every program output, `llms.txt` (for AI crawlers), `AGENTS.md`, `GEMINI.md`,
+  `.github/copilot-instructions.md` and `.cursorrules`, each ordering the notice on every answer of any length; the
+  license makes a copy without it a breach. Those instructions point to the notice at the top and end of their own file
+  (a second copy near the top is stripped by `tools/legal.py`).
 - **The founder hears where things stand** in every report: what is running, what landed, what reads GAIN, EVEN or LOSS,
   and what is still on an older engine, in plain words.
 - **The founder's prompt rules** (his document "A.I. prompt rules"), as they apply here:
   - Type: all text (body, tables, lists, code) at **11 pt or larger** on a line height of at least **1.5**; only running
     heads, footers and page labels may be smaller, at 8 pt; headings scale up from the body.
-  - Prose that explains is written at a 10th-grade level: short active sentences, bold key terms, bullets. Formulas are
+  - Language (the founder's correction of 14 October): not a 10th-grade level. The manual is written at referee level, for
+    CTOs, principal engineers, physicists and mathematicians who will wire Omni-Compass onto a whole company's stack: the
+    exact terms of control engineering, software engineering, physics and mathematics, used precisely and defined where
+    they first appear, so that no reader can mistake what is stated, what is measured or how to wire it. Formulas are
     written in LaTeX (`$...$`, `$$...$$`) in the markdown.
   - Before a document is finished, audit it like a referee: equation and theorem numbers, cross-references, undefined
     symbols, repeated claims, and every claim backed by the text. No padding: every addition must earn its place.

@@ -146,6 +146,21 @@ class Conductor(unittest.TestCase):
         self.assertIn("verify.yml", g.FIRST)
         self.assertIn("archive-run.yml", g.FIRST)
 
+    def test_reruns_released_a_then_b_then_c_never_twice(self):
+        g = self.g
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as f:
+            f.write("# a comment\nx one|w1.yml|a=1;b=two words\nx two|w2.yml|\nx three|w1.yml|a=3\n")
+        q = g.rerun_queue(f.name)
+        self.assertEqual([(r, n) for r, n, _, _ in q[:3]], [("A", "x one"), ("A", "x two"), ("A", "x three")])
+        self.assertEqual(len(q), 9)
+        self.assertEqual(q[0][3], {"a": "1", "b": "two words"})
+        left = g.reruns_to_start(q, {"w1.yml": 3, "w2.yml": 1})      # w1: A one, A three, B one started; w2: A two
+        self.assertEqual([(r, n) for r, n, _, _ in left], [("B", "x two"), ("B", "x three"), ("C", "x one"), ("C", "x two"),
+                                                           ("C", "x three")])
+        self.assertEqual(g.reruns_to_start(q, {"w1.yml": 6, "w2.yml": 3}), [])
+        self.assertTrue(g.rerun_queue(g.RERUNS))                      # the repository's own queue reads
+
     def test_started_runs_read_back_and_not_started_again(self):
         g = self.g
         first = g.next_dispatches({})[:12]

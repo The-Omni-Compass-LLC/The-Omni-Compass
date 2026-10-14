@@ -92,6 +92,14 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # the other clouds when he starts them, the push's verify and the archive of finished runs. While one of them waits for a
 # runner (or a grid run's report does), the conductor starts nothing new, so the job that waits is next in GitHub's queue
 # instead of behind the grid
+# every benchmark run again on the engine that stands (the founder's order of 13 October, night: everything on the newest
+# engine), three times each (A, B and C), released by this conductor a few at a time: A of every benchmark first, then B,
+# then C, and never while a run that goes first waits for a runner. A workflow's runs started since RERUN_SINCE are read
+# back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
+RERUNS = ROOT / "scripts" / "reruns.txt"
+RERUN_SINCE = "2026-10-14T01:30:00Z"
+RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
+RERUN_PER_TICK = 6                 # reruns released at most in one tick
 FIRST = ("aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
          "eks-metered.yml", "verify.yml", "archive-run.yml")
 
@@ -405,6 +413,44 @@ def jobs_in_flight():
     return queued, running, first
 
 
+def rerun_queue(path=None):
+    """The queue in release order: [(run, name, workflow, inputs)], A of every benchmark, then B, then C."""
+    path = Path(path or RERUNS)
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    entries = []
+    for ln in lines:
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        name, wf, inputs = (ln.split("|") + ["", ""])[:3]
+        kv = dict(x.split("=", 1) for x in inputs.split(";") if "=" in x)
+        entries.append((name.strip(), wf.strip(), kv))
+    return [(run, n, wf, kv) for run in "ABC" for n, wf, kv in entries]
+
+
+def reruns_to_start(queue, started):
+    """The entries not yet started: for each workflow, its first started[wf] entries in queue order count as started."""
+    seen, out = {}, []
+    for item in queue:
+        wf = item[2]
+        seen[wf] = seen.get(wf, 0) + 1
+        if seen[wf] > started.get(wf, 0):
+            out.append(item)
+    return out
+
+
+def reruns_started(queue):
+    """{workflow: runs dispatched since RERUN_SINCE}, read from GitHub."""
+    out = {}
+    for wf in sorted({q[2] for q in queue}):
+        d = api(f"repos/{REPO}/actions/workflows/{wf}/runs?event=workflow_dispatch&created=>={RERUN_SINCE}&per_page=1")
+        out[wf] = int(d.get("total_count", 0))
+    return out
+
+
 def dispatch(d, ref):
     if d["grid"] == "six":
         o = d["orgs"][0]
@@ -464,6 +510,7 @@ def main(argv=None):
     t.add_argument("--floor", type=int, default=150, help="the least jobs kept in flight")
     t.add_argument("--max-dispatches", type=int, default=40)
     t.add_argument("--grid", choices=("six", "six-kube", "all"), default="all", help="which grid to start (the buttons: their own)")
+    t.add_argument("--reruns-per-tick", type=int, default=RERUN_PER_TICK, help="reruns released at most in one tick")
     m = sub.add_parser("matrix")
     m.add_argument("--scale", type=int, required=True); m.add_argument("--orgs", required=True)
     m.add_argument("--first", type=int, default=0); m.add_argument("--runs", type=int, default=RUNS)
@@ -514,6 +561,20 @@ def main(argv=None):
     inflight, started = queued + running, []
     for t in first:
         print(f"waits for a runner and goes first: {t}")
+    reruns = []
+    if a.grid == "all" and not first:
+        queue = rerun_queue()
+        if queue:
+            for run, name, wf, kv in reruns_to_start(queue, reruns_started(queue))[:a.reruns_per_tick]:
+                if inflight >= target:
+                    break
+                if not a.dry:
+                    api(f"repos/{REPO}/actions/workflows/{wf}/dispatches", method="POST", data={"ref": a.ref, "inputs": kv})
+                    time.sleep(2)
+                reruns.append(f"{name} {run}")
+                inflight += RERUN_JOBS
+    for r in reruns:
+        print(f"rerun started on the engine that stands: {r}")
     for d in todo:
         if a.grid != "all" and d["grid"] != a.grid:
             continue
@@ -532,6 +593,8 @@ def main(argv=None):
         print("## The grid on the max: 1, 10 and 100 copies, every square to 100 runs" + (" (dry run: nothing started)" if a.dry else ""), file=out)
         print("", file=out)
         report(cov, started, queued, running, target, out, gave_up=gave_up, first=first)
+        for r in reruns:
+            print(f"- rerun started on the engine that stands: {r}", file=out)
     return 0
 
 

@@ -11,6 +11,8 @@ so it runs on any Python 3.8 or later straight after a pull.
 
   python3 tools/summary.py              the summary, as plain text for a terminal
   python3 tools/summary.py --markdown   the same, as Markdown
+  python3 tools/summary.py --fix        write the standing block into the manual's Executive Summary
+  python3 tools/summary.py --check      fail if that block no longer matches the result files (run by verify.py)
 """
 from __future__ import annotations
 
@@ -184,10 +186,72 @@ def build(markdown=False):
     return "\n".join(L) + "\n"
 
 
+# ---- the standing block: where things stand, written into the manual's Executive Summary from the result files, so the
+# manual never quotes a number the result files no longer hold (the founder's order of 14 October: every push realigns)
+BLOCK_START = "<!-- where things stand (tools/summary.py --fix) -->"
+BLOCK_END = "<!-- end of where things stand -->"
+BLOCK_PAGES = ("docs/OMNI_COMPASS_MANUAL.md",)
+
+
+def standing_block():
+    """The block's Markdown: the engine, the modelled muscles and organisms, the grid, the index and every benchmark's
+    one number with its word and class, each read from its own file."""
+    L = [BLOCK_START, "",
+         "**Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it "
+         "names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live "
+         "results run on the engines named in their own tables, and every one of them runs again on the newest engine.", "",
+         f"- **The engine on this checkout:** {engine_line()}."]
+    rp = realms_part()
+    if rp:
+        L.append("- " + rp[0])
+        L += ["  - " + x.strip() for x in rp[1:]]
+    gp = grid_part()
+    if gp:
+        L.append("- " + gp[0])
+    ip = index_part()
+    L.append("- " + ip[0])
+    L += ["  - " + x.strip() for x in ip[1:]]
+    d = load("results/BENEFIT_SHEET.json") or {}
+    if d.get("rows"):
+        L += ["", "| Benchmark | Its one number | Its word | Class |", "|---|---:|---|---|"]
+        for r in d["rows"]:
+            L.append(f"| {r['benchmark']} | {pct(r.get('pct'))} | {r.get('benefit', '')} | {evidence(r['benchmark'])} |")
+    L += ["", OWN_RUNS, "", BLOCK_END]
+    return "\n".join(L)
+
+
+def fix_pages(check=False):
+    """Writes the standing block into every page that carries its markers (check: says which pages are stale)."""
+    block, bad = standing_block(), []
+    for rel in BLOCK_PAGES:
+        p = ROOT / rel
+        text = p.read_text(encoding="utf-8")
+        a, b = text.find(BLOCK_START), text.find(BLOCK_END)
+        if a < 0 or b < 0:
+            bad.append(f"{rel}: no standing block (its markers are missing)")
+            continue
+        new = text[:a] + block + text[b + len(BLOCK_END):]
+        if new != text:
+            if check:
+                bad.append(f"{rel}: the standing block no longer matches the result files (python3 tools/summary.py --fix)")
+            else:
+                p.write_text(new, encoding="utf-8")
+    return bad
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--markdown", action="store_true", help="print Markdown instead of plain text")
+    ap.add_argument("--fix", action="store_true", help="write the standing block into the manual's Executive Summary")
+    ap.add_argument("--check", action="store_true", help="fail if the manual's standing block no longer matches the files")
     a = ap.parse_args(argv)
+    if a.fix or a.check:
+        bad = fix_pages(check=a.check)
+        for b in bad:
+            print(b, file=sys.stderr)
+        if not bad:
+            print("the standing block matches the result files" if a.check else "the standing block written")
+        return 1 if bad else 0
     sys.stdout.write(build(markdown=a.markdown))
     return 0
 

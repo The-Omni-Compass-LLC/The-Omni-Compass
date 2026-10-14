@@ -157,6 +157,18 @@ change this manual, the software it describes and their terms at any time, witho
 of this manual carries this notice, `LICENSE`, `NOTICE` and `DISCLOSURES.md` unchanged. All patents, copyrights and
 trademarks filed in the USA. www.omni-compass.com
 
+**THE PUBLISHED BENCHMARKS ARE THE RECORD OF WHAT OMNI-COMPASS DID ON THE SYSTEMS, LOADS AND ENGINE THEY NAME, EACH WITH ITS EVIDENCE CLASS. WHERE A RESULT ON ANY OTHER SYSTEM DIFFERS FROM THEM, OR ANYTHING LOOKS WRONG, THE FIRST PRESUMPTION IS THE WIRING, THE SETTINGS, OR HOW OMNI-COMPASS WAS IMPLEMENTED OR READ, NOT THE LAW. CHECK THOSE FIRST (THE MANUAL'S "WIRED RIGHT OR WIRED WRONG") BEFORE DRAWING ANY CONCLUSION ABOUT OMNI-COMPASS.**
+
+**The factory tune.** The engine in this repository is presented as The Omni-Compass LLC tuned it and ships it: a
+self-running engine, set at the factory. Every muscle in the catalog is wired, and each runs on the setting found for it:
+its own card where one was found on development seeds and kept under the strict rule (364 muscles,
+`realms/muscle_cards_v5.csv`), the engine's own setting for every other muscle, all frozen and fingerprinted by version
+(`python3 tools/omni_version.py`). Muscles differ: no single setting is right for every muscle, family, sector, domain or
+realm, and none is presented as universal. Every published result is this factory tune. As with any engine, a licensee may
+then add on, retune, upgrade or tune down any muscle or any combination of muscles (the dial, the cards, the bands and the
+service lines are all exposed); a changed tune is the licensee's own configuration, and its results are its own, not the
+published ones.
+
 **The wiring declaration.** Omni-Compass acts only through the wires it is given. A wrong reading, a wrong or shared
 lever, a wrong range, or a service line set for another workload makes it do exactly what its law says with the wrong
 information. It cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the
@@ -358,32 +370,41 @@ what it tells you.
 
 ## Introduction: The Problem, the Idea and the Promise
 
-**The problem.** Every computer system, and almost every modern machine, is run by many small controllers. Each one
-was tuned alone, by a different team, for a different worst day. The autoscaler does not know about the cooling. The
-cooling does not know about the batteries. The database's memory setting does not know how many web servers are about
-to arrive. Each controller keeps its own number safe, and that is all it was asked to do.
+**The problem.** Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
+power and clock governors, building-management loops, battery-management systems, connection pools, servo controllers.
+Each loop is tuned in isolation, against its own setpoint, with margins sized for a worst-case disturbance. Three costs
+follow, and every operator pays them:
 
-The result is a system that is safe but slow to answer and quick to waste. It shows up in three ways:
+- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
+  recomputes its desired replicas from averaged utilization on a sync period (15 seconds by default) and damps its
+  decisions with stabilization windows; new pods then need time to schedule and start. Queues form before capacity
+  arrives.
+- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
+  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
+  rarely used.
+- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
+  is another loop's disturbance. More web replicas saturate the database's connections; more cooling pushes a power feed
+  toward its limit.
 
-- **Waiting.** Work piles up while a controller reacts late. An autoscaler that waits for the average load to climb
-  adds machines after the customers are already in line.
-- **Waste.** Settings chosen for the worst day stay in place on every other day. Machines stay on "just in case," and
-  limits sit far below what the hardware can safely do.
-- **Blind spots.** One controller fixes its own number by pushing a problem onto another. More web servers can mean a
-  jammed database. More cooling can mean a power line near its limit.
+Operators close these gaps by hand, with fixed settings and runbooks. That is safe, and it leaves the region between the
+nominal operating point and the safe boundary unused nearly all of the time.
 
-Engineers fill these gaps by hand, with fixed settings and long runbooks. That works, but it leaves the headroom
-between the safe middle and the safe edge unused almost all of the time.
+**The idea.** Close one supervisory loop around the native loops. Omni-Compass treats each setting a native controller
+already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool size) as an actuator, each
+native telemetry stream as a measurement, and governs the whole body from above. Every decision period it runs five steps:
 
-**The idea.** Put one supervisory brain on top of the controllers you already run. Let it read every gauge, hold each
-setting inside its safe band, push toward the edge where the push buys real work, and pull back before any edge is
-reached. That brain is Omni-Compass. It works in four steps, every second:
-
-1. **Read.** It reads each muscle's own gauges through the plug: load, response time, temperature, power, queue length.
-2. **Decide.** The compass law places each reading in its band, from calm to the line, and sets the push and the pull.
-3. **Write.** It writes one setting through the plug and reads it back to be sure the write landed.
-4. **Check.** The verdict compares the muscle with and without the step; the body guard checks every other part. A
-   step that costs more than it buys is undone.
+1. **Sense.** It reads each muscle's own gauges through the plug: utilization, response-time percentiles, queue depth,
+   temperature, power, state of charge.
+2. **Normalize.** It places each reading in its band as a compass position, from 0 (calm) to 1 (the line), with a 5%
+   cushion at each edge.
+3. **Decide.** The compass law turns that position into one bounded increment per actuator: two antagonist forces, push
+   and pull, each with its own gain, combined through a smooth saturating response (tanh), so the command is continuous,
+   bounded and never chatters. The increment is clipped to the actuator's cover, the hard range nothing can leave.
+4. **Actuate.** It writes the increment through the plug, idempotently, and reads the value back to confirm the write
+   landed.
+5. **Verify.** The verdict compares the muscle with and without the step in a paired trial on the muscle itself, judged
+   on the muscle's own cost per unit of work; the body guard checks every coupled muscle against its own cushion. A step
+   that fails either test is reverted.
 
 **What Omni-Compass is not.**
 
@@ -413,7 +434,7 @@ setpoints and battery reserves, robot speeds and drone-swarm settings, and many 
 (compute, AI and cloud; physics, robotics and autonomy; energy, facility and industry; distribution and specialized
 systems) and run together as six organisms, from one realm alone up to the whole tower at once. The muscles in the
 catalog are modelled (class S). The real controllers it has been run on top of, such as Kubernetes and the databases,
-are live software (class L). The chapter that follows the key, "What You Are Looking At," shows which is which.
+are live software (class L). The chapter that follows the key, "What You Are Looking At," shows which is which. Appendix G lists every one of the 1,107 muscles: what it is, what Omni-Compass reads from it, what it moves, the organisms it belongs to, and its own card, the factory setting it runs on.
 
 **What you need before you wire it.**
 
@@ -514,42 +535,61 @@ competes with the controller underneath it.
 
 **What it does for you.** Every running system keeps room "just in case": machines sized for the worst minute of the
 day, a pool of connections held open for a load that comes once an hour, a consumer group sized for the quiet hours and
-then overrun at the peak, a cache ceiling set once and left. Omni-Compass turns that room into one of two things, and the
-operator chooses which: more work for the same resources, or the same work for fewer. The two are the same measurement
-read from two sides (section 3.4): a third more work from what is already installed is a quarter off the bill.
+then overrun at the peak, a cache ceiling set once and left. By default Omni-Compass turns that room into more work,
+faster: the max, every muscle run up to its own limit, read live, never past it and never below native, the energy it
+takes shown as power given beside the work and speed it bought. On the dial, anyone can tune it down to the same work
+with less. The two are the same measurement read from two sides (section 3.4): a third more work from what is already
+installed is a quarter off the bill.
 
-**What has been shown, on the frozen engine Omni v3, three separate times each, and run again on one commit on 10 October.**
-On real Kubernetes, seven preregistered tests of ten paired runs each (`results/live/V3_*.md`): work inside the response line
-**+54% to +68%** in every run of the all-four test, the 95th-percentile response time **57% to 66% faster** across the
-steady, wandering, all-four and fault tests, failed requests 11% to 18% fewer where load swings and under faults, machines
-1.7% to 2.0% fewer at steady load and 16% to 20% fewer on a queue of batch jobs, 7% to 9% fewer under a public day of demand
-(the Google cluster trace of 2011), and beside a noisy neighbour no difference beyond the noise on any row. On the five live
-stacks, run for the first time with the brain's own verdict on the knob (every notch tried on the stack itself before it is
-written, section 9.4): a real database behind its pooler (`results/live/V3_PGBENCH.md`) held 6% to 11% fewer connections for
-the same work on its read-only workload and refused the add above the operator's setting on the slow write workload, with
-no LOSS anywhere; a real database's buffer pool, MySQL under sysbench (`results/live/V3_SYSBENCH.md`), was held 10% to 20%
-smaller on the read-and-write workload with no LOSS; a real database's storage-engine cache, MongoDB under YCSB
-(`results/live/V3_YCSB.md`), was held 3% to 13% smaller on one workload with no LOSS; on a real message broker, Apache
-Kafka (`results/live/V3_KAFKA.md`), and a real cache, Redis (`results/live/V3_REDIS.md`), the first set read exactly nothing,
-no gain and no loss, because every spend trial on Kafka and most on Redis were abandoned before they could be judged: the
-rule of 9 October ended a spend trial when the service turned calm, and a spend that works calms the service within seconds;
-that rule is ours, it was amended the same day (a spend trial runs to its samples) and the five stacks run again on it. The
-earlier sets, in which the compass bought Kafka's hundredfold shorter queue with three to four times the consumers and
-Redis's hit rate with three to four times the memory, are whole in `docs/history`. In the modelled realms, 945 muscles and
-six organisms (`results/realms/REALMS.md`): every organism superior within its guardrails, zero muscles LOSS or power given, at every
-size from 1 to 1,000 copies, the published table reproduced in 3 of 3 again on 10 October. On the independent simulators: a
-power grid's losses lower in 7 of 11 grids and power given in 4; robot arms' peak torque down 29% where Omni-Compass moved and
-left native where the paired trial said not to; buildings' electricity bought and daily peak lower in all 11 battery
-districts and the bill higher in 7; drone swarms' energy a mission 7% to 20% lower with no late mission, near miss or
-collision. The one combined number, the Omni index over the six real categories the same in all three of our runs, stands at **+4.8%**
-on the sets of 10 October (`results/OMNI_INDEX.md`): Kubernetes +28.9% over seven tests, the database +0.8%, messaging
-+0.1%, the cache exactly nothing, the database's storage-engine cache +0.7% and the database's buffer pool +1.0%, every
-category weighed the same and every row inside the noise counted as exactly nothing. It stood at +20.5% on the sets of 7 to
-9 October; it came down because the spends that had bought the stacks' earlier gains at a resource cost were refused by the
-brain's verdict, or on Kafka and Redis not yet judged, so that every gain left is one the brain proved on the stack itself,
-and no row is a loss. A second reading of the same tables, declared 9 October and scoring service alone (work and speed,
-with the resources shown and not scored), stands at **+10.7%** (Kubernetes +84.5%, the five stacks nothing); it is printed
-beside the first in the index file, and section 16.6 says what each of the two is for. Nothing is hidden in either.
+<!-- where things stand (tools/summary.py --fix) -->
+
+**Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
+
+- **The engine on this checkout:** omni-v5, fingerprint 6093b2b88aa911b9 (44 files).
+- The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
+  - every muscle alone, over its loads: EVEN 580, GAIN 527
+  - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
+  - the organisms under the climb load: Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
+  - the organisms under the line load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
+- The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
+- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of engines v1 and v3, each named in its table): +5.2% GAIN on the resource reading (work, speed, machines, energy), +12.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+  - Real Kubernetes (GitHub): +31.8% GAIN
+  - Real database cache (MongoDB under YCSB, GitHub): +1.7% GAIN
+  - Real database (PostgreSQL behind PgBouncer, GitHub): +0.9% GAIN
+  - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
+  - Real cache (Redis, GitHub): +0.0% EVEN
+  - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
+
+| Benchmark | Its one number | Its word | Class |
+|---|---:|---|---|
+| Every real test together: the Omni index | +5.2% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | +59.5% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | +27.5% | GAIN, power given | L |
+| The six organisms with the real cluster inside, 10 and 100 copies | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
+| The big organisms with the real cluster inside, 1,000 copies on Azure | +155.0% | GAIN | L, the cluster; S, the organism around it |
+| The 945 modelled muscles as one tower, every muscle written at once | +0.3% | GAIN | S |
+| Robustness: the two-hour run | +0.0% | EVEN | L |
+| Robustness: the governor killed outright mid-run | +8.6% | GAIN | L |
+| Robot arms (MuJoCo), the three untouched robots | +3.8% | GAIN | S |
+| Redis, the cache's memory ceiling | +0.0% | EVEN | L |
+| Real Kubernetes, steady work | +30.5% | GAIN | L |
+| Real Kubernetes, faults | +36.6% | GAIN | L |
+| Real Kubernetes, demand that wanders | +37.0% | GAIN | L |
+| Real Kubernetes, all four at once | +41.7% | GAIN | L |
+| Real Kubernetes, a queue of jobs | +16.5% | GAIN | L |
+| Real Kubernetes, a public day of demand (Google 2011) | +46.4% | GAIN | L |
+| Real Kubernetes, a noisy neighbour | +0.0% | EVEN | L |
+| Power grids (SimBench), both load models | +5.8% | GAIN, power given | S |
+| PostgreSQL, the pooler's pool size | +0.9% | GAIN, power given | L |
+| MySQL, the buffer pool's size | +0.0% | EVEN | L |
+| MongoDB, the storage engine's cache size | +1.7% | GAIN | L |
+| Kafka, the consumer group's size | +0.1% | GAIN | L |
+| Drone swarms, the three untouched cells | +5.9% | GAIN | S |
+| Buildings and batteries (CityLearn), the districts with batteries | +0.8% | GAIN AND LOSS | S |
+
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+<!-- end of where things stand -->
 
 **What has not been shown, said plainly.** An energy or cloud-bill saving on real machines. Energy on kind is a
 declared model, because the machines are containers on one runner. Azure's bill on a 4-worker fleet read no difference

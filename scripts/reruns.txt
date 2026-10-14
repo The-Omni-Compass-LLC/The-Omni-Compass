@@ -1,0 +1,24 @@
+# Every benchmark run again on the engine that stands (the founder's order of 13 October, night), three times each (A, B
+# and C), released by the grid conductor (scripts/dispatch_grid.py): A of every line first, then B, then C, a few at a
+# time and never while an Azure run, a report, a verify or the archive waits for a runner. One line per benchmark:
+# name|workflow|inputs (k=v;k=v). The order is fixed: started runs are read back by count, in this order.
+# Already running or done on this engine, so not listed: Kubernetes steady and wandering (A, B, C), CruiseKube (A, B, C).
+kubernetes all four|benchmark-reps.yml|duration_s=2700;arms=native compass;loadgen=open;load_steps=1 2 3 4 5 6 7 8 7 6 5 4 3 2 1
+kubernetes fairness|benchmark-reps.yml|duration_s=900;arms=native compass;loadgen=open;two_app=1
+kubernetes faults|benchmark-reps.yml|duration_s=900;arms=native compass;loadgen=open;faults=1
+kubernetes batch|benchmark-reps.yml|duration_s=1500;arms=native compass;workload=batch
+kubernetes google 2011 trace|benchmark-reps.yml|duration_s=2592;arms=native compass;loadgen=open;load_steps=2 3 3 3 3 4 4 3 2 2 2 2 2 3 2 3 4 4 3 4 5 6 5 4
+kubernetes keda add-ons|kind-addons.yml|
+redis resource|redis.yml|workloads=all;reps=3;step_s=30;objective=resource
+kafka resource|kafka.yml|workloads=all;reps=3;step_s=30;objective=resource
+postgresql resource|pgbench.yml|workloads=untouched;reps=3;step_s=30;objective=resource
+mysql resource|sysbench.yml|workloads=all;reps=3;step_s=30;objective=resource
+mongodb resource|ycsb.yml|workloads=all;reps=3;step_s=30;objective=resource
+redis service|redis.yml|workloads=all;reps=3;step_s=30;objective=service
+kafka service|kafka.yml|workloads=all;reps=3;step_s=30;objective=service
+robot arms|mujoco.yml|robots=untouched;cycles=10
+power grids|pandapower.yml|grids=untouched;step=4
+buildings and batteries|citylearn.yml|datasets=untouched
+drone swarms|swarm.yml|cells=all
+robustness kill|robustness.yml|scenario=kill;reps=10;duration_s=900
+robustness long|robustness.yml|scenario=long;reps=3;duration_s=7200

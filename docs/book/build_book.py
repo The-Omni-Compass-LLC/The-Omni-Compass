@@ -242,6 +242,8 @@ def md_flow(lines, shift=0, story=None, strip=False):
     i = 0
     while i < len(lines):
         ln = lines[i]
+        if re.fullmatch(r"\s*<!--.*-->\s*", ln):            # a page marker for the tools, never printed
+            i += 1; continue
         if ln.startswith("```"):
             j = i + 1; buf = []
             while j < len(lines) and not lines[j].startswith("```"):
@@ -294,7 +296,7 @@ def md_flow(lines, shift=0, story=None, strip=False):
         if not ln.strip():
             i += 1; continue
         buf = [ln]; i += 1
-        while i < len(lines) and lines[i].strip() and not re.match(r"^(#|\||```|>|!\[|\s*(-|\*|\d+\.) |-{3,})", lines[i]) \
+        while i < len(lines) and lines[i].strip() and not re.match(r"^(#|\||```|>|!\[|<!--|\s*(-|\*|\d+\.) |-{3,})", lines[i]) \
                 and not lines[i].startswith("    "):
             buf.append(lines[i]); i += 1
         story.append(Paragraph(inline(" ".join(x.strip() for x in buf)), BODY))

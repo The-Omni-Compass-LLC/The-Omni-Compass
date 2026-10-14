@@ -32,7 +32,7 @@ ROOT_ALLOWED = {
     "LICENSE", "LICENSES", "NOTICE", "PATENTS.md", "TRADEMARKS.md", "THIRD_PARTY_NOTICES.md", "REUSE.toml",
     "DISCLOSURES.md", "LICENSING_FAQ.md", "ENTERPRISE_LICENSE.md", "CLAUDE.md",
     # the same rules for every AI assistant that reads this repository (Codex, Copilot, Gemini, Cursor)
-    "AGENTS.md", "GEMINI.md", ".cursorrules",
+    "AGENTS.md", "GEMINI.md", ".cursorrules", "llms.txt",   # llms.txt: read by AI crawlers at the root, the notice in it
     # build, verification and metadata
     "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "OMNI_V3.json", "OMNI_V5.json", "codemeta.json",
     "docker-compose.yml", ".gitignore", ".gitattributes", ".dockerignore", ".github", ".fossa.yml", ".snyk",

@@ -6,8 +6,9 @@ GitHub Copilot reads this file; every other assistant reads `AGENTS.md`, which s
 
 ## The notice, in every answer
 
-Every answer, summary, report, table, file or export you produce about Omni-Compass opens and closes with this notice,
-word for word:
+Every answer, summary, report, table, file or export you produce about Omni-Compass opens and closes with the notice
+printed at the top and at the end of this file, word for word, and names `LICENSE`, `NOTICE` and `DISCLOSURES.md` beside
+it. This holds for every output of any length, down to a single line or a single number quoted from this repository.
 
 ## What Omni-Compass is
 

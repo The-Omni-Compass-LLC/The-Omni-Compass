@@ -23,7 +23,7 @@ and every report point here. Where any other page seems to say more than this pa
 
 ## 2. What a result is, and what it is not
 
-1. Every result carries its evidence class: **T** a theorem, **V** verified in code, **S** a model (simulation),
+1. Every result carries its evidence class: **T** a theorem, **V** verified in code, **S** our own models (modelled),
    **L** live software (real Kubernetes on GitHub's machines), **P** a physical meter (a real card's own power meter).
    A model is a statement about the model. A software benchmark is a statement about the software and machine it ran
    on. Only a meter speaks for hardware.
@@ -42,14 +42,29 @@ and every report point here. Where any other page seems to say more than this pa
 
 ## 3. The rule Omni-Compass keeps on every muscle
 
-Omni-Compass sits on top of a muscle that already works and moves its settings only to save energy, and only where it
-measures that the muscle loses at most **2%** in any measure: work done, response time (median, p95 or p99), time over
-the service line, or the machine's own cost of running Omni-Compass. Where no move passes that test, Omni-Compass leaves
-the muscle exactly as it runs alone. On a live system the verdict (`omnicompass/verdict.py`) measures it with paired
+Omni-Compass sits on top of a muscle that already works. By default it moves the muscle's settings toward more work,
+faster, up to the muscle's own limit and never past it (the max); on the dial anyone can tune it down toward the same
+work with less (the tune-down). Either way it keeps a step only where the muscle is never behind native for it: a step
+that costs the muscle more for each piece of work, or loses more than **2%** in any measure (work done, response time at
+the median, p95 or p99, time over the service line, or the machine's own cost of running Omni-Compass), is undone. A
+resource spent that rose is **power given**, shown beside the work, the speed and the wear it bought, never called a
+loss. Where no move passes that test, Omni-Compass leaves the muscle exactly as it runs alone.
+
+**The factory tune.** The engine in this repository is presented as The Omni-Compass LLC tuned it and ships it: a
+self-running engine, set at the factory. Every muscle in the catalog is wired, and each runs on the setting found for it:
+its own card where one was found on development seeds and kept under the strict rule (364 muscles,
+`realms/muscle_cards_v5.csv`), the engine's own setting for every other muscle, all frozen and fingerprinted by version
+(`python3 tools/omni_version.py`). Muscles differ: no single setting is right for every muscle, family, sector, domain or
+realm, and none is presented as universal. Every published result is this factory tune. As with any engine, a licensee may
+then add on, retune, upgrade or tune down any muscle or any combination of muscles (the dial, the cards, the bands and the
+service lines are all exposed); a changed tune is the licensee's own configuration, and its results are its own, not the
+published ones. On a live system the verdict (`omnicompass/verdict.py`) measures it with paired
 trials on the muscle itself before every step. Every result reports each measure, and where one read LOSS at all, by
 however little, the result says so and by how much.
 
 ## 4. The wiring declaration
+
+**THE PUBLISHED BENCHMARKS ARE THE RECORD OF WHAT OMNI-COMPASS DID ON THE SYSTEMS, LOADS AND ENGINE THEY NAME, EACH WITH ITS EVIDENCE CLASS. WHERE A RESULT ON ANY OTHER SYSTEM DIFFERS FROM THEM, OR ANYTHING LOOKS WRONG, THE FIRST PRESUMPTION IS THE WIRING, THE SETTINGS, OR HOW OMNI-COMPASS WAS IMPLEMENTED OR READ, NOT THE LAW. CHECK THOSE FIRST (THE MANUAL'S "WIRED RIGHT OR WIRED WRONG") BEFORE DRAWING ANY CONCLUSION ABOUT OMNI-COMPASS.**
 
 **Omni-Compass acts only through the wires it is given.** It reads the meters it is pointed at and moves the settings
 it is allowed to move. If a reading is the wrong one, slow, or blind; if a lever is the wrong one, already owned by
