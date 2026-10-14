@@ -197,6 +197,10 @@ def main():
         for n in S["nodes"]:
             n.setdefault("spec", {})["providerID"] = f"kind://docker/omni-bench/{n['metadata']['name']}"
     t, st, c = capped(None, kind_nodes)
+    # A measured idle host leaves the request-based ceiling in force; no host sample holds at the current 10 replicas.
+    c.host_cpu.busy_share = 0.0
+    c.host_cpu.sample = lambda: 0.0
+    c.step()
     assert c._live_ceiling(json.loads(st.read_text())["hpas"][0]) == (4000 - 1000) // 200 - 1 and cap(st) == 14, cap(st)
     t, st, c = capped(None, web(alloc="2", workers=2, other_m=1000, room=2))   # the autoscaler may add 2 more: 35, one under: 34
     assert cap(st) == 18, f"read live with the autoscaler's room: cap {cap(st)}, expected the 18 asked for"
