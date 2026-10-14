@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-> **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: check the installation with section 8.5 of the manual (*Wired right or wired wrong*).
+> **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: check the installation with section 4.5 of the manual (*Wired right or wired wrong*).
 
 There are three ways to get real-machine numbers:
 - **Your own tower:** a machine you control, with a smart plug measuring the whole machine at the wall (section A).
@@ -90,7 +90,7 @@ tail -f run.log            # Ctrl+C stops watching; the test keeps running
 
 It runs, in order, and stops at the first failure:
 1. the machine check (one copy only, nothing else on the card, the card's default limit and clock range restored);
-2. the **wire check**, which must end `WIRED RIGHT` (manual, section 8.4);
+2. the **wire check**, which must end `WIRED RIGHT` (manual, section 4.4);
 3. the smoke test, about 40 minutes, never counted;
 4. the preregistered counted run on compute-bound work: 10 repetitions × native / watch / Omni, 600 s each, about
    6 hours;
@@ -125,7 +125,7 @@ rental site, so the billing stops.
 
 ## 6. Read it before you believe it
 
-Open `results/gpu/run-<stamp>/GPU_REPS.md` and check the rows of the manual's section 8.5 (*Wired right or wired
+Open `results/gpu/run-<stamp>/GPU_REPS.md` and check the rows of the manual's section 4.5 (*Wired right or wired
 wrong*): watch equal to native, requests equal, the card's busy clock under Omni at or above its own, the lid while busy
 at or above its own busy draw, fail-up rare in the credit-per-write table. If a row reads wired wrong, the run says
 nothing about Omni-Compass until the wiring is fixed (`DISCLOSURES.md`, section 3).

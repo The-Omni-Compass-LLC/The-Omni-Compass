@@ -11,7 +11,7 @@ so it runs on any Python 3.8 or later straight after a pull.
 
   python3 tools/summary.py              the summary, as plain text for a terminal
   python3 tools/summary.py --markdown   the same, as Markdown
-  python3 tools/summary.py --fix        write the standing block into the manual's Executive Summary
+  python3 tools/summary.py --fix        write the standing block into docs/STATE_OF_PLAY.md
   python3 tools/summary.py --check      fail if that block no longer matches the result files (run by verify.py)
 """
 from __future__ import annotations
@@ -186,11 +186,12 @@ def build(markdown=False):
     return "\n".join(L) + "\n"
 
 
-# ---- the standing block: where things stand, written into the manual's Executive Summary from the result files, so the
-# manual never quotes a number the result files no longer hold (the founder's order of 14 October: every push realigns)
+# ---- the standing block: where things stand, written into the state of play from the result files, so that page never
+# quotes a number the result files no longer hold (the founder's orders of 14 October: every push realigns; the manual is
+# the wiring and operating manual and carries no results, so the block lives with the results' own front page)
 BLOCK_START = "<!-- where things stand (tools/summary.py --fix) -->"
 BLOCK_END = "<!-- end of where things stand -->"
-BLOCK_PAGES = ("docs/OMNI_COMPASS_MANUAL.md",)
+BLOCK_PAGES = ("docs/STATE_OF_PLAY.md", "docs/OMNI_COMPASS_OWNERS_MANUAL.md")
 
 
 def standing_block():
@@ -242,8 +243,8 @@ def fix_pages(check=False):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--markdown", action="store_true", help="print Markdown instead of plain text")
-    ap.add_argument("--fix", action="store_true", help="write the standing block into the manual's Executive Summary")
-    ap.add_argument("--check", action="store_true", help="fail if the manual's standing block no longer matches the files")
+    ap.add_argument("--fix", action="store_true", help="write the standing block into docs/STATE_OF_PLAY.md")
+    ap.add_argument("--check", action="store_true", help="fail if the standing block in docs/STATE_OF_PLAY.md no longer matches the files")
     a = ap.parse_args(argv)
     if a.fix or a.check:
         bad = fix_pages(check=a.check)

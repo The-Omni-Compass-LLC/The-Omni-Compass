@@ -19,6 +19,7 @@ Every report says which kind each number is. A modelled number is never presente
 |---|---|---|---|
 | Response time, mean / 95th / 99th percentile | ms | live Kubernetes (`tools/live_reps.py`), GPU bench (`tools/gpu_reps.py`), GPU sims | measured live; modelled in sims |
 | Failed requests | % | live Kubernetes | measured |
+| Alert minutes: whole minutes whose 95th percentile, failed requests counted over, was over the line (the babysitting tax) | min | live Kubernetes and the cloud (`tools/live_reps.py`) | measured |
 | Requests served / not served | count | GPU bench, GPU sims | measured / modelled |
 | Pod start wait, total and mean | s | live Kubernetes (API server creation-to-Ready) | measured |
 | Pending pods | pod-minutes | live Kubernetes | measured |
@@ -86,6 +87,7 @@ the power budget are designed (`docs/DOMAIN_MAP.md`, "on-site batteries") and no
 | Gauge | Where | Kind |
 |---|---|---|
 | Writes executed per arm (native 0, watch 0, Omni-Compass n) | GPU bench, live Kubernetes | measured |
+| Settings commands the governor wrote on its own, and the share of its additions decided while the service was still inside its line (the babysitting tax; no person touches either arm) | live Kubernetes and the cloud (`tools/live_reps.py`) | measured |
 | Every arm ended at its start setting (the reset restored it) | GPU bench, live Kubernetes switch drill | measured |
 | Invariant violations (all, and excluding power) | stack benchmark | modelled |
 | Security violations, contradictions, pages | stack benchmark | modelled |

@@ -1070,6 +1070,55 @@ shows (its processor use, the requests waiting, the response times), as in every
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
+## In the cloud, the bill at native's work (the founder's order, 2026-10-14, night, before any run of it)
+
+The founder's order of 14 October: in the cloud Omni-Compass is to show one thing, a smaller bill for the same work as
+native; the benefit of the max belongs where Omni-Compass sits in the engine before the cloud or in the chip at its other
+end, not in the cloud's bill. The first Azure runs on the engine that stands were at the max and showed the opposite of
+what the cloud needs: on the steady load, three repetitions of run 38455383137 raised the bill 49% at list price (machines
+in service 2.9 against 1.8, replicas 19 against 9.5) to buy faster replies and fewer failed requests. From this order
+every Azure set runs as follows, and nothing else changes:
+
+- **Omni-Compass on top at the tune-down** (`dial save`, `OMNI_DIAL=save`): native's work on the least resource. Machines
+  are given back only where the paired trial on the machines shows the response time no more than 2% slower (the
+  verdict), through the release gate, one at a time; a breach puts one back at once.
+- **Native's own replica cap** (`replica_ceiling 0`): Omni-Compass never raises the app's replica ceiling above the
+  operator's. Inside that cap its HPA target still moves between 60% of the operator's target and the operator's own, so
+  at a moment it can hold more pods than native's HPA would, and Azure's autoscaler may then add a machine: in a burst the
+  bill can rise, and where it does the row reads power given and the setting is reported as failing its aim, never
+  hidden. A setting in which the governor in a cloud only gives back (its HPA target never below the operator's) is a
+  change to the engine and is proposed for the next version, not made here.
+- **The aim, and the readings.** The bill (machine-hours at list price) and the machines in service aim lower: a cut is
+  GAIN. Work served, response times, time over the line and failed requests must read EVEN or GAIN: a LOSS there is a
+  LOSS of the test, its cause found and fixed. A rise in the bill is power given and is reported as the setting failing
+  its aim.
+- **Disclosed before the run.** Where native is short (at its cap and failing requests, as on the steady load), there is
+  nothing to give back without costing work, and the bill is expected to read EVEN; the cuts are expected where native
+  holds machines it does not need, in the quiet stretches between bursts and in the hours of a day's trough.
+- **The runs of the max.** Steady A (run 38455383137: three repetitions finished at the max) and the burst at
+  `1 6 1 8 1 6` (run 38500160429, its first repetition) are stopped and kept as runs of the max, counted in no bill result.
+  Every Azure set starts again at the tune-down from `scripts/azure_queue.txt` (its run titles carry `dial save`), A of
+  every set, then B, then C: the steady load, `1 4 1 6 1 9` (the founder's), `1 6 1 8 1 6`, and the real day on 1 to 9.
+
+## The babysitting tax: three rows in the receipt (the founder's order, 2026-10-14, night, before any run at the tune-down)
+
+The founder's order of 14 October: show that the governor is an autopilot, self-running and self-steering like a
+self-driving car, acting ahead, so that nobody turns a knob and nobody has to react. Three rows join every Kubernetes and cloud receipt (`tools/live_reps.py`, `babysitting`), written
+here before any run at the tune-down; nothing else in the receipt or the readings changes.
+
+- **Alert minutes**: the whole minutes of the measured window whose 95th percentile response time (nearest rank, a failed
+  request counted over the line) was over the line, the minutes an on-call page would be open. Measured from the probe's
+  own records, in both arms; judged, the aim lower (time missed: a fall is GAIN).
+- **Settings commands the governor wrote on its own**: the writes in the governor's audit inside the window (a dry run
+  is none). Native and the watching arm write nothing and read 0. Shown, not judged.
+- **The governor's additions decided while the service was still inside its line**: of its decisions inside the window
+  that add (a machine more than it saw, or a lower HPA target than its last), the share made while the 95th percentile it
+  read was at or under the line. Shown, not judged.
+
+No person touches a setting in either arm of any run; that is stated in every receipt beside the rows.
+
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

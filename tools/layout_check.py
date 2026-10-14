@@ -62,7 +62,7 @@ def main():
             problems.append(f"root: {top} is not in the declared root set (move it under docs/, .github/ or a code folder)")
     for p in files:
         if not p.endswith(".md") or p.startswith(("results/live/raw/", "release/", "results/external_review/")) \
-                or p == "docs/book/OMNI_COMPASS_BOOK.md":            # quoted reviews; the book is built (build_book.py)
+                or p in ("docs/book/OMNI_COMPASS_BOOK.md", "docs/book/OMNI_COMPASS_OWNERS_BOOK.md"):            # quoted reviews; the book is built (build_book.py)
             continue
         text = (ROOT / p).read_text(errors="ignore")
         base = Path(p).parent
@@ -92,7 +92,7 @@ def main():
                     problems.append(f"path: {p} names `{t}` (no such file)")
     corpus = "\n".join((ROOT / p).read_text(errors="ignore") for p in files
                        if not p.startswith(("results/", "release/")) and p != "RELEASE_MANIFEST.json"
-                       and p != "docs/book/OMNI_COMPASS_BOOK.md" and p.endswith((".md", ".py", ".sh", ".yml", ".yaml", ".toml", ".json", ".txt")))
+                       and p not in ("docs/book/OMNI_COMPASS_BOOK.md", "docs/book/OMNI_COMPASS_OWNERS_BOOK.md") and p.endswith((".md", ".py", ".sh", ".yml", ".yaml", ".toml", ".json", ".txt")))
     for top in sorted({p.split("/")[1] for p in files if p.startswith("results/") and p.count("/") >= 1}):
         stem = top.rsplit(".", 1)[0] if "." in top else top
         if top.startswith("VERIFY_") or (f"results/{top}" not in corpus and f"results/{stem}" not in corpus and f'"{top}"' not in corpus

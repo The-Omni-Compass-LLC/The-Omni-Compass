@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-> **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: check the installation with section 8.5 of the manual (*Wired right or wired wrong*).
+> **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: check the installation with section 4.5 of the manual (*Wired right or wired wrong*).
 
 > **The current manual is `docs/INTEGRATION_MANUAL.md`** (every stack, every level, every switch). This page is kept for
 > reference; where the two differ, the integration manual is current.
@@ -12,7 +12,7 @@
 > lives by itself) or **operator's choice** (a trade). A knob that showed nothing, or lost, stays native.
 > **How to wire for superiority:** every knob starts in watch (wire out only); an observation run shows what native does
 > alone; then the brain's own verdict decides on the knob, in real time, whether a notch pays before it is written
-> (`tools/knob_verdict.py` around the engine's verdict; the manual, section 9.4); a knob that cannot prove it pays stays
+> (`tools/knob_verdict.py` around the engine's verdict; the manual, section 6.4); a knob that cannot prove it pays stays
 > native, and the operator's setting is always free. Where that verdict stands today, knob by knob, is the last table of
 > `docs/WIRING_VERDICTS.md`.
 
@@ -103,7 +103,7 @@ A PodDisruptionBudget on each service is required, because drains go through the
 | Native vs Omni on top vs Omni alone, paired on one machine, real Kubernetes | `results/live/LIVE_PAIRED.md` |
 | The full wiring manual | `docs/OPERATOR_MANUAL.md` |
 | The frozen engine's results, three runs each, read by rule | `results/live/V1_*.md`, `results/live/V3_*.md`; `docs/OMNI_V1.md`, `docs/OMNI_V3.md` |
-| The same wiring on Azure's managed Kubernetes (the bill), a database pooler, a rented machine, the simulators, a message broker's consumer group, a cache's memory ceiling, a drone swarm's autopilot | the manual, section 10 (`docs/OMNI_COMPASS_MANUAL.md`) |
+| The same wiring on Azure's managed Kubernetes (the bill), a database pooler, a rented machine, the simulators, a message broker's consumer group, a cache's memory ceiling, a drone swarm's autopilot | the manual, chapter 7 (`docs/OMNI_COMPASS_MANUAL.md`) |
 
 ---
 

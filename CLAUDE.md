@@ -78,8 +78,8 @@ the founder overrides one in the conversation.
   GitHub runs plus a margin; it starts nothing while an Azure run, a grid report or a verify waits for a runner (Azure
   first). It also releases the reruns of every benchmark on the engine that stands (`scripts/reruns.txt`; A of
   every benchmark, then B, then C; a few a tick; read back by count, never started twice). It starts every Azure set from `scripts/azure_queue.txt` (A of every set, then B, then C; one at a time in each
-  machine family's queue; read back by its run's title, never started twice): the steady set, the bursts `1 6 1 8 1 6`
-  and `1 4 1 6 1 9`, and the real day (Google 2011) on 1 to 9 (the founder's words of 14 October; the load generator alone
+  machine family's queue; read back by its run's title, never started twice): the steady set, the bursts `1 4 1 6 1 9`
+  and `1 6 1 8 1 6`, and the real day (Google 2011) on 1 to 9, every one at the tune-down with native's cap (the founder's words of 14 October; the load generator alone
   reads a schedule, never the governor). Each tick runs the conductor's newest
   code (fetched from the branch). `peek` (`.github/workflows/peek.yml`) prints a running run's finished repetitions,
   paired, so a benchmark is looked at while it runs and a problem fixed before it ends. Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
@@ -121,6 +121,30 @@ the founder overrides one in the conversation.
 
 ## Orders of 14 October
 
+- **In the cloud, the bill** (the founder's order of 14 October, night). In a cloud (Azure now; Google and Amazon when he
+  starts them) Omni-Compass is to show one thing: the same work as native for a smaller bill, never a bigger one. Every
+  cloud set runs Omni-Compass on top at the tune-down (`dial save`) with native's own replica cap (`replica_ceiling 0`):
+  never a replica ceiling above native's (inside it the HPA target still moves, so a burst can still raise the bill; a
+  give-back-only cloud setting is proposed for the next engine); the bill and the machines aim lower, and work, speed and
+  failures must read EVEN or GAIN. The benefit of the max belongs where Omni-Compass sits in the engine before the cloud, or in the
+  chip at its other end. Runs of the max in the cloud are stopped and kept as such, counted in no bill result.
+- **On autopilot: no babysitting tax** (the founder's words of 14 October, night). Omni-Compass is an autopilot,
+  self-running and self-steering inside the system like a self-driving car: nobody turns a knob and nobody has to
+  react, because it acts before the line is crossed. Every Kubernetes and cloud receipt shows it in both arms: the
+  alert minutes (judged), the settings commands the governor wrote on its own and its additions made inside the line
+  (shown) (`tools/live_reps.py`, `babysitting`); both manuals and the README say so.
+- **Two manuals** (the founder's orders of 14 October, evening and night), both kept in the repository until the founder
+  takes the Owner's Manual out:
+  - **The Operator's Manual** (`docs/OMNI_COMPASS_MANUAL.md` and `.pdf`): the glove box, not the blueprint. It shows an
+    engineering team how to embed, wire, tune, run and check Omni-Compass on a stacked, clustered system, or on any one
+    muscle, in all its processes. It does not explain what is inside Omni-Compass or how it is built: no theory, no
+    equations of the engine, no gains or internal rules, no engine source, no benchmark results (those stay in `results/`
+    and `docs/STATE_OF_PLAY.md`). The engine is shown only as its shell and its process. Nothing in it explains or points
+    to how the code is written, and nothing is disclosed or disclaimed about it.
+  - **The Owner's Manual, the master** (`docs/OMNI_COMPASS_OWNERS_MANUAL.md` and `.pdf`, `build_book.py --owner`):
+    everything and all, for whoever owns or licenses Omni-Compass and so must know the whole mechanism: the philosophy and
+    theory (`docs/book/THEORY.md`, `docs/book/DECLARATION.md`), the mathematics, the mechanism, how it is built, the
+    engine's source, every result, and the wiring. Every fix realigns both.
 - **The manual carries no illustrations and no blank pages.** None of the founder's plates (his illustration images) go
   in the manual: no cover art, no title-page rose, no plates, no List of Plates; no charts either. Every chapter starts on
   the next page; a part's heading sits at the top of a page with its first chapter under it. The contents and page numbers
@@ -216,8 +240,8 @@ the founder overrides one in the conversation.
   real thing" (class L); a meter is class P. The license's own phrase stays as written.
 - The newest result is always at the front; the repository keeps itself current (the archive bot and the front page);
   old material goes to `docs/history`.
-- The manual is a printed book: front matter, body, back matter, the wiring instructions for the people who implement it,
-  the theory of the mechanism; rebuilt as a PDF whenever it changes.
+- Both manuals are printed books, front matter, body and back matter (Orders of 14 October: the Operator's Manual for
+  the people who wire and run it, the Owner's Manual with everything); rebuilt as PDFs whenever they change.
 - The founder hears what a result says before it goes up.
 
 ## Repository
@@ -228,8 +252,10 @@ the founder overrides one in the conversation.
   `/tmp/tmp*` first, because test leftovers fill the disk. Keep the Python 3.12 environment outside `/tmp` (for example
   `/root/v312`), because a container reset wipes `/tmp`. After a push, check the GitHub verify run itself, not only the
   local one.
-- The manual (`docs/`, about 200+ pages, rebuilt as a PDF) explains the physics, philosophy, wiring and how to read every
-  metric, and holds the muscle catalog and the register.
+- The Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`, `python3 docs/book/build_book.py`) is the wiring and operating
+  manual, with every muscle's wiring and card (Appendix E); the Owner's Manual (`docs/OMNI_COMPASS_OWNERS_MANUAL.md`,
+  `build_book.py --owner`) explains the physics, philosophy, mechanism and wiring, how to read every metric, every result,
+  and holds the muscle catalog, the register and the engine's source.
 - Zips on request: split into parts under the upload limit, each part openable on its own, built from a pushed commit.
 - Never put a model identifier in a commit, PR or file.
 

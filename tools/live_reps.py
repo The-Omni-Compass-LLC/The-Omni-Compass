@@ -32,6 +32,11 @@ KEYS = ["worker nodes in service, mean", "node-hours", "energy, parked workers s
         "machines billed, machine-hours", "compute bill at list price ($)",
         "second app: response time (ms), 95th percentile", "second app: response time (ms), 99th percentile",
         "second app: time over the response line (% of samples)", "second app: failed requests (%)"]
+# the babysitting tax (the founder's order of 14 October): what a person on call would have had to do in each arm
+ALERT = "alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line)"
+COMMANDS = "settings commands the governor wrote on its own (no person touched either arm)"
+AHEAD = "governor's additions decided while the service was still inside its line (% of its additions)"
+KEYS[KEYS.index("failed requests (%)") + 1:KEYS.index("failed requests (%)") + 1] = [ALERT, COMMANDS, AHEAD]
 BILL = {"machines billed, machine-hours", "compute bill at list price ($)"}   # a real cloud only (PLATFORM=aks)
 SECOND = {k for k in KEYS if k.startswith("second app: ")}                     # the fairness test only (TWO_APP=1)
 HOST = {"host CPU busy, the real machine under kind (%)", "host cores (the real machine under kind)"}   # kind only
@@ -56,7 +61,8 @@ LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked w
          "energy, Kepler's reading of the machine's meter (Wh)": "energy, Kepler's reading of the same counters (Wh; Kepler 0.11.4: shown, not judged)",
          "energy Kepler attributes to the service's pods (Wh)": "energy Kepler attributes to the service's pods (Wh; its split of the meter by each pod's CPU time: shown, not judged)"}
 NEUTRAL = {"CPU used (cores), mean", "utilisation (used / allocatable)", "Omni's own CPU (cores), mean",
-           "CPU used with Omni's own (cores), mean", "energy per core-hour (Wh)", "pending pods, pod-minutes"} | HOST | KEPLER
+           "CPU used with Omni's own (cores), mean", "energy per core-hour (Wh)", "pending pods, pod-minutes",
+           COMMANDS, AHEAD} | HOST | KEPLER
 # more or less is not judged by itself. Energy per core-hour is energy over CPU used, and CPU used is not judged, so the
 # ratio is not either. A pod pending in the snapshot is waiting for a machine or is a pod the autoscaler just created and
 # is starting; the judged gauge is the scheduler's own verdict that no machine would take it (amendment 10)
@@ -112,6 +118,70 @@ def bill(d):
             else:
                 cost += dt * x[1] * default_price
         g["compute bill at list price ($)"] = cost
+    return g
+
+
+def babysitting(d, slo):
+    """The babysitting tax (the founder's order of 14 October): what a person on call would have had to do in each arm.
+    Alert minutes: the whole minutes of the measured window whose 95th percentile response time (nearest rank, a failed
+    request counted over the line) was over the line, the minutes an on-call page would be open; measured, judged (time
+    missed: lower). From the governor's audit, shown and never judged: the settings commands it wrote on its own, and the
+    share of its additions (a machine more, or a lower HPA target: more pods) decided while the 95th percentile it read
+    was still inside the line, acting before the line was crossed. Native and the watching arm write nothing: 0 commands."""
+    g = {}
+    try:
+        with open(d / "latency.csv") as f:
+            rows = list(csv.DictReader(f))
+    except OSError:
+        rows = []
+    mins = {}
+    for r in rows:
+        try:
+            m = int(float(r["elapsed_seconds"]) // 60)
+            v = float(r["latency_ms"]) if r.get("ok") == "1" and r.get("latency_ms") else float("inf")
+        except (KeyError, ValueError):
+            continue
+        mins.setdefault(m, []).append(v)
+    try:
+        t0 = float((d / "window_start.txt").read_text().split()[0])
+        t1 = float((d / "window_end.txt").read_text().split()[0])
+        full = int((t1 - t0) // 60)
+    except (OSError, ValueError, IndexError):
+        t0, t1, full = None, None, (max(mins) if mins else 0)   # no recorded end: the last, partial minute is dropped
+    if mins:
+        def p95(v):
+            v = sorted(v)
+            return v[max(0, math.ceil(0.95 * len(v)) - 1)]
+        g[ALERT] = float(sum(1 for m, v in mins.items() if m < full and p95(v) > slo))
+    native = d.name.split("-")[1].startswith("native") if d.name.count("-") >= 2 else "-native-" in d.name
+    audit = d / "audit.jsonl"
+    if native or not audit.exists():
+        g[COMMANDS] = 0.0 if native else float("nan")
+        return g
+    inside = (lambda t: True) if t0 is None else (lambda t: t0 <= t <= t1)
+    cmds, adds, ahead, prev = 0, 0, 0, None
+    recs = []
+    with open(audit) as f:
+        for line in f:
+            try:
+                recs.append(json.loads(line))
+            except ValueError:
+                continue                                  # a line cut off by a crash is no record
+    for rec in recs:
+        t = float(rec.get("time", 0.0))
+        if "write" in rec and not rec.get("dry_run") and inside(t):
+            cmds += 1
+        dec = rec.get("decision")
+        if isinstance(dec, dict):
+            rho = dec.get("hpa_target_recommended")
+            add = (dec.get("nodes_recommended") or 0) > (dec.get("nodes_observed") or 0) or (
+                prev is not None and rho is not None and rho < prev - 1e-9)
+            prev = rho if rho is not None else prev
+            if add and inside(t) and dec.get("latency_p95_ms") is not None:
+                adds += 1; ahead += float(dec["latency_p95_ms"]) <= slo
+    g[COMMANDS] = float(cmds)
+    if cmds and adds:
+        g[AHEAD] = 100.0 * ahead / adds
     return g
 
 
@@ -401,6 +471,7 @@ def arm_gauges(d):
     rows = list(csv.DictReader(open(d / "capture.csv")))
     g = gauges(rows); g.update(latency(str(d / "latency.csv"))); g.update(pod_starts(d))
     g.update(host_cpu(d)); g.update(robust_window(d, float(os.environ.get("SLO_MS", 500))))
+    g.update(babysitting(d, float(os.environ.get("SLO_MS", 500))))
     # the controller's own cost (its process and every command it ran; it runs beside the cluster, not in it), from its
     # audit: counted so a CPU saving in the cluster is never reported without what Omni itself spent. Native, and native
     # tuned by its operator (native40, native30, native20), run no Omni process: 0.
@@ -600,6 +671,11 @@ def main(root):
                   "Azure's cluster autoscaler deletes a machine once it is empty. Machine-hours are integrated every 15 s over the",
                   "measured window and priced at the list price per machine-hour. The energy rows remain the declared model.", ""]
                  if cloud else NOTE)
+    L += ["**The babysitting tax.** Omni-Compass runs on autopilot: no person touched a setting in either arm. An alert",
+          "minute is a whole minute whose 95th percentile, failed requests counted over, was over the line: a minute an",
+          "on-call page would be open. The commands are the settings the governor wrote on its own, each in its audit with",
+          "its reason; the share decided inside the line counts its additions (a machine more, or a lower HPA target) made",
+          "before the line was crossed. The alert minutes are judged; the commands and the share are shown, not judged.", ""]
     if any(not math.isnan(m.get("energy, the machine's own meter (Wh)", float("nan"))) for m in out["means"].values()):
         L += ["**This run carries the machine's own meter.** The processor's RAPL counters (its packages and its memory) were",
               "read every 2 s over the measured window: the energy the whole machine under the cluster drew, Omni-Compass's own",

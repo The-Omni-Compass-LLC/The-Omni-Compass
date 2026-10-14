@@ -3,7 +3,7 @@
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 > **Specification, carried from the package XPASS27 (2026-10-01).** It specifies a contract or a measurement; any result
-> it quotes is as of that package. Current results: the manual, section 15 (`docs/OMNI_COMPASS_MANUAL.md`).
+> it quotes is as of that package. Current results: `docs/STATE_OF_PLAY.md` and the tables in `results/`.
 
 > **License notice:** Omni-Compass is source-available for **evaluation and simulation only** under the root `LICENSE`; it is **not open source**. Production use, commercialization, monetization, hosted/SaaS/API use, customer-facing use, and commercial embedding/integration require a separate written paid license from **The Omni-Compass LLC**. The root `LICENSE` controls.
 

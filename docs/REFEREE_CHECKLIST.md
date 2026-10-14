@@ -32,7 +32,7 @@ checklists for experimental computer science (code, data, seeds, environment, st
 |---|---|---|
 | How to wire it onto a stack, step by step | the manual, parts III and IV; `docs/GPU_RUN_GUIDE.md`; `docs/AZURE_SETUP.md` | met |
 | How to plug in a new knob | `docs/specs/UNIVERSAL_MUSCLE_SDK.md`, `omnicompass/muscle_sdk.py` | met |
-| How to read every result | the manual, section 3.4; `docs/HOW_TO_READ_THE_RESULTS.md` | met |
+| How to read every result | the manual, chapter 11; `docs/HOW_TO_READ_THE_RESULTS.md` | met |
 
 ## 4. Experimental design
 
@@ -63,7 +63,7 @@ checklists for experimental computer science (code, data, seeds, environment, st
 
 | Requirement | Where it is met | Status |
 |---|---|---|
-| The metering method stated for every energy number | evidence classes T, V, S, L, P in the manual, section 14; every receipt states measured or modelled | met |
+| The metering method stated for every energy number | evidence classes T, V, S, L, P in the manual, chapter 11; every receipt states measured or modelled | met |
 | Device meter on hardware | the GPU's own power reading, sampled every 200 ms, and its energy counter | met (P class) |
 | Whole-machine meter | the wall plug and the server's own BMC (Redfish, IPMI) readers (`tools/wall_meter.py`) | built; used where the host allows |
 | A modelled number never presented as a meter | the kind energy rows carry "declared model" in their names | met |

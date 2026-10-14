@@ -466,7 +466,8 @@ def azure_title(kv):
     what = f"burst {kv['load_steps']}" if kv.get("load_steps") else "steady"
     org = f" organism {kv['organism']} x{kv.get('organism_scale') or '1'}" if kv.get("organism") else ""
     room = f" replica room {kv['replica_ceiling']}" if kv.get("replica_ceiling") else ""
-    return f"aks-metered {what}{org}{room} {loc} {fam}"
+    dial = kv.get("dial") or "save"
+    return f"aks-metered {what}{org}{room} dial {dial} {loc} {fam}"
 
 
 def azure_group(title):

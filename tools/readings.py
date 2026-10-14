@@ -446,7 +446,8 @@ def key_text() -> str:
     return re.sub(r"\*\*|`", "", "\n".join(out)).replace("## ", "")
 
 
-KEY_PAGES = ("README.md", "docs/HOW_TO_READ_THE_RESULTS.md", "docs/OMNI_COMPASS_MANUAL.md")
+KEY_PAGES = ("README.md", "docs/HOW_TO_READ_THE_RESULTS.md", "docs/OMNI_COMPASS_MANUAL.md",
+             "docs/OMNI_COMPASS_OWNERS_MANUAL.md")
 
 
 def _with_key(text: str) -> str:

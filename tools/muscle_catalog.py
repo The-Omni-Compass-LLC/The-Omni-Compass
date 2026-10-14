@@ -175,7 +175,7 @@ def main():
          "it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is "
          "reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of "
          "these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels "
-         "and the checks of the manual (chapters 8 and 9). See `DISCLOSURES.md`.", "",
+         "and the checks of the manual (chapters 4 and 6). See `DISCLOSURES.md`.", "",
          "## How to read an entry", "",
          "**The four kinds of knob.**", ""] + [f"- {v}" for v in KNOB.values()] + ["",
          "**The five kinds of plant.** Every muscle is modelled on one of five plants, each with its own service reading and "
@@ -206,7 +206,7 @@ def main():
           "**How a muscle is reached in a real stack.** The class of machine decides the wire:", "",
           "| Class of machine | What it is | The wire in a real stack |", "|---|---|---|"]
     for k in sorted({r["preset"] for r in rows}):
-        what, wire = PRESET.get(k, (k, "see the manual, section 8.2"))
+        what, wire = PRESET.get(k, (k, "see the manual, section 4.2"))
         L.append(f"| `{k}` | {what} | {wire} |")
     L += ["", "Wires marked *modelled only* exist as plants in the benchmark and are not built for live use.", ""]
 

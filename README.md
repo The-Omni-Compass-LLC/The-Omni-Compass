@@ -170,14 +170,21 @@ in both arms, four cap levels): EVEN, no difference beyond the noise at any cap,
 Omni-Compass has there, more copies of the service ([`results/live/V5_CAPACITY.md`](results/live/V5_CAPACITY.md)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
-## The manual: the book for the people who wire it
+## The manuals: the Operator's Manual and the Owner's Manual
 
-[`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf) is Omni-Compass as a printed book, built from the
-repository whenever it changes (`docs/book/build_book.py`): front matter with the card for the glove box, the theory of
-the mechanism, the wiring instructions level by level and stack by stack (Kubernetes, databases, message brokers, caches,
-GPUs, the processor itself, the data center under the servers, robots and drones), operating it, proving it, and back
-matter. Its text is [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md). It is written for the CTO who decides,
-the engineer who wires, the operator who runs a data center, and the auditor who checks.
+[`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf), the Operator's Manual, is the manual for the glove box, built from the
+repository whenever it changes (`docs/book/build_book.py`): how to embed, wire, tune, run and check Omni-Compass on a
+stacked, clustered system or on any one muscle. Front matter with the card for the glove box; the governor from the
+outside and its factory tune; the plug and the rules its wires obey; the wiring level by level and stack by stack
+(Kubernetes, databases, message brokers, caches, GPUs, the processor itself, the data center under the servers, robots
+and drones); operating it; checking it on your own system; and back matter with every muscle, its wiring and its card.
+Its text is [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md). It is written for the CTO who decides, the
+engineer who wires and the operator who runs it; the published results are on this page and in `results/`.
+
+[`docs/OMNI_COMPASS_OWNERS_MANUAL.pdf`](docs/OMNI_COMPASS_OWNERS_MANUAL.pdf), the Owner's Manual, is the master: everything
+in one book, for whoever owns or licenses Omni-Compass and so must know the whole mechanism (the philosophy, the
+mathematics, the mechanism, the engine's source, every result, and the wiring). Its text is
+[`docs/OMNI_COMPASS_OWNERS_MANUAL.md`](docs/OMNI_COMPASS_OWNERS_MANUAL.md).
 
 ## What is real and what is a model
 
@@ -202,6 +209,16 @@ to native; the kill switch, a separate security switch, turns it off everywhere 
 the max on the dial. The law, its
 proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.md),
 [`docs/TRACKING_THEOREM.md`](docs/TRACKING_THEOREM.md), [`docs/CONVEYANCE_LAW.md`](docs/CONVEYANCE_LAW.md).
+
+**Where the benefit is taken, and why nobody babysits it.** On machines already paid for (your own racks, a chip at its heat
+line) the max takes the benefit as more work from the same machines; in a chip the aim is more work at native's own
+heat, never hotter. In a
+public cloud the benefit is the bill: the cloud runs at the tune-down with native's own replica cap, native's work for a
+smaller bill and never a bigger one. Either way it runs on autopilot, self-running and self-steering like a self-driving
+car: nobody turns a knob and nobody has to react; every change is the governor's own, logged with its reason, made as the
+reading approaches the line rather than after it is crossed; every Kubernetes and cloud receipt
+counts the babysitting tax in both arms (the alert minutes an on-call page would be open, and the commands the governor
+wrote on its own).
 
 ## Check it yourself
 

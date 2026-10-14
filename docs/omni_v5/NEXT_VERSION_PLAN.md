@@ -68,6 +68,13 @@ made either way, because a saturated host can occur in production too.
 - The GPU's heat line: never over 83 C, and the headroom under it used where it buys work.
 - Micro steps inside each decision (fourth-order Runge-Kutta for the plants' motion, Monte Carlo over their uncertainty).
 - The body's hormones and immune system carried into every organism.
+- **In a cloud, give back only** (the founder's order of 14 October, night): on a billed machine the governor's HPA
+  target never goes below the operator's and no machine is held above native's count, so the bill can only fall or
+  stay; machines are given back where the verdict allows. Today's tune-down with native's replica cap still moves the
+  HPA target inside the cap, so a burst can raise the bill. The max keeps its push where the machines are paid for.
+- **The chip at native's heat** (the founder's order of 14 October): on a GPU the gain is more work inside the chip at
+  native's own temperature, never hotter; the clock and power ceilings move only where the card's heat stays at or
+  under native's.
 
 ## 5. Every LOSS that stands today, and what this version does about each
 

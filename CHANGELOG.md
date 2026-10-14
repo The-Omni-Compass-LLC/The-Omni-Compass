@@ -2,6 +2,71 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-14: the babysitting tax in every Kubernetes and cloud receipt; the cloud bill in both manuals
+
+- **The founder's order of 14 October (night):** show that Omni-Compass is an autopilot, self-running and self-steering
+  like a self-driving car, acting ahead: nobody turns a knob, nobody has to react. Three rows join every Kubernetes and cloud receipt (`tools/live_reps.py`, `babysitting`), written
+  into `docs/K8S_COMPASS_PREREGISTRATION.md` before any run at the tune-down: the **alert minutes** (whole minutes whose
+  95th percentile, failed requests counted over, was over the line; judged, the aim lower), the **settings commands the
+  governor wrote on its own** and the **share of its additions decided while the service was still inside its line**
+  (both shown, not judged). Every receipt states that no person touched either arm. Test: `tests/test_babysitting.py`.
+- **Both manuals** (the Operator's, sections 7.1 and chapter 8 and Appendix C; the Owner's, sections 10.1 and 11 and
+  Appendix D), the metrics catalog and the README: in the cloud the bill is the gauge and is never raised (the tune-down
+  with native's cap); the max belongs where the machines are paid for; no babysitting, and the rows that count it. Both
+  PDFs rebuilt. No engine file changed.
+
+## 2026-10-14: in the cloud, the bill at native's work: Omni-Compass on top at the tune-down with native's cap
+
+- **The founder's order of 14 October (night):** in the cloud Omni-Compass shows the same work as native for a smaller
+  bill, never a bigger one; the benefit of the max belongs in the engine before the cloud or in the chip. The Azure steady
+  run at the max (38455383137, three repetitions) had raised the bill 49% at list price to buy faster replies and fewer
+  failed requests; it and the burst at `1 6 1 8 1 6` at the max (38500160429) are stopped and kept as runs of the max,
+  counted in no bill result.
+- **`aks-metered.yml`:** a `dial` input (default `save`, the tune-down) passed to the governor (`OMNI_DIAL`,
+  `scripts/kind_bench.sh` `--dial`); the run's title carries the dial. Every line of `scripts/azure_queue.txt` runs at
+  `dial=save` with native's own replica cap (`replica_ceiling=0`), `1 4 1 6 1 9` first among the bursts; the conductor
+  reads the dial into each title (`azure_title`), so the runs of the max are never counted as started. Test updated.
+- **Preregistration** (`docs/K8S_COMPASS_PREREGISTRATION.md`, last section, before any run): the bill and the machines
+  aim lower; work, speed and failures must read EVEN or GAIN; disclosed: where native is short (at its cap and failing,
+  as on the steady load) the bill is expected EVEN, and the cuts in the quiet stretches between bursts and a day's
+  trough; inside native's cap the HPA target still moves, so a burst can still raise the bill (a give-back-only cloud
+  setting is proposed for the next engine). The replica room is off in every cloud set (`docs/AKS_REPLICA_ROOM_PREREGISTRATION.md`).
+- CLAUDE.md carries the order. No engine file changed: the dial and the replica cap are the engine's own settings.
+
+## 2026-10-14: two manuals: the Operator's Manual (the glove box) and the Owner's Manual (the master, everything)
+
+- **The founder's orders of 14 October (evening and night):** two manuals, both kept in the repository until the founder
+  takes one out. The **Operator's Manual** (`docs/OMNI_COMPASS_MANUAL.md`, `docs/OMNI_COMPASS_MANUAL.pdf`) shows an
+  engineering team how to embed, wire, tune, run and check Omni-Compass on a stacked, clustered system or on any one
+  muscle, and says nothing about how it is built. The **Owner's Manual**, the master (`docs/OMNI_COMPASS_OWNERS_MANUAL.md`,
+  `docs/OMNI_COMPASS_OWNERS_MANUAL.pdf`, 808 pages), holds everything, for whoever owns or licenses it and so must know the
+  whole mechanism: the philosophy and the theory, the mathematics, the mechanism, the engine's source, every result, and
+  the wiring. CLAUDE.md carries the orders.
+- **The Owner's Manual** is the full manual as it stood (every chapter, the equations, the mechanism, the results, the
+  evidence map, the reproduction chapter, the executive summary with the standing block), retitled, bound with the theory,
+  the declaration, the repository's documents and the engine's source (`python3 docs/book/build_book.py --owner`).
+- **The Operator's Manual, `docs/OMNI_COMPASS_MANUAL.md`, rewritten** (3,804 lines to about 2,000): front matter (the key, what you are looking
+  at, the notice with the wiring disclaimer and the factory tune, a foreword, a preface for each reader, the prelude, an
+  introduction on the problem, the idea and what the manual covers, and the card for the glove box); Part I the governor
+  from the outside (what it is; your stack as one body; a new chapter on tuning: the factory tune, the dial, each muscle's
+  card, the settings an installation writes, the profiles); Part II the plug, the adapters, the wire check and the rules
+  the wires obey; Part III the eight levels and every stack's wiring, brought to the rules as they stand (the pooler's
+  queue reading, the caches' miss-share gates, the buffer pool's hand-back on the server's time, the GPU and the cluster
+  at the max and at the tune-down); Part IV operating it; Part V checking it on your own system (paired runs, evidence
+  classes, the engine version and the three-run rule); Part VI the license and verifying a copy; back matter (glossary,
+  commands, the files an installation touches, the gauges, troubleshooting, every muscle). Removed: the engine's
+  equations, the mechanism and theory chapters, the compass law's gains, the engine's source, the results chapters, the
+  evidence map, the reproduction chapter and the executive summary (all kept in the Owner's Manual).
+- **The book builder** (`docs/book/build_book.py`) makes both: the Operator's Manual binds the manual, the muscle catalog
+  (Appendix E) and the license papers; `--owner` binds everything. The copyright page no longer says "simulated". Both
+  PDFs: no images, no blank page, nothing under 11 pt, the contents matching the pages.
+- **Where things stand** (`tools/summary.py --fix`) now writes its block into `docs/STATE_OF_PLAY.md`, the results'
+  own front page, and into the Owner's Manual's executive summary, and `verify.py` checks both; the key stands in both
+  manuals.
+- Every page that pointed into the old manual points to the new chapters: `DISCLOSURES.md`, the wiring banner on 20
+  pages, `docs/INTEGRATION_MANUAL.md`, `docs/WIRING_GUIDE.md`, `docs/GPU_RUN_GUIDE.md`, `docs/REFEREE_CHECKLIST.md`,
+  the muscle catalog (`tools/muscle_catalog.py`), the README and the instructions other AI tools read.
+
 ## 2026-10-14: the Azure sets queue themselves; two more burst shapes, `1 4 1 6 1 9` and the real day on 1 to 9
 
 - **The Azure queue** (`scripts/azure_queue.txt`, read by the grid conductor every 15 minutes): every Azure set in

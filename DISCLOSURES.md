@@ -74,12 +74,12 @@ not be the published one.
 
 Therefore:
 
-1. **It cannot be slapped on.** Every installation goes through the levels of the manual in order (chapter 9), starting
-   read-only, and every writing level begins with the wire check (manual, section 8.4) and a watch arm that must equal
+1. **It cannot be slapped on.** Every installation goes through the levels of the manual in order (chapter 6), starting
+   read-only, and every writing level begins with the wire check (manual, section 4.4) and a watch arm that must equal
    native.
 2. **If your paired receipts differ from the published benchmarks in direction** (service LOSS, or no saving where one
    was shown), **the first presumption is wiring, not the law.** Confirm the installation with the checks in the
-   manual's section 8.5 (*Wired right or wired wrong*) before drawing any conclusion about Omni-Compass.
+   manual's section 4.5 (*Wired right or wired wrong*) before drawing any conclusion about Omni-Compass.
 3. **This has happened to us, and is published.** On the first real card (NVIDIA A10, 2026-10-02) the governor read
    being busy as trouble, set its power lid under the card's own working draw and allowed the clock under the card's own
    working clock; the card served bursts more slowly and the slowest answers were 58.5% slower. The cause was found in
@@ -122,7 +122,7 @@ machines.
 |---|---|
 | What has been measured, and how strongly | `docs/STATE_OF_PLAY.md`, `docs/DOSSIER.md`, `docs/EVIDENCE_LEDGER.md` |
 | The rules written before each run | `docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md` |
-| How to wire it, level by level, and how to confirm it is wired right | `docs/OMNI_COMPASS_MANUAL.md` (chapters 8 and 9), the book `docs/OMNI_COMPASS_MANUAL.pdf` |
+| How to wire it, level by level, and how to confirm it is wired right | `docs/OMNI_COMPASS_MANUAL.md` (chapters 4 and 6), the book `docs/OMNI_COMPASS_MANUAL.pdf` |
 | The license, in plain answers, and third-party components | `LICENSE`, `LICENSING_FAQ.md`, `ENTERPRISE_LICENSE.md`, `NOTICE`, `THIRD_PARTY_NOTICES.md`, `PATENTS.md`, `TRADEMARKS.md`, `SECURITY.md`, `.github/CLA.md` |
 | The muscles, what each is for and how it is wired | `docs/MUSCLE_CATALOG.md` |
 | Proof the code is the code that ran | `python3 verify.py`, `RELEASE_MANIFEST.json`, `results/SEAL.json` |

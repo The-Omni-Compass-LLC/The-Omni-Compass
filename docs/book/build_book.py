@@ -6,18 +6,21 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Builds the printable book, docs/OMNI_COMPASS_MANUAL.pdf, and its one-file text, docs/book/OMNI_COMPASS_BOOK.md.
 
-The book is assembled from the theory chapters in docs/book/, the manual, the repository's documents, the muscle
-catalog and the source of the engine, in the order set in OUTLINE below. US Letter, mirrored margins for binding,
+Two books (the founder's orders of 14 October): the Operator's Manual (the default), how to embed, wire, tune, run and
+check Omni-Compass, with the muscle catalog and the license papers and nothing on how the engine is built; and, with
+--owner, the Owner's Manual, the master, docs/OMNI_COMPASS_OWNERS_MANUAL.pdf and docs/book/OMNI_COMPASS_OWNERS_BOOK.md,
+with everything: the theory and the declaration in docs/book/, the full manual, the repository's documents, the muscle
+catalog and the engine's source. Each in the order set in its outline below. US Letter, mirrored margins for binding,
 running heads, roman numerals in the front matter, a contents with page
 numbers and PDF bookmarks. No illustrations and no blank pages (the founder's order of 14 October): every chapter
 starts on the next page. Type (the founder's prompt rules): body text, tables, lists and code at 11 pt on a 1.5 line
 height, headings scaled up from it; only the running heads and footers are smaller, at 8 pt.
 
-    python3 docs/book/build_book.py
+    python3 docs/book/build_book.py            # the Operator's Manual
+    python3 docs/book/build_book.py --owner    # the Owner's Manual, the master
 """
 from __future__ import annotations
 
-import csv
 import re
 import sys
 from pathlib import Path
@@ -36,8 +39,25 @@ from reportlab.platypus.tableofcontents import TableOfContents
 
 ROOT = Path(__file__).resolve().parents[2]
 BOOK = ROOT / "docs" / "book"
-OUT_PDF = ROOT / "docs" / "OMNI_COMPASS_MANUAL.pdf"
-OUT_MD = BOOK / "OMNI_COMPASS_BOOK.md"
+# Two manuals (the founder's order of 14 October, night): the Operator's Manual, how to embed, wire, tune, run and check
+# Omni-Compass and nothing on how it is built (the default); and the Owner's Manual, the master, with everything: the
+# philosophy, the mathematics, the mechanism, the engine's source and every result (--owner). Both stay in the repository
+# until the founder takes the Owner's Manual out.
+OWNER = "--owner" in sys.argv
+MANUAL_REL = "docs/OMNI_COMPASS_OWNERS_MANUAL.md" if OWNER else "docs/OMNI_COMPASS_MANUAL.md"
+OUT_PDF = ROOT / "docs" / ("OMNI_COMPASS_OWNERS_MANUAL.pdf" if OWNER else "OMNI_COMPASS_MANUAL.pdf")
+OUT_MD = BOOK / ("OMNI_COMPASS_OWNERS_BOOK.md" if OWNER else "OMNI_COMPASS_BOOK.md")
+EDITION_NAME = "Owner's Manual" if OWNER else "Operator's Manual"
+SUBTITLE = ("The Master Manual: Its Philosophy, Its Mathematics, Its Mechanism, Its Results, and How to Wire It onto Your Stack"
+            if OWNER else "How to Embed, Wire, Tune and Run Omni-Compass on Your Stack")
+SUBTITLE_HTML = ("The Master Manual:<br/>Its Philosophy, Its Mathematics, Its Mechanism, Its Results,<br/>and How to Wire It "
+                 "onto Your Stack" if OWNER else "How to Embed, Wire, Tune and Run<br/>Omni-Compass on Your Stack")
+LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix F"
+INTRO = ("Introduction: The Problem, the Idea and the Promise" if OWNER else
+         "Introduction: The Problem, the Idea and What This Manual Covers")
+RESULTS_LINE = ("Every result in this book carries its evidence class." if OWNER else
+                "This book is the wiring and operating manual and carries no benchmark results; every published result "
+                "carries its evidence class.")
 EDITION = "October 2026"
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.legal import TOP, _drop_end, normalize_markdown  # noqa: E402  (the one notice, written once)
@@ -323,7 +343,7 @@ def split_h1(text):
 def manual_sections():
     """The manual, cut at its level-2 headings: {short title: lines}."""
     secs, cur = {}, None
-    for ln in clean_lines(read("docs/OMNI_COMPASS_MANUAL.md")):
+    for ln in clean_lines(read(MANUAL_REL)):
         m = re.match(r"^## (.*)", ln)
         if m:
             cur = re.sub(r"^\d+\.\s*", "", m.group(1).strip()); secs[cur] = []
@@ -344,13 +364,56 @@ def doc_body(rel):
     return title, lines
 
 
-THEORY = split_h1((BOOK / "THEORY.md").read_text())
-DECL = split_h1((BOOK / "DECLARATION.md").read_text())
 MAN = manual_sections()
+THEORY = split_h1((BOOK / "THEORY.md").read_text()) if OWNER else {}
+DECL = split_h1((BOOK / "DECLARATION.md").read_text()) if OWNER else {}
 
-# Each chapter: (title, source). Source: ("T", key) theory; ("D", key) declaration; ("M", key) manual section;
-# ("F", path) a repository document; ("FS", [paths]) several documents in one chapter; ("X", name) generated here.
-OUTLINE = [
+# Each chapter: (title, source). Source: ("T", key) theory; ("D", key) declaration; ("M", key) manual section; ("F", path)
+# a repository document; ("FS", [paths]) several documents in one chapter; ("X", name) generated here. The Operator's
+# Manual binds nothing on how the engine is built and no benchmark results; the Owner's Manual binds everything.
+OPERATOR_OUTLINE = [
+    ("PART", "The Governor, from the Outside",
+     "What Omni-Compass is as an installer meets it, how the muscles of a stack become one body, and how it is tuned."),
+    ("What Omni-Compass Is", ("M", "What Omni-Compass Is")),
+    ("Your Stack as One Body: Muscles and Organisms", ("M", "Your Stack as One Body: Muscles and Organisms")),
+    ("Tuning: The Factory Tune, the Dial and the Settings You Write",
+     ("M", "Tuning: The Factory Tune, the Dial and the Settings You Write")),
+    ("PART", "The Harness: Plugs, Wires and the Rules They Obey",
+     "The universal plug, the adapters, the wire check that must pass before anything writes, and the rules every wire "
+     "obeys."),
+    ("The Plug, the Adapters and the Wire Check", ("M", "The Plug, the Adapters and the Wire Check")),
+    ("The Rules the Wires Obey", ("M", "The Rules the Wires Obey")),
+    ("PART", "Wiring It onto Your Stack, Step by Step",
+     "The eight levels, from watching to governing the site, and the wiring of each kind of stack."),
+    ("Before You Start, and the Eight Levels", ("M", "Before You Start, and the Eight Levels")),
+    ("Stack by Stack", ("M", "Stack by Stack")),
+    ("PART", "Operating It",
+     "The OFF switch, the rules the governor obeys, the log it keeps, and the care of a running installation."),
+    ("The OFF Switch, the Rules, and the Log", ("M", "The OFF Switch, the Rules, and the Log")),
+    ("Maintenance, Upgrades and Security", ("M", "Maintenance, Upgrades and Security")),
+    ("PART", "Checking It on Your Own System",
+     "Paired runs and receipts on your own system, evidence classes, the engine version and the three-run rule."),
+    ("Paired Runs and Receipts on Your Own System", ("M", "Paired Runs and Receipts on Your Own System")),
+    ("Evidence Classes and How to Read a Receipt", ("M", "Evidence Classes and How to Read a Receipt")),
+    ("The Engine Version and the Three-Run Rule", ("M", "The Engine Version and the Three-Run Rule")),
+    ("PART", "License and Your Copy",
+     "The terms the software and this manual are licensed under, and how to verify a copy before it is installed."),
+    ("License and Commercial Terms", ("M", "License and Commercial Terms")),
+    ("Verifying Your Copy", ("M", "Verifying Your Copy")),
+    ("BACK", None),
+    ("Glossary", ("M", "Glossary")),
+    ("Appendix A. Command Reference", ("M", "Appendix A - Command Reference")),
+    ("Appendix B. The Files an Installation Touches", ("M", "Appendix B - The Files an Installation Touches")),
+    ("Appendix C. The Gauges", ("M", "Appendix C - The Gauges")),
+    ("Appendix D. Troubleshooting", ("M", "Appendix D - Troubleshooting")),
+    ("Appendix E. The Muscles: What Each Is For, and How It Is Wired", ("F", "docs/MUSCLE_CATALOG.md")),
+    ("Appendix F. The License", ("X", "license")),
+    ("Appendix G. Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
+    ("Appendix H. Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
+    ("Contact", ("X", "contact")),
+]
+
+OWNER_OUTLINE = [
     ("PART", "The Philosophy and the Theory",
      "Where Omni-Compass comes from: the closed circle, the four pieces, the compass, the basins and the reflex. The "
      "engineering in the rest of the book is this idea made exact."),
@@ -382,8 +445,8 @@ OUTLINE = [
     ("The Two-Way Nervous System", ("M", "The Two-Way Nervous System")),
     ("The Nervous System in Detail", ("FS", ["docs/TWO_WAY_NERVOUS_SYSTEM.md", "docs/NERVOUS.md"])),
     ("PART", "The Body: Muscles, Realms and Organisms",
-     "Nine hundred and forty-five muscles in four realms, stacked into six organisms, and every gauge used to judge "
-     "them."),
+     "One thousand one hundred and seven muscles in four realms, stacked into six organisms, and every gauge used to "
+     "judge them."),
     ("The Muscles, the Realms and the Six Organisms", ("M", "The Muscles, the Realms and the Six Organisms")),
     ("The Four Realms", ("F", "docs/REALMS.md")),
     ("The Realm Muscles", ("F", "docs/REALM_MUSCLES.md")),
@@ -452,9 +515,11 @@ OUTLINE = [
     ("Contact", ("X", "contact")),
 ]
 
+OUTLINE = OWNER_OUTLINE if OWNER else OPERATOR_OUTLINE
+
 # Manual section number -> book chapter number, so that "section 14" in the manual reads "Chapter 44" in the book.
 MAN_NUM = {}
-for m in re.finditer(r"^## (\d+)\. (.*)$", read("docs/OMNI_COMPASS_MANUAL.md"), re.M):
+for m in re.finditer(r"^## (\d+)\. (.*)$", read(MANUAL_REL), re.M):
     MAN_NUM[int(m.group(1))] = m.group(2).strip()
 
 
@@ -464,39 +529,7 @@ def source_listing(rel):
             *code_block(lines, SRC), Spacer(1, 10)]
 
 
-def catalog_flow():
-    rows = list(csv.DictReader(open(ROOT / "realms" / "catalog.csv", encoding="utf-8")))
-    intro = ("Every muscle Omni-Compass governs in the six organisms, by number. Family is the kind of machine; realms "
-             "are the realms the muscle belongs to (a muscle in more than one realm is counted once in the tower "
-             "and once per realm in the stack); template is the plant model that stands for it in simulation; "
-             "knob is the kind of setting the governor moves. Source: `realms/catalog.csv`.")
-    short = {"compute_ai_cloud": "Compute", "physics_robotics_autonomous": "Physics",
-             "energy_facility_industrial": "Energy", "distribution_specialized": "Distribution"}
-    story = [Paragraph(inline(intro), BODY), Spacer(1, 6)]
-    counts = {}
-    for r in rows:
-        for x in r["realms"].split(";"):
-            counts[x] = counts.get(x, 0) + 1
-    story.append(table([["Realm", "Muscles"]] + [[short.get(k, k), f"{v:,}"] for k, v in counts.items()] +
-                       [["Stack (every duplicate kept)", f"{sum(counts.values()):,}"], ["Tower (every muscle once)", f"{len(rows):,}"]]))
-    story.append(Spacer(1, 10))
-    data = [["#", "Family", "Muscle", "Realms", "Template", "Knob"]]
-    for r in sorted(rows, key=lambda r: (not r["muscle_id"].isdigit(), int(re.sub(r"\D", "", r["muscle_id"]) or 0))):
-        data.append([r["muscle_id"], r["family"], r["muscle"].replace("_", " "),
-                     ", ".join(short.get(x, x) for x in r["realms"].split(";")), r["template"].replace("_", " "), r["knob"]])
-    t = Table([[Paragraph(inline(c), CELL if k else CELLH) for c in row] for k, row in enumerate(data)],
-              colWidths=[0.07 * FW, 0.27 * FW, 0.25 * FW, 0.17 * FW, 0.14 * FW, 0.10 * FW], repeatRows=1, splitInRow=1)
-    t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#c0c0c0")), ("BACKGROUND", (0, 0), (-1, 0), NAVY),
-                           ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f4f1ea")]),
-                           ("TOPPADDING", (0, 0), (-1, -1), 2.5), ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
-                           ("VALIGN", (0, 0), (-1, -1), "TOP")]))
-    story.append(t)
-    return story
-
-
 def special(name):
-    if name == "catalog":
-        return catalog_flow()
     if name == "source":
         intro = ("The engine, the compass law, the compass on every muscle, the two-wire GPU governor, the plug adapter and the "
                  "nervous system, printed in full from the repository so that the book and the code can be read side by "
@@ -568,8 +601,8 @@ for item in OUTLINE:
 class Book(BaseDocTemplate):
     def __init__(self, path):
         super().__init__(str(path), pagesize=letter, leftMargin=INNER, rightMargin=OUTER, topMargin=TOP,
-                         bottomMargin=BOTTOM, title="The Omni-Compass Manual", author="The Omni-Compass LLC",
-                         subject="The governor, its mechanism, physics and philosophy, and how to wire it onto your stack",
+                         bottomMargin=BOTTOM, title="The Omni-Compass " + EDITION_NAME, author="The Omni-Compass LLC",
+                         subject="How to embed, wire, tune and run Omni-Compass on your stack",
                          creator="The Omni-Compass LLC")
         self.body_start = None
         self.chapter = ""
@@ -610,7 +643,7 @@ class Book(BaseDocTemplate):
             if right:
                 c.drawRightString(x1, PH - 0.6 * inch, self.chapter.upper()[:90])
             else:
-                c.drawString(x0, PH - 0.6 * inch, "THE OMNI-COMPASS MANUAL")
+                c.drawString(x0, PH - 0.6 * inch, "THE OMNI-COMPASS " + EDITION_NAME.upper())
             c.setStrokeColor(RULE); c.setLineWidth(0.5); c.line(x0, PH - 0.66 * inch, x1, PH - 0.66 * inch)
         # the foot of every page: the notice in two centered lines, the website alone and centered on the bottom line,
         # the page number in the bottom outside corner (left on a left-hand page, right on a right-hand page)
@@ -677,10 +710,9 @@ def front_matter(doc):
     # title page
     big = ParagraphStyle("tt", fontName="Serif-Bold", fontSize=34, leading=40, alignment=TA_CENTER, textColor=NAVY)
     sub = ParagraphStyle("st", fontName="Serif-Italic", fontSize=15, leading=20, alignment=TA_CENTER, textColor=INK)
-    s += [Marker("bare"), Spacer(1, 1.6 * inch), Paragraph("THE OMNI-COMPASS", big), Paragraph("MANUAL", big),
+    s += [Marker("bare"), Spacer(1, 1.6 * inch), Paragraph("THE OMNI-COMPASS", big), Paragraph(EDITION_NAME.upper(), big),
           Spacer(1, 14), GoldRule(FW, 1.5, 14),
-          Paragraph("The Governor of Everything:<br/>Its Philosophy, Its Mathematics, Its Physics,<br/>and How to Wire It "
-                    "onto Your Stack", sub), Spacer(1, 1.2 * inch),
+          Paragraph(SUBTITLE_HTML, sub), Spacer(1, 1.2 * inch),
           Paragraph("AJ Dubra", ParagraphStyle("au", fontName="Serif-Bold", fontSize=14, alignment=TA_CENTER, leading=18)),
           Paragraph("Owner and Developer", CENTER), Spacer(1, 0.3 * inch),
           Paragraph("THE OMNI-COMPASS LLC", ParagraphStyle("pub", fontName="Sans-Bold", fontSize=11, alignment=TA_CENTER,
@@ -690,8 +722,7 @@ def front_matter(doc):
     cp = ParagraphStyle("cp", parent=BODY, alignment=TA_LEFT, spaceAfter=7)
     s += [Marker("nohead"), Spacer(1, 0.2 * inch)]
     for t in [
-        "<b>The Omni-Compass Manual</b><br/>The Governor of Everything: Its Philosophy, Its Mathematics, Its Physics, and "
-        "How to Wire It onto Your Stack<br/>" + EDITION,
+        f"<b>The Omni-Compass {EDITION_NAME}</b><br/>{SUBTITLE}<br/>" + EDITION,
         "Copyright © 2026 The Omni-Compass LLC. All rights reserved. No part of this book may be reproduced, stored "
         "or transmitted in any form or by any means, except as allowed by the Omni-Compass Evaluation License, without "
         "the written permission of The Omni-Compass LLC.",
@@ -707,12 +738,11 @@ def front_matter(doc):
         "Omni-Compass and to reproduce its published results, in simulation and on systems the reader owns or controls. "
         "Any commercial use, commercialization, monetization, production use, redistribution, hosted or managed "
         "service, or incorporation into any product or service requires a written Omni-Compass Enterprise License, "
-        "signed by The Omni-Compass LLC and paid for. The full terms are printed in Appendix I.",
-        "<b>Disclaimer.</b> The software is provided “as is”, without warranty of any kind. Every result in "
-        "this book carries its evidence class. A simulated result is a statement about a model; a software benchmark "
-        "is a statement about the software it ran on; only a hardware meter speaks for hardware. Nothing in this book "
-        "is a promise of a particular saving on a particular system: the only number that applies to a system is the "
-        "one its own paired runs produce, on its own receipt.",
+        "signed by The Omni-Compass LLC and paid for. The full terms are printed in " + LICENSE_APPENDIX + ".",
+        "<b>Disclaimer.</b> The software is provided “as is”, without warranty of any kind. " + RESULTS_LINE + " A modelled result is a statement about a model; a software benchmark is a statement about the software "
+        "it ran on; only a hardware meter speaks for hardware. Nothing in this book is a promise of a particular saving on "
+        "a particular system: the only number that applies to a system is the one its own paired runs produce, on its own "
+        "receipt.",
         "Set in Liberation Serif and DejaVu Sans Mono, the text at 11 pt on a 16.5 pt line. Built from the repository "
         "by <font name='Mono' size='11'>"
         "docs/book/build_book.py</font>; the book and the code change in the same commit.",
@@ -734,9 +764,43 @@ def front_chapter(doc, title, lines):
                          Heading(inline(title), H1, 1, kind="chapter"), GoldRule(FW, 1.2, 16)] + md_flow(renumber(lines), shift=2, strip=True)
 
 
-PREFACE = """I wrote this book so that whoever connects Omni-Compass to a running system understands what they are
-connecting: not only which wire goes where, but why the governor behaves the way it does, where its law comes from,
-and how to prove on their own system what it does for them.
+OPERATOR_PREFACE = """I wrote this book for the engineers who put Omni-Compass into a running system: how to embed it, how to wire
+it to every muscle of a stacked, clustered system or to any one muscle, how to tune it, how to run it, how to switch it
+off, and how to check on their own system, with their own paired runs, what it does there. It is the manual for the glove
+box, not a description of how the engine is built.
+
+The book is in six parts, after the front matter.
+
+| You are | Read |
+|---|---|
+| CTO, architect, head of platform | the front matter, Part One, the eight levels in Part Three, then Part Five |
+| The engineer wiring it | everything, in order. Do not skip the wire check or the watch level |
+| Platform engineer for one stack | Part Two, the chapter of Part Three for your stack, and Part Four |
+| Data-center, facility or energy operator | the Quick Reference card, Part One, Part Three (levels five to seven, the processor and the data center under the servers), Part Four |
+| Site reliability engineer, on call | the Quick Reference card, Part Four (the switches and the log), the troubleshooting appendix |
+| Security and compliance | Part Four, the Disclosures, the license in the back matter |
+| Procurement and counsel | the Disclosures, Part Six, the license and its questions and answers in the back matter |
+
+**Part One, the governor from the outside,** says what Omni-Compass is as an installer meets it, how the muscles of a
+stack become one body, and how it is tuned: the factory tune, the dial, each muscle's own card and the settings an
+operator writes. **Part Two, the harness,** is the universal plug, the adapters, the wire check and the rules every wire
+obeys. **Part Three** wires it onto a stack one level at a time and then stack by stack. **Part Four** is operating it:
+the OFF switch, the rules, the log, maintenance and security. **Part Five** is checking it on your own system: paired
+runs and receipts, evidence classes, the engine version and the three-run rule. **Part Six** is the license and how to
+verify a copy. The back matter holds the glossary, every command, the files an installation touches, the gauges,
+troubleshooting, and every muscle with its wiring and its own card.
+
+**Conventions.** `Code` is a command, file or switch exactly as typed. "Native" means a system as it runs today,
+without Omni-Compass. "Muscle" means any machine, service or controller Omni-Compass can read and set. "Knob" or
+"lever" is one setting on a muscle. "The band" is a service reading's safe range. A step that writes to a system is
+marked **WRITES**. Every number in a receipt carries its evidence class: S for a model (modelled), L for live software,
+P for a physical meter."""
+
+
+OWNER_PREFACE = """This is the Owner's Manual, the master: everything about Omni-Compass in one book, for whoever owns or licenses
+it and so must know the whole mechanism. I wrote it so that the owner understands what they hold: not only which wire
+goes where, but why the governor behaves the way it does, where its law comes from, how it is built, and how to prove on
+their own system what it does for them. The Operator's Manual is the shorter book for the people who run it.
 
 The book is in eight parts, and it can be read in two ways.
 
@@ -771,6 +835,9 @@ are kept as they were written, because the record of how a result was reached is
 chapters give different figures for the same thing, the later run and the State of Play govern."""
 
 
+PREFACE = OWNER_PREFACE if OWNER else OPERATOR_PREFACE
+
+
 def preface_lines():
     """The book's preface: how the book reads, then the standards every page keeps (from the manual's preface)."""
     man = MAN["Preface: How to Use This Manual"]
@@ -786,24 +853,24 @@ def build():
     toc = TableOfContents(levelStyles=[TOC1, TOC2, TOC3], dotsMinLevel=1, formatter=doc.toc_label)
     story += new_page() + [Marker("nohead"), Spacer(1, 0.5 * inch), Paragraph("Contents", H1), GoldRule(FW, 1.2, 16), toc]
     # the front matter, in full chapters, before a word about wiring (the founder's order of 14 October): the foreword,
-    # the preface, the prelude and the introduction, then the key, what a hooked-up system looks like, the card, the summary
+    # the preface, the prelude and the introduction, then the key, what a hooked-up system looks like and the card
     story += front_chapter(doc, "Foreword", MAN["Foreword"])
     story += front_chapter(doc, "Preface", preface_lines())
     story += front_chapter(doc, "Prelude: A Night on the Cluster", MAN["Prelude: A Night on the Cluster"])
-    story += front_chapter(doc, "Introduction: The Problem, the Idea and the Promise",
-                           MAN["Introduction: The Problem, the Idea and the Promise"])
+    story += front_chapter(doc, INTRO, MAN[INTRO])
     story += front_chapter(doc, "The key: GAIN, EVEN and LOSS", MAN["The key: GAIN, EVEN and LOSS"])
     story += front_chapter(doc, "What You Are Looking At", MAN["What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report"])
     story += front_chapter(doc, "Quick Reference: The Card for the Glove Box", MAN["Quick Reference: The Card for the Glove Box"])
-    story += front_chapter(doc, "Executive Summary", MAN["Executive Summary"])
+    if OWNER:
+        story += front_chapter(doc, "Executive Summary", MAN["Executive Summary"])
     story += front_chapter(doc, "Disclosures, Declarations and Disclaimers", doc_body("DISCLOSURES.md")[1])
-    md_parts = ["# THE OMNI-COMPASS MANUAL", "", BANNER_MD, "", EDITION, "", FILED, "",
+    md_parts = [f"# THE OMNI-COMPASS {EDITION_NAME.upper()}", "", BANNER_MD, "", EDITION, "", FILED, "",
                 "The printable book of this text, with its contents and appendices: "
-                "`docs/OMNI_COMPASS_MANUAL.pdf`. Built by `docs/book/build_book.py`.", ""]
+                f"`docs/{OUT_PDF.name}`. Built by `docs/book/build_book.py`" + (" --owner" if OWNER else "") + ".", ""]
     md_parts += ["## Foreword", ""] + MAN["Foreword"] + ["## Preface", ""] + preface_lines() + [""]
-    for sec in ("Prelude: A Night on the Cluster", "Introduction: The Problem, the Idea and the Promise",
+    for sec in ("Prelude: A Night on the Cluster", INTRO,
                 "The key: GAIN, EVEN and LOSS", "What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report",
-                "Quick Reference: The Card for the Glove Box", "Executive Summary"):
+                "Quick Reference: The Card for the Glove Box") + (("Executive Summary",) if OWNER else ()):
         md_parts += [f"## {sec}", ""] + MAN[sec] + [""]
 
     part_no = 0
@@ -876,8 +943,6 @@ def _md_text(src):
             out += [f"### {t}", ""] + ["##" + ln if ln.startswith("#") else ln for ln in body]
         return out
     if kind == "X":
-        if key == "catalog":
-            return ["The full table of the muscles is in `realms/catalog.csv`."]
         if key == "source":
             return ["The full source of `omnicompass/core.py`, `omnicompass/compass_law.py`, `realms/compass_arm.py`, "
                     "`omni_controller/gpu_compass.py`, `omnicompass/adapter.py` and `omnicompass/nervous_system.py`."]

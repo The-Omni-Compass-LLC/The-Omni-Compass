@@ -452,7 +452,7 @@ def main():
     check("the key to the words (GAIN, EVEN, LOSS; tools/readings.py) stands word for word at the top of the README, the reading guide "
           "and the manual's front matter", r.returncode == 0, (r.stdout + r.stderr)[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "summary.py"), "--check"], capture_output=True, text=True)
-    check("the manual's standing block (where things stand: the engine, the muscles, the grid, the index, every benchmark's number) "
+    check("the standing block of the state of play (where things stand: the engine, the muscles, the grid, the index, every benchmark's number) "
           "matches the result files it is read from (tools/summary.py --check; every push realigns)", r.returncode == 0,
           (r.stdout + r.stderr)[-300:])
     r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_readings", "tests.test_summary"], cwd=ROOT,
