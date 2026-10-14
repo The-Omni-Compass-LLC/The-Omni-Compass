@@ -75,16 +75,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-14 01:59 | grid | cancelled | [38488920183](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38488920183) |
-| 2026-10-14 01:33 | big-organism-detached collect | success | [38495484752](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38495484752) |
-| 2026-10-13 22:43 | big-organism-detached start organism tower x100 reps 5+3 window 2880 protocol 3 | success | [38476939068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476939068) |
-| 2026-10-13 22:37 | big-organism-detached start organism tower x100 reps 8+3 window 2880 protocol 3 | success | [38476947839](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476947839) |
-| 2026-10-13 22:33 | big-organism-detached start organism tower x100 reps 1+4 window 2880 protocol 3 | success | [38476930989](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38476930989) |
-| 2026-10-13 22:30 | benchmark-reps | cancelled | [38472692081](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472692081) |
-| 2026-10-13 22:30 | kind-addons | cancelled | [38472765216](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472765216) |
-| 2026-10-13 22:30 | redis | cancelled | [38472891556](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472891556) |
-| 2026-10-13 22:29 | swarm | cancelled | [38473000707](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38473000707) |
-| 2026-10-13 22:29 | kafka | cancelled | [38472913779](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38472913779) |
+| 2026-10-14 07:27 | ycsb | success | [38512483039](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38512483039) |
+| 2026-10-14 07:16 | sysbench | success | [38512477941](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38512477941) |
+| 2026-10-14 07:11 | kafka | success | [38512492901](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38512492901) |
+| 2026-10-14 06:56 | redis | success | [38512488091](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38512488091) |
+| 2026-10-14 06:30 | six-kube x1 orgs stack reps 96+1 arms native compass split no window 960 protocol 3 | success | [38515203155](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38515203155) |
+| 2026-10-14 06:13 | pgbench | success | [38511141125](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38511141125) |
+| 2026-10-14 06:12 | citylearn | success | [38513847465](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38513847465) |
+| 2026-10-14 06:12 | robustness | failure | [38515192491](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38515192491) |
+| 2026-10-14 06:11 | benchmark-reps | success | [38509811805](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38509811805) |
+| 2026-10-14 05:05 | kind-addons | success | [38511127095](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38511127095) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
