@@ -4407,9 +4407,12 @@ so 9 × workers lets the fleet fill), the same in both arms. The preregistered d
 
 **In the cloud, the bill is the gauge, and it is never raised.** In a public cloud every machine that exists is billed,
 whether it carries work or not, so the aim on a managed cluster is native's work for a smaller bill, never a bigger one.
-The cloud therefore runs at the tune-down (`dial save`, the `dial` input of `aks-metered` and its default) with native's
-own replica cap (`replica_ceiling=0`): the governor holds the service at native's line and gives back the machines the
-response time does not need, which a cloud stack shows in the quiet stretches between bursts and in a day's trough. The
+The cloud therefore runs at the tune-down (`dial save`, the `dial` input of `aks-metered` and its default) with the governor
+on the machines alone (`OMNI_MACHINES_ONLY=1`): it moves no pod autoscaler, conveys no processor and caps no power, so the
+pods are exactly native's and the cloud's own autoscaler alone makes machines; the governor parks a machine the cloud
+already made only after its own trial shows the response time holds, and wakes it at once on a breach. It can hold no
+more pods and no more machines than native: the bill can only fall or stay, and it falls in the quiet stretches between
+bursts and in a day's trough. The
 max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
@@ -9649,12 +9652,18 @@ then 10, then 5 seconds a decision were asked the same night), and a change is m
 nothing anywhere. Read against the governor before any run, a faster decision period is not a free setting today: four
 of its rules count in decisions, not in seconds, and every one of them would change with the period:
 
-| Rule (counted in decisions) | At 60 s (as built and tested) | At 5 s |
-|---|---|---|
-| a trial of giving one machine back (`max_trial`, 20 decisions a phase, written in the engine) | 20 minutes a phase, time to measure the 200 response times it needs | 100 seconds, while the probe gives at most one response time a second: every trial would be abandoned for too little work, no machine would ever be given back, and the bill could not fall |
-| the cool-down after a breach (`--slo-clear`, 3 decisions) | nothing given back for 3 minutes | 15 seconds |
-| cruise (`--cruise-after`, 2 decisions) | work waiting for 2 minutes | 10 seconds |
-| the spacing of trials and the wait after a refusal (`--verdict-every` 10, `--verdict-recheck` 120) | 10 minutes; 2 hours | 50 seconds; 10 minutes |
+| Rule (counted in decisions) | At 60 s (as built and tested) | At 15 s (native's own check) | At 5 s |
+|---|---|---|---|
+| a trial of giving one machine back (`max_trial`, 20 decisions a phase, written in the engine) | 20 minutes a phase, time to measure the 200 response times it needs | 5 minutes, barely the time those 200 take at the probe's rate | 100 seconds, while the probe gives at most one response time a second: every trial would be abandoned for too little work, no machine would ever be given back, and the bill could not fall |
+| the cool-down after a breach (3 decisions, written in the engine) | nothing given back for 3 minutes | 45 seconds | 15 seconds |
+| cruise (`--cruise-after`, 2 decisions) | work waiting for 2 minutes | 30 seconds | 10 seconds |
+| the spacing of trials and the wait after a refusal (`--verdict-every` 10, `--verdict-recheck` 120) | 10 minutes; 2 hours | 150 seconds; 30 minutes | 50 seconds; 10 minutes |
+
+Two of the four are written in the engine and have no setting, so no run can keep them at their tested seconds at any
+period but 60: at native's own 15 seconds a machine would be given back after a trial a quarter as long, and given back
+again 45 seconds after a breach instead of 3 minutes, which is the risk of a person woken that the cloud exists to rule
+out. Native's own checks are never slowed by any of this: the HPA keeps its 15-second check and Azure's autoscaler its
+10 seconds underneath, whatever Omni-Compass's period.
 
 So every Azure set runs at the period the engine was built and tested at: the full decision every 60 seconds, the fast
 checks (the scheduling floor, the pod reflex, conveyance on every third, run between decisions) every 5
@@ -9662,8 +9671,29 @@ seconds, three times as fast as the HPA's own 15-second check. The rig accepts o
 `OMNI_FLOOR_INTERVAL`, passed as `--interval` and `--floor-interval`), and a window in which the governor made no write
 needs at least one decision a minute to count, whatever the period. The faster decision belongs to the next engine
 version, with every rule above counted in seconds and the fast checks on their own clock, and is used only once a test
-shows it reads no LOSS on any gauge anywhere. The cloud's arms are native and Omni-Compass on top, nothing else (`ARMS`
+shows it reads no LOSS on any gauge anywhere; until then the order holds as the founder put it: native's speed at least, faster only where it hurts nothing. The cloud's arms are native and Omni-Compass on top, nothing else (`ARMS`
 defaults to `native compass` in the workflow and in every cloud script); the steady run of the max had run those two.
+
+### In the cloud, the machines alone: a bill that can only fall or stay (the founder's order, 2026-10-14, night, before any run at the tune-down)
+
+The founder's order of 14 October: in the cloud Omni-Compass must never make the bill bigger. Read against the governor,
+the tune-down with native's replica cap still allowed it in a burst: the pod target moved down to 60% of the operator's,
+more pods than native's asked for machines, and Azure made them. From this order every Azure set runs the governor on the
+machines alone (`OMNI_MACHINES_ONLY=1` in `aks-metered.yml`; `scripts/kind_bench.sh`):
+
+- **No pod autoscaler is moved.** The governor is told it senses no service (`--sensed none/none`), so every HPA keeps
+  the operator's own target, and the replica room stays shut; the pods are exactly native's.
+- **No processor is conveyed and no power is capped** (no `--cap-deployments`, no `--power-cmd`): in a cloud neither
+  buys a smaller bill, and a pod given more processor would read busier to the HPA and ask for more pods.
+- **The machines.** The governor's machine lever only parks a machine that Azure already made and wakes it again
+  (`scripts/kind_nodepool.sh` never asks for more machines than the cluster has, and never tells Azure to make one). A
+  machine is parked only after its own trial shows the response time holds within 2% (the verdict, through the release
+  gate, one at a time), and a breach wakes it at once; a parked machine with no work is deleted by Azure's own
+  autoscaler. Azure's autoscaler alone makes machines, for native's own pods.
+
+So the omni arm can hold no more pods and no more machines than native's autoscalers give it: the bill can only fall or
+stay. The bill and the machines aim lower (a cut is GAIN); work, response time, failures and alert minutes must read EVEN
+or GAIN. The receipt's commands row shows how often a machine was parked or woken.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 

@@ -1146,6 +1146,27 @@ version, with every rule above counted in seconds and the fast checks on their o
 shows it reads no LOSS on any gauge anywhere; until then the order holds as the founder put it: native's speed at least, faster only where it hurts nothing. The cloud's arms are native and Omni-Compass on top, nothing else (`ARMS`
 defaults to `native compass` in the workflow and in every cloud script); the steady run of the max had run those two.
 
+## In the cloud, the machines alone: a bill that can only fall or stay (the founder's order, 2026-10-14, night, before any run at the tune-down)
+
+The founder's order of 14 October: in the cloud Omni-Compass must never make the bill bigger. Read against the governor,
+the tune-down with native's replica cap still allowed it in a burst: the pod target moved down to 60% of the operator's,
+more pods than native's asked for machines, and Azure made them. From this order every Azure set runs the governor on the
+machines alone (`OMNI_MACHINES_ONLY=1` in `aks-metered.yml`; `scripts/kind_bench.sh`):
+
+- **No pod autoscaler is moved.** The governor is told it senses no service (`--sensed none/none`), so every HPA keeps
+  the operator's own target, and the replica room stays shut; the pods are exactly native's.
+- **No processor is conveyed and no power is capped** (no `--cap-deployments`, no `--power-cmd`): in a cloud neither
+  buys a smaller bill, and a pod given more processor would read busier to the HPA and ask for more pods.
+- **The machines.** The governor's machine lever only parks a machine that Azure already made and wakes it again
+  (`scripts/kind_nodepool.sh` never asks for more machines than the cluster has, and never tells Azure to make one). A
+  machine is parked only after its own trial shows the response time holds within 2% (the verdict, through the release
+  gate, one at a time), and a breach wakes it at once; a parked machine with no work is deleted by Azure's own
+  autoscaler. Azure's autoscaler alone makes machines, for native's own pods.
+
+So the omni arm can hold no more pods and no more machines than native's autoscalers give it: the bill can only fall or
+stay. The bill and the machines aim lower (a cut is GAIN); work, response time, failures and alert minutes must read EVEN
+or GAIN. The receipt's commands row shows how often a machine was parked or woken.
+
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 ---

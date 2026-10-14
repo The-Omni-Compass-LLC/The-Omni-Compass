@@ -68,10 +68,10 @@ made either way, because a saturated host can occur in production too.
 - The GPU's heat line: never over 83 C, and the headroom under it used where it buys work.
 - Micro steps inside each decision (fourth-order Runge-Kutta for the plants' motion, Monte Carlo over their uncertainty).
 - The body's hormones and immune system carried into every organism.
-- **In a cloud, give back only** (the founder's order of 14 October, night): on a billed machine the governor's HPA
-  target never goes below the operator's and no machine is held above native's count, so the bill can only fall or
-  stay; machines are given back where the verdict allows. Today's tune-down with native's replica cap still moves the
-  HPA target inside the cap, so a burst can raise the bill. The max keeps its push where the machines are paid for.
+- **In a cloud, give back only** (the founder's order of 14 October, night): done from that night with existing settings
+  (`OMNI_MACHINES_ONLY=1`: the governor moves the machines alone, the pods exactly native's, so the bill can only fall or
+  stay). This version names it as one setting of the governor's own instead of three, so an operator sets it in one word.
+  The max keeps its push where the machines are paid for.
 - **No alert minute in the cloud** (the founder's order of 14 October, night): a minute over the line wakes a person,
   so the omni arm's alert minutes must read 0. Today the max halved the time over the line on Azure's steady load
   (30.3% to 14.6%, three repetitions of run 38455383137); the minute-by-minute record of that run says where the rest

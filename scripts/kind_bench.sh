@@ -91,6 +91,14 @@ case "$METER" in ""|rapl) ;; *) echo "METER must be empty or rapl (got $METER)";
 # the power cap writes the service's CPU limit; with CruiseKube the limit is CruiseKube's own (it resizes the running
 # pods in place), so the cap is left out of that set and its reset checks read the operator's limit on the Deployment
 CAP_ARGS="--cap-deployments default/php-apache"; [ -z "$CRUISEKUBE" ] || CAP_ARGS=""
+# In the cloud (OMNI_MACHINES_ONLY=1, aks-metered.yml; the founder's orders of 14 October, night: the same work for a bill
+# never bigger) the governor moves the machines alone. It moves no pod autoscaler (--sensed names no service, so every HPA
+# keeps the operator's own target), conveys no processor and caps no power: the pods are exactly native's, and Azure's own
+# autoscaler alone makes machines, for them. The governor only parks a machine Azure already made, after its own trial
+# shows the response time holds, and wakes it at once on a breach; a parked, empty machine Azure deletes. So the bill can
+# only fall or stay, never rise
+OMNI_SENSED="default/php-apache"; OMNI_POWER_CMD="bash scripts/kind_power.sh"
+if [ -n "${OMNI_MACHINES_ONLY:-}" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; fi
 limits_now() {   # the CPU limit the operator's record holds: the pods' own, or with CruiseKube the Deployment's template
   if [ -n "$CRUISEKUBE" ]; then
     kubectl get deployment php-apache -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}'
@@ -484,9 +492,9 @@ start_controller() {   # $1 decisions to make, $2 log file
   nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval "$OMNI_INTERVAL" --floor-interval "$OMNI_FLOOR_INTERVAL" --reflex-window-s 15 \
     --iterations "$1" --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
     --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
-    --power-cmd "bash scripts/kind_power.sh" --site-limit-w "$SITE_LIMIT_W" \
+    ${OMNI_POWER_CMD:+--power-cmd "$OMNI_POWER_CMD"} --site-limit-w "$SITE_LIMIT_W" \
     $CAP_ARGS --thermal-model --security-configmap default/omni-security \
-    --rollout-guard default/php-apache --sensed default/php-apache --latency-file "$OUT_DIR/latency.csv" --slo-ms "${SLO_MS:-500}" \
+    --rollout-guard default/php-apache --sensed "$OMNI_SENSED" --latency-file "$OUT_DIR/latency.csv" --slo-ms "${SLO_MS:-500}" \
     --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" $STRICT $LAW ${CLOSURE:+--closure "$CLOSURE"} ${REPLICA_CEILING:+--replica-ceiling "$REPLICA_CEILING"} ${OMNI_DIAL:+--dial "$OMNI_DIAL"} > "$2" 2>&1 &
   echo $!
 }
@@ -531,7 +539,7 @@ if [ -n "${ROBUST:-}" ]; then
     # the second governor is started by the robustness script when its moment comes, with the same command line: the
     # function and what it reads are exported before the script starts
     export -f start_controller
-    export DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING OMNI_DIAL MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE
+    export DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING OMNI_DIAL MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE OMNI_SENSED OMNI_POWER_CMD
   fi
   OUT_DIR="$OUT_DIR" DURATION="$DURATION" ROBUST="$ROBUST" OMNI_PID="$omni_pid" WORKERS="$WORKERS" HPA_RANGE="$HPA_RANGE" \
     WORKER_SEL="$WORKER_SEL" NATIVE="$NATIVE" bash scripts/kind_robust.sh > "$OUT_DIR/robust.out" 2>&1 &
@@ -629,7 +637,8 @@ elif [ -z "$NATIVE" ]; then
     --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" --audit "$OUT_DIR/audit_kill.jsonl" --kill-file "$OUT_DIR/kill"
   cpu_limit=$(limits_now)
   if [ -n "$CAP_ARGS" ]; then echo "pod CPU limits after kill: $cpu_limit" | tee -a "$OUT_DIR/kill_switch.txt"
-  else echo "the operator's CPU limit on the Deployment after kill: $cpu_limit (CruiseKube owns the pods' own)" | tee -a "$OUT_DIR/kill_switch.txt"; fi
+  elif [ -n "$CRUISEKUBE" ]; then echo "the operator's CPU limit on the Deployment after kill: $cpu_limit (CruiseKube owns the pods' own)" | tee -a "$OUT_DIR/kill_switch.txt"
+  else echo "the operator's CPU limit on the Deployment after kill: $cpu_limit (the governor moved the machines alone: no processor conveyed)" | tee -a "$OUT_DIR/kill_switch.txt"; fi
   if [ -n "$KEDA" ]; then   # KEDA rebuilds the HPA from its ScaledObject: the operator's settings must show on the HPA
     for i in $(seq 1 15); do
       [ "$(hpa_cpu_target php-apache)" = "$EXPECT_TARGET" ] && [ "$(kubectl get hpa php-apache -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')" = "$HPA_RANGE" ] && break

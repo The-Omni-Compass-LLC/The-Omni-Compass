@@ -1192,9 +1192,12 @@ anything, so that a refusal costs cents and not a cluster. The account setup, cl
 
 **In the cloud, the bill is the gauge, and it is never raised.** In a public cloud every machine that exists is billed,
 whether it carries work or not, so the aim on a managed cluster is native's work for a smaller bill, never a bigger one.
-The cloud therefore runs at the tune-down (`dial save`, the `dial` input of `aks-metered` and its default) with native's
-own replica cap (`replica_ceiling=0`): the governor holds the service at native's line and gives back the machines the
-response time does not need, which a cloud stack shows in the quiet stretches between bursts and in a day's trough. The
+The cloud therefore runs at the tune-down (`dial save`, the `dial` input of `aks-metered` and its default) with the governor
+on the machines alone (`OMNI_MACHINES_ONLY=1`): it moves no pod autoscaler, conveys no processor and caps no power, so the
+pods are exactly native's and the cloud's own autoscaler alone makes machines; the governor parks a machine the cloud
+already made only after its own trial shows the response time holds, and wakes it at once on a breach. It can hold no
+more pods and no more machines than native: the bill can only fall or stay, and it falls in the quiet stretches between
+bursts and in a day's trough. The
 max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.

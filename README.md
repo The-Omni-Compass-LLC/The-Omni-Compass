@@ -213,8 +213,8 @@ proof and its wiring: [`docs/MECHANISM_OF_ACTION.md`](docs/MECHANISM_OF_ACTION.m
 **Where the benefit is taken, and why nobody babysits it.** On machines already paid for (your own racks, a chip at its heat
 line) the max takes the benefit as more work from the same machines; in a chip the aim is more work at native's own
 heat, never hotter. In a
-public cloud the benefit is the bill: the cloud runs at the tune-down with native's own replica cap, native's work for a
-smaller bill and never a bigger one. Either way it runs on autopilot, self-running, self-steering and self-auditing like a
+public cloud the benefit is the bill: there the governor moves the machines alone (pods, processor limits and power stay
+native's) and parks only machines the cloud already made, so the bill can only fall or stay, never rise. Either way it runs on autopilot, self-running, self-steering and self-auditing like a
 self-driving car: nobody turns a knob, nobody checks its work and nobody has to react; every change is the governor's own, logged with its reason, made as the
 reading approaches the line rather than after it is crossed; every Kubernetes and cloud receipt
 counts the babysitting tax in both arms (the alert minutes an on-call page would be open, and the commands the governor

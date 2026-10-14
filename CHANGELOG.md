@@ -2,6 +2,18 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-14: in the cloud, the machines alone: a bill that can only fall or stay
+
+- **The founder's order of 14 October (night): never a bigger bill in the cloud.** The tune-down with native's replica
+  cap still let a burst raise the bill (the pod target moved down to 60% of the operator's; more pods asked Azure for
+  machines). Every Azure set now runs the governor on the machines alone (`OMNI_MACHINES_ONLY=1` in `aks-metered.yml`;
+  `scripts/kind_bench.sh`): no pod autoscaler moved (`--sensed none/none`), no processor conveyed, no power capped, so the
+  pods are exactly native's; the governor only parks machines Azure already made, after its own trial, and wakes them on
+  a breach. No engine file changed: existing settings only. Written into the Kubernetes preregistration before any run
+  at the tune-down. Test: `tests/test_cloud_machines_only.py` (a breach moves no pod target; the cloud's settings; the
+  machine lever never asks for a machine the cluster does not have).
+- Both manuals (sections 7.1 and 10.1), the README, CLAUDE.md and the next version's plan say so.
+
 ## 2026-10-14: the babysitting tax in every Kubernetes and cloud receipt; the cloud bill in both manuals
 
 - **The founder's order of 14 October (night):** show that Omni-Compass is an autopilot, self-running and self-steering

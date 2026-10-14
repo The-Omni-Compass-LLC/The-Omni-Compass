@@ -123,10 +123,11 @@ the founder overrides one in the conversation.
 
 - **In the cloud, the bill** (the founder's order of 14 October, night). In a cloud (Azure now; Google and Amazon when he
   starts them) Omni-Compass is to show one thing: the same work as native for a smaller bill, never a bigger one. Every
-  cloud set runs Omni-Compass on top at the tune-down (`dial save`) with native's own replica cap (`replica_ceiling 0`):
-  never a replica ceiling above native's (inside it the HPA target still moves, so a burst can still raise the bill; a
-  give-back-only cloud setting is proposed for the next engine); the bill and the machines aim lower, and work, speed and
-  failures must read EVEN or GAIN. The benefit of the max belongs where Omni-Compass sits in the engine before the cloud, or in the
+  cloud set runs Omni-Compass on top at the tune-down (`dial save`) on the machines alone (`OMNI_MACHINES_ONLY=1`): no pod
+  autoscaler moved, no processor conveyed, no power capped, so the pods are exactly native's; the governor only parks a
+  machine the cloud already made, after its own trial, and wakes it on a breach. No more pods and no more machines than
+  native: the bill can only fall or stay. The bill and the machines aim lower, and work, speed and failures must read
+  EVEN or GAIN. The benefit of the max belongs where Omni-Compass sits in the engine before the cloud, or in the
   chip at its other end. Runs of the max in the cloud are stopped and kept as such, counted in no bill result.
 - **On autopilot: no babysitting tax** (the founder's words of 14 October, night). Omni-Compass is an autopilot,
   self-running, self-steering and self-auditing inside the system like a self-driving car: nobody turns a knob, nobody
