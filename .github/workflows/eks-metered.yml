@@ -65,6 +65,11 @@ jobs:
           sparse-checkout: |
             /*
             !/results/live/raw/*
+      - name: Engine and source receipt
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
@@ -95,6 +100,7 @@ jobs:
           ORGANISM_SCALE: ${{ github.event.inputs.organism_scale || '1' }}
           EKS_MAX_NODES: ${{ github.event.inputs.max_workers || '4' }}
           HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
+          OMNI_MACHINES_ONLY: '0'
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - name: Delete every cluster this run made, whatever happened
         if: always()

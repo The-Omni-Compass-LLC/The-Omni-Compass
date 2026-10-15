@@ -55,7 +55,7 @@ def main(out, *paths):
         if not st:
             del per[STACK]
     total = max(len(v) for v in per.values())
-    law = ("the v5 law on every muscle (`realms/compass_arm_v5.py`, engine omni-v5)" if arm == "v5" else
+    law = ("the v5 muscle law (`realms/compass_arm_v5.py`); engine identity recorded above" if arm == "v5" else
            "the v3 compass law on every muscle (`realms/compass_arm.py`)")
     count = lambda k: (sum(len(rows_for(r, scale, cat)) for r in REALMS) if organism_name(k) == STACK and stack == "realms"
                        else len(rows_for(k, scale, cat)))

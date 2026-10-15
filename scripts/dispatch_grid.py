@@ -42,12 +42,10 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "results" / "grid_v5" / "DISPATCHED.json"
+MANIFEST = ROOT / "results" / "grid_v6" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
-SINCE = "2026-10-13T19:02:00Z"     # the grid of omni-v5 as re-declared on 13 Oct, night (digest 6093b2b8, every muscle from 1 up
-                                   # to one click under its own capacity, read live; protocol 3): runs started before belong
-                                   # to other engines or settings (results/grid_v5/history)
-ENGINE = "omni-v5"                 # the engine whose grid this is (tools/omni_version.py)
+SINCE = "2026-10-15T06:07:41Z"  # only this campaign; earlier engines are historical
+ENGINE = "omni-v6"                 # the engine whose grid this is (tools/omni_version.py)
 SIZES = (1, 10, 100)               # 1, 10 and 100 copies only (the founder's order, 12 Oct)
 RUNS = 100                         # every square to 100 runs: 1, 10 and 100 runs only (the founder's order, 12 Oct)
 TIERS = (10, 100)                  # the 10-run squares of every size first, then 100
@@ -97,7 +95,7 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # then C, and never while a run that goes first waits for a runner. A workflow's runs started since RERUN_SINCE are read
 # back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
 RERUNS = ROOT / "scripts" / "reruns.txt"
-RERUN_SINCE = "2026-10-14T01:30:00Z"
+RERUN_SINCE = "2026-10-15T06:07:41Z"
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # Azure, the first cloud (the founder's order of 13 October), its sets following one another without a hand on the
@@ -106,9 +104,9 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # or running, one a tick in each queue, and is read back by its run's title since AZURE_SINCE (a cancelled run counts for
 # nothing), so nothing is started twice and a set dispatched by hand counts as started
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
-AZURE_SINCE = "2026-10-13T19:00:00Z"
+AZURE_SINCE = "2026-10-15T06:07:41Z"
 AZURE_WF = "aks-metered.yml"
-FIRST = ("aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
+FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
          "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
 
 
@@ -435,7 +433,10 @@ def rerun_queue(path=None):
             continue
         name, wf, inputs = (ln.split("|") + ["", ""])[:3]
         kv = dict(x.split("=", 1) for x in inputs.split(";") if "=" in x)
-        entries.append((name.strip(), wf.strip(), kv))
+        wf = wf.strip()
+        if wf in {"gke-metered.yml", "eks-metered.yml", "gpu-bench.yml", "lambda-gpu.yml", "cloud-organism.yml"}:
+            raise ValueError(f"{wf} is excluded from the approved non-GPU campaign")
+        entries.append((name.strip(), wf, kv))
     return [(run, n, wf, kv) for run in "ABC" for n, wf, kv in entries]
 
 

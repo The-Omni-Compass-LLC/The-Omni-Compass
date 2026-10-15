@@ -48,6 +48,11 @@ jobs:
           sparse-checkout: |
             /*
             !/results/live/raw/*
+      - name: Engine and source receipt
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
       - name: The GPU
         run: nvidia-smi && nvidia-smi --query-gpu=name,driver_version,power.limit,power.min_limit,power.max_limit --format=csv
       - name: Python with PyTorch

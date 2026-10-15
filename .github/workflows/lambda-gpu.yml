@@ -21,6 +21,7 @@ on:
       region: {description: "Lambda region (empty: the first with a machine free)", default: ""}
       max_cost: {description: "Ceiling in US dollars for the hour budget plus one hour; above it nothing is rented", default: "400"}
       dry_run: {description: "Show the price and the plan, rent nothing (yes/no)", default: "yes"}
+      hil_profile: {description: "Prepared scale profile: standard or 1-to-1000 (model copies around physical GPU hardware)", default: "1-to-1000"}
   push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
 permissions:
   contents: read
@@ -47,6 +48,11 @@ jobs:
           sparse-checkout: |
             /*
             !/results/live/raw/*
+      - name: Engine and source receipt
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Rent, ship, start (or show the price on a dry run)
         id: go
         env:
@@ -59,6 +65,7 @@ jobs:
           REGION: ${{ github.event.inputs.region }}
           MAX_COST: ${{ github.event.inputs.max_cost }}
           DRY: ${{ github.event.inputs.dry_run }}
+          HIL_PROFILE: ${{ github.event.inputs.hil_profile || '1-to-1000' }}
         run: |
           set -euo pipefail
           echo "launched=false" >> "$GITHUB_OUTPUT"
@@ -69,6 +76,14 @@ jobs:
             1card:fast)   SCRIPT=scripts/gpu_rented_run.sh; ENVS="SKIP_DECODE=1 SKIP_CAP=1 SKIP_HIL=1 SKIP_LLM=1"; BUDGET=8;;
             1card:full)   SCRIPT=scripts/gpu_rented_run.sh; ENVS="";    BUDGET=32;;
             *) echo "unknown test/mode $TEST/$MODE" | tee -a "$GITHUB_STEP_SUMMARY"; exit 1;;
+          esac
+          case "$HIL_PROFILE" in
+            standard) ;;
+            1-to-1000)
+              HIL_REPS=$([ "$TEST" = 8card ] && echo 1,1,1,1 || echo 5,3,2,1)
+              ENVS="$ENVS HIL_SCALES=1,10,100,1000 HIL_REPS_BY_SCALE=$HIL_REPS"
+              ;;
+            *) echo "unknown HIL profile: $HIL_PROFILE"; exit 1;;
           esac
           TYPE="${TYPE_IN:-$([ "$TEST" = 8card ] && echo gpu_8x_a100_80gb_sxm4 || echo gpu_1x_a10)}"
           HOURS=$(python3 -c "print(float('$BUDGET') + 1)")

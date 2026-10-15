@@ -50,13 +50,13 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v5, fingerprint `6093b2b88aa911b9` (44 files); package 0.5.0. Its default brain is **the max**: every muscle pushed to its own limit, never past it and never below native, the energy it takes shown as power given beside the work and the wear; the dial turns it down ([`docs/OMNI_V5.md`](docs/OMNI_V5.md)).
+- **Engine on main:** omni-v6, fingerprint `df6147466ef18046` (45 files); package 0.6.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- 2026-10-12: the realms on Omni v5 at the max, the preregistered seeds 3000-3009: every muscle alone under its own load and with work waiting in line, the six organisms under their own load, the climb and the line ([`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md))
+- Omni v6 is queued for a fresh campaign; no completed v6 benchmark result is claimed yet. See [`docs/OMNI_V6.md`](docs/OMNI_V6.md).
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -64,10 +64,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-13 21:35 | [The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
-| 2026-10-13 21:35 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v5)](results/live/V5_GOLDILOCKS.md) |  |
-| 2026-10-13 21:35 | [The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table (Omni v5)](results/live/V5_CAPACITY.md) |  |
-| 2026-10-13 21:35 | [The grid of the card version: six organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs](results/grid_v5/GRID.md) | Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0. |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):

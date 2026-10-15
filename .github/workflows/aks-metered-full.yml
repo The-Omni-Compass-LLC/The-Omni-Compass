@@ -32,7 +32,7 @@ run-name: ${{ format('aks-metered-full {0} dial {1}', github.event.inputs.load_s
         default: '0.096'
       load_steps:
         description: 'Load-generator replicas per step, in order (the burst bill test: e.g. 1 6 1 8 1 6); empty: steady load'
-        default: 1 4 1 6
+        default: 1 4 1 6 1 9
       max_workers:
         description: Worker machines in the work pool (Azure's autoscaler runs 1 to this many); the subscription's eastus
           quota is 32 vCPUs, 2 a machine, one for the system pool
@@ -97,6 +97,11 @@ jobs:
         sparse-checkout: |
           /*
           !/results/live/raw/*
+    - name: Engine and source receipt
+      run: |
+        set -euo pipefail
+        git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
+        python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'

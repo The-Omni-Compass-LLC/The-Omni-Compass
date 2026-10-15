@@ -295,7 +295,12 @@ def current_table(p: str, root: Path = ROOT) -> bool:
     if OLD_ENGINE.search(p):
         return False
     try:
-        return bool(ENGINE_NOW.search((root / p).read_text(encoding="utf-8", errors="ignore")[:4000]))
+        v = engine_now(root)
+        number = re.search(r"omni-v(\d+)", v)
+        if not number:
+            return False
+        pattern = re.compile(r"(?:omni-v|Omni v)" + number.group(1) + r"(?!\d)")
+        return bool(pattern.search((root / p).read_text(encoding="utf-8", errors="ignore")[:4000]))
     except OSError:
         return False
 

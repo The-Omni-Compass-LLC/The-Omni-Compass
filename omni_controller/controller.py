@@ -53,6 +53,7 @@ from omnicompass import master
 from omnicompass.adapter import Governor, mode_law, OBSERVE
 from omnicompass.shield import enforce, ShieldLimits
 from omni_controller.muscles import Muscles, add_args as add_muscle_args
+from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
 COMPASS_UP, COMPASS_DOWN, COMPASS_RELEASE = 0.10, 0.02, -0.2   # the compass's gains, the same on every muscle (realms/compass_arm.py)
@@ -293,6 +294,7 @@ class Controller:
         self.log = open(a.audit, "a") if a.audit else None
         self.k = kube or Kube(a.kubectl, a.dry_run, self.audit, proxy=not getattr(a, "no_api_proxy", False))
         self.k.audit = self.audit
+        self.host_cpu = HostCpuSampler()   # shared-host signal for kind; None means no scale-out proof
         self.g = Governor(law=mode_law("fleet")); self.g.set_mode(OBSERVE)
         # the machine organ's own engine view: fed with machine-attributable pressure only (pods waiting for a place)
         self.gn = Governor(law=mode_law("fleet")); self.gn.set_mode(OBSERVE)
@@ -470,8 +472,10 @@ class Controller:
         req = sum(to_milli(c.get("resources", {}).get("requests", {}).get("cpu", "0")) for c in tpl.get("containers", []))
         if req <= 0 or not nodes:
             return None
-        if one_host(nodes):
-            # one machine under every node: its CPU once, and a node added on it adds none
+        shared_host = one_host(nodes)
+        if shared_host:
+            # kind nodes are containers on this machine: count its CPU once, then use /proc/stat busy share
+            # so host-side load generators and processes outside Kubernetes consume the same capacity budget.
             alloc = max(to_milli(n["status"]["allocatable"]["cpu"]) for n in nodes)
         else:
             alloc = sum(to_milli(n["status"]["allocatable"]["cpu"]) for n in nodes)
@@ -483,6 +487,9 @@ class Controller:
                     if p["status"].get("phase") in ("Running", "Pending") and not mine(p)
                     and (p["spec"].get("nodeName") in names or p["status"].get("phase") == "Pending")
                     for c in p["spec"]["containers"])
+        if shared_host:
+            current = int((h.get("status") or {}).get("currentReplicas", 0) or 0)
+            return kind_replica_ceiling(alloc, int(other), int(req), current, self.host_cpu.busy_share)
         return max(1, int((alloc - other) // req) - 1)
 
     def _replica_room(self, h, ns, name, win, obs, s):
@@ -507,8 +514,17 @@ class Controller:
         need = int(math.ceil(100.0 * dem / float(tgt) - 1e-9))      # the replicas the autoscaler's arithmetic asks for
         pressed = self.compass_law.p >= self.compass_law.band.center or not obs["slo_clean"]
         ceil_ = given if given > 0 else None
-        if cur >= cap and pressed and need > cap and ceil_ is None:
-            ceil_ = self._live_ceiling(h)                                 # read only when the cap binds and the compass presses
+        # Once Omni has raised the cap, refresh the shared-host ceiling every tick:
+        # utilization can climb after the first decision. Keep the live replica count
+        # runnable if the refreshed ceiling is below it.
+        if ceil_ is None and ((cur >= cap and pressed and need > cap) or cap > hi0):
+            ceil_ = self._live_ceiling(h)
+        if cap > hi0:
+            safe_cap = bounded_replica_cap(hi0, cap, cur, ceil_)
+            if safe_cap < cap:
+                self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"maxReplicas": safe_cap}})],
+                             f"replica room: cap {cap} -> {safe_cap} (live ceiling {ceil_}; current replicas {cur})")
+                return
         if cur >= cap and pressed and need > cap and ceil_ is not None and cap < ceil_:
             new = min(ceil_, need)
             if RANGE_ANN not in ann:
@@ -733,6 +749,7 @@ class Controller:
         return None
 
     def step(self):
+        self.host_cpu.sample()              # two adjacent controller ticks provide a host CPU busy share
         if self.killed():
             self.restore()
             return self.audit({"decision": "killed", "mode": "observe"})

@@ -3,7 +3,7 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-name: v5-all-benchmarks
+name: all-benchmarks
 # Every benchmark, one button (Actions -> v5-all-benchmarks -> Run workflow), on the branch it is started from. Nothing is
 # left out: the free tier starts every benchmark that runs on GitHub's own machines; the paid tiers start the GPU runner
 # and the metered clouds only when chosen AND their secrets are in place (a missing secret is reported and skipped, never
@@ -49,14 +49,14 @@ jobs:
       - name: Start every chosen benchmark
         run: |
           set -u
-          FREE="benchmark benchmark-reps citylearn cpu-power kafka kind-addons kwok-scale live-kind live-kind-full live-kind-levers live-shadow mujoco pandapower pgbench realms realms-v5 redis robustness six six-kube swarm sysbench ycsb"
+          FREE="benchmark benchmark-reps capacity citylearn cpu-power grid kafka kind-addons kind-cruisekube kind-goldilocks kwok-scale live-kind live-kind-full live-kind-levers live-shadow mujoco pandapower pgbench realms realms-v5 redis robustness six six-kube swarm sysbench ycsb"
           list=""
           [ "${{ github.event.inputs.free }}" = yes ] && list="$FREE"
           [ "${{ github.event.inputs.gpu }}" = yes ] && list="$list gpu-bench"
           skipped=""
           for c in $(echo "${{ github.event.inputs.clouds }}" | tr ',' ' '); do
             case "$c" in
-              aks) [ "$HAVE_AZURE" = true ] && list="$list aks-metered" || skipped="$skipped aks-metered(no AZURE_CREDENTIALS)";;
+              aks) [ "$HAVE_AZURE" = true ] && list="$list aks-metered-full" || skipped="$skipped aks-metered-full(no AZURE_CREDENTIALS)";;
               gke) [ "$HAVE_GCP" = true ] && list="$list gke-metered" || skipped="$skipped gke-metered(no GCP_CREDENTIALS)";;
               eks) [ "$HAVE_AWS" = true ] && list="$list eks-metered" || skipped="$skipped eks-metered(no AWS keys)";;
               *) skipped="$skipped $c(unknown cloud)";;
@@ -93,7 +93,7 @@ jobs:
           if [ -n "$LG" ]; then
             if [ "$HAVE_LAMBDA" != true ]; then skipped="$skipped lambda-gpu(no LAMBDA_ secrets)"
             elif [ "${{ github.event.inputs.dry_run }}" = yes ]; then echo "| lambda-gpu ($LG) | would start (dry run) |" >> "$GITHUB_STEP_SUMMARY"
-            elif gh workflow run lambda-gpu.yml --ref "$REF" -f test="$LG" -f mode=pooled -f dry_run=no; then
+            elif gh workflow run lambda-gpu.yml --ref "$REF" -f test="$LG" -f mode="$([ "$LG" = 1card ] && echo full || echo pooled)" -f dry_run=no; then
               echo "| lambda-gpu ($LG, pooled) | yes |" >> "$GITHUB_STEP_SUMMARY"; started=$((started + 1))
             else echo "| lambda-gpu ($LG) | FAILED to start |" >> "$GITHUB_STEP_SUMMARY"; failed=$((failed + 1)); fi
           fi

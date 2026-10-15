@@ -343,7 +343,10 @@ def main(argv=None):
     names = [n for n in a.organisms.split(",") if n]
     sizes = {sc: {n: len(r) for n, r in groups(sc).items() if n in names} for sc in scales}
     steps_of = {sc: {n: round(max(a.step_s, 1.5 * cost * m), 2) for n, m in sizes[sc].items()} for sc in scales}
+    from tools.omni_version import engine_files, version_of, digest
+    engine_snapshot = engine_files()
     run = {"started": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()), "commit": commit, "scales": scales,
+           "engine": version_of(engine_snapshot) or "undeclared", "engine_digest": digest(engine_snapshot),
            "reps_by_scale": reps_of, "step_s_by_scale": steps_of, "sim_step_s_per_muscle": cost,
            "steps": ORGANISM_STEPS, "start_limit_w": start_w, "slo_ms": slo_ms, "sim_card": a.sim}
     res = {}

@@ -171,7 +171,7 @@ def main():
          "that reads the setting once before the first write, reads back every write, steps aside if another controller "
          "moves it, and walks it back to native at the end. A knob native already runs at the top of its range is at its "
          "limit on native and is left there.", "",
-         f"This chapter lists all {len(rows)} muscles of the catalog (`realms/catalog_v5.csv`, engine omni-v5). For each one it says what kind of machine "
+         f"This chapter lists all {len(rows)} muscles of the v5 catalog (`realms/catalog_v5.csv`); each run records its engine separately. For each one it says what kind of machine "
          "it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is "
          "reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of "
          "these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels "

@@ -232,7 +232,7 @@ def main(argv=None):
          + (f" ({sum(len(v) for v in res.values())} of {len(jobs)} runs finished before the deadline)" if stopped else "")
          + f", {a.scale} cop{'y' if a.scale == 1 else 'ies'} "
          f"of each organism on one clock, {time.time() - t0:.0f} s on {a.workers} workers. Native: each organism's own "
-         "controllers. Omni: " + ("the v5 law on every muscle (`realms/compass_arm_v5.py`, engine omni-v5)" if a.arm == "v5" else
+         "controllers. Omni: " + (f"the v5 muscle law (`realms/compass_arm_v5.py`), engine {head['engine']}" if a.arm == "v5" else
                                   "the v3 compass law on every muscle (`realms/compass_arm.py`)")
          + f", catalog `{Path(cat).relative_to(ROOT)}`, the four stacked as "
          + ("each realm's own body on one clock (the native identical to each realm's)" if stack_mode == "realms" else "one body")

@@ -23,6 +23,11 @@ MANIFEST = ROOT / "RELEASE_MANIFEST.json"
 RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
+    "engine_v6_campaign": ["OMNI_V6.json", "omni_controller/capacity.py", "omni_controller/controller.py",
+                           "scripts/dispatch_grid.py", "scripts/reruns.txt", "scripts/benchmark_campaign.json",
+                           "scripts/gpu_campaign_profiles.json", "docs/OMNI_V6.md", "tests/test_release_campaign.py",
+                           "tools/run_realms_v5.py", "tools/run_scale.py", "tools/pool_scale.py", "tools/run_hil.py"],
+    "benchmark_workflows": sorted(str(p.relative_to(ROOT)) for p in (ROOT / ".github" / "workflows").glob("*.yml")),
     "canonical_engine": ["omnicompass/core.py", "cpp/src/core.cpp", "docs/CANONICAL_ENGINE.md"],
     "reference_engine": ["reference/omni_compass_reference_engine.py", "reference/PROVENANCE.json"],
     "cpp_twins_seal": ["results/SEAL.json"],

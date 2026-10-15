@@ -54,6 +54,11 @@ jobs:
           sparse-checkout: |
             /*
             !/results/live/raw/*
+      - name: Engine and source receipt
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Are the cloud's secrets in place?
         id: have
         env:
