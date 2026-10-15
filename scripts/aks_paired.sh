@@ -60,6 +60,15 @@ for arm in "${order[@]}"; do
     i=$(( i + 1 ))
   done
   az aks get-credentials -g "$RG" -n "$name" --admin --overwrite-existing
+  # azure/setup-kubectl's former default installed 1.31, which cannot address pods/resize.
+  # Install the actual control-plane release, verify its official checksum, then check the wire.
+  server_version=$(az aks show -g "$RG" -n "$name" --query currentKubernetesVersion -o tsv)
+  client_bin="${RUNNER_TEMP:-/tmp}/omni-aks-kubectl"
+  python3 scripts/aks_kubectl.py install --version "$server_version" --directory "$client_bin"
+  export PATH="$client_bin:$PATH"
+  client_checks=()
+  [ "${OMNI_MACHINES_ONLY:-0}" != 1 ] || client_checks+=(--machines-only)
+  python3 scripts/aks_kubectl.py check "${client_checks[@]}"
   kubectl wait --for=condition=Ready nodes --all --timeout=600s
   az aks show -g "$RG" -n "$name" -o json > "/tmp/aks-$name.json"
   echo "######## ARM $arm (repetition $REP)"
