@@ -5,7 +5,11 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Apply one explicitly requested AKS stop/cleanup/restart; never cancel unrelated runs."""
+import contextlib
 import datetime as dt
+import io
+import urllib.parse
+import urllib.request
 import json
 import os
 from pathlib import Path
@@ -23,11 +27,55 @@ def gh_api(path, method='GET', body=None):
     return json.loads(r.stdout) if r.stdout.strip() else None
 
 
+def list_price(size, location):
+    """Public Azure retail price only; never send subscription or resource metadata to this endpoint."""
+    query = f"armRegionName eq '{location}' and armSkuName eq '{size}' and priceType eq 'Consumption'"
+    url = 'https://prices.azure.com/api/retail/prices?' + urllib.parse.urlencode({'$filter': query, 'currencyCode': 'USD'})
+    prices = []
+    for _ in range(5):
+        with urllib.request.urlopen(url, timeout=30) as response:
+            data = json.load(response)
+        for row in data.get('Items', []):
+            if (row.get('armSkuName') == size and row.get('armRegionName') == location
+                    and row.get('serviceName') == 'Virtual Machines' and row.get('type') == 'Consumption'
+                    and row.get('currencyCode') == 'USD' and row.get('unitOfMeasure') == '1 Hour'
+                    and row.get('isPrimaryMeterRegion', True)
+                    and 'Windows' not in row.get('productName', '')
+                    and not any(x in row.get('skuName', '') for x in ('Spot', 'Low Priority'))
+                    and float(row.get('retailPrice', 0)) > 0):
+                prices.append(float(row['retailPrice']))
+        url = data.get('NextPageLink')
+        if not url:
+            break
+    if not prices:
+        raise RuntimeError('public list price could not be verified')
+    return min(prices)
+
+
+def private_capacity_inputs(request):
+    # In-memory checks only. No quota counters, candidate readiness, group existence or inventory is exported.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from scripts.azure_capacity import wait_capacity
+    inputs = dict(request['inputs'])
+    for size in request['vm_candidates']:
+        try:
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                wait_capacity(inputs['location'], size, f"{size}:{inputs['max_workers']}", timeout=0)
+                price = list_price(size, inputs['location'])
+        except (RuntimeError, ValueError, OSError):
+            continue
+        if price > float(request['max_price_per_node_hour']):
+            continue
+        inputs.update(vm_size=size, price_per_node_hour=str(price))
+        return inputs
+    raise RuntimeError('no configured benchmark machine is currently available within the approved price ceiling')
+
+
 def main(argv=None):
     request = json.loads(Path((argv or sys.argv[1:])[0]).read_text())
     repo = os.environ['GITHUB_REPOSITORY']
     base = f'repos/{repo}'
-    receipt = {'request': request, 'cancelled': [], 'resource_groups_deleted': [], 'restart': None}
+    receipt = {'request': request, 'cancelled': [], 'restart': None}
     out = Path('aks-restart-receipt.json')
     def save():
         out.write_text(json.dumps(receipt, indent=2) + '\n')
@@ -63,18 +111,20 @@ def main(argv=None):
             group = f'{prefix}{old["id"]}-{rep}'
             exists = subprocess.check_output(['az', 'group', 'exists', '-n', group], text=True).strip()
             if exists == 'true':
-                subprocess.run(['az', 'group', 'delete', '-n', group, '--yes', '--no-wait'], check=True)
+                subprocess.run(['az', 'group', 'delete', '-n', group, '--yes', '--no-wait'], check=True, capture_output=True, text=True)
                 groups.append(group)
     deadline = time.monotonic() + 900
     while groups and time.monotonic() < deadline:
         groups = [g for g in groups if subprocess.check_output(['az', 'group', 'exists', '-n', g], text=True).strip() == 'true']
         if groups:
-            print('Waiting for the old billed resources to be deleted:', ', '.join(groups), flush=True)
+            print('Waiting for superseded benchmark cleanup to complete.', flush=True)
             time.sleep(15)
     if groups:
         raise RuntimeError('Azure is still deleting the old resources; refusing a competing billed test')
-    receipt['resource_groups_deleted'] = True
     save()
+    if request.get('private_capacity_dispatch'):
+        request['inputs'] = private_capacity_inputs(request)
+        save()
     started = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
     gh_api(f'{base}/actions/workflows/aks-metered-full.yml/dispatches', 'POST',
            {'ref': 'main', 'inputs': request['inputs']})

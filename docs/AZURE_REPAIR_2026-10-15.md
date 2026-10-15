@@ -18,7 +18,7 @@ The helper exports no inventory: operational messages contain neither quota valu
 
 Regression tests cover repeated-family accounting, differently named sizes in one family, standalone VMs, the regional ceiling, occupied quota retries, unknown quota, confirmed deletion, deletion timeout and error propagation. Workflow checks verify the common queue and awaited cleanup.
 
-Live inventory export was blocked by automatic approval review because this repository is public. No inventory workflow was launched. Local tests cannot establish who owns occupied Azure quota or prove a successful cloud rerun. That live follow-up remains pending approval for diagnostic disclosure or another approved private diagnostic channel.
+Live inventory export was blocked by automatic approval review because this repository is public. No inventory workflow was launched. Local tests cannot establish who owns occupied Azure quota or prove a successful cloud rerun. The follow-up now uses private in-memory capacity checks and Azure's public retail price API. It selects only a configured two-CPU machine at or below the existing hourly price ceiling and records the selected deployment inputs and replacement run reference. It exports no quota counters, resource-group existence data, or unrelated inventory. A successful cloud rerun is still required before calling the incident resolved.
 
 Robustness run 38729569415 was invalid because too few controller decisions landed inside the measurement window. Redis run 38725712960 and capacity run 38722001872 also have failed jobs; their numerical results must not be relabelled successful without valid reruns.
 

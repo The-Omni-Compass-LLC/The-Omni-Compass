@@ -62,6 +62,45 @@ class AzureCapacity(unittest.TestCase):
             self.assertIn('azure_capacity.py cleanup', text)
         self.assertEqual(len(set(groups)), 1)
 
+    def test_private_selection_exports_no_quota_or_candidate_status(self):
+        import contextlib
+        import io
+        from scripts import restart_aks
+        request = {'inputs': {'location': 'eastus', 'max_workers': '4'},
+                   'vm_candidates': ['Standard_D2s_v4', 'Standard_D2s_v3'], 'max_price_per_node_hour': '0.096'}
+        def probe(location, size, pools, timeout):
+            print('private quota counters must never leave memory')
+            if size.endswith('_v4'):
+                raise RuntimeError('private quota unavailable')
+        output = io.StringIO()
+        with patch.object(cap, 'wait_capacity', side_effect=probe), patch.object(restart_aks, 'list_price', return_value=0.096):
+            with contextlib.redirect_stdout(output):
+                result = restart_aks.private_capacity_inputs(request)
+        self.assertEqual(output.getvalue(), '')
+        self.assertEqual(result['vm_size'], 'Standard_D2s_v3')
+        self.assertEqual(result['price_per_node_hour'], '0.096')
+        self.assertNotIn('quota', result)
+
+    def test_private_selection_refuses_a_higher_price(self):
+        from scripts import restart_aks
+        request = {'inputs': {'location': 'eastus', 'max_workers': '4'},
+                   'vm_candidates': ['Standard_D2s_v4'], 'max_price_per_node_hour': '0.096'}
+        with patch.object(cap, 'wait_capacity'), patch.object(restart_aks, 'list_price', return_value=0.2):
+            with self.assertRaises(RuntimeError):
+                restart_aks.private_capacity_inputs(request)
+
+    def test_retail_price_excludes_windows_and_spot(self):
+        import io
+        import json
+        from scripts import restart_aks
+        base = {'armSkuName': 'Standard_D2s_v3', 'armRegionName': 'eastus', 'serviceName': 'Virtual Machines',
+                'type': 'Consumption', 'currencyCode': 'USD', 'unitOfMeasure': '1 Hour',
+                'productName': 'Virtual Machines Dsv3 Series', 'skuName': 'D2s v3', 'retailPrice': 0.096}
+        data = {'Items': [dict(base, skuName='D2s v3 Spot', retailPrice=0.01),
+                          dict(base, productName='Virtual Machines Dsv3 Windows', retailPrice=0.18), base]}
+        with patch.object(restart_aks.urllib.request, 'urlopen', return_value=io.BytesIO(json.dumps(data).encode())):
+            self.assertEqual(restart_aks.list_price('Standard_D2s_v3', 'eastus'), 0.096)
+
     def test_cleanup_waits_for_resource_disappearance(self):
         with patch.object(cap, 'az', side_effect=[True, None, True, False]) as az, patch.object(cap.time, 'sleep') as sleep:
             cap.cleanup('omni-compass-full-123-1')
