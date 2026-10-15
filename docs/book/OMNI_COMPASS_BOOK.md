@@ -1047,7 +1047,7 @@ checked; install only a commit whose run passed.
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # the engine version (omni-v5), or every file that differs
+python3 tools/omni_version.py                  # the engine version (for example omni-v6), or every file that differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 
@@ -1141,6 +1141,80 @@ Pass: as level 3.
 
 ```
 sudo python3 tools/gpu_wire_check.py --gpu 0                    # must end: WIRED RIGHT
+# watch: computes both wires and writes neither
+sudo python3 -m omni_controller.gpu_compass --mode watch --gpus 0 --audit /var/log/omni/gpu.jsonl \
+     --latency-file <feed> --slo-ms <p95 target> --floor-w <your lowest watts>
+# govern: writes the clock ceiling and the power limit
+sudo python3 -m omni_controller.gpu_compass --mode cap --gpus 0 --audit /var/log/omni/gpu.jsonl \
+     --latency-file <feed> --slo-ms <p95 target> --floor-w <your lowest watts>
+# OFF: clocks reset, power limit back to the start, read back
+sudo touch /tmp/omni-gpu-kill
+```
+
+Every `--interval` seconds (default 2) it reads the card's own meters and the response times, and:
+- **learns the card on its own** first: while the ceiling is at the top and the card is busy, its busy clock and busy
+  draw; until 15 such readings are in, neither wire moves;
+- **races while work waits**: at 95% utilization or more, the ceiling to the top and the lid to the start limit;
+- **at the max** (`--dial max`, the default): the clock ceiling is never stepped below the top while the card serves, and
+  the lid sits above the card's own busy draw, never over the start limit;
+- **at the tune-down** (`--dial save`), it paces the slack: the mean response time of the last 5 s, in the band from a
+  tenth of `--slo-ms` to `--slo-ms`; the ceiling moves in whole 15 MHz steps, never under the card's own busy clock, and the
+  lid never under the card's own busy draw plus 10%, never over the start limit; and before the ceiling may go one step
+  lower, a paired trial measures the card's own time on each request (the workload's `service_ms`) at the top and at that
+  step, and the step is allowed only if it adds at most `--allow` (2%). Where no step passes, the ceiling stays at the top:
+  the card runs as it does alone, and the audit says so (`verdict_state: left native`);
+- **fails up** when p95 reaches `--slo-ms`, a request fails, the feed goes blind or the card reports a heat slowdown.
+
+The settings are the card's own (its busy clock and busy draw as learned), the line (`--slo-ms`), the allowance
+(`--allow`) and the dial. The workload must write `service_ms` (the card's own time per request) in its latency file, as
+`tools/gpu_workload.py` does; without it no step is ever allowed and the card stays native.
+Pass: work per energy up or equal; requests served equal; no request more than 2% slower at the median, p95 and p99
+at native or within 2%; every row of section 4.5 reads "wired right".
+
+**Level 6 - CPU clock and power. WRITES.** On bare metal, add to the controller:
+`--cpufreq-policy-root /sys/devices/system/cpu/cpufreq --cpufreq-require-schedutil --rapl-cmd "<prints CPU package watts>"`.
+The OFF switch writes every policy's recorded maximum back exactly.
+Pass: energy per unit of work down, no LOSS on any service gauge.
+
+**Level 7 - Site power and cooling. WRITES.**
+`--power-cmd "<prints site watts>" --site-limit-w <limit>` brings site power stress into the engine;
+`--cooling-cmd "<sets {c}>" --cooling-min-c 18 --cooling-max-c 27 --cooling-restore-c 22` lets it hold the supply-air
+setpoint in its band. CPU and GPU sharing one power budget, and groups of cards sharing a site budget, run as models
+today. Batteries are designed as a muscle of the site, not yet wired (section 7.10).
+
+### 6.4 Wiring for superiority: watch first, then the paired trial on every knob
+
+Every knob is wired out first and in last, and the wire in is connected only by a measurement the governor makes on the
+knob itself. The steps, for any stack:
+
+1. **Wire out, everything.** Every muscle's readings reach the governor, one wire out per muscle. Nothing is written. This
+   is watch mode (section 1.3): where every installation starts, and where any knob returns the moment it stops paying.
+2. **Run the observation.** With the stack together and under its real or replayed demand, let the governor watch for at
+   least one full cycle of that demand. In watch mode the governor learns the band of every reading, where the native
+   controllers hold them, and which readings leave calm and when. Nothing is decided yet; the audit says what the governor
+   saw.
+3. **Let the paired trial decide each knob, one trial at a time.** Switch the knobs the operator is willing to have moved
+   into trial mode. A knob still writes nothing until the governor has run a paired trial on it (section 1.2): the knob is
+   held at the operator's setting for a reference, then one notch away, under the same traffic, and the step is allowed
+   only if the muscle's own cost did not rise under the declared objective. The objective is the operator's one
+   declaration per knob: the resource reading (the service, the resource and the processor time weighed together) or the
+   service reading (work and speed alone). A refused step is not retried for a set time; an allowed step widens the
+   allowance by one notch, and the next trial probes the next. The governor then moves the knob inside the allowance,
+   never outside.
+4. **Keep checking.** The trials recur. A knob whose last step stops paying when the demand changes is refused on its
+   recheck and the allowance narrows back; a knob that never passes a trial stays native for good, which is the right
+   answer for that knob and costs nothing. New noise in the system is answered the same way: the governor reacts inside
+   the allowance, and the allowance itself is re-earned by measurement.
+5. **Read the trials, muscle by muscle.** The audit carries the state of every knob every second (`verdict_phase`,
+   `verdict_direction`, `allowed_low`, `allowed_high`, the cost sample), and the arm's record sums it. An operator who
+   wants one knob wired both ways and another watched only sets the objective on the first and leaves the second in watch.
+
+What this gives: no knob is ever written on faith. Where Omni-Compass can do more than the native controller on the
+muscle's own gauges, it will have shown it on that muscle before it moved it; where it cannot, the muscle runs by itself
+and Omni-Compass reads it. The body's result is then the sum of the knobs that earned it, not one turn of a single dial
+for the whole system. The live stacks of chapter 7 (the pooler, the broker, the cache, the storage engine's cache and the
+buffer pool) carry this trial on their knob, and on Kubernetes it guards every machine given back (section 1.2).
+
 
 ## 7. Stack by Stack
 
@@ -2849,7 +2923,7 @@ With Prometheus and the NGINX ingress controller, for example, $n_{ok}$ and $n_{
 the quantile $q$ is `histogram_quantile(q, sum by (le) (increase(nginx_ingress_controller_request_duration_seconds_bucket[30s])))`.
 A histogram's buckets bound the precision of every quantile: a service whose line is 500 ms needs buckets around 250, 400,
 500 and 750 ms, or the quantiles jump between bucket edges and the governor reads steps that are not there. A service
-mesh (Istio, Linkerd) exports the same two series under its own names; the application's own histogram is better still
+mesh (Istio, Linkerd) exports the same two series under its own names; the application's own histogram is the closest measurement of all
 when the line is written at the application. Section 22.7 gives an adapter that does all of this.
 
 **What the adapter must not do.** It must not average across windows, carry a value forward when a window is empty (an
@@ -3136,6 +3210,125 @@ CronJob with the watch role of chapter 14, writes one row every five minutes for
 
 ```bash
 #!/usr/bin/env bash
+# One row every 5 minutes: time, machines in the governed pools, the requests of the pods on them (DaemonSet pods
+# excluded: processor in millicores, memory in MiB), and the processor requests of every pod on them (for N_gov).
+SEL="omni-role=work"; OUT="room.csv"
+[ -s "$OUT" ] || echo "epoch,machines,cpu_req_m,mem_req_mib,cpu_req_all_m" > "$OUT"
+while true; do
+  nodes=$(kubectl get nodes -l "$SEL" -o json | jq -c '[.items[].metadata.name]')
+  kubectl get pods -A --field-selector status.phase=Running -o json | jq -r --argjson nodes "$nodes" '
+    def mcpu: if endswith("m") then .[:-1] | tonumber else tonumber * 1000 end;
+    def mib:  if endswith("Ki") then .[:-2] | tonumber / 1024 elif endswith("Mi") then .[:-2] | tonumber
+              elif endswith("Gi") then .[:-2] | tonumber * 1024 elif endswith("k") then .[:-1] | tonumber * 1e3 / 1048576
+              elif endswith("M") then .[:-1] | tonumber * 1e6 / 1048576 elif endswith("G") then .[:-1] | tonumber * 1e9 / 1048576
+              else tonumber / 1048576 end;
+    [.items[] | select(.spec.nodeName | IN($nodes[]))] as $on
+    | [$on[] | .spec.containers[].resources.requests // {}] as $all
+    | [$on[] | select(all(.metadata.ownerReferences[]?; .kind != "DaemonSet"))
+             | .spec.containers[].resources.requests // {}] as $r
+    | [now | floor, ($nodes | length),
+       ($r | map(.cpu // "0" | mcpu) | add // 0 | floor), ($r | map(.memory // "0" | mib) | add // 0 | floor),
+       ($all | map(.cpu // "0" | mcpu) | add // 0 | floor)]
+    | @csv' >> "$OUT"
+  sleep 300
+done
+```
+
+Two weeks of rows cover two weekly cycles. The room then follows from the formulas of section 24.2:
+
+```python
+import csv, math
+C_CPU, C_MEM = 3860, 12800      # one machine's allocatable less its DaemonSet requests (millicores, MiB): read them
+FLOOR, DT_H, K = 2, 300 / 3600, 0  # the floor, the sampling interval in hours, the committed machines
+rows = list(csv.DictReader(open("room.csv")))
+need = [max(FLOOR, math.ceil(max(int(r["cpu_req_m"]) / C_CPU, int(r["mem_req_mib"]) / C_MEM))) for r in rows]
+room = sum(DT_H * max(0, int(r["machines"]) - n) for r, n in zip(rows, need))
+billable = sum(DT_H * max(0, int(r["machines"]) - max(K, n)) for r, n in zip(rows, need))
+C_ALLOC, H = 3860, 0.5             # one machine's allocatable processor (millicores), the governor's headroom
+gov = [max(FLOOR, math.ceil((1 + H) * int(r["cpu_req_all_m"]) / C_ALLOC)) for r in rows]
+room_gov = sum(DT_H * max(0, int(r["machines"]) - g) for r, g in zip(rows, gov))
+print(f"{len(rows) * DT_H:.0f} h sampled: room {room:.0f} machine-hours, billable room {billable:.0f}, "
+      f"room under the governor's own floor {room_gov:.0f}")
+```
+
+The constants `C_CPU`, `C_MEM` and `C_ALLOC` above are placeholders for a machine with four virtual processors; each
+installation reads its own. The use term of $N_{gov}$ is left out of the script, because on a pool that holds its
+requests it rarely binds; it can be added from `kubectl top nodes`. The same rows, plotted by hour of the week, show where the room lives, and so which load the paired run
+must carry (section 24.6).
+
+### 24.4 The settings that bound the room, and whose they are
+
+None of the settings below is the governor's, and none is changed by it. They are the operator's, they shape native and
+omni alike, and a paired run holds each of them identical in both arms.
+
+| Setting | Where | What it does to the room |
+|---|---|---|
+| The floor (`--min-nodes`, `MIN_NODES`) | the governor's command line | the least the governor keeps in service; set it to at least the number of zones the service's availability design needs serving at every moment, never fewer than 2 |
+| The pools labelled `omni-role=work` | the node pools' labels | only these machines may be parked; a pool left unlabelled is never touched |
+| The HPA's minimum replicas | the service's HPA | a replica floor holds pods, and their machines, at every hour |
+| The HPA's scale-down behaviour (`behavior.scaleDown`, stabilization window 300 s by default) | the service's HPA | a long window keeps pods after a peak, so parked machines empty later |
+| The cluster autoscaler's scale-down profile | the provider (table below) | how long an empty or underused machine is kept before it is deleted |
+| PodDisruptionBudgets | the service's manifests | a budget of zero disruptions keeps the cluster autoscaler from draining a machine; native is held the same way |
+| Pods the cluster autoscaler will not move (`cluster-autoscaler.kubernetes.io/safe-to-evict: "false"`, local storage on some providers, bare pods with no controller) | the workloads | such a pod pins its machine until it ends |
+| Spot or preemptible pools | the node pools | billed at the spot price; parking one saves that price; the provider may reclaim it on its own |
+
+The cluster autoscaler's scale-down profile is set per provider:
+
+| Provider | How the profile is set | The settings that matter |
+|---|---|---|
+| Azure (AKS) | `az aks update -g <rg> -n <cluster> --cluster-autoscaler-profile scale-down-unneeded-time=10m scale-down-delay-after-add=10m scale-down-utilization-threshold=0.5 scan-interval=10s` (the values shown are AKS's defaults) | how long a machine must be unneeded before deletion; how long after a scale-up no scale-down happens; the utilisation under which a machine counts as unneeded |
+| Google (GKE) | `gcloud container clusters update <cluster> --autoscaling-profile balanced` or `optimize-utilization` | the profile as a whole; `optimize-utilization` removes underused machines sooner |
+| Amazon (EKS), Cluster Autoscaler | the flags on the autoscaler's own Deployment: `--scale-down-unneeded-time`, `--scale-down-delay-after-add`, `--scale-down-utilization-threshold`, `--scan-interval` | as on Azure |
+| Amazon (EKS), Karpenter | the NodePool's `spec.disruption`: `consolidationPolicy` (`WhenEmpty` or `WhenEmptyOrUnderutilized`) and `consolidateAfter` | how soon an empty or underused machine is consolidated away |
+
+A shorter scale-down profile also lowers native's bill. The comparison the governor is judged on is always at the same
+profile in both arms; a saving that came from a profile changed for one arm only is not the governor's, and a paired run
+that changes the profile between arms is not a paired run.
+
+### 24.5 Pricing terms, and whether a machine-hour saved is a dollar saved
+
+| Pricing term | What a deleted machine-hour saves | Planning rule |
+|---|---|---|
+| On-demand, billed by the second or the minute (the common case on all three providers; read the provider's own page for the machine family) | its full price | the billable room is the room |
+| A reservation, committed-use discount or savings plan covering $K$ machines of the family | nothing below $K$; the full price above $K$ | size commitments to the governed pool's floor and trough, not its peak; $R_{\$}$ of section 24.2 |
+| Spot or preemptible | the spot price | govern the on-demand pools first; a spot pool's machines can vanish on the provider's notice, governor or not |
+| Software licensed per machine or per core (a commercial operating system, an agent billed per node) | that licence too, where it is billed by the hour the machine exists | add it to $p$ |
+| The cluster's own fee (the control plane), storage, network egress, load balancers | nothing | never in the bill rows of a receipt; the cloud mode moves none of them |
+
+The bill rows of a receipt (section 19.6) price machine-hours at the provider's list price for the family, because list
+price is the one price both arms share and anyone can check. The company's own discounts change the dollars, never the
+machine-hours; finance converts the machine-hour row to the company's own price after the run (section 22.5).
+
+### 24.6 Choosing the load for the paired run from the shape of the room
+
+| Shape of the company's load | Where the room lives | The paired run that can show it |
+|---|---|---|
+| Steady at a level the pool was sized for | nowhere: $N \approx N_{req}$ | none; a steady run reads EVEN on the bill, honestly, and is still worth running for the response-time and alert rows |
+| A daily cycle (business hours, consumer evenings) | the trough and the descent after the peak | a replay of the company's own day, compressed only as far as the autoscaler's profile allows (a 10-minute unneeded time cannot be compressed below 10 minutes), or the repository's own day-shaped load (the Google 2011 trace on one to nine load generators) |
+| Bursts separated by quiet stretches | between bursts, as native's autoscaler holds machines through its scale-down delay | the burst steps of the service's own traffic; in the repository, the burst sets of section 19.6 |
+| A weekly cycle with a quiet weekend | the weekend | a run long enough to include a quiet stretch as long as the profile's scale-down time several times over |
+| Batch windows | after each window | the batch itself, with the service's line on the jobs' own completion time where that is the objective |
+
+**The run must be long enough for the autoscaler to act.** A quiet stretch shorter than the cluster autoscaler's
+unneeded time plus its scan interval gives neither arm a chance to delete a machine, and the bill reads EVEN for a reason
+that has nothing to do with the governor. Plan each quiet stretch of the paired run to last at least three times the
+unneeded time.
+
+### 24.7 What the plan delivers to the paired run
+
+Before phase 5 starts, the implementer writes, and the service owner and finance sign:
+
+1. the room and the billable room from two weeks of samples, with the constants used;
+2. the hours of the week that hold most of the room;
+3. the load the paired run will carry, chosen from section 24.6, with its quiet stretches sized to the profile;
+4. the settings of section 24.4 as they stand, identical in both arms;
+5. the price used for the bill rows (list price) and the company's own price for the conversion afterwards.
+
+A receipt that then reads GAIN on the bill, with response time, failed requests and alert minutes reading EVEN or GAIN,
+has measured a share of a room that was known beforehand; a receipt that reads EVEN on the bill where the plan found
+room is a wiring question to answer first (section 4.5): the feed, the line, the autoscaler's profile, a pod that pins
+its machine.
+
 
 ## 25. On Your Own Racks and in Private Clouds
 
@@ -3219,6 +3412,81 @@ oc new-project omni-compass
 oc apply -f deploy/install/omni-compass.yaml
 oc adm policy add-scc-to-user nonroot-v2 -z omni-compass -n omni-compass
 oc -n omni-compass get pod -l app=omni-compass -o jsonpath='{.items[0].metadata.annotations.openshift\.io/scc}'
+# prints: nonroot-v2
+```
+
+No other constraint is needed for the governor on a cluster: it is not privileged, mounts no host path and adds no
+capability. (The card governor of section 21.7 is a privileged agent on each graphics node and is a separate decision for
+the cluster's security owner.)
+
+**Machine sets and the cluster autoscaler.** On an installer-provisioned OpenShift cluster the machines are made by the
+Machine API from MachineSets, and the cluster autoscaler is configured by a `ClusterAutoscaler` resource and one
+`MachineAutoscaler` per MachineSet. Native is that autoscaler. The governed machines are those of the MachineSets whose
+node template carries the label `omni-role: work`:
+
+```yaml
+# in the MachineSet: the label every node it makes will carry
+spec:
+  template:
+    spec:
+      metadata:
+        labels:
+          omni-role: work
+```
+
+The governor itself runs on the infrastructure or control-plane machines, never on a machine it may park: set its
+`nodeSelector` to the infrastructure label the cluster uses (for example `node-role.kubernetes.io/infra: ""`) and add the
+matching toleration, in place of the manifest's `omni-role: system`.
+
+**`oc` and `kubectl`.** The governor's image carries `kubectl`, which works against OpenShift's API unchanged. Commands in
+this manual written with `kubectl` work with `oc` in their place.
+
+### 25.4 VMware vSphere, Rancher and Cluster API
+
+Where the cluster's machines are virtual machines on a private cloud and a cluster autoscaler makes and deletes them
+(VMware's Kubernetes on vSphere through Cluster API, Rancher's RKE2 with its node-pool autoscaling, OpenStack's Magnum, or
+any Cluster API provider with the cluster autoscaler's Cluster API integration), the cloud mode of chapter 19 applies as
+written: the work pools are labelled `omni-role=work`, the system pool carries the governor, and native is the cluster
+autoscaler. What changes is the price. A private cloud's bill is the company's own internal charge (chargeback or
+showback) per machine-hour, or, where there is none, the power and the licences per host; the receipt's machine-hour row
+is the measurement, and finance prices it.
+
+Where the private cloud licenses its hypervisor per host and hosts are not released when virtual machines are deleted,
+deleting a virtual machine saves nothing until the platform consolidates hosts. Read the platform's own consolidation
+behaviour (for vSphere, Distributed Power Management) before claiming a saving from machine-hours alone.
+
+### 25.5 Clusters with no route to the internet
+
+An air-gapped cluster pulls nothing from outside, so every artifact the installation needs is carried in:
+
+| Artifact | How it is carried in |
+|---|---|
+| The verified copy | the repository archive, its manifest and its seal, verified on a connected machine (`python3 verify.py`) and again inside (`python3 verify.py` and `python3 tools/seal.py --check` need no network) |
+| The base images | `python:3.12-slim` and `registry.k8s.io/kubectl` (the shipped Dockerfile's two bases), pulled on a connected machine, pinned by digest, saved (`docker save`), carried in and pushed to the internal registry |
+| The Python packages | the wheels for `requirements.txt` downloaded on a connected machine (`pip download -r requirements.txt -d wheels`) and installed inside from that directory (`pip install --no-index --find-links wheels -r requirements.txt`) |
+| `jq` for the cloud image | the distribution's package carried in with the base image, or a static `jq` binary copied into the image |
+| The built images | built inside from the carried-in bases, with the `FROM` lines pointed at the internal registry |
+
+The governor needs no network beyond the cluster's own API server and, for the probe, the service it measures. It sends
+nothing anywhere: no telemetry, no licence check, no update check.
+
+### 25.6 Clusters at the edge
+
+A cluster of a few machines at a factory, a store or a cell tower has a floor problem: the governor never keeps fewer than
+two machines in service, and a three-machine cluster can park at most one. The gain at the edge is usually not machines
+but work and power: the max on the pods and the processor, and, where a site has a power limit, the site's watts read into
+the engine (`--power-cmd`, `--site-limit-w`, level 7). The OFF switch, the watchdog and the audit are the same; the audit
+should be shipped off the site, because an edge site's disks are the first thing lost.
+
+### 25.7 Own machines: what to check before claiming a gain
+
+| Claim | What backs it |
+|---|---|
+| More work from the same machines | the paired receipt's work rows (requests served, jobs completed) reading GAIN, with response time and failures EVEN or GAIN, on the same machines in both arms |
+| The same work on fewer machines | the machine rows reading GAIN at the tune-down, with every service row EVEN or GAIN |
+| Power | a meter of class P named in the receipt; the power the max took shown as power given beside the work it bought, never called a loss |
+| A dollar figure | the company's own price per kilowatt-hour or per machine-hour, applied by finance to the measured rows, never by the governor's receipt |
+
 
 ## 26. Hardening and the Supply Chain
 
@@ -3315,6 +3583,180 @@ service account, and only it, to the writes the cloud mode makes: on a node, its
 pod, its own deletion-cost mark and nothing else.
 
 ```yaml
+# The governor's writes on machines: its own idle taint (PreferNoSchedule), nothing else.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata: {name: omni-compass-nodes}
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - {apiGroups: [""], apiVersions: ["v1"], operations: ["UPDATE"], resources: ["nodes"]}
+  matchConditions:
+    - name: the-governor
+      expression: "request.userInfo.username == 'system:serviceaccount:omni-compass:omni-compass'"
+  validations:
+    - expression: >-
+        has(object.metadata.labels) == has(oldObject.metadata.labels) &&
+        (!has(object.metadata.labels) || object.metadata.labels == oldObject.metadata.labels)
+      message: "the governor changes no label of a machine"
+    - expression: >-
+        has(object.metadata.annotations) == has(oldObject.metadata.annotations) &&
+        (!has(object.metadata.annotations) || object.metadata.annotations == oldObject.metadata.annotations)
+      message: "the governor changes no annotation of a machine"
+    - expression: >-
+        (has(object.spec.unschedulable) && object.spec.unschedulable) ==
+        (has(oldObject.spec.unschedulable) && oldObject.spec.unschedulable)
+      message: "the governor never cordons or uncordons a machine"
+    - expression: >-
+        (!has(object.spec.taints) || object.spec.taints.all(t,
+           (t.key == 'omnicompass.io/idle' && t.effect == 'PreferNoSchedule') ||
+           (has(oldObject.spec.taints) && oldObject.spec.taints.exists(o, o.key == t.key && o.effect == t.effect)))) &&
+        (!has(oldObject.spec.taints) || oldObject.spec.taints.all(o, o.key == 'omnicompass.io/idle' ||
+           (has(object.spec.taints) && object.spec.taints.exists(t, t.key == o.key && t.effect == o.effect))))
+      message: "the governor adds or removes no taint but its own omnicompass.io/idle:PreferNoSchedule"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata: {name: omni-compass-nodes}
+spec: {policyName: omni-compass-nodes, validationActions: [Deny]}
+---
+# The governor's writes on pods: its own deletion-cost mark, nothing else.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata: {name: omni-compass-pods}
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - {apiGroups: [""], apiVersions: ["v1"], operations: ["UPDATE"], resources: ["pods"]}
+  matchConditions:
+    - name: the-governor
+      expression: "request.userInfo.username == 'system:serviceaccount:omni-compass:omni-compass'"
+  validations:
+    - expression: "object.spec == oldObject.spec"
+      message: "the governor changes nothing in a pod's spec"
+    - expression: >-
+        has(object.metadata.labels) == has(oldObject.metadata.labels) &&
+        (!has(object.metadata.labels) || object.metadata.labels == oldObject.metadata.labels)
+      message: "the governor changes no label of a pod"
+    - expression: >-
+        (!has(object.metadata.annotations) || object.metadata.annotations.all(k,
+           k == 'controller.kubernetes.io/pod-deletion-cost' ||
+           (has(oldObject.metadata.annotations) && k in oldObject.metadata.annotations &&
+            oldObject.metadata.annotations[k] == object.metadata.annotations[k]))) &&
+        (!has(oldObject.metadata.annotations) || oldObject.metadata.annotations.all(k,
+           k == 'controller.kubernetes.io/pod-deletion-cost' ||
+           (has(object.metadata.annotations) && k in object.metadata.annotations)))
+      message: "the governor changes no annotation of a pod but controller.kubernetes.io/pod-deletion-cost"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata: {name: omni-compass-pods}
+spec: {policyName: omni-compass-pods, validationActions: [Deny]}
+```
+
+**Prove the policies before the governor relies on them.** A policy is proved the way the grant is (section 14.4): by
+asking the API server, as the governor, to do what the policy forbids and what it allows, and reading the answers. The
+implementer's own account needs the right to impersonate the service account, which a cluster administrator has:
+
+```bash
+SA=system:serviceaccount:omni-compass:omni-compass; N=<a work machine>; P=<a pod of the service>; NS=<its namespace>
+kubectl --as=$SA label node $N omni-test=1                                   # refused: changes no label of a machine
+kubectl --as=$SA cordon $N                                                   # refused: never cordons
+kubectl --as=$SA taint node $N omni-test=1:NoSchedule                        # refused: no taint but its own
+kubectl --as=$SA taint node $N omnicompass.io/idle=true:PreferNoSchedule     # admitted
+kubectl --as=$SA taint node $N omnicompass.io/idle:PreferNoSchedule-         # admitted
+kubectl --as=$SA label pod $P -n $NS omni-test=1                             # refused: changes no label of a pod
+kubectl --as=$SA annotate pod $P -n $NS controller.kubernetes.io/pod-deletion-cost=-1000 --overwrite   # admitted
+kubectl --as=$SA annotate pod $P -n $NS controller.kubernetes.io/pod-deletion-cost-                    # admitted
+```
+
+Each refusal names the policy and its message. Keep the eight answers with the installation record beside the grant's
+proof. Run the drill in a quiet hour: the two admitted taint commands park and wake the machine `$N` for a moment, and
+the two admitted annotations mark and unmark one pod.
+
+**What `failurePolicy: Fail` means here.** If the policy itself cannot be evaluated, the governor's write is refused,
+never admitted. A refused write is recorded as `refused` in the governor's audit (section 20.4); a refused park leaves a
+machine in service, and a refused wake leaves a machine parked, which never blocks a pod. The policy can therefore stop
+the governor from saving, never make it harm.
+
+The cloud mode needs nothing the policies forbid: the shipped machine script parks and wakes machines with the idle
+taint alone, marks pods with the deletion-cost annotation alone, and never cordons or uncordons a machine (section 28.1).
+
+### 26.5 The network: two endpoints
+
+The governor's pod talks to two endpoints: the cluster's API server (through `kubectl`, from the controller and the
+watchdog) and the service it measures (from the probe). It receives no connection at all. A `NetworkPolicy` can hold it
+to exactly that, where the cluster's network plugin enforces network policy (Azure Network Policy Manager or Cilium on
+AKS, GKE Dataplane V2 or Calico on GKE, the Amazon VPC CNI's network policy agent or Calico on EKS):
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: omni-compass, namespace: omni-compass}
+spec:
+  podSelector: {matchLabels: {app: omni-compass}}
+  policyTypes: [Ingress, Egress]
+  ingress: []                                   # nothing connects to the governor
+  egress:
+    - to:                                       # the cluster's DNS
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+          podSelector: {matchLabels: {k8s-app: kube-dns}}
+      ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]
+    - to:                                       # the API server: its address from `kubectl get endpoints kubernetes`
+        - ipBlock: {cidr: <api-server-address>/32}
+      ports: [{protocol: TCP, port: 443}]
+    - to:                                       # the measured service, for the probe
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: <namespace>}}
+          podSelector: {matchLabels: {<the service's selector>}}
+      ports: [{protocol: TCP, port: <the service's target port>}]
+```
+
+Three details decide whether this policy works on a given cluster: the API server's address, which on a managed cluster
+is outside the pod network and is read from `kubectl get endpoints kubernetes -n default` (and some providers translate
+it, so test from the pod); the DNS pods' label, which differs by provider (`k8s-app: kube-dns` on all three as of this
+writing); and the measured service's pods' labels and target port. Prove the policy as the grant is proved: from the
+governor's pod, the API server and the service answer, and nothing else does
+(`kubectl -n omni-compass exec deploy/omni-compass -c probe -- python -c "import urllib.request;
+urllib.request.urlopen('https://example.com', timeout=5)"` must fail).
+
+### 26.6 The API server's own record of every write
+
+The governor's audit records every write it makes; the API server's audit log records every write it receives. Read
+together, they prove that the governor wrote nothing it did not record, and that nothing wrote as the governor that was
+not the governor. Turn the control plane's audit log on, and filter it by the service account
+`system:serviceaccount:omni-compass:omni-compass`:
+
+| Provider | The API server's audit log |
+|---|---|
+| Azure (AKS) | diagnostic settings on the cluster, category `kube-audit` (or `kube-audit-admin` for writes only), to a Log Analytics workspace |
+| Google (GKE) | Cloud Audit Logs, Admin Activity (always on) for writes, in Cloud Logging |
+| Amazon (EKS) | control plane logging, log type `audit`, to CloudWatch Logs |
+
+Every `patch` on a node or a pod by the service account must match a `write` record in the governor's audit within the
+same few seconds, with the same object; every `write` record that is not marked `"dry_run": true` must match a patch.
+A patch by the service account with no `write` record behind it is a security incident: the token was used by something
+other than the governor.
+
+### 26.7 The token, and no other secret
+
+The governor holds no secret of any kind: no cloud credential (section 14.5), no password, no key; its role reads no
+`Secret` object. Its only credential is the Kubernetes service-account token that the kubelet projects into its pod,
+short-lived and rotated by the kubelet, bound to the pod's lifetime. No person and no other workload uses the
+`omni-compass` service account; a request by it from anywhere but the governor's pod is visible in the API server's audit
+log (section 26.6) by its source address and its user agent.
+
+### 26.8 The hardening record
+
+| Item | Evidence kept |
+|---|---|
+| The image | its digest, its software bill of materials, its last scan, its signature |
+| Admission | the signature rule and the namespace's Pod Security label |
+| The writes | the two admission policies, and the eight answers of their proof |
+| The network | the network policy and the proof that only the two endpoints answer |
+| The record | the API server's audit log turned on, and one quarter's cross-check against the governor's audit |
+
 
 ## 27. Rolling Out Across a Fleet: Many Clusters, Many Services, GitOps
 
@@ -3369,6 +3811,120 @@ omni-compass/
 An overlay for one cluster in phase 6:
 
 ```yaml
+# overlays/aks-eastus-prod-1/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources: [../../base/identity, ../../base/govern]
+images:
+  - name: omni-compass-cloud              # the image name in the manifest, without its tag
+    newName: <registry>/omni-compass-cloud
+    digest: sha256:<the signed digest>
+patches:
+  - target: {kind: Deployment, name: omni-compass}
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/1/env/0/value
+        value: http://checkout.shop.svc.cluster.local/
+      - op: replace
+        path: /spec/template/spec/containers/0/args
+        value: ["--mode", "nodepool", "--law", "compass", "--dial", "save", "--sensed", "none/none",
+                "--active-nodes-only", "--interval", "60", "--floor-interval", "5",
+                "--min-nodes", "3", "--max-nodes", "24", "--max-node-step", "1",
+                "--node-scale-cmd", "bash /app/scripts/kind_nodepool.sh {n}",
+                "--node-restore-cmd", "bash /app/scripts/kind_nodepool.sh 100000",
+                "--latency-file", "/feed/latency.csv", "--slo-ms", "400",
+                "--closure", "/app/law/closure.json",
+                "--audit", "/var/log/omni/audit.jsonl", "--kill-file", "/tmp/omni.kill"]
+```
+
+The patch replaces the governor's whole command line rather than single arguments, so that the line in Git is the line
+that runs, readable in one place; its absence of `--dry-run` is the change that the phase-6 change record approves
+(section 23.1). The containers are addressed by position (0 the governor, 1 the probe, 2 the watchdog), as the manifest
+orders them; `MIN_NODES` in the governor's and the watchdog's environment must be patched to the same floor as
+`--min-nodes`.
+
+### 27.4 Continuous delivery and the OFF switch
+
+A continuous-delivery controller that keeps the cluster equal to Git (Argo CD with automated sync and self-heal, Flux
+with its default reconciliation) undoes a change made directly in the cluster. Two of the OFF switch's forms (section
+20.3) are such changes, and the holder must know what the controller will do with them:
+
+| OFF form | What a self-healing controller does | What the installation does about it |
+|---|---|---|
+| Scale to zero (`kubectl scale ... --replicas=0`) | puts the replica count back to Git's 1 within its reconciliation interval, and the governor starts again | either the OFF switch of record is a commit to Git (`replicas: 0`), or the controller is told to leave the replica count alone: in Argo CD an `ignoreDifferences` entry on the Application for `/spec/replicas` of the `omni-compass` Deployment; in Flux, `flux suspend kustomization <name>` as the first step of the drill |
+| The kill file | nothing: the file is in the pod's `/tmp`, which Git does not describe | none needed; but a pod replaced for any reason, including a sync that changes the pod template, starts ON |
+| Revoke the grant (`kubectl delete clusterrolebinding omni-compass-machines`) | applies the binding again from Git | revoke in Git, or suspend the controller for the binding first |
+
+Write the chosen form into the runbook and drill it as it is written (section 20.3). A drill on a GitOps cluster that
+scales to zero and then watches the controller start the governor again has found the fault this section exists to
+prevent.
+
+**Other reconcilers of the same objects.** The governor writes two things: a taint on a node and an annotation on a pod.
+A tool that reconciles node taints to a declared list (some node-management controllers, some provider settings applied
+to a pool) removes the governor's `omnicompass.io/idle` taint, and a tool that reconciles pod annotations would remove
+the deletion-cost mark; either is a second writer of the governor's setting (section 20.8) and shows as a
+`proprioception` drift that does not close. Exclude the key from that tool's reconciliation, or leave that pool
+ungoverned. Pods are created by their controllers, not by Git, so a continuous-delivery controller never sees the
+deletion-cost mark.
+
+### 27.5 Many services on one cluster
+
+The cloud mode governs machines, and machines are shared. Where several services run on the governed pools, the
+governor's single feed must speak for all of them (section 18.6): the feed of the service most sensitive to a lost
+machine, or an adapter that writes the worst of the services' own percentiles against their own lines. Three practical
+rules follow:
+
+1. **Govern a pool, not a service.** Label `omni-role=work` on the pools whose machines the feed speaks for, and leave
+   pools that serve other services unlabelled. A pool dedicated to one service (a node pool with a taint the service
+   tolerates) is the simplest case and the cleanest receipt.
+2. **One line per pool.** If two services on the same pool have lines that cannot be scaled to one, they are not
+   governed together: split the pool, or govern only by the stricter line.
+3. **Batch and stateful work.** Pods that the cluster autoscaler will not move (section 24.4) pin their machines; the
+   governor may park such a machine, but it empties only when those pods end. A pool that carries long jobs and serving
+   pods together gives the governor little to give back, honestly; the receipt shows it as EVEN on the bill.
+
+### 27.6 Regions, zones and failover
+
+Each region's clusters are separate units. A governor in one region never reads another region's feed, and a regional
+failover (traffic moved from one region's clusters to another's) is, to each governor, a change in its own service's
+load: the receiving region's governor sees its line approach and wakes what it parked; the sending region's governor sees
+the load fall and, after its trials, parks what the trough allows. Two settings deserve attention in a region that must
+be able to absorb another's traffic at once:
+
+- **The floor.** A region that must carry a failover without waiting for the cloud to create machines sets its floor
+  (`--min-nodes`) to the machines the failover needs at its first minute, not to the trough's need; the bill's room then
+  starts above that floor (section 24.2).
+- **The zones.** The governor does not read zones, and the machine script chooses which machines to park by the work on
+  them. A service that needs a minimum number of serving machines in every zone keeps that minimum through its own pods'
+  topology spread constraints and a floor of at least that number times the zones; the `PreferNoSchedule` taint never
+  prevents a pod from landing on a parked machine in the zone it needs.
+
+### 27.7 Reading a fleet's audits as one
+
+Every governor writes its own audit (section 20.4); a fleet's audits become one record when the log collector adds the
+cluster's name to every line on its way to the log store (Fluent Bit's Kubernetes filter, the Azure Monitor agent, Google
+Cloud's logging agent and the CloudWatch agent each attach the cluster's identity, or can be configured to). Four fleet
+views answer most questions:
+
+| View | From | Shows |
+|---|---|---|
+| Machines parked, by cluster and hour | `write` records with `why` = `node pool size` | where and when the fleet gives machines back |
+| Trials refused or abandoned, by cluster | `verdict` records | clusters whose feed is thin or whose service is short of machines |
+| Blind and error decisions, by cluster | `authority` records' `senses`, and `error` records | clusters with a feed or API problem |
+| Drift that does not close, by cluster | `authority` records' `proprioception` | clusters with a second writer |
+
+The fleet's bill is read from the provider's own billing records by cluster and pool (section 22.5), never summed from
+receipts: a receipt is a controlled comparison on a day, and a bill is the fleet's actual cost over a period.
+
+### 27.8 Upgrading a fleet
+
+An engine upgrade moves through the fleet in the same waves as the first installation (section 20.6 for one cluster):
+each wave watches on the new version for a full cycle of its load, a paired receipt on the new version decides each kind,
+and only then does the wave govern on it. During the upgrade the fleet runs two versions, and every audit line,
+dashboard and receipt names the version it came from (`python3 tools/omni_version.py` on the build, the image tag in
+the cluster). The rollback of a wave is the rollback of one cluster repeated (section 20.6), safe at any moment because
+the governor carries no state between processes beyond the marks it reads back from the cluster.
+
 
 ## 28. Failure Modes and the Drill Book
 
@@ -3441,6 +3997,35 @@ for p in os.listdir("/proc"):
     if p.isdigit() and b"latency_probe.py" in open("/proc/%s/cmdline" % p, "rb").read():
         os.kill(int(p), getattr(signal, sys.argv[1]))'
 kubectl -n omni-compass exec deploy/omni-compass -c watchdog -- python -c "$PAUSE" SIGSTOP    # the feed stops
+# ... three decision periods later ...
+kubectl -n omni-compass exec deploy/omni-compass -c watchdog -- python -c "$PAUSE" SIGCONT    # the feed resumes
+```
+
+Pass: within three decision periods every `authority` record shows the feed blind; no machine is parked while it is
+blind; parked machines are woken one per decision; after `SIGCONT` the feed's rows resume on the same clock and the
+governor reads it again.
+
+**Drill 4: a write refused.** With the admission policies of section 26.4 in place, refuse the governor's next write by
+binding a policy that denies every node update from its service account for the drill's duration (a copy of
+`omni-compass-nodes` whose only validation is `false`). Pass: `refused` records appear; no other record changes; the
+service is untouched; when the drill policy is removed, the next decision's write lands.
+
+**Drill 5: a maintenance cordon.** Cordon one parked machine and one open machine (`kubectl cordon <name>`). Pass: the
+governor's next decisions neither uncordon nor count either of them; the parked one loses its `omnicompass.io/idle`
+taint; the OFF switch drill run now leaves both cordoned. Uncordon them afterwards.
+
+**Drill 6: the OFF switch under continuous delivery.** On a cluster whose governor is deployed by Argo CD or Flux, run
+the OFF switch drill exactly as the runbook writes it (section 27.4). Pass: the governor stays off until the holder turns
+it on, and the delivery controller does not start it again.
+
+### 28.3 What the drill book is for
+
+The drills prove three claims the installation makes to the people who run the cluster: that the governor can always be
+stopped, that its failure never strands a pod, and that every failure is visible in the audit with its cause. The
+records of the drills, kept with the installation record (section 14.7), are the evidence a reviewer asks for under
+"how do you know it fails safe?" (section 23.3), and the quarterly repetition of drills 1, 2 and 6 is part of day two
+(Appendix J).
+
 
 ## 29. A Complete Installation, Start to Finish
 
@@ -3455,6 +4040,161 @@ in angle brackets is the installation's own.
 ### 29.1 Day 0: the copy, the cluster and the service
 
 ```bash
+# The copy (phase 0, chapter 32)
+git clone <the licensed repository> omni-compass && cd omni-compass
+python3 verify.py                       # ends: VERIFICATION: PASS
+python3 tools/omni_version.py           # prints the engine version: record it with the commit
+git rev-parse HEAD
+
+# The cluster (phase 1, section 15.2): a system pool of two machines, one work pool under the autoscaler
+RG=shop-prod-rg; NAME=shop-prod; LOC=eastus; SIZE=Standard_D4s_v5
+az group create -n $RG -l $LOC -o none
+az aks create -g $RG -n $NAME -l $LOC --tier standard --node-count 2 --node-vm-size Standard_D2s_v5 \
+  --nodepool-name system --nodepool-taints CriticalAddonsOnly=true:NoSchedule --nodepool-labels omni-role=system \
+  --cluster-autoscaler-profile scale-down-unneeded-time=10m scale-down-delay-after-add=10m scan-interval=10s \
+  --generate-ssh-keys -o none
+az aks nodepool add -g $RG --cluster-name $NAME -n work0 --mode User --node-vm-size $SIZE --labels omni-role=work \
+  --node-count 3 --enable-cluster-autoscaler --min-count 3 --max-count 12 -o none
+az aks get-credentials -g $RG -n $NAME
+kubectl get nodes -L omni-role                # 2 system, 3 work
+```
+
+The system pool has two machines (section 28.1: the governor's pod must always have somewhere to go). The work pool's
+floor is 3 because the checkout spreads across three zones; its top is 12, the operator's cost ceiling. **Gate:** a test
+Deployment scaled past the pool and back shows Azure adding and deleting a machine (section 15.2).
+
+The service's own autoscaler is the operator's and stays so: `kubectl -n shop get hpa checkout` shows its target,
+minimum and maximum, which are written into the installation record (section 14.7).
+
+### 29.2 Day 1: identity, image and watch
+
+```bash
+# Identity (phase 2, chapter 14): the namespace, the service account, the watch role; the restricted profile
+kubectl apply -f deploy/install/omni-compass.yaml
+kubectl label namespace omni-compass pod-security.kubernetes.io/enforce=restricted
+for verb in get list; do for r in nodes pods horizontalpodautoscalers deployments; do
+  echo "$verb $r: $(kubectl auth can-i $verb $r --as=system:serviceaccount:omni-compass:omni-compass -A)"; done; done
+kubectl auth can-i patch nodes --as=system:serviceaccount:omni-compass:omni-compass       # no (not yet granted)
+
+# The images (section 15.4), built from the verified copy and tagged with the version and the commit
+ACR=shopprodacr; V=<version>-<commit>
+az acr create -g $RG -n $ACR --sku Standard -o none && az aks update -g $RG -n $NAME --attach-acr $ACR -o none
+az acr build -r $ACR -t omni-compass:$V -f deploy/Dockerfile .
+az acr build -r $ACR -t omni-compass-cloud:$V -f deploy/Dockerfile.cloud --build-arg BASE=$ACR.azurecr.io/omni-compass:$V .
+
+# Watch (phase 3, section 15.5)
+kubectl -n omni-compass set image deployment/omni-compass controller=$ACR.azurecr.io/omni-compass:$V
+kubectl -n omni-compass rollout status deployment/omni-compass
+kubectl -n omni-compass exec deploy/omni-compass -- tail -n 3 /var/log/omni/audit.jsonl
+```
+
+The last command prints `decision` records, one a minute, each with `nodes_observed` and `nodes_recommended`, and no
+`write` record. **Gate:** at least one full cycle of the checkout's load watched (a week, because the shop's peak is
+weekly), and the platform owner agrees with what the governor would have done.
+
+### 29.3 Day 2: the feed and the line
+
+The checkout has one representative endpoint, so the probe is the feed (section 18.3). Its URL and the line go into the
+installation record, signed by the service owner. Before governing, the feed is checked on its own (section 18.5): the
+probe is run beside the watch Deployment for an hour, and its rows advance every five seconds, its 95th percentile tracks
+the shop's own monitoring of the same endpoint, and a stopped endpoint shows as failed rows.
+
+At the same time the room is measured (chapter 24): two weeks of the sampling loop of section 24.3, from which the plan
+records where the room lives (here: the nights and the hours after the weekday peak), the billable room (the shop holds no
+reservation on this machine family) and the load the paired run will carry: a replay of one recorded day of checkout
+traffic, compressed no further than the autoscaler's ten-minute profile allows.
+
+### 29.4 Days 3 to 7: the paired run
+
+The paired run (phase 5, section 15.6) builds two identical clusters for each repetition, one native and one with
+Omni-Compass on top in the cloud mode, drives the same recorded day through both, and deletes both. Its receipt is read
+row by row (section 19.6), and before the installation proceeds it must show: the bill and the machine-hours reading
+GAIN or EVEN; response time, failed requests and alert minutes reading EVEN or GAIN; HPA replicas equal to native's
+within the noise. A LOSS row stops the installation until its cause is found in the wiring and the run is repeated
+(section 4.5). The receipt is signed by the service owner and by finance.
+
+### 29.5 Day 8: hardening
+
+```bash
+# The admission policies (section 26.4) and their proof: eight answers, kept with the record
+kubectl apply -f omni-compass-policies.yaml
+SA=system:serviceaccount:omni-compass:omni-compass
+kubectl --as=$SA label node <work machine> omni-test=1          # refused by omni-compass-nodes
+# ... the remaining seven commands of section 26.4 ...
+
+# The network policy (section 26.5), with this cluster's API server address and the checkout's labels and port
+kubectl get endpoints kubernetes -n default -o jsonpath='{.subsets[0].addresses[0].ip}'
+kubectl apply -f omni-compass-netpol.yaml
+
+# The API server's own audit log to the workspace the platform team reads (section 26.6)
+az monitor diagnostic-settings create --name aks-audit --resource $(az aks show -g $RG -n $NAME --query id -o tsv) \
+  --workspace <log-analytics-workspace-id> --logs '[{"category":"kube-audit-admin","enabled":true}]'
+```
+
+The image's signature rule (section 26.3) is applied by the platform team's existing admission control; the cloud image's
+digest is the one it allows in the `omni-compass` namespace.
+
+### 29.6 Day 9: govern, with the dry run first
+
+The governing manifest is the repository's, with this cluster's settings, a persistent volume for the audit, and the
+probe pointed at the checkout. Kept in the company's configuration repository as an overlay (section 27.3), its patch
+for this cluster is:
+
+```yaml
+# The audit on a persistent volume (section 20.4) instead of the manifest's emptyDir
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: omni-audit, namespace: omni-compass}
+spec: {accessModes: [ReadWriteOnce], storageClassName: managed-csi, resources: {requests: {storage: 5Gi}}}
+---
+# patch on Deployment omni-compass (JSON 6902)
+- {op: replace, path: /spec/template/spec/volumes/0, value: {name: audit, persistentVolumeClaim: {claimName: omni-audit}}}
+- {op: replace, path: /spec/template/spec/containers/1/env/0/value, value: "http://checkout.shop.svc.cluster.local/"}
+- {op: replace, path: /spec/template/spec/containers/0/env/1/value, value: "3"}     # MIN_NODES, the governor
+- {op: replace, path: /spec/template/spec/containers/2/env/1/value, value: "3"}     # MIN_NODES, the watchdog
+```
+
+and the governor's command line, written whole (section 27.3), carries `--min-nodes 3 --max-nodes 12 --slo-ms 400` and,
+for the first day, `--dry-run`. Then:
+
+```bash
+kubectl apply -f deploy/install/rbac-machines.yaml              # the machines role (section 14.3), approved in the change record
+kubectl -n omni-compass delete deployment omni-compass           # the watch Deployment goes; the governing one replaces it
+kubectl apply -k overlays/shop-prod                              # the governing Deployment, with --dry-run
+kubectl -n omni-compass get pod -l app=omni-compass              # READY 3/3: governor, probe, watchdog
+kubectl auth can-i patch nodes --as=system:serviceaccount:omni-compass:omni-compass       # yes
+```
+
+A day of the dry run's audit is read: every `write` record is marked `"dry_run": true` and asks for a count between 3
+and the machines that exist, one from the last (Appendix J, phase 6). Then the change record's approved commit removes
+`--dry-run` from the overlay, the delivery controller applies it, and the first real write is read when it comes: a
+`verdict` record with `step allowed`, then a `write` record with `why: node pool size`, then the next decision's
+`authority` record, whose `proprioception` shows that the command landed. In the cluster, one work machine now carries the
+`omnicompass.io/idle:PreferNoSchedule` taint.
+
+**Gate:** the OFF switch drilled by its holder in the form the runbook names (section 20.3, section 27.4 for a GitOps
+cluster): every parked machine woken and every mark removed within 60 seconds; the drill recorded.
+
+### 29.7 Day 10 onward: the first month
+
+| When | What is read | Expected |
+|---|---|---|
+| Every morning, first week | the dashboard of section 22.3 | machines parked overnight and woken before the morning's rise; the two response-time lines agree; no blind decisions |
+| Each weekly peak | alert minutes on the checkout's line | none caused by the governor; any alert minute is traced with section 22.6 to its cause |
+| End of week one | the drills of section 28.2, numbers 1, 2, 3 and 5 | each passes as written |
+| End of month one | the provider's billing records for the work pool (section 22.5) against the same weeks before installation, with requests served beside them | machine-hours lower in the hours the plan found room (chapter 24); higher only where traffic was higher |
+| End of month one | the API server's audit against the governor's (section 26.6) | every patch by the service account matched by a `write` record |
+| Every quarter | the OFF switch and drills 1, 2 and 6; the engine version against the receipts kept | as Appendix J, phase 7 |
+
+### 29.8 What the installation record holds at the end
+
+The record of section 14.7, complete: the verification receipt and the engine version and commit; the image digests, the
+software bill of materials, the scan and the signature; the grant as applied and its proof; the admission policies and
+their eight answers; the network policy and its proof; the line and its signature; the room and the plan; the paired
+receipt, signed; the governing command line as it runs; the change records of phases 2 and 6; and the records of every
+OFF switch drill and every failure drill. An installation whose record is complete can be audited by a person who was not
+there, which is the standard this manual holds every installation to.
+
 
 ## 30. Questions an Implementer Asks
 
@@ -3672,6 +4412,16 @@ Every copy, export or printout carries the legal notice at its head and foot, wi
 | OFF, one muscle (Kubernetes) | `touch /tmp/omni.kill` |
 | OFF, one card | `sudo touch /tmp/omni-gpu-kill` |
 | The whole harness OFF, ON, status, watchdog | `python3 tools/omni_switch.py off|on|status|watchdog` |
+| Cloud mode: the machines role, then the governing Deployment (dry run first) | `kubectl apply -f deploy/install/rbac-machines.yaml`, then `kubectl apply -f deploy/install/omni-compass-cloud.yaml` (chapter 19) |
+| Cloud mode: the cloud image | `docker build -f deploy/Dockerfile.cloud --build-arg BASE=<registry>/omni-compass:<version> -t <registry>/omni-compass-cloud:<version> .` |
+| Cloud mode: OFF, the switch of record | `kubectl -n omni-compass scale deployment/omni-compass --replicas=0` (section 20.3) |
+| Cloud mode: OFF from inside the pod | `kubectl -n omni-compass exec deploy/omni-compass -c controller -- touch /tmp/omni.kill` |
+| Cloud mode: the grant, as the governor sees it | `kubectl auth can-i <verb> <resource> --as=system:serviceaccount:omni-compass:omni-compass -A` (section 14.4) |
+| Cloud mode: machines parked now | `kubectl get nodes -l omni-role=work -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints[*].key` |
+| Cloud mode: the last decisions | `kubectl -n omni-compass exec deploy/omni-compass -c controller -- tail -n 20 /var/log/omni/audit.jsonl` |
+| Planning: the room on a cluster | the sampling loop and the arithmetic of section 24.3 |
+| A feed from the company's own Prometheus | `python3 tools/prom_feed.py --prometheus <url> --served <q> --failed <q> --quantile <q> --out <feed>` (section 22.7) |
+| The paired run on a cloud, from GitHub | the `aks-metered`, `gke-metered` or `eks-metered` workflow (Appendix N) |
 
 
 ## Appendix B. The Files an Installation Touches
@@ -3682,6 +4432,11 @@ Every copy, export or printout carries the legal notice at its head and foot, wi
 | `verify.py`, `tools/omni_version.py`, `tools/seal.py`, `RELEASE_MANIFEST.json` | checking the copy before it is installed (chapter 32) |
 | `deploy/Dockerfile` | the container image: non-root, read-only root filesystem, no Linux capabilities |
 | `deploy/install/omni-compass.yaml` | the watch-mode install with a read-only identity (level 1) |
+| `deploy/install/rbac-machines.yaml` | the cloud mode's machines role: patch nodes and patch pods, nothing else (section 14.3) |
+| `deploy/install/omni-compass-cloud.yaml` | the cloud mode's governing Deployment: the governor, its probe and its watchdog in one pod, shipped with `--dry-run` (chapter 19, Appendix I) |
+| `deploy/Dockerfile.cloud` | the cloud image: the shipped image with `jq`, the machine script, the probe, the Prometheus feed adapter and the switch tool |
+| `scripts/kind_nodepool.sh` | the machine script: keeps `{n}` machines in service by the idle taint alone; never creates, deletes, cordons or uncordons a machine, and never moves a pod |
+| `tools/prom_feed.py` | the response-time feed from the company's own Prometheus (section 22.7) |
 | `deploy/rbac-target.yaml`, `deploy/kind/rbac-omni.yaml` | the permissions of levels 2 and 3, exactly the verbs each level needs |
 | `scripts/latency_probe.py` | the response-time feed against any HTTP endpoint |
 | `scripts/kind_paired.sh`, `tools/live_reps.py`, `tools/confirm_abc.py` | the paired runs, the receipt and the three-run table on Kubernetes |
@@ -3689,7 +4444,8 @@ Every copy, export or printout carries the legal notice at its head and foot, wi
 | `scripts/cpu_power_run.sh` | the processor's paired run on bare metal |
 | `tools/omni_switch.py` | the master switch, the status and the watchdog (chapter 8) |
 | `realms/catalog_v5.csv`, `realms/muscle_cards_v5.csv`, `docs/MUSCLE_CATALOG.md` | every muscle, its wiring and its own card (Appendix E) |
-| `docs/AZURE_SETUP.md` | the Azure account and its secrets, click by click |
+| `docs/AZURE_SETUP.md`, `docs/GOOGLE_SETUP.md`, `docs/AMAZON_SETUP.md` | each cloud's account and its secrets, click by click (Appendices F to H) |
+| `.github/workflows/aks-metered.yml`, `gke-metered.yml`, `eks-metered.yml`, `aks-metered-full.yml` | the paired runs on each cloud, from GitHub (Appendix N) |
 | `LICENSE`, `NOTICE`, `DISCLOSURES.md`, `SECURITY.md` | the license, the notices, every declaration and disclaimer, and how to report a security issue |
 
 
@@ -5948,11 +6704,73 @@ Product names, billing granularity and console paths are the providers' own and 
 authority for each, and an installation's plan (chapter 24) records the terms it used.
 
 
-## Appendix N. The License
+## Appendix N. The Paired Run from GitHub: Every Input
+
+
+Phase 5's paired run can be made from the repository's own workflows, on GitHub's runners, against the company's cloud
+account (Appendices F to H set up the account and the repository secrets). Each workflow builds a fresh cluster for every
+arm of every repetition, runs native and native with Omni-Compass on top in rotation on the same load, prices the
+machines that existed every 15 seconds, deletes every cluster it made whatever happens, and writes the receipt to the
+run's summary and as an artifact. The inputs below are the workflows' own; a run's title names its load and its dial.
+
+### N.1 The inputs every cloud shares
+
+| Input | Default | What it is |
+|---|---|---|
+| `reps` | 5 | paired repetitions; one runs at a time |
+| `arms` | `native compass` | the two arms, in rotation order: native, and native with Omni-Compass on top |
+| `duration_s` | 900 | measured seconds per arm |
+| `price_per_node_hour` | the family's list price on the day the workflow was written | the price the bill rows use; check the provider's price list on the day |
+| `load_steps` | empty (a steady load) | load-generator replicas per step, in order, for a burst or a day-shaped load (for example `1 6 1 8 1 6`) |
+| `max_workers` | 4 | the work pool's top; the cloud's autoscaler runs it from 1 to this many |
+| `hpa_max` | empty (the manifest's 10) | the service's replica ceiling, the same in both arms; size it with the fleet (nine 200-millicore pods fit a two-processor machine) |
+| `organism`, `load_max`, `organism_scale` | empty, 6, 1 | one of the repository's six organisms with this cluster inside it, its peak load, and its copies on one clock (1, 10 or 100); empty runs the service alone |
+| `dial` | `save` | the dial of Omni-Compass on top: `save`, the tune-down, for every bill result; `max` is never read as a bill result (section 19.2) |
+
+Every cloud workflow runs the governor in the cloud mode (`OMNI_MACHINES_ONLY=1`, chapter 19).
+
+### N.2 The inputs of each cloud
+
+| Workflow | Input | Default | What it is |
+|---|---|---|---|
+| `aks-metered` | `location` | `eastus` | the Azure region |
+| | `vm_size` | `Standard_D2s_v4` | the work machines' size |
+| | `tier` | `free` | the clusters' control-plane tier, `free` or `standard` (outside the bill; the way past free-tier capacity refusals) |
+| | `worker_pools`, `pool_prices` | empty | several work pools, one machine family each with its own top (`size:max,...`), and each pool's list price (`work0=<price>;work1=<price>;...`): the way past a per-family allowance |
+| | `replica_ceiling` | empty | outside the cloud mode only: how far the governor may raise the service's replica cap; the cloud mode moves no autoscaler |
+| `gke-metered` | `project` | the `GCP_PROJECT` secret | the Google Cloud project |
+| | `zone` | `us-central1-a` | the zone |
+| | `machine` | `e2-standard-2` | the work machines' type |
+| `eks-metered` | `region` | `us-east-1` | the AWS region |
+| | `instance` | `m5.large` | the work machines' instance type |
+
+The repository's secrets each workflow reads are `AZURE_CREDENTIALS` (Azure), `GCP_CREDENTIALS` and `GCP_PROJECT`
+(Google Cloud), and `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` (Amazon). They are set once in the repository's
+settings, never printed, and used only to build and delete the run's own clusters; the governor inside the clusters
+never sees them (section 14.5).
+
+### N.3 A second Azure workflow, for machines already paid for
+
+`aks-metered-full` runs the same paired design with the governor's full wiring on the service (the pod autoscaler's
+target, the pods' processor limits and the modelled power sense) instead of the machines alone. It exists to measure the
+governor's levers beside the cloud's own, not to make a bill result: in a cloud every extra pod is billed, and the cloud
+mode alone is read for the bill (chapter 19). Its inputs are the shared ones above, with a burst of `1 4 1 6 1 9` and three
+repetitions of 600 seconds by default.
+
+### N.4 Reading the run
+
+The run's summary carries the receipt, row by row, read by the rules of chapter 11 and section 19.6: GAIN, EVEN or LOSS
+for each judged row, with its 95% interval, and the shown rows beside them. The artifact `live-reps-aks` (or the cloud's
+equivalent) holds the same table as Markdown and JSON, with the repository's notice, licence and disclosures attached. A
+receipt is read only against the engine version of the commit it ran on (`python3 tools/omni_version.py --commit <sha>`,
+chapter 12), which each repetition's job prints at its start.
+
+
+## Appendix O. The License
 
 The license is the file `LICENSE`.
 
-## Appendix O. Licensing: Questions and Answers
+## Appendix P. Licensing: Questions and Answers
 
 
 
@@ -6013,7 +6831,7 @@ section 19). The Omni-Compass LLC is based in Florida.
 
 **Who do I contact?** The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
 
-## Appendix P. Third-Party Notices
+## Appendix Q. Third-Party Notices
 
 
 

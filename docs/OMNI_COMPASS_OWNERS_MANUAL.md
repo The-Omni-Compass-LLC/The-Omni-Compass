@@ -7,7 +7,9 @@
 **This is the Owner's Manual, the master.** It holds everything: what Omni-Compass is, the philosophy and the
 mathematics it runs on, its mechanism, how it is built, every result with its evidence class, and how it is wired, run
 and checked. It is written for whoever owns or licenses Omni-Compass and so must know the whole mechanism. The
-Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`) is the shorter book for the people who wire and run it. The printed
+Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`) is the book for the people who wire and run it; its Part VI (chapters
+13 to 30) is the implementer's whole path onto a cloud, from an empty account to a governed cluster, and is the
+reference for that work in both books. The printed
 book of this text is `docs/OMNI_COMPASS_OWNERS_MANUAL.pdf` (`python3 docs/book/build_book.py --owner`).
 
 **October 2026**

@@ -2,6 +2,35 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-15: the Operator's Manual carries the implementer's whole cloud path
+
+- **The founder's order of 14 October (night): the Operator's Manual at least half the Owner's, covering all that matters
+  for the person putting Omni-Compass on a cloud.** Part VI now runs from chapter 13 to chapter 30: observability (the
+  feed from the company's own monitoring, the governor's series, dashboards, alarms, the provider's billing records, one
+  decision traced), change management, risk and compliance, planning the saving before the run (the room, the billable
+  room, the governor's own floor, the autoscaler's profile, pricing terms, the load's shape), own racks and private
+  clouds (bare metal, OpenShift, vSphere and Cluster API, air-gapped, edge), hardening and the supply chain (signed images,
+  the restricted profile, admission policies that narrow the governor's writes to its own taint and pod mark, network
+  policy, the API server's audit), a fleet under continuous delivery, the failure drill book, and one installation start
+  to finish. New appendices: the governor's settings, the audit record by record, the three clouds side by side, every
+  input of the paired run from GitHub; cloud troubleshooting rows and glossary terms. 434 pages against the Owner's 816.
+- **Fixes found while writing it, each checked against the code.** The machine script no longer treats a machine
+  someone else cordoned as parked: it never uncordons one (a person's maintenance, an upgrade's drain), never counts it,
+  and removes its own mark from it (`scripts/kind_nodepool.sh`; test in `tests/test_staging_order.py`). The cloud
+  manifest runs the watchdog in the governor's own pod with a shared process namespace, because a watchdog in another
+  pod cannot see the governor's process. The OFF switch of record in a cluster is scaling to zero (the kill file lives in
+  the pod). Wake timing as it is: a breach at the next full decision, a waiting pod at the next fast check, and no pod
+  ever waits for either. Watch mode writes no `would_write` record (there is none); a dry run's trials compare the service
+  with itself, so the paired run is the evidence. The cloud image builds pass the base image.
+- **The book builder** no longer reads a `#` comment inside a code block as a chapter heading (it had silently dropped
+  the text after such a comment, in chapter 6 among others), and prints the manual's LaTeX formulas as formulas.
+- **`tools/prom_feed.py`**: the governor's feed from the company's own Prometheus, one row per quantile midpoint, failures
+  capped, nothing for an empty window, its clock continued across restarts; test `tests/test_prom_feed.py`; in the cloud
+  image.
+- **Google and Amazon ready the way Azure is**: `gke-metered` and `eks-metered` take the dial (default `save`) and run
+  the governor on the machines alone (`OMNI_MACHINES_ONLY=1`); setup pages and install files for all three. Not run:
+  Google, Amazon and the GPU wait for the founder's word that Azure is done. No engine file changed.
+
 ## 2026-10-14: in the cloud, the machines alone: a bill that can only fall or stay
 
 - **The founder's order of 14 October (night): never a bigger bill in the cloud.** The tune-down with native's replica

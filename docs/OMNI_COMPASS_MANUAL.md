@@ -541,7 +541,8 @@ Card for the Glove Box
 Gauges; Appendix D Troubleshooting; Appendix E The Muscles: What Each Is For, and How It Is Wired; Appendix F The Azure
 Account, Click by Click; Appendix G The Google Cloud Account, Click by Click; Appendix H The Amazon Web Services Account,
 Click by Click; Appendix I The Install Manifests; Appendix J The Implementer's Checklists; Appendix K The Kubernetes
-Governor's Settings; Appendix L The Audit, Record by Record; Appendix M The Three Clouds Side by Side; Contact
+Governor's Settings; Appendix L The Audit, Record by Record; Appendix M The Three Clouds Side by Side; Appendix N The Paired Run from
+GitHub: Every Input; Contact
 
 ---
 
@@ -1112,7 +1113,7 @@ checked; install only a commit whose run passed.
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # the engine version (omni-v5), or every file that differs
+python3 tools/omni_version.py                  # the engine version (for example omni-v6), or every file that differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 
@@ -2947,7 +2948,7 @@ With Prometheus and the NGINX ingress controller, for example, $n_{ok}$ and $n_{
 the quantile $q$ is `histogram_quantile(q, sum by (le) (increase(nginx_ingress_controller_request_duration_seconds_bucket[30s])))`.
 A histogram's buckets bound the precision of every quantile: a service whose line is 500 ms needs buckets around 250, 400,
 500 and 750 ms, or the quantiles jump between bucket edges and the governor reads steps that are not there. A service
-mesh (Istio, Linkerd) exports the same two series under its own names; the application's own histogram is better still
+mesh (Istio, Linkerd) exports the same two series under its own names; the application's own histogram is the closest measurement of all
 when the line is written at the application. Section 22.7 gives an adapter that does all of this.
 
 **What the adapter must not do.** It must not average across windows, carry a value forward when a window is empty (an
@@ -4408,6 +4409,16 @@ Every copy, export or printout carries the legal notice at its head and foot, wi
 | OFF, one muscle (Kubernetes) | `touch /tmp/omni.kill` |
 | OFF, one card | `sudo touch /tmp/omni-gpu-kill` |
 | The whole harness OFF, ON, status, watchdog | `python3 tools/omni_switch.py off|on|status|watchdog` |
+| Cloud mode: the machines role, then the governing Deployment (dry run first) | `kubectl apply -f deploy/install/rbac-machines.yaml`, then `kubectl apply -f deploy/install/omni-compass-cloud.yaml` (chapter 19) |
+| Cloud mode: the cloud image | `docker build -f deploy/Dockerfile.cloud --build-arg BASE=<registry>/omni-compass:<version> -t <registry>/omni-compass-cloud:<version> .` |
+| Cloud mode: OFF, the switch of record | `kubectl -n omni-compass scale deployment/omni-compass --replicas=0` (section 20.3) |
+| Cloud mode: OFF from inside the pod | `kubectl -n omni-compass exec deploy/omni-compass -c controller -- touch /tmp/omni.kill` |
+| Cloud mode: the grant, as the governor sees it | `kubectl auth can-i <verb> <resource> --as=system:serviceaccount:omni-compass:omni-compass -A` (section 14.4) |
+| Cloud mode: machines parked now | `kubectl get nodes -l omni-role=work -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints[*].key` |
+| Cloud mode: the last decisions | `kubectl -n omni-compass exec deploy/omni-compass -c controller -- tail -n 20 /var/log/omni/audit.jsonl` |
+| Planning: the room on a cluster | the sampling loop and the arithmetic of section 24.3 |
+| A feed from the company's own Prometheus | `python3 tools/prom_feed.py --prometheus <url> --served <q> --failed <q> --quantile <q> --out <feed>` (section 22.7) |
+| The paired run on a cloud, from GitHub | the `aks-metered`, `gke-metered` or `eks-metered` workflow (Appendix N) |
 
 ## Appendix B - The Files an Installation Touches
 
@@ -4416,6 +4427,11 @@ Every copy, export or printout carries the legal notice at its head and foot, wi
 | `verify.py`, `tools/omni_version.py`, `tools/seal.py`, `RELEASE_MANIFEST.json` | checking the copy before it is installed (chapter 32) |
 | `deploy/Dockerfile` | the container image: non-root, read-only root filesystem, no Linux capabilities |
 | `deploy/install/omni-compass.yaml` | the watch-mode install with a read-only identity (level 1) |
+| `deploy/install/rbac-machines.yaml` | the cloud mode's machines role: patch nodes and patch pods, nothing else (section 14.3) |
+| `deploy/install/omni-compass-cloud.yaml` | the cloud mode's governing Deployment: the governor, its probe and its watchdog in one pod, shipped with `--dry-run` (chapter 19, Appendix I) |
+| `deploy/Dockerfile.cloud` | the cloud image: the shipped image with `jq`, the machine script, the probe, the Prometheus feed adapter and the switch tool |
+| `scripts/kind_nodepool.sh` | the machine script: keeps `{n}` machines in service by the idle taint alone; never creates, deletes, cordons or uncordons a machine, and never moves a pod |
+| `tools/prom_feed.py` | the response-time feed from the company's own Prometheus (section 22.7) |
 | `deploy/rbac-target.yaml`, `deploy/kind/rbac-omni.yaml` | the permissions of levels 2 and 3, exactly the verbs each level needs |
 | `scripts/latency_probe.py` | the response-time feed against any HTTP endpoint |
 | `scripts/kind_paired.sh`, `tools/live_reps.py`, `tools/confirm_abc.py` | the paired runs, the receipt and the three-run table on Kubernetes |
@@ -4423,7 +4439,8 @@ Every copy, export or printout carries the legal notice at its head and foot, wi
 | `scripts/cpu_power_run.sh` | the processor's paired run on bare metal |
 | `tools/omni_switch.py` | the master switch, the status and the watchdog (chapter 8) |
 | `realms/catalog_v5.csv`, `realms/muscle_cards_v5.csv`, `docs/MUSCLE_CATALOG.md` | every muscle, its wiring and its own card (Appendix E) |
-| `docs/AZURE_SETUP.md` | the Azure account and its secrets, click by click |
+| `docs/AZURE_SETUP.md`, `docs/GOOGLE_SETUP.md`, `docs/AMAZON_SETUP.md` | each cloud's account and its secrets, click by click (Appendices F to H) |
+| `.github/workflows/aks-metered.yml`, `gke-metered.yml`, `eks-metered.yml`, `aks-metered-full.yml` | the paired runs on each cloud, from GitHub (Appendix N) |
 | `LICENSE`, `NOTICE`, `DISCLOSURES.md`, `SECURITY.md` | the license, the notices, every declaration and disclaimer, and how to report a security issue |
 
 ## Appendix C - The Gauges
@@ -4756,6 +4773,66 @@ the chapters give the context and the choices. Every Kubernetes command (`kubect
 
 Product names, billing granularity and console paths are the providers' own and change; the provider's current documentation is the
 authority for each, and an installation's plan (chapter 24) records the terms it used.
+
+## Appendix N - The Paired Run from GitHub: Every Input
+
+Phase 5's paired run can be made from the repository's own workflows, on GitHub's runners, against the company's cloud
+account (Appendices F to H set up the account and the repository secrets). Each workflow builds a fresh cluster for every
+arm of every repetition, runs native and native with Omni-Compass on top in rotation on the same load, prices the
+machines that existed every 15 seconds, deletes every cluster it made whatever happens, and writes the receipt to the
+run's summary and as an artifact. The inputs below are the workflows' own; a run's title names its load and its dial.
+
+### N.1 The inputs every cloud shares
+
+| Input | Default | What it is |
+|---|---|---|
+| `reps` | 5 | paired repetitions; one runs at a time |
+| `arms` | `native compass` | the two arms, in rotation order: native, and native with Omni-Compass on top |
+| `duration_s` | 900 | measured seconds per arm |
+| `price_per_node_hour` | the family's list price on the day the workflow was written | the price the bill rows use; check the provider's price list on the day |
+| `load_steps` | empty (a steady load) | load-generator replicas per step, in order, for a burst or a day-shaped load (for example `1 6 1 8 1 6`) |
+| `max_workers` | 4 | the work pool's top; the cloud's autoscaler runs it from 1 to this many |
+| `hpa_max` | empty (the manifest's 10) | the service's replica ceiling, the same in both arms; size it with the fleet (nine 200-millicore pods fit a two-processor machine) |
+| `organism`, `load_max`, `organism_scale` | empty, 6, 1 | one of the repository's six organisms with this cluster inside it, its peak load, and its copies on one clock (1, 10 or 100); empty runs the service alone |
+| `dial` | `save` | the dial of Omni-Compass on top: `save`, the tune-down, for every bill result; `max` is never read as a bill result (section 19.2) |
+
+Every cloud workflow runs the governor in the cloud mode (`OMNI_MACHINES_ONLY=1`, chapter 19).
+
+### N.2 The inputs of each cloud
+
+| Workflow | Input | Default | What it is |
+|---|---|---|---|
+| `aks-metered` | `location` | `eastus` | the Azure region |
+| | `vm_size` | `Standard_D2s_v4` | the work machines' size |
+| | `tier` | `free` | the clusters' control-plane tier, `free` or `standard` (outside the bill; the way past free-tier capacity refusals) |
+| | `worker_pools`, `pool_prices` | empty | several work pools, one machine family each with its own top (`size:max,...`), and each pool's list price (`work0=<price>;work1=<price>;...`): the way past a per-family allowance |
+| | `replica_ceiling` | empty | outside the cloud mode only: how far the governor may raise the service's replica cap; the cloud mode moves no autoscaler |
+| `gke-metered` | `project` | the `GCP_PROJECT` secret | the Google Cloud project |
+| | `zone` | `us-central1-a` | the zone |
+| | `machine` | `e2-standard-2` | the work machines' type |
+| `eks-metered` | `region` | `us-east-1` | the AWS region |
+| | `instance` | `m5.large` | the work machines' instance type |
+
+The repository's secrets each workflow reads are `AZURE_CREDENTIALS` (Azure), `GCP_CREDENTIALS` and `GCP_PROJECT`
+(Google Cloud), and `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` (Amazon). They are set once in the repository's
+settings, never printed, and used only to build and delete the run's own clusters; the governor inside the clusters
+never sees them (section 14.5).
+
+### N.3 A second Azure workflow, for machines already paid for
+
+`aks-metered-full` runs the same paired design with the governor's full wiring on the service (the pod autoscaler's
+target, the pods' processor limits and the modelled power sense) instead of the machines alone. It exists to measure the
+governor's levers beside the cloud's own, not to make a bill result: in a cloud every extra pod is billed, and the cloud
+mode alone is read for the bill (chapter 19). Its inputs are the shared ones above, with a burst of `1 4 1 6 1 9` and three
+repetitions of 600 seconds by default.
+
+### N.4 Reading the run
+
+The run's summary carries the receipt, row by row, read by the rules of chapter 11 and section 19.6: GAIN, EVEN or LOSS
+for each judged row, with its 95% interval, and the shown rows beside them. The artifact `live-reps-aks` (or the cloud's
+equivalent) holds the same table as Markdown and JSON, with the repository's notice, licence and disclosures attached. A
+receipt is read only against the engine version of the commit it ran on (`python3 tools/omni_version.py --commit <sha>`,
+chapter 12), which each repetition's job prints at its start.
 
 ## Contact
 
