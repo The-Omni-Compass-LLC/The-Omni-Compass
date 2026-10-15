@@ -27,6 +27,7 @@ GROUPS = {
                            "scripts/dispatch_grid.py", "scripts/reruns.txt", "scripts/benchmark_campaign.json",
                            "scripts/restart_aks.py", ".github/aks_restart_request.json",
                            "scripts/azure_capacity.py", "tests/test_azure_capacity.py", "docs/AZURE_REPAIR_2026-10-15.md",
+                           "tools/artifact_legal.py", "tools/wire_artifact_legal.py", "tests/test_artifact_legal.py", "tests/test_robust_restart.py", "docs/REPAIR_STATUS_2026-10-15.md", "results/repair_20261015/STATUS.json",
                            "scripts/gpu_campaign_profiles.json", "docs/OMNI_V6.md", "tests/test_release_campaign.py",
                            "tools/run_realms_v5.py", "tools/run_scale.py", "tools/pool_scale.py", "tools/run_hil.py"],
     "benchmark_workflows": sorted(str(p.relative_to(ROOT)) for p in (ROOT / ".github" / "workflows").glob("*.yml")),

@@ -71,6 +71,29 @@ def private_capacity_inputs(request):
     raise RuntimeError('no configured benchmark machine is currently available within the approved price ceiling')
 
 
+def dispatch_free_checks(base, items):
+    allowed = {'robustness.yml', 'redis.yml'}
+    if any(item['workflow'] not in allowed for item in items):
+        raise ValueError('repair checks may dispatch only the named free benchmark workflows')
+    receipt = []
+    for item in items:
+        started = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        gh_api(f'{base}/actions/workflows/{item["workflow"]}/dispatches', 'POST',
+               {'ref': 'main', 'inputs': item['inputs']})
+        row = {**item, 'dispatch_accepted': True}
+        for _ in range(6):
+            data = gh_api(f'{base}/actions/workflows/{item["workflow"]}/runs?event=workflow_dispatch&per_page=10')
+            matches = [r for r in data['workflow_runs'] if r['head_branch'] == 'main'
+                       and dt.datetime.fromisoformat(r['created_at'].replace('Z', '+00:00')) >= started]
+            if matches:
+                run = max(matches, key=lambda r: r['id'])
+                row.update(id=run['id'], url=run['html_url'], status=run['status'])
+                break
+            time.sleep(3)
+        receipt.append(row)
+    return receipt
+
+
 def main(argv=None):
     request = json.loads(Path((argv or sys.argv[1:])[0]).read_text())
     repo = os.environ['GITHUB_REPOSITORY']
@@ -80,6 +103,11 @@ def main(argv=None):
     def save():
         out.write_text(json.dumps(receipt, indent=2) + '\n')
     save()
+    if request.get('free_dispatches'):
+        receipt['free_checks'] = dispatch_free_checks(base, request['free_dispatches'])
+        save()
+        print(json.dumps(receipt['free_checks']), flush=True)
+        return 0
     # Cancel the obsolete pending run before freeing the active run's queue slot.
     for old in request['superseded_runs']:
         run = gh_api(f'{base}/actions/runs/{old["id"]}')

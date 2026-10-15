@@ -101,6 +101,23 @@ class AzureCapacity(unittest.TestCase):
         with patch.object(restart_aks.urllib.request, 'urlopen', return_value=io.BytesIO(json.dumps(data).encode())):
             self.assertEqual(restart_aks.list_price('Standard_D2s_v3', 'eastus'), 0.096)
 
+    def test_free_repair_dispatch_rejects_cloud_before_any_mutation(self):
+        from scripts import restart_aks
+        with patch.object(restart_aks, 'gh_api') as api:
+            with self.assertRaises(ValueError):
+                restart_aks.dispatch_free_checks('repos/example/repo', [{'workflow': 'lambda-gpu.yml', 'inputs': {}}])
+            api.assert_not_called()
+
+    def test_free_repair_dispatch_records_the_actual_run_reference(self):
+        from scripts import restart_aks
+        row = {'workflow': 'robustness.yml', 'inputs': {'scenario': 'kill', 'reps': '10'}}
+        run = {'id': 123, 'head_branch': 'main', 'created_at': '2099-01-01T00:00:00Z',
+               'html_url': 'https://github.com/example/repo/actions/runs/123', 'status': 'queued'}
+        with patch.object(restart_aks, 'gh_api', side_effect=[None, {'workflow_runs': [run]}]) as api:
+            receipt = restart_aks.dispatch_free_checks('repos/example/repo', [row])
+        self.assertEqual(receipt[0]['id'], 123)
+        self.assertEqual(api.call_args_list[0].args[1], 'POST')
+
     def test_cleanup_waits_for_resource_disappearance(self):
         with patch.object(cap, 'az', side_effect=[True, None, True, False]) as az, patch.object(cap.time, 'sleep') as sleep:
             cap.cleanup('omni-compass-full-123-1')
