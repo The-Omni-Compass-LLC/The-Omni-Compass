@@ -23,7 +23,9 @@ def gh_api(path, method='GET', body=None):
     if body is not None:
         cmd += ['--input', '-']
     r = subprocess.run(cmd, input=json.dumps(body) if body is not None else None,
-                       text=True, capture_output=True, check=True)
+                       text=True, capture_output=True)
+    if r.returncode:
+        raise RuntimeError(f'GitHub API {method} {path} failed: {r.stderr.strip()}')
     return json.loads(r.stdout) if r.stdout.strip() else None
 
 
@@ -75,6 +77,17 @@ def dispatch_free_checks(base, items):
     allowed = {'robustness.yml', 'redis.yml'}
     if any(item['workflow'] not in allowed for item in items):
         raise ValueError('repair checks may dispatch only the named free benchmark workflows')
+    # Validate the entire request against the checked-out workflow contracts before dispatching any job.
+    import yaml
+    root = Path(__file__).resolve().parents[1]
+    for item in items:
+        workflow = yaml.load((root / '.github/workflows' / item['workflow']).read_text(), Loader=yaml.BaseLoader)
+        declared = workflow['on']['workflow_dispatch'].get('inputs', {})
+        unknown = set(item['inputs']) - set(declared)
+        missing = {key for key, spec in declared.items()
+                   if spec.get('required') == 'true' and 'default' not in spec and key not in item['inputs']}
+        if unknown or missing:
+            raise ValueError(f'{item["workflow"]}: unknown inputs {sorted(unknown)}; missing inputs {sorted(missing)}')
     receipt = []
     for item in items:
         started = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)

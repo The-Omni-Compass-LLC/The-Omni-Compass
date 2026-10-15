@@ -45,6 +45,8 @@ jobs:
         if: steps.purpose.outputs.azure == 'true'
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Install workflow contract parser
+        run: python3 -m pip install PyYAML==6.0.3
       - name: Dispatch requested repair checks or restart Azure with private capacity checks
         run: python3 scripts/restart_aks.py .github/aks_restart_request.json
       - name: Attach README, licenses and disclosures to this artifact

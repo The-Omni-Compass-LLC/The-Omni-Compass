@@ -4,6 +4,8 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Quota accounting and cleanup must not let sequential Azure arms overlap."""
+import json
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 from scripts import azure_capacity as cap
@@ -49,7 +51,6 @@ class AzureCapacity(unittest.TestCase):
                 cap.cleanup('omni-compass-full-123-1', timeout=1)
 
     def test_paid_suites_share_a_region_queue_and_wait_for_cleanup(self):
-        from pathlib import Path
         import yaml
         root = Path(__file__).resolve().parents[1]
         groups = []
@@ -107,6 +108,24 @@ class AzureCapacity(unittest.TestCase):
             with self.assertRaises(ValueError):
                 restart_aks.dispatch_free_checks('repos/example/repo', [{'workflow': 'lambda-gpu.yml', 'inputs': {}}])
             api.assert_not_called()
+
+    def test_free_repair_rejects_unknown_input_before_any_dispatch(self):
+        from scripts import restart_aks
+        items = [{'workflow': 'redis.yml', 'inputs': {'workloads': 'burst'}},
+                 {'workflow': 'robustness.yml', 'inputs': {'arms': 'native compass'}}]
+        with patch.object(restart_aks, 'gh_api') as api:
+            with self.assertRaisesRegex(ValueError, 'unknown inputs.*arms'):
+                restart_aks.dispatch_free_checks('repos/example/repo', items)
+            api.assert_not_called()
+
+    def test_current_repair_request_matches_real_workflow_contracts(self):
+        from scripts import restart_aks
+        import yaml
+        root = Path(restart_aks.__file__).resolve().parents[1]
+        request = json.loads((root / '.github/aks_restart_request.json').read_text())
+        for item in request['free_dispatches']:
+            workflow = yaml.load((root / '.github/workflows' / item['workflow']).read_text(), Loader=yaml.BaseLoader)
+            self.assertFalse(set(item['inputs']) - set(workflow['on']['workflow_dispatch']['inputs']))
 
     def test_free_repair_dispatch_records_the_actual_run_reference(self):
         from scripts import restart_aks
