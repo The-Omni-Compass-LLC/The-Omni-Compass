@@ -75,8 +75,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-14 23:51 | grid | success | [38622165229](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38622165229) |
-| 2026-10-14 23:26 | big-organism-detached collect | success | [38654105611](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38654105611) |
+| 2026-10-15 05:12 | big-organism-detached collect | success | [38685477902](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38685477902) |
+| 2026-10-15 04:12 | grid | success | [38656394936](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38656394936) |
+| 2026-10-15 04:05 | aks-metered steady replica room 0 dial save eastus Standard_D2s_v4 | success | [38648741673](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38648741673) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
