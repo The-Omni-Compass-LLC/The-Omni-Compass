@@ -2,6 +2,37 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-15 (night): the audit's findings fixed: engines named on every row, formulas in Unicode, the v6 tables, v7 under test
+
+- **Every result names its engine.** The benefit sheet and the state of play's standing block now carry an Engine column
+  read from each table (its run table, its JSON, its name, or the engine of the commit it names, by
+  `tools/omni_version.py --commit`), list the rows on the engine that stands first, and say how many of the benchmarks
+  are on it (4 of 26). A table on the engine that stands takes the place of the same benchmark's older table on the
+  sheet; the older one stays in `results/live` under its own name. Results are never read across engines.
+- **The v6 three-run tables** (`results/live/V6_GOLDILOCKS.md`, `V6_KEDA_REQUESTS.md`, `V6_KEDA_CPU_REQUESTS.md`,
+  `V6_CRUISEKUBE.md`), built by `tools/confirm_abc.py` from the twelve archived v6 runs, every run omni-v6: Goldilocks,
+  response time 45 to 47% faster, GAIN in all three of our runs; KEDA's HTTP add-on, 59% faster and alert minutes
+  GAIN in all three; KEDA on CPU and requests, GAIN; CruiseKube, EVEN in all three. No row reads LOSS on the three-run
+  rule. The KEDA HTTP table's pod start wait, mean, read +12.5%, +12.0% and +22.7% (EVEN on the three-run rule, a LOSS
+  in two single runs): its cause is found and fixed in the v7 candidate (below).
+- **Formulas in Unicode, never LaTeX markup** (the founder's order of 15 October). `tools/unicode_math.py` rewrote
+  every formula the two manuals print (326 in prose and one block of equations: w ∝ 1/√n, xᵢ,ₖ₊₁ = fᵢ(xᵢ,ₖ, …),
+  ⌈R(1+h)/r⌉), leaving code, prices and constant names untouched; `verify.py` now fails a push in which any formula a
+  manual prints is in LaTeX. Both PDFs rebuilt: the Operator's Manual 434 pages, the Owner's 820; neither prints a
+  backslash command or a braced subscript.
+- **The v7 candidate** (branch `v7-candidate`, docs/OMNI_V7.md on that branch): ChatGPT's quota-aware conveyance (pull request #13)
+  and one processor conveyed once. From the 151 pod starts of the v6 KEDA runs: a start is slower when the runner's
+  processor is busier, in both arms alike, and only the omni arm reached 75 to 100% busy, because every kind node
+  reports the one host's four cores as its own and each of three serving pods was given 3,700m of them. v7 counts a
+  host's processor once, raises no limit while it is 75% busy or unread, and raises none on a machine where a pod is
+  starting; lowering is never held. Five new regressions pass; its live trials (KEDA, Goldilocks, CruiseKube, the
+  capacity case) are queued on GitHub's free machines. It goes on main only if they show no LOSS.
+- **Wording**: the retired words in the day's new pages ("improved or worsened", "unfavorable", "standalone",
+  "confirmed/unconfirmed", the label FEWER MISSES) are replaced; the Owner's Manual's KWOK nodes are "stand-in nodes".
+- **CLAUDE.md**: the engine section names v6 as standing and v7 as the candidate; formulas in Unicode; the founder's
+  free/paid line on 1,000 copies (free GitHub machines may run 1,000 copies and runs; every paid machine stays at 1, 10
+  and 100), as relayed in commit `9f455da7e`.
+
 ## 2026-10-15: the Operator's Manual carries the implementer's whole cloud path
 
 - **The founder's order of 14 October (night): the Operator's Manual at least half the Owner's, covering all that matters

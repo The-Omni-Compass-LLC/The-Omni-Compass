@@ -19,7 +19,7 @@ My face is the compass. It is not decoration: it is how I read myself, every dec
 
 ### The wheel
 
-My deviation E, over its ceiling E_max, runs along the horizontal. Its rate of change runs along the vertical. Where I
+My deviation E, over its ceiling E[max], runs along the horizontal. Its rate of change runs along the vertical. Where I
 stand on that wheel is my heading, measured clockwise from north:
 
 | Point | Letter | Heading | Where I am |
@@ -64,7 +64,7 @@ The wheel turns I → II → III → IV → I:
 
 My axle is the structural basin S. Its rest point S* solves my equation (6):
 
-δ − α_s S − ¾ β_s S² = 0
+δ − αₛ S − ¾ βₛ S² = 0
 
 Without the axle, deviation diverges. With it, deviation circulates.
 
@@ -172,19 +172,19 @@ The reflex that raises the floor itself exists (`--pod-reflex-writes`); it is of
 ### 6. My energy is moved, never created
 
 One budget comes in, and I convey it across the body by need (`omnicompass/conveyance.py`):
-- da_i/dt = κ a_i (e_i − ē);
+- da_i/dt = κ aᵢ (eᵢ − ē);
 - the budget is conserved exactly, and each organ converges to its share of the demand;
 - organs with no work idle at their floor, and what they do not need goes where it is needed;
 - nothing leaves Ω.
 
 On each machine, I hand its idle CPU to the pods serving on it:
 
-c_i = min( max(L_i, (0.95 A_j − Q_j) / |P_j|), 0.95 A_j )
+cᵢ = min( max(Lᵢ, (0.95 Aⱼ − Qⱼ) / |Pⱼ|), 0.95 Aⱼ )
 
-- A_j is the machine's CPU.
-- Q_j is what every other pod on it has requested.
-- P_j is its serving pods.
-- L_i is the limit you gave the pod.
+- Aⱼ is the machine's CPU.
+- Qⱼ is what every other pod on it has requested.
+- Pⱼ is its serving pods.
+- Lᵢ is the limit you gave the pod.
 
 A pod's CPU limit is a quota. A request that needs more than one quota period waits for the next one while the
 machine stands idle. That wait is energy withheld from the work, not saved, because the request spends the same

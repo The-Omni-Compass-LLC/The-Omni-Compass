@@ -4,19 +4,19 @@
 
 ## Evidence and limits
 
-The full-control AKS run 38693801818 completed its first paired repetition. Its next two repetitions failed on Azure CPU quota. Later full-control dispatches also failed capacity checks. These are infrastructure failures, not evidence that Omni improved or worsened application performance.
+The full-control AKS run 38693801818 completed its first paired repetition. Its next two repetitions failed on Azure CPU quota. Later full-control dispatches also failed capacity checks. These are failures of the test machinery, so they give no GAIN, EVEN or LOSS reading of the service.
 
 The source also showed three preventable hazards: resource-group cleanup returned before deletion finished; cluster-delete errors were suppressed; and separate Azure suites could compete for the same regional machine-family allowance. Multi-pool preflight counted each pool separately rather than aggregating a shared family, and included the system node only when pool and system size names matched exactly. The live owner of occupied quota has not been established.
 
 ## Correction
 
-The capacity helper sums system and worker CPU demand by family, checks the regional allowance too, refuses unknown or insufficient allowances, and waits for occupied capacity before allocating resources. It rechecks capacity before each AKS arm. Existing named clusters are deleted synchronously and errors remain failures. Resource-group cleanup waits for confirmed disappearance. AKS machines-only, AKS full-control and ordinary large-organism workflows share a region queue. Large-organism candidate sizes are checked before VM creation.
+The capacity helper sums system and worker CPU demand by family, checks the regional allowance too, refuses unknown or insufficient allowances, and waits for occupied capacity before allocating resources. It rechecks capacity before each AKS arm. Existing named clusters are deleted synchronously and errors remain failures. Resource-group cleanup waits until the group is read back as gone. AKS machines-only, AKS full-control and ordinary large-organism workflows share a region queue. Large-organism candidate sizes are checked before VM creation.
 
 The helper exports no inventory: operational messages contain neither quota values nor infrastructure identifiers. Existing paired-run artifacts and historical failures are retained. The engine fingerprint, workload, worker ceiling, burst, organism scales and measured duration are unchanged. No quota increase, GPU launch, Amazon launch or Google launch is introduced.
 
 ## Validation and remaining work
 
-Regression tests cover repeated-family accounting, differently named sizes in one family, standalone VMs, the regional ceiling, occupied quota retries, unknown quota, confirmed deletion, deletion timeout and error propagation. Workflow checks verify the common queue and awaited cleanup.
+Regression tests cover repeated-family accounting, differently named sizes in one family, single virtual machines outside a cluster, the regional ceiling, occupied quota retries, unknown quota, deletion read back, deletion timeout and error propagation. Workflow checks verify the common queue and awaited cleanup.
 
 Live inventory export was blocked by automatic approval review because this repository is public. No inventory workflow was launched. Local tests cannot establish who owns occupied Azure quota or prove a successful cloud rerun. The follow-up now uses private in-memory capacity checks and Azure's public retail price API. It selects only a configured two-CPU machine at or below the existing hourly price ceiling and records the selected deployment inputs and replacement run reference. It exports no quota counters, resource-group existence data, or unrelated inventory. A successful cloud rerun is still required before calling the incident resolved.
 

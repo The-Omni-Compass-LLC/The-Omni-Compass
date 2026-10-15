@@ -179,7 +179,7 @@ the cloud mode, day two, the graphics processor, observability, change and risk,
 racks and private clouds, hardening and the supply chain, a fleet under continuous delivery, the failure drill book, and
 one installation start to finish); and back matter with every muscle, its wiring and its card, the install manifests,
 the implementer's checklists, the governor's settings, the audit record by record, the three clouds side by side and
-every input of the paired run from GitHub. It is 434 pages, more than half the Owner's 816. Its text is
+every input of the paired run from GitHub. It is 434 pages, more than half the Owner's 820. Its text is
 [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md); the cloud install files are `deploy/install/`
 (`omni-compass.yaml`, `rbac-machines.yaml`, `omni-compass-cloud.yaml`) and `deploy/Dockerfile.cloud`. It is written for the CTO who decides, the
 engineer who wires and the operator who runs it; the published results are on this page and in `results/`.

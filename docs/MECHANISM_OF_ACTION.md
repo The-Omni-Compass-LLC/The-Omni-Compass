@@ -12,9 +12,9 @@ hashes are checked by `verify.py`.
 |---|---|---|
 | E | energy / excitation | how hard the system is being driven: queues, overload, power, heat |
 | U | order parameter | how healthy and settled the system is: +1 healthy basin, -1 failed basin |
-| I_U | integrated need | unmet need accumulated over time: memory of pressure that has not been relieved |
+| I[U] | integrated need | unmet need accumulated over time: memory of pressure that has not been relieved |
 | S | stress | slow structural stress from heat, power, network, security, staleness |
-| B, B_dot | bath and its rate | a damped oscillator driven by stress: the slow "tide" of physical load |
+| B, Ḃ | bath and its rate | a damped oscillator driven by stress: the slow "tide" of physical load |
 
 ## 2. The equations (omnicompass/core.py, lines 5-12)
 
@@ -38,11 +38,11 @@ Each term does one job:
 - **(2) Order.** `mu U (1 - U^2)` is a double-well (bistable) drift with two stable basins, U = +1 (healthy) and
   U = -1 (failed), and an unstable ridge at U = 0. A rise in energy (`dE/dt`) pushes U out of the healthy basin. `u` is
   the bounded control input.
-- **(3) Integrated need.** I_U grows while U is below 1 (the system is not settled). It is reduced by energy and stress
+- **(3) Integrated need.** I[U] grows while U is below 1 (the system is not settled). It is reduced by energy and stress
   already being dealt with, and it leaks at lambda_I = 0.719. It is the engine's memory of unrelieved pressure.
 - **(5)-(6) Stress.** A cubic potential (the "well in the basin"). S rolls downhill to its stable root. This is the
   slowest restoring force.
-- **(7) Bath.** A damped harmonic oscillator (natural frequency omega_B = 1, quality Q_B = 2.5) driven by stress. It turns
+- **(7) Bath.** A damped harmonic oscillator (natural frequency omega_B = 1, quality Q[B] = 2.5) driven by stress. It turns
   stress into a smooth, lagged "tide". It is the only second-order element.
 - **(8) Audit.** The bath equation is re-checked numerically every step. The check is never fed back.
 
@@ -83,21 +83,21 @@ rollback authorised if S >= S_rollback, U is falling, or a security block is see
 
 | Muscle | Engine quantity used | Where |
 |---|---|---|
-| HPA target (pods) | rho* from I_U and E, equations (1) and (3) | adapter `Governor.step`; live `omni_controller/controller.py` |
-| Node pool (machines) | n_req from load, queue and rho*; release gated by push from equation (2) | same |
+| HPA target (pods) | rho* from I[U] and E, equations (1) and (3) | adapter `Governor.step`; live `omni_controller/controller.py` |
+| Node pool (machines) | n[req] from load, queue and rho*; release gated by push from equation (2) | same |
 | Power cap (pod CPU limits, CPU frequency, GPU limit) | cap from U gate and bath B, equation (7) | same; `omni_controller/muscles.py` |
 | Rollout guard | change_permitted (U), rollback (S, dU) | `muscles.py` |
 | Security hold | security observation raises S and blocks expansion | adapter, shield |
 | Speed-first law | rho* for pods; push gates machine release | `omnicompass/speed.py` |
 | Right-sizing | rho* sizes CPU; E widens the memory margin; push gates scale-in | `omnilab/rightsize.py` |
-| Cold start | rho* sizes instances; I_U sets how long to keep warm | `omnilab/coldstart.py` |
-| GPU packing | I_U pre-warms nodes; push gates power-off | `omnilab/gpupack.py` |
+| Cold start | rho* sizes instances; I[U] sets how long to keep warm | `omnilab/coldstart.py` |
+| GPU packing | I[U] pre-warms nodes; push gates power-off | `omnilab/gpupack.py` |
 | Training power | E tightens the applied ramp limit under sustained grid stress | `omnilab/powersmooth.py` |
 | GPU health | S and E shorten the checkpoint interval | `omnilab/health.py` |
 | Cooling | E widens the inlet-temperature margin | `omnilab/cooling.py` |
 | Inference | the full allocation law (node_delta) sizes replicas | `omnilab/inference.py` |
-| Agent containment | I_U throttles; the security observation contains | `omnilab/containment.py` |
-| VM energy | I_U and E raise the learning rate when attribution goes stale | `omnilab/vmenergy.py` |
+| Agent containment | I[U] throttles; the security observation contains | `omnilab/containment.py` |
+| VM energy | I[U] and E raise the learning rate when attribution goes stale | `omnilab/vmenergy.py` |
 
 ## 6. Measured: what the equations actually do inside the governor
 
@@ -123,7 +123,7 @@ Measured on a real observation stream (fleet plant, web services, fleet mode, 36
 
 - **Why "engine off" scores close to "engine on" in the muscle benchmarks.** With the equations frozen, the observation
   blend still moves the state. Both versions are then low-pass filters of the same telemetry. The engine's fast modes
-  (1-3 decisions) behave almost like the blend itself. Its distinct contribution is its slow memory: I_U (14 decisions),
+  (1-3 decisions) behave almost like the blend itself. Its distinct contribution is its slow memory: I[U] (14 decisions),
   S (60) and the bath (period 64 decisions). The muscle mappings mostly read E and rho*, which live on the fast modes.
 - **The engine clock is not matched to the workload's rhythm.** One decision advances engine time by 0.1. At 60-second
   decisions the bath rings every 64 minutes, but web demand has a 24-hour rhythm and training power a 2-second one. This
@@ -135,7 +135,7 @@ Three wiring experiments follow directly. None changes a single equation:
 
 1. **Clock matching.** Set engine time per decision so that the bath's natural period equals the workload's rhythm.
    The oscillator in (7) then carries the cycle and can anticipate it.
-2. **Slow-mode actuation.** Drive machines from I_U, S and B (the memory modes) rather than E (a fast mode).
+2. **Slow-mode actuation.** Drive machines from I[U], S and B (the memory modes) rather than E (a fast mode).
 3. **Closed-loop actuation.** Apply equation (2)'s u and use its magnitude, not only its sign, as the actuator command.
 
 Each is testable in the existing harness against every platform in the league (tuning/league.py), and will be tested
@@ -187,7 +187,7 @@ is placed in its band [lo, hi], where hi is the response line:
 with the band's center p0 = 0.5, cushion c = 0.05, authority A = 1, kp = 1 and kd = max(0, 2 sqrt(kp tau / dt) - 1) dt
 (critical damping for a muscle that answers in tau seconds). F > 0 asks for capacity, F < 0 offers it back.
 
-**How many machines.** With n machines in service now, n_nat the count native ran, m the floor (two by default, `MIN_NODES`) and M the
+**How many machines.** With n machines in service now, n[nat] the count native ran, m the floor (two by default, `MIN_NODES`) and M the
 machines that exist (every machine usable; an operator may hold whole machines back with `NODE_CUSHION`, off by
 default), every count stays in m <= n' <= M. The protection is not a machine sitting out: it is the band inside every
 machine. Capacity is added at 95% of the response line, before the line is reached (8.2-8.3), and a machine goes back
@@ -247,22 +247,22 @@ unit (a battery before a generator, a CPU before a GPU) is not wired; each pool 
 ## 9. The state each muscle carries, and the modes as a state machine
 
 **9.1 The compass on a muscle is a dynamical system, so its state must persist.** On muscle i the compass carries
-z_i = (p_i, v_i, x_i): the position of the service in its band, its velocity, and the knob's continuous value. At each
-decision k, with reading r_k:
+zᵢ = (pᵢ, vᵢ, xᵢ): the position of the service in its band, its velocity, and the knob's continuous value. At each
+decision k, with reading rₖ:
 
-    p_k = (r_k - lo) / (hi - lo),   v_k = s v_{k-1} + (1 - s)(p_k - p_{k-1}) / dt,   F_k = F(p_k, v_k) by (8.2)    (9.1)
-    x_{k+1} = clamp( x_k + sigma g(F_k) F_k (x_hi - x_lo), x_lo, x_hi ),   g = UP if F_k > 0 else DOWN          (9.2)
+    pₖ = (rₖ - lo) / (hi - lo),   vₖ = s vₖ₋₁ + (1 - s)(pₖ - pₖ₋₁) / dt,   Fₖ = F(pₖ, vₖ) by (8.2)    (9.1)
+    xₖ₊₁ = clamp( xₖ + sigma g(Fₖ) Fₖ (x[hi] - x[lo]), x[lo], x[hi] ),   g = UP if Fₖ > 0 else DOWN          (9.2)
 
-with x_0 the native value and sigma = +1 when a higher value is more capacity. Two properties depend on z persisting:
-(a) the knob integrates the force, x_k - x_0 = sum_j sigma g F_j span (until the cover binds), so a calm muscle eases
-step by step toward its cover; and (b) the damping term kd v_k needs p_{k-1}. If z were made fresh at every decision
-(p_{k-1} = p_k, v = 0, x_k = x_0), (9.2) would collapse to x_{k+1} = clamp(x_0 + sigma g F(p_k, 0) span): a memoryless map
+with x₀ the native value and sigma = +1 when a higher value is more capacity. Two properties depend on z persisting:
+(a) the knob integrates the force, xₖ - x₀ = sum_j sigma g Fⱼ span (until the cover binds), so a calm muscle eases
+step by step toward its cover; and (b) the damping term kd vₖ needs pₖ₋₁. If z were made fresh at every decision
+(pₖ₋₁ = pₖ, v = 0, xₖ = x₀), (9.2) would collapse to xₖ₊₁ = clamp(x₀ + sigma g F(pₖ, 0) span): a memoryless map
 of the present reading, at most one step from native, with no damping. That is a different, weaker law. A renamed
 attribute did exactly that on 2026-10-05; `tests/test_compass_arm.py` now fails if the compass is ever made twice on one
 muscle.
 
-**9.2 The modes.** The live controller is in exactly one mode at each decision. With q_k the pods waiting for a place,
-u_k the scaling-up flag, c the cruise count (`--cruise-after`, 2), M the machine ceiling and m the floor:
+**9.2 The modes.** The live controller is in exactly one mode at each decision. With qₖ the pods waiting for a place,
+uₖ the scaling-up flag, c the cruise count (`--cruise-after`, 2), M the machine ceiling and m the floor:
 
     cruise on      q_j > 0 for the last c decisions                                                   (9.3)
     cruise off     q_j = 0 and not u_j for the last c decisions                                       (9.4)
@@ -279,7 +279,7 @@ at once, n = M; a growing pool a step a decision), so the floor step's only acti
 need) adds nothing the climb does not already give: for a fixed pool floor <= M = n. Its reads (every pod, every node, node
 metrics, every HPA, each five seconds) carry no value of information, so removing them cannot change any action; they
 only cost CPU and API-server time on the machines the queue is using. The service's response time is also confounded
-in cruise: with a queue of other work holding the machines, a request waits on contended CPU, R = S / (1 - u_host), not on
+in cruise: with a queue of other work holding the machines, a request waits on contended CPU, R = S / (1 - u[host]), not on
 the service's own pods. Reading that R as the service's own queue and adding pods would answer the wrong cause. So in
 cruise Omni holds the machines and leaves the service to its own autoscaler. `tests/test_compass_controller.py` checks
 that the floor step makes no API read during cruise; the controller before this rule made the full set of reads every
@@ -302,31 +302,31 @@ move at all is a property of the muscle's physics. Four cases, each derived from
 test:
 
 - *Cooling power.* A zone's heat must leave it: over a run, the heat removed equals the heat made plus what the
-  room's mass stores. A cap on cooling power q_max cannot remove less heat. It only lets the temperature drift above
-  setpoint while the PI command grows, and the staging rule, units = ceil(command / (0.8 q_unit)), turns that command
-  into more units and more fan power, p = q_c / COP + units x p_unit. So a lower cap never saves energy, and the lever
+  room's mass stores. A cap on cooling power q[max] cannot remove less heat. It only lets the temperature drift above
+  setpoint while the PI command grows, and the staging rule, units = ceil(command / (0.8 q[unit])), turns that command
+  into more units and more fan power, p = q[c] / COP + units x p[unit]. So a lower cap never saves energy, and the lever
   stays native. (The setpoint, which changes the COP, and the units, which change fan power at the same heat, remain
   levers.)
 - *A battery's reserve.* Energy D drawn from the cells below the operator's reserve saves D sqrt(eta) of grid import,
   and the deficit is bought back at D / sqrt(eta). The net, D (1 - eta) / sqrt(eta) (10.5% of D at eta = 0.90), is
   always positive. Spending the reserve is never an energy saving; it is the price of keeping the draw under the
   connection's limit. So the reserve is spent only at the wall (p >= 0.95) and only when the battery can cover the
-  excess (0 < imp - p_lim <= p_batt). Otherwise the operator's reserve holds, and no round trip is paid for nothing.
+  excess (0 < imp - p[lim] <= p[batt]). Otherwise the operator's reserve holds, and no round trip is paid for nothing.
 - *A backup reserve (a UPS).* It is held for an outage, which the model does not contain, so spending it for a peak
   trades away the reason it exists. Never a lever.
 - *A compute pool's power cap.* With throughput mu(c) proportional to c^eps and the autoscaler holding utilisation near its
-  target u*, the energy per unit of work is e(c) = (p_idle / u* + p_dyn c) / mu(c). At c = 1, de/dc > 0 (a lower cap
+  target u*, the energy per unit of work is e(c) = (p[idle] / u* + p[dyn] c) / mu(c). At c = 1, de/dc > 0 (a lower cap
   saves) if and only if
 
       eps < p_dyn / (p_idle / u* + p_dyn)                                                                 (9.8)
 
   At eps = 0.4 the cap saves on CPU hosts (threshold 0.62), GPUs (0.74), databases (0.51) and radio units (0.54). It
   costs energy where idle power dominates: a quantum computer's cryostat (0.19), a network switch (0.32), storage
-  (0.26). There, running slower keeps the machines on longer: race to idle. In a deployment p_idle, p_dyn and the
+  (0.26). There, running slower keeps the machines on longer: race to idle. In a deployment p[idle], p[dyn] and the
   speed curve come from the machine's own specification.
 
-- *A motion axis's effort cap.* It lowers the copper loss of a full-acceleration move, (J a_max / kt)^2 R, and stretches
-  the move, which keeps paying the standing draw p_idle + b v_max^2. It moves only where the first exceeds the second: a
+- *A motion axis's effort cap.* It lowers the copper loss of a full-acceleration move, (J a[max] / kt)^2 R, and stretches
+  the move, which keeps paying the standing draw p[idle] + b v[max]^2. It moves only where the first exceeds the second: a
   reaction wheel (32 W against 5 W), not EV traction, a flight axis or a robot joint.
 - *A machine released from a node pool.* A machine boots in minutes, and a burst that arrives in the meantime is served
   late. So a machine goes back only when the machines left cover the recent peak at 0.3 of the pool's own release level,

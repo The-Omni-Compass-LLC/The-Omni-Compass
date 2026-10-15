@@ -38,10 +38,10 @@ The theory sets five requirements on any law that claims to close the circle:
 
 | Requirement | Meaning | In the engine |
 |---|---|---|
-| Finite deviation | the distance from the admissible state has a ceiling, abs(E) <= E_max | the deviation state E drains faster than it can fill |
+| Finite deviation | the distance from the admissible state has a ceiling, abs(E) <= E[max] | the deviation state E drains faster than it can fill |
 | Finite curvature | the landscape the state moves on has no infinite slopes or pits | the drive is bounded by tanh; the authority is clipped |
 | Global conservation | what flows in is matched by what flows out | the drain and the bath's friction match the drive |
-| Recurrence | a disturbed state returns arbitrarily close to where it was | convergence to the target pole at rate K_P |
+| Recurrence | a disturbed state returns arbitrarily close to where it was | convergence to the target pole at rate K[P] |
 | One law | every subsystem obeys the same law, no special cases | one engine, one compass, every muscle |
 
 ## The closed circle tested
@@ -170,7 +170,7 @@ wave function of the eigenvalue equation.
 
 A basin forms in three stages. While the driving tension T is low, curvature is weak and there is no dominant basin:
 flows spread outward. As T increases, curvature concentrates and a positive feedback loop begins. Then a stable
-geometric funnel forms: self-reinforcing curvature, finite depth, bounded deviation, with the boundary abs(E) <= E_max
+geometric funnel forms: self-reinforcing curvature, finite depth, bounded deviation, with the boundary abs(E) <= E[max]
 respected. Structure emerges from fluctuation through curvature concentration and feedback.
 
 In the engine, the basin state S rolls down its potential Phi(S) to a stable bottom; in the compass, every muscle's service
@@ -199,12 +199,12 @@ The dual-basin engine is a recursive transform with five stages:
    the flow; compression increases toward the center.
 2. **Saturation.** At the center, two cores of negative polarity meet back to back; the basin structure S reaches its
    critical value and the curvature reaches its maximum.
-3. **Transition (ignition).** Where the cores touch, the transition operator T(X) = sigma(S - S_c) T(X) activates:
+3. **Transition (ignition).** Where the cores touch, the transition operator T(X) = sigma(S - S[c]) T(X) activates:
    compression halts and redistribution begins.
 4. **Redistribution.** Two axial jets carry the excess out along the axis, with opposite helicity to the inflow.
 5. **Reset and recurrence.** The domain relaxes and the cycle repeats.
 
-The core mathematics is a bounded flow: dX/dt = G(X, t) with abs(G(X)) <= C_G, a curvature envelope K(X) <= K_max, and
+The core mathematics is a bounded flow: dX/dt = G(X, t) with abs(G(X)) <= C[G], a curvature envelope K(X) <= K[max], and
 a redistribution term that activates only at saturation. The state X = (E, U, S, B) stays in its admissible domain,
 whose horizon boundary is forward invariant (the Nagumo condition again).
 
@@ -291,8 +291,8 @@ Each state of the engine was checked against the closed-circle conditions:
 |---|---|---|
 | E, deviation | closed | it drains at rate alpha_E while its inputs are bounded (the drive is capped by tanh) |
 | U, alignment | closed | the cubic term mu U (1 - U^2) pushes back hard from far out |
-| I_U, memory | closed | it forgets at rate lambda_I |
-| B, the bath | closed | the friction omega_B / Q_B settles it |
+| I[U], memory | closed | it forgets at rate lambda_I |
+| B, the bath | closed | the friction omega_B / Q[B] settles it |
 | S, the basin | closed on the positive side; open on the negative side below an unstable ridge | Phi(S) carries a cubic term, so the landscape falls away below the ridge (at S = -3.5 with the default parameters) |
 
 Three openings were found and each has its closure:

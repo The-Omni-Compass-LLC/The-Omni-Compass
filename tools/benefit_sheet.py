@@ -49,6 +49,51 @@ from tools import wiring_verdicts as wv                            # noqa: E402
 LIVE = ROOT / "results" / "live"
 OUT_MD = ROOT / "docs" / "BENEFIT_SHEET.md"
 OUT_JSON = ROOT / "results" / "BENEFIT_SHEET.json"
+ENGINE_RE = re.compile(r"\bomni-v(\d+)\b")
+
+
+def engine_of(rel):
+    """The engines a row's table ran on, read from the table itself (its run table's Engine column, or the engine its JSON
+    names), oldest first: "omni-v6", or "omni-v1 and omni-v3" for a table built from several; "not named" where the table
+    does not say. The index names every engine its counted tables ran on."""
+    if rel.endswith("OMNI_INDEX.md"):
+        found = {int(m.group(1)) for c in wv.real_stacks(wv.load_index()) if c["counted"]
+                 for m in ENGINE_RE.finditer(engine_of(c["source"]))}
+    else:
+        p, texts = ROOT / rel, []
+        for q in (p.with_suffix(".json"), p):
+            try:
+                texts.append(q.read_text(encoding="utf-8"))
+            except OSError:
+                pass
+        found = {int(m.group(1)) for t in texts for m in ENGINE_RE.finditer(t)}
+        if not found:                                              # a table named for its engine (V3_...), or one that says "Omni v3"
+            m = re.match(r"V(\d+)_", p.name)
+            found = {int(m.group(1))} if m else {int(x) for t in texts for x in re.findall(r"\bOmni v(\d+)\b", t)}
+        if not found:                                              # the engine of the commit the table names, by the version tool
+            m = next((re.search(r"commit `([0-9a-f]{7,40})`", t) for t in texts if re.search(r"commit `([0-9a-f]{7,40})`", t)), None)
+            if m:
+                try:
+                    out = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", m.group(1)], cwd=ROOT,
+                                         capture_output=True, text=True, timeout=300).stdout
+                    found = {int(x) for x in ENGINE_RE.findall(out)}
+                except (OSError, subprocess.SubprocessError):
+                    pass
+    return " and ".join(f"omni-v{v}" for v in sorted(found)) if found else "not named"
+
+
+# the three-run tables on the engine that stands; each takes the place of the same benchmark's table on an older engine,
+# which stays in results/live under its own name
+NEWEST = [
+    ("V6_KEDA_REQUESTS.json", "Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs",
+     "every judged gauge of the three-run table: p95, alert minutes, replicas, machines, energy"),
+    ("V6_KEDA_CPU_REQUESTS.json", "Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs",
+     "every judged gauge of the three-run table: p95, alert minutes, replicas, machines, energy"),
+    ("V6_GOLDILOCKS.json", "Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs",
+     "every judged gauge of the three-run table: p95, time over the line, machines, energy"),
+    ("V6_CRUISEKUBE.json", "Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs",
+     "every judged gauge of the three-run table: p95, time over the line, machines, energy"),
+]
 
 
 def gmean(xs):
@@ -374,9 +419,22 @@ def main(check=False):
     r = from_realms()
     if r:
         rows.append(r)
+    for fname, name, what in NEWEST:
+        r = from_abc_table(fname, name, what)
+        if not r:
+            continue
+        same = re.sub(r"^V\d+_", "", fname).replace(".json", ".md")
+        rows = [x for x in rows if not re.search(r"/V\d+_" + re.escape(same) + "$", x["file"])]
+        rows.append(r)
     hl = headline_row()
     if hl:
         rows.append(hl)
+    for r in rows:
+        r["engine"] = engine_of(r["file"])
+        # nine places: the last digits of a geometric mean differ between Python versions, and the sheet is checked as text
+        r["pct"] = None if r.get("pct") is None else round(r["pct"], 9)
+        for p_ in r.get("parts") or []:
+            p_["pct"] = None if p_.get("pct") is None else round(p_["pct"], 9)
     if any(r["date"] is None for r in rows):                       # no history here: the dates the sheet already carries, by benchmark
         known = {}
         if OUT_JSON.exists():
@@ -409,10 +467,13 @@ def main(check=False):
          "the wiring page `docs/WIRING_VERDICTS.md` says what pays for what), **LOSS** (a LOSS and no GAIN), **power given** (a resource put "
          "in and nothing gained) or **EVEN** (nothing moved the same way in all three of our runs). LOSS should never appear: where it "
          "does, the row stands and its cause is found and fixed.", "",
-         "| Date | Benchmark | Benefit? | How much | Every change the same in all three of our runs, in words | Table |",
-         "|---|---|---|---:|---|---|"]
+         "Every row names the engine its table ran on (read from the table). Results are never read across engines: a row on an "
+         "older engine stands as that engine's result until the same benchmark's three runs on the engine that stands replace "
+         "it here, and every benchmark is rerun on the engine that stands.", "",
+         "| Date | Benchmark | Engine | Benefit? | How much | Every change the same in all three of our runs, in words | Table |",
+         "|---|---|---|---|---:|---|---|"]
     for r in rows:
-        L.append(f"| {r['date']} | {r['benchmark']} | **{r['benefit']}** | **{fmt_pct_words(r['pct'], r.get('loss', 0))}** | {r.get('words', '')} | `{r['file']}` |")
+        L.append(f"| {r['date']} | {r['benchmark']} | {r['engine']} | **{r['benefit']}** | **{fmt_pct_words(r['pct'], r.get('loss', 0))}** | {r.get('words', '')} | `{r['file']}` |")
     L += ["", "## The parts behind a row", "",
           "Where a row sums several workloads, grids, districts, cells or robots, each part with its own number, the same way round:", ""]
     for r in rows:

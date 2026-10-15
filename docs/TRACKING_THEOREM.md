@@ -112,7 +112,7 @@ Admissible set for a fixture with parameters p and initial state x0:
 
 ## What remains open (O)
 
-- Global stability of the forced six-state system (E, I_U, S, B are not all covered above).
+- Global stability of the forced six-state system (E, I[U], S, B are not all covered above).
 - A proved (not computed) epsilon_h over the declared box, and discrete invariance over the box.
 - The inheritance / intertwining residual against an outside plant: instrumented (`tools/gpu_reps.py`,
   representation fidelity), not yet measured on a real card.

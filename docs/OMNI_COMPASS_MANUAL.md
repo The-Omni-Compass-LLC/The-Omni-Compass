@@ -1753,7 +1753,7 @@ less work was done. The steps below are the whole method.
    anyone holding the files can rebuild it.
 
 **How many repetitions, and why.** The width of a paired interval shrinks with the square root of the number of pairs,
-$w \propto 1/\sqrt{n}$, so going from five pairs to ten narrows it by about a third ($1 - 1/\sqrt{2} \approx 0.29$), and from
+w ∝ 1/√n, so going from five pairs to ten narrows it by about a third (1 − 1/√2 ≈ 0.29), and from
 ten to forty by half again. On shared cloud runners, ten pairs of a 900 s window typically put the interval on a cluster's
 work inside the line at about ±10 points of native and on its 95th-percentile response time at ±15 to ±30 points: wide
 intervals, which clear zero only when the effect is tens of percent. A gauge computed from a declared formula over counts
@@ -2929,23 +2929,23 @@ whose own distribution is the served requests' distribution; keep the feed as de
 rows every five seconds; a feed thinner than twenty rows a minute leaves the governor's give-back trials short of
 samples, and the audit shows them as `trial abandoned (too little work)`, section 20.8); and never smooth. A metrics
 system stores counters and histograms, not single requests, so the adapter works in windows. For each window of length
-$\Delta$ ending at time $t$:
+Δ ending at time t:
 
-1. Read the count of requests served in the window, $n_{ok}$, and the count failed, $n_{fail}$, from the request
+1. Read the count of requests served in the window, n[ok], and the count failed, n[fail], from the request
    counter's increase over exactly that window (not a rate over a longer one).
-2. If $n_{ok} > 0$, read the served requests' quantiles $q_{0.05}, q_{0.15}, \dots, q_{0.95}$ (the midpoints of ten
+2. If n[ok] > 0, read the served requests' quantiles q[0.05], q[0.15], …, q[0.95] (the midpoints of ten
    equal shares of the requests) from the response-time histogram's bucket increases over the same window, and write one
-   row with `ok` $= 1$ for each. Each row then stands for a tenth of the window's served requests, so the rows' own mean
+   row with `ok` = 1 for each. Each row then stands for a tenth of the window's served requests, so the rows' own mean
    and percentiles are the window's, to the precision of the histogram's buckets.
-3. Write one row with `ok` $= 0$ for each failure, up to a cap (twenty a window is enough for the governor to see a
+3. Write one row with `ok` = 0 for each failure, up to a cap (twenty a window is enough for the governor to see a
    failing service; the receipt counts failures from its own probe or the service's own logs, not from the adapter).
 
-$\Delta$ must be at least twice the metrics system's scrape interval, or the counter's increase over it is undefined
+Δ must be at least twice the metrics system's scrape interval, or the counter's increase over it is undefined
 (two samples are needed); with a 15-second scrape, a 30-second window read every 15 seconds gives forty rows a minute.
 
-With Prometheus and the NGINX ingress controller, for example, $n_{ok}$ and $n_{fail}$ are the increases of
+With Prometheus and the NGINX ingress controller, for example, n[ok] and n[fail] are the increases of
 `nginx_ingress_controller_requests` (status below 500, and 500 and above) for the service's ingress over the window, and
-the quantile $q$ is `histogram_quantile(q, sum by (le) (increase(nginx_ingress_controller_request_duration_seconds_bucket[30s])))`.
+the quantile q is `histogram_quantile(q, sum by (le) (increase(nginx_ingress_controller_request_duration_seconds_bucket[30s])))`.
 A histogram's buckets bound the precision of every quantile: a service whose line is 500 ms needs buckets around 250, 400,
 500 and 750 ms, or the quantiles jump between bucket edges and the governor reads steps that are not there. A service
 mesh (Istio, Linkerd) exports the same two series under its own names; the application's own histogram is the closest measurement of all
@@ -3155,17 +3155,17 @@ the only measurement of how much of it the governor takes while the line holds.
 
 ### 24.1 Where the bill of a governed pool comes from
 
-In every provider's on-demand pricing, a work pool's compute bill over a period $T$ is the sum, over the machines that
+In every provider's on-demand pricing, a work pool's compute bill over a period T is the sum, over the machines that
 existed in it, of each machine's price per hour times the hours it existed:
 
-$$B = \sum_{m} p_m \, h_m , \qquad h_m = \int_0^T \mathbf{1}[\,m \text{ exists at } t\,]\, dt .$$
+B = Σₘ pₘ hₘ, hₘ = ∫₀ᵀ 1[m exists at t] dt .
 
-For a pool of one machine family at list price $p$, this is $B = p \int_0^T N(t)\, dt$, where $N(t)$ is the number of
-machines in the pool at time $t$. The cloud mode lowers $B$ in one way only: it makes machines exist for fewer hours. It
+For a pool of one machine family at list price p, this is B = p ∫₀ᵀ N(t) dt, where N(t) is the number of
+machines in the pool at time t. The cloud mode lowers B in one way only: it makes machines exist for fewer hours. It
 parks a machine (a `PreferNoSchedule` taint, chapter 19), marks that machine's pods first to go
 (`controller.kubernetes.io/pod-deletion-cost`), so that the next scale-down of the service's own HPA removes them first,
 and leaves the machine to empty; the cloud's own cluster autoscaler then deletes the empty machine on its own schedule.
-Every term of $B$ that the governor reduces is a machine the cluster autoscaler deleted. Two consequences follow, and an
+Every term of B that the governor reduces is a machine the cluster autoscaler deleted. Two consequences follow, and an
 implementer plans with both:
 
 1. **The saving is realised by the cluster autoscaler.** A parked machine still exists, and is still billed, until the
@@ -3177,51 +3177,51 @@ implementer plans with both:
 
 ### 24.2 The room: an upper bound on what any machine lever can save
 
-Define, for each sampling instant $t$ of the governed pools:
+Define, for each sampling instant t of the governed pools:
 
-- $N(t)$: the machines in the pools;
-- $Q_{c}(t)$ and $Q_{m}(t)$: the processor and memory **requests** of the pods running on them, DaemonSet pods excluded
+- N(t): the machines in the pools;
+- Q[c] (t) and Qₘ(t): the processor and memory **requests** of the pods running on them, DaemonSet pods excluded
   (a DaemonSet runs one pod on every machine whatever the count, so it is a per-machine overhead, not work);
-- $C_{c}$ and $C_{m}$: one machine's allocatable processor and memory (`kubectl get node <name> -o
+- C[c] and Cₘ: one machine's allocatable processor and memory (`kubectl get node <name> -o
   jsonpath='{.status.allocatable}'`) less the requests of the DaemonSet pods on it;
-- $N_{f}$: the floor of machines in service (`--min-nodes`, never fewer than 2).
+- N[f]: the floor of machines in service (`--min-nodes`, never fewer than 2).
 
-The fewest machines that could hold the pods' requests at instant $t$, packing perfectly, is
+The fewest machines that could hold the pods' requests at instant t, packing perfectly, is
 
-$$N_{req}(t) = \max\!\left(N_{f},\ \left\lceil \max\!\left(\frac{Q_{c}(t)}{C_{c}},\ \frac{Q_{m}(t)}{C_{m}}\right) \right\rceil\right),$$
+N[req] (t) = max(N[f], ⌈max((Q[c] (t))/(C[c]), Qₘ(t)/Cₘ)⌉),
 
 and the **room** over the period is the machine-hours above it:
 
-$$R = \int_0^T \big(N(t) - N_{req}(t)\big)^{+}\, dt \;\approx\; \sum_{k} \Delta t \,\big(N(t_k) - N_{req}(t_k)\big)^{+} ,$$
+R = ∫₀ᵀ (N(t) − N[req] (t))⁺ dt ≈ Σₖ Δ t (N(tₖ) − N[req] (tₖ))⁺,
 
-where $(x)^{+} = \max(x, 0)$ and $\Delta t$ is the sampling interval. $R$ is an upper bound for three reasons, each of
+where (x)⁺ = max(x, 0) and Δ t is the sampling interval. R is an upper bound for three reasons, each of
 which a real cluster exhibits: perfect packing is not achievable (pods have affinity rules, topology spread constraints
 and sizes that do not tile a machine); the scheduler places pods by its own scoring, not by packing; and a machine that is
 parked must also empty before the cloud deletes it. The cloud mode never asks the cloud for a machine and never holds more
-pods than native's autoscaler gives it, so the governed pool can never fall below $N_{req}$ by the governor's action, and
+pods than native's autoscaler gives it, so the governed pool can never fall below N[req] by the governor's action, and
 it does not try to: every machine it parks first passes its own trial against the line.
 
-**The billable room.** Where the company holds a commitment that pays for $K$ machines of the family whether they exist or
-not (section 24.5), only machine-hours above $K$ reach the bill:
+**The billable room.** Where the company holds a commitment that pays for K machines of the family whether they exist or
+not (section 24.5), only machine-hours above K reach the bill:
 
-$$R_{\$} = p \sum_{k} \Delta t\, \Big(N(t_k) - \max\big(K,\ N_{req}(t_k)\big)\Big)^{+} .$$
+R[$] = p Σₖ Δ t (N(tₖ) − max(K, N[req] (tₖ)))⁺ .
 
 **The governor's own floor.** The governor never parks a machine that would leave the processor requests of the pods
 on the machines in service, with the spare of its `--headroom` setting (half again, by default; Appendix K), or their
-processor in use, without a place. With $Q'_{c}(t)$ the requests of every pod on the machines in service (DaemonSet pods
-included), $U_{c}(t)$ the processor in use, and $C'_{c}$ one machine's allocatable processor, it keeps at least
+processor in use, without a place. With Q′[c] (t) the requests of every pod on the machines in service (DaemonSet pods
+included), U[c] (t) the processor in use, and C′[c] one machine's allocatable processor, it keeps at least
 
-$$N_{gov}(t) = \max\!\left(N_{f},\ \left\lceil \frac{(1+h)\,Q'_{c}(t)}{C'_{c}} \right\rceil,\ \left\lceil \frac{U_{c}(t)}{C'_{c}} \right\rceil\right), \qquad h = 0.5 ,$$
+N[gov] (t) = max(N[f], ⌈((1+h) Q′[c] (t))/(C′[c])⌉, ⌈(U[c] (t))/(C′[c])⌉), h = 0.5,
 
-so the room the cloud mode can take is at most $R_{gov} = \int_0^T (N(t) - N_{gov}(t))^{+}\,dt \le R$. A pool whose pods'
-requests, with half again to spare, already fill the machines the cluster autoscaler keeps has $R_{gov} = 0$: there is
+so the room the cloud mode can take is at most R[gov] = ∫₀ᵀ (N(t) − N[gov] (t))⁺ dt ≤ R. A pool whose pods'
+requests, with half again to spare, already fill the machines the cluster autoscaler keeps has R[gov] = 0: there is
 nothing to park, and a paired run on it reads EVEN on the bill, correctly.
 
 **An arithmetic illustration (not a measurement).** A pool holds 12 machines from 08:00 to 20:00 and 8 machines
 overnight; the pods' requests need 9 machines at the day's level and 3 overnight; the floor is 2 and there is no
-commitment. Then $R = 12\,\text{h} \times (12 - 9) + 12\,\text{h} \times (8 - 3) = 36 + 60 = 96$ machine-hours a day.
+commitment. Then R = 12 h × (12 − 9) + 12 h × (8 − 3) = 36 + 60 = 96 machine-hours a day.
 The overnight trough holds almost two thirds of the room; a paired run made only at the day's level could show at most
-36 of the 96, and a run at a steady peak where $N = N_{req}$ could show none. The illustration's numbers are invented to
+36 of the 96, and a run at a steady peak where N = N[req] could show none. The illustration's numbers are invented to
 show the arithmetic; the company's own samples replace them.
 
 ### 24.3 Measuring the room on the company's own cluster
@@ -3273,7 +3273,7 @@ print(f"{len(rows) * DT_H:.0f} h sampled: room {room:.0f} machine-hours, billabl
 ```
 
 The constants `C_CPU`, `C_MEM` and `C_ALLOC` above are placeholders for a machine with four virtual processors; each
-installation reads its own. The use term of $N_{gov}$ is left out of the script, because on a pool that holds its
+installation reads its own. The use term of N[gov] is left out of the script, because on a pool that holds its
 requests it rarely binds; it can be added from `kubectl top nodes`. The same rows, plotted by hour of the week, show where the room lives, and so which load the paired run
 must carry (section 24.6).
 
@@ -3311,9 +3311,9 @@ that changes the profile between arms is not a paired run.
 | Pricing term | What a deleted machine-hour saves | Planning rule |
 |---|---|---|
 | On-demand, billed by the second or the minute (the common case on all three providers; read the provider's own page for the machine family) | its full price | the billable room is the room |
-| A reservation, committed-use discount or savings plan covering $K$ machines of the family | nothing below $K$; the full price above $K$ | size commitments to the governed pool's floor and trough, not its peak; $R_{\$}$ of section 24.2 |
+| A reservation, committed-use discount or savings plan covering K machines of the family | nothing below K; the full price above K | size commitments to the governed pool's floor and trough, not its peak; R[$] of section 24.2 |
 | Spot or preemptible | the spot price | govern the on-demand pools first; a spot pool's machines can vanish on the provider's notice, governor or not |
-| Software licensed per machine or per core (a commercial operating system, an agent billed per node) | that licence too, where it is billed by the hour the machine exists | add it to $p$ |
+| Software licensed per machine or per core (a commercial operating system, an agent billed per node) | that licence too, where it is billed by the hour the machine exists | add it to p |
 | The cluster's own fee (the control plane), storage, network egress, load balancers | nothing | never in the bill rows of a receipt; the cloud mode moves none of them |
 
 The bill rows of a receipt (section 19.6) price machine-hours at the provider's list price for the family, because list
@@ -3324,7 +3324,7 @@ machine-hours; finance converts the machine-hour row to the company's own price 
 
 | Shape of the company's load | Where the room lives | The paired run that can show it |
 |---|---|---|
-| Steady at a level the pool was sized for | nowhere: $N \approx N_{req}$ | none; a steady run reads EVEN on the bill, honestly, and is still worth running for the response-time and alert rows |
+| Steady at a level the pool was sized for | nowhere: N ≈ N[req] | none; a steady run reads EVEN on the bill, honestly, and is still worth running for the response-time and alert rows |
 | A daily cycle (business hours, consumer evenings) | the trough and the descent after the peak | a replay of the company's own day, compressed only as far as the autoscaler's profile allows (a 10-minute unneeded time cannot be compressed below 10 minutes), or the repository's own day-shaped load (the Google 2011 trace on one to nine load generators) |
 | Bursts separated by quiet stretches | between bursts, as native's autoscaler holds machines through its scale-down delay | the burst steps of the service's own traffic; in the repository, the burst sets of section 19.6 |
 | A weekly cycle with a quiet weekend | the weekend | a run long enough to include a quiet stretch as long as the profile's scale-down time several times over |
@@ -4509,7 +4509,7 @@ pods it started), not to be counted for or against it.
 | Cloud: every decision shows the feed blind | the probe cannot reach the service (its URL, a network policy, the service's port), or the adapter's queries return nothing | `kubectl -n omni-compass logs deploy/omni-compass -c probe` (or `-c feed`); test the URL from the pod; check the network policy (section 26.5) and, for the adapter, run each query in the metrics system's own console |
 | Cloud: `trial abandoned (too little work)` in most `verdict` records | the feed is thinner than twenty rows a minute, or the service is idle | densify the feed (section 22.1); at an idle service, nothing is given back on trial, by design |
 | Cloud: `step refused: the muscle is slower there` in most `verdict` records | the service is slower without the machine | the governor is right to keep it; the pool has no room at this load (section 24.2) |
-| Cloud: the governor parks nothing for days and its trials are never begun | the pool already holds only what the pods' requests need with the governor's spare, or the floor is the pool | read $N_{gov}$ from the room sampler (section 24.3); EVEN on the bill is then the honest receipt |
+| Cloud: the governor parks nothing for days and its trials are never begun | the pool already holds only what the pods' requests need with the governor's spare, or the floor is the pool | read N[gov] from the room sampler (section 24.3); EVEN on the bill is then the honest receipt |
 | Cloud: `refused` records with code 1 on every park | the machines role is not bound, or an admission policy refuses the taint | `kubectl auth can-i patch nodes --as=system:serviceaccount:omni-compass:omni-compass`; the policy's message names the rule (section 26.4) |
 | Cloud: a parked machine is never deleted though its pods are gone | the cluster autoscaler's unneeded time is long, a DaemonSet or a pod it will not move remains, or a PodDisruptionBudget allows no disruption | read the autoscaler's own status (its config map or events, `kubectl -n kube-system describe configmap cluster-autoscaler-status`) for the machine's reason (section 24.4) |
 | Cloud: the audit is empty after a restart | the audit was on the pod's `emptyDir` | mount a persistent volume at `/var/log/omni` and ship the file (section 20.4) |

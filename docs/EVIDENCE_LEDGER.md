@@ -26,13 +26,13 @@ id `29d9808dfb8f…`; the printed configuration `printed_eight_line`, id `cd333d
 | Class | Statement | Where |
 |---|---|---|
 | T | Unsaturated, the U-channel error obeys de/dt = −KP e; V = e²/2 has dV/dt = −KP e² < 0 for e ≠ 0 (inside Omega_unsat only). | `docs/TRACKING_THEOREM.md` Thm 1 |
-| T | With the U drift bounded by F_bar < u_max, V decreases wherever e ≠ 0, saturated or not; e never changes sign; saturated stretches end in bounded time (continuous time). | Thm 2 |
-| T | On the declared parameter box, F_bar = 16.86 < 25, so Thm 2 holds over the whole box in continuous time. | Thm 2 |
-| T | The sampled controller (u held through each RK4 step) satisfies e_(k+1) = 0.88 e_k + d_k, hence abs(e_k) <= 0.88^k abs(e_0) + epsilon_h (1 − 0.88^k)/0.12. | Thm 3 |
+| T | With the U drift bounded by F[bar] < u[max], V decreases wherever e ≠ 0, saturated or not; e never changes sign; saturated stretches end in bounded time (continuous time). | Thm 2 |
+| T | On the declared parameter box, F[bar] = 16.86 < 25, so Thm 2 holds over the whole box in continuous time. | Thm 2 |
+| T | The sampled controller (u held through each RK4 step) satisfies e_(k+1) = 0.88 eₖ + dₖ, hence abs(eₖ) <= 0.88^k abs(e₀) + epsilon_h (1 − 0.88^k)/0.12. | Thm 3 |
 | V | epsilon_h = 0.00378 over every micro step of the 500 frozen fixtures (nearest target); ultimate bound 0.0315 < BASIN_TOL 0.10. Wrong target: 0.0243, bound 0.20 (wider than the basin). | `results/TRACKING_BOUNDS.json` |
 | V | The discrete execution dithers inside that band: abs(e) grew on 27 061 of 100 000 micro steps; e changed sign 747 times. The continuous monotone decay is not inherited. | same |
 | V | Saturated micro steps: 0 of 100 000 (nearest target), 5 of 100 000 (wrong target). | same |
-| T | The admissible box A (E interval, abs(U − sigma) <= abs(U0 − sigma), S between S0 and S_plus) is forward invariant in continuous time. | Thm 4 |
+| T | The admissible box A (E interval, abs(U − sigma) <= abs(U0 − sigma), S between S0 and S[plus]) is forward invariant in continuous time. | Thm 4 |
 | V | Discrete invariance of A: 0 failures over 100 000 micro steps of the frozen fixtures, both targets. | `results/TRACKING_BOUNDS.json` |
 | O | Discrete invariance and epsilon_h proved over the whole box (interval arithmetic). | — |
 | O | Global stability of the forced six-state system. | `docs/FORMAL_STATUS.md` |

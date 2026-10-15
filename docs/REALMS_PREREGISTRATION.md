@@ -338,7 +338,7 @@ The labelling rule gains the mirror of ENERGY IMPROVEMENT WITH SERVICE TRADEOFF:
 before, and every other label keeps its definition.
 
 Also in this amendment: an effort cap on a motion axis moves only where the copper loss it saves at full acceleration,
-(J a_max / kt)^2 R, exceeds the standing draw a longer move pays, p_idle + b v_max^2 (a reaction wheel; not traction, a
+(J a[max] / kt)^2 R, exceeds the standing draw a longer move pays, p[idle] + b v[max]^2 (a reaction wheel; not traction, a
 flight axis or a robot joint). The machine-release margin on node pools is 0.3, the largest at which no pool is later than
 native (`results/realms/RELEASE_MARGIN_SWEEP.md`, the per-muscle sweep).
 

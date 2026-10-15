@@ -33,8 +33,15 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v5 at the max (v3, v2 and v1 kept for their results)
+## The engine: Omni v6 stands, v7 under test (v5, v3, v2 and v1 kept for their results)
 
+- **Omni v6** (`OMNI_V6.json`, `docs/OMNI_V6.md`, 15 October) stands on main: v5's law and catalog unchanged, plus the
+  shared-host capacity repair (on kind every node is a container on one runner: its processor is counted once and no
+  replica is added while that runner is 75% busy or unread, `omni_controller/capacity.py`). **Omni v7** is the
+  candidate on branch `v7-candidate` (pull request #13 carried into it): conveyance bounded by each namespace's CPU
+  quota (omni_controller/quota.py on that branch), one processor conveyed once, and no limit raised while a pod starts
+  (docs/OMNI_V7.md on that branch; found from the v6 KEDA table's pod start wait). It goes on main only when its live trials show no
+  LOSS; then everything reruns on it.
 - `OMNI_V5.json` and `docs/OMNI_V5.md`: the max (`realms/compass_arm_v5.py`, `V5CFG`) on the 1,107-muscle catalog, the
   bone inside every organism with the living body's immune system (V6-V13, `docs/FORMAL_V5.md` section 4: native twins
   of every room, the heat debt, batteries timed for their lines, nothing locked), every muscle its own card
@@ -42,8 +49,8 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v5, omni-v3, omni-v2,
-  omni-v1, or what differs.
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v6, omni-v5, omni-v3,
+  omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
   1.0, never as a second product.
@@ -70,8 +77,10 @@ the founder overrides one in the conversation.
   `stack_1226` are read as aliases.
 - The grid: each organism runs native and omni at 1, 10 and 100 clustered copies (one organism, ten of the same
   organism, a hundred) × 1, 10 and 100 runs: 54 squares, modelled and with the real cluster inside, with both values shown
-  in every square. **1, 10 and 100 only** (the founder's order of 12 October, to cut the time and the bill): no 1,000
-  copies and no 1,000 runs anywhere; the whole grid runs on GitHub's own machines and nothing is rented for it. Every grid
+  in every square. **1, 10 and 100** (the founder's order of 12 October, to cut the time and the bill); on 15 October
+  the founder drew the line between free and paid (relayed in commit `9f455da7e`): GitHub's own free machines may also
+  run 1,000 copies and 1,000 runs, and every paid machine (a cloud, a GPU) stays at 1, 10 and 100 with at most 100
+  repetitions; the whole grid runs on GitHub's own machines and nothing is rented for it. Every grid
   button starts all three sizes × all three run counts and uses every runner GitHub gives. The conductor
   (`scripts/dispatch_grid.py`, `grid.yml` every 15 minutes; the six and six-kube buttons with their defaults) starts every
   run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what
@@ -166,8 +175,9 @@ the founder overrides one in the conversation.
 - **Every fix realigns everything, on every push.** When code changes or a bug is fixed, everything that describes it is
   brought up to it in the same push: the manual and its PDF, the README, the index, the tables, the plans and the
   standing pages. Then the newest-engine material is scanned top to bottom for the retired words and the old ways
-  (better/worse, brake, bowl, "confirmed", "simulation" for our own models, standalone or competitor arms, 1,000 copies,
-  power given called a loss) and anything found is fixed before the push. Old material stays where it is.
+  (better/worse, brake, bowl, "confirmed", "simulation" for our own models, standalone or competitor arms, 1,000 copies
+  on a paid machine, power given called a loss, LaTeX markup) and anything found is fixed before the push. Old material
+  stays where it is.
 - **The factory tune** is declared and disclosed (`DISCLOSURES.md`, section 3; the README; the manual's notice): the engine
   is presented as the owner tuned it and ships it, self-running, set at the factory; every muscle wired on its own setting
   (its card, or the engine's setting); no setting universal; any licensee may then add on, retune, upgrade or tune down
@@ -189,7 +199,10 @@ the founder overrides one in the conversation.
     CTOs, principal engineers, physicists and mathematicians who will wire Omni-Compass onto a whole company's stack: the
     exact terms of control engineering, software engineering, physics and mathematics, used precisely and defined where
     they first appear, so that no reader can mistake what is stated, what is measured or how to wire it. Formulas are
-    written in LaTeX (`$...$`, `$$...$$`) in the markdown.
+    written in Unicode (the founder's order of 15 October: "it's got to be Unicode", for printing and for the engineers
+    who wire and code it): w ∝ 1/√n, xᵢ,ₖ₊₁ = fᵢ(xᵢ,ₖ, …), Σ, ≤, ⌈·⌉, never LaTeX markup (`$`, backslash commands,
+    `_{}`) in any page, so one line reads the same on GitHub, in a terminal, in code and on paper; a letter Unicode has no
+    subscript for is written x[i].
   - Before a document is finished, audit it like a referee: equation and theorem numbers, cross-references, undefined
     symbols, repeated claims, and every claim backed by the text. No padding: every addition must earn its place.
   - In chat: no greetings, no echoing the request, no sign-offs; no follow-up questions (decide and do it); do what can be
