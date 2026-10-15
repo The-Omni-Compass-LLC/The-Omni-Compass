@@ -102,8 +102,10 @@ def index_part():
     if not d:
         return ["The Omni index: not built in this checkout (python3 tools/omni_index.py)."]
     h, s = d.get("headline_pct"), d.get("service_headline_pct")
+    sheet = load("results/BENEFIT_SHEET.json") or {}
+    eng = next((r.get("engine") for r in sheet.get("rows", []) if r.get("file") == "results/OMNI_INDEX.md"), None) or "the engines named in its tables"
     out = [f"The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run "
-           f"tables of engines v1 and v3, each named in its table): {pct(h)} {word_of_pct(h, s is not None and s < -0.05)} on the "
+           f"tables of {eng}, each named in its table): {pct(h)} {word_of_pct(h, s is not None and s < -0.05)} on the "
            f"resource reading (work, speed, machines, energy), {pct(s)} {word_of_pct(s, True)} on the service reading (work and "
            "speed alone). Source: results/OMNI_INDEX.md."]
     for c, v in sorted((d.get("categories") or {}).items(), key=lambda kv: -(kv[1] or 0)):
@@ -117,10 +119,22 @@ def benefit_part():
     if not d:
         return ["The benefit sheet: not built in this checkout (python3 tools/benefit_sheet.py)."]
     out = ["Every benchmark, one number and its word (source: docs/BENEFIT_SHEET.md; class in brackets):"]
-    for r in d.get("rows", []):
+    for r in by_engine(d.get("rows", [])):
         n = r.get("pct")
-        out.append(f"  {r.get('benefit', '?'):<18} {pct(n):>9}  {r['benchmark']} [{evidence(r['benchmark'])}]")
+        out.append(f"  {r.get('benefit', '?'):<18} {pct(n):>9}  {r['benchmark']} [{evidence(r['benchmark'])}; {r.get('engine', 'engine not named')}]")
     return out
+
+
+def newest_engine():
+    """The engine on this checkout as a name, omni-vN (None where the version tool cannot say)."""
+    m = re.match(r"(omni-v\d+)", engine_line())
+    return m.group(1) if m else None
+
+
+def by_engine(rows):
+    """The benefit sheet's rows, those on the engine that stands first (their own order kept within each group)."""
+    new = newest_engine()
+    return [r for r in rows if new and r.get("engine") == new] + [r for r in rows if not (new and r.get("engine") == new)]
 
 
 def wiring_part():
@@ -221,9 +235,14 @@ def standing_block():
     L += ["  - " + x.strip() for x in ip[1:]]
     d = load("results/BENEFIT_SHEET.json") or {}
     if d.get("rows"):
-        L += ["", "| Benchmark | Its one number | Its word | Class |", "|---|---:|---|---|"]
-        for r in d["rows"]:
-            L.append(f"| {r['benchmark']} | {pct(r.get('pct'))} | {r.get('benefit', '')} | {evidence(r['benchmark'])} |")
+        new = newest_engine()
+        on_new = [r for r in d["rows"] if new and r.get("engine") == new]
+        L += ["", f"**On the engine that stands ({new or 'unknown'}): {len(on_new)} of {len(d['rows'])} benchmarks so far.** "
+              "Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands "
+              "(`scripts/reruns.txt`); results are never read across engines.",
+              "", "| Benchmark | Engine | Its one number | Its word | Class |", "|---|---|---:|---|---|"]
+        for r in by_engine(d["rows"]):
+            L.append(f"| {r['benchmark']} | {r.get('engine', 'not named')} | {pct(r.get('pct'))} | {r.get('benefit', '')} | {evidence(r['benchmark'])} |")
     L += ["", OWN_RUNS, "", BLOCK_END]
     return "\n".join(L)
 

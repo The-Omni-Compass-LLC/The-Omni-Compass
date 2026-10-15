@@ -15,7 +15,7 @@ or filing states the equations differently, this page and the file it fingerprin
 | Fingerprint | SHA-256 of `omnicompass/core.py`, recorded in `results/PREREGISTRATION.json` and `RELEASE_MANIFEST.json`; checked by `verify.py` |
 | Evidence | every simulation, benchmark, live Kubernetes run and GPU harness in this repository |
 
-State: E (deviation), U (coherence), I_U (unmet-need integral), S (structural stress), B and B_dot (the bath).
+State: E (deviation), U (coherence), I[U] (unmet-need integral), S (structural stress), B and Ḃ (the bath).
 
 ```
 v_eff  = cos(omega_B t / 2) · c · tanh(lambda_0 + lambda_1 (U − 0.5) + lambda_2 S)        (spinor closure, 720°)
@@ -33,7 +33,7 @@ macro and micro steps of `omnicompass/core.py`.
 ### Mechanism identity
 
 `results/MECHANISM_IDENTITY.json` (`tools/mechanism_identity.py`) fingerprints the mechanism
-M = (F, Theta, C, h, G, M_act, dt, A) component by component: state law, parameters, controller, observation map,
+M = (F, Theta, C, h, G, M[act], dt, A) component by component: state law, parameters, controller, observation map,
 authority law, actuator map, execution timing, shield. `verify.py` fails if any component changes without the record
 being rewritten. Every evidence claim names the mechanism id that produced it; "the eight-line engine" alone names none.
 
@@ -68,7 +68,7 @@ dS/dt, dB/dt, dB_dot/dt as in section 1
 ```
 
 Differences from the canonical engine: logistic U instead of the symmetric double well; no spinor factor; a general
-target U_t; no lambda_I damping; alpha in place of alpha_E. alpha_U and k enter the printed form; they do not enter the
+target Uₜ; no lambda_I damping; alpha in place of alpha_E. alpha_U and k enter the printed form; they do not enter the
 canonical engine.
 
 ## 3. What would change this declaration
@@ -82,9 +82,9 @@ preregistration amended on record (`results/LOCK_AMENDMENTS.json`). Until then t
 
 - A global stability proof of the forced six-state system is not closed. What is held on the U channel is proved in
   `docs/TRACKING_THEOREM.md`: unsaturated exponential tracking; the saturated case under a drift bound that holds over
-  the declared box (F_bar = 16.86 < 25); the sampled-data bound of the executed RK4 controller; admissibility.
+  the declared box (F[bar] = 16.86 < 25); the sampled-data bound of the executed RK4 controller; admissibility.
 - Candidate routes: the Unified Circle Principle on a region; Theorem 5.6 of the Closed Structure, if its core maps onto
-  (E, U, I_U, S, B).
+  (E, U, I[U], S, B).
 
 ## 5. For filings
 

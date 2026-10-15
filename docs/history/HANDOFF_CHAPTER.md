@@ -24,7 +24,7 @@ the pods, the job. Omni reads a meter, writes one lever, and puts that lever bac
 | The chapter says | The code today | Check |
 |---|---|---|
 | Omni reads the plant's meters and maps them to the state E, U, S | `omnicompass/adapter.py`, `observe_vector` and `assimilate` | matches |
-| It computes the drift with the command at zero, then raw = −drift + K_P·(σ − U), clipped to the authority before the step | `omnicompass/core.py`, `control_command`: `u = clip(−f_U(x,t) + KP·(σ − U), ±U_AUTHORITY)` | matches |
+| It computes the drift with the command at zero, then raw = −drift + K[P]·(σ − U), clipped to the authority before the step | `omnicompass/core.py`, `control_command`: `u = clip(−f_U(x,t) + KP·(σ − U), ±U_AUTHORITY)` | matches |
 | It holds that same u through every RK4 stage and does not rewrite U afterwards | `core.py`, `macro_step`: one `u` per micro step, passed unchanged into all four RK4 stages; U is never overwritten | matches (proved: `docs/TRACKING_THEOREM.md`) |
 | It writes the clipped command u to the lever | **Not today.** The frozen live governor runs the engine with u = 0 (`macro_step(..., target=None)`) and uses u only as its convergence signal (`push = u / U_AUTHORITY`). The lever is set by the allocation law and the nervous system's authority (`omnicompass/nervous_system.py`). | **design aim**, see "What to strengthen" |
 | On exit it restores the lever | kill switch: `omni_controller/controller.py` restore; the GPU bench restores and reads back the start limit; the realm harness checks every knob is handed back | matches |

@@ -529,7 +529,7 @@ installed is a quarter off the bill.
   - the organisms under the climb load: Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
   - the organisms under the line load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of engines v1 and v3, each named in its table): +5.2% GAIN on the resource reading (work, speed, machines, energy), +12.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v3, each named in its table): +5.2% GAIN on the resource reading (work, speed, machines, energy), +12.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +31.8% GAIN
   - Real database cache (MongoDB under YCSB, GitHub): +1.7% GAIN
   - Real database (PostgreSQL behind PgBouncer, GitHub): +0.9% GAIN
@@ -537,32 +537,36 @@ installed is a quarter off the bill.
   - Real cache (Redis, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-| Benchmark | Its one number | Its word | Class |
-|---|---:|---|---|
-| Every real test together: the Omni index | +5.2% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | +59.5% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | +27.5% | GAIN, power given | L |
-| The six organisms with the real cluster inside, 10 and 100 copies | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
-| The big organisms with the real cluster inside, 1,000 copies on Azure | +155.0% | GAIN | L, the cluster; S, the organism around it |
-| The 945 modelled muscles as one tower, every muscle written at once | +0.3% | GAIN | S |
-| Robustness: the two-hour run | +0.0% | EVEN | L |
-| Robustness: the governor killed outright mid-run | +8.6% | GAIN | L |
-| Robot arms (MuJoCo), the three untouched robots | +3.8% | GAIN | S |
-| Redis, the cache's memory ceiling | +0.0% | EVEN | L |
-| Real Kubernetes, steady work | +30.5% | GAIN | L |
-| Real Kubernetes, faults | +36.6% | GAIN | L |
-| Real Kubernetes, demand that wanders | +37.0% | GAIN | L |
-| Real Kubernetes, all four at once | +41.7% | GAIN | L |
-| Real Kubernetes, a queue of jobs | +16.5% | GAIN | L |
-| Real Kubernetes, a public day of demand (Google 2011) | +46.4% | GAIN | L |
-| Real Kubernetes, a noisy neighbour | +0.0% | EVEN | L |
-| Power grids (SimBench), both load models | +5.8% | GAIN, power given | S |
-| PostgreSQL, the pooler's pool size | +0.9% | GAIN, power given | L |
-| MySQL, the buffer pool's size | +0.0% | EVEN | L |
-| MongoDB, the storage engine's cache size | +1.7% | GAIN | L |
-| Kafka, the consumer group's size | +0.1% | GAIN | L |
-| Drone swarms, the three untouched cells | +5.9% | GAIN | S |
-| Buildings and batteries (CityLearn), the districts with batteries | +0.8% | GAIN AND LOSS | S |
+**On the engine that stands (omni-v6): 4 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+
+| Benchmark | Engine | Its one number | Its word | Class |
+|---|---|---:|---|---|
+| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v6 | +54.0% | GAIN, power given | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v6 | +0.0% | EVEN | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +105.0% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +15.0% | GAIN, power given | L |
+| Every real test together: the Omni index | omni-v3 | +5.2% | GAIN, power given | L |
+| The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
+| The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
+| The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
+| Robustness: the two-hour run | omni-v3 | +0.0% | EVEN | L |
+| Robustness: the governor killed outright mid-run | omni-v3 | +8.6% | GAIN | L |
+| Robot arms (MuJoCo), the three untouched robots | omni-v3 | +3.8% | GAIN | S |
+| Redis, the cache's memory ceiling | omni-v3 | +0.0% | EVEN | L |
+| Real Kubernetes, steady work | omni-v3 | +30.5% | GAIN | L |
+| Real Kubernetes, faults | omni-v3 | +36.6% | GAIN | L |
+| Real Kubernetes, demand that wanders | omni-v3 | +37.0% | GAIN | L |
+| Real Kubernetes, all four at once | omni-v3 | +41.7% | GAIN | L |
+| Real Kubernetes, a queue of jobs | omni-v3 | +16.5% | GAIN | L |
+| Real Kubernetes, a public day of demand (Google 2011) | omni-v3 | +46.4% | GAIN | L |
+| Real Kubernetes, a noisy neighbour | omni-v3 | +0.0% | EVEN | L |
+| Power grids (SimBench), both load models | omni-v3 | +5.8% | GAIN, power given | S |
+| PostgreSQL, the pooler's pool size | omni-v3 | +0.9% | GAIN, power given | L |
+| MySQL, the buffer pool's size | omni-v3 | +0.0% | EVEN | L |
+| MongoDB, the storage engine's cache size | omni-v3 | +1.7% | GAIN | L |
+| Kafka, the consumer group's size | omni-v3 | +0.1% | GAIN | L |
+| Drone swarms, the three untouched cells | omni-v3 | +5.9% | GAIN | S |
+| Buildings and batteries (CityLearn), the districts with batteries | omni-v3 | +0.8% | GAIN AND LOSS | S |
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
@@ -941,10 +945,10 @@ The theory sets five requirements on any law that claims to close the circle:
 
 | Requirement | Meaning | In the engine |
 |---|---|---|
-| Finite deviation | the distance from the admissible state has a ceiling, abs(E) <= E_max | the deviation state E drains faster than it can fill |
+| Finite deviation | the distance from the admissible state has a ceiling, abs(E) <= E[max] | the deviation state E drains faster than it can fill |
 | Finite curvature | the landscape the state moves on has no infinite slopes or pits | the drive is bounded by tanh; the authority is clipped |
 | Global conservation | what flows in is matched by what flows out | the drain and the bath's friction match the drive |
-| Recurrence | a disturbed state returns arbitrarily close to where it was | convergence to the target pole at rate K_P |
+| Recurrence | a disturbed state returns arbitrarily close to where it was | convergence to the target pole at rate K[P] |
 | One law | every subsystem obeys the same law, no special cases | one engine, one compass, every muscle |
 
 ## The closed circle tested
@@ -1079,7 +1083,7 @@ wave function of the eigenvalue equation.
 
 A basin forms in three stages. While the driving tension T is low, curvature is weak and there is no dominant basin:
 flows spread outward. As T increases, curvature concentrates and a positive feedback loop begins. Then a stable
-geometric funnel forms: self-reinforcing curvature, finite depth, bounded deviation, with the boundary abs(E) <= E_max
+geometric funnel forms: self-reinforcing curvature, finite depth, bounded deviation, with the boundary abs(E) <= E[max]
 respected. Structure emerges from fluctuation through curvature concentration and feedback.
 
 In the engine, the basin state S rolls down its potential Phi(S) to a stable bottom; in the compass, every muscle's service
@@ -1108,12 +1112,12 @@ The dual-basin engine is a recursive transform with five stages:
    the flow; compression increases toward the center.
 2. **Saturation.** At the center, two cores of negative polarity meet back to back; the basin structure S reaches its
    critical value and the curvature reaches its maximum.
-3. **Transition (ignition).** Where the cores touch, the transition operator T(X) = sigma(S - S_c) T(X) activates:
+3. **Transition (ignition).** Where the cores touch, the transition operator T(X) = sigma(S - S[c]) T(X) activates:
    compression halts and redistribution begins.
 4. **Redistribution.** Two axial jets carry the excess out along the axis, with opposite helicity to the inflow.
 5. **Reset and recurrence.** The domain relaxes and the cycle repeats.
 
-The core mathematics is a bounded flow: dX/dt = G(X, t) with abs(G(X)) <= C_G, a curvature envelope K(X) <= K_max, and
+The core mathematics is a bounded flow: dX/dt = G(X, t) with abs(G(X)) <= C[G], a curvature envelope K(X) <= K[max], and
 a redistribution term that activates only at saturation. The state X = (E, U, S, B) stays in its admissible domain,
 whose horizon boundary is forward invariant (the Nagumo condition again).
 
@@ -1256,42 +1260,42 @@ the basin. Whatever the engine reaches, it reaches by the flow of its own equati
 |---|---|
 | E | Error, the misalignment energy |
 | U | Coherence, the alignment index |
-| I_U | Information, the internal-coherence channel |
+| I[U] | Information, the internal-coherence channel |
 | S | Coherence state potential |
 | B | Bath field |
 | B' | Bath field time derivative |
 | α | Feedback rate |
-| β_int(t) | Internal forcing function |
-| β_ext(t) | External forcing function |
+| β[int](t) | Internal forcing function |
+| β[ext](t) | External forcing function |
 | k | Coherence logistic damping gain |
 | σ₁ | Coupling of error into the information channel |
 | δ | Linear coherence coupling parameter |
 | λ₀ | Saturation bias |
 | λ₁ | Saturation gain |
 | λ₂ | S-state coupling gain |
-| U_t | Target coherence state |
+| Uₜ | Target coherence state |
 | c | Limiting velocity |
-| E_max | Per-trajectory error-rate normalization scale |
-| α_s | S-potential quadratic coefficient |
-| β_s | S-potential cubic coefficient |
+| E[max] | Per-trajectory error-rate normalization scale |
+| αₛ | S-potential quadratic coefficient |
+| βₛ | S-potential cubic coefficient |
 | Φ(S) | Potential field function |
-| F_state(S) | Canonical S-state flow |
-| ω_B | Bath frequency |
-| Q_B | Bath quality factor |
-| γ_c | Bath coupling gain |
+| F[state](S) | Canonical S-state flow |
+| ω[B] | Bath frequency |
+| Q[B] | Bath quality factor |
+| γ[c] | Bath coupling gain |
 
 ## The coupling architecture of Piece I
 
 The closed feedback core is E, U and S: error drives coherence, coherence and the state drive the velocity, the
-velocity drives error. The information channel I_U and the bath B with its derivative are driven response channels:
+velocity drives error. The information channel I[U] and the bath B with its derivative are driven response channels:
 they listen to the core and record it, and the core does not depend on them. γ₁ is reserved for compatibility and is
-inactive in the Piece I derivatives. The bath law uses ω_B² B, so ω_B carries the units of angular frequency.
+inactive in the Piece I derivatives. The bath law uses ω_B² B, so ω[B] carries the units of angular frequency.
 Line (7) advances B and B' continuously by RK4. Line (8) evaluates the discrete residual with
 D²_h B[n] = (B[n+1] - 2B[n] + B[n-1]) / h² and D⁻_h B[n] = (B[n] - B[n-1]) / h.
 
 ## The spinor closure
 
-The spinor extension introduces the phase θ(t) = ω_B t and multiplies line (4) by χ(θ) = cos(θ/2). At 0 degrees the
+The spinor extension introduces the phase θ(t) = ω[B] t and multiplies line (4) by χ(θ) = cos(θ/2). At 0 degrees the
 factor is +1, at 360 degrees it is -1, and at 720 degrees it is +1 again. A full turn of the bath reverses the sign
 of the velocity; only two full turns bring it home. The standard 20-step run evaluates the part of the phase it
 reaches, and a dedicated evidence test checks the 0, 360 and 720 degree periodicity on its own.
@@ -1344,31 +1348,31 @@ recorded state, or if it exhausts the horizon without CONVEY-5.
 | Group | Parameter | Value or range |
 |---|---|---|
 | Core | α | 4.2 |
-| Core | β_int | 0.0 to 1.0 |
-| Core | β_ext | 0.0 to 1.0 |
-| Core | E_max | 1.0 to 10.0, sampled once per trajectory |
+| Core | β[int] | 0.0 to 1.0 |
+| Core | β[ext] | 0.0 to 1.0 |
+| Core | E[max] | 1.0 to 10.0, sampled once per trajectory |
 | Core | k | 1.7 |
 | Information and coupling | σ₁ | 0.38 |
 | Information and coupling | δ | 0.01 to 1.0 |
 | Information and coupling | γ₁ | 1.35, reserved, inactive in the derivatives |
-| Information and coupling | γ_c | 1.0 |
+| Information and coupling | γ[c] | 1.0 |
 | Saturation and phase | c | 0.5 to 5.0 |
 | Saturation and phase | λ₀ | -2.0 to 2.0 |
 | Saturation and phase | λ₁ | 0.1 to 3.0 |
 | Saturation and phase | λ₂ | 0.0 to 2.0 |
-| Saturation and phase | U_t | 0.5 |
-| Saturation and phase | χ(t) | cos(ω_B t / 2) when the spinor closure is on |
-| S-state potential | α_s | 0.05 to 0.25 |
-| S-state potential | β_s | 0.05 to 0.25 |
-| Bath | ω_B | 0.1 to 5.0 |
-| Bath | Q_B | 0.5 to 10.0 |
+| Saturation and phase | Uₜ | 0.5 |
+| Saturation and phase | χ(t) | cos(ω[B] t / 2) when the spinor closure is on |
+| S-state potential | αₛ | 0.05 to 0.25 |
+| S-state potential | βₛ | 0.05 to 0.25 |
+| Bath | ω[B] | 0.1 to 5.0 |
+| Bath | Q[B] | 0.5 to 10.0 |
 | Noise and drift | D | 0.0 |
 | Noise and drift | μ | 0.0 |
 
 ## The mechanism-bound reporting doctrine
 
 Every table, grid, chart, scorecard, classification and conclusion the engine emits must be computed from what it
-actually executed: the trajectory rows, the recorded state histories of E, U, I_U, S, B and B', the sampled
+actually executed: the trajectory rows, the recorded state histories of E, U, I[U], S, B and B', the sampled
 parameters, the RK4 derivative evaluations, the basin entry and dwell histories, the line (8) residuals, the solver
 comparisons, the ablations, the disturbance and stress runs, the compute benchmark event records, and the enterprise
 benchmark ledgers.
@@ -1395,32 +1399,32 @@ signed agreement creates any obligation.
 ## 9. The Engine: Eight Equations and One Control Law
 
 
-The engine (`omnicompass/core.py`, frozen and fingerprinted) carries a six-part state x = (E, U, I_U, S, B, B_dot):
+The engine (`omnicompass/core.py`, frozen and fingerprinted) carries a six-part state x = (E, U, I[U], S, B, Ḃ):
 
 | State | Meaning | Physical picture |
 |---|---|---|
 | E | deviation: how far the system is from where it should be | a tank that fills with stress and drains on its own |
 | U | alignment, between the two poles -1 and +1 | a ball in a double well: two stable poles, a hill between them |
-| I_U | memory of misalignment | an integrator that remembers and slowly forgets |
+| I[U] | memory of misalignment | an integrator that remembers and slowly forgets |
 | S | basin structure | a ball rolling to the bottom of its landscape |
-| B, B_dot | the bath | a spring with friction that absorbs and settles energy |
+| B, Ḃ | the bath | a spring with friction that absorbs and settles energy |
 
 The eight equations (Appendix C gives them in full):
 
-1. dE/dt = -alpha_E E + beta_int + beta_ext + v_eff
+1. dE/dt = -alpha_E E + beta_int + beta_ext + v[eff]
 2. dU/dt = mu U (1 - U^2) - (dE/dt)/E_max - lambda_U U + u, with |u| <= 25
-3. dI_U/dt = (1 - U) - sigma_1 E - delta S - lambda_I I_U
-4. v_eff = cos(omega_B t / 2) c tanh(lambda_0 + lambda_1 (U - 0.5) + lambda_2 S)
+3. dI_U/dt = (1 - U) - sigma_1 E - delta S - lambda_I I[U]
+4. v[eff] = cos(omega_B t / 2) c tanh(lambda_0 + lambda_1 (U - 0.5) + lambda_2 S)
 5. Phi(S) = alpha_s S^2/2 + beta_s S^3/4 - delta S
 6. dS/dt = -dPhi/dS
 7. d2B/dt2 = gamma_c delta S - (omega_B/Q_B) dB/dt - omega_B^2 B
-8. R_B: a finite-difference audit of (7), never fed back
+8. R[B]: a finite-difference audit of (7), never fed back
 
-**The control law.** u = clip(-f_U(x, t) + K_P (sigma - U), -25, +25), where f_U is the drift of U with the command
-at zero, sigma is the target pole and K_P = 12. The first term cancels whatever is shoving U (the push); the second
+**The control law.** u = clip(-f_U(x, t) + K[P] (sigma - U), -25, +25), where f[U] is the drift of U with the command
+at zero, sigma is the target pole and K[P] = 12. The first term cancels whatever is shoving U (the push); the second
 pulls U to its pole, harder the farther it is (the pull). The command is held unchanged through every stage of the
 fourth-order Runge-Kutta step and U is never rewritten afterwards. Inside the authority limit, U converges to its pole
-at rate K_P; this is proved (`docs/TRACKING_THEOREM.md`).
+at rate K[P]; this is proved (`docs/TRACKING_THEOREM.md`).
 
 ### 4.1 What each equation does, in words
 
@@ -1429,22 +1433,22 @@ says how one of them moves.
 
 - **Equation 1, the deviation tank.** *E* is how hard the system is being driven: queues, overload, power, heat. It
   drains on its own at a fixed rate (alpha_E = 3.487) and is filled by two pressures, internal (queue and overload,
-  beta_int) and external (power, heat, network, staleness, security, beta_ext), plus a drive term v_eff that is bounded
+  beta_int) and external (power, heat, network, staleness, security, beta_ext), plus a drive term v[eff] that is bounded
   by a hyperbolic tangent. However extreme the observation, the engine's response rate is capped at c = 1. This is the
   saturation, the "speed limit" that no input can exceed.
 - **Equation 2, the alignment.** *U* is how healthy and settled the system is, and it lives in a double well: two stable
   poles at +1 (healthy) and −1 (failed) with an unstable ridge at 0. A rising deviation pushes *U* out of the healthy
   well; the bounded command *u* pulls it back. The cubic term mu U (1 − U²) is what makes the walls of the well push back
   harder the farther *U* strays.
-- **Equation 3, the memory.** *I_U* grows while *U* is below its pole, is reduced by deviation and stress already being
+- **Equation 3, the memory.** *I[U]* grows while *U* is below its pole, is reduced by deviation and stress already being
   dealt with, and leaks at lambda_I = 0.719. It is the engine's memory of unrelieved pressure: a system that has been
   stressed for an hour is not the same as one stressed for a second, and this integrator is what knows the difference.
-- **Equation 4, the drive.** The bounded drive v_eff mixes the alignment and the stress through a tanh, with a slow
+- **Equation 4, the drive.** The bounded drive v[eff] mixes the alignment and the stress through a tanh, with a slow
   cosine of the bath's frequency on top, so the drive breathes rather than pushes constantly.
 - **Equations 5 and 6, the stress.** *S* rolls downhill in a cubic potential to its stable root. It is the slowest
   restoring force: structural stress from heat, power, network, security and staleness that builds and relaxes over
   minutes rather than seconds.
-- **Equation 7, the bath.** A damped harmonic oscillator (natural frequency omega_B = 1, quality Q_B = 2.5) driven by
+- **Equation 7, the bath.** A damped harmonic oscillator (natural frequency omega_B = 1, quality Q[B] = 2.5) driven by
   stress. It turns stress into a smooth, lagged tide, and it is the only second-order element in the engine; its friction
   is what settles the whole.
 - **Equation 8, the audit.** The bath equation is re-checked numerically every step with a finite difference, and the
@@ -1522,7 +1526,7 @@ or filing states the equations differently, this page and the file it fingerprin
 | Fingerprint | SHA-256 of `omnicompass/core.py`, recorded in `results/PREREGISTRATION.json` and `RELEASE_MANIFEST.json`; checked by `verify.py` |
 | Evidence | every simulation, benchmark, live Kubernetes run and GPU harness in this repository |
 
-State: E (deviation), U (coherence), I_U (unmet-need integral), S (structural stress), B and B_dot (the bath).
+State: E (deviation), U (coherence), I[U] (unmet-need integral), S (structural stress), B and Ḃ (the bath).
 
 ```
 v_eff  = cos(omega_B t / 2) · c · tanh(lambda_0 + lambda_1 (U − 0.5) + lambda_2 S)        (spinor closure, 720°)
@@ -1540,7 +1544,7 @@ macro and micro steps of `omnicompass/core.py`.
 #### Mechanism identity
 
 `results/MECHANISM_IDENTITY.json` (`tools/mechanism_identity.py`) fingerprints the mechanism
-M = (F, Theta, C, h, G, M_act, dt, A) component by component: state law, parameters, controller, observation map,
+M = (F, Theta, C, h, G, M[act], dt, A) component by component: state law, parameters, controller, observation map,
 authority law, actuator map, execution timing, shield. `verify.py` fails if any component changes without the record
 being rewritten. Every evidence claim names the mechanism id that produced it; "the eight-line engine" alone names none.
 
@@ -1575,7 +1579,7 @@ dS/dt, dB/dt, dB_dot/dt as in section 1
 ```
 
 Differences from the canonical engine: logistic U instead of the symmetric double well; no spinor factor; a general
-target U_t; no lambda_I damping; alpha in place of alpha_E. alpha_U and k enter the printed form; they do not enter the
+target Uₜ; no lambda_I damping; alpha in place of alpha_E. alpha_U and k enter the printed form; they do not enter the
 canonical engine.
 
 ### 3. What would change this declaration
@@ -1589,9 +1593,9 @@ preregistration amended on record (`results/LOCK_AMENDMENTS.json`). Until then t
 
 - A global stability proof of the forced six-state system is not closed. What is held on the U channel is proved in
   `docs/TRACKING_THEOREM.md`: unsaturated exponential tracking; the saturated case under a drift bound that holds over
-  the declared box (F_bar = 16.86 < 25); the sampled-data bound of the executed RK4 controller; admissibility.
+  the declared box (F[bar] = 16.86 < 25); the sampled-data bound of the executed RK4 controller; admissibility.
 - Candidate routes: the Unified Circle Principle on a region; Theorem 5.6 of the Closed Structure, if its core maps onto
-  (E, U, I_U, S, B).
+  (E, U, I[U], S, B).
 
 ### 5. For filings
 
@@ -1667,8 +1671,8 @@ Each state of the engine was checked against the closed-circle conditions:
 |---|---|---|
 | E, deviation | closed | it drains at rate alpha_E while its inputs are bounded (the drive is capped by tanh) |
 | U, alignment | closed | the cubic term mu U (1 - U^2) pushes back hard from far out |
-| I_U, memory | closed | it forgets at rate lambda_I |
-| B, the bath | closed | the friction omega_B / Q_B settles it |
+| I[U], memory | closed | it forgets at rate lambda_I |
+| B, the bath | closed | the friction omega_B / Q[B] settles it |
 | S, the basin | closed on the positive side; open on the negative side below an unstable ridge | Phi(S) carries a cubic term, so the landscape falls away below the ridge (at S = -3.5 with the default parameters) |
 
 Three openings were found and each has its closure:
@@ -1806,7 +1810,7 @@ Admissible set for a fixture with parameters p and initial state x0:
 
 ### What remains open (O)
 
-- Global stability of the forced six-state system (E, I_U, S, B are not all covered above).
+- Global stability of the forced six-state system (E, I[U], S, B are not all covered above).
 - A proved (not computed) epsilon_h over the declared box, and discrete invariance over the box.
 - The inheritance / intertwining residual against an outside plant: instrumented (`tools/gpu_reps.py`,
   representation fidelity), not yet measured on a real card.
@@ -1821,7 +1825,7 @@ Admissible set for a fixture with parameters p and initial state x0:
 
 | Source | Text | Mechanism |
 |---|---|---|
-| Ch. 29 §8 | "E_system = E + U + S + B … dE_system/dt = 0 (over full cycle). Energy redistributes. Energy reorganizes. Energy does not diverge." | The budget (site watts, cluster cores) is **conserved**: it is moved between organs, never created. |
+| Ch. 29 §8 | "E[system] = E + U + S + B … dE_system/dt = 0 (over full cycle). Energy redistributes. Energy reorganizes. Energy does not diverge." | The budget (site watts, cluster cores) is **conserved**: it is moved between organs, never created. |
 | Ch. 31 §4 | "Redistribution B acts as mediator between the baths. When E grows locally, B increases to distribute gradients." | Budget flows **down the gradient of need**: from organs holding surplus to organs in deficit. |
 | Ch. 31 §5 | "eigenvalues of the coupled system must remain bounded … Re(λᵢ) ≤ 0" | The flow must have a proof of convergence, not a tuned damper. |
 | Ch. 30 §5-7 | "Redistribution surge … channels stored deviation into expansion … controlled release … No discontinuity." | A **reserve** is held and released **continuously** to organs at their limit. There is no on/off. |
@@ -1946,9 +1950,9 @@ Held:
 
 - Isolated S-flow is the gradient of Phi (same formula in both cores).
 - (T) Unsaturated: dU/dt = KP (sigma − U); V = e²/2 has dV/dt = −KP e² on that channel (Theorem 1).
-- (T) Saturated, with the U drift bounded by F_bar < U_AUTHORITY: V decreases wherever e ≠ 0; over the declared
-  parameter box F_bar = 16.86 < 25, so this holds over the box in continuous time (Theorem 2).
-- (T, constant computed) Sampled-data RK4 controller: e_(k+1) = 0.88 e_k + d_k; with epsilon_h computed over the
+- (T) Saturated, with the U drift bounded by F[bar] < U_AUTHORITY: V decreases wherever e ≠ 0; over the declared
+  parameter box F[bar] = 16.86 < 25, so this holds over the box in continuous time (Theorem 2).
+- (T, constant computed) Sampled-data RK4 controller: e_(k+1) = 0.88 eₖ + dₖ; with epsilon_h computed over the
   frozen fixtures (V), the ultimate bound 0.0315 lies inside the 0.10 basin (Theorem 3).
 - (T continuous, V discrete) Admissible box forward invariant (Theorem 4).
 
@@ -1957,7 +1961,7 @@ Open:
 - epsilon_h and discrete invariance proved over the whole box (interval arithmetic).
 - Inheritance embedding / intertwining residual against a real plant (Closed Structure Def. 11.1): instrumented in
   the GPU bench (`tools/gpu_reps.py`, representation fidelity), not yet measured on a card.
-- Mapping of monograph Theorem 5.6 onto (E,U,I_U,S,B).
+- Mapping of monograph Theorem 5.6 onto (E,U,I[U],S,B).
 - A tracking bound for printed_eight_line (logistic U drift).
 
 Default core remains symmetric_verified (mechanism id in `results/MECHANISM_IDENTITY.json`).
@@ -1976,38 +1980,38 @@ limits, and nothing on this page is claimed beyond them. The earlier formal resu
 
 ### 1. Setting
 
-A **body** is a set of plants p_1, ..., p_n run on one clock of decisions k = 0, 1, 2, ... (15 s each in the
+A **body** is a set of plants p₁, ..., pₙ run on one clock of decisions k = 0, 1, 2, ... (15 s each in the
 organisms). Each plant i has
 
-- a template τ_i (compute_pool, thermal_zone, energy_storage, motion_axis, process_loop: `realms/plants.py`),
-- one knob κ_i (capacity, setpoint, power or admission: the muscle's single wire),
-- a **native controller** N_i, the plant's own law, unchanged by Omni-Compass: the pod autoscaler or the cluster
+- a template τᵢ (compute_pool, thermal_zone, energy_storage, motion_axis, process_loop: `realms/plants.py`),
+- one knob κᵢ (capacity, setpoint, power or admission: the muscle's single wire),
+- a **native controller** Nᵢ, the plant's own law, unchanged by Omni-Compass: the pod autoscaler or the cluster
   autoscaler of a pool, the PI loop and staging of a cooled room, the dispatch of a battery site, the servo profile of
   an axis, the PI loop of a process,
-- a state x_{i,k} and an exogenous input w_{i,k} (arrivals, heat from its own load, the site's own load, disturbance),
+- a state xᵢ,ₖ and an exogenous input wᵢ,ₖ (arrivals, heat from its own load, the site's own load, disturbance),
   drawn from the plant's seed, the same in every arm.
 
-The plants are coupled through the body (`realms/harness.py`, `Body.couple`): with S_k the body's source power (every
-plant that is neither a room nor a battery site) and Z_k the rooms' power, room z receives heat h_z · S_{k−1} and battery
-site s receives load g_s · (S_{k−1} + Z_{k−1} − its nominal), where h_z and g_s are fixed by the body's calibration.
+The plants are coupled through the body (`realms/harness.py`, `Body.couple`): with Sₖ the body's source power (every
+plant that is neither a room nor a battery site) and Zₖ the rooms' power, room z receives heat h[z] · Sₖ₋₁ and battery
+site s receives load gₛ · (Sₖ₋₁ + Zₖ₋₁ − its nominal), where h[z] and gₛ are fixed by the body's calibration.
 
-An **override** o_{i,k} is a set of key-value pairs that bounds what N_i may do at decision k: a floor and a cap on the
+An **override** oᵢ,ₖ is a set of key-value pairs that bounds what Nᵢ may do at decision k: a floor and a cap on the
 machines a pool's autoscaler may ask for, a setpoint for a room's loop, a reserve or a defended ceiling for a battery's
 dispatch, a speed scale for an axis. The plant then steps by its own law under that bound:
-x_{i,k+1} = f_i(x_{i,k}, N_i(x_{i,k}; o_{i,k}), w_{i,k}, coupling_k). The empty override leaves N_i exactly as shipped.
+xᵢ,ₖ₊₁ = fᵢ(xᵢ,ₖ, Nᵢ(xᵢ,ₖ; oᵢ,ₖ), wᵢ,ₖ, coupling_k). The empty override leaves Nᵢ exactly as shipped.
 
-**Definition 1 (the two arms).** The native arm writes o_{i,k} = ∅ for every i and k. The Omni arm writes
-o_k = G(y_0, ..., y_k) for k < K, where y_k is what the governor reads at decision k and K is the decision at which the
+**Definition 1 (the two arms).** The native arm writes oᵢ,ₖ = ∅ for every i and k. The Omni arm writes
+oₖ = G(y₀, ..., yₖ) for k < K, where yₖ is what the governor reads at decision k and K is the decision at which the
 governor goes silent (in every run, K = 0.8 × the run's decisions), and the lease's walk back after K (Property V5).
 Both arms run the same plants, the same seeds and the same inputs.
 
 **Definition 2 (a governor, and a collection of tools).** A rule G is a **collection of separate tools** if there are
-maps g_1, ..., g_n with o_{i,k} = g_i(y_{i,0}, ..., y_{i,k}) for every i and k: each muscle's bound depends on that
-muscle's readings alone. G is **one governor over the body** if for some plant i the bound o_{i,k} depends on the
+maps g₁, ..., gₙ with oᵢ,ₖ = gᵢ(yᵢ,₀, ..., yᵢ,ₖ) for every i and k: each muscle's bound depends on that
+muscle's readings alone. G is **one governor over the body** if for some plant i the bound oᵢ,ₖ depends on the
 readings of another plant j ≠ i.
 
-**Definition 3 (a twin).** The twin T_i of a plant i is the same plant model, built from the same row and seed, fed the
-same exogenous input, run under N_i alone with no override. The pools' twins run inside the governor
+**Definition 3 (a twin).** The twin Tᵢ of a plant i is the same plant model, built from the same row and seed, fed the
+same exogenous input, run under Nᵢ alone with no override. The pools' twins run inside the governor
 (`Bone.__init__`, `Bone.advance_twin`); a twin is the governor's model of what native does with that plant.
 
 **Definition 4 (room on a line).** The lines of a body are the battery sites' connections and the rooms' cooling. For a
@@ -2035,11 +2039,11 @@ that knob; {capacity} on an axis alone (inside a body an axis keeps its everyday
 Proof: every branch of `max_apply`, `max_hold` and `max_body_step` writes only these keys. ∎
 
 **Property V2 (never fewer machines than native asks for).** For every pool i with a twin, at every decision k < K, the
-count its autoscaler is asked for is never below the twin's: a floor written is ≥ m(T_{i,k}), and a cap written is
-≥ max(m(T_{i,k}), n_min), where m counts machines in service and starting. Proof: `max_ask` sets base = m(T_{i,k}) and
+count its autoscaler is asked for is never below the twin's: a floor written is ≥ m(Tᵢ,ₖ), and a cap written is
+≥ max(m(Tᵢ,ₖ), n[min]), where m counts machines in service and starting. Proof: `max_ask` sets base = m(Tᵢ,ₖ) and
 want = max(forecast, base); `max_body_step` writes floor = max(now + can, base), and on a shortfall keep ≥ base. The
 pool's own law is a function of its own arrivals and settings only, so its twin runs exactly as the native arm's pool
-does: m(T_{i,k}) is the count native asks for at that decision. ∎
+does: m(Tᵢ,ₖ) is the count native asks for at that decision. ∎
 
 **Property V3 (native at its limit is left alone).** Under the max, the override of every muscle wired by power or
 admission, of every process loop, and of every axis whose machine has no speed above its everyday setting is empty at
@@ -2050,7 +2054,7 @@ every decision: native already runs them at the top of their range. Proof: `max_
 machines the max adds, summed over the body, is at most R(1), and the machines of a pool that take r decisions to start
 are granted only out of R(r) less what was already granted. With R(1) < 0, what the max added goes back, the pools
 holding the most first, never below each pool's twin (V2), and no room is pulled below its operator's setpoint. Proof:
-`_units`, the running decrements of r_src, r_all and used, and the shortfall branch of `max_body_step`. ∎
+`_units`, the running decrements of r[src], r[all] and used, and the shortfall branch of `max_body_step`. ∎
 *Limit, stated with it:* R is a forecast. A line that climbs further within one decision than any climb it has shown,
 while power granted earlier is still in service (power is handed back one decision after a line shows the need), can
 still be carried over its limit. Section 4 gives how often that happened.
@@ -2080,9 +2084,9 @@ the controller's own rules (the scheduling floor while pods wait for a place, on
 governor's law, cruise while a queue waits), within the rate limit; the first refusal by the pool, or by the cloud's
 quota behind it, sets the top from then on.
 
-**Definition 5 (the readings).** For each seed s, the paired difference is d_s = Omni_s / native_s − 1 for work and
+**Definition 5 (the readings).** For each seed s, the paired difference is dₛ = Omni_s / native_s − 1 for work and
 energy, and Omni_s − native_s (percentage points) for the share of decisions over the line. Over n seeds, the 95%
-interval is mean ± t_{0.975, n−1} · sd / √n. A gain or a loss is a row whose interval is clear of zero; otherwise the
+interval is mean ± t[0.975, n−1] · sd / √n. A gain or a loss is a row whose interval is clear of zero; otherwise the
 row reads no difference beyond the noise. Across runs A, B and C: the same sign in all three with every interval clear
 of zero reads "lower (or higher) in all three of our runs"; an interval across zero reads "no difference beyond the
 noise"; clear intervals of opposite signs read "the runs disagree" (`tools/readings.py`, `tools/confirm_abc.py`).
@@ -2118,10 +2122,10 @@ the brain read was wrong. Each cause, and the property of the code that removes 
    decision later and their cooling answers over its own averaging, one more), has as room on its line only its limit
    less its whole draw, read at the draw's own climb.
 3. **Machines handed back while a queue needed them.** *V7:* on a shortfall, a pool is never held below
-   ⌈(λ_{k−1} + Q_k / Δt) / μ⌉.
+   ⌈(λₖ₋₁ + Qₖ / Δt) / μ⌉.
 4. **A room left warmer than native.** *V8:* every room has a twin: the same room under its operator's settings, warmed
    by native's heat (the body's source power with each pool's power replaced by its twin's). A room wired by its
-   setpoint that reads warmer than its twin by e > 0 has its setpoint written at most t_set − e, unless its cooling is
+   setpoint that reads warmer than its twin by e > 0 has its setpoint written at most t[set] − e, unless its cooling is
    already flat out.
 5. **A room that cannot cure itself.** *V11 (the body cures what a muscle cannot):* a room wired by its cooling units,
    a power or an admission gate, or whose cooling is flat out, and that reads warmer than its twin by e > 0, puts a heat
@@ -2168,31 +2172,31 @@ version, every result run again on it, the founder told first.
 The founder's question of 12 October, night: does every muscle have its own tuning, maxed to its own benefit, instead of
 one global setting for a thousand muscles? It does, and the engine now carries it.
 
-**Definition 6 (a card).** For muscle i, a card θ_i is the brain's settings for that muscle: for a machine pool, its edge
-utilisation u_i (how full it runs on its forecast before it calls for more) and its window w_i (decisions of history it
-reads); for a battery, its line margin z_i (wobbles kept under its line) and, wired by its power, its hold window and
+**Definition 6 (a card).** For muscle i, a card θᵢ is the brain's settings for that muscle: for a machine pool, its edge
+utilisation uᵢ (how full it runs on its forecast before it calls for more) and its window wᵢ (decisions of history it
+reads); for a battery, its line margin zᵢ (wobbles kept under its line) and, wired by its power, its hold window and
 hold margin. The brain is one (the same law, the same bone, the same body); only these numbers differ by muscle. A muscle
-without a card runs the global setting θ_0 (u = 0.95, w = 20, z = 3.09, the hold window equal to w, a hold margin of a
+without a card runs the global setting θ₀ (u = 0.95, w = 20, z = 3.09, the hold window equal to w, a hold margin of a
 twentieth of the line). The tune-down never reads cards.
 
 **The search (development seeds only, `tools/tune_cards.py`).** Every muscle whose settings can change what the max does
 (458 machine pools, 44 batteries, 48 axes) tries every candidate in a declared grid on seeds 7100-7109, alone, under its
-own load and with work waiting in line; θ_0 is always among the candidates. Pools: u ∈ {0.70, 0.75, ..., 0.95} × w ∈
+own load and with work waiting in line; θ₀ is always among the candidates. Pools: u ∈ {0.70, 0.75, ..., 0.95} × w ∈
 {10, 20, 40, 60}; batteries wired by their power: z ∈ {0, 0.5, 1, 2, 3.09} × hold window ∈ {3, 5, 10, 20} × hold margin
 ∈ {0, 0.02, 0.05, 0.10}; other batteries: z ∈ {0, 0.25, ..., 4}; axes: heat head × strain. A candidate is kept if it
-beats θ_0 beyond the noise on those seeds (fewer misses, more work or faster: a 95% interval of the paired difference clear
-of zero), read LOSS than θ_0 nowhere, and is never behind native: on no seed and under no load over its line
+beats θ₀ beyond the noise on those seeds (fewer misses, more work or faster: a 95% interval of the paired difference clear
+of zero), read LOSS than θ₀ nowhere, and is never behind native: on no seed and under no load over its line
 more often than native, doing less work or clearing its line later (the engine's own no-harm tests, seed by seed); among
-those, the fewest misses, then the most work, the fastest, the least energy. It is then run again against θ_0 on seeds 7200-7209 and enters the engine only
+those, the fewest misses, then the most work, the fastest, the least energy. It is then run again against θ₀ on seeds 7200-7209 and enters the engine only
 if it wins there too: a card must win twice. The preregistered seeds 3000-3009 are never read by the search.
 
 **V14 (the body has the last word on a line it shares).** Inside a body, a battery wired by its power keeps the body's
-margins on its line: its z and its hold margin are never slimmer than θ_0's; its own window stays. A card is chosen for
+margins on its line: its z and its hold margin are never slimmer than θ₀'s; its own window stays. A card is chosen for
 the muscle alone, and a battery's line inside a body carries the whole body's swing, which the battery alone never saw:
 the one plant behind native that the cards produced in development (a rack's power allocation, one extra decision
 over its line in the whole tower with work waiting, one seed of ten) was exactly that case, and V14 removes it.
 
-What the search found: 409 of the 550 searched muscles beat θ_0 on the first seeds; 364 won again on the second (45 fell
+What the search found: 409 of the 550 searched muscles beat θ₀ on the first seeds; 364 won again on the second (45 fell
 back to the global setting, none LOSS); the engine's cards are those 364 (`realms/muscle_cards_v5.csv`: 333 machine
 pools, 31 batteries). No axis setting beat the global one. A first set of cards was chosen by the mean over the seeds
 alone (371 cards); the engine's own no-harm test then caught one of them (an electrolyzer battery, one decision over its
@@ -2247,9 +2251,9 @@ hashes are checked by `verify.py`.
 |---|---|---|
 | E | energy / excitation | how hard the system is being driven: queues, overload, power, heat |
 | U | order parameter | how healthy and settled the system is: +1 healthy basin, -1 failed basin |
-| I_U | integrated need | unmet need accumulated over time: memory of pressure that has not been relieved |
+| I[U] | integrated need | unmet need accumulated over time: memory of pressure that has not been relieved |
 | S | stress | slow structural stress from heat, power, network, security, staleness |
-| B, B_dot | bath and its rate | a damped oscillator driven by stress: the slow "tide" of physical load |
+| B, Ḃ | bath and its rate | a damped oscillator driven by stress: the slow "tide" of physical load |
 
 ### 2. The equations (omnicompass/core.py, lines 5-12)
 
@@ -2273,11 +2277,11 @@ Each term does one job:
 - **(2) Order.** `mu U (1 - U^2)` is a double-well (bistable) drift with two stable basins, U = +1 (healthy) and
   U = -1 (failed), and an unstable ridge at U = 0. A rise in energy (`dE/dt`) pushes U out of the healthy basin. `u` is
   the bounded control input.
-- **(3) Integrated need.** I_U grows while U is below 1 (the system is not settled). It is reduced by energy and stress
+- **(3) Integrated need.** I[U] grows while U is below 1 (the system is not settled). It is reduced by energy and stress
   already being dealt with, and it leaks at lambda_I = 0.719. It is the engine's memory of unrelieved pressure.
 - **(5)-(6) Stress.** A cubic potential (the "well in the basin"). S rolls downhill to its stable root. This is the
   slowest restoring force.
-- **(7) Bath.** A damped harmonic oscillator (natural frequency omega_B = 1, quality Q_B = 2.5) driven by stress. It turns
+- **(7) Bath.** A damped harmonic oscillator (natural frequency omega_B = 1, quality Q[B] = 2.5) driven by stress. It turns
   stress into a smooth, lagged "tide". It is the only second-order element.
 - **(8) Audit.** The bath equation is re-checked numerically every step. The check is never fed back.
 
@@ -2318,21 +2322,21 @@ rollback authorised if S >= S_rollback, U is falling, or a security block is see
 
 | Muscle | Engine quantity used | Where |
 |---|---|---|
-| HPA target (pods) | rho* from I_U and E, equations (1) and (3) | adapter `Governor.step`; live `omni_controller/controller.py` |
-| Node pool (machines) | n_req from load, queue and rho*; release gated by push from equation (2) | same |
+| HPA target (pods) | rho* from I[U] and E, equations (1) and (3) | adapter `Governor.step`; live `omni_controller/controller.py` |
+| Node pool (machines) | n[req] from load, queue and rho*; release gated by push from equation (2) | same |
 | Power cap (pod CPU limits, CPU frequency, GPU limit) | cap from U gate and bath B, equation (7) | same; `omni_controller/muscles.py` |
 | Rollout guard | change_permitted (U), rollback (S, dU) | `muscles.py` |
 | Security hold | security observation raises S and blocks expansion | adapter, shield |
 | Speed-first law | rho* for pods; push gates machine release | `omnicompass/speed.py` |
 | Right-sizing | rho* sizes CPU; E widens the memory margin; push gates scale-in | `omnilab/rightsize.py` |
-| Cold start | rho* sizes instances; I_U sets how long to keep warm | `omnilab/coldstart.py` |
-| GPU packing | I_U pre-warms nodes; push gates power-off | `omnilab/gpupack.py` |
+| Cold start | rho* sizes instances; I[U] sets how long to keep warm | `omnilab/coldstart.py` |
+| GPU packing | I[U] pre-warms nodes; push gates power-off | `omnilab/gpupack.py` |
 | Training power | E tightens the applied ramp limit under sustained grid stress | `omnilab/powersmooth.py` |
 | GPU health | S and E shorten the checkpoint interval | `omnilab/health.py` |
 | Cooling | E widens the inlet-temperature margin | `omnilab/cooling.py` |
 | Inference | the full allocation law (node_delta) sizes replicas | `omnilab/inference.py` |
-| Agent containment | I_U throttles; the security observation contains | `omnilab/containment.py` |
-| VM energy | I_U and E raise the learning rate when attribution goes stale | `omnilab/vmenergy.py` |
+| Agent containment | I[U] throttles; the security observation contains | `omnilab/containment.py` |
+| VM energy | I[U] and E raise the learning rate when attribution goes stale | `omnilab/vmenergy.py` |
 
 ### 6. Measured: what the equations actually do inside the governor
 
@@ -2358,7 +2362,7 @@ Measured on a real observation stream (fleet plant, web services, fleet mode, 36
 
 - **Why "engine off" scores close to "engine on" in the muscle benchmarks.** With the equations frozen, the observation
   blend still moves the state. Both versions are then low-pass filters of the same telemetry. The engine's fast modes
-  (1-3 decisions) behave almost like the blend itself. Its distinct contribution is its slow memory: I_U (14 decisions),
+  (1-3 decisions) behave almost like the blend itself. Its distinct contribution is its slow memory: I[U] (14 decisions),
   S (60) and the bath (period 64 decisions). The muscle mappings mostly read E and rho*, which live on the fast modes.
 - **The engine clock is not matched to the workload's rhythm.** One decision advances engine time by 0.1. At 60-second
   decisions the bath rings every 64 minutes, but web demand has a 24-hour rhythm and training power a 2-second one. This
@@ -2370,7 +2374,7 @@ Three wiring experiments follow directly. None changes a single equation:
 
 1. **Clock matching.** Set engine time per decision so that the bath's natural period equals the workload's rhythm.
    The oscillator in (7) then carries the cycle and can anticipate it.
-2. **Slow-mode actuation.** Drive machines from I_U, S and B (the memory modes) rather than E (a fast mode).
+2. **Slow-mode actuation.** Drive machines from I[U], S and B (the memory modes) rather than E (a fast mode).
 3. **Closed-loop actuation.** Apply equation (2)'s u and use its magnitude, not only its sign, as the actuator command.
 
 Each is testable in the existing harness against every platform in the league (tuning/league.py), and will be tested
@@ -2422,7 +2426,7 @@ is placed in its band [lo, hi], where hi is the response line:
 with the band's center p0 = 0.5, cushion c = 0.05, authority A = 1, kp = 1 and kd = max(0, 2 sqrt(kp tau / dt) - 1) dt
 (critical damping for a muscle that answers in tau seconds). F > 0 asks for capacity, F < 0 offers it back.
 
-**How many machines.** With n machines in service now, n_nat the count native ran, m the floor (two by default, `MIN_NODES`) and M the
+**How many machines.** With n machines in service now, n[nat] the count native ran, m the floor (two by default, `MIN_NODES`) and M the
 machines that exist (every machine usable; an operator may hold whole machines back with `NODE_CUSHION`, off by
 default), every count stays in m <= n' <= M. The protection is not a machine sitting out: it is the band inside every
 machine. Capacity is added at 95% of the response line, before the line is reached (8.2-8.3), and a machine goes back
@@ -2482,22 +2486,22 @@ unit (a battery before a generator, a CPU before a GPU) is not wired; each pool 
 ### 9. The state each muscle carries, and the modes as a state machine
 
 **9.1 The compass on a muscle is a dynamical system, so its state must persist.** On muscle i the compass carries
-z_i = (p_i, v_i, x_i): the position of the service in its band, its velocity, and the knob's continuous value. At each
-decision k, with reading r_k:
+zᵢ = (pᵢ, vᵢ, xᵢ): the position of the service in its band, its velocity, and the knob's continuous value. At each
+decision k, with reading rₖ:
 
-    p_k = (r_k - lo) / (hi - lo),   v_k = s v_{k-1} + (1 - s)(p_k - p_{k-1}) / dt,   F_k = F(p_k, v_k) by (8.2)    (9.1)
-    x_{k+1} = clamp( x_k + sigma g(F_k) F_k (x_hi - x_lo), x_lo, x_hi ),   g = UP if F_k > 0 else DOWN          (9.2)
+    pₖ = (rₖ - lo) / (hi - lo),   vₖ = s vₖ₋₁ + (1 - s)(pₖ - pₖ₋₁) / dt,   Fₖ = F(pₖ, vₖ) by (8.2)    (9.1)
+    xₖ₊₁ = clamp( xₖ + sigma g(Fₖ) Fₖ (x[hi] - x[lo]), x[lo], x[hi] ),   g = UP if Fₖ > 0 else DOWN          (9.2)
 
-with x_0 the native value and sigma = +1 when a higher value is more capacity. Two properties depend on z persisting:
-(a) the knob integrates the force, x_k - x_0 = sum_j sigma g F_j span (until the cover binds), so a calm muscle eases
-step by step toward its cover; and (b) the damping term kd v_k needs p_{k-1}. If z were made fresh at every decision
-(p_{k-1} = p_k, v = 0, x_k = x_0), (9.2) would collapse to x_{k+1} = clamp(x_0 + sigma g F(p_k, 0) span): a memoryless map
+with x₀ the native value and sigma = +1 when a higher value is more capacity. Two properties depend on z persisting:
+(a) the knob integrates the force, xₖ - x₀ = sum_j sigma g Fⱼ span (until the cover binds), so a calm muscle eases
+step by step toward its cover; and (b) the damping term kd vₖ needs pₖ₋₁. If z were made fresh at every decision
+(pₖ₋₁ = pₖ, v = 0, xₖ = x₀), (9.2) would collapse to xₖ₊₁ = clamp(x₀ + sigma g F(pₖ, 0) span): a memoryless map
 of the present reading, at most one step from native, with no damping. That is a different, weaker law. A renamed
 attribute did exactly that on 2026-10-05; `tests/test_compass_arm.py` now fails if the compass is ever made twice on one
 muscle.
 
-**9.2 The modes.** The live controller is in exactly one mode at each decision. With q_k the pods waiting for a place,
-u_k the scaling-up flag, c the cruise count (`--cruise-after`, 2), M the machine ceiling and m the floor:
+**9.2 The modes.** The live controller is in exactly one mode at each decision. With qₖ the pods waiting for a place,
+uₖ the scaling-up flag, c the cruise count (`--cruise-after`, 2), M the machine ceiling and m the floor:
 
     cruise on      q_j > 0 for the last c decisions                                                   (9.3)
     cruise off     q_j = 0 and not u_j for the last c decisions                                       (9.4)
@@ -2514,7 +2518,7 @@ at once, n = M; a growing pool a step a decision), so the floor step's only acti
 need) adds nothing the climb does not already give: for a fixed pool floor <= M = n. Its reads (every pod, every node, node
 metrics, every HPA, each five seconds) carry no value of information, so removing them cannot change any action; they
 only cost CPU and API-server time on the machines the queue is using. The service's response time is also confounded
-in cruise: with a queue of other work holding the machines, a request waits on contended CPU, R = S / (1 - u_host), not on
+in cruise: with a queue of other work holding the machines, a request waits on contended CPU, R = S / (1 - u[host]), not on
 the service's own pods. Reading that R as the service's own queue and adding pods would answer the wrong cause. So in
 cruise Omni holds the machines and leaves the service to its own autoscaler. `tests/test_compass_controller.py` checks
 that the floor step makes no API read during cruise; the controller before this rule made the full set of reads every
@@ -2537,31 +2541,31 @@ move at all is a property of the muscle's physics. Four cases, each derived from
 test:
 
 - *Cooling power.* A zone's heat must leave it: over a run, the heat removed equals the heat made plus what the
-  room's mass stores. A cap on cooling power q_max cannot remove less heat. It only lets the temperature drift above
-  setpoint while the PI command grows, and the staging rule, units = ceil(command / (0.8 q_unit)), turns that command
-  into more units and more fan power, p = q_c / COP + units x p_unit. So a lower cap never saves energy, and the lever
+  room's mass stores. A cap on cooling power q[max] cannot remove less heat. It only lets the temperature drift above
+  setpoint while the PI command grows, and the staging rule, units = ceil(command / (0.8 q[unit])), turns that command
+  into more units and more fan power, p = q[c] / COP + units x p[unit]. So a lower cap never saves energy, and the lever
   stays native. (The setpoint, which changes the COP, and the units, which change fan power at the same heat, remain
   levers.)
 - *A battery's reserve.* Energy D drawn from the cells below the operator's reserve saves D sqrt(eta) of grid import,
   and the deficit is bought back at D / sqrt(eta). The net, D (1 - eta) / sqrt(eta) (10.5% of D at eta = 0.90), is
   always positive. Spending the reserve is never an energy saving; it is the price of keeping the draw under the
   connection's limit. So the reserve is spent only at the wall (p >= 0.95) and only when the battery can cover the
-  excess (0 < imp - p_lim <= p_batt). Otherwise the operator's reserve holds, and no round trip is paid for nothing.
+  excess (0 < imp - p[lim] <= p[batt]). Otherwise the operator's reserve holds, and no round trip is paid for nothing.
 - *A backup reserve (a UPS).* It is held for an outage, which the model does not contain, so spending it for a peak
   trades away the reason it exists. Never a lever.
 - *A compute pool's power cap.* With throughput mu(c) proportional to c^eps and the autoscaler holding utilisation near its
-  target u*, the energy per unit of work is e(c) = (p_idle / u* + p_dyn c) / mu(c). At c = 1, de/dc > 0 (a lower cap
+  target u*, the energy per unit of work is e(c) = (p[idle] / u* + p[dyn] c) / mu(c). At c = 1, de/dc > 0 (a lower cap
   saves) if and only if
 
       eps < p_dyn / (p_idle / u* + p_dyn)                                                                 (9.8)
 
   At eps = 0.4 the cap saves on CPU hosts (threshold 0.62), GPUs (0.74), databases (0.51) and radio units (0.54). It
   costs energy where idle power dominates: a quantum computer's cryostat (0.19), a network switch (0.32), storage
-  (0.26). There, running slower keeps the machines on longer: race to idle. In a deployment p_idle, p_dyn and the
+  (0.26). There, running slower keeps the machines on longer: race to idle. In a deployment p[idle], p[dyn] and the
   speed curve come from the machine's own specification.
 
-- *A motion axis's effort cap.* It lowers the copper loss of a full-acceleration move, (J a_max / kt)^2 R, and stretches
-  the move, which keeps paying the standing draw p_idle + b v_max^2. It moves only where the first exceeds the second: a
+- *A motion axis's effort cap.* It lowers the copper loss of a full-acceleration move, (J a[max] / kt)^2 R, and stretches
+  the move, which keeps paying the standing draw p[idle] + b v[max]^2. It moves only where the first exceeds the second: a
   reaction wheel (32 W against 5 W), not EV traction, a flight axis or a robot joint.
 - *A machine released from a node pool.* A machine boots in minutes, and a burst that arrives in the meantime is served
   late. So a machine goes back only when the machines left cover the recent peak at 0.3 of the pool's own release level,
@@ -2658,11 +2662,11 @@ The compass (`omnicompass/compass_law.py`) is the law that carries the engine's 
   position to the bottom of the compass, the middle (0.5 by default; an operator may set it lower for extra margin). The
   walls run from 0.05 to 0.95; the last 5% on each side, 10% in all, is cushion.
 
-**The force.** F = A tanh((K_P (p - center) + K_D v) / A), where p is the position, v its rate of change, A the
+**The force.** F = A tanh((K[P] (p - center) + K[D] v) / A), where p is the position, v its rate of change, A the
 authority.
-- **Pull:** K_P (p - center), gentle near the bottom, stronger up the walls.
-- **Push:** K_D v, the force that meets whatever is shoving the position, and the friction that stops it sloshing.
-  With K_D at or above critical damping the position glides to the middle and stops, with no overshoot and no
+- **Pull:** K[P] (p - center), gentle near the bottom, stronger up the walls.
+- **Push:** K[D] v, the force that meets whatever is shoving the position, and the friction that stops it sloshing.
+  With K[D] at or above critical damping the position glides to the middle and stops, with no overshoot and no
   ringing. Overshoot is wasted energy: force spent going the wrong way and spent again coming back.
 - **Smooth, never a hammer:** tanh bends the force over into its maximum instead of slamming into a wall.
 - **Fail up:** past the 0.95 wall the up side goes to its full force at once and the down side may not act until the
@@ -2700,7 +2704,7 @@ speed or faster (section 16, and `docs/GPU_PREREGISTRATION.md`, amendments 6 and
 
 The law is written once (`CompassLaw`), and three declared numbers fit it to a muscle: the **decision period** *dt*
 (how often the governor decides), the muscle's **response time** tau (how long the service reading takes to follow the
-lever), and the **cover**. From tau and *dt* the law derives its own damping gain, K_D = (2 sqrt(K_P tau / dt) − 1) dt,
+lever), and the **cover**. From tau and *dt* the law derives its own damping gain, K[D] = (2 sqrt(K[P] tau / dt) − 1) dt,
 which is critical damping for a first-order muscle under a proportional-derivative pull: the position glides to the
 center and stops. Nothing else is tuned per stack. The table below is the complete list of the compass's settings on every
 stack in this manual, so a referee can see that the "gains" differ only through the declared physics:
@@ -3547,7 +3551,7 @@ Omni-Compass is the same engine on every muscle. Each muscle gets one connector 
 | Part | Role | Example (compute) |
 |---|---|---|
 | Afferent (sense) | What the muscle reports | load, pending work, power, heat |
-| Engine | Equations (1)-(7) turn readings into state: error E, coherence U, pressure I_U, stress S, bath B | same six-state engine everywhere |
+| Engine | Equations (1)-(7) turn readings into state: error E, coherence U, pressure I[U], stress S, bath B | same six-state engine everywhere |
 | Efferent (push) | The equation (2) law and allocation law drive the muscle toward convergence | node count, HPA target, power cap |
 | Reflex (shield) | Hard limits checked before any push | never below pod requests, step limits, power limit |
 | Kill | Control returns to the muscle's own controllers | restore HPA targets, observe only |
@@ -5546,7 +5550,7 @@ My face is the compass. It is not decoration: it is how I read myself, every dec
 
 #### The wheel
 
-My deviation E, over its ceiling E_max, runs along the horizontal. Its rate of change runs along the vertical. Where I
+My deviation E, over its ceiling E[max], runs along the horizontal. Its rate of change runs along the vertical. Where I
 stand on that wheel is my heading, measured clockwise from north:
 
 | Point | Letter | Heading | Where I am |
@@ -5591,7 +5595,7 @@ The wheel turns I → II → III → IV → I:
 
 My axle is the structural basin S. Its rest point S* solves my equation (6):
 
-δ − α_s S − ¾ β_s S² = 0
+δ − αₛ S − ¾ βₛ S² = 0
 
 Without the axle, deviation diverges. With it, deviation circulates.
 
@@ -5699,19 +5703,19 @@ The reflex that raises the floor itself exists (`--pod-reflex-writes`); it is of
 #### 6. My energy is moved, never created
 
 One budget comes in, and I convey it across the body by need (`omnicompass/conveyance.py`):
-- da_i/dt = κ a_i (e_i − ē);
+- da_i/dt = κ aᵢ (eᵢ − ē);
 - the budget is conserved exactly, and each organ converges to its share of the demand;
 - organs with no work idle at their floor, and what they do not need goes where it is needed;
 - nothing leaves Ω.
 
 On each machine, I hand its idle CPU to the pods serving on it:
 
-c_i = min( max(L_i, (0.95 A_j − Q_j) / |P_j|), 0.95 A_j )
+cᵢ = min( max(Lᵢ, (0.95 Aⱼ − Qⱼ) / |Pⱼ|), 0.95 Aⱼ )
 
-- A_j is the machine's CPU.
-- Q_j is what every other pod on it has requested.
-- P_j is its serving pods.
-- L_i is the limit you gave the pod.
+- Aⱼ is the machine's CPU.
+- Qⱼ is what every other pod on it has requested.
+- Pⱼ is its serving pods.
+- Lᵢ is the limit you gave the pod.
 
 A pod's CPU limit is a quota. A request that needs more than one quota period waits for the next one while the
 machine stands idle. That wait is energy withheld from the work, not saved, because the request spends the same
@@ -6176,7 +6180,7 @@ CSV beside the page (`results/WIRING_VERDICTS.csv`) has one row per knob and per
 
 ### Reading the benefit: more work, or the same work for less
 
-With the work held equal in both arms, the gain from Omni-Compass on top is *G = C_native / C_omni − 1*, where *C* is a
+With the work held equal in both arms, the gain from Omni-Compass on top is *G = C[native] / C[omni] − 1*, where *C* is a
 resource (machine-hours, CPU core-hours, joules). The same work then needs *1 / (1 + G)* of the resources, a saving of
 *G / (1 + G)*: a third more work is a quarter off the bill. The full explanation, the three rules for reading a receipt
 and where every number stands today are in the manual, section 3 (`docs/OMNI_COMPASS_MANUAL.md`).
@@ -6195,32 +6199,36 @@ The number is the Omni index's rule (`results/OMNI_INDEX.md`): each judged gauge
 
 **Benefit?** reads **GAIN** (gauges GAIN in all three of our runs, none LOSS or power given), **GAIN, power given** (a GAIN bought with a resource put in, named beside it), **GAIN AND LOSS** (both; the number says which way the trade nets by this scoring, and the wiring page `docs/WIRING_VERDICTS.md` says what pays for what), **LOSS** (a LOSS and no GAIN), **power given** (a resource put in and nothing gained) or **EVEN** (nothing moved the same way in all three of our runs). LOSS should never appear: where it does, the row stands and its cause is found and fixed.
 
-| Date | Benchmark | Benefit? | How much | Every change the same in all three of our runs, in words | Table |
-|---|---|---|---:|---|---|
-| 2026-10-10 | Every real test together: the Omni index | **GAIN, power given** | **+5.2% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
-| unknown | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | **GAIN, power given** | **+60% GAIN** | machines cut 5.9% to 7.8% (GAIN); machine-hours cut 5.8% to 8.2% (GAIN); mean response cut 59% (GAIN); p95 cut 73% to 76% (GAIN); p99 cut 70% to 72% (GAIN); time over the line cut 96% to 97% (GAIN); replicas cut 14% (GAIN); parked-worker energy up 1.4% to 2.6% (power given) | `results/live/V3_KEDA_REQUESTS.md` |
-| unknown | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | **GAIN, power given** | **+28% GAIN** | mean response cut 36% to 38% (GAIN); p95 cut 51% to 53% (GAIN); p99 cut 60% to 62% (GAIN); time over the line cut 97% to 100% (GAIN); parked-worker energy up 1.0% to 1.6% (power given) | `results/live/V3_KEDA_CPU_REQUESTS.md` |
-| 2026-10-10 | The six organisms with the real cluster inside, 10 and 100 copies | **GAIN, power given** | **+5.3% GAIN** | p95 cut 32% to 52% (GAIN); time over the line cut 8% to 36% (GAIN); replicas up 0.6% (power given); failed requests cut 8.4% to 8.5% (GAIN); parked-worker energy cut 0.3% (GAIN); standby-model energy cut 0.3% (GAIN) | `results/live/V3_SIX_KUBE.md` |
-| 2026-10-10 | The big organisms with the real cluster inside, 1,000 copies on Azure | **GAIN** | **+155% GAIN** | p95 cut 95% to 98% (GAIN); p99 cut 97% to 98% (GAIN) | `results/live/V3_BIG_ORGANISM.md` |
-| 2026-10-10 | The 945 modelled muscles as one tower, every muscle written at once | **GAIN** | **+0.3% GAIN** | work per energy up 0.3% (GAIN) | `results/realms/REALMS.md` |
-| 2026-10-10 | Robustness: the two-hour run | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V3_ROBUST_LONG.md` |
-| 2026-10-10 | Robustness: the governor killed outright mid-run | **GAIN** | **+8.6% GAIN** | mean response cut 33% to 40% (GAIN); p95 cut 27% to 48% (GAIN); time over the line cut 32% to 36% (GAIN) | `results/live/V3_ROBUST_KILL.md` |
-| 2026-10-10 | Robot arms (MuJoCo), the three untouched robots | **GAIN** | **+3.8% GAIN** | energy per takt cut 0.8% (GAIN); copper heating per cycle cut 11% (GAIN); mechanical work per cycle cut 6.6% (GAIN); peak joint torque cut 29% (GAIN); tracking error, RMS cut 21% (GAIN); end-point error at the waypoints cut 11% (GAIN) | `results/live/V3_MUJOCO.md` |
-| 2026-10-10 | Redis, the cache's memory ceiling | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V3_REDIS.md` |
-| 2026-10-10 | Real Kubernetes, steady work | **GAIN** | **+31% GAIN** | machines cut 1.7% to 2.0% (GAIN); machine-hours cut 1.7% to 2.0% (GAIN); standby-model energy cut 1.3% to 1.8% (GAIN); mean response cut 47% to 48% (GAIN); p95 cut 64% to 66% (GAIN); p99 cut 69% to 73% (GAIN); time over the line cut 97% to 99% (GAIN) | `results/live/V3_STEADY.md` |
-| 2026-10-10 | Real Kubernetes, faults | **GAIN** | **+37% GAIN** | mean response cut 34% to 51% (GAIN); p95 cut 58% to 63% (GAIN); time over the line cut 27% to 43% (GAIN); failed requests cut 14% to 18% (GAIN) | `results/live/V3_FAULTS.md` |
-| 2026-10-10 | Real Kubernetes, demand that wanders | **GAIN** | **+37% GAIN** | parked-worker energy cut 0.1% to 0.4% (GAIN); mean response cut 45% to 50% (GAIN); p95 cut 56% to 64% (GAIN); time over the line cut 36% to 42% (GAIN); failed requests cut 12% to 13% (GAIN) | `results/live/V3_WANDERING.md` |
-| 2026-10-10 | Real Kubernetes, all four at once | **GAIN** | **+42% GAIN** | work inside the line up 54% to 68% (GAIN); mean response cut 43% to 48% (GAIN); p95 cut 57% to 62% (GAIN); time over the line cut 38% to 41% (GAIN); failed requests cut 11% to 14% (GAIN) | `results/live/V3_ALL_FOUR.md` |
-| 2026-10-10 | Real Kubernetes, a queue of jobs | **GAIN** | **+16% GAIN** | machines cut 16% to 20% (GAIN); machine-hours cut 16% to 20% (GAIN); standby-model energy cut 11% to 14% (GAIN); mean response cut 11% to 13% (GAIN); machines after the queue cut 26% to 33% (GAIN) | `results/live/V3_BATCH.md` |
-| 2026-10-10 | Real Kubernetes, a public day of demand (Google 2011) | **GAIN** | **+46% GAIN** | machines cut 7.3% to 9.2% (GAIN); machine-hours cut 7.4% to 9.2% (GAIN); parked-worker energy cut 0.3% to 0.4% (GAIN); standby-model energy cut 5.3% to 6.7% (GAIN); mean response cut 51% to 53% (GAIN); p95 cut 64% to 66% (GAIN); p99 cut 60% to 62% (GAIN); time over the line cut 81% to 82% (GAIN); failed requests cut 11% to 18% (GAIN); replicas cut 3.8% to 8.3% (GAIN) | `results/live/V3_TRACE_GOOGLE2011.md` |
-| 2026-10-10 | Real Kubernetes, a noisy neighbour | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V3_FAIRNESS.md` |
-| 2026-10-10 | Power grids (SimBench), both load models | **GAIN, power given** | **+5.8% GAIN** | energy the loads drew cut 1.3% to 1.5% (GAIN); energy dissipated in lines and transformers cut 0.0% to 2.4% (GAIN); net import from the upstream grid cut 0% to 15% (GAIN); tap operations cut 16% to 38% (GAIN); energy dissipated in lines and transformers up 0.6% to 1.5% (power given); tap operations up 100% (power given); net import from the upstream grid up 0.0% (power given) | `results/live/V3_PANDAPOWER.md` |
-| 2026-10-10 | PostgreSQL, the pooler's pool size | **GAIN, power given** | **+0.9% GAIN** | connections most at once up 8% to 12% (power given); connections held open cut 7% to 13% (GAIN) | `results/live/V3_PGBENCH.md` |
-| 2026-10-10 | MySQL, the buffer pool's size | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V3_SYSBENCH.md` |
-| 2026-10-10 | MongoDB, the storage engine's cache size | **GAIN** | **+1.7% GAIN** | cache size held cut 10% to 15% (GAIN); cache in use cut 10% to 14% (GAIN) | `results/live/V3_YCSB.md` |
-| 2026-10-10 | Kafka, the consumer group's size | **GAIN** | **+0.1% GAIN** | consumers running cut 0.8% (GAIN) | `results/live/V3_KAFKA.md` |
-| 2026-10-10 | Drone swarms, the three untouched cells | **GAIN** | **+5.9% GAIN** | energy per mission cut 7% to 20% (GAIN); fleet energy over the window cut 7% to 20% (GAIN); missions per charge at the autopilot's reserve up 8% to 25% (GAIN) | `results/live/V3_SWARM.md` |
-| 2026-10-10 | Buildings and batteries (CityLearn), the districts with batteries | **GAIN AND LOSS** | **+0.8% GAIN** | electricity bought cut 0% to 15% (GAIN); daily peak draw cut 1% to 14% (GAIN); highest peak cut 2.7% to 3.5% (GAIN); ramping cut 1.3% to 7.2% (GAIN); daily load unevenness cut 0.3% to 4.7% (GAIN); monthly load unevenness cut 0.2% to 1.9% (GAIN); distance from zero net energy cut 0.0% to 6.1% (GAIN); electricity bill cut 8.6% (GAIN); carbon cut 0% to 12% (GAIN); monthly load unevenness up 0.1% (LOSS); energy not served up 2.0% to 9.8% (LOSS); time uncomfortable up 0.0% to 0.1% (LOSS); electricity bill up 0.2% to 0.3% (power given); ramping up 4.5% to 6.2% (power given); time uncomfortable cut 0.0% (GAIN); highest peak up 2.5% (power given); distance from zero net energy up 0.0% (power given) | `results/live/V3_CITYLEARN.md` |
+Every row names the engine its table ran on (read from the table). Results are never read across engines: a row on an older engine stands as that engine's result until the same benchmark's three runs on the engine that stands replace it here, and every benchmark is rerun on the engine that stands.
+
+| Date | Benchmark | Engine | Benefit? | How much | Every change the same in all three of our runs, in words | Table |
+|---|---|---|---|---:|---|---|
+| 2026-10-10 | Every real test together: the Omni index | omni-v3 | **GAIN, power given** | **+5.2% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
+| 2026-10-15 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v6 | **GAIN, power given** | **+54% GAIN** | parked-worker energy up 1.8% to 2.7% (power given); standby-model energy up 1.8% to 2.7% (power given); mean response cut 45% to 47% (GAIN); p95 cut 58% to 61% (GAIN); p99 cut 65% to 69% (GAIN); time over the line cut 99% to 100% (GAIN) | `results/live/V6_GOLDILOCKS.md` |
+| 2026-10-15 | Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v6 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V6_CRUISEKUBE.md` |
+| 2026-10-15 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | **GAIN, power given** | **+105% GAIN** | parked-worker energy up 1.6% to 2.1% (power given); standby-model energy up 1.6% to 2.1% (power given); mean response cut 59% to 60% (GAIN); p95 cut 73% to 75% (GAIN); p99 cut 68% to 74% (GAIN); time over the line cut 97% to 99% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 98% to 100% (GAIN); replicas cut 11% to 18% (GAIN) | `results/live/V6_KEDA_REQUESTS.md` |
+| 2026-10-15 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | **GAIN, power given** | **+15% GAIN** | parked-worker energy up 1.2% to 1.6% (power given); standby-model energy up 1.2% to 1.6% (power given); mean response cut 37% to 41% (GAIN); p95 cut 55% to 57% (GAIN); p99 cut 59% to 63% (GAIN) | `results/live/V6_KEDA_CPU_REQUESTS.md` |
+| 2026-10-10 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | **GAIN, power given** | **+5.3% GAIN** | p95 cut 32% to 52% (GAIN); time over the line cut 8% to 36% (GAIN); replicas up 0.6% (power given); failed requests cut 8.4% to 8.5% (GAIN); parked-worker energy cut 0.3% (GAIN); standby-model energy cut 0.3% (GAIN) | `results/live/V3_SIX_KUBE.md` |
+| 2026-10-10 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | **GAIN** | **+155% GAIN** | p95 cut 95% to 98% (GAIN); p99 cut 97% to 98% (GAIN) | `results/live/V3_BIG_ORGANISM.md` |
+| 2026-10-10 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | **GAIN** | **+0.3% GAIN** | work per energy up 0.3% (GAIN) | `results/realms/REALMS.md` |
+| 2026-10-10 | Robustness: the two-hour run | omni-v3 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V3_ROBUST_LONG.md` |
+| 2026-10-10 | Robustness: the governor killed outright mid-run | omni-v3 | **GAIN** | **+8.6% GAIN** | mean response cut 33% to 40% (GAIN); p95 cut 27% to 48% (GAIN); time over the line cut 32% to 36% (GAIN) | `results/live/V3_ROBUST_KILL.md` |
+| 2026-10-10 | Robot arms (MuJoCo), the three untouched robots | omni-v3 | **GAIN** | **+3.8% GAIN** | energy per takt cut 0.8% (GAIN); copper heating per cycle cut 11% (GAIN); mechanical work per cycle cut 6.6% (GAIN); peak joint torque cut 29% (GAIN); tracking error, RMS cut 21% (GAIN); end-point error at the waypoints cut 11% (GAIN) | `results/live/V3_MUJOCO.md` |
+| 2026-10-10 | Redis, the cache's memory ceiling | omni-v3 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V3_REDIS.md` |
+| 2026-10-10 | Real Kubernetes, steady work | omni-v3 | **GAIN** | **+31% GAIN** | machines cut 1.7% to 2.0% (GAIN); machine-hours cut 1.7% to 2.0% (GAIN); standby-model energy cut 1.3% to 1.8% (GAIN); mean response cut 47% to 48% (GAIN); p95 cut 64% to 66% (GAIN); p99 cut 69% to 73% (GAIN); time over the line cut 97% to 99% (GAIN) | `results/live/V3_STEADY.md` |
+| 2026-10-10 | Real Kubernetes, faults | omni-v3 | **GAIN** | **+37% GAIN** | mean response cut 34% to 51% (GAIN); p95 cut 58% to 63% (GAIN); time over the line cut 27% to 43% (GAIN); failed requests cut 14% to 18% (GAIN) | `results/live/V3_FAULTS.md` |
+| 2026-10-10 | Real Kubernetes, demand that wanders | omni-v3 | **GAIN** | **+37% GAIN** | parked-worker energy cut 0.1% to 0.4% (GAIN); mean response cut 45% to 50% (GAIN); p95 cut 56% to 64% (GAIN); time over the line cut 36% to 42% (GAIN); failed requests cut 12% to 13% (GAIN) | `results/live/V3_WANDERING.md` |
+| 2026-10-10 | Real Kubernetes, all four at once | omni-v3 | **GAIN** | **+42% GAIN** | work inside the line up 54% to 68% (GAIN); mean response cut 43% to 48% (GAIN); p95 cut 57% to 62% (GAIN); time over the line cut 38% to 41% (GAIN); failed requests cut 11% to 14% (GAIN) | `results/live/V3_ALL_FOUR.md` |
+| 2026-10-10 | Real Kubernetes, a queue of jobs | omni-v3 | **GAIN** | **+16% GAIN** | machines cut 16% to 20% (GAIN); machine-hours cut 16% to 20% (GAIN); standby-model energy cut 11% to 14% (GAIN); mean response cut 11% to 13% (GAIN); machines after the queue cut 26% to 33% (GAIN) | `results/live/V3_BATCH.md` |
+| 2026-10-10 | Real Kubernetes, a public day of demand (Google 2011) | omni-v3 | **GAIN** | **+46% GAIN** | machines cut 7.3% to 9.2% (GAIN); machine-hours cut 7.4% to 9.2% (GAIN); parked-worker energy cut 0.3% to 0.4% (GAIN); standby-model energy cut 5.3% to 6.7% (GAIN); mean response cut 51% to 53% (GAIN); p95 cut 64% to 66% (GAIN); p99 cut 60% to 62% (GAIN); time over the line cut 81% to 82% (GAIN); failed requests cut 11% to 18% (GAIN); replicas cut 3.8% to 8.3% (GAIN) | `results/live/V3_TRACE_GOOGLE2011.md` |
+| 2026-10-10 | Real Kubernetes, a noisy neighbour | omni-v3 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V3_FAIRNESS.md` |
+| 2026-10-10 | Power grids (SimBench), both load models | omni-v3 | **GAIN, power given** | **+5.8% GAIN** | energy the loads drew cut 1.3% to 1.5% (GAIN); energy dissipated in lines and transformers cut 0.0% to 2.4% (GAIN); net import from the upstream grid cut 0% to 15% (GAIN); tap operations cut 16% to 38% (GAIN); energy dissipated in lines and transformers up 0.6% to 1.5% (power given); tap operations up 100% (power given); net import from the upstream grid up 0.0% (power given) | `results/live/V3_PANDAPOWER.md` |
+| 2026-10-10 | PostgreSQL, the pooler's pool size | omni-v3 | **GAIN, power given** | **+0.9% GAIN** | connections most at once up 8% to 12% (power given); connections held open cut 7% to 13% (GAIN) | `results/live/V3_PGBENCH.md` |
+| 2026-10-10 | MySQL, the buffer pool's size | omni-v3 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V3_SYSBENCH.md` |
+| 2026-10-10 | MongoDB, the storage engine's cache size | omni-v3 | **GAIN** | **+1.7% GAIN** | cache size held cut 10% to 15% (GAIN); cache in use cut 10% to 14% (GAIN) | `results/live/V3_YCSB.md` |
+| 2026-10-10 | Kafka, the consumer group's size | omni-v3 | **GAIN** | **+0.1% GAIN** | consumers running cut 0.8% (GAIN) | `results/live/V3_KAFKA.md` |
+| 2026-10-10 | Drone swarms, the three untouched cells | omni-v3 | **GAIN** | **+5.9% GAIN** | energy per mission cut 7% to 20% (GAIN); fleet energy over the window cut 7% to 20% (GAIN); missions per charge at the autopilot's reserve up 8% to 25% (GAIN) | `results/live/V3_SWARM.md` |
+| 2026-10-10 | Buildings and batteries (CityLearn), the districts with batteries | omni-v3 | **GAIN AND LOSS** | **+0.8% GAIN** | electricity bought cut 0% to 15% (GAIN); daily peak draw cut 1% to 14% (GAIN); highest peak cut 2.7% to 3.5% (GAIN); ramping cut 1.3% to 7.2% (GAIN); daily load unevenness cut 0.3% to 4.7% (GAIN); monthly load unevenness cut 0.2% to 1.9% (GAIN); distance from zero net energy cut 0.0% to 6.1% (GAIN); electricity bill cut 8.6% (GAIN); carbon cut 0% to 12% (GAIN); monthly load unevenness up 0.1% (LOSS); energy not served up 2.0% to 9.8% (LOSS); time uncomfortable up 0.0% to 0.1% (LOSS); electricity bill up 0.2% to 0.3% (power given); ramping up 4.5% to 6.2% (power given); time uncomfortable cut 0.0% (GAIN); highest peak up 2.5% (power given); distance from zero net energy up 0.0% (power given) | `results/live/V3_CITYLEARN.md` |
 
 ### The parts behind a row
 
@@ -6971,7 +6979,7 @@ themselves, which is why every row is in its table.
 | **MongoDB as its publisher ships it, a database's operator-set storage-engine cache size** (512 MB as native; Omni on the cache size inside [256, 2,048] MB through the server's own console), YCSB's workloads b, c, f and burst untouched, 3 pairs × 3 runs (the set of 10 October, the brain's verdict on the cache, amendment 2) | v3 | L | the cache held **−3% to −13% on `f`, GAIN in all three of our runs**; `b`, `c` and `burst` inside the noise; work, p95, p99, mean latency and CPU inside the noise on all four; no failed operation; every cache handed back; the two earlier sets whole in `docs/history` | `results/live/V3_YCSB.md` |
 | **Robustness: the governor killed outright mid-run** (SIGKILL at 40% of the window, the watchdog beside it), 10 pairs × 3 runs (the set of 10 October) | v3 | L | every setting back within the allowance in every repetition of every run, a second governor to the end in every one; the whole window mean response −33% to −40%, p95 −27% to −48%, time over the line −32% to −36%, GAIN in all three of our runs; failed requests, machines and energy inside the noise; the first set (7 to 11 s to hand back) whole in `docs/history/V3_ROBUST_KILL_set1.md` | `results/live/V3_ROBUST_KILL.md` |
 | **The governor's own cost** at 1, 10, 100 and 1,000 copies with the real cluster inside | v3 and v1, each under its own engine | L | 0.006 to 0.013 of one core at every size, 0.1% to 0.3% of the host's cores; shown, not judged | `results/live/V3_OWN_COST.md` |
-| **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
+| **Scale**: the controller governing 50, 500 and 1,000 stand-in nodes (KWOK's nodes, no machines behind them), decision time and correctness | every push | L | runs on every push | `results/scale/` |
 | GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
 
 **Running now** (9 October): both big organisms at 1,000 copies done on rented machines (the four stacked and the whole
@@ -7794,12 +7802,12 @@ outcome, the repetitions, and the two guardrails above are unchanged.
   power, joules, temperature, utilization, clock-limit reasons; the workload's requests, latency and failures. Omni
   never supplies its own outcome.
 - **Secondary, descriptive (no verdict):**
-  - actuator fidelity: r_act = read back − requested (mean and max absolute), delay (median, max), enforced-under-requested
+  - actuator fidelity: r[act] = read back − requested (mean and max absolute), delay (median, max), enforced-under-requested
     count, total variation of the realized limit, reversals, refused writes;
-  - control effort: J_u = sum of abs(u_push) × decision interval; mean and max abs(u_push); saturations
-    (abs(u_push) = 25); shield interventions (a bound other than the engine decided); holds;
-  - representation fidelity: R_int = sqrt(mean over consecutive decision pairs of sum_k w_k (h(z_(k+1)) −
-    F_h(h(z_k), u_k))_k²) over E, U, I_U, S, B, weights 1, with h the memoryless map and F_h the engine's own
+  - control effort: Jᵤ = sum of abs(u[push]) × decision interval; mean and max abs(u[push]); saturations
+    (abs(u[push]) = 25); shield interventions (a bound other than the engine decided); holds;
+  - representation fidelity: R[int] = sqrt(mean over consecutive decision pairs of sum_k wₖ (h(z_(k+1)) −
+    Fₕ(h(zₖ), uₖ))_k²) over E, U, I[U], S, B, weights 1, with h the memoryless map and Fₕ the engine's own
     projection (`state_projected_next`); directional accuracy = share of pairs where sign(projected − current reading)
     equals sign(next measured − current measured), both movements at least 0.01, per state and by predicted size
     (0.01–0.03, 0.03–0.1, ≥ 0.1);
@@ -8501,7 +8509,7 @@ The labelling rule gains the mirror of ENERGY IMPROVEMENT WITH SERVICE TRADEOFF:
 before, and every other label keeps its definition.
 
 Also in this amendment: an effort cap on a motion axis moves only where the copper loss it saves at full acceleration,
-(J a_max / kt)^2 R, exceeds the standing draw a longer move pays, p_idle + b v_max^2 (a reaction wheel; not traction, a
+(J a[max] / kt)^2 R, exceeds the standing draw a longer move pays, p[idle] + b v[max]^2 (a reaction wheel; not traction, a
 flight axis or a robot joint). The machine-release margin on node pools is 0.3, the largest at which no pool is later than
 native (`results/realms/RELEASE_MARGIN_SWEEP.md`, the per-muscle sweep).
 
@@ -8630,7 +8638,7 @@ the pods' CPU limits and every worker to native, with no record left (`scripts/k
 ### The compass law in the live controller
 
 The service position is the 95th-percentile response time over the SLO (0 calm, 1 the line); a blind probe or a pod
-waiting for a place reads as past the wall. The force is `A tanh((K_P (p - 0.5) + K_D v) / A)` with K_D for critical
+waiting for a place reads as past the wall. The force is `A tanh((K_P (p - 0.5) + K_D v) / A)` with K[D] for critical
 damping times the realm push factor 3, the same law and gains as on every realm muscle (`realms/compass_arm.py`):
 up gain 0.10, down gain 0.02, release threshold -0.2. Two levers:
 
@@ -8846,30 +8854,30 @@ one rule neither result is labelled GAIN. Both causes are read from the controll
 stated here, as law, before the tests run again.
 
 **1. Only a sensed muscle moves (the fairness cause).** Let the probe measure the response time of the services in a
-set $\mathcal{S}$ (`--sensed ns/deployment,...`; empty means every HPA, the single-service case). For each HPA $h$
-scaling a deployment $d(h)$ with the operator's target $x^{op}_h$, the target written is
+set S (`--sensed ns/deployment,...`; empty means every HPA, the single-service case). For each HPA h
+scaling a deployment d(h) with the operator's target x^(op)ₕ, the target written is
 
-$$x_h(t) = \begin{cases} \text{the compass's (or the allocation law's) target} & d(h) \in \mathcal{S} \\ x^{op}_h & d(h) \notin \mathcal{S} \end{cases}$$
+xₕ(t) = the compass’s (or the allocation law’s) target, if d(h) ∈ S; x^(op)ₕ, if d(h) ∉ S
 
-The probe's position $p$ is a statement about $\mathcal{S}$ alone. A push on a muscle outside $\mathcal{S}$ answers no
-sensed error and adds pods that compete with $\mathcal{S}$ for the same machines (the run's pending pods and failures).
+The probe's position p is a statement about S alone. A push on a muscle outside S answers no
+sensed error and adds pods that compete with S for the same machines (the run's pending pods and failures).
 It is the GPU law's own rule, applied to Kubernetes: where Omni-Compass cannot sense, it stands at native's own setting.
 
-**2. Pods owed to a growing demand stay (the churn cause).** Let $u(t)$ be the CPU the workers use and $W$ the HPA's
-scale-down window ($W = 300$ s unless the operator set one). The demand is *still growing* when
+**2. Pods owed to a growing demand stay (the churn cause).** Let u(t) be the CPU the workers use and W the HPA's
+scale-down window (W = 300 s unless the operator set one). The demand is *still growing* when
 
-$$G(t) = \Big[\, u(t) > (1 + \epsilon)\, \min_{t - W \le s \le t} u(s) \,\Big], \qquad \epsilon = 0.05 .$$
+G(t) = [u(t) > (1 + ε) min[t − W ≤ s ≤ t] u(s)], ε = 0.05 .
 
-After a breach the compass lowers the target to the bottom of its cover, $x = x_{lo} = 0.6\,x^{op}$ (more pods, at once).
-Before this amendment, the first decision with the position back under the centre, $p < c = 0.4$, no breach and no
-pod waiting, returned $x = x^{op}$ at once. Under a rising load the autoscaler then removed the extra pods one window
+After a breach the compass lowers the target to the bottom of its cover, x = x[lo] = 0.6 x^(op) (more pods, at once).
+Before this amendment, the first decision with the position back under the centre, p < c = 0.4, no breach and no
+pod waiting, returned x = x^(op) at once. Under a rising load the autoscaler then removed the extra pods one window
 later and started them again at the next step: the run's churn. The return is now
 
-$$x \leftarrow x^{op} \quad \text{only if} \quad p < c,\ \ \text{no breach},\ \ \text{no pod waiting},\ \ \neg G(t),$$
+x ← x^(op) only if p < c, no breach, no pod waiting, ¬ G(t),
 
-and while $G(t)$ holds the target stays where the breach put it. A fault or a spike that has passed has a flat or
-falling $u$, so $G$ is false and the operator's target returns at once, as the fault test requires (set 31 F:
-HPA replicas under faults −1.1%); only a demand still climbing keeps its pods. $\epsilon = 0.05$ is set above the
+and while G(t) holds the target stays where the breach put it. A fault or a spike that has passed has a flat or
+falling u, so G is false and the operator's target returns at once, as the fault test requires (set 31 F:
+HPA replicas under faults −1.1%); only a demand still climbing keeps its pods. ε = 0.05 is set above the
 decision-to-decision noise of the node CPU reading. A rise too small to clear it leaves the rule as it was before this
 amendment (the target returns at once), so the correction can remove churn but cannot add any.
 
@@ -8908,21 +8916,21 @@ All three on commit `199f350`, 10 paired repetitions each, the design unchanged.
 37162457542 and 37162458834; nothing re-run). In the capacity test native started its pods once, early (33 of 38 in
 the first fifth of the window), and removed none. With Omni-Compass on top, two minutes into the window the controller
 raised the HPA target above the operator's (the conveyance: each pod given a larger CPU limit, the target raised by the
-same factor so each pod stays as busy, $x = g\,x^{op}$; 114% with the compass law, 190% with the allocation law). The
+same factor so each pod stays as busy, x = g x^(op); 114% with the compass law, 190% with the allocation law). The
 autoscaler then removed pods (14 with the compass law, 35 with the allocation law, over ten repetitions), and the next
 load steps started them again. **The extra starts are exactly those removals.** Correction 2 above read the wrong
 signal: the CPU used by the whole node, where one load step is lost in the node's own load.
 
 **3. A raise of the target waits for a steady demand.** Let the demand on an HPA's service be read from the
-autoscaler's own status, $D(t) = \bar{u}(t)\, r(t)$: the pods' mean CPU utilisation of their request times the pods
-running, the CPU used in units of one pod's request. With $W$ the HPA's scale-down window and $\epsilon = 0.05$,
+autoscaler's own status, D(t) = ū(t) r(t): the pods' mean CPU utilisation of their request times the pods
+running, the CPU used in units of one pod's request. With W the HPA's scale-down window and ε = 0.05,
 
-$$S(t) = \Big[\, t - t_0 \ge 0.9\,W \ \wedge\ \max_{[t-W,\,t]} D \le (1+\epsilon)\min_{[t-W,\,t]} D \,\Big]$$
+S(t) = [t − t₀ ≥ 0.9 W ∧ max[[t−W, t]] D ≤ (1+ε)min[[t−W, t]] D]
 
-($t_0$ the oldest sample in the window). A new target above the one standing (fewer, larger pods) is written only
-when $S(t)$ holds; the autoscaler itself removes pods only after its scale-down window, and Omni-Compass now asks the
+(t₀ the oldest sample in the window). A new target above the one standing (fewer, larger pods) is written only
+when S(t) holds; the autoscaler itself removes pods only after its scale-down window, and Omni-Compass now asks the
 same of its own consolidation. A lower target (more pods) is never held, and the return of the operator's own target
-after a fault (rule 2) is unchanged. Correction 2's growth test $G(t)$ now reads the same $D(t)$ of the HPA concerned,
+after a fault (rule 2) is unchanged. Correction 2's growth test G(t) now reads the same D(t) of the HPA concerned,
 not the node's CPU. Tests: `tests/test_compass_controller.py`, case *steady*.
 
 The capacity, fairness and fault tests are run again on the commit that carries this amendment, unchanged in design,
@@ -8932,11 +8940,11 @@ started on commit `199f350`, before this amendment, and is reported as of that c
 ### The third amendment, and a change considered and declined (2026-10-04, before the next runs)
 
 **4. A lower target is never held.** Until now every new HPA target, in either direction, was held for one autoscaler
-window $W$ while the line was clean, so on a step up the compass's push (a lower target, more pods) could wait up to $W$
+window W while the line was clean, so on a step up the compass's push (a lower target, more pods) could wait up to W
 and the pods arrive after the line is missed. The hold exists because a raise inside the window removes pods the
 autoscaler then starts again; a lower target asks for pods and removes none. The hold now applies to raises only:
 
-$$\text{write } x_h(t) \iff x_h(t) < x_h^{\text{now}}\ \vee\ \text{no write in } [t-W,\,t)\ \vee\ \text{the operator's own target returns},$$
+write xₕ(t) ⇔ xₕ(t) < xₕ^(now) ∨ no write in [t−W, t) ∨ the operator’s own target returns,
 
 with rule 3 still requiring a steady demand before any raise. Tests: `tests/test_convey.py` (a lower target written at
 once inside the window).
@@ -8989,12 +8997,12 @@ The founder's instruction: no number in the harness is hard-wired; every one mov
 of 10 in `deploy/kind/demo.yaml` is the value of Kubernetes' own php-apache example, not a choice of any operator, and
 an earlier session read it as an operator's bound. It becomes a lever, under the operator's grant.
 
-**5. Replica room.** With `--replica-ceiling` $N_{\max}$ granted (0, the default, leaves the cap untouched), for a
-sensed HPA under the compass law, with $r$ the pods running, $c$ the cap, $\bar{u}$ the pods' mean utilisation and $x$
-the target, the autoscaler's own arithmetic asks for $n = \lceil r\,\bar{u}/x \rceil$ replicas, and
+**5. Replica room.** With `--replica-ceiling` N[max] granted (0, the default, leaves the cap untouched), for a
+sensed HPA under the compass law, with r the pods running, c the cap, ū the pods' mean utilisation and x
+the target, the autoscaler's own arithmetic asks for n = ⌈r ū/x⌉ replicas, and
 
-$$c \leftarrow \min(N_{\max},\, n) \quad \text{if } r \ge c,\ n > c,\ p \ge \text{centre or the line is breached};$$
-$$c \leftarrow c^{op} \quad \text{if } n \le c^{op},\ p < \text{centre},\ \text{no breach},\ S(t).$$
+c ← min(N[max], n) if r ≥ c, n > c, p ≥ centre or the line is breached;
+c ← c^(op) if n ≤ c^(op), p < centre, no breach, S(t).
 
 The cap is raised only while it binds and the line is threatened, to what the autoscaler asks and never past the grant,
 and returns to the operator's once the demand has held still for a window. The operator's range is recorded before
@@ -9803,13 +9811,13 @@ id `29d9808dfb8f…`; the printed configuration `printed_eight_line`, id `cd333d
 | Class | Statement | Where |
 |---|---|---|
 | T | Unsaturated, the U-channel error obeys de/dt = −KP e; V = e²/2 has dV/dt = −KP e² < 0 for e ≠ 0 (inside Omega_unsat only). | `docs/TRACKING_THEOREM.md` Thm 1 |
-| T | With the U drift bounded by F_bar < u_max, V decreases wherever e ≠ 0, saturated or not; e never changes sign; saturated stretches end in bounded time (continuous time). | Thm 2 |
-| T | On the declared parameter box, F_bar = 16.86 < 25, so Thm 2 holds over the whole box in continuous time. | Thm 2 |
-| T | The sampled controller (u held through each RK4 step) satisfies e_(k+1) = 0.88 e_k + d_k, hence abs(e_k) <= 0.88^k abs(e_0) + epsilon_h (1 − 0.88^k)/0.12. | Thm 3 |
+| T | With the U drift bounded by F[bar] < u[max], V decreases wherever e ≠ 0, saturated or not; e never changes sign; saturated stretches end in bounded time (continuous time). | Thm 2 |
+| T | On the declared parameter box, F[bar] = 16.86 < 25, so Thm 2 holds over the whole box in continuous time. | Thm 2 |
+| T | The sampled controller (u held through each RK4 step) satisfies e_(k+1) = 0.88 eₖ + dₖ, hence abs(eₖ) <= 0.88^k abs(e₀) + epsilon_h (1 − 0.88^k)/0.12. | Thm 3 |
 | V | epsilon_h = 0.00378 over every micro step of the 500 frozen fixtures (nearest target); ultimate bound 0.0315 < BASIN_TOL 0.10. Wrong target: 0.0243, bound 0.20 (wider than the basin). | `results/TRACKING_BOUNDS.json` |
 | V | The discrete execution dithers inside that band: abs(e) grew on 27 061 of 100 000 micro steps; e changed sign 747 times. The continuous monotone decay is not inherited. | same |
 | V | Saturated micro steps: 0 of 100 000 (nearest target), 5 of 100 000 (wrong target). | same |
-| T | The admissible box A (E interval, abs(U − sigma) <= abs(U0 − sigma), S between S0 and S_plus) is forward invariant in continuous time. | Thm 4 |
+| T | The admissible box A (E interval, abs(U − sigma) <= abs(U0 − sigma), S between S0 and S[plus]) is forward invariant in continuous time. | Thm 4 |
 | V | Discrete invariance of A: 0 failures over 100 000 micro steps of the frozen fixtures, both targets. | `results/TRACKING_BOUNDS.json` |
 | O | Discrete invariance and epsilon_h proved over the whole box (interval arithmetic). | — |
 | O | Global stability of the forced six-state system. | `docs/FORMAL_STATUS.md` |
@@ -10029,7 +10037,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - the organisms under the climb load: Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
   - the organisms under the line load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of engines v1 and v3, each named in its table): +5.2% GAIN on the resource reading (work, speed, machines, energy), +12.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v3, each named in its table): +5.2% GAIN on the resource reading (work, speed, machines, energy), +12.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +31.8% GAIN
   - Real database cache (MongoDB under YCSB, GitHub): +1.7% GAIN
   - Real database (PostgreSQL behind PgBouncer, GitHub): +0.9% GAIN
@@ -10037,32 +10045,36 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - Real cache (Redis, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-| Benchmark | Its one number | Its word | Class |
-|---|---:|---|---|
-| Every real test together: the Omni index | +5.2% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | +59.5% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | +27.5% | GAIN, power given | L |
-| The six organisms with the real cluster inside, 10 and 100 copies | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
-| The big organisms with the real cluster inside, 1,000 copies on Azure | +155.0% | GAIN | L, the cluster; S, the organism around it |
-| The 945 modelled muscles as one tower, every muscle written at once | +0.3% | GAIN | S |
-| Robustness: the two-hour run | +0.0% | EVEN | L |
-| Robustness: the governor killed outright mid-run | +8.6% | GAIN | L |
-| Robot arms (MuJoCo), the three untouched robots | +3.8% | GAIN | S |
-| Redis, the cache's memory ceiling | +0.0% | EVEN | L |
-| Real Kubernetes, steady work | +30.5% | GAIN | L |
-| Real Kubernetes, faults | +36.6% | GAIN | L |
-| Real Kubernetes, demand that wanders | +37.0% | GAIN | L |
-| Real Kubernetes, all four at once | +41.7% | GAIN | L |
-| Real Kubernetes, a queue of jobs | +16.5% | GAIN | L |
-| Real Kubernetes, a public day of demand (Google 2011) | +46.4% | GAIN | L |
-| Real Kubernetes, a noisy neighbour | +0.0% | EVEN | L |
-| Power grids (SimBench), both load models | +5.8% | GAIN, power given | S |
-| PostgreSQL, the pooler's pool size | +0.9% | GAIN, power given | L |
-| MySQL, the buffer pool's size | +0.0% | EVEN | L |
-| MongoDB, the storage engine's cache size | +1.7% | GAIN | L |
-| Kafka, the consumer group's size | +0.1% | GAIN | L |
-| Drone swarms, the three untouched cells | +5.9% | GAIN | S |
-| Buildings and batteries (CityLearn), the districts with batteries | +0.8% | GAIN AND LOSS | S |
+**On the engine that stands (omni-v6): 4 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+
+| Benchmark | Engine | Its one number | Its word | Class |
+|---|---|---:|---|---|
+| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v6 | +54.0% | GAIN, power given | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v6 | +0.0% | EVEN | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +105.0% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +15.0% | GAIN, power given | L |
+| Every real test together: the Omni index | omni-v3 | +5.2% | GAIN, power given | L |
+| The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
+| The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
+| The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
+| Robustness: the two-hour run | omni-v3 | +0.0% | EVEN | L |
+| Robustness: the governor killed outright mid-run | omni-v3 | +8.6% | GAIN | L |
+| Robot arms (MuJoCo), the three untouched robots | omni-v3 | +3.8% | GAIN | S |
+| Redis, the cache's memory ceiling | omni-v3 | +0.0% | EVEN | L |
+| Real Kubernetes, steady work | omni-v3 | +30.5% | GAIN | L |
+| Real Kubernetes, faults | omni-v3 | +36.6% | GAIN | L |
+| Real Kubernetes, demand that wanders | omni-v3 | +37.0% | GAIN | L |
+| Real Kubernetes, all four at once | omni-v3 | +41.7% | GAIN | L |
+| Real Kubernetes, a queue of jobs | omni-v3 | +16.5% | GAIN | L |
+| Real Kubernetes, a public day of demand (Google 2011) | omni-v3 | +46.4% | GAIN | L |
+| Real Kubernetes, a noisy neighbour | omni-v3 | +0.0% | EVEN | L |
+| Power grids (SimBench), both load models | omni-v3 | +5.8% | GAIN, power given | S |
+| PostgreSQL, the pooler's pool size | omni-v3 | +0.9% | GAIN, power given | L |
+| MySQL, the buffer pool's size | omni-v3 | +0.0% | EVEN | L |
+| MongoDB, the storage engine's cache size | omni-v3 | +1.7% | GAIN | L |
+| Kafka, the consumer group's size | omni-v3 | +0.1% | GAIN | L |
+| Drone swarms, the three untouched cells | omni-v3 | +5.9% | GAIN | S |
+| Buildings and batteries (CityLearn), the districts with batteries | omni-v3 | +0.8% | GAIN AND LOSS | S |
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
@@ -10417,11 +10429,11 @@ Omni-Compass on top. Let
 
 **Productivity** is work per resource, *P = W / C*. With the work held equal, the gain from Omni-Compass on top is
 
-  *G = P_omni / P_native − 1 = C_native / C_omni − 1.*
+  *G = P[omni] / P[native] − 1 = C[native] / C[omni] − 1.*
 
 A gain *G* means the same resources can carry *G* more work. Read from the other side, the same work needs only
 
-  *C_omni / C_native = 1 / (1 + G)*
+  *C[omni] / C[native] = 1 / (1 + G)*
 
 of the resources, a saving of *S = G / (1 + G)*. So **a third more work (G = 33%) is a quarter off the bill
 (S = 25%)**; 20% more work is 16.7% off; 50% more work is a third off. Both columns are the same measurement.
@@ -10441,7 +10453,7 @@ Three rules for reading any receipt:
 49% more requests inside the response line: *G* is 0.35 to 0.49, so the same work would need 1/1.35 to 1/1.49 of the
 machines, a saving *S* of 26% to 33%, had the fleet been free to shrink; on kind it was not, which is why the table
 reports the work column and not a bill. In the database test, the pooler held 61% to 72% fewer connections open for the
-same work: the resource there is connections, *C_omni / C_native* is 0.28 to 0.39, and the gain read as "more work for
+same work: the resource there is connections, *C[omni] / C[native]* is 0.28 to 0.39, and the gain read as "more work for
 the same connections" would be *G* = 1.6 to 2.6, which the table reports as the machines-equivalent column, "fewer
 connections by". In the Kafka test the work inside the line rose 16% to 21% while the consumers running rose by a factor
 of 2.6 to 4: there the gain in work was bought with resources, and the table reports both, the one as GAIN in all three of our runs
@@ -10779,7 +10791,7 @@ the pods, the job. Omni reads a meter, writes one lever, and puts that lever bac
 | The chapter says | The code today | Check |
 |---|---|---|
 | Omni reads the plant's meters and maps them to the state E, U, S | `omnicompass/adapter.py`, `observe_vector` and `assimilate` | matches |
-| It computes the drift with the command at zero, then raw = −drift + K_P·(σ − U), clipped to the authority before the step | `omnicompass/core.py`, `control_command`: `u = clip(−f_U(x,t) + KP·(σ − U), ±U_AUTHORITY)` | matches |
+| It computes the drift with the command at zero, then raw = −drift + K[P]·(σ − U), clipped to the authority before the step | `omnicompass/core.py`, `control_command`: `u = clip(−f_U(x,t) + KP·(σ − U), ±U_AUTHORITY)` | matches |
 | It holds that same u through every RK4 stage and does not rewrite U afterwards | `core.py`, `macro_step`: one `u` per micro step, passed unchanged into all four RK4 stages; U is never overwritten | matches (proved: `docs/TRACKING_THEOREM.md`) |
 | It writes the clipped command u to the lever | **Not today.** The frozen live governor runs the engine with u = 0 (`macro_step(..., target=None)`) and uses u only as its convergence signal (`push = u / U_AUTHORITY`). The lever is set by the allocation law and the nervous system's authority (`omnicompass/nervous_system.py`). | **design aim**, see "What to strengthen" |
 | On exit it restores the lever | kill switch: `omni_controller/controller.py` restore; the GPU bench restores and reads back the start limit; the realm harness checks every knob is handed back | matches |

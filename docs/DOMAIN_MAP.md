@@ -11,7 +11,7 @@ Omni-Compass is the same engine on every muscle. Each muscle gets one connector 
 | Part | Role | Example (compute) |
 |---|---|---|
 | Afferent (sense) | What the muscle reports | load, pending work, power, heat |
-| Engine | Equations (1)-(7) turn readings into state: error E, coherence U, pressure I_U, stress S, bath B | same six-state engine everywhere |
+| Engine | Equations (1)-(7) turn readings into state: error E, coherence U, pressure I[U], stress S, bath B | same six-state engine everywhere |
 | Efferent (push) | The equation (2) law and allocation law drive the muscle toward convergence | node count, HPA target, power cap |
 | Reflex (shield) | Hard limits checked before any push | never below pod requests, step limits, power limit |
 | Kill | Control returns to the muscle's own controllers | restore HPA targets, observe only |

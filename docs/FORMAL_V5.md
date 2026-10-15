@@ -12,38 +12,38 @@ limits, and nothing on this page is claimed beyond them. The earlier formal resu
 
 ## 1. Setting
 
-A **body** is a set of plants p_1, ..., p_n run on one clock of decisions k = 0, 1, 2, ... (15 s each in the
+A **body** is a set of plants p₁, ..., pₙ run on one clock of decisions k = 0, 1, 2, ... (15 s each in the
 organisms). Each plant i has
 
-- a template τ_i (compute_pool, thermal_zone, energy_storage, motion_axis, process_loop: `realms/plants.py`),
-- one knob κ_i (capacity, setpoint, power or admission: the muscle's single wire),
-- a **native controller** N_i, the plant's own law, unchanged by Omni-Compass: the pod autoscaler or the cluster
+- a template τᵢ (compute_pool, thermal_zone, energy_storage, motion_axis, process_loop: `realms/plants.py`),
+- one knob κᵢ (capacity, setpoint, power or admission: the muscle's single wire),
+- a **native controller** Nᵢ, the plant's own law, unchanged by Omni-Compass: the pod autoscaler or the cluster
   autoscaler of a pool, the PI loop and staging of a cooled room, the dispatch of a battery site, the servo profile of
   an axis, the PI loop of a process,
-- a state x_{i,k} and an exogenous input w_{i,k} (arrivals, heat from its own load, the site's own load, disturbance),
+- a state xᵢ,ₖ and an exogenous input wᵢ,ₖ (arrivals, heat from its own load, the site's own load, disturbance),
   drawn from the plant's seed, the same in every arm.
 
-The plants are coupled through the body (`realms/harness.py`, `Body.couple`): with S_k the body's source power (every
-plant that is neither a room nor a battery site) and Z_k the rooms' power, room z receives heat h_z · S_{k−1} and battery
-site s receives load g_s · (S_{k−1} + Z_{k−1} − its nominal), where h_z and g_s are fixed by the body's calibration.
+The plants are coupled through the body (`realms/harness.py`, `Body.couple`): with Sₖ the body's source power (every
+plant that is neither a room nor a battery site) and Zₖ the rooms' power, room z receives heat h[z] · Sₖ₋₁ and battery
+site s receives load gₛ · (Sₖ₋₁ + Zₖ₋₁ − its nominal), where h[z] and gₛ are fixed by the body's calibration.
 
-An **override** o_{i,k} is a set of key-value pairs that bounds what N_i may do at decision k: a floor and a cap on the
+An **override** oᵢ,ₖ is a set of key-value pairs that bounds what Nᵢ may do at decision k: a floor and a cap on the
 machines a pool's autoscaler may ask for, a setpoint for a room's loop, a reserve or a defended ceiling for a battery's
 dispatch, a speed scale for an axis. The plant then steps by its own law under that bound:
-x_{i,k+1} = f_i(x_{i,k}, N_i(x_{i,k}; o_{i,k}), w_{i,k}, coupling_k). The empty override leaves N_i exactly as shipped.
+xᵢ,ₖ₊₁ = fᵢ(xᵢ,ₖ, Nᵢ(xᵢ,ₖ; oᵢ,ₖ), wᵢ,ₖ, coupling_k). The empty override leaves Nᵢ exactly as shipped.
 
-**Definition 1 (the two arms).** The native arm writes o_{i,k} = ∅ for every i and k. The Omni arm writes
-o_k = G(y_0, ..., y_k) for k < K, where y_k is what the governor reads at decision k and K is the decision at which the
+**Definition 1 (the two arms).** The native arm writes oᵢ,ₖ = ∅ for every i and k. The Omni arm writes
+oₖ = G(y₀, ..., yₖ) for k < K, where yₖ is what the governor reads at decision k and K is the decision at which the
 governor goes silent (in every run, K = 0.8 × the run's decisions), and the lease's walk back after K (Property V5).
 Both arms run the same plants, the same seeds and the same inputs.
 
 **Definition 2 (a governor, and a collection of tools).** A rule G is a **collection of separate tools** if there are
-maps g_1, ..., g_n with o_{i,k} = g_i(y_{i,0}, ..., y_{i,k}) for every i and k: each muscle's bound depends on that
-muscle's readings alone. G is **one governor over the body** if for some plant i the bound o_{i,k} depends on the
+maps g₁, ..., gₙ with oᵢ,ₖ = gᵢ(yᵢ,₀, ..., yᵢ,ₖ) for every i and k: each muscle's bound depends on that
+muscle's readings alone. G is **one governor over the body** if for some plant i the bound oᵢ,ₖ depends on the
 readings of another plant j ≠ i.
 
-**Definition 3 (a twin).** The twin T_i of a plant i is the same plant model, built from the same row and seed, fed the
-same exogenous input, run under N_i alone with no override. The pools' twins run inside the governor
+**Definition 3 (a twin).** The twin Tᵢ of a plant i is the same plant model, built from the same row and seed, fed the
+same exogenous input, run under Nᵢ alone with no override. The pools' twins run inside the governor
 (`Bone.__init__`, `Bone.advance_twin`); a twin is the governor's model of what native does with that plant.
 
 **Definition 4 (room on a line).** The lines of a body are the battery sites' connections and the rooms' cooling. For a
@@ -71,11 +71,11 @@ that knob; {capacity} on an axis alone (inside a body an axis keeps its everyday
 Proof: every branch of `max_apply`, `max_hold` and `max_body_step` writes only these keys. ∎
 
 **Property V2 (never fewer machines than native asks for).** For every pool i with a twin, at every decision k < K, the
-count its autoscaler is asked for is never below the twin's: a floor written is ≥ m(T_{i,k}), and a cap written is
-≥ max(m(T_{i,k}), n_min), where m counts machines in service and starting. Proof: `max_ask` sets base = m(T_{i,k}) and
+count its autoscaler is asked for is never below the twin's: a floor written is ≥ m(Tᵢ,ₖ), and a cap written is
+≥ max(m(Tᵢ,ₖ), n[min]), where m counts machines in service and starting. Proof: `max_ask` sets base = m(Tᵢ,ₖ) and
 want = max(forecast, base); `max_body_step` writes floor = max(now + can, base), and on a shortfall keep ≥ base. The
 pool's own law is a function of its own arrivals and settings only, so its twin runs exactly as the native arm's pool
-does: m(T_{i,k}) is the count native asks for at that decision. ∎
+does: m(Tᵢ,ₖ) is the count native asks for at that decision. ∎
 
 **Property V3 (native at its limit is left alone).** Under the max, the override of every muscle wired by power or
 admission, of every process loop, and of every axis whose machine has no speed above its everyday setting is empty at
@@ -86,7 +86,7 @@ every decision: native already runs them at the top of their range. Proof: `max_
 machines the max adds, summed over the body, is at most R(1), and the machines of a pool that take r decisions to start
 are granted only out of R(r) less what was already granted. With R(1) < 0, what the max added goes back, the pools
 holding the most first, never below each pool's twin (V2), and no room is pulled below its operator's setpoint. Proof:
-`_units`, the running decrements of r_src, r_all and used, and the shortfall branch of `max_body_step`. ∎
+`_units`, the running decrements of r[src], r[all] and used, and the shortfall branch of `max_body_step`. ∎
 *Limit, stated with it:* R is a forecast. A line that climbs further within one decision than any climb it has shown,
 while power granted earlier is still in service (power is handed back one decision after a line shows the need), can
 still be carried over its limit. Section 4 gives how often that happened.
@@ -116,9 +116,9 @@ the controller's own rules (the scheduling floor while pods wait for a place, on
 governor's law, cruise while a queue waits), within the rate limit; the first refusal by the pool, or by the cloud's
 quota behind it, sets the top from then on.
 
-**Definition 5 (the readings).** For each seed s, the paired difference is d_s = Omni_s / native_s − 1 for work and
+**Definition 5 (the readings).** For each seed s, the paired difference is dₛ = Omni_s / native_s − 1 for work and
 energy, and Omni_s − native_s (percentage points) for the share of decisions over the line. Over n seeds, the 95%
-interval is mean ± t_{0.975, n−1} · sd / √n. A gain or a loss is a row whose interval is clear of zero; otherwise the
+interval is mean ± t[0.975, n−1] · sd / √n. A gain or a loss is a row whose interval is clear of zero; otherwise the
 row reads no difference beyond the noise. Across runs A, B and C: the same sign in all three with every interval clear
 of zero reads "lower (or higher) in all three of our runs"; an interval across zero reads "no difference beyond the
 noise"; clear intervals of opposite signs read "the runs disagree" (`tools/readings.py`, `tools/confirm_abc.py`).
@@ -154,10 +154,10 @@ the brain read was wrong. Each cause, and the property of the code that removes 
    decision later and their cooling answers over its own averaging, one more), has as room on its line only its limit
    less its whole draw, read at the draw's own climb.
 3. **Machines handed back while a queue needed them.** *V7:* on a shortfall, a pool is never held below
-   ⌈(λ_{k−1} + Q_k / Δt) / μ⌉.
+   ⌈(λₖ₋₁ + Qₖ / Δt) / μ⌉.
 4. **A room left warmer than native.** *V8:* every room has a twin: the same room under its operator's settings, warmed
    by native's heat (the body's source power with each pool's power replaced by its twin's). A room wired by its
-   setpoint that reads warmer than its twin by e > 0 has its setpoint written at most t_set − e, unless its cooling is
+   setpoint that reads warmer than its twin by e > 0 has its setpoint written at most t[set] − e, unless its cooling is
    already flat out.
 5. **A room that cannot cure itself.** *V11 (the body cures what a muscle cannot):* a room wired by its cooling units,
    a power or an admission gate, or whose cooling is flat out, and that reads warmer than its twin by e > 0, puts a heat
@@ -204,31 +204,31 @@ version, every result run again on it, the founder told first.
 The founder's question of 12 October, night: does every muscle have its own tuning, maxed to its own benefit, instead of
 one global setting for a thousand muscles? It does, and the engine now carries it.
 
-**Definition 6 (a card).** For muscle i, a card θ_i is the brain's settings for that muscle: for a machine pool, its edge
-utilisation u_i (how full it runs on its forecast before it calls for more) and its window w_i (decisions of history it
-reads); for a battery, its line margin z_i (wobbles kept under its line) and, wired by its power, its hold window and
+**Definition 6 (a card).** For muscle i, a card θᵢ is the brain's settings for that muscle: for a machine pool, its edge
+utilisation uᵢ (how full it runs on its forecast before it calls for more) and its window wᵢ (decisions of history it
+reads); for a battery, its line margin zᵢ (wobbles kept under its line) and, wired by its power, its hold window and
 hold margin. The brain is one (the same law, the same bone, the same body); only these numbers differ by muscle. A muscle
-without a card runs the global setting θ_0 (u = 0.95, w = 20, z = 3.09, the hold window equal to w, a hold margin of a
+without a card runs the global setting θ₀ (u = 0.95, w = 20, z = 3.09, the hold window equal to w, a hold margin of a
 twentieth of the line). The tune-down never reads cards.
 
 **The search (development seeds only, `tools/tune_cards.py`).** Every muscle whose settings can change what the max does
 (458 machine pools, 44 batteries, 48 axes) tries every candidate in a declared grid on seeds 7100-7109, alone, under its
-own load and with work waiting in line; θ_0 is always among the candidates. Pools: u ∈ {0.70, 0.75, ..., 0.95} × w ∈
+own load and with work waiting in line; θ₀ is always among the candidates. Pools: u ∈ {0.70, 0.75, ..., 0.95} × w ∈
 {10, 20, 40, 60}; batteries wired by their power: z ∈ {0, 0.5, 1, 2, 3.09} × hold window ∈ {3, 5, 10, 20} × hold margin
 ∈ {0, 0.02, 0.05, 0.10}; other batteries: z ∈ {0, 0.25, ..., 4}; axes: heat head × strain. A candidate is kept if it
-beats θ_0 beyond the noise on those seeds (fewer misses, more work or faster: a 95% interval of the paired difference clear
-of zero), read LOSS than θ_0 nowhere, and is never behind native: on no seed and under no load over its line
+beats θ₀ beyond the noise on those seeds (fewer misses, more work or faster: a 95% interval of the paired difference clear
+of zero), read LOSS than θ₀ nowhere, and is never behind native: on no seed and under no load over its line
 more often than native, doing less work or clearing its line later (the engine's own no-harm tests, seed by seed); among
-those, the fewest misses, then the most work, the fastest, the least energy. It is then run again against θ_0 on seeds 7200-7209 and enters the engine only
+those, the fewest misses, then the most work, the fastest, the least energy. It is then run again against θ₀ on seeds 7200-7209 and enters the engine only
 if it wins there too: a card must win twice. The preregistered seeds 3000-3009 are never read by the search.
 
 **V14 (the body has the last word on a line it shares).** Inside a body, a battery wired by its power keeps the body's
-margins on its line: its z and its hold margin are never slimmer than θ_0's; its own window stays. A card is chosen for
+margins on its line: its z and its hold margin are never slimmer than θ₀'s; its own window stays. A card is chosen for
 the muscle alone, and a battery's line inside a body carries the whole body's swing, which the battery alone never saw:
 the one plant behind native that the cards produced in development (a rack's power allocation, one extra decision
 over its line in the whole tower with work waiting, one seed of ten) was exactly that case, and V14 removes it.
 
-What the search found: 409 of the 550 searched muscles beat θ_0 on the first seeds; 364 won again on the second (45 fell
+What the search found: 409 of the 550 searched muscles beat θ₀ on the first seeds; 364 won again on the second (45 fell
 back to the global setting, none LOSS); the engine's cards are those 364 (`realms/muscle_cards_v5.csv`: 333 machine
 pools, 31 batteries). No axis setting beat the global one. A first set of cards was chosen by the mean over the seeds
 alone (371 cards); the engine's own no-harm test then caught one of them (an electrolyzer battery, one decision over its

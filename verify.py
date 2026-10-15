@@ -457,6 +457,9 @@ def main():
     check("the standing block of the state of play (where things stand: the engine, the muscles, the grid, the index, every benchmark's number) "
           "matches the result files it is read from (tools/summary.py --check; every push realigns)", r.returncode == 0,
           (r.stdout + r.stderr)[-300:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "unicode_math.py"), "--check"], capture_output=True, text=True)
+    check("every formula the two manuals print is written in Unicode, never LaTeX markup (the founder's order of 15 October; "
+          "tools/unicode_math.py --check)", r.returncode == 0, (r.stdout + r.stderr)[-300:])
     r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_readings", "tests.test_summary"], cwd=ROOT,
                        capture_output=True, text=True)
     check("the words rule (a reading's word set by the gauge's aim, never its sign; a resource that rose is power given, never a "

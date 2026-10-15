@@ -15,7 +15,7 @@ The zero-valued machines-only flag repair is retained: `1` selects machines-only
 
 `scripts/benchmark_campaign.json` records this request. A successful `verify` run for the release commit marked
 `[all-nongpu]` starts the grid automatically; an unsuccessful release verification launches no campaign.
-`scripts/reruns.txt` lists every standalone benchmark variant;
+`scripts/reruns.txt` lists every single-benchmark variant;
 the grid conductor releases A, B and C gradually alongside every organism at 1, 10, 100 and 1,000 copies and nested 1, 10, 100 and
 1,000 runs on free GitHub runners. The v6 dispatch manifest lives under `results/grid_v6`; v5 receipts remain historical. Each job prints its
 engine fingerprint and source commit. A queued, failed or unavailable test is not a completed measurement.

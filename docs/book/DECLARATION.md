@@ -54,42 +54,42 @@ the basin. Whatever the engine reaches, it reaches by the flow of its own equati
 |---|---|
 | E | Error, the misalignment energy |
 | U | Coherence, the alignment index |
-| I_U | Information, the internal-coherence channel |
+| I[U] | Information, the internal-coherence channel |
 | S | Coherence state potential |
 | B | Bath field |
 | B' | Bath field time derivative |
 | α | Feedback rate |
-| β_int(t) | Internal forcing function |
-| β_ext(t) | External forcing function |
+| β[int](t) | Internal forcing function |
+| β[ext](t) | External forcing function |
 | k | Coherence logistic damping gain |
 | σ₁ | Coupling of error into the information channel |
 | δ | Linear coherence coupling parameter |
 | λ₀ | Saturation bias |
 | λ₁ | Saturation gain |
 | λ₂ | S-state coupling gain |
-| U_t | Target coherence state |
+| Uₜ | Target coherence state |
 | c | Limiting velocity |
-| E_max | Per-trajectory error-rate normalization scale |
-| α_s | S-potential quadratic coefficient |
-| β_s | S-potential cubic coefficient |
+| E[max] | Per-trajectory error-rate normalization scale |
+| αₛ | S-potential quadratic coefficient |
+| βₛ | S-potential cubic coefficient |
 | Φ(S) | Potential field function |
-| F_state(S) | Canonical S-state flow |
-| ω_B | Bath frequency |
-| Q_B | Bath quality factor |
-| γ_c | Bath coupling gain |
+| F[state](S) | Canonical S-state flow |
+| ω[B] | Bath frequency |
+| Q[B] | Bath quality factor |
+| γ[c] | Bath coupling gain |
 
 ## The coupling architecture of Piece I
 
 The closed feedback core is E, U and S: error drives coherence, coherence and the state drive the velocity, the
-velocity drives error. The information channel I_U and the bath B with its derivative are driven response channels:
+velocity drives error. The information channel I[U] and the bath B with its derivative are driven response channels:
 they listen to the core and record it, and the core does not depend on them. γ₁ is reserved for compatibility and is
-inactive in the Piece I derivatives. The bath law uses ω_B² B, so ω_B carries the units of angular frequency.
+inactive in the Piece I derivatives. The bath law uses ω_B² B, so ω[B] carries the units of angular frequency.
 Line (7) advances B and B' continuously by RK4. Line (8) evaluates the discrete residual with
 D²_h B[n] = (B[n+1] - 2B[n] + B[n-1]) / h² and D⁻_h B[n] = (B[n] - B[n-1]) / h.
 
 ## The spinor closure
 
-The spinor extension introduces the phase θ(t) = ω_B t and multiplies line (4) by χ(θ) = cos(θ/2). At 0 degrees the
+The spinor extension introduces the phase θ(t) = ω[B] t and multiplies line (4) by χ(θ) = cos(θ/2). At 0 degrees the
 factor is +1, at 360 degrees it is -1, and at 720 degrees it is +1 again. A full turn of the bath reverses the sign
 of the velocity; only two full turns bring it home. The standard 20-step run evaluates the part of the phase it
 reaches, and a dedicated evidence test checks the 0, 360 and 720 degree periodicity on its own.
@@ -142,31 +142,31 @@ recorded state, or if it exhausts the horizon without CONVEY-5.
 | Group | Parameter | Value or range |
 |---|---|---|
 | Core | α | 4.2 |
-| Core | β_int | 0.0 to 1.0 |
-| Core | β_ext | 0.0 to 1.0 |
-| Core | E_max | 1.0 to 10.0, sampled once per trajectory |
+| Core | β[int] | 0.0 to 1.0 |
+| Core | β[ext] | 0.0 to 1.0 |
+| Core | E[max] | 1.0 to 10.0, sampled once per trajectory |
 | Core | k | 1.7 |
 | Information and coupling | σ₁ | 0.38 |
 | Information and coupling | δ | 0.01 to 1.0 |
 | Information and coupling | γ₁ | 1.35, reserved, inactive in the derivatives |
-| Information and coupling | γ_c | 1.0 |
+| Information and coupling | γ[c] | 1.0 |
 | Saturation and phase | c | 0.5 to 5.0 |
 | Saturation and phase | λ₀ | -2.0 to 2.0 |
 | Saturation and phase | λ₁ | 0.1 to 3.0 |
 | Saturation and phase | λ₂ | 0.0 to 2.0 |
-| Saturation and phase | U_t | 0.5 |
-| Saturation and phase | χ(t) | cos(ω_B t / 2) when the spinor closure is on |
-| S-state potential | α_s | 0.05 to 0.25 |
-| S-state potential | β_s | 0.05 to 0.25 |
-| Bath | ω_B | 0.1 to 5.0 |
-| Bath | Q_B | 0.5 to 10.0 |
+| Saturation and phase | Uₜ | 0.5 |
+| Saturation and phase | χ(t) | cos(ω[B] t / 2) when the spinor closure is on |
+| S-state potential | αₛ | 0.05 to 0.25 |
+| S-state potential | βₛ | 0.05 to 0.25 |
+| Bath | ω[B] | 0.1 to 5.0 |
+| Bath | Q[B] | 0.5 to 10.0 |
 | Noise and drift | D | 0.0 |
 | Noise and drift | μ | 0.0 |
 
 ## The mechanism-bound reporting doctrine
 
 Every table, grid, chart, scorecard, classification and conclusion the engine emits must be computed from what it
-actually executed: the trajectory rows, the recorded state histories of E, U, I_U, S, B and B', the sampled
+actually executed: the trajectory rows, the recorded state histories of E, U, I[U], S, B and B', the sampled
 parameters, the RK4 derivative evaluations, the basin entry and dwell histories, the line (8) residuals, the solver
 comparisons, the ablations, the disturbance and stress runs, the compute benchmark event records, and the enterprise
 benchmark ledgers.

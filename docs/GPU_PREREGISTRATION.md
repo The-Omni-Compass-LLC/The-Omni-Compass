@@ -101,12 +101,12 @@ outcome, the repetitions, and the two guardrails above are unchanged.
   power, joules, temperature, utilization, clock-limit reasons; the workload's requests, latency and failures. Omni
   never supplies its own outcome.
 - **Secondary, descriptive (no verdict):**
-  - actuator fidelity: r_act = read back − requested (mean and max absolute), delay (median, max), enforced-under-requested
+  - actuator fidelity: r[act] = read back − requested (mean and max absolute), delay (median, max), enforced-under-requested
     count, total variation of the realized limit, reversals, refused writes;
-  - control effort: J_u = sum of abs(u_push) × decision interval; mean and max abs(u_push); saturations
-    (abs(u_push) = 25); shield interventions (a bound other than the engine decided); holds;
-  - representation fidelity: R_int = sqrt(mean over consecutive decision pairs of sum_k w_k (h(z_(k+1)) −
-    F_h(h(z_k), u_k))_k²) over E, U, I_U, S, B, weights 1, with h the memoryless map and F_h the engine's own
+  - control effort: Jᵤ = sum of abs(u[push]) × decision interval; mean and max abs(u[push]); saturations
+    (abs(u[push]) = 25); shield interventions (a bound other than the engine decided); holds;
+  - representation fidelity: R[int] = sqrt(mean over consecutive decision pairs of sum_k wₖ (h(z_(k+1)) −
+    Fₕ(h(zₖ), uₖ))_k²) over E, U, I[U], S, B, weights 1, with h the memoryless map and Fₕ the engine's own
     projection (`state_projected_next`); directional accuracy = share of pairs where sign(projected − current reading)
     equals sign(next measured − current measured), both movements at least 0.01, per state and by predicted size
     (0.01–0.03, 0.03–0.1, ≥ 0.1);

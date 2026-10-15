@@ -24,7 +24,7 @@ the pods' CPU limits and every worker to native, with no record left (`scripts/k
 ## The compass law in the live controller
 
 The service position is the 95th-percentile response time over the SLO (0 calm, 1 the line); a blind probe or a pod
-waiting for a place reads as past the wall. The force is `A tanh((K_P (p - 0.5) + K_D v) / A)` with K_D for critical
+waiting for a place reads as past the wall. The force is `A tanh((K_P (p - 0.5) + K_D v) / A)` with K[D] for critical
 damping times the realm push factor 3, the same law and gains as on every realm muscle (`realms/compass_arm.py`):
 up gain 0.10, down gain 0.02, release threshold -0.2. Two levers:
 
@@ -240,30 +240,30 @@ one rule neither result is labelled GAIN. Both causes are read from the controll
 stated here, as law, before the tests run again.
 
 **1. Only a sensed muscle moves (the fairness cause).** Let the probe measure the response time of the services in a
-set $\mathcal{S}$ (`--sensed ns/deployment,...`; empty means every HPA, the single-service case). For each HPA $h$
-scaling a deployment $d(h)$ with the operator's target $x^{op}_h$, the target written is
+set S (`--sensed ns/deployment,...`; empty means every HPA, the single-service case). For each HPA h
+scaling a deployment d(h) with the operator's target x^(op)ₕ, the target written is
 
-$$x_h(t) = \begin{cases} \text{the compass's (or the allocation law's) target} & d(h) \in \mathcal{S} \\ x^{op}_h & d(h) \notin \mathcal{S} \end{cases}$$
+xₕ(t) = the compass’s (or the allocation law’s) target, if d(h) ∈ S; x^(op)ₕ, if d(h) ∉ S
 
-The probe's position $p$ is a statement about $\mathcal{S}$ alone. A push on a muscle outside $\mathcal{S}$ answers no
-sensed error and adds pods that compete with $\mathcal{S}$ for the same machines (the run's pending pods and failures).
+The probe's position p is a statement about S alone. A push on a muscle outside S answers no
+sensed error and adds pods that compete with S for the same machines (the run's pending pods and failures).
 It is the GPU law's own rule, applied to Kubernetes: where Omni-Compass cannot sense, it stands at native's own setting.
 
-**2. Pods owed to a growing demand stay (the churn cause).** Let $u(t)$ be the CPU the workers use and $W$ the HPA's
-scale-down window ($W = 300$ s unless the operator set one). The demand is *still growing* when
+**2. Pods owed to a growing demand stay (the churn cause).** Let u(t) be the CPU the workers use and W the HPA's
+scale-down window (W = 300 s unless the operator set one). The demand is *still growing* when
 
-$$G(t) = \Big[\, u(t) > (1 + \epsilon)\, \min_{t - W \le s \le t} u(s) \,\Big], \qquad \epsilon = 0.05 .$$
+G(t) = [u(t) > (1 + ε) min[t − W ≤ s ≤ t] u(s)], ε = 0.05 .
 
-After a breach the compass lowers the target to the bottom of its cover, $x = x_{lo} = 0.6\,x^{op}$ (more pods, at once).
-Before this amendment, the first decision with the position back under the centre, $p < c = 0.4$, no breach and no
-pod waiting, returned $x = x^{op}$ at once. Under a rising load the autoscaler then removed the extra pods one window
+After a breach the compass lowers the target to the bottom of its cover, x = x[lo] = 0.6 x^(op) (more pods, at once).
+Before this amendment, the first decision with the position back under the centre, p < c = 0.4, no breach and no
+pod waiting, returned x = x^(op) at once. Under a rising load the autoscaler then removed the extra pods one window
 later and started them again at the next step: the run's churn. The return is now
 
-$$x \leftarrow x^{op} \quad \text{only if} \quad p < c,\ \ \text{no breach},\ \ \text{no pod waiting},\ \ \neg G(t),$$
+x ← x^(op) only if p < c, no breach, no pod waiting, ¬ G(t),
 
-and while $G(t)$ holds the target stays where the breach put it. A fault or a spike that has passed has a flat or
-falling $u$, so $G$ is false and the operator's target returns at once, as the fault test requires (set 31 F:
-HPA replicas under faults −1.1%); only a demand still climbing keeps its pods. $\epsilon = 0.05$ is set above the
+and while G(t) holds the target stays where the breach put it. A fault or a spike that has passed has a flat or
+falling u, so G is false and the operator's target returns at once, as the fault test requires (set 31 F:
+HPA replicas under faults −1.1%); only a demand still climbing keeps its pods. ε = 0.05 is set above the
 decision-to-decision noise of the node CPU reading. A rise too small to clear it leaves the rule as it was before this
 amendment (the target returns at once), so the correction can remove churn but cannot add any.
 
@@ -302,21 +302,21 @@ All three on commit `199f350`, 10 paired repetitions each, the design unchanged.
 37162457542 and 37162458834; nothing re-run). In the capacity test native started its pods once, early (33 of 38 in
 the first fifth of the window), and removed none. With Omni-Compass on top, two minutes into the window the controller
 raised the HPA target above the operator's (the conveyance: each pod given a larger CPU limit, the target raised by the
-same factor so each pod stays as busy, $x = g\,x^{op}$; 114% with the compass law, 190% with the allocation law). The
+same factor so each pod stays as busy, x = g x^(op); 114% with the compass law, 190% with the allocation law). The
 autoscaler then removed pods (14 with the compass law, 35 with the allocation law, over ten repetitions), and the next
 load steps started them again. **The extra starts are exactly those removals.** Correction 2 above read the wrong
 signal: the CPU used by the whole node, where one load step is lost in the node's own load.
 
 **3. A raise of the target waits for a steady demand.** Let the demand on an HPA's service be read from the
-autoscaler's own status, $D(t) = \bar{u}(t)\, r(t)$: the pods' mean CPU utilisation of their request times the pods
-running, the CPU used in units of one pod's request. With $W$ the HPA's scale-down window and $\epsilon = 0.05$,
+autoscaler's own status, D(t) = ū(t) r(t): the pods' mean CPU utilisation of their request times the pods
+running, the CPU used in units of one pod's request. With W the HPA's scale-down window and ε = 0.05,
 
-$$S(t) = \Big[\, t - t_0 \ge 0.9\,W \ \wedge\ \max_{[t-W,\,t]} D \le (1+\epsilon)\min_{[t-W,\,t]} D \,\Big]$$
+S(t) = [t − t₀ ≥ 0.9 W ∧ max[[t−W, t]] D ≤ (1+ε)min[[t−W, t]] D]
 
-($t_0$ the oldest sample in the window). A new target above the one standing (fewer, larger pods) is written only
-when $S(t)$ holds; the autoscaler itself removes pods only after its scale-down window, and Omni-Compass now asks the
+(t₀ the oldest sample in the window). A new target above the one standing (fewer, larger pods) is written only
+when S(t) holds; the autoscaler itself removes pods only after its scale-down window, and Omni-Compass now asks the
 same of its own consolidation. A lower target (more pods) is never held, and the return of the operator's own target
-after a fault (rule 2) is unchanged. Correction 2's growth test $G(t)$ now reads the same $D(t)$ of the HPA concerned,
+after a fault (rule 2) is unchanged. Correction 2's growth test G(t) now reads the same D(t) of the HPA concerned,
 not the node's CPU. Tests: `tests/test_compass_controller.py`, case *steady*.
 
 The capacity, fairness and fault tests are run again on the commit that carries this amendment, unchanged in design,
@@ -326,11 +326,11 @@ started on commit `199f350`, before this amendment, and is reported as of that c
 ## The third amendment, and a change considered and declined (2026-10-04, before the next runs)
 
 **4. A lower target is never held.** Until now every new HPA target, in either direction, was held for one autoscaler
-window $W$ while the line was clean, so on a step up the compass's push (a lower target, more pods) could wait up to $W$
+window W while the line was clean, so on a step up the compass's push (a lower target, more pods) could wait up to W
 and the pods arrive after the line is missed. The hold exists because a raise inside the window removes pods the
 autoscaler then starts again; a lower target asks for pods and removes none. The hold now applies to raises only:
 
-$$\text{write } x_h(t) \iff x_h(t) < x_h^{\text{now}}\ \vee\ \text{no write in } [t-W,\,t)\ \vee\ \text{the operator's own target returns},$$
+write xₕ(t) ⇔ xₕ(t) < xₕ^(now) ∨ no write in [t−W, t) ∨ the operator’s own target returns,
 
 with rule 3 still requiring a steady demand before any raise. Tests: `tests/test_convey.py` (a lower target written at
 once inside the window).
@@ -383,12 +383,12 @@ The founder's instruction: no number in the harness is hard-wired; every one mov
 of 10 in `deploy/kind/demo.yaml` is the value of Kubernetes' own php-apache example, not a choice of any operator, and
 an earlier session read it as an operator's bound. It becomes a lever, under the operator's grant.
 
-**5. Replica room.** With `--replica-ceiling` $N_{\max}$ granted (0, the default, leaves the cap untouched), for a
-sensed HPA under the compass law, with $r$ the pods running, $c$ the cap, $\bar{u}$ the pods' mean utilisation and $x$
-the target, the autoscaler's own arithmetic asks for $n = \lceil r\,\bar{u}/x \rceil$ replicas, and
+**5. Replica room.** With `--replica-ceiling` N[max] granted (0, the default, leaves the cap untouched), for a
+sensed HPA under the compass law, with r the pods running, c the cap, ū the pods' mean utilisation and x
+the target, the autoscaler's own arithmetic asks for n = ⌈r ū/x⌉ replicas, and
 
-$$c \leftarrow \min(N_{\max},\, n) \quad \text{if } r \ge c,\ n > c,\ p \ge \text{centre or the line is breached};$$
-$$c \leftarrow c^{op} \quad \text{if } n \le c^{op},\ p < \text{centre},\ \text{no breach},\ S(t).$$
+c ← min(N[max], n) if r ≥ c, n > c, p ≥ centre or the line is breached;
+c ← c^(op) if n ≤ c^(op), p < centre, no breach, S(t).
 
 The cap is raised only while it binds and the line is threatened, to what the autoscaler asks and never past the grant,
 and returns to the operator's once the demand has held still for a window. The operator's range is recorded before
