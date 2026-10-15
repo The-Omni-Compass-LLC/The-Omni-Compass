@@ -718,7 +718,8 @@ def add_args(ap):
     ap.add_argument("--convey-on", type=float, default=0.0,
                     help="0 (default): convey idle CPU always; > 0: only once p95 reaches this share of --slo-ms")
     ap.add_argument("--convey-off", type=float, default=0.25, help="return pods to the operator's limit once p95 is below this share")
-    ap.add_argument("--slo-clear", type=int, default=3, help="decisions the SLO must stay met before densifying or capping again")
+    ap.add_argument("--slo-clear", type=int, default=None, help="decisions the SLO must stay met before densifying or capping again (unset: --slo-clear-s)")
+    ap.add_argument("--slo-clear-s", type=float, default=180.0, help="seconds the SLO must stay met before densifying or capping again")
     ap.add_argument("--thermal-model", action="store_true", help="heat muscle: thermal state from the harness heat law")
     ap.add_argument("--security-configmap", default="", help="ns/name of a ConfigMap whose key 'hold' signals a security hold")
     ap.add_argument("--rollout-guard", default="", help="ns/name[,ns/name]: rollout muscle pauses, resumes, undoes")

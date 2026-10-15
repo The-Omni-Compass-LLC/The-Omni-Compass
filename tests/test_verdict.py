@@ -49,11 +49,19 @@ def main():
     log = drive(v, lambda k: 10.0 + k, 100)
     tries = [i for i, e in enumerate(log) if e["verdict"] == "trial"]
     assert len(tries) >= 2 and v.allowed == 0
-    # stepwise: each step 1.5% slower than the one before, allowance 2%: one step allowed, the second (3% past native)
-    # refused although it is only 1.5% past the first
-    v = Verdict(tolerance=0.02, min_samples=30, probe_every=3, recheck=10 ** 6, incremental=True)
+    # stepwise (the medians alone, the engines before v7): each step 1.5% slower than the one before, allowance 2%: one
+    # step allowed, the second (3% past native) refused although it is only 1.5% past the first
+    v = Verdict(tolerance=0.02, min_samples=30, probe_every=3, recheck=10 ** 6, incremental=True, judge="median")
     drive(v, lambda k: 10.0 * (1 + 0.015 * k), 200)
     assert v.allowed == 1, v.allowed
+    # stepwise in words (Omni v7): the same 1.5% rise, measured without noise, is a LOSS (its interval wholly above zero),
+    # so even the first step is refused; steps that cost nothing are allowed and held to native
+    v = Verdict(tolerance=0.02, min_samples=30, probe_every=3, recheck=10 ** 6, incremental=True)
+    drive(v, lambda k: 10.0 * (1 + 0.015 * k), 200)
+    assert v.allowed == 0, v.allowed
+    v = Verdict(tolerance=0.02, min_samples=30, probe_every=3, recheck=10 ** 6, incremental=True)
+    drive(v, lambda k: 10.0 if k <= 2 else 10.0 * (1 + 0.015 * (k - 2)), 200)
+    assert v.allowed == 2, v.allowed
     # the card: compute-bound work, Omni on top of the firmware; no request more than the allowance slower at median
     from realms.gpu_card import run, ALLOW
     a, n = run(5000, "omni", duration=300.0), run(5000, "native", duration=300.0)
