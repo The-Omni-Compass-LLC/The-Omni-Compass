@@ -23,6 +23,7 @@ MANIFEST = ROOT / "RELEASE_MANIFEST.json"
 RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
+    "quota_v7_candidate": ["OMNI_V7.json", "omni_controller/quota.py", "tests/test_quota_convey.py", "docs/OMNI_V7.md", "tools/mechanism_identity.py", "tests/fake_cluster/kubectl"],
     "engine_v6_campaign": ["OMNI_V6.json", "omni_controller/capacity.py", "omni_controller/controller.py",
                            "scripts/dispatch_grid.py", "scripts/reruns.txt", "scripts/benchmark_campaign.json",
                            "scripts/restart_aks.py", ".github/aks_restart_request.json",

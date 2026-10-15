@@ -408,8 +408,11 @@ class Muscles:
                  for n in self.k.get("get", "nodes", "-o", "json")["items"]}
         pods = [p for p in self.k.get("get", "pods", "-A", "-o", "json")["items"]
                 if p["status"].get("phase") in ("Running", "Pending") and p["spec"].get("nodeName")]
+        from omni_controller.quota import CpuLimitBudget
+        budget = CpuLimitBudget(self.k, self.audit)
         out = {}
         for ns, name in targets:
+            self.gain[(ns, name)] = 1.0
             dep = self.k.get("get", "deployment", name, "-n", ns, "-o", "json")
             ann = dep["metadata"].get("annotations", {}) or {}
             c0 = dep["spec"]["template"]["spec"]["containers"][0]
@@ -439,11 +442,22 @@ class Muscles:
                     cur = milli(p["spec"]["containers"][0].get("resources", {}).get("limits", {}).get("cpu", tmpl))
                     if obs.get("security_block", 0.0) > 0.5 and want > cur:
                         got.append(cur); continue  # shield I1: no expansion during a security hold
-                    if abs(want - cur) < self.a.cap_min_change_m:
+                    permitted, reservations = budget.limit(ns, p, cur, want)
+                    if abs(permitted - cur) < self.a.cap_min_change_m:
                         got.append(cur); continue
-                    self._resize(p, ns, f"{want}m", f"convey: {node} idle CPU to its {len(ps)} serving pod(s), limit {want}m in place"
-                                 if engaged else f"convey: response time calm, operator's limit {want}m in place")
-                    out[f"{ns}/{p['metadata']['name']}"] = want; got.append(want)
+                    try:
+                        self._resize(p, ns, f"{permitted}m", f"convey: {node} idle CPU to its {len(ps)} serving pod(s), limit {permitted}m in place"
+                                     if engaged else f"convey: response time calm, operator's limit {permitted}m in place")
+                    except Exception as error:
+                        # Admission can race another writer. Never advertise a rejected increase to the HPA.
+                        self.audit({"error": f"convey resize rejected: {type(error).__name__}: {str(getattr(error, 'stderr', '') or error).strip()[:400]}",
+                                    "pod": f"{ns}/{p['metadata']['name']}", "accepted_limit_m": cur})
+                        got.append(cur)
+                        # Do not reuse uncertain headroom for other pods in this decision.
+                        budget.reserve(reservations, cur, permitted)
+                        continue
+                    budget.reserve(reservations, cur, permitted)
+                    out[f"{ns}/{p['metadata']['name']}"] = permitted; got.append(permitted)
             # the gain g = mean conveyed limit / operator's limit: the replica organ reads it to keep the operator's
             # promise in queue terms (target x request / limit) while the limit is larger
             self.gain[(ns, name)] = (sum(got) / len(got) / base) if got and base > 0 else 1.0
