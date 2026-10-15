@@ -619,6 +619,10 @@ def yield_repair_coordinator():
     own = api(f"repos/{REPO}/actions/runs/{current}")
     if own['path'] != '.github/workflows/grid.yml' or own['head_branch'] != 'main':
         raise RuntimeError('only a main-branch coordinator may yield its runner')
+    if request.get('stop_repair'):
+        api(f"repos/{REPO}/actions/runs/{request['repair_run_id']}/cancel", method='POST')
+        print("Pending Azure restart stopped at the owner's direction.", flush=True)
+        return True
     # Exact repository run identities only: duplicate verification and coordinators contain no measured arm.
     pending = []
     for item in request['release_runs']:
