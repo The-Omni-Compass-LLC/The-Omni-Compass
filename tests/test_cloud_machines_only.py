@@ -9,6 +9,8 @@ Azure's autoscaler alone makes machines; the governor only parks machines that e
 import json
 import re
 import sys
+import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -34,12 +36,31 @@ class MachinesOnly(unittest.TestCase):
         y = (ROOT / ".github" / "workflows" / "aks-metered.yml").read_text()
         self.assertRegex(y, r"OMNI_MACHINES_ONLY: '1'")
         s = (ROOT / "scripts" / "kind_bench.sh").read_text()
-        self.assertIn('if [ -n "${OMNI_MACHINES_ONLY:-}" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; fi', s)
+        self.assertIn('if [ "${OMNI_MACHINES_ONLY:-0}" = "1" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; fi', s)
         self.assertIn('--sensed "$OMNI_SENSED"', s)
         self.assertIn('${OMNI_POWER_CMD:+--power-cmd "$OMNI_POWER_CMD"}', s)
         # elsewhere nothing changes: the sensed service, the power command and conveyance as before
         self.assertIn('OMNI_SENSED="default/php-apache"; OMNI_POWER_CMD="bash scripts/kind_power.sh"', s)
         self.assertIn('CAP_ARGS="--cap-deployments default/php-apache"', s)
+
+    def test_machines_only_flag_controls_the_actual_shell_wiring(self):
+        s = (ROOT / "scripts" / "kind_bench.sh").read_text()
+        start = s.index('OMNI_SENSED="default/php-apache"; OMNI_POWER_CMD=')
+        end = s.index('\nlimits_now()', start)
+        snippet = 'CAP_ARGS="--cap-deployments default/php-apache"\n' + s[start:end]
+        snippet += '\nprintf "%s\\n" "$OMNI_SENSED" "$OMNI_POWER_CMD" "$CAP_ARGS"'
+        for value in (None, "", "0", "1"):
+            with self.subTest(value=value):
+                env = dict(os.environ)
+                env.pop("OMNI_MACHINES_ONLY", None)
+                if value is not None:
+                    env["OMNI_MACHINES_ONLY"] = value
+                result = subprocess.run(["bash", "-eu", "-c", snippet], env=env,
+                                        text=True, capture_output=True, check=True)
+                expected = (["none/none", "", ""] if value == "1" else
+                            ["default/php-apache", "bash scripts/kind_power.sh",
+                             "--cap-deployments default/php-apache"])
+                self.assertEqual(result.stdout.splitlines(), expected)
 
     def test_the_machine_lever_only_parks_and_wakes_machines_that_exist(self):
         s = (ROOT / "scripts" / "kind_nodepool.sh").read_text()

@@ -98,7 +98,8 @@ CAP_ARGS="--cap-deployments default/php-apache"; [ -z "$CRUISEKUBE" ] || CAP_ARG
 # shows the response time holds, and wakes it at once on a breach; a parked, empty machine Azure deletes. So the bill can
 # only fall or stay, never rise
 OMNI_SENSED="default/php-apache"; OMNI_POWER_CMD="bash scripts/kind_power.sh"
-if [ -n "${OMNI_MACHINES_ONLY:-}" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; fi
+# Only 1 enables machines-only mode; 0, empty and unset retain the full wiring.
+if [ "${OMNI_MACHINES_ONLY:-0}" = "1" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; fi
 limits_now() {   # the CPU limit the operator's record holds: the pods' own, or with CruiseKube the Deployment's template
   if [ -n "$CRUISEKUBE" ]; then
     kubectl get deployment php-apache -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}'

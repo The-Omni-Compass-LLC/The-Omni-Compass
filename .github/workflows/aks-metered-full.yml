@@ -1,0 +1,198 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# Full-control AKS variant: HPA, pod CPU limits and model-based power sensing enabled.
+# This does not enable host RAPL, clock control or physical power metering.
+# Shares the machines-only workflow quota queue; preserves failed-run evidence.
+name: aks-metered-full
+run-name: ${{ format('aks-metered-full {0} dial {1}', github.event.inputs.load_steps != '' && format('burst {0}', github.event.inputs.load_steps)
+  || 'steady', github.event.inputs.dial || 'save') }}
+'on':
+  workflow_dispatch:
+    inputs:
+      reps:
+        description: Paired repetitions
+        default: '3'
+      arms:
+        description: Arms, in rotation order
+        default: native compass
+      duration_s:
+        description: Measured seconds per arm
+        default: '600'
+      location:
+        description: Azure region
+        default: eastus
+      vm_size:
+        description: Worker machine size (Standard_D2s_v5 is no longer offered to this subscription in eastus)
+        default: Standard_D2s_v4
+      price_per_node_hour:
+        description: List price of one worker machine-hour in USD (Standard_D2s_v4, Linux, pay as you go, eastus)
+        default: '0.096'
+      load_steps:
+        description: 'Load-generator replicas per step, in order (the burst bill test: e.g. 1 6 1 8 1 6); empty: steady load'
+        default: 1 4 1 6
+      max_workers:
+        description: Worker machines in the work pool (Azure's autoscaler runs 1 to this many); the subscription's eastus
+          quota is 32 vCPUs, 2 a machine, one for the system pool
+        default: '4'
+      hpa_max:
+        description: 'The app''s replica ceiling, the same in every arm; 9 pods of 200m fit one 2-vCPU worker, so 9 x max_workers
+          lets the fleet fill (empty: the manifest''s 10)'
+        default: ''
+      dial:
+        description: 'Dial: save or max'
+        default: save
+concurrency:
+  group: aks-metered
+  cancel-in-progress: false
+env:
+  OMNI_NOTICE: © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use,
+    commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires
+    a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries
+    this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      reps: ${{ steps.r.outputs.reps }}
+    steps:
+    - name: Legal notice at the top of this job's report
+      run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+    - id: r
+      run: |
+        python3 - <<'PY'
+        import json, os
+        n = int(os.environ['REPS'])
+        if not 1 <= n <= 20:
+            raise SystemExit('reps must be an integer from 1 to 20')
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            f.write('reps=' + json.dumps(list(range(1, n + 1))) + '\n')
+        PY
+      env:
+        REPS: ${{ github.event.inputs.reps || '3' }}
+    - name: Legal notice at the end of this job's report
+      if: always()
+      run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        rep: ${{ fromJSON(needs.plan.outputs.reps) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      AZ_RG: omni-compass-full-${{ github.run_id }}-${{ matrix.rep }}
+      AZ_LOCATION: ${{ github.event.inputs.location || 'eastus' }}
+      AKS_VM_SIZE: ${{ github.event.inputs.vm_size || 'Standard_D2s_v4' }}
+    steps:
+    - name: Legal notice at the top of this job's report
+      run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+    - uses: actions/checkout@v4
+      with:
+        sparse-checkout-cone-mode: false
+        sparse-checkout: |
+          /*
+          !/results/live/raw/*
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: pip install -r requirements.txt
+    - uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - uses: azure/setup-kubectl@v4
+    - run: az provider register --namespace Microsoft.ContainerService --wait
+    - name: Run the paired repetition (full controls)
+      run: |
+        set +e
+        bash scripts/aks_paired.sh > paired.log 2>&1
+        code=$?
+        # the end of the run's own output as annotations, readable on the run's page and through the API
+        grep -v -i "warning" paired.log | tail -10 | while IFS= read -r l; do echo "::notice::$l"; done
+        [ "$code" = 0 ] || { echo "::error::repetition ${{ matrix.rep }} ended with exit $code"; exit "$code"; }
+      env:
+        REP: ${{ matrix.rep }}
+        ARMS: ${{ github.event.inputs.arms || 'native compass' }}
+        DURATION: ${{ github.event.inputs.duration_s || '600' }}
+        LOADGEN: open
+        LOAD_STEPS: ${{ github.event.inputs.load_steps || '1' }}
+        AKS_MAX_NODES: ${{ github.event.inputs.max_workers || '4' }}
+        HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
+        OMNI_DIAL: ${{ github.event.inputs.dial || 'save' }}
+        OMNI_MACHINES_ONLY: '0'
+        CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+    - if: always()
+      run: az group delete -n "$AZ_RG" --yes --no-wait || true
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: aks-full-${{ matrix.rep }}
+        path: |-
+          bench-*-${{ matrix.rep }}
+          paired.log
+    - name: Legal notice at the end of this job's report
+      if: always()
+      run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  aggregate:
+    needs: run
+    if: always() && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Legal notice at the top of this job's report
+      run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+    - uses: actions/checkout@v4
+      with:
+        sparse-checkout-cone-mode: false
+        sparse-checkout: |
+          /*
+          !/results/live/raw/*
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: pip install -r requirements.txt
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: aks-full-*
+        path: reps
+        merge-multiple: true
+    - run: ls reps && python tools/live_reps.py reps
+      env:
+        PRICE_PER_NODE_HOUR: ${{ github.event.inputs.price_per_node_hour || '0.096' }}
+    - run: cat reps/LIVE_REPS.md >> "$GITHUB_STEP_SUMMARY"
+    - uses: actions/upload-artifact@v4
+      with:
+        name: live-reps-aks-full
+        path: reps/LIVE_REPS.*
+    - name: Legal files beside the files this run hands out
+      if: always()
+      uses: actions/checkout@v4
+      with:
+        path: _legal
+        sparse-checkout-cone-mode: false
+        sparse-checkout: |
+          README.md
+          LICENSE
+          NOTICE
+          DISCLOSURES.md
+          PATENTS.md
+          TRADEMARKS.md
+    - name: Legal notice handed out with this run's files
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: legal-notice
+        overwrite: true
+        path: |
+          _legal/README.md
+          _legal/LICENSE
+          _legal/NOTICE
+          _legal/DISCLOSURES.md
+          _legal/PATENTS.md
+          _legal/TRADEMARKS.md
+    - name: Legal notice at the end of this job's report
+      if: always()
+      run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
