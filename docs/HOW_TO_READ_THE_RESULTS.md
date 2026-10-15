@@ -74,6 +74,29 @@ follow it. Read the five ideas first, then go to the table you have in front of 
 | Knobs handed back, restored | at the end every setting Omni-Compass touched was put back exactly | True / yes |
 | Label | the verdict, chosen by a rule written before the run, never by hand | see each table |
 
+## State the objective and say what the gain is
+
+For each muscle, a report must name its intended benefit and primary gauge before interpreting the result. The objective
+depends on the vessel: Kubernetes may aim for more requests inside its response-time limit; a GPU may aim for more work
+within a power/temperature ceiling or equal work using less energy; a cloud capacity test may aim for fewer billed
+node-hours while holding the declared service level. A cloud-cost result does not need a speed gain unless speed was also
+declared as a target.
+
+Every comparison states native and Omni values, units, absolute and percentage changes, evidence class, repetitions, and
+uncertainty. It then gives the word for each gauge and a plain-language muscle verdict. For example, “energy GAIN, work
+EVEN” means the measured/modelled work stayed the same while energy fell; it does not mean more work was observed. “Cloud
+node-hours GAIN, service EVEN” means the same declared service was delivered with fewer node-hours; it does not imply
+faster response. If a result is flat on every target gauge, say EVEN. Do not call the benchmark a loss merely because it
+failed to improve an objective it never declared.
+
+A resource cut may also be translated into an idealized same-budget capacity estimate, but that is separate from the
+observed run. For equal work, with resource use `R_native` and `R_omni`, the observed resource saving is
+`1 - R_omni/R_native`; the conditional capacity estimate is `R_native/R_omni - 1`. Example: 100 versus 95 resource
+units is a 5% resource saving and a 5.26% idealized capacity estimate, assuming linear scaling, redeployable savings,
+and no other bottleneck. Label the estimate conditional; claim actual extra work only when the benchmark served it.
+`python3 tools/benefit_interpretation.py` applies this arithmetic and prints the objective-specific reading for a paired
+metric. The benchmark's preregistered objective, guardrails and uncertainty rule still control the verdict.
+
 ## The GPU card (`results/gpu/run-<stamp>/GPU_REPS.md`)
 
 One card, three arms, many repetitions:

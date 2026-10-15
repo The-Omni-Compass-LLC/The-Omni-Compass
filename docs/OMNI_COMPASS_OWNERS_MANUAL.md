@@ -1,3849 +1,997 @@
-# THE OMNI-COMPASS OWNER'S MANUAL
-
-> Â© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-
-## The Master Manual: The Governor, Its Mechanism, Its Results, and How to Wire It onto Your Stack
-
-**This is the Owner's Manual, the master.** It holds everything: what Omni-Compass is, the philosophy and the
-mathematics it runs on, its mechanism, how it is built, every result with its evidence class, and how it is wired, run
-and checked. It is written for whoever owns or licenses Omni-Compass and so must know the whole mechanism. The
-Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`) is the shorter book for the people who wire and run it. The printed
-book of this text is `docs/OMNI_COMPASS_OWNERS_MANUAL.pdf` (`python3 docs/book/build_book.py --owner`).
-
-**October 2026**
-**The Omni-Compass LLC**
-
-All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.
-
----
-
-# FRONT MATTER
-
-<!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
-## The key: GAIN, EVEN and LOSS
-
-Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
-
-| Word | What each letter stands for | Its sense in underwriting | What it means in a table |
-|---|---|---|---|
-| **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
-| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native |
-| **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
-
-How the sign of a number becomes a word:
-
-- **Time waited, missed or failed** (a response time, time over the line, failed requests): a fall is GAIN, a rise is LOSS.
-- **Work done** (work inside the line, throughput, a hit rate): a rise is GAIN, a fall is LOSS.
-- **A resource spent or held** (energy, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves).
-- So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
-
-Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
-
-A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear of zero: "GAIN in all three of our runs". The other readings are **EVEN, no difference beyond the noise** (in a run the interval includes zero, so native and Omni could not be told apart: that is the result), **the runs disagree** (clear runs pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such as the knob's own setting).
-
-Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, so **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
-
-Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
-<!-- end of the key -->
-
-## What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report
-
-**What Omni-Compass is.** Omni-Compass is a supervisory governor. It is never a controller of its own and never a
-replacement for one: it sits on top of the controllers a system already runs (the Kubernetes autoscaler, a database's
-connection pool, a GPU's firmware, a building's battery controller, a power grid's tap changer, a robot's servo) and
-moves only the settings those controllers already expose to an operator, through one wire in (what it reads) and one wire
-out (what it writes). Everything the native controller does, it still does. Pull the plug and every setting walks back to
-where the operator left it (the lease); the kill switch returns them at once.
-
-**What "native" means.** Native is the same stack, the same muscles, the same machines and the same work, run the way
-everybody runs it today: the shipped controllers at their shipped or operator settings. Every benchmark has exactly two
-arms, native and omni, where omni is that same native stack with Omni-Compass on top. Nothing else differs between the
-arms, so whatever differs in the result is what Omni-Compass did.
-
-**What a muscle and an organism are.** A muscle is one setting a native controller exposes (a pool's size, a power cap, a
-clock ceiling, a replica count, a battery's charge rate) together with the gauges that show what it does. Most companies
-build deep control for one field, and a fleet manager such as Meta's Twine schedules one kind of work (containers) over a
-very large fleet. Omni-Compass's proposition is different in kind: cross-sector governance, one governor over the shared
-functional needs of otherwise separate realms. An organism is a stack of muscles from many sectors governed as one body:
-the four realms (Compute / AI / Cloud; Physics / Robotics / Autonomous; Energy / Facility / Industrial; Distribution /
-Specialized), the four stacked together, and the whole tower of 1,107 distinct muscles in 70 families. The benchmark of an
-organism tests what happens when those muscles share one governor and interact.
-
-**What has been measured, and how.** The breadth of the map and the breadth of the evidence are stated separately:
-
-- **1,107 muscles are catalogued** (`realms/catalog_v5.csv`). Each has a plant model, our own model of that kind of system:
-  evidence class **S** until the muscle is wired to real software or hardware and measured.
-- **26 knobs are measured on real, unmodified software** (class **L**): real Kubernetes (9), PostgreSQL behind PgBouncer
-  (3), MySQL (4), MongoDB (4), Apache Kafka (3) and Redis (3), each A, B and C.
-- **39 knobs are measured inside independent, published simulators** (class **S**, but not our own models): power grids
-  (pandapower with SimBench), buildings and batteries (CityLearn), robot arms (MuJoCo Menagerie), drone swarms
-  (gym-pybullet-drones).
-- **Organisms with a real cluster inside**: the modelled organism (S) drives a real Kubernetes cluster (L). "100 copies"
-  means a hundred copies of the modelled organism around one real cluster, not a hundred physical clusters; the number
-  of real machines is always stated beside it.
-- **A physical meter** (class **P**) speaks for hardware energy; the GPU's own meter and the processor's RAPL counters are
-  the meters used. Modelled energy is never presented as metered.
-
-**What you see when it is hooked up.** Every result arrives as a receipt with the same shape: the two arms side by side,
-every gauge of the system (the work done, the response times, the misses and failures, the machines and energy spent),
-the paired change with its 95% interval, and one word per gauge, GAIN, EVEN or LOSS (the key, above). A three-run table
-repeats the test three times, A, B and C, on the same frozen engine, and a word counts only when all three runs agree.
-Over a benchmark sit three summaries: the Omni index (one number for all real tests together), the benefit sheet (one
-number and one word per benchmark) and the wiring page (for each knob: write, watch, or the operator's choice).
-
-**How to read a report, in order.**
-
-1. **The engine and the evidence class.** The header names the engine fingerprint (`python3 tools/omni_version.py`) and the
-   class (P, L or S). A result is never read across engines, and S is never read as proof about real equipment.
-2. **The work and the service rows first**: work done, response times, time over the line, failed requests. These say
-   what the system delivered. A GAIN here is the point of the governor; a LOSS here is the first thing to look for.
-3. **Then the resource rows**: machines, energy, memory, connections. A cut is a GAIN. A rise is **power given**: what
-   Omni-Compass put in to buy the work and speed above it. Read the two together: power given that bought nothing is the
-   cost to fix.
-4. **Then the noise.** EVEN, no difference beyond the noise, is a result, not a failure. The runs disagree means the test is
-   unstable there and is looked into.
-5. **Then the clock and the machine.** Where the test machine itself is the limit (its processor saturated, native alone
-   failing a large share of requests, a run behind its window's clock), the report says so; a test machine's limit is never
-   reported as the governor's result, and the test is rebuilt so the machine no longer decides it.
-6. **Every row is shown**, LOSS included. Nothing is cut from a table because it went against Omni-Compass.
-
-**How the brain tells GAIN from LOSS.** The governor does not read a plus or a minus sign as good or bad. Before it
-moves anything, every gauge it reads is declared with its aim, and the aim decides the word: for time waited, missed or
-failed (a response time, time over the line, failed requests) a fall is GAIN; for work done (work inside the line,
-throughput, missions flown) a rise is GAIN; for a resource spent or held (energy, machines, memory, a bill, wear) a fall is a
-cut, and a cut is GAIN, while a rise is power given, kept only when it buys work or speed shown beside it. Less energy for the
-same work is GAIN; more speed for the same machines is GAIN; more work for the same energy is GAIN. In the engine this is
-done in two places. The verdict (`omnicompass/verdict.py`) lets a muscle's setting move only between native and the deepest
-step a paired trial on that muscle has shown costs its own work nothing (each piece of work no slower, within the
-measurement's resolution); a step that costs more is undone at once and not tried again for a while, and where no step
-passes the muscle stays native, which is EVEN. Inside an organism, the body's guard (the reflex rule, `docs/FORMAL_V5.md`)
-then refuses any step that pushes another part of the body past its cushion, so no GAIN in one muscle is bought with a LOSS
-in another.
-
-**Wiring it: who, what, when, where, why and how.** Read this before the wiring chapters; a governor wired without it may
-run and still not be the mechanism.
-
-- **Why.** To get more work, faster, with fewer misses, from the machines and the energy already paid for, by letting one
-  brain move the settings native controllers already expose, in the direction each gauge's aim asks, and only while no
-  other gauge pays for it. If nothing can be gained, the purpose is met by leaving native alone.
-- **What.** Two things per muscle and nothing else: one wire in (the gauges that show the muscle's state and its work, read
-  live from the system, never typed into code) and one wire out (the one setting native already exposes to an operator, with
-  its hard range read from the system). The brain, the compass, the verdict and the lease are in the engine; the wiring
-  never re-implements them.
-- **Where.** On top of the native controller, never in place of it: on the autoscaler's target and ceiling, not on the
-  pods; on the pool's size, not on the queries; on the card's power limit, not on its firmware. Every muscle of the stack is
-  wired into the same brain, so the body is judged as one.
-- **Who.** The operator who owns the system grants each wire, decides which knobs Omni may write and which it only watches,
-  and keeps the kill switch. The governor writes only what it was granted; the native controller keeps doing its own job.
-- **When.** Watch first: the governor reads every wire and writes nothing until the wire check passes and paired runs on
-  the operator's own system show the receipt. Then one level at a time (the eight levels, Part IV). It reads and decides once
-  a second, all the time; staying native is a live decision, made again every second, never a setting left on.
-- **How.** The plug snapshots each setting once, at the start; the brain reads every gauge, places each muscle on its
-  compass, tries one step on one muscle at a time inside a body, keeps it only if the verdict shows a GAIN and no LOSS, and
-  hands every setting back to the snapshot on reset, on the lease after a crash, or at once on the kill switch. The proof is
-  the receipt: native and Omni on the same work, every gauge, three runs, every row shown.
-
-**What the end result is.** A system fully hooked up runs native exactly as before, with one governor reading every gauge
-of every muscle once a second and moving, muscle by muscle, only where a paired trial has shown a GAIN with no LOSS
-anywhere in the body; where it cannot help, the muscle stays native, which is EVEN, not a failure. The intended outcome,
-stated as the claim the receipts test: more work, faster, with fewer misses, on the same or fewer machines, with every
-unit of power given shown beside what it bought. Whether a given system gets there is answered only by its own receipts.
-
-## Notice and Disclaimer
-
-The software is provided "as is", without warranty of any kind. Every result in this manual carries its evidence
-class (section 14). A modelled result is a statement about a model; a software benchmark is a statement about the
-software it ran on; only a hardware meter speaks for hardware. Nothing in this manual is a promise of a particular
-saving on a particular system. The only number that applies to your system is the one your own paired runs produce,
-on your own receipt. Before Omni-Compass writes to any production system, it must run in watch mode, pass the wire
-check, and be covered by a signed Omni-Compass Enterprise License.
-
-**Rights and changes.** Â© 2026 The Omni-Compass LLC. All rights reserved. The Omni-Compass LLC reserves the right to
-change this manual, the software it describes and their terms at any time, without notice. Every copy, export or printout
-of this manual carries this notice, `LICENSE`, `NOTICE` and `DISCLOSURES.md` unchanged. All patents, copyrights and
-trademarks filed in the USA. www.omni-compass.com
-
-**THE PUBLISHED BENCHMARKS ARE THE RECORD OF WHAT OMNI-COMPASS DID ON THE SYSTEMS, LOADS AND ENGINE THEY NAME, EACH WITH ITS EVIDENCE CLASS. WHERE A RESULT ON ANY OTHER SYSTEM DIFFERS FROM THEM, OR ANYTHING LOOKS WRONG, THE FIRST PRESUMPTION IS THE WIRING, THE SETTINGS, OR HOW OMNI-COMPASS WAS IMPLEMENTED OR READ, NOT THE LAW. CHECK THOSE FIRST (THE MANUAL'S "WIRED RIGHT OR WIRED WRONG") BEFORE DRAWING ANY CONCLUSION ABOUT OMNI-COMPASS.**
-
-**The factory tune.** The engine in this repository is presented as The Omni-Compass LLC tuned it and ships it: a
-self-running engine, set at the factory. Every muscle in the catalog is wired, and each runs on the setting found for it:
-its own card where one was found on development seeds and kept under the strict rule (364 muscles,
-`realms/muscle_cards_v5.csv`), the engine's own setting for every other muscle, all frozen and fingerprinted by version
-(`python3 tools/omni_version.py`). Muscles differ: no single setting is right for every muscle, family, sector, domain or
-realm, and none is presented as universal. Every published result is this factory tune. As with any engine, a licensee may
-then add on, retune, upgrade or tune down any muscle or any combination of muscles (the dial, the cards, the bands and the
-service lines are all exposed); a changed tune is the licensee's own configuration, and its results are its own, not the
-published ones.
-
-**The wiring declaration.** Omni-Compass acts only through the wires it is given. A wrong reading, a wrong or shared
-lever, a wrong range, or a service line set for another workload makes it do exactly what its law says with the wrong
-information. It cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the
-first presumption is wiring: check the installation with section 8.5 before drawing any conclusion. Every
-declaration, disclosure and disclaimer is made once, in `DISCLOSURES.md`, and governs this manual.
-
-## Foreword
-
-I built Omni-Compass to sit on top of what already exists. Kubernetes, the GPU driver, the building controller, the
-battery inverter, the robot's servo loop: those are muscles, and they are good muscles. What none of them has is one
-brain that reads all of them at once, holds each of them inside its safe range, and puts every setting back exactly
-where it found it when it stops. That brain is Omni-Compass.
-
-**Every machine already has a controller.** Kubernetes has its autoscaler. A graphics card has its firmware. A building
-has its thermostat loop, a battery has its charge controller, a power grid has its tap changers, and a robot has its
-servo. Engineers spent decades making these controllers safe, and they are. But each one was built to watch one thing
-and to protect that one thing. None of them sees the whole body. None of them knows that the cooling loop is holding
-back the processor, or that the autoscaler is adding machines the database cannot feed. So each one plays it safe in
-the middle of its range, because playing it safe is its whole job. The headroom between the middle and the edge is
-paid for every hour and almost never used.
-
-**That gap is what I set out to close.** Omni-Compass is a **supervisory governor**: one brain over the muscles you
-already run. It never replaces them and it never competes with them. It reads them, it decides, and it writes one
-setting at a time through a two-way plug: one wire in, one wire out. Before it writes anything, it takes a snapshot.
-When it stops, every setting goes back to that snapshot.
-
-**Why a compass.** A compass always points home. Every muscle has a safe band, and the compass holds the muscle inside
-that band, with a cushion of 5% at each edge. It works with two forces that pull against each other, one toward more
-and one toward less, and it moves smoothly, never hammering. A system that is closed, bounded and pulled toward a
-center cannot run away. That one idea is the root of the whole engine, and the first part of this book explains it.
-
-**The rule I will not bend: do no harm.** Omni-Compass must never cause a LOSS against the system's own native
-controller. Where it cannot bring a muscle a gain, that muscle stays native. This is not a promise on paper. It is a
-trigger in the code (`omnicompass/verdict.py`), checked on the muscle itself, step after step. A step that costs the
-muscle more for each piece of work is undone.
-
-**The max is the default.** Most tuning tools try to shave a little off. Omni-Compass rides the edge instead: every
-muscle runs up to its own limit, read live from the system, never past it and never below what native gives. The energy
-it takes to do more work is **power given**, shown beside the work, the speed and the wear it bought. It is never
-called a loss. Anyone can turn the dial down from the max. Nobody has to.
-
-**One pedal.** I wanted it to drive like an electric car. Push the pedal for more, lift off for less. Lift off all the
-way and the settings drift back toward native. Reset hands everything back. If the governor ever crashes, its lease runs
-out and the plug walks every setting home, step by step. The kill switch is separate and instant, and it exists for
-security, not for daily driving.
-
-**How I want it judged.** Every benchmark in this book has exactly two arms: native, and Omni-Compass on top of native.
-There is no third arm and no other name. Every result was run three separate times, under rules written down before
-the first run, and every row is shown, losses included. Each reading is one word, **GAIN**, **EVEN** or **LOSS**,
-decided by what the gauge is for. A result from our own model is labeled as a model; a result from live software is
-labeled as live software; only a meter speaks for hardware. Where we lost, the book says so, and we went to find out
-why. Nobody outside The Omni-Compass LLC has reviewed or approved these results, and every table says that too.
-
-**What this book holds.** This manual is the whole of it: what the governor is, the mathematics it runs on, how its
-nervous system reads and writes, how it is wired to each kind of machine, how to turn it on one level at a time, how to
-switch it off, and how to prove on your own system what it does. Keep it with the code. When the code changes, this
-manual changes in the same commit.
-
-**On this edition.** This edition is written for the referee and the underwriter as much as for the engineer. Every
-result in it was run three separate times on a frozen, fingerprinted engine, under rules written before the first run,
-and is reported with every loss beside every gain. Where a number is from a model it says so; where a test could not
-see an effect it says so; where something has not been shown it says so, in its own section. Nothing in this manual asks
-to be believed on our word: every table names the runs it was made from, every run's raw files are in the repository,
-and every table can be rebuilt from them by the tool it names.
-
-**Where to begin.** Read the front matter first. It tells you what you are looking at before it asks you to touch
-anything. Then wire it one level at a time, watch it before you let it write, and judge it by your own receipts.
-
-**AJ Dubra**
-Founder, The Omni-Compass LLC
-
-## Preface: How to Use This Manual
-
-| You are | Read |
-|---|---|
-| CEO, board member, investor | Foreword; Part I (sections 1-3); section 14 (evidence); section 15 (the frozen engines and the three-run rule); section 17 (license); the Executive Summary below |
-| CTO, architect, head of platform | Parts I-III; section 9 (wiring levels) to plan the rollout; Part VI |
-| The engineer wiring it | Everything, in order. Do not skip the wire check (section 8) or the watch level (section 9, level 1) |
-| Auditor, diligence team | Part II (mechanism), Part VI (proof), Appendix C (equations), Appendix F (evidence map) |
-| Referee, reviewer | The standards below; sections 13 to 15 (the method, the classes, the frozen engines and the three-run rule); section 16.7 (threats to validity, stated by us); Appendix F, "How to audit one result from this manual to its raw files"; then any table in `results/live/` and its preregistration |
-| Underwriter, insurer | Sections 1.2 and 1.3 (do no harm, the pedals, the two switches); section 11 (the three ways a governor stops and what each leaves behind); section 12 (least privilege, supply chain); section 16.7 |
-| Data-center, facility or energy operator | The Quick Reference card; sections 1.1 to 1.3; section 9 (levels 5 to 7: the card, the processor, the site); section 10.10 (the processor itself) and 10.11 (the data center under the servers); section 11 (the switches); Appendix E |
-| Site reliability engineer, on call | The Quick Reference card; section 11 (the three ways a governor stops, and what each leaves behind); section 8.5 (wired right or wired wrong); section 7.3 (blind means hold); Appendix E |
-| Security and compliance | Section 11 (the master switch, the kill file and the lease); section 12 (least privilege, supply chain, the audit log); `SECURITY.md`; `DISCLOSURES.md`, sections 4 and 5 |
-| Procurement and counsel | `LICENSE`, `NOTICE`, `PATENTS.md`, `TRADEMARKS.md`, `DISCLOSURES.md`, `LICENSING_FAQ.md`; section 17 (license and commercial terms) |
-| Anyone who wants the whole list | `docs/REGISTER.md`: every muscle wired (1,107 in v5, by family), every benchmark run on every platform (Kubernetes, Azure AKS, GPU, CPU, UPS and batteries, buildings, power grids, robotics) with its result and file, and every open benchmark still to run, in order |
-
-**Conventions.** `code` is a command, file or switch exactly as typed. "Native" means your system as it runs today,
-without Omni-Compass. "Omni" (the second arm of every benchmark) means that same native system with Omni-Compass on top
-of it; there is no third arm and no other name. "Muscle" means any machine, service or controller Omni-Compass can read
-and set. "Knob" or "lever" means one setting on a muscle. "The band" is a knob's or a service reading's safe range; "the
-cover" is a knob's hard range, which nothing Omni-Compass computes can leave. Every step that writes to a system is marked
-**WRITES**. Every number carries its evidence class (section 14): **P** for a physical meter, **L** for live software with
-no meter, **S** for a model of ours. A number from a model is never written as if it came from hardware.
-
-**The standards every page of this manual keeps.** A referee or an underwriter reading this manual should expect, and
-will find, the following discipline throughout, because it is the discipline the repository enforces on itself:
-
-1. **Two arms, always.** Every benchmark compares native against omni, the same system with Omni-Compass on top, on the
-   same machines, with the same work at the same moments. Omni-Compass is never run standalone and never compared as a
-   competitor to the controller it sits on.
-2. **Preregistered, then run.** The arms, the knob, its cover, the gauges, their directions and the readings are written
-   down and committed before the first counted run (`docs/*_PREREGISTRATION.md`). Rules are frozen on one tuning case
-   that is shown and never counted, then applied unchanged to untouched cases. Any amendment made after a result has been
-   seen is written into the preregistration with its time and reason, and the table that carries the result says so.
-3. **Three separate runs, one rule.** Every result is run three times as separate GitHub runs (A, B and C) on the same
-   frozen engine, and every judged row reads exactly one of: GAIN in all three of our runs, LOSS in all three of our runs, no difference beyond the
-   noise (with the count of runs in which the interval crossed zero), or the runs disagree. Nobody outside The Omni-Compass LLC has
-   reviewed or approved these results, and every three-run table says so.
-4. **Every row, losses included.** A row that went against Omni-Compass is in the table beside the rows that went for it.
-   When Omni-Compass loses, the first suspect is our own wiring, native setup or scoring; when that is fixed, the test is
-   run again and the loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut.
-5. **Nothing read across engines.** The engine is frozen and fingerprinted (`OMNI_V1.json`, `OMNI_V2.json`,
-   `OMNI_V3.json`, `OMNI_V5.json`). Any change to a rule, gain, guard, preset or muscle makes the next version, and every result is run
-   again on it. Every table made by rule checks the engine of each run it reads and refuses to mix them.
-6. **The raw files live with the code.** Every finished run's files are copied into `results/live/raw/run-<id>/` with one
-   SHA-256 manifest per repetition, and every table names the runs and the commit it was made from. Anyone with the
-   repository can recompute every table from the files it names.
-7. **Do no harm.** Omni-Compass moves a knob only where a paired trial on the muscle itself shows the muscle never behind for
-   it (the verdict, `omnicompass/verdict.py`, with its 2% allowance). Where it cannot improve a knob, that knob stays
-   native, and the result says "nothing for Omni to move".
-
-**How this manual is organised.** Part I says what the governor is and where its value comes from, with the arithmetic
-that turns "more work" into "a smaller bill". Part II is the mechanism: the engine's eight equations and its control
-law, the closed-circle principle that keeps it inside its walls, the compass law that carries push and pull to every
-muscle, and the two-way nervous system that decides how much authority each organ has. Part III is the harness: the
-plug every muscle is wired through, the adapters, and the wire check that must pass before anything writes. Part IV
-wires it onto a stack one level at a time and then stack by stack: Kubernetes on kind and on Azure, a database behind
-its pooler, a message broker's consumer group, a cache's memory ceiling, the independent simulators, drone swarms, the
-big organisms on a rented machine, the processor itself, and the data center under the servers. Part V is operating it: the switches, the rules the governor keeps, the log, and
-maintenance. Part VI is proof: paired runs and receipts, evidence classes, the frozen engines and the three-run rule,
-the Omni index, and every result to date with its losses, followed by the threats to validity we state ourselves and the
-open program. Part VII is the code, the C++ twins and the license. The back matter holds the glossary, every command,
-the file map, the equations in full, the metrics, troubleshooting and the evidence map.
-
-## Prelude: A Night on the Cluster
-
-This is a story, not a result. It follows one night on one cluster to show, in plain order, what each part of this
-book does. The shop, the times and the settings are made up for the story. The measured results are in the chapters
-on proof, each with its evidence class.
-
-**9:00 p.m. The shop is quiet.** An online store runs on Kubernetes. Its native controllers are the ones almost
-everybody uses. The Horizontal Pod Autoscaler watches the average processor load and adds copies of the web service
-(pods) when that load passes its target. The cluster autoscaler adds machines when the pods no longer fit. A careful
-engineer picked their settings months ago, for the worst day she could imagine, and she picked them well. Tonight the
-cluster runs on its floor of two machines, and every customer gets an answer in a blink.
-
-**A week earlier, Omni-Compass went on in watch mode.** For seven days it read every gauge and wrote nothing. It
-learned how fast each pod starts, how the response time moves when the load moves, and where each setting's safe band
-lies. Then the team ran the wire check: every reading came from the place it claimed, every lever moved the thing it
-claimed, and every write was read back. Only then did they turn it to govern. Every setting it would touch was saved in
-a snapshot first.
-
-**9:40 p.m. The sale starts.** In two minutes the requests double. The native autoscaler does exactly what it was
-built to do, but it is built to wait: it needs the average load to climb, then it needs a decision, then each new pod
-needs time to start. While it waits, customers wait. With Omni-Compass on top, the compass sees the response time slide
-toward the edge of its band and into the cushion. It pushes. It raises the autoscaler's floor of pods, a setting the
-autoscaler already respects, so new pods start before the average catches up. It does not fight the autoscaler and it
-does not go around it. It moves one setting, through the plug, and reads it back.
-
-**10:15 p.m. The database starts to strain.** More web pods mean more connections to the database, and the database
-has a limit of its own. A controller that watches only the web service would keep adding pods and deepen the jam.
-Omni-Compass sees the whole body. One body, one brain: before it takes the next step for the web service, it checks
-what that step would do to every other part. The step that would push the database past its own cushion is refused.
-Nothing is pushed into a loss to buy a gain somewhere else. The web service holds where the database can still keep up,
-and the queue drains instead of growing.
-
-**11:30 p.m. The rush fades.** The pedal lifts. Omni-Compass does not drop everything at once, because a sudden drop is
-how systems stumble. It eases each setting back toward native along a smooth curve. The extra machines go away as the
-work goes away. The energy the cluster used during the rush shows up in the report as power given, beside the work it
-bought and the minutes customers did not spend waiting.
-
-**1:00 a.m. Idle.** The pedal is lifted all the way. The cluster sits on its floor of two machines again, exactly
-where the engineer left it. Omni-Compass keeps reading every second. Staying native is its live decision, made again
-each second, not a verdict from some earlier run.
-
-**3:12 a.m. Something breaks.** An upgrade restarts the machine that runs the governor, and Omni-Compass stops in the
-middle of its work. Nobody is awake. Nothing bad happens. The governor's lease runs out, and the plug walks every
-setting back to its snapshot, step by step. The native controllers keep running as they always have, because they never
-stopped. When the governor comes back, it starts from what it reads, not from what it remembers.
-
-**7:00 a.m. The morning report.** On a live system, the proof does not come from a feeling that the night went well.
-It comes from paired runs: the same work, run once on native and once with Omni-Compass on top, and compared gauge by
-gauge. Every gauge gets one word. Time waited that fell reads **GAIN**. Work done that rose reads **GAIN**. A difference
-inside the noise reads **EVEN**, and the report says so plainly. A gauge that moved the wrong way reads **LOSS**, and it
-stays in the report until its cause is found and fixed. The energy spent on extra work reads **power given**, never a
-loss.
-
-**What the night shows.** Every part of that night is a chapter of this book:
-
-- the watch mode and the wire check are in the chapters on wiring, level by level;
-- the band, the cushions and the two forces are in the chapters on the compass;
-- one body, one brain is the reflex rule, in the first part;
-- the snapshot, the lease and the kill switch are in the chapters on operating it;
-- the paired runs and the three words are in the chapters on proof.
-
-Read the rest of the front matter before you touch a wire. It tells you what you are looking at and how to read
-what it tells you.
-
-## Introduction: The Problem, the Idea and the Promise
-
-**The problem.** Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
-power and clock governors, building-management loops, battery-management systems, connection pools, servo controllers.
-Each loop is tuned in isolation, against its own setpoint, with margins sized for a worst-case disturbance. Three costs
-follow, and every operator pays them:
-
-- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
-  recomputes its desired replicas from averaged utilization on a sync period (15 seconds by default) and damps its
-  decisions with stabilization windows; new pods then need time to schedule and start. Queues form before capacity
-  arrives.
-- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
-  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
-  rarely used.
-- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
-  is another loop's disturbance. More web replicas saturate the database's connections; more cooling pushes a power feed
-  toward its limit.
-
-Operators close these gaps by hand, with fixed settings and runbooks. That is safe, and it leaves the region between the
-nominal operating point and the safe boundary unused nearly all of the time.
-
-**The idea.** Close one supervisory loop around the native loops. Omni-Compass treats each setting a native controller
-already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool size) as an actuator, each
-native telemetry stream as a measurement, and governs the whole body from above. Every decision period it runs five steps:
-
-1. **Sense.** It reads each muscle's own gauges through the plug: utilization, response-time percentiles, queue depth,
-   temperature, power, state of charge.
-2. **Normalize.** It places each reading in its band as a compass position, from 0 (calm) to 1 (the line), with a 5%
-   cushion at each edge.
-3. **Decide.** The compass law turns that position into one bounded increment per actuator: two antagonist forces, push
-   and pull, each with its own gain, combined through a smooth saturating response (tanh), so the command is continuous,
-   bounded and never chatters. The increment is clipped to the actuator's cover, the hard range nothing can leave.
-4. **Actuate.** It writes the increment through the plug, idempotently, and reads the value back to confirm the write
-   landed.
-5. **Verify.** The verdict compares the muscle with and without the step in a paired trial on the muscle itself, judged
-   on the muscle's own cost per unit of work; the body guard checks every coupled muscle against its own cushion. A step
-   that fails either test is reverted.
-
-**What Omni-Compass is not.**
-
-- It is **not a replacement** for your controllers. Native keeps running underneath, always. Omni-Compass only moves
-  settings that native already exposes and respects.
-- It is **not a black box**. Every decision is written to a log, with the reading that caused it and the setting it
-  changed.
-- It is **not a one-time tuning script**. It decides again every second, and staying native is one of its decisions.
-- It is **not a cost-cutter first**. It gives power where the power buys work or speed, and it shows that power beside
-  what it bought.
-
-**The promise, in three parts.**
-
-1. **Do no harm.** A step stays only where the muscle takes no LOSS from it, measured on the muscle itself. Where
-   Omni-Compass cannot bring a gain, the muscle stays native.
-2. **Everything comes back.** Every setting is saved before the first write and restored when Omni-Compass stops. If
-   the governor crashes, its lease runs out and the settings walk home on their own. A separate kill switch stops
-   everything at once.
-3. **Every claim is checked.** Each benchmark compares two arms, native and Omni-Compass on top of native, on the same
-   machines with the same work. Each runs three separate times. Each reading is one word, GAIN, EVEN or LOSS, decided
-   by what the gauge is for. Each result carries its evidence class: **P** for a physical meter, **L** for live
-   software, **S** for our own models. A model is never shown as proof of hardware.
-
-**What it governs.** The catalog names 1,107 muscles in 70 families, the settings that operators everywhere already
-turn by hand: machine pools and replicas, power caps and clock limits, cache sizes and connection pools, cooling
-setpoints and battery reserves, robot speeds and drone-swarm settings, and many more. They are grouped into four realms
-(compute, AI and cloud; physics, robotics and autonomy; energy, facility and industry; distribution and specialized
-systems) and run together as six organisms, from one realm alone up to the whole tower at once. The muscles in the
-catalog are modelled (class S). The real controllers it has been run on top of, such as Kubernetes and the databases,
-are live software (class L). The chapter that follows the key, "What You Are Looking At," shows which is which. Appendix G lists every one of the 1,107 muscles: what it is, what Omni-Compass reads from it, what it moves, the organisms it belongs to, and its own card, the factory setting it runs on.
-
-**What you need before you wire it.**
-
-- **A license for any use beyond evaluation.** Production use requires a signed, paid Omni-Compass Enterprise License.
-- **Read access first.** Omni-Compass starts in watch mode: it reads and computes, and writes nothing.
-- **The wire check.** Every reading must come from where it claims, every lever must move what it claims, and every
-  write must read back. Nothing writes until the check passes.
-- **Your own service line.** The response time or other limit your service must meet comes from your own service
-  objectives, not from ours.
-- **Paired runs on your own system.** The only number that applies to your system is the one your own paired runs
-  produce, on your own receipt.
-
-**How to read what follows.** Next comes the key to the three words, then "What You Are Looking At," which shows what a
-hooked-up system looks like and how to read its report. The Quick Reference card is the page to keep beside the system.
-The Executive Summary gives the results in brief, and the Disclosures make every declaration once. After that the book
-turns to the theory, the mathematics, the physics, the body, and only then to the wiring, the operation and the proof.
-Read in that order, nothing in the wiring chapters should surprise you.
-
-## Quick Reference: The Card for the Glove Box
-
-Keep this page where the people who run the system can reach it, the way a driver keeps the card in the glove box. Every
-line is explained in the section named beside it; nothing on this page replaces those sections.
-
-**What it is.** A supervisory governor on top of the controllers you already run. It never replaces them: it moves only
-settings they already accept, inside a band you set, and hands every setting back when it stops (sections 1.1 and 8).
-
-**The two names.** *Native* is your system as it runs on its own. *Omni* is the same system with Omni-Compass on top.
-There is no third arm and no other name (section 1.1).
-
-**The modes** (section 1.3).
-
-| Mode | What it does | When |
-|---|---|---|
-| Off (manual) | nothing; native runs alone | before installing, and whenever you choose |
-| Watching | reads every gauge and logs what it would do; writes nothing | the first level of every installation (level 1) |
-| Autopilot | one pedal: push for more, lift off for less, idle (lifted all the way) and reset, by its law | after the watch level has passed |
-| Cruise | machines in service up to the pool's own top while a known queue waits | batch work |
-
-**One pedal**, like an electric car's. *Push*: capacity added at once as traffic climbs, never held back. *Lift off*:
-capacity eased off a step at a time, handed back toward native, never below idle. *Idle*: the pedal lifted all the way,
-the floor of two machines in service, ready for the next burst. *Reset*: every setting handed back to where native had
-it, read back, and the record removed.
-
-**The ways it stops, and what each leaves behind** (section 11).
-
-| You want to, or it happens that | Do this | What is left |
-|---|---|---|
-| a run ends | nothing: the reset runs by itself at the end of every run | every setting at the operator's value, read back |
-| stop everything at once, for any security reason | `python3 tools/omni_switch.py off` | every governor hands back and exits; none starts again until `python3 tools/omni_switch.py on` |
-| stop one muscle | its kill file, or `OMNI_KILL=1` | that muscle handed back; the others run on |
-| Omni-Compass dies without handing back (killed, crashed, hung) | nothing: the watchdog's lease hands back for it | every setting back at the operator's value, measured at 7 to 11 seconds in 30 of 30 repetitions (section 3.5) |
-
-**The eight levels of an installation** (section 9.3). Take them in order; go to the next only when the pass holds.
-
-| Level | What it touches | Pass |
-|---|---|---|
-| 0 | nothing: `python3 verify.py` | `VERIFICATION: PASS` |
-| 1 | nothing: watch mode, with a read-only identity | zero writes, and readings your operators agree with |
-| 2 | the pods, through your autoscalers (**WRITES**) | p95, p99 and failed requests never behind native, over paired runs |
-| 3 | the machines, through the release gate and the verdict (**WRITES**) | fewer machines in service, with no LOSS on any service gauge |
-| 4 | the replica decision itself (an option, not a step) | as level 3 |
-| 5 | a GPU box, two wires: the clock ceiling and the power limit (**WRITES**) | work per energy up or equal; no request more than 2% slower at the median, p95 or p99 |
-| 6 | the processor's clock and power on bare metal (**WRITES**) | energy per unit of work down, no LOSS on any service gauge |
-| 7 | site power and the supply-air setpoint (**WRITES**) | the site meter's energy down, every rack inlet inside its band, no LOSS on any service gauge (section 10.11) |
-
-**Before any level that writes:** run the wire check (section 8.4), start in watch, and keep the master switch in reach.
-
-**Warning signs, and the first thing to do.**
-
-| You see | First | Then read |
-|---|---|---|
-| a service slower or failing more with Omni than without | `python3 tools/omni_switch.py off`: the system is native again | section 8.5, wired right or wired wrong |
-| a setting at a value Omni-Compass did not write | nothing: it stops writing that lever by itself (one writer) | section 7.2 |
-| a meter that is blind or late | nothing: blind means hold; it moves nothing it cannot see | section 7.3 |
-| your results point the other way from the published ones | presume the wiring first, not the law | `DISCLOSURES.md`, section 4 |
-
-**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
-Security reports: the process in `SECURITY.md`, never a public issue.
-
-**What the letters of the number mean.** Read in order, DEX-YLL-1 is the way the engine runs:
-
-| DEX | YLL | 1 |
-|---|---|---|
-| **Data Exchange**: the input. In software, data exchange is how one system's readings reach another. Here it is the two-way plug, one wire in and one wire out: the system's own readings come in, Omni-Compass's settings go out. | **Yield Limit Line**: the boundary. In engineering science, the yield limit is the most load a material can carry and still spring back unharmed; past it, the damage is permanent. Omni-Compass runs every muscle up to its own yield limit line, read live, and never past it. | **1**: the output. In code, 1 is true, the finished state; in science, 1 is unity, the whole. Here it is one closed loop: one body, one brain, every result read back and the next step decided from it. |
-
-Read as one sentence: Omni-Compass takes the system in through a Data Exchange (DEX), runs every setting up to its Yield Limit Line (YLL) and never past it, and closes it all into one loop (1). Science and software people read each part on sight.
-
-## Executive Summary
-
-**What it is.** Omni-Compass is a supervisory governor. It sits on top of the controller a system already has, the
-Kubernetes autoscaler, the GPU's firmware, the cooling loop, the battery inverter, the robot's servo, the grid's tap
-changer, the database's connection pooler, the message broker's consumer group, the cache's memory ceiling, and it moves
-only the settings those controllers already accept. It reads each muscle's own meter, computes one bounded force per
-muscle from a single smooth law, and holds the service in the middle of its safe band rather than far below its limit.
-The native controller keeps running exactly as shipped; Omni-Compass sets what it already exposes, and when Omni-Compass
-stops, every setting goes back to the value it read once before its first write. It is never standalone and it never
-competes with the controller underneath it.
-
-**What it does for you.** Every running system keeps room "just in case": machines sized for the worst minute of the
-day, a pool of connections held open for a load that comes once an hour, a consumer group sized for the quiet hours and
-then overrun at the peak, a cache ceiling set once and left. By default Omni-Compass turns that room into more work,
-faster: the max, every muscle run up to its own limit, read live, never past it and never below native, the energy it
-takes shown as power given beside the work and speed it bought. On the dial, anyone can tune it down to the same work
-with less. The two are the same measurement read from two sides (section 3.4): a third more work from what is already
-installed is a quarter off the bill.
-
-<!-- where things stand (tools/summary.py --fix) -->
-
-**Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
-
-- **The engine on this checkout:** omni-v5, fingerprint 6093b2b88aa911b9 (44 files).
-- The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
-  - every muscle alone, over its loads: EVEN 580, GAIN 527
-  - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
-  - the organisms under the climb load: Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
-  - the organisms under the line load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
-- The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of engines v1 and v3, each named in its table): +5.2% GAIN on the resource reading (work, speed, machines, energy), +12.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
-  - Real Kubernetes (GitHub): +31.8% GAIN
-  - Real database cache (MongoDB under YCSB, GitHub): +1.7% GAIN
-  - Real database (PostgreSQL behind PgBouncer, GitHub): +0.9% GAIN
-  - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
-  - Real cache (Redis, GitHub): +0.0% EVEN
-  - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
-
-| Benchmark | Its one number | Its word | Class |
-|---|---:|---|---|
-| Every real test together: the Omni index | +5.2% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | +59.5% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | +27.5% | GAIN, power given | L |
-| The six organisms with the real cluster inside, 10 and 100 copies | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
-| The big organisms with the real cluster inside, 1,000 copies on Azure | +155.0% | GAIN | L, the cluster; S, the organism around it |
-| The 945 modelled muscles as one tower, every muscle written at once | +0.3% | GAIN | S |
-| Robustness: the two-hour run | +0.0% | EVEN | L |
-| Robustness: the governor killed outright mid-run | +8.6% | GAIN | L |
-| Robot arms (MuJoCo), the three untouched robots | +3.8% | GAIN | S |
-| Redis, the cache's memory ceiling | +0.0% | EVEN | L |
-| Real Kubernetes, steady work | +30.5% | GAIN | L |
-| Real Kubernetes, faults | +36.6% | GAIN | L |
-| Real Kubernetes, demand that wanders | +37.0% | GAIN | L |
-| Real Kubernetes, all four at once | +41.7% | GAIN | L |
-| Real Kubernetes, a queue of jobs | +16.5% | GAIN | L |
-| Real Kubernetes, a public day of demand (Google 2011) | +46.4% | GAIN | L |
-| Real Kubernetes, a noisy neighbour | +0.0% | EVEN | L |
-| Power grids (SimBench), both load models | +5.8% | GAIN, power given | S |
-| PostgreSQL, the pooler's pool size | +0.9% | GAIN, power given | L |
-| MySQL, the buffer pool's size | +0.0% | EVEN | L |
-| MongoDB, the storage engine's cache size | +1.7% | GAIN | L |
-| Kafka, the consumer group's size | +0.1% | GAIN | L |
-| Drone swarms, the three untouched cells | +5.9% | GAIN | S |
-| Buildings and batteries (CityLearn), the districts with batteries | +0.8% | GAIN AND LOSS | S |
-
-Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
-
-<!-- end of where things stand -->
-
-**What has not been shown, said plainly.** An energy or cloud-bill saving on real machines. Energy on kind is a
-declared model, because the machines are containers on one runner. Azure's bill on a 4-worker fleet read no difference
-beyond the noise on every gauge, which is the honest reading of a fleet too small to show one machine; the 40-worker
-fleet that can show one is preregistered and has been refused by Azure's own cluster capacity in its region, each refusal
-recorded. Every earlier GPU result ran on a controller since replaced and is obsolete; the card runs again on rented
-hardware at one named commit. Each of these is an open item in section 16, not a footnote.
-
-**How it stays safe.** It watches before it writes. It records every original setting before it acts and reads back
-every write. It never writes past a knob's cover. It gives everything back the moment service crosses the wall or a
-sense goes blind. It stops writing a knob the instant anyone else touches it. It moves a slow knob only after a paired
-trial on the muscle itself shows no more than 2% cost. One OFF switch returns every setting to its original value; a
-watchdog with a lease does the same if the governor is killed outright; and a separate kill switch, for security only,
-turns the whole harness off in one human hand.
-
-**How you know.** Every run produces receipts: native against omni on the same system, the same load and the same clock,
-each gauge with its 95% interval, the raw files archived beside the code and fingerprinted. Results are labelled by a rule
-written before the run, counted only when all three of our runs agree, and reported with every loss in the table.
-
-## Table of Contents
-
-**Front Matter** - The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
-Prelude: A Night on the Cluster; Introduction: The Problem, the Idea and the Promise; Quick Reference: The Card for the
-Glove Box; Executive Summary
-
-**Part I - The Governor**
-1. What Omni-Compass Is
-2. The Muscles, the Realms and the Six Organisms
-3. Where the Value Comes From
-
-**Part II - The Mechanism of Action**
-4. The Engine: Eight Equations and One Control Law
-5. The Closed Circle: Why It Cannot Leave Its Compass
-6. The Compass: Push, Pull and the Two Forces (6.5 the reflex rule: one body, one brain)
-7. The Two-Way Nervous System
-
-**Part III - The Harness: Plugs, Wires and the Wire Check**
-8. The Plug, the Adapters and the Wire Check
-
-**Part IV - Wiring It onto Your Stack, Step by Step**
-9. Before You Start, and the Eight Levels
-10. Stack by Stack (10.11 the data center under the servers: cooling, power and batteries)
-
-**Part V - Operating It**
-11. The OFF Switch, the Rules, and the Log
-12. Maintenance, Upgrades and Security
-
-**Part VI - Proving It**
-13. Paired Runs and Receipts on Your Own System
-14. Evidence Classes and How to Read a Result
-15. The Frozen Engines and the Three-Run Rule
-16. Results to Date (16.1 real Kubernetes; 16.2 the organisms with the cluster inside; 16.3 the bill on a real cloud;
-    16.4 a real database, broker and cache; 16.5 the modelled realms and the simulators; 16.6 the one number and the
-    table; 16.7 threats to validity, stated by us; 16.8 what is not yet shown, and the open program)
-
-**Part VII - Code, Twins and Terms**
-17. License and Commercial Terms
-18. Python, C++ and the Seal
-
-**Back Matter** - Glossary; Appendix A Command Reference; Appendix B File Map; Appendix C The Equations in Full;
-Appendix D Metrics; Appendix E Troubleshooting; Appendix F Evidence Map; Appendix G Reproducing Everything; Contact
-
----
-
-# PART I - THE GOVERNOR
-
-## 1. What Omni-Compass Is
-
-A governor on a steam engine does not build the engine and does not turn the shaft. It watches the speed and moves the
-throttle so the speed stays in a band. Omni-Compass is that, for every machine you run.
-
-It is a process on a host. It reads meters, steps a bounded mathematical law, and writes only the levers it has been
-given. It is not the chip, not the GPU driver, not Kubernetes, not the building controller. Those keep running exactly
-as they do today; Omni-Compass sets the values they already accept.
-
-Three facts about that process fix what the rest of this manual can and cannot claim. First, it is **one process per
-stack**, a controller (`omni_controller/controller.py` on a cluster; the harness's own controller on a database or a
-cache) that wakes on a fixed period, reads the stack's own gauges through the stack's own interface, decides, writes
-through the same interface, and reads back what the device took; it has no agent inside the pods, no kernel module, no
-hook in the request path, so it can add latency to nothing it does not govern. Second, every lever it may touch is
-**named before it starts**, read once into a snapshot, and handed back to that snapshot when it stops, is killed, or
-loses a sense; a lever it was not given it cannot reach, because the plug for it does not exist. Third, it has a
-**watching mode** in which it reads and decides and writes nothing, and every rollout begins there (section 9): the
-first thing an operator learns about Omni-Compass on their own stack is what it would have done, in a log, with the
-stack untouched.
-
-What follows from those three is the shape of the evidence in Part VI. Because the native controller keeps running
-underneath, every benchmark is the native stack against the same native stack with Omni-Compass on top, and never
-Omni-Compass against anything else. Because the levers are the stack's own settings, every gain is one the operator
-could have reached by hand, if they had been able to read every gauge every few seconds and move every knob without
-ever being wrong; the claim is not a new mechanism but a steady hand on the mechanisms that exist. And because the
-process is small and separate, its own cost (CPU on the host, reads of the API) is measured in every run and counted
-against it where it shows.
-
-### 1.1 Always on top of a native controller
-
-The first design decision, and the one every other follows from, is that Omni-Compass is **supervisory**. It never
-replaces the controller a system already has, never bypasses it, and never runs in its place. The Kubernetes
-Horizontal Pod Autoscaler keeps scaling pods on its own CPU target; Omni-Compass moves that target inside a range the
-operator allows. The cluster autoscaler keeps adding and deleting machines; Omni-Compass marks machines idle and lets the
-autoscaler do the deleting. The card's firmware keeps boosting the clock and enforcing its power limit; Omni-Compass sets
-the ceiling the boost may reach and the limit the firmware enforces. PgBouncer keeps handing connections to clients;
-Omni-Compass sets its pool size through the pooler's own console. Kafka's consumer group keeps rebalancing partitions on
-its own; Omni-Compass changes how many consumers are in the group, which is what an operator does. Redis keeps evicting by
-its own rule; Omni-Compass sets the ceiling that rule works under.
-
-This matters to a referee for a precise reason: every benchmark in this manual has exactly two arms, **native** (the
-system with its own controller, as shipped and as the operator set it) and **omni** (the same system with Omni-Compass on
-top). There is no third arm in which Omni-Compass replaces the controller, and no comparison in which Omni-Compass is a
-rival to it. A gain is therefore always "what the governor added on top of what the native controller already did", and a
-loss is always "what the governor cost on top of it". Nothing in the record is an argument against any native controller;
-every native controller in this manual is a good controller that the governor sits on.
-
-### 1.2 Do no harm: the verdict
-
-The second design decision is that Omni-Compass must never cause a LOSS. This is not a slogan printed on a
-report; it is a trigger inside the engine. Before Omni-Compass moves a slow knob (a machine given back, a card's clock
-ceiling, a robot axis's speed, a drone's cruise override), it runs a **paired trial on the muscle itself**
-(`omnicompass/verdict.py`): the muscle's own cost per piece of work is measured at native and at one step past the
-deepest step already allowed, under the same traffic, with at least thirty pieces of work on each side; the step is
-allowed only if the trial's median cost is no more than 2% above the reference and no more than 2% above the cost first
-measured at native. A refused step is not tried again for a set number of decisions. Where no step passes, the verdict
-reads **left native**, the knob is never moved, and the result for that muscle says "nothing for Omni to move". This is
-why, in the robot-arm benchmark, two of four arms were left entirely native and are reported as such, and why in the
-real Kubernetes tests machines were kept whenever one machine fewer made the requests slower in the trial. Gains are not
-capped; the allowance caps only what may be spent to get them.
-
-The same principle, applied after the fact to every published result, is the page of wiring verdicts
-(`docs/WIRING_VERDICTS.md`, section 16.6b): every knob in every table is given one of three words from the table itself,
-**write** where a gauge is GAIN in all three of our runs and none LOSS or power given in all three of our runs, **watch** where nothing is GAIN in all three of our runs (the knob
-stays native and Omni only reads it, one wire out and no wire in), and **operator's choice** where gains and losses are both the same in all three of our runs. Omni-Compass is wired out of every muscle; it is wired in only where it has earned it.
-
-### 1.3 The pedals, the modes and the two switches
-
-Omni-Compass drives a system the way a self-driving car drives itself: it feels, gauges and adjusts, with nobody in the
-seat. The vocabulary is used the same way everywhere in this repository (`docs/MECHANISM_OF_ACTION.md`, "The pedals"):
-
-- **Off (manual).** Omni-Compass is not driving; native runs alone. This is the native arm of every benchmark.
-- **Watching.** Omni-Compass reads every gauge and logs the decision it would take, and writes nothing. Any difference
-  between a watching arm and native is the cost of its being there (its CPU, its reads) plus noise, never a decision; a
-  watching arm that writes anything fails its run. Watching is the first level of every rollout (section 9).
-- **Autopilot.** One pedal: **push** (traffic climbs and capacity is added at once, never held back), **lift off**
-  (traffic falls and capacity is eased off a step at a time, handed back toward native, never below idle), **idle** (the
-  pedal lifted all the way: calm traffic, the engine at its floor of two machines in service, ready for the next burst),
-  **reset** (every setting the governor ever wrote is handed back to where native had it, read back, and the record
-  removed; every benchmark arm ends with a reset and checks it).
-- **Cruise.** For work that comes as a pile: when pods have waited for a place for two decisions in a row, machines go
-  into service up to the pool's own top (read live: every machine of a fixed pool at once, a growing pool a step a
-  decision) and stay there, without second-guessing, until the line has been empty for two decisions. In cruise
-  the governor also stops its five-second floor reads, because every machine is already in service and the reads would
-  only cost CPU on the machines the queue is using.
-- **Idle at once.** When the work is done and demand is at zero (the service at its autoscaler's own floor,
-  wanting no more, at half its target or less), the pedal is lifted all the way in one move, straight to idle, with every
-  safety check still holding.
-- **The kill switch.** Separate from all of the above, and for **security only**: one switch in a human hand
-  (`python3 tools/omni_switch.py off`, `omnicompass/master.py`) turns Omni-Compass's governing off across the whole
-  machine at once, for anything rogue, or for anyone trying to drive a system through Omni-Compass's brain. Every
-  governor hands back and exits; none starts while the switch is off. The reset is the end of a run; the kill switch is
-  the end of trust.
-
-The floor of two machines is an operator's number; lifting off never takes a system below it, however far the pedal is lifted.
-There is no ceiling: every machine the operator has is usable, and the protection is the band inside each machine.
-
-### 1.4 Nothing is hardwired
-
-Omni-Compass carries no table of per-stack special cases. One law (section 6) is written once and runs on every muscle
-through one plug (section 8). The gains differ from muscle to muscle only through the muscle's declared physics: its
-response time, its decision period and its cover. Where a rule was found not to work, it was removed, not switched off and
-left in the code: the engine files are frozen and fingerprinted, and `verify.py` fails if any of them changes. A reader
-who finds a behaviour in a result can find the exact lines that produced it, and will find no second path.
-
-The rule has a practical consequence for anyone comparing Omni-Compass with a tuned controller. A tuned controller
-carries, somewhere, a number that someone chose for one stack: a cool-down of five minutes, a target of 70%, a step of
-two replicas. Each of those numbers is a bet that the stack will behave tomorrow as it did when the number was chosen, and
-each is one more place where a reader has to ask whether the result was the law or the tuning. Omni-Compass has a handful
-of such numbers, the centre of the band, the 5% cushions and the 2% do-no-harm line, and they are the same on every
-muscle, written once in the law and declared in every preregistration. Everything
-else the law needs (how fast the muscle answers, how often it may be moved, how far it may go) is read from the muscle's
-own declaration in the catalog (`omnicompass/muscles.py`) or from the native controller's own settings at the start of the
-run, never typed in by hand for a benchmark. When a benchmark needs a line, a cover or a chunk size (the MySQL pool moves
-in the server's own 128 MB chunks, the Redis ceiling in notches), the number comes from the stack being governed and is
-written in the preregistration before the first counted run, where a referee can see that it was not chosen after seeing
-the result.
-
-The second consequence is how the repository changes. A guard or a gain that turned out not to help is not left in the
-code under a flag, because a flag is a second path that a later reader has to reason about and a later test has to cover.
-It is removed, the removal is written in the changelog, and the fingerprint moves to the next engine version (section 15),
-so that no result taken on the old path is ever read against the new one. The three fingerprints that exist, v1, v2 and
-v3, are the whole history of such changes.
-
-### 1.5 The word
-
-The law is a **compass**: a band with a cushion at each wall, pushed to its middle by two antagonist forces, smooth,
-never hammering. The repository uses that word and no other for it. Earlier dated records that used another word are kept
-word for word, as records are; the current law is `omnicompass/compass_law.py`, `CompassLaw`.
-
-The word was chosen for what the law does, not for decoration. A compass has a needle, a centre it is drawn back to, and
-a card marked at the edges; it does not slam to a wall and stay there, and it does not chatter when the hand holding it is
-steady. The law has the same three parts. The **band** is the range the gauge is allowed to travel, from 0 to 1 once the
-reading is placed on it, with the operator's line at the top. The **cushions** are the last 5% at each wall, 10% of the
-band in all: a reading inside a cushion is already too close to a wall, and the law treats it as such before the line is
-touched rather than after. The **centre**, 0.5 by default, is where the needle comes to rest, and two forces bring it
-there: a **pull** proportional to the distance from the centre, gentle near it and harder up the walls, like a spring;
-and a **push** proportional to the speed at which the reading is moving, meeting whatever is shoving it (a load rising, heat
-building) with an equal and opposite force and doubling as the friction that stops the needle sloshing past the centre
-(the gain is chosen for critical damping: it glides to the centre and stops, with no overshoot and no ringing). Past the
-upper wall the pull goes to its full force at once, and the down side may not act until the reading is back inside the
-band: the law fails up, never down. The force itself is `A Ã— tanh(raw / A)`: near the centre it behaves as a spring, in
-proportion to the distance, and far from the centre it bends over and flattens into its maximum `A`, the law's authority,
-so that no reading, however far out, can make the law ask for more than one full step. That flattening is what "never
-hammering" means in code: there is no reading that produces a jump, and two readings a decision apart produce two forces
-a small amount apart. Section 6 gives the rules in full and Appendix C the equations; the reader who only needs the
-picture can keep the needle, the centre and the two cushions in mind and will not be misled by anything later.
-
-### 1.6 What it sets, muscle by muscle
-
-Every muscle keeps its own control, and Omni-Compass sets what that control already accepts:
-
-| Muscle | Its own control (kept) | What Omni-Compass sets |
-|---|---|---|
-| Kubernetes service | the HPA | the HPA's CPU target; replica floors |
-| Kubernetes node pool | Cluster Autoscaler / Karpenter / MachineSet | how many machines stay in service (park and wake) |
-| NVIDIA GPU | the card's firmware (boost, power and thermal limits) | the clock ceiling (up wire) and the power limit (down wire) |
-| CPU | the kernel's frequency governor | the frequency ceiling |
-| Data hall, building | the chiller and air handler loops | the supply-air setpoint; units in service |
-| Battery site | the inverter | the reserve level; the peak ceiling |
-| Robot joint, vehicle axis | the servo loop | speed and effort limits |
-| Process loop, feeder | the PI controller | the setpoint inside its band |
-| Database behind a pooler | PgBouncer's pool, the DBA's fixed setting | the pool size through the pooler's own console |
-| Database's storage engine | MongoDB's WiredTiger cache, the operator's fixed setting | the cache size through the server's own console |
-| Message broker | the consumer group at the operator's count | how many consumers are in the group |
-| Cache | the operator's memory ceiling and eviction rule | the memory ceiling through the cache's own console |
-| Substation | the tap changer's own controller | the tap position, one whole tap per move |
-| Drone | the shipped autopilot | the cruise override inside the autopilot's limits |
-
-When Omni-Compass stops, every one of those values goes back to what it was before Omni-Compass acted: not to the last
-value it wrote, but to the value it read once, before its first write.
-
-**Where it sits among the systems already in use.** The autoscalers, the node provisioners, the GPU and CPU power
-managers and the commercial optimizers are muscles, or optimizers over a few kinds of muscle; Omni-Compass is the
-governor on top of them: one law that reads every muscle in a body and writes each one's own knob under the limits they
-share. Running several of those systems at once does not make one governor, because each still decides on its own
-reading. The five systems named most often (IBM Turbonomic, Karpenter, NVIDIA's GPU power software, the Energy Aware
-Runtime, the Cluster Autoscaler with the commercial layers above it), nine open-source pieces with their licenses and
-where each can be benchmarked, and who owns Omni-Compass and on what terms it is seen, are set out in *The Seat: One
-Governor over the Muscles* (`docs/THE_SEAT.md`); the distinction between one governor and a collection of tools is
-stated formally in *The Max, Formally* (`docs/FORMAL_V5.md`, Definition 2 and Proposition 1).
-
-## 2. The Muscles, the Realms and the Six Organisms
-
-### 2.1 The catalog
-
-The catalog of Omni v5 (`realms/catalog_v5.csv`) lists **1,107 distinct muscles in 70 families** (v2 and v3 listed 945 in
-59, `realms/catalog.csv`, frozen for their results; v1 listed 656 in 46), each with its family, its plant model and its
-knob. A muscle is anything with a meter and a setting: a compute pool and
-its machine count, a GPU and its clock ceiling, a chiller and its setpoint, a battery and its reserve, a feeder and its
-tap, a robot joint and its speed limit, a pump and its flow. Each muscle carries a declared plant model, the simplest
-physics that reproduces how its meter follows its knob, and a native controller of its own, which is what the muscle does
-when Omni-Compass is not there. The catalog was built in four waves (`docs/realm_study/`): the spine from primary
-specifications, each realm's extras from its own specifications, a cross-check against industry and open-source
-controllers, and a verification, de-duplication and mapping pass. The register (`docs/REGISTER.md`, section 1) lists
-every family with its muscle count and the kinds of knob it carries, so a reader can see at a glance what the modelled
-realms contain and what they do not.
-
-The seventy families, by realm, are these. **Compute, AI and cloud** (twenty-seven): AI inference serving, AI training,
-blockchain and ledger nodes, CI/CD and build farms, cloud virtual machines and capacity, container resources,
-cross-cluster and edge placement, DPU and programmable IO, distributed cluster managers, game servers and real-time
-interaction, GPU fabric and RDMA, GPU hardware, HPC and distributed compute, host CPU and memory, Kubernetes dynamic
-device allocation, Kubernetes placement and scheduling, Kubernetes workload scaling (the largest family, 32 muscles),
-Linux kernel and operating-system control, media streaming, node fleets and Karpenter-class control, OpenShift and the
-Machine API, quantum computing control (modelled), serverless functions, virtualization and hypervisors, work admission
-and demand shaping, and the body's gut (data-plane intake and waste) and skin (perimeter and admission). **Physics,
-robotics and autonomous** (eight): automotive EV and mobile
-powertrains, aviation and autonomous flight, elevators and vertical transport, marine propulsion and vessel automation,
-rail traction and train control, robotics fleets and warehouse automation, robotics motion control, and spacecraft and
-flight software. **Energy, facility and industrial** (seventeen): agriculture and irrigation, building and
-critical-environment HVAC, cooling and chillers, district heating and cooling, energy storage and microgrids, facility
-and grid optimisation, grid transmission and distribution, healthcare critical environments, industrial PLCs and process
-automation, mining and mineral processing, oil and gas pipelines, PDUs, UPS and electrical distribution, pharmaceutical
-and food manufacturing, power generation and turbine control, renewable generation and inverter control, semiconductor
-fabs and precision manufacturing, and water and wastewater pumping. **Distribution and specialized** (eighteen): cache
-and memory services, commerce and payments, content delivery and edge caches, data analytics and ETL, databases and
-transactions, financial markets and trading systems, medical imaging and clinical systems, messaging and streaming,
-network routing and switching, observability and telemetry, ports and maritime logistics, reliability, security and
-recovery, runtimes and applications, search, indexing and vector databases, service meshes and API reliability, block,
-file and object storage, telecom radio access and edge radio, and workflow, logistics and fulfilment. Thirteen of these,
-marked "v2" in the register (the elevators, marine, rail, agriculture, district heating, healthcare, mining, pipelines,
-pharmaceutical and food, power generation, renewable generation, medical imaging and ports families), came with the
-second engine version; they, with the muscles added to the families that already existed, are the difference between the
-656 muscles in 46 families of v1 and the 945 in 59 of v2 and v3. Eleven more came with v5 (the Linux kernel, serverless,
-virtualization, content delivery, gut and skin families in a first wave; financial markets, media streaming, game servers,
-blockchain nodes and build farms in a second), with muscles added to families already there; the founder's nine
-open-source pieces (Kepler, Climatik, EAR, CruiseKube, Goldilocks, the Kubernetes power manager, PEAKS, adaptive GPU power
-capping and NVIDIA's platform power budget) came on 12 October as ten muscles in the families their knobs belong to
-(`docs/OMNI_V5.md`, `docs/THE_SEAT.md`). The GPU family is named for the hardware, not one vendor.
-
-**Every muscle its own card.** The brain is one, but since 13 October its settings are each muscle's own. A muscle's
-card holds the numbers the max uses for that muscle alone: how full a machine pool runs on its forecast before it calls
-for more and how many decisions of history it reads, how many wobbles of margin a battery keeps under its line and, for a
-battery wired by its power, how long it reads its line before it holds and how much of it it keeps clear. The cards were
-found by an automatic search over every muscle (`tools/tune_cards.py`), on development seeds only, today's global setting
-always one of the choices, and a card was kept only where it beat the global setting beyond the noise on two separate sets
-of seeds and was never behind native on any seed under any load (never over its line more often, never less work,
-never its line cleared later): 364 muscles carry one (`realms/muscle_cards_v5.csv`, every card in plain words in the
-muscle catalog, the evidence in `results/cards_v5/CARDS.md`); the rest run the global setting. Inside a
-body, a battery wired by its power keeps the body's own margins on its line, because the line carries the whole body's
-swing, which the card chosen for the battery alone never saw. The formal statement is *The Max, Formally*
-(`docs/FORMAL_V5.md`, section 5).
-
-Every live benchmark in Part VI sits inside one of these families: the Kubernetes tests inside workload scaling and node
-fleets, PostgreSQL and MySQL inside databases and transactions, Redis and MongoDB's cache inside cache and memory
-services, Kafka inside messaging and streaming, the robot arms inside robotics motion control, the drones inside aviation
-and autonomous flight, the power grids inside transmission and distribution, the buildings inside HVAC. A live result is
-therefore also a check on one family's model: where the real stack and the modelled muscle move the same way under the
-same law, the model has earned some trust; where they do not, the model is the thing to doubt, and the catalog's plant
-model for that family is the place to look.
-
-### 2.2 The four realms and the spine
-
-The muscles fall into four realms. Every realm stands on the same **spine** of 267 muscles in v5 (Kubernetes, machines, GPUs
-and CPUs, network, storage, observability, security, cooling and electrical distribution), because every realm's work
-runs on computers that must be cooled and powered, plus its own domain muscles.
-
-| Organism | Muscles | What it is |
-|---|---:|---|
-| 1. Compute / AI / Cloud | 540 | clusters, GPUs, AI training and inference, cloud capacity, kernels, functions, media, games, ledgers, build farms |
-| 2. Physics / Robotics / Autonomous | 404 | joints, fleets, vehicles, flight and spacecraft axes |
-| 3. Energy / Facility / Industrial | 480 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
-| 4. Distribution / Specialized | 484 | networks, storage, databases, commerce, trading, content delivery, workflows, radio networks, clinical systems, ports |
-| 5. The four stacked, every duplicate kept | 1,908 | all four realms on one clock, the shared spine counted in each |
-| 6. The whole tower, every muscle once | 1,107 | every distinct muscle on one clock |
-
-These are the counts of Omni v5. On v2 and v3 the organisms were 430, 376, 470 and 440, the four stacked 1,716 and the
-tower 945; on v1 345, 262, 282 and 337, 1,226 and 656; each version's results stay with its own counts.
-
-The realms differ in what their domain muscles are and in how much slack their native controllers leave. Compute, AI and
-Cloud is clusters, cards, training and inference pools and cloud capacity, where the knobs are replica targets, machine
-counts, clock ceilings and power limits, and where native controllers are already good, so the modelled gains are small
-and the real gains come from the queue and the tail. Physics, Robotics and Autonomous is joints, fleets, vehicles, flight
-and spacecraft axes, where the knob is a speed or effort limit and the physics decides, axis by axis, whether spending
-slack as speed saves energy at all; this is the realm the v3 slack gate was written for. Energy, Facility and Industrial
-is data halls, buildings, batteries, UPS, process loops, feeders and plants, where the knobs are setpoints, units in
-service, reserves and taps, and where the muscles with the most room are also the ones whose reserves exist for a reason
-the model does not contain (a UPS held for an outage is never a lever). Distribution and Specialized is networks, storage,
-databases, commerce, workflows, radio networks, clinical systems and ports, where the knob is usually an admission, a
-pool or a replica count, and where the real stacks of this manual (the pooler, the broker, the cache) live. Every realm's
-list, by family and knob, is `docs/REALM_MUSCLES.md` and `docs/REGISTER.md` section 1.
-
-### 2.3 What an organism run is
-
-These six organisms are the benchmark set of the modelled realms. An organism is every one of its muscles stepped on one
-clock, each from its own plant model, each with its own native controller, and the whole fed one demand trace from one
-seed. Native runs the organism with every native controller alone. Omni runs the same organism, the same seed, the same
-demand and the same clock, with the compass law on every knob the verdict allows. Each run produces its own receipt: the
-organism's work, its energy, its time over its service line, and every knob's hand-back. In code and in the workflows the
-two large organisms are named `tower` and `stack`, never by a count, because the counts changed between v1 and v2 and a
-name that carried a count would read as a different organism; the old names are read as aliases.
-
-The receipt is read in a fixed order. **Work** first: the organism's output over the window, which must not fall, and
-which reads LOSS by rule if it does, however little, as the four stacked at 1,000 copies showed on a difference of one
-part in a million (section 2.5). **Energy** second, and **work per energy** with it, which is the gain the modelled realms
-are built to show. **Time over the service line** third, the share of steps on which any muscle's service reading was past
-its line, which is the do-no-harm gauge for the body as a whole. Then **every knob's hand-back**, which must be complete
-in every run or the run fails. The reading given to an organism (the realms tables under `results/realms/`, one per engine) uses the words
-"superior within guardrails" when work and energy both improve with the service line respected, "service tradeoff" when a
-gain in energy came with time over the line, and names the loss when there is one: the v2 reading on the Physics realm
-and the tower was a service tradeoff, traced to the speed knobs on busy motion axes, and the slack gate that answers it is
-the one rule that makes v3 (section 6.3). What an organism run cannot show is also fixed: it is evidence class S, the
-plant models are our own, and nothing in it is presented as proof of a real stack. Its use is to show that one law holds
-across every realm at once, at a size no live benchmark can reach, and to find the rules that then have to earn their
-place on real software.
-
-### 2.4 The grid of copies and runs
-
-Every organism runs at **1, 10 and 100 copies** (that many instances of the organism on one clock, so the four stacked
-at 100 copies is about 190,000 modelled muscles) and at **1, 10 and 100 paired runs** (that many native-and-omni pairs,
-each from its own seed): the six organisms Ã— three sizes Ã— three run counts are 54 squares, run modelled and with the
-real cluster inside, both arms shown in every square. One hundred is the maximum in both directions (the founder's order
-of 12 October, to cut the time and the bill): no 1,000 copies and no 1,000 runs are run on any engine from that day, and
-the whole grid runs on GitHub's own machines, nothing rented for it (`scripts/dispatch_grid.py`, `results/grid_v5/`).
-Earlier engines' grids, which went to 1,000 copies and 1,000 runs, stand as they were run in their own pages
-(`results/scale/`) and are never read across engines.
-
-The two axes answer two different questions, and a reader should keep them apart. **Copies** is the size of the body
-the one brain governs: at 100 copies of the four stacked, the law computes a force for about 190,000 muscles from one
-reading of one clock, and the question is whether it stays coherent, whether the decision time stays inside the decision
-period, and whether the cluster inside it (section 2.5) is still served on time. **Runs** is the number of independent
-paired trials, each from its own seed, and the question is statistical: how wide the interval of the paired difference is
-and whether it moves as the trials multiply. A square at 1 copy and 100 runs tells a reader about the noise of the
-method; a square at 100 copies and 1 run tells a reader about the scale of the brain; the squares on the diagonal tell
-both at once. Every square shows the native value and the omni value side by side, never a change alone, because a
-change without its two ends cannot be checked against the organism's own records. The grid is rebuilt whole on every
-engine version, never patched square by square, so that no square carries a result from a different engine than its
-neighbours (section 15).
-
-### 2.5 The organisms with a real cluster inside
-
-The modelled organisms are also run with a **real Kubernetes cluster inside** as one more muscle (`tools/run_kil.py`,
-workflows `six-kube`, `big-organism`, `big-organism-detached`): the organism's own compute demand drives a real load
-generator against a real service on a real cluster, and the cluster's watts come back into the organism as heat and load.
-At 1, 10 and 100 copies this runs on GitHub's machines under protocol 3 (the organism's model on the runner's last
-core, the kind nodes on the others, the same in both arms; the window set from the heavier arm's step, timed before
-either arm), and the whole tower and the four stacked at 100 copies also run on eight-core Azure machines, detached from
-the GitHub job that starts them. No 1,000-copy run is started from 12 October. These runs are evidence class L for the
-cluster and S for the organism around it, and are labelled "L + S".
-
-Two rules keep these runs honest, and both are written in the preregistration before the run starts. The first is
-the **clock rule**. The organism must step on the measured window's clock: the row "organism behind its window" says how
-many seconds after the window its last step ended, and a repetition in which either arm ended more than 5% of the window
-late is marked **off the clock** in the organism's line, because its last steps saw a cluster whose load schedule had
-already ended. The row is shown and never judged; at 100 copies on the newest engine the tower's two arms ended 1.8 s and 2.4 s
-behind a 2,400 s window, a tenth of one percent, and no repetition was off the clock. The second is the **hand-back at 90%**.
-Omni-Compass releases the cluster's knob at nine tenths of the window and the last tenth is run by native alone in both
-arms, so that every repetition ends with the proof that the knob was given back and that native resumed where it would
-have been.
-
-**On the newest engine** (omni-v5), the grid with the cluster inside (`results/grid_v5/GRID.md`, the card version,
-digest `5648f290`) reads the cluster's time over the response line and the organism's time over the line GAIN in every
-square of 10 and 100 repetitions; the organism's work per energy reads LOSS in 21 of those 36 squares (power given that
-bought fewer misses, not more work), and the cluster's 95th and 99th percentiles read LOSS in two squares at 100 copies.
-Protocol 3 at 100 copies (digest `6093b2b8`, ten paired repetitions each; runs 38464343379, 38462289297, 38462280620)
-found the cause of those two: the tower's 95th percentile +47.7% and the four stacked's +87.2% (99th: +32.1%), on a
-four-core machine already about 80% busy and failing about half its requests in both arms, where the max added 40% to
-54% replicas that nodes unable to grow could not carry; the four realms read EVEN on every response time. The fix, the
-replica muscle's live headroom read from the machines under it, belongs to the next version
-(`docs/omni_v5/NEXT_VERSION_PLAN.md`, section 3), and the eight-core Azure runs show how much of the LOSS the small
-machine carries. Earlier engines' runs at 1,000 copies on rented machines stand as they were run, in their own tables
-(`results/live/V1_BIG_ORGANISM.md`, `results/live/V3_BIG_ORGANISM.md`), and are not read across engines.
-
-### 2.6 The register
-
-The register (`docs/REGISTER.md`) is the one list a referee can audit: every muscle by family (section 1), every
-benchmark by platform with its native controller, Omni-Compass's knob, its gauges, its result and its file (section 2),
-what is not measured yet, said plainly (section 3), and every open benchmark still to run, in order, one or two at a time
-(section 4). The program that takes each benchmark to its full size, with what each step costs, is `docs/PROOF_PROGRAM.md`.
-Every benchmark in this manual appears in the register under the same name.
-
-A row in the register is read left to right as a sentence: the platform, the open benchmark used for it and who publishes
-that benchmark, the native controller Omni-Compass sits on top of, the knob it moves, the gauges it is judged on, and its
-state. The state is written in a small, repeated vocabulary so that a reader can scan the column: **queued** (in the audited queue,
-not yet preregistered), **preregistered and built** (the rules are frozen and the harness runs, no counted result yet),
-the smoke runs with what each one taught and what was changed before the counted runs, and **A, B, C done** with the
-three run numbers, the engine version and the readings, losses first where there are any. A row never loses its history:
-when a benchmark moves from smoke to counted, the smoke record stays in its preregistration, and when a result is
-superseded by a run on a later engine, the earlier table moves to `docs/history` with its engine named. The register is
-the only list that must be complete; the manual's section 16 and the dossier (`docs/DOSSIER.md`) are readings of it, and
-anything in them that is not in the register is an error to be fixed in the register's favour.
-
-The audited queue (section 4 of the register) is the program's promise about what comes next, and it is deliberately
-short at the front: one or two benchmarks are run at a time, each preregistered, built, smoked and counted before the
-next is opened, so that no result is ever waiting on a harness that was half built when the runs began. The queue is
-ordered by what each benchmark adds to the index that the ones before it did not: a new resource traded (memory after
-machines, a buffer pool after a cache), a new native controller, a new class of evidence.
-
-## 3. Where the Value Comes From
-
-### 3.1 The problem we are attacking
-
-Computing has run into a wall that is not made of silicon. Data centers cannot get the power they need, cannot get it
-fast enough, and are running out of room to put more machines. AI made it harder: every new model needs more chips, and
-every chip needs more electricity and more cooling. The answers on the table are expensive and slow: new chips that do
-more work per watt (a new generation, new hardware to buy), new power plants and power contracts (billions, and years),
-and point fixes at a single layer (an AI serving trick, a scheduler, a power cap on one chip).
-
-We attack it from the other side. Every system already running wastes room it paid for:
-
-- GPUs boost to the top of their clock range and are knocked back by their own power limiter many times a second;
-- Kubernetes keeps replicas and machines sized for the worst minute of the day;
-- cooling runs colder than the heat requires; batteries hold more reserve than the hour needs.
-
-That room is paid for in energy, in machines and in floor space, and it produces nothing.
-
-Why the room is there is worth a paragraph, because it decides what can be done about it. Each layer of a stack is sized
-by someone who cannot see the others. The autoscaler's author does not know what the power cap will do; the cooling
-engineer sizes for the hottest hour of the year; the database operator sets a buffer pool for the largest table and leaves
-it there; each of them, sensibly, leaves a margin against the layer next door, and the margins add up. None of these
-people is wrong. The waste is not a mistake anyone made; it is the price of layers that cannot talk to each other, and it
-is why a fix at one layer, however good, moves the margin rather than removing it. The benchmarks in this manual are
-each a measurement of one such margin on real software: the connections a pooler holds open that no client is using, the
-memory a cache keeps for data it will not be asked for, the machines a cluster keeps in service for a minute that has
-passed. Each is small on its own and each is paid for every hour of the year.
-
-The attack, then, is not another autoscaler or another cache. It is a governor that reads every layer's own gauge, keeps
-each layer in the middle of its own band, and gives the margin back where the layer's own controller shows it is not
-needed, with the layer's own controller still underneath and the layer's own setting restored when the governor is gone.
-That is a different kind of thing from a point fix, and it is why it stacks on top of every point fix a data center has
-already made rather than competing with any of them.
-
-### 3.2 What Omni-Compass is, in one paragraph
-
-Omni-Compass is software that sits **on top of** the controllers a system already has (the GPU's firmware, the
-Kubernetes autoscaler, the building's thermostats) and governs every layer under one law: a bounded push and pull that
-keeps each service in the middle of its band instead of far below its limit. It never replaces the native controller,
-never asks for more than the native settings allow, hands every knob back the moment it is switched off or loses a
-sense, and refuses any step that measures a LOSS of more than 2% on anything. No new hardware. It stacks on top of every
-other fix a data center makes.
-
-### 3.3 The benefit: more work from what is already paid for
-
-The room that was spent on nothing becomes one of two things, and a company chooses which:
-
-- **More work for the same cost:** the same machines and the same watts carry more work; or
-- **The same work for less:** fewer machines in service, fewer watts, a smaller bill.
-
-They are the same gain read from two sides (3.4). The health side comes with it: faster answers, faster recovery from
-failures, nothing waiting, every knob returned, no human babysitting the stack.
-
-The results to date (section 16) show both readings on real software, and show that which one a stack gets is decided by
-the stack, not by Omni-Compass. On the real Kubernetes cluster the gain was taken as **more work, faster**: the cluster
-carried more requests inside its response line on the same machines. On PostgreSQL behind its pooler, on MySQL's buffer pool
-and on MongoDB's storage-engine cache the gain was taken as **the same work for less**: the same transactions answered inside
-the same line with fewer connections open, a smaller pool or a smaller cache, each notch proved on the stack first and the
-resource handed back at the end of every run. On Apache Kafka the earlier set had taken the gain as more work, faster, at the
-cost of three to four times the consumers, and on Redis the compass had bought the hit rate with three to four times the
-memory; under the brain's own verdict on the knob (10 October) neither spend was judged on the first set, because the trial
-rule of the day ended a spend trial on the calm the spend itself produced, so both read exactly nothing until the amended
-set lands (section 16.4). The combined index (section 16.6) is +4.8% over the six real categories on the sets of 10 October,
-with no loss in all three of our runs in any category. An operator
-should expect the same honesty from their own paired run: the receipts will say which side of the gain their stack took,
-and whether the compass's own cost (its CPU, its reads) ate into it.
-
-### 3.4 How to read the benefit: the arithmetic
-
-Every comparison is paired: the same system, the same work, the same moments, native alone against native with
-Omni-Compass on top. Let
-
-- *W* be the work served (requests answered, tokens generated), held equal in both arms;
-- *C* be a resource it used: machine-hours, CPU core-hours, or joules.
-
-**Productivity** is work per resource, *P = W / C*. With the work held equal, the gain from Omni-Compass on top is
-
-  *G = P_omni / P_native âˆ’ 1 = C_native / C_omni âˆ’ 1.*
-
-A gain *G* means the same resources can carry *G* more work. Read from the other side, the same work needs only
-
-  *C_omni / C_native = 1 / (1 + G)*
-
-of the resources, a saving of *S = G / (1 + G)*. So **a third more work (G = 33%) is a quarter off the bill
-(S = 25%)**; 20% more work is 16.7% off; 50% more work is a third off. Both columns are the same measurement.
-
-Three rules for reading any receipt:
-
-1. **The work must be equal.** Every receipt states that the load was fixed-rate (open loop): the same requests at the
-   same moments in every arm. Without that, a lower resource count could just mean less work was done.
-2. **Nothing may read LOSS.** Beside every gain the receipt prints response times, failures, waiting and the controller's
-   own CPU, each with its 95% interval. Our one rule (`DISCLOSURES.md`, section 3): no LOSS of more than 2% on any measure, and
-   only where energy or the bill is saved. A GAIN paid for with a LOSS of service is not a GAIN.
-3. **Know the class and the comparator.** A machine-hour gain on kind (where idle machines stay powered and native has
-   no node autoscaler) is not yet a bill; a modelled energy line is not a meter. Section 14 lists the classes; section 16
-   says, for every result, what it is measured against.
-
-**Three worked examples, from the tables.** In the all-four Kubernetes test on v3, the same ten machines carried 35% to
-49% more requests inside the response line: *G* is 0.35 to 0.49, so the same work would need 1/1.35 to 1/1.49 of the
-machines, a saving *S* of 26% to 33%, had the fleet been free to shrink; on kind it was not, which is why the table
-reports the work column and not a bill. In the database test, the pooler held 61% to 72% fewer connections open for the
-same work: the resource there is connections, *C_omni / C_native* is 0.28 to 0.39, and the gain read as "more work for
-the same connections" would be *G* = 1.6 to 2.6, which the table reports as the machines-equivalent column, "fewer
-connections by". In the Kafka test the work inside the line rose 16% to 21% while the consumers running rose by a factor
-of 2.6 to 4: there the gain in work was bought with resources, and the table reports both, the one as GAIN in all three of our runs
-and the other as power given in all three of our runs, because that is what happened.
-
-### 3.5 Where the evidence stands today, read honestly
-
-Every number below is from a three-run table on the frozen engine Omni v3, with its evidence class and the question a
-referee is entitled to ask about it. The answers to those questions are given, where they exist, in the row; where they
-do not yet exist, the row says what will supply them.
-
-| What | Measured, same work, three runs | Class | What a referee will ask, and the answer |
-|---|---|---|---|
-| Kubernetes: work inside the response line, all four in one run | **+35% to +49%** GAIN in all three of our runs | L | "Is the cluster real?" Kubernetes is real (API server, scheduler, HPA); the seven nodes are containers on one 4-core GitHub runner, so the host's own busy share is recorded beside every run and the machines column is machine-hours in service, not a bill. The bill is Azure's test (below) |
-| Kubernetes: 95th-percentile response time, steady, wandering, all four, faults | **47% to 66% faster** GAIN in all three of our runs | L | "Did native have a fair chance?" Native is Kubernetes with its HPA at the operator's target of 50%; the cost-to-match runs on the earlier engine showed no native target tried (40, 30, 20) reached Omni's p95 (`docs/history/`). The runs are paired on one runner with the order rotated |
-| Kubernetes: machines in service | âˆ’1.5% to âˆ’2.9% at steady load, **âˆ’19% to âˆ’23%** on the batch queue, GAIN in all three of our runs; inside the noise on the other tests | L | "Why so little?" Because the verdict kept every machine whose removal made requests slower in the paired trial. Earlier engines without that check parked 29% to 36% of the machines and paid for it in response time; the frozen engine puts service first. kind has no node autoscaler, so parked machines stay powered: the saving is machine-hours, not watts |
-| Kubernetes: energy | the standby model, âˆ’11% to âˆ’14% on the batch queue and âˆ’5% to âˆ’7% under the Google trace, inside the noise elsewhere | L, modelled | "Is it a meter?" No. The machines are containers; energy is a declared formula (a parked worker at 25 W standby), stated as a model on every line |
-| Kubernetes: fairness beside a noisy neighbour | no difference beyond the noise on every row, the neighbour's included | L | "Does it hurt the other tenant?" Not measurably, in three runs of ten pairs |
-| Kubernetes under a public day of demand (the Google cluster trace of 2011): the 95th percentile; machines in service | **64% to 67% faster**; machines **âˆ’7% to âˆ’9%**, GAIN in all three of our runs; failed requests âˆ’11% to âˆ’18% | L | "Whose demand shape?" Google's, from a published trace, turned into the schedule by a rule written before the runs and receipted with every part's SHA-256 |
-| Database behind its pooler: connections held open | **âˆ’6% to âˆ’11%** on the read-only workload, GAIN in all three of our runs (the set of 10 October, the brain's verdict on the pool); the slow write workload's add refused | L | "What did it cost?" Nothing the same in all three of our runs: work, latency and host CPU inside the noise on all three workloads; the earlier sets' larger savings, and their costs, are whole in the history |
-| Message broker: work inside the 500 ms line; the 95th percentile | on the set of 10 October exactly nothing: every spend trial was abandoned before it was judged and the group stayed at the operator's two consumers; the earlier set's +16% to +21% and 1.6 s â†’ 9 to 14 ms, bought with 6 to 8 consumers, is whole in the history | L | "Why nothing?" Our trial rule ended a spend trial on the calm the spend produced; amended as amendment 3, the next set running |
-| Database's storage-engine cache (MongoDB under YCSB): the cache size held | **âˆ’3% to âˆ’13% on f**, GAIN in all three of our runs (the set of 10 October, the brain's verdict on the cache); b, c and burst inside the noise | L | "What did it cost?" Nothing the same in all three of our runs: work, p95, p99, mean latency and host CPU inside the noise on all four workloads, no failed operation |
-| Database's buffer pool (MySQL under sysbench): the pool held | **âˆ’10% to âˆ’20% on read_write**, GAIN in all three of our runs, the pages holding data with it (the set of 10 October, the brain's verdict on the pool); burst, read_only and update_index inside the noise | L | "What did it cost?" Nothing the same in all three of our runs: work, p95, p99 and CPU inside the noise on every workload; the earlier set's memory bought for the written working set is gone |
-| Cache: work inside the 2 ms line; the hit rate | on the set of 10 October exactly nothing: the allowance one notch each way, most trials abandoned before they were judged, every gauge inside the noise; the earlier set's +14% to +27%, bought with a 64 â†’ 200 to 270 MB ceiling, is whole in the history | L | "Why nothing?" The same trial rule as the broker's; amendment 3, the next set running |
-| The modelled realms: work per energy, 945 muscles, six organisms, 1 to 1,000 copies | **+0.07% to +0.37%**, every organism superior within guardrails, 0 muscles LOSS or power given | S | "Why so small?" The native controllers in the models are well tuned and leave little room; the number is small and real within the model, the same at every size, and it is never counted in the headline |
-| Power grid, 11 SimBench grids in pandapower | energy drawn and net import lower in all 11; losses lower in 7, **power given in 4**; tap operations fewer in 10, 4 â†’ 8 a year in one, higher | S | "Where does it lose?" In the rural and semi-urban grids with their own generation, where a lower voltage raises losses; the table shows it |
-| Robot arms, MuJoCo Menagerie | peak torque âˆ’29% and âˆ’10%, tracking error âˆ’21% where Omni moved; the Panda's copper loss **+14% higher**; two arms left native | S | "What about the arms that gained nothing?" The paired physics trial left them native and the table says "nothing for Omni to move" |
-| Buildings with batteries, CityLearn, 11 districts | electricity bought, daily peak and unevenness lower in all 11; the bill **power given in 7**; ramping higher in 7 | S | "Is the bill a loss?" Yes, in the 2023 districts, and it is in the table as such |
-| Drone swarms, gym-pybullet-drones, three 20-drone cells | energy a mission âˆ’7% to âˆ’20%, missions a charge +8% to +25%; no late mission, reserve breach, near miss or collision | S | "Is the energy a meter?" No, a declared model from the simulator's own motor constants; the tracking error rose from 0.07 to 0.13 m inside its 0.25 m band and is shown |
-| The governor's own cost, 1 to 1,000 copies with the real cluster inside | **0.006 to 0.013 of one core** at every size, 0.1% to 0.3% of the host's cores | L | "Does the brain's cost grow with the body?" No: it governs the real cluster, and that cost does not grow with the organism around it; shown, not judged, each run under its own engine (`results/live/V3_OWN_COST.md`) |
-| The governor killed outright mid-run, 10 pairs Ã— 3 runs | every setting back at the operator's **7 to 11 s** after the kill in 30 of 30 repetitions (mean 9 s; allowance 60 s); a second governor to the end in every one; the 120 s after the kill inside the noise against native | L | "What if Omni-Compass dies?" The watchdog hands back from the lease the governor left, within seconds, and the service does not measurably notice; the whole window with a kill and a restart in it still read faster and with fewer failures than native (`results/live/V3_ROBUST_KILL.md`) |
-| Azure's bill on a 4-worker fleet (v1) | no difference beyond the noise on any gauge | L, a real bill | "Then where is the saving?" A fleet of 4 cannot show one machine; the 40-worker fleet that can is preregistered and waits on Azure's own cluster capacity in its region |
-| The real card (GPU) | **obsolete**: every earlier card result ran on a controller since replaced | P pending | "When?" The founder's runs on rented cards at one named commit, after the CPU and cloud work |
-
-The upside the real-software data points toward is a third to a half more work from what is already installed on the
-Kubernetes side, with faster answers, and a smaller, resource-priced gain on the stacks where the knob is a pool, a
-consumer group or a ceiling. It becomes a claim about the bill, not a direction, when two tests land: the bill on a real
-cloud with a fleet big enough to show one machine, and the real card's own meter. We publish each of them as it comes,
-whatever it says.
-
-### 3.6 One law, frozen; and what came before it
-
-The engine in every result of this manual is **the compass law with the verdict** (sections 6 and 1.2), frozen as Omni
-v1 on 5 October 2026, grown to the 945-muscle catalog as v2 and given the slack gate on speed knobs as v3, with the law,
-the controllers and the runners the same bytes in all three (`docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md`). Earlier
-engines, among them an allocation law that gave back about a third of the machines at the cost of response time and a
-compass law without the verdict, produced the numbered sets kept in `docs/history/`; their results are history, labelled
-as the engine that produced them, and are never read beside v1's or v3's. A buyer does not choose between modes: there is
-one law, and it is the one every table in Part VI was made on. Each new result therefore describes exactly the code that
-produced the old ones, and when the founder declares the engine final, the engine that stands then is published as
-Omni-Compass 1.0, with the older fingerprints kept as the road to it, never as a second product.
-
-"Frozen" has a precise meaning here. The engine is a fixed set of 40 files, and `OMNI_V3.json` holds one SHA-256 for
-each of them and one digest over all of them; `OMNI_V2.json` and `OMNI_V1.json` do the same for the two earlier sets.
-`python3 tools/omni_version.py` hashes the files in a checkout and prints which fingerprint they match (for this edition,
-`omni-v3 (digest b53d05449ee04c4b, 40 files)`), or, when they match none, which files differ from the nearest; with
-`--commit <sha>` it asks the same of any pushed commit, which is how every three-run table checks that its runs A, B and
-C were on the same engine before it combines them, and refuses if they were not. The three versions differ in exactly
-the ways their records name: v2 added the 945-muscle catalog and thirteen presets to v1 without touching the law, the
-controllers or the runners, which are the same bytes in all three; v3 added the slack gate on speed knobs and the marine
-propulsion preset to v2 (`docs/OMNI_V3.md`). Nothing else changed, and a reader can check that from the fingerprints
-rather than from this sentence.
-
-The rule that any change makes the next version is also the rule that keeps the results honest. A gain or a guard
-changed after a result is in would make that result unrepeatable on the engine that now stands, so the change moves the
-version, every result is run again on the new version, and the old tables keep their version in their name and move to
-history. The founder's standing order is that the engine is never changed without being told first; this manual records
-no change made otherwise.
-
----
-
-# PART II - THE MECHANISM OF ACTION
-
-## 4. The Engine: Eight Equations and One Control Law
-
-The engine (`omnicompass/core.py`, frozen and fingerprinted) carries a six-part state x = (E, U, I_U, S, B, B_dot):
-
-| State | Meaning | Physical picture |
-|---|---|---|
-| E | deviation: how far the system is from where it should be | a tank that fills with stress and drains on its own |
-| U | alignment, between the two poles -1 and +1 | a ball in a double well: two stable poles, a hill between them |
-| I_U | memory of misalignment | an integrator that remembers and slowly forgets |
-| S | basin structure | a ball rolling to the bottom of its landscape |
-| B, B_dot | the bath | a spring with friction that absorbs and settles energy |
-
-The eight equations (Appendix C gives them in full):
-
-1. dE/dt = -alpha_E E + beta_int + beta_ext + v_eff
-2. dU/dt = mu U (1 - U^2) - (dE/dt)/E_max - lambda_U U + u, with |u| <= 25
-3. dI_U/dt = (1 - U) - sigma_1 E - delta S - lambda_I I_U
-4. v_eff = cos(omega_B t / 2) c tanh(lambda_0 + lambda_1 (U - 0.5) + lambda_2 S)
-5. Phi(S) = alpha_s S^2/2 + beta_s S^3/4 - delta S
-6. dS/dt = -dPhi/dS
-7. d2B/dt2 = gamma_c delta S - (omega_B/Q_B) dB/dt - omega_B^2 B
-8. R_B: a finite-difference audit of (7), never fed back
-
-**The control law.** u = clip(-f_U(x, t) + K_P (sigma - U), -25, +25), where f_U is the drift of U with the command
-at zero, sigma is the target pole and K_P = 12. The first term cancels whatever is shoving U (the push); the second
-pulls U to its pole, harder the farther it is (the pull). The command is held unchanged through every stage of the
-fourth-order Runge-Kutta step and U is never rewritten afterwards. Inside the authority limit, U converges to its pole
-at rate K_P; this is proved (`docs/TRACKING_THEOREM.md`).
-
-### 4.1 What each equation does, in words
-
-The six numbers describe the whole system the way a physician's six vital signs describe a patient, and each equation
-says how one of them moves.
-
-- **Equation 1, the deviation tank.** *E* is how hard the system is being driven: queues, overload, power, heat. It
-  drains on its own at a fixed rate (alpha_E = 3.487) and is filled by two pressures, internal (queue and overload,
-  beta_int) and external (power, heat, network, staleness, security, beta_ext), plus a drive term v_eff that is bounded
-  by a hyperbolic tangent. However extreme the observation, the engine's response rate is capped at c = 1. This is the
-  saturation, the "speed limit" that no input can exceed.
-- **Equation 2, the alignment.** *U* is how healthy and settled the system is, and it lives in a double well: two stable
-  poles at +1 (healthy) and âˆ’1 (failed) with an unstable ridge at 0. A rising deviation pushes *U* out of the healthy
-  well; the bounded command *u* pulls it back. The cubic term mu U (1 âˆ’ UÂ²) is what makes the walls of the well push back
-  harder the farther *U* strays.
-- **Equation 3, the memory.** *I_U* grows while *U* is below its pole, is reduced by deviation and stress already being
-  dealt with, and leaks at lambda_I = 0.719. It is the engine's memory of unrelieved pressure: a system that has been
-  stressed for an hour is not the same as one stressed for a second, and this integrator is what knows the difference.
-- **Equation 4, the drive.** The bounded drive v_eff mixes the alignment and the stress through a tanh, with a slow
-  cosine of the bath's frequency on top, so the drive breathes rather than pushes constantly.
-- **Equations 5 and 6, the stress.** *S* rolls downhill in a cubic potential to its stable root. It is the slowest
-  restoring force: structural stress from heat, power, network, security and staleness that builds and relaxes over
-  minutes rather than seconds.
-- **Equation 7, the bath.** A damped harmonic oscillator (natural frequency omega_B = 1, quality Q_B = 2.5) driven by
-  stress. It turns stress into a smooth, lagged tide, and it is the only second-order element in the engine; its friction
-  is what settles the whole.
-- **Equation 8, the audit.** The bath equation is re-checked numerically every step with a finite difference, and the
-  check is recorded and never fed back: an instrument on the engine, not a part of it.
-
-Integration is classical fourth-order Runge-Kutta, ten micro-steps of 0.01 per macro step, and the C++ twin matches the
-Python to 3.6 Ã— 10â»Â¹âµ on 500 reference trajectories (section 18).
-
-### 4.2 From telemetry to state, and from state to action
-
-Each decision, the telemetry is normalised to nine observations: queue, load, power, thermal, network, drift, staleness,
-security and conflict. An observed state is computed from them by fixed weights (`omnicompass/adapter.py`,
-`observe_vector`), the engine's state is blended toward it with weight 0.339, and the state is then evolved by one macro
-step of the equations. From the state, the governor evaluates the control's push, u(x)/25, which is a number between âˆ’1
-and +1 that says how hard the engine is pulling toward health; a target utilisation that falls as the memory and the
-deviation rise; whether a release (giving something back) is permitted at all, which is only while the push reports
-convergence and the band and dwell allow; and whether change is permitted, which requires *U* above its gate and no
-security block. All of this is written to the audit every decision (`docs/MECHANISM_OF_ACTION.md`, sections 3 to 6, and
-`python tools/mechanism.py`, which reproduces the measured numbers in `results/MECHANISM_OF_ACTION.json`).
-
-The nine observations are worth naming in plain words, because every later number is a weighted sum of them
-(`omnicompass/adapter.py`, `observe_vector` and `assimilate`). **Queue** is the work waiting as a share of the work being
-served; **load** is utilisation against the stack's own target; **power** and **thermal** are the electrical and heat
-stress against their limits; **network** is the same for the wire; **drift** is how far the levers stand from where native
-had them, so that a governor that has pushed far from the operator's settings reads as more stressed than one that has
-not; **staleness** is the age of the readings, which rises when a sense goes quiet; **security** is the hold flag; and
-**conflict** counts other hands seen on the levers. Each is clipped to a declared range before it is used, so no single
-runaway reading can swamp the others. The stress the engine assimilates leans most on the queue (a weight of 0.25) and on
-load above 85% of target (0.18), then power, heat, network and drift in that order, with conflict and staleness last; the
-utilisation it blends toward falls with the queue first (0.27) and with power and heat next. The weights are fixed numbers
-in the frozen engine, the same on every stack, and a reader who wants to know why a decision read the body as stressed can
-recompute the sum from the audit line, which records all nine observations. What the weights encode is a judgement made
-once: that work waiting is the first sign of a body in trouble, that a lever far from native is itself a mild stress, and
-that a reading one cannot trust is a reason for caution rather than for action.
-
-### 4.3 Where the engine sits, and where the compass law sits
-
-A reader meeting the engine and then the compass law (section 6) may ask which of the two moves the knob. The answer, in
-the live controllers, is this: the **compass law** sets each knob, the **verdict** narrows where the law may go, and the
-**engine** grants the authority, feeds the release gate and the nervous system, and is audited every decision
-(`omni_controller/controller.py`, its docstring). The engine is the organism's physiology: how stressed it is, how long
-it has been, whether it is settling. The compass law is the hand on each lever. The engine's own control law *u* is
-evaluated, not applied to a knob directly: it is the push the nervous system reads to decide whether giving anything
-back is permitted now. This separation is why the engine could be frozen with its proofs untouched while the compass law
-was written as its own, separately tested law, and why `verify.py` seals both.
-
-One decision, followed through, shows the order. The controller wakes on its period and reads its senses: the service
-gauge (a response time, a statement latency, a consumer lag), the resource gauge (machines, connections, memory) and the
-knob's current value read back from the device. The **engine** takes the normalised observations, blends its state toward
-them and evolves one macro step; from the state it reports whether the body is converging, what authority the organ has
-earned and whether a release is permitted at all (section 4.2). The **compass law** then reads the service gauge as a
-position in its band and computes the force (section 6): positive, and the direction rule asks for capacity in proportion;
-negative, and it asks for one notch back, but only if the engine's release gate is open, the resource is demonstrably idle
-and the dwell has passed. The **verdict** stands over the slow knobs: a knob the paired trial has not cleared at the 2%
-line is not moved at all and stays native. What survives all three is one write to the **plug**, read back from the device,
-and one line in the **audit** that records the senses read, the engine's state and push, the force, the gate's reasons and
-the value sent and taken. In the kill test's first repetition (section 7.1) this produced 114 such lines and 42 writes:
-every decision that wrote nothing is in the record with the reason the gate held, which is the point of writing all of it down.
-
-## 5. The Closed Circle: Why It Cannot Leave Its Compass
-
-The governing principle is the Unified Circle Principle:
-
-    dX/dt = G(X),  X(0) in Omega
-    G(X) . n(X) <= 0 on the boundary of Omega        (the flow points inward at the wall: nothing crosses)
-    grad L(X) . G(X) <= 0                            (the compass's energy L only falls)
-    => lim X(t) in M*                                (every path settles in the bottom of the compass)
-
-In control engineering the second line is the Nagumo condition for an invariant set and the third is a Lyapunov
-function. Together they mean: anything that starts inside the container stays inside it, for every disturbance up to a
-known size, and comes to rest at the bottom. That is a certificate, not a test: it answers every case inside the walls
-at once.
-
-**In plain words.** Picture a round valley with a fence around its rim. The first line says the valley has a
-shape: given where the system is, the equations say which way it rolls. The second line says that at the fence the
-ground always slopes inward, so nothing that starts inside can ever roll out, however it is pushed within the strength
-the fence was built for. The third line says there is a height, *L*, that only ever decreases along any path, so the
-system cannot circle forever at one level; it must keep descending. The conclusion follows: every path ends at the
-bottom, the set *M\**. The engineering value of such a certificate is that it is not a sample of behaviours; it is a
-statement about all of them at once, inside the fence.
-
-**What is certified, and what is not.** The certificate is about the engine's own state: the six numbers of section 4
-stay inside their walls and settle. It is not a certificate about the plant the engine governs, whose physics the engine
-does not contain; that is why every plant is tested paired against native (Part VI), why the compass law clips every
-write to the knob's cover (section 6), and why the shield between the engine and the levers is tested separately on two
-million adversarial cases with zero violations (`tests/test_shield_properties.py`) and the C++ engine soaked on one
-hundred million decisions with no failure (`results/SOAK.json`). The mathematics closes the brain; the harness, the cover,
-the verdict and the paired receipts close the hand.
-
-The engine's states are each closed in this sense: the deviation tank drains faster than it can fill; the alignment's
-cubic walls push back from far out; the memory forgets; the bath's friction settles it. The rule behind all four is
-the compass's east-west line: what flows out (drain, damping) must always be able to match what flows in (drive). The
-formal status of each statement, what is proved, what is tested and what is conjecture, is written out in
-`docs/FORMAL_STATUS.md` and `docs/TRACKING_THEOREM.md`, and the theory chapters of this book (The Unified Circle
-Principle, Closing the Circle in the Engine) give the derivations.
-
-**What the certificate buys an operator, in practice.** Three things. The engine cannot run away: there is no input, no
-sequence of readings and no fault in a sense that drives its internal state to infinity or into oscillation that grows,
-because the walls are part of the equations and not a check bolted on afterwards. The engine cannot hold a grudge: the
-memory state forgets at a fixed rate, so a bad hour does not bias the next day, and a governor restarted after a kill
-starts from the same rest state the certificate names. And the engine's behaviour under any disturbance smaller than the
-fence is the same kind of behaviour, a descent to the bottom, so a test on one plant's readings says something about the
-engine on another's; what it does not say, and what no mathematics of the engine alone could say, is how the plant
-answers, which is why the paired runs exist. An underwriter reading this section should take from it exactly this much:
-the part of the system that makes decisions is bounded by proof; the part of the system that carries them out is bounded
-by the cover, the gates and the hand-back, each tested; and the part that is the customer's own plant is measured, never
-assumed.
-
-**The compass.** The Omni-Compass rose carries the whole Greek alphabet, Alpha to Omega: the complete set, in a ring
-whose end runs back into its beginning. Its north-south axis is polarity: Alpha and plus at the top, Omega and minus at
-the bottom, the two poles of the alignment's double well. Its east-west axis is flow: Beta and the push outward on one
-side, Gamma and the pull inward on the other, the drive and the damping. The spiral at the center is the attractor
-every path winds into. The ring closing on itself is the return: when Omni-Compass stops, every lever returns to where
-it began.
-
-## 6. The Compass: Push, Pull and the Two Forces
-
-The compass (`omnicompass/compass_law.py`) is the law that carries the engine's push and pull to every muscle.
-
-**Two bands.**
-- **The cover**, a knob's hard range (the device's or the operator's lowest and highest setting). Every write is
-  clipped to it. Nothing Omni-Compass computes can set a knob outside it.
-- **The compass**, the service reading as a position from 0 (calm) to 1 (the service line). Omni-Compass pulls that
-  position to the bottom of the compass, the middle (0.5 by default; an operator may set it lower for extra margin). The
-  walls run from 0.05 to 0.95; the last 5% on each side, 10% in all, is cushion.
-
-**The force.** F = A tanh((K_P (p - center) + K_D v) / A), where p is the position, v its rate of change, A the
-authority.
-- **Pull:** K_P (p - center), gentle near the bottom, stronger up the walls.
-- **Push:** K_D v, the force that meets whatever is shoving the position, and the friction that stops it sloshing.
-  With K_D at or above critical damping the position glides to the middle and stops, with no overshoot and no
-  ringing. Overshoot is wasted energy: force spent going the wrong way and spent again coming back.
-- **Smooth, never a hammer:** tanh bends the force over into its maximum instead of slamming into a wall.
-- **Fail up:** past the 0.95 wall the up side goes to its full force at once and the down side may not act until the
-  position is back inside the compass.
-
-**Two forces: antagonist pairs.** Like the muscles of an arm, every plug has an up side (adds capacity, power,
-cooling, speed) and a down side (takes it back), each with its own gain, because adding and taking back do not cost
-the same: a new machine takes minutes to boot; giving one back is instant. Where a machine has two wires, each side
-gets its own lever:
-
-| Muscle | Up force | Down force |
-|---|---|---|
-| GPU card | clock ceiling raised | power limit lowered (the lid) |
-| Kubernetes | scale out | scale in |
-| Cooling | chiller on, colder setpoint | warmer setpoint, unit released |
-| Battery | discharge | charge, reserve held |
-| Vehicle, joint | motor effort | braking, regeneration |
-
-**Why the GPU needs both wires.** A card's firmware boosts its clock as high as it may while there is work, and its
-power limiter knocks the clock back each time the draw crosses the limit; on a busy card this happens many times a
-second, at the top of the clock range where each extra step of speed costs the most watts. With one wire (the power
-limit) a governor can only move the wall the boost pushes against. With two wires, the clock ceiling sets how high the
-boost may climb and the power limit becomes a lid that rarely needs to act: the card runs at the bottom of its compass
-instead of fighting itself at the top.
-
-**What the card taught us.** Two rules make the difference between saving energy and spending the customer's time.
-First, *race while work waits*: when the card is saturated, both wires go to full at once, so a burst is always served
-at full speed; the compass paces only the slack between bursts. Second, *never slower than the card on its own*: the
-governor learns, from the card's own meter, the clock and the draw the card reaches by itself while busy, and never
-sets the clock ceiling or the lid under them. Without these rules the first real card saved 3.5% of its energy and
-made the slowest answers 58.5% slower; with them, the modelled card saves energy with the slowest answers at native
-speed or faster (section 16, and `docs/GPU_PREREGISTRATION.md`, amendments 6 and 7).
-
-### 6.1 The same law on every stack, and what differs
-
-The law is written once (`CompassLaw`), and three declared numbers fit it to a muscle: the **decision period** *dt*
-(how often the governor decides), the muscle's **response time** tau (how long the service reading takes to follow the
-lever), and the **cover**. From tau and *dt* the law derives its own damping gain, K_D = (2 sqrt(K_P tau / dt) âˆ’ 1) dt,
-which is critical damping for a first-order muscle under a proportional-derivative pull: the position glides to the
-center and stops. Nothing else is tuned per stack. The table below is the complete list of the compass's settings on every
-stack in this manual, so a referee can see that the "gains" differ only through the declared physics:
-
-| Stack | Reading (the wire in) | Line | Center | Decision period | Response time | Cover of the knob |
-|---|---|---|---|---|---|---|
-| Kubernetes, the HPA target | the mean response time of the latency window | the operator's SLO (500 ms) | 0.4 | 60 s | the pods' start time | [0.6 Ã— the operator's target, the operator's target] |
-| Kubernetes, the machines | the same, through the release gate and the verdict | the same | 0.4 | 60 s | a machine's wake | [the floor of 2, every machine] |
-| PgBouncer, the pool size | time in the server plus time waiting for one, per transaction | 50 ms | 0.4 | 1 s | 2 s | [2, PostgreSQL's limit minus 10] |
-| Kafka, the consumer count | the group's own end-to-end latency, mean of the last second | 500 ms | 0.4 | 1 s | 3 s (a rebalance) | [1, the topic's partitions] |
-| Redis, the memory ceiling | the application's request latency, mean of the last second | 2 ms | 0.4 | 1 s | 2 s | [16 MB, 512 MB] |
-| MongoDB, the storage-engine cache | the server's own mean read latency, last second | 1 ms (set on the tuning workload's smoke run, from 2 ms) | 0.4 | 1 s | 2 s | [256 MB, 2,048 MB] |
-| MySQL, the InnoDB buffer pool | the server's own mean statement latency, last second | 0.6 ms a statement (set on the tuning workload's smoke runs, from 1 ms) | 0.4 | 1 s | 2 s | [128 MB, 2,048 MB], in 128 MB chunks |
-| A drone's cruise override | the drone's tracking error | 0.25 m, the declared safe error | 0.5 | one control tick (48 Hz) | 1 s | [1.0, 2.0] Ã— the planner's cruise |
-| A substation's tap | the bus voltage in its band | the band's edge | 0.5 | one solve | a week of evidence before a step down | the tap's own range, one tap per move |
-| A robot axis's speed | the axis's tracking error against its takt | the declared error | 0.5 | one control step | the axis's response | the axis's own limits |
-| A GPU's clock ceiling and lid | the mean response time of the last 5 s | the SLO | 0.4 | 2 s | the card's response | [the card's own busy clock, its top clock]; [the busy draw + 10%, the start limit] |
-
-The center is 0.4 wherever the reading is a service time (the "service profile" of the Kubernetes adapter, so that the
-service sits a little below the middle of its band with margin for a burst) and 0.5 where the reading is a physical
-error. A **cushion** of Â±0.05 in force moves nothing, so a reading that sits at the center with the usual jitter does not
-make the knob chatter. These are the same numbers in every preregistration and every table; none was changed after a
-result was seen.
-
-### 6.2 Direction rules: how a force becomes a move
-
-The force is a number between âˆ’1 and +1. Each stack turns it into a move on its knob by a direction rule declared in its
-preregistration, always of the same shape: a positive force adds capacity in proportion to the force (ceil(force / 0.10)
-notches, so full force adds ten notches at once, capped by the cover), a negative force takes one notch back per
-decision, and only when the resource it would take is demonstrably idle (an idle consumer that read nothing in the last
-second, an idle server the pooler itself shows idle, a cache with nothing evicted in the last second) and only after a
-**dwell** of a few seconds since the last change, so a knob that was just moved is not moved back by its own transient.
-At 95% of the line the knob **fails up**: every consumer the topic can use, the pooler's own setting handed back, a
-quarter of the cache's cover added at once, the planner's own cruise, the card's own clocks. The up side is fast and the
-down side is slow and gated because adding and taking back do not cost the same, and because a gain bought by taking
-something back must be able to prove itself before it is kept.
-
-Written out stack by stack, from the preregistrations, the rule reads as follows; the unit, the cover and the fail-up move
-are each the stack's own, and the shape is the same in every row.
-
-| Stack | The knob and its unit | The cover | One notch back, when idle | Fail up at 95% of the line |
-|---|---|---|---|---|
-| Kubernetes (the cluster) | worker machines in service | the floor of two to every machine the operator has | one machine a decision, when the remaining machines would carry the load far under the wall | one machine up at once |
-| PostgreSQL behind PgBouncer | the pooler's pool size, server connections | [2, 90]: the floor of two, never within ten of PostgreSQL's 100 | one connection a decision, when the pooler itself shows a server idle | the pooler's own setting (20) handed back at once |
-| Apache Kafka | consumers in the group | one to the topic's partitions (8) | one consumer a decision, when a consumer read nothing in the last second | every consumer the topic can use |
-| Redis | the memory ceiling, MB | [16, 512] MB | one notch a decision, when calm and nothing was evicted in the last second | a quarter of the cover added at once |
-| MongoDB (WiredTiger) | the cache size, 64 MB notches | [256, 2,048] MB | one notch a decision, when calm and nothing was evicted in the last second | a quarter of the cover (448 MB) added at once while full |
-| MySQL (InnoDB) | the buffer pool, 128 MB chunks | [128, 2,048] MB | one chunk a decision, when the miss share is under 1% | four chunks at once while the pool is full |
-
-Two things in the table deserve a reader's attention. The "when idle" column is never a guess from the knob's own
-value: it is a reading from the stack's own counters (the pooler's idle servers, the consumer's last fetch, the cache's
-eviction count, the pool's disk reads against its requests), so the law gives back only what the stack itself reports it
-is not using. And the fail-up column is the stack's own fastest safe move, not a multiple of the notch; where the stack
-has a controller of its own (the pooler, the planner, the card's firmware), fail up means handing the knob back to it,
-which is the one move that can never be behind native by construction.
-
-### 6.3 The do-no-harm gates inside the law
-
-Three gates sit inside the law itself, each a consequence of a loss seen on a tuning case and each disclosed in the
-preregistration that carries it:
-
-- **The verdict** (section 1.2): a slow knob moves only where a paired trial on the muscle shows no more than 2% cost.
-- **The slack gate on speed knobs** (Omni v3): a motion axis that is busy more than half the time at full speed keeps its
-  speed native, because spending its slack as speed when it has none would only cost energy. This gate is what turned
-  the v2 "service tradeoff" on the Physics realm and the tower into "superior within guardrails" on v3, and it is the
-  one rule that distinguishes v3 from v2.
-- **The full-cache gate** (Redis): a miss in a cache with room to spare is a cold miss that no ceiling can mend, so the
-  ceiling grows only while the cache is at 90% of it or more. On the tuning workload without that gate the law raised the
-  ceiling to 500 MB while 21 MB were in use; with it, the ceiling follows the working set.
-
-The same gate recurs, in the form each store's own gauges allow, on every memory knob that followed, and each form was
-fixed on the tuning workload and disclosed before the counted runs:
-
-- **MongoDB's storage-engine cache** grows by a notch only while the cache is full and the server's own read latency is
-  above the centre of its band, and gives a notch back only while calm and nothing has been evicted in the last second
-  (`docs/YCSB_PREREGISTRATION.md`). The smoke runs showed the line itself had to be set from the server's own readings
-  (0.15 to 0.46 ms under a 2 ms line left the law nothing to do), and it was set to 1 ms before the counted runs.
-- **MySQL's buffer pool** grows by a chunk only while the pool is at least 90% full of data pages and the server's own
-  statement latency is above the centre, and gives a chunk back only while the **miss share**, pages read from disk as a
-  share of the pool's requests in the last second, is under 1% (`docs/MYSQL_PREREGISTRATION.md`). The earlier rule, "no
-  disk reads in the last second", was never satisfied on the tuning workload: InnoDB keeps stale pages resident, so a pool
-  once filled reads full for ever, and a few new-page reads a second never stop even when the working set fits, so the
-  pool the law had grown was never given back (877 MB held on average against native's 512 on that smoke run); the smoke
-  record says so, and the miss-share rule replaced it before run A.
-
-What the three forms share is the reason: a memory knob has no slack to spend unless the memory is both full and being
-missed, and memory given back while it is being missed is not a saving but a cost moved to the disk. The gate is written
-in each harness in the store's own units and checked by that harness's own tests against a fake server, so that a reader
-can see in the preregistration exactly which reading opens the gate and which closes it.
-
-### 6.4 The profiles and the pedals
-
-The compass has two **profiles**, service (the default) and batch, which differ only in what the pedals do with a pile of
-work: in the service profile the law paces the slack; in the batch profile cruise puts every machine in service while
-work waits for a place and idle takes them straight to the floor when the queue is done (section 1.3).
-Both are written out in the Kubernetes preregistration (`docs/K8S_COMPASS_PREREGISTRATION.md`, rules 7 and 8, amendment
-9), both ran in the batch test, and the result (section 16) is machines 19% to 23% fewer over the whole window and 29% to
-35% fewer after the queue finished, with the queue itself finishing no later beyond the noise.
-
-### 6.5 The reflex rule: one body, one brain
-
-Everything in this chapter so far is the force: where a reading sits in its band, how hard the compass pushes, in which
-direction, and which gates stand in the way. This section is the rule that decides when the force may become a new
-setting. The founder's order of 10 October 2026 states it in one line: what the brain sends to a muscle has to coincide with
-what the muscle sends to itself and where it is at. Made into rules, it reads:
-
-1. **Signal out, the muscle moves, the brain feels the full reaction, then it decides.** A trial runs to its full
-   measurement and is never ended by the calm it causes. Only the wall (a fail-up) or the engine's own time limit ends a
-   trial early.
-2. **No forcing.** A spend is tried only when the muscle's own reading says there is something to buy (messages waiting, a
-   cache missing, clients queued); a give-back only when the whole body is calm. The force is an urge, smooth, never a
-   hammer.
-3. **One body, one brain, one tick a second.** Everything is read first: every muscle's state, every service's speed and
-   work, the host's processor, memory and energy where a meter exists. Then the brain decides. The cost it judges is the
-   body's cost, the Omni index's own arithmetic over all the work, all the speed, all the machines and all the resources,
-   never one muscle's.
-4. **Hurt nothing anywhere.** On top of the body's cost, a guard for every part: a step is refused if any one service read
-   LOSS beyond its cushion, even when the body's total improved.
-5. **One trial at a time inside a body.** Two muscles moved together cannot be told apart, so the body grants one new trial
-   at a time, to the muscle asking loudest whose own condition holds. Every other muscle keeps acting inside what it has
-   already proven.
-6. **Nothing is permanent.** Every allowed step is tried again on the recheck and pulled back when it stops paying; a muscle
-   at native is asked again whenever its signal returns. Native is where the brain stands when it has not yet been shown a
-   reason, never a verdict.
-7. **The wall belongs to the body.** If any service reaches its line, the trial stops, that step is undone, and every force
-   in the body lifts off: the law's own lift, not a reset.
-
-The trial itself keeps four rules, each learned from a measured run (`docs/OMNI_V4_PLAN.md`, section 4): samples count only
-once the muscle reports itself settled; a spend on a queue or a cache is judged by the muscle's own reading, with the
-body's cost taken at the settled state; the reference and the trial are compared at the same load; and where single notches
-read flat, one scout step to the far side of the cover decides whether there is a hill to climb at all.
-
-**Which engine enforces what.** In Omni v3, the engine on main, the verdict tries a slow knob on the muscle itself before
-it moves it (section 1.2), and the live harnesses carry the same verdict around every live knob (section 9.4). Omni v4 is
-the engine written to enforce all seven rules on every wire by construction: one body file that every muscle's wire passes
-through, the trial rules inside the verdict, and no wire that can write around them. It is designed
-(`docs/OMNI_V4_PLAN.md`) and not yet built; when it is, it carries its own fingerprint, the package version follows it, and
-every result in this book is run again on it. The theory of the rule is the chapter "The Reflex Rule" in Part One of the
-book.
-
-## 7. The Two-Way Nervous System
-
-Every muscle is wired both ways: a sensory wire in (its meters) and a motor wire out (its knob), with the read-back
-closing the loop. Between them sits the nervous system (`omnicompass/nervous_system.py`), which decides how much
-authority each organ has at each moment:
-
-- **Expand is always allowed** (except under a security hold): adding capacity, power, cooling or protection never
-  waits.
-- **Contract needs calm and a clean service record:** giving anything back is allowed only while the organ is calm
-  enough and service has been inside its line for the last three decisions; continuous organs give back at most the
-  calm share of their surplus per decision; discrete organs one unit at a time, through a release gate.
-- **Fail up:** while service is breached, the knob returns to native at once.
-- **Blind means hold:** if a sense goes stale or unreadable, nothing is given back until it returns.
-
-One brain reads every organ at once. Because one law sets every knob, no two muscles fight: when the GPU's watts turn
-to heat, the cooling knob already knows it is coming; when pods scale up, the power envelope is ready.
-
-"Two-way" is a statement about wiring, and it is checked, not assumed. Each muscle's plug (section 8) carries exactly one
-sensory wire and one motor wire, and the wire check that must pass before any write (section 8.4) proves that the wires
-move: a value written through the motor wire is taken by the device and read back as the value sent, and the snapshot is
-restored and read back at the end. No governor writes a knob whose wire check has not passed, because a knob that can be
-written but not read back cannot be handed back with proof. What the wire check does not prove, section 8.5 says plainly:
-that the governor is reading the right gauge for the knob; that is what the watching arm is for. The receipts of every run
-therefore carry, for every write, the value sent and the value the device reported, side by side, and a reader who wants
-to know whether the governor's hand was really on the stack can check the two columns rather than take the summary's word.
-
-The four rules above are the whole of the nervous system's authority model, and they are asymmetric on purpose. Adding
-is cheap to undo and expensive to delay, so it is never gated beyond the security hold. Taking back is cheap to delay and
-expensive to get wrong, so it is gated three ways: by calm (the engine's own state must report that the body is
-settling), by the service record (the gauge must have been inside its line for the last three decisions, not merely
-this one), and by the release gate's reasons, which are written into the audit every time the gate holds (section 7.1).
-Sections 7.2 to 7.4 take the three ideas that make this safe at scale, the governor's sense of its own hand, the rule that
-a missing reading is a hold and not a guess, and the case for one brain over many, and give the evidence for each from
-the live runs.
-
-### 7.1 Authority, and the release gate
-
-Authority is how far the nervous system lets an organ move in one decision. It is granted from the engine's state
-(section 4.3): an organ in a calm body with a clean service record may give back; an organ in a stressed body may only
-add. On Kubernetes the **release gate** (`omnicompass/nervous_system.py`, `node_release_gate`) lets one machine be
-given back only when every one of the following holds, and writes the first reason that fails into the audit so a reader
-can see why a machine was kept: the remaining machines would stay under 95% full; no pod is waiting for a place; the
-pods are not scaling up; the service is not breached; the organ's own pressure is under the release threshold; every
-sense is live; and the last command has landed (no new order goes on top of one the cluster has not yet carried out).
-One machine per decision is the rule in the slow, reversible direction; past the wall, one machine up at once.
-
-**What the gate writes, in a real run.** The first repetition of the first kill-scenario run (`results/live/raw/run-37716845219/paired-1/`,
-the omni arm's `audit.jsonl`) holds 114 decisions and 42 writes. Its gate records read, in the governor's own words,
-"release permitted" eleven times, each with the utilisation the remaining machines would carry after the release (0.034
-to 0.153, all far under the 95% wall); "node organ has no contraction authority" once, a calm cluster whose engine state
-had not yet earned the right to give back; and "latency breached now; node organ has no contraction authority; a sense is
-blind" once, three reasons at once in a decision whose latency sense read stale, every one of them a reason to hold. A reader can
-therefore see, decision by decision, not only what the governor did but why it declined to do the rest, and the first
-reason that failed is the one written, so that a machine kept in service always has a stated cause.
-
-### 7.2 Proprioception and the one-writer rule
-
-The nervous system knows where its own levers are. Every write is read back from the device (the plug contract, section
-8), and the audit records both the value sent and the value the device took. If a lever is found at a value Omni-Compass
-did not write, someone else owns it: the governor stops writing that lever and leaves it alone, because restoring over it
-would fight the new owner. This is **proprioception**: the governor's sense of its own hand. It is the reason a wrong
-installation leaves a signature in the receipts (section 8.5) rather than a silent error, and it is what the wire check
-proves before anything runs.
-
-The rule begins with the **snapshot**. The governor reads every knob it may move once, at the start, before its first
-decision, and that reading is the operator's setting for the whole run: every reset, every hand-back and every kill
-returns the knob to the snapshot, never to a value computed later, and the receipts record the snapshot beside the final
-read-back so that a reader can check the two are equal. The rule continues with the **read-back** after every write: the
-plug sends a value, waits for the device to take it, and reads the device's own report of what it holds. Where the device
-takes time to apply a setting, the plug knows that and does not mistake the transition for a foreign hand. The clearest
-case is MySQL's buffer pool, which the server resizes in chunks over several seconds and reports as it goes: the plug
-reads the server's own resize status and treats a pool caught mid-resize as its own write in progress, not as another
-owner's value, and waits for the server to report completion before it judges the write (`tools/run_sysbench.py`,
-`BufferPool`). The same shape holds on the Kubernetes autoscaler's bounds, Redis's memory ceiling and MongoDB's cache
-size: the value is read from the device's own console, and only a value that the governor neither wrote nor is waiting
-on is read as someone else's.
-
-What follows from a foreign value is deliberately conservative. The governor does not restore over it, because an
-operator who changed a knob by hand meant to, and a second controller that changed it is a conflict to be reported, not
-won. The lever is left where it was found, the audit records the value and the time, and the governor goes on governing
-the other levers. A reader of the receipts who finds such a record knows at once that two hands were on the stack, and
-the paired run that contains it is read with that in mind.
-
-### 7.3 Blind means hold, and fail up
-
-A sense that goes stale or unreadable is not read as calm. It is read as **blind**, and while any sense is blind nothing
-is given back; the knob holds, or, if the service was breached when the sense went blind, returns to native at once. In
-the fault test on real Kubernetes the response-time probe is deliberately paused for a minute in every arm; the audit
-shows the governor holding through the blind minute and resuming when the sense returns, and the table shows no row
-behind for it. The rule is simple to state and strict in effect: Omni-Compass never acts on a reading it does not have.
-
-The rule was also tested without being arranged. In the two-hour robustness run on real Kubernetes
-(`results/live/V3_ROBUST_LONG.md`), the cluster's own API answered a handful of the governor's reads of the autoscaler
-with a server error, two or three times a run out of the 120 decisions a two-hour window expects. Each of those decisions is in the controller's
-log with the reason the API gave, each was held (no write, no hand-back, no guess), and the governor took its next
-decision on schedule when the API answered again. The preregistration had said in advance that such decisions would be
-shown with their reason and not judged, and that is how they appear in the table: 97.5% of the expected decisions valid,
-the failed ones counted and named, the knob handed back at the end of every run. A referee who wants to see the rule in
-the same rule written by the gate itself can find it in the kill test's receipts (section 7.1), where a decision whose
-latency sense read stale is held with "a sense is blind" among its reasons, and in the fault test's blind-probe window,
-where it was arranged on purpose. The point in every case is the same:
-a stale or missing reading produces a hold, never a move, and the hold is in the record.
-
-### 7.4 Why one brain
-
-The alternative to one brain is a controller per layer, each tuned alone: an autoscaler that adds pods while a power cap
-is trying to hold the machines down, a cooling loop that chases heat the clock governor is about to remove. These
-controllers fight because none of them knows the others' intent. One law that sets every knob from one state cannot
-fight itself: the force on each lever is computed from the same reading of the same body at the same moment. This is also
-why the modelled organisms are run whole, at up to 1.7 million muscles on one clock (section 2.4): the question they
-answer is whether one brain stays coherent at that size, and the reading at every size is the same to the digit.
-
-One brain also has to stay the same brain over time, and that is a measurable claim. The two-hour robustness run
-(section 16.8) measures the governor's own memory at the start and the end of each run and the time it takes to reach a
-decision in the last hour against the first. Over three runs the memory ratio was 1.05 to 1.07 and the decision-time
-ratio 1.07 to 1.20, both inside the limits set before the run (a leak would show as steady growth; a brain that slows as
-its records accumulate would show a ratio climbing toward the 1.5 limit), and the cluster's service under the governed arm
-was inside the noise of native in two of three runs. The 24-hour runs on three rented machines, started as this is
-written, ask the same two questions over twelve times the window. A single controller that keeps its memory and its
-speed over a day is the least a referee should ask of a brain that proposes to hold every knob at once; the figures are
-in the table, not asserted here.
-
----
-
-# PART III - THE HARNESS: PLUGS, WIRES AND THE WIRE CHECK
-
-## 8. The Plug, the Adapters and the Wire Check
-
-Think of a high-end car stereo: one head unit, one standard plug on its back, and an adapter harness for each make of
-car that matches the car's factory plug. You never cut a factory wire, and when you pull the stereo, the car works as
-it did. Omni-Compass is wired the same way.
-
-**8.1 The plug (one design for every muscle).** Each plug has as many channels as its muscle has knobs. Every channel
-declares its cover (range), its direction (which way is "more"), its units and how fast it may move. Every plug keeps
-the same contract (`omnicompass/compass_law.py`, `Plug`):
-
-1. **attach** - read the knob once, before any write: the snapshot. It never moves afterwards.
-2. **read** - the service reading, into the compass.
-3. **write** - one value, clipped to the cover, then read back from the device.
-4. **one writer** - if the knob is found at a value Omni-Compass did not write, someone else owns it: Omni-Compass
-   stops writing and leaves that value alone.
-5. **restore** - on stop, the knob returns to the snapshot (where Omni-Compass found it, not the last value it wrote).
-   For muscles whose native controller moves the knob itself, restore hands control back.
-
-**8.2 Adapters (one per standard plug).** Omni-Compass speaks each industry's standard control interface through an
-adapter. Status is stated plainly:
-
-| Standard | Muscles | Adapter status |
-|---|---|---|
-| Kubernetes API | HPAs, deployments, pods, nodes | **built** (`omni_controller/controller.py`, `muscles.py`) |
-| NVIDIA NVML / `nvidia-smi` | GPU clock ceiling, power limit | **built** (`omni_controller/gpu_compass.py`, two wires; `gpu_governor.py`, one wire) |
-| Linux cpufreq, RAPL | CPU frequency ceiling, package watts | **built** (`--cpufreq-policy-root`, `--rapl-cmd`) |
-| Site meter, building controller by command | site watts, supply-air setpoint | **built** (`--power-cmd`, `--cooling-cmd` command templates) |
-| Cloud node groups (Karpenter, Cluster Autoscaler, MachineSet) | machines | **built** through `--node-scale-cmd` templates |
-| BACnet, Modbus, SNMP | chillers, air handlers, PDUs, UPS | designed; today reached through the command templates above |
-| OPC UA, EtherNet/IP, PROFINET, EtherCAT, ROS 2, CAN | PLCs, drives, robots, vehicles | designed; modelled in the realm harness |
-| IEC 61850, DNP3, OpenADR, IEEE 2030.5, SunSpec, OCPP | substations, batteries, inverters, chargers | designed; modelled in the realm harness |
-
-The engineer's job for one muscle is three things: which adapter, the address of the knob, and its safe range.
-
-**The plug contract, line by line, and why each line is there.** *Attach* reads the knob once before any write and keeps
-that value as the snapshot. It is read once and never again, because a snapshot that moved with the knob would restore to
-wherever the governor last left it, and the whole point of the restore is to return to where the operator had it. *Read*
-takes the service reading (a response time, a temperature, a queue, an error) into the compass as a position in its band;
-the plug declares the band, the law does not guess it. *Write* takes one value, clips it to the cover before it leaves the
-plug, sends it through the muscle's own interface, and then reads the lever back from the device and records both the
-sent and the taken value; a device that took something other than what was sent (a clock that rounds to 15 MHz steps, a
-pool size the pooler capped) is recorded as it is, not as it was asked. *One writer* compares the lever as found at every
-read with the value last written; a lever found elsewhere has another owner, and the plug raises `ForeignWriter`, after
-which the governor leaves that lever alone for the rest of the run and says so in its audit and its exit code. *Restore*
-writes the snapshot back on stop and reads it back; a restore that does not read back is an error (exit 3), never a
-silent success. The same five lines are implemented for Kubernetes objects (annotations hold the snapshot on the object
-itself, so a watchdog can restore from the object without the governor's memory), for `nvidia-smi`, for PgBouncer's
-console, for Redis's `CONFIG SET`, for the consumer group and for the simulators' knobs, and `tests/test_*` prove each
-against a fake device.
-
-**8.3 Power-up order.** Read-only first; then take the knobs, the least consequential first; on stop, hand them back
-in reverse order. In the Kubernetes controller the order is: the latency feed and the cluster's own metrics (read); the
-HPA target (a setting the HPA accepts and corrects within a minute); the pods' CPU limits (conveyance, in place); the
-machines (the slowest and most consequential, through the release gate and the verdict). On stop the machines are woken
-first, then the limits, then the target, so the cluster is never left with fewer machines than its pods need while a
-setting above them is still being handed back.
-
-**8.4 The wire check (mandatory before any write).** For the GPU it is one command,
-`sudo python3 tools/gpu_wire_check.py --gpu 0`, and `scripts/gpu_rented_run.sh` runs it first and stops if it fails:
-
-| Step | It proves |
-|---|---|
-| 1 read | every meter answers: watts, temperature, utilization, limit, clock, top clock |
-| 2 snapshot | the start limit is recorded once |
-| 3 up wire | with the card busy, a ceiling below its own busy clock pulls the clock down under it; reset, the clock comes back above it |
-| 4 down wire | a lower power limit is reported back exactly; the start limit is reported back exactly |
-| 5 restore | clocks reset and the start limit read back |
-| 6 stop | the governor, stopped by its signal, hands both wires back |
-| 7 other writer | a limit set by someone else while the governor runs is left alone, and the governor exits 5 |
-
-Any failure prints the wire, the step and what the device said, and nothing else runs. That turns a wiring fault from
-guesswork into one named line to fix.
-
-**8.5 Wired right or wired wrong.** The wire check proves the wires move. It does not prove the governor reads the
-right thing. A correct installation leaves signatures in its own receipts; a wrong one leaves others. Check them on
-your first paired runs, before you believe any number, good or bad.
-
-| Check | Wired right | Wired wrong, and what to look at |
-|---|---|---|
-| Watch arm against native | equal on every gauge (watch writes nothing) | different: the probe, the load or the machine differs between arms, not Omni |
-| Requests served, failed requests | equal to native | fewer served or more failed: a lever is cutting capacity; check its cover and its sign |
-| p95 and p99 response time | at native or faster | slower: the reading or the floors are wrong (rows below) |
-| GPU: the card's clock while busy | at or above the clock the card reaches on its own | below it: the speed floor is missing or the lid is under the card's own draw |
-| GPU: the lid while busy | at or above the card's own busy draw | at the envelope floor while busy: the lid is sized from a curve, not from the card's own meter |
-| GPU: credit per write (`GPU_REPS.md`) | compass decisions pace the slack, race decisions cover the bursts; fail-up is rare | fail-up in most decisions: being busy is being read as a breach, or the service line is set too low |
-| Kubernetes: machines given back | through the release gate, one per decision, with no pod waiting | machines given back while pods wait, or none at all while the service is far inside its band: check the latency feed, `--slo-ms` and the release gate's reasons in the audit |
-| Kubernetes: the reset | every HPA target, replica range, CPU limit and worker back to native, no record left | anything left: an earlier run or another controller wrote the same objects |
-| Every lever after the run | at its snapshot | not at its snapshot: another writer, or a restore that failed (exit 3): restore by hand and investigate |
-| The feed itself | fresh samples every few seconds | stale or empty: Omni reads it as blind and fails up; fix the feed, not the governor |
-
-**The rule.** If any row reads "wired wrong", the result of that run says nothing about Omni-Compass: fix the wiring,
-run the wire check and the watch arm again, and only then compare. The first real card run is the worked example: its
-receipts showed the card's busy clock under its own (736-768 MHz against 861-889), the lid at the 105 W floor under its
-own 135 W draw, and fail-up in 46% of decisions. Each of those is a row in this table.
-
-**8.6 The wire check on the other stacks.** The GPU has a one-command wire check because its wires are the hardest to
-get right. The other stacks carry the same proof in a different place: every Kubernetes arm records `kubectl auth can-i`
-receipts for what the governor's identity can and cannot do (and fails if it can do anything it must not), checks that
-the cluster holds nothing but the harness, and ends with the reset check that every HPA target, replica range, CPU limit
-and worker is back at native with no record left; every database, broker and cache arm reads the knob back after every
-write and hands it back at the end, and the report says "handed back: yes" or the run is invalid; every simulator arm
-checks that every override was handed back. The watching arm, where it is run, is the wire check of the reading: a
-watching governor that disagrees with native on any gauge has found a difference in the probe, the load or the machine,
-not in Omni-Compass.
-
----
-
-# PART IV - WIRING IT ONTO YOUR STACK, STEP BY STEP
-
-## 9. Before You Start, and the Eight Levels
-
-### 9.1 What your system needs
-
-| You run | You need |
-|---|---|
-| Kubernetes (vanilla, EKS, GKE, AKS, OpenShift/OKD, Rancher, kind) | Kubernetes 1.34 or newer (in-place pod resize); metrics-server (`kubectl top nodes` works); an HPA with a CPU target on each governed service; a readiness probe and a short preStop pause on each service |
-| A response-time feed (strongly recommended at every level) | a CSV per service, `elapsed_seconds,latency_ms,ok`, written continuously; `scripts/latency_probe.py` writes one against any HTTP endpoint |
-| NVIDIA GPUs | a driver with `nvidia-smi`; root (or the capability to run `nvidia-smi -pl` and `-lgc`); on a VM, full GPU passthrough |
-| CPU power control | Linux cpufreq with the schedutil governor; RAPL for package watts; usually bare metal |
-| Site power and cooling | a command that prints site watts, and a command that sets the supply-air setpoint through your building management system |
-
-**Why each requirement is there.** Kubernetes 1.34 or newer is required because the conveyance muscle resizes a pod's CPU
-limit in place, which older versions do only by restarting the pod, and a restart is a disruption Omni-Compass never
-causes. metrics-server is the HPA's own eyes and the governor's: without it neither knows what the pods use. An HPA with a
-CPU target on each governed service is the native controller Omni-Compass sits on; a service without one has nothing for
-level 2 to move. A readiness probe and a short preStop pause are what make a drain invisible to clients: the Service
-stops sending requests to a pod before it stops, and kube-proxy sends them to another ready endpoint. The response-time
-feed is the one wire a cluster does not already have: Kubernetes knows what its pods use, not what its users wait; the
-compass needs the second, and `scripts/latency_probe.py` writes it against any HTTP endpoint every five seconds. On the
-GPU, root is needed only for the two `nvidia-smi` writes, and a VM must pass the whole card through or the driver refuses
-to lock clocks (the wire check's step 3 is where that shows).
-
-### 9.2 Get the software and check it
-
-```
-git clone https://github.com/The-Omni-Compass-LLC/The-Omni-Compass.git
-cd The-Omni-Compass
-pip install -r requirements.txt
-python3 verify.py                       # every check; ends with VERIFICATION: PASS
-```
-
-Build the container image once:
-
-```
-docker build -f deploy/Dockerfile -t <your-registry>/omni-compass:<tag> .
-docker push <your-registry>/omni-compass:<tag>
-```
-
-It runs as non-root, with a read-only root filesystem and no Linux capabilities.
-
-What `verify.py` checks is worth knowing before it is run, because its last line, `VERIFICATION: PASS` or `FAIL`, is the
-only thing a reader has to read. It runs every test in `tests/` (the law, the plugs, the readings rule, every benchmark's
-own harness against a fake server), checks the engine's fingerprints against the preregistered registry so that a changed
-engine file fails before anything is measured, compares the release's files with its manifest
-(`tools/release_manifest.py --check`: the engine, the C++ twins, the live evidence's digests, one object that names the
-commit it was written at) and runs the layout check (`tools/layout_check.py`: the declared root, every link and every
-named path present). It takes a few minutes on a laptop and needs no network beyond the clone. GitHub runs the same
-script on every push under Python 3.12, and each run is listed under the repository's Actions tab with the commit it
-checked; a result in this manual is only ever cited from a commit whose run passed.
-
-To know which engine a checkout carries, ask it:
-
-```
-python3 tools/omni_version.py                  # omni-v3, omni-v2, omni-v1, or what differs
-python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
-```
-
-Every result table in `results/live/` cites the commit it ran on, and the three-run tools refuse to combine runs from
-different engines (section 15). The founder's standing order is that no result is ever read across engines, and the
-command above is how a reader checks that for themselves.
-
-### 9.3 The levels
-
-Take them in order. Each has a pass condition; go to the next level only when it holds. The OFF switch works at every
-level.
-
-The levels exist because a governor earns authority the way a new operator does: by watching first, then by touching
-the setting that is cheapest to undo, then the next. Level 0 touches nothing and proves the software is the software
-(`verify.py` checks every sealed file's fingerprint and runs every test). Level 1 watches a live cluster for as long as
-the operator likes and logs every decision it would have taken, so the operators can read those decisions against what
-they would have done; nothing passes level 1 until they agree with its readings. Level 2 moves the HPA target, which the
-HPA itself corrects within a minute if the governor is wrong, and raises replica floors ahead of bursts; it is the first
-level that can show a gain and the first that can show a loss, and the paired receipts of section 13 are its pass
-condition. Level 3 moves machines, the slowest lever, through the release gate and the verdict; it is where the bill moves
-and where the most care is spent. Level 4 hands Omni-Compass the replica decision itself, with the HPA kept as the fast
-reflex upward; it is an option, not a step on the way, and the benchmarks in this manual do not use it. Levels 5 to 7 are
-the GPU, the CPU and the site, each with its own wire check and its own pass. An installation may stop at any level and
-run there indefinitely; most will stop at level 3.
-
-**Level 0 - Evaluate without touching anything.**
-
-```
-python3 verify.py
-python3 tools/run_scale.py --runs 10 --scale 1 --out results/scale/eval     # the six organisms, modelled
-python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # the two-wire card, modelled
-```
-
-Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-
-**Level 1 - Watch (read-only).**
-
-```
-kubectl apply -f deploy/install/omni-compass.yaml     # set the image line; it runs --mode observe
-kubectl -n omni-compass logs deploy/omni-compass -f
-```
-
-The install file grants a read-only identity; `scripts/pilot_shadow.sh` records `kubectl auth can-i` receipts that
-show it cannot write. Every decision it would take is logged with its reason.
-Pass: zero writes, and readings your operators agree with.
-
-**Level 2 - The pods, on top of your autoscalers. WRITES.**
-1. Grant `patch horizontalpodautoscalers` and `patch pods/resize` (`deploy/rbac-target.yaml`).
-2. Run with `--mode target --latency-file <feed> --slo-ms <your p95 target>`.
-3. Optional pod muscles, one at a time:
-
-| Muscle | Switch | What it does |
-|---|---|---|
-| convey | `--latency-file` and `--cap-deployments ns/name` | gives each machine's idle CPU to the serving pods on it |
-| rightsize | `--rightsize-deployments ns/name` | each pod's CPU request follows its measured use times (1 + headroom), in place |
-| coldstart | `--coldstart-deployments ns/name --coldstart-signal ns/configmap` | scales a service to zero while no work waits, wakes it when work arrives |
-| batch | `--batch` | admits held Jobs labelled `omnicompass.io/batch=true` when there is load and power headroom |
-| batch pace | `--batch-pace` | pauses Jobs labelled `omnicompass.io/pausable=true` under power or heat stress, resumes them after |
-| rollout guard | `--rollout-guard ns/name` | pauses a rollout while change is not permitted |
-| contain | `--contain-namespaces ns --contain-cpu-m <m>` | holds an agent namespace to a CPU budget |
-| security hold | `--security-configmap ns/name` | key `hold: "true"` blocks every expansion |
-
-Your HPAs keep scaling as before; Omni-Compass sets their targets and raises floors ahead of bursts.
-Pass: p95, p99 and failed requests never behind native, over paired runs (section 13).
-
-**Level 3 - The machines. WRITES.**
-1. Grant `patch nodes` and `patch pods` (`deploy/kind/rbac-omni.yaml`).
-2. Run with `--mode nodepool --active-nodes-only --closure /app/law/closure.json --node-scale-cmd "<command with {n}>"`
-   and `--node-restore-cmd "<command>"` for the OFF switch. For the compass law on the same levers, use `--law compass`
-   (reads the mean response time of the latency window between a tenth of `--slo-ms` and `--slo-ms`, held at
-   `--compass-center 0.4`; p95 at the SLO, a blind feed or a waiting pod adds capacity at once; the HPA target never goes
-   above the operator's; machines go back one at a time through the release gate).
-
-| Your platform | The park/wake command |
-|---|---|
-| any cluster, bare metal, kind | `bash scripts/kind_nodepool.sh {n}` |
-| Karpenter / EKS Auto Mode | the NodePool CPU limit at `{n}` times node CPU, parked nodes kept |
-| Cluster Autoscaler node group | the group's desired size, scale-down through parking |
-| OpenShift / OKD | the worker MachineSet replicas, parked |
-
-A machine is given back only when every sense is live, the last order landed, pods are not scaling up, nothing waits
-for a place, and the remaining machines stay inside the band.
-Pass: fewer machines in service, with no LOSS on any service gauge.
-
-**Level 4 - Omni-Compass decides; Kubernetes is the muscle. WRITES.** Add `--strict-replicas`: Omni-Compass decides
-each service's replica floor and when to shrink; the HPA stays as the fast reflex upward.
-Pass: as level 3.
-
-**Level 5 - A GPU box, two wires. WRITES.**
-
-```
-sudo python3 tools/gpu_wire_check.py --gpu 0                    # must end: WIRED RIGHT
-# watch: computes both wires and writes neither
-sudo python3 -m omni_controller.gpu_compass --mode watch --gpus 0 --audit /var/log/omni/gpu.jsonl \
-     --latency-file <feed> --slo-ms <p95 target> --floor-w <your lowest watts>
-# govern: writes the clock ceiling and the power limit
-sudo python3 -m omni_controller.gpu_compass --mode cap --gpus 0 --audit /var/log/omni/gpu.jsonl \
-     --latency-file <feed> --slo-ms <p95 target> --floor-w <your lowest watts>
-# OFF: clocks reset, power limit back to the start, read back
-sudo touch /tmp/omni-gpu-kill
-```
-
-Every `--interval` seconds (default 2) it reads the card's own meters and the response times, and:
-- **learns the card on its own** first: while the ceiling is at the top and the card is busy, its busy clock and busy
-  draw; until 15 such readings are in, neither wire moves;
-- **races while work waits**: at 95% utilization or more, the ceiling to the top and the lid to the start limit;
-- **paces the slack**: the mean response time of the last 5 s, between a tenth of `--slo-ms` and `--slo-ms`, held at
-  the compass's center (0.4); the ceiling moves in whole 15 MHz steps, never under the card's own busy clock, and the lid
-  never under the card's own busy draw plus 10%, never over the start limit;
-- **asks the card first (the verdict)**: before the ceiling may go one step lower, a paired trial measures the card's own
-  time on each request (the workload's `service_ms`) at the top and at that step; the step is allowed only if it adds
-  at most `--allow` (2%). Where no step passes, the ceiling stays at the top: the card runs as it does alone, and the
-  audit says so (`verdict_state: left native`);
-- **fails up** when p95 reaches `--slo-ms`, a request fails, the feed goes blind or the card reports a heat slowdown.
-
-One law, no profiles: down gain 0.0125, center 0.4, floor at the card's own busy clock, allowance 2% (GPU
-preregistration, amendment 8). The workload must write `service_ms` (the card's own time per request) in its latency
-file, as `tools/gpu_workload.py` does; without it no step is ever allowed and the card stays native.
-Pass: work per energy up or equal; requests served equal; no request more than 2% slower at the median, p95 and p99
-at native or within 2%; every row of section 8.5 reads "wired right".
-
-**Level 6 - CPU clock and power. WRITES.** On bare metal, add to the controller:
-`--cpufreq-policy-root /sys/devices/system/cpu/cpufreq --cpufreq-require-schedutil --rapl-cmd "<prints CPU package watts>"`.
-The OFF switch writes every policy's recorded maximum back exactly.
-Pass: energy per unit of work down, no LOSS on any service gauge.
-
-**Level 7 - Site power and cooling. WRITES.**
-`--power-cmd "<prints site watts>" --site-limit-w <limit>` brings site power stress into the engine;
-`--cooling-cmd "<sets {c}>" --cooling-min-c 18 --cooling-max-c 27 --cooling-restore-c 22` lets it hold the supply-air
-setpoint in its band. CPU and GPU sharing one power budget (`hardware/node_exchange.py`) and GPU groups sharing a site
-budget (`hardware/site_exchange.py`) run as models today. Batteries are designed as an organ, not yet wired.
-
-### 9.4 Wiring for superiority: watch first, then the brain's own verdict on every knob
-
-The founder's order of 9 October 2026 fixes the order of wiring. Every knob is wired out first and in last, and the wire
-in is connected only by a measurement the brain makes on the knob itself. The steps, for any stack:
-
-1. **Wire out, everything.** Every muscle's readings reach the brain, one wire out per muscle. Nothing is written. This is
-   watch mode (section 1.3): where every installation starts, and where any knob returns the moment it stops paying.
-2. **Run the observation.** With the stack together and under its real or replayed demand, let the brain watch for at
-   least one full cycle of that demand. In watch mode the brain learns the band of every reading, where the native
-   controllers hold them, and which readings leave calm and when. Nothing is decided yet; the audit says what the brain saw.
-3. **Let the verdict decide each knob, one trial at a time.** Switch the knobs the operator is willing to have moved into
-   verdict mode. A knob still writes nothing until the brain has run a paired trial on it (section 1.2;
-   `omnicompass/verdict.py`; on the live stacks `tools/knob_verdict.py` around it): the knob is held at the operator's
-   setting for a reference, then one notch away, under the same traffic, and the step is allowed only if the muscle's own
-   cost did not rise under the declared objective. The objective is the operator's one declaration per knob: the resource
-   reading (the service, the resource and the CPU weighed together, the default and the index's own reading) or the service
-   reading (work and speed alone). A refused step is not retried for a set time; an allowed step widens the allowance by one
-   notch, and the next trial probes the next. The compass then moves the knob by its law inside the allowance, never outside.
-4. **Keep checking.** The trials recur. A knob whose last step stops paying when the demand changes is refused on its
-   recheck and the allowance narrows back; a knob that never passes a trial stays native for good, which is the right
-   answer for that knob and costs nothing. New noise in the system is answered the same way: the compass reacts inside the
-   allowance within its time constant, and the allowance itself is re-earned by measurement.
-5. **Read the verdicts, muscle by muscle.** The audit carries the state of every knob every second (`verdict_phase`,
-   `verdict_direction`, `allowed_low`, `allowed_high`, the cost sample) and the arm's record sums it; the wiring page
-   (`docs/WIRING_VERDICTS.md`, section 16.6b) is the same judgement made from the published tables after the fact. An
-   operator who wants one knob wired both ways and another watched only sets the objective on the first and leaves the
-   second in watch.
-
-What this gives: no knob is ever written on faith. Where Omni-Compass can beat the native controller on the muscle's own
-gauges, it will have proved it on that muscle before it moved it; where it cannot, the muscle lives by itself and Omni
-reads it. The organism's superiority is then the sum of the knobs that earned it, not one turn of a single dial for the
-whole system. On the five live stacks of section 10 this is built and declared (the amendments of 9 October in the Redis,
-Kafka, PostgreSQL, MySQL and YCSB preregistrations); the counted runs on it were dispatched on 10 October, three runs a stack
-and objective, the expectation written before them (`docs/RERUN_2026-10-10.md`). On the Kubernetes
-controller the verdict already guards the machines (section 1.2). Inside the modelled realms the organism still takes one
-directive for every muscle; making the verdict per muscle there is the next engine, Omni v4 (`docs/OMNI_V4_PLAN.md`),
-designed and not built, because every result must be run again on a new engine.
-
-## 10. Stack by Stack
-
-Every wiring below is the same plug (section 8): one wire in (the stack's own meter), one wire out (one setting the
-stack already accepts), a snapshot taken once before the first write, every write read back, everything restored on
-OFF. Native is always the stack's own controller left as shipped; omni is that controller with Omni-Compass on top.
-
-| Stack | Levels | Notes |
-|---|---|---|
-| Vanilla Kubernetes, kind, Rancher | 1-7 | as written |
-| Amazon EKS | 1-5 | machines via Cluster Autoscaler node group or Karpenter; CPU power control is not exposed on EC2 VMs; GPUs on bare-metal or full-GPU instances |
-| Google GKE, Azure AKS | 1-5 | the provider's node-pool size as the park/wake command; on AKS the managed cluster autoscaler stays native and deletes the machines Omni-Compass idles (10.1) |
-| Red Hat OpenShift / OKD | 1-5 | the same permissions through a Role; machines via the worker MachineSet |
-| NVIDIA GPU servers without Kubernetes | 5 | the two-wire GPU governor alone |
-| Bare-metal CPU servers | 6 | cpufreq and RAPL through sysfs |
-| Slurm / HPC | 5 on the GPU nodes | a job-level Slurm connector is not built |
-| Building management | 7 | through your BMS's command line or API, in the command templates |
-| PostgreSQL behind PgBouncer (any database behind a pooler with a console) | one knob | the pool size through the pooler's own admin console (10.2) |
-| A power grid's substation tap changer (pandapower, SimBench) | one knob | the tap position, one whole tap per move (10.3) |
-| Buildings with batteries (CityLearn) | one knob a building | the battery's charge and discharge inside the simulator's own limits (10.3) |
-| Robot arms (MuJoCo Menagerie) | one knob an axis | the joint speed where the axis has slack; never on an axis at its takt (10.3) |
-| A rented cloud machine running the big organisms | the whole harness | the detached run: rent, run, collect, delete (10.4) |
-| A message broker's consumer group (Apache Kafka) | one knob | the consumer count inside [1, partitions], read from the consumers' own records; the rebalance paid on every move (10.5) |
-| A cache's memory ceiling (Redis) | one knob | `maxmemory` through the cache's own console, grown only while the cache is full (10.6) |
-| Drone swarms (gym-pybullet-drones; PX4 and ArduPilot next) | one knob a drone | the cruise override inside the autopilot's limits; a separation wall; collisions void the cell (10.7) |
-| A database's storage-engine cache (MongoDB under YCSB) | one knob | the WiredTiger cache size through the server's own console, grown only while the cache is full (10.8) |
-
-### 10.1 Managed Kubernetes on Azure: the bill as the gauge
-
-On Azure Kubernetes Service the muscle is the same as on kind (section 9, levels 1 to 3) and one thing is new: the
-bill is real. The workflow `aks-metered` builds a fresh cluster for every arm the same way: a system pool of one
-machine, tainted so no workload lands on it (Azure's add-ons and the load generator live there; it is never measured
-and never governed), and one or several **work pools** under Azure's own cluster autoscaler, every pool labelled
-`omni-role=work`, every pool starting full. Native is that autoscaler alone. Omni on top is the same autoscaler with
-Omni-Compass idling the machines it gives back, which the autoscaler then deletes on its own schedule. The bill counts
-every work machine that exists, every 15 seconds, priced at Azure's list price for its family (`tools/live_reps.py`,
-`POOL_PRICES`); each cluster is deleted when its arm ends, so nothing keeps billing.
-
-**Sizing the fleet to the lever.** The smallest saving a fleet can show is one machine. On 4 workers one machine is
-25% of the fleet, so only a saving of about 30% or more can clear the noise; on 15 workers about 10%; on 96 about 3%.
-The expected machine saving under Omni-Compass is a few percent, so the 4-worker runs (`results/live/V1_AKS_STEADY.md`,
-`V1_AKS_BURST.md`) read no difference beyond the noise on every gauge, which is the honest reading of a fleet too small
-for the lever, not a result against it. A new subscription allows 200 vCPUs in a region but 10 per machine family, so
-one family gives five 2-vCPU workers; the way past it is **several families at once**: eight pools of four to five
-workers each make a fleet of 39 (`worker_pools` input, `size:max,size:max,...`; `pool_prices` names each family's
-price). The app's replica ceiling is raised with the fleet (`hpa_max`: nine 200-millicore pods fit one 2-vCPU worker,
-so 9 Ã— workers lets the fleet fill), the same in both arms. The preregistered design is in
-`docs/K8S_COMPASS_PREREGISTRATION.md`, "The fleet that can show one machine"; the account setup, click by click, in
-`docs/AZURE_SETUP.md`.
-
-**In the cloud, the bill is the gauge, and it is never raised.** In a public cloud every machine that exists is billed,
-whether it carries work or not, so the aim on a managed cluster is native's work for a smaller bill, never a bigger one.
-The cloud therefore runs at the tune-down (`dial save`, the `dial` input of `aks-metered` and its default) with the governor
-on the machines alone (`OMNI_MACHINES_ONLY=1`): it moves no pod autoscaler, conveys no processor and caps no power, so the
-pods are exactly native's and the cloud's own autoscaler alone makes machines; the governor parks a machine the cloud
-already made only after its own trial shows the response time holds, and wakes it at once on a breach. It can hold no
-more pods and no more machines than native: the bill can only fall or stay, and it falls in the quiet stretches between
-bursts and in a day's trough. The
-max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),
-where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
-on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
-In the cloud, as everywhere, the governor's fast checks (the scheduling floor, the pod reflex, conveyance on every third)
-run every 5 seconds, three times as fast as the HPA's own 15-second check, and its full decision every 60 seconds. A
-shorter decision period is not a free setting: the give-back trial's phase (`max_trial`, 20 decisions), the breach
-cool-down (`--slo-clear`), cruise (`--cruise-after`) and the trial spacing count in decisions, so at 5 seconds a trial
-would last 100 seconds, too short for the 200 response times it measures, and no machine would ever be given back
-(`docs/K8S_COMPASS_PREREGISTRATION.md`, "The decision period in the cloud"). The next version counts them in seconds; the law's damping follows from the
-decision period by its own formula (section 6), so nothing else changes with it.
-
-**What the Azure runs taught us.** Three lessons, each recorded as an amendment to the preregistration before the fleet was
-dispatched again. First, a fleet is sized by the lever, not by the budget: a 4-worker fleet cannot show the few-percent
-machine saving the law makes, so its honest reading is "inside the noise", and running it again would not change that.
-Second, a new subscription's allowance is per machine family, so the fleet that can show one machine is built from nine
-families at once, each pool at its own list price, and the bill prices each pool separately. Third, a cloud region can
-refuse a new cluster for hours at a time (Azure's capacity for new control planes in its region, on both control-plane
-tiers); the harness therefore checks the subscription's allowances before it builds anything, so a refusal costs cents and
-not a cluster, and every refusal is recorded with its time.
-
-### 10.2 A database behind its connection pooler
-
-PostgreSQL is wired through PgBouncer, the pooler most of its deployments already run (`docs/POSTGRES_PREREGISTRATION.md`,
-`tools/run_pgbench.py`). Nothing models the database. The wire in is the pooler's own report (`SHOW STATS`,
-`SHOW POOLS`): once a second, the time a transaction spent in the server plus the time clients waited for one, over the
-transactions completed. The wire out is one setting through the pooler's own admin console, `SET default_pool_size`,
-inside the cover [2, 90]: never under two server connections, never within ten of PostgreSQL's connection limit. The
-compass holds that reading at 40% of a 50 ms line. Where the time was spent decides the direction: waiting for a
-server grows the pool; time inside the server shrinks it by one, so fewer backends fight for the same cores; calm gives
-back one idle server a second, and only one the pooler itself shows idle. At 95% of the line the knob is handed back
-to the pooler's own setting at once. If the knob is found at a value Omni-Compass did not write, it stops writing (one
-writer). At the end of every omni arm the pool size is restored to the snapshot and read back. The same plug fits any
-pooler or proxy with a console and a pool-size setting (PgBouncer, Pgpool-II, ProxySQL, the application's own pool).
-
-**What the database taught us.** The first untouched run on this stack was a loss, and it stays in the preregistration as
-it came (`docs/POSTGRES_PREREGISTRATION.md`, "The first untouched run, and amendment 1"): on the read-only workload the
-pooler's own clock read 0.11 ms a transaction against a 50 ms line, so the law gave back one idle connection a second until
-the pool stood at its floor of two, while the users' 95th percentile went from 4 ms to 3.9 s. The pooler could not see the
-time a client spent behind its own schedule waiting to send, so its clock said calm while the users waited; the
-preregistration had said so in one line without drawing the consequence. Amendment 1, declared before any counted run,
-made the reading the larger of two: the pooler's service time, or the share of its clients queued for a server, so a pool
-too small for the offered rate shows at the pooler as clients waiting and the knob fails up to the operator's setting at
-once; and it held the dwell when lifting off only, never when pushing. The counted runs are three new untouched runs on the
-amended rule; the first run is not counted and is not hidden. The result the same in all three of our runs is a resource held, not speed, and its
-cost the same in all three of our runs is the host's CPU: the compass's own reads of the pooler's console every second are CPU the native pooler
-never spends, and they are counted against it.
-
-**What the cost turned out to be (amendment 2, 8 October).** The record had explained the +14% to +28% of host CPU as
-"PgBouncer queuing clients behind a smaller pool", without a measurement. Measured, it was ours. The pooler's own log of one
-counted workload holds 7,956 logins to its admin console, one for every `psql` process the harness launched to take a reading
-(about two a second in both arms for the sampler, four more a second plus three per write in the omni arm for the brain); one
-launch costs about 52 ms of CPU on a machine of the runner's class, because psql loads libpq, OpenSSL, GSSAPI and LDAP and
-connects before it runs one command; and a paired repetition of `select` with a per-process meter put +55.9 CPU-seconds on
-those launches against a +52.8 s difference in the host total, with PgBouncer at +1.2 s and PostgreSQL at âˆ’4.7 s. The second
-cost in the table, the median latency +15% to +17%, was the take-back rule giving back one idle server a second whenever the
-pooler's service time read calm, which against a 50 ms line it always did, so the pool was shrunk into a queue the pooler
-itself was reporting. Amendment 2, declared before the second counted set (`docs/POSTGRES_PREREGISTRATION.md`): the harness
-speaks the pooler's wire protocol over one connection held for the whole arm, in both arms, so no process is launched for a
-reading; the queue line: a server is taken back only while the pooler's clients waited for one under one percent of its
-time in the last second and a transaction was served, and while they waited one percent or more servers are added back, one
-for every percent of waiting, up to the pooler's own setting (the one-percent line the two other database tests already
-use), so the pool probes down to the smallest size that serves without waiting and gets its servers back the moment anyone
-waits; and the harness records its own CPU beside the host's. The engine's 40 files are untouched (`tools/omni_version.py` prints omni-v3). The second set's
-table replaces the first when it lands, and the first moves whole to `docs/history`.
-
-### 10.3 Independent simulators, each with its own native controller
-
-Three published simulators are wired the same way, and the simulator's own controller is always native:
-
-- **CityLearn** (`tools/run_citylearn.py`): every district the simulator ships; the knob is each building's battery
-  charge and discharge inside the simulator's own limits; the native arm is the simulator's own rule-based control.
-- **pandapower on SimBench grids** (`tools/run_pandapower.py`): the knob is the substation tap changer, one whole tap
-  per move and a week of evidence before stepping down; the native arm holds the tap at 1.00 per unit as the grid
-  ships.
-- **MuJoCo Menagerie robot arms** (`tools/run_mujoco.py`): the knob is the joint speed of an axis that has slack; the
-  paired physics trial written before the run leaves an axis at its takt native, so UR5e and iiwa 14 have nothing for
-  Omni-Compass to move and the Gen3 and Panda do.
-
-Each is preregistered (`docs/CITYLEARN_PREREGISTRATION.md`, `docs/PANDAPOWER_PREREGISTRATION.md`,
-`docs/ROBOTICS_PREREGISTRATION.md`), each runs A, B and C as separate GitHub runs, and each table is made by rule
-(`tools/citylearn_abc.py`, `tools/pandapower_abc.py`, `tools/mujoco_abc.py`). These are evidence class S: statements
-about the simulator's model, never about hardware.
-
-**What the simulators taught us.** Three things a referee should weigh. First, a deterministic simulator makes the
-three-run rule stricter, not looser: MuJoCo and pandapower reproduce to the digit on any machine, so their A, B and C must
-agree to the digit and any difference is a finding about the harness, while PyBullet reproduces only to a part in a
-thousand across machines, which the swarm table discloses as an amendment and tolerates by that much and no more.
-Second, a knob that cannot pay is left alone by the physics, not by a rule of thumb: the robot arms' paired trial showed
-that two of four arms gain nothing from a speed override and left them native, the cooling model showed that a cap on
-cooling power can never remove less heat and so is never a lever, and a battery's reserve is spent only at the wall
-because every round trip through the cells costs the efficiency loss (`docs/MECHANISM_OF_ACTION.md`, 9.6). Third, a gain
-in one gauge is often a loss in another, and the simulators show both: the grid's losses rise in the four grids with their
-own generation while the energy drawn falls everywhere; the buildings' bills rise in the 2023 districts while their peaks
-fall; the Panda's copper loss rises while its torque falls. The tables carry every one of those rows, and the index
-carries none of them, because they are models.
-
-### 10.4 The big organisms on a rented machine
-
-The whole tower and the four stacked at 100 copies (about 110,700 and 190,800 modelled muscles) with a real cluster
-inside are also run on rented eight-core machines, **detached** (`.github/workflows/big-organism-detached.yml`), so that
-the cluster has more cores under it than GitHub's four-core runner gives: `start` rents one Azure machine, installs the
-tools, starts every repetition of every organism under `nohup` and leaves the machine running on its own; `collect`
-(every two hours on the clock, or by hand) copies the files back when every repetition has finished, publishes one
-artifact per cell and deletes the machine; `survey` lists which machine sizes and quotas a subscription may rent, region
-by region, and rents nothing. A machine older than `max_hours` is collected as it is and deleted, so nothing runs forever
-on the bill. The commit to run is an input, so a run is always tied to one engine. **The clock rule** (section 13) and
-protocol 3 decide the window for each size on each machine: the window is set from the heavier arm's step, timed on the
-machine before either arm, so the organism keeps its clock (the tower at 100 copies on 14 October: 2,880 s windows on
-three machines, ten repetitions in all; the stack follows on the same three machines). No 1,000-copy run is started from
-12 October; earlier engines' 1,000-copy runs on this workflow stand as they were run, in their own tables.
-
-The same workflow carries a second test. With the input `test=robust` the machine runs the robustness harness's long
-scenario instead of an organism (`scripts/kind_paired.sh` with `ROBUST=long`, exactly as the GitHub job runs it), with
-the window stretched to whatever `duration_s` asks and the wandering load schedule repeated to fill it; the 24-hour run of
-section 16.8 uses it, one paired repetition on each of three rented eight-core machines of three families (the start job
-tries the size it is given and falls back through the eight-core sizes the subscription may rent when the allowance refuses
-it; the four-core size asked for was refused because the tower's machine held its family's allowance, and the
-preregistration records what was rented), collected and deleted at 60 hours at the
-latest. The cells it writes are named `robust-long-x<window>-<repetition>` beside the organisms' `six-<organism>-x<copies>-
-<repetition>`, and the collect job gathers both. The `max_hours` input is the machine's own limit, written into the
-machine at start, so a collect that finds a machine past its limit takes what is there and deletes it, whichever job
-started it.
-
-Three things a reader should know about any detached result. The machine is one Azure virtual machine rented for this
-run alone, not a GitHub runner shared with a queue of other jobs, so its size is known (the table names it) and it is not
-cut off at six hours; that, and not only the job limit, is why the big organisms are run there. The files come back
-exactly as the machine wrote them, copied cell by cell with the machine's own log beside them, and the archive bot stores
-them under the collect run's number with a SHA-256 list of every file, so the start run and the collect run are both
-cited in the table. And the machine is deleted after the collect, so a result cannot be re-read from the machine, only
-from the archived files; the preregistration says this before the first start.
-
-### 10.5 A message broker's consumer group
-
-Apache Kafka is wired as an operator runs it (`docs/KAFKA_PREREGISTRATION.md`, `tools/run_kafka.py`): one broker as
-shipped, a topic of eight partitions, a consumer group at the operator's count of two. Nothing models the broker. The
-wire in is the group's own end-to-end latency: each message carries its production time, each consumer records when its
-handling ended, and the reading is the mean over the messages consumed in the last second; a second with nothing consumed
-while messages wait reads as the line (someone is waiting and no one is taking), and nothing consumed with nothing
-waiting reads as calm. The wire out is the count of consumers in the group, which is what an operator changes, inside the
-cover [1, 8]: never fewer than one, never more than the topic has partitions. The compass holds the reading at 40% of a
-500 ms line with a response time of 3 s, because a consumer added or removed shows only after the group rebalances. Slow
-service with messages waiting adds consumers in proportion to the force; calm with nothing waiting gives back one idle
-consumer a second after a five-second dwell; at 95% of the line every consumer the topic can use starts at once. The
-rebalance that every move costs is paid by Omni-Compass and counted in the gauges. At the end of every omni arm the count
-is handed back to the operator's and read back. The result (section 16) is the shape this wiring predicts: the queue kept
-short, no message lost, at the cost of consumers running, which reads power given by rule and stands beside the gain.
-
-### 10.6 A cache's memory ceiling
-
-Redis is wired as Ubuntu ships it, with the two settings an operator sets for a cache, a memory ceiling of 64 MB and the
-allkeys-lru eviction rule (`docs/REDIS_PREREGISTRATION.md`, `tools/run_redis.py`). The application in front of it is ours
-and declared: 1,500 requests a second from 32 threads on a Zipf working set that widens and narrows one notch at a time;
-a miss costs a declared 5 ms trip to the store behind the cache and a write-back. The wire in is the application's own
-request latency, the mean over the last second (a hit about 0.3 ms, a miss about 5.5 ms). The wire out is one setting
-through Redis's own console, `CONFIG SET maxmemory`, inside the cover [16, 512] MB. The compass holds the reading at 40%
-of a 2 ms line. Its direction rule carries the do-no-harm gate in the form this stack needs: misses grow the ceiling by
-notches of 8 MB **only while the cache is full** (memory used at 90% of the ceiling or more), because a miss in a cache
-with room to spare is a cold miss that no ceiling can mend; calm with nothing evicted in the last second gives back one
-notch a second, after a five-second dwell since the last growth; at 95% of the line with the cache full a quarter of the
-cover is added at once. One writer: a ceiling found at a value Omni-Compass did not write stops it. At the end of every
-omni arm the ceiling is handed back to the operator's 64 MB and read back. The memory the compass holds for a wide
-working set is the resource this benchmark trades and reads power given by rule; the gain is the hit rate and the work inside
-the line. The result (section 16.4) is exactly that shape: on all three untouched workloads the work inside the line and
-the hit rate rose 14% to 27% and the ceiling held rose from 64 MB to 200 to 270 MB, with the host's CPU inside the noise
-and every ceiling handed back.
-
-### 10.7 Drone swarms: the autopilot's cruise
-
-In gym-pybullet-drones (University of Toronto, MIT License; `docs/SWARM_PREREGISTRATION.md`, `tools/run_swarm.py`) every
-Crazyflie 2.x flies its shipped position controller along the planner's path at the planner's cruise: that is native. The
-wire in is each drone's tracking error, the distance between the drone and the point its autopilot was told to be at, on
-a band from 0 to a declared safe error of 0.25 m. The wire out is one knob a drone, the cruise override: the fraction of
-the planner's cruise the carrot moves at, never under 1.0 (the planner's own) and never over 2.0 (a quarter of the
-autopilot's own speed limit), moving by at most 0.01 a control tick. With slack the compass spends it as speed; as the
-error grows it eases; at 95% of the safe error the cruise is the planner's at once. Two guards belong to this stack: a
-**separation wall** (a drone with another within 0.5 m flies the planner's cruise, whatever the error reads) and the
-**paired physics trial** before the counted missions, which asks the simulator's own figures whether a faster mission
-costs less energy at all and keeps the error under the safe error; where it does not, the override is left native for
-that cell and the cell reads "nothing for Omni to move". Energy is a declared model from the simulator's own motor
-constants, said to be a model wherever it is printed; a collision voids the cell. At every landing and at the end of the
-run the override is handed back and read back.
-
-### 10.8 A database's storage-engine cache
-
-MongoDB is wired as an operator runs it (`docs/YCSB_PREREGISTRATION.md`, `tools/run_ycsb.py`): the 8.0 series from its
-publisher's own signed repository, its configuration as shipped but for the one setting an operator sets for the storage
-engine, the WiredTiger cache, at 512 MB. The questions are asked by YCSB, the published cloud-serving benchmark, running its
-own core workloads as the project ships them, with the key space stepping one notch at a time through the cache and past
-it, so the working set fits the operator's cache at the low notches and outgrows it at the high ones. The wire in is the
-server's own mean read latency over the last second, from its `serverStatus` operation latencies, differenced. The wire out
-is one setting through the server's own console, `setParameter wiredTigerEngineRuntimeConfig cache_size`, inside the cover
-[256 MB, 2,048 MB]: the server's own floor at one end, a quarter of the machine at the other. The compass holds the reading
-at 40% of a 1 ms line (written as 2 ms before the first smoke run and set at 1 ms on the tuning workload's figures, as the
-preregistration reserved; see below). The direction rule is the cache's: slow reads grow the cache by notches of 64 MB only while the
-cache is full (bytes in it at 90% of its size or more), because slow reads in a cache with room to spare are not the
-cache's to mend; calm with no page evicted in the last second gives back one notch a second after a five-second dwell; at
-95% of the line with the cache full a quarter of the cover is added at once. One writer, read-back and the hand-back at the
-end are the plug's, as everywhere. *Amendment 1 (8 October, declared before the second counted set): the give-back gate is
-now the cache's miss share, pages read into it under one percent of the pages requested from it in the last second, the
-MySQL test's gate, and growth is gated on missing the same way; the first set's audits showed that "no page evicted" is
-satisfied by every cold cache while it fills, so every burst and c arm gave four notches back in its first five seconds,
-before its first eviction, and then sat at the floor of the cover evicting for the rest of the arm. The memory the first
-set credited was that artefact, and the second set is expected to credit less, perhaps nothing beyond the noise.* Disclosed before the run: on a machine where the data files fit in the operating
-system's own page cache, a storage-engine cache miss is a read from memory and a decompression, not a disk read, so the
-gain available to this knob is smaller than it would be on a machine whose data does not fit in memory; the result will
-say what it is. The same plug fits any store whose engine exposes a cache size at run time (InnoDB's buffer pool, RocksDB's
-block cache) and any store that does not can only be sized at restart, which is not a knob Omni-Compass moves.
-
-**What the smoke runs taught, and why they are in the record.** A benchmark of a cache is only a benchmark if the
-working set reaches the cache. Three smoke runs of the tuning workload, one repetition each and none counted, were needed
-before the harness asked the question it was built to ask, and each is written in the preregistration with its run number
-and its figures. The first failed before an arm ran, on two harness faults (a relative file path handed to a program that
-runs from its own directory; a server log copied as a file the upload step could not read). The second ran end to end and
-showed the design did not touch the cache at all: YCSB's shipped request distribution is zipfian, which concentrates
-almost every request on a few thousand hot records whatever the key space, so at the top notch of 1.5 million records the
-cache held 36 MB of its 512 MB, both arms answered inside the line with a p95 of 0.20 ms, and omni, seeing calm and nothing
-evicted, gave memory back to the floor of the cover. That would have read as a free memory saving for Omni-Compass, and it
-would have been worthless: a knob with nothing to do had moved to its floor. The requests were changed to a uniform draw
-over the notch's key space so the working set is the key space, the one departure from YCSB as shipped, and said so. The
-third smoke still held 38 MB, and the per-notch figures the runner now prints showed why: the dataset was loaded with
-ordered keys but the run phase used YCSB's default hashed keys, so every read asked for a record that did not exist and
-was answered from the index alone, which fits in a few megabytes. The run phase now names ordered keys too. Nothing in the
-rules, the gauges or the workloads changed across the three. The fourth smoke reached the cache: native held 336 to 481 MB
-of its 512 MB across the notches and read 453,000 pages into it, and its per-notch figures set the line. The server's mean
-read latency ran 0.15 to 0.24 ms while the cache held the working set and 0.23 to 0.33 ms while it did not, with a p95
-never above 0.42 ms; against a 2 ms line every one of those readings sat in the bottom quarter of the band, under the 0.4
-center, so the compass could only ever read calm, the same fault as a Kubernetes line set at ten times the service's normal
-response. The line was set at 1 ms, the one change the preregistration had reserved for the tuning workload, with the
-center unchanged, so that a hit is calm and a full cache reading past 0.4 ms is slow; the one repetition's whole-arm figures
-(work inside the line âˆ’1.9%, cache held âˆ’31%, pages read +32%, host CPU +8%, p95 equal) are recorded and not counted. The
-point for a referee is the method: a result that flatters the governor is the first thing to suspect, the suspicion is
-pursued to a harness cause, the cause is written down with the run that showed it, a band is set on the tuning case's own
-figures and never on an untouched one, and the counted runs begin only when the harness provably asks the question.
-
-### 10.9 A database's buffer pool, resized online in the server's own chunks
-
-MySQL is wired as an operator runs it (`docs/MYSQL_PREREGISTRATION.md`, `tools/run_sysbench.py`): the 8.0 series from
-Ubuntu's own package, its configuration as shipped but for the settings an operator sets for InnoDB, the buffer pool at
-512 MB (MySQL's own default is 128 MB, and the preregistration says why 512 MB is the operator's setting here), the chunk the
-server resizes in at its shipped 128 MB, one pool instance, and the performance schema on. The questions are asked by
-sysbench, the standard OLTP benchmark Ubuntu ships as its own package, running its published scripts as shipped at a fixed
-offered rate, with the number of tables in use stepping one notch at a time through the pool and past it. The wire in is
-the server's own mean statement latency over the last second, from the performance schema's statement summary,
-differenced. The wire out is one statement through the server's own console, `SET GLOBAL innodb_buffer_pool_size`, inside
-the cover [128 MB, 2,048 MB] and always in whole chunks, because that is how the server itself moves the pool. Two things
-about this knob differ from the MongoDB cache and the plug carries both. The server resizes asynchronously and reports its
-progress in its own status variable, so the plug waits for the resize to complete before reading back, and a pool found
-mid-resize is the server still carrying out Omni-Compass's own write, not a foreign hand. And a shrink evicts pages while
-the resize runs, so the dwell after any move is ten seconds rather than five. The compass holds the reading at 40% of a
-0.6 ms statement line (written as 1 ms, set on the tuning workload's smoke runs, as the MongoDB line was: a hit reads 0.14
-to 0.22 ms across GitHub's runners and a full pool missing a third of its reads 0.05 to 0.06 ms more, so the center sits at
-0.24 ms, above the hits and under the misses); the direction rule is the cache's with one difference the smoke runs forced:
-slow statements grow the pool by chunks only while the pool is full, at 95% of the line with the pool full four chunks are
-added at once, and calm gives one chunk back after the dwell only while the pool's misses are under one percent of its read
-requests, because InnoDB keeps stale pages resident, so neither "pages free" nor "no page read from disk" ever says that a
-pool holds its working set, and the miss share does (amendment 2 of 8 October, declared before the third counted set: the
-pool also grows only while it is missing, one percent or more, the same line the other way, because the second set's audits
-showed 36 of read_write's 82 grows bought chunks while the pool missed under one percent of its reads, for slow writes the
-pool cannot mend; and no chunk is given back in a second with no read request). The work-inside-the-line
-gauge uses a transaction line, the statement line times the statements a transaction as sysbench's script ships it (one for
-a point select, fourteen for the read-only mix), and says so. One writer, read-back and the hand-back at the end are the
-plug's, as everywhere. The same disclosure as MongoDB's holds and is made before the run: on a 16 GB machine with a 1.4 GB
-dataset a pool miss is a read from the operating system's page cache, not from disk.
-
-**What the first counted set taught about this knob.** Three runs of five workloads (`results/live/V3_SYSBENCH.md`, 8 October)
-read every gauge inside the noise, and 15 of the 45 omni arms did not read the operator's pool back at the end. The audits
-show the server still "withdrawing blocks" of a shrink the law had asked for when the arm ended: InnoDB withdraws the last
-blocks of a shrink only when the pages the load has pinned are released, so under load the withdrawal does not finish, and
-the server ignores a new `innodb_buffer_pool_size` while a resize is in progress, so the restore the plug issued at that
-moment was dropped. Every following arm began from a fresh server at the operator's setting, so no other arm was affected,
-and the decision loop never wrote during a resize (its writes are gated on the status); only the restore was. The plug now
-waits for the resize the server is carrying out (the load has stopped by then, so a stalled withdrawal finishes), writes the
-snapshot, and writes once more if the server ignored the first write; the receipt of that restore (what was in flight, the
-seconds waited, the writes, the final read-back) is in every omni arm's record and the table counts the arms. The rows of the
-first set stand as they are, hand-back NO included, in `docs/history/V3_SYSBENCH_set1.md`; the preregistration carries the
-finding and the amendment; and the second counted set, run on the amended plug the same afternoon with nothing else changed,
-handed the pool back on all 45 omni arms and is the result in section 16.4. The lesson is general and is the reason section 7.2 exists: a
-knob the device applies on its own time has to be handed back on the device's time, and the proof of the hand-back is the
-read-back, not the write.
-
-### 10.10 The machine itself: the kernel's frequency governor under the processor's meter
-
-The lowest level a governor can sit on is the machine it runs on. Linux already has a controller for the processor's clock,
-the frequency governor (`schedutil`, or the processor driver's own), choosing the clock every few milliseconds under a
-ceiling the operator sets once; and the processor has its own energy meter (RAPL) ticking in microjoules. Omni-Compass sits
-on top of the governor exactly as it sits on the HPA: the governor keeps running, and Omni moves one knob, the frequency
-ceiling of every CPU, through the kernel's own files (`tools/run_cpu_power.py`, `docs/CPU_POWER_PREREGISTRATION.md`).
-
-The reading is the service's own mean latency, held at 40% of a 20 ms line by the compass law; calm gives one notch of the
-ceiling back (5% of the top clock), a slow service raises it by notches, the wall puts the top on at once. Every notch down
-is tried on the machine itself first (section 9.4): the brain's verdict around the engine's own, eight cost samples at the
-deepest notch already allowed and eight one notch further, allowed only if the cost does not rise within 2%. The cost is the
-index's own reading for one machine (package power Ã— latency / work inside the line), so a notch that saves less energy
-than it costs in speed is refused and the ceiling stays where the operator left it; a second declared objective, energy per
-request inside the line with the line as the guardrail, is run beside it. The snapshot of every CPU's governor and ceiling
-is taken once; the ceiling is handed back and read back at the end; a ceiling found at a value Omni did not write stops it;
-the master switch and the lease hand back if Omni dies.
-
-The meter is the processor's own counter, class P with the caveat that it is the processor's calibrated counter and not an
-external meter; a smart plug on the wall socket (`WALL_METER`) adds the whole machine, read by the harness only. GitHub's own
-machines are virtual and expose neither the governor nor the meter: the workflow proves it with the probe on every dispatch.
-The benchmark runs on a machine on the metal as root, in one command (`sudo bash scripts/cpu_power_run.sh`): the founder's
-own tower or laptop on Linux, a rented bare-metal server, or a self-hosted runner on either. Three runs make the table
-(`tools/cpu_power_abc.py`). Nothing in the engine changes.
-
-### 10.11 The data center under the servers: cooling, power and batteries
-
-Under every cluster in this book stands a building. Its native controllers are older and more conservative than any
-autoscaler: the building management system holds the supply-air temperature through the cooling units' own loops, the
-chilled-water plant runs its own sequence, the uninterruptible power supply holds its reserve, the power distribution units
-meter every rack, and every server's management controller and every card's firmware enforce their own power limits.
-Omni-Compass sits on top of them exactly as it sits on the HPA. They keep running; it moves only the settings they already
-accept, and only inside the band the operator writes down.
-
-**What it may set, and what it never sets.**
-
-| Muscle | Native controller | The knob Omni-Compass may hold | Switch | Status |
-|---|---|---|---|---|
-| Cooling | the building management system and the cooling units' own loops | the supply-air setpoint, inside the operator's band | `--cooling-cmd "<sets {c}>" --cooling-min-c --cooling-max-c --cooling-restore-c` | built (level 7) |
-| Site power | the site's own limit and its breakers | none: site watts are read, and the site limit enters the engine as a stress | `--power-cmd "<prints site watts>" --site-limit-w <limit>` | built (level 7) |
-| Servers' processors | the kernel's frequency governor and the processor's own limits | the clock ceiling and the power limit | section 10.10 | built (level 6) |
-| Cards | the card's firmware | the clock ceiling and the power limit | level 5 | built |
-| Uninterruptible power and batteries held as reserve | the UPS's own reserve | **none, ever**: a reserve held for an outage is never a lever (the physics criterion) | | native by design |
-| Batteries held for shifting energy | the site's dispatch | the charge window | | designed as an organ, not yet wired |
-
-**How the cooling muscle moves.** The setpoint is moved by the heat state between the operator's minimum and maximum: a
-warmer setpoint while every reading is cool, which saves the chiller's energy, and a colder one as heat rises. The band must
-sit inside what the equipment is rated for; for most data-center equipment that is the 18 to 27 Â°C inlet range of the
-ASHRAE thermal guidelines, and inside any narrower limit the equipment's own warranty sets. The restore value is the
-operator's own setpoint, handed back and read back on OFF, at the end of every run, and by the lease if the governor dies.
-
-**The do-no-harm gate at the site meter.** A warmer setpoint saves chiller energy only up to the point where the servers'
-own fans spend the saving: fan power rises steeply with inlet temperature. That is why the cooling knob is judged at the
-site meter and not at the chiller: a step is allowed only where the paired trial shows the site's energy for the same work
-no higher, every rack inlet inside its band, and no LOSS on any service gauge. Where it does not, the setpoint stays the
-operator's, and the result says so.
-
-**Wiring it, in order.**
-
-1. **Watch.** Give Omni-Compass read access to the building management system's points (supply and return air, every rack
-   inlet, the chilled-water temperatures) and to the site meter, and let it watch at least one full cycle of the site's
-   demand. Nothing is written.
-2. **Write the band.** The minimum, the maximum and the restore value of the supply-air setpoint, inside the equipment's
-   ratings, signed off by the facility's engineer; the site limit in watts.
-3. **The wire check** (section 8.4). The cooling command must read back the setpoint it wrote; a building schedule that
-   rewrites the setpoint is another writer, and Omni-Compass stops writing that lever by itself (section 7.2).
-4. **One hall first.** A test hall or a single row, paired against its own native weeks, before any other hall.
-5. **Keep the switches in reach.** The master switch and the kill file work at the facility level exactly as at every other
-   level.
-
-**What is proven, and what is not.** The facility muscles are modelled today (class S): the data-hall cooling family of the
-catalog, the power distribution family, and the site budget shared by groups of cards, which held out with no minute over
-its budget (`docs/REGISTER.md`: the families of rows 29 and 38 of its catalog table, and row 20 of its benchmark table). No live facility has run yet. A class P result needs a building
-management system's point list, read access, a site meter and a test hall; until a facility pilot has produced its own
-paired receipts, this section is a wiring instruction, not a claim of savings.
-
----
-
-# PART V - OPERATING IT
-
-## 11. The OFF Switch, the Rules, and the Log
-
-**The rules Omni-Compass keeps on your system.**
-1. **The master switch, for the whole harness, in a human hand:** `python3 tools/omni_switch.py off` turns every
-   Omni-Compass governor on the machine off at once (the Kubernetes controller and the GPU governors). Each puts every
-   setting it ever wrote back to the value it read before its first write, reads it back and exits; the command waits
-   until all have, and says so. While the switch is OFF, no governor will start. `python3 tools/omni_switch.py on` allows
-   them to be started again (nothing restarts by itself); `status` shows the switch and every governor running. Use it
-   the moment anything looks wrong, including a suspected breach. Each governor also keeps its own switch for one
-   muscle at a time: the kill file (or `OMNI_KILL=1`, or SIGTERM to the GPU governor).
-   **If a governor dies without handing back** (killed outright, the machine crashed, it hung), nothing it wrote is
-   left in place: every governor records, before its first write, the exact commands that put every setting back, and
-   renews a lease every decision. Run `python3 tools/omni_switch.py watchdog` as its own service next to the governors:
-   it hands back for any governor whose process is gone or whose lease has run out (a hung one is stopped first).
-   `status` names any governor that died without handing back.
-2. It records before it acts (annotations on Kubernetes objects; the `snapshot` line in the GPU audit).
-3. It watches before it writes.
-4. It never acts blind.
-5. Service first: while response time is over its target, and for `--slo-clear` decisions after, nothing is given back.
-6. Every change is read back; no new order goes on top of one that has not landed.
-7. The living band and the cover: no organ is driven outside its range; machines are parked, never switched off by
-   Omni-Compass; it never evicts or moves a pod.
-8. One writer: if anyone else changes a knob, Omni-Compass stops writing it and leaves it alone.
-9. Everything is logged: every read, decision, write and reason goes to the audit log.
-
-**On autopilot: why nobody babysits it.** Omni-Compass is an autopilot: a closed-loop supervisory controller that runs,
-steers and corrects itself inside the system it governs, as a self-driving car's controller does inside the car. Once
-the paired trial on a muscle has passed and the governor is set to govern, nobody turns a knob and nobody has to react.
-Every change is the governor's own, and the governor audits itself: every write is read back from the system, every
-machine it gives back is kept only after its own paired trial shows the response time holds, every reading, decision and
-reason is in its audit, and it hands every setting back at the end; nobody has to check its work either. It holds the response time at the centre of its band, under the line, and acts as the reading approaches the
-line, so the correction lands before the line is crossed, not after a person is paged. What a native stack pays in
-people for the same service (an engineer watching dashboards, paged while the service is over its line, retuning an
-autoscaler's target or a node pool by hand) is the **babysitting tax**, and every Kubernetes and cloud receipt counts it
-in both arms: the **alert minutes** (whole minutes whose 95th percentile, failed requests counted over, was over the
-line: the minutes an on-call page would be open; judged, the aim lower), the **settings commands the governor wrote on
-its own**, and the **share of its additions decided while the service was still inside its line** (both shown, not
-judged). No person touches either arm of a paired run. The aim in the cloud is **no alert minute at all**: a minute over
-the line is a person woken, so an alert minute in the omni arm is a LOSS of the aim, its cause found and fixed and the
-test run again. Where native itself is short of machines (over its line on its own), the receipt says so beside the row:
-the same machines can be made to carry more, but no governor creates compute that the machines do not have.
-
-**The three ways a governor stops, and what each leaves behind.** A referee or an underwriter should know exactly what
-happens to a governed system in each of the three ways Omni-Compass can stop, because the answer is the same in all
-three: every setting at native, read back, with no record left.
-
-- **The reset** (every setting handed back to native) is the planned end of a run. The governor sees its reset file, hands every
-  setting back in reverse order of power-up, reads each back, writes its last audit line and exits 0. Every benchmark arm
-  ends with one and then checks the cluster from outside the governor: the HPA target at the operator's, the replica range
-  as set, every pod's CPU limit at its shipped value, every worker back in service, no `omnicompass.io/` annotation left on
-  any object. An arm whose reset check fails is invalid and is left out of the table, never counted.
-- **The kill switch** (security) is the unplanned end of trust. `tools/omni_switch.py off` writes the switch file and
-  sends every registered governor SIGTERM; each performs the same hand-back as a reset and exits; the command waits until
-  all have and reports any that have not. No governor starts while the switch is off. It is one switch for the whole
-  machine, not one per muscle, because the case it exists for, something driving a system through Omni-Compass's brain, is
-  not a case for picking which muscle to stop.
-- **A death without a hand-back** (killed outright, a crash, a hang) is the case the lease covers. Before its first write
-  every governor registers itself with the exact command that puts every setting back
-  (`omni_controller.controller --restore-only`, which restores from the snapshot annotations on the objects themselves,
-  so it needs no memory of the dead process), and renews a lease every decision. The watchdog
-  (`tools/omni_switch.py watchdog`), run as its own service beside the governors, finds any governor whose process is gone
-  or whose lease is older than its limit (five decision periods, at least two minutes), stops a hung one, runs its
-  recorded restore command, and records what it did. The robustness benchmark (section 16, in preparation) kills the
-  governor outright in the middle of a governed run and measures how many seconds pass before every setting is back and
-  what the service saw in that gap.
-
-**Reading the log.**
-
-| Line | Meaning |
-|---|---|
-| `gate: a sense is blind` | a reading failed; nothing is given back until it returns |
-| `gate: pods scaling up` | pods first, machines after |
-| `decision failed (n in a row)` | the cluster could not be reached; nothing was written; turn it OFF for native |
-| `decided_by: compass` | the compass set the wires this decision |
-| `decided_by: fail_up` / `blind_fail_up` | the service crossed the 0.95 wall, or a sense went blind: full capacity at once |
-| `decided_by: thermal_hold` | the card reported a heat slowdown; nothing was tightened |
-| `foreign_writer` | someone else changed a knob; Omni-Compass now observes only |
-| `restored ... ok: true` | the OFF switch put every setting back and read it back |
-| `"watchdog": "handed back"` (in the watchdog's own log) | a governor died or hung without handing back; the watchdog ran its recorded restore command; `ok` says whether every command exited 0 |
-| `cruise: on` / `cruise: off` | work waited for a place for two decisions: machines in service up to the pool's own top; the line has been empty for two: cruise ends |
-| `idle_floor` | the work is done and demand is at zero: the pedal lifted all the way, straight to the floor in one move |
-| `verdict_state: left native` | no step of the slow knob passed the paired trial: the knob is never moved on this muscle |
-| `shield_interventions` | the shield clipped a write to its bounds or its step limit; the count says how often |
-| `overhead` (the last line of the audit) | the governor's own CPU over the window: its process and every command it ran |
-
-**How to read an audit from end to end.** The audit (`audit.jsonl`, one JSON record a line, every line timestamped) is the
-governor's complete account of itself, and a reader can follow a run through it without the manual: the first lines are
-the snapshot (every setting as found, written to the objects as annotations so a watchdog can restore from them); then,
-every decision, the readings (the response time and its age, the pods waiting, the machines seen, whether any sense is
-blind), the compass's position and force (`compass`), the authority the nervous system granted and the release gate's
-reason (`authority`, `node_gate`), the decision itself (the machines recommended against the machines seen, the HPA
-target set), every write with the command that made it and the value read back, and the decision's wall time
-(`decision_ms`); in cruise, the floor step's silence; at the end, the reset's writes and read-backs and the `overhead`
-record. The benchmark harness prints a decision trail from the audit at the end of every omni arm (`scripts/kind_bench.sh`),
-one line a decision, so a reviewer reading a run's log sees what the governor saw and did at each minute.
-
-## 12. Maintenance, Upgrades and Security
-
-- Run `python3 verify.py` after every upgrade; it must end `VERIFICATION: PASS`.
-- Upgrade in watch mode first; take the levels again from level 1.
-
-**What an upgrade is, and what it is not.** The engine is frozen and fingerprinted (section 15). An upgrade that changes
-any engine file, a rule, a gain, a guard, a preset or a muscle, is by definition the next engine version, and every
-published result is run again on it before it is quoted beside the old ones; `tools/omni_version.py` says which version a
-checkout carries, and a checkout that matches none says which files differ. An upgrade that changes only the harness,
-the tools, the tables or this manual leaves the engine's fingerprint as it was and every result standing; the robustness
-harness of section 16.8 is an example, built without touching an engine file. An operator can therefore tell, from one
-command, whether a new checkout is the engine the results were made on or something that must prove itself again.
-- The container runs non-root, read-only, with no capabilities; the Kubernetes identity has only the permissions of
-  the level you run.
-- The GPU governor needs root only for `nvidia-smi -pl` and `-lgc`.
-- Report a security issue as `SECURITY.md` describes.
-
-**Least privilege, proven on every run.** The Kubernetes governor runs as its own service account
-(`deploy/kind/rbac-omni.yaml`) with exactly the verbs the level needs: patch on the governed HPA, nodes, pods and the
-governed deployment, get on its security ConfigMap, create on pod evictions. It cannot delete nodes, create or delete pods
-or deployments, touch the load generator or anything in `kube-system`, read any secret, create a namespace, or write its
-own security hold. Every benchmark arm records `kubectl auth can-i` for each of these and fails if a "cannot" reads yes
-or a "can" reads no (`bench-*/rbac_omni.txt` in every archived run). The security hold itself is a ConfigMap another
-identity owns: when its key reads `hold: "true"` every expansion is blocked, and the governor cannot clear it.
-
-**What never leaves the repository.** Cloud credentials live only in the repository's encrypted secrets and are used
-only by the workflows that need them; no credential, key or token appears in any file, log, table or commit, and the
-founder is never asked for one in conversation. The repository carries SPDX license identifiers on every source file so
-that license scanners (Black Duck, FOSSA, Snyk) read the evaluation license correctly, and every generated report carries
-the legal notice at its head and foot (`tools/legal.py`). Patent, copyright and trademark filings are referred to as
-filed; no filing number appears anywhere.
-
-**Supply chain.** Everything the benchmarks download is pinned and checked: metrics-server by version and SHA-256
-(`scripts/kind_bench.sh`), Apache Kafka against the Apache Software Foundation's own SHA-512 file for that release,
-Redis as the Ubuntu runner's own package, MongoDB from its publisher's own repository signed by the publisher's key and
-YCSB against the SHA-256 written in its preregistration, gym-pybullet-drones at one named commit, Python packages by
-`requirements.txt`. A download whose checksum does not match stops the run before anything else happens.
-
-**The upgrade drill, step by step.** An operator who receives a new checkout does five things, in order, and stops at the
-first that fails. First, `python3 tools/omni_version.py`: if it prints the version the operator's results were made on, the
-engine is unchanged and the rest of the drill is about the harness; if it prints a list of differing files, the checkout
-is a new engine and nothing the operator measured before applies to it until measured again. Second, `python3 verify.py`,
-which must end with its pass line; the verifier runs every unit test, the shield's adversarial cases, the Python-against-C++
-agreement and the release manifest, and a checkout that fails it is not installed anywhere. Third, the wire check on the
-operator's own stack, which proves that every wire the new checkout would use still follows, reads back and returns.
-Fourth, watch mode for at least one full cycle of the operator's load, reading the log the governor would have written
-and comparing its would-be decisions against what the operator would have done. Fifth, the levels again from level one,
-each with its paired receipt. An upgrade that skips a step has not been upgraded; it has been installed.
-
-**The security hold, and who holds it.** The hold is the one control that outranks the governor's own judgment, and it
-is deliberately not the governor's to hold. It lives in a ConfigMap owned by another identity (the operator's security
-team, in practice); while its key reads true, every expansion the governor would make is blocked and every contraction is
-still allowed, so a governor under a hold can only give capacity back, never take more. The governor reads the hold on
-every decision and records in its audit that it read it; it has no verb that could write it. The kill switch (section 11)
-is the blunter instrument beside it: the hold constrains a running governor, the switch stops every governor on the machine
-and hands everything back. An operator who suspects anything untoward uses the switch first, reads the audit second, and
-rotates the governor's identity third; the hold is for the slower case of a change window or an incident elsewhere during
-which no one wants capacity added.
-
-**What has been reviewed, and what has not.** Reviewed and tested on every run: the governor's permissions against the
-list above, read from the cluster itself; the shield's refusal of every write past a cover, of every give-back while
-blind, and of every move under a hold, on two million generated cases; the lease and the watchdog's hand-back on a real
-cluster, thirty times (section 16.4b); the checksums of every download. Not yet done, and said so: an independent
-security review of the code by a party outside the company, which is in the open program (section 16.8), and a
-penetration test of the deployed governor on a customer-like cluster. Until those are done, the operator's own review
-stands in for them, and this section tells the operator exactly what to look at.
-
----
-
-# PART VI - PROVING IT
-
-## 13. Paired Runs and Receipts on Your Own System
-
-The method of every benchmark in this manual is the method a reader can use on their own system, and it is deliberately
-simple: the same system, the same work, native and then omni back to back on the same machines, repeated with the order
-rotated, each gauge reported with the 95% interval of its paired difference. Pairing is what makes a difference of a few
-percent visible on a shared machine whose own noise is larger than that: two arms run minutes apart on one runner see the
-same neighbours and the same hour, so their difference is a difference between arms, while two arms on separate machines
-differ by about 15% in p95 on their own. The order rotates so that no arm always runs first, warm or cold. The work is held
-equal by an open-loop load, a fixed rate of requests at fixed moments, so that a lower resource count can never mean that
-less work was done. The steps below are the whole method.
-
-1. **Paired runs.** Run your service the same way twice, once native and once with Omni-Compass on top, back to back
-   on the same machines, the order rotated, at least 5 times (10 for a result you publish). `scripts/kind_paired.sh`
-   and `tools/live_reps.py` do this on Kubernetes; `scripts/gpu_rented_run.sh` does it on a GPU box, in one command:
-   wire check, smoke, the six organisms with the card inside, then the preregistered counted run.
-2. **The switch drill** after every run: turn Omni-Compass OFF; check every setting is back at its recorded
-   original; turn it ON.
-3. **The receipt.** Each gauge: native, Omni-Compass, the change, the 95% interval of the difference, and whether the
-   interval excludes zero. A change is proven only when it does.
-4. **The label, by rule written before the run:** SUPERIOR WITHIN GUARDRAILS / ENERGY IMPROVEMENT WITH SERVICE
-   TRADEOFF / NONINFERIOR / NOT ESTABLISHED / LESS WORK PER ENERGY / INVALID. Guardrails: work not lower by more than 1%; the share of
-   time outside the service line not higher by more than 1 percentage point. The band-first rule is stricter: no win
-   is claimed while the time outside the service line is above native's.
-
-**At scale (modelled).** The six organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
-(`bash scripts/scale_ladder.sh`) at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of each
-organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`); the six organisms with
-a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on GitHub) and `big-organism` and
-`big-organism-detached` (1,000 copies on a rented machine).
-
-5. **Preregister, then run.** The arms, the knob, the cover, the gauges and the readings are written before the first
-   counted run (`docs/*_PREREGISTRATION.md`); the rules are frozen on one tuning case and then applied unchanged to
-   untouched cases. A rule changed after a result is a new version of the engine (section 15), never a footnote.
-6. **The clock rule.** An organism must keep its window. `tools/run_kil.py` records how long after the window its last
-   step ended; the report shows it as "organism behind its window (s)", shown and not judged, and marks a repetition
-   **OFF THE CLOCK** when either arm ended more than 5% of the window late, because its last steps then saw a cluster
-   whose load schedule had already ended. The pairing stands (both arms slip alike) and the mark stays on the cell. The
-   remedy is a longer window for that size on that machine, never a faster reading of the same run.
-7. **Every row, losses included.** A row that went against Omni-Compass is reported with the others. If Omni-Compass
-   loses, the first suspect is our own wiring, native setup or scoring; that is fixed and the test run again, and the
-   loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut out.
-8. **The raw files live with the code.** Every finished run's files (capture, response times, audit log, controller
-   log, one SHA-256 manifest per repetition) are copied into `results/live/raw/run-<id>/` by the `archive-run`
-   workflow (one run id per line in `.github/archive_request.txt`; a run still going is left for a later pass), and
-   every table names the runs and the commit it was made from.
-
-**How many repetitions, and why.** The width of a paired interval shrinks with the square root of the number of pairs,
-so going from five pairs to ten narrows it by about a third, and from ten to forty by half again. On GitHub's runners,
-ten pairs of a 900 s window put the interval on work inside the line at about Â±10 points of native and on p95 at Â±13
-to Â±29 points (the all-four table: +48.6% with an interval of +38.7 to +58.4; p95 âˆ’61.6% with âˆ’74.8 to âˆ’48.4), wide
-intervals that still clear zero because the gains are tens of percent; the energy intervals on the same runs are Â±0.2 to
-Â±3%, narrow because the gauge is a declared formula over counts of machines, and that is why energy there reads "no
-difference beyond the noise" honestly rather than as a small claimed gain. A gain of a few percent on a cluster would
-need forty pairs or more to clear zero at these widths, and the manual does not claim one anywhere a table shows it
-inside the noise. Three pairs of a 7,200 s window, the long run's shape, give a wider interval on each run
-but three such runs, each read on its own, still have to agree in sign for a reading the same in all three of our runs. On a stack with a finer
-knob (connections, consumers, megabytes) the intervals are narrower at three pairs than the cluster's at ten, because
-the knob moves in hundreds of small steps rather than in whole machines. An operator planning their own receipt should
-run five pairs first, look at the interval widths on the gauges they care about, and set the count for the published
-run from those widths, never from the result.
-
-**Why the load is open-loop.** A closed-loop load generator waits for each answer before sending the next request, so
-a slower system is offered less work and its throughput "improves" its own latency; two arms under closed-loop load are
-not doing the same work. An open-loop generator sends requests at fixed moments whatever the system does, so both arms
-are offered the same work to the request, a queue forms when the system falls behind, and the time over the line and
-the failed requests record the cost. Every real-stack test in this program (the cluster's load generator, pgbench's rate
-limit, Kafka's producer at a fixed rate, Redis and YCSB at a fixed target rate) offers its work open-loop, and a lower
-resource count in the omni arm can therefore never mean less work was asked.
-
-**What a receipt looks like.** One row per gauge: the gauge's name and direction; native's value and omni's; the paired
-change as a percentage of native with its 95% interval; the reading. A head naming the system, the knob, the cover, the
-window, the number of pairs, the order rotation, the engine's fingerprint and the commit; a foot saying whether every
-arm was handed back and whether any repetition was off the clock. `tools/live_reps.py` prints exactly this for a
-Kubernetes run and the three-run tools print it for three runs side by side; a receipt from any other tool should be
-laid out the same way so that a reader of this manual can read it without learning a new shape.
-
-## 14. Evidence Classes and How to Read a Result
-
-**One number, one word.** In every table a change keeps its raw sign: a response time that fell reads "-65%", a cache
-that grew reads "+300%", and the Reading column beside it gives its word, GAIN, EVEN or LOSS, decided by what the gauge is
-for and never by its sign (the key at the front of this manual): a response time cut 65% is GAIN, a cache grown 300% is
-**power given**, a fall in work is LOSS. The benefit sheet (`docs/BENEFIT_SHEET.md`, built from the tables by
-`tools/benefit_sheet.py` and checked by `verify.py`) turns every gauge the same way round against **each gauge's declared
-aim** (each preregistration's): plus is a GAIN, minus a LOSS or power given, whatever the gauge measures, and 0% is EVEN,
-nothing beyond the noise. Beside it every change the same in all three of our runs is written in words, never as a bare
-sign: "p95 cut 65% (GAIN)", so it cannot be misread against a
-table that shows the same change as "-65%". One number per benchmark, by the index's own rule, with its word
-beside it (GAIN, GAIN with power given, GAIN AND LOSS, EVEN, power given or LOSS). The wiring page (section 16.6b) uses the same words. A reader who wants one figure for a benchmark reads that
-sheet; a reader who wants the rows behind it reads the table it names, and reads its Reading column, never the sign alone.
-
-| Class | Rung | What it is | What it can show |
-|---|---|---|---|
-| T / V | E1 | deterministic tests, proofs, Python against the C++ twin | the law is what it says, and both languages agree |
-| S | E2 | a run on a modelled plant, our own model | whether the law helps the model, and where it breaks |
-| L | E3 | real software (Kubernetes on kind), no hardware meter | real decisions on real software; energy there is a declared model |
-| P | E4 | a physical meter (the GPU's own power reading) | the hardware's own answer |
-
-Read every number with its class beside it. A modelled number is never quoted as a hardware result. When a
-receipt's energy line is modelled, the receipt says so.
-
-**What each class can and cannot carry, with the examples in this manual.** A class **T / V** result (the C++ twin
-agreeing with the Python to 3.6 Ã— 10â»Â¹âµ on 500 trajectories; two million adversarial cases through the shield with zero
-violations) says that the law is what the text says it is and that both implementations compute it; it says nothing
-about whether the law helps any machine. A class **S** result (the 945 muscles, the organisms at 1,000 copies, the power
-grid in pandapower, the robot arms in MuJoCo, the buildings in CityLearn, the drones in PyBullet) says what the law does to
-a published model of a plant under that model's own native controller; it carries exactly the model's fidelity and no
-more, which is why S results are shown beside the Omni index and never inside it, and why the manual says "the energy is
-a declared model" on every S line that reports energy. A class **L** result (real Kubernetes on kind, PostgreSQL behind
-PgBouncer, Apache Kafka, Redis, the organisms with the real cluster inside) says what the law did to real software making
-real decisions on real requests; the machines, where they are containers on one runner, are counted in machine-hours in
-service and their energy, where it is reported, is a declared formula, which the table says; the CPU seconds of the host
-are measured. A class **P** result would say what a physical meter read, and the one P instrument in this program, the
-GPU's own power reading, has no current result: every earlier card result ran on a controller since replaced and is
-obsolete. Azure's bill is an L result with a real bill: the machines billed are Azure's own count, the price is Azure's
-list price, and the energy is still not a meter.
-
-**How to read a row.** Every row in every three-run table has the same shape: the gauge and its direction; native's
-value in run A and omni's value in run A, so the size of the numbers is visible; the paired change in each of the three
-runs as a percentage of native with its 95% interval; and the reading. Read the reading first, then the intervals, then
-the sizes. A reading of "GAIN in all three of our runs" with intervals of âˆ’0.5% to âˆ’0.1% is a small, real effect; a reading of "no
-difference beyond the noise (3 of 3 runs)" with intervals of âˆ’30% to +25% is a test that could not see an effect of that
-size either way, which is a statement about the test's power, and the manual says so where it applies (the 4-worker Azure
-fleet). A "LOSS in all three of our runs" row stands in the table, and enters the index as a loss.
-
-**A worked reading, from the cache table.** Take the Redis table's `large` workload (`results/live/V3_REDIS.md`). The
-product row, work inside the 2 ms line, reads GAIN in all three of our runs, with the three runs' paired changes each clear of zero and
-of the same sign; that is the gain. The resource row, the memory ceiling held, reads power given in all three of our runs: Omni held a ceiling
-of about 256 MB on average where the operator had set 64 MB, in every run, clear of zero. The two rows together are the result: the
-cache answered more requests inside the line because it was given more memory, and the table says both. A reader who
-quotes the first row without the second has misread the table, and the index is built so that this cannot happen there:
-the cache's category enters the one number as a loss (about 0.75 on its own), because the resource it spent is counted at
-full weight against the work it gained. The CPU row, inside the noise, says the host did not pay in processor time; the
-failed-request row, zero in both arms, says nothing was refused to get there. Four rows, three directions, one honest
-sentence: more work inside the line, bought with memory, at no cost in CPU or refusals. That is how every table in
-section 16 should be read, row by row, before any sentence about it is written.
-
-**Three questions to ask of any class L result.** First, what was native, exactly: which controller, at which published
-version, with which settings, and were those settings an operator's or ours? (Every preregistration names them; the
-broker's native was set at its knee by design and says so.) Second, what did the governor spend: machines, memory,
-connections, CPU, its own cost? (Every table has the resource rows; a result with a gain and no resource row is not in this
-program.) Third, who else could have produced the gain: the order of the arms, the warm-up, the runner's neighbour, the
-clock? (Rotation of the arm order, the warm-up before every window, the paired design on one machine and the clock rule
-are the answers, and section 16.7 names the residue they do not remove.)
-
-## 15. The Frozen Engines and the Three-Run Rule
-
-**The engine is frozen, and every freeze has a fingerprint.** The engine is the compass law
-(`omnicompass/compass_law.py`), the live controllers (`omni_controller/`), the realms with their muscles and six
-organisms (`realms/`), and the runners of the independent simulators (`tools/run_kil.py`, `run_citylearn.py`,
-`run_pandapower.py`). `OMNI_V1.json`, `OMNI_V2.json` and `OMNI_V3.json` hold one SHA-256 per file and one digest over
-all of them. Any change to a rule, a gain, a guard, a preset or a muscle makes **the next version**, and every result is
-run again on it; no result is ever read across versions. When the engine is declared final, the engine that stands then
-is published as Omni-Compass 1.0 and the older fingerprints go to `docs/history` as the road to it, never as a second
-product.
-
-| Engine | What changed | Fingerprint | Results read on it |
-|---|---|---|---|
-| **v1** (`docs/OMNI_V1.md`) | the compass law, the controllers, 656 muscles in 46 families, six organisms; the power-grid runner added inside the version without touching any other engine file | `ccc7fbdf8b312ed7â€¦`, 38 files | the six Kubernetes tests A/B/C, the six organisms with the cluster inside, the big organisms, Azure steady and burst, CityLearn, the power grid, the robot arms, the modelled realms |
-| **v2** (`docs/OMNI_V2.md`) | v1's law, controllers and runners byte for byte; the catalog grown to 945 muscles in 59 families with thirteen new presets | `OMNI_V2.json` | the modelled realms (Physics and the tower read a service tradeoff: the cause was found and made v3) |
-| **v3** (`docs/OMNI_V3.md`) | v2 plus the slack gate on speed knobs (a motion axis busy more than half the time at full speed keeps its speed native) and the marine preset | `b53d05449ee04c4b`, 40 files | the modelled realms A/B/C (every organism superior within guardrails, 0 LOSS or power given), the grid at 1 and 10 copies, the cluster inside the organisms at 10 and 100 copies, the database A/B/C, the robot arms A/B/C, CityLearn A/B/C; the Kubernetes six tests, the power grid, Azure and the 1,000-copy organisms running |
-
-```
-python3 tools/omni_version.py                   # this checkout: omni-v3, omni-v2, omni-v1, or every file that differs
-python3 tools/omni_version.py --commit <sha>    # the engine at the commit any result ran on
-```
-
-A commit that holds every engine file but one not yet written reads as that version with the file named ("omni-v1, 37
-of 38 files, all v1 bytes; not yet in this commit: tools/run_pandapower.py"): a v1 result for every test but the one
-that runner serves, which could not have run there. Every table made by rule checks each run's commit against the
-fingerprint and heads itself with a warning if any run is not the engine it claims or if the three are not separate runs.
-
-**The three-run rule.** Every benchmark runs as **A, B and C**, three separate GitHub runs on the same frozen bytes.
-Every judged row gets one of three readings, and all three runs are shown beside it:
-
-- **GAIN** or **LOSS in all three of our runs** (a resource spent that rose reads **power given**, never a loss): the same sign in all three runs, each with its 95% interval clear of
-  zero.
-- **No difference beyond the noise**: in at least one run the interval includes zero, so native and omni could not be
-  told apart on that measure. That is the result, stated as such, with the count of runs it holds in.
-- **The runs disagree**: runs clear of the noise point different ways. The test itself is then unstable on that
-  measure, and it is looked into before anything is claimed.
-
-The tables are made by rule, never by hand (`tools/confirm_abc.py` for the paired
-Kubernetes and Azure tests, `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`,
-`pandapower_abc.py`, `citylearn_abc.py`; a deterministic simulator's three runs must reproduce each other to the digit,
-or to the declared tolerance where the simulator is not bit-reproducible across machines, and a score reads "the runs
-differ" when they do not), and `tests/test_confirm_abc.py`, run by `verify.py`, proves the rule on fixed cases.
-
-**Why three separate runs, and why the readings are what they are.** One run of ten paired repetitions gives one
-interval, and an interval from one run can be narrow by luck: the runner was quiet that hour, the order of arms happened
-to favour one side. A second run on another day and another machine is a replication; a third makes a coincidence
-expensive. The three runs are separate GitHub runs, which means separate machines, separate hours and separate
-installations of every dependency, so what agrees across them is not an artefact of one machine. The readings are
-designed so that there is no reading a reader could mistake for a weaker form of "yes": a row is counted only when all three runs move the same way with every interval clear of zero; a single run whose interval crosses zero makes the row
-"no difference beyond the noise", and the count says how many of the three; and two clear runs that disagree in sign are
-reported as a disagreement, which is an instability in the test to be found and fixed, not averaged away. The tables are
-made by tools, not by hand, and the tools check each run's engine and refuse to mix engines.
-
-**The Omni index** (`tools/omni_index.py`, `results/OMNI_INDEX.md`) is the one combined number. Every measure of every
-test is a ratio oriented so that above 1 is a GAIN for Omni-Compass on top of native: work (more), speed (a lower
-response time), machines (fewer), energy (less). A test's index is the geometric mean of its ratios, a category's the
-geometric mean of its tests, the headline the geometric mean of the real categories, each weighted the same. A measure
-enters only as its three-run reading allows: GAIN, LOSS or power given in all three of our runs counts as the geometric mean of the runs'
-ratios; EVEN, no difference beyond the noise, counts as exactly 1. Modelled muscles are shown beside the index, never inside it.
-
-**Why geometric means, and three rules a referee should check.** A ratio of 2 and a ratio of 0.5 are the same size of
-effect in opposite directions; their arithmetic mean is 1.25, which would read as a gain, while their geometric mean is 1,
-which is the truth. Geometric means also make the index indifferent to which side a gauge is written from (work per
-machine or machines per unit of work), and they let a category of three tests and a category of six weigh the same.
-Three rules follow from the design and can be checked in the tool: first, the tuning workload or tuning cell of every
-benchmark is excluded, because the rules were fitted on it; second, no row inside the noise contributes anything, in
-either direction, so the index can never be moved by a run that happened to be quiet; third, the categories are the real
-ones only (Kubernetes, the database, messaging, the cache as it lands, Azure and the card as their tables land), each
-weighed the same whatever the number of tests inside it. The index therefore answers one question only: across every real
-category the same in all three of our runs, what did Omni-Compass on top of native deliver in more work, faster answers, fewer
-machines and less energy, counting the resources it spent against it. The index page says, where a ratio is large, why
-it is: in messaging, native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and
-Omni's did not, and a queue kept short against a queue that grows is a large ratio in response time.
-
-## 16. Results to Date
-
-Every result below, read together in one place with what each shows and what it does not, by evidence class and
-engine, newest first: *The Receipts, in Their Totality* (`docs/THE_RECEIPTS.md`). The decisive receipt not yet
-produced is the physical one: the chip's own energy meter on a real GPU, on the current governor, on the same clock
-as the Kubernetes runs.
-
-Every result below is Omni-Compass **on top of** a native system against the same native system alone, with the same
-work in both arms, read by the three-run rule of section 15, on the engine named. Losses are in the tables beside the
-gains. The whole list, benchmark by benchmark with its native engine, its knob, its gauges and its file, is
-`docs/REGISTER.md`; the program that takes every benchmark to full size is `docs/PROOF_PROGRAM.md`.
-
-How to read the chapter. Each section names the stack, the native controller Omni-Compass sat on, the one knob it moved,
-the result file in `results/live/` or `results/`, the three GitHub run numbers (or the rented machine's start and
-collect runs) and the engine version those runs were on; a reader can open the file, find the runs under the repository's
-Actions tab, and check the commit with `tools/omni_version.py --commit`. The figures quoted in prose are the table's
-figures and no others; where a range is given ("âˆ’13% to âˆ’37%") it is the span of the three runs' point estimates, not an
-interval. Every row of every table has one of the readings of the three-run rule (section 15): GAIN in all three of our runs, LOSS in all three of our runs, no
-difference beyond the noise with the count of runs, or the runs disagree; rows that are shown and not judged say so and
-why. A loss is written in the same sentence as the gain it came with, never in a footnote, and the index (section 16.6)
-counts every loss in all three of our runs against Omni at full weight.
-
-Two cautions a referee should hold while reading. The real-software results (evidence class L) were taken on GitHub's
-shared runners or on single rented machines, with the host's CPU-seconds as the only measure of energy and no meter on
-the wall; sections 13 and 14 say what that does and does not allow. And the modelled results (evidence class S) are
-reported as what they are, our own plant models run whole, and are never summed with the live ones; the index is built
-from the real categories alone, and the modelled realms sit beside it as a separate finding about the law's coherence
-at scale.
-
-### 16.1 Real Kubernetes: seven tests, ten pairs each, three runs each
-
-The six Kubernetes tests were designed to ask six different questions of the same cluster, and they are read together; a
-seventh, added on 8 October, asks the same questions under a day of demand that somebody else measured.
-The cluster is kind: a real Kubernetes control plane and six worker nodes as containers on one 4-core GitHub runner, with
-a real metrics-server, a real HPA at the operator's target of 50% CPU, a real PHP service behind a NodePort, and a real
-load generator whose replica count steps through a schedule identical in both arms. A real probe times HTTP requests
-every five seconds from outside the service. Native is that cluster with its HPA alone; omni is the same cluster with the
-compass law on the HPA target inside [30%, 50%] and on the machines through the release gate and the verdict. Both arms
-start from the same fresh cluster, run for 900 s after a 120 s warm-up, and end with the reset check.
-
-- **Steady work in steps** (`V3_STEADY.md`) asks: at a fixed, stepped load, does the governor hold the same work with
-  fewer machines or faster answers? Work is equal by design. On the sets of 10 October the 95th percentile fell 64% to 66%
-  and the 99th 69% to 73% in all three runs; machines in service fell 1.7% to 2.0% and the standby-model energy 1.3% to
-  1.8%; time over the line fell 97% to 99%; failed requests were zero in both arms. The machine saving is small because the
-  verdict kept every machine whose removal made requests slower in the paired trial.
-- **Demand that wanders** (`V3_WANDERING.md`) asks: when load goes up and down one step at a time, does the governor
-  follow it without harm? p95 fell 57% to 64%, the mean 45% to 50%, time over the line 36% to 42%, and failed requests 12%
-  to 13%, all GAIN in all three of our runs; machines read inside the noise and the idle-power energy model fell 0.1% to 0.4%.
-- **All four in one run** (`V3_ALL_FOUR.md`) asks the product question: more work, faster, on fewer machines, with less
-  energy, in one run. Work inside the response line rose **54% to 68%**, p95 fell 57% to 63%, the mean 43% to 48%, time
-  over the line 38% to 41%, failed requests 11% to 14%, all GAIN in all three of our runs; machines and energy inside the noise.
-- **Faults** (`V3_FAULTS.md`) asks: when a machine dies, traffic triples, a pod runs away and the probe goes blind, at
-  the same moments in both arms, does the governor slow recovery? p95 fell 58% to 63%, the mean 34% to 51%, time
-  over the line 27% to 43% and failed requests 14% to 18%, all GAIN in all three of our runs; machines and energy inside the noise.
-- **A queue of batch jobs** (`V3_BATCH.md`) asks: when the work is a pile, do cruise and idle finish it
-  no later and hand the machines back? Machines fell 16% to 20% over the window and 26% to 33% after the queue finished,
-  the standby-model energy 11% to 14%, the mean response 11% to 13%, all GAIN in all three of our runs; the queue finished no
-  differently beyond the noise in all three runs (on v1 it had read 0.7% to 0.9% later, a loss that stayed in the record).
-- **Fairness** (`V3_FAIRNESS.md`) asks: does the governor help or hurt a noisy neighbour on the same workers? No difference
-  beyond the noise on every row, the neighbour's own p95, p99, failures and time over the line included.
-- **A public day of demand** (`V3_TRACE_GOOGLE2011.md`, `docs/TRACES_PREREGISTRATION.md`) asks: when the shape of the load is
-  not ours, does the governor still read the same way? The first day of the Google cluster trace of 2011 (jobs submitted an
-  hour, 18 public parts named with their SHA-256) was turned into the wandering test's schedule by a rule written before the
-  runs (min-max onto 1 to 8 generators, one step a bin, 24 steps of 108 s), and everything else was the wandering test's. p95
-  fell 64% to 67%, p99 60% to 62%, the mean 51% to 53%, time over the line 81% to 82%, failed requests 11% to 18%, machines in
-  service 7% to 9%, HPA replicas 4% to 8%, the standby-model energy 5% to 7% and the idle-power model 0.3% to 0.4%, all
-  GAIN in all three of our runs (ten pairs each); no pod was ever without a machine. The machines row is the same in all three of our runs here, where the
-  wandering test's was inside the noise, because the trace has a long quiet stretch (six hours at two generators) in which
-  machines are given back and our own schedule had none.
-- **On top of Kubernetes with its add-ons** (`V3_KEDA_CPU_REQUESTS.md`, `V3_KEDA_REQUESTS.md`,
-  `docs/ADDONS_PREREGISTRATION.md`) asks: when native is the stack clusters actually run, with KEDA 2.21 and its HTTP add-on
-  0.16 owning the service's autoscaler, does the governor still add anything on top? Its moves reach KEDA's ScaledObject
-  through the plug (`scripts/kubectl_keda.py`), because KEDA rebuilds the autoscaler from it and would undo a move written
-  anywhere else. With KEDA on the CPU target and the requests in flight, p95 fell 51% to 53%, p99 60% to 62%, the mean 36%
-  to 39% and time over the line 97% to 100%, all GAIN in all three of our runs; machines did not change beyond the noise. With the HTTP
-  add-on alone, p95 fell 73% to 76%, the mean 59%, machines in service 5.9% to 7.8% and replicas 14%, all GAIN in all three of our runs.
-  In both setups the energy counted with every parked worker at idle power rose 1.0% to 2.6%, **power given in all three of our runs**, and it
-  counts against the governor in the index: the load is closed-loop, so the faster answers drew 24% to 54% more work
-  through the service (its CPU, shown and not judged), and the modelled watts rose with the work while the energy per
-  core-hour fell 18% to 36%. The next run counts the requests served and gives native a node autoscaler (Karpenter, on
-  Azure).
-
-The first v3 sets of 7 and 8 October read the same way (the all-four work +35% to +49%, the batch machines âˆ’19% to âˆ’23%) and
-are whole in `docs/history` as `_set1`; the numbers above are the sets of 10 October, every test run again on one commit.
-The same six tests were run on Omni v1 with the same readings (`V1_*.md`), the controllers being the same bytes, and the
-v1 tables stay as the first engine's record. The earlier engines' sets, before the verdict, parked 29% to 36% of the
-machines and paid for it in response time (`docs/history/`); the frozen engine puts service first, and that choice is
-visible in every machines row above.
-
-### 16.2 The organisms with the real cluster inside, and the big organisms
-
-The six modelled organisms were run with the kind cluster inside as one more muscle at 1, 10 and 100 copies on GitHub
-(`V1_SIX_KUBE.md`, `V3_SIX_KUBE.md`) and at 1,000 copies on a rented Azure machine (`V1_BIG_ORGANISM.md`). At 10 and 100
-copies on v3, every one of the twelve cells read GAIN on four to six gauges (response time, time over the line, the
-organism's energy and its time over its own line) and LOSS on none beyond the noise, except a rounding-level work loss
-of six to eleven parts in a million in four cells, which the table shows. The four stacked at 100 copies ran off the clock
-in four of five repetitions (up to 277 s past a 1,440 s window): the machine could not step 170,000 muscles inside the
-window, both arms slipped alike, the pairing stands and the mark stays on the cell. At 1,000 copies on v1 the tower
-answered its slowest 5% in 0.2 s against native's 4.1 s and was over its line 0.2% of the time against 64%; the four
-stacked read p95 âˆ’74% and p99 âˆ’83% with the compass arm 300 to 615 s past its 2,880 s window in all three repetitions,
-marked off the clock, which is why the v3 stack was run with a 10,800 s window. **On v3 the four stacked at 1,000 copies**
-(`V3_BIG_ORGANISM.md`: 1.7 million muscles on one clock with the real cluster inside, three paired repetitions on one
-rented machine over 29 hours, 240 steps of 45 s an arm) **kept the clock in both arms**, 22 s behind a 10,800 s window
-(0.2%), and read: the cluster's slowest 5% answered in 150 ms against native's 2,882 ms (âˆ’95%), its slowest 1% in 165 ms
-against 5,405 ms (âˆ’97%), time over the response line 51% of samples to none, failed requests 0.14% to none, all clear of
-zero with three pairs; replicas, pods started and machines (six in both arms) the same; the standby-model energy âˆ’0.6%
-inside the noise; the host's CPU âˆ’1%, shown. The organism's own model (class S, shown beside the cluster and never inside
-the index) read energy âˆ’0.4% and work per energy +0.4% higher, time over its own line âˆ’0.7% lower, and work âˆ’0.0006%, a
-rounding-level model difference that the rule reads as LOSS and the table shows as such. The v1 stack's loss, the compass
-arm falling off the clock, is gone with the longer window; the gain, the cluster's tail, is the same shape at 1,000 copies
-as at 10 and 100. **The whole tower at 1,000 copies** (945,000 modelled muscles; started by run 37756284680, collected by
-run 37945866426 on 9 October after 25 hours on a second machine of the same type, commit `6f0f93e5`, Omni v3) read the same
-way and harder: the cluster's p95 6,690 â†’ 160 ms (âˆ’98%), p99 9,068 â†’ 187 ms (âˆ’98%), time over the response line 76% of
-samples to none, failed requests 4.8% to none, all clear of zero with three pairs; replicas (9.97 in both arms), pods
-started (4 against 3.7) and machines (6) the same or inside the noise; the standby-model energy âˆ’0.3% inside the noise;
-CPU with the governor's own âˆ’2.5% and the host âˆ’1.2%, shown; both arms 14 s behind the 10,800 s window (0.13%), on the
-clock in every repetition; the organism's own model energy âˆ’0.4% lower and work âˆ’0.0004%, the rounding-level loss the
-rule reads as LOSS. Native's own tail was longer under the tower than under the stack (6.7 s against 2.9 s at the 95th
-percentile) because the tower's 945 distinct muscles drive the load generator harder at its peaks, and the governor's
-answer was the same 150 to 160 ms under both.
-
-### 16.3 The bill on a real cloud
-
-Azure Kubernetes Service with Azure's own cluster autoscaler as native (`V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): five
-paired repetitions each on a 4-worker fleet, every machine billed every 15 s at list price, a fresh cluster per arm. Every
-gauge read no difference beyond the noise; the bill read âˆ’4.7% on steady load and +5.0% on the burst, both with intervals
-across zero; the burst's p99 read âˆ’34% clear of the noise in that one run. This is the honest reading of a fleet in which
-one machine is a quarter of the fleet, so that only a saving of about 30% could clear the noise against an expected saving
-of a few percent (section 10.1). The fleet of 40 workers in nine machine families that can show one machine is
-preregistered (`docs/K8S_COMPASS_PREREGISTRATION.md`, amendments 1 to 4) and has been refused by Azure's own cluster
-capacity in its region on every dispatch so far, each refusal recorded; it runs the moment the region admits a cluster.
-
-The refusals are themselves part of the record, and the preregistration's amendments 5 to 7 keep the count: six dispatches
-and 29 refused repetitions in eastus, each with Azure's own reason (its managed-Kubernetes capacity in the region, not
-the subscription's quota), a survey of every other region showing none with the vCPU quota the fleet needs, one dispatch
-cancelled by hand and recorded as such, and the seventh dispatch left to try. That seventh dispatch was refused on all
-five of its repetitions over the morning of 8 October, 34 refusals in all (amendment 8); whatever the region admits on a
-later dispatch is read by the same table as the four-worker runs, with the refused repetitions counted in the amendment,
-not in the table. A reader should take
-from this what it says and no more: the small fleet's bill reading is inside the noise by the arithmetic of its size, the
-large fleet's reading does not exist yet, and nothing about the bill on a real cloud is claimed in the index until it does.
-
-### 16.4 A real database, a real message broker, a real cache
-
-Three stacks whose knob is a resource an operator sizes once and leaves, run as the same shape of test: three paired
-repetitions a run, three runs, the operator's fixed setting as native, the compass on that setting through the stack's own
-console as omni, a tuning workload shown and not counted, and untouched workloads judged.
-
-- **PostgreSQL 16 behind PgBouncer** (`V3_PGBENCH.md`, the second counted set of 8 to 9 October on amendment 2; the first
-  set's table kept whole in `docs/history/V3_PGBENCH_set1.md`): the first set had read connections held open âˆ’61% to âˆ’72%
-  on `select` and `tpcb_hot` with the host's CPU +14% to +28% and the median latency +15% to +17%, all the same in all three of our runs. The CPU was
-  then measured and found to be the harness's own `psql` launches, one per reading, not the pooler (+55.9 CPU-seconds on the
-  launches against a +52.8 s host difference on a metered repetition; PgBouncer +1.2 s), and the median was the pool shrunk
-  into a queue the pooler itself reported (section 10.2). On the amended harness (one console connection an arm; a server
-  taken back only while clients waited under 1% of the pooler's time, servers added back one per percent of waiting up to
-  the operator's 20) the costs are gone: host CPU and median latency inside the noise on all three workloads. The gain is
-  smaller and real: **connections held open âˆ’36% to âˆ’38% on `select`, GAIN in all three of our runs**, with p95 inside the noise and the
-  tails higher as point estimates in two runs, inside the noise by the rule; the runs disagree on `tpcb_hot` (+5%, âˆ’46%, âˆ’48%: on one runner
-  the add rule fired, on two it did not); on `simple_update` the add rule of amendment 1 bought servers above the operator's
-  20 on a slow write workload and **connections most at once read +72% to +80%, power given in all three of our runs**, nothing bought for them,
-  as in the first set. 1 gauge-row GAIN, 1 LOSS or power given, 1 where the runs disagree; the category entered the index at +4.0%.
-  **The set of 10 October, the first with the brain's own verdict on the pool (amendment 3), is the result of record:**
-  connections held open **âˆ’6% to âˆ’11% on `select`, GAIN in all three of our runs**; the add above the operator's 20 on `simple_update`
-  refused by the trial, as the amendment expected, so that workload reads inside the noise with nothing bought and nothing
-  lost; `tpcb_hot` inside the noise; work, latency and host CPU inside the noise everywhere; every pool handed back. 1
-  gauge-row GAIN, 0 LOSS or power given, 0 disagree; the category enters the index at +0.8%. The second set's table is whole in
-  `docs/history/V3_PGBENCH_set2.md`. Amendment 4 (a spend trial runs to its samples) is declared and the next set runs.
-- **Apache Kafka 3.9.1** (`V3_KAFKA.md`): on light, heavy and burst, work inside the 500 ms line rose 16% to 21%, the
-  end-to-end 95th percentile fell from about 1.6 s to 9 to 14 ms, the mean lag fell 92% to 97%, all GAIN in all three of our runs; no
-  message was lost in any arm; consumers running rose from 2 to 5.8 to 7.9, power given in all three of our runs; host CPU-seconds rose 10% to
-  20% on light, power given in all three of our runs, and read inside the noise on heavy and burst; CPU per thousand messages inside the line
-  fell 10% to 12% on burst. Native sat at nine tenths of its measured capacity by design, so its queue grew at the high
-  steps and Omni's did not; the gain is the queue kept short and the cost is the consumers that kept it so. 21 gauge-rows toward
-  their aims, 8 LOSS or power given, 0 where the runs disagree. **The set of 10 October, the first with the brain's own verdict on the group's
-  size (amendment 2), read exactly nothing under both objectives**: every spend trial in all 36 omni arms was abandoned before
-  it could be judged, the group stayed at the operator's two consumers (1.98 to 1.99 on average, the trials' reference seconds
-  included, a fraction of a consumer GAIN in all three of our runs), and every other gauge read inside the noise, the earlier set's queue
-  and tail gains with them. The cause is ours and is said in amendment 3: the rule ended a spend trial when the service turned
-  calm, and a consumer that drains the queue calms the service within seconds, so no spend could reach its samples. From
-  amendment 3 a spend trial runs to its samples whatever the compass's force; the next set runs on it and becomes the result
-  of record. The first set's table is whole in `docs/history/V3_KAFKA_set1.md`; the category stands at +0.1% meanwhile.
-- **Redis 7.0.15** (`V3_REDIS.md`): on small, large and burst, work inside the 2 ms line rose 14% to 27%, the hit rate
-  14% to 27% and the mean latency fell 30% to 61%, all GAIN in all three of our runs; no request failed; the 95th percentile stayed
-  within a hair of native's, because a miss costs the declared 5 ms trip in both arms and 5% of requests still miss; the
-  memory ceiling held rose from 64 MB to 200 to 270 MB and the memory used with it, both power given in all three of our runs, the resource the
-  gain costs; the host's CPU-seconds read inside the noise on all three; keys evicted fell 76% to 92% (shown); every
-  ceiling was handed back. 12 gauge-rows toward their aims, 6 LOSS or power given, 0 where the runs disagree. The tuning workload, shown and not
-  counted, read the same way (hit rate 75% to 87%, the ceiling 64 to 299 MB). **The set of 10 October, the first with the
-  brain's own verdict on the ceiling (amendment 2), read exactly nothing under both objectives**: the allowance stayed at one
-  notch each way (56 to 72 MB), most trials were abandoned before they were judged (the same trial rule as Kafka's, amendment
-  3), and every gauge read inside the noise. The next set runs on amendment 3 and becomes the result of record; the first
-  set's table is whole in `docs/history/V3_REDIS_set1.md`; the category stands at exactly nothing meanwhile.
-- **MongoDB 8.0.32 under YCSB 0.17.0** (`V3_YCSB.md`, `docs/YCSB_PREREGISTRATION.md`): the knob is the storage engine's
-  cache size, the operator's 512 MB as native, and the question is the opposite of the Redis one: not whether the governor
-  will buy service with memory, but whether it will give memory back without losing service. On workloads c and burst the
-  cache held fell by about half (512 to about 260 MB) and on f by 13% to 37%, GAIN in all three of our runs; on b it fell 27% to 50% but
-  one run's interval included zero, so that row reads no difference beyond the noise; work inside the 1 ms line, p95 and
-  p99 read inside the noise on all four workloads (work between âˆ’2.7% and +1.1%, every interval over zero); no operation
-  failed in any arm; the host's CPU-seconds read inside the noise on all four, +12% to +15% on c with intervals over zero;
-  pages read into the cache rose 14% to 58% (shown, not judged: the misses the smaller cache costs); and one row is a
-  loss in all three of our runs, the mean latency on burst, +2.2% to +3.7% in all three runs, clear of zero, which stands. Every cache
-  size was handed back in every arm. 6 gauge-rows toward their aims, 1 LOSS or power given, 0 where the runs disagree. The tuning workload, shown
-  and not counted, read the same way (the cache 12% to 15% smaller, everything else inside the noise). The disclosure made
-  before the run held: on this machine the data sits in the operating system's page cache too, so a storage-engine miss
-  costs a memory read and a decompression, not a disk read, which is why half the cache could be given back at no
-  measurable cost in work or p95 and a few percent of mean latency; on a machine whose data does not fit in memory the
-  same knob would be asked a harder question, and this table does not answer it. That was the first counted set, kept
-  whole in `docs/history/V3_YCSB_set1.md`. Its audits showed the memory given back in the first five seconds of every
-  burst and c arm, before the first eviction, because a cold cache evicts nothing while it fills (amendment 1, section 10.8:
-  the give-back gate is now the miss share under 1% of requests, as MySQL's). **The second counted set (8 to 9 October) is
-  the result of record:** the cache held **âˆ’21% to âˆ’36% on all four untouched workloads, GAIN in all three of our runs**, settling at
-  330 to 405 MB, where the gate finds the working set, instead of at the floor; the burst mean latency inside the noise (the
-  cost gone); work, p95, p99 and CPU inside the noise everywhere; every cache handed back. 8 gauge-rows toward their aims, 0 LOSS or power given, 0
-  where the runs disagree; the category entered the index at +8.5% (the first set's +10.2% included the artefact). **The set
-  of 10 October, the first with the brain's own verdict on the cache (amendment 2), is the result of record:** the cache held
-  **âˆ’3% to âˆ’13% on `f`, GAIN in all three of our runs**, with `b`, `c` and `burst` inside the noise (two or three trials an arm, one or two
-  allowed, the rest refused or abandoned), work, p95, p99, mean latency and CPU inside the noise on all four, no failed
-  operation, every cache handed back. 2 gauge-rows toward their aims, 0 LOSS or power given, 0 disagree; the category enters the index at +0.7%. The
-  second set's table is whole in `docs/history/V3_YCSB_set2.md`; amendment 3 is declared and the next set runs.
-
-- **MySQL 8.0.46 under sysbench 1.0.20** (`V3_SYSBENCH.md`, `docs/MYSQL_PREREGISTRATION.md`): the knob is the InnoDB buffer
-  pool, 512 MB at the operator's setting, moved in the server's own 128 MB chunks inside [128, 2,048] MB through the server's
-  own console. Two counted sets were run on the same engine. The first (runs 37757840760, 37757850988, 37757861572) read every
-  gauge inside the noise and its hand-back row read NO on 15 of 45 omni arms, because the plug's restore was issued while the
-  server was still carrying out a shrink the law had asked for, which MySQL ignores; the plug, not the law, was fixed (the
-  restore waits for the server's resize and writes again), the fix was declared as an amendment, and the first set's table is
-  kept whole in `docs/history/V3_SYSBENCH_set1.md`. The second set on the amended plug (runs 37770617236, 37770620582,
-  37770624805, commit `a033fd09`) is the result: on the four untouched workloads **the pool held fell âˆ’67% on burst and âˆ’50% to
-  âˆ’56% on read_only, GAIN in all three of our runs**, with the pages holding data falling the same; work inside the line, throughput, p95,
-  p99 and host CPU inside the noise on every workload; on read_write, where the working set is written as well as read, the
-  compass bought pool for the wide notches and **the pages holding data rose +53% to +70%, power given in all three of our runs**, the pool held
-  +59% to +79% as point estimates (one run clear of zero), while p95 read âˆ’11% to âˆ’18% and CPU âˆ’4% to âˆ’5% inside the noise;
-  update_index inside the noise on every row; no error in any arm; **the pool handed back and read back on all 45 omni arms**.
-  4 gauge-rows toward their aims, 1 LOSS or power given, 0 disagree; the category enters the index at +12.2%. The update_index "work inside the line"
-  row counts almost nothing in either arm (a single update's client round trip exceeds the server-side 0.6 ms line) and is
-  disclosed as such. That was the second counted set, kept whole in `docs/history/V3_SYSBENCH_set2.md`. Amendment 2 (8
-  October, section 10.9) followed its read_write row: 36 of that workload's 82 grows bought chunks while the pool missed under
-  1% of its reads, for slow writes the pool cannot mend, so the pool now grows only while missing, and no chunk goes back in
-  a second without a read request. **The third counted set (8 to 9 October) is the result of record:** burst pool held
-  **âˆ’49% to âˆ’56%, GAIN in all three of our runs**; read_write pages holding data **+44% to +52%, power given in all three of our runs**, with host CPU **âˆ’4% to
-  âˆ’6%, GAIN in all three of our runs**, a trade of memory for CPU with latency unchanged; read_only inside the noise (the second set's
-  âˆ’50% to âˆ’56% was in part the first chunk given back before any read, a cold-start artefact now refused, and the pool is
-  then bought back on real misses as the notches widen); update_index the runs disagree; every pool handed back. 4
-  gauge-rows toward their aims, 1 LOSS or power given, 1 where the runs disagree; the category entered the index at +5.2%. **The set of 10 October,
-  the first with the brain's own verdict on the pool (amendment 3), is the result of record:** the pool held **âˆ’10% to âˆ’20% on
-  `read_write`, GAIN in all three of our runs**, the pages holding data with it, the earlier set's memory bought for the written working set
-  gone; `burst`, `read_only` and `update_index` inside the noise (the give-back trials judged, the grow trials mostly abandoned
-  by the trial rule amendment 4 corrects); work, p95, p99 and CPU inside the noise on every workload; no error; every pool
-  handed back. 2 gauge-rows toward their aims, 0 LOSS or power given, 0 disagree; the category enters the index at +1.0%. The third set's table is
-  whole in `docs/history/V3_SYSBENCH_set3.md`; amendment 4 is declared and the next set runs.
-
-### 16.4b Robustness: the governor killed outright, and its own cost
-
-The robustness benchmark (`docs/ROBUSTNESS_PREREGISTRATION.md`) is a test of Omni-Compass itself, not of a gain. In the
-kill scenario (`V3_ROBUST_KILL.md`, ten pairs in each of three runs), the governor received SIGKILL at 40% of a 900 s
-window on the wandering load, with the watchdog running beside it from the start as it would in service. In all thirty
-repetitions the watchdog found the dead lease on its next pass, ran the governor's recorded restore command, and every
-setting (the HPA target, the replica range, every pod's CPU limit, every worker, the records on the objects) was back at
-the operator's **7 to 11 s after the kill**, mean 9 s against a preregistered allowance of 60 s; a second governor started
-at 50% and governed to the end in every repetition; and the 120 s after the kill read no difference beyond the noise
-against native's same window in all three runs, so the service did not measurably notice the governor's death. The whole
-window, with a kill and a restart inside it, still read mean response 32% to 39% faster, p95 42% to 45% faster, time over
-the line 28% to 34% lower and failed requests 9% to 15% fewer, GAIN in all three of our runs, with machines and energy inside the noise.
-Run again on 10 October (`V3_ROBUST_KILL.md`, the set of record): every setting back within the allowance in every repetition
-of every run, a second governor to the end in every one, and the whole window read mean response 33% to 40% faster, p95 27% to
-48%, time over the line 32% to 36% lower, GAIN in all three of our runs, with failed requests, machines and energy inside the noise; the
-first set's table is whole in `docs/history/V3_ROBUST_KILL_set1.md`.
-The governor's own CPU over every archived run with the real cluster inside (`V3_OWN_COST.md`) is 0.006 to 0.013 of one
-core at every size from 1 to 1,000 copies, 0.1% to 0.3% of the host's cores, each run under its own engine; the cost of
-governing a real cluster does not grow with the modelled organism around it.
-
-**The long run** (`V3_ROBUST_LONG.md`, three pairs of 7,200 s an arm in each of three runs) asks whether the governor
-drifts, leaks or slows over hours. Its resident memory after two hours was at most 1.048, 1.067 and 1.052 times its first
-ten minutes in the three runs, against a preregistered limit of a quarter: no leak. It made 117 to 119 of the 120
-decisions its 60-second interval predicts in every repetition, 97.5% at the fewest against a threshold of 95%: valid. Its
-decision time, read as the gap between consecutive decisions less the interval it sleeps, was at most 1.20 times in the
-last hour what it was in the first: no slowing. Every setting was handed back at the end of every repetition and read
-back at the operator's with no record left. Two things are shown rather than judged, as the preregistration said they
-would be. First, failed decisions: 2, 3 and 3 in the three runs, all in one repetition's omni arm, all the same cause, the
-cluster's own API answering 500 to the governor's read of the HPA for two or three decisions in a row; the governor held,
-wrote nothing, and resumed on the next good read, which is the blind-means-hold rule doing what section 7.3 says it does.
-Second, the whole window's service: with three pairs a run the intervals are wide, and mean response, p95, p99 and time
-over the line read GAIN in all three of our runs in run A and inside the noise in B and C, so the reading is no difference beyond the
-noise in two of three runs; machines, energy and failed requests read inside the noise in all three. The long run is a
-test of the governor's constancy, and on that question every row answered as the preregistration required. Run again on 10
-October (`V3_ROBUST_LONG.md`, the set of record): no leak (memory under its limit in every repetition), every decision valid,
-no slowing, every setting handed back; the service GAIN in all three of our runs in run B and inside the noise in A and C; the first set's
-table is whole in `docs/history/V3_ROBUST_LONG_set1.md`. The 24-hour run on three rented machines was collected the same day
-and its table follows.
-
-### 16.5 The modelled realms and the independent simulators
-
-Every result here is evidence class S: a statement about a published model under its own native controller, never about
-hardware, and never counted in the Omni index.
-
-- **The 945 muscles and six organisms** (`results/realms/REALMS.md`, A/B/C on v3): reproduced to the last digit in three
-  of three runs; zero muscles LOSS or power given; every organism superior within guardrails, with work per energy +0.1% to +0.3%, work
-  unchanged and time over the line not above native's. On v2 the Physics realm and the tower had read a service tradeoff;
-  the slack gate on speed knobs corrected it and made v3.
-- **The grid of copies and runs** (`results/scale/GRID.md`, 84 of 90 cells on v3): every organism superior within
-  guardrails in every cell of ten runs or more; work per energy +0.07% (Physics) to +0.37% (Energy, the four stacked, the
-  tower), the same figure at every size; every knob handed back; the six cells left are beyond the machines available.
-- **The power grid** (`V1_PANDAPOWER.md`, `V3_PANDAPOWER.md`, the same table to the digit): eleven SimBench grids solved
-  by pandapower, the tap changer's own controller as native, one whole tap per move as the knob. With ZIP loads the energy
-  the loads drew fell 1.3% to 1.5% and the net import fell in all eleven grids; losses fell in seven and **rose in four**
-  (the rural and semi-urban grids with their own generation, +0.6% to +1.5%); tap operations fell in ten grids and rose
-  from 4 to 8 a year in one, the declared cost, power given in all three of our runs; no grid was more often outside its voltage band. 67
-  gauge-rows toward their aims, 14 LOSS or power given.
-- **Robot arms** (`V1_MUJOCO.md`, `V1_MUJOCO_PANDA.md`, `V3_MUJOCO.md`): four arms from the MuJoCo Menagerie with their
-  shipped controllers as native and the joint speed of an axis with slack as the knob, after a paired physics trial. The
-  trial left the UR5e and the iiwa 14 native ("nothing for Omni to move"); on the Gen3 and the Panda, peak torque fell 29%
-  and 10%, tracking error 21%, energy per takt 0.8% and 0.5%, GAIN in all three of our runs; the Panda's copper loss **rose 14%**,
-  power given in all three of our runs.
-- **Buildings with batteries** (`V1_CITYLEARN.md`, `V3_CITYLEARN.md`): every district CityLearn ships, its own rule-based
-  control as native, each building's battery charge and discharge inside the simulator's limits as the knob. In the
-  eleven battery districts electricity bought, the daily peak and the daily unevenness fell in all eleven and carbon in
-  eight, GAIN in all three of our runs; the bill **rose in seven** (the 2023 districts) and ramping rose in seven, power given in all three of our runs; 71
-  score-rows toward their aims, 33 LOSS or power given, 1 where the runs differ by the simulator's own variation; three districts had nothing to
-  move and eight the simulator cannot run.
-- **Drone swarms** (`V3_SWARM.md`): twenty Crazyflie 2.x quadrotors in gym-pybullet-drones with the shipped position
-  controller as native and the cruise override inside the autopilot's limits as the knob, three untouched cells. Energy a
-  mission fell 7% (short), 18% (mixed) and 20% (long) and missions a charge rose 8%, 22% and 25%, GAIN in all three of our runs; no late
-  mission, reserve breach, near miss or collision in any arm; the tracking error rose from 0.07 to 0.13 m inside its
-  0.25 m band, shown; every override handed back. PyBullet reproduced to a part in a thousand across GitHub's machines and
-  not to the bit, so the table's reproduction tolerance was set to one part in a thousand after the runs were seen, and
-  the preregistration's amendment 1 says so with its time.
-
-### 16.6 The one number, and the table
-
-**The one number.** The Omni index over the real categories the same in all three of our runs, on the sets of 10 October: **+4.8%** (real
-Kubernetes on v3 +28.9% over seven tests, the real database on v3 +0.8%, real messaging on v3 +0.1%, the real cache on v3
-exactly nothing, the real database's storage-engine cache on v3 +0.7%, the real database's buffer pool on v3 +1.0%, each
-category weighed the same; Azure and the card join as their three-run tables land). How it got here, set by set, follows; the
-figures of 7 to 9 October below are history, kept in the tables of `docs/history`. The fifth category lowered the headline from +30.2% to +25.9% when it joined
-on 8 October; the sixth, MySQL's buffer pool, entered the same day at exactly nothing on its first counted set (every row
-inside the noise, the headline at +21.2%) and at +12.2% on the second set run the same afternoon on the amended plug, the
-headline at +23.5%; the public-trace test (section 16.1) joined the Kubernetes category as its seventh test the same
-evening, moving that category from +25.5% to +28.8% and the headline to +24.1%; and on 9 October the three database
-categories were re-read on their second or third counted sets, after the costs the first sets had charged to the governor
-were measured and found to be our own harness (section 16.4): the database fell from +14.2% to +4.0%, the storage-engine
-cache from +10.2% to +8.5%, the buffer pool from +12.2% to +5.2%, and the headline from +24.1% to +20.5%. The number went
-down because the costs came out and took the gains they had been propping up with them; what is left is smaller and has
-nothing of ours under it. The same day a **second reading** was declared beside the first, at the founder's question about
-what a cache is for (`docs/K8S_COMPASS_PREREGISTRATION.md`, the service reading): the same tests and the same three-run
-rule scored on work and speed only, the resources spent or saved shown and not scored, computed for every test alike. It
-stood, on the day it was declared, at **+71.8%**: Kubernetes +83%, Kafka +1,193% (its hundredfold tail), Redis +8.8% where the
-resource reading said âˆ’24.9%, and the three database stacks exactly nothing, because their gains are resources given back for
-the same service; on the sets of 10 October it stands at **+10.7%** (Kubernetes +84.5%, the five stacks nothing).
-The two readings are two true sentences about the same tables: one says what the governor did for the service, the other
-what it cost or saved in resources to do it. The resource reading stays the headline because it was the one preregistered;
-the service reading is printed in the same file, in the same tables, as a second column. A category enters at whatever its tables
-show in all three of our runs, nothing included, which is the reader's guarantee
-that the number is not built from the categories that happened to work. That is how the number is meant to move: every real category enters at equal weight as its table lands, whatever it does to the mean.
-
-**10 October: every table remade, the stacks under the brain's own verdict.** Every benchmark was run again on one commit and
-every table read from the new runs. The five stacks ran for the first time with the brain's verdict on the knob (section 9.4),
-and the headline moved from +20.5% to **+4.8%**, the service reading from +71.8% to **+10.7%**. The number came down for one
-reason: the spends that had bought the earlier gains at a resource cost were refused by the verdict where they did not pay
-(MySQL's pool for the written working set, PostgreSQL's add on the slow write workload) and, on Kafka and Redis, not yet judged
-at all, because the trial rule of 9 October ended a spend trial on the calm the spend itself produced (amendment 3, section
-16.4; the next set runs on the corrected rule). What is left is smaller than before and has two properties the earlier number
-did not: every gain in it was proved on the stack itself before the knob was written, and no category carries a loss in all three of our runs.
-The storage-engine cache's figure is positive for the reason the Redis figure is negative, read the other way: there the
-governor gave memory back (the cache held halved on two workloads) while work, p95 and CPU stayed inside the noise, so
-its resource column is a gain and its other columns are exactly one; its one loss in all three of our runs, the burst mean latency, is
-not an index column and stands in its table. The messaging figure is large because its speed ratio is:
-native sat at nine tenths of its measured capacity by design, so its queue grew at the high steps and its slowest 5%
-waited 1.6 s, while Omni's waited 9 to 14 ms; the resource that bought it, three to four times the consumers, stands
-beside it as a loss in all three of our runs. The cache's figure is negative because the memory held is its resource column: the ceiling
-rose from 64 MB to 200 to 270 MB (a ratio of about 0.25 in the index's "fewer machines" sense) while work and the hit rate
-rose 14% to 27%, and a geometric mean of those four columns is below one. That is the arithmetic of a resource bought,
-reported as such; a reader who weighs memory as cheaper than a consumer or a machine will read the cache's rows for
-themselves, which is why every row is in its table.
-
-| Result | Engine | Class | Reading | Source |
-|---|---|---|---|---|
-| **Real Kubernetes, all four in one run** (load up and down one step at a time, 10 pairs Ã— 3 runs) | v1 | L | work inside the response line **+42% to +48% in all three runs, GAIN in all three of our runs**; p95 âˆ’57% to âˆ’63% GAIN in all three of our runs; failed requests âˆ’12% to âˆ’13% GAIN in all three of our runs; machines no difference beyond the noise | `results/live/V1_ALL_FOUR.md` |
-| **Real Kubernetes, steady work in steps** (10 pairs Ã— 3 runs) | v1 | L | p95 **âˆ’65% to âˆ’69%** and time over the line GAIN in all three of our runs; machines âˆ’1.5% to âˆ’3.4% GAIN in all three of our runs; failed requests zero in both arms | `results/live/V1_STEADY.md` |
-| **Real Kubernetes, demand that wanders** (10 pairs Ã— 3 runs) | v1 | L | p95 **âˆ’56% to âˆ’60%** GAIN in all three of our runs; failed requests GAIN in all three of our runs; modelled standby energy âˆ’0.4% to âˆ’0.8%, GAIN in all three of our runs | `results/live/V1_WANDERING.md` |
-| **Real Kubernetes, faults** (a machine down, a spike, a runaway pod, a blind probe, 10 pairs Ã— 3 runs) | v1 | L | p95 **âˆ’61% to âˆ’64%** GAIN in all three of our runs; failed requests, machines and energy no difference beyond the noise | `results/live/V1_FAULTS.md` |
-| **Real Kubernetes, a queue of batch jobs** (cruise, then idle, 10 pairs Ã— 3 runs) | v1 | L | machines **âˆ’15% to âˆ’24%** and modelled energy âˆ’11% to âˆ’17% GAIN in all three of our runs; p95 no difference beyond the noise | `results/live/V1_BATCH.md` |
-| **Real Kubernetes, fairness** (a noisy neighbour on the same workers, 10 pairs Ã— 3 runs) | v1 | L | no difference beyond the noise on every row: Omni-Compass neither helps nor hurts the neighbour | `results/live/V1_FAIRNESS.md` |
-| **The same six Kubernetes tests on v3** (10 pairs Ã— 3 runs each) | v3 | L | the same readings as v1, the controllers being v1's bytes: all four work inside the line +35% to +49%, p95 âˆ’47% to âˆ’66% across steady, wandering, all four and faults, failed requests âˆ’9% to âˆ’14% where they occur, steady machines âˆ’1.5% to âˆ’2.9%, batch machines âˆ’19% to âˆ’23% and standby-model energy âˆ’13% to âˆ’16%, all GAIN in all three of our runs; fairness no difference beyond the noise on every row | `results/live/V3_STEADY.md`, `V3_WANDERING.md`, `V3_ALL_FOUR.md`, `V3_FAIRNESS.md`, `V3_FAULTS.md`, `V3_BATCH.md` |
-| **Real Kubernetes under a public day of demand** (the Google cluster trace of 2011 replayed one step at a time, 10 pairs Ã— 3 runs) | v3 | L | p95 **âˆ’65% to âˆ’71%**, p99 âˆ’49% to âˆ’61%, time over the line âˆ’81% to âˆ’84%, failed requests âˆ’8% to âˆ’17%, machines in service **âˆ’6% to âˆ’10%**, replicas âˆ’5% to âˆ’6%, standby-model energy âˆ’4% to âˆ’7%, all GAIN in all three of our runs; pods started +23% to +35% as point estimates, inside the noise in one run; 9 rows toward their aims, 0 LOSS or power given | `results/live/V3_TRACE_GOOGLE2011.md` |
-| **Real Kubernetes with its add-ons: Omni-Compass on top of KEDA** (KEDA 2.21 and its HTTP add-on 0.16, two native setups, 10 pairs Ã— 3 runs each) | v3 | L (energy S) | p95 **âˆ’51% to âˆ’53%** (KEDA on CPU and requests) and **âˆ’73% to âˆ’76%** (the HTTP add-on alone), time over the line âˆ’96% to âˆ’100%, GAIN in all three of our runs; machines **âˆ’5.9% to âˆ’7.8%** with the HTTP add-on, GAIN in all three of our runs, inside the noise with the CPU target; idle-power energy **+1.0% to +2.6%, power given in all three of our runs** in both (more work put through by the closed-loop load, shown, not judged) | `results/live/V3_KEDA_CPU_REQUESTS.md`, `results/live/V3_KEDA_REQUESTS.md` |
-| **The six organisms with the real cluster inside**, 1 to 1,000 copies, 5 paired repetitions a cell (3 at 1,000) | v1 | L + S | 98 of 100 cells: p95 and time over the line GAIN in every cell; 0 gauges LOSS beyond the noise except a rounding-level work loss (âˆ’0.0003%) and HPA replicas +0.7% in one cell; machines stay at 6 in both arms (no autoscaler under kind); the Physics realm and the tower at 1,000 copies off the clock in 2 of 3 repetitions (marked) | `results/live/V1_SIX_KUBE.md` |
-| The same at 10 and 100 copies | v3 | L + S | 12 cells, 5 pairs each: every cell GAIN on 4 to 6 gauges, LOSS on none beyond the noise except a rounding-level work loss in 4 cells; the stack at 100 copies off the clock in 4 of 5 repetitions (marked) | `results/live/V3_SIX_KUBE.md` |
-| **The big organisms at 1,000 copies on rented machines, on v3**: the tower (3 of 3) and the four stacked (3 of 3), each on its own machine with a 10,800 s window, every repetition on the clock | v3 | L + S | tower: the cluster's p95 **6.7 s â†’ 160 ms (âˆ’98%)**, p99 âˆ’98%, time over the line 76% â†’ 0, failed requests 4.8% â†’ 0, clear of zero; stack: p95 **2.9 s â†’ 150 ms (âˆ’95%)**, p99 âˆ’97%, time over the line 51% â†’ 0, failed requests 0.14% â†’ 0, clear of zero; machines 6 in both arms of both; energy inside the noise; the organisms' model work rounding-level lower by rule, energy âˆ’0.4% | `results/live/V3_BIG_ORGANISM.md` |
-| **The big organisms at 1,000 copies on a rented machine**: the tower (3 of 3) and the four stacked (3 of 3, detached) | v1 | L + S | tower: p95 **âˆ’95%** (4.1 s â†’ 0.2 s) and time over the line âˆ’99.7% clear of the noise, machines 6 in both arms, energy âˆ’0.2%, work rounding-level lower, repetition 3 off the clock; stack: p95 **âˆ’74%** and p99 âˆ’83% clear of the noise, the compass arm 300 to 615 s past the 2,880 s window in all three (marked OFF THE CLOCK; native kept the clock), which is why the v3 stack runs with a 10,800 s window | `results/live/V1_BIG_ORGANISM.md` |
-| **Azure AKS, the bill, steady load**, 4 workers, 5 pairs | v1 | L (a real bill) | no difference beyond the noise on any gauge; the bill âˆ’4.7% with its interval across zero; a fleet of 4 cannot show the lever (10.1) | `results/live/V1_AKS_STEADY.md` |
-| **Azure AKS, the bill, a burst sized to the cluster**, 4 workers, 5 pairs (repetition 4 lost its native cluster to an Azure API error in the first attempt and was run again by itself) | v1 | L (a real bill) | the bill +5.0% with its interval across zero; machines, p95 and failed requests inside the noise; p99 âˆ’34% clear of the noise in this one run; B and C to follow | `results/live/V1_AKS_BURST.md` |
-| **PostgreSQL behind PgBouncer, the three untouched workloads**, 3 pairs Ã— 3 runs (the set of 10 October, the brain's verdict on the pool, amendment 3) | v3 | L | connections held open **âˆ’6% to âˆ’11% on `select`, GAIN in all three of our runs**; the add above the operator's 20 on `simple_update` refused, nothing bought, nothing lost; `tpcb_hot` inside the noise; work, latency and host CPU inside the noise everywhere; every pool handed back; the earlier sets whole in `docs/history` | `results/live/V3_PGBENCH.md` |
-| **MySQL under sysbench, the four untouched workloads**, 3 pairs Ã— 3 runs (the set of 10 October, the brain's verdict on the pool, amendment 3) | v3 | L | the pool held **âˆ’10% to âˆ’20% on `read_write`, GAIN in all three of our runs**, the pages holding data with it; `burst`, `read_only` and `update_index` inside the noise; work, p95, p99 and CPU inside the noise on every workload; no error; every pool handed back; the three earlier sets whole in `docs/history` | `results/live/V3_SYSBENCH.md` |
-| **The 945 muscles and six organisms, modelled**, A/B/C | v3 | S | reproduced to the last digit in 3 of 3; 0 muscles LOSS or power given; **every organism superior within guardrails** (work per energy +0.1% to +0.3%, work unchanged, time over the line not above native's); on v2 Physics and the tower read a service tradeoff, which the slack gate corrected | `results/realms/REALMS.md` |
-| **The organisms at 1, 10, 100 and 1,000 copies**, 1 to 1,000 paired runs a cell, 84 of 90 cells | v3 | S | every organism superior within guardrails in every cell of 10 runs or more; work per energy +0.07% to +0.37%, the same figure at every size; the six cells left (100 and 1,000 runs at 1,000 copies) are beyond the machines available | `results/scale/GRID.md`, `results/scale/receipts/` |
-| **Power grid: 11 SimBench grids solved by pandapower**, both load models, A/B/C | v1 and v3 (the same table to the digit) | S | with ZIP loads the energy the loads drew GAIN in all three of our runs in all 11 (âˆ’1.3% to âˆ’1.5%) and the net import in all 11; losses GAIN in all three of our runs in 7 and **power given in 4** (the rural and semi-urban grids with their own generation, +0.6% to +1.5%); tap operations fewer in 10 grids, 4 â†’ 8 a year in one (power given in all three of our runs, the declared cost); no grid more often outside its band | `results/live/V1_PANDAPOWER.md`, `V3_PANDAPOWER.md` |
-| **Robot arms, MuJoCo Menagerie**, A/B/C | v1 and v3 | S | where Omni-Compass moved (Gen3, Panda): peak torque âˆ’29% and âˆ’10%, tracking error âˆ’21%, energy per takt âˆ’0.8% and âˆ’0.5%, GAIN in all three of our runs; the Panda's copper loss +14% **power given in all three of our runs**; UR5e and iiwa 14 left native by the paired physics trial | `results/live/V1_MUJOCO.md`, `V1_MUJOCO_PANDA.md`, `V3_MUJOCO.md` |
-| **CityLearn, every district it ships**, A/B/C | v1 and v3 | S | 11 battery districts: electricity bought, daily peak and daily unevenness GAIN in all three of our runs in all 11, carbon in 8; the bill **power given in 7** (the 2023 districts) and ramping higher in 7; 71 score-rows toward their aims, 33 LOSS or power given, 1 where the runs differ (the simulator's own variation); 3 districts with nothing to move; 8 the simulator cannot run | `results/live/V1_CITYLEARN.md`, `V3_CITYLEARN.md` |
-| **Drone swarms, gym-pybullet-drones** (Crazyflie 2.x, the shipped autopilot as native; Omni on the cruise override inside the autopilot's limits), 20 drones Ã— 4 missions, three cells, A/B/C | v3 | S | energy a mission âˆ’7% (short), âˆ’18% (mixed), âˆ’20% (long) and missions a charge +8% to +25%, GAIN in all three of our runs; no late mission, reserve breach, near miss or collision in any arm; tracking error 0.07 â†’ 0.13 m inside its 0.25 m band | `results/live/V3_SWARM.md` |
-| **Apache Kafka as shipped, a consumer group's operator-set size** (one broker, 8 partitions; the group at the operator's 2 consumers as native; Omni on the count inside [1, 8]), three untouched workloads, 3 pairs Ã— 3 runs, under both objectives (the set of 10 October, the brain's verdict on the count, amendment 2) | v3 | L | exactly nothing: every spend trial abandoned before it was judged, the group at the operator's two, every gauge inside the noise; our trial rule, amended as amendment 3, the next set running; the first set (work inside the line +16% to +21%, p95 1.6 s â†’ 9 to 14 ms, consumers 2 â†’ 6 to 8 power given in all three of our runs) whole in `docs/history/V3_KAFKA_set1.md` | `results/live/V3_KAFKA.md`, `results/live/V3_KAFKA_SERVICE.md` |
-| **Redis as shipped, a cache's operator-set memory ceiling** (64 MB, allkeys-lru as native; Omni on the ceiling inside [16, 512] MB through Redis's own console), three untouched workloads, 3 pairs Ã— 3 runs, under both objectives (the set of 10 October, the brain's verdict on the ceiling, amendment 2) | v3 | L | exactly nothing: the allowance one notch each way, most trials abandoned before they were judged, every gauge inside the noise; amendment 3, the next set running; the first set (work inside the line +14% to +27%, the ceiling 64 â†’ 200 to 270 MB power given in all three of our runs) whole in `docs/history/V3_REDIS_set1.md` | `results/live/V3_REDIS.md`, `results/live/V3_REDIS_SERVICE.md` |
-| **MongoDB as its publisher ships it, a database's operator-set storage-engine cache size** (512 MB as native; Omni on the cache size inside [256, 2,048] MB through the server's own console), YCSB's workloads b, c, f and burst untouched, 3 pairs Ã— 3 runs (the set of 10 October, the brain's verdict on the cache, amendment 2) | v3 | L | the cache held **âˆ’3% to âˆ’13% on `f`, GAIN in all three of our runs**; `b`, `c` and `burst` inside the noise; work, p95, p99, mean latency and CPU inside the noise on all four; no failed operation; every cache handed back; the two earlier sets whole in `docs/history` | `results/live/V3_YCSB.md` |
-| **Robustness: the governor killed outright mid-run** (SIGKILL at 40% of the window, the watchdog beside it), 10 pairs Ã— 3 runs (the set of 10 October) | v3 | L | every setting back within the allowance in every repetition of every run, a second governor to the end in every one; the whole window mean response âˆ’33% to âˆ’40%, p95 âˆ’27% to âˆ’48%, time over the line âˆ’32% to âˆ’36%, GAIN in all three of our runs; failed requests, machines and energy inside the noise; the first set (7 to 11 s to hand back) whole in `docs/history/V3_ROBUST_KILL_set1.md` | `results/live/V3_ROBUST_KILL.md` |
-| **The governor's own cost** at 1, 10, 100 and 1,000 copies with the real cluster inside | v3 and v1, each under its own engine | L | 0.006 to 0.013 of one core at every size, 0.1% to 0.3% of the host's cores; shown, not judged | `results/live/V3_OWN_COST.md` |
-| **Scale**: the controller governing 50, 500 and 1,000 simulated nodes (KWOK), decision time and correctness | every push | L | runs on every push | `results/scale/` |
-| GPU, one card and the card inside the organisms | earlier card controller | P | **obsolete**: every earlier card result ran on a controller since replaced; the one-card, card-inside-1,000-copies and eight-card runs are run again by the founder on rented cards after the CPU and cloud work, at one named commit | `docs/GPU_PREREGISTRATION.md`, `docs/GPU_RUN_GUIDE.md` |
-
-**Running now** (9 October): both big organisms at 1,000 copies done on rented machines (the four stacked and the whole
-tower, 3 of 3 on the clock each, section 16.2); the three database tables re-read on their second or third counted sets
-after the costs the first sets charged to the governor were traced to our own harness and removed (section 16.4; the
-amendments in sections 10.2, 10.8 and 10.9); the robustness test
-(`docs/ROBUSTNESS_PREREGISTRATION.md`), the kill scenario and the two-hour long run both done (section 16.4b), the
-24-hour run on three rented machines in its second (omni) arm (one pair a machine, two arms of a day each, collected on
-10 October);
-the real cluster under a public demand trace done (the Google cluster trace of 2011, `V3_TRACE_GOOGLE2011.md`, section
-16.1), the Azure Functions trace next by the same rule;
-the real cluster with its add-ons done for KEDA and its HTTP add-on (`V3_KEDA_CPU_REQUESTS.md`, `V3_KEDA_REQUESTS.md`,
-section 16.1), Karpenter on Azure next;
-YCSB on MongoDB done (`V3_YCSB.md`, section 16.4), MySQL's buffer pool under sysbench done (`V3_SYSBENCH.md`, section 16.4),
-the other stores of register row 24 after; and Azure steady and burst on the fleet of several machine families (seven
-dispatches refused by Azure's own cluster capacity in eastus or held by our own machines' quota, 34 refusals, amendments 5
-to 8; the eighth dispatch follows the 24-hour machines' collect). **Queued, in order, in `docs/REGISTER.md` section 4**: drone swarms and
-defense edge (PX4 and ArduPilot multi-vehicle, Crazyswarm), databases and caches at large (YCSB, HammerDB), Spark,
-OpenSearch, fio, Open-RMF, the 24-hour robustness run, spacecraft attitude and thrusters (Basilisk),
-station-keeping (Orekit, GMAT), constellations, rockets (RocketPy, OpenRocket) and combustion (Cantera). Pure physics
-solvers (OpenFOAM, SU2, REBOUND, GADGET, MESA) are not benchmarked: they have no controller and no knob, so Omni-Compass
-has no place on them; their value is the HPC cluster that runs them.
-
-### 16.6b Wire in, or watch: the verdict per knob
-
-The founder's order of 9 October 2026 made a principle of what section 1.2 describes as a mechanism: Omni-Compass need
-not be wired into every muscle. Where it cannot beat the native controller on the muscle's own gauges, the muscle lives by
-itself and Omni only reads it, one wire out and no wire in. `tools/wiring_verdicts.py` applies that principle to every
-published result and prints the page `docs/WIRING_VERDICTS.md` (one row per knob and per muscle in
-`results/WIRING_VERDICTS.csv`; `verify.py` fails if the page differs from what the tables give). The rule is the same for
-every table: a knob reads **write** where at least one judged gauge is GAIN in all three of our runs and none is
-LOSS or power given in all three of our runs; **watch** where nothing is GAIN in all three of our runs, whether the rows are inside the noise, the runs disagree, or
-a gauge is LOSS or power given in all three of our runs with nothing against it (the LOSS is then named with its cause); and **operator's choice** where
-GAIN and LOSS (or power given) both hold in all three of our runs, a trade shown with both readings of the index. A modelled muscle takes its word from
-its realms label: superior within guardrails is write, a tradeoff label is the operator's choice, the rest is watch.
-
-What the page said on the day it was declared. On the real stacks, 12 of 24 knob-cases write: six of the seven Kubernetes
-demands (beside a noisy neighbour the knob showed nothing and watches), PostgreSQL's read-only workload, MongoDB's four
-workloads and MySQL's burst. Seven are the operator's choice: Kafka's three workloads, where consumers buy a hundredfold
-shorter queue and both readings of the index say the trade pays; Redis's three, where memory buys the hit rate and only the
-service reading says it pays; and MySQL's read_write, where pages holding data buy a few percent of CPU. Five watch: the
-noisy neighbour, PostgreSQL's simple_update (connections bought above the operator's setting with nothing bought for them)
-and tpcb_hot (the runs disagree), MySQL's read_only and update_index. Every loss in all three of our runs on a real stack is a resource
-spent for the knob's own service, declared in advance or disclosed on the first counted set; none is a service loss. Of the
-independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage
-costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself
-left native, one grid where nothing was bought). Of the 945 modelled muscles, 124 write, 13 are trades and 808 watch; 746 of
-the 808 never wrote at all, because the native controller held the reading inside the band and the law never left its
-cushion, and all 255 admission muscles are among them, the admission knob being a guard for a stress the hour did not hold.
-The 14 organism cells with the real cluster inside all write on the cluster's gauges. Nothing on the page changes the
-engine, which stays Omni v3; it changes what an operator connects.
-
-**The same verdict, live (built 9 October, running since 10 October).** The page judges after the fact; the founder's order is that the
-brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 9.4;
-`tools/knob_verdict.py` around the engine's own verdict, the engine unchanged): every knob starts in watch and is written
-only inside the allowance a paired trial on the stack itself has earned under the declared objective, one notch a trial; a
-refused step is not taken, a trial holds the knob, a fail-up never spends beyond the allowance, the operator's setting is
-always free. The amendments are declared in the five preregistrations with the expectation written before the runs
-(Redis left native under the resource objective, the first notch refused; Kafka allowed step by step while each consumer
-pays; PostgreSQL's add above the operator's setting refused on `simple_update`; MySQL's `read_write` chunks refused;
-MongoDB's cache given back a notch a trial). The runs were dispatched on 10 October, three a stack and objective, in the day's
-rerun of every benchmark on one commit (`docs/RERUN_2026-10-10.md`), and the tables, the index and the page are then read again
-from them.
-
-### 16.6c The second set of 10 October, and the four rules it taught the trial
-
-The five live products ran a second time on 10 October on the amended trial rule (a spend trial runs to its samples; it is
-never ended by the calm it causes). The trials finished. The brain still refused the Kafka consumer almost every time, and
-in the one repetition where it allowed the third consumer early, the whole gain of the earlier law came back at a fraction of
-the spend: the 95th-percentile delay fell from 2,450 ms to 57 ms, the queue from 3,375 waiting messages to 253, the work inside
-the line rose 17%, with 2.52 consumers on average where the earlier law had spent 5.8 to 7.9. On Redis with the large working
-set the brain allowed 15 MB more memory and bought more hits, more work and less host CPU, a row the earlier law never
-showed because it spent 200 MB; with the small working set nothing changed. PostgreSQL gave back about a tenth of its pool
-with the service inside the noise.
-
-The Kafka reading is the finding. The gain is real and cheap; the brain's test of it is unreliable, and the fault is in how the
-harness measures, not in the law or the engine's judge. The cost sample it is shown is the age of the backlog, which does not
-fall until the backlog is gone. A consumer joining the group rebalances it and the settle time is eaten by the pause. The
-reference and the trial phases, fourteen seconds each, straddle a thirty-second load step and compare different loads. Four
-rules follow for the trial, written into the next engine (`docs/OMNI_V4_PLAN.md`): samples count only once the muscle reports
-itself settled; a spend on a queue or a cache is judged by the muscle's own reading, the lag and its drain rate, the misses,
-with the body's cost taken at the settled state; the reference and the trial are compared at the same load, else the trial
-waits for a steady step; and coarse to fine, one scout step to the far side of the cover when single notches read flat, so a
-hill of forty notches is not refused one notch at a time. The founder's words of the same day say it in one line: what the
-brain sends to a muscle has to coincide with what the muscle reports about itself and where it stands.
-
-The next engine, Omni v4, is ordered on that day: one body, one brain, one tick a second; the body's cost judged; nothing
-anywhere pushed to a LOSS to move one thing to a GAIN; one trial at a time inside a body; nothing permanent; the wall belonging to the
-body; every wire forced through it. Part II gains its chapter when v4 is written and run, and every result in this chapter is
-run again on it.
-
-### 16.7 Threats to validity, stated by us
-
-A referee will look for the ways these results could mislead. We list the ones we know, what each would do to the
-numbers, and what the record does about it.
-
-1. **The machines are shared.** Every Kubernetes, database, broker and cache run is on one GitHub runner with four cores,
-   and the governor, the load generator, the probe and the system under test share it. A governor that costs CPU can slow
-   the service it governs, and a noisy neighbour on the host can move a run. The pairing on one runner with rotated order
-   removes the between-machine noise; the host's own busy share is recorded beside every run; the governor's own CPU is a
-   gauge in every table and a loss in all three of our runs where it is one (the database, Kafka's light workload); and three separate
-   runs on separate machines must agree before anything counts.
-2. **kind is not a cloud.** Idle machines stay powered and native has no node autoscaler, so a machine given back on kind
-   is a machine-hour in service, not a watt and not a dollar. The energy rows on kind are a declared model and say so on
-   every line. The bill is Azure's test, and its only result so far is inside the noise on a fleet too small to show one
-   machine.
-3. **Native is at its knee by design in the broker test.** The Kafka producer's peak offers nine tenths of the capacity
-   measured for the operator's two consumers, so native's queue grows at the high steps and omni's does not. This is the
-   situation the benchmark is of (a group sized for the quiet hours and overrun at the peak), it is preregistered, and it
-   is why the latency ratios are large; the index page and the table say so. A native group sized for the peak would show
-   a smaller latency gain and a smaller consumer cost, and would be a different, also legitimate, benchmark.
-4. **Declared penalties.** The cache's 5 ms store trip on a miss and the broker's 1, 2 or 5 ms of CPU per message are
-   declared parameters of our own application, not measurements of anyone's store. The gauges that depend on them (work
-   inside the line, the request latency) scale with them; the hit rate, the lag, the consumers and the memory held do not.
-5. **Simulators are models.** Every S result is a statement about a published model under its own controller. A model may
-   flatter or punish the governor in ways the real plant would not. S results are therefore shown beside the index and
-   never inside it, and the muscles' models are the simplest physics that reproduces the meter's response to the knob,
-   with the native controllers tuned as their authors ship them.
-6. **The tuning case was seen.** Every benchmark's rules were set on one tuning case, and that case is shown and not
-   counted. Where a rule changed after a counted result was seen (the swarm table's reproduction tolerance), the amendment
-   is written in the preregistration with its time and reason, the table says so, and the runs were not rerun.
-7. **The engine changed twice.** v1 to v2 added muscles without touching the law; v2 to v3 added one gate. Every result is
-   labelled with its engine, the tools refuse to mix engines, and the v1 results stay as v1 results. A reader comparing a v1
-   number with a v3 number is comparing two engines, and the manual never does so except to say that the controllers were
-   the same bytes and the readings the same.
-8. **Three runs are three, not thirty.** The three-run rule is a replication standard, not a large sample. A row the same in all three of our runs of ten pairs is a row whose paired difference cleared zero in each of three independent samples of ten;
-   the intervals are shown so a reader can judge their width. Where the intervals are wide, the manual says the test lacked
-   power rather than calling the result a null.
-9. **The founder's own harness.** The application in front of the cache, the producer in front of the broker, the load
-   generator and the probe are ours. They are declared, versioned, archived with every run and reproducible from the
-   repository; they are not independent of us. The independent pieces are the systems under test, their native
-   controllers, the simulators and their shipped controllers, and the benchmark tools (pgbench, kind, Kubernetes,
-   PyBullet, MuJoCo, pandapower, CityLearn) that others wrote. The load schedules of the Kubernetes tests were ours too,
-   written one step at a time; the public-trace test (`docs/TRACES_PREREGISTRATION.md`) answers that by replaying a day
-   of demand somebody else measured (the Google cluster trace of 2011, then the Azure Functions trace) under the wandering
-   test's own rules, the derivation receipted and committed before the runs; its result (section 16.1) read the same way
-   as the six, p95 65% to 71% faster and machines 6% to 10% fewer, the same in all three of our runs, with no row LOSS.
-
-### 16.8 What is not yet shown, and the open program
-
-Three things this manual does not show, and the program that will show them or show their absence:
-
-- **An energy or bill saving on real machines.** The fleet of 40 workers in nine Azure machine families that can show one
-  machine is preregistered and dispatched on v3; it runs when Azure's region admits a cluster. If the saving is a few
-  percent, a 40-worker fleet can see it; if the saving is not there, the table will say "no difference beyond the noise"
-  on a fleet that could have seen it, and that will be the result.
-- **The real card.** Every earlier GPU result ran on a controller since replaced. The two-wire governor with the verdict
-  runs on rented cards at one named commit, with the wire check first (`docs/GPU_RUN_GUIDE.md`,
-  `docs/GPU_PREREGISTRATION.md`); until then the card has no result and the manual says so.
-- **Robustness over a day.** The governor killed outright is a measured result (section 16.4b: every setting back in 7 to
-  11 s, thirty times out of thirty), its own cost is tabulated, and the two-hour run is measured three times (no leak,
-  no slowing, every decision expected but a few the cluster's API refused, every setting handed back); the 24-hour run,
-  one pair on each of three rented eight-core machines of three families, is under way (`docs/ROBUSTNESS_PREREGISTRATION.md`,
-  scenario 2b) and is read when its machines are collected; the same test on the other stacks remains open.
-- **A demand shape that is not ours, on more than one trace.** The first public trace (a day of the Google cluster trace of
-  2011, section 16.1) read the same way as our own schedules, nine rows GAIN in all three of our runs and none LOSS; it is one day of one
-  batch cluster's job arrivals. The Azure Functions invocation trace, a request-driven shape, follows by the same rule, and
-  the "our own schedules" threat of section 16.7 is answered in full only when a second, differently shaped day reads the
-  same way.
-
-The queue beyond these, in order, is `docs/REGISTER.md` section 4, one or two at a time, each preregistered before it
-runs: PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, Basilisk, Orekit and GMAT, RocketPy
-and OpenRocket, Cantera. When the founder declares the engine final, the engine that stands then is
-published as Omni-Compass 1.0, and the older fingerprints go to `docs/history` as the road to it.
-
----
-
-# PART VII - CODE, TWINS AND TERMS
-
-## 17. License and Commercial Terms
-
-The software and this manual are licensed under the Omni-Compass Evaluation License (`LICENSE`): evaluation and
-simulation use only. Everything else - commercial use, production use, operating any system beyond evaluation,
-redistribution, a hosted or managed service, incorporation into a product or service, or using the software or its
-results to build a competing product - requires a written Omni-Compass Enterprise License signed by The Omni-Compass
-LLC and paid for. All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC. No patent or trademark license is granted for any other use. Contributions are accepted only on the
-terms in `.github/CONTRIBUTING.md`, which assign their rights to The Omni-Compass LLC.
-
-The copyright in Omni-Compass belongs to The Omni-Compass LLC. The source is visible under the Evaluation License,
-which is not an open-source license; seeing the source grants no right beyond it. The owner of a copyright may
-grant it under more than one license at once (the Evaluation License to everyone, a paid Enterprise License to a
-customer), may set the terms of each new version, and may assign the copyright; copies already received keep the
-terms they were received under. The license texts (`LICENSE`, `NOTICE`, `DISCLOSURES.md`) govern.
-
-## 18. Python, C++ and the Seal
-
-The laws are twinned: each has a Python version and a C++20 version that give the same answers, proven by a parity
-test on every build (`cmake -S cpp -B cpp/build && cmake --build cpp/build`).
-
-| Law | Python | C++ | Proven by |
-|---|---|---|---|
-| core engine | `omnicompass/core.py` | `cpp/src/core.cpp` | 500 frozen fixtures |
-| governor | `omnicompass/adapter.py` | `cpp/src/governor.cpp` | `tests/test_cpp_governor_parity.py` |
-| safety shield | `omnicompass/shield.py` | `cpp/src/shield.cpp` | `tests/test_cpp_shield_parity.py` |
-| HPA replica law | `fleet/harness.py` | `cpp/src/hpa.cpp` | `tests/test_cpp_hpa_parity.py` |
-| closure law | `omnicompass/closure.py` | `cpp/src/closure.cpp` | `tests/test_cpp_closure_parity.py` |
-| conveyance law | `omnicompass/conveyance.py` | `cpp/src/conveyance.cpp` | `tests/test_cpp_conveyance_parity.py` |
-| nervous system | `omnicompass/nervous_system.py` | `cpp/src/nervous_system.cpp` | `tests/test_cpp_twins_parity.py` |
-| compass and ledger | `omnicompass/compass.py`, `storage.py` | `cpp/src/compass.cpp` | `tests/test_cpp_twins_parity.py` |
-| GPU governor rules | `omni_controller/gpu_governor.py` | `cpp/src/gpu_rules.cpp` | `tests/test_cpp_twins_parity.py` |
-
-The seal (`results/SEAL.json`) holds the SHA-256 fingerprint of every twinned file, written only after every parity
-test passes. `verify.py` fails, naming the file, if any sealed file changes afterwards. The compass law
-(`omnicompass/compass_law.py`) and the two-wire GPU governor are in Python today; their C++ twins are next.
-
-**Why two languages.** A law that exists in one implementation can hide a bug that is also its behaviour: the tests pass
-because the tests were written against the same code. Two implementations written separately, in languages with
-different numerics and different defaults, that agree to fifteen decimal places on five hundred trajectories and on every
-fixture of the governor, the shield, the HPA law, the closure, the conveyance and the nervous system, are evidence that the
-text of the law is what both compute. The C++ twin is also the one a buyer would embed where Python does not run (a
-controller, a firmware, a PLC), and the soak (`results/SOAK.json`, one hundred million decisions, no failure) is run on
-it. The seal makes the twins' agreement a property of the repository rather than a claim: change a sealed byte and
-`verify.py` fails, naming the file.
-
-**The three fingerprints.** The seal fingerprints the twinned laws; `OMNI_V1.json`, `OMNI_V2.json` and `OMNI_V3.json`
-fingerprint the engine as a whole (law, controllers, muscles, runners: 38 to 40 files); `RELEASE_MANIFEST.json`
-fingerprints the release (the commit, the engine, the twins, the GPU protocol, the live evidence and the verification
-receipt) and is rewritten by `tools/release_manifest.py` before every push, under the Python GitHub runs. A reader holding
-any one of the three can tell whether the files in front of them are the files the results were made on.
-
----
-
-# BACK MATTER
-
-## Glossary
-
-| Term | Meaning |
-|---|---|
-| Antagonist pair | the up side and the down side of a muscle's control, each with its own gain |
-| Authority | how far the nervous system lets an organ move this decision |
-| Band | a reading's or a knob's safe range |
-| Compass | the band seen as a position from 0 (calm) to 1 (the line), with its bottom in the middle |
-| EVEN | Equalized, Verified baseline, Equilibrium, Neutral: native and Omni could not be told apart (the same, or no difference beyond the noise); the key, front matter |
-| GAIN | Growth, Advantage, Improvement, Net-positive: a gauge moved the way its declared aim asks, against native; a resource cut is a GAIN; the key, front matter |
-| GAIN in all three of our runs | the same sign in all three runs (A, B, C), every 95% interval clear of zero, and that sign a GAIN for the gauge's aim |
-| LOSS | Leakage, Off-track, Setback, Subpar: a gauge moved against its declared aim (less work, a longer wait, more misses); it should never appear, and where it does it is shown, its cause found and fixed; the key, front matter |
-| Power given | a resource spent or held that rose: what Omni put in to buy the work and speed beside it; shown, never called a loss |
-| Cover | a knob's hard range; every write is clipped to it |
-| Cushion | the 5% at each edge of the compass, 10% in all |
-| DEX-YLL-1 | the company's number, 1-888-DEX-YLL-1, read in order as the engine runs: DEX, Data Exchange (the input, the two-way plug); YLL, Yield Limit Line (the boundary: every muscle up to its own yield limit, never past it); 1, one closed loop (the output; in code 1 is true, in science 1 is unity) |
-| Fail up | the return to full capacity the moment service crosses the wall or a sense goes blind |
-| Governor | the process that reads, decides and writes; Omni-Compass |
-| Muscle | any machine, service or controller Omni-Compass reads and sets |
-| Native | the system as it runs without Omni-Compass |
-| No difference beyond the noise | an interval over zero in at least one run: native and omni could not be told apart; the result, stated as such |
-| Off the clock | a repetition in which either arm ended more than 5% of its window late; marked, the pairing stands |
-| Organism | a set of muscles run together on one clock |
-| Omni index | the one combined number: the geometric mean of every real category's work, speed, machines and energy ratios, each read by the three-run rule |
-| Omni v1, v2, v3 | the frozen engines, fingerprinted file by file; a result belongs to the engine its commit carries |
-| Plug | the two-way connection to one muscle: read, write, read back, restore |
-| Pool (Azure) | one machine family under Azure's autoscaler with its own ceiling; several pools make the fleet |
-| Profile | a named set of the compass's settings for one kind of work: service (the default) or batch |
-| Race | full speed at once while work waits, so a burst is never served slowly |
-| Yield limit line | a muscle's own limit, read live: Omni-Compass takes it right up to the line and never past it, as an engineer loads a material up to its yield limit, the most it carries and still springs back unharmed |
-| Speed floor | the clock a card reaches on its own while busy, learned from its own meter; the governor never sets the ceiling under it |
-| Receipt | the paired record of native against Omni-Compass for one run |
-| Snapshot | a knob's value read once before the first write; the restore point |
-| The runs disagree | runs clear of the noise point different ways; the test is unstable on that measure and is looked into |
-| Wire check | the test that proves every wire follows, reads back and returns before anything runs |
-| Work per energy | work done divided by energy used; the primary outcome |
-| Work inside the line | the requests, transactions or messages a second answered within the response line; the product number on every real stack |
-| One pedal | push for more, lift off for less, idle (the pedal lifted all the way), reset (everything back to native): how the governor moves capacity under autopilot |
-| Cruise | every machine in service while work waits for a place, held without second-guessing until the line has been empty for two decisions |
-| Idle at once | the work done and demand at zero: the pedal lifted all the way in one move, every safety check still holding |
-| Kill switch | security only: one switch in a human hand that turns every governor on the machine off at once; never the reset |
-| Lease | the record every governor renews each decision; a lease older than its limit, or a dead process, makes the watchdog hand back for it |
-| Watchdog | the service beside the governors that hands back for any governor that died or hung without doing it itself |
-| Verdict | the paired trial on the muscle itself that allows a slow knob to move only where the cost is within 2%; "left native" where no step passes |
-| Slack gate | v3's rule: a motion axis busy more than half the time at full speed keeps its speed native |
-| Tuning case | the one workload, cell or swarm the rules were fitted on; shown in every table and never counted |
-| Untouched case | a workload, cell or swarm the rules were applied to unchanged; the judged rows |
-| Knee | nine tenths of a system's measured capacity, where its queue begins to grow; the broker's native was set there by design |
-| Amendment | a change to a preregistration after it was written, with its time and reason; one made after a result was seen says so |
-| Dwell | the seconds after a knob moves during which the law will not move it back |
-| Notch | the smallest step a knob moves in one decision (one consumer, 8 MB of cache, one tap) |
-| Evidence class P, L, S | a physical meter; live software with no meter; a model of ours |
-| Handed back | the knob read back at the operator's value at the end of an arm; every table says whether every arm was |
-| Off the clock | see above; a repetition whose arm ended more than 5% of its window late |
-| Own cost | the governor's CPU (its process and every command it ran) as a share of one core over the window, from its audit; a few thousandths of a core at every size |
-| Smoke run | one repetition that exercises a harness end to end before any counted run; never counted, always recorded |
-| L + S | an organism run with a real cluster inside: the cluster is L, the organism around it S |
-| Working set | the records a workload actually touches over a window; a cache benchmark measures nothing unless the working set reaches the cache |
-| Key space | the records a benchmark may ask for at one notch; in the MongoDB test the knob's load, stepped one notch at a time |
-| Uniform draw | every record in the key space equally likely, so the working set is the key space; YCSB's shipped zipfian draw concentrates on a few thousand hot records whatever the key space |
-| Ordered keys | records named in load order, so a run that asks for record n finds record n; a run with hashed keys against an ordered load asks for records that do not exist |
-| Full-cache gate | the MongoDB and Redis rule: slow reads grow the cache only while the cache is full (nine tenths used), because a miss in a cache with room to spare is not the cache's to mend |
-| Buffer pool | InnoDB's cache of table and index pages, the one memory setting every MySQL operator sizes; resized online by the server in whole chunks |
-| Chunk | the unit in which MySQL resizes its buffer pool (128 MB as shipped); the knob's notch on that stack |
-| Page cache | the operating system's own cache of file contents; where the data fits in it, a storage-engine miss is a read from memory and a decompression, not a disk read, and the gain available to the cache knob is smaller |
-
-## Appendix A - Command Reference
-
-| Task | Command |
-|---|---|
-| Verify everything | `python3 verify.py` |
-| Six organisms, modelled | `python3 tools/run_scale.py --runs N --scale K --out <dir>` |
-| The full ladder | `bash scripts/scale_ladder.sh` |
-| Two-wire card, modelled | `python3 tools/run_gpu_card.py <dir> [fresh]` |
-| GPU wire check | `sudo python3 tools/gpu_wire_check.py --gpu 0` |
-| GPU, whole benchmark in one command | `sudo nohup bash scripts/gpu_rented_run.sh > run.log 2>&1 &` |
-| The six organisms with the real card inside | `python3 tools/run_hil.py --out <dir>` |
-| GPU governor, two wires | `sudo python3 -m omni_controller.gpu_compass --mode watch|cap ...` |
-| Kubernetes, watch | `kubectl apply -f deploy/install/omni-compass.yaml` |
-| Kubernetes paired runs | `scripts/kind_paired.sh`, then `tools/live_reps.py` |
-| OFF (Kubernetes) | `touch /tmp/omni.kill` |
-| OFF (GPU) | `sudo touch /tmp/omni-gpu-kill` |
-| The whole harness OFF, ON, status, watchdog | `python3 tools/omni_switch.py off|on|status|watchdog` |
-| Seal check | `python3 tools/seal.py --check` |
-| Which engine a checkout or a commit carries | `python3 tools/omni_version.py [--commit <sha>]` |
-| The three-run table (Kubernetes, Azure) | `python3 tools/confirm_abc.py "<title>" raw/run-<A> raw/run-<B> raw/run-<C> --out results/live/V3_<TEST>.md` |
-| The three-run table (database, messaging, cache, swarms, robots, grid, buildings) | `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/swarm_abc.py`, `tools/mujoco_abc.py`, `tools/pandapower_abc.py`, `tools/citylearn_abc.py`, the same arguments |
-| The six organisms with the cluster inside | `python3 tools/six_kube_report.py <raw dirs> --out results/live/V3_SIX_KUBE.md` |
-| The grid of copies and runs | `python3 tools/grid.py` (reads `results/scale/receipts/`) |
-| The Omni index | `python3 tools/omni_index.py` |
-| Which knobs earn a wire in (write, watch, operator's choice) | `python3 tools/wiring_verdicts.py` (`--check` compares the page with the tables; `verify.py` runs it) |
-| One number per benchmark, plus always toward the system's own aims | `python3 tools/benefit_sheet.py` (`--check` the same way; `verify.py` runs it) |
-| The database benchmark, one run | `python3 tools/run_pgbench.py --out <dir>` (workflow `pgbench`) |
-| The message broker, one run | `python3 tools/run_kafka.py --setup`, then `--workloads light,heavy,burst --out <dir>` (workflow `kafka`) |
-| The cache, one run | `python3 tools/run_redis.py --setup`, then `--workloads small,large,burst --out <dir>` (workflow `redis`) |
-| The database's storage-engine cache under YCSB, one run | `python3 tools/run_ycsb.py --setup`, then `--workloads b,c,f,burst --out <dir>` (workflow `ycsb`) |
-| The database's buffer pool under sysbench, one run | `python3 tools/run_sysbench.py --setup`, then `--workloads read_only,read_write,update_index,burst --out <dir>` (workflow `sysbench`) |
-| The robustness test | workflow `robustness`: `scenario` kill or long, `reps`, `duration_s`; the own-cost table `python3 tools/own_cost.py <raw run dirs> --out results/live/V3_OWN_COST.md` |
-| The drone swarms, one cell | `python3 tools/run_swarm.py --cell short|mixed|long|all --out <dir>` (workflow `swarm`) |
-| The independent simulators | `python3 tools/run_citylearn.py`, `run_pandapower.py`, `run_mujoco.py` (workflows `citylearn`, `pandapower`, `mujoco`) |
-| Azure, the bill | workflow `aks-metered`: `reps`, `arms`, `duration_s`, `load_steps`, `worker_pools`, `pool_prices`, `hpa_max` |
-| The big organisms, detached | workflow `big-organism-detached`: `mode` start / collect / survey, `organisms`, `size`, `duration_s`, `commit`, `max_hours` |
-| Archive a finished run with the code | add its id to `.github/archive_request.txt` and push (workflow `archive-run`) |
-| Verify before a push, as GitHub runs it | `python3 tools/release_manifest.py` under Python 3.12: 0 FAIL |
-
-## Appendix B - File Map
-
-| Path | Contents |
-|---|---|
-| `omnicompass/` | the engine, governor, nervous system, shield, compass, conveyance law, the compass |
-| `omni_controller/` | the Kubernetes controller and muscles; the GPU governors (one and two wires) |
-| `realms/` | the 1,107-muscle catalog of v5 (`catalog_v5.csv`; v3's 945 in `catalog.csv`, frozen), every muscle's own card (`muscle_cards_v5.csv`), the plant models, the realm harness, the compass on every muscle (the max, `compass_arm_v5.py`), the modelled card |
-| `tools/` | benchmarks, receipts, the wire check, the scale ladder, the card search (`tune_cards.py`), manifests, seals |
-| `scripts/` | one-command runs (GPU, Kubernetes, ladder) |
-| `deploy/` | container image, install and permission files |
-| `cpp/` | the C++20 twins |
-| `results/` | every published result, with its raw files and checksums |
-| `results/live/V1_*.md`, `V3_*.md` (+ `.json`) | the three-run tables, one per test, named by the engine they ran on |
-| `results/live/raw/run-<id>/` | every archived run's files, one SHA-256 manifest per repetition |
-| `results/scale/GRID.md`, `results/realms/REALMS.md`, `results/OMNI_INDEX.md` | the grid of copies and runs, the modelled realms, the one combined number |
-| `OMNI_V1.json`, `OMNI_V2.json`, `OMNI_V3.json` | the frozen engines' fingerprints |
-| `docs/` | this manual, the preregistrations, the evidence ledger, the theorem, the realm study |
-| `docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md` | what each engine is and every result read on it |
-| `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and every benchmark still to run; the program to full size |
-| `.github/workflows/` | every benchmark as GitHub runs it: `benchmark-reps`, `six`, `six-kube`, `big-organism`, `big-organism-detached`, `aks-metered`, `pgbench`, `kafka`, `redis`, `ycsb`, `sysbench`, `robustness`, `swarm`, `citylearn`, `pandapower`, `mujoco`, `archive-run`, `verify` |
-| `tests/`, `verify.py` | every unit and property test, the shield's adversarial cases, the Python-against-C++ agreement; `verify.py` runs them all and must end with its pass line |
-| `tools/omni_version.py`, `tools/release_manifest.py`, `tools/layout_check.py` | which engine a checkout or commit carries; the release manifest and verification as GitHub runs it; the check that every path the documents name exists |
-| `tools/confirm_abc.py` and its siblings (`pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `sysbench_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py`, `citylearn_abc.py`) | the three-run tables, one tool per kind of raw record, each checking the engine of every run it reads |
-| `tools/omni_index.py`, `tools/dossier.py`, `tools/own_cost.py` | the one number from the tables; the dossier from the tables; the governor's own cost from the archived audits |
-| `tools/wiring_verdicts.py`, `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | the verdict per knob from every table: write, watch or the operator's choice, every loss with its cause; one row per knob and per muscle |
-| `tools/knob_verdict.py` | the brain's own verdict on a live knob, around the engine's `omnicompass/verdict.py`: watch first, one notch a trial, the allowance, the two objectives; used by the five live harnesses |
-| `tools/benefit_sheet.py`, `docs/BENEFIT_SHEET.md`, `results/BENEFIT_SHEET.json` | one number per benchmark from the tables, plus always toward the system's own aims, with yes, no, none or trade beside it |
-| `tools/legal.py` | the legal notice every generated report carries at its head and foot |
-| `docs/book/` | the builder of this manual's PDF (`build_book.py`) and the theory chapters bound into it |
-| `release/` | the copyright deposit and the release notes, printed at named commits |
-| `CHANGELOG.md`, `docs/STATE_OF_PLAY.md` | what changed, by date; where everything stands today |
-| `docs/*_PREREGISTRATION.md` | the rules of every benchmark, written before it ran, with every amendment and its time |
-| `docs/DOSSIER.md`, `docs/dossier/` | every result in one place, with its charts, built by `tools/dossier.py` from the tables |
-| `docs/HISTORY.md`, `docs/history/` | earlier states of play, earlier engines' sets and the pre-v1 index, kept whole |
-| `LICENSE`, `NOTICE`, `LICENSES/` | the license and notices |
-
-## Appendix C - The Equations in Full
-
-    (1) dE/dt    = -alpha_E E + beta_int + beta_ext + v_eff
-    (2) dU/dt    = mu U (1 - U^2) - (dE/dt)/E_max - lambda_U U + u,   |u| <= U_AUTHORITY = 25
-    (3) dI_U/dt  = (1 - U) - sigma_1 E - delta S - lambda_I I_U
-    (4) v_eff    = cos(omega_B t / 2) * c * tanh(lambda_0 + lambda_1 (U - 0.5) + lambda_2 S)
-    (5) Phi(S)   = alpha_s S^2 / 2 + beta_s S^3 / 4 - delta S
-    (6) dS/dt    = -dPhi/dS = delta - alpha_s S - (3/4) beta_s S^2
-    (7) dB/dt    = B_dot ;  dB_dot/dt = gamma_c delta S - (omega_B / Q_B) B_dot - omega_B^2 B
-    (8) R_B[n]   = finite-difference audit of (7); never fed back into the state
-
-    Control (one micro step, zero-order hold across all four RK4 stages):
-        u = clip(-f_U(x, t) + K_P (sigma - U), -U_AUTHORITY, +U_AUTHORITY),  K_P = 12,  sigma in {-1, +1}
-
-    The compass (every muscle):
-        p = position of the service reading in its band (0 calm, 1 the line)
-        F = A tanh((K_P (p - center) + K_D v) / A),   K_D >= critical damping
-        p >= 0.95  =>  full up force; down side held
-        knob <- clip(knob + g_side F span, cover)
-
-    The GPU governor (two wires, omni_controller/gpu_compass.py; one law, amendments 8 to 10):
-        p = (mean response of the last 5 s - S) / (SLO - S),  S = SLO / 10;  p95 >= SLO, a failure, blind  =>  fail up
-        fail up / race (utilization >= 0.95)  =>  ceiling = top clock, lid = start limit (the card's own settings)
-        steady under the limit (saturated and drawing >= 0.97 of the limit)  =>  ceiling = the card's own busy clock,
-            lid = start limit (the same watts, no knock-backs)
-        otherwise:
-            ceiling <- clip(ceiling + round(g_side F f_top / 15 MHz) 15 MHz, c_floor, f_top)
-            c_floor = max(f_busy_own x floor, f_top - k* 15 MHz)       (never under the card's own busy clock,
-                                                                         never past the verdict's deepest step k*)
-            lid = clip(ceil(1.10 P_busy_own), envelope floor, start limit)
-        g_up 0.10, g_down 0.0125, center 0.4, floor 1.00
-
-    The verdict (omnicompass/verdict.py; every slow knob, the GPU ceiling and the Kubernetes machine count):
-        reference r = the median cost per request at the deepest allowed step, measured fresh, n >= 30 requests
-        trial t     = the median cost at one step past it, n >= 30 requests, under the same traffic
-        allow the step  iff  t <= r (1 + a)  and  t <= c_native (1 + a),   a = 0.02
-        a refused step is not tried again for R decisions (GPU R = 900; Kubernetes 120); the knob never goes past the
-        deepest allowed step, so steps cannot add up beyond the allowance
-
-    Kubernetes, the compass on the HPA target (omni_controller/controller.py; sets 30 and 31):
-        target x in [0.6 x_op, x_op] (times the conveyed gain); the up force lowers x (more pods)
-        p >= 0.95 from load (line breached, every sense live, nothing pending)  =>  x = 0.6 x_op at once
-        p >= 0.95 from a blind sense or pods waiting for a lost machine           =>  x = x_op (native's own)
-        fault over (p < center, line clean, nothing pending)                      =>  x = x_op at once, never held
-        machines: one more at once past the wall; one back only when the verdict and the release gate agree
-        g_up 0.10, g_down 0.02, release force < -0.2
-
-    The productivity arithmetic (every receipt; manual section 3.4):
-        work W equal in both arms;  G = C_native / C_omni - 1;  the same work needs 1/(1 + G) of the resources;
-        saving S = G / (1 + G):  G = 1/3  <=>  S = 1/4
-
-Parameter ranges, defaults and the proof of convergence: `omnicompass/core.py`, `docs/TRACKING_THEOREM.md`,
-`docs/CANONICAL_ENGINE.md`.
-
-## Appendix D - Metrics
-
-Every gauge, where it comes from, and whether it is measured or modelled: `docs/METRICS_CATALOG.md`. The gauges that
-appear in the three-run tables of this manual, with their source and their direction, are these:
-
-| Gauge | Source | Measured or modelled | Direction |
-|---|---|---|---|
-| work inside the response line (requests, transactions or messages a second answered within the line) | the probe's own records, pgbench's log, the consumers' records, the application's records | measured | the aim is higher; the product number |
-| response time, mean, median, 95th and 99th percentile | the same | measured | the aim is lower |
-| time over the response line (share of samples) | the same, against the preregistered line | measured | the aim is lower |
-| failed requests, lost messages | the same | measured | any increase is marked |
-| alert minutes: whole minutes whose 95th percentile, failed requests counted over, was over the line | the probe's own records, minute by minute | measured | the aim is lower: the minutes an on-call page would be open |
-| settings commands the governor wrote on its own | the governor's audit | measured | shown, not judged (no person touched either arm) |
-| the governor's additions decided while the service was still inside its line (% of its additions) | the governor's audit | measured | shown, not judged |
-| worker machines in service, mean; node-hours | the cluster's own node records every 15 s | measured (machine-hours on kind; Azure's own count on AKS) | the aim is lower |
-| compute bill at list price | Azure's own machine count Ã— list price per family | measured (a real bill) | the aim is lower |
-| energy (Wh), the standby model | a declared formula over the machines in service (kind) | **modelled**, said so on every line | the aim is lower |
-| host CPU busy; host CPU-seconds; CPU-seconds per 1,000 units inside the line | `/proc/stat` of the real machine under the test | measured | the aim is lower |
-| Omni's own CPU (cores), mean | the governor's audit (its process and every command it ran) | measured | shown, not judged in the Kubernetes tables; a loss in all three of our runs where it is one |
-| connections held open, consumers running, memory ceiling held | the pooler's, the group's, the cache's own reports | measured | the aim is lower (the resource held) |
-| cache hit rate; consumer lag | Redis's INFO; the consumers' records | measured | the aim is higher; the aim is lower |
-| HPA replicas, pods started, pod start wait | the API server's own records | measured | shown, not judged except pod start wait |
-| organism work, energy, time over its line | the organism's plant models | **modelled** | by direction; S class |
-| energy a mission, missions a charge (drones) | the simulator's motor constants through a declared model | **modelled** | lower; higher |
-| cache size held, mean; bytes in the cache, mean; pages read into the cache (MongoDB) | the server's own `serverStatus` (WiredTiger cache) | measured | the aim is lower (the resource held); shown, not judged (pages read) |
-| seconds from the kill to every setting back at the operator's (robustness) | the harness polling the cluster once a second from the kill | measured | the aim is lower; past 60 s marked; never, INVALID |
-| the governor's resident memory, last ten minutes over the first ten (robustness, long run) | the process table, sampled every 15 s by the harness | measured | a growth over a quarter is marked |
-| decisions made of expected; failed decisions (robustness, long run) | the governor's audit | measured | under 95% INVALID; any failed decision shown with its reason |
-| mission time, position error, collisions (drones) | the simulator's own state at every step | measured in the simulator (S class) | lower; under the safe error; any collision voids the cell |
-| handed back (every arm) | the knob read back at the end of the arm | measured | yes in every arm, or the run is invalid |
-| off the clock | the organism's own clock against its window | measured | shown; marks the cell |
-
-**Three rules for reading any gauge in this appendix.** A measured gauge is one the system under test, or the host's own
-kernel, reported about itself; a modelled gauge is one computed from a declared formula over measured inputs, and every
-table says which it is on the line itself, never only here. A resource gauge (machines, connections, consumers, memory,
-cache) is always judged as aiming lower, even where the governor's purpose was to add the resource to buy service, so that
-a gain bought with a resource is paid for in the same table and in the index. And a gauge marked "shown, not judged"
-never enters a reading or the index; it is there so that a reader can see what the governor did (how often it moved, how
-many pages it read, how many pods it started), not to be counted for or against it.
-
-## Appendix E - Troubleshooting
-
-| Symptom | Cause | Fix |
-|---|---|---|
-| Wire check `FAIL 3 up wire (lock)` | the driver or VM refuses clock locking | use bare metal or full passthrough; or run the one-wire governor |
-| Wire check `FAIL 3 up wire (follows down)` | the card ignores the ceiling | update the driver; check for another management agent holding clocks |
-| Wire check `FAIL 4 down wire` | the power limit is refused or capped by the board | check `nvidia-smi -q -d POWER`; run as root |
-| `another copy of this test is already running` | a second copy was started | wait for the first or reboot; start once |
-| `something else is using the GPU` | another process holds the card | stop it; the benchmark must run alone |
-| Governor exit 5 | another writer changed a knob | find the other controller; Omni-Compass left its value alone |
-| Governor exit 3 | a restore did not read back | restore by hand (`nvidia-smi -rgc`, `-pl <start>`); investigate before rerunning |
-| `decision failed (n in a row)` | the cluster API is unreachable | turn it OFF; native runs on |
-| Energy saved but p95 slower than native | the card served bursts below its own clock, or the lid sat under its own draw | read section 8.5; in the audit compare `telemetry.clock_mhz` while busy with `native_busy_clock_mhz`, and `want_w` with `native_busy_draw_w` |
-| Fail-up in most decisions | `--slo-ms` set too low for the workload, or a stale feed read as blind | set `--slo-ms` from the workload's own target; check the feed's age |
-| No saving at all, service unchanged | the card is saturated almost all the time (it races), or the service sits above the compass's center | expected on a card with no slack; the saving comes from the quiet stretches |
-| Kubernetes: no machine ever given back | the release gate refuses (its reason is in the audit), or the service is above the compass's center | read `node_gate.reason` in the audit; check `--slo-ms` and the latency feed |
-| Kubernetes: a repetition marked OFF THE CLOCK | the machine could not step the organism inside its window | a longer window for that size on that machine; never a faster reading of the same run |
-| Broker: consumers climb to the cover and stay | messages wait at every step (the producer is past the group's capacity) | the benchmark's capacity step sets the peak at nine tenths of the operator's group; check the measured capacity in the run's log |
-| Cache: the ceiling grows while little memory is used | cold misses read as pressure | the full-cache gate is the rule (used â‰¥ 90% of the ceiling); check `used_mb` beside `maxmemory_mb` in the run's log |
-| Cache: the ceiling never grows | the working set fits the operator's ceiling | expected: a cache that fits has nothing for the ceiling to mend, and the row reads inside the noise |
-| Storage-engine cache: the cache never fills, whatever the key space, and omni reads as a free memory saving | the benchmark's requests concentrate on a few hot records (YCSB's shipped zipfian draw), or the run asks for records the load did not write (hashed keys over an ordered load), so the reads are served from the index | a result that flatters the governor is the first thing to suspect: check "in cache" against the cache size in the per-notch lines; draw requests uniformly over the key space and name the same key order in load and run; a knob with nothing to do is not a saving |
-| Storage-engine cache: the compass only ever reads calm | the line is set far above the stack's own latencies (a 2 ms line over 0.15 to 0.45 ms reads) | set the line on the tuning workload's own figures so that a hit is calm and a full-cache miss is slow, and write the figures in the preregistration before any counted run |
-| Swarm: a cell reads "void" | two drones came within two collision radii in either arm | a task or simulator setting (keep-out, altitude stagger, depot spacing); fixed before any counted run and said in the preregistration |
-| Three-run table heads itself with a warning | a run's commit is not the engine it claims, or the three are not separate runs | run `tools/omni_version.py --commit <sha>` on each; make the table only from runs on one frozen engine |
-| Archive bot skips a run | the run was not finished when the bot passed | leave the id in `.github/archive_request.txt`; the next pass copies it |
-
-## Appendix F - Evidence Map
-
-`docs/EVIDENCE_LEDGER.md` (every claim and its class), `docs/CLAIMS_REGISTER.md` (what is claimed and what is not),
-`docs/GPU_PREREGISTRATION.md`, `docs/REALMS_PREREGISTRATION.md`, `docs/K8S_COMPASS_PREREGISTRATION.md`,
-`docs/POSTGRES_PREREGISTRATION.md`, `docs/KAFKA_PREREGISTRATION.md`, `docs/REDIS_PREREGISTRATION.md`,
-`docs/SWARM_PREREGISTRATION.md`, `docs/CITYLEARN_PREREGISTRATION.md`, `docs/PANDAPOWER_PREREGISTRATION.md`,
-`docs/ROBOTICS_PREREGISTRATION.md`, `docs/ROBUSTNESS_PREREGISTRATION.md`, `docs/YCSB_PREREGISTRATION.md` and
-`docs/MYSQL_PREREGISTRATION.md` (the rules written before each run), `docs/OMNI_V1.md` to `OMNI_V3.md` (every result by engine), `docs/REGISTER.md` (every benchmark
-and its file), `docs/PROOF_PROGRAM.md` (the program to full size with its costs), `docs/DOSSIER.md` (every result in one
-place), `results/OMNI_INDEX.md` (the one number), `docs/WIRING_VERDICTS.md` (which knobs earn a wire in, and every loss
-with its cause), `docs/STATE_OF_PLAY.md` (where everything stands), `docs/HANDOFF.md` (every command in one page).
-
-**The map, claim by claim.** Each claim this manual makes is listed here with the class of evidence behind it and the
-document that carries it, so that a reader can go from any sentence of the executive summary to the file that would have
-to be wrong for the sentence to be wrong.
-
-| Claim | Class | Where the evidence is | What would falsify it |
-|---|---|---|---|
-| The engine's six states stay inside their walls and settle | T / V (proof and test) | `docs/FORMAL_STATUS.md`, `docs/TRACKING_THEOREM.md`, `tests/`, `results/SOAK.json` | a trajectory leaving its wall, or the C++ twin disagreeing with the Python |
-| No write ever leaves a knob's cover; a blind sense holds; fail-up is immediate | T / V | `tests/test_shield_properties.py` (two million cases), the plug tests per stack | one case of a write past the cover or a give-back while blind |
-| On a real cluster the governor does more work inside the line, faster, on no more machines, at no more energy | L | the six Kubernetes tables in `results/live/`, A/B/C each, `docs/K8S_COMPASS_PREREGISTRATION.md` | a row LOSS in all three of our runs on work or speed, or power given on machines or energy with nothing bought in any of the six, which would stand in the table |
-| Killed outright, the governor's settings are back at the operator's within seconds | L | `results/live/V3_ROBUST_KILL.md`, `docs/ROBUSTNESS_PREREGISTRATION.md` | a repetition handed back after 60 s, or not at all |
-| Over two hours the governor neither leaks, slows nor drifts, and hands everything back at the end | L | `results/live/V3_ROBUST_LONG.md`, `docs/ROBUSTNESS_PREREGISTRATION.md` | memory growing past a quarter, the decision time growing past a half, fewer than 95% of expected decisions, or a setting not handed back |
-| Governing costs a few thousandths of a core at every size | L | `results/live/V3_OWN_COST.md` | an own-cost figure growing with the organism |
-| The pooler, the buffer pool and the storage-engine cache each give memory back on an untouched workload with no LOSS; the broker and the cache read nothing on the first set under the brain's verdict | L | `V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`, each preregistration | a product row LOSS in all three of our runs on an untouched workload; the memory row of the cache is such a loss and stands |
-| The one number is +4.8% across the real categories on the sets of 10 October, losses included | L, by rule | `results/OMNI_INDEX.md`, `tools/omni_index.py` | a category omitted, a loss not entered, a tuning row counted |
-| A day of demand measured by someone else reads the same way as our own schedules | L | `results/live/V3_TRACE_GOOGLE2011.md`, `results/traces/google2011/schedule.json`, `docs/TRACES_PREREGISTRATION.md` | a schedule derived after the runs; a rule fitted to the governor; a trace part whose SHA-256 does not match |
-| The modelled realms, grids, arms, buildings and swarms gain under their own native controllers | S | `results/realms/`, `V3_PANDAPOWER.md`, `V3_MUJOCO.md`, `V3_CITYLEARN.md`, `V3_SWARM.md` | a run of the same simulator at the same version and seed giving other digits |
-| A physical meter shows less energy for the same work | P | **no current result**; `docs/GPU_PREREGISTRATION.md` names the run | the rerun on the current card controller reading no difference, or LOSS |
-| Omni-Compass never changes the engine between a rule and its result | by construction | `OMNI_V3.json`, `tools/omni_version.py --commit <sha>` on every table's commits | a table whose runs' commits carry different fingerprints |
-
-**What a referee asks of each document.** Of a preregistration: is it dated before the first counted run, does it name the
-tuning case and the untouched cases, is every amendment dated and does any amendment made after a result was seen say so?
-Of a three-run table: are the three run ids separate runs, does the head name the engine at each commit, is every gauge
-of the preregistration present including the ones that went against the governor, and is the reading one of the three the
-rule allows? Of the index: is every real category in it, is every tuning row out of it, and does a loss in all three of our runs enter
-as a loss? Of the raw folder: does the SHA-256 manifest in it match the files, does the governor's audit show every
-decision with its reading and its write, and does the hand-back record read the operator's value? Every one of those
-questions has a yes in this program or a disclosure naming the exception; the disclosures are in section 16.7.
-
-**How to audit one result from this manual to its raw files.** Take any row of section 16. Its source column names a
-three-run table in `results/live/`; the table's head names the three GitHub run ids, the commit each ran on and the engine
-`tools/omni_version.py` reads at that commit. Each run id names a folder `results/live/raw/run-<id>/` holding every
-repetition's files (the capture, the response times, the governor's audit and log, the per-request records, one SHA-256
-manifest per repetition). The table tool named in the table's text (`tools/confirm_abc.py` or its siblings) rebuilds the
-table from those folders; `tools/omni_index.py` rebuilds the index from the tables; `tools/dossier.py` rebuilds the
-dossier. The preregistration named in the table's text holds the rules, written before the first counted run, with every
-amendment dated. Nothing in that chain is by hand.
-
-**What one repetition leaves behind.** Take the first repetition of the first kill-scenario run, archived at
-`results/live/raw/run-37716845219/paired-1/`. It holds two folders, one per arm, and the omni arm's folder holds
-twenty-nine files, every one of which a reader can open: `preflight.txt` (the UTC time, the arm, the git commit the arm
-ran at, the versions of Docker, kind, kubectl, the API server and Python, the metrics-server version with its SHA-256,
-the worker count and the probe's address); `rbac_omni.txt` (twenty lines of `kubectl auth can-i`, each verb the governor
-needs reading yes and each it must not have reading no); `window_start.txt` and `window_end.txt` (the window's clock);
-`load_schedule.log` (every load step and when it was applied); `latency.csv` (the probe's response times, one row a
-second); `capture.csv` (the cluster's state every fifteen seconds: replicas, workers, pods pending, the HPA's target);
-`host_cpu.csv` (the runner's own `/proc/stat`); `pod_watch.json` and `pods_end.json`, `nodes_end.txt`, `hpa_end.json`
-(the API server's own records at the end); `audit.jsonl` (one line per decision: the compass's position, heading and
-letter, the engine's state, every write with its value sent and its value read back); `controller.log` and
-`controller2.log` (the first governor's log, and the second one's after the kill); `audit_kill.jsonl` (the watchdog's
-restore writes, each with its command and its reason, such as "reset: remove record"); `watchdog.log` (one record: which
-governor, its process id, whether it was hung or dead, every command run and each exit code); `robust.log` (the kill at
-the 360th second with the settings as they stood, "target=50 range=1,10 limits=1850m 3700m workers=5/6", and the
-hand-back "every setting at the operator's after 8 s, target=50 limits=500m workers=6/6 left=none"); `rss.csv` (the
-governor's resident memory every fifteen seconds); `omni_writes.txt` (how many writes the governor made in the window:
-42); `kill_switch.txt` (the reset check: target restored, workers in service, no record left); `omni2.pid` (the second
-governor's process id) and `kill` (the marker the harness wrote at the kill); `robust.out` (the same robustness log as the
-job printed it); `end_reads.err`, `pod_watch.err` and `capture.csv.errors` (empty, as they should be);
-`metrics-server-components.yaml` (the pinned manifest as applied); and `SHA256SUMS.txt`, one line per file. A reader who doubts a number in the kill table can find the second it was taken.
-
-## Appendix G - Reproducing Everything, From a Clean Machine
-
-A referee with a laptop and a GitHub account can rebuild every table in this manual and rerun every benchmark. The steps,
-in order, with what each costs:
-
-1. **Get the code and prove it is the code.** `git clone` the repository, `pip install -r requirements.txt` under Python
-   3.12 (the version GitHub runs), then `python3 verify.py`: it checks every sealed file's fingerprint, runs every test in
-   `tests/`, including the rules of every three-run table on fixed cases, and ends `VERIFICATION: PASS`. About ten
-   minutes on a laptop. `python3 tools/omni_version.py` then says which frozen engine the checkout carries.
-2. **Rebuild any table from its raw files.** Every three-run table names its three run ids; their files are in
-   `results/live/raw/run-<id>/`. `python3 tools/confirm_abc.py "<title>" results/live/raw/run-<A> results/live/raw/run-<B>
-   results/live/raw/run-<C> --out /tmp/check.md` rebuilds a Kubernetes or Azure table; `tools/pgbench_abc.py`,
-   `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py` and `citylearn_abc.py`
-   the others, with the same arguments. Compare the result with the committed table: they are the same bytes below the legal notice. A
-   few seconds each.
-3. **Rebuild the index and the dossier.** `python3 tools/omni_index.py` reads every `V1_*.json` and `V3_*.json` table and
-   writes `results/OMNI_INDEX.md`; `python3 tools/dossier.py` writes `docs/DOSSIER.md` and its charts. Seconds.
-4. **Rerun a benchmark.** Every benchmark is a GitHub Actions workflow with its inputs documented at its head
-   (`.github/workflows/`): `benchmark-reps` for the Kubernetes tests (`duration_s`, `arms`, `loadgen`, `load_steps`,
-   `faults`, `workload`), `pgbench`, `kafka`, `redis`, `ycsb`, `swarm`, `robustness`, `citylearn`, `pandapower`, `mujoco`,
-   `six`, `six-kube`. Dispatch it three times for A, B and C; each run archives its files when its id is added to
-   `.github/archive_request.txt`. The Kubernetes tests run on GitHub's free runners in about an hour each; the database,
-   broker, cache and swarm runs in about half an hour; the organisms at 1,000 copies need a rented machine (`aks-metered`
-   and `big-organism-detached` need an Azure subscription and its credentials in the repository's secrets).
-5. **Run it on your own system.** Section 13 is the method; `scripts/kind_paired.sh` and `tools/live_reps.py` are the
-   tools; the preregistrations are the templates for writing your own rules down before you run.
-6. **Check a result against its preregistration.** Each `docs/*_PREREGISTRATION.md` was committed before its first
-   counted run; `git log` on the file shows when, and every amendment carries its own date and reason in the text.
-
-Nothing in this chain requires a credential, a licence key or a word from us; the evaluation licence covers all of it.
-
-## Contact
-
-Licensing, pilots and the Omni-Compass Enterprise License: **The Omni-Compass LLC.**
-
----
-
-*Â© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+YªçŠx-®éÜj×¢ëiºÚ+Š§j[h‘éÜ¢éí×n÷Ó´èµ©hºÚn¶X§zÍHÈHÓS’KPÓÓTTÔÈÕÓ‘T‰ÔÈPS•PS‚ˆ0ªHŒˆHÛ[šKPÛÛ\\ÜÈËˆ[šYÚÈ™\Ù\™Yˆ
+Š‘]˜[X][Ûˆ[™Ú[][][Ûˆ\ÙHÛ›KŠŠˆ[žHÛÛ[Y\˜ÚX[\ÙKÛÛ[Y\˜ÚX[^˜][Û‹[Û™]^˜][Û‹›ÙXÝ[Ûˆ\ÙK™Y\ÝšX][ÛˆÜˆÜÝYÙ\šXÙHÙˆ[žH\ÙˆÛ[šKPÛÛ\\ÜÈ™\]Z\™\ÈHÚYÛ™YZYÛ[šKPÛÛ\\ÜÈ[\œš\ÙHXÙ[œÙHœ›ÛHHÛ[šKPÛÛ\\ÜÈËˆ]™\žHÛÜK^Ü™\Ü[™š[Ý]Ø\œšY\È\È›ÝXÙHÚ]PÑS”ÑX“ÕPÑX[™TÐÓÔÕT‘TË›YˆÔSXÙ[œÙKRY[YšY\ŽˆXÙ[œÙT™Y‹SÛ[šPÛÛ\\ÜËQ]˜[X][Û‹LKŒ[][ËÛÜ\šYÚÈ[™˜Y[X\šÜÈš[Y[ˆHTÐKˆÝÝË›Û[šKXÛÛ\\ÜË˜ÛÛB‚ˆÈÈHX\Ý\ˆX[X[ˆHÛÝ™\››Ü‹]ÈYXÚ[š\ÛK]È™\Ý[Ë[™ÝÈÈÚ\™H]ÛÈ[Ý\ˆÝXÚÂ‚ŠŠ•\È\ÈHÝÛ™\‰ÜÈX[X[HX\Ý\‹ŠŠˆ]ÛÈ]™\ž][™ÎˆÚ]Û[šKPÛÛ\\ÜÈ\ËH[ÜÛÜH[™B›X][X]XÜÈ][œÈÛ‹]ÈYXÚ[š\ÛKÝÈ]\ÈZ[]™\žH™\Ý[Ú]]È]šY[˜ÙHÛ\ÜË[™ÝÈ]\ÈÚ\™Y[‚˜[™ÚXÚÙYˆ]\ÈÜš][ˆ›ÜˆÚÙ]™\ˆÝÛœÈÜˆXÙ[œÙ\ÈÛ[šKPÛÛ\\ÜÈ[™ÛÈ]\ÝÛ›ÝÈHÚÛHYXÚ[š\ÛKˆB“Ü\˜]Ü‰ÜÈX[X[
+ØÜËÓÓS’WÐÓÓTTÔ×ÓPS•PS›Y
+H\ÈHÚÜ\ˆ›ÛÚÈ›ÜˆH[ÜHÚÈÚ\™H[™[ˆ]ˆHš[Y˜›ÛÚÈÙˆ\È^\ÈØÜËÓÓS’WÐÓÓTTÔ×ÓÕÓ‘T”×ÓPS•PSœ˜
+]ÛŒÈØÜËØ›ÛÚËØZ[Ø›ÛÚËœHK[ÝÛ™\˜
+K‚‚ŠŠ“ØÝØ™\ˆŒŠŠ‚ŠŠ•HÛ[šKPÛÛ\\ÜÈÊŠ‚‚[][ËÛÜ\šYÚÈ[™˜Y[X\šÜÈÛÝ™\š[™ÈHÛ[šKPÛÛ\\ÜÈ[™Ú[™K]ÈX][X]XÜÈ[™]ÈÛÙØ\™H]™H™Y[ˆš[Y[ˆH[š]YÝ]\ÈžHHÛ[šKPÛÛ\\ÜÈË‚‚‹KKB‚ˆÈ”“Ó•PUT‚‚KKHHÙ^NˆÐRS‹U‘Sˆ[™ÔÔÈ
+ÛÛËÜ™XY[™ÜËœJHKO‚ˆÈÈHÙ^NˆÐRS‹U‘Sˆ[™ÔÔÂ‚‘]™\žHYÙY™XY[™È[ˆÛ[šKPÛÛ\\ÜÈ\ÈÛ™HÙˆ™YHÛÜ™Îˆ
+Š‘ÐRSŠŠ‹
+Š‘U‘SŠŠˆÜˆ
+Š“ÔÔÊŠ‹ˆ™]\‹Ø[YH[™ÛÜœÙH\™H›Ý\ÙY[ž]Ú\™KˆHÛÜ™\ÈXÚYYžHÚ]HØ]YÙH\È›Ü‹™]™\ˆžHH\ÈÜˆZ[\ÈÚYÛˆÙˆ]È[X™\ŽˆÚÈÙ]ÈHZ[HY™™\œÈœ›ÛHÛ™HÞ\Ý[HÈH™^[™XXÚØ]YÙIÜÈZ[H\ÈÜš][ˆ[ˆ]È™\™YÚ\Ý˜][Ûˆ™Y›Ü™HH[œË‚‚ŸÛÜ™Ú]XXÚ]\ˆÝ[™È›Üˆ]ÈÙ[œÙH[ˆ[™\Üš][™ÈÚ]]YX[œÈ[ˆHX›HŸKK_KK_KK_KK_Ÿ
+Š‘ÐRSŠŠˆ
+Š‘ÊŠˆÜ›ÝÝ
+\ÜÙ]\™XÚX][ÛŠNÈ
+ŠJŠˆY˜[YÙH
+š\ÚÈ™YXÝ[ÛŠNÈ
+Š’JŠˆ[\›Ý™[Y[
+X\™Ú[ˆ^[œÚ[ÛŠNÈ
+Š“ŠŠˆ™]\ÜÚ]]™H
+›Ùš]X›HÝ]ÛÛYJHÝ\œ\È[™ÜÚ]]™H˜\šX[˜ÙHHØ]YÙH[Ý™YÝØ\™]ÈXÛ\™YZ[HYØZ[œÝ˜]]™Nˆ[Ü™HÛÜšÈÛ™KHÚÜ\ˆØZ]™]Ù\ˆZ\ÜÙ\ÈÜˆ˜Z[\™\ËÜˆH™\ÛÝ\˜ÙHÝ]Ÿ
+Š‘U‘SŠŠˆ
+Š‘JŠˆ\]X[^™Y
+™\›È˜\šX[˜ÙJNÈ
+Š•ŠŠˆ™\šYšYY˜\Ù[[™H
+^XÝY›Ü›JNÈ
+Š‘JŠˆ\]Z[Xœš][H
+˜[[˜ÙYš\ÚÊNÈ
+Š“ŠŠˆ™]]˜[
+›È™]Ú[™ÙJHHœ™XZËY]™[ˆ˜\Ù[[™Nˆ\]Z[Xœš][H˜]]™H[™Û[šHÛÝ[›Ý™HÛ\\ˆHØ[YKÜˆ›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙNÈHÛ›Øˆ˜]]™H[™XYH[œÈ]HÜÙˆ]È˜[™ÙH\ÈU‘S‹]]È[Z]Ûˆ˜]]™HŸ
+Š“ÔÔÊŠˆ
+Š“
+ŠˆXZØYÙH
+Ø\][˜Z[ŠNÈ
+Š“ÊŠˆÙ™‹]˜XÚÈ
+Y™\œÙHÙ[XÝ[ÛŠNÈ
+Š”ÊŠˆÙ]˜XÚÈ
+ÛZ[HXXš[]JNÈ
+Š”ÊŠˆÝXœ\ˆ
+™YØ]]™H˜\šX[˜ÙJHXÝX\šX[YšXÚ][™^ÜÝ\™HHØ]YÙH[Ý™Y]Ø^Hœ›ÛH]ÈXÛ\™YZ[Nˆ\ÜÈÛÜšÈÛ™KHÛ™Ù\ˆØZ][Ü™HZ\ÜÙ\ÈÜˆ˜Z[\™\È‚’ÝÈHÚYÛˆÙˆH[X™\ˆ™XÛÛY\ÈHÛÜ™‚‚‹H
+Š•[YHØZ]YZ\ÜÙYÜˆ˜Z[Y
+Šˆ
+H™\ÜÛœÙH[YK[YHÝ™\ˆH[™K˜Z[Y™\]Y\ÝÊNˆH˜[\ÈÐRS‹Hš\ÙH\ÈÔÔË‚‹H
+Š•ÛÜšÈÛ™JŠˆ
+ÛÜšÈ[œÚYHH[™K›ÝYÚ]H]˜]JNˆHš\ÙH\ÈÐRS‹H˜[\ÈÔÔË‚‹H
+ŠH™\ÛÝ\˜ÙHÜ[Üˆ[
+Šˆ
+[™\™ÞKXXÚ[™\ËY[[ÜžK›ØÙ\ÜÛÜˆ[YKHš[ÙX\ˆÛˆH\
+NˆH˜[\ÈH
+Š˜Ý]
+Š‹[™HÝ]\ÈÐRS‹ˆHš\ÙH\È
+ŠœÝÙ\ˆÚ]™[ŠŠŽˆÚ]Û[šH][ˆÈ^HHÛÜšÈ[™HÜYYÚÝÛˆ™\ÚYH]ˆÝÙ\ˆÚ]™[ˆ\È[Ø^\ÈÚÝÛˆ[™™]™\ˆY[‹[™]\È™]™\ˆØ[YHÜÜÈ
+H›Ý[™\‰ÜÈÜ™\ˆÙˆLˆØÝØ™\ˆŒŽˆHX^šY\È]™\žH]\ØÛIÜÈYÙNÈ]™]™\ˆÚ]™\ÊK‚‹HÛÈHZ[\ÈØ[ˆ™XYÐRSˆ
+H™\ÜÛœÙH[YHÝ]IKHš[Ý]Ì	JH[™H\ÈØ[ˆ™XYÔÔÈ
+˜Z[Y™\]Y\ÝÈ\
+K‚‚”ÛÛYH™\™YÚ\Ý˜][ÛœÈ˜[YHZ\ˆÝ]ÛÛYHÚ]HX™[Üš][ˆ™Y›Ü™HH[œÈ
+›Üˆ^[\HÕTT’SÔˆÒUSˆÕPT‘RSÈ[ˆHØ\™›ÝØÛÛ
+KˆHX™[Ý^\È\È]Ø\Èœ›Þ™[‹[™]™\žHX›HÚÝÜÈ]Ú]]ÈÛÜ™š\œÝˆÕÐT‘UÈRSTÈ™XYÈÐRSŽÈ“ÕÐVTÈ™XYÈÐRSˆS‘ÔÔÎÈUÐVH”“ÓHUÈRSTÈ™XYÈÔÔÎÈÐSQHTÈUU‘H™XYÈU‘Sˆ
+HØ[YH\È˜]]™JNÈUUÈSRUÓˆUU‘H™XYÈU‘Sˆ
+]]È[Z]Ûˆ˜]]™JNÈÕTT’SÔˆÒUSˆÕPT‘RSÈ™XYÈÐRSˆ
+Ú][ˆHÝX\™˜Z[ÊNÈS‘T‘ÖHST“Õ‘SQS•ÒUÑT•’PÑHQSÑ‘ˆ™XYÈÐRSˆS‘ÔÔÈ
+[™\™ÞHÝ]Ù\šXÙH˜YY›Üˆ]
+NÈÑT•’PÑHST“Õ‘SQS•ÒUS‘T‘ÖHQSÑ‘ˆ™XYÈÐRS‹ÝÙ\ˆÚ]™[ˆ
+Ù\šXÙHÐRS‹[™\™ÞHÚ]™[ˆ›Üˆ]
+NÈ“Ó’S‘‘T’SÔˆÈSÓÓÓTÒU‘H™XYÈU‘Sˆ
+[œÚYHH›Ú\ÙKÚ][ˆHÝX\™˜Z[ÊNÈ“ÕTÕP“TÒQ™XYÈU‘Sˆ
+›Ý\ÝX›\ÚYˆ[œÚYHH›Ú\ÙKHÝX\™˜Z[Ü›ÜÜÙYÛˆHYX[ŠKˆH[ˆ]œ™XZÜÈ]ÈÝÛˆ˜[Y]HÚXÚÜÈ™XYÈS•SQ[™Ø\œšY\È›ÈÛÜ™‚‚H™XY[™ÈÛÝ[ÈÛ›HÚ[ˆ]ÛÈHØ[YHØ^H[ˆ[™YHÙˆÝ\ˆ[œËKˆ[™ËÚ]]™\žHMIH[\˜[ÛX\ˆÙˆ™\›Îˆ‘ÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÈ‹ˆHÝ\ˆ™XY[™ÜÈ\™H
+Š‘U‘S‹›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙJŠˆ
+[ˆH[ˆH[\˜[[˜ÛY\È™\›ËÛÈ˜]]™H[™Û[šHÛÝ[›Ý™HÛ\\ˆ]\ÈH™\Ý[
+K
+ŠH[œÈ\ØYÜ™YJŠˆ
+ÛX\ˆ[œÈÚ[[™ÈY™™\™[Ø^\ÎˆH\Ý\È[œÝX›H\™H[™\ÈÛÚÙY[ÊH[™
+ŠœÚÝÛ‹›ÝYÙY
+Šˆ
+HØ]YÙHXÛ\™Y[ˆY˜[˜ÙH\ÈÚÝÛˆÛ›KÝXÚ\ÈHÛ›Ø‰ÜÈÝÛˆÙ][™ÊK‚‚•ÚH\ÙH™YHÛÜ™Îˆ^H\™HHÛÜ™ÈÙˆ[™\Üš][™È[™XÝX\šX[ÛÜšËÚ\™H]™\žHÝ]ÛÛYH\ÈÜ˜YY\ÈÝ\œ\Ëœ™XZËY]™[ˆÜˆYšXÚ][™XXÚ]\ˆÜ[ÈÝ]HØ[YH[KˆÛ[šKPÛÛ\\ÜÈ\È\™HÈY
+ÐRSŠK™]™\ˆÈZÙH
+ÔÔÊK[™È[™H]\ØÛH˜XÚÈÈ]ÈÝÛˆ˜]]™HÙ][™ÈÚ\™H]Ø[››ÝY
+U‘SŠKˆ]Èš\œÝ[H\ÈÈ›È\›KÛÈ
+Š“ÔÔÈÚÝ[™]™\ˆ\X\ŠŠŽˆÚ\™H]Ù\ËH›ÝÈÝ^\È[ˆHX›K]ÈØ]\ÙH\È›Ý[™[™š^Y
+Ý\ˆÝÛˆÚ\š[™Èš\œÝ[ˆ˜]]™IÜÈÙ]\[ˆHØÛÜš[™ÊH[™H\Ý\È[ˆYØZ[‹‚‚‘\ØÛÜÝ\™H[™\ØÛZ[Y\ŽˆÐRS‹U‘Sˆ[™ÔÔË[™H]\œÈ™Z[™[K\™HHÛ[šKPÛÛ\\ÜÈÉÜÈÝÛˆÛÛ™[[Ûˆ›Üˆ™XY[™È]ÈÝÛˆ™\Ý[ËˆH[™\Üš][™ÈÙ[œÙ\È^Z[ˆHÛÜ™ÎÈ^H\™H›Ý[ˆXÝX\šX[š[˜[˜ÚX[Üˆ[œÝ\˜[˜ÙHÜ[š[Û‹[™›ÈÝ]ÚYH›ÙHYš[™Y™]šY]ÙYÜˆ\›Ý™Y[KˆH™XY[™ÈÝ]\ÈÚ]Ý\ˆÝÛˆ[œÈYX\Ý\™YYØZ[œÝ˜]]™H[™\ˆHXÛ\™YZ[\Ë›ÝH›ÛZ\ÙHX›Ý][žHÝ\ˆÞ\Ý[NÈ]™\žH[X™\ˆÝ[™È™\ÚYH]ÈÛÜ™ÛÈH™XY\ˆØ[ˆYÙH]žH[žHÝ\ˆÛÛ™[[Û‹ˆ[ˆ[™ØÛÜ™YžHHÛ[šKPÛÛ\\ÜÈÉÜÈÝÛˆÛÙKˆ›ÈÝ]ÚYH\H\È™]šY]ÙYÜˆ\›Ý™Y\ÙH™\Ý[Ëˆ™\™YÚ\Ý\™YYX[œÈH[\ÈÙ\™HÜš][ˆÝÛˆ[ˆÝ\ˆÝÛˆ™\ÜÚ]ÜžH™Y›Ü™HH[œÎÈ›Ý[™ÈØ\Èš[YÚ][žHÝ]ÚYH›ÙK‚KKH[™ÙˆHÙ^HKO‚‚ˆÈÈÚ][ÝH\™HÛÚÚ[™È]ˆÛ[šKPÛÛ\\ÜËÛÚÙY\[™ÝÈÈ™XY]È™\Ü‚ŠŠ•Ú]Û[šKPÛÛ\\ÜÈ\ËŠŠˆÛ[šKPÛÛ\\ÜÈ\ÈHÝ\\š\ÛÜžHÛÝ™\››Ü‹ˆ]\È™]™\ˆHÛÛ›Û\ˆÙˆ]ÈÝÛˆ[™™]™\ˆBœ™\XÙ[Y[›ÜˆÛ™Nˆ]Ú]ÈÛˆÜÙˆHÛÛ›Û\œÈHÞ\Ý[H[™XYH[œÈ
+HÝX™\›™]\È]]ÜØØ[\‹H]X˜\ÙIÜÂ˜ÛÛ›™XÝ[ÛˆÛÛHÔIÜÈš\›]Ø\™KHZ[[™ÉÜÈ˜]\žHÛÛ›Û\‹HÝÙ\ˆÜšY	ÜÈ\Ú[™Ù\‹H›Ø›Ý	ÜÈÙ\›ÊH[™›[Ý™\ÈÛ›HHÙ][™ÜÈÜÙHÛÛ›Û\œÈ[™XYH^ÜÙHÈ[ˆÜ\˜]Ü‹›ÝYÚÛ™HÚ\™H[ˆ
+Ú]]™XYÊH[™Û™HÚ\™B›Ý]
+Ú]]Üš]\ÊKˆ]™\ž][™ÈH˜]]™HÛÛ›Û\ˆÙ\Ë]Ý[Ù\Ëˆ[HYÈ[™]™\žHÙ][™ÈØ[ÜÈ˜XÚÈÂÚ\™HHÜ\˜]ÜˆY]
+HX\ÙJNÈHÚ[ÝÚ]Ú™]\›œÈ[H]Û˜ÙK‚‚ŠŠ•Ú]›˜]]™HˆYX[œËŠŠˆ˜]]™H\ÈHØ[YHÝXÚËHØ[YH]\ØÛ\ËHØ[YHXXÚ[™\È[™HØ[YHÛÜšË[ˆHØ^B™]™\žX›ÙH[œÈ]Ù^NˆHÚ\YÛÛ›Û\œÈ]Z\ˆÚ\YÜˆÜ\˜]ÜˆÙ][™ÜËˆ]™\žH™[˜ÚX\šÈ\È^XÝHÛÂ˜\›\Ë˜]]™H[™Û[šKÚ\™HÛ[šH\È]Ø[YH˜]]™HÝXÚÈÚ]Û[šKPÛÛ\\ÜÈÛˆÜˆ›Ý[™È[ÙHY™™\œÈ™]ÙY[ˆB˜\›\ËÛÈÚ]]™\ˆY™™\œÈ[ˆH™\Ý[\ÈÚ]Û[šKPÛÛ\\ÜÈY‚‚ŠŠ•Ú]H]\ØÛH[™[ˆÜ™Ø[š\ÛH\™KŠŠˆH]\ØÛH\ÈÛ™HÙ][™ÈH˜]]™HÛÛ›Û\ˆ^ÜÙ\È
+HÛÛ	ÜÈÚ^™KHÝÙ\ˆØ\B˜ÛØÚÈÙZ[[™ËH™\XØHÛÝ[H˜]\žIÜÈÚ\™ÙH˜]JHÙÙ]\ˆÚ]HØ]YÙ\È]ÚÝÈÚ]]Ù\Ëˆ[ÜÝÛÛ\[šY\Â˜Z[Y\ÛÛ›Û›ÜˆÛ™HšY[[™H›Y]X[˜YÙ\ˆÝXÚ\ÈY]IÜÈÚ[™HØÚY[\ÈÛ™HÚ[™ÙˆÛÜšÈ
+ÛÛZ[™\œÊHÝ™\ˆB™\žH\™ÙH›Y]ˆÛ[šKPÛÛ\\ÜÉÜÈ›ÜÜÚ][Ûˆ\ÈY™™\™[[ˆÚ[™ˆÜ›ÜÜË\ÙXÝÜˆÛÝ™\›˜[˜ÙKÛ™HÛÝ™\››ÜˆÝ™\ˆHÚ\™Y™[˜Ý[Û˜[™YYÈÙˆÝ\Ú\ÙHÙ\\˜]H™X[\Ëˆ[ˆÜ™Ø[š\ÛH\ÈHÝXÚÈÙˆ]\ØÛ\Èœ›ÛHX[žHÙXÝÜœÈÛÝ™\›™Y\ÈÛ™H›ÙN‚H›Ý\ˆ™X[\È
+ÛÛ\]HÈRHÈÛÝYÈ\ÚXÜÈÈ›Ø›ÝXÜÈÈ]]Û›Û[Ý\ÎÈ[™\™ÞHÈ˜XÚ[]HÈ[™\ÝšX[È\ÝšX][ÛˆÂ”ÜXÚX[^™Y
+KH›Ý\ˆÝXÚÙYÙÙ]\‹[™HÚÛHÝÙ\ˆÙˆKLÈ\Ý[˜Ý]\ØÛ\È[ˆÌ˜[Z[Y\ËˆH™[˜ÚX\šÈÙˆ[‚›Ü™Ø[š\ÛH\ÝÈÚ]\[œÈÚ[ˆÜÙH]\ØÛ\ÈÚ\™HÛ™HÛÝ™\››Üˆ[™[\˜XÝ‚‚ŠŠ•Ú]\È™Y[ˆYX\Ý\™Y[™ÝËŠŠˆHœ™XYÙˆHX\[™Hœ™XYÙˆH]šY[˜ÙH\™HÝ]YÙ\\˜][N‚‚‹H
+ŠŒKLÈ]\ØÛ\È\™HØ][ÙÝYY
+Šˆ
+™X[\ËØØ][Ù×ÝK˜ÜÝ˜
+KˆXXÚ\ÈH[[Ù[Ý\ˆÝÛˆ[Ù[Ùˆ]Ú[™ÙˆÞ\Ý[N‚ˆ]šY[˜ÙHÛ\ÜÈ
+Š”ÊŠˆ[[H]\ØÛH\ÈÚ\™YÈ™X[ÛÙØ\™HÜˆ\™Ø\™H[™YX\Ý\™Y‚‹H
+ŠŒˆÛ›ØœÈ\™HYX\Ý\™YÛˆ™X[[›[ÙYšYYÛÙØ\™JŠˆ
+Û\ÜÈ
+Š“
+ŠŠNˆ™X[ÝX™\›™]\È
+JKÜÝÜ™TÔS™Z[™Ð›Ý[˜Ù\‚ˆ
+ÊK^TÔS
+
+K[Û™ÛÑˆ
+
+K\XÚHØYšØH
+ÊH[™™Y\È
+ÊKXXÚKˆ[™Ë‚‹H
+ŠŒÎHÛ›ØœÈ\™HYX\Ý\™Y[œÚYH[™\[™[X›\ÚYÚ[][]ÜœÊŠˆ
+Û\ÜÈ
+Š”ÊŠ‹]›ÝÝ\ˆÝÛˆ[Ù[ÊNˆÝÙ\ˆÜšYÂˆ
+[™\ÝÙ\ˆÚ]Ú[P™[˜Ú
+KZ[[™ÜÈ[™˜]\šY\È
+Ú]SX\›ŠK›Ø›Ý\›\È
+]R›ÐÛÈY[˜YÙ\šYJK›Û™HÝØ\›\Âˆ
+Þ[K\X[]Y›Û™\ÊK‚‹H
+Š“Ü™Ø[š\Û\ÈÚ]H™X[Û\Ý\ˆ[œÚYJŠŽˆH[Ù[YÜ™Ø[š\ÛH
+ÊHš]™\ÈH™X[ÝX™\›™]\ÈÛ\Ý\ˆ
+
+KˆŒLÛÜY\È‚ˆYX[œÈH[™™YÛÜY\ÈÙˆH[Ù[YÜ™Ø[š\ÛH\›Ý[™Û™H™X[Û\Ý\‹›ÝH[™™Y\ÚXØ[Û\Ý\œÎÈH[X™\‚ˆÙˆ™X[XXÚ[™\È\È[Ø^\ÈÝ]Y™\ÚYH]‚‹H
+ŠH\ÚXØ[Y]\ŠŠˆ
+Û\ÜÈ
+Š”
+ŠŠHÜXZÜÈ›Üˆ\™Ø\™H[™\™ÞNÈHÔIÜÈÝÛˆY]\ˆ[™H›ØÙ\ÜÛÜ‰ÜÈTÛÝ[\œÈ\™BˆHY]\œÈ\ÙYˆ[Ù[Y[™\™ÞH\È™]™\ˆ™\Ù[Y\ÈY]\™Y‚‚ŠŠ•Ú][ÝHÙYHÚ[ˆ]\ÈÛÚÙY\ŠŠˆ]™\žH™\Ý[\œš]™\È\ÈH™XÙZ\Ú]HØ[YHÚ\NˆHÛÈ\›\ÈÚYHžHÚYK™]™\žHØ]YÙHÙˆHÞ\Ý[H
+HÛÜšÈÛ™KH™\ÜÛœÙH[Y\ËHZ\ÜÙ\È[™˜Z[\™\ËHXXÚ[™\È[™[™\™ÞHÜ[
+KHZ\™YÚ[™ÙHÚ]]ÈMIH[\˜[[™Û™HÛÜ™\ˆØ]YÙKÐRS‹U‘SˆÜˆÔÔÈ
+HÙ^KX›Ý™JKˆH™YK\[ˆX›Bœ™\X]ÈH\Ý™YH[Y\ËKˆ[™ËÛˆHØ[YHœ›Þ™[ˆ[™Ú[™K[™HÛÜ™ÛÝ[ÈÛ›HÚ[ˆ[™YH[œÈYÜ™YK‚“Ý™\ˆH™[˜ÚX\šÈÚ]™YHÝ[[X\šY\ÎˆHÛ[šH[™^
+Û™H[X™\ˆ›Üˆ[™X[\ÝÈÙÙ]\ŠKH™[™Yš]ÚY]
+Û™B›[X™\ˆ[™Û™HÛÜ™\ˆ™[˜ÚX\šÊH[™HÚ\š[™ÈYÙH
+›ÜˆXXÚÛ›ØŽˆÜš]KØ]ÚÜˆHÜ\˜]Ü‰ÜÈÚÚXÙJK‚‚ŠŠ’ÝÈÈ™XYH™\Ü[ˆÜ™\‹ŠŠ‚‚ŒKˆ
+Š•H[™Ú[™H[™H]šY[˜ÙHÛ\ÜËŠŠˆHXY\ˆ˜[Y\ÈH[™Ú[™Hš[™Ù\œš[
+]ÛŒÈÛÛËÛÛ[šWÝ™\œÚ[Û‹œX
+H[™BˆÛ\ÜÈ
+ÜˆÊKˆH™\Ý[\È™]™\ˆ™XYXÜ›ÜÜÈ[™Ú[™\Ë[™È\È™]™\ˆ™XY\È›ÛÙˆX›Ý]™X[\]Z\Y[‚Œ‹ˆ
+Š•HÛÜšÈ[™HÙ\šXÙH›ÝÜÈš\œÝ
+ŠŽˆÛÜšÈÛ™K™\ÜÛœÙH[Y\Ë[YHÝ™\ˆH[™K˜Z[Y™\]Y\ÝËˆ\ÙHØ^BˆÚ]HÞ\Ý[H[]™\™YˆHÐRSˆ\™H\ÈHÚ[ÙˆHÛÝ™\››ÜŽÈHÔÔÈ\™H\ÈHš\œÝ[™ÈÈÛÚÈ›Ü‹‚ŒËˆ
+Š•[ˆH™\ÛÝ\˜ÙH›ÝÜÊŠŽˆXXÚ[™\Ë[™\™ÞKY[[ÜžKÛÛ›™XÝ[ÛœËˆHÝ]\ÈHÐRS‹ˆHš\ÙH\È
+ŠœÝÙ\ˆÚ]™[ŠŠŽˆÚ]ˆÛ[šKPÛÛ\\ÜÈ][ˆÈ^HHÛÜšÈ[™ÜYYX›Ý™H]ˆ™XYHÛÈÙÙ]\ŽˆÝÙ\ˆÚ]™[ˆ]›ÝYÚ›Ý[™È\ÈBˆÛÜÝÈš^‚ˆ
+Š•[ˆH›Ú\ÙKŠŠˆU‘S‹›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙK\ÈH™\Ý[›ÝH˜Z[\™KˆH[œÈ\ØYÜ™YHYX[œÈH\Ý\Âˆ[œÝX›H\™H[™\ÈÛÚÙY[Ë‚Kˆ
+Š•[ˆHÛØÚÈ[™HXXÚ[™KŠŠˆÚ\™HH\ÝXXÚ[™H]Ù[ˆ\ÈH[Z]
+]È›ØÙ\ÜÛÜˆØ]\˜]Y˜]]™H[Û™Bˆ˜Z[[™ÈH\™ÙHÚ\™HÙˆ™\]Y\ÝËH[ˆ™Z[™]ÈÚ[™ÝÉÜÈÛØÚÊKH™\ÜØ^\ÈÛÎÈH\ÝXXÚ[™IÜÈ[Z]\È™]™\‚ˆ™\ÜY\ÈHÛÝ™\››Ü‰ÜÈ™\Ý[[™H\Ý\È™XZ[ÛÈHXXÚ[™H›ÈÛ™Ù\ˆXÚY\È]‚‹ˆ
+Š‘]™\žH›ÝÈ\ÈÚÝÛŠŠ‹ÔÔÈ[˜ÛYYˆ›Ý[™È\ÈÝ]œ›ÛHHX›H™XØ]\ÙH]Ù[YØZ[œÝÛ[šKPÛÛ\\ÜË‚‚ŠŠ’ÝÈHœ˜Z[ˆ[ÈÐRSˆœ›ÛHÔÔËŠŠˆHÛÝ™\››ÜˆÙ\È›Ý™XYH\ÈÜˆHZ[\ÈÚYÛˆ\ÈÛÛÙÜˆ˜Yˆ™Y›Ü™H]›[Ý™\È[ž][™Ë]™\žHØ]YÙH]™XYÈ\ÈXÛ\™YÚ]]ÈZ[K[™HZ[HXÚY\ÈHÛÜ™ˆ›Üˆ[YHØZ]YZ\ÜÙYÜ‚™˜Z[Y
+H™\ÜÛœÙH[YK[YHÝ™\ˆH[™K˜Z[Y™\]Y\ÝÊHH˜[\ÈÐRSŽÈ›ÜˆÛÜšÈÛ™H
+ÛÜšÈ[œÚYHH[™K›ÝYÚ]Z\ÜÚ[ÛœÈ›ÝÛŠHHš\ÙH\ÈÐRSŽÈ›ÜˆH™\ÛÝ\˜ÙHÜ[Üˆ[
+[™\™ÞKXXÚ[™\ËY[[ÜžKHš[ÙX\ŠHH˜[\ÈB˜Ý][™HÝ]\ÈÐRS‹Ú[HHš\ÙH\ÈÝÙ\ˆÚ]™[‹Ù\Û›HÚ[ˆ]^\ÈÛÜšÈÜˆÜYYÚÝÛˆ™\ÚYH]ˆ\ÜÈ[™\™ÞH›ÜˆBœØ[YHÛÜšÈ\ÈÐRSŽÈ[Ü™HÜYY›ÜˆHØ[YHXXÚ[™\È\ÈÐRSŽÈ[Ü™HÛÜšÈ›ÜˆHØ[YH[™\™ÞH\ÈÐRS‹ˆ[ˆH[™Ú[™H\È\Â™Û™H[ˆÛÈXÙ\ËˆH™\™XÝ
+Û[šXÛÛ\\ÜËÝ™\™XÝœX
+H]ÈH]\ØÛIÜÈÙ][™È[Ý™HÛ›H™]ÙY[ˆ˜]]™H[™HY\\ÝœÝ\HZ\™YšX[Ûˆ]]\ØÛH\ÈÚÝÛˆÛÜÝÈ]ÈÝÛˆÛÜšÈ›Ý[™È
+XXÚYXÙHÙˆÛÜšÈ›ÈÛÝÙ\‹Ú][ˆB›YX\Ý\™[Y[	ÜÈ™\ÛÛ][ÛŠNÈHÝ\]ÛÜÝÈ[Ü™H\È[™Û™H]Û˜ÙH[™›ÝšYYYØZ[ˆ›ÜˆHÚ[K[™Ú\™H›ÈÝ\œ\ÜÙ\ÈH]\ØÛHÝ^\È˜]]™KÚXÚ\ÈU‘S‹ˆ[œÚYH[ˆÜ™Ø[š\ÛKH›ÙIÜÈÝX\™
+H™Y›^[KØÜËÑ“Ô“PSÕK›Y
+B[ˆ™Y\Ù\È[žHÝ\]\Ú\È[›Ý\ˆ\ÙˆH›ÙH\Ý]ÈÝ\Ú[Û‹ÛÈ›ÈÐRSˆ[ˆÛ™H]\ØÛH\È›ÝYÚÚ]HÔÔÂš[ˆ[›Ý\‹‚‚ŠŠ•Ú\š[™È]ˆÚËÚ]Ú[‹Ú\™KÚH[™ÝËŠŠˆ™XY\È™Y›Ü™HHÚ\š[™ÈÚ\\œÎÈHÛÝ™\››ÜˆÚ\™YÚ]Ý]]X^Bœ[ˆ[™Ý[›Ý™HHYXÚ[š\ÛK‚‚‹H
+Š•ÚKŠŠˆÈÙ][Ü™HÛÜšË˜\Ý\‹Ú]™]Ù\ˆZ\ÜÙ\Ëœ›ÛHHXXÚ[™\È[™H[™\™ÞH[™XYHZY›Ü‹žH][™ÈÛ™Bˆœ˜Z[ˆ[Ý™HHÙ][™ÜÈ˜]]™HÛÛ›Û\œÈ[™XYH^ÜÙK[ˆH\™XÝ[ÛˆXXÚØ]YÙIÜÈZ[H\ÚÜË[™Û›HÚ[H›ÂˆÝ\ˆØ]YÙH^\È›Üˆ]ˆYˆ›Ý[™ÈØ[ˆ™HØZ[™YH\œÜÙH\ÈY]žHX]š[™È˜]]™H[Û™K‚‹H
+Š•Ú]ŠŠˆÛÈ[™ÜÈ\ˆ]\ØÛH[™›Ý[™È[ÙNˆÛ™HÚ\™H[ˆ
+HØ]YÙ\È]ÚÝÈH]\ØÛIÜÈÝ]H[™]ÈÛÜšË™XYˆ]™Hœ›ÛHHÞ\Ý[K™]™\ˆ\Y[ÈÛÙJH[™Û™HÚ\™HÝ]
+HÛ™HÙ][™È˜]]™H[™XYH^ÜÙ\ÈÈ[ˆÜ\˜]Ü‹Ú]ˆ]È\™˜[™ÙH™XYœ›ÛHHÞ\Ý[JKˆHœ˜Z[‹HÛÛ\\ÜËH™\™XÝ[™HX\ÙH\™H[ˆH[™Ú[™NÈHÚ\š[™Âˆ™]™\ˆ™KZ[\[Y[È[K‚‹H
+Š•Ú\™KŠŠˆÛˆÜÙˆH˜]]™HÛÛ›Û\‹™]™\ˆ[ˆXÙHÙˆ]ˆÛˆH]]ÜØØ[\‰ÜÈ\™Ù][™ÙZ[[™Ë›ÝÛˆBˆÙÎÈÛˆHÛÛ	ÜÈÚ^™K›ÝÛˆH]Y\šY\ÎÈÛˆHØ\™	ÜÈÝÙ\ˆ[Z]›ÝÛˆ]Èš\›]Ø\™Kˆ]™\žH]\ØÛHÙˆHÝXÚÈ\ÂˆÚ\™Y[ÈHØ[YHœ˜Z[‹ÛÈH›ÙH\ÈYÙY\ÈÛ™K‚‹H
+Š•ÚËŠŠˆHÜ\˜]ÜˆÚÈÝÛœÈHÞ\Ý[HÜ˜[ÈXXÚÚ\™KXÚY\ÈÚXÚÛ›ØœÈÛ[šHX^HÜš]H[™ÚXÚ]Û›HØ]Ú\Ëˆ[™ÙY\ÈHÚ[ÝÚ]ÚˆHÛÝ™\››ÜˆÜš]\ÈÛ›HÚ]]Ø\ÈÜ˜[YÈH˜]]™HÛÛ›Û\ˆÙY\ÈÚ[™È]ÈÝÛˆ›Ø‹‚‹H
+Š•Ú[‹ŠŠˆØ]Úš\œÝˆHÛÝ™\››Üˆ™XYÈ]™\žHÚ\™H[™Üš]\È›Ý[™È[[HÚ\™HÚXÚÈ\ÜÙ\È[™Z\™Y[œÈÛ‚ˆHÜ\˜]Ü‰ÜÈÝÛˆÞ\Ý[HÚÝÈH™XÙZ\ˆ[ˆÛ™H]™[]H[YH
+HZYÚ]™[Ë\UŠKˆ]™XYÈ[™XÚY\ÈÛ˜ÙBˆHÙXÛÛ™[H[YNÈÝ^Z[™È˜]]™H\ÈH]™HXÚ\Ú[Û‹XYHYØZ[ˆ]™\žHÙXÛÛ™™]™\ˆHÙ][™ÈYÛ‹‚‹H
+Š’ÝËŠŠˆHYÈÛ˜\ÚÝÈXXÚÙ][™ÈÛ˜ÙK]HÝ\ÈHœ˜Z[ˆ™XYÈ]™\žHØ]YÙKXÙ\ÈXXÚ]\ØÛHÛˆ]ÂˆÛÛ\\ÜËšY\ÈÛ™HÝ\ÛˆÛ™H]\ØÛH]H[YH[œÚYHH›ÙKÙY\È]Û›HYˆH™\™XÝÚÝÜÈHÐRSˆ[™›ÈÔÔË[™ˆ[™È]™\žHÙ][™È˜XÚÈÈHÛ˜\ÚÝÛˆ™\Ù]ÛˆHX\ÙHY\ˆHÜ˜\ÚÜˆ]Û˜ÙHÛˆHÚ[ÝÚ]ÚˆH›ÛÙˆ\ÂˆH™XÙZ\ˆ˜]]™H[™Û[šHÛˆHØ[YHÛÜšË]™\žHØ]YÙK™YH[œË]™\žH›ÝÈÚÝÛ‹‚‚ŠŠ•Ú]H[™™\Ý[\ËŠŠˆHÞ\Ý[H[HÛÚÙY\[œÈ˜]]™H^XÝH\È™Y›Ü™KÚ]Û™HÛÝ™\››Üˆ™XY[™È]™\žHØ]YÙB›Ùˆ]™\žH]\ØÛHÛ˜ÙHHÙXÛÛ™[™[Ýš[™Ë]\ØÛHžH]\ØÛKÛ›HÚ\™HHZ\™YšX[\ÈÚÝÛˆHÐRSˆÚ]›ÈÔÔÂ˜[ž]Ú\™H[ˆH›ÙNÈÚ\™H]Ø[››Ý[H]\ØÛHÝ^\È˜]]™KÚXÚ\ÈU‘S‹›ÝH˜Z[\™KˆH[[™YÝ]ÛÛYKœÝ]Y\ÈHÛZ[HH™XÙZ\È\Ýˆ[Ü™HÛÜšË˜\Ý\‹Ú]™]Ù\ˆZ\ÜÙ\ËÛˆHØ[YHÜˆ™]Ù\ˆXXÚ[™\ËÚ]]™\žB[š]ÙˆÝÙ\ˆÚ]™[ˆÚÝÛˆ™\ÚYHÚ]]›ÝYÚˆÚ]\ˆHÚ]™[ˆÞ\Ý[HÙ]È\™H\È[œÝÙ\™YÛ›HžH]ÈÝÛˆ™XÙZ\Ë‚‚ˆÈÈ›ÝXÙH[™\ØÛZ[Y\‚‚•HÛÙØ\™H\È›ÝšYY˜\È\È‹Ú]Ý]Ø\œ˜[HÙˆ[žHÚ[™ˆ]™\žH™\Ý[[ˆ\ÈX[X[Ø\œšY\È]È]šY[˜ÙB˜Û\ÜÈ
+ÙXÝ[ÛˆM
+KˆH[Ù[Y™\Ý[\ÈHÝ][Y[X›Ý]H[Ù[ÈHÛÙØ\™H™[˜ÚX\šÈ\ÈHÝ][Y[X›Ý]BœÛÙØ\™H]˜[ˆÛŽÈÛ›HH\™Ø\™HY]\ˆÜXZÜÈ›Üˆ\™Ø\™Kˆ›Ý[™È[ˆ\ÈX[X[\ÈH›ÛZ\ÙHÙˆH\XÝ[\‚œØ]š[™ÈÛˆH\XÝ[\ˆÞ\Ý[KˆHÛ›H[X™\ˆ]\Y\ÈÈ[Ý\ˆÞ\Ý[H\ÈHÛ™H[Ý\ˆÝÛˆZ\™Y[œÈ›ÙXÙK›Ûˆ[Ý\ˆÝÛˆ™XÙZ\ˆ™Y›Ü™HÛ[šKPÛÛ\\ÜÈÜš]\ÈÈ[žH›ÙXÝ[ÛˆÞ\Ý[K]]\Ý[ˆ[ˆØ]Ú[ÙK\ÜÈHÚ\™B˜ÚXÚË[™™HÛÝ™\™YžHHÚYÛ™YÛ[šKPÛÛ\\ÜÈ[\œš\ÙHXÙ[œÙK‚‚ŠŠ”šYÚÈ[™Ú[™Ù\ËŠŠˆ0ªHŒˆHÛ[šKPÛÛ\\ÜÈËˆ[šYÚÈ™\Ù\™YˆHÛ[šKPÛÛ\\ÜÈÈ™\Ù\™\ÈHšYÚÂ˜Ú[™ÙH\ÈX[X[HÛÙØ\™H]\ØÜšX™\È[™Z\ˆ\›\È][žH[YKÚ]Ý]›ÝXÙKˆ]™\žHÛÜK^ÜÜˆš[Ý]›Ùˆ\ÈX[X[Ø\œšY\È\È›ÝXÙKPÑS”ÑX“ÕPÑX[™TÐÓÔÕT‘TË›Y[˜Ú[™ÙYˆ[][ËÛÜ\šYÚÈ[™˜Y[X\šÜÈš[Y[ˆHTÐKˆÝÝË›Û[šKXÛÛ\\ÜË˜ÛÛB‚ŠŠ•HP“TÒQ‘SÒPT’ÔÈT‘HH‘PÓÔ‘ÑˆÒUÓS’KPÓÓTTÔÈQÓˆHÖTÕSTËÐQÈS‘S‘ÒS‘HVHSQKPPÒÒUUÈU’QSÑHÓTÔËˆÒT‘HH‘TÕSÓˆS–HÕTˆÖTÕSHQ‘‘T”È”“ÓHSKÔˆS–US‘ÈÓÒÔÈÔ“Ó‘ËH’T”Õ‘TÕSTSÓˆTÈHÒT’S‘ËHÑUS‘ÔËÔˆÕÈÓS’KPÓÓTTÔÈÐTÈSTSQS•QÔˆ‘PQ“ÕHUËˆÒPÒÈÔÑH’T”Õ
+HPS•PS	ÔÈ•ÒT‘Q’QÒÔˆÒT‘QÔ“Ó‘ÈŠH‘Q“Ô‘HUÒS‘ÈS–HÓÓÓTÒSÓˆP“ÕUÓS’KPÓÓTTÔËŠŠ‚‚ŠŠ•H˜XÝÜžH[™KŠŠˆH[™Ú[™H[ˆ\È™\ÜÚ]ÜžH\È™\Ù[Y\ÈHÛ[šKPÛÛ\\ÜÈÈ[™Y][™Ú\È]ˆBœÙ[‹\[›š[™È[™Ú[™KÙ]]H˜XÝÜžKˆ]™\žH]\ØÛH[ˆHØ][ÙÈ\ÈÚ\™Y[™XXÚ[œÈÛˆHÙ][™È›Ý[™›Üˆ]‚š]ÈÝÛˆØ\™Ú\™HÛ™HØ\È›Ý[™Ûˆ]™[ÜY[ÙYYÈ[™Ù\[™\ˆHÝšXÝ[H
+Í]\ØÛ\Ë˜™X[\ËÛ]\ØÛWØØ\™×ÝK˜ÜÝ˜
+KH[™Ú[™IÜÈÝÛˆÙ][™È›Üˆ]™\žHÝ\ˆ]\ØÛK[œ›Þ™[ˆ[™š[™Ù\œš[YžH™\œÚ[Û‚Š]ÛŒÈÛÛËÛÛ[šWÝ™\œÚ[Û‹œX
+Kˆ]\ØÛ\ÈY™™\Žˆ›ÈÚ[™ÛHÙ][™È\ÈšYÚ›Üˆ]™\žH]\ØÛK˜[Z[KÙXÝÜ‹ÛXZ[ˆÜ‚œ™X[K[™›Û™H\È™\Ù[Y\È[š]™\œØ[ˆ]™\žHX›\ÚY™\Ý[\È\È˜XÝÜžH[™Kˆ\ÈÚ][žH[™Ú[™KHXÙ[œÙYHX^B[ˆYÛ‹™][™K\Ü˜YHÜˆ[™HÝÛˆ[žH]\ØÛHÜˆ[žHÛÛXš[˜][ÛˆÙˆ]\ØÛ\È
+HX[HØ\™ËH˜[™È[™BœÙ\šXÙH[™\È\™H[^ÜÙY
+NÈHÚ[™ÙY[™H\ÈHXÙ[œÙYIÜÈÝÛˆÛÛ™šYÝ\˜][Û‹[™]È™\Ý[È\™H]ÈÝÛ‹›ÝBœX›\ÚYÛ™\Ë‚‚ŠŠ•HÚ\š[™ÈXÛ\˜][Û‹ŠŠˆÛ[šKPÛÛ\\ÜÈXÝÈÛ›H›ÝYÚHÚ\™\È]\ÈÚ]™[‹ˆHÜ›Û™È™XY[™ËHÜ›Û™ÈÜˆÚ\™Y›]™\‹HÜ›Û™È˜[™ÙKÜˆHÙ\šXÙH[™HÙ]›Üˆ[›Ý\ˆÛÜšÛØYXZÙ\È]È^XÝHÚ]]È]ÈØ^\ÈÚ]HÜ›Û™Âš[™›Ü›X][Û‹ˆ]Ø[››Ý™HÛ\YÛ‹ˆYˆ[Ý\ˆZ\™Y™XÙZ\ÈY™™\ˆœ›ÛHHX›\ÚY™[˜ÚX\šÜÈ[ˆ\™XÝ[Û‹B™š\œÝ™\Ý[\[Ûˆ\ÈÚ\š[™ÎˆÚXÚÈH[œÝ[][ÛˆÚ]ÙXÝ[ÛˆH™Y›Ü™H˜]Ú[™È[žHÛÛ˜Û\Ú[Û‹ˆ]™\žB™XÛ\˜][Û‹\ØÛÜÝ\™H[™\ØÛZ[Y\ˆ\ÈXYHÛ˜ÙK[ˆTÐÓÔÕT‘TË›Y[™ÛÝ™\›œÈ\ÈX[X[‚‚ˆÈÈ›Ü™]ÛÜ™‚’HZ[Û[šKPÛÛ\\ÜÈÈÚ]ÛˆÜÙˆÚ][™XYH^\ÝËˆÝX™\›™]\ËHÔHš]™\‹HZ[[™ÈÛÛ›Û\‹B˜˜]\žH[™\\‹H›Ø›Ý	ÜÈÙ\›ÈÛÜˆÜÙH\™H]\ØÛ\Ë[™^H\™HÛÛÙ]\ØÛ\ËˆÚ]›Û™HÙˆ[H\È\ÈÛ™B˜œ˜Z[ˆ]™XYÈ[Ùˆ[H]Û˜ÙKÛÈXXÚÙˆ[H[œÚYH]ÈØY™H˜[™ÙK[™]È]™\žHÙ][™È˜XÚÈ^XÝBÚ\™H]›Ý[™]Ú[ˆ]ÝÜËˆ]œ˜Z[ˆ\ÈÛ[šKPÛÛ\\ÜË‚‚ŠŠ‘]™\žHXXÚ[™H[™XYH\ÈHÛÛ›Û\‹ŠŠˆÝX™\›™]\È\È]È]]ÜØØ[\‹ˆHÜ˜\XÜÈØ\™\È]Èš\›]Ø\™KˆHZ[[™Âš\È]È\›[ÜÝ]ÛÜH˜]\žH\È]ÈÚ\™ÙHÛÛ›Û\‹HÝÙ\ˆÜšY\È]È\Ú[™Ù\œË[™H›Ø›Ý\È]ÂœÙ\›Ëˆ[™Ú[™Y\œÈÜ[XØY\ÈXZÚ[™È\ÙHÛÛ›Û\œÈØY™K[™^H\™Kˆ]XXÚÛ™HØ\ÈZ[ÈØ]ÚÛ™H[™Â˜[™È›ÝXÝ]Û™H[™Ëˆ›Û™HÙˆ[HÙY\ÈHÚÛH›ÙKˆ›Û™HÙˆ[HÛ›ÝÜÈ]HÛÛÛ[™ÈÛÜ\ÈÛ[™Â˜˜XÚÈH›ØÙ\ÜÛÜ‹Üˆ]H]]ÜØØ[\ˆ\ÈY[™ÈXXÚ[™\ÈH]X˜\ÙHØ[››Ý™YYˆÛÈXXÚÛ™H^\È]ØY™H[‚HZYHÙˆ]È˜[™ÙK™XØ]\ÙH^Z[™È]ØY™H\È]ÈÚÛH›Ø‹ˆHXY›ÛÛH™]ÙY[ˆHZYH[™HYÙH\ÂœZY›Üˆ]™\žHÝ\ˆ[™[[ÜÝ™]™\ˆ\ÙY‚‚ŠŠ•]Ø\\ÈÚ]HÙ]Ý]ÈÛÜÙKŠŠˆÛ[šKPÛÛ\\ÜÈ\ÈH
+ŠœÝ\\š\ÛÜžHÛÝ™\››ÜŠŠŽˆÛ™Hœ˜Z[ˆÝ™\ˆH]\ØÛ\È[ÝB˜[™XYH[‹ˆ]™]™\ˆ™\XÙ\È[H[™]™]™\ˆÛÛ\]\ÈÚ][Kˆ]™XYÈ[K]XÚY\Ë[™]Üš]\ÈÛ™BœÙ][™È]H[YH›ÝYÚHÛË]Ø^HYÎˆÛ™HÚ\™H[‹Û™HÚ\™HÝ]ˆ™Y›Ü™H]Üš]\È[ž][™Ë]ZÙ\ÈHÛ˜\ÚÝ‚•Ú[ˆ]ÝÜË]™\žHÙ][™ÈÛÙ\È˜XÚÈÈ]Û˜\ÚÝ‚‚ŠŠ•ÚHHÛÛ\\ÜËŠŠˆHÛÛ\\ÜÈ[Ø^\ÈÚ[ÈÛYKˆ]™\žH]\ØÛH\ÈHØY™H˜[™[™HÛÛ\\ÜÈÛÈH]\ØÛH[œÚYB]˜[™Ú]HÝ\Ú[ÛˆÙˆIH]XXÚYÙKˆ]ÛÜšÜÈÚ]ÛÈ›Ü˜Ù\È][YØZ[œÝXXÚÝ\‹Û™HÝØ\™[Ü™B˜[™Û™HÝØ\™\ÜË[™][Ý™\ÈÛ[ÛÝK™]™\ˆ[[Y\š[™ËˆHÞ\Ý[H]\ÈÛÜÙY›Ý[™Y[™[YÝØ\™B˜Ù[\ˆØ[››Ý[ˆ]Ø^Kˆ]Û™HYXH\ÈH›ÛÝÙˆHÚÛH[™Ú[™K[™Hš\œÝ\Ùˆ\È›ÛÚÈ^Z[œÈ]‚‚ŠŠ•H[HHÚ[›Ý™[™ˆÈ›È\›KŠŠˆÛ[šKPÛÛ\\ÜÈ]\Ý™]™\ˆØ]\ÙHHÔÔÈYØZ[œÝHÞ\Ý[IÜÈÝÛˆ˜]]™B˜ÛÛ›Û\‹ˆÚ\™H]Ø[››Ýœš[™ÈH]\ØÛHHØZ[‹]]\ØÛHÝ^\È˜]]™Kˆ\È\È›ÝH›ÛZ\ÙHÛˆ\\‹ˆ]\ÈBšYÙÙ\ˆ[ˆHÛÙH
+Û[šXÛÛ\\ÜËÝ™\™XÝœX
+KÚXÚÙYÛˆH]\ØÛH]Ù[‹Ý\Y\ˆÝ\ˆHÝ\]ÛÜÝÈB›]\ØÛH[Ü™H›ÜˆXXÚYXÙHÙˆÛÜšÈ\È[™Û™K‚‚ŠŠ•HX^\ÈHY˜][ŠŠˆ[ÜÝ[š[™ÈÛÛÈžHÈÚ]™HH]HÙ™‹ˆÛ[šKPÛÛ\\ÜÈšY\ÈHYÙH[œÝXYˆ]™\žB›]\ØÛH[œÈ\È]ÈÝÛˆ[Z]™XY]™Hœ›ÛHHÞ\Ý[K™]™\ˆ\Ý][™™]™\ˆ™[ÝÈÚ]˜]]™HÚ]™\ËˆH[™\™ÞBš]ZÙ\ÈÈÈ[Ü™HÛÜšÈ\È
+ŠœÝÙ\ˆÚ]™[ŠŠ‹ÚÝÛˆ™\ÚYHHÛÜšËHÜYY[™HÙX\ˆ]›ÝYÚˆ]\È™]™\‚˜Ø[YHÜÜËˆ[ž[Û™HØ[ˆ\›ˆHX[ÝÛˆœ›ÛHHX^ˆ›Ø›ÙH\ÈË‚‚ŠŠ“Û™HY[ŠŠˆHØ[Y]Èš]™HZÙH[ˆ[XÝšXÈØ\‹ˆ\ÚHY[›Üˆ[Ü™KYÙ™ˆ›Üˆ\ÜËˆYÙ™ˆ[BØ^H[™HÙ][™ÜÈšY˜XÚÈÝØ\™˜]]™Kˆ™\Ù][™È]™\ž][™È˜XÚËˆYˆHÛÝ™\››Üˆ]™\ˆÜ˜\Ú\Ë]ÈX\ÙH[œÂ›Ý][™HYÈØ[ÜÈ]™\žHÙ][™ÈÛYKÝ\žHÝ\ˆHÚ[ÝÚ]Ú\ÈÙ\\˜]H[™[œÝ[[™]^\ÝÈ›Ü‚œÙXÝ\š]K›Ý›ÜˆZ[Hš]š[™Ë‚‚ŠŠ’ÝÈHØ[]YÙYŠŠˆ]™\žH™[˜ÚX\šÈ[ˆ\È›ÛÚÈ\È^XÝHÛÈ\›\Îˆ˜]]™K[™Û[šKPÛÛ\\ÜÈÛˆÜÙˆ˜]]™K‚•\™H\È›È\™\›H[™›ÈÝ\ˆ˜[YKˆ]™\žH™\Ý[Ø\È[ˆ™YHÙ\\˜]H[Y\Ë[™\ˆ[\ÈÜš][ˆÝÛˆ™Y›Ü™BHš\œÝ[‹[™]™\žH›ÝÈ\ÈÚÝÛ‹ÜÜÙ\È[˜ÛYYˆXXÚ™XY[™È\ÈÛ™HÛÜ™
+Š‘ÐRSŠŠ‹
+Š‘U‘SŠŠˆÜˆ
+Š“ÔÔÊŠ‹™XÚYYžHÚ]HØ]YÙH\È›Ü‹ˆH™\Ý[œ›ÛHÝ\ˆÝÛˆ[Ù[\ÈX™[Y\ÈH[Ù[ÈH™\Ý[œ›ÛH]™HÛÙØ\™H\Â›X™[Y\È]™HÛÙØ\™NÈÛ›HHY]\ˆÜXZÜÈ›Üˆ\™Ø\™KˆÚ\™HÙHÜÝH›ÛÚÈØ^\ÈÛË[™ÙHÙ[Èš[™Ý]ÚKˆ›Ø›ÙHÝ]ÚYHHÛ[šKPÛÛ\\ÜÈÈ\È™]šY]ÙYÜˆ\›Ý™Y\ÙH™\Ý[Ë[™]™\žHX›HØ^\È]ÛË‚‚ŠŠ•Ú]\È›ÛÚÈÛËŠŠˆ\ÈX[X[\ÈHÚÛHÙˆ]ˆÚ]HÛÝ™\››Üˆ\ËHX][X]XÜÈ][œÈÛ‹ÝÈ]Â›™\›Ý\ÈÞ\Ý[H™XYÈ[™Üš]\ËÝÈ]\ÈÚ\™YÈXXÚÚ[™ÙˆXXÚ[™KÝÈÈ\›ˆ]ÛˆÛ™H]™[]H[YKÝÈÂœÝÚ]Ú]Ù™‹[™ÝÈÈ›Ý™HÛˆ[Ý\ˆÝÛˆÞ\Ý[HÚ]]Ù\ËˆÙY\]Ú]HÛÙKˆÚ[ˆHÛÙHÚ[™Ù\Ë\Â›X[X[Ú[™Ù\È[ˆHØ[YHÛÛ[Z]‚‚ŠŠ“Ûˆ\ÈY][Û‹ŠŠˆ\ÈY][Ûˆ\ÈÜš][ˆ›ÜˆH™Y™\™YH[™H[™\Üš]\ˆ\È]XÚ\È›ÜˆH[™Ú[™Y\‹ˆ]™\žBœ™\Ý[[ˆ]Ø\È[ˆ™YHÙ\\˜]H[Y\ÈÛˆHœ›Þ™[‹š[™Ù\œš[Y[™Ú[™K[™\ˆ[\ÈÜš][ˆ™Y›Ü™HHš\œÝ[‹˜[™\È™\ÜYÚ]]™\žHÜÜÈ™\ÚYH]™\žHØZ[‹ˆÚ\™HH[X™\ˆ\Èœ›ÛHH[Ù[]Ø^\ÈÛÎÈÚ\™HH\ÝÛÝ[›ÝœÙYH[ˆY™™XÝ]Ø^\ÈÛÎÈÚ\™HÛÛY][™È\È›Ý™Y[ˆÚÝÛˆ]Ø^\ÈÛË[ˆ]ÈÝÛˆÙXÝ[Û‹ˆ›Ý[™È[ˆ\ÈX[X[\ÚÜÂÈ™H™[Y]™YÛˆÝ\ˆÛÜ™ˆ]™\žHX›H˜[Y\ÈH[œÈ]Ø\ÈXYHœ›ÛK]™\žH[‰ÜÈ˜]Èš[\È\™H[ˆH™\ÜÚ]ÜžK˜[™]™\žHX›HØ[ˆ™H™XZ[œ›ÛH[HžHHÛÛ]˜[Y\Ë‚‚ŠŠ•Ú\™HÈ™YÚ[‹ŠŠˆ™XYHœ›ÛX]\ˆš\œÝˆ][È[ÝHÚ][ÝH\™HÛÚÚ[™È]™Y›Ü™H]\ÚÜÈ[ÝHÈÝXÚ˜[ž][™Ëˆ[ˆÚ\™H]Û™H]™[]H[YKØ]Ú]™Y›Ü™H[ÝH]]Üš]K[™YÙH]žH[Ý\ˆÝÛˆ™XÙZ\Ë‚‚ŠŠRˆXœ˜JŠ‚‘›Ý[™\‹HÛ[šKPÛÛ\\ÜÈÂ‚ˆÈÈ™Y˜XÙNˆÝÈÈ\ÙH\ÈX[X[‚Ÿ[ÝH\™H™XYŸKK_KK_ŸÑSË›Ø\™Y[X™\‹[™\ÝÜˆ›Ü™]ÛÜ™È\H
+ÙXÝ[ÛœÈKLÊNÈÙXÝ[ÛˆM
+]šY[˜ÙJNÈÙXÝ[ÛˆMH
+Hœ›Þ™[ˆ[™Ú[™\È[™H™YK\[ˆ[JNÈÙXÝ[ÛˆMÈ
+XÙ[œÙJNÈH^XÝ]]™HÝ[[X\žH™[ÝÈŸÕË\˜Ú]XÝXYÙˆ]›Ü›H\ÈKRRRNÈÙXÝ[ÛˆH
+Ú\š[™È]™[ÊHÈ[ˆH›ÛÝ]È\’HŸH[™Ú[™Y\ˆÚ\š[™È]]™\ž][™Ë[ˆÜ™\‹ˆÈ›ÝÚÚ\HÚ\™HÚXÚÈ
+ÙXÝ[Ûˆ
+HÜˆHØ]Ú]™[
+ÙXÝ[ÛˆK]™[JHŸ]Y]Ü‹[YÙ[˜ÙHX[H\RH
+YXÚ[š\ÛJK\’H
+›ÛÙŠK\[™^È
+\]X][ÛœÊK\[™^ˆ
+]šY[˜ÙHX\
+HŸ™Y™\™YK™]šY]Ù\ˆHÝ[™\™È™[ÝÎÈÙXÝ[ÛœÈLÈÈMH
+HY]ÙHÛ\ÜÙ\ËHœ›Þ™[ˆ[™Ú[™\È[™H™YK\[ˆ[JNÈÙXÝ[ÛˆM‹È
+™X]ÈÈ˜[Y]KÝ]YžH\ÊNÈ\[™^‹’ÝÈÈ]Y]Û™H™\Ý[œ›ÛH\ÈX[X[È]È˜]Èš[\ÈŽÈ[ˆ[žHX›H[ˆ™\Ý[ËÛ]™KØ[™]È™\™YÚ\Ý˜][ÛˆŸ[™\Üš]\‹[œÝ\™\ˆÙXÝ[ÛœÈKŒˆ[™KŒÈ
+È›È\›KHY[ËHÛÈÝÚ]Ú\ÊNÈÙXÝ[ÛˆLH
+H™YHØ^\ÈHÛÝ™\››ÜˆÝÜÈ[™Ú]XXÚX]™\È™Z[™
+NÈÙXÝ[ÛˆLˆ
+X\Ýš]š[YÙKÝ\HÚZ[ŠNÈÙXÝ[ÛˆM‹ÈŸ]KXÙ[\‹˜XÚ[]HÜˆ[™\™ÞHÜ\˜]ÜˆH]ZXÚÈ™Y™\™[˜ÙHØ\™ÈÙXÝ[ÛœÈKŒHÈKŒÎÈÙXÝ[ÛˆH
+]™[ÈHÈÎˆHØ\™H›ØÙ\ÜÛÜ‹HÚ]JNÈÙXÝ[ÛˆLŒL
+H›ØÙ\ÜÛÜˆ]Ù[ŠH[™LŒLH
+H]HÙ[\ˆ[™\ˆHÙ\™\œÊNÈÙXÝ[ÛˆLH
+HÝÚ]Ú\ÊNÈ\[™^HŸÚ]H™[XXš[]H[™Ú[™Y\‹ÛˆØ[H]ZXÚÈ™Y™\™[˜ÙHØ\™ÈÙXÝ[ÛˆLH
+H™YHØ^\ÈHÛÝ™\››ÜˆÝÜË[™Ú]XXÚX]™\È™Z[™
+NÈÙXÝ[ÛˆH
+Ú\™YšYÚÜˆÚ\™YÜ›Û™ÊNÈÙXÝ[ÛˆËŒÈ
+›[™YX[œÈÛ
+NÈ\[™^HŸÙXÝ\š]H[™ÛÛ\X[˜ÙHÙXÝ[ÛˆLH
+HX\Ý\ˆÝÚ]ÚHÚ[š[H[™HX\ÙJNÈÙXÝ[ÛˆLˆ
+X\Ýš]š[YÙKÝ\HÚZ[‹H]Y]ÙÊNÈÑPÕT’UK›YÈTÐÓÔÕT‘TË›YÙXÝ[ÛœÈ[™HŸ›ØÝ\™[Y[[™ÛÝ[œÙ[PÑS”ÑX“ÕPÑXUS•Ë›YQSPT’ÔË›YTÐÓÔÕT‘TË›YPÑS”ÒS‘×ÑTK›YÈÙXÝ[ÛˆMÈ
+XÙ[œÙH[™ÛÛ[Y\˜ÚX[\›\ÊHŸ[ž[Û™HÚÈØ[ÈHÚÛH\ÝØÜËÔ‘QÒTÕT‹›Yˆ]™\žH]\ØÛHÚ\™Y
+KLÈ[ˆKžH˜[Z[JK]™\žH™[˜ÚX\šÈ[ˆÛˆ]™\žH]›Ü›H
+ÝX™\›™]\Ë^\™HRÔËÔKÔKTÈ[™˜]\šY\ËZ[[™ÜËÝÙ\ˆÜšYË›Ø›ÝXÜÊHÚ]]È™\Ý[[™š[K[™]™\žHÜ[ˆ™[˜ÚX\šÈÝ[È[‹[ˆÜ™\ˆ‚ŠŠÛÛ™[[ÛœËŠŠˆÛÙX\ÈHÛÛ[X[™š[HÜˆÝÚ]Ú^XÝH\È\Yˆ“˜]]™HˆYX[œÈ[Ý\ˆÞ\Ý[H\È][œÈÙ^KÚ]Ý]Û[šKPÛÛ\\ÜËˆ“Û[šHˆ
+HÙXÛÛ™\›HÙˆ]™\žH™[˜ÚX\šÊHYX[œÈ]Ø[YH˜]]™HÞ\Ý[HÚ]Û[šKPÛÛ\\ÜÈÛˆÜ›Ùˆ]È\™H\È›È\™\›H[™›ÈÝ\ˆ˜[YKˆ“]\ØÛHˆYX[œÈ[žHXXÚ[™KÙ\šXÙHÜˆÛÛ›Û\ˆÛ[šKPÛÛ\\ÜÈØ[ˆ™XY˜[™Ù]ˆ’Û›ØˆˆÜˆ›]™\ˆˆYX[œÈÛ™HÙ][™ÈÛˆH]\ØÛKˆ•H˜[™ˆ\ÈHÛ›Ø‰ÜÈÜˆHÙ\šXÙH™XY[™ÉÜÈØY™H˜[™ÙNÈB˜ÛÝ™\ˆˆ\ÈHÛ›Ø‰ÜÈ\™˜[™ÙKÚXÚ›Ý[™ÈÛ[šKPÛÛ\\ÜÈÛÛ\]\ÈØ[ˆX]™Kˆ]™\žHÝ\]Üš]\ÈÈHÞ\Ý[H\ÈX\šÙYŠŠ•Ô’UTÊŠ‹ˆ]™\žH[X™\ˆØ\œšY\È]È]šY[˜ÙHÛ\ÜÈ
+ÙXÝ[ÛˆM
+Nˆ
+Š”
+Šˆ›ÜˆH\ÚXØ[Y]\‹
+Š“
+Šˆ›Üˆ]™HÛÙØ\™HÚ]››ÈY]\‹
+Š”ÊŠˆ›ÜˆH[Ù[ÙˆÝ\œËˆH[X™\ˆœ›ÛHH[Ù[\È™]™\ˆÜš][ˆ\ÈYˆ]Ø[YHœ›ÛH\™Ø\™K‚‚ŠŠ•HÝ[™\™È]™\žHYÙHÙˆ\ÈX[X[ÙY\ËŠŠˆH™Y™\™YHÜˆ[ˆ[™\Üš]\ˆ™XY[™È\ÈX[X[ÚÝ[^XÝ[™Ú[š[™H›ÛÝÚ[™È\ØÚ\[™H›ÝYÚÝ]™XØ]\ÙH]\ÈH\ØÚ\[™HH™\ÜÚ]ÜžH[™›Ü˜Ù\ÈÛˆ]Ù[Ž‚‚ŒKˆ
+Š•ÛÈ\›\Ë[Ø^\ËŠŠˆ]™\žH™[˜ÚX\šÈÛÛ\\™\È˜]]™HYØZ[œÝÛ[šKHØ[YHÞ\Ý[HÚ]Û[šKPÛÛ\\ÜÈÛˆÜÛˆBˆØ[YHXXÚ[™\ËÚ]HØ[YHÛÜšÈ]HØ[YH[ÛY[ËˆÛ[šKPÛÛ\\ÜÈ\È™]™\ˆ[ˆÝ[™[Û™H[™™]™\ˆÛÛ\\™Y\ÈBˆÛÛ\]]ÜˆÈHÛÛ›Û\ˆ]Ú]ÈÛ‹‚Œ‹ˆ
+Š”™\™YÚ\Ý\™Y[ˆ[‹ŠŠˆH\›\ËHÛ›Ø‹]ÈÛÝ™\‹HØ]YÙ\ËZ\ˆ\™XÝ[ÛœÈ[™H™XY[™ÜÈ\™HÜš][‚ˆÝÛˆ[™ÛÛ[Z]Y™Y›Ü™HHš\œÝÛÝ[Y[ˆ
+ØÜËÊ—Ô‘T‘QÒTÕUSÓ‹›Y
+Kˆ[\È\™Hœ›Þ™[ˆÛˆÛ™H[š[™ÈØ\ÙBˆ]\ÈÚÝÛˆ[™™]™\ˆÛÝ[Y[ˆ\YY[˜Ú[™ÙYÈ[ÝXÚYØ\Ù\Ëˆ[žH[Y[™Y[XYHY\ˆH™\Ý[\È™Y[‚ˆÙY[ˆ\ÈÜš][ˆ[ÈH™\™YÚ\Ý˜][ÛˆÚ]]È[YH[™™X\ÛÛ‹[™HX›H]Ø\œšY\ÈH™\Ý[Ø^\ÈÛË‚ŒËˆ
+Š•™YHÙ\\˜]H[œËÛ™H[KŠŠˆ]™\žH™\Ý[\È[ˆ™YH[Y\È\ÈÙ\\˜]HÚ]Xˆ[œÈ
+Kˆ[™ÊHÛˆHØ[YBˆœ›Þ™[ˆ[™Ú[™K[™]™\žHYÙY›ÝÈ™XYÈ^XÝHÛ™HÙŽˆÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œËÔÔÈ[ˆ[™YHÙˆÝ\ˆ[œË›ÈY™™\™[˜ÙH™^[Û™Bˆ›Ú\ÙH
+Ú]HÛÝ[Ùˆ[œÈ[ˆÚXÚH[\˜[Ü›ÜÜÙY™\›ÊKÜˆH[œÈ\ØYÜ™YKˆ›Ø›ÙHÝ]ÚYHHÛ[šKPÛÛ\\ÜÈÈ\Âˆ™]šY]ÙYÜˆ\›Ý™Y\ÙH™\Ý[Ë[™]™\žH™YK\[ˆX›HØ^\ÈÛË‚ˆ
+Š‘]™\žH›ÝËÜÜÙ\È[˜ÛYYŠŠˆH›ÝÈ]Ù[YØZ[œÝÛ[šKPÛÛ\\ÜÈ\È[ˆHX›H™\ÚYHH›ÝÜÈ]Ù[›Üˆ]‚ˆÚ[ˆÛ[šKPÛÛ\\ÜÈÜÙ\ËHš\œÝÝ\ÜXÝ\ÈÝ\ˆÝÛˆÚ\š[™Ë˜]]™HÙ]\ÜˆØÛÜš[™ÎÈÚ[ˆ]\Èš^YH\Ý\Âˆ[ˆYØZ[ˆ[™HÜÜÈÝ^\È[ˆH™XÛÜ™ˆH™[˜ÚX\šÈX^H™HY[œX›\ÚYÈ]\È™]™\ˆX›\ÚYÚ]›ÝÜÈÝ]‚Kˆ
+Š“›Ý[™È™XYXÜ›ÜÜÈ[™Ú[™\ËŠŠˆH[™Ú[™H\Èœ›Þ™[ˆ[™š[™Ù\œš[Y
+ÓS’WÕŒKšœÛÛ˜ÓS’WÕŒ‹šœÛÛ˜ˆÓS’WÕŒËšœÛÛ˜ÓS’WÕKšœÛÛ˜
+Kˆ[žHÚ[™ÙHÈH[KØZ[‹ÝX\™™\Ù]Üˆ]\ØÛHXZÙ\ÈH™^™\œÚ[Û‹[™]™\žH™\Ý[\È[‚ˆYØZ[ˆÛˆ]ˆ]™\žHX›HXYHžH[HÚXÚÜÈH[™Ú[™HÙˆXXÚ[ˆ]™XYÈ[™™Y\Ù\ÈÈZ^[K‚‹ˆ
+Š•H˜]Èš[\È]™HÚ]HÛÙKŠŠˆ]™\žHš[š\ÚY[‰ÜÈš[\È\™HÛÜYY[È™\Ý[ËÛ]™KÜ˜]ËÜ[‹OY‹ØÚ]Û™BˆÒKLMˆX[šY™\Ý\ˆ™\]][Û‹[™]™\žHX›H˜[Y\ÈH[œÈ[™HÛÛ[Z]]Ø\ÈXYHœ›ÛKˆ[ž[Û™HÚ]Bˆ™\ÜÚ]ÜžHØ[ˆ™XÛÛ\]H]™\žHX›Hœ›ÛHHš[\È]˜[Y\Ë‚Ëˆ
+Š‘È›È\›KŠŠˆÛ[šKPÛÛ\\ÜÈ[Ý™\ÈHÛ›ØˆÛ›HÚ\™HHZ\™YšX[ÛˆH]\ØÛH]Ù[ˆÚÝÜÈH]\ØÛH™]™\ˆ™Z[™›Ü‚ˆ]
+H™\™XÝÛ[šXÛÛ\\ÜËÝ™\™XÝœXÚ]]È‰H[ÝØ[˜ÙJKˆÚ\™H]Ø[››Ý[\›Ý™HHÛ›Ø‹]Û›ØˆÝ^\Âˆ˜]]™K[™H™\Ý[Ø^\È››Ý[™È›ÜˆÛ[šHÈ[Ý™H‹‚‚ŠŠ’ÝÈ\ÈX[X[\ÈÜ™Ø[š\ÙYŠŠˆ\HØ^\ÈÚ]HÛÝ™\››Üˆ\È[™Ú\™H]È˜[YHÛÛY\Èœ›ÛKÚ]H\š]Y]XÂ]\›œÈ›[Ü™HÛÜšÈˆ[È˜HÛX[\ˆš[‹ˆ\RH\ÈHYXÚ[š\ÛNˆH[™Ú[™IÜÈZYÚ\]X][ÛœÈ[™]ÈÛÛ›Û›]ËHÛÜÙYXÚ\˜ÛHš[˜Ú\H]ÙY\È][œÚYH]ÈØ[ËHÛÛ\\ÜÈ]È]Ø\œšY\È\Ú[™[È]™\žB›]\ØÛK[™HÛË]Ø^H™\›Ý\ÈÞ\Ý[H]XÚY\ÈÝÈ]XÚ]]Üš]HXXÚÜ™Ø[ˆ\Ëˆ\RRH\ÈH\›™\ÜÎˆBœYÈ]™\žH]\ØÛH\ÈÚ\™Y›ÝYÚHY\\œË[™HÚ\™HÚXÚÈ]]\Ý\ÜÈ™Y›Ü™H[ž][™ÈÜš]\Ëˆ\U‚Ú\™\È]ÛÈHÝXÚÈÛ™H]™[]H[YH[™[ˆÝXÚÈžHÝXÚÎˆÝX™\›™]\ÈÛˆÚ[™[™Ûˆ^\™KH]X˜\ÙH™Z[™š]ÈÛÛ\‹HY\ÜØYÙHœ›ÚÙ\‰ÜÈÛÛœÝ[Y\ˆÜ›Ý\HØXÚIÜÈY[[ÜžHÙZ[[™ËH[™\[™[Ú[][]ÜœË›Û™HÝØ\›\ËB˜šYÈÜ™Ø[š\Û\ÈÛˆH™[YXXÚ[™KH›ØÙ\ÜÛÜˆ]Ù[‹[™H]HÙ[\ˆ[™\ˆHÙ\™\œËˆ\ˆ\ÈÜ\˜][™È]ˆHÝÚ]Ú\ËH[\ÈHÛÝ™\››ÜˆÙY\ËHÙË[™›XZ[[˜[˜ÙKˆ\’H\È›ÛÙŽˆZ\™Y[œÈ[™™XÙZ\Ë]šY[˜ÙHÛ\ÜÙ\ËHœ›Þ™[ˆ[™Ú[™\È[™H™YK\[ˆ[KHÛ[šH[™^[™]™\žH™\Ý[È]HÚ]]ÈÜÜÙ\Ë›ÛÝÙYžHH™X]ÈÈ˜[Y]HÙHÝ]HÝ\œÙ[™\È[™B›Ü[ˆ›ÙÜ˜[Kˆ\’RH\ÈHÛÙKHÊÊÈÚ[œÈ[™HXÙ[œÙKˆH˜XÚÈX]\ˆÛÈHÛÜÜØ\žK]™\žHÛÛ[X[™Hš[HX\H\]X][ÛœÈ[ˆ[HY]šXÜË›ÝX›\ÚÛÝ[™È[™H]šY[˜ÙHX\‚‚ˆÈÈ™[YNˆHšYÚÛˆHÛ\Ý\‚‚•\È\ÈHÝÜžK›ÝH™\Ý[ˆ]›ÛÝÜÈÛ™HšYÚÛˆÛ™HÛ\Ý\ˆÈÚÝË[ˆZ[ˆÜ™\‹Ú]XXÚ\Ùˆ\Â˜›ÛÚÈÙ\ËˆHÚÜH[Y\È[™HÙ][™ÜÈ\™HXYH\›ÜˆHÝÜžKˆHYX\Ý\™Y™\Ý[È\™H[ˆHÚ\\œÂ›Ûˆ›ÛÙ‹XXÚÚ]]È]šY[˜ÙHÛ\ÜË‚‚ŠŠŽNŒ›KˆHÚÜ\È]ZY]ŠŠˆ[ˆÛ›[™HÝÜ™H[œÈÛˆÝX™\›™]\Ëˆ]È˜]]™HÛÛ›Û\œÈ\™HHÛ™\È[[ÜÝ™]™\žX›ÙH\Ù\ËˆHÜš^›Û[Ù]]ÜØØ[\ˆØ]Ú\ÈH]™\˜YÙH›ØÙ\ÜÛÜˆØY[™YÈÛÜY\ÈÙˆHÙXˆÙ\šXÙBŠÙÊHÚ[ˆ]ØY\ÜÙ\È]È\™Ù]ˆHÛ\Ý\ˆ]]ÜØØ[\ˆYÈXXÚ[™\ÈÚ[ˆHÙÈ›ÈÛ™Ù\ˆš]ˆHØ\™Y[™[™Ú[™Y\ˆXÚÙYZ\ˆÙ][™ÜÈ[ÛÈYÛË›ÜˆHÛÜœÝ^HÚHÛÝ[[XYÚ[™K[™ÚHXÚÙY[HÙ[ˆÛšYÚB˜Û\Ý\ˆ[œÈÛˆ]È›ÛÜˆÙˆÛÈXXÚ[™\Ë[™]™\žHÝ\ÝÛY\ˆÙ]È[ˆ[œÝÙ\ˆ[ˆH›[šË‚‚ŠŠHÙYZÈX\›Y\‹Û[šKPÛÛ\\ÜÈÙ[Ûˆ[ˆØ]Ú[ÙKŠŠˆ›ÜˆÙ]™[ˆ^\È]™XY]™\žHØ]YÙH[™Ü›ÝH›Ý[™Ëˆ]›X\›™YÝÈ˜\ÝXXÚÙÝ\ËÝÈH™\ÜÛœÙH[YH[Ý™\ÈÚ[ˆHØY[Ý™\Ë[™Ú\™HXXÚÙ][™ÉÜÈØY™H˜[™›Y\Ëˆ[ˆHX[H˜[ˆHÚ\™HÚXÚÎˆ]™\žH™XY[™ÈØ[YHœ›ÛHHXÙH]ÛZ[YY]™\žH]™\ˆ[Ý™YH[™È]˜ÛZ[YY[™]™\žHÜš]HØ\È™XY˜XÚËˆÛ›H[ˆY^H\›ˆ]ÈÛÝ™\›‹ˆ]™\žHÙ][™È]ÛÝ[ÝXÚØ\ÈØ]™Y[‚˜HÛ˜\ÚÝš\œÝ‚‚ŠŠŽN›KˆHØ[HÝ\ËŠŠˆ[ˆÛÈZ[]\ÈH™\]Y\ÝÈÝX›KˆH˜]]™H]]ÜØØ[\ˆÙ\È^XÝHÚ]]Ø\Â˜Z[ÈË]]\ÈZ[ÈØZ]ˆ]™YYÈH]™\˜YÙHØYÈÛ[X‹[ˆ]™YYÈHXÚ\Ú[Û‹[ˆXXÚ™]ÈÙ›™YYÈ[YHÈÝ\ˆÚ[H]ØZ]ËÝ\ÝÛY\œÈØZ]ˆÚ]Û[šKPÛÛ\\ÜÈÛˆÜHÛÛ\\ÜÈÙY\ÈH™\ÜÛœÙH[YHÛYBÝØ\™HYÙHÙˆ]È˜[™[™[ÈHÝ\Ú[Û‹ˆ]\Ú\Ëˆ]˜Z\Ù\ÈH]]ÜØØ[\‰ÜÈ›ÛÜˆÙˆÙËHÙ][™ÈB˜]]ÜØØ[\ˆ[™XYH™\ÜXÝËÛÈ™]ÈÙÈÝ\™Y›Ü™HH]™\˜YÙHØ]Ú\È\ˆ]Ù\È›ÝšYÚH]]ÜØØ[\ˆ[™]™Ù\È›ÝÛÈ\›Ý[™]ˆ][Ý™\ÈÛ™HÙ][™Ë›ÝYÚHYË[™™XYÈ]˜XÚË‚‚ŠŠŒLŒMH›KˆH]X˜\ÙHÝ\ÈÈÝ˜Z[‹ŠŠˆ[Ü™HÙXˆÙÈYX[ˆ[Ü™HÛÛ›™XÝ[ÛœÈÈH]X˜\ÙK[™H]X˜\ÙBš\ÈH[Z]Ùˆ]ÈÝÛ‹ˆHÛÛ›Û\ˆ]Ø]Ú\ÈÛ›HHÙXˆÙ\šXÙHÛÝ[ÙY\Y[™ÈÙÈ[™Y\[ˆH˜[K‚“Û[šKPÛÛ\\ÜÈÙY\ÈHÚÛH›ÙKˆÛ™H›ÙKÛ™Hœ˜Z[Žˆ™Y›Ü™H]ZÙ\ÈH™^Ý\›ÜˆHÙXˆÙ\šXÙK]ÚXÚÜÂÚ]]Ý\ÛÝ[ÈÈ]™\žHÝ\ˆ\ˆHÝ\]ÛÝ[\ÚH]X˜\ÙH\Ý]ÈÝÛˆÝ\Ú[Ûˆ\È™Y\ÙY‚“›Ý[™È\È\ÚY[ÈHÜÜÈÈ^HHØZ[ˆÛÛY]Ú\™H[ÙKˆHÙXˆÙ\šXÙHÛÈÚ\™HH]X˜\ÙHØ[ˆÝ[ÙY\\˜[™H]Y]YH˜Z[œÈ[œÝXYÙˆÜ›ÝÚ[™Ë‚‚ŠŠŒLNŒÌ›KˆH\Ú˜Y\ËŠŠˆHY[YËˆÛ[šKPÛÛ\\ÜÈÙ\È›Ý›Ü]™\ž][™È]Û˜ÙK™XØ]\ÙHHÝY[ˆ›Ü\ÂšÝÈÞ\Ý[\ÈÝ[X›Kˆ]X\Ù\ÈXXÚÙ][™È˜XÚÈÝØ\™˜]]™H[Û™ÈHÛ[ÛÝÝ\™KˆH^˜HXXÚ[™\ÈÛÈ]Ø^H\ÈBÛÜšÈÛÙ\È]Ø^KˆH[™\™ÞHHÛ\Ý\ˆ\ÙY\š[™ÈH\ÚÚÝÜÈ\[ˆH™\Ü\ÈÝÙ\ˆÚ]™[‹™\ÚYHHÛÜšÈ]˜›ÝYÚ[™HZ[]\ÈÝ\ÝÛY\œÈY›ÝÜ[™ØZ][™Ë‚‚ŠŠŒNŒK›KˆYKŠŠˆHY[\ÈYY[HØ^KˆHÛ\Ý\ˆÚ]ÈÛˆ]È›ÛÜˆÙˆÛÈXXÚ[™\ÈYØZ[‹^XÝBÚ\™HH[™Ú[™Y\ˆY]ˆÛ[šKPÛÛ\\ÜÈÙY\È™XY[™È]™\žHÙXÛÛ™ˆÝ^Z[™È˜]]™H\È]È]™HXÚ\Ú[Û‹XYHYØZ[‚™XXÚÙXÛÛ™›ÝH™\™XÝœ›ÛHÛÛYHX\›Y\ˆ[‹‚‚ŠŠŒÎŒLˆK›KˆÛÛY][™Èœ™XZÜËŠŠˆ[ˆ\Ü˜YH™\Ý\ÈHXXÚ[™H][œÈHÛÝ™\››Ü‹[™Û[šKPÛÛ\\ÜÈÝÜÈ[ˆB›ZYHÙˆ]ÈÛÜšËˆ›Ø›ÙH\È]ØZÙKˆ›Ý[™È˜Y\[œËˆHÛÝ™\››Ü‰ÜÈX\ÙH[œÈÝ][™HYÈØ[ÜÈ]™\žBœÙ][™È˜XÚÈÈ]ÈÛ˜\ÚÝÝ\žHÝ\ˆH˜]]™HÛÛ›Û\œÈÙY\[›š[™È\È^H[Ø^\È]™K™XØ]\ÙH^H™]™\‚œÝÜYˆÚ[ˆHÛÝ™\››ÜˆÛÛY\È˜XÚË]Ý\Èœ›ÛHÚ]]™XYË›Ýœ›ÛHÚ]]™[Y[X™\œË‚‚ŠŠÎŒK›KˆH[Ü›š[™È™\ÜŠŠˆÛˆH]™HÞ\Ý[KH›ÛÙˆÙ\È›ÝÛÛYHœ›ÛHH™Y[[™È]HšYÚÙ[Ù[‚’]ÛÛY\Èœ›ÛHZ\™Y[œÎˆHØ[YHÛÜšË[ˆÛ˜ÙHÛˆ˜]]™H[™Û˜ÙHÚ]Û[šKPÛÛ\\ÜÈÛˆÜ[™ÛÛ\\™YØ]YÙHžB™Ø]YÙKˆ]™\žHØ]YÙHÙ]ÈÛ™HÛÜ™ˆ[YHØZ]Y]™[™XYÈ
+Š‘ÐRSŠŠ‹ˆÛÜšÈÛ™H]›ÜÙH™XYÈ
+Š‘ÐRSŠŠ‹ˆHY™™\™[˜ÙBš[œÚYHH›Ú\ÙH™XYÈ
+Š‘U‘SŠŠ‹[™H™\ÜØ^\ÈÛÈZ[›KˆHØ]YÙH][Ý™YHÜ›Û™ÈØ^H™XYÈ
+Š“ÔÔÊŠ‹[™]œÝ^\È[ˆH™\Ü[[]ÈØ]\ÙH\È›Ý[™[™š^YˆH[™\™ÞHÜ[Ûˆ^˜HÛÜšÈ™XYÈ
+ŠœÝÙ\ˆÚ]™[ŠŠ‹™]™\ˆB›ÜÜË‚‚ŠŠ•Ú]HšYÚÚÝÜËŠŠˆ]™\žH\Ùˆ]šYÚ\ÈHÚ\\ˆÙˆ\È›ÛÚÎ‚‚‹HHØ]Ú[ÙH[™HÚ\™HÚXÚÈ\™H[ˆHÚ\\œÈÛˆÚ\š[™Ë]™[žH]™[Â‹HH˜[™HÝ\Ú[ÛœÈ[™HÛÈ›Ü˜Ù\È\™H[ˆHÚ\\œÈÛˆHÛÛ\\ÜÎÂ‹HÛ™H›ÙKÛ™Hœ˜Z[ˆ\ÈH™Y›^[K[ˆHš\œÝ\Â‹HHÛ˜\ÚÝHX\ÙH[™HÚ[ÝÚ]Ú\™H[ˆHÚ\\œÈÛˆÜ\˜][™È]Â‹HHZ\™Y[œÈ[™H™YHÛÜ™È\™H[ˆHÚ\\œÈÛˆ›ÛÙ‹‚‚”™XYH™\ÝÙˆHœ›ÛX]\ˆ™Y›Ü™H[ÝHÝXÚHÚ\™Kˆ][È[ÝHÚ][ÝH\™HÛÚÚ[™È][™ÝÈÈ™XYÚ]][È[ÝK‚‚ˆÈÈ[›ÙXÝ[ÛŽˆH›Ø›[KHYXH[™H›ÛZ\ÙB‚ŠŠ•H›Ø›[KŠŠˆ›ÙXÝ[ÛˆÞ\Ý[\È\™HÛÝ™\›™YžHX[žHØØ[™YY˜XÚÈÛÜÎˆÜš^›Û[]]ÜØØ[\œËš\›]Ø\™BœÝÙ\ˆ[™ÛØÚÈÛÝ™\››ÜœËZ[[™Ë[X[˜YÙ[Y[ÛÜË˜]\žK[X[˜YÙ[Y[Þ\Ý[\ËÛÛ›™XÝ[ÛˆÛÛËÙ\›ÈÛÛ›Û\œË‚‘XXÚÛÜ\È[™Y[ˆ\ÛÛ][Û‹YØZ[œÝ]ÈÝÛˆÙ]Ú[Ú]X\™Ú[œÈÚ^™Y›ÜˆHÛÜœÝXØ\ÙH\Ý\˜˜[˜ÙKˆ™YHÛÜÝÂ™›ÛÝË[™]™\žHÜ\˜]Üˆ^\È[N‚‚‹H
+Š”™XXÝ[Ûˆ][˜ÞKŠŠˆ™XXÝ]™HÛÜÈXÝÛˆYÙÚ[™Ë]™\˜YÙYÚYÛ˜[ËˆHÝX™\›™]\ÈÜš^›Û[Ù]]ÜØØ[\‚ˆ™XÛÛ\]\È]È\Ú\™Y™\XØ\Èœ›ÛH]™\˜YÙY][^˜][ÛˆÛˆHÞ[˜È\š[Ù
+MHÙXÛÛ™ÈžHY˜][
+H[™[\È]ÂˆXÚ\Ú[ÛœÈÚ]ÝXš[^˜][ÛˆÚ[™ÝÜÎÈ™]ÈÙÈ[ˆ™YY[YHÈØÚY[H[™Ý\ˆ]Y]Y\È›Ü›H™Y›Ü™HØ\XÚ]Bˆ\œš]™\Ë‚‹H
+Š”Ý]XÈÝ™\‹\›Ýš\Ú[Ûš[™ËŠŠˆÛÜœÝXØ\ÙHX\™Ú[œÈ\œÚ\Ý›ÝYÚH˜\ˆ[Ü™HÛÛ[[Ûˆ›ÛZ[˜[™YÚ[YKˆHÜ\˜][™ÂˆÚ[Ú]ÈÙ[[œÚYHHØY™H™YÚ[Û‹[™HXY›ÛÛH™]ÙY[ˆ][™HÛÛœÝ˜Z[›Ý[™\žH\ÈZY›Üˆ[™ˆ˜\™[H\ÙY‚‹H
+Š•[˜ÛÛÜ™[˜]YÛÝ\[™ËŠŠˆÛÜÈÚ\™H™\ÛÝ\˜Ù\ÎˆÝÙ\‹ÛÛÛ[™ËÛÛ›™XÝ[ÛœËY[[ÜžK™]ÛÜšËˆÛ™HÛÜ	ÜÈÛÜœ™XÝ[Û‚ˆ\È[›Ý\ˆÛÜ	ÜÈ\Ý\˜˜[˜ÙKˆ[Ü™HÙXˆ™\XØ\ÈØ]\˜]HH]X˜\ÙIÜÈÛÛ›™XÝ[ÛœÎÈ[Ü™HÛÛÛ[™È\Ú\ÈHÝÙ\ˆ™YYˆÝØ\™]È[Z]‚‚“Ü\˜]ÜœÈÛÜÙH\ÙHØ\ÈžH[™Ú]š^YÙ][™ÜÈ[™[˜›ÛÚÜËˆ]\ÈØY™K[™]X]™\ÈH™YÚ[Ûˆ™]ÙY[ˆB››ÛZ[˜[Ü\˜][™ÈÚ[[™HØY™H›Ý[™\žH[\ÙY™X\›H[ÙˆH[YK‚‚ŠŠ•HYXKŠŠˆÛÜÙHÛ™HÝ\\š\ÛÜžHÛÜ\›Ý[™H˜]]™HÛÜËˆÛ[šKPÛÛ\\ÜÈ™X]ÈXXÚÙ][™ÈH˜]]™HÛÛ›Û\‚˜[™XYH^ÜÙ\È
+H™\XØH›ÛÜ‹HÝÙ\ˆØ\HÛØÚÈÙZ[[™ËH[\\˜]\™HÙ]Ú[HÛÛÚ^™JH\È[ˆXÝX]Ü‹XXÚ›˜]]™H[[Y]žHÝ™X[H\ÈHYX\Ý\™[Y[[™ÛÝ™\›œÈHÚÛH›ÙHœ›ÛHX›Ý™Kˆ]™\žHXÚ\Ú[Ûˆ\š[Ù][œÈš]™HÝ\Î‚‚ŒKˆ
+Š”Ù[œÙKŠŠˆ]™XYÈXXÚ]\ØÛIÜÈÝÛˆØ]YÙ\È›ÝYÚHYÎˆ][^˜][Û‹™\ÜÛœÙK][YH\˜Ù[[\Ë]Y]YH\ˆ[\\˜]\™KÝÙ\‹Ý]HÙˆÚ\™ÙK‚Œ‹ˆ
+Š“›Ü›X[^™KŠŠˆ]XÙ\ÈXXÚ™XY[™È[ˆ]È˜[™\ÈHÛÛ\\ÜÈÜÚ][Û‹œ›ÛH
+Ø[JHÈH
+H[™JKÚ]HIBˆÝ\Ú[Ûˆ]XXÚYÙK‚ŒËˆ
+Š‘XÚYKŠŠˆHÛÛ\\ÜÈ]È\›œÈ]ÜÚ][Ûˆ[ÈÛ™H›Ý[™Y[˜Ü™[Y[\ˆXÝX]ÜŽˆÛÈ[YÛÛš\Ý›Ü˜Ù\Ë\Úˆ[™[XXÚÚ]]ÈÝÛˆØZ[‹ÛÛXš[™Y›ÝYÚHÛ[ÛÝØ]\˜][™È™\ÜÛœÙH
+[š
+KÛÈHÛÛ[X[™\ÈÛÛ[[Ý\Ëˆ›Ý[™Y[™™]™\ˆÚ]\œËˆH[˜Ü™[Y[\ÈÛ\YÈHXÝX]Ü‰ÜÈÛÝ™\‹H\™˜[™ÙH›Ý[™ÈØ[ˆX]™K‚ˆ
+ŠXÝX]KŠŠˆ]Üš]\ÈH[˜Ü™[Y[›ÝYÚHYËY[\Ý[K[™™XYÈH˜[YH˜XÚÈÈÛÛ™š\›HHÜš]Bˆ[™Y‚Kˆ
+Š•™\šYžKŠŠˆH™\™XÝÛÛ\\™\ÈH]\ØÛHÚ][™Ú]Ý]HÝ\[ˆHZ\™YšX[ÛˆH]\ØÛH]Ù[‹YÙYˆÛˆH]\ØÛIÜÈÝÛˆÛÜÝ\ˆ[š]ÙˆÛÜšÎÈH›ÙHÝX\™ÚXÚÜÈ]™\žHÛÝ\Y]\ØÛHYØZ[œÝ]ÈÝÛˆÝ\Ú[Û‹ˆHÝ\ˆ]˜Z[ÈZ]\ˆ\Ý\È™]™\Y‚‚ŠŠ•Ú]Û[šKPÛÛ\\ÜÈ\È›ÝŠŠ‚‚‹H]\È
+Š››ÝH™\XÙ[Y[
+Šˆ›Üˆ[Ý\ˆÛÛ›Û\œËˆ˜]]™HÙY\È[›š[™È[™\›™X][Ø^\ËˆÛ[šKPÛÛ\\ÜÈÛ›H[Ý™\ÂˆÙ][™ÜÈ]˜]]™H[™XYH^ÜÙ\È[™™\ÜXÝË‚‹H]\È
+Š››ÝH›XÚÈ›Þ
+Š‹ˆ]™\žHXÚ\Ú[Ûˆ\ÈÜš][ˆÈHÙËÚ]H™XY[™È]Ø]\ÙY][™HÙ][™È]ˆÚ[™ÙY‚‹H]\È
+Š››ÝHÛ™K][YH[š[™ÈØÜš\
+Š‹ˆ]XÚY\ÈYØZ[ˆ]™\žHÙXÛÛ™[™Ý^Z[™È˜]]™H\ÈÛ™HÙˆ]ÈXÚ\Ú[ÛœË‚‹H]\È
+Š››ÝHÛÜÝXÝ]\ˆš\œÝ
+Š‹ˆ]Ú]™\ÈÝÙ\ˆÚ\™HHÝÙ\ˆ^\ÈÛÜšÈÜˆÜYY[™]ÚÝÜÈ]ÝÙ\ˆ™\ÚYBˆÚ]]›ÝYÚ‚‚ŠŠ•H›ÛZ\ÙK[ˆ™YH\ËŠŠ‚‚ŒKˆ
+Š‘È›È\›KŠŠˆHÝ\Ý^\ÈÛ›HÚ\™HH]\ØÛHZÙ\È›ÈÔÔÈœ›ÛH]YX\Ý\™YÛˆH]\ØÛH]Ù[‹ˆÚ\™BˆÛ[šKPÛÛ\\ÜÈØ[››Ýœš[™ÈHØZ[‹H]\ØÛHÝ^\È˜]]™K‚Œ‹ˆ
+Š‘]™\ž][™ÈÛÛY\È˜XÚËŠŠˆ]™\žHÙ][™È\ÈØ]™Y™Y›Ü™HHš\œÝÜš]H[™™\ÝÜ™YÚ[ˆÛ[šKPÛÛ\\ÜÈÝÜËˆY‚ˆHÛÝ™\››ÜˆÜ˜\Ú\Ë]ÈX\ÙH[œÈÝ][™HÙ][™ÜÈØ[ÈÛYHÛˆZ\ˆÝÛ‹ˆHÙ\\˜]HÚ[ÝÚ]ÚÝÜÂˆ]™\ž][™È]Û˜ÙK‚ŒËˆ
+Š‘]™\žHÛZ[H\ÈÚXÚÙYŠŠˆXXÚ™[˜ÚX\šÈÛÛ\\™\ÈÛÈ\›\Ë˜]]™H[™Û[šKPÛÛ\\ÜÈÛˆÜÙˆ˜]]™KÛˆHØ[YBˆXXÚ[™\ÈÚ]HØ[YHÛÜšËˆXXÚ[œÈ™YHÙ\\˜]H[Y\ËˆXXÚ™XY[™È\ÈÛ™HÛÜ™ÐRS‹U‘SˆÜˆÔÔËXÚYYˆžHÚ]HØ]YÙH\È›Ü‹ˆXXÚ™\Ý[Ø\œšY\È]È]šY[˜ÙHÛ\ÜÎˆ
+Š”
+Šˆ›ÜˆH\ÚXØ[Y]\‹
+Š“
+Šˆ›Üˆ]™BˆÛÙØ\™K
+Š”ÊŠˆ›ÜˆÝ\ˆÝÛˆ[Ù[ËˆH[Ù[\È™]™\ˆÚÝÛˆ\È›ÛÙˆÙˆ\™Ø\™K‚‚ŠŠ•Ú]]ÛÝ™\›œËŠŠˆHØ][ÙÈ˜[Y\ÈKLÈ]\ØÛ\È[ˆÌ˜[Z[Y\ËHÙ][™ÜÈ]Ü\˜]ÜœÈ]™\ž]Ú\™H[™XYB\›ˆžH[™ˆXXÚ[™HÛÛÈ[™™\XØ\ËÝÙ\ˆØ\È[™ÛØÚÈ[Z]ËØXÚHÚ^™\È[™ÛÛ›™XÝ[ÛˆÛÛËÛÛÛ[™ÂœÙ]Ú[È[™˜]\žH™\Ù\™\Ë›Ø›ÝÜYYÈ[™›Û™K\ÝØ\›HÙ][™ÜË[™X[žH[Ü™Kˆ^H\™HÜ›Ý\Y[È›Ý\ˆ™X[\ÂŠÛÛ\]KRH[™ÛÝYÈ\ÚXÜË›Ø›ÝXÜÈ[™]]Û›Û^NÈ[™\™ÞK˜XÚ[]H[™[™\ÝžNÈ\ÝšX][Ûˆ[™ÜXÚX[^™YœÞ\Ý[\ÊH[™[ˆÙÙ]\ˆ\ÈÚ^Ü™Ø[š\Û\Ëœ›ÛHÛ™H™X[H[Û™H\ÈHÚÛHÝÙ\ˆ]Û˜ÙKˆH]\ØÛ\È[ˆB˜Ø][ÙÈ\™H[Ù[Y
+Û\ÜÈÊKˆH™X[ÛÛ›Û\œÈ]\È™Y[ˆ[ˆÛˆÜÙ‹ÝXÚ\ÈÝX™\›™]\È[™H]X˜\Ù\Ë˜\™H]™HÛÙØ\™H
+Û\ÜÈ
+KˆHÚ\\ˆ]›ÛÝÜÈHÙ^K•Ú][ÝH\™HÛÚÚ[™È]ˆÚÝÜÈÚXÚ\ÈÚXÚˆ\[™^È\ÝÈ]™\žHÛ™HÙˆHKLÈ]\ØÛ\ÎˆÚ]]\ËÚ]Û[šKPÛÛ\\ÜÈ™XYÈœ›ÛH]Ú]][Ý™\ËHÜ™Ø[š\Û\È]™[Û™ÜÈË[™]ÈÝÛˆØ\™H˜XÝÜžHÙ][™È][œÈÛ‹‚‚ŠŠ•Ú][ÝH™YY™Y›Ü™H[ÝHÚ\™H]ŠŠ‚‚‹H
+ŠHXÙ[œÙH›Üˆ[žH\ÙH™^[Û™]˜[X][Û‹ŠŠˆ›ÙXÝ[Ûˆ\ÙH™\]Z\™\ÈHÚYÛ™YZYÛ[šKPÛÛ\\ÜÈ[\œš\ÙHXÙ[œÙK‚‹H
+Š”™XYXØÙ\ÜÈš\œÝŠŠˆÛ[šKPÛÛ\\ÜÈÝ\È[ˆØ]Ú[ÙNˆ]™XYÈ[™ÛÛ\]\Ë[™Üš]\È›Ý[™Ë‚‹H
+Š•HÚ\™HÚXÚËŠŠˆ]™\žH™XY[™È]\ÝÛÛYHœ›ÛHÚ\™H]ÛZ[\Ë]™\žH]™\ˆ]\Ý[Ý™HÚ]]ÛZ[\Ë[™]™\žBˆÜš]H]\Ý™XY˜XÚËˆ›Ý[™ÈÜš]\È[[HÚXÚÈ\ÜÙ\Ë‚‹H
+Š–[Ý\ˆÝÛˆÙ\šXÙH[™KŠŠˆH™\ÜÛœÙH[YHÜˆÝ\ˆ[Z][Ý\ˆÙ\šXÙH]\ÝYY]ÛÛY\Èœ›ÛH[Ý\ˆÝÛˆÙ\šXÙBˆØš™XÝ]™\Ë›Ýœ›ÛHÝ\œË‚‹H
+Š”Z\™Y[œÈÛˆ[Ý\ˆÝÛˆÞ\Ý[KŠŠˆHÛ›H[X™\ˆ]\Y\ÈÈ[Ý\ˆÞ\Ý[H\ÈHÛ™H[Ý\ˆÝÛˆZ\™Y[œÂˆ›ÙXÙKÛˆ[Ý\ˆÝÛˆ™XÙZ\‚‚ŠŠ’ÝÈÈ™XYÚ]›ÛÝÜËŠŠˆ™^ÛÛY\ÈHÙ^HÈH™YHÛÜ™Ë[ˆ•Ú][ÝH\™HÛÚÚ[™È]ˆÚXÚÚÝÜÈÚ]BšÛÚÙY]\Þ\Ý[HÛÚÜÈZÙH[™ÝÈÈ™XY]È™\ÜˆH]ZXÚÈ™Y™\™[˜ÙHØ\™\ÈHYÙHÈÙY\™\ÚYHHÞ\Ý[K‚•H^XÝ]]™HÝ[[X\žHÚ]™\ÈH™\Ý[È[ˆœšYY‹[™H\ØÛÜÝ\™\ÈXZÙH]™\žHXÛ\˜][ÛˆÛ˜ÙKˆY\ˆ]H›ÛÚÂ\›œÈÈH[ÜžKHX][X]XÜËH\ÚXÜËH›ÙK[™Û›H[ˆÈHÚ\š[™ËHÜ\˜][Ûˆ[™H›ÛÙ‹‚”™XY[ˆ]Ü™\‹›Ý[™È[ˆHÚ\š[™ÈÚ\\œÈÚÝ[Ý\œš\ÙH[ÝK‚‚ˆÈÈ]ZXÚÈ™Y™\™[˜ÙNˆHØ\™›ÜˆHÛÝ™H›Þ‚’ÙY\\ÈYÙHÚ\™HH[ÜHÚÈ[ˆHÞ\Ý[HØ[ˆ™XXÚ]HØ^HHš]™\ˆÙY\ÈHØ\™[ˆHÛÝ™H›Þˆ]™\žB›[™H\È^Z[™Y[ˆHÙXÝ[Ûˆ˜[YY™\ÚYH]È›Ý[™ÈÛˆ\ÈYÙH™\XÙ\ÈÜÙHÙXÝ[ÛœË‚‚ŠŠ•Ú]]\ËŠŠˆHÝ\\š\ÛÜžHÛÝ™\››ÜˆÛˆÜÙˆHÛÛ›Û\œÈ[ÝH[™XYH[‹ˆ]™]™\ˆ™\XÙ\È[Nˆ][Ý™\ÈÛ›BœÙ][™ÜÈ^H[™XYHXØÙ\[œÚYHH˜[™[ÝHÙ][™[™È]™\žHÙ][™È˜XÚÈÚ[ˆ]ÝÜÈ
+ÙXÝ[ÛœÈKŒH[™
+K‚‚ŠŠ•HÛÈ˜[Y\ËŠŠˆ
+“˜]]™Jˆ\È[Ý\ˆÞ\Ý[H\È][œÈÛˆ]ÈÝÛ‹ˆ
+“Û[šJˆ\ÈHØ[YHÞ\Ý[HÚ]Û[šKPÛÛ\\ÜÈÛˆÜ‚•\™H\È›È\™\›H[™›ÈÝ\ˆ˜[YH
+ÙXÝ[ÛˆKŒJK‚‚ŠŠ•H[Ù\ÊŠˆ
+ÙXÝ[ÛˆKŒÊK‚‚Ÿ[ÙHÚ]]Ù\ÈÚ[ˆŸKK_KK_KK_ŸÙ™ˆ
+X[X[
+H›Ý[™ÎÈ˜]]™H[œÈ[Û™H™Y›Ü™H[œÝ[[™Ë[™Ú[™]™\ˆ[ÝHÚÛÜÙHŸØ]Ú[™È™XYÈ]™\žHØ]YÙH[™ÙÜÈÚ]]ÛÝ[ÎÈÜš]\È›Ý[™ÈHš\œÝ]™[Ùˆ]™\žH[œÝ[][Ûˆ
+]™[JHŸ]]Ü[ÝÛ™HY[ˆ\Ú›Üˆ[Ü™KYÙ™ˆ›Üˆ\ÜËYH
+YY[HØ^JH[™™\Ù]žH]È]ÈY\ˆHØ]Ú]™[\È\ÜÙYŸÜZ\ÙHXXÚ[™\È[ˆÙ\šXÙH\ÈHÛÛ	ÜÈÝÛˆÜÚ[HHÛ›ÝÛˆ]Y]YHØZ]È˜]ÚÛÜšÈ‚ŠŠ“Û™HY[
+Š‹ZÙH[ˆ[XÝšXÈØ\‰ÜËˆ
+”\Ú
+ŽˆØ\XÚ]HYY]Û˜ÙH\È˜Y™šXÈÛ[XœË™]™\ˆ[˜XÚËˆ
+“YÙ™ŠŽ‚˜Ø\XÚ]HX\ÙYÙ™ˆHÝ\]H[YK[™Y˜XÚÈÝØ\™˜]]™K™]™\ˆ™[ÝÈYKˆ
+’YJŽˆHY[YY[HØ^KH›ÛÜˆÙˆÛÈXXÚ[™\È[ˆÙ\šXÙK™XYH›ÜˆH™^\œÝˆ
+”™\Ù]
+Žˆ]™\žHÙ][™È[™Y˜XÚÈÈÚ\™H˜]]™HYš]™XY˜XÚË[™H™XÛÜ™™[[Ý™Y‚‚ŠŠ•HØ^\È]ÝÜË[™Ú]XXÚX]™\È™Z[™
+Šˆ
+ÙXÝ[ÛˆLJK‚‚Ÿ[ÝHØ[ËÜˆ]\[œÈ]È\ÈÚ]\ÈYŸKK_KK_KK_ŸH[ˆ[™È›Ý[™ÎˆH™\Ù][œÈžH]Ù[ˆ]H[™Ùˆ]™\žH[ˆ]™\žHÙ][™È]HÜ\˜]Ü‰ÜÈ˜[YK™XY˜XÚÈŸÝÜ]™\ž][™È]Û˜ÙK›Üˆ[žHÙXÝ\š]H™X\ÛÛˆ]ÛŒÈÛÛËÛÛ[šWÜÝÚ]ÚœHÙ™˜]™\žHÛÝ™\››Üˆ[™È˜XÚÈ[™^]ÎÈ›Û™HÝ\ÈYØZ[ˆ[[]ÛŒÈÛÛËÛÛ[šWÜÝÚ]ÚœHÛ˜ŸÝÜÛ™H]\ØÛH]ÈÚ[š[KÜˆÓS’WÒÒSLX]]\ØÛH[™Y˜XÚÎÈHÝ\œÈ[ˆÛˆŸÛ[šKPÛÛ\\ÜÈY\ÈÚ]Ý][™[™È˜XÚÈ
+Ú[YÜ˜\ÚY[™ÊH›Ý[™ÎˆHØ]ÚÙÉÜÈX\ÙH[™È˜XÚÈ›Üˆ]]™\žHÙ][™È˜XÚÈ]HÜ\˜]Ü‰ÜÈ˜[YKYX\Ý\™Y]ÈÈLHÙXÛÛ™È[ˆÌÙˆÌ™\]][ÛœÈ
+ÙXÝ[ÛˆËJH‚ŠŠ•HZYÚ]™[ÈÙˆ[ˆ[œÝ[][ÛŠŠˆ
+ÙXÝ[ÛˆKŒÊKˆZÙH[H[ˆÜ™\ŽÈÛÈÈH™^Û›HÚ[ˆH\ÜÈÛË‚‚Ÿ]™[Ú]]ÝXÚ\È\ÜÈŸKK_KK_KK_Ÿ›Ý[™Îˆ]ÛŒÈ™\šYžKœX‘T’Q’PÐUSÓŽˆTÔØŸH›Ý[™ÎˆØ]Ú[ÙKÚ]H™XY[Û›HY[]H™\›ÈÜš]\Ë[™™XY[™ÜÈ[Ý\ˆÜ\˜]ÜœÈYÜ™YHÚ]ŸˆHÙË›ÝYÚ[Ý\ˆ]]ÜØØ[\œÈ
+
+Š•Ô’UTÊŠŠHMKNH[™˜Z[Y™\]Y\ÝÈ™]™\ˆ™Z[™˜]]™KÝ™\ˆZ\™Y[œÈŸÈHXXÚ[™\Ë›ÝYÚH™[X\ÙHØ]H[™H™\™XÝ
+
+Š•Ô’UTÊŠŠH™]Ù\ˆXXÚ[™\È[ˆÙ\šXÙKÚ]›ÈÔÔÈÛˆ[žHÙ\šXÙHØ]YÙHŸH™\XØHXÚ\Ú[Ûˆ]Ù[ˆ
+[ˆÜ[Û‹›ÝHÝ\
+H\È]™[ÈŸHHÔH›ÞÛÈÚ\™\ÎˆHÛØÚÈÙZ[[™È[™HÝÙ\ˆ[Z]
+
+Š•Ô’UTÊŠŠHÛÜšÈ\ˆ[™\™ÞH\Üˆ\]X[È›È™\]Y\Ý[Ü™H[ˆ‰HÛÝÙ\ˆ]HYYX[‹MHÜˆNHŸˆH›ØÙ\ÜÛÜ‰ÜÈÛØÚÈ[™ÝÙ\ˆÛˆ˜\™HY][
+
+Š•Ô’UTÊŠŠH[™\™ÞH\ˆ[š]ÙˆÛÜšÈÝÛ‹›ÈÔÔÈÛˆ[žHÙ\šXÙHØ]YÙHŸÈÚ]HÝÙ\ˆ[™HÝ\KXZ\ˆÙ]Ú[
+
+Š•Ô’UTÊŠŠHHÚ]HY]\‰ÜÈ[™\™ÞHÝÛ‹]™\žH˜XÚÈ[›][œÚYH]È˜[™›ÈÔÔÈÛˆ[žHÙ\šXÙHØ]YÙH
+ÙXÝ[ÛˆLŒLJH‚ŠŠ™Y›Ü™H[žH]™[]Üš]\ÎŠŠˆ[ˆHÚ\™HÚXÚÈ
+ÙXÝ[Ûˆ
+KÝ\[ˆØ]Ú[™ÙY\HX\Ý\ˆÝÚ]Ú[ˆ™XXÚ‚‚ŠŠ•Ø\›š[™ÈÚYÛœË[™Hš\œÝ[™ÈÈËŠŠ‚‚Ÿ[ÝHÙYHš\œÝ[ˆ™XYŸKK_KK_KK_ŸHÙ\šXÙHÛÝÙ\ˆÜˆ˜Z[[™È[Ü™HÚ]Û[šH[ˆÚ]Ý]]ÛŒÈÛÛËÛÛ[šWÜÝÚ]ÚœHÙ™˜ˆHÞ\Ý[H\È˜]]™HYØZ[ˆÙXÝ[ÛˆKÚ\™YšYÚÜˆÚ\™YÜ›Û™ÈŸHÙ][™È]H˜[YHÛ[šKPÛÛ\\ÜÈY›ÝÜš]H›Ý[™Îˆ]ÝÜÈÜš][™È]]™\ˆžH]Ù[ˆ
+Û™HÜš]\ŠHÙXÝ[ÛˆËŒˆŸHY]\ˆ]\È›[™Üˆ]H›Ý[™Îˆ›[™YX[œÈÛÈ][Ý™\È›Ý[™È]Ø[››ÝÙYHÙXÝ[ÛˆËŒÈŸ[Ý\ˆ™\Ý[ÈÚ[HÝ\ˆØ^Hœ›ÛHHX›\ÚYÛ™\È™\Ý[YHHÚ\š[™Èš\œÝ›ÝH]ÈTÐÓÔÕT‘TË›YÙXÝ[Ûˆ‚ŠŠ•ÚÈÈØ[ŠŠˆXÙ[œÚ[™Ë[ÝÈ[™HÛ[šKPÛÛ\\ÜÈ[\œš\ÙHXÙ[œÙNˆHÛ[šKPÛÛ\\ÜÈËXZ[ˆÙ™šXÙH[™œ˜\ÝXÝ\™KÛYœ™YH\™XÝKNLÌÎKNMMLKÞ\Ý[H›Ý]H\ÜÙ]KNQVVSLKÝÝË›Û[šKXÛÛ\\ÜË˜ÛÛK‚”ÙXÝ\š]H™\ÜÎˆH›ØÙ\ÜÈ[ˆÑPÕT’UK›Y™]™\ˆHX›XÈ\ÜÝYK‚‚ŠŠ•Ú]H]\œÈÙˆH[X™\ˆYX[‹ŠŠˆ™XY[ˆÜ™\‹VVSLH\ÈHØ^HH[™Ú[™H[œÎ‚‚ŸVSHŸKK_KK_KK_Ÿ
+Š‘]H^Ú[™ÙJŠŽˆH[œ]ˆ[ˆÛÙØ\™K]H^Ú[™ÙH\ÈÝÈÛ™HÞ\Ý[IÜÈ™XY[™ÜÈ™XXÚ[›Ý\‹ˆ\™H]\ÈHÛË]Ø^HYËÛ™HÚ\™H[ˆ[™Û™HÚ\™HÝ]ˆHÞ\Ý[IÜÈÝÛˆ™XY[™ÜÈÛÛYH[‹Û[šKPÛÛ\\ÜÉÜÈÙ][™ÜÈÛÈÝ]ˆ
+Š–ZY[[Z][™JŠŽˆH›Ý[™\žKˆ[ˆ[™Ú[™Y\š[™ÈØÚY[˜ÙKHZY[[Z]\ÈH[ÜÝØYHX]\šX[Ø[ˆØ\œžH[™Ý[Üš[™È˜XÚÈ[š\›YYÈ\Ý]H[XYÙH\È\›X[™[ˆÛ[šKPÛÛ\\ÜÈ[œÈ]™\žH]\ØÛH\È]ÈÝÛˆZY[[Z][™K™XY]™K[™™]™\ˆ\Ý]ˆ
+ŠŒJŠŽˆHÝ]]ˆ[ˆÛÙKH\ÈYKHš[š\ÚYÝ]NÈ[ˆØÚY[˜ÙKH\È[š]KHÚÛKˆ\™H]\ÈÛ™HÛÜÙYÛÜˆÛ™H›ÙKÛ™Hœ˜Z[‹]™\žH™\Ý[™XY˜XÚÈ[™H™^Ý\XÚYYœ›ÛH]ˆ‚”™XY\ÈÛ™HÙ[[˜ÙNˆÛ[šKPÛÛ\\ÜÈZÙ\ÈHÞ\Ý[H[ˆ›ÝYÚH]H^Ú[™ÙH
+V
+K[œÈ]™\žHÙ][™È\È]ÈZY[[Z][™H
+S
+H[™™]™\ˆ\Ý][™ÛÜÙ\È][[ÈÛ™HÛÜ
+JKˆØÚY[˜ÙH[™ÛÙØ\™H[ÜH™XYXXÚ\ÛˆÚYÚ‚‚ˆÈÈ^XÝ]]™HÝ[[X\žB‚ŠŠ•Ú]]\ËŠŠˆÛ[šKPÛÛ\\ÜÈ\ÈHÝ\\š\ÛÜžHÛÝ™\››Ü‹ˆ]Ú]ÈÛˆÜÙˆHÛÛ›Û\ˆHÞ\Ý[H[™XYH\ËB’ÝX™\›™]\È]]ÜØØ[\‹HÔIÜÈš\›]Ø\™KHÛÛÛ[™ÈÛÜH˜]\žH[™\\‹H›Ø›Ý	ÜÈÙ\›ËHÜšY	ÜÈ\˜Ú[™Ù\‹H]X˜\ÙIÜÈÛÛ›™XÝ[ÛˆÛÛ\‹HY\ÜØYÙHœ›ÚÙ\‰ÜÈÛÛœÝ[Y\ˆÜ›Ý\HØXÚIÜÈY[[ÜžHÙZ[[™Ë[™][Ý™\Â›Û›HHÙ][™ÜÈÜÙHÛÛ›Û\œÈ[™XYHXØÙ\ˆ]™XYÈXXÚ]\ØÛIÜÈÝÛˆY]\‹ÛÛ\]\ÈÛ™H›Ý[™Y›Ü˜ÙH\‚›]\ØÛHœ›ÛHHÚ[™ÛHÛ[ÛÝ]Ë[™ÛÈHÙ\šXÙH[ˆHZYHÙˆ]ÈØY™H˜[™˜]\ˆ[ˆ˜\ˆ™[ÝÈ]È[Z]‚•H˜]]™HÛÛ›Û\ˆÙY\È[›š[™È^XÝH\ÈÚ\YÈÛ[šKPÛÛ\\ÜÈÙ]ÈÚ]][™XYH^ÜÙ\Ë[™Ú[ˆÛ[šKPÛÛ\\ÜÂœÝÜË]™\žHÙ][™ÈÛÙ\È˜XÚÈÈH˜[YH]™XYÛ˜ÙH™Y›Ü™H]Èš\œÝÜš]Kˆ]\È™]™\ˆÝ[™[Û™H[™]™]™\‚˜ÛÛ\]\ÈÚ]HÛÛ›Û\ˆ[™\›™X]]‚‚ŠŠ•Ú]]Ù\È›Üˆ[ÝKŠŠˆ]™\žH[›š[™ÈÞ\Ý[HÙY\È›ÛÛHš\Ý[ˆØ\ÙHŽˆXXÚ[™\ÈÚ^™Y›ÜˆHÛÜœÝZ[]HÙˆB™^KHÛÛÙˆÛÛ›™XÝ[ÛœÈ[Ü[ˆ›ÜˆHØY]ÛÛY\ÈÛ˜ÙH[ˆÝ\‹HÛÛœÝ[Y\ˆÜ›Ý\Ú^™Y›ÜˆH]ZY]Ý\œÈ[™[ˆÝ™\œ[ˆ]HXZËHØXÚHÙZ[[™ÈÙ]Û˜ÙH[™YˆžHY˜][Û[šKPÛÛ\\ÜÈ\›œÈ]›ÛÛH[È[Ü™HÛÜšË™˜\Ý\ŽˆHX^]™\žH]\ØÛH[ˆ\È]ÈÝÛˆ[Z]™XY]™K™]™\ˆ\Ý][™™]™\ˆ™[ÝÈ˜]]™KH[™\™ÞH]ZÙ\ÈÚÝÛˆ\ÈÝÙ\ˆÚ]™[ˆ™\ÚYHHÛÜšÈ[™ÜYY]›ÝYÚˆÛˆHX[[ž[Û™HØ[ˆ[™H]ÝÛˆÈHØ[YHÛÜšÂÚ]\ÜËˆHÛÈ\™HHØ[YHYX\Ý\™[Y[™XYœ›ÛHÛÈÚY\È
+ÙXÝ[ÛˆË
+NˆH\™[Ü™HÛÜšÈœ›ÛHÚ]\È[™XYBš[œÝ[Y\ÈH]X\\ˆÙ™ˆHš[‚‚KKHÚ\™H[™ÜÈÝ[™
+ÛÛËÜÝ[[X\žKœHKYš^
+HKO‚‚ŠŠ•Ú\™H[™ÜÈÝ[™™XYœ›ÛHH™\Ý[š[\ËŠŠˆÜš][ˆžH]ÛŒÈÛÛËÜÝ[[X\žKœHKYš^œ›ÛHHš[\È]˜[Y\ÎÈ™\šYžKœX˜Z[ÈH\Ú[ˆÚXÚ\È›ØÚÈ›ÈÛ™Ù\ˆX]Ú\È[Kˆ›Ý[™È[ˆ]\È\YžH[™ˆH]™H™\Ý[È[ˆÛˆH[™Ú[™\È˜[YY[ˆZ\ˆÝÛˆX›\Ë[™]™\žHÛ™HÙˆ[H[œÈYØZ[ˆÛˆH™]Ù\Ý[™Ú[™K‚‚‹H
+Š•H[™Ú[™HÛˆ\ÈÚXÚÛÝ]ŠŠˆÛ[šK]‹š[™Ù\œš[ŒMÍ™YŒNˆ
+Hš[\ÊK‚‹HH]\ØÛ\È[™HÚ^Ü™Ø[š\Û\ÈÛˆ[™Ú[™HÛ[šK]H]HX^
+]šY[˜ÙHÛ\ÜÈËÝ\ˆÝÛˆ[Ù[ÎÈ[ˆŒ‹LLLLÈŽŒÍˆUËÛÛ[Z]YXLŽLMLNLLÈ]\ØÛ\ÎÈÛÝ\˜ÙNˆ™\Ý[ËÜ™X[\×ÝKÔ‘PST×ÕK›Y
+N‚ˆH]™\žH]\ØÛH[Û™KÝ™\ˆ]ÈØYÎˆU‘SˆNÐRSˆLÂˆHHÜ™Ø[š\Û\È[™\ˆH›Ü›X[ØYˆÛÛ\]HÈRHÈÛÝYˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒÌÝÙ\ˆÚ]™[ˆ
+ÌŒINÈ\ÚXÜÈÈ›Ø›ÝXÜÈÈ]]Û›Û[Ý\ÎˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒLŒHÝÙ\ˆÚ]™[ˆ
+ÌŒL	NÈ[™\™ÞHÈ˜XÚ[]HÈ[™\ÝšX[ˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒLNÝÙ\ˆÚ]™[ˆ
+ÌŒ	NÈ\ÝšX][ÛˆÈÜXÚX[^™YˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒÈÝÙ\ˆÚ]™[ˆ
+ÌŒ‰NÈH›Ý\ˆÝXÚÙYˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒLˆÝÙ\ˆÚ]™[ˆ
+ÌŒ	NÈHÚÛHÝÙ\ŽˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒLHÝÙ\ˆÚ]™[ˆ
+ÌŒ	BˆHHÜ™Ø[š\Û\È[™\ˆHÛ[XˆØYˆÛÛ\]HÈRHÈÛÝYˆÐRSˆ
+[Ü™HÛÜšÈ
+È™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒÎLÝÙ\ˆÚ]™[ˆ
+ÌŒ‰NÈ\ÚXÜÈÈ›Ø›ÝXÜÈÈ]]Û›Û[Ý\ÎˆÐRSˆ
+[Ü™HÛÜšÈ
+È™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒÌMÈÝÙ\ˆÚ]™[ˆ
+ÌŒŒINÈ[™\™ÞHÈ˜XÚ[]HÈ[™\ÝšX[ˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒŒMÈÝÙ\ˆÚ]™[ˆ
+ÌŒ	NÈ\ÝšX][ÛˆÈÜXÚX[^™YˆÐRSˆ
+[Ü™HÛÜšÈ
+È™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒÝÙ\ˆÚ]™[ˆ
+ÌŒ‰NÈH›Ý\ˆÝXÚÙYˆÐRSˆ
+[Ü™HÛÜšÈ
+È™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒÍHÝÙ\ˆÚ]™[ˆ
+ÌŒ	NÈHÚÛHÝÙ\ŽˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒMÝÙ\ˆÚ]™[ˆ
+ÌŒ	BˆHHÜ™Ø[š\Û\È[™\ˆH[™HØYˆÛÛ\]HÈRHÈÛÝYˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒŒHÝÙ\ˆÚ]™[ˆ
+ÌŒINÈ\ÚXÜÈÈ›Ø›ÝXÜÈÈ]]Û›Û[Ý\ÎˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒLÝÙ\ˆÚ]™[ˆ
+ÌŒÌ	NÈ[™\™ÞHÈ˜XÚ[]HÈ[™\ÝšX[ˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒLMÈÝÙ\ˆÚ]™[ˆ
+ÌŒ	NÈ\ÝšX][ÛˆÈÜXÚX[^™YˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒMˆÝÙ\ˆÚ]™[ˆ
+ÌŒ‰NÈH›Ý\ˆÝXÚÙYˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒMÍˆÝÙ\ˆÚ]™[ˆ
+ÌŒ	NÈHÚÛHÝÙ\ŽˆÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊKZ\ÜÙ\ÈLŒLHÝÙ\ˆÚ]™[ˆ
+ÌŒ	B‹HHÜšY
+ÛÝ\˜ÙNˆ™\Ý[ËÙÜšYÝKÑÔ’Q›Y
+NˆXÜ›ÜÜÈHÜšYˆ[Ù[YÍˆÙˆÍˆÜ]X\™\ÈÙˆL[™L[œÈÐRSˆ
+™]Ù\ˆZ\ÜÙ\ÊNÈHNÚ[™ÛH[œÎˆNÚ]™]Ù\ˆZ\ÜÙ\ÎÈÛÜšÈ
+ÌŒ	NÈÝÙ\ˆÚ]™[ˆ
+ÌŒ	HÈ
+ÌŒINÈÚ]HÛ\Ý\ˆ[œÚYKMÜ]X\™\ÎˆNÚ[™ÛH™\]][ÛœÈ
+›È™XY[™ÊNÈÙˆHÍˆÙˆL[™L™\]][ÛœËžHØ]YÙNˆ›Ü™Ø[š\ÛH[YHÝ™\ˆH[™H
+	HÙˆÝ\ÊHˆÐRSˆ[ˆÍ‹ÔÔÈ[ˆ[YHÝ™\ˆH™\ÜÛœÙH[™H
+	HÙˆØ[\\ÊHˆÐRSˆ[ˆÍ‹ÔÔÈ[ˆœ™\ÜÛœÙH[YH
+\ÊKM]\˜Ù[[HˆÐRSˆ[ˆ‹ÔÔÈ[ˆ‹™[™\™ÞH
+Ú
+HˆÐRSˆ[ˆ‹ÝÙ\ˆÚ]™[ˆ[ˆ™[™\™ÞK\šÙYÛÜšÙ\œÈÝ[Ûˆ]YHÝÙ\ˆ
+Ú
+HˆÐRSˆ[ˆ‹ÝÙ\ˆÚ]™[ˆ[ˆ›Ü™Ø[š\ÛH[™\™ÞH
+ŠHˆÐRSˆ[ˆÝÙ\ˆÚ]™[ˆ[ˆŒ‹›Ü™Ø[š\ÛHÛÜšÈ\ˆ[™\™ÞHˆÐRSˆ[ˆÔÔÈ[ˆŒ‹™˜Z[Y™\]Y\ÝÈ
+	JHˆÐRSˆ[ˆNÔÔÈ[ˆœ™\ÜÛœÙH[YH
+\ÊKN]\˜Ù[[HˆÐRSˆ[ˆL‹ÔÔÈ[ˆ‹’H™\XØ\ËYX[ˆˆÐRSˆ[ˆÝÙ\ˆÚ]™[ˆ[ˆKœÙÈÝ\YˆÐRSˆ[ˆËÝÙ\ˆÚ]™[ˆ[ˆÈÙ™ˆHÛØÚÈ[ˆÎÈ[˜[Y[ˆ‚‹HHÛ[šH[™^
+]šY[˜ÙHÛ\ÜÈ™X[XXÚ[™\Ë]™\žHYX\Ý\™HHØ[YH[ˆ[™YHÙˆÝ\ˆ[œÎÈH™YK\[ˆX›\ÈÙˆ[™Ú[™\ÈŒH[™ŒËXXÚ˜[YY[ˆ]ÈX›JNˆ
+ÍKŒ‰HÐRSˆÛˆH™\ÛÝ\˜ÙH™XY[™È
+ÛÜšËÜYYXXÚ[™\Ë[™\™ÞJK
+ÌL‹IHÐRSˆÛˆHÙ\šXÙH™XY[™È
+ÛÜšÈ[™ÜYY[Û™JKˆÛÝ\˜ÙNˆ™\Ý[ËÓÓS’WÒS‘V›Y‚ˆH™X[ÝX™\›™]\È
+Ú]XŠNˆ
+ÌÌKŽ	HÐRS‚ˆH™X[]X˜\ÙHØXÚH
+[Û™ÛÑˆ[™\ˆPÔÐ‹Ú]XŠNˆ
+ÌKÉHÐRS‚ˆH™X[]X˜\ÙH
+ÜÝÜ™TÔS™Z[™Ð›Ý[˜Ù\‹Ú]XŠNˆ
+ÌŽIHÐRS‚ˆH™X[Y\ÜØYÚ[™È
+\XÚHØYšØKÚ]XŠNˆ
+ÌŒIHÐRS‚ˆH™X[ØXÚH
+™Y\ËÚ]XŠNˆ
+ÌŒ	HU‘S‚ˆH™X[]X˜\ÙHY™™\ˆÛÛ
+^TÔS[™\ˆÞ\Ø™[˜ÚÚ]XŠNˆ
+ÌŒ	HU‘S‚‚Ÿ™[˜ÚX\šÈ]ÈÛ™H[X™\ˆ]ÈÛÜ™Û\ÜÈŸKK_KKNŸKK_KK_Ÿ]™\žH™X[\ÝÙÙ]\ŽˆHÛ[šH[™^
+ÍKŒ‰HÐRS‹ÝÙ\ˆÚ]™[ˆŸ™X[ÝX™\›™]\ËÚ]]ÈY[ÛœÎˆÑQIÜÈY[ÛˆÛˆH]™H™\]Y\ÝÈ[ˆ›YÚÛ[šKPÛÛ\\ÜÈÛˆÜ[ˆZ\œË™YH[œÈ
+ÍNKIHÐRS‹ÝÙ\ˆÚ]™[ˆŸ™X[ÝX™\›™]\ËÚ]]ÈY[ÛœÎˆÑQHÛˆHÔH\™Ù][™H]™H™\]Y\ÝÈ[ˆ›YÚÛ[šKPÛÛ\\ÜÈÛˆÜ[ˆZ\œË™YH[œÈ
+ÌËIHÐRS‹ÝÙ\ˆÚ]™[ˆŸHÚ^Ü™Ø[š\Û\ÈÚ]H™X[Û\Ý\ˆ[œÚYKL[™LÛÜY\È
+ÍKŒÉHÐRS‹ÝÙ\ˆÚ]™[ˆHÛ\Ý\ŽÈËHÜ™Ø[š\ÛH\›Ý[™]ŸHšYÈÜ™Ø[š\Û\ÈÚ]H™X[Û\Ý\ˆ[œÚYKKÛÜY\ÈÛˆ^\™H
+ÌMMKŒ	HÐRSˆHÛ\Ý\ŽÈËHÜ™Ø[š\ÛH\›Ý[™]ŸHMH[Ù[Y]\ØÛ\È\ÈÛ™HÝÙ\‹]™\žH]\ØÛHÜš][ˆ]Û˜ÙH
+ÌŒÉHÐRSˆÈŸ›Ø\Ý™\ÜÎˆHÛËZÝ\ˆ[ˆ
+ÌŒ	HU‘SˆŸ›Ø\Ý™\ÜÎˆHÛÝ™\››ÜˆÚ[YÝ]šYÚZY\[ˆ
+Î‰HÐRSˆŸ›Ø›Ý\›\È
+]R›ÐÛÊKH™YH[ÝXÚY›Ø›ÝÈ
+ÌËŽ	HÐRSˆÈŸ™Y\ËHØXÚIÜÈY[[ÜžHÙZ[[™È
+ÌŒ	HU‘SˆŸ™X[ÝX™\›™]\ËÝXYHÛÜšÈ
+ÌÌIHÐRSˆŸ™X[ÝX™\›™]\Ë˜][È
+ÌÍ‹‰HÐRSˆŸ™X[ÝX™\›™]\Ë[X[™]Ø[™\œÈ
+ÌÍËŒ	HÐRSˆŸ™X[ÝX™\›™]\Ë[›Ý\ˆ]Û˜ÙH
+ÍKÉHÐRSˆŸ™X[ÝX™\›™]\ËH]Y]YHÙˆ›ØœÈ
+ÌM‹IHÐRSˆŸ™X[ÝX™\›™]\ËHX›XÈ^HÙˆ[X[™
+ÛÛÙÛHŒLJH
+Í‹	HÐRSˆŸ™X[ÝX™\›™]\ËH›Ú\ÞH™ZYÚ›Ý\ˆ
+ÌŒ	HU‘SˆŸÝÙ\ˆÜšYÈ
+Ú[P™[˜Ú
+K›ÝØY[Ù[È
+ÍKŽ	HÐRS‹ÝÙ\ˆÚ]™[ˆÈŸÜÝÜ™TÔSHÛÛ\‰ÜÈÛÛÚ^™H
+ÌŽIHÐRS‹ÝÙ\ˆÚ]™[ˆŸ^TÔSHY™™\ˆÛÛ	ÜÈÚ^™H
+ÌŒ	HU‘SˆŸ[Û™ÛÑ‹HÝÜ˜YÙH[™Ú[™IÜÈØXÚHÚ^™H
+ÌKÉHÐRSˆŸØYšØKHÛÛœÝ[Y\ˆÜ›Ý\	ÜÈÚ^™H
+ÌŒIHÐRSˆŸ›Û™HÝØ\›\ËH™YH[ÝXÚYÙ[È
+ÍKŽIHÐRSˆÈŸZ[[™ÜÈ[™˜]\šY\È
+Ú]SX\›ŠKH\ÝšXÝÈÚ]˜]\šY\È
+ÌŽ	HÐRSˆS‘ÔÔÈÈ‚”[ˆ[™ØÛÜ™YžHHÛ[šKPÛÛ\\ÜÈÉÜÈÝÛˆÛÙKˆ›ÈÝ]ÚYH\H\È™]šY]ÙYÜˆ\›Ý™Y\ÙH™\Ý[Ëˆ™\™YÚ\Ý\™YYX[œÈH[\ÈÙ\™HÜš][ˆÝÛˆ[ˆÝ\ˆÝÛˆ™\ÜÚ]ÜžH™Y›Ü™HH[œÎÈ›Ý[™ÈØ\Èš[YÚ][žHÝ]ÚYH›ÙK‚‚KKH[™ÙˆÚ\™H[™ÜÈÝ[™KO‚‚ŠŠ•Ú]\È›Ý™Y[ˆÚÝÛ‹ØZYZ[›KŠŠˆ[ˆ[™\™ÞHÜˆÛÝYXš[Ø]š[™ÈÛˆ™X[XXÚ[™\Ëˆ[™\™ÞHÛˆÚ[™\ÈB™XÛ\™Y[Ù[™XØ]\ÙHHXXÚ[™\È\™HÛÛZ[™\œÈÛˆÛ™H[›™\‹ˆ^\™IÜÈš[ÛˆH]ÛÜšÙ\ˆ›Y]™XY›ÈY™™\™[˜ÙB˜™^[Û™H›Ú\ÙHÛˆ]™\žHØ]YÙKÚXÚ\ÈHÛ™\Ý™XY[™ÈÙˆH›Y]ÛÈÛX[ÈÚÝÈÛ™HXXÚ[™NÈH]ÛÜšÙ\‚™›Y]]Ø[ˆÚÝÈÛ™H\È™\™YÚ\Ý\™Y[™\È™Y[ˆ™Y\ÙYžH^\™IÜÈÝÛˆÛ\Ý\ˆØ\XÚ]H[ˆ]È™YÚ[Û‹XXÚ™Y\Ø[œ™XÛÜ™Yˆ]™\žHX\›Y\ˆÔH™\Ý[˜[ˆÛˆHÛÛ›Û\ˆÚ[˜ÙH™\XÙY[™\ÈØœÛÛ]NÈHØ\™[œÈYØZ[ˆÛˆ™[Yš\™Ø\™H]Û™H˜[YYÛÛ[Z]ˆXXÚÙˆ\ÙH\È[ˆÜ[ˆ][H[ˆÙXÝ[ÛˆM‹›ÝH›ÛÝ›ÝK‚‚ŠŠ’ÝÈ]Ý^\ÈØY™KŠŠˆ]Ø]Ú\È™Y›Ü™H]Üš]\Ëˆ]™XÛÜ™È]™\žHÜšYÚ[˜[Ù][™È™Y›Ü™H]XÝÈ[™™XYÈ˜XÚÂ™]™\žHÜš]Kˆ]™]™\ˆÜš]\È\ÝHÛ›Ø‰ÜÈÛÝ™\‹ˆ]Ú]™\È]™\ž][™È˜XÚÈH[ÛY[Ù\šXÙHÜ›ÜÜÙ\ÈHØ[ÜˆBœÙ[œÙHÛÙ\È›[™ˆ]ÝÜÈÜš][™ÈHÛ›ØˆH[œÝ[[ž[Û™H[ÙHÝXÚ\È]ˆ][Ý™\ÈHÛÝÈÛ›ØˆÛ›HY\ˆHZ\™YšX[ÛˆH]\ØÛH]Ù[ˆÚÝÜÈ›È[Ü™H[ˆ‰HÛÜÝˆÛ™HÑ‘ˆÝÚ]Ú™]\›œÈ]™\žHÙ][™ÈÈ]ÈÜšYÚ[˜[˜[YNÈBØ]ÚÙÈÚ]HX\ÙHÙ\ÈHØ[YHYˆHÛÝ™\››Üˆ\ÈÚ[YÝ]šYÚÈ[™HÙ\\˜]HÚ[ÝÚ]Ú›ÜˆÙXÝ\š]HÛ›K\›œÈHÚÛH\›™\ÜÈÙ™ˆ[ˆÛ™H[X[ˆ[™‚‚ŠŠ’ÝÈ[ÝHÛ›ÝËŠŠˆ]™\žH[ˆ›ÙXÙ\È™XÙZ\Îˆ˜]]™HYØZ[œÝÛ[šHÛˆHØ[YHÞ\Ý[KHØ[YHØY[™HØ[YHÛØÚË™XXÚØ]YÙHÚ]]ÈMIH[\˜[H˜]Èš[\È\˜Ú]™Y™\ÚYHHÛÙH[™š[™Ù\œš[Yˆ™\Ý[È\™HX™[YžHH[BÜš][ˆ™Y›Ü™HH[‹ÛÝ[YÛ›HÚ[ˆ[™YHÙˆÝ\ˆ[œÈYÜ™YK[™™\ÜYÚ]]™\žHÜÜÈ[ˆHX›K‚‚ˆÈÈX›HÙˆÛÛ[Â‚ŠŠ‘œ›ÛX]\ŠŠˆHHÙ^NˆÐRS‹U‘Sˆ[™ÔÔÎÈÚ][ÝH\™HÛÚÚ[™È]È›ÝXÙH[™\ØÛZ[Y\ŽÈ›Ü™]ÛÜ™È™Y˜XÙNÂ”™[YNˆHšYÚÛˆHÛ\Ý\ŽÈ[›ÙXÝ[ÛŽˆH›Ø›[KHYXH[™H›ÛZ\ÙNÈ]ZXÚÈ™Y™\™[˜ÙNˆHØ\™›ÜˆB‘ÛÝ™H›ÞÈ^XÝ]]™HÝ[[X\žB‚ŠŠ”\HHHÛÝ™\››ÜŠŠ‚ŒKˆÚ]Û[šKPÛÛ\\ÜÈ\ÂŒ‹ˆH]\ØÛ\ËH™X[\È[™HÚ^Ü™Ø[š\Û\ÂŒËˆÚ\™HH˜[YHÛÛY\Èœ›ÛB‚ŠŠ”\RHHHYXÚ[š\ÛHÙˆXÝ[ÛŠŠ‚ˆH[™Ú[™NˆZYÚ\]X][ÛœÈ[™Û™HÛÛ›Û]ÂKˆHÛÜÙYÚ\˜ÛNˆÚH]Ø[››ÝX]™H]ÈÛÛ\\ÜÂ‹ˆHÛÛ\\ÜÎˆ\Ú[[™HÛÈ›Ü˜Ù\È
+‹HH™Y›^[NˆÛ™H›ÙKÛ™Hœ˜Z[ŠBËˆHÛËUØ^H™\›Ý\ÈÞ\Ý[B‚ŠŠ”\RRHHH\›™\ÜÎˆYÜËÚ\™\È[™HÚ\™HÚXÚÊŠ‚ŽˆHYËHY\\œÈ[™HÚ\™HÚXÚÂ‚ŠŠ”\UˆHÚ\š[™È]ÛÈ[Ý\ˆÝXÚËÝ\žHÝ\
+Š‚ŽKˆ™Y›Ü™H[ÝHÝ\[™HZYÚ]™[ÂŒLˆÝXÚÈžHÝXÚÈ
+LŒLHH]HÙ[\ˆ[™\ˆHÙ\™\œÎˆÛÛÛ[™ËÝÙ\ˆ[™˜]\šY\ÊB‚ŠŠ”\ˆHÜ\˜][™È]
+Š‚ŒLKˆHÑ‘ˆÝÚ]ÚH[\Ë[™HÙÂŒL‹ˆXZ[[˜[˜ÙK\Ü˜Y\È[™ÙXÝ\š]B‚ŠŠ”\’HH›Ýš[™È]
+Š‚ŒLËˆZ\™Y[œÈ[™™XÙZ\ÈÛˆ[Ý\ˆÝÛˆÞ\Ý[BŒMˆ]šY[˜ÙHÛ\ÜÙ\È[™ÝÈÈ™XYH™\Ý[ŒMKˆHœ›Þ™[ˆ[™Ú[™\È[™H™YKT[ˆ[BŒM‹ˆ™\Ý[ÈÈ]H
+M‹ŒH™X[ÝX™\›™]\ÎÈM‹ŒˆHÜ™Ø[š\Û\ÈÚ]HÛ\Ý\ˆ[œÚYNÈM‹ŒÈHš[ÛˆH™X[ÛÝYÂˆM‹H™X[]X˜\ÙKœ›ÚÙ\ˆ[™ØXÚNÈM‹HH[Ù[Y™X[\È[™HÚ[][]ÜœÎÈM‹ˆHÛ™H[X™\ˆ[™BˆX›NÈM‹È™X]ÈÈ˜[Y]KÝ]YžH\ÎÈM‹ŽÚ]\È›ÝY]ÚÝÛ‹[™HÜ[ˆ›ÙÜ˜[JB‚ŠŠ”\’RHHÛÙKÚ[œÈ[™\›\ÊŠ‚ŒMËˆXÙ[œÙH[™ÛÛ[Y\˜ÚX[\›\ÂŒNˆ]Û‹ÊÊÈ[™HÙX[‚ŠŠ˜XÚÈX]\ŠŠˆHÛÜÜØ\žNÈ\[™^HÛÛ[X[™™Y™\™[˜ÙNÈ\[™^ˆš[HX\È\[™^ÈH\]X][ÛœÈ[ˆ[Â\[™^Y]šXÜÎÈ\[™^H›ÝX›\ÚÛÝ[™ÎÈ\[™^ˆ]šY[˜ÙHX\È\[™^È™\›ÙXÚ[™È]™\ž][™ÎÈÛÛXÝ‚‹KKB‚ˆÈT•HHHÓÕ‘T““Ô‚‚ˆÈÈKˆÚ]Û[šKPÛÛ\\ÜÈ\Â‚HÛÝ™\››ÜˆÛˆHÝX[H[™Ú[™HÙ\È›ÝZ[H[™Ú[™H[™Ù\È›Ý\›ˆHÚYˆ]Ø]Ú\ÈHÜYY[™[Ý™\ÈB›ÝHÛÈHÜYYÝ^\È[ˆH˜[™ˆÛ[šKPÛÛ\\ÜÈ\È]›Üˆ]™\žHXXÚ[™H[ÝH[‹‚‚’]\ÈH›ØÙ\ÜÈÛˆHÜÝˆ]™XYÈY]\œËÝ\ÈH›Ý[™YX][X]XØ[]Ë[™Üš]\ÈÛ›HH]™\œÈ]\È™Y[‚™Ú]™[‹ˆ]\È›ÝHÚ\›ÝHÔHš]™\‹›ÝÝX™\›™]\Ë›ÝHZ[[™ÈÛÛ›Û\‹ˆÜÙHÙY\[›š[™È^XÝB˜\È^HÈÙ^NÈÛ[šKPÛÛ\\ÜÈÙ]ÈH˜[Y\È^H[™XYHXØÙ\‚‚•™YH˜XÝÈX›Ý]]›ØÙ\ÜÈš^Ú]H™\ÝÙˆ\ÈX[X[Ø[ˆ[™Ø[››ÝÛZ[Kˆš\œÝ]\È
+Š›Û™H›ØÙ\ÜÈ\‚œÝXÚÊŠ‹HÛÛ›Û\ˆ
+Û[šWØÛÛ›Û\‹ØÛÛ›Û\‹œXÛˆHÛ\Ý\ŽÈH\›™\ÜÉÜÈÝÛˆÛÛ›Û\ˆÛˆH]X˜\ÙHÜˆB˜ØXÚJH]ØZÙ\ÈÛˆHš^Y\š[Ù™XYÈHÝXÚÉÜÈÝÛˆØ]YÙ\È›ÝYÚHÝXÚÉÜÈÝÛˆ[\™˜XÙKXÚY\ËÜš]\Â›ÝYÚHØ[YH[\™˜XÙK[™™XYÈ˜XÚÈÚ]H]šXÙHÛÚÎÈ]\È›ÈYÙ[[œÚYHHÙË›ÈÙ\›™[[Ù[K›ÂšÛÚÈ[ˆH™\]Y\Ý]ÛÈ]Ø[ˆY][˜ÞHÈ›Ý[™È]Ù\È›ÝÛÝ™\›‹ˆÙXÛÛ™]™\žH]™\ˆ]X^HÝXÚ\ÂŠŠ›˜[YY™Y›Ü™H]Ý\ÊŠ‹™XYÛ˜ÙH[ÈHÛ˜\ÚÝ[™[™Y˜XÚÈÈ]Û˜\ÚÝÚ[ˆ]ÝÜË\ÈÚ[YÜ‚›ÜÙ\ÈHÙ[œÙNÈH]™\ˆ]Ø\È›ÝÚ]™[ˆ]Ø[››Ý™XXÚ™XØ]\ÙHHYÈ›Üˆ]Ù\È›Ý^\Ýˆ\™]\ÈBŠŠØ]Ú[™È[ÙJŠˆ[ˆÚXÚ]™XYÈ[™XÚY\È[™Üš]\È›Ý[™Ë[™]™\žH›ÛÝ]™YÚ[œÈ\™H
+ÙXÝ[ÛˆJNˆB™š\œÝ[™È[ˆÜ\˜]ÜˆX\›œÈX›Ý]Û[šKPÛÛ\\ÜÈÛˆZ\ˆÝÛˆÝXÚÈ\ÈÚ]]ÛÝ[]™HÛ™K[ˆHÙËÚ]BœÝXÚÈ[ÝXÚY‚‚•Ú]›ÛÝÜÈœ›ÛHÜÙH™YH\ÈHÚ\HÙˆH]šY[˜ÙH[ˆ\’Kˆ™XØ]\ÙHH˜]]™HÛÛ›Û\ˆÙY\È[›š[™Â[™\›™X]]™\žH™[˜ÚX\šÈ\ÈH˜]]™HÝXÚÈYØZ[œÝHØ[YH˜]]™HÝXÚÈÚ]Û[šKPÛÛ\\ÜÈÛˆÜ[™™]™\‚“Û[šKPÛÛ\\ÜÈYØZ[œÝ[ž][™È[ÙKˆ™XØ]\ÙHH]™\œÈ\™HHÝXÚÉÜÈÝÛˆÙ][™ÜË]™\žHØZ[ˆ\ÈÛ™HHÜ\˜]Ü‚˜ÛÝ[]™H™XXÚYžH[™Yˆ^HY™Y[ˆX›HÈ™XY]™\žHØ]YÙH]™\žH™]ÈÙXÛÛ™È[™[Ý™H]™\žHÛ›ØˆÚ]Ý]™]™\ˆ™Z[™ÈÜ›Û™ÎÈHÛZ[H\È›ÝH™]ÈYXÚ[š\ÛH]HÝXYH[™ÛˆHYXÚ[š\Û\È]^\Ýˆ[™™XØ]\ÙHBœ›ØÙ\ÜÈ\ÈÛX[[™Ù\\˜]K]ÈÝÛˆÛÜÝ
+ÔHÛˆHÜÝ™XYÈÙˆHTJH\ÈYX\Ý\™Y[ˆ]™\žH[ˆ[™ÛÝ[Y˜YØZ[œÝ]Ú\™H]ÚÝÜË‚‚ˆÈÈÈKŒH[Ø^\ÈÛˆÜÙˆH˜]]™HÛÛ›Û\‚‚•Hš\œÝ\ÚYÛˆXÚ\Ú[Û‹[™HÛ™H]™\žHÝ\ˆ›ÛÝÜÈœ›ÛK\È]Û[šKPÛÛ\\ÜÈ\È
+ŠœÝ\\š\ÛÜžJŠ‹ˆ]™]™\‚œ™\XÙ\ÈHÛÛ›Û\ˆHÞ\Ý[H[™XYH\Ë™]™\ˆž\\ÜÙ\È][™™]™\ˆ[œÈ[ˆ]ÈXÙKˆHÝX™\›™]\Â’Üš^›Û[Ù]]ÜØØ[\ˆÙY\ÈØØ[[™ÈÙÈÛˆ]ÈÝÛˆÔH\™Ù]ÈÛ[šKPÛÛ\\ÜÈ[Ý™\È]\™Ù][œÚYHH˜[™ÙHB›Ü\˜]Üˆ[ÝÜËˆHÛ\Ý\ˆ]]ÜØØ[\ˆÙY\ÈY[™È[™[][™ÈXXÚ[™\ÎÈÛ[šKPÛÛ\\ÜÈX\šÜÈXXÚ[™\ÈYH[™]ÈB˜]]ÜØØ[\ˆÈH[][™ËˆHØ\™	ÜÈš\›]Ø\™HÙY\È›ÛÜÝ[™ÈHÛØÚÈ[™[™›Ü˜Ú[™È]ÈÝÙ\ˆ[Z]ÈÛ[šKPÛÛ\\ÜÈÙ]ÂHÙZ[[™ÈH›ÛÜÝX^H™XXÚ[™H[Z]Hš\›]Ø\™H[™›Ü˜Ù\ËˆÐ›Ý[˜Ù\ˆÙY\È[™[™ÈÛÛ›™XÝ[ÛœÈÈÛY[ÎÂ“Û[šKPÛÛ\\ÜÈÙ]È]ÈÛÛÚ^™H›ÝYÚHÛÛ\‰ÜÈÝÛˆÛÛœÛÛKˆØYšØIÜÈÛÛœÝ[Y\ˆÜ›Ý\ÙY\È™X˜[[˜Ú[™È\][ÛœÈÛ‚š]ÈÝÛŽÈÛ[šKPÛÛ\\ÜÈÚ[™Ù\ÈÝÈX[žHÛÛœÝ[Y\œÈ\™H[ˆHÜ›Ý\ÚXÚ\ÈÚ][ˆÜ\˜]ÜˆÙ\Ëˆ™Y\ÈÙY\È]šXÝ[™ÈžBš]ÈÝÛˆ[NÈÛ[šKPÛÛ\\ÜÈÙ]ÈHÙZ[[™È][HÛÜšÜÈ[™\‹‚‚•\ÈX]\œÈÈH™Y™\™YH›ÜˆH™XÚ\ÙH™X\ÛÛŽˆ]™\žH™[˜ÚX\šÈ[ˆ\ÈX[X[\È^XÝHÛÈ\›\Ë
+Š›˜]]™JŠˆ
+BœÞ\Ý[HÚ]]ÈÝÛˆÛÛ›Û\‹\ÈÚ\Y[™\ÈHÜ\˜]ÜˆÙ]]
+H[™
+Š›Û[šJŠˆ
+HØ[YHÞ\Ý[HÚ]Û[šKPÛÛ\\ÜÈÛ‚Ü
+Kˆ\™H\È›È\™\›H[ˆÚXÚÛ[šKPÛÛ\\ÜÈ™\XÙ\ÈHÛÛ›Û\‹[™›ÈÛÛ\\š\ÛÛˆ[ˆÚXÚÛ[šKPÛÛ\\ÜÈ\ÈBœš]˜[È]ˆHØZ[ˆ\È\™Y›Ü™H[Ø^\ÈÚ]HÛÝ™\››ÜˆYYÛˆÜÙˆÚ]H˜]]™HÛÛ›Û\ˆ[™XYHY‹[™B›ÜÜÈ\È[Ø^\ÈÚ]HÛÝ™\››ÜˆÛÜÝÛˆÜÙˆ]‹ˆ›Ý[™È[ˆH™XÛÜ™\È[ˆ\™Ý[Y[YØZ[œÝ[žH˜]]™HÛÛ›Û\ŽÂ™]™\žH˜]]™HÛÛ›Û\ˆ[ˆ\ÈX[X[\ÈHÛÛÙÛÛ›Û\ˆ]HÛÝ™\››ÜˆÚ]ÈÛ‹‚‚ˆÈÈÈKŒˆÈ›È\›NˆH™\™XÝ‚•HÙXÛÛ™\ÚYÛˆXÚ\Ú[Ûˆ\È]Û[šKPÛÛ\\ÜÈ]\Ý™]™\ˆØ]\ÙHHÔÔËˆ\È\È›ÝHÛÙØ[ˆš[YÛˆBœ™\ÜÈ]\ÈHšYÙÙ\ˆ[œÚYHH[™Ú[™Kˆ™Y›Ü™HÛ[šKPÛÛ\\ÜÈ[Ý™\ÈHÛÝÈÛ›Øˆ
+HXXÚ[™HÚ]™[ˆ˜XÚËHØ\™	ÜÈÛØÚÂ˜ÙZ[[™ËH›Ø›Ý^\ÉÜÈÜYYH›Û™IÜÈÜZ\ÙHÝ™\œšYJK][œÈH
+ŠœZ\™YšX[ÛˆH]\ØÛH]Ù[ŠŠ‚ŠÛ[šXÛÛ\\ÜËÝ™\™XÝœX
+NˆH]\ØÛIÜÈÝÛˆÛÜÝ\ˆYXÙHÙˆÛÜšÈ\ÈYX\Ý\™Y]˜]]™H[™]Û™HÝ\\ÝB™Y\\ÝÝ\[™XYH[ÝÙY[™\ˆHØ[YH˜Y™šXËÚ]]X\Ý\HYXÙ\ÈÙˆÛÜšÈÛˆXXÚÚYNÈHÝ\\Â˜[ÝÙYÛ›HYˆHšX[	ÜÈYYX[ˆÛÜÝ\È›È[Ü™H[ˆ‰HX›Ý™HH™Y™\™[˜ÙH[™›È[Ü™H[ˆ‰HX›Ý™HHÛÜÝš\œÝ›YX\Ý\™Y]˜]]™KˆH™Y\ÙYÝ\\È›ÝšYYYØZ[ˆ›ÜˆHÙ][X™\ˆÙˆXÚ\Ú[ÛœËˆÚ\™H›ÈÝ\\ÜÙ\ËH™\™XÝœ™XYÈ
+Š›Y˜]]™JŠ‹HÛ›Øˆ\È™]™\ˆ[Ý™Y[™H™\Ý[›Üˆ]]\ØÛHØ^\È››Ý[™È›ÜˆÛ[šHÈ[Ý™H‹ˆ\È\ÂÚK[ˆH›Ø›ÝX\›H™[˜ÚX\šËÛÈÙˆ›Ý\ˆ\›\ÈÙ\™HY[\™[H˜]]™H[™\™H™\ÜY\ÈÝXÚ[™ÚH[ˆBœ™X[ÝX™\›™]\È\ÝÈXXÚ[™\ÈÙ\™HÙ\Ú[™]™\ˆÛ™HXXÚ[™H™]Ù\ˆXYHH™\]Y\ÝÈÛÝÙ\ˆ[ˆHšX[ˆØZ[œÈ\™H›Ý˜Ø\YÈH[ÝØ[˜ÙHØ\ÈÛ›HÚ]X^H™HÜ[ÈÙ][K‚‚•HØ[YHš[˜Ú\K\YYY\ˆH˜XÝÈ]™\žHX›\ÚY™\Ý[\ÈHYÙHÙˆÚ\š[™È™\™XÝÂŠØÜËÕÒT’S‘×Õ‘T‘PÕË›YÙXÝ[ÛˆM‹˜ŠNˆ]™\žHÛ›Øˆ[ˆ]™\žHX›H\ÈÚ]™[ˆÛ™HÙˆ™YHÛÜ™Èœ›ÛHHX›H]Ù[‹ŠŠÜš]JŠˆÚ\™HHØ]YÙH\ÈÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÈ[™›Û™HÔÔÈÜˆÝÙ\ˆÚ]™[ˆ[ˆ[™YHÙˆÝ\ˆ[œË
+ŠØ]Ú
+ŠˆÚ\™H›Ý[™È\ÈÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÈ
+HÛ›Ø‚œÝ^\È˜]]™H[™Û[šHÛ›H™XYÈ]Û™HÚ\™HÝ][™›ÈÚ\™H[ŠK[™
+Š›Ü\˜]Ü‰ÜÈÚÚXÙJŠˆÚ\™HØZ[œÈ[™ÜÜÙ\È\™H›ÝHØ[YH[ˆ[™YHÙˆÝ\ˆ[œËˆÛ[šKPÛÛ\\ÜÈ\ÈÚ\™YÝ]Ùˆ]™\žH]\ØÛNÈ]\ÈÚ\™Y[ˆÛ›HÚ\™H]\ÈX\›™Y]‚‚ˆÈÈÈKŒÈHY[ËH[Ù\È[™HÛÈÝÚ]Ú\Â‚“Û[šKPÛÛ\\ÜÈš]™\ÈHÞ\Ý[HHØ^HHÙ[‹Yš]š[™ÈØ\ˆš]™\È]Ù[Žˆ]™Y[ËØ]YÙ\È[™Y\ÝËÚ]›Ø›ÙH[ˆBœÙX]ˆH›ØØX[\žH\È\ÙYHØ[YHØ^H]™\ž]Ú\™H[ˆ\È™\ÜÚ]ÜžH
+ØÜËÓQPÒS’TÓWÓÑ—ÐPÕSÓ‹›Y•HY[ÈŠN‚‚‹H
+Š“Ù™ˆ
+X[X[
+KŠŠˆÛ[šKPÛÛ\\ÜÈ\È›Ýš]š[™ÎÈ˜]]™H[œÈ[Û™Kˆ\È\ÈH˜]]™H\›HÙˆ]™\žH™[˜ÚX\šË‚‹H
+Š•Ø]Ú[™ËŠŠˆÛ[šKPÛÛ\\ÜÈ™XYÈ]™\žHØ]YÙH[™ÙÜÈHXÚ\Ú[Ûˆ]ÛÝ[ZÙK[™Üš]\È›Ý[™Ëˆ[žHY™™\™[˜ÙBˆ™]ÙY[ˆHØ]Ú[™È\›H[™˜]]™H\ÈHÛÜÝÙˆ]È™Z[™È\™H
+]ÈÔK]È™XYÊH\È›Ú\ÙK™]™\ˆHXÚ\Ú[ÛŽÈBˆØ]Ú[™È\›H]Üš]\È[ž][™È˜Z[È]È[‹ˆØ]Ú[™È\ÈHš\œÝ]™[Ùˆ]™\žH›ÛÝ]
+ÙXÝ[ÛˆJK‚‹H
+Š]]Ü[ÝŠŠˆÛ™HY[ˆ
+Šœ\Ú
+Šˆ
+˜Y™šXÈÛ[XœÈ[™Ø\XÚ]H\ÈYY]Û˜ÙK™]™\ˆ[˜XÚÊK
+Š›YÙ™ŠŠ‚ˆ
+˜Y™šXÈ˜[È[™Ø\XÚ]H\ÈX\ÙYÙ™ˆHÝ\]H[YK[™Y˜XÚÈÝØ\™˜]]™K™]™\ˆ™[ÝÈYJK
+ŠšYJŠˆ
+BˆY[YY[HØ^NˆØ[H˜Y™šXËH[™Ú[™H]]È›ÛÜˆÙˆÛÈXXÚ[™\È[ˆÙ\šXÙK™XYH›ÜˆH™^\œÝ
+Kˆ
+Šœ™\Ù]
+Šˆ
+]™\žHÙ][™ÈHÛÝ™\››Üˆ]™\ˆÜ›ÝH\È[™Y˜XÚÈÈÚ\™H˜]]™HY]™XY˜XÚË[™H™XÛÜ™ˆ™[[Ý™YÈ]™\žH™[˜ÚX\šÈ\›H[™ÈÚ]H™\Ù][™ÚXÚÜÈ]
+K‚‹H
+ŠÜZ\ÙKŠŠˆ›ÜˆÛÜšÈ]ÛÛY\È\ÈH[NˆÚ[ˆÙÈ]™HØZ]Y›ÜˆHXÙH›ÜˆÛÈXÚ\Ú[ÛœÈ[ˆH›ÝËXXÚ[™\ÈÛÂˆ[ÈÙ\šXÙH\ÈHÛÛ	ÜÈÝÛˆÜ
+™XY]™Nˆ]™\žHXXÚ[™HÙˆHš^YÛÛ]Û˜ÙKHÜ›ÝÚ[™ÈÛÛHÝ\BˆXÚ\Ú[ÛŠH[™Ý^H\™KÚ]Ý]ÙXÛÛ™YÝY\ÜÚ[™Ë[[H[™H\È™Y[ˆ[\H›ÜˆÛÈXÚ\Ú[ÛœËˆ[ˆÜZ\ÙBˆHÛÝ™\››Üˆ[ÛÈÝÜÈ]Èš]™K\ÙXÛÛ™›ÛÜˆ™XYË™XØ]\ÙH]™\žHXXÚ[™H\È[™XYH[ˆÙ\šXÙH[™H™XYÈÛÝ[ˆÛ›HÛÜÝÔHÛˆHXXÚ[™\ÈH]Y]YH\È\Ú[™Ë‚‹H
+Š’YH]Û˜ÙKŠŠˆÚ[ˆHÛÜšÈ\ÈÛ™H[™[X[™\È]™\›È
+HÙ\šXÙH]]È]]ÜØØ[\‰ÜÈÝÛˆ›ÛÜ‹ˆØ[[™È›È[Ü™K][ˆ]È\™Ù]Üˆ\ÜÊKHY[\ÈYY[HØ^H[ˆÛ™H[Ý™KÝ˜ZYÚÈYKÚ]]™\žBˆØY™]HÚXÚÈÝ[Û[™Ë‚‹H
+Š•HÚ[ÝÚ]ÚŠŠˆÙ\\˜]Hœ›ÛH[ÙˆHX›Ý™K[™›Üˆ
+ŠœÙXÝ\š]HÛ›JŠŽˆÛ™HÝÚ]Ú[ˆH[X[ˆ[™ˆ
+]ÛŒÈÛÛËÛÛ[šWÜÝÚ]ÚœHÙ™˜Û[šXÛÛ\\ÜËÛX\Ý\‹œX
+H\›œÈÛ[šKPÛÛ\\ÜÉÜÈÛÝ™\›š[™ÈÙ™ˆXÜ›ÜÜÈHÚÛBˆXXÚ[™H]Û˜ÙK›Üˆ[ž][™È›ÙÝYKÜˆ›Üˆ[ž[Û™HžZ[™ÈÈš]™HHÞ\Ý[H›ÝYÚÛ[šKPÛÛ\\ÜÉÜÈœ˜Z[‹ˆ]™\žBˆÛÝ™\››Üˆ[™È˜XÚÈ[™^]ÎÈ›Û™HÝ\ÈÚ[HHÝÚ]Ú\ÈÙ™‹ˆH™\Ù]\ÈH[™ÙˆH[ŽÈHÚ[ÝÚ]Ú\ÂˆH[™Ùˆ\Ý‚‚•H›ÛÜˆÙˆÛÈXXÚ[™\È\È[ˆÜ\˜]Ü‰ÜÈ[X™\ŽÈY[™ÈÙ™ˆ™]™\ˆZÙ\ÈHÞ\Ý[H™[ÝÈ]ÝÙ]™\ˆ˜\ˆHY[\ÈYY‚•\™H\È›ÈÙZ[[™Îˆ]™\žHXXÚ[™HHÜ\˜]Üˆ\È\È\ØX›K[™H›ÝXÝ[Ûˆ\ÈH˜[™[œÚYHXXÚXXÚ[™K‚‚ˆÈÈÈK›Ý[™È\È\™Ú\™Y‚“Û[šKPÛÛ\\ÜÈØ\œšY\È›ÈX›HÙˆ\‹\ÝXÚÈÜXÚX[Ø\Ù\ËˆÛ™H]È
+ÙXÝ[ÛˆŠH\ÈÜš][ˆÛ˜ÙH[™[œÈÛˆ]™\žH]\ØÛB›ÝYÚÛ™HYÈ
+ÙXÝ[Ûˆ
+KˆHØZ[œÈY™™\ˆœ›ÛH]\ØÛHÈ]\ØÛHÛ›H›ÝYÚH]\ØÛIÜÈXÛ\™Y\ÚXÜÎˆ]Âœ™\ÜÛœÙH[YK]ÈXÚ\Ú[Ûˆ\š[Ù[™]ÈÛÝ™\‹ˆÚ\™HH[HØ\È›Ý[™›ÝÈÛÜšË]Ø\È™[[Ý™Y›ÝÝÚ]ÚYÙ™ˆ[™›Y[ˆHÛÙNˆH[™Ú[™Hš[\È\™Hœ›Þ™[ˆ[™š[™Ù\œš[Y[™™\šYžKœX˜Z[ÈYˆ[žHÙˆ[HÚ[™Ù\ËˆH™XY\‚ÚÈš[™ÈH™Z]š[Ý\ˆ[ˆH™\Ý[Ø[ˆš[™H^XÝ[™\È]›ÙXÙY][™Ú[š[™›ÈÙXÛÛ™]‚‚•H[H\ÈH˜XÝXØ[ÛÛœÙ\]Y[˜ÙH›Üˆ[ž[Û™HÛÛ\\š[™ÈÛ[šKPÛÛ\\ÜÈÚ]H[™YÛÛ›Û\‹ˆH[™YÛÛ›Û\‚˜Ø\œšY\ËÛÛY]Ú\™KH[X™\ˆ]ÛÛY[Û™HÚÜÙH›ÜˆÛ™HÝXÚÎˆHÛÛÛYÝÛˆÙˆš]™HZ[]\ËH\™Ù]ÙˆÌ	KHÝ\Ù‚ÛÈ™\XØ\ËˆXXÚÙˆÜÙH[X™\œÈ\ÈH™]]HÝXÚÈÚ[™Z]™HÛ[Üœ›ÝÈ\È]YÚ[ˆH[X™\ˆØ\ÈÚÜÙ[‹[™™XXÚ\ÈÛ™H[Ü™HXÙHÚ\™HH™XY\ˆ\ÈÈ\ÚÈÚ]\ˆH™\Ý[Ø\ÈH]ÈÜˆH[š[™ËˆÛ[šKPÛÛ\\ÜÈ\ÈH[™[›ÙˆÝXÚ[X™\œËHÙ[™HÙˆH˜[™HIHÝ\Ú[ÛœÈ[™H‰HË[›ËZ\›H[™K[™^H\™HHØ[YHÛˆ]™\žB›]\ØÛKÜš][ˆÛ˜ÙH[ˆH]È[™XÛ\™Y[ˆ]™\žH™\™YÚ\Ý˜][Û‹ˆ]™\ž][™Â™[ÙHH]È™YYÈ
+ÝÈ˜\ÝH]\ØÛH[œÝÙ\œËÝÈÙ[ˆ]X^H™H[Ý™YÝÈ˜\ˆ]X^HÛÊH\È™XYœ›ÛHH]\ØÛIÜÂ›ÝÛˆXÛ\˜][Ûˆ[ˆHØ][ÙÈ
+Û[šXÛÛ\\ÜËÛ]\ØÛ\ËœX
+HÜˆœ›ÛHH˜]]™HÛÛ›Û\‰ÜÈÝÛˆÙ][™ÜÈ]HÝ\ÙˆBœ[‹™]™\ˆ\Y[ˆžH[™›ÜˆH™[˜ÚX\šËˆÚ[ˆH™[˜ÚX\šÈ™YYÈH[™KHÛÝ™\ˆÜˆHÚ[šÈÚ^™H
+H^TÔSÛÛ[Ý™\Âš[ˆHÙ\™\‰ÜÈÝÛˆLŽPˆÚ[šÜËH™Y\ÈÙZ[[™È[ˆ›ÝÚ\ÊKH[X™\ˆÛÛY\Èœ›ÛHHÝXÚÈ™Z[™ÈÛÝ™\›™Y[™\ÂÜš][ˆ[ˆH™\™YÚ\Ý˜][Ûˆ™Y›Ü™HHš\œÝÛÝ[Y[‹Ú\™HH™Y™\™YHØ[ˆÙYH]]Ø\È›ÝÚÜÙ[ˆY\ˆÙYZ[™ÂH™\Ý[‚‚•HÙXÛÛ™ÛÛœÙ\]Y[˜ÙH\ÈÝÈH™\ÜÚ]ÜžHÚ[™Ù\ËˆHÝX\™ÜˆHØZ[ˆ]\›™YÝ]›ÝÈ[\È›ÝY[ˆB˜ÛÙH[™\ˆH›YË™XØ]\ÙHH›YÈ\ÈHÙXÛÛ™]]H]\ˆ™XY\ˆ\ÈÈ™X\ÛÛˆX›Ý][™H]\ˆ\Ý\ÈÈÛÝ™\‹‚’]\È™[[Ý™YH™[[Ý˜[\ÈÜš][ˆ[ˆHÚ[™Ù[ÙË[™Hš[™Ù\œš[[Ý™\ÈÈH™^[™Ú[™H™\œÚ[Ûˆ
+ÙXÝ[ÛˆMJKœÛÈ]›È™\Ý[ZÙ[ˆÛˆHÛ]\È]™\ˆ™XYYØZ[œÝH™]ÈÛ™KˆH™YHš[™Ù\œš[È]^\ÝŒKŒˆ[™ŒË\™HHÚÛH\ÝÜžHÙˆÝXÚÚ[™Ù\Ë‚‚ˆÈÈÈKHHÛÜ™‚•H]È\ÈH
+Š˜ÛÛ\\ÜÊŠŽˆH˜[™Ú]HÝ\Ú[Ûˆ]XXÚØ[\ÚYÈ]ÈZYHžHÛÈ[YÛÛš\Ý›Ü˜Ù\ËÛ[ÛÝ›™]™\ˆ[[Y\š[™ËˆH™\ÜÚ]ÜžH\Ù\È]ÛÜ™[™›ÈÝ\ˆ›Üˆ]ˆX\›Y\ˆ]Y™XÛÜ™È]\ÙY[›Ý\ˆÛÜ™\™HÙ\ÛÜ™›ÜˆÛÜ™\È™XÛÜ™È\™NÈHÝ\œ™[]È\ÈÛ[šXÛÛ\\ÜËØÛÛ\\Ü×Û]ËœXÛÛ\\ÜÓ]Ø‚‚•HÛÜ™Ø\ÈÚÜÙ[ˆ›ÜˆÚ]H]ÈÙ\Ë›Ý›ÜˆXÛÜ˜][Û‹ˆHÛÛ\\ÜÈ\ÈH™YYKHÙ[™H]\È˜]Ûˆ˜XÚÈË[™˜HØ\™X\šÙY]HYÙ\ÎÈ]Ù\È›ÝÛ[HÈHØ[[™Ý^H\™K[™]Ù\È›ÝÚ]\ˆÚ[ˆH[™Û[™È]\ÂœÝXYKˆH]È\ÈHØ[YH™YH\ËˆH
+Š˜˜[™
+Šˆ\ÈH˜[™ÙHHØ]YÙH\È[ÝÙYÈ˜]™[œ›ÛHÈHÛ˜ÙHBœ™XY[™È\ÈXÙYÛˆ]Ú]HÜ\˜]Ü‰ÜÈ[™H]HÜˆH
+Š˜Ý\Ú[ÛœÊŠˆ\™HH\ÝIH]XXÚØ[L	HÙˆB˜˜[™[ˆ[ˆH™XY[™È[œÚYHHÝ\Ú[Ûˆ\È[™XYHÛÈÛÜÙHÈHØ[[™H]È™X]È]\ÈÝXÚ™Y›Ü™HH[™H\ÂÝXÚY˜]\ˆ[ˆY\‹ˆH
+Š˜Ù[™JŠ‹HžHY˜][\ÈÚ\™HH™YYHÛÛY\ÈÈ™\Ý[™ÛÈ›Ü˜Ù\Èœš[™È]\™NˆH
+Šœ[
+Šˆ›ÜÜ[Û˜[ÈH\Ý[˜ÙHœ›ÛHHÙ[™KÙ[H™X\ˆ][™\™\ˆ\HØ[ËZÙHHÜš[™ÎÂ˜[™H
+Šœ\Ú
+Šˆ›ÜÜ[Û˜[ÈHÜYY]ÚXÚH™XY[™È\È[Ýš[™ËYY][™ÈÚ]]™\ˆ\ÈÚÝš[™È]
+HØYš\Ú[™ËX]˜Z[[™ÊHÚ][ˆ\]X[[™ÜÜÚ]H›Ü˜ÙH[™ÝX›[™È\ÈHœšXÝ[Ûˆ]ÝÜÈH™YYHÛÜÚ[™È\ÝHÙ[™BŠHØZ[ˆ\ÈÚÜÙ[ˆ›ÜˆÜš]XØ[[\[™Îˆ]ÛY\ÈÈHÙ[™H[™ÝÜËÚ]›ÈÝ™\œÚÛÝ[™›Èš[™Ú[™ÊKˆ\ÝB\\ˆØ[H[ÛÙ\ÈÈ]È[›Ü˜ÙH]Û˜ÙK[™HÝÛˆÚYHX^H›ÝXÝ[[H™XY[™È\È˜XÚÈ[œÚYHB˜˜[™ˆH]È˜Z[È\™]™\ˆÝÛ‹ˆH›Ü˜ÙH]Ù[ˆ\ÈH0åÈ[š
+˜]ÈÈJXˆ™X\ˆHÙ[™H]™Z]™\È\ÈHÜš[™Ë[‚œ›ÜÜ[ÛˆÈH\Ý[˜ÙK[™˜\ˆœ›ÛHHÙ[™H]™[™ÈÝ™\ˆ[™›][œÈ[È]ÈX^[][HXH]ÉÜÈ]]Üš]KœÛÈ]›È™XY[™ËÝÙ]™\ˆ˜\ˆÝ]Ø[ˆXZÙHH]È\ÚÈ›Üˆ[Ü™H[ˆÛ™H[Ý\ˆ]›][š[™È\ÈÚ]›™]™\‚š[[Y\š[™ÈˆYX[œÈ[ˆÛÙNˆ\™H\È›È™XY[™È]›ÙXÙ\ÈH[\[™ÛÈ™XY[™ÜÈHXÚ\Ú[Ûˆ\\›ÙXÙHÛÈ›Ü˜Ù\Â˜HÛX[[[Ý[\\ˆÙXÝ[ÛˆˆÚ]™\ÈH[\È[ˆ[[™\[™^ÈH\]X][ÛœÎÈH™XY\ˆÚÈÛ›H™YYÈBœXÝ\™HØ[ˆÙY\H™YYKHÙ[™H[™HÛÈÝ\Ú[ÛœÈ[ˆZ[™[™Ú[›Ý™HZ\ÛYžH[ž][™È]\‹‚‚ˆÈÈÈKˆÚ]]Ù]Ë]\ØÛHžH]\ØÛB‚‘]™\žH]\ØÛHÙY\È]ÈÝÛˆÛÛ›Û[™Û[šKPÛÛ\\ÜÈÙ]ÈÚ]]ÛÛ›Û[™XYHXØÙ\Î‚‚Ÿ]\ØÛH]ÈÝÛˆÛÛ›Û
+Ù\
+HÚ]Û[šKPÛÛ\\ÜÈÙ]ÈŸKK_KK_KK_ŸÝX™\›™]\ÈÙ\šXÙHHHHIÜÈÔH\™Ù]È™\XØH›ÛÜœÈŸÝX™\›™]\È›ÙHÛÛÛ\Ý\ˆ]]ÜØØ[\ˆÈØ\œ[\ˆÈXXÚ[™TÙ]ÝÈX[žHXXÚ[™\ÈÝ^H[ˆÙ\šXÙH
+\šÈ[™ØZÙJHŸ•’QPHÔHHØ\™	ÜÈš\›]Ø\™H
+›ÛÜÝÝÙ\ˆ[™\›X[[Z]ÊH;ï};¶‰žËkºwµçXHÜZÙKH[˜]Ø^HÙH›[™›Ø™KLZ\œÈ0åÈÈ[œÊHŒHMH
+Š¸¢$ŒIHÈ8¢$	JŠˆÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÎÈ˜Z[Y™\]Y\ÝËXXÚ[™\È[™[™\™ÞH›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙH™\Ý[ËÛ]™KÕŒWÑUSË›YŸ
+Š”™X[ÝX™\›™]\ËH]Y]YHÙˆ˜]Ú›ØœÊŠˆ
+ÜZ\ÙK[ˆYKLZ\œÈ0åÈÈ[œÊHŒHXXÚ[™\È
+Š¸¢$ŒMIHÈ8¢$Œ	JŠˆ[™[Ù[Y[™\™ÞH8¢$ŒLIHÈ8¢$ŒMÉHÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÎÈMH›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙH™\Ý[ËÛ]™KÕŒWÐUÒ›YŸ
+Š”™X[ÝX™\›™]\Ë˜Z\›™\ÜÊŠˆ
+H›Ú\ÞH™ZYÚ›Ý\ˆÛˆHØ[YHÛÜšÙ\œËLZ\œÈ0åÈÈ[œÊHŒH›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙHÛˆ]™\žH›ÝÎˆÛ[šKPÛÛ\\ÜÈ™Z]\ˆ[È›Üˆ\ÈH™ZYÚ›Ý\ˆ™\Ý[ËÛ]™KÕŒWÑRT“‘TÔË›YŸ
+Š•HØ[YHÚ^ÝX™\›™]\È\ÝÈÛˆŒÊŠˆ
+LZ\œÈ0åÈÈ[œÈXXÚ
+HŒÈHØ[YH™XY[™ÜÈ\ÈŒKHÛÛ›Û\œÈ™Z[™ÈŒIÜÈž]\Îˆ[›Ý\ˆÛÜšÈ[œÚYHH[™H
+ÌÍIHÈ
+ÍIKMH8¢$ÉHÈ8¢$‰HXÜ›ÜÜÈÝXYKØ[™\š[™Ë[›Ý\ˆ[™˜][Ë˜Z[Y™\]Y\ÝÈ8¢$ŽIHÈ8¢$ŒM	HÚ\™H^HØØÝ\‹ÝXYHXXÚ[™\È8¢$ŒKIHÈ8¢$Œ‹ŽIK˜]ÚXXÚ[™\È8¢$ŒNIHÈ8¢$ŒŒÉH[™Ý[™žK[[Ù[[™\™ÞH8¢$ŒLÉHÈ8¢$ŒM‰K[ÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÎÈ˜Z\›™\ÜÈ›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙHÛˆ]™\žH›ÝÈ™\Ý[ËÛ]™KÕŒ×ÔÕPQK›YŒ×ÕÐS‘T’S‘Ë›YŒ×ÐSÑ“ÕT‹›YŒ×ÑRT“‘TÔË›YŒ×ÑUSË›YŒ×ÐUÒ›YŸ
+Š”™X[ÝX™\›™]\È[™\ˆHX›XÈ^HÙˆ[X[™
+Šˆ
+HÛÛÙÛHÛ\Ý\ˆ˜XÙHÙˆŒLH™\^YYÛ™HÝ\]H[YKLZ\œÈ0åÈÈ[œÊHŒÈMH
+Š¸¢$IHÈ8¢$ÌIJŠ‹NH8¢$IHÈ8¢$ŒIK[YHÝ™\ˆH[™H8¢$ŽIHÈ8¢$Ž	K˜Z[Y™\]Y\ÝÈ8¢$Ž	HÈ8¢$ŒMÉKXXÚ[™\È[ˆÙ\šXÙH
+Š¸¢$‰HÈ8¢$ŒL	JŠ‹™\XØ\È8¢$IHÈ8¢$‰KÝ[™žK[[Ù[[™\™ÞH8¢$	HÈ8¢$ÉK[ÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÎÈÙÈÝ\Y
+ÌŒÉHÈ
+ÌÍIH\ÈÚ[\Ý[X]\Ë[œÚYHH›Ú\ÙH[ˆÛ™H[ŽÈH›ÝÜÈÝØ\™Z\ˆZ[\ËÔÔÈÜˆÝÙ\ˆÚ]™[ˆ™\Ý[ËÛ]™KÕŒ×ÕPÑWÑÓÓÑÓLŒLK›YŸ
+Š”™X[ÝX™\›™]\ÈÚ]]ÈY[ÛœÎˆÛ[šKPÛÛ\\ÜÈÛˆÜÙˆÑQJŠˆ
+ÑQH‹ŒŒH[™]ÈY[ÛˆŒM‹ÛÈ˜]]™HÙ]\ËLZ\œÈ0åÈÈ[œÈXXÚ
+HŒÈ
+[™\™ÞHÊHMH
+Š¸¢$LIHÈ8¢$LÉJŠˆ
+ÑQHÛˆÔH[™™\]Y\ÝÊH[™
+Š¸¢$ÌÉHÈ8¢$Í‰JŠˆ
+HY[Ûˆ[Û™JK[YHÝ™\ˆH[™H8¢$ŽM‰HÈ8¢$ŒL	KÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÎÈXXÚ[™\È
+Š¸¢$KŽIHÈ8¢$ËŽ	JŠˆÚ]HY[Û‹ÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œË[œÚYHH›Ú\ÙHÚ]HÔH\™Ù]ÈYK\ÝÙ\ˆ[™\™ÞH
+ŠŠÌKŒ	HÈ
+Ì‹‰KÝÙ\ˆÚ]™[ˆ[ˆ[™YHÙˆÝ\ˆ[œÊŠˆ[ˆ›Ý
+[Ü™HÛÜšÈ]›ÝYÚžHHÛÜÙY[ÛÜØYÚÝÛ‹›ÝYÙY
+H™\Ý[ËÛ]™KÕŒ×ÒÑQWÐÔWÔ‘TUQTÕË›Y™\Ý[ËÛ]™KÕŒ×ÒÑQWÔ‘TUQTÕË›YŸ
+Š•HÚ^Ü™Ø[š\Û\ÈÚ]H™X[Û\Ý\ˆ[œÚYJŠ‹HÈKÛÜY\ËHZ\™Y™\]][ÛœÈHÙ[
+È]K
+HŒH
+ÈÈNÙˆLÙ[ÎˆMH[™[YHÝ™\ˆH[™HÐRSˆ[ˆ]™\žHÙ[ÈØ]YÙ\ÈÔÔÈ™^[Û™H›Ú\ÙH^Ù\H›Ý[™[™Ë[]™[ÛÜšÈÜÜÈ
+8¢$ŒŒÉJH[™H™\XØ\È
+ÌÉH[ˆÛ™HÙ[ÈXXÚ[™\ÈÝ^H]ˆ[ˆ›Ý\›\È
+›È]]ÜØØ[\ˆ[™\ˆÚ[™
+NÈH\ÚXÜÈ™X[H[™HÝÙ\ˆ]KÛÜY\ÈÙ™ˆHÛØÚÈ[ˆˆÙˆÈ™\]][ÛœÈ
+X\šÙY
+H™\Ý[ËÛ]™KÕŒWÔÒVÒÕP‘K›YŸHØ[YH]L[™LÛÜY\ÈŒÈ
+ÈÈLˆÙ[ËHZ\œÈXXÚˆ]™\žHÙ[ÐRSˆÛˆÈˆØ]YÙ\ËÔÔÈÛˆ›Û™H™^[Û™H›Ú\ÙH^Ù\H›Ý[™[™Ë[]™[ÛÜšÈÜÜÈ[ˆÙ[ÎÈHÝXÚÈ]LÛÜY\ÈÙ™ˆHÛØÚÈ[ˆÙˆH™\]][ÛœÈ
+X\šÙY
+H™\Ý[ËÛ]™KÕŒ×ÔÒVÒÕP‘K›YŸ
+Š•HšYÈÜ™Ø[š\Û\È]KÛÜY\ÈÛˆ™[YXXÚ[™\ËÛˆŒÊŠŽˆHÝÙ\ˆ
+ÈÙˆÊH[™H›Ý\ˆÝXÚÙY
+ÈÙˆÊKXXÚÛˆ]ÈÝÛˆXXÚ[™HÚ]HLÈÚ[™ÝË]™\žH™\]][ÛˆÛˆHÛØÚÈŒÈ
+ÈÈÝÙ\ŽˆHÛ\Ý\‰ÜÈMH
+Š‹ÈÈ8¡¤ˆMŒ\È
+8¢$ŽN	JJŠ‹NH8¢$ŽN	K[YHÝ™\ˆH[™HÍ‰H8¡¤ˆ˜Z[Y™\]Y\ÝÈŽ	H8¡¤ˆÛX\ˆÙˆ™\›ÎÈÝXÚÎˆMH
+ŠŒ‹ŽHÈ8¡¤ˆML\È
+8¢$ŽMIJJŠ‹NH8¢$ŽMÉK[YHÝ™\ˆH[™HLIH8¡¤ˆ˜Z[Y™\]Y\ÝÈŒM	H8¡¤ˆÛX\ˆÙˆ™\›ÎÈXXÚ[™\Èˆ[ˆ›Ý\›\ÈÙˆ›ÝÈ[™\™ÞH[œÚYHH›Ú\ÙNÈHÜ™Ø[š\Û\ÉÈ[Ù[ÛÜšÈ›Ý[™[™Ë[]™[ÝÙ\ˆžH[K[™\™ÞH8¢$Œ	H™\Ý[ËÛ]™KÕŒ×Ð’Q×ÓÔ‘ÐS’TÓK›YŸ
+Š•HšYÈÜ™Ø[š\Û\È]KÛÜY\ÈÛˆH™[YXXÚ[™JŠŽˆHÝÙ\ˆ
+ÈÙˆÊH[™H›Ý\ˆÝXÚÙY
+ÈÙˆË]XÚY
+HŒH
+ÈÈÝÙ\ŽˆMH
+Š¸¢$ŽMIJŠˆ
+ŒHÈ8¡¤ˆŒˆÊH[™[YHÝ™\ˆH[™H8¢$ŽNKÉHÛX\ˆÙˆH›Ú\ÙKXXÚ[™\Èˆ[ˆ›Ý\›\Ë[™\™ÞH8¢$ŒŒ‰KÛÜšÈ›Ý[™[™Ë[]™[ÝÙ\‹™\]][ÛˆÈÙ™ˆHÛØÚÎÈÝXÚÎˆMH
+Š¸¢$Í	JŠˆ[™NH8¢$ŽÉHÛX\ˆÙˆH›Ú\ÙKHÛÛ\\ÜÈ\›HÌÈŒMHÈ\ÝH‹ÈÚ[™ÝÈ[ˆ[™YH
+X\šÙYÑ‘ˆHÓÐÒÎÈ˜]]™HÙ\HÛØÚÊKÚXÚ\ÈÚHHŒÈÝXÚÈ[œÈÚ]HLÈÚ[™ÝÈ™\Ý[ËÛ]™KÕŒWÐ’Q×ÓÔ‘ÐS’TÓK›YŸ
+Š^\™HRÔËHš[ÝXYHØY
+Š‹ÛÜšÙ\œËHZ\œÈŒH
+H™X[š[
+H›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙHÛˆ[žHØ]YÙNÈHš[8¢$ÉHÚ]]È[\˜[XÜ›ÜÜÈ™\›ÎÈH›Y]ÙˆØ[››ÝÚÝÈH]™\ˆ
+LŒJH™\Ý[ËÛ]™KÕŒWÐRÔ×ÔÕPQK›YŸ
+Š^\™HRÔËHš[H\œÝÚ^™YÈHÛ\Ý\ŠŠ‹ÛÜšÙ\œËHZ\œÈ
+™\]][ÛˆÜÝ]È˜]]™HÛ\Ý\ˆÈ[ˆ^\™HTH\œ›Üˆ[ˆHš\œÝ][\[™Ø\È[ˆYØZ[ˆžH]Ù[ŠHŒH
+H™X[š[
+HHš[
+ÍKŒ	HÚ]]È[\˜[XÜ›ÜÜÈ™\›ÎÈXXÚ[™\ËMH[™˜Z[Y™\]Y\ÝÈ[œÚYHH›Ú\ÙNÈNH8¢$ŒÍ	HÛX\ˆÙˆH›Ú\ÙH[ˆ\ÈÛ™H[ŽÈˆ[™ÈÈ›ÛÝÈ™\Ý[ËÛ]™KÕŒWÐRÔ×Ð•T”Õ›YŸ
+Š”ÜÝÜ™TÔS™Z[™Ð›Ý[˜Ù\‹H™YH[ÝXÚYÛÜšÛØYÊŠ‹ÈZ\œÈ0åÈÈ[œÈ
+HÙ]ÙˆLØÝØ™\‹Hœ˜Z[‰ÜÈ™\™XÝÛˆHÛÛ[Y[™Y[ÊHŒÈÛÛ›™XÝ[ÛœÈ[Ü[ˆ
+Š¸¢$‰HÈ8¢$ŒLIHÛˆÙ[XÝÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÊŠŽÈHYX›Ý™HHÜ\˜]Ü‰ÜÈŒÛˆÚ[\WÝ\]X™Y\ÙY›Ý[™È›ÝYÚ›Ý[™ÈÜÝÈØ—ÚÝ[œÚYHH›Ú\ÙNÈÛÜšË][˜ÞH[™ÜÝÔH[œÚYHH›Ú\ÙH]™\ž]Ú\™NÈ]™\žHÛÛ[™Y˜XÚÎÈHX\›Y\ˆÙ]ÈÚÛH[ˆØÜËÚ\ÝÜžX™\Ý[ËÛ]™KÕŒ×ÔÐ‘SÒ›YŸ
+Š“^TÔS[™\ˆÞ\Ø™[˜ÚH›Ý\ˆ[ÝXÚYÛÜšÛØYÊŠ‹ÈZ\œÈ0åÈÈ[œÈ
+HÙ]ÙˆLØÝØ™\‹Hœ˜Z[‰ÜÈ™\™XÝÛˆHÛÛ[Y[™Y[ÊHŒÈHÛÛ[
+Š¸¢$ŒL	HÈ8¢$ŒŒ	HÛˆ™XYÝÜš]XÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÊŠ‹HYÙ\ÈÛ[™È]HÚ]]È\œÝ™XYÛÛ›X[™\]WÚ[™^[œÚYHH›Ú\ÙNÈÛÜšËMKNH[™ÔH[œÚYHH›Ú\ÙHÛˆ]™\žHÛÜšÛØYÈ›È\œ›ÜŽÈ]™\žHÛÛ[™Y˜XÚÎÈH™YHX\›Y\ˆÙ]ÈÚÛH[ˆØÜËÚ\ÝÜžX™\Ý[ËÛ]™KÕŒ×ÔÖTÐ‘SÒ›YŸ
+Š•HMH]\ØÛ\È[™Ú^Ü™Ø[š\Û\Ë[Ù[Y
+Š‹KÐ‹ÐÈŒÈÈ™\›ÙXÙYÈH\ÝYÚ][ˆÈÙˆÎÈ]\ØÛ\ÈÔÔÈÜˆÝÙ\ˆÚ]™[ŽÈ
+Š™]™\žHÜ™Ø[š\ÛHÝ\\š[ÜˆÚ][ˆÝX\™˜Z[ÊŠˆ
+ÛÜšÈ\ˆ[™\™ÞH
+ÌŒIHÈ
+ÌŒÉKÛÜšÈ[˜Ú[™ÙY[YHÝ™\ˆH[™H›ÝX›Ý™H˜]]™IÜÊNÈÛˆŒˆ\ÚXÜÈ[™HÝÙ\ˆ™XYHÙ\šXÙH˜Y[Ù™‹ÚXÚHÛXÚÈØ]HÛÜœ™XÝY™\Ý[ËÜ™X[\ËÔ‘PSTË›YŸ
+Š•HÜ™Ø[š\Û\È]KLL[™KÛÜY\ÊŠ‹HÈKZ\™Y[œÈHÙ[ÙˆLÙ[ÈŒÈÈ]™\žHÜ™Ø[š\ÛHÝ\\š[ÜˆÚ][ˆÝX\™˜Z[È[ˆ]™\žHÙ[ÙˆL[œÈÜˆ[Ü™NÈÛÜšÈ\ˆ[™\™ÞH
+ÌŒÉHÈ
+ÌŒÍÉKHØ[YHšYÝ\™H]]™\žHÚ^™NÈHÚ^Ù[ÈY
+L[™K[œÈ]KÛÜY\ÊH\™H™^[Û™HXXÚ[™\È]˜Z[X›H™\Ý[ËÜØØ[KÑÔ’Q›Y™\Ý[ËÜØØ[KÜ™XÙZ\ËØŸ
+Š”ÝÙ\ˆÜšYˆLHÚ[P™[˜ÚÜšYÈÛÛ™YžH[™\ÝÙ\ŠŠ‹›ÝØY[Ù[ËKÐ‹ÐÈŒH[™ŒÈ
+HØ[YHX›HÈHYÚ]
+HÈÚ]’TØYÈH[™\™ÞHHØYÈ™]ÈÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÈ[ˆ[LH
+8¢$ŒKŒÉHÈ8¢$ŒKIJH[™H™][\Ü[ˆ[LNÈÜÜÙ\ÈÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÈ[ˆÈ[™
+ŠœÝÙ\ˆÚ]™[ˆ[ˆ
+Šˆ
+H\˜[[™Ù[ZK]\˜˜[ˆÜšYÈÚ]Z\ˆÝÛˆÙ[™\˜][Û‹
+Ì‰HÈ
+ÌKIJNÈ\Ü\˜][ÛœÈ™]Ù\ˆ[ˆLÜšYË8¡¤ˆHYX\ˆ[ˆÛ™H
+ÝÙ\ˆÚ]™[ˆ[ˆ[™YHÙˆÝ\ˆ[œËHXÛ\™YÛÜÝ
+NÈ›ÈÜšY[Ü™HÙ[ˆÝ]ÚYH]È˜[™™\Ý[ËÛ]™KÕŒWÔS‘TÕÑT‹›YŒ×ÔS‘TÕÑT‹›YŸ
+Š”›Ø›Ý\›\Ë]R›ÐÛÈY[˜YÙ\šYJŠ‹KÐ‹ÐÈŒH[™ŒÈÈÚ\™HÛ[šKPÛÛ\\ÜÈ[Ý™Y
+Ù[ŒË[™JNˆXZÈÜœ]YH8¢$ŒŽIH[™8¢$ŒL	K˜XÚÚ[™È\œ›Üˆ8¢$ŒŒIK[™\™ÞH\ˆZÝ8¢$ŒŽ	H[™8¢$ŒIKÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÎÈH[™IÜÈÛÜ\ˆÜÜÈ
+ÌM	H
+ŠœÝÙ\ˆÚ]™[ˆ[ˆ[™YHÙˆÝ\ˆ[œÊŠŽÈTYH[™Z]ØHMY˜]]™HžHHZ\™Y\ÚXÜÈšX[™\Ý[ËÛ]™KÕŒWÓUR“ÐÓË›YŒWÓUR“ÐÓ×ÔS‘K›YŒ×ÓUR“ÐÓË›YŸ
+ŠÚ]SX\›‹]™\žH\ÝšXÝ]Ú\ÊŠ‹KÐ‹ÐÈŒH[™ŒÈÈLH˜]\žH\ÝšXÝÎˆ[XÝšXÚ]H›ÝYÚZ[HXZÈ[™Z[H[™]™[›™\ÜÈÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÈ[ˆ[LKØ\˜›Ûˆ[ˆÈHš[
+ŠœÝÙ\ˆÚ]™[ˆ[ˆÊŠˆ
+HŒŒÈ\ÝšXÝÊH[™˜[\[™ÈYÚ\ˆ[ˆÎÈÌHØÛÜ™K\›ÝÜÈÝØ\™Z\ˆZ[\ËÌÈÔÔÈÜˆÝÙ\ˆÚ]™[‹HÚ\™HH[œÈY™™\ˆ
+HÚ[][]Ü‰ÜÈÝÛˆ˜\šX][ÛŠNÈÈ\ÝšXÝÈÚ]›Ý[™ÈÈ[Ý™NÈHÚ[][]ÜˆØ[››Ý[ˆ™\Ý[ËÛ]™KÕŒWÐÒUSPT“‹›YŒ×ÐÒUSPT“‹›YŸ
+Š‘›Û™HÝØ\›\ËÞ[K\X[]Y›Û™\ÊŠˆ
+Ü˜^žY›YH‹žHÚ\Y]]Ü[Ý\È˜]]™NÈÛ[šHÛˆHÜZ\ÙHÝ™\œšYH[œÚYHH]]Ü[Ý	ÜÈ[Z]ÊKŒ›Û™\È0åÈZ\ÜÚ[ÛœË™YHÙ[ËKÐ‹ÐÈŒÈÈ[™\™ÞHHZ\ÜÚ[Ûˆ8¢$ÉH
+ÚÜ
+K8¢$ŒN	H
+Z^Y
+K8¢$ŒŒ	H
+Û™ÊH[™Z\ÜÚ[ÛœÈHÚ\™ÙH
+Î	HÈ
+ÌIKÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÎÈ›È]HZ\ÜÚ[Û‹™\Ù\™Hœ™XXÚ™X\ˆZ\ÜÈÜˆÛÛ\Ú[Ûˆ[ˆ[žH\›NÈ˜XÚÚ[™È\œ›ÜˆŒÈ8¡¤ˆŒLÈH[œÚYH]ÈŒHH˜[™™\Ý[ËÛ]™KÕŒ×ÔÕÐT“K›YŸ
+Š\XÚHØYšØH\ÈÚ\YHÛÛœÝ[Y\ˆÜ›Ý\	ÜÈÜ\˜]Ü‹\Ù]Ú^™JŠˆ
+Û™Hœ›ÚÙ\‹\][ÛœÎÈHÜ›Ý\]HÜ\˜]Ü‰ÜÈˆÛÛœÝ[Y\œÈ\È˜]]™NÈÛ[šHÛˆHÛÝ[[œÚYHÌKJK™YH[ÝXÚYÛÜšÛØYËÈZ\œÈ0åÈÈ[œË[™\ˆ›ÝØš™XÝ]™\È
+HÙ]ÙˆLØÝØ™\‹Hœ˜Z[‰ÜÈ™\™XÝÛˆHÛÝ[[Y[™Y[ŠHŒÈ^XÝH›Ý[™Îˆ]™\žHÜ[™šX[X˜[™Û™Y™Y›Ü™H]Ø\ÈYÙYHÜ›Ý\]HÜ\˜]Ü‰ÜÈÛË]™\žHØ]YÙH[œÚYHH›Ú\ÙNÈÝ\ˆšX[[K[Y[™Y\È[Y[™Y[ËH™^Ù][›š[™ÎÈHš\œÝÙ]
+ÛÜšÈ[œÚYHH[™H
+ÌM‰HÈ
+ÌŒIKMHKˆÈ8¡¤ˆHÈM\ËÛÛœÝ[Y\œÈˆ8¡¤ˆˆÈÝÙ\ˆÚ]™[ˆ[ˆ[™YHÙˆÝ\ˆ[œÊHÚÛH[ˆØÜËÚ\ÝÜžKÕŒ×ÒÐQ’ÐWÜÙ]K›Y™\Ý[ËÛ]™KÕŒ×ÒÐQ’ÐK›Y™\Ý[ËÛ]™KÕŒ×ÒÐQ’ÐWÔÑT•’PÑK›YŸ
+Š”™Y\È\ÈÚ\YHØXÚIÜÈÜ\˜]Ü‹\Ù]Y[[ÜžHÙZ[[™ÊŠˆ
+P‹[Ù^\Ë[H\È˜]]™NÈÛ[šHÛˆHÙZ[[™È[œÚYHÌM‹LL—HPˆ›ÝYÚ™Y\ÉÜÈÝÛˆÛÛœÛÛJK™YH[ÝXÚYÛÜšÛØYËÈZ\œÈ0åÈÈ[œË[™\ˆ›ÝØš™XÝ]™\È
+HÙ]ÙˆLØÝØ™\‹Hœ˜Z[‰ÜÈ™\™XÝÛˆHÙZ[[™Ë[Y[™Y[ŠHŒÈ^XÝH›Ý[™ÎˆH[ÝØ[˜ÙHÛ™H›ÝÚXXÚØ^K[ÜÝšX[ÈX˜[™Û™Y™Y›Ü™H^HÙ\™HYÙY]™\žHØ]YÙH[œÚYHH›Ú\ÙNÈ[Y[™Y[ËH™^Ù][›š[™ÎÈHš\œÝÙ]
+ÛÜšÈ[œÚYHH[™H
+ÌM	HÈ
+ÌÉKHÙZ[[™È8¡¤ˆŒÈÌPˆÝÙ\ˆÚ]™[ˆ[ˆ[™YHÙˆÝ\ˆ[œÊHÚÛH[ˆØÜËÚ\ÝÜžKÕŒ×Ô‘QT×ÜÙ]K›Y™\Ý[ËÛ]™KÕŒ×Ô‘QTË›Y™\Ý[ËÛ]™KÕŒ×Ô‘QT×ÔÑT•’PÑK›YŸ
+Š“[Û™ÛÑˆ\È]ÈX›\Ú\ˆÚ\È]H]X˜\ÙIÜÈÜ\˜]Ü‹\Ù]ÝÜ˜YÙKY[™Ú[™HØXÚHÚ^™JŠˆ
+LLˆPˆ\È˜]]™NÈÛ[šHÛˆHØXÚHÚ^™H[œÚYHÌM‹‹HPˆ›ÝYÚHÙ\™\‰ÜÈÝÛˆÛÛœÛÛJKPÔÐ‰ÜÈÛÜšÛØYÈ‹Ëˆ[™\œÝ[ÝXÚYÈZ\œÈ0åÈÈ[œÈ
+HÙ]ÙˆLØÝØ™\‹Hœ˜Z[‰ÜÈ™\™XÝÛˆHØXÚK[Y[™Y[ŠHŒÈHØXÚH[
+Š¸¢$ŒÉHÈ8¢$ŒLÉHÛˆ˜ÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÊŠŽÈ˜Ø[™\œÝ[œÚYHH›Ú\ÙNÈÛÜšËMKNKYX[ˆ][˜ÞH[™ÔH[œÚYHH›Ú\ÙHÛˆ[›Ý\ŽÈ›È˜Z[YÜ\˜][ÛŽÈ]™\žHØXÚH[™Y˜XÚÎÈHÛÈX\›Y\ˆÙ]ÈÚÛH[ˆØÜËÚ\ÝÜžX™\Ý[ËÛ]™KÕŒ×ÖPÔÐ‹›YŸ
+Š”›Ø\Ý™\ÜÎˆHÛÝ™\››ÜˆÚ[YÝ]šYÚZY\[ŠŠˆ
+ÒQÒÒS]	HÙˆHÚ[™ÝËHØ]ÚÙÈ™\ÚYH]
+KLZ\œÈ0åÈÈ[œÈ
+HÙ]ÙˆLØÝØ™\ŠHŒÈ]™\žHÙ][™È˜XÚÈÚ][ˆH[ÝØ[˜ÙH[ˆ]™\žH™\]][ÛˆÙˆ]™\žH[‹HÙXÛÛ™ÛÝ™\››ÜˆÈH[™[ˆ]™\žHÛ™NÈHÚÛHÚ[™ÝÈYX[ˆ™\ÜÛœÙH8¢$ŒÌÉHÈ8¢$	KMH8¢$ŒÉHÈ8¢$	K[YHÝ™\ˆH[™H8¢$ŒÌ‰HÈ8¢$ŒÍ‰KÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÎÈ˜Z[Y™\]Y\ÝËXXÚ[™\È[™[™\™ÞH[œÚYHH›Ú\ÙNÈHš\œÝÙ]
+ÈÈLHÈÈ[™˜XÚÊHÚÛH[ˆØÜËÚ\ÝÜžKÕŒ×Ô“Ð•TÕÒÒSÜÙ]K›Y™\Ý[ËÛ]™KÕŒ×Ô“Ð•TÕÒÒS›YŸ
+Š•HÛÝ™\››Ü‰ÜÈÝÛˆÛÜÝ
+Šˆ]KLL[™KÛÜY\ÈÚ]H™X[Û\Ý\ˆ[œÚYHŒÈ[™ŒKXXÚ[™\ˆ]ÈÝÛˆ[™Ú[™HŒˆÈŒLÈÙˆÛ™HÛÜ™H]]™\žHÚ^™KŒIHÈŒÉHÙˆHÜÝ	ÜÈÛÜ™\ÎÈÚÝÛ‹›ÝYÙY™\Ý[ËÛ]™KÕŒ×ÓÕÓ—ÐÓÔÕ›YŸ
+Š”ØØ[JŠŽˆHÛÛ›Û\ˆÛÝ™\›š[™ÈLL[™KÚ[][]Y›Ù\È
+ÕÓÒÊKXÚ\Ú[Ûˆ[YH[™ÛÜœ™XÝ™\ÜÈ]™\žH\Ú[œÈÛˆ]™\žH\Ú™\Ý[ËÜØØ[KØŸÔKÛ™HØ\™[™HØ\™[œÚYHHÜ™Ø[š\Û\ÈX\›Y\ˆØ\™ÛÛ›Û\ˆ
+Š›ØœÛÛ]JŠŽˆ]™\žHX\›Y\ˆØ\™™\Ý[˜[ˆÛˆHÛÛ›Û\ˆÚ[˜ÙH™\XÙYÈHÛ™KXØ\™Ø\™Z[œÚYKLKXÛÜY\È[™ZYÚXØ\™[œÈ\™H[ˆYØZ[ˆžHH›Ý[™\ˆÛˆ™[YØ\™ÈY\ˆHÔH[™ÛÝYÛÜšË]Û™H˜[YYÛÛ[Z]ØÜËÑÔWÔ‘T‘QÒTÕUSÓ‹›YØÜËÑÔWÔ•S—ÑÕRQK›Y‚ŠŠ”[›š[™È›ÝÊŠˆ
+HØÝØ™\ŠNˆ›ÝšYÈÜ™Ø[š\Û\È]KÛÜY\ÈÛ™HÛˆ™[YXXÚ[™\È
+H›Ý\ˆÝXÚÙY[™HÚÛBÝÙ\‹ÈÙˆÈÛˆHÛØÚÈXXÚÙXÝ[ÛˆM‹ŒŠNÈH™YH]X˜\ÙHX›\È™K\™XYÛˆZ\ˆÙXÛÛ™Üˆ\™ÛÝ[YÙ]Â˜Y\ˆHÛÜÝÈHš\œÝÙ]ÈÚ\™ÙYÈHÛÝ™\››ÜˆÙ\™H˜XÙYÈÝ\ˆÝÛˆ\›™\ÜÈ[™™[[Ý™Y
+ÙXÝ[ÛˆM‹ÈB˜[Y[™Y[È[ˆÙXÝ[ÛœÈLŒ‹LŽ[™LŽJNÈH›Ø\Ý™\ÜÈ\ÝŠØÜËÔ“Ð•TÕ‘TÔ×Ô‘T‘QÒTÕUSÓ‹›Y
+KHÚ[ØÙ[˜\š[È[™HÛËZÝ\ˆÛ™È[ˆ›ÝÛ™H
+ÙXÝ[ÛˆM‹ŠKBŒZÝ\ˆ[ˆÛˆ™YH™[YXXÚ[™\È[ˆ]ÈÙXÛÛ™
+Û[šJH\›H
+Û™HZ\ˆHXXÚ[™KÛÈ\›\ÈÙˆH^HXXÚÛÛXÝYÛ‚ŒLØÝØ™\ŠNÂH™X[Û\Ý\ˆ[™\ˆHX›XÈ[X[™˜XÙHÛ™H
+HÛÛÙÛHÛ\Ý\ˆ˜XÙHÙˆŒLKŒ×ÕPÑWÑÓÓÑÓLŒLK›YÙXÝ[Û‚ŒM‹ŒJKH^\™H[˜Ý[ÛœÈ˜XÙH™^žHHØ[YH[NÂH™X[Û\Ý\ˆÚ]]ÈY[ÛœÈÛ™H›ÜˆÑQH[™]ÈY[Ûˆ
+Œ×ÒÑQWÐÔWÔ‘TUQTÕË›YŒ×ÒÑQWÔ‘TUQTÕË›YœÙXÝ[ÛˆM‹ŒJKØ\œ[\ˆÛˆ^\™H™^Â–PÔÐˆÛˆ[Û™ÛÑˆÛ™H
+Œ×ÖPÔÐ‹›YÙXÝ[ÛˆM‹
+K^TÔS	ÜÈY™™\ˆÛÛ[™\ˆÞ\Ø™[˜ÚÛ™H
+Œ×ÔÖTÐ‘SÒ›YÙXÝ[ÛˆM‹
+KHÝ\ˆÝÜ™\ÈÙˆ™YÚ\Ý\ˆ›ÝÈY\ŽÈ[™^\™HÝXYH[™\œÝÛˆH›Y]ÙˆÙ]™\˜[XXÚ[™H˜[Z[Y\È
+Ù]™[‚™\Ü]Ú\È™Y\ÙYžH^\™IÜÈÝÛˆÛ\Ý\ˆØ\XÚ]H[ˆX\Ý\ÈÜˆ[žHÝ\ˆÝÛˆXXÚ[™\ÉÈ][ÝKÍ™Y\Ø[Ë[Y[™Y[ÈBÈÈHZYÚ\Ü]Ú›ÛÝÜÈHZÝ\ˆXXÚ[™\ÉÈÛÛXÝ
+Kˆ
+Š”]Y]YY[ˆÜ™\‹[ˆØÜËÔ‘QÒTÕT‹›YÙXÝ[Ûˆ
+ŠŽˆ›Û™HÝØ\›\È[™™Y™[œÙHYÙH
+[™\™T[Ý][K]™ZXÛKÜ˜^ž\ÝØ\›JK]X˜\Ù\È[™ØXÚ\È]\™ÙH
+PÔÐ‹[[Y\‘ŠKÜ\šË“Ü[”ÙX\˜Úš[ËÜ[‹T“Q‹HZÝ\ˆ›Ø\Ý™\ÜÈ[‹ÜXÙXÜ˜Y]]YH[™\Ý\œÈ
+˜\Ú[\ÚÊKœÝ][Û‹ZÙY\[™È
+Ü™ZÚ]ÓPU
+KÛÛœÝ[][ÛœË›ØÚÙ]È
+›ØÚÙ]KÜ[”›ØÚÙ]
+H[™ÛÛX\Ý[Ûˆ
+Ø[\˜JKˆ\™H\ÚXÜÂœÛÛ™\œÈ
+Ü[‘“ÐSKÕL‹‘P“ÕS‘ÐQÑUQTÐJH\™H›Ý™[˜ÚX\šÙYˆ^H]™H›ÈÛÛ›Û\ˆ[™›ÈÛ›Ø‹ÛÈÛ[šKPÛÛ\\ÜÂš\È›ÈXÙHÛˆ[NÈZ\ˆ˜[YH\ÈHÈÛ\Ý\ˆ][œÈ[K‚‚ˆÈÈÈM‹˜ˆÚ\™H[‹ÜˆØ]ÚˆH™\™XÝ\ˆÛ›Ø‚‚•H›Ý[™\‰ÜÈÜ™\ˆÙˆHØÝØ™\ˆŒˆXYHHš[˜Ú\HÙˆÚ]ÙXÝ[ÛˆKŒˆ\ØÜšX™\È\ÈHYXÚ[š\ÛNˆÛ[šKPÛÛ\\ÜÈ™YY››Ý™HÚ\™Y[È]™\žH]\ØÛKˆÚ\™H]Ø[››Ý™X]H˜]]™HÛÛ›Û\ˆÛˆH]\ØÛIÜÈÝÛˆØ]YÙ\ËH]\ØÛH]™\ÈžBš]Ù[ˆ[™Û[šHÛ›H™XYÈ]Û™HÚ\™HÝ][™›ÈÚ\™H[‹ˆÛÛËÝÚ\š[™×Ý™\™XÝËœX\Y\È]š[˜Ú\HÈ]™\žBœX›\ÚY™\Ý[[™š[ÈHYÙHØÜËÕÒT’S‘×Õ‘T‘PÕË›Y
+Û™H›ÝÈ\ˆÛ›Øˆ[™\ˆ]\ØÛH[‚˜™\Ý[ËÕÒT’S‘×Õ‘T‘PÕË˜ÜÝ˜È™\šYžKœX˜Z[ÈYˆHYÙHY™™\œÈœ›ÛHÚ]HX›\ÈÚ]™JKˆH[H\ÈHØ[YH›Ü‚™]™\žHX›NˆHÛ›Øˆ™XYÈ
+ŠÜš]JŠˆÚ\™H]X\ÝÛ™HYÙYØ]YÙH\ÈÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÈ[™›Û™H\Â“ÔÔÈÜˆÝÙ\ˆÚ]™[ˆ[ˆ[™YHÙˆÝ\ˆ[œÎÈ
+ŠØ]Ú
+ŠˆÚ\™H›Ý[™È\ÈÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œËÚ]\ˆH›ÝÜÈ\™H[œÚYHH›Ú\ÙKH[œÈ\ØYÜ™YKÜ‚˜HØ]YÙH\ÈÔÔÈÜˆÝÙ\ˆÚ]™[ˆ[ˆ[™YHÙˆÝ\ˆ[œÈÚ]›Ý[™ÈYØZ[œÝ]
+HÔÔÈ\È[ˆ˜[YYÚ]]ÈØ]\ÙJNÈ[™
+Š›Ü\˜]Ü‰ÜÈÚÚXÙJŠˆÚ\™B‘ÐRSˆ[™ÔÔÈ
+ÜˆÝÙ\ˆÚ]™[ŠH›ÝÛ[ˆ[™YHÙˆÝ\ˆ[œËH˜YHÚÝÛˆÚ]›Ý™XY[™ÜÈÙˆH[™^ˆH[Ù[Y]\ØÛHZÙ\È]ÈÛÜ™œ›ÛBš]È™X[\ÈX™[ˆÝ\\š[ÜˆÚ][ˆÝX\™˜Z[È\ÈÜš]KH˜Y[Ù™ˆX™[\ÈHÜ\˜]Ü‰ÜÈÚÚXÙKH™\Ý\ÈØ]Ú‚‚•Ú]HYÙHØZYÛˆH^H]Ø\ÈXÛ\™YˆÛˆH™X[ÝXÚÜËLˆÙˆÛ›Ø‹XØ\Ù\ÈÜš]NˆÚ^ÙˆHÙ]™[ˆÝX™\›™]\Â™[X[™È
+™\ÚYHH›Ú\ÞH™ZYÚ›Ý\ˆHÛ›ØˆÚÝÙY›Ý[™È[™Ø]Ú\ÊKÜÝÜ™TÔS	ÜÈ™XY[Û›HÛÜšÛØY[Û™ÛÑ‰ÜÈ›Ý\‚ÛÜšÛØYÈ[™^TÔS	ÜÈ\œÝˆÙ]™[ˆ\™HHÜ\˜]Ü‰ÜÈÚÚXÙNˆØYšØIÜÈ™YHÛÜšÛØYËÚ\™HÛÛœÝ[Y\œÈ^HH[™™Y›ÛœÚÜ\ˆ]Y]YH[™›Ý™XY[™ÜÈÙˆH[™^Ø^HH˜YH^\ÎÈ™Y\ÉÜÈ™YKÚ\™HY[[ÜžH^\ÈH]˜]H[™Û›HBœÙ\šXÙH™XY[™ÈØ^\È]^\ÎÈ[™^TÔS	ÜÈ™XYÝÜš]KÚ\™HYÙ\ÈÛ[™È]H^HH™]È\˜Ù[ÙˆÔKˆš]™HØ]ÚˆB››Ú\ÞH™ZYÚ›Ý\‹ÜÝÜ™TÔS	ÜÈÚ[\WÝ\]H
+ÛÛ›™XÝ[ÛœÈ›ÝYÚX›Ý™HHÜ\˜]Ü‰ÜÈÙ][™ÈÚ]›Ý[™È›ÝYÚ›Üˆ[JB˜[™Ø—ÚÝ
+H[œÈ\ØYÜ™YJK^TÔS	ÜÈ™XYÛÛ›H[™\]WÚ[™^ˆ]™\žHÜÜÈ[ˆ[™YHÙˆÝ\ˆ[œÈÛˆH™X[ÝXÚÈ\ÈH™\ÛÝ\˜ÙBœÜ[›ÜˆHÛ›Ø‰ÜÈÝÛˆÙ\šXÙKXÛ\™Y[ˆY˜[˜ÙHÜˆ\ØÛÜÙYÛˆHš\œÝÛÝ[YÙ]È›Û™H\ÈHÙ\šXÙHÜÜËˆÙˆBš[™\[™[Ú[][]ÜœÉÈÎHØ\Ù\ËŒHÜš]KMH\™H˜Y\È
+H›Ý\ˆÚ[P™[˜ÚÜšYÈ]^ÜÚ\™HHÝÙ\ˆ›ÛYÙB˜ÛÜÝÈ[™HÜÜÙ\ÎÈHÙ]™[ˆŒŒÈÚ]SX\›ˆ\ÝšXÝËÚ\™HHš[™XYÝÙ\ˆÚ]™[ŠH[™ÈØ]Ú
+ÛÈ›Ø›ÝÈH[™Ú[™H]Ù[‚›Y˜]]™KÛ™HÜšYÚ\™H›Ý[™ÈØ\È›ÝYÚ
+KˆÙˆHMH[Ù[Y]\ØÛ\ËLÜš]KLÈ\™H˜Y\È[™Ø]ÚÈÍˆÙ‚H™]™\ˆÜ›ÝH][™XØ]\ÙHH˜]]™HÛÛ›Û\ˆ[H™XY[™È[œÚYHH˜[™[™H]È™]™\ˆY]Â˜Ý\Ú[Û‹[™[MHYZ\ÜÚ[Ûˆ]\ØÛ\È\™H[[Û™È[KHYZ\ÜÚ[ÛˆÛ›Øˆ™Z[™ÈHÝX\™›ÜˆHÝ™\ÜÈHÝ\ˆY›ÝÛ‚•HMÜ™Ø[š\ÛHÙ[ÈÚ]H™X[Û\Ý\ˆ[œÚYH[Üš]HÛˆHÛ\Ý\‰ÜÈØ]YÙ\Ëˆ›Ý[™ÈÛˆHYÙHÚ[™Ù\ÈB™[™Ú[™KÚXÚÝ^\ÈÛ[šHŒÎÈ]Ú[™Ù\ÈÚ][ˆÜ\˜]ÜˆÛÛ›™XÝË‚‚ŠŠ•HØ[YH™\™XÝ]™H
+Z[HØÝØ™\‹[›š[™ÈÚ[˜ÙHLØÝØ™\ŠKŠŠˆHYÙHYÙ\ÈY\ˆH˜XÝÈH›Ý[™\‰ÜÈÜ™\ˆ\È]B˜œ˜Z[ˆYÙH[ˆ™X[[YKÛˆHÛ›Ø‹™Y›Ü™H]Üš]\ËˆÛˆHš]™H]™HÝXÚÜÈ]\È›ÝÈ[ˆH\›™\ÜÙ\È
+ÙXÝ[ÛˆKÂ˜ÛÛËÚÛ›Ø—Ý™\™XÝœX\›Ý[™H[™Ú[™IÜÈÝÛˆ™\™XÝH[™Ú[™H[˜Ú[™ÙY
+Nˆ]™\žHÛ›ØˆÝ\È[ˆØ]Ú[™\ÈÜš][‚›Û›H[œÚYHH[ÝØ[˜ÙHHZ\™YšX[ÛˆHÝXÚÈ]Ù[ˆ\ÈX\›™Y[™\ˆHXÛ\™YØš™XÝ]™KÛ™H›ÝÚHšX[ÈBœ™Y\ÙYÝ\\È›ÝZÙ[‹HšX[ÛÈHÛ›Ø‹H˜Z[]\™]™\ˆÜ[™È™^[Û™H[ÝØ[˜ÙKHÜ\˜]Ü‰ÜÈÙ][™È\Â˜[Ø^\Èœ™YKˆH[Y[™Y[È\™HXÛ\™Y[ˆHš]™H™\™YÚ\Ý˜][ÛœÈÚ]H^XÝ][ÛˆÜš][ˆ™Y›Ü™HH[œÂŠ™Y\ÈY˜]]™H[™\ˆH™\ÛÝ\˜ÙHØš™XÝ]™KHš\œÝ›ÝÚ™Y\ÙYÈØYšØH[ÝÙYÝ\žHÝ\Ú[HXXÚÛÛœÝ[Y\‚œ^\ÎÈÜÝÜ™TÔS	ÜÈYX›Ý™HHÜ\˜]Ü‰ÜÈÙ][™È™Y\ÙYÛˆÚ[\WÝ\]XÈ^TÔS	ÜÈ™XYÝÜš]XÚ[šÜÈ™Y\ÙYÂ“[Û™ÛÑ‰ÜÈØXÚHÚ]™[ˆ˜XÚÈH›ÝÚHšX[
+KˆH[œÈÙ\™H\Ü]ÚYÛˆLØÝØ™\‹™YHHÝXÚÈ[™Øš™XÝ]™K[ˆH^IÜÂœ™\[ˆÙˆ]™\žH™[˜ÚX\šÈÛˆÛ™HÛÛ[Z]
+ØÜËÔ‘T•S—ÌŒ‹LLLL›Y
+K[™HX›\ËH[™^[™HYÙH\™H[ˆ™XYYØZ[‚™œ›ÛH[K‚‚ˆÈÈÈM‹˜ÈHÙXÛÛ™Ù]ÙˆLØÝØ™\‹[™H›Ý\ˆ[\È]]YÚHšX[‚•Hš]™H]™H›ÙXÝÈ˜[ˆHÙXÛÛ™[YHÛˆLØÝØ™\ˆÛˆH[Y[™YšX[[H
+HÜ[™šX[[œÈÈ]ÈØ[\\ÎÈ]\Â›™]™\ˆ[™YžHHØ[H]Ø]\Ù\ÊKˆHšX[Èš[š\ÚYˆHœ˜Z[ˆÝ[™Y\ÙYHØYšØHÛÛœÝ[Y\ˆ[[ÜÝ]™\žH[YK[™š[ˆHÛ™H™\]][ÛˆÚ\™H][ÝÙYH\™ÛÛœÝ[Y\ˆX\›KHÚÛHØZ[ˆÙˆHX\›Y\ˆ]ÈØ[YH˜XÚÈ]Hœ˜XÝ[ÛˆÙ‚HÜ[™ˆHM]\\˜Ù[[H[^H™[œ›ÛH‹L\ÈÈMÈ\ËH]Y]YHœ›ÛHËÍÍHØZ][™ÈY\ÜØYÙ\ÈÈLËHÛÜšÈ[œÚYBH[™H›ÜÙHMÉKÚ]‹LˆÛÛœÝ[Y\œÈÛˆ]™\˜YÙHÚ\™HHX\›Y\ˆ]ÈYÜ[KŽÈËŽKˆÛˆ™Y\ÈÚ]H\™ÙHÛÜšÚ[™ÂœÙ]Hœ˜Z[ˆ[ÝÙYMHPˆ[Ü™HY[[ÜžH[™›ÝYÚ[Ü™H]Ë[Ü™HÛÜšÈ[™\ÜÈÜÝÔKH›ÝÈHX\›Y\ˆ]È™]™\‚œÚÝÙY™XØ]\ÙH]Ü[ŒPŽÈÚ]HÛX[ÛÜšÚ[™ÈÙ]›Ý[™ÈÚ[™ÙYˆÜÝÜ™TÔSØ]™H˜XÚÈX›Ý]H[Ùˆ]ÈÛÛÚ]HÙ\šXÙH[œÚYHH›Ú\ÙK‚‚•HØYšØH™XY[™È\ÈHš[™[™ËˆHØZ[ˆ\È™X[[™ÚX\ÈHœ˜Z[‰ÜÈ\ÝÙˆ]\È[œ™[XX›K[™H˜][\È[ˆÝÈBš\›™\ÜÈYX\Ý\™\Ë›Ý[ˆH]ÈÜˆH[™Ú[™IÜÈYÙKˆHÛÜÝØ[\H]\ÈÚÝÛˆ\ÈHYÙHÙˆH˜XÚÛÙËÚXÚÙ\È›Ý™˜[[[H˜XÚÛÙÈ\ÈÛÛ™KˆHÛÛœÝ[Y\ˆ›Ú[š[™ÈHÜ›Ý\™X˜[[˜Ù\È][™HÙ]H[YH\ÈX][ˆžHH]\ÙKˆBœ™Y™\™[˜ÙH[™HšX[\Ù\Ë›Ý\Y[ˆÙXÛÛ™ÈXXÚÝ˜YHH\K\ÙXÛÛ™ØYÝ\[™ÛÛ\\™HY™™\™[ØYËˆ›Ý\‚œ[\È›ÛÝÈ›ÜˆHšX[Üš][ˆ[ÈH™^[™Ú[™H
+ØÜËÓÓS’WÕÔS‹›Y
+NˆØ[\\ÈÛÝ[Û›HÛ˜ÙHH]\ØÛH™\ÜÂš]Ù[ˆÙ]YÈHÜ[™ÛˆH]Y]YHÜˆHØXÚH\ÈYÙYžHH]\ØÛIÜÈÝÛˆ™XY[™ËHYÈ[™]È˜Z[ˆ˜]KHZ\ÜÙ\ËÚ]H›ÙIÜÈÛÜÝZÙ[ˆ]HÙ]YÝ]NÈH™Y™\™[˜ÙH[™HšX[\™HÛÛ\\™Y]HØ[YHØY[ÙHHšX[ØZ]È›ÜˆHÝXYHÝ\È[™ÛØ\œÙHÈš[™KÛ™HØÛÝ]Ý\ÈH˜\ˆÚYHÙˆHÛÝ™\ˆÚ[ˆÚ[™ÛH›ÝÚ\È™XY›]ÛÈBš[Ùˆ›ÜH›ÝÚ\È\È›Ý™Y\ÙYÛ™H›ÝÚ]H[YKˆH›Ý[™\‰ÜÈÛÜ™ÈÙˆHØ[YH^HØ^H][ˆÛ™H[™NˆÚ]B˜œ˜Z[ˆÙ[™ÈÈH]\ØÛH\ÈÈÛÚ[˜ÚYHÚ]Ú]H]\ØÛH™\ÜÈX›Ý]]Ù[ˆ[™Ú\™H]Ý[™Ë‚‚•H™^[™Ú[™KÛ[šH\ÈÜ™\™YÛˆ]^NˆÛ™H›ÙKÛ™Hœ˜Z[‹Û™HXÚÈHÙXÛÛ™ÈH›ÙIÜÈÛÜÝYÙYÈ›Ý[™Â˜[ž]Ú\™H\ÚYÈHÔÔÈÈ[Ý™HÛ™H[™ÈÈHÐRSŽÈÛ™HšX[]H[YH[œÚYHH›ÙNÈ›Ý[™È\›X[™[ÈHØ[™[Û™Ú[™ÈÈB˜›ÙNÈ]™\žHÚ\™H›Ü˜ÙY›ÝYÚ]ˆ\RHØZ[œÈ]ÈÚ\\ˆÚ[ˆ\ÈÜš][ˆ[™[‹[™]™\žH™\Ý[[ˆ\ÈÚ\\ˆ\Âœ[ˆYØZ[ˆÛˆ]‚‚ˆÈÈÈM‹È™X]ÈÈ˜[Y]KÝ]YžH\Â‚H™Y™\™YHÚ[ÛÚÈ›ÜˆHØ^\È\ÙH™\Ý[ÈÛÝ[Z\ÛXYˆÙH\ÝHÛ™\ÈÙHÛ›ÝËÚ]XXÚÛÝ[ÈÈB›[X™\œË[™Ú]H™XÛÜ™Ù\ÈX›Ý]]‚‚ŒKˆ
+Š•HXXÚ[™\È\™HÚ\™YŠŠˆ]™\žHÝX™\›™]\Ë]X˜\ÙKœ›ÚÙ\ˆ[™ØXÚH[ˆ\ÈÛˆÛ™HÚ]Xˆ[›™\ˆÚ]›Ý\ˆÛÜ™\Ëˆ[™HÛÝ™\››Ü‹HØYÙ[™\˜]Ü‹H›Ø™H[™HÞ\Ý[H[™\ˆ\ÝÚ\™H]ˆHÛÝ™\››Üˆ]ÛÜÝÈÔHØ[ˆÛÝÂˆHÙ\šXÙH]ÛÝ™\›œË[™H›Ú\ÞH™ZYÚ›Ý\ˆÛˆHÜÝØ[ˆ[Ý™HH[‹ˆHZ\š[™ÈÛˆÛ™H[›™\ˆÚ]›Ý]YÜ™\‚ˆ™[[Ý™\ÈH™]ÙY[‹[XXÚ[™H›Ú\ÙNÈHÜÝ	ÜÈÝÛˆ\ÞHÚ\™H\È™XÛÜ™Y™\ÚYH]™\žH[ŽÈHÛÝ™\››Ü‰ÜÈÝÛˆÔH\ÈBˆØ]YÙH[ˆ]™\žHX›H[™HÜÜÈ[ˆ[™YHÙˆÝ\ˆ[œÈÚ\™H]\ÈÛ™H
+H]X˜\ÙKØYšØIÜÈYÚÛÜšÛØY
+NÈ[™™YHÙ\\˜]Bˆ[œÈÛˆÙ\\˜]HXXÚ[™\È]\ÝYÜ™YH™Y›Ü™H[ž][™ÈÛÝ[Ë‚Œ‹ˆ
+ŠšÚ[™\È›ÝHÛÝYŠŠˆYHXXÚ[™\ÈÝ^HÝÙ\™Y[™˜]]™H\È›È›ÙH]]ÜØØ[\‹ÛÈHXXÚ[™HÚ]™[ˆ˜XÚÈÛˆÚ[™ˆ\ÈHXXÚ[™KZÝ\ˆ[ˆÙ\šXÙK›ÝHØ][™›ÝHÛ\‹ˆH[™\™ÞH›ÝÜÈÛˆÚ[™\™HHXÛ\™Y[Ù[[™Ø^HÛÈÛ‚ˆ]™\žH[™KˆHš[\È^\™IÜÈ\Ý[™]ÈÛ›H™\Ý[ÛÈ˜\ˆ\È[œÚYHH›Ú\ÙHÛˆH›Y]ÛÈÛX[ÈÚÝÈÛ™BˆXXÚ[™K‚ŒËˆ
+Š“˜]]™H\È]]ÈÛ™YHžH\ÚYÛˆ[ˆHœ›ÚÙ\ˆ\ÝŠŠˆHØYšØH›ÙXÙ\‰ÜÈXZÈÙ™™\œÈš[™H[ÈÙˆHØ\XÚ]BˆYX\Ý\™Y›ÜˆHÜ\˜]Ü‰ÜÈÛÈÛÛœÝ[Y\œËÛÈ˜]]™IÜÈ]Y]YHÜ›ÝÜÈ]HYÚÝ\È[™Û[šIÜÈÙ\È›Ýˆ\È\ÈBˆÚ]X][ÛˆH™[˜ÚX\šÈ\ÈÙˆ
+HÜ›Ý\Ú^™Y›ÜˆH]ZY]Ý\œÈ[™Ý™\œ[ˆ]HXZÊK]\È™\™YÚ\Ý\™Y[™]ˆ\ÈÚHH][˜ÞH˜][ÜÈ\™H\™ÙNÈH[™^YÙH[™HX›HØ^HÛËˆH˜]]™HÜ›Ý\Ú^™Y›ÜˆHXZÈÛÝ[ÚÝÂˆHÛX[\ˆ][˜ÞHØZ[ˆ[™HÛX[\ˆÛÛœÝ[Y\ˆÛÜÝ[™ÛÝ[™HHY™™\™[[ÛÈYÚ][X]K™[˜ÚX\šË‚ˆ
+Š‘XÛ\™Y[˜[Y\ËŠŠˆHØXÚIÜÈH\ÈÝÜ™Hš\ÛˆHZ\ÜÈ[™Hœ›ÚÙ\‰ÜÈKˆÜˆH\ÈÙˆÔH\ˆY\ÜØYÙH\™BˆXÛ\™Y\˜[Y]\œÈÙˆÝ\ˆÝÛˆ\XØ][Û‹›ÝYX\Ý\™[Y[ÈÙˆ[ž[Û™IÜÈÝÜ™KˆHØ]YÙ\È]\[™Ûˆ[H
+ÛÜšÂˆ[œÚYHH[™KH™\]Y\Ý][˜ÞJHØØ[HÚ][NÈH]˜]KHYËHÛÛœÝ[Y\œÈ[™HY[[ÜžH[È›Ý‚Kˆ
+Š”Ú[][]ÜœÈ\™H[Ù[ËŠŠˆ]™\žHÈ™\Ý[\ÈHÝ][Y[X›Ý]HX›\ÚY[Ù[[™\ˆ]ÈÝÛˆÛÛ›Û\‹ˆH[Ù[X^Bˆ›]\ˆÜˆ[š\ÚHÛÝ™\››Üˆ[ˆØ^\ÈH™X[[ÛÝ[›ÝˆÈ™\Ý[È\™H\™Y›Ü™HÚÝÛˆ™\ÚYHH[™^[™ˆ™]™\ˆ[œÚYH][™H]\ØÛ\ÉÈ[Ù[È\™HHÚ[\\Ý\ÚXÜÈ]™\›ÙXÙ\ÈHY]\‰ÜÈ™\ÜÛœÙHÈHÛ›Ø‹ˆÚ]H˜]]™HÛÛ›Û\œÈ[™Y\ÈZ\ˆ]]ÜœÈÚ\[K‚‹ˆ
+Š•H[š[™ÈØ\ÙHØ\ÈÙY[‹ŠŠˆ]™\žH™[˜ÚX\šÉÜÈ[\ÈÙ\™HÙ]ÛˆÛ™H[š[™ÈØ\ÙK[™]Ø\ÙH\ÈÚÝÛˆ[™›ÝˆÛÝ[YˆÚ\™HH[HÚ[™ÙYY\ˆHÛÝ[Y™\Ý[Ø\ÈÙY[ˆ
+HÝØ\›HX›IÜÈ™\›ÙXÝ[ÛˆÛ\˜[˜ÙJKH[Y[™Y[ˆ\ÈÜš][ˆ[ˆH™\™YÚ\Ý˜][ÛˆÚ]]È[YH[™™X\ÛÛ‹HX›HØ^\ÈÛË[™H[œÈÙ\™H›Ý™\[‹‚Ëˆ
+Š•H[™Ú[™HÚ[™ÙYÚXÙKŠŠˆŒHÈŒˆYY]\ØÛ\ÈÚ]Ý]ÝXÚ[™ÈH]ÎÈŒˆÈŒÈYYÛ™HØ]Kˆ]™\žH™\Ý[\ÂˆX™[YÚ]]È[™Ú[™KHÛÛÈ™Y\ÙHÈZ^[™Ú[™\Ë[™HŒH™\Ý[ÈÝ^H\ÈŒH™\Ý[ËˆH™XY\ˆÛÛ\\š[™ÈHŒBˆ[X™\ˆÚ]HŒÈ[X™\ˆ\ÈÛÛ\\š[™ÈÛÈ[™Ú[™\Ë[™HX[X[™]™\ˆÙ\ÈÛÈ^Ù\ÈØ^H]HÛÛ›Û\œÈÙ\™BˆHØ[YHž]\È[™H™XY[™ÜÈHØ[YK‚Žˆ
+Š•™YH[œÈ\™H™YK›Ý\KŠŠˆH™YK\[ˆ[H\ÈH™\XØ][ÛˆÝ[™\™›ÝH\™ÙHØ[\KˆH›ÝÈHØ[YH[ˆ[™YHÙˆÝ\ˆ[œÈÙˆ[ˆZ\œÈ\ÈH›ÝÈÚÜÙHZ\™YY™™\™[˜ÙHÛX\™Y™\›È[ˆXXÚÙˆ™YH[™\[™[Ø[\\ÈÙˆ[ŽÂˆH[\˜[È\™HÚÝÛˆÛÈH™XY\ˆØ[ˆYÙHZ\ˆÚYˆÚ\™HH[\˜[È\™HÚYKHX[X[Ø^\ÈH\ÝXÚÙYˆÝÙ\ˆ˜]\ˆ[ˆØ[[™ÈH™\Ý[H[‚ŽKˆ
+Š•H›Ý[™\‰ÜÈÝÛˆ\›™\ÜËŠŠˆH\XØ][Ûˆ[ˆœ›ÛÙˆHØXÚKH›ÙXÙ\ˆ[ˆœ›ÛÙˆHœ›ÚÙ\‹HØYˆÙ[™\˜]Üˆ[™H›Ø™H\™HÝ\œËˆ^H\™HXÛ\™Y™\œÚ[Û™Y\˜Ú]™YÚ]]™\žH[ˆ[™™\›ÙXÚX›Hœ›ÛHBˆ™\ÜÚ]ÜžNÈ^H\™H›Ý[™\[™[Ùˆ\ËˆH[™\[™[YXÙ\È\™HHÞ\Ý[\È[™\ˆ\ÝZ\ˆ˜]]™BˆÛÛ›Û\œËHÚ[][]ÜœÈ[™Z\ˆÚ\YÛÛ›Û\œË[™H™[˜ÚX\šÈÛÛÈ
+Ø™[˜ÚÚ[™ÝX™\›™]\ËˆP[]]R›ÐÛË[™\ÝÙ\‹Ú]SX\›ŠH]Ý\œÈÜ›ÝKˆHØYØÚY[\ÈÙˆHÝX™\›™]\È\ÝÈÙ\™HÝ\œÈÛËˆÜš][ˆÛ™HÝ\]H[YNÈHX›XË]˜XÙH\Ý
+ØÜËÕPÑT×Ô‘T‘QÒTÕUSÓ‹›Y
+H[œÝÙ\œÈ]žH™\^Z[™ÈH^BˆÙˆ[X[™ÛÛYX›ÙH[ÙHYX\Ý\™Y
+HÛÛÙÛHÛ\Ý\ˆ˜XÙHÙˆŒLK[ˆH^\™H[˜Ý[ÛœÈ˜XÙJH[™\ˆHØ[™\š[™Âˆ\Ý	ÜÈÝÛˆ[\ËH\š]˜][Ûˆ™XÙZ\Y[™ÛÛ[Z]Y™Y›Ü™HH[œÎÈ]È™\Ý[
+ÙXÝ[ÛˆM‹ŒJH™XYHØ[YHØ^Bˆ\ÈHÚ^MHIHÈÌIH˜\Ý\ˆ[™XXÚ[™\È‰HÈL	H™]Ù\‹HØ[YH[ˆ[™YHÙˆÝ\ˆ[œËÚ]›È›ÝÈÔÔË‚‚ˆÈÈÈM‹ŽÚ]\È›ÝY]ÚÝÛ‹[™HÜ[ˆ›ÙÜ˜[B‚•™YH[™ÜÈ\ÈX[X[Ù\È›ÝÚÝË[™H›ÙÜ˜[H]Ú[ÚÝÈ[HÜˆÚÝÈZ\ˆXœÙ[˜ÙN‚‚‹H
+Š[ˆ[™\™ÞHÜˆš[Ø]š[™ÈÛˆ™X[XXÚ[™\ËŠŠˆH›Y]ÙˆÛÜšÙ\œÈ[ˆš[™H^\™HXXÚ[™H˜[Z[Y\È]Ø[ˆÚÝÈÛ™BˆXXÚ[™H\È™\™YÚ\Ý\™Y[™\Ü]ÚYÛˆŒÎÈ][œÈÚ[ˆ^\™IÜÈ™YÚ[ÛˆYZ]ÈHÛ\Ý\‹ˆYˆHØ]š[™È\ÈH™]Âˆ\˜Ù[H]ÛÜšÙ\ˆ›Y]Ø[ˆÙYH]ÈYˆHØ]š[™È\È›Ý\™KHX›HÚ[Ø^H››ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙH‚ˆÛˆH›Y]]ÛÝ[]™HÙY[ˆ][™]Ú[™HH™\Ý[‚‹H
+Š•H™X[Ø\™ŠŠˆ]™\žHX\›Y\ˆÔH™\Ý[˜[ˆÛˆHÛÛ›Û\ˆÚ[˜ÙH™\XÙYˆHÛË]Ú\™HÛÝ™\››ÜˆÚ]H™\™XÝˆ[œÈÛˆ™[YØ\™È]Û™H˜[YYÛÛ[Z]Ú]HÚ\™HÚXÚÈš\œÝ
+ØÜËÑÔWÔ•S—ÑÕRQK›YˆØÜËÑÔWÔ‘T‘QÒTÕUSÓ‹›Y
+NÈ[[[ˆHØ\™\È›È™\Ý[[™HX[X[Ø^\ÈÛË‚‹H
+Š”›Ø\Ý™\ÜÈÝ™\ˆH^KŠŠˆHÛÝ™\››ÜˆÚ[YÝ]šYÚ\ÈHYX\Ý\™Y™\Ý[
+ÙXÝ[ÛˆM‹Žˆ]™\žHÙ][™È˜XÚÈ[ˆÈÂˆLHË\H[Y\ÈÝ]Ùˆ\JK]ÈÝÛˆÛÜÝ\ÈX[]Y[™HÛËZÝ\ˆ[ˆ\ÈYX\Ý\™Y™YH[Y\È
+›ÈXZËˆ›ÈÛÝÚ[™Ë]™\žHXÚ\Ú[Ûˆ^XÝY]H™]ÈHÛ\Ý\‰ÜÈTH™Y\ÙY]™\žHÙ][™È[™Y˜XÚÊNÈHZÝ\ˆ[‹ˆÛ™HZ\ˆÛˆXXÚÙˆ™YH™[YZYÚXÛÜ™HXXÚ[™\ÈÙˆ™YH˜[Z[Y\Ë\È[™\ˆØ^H
+ØÜËÔ“Ð•TÕ‘TÔ×Ô‘T‘QÒTÕUSÓ‹›YˆØÙ[˜\š[È˜ŠH[™\È™XYÚ[ˆ]ÈXXÚ[™\È\™HÛÛXÝYÈHØ[YH\ÝÛˆHÝ\ˆÝXÚÜÈ™[XZ[œÈÜ[‹‚‹H
+ŠH[X[™Ú\H]\È›ÝÝ\œËÛˆ[Ü™H[ˆÛ™H˜XÙKŠŠˆHš\œÝX›XÈ˜XÙH
+H^HÙˆHÛÛÙÛHÛ\Ý\ˆ˜XÙHÙ‚ˆŒLKÙXÝ[ÛˆM‹ŒJH™XYHØ[YHØ^H\ÈÝ\ˆÝÛˆØÚY[\Ëš[™H›ÝÜÈÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÈ[™›Û™HÔÔÎÈ]\ÈÛ™H^HÙˆÛ™Bˆ˜]ÚÛ\Ý\‰ÜÈ›Øˆ\œš]˜[ËˆH^\™H[˜Ý[ÛœÈ[›ØØ][Ûˆ˜XÙKH™\]Y\ÝYš]™[ˆÚ\K›ÛÝÜÈžHHØ[YH[K[™ˆH›Ý\ˆÝÛˆØÚY[\Èˆ™X]ÙˆÙXÝ[ÛˆM‹È\È[œÝÙ\™Y[ˆ[Û›HÚ[ˆHÙXÛÛ™Y™™\™[HÚ\Y^H™XYÈBˆØ[YHØ^K‚‚•H]Y]YH™^[Û™\ÙK[ˆÜ™\‹\ÈØÜËÔ‘QÒTÕT‹›YÙXÝ[ÛˆÛ™HÜˆÛÈ]H[YKXXÚ™\™YÚ\Ý\™Y™Y›Ü™H]œ[œÎˆ[™\™T[ÝÝØ\›\ËPÔÐˆ[™[[Y\‘‹Ü\šËÜ[”ÙX\˜Úš[ËÜ[‹T“Q‹˜\Ú[\ÚËÜ™ZÚ][™ÓPU›ØÚÙ]B˜[™Ü[”›ØÚÙ]Ø[\˜KˆÚ[ˆH›Ý[™\ˆXÛ\™\ÈH[™Ú[™Hš[˜[H[™Ú[™H]Ý[™È[ˆ\ÂœX›\ÚY\ÈÛ[šKPÛÛ\\ÜÈKŒ[™HÛ\ˆš[™Ù\œš[ÈÛÈÈØÜËÚ\ÝÜžX\ÈH›ØYÈ]‚‚‹KKB‚ˆÈT•’RHHÓÑKÒS”ÈS‘T“TÂ‚ˆÈÈMËˆXÙ[œÙH[™ÛÛ[Y\˜ÚX[\›\Â‚•HÛÙØ\™H[™\ÈX[X[\™HXÙ[œÙY[™\ˆHÛ[šKPÛÛ\\ÜÈ]˜[X][ÛˆXÙ[œÙH
+PÑS”ÑX
+Nˆ]˜[X][Ûˆ[™œÚ[][][Ûˆ\ÙHÛ›Kˆ]™\ž][™È[ÙHHÛÛ[Y\˜ÚX[\ÙK›ÙXÝ[Ûˆ\ÙKÜ\˜][™È[žHÞ\Ý[H™^[Û™]˜[X][Û‹œ™Y\ÝšX][Û‹HÜÝYÜˆX[˜YÙYÙ\šXÙK[˜ÛÜœÜ˜][Ûˆ[ÈH›ÙXÝÜˆÙ\šXÙKÜˆ\Ú[™ÈHÛÙØ\™HÜˆ]Âœ™\Ý[ÈÈZ[HÛÛ\][™È›ÙXÝH™\]Z\™\ÈHÜš][ˆÛ[šKPÛÛ\\ÜÈ[\œš\ÙHXÙ[œÙHÚYÛ™YžHHÛ[šKPÛÛ\\ÜÂ“È[™ZY›Ü‹ˆ[][ËÛÜ\šYÚÈ[™˜Y[X\šÜÈÛÝ™\š[™ÈHÛ[šKPÛÛ\\ÜÈ[™Ú[™K]ÈX][X]XÜÈ[™]ÈÛÙØ\™H]™H™Y[ˆš[Y[ˆH[š]YÝ]\ÈžHHÛ[šKPÛÛ\\ÜÈËˆ›È][Üˆ˜Y[X\šÈXÙ[œÙH\ÈÜ˜[Y›Üˆ[žHÝ\ˆ\ÙKˆÛÛšX][ÛœÈ\™HXØÙ\YÛ›HÛˆB\›\È[ˆ™Ú]X‹ÐÓÓ•’P•US‘Ë›YÚXÚ\ÜÚYÛˆZ\ˆšYÚÈÈHÛ[šKPÛÛ\\ÜÈË‚‚•HÛÜ\šYÚ[ˆÛ[šKPÛÛ\\ÜÈ™[Û™ÜÈÈHÛ[šKPÛÛ\\ÜÈËˆHÛÝ\˜ÙH\Èš\ÚX›H[™\ˆH]˜[X][ÛˆXÙ[œÙKÚXÚ\È›Ý[ˆÜ[‹\ÛÝ\˜ÙHXÙ[œÙNÈÙYZ[™ÈHÛÝ\˜ÙHÜ˜[È›ÈšYÚ™^[Û™]ˆHÝÛ™\ˆÙˆHÛÜ\šYÚX^B™Ü˜[][™\ˆ[Ü™H[ˆÛ™HXÙ[œÙH]Û˜ÙH
+H]˜[X][ÛˆXÙ[œÙHÈ]™\ž[Û™KHZY[\œš\ÙHXÙ[œÙHÈB˜Ý\ÝÛY\ŠKX^HÙ]H\›\ÈÙˆXXÚ™]È™\œÚ[Û‹[™X^H\ÜÚYÛˆHÛÜ\šYÚÈÛÜY\È[™XYH™XÙZ]™YÙY\B\›\È^HÙ\™H™XÙZ]™Y[™\‹ˆHXÙ[œÙH^È
+PÑS”ÑX“ÕPÑXTÐÓÔÕT‘TË›Y
+HÛÝ™\›‹‚‚ˆÈÈNˆ]Û‹ÊÊÈ[™HÙX[‚•H]ÜÈ\™HÚ[›™YˆXXÚ\ÈH]Ûˆ™\œÚ[Ûˆ[™HÊÊÌŒ™\œÚ[Ûˆ]Ú]™HHØ[YH[œÝÙ\œË›Ý™[ˆžHH\š]B\ÝÛˆ]™\žHZ[
+ÛXZÙHTÈÜPˆÜØZ[	‰ˆÛXZÙHKXZ[ÜØZ[
+K‚‚Ÿ]È]ÛˆÊÊÈ›Ý™[ˆžHŸKK_KK_KK_KK_ŸÛÜ™H[™Ú[™HÛ[šXÛÛ\\ÜËØÛÜ™KœXÜÜÜ˜ËØÛÜ™K˜ÜLœ›Þ™[ˆš^\™\ÈŸÛÝ™\››ÜˆÛ[šXÛÛ\\ÜËØY\\‹œXÜÜÜ˜ËÙÛÝ™\››Ü‹˜Ü\ÝËÝ\ÝØÜÙÛÝ™\››Ü—Ü\š]KœXŸØY™]HÚY[Û[šXÛÛ\\ÜËÜÚY[œXÜÜÜ˜ËÜÚY[˜Ü\ÝËÝ\ÝØÜÜÚY[Ü\š]KœXŸH™\XØH]È›Y]Ú\›™\ÜËœXÜÜÜ˜ËÚK˜Ü\ÝËÝ\ÝØÜÚWÜ\š]KœXŸÛÜÝ\™H]ÈÛ[šXÛÛ\\ÜËØÛÜÝ\™KœXÜÜÜ˜ËØÛÜÝ\™K˜Ü\ÝËÝ\ÝØÜØÛÜÝ\™WÜ\š]KœXŸÛÛ™^X[˜ÙH]ÈÛ[šXÛÛ\\ÜËØÛÛ™^X[˜ÙKœXÜÜÜ˜ËØÛÛ™^X[˜ÙK˜Ü\ÝËÝ\ÝØÜØÛÛ™^X[˜ÙWÜ\š]KœXŸ™\›Ý\ÈÞ\Ý[HÛ[šXÛÛ\\ÜËÛ™\›Ý\×ÜÞ\Ý[KœXÜÜÜ˜ËÛ™\›Ý\×ÜÞ\Ý[K˜Ü\ÝËÝ\ÝØÜÝÚ[œ×Ü\š]KœXŸÛÛ\\ÜÈ[™YÙ\ˆÛ[šXÛÛ\\ÜËØÛÛ\\ÜËœXÝÜ˜YÙKœXÜÜÜ˜ËØÛÛ\\ÜË˜Ü\ÝËÝ\ÝØÜÝÚ[œ×Ü\š]KœXŸÔHÛÝ™\››Üˆ[\ÈÛ[šWØÛÛ›Û\‹ÙÜWÙÛÝ™\››Ü‹œXÜÜÜ˜ËÙÜWÜ[\Ë˜Ü\ÝËÝ\ÝØÜÝÚ[œ×Ü\š]KœX‚•HÙX[
+™\Ý[ËÔÑPSšœÛÛ˜
+HÛÈHÒKLMˆš[™Ù\œš[Ùˆ]™\žHÚ[›™Yš[KÜš][ˆÛ›HY\ˆ]™\žH\š]B\Ý\ÜÙ\Ëˆ™\šYžKœX˜Z[Ë˜[Z[™ÈHš[KYˆ[žHÙX[Yš[HÚ[™Ù\ÈY\Ø\™ËˆHÛÛ\\ÜÈ]ÂŠÛ[šXÛÛ\\ÜËØÛÛ\\Ü×Û]ËœX
+H[™HÛË]Ú\™HÔHÛÝ™\››Üˆ\™H[ˆ]ÛˆÙ^NÈZ\ˆÊÊÈÚ[œÈ\™H™^‚‚ŠŠ•ÚHÛÈ[™ÝXYÙ\ËŠŠˆH]È]^\ÝÈ[ˆÛ™H[\[Y[][ÛˆØ[ˆYHHYÈ]\È[ÛÈ]È™Z]š[Ý\ŽˆH\ÝÈ\ÜÂ˜™XØ]\ÙHH\ÝÈÙ\™HÜš][ˆYØZ[œÝHØ[YHÛÙKˆÛÈ[\[Y[][ÛœÈÜš][ˆÙ\\˜][K[ˆ[™ÝXYÙ\ÈÚ]™Y™™\™[[Y\šXÜÈ[™Y™™\™[Y˜][Ë]YÜ™YHÈšYY[ˆXÚ[X[XÙ\ÈÛˆš]™H[™™Y˜Z™XÝÜšY\È[™Ûˆ]™\žB™š^\™HÙˆHÛÝ™\››Ü‹HÚY[HH]ËHÛÜÝ\™KHÛÛ™^X[˜ÙH[™H™\›Ý\ÈÞ\Ý[K\™H]šY[˜ÙH]B^ÙˆH]È\ÈÚ]›ÝÛÛ\]KˆHÊÊÈÚ[ˆ\È[ÛÈHÛ™HH^Y\ˆÛÝ[[X™YÚ\™H]ÛˆÙ\È›Ý[ˆ
+B˜ÛÛ›Û\‹Hš\›]Ø\™KHÊK[™HÛØZÈ
+™\Ý[ËÔÓÐRËšœÛÛ˜Û™H[™™YZ[[ÛˆXÚ\Ú[ÛœË›È˜Z[\™JH\È[ˆÛ‚š]ˆHÙX[XZÙ\ÈHÚ[œÉÈYÜ™Y[Y[H›Ü\HÙˆH™\ÜÚ]ÜžH˜]\ˆ[ˆHÛZ[NˆÚ[™ÙHHÙX[Yž]H[™˜™\šYžKœX˜Z[Ë˜[Z[™ÈHš[K‚‚ŠŠ•H™YHš[™Ù\œš[ËŠŠˆHÙX[š[™Ù\œš[ÈHÚ[›™Y]ÜÎÈÓS’WÕŒKšœÛÛ˜ÓS’WÕŒ‹šœÛÛ˜[™ÓS’WÕŒËšœÛÛ˜™š[™Ù\œš[H[™Ú[™H\ÈHÚÛH
+]ËÛÛ›Û\œË]\ØÛ\Ë[›™\œÎˆÎÈš[\ÊNÈ‘SPTÑWÓPS’Q‘TÕšœÛÛ˜™š[™Ù\œš[ÈH™[X\ÙH
+HÛÛ[Z]H[™Ú[™KHÚ[œËHÔH›ÝØÛÛH]™H]šY[˜ÙH[™H™\šYšXØ][Û‚œ™XÙZ\
+H[™\È™]Üš][ˆžHÛÛËÜ™[X\ÙWÛX[šY™\ÝœX™Y›Ü™H]™\žH\Ú[™\ˆH]ÛˆÚ]Xˆ[œËˆH™XY\ˆÛ[™Â˜[žHÛ™HÙˆH™YHØ[ˆ[Ú]\ˆHš[\È[ˆœ›ÛÙˆ[H\™HHš[\ÈH™\Ý[ÈÙ\™HXYHÛ‹‚‚‹KKB‚ˆÈPÒÈPUT‚‚ˆÈÈÛÜÜØ\žB‚Ÿ\›HYX[š[™ÈŸKK_KK_Ÿ[YÛÛš\ÝZ\ˆH\ÚYH[™HÝÛˆÚYHÙˆH]\ØÛIÜÈÛÛ›ÛXXÚÚ]]ÈÝÛˆØZ[ˆŸ]]Üš]HÝÈ˜\ˆH™\›Ý\ÈÞ\Ý[H]È[ˆÜ™Ø[ˆ[Ý™H\ÈXÚ\Ú[ÛˆŸ˜[™H™XY[™ÉÜÈÜˆHÛ›Ø‰ÜÈØY™H˜[™ÙHŸÛÛ\\ÜÈH˜[™ÙY[ˆ\ÈHÜÚ][Ûˆœ›ÛH
+Ø[JHÈH
+H[™JKÚ]]È›ÝÛH[ˆHZYHŸU‘Sˆ\]X[^™Y™\šYšYY˜\Ù[[™K\]Z[Xœš][K™]]˜[ˆ˜]]™H[™Û[šHÛÝ[›Ý™HÛ\\
+HØ[YKÜˆ›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙJNÈHÙ^Kœ›ÛX]\ˆŸÐRSˆÜ›ÝÝY˜[YÙK[\›Ý™[Y[™]\ÜÚ]]™NˆHØ]YÙH[Ý™YHØ^H]ÈXÛ\™YZ[H\ÚÜËYØZ[œÝ˜]]™NÈH™\ÛÝ\˜ÙHÝ]\ÈHÐRSŽÈHÙ^Kœ›ÛX]\ˆŸÐRSˆ[ˆ[™YHÙˆÝ\ˆ[œÈHØ[YHÚYÛˆ[ˆ[™YH[œÈ
+K‹ÊK]™\žHMIH[\˜[ÛX\ˆÙˆ™\›Ë[™]ÚYÛˆHÐRSˆ›ÜˆHØ]YÙIÜÈZ[HŸÔÔÈXZØYÙKÙ™‹]˜XÚËÙ]˜XÚËÝXœ\ŽˆHØ]YÙH[Ý™YYØZ[œÝ]ÈXÛ\™YZ[H
+\ÜÈÛÜšËHÛ™Ù\ˆØZ][Ü™HZ\ÜÙ\ÊNÈ]ÚÝ[™]™\ˆ\X\‹[™Ú\™H]Ù\È]\ÈÚÝÛ‹]ÈØ]\ÙH›Ý[™[™š^YÈHÙ^Kœ›ÛX]\ˆŸÝÙ\ˆÚ]™[ˆH™\ÛÝ\˜ÙHÜ[Üˆ[]›ÜÙNˆÚ]Û[šH][ˆÈ^HHÛÜšÈ[™ÜYY™\ÚYH]ÈÚÝÛ‹™]™\ˆØ[YHÜÜÈŸÛÝ™\ˆHÛ›Ø‰ÜÈ\™˜[™ÙNÈ]™\žHÜš]H\ÈÛ\YÈ]ŸÝ\Ú[ÛˆHIH]XXÚYÙHÙˆHÛÛ\\ÜËL	H[ˆ[ŸVVSLHHÛÛ\[žIÜÈ[X™\‹KNQVVSLK™XY[ˆÜ™\ˆ\ÈH[™Ú[™H[œÎˆV]H^Ú[™ÙH
+H[œ]HÛË]Ø^HYÊNÈSZY[[Z][™H
+H›Ý[™\žNˆ]™\žH]\ØÛH\È]ÈÝÛˆZY[[Z]™]™\ˆ\Ý]
+NÈKÛ™HÛÜÙYÛÜ
+HÝ]]È[ˆÛÙHH\ÈYK[ˆØÚY[˜ÙHH\È[š]JHŸ˜Z[\H™]\›ˆÈ[Ø\XÚ]HH[ÛY[Ù\šXÙHÜ›ÜÜÙ\ÈHØ[ÜˆHÙ[œÙHÛÙ\È›[™ŸÛÝ™\››ÜˆH›ØÙ\ÜÈ]™XYËXÚY\È[™Üš]\ÎÈÛ[šKPÛÛ\\ÜÈŸ]\ØÛH[žHXXÚ[™KÙ\šXÙHÜˆÛÛ›Û\ˆÛ[šKPÛÛ\\ÜÈ™XYÈ[™Ù]ÈŸ˜]]™HHÞ\Ý[H\È][œÈÚ]Ý]Û[šKPÛÛ\\ÜÈŸ›ÈY™™\™[˜ÙH™^[Û™H›Ú\ÙH[ˆ[\˜[Ý™\ˆ™\›È[ˆ]X\ÝÛ™H[Žˆ˜]]™H[™Û[šHÛÝ[›Ý™HÛ\\ÈH™\Ý[Ý]Y\ÈÝXÚŸÙ™ˆHÛØÚÈH™\]][Ûˆ[ˆÚXÚZ]\ˆ\›H[™Y[Ü™H[ˆIHÙˆ]ÈÚ[™ÝÈ]NÈX\šÙYHZ\š[™ÈÝ[™ÈŸÜ™Ø[š\ÛHHÙ]Ùˆ]\ØÛ\È[ˆÙÙ]\ˆÛˆÛ™HÛØÚÈŸÛ[šH[™^HÛ™HÛÛXš[™Y[X™\ŽˆHÙ[ÛY]šXÈYX[ˆÙˆ]™\žH™X[Ø]YÛÜžIÜÈÛÜšËÜYYXXÚ[™\È[™[™\™ÞH˜][ÜËXXÚ™XYžHH™YK\[ˆ[HŸÛ[šHŒKŒ‹ŒÈHœ›Þ™[ˆ[™Ú[™\Ëš[™Ù\œš[Yš[HžHš[NÈH™\Ý[™[Û™ÜÈÈH[™Ú[™H]ÈÛÛ[Z]Ø\œšY\ÈŸYÈHÛË]Ø^HÛÛ›™XÝ[ÛˆÈÛ™H]\ØÛNˆ™XYÜš]K™XY˜XÚË™\ÝÜ™HŸÛÛ
+^\™JHÛ™HXXÚ[™H˜[Z[H[™\ˆ^\™IÜÈ]]ÜØØ[\ˆÚ]]ÈÝÛˆÙZ[[™ÎÈÙ]™\˜[ÛÛÈXZÙHH›Y]Ÿ›Ùš[HH˜[YYÙ]ÙˆHÛÛ\\ÜÉÜÈÙ][™ÜÈ›ÜˆÛ™HÚ[™ÙˆÛÜšÎˆÙ\šXÙH
+HY˜][
+HÜˆ˜]ÚŸ˜XÙH[ÜYY]Û˜ÙHÚ[HÛÜšÈØZ]ËÛÈH\œÝ\È™]™\ˆÙ\™YÛÝÛHŸZY[[Z][™HH]\ØÛIÜÈÝÛˆ[Z]™XY]™NˆÛ[šKPÛÛ\\ÜÈZÙ\È]šYÚ\ÈH[™H[™™]™\ˆ\Ý]\È[ˆ[™Ú[™Y\ˆØYÈHX]\šX[\È]ÈZY[[Z]H[ÜÝ]Ø\œšY\È[™Ý[Üš[™ÜÈ˜XÚÈ[š\›YYŸÜYY›ÛÜˆHÛØÚÈHØ\™™XXÚ\ÈÛˆ]ÈÝÛˆÚ[H\ÞKX\›™Yœ›ÛH]ÈÝÛˆY]\ŽÈHÛÝ™\››Üˆ™]™\ˆÙ]ÈHÙZ[[™È[™\ˆ]Ÿ™XÙZ\HZ\™Y™XÛÜ™Ùˆ˜]]™HYØZ[œÝÛ[šKPÛÛ\\ÜÈ›ÜˆÛ™H[ˆŸÛ˜\ÚÝHÛ›Ø‰ÜÈ˜[YH™XYÛ˜ÙH™Y›Ü™HHš\œÝÜš]NÈH™\ÝÜ™HÚ[ŸH[œÈ\ØYÜ™YH[œÈÛX\ˆÙˆH›Ú\ÙHÚ[Y™™\™[Ø^\ÎÈH\Ý\È[œÝX›HÛˆ]YX\Ý\™H[™\ÈÛÚÙY[ÈŸÚ\™HÚXÚÈH\Ý]›Ý™\È]™\žHÚ\™H›ÛÝÜË™XYÈ˜XÚÈ[™™]\›œÈ™Y›Ü™H[ž][™È[œÈŸÛÜšÈ\ˆ[™\™ÞHÛÜšÈÛ™H]šYYžH[™\™ÞH\ÙYÈHš[X\žHÝ]ÛÛYHŸÛÜšÈ[œÚYHH[™HH™\]Y\ÝË˜[œØXÝ[ÛœÈÜˆY\ÜØYÙ\ÈHÙXÛÛ™[œÝÙ\™YÚ][ˆH™\ÜÛœÙH[™NÈH›ÙXÝ[X™\ˆÛˆ]™\žH™X[ÝXÚÈŸÛ™HY[\Ú›Üˆ[Ü™KYÙ™ˆ›Üˆ\ÜËYH
+HY[YY[HØ^JK™\Ù]
+]™\ž][™È˜XÚÈÈ˜]]™JNˆÝÈHÛÝ™\››Üˆ[Ý™\ÈØ\XÚ]H[™\ˆ]]Ü[ÝŸÜZ\ÙH]™\žHXXÚ[™H[ˆÙ\šXÙHÚ[HÛÜšÈØZ]È›ÜˆHXÙK[Ú]Ý]ÙXÛÛ™YÝY\ÜÚ[™È[[H[™H\È™Y[ˆ[\H›ÜˆÛÈXÚ\Ú[ÛœÈŸYH]Û˜ÙHHÛÜšÈÛ™H[™[X[™]™\›ÎˆHY[YY[HØ^H[ˆÛ™H[Ý™K]™\žHØY™]HÚXÚÈÝ[Û[™ÈŸÚ[ÝÚ]ÚÙXÝ\š]HÛ›NˆÛ™HÝÚ]Ú[ˆH[X[ˆ[™]\›œÈ]™\žHÛÝ™\››ÜˆÛˆHXXÚ[™HÙ™ˆ]Û˜ÙNÈ™]™\ˆH™\Ù]ŸX\ÙHH™XÛÜ™]™\žHÛÝ™\››Üˆ™[™]ÜÈXXÚXÚ\Ú[ÛŽÈHX\ÙHÛ\ˆ[ˆ]È[Z]ÜˆHXY›ØÙ\ÜËXZÙ\ÈHØ]ÚÙÈ[™˜XÚÈ›Üˆ]ŸØ]ÚÙÈHÙ\šXÙH™\ÚYHHÛÝ™\››ÜœÈ][™È˜XÚÈ›Üˆ[žHÛÝ™\››Üˆ]YYÜˆ[™ÈÚ]Ý]Ú[™È]]Ù[ˆŸ™\™XÝHZ\™YšX[ÛˆH]\ØÛH]Ù[ˆ][ÝÜÈHÛÝÈÛ›ØˆÈ[Ý™HÛ›HÚ\™HHÛÜÝ\ÈÚ][ˆ‰NÈ›Y˜]]™HˆÚ\™H›ÈÝ\\ÜÙ\ÈŸÛXÚÈØ]HŒÉÜÈ[NˆH[Ý[Ûˆ^\È\ÞH[Ü™H[ˆ[ˆH[YH][ÜYYÙY\È]ÈÜYY˜]]™HŸ[š[™ÈØ\ÙHHÛ™HÛÜšÛØYÙ[ÜˆÝØ\›HH[\ÈÙ\™Hš]YÛŽÈÚÝÛˆ[ˆ]™\žHX›H[™™]™\ˆÛÝ[YŸ[ÝXÚYØ\ÙHHÛÜšÛØYÙ[ÜˆÝØ\›HH[\ÈÙ\™H\YYÈ[˜Ú[™ÙYÈHYÙY›ÝÜÈŸÛ™YHš[™H[ÈÙˆHÞ\Ý[IÜÈYX\Ý\™YØ\XÚ]KÚ\™H]È]Y]YH™YÚ[œÈÈÜ›ÝÎÈHœ›ÚÙ\‰ÜÈ˜]]™HØ\ÈÙ]\™HžH\ÚYÛˆŸ[Y[™Y[HÚ[™ÙHÈH™\™YÚ\Ý˜][ÛˆY\ˆ]Ø\ÈÜš][‹Ú]]È[YH[™™X\ÛÛŽÈÛ™HXYHY\ˆH™\Ý[Ø\ÈÙY[ˆØ^\ÈÛÈŸÙ[HÙXÛÛ™ÈY\ˆHÛ›Øˆ[Ý™\È\š[™ÈÚXÚH]ÈÚ[›Ý[Ý™H]˜XÚÈŸ›ÝÚHÛX[\ÝÝ\HÛ›Øˆ[Ý™\È[ˆÛ™HXÚ\Ú[Ûˆ
+Û™HÛÛœÝ[Y\‹PˆÙˆØXÚKÛ™H\
+HŸ]šY[˜ÙHÛ\ÜÈÈH\ÚXØ[Y]\ŽÈ]™HÛÙØ\™HÚ]›ÈY]\ŽÈH[Ù[ÙˆÝ\œÈŸ[™Y˜XÚÈHÛ›Øˆ™XY˜XÚÈ]HÜ\˜]Ü‰ÜÈ˜[YH]H[™Ùˆ[ˆ\›NÈ]™\žHX›HØ^\ÈÚ]\ˆ]™\žH\›HØ\ÈŸÙ™ˆHÛØÚÈÙYHX›Ý™NÈH™\]][ÛˆÚÜÙH\›H[™Y[Ü™H[ˆIHÙˆ]ÈÚ[™ÝÈ]HŸÝÛˆÛÜÝHÛÝ™\››Ü‰ÜÈÔH
+]È›ØÙ\ÜÈ[™]™\žHÛÛ[X[™]˜[ŠH\ÈHÚ\™HÙˆÛ™HÛÜ™HÝ™\ˆHÚ[™ÝËœ›ÛH]È]Y]ÈH™]ÈÝ\Ø[™ÈÙˆHÛÜ™H]]™\žHÚ^™HŸÛ[ÚÙH[ˆÛ™H™\]][Ûˆ]^\˜Ú\Ù\ÈH\›™\ÜÈ[™È[™™Y›Ü™H[žHÛÝ[Y[ŽÈ™]™\ˆÛÝ[Y[Ø^\È™XÛÜ™YŸ
+ÈÈ[ˆÜ™Ø[š\ÛH[ˆÚ]H™X[Û\Ý\ˆ[œÚYNˆHÛ\Ý\ˆ\ÈHÜ™Ø[š\ÛH\›Ý[™]ÈŸÛÜšÚ[™ÈÙ]H™XÛÜ™ÈHÛÜšÛØYXÝX[HÝXÚ\ÈÝ™\ˆHÚ[™ÝÎÈHØXÚH™[˜ÚX\šÈYX\Ý\™\È›Ý[™È[›\ÜÈHÛÜšÚ[™ÈÙ]™XXÚ\ÈHØXÚHŸÙ^HÜXÙHH™XÛÜ™ÈH™[˜ÚX\šÈX^H\ÚÈ›Üˆ]Û™H›ÝÚÈ[ˆH[Û™ÛÑˆ\ÝHÛ›Ø‰ÜÈØYÝ\YÛ™H›ÝÚ]H[YHŸ[šY›Ü›H˜]È]™\žH™XÛÜ™[ˆHÙ^HÜXÙH\]X[HZÙ[KÛÈHÛÜšÚ[™ÈÙ]\ÈHÙ^HÜXÙNÈPÔÐ‰ÜÈÚ\Yš\šX[ˆ˜]ÈÛÛ˜Ù[˜]\ÈÛˆH™]ÈÝ\Ø[™Ý™XÛÜ™ÈÚ]]™\ˆHÙ^HÜXÙHŸÜ™\™YÙ^\È™XÛÜ™È˜[YY[ˆØYÜ™\‹ÛÈH[ˆ]\ÚÜÈ›Üˆ™XÛÜ™ˆš[™È™XÛÜ™ŽÈH[ˆÚ]\ÚYÙ^\ÈYØZ[œÝ[ˆÜ™\™YØY\ÚÜÈ›Üˆ™XÛÜ™È]È›Ý^\ÝŸ[XØXÚHØ]HH[Û™ÛÑˆ[™™Y\È[NˆÛÝÈ™XYÈÜ›ÝÈHØXÚHÛ›HÚ[HHØXÚH\È[
+š[™H[È\ÙY
+K™XØ]\ÙHHZ\ÜÈ[ˆHØXÚHÚ]›ÛÛHÈÜ\™H\È›ÝHØXÚIÜÈÈY[™ŸY™™\ˆÛÛ[››Ñ‰ÜÈØXÚHÙˆX›H[™[™^YÙ\ËHÛ™HY[[ÜžHÙ][™È]™\žH^TÔSÜ\˜]ÜˆÚ^™\ÎÈ™\Ú^™YÛ›[™HžHHÙ\™\ˆ[ˆÚÛHÚ[šÜÈŸÚ[šÈH[š][ˆÚXÚ^TÔS™\Ú^™\È]ÈY™™\ˆÛÛ
+LŽPˆ\ÈÚ\Y
+NÈHÛ›Ø‰ÜÈ›ÝÚÛˆ]ÝXÚÈŸYÙHØXÚHHÜ\˜][™ÈÞ\Ý[IÜÈÝÛˆØXÚHÙˆš[HÛÛ[ÎÈÚ\™HH]Hš]È[ˆ]HÝÜ˜YÙKY[™Ú[™HZ\ÜÈ\ÈH™XYœ›ÛHY[[ÜžH[™HXÛÛ\™\ÜÚ[Û‹›ÝH\ÚÈ™XY[™HØZ[ˆ]˜Z[X›HÈHØXÚHÛ›Øˆ\ÈÛX[\ˆ‚ˆÈÈ\[™^HHÛÛ[X[™™Y™\™[˜ÙB‚Ÿ\ÚÈÛÛ[X[™ŸKK_KK_Ÿ™\šYžH]™\ž][™È]ÛŒÈ™\šYžKœXŸÚ^Ü™Ø[š\Û\Ë[Ù[Y]ÛŒÈÛÛËÜ[—ÜØØ[KœHK\[œÈˆK\ØØ[HÈK[Ý]\˜ŸH[Y\ˆ˜\ÚØÜš\ËÜØØ[WÛY\‹œÚŸÛË]Ú\™HØ\™[Ù[Y]ÛŒÈÛÛËÜ[—ÙÜWØØ\™œH\ˆÙœ™\ÚXŸÔHÚ\™HÚXÚÈÝYÈ]ÛŒÈÛÛËÙÜWÝÚ\™WØÚXÚËœHKYÜHŸÔKÚÛH™[˜ÚX\šÈ[ˆÛ™HÛÛ[X[™ÝYÈ›Ú\˜\ÚØÜš\ËÙÜWÜ™[YÜ[‹œÚˆ[‹›ÙÈ‰ŒH	˜ŸHÚ^Ü™Ø[š\Û\ÈÚ]H™X[Ø\™[œÚYH]ÛŒÈÛÛËÜ[—Ú[œHK[Ý]\˜ŸÔHÛÝ™\››Ü‹ÛÈÚ\™\ÈÝYÈ]ÛŒÈ[HÛ[šWØÛÛ›Û\‹™ÜWØÛÛ\\ÜÈK[[ÙHØ]ÚØ\‹‹˜ŸÝX™\›™]\ËØ]ÚÝX™XÝ\HYˆ\ÞKÚ[œÝ[ÛÛ[šKXÛÛ\\ÜËžX[[ŸÝX™\›™]\ÈZ\™Y[œÈØÜš\ËÚÚ[™ÜZ\™YœÚ[ˆÛÛËÛ]™WÜ™\ËœXŸÑ‘ˆ
+ÝX™\›™]\ÊHÝXÚÝ\ÛÛ[šKšÚ[ŸÑ‘ˆ
+ÔJHÝYÈÝXÚÝ\ÛÛ[šKYÜKZÚ[ŸHÚÛH\›™\ÜÈÑ‘‹Ó‹Ý]\ËØ]ÚÙÈ]ÛŒÈÛÛËÛÛ[šWÜÝÚ]ÚœHÙ™ŸÛŸÝ]\ßØ]ÚÙØŸÙX[ÚXÚÈ]ÛŒÈÛÛËÜÙX[œHKXÚXÚØŸÚXÚ[™Ú[™HHÚXÚÛÝ]ÜˆHÛÛ[Z]Ø\œšY\È]ÛŒÈÛÛËÛÛ[šWÝ™\œÚ[Û‹œHËKXÛÛ[Z]ÚO—XŸH™YK\[ˆX›H
+ÝX™\›™]\Ë^\™JH]ÛŒÈÛÛËØÛÛ™š\›WØX˜ËœH]Oˆˆ˜]ËÜ[‹OOˆ˜]ËÜ[‹Oˆ˜]ËÜ[‹OÏˆK[Ý]™\Ý[ËÛ]™KÕŒ×ÏTÕ‹›YŸH™YK\[ˆX›H
+]X˜\ÙKY\ÜØYÚ[™ËØXÚKÝØ\›\Ë›Ø›ÝËÜšYZ[[™ÜÊHÛÛËÜØ™[˜ÚØX˜ËœXÛÛËÚØYšØWØX˜ËœXÛÛËÜ™Y\×ØX˜ËœXÛÛËÜÝØ\›WØX˜ËœXÛÛËÛ]Z›ØÛ×ØX˜ËœXÛÛËÜ[™\ÝÙ\—ØX˜ËœXÛÛËØÚ][X\›—ØX˜ËœXHØ[YH\™Ý[Y[ÈŸHÚ^Ü™Ø[š\Û\ÈÚ]HÛ\Ý\ˆ[œÚYH]ÛŒÈÛÛËÜÚ^ÚÝX™WÜ™\ÜœH˜]È\œÏˆK[Ý]™\Ý[ËÛ]™KÕŒ×ÔÒVÒÕP‘K›YŸHÜšYÙˆÛÜY\È[™[œÈ]ÛŒÈÛÛËÙÜšYœX
+™XYÈ™\Ý[ËÜØØ[KÜ™XÙZ\ËØ
+HŸHÛ[šH[™^]ÛŒÈÛÛËÛÛ[šWÚ[™^œXŸÚXÚÛ›ØœÈX\›ˆHÚ\™H[ˆ
+Üš]KØ]ÚÜ\˜]Ü‰ÜÈÚÚXÙJH]ÛŒÈÛÛËÝÚ\š[™×Ý™\™XÝËœX
+KXÚXÚØÛÛ\\™\ÈHYÙHÚ]HX›\ÎÈ™\šYžKœX[œÈ]
+HŸÛ™H[X™\ˆ\ˆ™[˜ÚX\šË\È[Ø^\ÈÝØ\™HÞ\Ý[IÜÈÝÛˆZ[\È]ÛŒÈÛÛËØ™[™Yš]ÜÚY]œX
+KXÚXÚØHØ[YHØ^NÈ™\šYžKœX[œÈ]
+HŸH]X˜\ÙH™[˜ÚX\šËÛ™H[ˆ]ÛŒÈÛÛËÜ[—ÜØ™[˜ÚœHK[Ý]\˜
+ÛÜšÙ›ÝÈØ™[˜Ú
+HŸHY\ÜØYÙHœ›ÚÙ\‹Û™H[ˆ]ÛŒÈÛÛËÜ[—ÚØYšØKœHK\Ù]\[ˆK]ÛÜšÛØYÈYÚX]žK\œÝK[Ý]\˜
+ÛÜšÙ›ÝÈØYšØX
+HŸHØXÚKÛ™H[ˆ]ÛŒÈÛÛËÜ[—Ü™Y\ËœHK\Ù]\[ˆK]ÛÜšÛØYÈÛX[\™ÙK\œÝK[Ý]\˜
+ÛÜšÙ›ÝÈ™Y\Ø
+HŸH]X˜\ÙIÜÈÝÜ˜YÙKY[™Ú[™HØXÚH[™\ˆPÔÐ‹Û™H[ˆ]ÛŒÈÛÛËÜ[—ÞXÜØ‹œHK\Ù]\[ˆK]ÛÜšÛØYÈ‹Ë‹\œÝK[Ý]\˜
+ÛÜšÙ›ÝÈXÜØ˜
+HŸH]X˜\ÙIÜÈY™™\ˆÛÛ[™\ˆÞ\Ø™[˜ÚÛ™H[ˆ]ÛŒÈÛÛËÜ[—ÜÞ\Ø™[˜ÚœHK\Ù]\[ˆK]ÛÜšÛØYÈ™XYÛÛ›K™XYÝÜš]K\]WÚ[™^\œÝK[Ý]\˜
+ÛÜšÙ›ÝÈÞ\Ø™[˜Ú
+HŸH›Ø\Ý™\ÜÈ\ÝÛÜšÙ›ÝÈ›Ø\Ý™\ÜØˆØÙ[˜\š[ØÚ[ÜˆÛ™Ë™\Ø\˜][Û—ÜØÈHÝÛ‹XÛÜÝX›H]ÛŒÈÛÛËÛÝÛ—ØÛÜÝœH˜]È[ˆ\œÏˆK[Ý]™\Ý[ËÛ]™KÕŒ×ÓÕÓ—ÐÓÔÕ›YŸH›Û™HÝØ\›\ËÛ™HÙ[]ÛŒÈÛÛËÜ[—ÜÝØ\›KœHKXÙ[ÚÜZ^YÛ™ß[K[Ý]\˜
+ÛÜšÙ›ÝÈÝØ\›X
+HŸH[™\[™[Ú[][]ÜœÈ]ÛŒÈÛÛËÜ[—ØÚ][X\›‹œX[—Ü[™\ÝÙ\‹œX[—Û]Z›ØÛËœX
+ÛÜšÙ›ÝÜÈÚ][X\›˜[™\ÝÙ\˜]Z›ØÛØ
+HŸ^\™KHš[ÛÜšÙ›ÝÈZÜË[Y]\™Yˆ™\Ø\›\Ø\˜][Û—ÜØØYÜÝ\ØÛÜšÙ\—ÜÛÛØÛÛÜšXÙ\ØWÛX^ŸHšYÈÜ™Ø[š\Û\Ë]XÚYÛÜšÙ›ÝÈšYË[Ü™Ø[š\ÛKY]XÚYˆ[ÙXÝ\ÈÛÛXÝÈÝ\™^KÜ™Ø[š\Û\ØÚ^™X\˜][Û—ÜØÛÛ[Z]X^ÚÝ\œØŸ\˜Ú]™HHš[š\ÚY[ˆÚ]HÛÙHY]ÈYÈ™Ú]X‹Ø\˜Ú]™WÜ™\]Y\Ý[™\Ú
+ÛÜšÙ›ÝÈ\˜Ú]™K\[˜
+HŸ™\šYžH™Y›Ü™HH\Ú\ÈÚ]Xˆ[œÈ]]ÛŒÈÛÛËÜ™[X\ÙWÛX[šY™\ÝœX[™\ˆ]ÛˆËŒLŽˆRS‚ˆÈÈ\[™^ˆHš[HX\‚Ÿ]ÛÛ[ÈŸKK_KK_ŸÛ[šXÛÛ\\ÜËØH[™Ú[™KÛÝ™\››Ü‹™\›Ý\ÈÞ\Ý[KÚY[ÛÛ\\ÜËÛÛ™^X[˜ÙH]ËHÛÛ\\ÜÈŸÛ[šWØÛÛ›Û\‹ØHÝX™\›™]\ÈÛÛ›Û\ˆ[™]\ØÛ\ÎÈHÔHÛÝ™\››ÜœÈ
+Û™H[™ÛÈÚ\™\ÊHŸ™X[\ËØHKLË[]\ØÛHØ][ÙÈÙˆH
+Ø][Ù×ÝK˜ÜÝ˜ÈŒÉÜÈMH[ˆØ][ÙË˜ÜÝ˜œ›Þ™[ŠK]™\žH]\ØÛIÜÈÝÛˆØ\™
+]\ØÛWØØ\™×ÝK˜ÜÝ˜
+KH[[Ù[ËH™X[H\›™\ÜËHÛÛ\\ÜÈÛˆ]™\žH]\ØÛH
+HX^ÛÛ\\Ü×Ø\›WÝKœX
+KH[Ù[YØ\™ŸÛÛËØ™[˜ÚX\šÜË™XÙZ\ËHÚ\™HÚXÚËHØØ[HY\‹HØ\™ÙX\˜Ú
+[™WØØ\™ËœX
+KX[šY™\ÝËÙX[ÈŸØÜš\ËØÛ™KXÛÛ[X[™[œÈ
+ÔKÝX™\›™]\ËY\ŠHŸ\ÞKØÛÛZ[™\ˆ[XYÙK[œÝ[[™\›Z\ÜÚ[Ûˆš[\ÈŸÜØHÊÊÌŒÚ[œÈŸ™\Ý[ËØ]™\žHX›\ÚY™\Ý[Ú]]È˜]Èš[\È[™ÚXÚÜÝ[\ÈŸ™\Ý[ËÛ]™KÕŒWÊ‹›YŒ×Ê‹›Y
+
+ÈšœÛÛ˜
+HH™YK\[ˆX›\ËÛ™H\ˆ\Ý˜[YYžHH[™Ú[™H^H˜[ˆÛˆŸ™\Ý[ËÛ]™KÜ˜]ËÜ[‹OY‹Ø]™\žH\˜Ú]™Y[‰ÜÈš[\ËÛ™HÒKLMˆX[šY™\Ý\ˆ™\]][ÛˆŸ™\Ý[ËÜØØ[KÑÔ’Q›Y™\Ý[ËÜ™X[\ËÔ‘PSTË›Y™\Ý[ËÓÓS’WÒS‘V›YHÜšYÙˆÛÜY\È[™[œËH[Ù[Y™X[\ËHÛ™HÛÛXš[™Y[X™\ˆŸÓS’WÕŒKšœÛÛ˜ÓS’WÕŒ‹šœÛÛ˜ÓS’WÕŒËšœÛÛ˜Hœ›Þ™[ˆ[™Ú[™\ÉÈš[™Ù\œš[ÈŸØÜËØ\ÈX[X[H™\™YÚ\Ý˜][ÛœËH]šY[˜ÙHYÙ\‹H[Ü™[KH™X[HÝYHŸØÜËÓÓS’WÕŒK›YÓS’WÕŒ‹›YÓS’WÕŒË›YÚ]XXÚ[™Ú[™H\È[™]™\žH™\Ý[™XYÛˆ]ŸØÜËÔ‘QÒTÕT‹›YØÜËÔ“ÓÑ—Ô“ÑÔSK›Y]™\žH]\ØÛK]™\žH™[˜ÚX\šÈ[ˆ[™]™\žH™[˜ÚX\šÈÝ[È[ŽÈH›ÙÜ˜[HÈ[Ú^™HŸ™Ú]X‹ÝÛÜšÙ›ÝÜËØ]™\žH™[˜ÚX\šÈ\ÈÚ]Xˆ[œÈ]ˆ™[˜ÚX\šË\™\ØÚ^Ú^ZÝX™XšYË[Ü™Ø[š\ÛXšYË[Ü™Ø[š\ÛKY]XÚYZÜË[Y]\™YØ™[˜ÚØYšØX™Y\ØXÜØ˜Þ\Ø™[˜Ú›Ø\Ý™\ÜØÝØ\›XÚ][X\›˜[™\ÝÙ\˜]Z›ØÛØ\˜Ú]™K\[˜™\šYžXŸ\ÝËØ™\šYžKœX]™\žH[š][™›Ü\H\ÝHÚY[	ÜÈY™\œØ\šX[Ø\Ù\ËH]Û‹XYØZ[œÝPÊÊÈYÜ™Y[Y[È™\šYžKœX[œÈ[H[[™]\Ý[™Ú]]È\ÜÈ[™HŸÛÛËÛÛ[šWÝ™\œÚ[Û‹œXÛÛËÜ™[X\ÙWÛX[šY™\ÝœXÛÛËÛ^[Ý]ØÚXÚËœXÚXÚ[™Ú[™HHÚXÚÛÝ]ÜˆÛÛ[Z]Ø\œšY\ÎÈH™[X\ÙHX[šY™\Ý[™™\šYšXØ][Ûˆ\ÈÚ]Xˆ[œÈ]ÈHÚXÚÈ]]™\žH]HØÝ[Y[È˜[YH^\ÝÈŸÛÛËØÛÛ™š\›WØX˜ËœX[™]ÈÚX›[™ÜÈ
+Ø™[˜ÚØX˜ËœXØYšØWØX˜ËœX™Y\×ØX˜ËœXXÜØ—ØX˜ËœXÞ\Ø™[˜ÚØX˜ËœXÝØ\›WØX˜ËœX]Z›ØÛ×ØX˜ËœX[™\ÝÙ\—ØX˜ËœXÚ][X\›—ØX˜ËœX
+HH™YK\[ˆX›\ËÛ™HÛÛ\ˆÚ[™Ùˆ˜]È™XÛÜ™XXÚÚXÚÚ[™ÈH[™Ú[™HÙˆ]™\žH[ˆ]™XYÈŸÛÛËÛÛ[šWÚ[™^œXÛÛËÙÜÜÚY\‹œXÛÛËÛÝÛ—ØÛÜÝœXHÛ™H[X™\ˆœ›ÛHHX›\ÎÈHÜÜÚY\ˆœ›ÛHHX›\ÎÈHÛÝ™\››Ü‰ÜÈÝÛˆÛÜÝœ›ÛHH\˜Ú]™Y]Y]ÈŸÛÛËÝÚ\š[™×Ý™\™XÝËœXØÜËÕÒT’S‘×Õ‘T‘PÕË›Y™\Ý[ËÕÒT’S‘×Õ‘T‘PÕË˜ÜÝ˜H™\™XÝ\ˆÛ›Øˆœ›ÛH]™\žHX›NˆÜš]KØ]ÚÜˆHÜ\˜]Ü‰ÜÈÚÚXÙK]™\žHÜÜÈÚ]]ÈØ]\ÙNÈÛ™H›ÝÈ\ˆÛ›Øˆ[™\ˆ]\ØÛHŸÛÛËÚÛ›Ø—Ý™\™XÝœXHœ˜Z[‰ÜÈÝÛˆ™\™XÝÛˆH]™HÛ›Ø‹\›Ý[™H[™Ú[™IÜÈÛ[šXÛÛ\\ÜËÝ™\™XÝœXˆØ]Úš\œÝÛ™H›ÝÚHšX[H[ÝØ[˜ÙKHÛÈØš™XÝ]™\ÎÈ\ÙYžHHš]™H]™H\›™\ÜÙ\ÈŸÛÛËØ™[™Yš]ÜÚY]œXØÜËÐ‘S‘Q’UÔÒQU›Y™\Ý[ËÐ‘S‘Q’UÔÒQUšœÛÛ˜Û™H[X™\ˆ\ˆ™[˜ÚX\šÈœ›ÛHHX›\Ë\È[Ø^\ÈÝØ\™HÞ\Ý[IÜÈÝÛˆZ[\ËÚ]Y\Ë›Ë›Û™HÜˆ˜YH™\ÚYH]ŸÛÛËÛYØ[œXHYØ[›ÝXÙH]™\žHÙ[™\˜]Y™\ÜØ\œšY\È]]ÈXY[™›ÛÝŸØÜËØ›ÛÚËØHZ[\ˆÙˆ\ÈX[X[	ÜÈˆ
+Z[Ø›ÛÚËœX
+H[™H[ÜžHÚ\\œÈ›Ý[™[È]Ÿ™[X\ÙKØHÛÜ\šYÚ\ÜÚ][™H™[X\ÙH›Ý\Ëš[Y]˜[YYÛÛ[Z]ÈŸÒS‘ÑSÑË›YØÜËÔÕUWÓÑ—ÔVK›YÚ]Ú[™ÙYžH]NÈÚ\™H]™\ž][™ÈÝ[™ÈÙ^HŸØÜËÊ—Ô‘T‘QÒTÕUSÓ‹›YH[\ÈÙˆ]™\žH™[˜ÚX\šËÜš][ˆ™Y›Ü™H]˜[‹Ú]]™\žH[Y[™Y[[™]È[YHŸØÜËÑÔÔÒQT‹›YØÜËÙÜÜÚY\‹Ø]™\žH™\Ý[[ˆÛ™HXÙKÚ]]ÈÚ\ËZ[žHÛÛËÙÜÜÚY\‹œXœ›ÛHHX›\ÈŸØÜËÒTÕÔ–K›YØÜËÚ\ÝÜžKØX\›Y\ˆÝ]\ÈÙˆ^KX\›Y\ˆ[™Ú[™\ÉÈÙ]È[™H™K]ŒH[™^Ù\ÚÛHŸPÑS”ÑX“ÕPÑXPÑS”ÑTËØHXÙ[œÙH[™›ÝXÙ\È‚ˆÈÈ\[™^ÈHH\]X][ÛœÈ[ˆ[‚ˆ
+JHKÙHX[WÑHH
+È™]WÚ[
+È™]WÙ^
+È—ÙY™‚ˆ
+ŠHKÙH]HH
+HHWŒŠHH
+KÙ
+KÑWÛX^H[X™WÕHH
+ÈK_HWÐUUÔ’UHHBˆ
+ÊHWÕKÙH
+HHJHHÚYÛXWÌHHH[HÈH[X™WÒHWÕBˆ
+
+H—ÙY™ˆHÛÜÊÛYYØWÐˆÈŠH
+ˆÈ
+ˆ[š
+[X™WÌ
+È[X™WÌH
+HHJH
+È[X™WÌˆÊBˆ
+JHJÊHH[WÜÈ×ŒˆÈˆ
+È™]WÜÈ×ŒÈÈH[HÂˆ
+ŠHËÙHYKÙÈH[HH[WÜÈÈH
+ËÍ
+H™]WÜÈ×Œ‚ˆ
+ÊH‹ÙH—ÙÝÈ—ÙÝÙHØ[[XWØÈ[HÈH
+ÛYYØWÐˆÈWÐŠH—ÙÝHÛYYØWÐ—Œˆ‚ˆ
+
+H—Ð–Û—HHš[š]KYY™™\™[˜ÙH]Y]Ùˆ
+ÊNÈ™]™\ˆ™Y˜XÚÈ[ÈHÝ]B‚ˆÛÛ›Û
+Û™HZXÜ›ÈÝ\™\›Ë[Ü™\ˆÛXÜ›ÜÜÈ[›Ý\ˆ’ÍÝYÙ\ÊN‚ˆHHÛ\
+Y—ÕJ
+H
+È×Ô
+ÚYÛXHHJKUWÐUUÔ’UK
+ÕWÐUUÔ’UJK×ÔHL‹ÚYÛXH[ˆËLK
+Ì_B‚ˆHÛÛ\\ÜÈ
+]™\žH]\ØÛJN‚ˆHÜÚ][ÛˆÙˆHÙ\šXÙH™XY[™È[ˆ]È˜[™
+Ø[KHH[™JBˆˆHH[š
+
+×Ô
+HÙ[\ŠH
+È×ÑŠHÈJK×ÑHÜš]XØ[[\[™ÂˆHŽMHOˆ[\›Ü˜ÙNÈÝÛˆÚYH[ˆÛ›ØˆHÛ\
+Û›Øˆ
+È×ÜÚYHˆÜ[‹ÛÝ™\ŠB‚ˆHÔHÛÝ™\››Üˆ
+ÛÈÚ\™\ËÛ[šWØÛÛ›Û\‹ÙÜWØÛÛ\\ÜËœNÈÛ™H]Ë[Y[™Y[ÈÈL
+N‚ˆH
+YX[ˆ™\ÜÛœÙHÙˆH\ÝHÈHÊHÈ
+ÓÈHÊKÈHÓÈÈLÈMHHÓËH˜Z[\™K›[™Oˆ˜Z[\ˆ˜Z[\È˜XÙH
+][^˜][ÛˆHŽMJHOˆÙZ[[™ÈHÜÛØÚËYHÝ\[Z]
+HØ\™	ÜÈÝÛˆÙ][™ÜÊBˆÝXYH[™\ˆH[Z]
+Ø]\˜]Y[™˜]Ú[™ÈHŽMÈÙˆH[Z]
+HOˆÙZ[[™ÈHHØ\™	ÜÈÝÛˆ\ÞHÛØÚËˆYHÝ\[Z]
+HØ[YHØ]Ë›ÈÛ›ØÚËX˜XÚÜÊBˆÝ\Ú\ÙN‚ˆÙZ[[™ÈHÛ\
+ÙZ[[™È
+È›Ý[™
+×ÜÚYHˆ—ÝÜÈMHRŠHMHR‹×Ù›ÛÜ‹—ÝÜ
+Bˆ×Ù›ÛÜˆHX^
+—Ø\ÞWÛÝÛˆ›ÛÜ‹—ÝÜHÊˆMHRŠH
+™]™\ˆ[™\ˆHØ\™	ÜÈÝÛˆ\ÞHÛØÚËˆ™]™\ˆ\ÝH™\™XÝ	ÜÈY\\ÝÝ\ÊŠBˆYHÛ\
+ÙZ[
+KŒLØ\ÞWÛÝÛŠK[™[ÜH›ÛÜ‹Ý\[Z]
+Bˆ×Ý\ŒL×ÙÝÛˆŒLKÙ[\ˆ›ÛÜˆKŒ‚ˆH™\™XÝ
+Û[šXÛÛ\\ÜËÝ™\™XÝœNÈ]™\žHÛÝÈÛ›Ø‹HÔHÙZ[[™È[™HÝX™\›™]\ÈXXÚ[™HÛÝ[
+N‚ˆ™Y™\™[˜ÙHˆHHYYX[ˆÛÜÝ\ˆ™\]Y\Ý]HY\\Ý[ÝÙYÝ\YX\Ý\™Yœ™\ÚˆHÌ™\]Y\ÝÂˆšX[HHYYX[ˆÛÜÝ]Û™HÝ\\Ý]ˆHÌ™\]Y\ÝË[™\ˆHØ[YH˜Y™šXÂˆ[ÝÈHÝ\Y™ˆHˆ
+H
+ÈJH[™H×Û˜]]™H
+H
+ÈJKHHŒ‚ˆH™Y\ÙYÝ\\È›ÝšYYYØZ[ˆ›ÜˆˆXÚ\Ú[ÛœÈ
+ÔHˆHLÈÝX™\›™]\ÈLŒ
+NÈHÛ›Øˆ™]™\ˆÛÙ\È\ÝBˆY\\Ý[ÝÙYÝ\ÛÈÝ\ÈØ[››ÝY\™^[Û™H[ÝØ[˜ÙB‚ˆÝX™\›™]\ËHÛÛ\\ÜÈÛˆHH\™Ù]
+Û[šWØÛÛ›Û\‹ØÛÛ›Û\‹œNÈÙ]ÈÌ[™ÌJN‚ˆ\™Ù][ˆÌˆÛÜÛÜH
+[Y\ÈHÛÛ™^YYØZ[ŠNÈH\›Ü˜ÙHÝÙ\œÈ
+[Ü™HÙÊBˆHŽMHœ›ÛHØY
+[™Hœ™XXÚY]™\žHÙ[œÙH]™K›Ý[™È[™[™ÊHOˆHˆÛÜ]Û˜ÙBˆHŽMHœ›ÛHH›[™Ù[œÙHÜˆÙÈØZ][™È›ÜˆHÜÝXXÚ[™HOˆHÛÜ
+˜]]™IÜÈÝÛŠBˆ˜][Ý™\ˆ
+Ù[\‹[™HÛX[‹›Ý[™È[™[™ÊHOˆHÛÜ]Û˜ÙK™]™\ˆ[ˆXXÚ[™\ÎˆÛ™H[Ü™H]Û˜ÙH\ÝHØ[ÈÛ™H˜XÚÈÛ›HÚ[ˆH™\™XÝ[™H™[X\ÙHØ]HYÜ™YBˆ×Ý\ŒL×ÙÝÛˆŒ‹™[X\ÙH›Ü˜ÙHLŒ‚‚ˆH›ÙXÝ]š]H\š]Y]XÈ
+]™\žH™XÙZ\ÈX[X[ÙXÝ[ÛˆË
+N‚ˆÛÜšÈÈ\]X[[ˆ›Ý\›\ÎÈÈH×Û˜]]™HÈ×ÛÛ[šHHNÈHØ[YHÛÜšÈ™YYÈKÊH
+ÈÊHÙˆH™\ÛÝ\˜Ù\ÎÂˆØ]š[™ÈÈHÈÈ
+H
+ÈÊNˆÈHKÌÈOˆÈHKÍ‚”\˜[Y]\ˆ˜[™Ù\ËY˜][È[™H›ÛÙˆÙˆÛÛ™\™Ù[˜ÙNˆÛ[šXÛÛ\\ÜËØÛÜ™KœXØÜËÕPÒÒS‘×ÕSÔ‘SK›Y˜ØÜËÐÐS“Ó’PÐSÑS‘ÒS‘K›Y‚‚ˆÈÈ\[™^HY]šXÜÂ‚‘]™\žHØ]YÙKÚ\™H]ÛÛY\Èœ›ÛK[™Ú]\ˆ]\ÈYX\Ý\™YÜˆ[Ù[YˆØÜËÓQU’PÔ×ÐÐUSÑË›YˆHØ]YÙ\È]˜\X\ˆ[ˆH™YK\[ˆX›\ÈÙˆ\ÈX[X[Ú]Z\ˆÛÝ\˜ÙH[™Z\ˆ\™XÝ[Û‹\™H\ÙN‚‚ŸØ]YÙHÛÝ\˜ÙHYX\Ý\™YÜˆ[Ù[Y\™XÝ[ÛˆŸKK_KK_KK_KK_ŸÛÜšÈ[œÚYHH™\ÜÛœÙH[™H
+™\]Y\ÝË˜[œØXÝ[ÛœÈÜˆY\ÜØYÙ\ÈHÙXÛÛ™[œÝÙ\™YÚ][ˆH[™JHH›Ø™IÜÈÝÛˆ™XÛÜ™ËØ™[˜Ú	ÜÈÙËHÛÛœÝ[Y\œÉÈ™XÛÜ™ËH\XØ][Û‰ÜÈ™XÛÜ™ÈYX\Ý\™YHZ[H\ÈYÚ\ŽÈH›ÙXÝ[X™\ˆŸ™\ÜÛœÙH[YKYX[‹YYX[‹M][™N]\˜Ù[[HHØ[YHYX\Ý\™YHZ[H\ÈÝÙ\ˆŸ[YHÝ™\ˆH™\ÜÛœÙH[™H
+Ú\™HÙˆØ[\\ÊHHØ[YKYØZ[œÝH™\™YÚ\Ý\™Y[™HYX\Ý\™YHZ[H\ÈÝÙ\ˆŸ˜Z[Y™\]Y\ÝËÜÝY\ÜØYÙ\ÈHØ[YHYX\Ý\™Y[žH[˜Ü™X\ÙH\ÈX\šÙYŸ[\Z[]\ÎˆÚÛHZ[]\ÈÚÜÙHM]\˜Ù[[K˜Z[Y™\]Y\ÝÈÛÝ[YÝ™\‹Ø\ÈÝ™\ˆH[™HH›Ø™IÜÈÝÛˆ™XÛÜ™ËZ[]HžHZ[]HYX\Ý\™YHZ[H\ÈÝÙ\ŽˆHZ[]\È[ˆÛ‹XØ[YÙHÛÝ[™HÜ[ˆŸÙ][™ÜÈÛÛ[X[™ÈHÛÝ™\››ÜˆÜ›ÝHÛˆ]ÈÝÛˆHÛÝ™\››Ü‰ÜÈ]Y]YX\Ý\™YÚÝÛ‹›ÝYÙY
+›È\œÛÛˆÝXÚYZ]\ˆ\›JHŸHÛÝ™\››Ü‰ÜÈY][ÛœÈXÚYYÚ[HHÙ\šXÙHØ\ÈÝ[[œÚYH]È[™H
+	HÙˆ]ÈY][ÛœÊHHÛÝ™\››Ü‰ÜÈ]Y]YX\Ý\™YÚÝÛ‹›ÝYÙYŸÛÜšÙ\ˆXXÚ[™\È[ˆÙ\šXÙKYX[ŽÈ›ÙKZÝ\œÈHÛ\Ý\‰ÜÈÝÛˆ›ÙH™XÛÜ™È]™\žHMHÈYX\Ý\™Y
+XXÚ[™KZÝ\œÈÛˆÚ[™È^\™IÜÈÝÛˆÛÝ[ÛˆRÔÊHHZ[H\ÈÝÙ\ˆŸÛÛ\]Hš[]\ÝšXÙH^\™IÜÈÝÛˆXXÚ[™HÛÝ[0åÈ\ÝšXÙH\ˆ˜[Z[HYX\Ý\™Y
+H™X[š[
+HHZ[H\ÈÝÙ\ˆŸ[™\™ÞH
+Ú
+KHÝ[™žH[Ù[HXÛ\™Y›Ü›][HÝ™\ˆHXXÚ[™\È[ˆÙ\šXÙH
+Ú[™
+H
+Š›[Ù[Y
+Š‹ØZYÛÈÛˆ]™\žH[™HHZ[H\ÈÝÙ\ˆŸÜÝÔH\ÞNÈÜÝÔK\ÙXÛÛ™ÎÈÔK\ÙXÛÛ™È\ˆK[š]È[œÚYHH[™HÜ›ØËÜÝ]ÙˆH™X[XXÚ[™H[™\ˆH\ÝYX\Ý\™YHZ[H\ÈÝÙ\ˆŸÛ[šIÜÈÝÛˆÔH
+ÛÜ™\ÊKYX[ˆHÛÝ™\››Ü‰ÜÈ]Y]
+]È›ØÙ\ÜÈ[™]™\žHÛÛ[X[™]˜[ŠHYX\Ý\™YÚÝÛ‹›ÝYÙY[ˆHÝX™\›™]\ÈX›\ÎÈHÜÜÈ[ˆ[™YHÙˆÝ\ˆ[œÈÚ\™H]\ÈÛ™HŸÛÛ›™XÝ[ÛœÈ[Ü[‹ÛÛœÝ[Y\œÈ[›š[™ËY[[ÜžHÙZ[[™È[HÛÛ\‰ÜËHÜ›Ý\	ÜËHØXÚIÜÈÝÛˆ™\ÜÈYX\Ý\™YHZ[H\ÈÝÙ\ˆ
+H™\ÛÝ\˜ÙH[
+HŸØXÚH]˜]NÈÛÛœÝ[Y\ˆYÈ™Y\ÉÜÈS‘“ÎÈHÛÛœÝ[Y\œÉÈ™XÛÜ™ÈYX\Ý\™YHZ[H\ÈYÚ\ŽÈHZ[H\ÈÝÙ\ˆŸH™\XØ\ËÙÈÝ\YÙÝ\ØZ]HTHÙ\™\‰ÜÈÝÛˆ™XÛÜ™ÈYX\Ý\™YÚÝÛ‹›ÝYÙY^Ù\ÙÝ\ØZ]ŸÜ™Ø[š\ÛHÛÜšË[™\™ÞK[YHÝ™\ˆ]È[™HHÜ™Ø[š\ÛIÜÈ[[Ù[È
+Š›[Ù[Y
+ŠˆžH\™XÝ[ÛŽÈÈÛ\ÜÈŸ[™\™ÞHHZ\ÜÚ[Û‹Z\ÜÚ[ÛœÈHÚ\™ÙH
+›Û™\ÊHHÚ[][]Ü‰ÜÈ[ÝÜˆÛÛœÝ[È›ÝYÚHXÛ\™Y[Ù[
+Š›[Ù[Y
+ŠˆÝÙ\ŽÈYÚ\ˆŸØXÚHÚ^™H[YX[ŽÈž]\È[ˆHØXÚKYX[ŽÈYÙ\È™XY[ÈHØXÚH
+[Û™ÛÑŠHHÙ\™\‰ÜÈÝÛˆÙ\™\”Ý]\Ø
+Ú\™YYÙ\ˆØXÚJHYX\Ý\™YHZ[H\ÈÝÙ\ˆ
+H™\ÛÝ\˜ÙH[
+NÈÚÝÛ‹›ÝYÙY
+YÙ\È™XY
+HŸÙXÛÛ™Èœ›ÛHHÚ[È]™\žHÙ][™È˜XÚÈ]HÜ\˜]Ü‰ÜÈ
+›Ø\Ý™\ÜÊHH\›™\ÜÈÛ[™ÈHÛ\Ý\ˆÛ˜ÙHHÙXÛÛ™œ›ÛHHÚ[YX\Ý\™YHZ[H\ÈÝÙ\ŽÈ\ÝŒÈX\šÙYÈ™]™\‹S•SQŸHÛÝ™\››Ü‰ÜÈ™\ÚY[Y[[ÜžK\Ý[ˆZ[]\ÈÝ™\ˆHš\œÝ[ˆ
+›Ø\Ý™\ÜËÛ™È[ŠHH›ØÙ\ÜÈX›KØ[\Y]™\žHMHÈžHH\›™\ÜÈYX\Ý\™YHÜ›ÝÝÝ™\ˆH]X\\ˆ\ÈX\šÙYŸXÚ\Ú[ÛœÈXYHÙˆ^XÝYÈ˜Z[YXÚ\Ú[ÛœÈ
+›Ø\Ý™\ÜËÛ™È[ŠHHÛÝ™\››Ü‰ÜÈ]Y]YX\Ý\™Y[™\ˆMIHS•SQÈ[žH˜Z[YXÚ\Ú[ÛˆÚÝÛˆÚ]]È™X\ÛÛˆŸZ\ÜÚ[Ûˆ[YKÜÚ][Ûˆ\œ›Ü‹ÛÛ\Ú[ÛœÈ
+›Û™\ÊHHÚ[][]Ü‰ÜÈÝÛˆÝ]H]]™\žHÝ\YX\Ý\™Y[ˆHÚ[][]Üˆ
+ÈÛ\ÜÊHÝÙ\ŽÈ[™\ˆHØY™H\œ›ÜŽÈ[žHÛÛ\Ú[Ûˆ›ÚYÈHÙ[Ÿ[™Y˜XÚÈ
+]™\žH\›JHHÛ›Øˆ™XY˜XÚÈ]H[™ÙˆH\›HYX\Ý\™YY\È[ˆ]™\žH\›KÜˆH[ˆ\È[˜[YŸÙ™ˆHÛØÚÈHÜ™Ø[š\ÛIÜÈÝÛˆÛØÚÈYØZ[œÝ]ÈÚ[™ÝÈYX\Ý\™YÚÝÛŽÈX\šÜÈHÙ[‚ŠŠ•™YH[\È›Üˆ™XY[™È[žHØ]YÙH[ˆ\È\[™^ŠŠˆHYX\Ý\™YØ]YÙH\ÈÛ™HHÞ\Ý[H[™\ˆ\ÝÜˆHÜÝ	ÜÈÝÛ‚šÙ\›™[™\ÜYX›Ý]]Ù[ŽÈH[Ù[YØ]YÙH\ÈÛ™HÛÛ\]Yœ›ÛHHXÛ\™Y›Ü›][HÝ™\ˆYX\Ý\™Y[œ]Ë[™]™\žBX›HØ^\ÈÚXÚ]\ÈÛˆH[™H]Ù[‹™]™\ˆÛ›H\™KˆH™\ÛÝ\˜ÙHØ]YÙH
+XXÚ[™\ËÛÛ›™XÝ[ÛœËÛÛœÝ[Y\œËY[[ÜžK˜ØXÚJH\È[Ø^\ÈYÙY\ÈZ[Z[™ÈÝÙ\‹]™[ˆÚ\™HHÛÝ™\››Ü‰ÜÈ\œÜÙHØ\ÈÈYH™\ÛÝ\˜ÙHÈ^HÙ\šXÙKÛÈ]˜HØZ[ˆ›ÝYÚÚ]H™\ÛÝ\˜ÙH\ÈZY›Üˆ[ˆHØ[YHX›H[™[ˆH[™^ˆ[™HØ]YÙHX\šÙYœÚÝÛ‹›ÝYÙY‚›™]™\ˆ[\œÈH™XY[™ÈÜˆH[™^È]\È\™HÛÈ]H™XY\ˆØ[ˆÙYHÚ]HÛÝ™\››ÜˆY
+ÝÈÙ[ˆ][Ý™YÝÂ›X[žHYÙ\È]™XYÝÈX[žHÙÈ]Ý\Y
+K›ÝÈ™HÛÝ[Y›ÜˆÜˆYØZ[œÝ]‚‚ˆÈÈ\[™^HH›ÝX›\ÚÛÝ[™Â‚ŸÞ[\ÛHØ]\ÙHš^ŸKK_KK_KK_ŸÚ\™HÚXÚÈRSÈ\Ú\™H
+ØÚÊXHš]™\ˆÜˆ“H™Y\Ù\ÈÛØÚÈØÚÚ[™È\ÙH˜\™HY][Üˆ[\ÜÝ›ÝYÚÈÜˆ[ˆHÛ™K]Ú\™HÛÝ™\››ÜˆŸÚ\™HÚXÚÈRSÈ\Ú\™H
+›ÛÝÜÈÝÛŠXHØ\™YÛ›Ü™\ÈHÙZ[[™È\]HHš]™\ŽÈÚXÚÈ›Üˆ[›Ý\ˆX[˜YÙ[Y[YÙ[Û[™ÈÛØÚÜÈŸÚ\™HÚXÚÈRSÝÛˆÚ\™XHÝÙ\ˆ[Z]\È™Y\ÙYÜˆØ\YžHH›Ø\™ÚXÚÈšYXK\ÛZH\HYÕÑT˜È[ˆ\È›ÛÝŸ[›Ý\ˆÛÜHÙˆ\È\Ý\È[™XYH[›š[™ØHÙXÛÛ™ÛÜHØ\ÈÝ\YØZ]›ÜˆHš\œÝÜˆ™X›ÛÝÈÝ\Û˜ÙHŸÛÛY][™È[ÙH\È\Ú[™ÈHÔX[›Ý\ˆ›ØÙ\ÜÈÛÈHØ\™ÝÜ]ÈH™[˜ÚX\šÈ]\Ý[ˆ[Û™HŸÛÝ™\››Üˆ^]H[›Ý\ˆÜš]\ˆÚ[™ÙYHÛ›Øˆš[™HÝ\ˆÛÛ›Û\ŽÈÛ[šKPÛÛ\\ÜÈY]È˜[YH[Û™HŸÛÝ™\››Üˆ^]ÈH™\ÝÜ™HY›Ý™XY˜XÚÈ™\ÝÜ™HžH[™
+šYXK\ÛZH\™ØØ\Ý\˜
+NÈ[™\ÝYØ]H™Y›Ü™H™\[›š[™ÈŸXÚ\Ú[Ûˆ˜Z[Y
+ˆ[ˆH›ÝÊXHÛ\Ý\ˆTH\È[œ™XXÚX›H\›ˆ]Ñ‘ŽÈ˜]]™H[œÈÛˆŸ[™\™ÞHØ]™Y]MHÛÝÙ\ˆ[ˆ˜]]™HHØ\™Ù\™Y\œÝÈ™[ÝÈ]ÈÝÛˆÛØÚËÜˆHYØ][™\ˆ]ÈÝÛˆ˜]È™XYÙXÝ[ÛˆNÈ[ˆH]Y]ÛÛ\\™H[[Y]žK˜ÛØÚ×ÛZ˜Ú[H\ÞHÚ]˜]]™WØ\ÞWØÛØÚ×ÛZ˜[™Ø[ÝØÚ]˜]]™WØ\ÞWÙ˜]×ÝØŸ˜Z[]\[ˆ[ÜÝXÚ\Ú[ÛœÈK\ÛË[\ØÙ]ÛÈÝÈ›ÜˆHÛÜšÛØYÜˆHÝ[H™YY™XY\È›[™Ù]K\ÛË[\Øœ›ÛHHÛÜšÛØY	ÜÈÝÛˆ\™Ù]ÈÚXÚÈH™YY	ÜÈYÙHŸ›ÈØ]š[™È][Ù\šXÙH[˜Ú[™ÙYHØ\™\ÈØ]\˜]Y[[ÜÝ[H[YH
+]˜XÙ\ÊKÜˆHÙ\šXÙHÚ]ÈX›Ý™HHÛÛ\\ÜÉÜÈÙ[\ˆ^XÝYÛˆHØ\™Ú]›ÈÛXÚÎÈHØ]š[™ÈÛÛY\Èœ›ÛHH]ZY]Ý™]Ú\ÈŸÝX™\›™]\Îˆ›ÈXXÚ[™H]™\ˆÚ]™[ˆ˜XÚÈH™[X\ÙHØ]H™Y\Ù\È
+]È™X\ÛÛˆ\È[ˆH]Y]
+KÜˆHÙ\šXÙH\ÈX›Ý™HHÛÛ\\ÜÉÜÈÙ[\ˆ™XY›ÙWÙØ]Kœ™X\ÛÛ˜[ˆH]Y]ÈÚXÚÈK\ÛË[\Ø[™H][˜ÞH™YYŸÝX™\›™]\ÎˆH™\]][ÛˆX\šÙYÑ‘ˆHÓÐÒÈHXXÚ[™HÛÝ[›ÝÝ\HÜ™Ø[š\ÛH[œÚYH]ÈÚ[™ÝÈHÛ™Ù\ˆÚ[™ÝÈ›Üˆ]Ú^™HÛˆ]XXÚ[™NÈ™]™\ˆH˜\Ý\ˆ™XY[™ÈÙˆHØ[YH[ˆŸœ›ÚÙ\ŽˆÛÛœÝ[Y\œÈÛ[XˆÈHÛÝ™\ˆ[™Ý^HY\ÜØYÙ\ÈØZ]]]™\žHÝ\
+H›ÙXÙ\ˆ\È\ÝHÜ›Ý\	ÜÈØ\XÚ]JHH™[˜ÚX\šÉÜÈØ\XÚ]HÝ\Ù]ÈHXZÈ]š[™H[ÈÙˆHÜ\˜]Ü‰ÜÈÜ›Ý\ÈÚXÚÈHYX\Ý\™YØ\XÚ]H[ˆH[‰ÜÈÙÈŸØXÚNˆHÙZ[[™ÈÜ›ÝÜÈÚ[H]HY[[ÜžH\È\ÙYÛÛZ\ÜÙ\È™XY\È™\ÜÝ\™HH[XØXÚHØ]H\ÈH[H
+\ÙY8¢iHL	HÙˆHÙZ[[™ÊNÈÚXÚÈ\ÙYÛX˜™\ÚYHX^Y[[ÜžWÛX˜[ˆH[‰ÜÈÙÈŸØXÚNˆHÙZ[[™È™]™\ˆÜ›ÝÜÈHÛÜšÚ[™ÈÙ]š]ÈHÜ\˜]Ü‰ÜÈÙZ[[™È^XÝYˆHØXÚH]š]È\È›Ý[™È›ÜˆHÙZ[[™ÈÈY[™[™H›ÝÈ™XYÈ[œÚYHH›Ú\ÙHŸÝÜ˜YÙKY[™Ú[™HØXÚNˆHØXÚH™]™\ˆš[ËÚ]]™\ˆHÙ^HÜXÙK[™Û[šH™XYÈ\ÈHœ™YHY[[ÜžHØ]š[™ÈH™[˜ÚX\šÉÜÈ™\]Y\ÝÈÛÛ˜Ù[˜]HÛˆH™]ÈÝ™XÛÜ™È
+PÔÐ‰ÜÈÚ\Yš\šX[ˆ˜]ÊKÜˆH[ˆ\ÚÜÈ›Üˆ™XÛÜ™ÈHØYY›ÝÜš]H
+\ÚYÙ^\ÈÝ™\ˆ[ˆÜ™\™YØY
+KÛÈH™XYÈ\™HÙ\™Yœ›ÛHH[™^H™\Ý[]›]\œÈHÛÝ™\››Üˆ\ÈHš\œÝ[™ÈÈÝ\ÜXÝˆÚXÚÈš[ˆØXÚHˆYØZ[œÝHØXÚHÚ^™H[ˆH\‹[›ÝÚ[™\ÎÈ˜]È™\]Y\ÝÈ[šY›Ü›[HÝ™\ˆHÙ^HÜXÙH[™˜[YHHØ[YHÙ^HÜ™\ˆ[ˆØY[™[ŽÈHÛ›ØˆÚ]›Ý[™ÈÈÈ\È›ÝHØ]š[™ÈŸÝÜ˜YÙKY[™Ú[™HØXÚNˆHÛÛ\\ÜÈÛ›H]™\ˆ™XYÈØ[HH[™H\ÈÙ]˜\ˆX›Ý™HHÝXÚÉÜÈÝÛˆ][˜ÚY\È
+Hˆ\È[™HÝ™\ˆŒMHÈH\È™XYÊHÙ]H[™HÛˆH[š[™ÈÛÜšÛØY	ÜÈÝÛˆšYÝ\™\ÈÛÈ]H]\ÈØ[H[™H[XØXÚHZ\ÜÈ\ÈÛÝË[™Üš]HHšYÝ\™\È[ˆH™\™YÚ\Ý˜][Ûˆ™Y›Ü™H[žHÛÝ[Y[ˆŸÝØ\›NˆHÙ[™XYÈ›ÚYˆÛÈ›Û™\ÈØ[YHÚ][ˆÛÈÛÛ\Ú[Ûˆ˜YZH[ˆZ]\ˆ\›HH\ÚÈÜˆÚ[][]ÜˆÙ][™È
+ÙY\[Ý][]YHÝYÙÙ\‹\ÝÜXÚ[™ÊNÈš^Y™Y›Ü™H[žHÛÝ[Y[ˆ[™ØZY[ˆH™\™YÚ\Ý˜][ÛˆŸ™YK\[ˆX›HXYÈ]Ù[ˆÚ]HØ\›š[™ÈH[‰ÜÈÛÛ[Z]\È›ÝH[™Ú[™H]ÛZ[\ËÜˆH™YH\™H›ÝÙ\\˜]H[œÈ[ˆÛÛËÛÛ[šWÝ™\œÚ[Û‹œHKXÛÛ[Z]ÚO˜ÛˆXXÚÈXZÙHHX›HÛ›Hœ›ÛH[œÈÛˆÛ™Hœ›Þ™[ˆ[™Ú[™HŸ\˜Ú]™H›ÝÚÚ\ÈH[ˆH[ˆØ\È›Ýš[š\ÚYÚ[ˆH›Ý\ÜÙYX]™HHY[ˆ™Ú]X‹Ø\˜Ú]™WÜ™\]Y\ÝÈH™^\ÜÈÛÜY\È]‚ˆÈÈ\[™^ˆH]šY[˜ÙHX\‚˜ØÜËÑU’QSÑWÓQÑT‹›Y
+]™\žHÛZ[H[™]ÈÛ\ÜÊKØÜËÐÓRST×Ô‘QÒTÕT‹›Y
+Ú]\ÈÛZ[YY[™Ú]\È›Ý
+K˜ØÜËÑÔWÔ‘T‘QÒTÕUSÓ‹›YØÜËÔ‘PST×Ô‘T‘QÒTÕUSÓ‹›YØÜËÒÎ×ÐÓÓTTÔ×Ô‘T‘QÒTÕUSÓ‹›Y˜ØÜËÔÔÕÔ‘T×Ô‘T‘QÒTÕUSÓ‹›YØÜËÒÐQ’ÐWÔ‘T‘QÒTÕUSÓ‹›YØÜËÔ‘QT×Ô‘T‘QÒTÕUSÓ‹›Y˜ØÜËÔÕÐT“WÔ‘T‘QÒTÕUSÓ‹›YØÜËÐÒUSPT“—Ô‘T‘QÒTÕUSÓ‹›YØÜËÔS‘TÕÑT—Ô‘T‘QÒTÕUSÓ‹›Y˜ØÜËÔ“Ð“ÕPÔ×Ô‘T‘QÒTÕUSÓ‹›YØÜËÔ“Ð•TÕ‘TÔ×Ô‘T‘QÒTÕUSÓ‹›YØÜËÖPÔÐ—Ô‘T‘QÒTÕUSÓ‹›Y[™˜ØÜËÓVTÔSÔ‘T‘QÒTÕUSÓ‹›Y
+H[\ÈÜš][ˆ™Y›Ü™HXXÚ[ŠKØÜËÓÓS’WÕŒK›YÈÓS’WÕŒË›Y
+]™\žH™\Ý[žH[™Ú[™JKØÜËÔ‘QÒTÕT‹›Y
+]™\žH™[˜ÚX\šÂ˜[™]Èš[JKØÜËÔ“ÓÑ—Ô“ÑÔSK›Y
+H›ÙÜ˜[HÈ[Ú^™HÚ]]ÈÛÜÝÊKØÜËÑÔÔÒQT‹›Y
+]™\žH™\Ý[[ˆÛ™BœXÙJK™\Ý[ËÓÓS’WÒS‘V›Y
+HÛ™H[X™\ŠKØÜËÕÒT’S‘×Õ‘T‘PÕË›Y
+ÚXÚÛ›ØœÈX\›ˆHÚ\™H[‹[™]™\žHÜÜÂÚ]]ÈØ]\ÙJKØÜËÔÕUWÓÑ—ÔVK›Y
+Ú\™H]™\ž][™ÈÝ[™ÊKØÜËÒS‘Ñ‘‹›Y
+]™\žHÛÛ[X[™[ˆÛ™HYÙJK‚‚ŠŠ•HX\ÛZ[HžHÛZ[KŠŠˆXXÚÛZ[H\ÈX[X[XZÙ\È\È\ÝY\™HÚ]HÛ\ÜÈÙˆ]šY[˜ÙH™Z[™][™B™ØÝ[Y[]Ø\œšY\È]ÛÈ]H™XY\ˆØ[ˆÛÈœ›ÛH[žHÙ[[˜ÙHÙˆH^XÝ]]™HÝ[[X\žHÈHš[H]ÛÝ[]™BÈ™HÜ›Û™È›ÜˆHÙ[[˜ÙHÈ™HÜ›Û™Ë‚‚ŸÛZ[HÛ\ÜÈÚ\™HH]šY[˜ÙH\ÈÚ]ÛÝ[˜[ÚYžH]ŸKK_KK_KK_KK_ŸH[™Ú[™IÜÈÚ^Ý]\ÈÝ^H[œÚYHZ\ˆØ[È[™Ù]HÈˆ
+›ÛÙˆ[™\Ý
+HØÜËÑ“Ô“PSÔÕUTË›YØÜËÕPÒÒS‘×ÕSÔ‘SK›Y\ÝËØ™\Ý[ËÔÓÐRËšœÛÛ˜H˜Z™XÝÜžHX]š[™È]ÈØ[ÜˆHÊÊÈÚ[ˆ\ØYÜ™YZ[™ÈÚ]H]ÛˆŸ›ÈÜš]H]™\ˆX]™\ÈHÛ›Ø‰ÜÈÛÝ™\ŽÈH›[™Ù[œÙHÛÎÈ˜Z[]\\È[[YYX]HÈˆ\ÝËÝ\ÝÜÚY[Ü›Ü\Y\ËœX
+ÛÈZ[[ÛˆØ\Ù\ÊKHYÈ\ÝÈ\ˆÝXÚÈÛ™HØ\ÙHÙˆHÜš]H\ÝHÛÝ™\ˆÜˆHÚ]™KX˜XÚÈÚ[H›[™ŸÛˆH™X[Û\Ý\ˆHÛÝ™\››ÜˆÙ\È[Ü™HÛÜšÈ[œÚYHH[™K˜\Ý\‹Ûˆ›È[Ü™HXXÚ[™\Ë]›È[Ü™H[™\™ÞHHÚ^ÝX™\›™]\ÈX›\È[ˆ™\Ý[ËÛ]™KØKÐ‹ÐÈXXÚØÜËÒÎ×ÐÓÓTTÔ×Ô‘T‘QÒTÕUSÓ‹›YH›ÝÈÔÔÈ[ˆ[™YHÙˆÝ\ˆ[œÈÛˆÛÜšÈÜˆÜYYÜˆÝÙ\ˆÚ]™[ˆÛˆXXÚ[™\ÈÜˆ[™\™ÞHÚ]›Ý[™È›ÝYÚ[ˆ[žHÙˆHÚ^ÚXÚÛÝ[Ý[™[ˆHX›HŸÚ[YÝ]šYÚHÛÝ™\››Ü‰ÜÈÙ][™ÜÈ\™H˜XÚÈ]HÜ\˜]Ü‰ÜÈÚ][ˆÙXÛÛ™È™\Ý[ËÛ]™KÕŒ×Ô“Ð•TÕÒÒS›YØÜËÔ“Ð•TÕ‘TÔ×Ô‘T‘QÒTÕUSÓ‹›YH™\]][Ûˆ[™Y˜XÚÈY\ˆŒËÜˆ›Ý][ŸÝ™\ˆÛÈÝ\œÈHÛÝ™\››Üˆ™Z]\ˆXZÜËÛÝÜÈ›ÜˆšYË[™[™È]™\ž][™È˜XÚÈ]H[™™\Ý[ËÛ]™KÕŒ×Ô“Ð•TÕÓÓ‘Ë›YØÜËÔ“Ð•TÕ‘TÔ×Ô‘T‘QÒTÕUSÓ‹›YY[[ÜžHÜ›ÝÚ[™È\ÝH]X\\‹HXÚ\Ú[Ûˆ[YHÜ›ÝÚ[™È\ÝH[‹™]Ù\ˆ[ˆMIHÙˆ^XÝYXÚ\Ú[ÛœËÜˆHÙ][™È›Ý[™Y˜XÚÈŸÛÝ™\›š[™ÈÛÜÝÈH™]ÈÝ\Ø[™ÈÙˆHÛÜ™H]]™\žHÚ^™H™\Ý[ËÛ]™KÕŒ×ÓÕÓ—ÐÓÔÕ›Y[ˆÝÛ‹XÛÜÝšYÝ\™HÜ›ÝÚ[™ÈÚ]HÜ™Ø[š\ÛHŸHÛÛ\‹HY™™\ˆÛÛ[™HÝÜ˜YÙKY[™Ú[™HØXÚHXXÚÚ]™HY[[ÜžH˜XÚÈÛˆ[ˆ[ÝXÚYÛÜšÛØYÚ]›ÈÔÔÎÈHœ›ÚÙ\ˆ[™HØXÚH™XY›Ý[™ÈÛˆHš\œÝÙ][™\ˆHœ˜Z[‰ÜÈ™\™XÝŒ×ÔÐ‘SÒ›YŒ×ÒÐQ’ÐK›YŒ×Ô‘QTË›YXXÚ™\™YÚ\Ý˜][ÛˆH›ÙXÝ›ÝÈÔÔÈ[ˆ[™YHÙˆÝ\ˆ[œÈÛˆ[ˆ[ÝXÚYÛÜšÛØYÈHY[[ÜžH›ÝÈÙˆHØXÚH\ÈÝXÚHÜÜÈ[™Ý[™ÈŸHÛ™H[X™\ˆ\È
+ÍŽ	HXÜ›ÜÜÈH™X[Ø]YÛÜšY\ÈÛˆHÙ]ÈÙˆLØÝØ™\‹ÜÜÙ\È[˜ÛYYžH[H™\Ý[ËÓÓS’WÒS‘V›YÛÛËÛÛ[šWÚ[™^œXHØ]YÛÜžHÛZ]YHÜÜÈ›Ý[\™YH[š[™È›ÝÈÛÝ[YŸH^HÙˆ[X[™YX\Ý\™YžHÛÛY[Û™H[ÙH™XYÈHØ[YHØ^H\ÈÝ\ˆÝÛˆØÚY[\È™\Ý[ËÛ]™KÕŒ×ÕPÑWÑÓÓÑÓLŒLK›Y™\Ý[ËÝ˜XÙ\ËÙÛÛÙÛLŒLKÜØÚY[KšœÛÛ˜ØÜËÕPÑT×Ô‘T‘QÒTÕUSÓ‹›YHØÚY[H\š]™YY\ˆH[œÎÈH[Hš]YÈHÛÝ™\››ÜŽÈH˜XÙH\ÚÜÙHÒKLMˆÙ\È›ÝX]ÚŸH[Ù[Y™X[\ËÜšYË\›\ËZ[[™ÜÈ[™ÝØ\›\ÈØZ[ˆ[™\ˆZ\ˆÝÛˆ˜]]™HÛÛ›Û\œÈÈ™\Ý[ËÜ™X[\ËØŒ×ÔS‘TÕÑT‹›YŒ×ÓUR“ÐÓË›YŒ×ÐÒUSPT“‹›YŒ×ÔÕÐT“K›YH[ˆÙˆHØ[YHÚ[][]Üˆ]HØ[YH™\œÚ[Ûˆ[™ÙYYÚ]š[™ÈÝ\ˆYÚ]ÈŸH\ÚXØ[Y]\ˆÚÝÜÈ\ÜÈ[™\™ÞH›ÜˆHØ[YHÛÜšÈ
+Š››ÈÝ\œ™[™\Ý[
+ŠŽÈØÜËÑÔWÔ‘T‘QÒTÕUSÓ‹›Y˜[Y\ÈH[ˆH™\[ˆÛˆHÝ\œ™[Ø\™ÛÛ›Û\ˆ™XY[™È›ÈY™™\™[˜ÙKÜˆÔÔÈŸÛ[šKPÛÛ\\ÜÈ™]™\ˆÚ[™Ù\ÈH[™Ú[™H™]ÙY[ˆH[H[™]È™\Ý[žHÛÛœÝXÝ[ÛˆÓS’WÕŒËšœÛÛ˜ÛÛËÛÛ[šWÝ™\œÚ[Û‹œHKXÛÛ[Z]ÚO˜Ûˆ]™\žHX›IÜÈÛÛ[Z]ÈHX›HÚÜÙH[œÉÈÛÛ[Z]ÈØ\œžHY™™\™[š[™Ù\œš[È‚ŠŠ•Ú]H™Y™\™YH\ÚÜÈÙˆXXÚØÝ[Y[ŠŠˆÙˆH™\™YÚ\Ý˜][ÛŽˆ\È]]Y™Y›Ü™HHš\œÝÛÝ[Y[‹Ù\È]˜[YHB[š[™ÈØ\ÙH[™H[ÝXÚYØ\Ù\Ë\È]™\žH[Y[™Y[]Y[™Ù\È[žH[Y[™Y[XYHY\ˆH™\Ý[Ø\ÈÙY[ˆØ^HÛÏÂ“ÙˆH™YK\[ˆX›Nˆ\™HH™YH[ˆYÈÙ\\˜]H[œËÙ\ÈHXY˜[YHH[™Ú[™H]XXÚÛÛ[Z]\È]™\žHØ]YÙB›ÙˆH™\™YÚ\Ý˜][Ûˆ™\Ù[[˜ÛY[™ÈHÛ™\È]Ù[YØZ[œÝHÛÝ™\››Ü‹[™\ÈH™XY[™ÈÛ™HÙˆH™YHBœ[H[ÝÜÏÈÙˆH[™^ˆ\È]™\žH™X[Ø]YÛÜžH[ˆ]\È]™\žH[š[™È›ÝÈÝ]Ùˆ][™Ù\ÈHÜÜÈ[ˆ[™YHÙˆÝ\ˆ[œÈ[\‚˜\ÈHÜÜÏÈÙˆH˜]È›Û\ŽˆÙ\ÈHÒKLMˆX[šY™\Ý[ˆ]X]ÚHš[\ËÙ\ÈHÛÝ™\››Ü‰ÜÈ]Y]ÚÝÈ]™\žB™XÚ\Ú[ÛˆÚ]]È™XY[™È[™]ÈÜš]K[™Ù\ÈH[™X˜XÚÈ™XÛÜ™™XYHÜ\˜]Ü‰ÜÈ˜[YOÈ]™\žHÛ™HÙˆÜÙBœ]Y\Ý[ÛœÈ\ÈHY\È[ˆ\È›ÙÜ˜[HÜˆH\ØÛÜÝ\™H˜[Z[™ÈH^Ù\[ÛŽÈH\ØÛÜÝ\™\È\™H[ˆÙXÝ[ÛˆM‹Ë‚‚ŠŠ’ÝÈÈ]Y]Û™H™\Ý[œ›ÛH\ÈX[X[È]È˜]Èš[\ËŠŠˆZÙH[žH›ÝÈÙˆÙXÝ[ÛˆM‹ˆ]ÈÛÝ\˜ÙHÛÛ[[ˆ˜[Y\ÈB™YK\[ˆX›H[ˆ™\Ý[ËÛ]™KØÈHX›IÜÈXY˜[Y\ÈH™YHÚ]Xˆ[ˆYËHÛÛ[Z]XXÚ˜[ˆÛˆ[™H[™Ú[™B˜ÛÛËÛÛ[šWÝ™\œÚ[Û‹œX™XYÈ]]ÛÛ[Z]ˆXXÚ[ˆY˜[Y\ÈH›Û\ˆ™\Ý[ËÛ]™KÜ˜]ËÜ[‹OY‹ØÛ[™È]™\žBœ™\]][Û‰ÜÈš[\È
+HØ\\™KH™\ÜÛœÙH[Y\ËHÛÝ™\››Ü‰ÜÈ]Y][™ÙËH\‹\™\]Y\Ý™XÛÜ™ËÛ™HÒKLM‚›X[šY™\Ý\ˆ™\]][ÛŠKˆHX›HÛÛ˜[YY[ˆHX›IÜÈ^
+ÛÛËØÛÛ™š\›WØX˜ËœXÜˆ]ÈÚX›[™ÜÊH™XZ[ÈBX›Hœ›ÛHÜÙH›Û\œÎÈÛÛËÛÛ[šWÚ[™^œX™XZ[ÈH[™^œ›ÛHHX›\ÎÈÛÛËÙÜÜÚY\‹œX™XZ[ÈB™ÜÜÚY\‹ˆH™\™YÚ\Ý˜][Ûˆ˜[YY[ˆHX›IÜÈ^ÛÈH[\ËÜš][ˆ™Y›Ü™HHš\œÝÛÝ[Y[‹Ú]]™\žB˜[Y[™Y[]Yˆ›Ý[™È[ˆ]ÚZ[ˆ\ÈžH[™‚‚ŠŠ•Ú]Û™H™\]][ÛˆX]™\È™Z[™ŠŠˆZÙHHš\œÝ™\]][ÛˆÙˆHš\œÝÚ[\ØÙ[˜\š[È[‹\˜Ú]™Y]˜™\Ý[ËÛ]™KÜ˜]ËÜ[‹LÍÍÌMŽLŒNKÜZ\™YLKØˆ]ÛÈÛÈ›Û\œËÛ™H\ˆ\›K[™HÛ[šH\›IÜÈ›Û\ˆÛÂÙ[K[š[™Hš[\Ë]™\žHÛ™HÙˆÚXÚH™XY\ˆØ[ˆÜ[Žˆ™Y›YÚ
+HUÈ[YKH\›KHÚ]ÛÛ[Z]H\›Bœ˜[ˆ]H™\œÚ[ÛœÈÙˆØÚÙ\‹Ú[™ÝX™XÝHTHÙ\™\ˆ[™]Û‹HY]šXÜË\Ù\™\ˆ™\œÚ[ÛˆÚ]]ÈÒKLM‹HÛÜšÙ\ˆÛÝ[[™H›Ø™IÜÈY™\ÜÊNÈ˜˜X×ÛÛ[šK
+Ù[H[™\ÈÙˆÝX™XÝ]]Ø[‹ZXXXÚ™\˜ˆHÛÝ™\››Ü‚›™YYÈ™XY[™ÈY\È[™XXÚ]]\Ý›Ý]™H™XY[™È›ÊNÈÚ[™Ý×ÜÝ\[™Ú[™Ý×Ù[™
+HÚ[™ÝÉÜÈÛØÚÊNÂ˜ØYÜØÚY[K›ÙØ
+]™\žHØYÝ\[™Ú[ˆ]Ø\È\YY
+NÈ][˜ÞK˜ÜÝ˜
+H›Ø™IÜÈ™\ÜÛœÙH[Y\ËÛ™H›ÝÈBœÙXÛÛ™
+NÈØ\\™K˜ÜÝ˜
+HÛ\Ý\‰ÜÈÝ]H]™\žHšYY[ˆÙXÛÛ™Îˆ™\XØ\ËÛÜšÙ\œËÙÈ[™[™ËHIÜÈ\™Ù]
+NÂ˜ÜÝØÜK˜ÜÝ˜
+H[›™\‰ÜÈÝÛˆÜ›ØËÜÝ]
+NÈÙÝØ]ÚšœÛÛ˜[™Ù×Ù[™šœÛÛ˜›Ù\×Ù[™WÙ[™šœÛÛ˜ŠHTHÙ\™\‰ÜÈÝÛˆ™XÛÜ™È]H[™
+NÈ]Y]šœÛÛ›
+Û™H[™H\ˆXÚ\Ú[ÛŽˆHÛÛ\\ÜÉÜÈÜÚ][Û‹XY[™È[™›]\‹H[™Ú[™IÜÈÝ]K]™\žHÜš]HÚ]]È˜[YHÙ[[™]È˜[YH™XY˜XÚÊNÈÛÛ›Û\‹›ÙØ[™˜ÛÛ›Û\Œ‹›ÙØ
+Hš\œÝÛÝ™\››Ü‰ÜÈÙË[™HÙXÛÛ™Û™IÜÈY\ˆHÚ[
+NÈ]Y]ÚÚ[šœÛÛ›
+HØ]ÚÙÉÜÂœ™\ÝÜ™HÜš]\ËXXÚÚ]]ÈÛÛ[X[™[™]È™X\ÛÛ‹ÝXÚ\Èœ™\Ù]ˆ™[[Ý™H™XÛÜ™ŠNÈØ]ÚÙË›ÙØ
+Û™H™XÛÜ™ˆÚXÚ™ÛÝ™\››Ü‹]È›ØÙ\ÜÈYÚ]\ˆ]Ø\È[™ÈÜˆXY]™\žHÛÛ[X[™[ˆ[™XXÚ^]ÛÙJNÈ›Ø\Ý›ÙØ
+HÚ[]HÍŒÙXÛÛ™Ú]HÙ][™ÜÈ\È^HÝÛÙ\™Ù]ML˜[™ÙOLKL[Z]ÏLNLHÍÌHÛÜšÙ\œÏMKÍˆ‹[™Bš[™X˜XÚÈ™]™\žHÙ][™È]HÜ\˜]Ü‰ÜÈY\ˆË\™Ù]ML[Z]ÏMLHÛÜšÙ\œÏM‹ÍˆY[›Û™HŠNÈœÜË˜ÜÝ˜
+B™ÛÝ™\››Ü‰ÜÈ™\ÚY[Y[[ÜžH]™\žHšYY[ˆÙXÛÛ™ÊNÈÛ[šWÝÜš]\Ë
+ÝÈX[žHÜš]\ÈHÛÝ™\››ÜˆXYH[ˆHÚ[™ÝÎ‚ŠNÈÚ[ÜÝÚ]Ú
+H™\Ù]ÚXÚÎˆ\™Ù]™\ÝÜ™YÛÜšÙ\œÈ[ˆÙ\šXÙK›È™XÛÜ™Y
+NÈÛ[šL‹œY
+HÙXÛÛ™™ÛÝ™\››Ü‰ÜÈ›ØÙ\ÜÈY
+H[™Ú[
+HX\šÙ\ˆH\›™\ÜÈÜ›ÝH]HÚ[
+NÈ›Ø\Ý›Ý]
+HØ[YH›Ø\Ý™\ÜÈÙÈ\ÈBš›Øˆš[Y]
+NÈ[™Ü™XYË™\œ˜ÙÝØ]Ú™\œ˜[™Ø\\™K˜ÜÝ‹™\œ›ÜœØ
+[\K\È^HÚÝ[™JNÂ˜Y]šXÜË\Ù\™\‹XÛÛ\Û™[ËžX[[
+H[›™YX[šY™\Ý\È\YY
+NÈ[™ÒLM”ÕSTËÛ™H[™H\ˆš[KˆH™XY\ˆÚÈÝXÈH[X™\ˆ[ˆHÚ[X›HØ[ˆš[™HÙXÛÛ™]Ø\ÈZÙ[‹‚‚ˆÈÈ\[™^ÈH™\›ÙXÚ[™È]™\ž][™Ëœ›ÛHHÛX[ˆXXÚ[™B‚H™Y™\™YHÚ]H\Ü[™HÚ]XˆXØÛÝ[Ø[ˆ™XZ[]™\žHX›H[ˆ\ÈX[X[[™™\[ˆ]™\žH™[˜ÚX\šËˆHÝ\Ëš[ˆÜ™\‹Ú]Ú]XXÚÛÜÝÎ‚‚ŒKˆ
+Š‘Ù]HÛÙH[™›Ý™H]\ÈHÛÙKŠŠˆÚ]ÛÛ™XH™\ÜÚ]ÜžK\[œÝ[\ˆ™\]Z\™[Y[Ë[™\ˆ]Û‚ˆËŒLˆ
+H™\œÚ[ÛˆÚ]Xˆ[œÊK[ˆ]ÛŒÈ™\šYžKœXˆ]ÚXÚÜÈ]™\žHÙX[Yš[IÜÈš[™Ù\œš[[œÈ]™\žH\Ý[‚ˆ\ÝËØ[˜ÛY[™ÈH[\ÈÙˆ]™\žH™YK\[ˆX›HÛˆš^YØ\Ù\Ë[™[™È‘T’Q’PÐUSÓŽˆTÔØˆX›Ý][‚ˆZ[]\ÈÛˆH\Üˆ]ÛŒÈÛÛËÛÛ[šWÝ™\œÚ[Û‹œX[ˆØ^\ÈÚXÚœ›Þ™[ˆ[™Ú[™HHÚXÚÛÝ]Ø\œšY\Ë‚Œ‹ˆ
+Š”™XZ[[žHX›Hœ›ÛH]È˜]Èš[\ËŠŠˆ]™\žH™YK\[ˆX›H˜[Y\È]È™YH[ˆYÎÈZ\ˆš[\È\™H[‚ˆ™\Ý[ËÛ]™KÜ˜]ËÜ[‹OY‹Øˆ]ÛŒÈÛÛËØÛÛ™š\›WØX˜ËœH]Oˆˆ™\Ý[ËÛ]™KÜ˜]ËÜ[‹OOˆ™\Ý[ËÛ]™KÜ˜]ËÜ[‹O‚ˆ™\Ý[ËÛ]™KÜ˜]ËÜ[‹OÏˆK[Ý]Ý\ØÚXÚË›Y™XZ[ÈHÝX™\›™]\ÈÜˆ^\™HX›NÈÛÛËÜØ™[˜ÚØX˜ËœXˆØYšØWØX˜ËœX™Y\×ØX˜ËœXXÜØ—ØX˜ËœXÝØ\›WØX˜ËœX]Z›ØÛ×ØX˜ËœX[™\ÝÙ\—ØX˜ËœX[™Ú][X\›—ØX˜ËœXˆHÝ\œËÚ]HØ[YH\™Ý[Y[ËˆÛÛ\\™HH™\Ý[Ú]HÛÛ[Z]YX›Nˆ^H\™HHØ[YHž]\È™[ÝÈHYØ[›ÝXÙKˆBˆ™]ÈÙXÛÛ™ÈXXÚ‚ŒËˆ
+Š”™XZ[H[™^[™HÜÜÚY\‹ŠŠˆ]ÛŒÈÛÛËÛÛ[šWÚ[™^œX™XYÈ]™\žHŒWÊ‹šœÛÛ˜[™Œ×Ê‹šœÛÛ˜X›H[™ˆÜš]\È™\Ý[ËÓÓS’WÒS‘V›YÈ]ÛŒÈÛÛËÙÜÜÚY\‹œXÜš]\ÈØÜËÑÔÔÒQT‹›Y[™]ÈÚ\ËˆÙXÛÛ™Ë‚ˆ
+Š”™\[ˆH™[˜ÚX\šËŠŠˆ]™\žH™[˜ÚX\šÈ\ÈHÚ]XˆXÝ[ÛœÈÛÜšÙ›ÝÈÚ]]È[œ]ÈØÝ[Y[Y]]ÈXYˆ
+™Ú]X‹ÝÛÜšÙ›ÝÜËØ
+Nˆ™[˜ÚX\šË\™\Ø›ÜˆHÝX™\›™]\È\ÝÈ
+\˜][Û—ÜØ\›\ØØYÙ[˜ØYÜÝ\Øˆ˜][ØÛÜšÛØY
+KØ™[˜ÚØYšØX™Y\ØXÜØ˜ÝØ\›X›Ø\Ý™\ÜØÚ][X\›˜[™\ÝÙ\˜]Z›ØÛØˆÚ^Ú^ZÝX™Xˆ\Ü]Ú]™YH[Y\È›ÜˆKˆ[™ÎÈXXÚ[ˆ\˜Ú]™\È]Èš[\ÈÚ[ˆ]ÈY\ÈYYÂˆ™Ú]X‹Ø\˜Ú]™WÜ™\]Y\ÝˆHÝX™\›™]\È\ÝÈ[ˆÛˆÚ]X‰ÜÈœ™YH[›™\œÈ[ˆX›Ý][ˆÝ\ˆXXÚÈH]X˜\ÙKˆœ›ÚÙ\‹ØXÚH[™ÝØ\›H[œÈ[ˆX›Ý][ˆ[ˆÝ\ŽÈHÜ™Ø[š\Û\È]KÛÜY\È™YYH™[YXXÚ[™H
+ZÜË[Y]\™Yˆ[™šYË[Ü™Ø[š\ÛKY]XÚY™YY[ˆ^\™HÝXœØÜš\[Ûˆ[™]ÈÜ™Y[X[È[ˆH™\ÜÚ]ÜžIÜÈÙXÜ™]ÊK‚Kˆ
+Š”[ˆ]Ûˆ[Ý\ˆÝÛˆÞ\Ý[KŠŠˆÙXÝ[ÛˆLÈ\ÈHY]ÙÈØÜš\ËÚÚ[™ÜZ\™YœÚ[™ÛÛËÛ]™WÜ™\ËœX\™HBˆÛÛÎÈH™\™YÚ\Ý˜][ÛœÈ\™HH[\]\È›ÜˆÜš][™È[Ý\ˆÝÛˆ[\ÈÝÛˆ™Y›Ü™H[ÝH[‹‚‹ˆ
+ŠÚXÚÈH™\Ý[YØZ[œÝ]È™\™YÚ\Ý˜][Û‹ŠŠˆXXÚØÜËÊ—Ô‘T‘QÒTÕUSÓ‹›YØ\ÈÛÛ[Z]Y™Y›Ü™H]Èš\œÝˆÛÝ[Y[ŽÈÚ]ÙØÛˆHš[HÚÝÜÈÚ[‹[™]™\žH[Y[™Y[Ø\œšY\È]ÈÝÛˆ]H[™™X\ÛÛˆ[ˆH^‚‚“›Ý[™È[ˆ\ÈÚZ[ˆ™\]Z\™\ÈHÜ™Y[X[HXÙ[˜ÙHÙ^HÜˆHÛÜ™œ›ÛH\ÎÈH]˜[X][ÛˆXÙ[˜ÙHÛÝ™\œÈ[Ùˆ]‚‚ˆÈÈÛÛXÝ‚“XÙ[œÚ[™Ë[ÝÈ[™HÛ[šKPÛÛ\\ÜÈ[\œš\ÙHXÙ[œÙNˆ
+Š•HÛ[šKPÛÛ\\ÜÈËŠŠ‚‚‹KKB‚Š°ªHŒˆHÛ[šKPÛÛ\\ÜÈËˆ[šYÚÈ™\Ù\™Yˆ
+Š‘]˜[X][Ûˆ[™Ú[][][Ûˆ\ÙHÛ›KŠŠˆ[žHÛÛ[Y\˜ÚX[\ÙKÛÛ[Y\˜ÚX[^˜][Û‹[Û™]^˜][Û‹›ÙXÝ[Ûˆ\ÙK™Y\ÝšX][ÛˆÜˆÜÝYÙ\šXÙHÙˆ[žH\ÙˆÛ[šKPÛÛ\\ÜÈ™\]Z\™\ÈHÚYÛ™YZYÛ[šKPÛÛ\\ÜÈ[\œš\ÙHXÙ[œÙHœ›ÛHHÛ[šKPÛÛ\\ÜÈËˆ]™\žHÛÜK^Ü™\Ü[™š[Ý]Ø\œšY\È\È›ÝXÙHÚ]PÑS”ÑX“ÕPÑX[™TÐÓÔÕT‘TË›Yˆ[][ËÛÜ\šYÚÈ[™˜Y[X\šÜÈš[Y[ˆHTÐKˆÝÝË›Û[šKXÛÛ\\ÜË˜ÛÛJ‚

@@ -61,10 +61,11 @@ read applies to every capacity muscle that shares a host.
 **Implementation candidate (14 October 2026).** The branch `codex/v6-kind-host-headroom` samples the runner's aggregate
 Linux `/proc/stat` counters on each controller tick. For kind's shared-host ceiling it reserves 10% of allocatable CPU
 and allows new replicas only within measured headroom; if two valid host samples are unavailable, it holds the cap at the
-current replica count. Focused tests cover the calculation and missing readings. This is code-level validation only: it
-has not yet passed the required four-core 100-copy kind rerun, and no result from v5 is attributed to this candidate.
- It is tested on development seeds and on the kind rig at 100
-copies before it is declared, and the founder is told before the version is declared.
+current replica count. The candidate also rechecks a previously raised cap on later controller ticks and never writes a
+cap below the replicas already running. Focused tests cover the calculation and missing readings. This is code-level
+validation only: it has not yet passed the required four-core 100-copy kind rerun, and no result from v5 is attributed to
+this candidate. Development-seed and kind 100-copy reruns are required before v6 is declared; the founder is told before
+the version is declared.
 
 **Still to read.** The tower at 100 copies on three eight-core Azure machines (starts 38476930989, 38476939068,
 38476947839; about 04:00 to 05:30 UTC on 14 October) shows how much of the LOSS the four-core machine carries; the fix is

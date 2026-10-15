@@ -53,7 +53,7 @@ from omnicompass import master
 from omnicompass.adapter import Governor, mode_law, OBSERVE
 from omnicompass.shield import enforce, ShieldLimits
 from omni_controller.muscles import Muscles, add_args as add_muscle_args
-from omni_controller.capacity import HostCpuSampler, kind_replica_ceiling
+from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
 COMPASS_UP, COMPASS_DOWN, COMPASS_RELEASE = 0.10, 0.02, -0.2   # the compass's gains, the same on every muscle (realms/compass_arm.py)
@@ -514,8 +514,17 @@ class Controller:
         need = int(math.ceil(100.0 * dem / float(tgt) - 1e-9))      # the replicas the autoscaler's arithmetic asks for
         pressed = self.compass_law.p >= self.compass_law.band.center or not obs["slo_clean"]
         ceil_ = given if given > 0 else None
-        if cur >= cap and pressed and need > cap and ceil_ is None:
-            ceil_ = self._live_ceiling(h)                                 # read only when the cap binds and the compass presses
+        # Once Omni has raised the cap, refresh the shared-host ceiling every tick:
+        # utilization can climb after the first decision. Keep the live replica count
+        # runnable if the refreshed ceiling is below it.
+        if ceil_ is None and ((cur >= cap and pressed and need > cap) or cap > hi0):
+            ceil_ = self._live_ceiling(h)
+        if cap > hi0:
+            safe_cap = bounded_replica_cap(hi0, cap, cur, ceil_)
+            if safe_cap < cap:
+                self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"maxReplicas": safe_cap}})],
+                             f"replica room: cap {cap} -> {safe_cap} (live ceiling {ceil_}; current replicas {cur})")
+                return
         if cur >= cap and pressed and need > cap and ceil_ is not None and cap < ceil_:
             new = min(ceil_, need)
             if RANGE_ANN not in ann:

@@ -14,6 +14,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+KIND_SCALE_OUT_BUSY_LIMIT = 0.75
+
 
 class HostCpuSampler:
     """Measure aggregate host CPU busy share from Linux /proc/stat."""
@@ -60,6 +62,7 @@ def kind_replica_ceiling(
     current_replicas: int,
     host_busy_share: float | None,
     reserve_share: float = 0.10,
+    max_busy_share: float = KIND_SCALE_OUT_BUSY_LIMIT,
 ) -> int:
     """Return a total replica ceiling for kind's single shared host.
 
@@ -81,8 +84,33 @@ def kind_replica_ceiling(
         return current
     if not 0.0 <= host_busy_share <= 1.0:
         return current
+    # A request-based headroom calculation can still authorize more pods on a
+    # host whose measured CPU is already under sustained pressure. At that
+    # point, fail closed: do not expand the HPA cap until the host is below the
+    # threshold. The threshold is a conservative starting guard for kind and
+    # must be validated against the paired live workload before release.
+    if host_busy_share >= min(1.0, max(0.0, float(max_busy_share))):
+        return current
 
     reserve = min(0.95, max(0.0, float(reserve_share)))
     headroom_m = max(0, int(alloc * max(0.0, round(1.0 - reserve - host_busy_share, 12))))
     measured_ceiling = current + headroom_m // request
     return max(current, min(request_ceiling, measured_ceiling))
+
+
+def bounded_replica_cap(
+    operator_max: int,
+    current_max: int,
+    current_replicas: int,
+    live_ceiling: int | None,
+) -> int:
+    """Recheck an Omni-raised HPA cap without setting it below live replicas.
+
+    If the live ceiling cannot be read, restore the operator's original cap;
+    Kubernetes must still be allowed to keep its currently running replicas.
+    """
+    original = max(1, int(operator_max))
+    cap = max(original, int(current_max))
+    running = max(0, int(current_replicas))
+    measured = original if live_ceiling is None else max(0, int(live_ceiling))
+    return max(original, running, min(cap, measured))
