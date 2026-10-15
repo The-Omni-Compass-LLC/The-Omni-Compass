@@ -40,7 +40,7 @@ class RunScale(unittest.TestCase):
             d = json.loads((Path(t) / "SCALE.json").read_text())
             self.assertFalse(d["complete"])
             self.assertEqual(d["runs_done"], 1)                 # the first run always starts; none after the deadline
-            from tools.omni_version import version_of, engine_files
+            from tools.omni_version import engine_files, version_of
             self.assertEqual(d["engine"], version_of(engine_files()))
             run = d["per_run"]["energy_facility_industrial"][str(SEED0)]
             self.assertGreater(run["wall_s"], 0.0)
@@ -86,6 +86,41 @@ class PoolScale(unittest.TestCase):
                 (Path(t) / str(i) / "SCALE.json").write_text(json.dumps(d))
             with self.assertRaises(AssertionError):
                 pool_scale.main(str(Path(t) / "SIX.md"), str(Path(t) / "*" / "SCALE.json"))
+
+    def test_later_seed_shard_and_complete_join(self):
+        with tempfile.TemporaryDirectory() as t:
+            def shard(name, first, runs):
+                d = {"runs": runs, "first": first, "scale": 1, "commit": "0" * 40,
+                     "engine": "omni-v6", "arm": "v5", "load": "line",
+                     "catalog": "realms/catalog_v5.csv", "stack": "realms",
+                     "per_run": {REALMS[0]: {str(SEED0 + i): _run(1.0, 2.0)
+                                            for i in range(first, first + runs)}}}
+                p = Path(t) / name
+                p.write_text(json.dumps(d))
+                return str(p)
+            late = shard("late.json", 10, 90)
+            out = Path(t) / "SIX.md"
+            pool_scale.main(str(out), late)
+            d = json.loads(out.with_suffix(".json").read_text())
+            self.assertEqual(d["summary"]["1"][REALMS[0]]["label"], "NO RUNS")
+            hundred = d["summary"]["100"][REALMS[0]]
+            self.assertEqual(hundred["runs"], 90)
+            self.assertEqual(hundred["missing_seeds"], list(range(SEED0, SEED0 + 10)))
+            self.assertFalse(hundred["complete"])
+            self.assertEqual(hundred["band_first"], "NOT held")
+            self.assertIn("90 of 100", out.read_text())
+            early = shard("early.json", 0, 10)
+            pool_scale.main(str(out), late, early, late)
+            d = json.loads(out.with_suffix(".json").read_text())
+            self.assertTrue(d["summary"]["100"][REALMS[0]]["complete"])
+            self.assertEqual(d["available_runs"][REALMS[0]], 100)
+            # An overlapping shard cannot quietly replace an earlier observation.
+            bad = json.loads(Path(early).read_text())
+            bad["per_run"][REALMS[0]][str(SEED0)] = _run(2.0, 2.0)
+            conflict = Path(t) / "conflict.json"
+            conflict.write_text(json.dumps(bad))
+            with self.assertRaisesRegex(ValueError, "conflicting duplicate"):
+                pool_scale.main(str(out), early, str(conflict))
 
 
 class Conductor(unittest.TestCase):
