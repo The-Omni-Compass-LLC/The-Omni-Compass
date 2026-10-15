@@ -394,14 +394,17 @@ class Muscles:
         Resized in place through pods/resize: no pod restarts. No expansion during a security hold. The reset
         returns every pod to L_i.
 
-        One processor is conveyed once (v7). Where every node is a container on one machine (kind), each node reports
-        that machine's whole CPU as its own; the machine is then the one j above: A_j its CPU counted once, Q_j every
-        other pod's requests on all its nodes, P_j every serving pod on it. No limit is raised while that machine's
-        measured busy share is at or over 75% or cannot be read (the same guard as the replica room, capacity.py). And
-        no limit is raised on a machine where a pod is starting: a start uses the processor outside any request the
-        scheduler counted, and on kind the serving pods' extra CPU had slowed every start (results/live/V6_KEDA_REQUESTS.md,
-        pod start wait 8.1 s against 7.9 s at the same host load, 12.4 s once the conveyed CPU took the host past 75%).
-        Limits already given stay as they are until the next pass; lowering is never held back.
+        On kind every node is a container on one machine and reports that machine's whole CPU as its own, so the limits
+        the nodes hand out sum to more than the machine: a ceiling, not a use, and the kernel's fair scheduler arbitrates
+        when the serving pods ask for more than the machine, as it does for native's pods. v7 adds one guard, the same
+        as the replica room's (capacity.py): on such a shared host no limit is raised while the machine's measured busy
+        share is at or over 75% or cannot be read; limits already given stay, and lowering is never held back. Each hold
+        is written to the audit ("convey": "held"). Two other designs were tried in the toy gate (tools/toy_gate.py,
+        docs/OMNI_V7.md) and refused by it: the host's CPU counted once and shared by every serving pod (at the v6 KEDA
+        runs' nine replicas, 3,500m / 9 is under the operator's 500m, so nothing is ever conveyed and the +64% work and
+        -53% response time of conveyance are lost whole), and a hold while a pod starts on the host (a start wait 1%
+        shorter for a LOSS on work and speed). The slower pod start of the v6 KEDA runs (+12.5% mean, EVEN on the
+        three-run rule) is the busier host serving more requests: the price of the work, not a fault to hold against.
 
         Conveyance is on by default. It moves no work: the same requests run with less waiting. (The +26% CPU seen on
         kind is more requests served, because that load is closed-loop, not waste.) Optionally, --convey-on (a share
@@ -413,7 +416,7 @@ class Muscles:
         if not targets:
             return None
         engaged = self._convey_engaged()
-        from omni_controller.capacity import HostCpuSampler, KIND_SCALE_OUT_BUSY_LIMIT, one_host, starting
+        from omni_controller.capacity import HostCpuSampler, KIND_SCALE_OUT_BUSY_LIMIT, one_host
         node_items = self.k.get("get", "nodes", "-o", "json")["items"]
         alloc = {n["metadata"]["name"]: milli(n["status"]["allocatable"]["cpu"]) for n in node_items}
         pods = [p for p in self.k.get("get", "pods", "-A", "-o", "json")["items"]
@@ -422,14 +425,8 @@ class Muscles:
         if not hasattr(self, "host_cpu"):
             self.host_cpu = HostCpuSampler()
         busy = self.host_cpu.sample() if shared else None
-        # the machine a node stands on: every kind node is the one host; elsewhere each node is its own machine
-        machine = (lambda node: "host") if shared else (lambda node: node)
-        if shared:
-            alloc_m = {"host": max(alloc.values()) if alloc else 0.0}
-        else:
-            alloc_m = dict(alloc)
+        # the shared host near its top, or unread: no limit is raised anywhere on it (v7); elsewhere nothing is held
         busy_hold = shared and (busy is None or busy >= KIND_SCALE_OUT_BUSY_LIMIT)
-        starts = {machine(p["spec"]["nodeName"]) for p in pods if starting(p)}
         from omni_controller.quota import CpuLimitBudget
         budget = CpuLimitBudget(self.k, self.audit)
         out = {}
@@ -448,7 +445,7 @@ class Muscles:
                 (p["metadata"].get("labels", {}) or {}).get(k) == v for k, v in sel.items())
             serving, other = {}, {}
             for p in pods:
-                node = machine(p["spec"]["nodeName"])
+                node = p["spec"]["nodeName"]
                 if mine(p) and p["status"].get("phase") == "Running":
                     serving.setdefault(node, []).append(p)
                 elif not mine(p):
@@ -458,16 +455,15 @@ class Muscles:
                 self.k.write(["annotate", "deployment", name, "-n", ns, f"{CPU_ANN}={int(base)}m"], "convey: record original CPU limit")
             got = []
             for node, ps in serving.items():
-                a_j = alloc_m.get(node, 0.0)
+                a_j = alloc.get(node, 0.0)
                 share = (BAND[1] * a_j - other.get(node, 0.0)) / len(ps)
                 want = int(min(max(base, math.floor(share / 10.0) * 10), BAND[1] * a_j)) if engaged else int(base)
-                hold = busy_hold or node in starts
                 for p in ps:
                     cur = milli(p["spec"]["containers"][0].get("resources", {}).get("limits", {}).get("cpu", tmpl))
                     if obs.get("security_block", 0.0) > 0.5 and want > cur:
                         got.append(cur); continue  # shield I1: no expansion during a security hold
-                    if hold and want > cur:
-                        held.add(node); got.append(cur); continue  # a start in progress, or a shared host near its top
+                    if busy_hold and want > cur:
+                        held.add(node); got.append(cur); continue  # the shared host near its top, or unread
                     permitted, reservations = budget.limit(ns, p, cur, want)
                     if abs(permitted - cur) < self.a.cap_min_change_m:
                         got.append(cur); continue
@@ -489,8 +485,8 @@ class Muscles:
             self.gain[(ns, name)] = (sum(got) / len(got) / base) if got and base > 0 else 1.0
             self.base[(ns, name)] = base
         if held:
-            self.audit({"convey": "held", "machines": sorted(held), "starting": sorted(starts & held),
-                        "host_busy": None if busy is None else round(busy, 3), "shared_host": shared})
+            self.audit({"convey": "held", "machines": sorted(held), "host_busy": None if busy is None else round(busy, 3),
+                        "shared_host": shared})
         return out
 
     def _convey_engaged(self):

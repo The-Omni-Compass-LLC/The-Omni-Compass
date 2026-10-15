@@ -24,18 +24,6 @@ def one_host(nodes) -> bool:
     return bool(nodes) and all(str((n.get("spec") or {}).get("providerID", "")).startswith("kind://") for n in nodes)
 
 
-def starting(pod) -> bool:
-    """A pod placed on a machine whose containers are not yet ready: its start (image, runtime, readiness probe) is using
-    the machine's processor now, outside any request the scheduler counted."""
-    st = pod.get("status") or {}
-    if not (pod.get("spec") or {}).get("nodeName") or (pod.get("metadata") or {}).get("deletionTimestamp"):
-        return False
-    if st.get("phase") == "Pending":
-        return True                                     # placed, its containers being made
-    ready = [c for c in st.get("conditions") or [] if c.get("type") == "Ready"]
-    return st.get("phase") == "Running" and bool(ready) and ready[0].get("status") != "True"
-
-
 class HostCpuSampler:
     """Measure aggregate host CPU busy share from Linux /proc/stat."""
 

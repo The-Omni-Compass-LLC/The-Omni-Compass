@@ -3,10 +3,11 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""One processor is conveyed once (Omni v7, omni_controller/muscles.py, convey): on kind, where every node is a container
-on one machine, the serving pods share that machine's CPU counted once; no limit is raised while the machine is at or over
-75% busy, cannot be read, or has a pod starting on it; on separate machines each node keeps its own arithmetic and only a
-start on that node holds it. Every case reads the same conveyance code the live controller runs."""
+"""Conveyance on a shared host (Omni v7, omni_controller/muscles.py, convey): on kind, where every node is a container on
+one machine, no limit is raised while the machine is at or over 75% busy or cannot be read; limits already given stay and
+lowering goes on; a pod starting on the host holds nothing (the toy gate refused that hold: a LOSS on work and speed for
+1% of start wait, docs/OMNI_V7.md); each node keeps its own arithmetic, on kind and on separate machines alike. Every case
+reads the same conveyance code the live controller runs."""
 import copy
 import json
 import tempfile
@@ -14,7 +15,6 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-from omni_controller.capacity import starting
 from omni_controller.muscles import Muscles
 
 
@@ -87,13 +87,13 @@ class SharedHostConvey(unittest.TestCase):
                 pod("dns", "w1", app="coredns", req="300m", ns="kube-system")] + list(extra)
         return Cluster(nodes, pods)
 
-    def test_one_host_counts_its_processor_once(self):
+    def test_each_node_keeps_its_own_arithmetic_under_the_top(self):
         c, stat = self.kind_cluster(), Stat(0.40)
-        m, _ = muscles(c, stat)
+        m, events = muscles(c, stat)
         out = m.convey()
-        # (0.95 x 4000 - 300) / 3 = 1166.7 -> 1160 per serving pod, not 3700 on each of three nodes
-        self.assertEqual(out, {"default/web-1": 1160, "default/web-2": 1160, "default/web-3": 1160})
-        self.assertLessEqual(sum(out.values()), 0.95 * 4000)
+        # w1: (0.95 x 4000 - 300) / 1 = 3500; w2, w3: 0.95 x 4000 = 3800, one serving pod each (the v6 arithmetic)
+        self.assertEqual(out, {"default/web-1": 3500, "default/web-2": 3800, "default/web-3": 3800})
+        self.assertFalse(any(e.get("convey") == "held" for e in events))
 
     def test_busy_or_unread_host_holds_every_raise(self):
         for stat in (Stat(0.80), None):
@@ -101,40 +101,36 @@ class SharedHostConvey(unittest.TestCase):
             m, events = muscles(c, stat)
             self.assertEqual(m.convey(), {})
             self.assertFalse(any(a[0] == "patch" for a, _ in c.writes))
-            self.assertTrue(any(e.get("convey") == "held" for e in events))
+            held = [e for e in events if e.get("convey") == "held"]
+            self.assertTrue(held and held[0]["shared_host"] and sorted(held[0]["machines"]) == ["w1", "w2", "w3"])
 
-    def test_a_start_on_the_host_holds_the_raise_and_lowering_still_happens(self):
+    def test_a_busy_host_still_lowers(self):
+        c, stat = self.kind_cluster([pod("web-4", "w2")]), Stat(0.80)
+        for p in c.pods[:3]:
+            p["spec"]["containers"][0]["resources"]["limits"]["cpu"] = "3800m"
+        m, events = muscles(c, stat)
+        out = m.convey()
+        # w1: 3800 -> 3500 and w2 (two serving pods now): 3800 -> 1900 are lowerings, written though the host is past its
+        # top; web-4's 500 -> 1900 is a raise, held
+        self.assertEqual(out, {"default/web-1": 3500, "default/web-2": 1900})
+        held = [e for e in events if e.get("convey") == "held"]
+        self.assertTrue(held and held[0]["machines"] == ["w2"])
+
+    def test_a_start_holds_nothing(self):
         c, stat = self.kind_cluster([pod("web-4", "w2", ready=False)]), Stat(0.30)
         m, events = muscles(c, stat)
-        self.assertEqual(m.convey(), {})
-        held = [e for e in events if e.get("convey") == "held"]
-        self.assertTrue(held and held[0]["starting"] == ["host"])
-        # a limit above the new share comes down even while a pod starts; the starting serving pod shares too:
-        # (0.95 x 4000 - 300) / 4 = 875 -> 870
-        for p in c.pods[:3]:
-            p["spec"]["containers"][0]["resources"]["limits"]["cpu"] = "3700m"
-        stat2 = Stat(0.30)
-        m2, _ = muscles(c, stat2)
-        out = m2.convey()
-        self.assertEqual(out, {"default/web-1": 870, "default/web-2": 870, "default/web-3": 870})
+        out = m.convey()
+        # the starting pod on w2 is a serving pod like any other (v6's arithmetic): w2's 3800 shared by two
+        self.assertEqual(out, {"default/web-1": 3500, "default/web-2": 1900, "default/web-4": 1900, "default/web-3": 3800})
+        self.assertFalse(any(e.get("convey") == "held" for e in events))
 
-    def test_separate_machines_keep_their_own_arithmetic(self):
+    def test_separate_machines_are_never_held(self):
         nodes = [node("a", kind=False), node("b", kind=False)]
         c = Cluster(nodes, [pod("web-1", "a"), pod("web-2", "b"), pod("web-3", "b", ready=False)])
-        m, events = muscles(c)
+        m, events = muscles(c, None)                   # no host sampler at all: not a shared host, nothing to read
         out = m.convey()
-        self.assertEqual(out, {"default/web-1": 3800})            # machine a: its own 95%, nothing starting there
-        held = [e for e in events if e.get("convey") == "held"]
-        self.assertEqual(held[0]["machines"], ["b"])               # machine b: a start in progress holds it
-
-    def test_starting_reads_the_pod_itself(self):
-        self.assertTrue(starting(pod("x", "w1", phase="Pending")))
-        self.assertTrue(starting(pod("x", "w1", ready=False)))
-        self.assertFalse(starting(pod("x", "w1")))
-        unplaced = pod("x", "w1", phase="Pending"); unplaced["spec"].pop("nodeName")
-        self.assertFalse(starting(unplaced))
-        leaving = pod("x", "w1", ready=False); leaving["metadata"]["deletionTimestamp"] = "2026-10-15T00:00:00Z"
-        self.assertFalse(starting(leaving))
+        self.assertEqual(out, {"default/web-1": 3800, "default/web-2": 1900, "default/web-3": 1900})
+        self.assertFalse(any(e.get("convey") == "held" for e in events))
 
 
 if __name__ == "__main__":

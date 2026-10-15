@@ -310,7 +310,9 @@ class Controller:
         apply_give_back_only(a)
         # v7: every rule of the governor counts in seconds; its count of decisions follows from the decision period, so
         # the period can change without changing any rule's time (at --interval 60 every count is the one v6 used)
-        per = lambda sec: max(1, int(round(float(sec) / float(a.interval))))
+        # --interval 0 is a model's or a test's loop that does not sleep: each call is one decision of the shipped minute
+        period = float(a.interval) if float(a.interval) > 0 else 60.0
+        per = lambda sec: max(1, int(round(float(sec) / period)))
         pick = lambda n, sec: int(n) if n is not None else per(sec)
         self.n_slo_clear = pick(getattr(a, "slo_clear", None), getattr(a, "slo_clear_s", 180.0))
         self.n_cruise_after = pick(getattr(a, "cruise_after", None), getattr(a, "cruise_after_s", 120.0)) \
@@ -319,8 +321,10 @@ class Controller:
         self.n_verdict_every = pick(getattr(a, "verdict_every", None), getattr(a, "verdict_every_s", 600.0))
         self.n_verdict_recheck = pick(getattr(a, "verdict_recheck", None), getattr(a, "verdict_recheck_s", 7200.0))
         self.n_verdict_trial = per(getattr(a, "verdict_trial_s", 1200.0))
-        self.step_scale = float(a.interval) / 60.0     # the compass's gains are per minute: a decision moves its share of one
-        self.last_release = None                       # when the pool last gave a machine back (at most one a minute)
+        self.step_scale = period / 60.0                # the compass's gains are per minute: a decision moves its share of one
+        self.n_release = per(RELEASE_PERIOD_S)         # decisions between two machines given back (at most one a minute)
+        self.decisions = 0                             # decisions taken, the governor's own clock for the rules above
+        self.last_release = None                       # the decision at which the pool last gave a machine back
         self.log = open(a.audit, "a") if a.audit else None
         self.k = kube or Kube(a.kubectl, a.dry_run, self.audit, proxy=not getattr(a, "no_api_proxy", False))
         self.k.audit = self.audit
@@ -779,6 +783,7 @@ class Controller:
         return None
 
     def step(self):
+        self.decisions += 1
         self.host_cpu.sample()              # two adjacent controller ticks provide a host CPU busy share
         if self.killed():
             self.restore()
@@ -908,11 +913,11 @@ class Controller:
                                  senses_live=not any(blind.values()), last_command_landed=nodes_landed)
         if rec_n < n and not gate["ok"]:
             rec_n = n            # nervous system: the machine organ may not give a machine back now (reason audited)
-        elif rec_n < n and self.last_release is not None and time.time() - self.last_release < RELEASE_PERIOD_S * 0.95:
+        elif rec_n < n and self.last_release is not None and self.decisions - self.last_release < self.n_release:
             rec_n = n            # at most one machine a minute, however often the governor decides (v7)
         elif rec_n < n:
             rec_n = n - 1        # one machine at a time: release is the slow, reversible direction
-            self.last_release = time.time()
+            self.last_release = self.decisions
         # cruise (rule 7): work waiting for a place, decision after decision, so every machine goes in service and stays
         # there, without second-guessing, until the line has been empty for as many decisions
         ca = self.n_cruise_after
