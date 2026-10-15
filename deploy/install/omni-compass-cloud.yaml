@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The cloud mode (the Operator's Manual, chapter 19): Omni-Compass on top at the tune-down, on the machines alone. It moves
+# no pod autoscaler (--sensed names no service), conveys no processor and caps no power; it parks only machines the
+# cloud's autoscaler already made, after its own trial, and wakes them on a breach. Apply after omni-compass.yaml (the
+# namespace, the service account and the watch role) and rbac-machines.yaml. It ships with --dry-run: it decides and
+# writes nothing until that line is removed. Set the image (<registry>/omni-compass-cloud:<version>), TARGET_URL (the
+# service's URL) and --slo-ms (the service's line), and --max-nodes (the work pools' top). Three containers in one pod:
+# the governor, the probe (its response-time feed) and the watchdog (its lease), sharing one process namespace.
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: omni-compass, namespace: omni-compass, labels: {app: omni-compass}}
+spec:
+  replicas: 1                          # one writer: never more than one
+  strategy: {type: Recreate}           # never two governors at once, even during a rollout
+  selector: {matchLabels: {app: omni-compass}}
+  template:
+    metadata: {labels: {app: omni-compass}}
+    spec:
+      serviceAccountName: omni-compass
+      shareProcessNamespace: true          # the watchdog sees the governor's process (the lease, chapter 20.2)
+      terminationGracePeriodSeconds: 60    # room for the hand-back on SIGTERM: every parked machine woken, read back
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, seccompProfile: {type: RuntimeDefault}}
+      tolerations: [{key: CriticalAddonsOnly, operator: Exists}]     # runs on the system pool, never on a machine it parks
+      nodeSelector: {omni-role: system}
+      containers:
+        - name: controller
+          image: omni-compass-cloud:local
+          args: ["--mode", "nodepool", "--law", "compass", "--dial", "save", "--sensed", "none/none",
+                 "--active-nodes-only", "--interval", "60", "--floor-interval", "5",
+                 "--min-nodes", "2", "--max-nodes", "4", "--max-node-step", "1",
+                 "--node-scale-cmd", "bash /app/scripts/kind_nodepool.sh {n}",
+                 "--node-restore-cmd", "bash /app/scripts/kind_nodepool.sh 100000",
+                 "--latency-file", "/feed/latency.csv", "--slo-ms", "500",
+                 "--closure", "/app/law/closure.json",
+                 "--audit", "/var/log/omni/audit.jsonl", "--kill-file", "/tmp/omni.kill",
+                 "--dry-run"]
+          env:
+            - {name: WORKER_SEL, value: "omni-role=work"}      # the machines it may park
+            - {name: MIN_NODES, value: "2"}                    # never fewer in service
+          resources: {requests: {cpu: 50m, memory: 128Mi}, limits: {cpu: 500m, memory: 256Mi}}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          volumeMounts: [{name: audit, mountPath: /var/log/omni}, {name: tmp, mountPath: /tmp}, {name: feed, mountPath: /feed}]
+        - name: probe                  # the response-time feed (chapter 18): real requests to the service, every 5 s
+          image: omni-compass-cloud:local
+          command: ["python", "/app/scripts/latency_probe.py"]
+          args: ["$(TARGET_URL)", "/feed/latency.csv"]
+          env:
+            - {name: TARGET_URL, value: "http://<service>.<namespace>.svc.cluster.local/"}
+            - {name: INTERVAL, value: "5"}
+            - {name: N, value: "5"}
+            - {name: DURATION, value: "31536000"}
+          resources: {requests: {cpu: 10m, memory: 32Mi}, limits: {cpu: 100m, memory: 64Mi}}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          volumeMounts: [{name: feed, mountPath: /feed}]
+        - name: watchdog               # the lease (chapter 20.2): if the governor dies or hangs, it runs the governor's own
+          image: omni-compass-cloud:local    # recorded restore (--restore-only), which wakes every parked machine
+          command: ["python", "/app/tools/omni_switch.py", "watchdog", "--every", "10"]
+          env:                         # the restore is the governor's own command line: it needs the governor's environment
+            - {name: WORKER_SEL, value: "omni-role=work"}
+            - {name: MIN_NODES, value: "2"}
+          resources: {requests: {cpu: 10m, memory: 64Mi}, limits: {cpu: 500m, memory: 256Mi}}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          volumeMounts: [{name: audit, mountPath: /var/log/omni}, {name: tmp, mountPath: /tmp}]
+      volumes: [{name: audit, emptyDir: {}}, {name: tmp, emptyDir: {}}, {name: feed, emptyDir: {}}]

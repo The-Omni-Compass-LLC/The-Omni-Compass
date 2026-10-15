@@ -522,7 +522,7 @@ installed is a quarter off the bill.
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v5, fingerprint 6093b2b88aa911b9 (44 files).
+- **The engine on this checkout:** omni-v6, fingerprint df6147466ef18046 (45 files).
 - The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -4354,6 +4354,84 @@ Pass: as level 3.
 
 ```
 sudo python3 tools/gpu_wire_check.py --gpu 0                    # must end: WIRED RIGHT
+# watch: computes both wires and writes neither
+sudo python3 -m omni_controller.gpu_compass --mode watch --gpus 0 --audit /var/log/omni/gpu.jsonl \
+     --latency-file <feed> --slo-ms <p95 target> --floor-w <your lowest watts>
+# govern: writes the clock ceiling and the power limit
+sudo python3 -m omni_controller.gpu_compass --mode cap --gpus 0 --audit /var/log/omni/gpu.jsonl \
+     --latency-file <feed> --slo-ms <p95 target> --floor-w <your lowest watts>
+# OFF: clocks reset, power limit back to the start, read back
+sudo touch /tmp/omni-gpu-kill
+```
+
+Every `--interval` seconds (default 2) it reads the card's own meters and the response times, and:
+- **learns the card on its own** first: while the ceiling is at the top and the card is busy, its busy clock and busy
+  draw; until 15 such readings are in, neither wire moves;
+- **races while work waits**: at 95% utilization or more, the ceiling to the top and the lid to the start limit;
+- **paces the slack**: the mean response time of the last 5 s, between a tenth of `--slo-ms` and `--slo-ms`, held at
+  the compass's center (0.4); the ceiling moves in whole 15 MHz steps, never under the card's own busy clock, and the lid
+  never under the card's own busy draw plus 10%, never over the start limit;
+- **asks the card first (the verdict)**: before the ceiling may go one step lower, a paired trial measures the card's own
+  time on each request (the workload's `service_ms`) at the top and at that step; the step is allowed only if it adds
+  at most `--allow` (2%). Where no step passes, the ceiling stays at the top: the card runs as it does alone, and the
+  audit says so (`verdict_state: left native`);
+- **fails up** when p95 reaches `--slo-ms`, a request fails, the feed goes blind or the card reports a heat slowdown.
+
+One law, no profiles: down gain 0.0125, center 0.4, floor at the card's own busy clock, allowance 2% (GPU
+preregistration, amendment 8). The workload must write `service_ms` (the card's own time per request) in its latency
+file, as `tools/gpu_workload.py` does; without it no step is ever allowed and the card stays native.
+Pass: work per energy up or equal; requests served equal; no request more than 2% slower at the median, p95 and p99
+at native or within 2%; every row of section 8.5 reads "wired right".
+
+**Level 6 - CPU clock and power. WRITES.** On bare metal, add to the controller:
+`--cpufreq-policy-root /sys/devices/system/cpu/cpufreq --cpufreq-require-schedutil --rapl-cmd "<prints CPU package watts>"`.
+The OFF switch writes every policy's recorded maximum back exactly.
+Pass: energy per unit of work down, no LOSS on any service gauge.
+
+**Level 7 - Site power and cooling. WRITES.**
+`--power-cmd "<prints site watts>" --site-limit-w <limit>` brings site power stress into the engine;
+`--cooling-cmd "<sets {c}>" --cooling-min-c 18 --cooling-max-c 27 --cooling-restore-c 22` lets it hold the supply-air
+setpoint in its band. CPU and GPU sharing one power budget (`hardware/node_exchange.py`) and GPU groups sharing a site
+budget (`hardware/site_exchange.py`) run as models today. Batteries are designed as an organ, not yet wired.
+
+### 9.4 Wiring for superiority: watch first, then the brain's own verdict on every knob
+
+The founder's order of 9 October 2026 fixes the order of wiring. Every knob is wired out first and in last, and the wire
+in is connected only by a measurement the brain makes on the knob itself. The steps, for any stack:
+
+1. **Wire out, everything.** Every muscle's readings reach the brain, one wire out per muscle. Nothing is written. This is
+   watch mode (section 1.3): where every installation starts, and where any knob returns the moment it stops paying.
+2. **Run the observation.** With the stack together and under its real or replayed demand, let the brain watch for at
+   least one full cycle of that demand. In watch mode the brain learns the band of every reading, where the native
+   controllers hold them, and which readings leave calm and when. Nothing is decided yet; the audit says what the brain saw.
+3. **Let the verdict decide each knob, one trial at a time.** Switch the knobs the operator is willing to have moved into
+   verdict mode. A knob still writes nothing until the brain has run a paired trial on it (section 1.2;
+   `omnicompass/verdict.py`; on the live stacks `tools/knob_verdict.py` around it): the knob is held at the operator's
+   setting for a reference, then one notch away, under the same traffic, and the step is allowed only if the muscle's own
+   cost did not rise under the declared objective. The objective is the operator's one declaration per knob: the resource
+   reading (the service, the resource and the CPU weighed together, the default and the index's own reading) or the service
+   reading (work and speed alone). A refused step is not retried for a set time; an allowed step widens the allowance by one
+   notch, and the next trial probes the next. The compass then moves the knob by its law inside the allowance, never outside.
+4. **Keep checking.** The trials recur. A knob whose last step stops paying when the demand changes is refused on its
+   recheck and the allowance narrows back; a knob that never passes a trial stays native for good, which is the right
+   answer for that knob and costs nothing. New noise in the system is answered the same way: the compass reacts inside the
+   allowance within its time constant, and the allowance itself is re-earned by measurement.
+5. **Read the verdicts, muscle by muscle.** The audit carries the state of every knob every second (`verdict_phase`,
+   `verdict_direction`, `allowed_low`, `allowed_high`, the cost sample) and the arm's record sums it; the wiring page
+   (`docs/WIRING_VERDICTS.md`, section 16.6b) is the same judgement made from the published tables after the fact. An
+   operator who wants one knob wired both ways and another watched only sets the objective on the first and leaves the
+   second in watch.
+
+What this gives: no knob is ever written on faith. Where Omni-Compass can beat the native controller on the muscle's own
+gauges, it will have proved it on that muscle before it moved it; where it cannot, the muscle lives by itself and Omni
+reads it. The organism's superiority is then the sum of the knobs that earned it, not one turn of a single dial for the
+whole system. On the five live stacks of section 10 this is built and declared (the amendments of 9 October in the Redis,
+Kafka, PostgreSQL, MySQL and YCSB preregistrations); the counted runs on it were dispatched on 10 October, three runs a stack
+and objective, the expectation written before them (`docs/RERUN_2026-10-10.md`). On the Kubernetes
+controller the verdict already guards the machines (section 1.2). Inside the modelled realms the organism still takes one
+directive for every muscle; making the verdict per muscle there is the next engine, Omni v4 (`docs/OMNI_V4_PLAN.md`),
+designed and not built, because every result must be run again on a new engine.
+
 
 ## 34. Stack by Stack
 
@@ -4410,7 +4488,7 @@ whether it carries work or not, so the aim on a managed cluster is native's work
 The cloud therefore runs at the tune-down (`dial save`, the `dial` input of `aks-metered` and its default) with the governor
 on the machines alone (`OMNI_MACHINES_ONLY=1`): it moves no pod autoscaler, conveys no processor and caps no power, so the
 pods are exactly native's and the cloud's own autoscaler alone makes machines; the governor parks a machine the cloud
-already made only after its own trial shows the response time holds, and wakes it at once on a breach. It can hold no
+already made only after its own trial shows the response time holds, and wakes it on a breach. It can hold no
 more pods and no more machines than native: the bill can only fall or stay, and it falls in the quiet stretches between
 bursts and in a day's trough. The
 max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),
@@ -9944,7 +10022,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v5, fingerprint 6093b2b88aa911b9 (44 files).
+- **The engine on this checkout:** omni-v6, fingerprint df6147466ef18046 (45 files).
 - The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%

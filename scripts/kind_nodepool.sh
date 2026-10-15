@@ -13,14 +13,26 @@
 # Wake a worker: remove the mark (those still carrying work first, they are warm), clear the marks on its pods; it is in
 # service at once, with no boot.
 # Which workers idle: fewest serving pods first, then fewest pods, so an empty worker idles before one with work.
+# A worker someone else cordoned (a person's maintenance, a cluster upgrade's drain, a repair) is not mine: it is never
+# uncordoned, never counted in service or idle, and my idle mark on it, if any, comes off (and my marks on its pods).
 # Usage: bash scripts/kind_nodepool.sh N
 set -euo pipefail
 KUBECTL="${KUBECTL:-kubectl}"   # kind_bench.sh sets this to scripts/kubectl_omni.sh (least privilege)
 want="${1:?usage: kind_nodepool.sh N}"
 workers=$($KUBECTL get nodes -l "${WORKER_SEL:-!node-role.kubernetes.io/control-plane}" -o json)
-CLOSED_Q='(.spec.unschedulable == true or any(.spec.taints[]?; .key == "omnicompass.io/idle"))'
-mapfile -t active < <(echo "$workers" | jq -r ".items[] | select($CLOSED_Q | not) | .metadata.name")
+FOREIGN_Q='(.spec.unschedulable == true)'                                   # cordoned by someone else: not mine
+CLOSED_Q="(any(.spec.taints[]?; .key == \"omnicompass.io/idle\") and ($FOREIGN_Q | not))"   # idled by me
+OPEN_Q="(($FOREIGN_Q or any(.spec.taints[]?; .key == \"omnicompass.io/idle\")) | not)"
+mapfile -t active < <(echo "$workers" | jq -r ".items[] | select($OPEN_Q) | .metadata.name")
 mapfile -t parked < <(echo "$workers" | jq -r ".items[] | select($CLOSED_Q) | .metadata.name")
+mapfile -t foreign < <(echo "$workers" | jq -r ".items[] | select($FOREIGN_Q and any(.spec.taints[]?; .key == \"omnicompass.io/idle\")) | .metadata.name")
+for node in "${foreign[@]}"; do      # someone else closed a machine I had idled: it is theirs now; my marks come off
+  $KUBECTL taint node "$node" omnicompass.io/idle:PreferNoSchedule- >/dev/null 2>&1 || true
+  for pod in $($KUBECTL get pods -A --field-selector "spec.nodeName=$node" -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}'); do
+    $KUBECTL annotate -n "${pod%%/*}" "pod/${pod#*/}" controller.kubernetes.io/pod-deletion-cost- >/dev/null 2>&1 || true
+  done
+  echo "left $node: cordoned by someone else; my idle mark removed, never uncordoned by me"
+done
 total=$(( ${#active[@]} + ${#parked[@]} ))
 floor="${MIN_NODES:-2}"   # machines always in service, ready for the next burst (the founder's floor: two)
 ceiling=$(( total - ${NODE_CUSHION:-0} ))   # every machine usable; the protection is the band inside each machine.
@@ -39,7 +51,6 @@ if (( want > n )); then
   mapfile -t wake < <(for node in "${parked[@]}"; do echo "$(workload_on "$node") $node"; done | sort -rn | awk '{print $2}')
   for node in "${wake[@]:0:$((want - n))}"; do
     $KUBECTL taint node "$node" omnicompass.io/idle:PreferNoSchedule- >/dev/null 2>&1 || true
-    $KUBECTL uncordon "$node" >/dev/null
     echo "wake $node: open to work"
     for pod in $($KUBECTL get pods -A --field-selector "spec.nodeName=$node" -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}'); do
       $KUBECTL annotate -n "${pod%%/*}" "pod/${pod#*/}" controller.kubernetes.io/pod-deletion-cost- >/dev/null 2>&1 || true
@@ -94,4 +105,4 @@ elif (( want < n )); then
     rank=$(( rank - 1 ))
   done
 fi
-echo "open workers: $($KUBECTL get nodes -l "${WORKER_SEL:-!node-role.kubernetes.io/control-plane}" -o json | jq "[.items[] | select($CLOSED_Q | not)] | length") (wanted $want)"
+echo "open workers: $($KUBECTL get nodes -l "${WORKER_SEL:-!node-role.kubernetes.io/control-plane}" -o json | jq "[.items[] | select($OPEN_Q)] | length") (wanted $want)"

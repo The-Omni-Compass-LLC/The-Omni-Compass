@@ -52,7 +52,7 @@ SUBTITLE = ("The Master Manual: Its Philosophy, Its Mathematics, Its Mechanism, 
             if OWNER else "How to Embed, Wire, Tune and Run Omni-Compass on Your Stack")
 SUBTITLE_HTML = ("The Master Manual:<br/>Its Philosophy, Its Mathematics, Its Mechanism, Its Results,<br/>and How to Wire It "
                  "onto Your Stack" if OWNER else "How to Embed, Wire, Tune and Run<br/>Omni-Compass on Your Stack")
-LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix F"
+LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix O"
 INTRO = ("Introduction: The Problem, the Idea and the Promise" if OWNER else
          "Introduction: The Problem, the Idea and What This Manual Covers")
 RESULTS_LINE = ("Every result in this book carries its evidence class." if OWNER else
@@ -153,6 +153,75 @@ def glyphs(t: str, cmap: set) -> str:
     return "".join(c if ord(c) < 128 or ord(c) in cmap or ord(c) not in SYM_CMAP else f'<font name="Sym">{c}</font>' for c in t)
 
 
+TEX_SYM = {"sum": "\u2211", "int": "\u222b", "approx": "\u2248", "le": "\u2264", "leq": "\u2264", "ge": "\u2265",
+           "geq": "\u2265", "times": "\u00d7", "cdot": "\u00b7", "Delta": "\u0394", "propto": "\u221d", "dots": "\u2026",
+           "ldots": "\u2026", "infty": "\u221e", "lceil": "\u2308", "rceil": "\u2309", "max": "max", "min": "min",
+           "qquad": "\u2003\u2003", "quad": "\u2003", ",": "\u2009", ";": " ", ":": " ", " ": " ", "!": "", "$": "$",
+           "lambda": "\u03bb", "rho": "\u03c1", "sigma": "\u03c3", "mu": "\u03bc", "tau": "\u03c4", "alpha": "\u03b1"}
+TEX_DROP = ("left", "right", "big", "Big", "bigg", "Bigg", "bigl", "bigr", "Bigl", "Bigr")
+
+
+def tex(src: str) -> str:
+    """A formula written in LaTeX in the markdown ($...$), set as text for the printed book: symbols as their glyphs,
+    subscripts and superscripts as such, fractions as a/b. The markdown keeps the LaTeX."""
+    s = src.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
+    i, out = 0, []
+
+    def group(j):                      # the {...} at j (or one character), and the index after it
+        while j < len(s) and s[j] == " ":
+            j += 1
+        if j < len(s) and s[j] == "{":
+            depth, k = 0, j
+            while k < len(s):
+                depth += {"{": 1, "}": -1}.get(s[k], 0)
+                if depth == 0:
+                    return s[j + 1:k], k + 1
+                k += 1
+            return s[j + 1:], len(s)
+        if j < len(s) and s[j] == "\\" and re.match(r"\\([A-Za-z]+|.)", s[j:]):
+            m = re.match(r"\\([A-Za-z]+|.)", s[j:])
+            return s[j:j + len(m.group(0))], j + len(m.group(0))
+        return s[j:j + 1], j + 1
+    while i < len(s):
+        c = s[i]
+        if c == "\\":
+            m = re.match(r"\\([A-Za-z]+|.)", s[i:])
+            if m is None:
+                i += 1; continue
+            name = m.group(1); i += len(m.group(0))
+            if name in TEX_DROP:
+                continue
+            if name in ("text", "mathrm", "mathbf", "mathit", "operatorname"):
+                g, i = group(i); out.append(tex(g) if name != "text" else esc_txt(g)); continue
+            if name == "frac":
+                a, i = group(i); b, i = group(i)
+                a, b = tex(a), tex(b)
+                wrap = lambda x: f"({x})" if re.search(r"[ +\u2212=\u2009\u2003]", re.sub(r"<[^>]+>", "", x)) else x
+                out.append(f"{wrap(a)}/{wrap(b)}"); continue
+            if name == "sqrt":
+                a, i = group(i); out.append("\u221a" + (tex(a) if len(a) == 1 else f"({tex(a)})")); continue
+            out.append(TEX_SYM.get(name, name)); continue
+        if c in "_^":
+            g, i = group(i + 1)
+            tag = "sub" if c == "_" else "super"           # at the body's own size: no text under 11 pt
+            out.append(f'<{tag} size="{PT}" rise="{2 if c == "_" else 3}">{tex(g)}</{tag}>'); continue
+        if c in "{}":
+            i += 1; continue
+        if c == "'":
+            out.append("\u2032"); i += 1; continue
+        if c == "-":
+            out.append("\u2212"); i += 1; continue
+        out.append(esc_txt(c)); i += 1
+    return glyphs("".join(out), SERIF_CMAP)
+
+
+def esc_txt(x: str) -> str:
+    return x.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+MATH = re.compile(r"\$\$(.+?)\$\$|(?<![\\\w$])\$(?=\S)((?:\\\$|[^$\n])+?)(?<=\S)(?<!\\)\$(?![\w$])")
+
+
 def inline(t: str) -> str:
     t = t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     codes = []
@@ -160,12 +229,18 @@ def inline(t: str) -> str:
     def keep(m):
         codes.append(m.group(1)); return f"\x00{len(codes) - 1}\x00"
     t = re.sub(r"`([^`]+)`", keep, t)
+    maths = []
+
+    def keep_math(m):
+        maths.append(tex(m.group(1) if m.group(1) is not None else m.group(2))); return f"\x01{len(maths) - 1}\x01"
+    t = MATH.sub(keep_math, t)
     t = re.sub(r"!\[([^\]]*)\]\([^)]+\)", r"\1", t)
     t = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", t)
     t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
     t = re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?!\w)", r"<i>\1</i>", t)
     t = re.sub(r"(?<![\w_])_(?![\s_])([^_]+?)(?<![\s_])_(?![\w_])", r"<i>\1</i>", t)
     t = glyphs(t, SERIF_CMAP)
+    t = re.sub(r"\x01(\d+)\x01", lambda m: maths[int(m.group(1))], t)
     return re.sub(r"\x00(\d+)\x00", lambda m: f'<font name="Mono" size="{PT}">' + glyphs(codes[int(m.group(1))], MONO_CMAP) + "</font>", t)
 
 
@@ -342,9 +417,15 @@ def split_h1(text):
 
 def manual_sections():
     """The manual, cut at its level-2 headings: {short title: lines}."""
-    secs, cur = {}, None
+    secs, cur, fence = {}, None, False
     for ln in clean_lines(read(MANUAL_REL)):
-        m = re.match(r"^## (.*)", ln)
+        if ln.lstrip().startswith("```"):
+            fence = not fence                    # a line inside a code block is never a heading ("# a comment")
+        m = None if fence or ln.lstrip().startswith("```") else re.match(r"^## (.*)", ln)
+        if fence or ln.lstrip().startswith("```"):
+            if cur:
+                secs[cur].append(ln)
+            continue
         if m:
             cur = re.sub(r"^\d+\.\s*", "", m.group(1).strip()); secs[cur] = []
         elif re.match(r"^# ", ln):
@@ -396,6 +477,39 @@ OPERATOR_OUTLINE = [
     ("Paired Runs and Receipts on Your Own System", ("M", "Paired Runs and Receipts on Your Own System")),
     ("Evidence Classes and How to Read a Receipt", ("M", "Evidence Classes and How to Read a Receipt")),
     ("The Engine Version and the Three-Run Rule", ("M", "The Engine Version and the Three-Run Rule")),
+    ("PART", "The Implementer's Guide: Omni-Compass on a Cloud",
+     "For the engineer who installs it on Azure, Google Cloud or Amazon Web Services and keeps it in service: the path and "
+     "its gates, the permissions, each cloud step by step, the response-time feed, the cloud mode, day two, the graphics "
+     "processor, observability, change and risk, planning the saving, own racks and private clouds, hardening, a fleet, "
+     "the failure drills, a complete installation, and the questions implementers ask."),
+    ("The Implementer's Path: From an Empty Account to a Governed Cluster",
+     ("M", "The Implementer's Path: From an Empty Account to a Governed Cluster")),
+    ("Identity, Permissions and Least Privilege on a Managed Cluster",
+     ("M", "Identity, Permissions and Least Privilege on a Managed Cluster")),
+    ("Azure Kubernetes Service, Step by Step", ("M", "Azure Kubernetes Service, Step by Step")),
+    ("Google Kubernetes Engine, Step by Step", ("M", "Google Kubernetes Engine, Step by Step")),
+    ("Amazon Elastic Kubernetes Service, Step by Step", ("M", "Amazon Elastic Kubernetes Service, Step by Step")),
+    ("The Response-Time Feed and the Line", ("M", "The Response-Time Feed and the Line")),
+    ("Running in the Cloud: the Machines Alone, the Bill and the Alarm Minutes",
+     ("M", "Running in the Cloud: the Machines Alone, the Bill and the Alarm Minutes")),
+    ("Day Two: Running Omni-Compass in Production", ("M", "Day Two: Running Omni-Compass in Production")),
+    ("The Graphics Processor: Putting the Governor on a Card", ("M", "The Graphics Processor: Putting the Governor on a Card")),
+    ("Observability: Feeding the Governor from Your Monitoring, and Watching It",
+     ("M", "Observability: Feeding the Governor from Your Monitoring, and Watching It")),
+    ("Change Management, Risk and Compliance", ("M", "Change Management, Risk and Compliance")),
+    ("Planning the Saving Before the Run: Capacity, Cost and the Shape of Load",
+     ("M", "Planning the Saving Before the Run: Capacity, Cost and the Shape of Load")),
+    ("On Your Own Racks and in Private Clouds",
+     ("M", "On Your Own Racks and in Private Clouds")),
+    ("Hardening and the Supply Chain",
+     ("M", "Hardening and the Supply Chain")),
+    ("Rolling Out Across a Fleet: Many Clusters, Many Services, GitOps",
+     ("M", "Rolling Out Across a Fleet: Many Clusters, Many Services, GitOps")),
+    ("Failure Modes and the Drill Book",
+     ("M", "Failure Modes and the Drill Book")),
+    ("A Complete Installation, Start to Finish",
+     ("M", "A Complete Installation, Start to Finish")),
+    ("Questions an Implementer Asks", ("M", "Questions an Implementer Asks")),
     ("PART", "License and Your Copy",
      "The terms the software and this manual are licensed under, and how to verify a copy before it is installed."),
     ("License and Commercial Terms", ("M", "License and Commercial Terms")),
@@ -407,9 +521,18 @@ OPERATOR_OUTLINE = [
     ("Appendix C. The Gauges", ("M", "Appendix C - The Gauges")),
     ("Appendix D. Troubleshooting", ("M", "Appendix D - Troubleshooting")),
     ("Appendix E. The Muscles: What Each Is For, and How It Is Wired", ("F", "docs/MUSCLE_CATALOG.md")),
-    ("Appendix F. The License", ("X", "license")),
-    ("Appendix G. Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
-    ("Appendix H. Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
+    ("Appendix F. The Azure Account, Click by Click", ("F", "docs/AZURE_SETUP.md")),
+    ("Appendix G. The Google Cloud Account, Click by Click", ("F", "docs/GOOGLE_SETUP.md")),
+    ("Appendix H. The Amazon Web Services Account, Click by Click", ("F", "docs/AMAZON_SETUP.md")),
+    ("Appendix I. The Install Manifests", ("X", "manifests")),
+    ("Appendix J. The Implementer's Checklists", ("M", "Appendix J - The Implementer's Checklists")),
+    ("Appendix K. The Kubernetes Governor's Settings", ("M", "Appendix K - The Kubernetes Governor's Settings")),
+    ("Appendix L. The Audit, Record by Record", ("M", "Appendix L - The Audit, Record by Record")),
+    ("Appendix M. The Three Clouds Side by Side", ("M", "Appendix M - The Three Clouds Side by Side")),
+    ("Appendix N. The Paired Run from GitHub: Every Input", ("M", "Appendix N - The Paired Run from GitHub: Every Input")),
+    ("Appendix O. The License", ("X", "license")),
+    ("Appendix P. Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
+    ("Appendix Q. Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
     ("Contact", ("X", "contact")),
 ]
 
@@ -538,6 +661,12 @@ def special(name):
         story = [Paragraph(inline(intro), BODY)]
         for rel in ["omnicompass/core.py", "omnicompass/compass_law.py", "realms/compass_arm.py", "omni_controller/gpu_compass.py",
                     "omnicompass/adapter.py", "omnicompass/nervous_system.py"]:
+            story += source_listing(rel)
+        return story
+    if name == "manifests":
+        story = md_flow(MAN["Appendix I - The Install Manifests"], shift=2, strip=True)
+        for rel in ["deploy/install/omni-compass.yaml", "deploy/install/rbac-machines.yaml", "deploy/install/omni-compass-cloud.yaml",
+                    "deploy/rbac-target.yaml", "deploy/Dockerfile", "deploy/Dockerfile.cloud"]:
             story += source_listing(rel)
         return story
     if name == "license":

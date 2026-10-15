@@ -173,8 +173,15 @@ repository whenever it changes (`docs/book/build_book.py`): how to embed, wire, 
 stacked, clustered system or on any one muscle. Front matter with the card for the glove box; the governor from the
 outside and its factory tune; the plug and the rules its wires obey; the wiring level by level and stack by stack
 (Kubernetes, databases, message brokers, caches, GPUs, the processor itself, the data center under the servers, robots
-and drones); operating it; checking it on your own system; and back matter with every muscle, its wiring and its card.
-Its text is [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md). It is written for the CTO who decides, the
+and drones); operating it; checking it on your own system; **the implementer's guide for the cloud** (Part VI, chapters
+13 to 30: the path and its gates, least privilege, Azure, Google Cloud and Amazon step by step, the response-time feed,
+the cloud mode, day two, the graphics processor, observability, change and risk, planning the saving before the run, own
+racks and private clouds, hardening and the supply chain, a fleet under continuous delivery, the failure drill book, and
+one installation start to finish); and back matter with every muscle, its wiring and its card, the install manifests,
+the implementer's checklists, the governor's settings, the audit record by record, the three clouds side by side and
+every input of the paired run from GitHub. It is 434 pages, more than half the Owner's 816. Its text is
+[`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md); the cloud install files are `deploy/install/`
+(`omni-compass.yaml`, `rbac-machines.yaml`, `omni-compass-cloud.yaml`) and `deploy/Dockerfile.cloud`. It is written for the CTO who decides, the
 engineer who wires and the operator who runs it; the published results are on this page and in `results/`.
 
 [`docs/OMNI_COMPASS_OWNERS_MANUAL.pdf`](docs/OMNI_COMPASS_OWNERS_MANUAL.pdf), the Owner's Manual, is the master: everything

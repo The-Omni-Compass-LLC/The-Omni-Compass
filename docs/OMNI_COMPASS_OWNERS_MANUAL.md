@@ -7,7 +7,9 @@
 **This is the Owner's Manual, the master.** It holds everything: what Omni-Compass is, the philosophy and the
 mathematics it runs on, its mechanism, how it is built, every result with its evidence class, and how it is wired, run
 and checked. It is written for whoever owns or licenses Omni-Compass and so must know the whole mechanism. The
-Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`) is the shorter book for the people who wire and run it. The printed
+Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`) is the book for the people who wire and run it; its Part VI (chapters
+13 to 30) is the implementer's whole path onto a cloud, from an empty account to a governed cluster, and is the
+reference for that work in both books. The printed
 book of this text is `docs/OMNI_COMPASS_OWNERS_MANUAL.pdf` (`python3 docs/book/build_book.py --owner`).
 
 **October 2026**
@@ -2100,7 +2102,7 @@ whether it carries work or not, so the aim on a managed cluster is native's work
 The cloud therefore runs at the tune-down (`dial save`, the `dial` input of `aks-metered` and its default) with the governor
 on the machines alone (`OMNI_MACHINES_ONLY=1`): it moves no pod autoscaler, conveys no processor and caps no power, so the
 pods are exactly native's and the cloud's own autoscaler alone makes machines; the governor parks a machine the cloud
-already made only after its own trial shows the response time holds, and wakes it at once on a breach. It can hold no
+already made only after its own trial shows the response time holds, and wakes it on a breach. It can hold no
 more pods and no more machines than native: the bill can only fall or stay, and it falls in the quiet stretches between
 bursts and in a day's trough. The
 max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),

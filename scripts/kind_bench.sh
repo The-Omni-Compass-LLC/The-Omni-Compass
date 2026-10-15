@@ -54,6 +54,9 @@ IDLE_W="${IDLE_W:-100}"; DYN_W="${DYN_W:-150}"
 PARK_FRAC="${PARK_FRAC:-0.25}"
 STANDBY_W="${STANDBY_W:-$(python -c "print($IDLE_W * $PARK_FRAC)")}"; export IDLE_W DYN_W STANDBY_W
 mkdir -p "$OUT_DIR"
+if [ "${OMNI_MACHINES_ONLY:-0}" = "1" ]; then   # the receipt names this arm as it ran (tools/live_reps.py)
+  echo "machines alone: no pod autoscaler moved, no processor conveyed, no power capped" > "$OUT_DIR/machines_only.txt"
+fi
 # PLATFORM=kind (default): the kind cluster on one runner. PLATFORM=aks: a real Azure Kubernetes Service cluster
 # (.github/workflows/aks-metered.yml): workers are the user pool (agentpool=work) under Azure's own cluster autoscaler,
 # which deletes a machine once it is empty, so a machine given back is a machine no longer billed; the system pool

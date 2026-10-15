@@ -151,7 +151,10 @@ the founder overrides one in the conversation.
     muscle, in all its processes. It does not explain what is inside Omni-Compass or how it is built: no theory, no
     equations of the engine, no gains or internal rules, no engine source, no benchmark results (those stay in `results/`
     and `docs/STATE_OF_PLAY.md`). The engine is shown only as its shell and its process. Nothing in it explains or points
-    to how the code is written, and nothing is disclosed or disclaimed about it.
+    to how the code is written, and nothing is disclosed or disclaimed about it. It is at least half the Owner's length
+    (the founder's order of 14 October, night) and carries the implementer's whole cloud path (Part VI, chapters 13 to
+    30, with the install files in `deploy/install/` and `deploy/Dockerfile.cloud`): Google and Amazon ready the way Azure
+    is, the governor on the machines alone in every cloud.
   - **The Owner's Manual, the master** (`docs/OMNI_COMPASS_OWNERS_MANUAL.md` and `.pdf`, `build_book.py --owner`):
     everything and all, for whoever owns or licenses Omni-Compass and so must know the whole mechanism: the philosophy and
     theory (`docs/book/THEORY.md`, `docs/book/DECLARATION.md`), the mathematics, the mechanism, how it is built, the

@@ -6,10 +6,11 @@ This connects GitHub to a Google Cloud account so two workflows can run the same
 
 - **`gke-metered`**: a real Google Kubernetes Engine cluster, native Kubernetes (with Google's own cluster autoscaler)
   against the same with Omni-Compass on top, the machines Google bills counted every 15 seconds, the organisms with the
-  cluster inside at 1, 10, 100 and 1,000 copies (`organism`, `organism_scale`), everything deleted at the end. The same
+  cluster inside at 1, 10 and 100 copies (`organism`, `organism_scale`), everything deleted at the end; every set at the
+  tune-down with the governor on the machines alone, so the bill can only fall or stay. The same
   design as Azure's `aks-metered` (`docs/K8S_COMPASS_PREREGISTRATION.md`).
-- **`cloud-organism`** with `cloud` = `gcp`: the big organisms (the whole tower and the four stacked at 1,000 copies, the
-  real cluster inside) on one rented 8-processor machine, the same test Azure's `big-organism-detached` runs.
+- **`cloud-organism`** with `cloud` = `gcp`: the big organisms (the whole tower and the four stacked, the
+  real cluster inside, at 100 copies) on one rented 8-processor machine, the same test Azure's `big-organism-detached` runs.
 
 About fifteen minutes, once. New accounts get **$300 of free credit for 90 days**; Google does not charge the card during the
 free trial.
@@ -63,8 +64,8 @@ project, run `gcloud config set project YOUR-PROJECT-ID` first.)
 2. **New repository secret**. Name: `GCP_CREDENTIALS`. Secret: paste the whole block from step 4. **Add secret**.
 3. **New repository secret**. Name: `GCP_PROJECT`. Secret: the Project ID from step 2. **Add secret**.
 
-That is all. Tell Claude the two secrets are in; it starts the runs on the newest engine (branch `v5`) and reports each
-result before anything goes up.
+That is all. The runs start from the repository's **Actions** tab on the newest engine (branch `v5`), and no result goes up
+before it has been read.
 
 ## 6. What it costs
 

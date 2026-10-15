@@ -49,12 +49,13 @@ That block is a password for this one purpose; never paste it anywhere but the G
 ## 5. Run it
 
 **Actions** tab, then **aks-metered** on the left, then **Run workflow**, then the green **Run workflow** button. The
-defaults are the preregistered design (5 repetitions, native / compass / omni, 900 measured seconds, Standard_D2s_v5 in
-eastus). About 6 hours on GitHub. Each cluster is deleted when its arm ends, and the resource group at the end of every
+defaults are the preregistered design (5 repetitions, native and native with Omni-Compass on top, 900 measured seconds,
+Standard_D2s_v4 in eastus, the governor at the tune-down on the machines alone: the pods exactly native's, so the bill can
+only fall or stay). About 6 hours on GitHub. Each cluster is deleted when its arm ends, and the resource group at the end of every
 repetition whatever happens, so nothing keeps billing.
 
 If Azure answers **quota exceeded**: in the portal, search **Subscriptions**, open yours, and upgrade it to
-**Pay-As-You-Go** (the credit stays), or ask for a quota of 10 vCPUs for the Dv5 family in the region.
+**Pay-As-You-Go** (the credit stays), or ask for a quota of 10 vCPUs for the DSv4 family in the region.
 
 ## 6. Afterwards
 
