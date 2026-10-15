@@ -35,8 +35,7 @@ or physical power meters on managed Azure VMs.
 Google/GKE and Amazon/EKS retain their deployment scripts and use the new shared engine on a future manual launch.
 Their workflows, cloud-organism, gpu-bench and lambda-gpu are excluded from this campaign. No GPU machine is rented by it.
 `scripts/gpu_campaign_profiles.json` defines one physical card and eight physical cards, with organism scales
-1, 10, 100 and 1,000. These are model copies around real hardware. A 1,000-physical-GPU experiment would require an actual
-fleet, distributed workload and per-device receipts; this repository does not claim that result from one card.
+1, 10 and 100. These are model copies around real hardware; only these three organism scales are permitted.
 
 The profiles are operational through the existing `HIL_SCALES` and `HIL_REPS_BY_SCALE` environment variables. Existing
 wall-clock budgets still apply: a stage that cannot finish within its budget must be reported incomplete.

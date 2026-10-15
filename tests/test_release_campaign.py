@@ -64,7 +64,7 @@ class ReleaseCampaign(unittest.TestCase):
         self.assertEqual(d['profiles']['one-card']['physical_gpus'], 1)
         self.assertEqual(d['profiles']['eight-card']['physical_gpus'], 8)
         for p in d['profiles'].values():
-            self.assertEqual(p['environment']['HIL_SCALES'], '1,10,100,1000')
+            self.assertEqual(p['environment']['HIL_SCALES'], '1,10,100')
 
 
 if __name__ == '__main__':

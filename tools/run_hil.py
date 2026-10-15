@@ -328,6 +328,9 @@ def main(argv=None):
     ap.add_argument("--sim", action="store_true", default=bool(os.environ.get("SIM")))
     ap.add_argument("--workload-args", default=os.environ.get("WORKLOAD_ARGS", ""))
     a = ap.parse_args(argv)
+    scales = [int(x) for x in a.scales.split(",") if x.strip()]
+    if not scales or any(x not in (1, 10, 100) for x in scales):
+        ap.error("organism scales must be drawn from 1,10,100")
     a.out = Path(a.out); a.out.mkdir(parents=True, exist_ok=True)
     start_w = limit(a)
     cal = [sys.executable, str(ROOT / "tools" / "gpu_workload.py"), "calibrate", "--out", str(a.out), "--device",
@@ -336,7 +339,6 @@ def main(argv=None):
     service = json.loads((a.out / "calib.json").read_text())["service_ms"]
     slo_ms = round(10 * service, 1)
     commit = subprocess.run(["git", "-c", "safe.directory=*", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-    scales = [int(x) for x in a.scales.split(",") if x.strip()]
     rbs = [int(x) for x in a.reps_by_scale.split(",") if x.strip()]
     reps_of = {sc: (a.reps if a.reps is not None else (rbs[i] if i < len(rbs) else rbs[-1])) for i, sc in enumerate(scales)}
     cost = per_muscle_step_s()

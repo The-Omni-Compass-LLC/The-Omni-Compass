@@ -21,7 +21,7 @@ on:
       region: {description: "Lambda region (empty: the first with a machine free)", default: ""}
       max_cost: {description: "Ceiling in US dollars for the hour budget plus one hour; above it nothing is rented", default: "400"}
       dry_run: {description: "Show the price and the plan, rent nothing (yes/no)", default: "yes"}
-      hil_profile: {description: "Prepared scale profile: standard or 1-to-1000 (model copies around physical GPU hardware)", default: "1-to-1000"}
+      hil_profile: {description: "Prepared organism scales: standard or 1-10-100", default: "1-10-100"}
   push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
 permissions:
   contents: read
@@ -65,7 +65,7 @@ jobs:
           REGION: ${{ github.event.inputs.region }}
           MAX_COST: ${{ github.event.inputs.max_cost }}
           DRY: ${{ github.event.inputs.dry_run }}
-          HIL_PROFILE: ${{ github.event.inputs.hil_profile || '1-to-1000' }}
+          HIL_PROFILE: ${{ github.event.inputs.hil_profile || '1-10-100' }}
         run: |
           set -euo pipefail
           echo "launched=false" >> "$GITHUB_OUTPUT"
@@ -79,11 +79,11 @@ jobs:
           esac
           case "$HIL_PROFILE" in
             standard) ;;
-            1-to-1000)
-              HIL_REPS=$([ "$TEST" = 8card ] && echo 1,1,1,1 || echo 5,3,2,1)
-              ENVS="$ENVS HIL_SCALES=1,10,100,1000 HIL_REPS_BY_SCALE=$HIL_REPS"
+            1-10-100)
+              HIL_REPS=100,100,100
+              ENVS="$ENVS HIL_SCALES=1,10,100 HIL_REPS_BY_SCALE=$HIL_REPS"
               ;;
-            *) echo "unknown HIL profile: $HIL_PROFILE"; exit 1;;
+            *) echo "unsupported HIL profile: $HIL_PROFILE (use standard or 1-10-100)"; exit 1;;
           esac
           TYPE="${TYPE_IN:-$([ "$TEST" = 8card ] && echo gpu_8x_a100_80gb_sxm4 || echo gpu_1x_a10)}"
           HOURS=$(python3 -c "print(float('$BUDGET') + 1)")
