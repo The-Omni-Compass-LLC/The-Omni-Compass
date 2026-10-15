@@ -52,6 +52,25 @@ OUT_JSON = ROOT / "results" / "BENEFIT_SHEET.json"
 ENGINE_RE = re.compile(r"\bomni-v(\d+)\b")
 
 
+def has_commit(sha):
+    """Whether this checkout holds the named commit (a shallow checkout, as GitHub's verify runs, does not)."""
+    try:
+        return subprocess.run(["git", "cat-file", "-e", f"{sha}^{{commit}}"], cwd=ROOT, capture_output=True,
+                              timeout=60).returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+def recorded_engine(rel):
+    """The engine the committed sheet records for a table, read where the commit it names was in the history."""
+    try:
+        rows = json.loads(OUT_JSON.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return "not named"
+    rows = rows.get("rows", []) if isinstance(rows, dict) else rows
+    return next((r.get("engine") or "not named" for r in rows if r.get("file") == rel), "not named")
+
+
 def engine_of(rel):
     """The engines a row's table ran on, read from the table itself (its run table's Engine column, or the engine its JSON
     names), oldest first: "omni-v6", or "omni-v1 and omni-v3" for a table built from several; "not named" where the table
@@ -72,6 +91,8 @@ def engine_of(rel):
             found = {int(m.group(1))} if m else {int(x) for t in texts for x in re.findall(r"\bOmni v(\d+)\b", t)}
         if not found:                                              # the engine of the commit the table names, by the version tool
             m = next((re.search(r"commit `([0-9a-f]{7,40})`", t) for t in texts if re.search(r"commit `([0-9a-f]{7,40})`", t)), None)
+            if m and not has_commit(m.group(1)):                   # a checkout without that history (GitHub's is one commit
+                return recorded_engine(rel)                        # deep): the engine the sheet recorded where it was there
             if m:
                 try:
                     out = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", m.group(1)], cwd=ROOT,
