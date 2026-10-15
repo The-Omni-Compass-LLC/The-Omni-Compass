@@ -604,6 +604,38 @@ def report(cov, started, queued, running, target, out=sys.stdout, gave_up=None, 
               "dropped silently)", file=out)
 
 
+def yield_repair_coordinator():
+    """One explicit maintenance request releases a sleeping coordinator, never measured benchmark jobs."""
+    request_path = ROOT / 'scripts' / 'azure_runner_priority.json'
+    if not request_path.exists():
+        return False
+    request = json.loads(request_path.read_text())
+    current = os.environ.get('GITHUB_RUN_ID', '')
+    if current != str(request['coordinator_run_id']):
+        return False
+    repair = api(f"repos/{REPO}/actions/runs/{request['repair_run_id']}")
+    if repair['path'] != '.github/workflows/restart-aks.yml' or repair['status'] == 'completed':
+        return False
+    own = api(f"repos/{REPO}/actions/runs/{current}")
+    if own['path'] != '.github/workflows/grid.yml' or own['head_branch'] != 'main':
+        raise RuntimeError('only a main-branch coordinator may yield its runner')
+    # Exact repository run identities only: duplicate verification and coordinators contain no measured arm.
+    pending = []
+    for item in request['release_runs']:
+        if item['path'] not in ('.github/workflows/grid.yml', '.github/workflows/verify.yml'):
+            raise RuntimeError('refusing to cancel measured work')
+        run = api(f"repos/{REPO}/actions/runs/{item['id']}")
+        if run['path'] != item['path'] or run['head_branch'] != 'main':
+            raise RuntimeError('maintenance runner request identity mismatch')
+        if run['status'] != 'completed':
+            pending.append(item['id'])
+    for run_id in pending:
+        api(f"repos/{REPO}/actions/runs/{run_id}/cancel", method='POST')
+    print('Yielding the sleeping grid coordinator runner for the approved Azure restart; measured jobs continue.', flush=True)
+    api(f"repos/{REPO}/actions/runs/{current}/cancel", method='POST')
+    return True
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="what", required=True)
@@ -626,6 +658,8 @@ def main(argv=None):
     k.add_argument("--reps", required=True); k.add_argument("--rep-first", type=int, default=1)
     k.add_argument("--durations", required=True); k.add_argument("--split", default="no")
     a = ap.parse_args(argv)
+    if a.what == 'tick' and not a.dry and yield_repair_coordinator():
+        return 0
 
     if a.what == "matrix":
         js = lambda s: json.loads(s) if s.strip().startswith("{") else ({} if not s.strip() else None)
