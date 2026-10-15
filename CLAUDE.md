@@ -39,8 +39,11 @@ the founder overrides one in the conversation.
   shared-host capacity repair (on kind every node is a container on one runner: its processor is counted once and no
   replica is added while that runner is 75% busy or unread, `omni_controller/capacity.py`). **Omni v7** is the
   candidate on branch `v7-candidate` (pull request #13 carried into it): conveyance bounded by each namespace's CPU
-  quota (omni_controller/quota.py on that branch), one processor conveyed once, and no limit raised while a pod starts
-  (docs/OMNI_V7.md on that branch; found from the v6 KEDA table's pod start wait). It goes on main only when its live trials show no
+  quota (omni_controller/quota.py on that branch); on a shared host no limit raised while the machine is 75% busy or
+  unread (the replica room's guard); the verdict reading a trial in the reports' words (GAIN, EVEN, LOSS: a clear rise
+  refused); every rule in seconds; the cloud's one flag `--give-back-only` (docs/OMNI_V7.md on that branch). Two repairs
+  first written for the v6 KEDA table's pod start wait, the host's processor counted once and a hold while a pod
+  starts, were refused by the toy gate (below) and are not in v7. It goes on main only when its live trials show no
   LOSS; then everything reruns on it.
 - `OMNI_V5.json` and `docs/OMNI_V5.md`: the max (`realms/compass_arm_v5.py`, `V5CFG`) on the 1,107-muscle catalog, the
   bone inside every organism with the living body's immune system (V6-V13, `docs/FORMAL_V5.md` section 4: native twins
@@ -127,6 +130,18 @@ the founder overrides one in the conversation.
 - The notice is written once, in `tools/legal.py`; `python3 tools/legal.py --fix` puts it on every page, header, workflow
   report and export, and `--check` (run by `verify.py`) fails any push where a file lacks it. Engine files locked by a
   fingerprint take the new header only with the next engine version.
+
+## Orders of 15 October
+
+- **The toy gate first** (the founder's order of 15 October, night: every fix, knob and rule is tried in a toy model
+  before it is pushed, and goes to a real run only where it shows promise there). Every change to the engine or to a
+  live controller runs in our own models (`tools/toy_gate.py`: the shipped controller on the toy cluster in the cloud
+  setting at 60 and 15 s, conveyance on one kind host set to the v6 KEDA run's own regime, the verdict on noisy work)
+  against the engine that stands, on the same seeds, paired, read GAIN, EVEN or LOSS by the gauge's aim. A LOSS there
+  is root-caused and fixed in the model, never carried into a real run; a change that reads no LOSS and shows promise
+  goes to its GitHub trials; nothing is dispatched before. The gate's readings are models (class S), recorded in the
+  candidate branch's results/toy_gate folder and never presented as a benchmark result. The toy's regime is set from
+  a real run's own files (the host's busy share, the response time, the replicas), never guessed.
 
 ## Orders of 14 October
 

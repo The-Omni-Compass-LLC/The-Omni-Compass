@@ -20,13 +20,15 @@
   ⌈R(1+h)/r⌉), leaving code, prices and constant names untouched; `verify.py` now fails a push in which any formula a
   manual prints is in LaTeX. Both PDFs rebuilt: the Operator's Manual 434 pages, the Owner's 820; neither prints a
   backslash command or a braced subscript.
-- **The v7 candidate** (branch `v7-candidate`, docs/OMNI_V7.md on that branch): ChatGPT's quota-aware conveyance (pull request #13)
-  and one processor conveyed once. From the 151 pod starts of the v6 KEDA runs: a start is slower when the runner's
-  processor is busier, in both arms alike, and only the omni arm reached 75 to 100% busy, because every kind node
-  reports the one host's four cores as its own and each of three serving pods was given 3,700m of them. v7 counts a
-  host's processor once, raises no limit while it is 75% busy or unread, and raises none on a machine where a pod is
-  starting; lowering is never held. Five new regressions pass; its live trials (KEDA, Goldilocks, CruiseKube, the
-  capacity case) are queued on GitHub's free machines. It goes on main only if they show no LOSS.
+- **The v7 candidate** (branch `v7-candidate`, docs/OMNI_V7.md on that branch): ChatGPT's quota-aware conveyance (pull request #13);
+  the verdict reading a give-back trial in the reports' own words (a clear rise refused, the evidence measured on while
+  it is wider than the allowance); every rule of the governor stated in seconds; the cloud's rule as one flag,
+  `--give-back-only`; and on a shared host no limit raised while the machine is 75% busy or unread. The founder's order
+  of 15 October, night: every change is tried in our own toy models before any real run (`tools/toy_gate.py`, section 6
+  of docs/OMNI_V7.md). The gate refused two repairs written for the v6 KEDA table's pod start wait, the host's processor
+  counted once (nothing conveyed at the run's nine replicas: the +64% work and -53% response time of conveyance lost
+  whole) and a hold while a pod starts (1% of start wait for a LOSS on work and speed); the slower start is the busier
+  host serving more requests. v7 goes on main only if its live trials show no LOSS.
 - **Wording**: the retired words in the day's new pages ("improved or worsened", "unfavorable", "standalone",
   "confirmed/unconfirmed", the label FEWER MISSES) are replaced; the Owner's Manual's KWOK nodes are "stand-in nodes".
 - **CLAUDE.md**: the engine section names v6 as standing and v7 as the candidate; formulas in Unicode; the founder's
