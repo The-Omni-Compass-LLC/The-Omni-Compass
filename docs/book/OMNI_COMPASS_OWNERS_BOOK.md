@@ -1265,8 +1265,8 @@ the basin. Whatever the engine reaches, it reaches by the flow of its own equati
 | B | Bath field |
 | B' | Bath field time derivative |
 | α | Feedback rate |
-| β[int](t) | Internal forcing function |
-| β[ext](t) | External forcing function |
+| β[int] (t) | Internal forcing function |
+| β[ext] (t) | External forcing function |
 | k | Coherence logistic damping gain |
 | σ₁ | Coupling of error into the information channel |
 | δ | Linear coherence coupling parameter |
@@ -1279,7 +1279,7 @@ the basin. Whatever the engine reaches, it reaches by the flow of its own equati
 | αₛ | S-potential quadratic coefficient |
 | βₛ | S-potential cubic coefficient |
 | Φ(S) | Potential field function |
-| F[state](S) | Canonical S-state flow |
+| F[state] (S) | Canonical S-state flow |
 | ω[B] | Bath frequency |
 | Q[B] | Bath quality factor |
 | γ[c] | Bath coupling gain |

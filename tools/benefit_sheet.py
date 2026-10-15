@@ -431,6 +431,10 @@ def main(check=False):
         rows.append(hl)
     for r in rows:
         r["engine"] = engine_of(r["file"])
+        # nine places: the last digits of a geometric mean differ between Python versions, and the sheet is checked as text
+        r["pct"] = None if r.get("pct") is None else round(r["pct"], 9)
+        for p_ in r.get("parts") or []:
+            p_["pct"] = None if p_.get("pct") is None else round(p_["pct"], 9)
     if any(r["date"] is None for r in rows):                       # no history here: the dates the sheet already carries, by benchmark
         known = {}
         if OUT_JSON.exists():

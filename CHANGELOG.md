@@ -20,7 +20,7 @@
   ⌈R(1+h)/r⌉), leaving code, prices and constant names untouched; `verify.py` now fails a push in which any formula a
   manual prints is in LaTeX. Both PDFs rebuilt: the Operator's Manual 434 pages, the Owner's 820; neither prints a
   backslash command or a braced subscript.
-- **The v7 candidate** (branch `v7-candidate`, `docs/OMNI_V7.md`): ChatGPT's quota-aware conveyance (pull request #13)
+- **The v7 candidate** (branch `v7-candidate`, docs/OMNI_V7.md on that branch): ChatGPT's quota-aware conveyance (pull request #13)
   and one processor conveyed once. From the 151 pod starts of the v6 KEDA runs: a start is slower when the runner's
   processor is busier, in both arms alike, and only the omni arm reached 75 to 100% busy, because every kind node
   reports the one host's four cores as its own and each of three serving pods was given 3,700m of them. v7 counts a

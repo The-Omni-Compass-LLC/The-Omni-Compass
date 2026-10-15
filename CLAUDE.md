@@ -39,8 +39,8 @@ the founder overrides one in the conversation.
   shared-host capacity repair (on kind every node is a container on one runner: its processor is counted once and no
   replica is added while that runner is 75% busy or unread, `omni_controller/capacity.py`). **Omni v7** is the
   candidate on branch `v7-candidate` (pull request #13 carried into it): conveyance bounded by each namespace's CPU
-  quota (`omni_controller/quota.py`), one processor conveyed once, and no limit raised while a pod starts
-  (`docs/OMNI_V7.md`; found from the v6 KEDA table's pod start wait). It goes on main only when its live trials show no
+  quota (omni_controller/quota.py on that branch), one processor conveyed once, and no limit raised while a pod starts
+  (docs/OMNI_V7.md on that branch; found from the v6 KEDA table's pod start wait). It goes on main only when its live trials show no
   LOSS; then everything reruns on it.
 - `OMNI_V5.json` and `docs/OMNI_V5.md`: the max (`realms/compass_arm_v5.py`, `V5CFG`) on the 1,107-muscle catalog, the
   bone inside every organism with the living body's immune system (V6-V13, `docs/FORMAL_V5.md` section 4: native twins

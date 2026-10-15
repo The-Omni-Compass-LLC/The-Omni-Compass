@@ -174,6 +174,7 @@ def convert(s):
     text = "".join(out)
     text = re.sub(r"([⌈⌊(\[⟨]) +", r"\1", text)
     text = re.sub(r" +([⌉⌋)\]⟩,;])", r"\1", text)
+    text = text.replace("](", "]\u2009(")                       # a bracketed subscript before an argument, never a link
     return re.sub(r"  +", " ", text).strip()
 
 

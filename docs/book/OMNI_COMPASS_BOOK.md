@@ -3159,7 +3159,7 @@ implementer plans with both:
 Define, for each sampling instant t of the governed pools:
 
 - N(t): the machines in the pools;
-- Q[c](t) and Qₘ(t): the processor and memory **requests** of the pods running on them, DaemonSet pods excluded
+- Q[c] (t) and Qₘ(t): the processor and memory **requests** of the pods running on them, DaemonSet pods excluded
   (a DaemonSet runs one pod on every machine whatever the count, so it is a per-machine overhead, not work);
 - C[c] and Cₘ: one machine's allocatable processor and memory (`kubectl get node <name> -o
   jsonpath='{.status.allocatable}'`) less the requests of the DaemonSet pods on it;
@@ -3167,11 +3167,11 @@ Define, for each sampling instant t of the governed pools:
 
 The fewest machines that could hold the pods' requests at instant t, packing perfectly, is
 
-N[req](t) = max(N[f], ⌈max((Q[c](t))/(C[c]), Qₘ(t)/Cₘ)⌉),
+N[req] (t) = max(N[f], ⌈max((Q[c] (t))/(C[c]), Qₘ(t)/Cₘ)⌉),
 
 and the **room** over the period is the machine-hours above it:
 
-R = ∫₀ᵀ (N(t) − N[req](t))⁺ dt ≈ Σₖ Δ t (N(tₖ) − N[req](tₖ))⁺,
+R = ∫₀ᵀ (N(t) − N[req] (t))⁺ dt ≈ Σₖ Δ t (N(tₖ) − N[req] (tₖ))⁺,
 
 where (x)⁺ = max(x, 0) and Δ t is the sampling interval. R is an upper bound for three reasons, each of
 which a real cluster exhibits: perfect packing is not achievable (pods have affinity rules, topology spread constraints
@@ -3183,16 +3183,16 @@ it does not try to: every machine it parks first passes its own trial against th
 **The billable room.** Where the company holds a commitment that pays for K machines of the family whether they exist or
 not (section 24.5), only machine-hours above K reach the bill:
 
-R[$] = p Σₖ Δ t (N(tₖ) − max(K, N[req](tₖ)))⁺ .
+R[$] = p Σₖ Δ t (N(tₖ) − max(K, N[req] (tₖ)))⁺ .
 
 **The governor's own floor.** The governor never parks a machine that would leave the processor requests of the pods
 on the machines in service, with the spare of its `--headroom` setting (half again, by default; Appendix K), or their
-processor in use, without a place. With Q′[c](t) the requests of every pod on the machines in service (DaemonSet pods
-included), U[c](t) the processor in use, and C′[c] one machine's allocatable processor, it keeps at least
+processor in use, without a place. With Q′[c] (t) the requests of every pod on the machines in service (DaemonSet pods
+included), U[c] (t) the processor in use, and C′[c] one machine's allocatable processor, it keeps at least
 
-N[gov](t) = max(N[f], ⌈((1+h) Q′[c](t))/(C′[c])⌉, ⌈(U[c](t))/(C′[c])⌉), h = 0.5,
+N[gov] (t) = max(N[f], ⌈((1+h) Q′[c] (t))/(C′[c])⌉, ⌈(U[c] (t))/(C′[c])⌉), h = 0.5,
 
-so the room the cloud mode can take is at most R[gov] = ∫₀ᵀ (N(t) − N[gov](t))⁺ dt ≤ R. A pool whose pods'
+so the room the cloud mode can take is at most R[gov] = ∫₀ᵀ (N(t) − N[gov] (t))⁺ dt ≤ R. A pool whose pods'
 requests, with half again to spare, already fill the machines the cluster autoscaler keeps has R[gov] = 0: there is
 nothing to park, and a paired run on it reads EVEN on the bill, correctly.
 
