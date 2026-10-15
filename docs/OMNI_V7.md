@@ -24,11 +24,11 @@ The v6 three-run KEDA table (`results/live/V6_KEDA_REQUESTS.md`) read the pod st
 
 ## 3. The verdict in words
 
-The verdict (`omnicompass/verdict.py`) is the engine's do-no-harm trigger: before a knob may move one step further from native, the step runs as a trial and its cost per piece of work is compared with the cost at the reference. Through v6 the comparison was the two medians alone: the step was allowed if m_trial ≤ m_ref · (1 + tolerance). On noisy work a median wanders, so a step that truly cost more than the allowance was often allowed by chance.
+The verdict (`omnicompass/verdict.py`) is the engine's do-no-harm trigger: before a knob may move one step further from native, the step runs as a trial and its cost per piece of work is compared with the cost at the reference. Through v6 the comparison was the two medians alone: the step was allowed if m[trial] ≤ m[ref] · (1 + tolerance). On noisy work a median wanders, so a step that truly cost more than the allowance was often allowed by chance.
 
 v7 (`judge="interval"`, the default) reads the trial exactly as a report reads a row (`tools/readings.py`). On the logarithm of each piece of work's cost, so that a heavy tail does not decide it, the change is
 
-d = mean ln c_trial − mean ln c_ref,  with the 95% interval  d ± 1.96 · √(s²_ref / n_ref + s²_trial / n_trial)  (Welch's standard error),
+d = mean ln c[trial] − mean ln c[ref],  with the 95% interval  d ± 1.96 · √(s²[ref] / n[ref] + s²[trial] / n[trial])  (Welch's standard error),
 
 and with τ = ln(1 + tolerance) the allowance in the same units:
 

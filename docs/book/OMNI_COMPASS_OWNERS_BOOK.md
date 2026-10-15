@@ -522,7 +522,7 @@ installed is a quarter off the bill.
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v6, fingerprint df6147466ef18046 (45 files).
+- **The engine on this checkout:** omni-v7, fingerprint 4716058a82da6268 (46 files).
 - The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -537,15 +537,15 @@ installed is a quarter off the bill.
   - Real cache (Redis, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v6): 4 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v7): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
+| Every real test together: the Omni index | omni-v3 | +5.2% | GAIN, power given | L |
 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v6 | +54.0% | GAIN, power given | L |
 | Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v6 | +0.0% | EVEN | L |
 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +105.0% | GAIN, power given | L |
 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +15.0% | GAIN, power given | L |
-| Every real test together: the Omni index | omni-v3 | +5.2% | GAIN, power given | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
@@ -651,9 +651,15 @@ The second design decision is that Omni-Compass must never cause a LOSS. This is
 report; it is a trigger inside the engine. Before Omni-Compass moves a slow knob (a machine given back, a card's clock
 ceiling, a robot axis's speed, a drone's cruise override), it runs a **paired trial on the muscle itself**
 (`omnicompass/verdict.py`): the muscle's own cost per piece of work is measured at native and at one step past the
-deepest step already allowed, under the same traffic, with at least thirty pieces of work on each side; the step is
-allowed only if the trial's median cost is no more than 2% above the reference and no more than 2% above the cost first
-measured at native. A refused step is not tried again for a set number of decisions. Where no step passes, the verdict
+deepest step already allowed, under the same traffic, with at least thirty pieces of work on each side. From v7 the trial is read in the reports' own words: on the
+logarithm of each piece of work's cost, the change d = mean ln c[trial] − mean ln c[ref] carries its 95% interval
+d ± 1.96 · √(s²[ref] / n[ref] + s²[trial] / n[trial]), and with τ = ln 1.02 the 2% allowance in the same units, an interval
+wholly above zero is a LOSS and the step is refused whatever the allowance says; while the interval's half-width exceeds
+τ the trial measures on, up to three times its minimum; and a GAIN or EVEN step is allowed only if its median cost and
+its mean-log change are both no more than 2% above the reference and above the cost first measured at native. On
+modelled noisy costs (σ = 0.25) this allows a step that truly costs 3% more 28% of the time instead of the medians'
+40%, one that costs 5% more 14% instead of 26%, and a free step 60% instead of 63% (`docs/OMNI_V7.md`, section 3;
+class S). The engines before v7 read the medians alone (`judge="median"`). A refused step is not tried again for a set number of decisions. Where no step passes, the verdict
 reads **left native**, the knob is never moved, and the result for that muscle says "nothing for Omni to move". This is
 why, in the robot-arm benchmark, two of four arms were left entirely native and are reported as such, and why in the
 real Kubernetes tests machines were kept whenever one machine fewer made the requests slower in the trial. Gains are not
@@ -4499,12 +4505,20 @@ max (`dial max`) belongs where the machines are already paid for (your own racks
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
 In the cloud, as everywhere, the governor's fast checks (the scheduling floor, the pod reflex, conveyance on every third)
-run every 5 seconds, three times as fast as the HPA's own 15-second check, and its full decision every 60 seconds. A
-shorter decision period is not a free setting: the give-back trial's phase (`max_trial`, 20 decisions), the breach
-cool-down (`--slo-clear`), cruise (`--cruise-after`) and the trial spacing count in decisions, so at 5 seconds a trial
-would last 100 seconds, too short for the 200 response times it measures, and no machine would ever be given back
-(`docs/K8S_COMPASS_PREREGISTRATION.md`, "The decision period in the cloud"). The next version counts them in seconds; the law's damping follows from the
-decision period by its own formula (section 6), so nothing else changes with it.
+run every 5 seconds, three times as fast as the HPA's own 15-second check, and its full decision every 60 seconds. Through
+v6 a shorter decision period was not a free setting: the give-back trial's phase (`max_trial`, 20 decisions), the breach
+cool-down (`--slo-clear`), cruise (`--cruise-after`) and the trial spacing counted in decisions, so at 5 seconds a trial
+would have lasted 100 seconds, too short for the 200 response times it measures, and no machine would ever have been
+given back (`docs/K8S_COMPASS_PREREGISTRATION.md`, "The decision period in the cloud"). v7 states every one of them in
+seconds (`--slo-clear-s 180`, `--cruise-after-s 120`, `--strict-window-s 300`, `--verdict-every-s 600`,
+`--verdict-recheck-s 7200`, `--verdict-trial-s 1200`) and converts each to decisions at the running period,
+n = max(1, round(seconds / period)), so at 60 seconds every count is v6's; the compass's step on the HPA target and its
+coasting are scaled by period / 60, so the target moves the same amount a minute, and a pool gives back at most one
+machine a minute at any period (`docs/OMNI_V7.md`, section 4). The default period stays 60 seconds, because the governor
+core still advances its own state one fixed step per decision; a shorter default waits for that clock in seconds and a
+test that shows no LOSS. In the cloud v7 also makes the whole rule one flag, `--give-back-only`, enforced in the governor
+itself: every actuator but the node pool off, the replica ceiling 0, the dial at the tune-down (`docs/OMNI_V7.md`,
+section 5).
 
 **What the Azure runs taught us.** Three lessons, each recorded as an amendment to the preregistration before the fleet was
 dispatched again. First, a fleet is sized by the lever, not by the budget: a 4-worker fleet cannot show the few-percent
@@ -5379,7 +5393,7 @@ compute.
 2. It records before it acts (annotations on Kubernetes objects; the `snapshot` line in the GPU audit).
 3. It watches before it writes.
 4. It never acts blind.
-5. Service first: while response time is over its target, and for `--slo-clear` decisions after, nothing is given back.
+5. Service first: while response time is over its target, and for `--slo-clear-s` seconds after (180 by default), nothing is given back.
 6. Every change is read back; no new order goes on top of one that has not landed.
 7. The living band and the cover: no organ is driven outside its range; machines are parked, never switched off by
    Omni-Compass; it never evicts or moves a pod.
@@ -10030,7 +10044,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v6, fingerprint df6147466ef18046 (45 files).
+- **The engine on this checkout:** omni-v7, fingerprint 4716058a82da6268 (46 files).
 - The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -10045,15 +10059,15 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - Real cache (Redis, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v6): 4 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v7): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
+| Every real test together: the Omni index | omni-v3 | +5.2% | GAIN, power given | L |
 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v6 | +54.0% | GAIN, power given | L |
 | Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v6 | +0.0% | EVEN | L |
 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +105.0% | GAIN, power given | L |
 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +15.0% | GAIN, power given | L |
-| Every real test together: the Omni index | omni-v3 | +5.2% | GAIN, power given | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
