@@ -16,6 +16,7 @@ of the verification run made when it was written. One object, so nobody has to r
 from __future__ import annotations
 
 import argparse, datetime, hashlib, json, subprocess, sys
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,7 +24,8 @@ MANIFEST = ROOT / "RELEASE_MANIFEST.json"
 RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
-    "quota_v7_candidate": ["OMNI_V7.json", "omni_controller/quota.py", "tests/test_quota_convey.py", "docs/OMNI_V7.md", "tools/mechanism_identity.py", "tests/fake_cluster/kubectl"],
+    "quota_v7_candidate": ["OMNI_V7.json", "omni_controller/quota.py", "tests/test_quota_convey.py", "docs/OMNI_V7.md", "tools/mechanism_identity.py", "tests/fake_cluster/kubectl", "tools/layout_check.py"],
+    "release_operations": ["tools/release_manifest.py", "scripts/aks_kubectl.py", "tests/test_manifest_refresh.py", "tests/test_aks_kubectl.py"],
     "engine_v6_campaign": ["OMNI_V6.json", "omni_controller/capacity.py", "omni_controller/controller.py",
                            "scripts/dispatch_grid.py", "scripts/reruns.txt", "scripts/benchmark_campaign.json",
                            "scripts/restart_aks.py", ".github/aks_restart_request.json",
@@ -80,6 +82,54 @@ LIVE = {
 }
 
 
+GENERATED_REPORTS = {
+    'results/OMNI_INDEX.md', 'results/OMNI_INDEX.json', 'docs/BENEFIT_SHEET.md',
+    'results/BENEFIT_SHEET.json', 'docs/WIRING_VERDICTS.md', 'results/WIRING_VERDICTS.csv',
+    'docs/DOSSIER.md',
+}
+
+
+def refresh_generated(baseline_reader=None):
+    """Refresh derived reports or exact legal normalization, never engine/test/protocol changes.
+
+    Validate the whole change set before writing. Existing verification receipts remain historical;
+    this operation does not run verification and never declares that it passed.
+    """
+    manifest = json.loads(MANIFEST.read_text())
+    def baseline(path):
+        return subprocess.run(['git', 'show', f'HEAD:{path}'], cwd=ROOT, capture_output=True, check=True).stdout
+    reader = baseline_reader or baseline
+    updates = {}
+    for files in manifest['files'].values():
+        for name, expected in files.items():
+            path = ROOT / name
+            if not path.is_file():
+                continue  # sparse checkout: absent historical evidence is not re-sealed
+            data = path.read_bytes()
+            actual = hashlib.sha256(data).hexdigest()
+            if actual == expected or name in updates:
+                continue
+            old = reader(name)
+            if hashlib.sha256(old).hexdigest() != expected:
+                raise ValueError(f'{name}: baseline already differs from the manifest; explicit repair required')
+            generated = name in GENERATED_REPORTS or bool(re.fullmatch(
+                r'results/live/V\d+_(?:REDIS|KAFKA|PGBENCH|SYSBENCH|YCSB)(?:_SERVICE)?\.md', name))
+            legal_only = False
+            if name.endswith('.md') and name.startswith(('docs/', 'results/')):
+                from tools.legal import normalize_markdown
+                legal_only = normalize_markdown(old.decode('utf-8'))[0].encode('utf-8') == data
+            if not (generated or legal_only):
+                raise ValueError(f'{name}: automatic refresh cannot re-seal source, tests, protocols or edited evidence')
+            updates[name] = actual
+    for files in manifest['files'].values():
+        for name in files.keys() & updates.keys():
+            files[name] = updates[name]
+    if updates:
+        manifest['generated_refresh'] = {'files': sorted(updates), 'verification': 'not run by this refresh'}
+        MANIFEST.write_text(json.dumps(manifest, indent=1) + '\n')
+    return sorted(updates)
+
+
 def sha_files(paths):
     h = hashlib.sha256()
     for p in paths:
@@ -115,7 +165,11 @@ def check():
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true")
+    ap.add_argument('--refresh-generated', action='store_true', help='update only derived-report/legal-normalization hashes; never declare verification passed')
     a = ap.parse_args(argv)
+    if a.refresh_generated:
+        print('Generated manifest hashes refreshed: ' + ', '.join(refresh_generated()))
+        return 0
     if a.check:
         bad = check()
         print("\n".join(bad) if bad else "release manifest matches the files")

@@ -1,0 +1,177 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: aks-client-check
+on:
+  push:
+    paths:
+      - scripts/aks_kubectl.py
+      - scripts/aks_paired.sh
+      - tests/test_aks_kubectl.py
+      - .github/workflows/aks-client-check.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  client:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python3 -m unittest tests.test_aks_kubectl tests.test_manifest_refresh
+      - run: bash scripts/kind_install.sh v0.31.0 v1.35.0
+      - name: Create a disposable GitHub-only compatibility cluster
+        run: kind create cluster --name omni-client-check --image kindest/node:v1.35.0 --wait 120s
+      - name: Install the matching verified client and exercise the real resize wire
+        run: |
+          set -euo pipefail
+          version=$(kubectl version -o json | python3 -c 'import json,sys; print(json.load(sys.stdin)["serverVersion"]["gitVersion"])')
+          python3 scripts/aks_kubectl.py install --version "$version" --directory "$RUNNER_TEMP/omni-client"
+          export PATH="$RUNNER_TEMP/omni-client:$PATH"
+          python3 scripts/aks_kubectl.py check > client-check.json
+          python3 - <<'PY_POD' | kubectl apply -f -
+          import json
+          print(json.dumps({'apiVersion':'v1','kind':'Pod','metadata':{'name':'resize-check'},'spec':{'containers':[
+              {'name':'pause','image':'registry.k8s.io/pause:3.10','resources':{'requests':{'cpu':'100m'},'limits':{'cpu':'200m'}}}]}}))
+          PY_POD
+          kubectl wait --for=condition=Ready pod/resize-check --timeout=120s
+          kubectl patch pod resize-check --subresource=resize --type=json -p '[{"op":"replace","path":"/spec/containers/0/resources/limits/cpu","value":"300m"}]'
+          kubectl get pod resize-check -o json > resized-pod.json
+          python3 - <<'PY_RESIZE'
+          import json
+          pod=json.load(open('resized-pod.json'))
+          assert pod['spec']['containers'][0]['resources']['limits']['cpu']=='300m'
+          assert pod['status']['containerStatuses'][0]['restartCount']==0
+          print('Real CPU resize accepted; pod did not restart. No Azure resources used.')
+          PY_RESIZE
+          kubectl patch pod resize-check --subresource=resize --type=json -p '[{"op":"replace","path":"/spec/containers/0/resources/limits/cpu","value":"200m"}]'
+      - name: Delete the disposable cluster
+        if: always()
+        run: kind delete cluster --name omni-client-check
+      - name: Attach README, licenses and disclosures to this artifact
+        id: omni_legal_export_1
+        if: "always()"
+        env:
+          OMNI_EXPORT_PATHS: |
+            client-check.json
+            resized-pod.json
+        shell: python
+        run: |
+          #!/usr/bin/env python3
+          # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+          # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+          # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+          # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+          """Attach the exact legal bundle inside an artifact without changing its result-file layout."""
+          import glob
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import urllib.parse
+          import urllib.request
+          import uuid
+          
+          BUNDLE = ('README.md', 'LICENSE', 'NOTICE', 'DISCLOSURES.md', 'PATENTS.md', 'TRADEMARKS.md')
+          
+          
+          def search_root(pattern, workspace):
+              path = Path(os.path.expanduser(pattern))
+              if not path.is_absolute():
+                  path = workspace / path
+              prefix = Path(path.anchor)
+              for part in path.parts[1:]:
+                  if glob.has_magic(part):
+                      return prefix
+                  prefix /= part
+              return path if path.is_dir() or (not path.exists() and not path.suffix) else path.parent
+          
+          
+          def attach(paths, workspace, loader=None):
+              workspace = Path(workspace).absolute()
+              lines = [p.strip() for p in paths.splitlines() if p.strip()]
+              roots = [search_root(p, workspace) for p in lines if not p.startswith('!')]
+              if not roots:
+                  raise ValueError('artifact has no positive output path')
+              root = Path(os.path.commonpath([str(p) for p in roots]))
+              if root == Path(root.anchor):
+                  raise ValueError('refusing to write an export bundle at a filesystem root')
+              legal = root / '_omni_legal'
+              legal.mkdir(parents=True, exist_ok=True)
+              hashes = {}
+              for name in BUNDLE:
+                  source = workspace / name
+                  data = source.read_bytes() if source.is_file() else loader(name) if loader else None
+                  if data is None:
+                      raise FileNotFoundError('required export legal file is unavailable: ' + name)
+                  target = legal / name
+                  target.write_bytes(data)
+                  hashes[name] = hashlib.sha256(data).hexdigest()
+              (legal / 'SHA256SUMS.json').write_text(json.dumps(hashes, indent=2) + '\n')
+              return '\n'.join([*lines, *(str(legal / n) for n in (*BUNDLE, 'SHA256SUMS.json'))])
+          
+          
+          def main():
+              workspace = Path(os.environ.get('GITHUB_WORKSPACE', '.')).absolute()
+              def public_source(name):
+                  # Collect-only jobs may not check out source. Fetch only these public legal files, pinned to the run commit.
+                  repo, sha = os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_SHA']
+                  url = f'https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(name)}'
+                  with urllib.request.urlopen(url, timeout=30) as response:
+                      return response.read()
+              paths = attach(os.environ['OMNI_EXPORT_PATHS'], workspace, public_source)
+              delimiter = 'OMNI_LEGAL_' + uuid.uuid4().hex
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+                  out.write('paths<<' + delimiter + '\n' + paths + '\n' + delimiter + '\n')
+          
+          
+          if __name__ == '__main__':
+              main()
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aks-client-check
+          path: "${{ steps.omni_legal_export_1.outputs.paths }}"
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

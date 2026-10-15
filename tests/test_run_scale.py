@@ -40,7 +40,8 @@ class RunScale(unittest.TestCase):
             d = json.loads((Path(t) / "SCALE.json").read_text())
             self.assertFalse(d["complete"])
             self.assertEqual(d["runs_done"], 1)                 # the first run always starts; none after the deadline
-            self.assertEqual(d["engine"], "omni-v6")
+            from tools.omni_version import version_of, engine_files
+            self.assertEqual(d["engine"], version_of(engine_files()))
             run = d["per_run"]["energy_facility_industrial"][str(SEED0)]
             self.assertGreater(run["wall_s"], 0.0)
             self.assertIn("sums", run)
