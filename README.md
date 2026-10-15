@@ -71,9 +71,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-15 05:12 | big-organism-detached collect | success | [38685477902](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38685477902) |
-| 2026-10-15 04:12 | grid | success | [38656394936](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38656394936) |
-| 2026-10-15 04:05 | aks-metered steady replica room 0 dial save eastus Standard_D2s_v4 | success | [38648741673](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38648741673) |
+| 2026-10-15 07:24 | benchmark | success | [38695765193](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38695765193) |
+| 2026-10-15 07:24 | realms-v5 | success | [38697594646](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38697594646) |
+| 2026-10-15 07:22 | realms | success | [38697587734](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38697587734) |
+| 2026-10-15 07:21 | live-kind | success | [38695770306](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38695770306) |
+| 2026-10-15 07:21 | live-kind-full | success | [38695776208](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38695776208) |
+| 2026-10-15 07:19 | kwok-scale | success | [38697580531](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38697580531) |
+| 2026-10-15 07:17 | six x10 line orgs 5 runs 0+10 | success | [38695871187](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38695871187) |
+| 2026-10-15 07:17 | cpu-power | success | [38697601453](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38697601453) |
+| 2026-10-15 07:12 | live-shadow | success | [38695788148](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38695788148) |
+| 2026-10-15 07:11 | six x10 line orgs 6 runs 0+10 | success | [38695877454](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38695877454) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
