@@ -17,6 +17,25 @@ from pathlib import Path
 KIND_SCALE_OUT_BUSY_LIMIT = 0.75
 
 
+def one_host(nodes) -> bool:
+    """Nodes that are containers on one machine (kind: providerID kind://...): each reports the whole host's CPU as its
+    own, so the cluster's real CPU is one host's, not the sum (the replica room on kind, results/live/REPLICA_ROOM.md:
+    the cap raised to 30 served no more requests and ran 78% more pods)."""
+    return bool(nodes) and all(str((n.get("spec") or {}).get("providerID", "")).startswith("kind://") for n in nodes)
+
+
+def starting(pod) -> bool:
+    """A pod placed on a machine whose containers are not yet ready: its start (image, runtime, readiness probe) is using
+    the machine's processor now, outside any request the scheduler counted."""
+    st = pod.get("status") or {}
+    if not (pod.get("spec") or {}).get("nodeName") or (pod.get("metadata") or {}).get("deletionTimestamp"):
+        return False
+    if st.get("phase") == "Pending":
+        return True                                     # placed, its containers being made
+    ready = [c for c in st.get("conditions") or [] if c.get("type") == "Ready"]
+    return st.get("phase") == "Running" and bool(ready) and ready[0].get("status") != "True"
+
+
 class HostCpuSampler:
     """Measure aggregate host CPU busy share from Linux /proc/stat."""
 

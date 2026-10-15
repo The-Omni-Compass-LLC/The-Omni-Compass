@@ -53,7 +53,7 @@ from omnicompass import master
 from omnicompass.adapter import Governor, mode_law, OBSERVE
 from omnicompass.shield import enforce, ShieldLimits
 from omni_controller.muscles import Muscles, add_args as add_muscle_args
-from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling
+from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling, one_host
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
 COMPASS_UP, COMPASS_DOWN, COMPASS_RELEASE = 0.10, 0.02, -0.2   # the compass's gains, the same on every muscle (realms/compass_arm.py)
@@ -218,13 +218,6 @@ def worker(n):
 
 
 UNBOUNDED = sys.maxsize   # no top but what the system itself refuses (the founder's rule of 13 October: from 1 up, unbounded)
-
-
-def one_host(nodes) -> bool:
-    """Nodes that are containers on one machine (kind: providerID kind://...): each reports the whole host's CPU as its
-    own, so the cluster's real CPU is one host's, not the sum (the replica room on kind, results/live/REPLICA_ROOM.md:
-    the cap raised to 30 served no more requests and ran 78% more pods)."""
-    return bool(nodes) and all(str((n.get("spec") or {}).get("providerID", "")).startswith("kind://") for n in nodes)
 
 
 def autoscaler_room(k):

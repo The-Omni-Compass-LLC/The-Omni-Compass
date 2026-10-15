@@ -394,6 +394,15 @@ class Muscles:
         Resized in place through pods/resize: no pod restarts. No expansion during a security hold. The reset
         returns every pod to L_i.
 
+        One processor is conveyed once (v7). Where every node is a container on one machine (kind), each node reports
+        that machine's whole CPU as its own; the machine is then the one j above: A_j its CPU counted once, Q_j every
+        other pod's requests on all its nodes, P_j every serving pod on it. No limit is raised while that machine's
+        measured busy share is at or over 75% or cannot be read (the same guard as the replica room, capacity.py). And
+        no limit is raised on a machine where a pod is starting: a start uses the processor outside any request the
+        scheduler counted, and on kind the serving pods' extra CPU had slowed every start (results/live/V6_KEDA_REQUESTS.md,
+        pod start wait 8.1 s against 7.9 s at the same host load, 12.4 s once the conveyed CPU took the host past 75%).
+        Limits already given stay as they are until the next pass; lowering is never held back.
+
         Conveyance is on by default. It moves no work: the same requests run with less waiting. (The +26% CPU seen on
         kind is more requests served, because that load is closed-loop, not waste.) Optionally, --convey-on (a share
         of --slo-ms) engages it only once the 95th-percentile response time reaches convey-on x SLO and releases it
@@ -404,13 +413,27 @@ class Muscles:
         if not targets:
             return None
         engaged = self._convey_engaged()
-        alloc = {n["metadata"]["name"]: milli(n["status"]["allocatable"]["cpu"])
-                 for n in self.k.get("get", "nodes", "-o", "json")["items"]}
+        from omni_controller.capacity import HostCpuSampler, KIND_SCALE_OUT_BUSY_LIMIT, one_host, starting
+        node_items = self.k.get("get", "nodes", "-o", "json")["items"]
+        alloc = {n["metadata"]["name"]: milli(n["status"]["allocatable"]["cpu"]) for n in node_items}
         pods = [p for p in self.k.get("get", "pods", "-A", "-o", "json")["items"]
                 if p["status"].get("phase") in ("Running", "Pending") and p["spec"].get("nodeName")]
+        shared = one_host(node_items)
+        if not hasattr(self, "host_cpu"):
+            self.host_cpu = HostCpuSampler()
+        busy = self.host_cpu.sample() if shared else None
+        # the machine a node stands on: every kind node is the one host; elsewhere each node is its own machine
+        machine = (lambda node: "host") if shared else (lambda node: node)
+        if shared:
+            alloc_m = {"host": max(alloc.values()) if alloc else 0.0}
+        else:
+            alloc_m = dict(alloc)
+        busy_hold = shared and (busy is None or busy >= KIND_SCALE_OUT_BUSY_LIMIT)
+        starts = {machine(p["spec"]["nodeName"]) for p in pods if starting(p)}
         from omni_controller.quota import CpuLimitBudget
         budget = CpuLimitBudget(self.k, self.audit)
         out = {}
+        held = set()
         for ns, name in targets:
             self.gain[(ns, name)] = 1.0
             dep = self.k.get("get", "deployment", name, "-n", ns, "-o", "json")
@@ -425,7 +448,7 @@ class Muscles:
                 (p["metadata"].get("labels", {}) or {}).get(k) == v for k, v in sel.items())
             serving, other = {}, {}
             for p in pods:
-                node = p["spec"]["nodeName"]
+                node = machine(p["spec"]["nodeName"])
                 if mine(p) and p["status"].get("phase") == "Running":
                     serving.setdefault(node, []).append(p)
                 elif not mine(p):
@@ -435,13 +458,16 @@ class Muscles:
                 self.k.write(["annotate", "deployment", name, "-n", ns, f"{CPU_ANN}={int(base)}m"], "convey: record original CPU limit")
             got = []
             for node, ps in serving.items():
-                a_j = alloc.get(node, 0.0)
+                a_j = alloc_m.get(node, 0.0)
                 share = (BAND[1] * a_j - other.get(node, 0.0)) / len(ps)
                 want = int(min(max(base, math.floor(share / 10.0) * 10), BAND[1] * a_j)) if engaged else int(base)
+                hold = busy_hold or node in starts
                 for p in ps:
                     cur = milli(p["spec"]["containers"][0].get("resources", {}).get("limits", {}).get("cpu", tmpl))
                     if obs.get("security_block", 0.0) > 0.5 and want > cur:
                         got.append(cur); continue  # shield I1: no expansion during a security hold
+                    if hold and want > cur:
+                        held.add(node); got.append(cur); continue  # a start in progress, or a shared host near its top
                     permitted, reservations = budget.limit(ns, p, cur, want)
                     if abs(permitted - cur) < self.a.cap_min_change_m:
                         got.append(cur); continue
@@ -462,6 +488,9 @@ class Muscles:
             # promise in queue terms (target x request / limit) while the limit is larger
             self.gain[(ns, name)] = (sum(got) / len(got) / base) if got and base > 0 else 1.0
             self.base[(ns, name)] = base
+        if held:
+            self.audit({"convey": "held", "machines": sorted(held), "starting": sorted(starts & held),
+                        "host_busy": None if busy is None else round(busy, 3), "shared_host": shared})
         return out
 
     def _convey_engaged(self):
