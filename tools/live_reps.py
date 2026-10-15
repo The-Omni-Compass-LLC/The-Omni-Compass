@@ -643,6 +643,7 @@ def capacity_table(root, cols):
 
 def main(root):
     root = Path(root); runs = {}; native_kept = {}
+    machines_only = any((d / "machines_only.txt").exists() for d in root.glob("bench-*-*"))
     for d in sorted(root.glob("bench-*-*")):
         _, arm, rep = arm_rep(d)
         if (d / "capture.csv").exists() and not (d / "INVALID").exists():
@@ -686,7 +687,9 @@ def main(root):
         reps = sorted(set(runs[a]) & set(runs["native"]))
         out["paired"][a] = {}
         title = {"watch": "omni, watching (dry run, writes nothing: the cost of being there)", "omni": "omni (allocation law, earlier sets)",
-                 "compass": "omni (compass law): Omni-Compass on top of native, push and pull on the HPA target and the node pool",
+                 "compass": ("omni (compass law, the cloud mode): Omni-Compass on top of native, on the machines alone (no pod "
+                             "autoscaler moved, no processor conveyed, no power capped)") if machines_only else
+                            "omni (compass law): Omni-Compass on top of native, push and pull on the HPA target and the node pool",
                  "strict": "omni alone (not on top: earlier sets only)"}[a]
         kept = sorted(native_kept.get(a, set()) & set(reps), key=lambda r: int(r) if str(r).isdigit() else 0)
         L += [f"## {title} vs native, {len(reps)} paired repetitions", ""]
