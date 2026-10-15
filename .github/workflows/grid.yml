@@ -4,10 +4,10 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: grid
-# The conductor of the grid on the max (scripts/dispatch_grid.py): the six organisms at 1, 10 and 100 copies, each to 100
-# runs (1, 10 and 100 only, the founder's order of 12 October), modelled and with the real cluster inside. Every 15
+# The conductor of the grid on the max (scripts/dispatch_grid.py): the six organisms at 1, 10, 100 and 1,000 copies, each to 1,000
+# runs (free GitHub runners only, owner's order of 15 October), modelled and with the real cluster inside. Every 15
 # minutes it reads which runs of every square are started, from the runs' own names, and starts the next ones (the 10-run
-# squares of every size first, then 100) until the repository's queued and running jobs reach what GitHub is running now
+# squares of every size first, then 100 and 1,000) until the repository's queued and running jobs reach what GitHub is running now
 # plus a margin; so every runner GitHub gives this repository is busy and the queue never holds more than the margin
 # (other workflows still get a runner within minutes). Every square runs on GitHub's own machines; nothing is rented. It
 # never starts a run twice and never starts a run on another engine; when every square is started it starts nothing. One job ticks every 15 minutes for five hours, then starts the next job (GitHub's own
@@ -15,6 +15,10 @@ name: grid
 # conductors never run at once). To stop the grid: Actions -> grid -> "..." -> Disable workflow (and cancel the six and
 # six-kube runs in flight). Started by hand it ticks at once; dry_run says what it would start, once.
 on:
+  workflow_run:
+    workflows: [verify]
+    types: [completed]
+    branches: [main]
   schedule:
     - cron: "7 */3 * * *"
   workflow_dispatch:
@@ -24,11 +28,12 @@ on:
 permissions:
   actions: write
   contents: read
-concurrency: {group: grid-conductor, cancel-in-progress: false}
+concurrency: {group: grid-conductor-v6, cancel-in-progress: false}
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
   tick:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.message, '[all-nongpu]'))
     runs-on: ubuntu-latest
     timeout-minutes: 340
     env:
@@ -39,7 +44,12 @@ jobs:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
-        with: {sparse-checkout: "scripts\nresults/grid_v5\ntools\nrealms\nomnicompass\nomni_controller"}
+        with: {sparse-checkout: "scripts\nresults/grid_v6\ntools\nrealms\nomnicompass\nomni_controller"}
+      - name: Engine and source receipt
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Start the squares' next runs, every 15 minutes for five hours
         run: |
           rounds=18; [ "$DRY" = yes ] && rounds=1      # 18 ticks 15 minutes apart: under the job's 340 minutes

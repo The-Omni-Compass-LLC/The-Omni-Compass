@@ -41,8 +41,15 @@ WHAT = ("Omni-Compass is a supervisory governor. It always sits on top of a syst
 CLASSES = ("Evidence classes: P is a physical meter; L is live software, the real thing (a real Kubernetes cluster, a real "
            "database); S is our own models. S is never presented as proof.")
 
+INTERPRETATION_RULE = ("Interpret each muscle against its declared objective: report the actual native/Omni quantities and "
+                       "classify each gauge by its own aim. The same work for less energy or fewer billed node-hours is a "
+                       "resource GAIN even when throughput is EVEN. Any extra work calculated from that saving at a fixed "
+                       "budget is a conditional capacity estimate, not work observed; see docs/OMNI_COMPASS_MANUAL.md and "
+                       "tools/benefit_interpretation.py.")
+
 READ_MORE = [("README.md", "the front page, newest result first"),
              ("docs/HOW_TO_READ_THE_RESULTS.md", "how to read every table, the key at its top"),
+             ("tools/benefit_interpretation.py", "objective-specific GAIN/EVEN/LOSS and conditional capacity arithmetic"),
              ("docs/OMNI_COMPASS_MANUAL.pdf", "the manual, the key in its front matter"),
              ("results/OMNI_INDEX.md", "the one combined number, test by test"),
              ("docs/BENEFIT_SHEET.md", "one number and one word per benchmark"),
@@ -174,7 +181,7 @@ def build(markdown=False):
     plain = lambda s: re.sub(r"\*\*|`", "", s) if not markdown else s
     L = [NOTICE if markdown else plain(NOTICE), ""]
     L += ["# Omni-Compass: the whole summary" if markdown else "OMNI-COMPASS: THE WHOLE SUMMARY", ""]
-    L += [WHAT, "", CLASSES, "", f"Engine on this checkout: {engine_line()}.", ""]
+    L += [WHAT, "", CLASSES, "", INTERPRETATION_RULE, "", f"Engine on this checkout: {engine_line()}.", ""]
     L += key_lines() if markdown else key_text().splitlines()
     L += ["", "## The results, each with its word" if markdown else "THE RESULTS, EACH WITH ITS WORD", ""]
     for part in (index_part(), benefit_part(), wiring_part(), realms_part(), grid_part()):

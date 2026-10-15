@@ -8,11 +8,11 @@ name: six-kube
 # four stacked, each native against native with Omni-Compass on top (the max), paired on one runner per repetition, each
 # arm on a fresh six-worker kind cluster (scripts/kind_paired.sh). Six organisms times two arms: twelve columns, one report
 # (tools/six_kube_report.py -> SIX_KUBE.md). Started with its defaults (Actions -> six-kube -> Run workflow), it starts
-# the whole grid: every organism at 1, 10 and 100 copies, every size to 100 repetitions (1, 10 and 100 only, the founder's
-# order of 12 October; scripts/dispatch_grid.py, kept going by grid.yml until every square is full). Started with what =
+# the whole grid: every organism at 1, 10, 100 and 1,000 copies, every size to 1,000 repetitions (free GitHub only, owner's
+# order of 15 October; scripts/dispatch_grid.py, kept going by grid.yml until every square is full). Started with what =
 # runs, it runs one dispatch. The organism steps on the window's clock, so the window is set long enough for the max's arm
 # to make every step in time (a repetition more than 5% late is marked off the clock). With split = yes each arm of a
-# repetition runs on its own runner (for a window too long for both on one; the grid never needs it). "protocol 3" in a run's
+# repetition runs on its own runner (for a window too long for both on one; the planner checks the full per-arm job budget). "protocol 3" in a run's
 # name: the test rig as amended on 12 Oct (scripts/kind_bench.sh: the governor never below the organism's CPU priority, its
 # decisions counted inside the window, refused downloads tried again) and on 13 Oct (the model of the organism on the
 # runner's last core, the kind nodes on the others; the window lengthened from the heavier arm's step timed before either
@@ -25,8 +25,8 @@ run-name: >-
 on:
   workflow_dispatch:
     inputs:
-      what: {description: "grid (start every square of the whole grid: 1, 10 and 100 copies, every size to 100 repetitions) or runs (only the repetitions below)", default: "grid"}
-      sizes: {description: "runs: copies of each organism on one clock, the real cluster inside (1, 10, 100; comma-separated)", default: "1"}
+      what: {description: "grid (start every square of the whole grid: 1, 10, 100 and 1,000 copies, every size to 1,000 repetitions) or runs (only the repetitions below)", default: "grid"}
+      sizes: {description: "runs: copies of each organism on one clock, the real cluster inside (1, 10, 100, 1000; free runners only, comma-separated)", default: "1"}
       organisms: {description: "runs: organisms, comma-separated (compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower)", default: "compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower"}
       reps: {description: "runs: paired repetitions of each organism (one number, or one per size)", default: "10"}
       rep_first: {description: "runs: the first repetition (1-based), so a square's repetitions can be cut into dispatches under GitHub's 256 jobs", default: "1"}
@@ -49,7 +49,7 @@ jobs:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
-        with: {sparse-checkout: "scripts\nresults/grid_v5\ntools\nrealms\nomnicompass\nomni_controller"}
+        with: {sparse-checkout: "scripts\nresults/grid_v6\ntools\nrealms\nomnicompass\nomni_controller"}
       - name: Start every square with the cluster inside not yet started
         env: {GITHUB_TOKEN: "${{ github.token }}"}
         run: python3 scripts/dispatch_grid.py tick --grid six-kube --ref "${{ github.ref_name }}"
@@ -88,6 +88,11 @@ jobs:
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4      # the code the cluster and the organism need, not the 82,000 result files
         with: {sparse-checkout: "deploy\nscripts\ntools\npilot\nfleet\ntuning\nomni_controller\nomnicompass\nrealms\nhardware\nresults/hardware"}
+      - name: Engine and source receipt
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
@@ -111,9 +116,88 @@ jobs:
           LOAD_MAX: ${{ github.event.inputs.load_max || '6' }}
           LOADGEN: ${{ github.event.inputs.loadgen || 'open' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
+      - name: Attach README, licenses and disclosures to this artifact
+        id: omni_legal_export_1
+        if: "always()"
+        env:
+          OMNI_EXPORT_PATHS: |
+            bench-*-${{ matrix.cell.rep }}
+        shell: python
+        run: |
+          #!/usr/bin/env python3
+          # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+          # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+          # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+          # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+          """Attach the exact legal bundle inside an artifact without changing its result-file layout."""
+          import glob
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import urllib.parse
+          import urllib.request
+          import uuid
+          
+          BUNDLE = ('README.md', 'LICENSE', 'NOTICE', 'DISCLOSURES.md', 'PATENTS.md', 'TRADEMARKS.md')
+          
+          
+          def search_root(pattern, workspace):
+              path = Path(os.path.expanduser(pattern))
+              if not path.is_absolute():
+                  path = workspace / path
+              prefix = Path(path.anchor)
+              for part in path.parts[1:]:
+                  if glob.has_magic(part):
+                      return prefix
+                  prefix /= part
+              return path if path.is_dir() or (not path.exists() and not path.suffix) else path.parent
+          
+          
+          def attach(paths, workspace, loader=None):
+              workspace = Path(workspace).absolute()
+              lines = [p.strip() for p in paths.splitlines() if p.strip()]
+              roots = [search_root(p, workspace) for p in lines if not p.startswith('!')]
+              if not roots:
+                  raise ValueError('artifact has no positive output path')
+              root = Path(os.path.commonpath([str(p) for p in roots]))
+              if root == Path(root.anchor):
+                  raise ValueError('refusing to write an export bundle at a filesystem root')
+              legal = root / '_omni_legal'
+              legal.mkdir(parents=True, exist_ok=True)
+              hashes = {}
+              for name in BUNDLE:
+                  source = workspace / name
+                  data = source.read_bytes() if source.is_file() else loader(name) if loader else None
+                  if data is None:
+                      raise FileNotFoundError('required export legal file is unavailable: ' + name)
+                  target = legal / name
+                  target.write_bytes(data)
+                  hashes[name] = hashlib.sha256(data).hexdigest()
+              (legal / 'SHA256SUMS.json').write_text(json.dumps(hashes, indent=2) + '\n')
+              return '\n'.join([*lines, *(str(legal / n) for n in (*BUNDLE, 'SHA256SUMS.json'))])
+          
+          
+          def main():
+              workspace = Path(os.environ.get('GITHUB_WORKSPACE', '.')).absolute()
+              def public_source(name):
+                  # Collect-only jobs may not check out source. Fetch only these public legal files, pinned to the run commit.
+                  repo, sha = os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_SHA']
+                  url = f'https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(name)}'
+                  with urllib.request.urlopen(url, timeout=30) as response:
+                      return response.read()
+              paths = attach(os.environ['OMNI_EXPORT_PATHS'], workspace, public_source)
+              delimiter = 'OMNI_LEGAL_' + uuid.uuid4().hex
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+                  out.write('paths<<' + delimiter + '\n' + paths + '\n' + delimiter + '\n')
+          
+          
+          if __name__ == '__main__':
+              main()
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: "six-${{ matrix.cell.organism }}-x${{ matrix.cell.size }}-${{ matrix.cell.rep }}${{ matrix.cell.tag }}", path: "bench-*-${{ matrix.cell.rep }}"}
+        with: {name: "six-${{ matrix.cell.organism }}-x${{ matrix.cell.size }}-${{ matrix.cell.rep }}${{ matrix.cell.tag }}", path: "${{ steps.omni_legal_export_1.outputs.paths }}"}
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -133,8 +217,86 @@ jobs:
         with: {pattern: "six-*", path: six}
       - run: python tools/six_kube_report.py six
       - run: cat six/SIX_KUBE.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Attach README, licenses and disclosures to this artifact
+        id: omni_legal_export_2
+        env:
+          OMNI_EXPORT_PATHS: |
+            six/SIX_KUBE.*
+        shell: python
+        run: |
+          #!/usr/bin/env python3
+          # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+          # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+          # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+          # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+          """Attach the exact legal bundle inside an artifact without changing its result-file layout."""
+          import glob
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import urllib.parse
+          import urllib.request
+          import uuid
+          
+          BUNDLE = ('README.md', 'LICENSE', 'NOTICE', 'DISCLOSURES.md', 'PATENTS.md', 'TRADEMARKS.md')
+          
+          
+          def search_root(pattern, workspace):
+              path = Path(os.path.expanduser(pattern))
+              if not path.is_absolute():
+                  path = workspace / path
+              prefix = Path(path.anchor)
+              for part in path.parts[1:]:
+                  if glob.has_magic(part):
+                      return prefix
+                  prefix /= part
+              return path if path.is_dir() or (not path.exists() and not path.suffix) else path.parent
+          
+          
+          def attach(paths, workspace, loader=None):
+              workspace = Path(workspace).absolute()
+              lines = [p.strip() for p in paths.splitlines() if p.strip()]
+              roots = [search_root(p, workspace) for p in lines if not p.startswith('!')]
+              if not roots:
+                  raise ValueError('artifact has no positive output path')
+              root = Path(os.path.commonpath([str(p) for p in roots]))
+              if root == Path(root.anchor):
+                  raise ValueError('refusing to write an export bundle at a filesystem root')
+              legal = root / '_omni_legal'
+              legal.mkdir(parents=True, exist_ok=True)
+              hashes = {}
+              for name in BUNDLE:
+                  source = workspace / name
+                  data = source.read_bytes() if source.is_file() else loader(name) if loader else None
+                  if data is None:
+                      raise FileNotFoundError('required export legal file is unavailable: ' + name)
+                  target = legal / name
+                  target.write_bytes(data)
+                  hashes[name] = hashlib.sha256(data).hexdigest()
+              (legal / 'SHA256SUMS.json').write_text(json.dumps(hashes, indent=2) + '\n')
+              return '\n'.join([*lines, *(str(legal / n) for n in (*BUNDLE, 'SHA256SUMS.json'))])
+          
+          
+          def main():
+              workspace = Path(os.environ.get('GITHUB_WORKSPACE', '.')).absolute()
+              def public_source(name):
+                  # Collect-only jobs may not check out source. Fetch only these public legal files, pinned to the run commit.
+                  repo, sha = os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_SHA']
+                  url = f'https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(name)}'
+                  with urllib.request.urlopen(url, timeout=30) as response:
+                      return response.read()
+              paths = attach(os.environ['OMNI_EXPORT_PATHS'], workspace, public_source)
+              delimiter = 'OMNI_LEGAL_' + uuid.uuid4().hex
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+                  out.write('paths<<' + delimiter + '\n' + paths + '\n' + delimiter + '\n')
+          
+          
+          if __name__ == '__main__':
+              main()
       - uses: actions/upload-artifact@v4
-        with: {name: six-kube, path: "six/SIX_KUBE.*"}
+        with: {name: six-kube, path: "${{ steps.omni_legal_export_2.outputs.paths }}"}
       - name: Legal files beside the files this run hands out
         if: always()
         uses: actions/checkout@v4

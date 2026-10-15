@@ -6,6 +6,10 @@ Written 13 October 2026 (night), before any of it is built, on the founder's ord
 is omni-v5, digest `6093b2b88aa911b9`. Everything below changes the engine, so it lands as the next declared version, and
 every benchmark then runs again on it, A, B and C. Nothing here is a result.
 
+## Update, 15 October 2026
+
+The v6 capacity repair and non-GPU rerun campaign are now implemented in `docs/OMNI_V6.md`. The repair does not declare every proposal in this historical plan complete. Google, Amazon and physical GPU launches remain deferred.
+
 ## 1. GAIN, EVEN and LOSS as the code that steers the brain
 
 Today the words are in every report (`tools/readings.py`) and the engine already acts on the same aims: the verdict

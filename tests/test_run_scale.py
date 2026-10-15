@@ -40,7 +40,7 @@ class RunScale(unittest.TestCase):
             d = json.loads((Path(t) / "SCALE.json").read_text())
             self.assertFalse(d["complete"])
             self.assertEqual(d["runs_done"], 1)                 # the first run always starts; none after the deadline
-            self.assertEqual(d["engine"], "omni-v5")
+            self.assertEqual(d["engine"], "omni-v6")
             run = d["per_run"]["energy_facility_industrial"][str(SEED0)]
             self.assertGreater(run["wall_s"], 0.0)
             self.assertIn("sums", run)
@@ -88,8 +88,7 @@ class PoolScale(unittest.TestCase):
 
 
 class Conductor(unittest.TestCase):
-    """scripts/dispatch_grid.py: every square planned once to 100 runs at 1, 10 and 100 copies (the founder's order of 12
-    October: no 1,000s), nothing started twice, every shard inside a runner's six hours and memory, and the started runs
+    """scripts/dispatch_grid.py: every supported free square planned once to 1,000 runs at 1/10/100/1000 copies, nothing started twice, every shard inside a runner's six hours and memory, and the started runs
     read back from their own names."""
 
     @classmethod
@@ -100,7 +99,7 @@ class Conductor(unittest.TestCase):
 
     def test_every_square_once_to_100(self):
         g = self.g
-        self.assertEqual((g.SIZES, g.RUNS), ((1, 10, 100), 100))
+        self.assertEqual((g.SIZES, g.RUNS), ((1, 10, 100, 1000), 1000))
         plan = g.next_dispatches({})
         seen = {}
         for d in plan:
@@ -117,21 +116,27 @@ class Conductor(unittest.TestCase):
                 s.update(r)
         for size in g.SIZES:
             for o, k in zip(g.ORGS, g.KUBE):
-                self.assertEqual(seen.get(("six", size, o)), set(range(100)), (size, o))
-                self.assertEqual(seen.get(("kube", size, k)), set(range(1, 101)), (size, k))
-        self.assertFalse([d for d in plan if d["size"] >= 1000 or d.get("split")])
+                expected = set(range(g.RUNS)) if g.shape(size, o) else None
+                self.assertEqual(seen.get(("six", size, o)), expected, (size, o))
+                expected = set(range(1, g.RUNS + 1)) if g.kube_fits(size, k) else None
+                self.assertEqual(seen.get(("kube", size, k)), expected, (size, k))
+        self.assertTrue([d for d in plan if d["size"] == 1000])
+        self.assertTrue(g.free_runner_refusals())
 
     def test_shards_fit_a_runner(self):
         g = self.g
         for size in g.SIZES:
             for o in g.ORGS:
+                if g.shape(size, o) is None:
+                    continue
                 per, w = g.shape(size, o)
                 self.assertLessEqual(w * g.MEM[size][o], g.RUNNER_GB)
                 runs_per_worker = -(-per // w)
                 self.assertLess(g.CAL[size][o] + runs_per_worker * g.SEC[size][o], g.DEADLINE_MIN * 60, (size, o))
         for size in g.SIZES:
             for k in g.KUBE:
-                self.assertLess(g.kube_minutes(size, k, False), 330, (size, k))
+                if g.kube_fits(size, k):
+                    self.assertLess(g.kube_minutes(size, k, size >= 1000), 330, (size, k))
 
     def test_azure_and_reports_go_before_the_grid(self):
         g = self.g
@@ -183,7 +188,7 @@ class Conductor(unittest.TestCase):
         self.assertEqual(g.azure_to_start(q, {steady: 3, x: 3, y: 3}, set()), [])
         self.assertEqual(g.azure_group("aks-metered burst 1 6 1 8 1 6 dial save eastus Standard_D2_v4"), d2)
         self.assertEqual(g.azure_title({"dial": "max", "replica_ceiling": "0"}), "aks-metered steady replica room 0 dial max eastus Standard_D2s_v4")
-        self.assertTrue(g.azure_queue(g.AZURE_QUEUE))                 # the repository's own queue reads
+        self.assertEqual(g.azure_queue(g.AZURE_QUEUE), [])                 # the repository's own queue reads
 
     def test_started_runs_read_back_and_not_started_again(self):
         g = self.g

@@ -7,7 +7,7 @@ name: six
 # The six organisms, native and Omni (tools/run_scale.py): the four realms, the four stacked with every duplicate kept
 # and the whole tower, on the engine's v5 law at the max on the v5 catalog, with work waiting in line (the founder's
 # order). Started with its defaults (Actions -> six -> Run workflow), it starts the whole grid: every organism at 1, 10
-# and 100 copies, every size to 100 runs (1, 10 and 100 only, the founder's order of 12 October; scripts/dispatch_grid.py:
+# and 100 copies, every size to 1,000 runs (free GitHub runners only, owner's order of 15 October; scripts/dispatch_grid.py:
 # the conductor starts the runs not yet started, small squares first, and grid.yml keeps it going every 15 minutes until
 # every square is full, using every runner GitHub gives this repository). Started with what = runs, it runs one dispatch: the runs first .. first+runs-1 of the organisms
 # asked, at one size, cut into shards from the max's measured run times; each shard stops starting runs at its deadline
@@ -20,8 +20,8 @@ run-name: >-
 on:
   workflow_dispatch:
     inputs:
-      what: {description: "grid (start every square of the whole grid: 1, 10 and 100 copies, every size to 100 runs) or runs (only the runs below)", default: "grid"}
-      scale: {description: "runs: copies of each organism on one clock (1, 10 or 100)", default: "1"}
+      what: {description: "grid (start every square of the whole grid: 1, 10, 100 and 1,000 copies, every size to 1,000 runs) or runs (only the runs below)", default: "grid"}
+      scale: {description: "runs: copies of each organism on one clock (1, 10, 100 or 1000; free runners only)", default: "1"}
       orgs: {description: "runs: organisms, comma-separated numbers 1-6", default: "1,2,3,4,5,6"}
       first: {description: "runs: the first run (0-based; seeds 7000+first on, so the 1-, 10- and 100-run squares nest)", default: "0"}
       runs: {description: "runs: how many runs of each organism", default: "100"}
@@ -45,7 +45,7 @@ jobs:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
-        with: {sparse-checkout: "scripts\nresults/grid_v5\ntools\nrealms\nomnicompass\nomni_controller"}
+        with: {sparse-checkout: "scripts\nresults/grid_v6\ntools\nrealms\nomnicompass\nomni_controller"}
       - name: Start every square of the modelled grid not yet started
         env: {GITHUB_TOKEN: "${{ github.token }}"}
         run: python3 scripts/dispatch_grid.py tick --grid six --ref "${{ github.ref_name }}"
@@ -88,6 +88,11 @@ jobs:
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4      # only the code the run needs: the whole tree (82,000 result files) took 16 minutes
         with: {sparse-checkout: "realms\ntools\nomnicompass\nomni_controller"}
+      - name: Engine and source receipt
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
@@ -98,9 +103,88 @@ jobs:
             --organisms "${{ matrix.org }}" --out "part-${{ matrix.org }}-${{ matrix.first }}" \
             --workers "${{ matrix.w }}" --arm "${{ github.event.inputs.arm || 'v5' }}" --load "${{ github.event.inputs.load || 'line' }}" \
             --deadline-min "${{ github.event.inputs.deadline_min || '320' }}"
+      - name: Attach README, licenses and disclosures to this artifact
+        id: omni_legal_export_1
+        if: "always()"
+        env:
+          OMNI_EXPORT_PATHS: |
+            part-${{ matrix.org }}-${{ matrix.first }}
+        shell: python
+        run: |
+          #!/usr/bin/env python3
+          # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+          # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+          # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+          # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+          """Attach the exact legal bundle inside an artifact without changing its result-file layout."""
+          import glob
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import urllib.parse
+          import urllib.request
+          import uuid
+          
+          BUNDLE = ('README.md', 'LICENSE', 'NOTICE', 'DISCLOSURES.md', 'PATENTS.md', 'TRADEMARKS.md')
+          
+          
+          def search_root(pattern, workspace):
+              path = Path(os.path.expanduser(pattern))
+              if not path.is_absolute():
+                  path = workspace / path
+              prefix = Path(path.anchor)
+              for part in path.parts[1:]:
+                  if glob.has_magic(part):
+                      return prefix
+                  prefix /= part
+              return path if path.is_dir() or (not path.exists() and not path.suffix) else path.parent
+          
+          
+          def attach(paths, workspace, loader=None):
+              workspace = Path(workspace).absolute()
+              lines = [p.strip() for p in paths.splitlines() if p.strip()]
+              roots = [search_root(p, workspace) for p in lines if not p.startswith('!')]
+              if not roots:
+                  raise ValueError('artifact has no positive output path')
+              root = Path(os.path.commonpath([str(p) for p in roots]))
+              if root == Path(root.anchor):
+                  raise ValueError('refusing to write an export bundle at a filesystem root')
+              legal = root / '_omni_legal'
+              legal.mkdir(parents=True, exist_ok=True)
+              hashes = {}
+              for name in BUNDLE:
+                  source = workspace / name
+                  data = source.read_bytes() if source.is_file() else loader(name) if loader else None
+                  if data is None:
+                      raise FileNotFoundError('required export legal file is unavailable: ' + name)
+                  target = legal / name
+                  target.write_bytes(data)
+                  hashes[name] = hashlib.sha256(data).hexdigest()
+              (legal / 'SHA256SUMS.json').write_text(json.dumps(hashes, indent=2) + '\n')
+              return '\n'.join([*lines, *(str(legal / n) for n in (*BUNDLE, 'SHA256SUMS.json'))])
+          
+          
+          def main():
+              workspace = Path(os.environ.get('GITHUB_WORKSPACE', '.')).absolute()
+              def public_source(name):
+                  # Collect-only jobs may not check out source. Fetch only these public legal files, pinned to the run commit.
+                  repo, sha = os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_SHA']
+                  url = f'https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(name)}'
+                  with urllib.request.urlopen(url, timeout=30) as response:
+                      return response.read()
+              paths = attach(os.environ['OMNI_EXPORT_PATHS'], workspace, public_source)
+              delimiter = 'OMNI_LEGAL_' + uuid.uuid4().hex
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+                  out.write('paths<<' + delimiter + '\n' + paths + '\n' + delimiter + '\n')
+          
+          
+          if __name__ == '__main__':
+              main()
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: "part-${{ matrix.org }}-${{ matrix.first }}", path: "part-${{ matrix.org }}-${{ matrix.first }}", if-no-files-found: warn}
+        with: {name: "part-${{ matrix.org }}-${{ matrix.first }}", path: "${{ steps.omni_legal_export_1.outputs.paths }}", if-no-files-found: warn}
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -119,8 +203,86 @@ jobs:
       - uses: actions/download-artifact@v4
         with: {path: parts, pattern: "part-*"}
       - run: python3 tools/pool_scale.py SIX.md "parts/*/SCALE.json" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Attach README, licenses and disclosures to this artifact
+        id: omni_legal_export_2
+        env:
+          OMNI_EXPORT_PATHS: |
+            SIX.*
+        shell: python
+        run: |
+          #!/usr/bin/env python3
+          # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+          # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+          # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+          # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+          """Attach the exact legal bundle inside an artifact without changing its result-file layout."""
+          import glob
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import urllib.parse
+          import urllib.request
+          import uuid
+          
+          BUNDLE = ('README.md', 'LICENSE', 'NOTICE', 'DISCLOSURES.md', 'PATENTS.md', 'TRADEMARKS.md')
+          
+          
+          def search_root(pattern, workspace):
+              path = Path(os.path.expanduser(pattern))
+              if not path.is_absolute():
+                  path = workspace / path
+              prefix = Path(path.anchor)
+              for part in path.parts[1:]:
+                  if glob.has_magic(part):
+                      return prefix
+                  prefix /= part
+              return path if path.is_dir() or (not path.exists() and not path.suffix) else path.parent
+          
+          
+          def attach(paths, workspace, loader=None):
+              workspace = Path(workspace).absolute()
+              lines = [p.strip() for p in paths.splitlines() if p.strip()]
+              roots = [search_root(p, workspace) for p in lines if not p.startswith('!')]
+              if not roots:
+                  raise ValueError('artifact has no positive output path')
+              root = Path(os.path.commonpath([str(p) for p in roots]))
+              if root == Path(root.anchor):
+                  raise ValueError('refusing to write an export bundle at a filesystem root')
+              legal = root / '_omni_legal'
+              legal.mkdir(parents=True, exist_ok=True)
+              hashes = {}
+              for name in BUNDLE:
+                  source = workspace / name
+                  data = source.read_bytes() if source.is_file() else loader(name) if loader else None
+                  if data is None:
+                      raise FileNotFoundError('required export legal file is unavailable: ' + name)
+                  target = legal / name
+                  target.write_bytes(data)
+                  hashes[name] = hashlib.sha256(data).hexdigest()
+              (legal / 'SHA256SUMS.json').write_text(json.dumps(hashes, indent=2) + '\n')
+              return '\n'.join([*lines, *(str(legal / n) for n in (*BUNDLE, 'SHA256SUMS.json'))])
+          
+          
+          def main():
+              workspace = Path(os.environ.get('GITHUB_WORKSPACE', '.')).absolute()
+              def public_source(name):
+                  # Collect-only jobs may not check out source. Fetch only these public legal files, pinned to the run commit.
+                  repo, sha = os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_SHA']
+                  url = f'https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(name)}'
+                  with urllib.request.urlopen(url, timeout=30) as response:
+                      return response.read()
+              paths = attach(os.environ['OMNI_EXPORT_PATHS'], workspace, public_source)
+              delimiter = 'OMNI_LEGAL_' + uuid.uuid4().hex
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+                  out.write('paths<<' + delimiter + '\n' + paths + '\n' + delimiter + '\n')
+          
+          
+          if __name__ == '__main__':
+              main()
       - uses: actions/upload-artifact@v4
-        with: {name: six-receipts, path: "SIX.*"}
+        with: {name: six-receipts, path: "${{ steps.omni_legal_export_2.outputs.paths }}"}
       - name: Legal files beside the files this run hands out
         if: always()
         uses: actions/checkout@v4

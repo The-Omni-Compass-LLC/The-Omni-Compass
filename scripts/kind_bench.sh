@@ -98,7 +98,8 @@ CAP_ARGS="--cap-deployments default/php-apache"; [ -z "$CRUISEKUBE" ] || CAP_ARG
 # shows the response time holds, and wakes it at once on a breach; a parked, empty machine Azure deletes. So the bill can
 # only fall or stay, never rise
 OMNI_SENSED="default/php-apache"; OMNI_POWER_CMD="bash scripts/kind_power.sh"
-if [ -n "${OMNI_MACHINES_ONLY:-}" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; fi
+# Only 1 enables machines-only mode; 0, empty and unset retain the full wiring.
+if [ "${OMNI_MACHINES_ONLY:-0}" = "1" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; fi
 limits_now() {   # the CPU limit the operator's record holds: the pods' own, or with CruiseKube the Deployment's template
   if [ -n "$CRUISEKUBE" ]; then
     kubectl get deployment php-apache -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}'
@@ -539,7 +540,7 @@ if [ -n "${ROBUST:-}" ]; then
     # the second governor is started by the robustness script when its moment comes, with the same command line: the
     # function and what it reads are exported before the script starts
     export -f start_controller
-    export DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING OMNI_DIAL MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE OMNI_SENSED OMNI_POWER_CMD
+    export CAP_ARGS DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING OMNI_DIAL MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE OMNI_SENSED OMNI_POWER_CMD
   fi
   OUT_DIR="$OUT_DIR" DURATION="$DURATION" ROBUST="$ROBUST" OMNI_PID="$omni_pid" WORKERS="$WORKERS" HPA_RANGE="$HPA_RANGE" \
     WORKER_SEL="$WORKER_SEL" NATIVE="$NATIVE" bash scripts/kind_robust.sh > "$OUT_DIR/robust.out" 2>&1 &
@@ -571,7 +572,7 @@ end_read() { local f="$1"; shift; for t in 1 2 3 4 5 6; do kubectl "$@" --reques
   echo "the API server did not answer: kubectl $*" >> "$OUT_DIR/end_reads.err"; }
 end_read "$OUT_DIR/pods_end.json" get pods -n default -l run=php-apache -o json
 if [ -n "$robust_pid" ]; then
-  wait "$robust_pid" || true
+  wait "$robust_pid" || { echo "INVALID RUN: robustness helper failed; see robust.out"; exit 1; }
   # the second governor of the kill scenario was started by the robustness script: wait for it to finish its decisions
   if [ -f "$OUT_DIR/omni2.pid" ]; then
     p2=$(cat "$OUT_DIR/omni2.pid"); while kill -0 "$p2" 2>/dev/null; do sleep 2; done

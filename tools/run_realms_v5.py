@@ -230,11 +230,11 @@ def misses_line(o):
 def write_md(out, res, orgs, run):
     L = []
     w = L.append
-    w(f"# The realms on Omni v5 at the max: {len(res)} muscles and six organisms, native against Omni on top")
+    w(f"# The realms on {run['engine']} at the max: {len(res)} muscles and six organisms, native against Omni on top")
     w("")
     w(f"Evidence class **S** (modelled). Run {run['started']}, commit `{run['commit'][:12]}`, seeds "
       f"{run['seeds'][0]}-{run['seeds'][-1]} ({len(run['seeds'])} paired seeds per muscle, per organism and per load), "
-      f"catalog `{run['catalog']}`. The engine is **omni-v5** (`tools/omni_version.py`, `OMNI_V5.json`) at its default, "
+      f"catalog `{run['catalog']}`. The engine is **{run['engine']}** (`tools/omni_version.py`) at its default, "
       "**the max** (`realms/compass_arm_v5.py`, `V5CFG`), on top of each plant's own native controller. Harness `realms/`.")
     w("")
     w("**The max.** Every muscle is pushed toward its own limit for the most work, faster: a pool's machines are started "
@@ -413,8 +413,10 @@ def main(argv=None):
     commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     frozen_files = [str(p.relative_to(ROOT)) for d in ("realms", "omnicompass") for p in sorted((ROOT / d).rglob("*"))
                     if p.is_file() and p.suffix in (".py", ".csv", ".json")]
+    from tools.omni_version import engine_files, version_of, digest
+    engine_snapshot = engine_files()
     run = {"started": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()), "commit": commit, "seeds": a.seeds,
-           "preregistered": prereg, "dirty": bool(dirty), "muscles": len(rows), "engine": "omni-v5", "dial": "max",
+           "preregistered": prereg, "dirty": bool(dirty), "muscles": len(rows), "engine": version_of(engine_snapshot) or "undeclared", "engine_digest": digest(engine_snapshot), "dial": "max",
            "loads": loads, "muscle_loads": list(MUSCLE_LOADS), "line": LINE, "kill_at": KILL_AT, "walk": WALK,
            "catalog": str(Path(a.catalog).relative_to(ROOT)) if Path(a.catalog).is_absolute() else a.catalog,
            "frozen_tree_sha256": tree_sha(frozen_files + ["tools/run_realms_v5.py"]),
