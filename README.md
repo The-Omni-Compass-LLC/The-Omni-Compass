@@ -64,6 +64,10 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-15 21:25 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v6)](results/live/V6_KEDA_REQUESTS.md) |  |
+| 2026-10-15 21:25 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v6)](results/live/V6_KEDA_CPU_REQUESTS.md) |  |
+| 2026-10-15 21:25 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v6)](results/live/V6_GOLDILOCKS.md) |  |
+| 2026-10-15 21:25 | [CruiseKube: Omni-Compass on top of a service rightsized by CruiseKube applying its own recommendations: the A/B/C three-run table (Omni v6)](results/live/V6_CRUISEKUBE.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -71,16 +75,14 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-15 22:23 | grid | cancelled | [38813168083](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38813168083) |
+| 2026-10-15 22:13 | kind-addons | cancelled | [38809446951](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38809446951) |
+| 2026-10-15 22:13 | kind-goldilocks | cancelled | [38809451097](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38809451097) |
+| 2026-10-15 22:13 | kind-cruisekube | cancelled | [38809454764](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38809454764) |
+| 2026-10-15 22:13 | capacity v7-trial: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | cancelled | [38809460964](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38809460964) |
 | 2026-10-15 21:54 | aks-client-check | success | [38808120895](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38808120895) |
 | 2026-10-15 21:52 | big-organism-detached collect | success | [38812428208](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38812428208) |
 | 2026-10-15 21:16 | quota-convey-trial | success | [38799140676](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38799140676) |
-| 2026-10-15 21:13 | grid | cancelled | [38803750637](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38803750637) |
-| 2026-10-15 20:28 | six x100 line orgs 2 runs 10+90 | success | [38778455247](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38778455247) |
-| 2026-10-15 19:15 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower reps 52+41 arms native compass split no window 960 protocol 3 | success | [38771924309](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38771924309) |
-| 2026-10-15 19:15 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,stack,tower reps 93+8 arms native compass split no window 960 protocol 3 | success | [38778423065](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38778423065) |
-| 2026-10-15 19:15 | six-kube x10 orgs distribution_specialized reps 26+1 arms native compass split no window 960 protocol 3 | success | [38778431524](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38778431524) |
-| 2026-10-15 19:15 | six-kube x10 orgs distribution_specialized reps 93+8 arms native compass split no window 960 protocol 3 | success | [38778439859](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38778439859) |
-| 2026-10-15 17:34 | six x10 line orgs 5 runs 10+90 | success | [38760179918](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38760179918) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
