@@ -52,7 +52,7 @@ SUBTITLE = ("The Master Manual: Its Philosophy, Its Mathematics, Its Mechanism, 
             if OWNER else "How to Embed, Wire, Tune and Run Omni-Compass on Your Stack")
 SUBTITLE_HTML = ("The Master Manual:<br/>Its Philosophy, Its Mathematics, Its Mechanism, Its Results,<br/>and How to Wire It "
                  "onto Your Stack" if OWNER else "How to Embed, Wire, Tune and Run<br/>Omni-Compass on Your Stack")
-LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix F"
+LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix N"
 INTRO = ("Introduction: The Problem, the Idea and the Promise" if OWNER else
          "Introduction: The Problem, the Idea and What This Manual Covers")
 RESULTS_LINE = ("Every result in this book carries its evidence class." if OWNER else
@@ -396,6 +396,39 @@ OPERATOR_OUTLINE = [
     ("Paired Runs and Receipts on Your Own System", ("M", "Paired Runs and Receipts on Your Own System")),
     ("Evidence Classes and How to Read a Receipt", ("M", "Evidence Classes and How to Read a Receipt")),
     ("The Engine Version and the Three-Run Rule", ("M", "The Engine Version and the Three-Run Rule")),
+    ("PART", "The Implementer's Guide: Omni-Compass on a Cloud",
+     "For the engineer who installs it on Azure, Google Cloud or Amazon Web Services and keeps it in service: the path and "
+     "its gates, the permissions, each cloud step by step, the response-time feed, the cloud mode, day two, the graphics "
+     "processor, observability, change and risk, planning the saving, own racks and private clouds, hardening, a fleet, "
+     "the failure drills, a complete installation, and the questions implementers ask."),
+    ("The Implementer's Path: From an Empty Account to a Governed Cluster",
+     ("M", "The Implementer's Path: From an Empty Account to a Governed Cluster")),
+    ("Identity, Permissions and Least Privilege on a Managed Cluster",
+     ("M", "Identity, Permissions and Least Privilege on a Managed Cluster")),
+    ("Azure Kubernetes Service, Step by Step", ("M", "Azure Kubernetes Service, Step by Step")),
+    ("Google Kubernetes Engine, Step by Step", ("M", "Google Kubernetes Engine, Step by Step")),
+    ("Amazon Elastic Kubernetes Service, Step by Step", ("M", "Amazon Elastic Kubernetes Service, Step by Step")),
+    ("The Response-Time Feed and the Line", ("M", "The Response-Time Feed and the Line")),
+    ("Running in the Cloud: the Machines Alone, the Bill and the Alarm Minutes",
+     ("M", "Running in the Cloud: the Machines Alone, the Bill and the Alarm Minutes")),
+    ("Day Two: Running Omni-Compass in Production", ("M", "Day Two: Running Omni-Compass in Production")),
+    ("The Graphics Processor: Putting the Governor on a Card", ("M", "The Graphics Processor: Putting the Governor on a Card")),
+    ("Observability: Feeding the Governor from Your Monitoring, and Watching It",
+     ("M", "Observability: Feeding the Governor from Your Monitoring, and Watching It")),
+    ("Change Management, Risk and Compliance", ("M", "Change Management, Risk and Compliance")),
+    ("Planning the Saving Before the Run: Capacity, Cost and the Shape of Load",
+     ("M", "Planning the Saving Before the Run: Capacity, Cost and the Shape of Load")),
+    ("On Your Own Racks and in Private Clouds",
+     ("M", "On Your Own Racks and in Private Clouds")),
+    ("Hardening and the Supply Chain",
+     ("M", "Hardening and the Supply Chain")),
+    ("Rolling Out Across a Fleet: Many Clusters, Many Services, GitOps",
+     ("M", "Rolling Out Across a Fleet: Many Clusters, Many Services, GitOps")),
+    ("Failure Modes and the Drill Book",
+     ("M", "Failure Modes and the Drill Book")),
+    ("A Complete Installation, Start to Finish",
+     ("M", "A Complete Installation, Start to Finish")),
+    ("Questions an Implementer Asks", ("M", "Questions an Implementer Asks")),
     ("PART", "License and Your Copy",
      "The terms the software and this manual are licensed under, and how to verify a copy before it is installed."),
     ("License and Commercial Terms", ("M", "License and Commercial Terms")),
@@ -407,9 +440,17 @@ OPERATOR_OUTLINE = [
     ("Appendix C. The Gauges", ("M", "Appendix C - The Gauges")),
     ("Appendix D. Troubleshooting", ("M", "Appendix D - Troubleshooting")),
     ("Appendix E. The Muscles: What Each Is For, and How It Is Wired", ("F", "docs/MUSCLE_CATALOG.md")),
-    ("Appendix F. The License", ("X", "license")),
-    ("Appendix G. Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
-    ("Appendix H. Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
+    ("Appendix F. The Azure Account, Click by Click", ("F", "docs/AZURE_SETUP.md")),
+    ("Appendix G. The Google Cloud Account, Click by Click", ("F", "docs/GOOGLE_SETUP.md")),
+    ("Appendix H. The Amazon Web Services Account, Click by Click", ("F", "docs/AMAZON_SETUP.md")),
+    ("Appendix I. The Install Manifests", ("X", "manifests")),
+    ("Appendix J. The Implementer's Checklists", ("M", "Appendix J - The Implementer's Checklists")),
+    ("Appendix K. The Kubernetes Governor's Settings", ("M", "Appendix K - The Kubernetes Governor's Settings")),
+    ("Appendix L. The Audit, Record by Record", ("M", "Appendix L - The Audit, Record by Record")),
+    ("Appendix M. The Three Clouds Side by Side", ("M", "Appendix M - The Three Clouds Side by Side")),
+    ("Appendix N. The License", ("X", "license")),
+    ("Appendix O. Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
+    ("Appendix P. Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
     ("Contact", ("X", "contact")),
 ]
 
@@ -538,6 +579,12 @@ def special(name):
         story = [Paragraph(inline(intro), BODY)]
         for rel in ["omnicompass/core.py", "omnicompass/compass_law.py", "realms/compass_arm.py", "omni_controller/gpu_compass.py",
                     "omnicompass/adapter.py", "omnicompass/nervous_system.py"]:
+            story += source_listing(rel)
+        return story
+    if name == "manifests":
+        story = md_flow(MAN["Appendix I - The Install Manifests"], shift=2, strip=True)
+        for rel in ["deploy/install/omni-compass.yaml", "deploy/install/rbac-machines.yaml", "deploy/install/omni-compass-cloud.yaml",
+                    "deploy/rbac-target.yaml", "deploy/Dockerfile", "deploy/Dockerfile.cloud"]:
             story += source_listing(rel)
         return story
     if name == "license":

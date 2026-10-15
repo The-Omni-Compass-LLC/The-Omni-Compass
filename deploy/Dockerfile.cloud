@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The cloud mode's image (the Operator's Manual, chapter 19): the shipped image (deploy/Dockerfile) plus what moving the
+# machines alone needs: jq (the machine lever reads the cluster's JSON with it), the machine lever's script, the
+# response-time probe or the Prometheus feed adapter, and the switch tool the in-pod watchdog runs (the lease). Build the shipped image first and pass it: --build-arg BASE=<registry>/omni-compass:<version>.
+ARG BASE=omni-compass:local
+FROM ${BASE}
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends jq && rm -rf /var/lib/apt/lists/*
+COPY scripts/kind_nodepool.sh /app/scripts/kind_nodepool.sh
+COPY scripts/latency_probe.py /app/scripts/latency_probe.py
+COPY tools/omni_switch.py /app/tools/omni_switch.py
+COPY tools/prom_feed.py /app/tools/prom_feed.py
+USER 10001

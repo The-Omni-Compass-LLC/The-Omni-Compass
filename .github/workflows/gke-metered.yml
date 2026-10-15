@@ -11,6 +11,8 @@
 # cluster this run made is deleted at the end whatever happens. Written, not yet run on Google Cloud: the first
 # repetition is a shakedown.
 name: gke-metered
+run-name: >-
+  ${{ format('gke-metered {0} dial {1}', github.event.inputs.load_steps != '' && format('burst {0}', github.event.inputs.load_steps) || 'steady', github.event.inputs.dial || 'save') }}
 on:
   workflow_dispatch:
     inputs:
@@ -27,6 +29,7 @@ on:
       organism: {description: "One of the six organisms with this cluster inside it (tools/run_kil.py): compute_ai_cloud, physics_robotics_autonomous, energy_facility_industrial, distribution_specialized, stack, tower; empty: the service alone", default: ""}
       load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
       organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10 or 100)", default: "1"}
+      dial: {description: "The dial of Omni-Compass on top: save, the tune-down (the founder's order of 14 October for every cloud: the same work as native for a bill that can only fall or stay), or max (the most work, faster, at any spend; never in a bill result)", default: "save"}
   push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
 concurrency: {group: "gke-metered-${{ github.event_name }}", cancel-in-progress: false}   # a push (which runs nothing) never takes a dispatch's place
 env:
@@ -92,6 +95,10 @@ jobs:
           ORGANISM_SCALE: ${{ github.event.inputs.organism_scale || '1' }}
           GKE_MAX_NODES: ${{ github.event.inputs.max_workers || '4' }}
           HPA_MAX: ${{ github.event.inputs.hpa_max || '' }}
+          OMNI_DIAL: ${{ github.event.inputs.dial || 'save' }}
+          # in every cloud the governor moves the machines alone (the founder's orders of 14 October, night): pods,
+          # processor limits and power stay native's, so the bill can only fall or stay (scripts/kind_bench.sh)
+          OMNI_MACHINES_ONLY: '1'
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - name: Delete every cluster this run made, whatever happened
         if: always()

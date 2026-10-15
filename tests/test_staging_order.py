@@ -116,12 +116,34 @@ class StagingOrder(unittest.TestCase):
             s = self.run_pool(d, 4, cushion=1)
             self.assertEqual(len(idle(s)), 1)
 
+    def test_foreign_cordon_left_alone(self):
+        # a machine someone else cordoned (maintenance, an upgrade's drain) is never uncordoned, never counted, and the
+        # governor's own idle mark on it comes off; waking every machine (the OFF switch's reset) leaves it cordoned
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            (d / "kubectl").write_text(FAKE); (d / "kubectl").chmod(0o755)
+            nodes = [node(n) for n in ("w1", "w2", "w3", "w4", "w5")]
+            nodes[3]["spec"] = {"unschedulable": True}                                          # w4: cordoned, no mark
+            nodes[4]["spec"] = {"unschedulable": True, "taints": [{"key": "omnicompass.io/idle", "effect": "PreferNoSchedule"}]}
+            st = {"nodes": nodes, "pods": [pod("a1", "w1"), pod("b1", "w2"), pod("d1", "w4"), pod("e1", "w5")], "log": []}
+            (d / "state.json").write_text(json.dumps(st))
+            s = self.run_pool(d, 100000)
+            by = {n["metadata"]["name"]: n["spec"] for n in s["nodes"]}
+            self.assertTrue(by["w4"].get("unschedulable") and by["w5"].get("unschedulable"), "a foreign cordon stays")
+            self.assertFalse([l for l in s["log"] if l[0] == "uncordon"], "never uncordons")
+            self.assertFalse(any(x["key"] == "omnicompass.io/idle" for x in by["w5"].get("taints", [])), "own mark removed")
+            # down to 2: only the three open machines count; the cordoned ones are neither in service nor idled
+            s = self.run_pool(d, 2)
+            idled = [n["metadata"]["name"] for n in s["nodes"] if any(x["key"] == "omnicompass.io/idle" for x in n["spec"].get("taints", []))]
+            self.assertEqual(idled, ["w3"])
+            self.assertFalse([l for l in s["log"] if l[0] in ("uncordon", "FORBIDDEN")])
+
 
 def main():
     r = unittest.TextTestRunner(verbosity=0).run(unittest.defaultTestLoader.loadTestsFromTestCase(StagingOrder))
     if not r.wasSuccessful():
         raise SystemExit(1)
-    print("PASS staging order: the emptiest idles first, the warmest wakes first, two always in service (the floor), every machine usable, no pod moved")
+    print("PASS staging order: the emptiest idles first, the warmest wakes first, two always in service (the floor), every machine usable, no pod moved, a machine someone else cordoned left alone")
 
 
 if __name__ == "__main__":

@@ -6,10 +6,11 @@ This connects GitHub to an Amazon Web Services (AWS) account so two workflows ca
 
 - **`eks-metered`**: a real Amazon Elastic Kubernetes Service cluster, native Kubernetes (with its own cluster autoscaler)
   against the same with Omni-Compass on top, the machines Amazon bills counted every 15 seconds, the organisms with the
-  cluster inside at 1, 10, 100 and 1,000 copies (`organism`, `organism_scale`), everything deleted at the end. The same
+  cluster inside at 1, 10 and 100 copies (`organism`, `organism_scale`), everything deleted at the end; every set at the
+  tune-down with the governor on the machines alone, so the bill can only fall or stay. The same
   design as Azure's `aks-metered` (`docs/K8S_COMPASS_PREREGISTRATION.md`).
-- **`cloud-organism`** with `cloud` = `aws`: the big organisms (the whole tower and the four stacked at 1,000 copies, the
-  real cluster inside) on one rented 8-processor machine, the same test Azure's `big-organism-detached` runs.
+- **`cloud-organism`** with `cloud` = `aws`: the big organisms (the whole tower and the four stacked, the
+  real cluster inside, at 100 copies) on one rented 8-processor machine, the same test Azure's `big-organism-detached` runs.
 
 About fifteen minutes, once. New accounts get **$100 of credit at sign-up and up to $100 more** for trying services, used
 before the card.
@@ -48,8 +49,8 @@ before the card.
 2. **New repository secret**. Name: `AWS_ACCESS_KEY_ID`. Secret: the Access key. **Add secret**.
 3. **New repository secret**. Name: `AWS_SECRET_ACCESS_KEY`. Secret: the Secret access key. **Add secret**.
 
-That is all. Tell Claude the two secrets are in; it starts the runs on the newest engine (branch `v5`) and reports each
-result before anything goes up.
+That is all. The runs start from the repository's **Actions** tab on the newest engine (branch `v5`), and no result goes up
+before it has been read.
 
 ## 4. What it costs
 

@@ -2100,7 +2100,7 @@ whether it carries work or not, so the aim on a managed cluster is native's work
 The cloud therefore runs at the tune-down (`dial save`, the `dial` input of `aks-metered` and its default) with the governor
 on the machines alone (`OMNI_MACHINES_ONLY=1`): it moves no pod autoscaler, conveys no processor and caps no power, so the
 pods are exactly native's and the cloud's own autoscaler alone makes machines; the governor parks a machine the cloud
-already made only after its own trial shows the response time holds, and wakes it at once on a breach. It can hold no
+already made only after its own trial shows the response time holds, and wakes it on a breach. It can hold no
 more pods and no more machines than native: the bill can only fall or stay, and it falls in the quiet stretches between
 bursts and in a day's trough. The
 max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),
