@@ -72,8 +72,19 @@ jobs:
       - name: Run the workload, native and omni
         run: |
           set +e
-          python tools/run_redis.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out --objective "${{ github.event.inputs.objective || 'resource' }}" > run.log 2>&1
+          # the runner's own health every 30 s, kept in the artifact, and the workload ended 20 minutes before the job's
+          # limit, so a job that hangs still hands in its files (run 38725712960: the burst job ended with the workload
+          # in progress and no artifact, its cause not found)
+          mkdir -p out
+          ( echo "epoch_s,mem_used_mb,mem_available_mb,disk_free_mb,processes"
+            while :; do
+              echo "$(date -u +%s),$(free -m | awk '/^Mem:/{print $3","$7}'),$(df -m / | awk 'NR==2{print $4}'),$(ps -e --no-headers | wc -l)"
+              sleep 30
+            done ) > out/host_health.csv 2>/dev/null &
+          monitor=$!
+          timeout --kill-after=60s 130m python tools/run_redis.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out --objective "${{ github.event.inputs.objective || 'resource' }}" > run.log 2>&1
           code=$?
+          kill "$monitor" 2>/dev/null || true      # the health file is final before the artifact is hashed
           mkdir -p out
           cp run.log out/run.log
           tail -40 run.log

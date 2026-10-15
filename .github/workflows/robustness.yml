@@ -66,7 +66,22 @@ jobs:
         if: steps.kind.outcome == 'failure'
         run: bash scripts/kind_install.sh v0.31.0 v1.35.0
       - run: python tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
-      - run: bash scripts/kind_paired.sh
+      # the runner's own health every 30 s (memory used and available, free disk, processes), kept in the pair's artifact
+      # (bench-health-N), and the pair ended 30 minutes after its two arms should have finished, so a pair that hangs ends
+      # while the runner can still hand in its files (run 38759312286, pair 3: 57 minutes against 38 for the other nine,
+      # then the runner was lost with no artifact and no cause)
+      - run: |
+          mkdir -p "bench-health-$REP"
+          ( echo "epoch_s,mem_used_mb,mem_available_mb,disk_free_mb,processes"
+            while :; do
+              echo "$(date -u +%s),$(free -m | awk '/^Mem:/{print $3","$7}'),$(df -m / | awk 'NR==2{print $4}'),$(ps -e --no-headers | wc -l)"
+              sleep 30
+            done ) > "bench-health-$REP/host_health.csv" 2>/dev/null &
+          monitor=$!
+          code=0
+          timeout --kill-after=60s "$(( ${DURATION:-900} * 2 + 1800 ))s" bash scripts/kind_paired.sh || code=$?
+          kill "$monitor" 2>/dev/null || true      # the health file is final before the artifact is hashed
+          exit $code
         env:
           REP: ${{ matrix.rep }}
           ARMS: "native compass"
