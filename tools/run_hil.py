@@ -274,6 +274,31 @@ def away_on(xs):
             for k in ("primary", "work", "energy", "p95", "viol_pp") if reading(k, m(k)) == f"({away_word(k)}: {AWAY[k]})"]
 
 
+def write_prefixes(root, res):
+    """Report actual first 1/10/100 paired repetitions; missing pairs never shift later runs into a prefix."""
+    rows = []
+    lines = ["# GPU organism nested repetition prefixes", "",
+             "Requested prefixes are 1, 10 and 100 runs. Incomplete prefixes retain their actual completed count.", "",
+             "| Copies | Organism | Prefix | Paired runs | Part | Reading |",
+             "|---:|---|---:|---:|---|---|"]
+    for (scale, name), reps in sorted(res.items()):
+        for n in (1, 10, 100):
+            pairs = []
+            for rep, arms in reps.items():
+                index = int(rep[4:]) - 1 if isinstance(rep, str) else rep
+                if 0 <= index < n and "omni" in arms and "native" in arms:
+                    pairs.append(contrast(arms["omni"], arms["native"]))
+            for part in ("sim", "card", "all"):
+                xs = [p[part] for p in pairs]
+                word = labelled(label(xs)) if len(xs) >= 2 else ("ONE REPETITION (no label)" if xs else "INCOMPLETE")
+                rows.append({"copies": scale, "organism": name, "prefix": n, "paired_runs": len(xs),
+                             "part": part, "reading": word, "complete": len(xs) == n})
+                lines.append(f"| {scale} | {name} | {n} | {len(xs)} of {n} | {part} | {word} |")
+    root = Path(root)
+    (root / "HIL_PREFIXES.json").write_text(json.dumps(rows, indent=2) + "\n")
+    (root / "HIL_PREFIXES.md").write_text("\n".join(_legal_stamp(lines)) + "\n")
+
+
 def rescore(root):
     """A finished card run reported in full from its own raw files (arm.json and latency.csv): the card's
     time over the line is counted from latency.csv where the run did not record it. Writes HIL_RESCORED.md."""
@@ -305,6 +330,7 @@ def rescore(root):
             mm = lambda k: sum(x[k] for x in xs) / len(xs)
             L.append(f"| {sc}x | {NAMES[name]} | {pname} | {len(xs)} | {lab} | {100 * mm('primary'):+.2f}% | {100 * mm('energy'):+.2f}% | "
                      f"{mm('viol_pp'):+.2f} | {100 * mm('p95'):+.1f}% |")
+    write_prefixes(root, res)
     (root / "HIL_RESCORED.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     print("\n".join(L))
     return 0
@@ -331,6 +357,12 @@ def main(argv=None):
     scales = [int(x) for x in a.scales.split(",") if x.strip()]
     if not scales or any(x not in (1, 10, 100) for x in scales):
         ap.error("organism scales must be drawn from 1,10,100")
+    rbs = [int(x) for x in a.reps_by_scale.split(",") if x.strip()]
+    if not rbs:
+        ap.error("repetitions by scale must not be empty")
+    reps_of = {sc: (a.reps if a.reps is not None else (rbs[i] if i < len(rbs) else rbs[-1])) for i, sc in enumerate(scales)}
+    if not rbs or any(n < 1 or n > 100 for n in reps_of.values()):
+        ap.error("paid GPU repetitions must be between 1 and 100")
     a.out = Path(a.out); a.out.mkdir(parents=True, exist_ok=True)
     start_w = limit(a)
     cal = [sys.executable, str(ROOT / "tools" / "gpu_workload.py"), "calibrate", "--out", str(a.out), "--device",
@@ -339,8 +371,6 @@ def main(argv=None):
     service = json.loads((a.out / "calib.json").read_text())["service_ms"]
     slo_ms = round(10 * service, 1)
     commit = subprocess.run(["git", "-c", "safe.directory=*", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-    rbs = [int(x) for x in a.reps_by_scale.split(",") if x.strip()]
-    reps_of = {sc: (a.reps if a.reps is not None else (rbs[i] if i < len(rbs) else rbs[-1])) for i, sc in enumerate(scales)}
     cost = per_muscle_step_s()
     names = [n for n in a.organisms.split(",") if n]
     sizes = {sc: {n: len(r) for n, r in groups(sc).items() if n in names} for sc in scales}
@@ -418,6 +448,7 @@ def main(argv=None):
     L += ["", "## Validity", ""] + ([f"- {p}" for p in problems] or ["- Every arm ended with the card at its start limit and its own clock range; every simulated knob was handed back; the card's governor exited cleanly."])
     L += ["", "Raw: every arm's `arm.json`, `smi.csv` (the card's own samples), `latency.csv`, `requests.csv`, `audit.jsonl`; checksums in `SHA256SUMS.txt`."]
     (a.out / "HIL.md").write_text("\n".join(_legal_stamp(L)) + "\n")
+    write_prefixes(a.out, res)
     (a.out / "HIL.json").write_text(json.dumps({"run": run, "results": out, "problems": problems}, indent=1) + "\n")
     sums = [f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(a.out)}" for p in sorted(a.out.rglob("*"))
             if p.is_file() and p.name != "SHA256SUMS.txt"]

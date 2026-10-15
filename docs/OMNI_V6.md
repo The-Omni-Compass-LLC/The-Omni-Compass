@@ -16,8 +16,8 @@ The zero-valued machines-only flag repair is retained: `1` selects machines-only
 `scripts/benchmark_campaign.json` records this request. A successful `verify` run for the release commit marked
 `[all-nongpu]` starts the grid automatically; an unsuccessful release verification launches no campaign.
 `scripts/reruns.txt` lists every standalone benchmark variant;
-the grid conductor releases A, B and C gradually alongside every organism at 1, 10 and 100 copies and nested 1, 10 and
-100 runs. The v6 dispatch manifest lives under `results/grid_v6`; v5 receipts remain historical. Each job prints its
+the grid conductor releases A, B and C gradually alongside every organism at 1, 10, 100 and 1,000 copies and nested 1, 10, 100 and
+1,000 runs on free GitHub runners. The v6 dispatch manifest lives under `results/grid_v6`; v5 receipts remain historical. Each job prints its
 engine fingerprint and source commit. A queued, failed or unavailable test is not a completed measurement.
 
 The queue covers Kubernetes baseline/full/levers/observe, fairness, faults, batch and trace loads, KEDA, CruiseKube,
@@ -30,12 +30,17 @@ The Azure burst is `1 4 1 6 1 9`, three paired repetitions, 600 measured seconds
 Full wiring enables HPA control, pod CPU limits and the existing power model. It does not create host RAPL, clock control
 or physical power meters on managed Azure VMs.
 
+Free GitHub Kubernetes, Linux, swarm and organism/model workloads may use 1,000 copies and 1,000 runs.
+Paid cloud and GPU organism scales remain 1, 10 and 100, with at most 100 repetitions.
+The conductor lists cells that exceed free runner memory/time as pending runner capacity; it never rents a cloud
+machine for them. The 1,000-copy planning estimates are extrapolations, not completed measurements.
+
 ## Prepared, not launched
 
 Google/GKE and Amazon/EKS retain their deployment scripts and use the new shared engine on a future manual launch.
 Their workflows, cloud-organism, gpu-bench and lambda-gpu are excluded from this campaign. No GPU machine is rented by it.
-`scripts/gpu_campaign_profiles.json` defines one physical card and eight physical cards, with organism scales
-1, 10 and 100. These are model copies around real hardware; only these three organism scales are permitted.
+`scripts/gpu_campaign_profiles.json` defines one physical card and eight physical cards, with all six organisms at scales
+1, 10 and 100 and 100 paired repetitions per scale. Reports show nested 1/10/100 run prefixes. These are model copies around real hardware; only these three organism scales are permitted.
 
 The profiles are operational through the existing `HIL_SCALES` and `HIL_REPS_BY_SCALE` environment variables. Existing
 wall-clock budgets still apply: a stage that cannot finish within its budget must be reported incomplete.

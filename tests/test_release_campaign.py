@@ -63,8 +63,35 @@ class ReleaseCampaign(unittest.TestCase):
         self.assertFalse(d['launch'])
         self.assertEqual(d['profiles']['one-card']['physical_gpus'], 1)
         self.assertEqual(d['profiles']['eight-card']['physical_gpus'], 8)
+        self.assertEqual(len(d['organisms']), 6)
+        self.assertEqual(d['reported_run_prefixes'], [1, 10, 100])
+        self.assertEqual(grid.SIZES, (1, 10, 100, 1000))
+        self.assertEqual(grid.RUNS, 1000)
         for p in d['profiles'].values():
             self.assertEqual(p['environment']['HIL_SCALES'], '1,10,100')
+            self.assertEqual(p['environment']['HIL_REPS_BY_SCALE'], '100,100,100')
+
+    def test_gpu_prefixes_keep_missing_early_pairs_missing(self):
+        from unittest.mock import patch
+        from tools import run_hil
+        with tempfile.TemporaryDirectory() as tmp:
+            value = {part: {"primary": 0.0, "work": 0.0, "energy": 0.0, "viol_pp": 0.0, "p95": 0.0}
+                     for part in ("sim", "card", "all")}
+            with patch.object(run_hil, "contrast", return_value=value):
+                run_hil.write_prefixes(tmp, {(1, "tower"): {1: {"native": {}, "omni": {}}}})
+            rows = json.loads((Path(tmp) / "HIL_PREFIXES.json").read_text())
+            self.assertTrue(all(r['paired_runs'] == 0 for r in rows if r['prefix'] == 1))
+            self.assertTrue(all(r['paired_runs'] == 1 for r in rows if r['prefix'] in (10, 100)))
+            self.assertFalse(any(r['complete'] for r in rows))
+
+    def test_gpu_rejects_paid_oversize_before_hardware_access(self):
+        from unittest.mock import patch
+        from tools import run_hil
+        with patch.object(run_hil, "limit", side_effect=AssertionError("hardware accessed")):
+            for args in (["--scales", "1000"], ["--reps", "1000"]):
+                with self.subTest(args=args), self.assertRaises(SystemExit) as cm:
+                    run_hil.main(["--out", "/tmp/omni-paid-rejected", *args])
+                self.assertEqual(cm.exception.code, 2)
 
 
 if __name__ == '__main__':

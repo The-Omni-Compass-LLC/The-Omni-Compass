@@ -4,11 +4,9 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The grid, every square filled to 100 runs: each of the six organisms at 1, 10 and 100 copies clustered on one clock,
-each size at 1, 10 and 100 runs, native and Omni side by side (54 squares), twice: modelled (six.yml) and with the real
-Kubernetes cluster inside (six-kube.yml). A square's runs are nested (its first 1, 10 and 100 runs), so a size needs its
-100 runs once. 1, 10 and 100 only, the founder's order of 12 October: no 1,000 copies and no 1,000 runs, to cut the time
-and the bill; the whole grid runs on GitHub's own machines.
+"""The free GitHub grid: all six organisms at 1, 10, 100 and 1,000 copies, with nested
+1, 10, 100 and 1,000 paired runs. Paid cloud and GPU jobs retain their separate 100-copy/100-run ceiling.
+The planner never rents hardware for an oversized free cell: memory/time refusals are listed explicitly.
 
 The conductor (tick) starts the grid and keeps every runner GitHub gives this repository busy without flooding the queue:
 it finds which runs of each square are already started (the dispatches named by their squares, plus the manifest of the
@@ -46,9 +44,9 @@ MANIFEST = ROOT / "results" / "grid_v6" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
 SINCE = "2026-10-15T06:07:41Z"  # only this campaign; earlier engines are historical
 ENGINE = "omni-v6"                 # the engine whose grid this is (tools/omni_version.py)
-SIZES = (1, 10, 100)               # 1, 10 and 100 copies only (the founder's order, 12 Oct)
-RUNS = 100                         # every square to 100 runs: 1, 10 and 100 runs only (the founder's order, 12 Oct)
-TIERS = (10, 100)                  # the 10-run squares of every size first, then 100
+SIZES = (1, 10, 100, 1000)          # free GitHub only: owner restored 1,000 on 15 October
+RUNS = 1000                        # nested 1/10/100/1000 runs on free GitHub runners
+TIERS = (10, 100, 1000)             # smaller prefixes first
 MAX_JOBS = 250                     # GitHub: at most 256 jobs in one run's matrix (a few kept for the plan and the receipt)
 ORGS = ["1", "2", "3", "4", "5", "6"]   # tools/run_scale.py: the four realms, the four stacked, the whole tower
 KUBE = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
@@ -67,6 +65,10 @@ CAL = {1: {o: 2 for o in ORGS}, 10: {o: 15 for o in ORGS},
        100: {"1": 150, "2": 200, "3": 170, "4": 150, "5": 670, "6": 500}}
 MEM = {1: {o: 0.2 for o in ORGS}, 10: {o: 0.4 for o in ORGS},
        100: {"1": 0.9, "2": 0.9, "3": 0.9, "4": 0.9, "5": 3.2, "6": 1.8}}
+# Planning estimates only, extrapolated from the measured 100-copy timings/memory above.
+# They are not 1,000-copy benchmark measurements. Oversized cells remain explicit, never sent to Azure.
+for table in (SEC, CAL, MEM):
+    table[1000] = {o: value * 10 for o, value in table[100].items()}
 RUNNER_GB, RUNNER_CPUS = 14.0, 4   # GitHub's machine for a public repository: 4 cores, 16 GB (2 kept for the system)
 JOB_S = 4 * 3600                   # a shard's planned work (a single run that needs more gets up to LONG_S)
 LONG_S = 5 * 3600
@@ -74,9 +76,10 @@ DEADLINE_MIN = 320                 # run_scale starts no run that would end afte
 # with the real cluster inside, the organism steps on the window's clock (240 steps), so the window must be long enough
 # for the max's arm to make each step in time (tools/six_kube_report.py marks a repetition more than 5% late OFF THE
 # CLOCK): seconds per arm by size, and by organism where the default is too short
-KUBE_WINDOW = {1: 960, 10: 960, 100: 1440}
-KUBE_WINDOW_ORG = {(100, "tower"): 2400, (100, "stack"): 3600}
-KUBE_BUILD = {1: 1, 10: 1, 100: 8}         # minutes to build the organism (calibration, plants, the max's bone)
+KUBE_WINDOW = {1: 960, 10: 960, 100: 1440, 1000: 14400}
+KUBE_WINDOW_ORG = {(100, "tower"): 2400, (100, "stack"): 3600,
+                   (1000, "tower"): 24000, (1000, "stack"): 36000}
+KUBE_BUILD = {1: 1, 10: 1, 100: 8, 1000: 80}         # minutes to build the organism (calibration, plants, the max's bone)
 # the test rig's protocol with the real cluster inside (scripts/kind_bench.sh), carried in each run's name. Protocol 2 (12
 # Oct): the governor at the organism's own CPU priority, never below the rig beside it; its decisions counted inside the
 # measured window; kind, kubectl and the metrics-server manifest tried again when a download is refused. Protocol 3 (13
@@ -113,13 +116,15 @@ FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml",
 # ------------------------------------------------------------------------------------------------- shard shapes
 def shape(size, org):
     """(runs per shard, workers per runner) for a modelled square, or None where it cannot run on GitHub."""
+    if MEM[size][org] > RUNNER_GB:
+        return None
     workers = max(1, min(RUNNER_CPUS, int(RUNNER_GB // MEM[size][org])))
     cal, sec = CAL[size][org], SEC[size][org]
     budget = JOB_S if cal + sec <= JOB_S else LONG_S
     per_worker = int((budget - cal) // sec)
     if per_worker < 1:
         return None
-    return min(100, per_worker * workers), workers
+    return min(RUNS, per_worker * workers), workers
 
 
 def kube_minutes(size, org, split):
@@ -129,6 +134,23 @@ def kube_minutes(size, org, split):
     arm = 6 + KUBE_BUILD[size] + 2 + win / 60.0 + 2
     cal = KUBE_BUILD[size] + 2                       # the heavier arm's step timed once a job, before its arms (protocol 3)
     return arm + cal if split else 2 * arm + cal
+
+
+def kube_fits(size, organism):
+    org = ORGS[KUBE.index(organism)]
+    return MEM[size][org] <= RUNNER_GB and kube_minutes(size, organism, size >= 1000) < 330
+
+
+def free_runner_refusals():
+    """All requested cells remain visible, including those too large for the free runner."""
+    out = []
+    for size in SIZES:
+        for org, name in zip(ORGS, KUBE):
+            if shape(size, org) is None:
+                out.append(("six", size, org))
+            if not kube_fits(size, name):
+                out.append(("six-kube", size, name))
+    return out
 
 
 def matrix(scale, orgs, first, runs, per=None, workers=None):
@@ -252,9 +274,11 @@ def next_dispatches(cov):
                                     "title": six_title(size, o, f2, k)})
                         cov.setdefault(("six", size, o), set()).update(range(f2, f2 + k))
             # with the cluster inside: organisms that share a window and the same runs still to start go in one dispatch
-            split, hi = False, tier + 1          # both arms of a repetition on one runner (paired)
+            split, hi = size >= 1000, tier + 1          # both arms of a repetition on one runner (paired)
             groups = {}
             for o in KUBE:
+                if not kube_fits(size, o):
+                    continue
                 win = KUBE_WINDOW_ORG.get((size, o), KUBE_WINDOW[size])
                 groups.setdefault((win, tuple(gaps(cov.get(("kube", size, o), set()), 1, hi))), []).append(o)
             for (win, todo), orgs in groups.items():
@@ -565,6 +589,8 @@ def report(cov, started, queued, running, target, out=sys.stdout, gave_up=None, 
         print(f"| {size:,} | {names[o]} | {six:,} | {kube:,} |", file=out)
     print(f"\nJobs now: {running} running, {queued} queued; target {target}. Started this time: {len(started)} dispatches, "
           f"{sum(d['jobs'] for d in started)} jobs.", file=out)
+    for grid, size, org in free_runner_refusals():
+        print(f"- pending runner capacity: {grid} {org} x{size}; exceeds free runner memory/time estimate; no paid fallback", file=out)
     for t in first:
         print(f"- held: {t} waits for a runner and goes before the grid", file=out)
     for d in started:
@@ -683,7 +709,7 @@ def main(argv=None):
     print(f"jobs now {running} running, {queued} queued; target {target}")
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     with (open(summary, "a") if summary else contextlib.nullcontext(sys.stdout)) as out:
-        print("## The grid on the max: 1, 10 and 100 copies, every square to 100 runs" + (" (dry run: nothing started)" if a.dry else ""), file=out)
+        print("## Free GitHub grid: 1, 10, 100 and 1,000 copies; nested runs through 1,000" + (" (dry run: nothing started)" if a.dry else ""), file=out)
         print("", file=out)
         report(cov, started, queued, running, target, out, gave_up=gave_up, first=first)
         for r in reruns:

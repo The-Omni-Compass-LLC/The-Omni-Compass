@@ -8,7 +8,7 @@ name: six-kube-pool
 # dispatches, and a repetition whose job failed is started again in a later run (scripts/dispatch_grid.py). This workflow
 # downloads every cell of the runs it is given, each run in its own folder (a repetition is paired within one run, and
 # a repetition started again is taken from the latest run where native and Omni are both valid: tools/six_kube_report.py),
-# and writes the report three times, for the first 1, 10 and 100 repetitions of every square (nested). The cells stay on
+# and writes the report three times, for the first 1, 10, 100 and 1,000 repetitions of every square (nested). The cells stay on
 # GitHub (gigabytes at 100 copies); the reports are handed out and archived (.github/archive_request.txt).
 on:
   workflow_dispatch:
@@ -51,11 +51,11 @@ jobs:
               || echo "::warning::run $r: no cells downloaded"
           done
           echo "repetition folders: $(find kube -type d -name 'bench-*-*' | wc -l); disk: $(df -h . | tail -1)"
-      - name: The reports, the first 1, 10 and 100 repetitions of every square
+      - name: The reports, the first 1, 10, 100 and 1,000 repetitions of every square
         env:
           LABEL: ${{ github.event.inputs.label }}
         run: |
-          for n in 1 10 100; do
+          for n in 1 10 100 1000; do
             python3 tools/six_kube_report.py kube --reps "$n" --out "SIX_KUBE_${LABEL}_r${n}.md" > /dev/null
           done
           cat "SIX_KUBE_${LABEL}_r100.md" >> "$GITHUB_STEP_SUMMARY"
