@@ -45,7 +45,7 @@ run-name: ${{ format('aks-metered-full {0} dial {1}', github.event.inputs.load_s
         description: 'Dial: save or max'
         default: save
 concurrency:
-  group: aks-metered
+  group: azure-benchmark-${{ github.event.inputs.location || 'eastus' }}
   cancel-in-progress: false
 env:
   OMNI_NOTICE: © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use,
@@ -157,7 +157,7 @@ jobs:
         OMNI_MACHINES_ONLY: '0'
         CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
     - if: always()
-      run: az group delete -n "$AZ_RG" --yes --no-wait || true
+      run: python3 scripts/azure_capacity.py cleanup --group "$AZ_RG"
     - uses: actions/upload-artifact@v4
       if: always()
       with:

@@ -348,7 +348,7 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py")], cwd=ROOT, capture_output=True, text=True)
     check("the engine in this checkout carries a declared fingerprint (tools/omni_version.py prints omni-vN; any change to the engine is a new version first)",
           r.returncode == 0 and r.stdout.startswith("omni-v"), r.stdout[-200:])
-    r = subprocess.run([sys.executable, '-m', 'unittest', 'tests.test_release_campaign', 'tests.test_cloud_machines_only'], cwd=ROOT, capture_output=True, text=True)
+    r = subprocess.run([sys.executable, '-m', 'unittest', 'tests.test_release_campaign', 'tests.test_cloud_machines_only', 'tests.test_azure_capacity'], cwd=ROOT, capture_output=True, text=True)
     check("v6 capacity regressions, full-control flag and non-GPU campaign dispatch boundaries", r.returncode == 0, (r.stdout + r.stderr)[-400:])
     from tests import test_compass_law
     test_compass_law.main(); check("compass law and plug: smooth bounded push and pull to the center, fail up, cover, one restore point, foreign writer, two-wire card", True)

@@ -39,7 +39,7 @@ on:
 # (Standard_D2s_v4 in eastus, and every multi-pool fleet, which uses it too) keeps the one queue it always had; a set on
 # another family or in another region queues on its own and runs beside it
 concurrency:
-  group: "${{ format('aks-metered{0}', ((github.event.inputs.location || 'eastus') != 'eastus' || ((github.event.inputs.vm_size || 'Standard_D2s_v4') != 'Standard_D2s_v4' && github.event.inputs.worker_pools == '')) && format('-{0}-{1}', github.event.inputs.location || 'eastus', github.event.inputs.vm_size || 'Standard_D2s_v4') || '') }}"
+  group: azure-benchmark-${{ github.event.inputs.location || 'eastus' }}
   cancel-in-progress: false
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
@@ -142,7 +142,7 @@ jobs:
           AKS_WORKER_POOLS: ${{ github.event.inputs.worker_pools || '' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
       - if: always()
-        run: az group delete -n "$AZ_RG" --yes --no-wait || true
+        run: python3 scripts/azure_capacity.py cleanup --group "$AZ_RG"
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: "aks-${{ matrix.rep }}", path: "bench-*-${{ matrix.rep }}\npaired.log"}

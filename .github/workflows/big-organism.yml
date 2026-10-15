@@ -20,6 +20,9 @@ on:
       duration_s: {description: "Measured seconds per arm (240 organism steps)", default: "2880"}
       vm_size: {description: "Azure machine size", default: "Standard_D8s_v4"}
       location: {description: "Azure region", default: "eastus"}
+concurrency:
+  group: azure-benchmark-${{ github.event.inputs.location || 'eastus' }}
+  cancel-in-progress: false
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
@@ -102,6 +105,10 @@ jobs:
           # Azure's own refusal is reported as an annotation (readable on the run's page and through the API)
           ok=""
           for sz in "$SIZE" Standard_D8s_v3 Standard_E4s_v4 Standard_E4s_v3 Standard_D8as_v4 Standard_B8ms; do
+            if ! python3 scripts/azure_capacity.py wait --location "$LOC" --system-size "$sz" --pools '' --timeout 0; then
+              echo "::notice::candidate machine unavailable within current CPU allowance; trying the next configured size"
+              continue
+            fi
             if az vm create -g "$RG" -n big --image Ubuntu2204 --size "$sz" --admin-username omni \
                  --generate-ssh-keys --public-ip-sku Standard --os-disk-size-gb 128 -o none 2> err.txt; then
               ok="$sz"; echo "::notice::rented $sz"; break
@@ -152,7 +159,7 @@ jobs:
         with: {name: "six-${{ matrix.cell.organism }}-x${{ github.event.inputs.size || '100' }}-${{ matrix.cell.rep }}", path: out}
       - name: Delete the machine
         if: always()
-        run: az group delete -n "$RG" --yes --no-wait || true
+        run: python3 scripts/azure_capacity.py cleanup --group "$RG"
       - name: Legal files beside the files this run hands out
         if: always() && strategy.job-index == 0
         uses: actions/checkout@v4
