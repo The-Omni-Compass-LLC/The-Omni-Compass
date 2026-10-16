@@ -2,6 +2,32 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-16 (later): everything in line with the engine that stands
+
+- **The realm pages on the catalog that stands.** `docs/REALM_MUSCLES.md` (`tools/realm_muscles.py`) now writes every organism out,
+  muscle by muscle, from `realms/catalog_v5.csv`: the spine of 267, the four realms (540, 404, 480, 484), the four stacked (1,908)
+  and the tower (1,107); it had stood on the 945-muscle v2 catalog. `docs/REALMS.md` says what the realms are on that catalog, how
+  to run them (`tools/run_realms_v5.py`) and where every result and page is; "simulation" is not used for our own models.
+- **The wiring verdicts from the v5 realms result.** `tools/wiring_verdicts.py` reads the 1,107 muscles under their two loads
+  (`results/realms_v5/MUSCLES_V5.csv`) and the six organisms under three loads (`REALMS_V5.json`): a GAIN on work, speed or misses
+  is write and the energy the max took for it is power given, never a trade; SAME AS NATIVE and AT ITS LIMIT ON NATIVE are watch.
+  527 muscles write and 580 stay native (421 at their limit on native, 159 the same as native); every organism under every load
+  writes. The page's power-given table replaces the v3 trades table.
+- **The state of play on the engine that stands.** The body of `docs/STATE_OF_PLAY.md` (the 10 October narrative of Omni v3) is
+  moved whole to `docs/history/STATE_OF_PLAY_2026-10-10.md`; the page now says, in words, what the standing block says in figures:
+  omni-v6 stands, four benchmarks have their three-run table on it, every other row is its own engine's result queued to run again,
+  the v5 muscles and organisms, Azure at the tune-down, the card, Linux, the open items. The Owner's Manual's evidence table (3.5)
+  opens with the four v6 rows and names the engine of every row; section 3.6 and the engine chapter carry v5, v6 and the v7
+  candidate with their fingerprints; the file map names `OMNI_V6.json`. The README's front-page line no longer says no v6 result
+  is claimed. `docs/REGISTER.md` row 56 and the catalog generator's docstring name the 1,107-muscle catalog.
+- **CLAUDE.md's grid paragraph** carries the founder's distinction of 15 October: the 1,000 tier stands again on GitHub's own
+  machines only; paid cloud and GPU runs stay at 1, 10 and 100 copies.
+- **The Azure receipts of 14 and 15 October** (six machines-only sets at the tune-down, one full-wiring burst) are requested
+  from the archive bot (`.github/archive_request.txt`); their tables follow, each on the engine it ran on.
+- **The v7 candidate's first trials, and the correction** are recorded on the branch `v7-candidate` (its page docs/OMNI_V7.md,
+  section 1): an unreadable ResourceQuota was read as a zero budget, so conveyance never raised a limit; corrected, toy-gated,
+  and the trials run again. Nothing on main changes: omni-v6 stands.
+
 ## 2026-10-16: every family's wiring on your own stack, in both manuals
 
 - **The wiring recipes** (`docs/wiring_recipes.csv`, 70 rows, one per family of the 1,107-muscle catalog): the native

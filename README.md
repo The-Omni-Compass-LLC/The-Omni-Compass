@@ -56,7 +56,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- Omni v6 is queued for a fresh campaign; no completed v6 benchmark result is claimed yet. See [`docs/OMNI_V6.md`](docs/OMNI_V6.md).
+- Omni v6 stands on main. The benchmarks with their three-run table on it so far are the four Kubernetes add-on tests below (Goldilocks, CruiseKube, KEDA's HTTP add-on, KEDA on the CPU target and the requests); every other benchmark runs again on it from `scripts/reruns.txt`, and until its three runs land its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on. The count on the engine that stands is kept in the standing block of [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md). See [`docs/OMNI_V6.md`](docs/OMNI_V6.md).
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -86,10 +86,18 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## The engine now: every muscle from 1 up to one click under its own capacity, read live (Omni v5, 13 October, night)
+## The engine that stands: omni-v6 (the max on every muscle, every muscle its own card, the shared-host capacity repair)
 
-The founder's order of 13 October is now in the live controllers ([`docs/OMNI_V5.md`](docs/OMNI_V5.md), amendment 5;
-fingerprint `6093b2b88aa911b9`): no top or floor is a number we wrote down. Machines go up to what the cluster itself can
+The engine on main is **omni-v6** (`OMNI_V6.json`, fingerprint `df6147466ef18046`, 45 files; [`docs/OMNI_V6.md`](docs/OMNI_V6.md)): the max
+on every muscle of the 1,107-muscle catalog, every muscle its own card, with the Kubernetes controller's shared-host capacity repair. Its three-run tables so far are
+the four Kubernetes add-on tests above; every other benchmark runs again on it (`scripts/reruns.txt`) and its row on the
+[benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on until then. **Omni v7 is a candidate** on its own branch, tried in the
+toy gate and in live trials before it may stand; its first trials (16 October) found a fault in its quota budget, corrected the same day.
+
+## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
+
+The founder's order of 13 October is in the live controllers ([`docs/OMNI_V5.md`](docs/OMNI_V5.md), amendment 5, carried unchanged by the
+engine that stands): no top or floor is a number we wrote down. Machines go up to what the cluster itself can
 add (its own autoscaler's room, or, where Omni-Compass resizes the pool, one under the first count the pool refuses;
 before: a fixed 1,000), and never below two; the service's replica cap may rise to what the machines can hold of its
 pods, one pod under it; at the max the power cap is never set under native (each machine's idle CPU goes to the work);
@@ -98,9 +106,9 @@ organism runs on its own core, away from the real cluster's, the same in both ar
 heavier arm's measured step, so the 100-copy squares measure the governor, not the test machine. **Every result runs
 again on this engine**; the card version's results below stand as that version's record until the new runs replace them.
 
-## Newest result: every muscle its own card (Omni v5, 13 October)
+## The muscles and the six organisms, modelled: every muscle its own card (13 October)
 
-Omni v5 at its default, **the max**, with **the living body**, and now **every muscle its own card**: the brain is one,
+The engine at its default, **the max**, with **the living body**, and **every muscle its own card**: the brain is one,
 its settings each muscle's own. An automatic search over every muscle (development seeds only, today's global setting
 always one of the choices) found the settings that do each muscle the most good; a card enters the engine only if it won
 twice, on two separate sets of development seeds, and on no seed under any load was it over its line more often than
@@ -240,7 +248,7 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **Omni v5 at the max: the engine that stands, fingerprinted; the max, the bone, the lease, the dial** | [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines, v3, v2 and v1, stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
+| **The engine that stands, omni-v6, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V6.md`](docs/OMNI_V6.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines, v3, v2 and v1, stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | The method, written before each run | [`docs/K8S_COMPASS_PREREGISTRATION.md`](docs/K8S_COMPASS_PREREGISTRATION.md), [`docs/GPU_PREREGISTRATION.md`](docs/GPU_PREREGISTRATION.md), [`docs/REALMS_PREREGISTRATION.md`](docs/REALMS_PREREGISTRATION.md) |

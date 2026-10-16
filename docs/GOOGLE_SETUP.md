@@ -64,7 +64,7 @@ project, run `gcloud config set project YOUR-PROJECT-ID` first.)
 2. **New repository secret**. Name: `GCP_CREDENTIALS`. Secret: paste the whole block from step 4. **Add secret**.
 3. **New repository secret**. Name: `GCP_PROJECT`. Secret: the Project ID from step 2. **Add secret**.
 
-That is all. The runs start from the repository's **Actions** tab on the newest engine (branch `v5`), and no result goes up
+That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v5` is kept in step with it), and no result goes up
 before it has been read.
 
 ## 6. What it costs

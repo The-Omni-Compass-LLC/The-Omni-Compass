@@ -119,6 +119,10 @@ locally at this commit.
 | `docs/history/CONSENSUS_AUDIT.md` | the five-reviewer audit (written by the same assistant that built the code; internal, not independent) |
 
 
+## The state of play as it stood on 2026-10-10 (Omni v3), moved whole on 2026-10-16
+
+Kept as its own page, `docs/history/STATE_OF_PLAY_2026-10-10.md`: the 10 October narrative, every number Omni v3's, named as such.
+
 ## The state of play as it stood on 2026-10-06 (moved here whole on 2026-10-07)
 
 ## In one paragraph (2026-10-06, Omni v1)

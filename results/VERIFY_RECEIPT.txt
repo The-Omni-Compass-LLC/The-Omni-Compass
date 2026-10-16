@@ -1,4 +1,4 @@
-verify.py --quick at commit 92c4102cc82bc5a5839817e9e7ae851ec0812479, 2026-10-16T02:37:06+00:00
+verify.py --quick at commit 1a54a46fc4ba9176c971cc1eaa5b6eec735de036, 2026-10-16T02:59:31+00:00
 
 PASS  reference engine SHA-256
 PASS  pre-registered file unchanged or amended on record (SHA-256): omnicompass/core.py
@@ -70,8 +70,8 @@ PASS  independent C++ HPA replica law vs fleet harness HPA
 C++ HPA vs harness HPA: 345600 steps, 240 streams, mismatches = 208204
 PASS  negative control: parity test detects a C++ HPA with 5% instead of 10% tolerance
 PASS  C++ governor contract smoke test (bounds, security, determinism, both modes)
-PASS  soak test (power_protect), 1,000,000 decisions, no failures, memory flat after warm-up  (3100 ns per decision, RSS checkpoints [3648, 3648, 3648, 3648] kB)
-PASS  soak test (throughput), 1,000,000 decisions, no failures, memory flat after warm-up  (3001 ns per decision, RSS checkpoints [3644, 3644, 3644, 3644] kB)
+PASS  soak test (power_protect), 1,000,000 decisions, no failures, memory flat after warm-up  (3077 ns per decision, RSS checkpoints [3660, 3660, 3660, 3660] kB)
+PASS  soak test (throughput), 1,000,000 decisions, no failures, memory flat after warm-up  (3064 ns per decision, RSS checkpoints [3620, 3620, 3620, 3620] kB)
 processed 1440 governor steps
 C++ vs Python governor (power_protect): 1440 directives, discrete mismatches = 95, max |diff| = 3.331e-16
 PASS  negative control: parity test detects a mutated C++ governor (dwell 3 instead of 4)
@@ -215,7 +215,7 @@ PASS  exact pod-start timing from the API server's watch stream (creation to Rea
 GPU Fake GPU, driver 0.0, persistence mode Enabled, start power limit 300.00 W, workload tools/gpu_workload.py (seeded fp16 matmul request stream).
 2 repetitions, order rotated, 5.0 s per arm plus 1.0 s drain, 0.0 s idle before each arm.
 
-Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json, rechecked at the end.
+Phase: **smoke**. Omni frozen at commit 1a54a46fc4ba; file hashes in FREEZE.json, rechecked at the end.
 
 ## INVALID RUN
 
@@ -225,17 +225,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni, watching (writes nothing) | omni |
 |---|---:|---:|---:|
-| work per energy (served requests per kJ) | 107 | 107 | 105.3 |
-| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.59 | 89.58 |
+| work per energy (served requests per kJ) | 105.3 | 107 | 107 |
+| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | 89.58 |
 | energy, whole machine at the wall (J) | 1250 | 1250 | 1250 |
-| energy, GPU (J) | 1046 | 1046 | 1064 |
-| energy per served request (J) | 9.342 | 9.342 | 9.501 |
-| power, GPU mean (W) | 173.2 | 172.9 | 175.9 |
+| energy, GPU (J) | 1064 | 1046 | 1047 |
+| energy per served request (J) | 9.503 | 9.342 | 9.346 |
+| power, GPU mean (W) | 176.1 | 173.1 | 173.1 |
 | requests served | 112 | 112 | 112 |
 | requests not served | 0 | 0 | 0 |
-| response time, mean (ms) | 34.83 | 34.85 | 34.79 |
-| response time, 95th percentile (ms) | 76.38 | 76.35 | 76.37 |
-| response time, 99th percentile (ms) | 86.02 | 85.95 | 85.8 |
+| response time, mean (ms) | 34.93 | 34.9 | 34.88 |
+| response time, 95th percentile (ms) | 76.93 | 76.55 | 76.65 |
+| response time, 99th percentile (ms) | 86.05 | 86.02 | 85.9 |
 | temperature, peak (C) | 60 | 60 | 60 |
 | temperature, mean (C) | 60 | 60 | 60 |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
@@ -249,17 +249,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 107 | 105.3 | -1.6% | -24.39 to +20.86 | LOSS, not proven |
-| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.58 | +0.0% | -2.5e-05 to +2.927e-05 | GAIN, not proven |
-| energy, whole machine at the wall (J) | 1250 | 1250 | -0.0% | -0.0004085 to +0.0003489 | GAIN, not proven |
-| energy, GPU (J) | 1046 | 1064 | +1.7% | -210.9 to +246.5 | power given, not proven |
-| energy per served request (J) | 9.342 | 9.501 | +1.7% | -1.883 to +2.201 | power given, not proven |
-| power, GPU mean (W) | 173.2 | 175.9 | +1.6% | -32.79 to +38.21 | power given, not proven |
+| **work per energy (served requests per kJ) (primary)** | 105.3 | 107 | +1.6% | -21.47 to +24.94 | GAIN, not proven |
+| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | -0.0% | -0.1228 to +0.1049 | LOSS, not proven |
+| energy, whole machine at the wall (J) | 1250 | 1250 | +0.0% | -1.463 to +1.713 | power given, not proven |
+| energy, GPU (J) | 1064 | 1047 | -1.6% | -252 to +216.9 | GAIN, not proven |
+| energy per served request (J) | 9.503 | 9.346 | -1.6% | -2.25 to +1.936 | GAIN, not proven |
+| power, GPU mean (W) | 176.1 | 173.1 | -1.7% | -42.05 to +36.05 | GAIN, not proven |
 | requests served | 112 | 112 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 34.83 | 34.79 | -0.1% | -0.1904 to +0.1091 | GAIN, not proven |
-| response time, 95th percentile (ms) | 76.38 | 76.37 | -0.0% | -2.365 to +2.357 | GAIN, not proven |
-| response time, 99th percentile (ms) | 86.02 | 85.8 | -0.3% | -1.335 to +0.8876 | GAIN, not proven |
+| response time, mean (ms) | 34.93 | 34.88 | -0.1% | -0.9329 to +0.8341 | GAIN, not proven |
+| response time, 95th percentile (ms) | 76.93 | 76.65 | -0.4% | -6.583 to +6.025 | GAIN, not proven |
+| response time, 99th percentile (ms) | 86.05 | 85.9 | -0.2% | -0.4384 to +0.1512 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -273,17 +273,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni, watching (writes nothing) | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 107 | 107 | -0.0% | -3.009e-05 to +2.57e-05 | LOSS, not proven |
-| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.59 | +0.0% | -0.1049 to +0.1228 | GAIN, not proven |
-| energy, whole machine at the wall (J) | 1250 | 1250 | -0.0% | -1.714 to +1.463 | GAIN, not proven |
-| energy, GPU (J) | 1046 | 1046 | +0.0% | -0.0002512 to +0.0002941 | power given, not proven |
-| energy per served request (J) | 9.342 | 9.342 | +0.0% | -2.243e-06 to +2.626e-06 | power given, not proven |
-| power, GPU mean (W) | 173.2 | 172.9 | -0.2% | -3.188 to +2.606 | GAIN, not proven |
+| **work per energy (served requests per kJ) (primary)** | 105.3 | 107 | +1.7% | -21.07 to +24.63 | GAIN, not proven |
+| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | -0.0% | -0.1228 to +0.1049 | LOSS, not proven |
+| energy, whole machine at the wall (J) | 1250 | 1250 | +0.0% | -1.463 to +1.714 | power given, not proven |
+| energy, GPU (J) | 1064 | 1046 | -1.7% | -249 to +213 | GAIN, not proven |
+| energy per served request (J) | 9.503 | 9.342 | -1.7% | -2.223 to +1.902 | GAIN, not proven |
+| power, GPU mean (W) | 176.1 | 173.1 | -1.7% | -41.62 to +35.56 | GAIN, not proven |
 | requests served | 112 | 112 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 34.83 | 34.85 | +0.1% | -1.142 to +1.182 | LOSS, not proven |
-| response time, 95th percentile (ms) | 76.38 | 76.35 | -0.0% | -5.108 to +5.064 | GAIN, not proven |
-| response time, 99th percentile (ms) | 86.02 | 85.95 | -0.1% | -3.132 to +2.984 | GAIN, not proven |
+| response time, mean (ms) | 34.93 | 34.9 | -0.1% | -0.3391 to +0.2645 | GAIN, not proven |
+| response time, 95th percentile (ms) | 76.93 | 76.55 | -0.5% | -1.868 to +1.114 | GAIN, not proven |
+| response time, 99th percentile (ms) | 86.05 | 86.02 | -0.0% | -2.496 to +2.434 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -297,17 +297,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | omni, watching (writes nothing) | omni | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 107 | 105.3 | -1.6% | -24.39 to +20.86 | LOSS, not proven |
-| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | -0.0% | -0.1228 to +0.1049 | LOSS, not proven |
-| energy, whole machine at the wall (J) | 1250 | 1250 | +0.0% | -1.463 to +1.713 | power given, not proven |
-| energy, GPU (J) | 1046 | 1064 | +1.7% | -210.9 to +246.5 | power given, not proven |
-| energy per served request (J) | 9.342 | 9.501 | +1.7% | -1.883 to +2.201 | power given, not proven |
-| power, GPU mean (W) | 172.9 | 175.9 | +1.7% | -35.39 to +41.39 | power given, not proven |
+| **work per energy (served requests per kJ) (primary)** | 107 | 107 | -0.0% | -0.3964 to +0.3044 | LOSS, not proven |
+| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.58 | +0.0% | -2.5e-05 to +2.927e-05 | GAIN, not proven |
+| energy, whole machine at the wall (J) | 1250 | 1250 | -0.0% | -0.0004085 to +0.0003489 | GAIN, not proven |
+| energy, GPU (J) | 1046 | 1047 | +0.0% | -2.98 to +3.88 | power given, not proven |
+| energy per served request (J) | 9.342 | 9.346 | +0.0% | -0.02661 to +0.03465 | power given, not proven |
+| power, GPU mean (W) | 173.1 | 173.1 | +0.0% | -0.4314 to +0.4921 | power given, not proven |
 | requests served | 112 | 112 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 34.85 | 34.79 | -0.2% | -1.373 to +1.251 | GAIN, not proven |
-| response time, 95th percentile (ms) | 76.35 | 76.37 | +0.0% | -2.707 to +2.743 | LOSS, not proven |
-| response time, 99th percentile (ms) | 85.95 | 85.8 | -0.2% | -2.097 to +1.798 | GAIN, not proven |
+| response time, mean (ms) | 34.9 | 34.88 | -0.0% | -0.5939 to +0.5696 | GAIN, not proven |
+| response time, 95th percentile (ms) | 76.55 | 76.65 | +0.1% | -4.714 to +4.912 | LOSS, not proven |
+| response time, 99th percentile (ms) | 86.02 | 85.9 | -0.1% | -2.872 to +2.647 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -319,18 +319,18 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 ## Verdict on the preregistered question
 
-Work per energy under Omni against native: 107 -> 105.3 served requests per kJ, difference -1.762 (95% interval -24.39 to +20.86).
+Work per energy under Omni against native: 105.3 -> 107 served requests per kJ, difference +1.734 (95% interval -21.47 to +24.94).
 Guardrails: requests served held (not below -1%), 95th-percentile response time held (not above +10%), requests not served held (not above +1% of native served).
-Observation (watch against native) on the same outcome: LOSS, not proven. Authority (omni against watch): LOSS, not proven.
-Whole machine at the wall (smart plug Omni never reads): GAIN, not proven, 89.58 -> 89.58 served requests per kJ.
+Observation (watch against native) on the same outcome: GAIN, not proven. Authority (omni against watch): LOSS, not proven.
+Whole machine at the wall (smart plug Omni never reads): LOSS, not proven, 89.59 -> 89.58 served requests per kJ.
 **Result, by rule: INVALID.**
 
 ## Actuator fidelity (receipt B: requested against read back from the device)
 
 | Arm | Rep | Writes | Refused | mean abs(read back − requested) W | max W | delay median s | delay max s | enforced under requested | total variation W | reversals | restored |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| omni | 1 | 2 | 0 | 0 | 0 | 0.051 | 0.051 | 0 | 132 | 1 | True |
-| omni | 2 | 2 | 0 | 0 | 0 | 0.0545 | 0.058 | 0 | 132 | 1 | True |
+| omni | 1 | 2 | 0 | 0 | 0 | 0.0555 | 0.059 | 0 | 132 | 1 | True |
+| omni | 2 | 2 | 0 | 0 | 0 | 0.054 | 0.055 | 0 | 132 | 1 | True |
 | watch | 1 | 0 | 0 | n/a | n/a | n/a | n/a | 0 | 0 | 0 | True |
 | watch | 2 | 0 | 0 | n/a | n/a | n/a | n/a | 0 | 0 | 0 | True |
 
@@ -339,9 +339,9 @@ Whole machine at the wall (smart plug Omni never reads): GAIN, not proven, 89.58
 | Arm | Rep | Decisions | J_u = sum abs(u) dt | mean abs(u) | max abs(u) | saturations | shield interventions | holds |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | omni | 1 | 7 | 4.2 | 0.568 | 0.775 | 0 | 7 | 0 |
-| omni | 2 | 7 | 4.21 | 0.568 | 0.775 | 0 | 7 | 0 |
+| omni | 2 | 7 | 4.22 | 0.568 | 0.775 | 0 | 7 | 0 |
 | watch | 1 | 7 | 4.21 | 0.568 | 0.775 | 0 | 7 | 0 |
-| watch | 2 | 7 | 4.2 | 0.568 | 0.775 | 0 | 7 | 0 |
+| watch | 2 | 7 | 4.22 | 0.568 | 0.775 | 0 | 7 | 0 |
 
 ## Representation fidelity (the engine's projection against the telemetry at the next decision)
 
@@ -360,7 +360,7 @@ Each write owns the interval until the next write. Joules and requests finished 
 
 | Decided by | Writes | Seconds owned | GPU joules vs native | Requests finished vs native |
 |---|---:|---:|---:|---:|
-| slo_or_blind_reflex | 2 | 9 | -72 | +0 |
+| slo_or_blind_reflex | 2 | 9 | +36.9 | +0 |
 
 ## The control
 
@@ -373,7 +373,7 @@ Each write owns the interval until the next write. Joules and requests finished 
 GPU Fake GPU, driver 0.0, persistence mode Enabled, start power limit 300.00 W, workload tools/gpu_workload.py (seeded fp16 matmul request stream).
 2 repetitions, order rotated, 5.0 s per arm plus 1.0 s drain, 0.0 s idle before each arm.
 
-Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json, rechecked at the end.
+Phase: **smoke**. Omni frozen at commit 1a54a46fc4ba; file hashes in FREEZE.json, rechecked at the end.
 
 ## INVALID RUN
 
@@ -383,17 +383,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni, watching (writes nothing) | omni |
 |---|---:|---:|---:|
-| work per energy (served requests per kJ) | 107 | 107 | 105.3 |
-| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.59 | 89.58 |
+| work per energy (served requests per kJ) | 105.3 | 107 | 107 |
+| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | 89.58 |
 | energy, whole machine at the wall (J) | 1250 | 1250 | 1250 |
-| energy, GPU (J) | 1046 | 1046 | 1064 |
-| energy per served request (J) | 9.342 | 9.342 | 9.501 |
-| power, GPU mean (W) | 173.2 | 172.9 | 175.9 |
+| energy, GPU (J) | 1064 | 1046 | 1047 |
+| energy per served request (J) | 9.503 | 9.342 | 9.346 |
+| power, GPU mean (W) | 176.1 | 173.1 | 173.1 |
 | requests served | 112 | 112 | 112 |
 | requests not served | 0 | 0 | 0 |
-| response time, mean (ms) | 34.83 | 34.85 | 34.79 |
-| response time, 95th percentile (ms) | 76.38 | 76.35 | 76.37 |
-| response time, 99th percentile (ms) | 86.02 | 85.95 | 85.8 |
+| response time, mean (ms) | 34.93 | 34.9 | 34.88 |
+| response time, 95th percentile (ms) | 76.93 | 76.55 | 76.65 |
+| response time, 99th percentile (ms) | 86.05 | 86.02 | 85.9 |
 | temperature, peak (C) | 60 | 60 | 60 |
 | temperature, mean (C) | 60 | 60 | 60 |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
@@ -407,17 +407,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 107 | 105.3 | -1.6% | -24.39 to +20.86 | LOSS, not proven |
-| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.58 | +0.0% | -2.5e-05 to +2.927e-05 | GAIN, not proven |
-| energy, whole machine at the wall (J) | 1250 | 1250 | -0.0% | -0.0004085 to +0.0003489 | GAIN, not proven |
-| energy, GPU (J) | 1046 | 1064 | +1.7% | -210.9 to +246.5 | power given, not proven |
-| energy per served request (J) | 9.342 | 9.501 | +1.7% | -1.883 to +2.201 | power given, not proven |
-| power, GPU mean (W) | 173.2 | 175.9 | +1.6% | -32.79 to +38.21 | power given, not proven |
+| **work per energy (served requests per kJ) (primary)** | 105.3 | 107 | +1.6% | -21.47 to +24.94 | GAIN, not proven |
+| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | -0.0% | -0.1228 to +0.1049 | LOSS, not proven |
+| energy, whole machine at the wall (J) | 1250 | 1250 | +0.0% | -1.463 to +1.713 | power given, not proven |
+| energy, GPU (J) | 1064 | 1047 | -1.6% | -252 to +216.9 | GAIN, not proven |
+| energy per served request (J) | 9.503 | 9.346 | -1.6% | -2.25 to +1.936 | GAIN, not proven |
+| power, GPU mean (W) | 176.1 | 173.1 | -1.7% | -42.05 to +36.05 | GAIN, not proven |
 | requests served | 112 | 112 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 34.83 | 34.79 | -0.1% | -0.1904 to +0.1091 | GAIN, not proven |
-| response time, 95th percentile (ms) | 76.38 | 76.37 | -0.0% | -2.365 to +2.357 | GAIN, not proven |
-| response time, 99th percentile (ms) | 86.02 | 85.8 | -0.3% | -1.335 to +0.8876 | GAIN, not proven |
+| response time, mean (ms) | 34.93 | 34.88 | -0.1% | -0.9329 to +0.8341 | GAIN, not proven |
+| response time, 95th percentile (ms) | 76.93 | 76.65 | -0.4% | -6.583 to +6.025 | GAIN, not proven |
+| response time, 99th percentile (ms) | 86.05 | 85.9 | -0.2% | -0.4384 to +0.1512 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -431,17 +431,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni, watching (writes nothing) | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 107 | 107 | -0.0% | -3.009e-05 to +2.57e-05 | LOSS, not proven |
-| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.59 | +0.0% | -0.1049 to +0.1228 | GAIN, not proven |
-| energy, whole machine at the wall (J) | 1250 | 1250 | -0.0% | -1.714 to +1.463 | GAIN, not proven |
-| energy, GPU (J) | 1046 | 1046 | +0.0% | -0.0002512 to +0.0002941 | power given, not proven |
-| energy per served request (J) | 9.342 | 9.342 | +0.0% | -2.243e-06 to +2.626e-06 | power given, not proven |
-| power, GPU mean (W) | 173.2 | 172.9 | -0.2% | -3.188 to +2.606 | GAIN, not proven |
+| **work per energy (served requests per kJ) (primary)** | 105.3 | 107 | +1.7% | -21.07 to +24.63 | GAIN, not proven |
+| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | -0.0% | -0.1228 to +0.1049 | LOSS, not proven |
+| energy, whole machine at the wall (J) | 1250 | 1250 | +0.0% | -1.463 to +1.714 | power given, not proven |
+| energy, GPU (J) | 1064 | 1046 | -1.7% | -249 to +213 | GAIN, not proven |
+| energy per served request (J) | 9.503 | 9.342 | -1.7% | -2.223 to +1.902 | GAIN, not proven |
+| power, GPU mean (W) | 176.1 | 173.1 | -1.7% | -41.62 to +35.56 | GAIN, not proven |
 | requests served | 112 | 112 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 34.83 | 34.85 | +0.1% | -1.142 to +1.182 | LOSS, not proven |
-| response time, 95th percentile (ms) | 76.38 | 76.35 | -0.0% | -5.108 to +5.064 | GAIN, not proven |
-| response time, 99th percentile (ms) | 86.02 | 85.95 | -0.1% | -3.132 to +2.984 | GAIN, not proven |
+| response time, mean (ms) | 34.93 | 34.9 | -0.1% | -0.3391 to +0.2645 | GAIN, not proven |
+| response time, 95th percentile (ms) | 76.93 | 76.55 | -0.5% | -1.868 to +1.114 | GAIN, not proven |
+| response time, 99th percentile (ms) | 86.05 | 86.02 | -0.0% | -2.496 to +2.434 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -455,17 +455,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | omni, watching (writes nothing) | omni | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 107 | 105.3 | -1.6% | -24.39 to +20.86 | LOSS, not proven |
-| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | -0.0% | -0.1228 to +0.1049 | LOSS, not proven |
-| energy, whole machine at the wall (J) | 1250 | 1250 | +0.0% | -1.463 to +1.713 | power given, not proven |
-| energy, GPU (J) | 1046 | 1064 | +1.7% | -210.9 to +246.5 | power given, not proven |
-| energy per served request (J) | 9.342 | 9.501 | +1.7% | -1.883 to +2.201 | power given, not proven |
-| power, GPU mean (W) | 172.9 | 175.9 | +1.7% | -35.39 to +41.39 | power given, not proven |
+| **work per energy (served requests per kJ) (primary)** | 107 | 107 | -0.0% | -0.3964 to +0.3044 | LOSS, not proven |
+| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.58 | +0.0% | -2.5e-05 to +2.927e-05 | GAIN, not proven |
+| energy, whole machine at the wall (J) | 1250 | 1250 | -0.0% | -0.0004085 to +0.0003489 | GAIN, not proven |
+| energy, GPU (J) | 1046 | 1047 | +0.0% | -2.98 to +3.88 | power given, not proven |
+| energy per served request (J) | 9.342 | 9.346 | +0.0% | -0.02661 to +0.03465 | power given, not proven |
+| power, GPU mean (W) | 173.1 | 173.1 | +0.0% | -0.4314 to +0.4921 | power given, not proven |
 | requests served | 112 | 112 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 34.85 | 34.79 | -0.2% | -1.373 to +1.251 | GAIN, not proven |
-| response time, 95th percentile (ms) | 76.35 | 76.37 | +0.0% | -2.707 to +2.743 | LOSS, not proven |
-| response time, 99th percentile (ms) | 85.95 | 85.8 | -0.2% | -2.097 to +1.798 | GAIN, not proven |
+| response time, mean (ms) | 34.9 | 34.88 | -0.0% | -0.5939 to +0.5696 | GAIN, not proven |
+| response time, 95th percentile (ms) | 76.55 | 76.65 | +0.1% | -4.714 to +4.912 | LOSS, not proven |
+| response time, 99th percentile (ms) | 86.02 | 85.9 | -0.1% | -2.872 to +2.647 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -477,18 +477,18 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 ## Verdict on the preregistered question
 
-Work per energy under Omni against native: 107 -> 105.3 served requests per kJ, difference -1.762 (95% interval -24.39 to +20.86).
+Work per energy under Omni against native: 105.3 -> 107 served requests per kJ, difference +1.734 (95% interval -21.47 to +24.94).
 Guardrails: requests served held (not below -1%), 95th-percentile response time held (not above +10%), requests not served held (not above +1% of native served).
-Observation (watch against native) on the same outcome: LOSS, not proven. Authority (omni against watch): LOSS, not proven.
-Whole machine at the wall (smart plug Omni never reads): GAIN, not proven, 89.58 -> 89.58 served requests per kJ.
+Observation (watch against native) on the same outcome: GAIN, not proven. Authority (omni against watch): LOSS, not proven.
+Whole machine at the wall (smart plug Omni never reads): LOSS, not proven, 89.59 -> 89.58 served requests per kJ.
 **Result, by rule: INVALID.**
 
 ## Actuator fidelity (receipt B: requested against read back from the device)
 
 | Arm | Rep | Writes | Refused | mean abs(read back − requested) W | max W | delay median s | delay max s | enforced under requested | total variation W | reversals | restored |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| omni | 1 | 2 | 0 | 0 | 0 | 0.051 | 0.051 | 0 | 132 | 1 | True |
-| omni | 2 | 2 | 0 | 0 | 0 | 0.0545 | 0.058 | 0 | 132 | 1 | True |
+| omni | 1 | 2 | 0 | 0 | 0 | 0.0555 | 0.059 | 0 | 132 | 1 | True |
+| omni | 2 | 2 | 0 | 0 | 0 | 0.054 | 0.055 | 0 | 132 | 1 | True |
 | watch | 1 | 0 | 0 | n/a | n/a | n/a | n/a | 0 | 0 | 0 | True |
 | watch | 2 | 0 | 0 | n/a | n/a | n/a | n/a | 0 | 0 | 0 | True |
 
@@ -497,9 +497,9 @@ Whole machine at the wall (smart plug Omni never reads): GAIN, not proven, 89.58
 | Arm | Rep | Decisions | J_u = sum abs(u) dt | mean abs(u) | max abs(u) | saturations | shield interventions | holds |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | omni | 1 | 7 | 4.2 | 0.568 | 0.775 | 0 | 7 | 0 |
-| omni | 2 | 7 | 4.21 | 0.568 | 0.775 | 0 | 7 | 0 |
+| omni | 2 | 7 | 4.22 | 0.568 | 0.775 | 0 | 7 | 0 |
 | watch | 1 | 7 | 4.21 | 0.568 | 0.775 | 0 | 7 | 0 |
-| watch | 2 | 7 | 4.2 | 0.568 | 0.775 | 0 | 7 | 0 |
+| watch | 2 | 7 | 4.22 | 0.568 | 0.775 | 0 | 7 | 0 |
 
 ## Representation fidelity (the engine's projection against the telemetry at the next decision)
 
@@ -518,7 +518,7 @@ Each write owns the interval until the next write. Joules and requests finished 
 
 | Decided by | Writes | Seconds owned | GPU joules vs native | Requests finished vs native |
 |---|---:|---:|---:|---:|
-| slo_or_blind_reflex | 2 | 9 | -72 | +0 |
+| slo_or_blind_reflex | 2 | 9 | +36.9 | +0 |
 
 ## The control
 
@@ -531,7 +531,7 @@ Each write owns the interval until the next write. Joules and requests finished 
 GPU Fake GPU, driver 0.0, persistence mode Enabled, start power limit 300.00 W, workload tools/gpu_workload.py (seeded fp16 matmul request stream).
 2 repetitions, order rotated, 5.0 s per arm plus 1.0 s drain, 0.0 s idle before each arm.
 
-Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json, rechecked at the end.
+Phase: **smoke**. Omni frozen at commit 1a54a46fc4ba; file hashes in FREEZE.json, rechecked at the end.
 
 ## INVALID RUN
 
@@ -541,17 +541,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni, watching (writes nothing) | omni |
 |---|---:|---:|---:|
-| work per energy (served requests per kJ) | 107 | 107 | 105.3 |
-| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.59 | 89.58 |
+| work per energy (served requests per kJ) | 105.3 | 107 | 107 |
+| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | 89.58 |
 | energy, whole machine at the wall (J) | 1250 | 1250 | 1250 |
-| energy, GPU (J) | 1046 | 1046 | 1064 |
-| energy per served request (J) | 9.342 | 9.342 | 9.501 |
-| power, GPU mean (W) | 173.2 | 172.9 | 175.9 |
+| energy, GPU (J) | 1064 | 1046 | 1047 |
+| energy per served request (J) | 9.503 | 9.342 | 9.346 |
+| power, GPU mean (W) | 176.1 | 173.1 | 173.1 |
 | requests served | 112 | 112 | 112 |
 | requests not served | 0 | 0 | 0 |
-| response time, mean (ms) | 34.83 | 34.85 | 34.79 |
-| response time, 95th percentile (ms) | 76.38 | 76.35 | 76.37 |
-| response time, 99th percentile (ms) | 86.02 | 85.95 | 85.8 |
+| response time, mean (ms) | 34.93 | 34.9 | 34.88 |
+| response time, 95th percentile (ms) | 76.93 | 76.55 | 76.65 |
+| response time, 99th percentile (ms) | 86.05 | 86.02 | 85.9 |
 | temperature, peak (C) | 60 | 60 | 60 |
 | temperature, mean (C) | 60 | 60 | 60 |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
@@ -565,17 +565,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 107 | 105.3 | -1.6% | -24.39 to +20.86 | LOSS, not proven |
-| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.58 | +0.0% | -2.5e-05 to +2.927e-05 | GAIN, not proven |
-| energy, whole machine at the wall (J) | 1250 | 1250 | -0.0% | -0.0004085 to +0.0003489 | GAIN, not proven |
-| energy, GPU (J) | 1046 | 1064 | +1.7% | -210.9 to +246.5 | power given, not proven |
-| energy per served request (J) | 9.342 | 9.501 | +1.7% | -1.883 to +2.201 | power given, not proven |
-| power, GPU mean (W) | 173.2 | 175.9 | +1.6% | -32.79 to +38.21 | power given, not proven |
+| **work per energy (served requests per kJ) (primary)** | 105.3 | 107 | +1.6% | -21.47 to +24.94 | GAIN, not proven |
+| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | -0.0% | -0.1228 to +0.1049 | LOSS, not proven |
+| energy, whole machine at the wall (J) | 1250 | 1250 | +0.0% | -1.463 to +1.713 | power given, not proven |
+| energy, GPU (J) | 1064 | 1047 | -1.6% | -252 to +216.9 | GAIN, not proven |
+| energy per served request (J) | 9.503 | 9.346 | -1.6% | -2.25 to +1.936 | GAIN, not proven |
+| power, GPU mean (W) | 176.1 | 173.1 | -1.7% | -42.05 to +36.05 | GAIN, not proven |
 | requests served | 112 | 112 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 34.83 | 34.79 | -0.1% | -0.1904 to +0.1091 | GAIN, not proven |
-| response time, 95th percentile (ms) | 76.38 | 76.37 | -0.0% | -2.365 to +2.357 | GAIN, not proven |
-| response time, 99th percentile (ms) | 86.02 | 85.8 | -0.3% | -1.335 to +0.8876 | GAIN, not proven |
+| response time, mean (ms) | 34.93 | 34.88 | -0.1% | -0.9329 to +0.8341 | GAIN, not proven |
+| response time, 95th percentile (ms) | 76.93 | 76.65 | -0.4% | -6.583 to +6.025 | GAIN, not proven |
+| response time, 99th percentile (ms) | 86.05 | 85.9 | -0.2% | -0.4384 to +0.1512 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -589,17 +589,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni, watching (writes nothing) | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 107 | 107 | -0.0% | -3.009e-05 to +2.57e-05 | LOSS, not proven |
-| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.59 | +0.0% | -0.1049 to +0.1228 | GAIN, not proven |
-| energy, whole machine at the wall (J) | 1250 | 1250 | -0.0% | -1.714 to +1.463 | GAIN, not proven |
-| energy, GPU (J) | 1046 | 1046 | +0.0% | -0.0002512 to +0.0002941 | power given, not proven |
-| energy per served request (J) | 9.342 | 9.342 | +0.0% | -2.243e-06 to +2.626e-06 | power given, not proven |
-| power, GPU mean (W) | 173.2 | 172.9 | -0.2% | -3.188 to +2.606 | GAIN, not proven |
+| **work per energy (served requests per kJ) (primary)** | 105.3 | 107 | +1.7% | -21.07 to +24.63 | GAIN, not proven |
+| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | -0.0% | -0.1228 to +0.1049 | LOSS, not proven |
+| energy, whole machine at the wall (J) | 1250 | 1250 | +0.0% | -1.463 to +1.714 | power given, not proven |
+| energy, GPU (J) | 1064 | 1046 | -1.7% | -249 to +213 | GAIN, not proven |
+| energy per served request (J) | 9.503 | 9.342 | -1.7% | -2.223 to +1.902 | GAIN, not proven |
+| power, GPU mean (W) | 176.1 | 173.1 | -1.7% | -41.62 to +35.56 | GAIN, not proven |
 | requests served | 112 | 112 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 34.83 | 34.85 | +0.1% | -1.142 to +1.182 | LOSS, not proven |
-| response time, 95th percentile (ms) | 76.38 | 76.35 | -0.0% | -5.108 to +5.064 | GAIN, not proven |
-| response time, 99th percentile (ms) | 86.02 | 85.95 | -0.1% | -3.132 to +2.984 | GAIN, not proven |
+| response time, mean (ms) | 34.93 | 34.9 | -0.1% | -0.3391 to +0.2645 | GAIN, not proven |
+| response time, 95th percentile (ms) | 76.93 | 76.55 | -0.5% | -1.868 to +1.114 | GAIN, not proven |
+| response time, 99th percentile (ms) | 86.05 | 86.02 | -0.0% | -2.496 to +2.434 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -613,17 +613,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | omni, watching (writes nothing) | omni | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 107 | 105.3 | -1.6% | -24.39 to +20.86 | LOSS, not proven |
-| work per wall energy (served requests per kJ, whole machine) | 89.59 | 89.58 | -0.0% | -0.1228 to +0.1049 | LOSS, not proven |
-| energy, whole machine at the wall (J) | 1250 | 1250 | +0.0% | -1.463 to +1.713 | power given, not proven |
-| energy, GPU (J) | 1046 | 1064 | +1.7% | -210.9 to +246.5 | power given, not proven |
-| energy per served request (J) | 9.342 | 9.501 | +1.7% | -1.883 to +2.201 | power given, not proven |
-| power, GPU mean (W) | 172.9 | 175.9 | +1.7% | -35.39 to +41.39 | power given, not proven |
+| **work per energy (served requests per kJ) (primary)** | 107 | 107 | -0.0% | -0.3964 to +0.3044 | LOSS, not proven |
+| work per wall energy (served requests per kJ, whole machine) | 89.58 | 89.58 | +0.0% | -2.5e-05 to +2.927e-05 | GAIN, not proven |
+| energy, whole machine at the wall (J) | 1250 | 1250 | -0.0% | -0.0004085 to +0.0003489 | GAIN, not proven |
+| energy, GPU (J) | 1046 | 1047 | +0.0% | -2.98 to +3.88 | power given, not proven |
+| energy per served request (J) | 9.342 | 9.346 | +0.0% | -0.02661 to +0.03465 | power given, not proven |
+| power, GPU mean (W) | 173.1 | 173.1 | +0.0% | -0.4314 to +0.4921 | power given, not proven |
 | requests served | 112 | 112 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 34.85 | 34.79 | -0.2% | -1.373 to +1.251 | GAIN, not proven |
-| response time, 95th percentile (ms) | 76.35 | 76.37 | +0.0% | -2.707 to +2.743 | LOSS, not proven |
-| response time, 99th percentile (ms) | 85.95 | 85.8 | -0.2% | -2.097 to +1.798 | GAIN, not proven |
+| response time, mean (ms) | 34.9 | 34.88 | -0.0% | -0.5939 to +0.5696 | GAIN, not proven |
+| response time, 95th percentile (ms) | 76.55 | 76.65 | +0.1% | -4.714 to +4.912 | LOSS, not proven |
+| response time, 99th percentile (ms) | 86.02 | 85.9 | -0.1% | -2.872 to +2.647 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -635,18 +635,18 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 ## Verdict on the preregistered question
 
-Work per energy under Omni against native: 107 -> 105.3 served requests per kJ, difference -1.762 (95% interval -24.39 to +20.86).
+Work per energy under Omni against native: 105.3 -> 107 served requests per kJ, difference +1.734 (95% interval -21.47 to +24.94).
 Guardrails: requests served held (not below -1%), 95th-percentile response time held (not above +10%), requests not served held (not above +1% of native served).
-Observation (watch against native) on the same outcome: LOSS, not proven. Authority (omni against watch): LOSS, not proven.
-Whole machine at the wall (smart plug Omni never reads): GAIN, not proven, 89.58 -> 89.58 served requests per kJ.
+Observation (watch against native) on the same outcome: GAIN, not proven. Authority (omni against watch): LOSS, not proven.
+Whole machine at the wall (smart plug Omni never reads): LOSS, not proven, 89.59 -> 89.58 served requests per kJ.
 **Result, by rule: INVALID.**
 
 ## Actuator fidelity (receipt B: requested against read back from the device)
 
 | Arm | Rep | Writes | Refused | mean abs(read back − requested) W | max W | delay median s | delay max s | enforced under requested | total variation W | reversals | restored |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| omni | 1 | 2 | 0 | 0 | 0 | 0.051 | 0.051 | 0 | 132 | 1 | True |
-| omni | 2 | 2 | 0 | 0 | 0 | 0.0545 | 0.058 | 0 | 132 | 1 | True |
+| omni | 1 | 2 | 0 | 0 | 0 | 0.0555 | 0.059 | 0 | 132 | 1 | True |
+| omni | 2 | 2 | 0 | 0 | 0 | 0.054 | 0.055 | 0 | 132 | 1 | True |
 | watch | 1 | 0 | 0 | n/a | n/a | n/a | n/a | 0 | 0 | 0 | True |
 | watch | 2 | 0 | 0 | n/a | n/a | n/a | n/a | 0 | 0 | 0 | True |
 
@@ -655,9 +655,9 @@ Whole machine at the wall (smart plug Omni never reads): GAIN, not proven, 89.58
 | Arm | Rep | Decisions | J_u = sum abs(u) dt | mean abs(u) | max abs(u) | saturations | shield interventions | holds |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | omni | 1 | 7 | 4.2 | 0.568 | 0.775 | 0 | 7 | 0 |
-| omni | 2 | 7 | 4.21 | 0.568 | 0.775 | 0 | 7 | 0 |
+| omni | 2 | 7 | 4.22 | 0.568 | 0.775 | 0 | 7 | 0 |
 | watch | 1 | 7 | 4.21 | 0.568 | 0.775 | 0 | 7 | 0 |
-| watch | 2 | 7 | 4.2 | 0.568 | 0.775 | 0 | 7 | 0 |
+| watch | 2 | 7 | 4.22 | 0.568 | 0.775 | 0 | 7 | 0 |
 
 ## Representation fidelity (the engine's projection against the telemetry at the next decision)
 
@@ -676,7 +676,7 @@ Each write owns the interval until the next write. Joules and requests finished 
 
 | Decided by | Writes | Seconds owned | GPU joules vs native | Requests finished vs native |
 |---|---:|---:|---:|---:|
-| slo_or_blind_reflex | 2 | 9 | -72 | +0 |
+| slo_or_blind_reflex | 2 | 9 | +36.9 | +0 |
 
 ## The control
 
@@ -689,23 +689,23 @@ Each write owns the interval until the next write. Joules and requests finished 
 GPU Fake GPU, driver 0.0, persistence mode Enabled, start power limit 300.00 W, workload tools/gpu_workload.py (seeded fp16 matmul request stream).
 5 repetitions, order rotated, 4.0 s per arm plus 1.0 s drain, 0.0 s idle before each arm.
 
-Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json, rechecked at the end.
+Phase: **smoke**. Omni frozen at commit 1a54a46fc4ba; file hashes in FREEZE.json, rechecked at the end.
 
 ## Every column, mean over repetitions
 
 | Gauge | native | omni, watching (writes nothing) | omni |
 |---|---:|---:|---:|
-| work per energy (served requests per kJ) | 100.7 | 100.7 | 100.7 |
+| work per energy (served requests per kJ) | 100.7 | 100.7 | 98.62 |
 | work per wall energy (served requests per kJ, whole machine) | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
 | energy, whole machine at the wall (J) | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
-| energy, GPU (J) | 884.1 | 883.9 | 884 |
-| energy per served request (J) | 9.933 | 9.931 | 9.932 |
-| power, GPU mean (W) | 172.1 | 172.3 | 172.2 |
+| energy, GPU (J) | 884.2 | 884 | 902.4 |
+| energy per served request (J) | 9.934 | 9.932 | 10.14 |
+| power, GPU mean (W) | 172.1 | 172.2 | 175.5 |
 | requests served | 89 | 89 | 89 |
 | requests not served | 0 | 0 | 0 |
-| response time, mean (ms) | 32.61 | 32.53 | 32.46 |
-| response time, 95th percentile (ms) | 70.76 | 70.56 | 70.4 |
-| response time, 99th percentile (ms) | 86.53 | 86.15 | 85.9 |
+| response time, mean (ms) | 32.68 | 32.51 | 32.54 |
+| response time, 95th percentile (ms) | 71 | 70.61 | 70.58 |
+| response time, 99th percentile (ms) | 86.68 | 86.22 | 86.19 |
 | temperature, peak (C) | 60 | 60 | 60 |
 | temperature, mean (C) | 60 | 60 | 60 |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
@@ -719,17 +719,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 100.7 | 100.7 | +0.0% | -0.1152 to +0.1349 | GAIN, not proven |
+| **work per energy (served requests per kJ) (primary)** | 100.7 | 98.62 | -2.1% | -28.76 to +24.6 | LOSS, not proven |
 | work per wall energy (served requests per kJ, whole machine) | UNAVAILABLE | UNAVAILABLE | | | no meter |
 | energy, whole machine at the wall (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
-| energy, GPU (J) | 884.1 | 884 | -0.0% | -1.233 to +1.053 | GAIN, not proven |
-| energy per served request (J) | 9.933 | 9.932 | -0.0% | -0.01386 to +0.01184 | GAIN, not proven |
-| power, GPU mean (W) | 172.1 | 172.2 | +0.1% | -0.4287 to +0.7642 | power given, not proven |
+| energy, GPU (J) | 884.2 | 902.4 | +2.1% | -216.2 to +252.7 | power given, not proven |
+| energy per served request (J) | 9.934 | 10.14 | +2.1% | -2.429 to +2.839 | power given, not proven |
+| power, GPU mean (W) | 172.1 | 175.5 | +2.0% | -43.31 to +50.1 | power given, not proven |
 | requests served | 89 | 89 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 32.61 | 32.46 | -0.5% | -0.5116 to +0.2144 | GAIN, not proven |
-| response time, 95th percentile (ms) | 70.76 | 70.4 | -0.5% | -4.47 to +3.744 | GAIN, not proven |
-| response time, 99th percentile (ms) | 86.53 | 85.9 | -0.7% | -7.053 to +5.794 | GAIN, not proven |
+| response time, mean (ms) | 32.68 | 32.54 | -0.4% | -1.15 to +0.8827 | GAIN, not proven |
+| response time, 95th percentile (ms) | 71 | 70.58 | -0.6% | -2.852 to +1.999 | GAIN, not proven |
+| response time, 99th percentile (ms) | 86.68 | 86.19 | -0.6% | -3.748 to +2.777 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -743,17 +743,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | native | omni, watching (writes nothing) | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 100.7 | 100.7 | +0.0% | +0.009858 to +0.0312 | GAIN, proven |
+| **work per energy (served requests per kJ) (primary)** | 100.7 | 100.7 | +0.0% | -0.2304 to +0.2698 | GAIN, not proven |
 | work per wall energy (served requests per kJ, whole machine) | UNAVAILABLE | UNAVAILABLE | | | no meter |
 | energy, whole machine at the wall (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
-| energy, GPU (J) | 884.1 | 883.9 | -0.0% | -0.18 to -0.18 | GAIN, proven |
-| energy per served request (J) | 9.933 | 9.931 | -0.0% | -0.002023 to -0.002023 | GAIN, proven |
-| power, GPU mean (W) | 172.1 | 172.3 | +0.2% | -2.443 to +2.972 | power given, not proven |
+| energy, GPU (J) | 884.2 | 884 | -0.0% | -2.467 to +2.107 | GAIN, not proven |
+| energy per served request (J) | 9.934 | 9.932 | -0.0% | -0.02772 to +0.02368 | GAIN, not proven |
+| power, GPU mean (W) | 172.1 | 172.2 | +0.0% | -2.186 to +2.285 | power given, not proven |
 | requests served | 89 | 89 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 32.61 | 32.53 | -0.2% | -0.7967 to +0.6518 | GAIN, not proven |
-| response time, 95th percentile (ms) | 70.76 | 70.56 | -0.3% | -1.087 to +0.6741 | GAIN, not proven |
-| response time, 99th percentile (ms) | 86.53 | 86.15 | -0.4% | -3.048 to +2.302 | GAIN, not proven |
+| response time, mean (ms) | 32.68 | 32.51 | -0.5% | -1.398 to +1.061 | GAIN, not proven |
+| response time, 95th percentile (ms) | 71 | 70.61 | -0.5% | -3.692 to +2.912 | GAIN, not proven |
+| response time, 99th percentile (ms) | 86.68 | 86.22 | -0.5% | -3.852 to +2.937 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -767,17 +767,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 | Gauge | omni, watching (writes nothing) | omni | Change | 95% interval of the difference | Verdict |
 |---|---:|---:|---:|---:|---|
-| **work per energy (served requests per kJ) (primary)** | 100.7 | 100.7 | -0.0% | -0.1464 to +0.1251 | LOSS, not proven |
+| **work per energy (served requests per kJ) (primary)** | 100.7 | 98.62 | -2.1% | -28.53 to +24.33 | LOSS, not proven |
 | work per wall energy (served requests per kJ, whole machine) | UNAVAILABLE | UNAVAILABLE | | | no meter |
 | energy, whole machine at the wall (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
-| energy, GPU (J) | 883.9 | 884 | +0.0% | -1.053 to +1.233 | power given, not proven |
-| energy per served request (J) | 9.931 | 9.932 | +0.0% | -0.01184 to +0.01386 | power given, not proven |
-| power, GPU mean (W) | 172.3 | 172.2 | -0.1% | -2.208 to +2.014 | GAIN, not proven |
+| energy, GPU (J) | 884 | 902.4 | +2.1% | -213.7 to +250.6 | power given, not proven |
+| energy per served request (J) | 9.932 | 10.14 | +2.1% | -2.401 to +2.816 | power given, not proven |
+| power, GPU mean (W) | 172.2 | 175.5 | +1.9% | -41.13 to +47.81 | power given, not proven |
 | requests served | 89 | 89 | +0.0% | +0 to +0 | EVEN, the same |
 | requests not served | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| response time, mean (ms) | 32.53 | 32.46 | -0.2% | -0.4374 to +0.2851 | GAIN, not proven |
-| response time, 95th percentile (ms) | 70.56 | 70.4 | -0.2% | -3.384 to +3.07 | GAIN, not proven |
-| response time, 99th percentile (ms) | 86.15 | 85.9 | -0.3% | -4.005 to +3.492 | GAIN, not proven |
+| response time, mean (ms) | 32.51 | 32.54 | +0.1% | -0.1786 to +0.2475 | LOSS, not proven |
+| response time, 95th percentile (ms) | 70.61 | 70.58 | -0.1% | -0.9129 to +0.8405 | GAIN, not proven |
+| response time, 99th percentile (ms) | 86.22 | 86.19 | -0.0% | -0.1605 to +0.1037 | GAIN, not proven |
 | temperature, peak (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | temperature, mean (C) | 60 | 60 | +0.0% | +0 to +0 | EVEN, the same |
 | energy, CPU package (J) | UNAVAILABLE | UNAVAILABLE | | | no meter |
@@ -789,17 +789,17 @@ Phase: **smoke**. Omni frozen at commit 92c4102cc82b; file hashes in FREEZE.json
 
 ## Verdict on the preregistered question
 
-Work per energy under Omni against native: 100.7 -> 100.7 served requests per kJ, difference +0.009848 (95% interval -0.1152 to +0.1349).
+Work per energy under Omni against native: 100.7 -> 98.62 served requests per kJ, difference -2.08 (95% interval -28.76 to +24.6).
 Guardrails: requests served held (not below -1%), 95th-percentile response time held (not above +10%), requests not served held (not above +1% of native served).
-Observation (watch against native) on the same outcome: GAIN, proven. Authority (omni against watch): LOSS, not proven.
-**Result, by rule: NOT ATTRIBUTABLE: WATCH DIFFERS FROM NATIVE.**
+Observation (watch against native) on the same outcome: GAIN, not proven. Authority (omni against watch): LOSS, not proven.
+**Result, by rule: EVEN (inside the noise, within the guardrails).**
 
 ## Actuator fidelity (receipt B: requested against read back from the device)
 
 | Arm | Rep | Writes | Refused | mean abs(read back − requested) W | max W | delay median s | delay max s | enforced under requested | total variation W | reversals | restored |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| omni | 1 | 2 | 0 | 0 | 0 | 0.0515 | 0.052 | 0 | 132 | 1 | True |
-| omni | 2 | 2 | 0 | 0 | 0 | 0.0555 | 0.058 | 0 | 132 | 1 | True |
+| omni | 1 | 2 | 0 | 0 | 0 | 0.069 | 0.076 | 0 | 132 | 1 | True |
+| omni | 2 | 2 | 0 | 0 | 0 | 0.056 | 0.056 | 0 | 132 | 1 | True |
 | watch | 1 | 0 | 0 | n/a | n/a | n/a | n/a | 0 | 0 | 0 | True |
 | watch | 2 | 0 | 0 | n/a | n/a | n/a | n/a | 0 | 0 | 0 | True |
 
@@ -808,9 +808,9 @@ Observation (watch against native) on the same outcome: GAIN, proven. Authority 
 | Arm | Rep | Decisions | J_u = sum abs(u) dt | mean abs(u) | max abs(u) | saturations | shield interventions | holds |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | omni | 1 | 5 | 3.18 | 0.599 | 0.775 | 0 | 5 | 0 |
-| omni | 2 | 5 | 3.18 | 0.599 | 0.775 | 0 | 5 | 0 |
-| watch | 1 | 5 | 3.16 | 0.599 | 0.775 | 0 | 5 | 0 |
-| watch | 2 | 5 | 3.16 | 0.599 | 0.775 | 0 | 5 | 0 |
+| omni | 2 | 5 | 3.19 | 0.599 | 0.775 | 0 | 5 | 0 |
+| watch | 1 | 5 | 3.18 | 0.599 | 0.775 | 0 | 5 | 0 |
+| watch | 2 | 5 | 3.17 | 0.599 | 0.775 | 0 | 5 | 0 |
 
 ## Representation fidelity (the engine's projection against the telemetry at the next decision)
 
@@ -829,7 +829,7 @@ Each write owns the interval until the next write. Joules and requests finished 
 
 | Decided by | Writes | Seconds owned | GPU joules vs native | Requests finished vs native |
 |---|---:|---:|---:|---:|
-| slo_or_blind_reflex | 2 | 6 | +36 | +0 |
+| slo_or_blind_reflex | 2 | 6 | +72.72 | +0 |
 
 ## The control
 
@@ -1124,12 +1124,12 @@ PASS  the v2 catalog rebuilds from its three committed sources by the v1 rules (
 PASS  the engine in this checkout carries a declared fingerprint (tools/omni_version.py prints omni-vN; any change to the engine is a new version first)  (omni-v6 (digest df6147466ef18046, 45 files)
 )
 PASS  v6 capacity regressions, full-control flag and non-GPU campaign dispatch boundaries  (on traceback
-/usr/lib/python3.12/csv.py:124: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpvthiyudm/audit.jsonl' mode='a' encoding='UTF-8'>
+/usr/lib/python3.12/csv.py:124: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmptpokf6c9/audit.jsonl' mode='a' encoding='UTF-8'>
   d = dict(zip(self.fieldnames, row))
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ..............................
 ----------------------------------------------------------------------
-Ran 45 tests in 1.311s
+Ran 45 tests in 1.340s
 
 OK
 )
@@ -1163,22 +1163,22 @@ PASS  A/B/C three-run table rule: GAIN or LOSS in all three of our runs only wit
 == twolink: the paired trial says a slower cycle is not cheaper (standing draw dominates); omni leaves the override native
 PASS  robot runner: feasible speed set by the arm's own servo, the paired trial decides whether Omni moves (left native), standing draw per takt in both arms, override inside its guards and handed back, no cycle over the takt, deterministic
 PASS  robot runner: the arm's own servo sets the planned speed, the paired physics trial decides whether Omni moves, standing draw per takt in both arms, the override inside its guards and handed back, no cycle over the takt, deterministic
-/tmp/tmpv8xsrxsw/V1.md: 1 robots moved (4 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 0 where the runs differ), 1 nothing to move, 1 could not run
+/tmp/tmpqk9i6xrx/V1.md: 1 robots moved (4 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 0 where the runs differ), 1 nothing to move, 1 could not run
 PASS  robot arms A/B/C rule: reproduced runs read GAIN, EVEN or LOSS by what each gauge is for, a run that differs is a finding, added tracking error or a cycle over the takt is a LOSS, a robot left native is nothing to move, a robot that cannot run is listed
 PASS  robot arms A/B/C rule: a deterministic simulator's runs must reproduce; added tracking error or a cycle over the takt reads higher
-/tmp/tmpkdwzu9un/V1.md: 1 grids; 2 gauge-rows GAIN in all three of our runs, 2 LOSS, 4 power given, 0 where the runs differ
+/tmp/tmp5t1l7zz7/V1.md: 1 grids; 2 gauge-rows GAIN in all three of our runs, 2 LOSS, 4 power given, 0 where the runs differ
 PASS  power-grid A/B/C rule: reproduced runs read GAIN, EVEN or LOSS by what each gauge is for, a run that differs is a finding, any added violation is a LOSS and every extra tap is power given, shown-only gauges never judged
 PASS  power-grid A/B/C rule: a deterministic simulator's runs must reproduce; any added violation and every extra tap read higher
 PASS  database A/B/C rule: GAIN or LOSS in all three of our runs (by what the gauge is for; a resource spent that rose is power given) only with the same sign and every interval clear of zero in all three runs; an interval over zero reads EVEN, no difference beyond the noise, with its count; clear runs pointing different ways read as a disagreement; any added failed transaction is marked; the pool size is shown, never judged
 PASS  database A/B/C rule: GAIN or LOSS in all three of our runs only with the same sign and every interval clear of zero in all three runs; an interval over zero reads no difference beyond the noise with its count; any added failed transaction is marked; the pool size is shown
 PASS  swarm runner: paths clear of the depot columns and depots apart, every mission inside its deadline under a perfect autopilot, the override inside its guards (slack spent as speed, the planner's cruise at the wall and near another drone) and handed back, the declared energy model, deterministic plan
 PASS  swarm runner: the task keeps the fleet apart, every mission inside its deadline under a perfect autopilot, the cruise override inside its guards (slack spent as speed, the planner's cruise at the wall and near another drone) and handed back, the declared energy model
-/tmp/tmp4o746eg8/V3.md: 2 cells moved (3 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 0 where the runs differ, the tuning cell shown and not counted), 1 nothing to move, 1 void
+/tmp/tmp_inn4pw6/V3.md: 2 cells moved (3 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 0 where the runs differ, the tuning cell shown and not counted), 1 nothing to move, 1 void
 PASS  drone swarms A/B/C rule: reproduced runs read GAIN, EVEN or LOSS by what each gauge is for, a run that differs is a finding, a late mission, a reserve breach or a near miss added is a LOSS, a cell left native is nothing to move, a collision voids the cell, the tuning cell is not counted
 PASS  drone swarms A/B/C rule: a deterministic simulator's runs must reproduce; a late mission, a reserve breach or a near miss added reads higher; a collision voids the cell; the tuning cell is shown and not counted
 PASS  Kafka runner: slow with messages waiting adds consumers, calm gives back one idle consumer after the dwell and only with nothing waiting, the wall starts every consumer at once, the cover holds; the group's reading from its own records; the paired reading; the service time spent as CPU
 PASS  Kafka runner: slow with messages waiting adds consumers, calm gives back one idle consumer after the dwell and only with nothing waiting, the wall starts every consumer at once, the cover holds; the group's own reading; the paired reading; the service time as CPU
-/tmp/tmpn8rbx57d/V3.md: 1 untouched workloads; 1 GAIN, 0 LOSS, 2 power given, 11 EVEN, 0 disagree
+/tmp/tmpp7ne_rlx/V3.md: 1 untouched workloads; 1 GAIN, 0 LOSS, 2 power given, 11 EVEN, 0 disagree
 PASS  Kafka A/B/C rule: GAIN or LOSS in all three of our runs (by what the gauge is for) only with the same sign and every interval clear of zero in all three runs; an interval over zero reads EVEN, no difference beyond the noise, with its count; any lost message is marked; more consumers held reads power given; the tuning workload is not counted
 PASS  Kafka A/B/C rule: GAIN or LOSS in all three of our runs only with the same sign and every interval clear of zero in all three runs; an interval over zero reads no difference beyond the noise with its count; any lost message is marked; the tuning workload is shown and not counted
 PASS  YCSB runner: slow reads with the cache full and missing grow the cache by notches, calm with misses under 1% of requests gives one back after the dwell, the wall adds a quarter of the cover, the cover holds; the plug snapshots, reads back, stops for another writer and restores; the server's own reading; YCSB's records parsed; the paired reading
@@ -1195,21 +1195,21 @@ PASS  robustness readings: the kill and hand-back marks, the 120 s after the kil
 PASS  robustness readings: the kill and hand-back marks, the 120 s after the kill in both arms, the governor's memory ratio; a late hand-back, a leak or a missing second governor is marked; the three-run rows read the same in all three of our runs only when every repetition of every run was handed back
 PASS  Redis runner: misses grow the ceiling by notches, calm with nothing evicted gives one back after the dwell, the wall puts the whole cover on, the cover holds; the plug snapshots, reads back, stops for another writer and restores; a seeded Zipf working set; the application's own reading; the paired reading
 PASS  Redis runner: misses with the cache full grow the ceiling by notches, calm with nothing evicted gives one back, the wall adds a quarter of the cover, the cover holds; the plug snapshots, reads back, stops for another writer and restores; a seeded working set; the paired reading
-/tmp/tmp8khzk7_d/V3.md: 1 untouched workloads; 2 GAIN, 0 LOSS, 1 power given, 9 EVEN, 0 disagree
+/tmp/tmpvdmxrrb2/V3.md: 1 untouched workloads; 2 GAIN, 0 LOSS, 1 power given, 9 EVEN, 0 disagree
 PASS  Redis A/B/C rule: GAIN or LOSS in all three of our runs (by what the gauge is for) only with the same sign and every interval clear of zero in all three runs; an interval over zero reads EVEN, no difference beyond the noise, with its count; any failed request is marked; more memory held reads power given; the tuning workload is not counted
 PASS  Redis A/B/C rule: GAIN or LOSS in all three of our runs only with the same sign and every interval clear of zero in all three runs; an interval over zero reads no difference beyond the noise with its count; any failed request is marked; the tuning workload is shown and not counted
 PASS  engine fingerprints: this checkout is one declared version; a commit before a runner was written reads as that version minus the runner; a changed byte or an extra engine file is no version
 PASS  engine fingerprints: this checkout is one declared version; a commit before a runner was written reads as that version minus the runner; a changed byte or an extra engine file is no version
 PASS  database runner: the direction follows where the time goes, calm gives back one idle server and never one in use nor one in demand, cushion, dwell, cover and fail-up to the pooler's own setting hold; pgbench's log reads into the gauges; the paired reading says GAIN, LOSS or power given by what the gauge is for, EVEN, and never-more
 PASS  database runner rule: the direction follows where the time goes, calm gives back one idle server and never one in use, cushion, dwell, cover and fail-up to the pooler's own setting; pgbench's log reads into the gauges; the paired reading by rule
-/tmp/tmpr8zrnixe/V1.md: 1 districts with batteries (1 score-rows GAIN in all three of our runs, 1 LOSS, 0 power given, 0 where the runs differ), 1 with nothing to move, 1 CityLearn cannot run
+/tmp/tmpbxl1fbgw/V1.md: 1 districts with batteries (1 score-rows GAIN in all three of our runs, 1 LOSS, 0 power given, 0 where the runs differ), 1 with nothing to move, 1 CityLearn cannot run
 PASS  CityLearn A/B/C rule: reproduced runs read GAIN, EVEN or LOSS by what each score is for, a run that differs is a finding, no battery means nothing to move, a district CityLearn cannot run is listed
 PASS  CityLearn A/B/C rule: a deterministic simulator's runs must reproduce; no battery means nothing to move; a district CityLearn cannot run is listed
 PASS  six organisms with the cluster inside: the same demand in both arms, every simulated knob handed back, an archived record stored gzipped reads the same  (' encoding='UTF-8'>
   self.assertEqual(run_kil.main(["--organism", "compute_ai_cloud", "--arm", "compass", "--duration", "0.5",
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ----------------------------------------------------------------------
-Ran 5 tests in 6.640s
+Ran 5 tests in 6.630s
 
 OK
 )
@@ -1221,13 +1221,13 @@ PASS  cluster capture script parses
 PASS  the repository is lined up: the declared root, every link and every named path present (tools/layout_check.py)  (layout: lined up)
 PASS  every GitHub workflow file parses as YAML with its on and jobs (a file that does not is never run by GitHub)
 PASS  the legal tool (tools/legal.py): one notice under every title and at every end, older notices replaced not doubled, headers rewritten after a shebang, a workflow's own steps kept exactly while each job opens and closes its report with the notice, locked files untouched, the export bundle complete  (----------------------------------------------------------------------
-Ran 10 tests in 0.094s
+Ran 10 tests in 0.098s
 
 OK
 )
 PASS  the front page keeps itself current (tools/front_page.py): archived runs grouped by what they are, the three newest complete runs of a kind as A, B and C, a table rebuilt only when its runs changed, the README's latest lines newest first  (README has no front-page markers; the latest lines were not written
 ----------------------------------------------------------------------
-Ran 5 tests in 0.046s
+Ran 5 tests in 0.038s
 
 OK
 )
@@ -1242,20 +1242,20 @@ PASS  the standing block of the state of play (where things stand: the engine, t
 PASS  every formula the two manuals print is written in Unicode, never LaTeX markup (the founder's order of 15 October; tools/unicode_math.py --check)  (every formula the manuals print is in Unicode
 )
 PASS  the words rule (a reading's word set by the gauge's aim, never its sign; a resource that rose is power given, never a LOSS; old words read back) and the whole summary straight after a pull (tools/summary.py)  (----------------------------------------------------------------------
-Ran 6 tests in 0.380s
+Ran 6 tests in 0.416s
 
 OK
 )
 PASS  the brain's own verdict on a live knob (tools/knob_verdict.py around the frozen engine's Verdict): every knob starts in watch, a spend that costs more than it buys is refused, a give-back that costs nothing is allowed one step a trial, a trial holds the knob, native is always free  (----------------------------------------------------------------------
-Ran 11 tests in 0.008s
+Ran 11 tests in 0.007s
 
 OK
 )
 PASS  CPU power harness (tools/run_cpu_power.py) on a modelled machine: the decision rule, the grid of notches, the plug on the kernel's files (snapshot once, one writer, restore), the meter's wrap-around, the probe, the hand-back from a snapshot file, one paired run with the brain's verdict allowing notches by trial and the ceiling handed back, the three-run table flagging a modelled machine  ( traceback
-/usr/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=20717) is multi-threaded, use of fork() may lead to deadlocks in the child.
+/usr/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=30703) is multi-threaded, use of fork() may lead to deadlocks in the child.
   self.pid = os.fork()
 ----------------------------------------------------------------------
-Ran 8 tests in 50.942s
+Ran 8 tests in 50.981s
 
 OK
 )
