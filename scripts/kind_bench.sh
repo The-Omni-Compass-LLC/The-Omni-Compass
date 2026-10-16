@@ -102,7 +102,8 @@ CAP_ARGS="--cap-deployments default/php-apache"; [ -z "$CRUISEKUBE" ] || CAP_ARG
 # only fall or stay, never rise
 OMNI_SENSED="default/php-apache"; OMNI_POWER_CMD="bash scripts/kind_power.sh"
 # Only 1 enables machines-only mode; 0, empty and unset retain the full wiring.
-if [ "${OMNI_MACHINES_ONLY:-0}" = "1" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; fi
+GIVE_BACK_ONLY=""
+if [ "${OMNI_MACHINES_ONLY:-0}" = "1" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; GIVE_BACK_ONLY="--give-back-only"; fi
 limits_now() {   # the CPU limit the operator's record holds: the pods' own, or with CruiseKube the Deployment's template
   if [ -n "$CRUISEKUBE" ]; then
     kubectl get deployment php-apache -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}'
@@ -499,7 +500,7 @@ start_controller() {   # $1 decisions to make, $2 log file
     ${OMNI_POWER_CMD:+--power-cmd "$OMNI_POWER_CMD"} --site-limit-w "$SITE_LIMIT_W" \
     $CAP_ARGS --thermal-model --security-configmap default/omni-security \
     --rollout-guard default/php-apache --sensed "$OMNI_SENSED" --latency-file "$OUT_DIR/latency.csv" --slo-ms "${SLO_MS:-500}" \
-    --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" $STRICT $LAW ${CLOSURE:+--closure "$CLOSURE"} ${REPLICA_CEILING:+--replica-ceiling "$REPLICA_CEILING"} ${OMNI_DIAL:+--dial "$OMNI_DIAL"} > "$2" 2>&1 &
+    --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" $GIVE_BACK_ONLY $STRICT $LAW ${CLOSURE:+--closure "$CLOSURE"} ${REPLICA_CEILING:+--replica-ceiling "$REPLICA_CEILING"} ${OMNI_DIAL:+--dial "$OMNI_DIAL"} > "$2" 2>&1 &
   echo $!
 }
 # the window's governor is not a child of this shell (start_controller runs in a subshell), so `wait` cannot see it (12

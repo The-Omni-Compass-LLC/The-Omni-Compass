@@ -394,6 +394,21 @@ class Muscles:
         Resized in place through pods/resize: no pod restarts. No expansion during a security hold. The reset
         returns every pod to L_i.
 
+        On kind every node is a container on one machine and reports that machine's whole CPU as its own, so the limits
+        the nodes hand out sum to more than the machine: a ceiling, not a use, and the kernel's fair scheduler arbitrates
+        when the serving pods ask for more than the machine, as it does for native's pods. v7 adds one guard, the same
+        as the replica room's (capacity.py): on such a shared host no limit is raised while the machine's measured busy
+        share is at or over 75% or cannot be read; limits already given stay, and lowering is never held back. Each hold
+        is written to the audit ("convey": "held"). Two other designs were tried in the toy gate (tools/toy_gate.py,
+        docs/OMNI_V7.md) and refused by it: the host's CPU counted once and shared by every serving pod (at the v6 KEDA
+        runs' nine replicas, 3,500m / 9 is under the operator's 500m, so nothing is ever conveyed and the +64% work and
+        -53% response time of conveyance are lost whole), and a hold while a pod starts on the host (a start wait 1%
+        shorter for a LOSS on work and speed). The slower pod start of the v6 KEDA runs (+12.5% mean, EVEN on the
+        three-run rule) is the busier host serving more requests: the price of the work, not a fault to hold against.
+        The namespace's CPU quota, where the governor's role can read it, bounds every raise (omni_controller/quota.py);
+        where it cannot be read, no budget is known and the raise proceeds as on v6, Kubernetes' own admission the
+        authority: the first v7 trial read an unreadable quota as zero and conveyed nothing (docs/OMNI_V7.md, section 1).
+
         Conveyance is on by default. It moves no work: the same requests run with less waiting. (The +26% CPU seen on
         kind is more requests served, because that load is closed-loop, not waste.) Optionally, --convey-on (a share
         of --slo-ms) engages it only once the 95th-percentile response time reaches convey-on x SLO and releases it
@@ -404,12 +419,23 @@ class Muscles:
         if not targets:
             return None
         engaged = self._convey_engaged()
-        alloc = {n["metadata"]["name"]: milli(n["status"]["allocatable"]["cpu"])
-                 for n in self.k.get("get", "nodes", "-o", "json")["items"]}
+        from omni_controller.capacity import HostCpuSampler, KIND_SCALE_OUT_BUSY_LIMIT, one_host
+        node_items = self.k.get("get", "nodes", "-o", "json")["items"]
+        alloc = {n["metadata"]["name"]: milli(n["status"]["allocatable"]["cpu"]) for n in node_items}
         pods = [p for p in self.k.get("get", "pods", "-A", "-o", "json")["items"]
                 if p["status"].get("phase") in ("Running", "Pending") and p["spec"].get("nodeName")]
+        shared = one_host(node_items)
+        if not hasattr(self, "host_cpu"):
+            self.host_cpu = HostCpuSampler()
+        busy = self.host_cpu.sample() if shared else None
+        # the shared host near its top, or unread: no limit is raised anywhere on it (v7); elsewhere nothing is held
+        busy_hold = shared and (busy is None or busy >= KIND_SCALE_OUT_BUSY_LIMIT)
+        from omni_controller.quota import CpuLimitBudget
+        budget = CpuLimitBudget(self.k, self.audit)
         out = {}
+        held = set()
         for ns, name in targets:
+            self.gain[(ns, name)] = 1.0
             dep = self.k.get("get", "deployment", name, "-n", ns, "-o", "json")
             ann = dep["metadata"].get("annotations", {}) or {}
             c0 = dep["spec"]["template"]["spec"]["containers"][0]
@@ -439,15 +465,31 @@ class Muscles:
                     cur = milli(p["spec"]["containers"][0].get("resources", {}).get("limits", {}).get("cpu", tmpl))
                     if obs.get("security_block", 0.0) > 0.5 and want > cur:
                         got.append(cur); continue  # shield I1: no expansion during a security hold
-                    if abs(want - cur) < self.a.cap_min_change_m:
+                    if busy_hold and want > cur:
+                        held.add(node); got.append(cur); continue  # the shared host near its top, or unread
+                    permitted, reservations = budget.limit(ns, p, cur, want)
+                    if abs(permitted - cur) < self.a.cap_min_change_m:
                         got.append(cur); continue
-                    self._resize(p, ns, f"{want}m", f"convey: {node} idle CPU to its {len(ps)} serving pod(s), limit {want}m in place"
-                                 if engaged else f"convey: response time calm, operator's limit {want}m in place")
-                    out[f"{ns}/{p['metadata']['name']}"] = want; got.append(want)
+                    try:
+                        self._resize(p, ns, f"{permitted}m", f"convey: {node} idle CPU to its {len(ps)} serving pod(s), limit {permitted}m in place"
+                                     if engaged else f"convey: response time calm, operator's limit {permitted}m in place")
+                    except Exception as error:
+                        # Admission can race another writer. Never advertise a rejected increase to the HPA.
+                        self.audit({"error": f"convey resize rejected: {type(error).__name__}: {str(getattr(error, 'stderr', '') or error).strip()[:400]}",
+                                    "pod": f"{ns}/{p['metadata']['name']}", "accepted_limit_m": cur})
+                        got.append(cur)
+                        # Do not reuse uncertain headroom for other pods in this decision.
+                        budget.reserve(reservations, cur, permitted)
+                        continue
+                    budget.reserve(reservations, cur, permitted)
+                    out[f"{ns}/{p['metadata']['name']}"] = permitted; got.append(permitted)
             # the gain g = mean conveyed limit / operator's limit: the replica organ reads it to keep the operator's
             # promise in queue terms (target x request / limit) while the limit is larger
             self.gain[(ns, name)] = (sum(got) / len(got) / base) if got and base > 0 else 1.0
             self.base[(ns, name)] = base
+        if held:
+            self.audit({"convey": "held", "machines": sorted(held), "host_busy": None if busy is None else round(busy, 3),
+                        "shared_host": shared})
         return out
 
     def _convey_engaged(self):
@@ -675,7 +717,8 @@ def add_args(ap):
     ap.add_argument("--convey-on", type=float, default=0.0,
                     help="0 (default): convey idle CPU always; > 0: only once p95 reaches this share of --slo-ms")
     ap.add_argument("--convey-off", type=float, default=0.25, help="return pods to the operator's limit once p95 is below this share")
-    ap.add_argument("--slo-clear", type=int, default=3, help="decisions the SLO must stay met before densifying or capping again")
+    ap.add_argument("--slo-clear", type=int, default=None, help="decisions the SLO must stay met before densifying or capping again (unset: --slo-clear-s)")
+    ap.add_argument("--slo-clear-s", type=float, default=180.0, help="seconds the SLO must stay met before densifying or capping again")
     ap.add_argument("--thermal-model", action="store_true", help="heat muscle: thermal state from the harness heat law")
     ap.add_argument("--security-configmap", default="", help="ns/name of a ConfigMap whose key 'hold' signals a security hold")
     ap.add_argument("--rollout-guard", default="", help="ns/name[,ns/name]: rollout muscle pauses, resumes, undoes")

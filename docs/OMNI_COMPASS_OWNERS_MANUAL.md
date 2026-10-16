@@ -290,7 +290,7 @@ will find, the following discipline throughout, because it is the discipline the
    When Omni-Compass loses, the first suspect is our own wiring, native setup or scoring; when that is fixed, the test is
    run again and the loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut.
 5. **Nothing read across engines.** The engine is frozen and fingerprinted (`OMNI_V1.json`, `OMNI_V2.json`,
-   `OMNI_V3.json`, `OMNI_V5.json`, `OMNI_V6.json`). Any change to a rule, gain, guard, preset or muscle makes the next version, and every result is run
+   `OMNI_V3.json`, `OMNI_V5.json`, `OMNI_V6.json`, `OMNI_V7.json`). Any change to a rule, gain, guard, preset or muscle makes the next version, and every result is run
    again on it. Every table made by rule checks the engine of each run it reads and refuses to mix them.
 6. **The raw files live with the code.** Every finished run's files are copied into `results/live/raw/run-<id>/` with one
    SHA-256 manifest per repetition, and every table names the runs and the commit it was made from. Anyone with the
@@ -554,8 +554,8 @@ installed is a quarter off the bill.
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v6, fingerprint df6147466ef18046 (45 files).
-- The muscles and the seven organisms on engine omni-v6 at the max (evidence class S, our own models; run 2026-10-16 03:48 UTC, commit 1d870bc33b2b, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
+- **The engine on this checkout:** omni-v7, fingerprint d6d467b824c585f1 (46 files).
+- The muscles and the seven organisms on engine omni-v7 at the max (evidence class S, our own models; run 2026-10-16 04:34 UTC, commit 1637d32cd26c, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
   - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses -0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
@@ -569,15 +569,15 @@ installed is a quarter off the bill.
   - Real cache (Redis, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v6): 4 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v7): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
+| Every real test together: the Omni index | omni-v3 | +5.2% | GAIN, power given | L |
 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v6 | +54.0% | GAIN, power given | L |
 | Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v6 | +0.0% | EVEN | L |
 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +105.0% | GAIN, power given | L |
 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +15.0% | GAIN, power given | L |
-| Every real test together: the Omni index | omni-v3 | +5.2% | GAIN, power given | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
@@ -722,9 +722,15 @@ The second design decision is that Omni-Compass must never cause a LOSS. This is
 report; it is a trigger inside the engine. Before Omni-Compass moves a slow knob (a machine given back, a card's clock
 ceiling, a robot axis's speed, a drone's cruise override), it runs a **paired trial on the muscle itself**
 (`omnicompass/verdict.py`): the muscle's own cost per piece of work is measured at native and at one step past the
-deepest step already allowed, under the same traffic, with at least thirty pieces of work on each side; the step is
-allowed only if the trial's median cost is no more than 2% above the reference and no more than 2% above the cost first
-measured at native. A refused step is not tried again for a set number of decisions. Where no step passes, the verdict
+deepest step already allowed, under the same traffic, with at least thirty pieces of work on each side. From v7 the trial is read in the reports' own words: on the
+logarithm of each piece of work's cost, the change d = mean ln c[trial] − mean ln c[ref] carries its 95% interval
+d ± 1.96 · √(s²[ref] / n[ref] + s²[trial] / n[trial]), and with τ = ln 1.02 the 2% allowance in the same units, an interval
+wholly above zero is a LOSS and the step is refused whatever the allowance says; while the interval's half-width exceeds
+τ the trial measures on, up to three times its minimum; and a GAIN or EVEN step is allowed only if its median cost and
+its mean-log change are both no more than 2% above the reference and above the cost first measured at native. On
+modelled noisy costs (σ = 0.25) this allows a step that truly costs 3% more 28% of the time instead of the medians'
+40%, one that costs 5% more 14% instead of 26%, and a free step 60% instead of 63% (`docs/OMNI_V7.md`, section 3;
+class S). The engines before v7 read the medians alone (`judge="median"`). A refused step is not tried again for a set number of decisions. Where no step passes, the verdict
 reads **left native**, the knob is never moved, and the result for that muscle says "nothing for Omni to move". This is
 why, in the robot-arm benchmark, two of four arms were left entirely native and are reported as such, and why in the
 real Kubernetes tests machines were kept whenever one machine fewer made the requests slower in the trial. Gains are not
@@ -1173,9 +1179,9 @@ and the other as power given in all three of our runs, because that is what happ
 ### 3.5 Where the evidence stands today, read honestly
 
 Every number below is from a three-run table, each row naming the engine it ran on, with its evidence class and the
-question a referee is entitled to ask about it. The engine that stands is **omni-v6** (`OMNI_V6.json`, digest
-`df6147466ef18046`), and four benchmarks have their three-run table on it (the first four rows); every row not marked
-**omni-v6** is Omni v3's own result, as its table names it, and runs again on the engine that stands
+question a referee is entitled to ask about it. The engine that stands is **omni-v7** (`OMNI_V7.json`, digest
+`d6d467b824c585f1`, on main since 16 October by the founder's order); every row names the engine it ran on (the first four
+rows omni-v6, the engine of 15 October; the rest Omni v3's own results, as their tables name them) and runs again on the engine that stands
 (`scripts/reruns.txt`), its row replaced here when its three runs land. Results are never read across engines. The
 answers to the referee's questions are given, where they exist, in the row; where they do not yet exist, the row says
 what will supply them. The newest state, written from the result files on every push, is the standing block of
@@ -1198,7 +1204,7 @@ what will supply them. The newest state, written from the result files on every 
 | Database's storage-engine cache (MongoDB under YCSB): the cache size held | **−3% to −13% on f**, GAIN in all three of our runs (the set of 10 October, the brain's verdict on the cache); b, c and burst inside the noise | L | "What did it cost?" Nothing the same in all three of our runs: work, p95, p99, mean latency and host CPU inside the noise on all four workloads, no failed operation |
 | Database's buffer pool (MySQL under sysbench): the pool held | **−10% to −20% on read_write**, GAIN in all three of our runs, the pages holding data with it (the set of 10 October, the brain's verdict on the pool); burst, read_only and update_index inside the noise | L | "What did it cost?" Nothing the same in all three of our runs: work, p95, p99 and CPU inside the noise on every workload; the earlier set's memory bought for the written working set is gone |
 | Cache: work inside the 2 ms line; the hit rate | on the set of 10 October exactly nothing: the allowance one notch each way, most trials abandoned before they were judged, every gauge inside the noise; the earlier set's +14% to +27%, bought with a 64 → 200 to 270 MB ceiling, is whole in the history | L | "Why nothing?" The same trial rule as the broker's; amendment 3, the next set running |
-| **omni-v6.** The modelled muscles and seven organisms, the spine the seventh (16 October): 1,107 muscles in 70 families, every muscle its own card, three loads | every muscle alone over its loads EVEN 580, GAIN 527, LOSS 0; every organism GAIN (fewer misses, and under the climb more work) under the normal, climb and line loads, not one plant behind native, power given +0.00% to +0.05%; the spine alone: misses −6.1% under its own load, −7.9% with more work under the climb, −8.8% with work waiting in line, power given +0.01% to +0.04%; the grid 36 of 36 squares of 10 and 100 runs GAIN on the six run so far, the spine's squares queued | S | "Why is the energy not a saving?" Because the max buys work and speed and the energy it takes is power given, shown beside them, never counted as a loss or a gain; the models are ours (class S) and are never counted in the headline |
+| **omni-v7.** The modelled muscles and seven organisms, the spine the seventh (16 October): 1,107 muscles in 70 families, every muscle its own card, three loads | every muscle alone over its loads EVEN 580, GAIN 527, LOSS 0; every organism GAIN (fewer misses, and under the climb more work) under the normal, climb and line loads, not one plant behind native, power given +0.00% to +0.05%; the spine alone: misses −6.1% under its own load, −7.9% with more work under the climb, −8.8% with work waiting in line, power given +0.01% to +0.04%; the grid 36 of 36 squares of 10 and 100 runs GAIN on the six run so far, the spine's squares queued | S | "Why is the energy not a saving?" Because the max buys work and speed and the energy it takes is power given, shown beside them, never counted as a loss or a gain; the models are ours (class S) and are never counted in the headline |
 | Power grid, 11 SimBench grids in pandapower | energy drawn and net import lower in all 11; losses lower in 7, **power given in 4**; tap operations fewer in 10, 4 → 8 a year in one, higher | S | "Where does it lose?" In the rural and semi-urban grids with their own generation, where a lower voltage raises losses; the table shows it |
 | Robot arms, MuJoCo Menagerie | peak torque −29% and −10%, tracking error −21% where Omni moved; the Panda's copper loss **+14% higher**; two arms left native | S | "What about the arms that gained nothing?" The paired physics trial left them native and the table says "nothing for Omni to move" |
 | Buildings with batteries, CityLearn, 11 districts | electricity bought, daily peak and unevenness lower in all 11; the bill **power given in 7**; ramping higher in 7 | S | "Is the bill a loss?" Yes, in the 2023 districts, and it is in the table as such |
@@ -1221,18 +1227,19 @@ fingerprinted at every change: frozen as Omni v1 on 5 October 2026; grown to the
 gate on speed knobs as v3; redesigned as **v5** (12 and 13 October) with the max as its default brain on the 1,107-muscle
 catalog, every muscle its own card, the living body and the lease's walk back (v4 was the written plan of that redesign,
 `docs/OMNI_V4_PLAN.md`, never fingerprinted); and given the shared-host capacity repair of the Kubernetes controller as
-**v6**, the engine that stands (`docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md`, `OMNI_V5.md`, `OMNI_V6.md`). **v7 is a
-candidate** on its own branch, tried in the toy gate and in live trials before it may stand. Earlier engines, among them an
+**v6** (15 October); and given conveyance bounded by each namespace's quota, the verdict in the reports' words, every rule in
+seconds and the cloud's one flag as **v7**, the engine that stands since 16 October by the founder's order, tried in the toy
+gate and in live trials first (`docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md`, `OMNI_V5.md`, `OMNI_V6.md`, `OMNI_V7.md`). Earlier engines, among them an
 allocation law that gave back about a third of the machines at the cost of response time and a compass law without the
 verdict, produced the numbered sets kept in `docs/history/`; their results are history, labelled as the engine that produced
 them, and are never read beside a later engine's. A buyer does not choose between modes: there is one law, and every table
 names the version of it that produced the table. When the founder declares the engine final, the engine that stands then
 is published as Omni-Compass 1.0, with the older fingerprints kept as the road to it, never as a second product.
 
-"Versioned" has a precise meaning here. The engine is a fixed set of files (45 on v6), and `OMNI_V6.json` holds one
-SHA-256 for each of them and one digest over all of them; `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json` and
+"Versioned" has a precise meaning here. The engine is a fixed set of files (46 on v7), and `OMNI_V7.json` holds one
+SHA-256 for each of them and one digest over all of them; `OMNI_V6.json`, `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json` and
 `OMNI_V1.json` do the same for the earlier sets. `python3 tools/omni_version.py` hashes the files in a checkout and prints
-which fingerprint they match (for this edition, `omni-v6 (digest df6147466ef18046, 45 files)`), or, when they match none,
+which fingerprint they match (for this edition, `omni-v7 (digest d6d467b824c585f1, 46 files)`), or, when they match none,
 which files differ from the nearest; with `--commit <sha>` it asks the same of any pushed commit, which is how every
 three-run table checks that its runs A, B and C were on the same engine before it combines them, and refuses if they were
 not. The versions differ in exactly the ways their records name, and a reader can check that from the fingerprints rather
@@ -1899,7 +1906,7 @@ checked; a result in this manual is only ever cited from a commit whose run pass
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # omni-v6, omni-v5, omni-v3, omni-v2, omni-v1, or what differs
+python3 tools/omni_version.py                  # omni-v7, omni-v6, omni-v5, omni-v3, omni-v2, omni-v1, or what differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 
@@ -2131,12 +2138,20 @@ max (`dial max`) belongs where the machines are already paid for (your own racks
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
 In the cloud, as everywhere, the governor's fast checks (the scheduling floor, the pod reflex, conveyance on every third)
-run every 5 seconds, three times as fast as the HPA's own 15-second check, and its full decision every 60 seconds. A
-shorter decision period is not a free setting: the give-back trial's phase (`max_trial`, 20 decisions), the breach
-cool-down (`--slo-clear`), cruise (`--cruise-after`) and the trial spacing count in decisions, so at 5 seconds a trial
-would last 100 seconds, too short for the 200 response times it measures, and no machine would ever be given back
-(`docs/K8S_COMPASS_PREREGISTRATION.md`, "The decision period in the cloud"). The next version counts them in seconds; the law's damping follows from the
-decision period by its own formula (section 6), so nothing else changes with it.
+run every 5 seconds, three times as fast as the HPA's own 15-second check, and its full decision every 60 seconds. Through
+v6 a shorter decision period was not a free setting: the give-back trial's phase (`max_trial`, 20 decisions), the breach
+cool-down (`--slo-clear`), cruise (`--cruise-after`) and the trial spacing counted in decisions, so at 5 seconds a trial
+would have lasted 100 seconds, too short for the 200 response times it measures, and no machine would ever have been
+given back (`docs/K8S_COMPASS_PREREGISTRATION.md`, "The decision period in the cloud"). v7 states every one of them in
+seconds (`--slo-clear-s 180`, `--cruise-after-s 120`, `--strict-window-s 300`, `--verdict-every-s 600`,
+`--verdict-recheck-s 7200`, `--verdict-trial-s 1200`) and converts each to decisions at the running period,
+n = max(1, round(seconds / period)), so at 60 seconds every count is v6's; the compass's step on the HPA target and its
+coasting are scaled by period / 60, so the target moves the same amount a minute, and a pool gives back at most one
+machine a minute at any period (`docs/OMNI_V7.md`, section 4). The default period stays 60 seconds, because the governor
+core still advances its own state one fixed step per decision; a shorter default waits for that clock in seconds and a
+test that shows no LOSS. In the cloud v7 also makes the whole rule one flag, `--give-back-only`, enforced in the governor
+itself: every actuator but the node pool off, the replica ceiling 0, the dial at the tune-down (`docs/OMNI_V7.md`,
+section 5).
 
 **What the Azure runs taught us.** Three lessons, each recorded as an amendment to the preregistration before the fleet was
 dispatched again. First, a fleet is sized by the lever, not by the budget: a 4-worker fleet cannot show the few-percent
@@ -2505,7 +2520,7 @@ paired receipts, this section is a wiring instruction, not a claim of savings.
 2. It records before it acts (annotations on Kubernetes objects; the `snapshot` line in the GPU audit).
 3. It watches before it writes.
 4. It never acts blind.
-5. Service first: while response time is over its target, and for `--slo-clear` decisions after, nothing is given back.
+5. Service first: while response time is over its target, and for `--slo-clear-s` seconds after (180 by default), nothing is given back.
 6. Every change is read back; no new order goes on top of one that has not landed.
 7. The living band and the cover: no organ is driven outside its range; machines are parked, never switched off by
    Omni-Compass; it never evicts or moves a pod.
@@ -2803,7 +2818,7 @@ are the answers, and section 16.7 names the residue they do not remove.)
 **The engine is frozen, and every freeze has a fingerprint.** The engine is the compass law
 (`omnicompass/compass_law.py`), the live controllers (`omni_controller/`), the realms with their muscles and six
 organisms (`realms/`), and the runners of the independent simulators (`tools/run_kil.py`, `run_citylearn.py`,
-`run_pandapower.py`). `OMNI_V1.json`, `OMNI_V2.json`, `OMNI_V3.json`, `OMNI_V5.json` and `OMNI_V6.json` hold one SHA-256 per file and one
+`run_pandapower.py`). `OMNI_V1.json`, `OMNI_V2.json`, `OMNI_V3.json`, `OMNI_V5.json`, `OMNI_V6.json` and `OMNI_V7.json` hold one SHA-256 per file and one
 digest over all of them. Any change to a rule, a gain, a guard, a preset or a muscle makes **the next version**, and every result is
 run again on it; no result is ever read across versions. When the engine is declared final, the engine that stands then
 is published as Omni-Compass 1.0 and the older fingerprints go to `docs/history` as the road to it, never as a second
@@ -2815,11 +2830,11 @@ product.
 | **v2** (`docs/OMNI_V2.md`) | v1's law, controllers and runners byte for byte; the catalog grown to 945 muscles in 59 families with thirteen new presets | `OMNI_V2.json` | the modelled realms (Physics and the tower read a service tradeoff: the cause was found and made v3) |
 | **v3** (`docs/OMNI_V3.md`) | v2 plus the slack gate on speed knobs (a motion axis busy more than half the time at full speed keeps its speed native) and the marine preset | `b53d05449ee04c4b`, 40 files | the modelled realms A/B/C (every organism superior within guardrails, 0 LOSS or power given), the grid at 1 and 10 copies, the cluster inside the organisms at 10 and 100 copies, the database A/B/C, the robot arms A/B/C, CityLearn A/B/C; the Kubernetes six tests, the power grid, Azure and the 1,000-copy organisms running |
 | **v5** (`docs/OMNI_V5.md`) | the max as the default brain on the 1,107-muscle catalog in 70 families (six organisms: 540, 404, 480, 484, the four stacked 1,908, the tower 1,107); every muscle its own card; the living body; the lease's walk back; the dial's tune-down; every muscle from 1 up to one click under its own capacity, read live | `6093b2b88aa911b9`, 44 files (re-declared on each change while in development: `9be48445…`, `5648f290…`) | the muscles and the six organisms under three loads (`results/realms_v5/`), the grid (`results/grid_v5/`), the capacity test (`results/live/V5_CAPACITY.md`) |
-| **v6** (`docs/OMNI_V6.md`), **the engine that stands** | v5's law and catalog byte for byte; the shared-host capacity repair in the Kubernetes controller (the host counted once, no extra replica room while it is busy or unmeasured, an enlarged ceiling rechecked); since 16 October its catalog is run as seven organisms, the spine the seventh (`docs/THE_SPINE.md`), with no engine file changed | `df6147466ef18046`, 45 files | Goldilocks, CruiseKube, KEDA's HTTP add-on, KEDA on the CPU target and the requests (`results/live/V6_*.md`); every other benchmark queued (`scripts/reruns.txt`) |
-| **v7**, a candidate (its page docs/OMNI_V7.md on the branch `v7-candidate`) | quota-aware conveyance; the verdict in the reports' words; every rule in seconds; the cloud's rule as one flag; the busy guard on a shared host; corrected on 16 October after its first trials (an unreadable quota is no budget known) | on its branch | the toy gate (its results/toy_gate folder there) and its live trials; nothing on main |
+| **v6** (`docs/OMNI_V6.md`), the engine of 15 October | v5's law and catalog byte for byte; the shared-host capacity repair in the Kubernetes controller (the host counted once, no extra replica room while it is busy or unmeasured, an enlarged ceiling rechecked); since 16 October its catalog is run as seven organisms, the spine the seventh (`docs/THE_SPINE.md`), with no engine file changed | `df6147466ef18046`, 45 files | Goldilocks, CruiseKube, KEDA's HTTP add-on, KEDA on the CPU target and the requests (`results/live/V6_*.md`); every other benchmark queued (`scripts/reruns.txt`) |
+| **v7** (`docs/OMNI_V7.md`), **the engine that stands** (16 October, the founder's order) | quota-aware conveyance; the verdict in the reports' words; every rule in seconds; the cloud's rule as one flag; the busy guard on a shared host; corrected on 16 October after its first trials (an unreadable quota is no budget known) | `d6d467b824c585f1`, 46 files | the toy gate (`results/toy_gate/`); its live trials, A, B and C of Goldilocks, KEDA's add-ons, fixed capacity and CruiseKube running (the first runs GAIN, nothing behind the tables of 15 October); every benchmark queued (`scripts/reruns.txt`) |
 
 ```
-python3 tools/omni_version.py                   # this checkout: omni-v6, omni-v5, omni-v3, omni-v2, omni-v1, or every file that differs
+python3 tools/omni_version.py                   # this checkout: omni-v7, omni-v6, omni-v5, omni-v3, omni-v2, omni-v1, or every file that differs
 python3 tools/omni_version.py --commit <sha>    # the engine at the commit any result ran on
 ```
 
@@ -3481,8 +3496,8 @@ controller, a firmware, a PLC), and the soak (`results/SOAK.json`, one hundred m
 it. The seal makes the twins' agreement a property of the repository rather than a claim: change a sealed byte and
 `verify.py` fails, naming the file.
 
-**The three fingerprints.** The seal fingerprints the twinned laws; `OMNI_V1.json` to `OMNI_V6.json`
-fingerprint the engine as a whole (law, controllers, muscles, runners: 38 to 45 files); `RELEASE_MANIFEST.json`
+**The three fingerprints.** The seal fingerprints the twinned laws; `OMNI_V1.json` to `OMNI_V7.json`
+fingerprint the engine as a whole (law, controllers, muscles, runners: 38 to 46 files); `RELEASE_MANIFEST.json`
 fingerprints the release (the commit, the engine, the twins, the GPU protocol, the live evidence and the verification
 receipt) and is rewritten by `tools/release_manifest.py` before every push, under the Python GitHub runs. A reader holding
 any one of the three can tell whether the files in front of them are the files the results were made on.
@@ -3611,9 +3626,9 @@ any one of the three can tell whether the files in front of them are the files t
 | `results/live/V1_*.md`, `V3_*.md` (+ `.json`) | the three-run tables, one per test, named by the engine they ran on |
 | `results/live/raw/run-<id>/` | every archived run's files, one SHA-256 manifest per repetition |
 | `results/grid_v5/GRID.md`, `results/realms_v5/REALMS_V5.md`, `results/OMNI_INDEX.md` | the grid of copies and runs, the modelled muscles and organisms, the one combined number (the older engines' tables stay under their own names) |
-| `OMNI_V6.json` (the engine that stands), `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json`, `OMNI_V1.json` | the engines' fingerprints |
+| `OMNI_V7.json` (the engine that stands), `OMNI_V6.json`, `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json`, `OMNI_V1.json` | the engines' fingerprints |
 | `docs/` | this manual, the preregistrations, the evidence ledger, the theorem, the realm study |
-| `docs/OMNI_V6.md`, `OMNI_V5.md`, `OMNI_V3.md`, `OMNI_V2.md`, `OMNI_V1.md` | what each engine is and every result read on it |
+| `docs/OMNI_V7.md`, `OMNI_V6.md`, `OMNI_V5.md`, `OMNI_V3.md`, `OMNI_V2.md`, `OMNI_V1.md` | what each engine is and every result read on it |
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and every benchmark still to run; the program to full size |
 | `.github/workflows/` | every benchmark as GitHub runs it: `benchmark-reps`, `six`, `six-kube`, `big-organism`, `big-organism-detached`, `aks-metered`, `pgbench`, `kafka`, `redis`, `ycsb`, `sysbench`, `robustness`, `swarm`, `citylearn`, `pandapower`, `mujoco`, `archive-run`, `verify` |
 | `tests/`, `verify.py` | every unit and property test, the shield's adversarial cases, the Python-against-C++ agreement; `verify.py` runs them all and must end with its pass line |

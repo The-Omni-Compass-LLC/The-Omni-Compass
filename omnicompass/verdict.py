@@ -28,8 +28,25 @@ verdict is how the brain finds that out, on the muscle itself, before it acts an
 
 The verdict never makes the knob more aggressive than the law: it only narrows where the law may go. Every probe and
 every judgement is returned to the caller for the audit.
+
+  in words  (Omni v7, judge="interval": the reports' own words, GAIN, EVEN and LOSS, as the code that steers the knob,
+            docs/omni_v5/NEXT_VERSION_PLAN.md section 1) the trial step is read exactly as a report reads a row: the 95%
+            interval of its change in cost, on the logarithm of each piece of work's cost (so a heavy tail does not
+            decide it), d = mean ln c_trial − mean ln c_ref ± 1.96 se. The interval wholly above zero is a LOSS: the step
+            is refused and undone, whatever the allowance says. Wholly below zero is a GAIN, and across zero is EVEN.
+            While the interval is wider than the allowance (its half-width over τ = ln(1 + tolerance)) the trial measures
+            on, up to three times min_samples. A GAIN or an EVEN step is allowed only if both estimates of its change
+            are within the allowance: the median (the guard of the engines before v7, kept) and the mean of the log
+            costs, d ≤ τ. A stepwise step is read, the same way, against the costs first measured at native. On noisy
+            work this refuses a step that truly costs 3% more against a 2% allowance about a quarter less often than the
+            medians alone allowed it, and one that costs 5% more about half as often, while a free step is kept almost
+            as often (tests/test_verdict_interval.py). judge="median" keeps the engines before v7 (the medians alone).
 """
 from __future__ import annotations
+
+import math
+
+Z95 = 1.96                       # the two-sided 95% interval every report reads (tools/readings.py)
 
 
 def median(xs):
@@ -38,10 +55,33 @@ def median(xs):
     return None if n == 0 else (s[n // 2] if n % 2 else 0.5 * (s[n // 2 - 1] + s[n // 2]))
 
 
+def log_stats(xs):
+    """(mean, variance, n) of the logarithms of the positive costs; the variance is infinite with fewer than two."""
+    ls = [math.log(x) for x in xs if x is not None and x > 0]
+    n = len(ls)
+    if n == 0:
+        return None
+    m = sum(ls) / n
+    var = sum((x - m) ** 2 for x in ls) / (n - 1) if n > 1 else math.inf
+    return m, var, n
+
+
+def change_interval(ref, got, z=Z95):
+    """The 95% interval of the change in log cost from ref to got (Welch's standard error), or None if either is empty."""
+    a, b = log_stats(ref), log_stats(got)
+    if a is None or b is None:
+        return None
+    d = b[0] - a[0]
+    se = math.sqrt(a[1] / a[2] + b[1] / b[2]) if math.isfinite(a[1]) and math.isfinite(b[1]) else math.inf
+    return d - z * se, d + z * se
+
+
 class Verdict:
     def __init__(self, tolerance=0.005, min_samples=30, probe_every=120, recheck=1800, max_steps=60, max_trial=30,
-                 incremental=False):
+                 incremental=False, judge="interval"):
         self.tol = tolerance
+        self.judge = judge
+        self.native_ref = None            # the costs measured at native (incremental, judge="interval")
         self.min_n = min_samples
         self.probe_every = probe_every
         self.recheck = recheck
@@ -88,8 +128,23 @@ class Verdict:
             m0, mk = median(self.ref), median(self.got)
             if self.incremental and self.allowed == 0:
                 self.native_cost = m0
+                self.native_ref = list(self.ref)
             bound = m0 if self.native_cost is None else min(m0, self.native_cost)
-            if mk <= bound * (1.0 + self.tol):
+            within = mk <= bound * (1.0 + self.tol)
+            if self.judge == "interval":
+                reading, ivs, wide, d_max = self._reading()
+                if reading != "LOSS" and wide and len(self.got) < 3 * self.min_n:
+                    return self._stand()                         # the evidence is wider than the allowance: it measures on
+                if reading != "LOSS" and within and d_max <= math.log(1.0 + self.tol):
+                    self.allowed = self.trial
+                    event = {"verdict": "step allowed", "step": self.trial, "cost_native": m0, "cost_step": mk,
+                             "reading": reading, "interval_ln": ivs}
+                else:
+                    self.refused_until[self.trial] = self.t + self.recheck
+                    event = {"verdict": "step refused: the muscle is slower there", "step": self.trial,
+                             "cost_native": m0, "cost_step": mk,
+                             "reading": "LOSS" if reading == "LOSS" else "past the allowance", "interval_ln": ivs}
+            elif within:
                 self.allowed = self.trial
                 event = {"verdict": "step allowed", "step": self.trial, "cost_native": m0, "cost_step": mk}
             else:
@@ -107,3 +162,29 @@ class Verdict:
         if self.phase == "trial":
             return self.trial, True, event
         return self.allowed, False, event
+
+    def _stand(self):
+        """The knob stays at the trial step for another decision (the trial measures on)."""
+        return self.trial, True, None
+
+    def _reading(self):
+        """The trial's reading in the reports' words (tools/readings.py: a 95% interval wholly on one side of zero is a
+        GAIN or a LOSS, across zero is EVEN), against the reference and, stepwise, against native: LOSS if any interval
+        is wholly above zero, GAIN if every interval is wholly below it, else EVEN. Returns the reading, the intervals
+        (for the audit), whether any interval is wider than the allowance (half-width over τ) and the largest estimate d."""
+        tau = math.log(1.0 + self.tol)
+        ivs = [change_interval(self.ref, self.got)]
+        if self.incremental and self.native_ref:
+            ivs.append(change_interval(self.native_ref, self.got))
+        ivs = [iv for iv in ivs if iv is not None]
+        if not ivs:
+            return "EVEN", [], True, math.inf
+        if any(lo > 0.0 for lo, _ in ivs):
+            reading = "LOSS"
+        elif all(hi < 0.0 for _, hi in ivs):
+            reading = "GAIN"
+        else:
+            reading = "EVEN"
+        wide = any((hi - lo) / 2.0 > tau for lo, hi in ivs)
+        d_max = max((lo + hi) / 2.0 for lo, hi in ivs)
+        return reading, [[round(lo, 5), round(hi, 5)] for lo, hi in ivs], wide, d_max

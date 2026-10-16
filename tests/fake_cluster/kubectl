@@ -98,9 +98,15 @@ elif a[:2] == ["annotate", "job"]:
     save()
 elif a[:2] == ["get", "resourcequota"]:
     ns = a[a.index("-n") + 1]
-    q = next((q for q in st.get("quotas", []) if q["name"] == a[2] and q["namespace"] == ns), None)
-    if q is None: sys.exit("NotFound")
-    print(json.dumps({"metadata": {"name": q["name"], "namespace": ns, "annotations": q.get("annotations", {})}, "spec": {"hard": q["hard"]}}))
+    def quota_object(q):
+        return {"metadata": {"name": q["name"], "namespace": ns, "annotations": q.get("annotations", {})},
+                "spec": {"hard": q["hard"], **q.get("scope", {})}, "status": q.get("status", {})}
+    if len(a) < 3 or a[2].startswith("-"):
+        print(json.dumps({"items": [quota_object(q) for q in st.get("quotas", []) if q["namespace"] == ns]}))
+    else:
+        q = next((q for q in st.get("quotas", []) if q["name"] == a[2] and q["namespace"] == ns), None)
+        if q is None: sys.exit("NotFound")
+        print(json.dumps(quota_object(q)))
 elif a[:2] == ["annotate", "resourcequota"]:
     log(); ns = a[a.index("-n") + 1]; q = next(q for q in st["quotas"] if q["name"] == a[2] and q["namespace"] == ns)
     k, v = a[-1].split("=", 1); q.setdefault("annotations", {})[k] = v; save()

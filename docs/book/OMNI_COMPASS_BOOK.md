@@ -1145,7 +1145,7 @@ checked; install only a commit whose run passed.
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # the engine version (for example omni-v6), or every file that differs
+python3 tools/omni_version.py                  # the engine version (for example omni-v7), or every file that differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 
@@ -1365,7 +1365,7 @@ anything, so that a refusal costs cents and not a cluster. The account setup, cl
 **In the cloud, the bill is the gauge, and it is never raised.** In a public cloud every machine that exists is billed,
 whether it carries work or not, so the aim on a managed cluster is native's work for a smaller bill, never a bigger one.
 The cloud therefore runs at the tune-down (`dial save`, the `dial` input of `aks-metered` and its default) with the governor
-on the machines alone (`OMNI_MACHINES_ONLY=1`): it moves no pod autoscaler, conveys no processor and caps no power, so the
+on the machines alone (`OMNI_MACHINES_ONLY=1`, which starts the governor with its one cloud flag, `--give-back-only`): it moves no pod autoscaler, conveys no processor and caps no power, so the
 pods are exactly native's and the cloud's own autoscaler alone makes machines; the governor parks a machine the cloud
 already made only after its own trial shows the response time holds, and wakes it on a breach. It can hold no
 more pods and no more machines than native: the bill can only fall or stay, and it falls in the quiet stretches between
@@ -1612,7 +1612,7 @@ paired receipts, this section is a wiring instruction, not a claim of savings.
 2. It records before it acts (annotations on Kubernetes objects; the `snapshot` line in the GPU audit).
 3. It watches before it writes.
 4. It never acts blind.
-5. Service first: while response time is over its target, and for `--slo-clear` decisions after, nothing is given back.
+5. Service first: while response time is over its target, and for `--slo-clear-s` seconds after (180 by default), nothing is given back.
 6. Every change is read back; no new order goes on top of one that has not landed.
 7. The living band and the cover: no organ is driven outside its range; machines are parked, never switched off by
    Omni-Compass; it never evicts or moves a pod.
@@ -7033,7 +7033,7 @@ project, run `gcloud config set project YOUR-PROJECT-ID` first.)
 2. **New repository secret**. Name: `GCP_CREDENTIALS`. Secret: paste the whole block from step 4. **Add secret**.
 3. **New repository secret**. Name: `GCP_PROJECT`. Secret: the Project ID from step 2. **Add secret**.
 
-That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v5` is kept in step with it), and no result goes up
+That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v7` is kept in step with it), and no result goes up
 before it has been read.
 
 ### 6. What it costs
@@ -7099,7 +7099,7 @@ before the card.
 2. **New repository secret**. Name: `AWS_ACCESS_KEY_ID`. Secret: the Access key. **Add secret**.
 3. **New repository secret**. Name: `AWS_SECRET_ACCESS_KEY`. Secret: the Secret access key. **Add secret**.
 
-That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v5` is kept in step with it), and no result goes up
+That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v7` is kept in step with it), and no result goes up
 before it has been read.
 
 ### 4. What it costs
@@ -7262,12 +7262,13 @@ These turn on muscles of levels 2 to 7 (section 6.3) on machines already paid fo
 | `--rapl-cmd`, `--cpufreq-cmd`, `--cpufreq-policy-root`, `--cpufreq-require-schedutil`, `--cpu-max-khz` | the processor's own frequency governor under its power meter (section 7.9) |
 | `--gpu-query-cmd`, `--gpu-power-cmd`, `--gpu-max-w`, `--gpu-temp-limit` | a graphics card's power reading and limit through commands (chapter 21 uses the card governor instead) |
 | `--thermal-model` | the heat muscle's state from the harness's heat model (for modelled runs only) |
+| `--give-back-only` | the cloud mode in one flag: every switch above is turned off whatever else is passed, the replica ceiling is 0, the dial is at the tune-down and the node pool is the only knob |
 
 ### K.4 The factory tune
 
-`--allow`, `--verdict-samples`, `--verdict-every`, `--verdict-recheck`, `--compass-tau`, `--compass-center`,
-`--cruise-after`, `--idle-demand`, `--coast-step`, `--min-target-change`, `--headroom`, `--reflex-window-s`,
-`--strict-window`, `--latency-window-s`, `--slo-clear`, `--convey-on`, `--convey-off`, `--cap-min`, `--cap-min-change-m`,
+`--allow`, `--verdict-samples`, `--verdict-every-s`, `--verdict-recheck-s`, `--verdict-trial-s`, `--compass-tau`,
+`--compass-center`, `--cruise-after-s`, `--idle-demand`, `--coast-step`, `--min-target-change`, `--headroom`,
+`--reflex-window-s`, `--strict-window-s`, `--latency-window-s`, `--slo-clear-s`, `--convey-on`, `--convey-off`, `--cap-min`, `--cap-min-change-m`,
 `--cap-headroom`, `--batch-load-max`, `--batch-power-max`, `--pace-high`, `--pace-low`, `--pace-heat`,
 `--rightsize-headroom`, `--rightsize-min-m`, `--coldstart-idle`.
 
@@ -7276,6 +7277,11 @@ bear on planning and are stated here for that reason only. `--headroom` (half ag
 governor keeps above the processor requests of the pods when it counts the machines they need: it never parks a machine
 that would leave the pods' requests, plus that spare, without a place (section 24.2). `--allow` (2%) is the most a
 machine given back on trial may add to the service's response time before the trial takes it back (section 19.1).
+
+Every setting that names a time is stated in seconds (the `-s` settings) and keeps its time at any decision period
+(`--interval`). The older count forms, `--verdict-every`, `--verdict-recheck`, `--cruise-after`, `--strict-window` and
+`--slo-clear`, are still read, as a number of decisions, and win where they are given. Whatever the period, the node
+pool gives back at most one machine a minute.
 
 
 ## Appendix L. The Audit, Record by Record
@@ -7290,7 +7296,7 @@ owner's analysis and not needed to operate the governor.
 
 | Record (its key) | When | Fields an implementer reads |
 |---|---|---|
-| `verdict` | when a give-back trial begins, ends or is abandoned | `verdict`: `trial`, `step allowed`, `step refused: the muscle is slower there`, `trial abandoned (service not calm)` or `trial abandoned (too little work)`; `step` (machines given back on trial); `machines_given_back_allowed` (how many may stay given back); `machines_native` (the machines the cluster held when the governor started) |
+| `verdict` | when a give-back trial begins, ends or is abandoned | `verdict`: `trial`, `step allowed`, `step refused: the muscle is slower there`, `trial abandoned (service not calm)` or `trial abandoned (too little work)`; `step` (machines given back on trial); `machines_given_back_allowed` (how many may stay given back); `machines_native` (the machines the cluster held when the governor started); on `step allowed` and `step refused`, `reading` (`GAIN`, `EVEN`, `LOSS` or `past the allowance`, the trial's reading against the reference) and `interval_ln` (the 95% intervals behind it, in log units) |
 | `cruise` | when work has waited for a place for several decisions, and when it stops | `cruise`: `on` or `off`; `pending` (pods waiting); while cruise is on, every machine is in service and the governor stands back |
 | `authority` | every decision | `senses.blind` (each sense, `true` when it is blind), `senses.latency_age_s` (seconds since the feed's newest row), `proprioception` (for the machines, the drift between the count last commanded and the count now in service, as a share of the command: 0 means the command landed), `node_gate.ok` and `node_gate.reason` (whether the release gate would let a machine go, and why not) |
 | `decision` | every decision | `nodes_observed` (machines in service), `nodes_recommended` (machines the governor wants in service), `pending` (pods waiting for a place), `latency_p95_ms` (the feed's 95th percentile over its window), `slo_clean` (the line met over the last decisions), `mode`; outside the cloud mode, `hpa_target_recommended` |
@@ -7396,7 +7402,7 @@ run's summary and as an artifact. The inputs below are the workflows' own; a run
 | `organism`, `load_max`, `organism_scale` | empty, 6, 1 | one of the repository's seven organisms (the spine among them) with this cluster inside it, its peak load, and its copies on one clock (1, 10 or 100); empty runs the service alone |
 | `dial` | `save` | the dial of Omni-Compass on top: `save`, the tune-down, for every bill result; `max` is never read as a bill result (section 19.2) |
 
-Every cloud workflow runs the governor in the cloud mode (`OMNI_MACHINES_ONLY=1`, chapter 19).
+Every cloud workflow runs the governor in the cloud mode (`OMNI_MACHINES_ONLY=1`, which passes `--give-back-only`, chapter 19).
 
 ### N.2 The inputs of each cloud
 

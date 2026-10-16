@@ -4,7 +4,7 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The engines, fingerprinted file by file: Omni v6 candidate (OMNI_V6.json), Omni v5 (OMNI_V5.json,
+"""The engines, fingerprinted file by file: Omni v7 quota candidate (OMNI_V7.json), Omni v6 (OMNI_V6.json), Omni v5 (OMNI_V5.json,
 docs/OMNI_V5.md), then the frozen v3 (OMNI_V3.json, docs/OMNI_V3.md), v2 (OMNI_V2.json, docs/OMNI_V2.md) and v1
 (OMNI_V1.json, docs/OMNI_V1.md), each kept for its own results. v5 adds the v5 compass law (realms/compass_arm_v5.py) and its arm in the harness to v3's engine; while
 v5 is in active development its fingerprint is re-declared on each engine change, and no v5 result is published until the
@@ -27,7 +27,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
+VERSIONS = {"v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
             "v1": ROOT / "OMNI_V1.json"}     # newest first
 SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py", "tools/run_pandapower.py")
 
