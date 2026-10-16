@@ -18,16 +18,16 @@ or filing states the equations differently, this page and the file it fingerprin
 State: E (deviation), U (coherence), I[U] (unmet-need integral), S (structural stress), B and Ḃ (the bath).
 
 ```
-v_eff  = cos(omega_B t / 2) · c · tanh(lambda_0 + lambda_1 (U − 0.5) + lambda_2 S)        (spinor closure, 720°)
-dE/dt  = −alpha_E E + beta_int + beta_ext + v_eff
-dU/dt  = mu U (1 − U²) − (dE/dt) / E_max − lambda_U U + u                                 (symmetric double well)
-dI_U/dt = (1 − U) − sigma_1 E − delta S − lambda_I I_U
-dS/dt  = delta − alpha_s S − (3/4) beta_s S²                                               (gradient of Phi)
-dB/dt  = B_dot
-dB_dot/dt = gamma_c delta S − (omega_B / Q_B) B_dot − omega_B² B
-Phi(S) = alpha_s S² / 2 + beta_s S³ / 4 − delta S
+v[eff]   = cos(ω[B] t / 2) · c · tanh(λ₀ + λ₁ (U − 0.5) + λ₂ S)        (spinor closure, 720°)
+dE/dt    = −α[E] E + β[int] + β[ext] + v[eff]
+dU/dt    = μ U (1 − U²) − (dE/dt) / E[max] − λ[U] U + u                  (symmetric double well)
+dI[U]/dt = (1 − U) − σ₁ E − δ S − λ[I] I[U]
+dS/dt    = δ − αₛ S − (3/4) βₛ S²                                        (gradient of Φ)
+dB/dt    = Ḃ
+dḂ/dt    = γ[c] δ S − (ω[B] / Q[B]) Ḃ − ω[B]² B
+Φ(S)     = αₛ S² / 2 + βₛ S³ / 4 − δ S
 ```
-u is the controller's command, `KP (target − U) − drift`, bounded by `U_AUTHORITY`; integration is RK4 with the
+u is the controller's command, `K[P] (target − U) − drift`, bounded by `U_AUTHORITY`; integration is RK4 with the
 macro and micro steps of `omnicompass/core.py`.
 
 ### Mechanism identity
@@ -60,15 +60,15 @@ Implemented in `omnicompass/configurations.py`, checked against the printed plat
 **not benchmarked**: no result in this repository comes from it.
 
 ```
-v_eff  = c · tanh(lambda_0 + lambda_1 (U − U_t) + lambda_2 S)                             (no spinor factor)
-dE/dt  = −alpha E + beta_int + beta_ext + v_eff
-dU/dt  = alpha (1 − U) − (dE/dt) / E_max − k U (1 − U) + u                                 (logistic)
-dI_U/dt = (1 − U) − sigma_1 E − delta S                                                    (no lambda_I term)
-dS/dt, dB/dt, dB_dot/dt as in section 1
+v[eff]   = c · tanh(λ₀ + λ₁ (U − Uₜ) + λ₂ S)                             (no spinor factor)
+dE/dt    = −α E + β[int] + β[ext] + v[eff]
+dU/dt    = α (1 − U) − (dE/dt) / E[max] − k U (1 − U) + u                (logistic)
+dI[U]/dt = (1 − U) − σ₁ E − δ S                                          (no λ[I] term)
+dS/dt, dB/dt, dḂ/dt as in section 1
 ```
 
 Differences from the canonical engine: logistic U instead of the symmetric double well; no spinor factor; a general
-target Uₜ; no lambda_I damping; alpha in place of alpha_E. alpha_U and k enter the printed form; they do not enter the
+target Uₜ; no λ[I] damping; α in place of α[E]. α[U] and k enter the printed form; they do not enter the
 canonical engine.
 
 ## 3. What would change this declaration

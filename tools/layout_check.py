@@ -47,6 +47,20 @@ LINK = re.compile(r"\]\(([^)\s#]+)(?:#[^)]*)?\)")
 TICK = re.compile(r"`([A-Za-z0-9_.\-/]+)`")
 
 
+def prose_only(text: str) -> str:
+    """The page without its code: fenced blocks, indented code blocks and `inline code` carry no links, so an equation
+    written with a bracket subscript, f[U](x), is not read as one."""
+    out, fence = [], False
+    for ln in text.split("\n"):
+        if ln.lstrip().startswith("```"):
+            fence = not fence
+            continue
+        if fence or (ln.startswith("    ") and not re.match(r"^\s*(-|\*|\d+\.) ", ln)):
+            continue
+        out.append(re.sub(r"`[^`]*`", "`", ln))
+    return "\n".join(out)
+
+
 def tracked():
     out = subprocess.run(["git", "-c", "safe.directory=*", "ls-files"], cwd=ROOT, capture_output=True, text=True).stdout
     return [p for p in out.splitlines() if p]
@@ -66,7 +80,7 @@ def main():
             continue
         text = (ROOT / p).read_text(errors="ignore")
         base = Path(p).parent
-        for m in LINK.finditer(text):
+        for m in LINK.finditer(prose_only(text)):
             t = m.group(1)
             if "://" in t or t.startswith(("mailto:", "/")):
                 continue
