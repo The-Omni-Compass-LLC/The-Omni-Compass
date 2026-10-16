@@ -17,6 +17,8 @@
 - **The realms table on omni-v7** (`results/realms_v5/REALMS_V5.md`, run 2026-10-16, commit `1637d32cd26c`, seeds 3000-3009): every
   muscle alone and the seven organisms under three loads reproduce the readings of the engine before it to the digit (the law and the
   muscles are unchanged; `MUSCLES_V5.csv` byte for byte the same), and the table now names omni-v7.
+- **The branch `v7`** carries the engine that stands, in step with `main` (the founder's words: "push everything to version 7");
+  `v5` and `v7-candidate` are kept level with them; the Google and Amazon appendices name `v7`.
 - **Every page names v7**: the README, CLAUDE.md, the state of play, both manuals (the evidence table, the engine chapter, the file
   map), `docs/OMNI_V7.md` (no longer a candidate), `docs/OMNI_V6.md` (one day's engine), codemeta 0.7.0.
 
