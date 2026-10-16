@@ -102,6 +102,23 @@ No row reads LOSS on the three-run rule.
 Single runs clear of the noise that the other two did not repeat, each EVEN on the rule: CruiseKube's 99th percentile +3.1% (run A)
 and node-hours +1.0% (run B); Goldilocks replicas +3.4% (run C); capacity's completed work +3.8% at 1 core (run A).
 
+## The room search (16 October): the muscles that read the same as native
+
+The founder's standing question is whether every muscle runs at its own edge. On the realms table of the engine that stands
+(`results/realms_v5/MUSCLES_V5.csv`, the preregistered seeds 3000-3009), 159 of the 1,107 muscles read SAME AS NATIVE on every
+load. Measured muscle by muscle on development seeds (7100 and 7101) in our own models (class S, never a benchmark result):
+
+| Muscles | Plant and knob | What the max does | Native's own misses | Room under the max's gauges |
+|---|---|---|---|---|
+| 111 | a process loop's setpoint (the process, irrigation, turbine, batch-reactor, pipeline, mill, district-heat and inverter presets) | writes nothing: the loop's actuator is native's full range, and the loop's work is the disturbance it handles, fixed by the load | median 0.00% of decisions, at most 0.56%; 6 of the 111 miss at all | none on work or speed; on misses, the 0.56% of six loops, which a setpoint eased toward the band's middle could touch: a card candidate for a later version, worth under one part in a hundred |
+| 36 | a cooled zone's setpoint (the data-hall, building and hospital presets) | cools ahead of the heat (28 of the 36 wrote), and under native the room never nears its line either | 0.00% on all 36 | none: nothing above native to give |
+| 12 | a battery's power knob (the UPS, microgrid and facility presets) | holds the charge for the line and gives native's full power once the line could need it | 2.1% to 24.3% of decisions | every miss falls while the charge sits at the operator's reserve (0.6 for a UPS, 0.2 for a microgrid), above the outage floor; the power knob may not spend the reserve, and the max keeps that boundary. The charge between the reserve and the floor belongs to the setpoint knob, where the engine's cards already read GAIN (8 of 8) |
+
+The reading: the max already takes every muscle to the edge its own knob has. Where a muscle reads the same as native, the
+measurement says there is nothing above native for that knob to give, and the max leaves it native by design (do no harm).
+The one measurable room, six process loops' 0.56% of decisions, is noted for a later version's card search; it is not an
+engine change, and no engine file moved for this measurement.
+
 ## Validation
 
 Six shared-host regressions pass (`tests/test_convey_shared_host.py`: each node keeps its own arithmetic under the top, a busy or unread host holds every raise, a busy host still lowers, a start holds nothing, separate machines are never held, an unreadable quota holds nothing). Nine quota regressions pass (`tests/test_quota_convey.py`, among them: an unreadable quota is no budget known); the original source fails both the full-quota regression and the admission-rejection regression. Existing conveyance integration checks pass unchanged. The verdict's rule tests (`tests/test_verdict_interval.py`, `tests/test_verdict.py`: v6's medians kept under `judge="median"`, a noiseless 1.5% rise refused against a 1% allowance under v7), the time-correct tests (`tests/test_time_correct.py`, `tests/test_cloud_cadence.py`) and the cloud tests (`tests/test_cloud_machines_only.py`) pass, as do every verdict user's tests (Redis, Kafka, pgbench, sysbench, YCSB, CPU power, GPU). Live GitHub trials on the v7 commit (KEDA's add-ons, Goldilocks, CruiseKube, capacity) repeats the original cap 1500m / repetition 4 / 1200-second-per-arm case at the original request rates. Its completion and measured result must be read from its artifact, with any LOSS retained. The trial cannot launch Azure, Google, Amazon or GPUs.

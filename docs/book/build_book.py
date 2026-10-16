@@ -22,6 +22,7 @@ height, headings scaled up from it; only the running heads and footers are small
 from __future__ import annotations
 
 import json
+import csv
 import re
 import sys
 from pathlib import Path
@@ -36,7 +37,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont as RLFont
 from reportlab.platypus import (BaseDocTemplate, CondPageBreak, Flowable, Frame, PageBreak, PageTemplate, Paragraph,
                                 Preformatted, Spacer, Table, TableStyle)
-from reportlab.platypus.tableofcontents import TableOfContents
+from reportlab.platypus.tableofcontents import SimpleIndex, TableOfContents
 
 ROOT = Path(__file__).resolve().parents[2]
 BOOK = ROOT / "docs" / "book"
@@ -111,6 +112,8 @@ CENTER = ParagraphStyle("center", parent=BODY, alignment=TA_CENTER)
 TOC1 = ParagraphStyle("toc1", fontName="Serif-Bold", fontSize=12, leading=18, leftIndent=0, spaceBefore=7, textColor=NAVY)
 TOC2 = ParagraphStyle("toc2", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=18, firstLineIndent=0)
 TOC3 = ParagraphStyle("toc3", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=36, textColor=GREY)
+# the index at the back of the book (a monograph's): every entry at the body size, page numbers on the right
+INDEX = SimpleIndex(style=ParagraphStyle("ix", fontName="Serif", fontSize=PT, leading=LEAD), dot=" . ", headers=True)
 CODE_WIDTH = 70                     # characters of 11 pt mono that fit the frame inside a code block's padding
 
 # ---------------------------------------------------------------- text cleaning
@@ -245,6 +248,60 @@ def inline(t: str) -> str:
     return re.sub(r"\x00(\d+)\x00", lambda m: f'<font name="Mono" size="{PT}">' + glyphs(codes[int(m.group(1))], MONO_CMAP) + "</font>", t)
 
 
+# ---------------------------------------------------------------- the index
+# What is indexed: every glossary term where it is defined or discussed (in bold, or in a heading), every muscle family
+# where it is named the same way, every repository file named in a code span, and every setting (--flag). A plain mention
+# of a common word is not an entry: the index points to where a thing is explained, as a monograph's does.
+_INDEX_TERM_RES = None
+PATH_RE = re.compile(r"`((?:tools|scripts|docs|deploy|omnicompass|omni_controller|realms|tests|results|pilot|benchmarks|cpp|"
+                     r"k8s_fleet|k8s_controlplane|fleet|hardware|tuning|\.github/workflows)/[\w./*-]+?)`")
+FLAG_RE = re.compile(r"`(--[a-z][\w-]*)")
+BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
+
+
+def index_term_res():
+    """(term, its whole-word regex) for every glossary term and every muscle family, compiled once."""
+    global _INDEX_TERM_RES
+    if _INDEX_TERM_RES is None:
+        terms = []
+        for ln in MAN.get("Glossary", []):
+            if ln.startswith("|") and not ln.startswith("| Term") and not re.match(r"^\|\s*-", ln):
+                cell = re.sub(r"[`*]", "", ln.strip().strip("|").split("|")[0]).strip()
+                if len(cell) >= 3:
+                    terms.append(cell)
+        with (ROOT / "realms" / "catalog_v5.csv").open() as f:
+            terms += sorted({r["family"] for r in csv.DictReader(f)})
+        seen, out = set(), []
+        for t in terms:
+            if t.lower() in seen:
+                continue
+            seen.add(t.lower())
+            out.append((t, re.compile(r"(?<![\w-])" + re.escape(t) + r"(?![\w-])", re.I)))
+        _INDEX_TERM_RES = out
+    return _INDEX_TERM_RES
+
+
+def index_tags(text, kind="body"):
+    """The <index/> tags a paragraph carries, by what it names: files and settings always; glossary terms and families
+    where the paragraph defines or discusses them (bold) or is a heading about them."""
+    items = set()
+    for m in PATH_RE.finditer(text):
+        p = m.group(1).rstrip(".,;:")
+        if "/" in p and not p.endswith("/"):
+            items.add(p)
+    for m in FLAG_RE.finditer(text):
+        items.add(m.group(1))
+    if kind in ("body", "heading", "note", "list"):
+        hay = text if kind == "heading" else " ".join(BOLD_RE.findall(text))
+        if hay:
+            for term, rx in index_term_res():
+                if rx.search(hay):
+                    items.add(term)
+    if not items:
+        return ""
+    return "".join('<index item="%s"/>' % i.replace(",", ";").replace("&", "&amp;").replace('"', "&quot;") for i in sorted(items))
+
+
 # ---------------------------------------------------------------- flowables
 class Marker(Flowable):
     """Zero-size flowable that tells the document something when it is drawn (a chapter starts, the body starts)."""
@@ -293,7 +350,7 @@ def table(rows_txt, small=False):
         extra = sum(floor - widths[k] for k in short)
         big = sum(w for k, w in enumerate(widths) if k not in short)
         widths = [floor if k in short else w - extra * w / big for k, w in enumerate(widths)]
-    data = [[Paragraph(inline(c), hs if k == 0 else cs) for c in r] for k, r in enumerate(rows_txt)]
+    data = [[Paragraph(index_tags(c, "cell") + inline(c), hs if k == 0 else cs) for c in r] for k, r in enumerate(rows_txt)]
     t = Table(data, colWidths=widths, repeatRows=1, hAlign="LEFT", splitInRow=1)   # a row taller than a page breaks across it
     t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#b8b8b8")),
                            ("BACKGROUND", (0, 0), (-1, 0), NAVY),
@@ -370,12 +427,12 @@ def md_flow(lines, shift=0, story=None, strip=False):
             txt = m.group(2).strip()
             if strip:                                   # the manual's own numbers give way to the book's
                 txt = re.sub(r"^(\d+(\.\d+)*\.?|[A-Z]\.)\s+(?=[A-Z])", "", txt)
-            story.append(Heading(inline(txt), H2 if lvl == 2 else H3, lvl)); i += 1; continue
+            story.append(Heading(index_tags(txt, "heading") + inline(txt), H2 if lvl == 2 else H3, lvl)); i += 1; continue
         if ln.startswith(">"):
             buf = []
             while i < len(lines) and lines[i].startswith(">"):
                 buf.append(lines[i].lstrip(">").strip()); i += 1
-            story.append(Paragraph(inline(" ".join(buf)), NOTE)); continue
+            story.append(Paragraph(index_tags(" ".join(buf), "note") + inline(" ".join(buf)), NOTE)); continue
         if re.fullmatch(r"\s*(-{3,}|\*{3,}|_{3,})\s*", ln):
             story.append(Spacer(1, 6)); i += 1; continue
         mm = re.match(r"^(\s*)(-|\*|\d+\.) (.*)", ln)
@@ -386,7 +443,7 @@ def md_flow(lines, shift=0, story=None, strip=False):
                 buf.append(lines[i].strip()); i += 1
             ind = 14 + 12 * (len(mm.group(1)) // 2)
             bullet = "•" if mm.group(2) in "-*" else mm.group(2)
-            story.append(Paragraph(inline(" ".join(buf)), ParagraphStyle("li", parent=BODY, leftIndent=ind + 6, bulletIndent=ind - 8,
+            story.append(Paragraph(index_tags(" ".join(buf), "list") + inline(" ".join(buf)), ParagraphStyle("li", parent=BODY, leftIndent=ind + 6, bulletIndent=ind - 8,
                                    spaceAfter=3, alignment=TA_LEFT), bulletText=bullet))
             continue
         if not ln.strip():
@@ -395,7 +452,8 @@ def md_flow(lines, shift=0, story=None, strip=False):
         while i < len(lines) and lines[i].strip() and not re.match(r"^(#|\||```|>|!\[|<!--|\s*(-|\*|\d+\.) |-{3,})", lines[i]) \
                 and not lines[i].startswith("    "):
             buf.append(lines[i]); i += 1
-        story.append(Paragraph(inline(" ".join(x.strip() for x in buf)), BODY))
+        text = " ".join(x.strip() for x in buf)
+        story.append(Paragraph(index_tags(text, "body") + inline(text), BODY))
     return story
 
 
@@ -538,6 +596,7 @@ OPERATOR_OUTLINE = [
     ("Appendix R. The Enterprise License: Standard Terms", ("F", "ENTERPRISE_LICENSE.md")),
     ("Appendix S. Patents and Trademarks", ("FS", ["PATENTS.md", "TRADEMARKS.md"])),
     ("Appendix T. Security Policy", ("F", "SECURITY.md")),
+    ("Index", ("X", "index")),
     ("Contact", ("X", "contact")),
 ]
 
@@ -646,6 +705,7 @@ OWNER_OUTLINE = [
     ("Appendix G. The Muscles: What Each Is For, and How It Is Wired", ("F", "docs/MUSCLE_CATALOG.md")),
     ("Appendix H. Source of the Engine", ("X", "source")),
     ("Appendix I. The License", ("X", "license")),
+    ("Index", ("X", "index")),
     ("Contact", ("X", "contact")),
 ]
 
@@ -692,6 +752,11 @@ def special(name):
                     "deploy/rbac-target.yaml", "deploy/Dockerfile", "deploy/Dockerfile.cloud"]:
             story += source_listing(rel)
         return story
+    if name == "index":
+        return [Paragraph(inline("Every term of the glossary where this book defines or discusses it, every muscle family where it "
+                                 "is named, every file of the repository and every command-line setting this book names, with the "
+                                 "pages they stand on. A plain mention of a common word is not an entry: the index points to where "
+                                 "a thing is explained."), BODY), Spacer(1, 10), INDEX]
     if name == "license":
         lines = [ln for ln in read("LICENSE").splitlines()]
         return [Paragraph(inline("The license under which this book and the software are made available, as it stands in "
@@ -742,7 +807,7 @@ def chapter_flow(src):
 CHAPNUM = {}
 n = 0
 for item in OUTLINE:
-    if item[0] not in ("PART", "BACK") and not item[0].startswith(("Appendix", "Glossary", "Contact")):
+    if item[0] not in ("PART", "BACK") and not item[0].startswith(("Appendix", "Glossary", "Index", "Contact")):
         n += 1; CHAPNUM[item[0]] = n
         if item[1][0] == "M":
             CHAPNUM[item[1][1]] = n
@@ -1068,7 +1133,7 @@ def build():
     # the notice at the end of the book, as at its start
     story += [Spacer(1, 24), GoldRule(FW, 1.2, 14),
               Paragraph(inline(BANNER_MD[2:]), ParagraphStyle("end", parent=BODY, alignment=TA_LEFT))]
-    doc.multiBuild(story)
+    doc.multiBuild(story, canvasmaker=INDEX.getCanvasMaker())
     OUT_MD.write_text(normalize_markdown("\n".join(md_parts) + "\n")[0], encoding="utf-8")   # the notice on top and at the end
     print(OUT_PDF, doc.page, "pages")
 
@@ -1102,6 +1167,9 @@ def _md_text(src):
                     f"{fp['digest'][:16]}), {len(py)} files, as the printed book carries it: " + ", ".join(f"`{rel}`" for rel in py) + "."]
         if key == "license":
             return ["The license is the file `LICENSE`."]
+        if key == "index":
+            return ["Every glossary term where the book defines or discusses it, every muscle family, every file of the repository "
+                    "and every setting the book names, with the pages they stand on in the printed book (this one-file text has no pages)."]
         if key == "contact":
             return ["The Omni-Compass LLC. Owner and developer: AJ Dubra. Main office infrastructure: toll-free direct "
                     "1-888-339-9551, system route asset 1-888-DEX-YLL-1. www.omni-compass.com"]

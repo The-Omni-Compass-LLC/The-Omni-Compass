@@ -266,8 +266,9 @@ the engine is built; where its reader needs what is inside, the text says so and
 it lives, and never repeats it.
 
 The two books share their front matter (the key, the notice, the foreword, the prefaces, the quick reference), their
-vocabulary (one glossary), their structure (parts, chapters, numbered sections, appendices, and a table of contents rebuilt
-from the book itself at every edition) and their reading rule: **the order of the chapters is the order of understanding and
+vocabulary (one glossary), their structure (parts, chapters, numbered sections, appendices, a table of contents rebuilt
+from the book itself at every edition, and an index of every term, muscle family, file and setting with its pages) and their reading
+rule: **the order of the chapters is the order of understanding and
 of implementing.** Nobody can wire what they have not understood, so each book is read from the front: what Omni-Compass is;
 the stack as one body; the plug and the rules its wires obey; the wiring, level by level and stack by stack; operating it;
 checking it against its own receipts. Each chapter tells the reader what to do, what they should see when it is done right,
@@ -714,7 +715,7 @@ Glove Box; Executive Summary
 18. Python, C++ and the Seal
 
 **Back Matter** - Glossary; Appendix A Command Reference; Appendix B File Map; Appendix C The Equations in Full;
-Appendix D Metrics; Appendix E Troubleshooting; Appendix F Evidence Map; Appendix G Reproducing Everything; Contact
+Appendix D Metrics; Appendix E Troubleshooting; Appendix F Evidence Map; Appendix G Reproducing Everything; Index; Contact
 
 ---
 

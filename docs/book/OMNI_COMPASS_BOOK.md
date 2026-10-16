@@ -8023,6 +8023,10 @@ reported to its own maintainers.
 - The capture script (`fleet/capture/kube_capture.sh`) is read-only; no component writes to a live cluster unless the
   operator starts it in a writing mode.
 
+## Index
+
+Every glossary term where the book defines or discusses it, every muscle family, every file of the repository and every setting the book names, with the pages they stand on in the printed book (this one-file text has no pages).
+
 ## Contact
 
 The Omni-Compass LLC. Owner and developer: AJ Dubra. Main office infrastructure: toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1. www.omni-compass.com

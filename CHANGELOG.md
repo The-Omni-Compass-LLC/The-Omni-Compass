@@ -2,6 +2,17 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-16 (night, the index and the room)
+
+- **Both books carry an index** (`docs/book/build_book.py`): every glossary term where the book defines or discusses it, every
+  muscle family where it is named, every file of the repository and every setting (`--...`) the book names, with the pages they
+  stand on; a plain mention of a common word is not an entry. The index is the last chapter before Contact in both books, and
+  the front matter of each names it. The Operator's is 496 pages, the Owner's 1,354.
+- **The room search** (`docs/OMNI_V7.md`, "The room search (16 October)"): of the 159 muscles that read SAME AS NATIVE on omni-v7's
+  realms table, 147 have no native misses to cut and fixed work, and the 12 battery power knobs miss only while the charge sits
+  at the operator's reserve, which the power knob may not spend; the max already takes every muscle to the edge its own knob
+  has. Six process loops miss at most 0.56% of decisions: a card candidate for a later version. No engine file moved.
+
 ## 2026-10-16 (night, after): the book as the teacher; the reading key on every receipt; the three clouds on one harness
 
 - **Both manuals open with the two books explained** (the Owner's puts the engine inside the vessel; the Operator's drives it),

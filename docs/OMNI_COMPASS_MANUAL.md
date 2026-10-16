@@ -224,8 +224,9 @@ the engine is built; where its reader needs what is inside, the text says so and
 it lives, and never repeats it.
 
 The two books share their front matter (the key, the notice, the foreword, the prefaces, the quick reference), their
-vocabulary (one glossary), their structure (parts, chapters, numbered sections, appendices, and a table of contents rebuilt
-from the book itself at every edition) and their reading rule: **the order of the chapters is the order of understanding and
+vocabulary (one glossary), their structure (parts, chapters, numbered sections, appendices, a table of contents rebuilt
+from the book itself at every edition, and an index of every term, muscle family, file and setting with its pages) and their reading
+rule: **the order of the chapters is the order of understanding and
 of implementing.** Nobody can wire what they have not understood, so each book is read from the front: what Omni-Compass is;
 the stack as one body; the plug and the rules its wires obey; the wiring, level by level and stack by stack; operating it;
 checking it against its own receipts. Each chapter tells the reader what to do, what they should see when it is done right,
@@ -597,7 +598,7 @@ Account, Click by Click; Appendix G The Google Cloud Account, Click by Click; Ap
 Click by Click; Appendix I The Install Manifests; Appendix J The Implementer's Checklists; Appendix K The Kubernetes
 Governor's Settings; Appendix L The Audit, Record by Record; Appendix M The Three Clouds Side by Side; Appendix N The Paired Run from
 GitHub: Every Input; Appendix O The License; Appendix P Licensing: Questions and Answers; Appendix Q Third-Party Notices;
-Appendix R The Enterprise License: Standard Terms; Appendix S Patents and Trademarks; Appendix T Security Policy; Contact
+Appendix R The Enterprise License: Standard Terms; Appendix S Patents and Trademarks; Appendix T Security Policy; Index; Contact
 
 ---
 
