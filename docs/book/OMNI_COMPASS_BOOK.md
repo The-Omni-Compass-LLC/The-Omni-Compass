@@ -985,6 +985,83 @@ checks that every override was handed back. The watching arm, where it is run, i
 watching governor that disagrees with native on any gauge has found a difference in the probe, the load or the machine,
 not in Omni-Compass.
 
+### 4.7 Coding a new muscle: the muscle SDK
+
+A muscle not in the catalog (Appendix E), or one whose native controller speaks an API no adapter covers, is coded on the
+muscle SDK (`omnicompass/muscle_sdk.py`), the contract every adapter in this book obeys: **observe, bound, request, execute,
+read back, receipt, restore**. The SDK adds a muscle; it never adds a brain. The governor proposes a setting; the SDK's
+runtime earns the authority to write it, verifies the write and writes the receipt. An engineer codes five functions and
+declares three contracts; everything else (the clamp, the gate, the snapshot, the restore, the receipt) is the runtime's.
+
+**The five functions** (the `MuscleAdapter` protocol, or `FunctionalMuscle` for a small connector): `observe()` returns the reading with its timestamp and quality (the wire out); `snapshot_native()` records the setting as found, once, before the first write; `execute(value)` writes one setting through the system's own command or API (the wire in; **WRITES**); `readback()` reads the setting back from the system, never from memory; `restore_native(snapshot)` puts the setting back as found. The adapter owns the vendor's API; the brain never sees it.
+
+**The three contracts** (`MuscleSpec`): the **capability** (`CapabilityContract`: the cover's `minimum` and `maximum`, the `resolution`, the most one write may move (`max_step`) or the most a second may move (`max_rate_per_s`), the `units`, whether the knob is `reversible` and whether it reads back); the **timing** (`TimingContract`: the observation and decision periods, the actuation delay, the minimum hold and the cooldown between writes, the timeout, and `stale_after_s`, past which a reading is blind); the **safety** (`SafetyContract`: the `hard_min` and `hard_max` nothing may cross, `fail_closed`, a `safe_default`, and the `forbidden` context keys, such as a security hold, under which no write is permitted). The spec also names the muscle (`muscle_id`, `plant_id`), its class (`resource_type`, one of the standard classes below), its `automation` mode and its evidence class (`Evidence`: D design, S our own models, L live software, P physical meter, C commercial).
+
+**The automation modes**, from least to most authority: `disabled`; `recommend` (every command computed and receipted, nothing written: the watch level of section 6.3); `manual`; `external_approval` (a write only with `approved=True` from your change process); `automatic`. A muscle starts at `recommend` and is promoted exactly as chapter 6's levels promote a stack.
+
+**What the runtime does with each command** (`MuscleRuntime.command`), in order: a stale or invalid observation blocks the write and marks the muscle blind (section 5.3); the mode is checked; the request is clamped to the capability (cover, step, rate, resolution); the safety contract is asked (`outside_hard_bounds`, `forbidden:<key>`); the hold and the cooldown are checked (`hold_or_cooldown`); only then is the native snapshot taken, once, and the write made, and where the capability says the knob reads back, the setting is read back and the residual (realized minus bounded) recorded. Every attempt, permitted or not, writes one receipt (`MuscleReceipt`): `muscle_id`, `mode`, `requested`, `bounded`, `realized`, `units`, `permitted`, `reason`, `observation_age_s`, `actuation_latency_s`, `actuator_residual`, `evidence`, `status`. `MuscleRegistry` holds every muscle of a body, refuses a duplicate name, answers `catalog()` (every muscle with its cover, mode, evidence and status) and `restore_all()`, which hands every muscle back in the reverse of the order they were registered.
+
+**A worked example.** The power limit of one graphics card, through the card's own command, first in `recommend`:
+
+```python
+import json, subprocess
+from omnicompass.muscle_sdk import (
+    AutomationMode, CapabilityContract, Evidence, FunctionalMuscle,
+    MuscleRegistry, MuscleRuntime, MuscleSpec, Observation,
+    SafetyContract, TimingContract)
+
+def read_limit():
+    # the wire out: the setting as the card reports it now
+    out = subprocess.run(
+        ["nvidia-smi", "-i", "0", "--query-gpu=power.limit",
+         "--format=csv,noheader,nounits"],
+        capture_output=True, text=True, check=True).stdout
+    return float(out.strip())
+
+def write_limit(w):
+    # the wire in: one setting, the card's own command (WRITES)
+    subprocess.run(["nvidia-smi", "-i", "0", "-pl", str(int(w))],
+                   check=True)
+
+spec = MuscleSpec(
+    muscle_id="gpu0.power_limit", plant_id="card-0",
+    resource_type="gpu.power_limit", adapter_version="1.0",
+    capability=CapabilityContract(minimum=100.0, maximum=300.0,
+                                  resolution=1.0, max_step=25.0,
+                                  units="W"),
+    timing=TimingContract(observation_period_s=2.0,
+                          decision_period_s=2.0, minimum_hold_s=10.0,
+                          stale_after_s=6.0),
+    safety=SafetyContract(hard_min=100.0, hard_max=300.0,
+                          forbidden=("security_block",)),
+    automation=AutomationMode.RECOMMEND,
+    evidence=Evidence.LIVE_SOFTWARE,
+    native_owner="the card's firmware")
+muscle = FunctionalMuscle(
+    spec, observe=lambda: Observation(read_limit()),
+    execute=write_limit, readback=read_limit,
+    snapshot=read_limit, restore=write_limit)
+audit = open("/var/log/omni/muscles.jsonl", "a")
+registry = MuscleRegistry()
+registry.register(MuscleRuntime(
+    muscle, audit=lambda rec: audit.write(json.dumps(rec) + "\n")))
+
+receipt = registry.command("gpu0.power_limit", 250.0,
+                           context={"security_block": False})
+# recommend: permitted False, reason "recommend", nothing written;
+# the receipt is in the audit
+registry.restore_all()
+# every muscle back as found, in reverse order; each one receipted
+```
+
+Promoted to `AutomationMode.AUTOMATIC`, the same code writes: a request of 250 W from the 300 W found is bounded to 250 and read back (residual 0); a request of 200 W ten seconds later is bounded to 225 by `max_step`; a request inside the 10-second hold is refused (`hold_or_cooldown`); a request made while `security_block` is true is refused (`forbidden:security_block`) and nothing moves; `restore_all()` returns the card to the 300 W found at the start and its receipt says `restored`. These outcomes are the SDK's own tests (`tests/test_muscle_sdk.py`).
+
+**The standard classes** (`STANDARD_MUSCLE_CLASSES`) name the knob a new adapter governs, so that the catalog and the receipts read the same across a company's stacks: `kubernetes.replicas`, `.cpu_request`, `.cpu_limit`, `.memory_request`, `.memory_limit`, `.hpa_target`, `.pod_placement`, `.node_pool`; `host.cpufreq`, `.cpu_quota`, `.cpuset`, `.memory`, `.io`; `gpu.power_limit`, `.clock_envelope`, `.mig`, `.admission`; `cloud.instance_count`, `.instance_size`, `.placement`, `.start_stop`, `.capacity_policy`; `storage.volume_size`, `.tier`, `.iops`, `.throughput`, `.placement`; `network.traffic_weight`, `.rate_limit`, `.bandwidth`, `.routing`; `application.concurrency`, `.worker_count`, `.queue_admission`, `.jvm_heap`, `.thread_pool`, `.batch`; `facility.cooling_setpoint`, `.rack_power`, `.site_power`. A class is a contract, not a claim that a connector for it has run live: each adapter earns its own evidence class, and Appendix E's wiring recipes say which have (`docs/wiring_recipes.csv`).
+
+A muscle coded on the SDK is wired into a body as any other (chapter 2): one governor per body, the muscle's reading a gauge
+of that body, its receipts in the body's audit; the wire check of section 4.4 applies to it unchanged (snapshot, write,
+read-back, restore, nothing left behind), and it enters service through the levels of chapter 6, watched first.
+
 
 ## 6. The Rules the Wires Obey
 
@@ -1083,6 +1160,56 @@ one thing to a GAIN; one trial runs at a time inside a body, so every receipt ca
 This is why chapter 2 asks for every muscle of a body, and every resource the muscles share, to be wired into the same
 governor. Where a shared resource is left out, the governor cannot see the coupling, and no rule in this chapter can
 respect a limit the wires do not carry.
+
+### 5.5 The rules of the engine that stands, as an operator meets them
+
+The engine every receipt in this edition names is **omni-v7** (`python3 tools/omni_version.py` prints it; chapter 12). Its
+mechanism is the Owner's Manual's; five of its rules show in the wiring, the settings and the audit, and are stated here so
+that a line in the audit is read for what it is.
+
+**Conveyance obeys the namespace's own quota.** Where the governor conveys a machine's idle processor to the serving pods on
+it (`--cap-deployments`, level 3), every raise of a pod's CPU limit is bounded by the namespace's ResourceQuota as Kubernetes
+reads it (hard and used; the stricter of the quota's spec and its status), and a raise the quota would not admit is not
+written. The governor never raises, lowers or deletes a quota. Where its role cannot read the quotas, the budget is **no
+budget known**, not zero: the raise proceeds as the plug has always made it, Kubernetes' own admission refuses any write
+over a quota the governor cannot see, the plug reads the refusal back, and the audit says so once a pass (`quota: no budget
+known: the raise proceeds, Kubernetes admission is the authority`, with the namespace and the reason). An operator who wants
+the budget bounded before the write grants the governor's role `get` and `list` on `resourcequotas`; one who does not loses
+nothing but that line.
+
+**On a shared host, no limit is raised while the machine is at its top.** Where several nodes are containers on one
+machine (a kind cluster, a laboratory host), the governor raises no pod CPU limit while that machine's measured busy share
+is at or over 75%, or cannot be read; limits already given stay; lowering is never held. Each hold is one audit record,
+`convey: held`, with the machines held, the host's busy share and whether the host is shared. On separate machines the
+guard never binds. It is the same guard the replica room obeys before it adds a replica on a shared host.
+
+**The clocks are in seconds.** Every rule that waits is stated in seconds and keeps its time at any decision period: the
+clear time after a breach (`--slo-clear-s`, 180 s), the cruise wait (`--cruise-after-s`, 120 s), the strict window
+(`--strict-window-s`, 300 s), the verdict's spacing, recheck and trial (`--verdict-every-s` 600 s, `--verdict-recheck-s`
+7,200 s, `--verdict-trial-s` 1,200 s) and the reflex window (`--reflex-window-s`, 30 s). Each is converted to a count of
+decisions at the running period, n = max(1, round(seconds / period)), so a governor deciding every 15 s waits the same
+minutes as one deciding every 60 s. The compass moves an autoscaler's target by the same amount a minute at any period, and
+the node pool gives back at most one machine a minute. The decision period itself stays 60 s (section 3.4); the fast
+checks run every 5 s underneath it, and native's own autoscaler keeps its own 15-second check untouched.
+
+**The verdict reads a trial in the words of a receipt.** Before a knob moves one step further from native, the step runs as
+a trial and its cost per piece of work is compared with the cost at the reference, on the logarithm of each piece's cost,
+with a 95% interval. The interval wholly above zero is a **LOSS** and the step is undone whatever the allowance says; wholly
+below is a **GAIN**; across zero is **EVEN**; a GAIN or EVEN step is kept only if both the median and the mean of the
+logarithms are inside the allowance (`--allow`, 2%); while the interval is wider than the allowance the trial measures on,
+up to three times its sample count, before it decides. Every judgement is in the audit as `reading` (`GAIN`, `EVEN`, `LOSS`
+or `past the allowance`) and `interval_ln`, so an operator can see why a machine stayed given back or came back (Appendix
+L, `verdict`).
+
+**The cloud's rule is one flag.** `--give-back-only` turns off every pod, processor, power, clock, cooling and batch
+actuator, sets the replica ceiling to 0 and the dial to the tune-down, and leaves the node pool as the only knob, whatever
+else the command line says: the governor can then only park a machine the cloud already made, after its own trial, and wake
+it on a breach, so the bill can only fall or stay. The cloud install file (`deploy/install/omni-compass-cloud.yaml`) passes
+it; chapter 19 is written on it.
+
+None of these is a setting an operator tunes (Appendix K lists each with its shipped value). They are stated so that the
+audit lines they write are read as the rules they are, and so that a reading taken on this engine is never set beside one
+taken on another (chapter 12).
 
 ---
 
@@ -4384,6 +4511,14 @@ grant it under more than one license at once (the Evaluation License to everyone
 customer), may set the terms of each new version, and may assign the copyright; copies already received keep the
 terms they were received under. The license texts (`LICENSE`, `NOTICE`, `DISCLOSURES.md`) govern.
 
+Every paper a buyer's counsel asks for is bound into this book in full, as it stands in the repository: the Evaluation
+License (Appendix O), the licensing questions and answers (Appendix P), the third-party notices (Appendix Q), the standard
+terms of the Enterprise License (Appendix R: the grant, the term, the fees' basis, the warranties and their limits, the
+indemnities, the audit right, the source escrow and the governing law, as a company wiring Omni-Compass onto its own
+stack will sign them), the patents and trademarks statements (Appendix S) and the security policy (Appendix T); the
+disclosures, declarations and disclaimers stand in the front matter. Where a paper and this chapter differ, the paper
+governs.
+
 
 ## 33. Verifying Your Copy
 
@@ -4563,7 +4698,7 @@ Every gauge in a receipt, where it comes from, and whether it is measured or mod
 | the governor's additions decided while the service was still inside its line (% of its additions) | the governor's audit | measured | shown, not judged |
 | worker machines in service, mean; node-hours | the cluster's own node records every 15 s | measured (machine-hours on a local cluster; the provider's own count in a cloud) | lower; a rise is power given |
 | compute bill at list price | the provider's own machine count × list price per family | measured (a real bill) | lower; a rise is power given |
-| energy (Wh), the standby model | a declared formula over the machines in service | **modelled**, said so on every line | lower; a rise is power given |
+| energy (Wh), the standby model (in the receipts, "parked-worker energy": a parked machine still drawing its idle power) | a declared formula over the machines in service | **modelled**, said so on every line | lower; a rise is power given |
 | energy, the machine's own meter | the processor's RAPL counters, a card's own power reading, a site meter | measured (class P) | lower; a rise is power given |
 | host CPU busy; host CPU-seconds; CPU-seconds per 1,000 units inside the line | `/proc/stat` of the real machine under the run | measured | lower |
 | Omni's own CPU (cores), mean | the governor's audit (its process and every command it ran) | measured | shown beside the receipt |
@@ -4571,6 +4706,8 @@ Every gauge in a receipt, where it comes from, and whether it is measured or mod
 | cache hit rate; consumer lag | Redis's INFO; the consumers' records | measured | higher; lower |
 | pages read into a cache, the cache's miss share | the server's own counters | measured | shown, not judged |
 | HPA replicas, pods started, pod start wait | the API server's own records | measured | shown, not judged except pod start wait (lower) |
+| pods waiting for a place (pending), mean | the API server's own pod records | measured | lower: work with no machine to run on |
+| CPU limits conveyed; conveyance holds (`convey: held`); quota lines (`quota`) | the governor's audit | measured | shown, not judged: what the processor lever did and what held it (section 5.5) |
 | seconds from a kill to every setting back at the operator's | the harness polling the system once a second from the kill | measured | lower; past 60 s marked; never, INVALID |
 | handed back (every arm) | the knob read back at the end of the arm | measured | yes in every arm, or the run is invalid |
 
@@ -7283,6 +7420,52 @@ Every setting that names a time is stated in seconds (the `-s` settings) and kee
 `--slo-clear`, are still read, as a number of decisions, and win where they are given. Whatever the period, the node
 pool gives back at most one machine a minute.
 
+### K.5 The card governors' settings
+
+Two governors run on a graphics card (chapter 21), and neither takes a setting from K.1 to K.4. The **two-wire card
+governor** (`python3 -m omni_controller.gpu_compass`) reads the card's draw, clocks, utilization and temperature through
+`nvidia-smi` and writes the clock ceiling and the power limit under the compass law with the verdict; the **one-wire power
+governor** (`python3 -m omni_controller.gpu_governor`) writes the power limit alone, with the speed lock. Both are
+factory-tuned: an installation writes the first group and leaves the rest as shipped. The card governors' counts
+(`--verdict-every`, `--verdict-recheck`, `--slo-clear`) are in decisions at their own 2-second period (8 decisions is 16 s;
+900 is 30 minutes).
+
+| Setting (both governors) | Default | What it is |
+|---|---|---|
+| `--mode` | `watch` | `watch` decides and records, writes nothing; `cap` writes |
+| `--gpus` | `0` | the card indexes governed, comma separated |
+| `--smi` | `nvidia-smi` (or `NVIDIA_SMI` in the environment) | the client the governor reads and writes through |
+| `--interval` | 2.0 s | the decision period on a card |
+| `--duration` | 0 (until killed) | seconds to run |
+| `--audit` | `gpu_compass_audit.jsonl`; `gpu_audit.jsonl` | the audit file (Appendix L.5) |
+| `--kill-file` | `/tmp/omni-gpu-kill` | the file whose presence turns the governor OFF (section 21.6) |
+| `--latency-file`, `--slo-ms` | none; 0 (no line) | the response-time feed and the line (section 21.2) |
+| `--latency-window-s` | 5 s (two-wire); 30 s (one-wire) | seconds of response times the position reads |
+| `--floor-w` | 0 (off) | the declared envelope's lowest watts: the power limit never under it |
+
+| Setting (the two-wire governor only) | Default | What it is |
+|---|---|---|
+| `--dial` | `max` (or `OMNI_DIAL`) | the max: the clock ceiling never stepped below the top while the card serves; `save`: the tune-down (section 3.2) |
+| `--race-util` | 0.95 | the utilization at which work is waiting: race, never pace |
+| `--learn-samples` | 15 | busy readings of the card on its own before the compass may lower anything |
+| `--clock-min-share` | 0 (the card's own lowest supported clock) | the clock ceiling's cover, as a share of the top |
+| `--allow` | 0.02 | the most a ceiling step may add to the card's own time on a request |
+| `--verdict-samples`, `--verdict-every`, `--verdict-recheck` | 30; 8; 900 | requests measured at native and at the trial step; decisions between trials; decisions before a refused step is tried again |
+| `--up-gain`, `--down-gain` | 0.10; the law's | share of the top clock moved per unit of force, up and down |
+| `--lid-headroom` | 0.10 | the lid above the draw the power limit takes |
+| `--min-change-mhz`, `--min-change-w` | 15 MHz; 3 W | the smallest changes written |
+
+| Setting (the one-wire governor only) | Default | What it is |
+|---|---|---|
+| `--headroom` | 0.3 | the limit never below the draw × (1 + headroom) |
+| `--min-share` | 0.70 | the limit never below this share of the start limit (0: off) |
+| `--util-gate`, `--util-band` | 0.5; 0.1 | the smoothed utilization at which the start limit returns, and the band below it at which the cap resumes |
+| `--baseline-file`, `--speed-gain` | none (the lock off); 0.01 | the speed lock: the baseline from `tools/gpu_baseline.py`, and its line (at least this much faster than the baseline) |
+| `--lock-boost`, `--lock-margin`, `--lock-step`, `--lock-hold-s`, `--lock-window-s`, `--lock-floor` | 5; 0.08; 0.02; 10 s; 60 s; 0.5 | the lock's largest step down (a multiple of `--lock-step`); the margin under the line within which watts are spent; the share of the start limit given up a decision; the seconds between two steps down; the response-time window the lock reads; the share of the start limit the lock never holds the limit under |
+| `--min-change-w` | 5 W | the smallest change written |
+| `--temp-limit` | 83 °C | the temperature read as heat 1.0 (section 21.5) |
+| `--slo-clear` | 3 | decisions inside the line before a breach is counted clear |
+
 
 ## Appendix L. The Audit, Record by Record
 
@@ -7311,10 +7494,10 @@ owner's analysis and not needed to operate the governor.
 | `error` | a decision or a fast check fails (the API unreachable, a read refused) | `error` (the exception), `stderr` (the client's last output), `consecutive_failures` |
 | `decision` with a text value | `killed` (the kill file is present: every setting handed back, nothing written), `restore only: every setting handed back` (the watchdog's restore), `master switch: OFF; every setting handed back; exiting` (`SIGTERM` or the master switch) | the text itself |
 | `overhead` | when the governor's process exits | `cpu_s` (processor seconds of the governor and every command it ran), `wall_s`, `cores_mean` (their ratio: the governor's own cost in cores) |
-| `idle_floor` | outside the cloud mode, when the service is idle and the pool goes to its floor | `from`, `to`, `demand` |
+| `idle_floor` | outside the cloud mode, when the service is idle and the pool goes to its floor | `from`, `to`, `demand`, `at_idle` |
 | `compass` | every decision | the engine's own reading, for the owner's analysis |
 
-### L.3 Five searches that answer most questions
+### L.3 Six searches that answer most questions
 
 ```bash
 A=/var/log/omni/audit.jsonl
@@ -7323,10 +7506,54 @@ jq -c 'select(.verdict) | {time, verdict, step, machines_given_back_allowed}' $A
 jq -c 'select(.authority) | select([.authority.senses.blind[]?] | any) | {time, senses: .authority.senses}' $A   # blind
 jq -c 'select(.authority.proprioception.nodes? > 0) | {time, drift: .authority.proprioception}' $A          # unlanded
 jq -c 'select(.error or .refused)' $A                                                     # failures and refusals
+jq -c 'select(.convey or .quota) | {time, convey, quota, machines, host_busy, p95_ms}' $A   # the processor lever and the quota
 ```
 
 A drift reading on one decision is normal: the command was given at the end of the last decision, and the machine
 script takes seconds. A drift that stays above zero across several decisions is the one-writer question of section 20.8.
+
+### L.4 The records of the other muscles
+
+Outside the cloud mode the muscles of levels 2 to 7 (section 6.3) write their own records. Each is one JSON object with
+`time`, as in L.1; the fields an implementer reads:
+
+| Record | When | Fields |
+|---|---|---|
+| `quota` | once a conveyance pass, in a namespace whose ResourceQuotas the governor's role cannot read (section 5.5) | `quota`: `no budget known: the raise proceeds, Kubernetes admission is the authority`; `namespace`; `reason` (`quota read unavailable: <the error's class>`) |
+| `convey` = `held` | a conveyance pass on a shared host at or over 75% busy, or unread, that would otherwise have raised a limit | `machines` (the nodes held), `host_busy` (the machine's busy share; `null` when unread), `shared_host` |
+| `convey` = `engaged` or `released` | conveyance turning on (the 95th percentile at or over `--convey-on` × the line, or the feed blind) or off (under `--convey-off` × the line) | `p95_ms` (`null` while blind), `slo_ms`, `blind` |
+| `write` with `why` beginning `convey:` | each pod CPU limit written: `convey: record original CPU limit` (the operator's limit annotated once, before the first raise); `convey: <node> idle CPU to its <n> serving pod(s), limit <m>m in place`; `convey: response time calm, operator's limit <m>m in place` | as `write` in L.1 |
+| `error` beginning `convey resize rejected:` | Kubernetes refused a resize (the quota, admission, or the pod gone) | the error's class and its first 400 characters; a refused limit is never counted as given |
+| `pod_reflex_reading` | each fast check that reads a sensed autoscaler's floor | the deployment and the floor it needs; `replicas` (now); `busy` (the host's busy share) |
+| `pod_reflex` | a fast check that raises, or would raise, a floor (`--pod-reflex-writes`) | each deployment's new floor; `busy`; `R_ms` (the response time read); `S_ms` (the floor the line allows) |
+| `cpu_pstate_snapshot` | once, at the start, on a machine whose processor ceilings the governor holds (section 7.9) | every frequency policy's ceiling as found |
+| `cpu_pstate_write` | each ceiling written | the ceiling written; `why` (`cpu_pstate: ceiling <c> (cap <cap>, envelope [<lo>, <hi>], …)`) |
+| `cpu_pstate_restore` | at reset or OFF | the ceilings restored from the snapshot; `why`: `reset: exact pre-Omni CPU ceilings` |
+| `error` beginning with a muscle's name | a muscle's read or write failed | the error's class and its text; the decision goes on, the muscle holds |
+
+### L.5 The card governors' records
+
+The card governors (chapter 21; Appendix K.5) keep their own audit files, one JSON object a line with `time`, and are read
+the same way. The records, in the order a run writes them:
+
+| Record | When | Fields an implementer reads |
+|---|---|---|
+| `snapshot` | once, at the start, before any write | per card: `limit_w` (the power limit read at start, the limit every reset returns to), `min_limit_w`, `enforced_w` (the limit the card obeys, where the driver reports it), the clock top, the power-management state; `mode`; `engine` (`compass, two wires`); the two-wire governor also writes `law` (its profile), `verdict` (the allowance, the samples, the spacing, the recheck) and `covers` (the clock range and the power range nothing it computes can leave) |
+| `refused` | at the start, in `cap` mode, when the card's power management is not enabled | the text: a written limit would not bind, so no authority is taken and the governor exits |
+| `decision` | every decision | per card, the reading and the step: utilization, draw, the position in the band, the ceiling and the lid chosen, the verdict's state and the deepest step allowed; `hold: last write not read back` while a write has not landed |
+| `would_write`, `would_clock_write` | in `watch` mode, or after another writer appeared, each write that would have been made | the `nvidia-smi` command as its argument list; `why`; `withheld` when another writer owns the limit |
+| `write`, `clock_write` | each power limit, clock ceiling (`-lgc floor,ceiling`) or clock reset (`-rgc`) written in `cap` mode | the command; `why` (the step's reason, `restore`, or `reset: the limit read at start`); for a clock write `rc` and `stderr` |
+| `actuator` | after each power-limit write | `gpu`, `requested_w`, `t_requested`, `rc`, `stderr`; on success `readback_w`, `enforced_w`, `t_readback`, `realized` (the read-back equals the request), `override` (the card enforces less than the limit), `delay_s`; on failure `write_failed` (the command) and the run ends with `fatal` |
+| `actuator_realized` | a later decision, when a write that had not read back at once has landed | `gpu`, `requested_w`, `readback_w`, `enforced_w`, `delay_s` |
+| `foreign_writer` | the limit read differs from what the governor wrote and from what it found: another writer | `gpu`, `reads_w`, `expected_w` (`pending_w` where a write was in flight); `action`: `observe only from now on` and both wires left to the other writer, for the rest of the run |
+| `verdict` | when a ceiling trial begins, ends or is abandoned (two-wire governor) | as in L.1; `deepest_step` (the deepest ceiling step allowed) |
+| `restored` | at the end, after the kill switch, OFF or the duration | per card, the limit read back; `start` (the limit read at the start); `ok` (every card back at its start, or another writer owned the limit); `writes` (how many the governor made); `foreign_writer`; `restore_write_failed` (any restore write the card refused) |
+| `fatal` | a write the card refused | `write failed: <the command and its error>`; the arm ends here and never carries on as if watching |
+| `error` | a decision that failed for any other reason | the error's class and text; the next decision is taken on schedule |
+
+A card run is read from `snapshot` to `restored`: `ok` true in `restored`, no `foreign_writer`, no `fatal`, is a run in which
+every setting was handed back; `foreign_writer` true is a run in which the governor stood back from the first foreign
+reading, and the card's settings from then on are the other writer's.
 
 
 ## Appendix M. The Three Clouds Side by Side
@@ -7528,6 +7755,227 @@ Omni-Compass Evaluation License changes those terms. Installed versions are thos
 
 Kubernetes, kind, `kubectl`, the NVIDIA driver and `nvidia-smi` are not distributed with Omni-Compass; it calls them
 where an operator has installed them. Their names are the property of their owners (`DISCLOSURES.md`, section 1).
+
+## Appendix R. The Enterprise License: Standard Terms
+
+
+
+This page summarizes the standard terms of the Omni-Compass Enterprise License, the paid license that every production
+use, commercial use, hosted service, distribution, OEM or embedded use, and every other commercialization or monetization
+of Omni-Compass requires (`LICENSE`, section 5). It is a summary for evaluation and planning. It is not an offer, and it
+binds no one: only an Enterprise License signed by The Omni-Compass LLC and the licensee, with its order form, grants any
+right, and that signed agreement controls over this page in every respect.
+
+### 1. What can be licensed
+
+| License | What it allows |
+|---|---|
+| **Production** | The licensee runs Omni-Compass on top of its own systems (clusters, fleets, cards, sites, plants), on premises or in its own cloud accounts, within the scope in the order form |
+| **Hosted service** | The licensee offers Omni-Compass's function to its own customers as a hosted, managed or software-as-a-service offering, under a hosted-service rider (per customer, per managed unit or revenue share) |
+| **OEM and embedded** | The licensee ships Omni-Compass inside its own product, appliance, firmware or platform, under an OEM rider (per unit or per installed base) |
+| **Managed service provider** | The licensee operates Omni-Compass for named third parties under a managed-service rider |
+| **Research** | A university or public laboratory uses Omni-Compass beyond evaluation for non-commercial research and publication, under a research rider |
+
+**Scope** is set in each order form: the licensed systems and their size (machines, cores, cards, sites, muscles or
+managed units), the fields of use, the territory, the named sites or accounts, and the engine versions covered.
+
+### 2. Fees
+
+Fees are set in each order form: a subscription, a usage-based fee, a share of the measured value captured, or a
+combination, with any minimum commitment. Where fees track value, the value is measured on the licensee's own paired
+receipts (native against Omni-Compass on the same system, the same load and the same clock), by the method the order form
+names. Payment terms, taxes and late charges are as the order form states. No price, rate or benchmark in this repository
+is an offer.
+
+### 3. What the licensee receives
+
+1. The licensed engine at a named, sealed version (its fingerprint, `tools/omni_version.py`), and each later version the
+   subscription covers.
+2. The wiring kits and the plug for the licensed systems, the manual and the book, and the receipts tooling.
+3. Support and maintenance at the tier in the order form: response targets, named contacts, and corrections of defects
+   that reproduce on the licensed version.
+4. Installation through the manual's levels: read-only first, the wire check, a watch arm equal to native, then writing
+   levels one at a time, each with its receipt.
+
+### 4. Warranties
+
+1. **Conformance.** For the warranty period in the order form, the licensed version performs materially as its
+   documentation describes. The remedy is correction or, failing that, a refund of the fees paid for the nonconforming
+   version for the affected period.
+2. **The safeguards.** The kill switch hands every setting back to the value read before Omni-Compass's first write; the
+   shield keeps every write inside the cover the operator granted; Omni-Compass never fights another writer.
+3. **No other warranty.** No outcome, saving or result on the licensee's systems is warranted. Published results are
+   evidence about the systems they ran on (`DISCLOSURES.md`, section 2).
+
+### 5. Intellectual property
+
+1. The Omni-Compass LLC keeps all right, title and interest in Omni-Compass, the Mechanism and the marks. The licensee
+   receives the rights its order form lists, for its term, and no others.
+2. **Patent license.** The Enterprise License includes a license under The Omni-Compass LLC's patent rights in the filed
+   applications, and in any patent issuing from them, for the licensed scope.
+3. **Infringement indemnity.** The Omni-Compass LLC defends the licensee against a third-party claim that the licensed
+   version, used as licensed, infringes that party's intellectual property, and pays the damages finally awarded or the
+   settlement it agrees, subject to prompt notice, control of the defense and the usual exclusions (modifications,
+   combinations, unlicensed use, versions superseded by an offered fix). Remedies may include a license, a modification
+   or a refund.
+4. **Confidential filings.** The patent application number and other confidential information are disclosed to a
+   licensee under the agreement's confidentiality terms.
+
+### 6. Limits of liability
+
+Each party's liability is limited to the fees paid or payable in the twelve months before the claim, and neither party is
+liable for indirect, incidental, special, consequential or punitive damages, except for the exclusions the signed
+agreement states (for example, breach of confidentiality, the infringement indemnity, and the licensee's breach of the
+license scope).
+
+### 7. Confidentiality, data and security
+
+1. **Confidentiality.** Mutual, for the term and a period after it, covering non-public information either party gives
+   the other.
+2. **Data.** Omni-Compass contains no telemetry. The licensee's data, readings, settings and receipts stay on the
+   licensee's systems and remain the licensee's. Where the licensee chooses to share data for support, a data-processing
+   agreement applies.
+3. **Security.** A software bill of materials ships with every version (`sbom/`); vulnerabilities are handled under
+   `SECURITY.md`; the licensee may run the verifier (`python3 verify.py`) and the seal checks on every delivered version.
+
+### 8. Safety and operation
+
+1. The licensee remains the operator of its systems. The machines' own controls and protections stay in place;
+   Omni-Compass sets only values they already accept.
+2. Any connection to a physical system (grid, plant, vehicle, robot, medical device, facility) requires a written safety
+   case accepted by the system's owner and every review its regulator requires; safety-critical systems are licensed only
+   on those terms.
+3. The kill switch stays operable at all times.
+
+### 9. Compliance, audit and insurance
+
+1. Each party complies with export-control, sanctions and anti-corruption law.
+2. The licensee reports usage against the licensed scope as the order form provides, and The Omni-Compass LLC may verify
+   it on reasonable notice, no more than once a year.
+3. Insurance, where the order form requires it, is carried by each party at the limits stated there.
+
+### 10. Term, renewal and transition
+
+1. Term and renewal are as the order form states.
+2. On termination or expiry, the licensee stops use, every setting Omni-Compass changed is handed back to native (the
+   hand-back is built into the engine), and every copy is returned or destroyed; transition assistance is available at
+   the rates in the order form.
+3. Source-code escrow for the licensed version is available under a three-party escrow agreement.
+
+### 11. Governing law and precedence
+
+The signed agreement states its governing law and venue; the standard is the law of the State of Delaware, with venue in
+the Delaware state courts and the United States District Court for the District of Delaware. Its order of precedence is: the order form, then any rider, then
+the Enterprise License terms, then the documentation. This page and the evaluation license (`LICENSE`) are superseded by
+the signed agreement for the licensee and its scope.
+
+### 12. How to obtain one
+
+The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com. A license starts with an evaluation on the licensee's own systems
+(`LICENSE`, section 1.4): watch mode, the wire check, and paired receipts on its own load.
+
+## Appendix S. Patents and Trademarks
+
+### Patents
+
+
+
+**All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.**
+
+The filings cover, among other things, the Omni-Compass engine (the six-state closed law and its bounded control
+command held through the integration step), the compass law (the service position pulled to the middle of its band by a
+bounded push and pull, with fail-up at the wall), the antagonist up/down wiring of each muscle, the plug contract (one
+restore point, read-back, the one-writer rule), the two-wire governance of a processor (clock ceiling and power limit),
+the two-way nervous system that grants and withdraws authority per organ, and one governor over many machines and
+realms on one clock.
+
+#### What has been filed
+
+| | |
+|---|---|
+| Application | a **nonprovisional utility patent application** under 35 U.S.C. 111(a), filed with the United States Patent and Trademark Office |
+| Title of the invention | **The Omni-Compass** |
+| Inventor | Alan John Dubra, Kissimmee, Florida, United States |
+| Drawing sheets | 15 |
+| Application data sheet signed | 20 September 2026 (form PTO/AIA/14, 37 CFR 1.76) |
+| Publication | normal eighteen-month publication requested |
+| Application number | withheld here on purpose; the filing is verifiable with the USPTO and is shown to a licensee under a signed Omni-Compass Enterprise License |
+
+The application data sheet names no assignee; the application stands in the inventor's name. Any assignment to The
+Omni-Compass LLC is recorded with the USPTO separately (37 CFR part 3).
+
+No patent license is granted by publishing this repository, by the evaluation license, or by any act of The
+Omni-Compass LLC other than a signed, paid Omni-Compass Enterprise License. Use outside the evaluation license is
+infringement. Everyone who downloads, forks, scans or runs this software is on notice of these filings.
+### Trademarks
+
+
+
+**All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.**
+
+#### The marks
+
+"Omni-Compass", "OmniCompass", the Omni-Compass compass rose with its ring of Greek letters, and the related names, logos
+and trade dress (the "Marks") are trademarks of The Omni-Compass LLC; trademark applications have been filed in the
+United States. Neither the evaluation license (`LICENSE`) nor publication of this repository grants any license to the
+Marks. A license to use them is granted only in a signed Omni-Compass Enterprise License, and only as it states.
+
+#### What is allowed without a license
+
+- Referring to Omni-Compass by name, accurately and in plain text, to say what it is, that you evaluated it, or that a
+  result was produced with it, with the engine version and commit (`LICENSE`, section 4).
+- Linking to the repository or to www.omni-compass.com.
+
+#### What is not allowed
+
+- Using any Mark, or anything confusingly similar, in the name of a product, service, company, domain, account, package,
+  repository, fork or derivative.
+- Using the logo or the compass rose, or altering any Mark.
+- Suggesting endorsement, sponsorship, certification, partnership or affiliation by The Omni-Compass LLC.
+- Using a Mark in advertising, comparative claims or sales material without a signed license.
+
+#### Other companies' marks
+
+Kubernetes is a trademark of The Linux Foundation; NVIDIA is a trademark of NVIDIA Corporation; KEDA and Karpenter are
+projects of their maintainers; other names belong to their owners. Their mention describes compatibility or a system
+Omni-Compass was tested with; it states no affiliation, endorsement or certification (`DISCLOSURES.md`, section 1).
+
+#### Reporting misuse
+
+The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
+
+## Appendix T. Security Policy
+
+
+
+### Reporting a vulnerability
+
+Report a suspected vulnerability privately to The Omni-Compass LLC by telephone at its main office infrastructure (toll-free direct 1-888-339-9551; system route asset 1-888-DEX-YLL-1) or through www.omni-compass.com, never in a public issue,
+pull request or discussion. Include the version and commit, what you saw, how to reproduce it, and its likely impact. We
+acknowledge reports, keep the reporter informed, and coordinate disclosure: a fix or a mitigation is published before the
+details are, and the reporter is credited if they wish. Please give us a reasonable time to fix before any disclosure, do
+not access data that is not yours, and do not disrupt any system; good-faith research that follows this policy will not
+be pursued by us.
+
+### What is in scope
+
+The engine, the controllers, the plugs and wiring, the harnesses, the workflows and the verifier in this repository.
+Third-party software Omni-Compass runs on or connects to (Kubernetes, KEDA, Karpenter, NVIDIA drivers, databases) is
+reported to its own maintainers.
+
+### How Omni-Compass is built to fail safe
+
+- The governor issues control actions only through the shield (`omnicompass/shield.py`, `cpp/src/shield.cpp`), inside the
+  cover the operator granted, and never fights another writer.
+- It snapshots every setting once, before its first write, and the kill switch (`python3 tools/omni_switch.py off`) hands
+  every setting back; a dead-man lease hands them back if the governor stops.
+- It runs under least privilege: on Kubernetes, a service account with `kubectl auth can-i` receipts for what it can and
+  cannot do (`deploy/kind/rbac-omni.yaml`).
+- It contains no telemetry and makes no network connection of its own except to the systems an operator points it at.
+- Every release carries a software bill of materials (`sbom/`) and a seal of the engine and its twins (`results/SEAL.json`,
+  `python3 verify.py`).
+- The capture script (`fleet/capture/kube_capture.sh`) is read-only; no component writes to a live cluster unless the
+  operator starts it in a writing mode.
 
 ## Contact
 

@@ -253,6 +253,7 @@ Founder, The Omni-Compass LLC
 | You are | Read |
 |---|---|
 | CEO, board member, investor | Foreword; Part I (sections 1-3); section 14 (evidence); section 15 (the frozen engines and the three-run rule); section 17 (license); the Executive Summary below |
+| CFO, CIO | section 3 (where the value comes from; 3.4 the arithmetic of the benefit; 3.5 where the evidence stands, read honestly); section 16.3 (the bill on a real cloud); section 14 (what a receipt proves and what it does not); "The Economics of a Receipt" and "Due Diligence"; section 17 and the chapters bound after it (the Enterprise License's standard terms, the patents and trademarks, the security policy) |
 | CTO, architect, head of platform | Parts I-III; section 9 (wiring levels) to plan the rollout; Part VI |
 | The engineer wiring it | Everything, in order. Do not skip the wire check (section 8) or the watch level (section 9, level 1) |
 | Auditor, diligence team | Part II (mechanism), Part VI (proof), Appendix C (equations), Appendix F (evidence map) |
@@ -261,8 +262,8 @@ Founder, The Omni-Compass LLC
 | Data-center, facility or energy operator | The Quick Reference card; sections 1.1 to 1.3; section 9 (levels 5 to 7: the card, the processor, the site); section 10.10 (the processor itself) and 10.11 (the data center under the servers); section 11 (the switches); Appendix E |
 | Site reliability engineer, on call | The Quick Reference card; section 11 (the three ways a governor stops, and what each leaves behind); section 8.5 (wired right or wired wrong); section 7.3 (blind means hold); Appendix E |
 | Security and compliance | Section 11 (the master switch, the kill file and the lease); section 12 (least privilege, supply chain, the audit log); `SECURITY.md`; `DISCLOSURES.md`, sections 4 and 5 |
-| Procurement and counsel | `LICENSE`, `NOTICE`, `PATENTS.md`, `TRADEMARKS.md`, `DISCLOSURES.md`, `LICENSING_FAQ.md`; section 17 (license and commercial terms) |
-| Anyone who wants the whole list | `docs/REGISTER.md`: every muscle wired (1,107 in v5, by family), every benchmark run on every platform (Kubernetes, Azure AKS, GPU, CPU, UPS and batteries, buildings, power grids, robotics) with its result and file, and every open benchmark still to run, in order |
+| Procurement, counsel and attorneys | `LICENSE`, `NOTICE`, `PATENTS.md`, `TRADEMARKS.md`, `DISCLOSURES.md`, `LICENSING_FAQ.md`, `ENTERPRISE_LICENSE.md`, `SECURITY.md`, every one bound into this book in full (the front matter's Disclosures, Declarations and Disclaimers; section 17 and the chapters after it; the License appendix) |
+| Anyone who wants the whole list | `docs/REGISTER.md`: every muscle wired (1,107 on the engine that stands, by family), every benchmark run on every platform (Kubernetes, Azure AKS, GPU, CPU, UPS and batteries, buildings, power grids, robotics) with its result and file, and every open benchmark still to run, in order |
 
 **Conventions.** `code` is a command, file or switch exactly as typed. "Native" means your system as it runs today,
 without Omni-Compass. "Omni" (the second arm of every benchmark) means that same native system with Omni-Compass on top
@@ -1847,6 +1848,84 @@ write and hands it back at the end, and the report says "handed back: yes" or th
 checks that every override was handed back. The watching arm, where it is run, is the wire check of the reading: a
 watching governor that disagrees with native on any gauge has found a difference in the probe, the load or the machine,
 not in Omni-Compass.
+
+**8.7 Coding a new muscle: the muscle SDK.** A muscle not in the catalog (Appendix G), or one whose native controller
+speaks an API no adapter covers, is coded on the muscle SDK (`omnicompass/muscle_sdk.py`, printed in full in the Source
+appendix), the contract every adapter obeys: **observe, bound, request, execute, read back, receipt, restore**. The SDK adds
+a muscle and never a brain: the chain is plant telemetry → observation adapter → the same engine state → bounded authority
+→ shield → actuator → read-back → plant, and the governing state (E, U, I[U], S, B, Ḃ) is untouched by any muscle added
+(section 4). The governor proposes a setting; the SDK's runtime earns the authority to write it, verifies the write and
+writes the receipt. An engineer codes five functions and declares three contracts; everything else (the clamp, the gate,
+the snapshot, the restore, the receipt) is the runtime's.
+
+**The five functions** (the `MuscleAdapter` protocol, or `FunctionalMuscle` for a small connector): `observe()` returns the reading with its timestamp and quality (the wire out); `snapshot_native()` records the setting as found, once, before the first write; `execute(value)` writes one setting through the system's own command or API (the wire in; **WRITES**); `readback()` reads the setting back from the system, never from memory; `restore_native(snapshot)` puts the setting back as found. The adapter owns the vendor's API; the brain never sees it.
+
+**The three contracts** (`MuscleSpec`): the **capability** (`CapabilityContract`: the cover's `minimum` and `maximum`, the `resolution`, the most one write may move (`max_step`) or the most a second may move (`max_rate_per_s`), the `units`, whether the knob is `reversible` and whether it reads back); the **timing** (`TimingContract`: the observation and decision periods, the actuation delay, the minimum hold and the cooldown between writes, the timeout, and `stale_after_s`, past which a reading is blind); the **safety** (`SafetyContract`: the `hard_min` and `hard_max` nothing may cross, `fail_closed`, a `safe_default`, and the `forbidden` context keys, such as a security hold, under which no write is permitted). The spec also names the muscle (`muscle_id`, `plant_id`), its class (`resource_type`, one of the standard classes below), its `automation` mode and its evidence class (`Evidence`: D design, S our own models, L live software, P physical meter, C commercial).
+
+**The automation modes**, from least to most authority: `disabled`; `recommend` (every command computed and receipted, nothing written: the watch level of section 9); `manual`; `external_approval` (a write only with `approved=True` from your change process); `automatic`. A muscle starts at `recommend` and is promoted exactly as section 9's levels promote a stack.
+
+**What the runtime does with each command** (`MuscleRuntime.command`), in order: a stale or invalid observation blocks the write and marks the muscle blind (section 7.3); the mode is checked; the request is clamped to the capability (cover, step, rate, resolution); the safety contract is asked (`outside_hard_bounds`, `forbidden:<key>`); the hold and the cooldown are checked (`hold_or_cooldown`); only then is the native snapshot taken, once, and the write made, and where the capability says the knob reads back, the setting is read back and the residual (realized minus bounded) recorded. Every attempt, permitted or not, writes one receipt (`MuscleReceipt`): `muscle_id`, `mode`, `requested`, `bounded`, `realized`, `units`, `permitted`, `reason`, `observation_age_s`, `actuation_latency_s`, `actuator_residual`, `evidence`, `status`. `MuscleRegistry` holds every muscle of a body, refuses a duplicate name, answers `catalog()` (every muscle with its cover, mode, evidence and status) and `restore_all()`, which hands every muscle back in the reverse of the order they were registered.
+
+**A worked example.** The power limit of one graphics card, through the card's own command, first in `recommend`:
+
+```python
+import json, subprocess
+from omnicompass.muscle_sdk import (
+    AutomationMode, CapabilityContract, Evidence, FunctionalMuscle,
+    MuscleRegistry, MuscleRuntime, MuscleSpec, Observation,
+    SafetyContract, TimingContract)
+
+def read_limit():
+    # the wire out: the setting as the card reports it now
+    out = subprocess.run(
+        ["nvidia-smi", "-i", "0", "--query-gpu=power.limit",
+         "--format=csv,noheader,nounits"],
+        capture_output=True, text=True, check=True).stdout
+    return float(out.strip())
+
+def write_limit(w):
+    # the wire in: one setting, the card's own command (WRITES)
+    subprocess.run(["nvidia-smi", "-i", "0", "-pl", str(int(w))],
+                   check=True)
+
+spec = MuscleSpec(
+    muscle_id="gpu0.power_limit", plant_id="card-0",
+    resource_type="gpu.power_limit", adapter_version="1.0",
+    capability=CapabilityContract(minimum=100.0, maximum=300.0,
+                                  resolution=1.0, max_step=25.0,
+                                  units="W"),
+    timing=TimingContract(observation_period_s=2.0,
+                          decision_period_s=2.0, minimum_hold_s=10.0,
+                          stale_after_s=6.0),
+    safety=SafetyContract(hard_min=100.0, hard_max=300.0,
+                          forbidden=("security_block",)),
+    automation=AutomationMode.RECOMMEND,
+    evidence=Evidence.LIVE_SOFTWARE,
+    native_owner="the card's firmware")
+muscle = FunctionalMuscle(
+    spec, observe=lambda: Observation(read_limit()),
+    execute=write_limit, readback=read_limit,
+    snapshot=read_limit, restore=write_limit)
+audit = open("/var/log/omni/muscles.jsonl", "a")
+registry = MuscleRegistry()
+registry.register(MuscleRuntime(
+    muscle, audit=lambda rec: audit.write(json.dumps(rec) + "\n")))
+
+receipt = registry.command("gpu0.power_limit", 250.0,
+                           context={"security_block": False})
+# recommend: permitted False, reason "recommend", nothing written;
+# the receipt is in the audit
+registry.restore_all()
+# every muscle back as found, in reverse order; each one receipted
+```
+
+Promoted to `AutomationMode.AUTOMATIC`, the same code writes: a request of 250 W from the 300 W found is bounded to 250 and read back (residual 0); a request of 200 W ten seconds later is bounded to 225 by `max_step`; a request inside the 10-second hold is refused (`hold_or_cooldown`); a request made while `security_block` is true is refused (`forbidden:security_block`) and nothing moves; `restore_all()` returns the card to the 300 W found at the start and its receipt says `restored`. These outcomes are the SDK's own tests (`tests/test_muscle_sdk.py`).
+
+**The standard classes** (`STANDARD_MUSCLE_CLASSES`) name the knob a new adapter governs, so that the catalog and the receipts read the same across a company's stacks: `kubernetes.replicas`, `.cpu_request`, `.cpu_limit`, `.memory_request`, `.memory_limit`, `.hpa_target`, `.pod_placement`, `.node_pool`; `host.cpufreq`, `.cpu_quota`, `.cpuset`, `.memory`, `.io`; `gpu.power_limit`, `.clock_envelope`, `.mig`, `.admission`; `cloud.instance_count`, `.instance_size`, `.placement`, `.start_stop`, `.capacity_policy`; `storage.volume_size`, `.tier`, `.iops`, `.throughput`, `.placement`; `network.traffic_weight`, `.rate_limit`, `.bandwidth`, `.routing`; `application.concurrency`, `.worker_count`, `.queue_admission`, `.jvm_heap`, `.thread_pool`, `.batch`; `facility.cooling_setpoint`, `.rack_power`, `.site_power`. A class is a contract, not a claim that a connector for it has run live: each adapter earns its own evidence class, and Appendix G's wiring recipes say which have (`docs/wiring_recipes.csv`).
+
+A muscle coded on the SDK is wired into a body as any other (section 2): one governor per body, the muscle's reading a gauge
+of that body, its receipts in the body's audit; the wire check of section 8.4 applies to it unchanged (snapshot, write,
+read-back, restore, nothing left behind), and it enters service through the levels of section 9, watched first.
 
 ---
 
@@ -3465,6 +3544,14 @@ which is not an open-source license; seeing the source grants no right beyond it
 grant it under more than one license at once (the Evaluation License to everyone, a paid Enterprise License to a
 customer), may set the terms of each new version, and may assign the copyright; copies already received keep the
 terms they were received under. The license texts (`LICENSE`, `NOTICE`, `DISCLOSURES.md`) govern.
+
+Every paper is bound into this book in full, as it stands in the repository, in the chapters that follow this one: the
+licensing questions and answers, the third-party notices, the standard terms of the Enterprise License (the grant, the
+term, the fees' basis, the warranties and their limits, the indemnities, the audit right, the source escrow and the
+governing law), the patents and trademarks statements and the security policy; the Evaluation License itself is the
+License appendix, and the disclosures, declarations and disclaimers stand in the front matter. Where a paper and this
+chapter differ, the paper governs. The engine's whole source, every Python file the fingerprint `OMNI_V7.json` names,
+is printed in the Source appendix: nothing in the mechanism is withheld from the owner.
 
 ## 18. Python, C++ and the Seal
 

@@ -2583,7 +2583,120 @@ What a lever buys is labelled for what it is. Less work per energy, with no work
 proven lower, is SERVICE IMPROVEMENT WITH ENERGY TRADEOFF, the mirror of ENERGY IMPROVEMENT WITH SERVICE TRADEOFF.
 Without that proof it reads LESS WORK PER ENERGY.
 
-## 18. The Engines and Their Audit
+## 18. The Engine That Stands: Omni v7
+
+
+
+Omni v7 is the engine that stands on main since 16 October (the founder's order: everything on the newest engine). Every benchmark runs again on it (`scripts/reruns.txt`; the grid conductor's reruns, grid and Azure queues restarted on it the same day), and every earlier table stands as its own engine's result until its three runs on v7 land; results from two versions are never pooled. v7 is v6 with five changes, each found from a v6 run's own files or from the governing rules themselves:
+
+| # | Change | Where | What it tightens |
+|---|---|---|---|
+| 1 | CPU conveyance obeys the namespace quota | `omni_controller/quota.py`, `muscles.py` | no write Kubernetes would refuse |
+| 2 | On a shared host, no limit raised while the machine is at or over 75% busy or unread (the replica room's guard) | `omni_controller/muscles.py` | the host's top, nothing else |
+| 3 | The verdict reads a trial in the reports' own words (GAIN, EVEN, LOSS) | `omnicompass/verdict.py` | the do-no-harm trigger |
+| 4 | Every rule counts in seconds, not decisions | `omni_controller/controller.py` | the same behaviour at any decision period |
+| 5 | The cloud's rule in one word, `--give-back-only` | `omni_controller/controller.py`, `deploy/install/omni-compass-cloud.yaml`, `scripts/kind_bench.sh` | the bill can only fall or stay |
+
+### 1. Quota-aware conveyance
+
+The original capacity run 38722001872 tried to raise a pod CPU limit while its namespace CPU quota was already full. The candidate reads each namespace's ResourceQuota CPU-limit hard/used values, obeys the stricter pending spec/status ceiling, and reserves each accepted increase across all target deployments in one conveyance pass. It does not increase or delete an operator quota. PriorityClass scope selectors are matched from pod metadata, without deployment or quota names hardwired into the governor. Unknown quota state, read failures and unsupported scopes preserve native limits for expansion; reductions remain possible. Decreases do not create spendable headroom until observed by Kubernetes.
+
+**What the first live trial found, and the correction (16 October).** The three trials of the candidate as first pushed (Goldilocks run 38825214203, the KEDA add-ons run 38825211370, the capacity test run 38825208939; one run of ten pairs each, so single runs, not three-run tables) read the candidate well short of omni-v6's three-run tables on the two add-on tests: Goldilocks response time at the 95th percentile -6% (EVEN) against v6's -58% GAIN in all three runs, HPA replicas +20% and pods started +200% (power given), the pod start wait +172% (LOSS); KEDA on the requests in flight p95 -2.7% (EVEN) against v6's -73%, replicas +17% (power given); KEDA on the CPU target and the requests p95 +3% (EVEN) against v6's -55%; the capacity test EVEN at every cap, as on v5. The governor wrote 5 commands a run against v6's 15 and the host was 4% busier against 40%: conveyance never raised a limit. The audit says why, 65 times in one repetition: `quota: CPU limit expansion blocked, reason: quota read unavailable: CalledProcessError`. The governor's role on every kind test (`deploy/kind/rbac-omni.yaml`, receipted in each run's `rbac_omni.txt`) cannot list ResourceQuotas, and the budget as first written read an unreadable quota as a zero allowance. The toy gate had not seen it because its model of the cluster answered the quota read with an empty list. The correction: a namespace whose quotas cannot be read is **no budget known**, not a zero budget; the raise proceeds as it did on omni-v6 and Kubernetes' own admission, which refuses any write over a quota the governor cannot see, stays the authority (the plug reads every write back and a refused one is audited and never advertised); the audit says so once a pass. Where the role can read the quota, the budget bounds every raise as before. The toy now runs the convey model a second time with the quota unreadable (section 6), the regression `test_an_unreadable_quota_holds_nothing` holds the v6 arithmetic under a forbidden read, and the three trials run again on the corrected candidate; the first trials stay in `results/live/raw/` on this branch as the record of the fault.
+
+Kubernetes admission remains authoritative. A concurrent rejected write is audited and does not become an invented conveyance gain. The node's existing CPU cushion, operator CPU floor, security hold, workload schedule and benchmark validity checks remain intact. The separate runner shutdown in the historical run has no established cause and is not claimed fixed by this actuator change.
+
+### 2. Conveyance on a shared host: one guard, two designs refused by the toy
+
+The v6 three-run KEDA table (`results/live/V6_KEDA_REQUESTS.md`) read the pod start wait, mean, +12.5%, +12.0% and +22.7% (EVEN on the three-run rule, LOSS in two single runs) beside response time -59% and CPU used +55%. The run's own files (`results/live/raw/addons-run-38725705826`): 149 raises, each pod's limit set to 1,850m (two serving pods on its node) or 3,700m (one), the HPA at 8.8 replicas on average, the host 0.27 busy under native and 0.34 under Omni-Compass, past 75% busy for 0.3% of its samples. On kind every node is a container on one 4-core machine and reports all four cores as its own, so the limits sum to about three machines: a ceiling, not a use; the kernel's fair scheduler arbitrates when the pods ask for more than the machine, as it does for native's pods.
+
+Two repairs were written first and both were refused by the toy gate (section 6) before any real run: **the host's CPU counted once** and shared by every serving pod (at the run's nine replicas 3,500m / 9 is under the operator's 500m, so nothing is ever conveyed: in the model the +64% work and -53% response time of conveyance are lost whole, requests served -16% against v6, LOSS); and **a hold while a pod starts on the host** (start wait 1.1% shorter for requests served -0.11% and response time +0.5%, both LOSS against v6 at the real regime). v7 keeps the one guard the model reads as no LOSS, the same as the replica room's (`omni_controller/capacity.py`): on a shared host no limit is raised while the machine's measured busy share is at or over 75% or cannot be read; limits already given stay; lowering is never held back; each hold is written to the audit (`"convey": "held"`). The slower pod start is the busier host serving more requests, the price of the work; it stays shown in every receipt and is judged as the table judges it.
+
+### 3. The verdict in words
+
+The verdict (`omnicompass/verdict.py`) is the engine's do-no-harm trigger: before a knob may move one step further from native, the step runs as a trial and its cost per piece of work is compared with the cost at the reference. Through v6 the comparison was the two medians alone: the step was allowed if m[trial] ≤ m[ref] · (1 + tolerance). On noisy work a median wanders, so a step that truly cost more than the allowance was often allowed by chance.
+
+v7 (`judge="interval"`, the default) reads the trial exactly as a report reads a row (`tools/readings.py`). On the logarithm of each piece of work's cost, so that a heavy tail does not decide it, the change is
+
+d = mean ln c[trial] − mean ln c[ref],  with the 95% interval  d ± 1.96 · √(s²[ref] / n[ref] + s²[trial] / n[trial])  (Welch's standard error),
+
+and with τ = ln(1 + tolerance) the allowance in the same units:
+
+- the interval wholly above zero is a **LOSS**: the step is refused and undone, whatever the allowance says;
+- wholly below zero is a **GAIN**; across zero is **EVEN**;
+- while the interval's half-width exceeds τ, the evidence is wider than the allowance, and the trial measures on, up to three times `min_samples`, before it decides;
+- a GAIN or EVEN step is allowed only if both estimates are inside the allowance: the median (v6's guard, kept) and d ≤ τ;
+- a stepwise knob is read the same way against the costs first measured at native as well, so a run of small steps cannot add up past the allowance.
+
+Every judgement writes its reading and its intervals to the audit (`"reading"`, `"interval_ln"`). `judge="median"` reproduces v6 exactly.
+
+On noisy work (log-normal costs, σ = 0.25, a 2% allowance, 300 trials each, seeded):
+
+| True cost of the step | Allowed through v6 (medians) | Allowed in v7 (in words) |
+|---|---|---|
+| +0% (free) | 63% | 60% |
+| +1% | 56% | 50% |
+| +2% (at the allowance) | 47% | 39% |
+| +3% | 40% | 28% |
+| +5% | 26% | 14% |
+
+A step that costs more than the allowance is allowed about a third less often at +3% and about half as often at +5%; a free step is kept almost as often. A step whose cost is clearly higher reads LOSS and is refused. These are properties of the rule on modelled costs (class S), not benchmark results (`tests/test_verdict_interval.py`).
+
+### 4. Every rule counts in seconds
+
+Five of the governor's rules counted decisions: the clear time after a breach (3), the cruise wait (2), the strict window (5), the verdict's probe spacing (10), recheck (120) and trial length (20). At a decision every 60 seconds those are 3, 2, 5, 10, 120 and 20 minutes; at 15 seconds they would silently shrink fourfold, and a give-back trial's 20 decisions would last 5 minutes instead of 20. v7 states each rule in seconds (`--slo-clear-s 180`, `--cruise-after-s 120`, `--strict-window-s 300`, `--verdict-every-s 600`, `--verdict-recheck-s 7200`, `--verdict-trial-s 1200`) and converts it to decisions at the running period, n = max(1, round(seconds / period)). At 60 s every count is v6's; an explicit count (`--slo-clear`, `--cruise-after`, `--strict-window`, `--verdict-every`, `--verdict-recheck`) still wins.
+
+Two moves are made rates in time as well: the compass moves the HPA target by the same amount a minute at any period (its step is scaled by period / 60, and coasting likewise), and a node pool gives back at most one machine a minute (`RELEASE_PERIOD_S = 60`), however often the governor decides.
+
+
+### 5. The cloud's rule in one word
+
+In a cloud Omni-Compass shows one thing: the same work as native for a smaller bill, never a bigger one. Through v6 that rule was assembled from several settings in the workflow (`OMNI_MACHINES_ONLY=1`, the dial at the tune-down, the sensed and capped deployments left empty). v7 makes it one flag, enforced in the governor itself: `--give-back-only` turns off every pod-, processor-, power-, clock-, cooling- and batch-actuator, sets the replica ceiling to 0 and the dial to the tune-down, and leaves the node pool as the only knob. Whatever else is passed, the governor can then only park a machine the cloud already made, after its own trial, and wake it on a breach: no more pods and no more machines than native. The Azure, Google and Amazon install file (`deploy/install/omni-compass-cloud.yaml`) and the machines-only branch of `scripts/kind_bench.sh` pass it.
+
+### 6. The toy gate: every change run in our own models first
+
+The founder's order of 15 October, night: every fix, knob and rule is tried in a toy model before it is pushed, and goes to a real run only where it shows promise there. `tools/toy_gate.py` runs two checkouts, the engine that stands and the candidate, each in its own process, on the same seeds, and reads the candidate against the standing engine paired by seed (the mean change, its 95% interval over the seeds, the word by the gauge's aim). Three toys, all evidence class S, our own models, never a benchmark result:
+
+- **cluster**: the shipped Kubernetes controller in the cloud setting (node-pool mode, the compass law, the tune-down, `--give-back-only`) on the toy cluster of `pilot/selfpilot.py` as the cloud meets it (the cloud's own autoscaler makes machines in both arms; the governor only parks one that exists, which the cloud deletes after ten minutes empty, and wakes it while it exists); a decision every 60 s and the fast check every 15 s; **cluster15** the same with a decision every 15 s.
+- **convey**: one 4-core host carrying three kind nodes, php-apache under its HPA (200m request, 500m limit, 50%, 1 to 10), load generators stepping 1 2 3 1 2 1 as `deploy/kind/loadgen.yaml` runs them, set so the native arm sits where the v6 KEDA run's native arm did (host busy 0.28 and p95 0.40, response p95 229 ms, 8.3 pods against the run's 0.27, 0.42, 248 ms and 8.8); the candidate's own `Muscles.convey` called every 15 s. Since 16 October the model runs twice: once with the namespace's quota readable and empty (`convey`), once with the quota unreadable, as the governor's role finds it on every kind test (`convey_unreadable_quota`): the first trial's fault (section 1) is now the toy's to catch.
+- **verdict**: the do-no-harm trigger alone on noisy work.
+
+What it read on v7 against v6, 10 seeds (`results/toy_gate/`):
+
+| Toy | Reading |
+|---|---|
+| cluster, 60 s | v7 and v6 EVEN on every gauge; both against native: bill -1% (EVEN), energy per core-hour -2.4% GAIN, pods waiting for a place about three times native's (v6 LOSS, v7 EVEN). The cloud setting itself barely cuts the bill in this model and makes pods wait; checked against the Azure receipts' own pending-pod gauge before anything is concluded. |
+| cluster, 15 s | v6: bill +43% (power given), pods waiting 10x (LOSS). v7: bill EVEN against native, pods waiting +111% LOSS, p95 +0.3% LOSS. Every rule now keeps its time, and faster is still not free: the default stays 60 s. |
+| convey | v7 as first written (host once, start hold): requests served -16%, p95 +155% against v6, LOSS, nothing conveyed. The busy guard alone: identical to v6 at the real regime and at double load (the hold never binds under 75%). |
+| convey, quota unreadable (added 16 October) | the candidate as first pushed (digest 1a0d1d1b91bc49ad): requests served -39% and p95 +113% against v6, LOSS, the host and the limits given identical to native: nothing conveyed, as the live trials found. The corrected candidate (digest d6d467b824c585f1): identical to v6 on every gauge (+64% requests and -53% p95 against native), with the quota readable and empty and with it unreadable alike. |
+| verdict | a step costing 3% more allowed 28% of the time instead of 40%; 5% more, 14% instead of 26%; a free step 60% instead of 63%. |
+
+### The first three-run tables on v7 (16 October)
+
+Twelve runs on real Kubernetes, ten pairs each, every one omni-v7 (`results/live/V7_*.md`), native against Omni-Compass on top.
+No row reads LOSS on the three-run rule.
+
+| Benchmark | What moved, GAIN in all three of our runs | EVEN | Power given |
+|---|---|---|---|
+| Goldilocks and the VPA's recommender | response time −45% to −47% mean, −60% to −62% p95, −67% to −69% p99; time over the line −100% | machines, failed requests, replicas, pods started, pod start wait, alert minutes | parked-worker energy +1.6% to +2.3% |
+| KEDA's HTTP add-on | response time −57% to −58% mean, −71% to −75% p95; alert minutes −93% to −96%; replicas −15% to −19%; pods started −17% to −23% | machines, failed requests, pod start wait | parked-worker energy +2.2% to +2.3% |
+| KEDA on CPU and requests | response time −36% to −38% mean, −52% to −54% p95, −57% to −59% p99; time over the line −98% to −100% | machines, failed requests, replicas, alert minutes | parked-worker energy +1.1% to +1.7% |
+| CruiseKube applying its own recommendations | nothing: no setting written | every gauge | none |
+| Fixed capacity, four CPU caps | nothing: the cap blocks the one lever | completed work and work inside the line at every cap | none |
+
+Single runs clear of the noise that the other two did not repeat, each EVEN on the rule: CruiseKube's 99th percentile +3.1% (run A)
+and node-hours +1.0% (run B); Goldilocks replicas +3.4% (run C); capacity's completed work +3.8% at 1 core (run A).
+
+### Validation
+
+Six shared-host regressions pass (`tests/test_convey_shared_host.py`: each node keeps its own arithmetic under the top, a busy or unread host holds every raise, a busy host still lowers, a start holds nothing, separate machines are never held, an unreadable quota holds nothing). Nine quota regressions pass (`tests/test_quota_convey.py`, among them: an unreadable quota is no budget known); the original source fails both the full-quota regression and the admission-rejection regression. Existing conveyance integration checks pass unchanged. The verdict's rule tests (`tests/test_verdict_interval.py`, `tests/test_verdict.py`: v6's medians kept under `judge="median"`, a noiseless 1.5% rise refused against a 1% allowance under v7), the time-correct tests (`tests/test_time_correct.py`, `tests/test_cloud_cadence.py`) and the cloud tests (`tests/test_cloud_machines_only.py`) pass, as do every verdict user's tests (Redis, Kafka, pgbench, sysbench, YCSB, CPU power, GPU). Live GitHub trials on the v7 commit (KEDA's add-ons, Goldilocks, CruiseKube, capacity) repeats the original cap 1500m / repetition 4 / 1200-second-per-arm case at the original request rates. Its completion and measured result must be read from its artifact, with any LOSS retained. The trial cannot launch Azure, Google, Amazon or GPUs.
+
+The organisms the candidate is run on are the seven of 16 October (the spine, the 267 muscles every stack runs on, the seventh; `docs/THE_SPINE.md`): they are groupings of catalog rows made in the runners, so the candidate's fingerprint did not move for them, and every organism table on this engine lists the spine first.
+
+Reference: Kubernetes [Resource Quotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/) and [in-place container resource resizing](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/). The CPU budget helper is included in both the engine and actuator fingerprints. README.md, LICENSE, NOTICE, DISCLOSURES.md, PATENTS.md and TRADEMARKS.md accompany the trial artifact.
+
+© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+
+## 19. The Engines and Their Audit
 
 ### Which engine is which
 
@@ -2657,7 +2770,7 @@ that gates every machine release.
 *Push and pull, the band and its cushions, the physics of a processor, and the two-way wires that carry the force from the brain to every muscle and back.*
 
 
-## 19. The Compass: Push, Pull and the Two Forces
+## 20. The Compass: Push, Pull and the Two Forces
 
 
 The compass (`omnicompass/compass_law.py`) is the law that carries the engine's push and pull to every muscle.
@@ -2853,7 +2966,7 @@ every result in this book is run again on it. The theory of the rule is the chap
 book.
 
 
-## 20. The Physics of a Processor
+## 21. The Physics of a Processor
 
 
 A GPU's firmware raises its clock one step at a time whenever there is work and room; each higher clock needs a higher
@@ -2875,7 +2988,7 @@ stops at the bottom of the compass instead of slamming into the wall; the limite
 the chip is saved twice in a data center: once at the chip and again at the chillers that would have carried its heat.
 
 
-## 21. The Two-Way Nervous System
+## 22. The Two-Way Nervous System
 
 
 Every muscle is wired both ways: a sensory wire in (its meters) and a motor wire out (its knob), with the read-back
@@ -3001,7 +3114,7 @@ in the table, not asserted here.
 ---
 
 
-## 22. The Nervous System in Detail
+## 23. The Nervous System in Detail
 
 ### The two-way nervous system (live controller)
 
@@ -3098,7 +3211,7 @@ python k8s_controlplane/test_nervous.py
 *One thousand one hundred and seven muscles in four realms on one spine, built into seven organisms, and every gauge used to judge them.*
 
 
-## 23. The Muscles, the Realms and the Seven Organisms
+## 24. The Muscles, the Realms and the Seven Organisms
 
 
 ### 2.1 The catalog
@@ -3312,7 +3425,7 @@ ordered by what each benchmark adds to the index that the ones before it did not
 machines, a buffer pool after a cache), a new native controller, a new class of evidence.
 
 
-## 24. The Spine: the Base Every Stack Runs On
+## 25. The Spine: the Base Every Stack Runs On
 
 
 
@@ -3403,7 +3516,7 @@ own number. Every table lists the spine first, because the other six stand on it
 | `docs/REALM_MUSCLES.md`, `docs/MUSCLE_CATALOG.md` | the spine's 267 muscles listed first; each muscle's organisms column names the spine |
 | `results/realms_v5/`, `results/grid_v5/`, `docs/STATE_OF_PLAY.md` | the spine's readings, native against Omni-Compass on top, each named for the engine it ran on |
 
-## 25. The Four Realms
+## 26. The Four Realms
 
 
 
@@ -3469,7 +3582,7 @@ A realm result that reads GAIN is a reason to test that knob on a real machine, 
 whose knobs can be tested for real first are the compute realm's (Kubernetes on kind, the card), because the tools
 already exist.
 
-## 26. The Realm Muscles
+## 27. The Realm Muscles
 
 
 
@@ -3734,7 +3847,7 @@ Every muscle of the catalog once (`tower`; the older name `organism_656` is read
 
 The spine listed first above, run on its own (`spine`): the same muscles, the same native controllers, nothing of any one realm on top of them.
 
-## 27. The Domain Map
+## 28. The Domain Map
 
 
 
@@ -3884,7 +3997,7 @@ Omni-Compass can be the boundary layer AI runs inside. It cannot be the thing th
 
 Each connector follows the same path as compute: wired, benchmarked against today's controls, verified, pre-registered, tested on held-out scenarios, then released.
 
-## 28. The Problem Map
+## 29. The Problem Map
 
 
 
@@ -3964,7 +4077,7 @@ equation alone setting the draw) cut ramps 63% but did not hold the grid limit: 
 - [vLLM anatomy](https://vllm.ai/blog/2025-09-05-anatomy-of-vllm); [llm-d 0.5](https://llm-d.ai/blog/llm-d-v0.5-sustaining-performance-at-scale)
 - [Dark Reading: AI agents and runaway costs](https://www.darkreading.com/application-security/how-ai-agents-can-trigger-runaway-costs)
 
-## 29. The Seven Organisms and the Benchmark Grid
+## 30. The Seven Organisms and the Benchmark Grid
 
 
 Omni-Compass is benchmarked on seven organisms, each run native and with Omni-Compass on top of native on the same seed,
@@ -4014,7 +4127,7 @@ the real cache and the real card are the anchors measured on real software and, 
 and their losses are in the manual's section 16.
 
 
-## 30. The Metrics Catalog
+## 31. The Metrics Catalog
 
 
 
@@ -4143,7 +4256,7 @@ the power budget are designed (`docs/DOMAIN_MAP.md`, "on-site batteries") and no
 *The universal plug, the adapters, the wire check, and the step-by-step work of wiring Omni-Compass onto a running stack.*
 
 
-## 31. The Plug, the Adapters and the Wire Check
+## 32. The Plug, the Adapters and the Wire Check
 
 
 Think of a high-end car stereo: one head unit, one standard plug on its back, and an adapter harness for each make of
@@ -4249,10 +4362,88 @@ checks that every override was handed back. The watching arm, where it is run, i
 watching governor that disagrees with native on any gauge has found a difference in the probe, the load or the machine,
 not in Omni-Compass.
 
+**8.7 Coding a new muscle: the muscle SDK.** A muscle not in the catalog (Appendix G), or one whose native controller
+speaks an API no adapter covers, is coded on the muscle SDK (`omnicompass/muscle_sdk.py`, printed in full in the Source
+appendix), the contract every adapter obeys: **observe, bound, request, execute, read back, receipt, restore**. The SDK adds
+a muscle and never a brain: the chain is plant telemetry → observation adapter → the same engine state → bounded authority
+→ shield → actuator → read-back → plant, and the governing state (E, U, I[U], S, B, Ḃ) is untouched by any muscle added
+(section 4). The governor proposes a setting; the SDK's runtime earns the authority to write it, verifies the write and
+writes the receipt. An engineer codes five functions and declares three contracts; everything else (the clamp, the gate,
+the snapshot, the restore, the receipt) is the runtime's.
+
+**The five functions** (the `MuscleAdapter` protocol, or `FunctionalMuscle` for a small connector): `observe()` returns the reading with its timestamp and quality (the wire out); `snapshot_native()` records the setting as found, once, before the first write; `execute(value)` writes one setting through the system's own command or API (the wire in; **WRITES**); `readback()` reads the setting back from the system, never from memory; `restore_native(snapshot)` puts the setting back as found. The adapter owns the vendor's API; the brain never sees it.
+
+**The three contracts** (`MuscleSpec`): the **capability** (`CapabilityContract`: the cover's `minimum` and `maximum`, the `resolution`, the most one write may move (`max_step`) or the most a second may move (`max_rate_per_s`), the `units`, whether the knob is `reversible` and whether it reads back); the **timing** (`TimingContract`: the observation and decision periods, the actuation delay, the minimum hold and the cooldown between writes, the timeout, and `stale_after_s`, past which a reading is blind); the **safety** (`SafetyContract`: the `hard_min` and `hard_max` nothing may cross, `fail_closed`, a `safe_default`, and the `forbidden` context keys, such as a security hold, under which no write is permitted). The spec also names the muscle (`muscle_id`, `plant_id`), its class (`resource_type`, one of the standard classes below), its `automation` mode and its evidence class (`Evidence`: D design, S our own models, L live software, P physical meter, C commercial).
+
+**The automation modes**, from least to most authority: `disabled`; `recommend` (every command computed and receipted, nothing written: the watch level of section 9); `manual`; `external_approval` (a write only with `approved=True` from your change process); `automatic`. A muscle starts at `recommend` and is promoted exactly as section 9's levels promote a stack.
+
+**What the runtime does with each command** (`MuscleRuntime.command`), in order: a stale or invalid observation blocks the write and marks the muscle blind (section 7.3); the mode is checked; the request is clamped to the capability (cover, step, rate, resolution); the safety contract is asked (`outside_hard_bounds`, `forbidden:<key>`); the hold and the cooldown are checked (`hold_or_cooldown`); only then is the native snapshot taken, once, and the write made, and where the capability says the knob reads back, the setting is read back and the residual (realized minus bounded) recorded. Every attempt, permitted or not, writes one receipt (`MuscleReceipt`): `muscle_id`, `mode`, `requested`, `bounded`, `realized`, `units`, `permitted`, `reason`, `observation_age_s`, `actuation_latency_s`, `actuator_residual`, `evidence`, `status`. `MuscleRegistry` holds every muscle of a body, refuses a duplicate name, answers `catalog()` (every muscle with its cover, mode, evidence and status) and `restore_all()`, which hands every muscle back in the reverse of the order they were registered.
+
+**A worked example.** The power limit of one graphics card, through the card's own command, first in `recommend`:
+
+```python
+import json, subprocess
+from omnicompass.muscle_sdk import (
+    AutomationMode, CapabilityContract, Evidence, FunctionalMuscle,
+    MuscleRegistry, MuscleRuntime, MuscleSpec, Observation,
+    SafetyContract, TimingContract)
+
+def read_limit():
+    # the wire out: the setting as the card reports it now
+    out = subprocess.run(
+        ["nvidia-smi", "-i", "0", "--query-gpu=power.limit",
+         "--format=csv,noheader,nounits"],
+        capture_output=True, text=True, check=True).stdout
+    return float(out.strip())
+
+def write_limit(w):
+    # the wire in: one setting, the card's own command (WRITES)
+    subprocess.run(["nvidia-smi", "-i", "0", "-pl", str(int(w))],
+                   check=True)
+
+spec = MuscleSpec(
+    muscle_id="gpu0.power_limit", plant_id="card-0",
+    resource_type="gpu.power_limit", adapter_version="1.0",
+    capability=CapabilityContract(minimum=100.0, maximum=300.0,
+                                  resolution=1.0, max_step=25.0,
+                                  units="W"),
+    timing=TimingContract(observation_period_s=2.0,
+                          decision_period_s=2.0, minimum_hold_s=10.0,
+                          stale_after_s=6.0),
+    safety=SafetyContract(hard_min=100.0, hard_max=300.0,
+                          forbidden=("security_block",)),
+    automation=AutomationMode.RECOMMEND,
+    evidence=Evidence.LIVE_SOFTWARE,
+    native_owner="the card's firmware")
+muscle = FunctionalMuscle(
+    spec, observe=lambda: Observation(read_limit()),
+    execute=write_limit, readback=read_limit,
+    snapshot=read_limit, restore=write_limit)
+audit = open("/var/log/omni/muscles.jsonl", "a")
+registry = MuscleRegistry()
+registry.register(MuscleRuntime(
+    muscle, audit=lambda rec: audit.write(json.dumps(rec) + "\n")))
+
+receipt = registry.command("gpu0.power_limit", 250.0,
+                           context={"security_block": False})
+# recommend: permitted False, reason "recommend", nothing written;
+# the receipt is in the audit
+registry.restore_all()
+# every muscle back as found, in reverse order; each one receipted
+```
+
+Promoted to `AutomationMode.AUTOMATIC`, the same code writes: a request of 250 W from the 300 W found is bounded to 250 and read back (residual 0); a request of 200 W ten seconds later is bounded to 225 by `max_step`; a request inside the 10-second hold is refused (`hold_or_cooldown`); a request made while `security_block` is true is refused (`forbidden:security_block`) and nothing moves; `restore_all()` returns the card to the 300 W found at the start and its receipt says `restored`. These outcomes are the SDK's own tests (`tests/test_muscle_sdk.py`).
+
+**The standard classes** (`STANDARD_MUSCLE_CLASSES`) name the knob a new adapter governs, so that the catalog and the receipts read the same across a company's stacks: `kubernetes.replicas`, `.cpu_request`, `.cpu_limit`, `.memory_request`, `.memory_limit`, `.hpa_target`, `.pod_placement`, `.node_pool`; `host.cpufreq`, `.cpu_quota`, `.cpuset`, `.memory`, `.io`; `gpu.power_limit`, `.clock_envelope`, `.mig`, `.admission`; `cloud.instance_count`, `.instance_size`, `.placement`, `.start_stop`, `.capacity_policy`; `storage.volume_size`, `.tier`, `.iops`, `.throughput`, `.placement`; `network.traffic_weight`, `.rate_limit`, `.bandwidth`, `.routing`; `application.concurrency`, `.worker_count`, `.queue_admission`, `.jvm_heap`, `.thread_pool`, `.batch`; `facility.cooling_setpoint`, `.rack_power`, `.site_power`. A class is a contract, not a claim that a connector for it has run live: each adapter earns its own evidence class, and Appendix G's wiring recipes say which have (`docs/wiring_recipes.csv`).
+
+A muscle coded on the SDK is wired into a body as any other (section 2): one governor per body, the muscle's reading a gauge
+of that body, its receipts in the body's audit; the wire check of section 8.4 applies to it unchanged (snapshot, write,
+read-back, restore, nothing left behind), and it enters service through the levels of section 9, watched first.
+
 ---
 
 
-## 32. The Harness
+## 33. The Harness
 
 
 
@@ -4314,7 +4505,7 @@ Live kube-controller-manager, kind CI, GPU MIG scheduler, facility cooling plant
 
 See `LIMITS.md`.
 
-## 33. The Wiring Guide
+## 34. The Wiring Guide
 
 
 
@@ -4421,7 +4612,7 @@ A PodDisruptionBudget on each service is required, because drains go through the
 | The frozen engine's results, three runs each, read by rule | `results/live/V1_*.md`, `results/live/V3_*.md`; `docs/OMNI_V1.md`, `docs/OMNI_V3.md` |
 | The same wiring on Azure's managed Kubernetes (the bill), a database pooler, a rented machine, the simulators, a message broker's consumer group, a cache's memory ceiling, a drone swarm's autopilot | the manual, chapter 7 (`docs/OMNI_COMPASS_MANUAL.md`) |
 
-## 34. Before You Start, and the Eight Levels
+## 35. Before You Start, and the Eight Levels
 
 
 ### 9.1 What your system needs
@@ -4648,7 +4839,7 @@ directive for every muscle; making the verdict per muscle there is the next engi
 designed and not built, because every result must be run again on a new engine.
 
 
-## 35. Stack by Stack
+## 36. Stack by Stack
 
 
 Every wiring below is the same plug (section 8): one wire in (the stack's own meter), one wire out (one setting the
@@ -5073,7 +5264,7 @@ paired receipts, this section is a wiring instruction, not a claim of savings.
 ---
 
 
-## 36. The Integration Manual
+## 37. The Integration Manual
 
 
 
@@ -5368,7 +5559,7 @@ simulation harnesses; every decision they take goes through the twinned laws. Th
 Keep this manual with the code. When Omni-Compass changes, this manual, the C++ twin and the seal change in the same
 commit.
 
-## 37. Running the GPU Benchmark
+## 38. Running the GPU Benchmark
 
 
 
@@ -5579,7 +5770,7 @@ compute.
 *The OFF switch, the rules the governor obeys, the log it keeps, and the care of a running installation.*
 
 
-## 38. The OFF Switch, the Rules, and the Log
+## 39. The OFF Switch, the Rules, and the Log
 
 
 **The rules Omni-Compass keeps on your system.**
@@ -5677,7 +5868,7 @@ record. The benchmark harness prints a decision trail from the audit at the end 
 one line a decision, so a reviewer reading a run's log sees what the governor saw and did at each minute.
 
 
-## 39. Maintenance, Upgrades and Security
+## 40. Maintenance, Upgrades and Security
 
 
 - Run `python3 verify.py` after every upgrade; it must end `VERIFICATION: PASS`.
@@ -5748,7 +5939,7 @@ stands in for them, and this section tells the operator exactly what to look at.
 ---
 
 
-## 40. The Operator Manual
+## 41. The Operator Manual
 
 
 
@@ -6074,7 +6265,7 @@ Add `--strict-replicas`:
 *Paired runs, receipts, rules written before the runs, and every result to date with its evidence class.*
 
 
-## 41. The Receipts, in Their Totality
+## 42. The Receipts, in Their Totality
 
 
 
@@ -6186,7 +6377,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any
 outside body.
 
-## 42. How to Read the Results
+## 43. How to Read the Results
 
 
 
@@ -6404,7 +6595,7 @@ resource (machine-hours, CPU core-hours, joules). The same work then needs *1 / 
 *G / (1 + G)*: a third more work is a quarter off the bill. The full explanation, the three rules for reading a receipt
 and where every number stands today are in the manual, section 3 (`docs/OMNI_COMPASS_MANUAL.md`).
 
-## 43. The Benefit Sheet: One Number per Benchmark
+## 44. The Benefit Sheet: One Number per Benchmark
 
 
 
@@ -6472,7 +6663,7 @@ Where a row sums several workloads, grids, districts, cells or robots, each part
 - **The card (NVIDIA)**: every earlier result is obsolete; the current governor has not run on a real card.
 - **The index's second reading** (service alone, `results/OMNI_INDEX.md`): a second true number for the same tests, not repeated here; this sheet carries the preregistered one.
 
-## 44. The Dossier: Every Result in One Place
+## 45. The Dossier: Every Result in One Place
 
 
 
@@ -6645,7 +6836,7 @@ The rules for each run were written and committed before it ran (`docs/*_PREREGI
 - The grid stops at 100 copies and 100 runs (the founder's order of 12 October, to cut the time and the bill): no 1,000 copies and no 1,000 runs are run on any engine from that day; the v3 cells at 1,000 above stand as they were run.
 - The queue in `docs/REGISTER.md` section 4 (drone swarms on gym-pybullet-drones and Kafka done; Redis running): PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera.
 
-## 45. Paired Runs and Receipts on Your Own System
+## 46. Paired Runs and Receipts on Your Own System
 
 
 The method of every benchmark in this manual is the method a reader can use on their own system, and it is deliberately
@@ -6723,7 +6914,7 @@ Kubernetes run and the three-run tools print it for three runs side by side; a r
 laid out the same way so that a reader of this manual can read it without learning a new shape.
 
 
-## 46. Evidence Classes and How to Read a Result
+## 47. Evidence Classes and How to Read a Result
 
 
 **One number, one word.** In every table a change keeps its raw sign: a response time that fell reads "-65%", a cache
@@ -6793,7 +6984,7 @@ clock? (Rotation of the arm order, the warm-up before every window, the paired d
 are the answers, and section 16.7 names the residue they do not remove.)
 
 
-## 47. Results to Date
+## 48. Results to Date
 
 
 Every result below, read together in one place with what each shows and what it does not, by evidence class and
@@ -7354,7 +7545,7 @@ published as Omni-Compass 1.0, and the older fingerprints go to `docs/history` a
 ---
 
 
-## 48. Wire In, or Watch: The Verdict per Knob
+## 49. Wire In, or Watch: The Verdict per Knob
 
 
 
@@ -7756,7 +7947,7 @@ This page judges after the fact, from published tables. The founder's order of 9
 | The 1,107 modelled muscles | each muscle's knob | the max on every muscle, every muscle its own card; the knobs native already runs at the top of their range read and left native | the law's own push and pull | Omni v5 at the max (the law omni-v6 carries), `docs/OMNI_V5.md` |
 | The machine itself: the Linux kernel's frequency ceiling (`docs/CPU_POWER_PREREGISTRATION.md`) | one knob | `tools/knob_verdict.py` around the engine's verdict: every notch down tried on the machine first, under the index's reading for one machine (energy x latency / work) or energy per request inside the line | give back only (the ceiling cannot go above the top; the top always free) | outside the engine; built 10 October, waiting for a machine on the metal, no run yet |
 
-## 49. The Pilot Protocol and Kit
+## 50. The Pilot Protocol and Kit
 
 ### Pilot Protocol
 
@@ -7816,7 +8007,7 @@ Guarded control follows `docs/PILOT_PROTOCOL.md`: one loop at a time, the reset 
 
 The kit is exercised end to end on kind by the `live-shadow` workflow.
 
-## 50. The GPU Bench
+## 51. The GPU Bench
 
 
 
@@ -7936,7 +8127,7 @@ undone. The card's own energy counter (NVML) and its ECC and retired-page counte
 workload's `--sim` mode. The stand-in has no real power physics, so its numbers mean nothing; it proves the script,
 the controls and the validity checks work.
 
-## 51. The GPU Preregistration
+## 52. The GPU Preregistration
 
 
 
@@ -8406,7 +8597,7 @@ organism runs once per size. Nothing else changes: the arms, the measures, the l
 On one card the stage takes at least 16 hours (60 paired repetitions, each arm 240 steps of 2 s; a size whose step must
 be longer is measured on the machine and stated in the receipt), where it took about 25 with the 1,000 copies.
 
-## 52. The Realms Preregistration
+## 53. The Realms Preregistration
 
 
 
@@ -8868,7 +9059,7 @@ center with nothing of any one trade in it, the base every stack runs on (`docs/
   to the digit, checked by `realms-v5.yml`).
 - Nothing is read across engines: the spine's rows carry the engine they ran on, like every other row.
 
-## 53. The Compass Law on Real Kubernetes: Preregistration
+## 54. The Compass Law on Real Kubernetes: Preregistration
 
 
 
@@ -10048,7 +10239,7 @@ conductor starts its squares, reads them back and never starts one twice, as it 
 `six-kube`, `aks-metered`, `gke-metered`, `eks-metered` and `cloud-organism` accept `spine`. The results already written on
 six organisms stand as they were run; nothing is read across engines or across organism sets.
 
-## 54. The Evidence Ledger
+## 55. The Evidence Ledger
 
 
 
@@ -10156,7 +10347,7 @@ Nothing here is deleted when a later result looks different.
 | S | Right-sizing against VPA: p95 +15%, memory (OOM) kills +531%. | `docs/history/BENCHMARK_REPORT.md` |
 | — | Reported in the external master-build report (not reproducible from this repository): on fresh scenarios Karpenter+VPA sometimes used less modelled energy than Omni, while Omni had lower churn and fewer request-induced evictions. Kept here so it is not lost; to be re-run here before it is cited. | external |
 
-## 55. The Claims Register
+## 56. The Claims Register
 
 
 
@@ -10195,7 +10386,7 @@ Every claim, its evidence status and the command that reproduces it. Simulation 
 | C13 | Decision components (autoscalers, power agents, paging, Terraform as controller) consume about 0.02% of fleet CPU; idle capacity is 92% of fleet CPU at 8% utilization. | Modeled from published figures and stated assumptions | `python benchmarks/fleet_overhead.py` |
 | C14 | Behaviour on production systems. | Not established; requires the pilot protocol | `docs/PILOT_PROTOCOL.md` |
 
-## 56. Comparison with Existing Controllers
+## 57. Comparison with Existing Controllers
 
 
 
@@ -10281,7 +10472,7 @@ the customer's own system, with the same paired method.
 
 Where a row above is wrong or out of date, correct it from the maker's own publication.
 
-## 57. The State of Play
+## 58. The State of Play
 
 
 
@@ -10519,7 +10710,7 @@ being made), and anything on a real card.
 *What a receipt is worth, how the license is priced against it, how the code is sealed, and how Omni-Compass came to be.*
 
 
-## 58. Where the Value Comes From
+## 59. Where the Value Comes From
 
 
 ### 3.1 The problem we are attacking
@@ -10706,7 +10897,7 @@ manual records no change made otherwise.
 ---
 
 
-## 59. The Economics of a Receipt
+## 60. The Economics of a Receipt
 
 
 Run the stack native and print the receipt. Run the same stack with Omni-Compass and print the receipt. The difference
@@ -10740,7 +10931,7 @@ stack, and reads its losses in the same table as its gains.
 one time, with its interval. The only number that applies to a customer's system is the one their own paired runs produce,
 and the method of those runs is the manual's section 13, the same method every table in this book was made with.
 
-## 60. Due Diligence
+## 61. Due Diligence
 
 
 
@@ -10773,7 +10964,7 @@ Answers reference the Claims Register (C-numbers) and the Technical Manual.
 **Was it tuned on the test data?** No. Law, shield and baselines were frozen and fingerprinted before the held-out seeds 346410161 and 360555127 (results/PREREGISTRATION.json).
 **Where does it fail?** Backlog violations against current autoscaling (C11); the engine-dynamics ablation (Manual Chapter 8); open obligations (Manual Chapter 10).
 
-## 61. License and Commercial Terms
+## 62. License and Commercial Terms
 
 
 The software and this manual are licensed under the Omni-Compass Evaluation License (`LICENSE`): evaluation and
@@ -10789,8 +10980,16 @@ grant it under more than one license at once (the Evaluation License to everyone
 customer), may set the terms of each new version, and may assign the copyright; copies already received keep the
 terms they were received under. The license texts (`LICENSE`, `NOTICE`, `DISCLOSURES.md`) govern.
 
+Every paper is bound into this book in full, as it stands in the repository, in the chapters that follow this one: the
+licensing questions and answers, the third-party notices, the standard terms of the Enterprise License (the grant, the
+term, the fees' basis, the warranties and their limits, the indemnities, the audit right, the source escrow and the
+governing law), the patents and trademarks statements and the security policy; the Evaluation License itself is the
+License appendix, and the disclosures, declarations and disclaimers stand in the front matter. Where a paper and this
+chapter differ, the paper governs. The engine's whole source, every Python file the fingerprint `OMNI_V7.json` names,
+is printed in the Source appendix: nothing in the mechanism is withheld from the owner.
 
-## 62. Licensing: Questions and Answers
+
+## 63. Licensing: Questions and Answers
 
 
 
@@ -10851,7 +11050,7 @@ section 19). The Omni-Compass LLC is based in Florida.
 
 **Who do I contact?** The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
 
-## 63. Third-Party Notices
+## 64. Third-Party Notices
 
 
 
@@ -10874,7 +11073,228 @@ Omni-Compass Evaluation License changes those terms. Installed versions are thos
 Kubernetes, kind, `kubectl`, the NVIDIA driver and `nvidia-smi` are not distributed with Omni-Compass; it calls them
 where an operator has installed them. Their names are the property of their owners (`DISCLOSURES.md`, section 1).
 
-## 64. Repository Standards
+## 65. The Enterprise License: Standard Terms
+
+
+
+This page summarizes the standard terms of the Omni-Compass Enterprise License, the paid license that every production
+use, commercial use, hosted service, distribution, OEM or embedded use, and every other commercialization or monetization
+of Omni-Compass requires (`LICENSE`, section 5). It is a summary for evaluation and planning. It is not an offer, and it
+binds no one: only an Enterprise License signed by The Omni-Compass LLC and the licensee, with its order form, grants any
+right, and that signed agreement controls over this page in every respect.
+
+### 1. What can be licensed
+
+| License | What it allows |
+|---|---|
+| **Production** | The licensee runs Omni-Compass on top of its own systems (clusters, fleets, cards, sites, plants), on premises or in its own cloud accounts, within the scope in the order form |
+| **Hosted service** | The licensee offers Omni-Compass's function to its own customers as a hosted, managed or software-as-a-service offering, under a hosted-service rider (per customer, per managed unit or revenue share) |
+| **OEM and embedded** | The licensee ships Omni-Compass inside its own product, appliance, firmware or platform, under an OEM rider (per unit or per installed base) |
+| **Managed service provider** | The licensee operates Omni-Compass for named third parties under a managed-service rider |
+| **Research** | A university or public laboratory uses Omni-Compass beyond evaluation for non-commercial research and publication, under a research rider |
+
+**Scope** is set in each order form: the licensed systems and their size (machines, cores, cards, sites, muscles or
+managed units), the fields of use, the territory, the named sites or accounts, and the engine versions covered.
+
+### 2. Fees
+
+Fees are set in each order form: a subscription, a usage-based fee, a share of the measured value captured, or a
+combination, with any minimum commitment. Where fees track value, the value is measured on the licensee's own paired
+receipts (native against Omni-Compass on the same system, the same load and the same clock), by the method the order form
+names. Payment terms, taxes and late charges are as the order form states. No price, rate or benchmark in this repository
+is an offer.
+
+### 3. What the licensee receives
+
+1. The licensed engine at a named, sealed version (its fingerprint, `tools/omni_version.py`), and each later version the
+   subscription covers.
+2. The wiring kits and the plug for the licensed systems, the manual and the book, and the receipts tooling.
+3. Support and maintenance at the tier in the order form: response targets, named contacts, and corrections of defects
+   that reproduce on the licensed version.
+4. Installation through the manual's levels: read-only first, the wire check, a watch arm equal to native, then writing
+   levels one at a time, each with its receipt.
+
+### 4. Warranties
+
+1. **Conformance.** For the warranty period in the order form, the licensed version performs materially as its
+   documentation describes. The remedy is correction or, failing that, a refund of the fees paid for the nonconforming
+   version for the affected period.
+2. **The safeguards.** The kill switch hands every setting back to the value read before Omni-Compass's first write; the
+   shield keeps every write inside the cover the operator granted; Omni-Compass never fights another writer.
+3. **No other warranty.** No outcome, saving or result on the licensee's systems is warranted. Published results are
+   evidence about the systems they ran on (`DISCLOSURES.md`, section 2).
+
+### 5. Intellectual property
+
+1. The Omni-Compass LLC keeps all right, title and interest in Omni-Compass, the Mechanism and the marks. The licensee
+   receives the rights its order form lists, for its term, and no others.
+2. **Patent license.** The Enterprise License includes a license under The Omni-Compass LLC's patent rights in the filed
+   applications, and in any patent issuing from them, for the licensed scope.
+3. **Infringement indemnity.** The Omni-Compass LLC defends the licensee against a third-party claim that the licensed
+   version, used as licensed, infringes that party's intellectual property, and pays the damages finally awarded or the
+   settlement it agrees, subject to prompt notice, control of the defense and the usual exclusions (modifications,
+   combinations, unlicensed use, versions superseded by an offered fix). Remedies may include a license, a modification
+   or a refund.
+4. **Confidential filings.** The patent application number and other confidential information are disclosed to a
+   licensee under the agreement's confidentiality terms.
+
+### 6. Limits of liability
+
+Each party's liability is limited to the fees paid or payable in the twelve months before the claim, and neither party is
+liable for indirect, incidental, special, consequential or punitive damages, except for the exclusions the signed
+agreement states (for example, breach of confidentiality, the infringement indemnity, and the licensee's breach of the
+license scope).
+
+### 7. Confidentiality, data and security
+
+1. **Confidentiality.** Mutual, for the term and a period after it, covering non-public information either party gives
+   the other.
+2. **Data.** Omni-Compass contains no telemetry. The licensee's data, readings, settings and receipts stay on the
+   licensee's systems and remain the licensee's. Where the licensee chooses to share data for support, a data-processing
+   agreement applies.
+3. **Security.** A software bill of materials ships with every version (`sbom/`); vulnerabilities are handled under
+   `SECURITY.md`; the licensee may run the verifier (`python3 verify.py`) and the seal checks on every delivered version.
+
+### 8. Safety and operation
+
+1. The licensee remains the operator of its systems. The machines' own controls and protections stay in place;
+   Omni-Compass sets only values they already accept.
+2. Any connection to a physical system (grid, plant, vehicle, robot, medical device, facility) requires a written safety
+   case accepted by the system's owner and every review its regulator requires; safety-critical systems are licensed only
+   on those terms.
+3. The kill switch stays operable at all times.
+
+### 9. Compliance, audit and insurance
+
+1. Each party complies with export-control, sanctions and anti-corruption law.
+2. The licensee reports usage against the licensed scope as the order form provides, and The Omni-Compass LLC may verify
+   it on reasonable notice, no more than once a year.
+3. Insurance, where the order form requires it, is carried by each party at the limits stated there.
+
+### 10. Term, renewal and transition
+
+1. Term and renewal are as the order form states.
+2. On termination or expiry, the licensee stops use, every setting Omni-Compass changed is handed back to native (the
+   hand-back is built into the engine), and every copy is returned or destroyed; transition assistance is available at
+   the rates in the order form.
+3. Source-code escrow for the licensed version is available under a three-party escrow agreement.
+
+### 11. Governing law and precedence
+
+The signed agreement states its governing law and venue; the standard is the law of the State of Delaware, with venue in
+the Delaware state courts and the United States District Court for the District of Delaware. Its order of precedence is: the order form, then any rider, then
+the Enterprise License terms, then the documentation. This page and the evaluation license (`LICENSE`) are superseded by
+the signed agreement for the licensee and its scope.
+
+### 12. How to obtain one
+
+The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com. A license starts with an evaluation on the licensee's own systems
+(`LICENSE`, section 1.4): watch mode, the wire check, and paired receipts on its own load.
+
+## 66. Patents and Trademarks
+
+### Patents
+
+
+
+**All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.**
+
+The filings cover, among other things, the Omni-Compass engine (the six-state closed law and its bounded control
+command held through the integration step), the compass law (the service position pulled to the middle of its band by a
+bounded push and pull, with fail-up at the wall), the antagonist up/down wiring of each muscle, the plug contract (one
+restore point, read-back, the one-writer rule), the two-wire governance of a processor (clock ceiling and power limit),
+the two-way nervous system that grants and withdraws authority per organ, and one governor over many machines and
+realms on one clock.
+
+#### What has been filed
+
+| | |
+|---|---|
+| Application | a **nonprovisional utility patent application** under 35 U.S.C. 111(a), filed with the United States Patent and Trademark Office |
+| Title of the invention | **The Omni-Compass** |
+| Inventor | Alan John Dubra, Kissimmee, Florida, United States |
+| Drawing sheets | 15 |
+| Application data sheet signed | 20 September 2026 (form PTO/AIA/14, 37 CFR 1.76) |
+| Publication | normal eighteen-month publication requested |
+| Application number | withheld here on purpose; the filing is verifiable with the USPTO and is shown to a licensee under a signed Omni-Compass Enterprise License |
+
+The application data sheet names no assignee; the application stands in the inventor's name. Any assignment to The
+Omni-Compass LLC is recorded with the USPTO separately (37 CFR part 3).
+
+No patent license is granted by publishing this repository, by the evaluation license, or by any act of The
+Omni-Compass LLC other than a signed, paid Omni-Compass Enterprise License. Use outside the evaluation license is
+infringement. Everyone who downloads, forks, scans or runs this software is on notice of these filings.
+### Trademarks
+
+
+
+**All patents, copyrights and trademarks covering the Omni-Compass engine, its mathematics and its software have been filed in the United States by The Omni-Compass LLC.**
+
+#### The marks
+
+"Omni-Compass", "OmniCompass", the Omni-Compass compass rose with its ring of Greek letters, and the related names, logos
+and trade dress (the "Marks") are trademarks of The Omni-Compass LLC; trademark applications have been filed in the
+United States. Neither the evaluation license (`LICENSE`) nor publication of this repository grants any license to the
+Marks. A license to use them is granted only in a signed Omni-Compass Enterprise License, and only as it states.
+
+#### What is allowed without a license
+
+- Referring to Omni-Compass by name, accurately and in plain text, to say what it is, that you evaluated it, or that a
+  result was produced with it, with the engine version and commit (`LICENSE`, section 4).
+- Linking to the repository or to www.omni-compass.com.
+
+#### What is not allowed
+
+- Using any Mark, or anything confusingly similar, in the name of a product, service, company, domain, account, package,
+  repository, fork or derivative.
+- Using the logo or the compass rose, or altering any Mark.
+- Suggesting endorsement, sponsorship, certification, partnership or affiliation by The Omni-Compass LLC.
+- Using a Mark in advertising, comparative claims or sales material without a signed license.
+
+#### Other companies' marks
+
+Kubernetes is a trademark of The Linux Foundation; NVIDIA is a trademark of NVIDIA Corporation; KEDA and Karpenter are
+projects of their maintainers; other names belong to their owners. Their mention describes compatibility or a system
+Omni-Compass was tested with; it states no affiliation, endorsement or certification (`DISCLOSURES.md`, section 1).
+
+#### Reporting misuse
+
+The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
+
+## 67. Security Policy
+
+
+
+### Reporting a vulnerability
+
+Report a suspected vulnerability privately to The Omni-Compass LLC by telephone at its main office infrastructure (toll-free direct 1-888-339-9551; system route asset 1-888-DEX-YLL-1) or through www.omni-compass.com, never in a public issue,
+pull request or discussion. Include the version and commit, what you saw, how to reproduce it, and its likely impact. We
+acknowledge reports, keep the reporter informed, and coordinate disclosure: a fix or a mitigation is published before the
+details are, and the reporter is credited if they wish. Please give us a reasonable time to fix before any disclosure, do
+not access data that is not yours, and do not disrupt any system; good-faith research that follows this policy will not
+be pursued by us.
+
+### What is in scope
+
+The engine, the controllers, the plugs and wiring, the harnesses, the workflows and the verifier in this repository.
+Third-party software Omni-Compass runs on or connects to (Kubernetes, KEDA, Karpenter, NVIDIA drivers, databases) is
+reported to its own maintainers.
+
+### How Omni-Compass is built to fail safe
+
+- The governor issues control actions only through the shield (`omnicompass/shield.py`, `cpp/src/shield.cpp`), inside the
+  cover the operator granted, and never fights another writer.
+- It snapshots every setting once, before its first write, and the kill switch (`python3 tools/omni_switch.py off`) hands
+  every setting back; a dead-man lease hands them back if the governor stops.
+- It runs under least privilege: on Kubernetes, a service account with `kubectl auth can-i` receipts for what it can and
+  cannot do (`deploy/kind/rbac-omni.yaml`).
+- It contains no telemetry and makes no network connection of its own except to the systems an operator points it at.
+- Every release carries a software bill of materials (`sbom/`) and a seal of the engine and its twins (`results/SEAL.json`,
+  `python3 verify.py`).
+- The capture script (`fleet/capture/kube_capture.sh`) is read-only; no component writes to a live cluster unless the
+  operator starts it in a writing mode.
+
+## 68. Repository Standards
 
 
 
@@ -10906,7 +11326,7 @@ The files the leading repositories carry, the open ones such as Kubernetes and t
 
 Files present at the commit this page describes; `python3 verify.py` checks the ones the results depend on.
 
-## 65. Python, C++ and the Seal
+## 69. Python, C++ and the Seal
 
 
 The laws are twinned: each has a Python version and a C++20 version that give the same answers, proven by a parity
@@ -10946,7 +11366,7 @@ any one of the three can tell whether the files in front of them are the files t
 ---
 
 
-## 66. The Founder's Working Notes
+## 70. The Founder's Working Notes
 
 
 
@@ -11139,7 +11559,284 @@ are sourced.
 4. **Aim the chip at about 5% more finished work on the same bill**, cap unchanged and temperature never behind, or at
    fewer joules for the same work. The buyer chooses, and the receipt prints which.
 
-## 67. History
+## 71. The Road to the Engine That Stands: Omni v5 and v6
+
+### Omni v5 — the engine fingerprint
+
+
+
+**omni-v5** is a distinct engine, its own tree, no longer read as v3. It is fingerprinted file by file in `OMNI_V5.json`
+(`tools/omni_version.py`); `python3 tools/omni_version.py` prints `omni-v5` on this checkout. v1, v2 and v3 stay frozen,
+each kept for its own results; no result is ever read across versions.
+
+#### The default brain: the max (12 October)
+
+The founder's order of 12 October: "We're going to show a benchmark that shows it to the max. And we're going to show
+one native... anybody can tune it from the max down." v5's default (`V5CFG`) is therefore **the max**: every muscle
+pushed toward its own limit for the most work, faster, never past its limit and never below native. The energy that
+takes is reported as **LOSS**, beside the work and the speed it bought; the max never shaves (nothing is taken
+from one muscle to give to another). The dial turns it down: **the tune-down** (`V5SAVE`, the save setting described
+below) is native's work on the least energy, kept and tested on every muscle.
+
+- **A pool** gets the machines its forecast needs before the rush lands: the recent peak arrivals widened by the largest
+  rise the pool has shown within one machine start, at 95% utilisation, plus any **work waiting in line** cleared within
+  one machine start, through a floor under its own autoscaler, never fewer than its **twin** runs (the brain's model of
+  native: the same pool under its own autoscaler alone, on the same arrivals). The machines it added and no longer needs
+  go back at once (a ceiling at the larger of its need and its twin's count; the autoscaler's own scale-down would hold
+  them for its window). Its power cap and admission stay native: full clock, every request admitted.
+- **A room** is cooled ahead of the heat as it nears its limit or its cooling nears flat out, never warmer than native.
+- **A battery site** clips its line from its charge, native plus: the operator's own reserve while nothing would cross,
+  and below it, down to its band's floor, exactly the draw that would cross; a UPS lends only the charge above its outage
+  floor.
+- **A motion axis alone**, while tasks are waiting, runs at **its own peak speed** (`s_peak`, `realms/presets.py`: the
+  head the machine itself has above the everyday profile native runs: a joint's drive and a multirotor's airframe 1.25, a
+  road vehicle's drive 1.25, a ship's engine to its maximum continuous rating 1.15), never past it, back to the everyday
+  setting at once when its motor passes 80% of its heat rise or its tracking error passes half its line. A reaction
+  wheel's saturation, a train's line speed and an elevator's overspeed governor are their limits: those stay native.
+  Inside a body an axis keeps its everyday speed (see the bone). Torque (effort) limits stay native: in these models a
+  higher one changes nothing.
+- **A process loop** native already runs flat out (the full actuator): wired, watched, native.
+- **At its limit on native.** Every power limit at full, every admission gate open, a loop's actuator at its full range:
+  native already runs these at the top of their range, the max writes nothing, and the tables say so in those words
+  (`native_at_limit`).
+- **The bone.** Inside an organism the body's lines (each site's grid line, each room's cooling and its degrees to its
+  limit) are loaded by the whole body, so the max grants machines and cooling only out of the room the most loaded line
+  has left, one decision ahead (its latest reading plus the larger of 3.09 of its own wobbles and the largest single climb
+  it has shown, counted on the line without the max's own machines: its own steps are not the line's wobble). A machine
+  is started only if the lines can still carry it when it is ready (the climb grown by the square root of its start time:
+  one started and then cancelled only burns its start). A site with flexible load waiting gives its catch-up the room
+  first. With no room, what the max added goes back, as much as the shortfall needs, the pools with the most extra first
+  and the machines started last first, never below a pool's twin. An axis inside a body keeps its everyday speed: at the
+  peak hour the organisms run, the bone almost never has room for its worst case, and in the development runs its peak
+  gave the body nothing while its changed rhythm crossed neighbours at their own limits.
+- **One pedal.** Push for more, lift off for less; lifting hands the setting back toward native. At idle the
+  pool lifts all the way to its breathing floor (two machines) and wakes straight to the work. **The lease**: at 80% of
+  every modelled run the brain is cut and the plug walks every setting back to native over 24 decisions (no jump the body
+  must absorb at once); a floor that only held a pool at its twin's count adds nothing to walk back and is let go at once
+  (a walking floor would hold machines native had already released). The security kill switch is instant.
+- **Wear** is metered beside the work, never judged: a pool's machine-hours, a room's cooling unit-hours, a battery's kWh
+  cycled, an axis's motor heat (degree-hours above ambient), a loop's actuator duty-hours.
+- **Three loads**, fixed before the preregistered run (seeds 3000-3009): each organism's own load, **the climb** (the load
+  stepping 1 2 3 2 3 4 ..., up to twice its own), and **the line** (`LINE` in `realms/harness.py`: work already waiting
+  when the run starts, a quarter of the work the run itself brings; a pool's jobs, an axis's tasks, a site's held-over
+  flexible load; a room's heat and a loop's demand cannot wait and have none). Every muscle alone runs its own load and
+  the line; the organisms run all three. Speed is judged where there is a line: the arm that clears it sooner is faster.
+- **The live controllers** carry the same dial (`--dial max`, the default): the Kubernetes controller holds the service
+  well inside its line (the compass at 0.3) and never gives back a machine the cluster had on its own; the GPU compass
+  keeps the card's clock ceiling at the top while it serves (the card already runs flat out on its own power limit).
+
+The organisms run the hour around each battery site's daily peak, where the UPS lines carry most of their rating: there
+the bone is tight and the max gives only what the lines can carry. Every muscle alone has no body around it, so the max
+gives it everything its own limits allow. `results/realms_v5/REALMS_V5.md` shows both, and the climb (the load stepping
+1 2 3 2 3 4 ..., up to twice the organism's own) where native breaks first.
+
+#### What v5 is
+
+v5 is **a combination of everything**: it takes v3's proven engine (its live controllers, its realms and organisms, its
+runners) and adds the **v5 compass law** (`realms/compass_arm_v5.py`) and its arm in the harness (`realms/harness.py`). The
+goal is to be equal to or ahead of native and every prior version on every measure, and never behind on any — *do no
+harm*.
+
+The v5 muscle catalog (`realms/catalog_v5.csv`) is **1,107 muscles in 70 families** — v3's 945, then a first wave of six
+new families of real control points: **Linux Kernel & OS Control** (cgroups, the CFS scheduler, DVFS/cpufreq, transparent
+hugepages, the I/O scheduler, NUMA balancing, dirty-ratio writeback, swappiness, TCP buffers, …), **Serverless & Functions
+(FaaS)**, **Virtualization & Hypervisor**, **Content Delivery & Edge Cache**, **Gut** (data-plane intake and waste), and
+**Skin** (perimeter and admission); then a second wave (12 October) of 95 muscles: five new families, **Financial Markets
+& Trading Systems** (matching engines, order gateways, pre-trade risk, market-data fan-out), **Media Streaming & CDN**
+(transcoders, packagers, origin shields, player buffers), **Game Servers & Real-Time Interactive** (Agones fleets, tick
+rates, matchmaking, relays), **Blockchain & Ledger Nodes** (a node's cache, mempool, peers and validation threads; never a
+consensus rule) and **CI/CD & Build Farms** (runner scale sets, build concurrency, caches, test shards), plus additions to
+seven families already there: security engines (an intrusion-detection system's capture threads and ring buffer, a web
+firewall's inspection workers, a SIEM's ingest), MQTT brokers, DNS and mail caches, ROS 2 executors, humanoids and
+manipulators, warehouse robot fleets, PX4 and ArduPilot drones and swarm spacing, and edge sites. The GPU family is named
+for the hardware, not one vendor (**GPU Hardware**), and the eight audited families carry numbers (64 to 71) like every
+other family. Each is a distinct real-world knob, modelled on the matching plant template, exactly as v3's 945 already
+share five templates. A third wave (12 October, night) adds the founder's nine open-source pieces as ten muscles, each in
+the spine family its knob belongs to (`docs/THE_SEAT.md`): Kepler's energy reading driving a pool's target (Kubernetes
+Workload Scaling), Climatik's inference power cap, Adaptive GPU Power Capping and NVIDIA's platform power budget (GPU
+Hardware), EAR's CPU frequency policy and global energy budget and the Kubernetes Power Manager's core profiles (Host CPU &
+Memory), CruiseKube's and Goldilocks's request rightsizing (Container Resources) and PEAKS's power-aware placement
+(Kubernetes Placement & Scheduling). The organisms on v5: Compute / AI / Cloud 540, Physics / Robotics / Autonomous 404,
+Energy / Facility / Industrial 480, Distribution / Specialized 484, the four stacked 1,908, the whole tower 1,107; the spine
+all four realms share is 267. (v3's own catalog `realms/catalog.csv` stays 945, frozen for v3's results.)
+
+Two math-only guardrails, and otherwise free arms:
+
+- **The edge** — a per-knob cushion that widens at once when service climbs and narrows slowly when it falls
+  (`cushion = climb × reaction + z × wobble`), so nothing riding its own limit falls off.
+- **The centre / the hole** — nothing is eased into a pit it cannot climb out of. A cooled zone is eased only by the
+  degrees its cooling can still recover (the Lindley reach), and not at all while its cooling headroom is falling toward
+  empty faster than the cooling can answer. A process loop's setpoint never sits closer to its band's edge than the
+  loop's own largest swing toward that edge (the loop reach, read from the historian's low and high over each decision,
+  carried ahead for a slow loop). A serving pool is never capped below the largest jump in demand it has shown (the drop
+  floor) nor so far that a burst would push its responses over the line where native's would not (the latency floor).
+  And nothing permanent: a machine handed back to a cloud is the cluster autoscaler's own decision, because the
+  autoscaler shrinks from wherever it is left, so an early hand-back would leave the pool a machine short of native for
+  good; and a motion axis is slowed only while the wake forecast over a whole deadline (the most that can arrive in one
+  deadline at the recent peak rate) still finishes inside that deadline at the slowed speed, so a delay is always
+  recovered before a later rush could make it permanent. When work comes, every muscle wakes straight to the level the
+  work needs (the founder's rule: from idle straight to 99, never past 100).
+
+Every other knob is free to move both ways inside its physical cover, generating units included (a unit's steam,
+speed or gate loop eased inside its band serves the same load with less effort), and **a knob stays native only where its
+own physics says moving it cannot help without harm**: an interactive pool's power cap (its response line is shorter
+than one decision, so a cap's one decision of slower service cannot be seen and undone inside the line; the metered GPU,
+class P, is where that cap is proven), a battery's peak-shave (round-trip energy bought for service), and a cloud pool's
+machine hand-back. A batch queue's, a training job's or a terminal's power cap is free under the drop and latency floors.
+
+**Amendment, 12 October.** The first v5 table (commit `c0e80a852`, the whole tower +0.0%) ran an engine that held every
+generating unit's loop, every power cap and every inverter native by blanket gates. The gate on generating units alone
+threw away almost all of what v5 saves: on the tower, 1.09% with it off against 0.04% with it on, on development seeds.
+v5 was re-declared with the gates replaced by the physics floors above, developed on seeds 7100-7209 only, and the
+preregistered seeds 3000-3009 were run again unchanged.
+
+**Amendment 2, 12 October.** The catalog's second wave (95 muscles, five new families and additions to seven) took it to
+1,097 muscles in 70 families; the engine's law is unchanged, its fingerprint re-declared because the catalog is part of
+it. Developed on seeds 7100-7109 only (0 of 1,097 LOSS or power given, all six organisms superior); the preregistered seeds 3000-3009
+were run again unchanged on commit `04d9eb3b3`, with the same savings on the whole tower, the four stacked and Energy /
+Facility (3.0 times v3's).
+
+**Amendment 3, 12 October (night): the living body.** The founder's order of 12 October: "whatever one muscle is having
+a problem, the other muscles kick in ... the brain and nervous system to activate its immune system ... nothing can be
+locked." The engine now carries, as properties of the code (`docs/FORMAL_V5.md`, section 4): a native twin of every room
+(the brain's sense of the temperature native would leave it at, exact by construction), the room's own knob curing it
+where it can and the body's heat debt handing back the max's machines where it cannot (V8, V11), every battery's charge
+counted as room only while it lasts and its discharge timed for its line (V6, V12), no machine taken from a queue that
+needs it (V7), a pull-down handed back gradually and granted only where it can be held (V9, V10), and every forecast
+starting at the plant's first reading (V13: a lock that kept every battery's timed discharge shut for the whole run, and
+a room twin that started wrong, both removed). The catalog's third wave took it to 1,107 muscles. Developed on seeds
+7100-7199 only: under the climb, plants with less work or more misses inside the four realms fell from 19 to 0 in 400 organism runs while the
+misses fell about twice as far as before; on seeds 7100-7109 every muscle alone and the six organisms on all three loads
+showed 0 muscles and 0 plants with less work or more misses. Fingerprint re-declared (digest `9be48445438943c2`); the preregistered seeds
+3000-3009 were run again unchanged.
+
+**Amendment 4, 13 October: every muscle its own card.** The founder's question of 12 October, night: does every muscle
+have its own tuning, maxed to its own benefit, instead of one global setting for a thousand muscles? The brain stays one;
+its settings are now each muscle's own (`docs/FORMAL_V5.md`, section 5). A muscle's card (`realms/muscle_cards_v5.csv`)
+holds what the max uses for it: a machine pool's edge utilisation and window, a battery's line margin and, wired by its
+power, its hold window and hold margin. The cards were found by an automatic search over every muscle whose settings can
+change what the max does (`tools/tune_cards.py`), on development seeds only, today's global setting always one of the
+choices, and kept only where the card beat the global setting beyond the noise on seeds 7100-7109 and again on seeds
+7200-7209 and never behind native on any of their seeds under any load (never over its line more often, never less
+work, never its line cleared later): 364 muscles (333 machine pools, 31 batteries); every other muscle runs the global
+setting. Inside a body, a battery wired by its power keeps the body's margins on its line (V14: its card was
+chosen alone; the line carries the whole body's swing). In development, 360 organism runs on the two sets: 0 plants with less
+work or more misses, the misses removed 1.7 times the global setting's. Fingerprint re-declared (digest `5648f2902f1fae68`, 44 files,
+the cards among them); the preregistered seeds were run again unchanged. Every card is printed in plain words in the
+muscle catalog (`docs/MUSCLE_CATALOG.md`).
+
+**Amendment 5, 13 October (evening): every muscle from 1 up to one click under its own capacity, read live.** The
+founder's order of 13 October: "you can write it in code ... to show one, two, whatever a muscle's capacity is able to
+handle, guardrailed and skimmed on its border, one click down probably, so it never goes beyond. And, of course, can all
+scale right back down. It can never go be less than one." No top or floor in the live controllers is a number written
+down for a muscle any more; each muscle reads its own from the system it runs on:
+
+- **Machines** (the Kubernetes controller): the top is the operator's own `--max-nodes` where given; else every ready
+  worker plus what the cluster's own autoscaler may still add (its published status); where Omni-Compass resizes the
+  pool with the operator's own command and no autoscaler reports, there is no top but the one the pool shows: one under
+  the first count it refuses, read from the command's own refusal. Before: a fixed 1,000. The floor stays the founder's
+  two machines, and cruise climbs toward the top one step a decision.
+- **Replicas** (the replica room): at the autoscaler's cap with the compass pressing, the cap rises to the replicas the
+  autoscaler's own arithmetic asks for, never past what the machines can hold of the service's pods, one pod under it,
+  read live (the allocatable CPU of every ready worker and of the machines the system can still add, less what every
+  other pod asks for); where every node is a container on one machine (kind), each reports the whole machine's CPU as its
+  own, so that machine's CPU counts once (on 4 October the room raised to 30 on kind served no more requests and ran 78%
+  more pods, `results/live/REPLICA_ROOM.md`: the cap was never kind's limit, the machine was); `--replica-ceiling N` is
+  the operator's own; 0 keeps the cap unmoved. Before: off unless the operator gave a number.
+- **The power cap at the max is never set under native**: each machine's idle CPU goes to the capped service's pods
+  (one click under the machine: its last 5% is never handed out, and no pod gets less than its operator gave it), and the
+  frequency ceiling and the GPU limit stay at their top. Before: the governor's trim to demand could set the pods' CPU
+  limit and the frequency ceiling as low as 69.5% even at the max (never on the sets with a response-time probe, where the
+  muscle already conveyed). The tune-down trims as before, with no fixed floor: the pod's own request and its use plus
+  headroom (before: a fixed 65%), and the card's own minimum power limit, read live.
+- **GPU**: the clock ceiling's floor is the card's own lowest supported clock (before: 35% of the top); one degree under
+  the card's own slowdown temperature reads as full heat where the card reports it (before: a fixed 83 C for every card).
+- **Batch**: held work is admitted while load and power stress are under the compass's wall less one cushion
+  (0.95 - 0.05 = 0.90, the nervous system's own admit gate; before: load 0.80).
+- **The nervous system's site power envelope** is the living band of the device's own range, [0.05, 0.95] (before:
+  [0.65, 0.95]); the C++ twin the same, re-proven equal value for value and re-sealed.
+- **Words**: the engine's own files say which way a number went (the founder's order of 13 October); the older result
+  label "WORSE" is "AWAY FROM ITS AIM", the GPU benchmark's own.
+
+The modelled organisms are unchanged: their code differs only in comments, file headers and that one label's name, so
+the 1,107 muscles, the cards and the max give the same numbers on the same seeds. The test rig with the real cluster
+inside changes beside the engine (protocol 3, `docs/K8S_COMPASS_PREREGISTRATION.md`): the model of the organism on the
+runner's last core and the kind nodes on the others, and the window set from the heavier arm's measured step.
+Fingerprint re-declared (digest `6093b2b88aa911b9`, 44 files); the mechanism identity's actuator part re-recorded (the
+core, the law, the observation map, the governor, the time step and the shield unchanged); every result runs again on it.
+
+#### The no-harm proof (modelled, class S)
+
+On a fixed seed, for **every** muscle in the catalog, the v5 default does no less work than native, is over its line no
+more often, and hands every knob back to native on the kill (the dead-man lease); the energy it takes is power given,
+shown beside the work and the speed it bought. On the preregistered seeds 3000-3009 (commit `eea291501848`, digest
+`5648f2902f1fae68`, every muscle its own card): **0 of 1,107 muscles LOSS or power given or mixed** (527 toward their aims, 421 at their limit on
+native, 159 the same), every organism ahead of native under all three loads, and **not one plant with less work or more misses inside any
+organism under any load**; the misses fall 1.9% to 7.5% under each organism's own load, 1.4% to 7.2% under the climb and
+1.1% to 8.3% with work waiting in line, against 1.6% to 6.4%, 0.9% to 3.5% and 1.0% to 7.2% with one global setting
+(digest `9be48445438943c2`), with less power given and less wear. This is checked in `tests/test_compass_arm_v5.py` and run in full by
+`tools/run_realms_v5.py` (`results/realms_v5/`). Models are class S: a model's energy is not a meter's, and a plant written
+by the same people who wrote the law is not an independent test.
+
+#### In development
+
+While v5 is in active development its fingerprint is **re-declared on each engine change** (`python3 tools/omni_version.py
+--write v5`), and **no v5 result is published** until the v5 freeze. At the freeze, every benchmark is rerun on v5, A/B/C,
+the founder hears each result before it goes up, and the fingerprint is final.
+### Omni v6: capacity repair and complete non-GPU rerun campaign
+
+
+
+Omni v6 stood on main from 15 to 16 October; since 16 October the engine that stands is Omni v7 (`docs/OMNI_V7.md`, the founder's
+order). This page and v6's four three-run tables (`results/live/V6_*.md`) stay as that engine's record, read beside no other engine's.
+
+The engine combines the unchanged v5 muscle law and 1,107-muscle catalog with the v6 shared-host Kubernetes capacity repair.
+The controller samples Linux host CPU occupancy, counts kind's shared host once, refuses extra replica capacity when that
+host is busy or unmeasured, and rechecks a previously enlarged replica ceiling. This is a versioned evaluation engine;
+it does not establish that every workload gains. Every result retains its own engine fingerprint and evidence class.
+
+The source of the capacity repair is branch `codex/v6-kind-headroom-repair`, commit `3bda41a00fab81052551be99e618a523b5c61347`.
+The damaged Markdown manuals on that branch are not imported. The existing intact manuals remain the starting point.
+The zero-valued machines-only flag repair is retained: `1` selects machines-only; `0`, empty and unset retain full wiring.
+
+#### Campaign
+
+`scripts/benchmark_campaign.json` records this request. A successful `verify` run for the release commit marked
+`[all-nongpu]` starts the grid automatically; an unsuccessful release verification launches no campaign.
+`scripts/reruns.txt` lists every single-benchmark variant;
+the grid conductor releases A, B and C gradually alongside every organism at 1, 10, 100 and 1,000 copies and nested 1, 10, 100 and
+1,000 runs on free GitHub runners. The v6 dispatch manifest lives under `results/grid_v6`; v5 receipts remain historical. Each job prints its
+engine fingerprint and source commit. A queued, failed or unavailable test is not a completed measurement.
+
+The queue covers Kubernetes baseline/full/levers/observe, fairness, faults, batch and trace loads, KEDA, CruiseKube,
+Goldilocks, fixed capacity, scale control-plane checks, both muscle catalogs, all seven organisms (the spine the seventh since
+16 October, `docs/THE_SPINE.md`) and their live-cluster
+grid, Redis, Kafka, PostgreSQL, MySQL, MongoDB, MuJoCo, pandapower, CityLearn, drone swarms, robustness, Linux CPU-governor
+checks, the Azure full-control burst and the larger Azure organism machine. Linux cpufreq/RAPL execution requires a host
+that exposes the interfaces; a hosted VM capability refusal remains visible as unavailable hardware.
+
+The Azure burst is `1 4 1 6 1 9`, three paired repetitions, 600 measured seconds per arm, 100 seconds per load stage.
+Full wiring enables HPA control, pod CPU limits and the existing power model. It does not create host RAPL, clock control
+or physical power meters on managed Azure VMs.
+
+Free GitHub Kubernetes, Linux, swarm and organism/model workloads may use 1,000 copies and 1,000 runs.
+Paid cloud and GPU organism scales remain 1, 10 and 100, with at most 100 repetitions.
+The conductor lists cells that exceed free runner memory/time as pending runner capacity; it never rents a cloud
+machine for them. The 1,000-copy planning estimates are extrapolations, not completed measurements.
+
+#### Prepared, not launched
+
+Google/GKE and Amazon/EKS retain their deployment scripts and use the new shared engine on a future manual launch.
+Their workflows, cloud-organism, gpu-bench and lambda-gpu are excluded from this campaign. No GPU machine is rented by it.
+`scripts/gpu_campaign_profiles.json` defines one physical card and eight physical cards, with all seven organisms at scales
+1, 10 and 100 and 100 paired repetitions per scale. Reports show nested 1/10/100 run prefixes. These are model copies around real hardware; only these three organism scales are permitted.
+
+The profiles are operational through the existing `HIL_SCALES` and `HIL_REPS_BY_SCALE` environment variables. Existing
+wall-clock budgets still apply: a stage that cannot finish within its budget must be reported incomplete.
+
+© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+
+## 72. History
 
 
 
@@ -14036,7 +14733,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 ## Appendix H. Source of the Engine
 
-The full source of `omnicompass/core.py`, `omnicompass/compass_law.py`, `realms/compass_arm.py`, `omni_controller/gpu_compass.py`, `omnicompass/adapter.py` and `omnicompass/nervous_system.py`.
+The full source of every Python file of the engine that stands, omni-v7 (`OMNI_V7.json`, digest d6d467b824c585f1), 41 files, as the printed book carries it: `omni_controller/__init__.py`, `omni_controller/capacity.py`, `omni_controller/controller.py`, `omni_controller/gpu_compass.py`, `omni_controller/gpu_governor.py`, `omni_controller/muscles.py`, `omni_controller/quota.py`, `omnicompass/__init__.py`, `omnicompass/adapter.py`, `omnicompass/authority_contract.py`, `omnicompass/ce_score.py`, `omnicompass/closure.py`, `omnicompass/compass.py`, `omnicompass/compass_law.py`, `omnicompass/configurations.py`, `omnicompass/conveyance.py`, `omnicompass/core.py`, `omnicompass/disruption_budget.py`, `omnicompass/edge.py`, `omnicompass/master.py`, `omnicompass/mathdrive.py`, `omnicompass/muscle_sdk.py`, `omnicompass/muscles.py`, `omnicompass/nervous.py`, `omnicompass/nervous_system.py`, `omnicompass/pools.py`, `omnicompass/shield.py`, `omnicompass/speed.py`, `omnicompass/stack_sim.py`, `omnicompass/storage.py`, `omnicompass/verdict.py`, `realms/__init__.py`, `realms/compass_arm.py`, `realms/compass_arm_v5.py`, `realms/gpu_card.py`, `realms/harness.py`, `realms/plants.py`, `realms/presets.py`, `tools/run_citylearn.py`, `tools/run_kil.py`, `tools/run_pandapower.py`.
 
 ## Appendix I. The License
 
