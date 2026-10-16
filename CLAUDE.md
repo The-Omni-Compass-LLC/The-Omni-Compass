@@ -78,13 +78,14 @@ the founder overrides one in the conversation.
   with a spine of 190; their results stay theirs.
 - The organisms are named `tower` and `stack` in code and workflows (never by a count); the old names `organism_656` and
   `stack_1226` are read as aliases.
-- The grid: each organism runs native and omni at 1, 10 and 100 clustered copies (one organism, ten of the same
-  organism, a hundred) × 1, 10 and 100 runs: 54 squares, modelled and with the real cluster inside, with both values shown
-  in every square. **1, 10 and 100** (the founder's order of 12 October, to cut the time and the bill); on 15 October
-  the founder drew the line between free and paid (relayed in commit `9f455da7e`): GitHub's own free machines may also
-  run 1,000 copies and 1,000 runs, and every paid machine (a cloud, a GPU) stays at 1, 10 and 100 with at most 100
-  repetitions; the whole grid runs on GitHub's own machines and nothing is rented for it. Every grid
-  button starts all three sizes × all three run counts and uses every runner GitHub gives. The conductor
+- The grid: each organism runs native and omni at clustered copies × runs: 54 squares at 1, 10 and 100 copies × 1, 10
+  and 100 runs, modelled and with the real cluster inside, with both values shown in every square. **On GitHub's own
+  machines only, the 1,000 tier stands again** (the founder's distinction of 15 October, `scripts/dispatch_grid.py`,
+  `docs/OMNI_V6.md`): the six organisms and their modelled, Kubernetes, Linux and swarm workloads run at 1, 10, 100 and
+  1,000 copies and nested 1, 10, 100 and 1,000 runs on free runners, and a cell beyond a free runner's memory or time is
+  listed as pending runner capacity, never rented; **paid cloud and GPU runs stay at 1, 10 and 100 copies with at most
+  100 repetitions** (the founder's order of 12 October, kept for everything that costs money). Nothing is rented for the
+  grid. Every grid button starts all its sizes × all its run counts and uses every runner GitHub gives. The conductor
   (`scripts/dispatch_grid.py`, `grid.yml` every 15 minutes; the six and six-kube buttons with their defaults) starts every
   run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what
   GitHub runs plus a margin; it starts nothing while an Azure run, a grid report or a verify waits for a runner (Azure

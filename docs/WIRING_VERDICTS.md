@@ -6,7 +6,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired measurement shows no gauge of the muscle read **LOSS** against native. Where the measurement shows nothing (**EVEN**), or shows a LOSS, the muscle stays native and Omni only watches it: one wire out, no wire in. This is not a new rule. It is what the engine does on the muscle itself before it moves anything (`omnicompass/verdict.py`: the paired trial, and the verdict **left native** where no step is allowed), and it is the watch arm of every realms run (`docs/REALMS_PREREGISTRATION.md`: the governor reads every period and writes nothing). This page applies the same principle to every published result, one verdict per knob, so that an operator can see which knobs earn a wire in and which stay native. The founder's order of 9 October 2026: where Omni cannot beat native, the muscle lives by itself; we only wire out of it.
 
-Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1037 rows, the 945 modelled muscles included one by one).
+Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1212 rows, the 1,107 modelled muscles included one by one, and the six organisms under three loads).
 
 ## The rule
 
@@ -16,7 +16,7 @@ Every judged gauge of a table counts (rows marked "shown, not judged" never do).
 - **watch**: no GAIN in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a gauge read LOSS or power given in all three of our runs, it is named and its cause given below. Where the runs disagree, nothing is settled and the knob stays native until it is.
 - **operator's choice**: GAIN, and LOSS or power given, both the same in all three of our runs: a trade. Both readings of the Omni index are shown where the test is in it (the resource reading, the preregistered headline, and the service reading, work and speed alone), and the side that pays is named. The operator who wants the gain and can pay the price wires in; every other operator watches.
 
-A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes its verdict from its label by rule: GAIN within the guardrails is write; GAIN AND LOSS (energy cut, service traded for it) and GAIN with power given (service GAIN, energy given for it) are operator's choice; EVEN (inside the noise, or not established), LOSS and any other label are watch.
+A modelled muscle (the 1,107 on their plants under its own load and work waiting in line, `results/realms_v5/MUSCLES_V5.csv`, engine omni-v5 at the max, the law omni-v6 carries unchanged) takes its verdict from its label by rule: a GAIN on work, speed or misses (MORE WORK, FASTER, FEWER MISSES, alone or together, on every load it ran) is write, and the energy the max took for it is power given, shown beside it and never a trade (the founder's order of 13 October); SAME AS NATIVE is watch, nothing moved beyond the noise; AT ITS LIMIT ON NATIVE is watch by design, the knob already at the top of its range on native, read and left native.
 
 ## The count
 
@@ -24,10 +24,10 @@ A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes 
 |---|---:|---:|---:|---:|
 | Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 26 | 10 | 2 | 14 |
 | Independent simulators, three runs each (robot arms, grids, districts, swarms; evidence class S) | 39 | 21 | 15 | 3 |
-| The 945 modelled muscles, alone on their plants (evidence class S) | 945 | 124 | 13 | 808 |
+| The 1,107 modelled muscles, alone on their plants under two loads (evidence class S) | 1107 | 527 | 0 | 580 |
 | The organisms with the real cluster inside (GitHub at 10 and 100 copies; Azure at 1,000) | 14 | 12 | 1 | 1 |
 
-In words: on the real stacks Omni earns its wire in on 10 of 26 knob-cases, trades on 2 and watches on 14. Of the 945 modelled muscles, 124 earn a wire in, 13 are trades and 808 stay native: 746 of the 808 wrote nothing in any run, because the native controller already held the reading inside the band and the law never left its cushion. A knob that never writes costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
+In words: on the real stacks Omni earns its wire in on 10 of 26 knob-cases, trades on 2 and watches on 14. Of the 1,107 modelled muscles, 527 earn a wire in and 580 stay native: 421 of the 580 are at their limit on native (the knob already at the top of its range: nothing to push, read and left native) and 159 read the same as native (nothing moved beyond the noise). A knob left native costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
 
 ## The real stacks (evidence class L: live software, three separate GitHub runs on the frozen engine)
 
@@ -191,136 +191,164 @@ The knob: the autopilot's cruise override.
 | mixed | energy per mission cut 18%, fleet energy over the window cut 18%, missions per charge at the autopilot's reserve up 22% | none | **write** | the runs differ on closest two drones ever came (-46% to -42%), tracking error, RMS (+83% to +86%), cruise override, mean (+48% to +49%). No LOSS: the tracking error is spent inside the compass's band (shown, the runs differ on its exact figure) and no safety gauge moved. | `results/live/V3_SWARM.md` |
 | short | energy per mission cut 7.4%, fleet energy over the window cut 7.4%, missions per charge at the autopilot's reserve up 8.0% | none | **write** | the runs differ on closest two drones ever came (-49% to -26%). No LOSS: the tracking error is spent inside the compass's band (shown, the runs differ on its exact figure) and no safety gauge moved. | `results/live/V3_SWARM.md` |
 
-## The 945 modelled muscles, alone on their plants (evidence class S)
+## The 1,107 modelled muscles, alone on their plants (evidence class S)
 
-Every muscle's own row, with its verdict and the reason, is in `results/WIRING_VERDICTS.csv`; the labels and intervals are the realms table's (`results/realms/REALMS.md`, `results/realms/MUSCLES.csv`; seeds 3000 to 3009, ten paired seeds a muscle).
+Every muscle's own row, with its verdict and the reason, is in `results/WIRING_VERDICTS.csv`; the labels and figures are the v5 realms table's (`results/realms_v5/REALMS_V5.md`, `results/realms_v5/MUSCLES_V5.csv`; engine omni-v5 at the max, every muscle its own card; seeds 3000 to 3009, ten paired seeds a muscle, under its own load and under work waiting in line). The label is the muscle's over every load it ran; the Why column gives each load's own.
 
-| Reading (the label by rule, its word first) | Muscles | Verdict |
+| Reading (the label over every load, its word first) | Muscles | Verdict |
 |---|---:|---|
-| EVEN (inside the noise, within the guardrails) | 807 | **watch** |
-| GAIN (within the guardrails) | 124 | **write** |
-| GAIN AND LOSS (energy cut, service traded for it) | 9 | **operator's choice** |
-| GAIN, power given (service GAIN, energy given for it) | 4 | **operator's choice** |
-| EVEN (not established: inside the noise, a guardrail crossed on the mean) | 1 | **watch** |
+| EVEN (at its limit on native) | 421 | **watch** |
+| GAIN (faster + fewer misses) | 345 | **write** |
+| EVEN (the same as native) | 159 | **watch** |
+| GAIN (faster) | 115 | **write** |
+| GAIN (fewer misses) | 34 | **write** |
+| GAIN (more work + faster + fewer misses) | 30 | **write** |
+| GAIN (more work + faster) | 3 | **write** |
 
 ### By knob
 
-| Knob | Muscles | Write | Operator's choice | Watch | Of the watch, wrote nothing in any run |
+| Knob | Muscles | Write | Watch: at its limit on native | Watch: the same as native | Of the watch, wrote nothing in any run |
 |---|---:|---:|---:|---:|---:|
-| capacity | 454 | 19 | 0 | 435 | 392 |
-| setpoint | 134 | 82 | 8 | 44 | 37 |
-| power | 102 | 23 | 5 | 74 | 62 |
-| admission | 255 | 0 | 0 | 255 | 255 |
+| capacity | 539 | 472 | 50 | 17 | 58 |
+| setpoint | 174 | 44 | 0 | 130 | 111 |
+| power | 119 | 11 | 96 | 12 | 96 |
+| admission | 275 | 0 | 275 | 0 | 275 |
 
 ### By family
 
-| Realm: family | Muscles | Write | Operator's choice | Watch | Wrote nothing |
-|---|---:|---:|---:|---:|---:|
-| Compute / AI / Cloud: AI Inference Serving | 24 | 1 | 0 | 23 | 23 |
-| Compute / AI / Cloud: AI Training | 18 | 1 | 0 | 17 | 17 |
-| Compute / AI / Cloud: Cloud VM & Capacity | 21 | 0 | 0 | 21 | 21 |
-| Compute / AI / Cloud: Container Resources | 23 | 0 | 0 | 23 | 23 |
-| Compute / AI / Cloud: Cross-Cluster, Multi-Region & Edge | 15 | 0 | 0 | 15 | 14 |
-| Compute / AI / Cloud: DPU SmartNIC & Programmable IO | 12 | 0 | 0 | 12 | 12 |
-| Compute / AI / Cloud: Distributed Cluster Managers | 15 | 0 | 0 | 15 | 15 |
-| Compute / AI / Cloud: GPU Fabric & RDMA | 18 | 0 | 0 | 18 | 18 |
-| Compute / AI / Cloud: HPC & Distributed Compute | 19 | 2 | 0 | 17 | 17 |
-| Compute / AI / Cloud: Host CPU & Memory | 23 | 11 | 1 | 11 | 11 |
-| Compute / AI / Cloud: Kubernetes Dynamic Device Allocation | 8 | 0 | 0 | 8 | 8 |
-| Compute / AI / Cloud: Kubernetes Placement & Scheduling | 20 | 0 | 0 | 20 | 20 |
-| Compute / AI / Cloud: Kubernetes Workload Scaling | 31 | 0 | 0 | 31 | 31 |
-| Compute / AI / Cloud: NVIDIA GPU Hardware | 19 | 6 | 0 | 13 | 13 |
-| Compute / AI / Cloud: Node Fleet & Karpenter-Class Control | 24 | 0 | 0 | 24 | 24 |
-| Compute / AI / Cloud: OpenShift & Machine API | 9 | 0 | 0 | 9 | 9 |
-| Compute / AI / Cloud: Quantum Computing Control Simulation | 16 | 0 | 0 | 16 | 16 |
-| Compute / AI / Cloud: Work Admission & Demand Shaping | 19 | 0 | 0 | 19 | 19 |
-| Distribution / Specialized: Cache & Memory Services | 16 | 0 | 0 | 16 | 16 |
-| Distribution / Specialized: Commerce & Payment Systems | 15 | 0 | 0 | 15 | 15 |
-| Distribution / Specialized: Data Analytics & ETL | 15 | 0 | 0 | 15 | 15 |
-| Distribution / Specialized: Database & Transactions | 19 | 0 | 0 | 19 | 19 |
-| Distribution / Specialized: Messaging & Streaming | 18 | 0 | 0 | 18 | 18 |
-| Distribution / Specialized: Network Routing & Switching | 19 | 0 | 0 | 19 | 19 |
-| Distribution / Specialized: Observability & Telemetry | 9 | 0 | 0 | 9 | 9 |
-| Distribution / Specialized: Reliability, Security & Recovery | 12 | 0 | 0 | 12 | 12 |
-| Distribution / Specialized: Runtime & Application | 17 | 0 | 0 | 17 | 17 |
-| Distribution / Specialized: Search, Indexing & Vector DB | 16 | 0 | 0 | 16 | 16 |
-| Distribution / Specialized: Service Mesh & API Reliability | 16 | 0 | 0 | 16 | 16 |
-| Distribution / Specialized: Storage Block/File/Object | 20 | 0 | 0 | 20 | 20 |
-| Distribution / Specialized: Telecom RAN & Edge Radio | 12 | 1 | 0 | 11 | 11 |
-| Distribution / Specialized: Workflow, Logistics & Fulfillment | 15 | 0 | 0 | 15 | 15 |
-| Energy / Facility / Industrial: Building & Critical Environment HVAC | 15 | 5 | 0 | 10 | 4 |
-| Energy / Facility / Industrial: Cooling, Chillers & Thermodynamics | 18 | 6 | 0 | 12 | 12 |
-| Energy / Facility / Industrial: Energy Storage & Microgrid | 19 | 0 | 3 | 16 | 16 |
-| Energy / Facility / Industrial: Facility & Grid Optimization | 15 | 0 | 1 | 14 | 14 |
-| Energy / Facility / Industrial: Grid Transmission & Distribution | 12 | 4 | 0 | 8 | 4 |
-| Energy / Facility / Industrial: Industrial PLC & Process Automation | 18 | 6 | 0 | 12 | 3 |
-| Energy / Facility / Industrial: PDU, UPS & Electrical Distribution | 18 | 0 | 0 | 18 | 18 |
-| Energy / Facility / Industrial: Semiconductor Fab & Precision Manufacturing | 13 | 2 | 0 | 11 | 4 |
-| Energy / Facility / Industrial: Water Wastewater & Pumping | 12 | 4 | 0 | 8 | 5 |
-| Physics / Robotics / Autonomous: Automotive EV & Mobile Powertrain | 14 | 0 | 0 | 14 | 14 |
-| Physics / Robotics / Autonomous: Aviation & Autonomous Flight | 20 | 7 | 0 | 13 | 13 |
-| Physics / Robotics / Autonomous: Robotics Fleet & Warehouse Automation | 15 | 0 | 0 | 15 | 15 |
-| Physics / Robotics / Autonomous: Robotics Motion Control | 18 | 8 | 0 | 10 | 10 |
-| Physics / Robotics / Autonomous: Spacecraft & Flight Software | 14 | 4 | 4 | 6 | 6 |
-| Energy / Facility / Industrial: Healthcare Critical Environments | 13 | 7 | 0 | 6 | 3 |
-| Distribution / Specialized: Medical Imaging & Clinical Systems | 12 | 0 | 0 | 12 | 12 |
-| Energy / Facility / Industrial: Agriculture & Irrigation | 14 | 10 | 0 | 4 | 1 |
-| Energy / Facility / Industrial: Oil & Gas Pipelines | 14 | 8 | 0 | 6 | 3 |
-| Physics / Robotics / Autonomous: Rail Traction & Train Control | 14 | 0 | 0 | 14 | 14 |
-| Physics / Robotics / Autonomous: Marine Propulsion & Vessel Automation | 12 | 0 | 0 | 12 | 11 |
-| Distribution / Specialized: Ports & Maritime Logistics | 12 | 1 | 0 | 11 | 11 |
-| Energy / Facility / Industrial: Mining & Mineral Processing | 14 | 5 | 0 | 9 | 2 |
-| Energy / Facility / Industrial: District Heating & Cooling | 13 | 3 | 4 | 6 | 2 |
-| Energy / Facility / Industrial: Power Generation & Turbine Control | 14 | 10 | 0 | 4 | 2 |
-| Energy / Facility / Industrial: Renewable Generation & Inverter Control | 13 | 2 | 0 | 11 | 3 |
-| Physics / Robotics / Autonomous: Elevators & Vertical Transport | 12 | 0 | 0 | 12 | 11 |
-| Energy / Facility / Industrial: Pharmaceutical & Food Manufacturing | 14 | 10 | 0 | 4 | 4 |
+| Realm: family | Muscles | Write | Watch: at its limit on native | Watch: the same as native |
+|---|---:|---:|---:|---:|
+| Compute / AI / Cloud: AI Inference Serving | 24 | 15 | 9 | 0 |
+| Compute / AI / Cloud: AI Training | 18 | 16 | 2 | 0 |
+| Compute / AI / Cloud: Cloud VM & Capacity | 21 | 20 | 1 | 0 |
+| Compute / AI / Cloud: Container Resources | 25 | 22 | 3 | 0 |
+| Compute / AI / Cloud: Cross-Cluster, Multi-Region & Edge | 18 | 10 | 7 | 1 |
+| Compute / AI / Cloud: DPU SmartNIC & Programmable IO | 12 | 10 | 2 | 0 |
+| Compute / AI / Cloud: Distributed Cluster Managers | 15 | 8 | 7 | 0 |
+| Compute / AI / Cloud: GPU Fabric & RDMA | 18 | 14 | 4 | 0 |
+| Compute / AI / Cloud: HPC & Distributed Compute | 19 | 11 | 8 | 0 |
+| Compute / AI / Cloud: Host CPU & Memory | 26 | 10 | 16 | 0 |
+| Compute / AI / Cloud: Kubernetes Dynamic Device Allocation | 8 | 7 | 1 | 0 |
+| Compute / AI / Cloud: Kubernetes Placement & Scheduling | 21 | 16 | 5 | 0 |
+| Compute / AI / Cloud: Kubernetes Workload Scaling | 32 | 24 | 8 | 0 |
+| Compute / AI / Cloud: GPU Hardware | 22 | 11 | 11 | 0 |
+| Compute / AI / Cloud: Node Fleet & Karpenter-Class Control | 24 | 19 | 5 | 0 |
+| Compute / AI / Cloud: OpenShift & Machine API | 9 | 5 | 4 | 0 |
+| Compute / AI / Cloud: Quantum Computing Control Simulation | 16 | 11 | 5 | 0 |
+| Compute / AI / Cloud: Work Admission & Demand Shaping | 19 | 0 | 19 | 0 |
+| Distribution / Specialized: Cache & Memory Services | 16 | 12 | 4 | 0 |
+| Distribution / Specialized: Commerce & Payment Systems | 15 | 7 | 8 | 0 |
+| Distribution / Specialized: Data Analytics & ETL | 15 | 11 | 4 | 0 |
+| Distribution / Specialized: Database & Transactions | 19 | 14 | 5 | 0 |
+| Distribution / Specialized: Messaging & Streaming | 22 | 13 | 7 | 2 |
+| Distribution / Specialized: Network Routing & Switching | 19 | 12 | 7 | 0 |
+| Distribution / Specialized: Observability & Telemetry | 9 | 6 | 3 | 0 |
+| Distribution / Specialized: Reliability, Security & Recovery | 18 | 9 | 8 | 1 |
+| Distribution / Specialized: Runtime & Application | 21 | 14 | 5 | 2 |
+| Distribution / Specialized: Search, Indexing & Vector DB | 16 | 10 | 6 | 0 |
+| Distribution / Specialized: Service Mesh & API Reliability | 16 | 9 | 7 | 0 |
+| Distribution / Specialized: Storage Block/File/Object | 20 | 17 | 3 | 0 |
+| Distribution / Specialized: Telecom RAN & Edge Radio | 12 | 8 | 4 | 0 |
+| Distribution / Specialized: Workflow, Logistics & Fulfillment | 15 | 10 | 5 | 0 |
+| Energy / Facility / Industrial: Building & Critical Environment HVAC | 15 | 0 | 4 | 11 |
+| Energy / Facility / Industrial: Cooling, Chillers & Thermodynamics | 18 | 0 | 4 | 14 |
+| Energy / Facility / Industrial: Energy Storage & Microgrid | 19 | 14 | 2 | 3 |
+| Energy / Facility / Industrial: Facility & Grid Optimization | 15 | 9 | 5 | 1 |
+| Energy / Facility / Industrial: Grid Transmission & Distribution | 12 | 0 | 8 | 4 |
+| Energy / Facility / Industrial: Industrial PLC & Process Automation | 18 | 0 | 12 | 6 |
+| Energy / Facility / Industrial: PDU, UPS & Electrical Distribution | 18 | 7 | 3 | 8 |
+| Energy / Facility / Industrial: Semiconductor Fab & Precision Manufacturing | 13 | 0 | 11 | 2 |
+| Energy / Facility / Industrial: Water Wastewater & Pumping | 12 | 0 | 8 | 4 |
+| Physics / Robotics / Autonomous: Automotive EV & Mobile Powertrain | 14 | 1 | 13 | 0 |
+| Physics / Robotics / Autonomous: Aviation & Autonomous Flight | 28 | 14 | 14 | 0 |
+| Physics / Robotics / Autonomous: Robotics Fleet & Warehouse Automation | 17 | 14 | 3 | 0 |
+| Physics / Robotics / Autonomous: Robotics Motion Control | 26 | 19 | 5 | 2 |
+| Physics / Robotics / Autonomous: Spacecraft & Flight Software | 14 | 0 | 14 | 0 |
+| Energy / Facility / Industrial: Healthcare Critical Environments | 13 | 0 | 3 | 10 |
+| Distribution / Specialized: Medical Imaging & Clinical Systems | 12 | 3 | 9 | 0 |
+| Energy / Facility / Industrial: Agriculture & Irrigation | 14 | 0 | 4 | 10 |
+| Energy / Facility / Industrial: Oil & Gas Pipelines | 14 | 0 | 6 | 8 |
+| Physics / Robotics / Autonomous: Rail Traction & Train Control | 14 | 0 | 14 | 0 |
+| Physics / Robotics / Autonomous: Marine Propulsion & Vessel Automation | 12 | 5 | 7 | 0 |
+| Distribution / Specialized: Ports & Maritime Logistics | 12 | 6 | 6 | 0 |
+| Energy / Facility / Industrial: Mining & Mineral Processing | 14 | 0 | 6 | 8 |
+| Energy / Facility / Industrial: District Heating & Cooling | 13 | 0 | 6 | 7 |
+| Energy / Facility / Industrial: Power Generation & Turbine Control | 14 | 0 | 4 | 10 |
+| Energy / Facility / Industrial: Renewable Generation & Inverter Control | 13 | 0 | 7 | 6 |
+| Physics / Robotics / Autonomous: Elevators & Vertical Transport | 12 | 0 | 12 | 0 |
+| Energy / Facility / Industrial: Pharmaceutical & Food Manufacturing | 14 | 0 | 4 | 10 |
+| Compute / AI / Cloud: Linux Kernel & OS Control | 20 | 9 | 3 | 8 |
+| Compute / AI / Cloud: Serverless & Functions (FaaS) | 9 | 6 | 2 | 1 |
+| Compute / AI / Cloud: Virtualization & Hypervisor | 9 | 6 | 2 | 1 |
+| Distribution / Specialized: Content Delivery & Edge Cache | 6 | 2 | 2 | 2 |
+| Compute / AI / Cloud: Gut: Data-plane Intake & Waste | 8 | 0 | 5 | 3 |
+| Compute / AI / Cloud: Skin: Perimeter & Admission | 5 | 1 | 4 | 0 |
+| Distribution / Specialized: Financial Markets & Trading Systems | 14 | 7 | 3 | 4 |
+| Compute / AI / Cloud: Media Streaming & CDN | 14 | 5 | 4 | 5 |
+| Compute / AI / Cloud: Game Servers & Real-Time Interactive | 12 | 7 | 3 | 2 |
+| Compute / AI / Cloud: Blockchain & Ledger Nodes | 10 | 5 | 3 | 2 |
+| Compute / AI / Cloud: CI/CD & Build Farms | 10 | 6 | 3 | 1 |
 
 ### Why the watch muscles are watch
 
-- **746 muscles wrote nothing in any run.** Their plants' native controllers held the reading inside the compass's band for the whole hour on every seed, so the law never left its cushion and had nothing to push. On these muscles Omni on top is native, EVEN: nothing earned, nothing given, and no wire in is needed. They are 392 capacity knobs, 255 admission knobs, 62 power knobs and 37 setpoint knobs, 567 of them on the compute plant, whose native autoscaler and fixed admission limit already serve the modelled demand inside its line.
-- **All 255 admission muscles are watch**, and all wrote nothing: the admission knob is native while change is permitted, and limits what is let in only while it is not (a power or heat stress; `docs/REALMS_PREREGISTRATION.md`). No run reached that state, so the knob was never touched. This is the knob's design, not a failure: admission is a brake for an emergency the hour did not hold.
-- **62 muscles wrote and read EVEN**: their work per energy moved by at most +1.8% with an interval across zero. They are process loops, inverters, chambers, mills and zones where the law moved the knob inside its band and the plant's output did not measurably follow. Watch, by rule.
-- **One muscle is EVEN, not established** (Elevators & Vertical Transport, `hoist_speed_target`): the interval is too wide to read and the work guardrail did not hold. Watch, until a longer run decides it.
+- **421 muscles are at their limit on native.** Native already runs the knob at the top of its range: every admission knob lets everything in while change is permitted (275 admission knobs), a power knob runs the full clock or the full battery power (96 power knobs), and 50 capacity and setpoint knobs sit where native's own controller already has what the plant needs. There is nothing for the max to push; the knob is read and left native, EVEN by design, and no wire in is needed.
+- **159 muscles read the same as native**: 40 of them wrote and nothing moved beyond the noise on work, speed or misses, 119 wrote nothing because native held the reading and the law had nothing to push. Watch, by rule; these are the room the next engine looks for a gain in, in the toy gate first.
 
-### The trades, muscle by muscle
+### Power given, muscle by muscle
 
-| Muscle | Family | Knob | Reading | Work per energy | Work | Violations (pp) | Verdict |
-|---|---|---|---|---:|---:|---:|---|
-| `cpufreq_min` | Host CPU & Memory | power | GAIN AND LOSS (energy cut, service traded for it) | +1.41% (+1.12 to +1.71) | +0.00% | +0.11 | **operator's choice** |
-| `battery_soc_reserve` | Energy Storage & Microgrid | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.21% (-0.22 to -0.21) | +0.00% | -1.40 | **operator's choice** |
-| `time_of_use_schedule` | Energy Storage & Microgrid | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.21% (-0.22 to -0.21) | +0.00% | -1.39 | **operator's choice** |
-| `microgrid_emergency_reserve` | Energy Storage & Microgrid | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.21% (-0.21 to -0.20) | +0.00% | -1.40 | **operator's choice** |
-| `pue_target` | Facility & Grid Optimization | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.12% (-0.13 to -0.12) | +0.00% | -0.81 | **operator's choice** |
-| `payload_duty_cycle` | Spacecraft & Flight Software | power | GAIN AND LOSS (energy cut, service traded for it) | +0.82% (+0.66 to +0.98) | +0.00% | +0.92 | **operator's choice** |
-| `space_power_budget` | Spacecraft & Flight Software | power | GAIN AND LOSS (energy cut, service traded for it) | +0.75% (+0.66 to +0.84) | +0.00% | +0.50 | **operator's choice** |
-| `space_thermal_command` | Spacecraft & Flight Software | power | GAIN AND LOSS (energy cut, service traded for it) | +0.80% (+0.76 to +0.85) | +0.00% | +0.36 | **operator's choice** |
-| `rcs_authority` | Spacecraft & Flight Software | power | GAIN AND LOSS (energy cut, service traded for it) | +0.84% (+0.75 to +0.93) | +0.00% | +0.36 | **operator's choice** |
-| `return_temperature_target` | District Heating & Cooling | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +5.15% (+2.49 to +7.80) | -0.02% | +0.04 | **operator's choice** |
-| `differential_pressure_setpoint` | District Heating & Cooling | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +3.74% (+0.62 to +6.87) | -0.06% | +0.06 | **operator's choice** |
-| `thermal_storage_level_target` | District Heating & Cooling | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +3.88% (+1.08 to +6.69) | -0.03% | +0.06 | **operator's choice** |
-| `cooling_storage_level_target` | District Heating & Cooling | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +3.47% (+0.51 to +6.43) | -0.11% | +0.10 | **operator's choice** |
-| `hoist_speed_target` | Elevators & Vertical Transport | capacity | EVEN (not established: inside the noise, a guardrail crossed on the mean) | -1.63% (-7.65 to +4.39) | -2.50% | +0.00 | **watch** |
+The max buys work and speed; the energy it takes is **power given**, shown beside what it bought and never a trade or a loss (the founder's order of 13 October). The write muscles whose power given on their own load is the largest:
 
-The nine energy-for-service trades (GAIN AND LOSS) are the CPU's minimum clock (`cpufreq_min`), four spacecraft power knobs and four district heating setpoints: energy cut at a measurable LOSS in work or in time in violation. The four service-for-energy trades (GAIN, power given) are three microgrid reserves and a facility's PUE target: time in violation proven cut, a GAIN, for a little energy given. Each is the operator's to take or leave; none is wired in by default.
+| Muscle | Family | Knob | Reading | Misses (pp) | Work | Power given |
+|---|---|---|---|---:|---:|---:|
+| `db_replicas` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -5.54 | +0.27% | +104.31% |
+| `io_capacity` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -6.89 | +0.35% | +96.73% |
+| `read_route` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -6.31 | +0.35% | +90.41% |
+| `synchronous_replication` | Database & Transactions | capacity | GAIN (fewer misses) | -3.90 | +0.39% | +89.14% |
+| `payment_failover` | Commerce & Payment Systems | capacity | GAIN (more work + fewer misses) | -5.71 | +0.17% | +88.88% |
+| `buffer_pool` | Database & Transactions | capacity | GAIN (fewer misses) | -3.82 | +0.23% | +88.65% |
+| `placement_group` | Cloud VM & Capacity | capacity | GAIN (fewer misses) | -2.49 | +0.10% | +88.00% |
+| `parallel_workers` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -3.92 | +0.24% | +87.92% |
+| `pulse_duration` | Quantum Computing Control Simulation | setpoint | GAIN (fewer misses) | -0.85 | +0.00% | +86.36% |
+| `interruption_response` | Cloud VM & Capacity | capacity | GAIN (fewer misses) | -2.32 | +0.14% | +83.97% |
+| `multi_cluster_dispatch` | Cross-Cluster, Multi-Region & Edge | capacity | GAIN (fewer misses) | -2.39 | +0.14% | +83.95% |
+| `nodepool_weight` | Node Fleet & Karpenter-Class Control | setpoint | GAIN (more work + fewer misses) | -2.99 | +0.19% | +83.62% |
+| `db_failover` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -6.15 | +0.44% | +83.17% |
+| `kubelet_reserved_resources` | Node Fleet & Karpenter-Class Control | capacity | GAIN (fewer misses) | -2.22 | +0.26% | +82.84% |
+| `asg_min` | Cloud VM & Capacity | capacity | GAIN (fewer misses) | -1.53 | +0.01% | +82.21% |
+| `runner_scale_set_max_runners` | CI/CD & Build Farms | capacity | GAIN (fewer misses) | -2.57 | +0.31% | +82.16% |
+| `checkpoint_rate` | Database & Transactions | capacity | GAIN (fewer misses) | -5.18 | +0.46% | +81.95% |
+| `background_writer` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -3.94 | +0.26% | +81.69% |
+| `pulse_phase` | Quantum Computing Control Simulation | capacity | GAIN (fewer misses) | -2.01 | +0.00% | +81.01% |
+| `db_memory` | Database & Transactions | capacity | GAIN (fewer misses) | -5.32 | +0.09% | +80.86% |
 
-### The setpoint muscles, and what the band alone gives
-
-Of the 82 setpoint muscles that read GAIN within the guardrails, a fixed setpoint at the band's calm end (the `fixed_calm` arm, the native controller with the setpoint fixed, no governor) gave as much or more work per energy on every one. On 64 of them the fixed setpoint also held the service guardrails, so the gain is the band's and an operator may simply fix the setpoint; on 18 the fixed setpoint broke the service guardrail (GAIN AND LOSS: energy cut, service traded for it), and there the governor's moving hand is what keeps the service while the energy is saved. The CSV says which is which, muscle by muscle.
+Of the 527 write muscles, 523 took power for their gain on their own load and 4 took none (the gain came from timing, not from more energy). Every muscle's figure, on both loads, is in the CSV.
 
 ## The organisms
 
-### The five modelled organisms (every muscle written at once, one governor)
+### The six modelled organisms under three loads (every muscle written at once, one brain)
 
-| Organism | Muscles | Reading | Verdict | Figures |
+| Organism and load | Muscles | Reading | Verdict | Figures |
 |---|---:|---|---|---|
-| Compute / AI / Cloud | 430 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.1% (+0.1 to +0.1), work +0.0%, energy -0.1%, violations -0.012 pp; valid: yes |
-| Physics / Robotics / Autonomous | 376 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.1% (+0.1 to +0.1), work +0.0%, energy -0.1%, violations -0.003 pp; valid: yes |
-| Energy / Facility / Industrial | 470 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.3% (+0.2 to +0.4), work +0.0%, energy -0.3%, violations -0.013 pp; valid: yes |
-| Distribution / Specialized | 440 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.2% (+0.1 to +0.2), work +0.0%, energy -0.2%, violations -0.009 pp; valid: yes |
-| The whole tower, every muscle once | 945 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.3% (+0.2 to +0.4), work +0.0%, energy -0.3%, violations -0.004 pp; valid: yes |
+| Compute / AI / Cloud, the normal load | 540 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.070 pp (-0.084 to -0.057), work +0.000%, power given +0.009%; valid: yes |
+| Physics / Robotics / Autonomous, the normal load | 404 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.121 pp (-0.145 to -0.097), work +0.000%, power given +0.010%; valid: yes |
+| Energy / Facility / Industrial, the normal load | 480 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.118 pp (-0.144 to -0.093), work +0.000%, power given +0.000%; valid: yes |
+| Distribution / Specialized, the normal load | 484 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.067 pp (-0.082 to -0.052), work +0.000%, power given +0.002%; valid: yes |
+| The four stacked, every duplicate kept, the normal load | 1908 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.092 pp (-0.106 to -0.078), work +0.000%, power given +0.000%; valid: yes |
+| The whole tower, every muscle once, the normal load | 1107 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.051 pp (-0.062 to -0.040), work +0.000%, power given +0.000%; valid: yes |
+| Compute / AI / Cloud, the climb load | 540 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.390 pp (-0.421 to -0.358), work +0.002%, power given +0.046%; valid: yes |
+| Physics / Robotics / Autonomous, the climb load | 404 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.317 pp (-0.361 to -0.274), work +0.002%, power given +0.021%; valid: yes |
+| Energy / Facility / Industrial, the climb load | 480 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.217 pp (-0.247 to -0.187), work +0.000%, power given +0.000%; valid: yes |
+| Distribution / Specialized, the climb load | 484 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.460 pp (-0.489 to -0.431), work +0.003%, power given +0.026%; valid: yes |
+| The four stacked, every duplicate kept, the climb load | 1908 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.349 pp (-0.370 to -0.327), work +0.002%, power given +0.000%; valid: yes |
+| The whole tower, every muscle once, the climb load | 1107 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.094 pp (-0.107 to -0.082), work +0.000%, power given +0.000%; valid: yes |
+| Compute / AI / Cloud, the line load | 540 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.205 pp (-0.217 to -0.193), work +0.000%, power given +0.045%; valid: yes |
+| Physics / Robotics / Autonomous, the line load | 404 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.250 pp (-0.275 to -0.225), work +0.000%, power given +0.030%; valid: yes |
+| Energy / Facility / Industrial, the line load | 480 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.117 pp (-0.143 to -0.092), work +0.000%, power given +0.000%; valid: yes |
+| Distribution / Specialized, the line load | 484 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.142 pp (-0.167 to -0.117), work +0.000%, power given +0.006%; valid: yes |
+| The four stacked, every duplicate kept, the line load | 1908 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.176 pp (-0.190 to -0.163), work +0.000%, power given +0.000%; valid: yes |
+| The whole tower, every muscle once, the line load | 1107 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.051 pp (-0.062 to -0.040), work +0.000%, power given +0.000%; valid: yes |
 
-An organism's label is the whole's: every muscle written at once. The wiring an operator takes from this page is finer: the write muscles wired in, the trades chosen, the watch muscles left native with one wire out. The organism result says the whole, written at once, read no LOSS and some small GAIN; this page says which parts carried it.
+An organism's label is the whole's: every muscle written at once. The wiring an operator takes from this page is finer: the write muscles wired in, the watch muscles left native with one wire out. The organism result says the whole, written at once, read GAIN (fewer misses, and under the climb more work) in every organism under every load, the power given shown beside it; this page says which parts carried it.
 
 ### The organisms with the real cluster inside
 
@@ -366,7 +394,7 @@ This page judges after the fact, from published tables. The founder's order of 9
 | The card: the clock ceiling | one 15 MHz step at a time | the engine's verdict: a paired trial per step while the service is calm; no step passing, the card runs as it does alone; the power lid stays at the operator's | give back (slower clock for the same service); the speed floor never under the card's own busy clock | Omni v3 (`omni_controller/gpu_compass.py`) |
 | Robot arms: the speed override; drones: the cruise | one knob each | the engine's verdict on the robot and the swarm; two of four robots left native by it | give back | Omni v3 |
 | Power grids: the tap; buildings: the batteries | one knob each | the compass law alone, no trial; the trades on four exporting grids and seven 2023 districts are read from the tables above as the operator's choice | the law's own push and pull | Omni v3 (a trial there is the next engine) |
-| The 945 modelled muscles | each muscle's knob | one directive from the organism's governor, no trial per muscle; 746 never wrote, 13 are trades | the law's own push and pull | Omni v3 (the verdict per muscle is Omni v4, `docs/OMNI_V4_PLAN.md`, not built) |
+| The 1,107 modelled muscles | each muscle's knob | the max on every muscle, every muscle its own card; the knobs native already runs at the top of their range read and left native | the law's own push and pull | Omni v5 at the max (the law omni-v6 carries), `docs/OMNI_V5.md` |
 | The machine itself: the Linux kernel's frequency ceiling (`docs/CPU_POWER_PREREGISTRATION.md`) | one knob | `tools/knob_verdict.py` around the engine's verdict: every notch down tried on the machine first, under the index's reading for one machine (energy x latency / work) or energy per request inside the line | give back only (the ceiling cannot go above the top; the top always free) | outside the engine; built 10 October, waiting for a machine on the metal, no run yet |
 
 ---

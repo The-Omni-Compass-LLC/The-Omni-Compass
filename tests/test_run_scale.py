@@ -224,7 +224,12 @@ class Conductor(unittest.TestCase):
         self.assertEqual(g.azure_to_start(q, {steady: 3, x: 3, y: 3}, set()), [])
         self.assertEqual(g.azure_group("aks-metered burst 1 6 1 8 1 6 dial save eastus Standard_D2_v4"), d2)
         self.assertEqual(g.azure_title({"dial": "max", "replica_ceiling": "0"}), "aks-metered steady replica room 0 dial max eastus Standard_D2s_v4")
-        self.assertEqual(g.azure_queue(g.AZURE_QUEUE), [])                 # the repository's own queue reads
+        own = g.azure_queue(g.AZURE_QUEUE)                                 # the repository's own queue reads: the four sets at the
+        self.assertEqual(len(own), 12)                                     # tune-down (the founder's order of 14 October), A, B, C of each
+        self.assertEqual([n for r, n, _, _ in own if r == "A"], ["steady", "burst 1 4 1 6 1 9", "burst 1 6 1 8 1 6", "the real day on 1 to 9"])
+        for _, _, title, kv in own:
+            self.assertTrue(title.startswith("aks-metered ") and " dial save " in title, title)
+            self.assertEqual((kv.get("dial"), kv.get("replica_ceiling")), ("save", "0"))
 
     def test_started_runs_read_back_and_not_started_again(self):
         g = self.g

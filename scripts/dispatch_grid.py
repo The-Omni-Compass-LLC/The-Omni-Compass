@@ -107,7 +107,7 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # or running, one a tick in each queue, and is read back by its run's title since AZURE_SINCE (a cancelled run counts for
 # nothing), so nothing is started twice and a set dispatched by hand counts as started
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
-AZURE_SINCE = "2026-10-15T06:07:41Z"
+AZURE_SINCE = "2026-10-14T00:00:00Z"   # the machines-only sets of 14 October count as started (read back by title)
 AZURE_WF = "aks-metered.yml"
 FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
          "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")

@@ -131,7 +131,7 @@ will find, the following discipline throughout, because it is the discipline the
    When Omni-Compass loses, the first suspect is our own wiring, native setup or scoring; when that is fixed, the test is
    run again and the loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut.
 5. **Nothing read across engines.** The engine is frozen and fingerprinted (`OMNI_V1.json`, `OMNI_V2.json`,
-   `OMNI_V3.json`, `OMNI_V5.json`). Any change to a rule, gain, guard, preset or muscle makes the next version, and every result is run
+   `OMNI_V3.json`, `OMNI_V5.json`, `OMNI_V6.json`). Any change to a rule, gain, guard, preset or muscle makes the next version, and every result is run
    again on it. Every table made by rule checks the engine of each run it reads and refuses to mix them.
 6. **The raw files live with the code.** Every finished run's files are copied into `results/live/raw/run-<id>/` with one
    SHA-256 manifest per repetition, and every table names the runs and the commit it was made from. Anyone with the
@@ -274,7 +274,7 @@ setpoints and battery reserves, robot speeds and drone-swarm settings, and many 
 (compute, AI and cloud; physics, robotics and autonomy; energy, facility and industry; distribution and specialized
 systems) and run together as six organisms, from one realm alone up to the whole tower at once. The muscles in the
 catalog are modelled (class S). The real controllers it has been run on top of, such as Kubernetes and the databases,
-are live software (class L). The chapter that follows the key, "What You Are Looking At," shows which is which. Appendix G lists every one of the 1,107 muscles: what it is, what Omni-Compass reads from it, what it moves, the organisms it belongs to, and its own card, the factory setting it runs on.
+are live software (class L). The chapter that follows the key, "What You Are Looking At," shows which is which. Appendix G lists every one of the 1,107 muscles: what it is, what Omni-Compass reads from it, what it moves, the organisms it belongs to, and its own card, the factory setting it runs on; and for each of the 70 families, how to wire it on any stack: the native controller that owns it, the wire out (what is read, and where), the wire in (what is written, and where), the restore, and whether that wire has run live in this repository or only on a model (`docs/wiring_recipes.csv`).
 
 **What you need before you wire it.**
 
@@ -522,7 +522,7 @@ installed is a quarter off the bill.
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v7, fingerprint 1a0d1d1b91bc49ad (46 files).
+- **The engine on this checkout:** omni-v7, fingerprint d6d467b824c585f1 (46 files).
 - The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -2843,7 +2843,7 @@ once the muscle reports itself settled; a spend on a queue or a cache is judged 
 body's cost taken at the settled state; the reference and the trial are compared at the same load; and where single notches
 read flat, one scout step to the far side of the cover decides whether there is a hill to climb at all.
 
-**Which engine enforces what.** In Omni v3, the engine on main, the verdict tries a slow knob on the muscle itself before
+**Which engine enforces what.** In Omni v3, and in the v5 and v6 engines that carry its verdict, the verdict tries a slow knob on the muscle itself before
 it moves it (section 1.2), and the live harnesses carry the same verdict around every live knob (section 9.4). Omni v4 is
 the engine written to enforce all seven rules on every wire by construction: one body file that every muscle's wire passes
 through, the trial rules inside the verdict, and no wire that can write around them. It is designed
@@ -3309,92 +3309,133 @@ machines, a buffer pool after a cache), a new native controller, a new class of 
 
 
 
-The muscle tower on modelled plants (945 muscles in Omni v2, 656 in v1): four realms and the whole tower as a fifth organism, each run natively and
-with Omni-Compass on top, with meters and receipts. Evidence class **S** (simulation).
+The muscle tower on modelled plants: **1,107 distinct muscles in 70 families** (`realms/catalog_v5.csv`, the catalog the
+engine that stands carries), cut into four realms and run as **six organisms**: each realm's organism (its own families
+plus the shared spine of 267 muscles every real stack runs on: Compute / AI / Cloud 540, Physics / Robotics / Autonomous
+404, Energy / Facility / Industrial 480, Distribution / Specialized 484), the four stacked on one clock with every
+duplicate of the spine kept (`stack`, 1,908) and the whole tower, every muscle once (`tower`, 1,107). Every muscle also
+runs alone on its own plant. Each is run natively (the plant's own controller alone) and with Omni-Compass on top, with
+meters and receipts, under three loads: the organism's own load, the climb (the load stepping by one, 1 2 3 2 3 4 …)
+and work waiting in line. Evidence class **S** (modelled: our own models of these machines, never counted in the
+headline and never presented as proof). The word "simulation" is not used for them; a live stack is class L, a meter
+class P.
 
 ### Run it
 
 ```
 pip install -r requirements.txt
-python3 tools/run_realms.py                      # the preregistered run: every muscle and 5 organisms, seeds 1000-1009
-python3 tests/test_realms.py                     # the harness's own checks (also inside verify.py)
+python3 tools/run_realms_v5.py --out realms5-out     # the preregistered run: every muscle alone and the six organisms, seeds 3000-3009
+python3 tests/test_realms.py                         # the harness's own checks (also inside verify.py)
+python3 tools/realm_muscles.py                       # docs/REALM_MUSCLES.md: every organism written out, muscle by muscle
+python3 tools/muscle_catalog.py                      # docs/MUSCLE_CATALOG.md: every muscle explained, wired and carded
 ```
 
-Results (Omni v3; v2's are in `results/realms/v2/`, v1's in `results/realms/v1/`): `results/realms/REALMS.md` (the tables), `MUSCLES.csv` (one row per muscle), `REALMS.json` (every per-seed
-contrast), `RUN.json` and `SHA256SUMS.txt` (commit and fingerprints).
+The run is deterministic: `realms-v5.yml` (GitHub) runs it again and fails if any label or number differs from the
+table committed in `results/realms_v5/`.
+
+Results, each named for the engine it ran on: `results/realms_v5/REALMS_V5.md` (the tables: every muscle alone over its
+loads, and the six organisms under the normal, climb and line loads), `MUSCLES_V5.csv` (one row per muscle and load),
+`REALMS_V5.json` (every per-seed contrast), `RUN.json` and `SHA256SUMS.txt` (commit and fingerprints). The grid of
+copies and runs (1, 10 and 100 copies × 1, 10 and 100 runs, modelled and with the real cluster inside) is
+`results/grid_v5/GRID.md`. The earlier catalogs' results stay as the road to 1.0: v3's in `results/realms/`, v2's in
+`results/realms/v2/`, v1's in `results/realms/v1/`; nothing is read across engines, and every result runs again on the
+engine that stands (`scripts/reruns.txt`).
 
 ### What is where
 
 | File | What it is |
 |---|---|
-| `realms/catalog.csv` | the 945 muscles: family, name, realm, plant, parameter set, knob (v1's 656: `realms/catalog_v1.csv`) |
-| `tools/realms_catalog.py` | the rules that gave each muscle its realm, plant and knob |
+| `realms/catalog_v5.csv` | the 1,107 muscles: family, name, realm, plant, parameter set, knob (v1's 656: `realms/catalog_v1.csv`; v2/v3's 945: `realms/catalog.csv`) |
+| `realms/muscle_cards_v5.csv` | every muscle's own card: the factory setting it runs on, found on development seeds and kept only when it wins twice and never falls behind native on any seed |
+| `docs/wiring_recipes.csv` | every family's wiring on a real stack: the native controller, the wire out, the wire in, the restore, run live or modelled |
 | `realms/plants.py` | the five plants and their native controllers; the four knobs; the capacity law for one plant |
 | `realms/presets.py` | every parameter, one set per family class |
-| `realms/harness.py` | the arms (native, watch, omni, fixed setpoint), the organisms, the outcome and the label rule |
+| `realms/compass_arm_v5.py` | the law on every muscle at its default, the max, and the dial's tune-down (`V5CFG`, `V5SAVE`) |
+| `realms/harness.py` | the arms (native, omni), the organisms, the three loads, the outcome and the label rule |
 | `docs/REALMS_PREREGISTRATION.md` | the question, the rules, the seeds and the development history, frozen before the run |
+| `docs/REALM_MUSCLES.md`, `docs/MUSCLE_CATALOG.md` | every organism written out muscle by muscle; every muscle explained, wired and carded (the manuals' appendix) |
 
 ### How it relates to the rest
 
 | Layer | Realm harness | Elsewhere in this repository |
 |---|---|---|
-| Mathematics (T, V) | uses the frozen engine and governor unchanged | `docs/TRACKING_THEOREM.md`, `verify.py` |
-| Simulation (S) | **this** | fleet and cluster simulators, GPU model |
-| Real software (L) | not here | set 22 on real Kubernetes (`results/live/LIVE_REPS_22.md`) |
-| Physical (P) | not here | the GPU bench: first run on an NVIDIA A10, 2026-10-02 (`results/gpu/run-20261002T082232Z/GPU_REPS.md`); the corrected governor not yet run on a card (`docs/GPU_PREREGISTRATION.md`) |
+| Mathematics (T, V) | uses the engine and governor unchanged | `docs/TRACKING_THEOREM.md`, `verify.py` |
+| Modelled (S) | **this** | the fleet and cluster models, the GPU model, the independent simulators (robot arms, grids, districts, swarms) |
+| Real software (L) | not here | real Kubernetes and the live stacks (`results/live/`, newest engine first on the benefit sheet, `docs/BENEFIT_SHEET.md`) |
+| Physical (P) | not here | the card: every earlier card result is obsolete and runs again on rented cards at one named commit (`docs/GPU_PREREGISTRATION.md`) |
 
-A realm result that looks good is a reason to test that knob on a real machine, not a substitute for it. The realms
-whose knobs can be tested for real first are the compute realm's (the GPU bench, kind), because the tools already
-exist.
+A realm result that reads GAIN is a reason to test that knob on a real machine, not a substitute for it. The realms
+whose knobs can be tested for real first are the compute realm's (Kubernetes on kind, the card), because the tools
+already exist.
 
 ## 25. The Realm Muscles
 
 
 
-Generated from `realms/catalog.csv` (rules: `tools/realms_catalog.py`; the v2 build: `tools/realms_catalog_v2.py`). Every realm's organism is its own families plus the **shared spine** (the infrastructure every real stack runs on), so the realm counts add to more than the tower. Each muscle is followed by the one knob Omni may hold on it.
+Generated from `realms/catalog_v5.csv` (the catalog the engine that stands carries: 1,107 distinct muscles in 70 families) by `tools/realm_muscles.py`. A **muscle** is one setting on one machine that already has its own control; the one knob Omni-Compass may hold on it stands in brackets after its name. Every realm's organism is its own families plus the **shared spine** (the infrastructure every real stack runs on), so the realm counts add to more than the tower. What the engine does with each knob, which native controller owns it, where the reading is tapped and the setting written, how it is restored and its own card are written family by family in `docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix); the organisms' results are in `results/realms_v5/REALMS_V5.md` and the grid in `results/grid_v5/GRID.md`, each named for the engine it ran on.
 
-### The shared spine: 257 muscles, in all four realms
+### The six organisms
 
-#### Cloud VM & Capacity (21; plant: compute_pool, node)
-vm_count [capacity], vm_size [capacity], vm_start_stop [capacity], vm_migrate [capacity], instance_family [capacity], asg_min [capacity], asg_max [capacity], spot_mix [capacity], reservation_mix [capacity], zone_selection [capacity], region_selection [capacity], architecture_selection [capacity], accelerator_selection [capacity], boot_disk_class [capacity], placement_group [capacity], interruption_response [capacity], target_tracking_policy [setpoint], scaling_cooldown_warmup [capacity], vm_cpu_cap_by_priority [admission], predictive_scaling [capacity], instance_refresh [capacity]
+| Organism | Muscles | What it is |
+|---|---:|---|
+| 1. Compute / AI / Cloud | 540 | its 273 own muscles and the spine of 267 |
+| 2. Physics / Robotics / Autonomous | 404 | its 137 own muscles and the spine of 267 |
+| 3. Energy / Facility / Industrial | 480 | its 213 own muscles and the spine of 267 |
+| 4. Distribution / Specialized | 484 | its 217 own muscles and the spine of 267 |
+| 5. The four stacked (`stack`) | 1,908 | the four realms' organisms on one clock, every duplicate of the spine kept |
+| 6. The whole tower (`tower`) | 1,107 | every muscle of the catalog once |
 
-#### Container Resources (23; plant: compute_pool, server)
-cpu_request [capacity], cpu_limit [capacity], memory_request [capacity], memory_limit [capacity], ephemeral_storage [capacity], hugepages [capacity], io_weight [setpoint], pids_limit [capacity], memory_high [capacity], memory_reclaim [capacity], swap_limit [capacity], cgroup_io_max [capacity], cpu_weight [setpoint], cpu_quota [admission], cpuset [capacity], runtime_class [capacity], in_place_resize [capacity], namespace_quota [admission], default_limits [capacity], memory_hard_limit [capacity], memory_protection [capacity], io_latency_target [setpoint], freeze [admission]
+### The shared spine: 267 muscles, in all four realms
 
-#### Cooling, Chillers & Thermodynamics (18; plant: thermal_zone, data_hall)
-supply_air_temperature [setpoint], return_air_target [setpoint], coolant_supply_temperature [setpoint], coolant_flow [capacity], pump_speed [capacity], fan_speed [capacity], chiller_setpoint [setpoint], compressor_authority [power], cooling_tower_fan [capacity], cooling_capacity [capacity], rack_thermal_budget [power], gpu_thermal_envelope [setpoint], cpu_thermal_envelope [setpoint], thermal_workload_migrate [admission], thermal_load_shed [admission], server_fan_speed [capacity], economiser [capacity], chiller_plant_supervisory_control_rl_with_safety_layer [capacity]
+#### Kubernetes Workload Scaling (32; plant: compute_pool, server)
+replicas [capacity], hpa_cpu_target [setpoint], hpa_memory_target [setpoint], hpa_custom_target [setpoint], vpa_apply [capacity], scale_to_zero [capacity], keda_threshold [admission], rollout_rate [capacity], max_surge [capacity], max_unavailable [capacity], deployment_pause_resume [admission], rollout_abort [admission], pod_eviction [admission], pdb_policy [capacity], scheduler_queue_priority [admission], api_priority_fairness [admission], hpa_min_replicas [capacity], hpa_max_replicas [capacity], hpa_scale_down_stabilisation_window [setpoint], hpa_scale_up_stabilisation_window [setpoint], hpa_scaling_rate_policies [capacity], hpa_policy_selection [capacity], hpa_tolerance [capacity], hpa_sync_period [capacity], vpa_minmax_allowed_resources [capacity], keda_polling_interval [setpoint], rollout_progress_deadline [admission], rollout_readiness_delay [capacity], unhealthy_pod_eviction_policy [admission], graceful_termination [capacity], probes [capacity], kepler_energy_target_autoscaling [setpoint]
 
-#### Host CPU & Memory (23; plant: compute_pool, cpu_host)
-cpufreq_min [power], cpufreq_max [power], rapl_package_power [power], uncore_frequency [power], energy_perf_preference [power], cpu_idle_policy [power], memory_bandwidth [capacity], numa_balance [capacity], irq_affinity [capacity], llc_allocation [capacity], memory_pressure_gate [admission], page_reclaim_rate [capacity], transparent_hugepages [capacity], core_online_offline [capacity], thermal_throttle_policy [power], host_power_profile [power], frequency_governor [power], turbo_boost [capacity], dram_power_limit [power], swappiness_reclaim [capacity], core_packing [capacity], per_pod_cpu_frequency_range_and_c_state_access [power], uncore_frequency_per_node [power]
+#### Container Resources (25; plant: compute_pool, server)
+cpu_request [capacity], cpu_limit [capacity], memory_request [capacity], memory_limit [capacity], ephemeral_storage [capacity], hugepages [capacity], io_weight [setpoint], pids_limit [capacity], memory_high [capacity], memory_reclaim [capacity], swap_limit [capacity], cgroup_io_max [capacity], cpu_weight [setpoint], cpu_quota [admission], cpuset [capacity], runtime_class [capacity], in_place_resize [capacity], namespace_quota [admission], default_limits [capacity], memory_hard_limit [capacity], memory_protection [capacity], io_latency_target [setpoint], freeze [admission], cruisekube_request_rightsizing [capacity], goldilocks_vpa_request_recommendation [capacity]
 
-#### Kubernetes Placement & Scheduling (20; plant: compute_pool, server)
-node_selector [capacity], node_affinity [capacity], pod_anti_affinity [capacity], topology_spread [capacity], numa_placement [capacity], gpu_topology [capacity], storage_locality [capacity], network_locality [capacity], taint_toleration [setpoint], priority_class [admission], preemption_policy [admission], device_claim [capacity], failure_domain_spread [capacity], scheduler_backoff [admission], gang_admission [admission], deschedule [capacity], scheduler_scoring_strategy [capacity], scheduler_plugin_weights [setpoint], scheduling_gates [admission], cpu_manager [capacity]
-
-#### Kubernetes Workload Scaling (31; plant: compute_pool, server)
-replicas [capacity], hpa_cpu_target [setpoint], hpa_memory_target [setpoint], hpa_custom_target [setpoint], vpa_apply [capacity], scale_to_zero [capacity], keda_threshold [admission], rollout_rate [capacity], max_surge [capacity], max_unavailable [capacity], deployment_pause_resume [admission], rollout_abort [admission], pod_eviction [admission], pdb_policy [capacity], scheduler_queue_priority [admission], api_priority_fairness [admission], hpa_min_replicas [capacity], hpa_max_replicas [capacity], hpa_scale_down_stabilisation_window [setpoint], hpa_scale_up_stabilisation_window [setpoint], hpa_scaling_rate_policies [capacity], hpa_policy_selection [capacity], hpa_tolerance [capacity], hpa_sync_period [capacity], vpa_minmax_allowed_resources [capacity], keda_polling_interval [setpoint], rollout_progress_deadline [admission], rollout_readiness_delay [capacity], unhealthy_pod_eviction_policy [admission], graceful_termination [capacity], probes [capacity]
-
-#### NVIDIA GPU Hardware (19; plant: compute_pool, gpu)
-gpu_allocate [capacity], gpu_power_limit [power], gpu_sm_clock [power], gpu_memory_clock [power], gpu_persistence_mode [capacity], gpu_compute_mode [capacity], mig_mode [capacity], mig_geometry [capacity], gpu_timeslice [capacity], gpu_mps [capacity], gpu_quarantine [admission], gpu_reset [capacity], gpu_thermal_limit [power], gpu_ecc_response [capacity], gpu_job_power_budget [admission], application_clocks [power], gpu_temperature_target [setpoint], sync_boost [capacity], target_clocks [power]
-
-#### Network Routing & Switching (19; plant: compute_pool, network)
-lb_weight [setpoint], route_weight [setpoint], rate_limit [admission], bandwidth_limit [capacity], qos_class [capacity], connection_limit [admission], failover_route [capacity], nic_rate_limit [admission], nic_queue_count [capacity], queue_discipline [capacity], congestion_control [capacity], egress_budget [admission], ingress_budget [admission], ecmp_weight [setpoint], path_selection [capacity], network_isolation [admission], nic_interrupt_coalescing [capacity], nic_ring_size [capacity], port_link_power [power]
+#### Kubernetes Placement & Scheduling (21; plant: compute_pool, server)
+node_selector [capacity], node_affinity [capacity], pod_anti_affinity [capacity], topology_spread [capacity], numa_placement [capacity], gpu_topology [capacity], storage_locality [capacity], network_locality [capacity], taint_toleration [setpoint], priority_class [admission], preemption_policy [admission], device_claim [capacity], failure_domain_spread [capacity], scheduler_backoff [admission], gang_admission [admission], deschedule [capacity], scheduler_scoring_strategy [capacity], scheduler_plugin_weights [setpoint], scheduling_gates [admission], cpu_manager [capacity], peaks_power_aware_placement [capacity]
 
 #### Node Fleet & Karpenter-Class Control (24; plant: compute_pool, node)
 node_desired [capacity], node_pool_min [capacity], node_pool_max [capacity], node_provision [capacity], node_cordon [admission], node_drain [admission], node_consolidate [capacity], node_replace [capacity], node_shutdown [capacity], node_power_on [capacity], nodepool_weight [setpoint], disruption_budget [admission], consolidation_policy [capacity], consolidate_after [capacity], expire_after [capacity], capacity_class [capacity], scale_down_utilisation_threshold [admission], scale_down_unneeded_time [capacity], scale_down_delay_after_add [capacity], expander [capacity], node_pool_limits [capacity], kubelet_eviction_thresholds [admission], kubelet_reserved_resources [capacity], max_pods_per_node [capacity]
 
-#### Observability & Telemetry (9; plant: compute_pool, server)
-collector_memory_limit [capacity], export_concurrency [admission], cardinality_budget [admission], retention_window [setpoint], remote_write_queue [capacity], telemetry_shed [admission], metric_scrape_interval [setpoint], batching [capacity], per_pod_energy_attribution [capacity]
+#### Cloud VM & Capacity (21; plant: compute_pool, node)
+vm_count [capacity], vm_size [capacity], vm_start_stop [capacity], vm_migrate [capacity], instance_family [capacity], asg_min [capacity], asg_max [capacity], spot_mix [capacity], reservation_mix [capacity], zone_selection [capacity], region_selection [capacity], architecture_selection [capacity], accelerator_selection [capacity], boot_disk_class [capacity], placement_group [capacity], interruption_response [capacity], target_tracking_policy [setpoint], scaling_cooldown_warmup [capacity], vm_cpu_cap_by_priority [admission], predictive_scaling [capacity], instance_refresh [capacity]
 
-#### PDU, UPS & Electrical Distribution (18; plant: energy_storage, ups)
-server_power_cap [power], rack_power_cap [power], pdu_branch_power_limit [power], pdu_outlet_control [capacity], ups_operating_mode [capacity], ups_charge_rate [power], ups_discharge_rate [power], phase_balance [capacity], load_transfer [admission], reactive_power_target [setpoint], voltage_target [setpoint], generator_dispatch [capacity], electrical_isolation [admission], breaker_trip_gate [admission], ups_shutdown_battery_test [capacity], hierarchical_power_budget_row_pdu_switchboard_controllers [power], priority_aware_capping_throttle_low_priority_first [power], power_oversubscription_with_prediction [power]
+#### Host CPU & Memory (26; plant: compute_pool, cpu_host)
+cpufreq_min [power], cpufreq_max [power], rapl_package_power [power], uncore_frequency [power], energy_perf_preference [power], cpu_idle_policy [power], memory_bandwidth [capacity], numa_balance [capacity], irq_affinity [capacity], llc_allocation [capacity], memory_pressure_gate [admission], page_reclaim_rate [capacity], transparent_hugepages [capacity], core_online_offline [capacity], thermal_throttle_policy [power], host_power_profile [power], frequency_governor [power], turbo_boost [capacity], dram_power_limit [power], swappiness_reclaim [capacity], core_packing [capacity], per_pod_cpu_frequency_range_and_c_state_access [power], uncore_frequency_per_node [power], ear_cpu_frequency_policy [power], ear_global_energy_budget [admission], k8s_power_manager_core_profile [power]
 
-#### Reliability, Security & Recovery (12; plant: compute_pool, server)
-restart [capacity], rollback [capacity], traffic_divert_recovery [capacity], degraded_mode [capacity], actuator_freeze [admission], workload_isolate [admission], credential_rotation_gate [admission], policy_enforcement [capacity], rate_abuse_gate [admission], fault_domain_isolate [admission], backup_trigger [capacity], kill_switch [admission]
+#### GPU Hardware (22; plant: compute_pool, gpu)
+gpu_allocate [capacity], gpu_power_limit [power], gpu_sm_clock [power], gpu_memory_clock [power], gpu_persistence_mode [capacity], gpu_compute_mode [capacity], mig_mode [capacity], mig_geometry [capacity], gpu_timeslice [capacity], gpu_mps [capacity], gpu_quarantine [admission], gpu_reset [capacity], gpu_thermal_limit [power], gpu_ecc_response [capacity], gpu_job_power_budget [admission], application_clocks [power], gpu_temperature_target [setpoint], sync_boost [capacity], target_clocks [power], climatik_inference_power_cap [power], adaptive_gpu_power_cap [power], nvidia_platform_power_budget [power]
+
+#### Network Routing & Switching (19; plant: compute_pool, network)
+lb_weight [setpoint], route_weight [setpoint], rate_limit [admission], bandwidth_limit [capacity], qos_class [capacity], connection_limit [admission], failover_route [capacity], nic_rate_limit [admission], nic_queue_count [capacity], queue_discipline [capacity], congestion_control [capacity], egress_budget [admission], ingress_budget [admission], ecmp_weight [setpoint], path_selection [capacity], network_isolation [admission], nic_interrupt_coalescing [capacity], nic_ring_size [capacity], port_link_power [power]
 
 #### Storage Block/File/Object (20; plant: compute_pool, storage)
 volume_size [capacity], iops_limit [capacity], throughput_limit [capacity], replica_count [capacity], storage_tier [capacity], volume_placement [capacity], snapshot_trigger [capacity], rebalance [capacity], recovery_rate [capacity], backfill_rate [capacity], compaction_pressure [capacity], cache_allocation [capacity], object_replication [capacity], erasure_code_profile [capacity], storage_admission [admission], degraded_storage_gate [admission], scrub_schedule [capacity], io_scheduler [capacity], disk_power_spin_down [power], lifecycle_tiering [capacity]
 
-### Realm 1: Compute / AI / Cloud: 173 own muscles + the spine = 430 in its organism
+#### Observability & Telemetry (9; plant: compute_pool, server)
+collector_memory_limit [capacity], export_concurrency [admission], cardinality_budget [admission], retention_window [setpoint], remote_write_queue [capacity], telemetry_shed [admission], metric_scrape_interval [setpoint], batching [capacity], per_pod_energy_attribution [capacity]
+
+#### Reliability, Security & Recovery (12; plant: compute_pool, server)
+restart [capacity], rollback [capacity], traffic_divert_recovery [capacity], degraded_mode [capacity], actuator_freeze [admission], workload_isolate [admission], credential_rotation_gate [admission], policy_enforcement [capacity], rate_abuse_gate [admission], fault_domain_isolate [admission], backup_trigger [capacity], kill_switch [admission]
+
+#### PDU, UPS & Electrical Distribution (18; plant: energy_storage, ups)
+server_power_cap [power], rack_power_cap [power], pdu_branch_power_limit [power], pdu_outlet_control [capacity], ups_operating_mode [capacity], ups_charge_rate [power], ups_discharge_rate [power], phase_balance [capacity], load_transfer [admission], reactive_power_target [setpoint], voltage_target [setpoint], generator_dispatch [capacity], electrical_isolation [admission], breaker_trip_gate [admission], ups_shutdown_battery_test [capacity], hierarchical_power_budget_row_pdu_switchboard_controllers [power], priority_aware_capping_throttle_low_priority_first [power], power_oversubscription_with_prediction [power]
+
+#### Cooling, Chillers & Thermodynamics (18; plant: thermal_zone, data_hall)
+supply_air_temperature [setpoint], return_air_target [setpoint], coolant_supply_temperature [setpoint], coolant_flow [capacity], pump_speed [capacity], fan_speed [capacity], chiller_setpoint [setpoint], compressor_authority [power], cooling_tower_fan [capacity], cooling_capacity [capacity], rack_thermal_budget [power], gpu_thermal_envelope [setpoint], cpu_thermal_envelope [setpoint], thermal_workload_migrate [admission], thermal_load_shed [admission], server_fan_speed [capacity], economiser [capacity], chiller_plant_supervisory_control_rl_with_safety_layer [capacity]
+
+### Organism 1: Compute / AI / Cloud: 273 own muscles + the spine of 267 = 540 in its organism
+
+#### Work Admission & Demand Shaping (19; plant: compute_pool, server)
+api_concurrency [admission], queue_concurrency [admission], queue_backpressure [admission], job_admission [admission], batch_admission [admission], inference_admission [admission], load_shed [admission], priority_gate [admission], tenant_admission [admission], burst_limit [admission], deadline_admission [admission], work_budget [admission], request_queue_limit [admission], retry_admission [admission], background_work_gate [admission], maintenance_work_gate [admission], request_concurrency_limit [admission], adaptive_concurrency_limit [admission], priority_request_queue_under_limit [admission]
+
+#### OpenShift & Machine API (9; plant: compute_pool, node)
+machine_remediation [capacity], machine_health_gate [admission], mcp_pause [admission], mcp_max_unavailable [capacity], node_config_rollout [capacity], operator_reconcile_budget [admission], cluster_version_pacing [capacity], infra_machine_admission [admission], machine_failure_domain [capacity]
+
+#### GPU Fabric & RDMA (18; plant: compute_pool, fabric)
+nvlink_placement [capacity], nvswitch_route [capacity], gpu_fabric_quarantine [admission], rdma_bandwidth [capacity], rdma_route [capacity], nic_affinity [capacity], collective_concurrency [admission], collective_algorithm [capacity], collective_chunk_size [capacity], rank_placement [capacity], gpudirect_policy [capacity], congestion_response [capacity], rail_selection [capacity], fabric_failover [capacity], communication_priority [admission], fabric_isolation [admission], collective_protocol [capacity], nic_hca_selection [capacity]
 
 #### AI Inference Serving (24; plant: compute_pool, gpu)
 model_replicas [capacity], model_route_weight [setpoint], model_load [capacity], model_unload [capacity], model_instance_count [capacity], continuous_batching [capacity], max_batch_size [capacity], batch_queue_delay [capacity], inference_concurrency [admission], inference_max_tokens [capacity], kv_cache_budget [admission], prefix_cache_budget [admission], speculative_decode_budget [admission], model_precision [power], inference_priority [admission], inference_slo_gate [admission], autoscaling_target_concurrency_qps [admission], scale_to_zero_panic_window [setpoint], request_priority_levels [admission], kv_cache_swap_space [capacity], chunked_prefill [capacity], tensor_parallel_degree [capacity], disaggregated_prefill_decode [capacity], lora_adapter_load [capacity]
@@ -3402,69 +3443,81 @@ model_replicas [capacity], model_route_weight [setpoint], model_load [capacity],
 #### AI Training (18; plant: compute_pool, gpu_batch)
 training_workers [capacity], global_batch_size [capacity], microbatch_size [capacity], gradient_accumulation [capacity], data_parallelism [capacity], tensor_parallelism [capacity], pipeline_parallelism [capacity], expert_parallelism [capacity], checkpoint_interval [setpoint], checkpoint_trigger [capacity], training_preempt [admission], training_gang_size [capacity], elastic_worker_count [capacity], straggler_mitigation [capacity], training_precision [power], compute_comm_overlap [capacity], activation_checkpointing [capacity], dataloader_workers [capacity]
 
-#### Cross-Cluster, Multi-Region & Edge (15; plant: compute_pool, node)
-multi_cluster_dispatch [capacity], region_dispatch [capacity], zone_dispatch [capacity], edge_dispatch [capacity], cloud_capacity_class [capacity], workload_migrate_region [capacity], data_residency_gate [admission], latency_region_gate [admission], cost_region_gate [admission], carbon_region_gate [admission], global_failover [capacity], federation_quota [admission], cross_cluster_replication [capacity], edge_offload [capacity], global_admission [admission]
-
-#### DPU SmartNIC & Programmable IO (12; plant: compute_pool, fabric)
-dpu_pf_tx_rate [capacity], dpu_vf_tx_rate [capacity], dpu_sf_tx_rate [capacity], dpu_bandwidth_share [capacity], dpu_qos_group [capacity], sriov_vf_count [capacity], smartnic_flow_steering [capacity], smartnic_offload_enable [capacity], dpu_cpu_budget [admission], dpu_memory_budget [admission], dpu_service_placement [capacity], dpu_failover [capacity]
+#### HPC & Distributed Compute (19; plant: compute_pool, batch)
+job_slots [capacity], mpi_ranks [capacity], rank_mapping [capacity], node_allocation [capacity], job_walltime [capacity], job_priority [admission], job_preemption [admission], checkpoint_restart [capacity], parallel_io_budget [admission], collective_budget [admission], accelerator_share [capacity], cpu_gpu_ratio [setpoint], memory_per_rank [capacity], scratch_budget [admission], scheduler_fair_share [admission], backfill_policy [capacity], node_power_saving [power], cpu_frequency_per_job [power], partition_limits [capacity]
 
 #### Distributed Cluster Managers (15; plant: compute_pool, batch)
 task_admission [admission], task_priority [admission], resource_reservation [capacity], cluster_quota [admission], task_preemption [admission], binpack_pressure [capacity], spread_pressure [capacity], gang_schedule [capacity], worker_allocation [capacity], maintenance_evacuation [capacity], oversubscription [capacity], resource_reclaim [capacity], queue_fairness [admission], deadline_pressure [admission], scheduler_retry [admission]
 
-#### GPU Fabric & RDMA (18; plant: compute_pool, fabric)
-nvlink_placement [capacity], nvswitch_route [capacity], gpu_fabric_quarantine [admission], rdma_bandwidth [capacity], rdma_route [capacity], nic_affinity [capacity], collective_concurrency [admission], collective_algorithm [capacity], collective_chunk_size [capacity], rank_placement [capacity], gpudirect_policy [capacity], congestion_response [capacity], rail_selection [capacity], fabric_failover [capacity], communication_priority [admission], fabric_isolation [admission], collective_protocol [capacity], nic_hca_selection [capacity]
+#### Quantum Computing Control Simulation (16; plant: compute_pool, qpu)
+qubit_mapping [capacity], circuit_admission [admission], shot_allocation [capacity], circuit_scheduling [admission], gate_scheduling [capacity], pulse_amplitude [capacity], pulse_duration [setpoint], pulse_phase [capacity], pulse_frequency [power], coupling_control [capacity], reset_scheduling [capacity], measurement_scheduling [capacity], dynamical_decoupling [capacity], noise_aware_routing [capacity], error_mitigation_budget [admission], quantum_queue_priority [admission]
 
-#### HPC & Distributed Compute (19; plant: compute_pool, batch)
-job_slots [capacity], mpi_ranks [capacity], rank_mapping [capacity], node_allocation [capacity], job_walltime [capacity], job_priority [admission], job_preemption [admission], checkpoint_restart [capacity], parallel_io_budget [admission], collective_budget [admission], accelerator_share [capacity], cpu_gpu_ratio [setpoint], memory_per_rank [capacity], scratch_budget [admission], scheduler_fair_share [admission], backfill_policy [capacity], node_power_saving [power], cpu_frequency_per_job [power], partition_limits [capacity]
+#### Cross-Cluster, Multi-Region & Edge (18; plant: compute_pool, node)
+multi_cluster_dispatch [capacity], region_dispatch [capacity], zone_dispatch [capacity], edge_dispatch [capacity], cloud_capacity_class [capacity], workload_migrate_region [capacity], data_residency_gate [admission], latency_region_gate [admission], cost_region_gate [admission], carbon_region_gate [admission], global_failover [capacity], federation_quota [admission], cross_cluster_replication [capacity], edge_offload [capacity], global_admission [admission], edge_site_node_pool [capacity], edge_inference_gpu_clocks [power], edge_sync_interval [setpoint]
+
+#### Linux Kernel & OS Control (20; plant: compute_pool, cpu_host)
+cgroup_cpu_weight [capacity], cgroup_cpu_quota [capacity], cgroup_memory_high [capacity], cfs_scheduler_latency [setpoint], cpufreq_dvfs_governor [power], transparent_hugepages [setpoint], io_scheduler_depth [capacity], numa_auto_balancing [setpoint], dirty_ratio_writeback [setpoint], vm_swappiness [setpoint], tcp_buffer_autotune [capacity], block_nr_requests [capacity], ksm_memory_dedup [capacity], net_rx_coalesce [capacity], cpu_cstate_governor [power], zswap_pool_fraction [setpoint], page_cache_reclaim [setpoint], irqbalance_affinity [capacity], net_qdisc_codel_target [setpoint], hugepage_pool_reserve [capacity]
+
+#### Serverless & Functions (FaaS) (9; plant: compute_pool, server)
+fn_concurrency_limit [capacity], fn_provisioned_concurrency [capacity], fn_scale_to_zero_idle [admission], fn_memory_size [capacity], fn_prewarm_pool [capacity], fn_reserved_concurrency [capacity], fn_burst_admission [admission], fn_snapstart_restore [capacity], fn_timeout_budget [setpoint]
+
+#### Virtualization & Hypervisor (9; plant: compute_pool, cpu_host)
+vcpu_allocation [capacity], memory_ballooning [capacity], vm_overcommit_density [capacity], live_migration_pacing [admission], numa_vcpu_pinning [setpoint], sriov_vf_allocation [capacity], vgpu_partition [capacity], vm_memory_dedup_ksm [capacity], hypervisor_cpu_pinning [capacity]
+
+#### Gut: Data-plane Intake & Waste (8; plant: process_loop, process)
+ingress_intake_pacing [capacity], dead_letter_retry_cap [setpoint], gc_compaction_pacing [capacity], ttl_eviction_waste [setpoint], backpressure_threshold [admission], queue_drain_rate [capacity], retry_budget_window [setpoint], compaction_debt_drain [capacity]
+
+#### Skin: Perimeter & Admission (5; plant: compute_pool, server)
+rate_limit_token_bucket [admission], connection_admission [admission], waf_inspection_sampling [capacity], tls_session_cache [capacity], ddos_shield_admission [admission]
+
+#### Media Streaming & CDN (14; plant: process_loop, process)
+abr_bitrate_ladder_cap [setpoint], player_buffer_target [setpoint], transcoder_worker_pool [capacity], live_transcode_gpu_clocks [power], vod_transcode_batch_power [power], packager_workers [capacity], origin_shield_cache_size [capacity], edge_cache_ttl [setpoint], segment_duration_target [setpoint], cdn_request_coalescing [admission], drm_license_server_pool [capacity], thumbnail_sprite_batch [capacity], media_ingest_admission [admission], encoder_lookahead_frames [setpoint]
+
+#### Game Servers & Real-Time Interactive (12; plant: compute_pool, server)
+agones_fleet_buffer_size [capacity], agones_fleet_min_replicas [capacity], agones_fleet_max_replicas [capacity], game_server_tick_rate [setpoint], players_per_server_cap [admission], matchmaking_admission_rate [admission], matchmaking_wait_window [setpoint], relay_server_pool [capacity], voice_chat_mixer_pool [capacity], game_node_pool_autoscaler [capacity], replay_render_batch [capacity], cloud_gaming_gpu_clocks [power]
+
+#### Blockchain & Ledger Nodes (10; plant: compute_pool, storage)
+node_db_cache_size [capacity], mempool_max_size [setpoint], max_peer_connections [capacity], script_validation_threads [capacity], block_relay_admission [admission], rpc_work_queue_depth [admission], utxo_cache_flush_interval [setpoint], indexer_batch_workers [capacity], archive_node_storage_tier [capacity], validator_host_power_profile [power]
+
+#### CI/CD & Build Farms (10; plant: compute_pool, batch)
+runner_scale_set_min_runners [capacity], runner_scale_set_max_runners [capacity], build_concurrency_limit [admission], build_cache_size [capacity], test_shard_parallelism [capacity], job_queue_admission [admission], artifact_retention_ttl [setpoint], build_node_cpu_frequency [power], remote_execution_workers [capacity], warm_runner_pool [capacity]
+
+#### DPU SmartNIC & Programmable IO (12; plant: compute_pool, fabric)
+dpu_pf_tx_rate [capacity], dpu_vf_tx_rate [capacity], dpu_sf_tx_rate [capacity], dpu_bandwidth_share [capacity], dpu_qos_group [capacity], sriov_vf_count [capacity], smartnic_flow_steering [capacity], smartnic_offload_enable [capacity], dpu_cpu_budget [admission], dpu_memory_budget [admission], dpu_service_placement [capacity], dpu_failover [capacity]
 
 #### Kubernetes Dynamic Device Allocation (8; plant: compute_pool, gpu)
 dra_device_class_selection [capacity], dra_claim_capacity [capacity], dra_claim_sharing [capacity], dra_device_taint [capacity], dra_device_eviction [admission], dra_binding_readiness [capacity], dra_binding_failure_response [capacity], dra_device_configuration [setpoint]
 
-#### OpenShift & Machine API (9; plant: compute_pool, node)
-machine_remediation [capacity], machine_health_gate [admission], mcp_pause [admission], mcp_max_unavailable [capacity], node_config_rollout [capacity], operator_reconcile_budget [admission], cluster_version_pacing [capacity], infra_machine_admission [admission], machine_failure_domain [capacity]
+### Organism 2: Physics / Robotics / Autonomous: 137 own muscles + the spine of 267 = 404 in its organism
 
-#### Quantum Computing Control Simulation (16; plant: compute_pool, qpu)
-qubit_mapping [capacity], circuit_admission [admission], shot_allocation [capacity], circuit_scheduling [admission], gate_scheduling [capacity], pulse_amplitude [capacity], pulse_duration [setpoint], pulse_phase [capacity], pulse_frequency [power], coupling_control [capacity], reset_scheduling [capacity], measurement_scheduling [capacity], dynamical_decoupling [capacity], noise_aware_routing [capacity], error_mitigation_budget [admission], quantum_queue_priority [admission]
+#### Robotics Motion Control (26; plant: motion_axis, robot_joint)
+joint_position [capacity], joint_velocity [capacity], joint_acceleration [capacity], joint_effort [power], cartesian_velocity [capacity], trajectory_speed [capacity], trajectory_acceleration [capacity], jerk_limit [capacity], collision_margin [capacity], force_limit [power], gripper_force [power], locomotion_speed [capacity], steering_angle [capacity], braking_force [power], balance_correction [capacity], trajectory_tolerances [capacity], velocity_acceleration_scaling [capacity], controller_update_rate [capacity], ros2_executor_threads [capacity], ros2_qos_history_depth [setpoint], ros2_control_loop_rate [setpoint], humanoid_balance_margin [capacity], humanoid_gait_speed [capacity], humanoid_joint_torque_limit [power], humanoid_step_height [capacity], manipulator_payload_speed_scaling [capacity]
 
-#### Work Admission & Demand Shaping (19; plant: compute_pool, server)
-api_concurrency [admission], queue_concurrency [admission], queue_backpressure [admission], job_admission [admission], batch_admission [admission], inference_admission [admission], load_shed [admission], priority_gate [admission], tenant_admission [admission], burst_limit [admission], deadline_admission [admission], work_budget [admission], request_queue_limit [admission], retry_admission [admission], background_work_gate [admission], maintenance_work_gate [admission], request_concurrency_limit [admission], adaptive_concurrency_limit [admission], priority_request_queue_under_limit [admission]
+#### Robotics Fleet & Warehouse Automation (17; plant: compute_pool, robot_fleet)
+robot_dispatch [capacity], task_assignment [capacity], traffic_reservation [capacity], robot_route [capacity], charging_dispatch [capacity], battery_reserve [capacity], elevator_request [capacity], door_request [capacity], conveyor_speed [capacity], agv_speed [capacity], warehouse_zone_admission [admission], robot_quarantine [admission], fleet_failover [capacity], human_safe_stop [capacity], fleet_concurrency [admission], amr_fleet_charge_threshold [setpoint], amr_fleet_active_robots [capacity]
 
-### Realm 2: Physics / Robotics / Autonomous: 119 own muscles + the spine = 376 in its organism
-
-#### Automotive EV & Mobile Powertrain (14; plant: motion_axis, ev_traction)
-traction_torque_limit [power], regen_braking_level [power], battery_charge_limit [power], battery_discharge_limit [power], battery_thermal_target [power], motor_thermal_limit [power], vehicle_speed_envelope [capacity], energy_recovery_target [power], auxiliary_power_budget [power], fast_charge_current [power], fast_charge_voltage [power], vehicle_safe_state [admission], state_of_charge_limits [power], smart_charging_schedule [admission]
-
-#### Aviation & Autonomous Flight (20; plant: motion_axis, flight_axis)
-throttle_envelope [power], attitude_target [capacity], attitude_rate_target [capacity], velocity_target [capacity], altitude_target [capacity], waypoint_authority [capacity], flight_hold [admission], return_to_home [admission], land_action [admission], mission_admission [admission], geofence_response [admission], failsafe_selection [admission], battery_reserve_threshold [admission], actuator_saturation_envelope [capacity], flight_mode_transition [admission], flight_termination_safe_state [admission], attitude_rate_gains [capacity], horizontal_speed_limit [power], vertical_speed_limits [power], acceleration_jerk_limits [power]
-
-#### Elevators & Vertical Transport (12; plant: motion_axis, elevator_hoist)
-hoist_speed_target [capacity], acceleration_limit [capacity], regen_drive_mode [power], standby_power_mode [admission], destination_dispatch_schedule [admission], car_parking_mode [admission], door_dwell_hold [admission], escalator_speed_target [capacity], group_capacity_mode [admission], motor_thermal_derate [power], brake_test_schedule [admission], fire_recall_mode [admission]
-
-#### Marine Propulsion & Vessel Automation (12; plant: motion_axis, marine_propulsion)
-shaft_speed_target [capacity], propeller_pitch_limit [power], shaft_power_limit [power], bow_thruster_duty [power], ballast_pump_mode [admission], engine_load_sharing_setpoint [capacity], slow_steaming_speed_target [capacity], auxiliary_engine_staging [capacity], shore_power_mode [admission], hotel_load_budget [power], trim_target [capacity], rudder_rate_limit [power]
-
-#### Rail Traction & Train Control (14; plant: motion_axis, rail_traction)
-traction_effort_limit [power], regenerative_braking_share [power], coasting_speed_target [capacity], dwell_time_schedule [admission], hvac_duty_cycle [power], train_auxiliary_power_budget [power], platform_approach_speed [capacity], acceleration_rate_setpoint [capacity], wheel_slip_protection_mode [admission], traction_motor_thermal_derate [power], catenary_voltage_limit [power], timetable_recovery_margin [admission], headway_target [capacity], door_release_hold [admission]
-
-#### Robotics Fleet & Warehouse Automation (15; plant: compute_pool, robot_fleet)
-robot_dispatch [capacity], task_assignment [capacity], traffic_reservation [capacity], robot_route [capacity], charging_dispatch [capacity], battery_reserve [capacity], elevator_request [capacity], door_request [capacity], conveyor_speed [capacity], agv_speed [capacity], warehouse_zone_admission [admission], robot_quarantine [admission], fleet_failover [capacity], human_safe_stop [capacity], fleet_concurrency [admission]
-
-#### Robotics Motion Control (18; plant: motion_axis, robot_joint)
-joint_position [capacity], joint_velocity [capacity], joint_acceleration [capacity], joint_effort [power], cartesian_velocity [capacity], trajectory_speed [capacity], trajectory_acceleration [capacity], jerk_limit [capacity], collision_margin [capacity], force_limit [power], gripper_force [power], locomotion_speed [capacity], steering_angle [capacity], braking_force [power], balance_correction [capacity], trajectory_tolerances [capacity], velocity_acceleration_scaling [capacity], controller_update_rate [capacity]
+#### Aviation & Autonomous Flight (28; plant: motion_axis, flight_axis)
+throttle_envelope [power], attitude_target [capacity], attitude_rate_target [capacity], velocity_target [capacity], altitude_target [capacity], waypoint_authority [capacity], flight_hold [admission], return_to_home [admission], land_action [admission], mission_admission [admission], geofence_response [admission], failsafe_selection [admission], battery_reserve_threshold [admission], actuator_saturation_envelope [capacity], flight_mode_transition [admission], flight_termination_safe_state [admission], attitude_rate_gains [capacity], horizontal_speed_limit [power], vertical_speed_limits [power], acceleration_jerk_limits [power], px4_mpc_xy_vel_max [capacity], px4_mpc_z_vel_max_up [capacity], px4_mpc_acc_hor [capacity], px4_mc_rollrate_max [capacity], ardupilot_wpnav_speed [capacity], ardupilot_atc_accel_r_max [power], drone_battery_failsafe_reserve [setpoint], swarm_formation_spacing [capacity]
 
 #### Spacecraft & Flight Software (14; plant: motion_axis, reaction_wheel)
 space_command_admission [admission], flight_task_schedule [admission], space_mode_transition [admission], payload_duty_cycle [power], communication_allocation [capacity], space_power_budget [power], space_thermal_command [power], attitude_command_envelope [capacity], reaction_wheel_allocation [capacity], rcs_authority [power], safe_mode_transition [admission], watchdog_recovery [admission], instrument_activation [capacity], fault_isolation [admission]
 
-### Realm 3: Energy / Facility / Industrial: 213 own muscles + the spine = 470 in its organism
+#### Rail Traction & Train Control (14; plant: motion_axis, rail_traction)
+traction_effort_limit [power], regenerative_braking_share [power], coasting_speed_target [capacity], dwell_time_schedule [admission], hvac_duty_cycle [power], train_auxiliary_power_budget [power], platform_approach_speed [capacity], acceleration_rate_setpoint [capacity], wheel_slip_protection_mode [admission], traction_motor_thermal_derate [power], catenary_voltage_limit [power], timetable_recovery_margin [admission], headway_target [capacity], door_release_hold [admission]
 
-#### Agriculture & Irrigation (14; plant: process_loop, irrigation)
-irrigation_pump_speed [capacity], mainline_pressure_setpoint [setpoint], soil_moisture_target [setpoint], pivot_speed_setpoint [setpoint], fertigation_dose [power], greenhouse_temperature_setpoint [setpoint], greenhouse_co2_target [setpoint], vent_position_setpoint [setpoint], grain_dryer_temperature_setpoint [setpoint], cold_storage_temperature_setpoint [setpoint], barn_ventilation_rate [capacity], milking_vacuum_level_setpoint [setpoint], well_drawdown_level_target [setpoint], drip_zone_dispatch [admission]
+#### Marine Propulsion & Vessel Automation (12; plant: motion_axis, marine_propulsion)
+shaft_speed_target [capacity], propeller_pitch_limit [power], shaft_power_limit [power], bow_thruster_duty [power], ballast_pump_mode [admission], engine_load_sharing_setpoint [capacity], slow_steaming_speed_target [capacity], auxiliary_engine_staging [capacity], shore_power_mode [admission], hotel_load_budget [power], trim_target [capacity], rudder_rate_limit [power]
 
-#### Building & Critical Environment HVAC (15; plant: thermal_zone, building)
-zone_temperature_target [setpoint], zone_airflow [capacity], ahu_fan_speed [capacity], damper_position [capacity], economizer_position [capacity], boiler_setpoint [setpoint], heat_pump_mode [admission], humidity_target [setpoint], occupancy_ventilation [admission], building_demand_limit [power], thermal_storage_dispatch [capacity], hvac_emergency_mode [admission], setpoint_reset_trim_and_respond [setpoint], duct_static_pressure_setpoint [setpoint], optimal_start_stop [capacity]
+#### Elevators & Vertical Transport (12; plant: motion_axis, elevator_hoist)
+hoist_speed_target [capacity], acceleration_limit [capacity], regen_drive_mode [power], standby_power_mode [admission], destination_dispatch_schedule [admission], car_parking_mode [admission], door_dwell_hold [admission], escalator_speed_target [capacity], group_capacity_mode [admission], motor_thermal_derate [power], brake_test_schedule [admission], fire_recall_mode [admission]
 
-#### District Heating & Cooling (13; plant: process_loop, district_heat)
-supply_temperature_setpoint [setpoint], return_temperature_target [setpoint], differential_pressure_setpoint [setpoint], network_pump_speed [capacity], heat_pump_staging [capacity], chp_dispatch [admission], thermal_storage_level_target [setpoint], peak_boiler_heater_output [power], substation_flow_limit [capacity], peak_demand_shed [admission], outdoor_reset_setpoint [setpoint], cooling_network_supply_temperature [setpoint], cooling_storage_level_target [setpoint]
+#### Automotive EV & Mobile Powertrain (14; plant: motion_axis, ev_traction)
+state_of_charge_limits [power], smart_charging_schedule [admission], traction_torque_limit [power], regen_braking_level [power], battery_charge_limit [power], battery_discharge_limit [power], battery_thermal_target [power], motor_thermal_limit [power], vehicle_speed_envelope [capacity], energy_recovery_target [power], auxiliary_power_budget [power], fast_charge_current [power], fast_charge_voltage [power], vehicle_safe_state [admission]
+
+### Organism 3: Energy / Facility / Industrial: 213 own muscles + the spine of 267 = 480 in its organism
+
+#### Industrial PLC & Process Automation (18; plant: process_loop, process)
+plc_cycle_authority [admission], machine_cell_admission [admission], valve_position [setpoint], pump_flow [capacity], compressor_speed [capacity], heater_power [power], furnace_setpoint [setpoint], pressure_setpoint [setpoint], temperature_setpoint [setpoint], mass_flow_setpoint [setpoint], tank_level_target [setpoint], conveyor_rate [capacity], feed_rate [capacity], purge_vent_action [admission], controller_mode [capacity], alarm_limits [capacity], safety_interlock_trip [capacity], opc_ua_writes [capacity]
 
 #### Energy Storage & Microgrid (19; plant: energy_storage, microgrid)
 battery_charge_power [power], battery_discharge_power [power], battery_soc_reserve [setpoint], grid_import_limit [power], grid_export_limit [power], pv_curtailment [power], ev_charge_power [power], heat_pump_power [power], electrolyzer_power [power], microgrid_demand_limit [power], peak_shaving [capacity], time_of_use_schedule [setpoint], energy_load_shed [admission], flex_load_admission [admission], storage_dispatch [capacity], microgrid_emergency_reserve [setpoint], volt_var [capacity], volt_watt [capacity], constant_power_factor_reactive_power [power]
@@ -3472,23 +3525,20 @@ battery_charge_power [power], battery_discharge_power [power], battery_soc_reser
 #### Facility & Grid Optimization (15; plant: energy_storage, facility)
 facility_power_budget [power], utility_demand_limit [power], demand_response [admission], electricity_price_gate [admission], carbon_intensity_gate [admission], renewable_dispatch [capacity], generator_start_stop [capacity], site_battery_dispatch [capacity], pue_target [setpoint], cooling_power_budget [power], it_power_budget [power], rack_power_allocation [power], facility_peak_guard [capacity], grid_frequency_response [admission], facility_islanding [admission]
 
-#### Grid Transmission & Distribution (12; plant: process_loop, feeder_voltage)
-capacitor_bank_switch [capacity], voltage_regulator_tap [setpoint], transformer_tap [setpoint], inverter_real_power [power], inverter_reactive_power [power], feeder_voltage_target [setpoint], feeder_load_transfer [capacity], distribution_storage_dispatch [admission], demand_response_dispatch [admission], frequency_droop_setpoint [setpoint], grid_protection_mode [admission], grid_restoration_sequence [admission]
-
 #### Healthcare Critical Environments (13; plant: thermal_zone, hospital)
 operating_room_air_change_setpoint [setpoint], isolation_room_pressure_target [setpoint], patient_room_temperature_setpoint [setpoint], surgical_suite_humidity_target [setpoint], ahu_supply_air_temperature [setpoint], pharmacy_cold_room_setpoint [setpoint], sterile_storage_humidity_setpoint [setpoint], imaging_suite_cooling_capacity [capacity], chiller_plant_staging [capacity], exhaust_fan_capacity [capacity], ward_night_setback_mode [admission], medical_gas_plant_demand_limit [power], emergency_power_load_shed [admission]
 
-#### Industrial PLC & Process Automation (18; plant: process_loop, process)
-plc_cycle_authority [admission], machine_cell_admission [admission], valve_position [setpoint], pump_flow [capacity], compressor_speed [capacity], heater_power [power], furnace_setpoint [setpoint], pressure_setpoint [setpoint], temperature_setpoint [setpoint], mass_flow_setpoint [setpoint], tank_level_target [setpoint], conveyor_rate [capacity], feed_rate [capacity], purge_vent_action [admission], controller_mode [capacity], alarm_limits [capacity], safety_interlock_trip [capacity], opc_ua_writes [capacity]
-
-#### Mining & Mineral Processing (14; plant: process_loop, mill)
-sag_mill_load_setpoint [setpoint], mill_speed_target [setpoint], crusher_gap_setpoint [setpoint], flotation_aeration_rate [power], cyclone_feed_pressure_target [setpoint], thickener_underflow_density_target [setpoint], reagent_dose [power], conveyor_speed_setpoint [setpoint], dewatering_pump_level_target [setpoint], ventilation_on_demand_airflow [capacity], stockpile_level_target [setpoint], slurry_pump_speed [capacity], tailings_discharge_shutdown [admission], ore_blend_dispatch [admission]
+#### Agriculture & Irrigation (14; plant: process_loop, irrigation)
+irrigation_pump_speed [capacity], mainline_pressure_setpoint [setpoint], soil_moisture_target [setpoint], pivot_speed_setpoint [setpoint], fertigation_dose [power], greenhouse_temperature_setpoint [setpoint], greenhouse_co2_target [setpoint], vent_position_setpoint [setpoint], grain_dryer_temperature_setpoint [setpoint], cold_storage_temperature_setpoint [setpoint], barn_ventilation_rate [capacity], milking_vacuum_level_setpoint [setpoint], well_drawdown_level_target [setpoint], drip_zone_dispatch [admission]
 
 #### Oil & Gas Pipelines (14; plant: process_loop, pipeline)
 compressor_discharge_pressure_setpoint [setpoint], pump_station_suction_pressure_target [setpoint], line_pack_target [setpoint], pipeline_flow_setpoint [setpoint], compressor_unit_staging [capacity], vfd_pump_speed [capacity], terminal_tank_level_target [setpoint], leak_detection_shutdown [admission], batch_interface_dispatch [admission], heater_outlet_temperature_setpoint [setpoint], drag_reducing_agent_dose [power], valve_position_target [setpoint], cathodic_protection_voltage [setpoint], pressure_protection_priority [admission]
 
-#### Pharmaceutical & Food Manufacturing (14; plant: process_loop, batch_reactor)
-reactor_temperature_setpoint [setpoint], agitator_speed_setpoint [setpoint], fermenter_dissolved_oxygen_target [setpoint], ph_setpoint [setpoint], pasteurizer_holding_temperature_setpoint [setpoint], freezer_tunnel_temperature_setpoint [setpoint], cip_cycle_dispatch [admission], cleanroom_pressure_cascade_setpoint [setpoint], lyophilizer_shelf_temperature_setpoint [setpoint], chromatography_flow_setpoint [setpoint], steam_sterilizer_cycle_priority [admission], oven_zone_temperature_setpoint [setpoint], refrigerant_compressor_authority [admission], batch_hold_quarantine [admission]
+#### Mining & Mineral Processing (14; plant: process_loop, mill)
+sag_mill_load_setpoint [setpoint], mill_speed_target [setpoint], crusher_gap_setpoint [setpoint], flotation_aeration_rate [power], cyclone_feed_pressure_target [setpoint], thickener_underflow_density_target [setpoint], reagent_dose [power], conveyor_speed_setpoint [setpoint], dewatering_pump_level_target [setpoint], ventilation_on_demand_airflow [capacity], stockpile_level_target [setpoint], slurry_pump_speed [capacity], tailings_discharge_shutdown [admission], ore_blend_dispatch [admission]
+
+#### District Heating & Cooling (13; plant: process_loop, district_heat)
+supply_temperature_setpoint [setpoint], return_temperature_target [setpoint], differential_pressure_setpoint [setpoint], network_pump_speed [capacity], heat_pump_staging [capacity], chp_dispatch [admission], thermal_storage_level_target [setpoint], peak_boiler_heater_output [power], substation_flow_limit [capacity], peak_demand_shed [admission], outdoor_reset_setpoint [setpoint], cooling_network_supply_temperature [setpoint], cooling_storage_level_target [setpoint]
 
 #### Power Generation & Turbine Control (14; plant: process_loop, turbine)
 turbine_speed_droop_setpoint [setpoint], unit_load_setpoint [setpoint], boiler_steam_pressure_setpoint [setpoint], feedwater_level_target [setpoint], agc_participation_limit [capacity], excitation_voltage_setpoint [setpoint], hydro_gate_position_target [setpoint], combustion_air_ratio_setpoint [setpoint], cooling_water_flow_setpoint [setpoint], inlet_guide_vane_position [setpoint], reserve_dispatch_priority [admission], turbine_ramp_rate_limit [capacity], emissions_shutdown [admission], nuclear_rod_position_target [setpoint]
@@ -3496,53 +3546,75 @@ turbine_speed_droop_setpoint [setpoint], unit_load_setpoint [setpoint], boiler_s
 #### Renewable Generation & Inverter Control (13; plant: process_loop, inverter)
 inverter_volt_var_setpoint [setpoint], inverter_volt_watt_setpoint [setpoint], active_power_curtailment [power], plant_reactive_power_target [setpoint], wind_turbine_yaw_offset [capacity], pitch_angle_limit [capacity], rotor_speed_setpoint [setpoint], inverter_frequency_droop_setpoint [setpoint], ramp_rate_limit [capacity], tracker_stow_mode [admission], string_mppt_voltage_setpoint [setpoint], noise_mode_schedule [admission], ice_detection_shutdown [admission]
 
+#### Pharmaceutical & Food Manufacturing (14; plant: process_loop, batch_reactor)
+reactor_temperature_setpoint [setpoint], agitator_speed_setpoint [setpoint], fermenter_dissolved_oxygen_target [setpoint], ph_setpoint [setpoint], pasteurizer_holding_temperature_setpoint [setpoint], freezer_tunnel_temperature_setpoint [setpoint], cip_cycle_dispatch [admission], cleanroom_pressure_cascade_setpoint [setpoint], lyophilizer_shelf_temperature_setpoint [setpoint], chromatography_flow_setpoint [setpoint], steam_sterilizer_cycle_priority [admission], oven_zone_temperature_setpoint [setpoint], refrigerant_compressor_authority [admission], batch_hold_quarantine [admission]
+
+#### Building & Critical Environment HVAC (15; plant: thermal_zone, building)
+setpoint_reset_trim_and_respond [setpoint], duct_static_pressure_setpoint [setpoint], optimal_start_stop [capacity], zone_temperature_target [setpoint], zone_airflow [capacity], ahu_fan_speed [capacity], damper_position [capacity], economizer_position [capacity], boiler_setpoint [setpoint], heat_pump_mode [admission], humidity_target [setpoint], occupancy_ventilation [admission], building_demand_limit [power], thermal_storage_dispatch [capacity], hvac_emergency_mode [admission]
+
+#### Grid Transmission & Distribution (12; plant: process_loop, feeder_voltage)
+capacitor_bank_switch [capacity], voltage_regulator_tap [setpoint], transformer_tap [setpoint], inverter_real_power [power], inverter_reactive_power [power], feeder_voltage_target [setpoint], feeder_load_transfer [capacity], distribution_storage_dispatch [admission], demand_response_dispatch [admission], frequency_droop_setpoint [setpoint], grid_protection_mode [admission], grid_restoration_sequence [admission]
+
 #### Semiconductor Fab & Precision Manufacturing (13; plant: process_loop, chamber)
-tool_job_dispatch [admission], wafer_route [capacity], chamber_recipe_selection [admission], chamber_temperature [setpoint], chamber_pressure [setpoint], gas_flow [capacity], rf_power [power], vacuum_pump_speed [capacity], robot_transfer_rate [capacity], lot_priority [admission], tool_quarantine [admission], run_to_run_control [capacity], idle_sleep_mode [capacity]
+run_to_run_control [capacity], idle_sleep_mode [capacity], tool_job_dispatch [admission], wafer_route [capacity], chamber_recipe_selection [admission], chamber_temperature [setpoint], chamber_pressure [setpoint], gas_flow [capacity], rf_power [power], vacuum_pump_speed [capacity], robot_transfer_rate [capacity], lot_priority [admission], tool_quarantine [admission]
 
 #### Water Wastewater & Pumping (12; plant: process_loop, water)
 pump_speed_water [capacity], valve_position_water [setpoint], reservoir_level_target [setpoint], line_pressure_target [setpoint], flow_target_water [setpoint], aeration_rate [power], chemical_dose_rate [power], filtration_backwash [admission], lift_station_dispatch [admission], leak_isolation [admission], water_demand_shed [admission], water_emergency_shutdown [admission]
 
-### Realm 4: Distribution / Specialized: 183 own muscles + the spine = 440 in its organism
-
-#### Cache & Memory Services (16; plant: compute_pool, server)
-cache_size [capacity], cache_ttl [setpoint], cache_eviction_policy [admission], cache_replicas [capacity], cache_sharding [capacity], cache_prefetch [capacity], cache_writeback_rate [capacity], cache_admission [admission], hot_key_isolation [admission], cache_connection_limit [admission], cache_memory_limit [capacity], cache_compression [capacity], cache_warmup [capacity], cache_failover [capacity], cache_flush_rate [capacity], memory_size_threads [capacity]
-
-#### Commerce & Payment Systems (15; plant: compute_pool, commerce)
-payment_admission [admission], payment_concurrency [admission], payment_retry [admission], payment_timeout [admission], fraud_review_gate [admission], authorization_route [capacity], processor_route_weight [setpoint], transaction_queue_limit [admission], idempotency_window [setpoint], order_reservation [capacity], inventory_hold [admission], checkout_load_shed [admission], refund_queue_rate [capacity], settlement_batch [capacity], payment_failover [capacity]
-
-#### Data Analytics & ETL (15; plant: compute_pool, batch)
-executor_size [capacity], dynamic_allocation_min [capacity], dynamic_allocation_max [capacity], shuffle_partitions [capacity], shuffle_bandwidth [capacity], etl_concurrency [admission], stage_parallelism [capacity], query_slots [capacity], spill_threshold [admission], cache_fraction [setpoint], batch_interval [setpoint], stream_backpressure [admission], data_locality_wait [capacity], speculation_policy [capacity], analytics_admission [admission]
-
-#### Database & Transactions (19; plant: compute_pool, database)
-db_replicas [capacity], db_memory [capacity], db_cache [capacity], query_concurrency [admission], read_route [capacity], shard_placement [capacity], db_failover [capacity], replication_lag_gate [admission], db_write_throttle [admission], db_pool_resize [capacity], transaction_concurrency [admission], lock_timeout [admission], checkpoint_rate [capacity], vacuum_compaction_rate [capacity], parallel_workers [capacity], background_writer [capacity], synchronous_replication [capacity], buffer_pool [capacity], io_capacity [capacity]
-
-#### Medical Imaging & Clinical Systems (12; plant: compute_pool, clinical)
-pacs_archive_tier_target [setpoint], dicom_router_concurrency [admission], ehr_application_replicas [capacity], hl7_interface_queue_limit [admission], fhir_api_rate_limit [admission], reconstruction_gpu_workers [capacity], modality_worklist_timeout [admission], patient_monitoring_gateway_capacity [admission], lab_analyzer_batch_window [admission], telehealth_session_admission [admission], clinical_backup_window [admission], imaging_prefetch_priority [admission]
-
-#### Messaging & Streaming (18; plant: compute_pool, server)
-partition_count [capacity], partition_placement [capacity], producer_quota [admission], consumer_quota [admission], broker_io_quota [admission], message_retention [capacity], queue_depth_limit [admission], consumer_concurrency [admission], producer_batch_size [capacity], fetch_batch_size [capacity], rebalance_rate [capacity], replication_factor [capacity], retry_backoff [admission], dead_letter_divert [capacity], stream_priority [admission], broker_failover [capacity], prefetch [capacity], memory_disk_alarm [capacity]
-
-#### Ports & Maritime Logistics (12; plant: compute_pool, port)
-quay_crane_allocation [capacity], yard_crane_fleet_size [capacity], berth_window_admission [admission], truck_gate_rate_limit [admission], horizontal_transport_fleet_size [capacity], reefer_plug_power_budget [power], shore_power_connection_capacity [capacity], rail_mounted_gantry_dispatch [capacity], container_dwell_priority [admission], vessel_arrival_pacing [admission], stacking_height_target [setpoint], equipment_charging_window [admission]
-
-#### Runtime & Application (17; plant: compute_pool, server)
-worker_count [capacity], thread_pool [capacity], jvm_heap [capacity], gc_budget [admission], connection_pool_runtime [capacity], application_cache_size [capacity], runtime_memory [capacity], async_concurrency [admission], event_loop_workers [capacity], process_count [capacity], request_timeout [admission], background_workers [capacity], runtime_cpu_budget [admission], runtime_io_budget [admission], runtime_restart [capacity], go_runtime [capacity], keepalive_connection_reuse [capacity]
-
-#### Search, Indexing & Vector DB (16; plant: compute_pool, server)
-index_workers [capacity], index_refresh_rate [capacity], segment_merge_rate [capacity], search_concurrency [admission], search_timeout [admission], shard_count [capacity], shard_replication [capacity], shard_rebalance [capacity], vector_search_k [capacity], vector_batch_size [capacity], embedding_workers [capacity], index_memory_budget [admission], query_route [capacity], hot_shard_isolation [admission], search_admission [admission], circuit_breakers [admission]
+### Organism 4: Distribution / Specialized: 217 own muscles + the spine of 267 = 484 in its organism
 
 #### Service Mesh & API Reliability (16; plant: compute_pool, server)
 circuit_breaker [admission], retry_budget [admission], service_timeout [admission], service_concurrency [admission], connection_pool [capacity], traffic_divert [capacity], traffic_mirror [capacity], canary_weight [setpoint], outlier_ejection [admission], health_threshold [admission], dns_traffic_weight [setpoint], session_affinity [capacity], request_hedging [capacity], fault_injection_gate [admission], service_failover [capacity], load_balancing_policy [capacity]
 
-#### Telecom RAN & Edge Radio (12; plant: compute_pool, ran)
-ran_connection_admission [admission], ran_ue_handover [capacity], ran_cell_traffic_steering [capacity], ran_slice_resource_budget [admission], ran_prb_allocation [capacity], ran_scheduler_weight [setpoint], ran_tx_power [power], ran_antenna_tilt [capacity], ran_carrier_enable [capacity], ran_cell_sleep [capacity], ran_du_cu_placement [capacity], ran_fronthaul_budget [admission]
+#### Database & Transactions (19; plant: compute_pool, database)
+db_replicas [capacity], db_memory [capacity], db_cache [capacity], query_concurrency [admission], read_route [capacity], shard_placement [capacity], db_failover [capacity], replication_lag_gate [admission], db_write_throttle [admission], db_pool_resize [capacity], transaction_concurrency [admission], lock_timeout [admission], checkpoint_rate [capacity], vacuum_compaction_rate [capacity], parallel_workers [capacity], background_writer [capacity], synchronous_replication [capacity], buffer_pool [capacity], io_capacity [capacity]
+
+#### Messaging & Streaming (22; plant: compute_pool, server)
+partition_count [capacity], partition_placement [capacity], producer_quota [admission], consumer_quota [admission], broker_io_quota [admission], message_retention [capacity], queue_depth_limit [admission], consumer_concurrency [admission], producer_batch_size [capacity], fetch_batch_size [capacity], rebalance_rate [capacity], replication_factor [capacity], retry_backoff [admission], dead_letter_divert [capacity], stream_priority [admission], broker_failover [capacity], prefetch [capacity], memory_disk_alarm [capacity], mqtt_broker_max_connections [capacity], mqtt_max_inflight_messages [setpoint], mqtt_session_expiry [setpoint], broker_cluster_nodes [capacity]
+
+#### Cache & Memory Services (16; plant: compute_pool, server)
+cache_size [capacity], cache_ttl [setpoint], cache_eviction_policy [admission], cache_replicas [capacity], cache_sharding [capacity], cache_prefetch [capacity], cache_writeback_rate [capacity], cache_admission [admission], hot_key_isolation [admission], cache_connection_limit [admission], cache_memory_limit [capacity], cache_compression [capacity], cache_warmup [capacity], cache_failover [capacity], cache_flush_rate [capacity], memory_size_threads [capacity]
+
+#### Search, Indexing & Vector DB (16; plant: compute_pool, server)
+index_workers [capacity], index_refresh_rate [capacity], segment_merge_rate [capacity], search_concurrency [admission], search_timeout [admission], shard_count [capacity], shard_replication [capacity], shard_rebalance [capacity], vector_search_k [capacity], vector_batch_size [capacity], embedding_workers [capacity], index_memory_budget [admission], query_route [capacity], hot_shard_isolation [admission], search_admission [admission], circuit_breakers [admission]
+
+#### Data Analytics & ETL (15; plant: compute_pool, batch)
+executor_size [capacity], dynamic_allocation_min [capacity], dynamic_allocation_max [capacity], shuffle_partitions [capacity], shuffle_bandwidth [capacity], etl_concurrency [admission], stage_parallelism [capacity], query_slots [capacity], spill_threshold [admission], cache_fraction [setpoint], batch_interval [setpoint], stream_backpressure [admission], data_locality_wait [capacity], speculation_policy [capacity], analytics_admission [admission]
+
+#### Runtime & Application (21; plant: compute_pool, server)
+worker_count [capacity], thread_pool [capacity], jvm_heap [capacity], gc_budget [admission], connection_pool_runtime [capacity], application_cache_size [capacity], runtime_memory [capacity], async_concurrency [admission], event_loop_workers [capacity], process_count [capacity], request_timeout [admission], background_workers [capacity], runtime_cpu_budget [admission], runtime_io_budget [admission], runtime_restart [capacity], go_runtime [capacity], keepalive_connection_reuse [capacity], dns_resolver_cache_size [capacity], dns_negative_cache_ttl [setpoint], mail_queue_concurrency [capacity], mail_retry_interval [setpoint]
+
+#### Reliability, Security & Recovery (6; plant: compute_pool, network)
+ids_capture_threads [capacity], ids_ring_buffer_size [setpoint], ids_rule_group_admission [admission], waf_inspection_workers [capacity], siem_ingest_pipeline_workers [capacity], endpoint_scan_scheduling [admission]
+
+#### Commerce & Payment Systems (15; plant: compute_pool, commerce)
+payment_admission [admission], payment_concurrency [admission], payment_retry [admission], payment_timeout [admission], fraud_review_gate [admission], authorization_route [capacity], processor_route_weight [setpoint], transaction_queue_limit [admission], idempotency_window [setpoint], order_reservation [capacity], inventory_hold [admission], checkout_load_shed [admission], refund_queue_rate [capacity], settlement_batch [capacity], payment_failover [capacity]
 
 #### Workflow, Logistics & Fulfillment (15; plant: compute_pool, workflow)
 workflow_admission [admission], workflow_worker_rate [capacity], task_queue_rate [capacity], workflow_retry [admission], workflow_backoff [admission], workflow_timeout [admission], inventory_allocation [capacity], fulfillment_route [capacity], warehouse_queue [capacity], carrier_selection [capacity], dispatch_priority [admission], shipment_batch [capacity], route_replan [capacity], sla_escalation [capacity], compensation_action [capacity]
 
-### Organism 5: the four stacked, every duplicate kept, 1,716 muscles
+#### Medical Imaging & Clinical Systems (12; plant: compute_pool, clinical)
+pacs_archive_tier_target [setpoint], dicom_router_concurrency [admission], ehr_application_replicas [capacity], hl7_interface_queue_limit [admission], fhir_api_rate_limit [admission], reconstruction_gpu_workers [capacity], modality_worklist_timeout [admission], patient_monitoring_gateway_capacity [admission], lab_analyzer_batch_window [admission], telehealth_session_admission [admission], clinical_backup_window [admission], imaging_prefetch_priority [admission]
 
-### Organism 6: the whole tower, all 945 muscles once
+#### Ports & Maritime Logistics (12; plant: compute_pool, port)
+quay_crane_allocation [capacity], yard_crane_fleet_size [capacity], berth_window_admission [admission], truck_gate_rate_limit [admission], horizontal_transport_fleet_size [capacity], reefer_plug_power_budget [power], shore_power_connection_capacity [capacity], rail_mounted_gantry_dispatch [capacity], container_dwell_priority [admission], vessel_arrival_pacing [admission], stacking_height_target [setpoint], equipment_charging_window [admission]
+
+#### Content Delivery & Edge Cache (6; plant: process_loop, process)
+cdn_cache_ttl [setpoint], edge_cache_size [capacity], origin_shield_concurrency [capacity], prefetch_aggressiveness [setpoint], tiered_cache_promotion [capacity], edge_pop_admission [admission]
+
+#### Financial Markets & Trading Systems (14; plant: compute_pool, server)
+matching_engine_threads [capacity], order_gateway_sessions [capacity], order_admission_rate_limit [admission], pre_trade_risk_check_workers [capacity], market_data_fanout_threads [capacity], market_data_conflation_interval [setpoint], fix_session_heartbeat_interval [setpoint], kernel_bypass_poll_cores [power], tick_store_write_batch [setpoint], post_trade_settlement_workers [capacity], end_of_day_risk_batch_power [power], colocation_rack_cooling_setpoint [setpoint], backtest_grid_nodes [capacity], surveillance_alert_queue_workers [capacity]
+
+#### Telecom RAN & Edge Radio (12; plant: compute_pool, ran)
+ran_connection_admission [admission], ran_ue_handover [capacity], ran_cell_traffic_steering [capacity], ran_slice_resource_budget [admission], ran_prb_allocation [capacity], ran_scheduler_weight [setpoint], ran_tx_power [power], ran_antenna_tilt [capacity], ran_carrier_enable [capacity], ran_cell_sleep [capacity], ran_du_cu_placement [capacity], ran_fronthaul_budget [admission]
+
+### Organism 5: the four stacked, every duplicate kept, 1,908 muscles
+
+The four realms' organisms above, run on one clock as one body (`stack`; the older name `stack_1226` is read as an alias): every muscle listed under organisms 1 to 4, the spine counted once in each, 1,908 in all.
+
+### Organism 6: the whole tower, all 1,107 muscles once
+
+Every muscle of the catalog once (`tower`; the older name `organism_656` is read as an alias): the spine and every realm's own families, 1,107 in all.
 
 ## 26. The Domain Map
 
@@ -4271,7 +4343,7 @@ checked; a result in this manual is only ever cited from a commit whose run pass
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # omni-v3, omni-v2, omni-v1, or what differs
+python3 tools/omni_version.py                  # omni-v6, omni-v5, omni-v3, omni-v2, omni-v1, or what differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 
@@ -6546,7 +6618,7 @@ receipt's energy line is modelled, the receipt says so.
 **What each class can and cannot carry, with the examples in this manual.** A class **T / V** result (the C++ twin
 agreeing with the Python to 3.6 × 10⁻¹⁵ on 500 trajectories; two million adversarial cases through the shield with zero
 violations) says that the law is what the text says it is and that both implementations compute it; it says nothing
-about whether the law helps any machine. A class **S** result (the 945 muscles, the organisms at 1,000 copies, the power
+about whether the law helps any machine. A class **S** result (the 1,107 muscles and six organisms, the organisms at 1,000 copies, the power
 grid in pandapower, the robot arms in MuJoCo, the buildings in CityLearn, the drones in PyBullet) says what the law does to
 a published model of a plant under that model's own native controller; it carries exactly the model's fidelity and no
 more, which is why S results are shown beside the Omni index and never inside it, and why the manual says "the energy is
@@ -6707,7 +6779,7 @@ started (4 against 3.7) and machines (6) the same or inside the noise; the stand
 CPU with the governor's own −2.5% and the host −1.2%, shown; both arms 14 s behind the 10,800 s window (0.13%), on the
 clock in every repetition; the organism's own model energy −0.4% lower and work −0.0004%, the rounding-level loss the
 rule reads as LOSS. Native's own tail was longer under the tower than under the stack (6.7 s against 2.9 s at the 95th
-percentile) because the tower's 945 distinct muscles drive the load generator harder at its peaks, and the governor's
+percentile) because that engine's tower (945 distinct muscles on omni-v3; 1,107 on the catalog that stands) drives the load generator harder at its peaks, and the governor's
 answer was the same 150 to 160 ms under both.
 
 ### 16.3 The bill on a real cloud
@@ -7028,23 +7100,10 @@ every table: a knob reads **write** where at least one judged gauge is GAIN in a
 LOSS or power given in all three of our runs; **watch** where nothing is GAIN in all three of our runs, whether the rows are inside the noise, the runs disagree, or
 a gauge is LOSS or power given in all three of our runs with nothing against it (the LOSS is then named with its cause); and **operator's choice** where
 GAIN and LOSS (or power given) both hold in all three of our runs, a trade shown with both readings of the index. A modelled muscle takes its word from
-its realms label: superior within guardrails is write, a tradeoff label is the operator's choice, the rest is watch.
+its realms label (`results/realms_v5`): a GAIN on work, speed or misses is write, the energy the max took for it power given and
+never a trade; SAME AS NATIVE and AT ITS LIMIT ON NATIVE are watch.
 
-What the page said on the day it was declared. On the real stacks, 12 of 24 knob-cases write: six of the seven Kubernetes
-demands (beside a noisy neighbour the knob showed nothing and watches), PostgreSQL's read-only workload, MongoDB's four
-workloads and MySQL's burst. Seven are the operator's choice: Kafka's three workloads, where consumers buy a hundredfold
-shorter queue and both readings of the index say the trade pays; Redis's three, where memory buys the hit rate and only the
-service reading says it pays; and MySQL's read_write, where pages holding data buy a few percent of CPU. Five watch: the
-noisy neighbour, PostgreSQL's simple_update (connections bought above the operator's setting with nothing bought for them)
-and tpcb_hot (the runs disagree), MySQL's read_only and update_index. Every loss in all three of our runs on a real stack is a resource
-spent for the knob's own service, declared in advance or disclosed on the first counted set; none is a service loss. Of the
-independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage
-costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself
-left native, one grid where nothing was bought). Of the 945 modelled muscles, 124 write, 13 are trades and 808 watch; 746 of
-the 808 never wrote at all, because the native controller held the reading inside the band and the law never left its
-cushion, and all 255 admission muscles are among them, the admission knob being a guard for a stress the hour did not hold.
-The 14 organism cells with the real cluster inside all write on the cluster's gauges. Nothing on the page changes the
-engine, which stays Omni v3; it changes what an operator connects.
+What the page says on the engine that stands (16 October). On the real stacks, 10 of 26 knob-cases write, 2 are the operator's choice and 14 watch (the sets of 10 October on omni-v3 and the four v6 tables; each row names its engine and the v3 rows run again on v6). Of the independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself left native, one grid where nothing was bought). Of the 1,107 modelled muscles on the v5 realms result, 527 write and 580 watch: 421 of the 580 are at their limit on native (every admission knob, 96 power knobs and 50 capacity and setpoint knobs that native already runs at the top of their range: nothing to push, read and left native) and 159 read the same as native (40 wrote and nothing moved beyond the noise, 119 wrote nothing). Every one of the six organisms writes under every load, the power given shown beside its gain. Of the 14 organism cells with the real cluster inside, 12 write on the cluster's gauges, one is the operator's choice and one watches. Nothing on the page changes the engine, which stays the engine that stands (omni-v6); it changes what an operator connects.
 
 **The same verdict, live (built 9 October, running since 10 October).** The page judges after the fact; the founder's order is that the
 brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 9.4;
@@ -7170,7 +7229,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired measurement shows no gauge of the muscle read **LOSS** against native. Where the measurement shows nothing (**EVEN**), or shows a LOSS, the muscle stays native and Omni only watches it: one wire out, no wire in. This is not a new rule. It is what the engine does on the muscle itself before it moves anything (`omnicompass/verdict.py`: the paired trial, and the verdict **left native** where no step is allowed), and it is the watch arm of every realms run (`docs/REALMS_PREREGISTRATION.md`: the governor reads every period and writes nothing). This page applies the same principle to every published result, one verdict per knob, so that an operator can see which knobs earn a wire in and which stay native. The founder's order of 9 October 2026: where Omni cannot beat native, the muscle lives by itself; we only wire out of it.
 
-Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1037 rows, the 945 modelled muscles included one by one).
+Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1212 rows, the 1,107 modelled muscles included one by one, and the six organisms under three loads).
 
 ### The rule
 
@@ -7180,7 +7239,7 @@ Every judged gauge of a table counts (rows marked "shown, not judged" never do).
 - **watch**: no GAIN in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a gauge read LOSS or power given in all three of our runs, it is named and its cause given below. Where the runs disagree, nothing is settled and the knob stays native until it is.
 - **operator's choice**: GAIN, and LOSS or power given, both the same in all three of our runs: a trade. Both readings of the Omni index are shown where the test is in it (the resource reading, the preregistered headline, and the service reading, work and speed alone), and the side that pays is named. The operator who wants the gain and can pay the price wires in; every other operator watches.
 
-A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes its verdict from its label by rule: GAIN within the guardrails is write; GAIN AND LOSS (energy cut, service traded for it) and GAIN with power given (service GAIN, energy given for it) are operator's choice; EVEN (inside the noise, or not established), LOSS and any other label are watch.
+A modelled muscle (the 1,107 on their plants under its own load and work waiting in line, `results/realms_v5/MUSCLES_V5.csv`, engine omni-v5 at the max, the law omni-v6 carries unchanged) takes its verdict from its label by rule: a GAIN on work, speed or misses (MORE WORK, FASTER, FEWER MISSES, alone or together, on every load it ran) is write, and the energy the max took for it is power given, shown beside it and never a trade (the founder's order of 13 October); SAME AS NATIVE is watch, nothing moved beyond the noise; AT ITS LIMIT ON NATIVE is watch by design, the knob already at the top of its range on native, read and left native.
 
 ### The count
 
@@ -7188,10 +7247,10 @@ A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes 
 |---|---:|---:|---:|---:|
 | Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 26 | 10 | 2 | 14 |
 | Independent simulators, three runs each (robot arms, grids, districts, swarms; evidence class S) | 39 | 21 | 15 | 3 |
-| The 945 modelled muscles, alone on their plants (evidence class S) | 945 | 124 | 13 | 808 |
+| The 1,107 modelled muscles, alone on their plants under two loads (evidence class S) | 1107 | 527 | 0 | 580 |
 | The organisms with the real cluster inside (GitHub at 10 and 100 copies; Azure at 1,000) | 14 | 12 | 1 | 1 |
 
-In words: on the real stacks Omni earns its wire in on 10 of 26 knob-cases, trades on 2 and watches on 14. Of the 945 modelled muscles, 124 earn a wire in, 13 are trades and 808 stay native: 746 of the 808 wrote nothing in any run, because the native controller already held the reading inside the band and the law never left its cushion. A knob that never writes costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
+In words: on the real stacks Omni earns its wire in on 10 of 26 knob-cases, trades on 2 and watches on 14. Of the 1,107 modelled muscles, 527 earn a wire in and 580 stay native: 421 of the 580 are at their limit on native (the knob already at the top of its range: nothing to push, read and left native) and 159 read the same as native (nothing moved beyond the noise). A knob left native costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
 
 ### The real stacks (evidence class L: live software, three separate GitHub runs on the frozen engine)
 
@@ -7355,136 +7414,164 @@ The knob: the autopilot's cruise override.
 | mixed | energy per mission cut 18%, fleet energy over the window cut 18%, missions per charge at the autopilot's reserve up 22% | none | **write** | the runs differ on closest two drones ever came (-46% to -42%), tracking error, RMS (+83% to +86%), cruise override, mean (+48% to +49%). No LOSS: the tracking error is spent inside the compass's band (shown, the runs differ on its exact figure) and no safety gauge moved. | `results/live/V3_SWARM.md` |
 | short | energy per mission cut 7.4%, fleet energy over the window cut 7.4%, missions per charge at the autopilot's reserve up 8.0% | none | **write** | the runs differ on closest two drones ever came (-49% to -26%). No LOSS: the tracking error is spent inside the compass's band (shown, the runs differ on its exact figure) and no safety gauge moved. | `results/live/V3_SWARM.md` |
 
-### The 945 modelled muscles, alone on their plants (evidence class S)
+### The 1,107 modelled muscles, alone on their plants (evidence class S)
 
-Every muscle's own row, with its verdict and the reason, is in `results/WIRING_VERDICTS.csv`; the labels and intervals are the realms table's (`results/realms/REALMS.md`, `results/realms/MUSCLES.csv`; seeds 3000 to 3009, ten paired seeds a muscle).
+Every muscle's own row, with its verdict and the reason, is in `results/WIRING_VERDICTS.csv`; the labels and figures are the v5 realms table's (`results/realms_v5/REALMS_V5.md`, `results/realms_v5/MUSCLES_V5.csv`; engine omni-v5 at the max, every muscle its own card; seeds 3000 to 3009, ten paired seeds a muscle, under its own load and under work waiting in line). The label is the muscle's over every load it ran; the Why column gives each load's own.
 
-| Reading (the label by rule, its word first) | Muscles | Verdict |
+| Reading (the label over every load, its word first) | Muscles | Verdict |
 |---|---:|---|
-| EVEN (inside the noise, within the guardrails) | 807 | **watch** |
-| GAIN (within the guardrails) | 124 | **write** |
-| GAIN AND LOSS (energy cut, service traded for it) | 9 | **operator's choice** |
-| GAIN, power given (service GAIN, energy given for it) | 4 | **operator's choice** |
-| EVEN (not established: inside the noise, a guardrail crossed on the mean) | 1 | **watch** |
+| EVEN (at its limit on native) | 421 | **watch** |
+| GAIN (faster + fewer misses) | 345 | **write** |
+| EVEN (the same as native) | 159 | **watch** |
+| GAIN (faster) | 115 | **write** |
+| GAIN (fewer misses) | 34 | **write** |
+| GAIN (more work + faster + fewer misses) | 30 | **write** |
+| GAIN (more work + faster) | 3 | **write** |
 
 #### By knob
 
-| Knob | Muscles | Write | Operator's choice | Watch | Of the watch, wrote nothing in any run |
+| Knob | Muscles | Write | Watch: at its limit on native | Watch: the same as native | Of the watch, wrote nothing in any run |
 |---|---:|---:|---:|---:|---:|
-| capacity | 454 | 19 | 0 | 435 | 392 |
-| setpoint | 134 | 82 | 8 | 44 | 37 |
-| power | 102 | 23 | 5 | 74 | 62 |
-| admission | 255 | 0 | 0 | 255 | 255 |
+| capacity | 539 | 472 | 50 | 17 | 58 |
+| setpoint | 174 | 44 | 0 | 130 | 111 |
+| power | 119 | 11 | 96 | 12 | 96 |
+| admission | 275 | 0 | 275 | 0 | 275 |
 
 #### By family
 
-| Realm: family | Muscles | Write | Operator's choice | Watch | Wrote nothing |
-|---|---:|---:|---:|---:|---:|
-| Compute / AI / Cloud: AI Inference Serving | 24 | 1 | 0 | 23 | 23 |
-| Compute / AI / Cloud: AI Training | 18 | 1 | 0 | 17 | 17 |
-| Compute / AI / Cloud: Cloud VM & Capacity | 21 | 0 | 0 | 21 | 21 |
-| Compute / AI / Cloud: Container Resources | 23 | 0 | 0 | 23 | 23 |
-| Compute / AI / Cloud: Cross-Cluster, Multi-Region & Edge | 15 | 0 | 0 | 15 | 14 |
-| Compute / AI / Cloud: DPU SmartNIC & Programmable IO | 12 | 0 | 0 | 12 | 12 |
-| Compute / AI / Cloud: Distributed Cluster Managers | 15 | 0 | 0 | 15 | 15 |
-| Compute / AI / Cloud: GPU Fabric & RDMA | 18 | 0 | 0 | 18 | 18 |
-| Compute / AI / Cloud: HPC & Distributed Compute | 19 | 2 | 0 | 17 | 17 |
-| Compute / AI / Cloud: Host CPU & Memory | 23 | 11 | 1 | 11 | 11 |
-| Compute / AI / Cloud: Kubernetes Dynamic Device Allocation | 8 | 0 | 0 | 8 | 8 |
-| Compute / AI / Cloud: Kubernetes Placement & Scheduling | 20 | 0 | 0 | 20 | 20 |
-| Compute / AI / Cloud: Kubernetes Workload Scaling | 31 | 0 | 0 | 31 | 31 |
-| Compute / AI / Cloud: NVIDIA GPU Hardware | 19 | 6 | 0 | 13 | 13 |
-| Compute / AI / Cloud: Node Fleet & Karpenter-Class Control | 24 | 0 | 0 | 24 | 24 |
-| Compute / AI / Cloud: OpenShift & Machine API | 9 | 0 | 0 | 9 | 9 |
-| Compute / AI / Cloud: Quantum Computing Control Simulation | 16 | 0 | 0 | 16 | 16 |
-| Compute / AI / Cloud: Work Admission & Demand Shaping | 19 | 0 | 0 | 19 | 19 |
-| Distribution / Specialized: Cache & Memory Services | 16 | 0 | 0 | 16 | 16 |
-| Distribution / Specialized: Commerce & Payment Systems | 15 | 0 | 0 | 15 | 15 |
-| Distribution / Specialized: Data Analytics & ETL | 15 | 0 | 0 | 15 | 15 |
-| Distribution / Specialized: Database & Transactions | 19 | 0 | 0 | 19 | 19 |
-| Distribution / Specialized: Messaging & Streaming | 18 | 0 | 0 | 18 | 18 |
-| Distribution / Specialized: Network Routing & Switching | 19 | 0 | 0 | 19 | 19 |
-| Distribution / Specialized: Observability & Telemetry | 9 | 0 | 0 | 9 | 9 |
-| Distribution / Specialized: Reliability, Security & Recovery | 12 | 0 | 0 | 12 | 12 |
-| Distribution / Specialized: Runtime & Application | 17 | 0 | 0 | 17 | 17 |
-| Distribution / Specialized: Search, Indexing & Vector DB | 16 | 0 | 0 | 16 | 16 |
-| Distribution / Specialized: Service Mesh & API Reliability | 16 | 0 | 0 | 16 | 16 |
-| Distribution / Specialized: Storage Block/File/Object | 20 | 0 | 0 | 20 | 20 |
-| Distribution / Specialized: Telecom RAN & Edge Radio | 12 | 1 | 0 | 11 | 11 |
-| Distribution / Specialized: Workflow, Logistics & Fulfillment | 15 | 0 | 0 | 15 | 15 |
-| Energy / Facility / Industrial: Building & Critical Environment HVAC | 15 | 5 | 0 | 10 | 4 |
-| Energy / Facility / Industrial: Cooling, Chillers & Thermodynamics | 18 | 6 | 0 | 12 | 12 |
-| Energy / Facility / Industrial: Energy Storage & Microgrid | 19 | 0 | 3 | 16 | 16 |
-| Energy / Facility / Industrial: Facility & Grid Optimization | 15 | 0 | 1 | 14 | 14 |
-| Energy / Facility / Industrial: Grid Transmission & Distribution | 12 | 4 | 0 | 8 | 4 |
-| Energy / Facility / Industrial: Industrial PLC & Process Automation | 18 | 6 | 0 | 12 | 3 |
-| Energy / Facility / Industrial: PDU, UPS & Electrical Distribution | 18 | 0 | 0 | 18 | 18 |
-| Energy / Facility / Industrial: Semiconductor Fab & Precision Manufacturing | 13 | 2 | 0 | 11 | 4 |
-| Energy / Facility / Industrial: Water Wastewater & Pumping | 12 | 4 | 0 | 8 | 5 |
-| Physics / Robotics / Autonomous: Automotive EV & Mobile Powertrain | 14 | 0 | 0 | 14 | 14 |
-| Physics / Robotics / Autonomous: Aviation & Autonomous Flight | 20 | 7 | 0 | 13 | 13 |
-| Physics / Robotics / Autonomous: Robotics Fleet & Warehouse Automation | 15 | 0 | 0 | 15 | 15 |
-| Physics / Robotics / Autonomous: Robotics Motion Control | 18 | 8 | 0 | 10 | 10 |
-| Physics / Robotics / Autonomous: Spacecraft & Flight Software | 14 | 4 | 4 | 6 | 6 |
-| Energy / Facility / Industrial: Healthcare Critical Environments | 13 | 7 | 0 | 6 | 3 |
-| Distribution / Specialized: Medical Imaging & Clinical Systems | 12 | 0 | 0 | 12 | 12 |
-| Energy / Facility / Industrial: Agriculture & Irrigation | 14 | 10 | 0 | 4 | 1 |
-| Energy / Facility / Industrial: Oil & Gas Pipelines | 14 | 8 | 0 | 6 | 3 |
-| Physics / Robotics / Autonomous: Rail Traction & Train Control | 14 | 0 | 0 | 14 | 14 |
-| Physics / Robotics / Autonomous: Marine Propulsion & Vessel Automation | 12 | 0 | 0 | 12 | 11 |
-| Distribution / Specialized: Ports & Maritime Logistics | 12 | 1 | 0 | 11 | 11 |
-| Energy / Facility / Industrial: Mining & Mineral Processing | 14 | 5 | 0 | 9 | 2 |
-| Energy / Facility / Industrial: District Heating & Cooling | 13 | 3 | 4 | 6 | 2 |
-| Energy / Facility / Industrial: Power Generation & Turbine Control | 14 | 10 | 0 | 4 | 2 |
-| Energy / Facility / Industrial: Renewable Generation & Inverter Control | 13 | 2 | 0 | 11 | 3 |
-| Physics / Robotics / Autonomous: Elevators & Vertical Transport | 12 | 0 | 0 | 12 | 11 |
-| Energy / Facility / Industrial: Pharmaceutical & Food Manufacturing | 14 | 10 | 0 | 4 | 4 |
+| Realm: family | Muscles | Write | Watch: at its limit on native | Watch: the same as native |
+|---|---:|---:|---:|---:|
+| Compute / AI / Cloud: AI Inference Serving | 24 | 15 | 9 | 0 |
+| Compute / AI / Cloud: AI Training | 18 | 16 | 2 | 0 |
+| Compute / AI / Cloud: Cloud VM & Capacity | 21 | 20 | 1 | 0 |
+| Compute / AI / Cloud: Container Resources | 25 | 22 | 3 | 0 |
+| Compute / AI / Cloud: Cross-Cluster, Multi-Region & Edge | 18 | 10 | 7 | 1 |
+| Compute / AI / Cloud: DPU SmartNIC & Programmable IO | 12 | 10 | 2 | 0 |
+| Compute / AI / Cloud: Distributed Cluster Managers | 15 | 8 | 7 | 0 |
+| Compute / AI / Cloud: GPU Fabric & RDMA | 18 | 14 | 4 | 0 |
+| Compute / AI / Cloud: HPC & Distributed Compute | 19 | 11 | 8 | 0 |
+| Compute / AI / Cloud: Host CPU & Memory | 26 | 10 | 16 | 0 |
+| Compute / AI / Cloud: Kubernetes Dynamic Device Allocation | 8 | 7 | 1 | 0 |
+| Compute / AI / Cloud: Kubernetes Placement & Scheduling | 21 | 16 | 5 | 0 |
+| Compute / AI / Cloud: Kubernetes Workload Scaling | 32 | 24 | 8 | 0 |
+| Compute / AI / Cloud: GPU Hardware | 22 | 11 | 11 | 0 |
+| Compute / AI / Cloud: Node Fleet & Karpenter-Class Control | 24 | 19 | 5 | 0 |
+| Compute / AI / Cloud: OpenShift & Machine API | 9 | 5 | 4 | 0 |
+| Compute / AI / Cloud: Quantum Computing Control Simulation | 16 | 11 | 5 | 0 |
+| Compute / AI / Cloud: Work Admission & Demand Shaping | 19 | 0 | 19 | 0 |
+| Distribution / Specialized: Cache & Memory Services | 16 | 12 | 4 | 0 |
+| Distribution / Specialized: Commerce & Payment Systems | 15 | 7 | 8 | 0 |
+| Distribution / Specialized: Data Analytics & ETL | 15 | 11 | 4 | 0 |
+| Distribution / Specialized: Database & Transactions | 19 | 14 | 5 | 0 |
+| Distribution / Specialized: Messaging & Streaming | 22 | 13 | 7 | 2 |
+| Distribution / Specialized: Network Routing & Switching | 19 | 12 | 7 | 0 |
+| Distribution / Specialized: Observability & Telemetry | 9 | 6 | 3 | 0 |
+| Distribution / Specialized: Reliability, Security & Recovery | 18 | 9 | 8 | 1 |
+| Distribution / Specialized: Runtime & Application | 21 | 14 | 5 | 2 |
+| Distribution / Specialized: Search, Indexing & Vector DB | 16 | 10 | 6 | 0 |
+| Distribution / Specialized: Service Mesh & API Reliability | 16 | 9 | 7 | 0 |
+| Distribution / Specialized: Storage Block/File/Object | 20 | 17 | 3 | 0 |
+| Distribution / Specialized: Telecom RAN & Edge Radio | 12 | 8 | 4 | 0 |
+| Distribution / Specialized: Workflow, Logistics & Fulfillment | 15 | 10 | 5 | 0 |
+| Energy / Facility / Industrial: Building & Critical Environment HVAC | 15 | 0 | 4 | 11 |
+| Energy / Facility / Industrial: Cooling, Chillers & Thermodynamics | 18 | 0 | 4 | 14 |
+| Energy / Facility / Industrial: Energy Storage & Microgrid | 19 | 14 | 2 | 3 |
+| Energy / Facility / Industrial: Facility & Grid Optimization | 15 | 9 | 5 | 1 |
+| Energy / Facility / Industrial: Grid Transmission & Distribution | 12 | 0 | 8 | 4 |
+| Energy / Facility / Industrial: Industrial PLC & Process Automation | 18 | 0 | 12 | 6 |
+| Energy / Facility / Industrial: PDU, UPS & Electrical Distribution | 18 | 7 | 3 | 8 |
+| Energy / Facility / Industrial: Semiconductor Fab & Precision Manufacturing | 13 | 0 | 11 | 2 |
+| Energy / Facility / Industrial: Water Wastewater & Pumping | 12 | 0 | 8 | 4 |
+| Physics / Robotics / Autonomous: Automotive EV & Mobile Powertrain | 14 | 1 | 13 | 0 |
+| Physics / Robotics / Autonomous: Aviation & Autonomous Flight | 28 | 14 | 14 | 0 |
+| Physics / Robotics / Autonomous: Robotics Fleet & Warehouse Automation | 17 | 14 | 3 | 0 |
+| Physics / Robotics / Autonomous: Robotics Motion Control | 26 | 19 | 5 | 2 |
+| Physics / Robotics / Autonomous: Spacecraft & Flight Software | 14 | 0 | 14 | 0 |
+| Energy / Facility / Industrial: Healthcare Critical Environments | 13 | 0 | 3 | 10 |
+| Distribution / Specialized: Medical Imaging & Clinical Systems | 12 | 3 | 9 | 0 |
+| Energy / Facility / Industrial: Agriculture & Irrigation | 14 | 0 | 4 | 10 |
+| Energy / Facility / Industrial: Oil & Gas Pipelines | 14 | 0 | 6 | 8 |
+| Physics / Robotics / Autonomous: Rail Traction & Train Control | 14 | 0 | 14 | 0 |
+| Physics / Robotics / Autonomous: Marine Propulsion & Vessel Automation | 12 | 5 | 7 | 0 |
+| Distribution / Specialized: Ports & Maritime Logistics | 12 | 6 | 6 | 0 |
+| Energy / Facility / Industrial: Mining & Mineral Processing | 14 | 0 | 6 | 8 |
+| Energy / Facility / Industrial: District Heating & Cooling | 13 | 0 | 6 | 7 |
+| Energy / Facility / Industrial: Power Generation & Turbine Control | 14 | 0 | 4 | 10 |
+| Energy / Facility / Industrial: Renewable Generation & Inverter Control | 13 | 0 | 7 | 6 |
+| Physics / Robotics / Autonomous: Elevators & Vertical Transport | 12 | 0 | 12 | 0 |
+| Energy / Facility / Industrial: Pharmaceutical & Food Manufacturing | 14 | 0 | 4 | 10 |
+| Compute / AI / Cloud: Linux Kernel & OS Control | 20 | 9 | 3 | 8 |
+| Compute / AI / Cloud: Serverless & Functions (FaaS) | 9 | 6 | 2 | 1 |
+| Compute / AI / Cloud: Virtualization & Hypervisor | 9 | 6 | 2 | 1 |
+| Distribution / Specialized: Content Delivery & Edge Cache | 6 | 2 | 2 | 2 |
+| Compute / AI / Cloud: Gut: Data-plane Intake & Waste | 8 | 0 | 5 | 3 |
+| Compute / AI / Cloud: Skin: Perimeter & Admission | 5 | 1 | 4 | 0 |
+| Distribution / Specialized: Financial Markets & Trading Systems | 14 | 7 | 3 | 4 |
+| Compute / AI / Cloud: Media Streaming & CDN | 14 | 5 | 4 | 5 |
+| Compute / AI / Cloud: Game Servers & Real-Time Interactive | 12 | 7 | 3 | 2 |
+| Compute / AI / Cloud: Blockchain & Ledger Nodes | 10 | 5 | 3 | 2 |
+| Compute / AI / Cloud: CI/CD & Build Farms | 10 | 6 | 3 | 1 |
 
 #### Why the watch muscles are watch
 
-- **746 muscles wrote nothing in any run.** Their plants' native controllers held the reading inside the compass's band for the whole hour on every seed, so the law never left its cushion and had nothing to push. On these muscles Omni on top is native, EVEN: nothing earned, nothing given, and no wire in is needed. They are 392 capacity knobs, 255 admission knobs, 62 power knobs and 37 setpoint knobs, 567 of them on the compute plant, whose native autoscaler and fixed admission limit already serve the modelled demand inside its line.
-- **All 255 admission muscles are watch**, and all wrote nothing: the admission knob is native while change is permitted, and limits what is let in only while it is not (a power or heat stress; `docs/REALMS_PREREGISTRATION.md`). No run reached that state, so the knob was never touched. This is the knob's design, not a failure: admission is a brake for an emergency the hour did not hold.
-- **62 muscles wrote and read EVEN**: their work per energy moved by at most +1.8% with an interval across zero. They are process loops, inverters, chambers, mills and zones where the law moved the knob inside its band and the plant's output did not measurably follow. Watch, by rule.
-- **One muscle is EVEN, not established** (Elevators & Vertical Transport, `hoist_speed_target`): the interval is too wide to read and the work guardrail did not hold. Watch, until a longer run decides it.
+- **421 muscles are at their limit on native.** Native already runs the knob at the top of its range: every admission knob lets everything in while change is permitted (275 admission knobs), a power knob runs the full clock or the full battery power (96 power knobs), and 50 capacity and setpoint knobs sit where native's own controller already has what the plant needs. There is nothing for the max to push; the knob is read and left native, EVEN by design, and no wire in is needed.
+- **159 muscles read the same as native**: 40 of them wrote and nothing moved beyond the noise on work, speed or misses, 119 wrote nothing because native held the reading and the law had nothing to push. Watch, by rule; these are the room the next engine looks for a gain in, in the toy gate first.
 
-#### The trades, muscle by muscle
+#### Power given, muscle by muscle
 
-| Muscle | Family | Knob | Reading | Work per energy | Work | Violations (pp) | Verdict |
-|---|---|---|---|---:|---:|---:|---|
-| `cpufreq_min` | Host CPU & Memory | power | GAIN AND LOSS (energy cut, service traded for it) | +1.41% (+1.12 to +1.71) | +0.00% | +0.11 | **operator's choice** |
-| `battery_soc_reserve` | Energy Storage & Microgrid | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.21% (-0.22 to -0.21) | +0.00% | -1.40 | **operator's choice** |
-| `time_of_use_schedule` | Energy Storage & Microgrid | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.21% (-0.22 to -0.21) | +0.00% | -1.39 | **operator's choice** |
-| `microgrid_emergency_reserve` | Energy Storage & Microgrid | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.21% (-0.21 to -0.20) | +0.00% | -1.40 | **operator's choice** |
-| `pue_target` | Facility & Grid Optimization | setpoint | GAIN, power given (service GAIN, energy given for it) | -0.12% (-0.13 to -0.12) | +0.00% | -0.81 | **operator's choice** |
-| `payload_duty_cycle` | Spacecraft & Flight Software | power | GAIN AND LOSS (energy cut, service traded for it) | +0.82% (+0.66 to +0.98) | +0.00% | +0.92 | **operator's choice** |
-| `space_power_budget` | Spacecraft & Flight Software | power | GAIN AND LOSS (energy cut, service traded for it) | +0.75% (+0.66 to +0.84) | +0.00% | +0.50 | **operator's choice** |
-| `space_thermal_command` | Spacecraft & Flight Software | power | GAIN AND LOSS (energy cut, service traded for it) | +0.80% (+0.76 to +0.85) | +0.00% | +0.36 | **operator's choice** |
-| `rcs_authority` | Spacecraft & Flight Software | power | GAIN AND LOSS (energy cut, service traded for it) | +0.84% (+0.75 to +0.93) | +0.00% | +0.36 | **operator's choice** |
-| `return_temperature_target` | District Heating & Cooling | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +5.15% (+2.49 to +7.80) | -0.02% | +0.04 | **operator's choice** |
-| `differential_pressure_setpoint` | District Heating & Cooling | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +3.74% (+0.62 to +6.87) | -0.06% | +0.06 | **operator's choice** |
-| `thermal_storage_level_target` | District Heating & Cooling | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +3.88% (+1.08 to +6.69) | -0.03% | +0.06 | **operator's choice** |
-| `cooling_storage_level_target` | District Heating & Cooling | setpoint | GAIN AND LOSS (energy cut, service traded for it) | +3.47% (+0.51 to +6.43) | -0.11% | +0.10 | **operator's choice** |
-| `hoist_speed_target` | Elevators & Vertical Transport | capacity | EVEN (not established: inside the noise, a guardrail crossed on the mean) | -1.63% (-7.65 to +4.39) | -2.50% | +0.00 | **watch** |
+The max buys work and speed; the energy it takes is **power given**, shown beside what it bought and never a trade or a loss (the founder's order of 13 October). The write muscles whose power given on their own load is the largest:
 
-The nine energy-for-service trades (GAIN AND LOSS) are the CPU's minimum clock (`cpufreq_min`), four spacecraft power knobs and four district heating setpoints: energy cut at a measurable LOSS in work or in time in violation. The four service-for-energy trades (GAIN, power given) are three microgrid reserves and a facility's PUE target: time in violation proven cut, a GAIN, for a little energy given. Each is the operator's to take or leave; none is wired in by default.
+| Muscle | Family | Knob | Reading | Misses (pp) | Work | Power given |
+|---|---|---|---|---:|---:|---:|
+| `db_replicas` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -5.54 | +0.27% | +104.31% |
+| `io_capacity` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -6.89 | +0.35% | +96.73% |
+| `read_route` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -6.31 | +0.35% | +90.41% |
+| `synchronous_replication` | Database & Transactions | capacity | GAIN (fewer misses) | -3.90 | +0.39% | +89.14% |
+| `payment_failover` | Commerce & Payment Systems | capacity | GAIN (more work + fewer misses) | -5.71 | +0.17% | +88.88% |
+| `buffer_pool` | Database & Transactions | capacity | GAIN (fewer misses) | -3.82 | +0.23% | +88.65% |
+| `placement_group` | Cloud VM & Capacity | capacity | GAIN (fewer misses) | -2.49 | +0.10% | +88.00% |
+| `parallel_workers` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -3.92 | +0.24% | +87.92% |
+| `pulse_duration` | Quantum Computing Control Simulation | setpoint | GAIN (fewer misses) | -0.85 | +0.00% | +86.36% |
+| `interruption_response` | Cloud VM & Capacity | capacity | GAIN (fewer misses) | -2.32 | +0.14% | +83.97% |
+| `multi_cluster_dispatch` | Cross-Cluster, Multi-Region & Edge | capacity | GAIN (fewer misses) | -2.39 | +0.14% | +83.95% |
+| `nodepool_weight` | Node Fleet & Karpenter-Class Control | setpoint | GAIN (more work + fewer misses) | -2.99 | +0.19% | +83.62% |
+| `db_failover` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -6.15 | +0.44% | +83.17% |
+| `kubelet_reserved_resources` | Node Fleet & Karpenter-Class Control | capacity | GAIN (fewer misses) | -2.22 | +0.26% | +82.84% |
+| `asg_min` | Cloud VM & Capacity | capacity | GAIN (fewer misses) | -1.53 | +0.01% | +82.21% |
+| `runner_scale_set_max_runners` | CI/CD & Build Farms | capacity | GAIN (fewer misses) | -2.57 | +0.31% | +82.16% |
+| `checkpoint_rate` | Database & Transactions | capacity | GAIN (fewer misses) | -5.18 | +0.46% | +81.95% |
+| `background_writer` | Database & Transactions | capacity | GAIN (more work + fewer misses) | -3.94 | +0.26% | +81.69% |
+| `pulse_phase` | Quantum Computing Control Simulation | capacity | GAIN (fewer misses) | -2.01 | +0.00% | +81.01% |
+| `db_memory` | Database & Transactions | capacity | GAIN (fewer misses) | -5.32 | +0.09% | +80.86% |
 
-#### The setpoint muscles, and what the band alone gives
-
-Of the 82 setpoint muscles that read GAIN within the guardrails, a fixed setpoint at the band's calm end (the `fixed_calm` arm, the native controller with the setpoint fixed, no governor) gave as much or more work per energy on every one. On 64 of them the fixed setpoint also held the service guardrails, so the gain is the band's and an operator may simply fix the setpoint; on 18 the fixed setpoint broke the service guardrail (GAIN AND LOSS: energy cut, service traded for it), and there the governor's moving hand is what keeps the service while the energy is saved. The CSV says which is which, muscle by muscle.
+Of the 527 write muscles, 523 took power for their gain on their own load and 4 took none (the gain came from timing, not from more energy). Every muscle's figure, on both loads, is in the CSV.
 
 ### The organisms
 
-#### The five modelled organisms (every muscle written at once, one governor)
+#### The six modelled organisms under three loads (every muscle written at once, one brain)
 
-| Organism | Muscles | Reading | Verdict | Figures |
+| Organism and load | Muscles | Reading | Verdict | Figures |
 |---|---:|---|---|---|
-| Compute / AI / Cloud | 430 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.1% (+0.1 to +0.1), work +0.0%, energy -0.1%, violations -0.012 pp; valid: yes |
-| Physics / Robotics / Autonomous | 376 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.1% (+0.1 to +0.1), work +0.0%, energy -0.1%, violations -0.003 pp; valid: yes |
-| Energy / Facility / Industrial | 470 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.3% (+0.2 to +0.4), work +0.0%, energy -0.3%, violations -0.013 pp; valid: yes |
-| Distribution / Specialized | 440 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.2% (+0.1 to +0.2), work +0.0%, energy -0.2%, violations -0.009 pp; valid: yes |
-| The whole tower, every muscle once | 945 muscles | GAIN (within the guardrails) | **write** | GAIN (within the guardrails): work per energy +0.3% (+0.2 to +0.4), work +0.0%, energy -0.3%, violations -0.004 pp; valid: yes |
+| Compute / AI / Cloud, the normal load | 540 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.070 pp (-0.084 to -0.057), work +0.000%, power given +0.009%; valid: yes |
+| Physics / Robotics / Autonomous, the normal load | 404 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.121 pp (-0.145 to -0.097), work +0.000%, power given +0.010%; valid: yes |
+| Energy / Facility / Industrial, the normal load | 480 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.118 pp (-0.144 to -0.093), work +0.000%, power given +0.000%; valid: yes |
+| Distribution / Specialized, the normal load | 484 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.067 pp (-0.082 to -0.052), work +0.000%, power given +0.002%; valid: yes |
+| The four stacked, every duplicate kept, the normal load | 1908 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.092 pp (-0.106 to -0.078), work +0.000%, power given +0.000%; valid: yes |
+| The whole tower, every muscle once, the normal load | 1107 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.051 pp (-0.062 to -0.040), work +0.000%, power given +0.000%; valid: yes |
+| Compute / AI / Cloud, the climb load | 540 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.390 pp (-0.421 to -0.358), work +0.002%, power given +0.046%; valid: yes |
+| Physics / Robotics / Autonomous, the climb load | 404 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.317 pp (-0.361 to -0.274), work +0.002%, power given +0.021%; valid: yes |
+| Energy / Facility / Industrial, the climb load | 480 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.217 pp (-0.247 to -0.187), work +0.000%, power given +0.000%; valid: yes |
+| Distribution / Specialized, the climb load | 484 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.460 pp (-0.489 to -0.431), work +0.003%, power given +0.026%; valid: yes |
+| The four stacked, every duplicate kept, the climb load | 1908 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.349 pp (-0.370 to -0.327), work +0.002%, power given +0.000%; valid: yes |
+| The whole tower, every muscle once, the climb load | 1107 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.094 pp (-0.107 to -0.082), work +0.000%, power given +0.000%; valid: yes |
+| Compute / AI / Cloud, the line load | 540 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.205 pp (-0.217 to -0.193), work +0.000%, power given +0.045%; valid: yes |
+| Physics / Robotics / Autonomous, the line load | 404 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.250 pp (-0.275 to -0.225), work +0.000%, power given +0.030%; valid: yes |
+| Energy / Facility / Industrial, the line load | 480 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.117 pp (-0.143 to -0.092), work +0.000%, power given +0.000%; valid: yes |
+| Distribution / Specialized, the line load | 484 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.142 pp (-0.167 to -0.117), work +0.000%, power given +0.006%; valid: yes |
+| The four stacked, every duplicate kept, the line load | 1908 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.176 pp (-0.190 to -0.163), work +0.000%, power given +0.000%; valid: yes |
+| The whole tower, every muscle once, the line load | 1107 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.051 pp (-0.062 to -0.040), work +0.000%, power given +0.000%; valid: yes |
 
-An organism's label is the whole's: every muscle written at once. The wiring an operator takes from this page is finer: the write muscles wired in, the trades chosen, the watch muscles left native with one wire out. The organism result says the whole, written at once, read no LOSS and some small GAIN; this page says which parts carried it.
+An organism's label is the whole's: every muscle written at once. The wiring an operator takes from this page is finer: the write muscles wired in, the watch muscles left native with one wire out. The organism result says the whole, written at once, read GAIN (fewer misses, and under the climb more work) in every organism under every load, the power given shown beside it; this page says which parts carried it.
 
 #### The organisms with the real cluster inside
 
@@ -7530,7 +7617,7 @@ This page judges after the fact, from published tables. The founder's order of 9
 | The card: the clock ceiling | one 15 MHz step at a time | the engine's verdict: a paired trial per step while the service is calm; no step passing, the card runs as it does alone; the power lid stays at the operator's | give back (slower clock for the same service); the speed floor never under the card's own busy clock | Omni v3 (`omni_controller/gpu_compass.py`) |
 | Robot arms: the speed override; drones: the cruise | one knob each | the engine's verdict on the robot and the swarm; two of four robots left native by it | give back | Omni v3 |
 | Power grids: the tap; buildings: the batteries | one knob each | the compass law alone, no trial; the trades on four exporting grids and seven 2023 districts are read from the tables above as the operator's choice | the law's own push and pull | Omni v3 (a trial there is the next engine) |
-| The 945 modelled muscles | each muscle's knob | one directive from the organism's governor, no trial per muscle; 746 never wrote, 13 are trades | the law's own push and pull | Omni v3 (the verdict per muscle is Omni v4, `docs/OMNI_V4_PLAN.md`, not built) |
+| The 1,107 modelled muscles | each muscle's knob | the max on every muscle, every muscle its own card; the knobs native already runs at the top of their range read and left native | the law's own push and pull | Omni v5 at the max (the law omni-v6 carries), `docs/OMNI_V5.md` |
 | The machine itself: the Linux kernel's frequency ceiling (`docs/CPU_POWER_PREREGISTRATION.md`) | one knob | `tools/knob_verdict.py` around the engine's verdict: every notch down tried on the machine first, under the index's reading for one machine (energy x latency / work) or energy per request inside the line | give back only (the ceiling cannot go above the top; the top always free) | outside the engine; built 10 October, waiting for a machine on the metal, no run yet |
 
 ## 48. The Pilot Protocol and Kit
@@ -10044,7 +10131,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v7, fingerprint 1a0d1d1b91bc49ad (46 files).
+- **The engine on this checkout:** omni-v7, fingerprint d6d467b824c585f1 (46 files).
 - The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -10126,239 +10213,112 @@ with inputs, times and ids, is `docs/RERUN_2026-10-10.md`. Not restarted, and wh
 waits on the family allowance those machines hold.
 
 
-### In one paragraph (2026-10-10, Omni v3, every table remade)
+### In one paragraph (2026-10-16, the engine that stands is omni-v6)
 
-**The engine is Omni v3, frozen and fingerprinted** (`OMNI_V3.json`, `docs/OMNI_V3.md`: v1's law and controllers byte
-for byte, 945 muscles in 59 families, a do-no-harm gate on speed knobs). Every benchmark runs three times as separate
-GitHub runs on it (A the result, B and C the replications) and every judged row reads GAIN in all three of our runs, LOSS in all three of our runs,
-no difference beyond the noise, or the runs disagree (`docs/OMNI_V1.md`, the rule). On 10 October every benchmark was run
-again on one commit (`3aac0ab7`) and every table below was remade from the new runs; the tables they supersede are whole in
-`docs/history`. **Real Kubernetes, seven tests, ten pairs each, all seven the same again in all three of our runs on v3** (`results/live/V3_*.md`):
-work inside the response line **+54% to +68%** in all three runs of the all-four test; the 95th percentile **−57% to −66%**
-in every run of the steady, wandering, all-four and fault tests; failed requests −11% to −18% where load swings and under
-faults; machines −1.7% to −2.0% at steady load and −16% to −20% on the batch queue (−26% to −33% after the queue finished),
-with the standby-model energy −11% to −14% there; under the Google trace of 2011 machines −7% to −9% and p95 −64% to −67%;
-beside a noisy neighbour no difference beyond the noise on every row. **The five live stacks ran for the first time with the
-brain's own verdict on the knob** (the amendments of 9 October: every knob starts in watch and is written only inside the
-allowance a paired trial on the stack itself has earned under the index's own reading). What they read. **PostgreSQL**
-(`results/live/V3_PGBENCH.md`): connections held open **−6% to −11% on `select`, GAIN in all three of our runs**; the add above the
-operator's 20 on `simple_update` refused, as expected; everything else inside the noise; no loss anywhere. **MySQL**
-(`results/live/V3_SYSBENCH.md`): the pool held **−10% to −20% on `read_write`, GAIN in all three of our runs**, the pages holding data
-with it; the earlier set's memory bought for the written working set is gone; the other three workloads inside the noise.
-**MongoDB** (`results/live/V3_YCSB.md`): the cache held **−3% to −13% on `f`, GAIN in all three of our runs**; the other three inside the
-noise; no LOSS. **Kafka** (`results/live/V3_KAFKA.md`) and **Redis** (`results/live/V3_REDIS.md`) read exactly nothing:
-no gain and no loss, every gauge inside the noise under both objectives, because every spend trial on Kafka (36 of 36 arms)
-and most on Redis were abandoned before they could be judged. **That is our wiring, found on the first set and amended the
-same day** (amendment 3 in all five preregistrations): the rule of 9 October ended a spend trial when the service turned
-calm, and a spend that works calms the service within seconds, so no spend could ever be judged; from amendment 3 a spend
-trial runs to its samples, and the five stacks run again on it, those runs becoming the result of record when they land.
-**The Omni index on the tables as they stand: +4.8%** (`results/OMNI_INDEX.md`: Kubernetes +28.9% over seven tests,
-PostgreSQL +0.8%, Kafka +0.1%, Redis exactly nothing, MongoDB +0.7%, MySQL +1.0%, each category weighed the same); the
-service reading **+10.7%** (Kubernetes +84.5%, the five stacks nothing). The number is down from +20.5% because the brain
-refused, or could not yet judge, the spends that bought the earlier gains at a resource cost: every gain left is one the
-brain proved on the stack itself, and no row anywhere is a loss. **Robustness**: the governor killed outright, every setting
-handed back within the allowance in every repetition of every run, the whole window's p95 −27% to −48%; the long run, no
-leak, every decision valid, no slowing, the service inside the noise in two of three runs. **The six organisms with the real
-cluster inside**: the cluster's p95 lower in all 12 cells (−1% to −52%), failed requests lower in 11. **The realms**: the
-published table reproduced in 3 of 3. **The simulators** read as their earlier sets (they are deterministic): power grids 67
-gauge-rows toward their aims and 14 LOSS or power given, the districts 71 toward their aims, 33 LOSS or power given and 2 where the runs differ, the robot arms 7 toward their aims with
-Gen3 moved and UR5e and iiwa left native, the drone swarms 9 toward their aims and 0 LOSS or power given. The v1 tables stay as the first engine's record.
+**The engine that stands is omni-v6** (`OMNI_V6.json`, digest `df6147466ef18046`, 45 files; `docs/OMNI_V6.md`): the
+v5 law at the max on the 1,107-muscle catalog with every muscle's own card, and the shared-host capacity repair in the
+Kubernetes controller. **Omni v7 is a candidate** on the branch `v7-candidate` (its page docs/OMNI_V7.md there), never on main
+until its live trials read no LOSS against native and nothing behind v6; its first trials, read on 16 October, found a
+fault in its quota budget (an unreadable ResourceQuota read as a zero allowance, so conveyance never raised a limit), fixed
+the same day in the toy gate first and then in the candidate, and the trials run again. Every benchmark runs again on the
+engine that stands (`scripts/reruns.txt`, released a few a tick by the grid conductor, A of every benchmark, then B, then
+C); **4 of 26 benchmarks have their three-run table on omni-v6 so far**, every other row stands as its own engine's result
+(omni-v3, named in its Engine column on `docs/BENEFIT_SHEET.md` and in the standing block above) until its three runs on
+v6 land. Results are never read across engines. The standing block at the top of this page is written from the result
+files by `tools/summary.py --fix` and checked on every push; the prose below says the same in words.
 
-**What is shown and what is not.** Shown: more work inside the response line on the same machines and a faster tail,
-on real Kubernetes, three times on a frozen engine, and again on 10 October; a real database, a buffer pool and a
-storage-engine cache each giving memory back for the same service, every notch proved on the stack first; a message queue
-and a cache on which the brain's first set could not yet judge a spend (amendment 3, the next set running).
-Not yet shown: an energy or cloud-bill saving on real machines. Energy on kind is a declared model (the machines are
-containers on one runner); Azure's bill on a 4-worker fleet read no difference beyond the noise on every gauge
-(`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`), which is a fleet too small to show one machine; the fleet of 40
-workers in nine machine families that can show one is preregistered and dispatched (`docs/K8S_COMPASS_PREREGISTRATION.md`,
-the fleet that can show one machine, amendments 1 to 3), waiting on Azure's own capacity in eastus. The real card has
-not run on the current governor; every earlier card result is obsolete and is run again by the founder on rented cards.
+**On omni-v6, real Kubernetes (evidence class L), ten pairs × three runs each** (`results/live/V6_*.md`):
 
-**Wire in, or watch (9 October).** The founder's order: Omni need not be wired into every muscle; where it cannot beat
-native, the muscle stays native and Omni only reads it. `docs/WIRING_VERDICTS.md` (`tools/wiring_verdicts.py`, checked by
-`verify.py` against every table it reads) gives every knob in every result one of three words. Real stacks, on the sets of 10 October: 11 of 24
-knob-cases **write** (six of the seven Kubernetes demands, PostgreSQL's `select`, MySQL's `read_write`, MongoDB's `f`, and
-Kafka's `heavy` and `burst` on a fraction of a consumer); 0 are **the operator's choice**, because the brain's verdict took
-no spend the index would read as a trade; 13 **watch** (Kubernetes beside a noisy neighbour, PostgreSQL's `simple_update` and
-`tpcb_hot`, Kafka's `light`, Redis's three, MongoDB's `b`, `c` and `burst`, MySQL's `burst`, `read_only` and `update_index`:
-nothing moved the same way in all three of our runs). No real stack carries a loss in all three of our runs on these sets. The simulators: 21 write, 15 trades (the
-four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill
-read power given), 3 watch (two robots the engine itself left native, one grid where nothing was bought). The 945 modelled muscles:
-124 write, 13 trades, 808 watch, 746 of them because the native controller kept the reading in band and the law never wrote;
-all 255 admission muscles are among the 746. Of the 12 organism cells with the real cluster inside 12 write on the cluster's gauges
-(one with a replica cost beside its gains, one watching). The engine is unchanged; the page decides what an operator connects.
+- **A service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top** (`V6_GOLDILOCKS.md`): response
+  time **-45% to -47% mean, -58% to -61% at the 95th percentile, -65% to -69% at the 99th**, time over the response line
+  -99% to -100%, GAIN in all three of our runs; machines, node-hours, failed requests and the alert minutes EVEN; the
+  parked-worker energy +1.8% to +2.7%, power given; HPA replicas EVEN. One number: **+54% GAIN, power given**.
+- **KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top** (`V6_KEDA_REQUESTS.md`): response time
+  **-59% mean, -73% to -75% at the 95th percentile**, time over the line -97% to -99%, alert minutes -98% to -100%, HPA
+  replicas **-11% to -18%**, all GAIN in all three of our runs; parked-worker energy +1.6% to +2.1%, power given. One
+  number: **+105% GAIN, power given**.
+- **KEDA on the CPU target and the live requests in flight, Omni-Compass on top** (`V6_KEDA_CPU_REQUESTS.md`): response
+  time **-37% to -41% mean, -55% to -57% at the 95th percentile, -59% to -63% at the 99th**, GAIN in all three of our
+  runs; machines, failed requests, alert minutes and replicas EVEN; parked-worker energy +1.2% to +1.6%, power given. One
+  number: **+15% GAIN, power given**.
+- **A service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top** (`V6_CRUISEKUBE.md`):
+  every gauge EVEN, no difference beyond the noise: CruiseKube's own rightsizing leaves Omni-Compass nothing to move on
+  this service. One number: **0%, EVEN**.
 
-**The brain's own verdict, live (built 9 October; the first set landed 10 October; the second set, on amendment 3, running).** The founder's order of 9 October: the verdict must
-be the brain's, in real time, on the knob, before it writes; a knob that cannot prove it pays stays native. `tools/knob_verdict.py`
-wraps the frozen engine's verdict (`omnicompass/verdict.py`, unchanged) around every live knob of the five database, messaging
-and cache harnesses: the knob starts in watch, a paired trial on the stack itself allows one notch at a time under the declared
-objective (resource, the index's reading, or service), a refused step is not taken, a trial holds the knob, a fail-up never
-spends beyond the allowance, the operator's setting is always free. Declared as amendments in the five preregistrations with the
-expectation written before the runs: Redis left native under the resource objective (the first notch refused), Kafka allowed step
-by step while each consumer pays, PostgreSQL's add above the operator's setting refused on simple_update, MySQL's read_write
-chunks refused, MongoDB's cache given back a notch a trial. The 21 runs (the five stacks under the resource objective; Redis and
-Kafka also under the service objective; three runs each) were dispatched on 10 October at 01:28 to 01:29 UTC on commit `3aac0ab7`
-(`docs/RERUN_2026-10-10.md`) and landed by midday: PostgreSQL, MySQL and MongoDB gave memory back where it paid (connections −6% to −11% on `select`;
-the pool −10% to −20% on `read_write`; the cache −3% to −13% on `f`) and lost nothing; Kafka and Redis read nothing, because every
-spend trial on Kafka and most on Redis were abandoned before they were judged: the rule ended a spend trial when the service turned
-calm, and a spend that works calms the service within seconds. Amendment 3 (all five preregistrations, 13:05 UTC) lets a spend
-trial run to its samples; the five stacks run again on it, and the result of record is that set. Where the brain's verdict stands today, knob by knob
-(the five stacks both ways; the cluster's machines, the card's clock, the robots' speed and the drones' cruise by the engine's own
-verdict; the grids, the districts and the 945 modelled muscles by the law alone), is the last table of `docs/WIRING_VERDICTS.md`.
-Inside the modelled realms the organism still
-takes one directive for every muscle; the verdict per muscle there is the next engine, Omni v4, ordered on 10 October and
-designed in `docs/OMNI_V4_PLAN.md` as the collective mechanism (one body, one brain); it is built next and every result is run
-again on it.
+In every one of these the governor ran on autopilot: no person touched a setting in either arm; the settings commands it
+wrote on its own (15 to 17 a run on Goldilocks and on KEDA with the CPU target, 4 to 5 on KEDA's HTTP add-on) are in each
+run's audit with their reasons, and the alert minutes (a whole minute over the line, when an on-call page would be open)
+are judged in every table.
 
-### Measured on real systems (evidence class L), Omni v3
+**Still on omni-v3, each named as that engine's result and queued to run again on v6** (`docs/BENEFIT_SHEET.md`): the
+seven real-Kubernetes demands (steady +31%, faults +37%, wandering +37%, all four at once +42%, a queue of jobs +16%, the
+Google day of 2011 +46%, all GAIN; a noisy neighbour EVEN), the five live stacks (PostgreSQL +0.9% GAIN with power given,
+MongoDB +1.7% GAIN, Kafka +0.1% GAIN, MySQL EVEN, Redis EVEN), robustness (the governor killed mid-run +8.6% GAIN; the
+two-hour run EVEN), the six organisms with the real cluster inside at 10 and 100 copies (+5.3% GAIN, power given), the
+big organisms at 1,000 copies on Azure (+155% GAIN), the modelled tower of that engine's 945 muscles (+0.3% GAIN), the robot
+arms (+3.8% GAIN), the power grids (+5.8% GAIN, power given), the drone swarms (+5.9% GAIN) and the buildings with batteries
+(+0.8%, GAIN AND LOSS: the bill in the 2023 districts read power given), and the Omni index over the real tests (+5.2% GAIN,
+power given). None of these is shown in front of a v6 result, and none is read beside one.
 
-| Test, ten pairs × three runs | Work | Speed (p95) | Machines | Energy (declared model) | Source |
-|---|---|---|---|---|---|
-| **Newest: on top of KEDA, Kubernetes with its add-ons** (`docs/ADDONS_PREREGISTRATION.md`): KEDA on the CPU target and the requests in flight | service CPU +24% to +32% (closed-loop load: work shown, not judged); failed requests no difference beyond the noise | **−51% to −53%** (time over the line −97% to −100%) | no difference beyond the noise | idle-power model **+1.0% to +1.6%, power given in all three of our runs**; standby model inside the noise in 1 of 3 runs | `results/live/V3_KEDA_CPU_REQUESTS.md` |
-| **Newest: on top of KEDA's HTTP add-on** (the requests in flight alone) | service CPU +45% to +54% (shown, not judged); failed requests no difference beyond the noise | **−73% to −76%** (time over the line −96% to −97%) | **−5.9% to −7.8%, GAIN in all three of our runs** (replicas −14%) | idle-power model **+1.4% to +2.6%, power given in all three of our runs**; standby model −1.6% to −4.2%, inside the noise in 1 of 3 runs | `results/live/V3_KEDA_REQUESTS.md` |
-| All four in one run | **+54% to +68%** | −57% to −63% | inside the noise | inside the noise | `results/live/V3_ALL_FOUR.md` |
-| Steady work in steps | equal by design | −64% to −66% | **−1.7% to −2.0%** | −1.3% to −1.8% | `results/live/V3_STEADY.md` |
-| Demand that wanders | failed requests −12% to −13% | −57% to −64% | inside the noise | idle-power model −0.1% to −0.4% | `results/live/V3_WANDERING.md` |
-| A public day of demand: the Google cluster trace of 2011 replayed one step at a time (`docs/TRACES_PREREGISTRATION.md`) | failed requests **−11% to −18%**, GAIN in all three of our runs; no pod ever without a machine | **−64% to −67%** (p99 −60% to −62%) | **−7% to −9%, GAIN in all three of our runs** (replicas −4% to −8%) | standby model **−5% to −7%, GAIN in all three of our runs**; idle-power model −0.3% to −0.4% | `results/live/V3_TRACE_GOOGLE2011.md` |
-| Faults: machine down, spike, runaway pod, blind probe | failed requests **−14% to −18%**, GAIN in all three of our runs | −58% to −63% | inside the noise | inside the noise | `results/live/V3_FAULTS.md` |
-| A queue of batch jobs | queue finished no difference beyond the noise | mean response −11% to −13% | **−16% to −20%** (−26% to −33% after the queue) | **−11% to −14%** | `results/live/V3_BATCH.md` |
-| Fairness, a noisy neighbour | inside the noise on every row | inside the noise | inside the noise | inside the noise | `results/live/V3_FAIRNESS.md` |
-| PostgreSQL behind PgBouncer, three workloads (the set of 10 October, the brain's verdict on the pool) | inside the noise | inside the noise | connections held open **−6% to −11% on `select`, GAIN in all three of our runs**; `simple_update` and `tpcb_hot` inside the noise (the add above the operator's 20 refused, as expected) | host CPU inside the noise on all three | `results/live/V3_PGBENCH.md` |
-| Apache Kafka, a consumer group's size, three workloads (the set of 10 October, the brain's verdict on the count) | inside the noise | inside the noise | consumers 2 → 1.98 to 1.99, GAIN in all three of our runs by a fraction (the trial's reference seconds); every spend trial abandoned unjudged, the group left at the operator's two: amendment 3, the next set running | inside the noise | `results/live/V3_KAFKA.md`, `results/live/V3_KAFKA_SERVICE.md` |
-| Redis, a cache's memory ceiling, three workloads (the set of 10 October, the brain's verdict on the ceiling) | inside the noise | inside the noise | the allowance one notch each way (56 to 72 MB), most trials abandoned unjudged, every gauge inside the noise: amendment 3, the next set running | inside the noise | `results/live/V3_REDIS.md`, `results/live/V3_REDIS_SERVICE.md` |
-| MongoDB under YCSB, a database's storage-engine cache size, four workloads (the set of 10 October, the brain's verdict on the cache) | inside the noise on all four; no failed operation | inside the noise on all four | cache size held **−3% to −13% on `f`, GAIN in all three of our runs**; `b`, `c` and `burst` inside the noise | inside the noise | `results/live/V3_YCSB.md` |
-| MySQL under sysbench, a database's buffer pool size, four workloads (the set of 10 October, the brain's verdict on the pool) | inside the noise on all four; no error | inside the noise on all four | pool held **−10% to −20% on `read_write`, GAIN in all three of our runs**, the pages holding data with it; `burst`, `read_only` and `update_index` inside the noise; handed back on every omni arm | inside the noise | `results/live/V3_SYSBENCH.md` |
-| Robustness: the governor killed outright at 40% of the window, 10 pairs × 3 runs | **every setting back within the allowance in every repetition of every run**; a second governor to the end; failed requests inside the noise | the whole window p95 −27% to −48%, mean response −33% to −40%, time over the line −32% to −36%, GAIN in all three of our runs | inside the noise | inside the noise | `results/live/V3_ROBUST_KILL.md` |
-| Robustness: the long run, 7,200 s an arm, 3 pairs × 3 runs | decisions valid in every repetition; failed requests inside the noise | inside the noise in 2 of 3 runs (GAIN in all three of our runs in B) | inside the noise; **no leak** (memory under its limit in every repetition); no slowing; every setting handed back | inside the noise | `results/live/V3_ROBUST_LONG.md` |
-| The six organisms with the real cluster inside, 10 and 100 copies, 5 pairs a cell (the set of 10 October) | the organisms' work unchanged | the cluster's p95 lower in all 12 cells (−1% to −52%); failed requests lower in 11 | 6 in both arms (no autoscaler under kind) | the organisms' energy lower in every cell | `results/live/V3_SIX_KUBE.md` (v1 at 1 to 1,000 copies: `V1_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`) |
+**The muscles and the six organisms, modelled (evidence class S, our own models, never counted in the headline)**, on
+engine omni-v5 at the max (the law omni-v6 carries unchanged; the rerun on v6 is in the queue): 1,107 muscles in 70
+families (`realms/catalog_v5.csv`), every muscle its own card (`realms/muscle_cards_v5.csv`), every muscle alone over its
+loads EVEN 580 and GAIN 527, LOSS 0; every one of the six organisms (Compute / AI / Cloud 540, Physics / Robotics /
+Autonomous 404, Energy / Facility / Industrial 480, Distribution / Specialized 484, the four stacked 1,908, the whole tower
+1,107) GAIN (fewer misses, and under the climb more work) under the normal, climb and line loads, the power given +0.00% to
++0.05% (`results/realms_v5/REALMS_V5.md`); the grid, 36 of 36 squares of 10 and 100 runs GAIN with the organisms alone and,
+with the real cluster inside, the organism's time over the line GAIN in 36 of 36 (`results/grid_v5/GRID.md`). Every
+muscle is written out, organism by organism, in `docs/REALM_MUSCLES.md`, and explained, wired and carded in
+`docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix, with every family's wiring on a real stack from
+`docs/wiring_recipes.csv`).
 
-### Measured on a real cloud (Azure, its own bill), Omni v1
+**The cloud (Azure), the bill at native's work.** The founder's order of 14 October: in a cloud Omni-Compass shows one
+thing, the same work as native for a smaller bill, at the tune-down on the machines alone. The sets ran at the tune-down on
+14 October (steady, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; `aks-metered`, every run's title
+carrying `dial save`), and a full-wiring burst (`aks-metered-full`, the pod autoscaler moved too) ran on 15 October; their
+receipts are archived by this push and their tables follow, each on the engine it ran on. The only Azure tables up so far
+are v1's 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show
+one machine. Google (GKE) and Amazon (EKS) are built (`gke-metered`, `eks-metered`; the Operator's Manual's appendices G
+and H, click by click) and run only when the founder opens the accounts and says so.
 
-| Test | Reading | Source |
-|---|---|---|
-| Steady load, 4 workers, 5 pairs | no difference beyond the noise on any gauge; the bill −4.7% with its interval across zero | `results/live/V1_AKS_STEADY.md` |
-| A burst sized to the cluster, 4 workers, 5 pairs | the bill +5.0% with its interval across zero; p99 −34% clear of the noise in this one run; the rest inside the noise | `results/live/V1_AKS_BURST.md` |
-| The fleet that can show one machine (40 workers, nine families) on v3 | dispatched; two earlier dispatches refused by the subscription's family allowances before any arm ran, the third by Azure's own cluster capacity in eastus; every refusal cost cents and is recorded | `docs/K8S_COMPASS_PREREGISTRATION.md` |
+**The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards come after the
+CPU and cloud work, at one named commit. **Linux's own CPU governor and meter** (`cpu-power`): built and preregistered; it
+waits for a machine on the metal, because GitHub's machines are virtual and expose neither.
 
-### Modelled (evidence class S: our own models, never counted in the headline), Omni v3
-
-| What | Reading | Source |
-|---|---|---|
-| The 945 muscles and six organisms, A/B/C | reproduced to the digit in 3 of 3; 0 muscles LOSS or power given; every organism superior within guardrails (work per energy +0.1% to +0.3%) | `results/realms/REALMS.md` |
-| The whole tower at 1,000 copies (945,000 modelled muscles) with the real cluster inside, on a rented machine, 3 pairs (v3) | the organism's work unchanged (rounding-level) | the cluster's p95 **6.7 s → 160 ms**, p99 −98%, time over the line **76% → 0**, failed requests **4.8% → 0** | 6 machines in both arms | inside the noise (standby model); the organism's energy −0.4% (model) | `results/live/V3_BIG_ORGANISM.md` |
-| The four stacked at 1,000 copies with the real cluster inside, on a rented machine, 3 pairs (v3) | the organism's work unchanged (rounding-level) | the cluster's p95 **2.9 s → 150 ms**, p99 −97%, time over the line **51% → 0**, failed requests **0.14% → 0** | 6 machines in both arms | inside the noise (standby model); the organism's energy −0.4% (model) | `results/live/V3_BIG_ORGANISM.md` |
-| The organisms at 1, 10, 100 and 1,000 copies × 1 to 1,000 runs, 84 of 90 cells | every organism superior within guardrails in every cell of 10 runs or more; work per energy +0.07% to +0.37%, the same figure at every size; the six cells left are beyond the machines available | `results/scale/GRID.md` |
-| Power grid, 11 SimBench grids in pandapower, A/B/C (v1 and v3 identical) | with ZIP loads energy drawn and net import lower in all 11; losses lower in 7, power given in 4; tap operations fewer in 10, 4 → 8 a year in one (higher, the declared cost) | `results/live/V3_PANDAPOWER.md` |
-| Robot arms, MuJoCo Menagerie, A/B/C | Gen3 and Panda: peak torque −29% and −10%, tracking error −21%, energy per takt −0.8% and −0.5%; the Panda's copper +14% higher; UR5e and iiwa left native | `results/live/V3_MUJOCO.md`, `V1_MUJOCO_PANDA.md` |
-| CityLearn, every district, A/B/C | electricity bought, peak and unevenness lower in all 11 battery districts, carbon in 8; the bill higher in 7, ramping higher in 7 | `results/live/V3_CITYLEARN.md` |
-| Drone swarms, gym-pybullet-drones, 20 drones in three cells, A/B/C | energy a mission −7% to −20% and missions a charge +8% to +25%, GAIN in all three of our runs; no late mission, reserve breach, near miss or collision in any arm | `results/live/V3_SWARM.md` |
-
-### The card (evidence class P)
-
-Every earlier card result ran on a controller since replaced and is obsolete. The one-card, card-inside-the-organisms
-and eight-card runs are the founder's, on rented cards, after the CPU and cloud work, at one named commit
-(`docs/GPU_RUN_GUIDE.md`, `docs/GPU_PREREGISTRATION.md`).
-
-### Verified in code
-
-| Property | Where |
-|---|---|
-| The canonical engine is `symmetric_verified`; the printed chart is a named variant, not benchmarked | `docs/CANONICAL_ENGINE.md` |
-| Nine laws twinned in C++20 and proven equal to the Python; sealed by fingerprint | `results/SEAL.json`, `tools/seal.py` |
-| The conveyance law conserves its budget and converges (proof and 20,000 random systems) | `docs/CONVEYANCE_LAW.md`, `tests/test_conveyance.py` |
-| Safety shield: 2,000,000 adversarial cases, 0 violations; C++ engine: 100,000,000 decisions, no failures | `tests/test_shield_properties.py`, `results/SOAK.json` |
-
+**What is shown and what is not.** Shown, on the engine that stands and on real Kubernetes: a faster tail and more work
+inside the response line on the same machines, on top of the operator's own rightsizers and autoscalers (Goldilocks, KEDA),
+three times each. Shown on the older engine and queued to run again: the same on seven demands, memory and connections
+given back on real databases and a broker at no measured cost, the governor's hand-back when killed. Not yet shown: an
+energy or cloud-bill saving on real machines (energy on kind is a declared model; the Azure tables at the tune-down are
+being made), and anything on a real card.
 
 ### Open
 
-1. **Azure, the fleet that can show one machine**: steady and burst on 40 workers, v3; waiting on Azure's cluster
-   capacity in eastus (the only region where this subscription has more than 10 cores). Then B and C.
-2. **The four stacked and the tower at 1,000 copies with the real cluster inside, on v3: both done, 3 of 3 on the clock**
-   (`results/live/V3_BIG_ORGANISM.md`). The stack: the cluster's p95 2.9 s → 150 ms, time over the line 51% → 0, failed
-   requests 0.14% → 0, machines and energy unchanged, 22 s behind a 10,800 s window. The tower (945,000 modelled muscles,
-   collected 9 October by run 37945866426 after 25 hours on its rented machine): the cluster's **p95 6.7 s → 160 ms (−98%)**,
-   p99 9.1 s → 187 ms, **time over the line 76% → 0, failed requests 4.8% → 0**, all clear of zero; replicas, pods started
-   and machines (6 in both arms) the same; energy inside the noise; 14 s behind the window in both arms; the organism's own
-   model (shown, never in the index) energy −0.4% and work rounding-level lower by rule. Both machines deleted.
-3. **The real card**: the founder's runs on Lambda, one exact commit.
-4. **Robustness** (`docs/ROBUSTNESS_PREREGISTRATION.md`, no engine file changes): the kill scenario is done
-   (`results/live/V3_ROBUST_KILL.md`: every setting back 7 to 11 s after the kill in 30 of 30 repetitions) and the
-   governor's own CPU is tabulated (`results/live/V3_OWN_COST.md`); the long run is done (`results/live/V3_ROBUST_LONG.md`, 3 pairs × 3 runs, 7,200 s an arm: no leak, the decisions valid, no slowing, every setting handed back at the end; service inside the noise in two of three runs);
-   the 24-hour run on three rented machines (scenario 2b, started 8 October 10:15 UTC) ends about 10:15 UTC on 10 October and is
-   collected by the scheduled collect; the kill and long scenarios were dispatched again on 10 October (`docs/RERUN_2026-10-10.md`).
-5. **YCSB on MongoDB, done** (`docs/YCSB_PREREGISTRATION.md`, `results/live/V3_YCSB.md`): the operator's WiredTiger cache
-   as native, Omni on the cache size through the server's own console; four smoke runs recorded, then A, B and C on v3; the
-   cache held given back by about half on two untouched workloads at no measurable cost in work, p95 or CPU, one loss in all three of our runs
-    (the burst mean latency, +2% to +4%) that the second counted set of 9 October removed (item 6); the index spans six
-   real categories at +20.5%. Cassandra and Redis under YCSB and HammerDB are next in row 24.
-6. **The costs in the database tables, traced and amended with the engine locked** (8 October; `docs/POSTGRES_PREREGISTRATION.md`
-   amendment 2, `docs/MYSQL_PREREGISTRATION.md` amendment 2, `docs/YCSB_PREREGISTRATION.md` amendment 1; Omni v3 before and
-   after, the harnesses are outside the fingerprint). PostgreSQL's +14% to +28% host CPU was our harness launching a `psql`
-   process for every reading (measured: 52 ms of CPU a launch, 7,956 console logins in one workload's pooler log, +55.9 CPU-s
-   on the launches against a +52.8 s host difference on a metered repetition; the pooler +1.2 s), and its +15% to +17% median
-   latency was the pool shrunk into a queue the pooler itself reported: one console connection an arm and the queue line (a
-   server taken back only while clients waited under 1% of the pooler's time, servers added back one per percent of
-   waiting, up to the operator's 20). MySQL's read_write pool was bought for slow writes the pool cannot mend (36 of 82 grows at a miss share under
-   1%): the pool grows only while missing. MongoDB's memory saving on b, c and burst was a cold cache given back before its
-   first eviction (four notches in the first five seconds of every arm) and held at the floor evicting: the give-back gate is
-   the miss share, as MySQL's, and the saving may fall to the noise, said beforehand. The second (PostgreSQL, MongoDB) and
-   third (MySQL) counted sets run on these rules, dispatched 23:16 UTC on commit `310cf318` (PostgreSQL 37858494179,
-   37858496620, 37858499033; MySQL 37858501997, 37858505059, 37858509109; MongoDB 37858512907, 37858515717, 37858519010).
-   **Done, 9 October; the earlier tables are whole in `docs/history`.** PostgreSQL: CPU and median latency inside the noise on
-   all three workloads, connections −36% to −38% on `select` GAIN in all three of our runs, the runs disagree on `tpcb_hot`, and on
-   `simple_update` the add rule of amendment 1 buys connections above the operator's 20 (most at once +72% to +80%,
-   power given in all three of our runs, nothing bought): category +4.0% from +14.2%. MongoDB: the cache −21% to −36% on all four workloads,
-   GAIN in all three of our runs, the latency cost gone, 8 rows toward their aims and 0 LOSS or power given: category +8.5% from +10.2%. MySQL: burst −49% to −56%
-   GAIN in all three of our runs; read_write memory +44% to +52% higher with CPU −4% to −6% lower, a trade; read_only inside the noise
-   (its earlier saving was in part the cold-start give-back); update_index disagree: category +5.2% from +12.2%. The index
-   headline moves from +24.1% to **+20.5%**: smaller, and every number in it is now a gain without a harness cost under it.
-7. **The queue** (`docs/REGISTER.md` section 4, `docs/PROOF_PROGRAM.md`): drone swarms on PX4 and ArduPilot (gym-pybullet-drones done), YCSB on
-   Cassandra and Redis and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT,
-   RocketPy, Cantera (Kafka and Redis done); one or two at a time, each preregistered.
-8. **The gaps the tree shows (the founder's reading, 10 October).** The index's six real categories are the cluster, PostgreSQL,
-   Kafka, Redis, MongoDB and MySQL; Azure waits on its three-run close (item 1) and the card on its run on the current controller
-   (item 3); the power grids and the districts are in as modelled results, never in the index by rule. Not yet a category: **a second
-   and a third cloud**, AWS and Google Cloud under Azure's method (`docs/REGISTER.md` row 38; each needs its own account credential
-   in a GitHub secret and an allowance of about 90 cores, about $12 a steady and $22 a burst run, nothing spent until the account
-   exists); **CPU power through Linux's own governor with the RAPL meter**: **built and preregistered the same day**
-   (`docs/CPU_POWER_PREREGISTRATION.md`; `tools/run_cpu_power.py`, one command `scripts/cpu_power_run.sh`, workflow `cpu-power`,
-   the three-run table `tools/cpu_power_abc.py`): the kernel's governor stays native, Omni moves the frequency ceiling on top
-   inside [half the top clock, the top], every notch down tried on the machine first by the brain's verdict, energy from the
-   processor's own meter and a wall plug where fitted; it waits for a machine on the metal, the founder's own tower or laptop on
-   Linux (free) or a rented bare-metal server (about $10), because GitHub's machines are virtual and expose neither the governor
-   nor the meter (the workflow's probe says so on every dispatch); **the card's energy meter**, which the card harness already
-   has (the integral of the device's power draw, the CPU package by RAPL, the wall plug where fitted, `tools/gpu_reps.py`) and
-   which reads on the founder's run. **The founder's sweep of the same day** (nothing with value left out: operating systems,
-   television and telecom, satellites and signals, energy, oil and minerals, finance, the platforms and social media, science and
-   physics, robotics to the top) added rows 39 to 57 to the register's queue and section 3.5 to the proof program, each an open
-   benchmark with a shipped controller for native and one knob for Omni, each to be preregistered before its first run; aerospace
-   and rockets were already rows 32 to 36. **The second check the same night** (cars, self-driving, batteries, nuclear, power plants,
-   medicine, surgery named) is written as `docs/COVERAGE_MAP.md`: every domain in the world of controllers against the register,
-   with the abbreviations (AKS, CPU, UPS, GPU, AWS and the rest) each given its place; it added rows 58 to 73 (self-driving stacks,
-   the EV powertrain, mobility fleets, stream processing, storage clusters, AI batch admission, games, thermal plants with nuclear as
-   the model only, fabs, surgical robot servos, the other Kubernetes scalers, distributed SQL, the other brokers, CDN caches, air
-   traffic, observability pipelines) and wrote the exclusions by rule: safety reserves, clinical dosing, trading decisions, weapons, a
-   person's command, solvers without a controller.
-9. **Omni-Compass 1.0**: when the founder declares the engine final, v3 as it stands is published as 1.0 and the older
-   fingerprints go to `docs/history` as the road to it.
+1. **Every benchmark on omni-v6**: 4 of 26 tables up; the rest released A, then B, then C by the conductor from
+   `scripts/reruns.txt`; each table replaces its v3 row on the sheet when its three runs land.
+2. **Omni v7**: the candidate corrected on 16 October (the quota read), its three trials dispatched again; it goes to main
+   only when they read no LOSS against native and nothing behind v6, and then everything runs again on it.
+3. **Azure at the tune-down**: the receipts of 14 and 15 October into tables (archive requested), checked against the
+   cloud toy's finding that the machines-only setting barely cuts the bill while pods wait for a place.
+4. **Google and Amazon**: on the founder's word; the accounts and secrets are his to make (appendices G and H).
+5. **The card**: the founder's runs on Lambda, one exact commit, after the CPU and cloud work.
+6. **Linux**: a machine on the metal for `cpu-power`.
+7. **More room**: 453 of the 2,214 muscle-load cases read SAME AS NATIVE and 14 of 26 knob-cases on the real stacks read
+   watch; the next engine looks for a gain in each, in the toy gate first.
+8. **Omni-Compass 1.0**: when the founder declares the engine final, the engine that stands then is published as 1.0 and
+   the older fingerprints go to `docs/history` as the road to it.
 
 ### Where things are
 
 | Path | What it is |
 |---|---|
-| `docs/OMNI_COMPASS_MANUAL.md` (PDF: `docs/OMNI_COMPASS_MANUAL.pdf`) | the manual: the governor, its mechanism, the wiring stack by stack, the frozen engines, the three-run rule, every result |
-| `docs/RERUN_2026-10-10.md` | every benchmark dispatched again on 10 October 2026 on one commit: the record, run by run |
-| `docs/OMNI_V3.md`, `docs/OMNI_V1.md` | what each engine is and every result read on it |
-| `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and still to run; the program to full size |
-| `results/live/V3_*.md`, `V1_*.md`, `results/live/raw/` | the three-run tables and every archived run's files |
-| `results/OMNI_INDEX.md` | the one combined number |
-| `docs/BENEFIT_SHEET.md` | one number per benchmark, plus always toward the system's own aims and minus away from them, whatever the gauge measures; yes, no, none or trade beside it |
-| `docs/WIRING_VERDICTS.md`, `results/WIRING_VERDICTS.csv` | which knobs earn a wire in: write, watch or the operator's choice, per knob and per muscle, from every table, every loss with its cause |
-| `docs/INTEGRATION_MANUAL.md`, `docs/WIRING_GUIDE.md` | wiring it in yourself |
-| `docs/METRICS_CATALOG.md` | every gauge, and whether it is measured or modelled |
-| `omnicompass/`, `omni_controller/`, `realms/`, `cpp/` | the engine, the controllers, the muscles, the C++20 twins |
-| `docs/HISTORY.md` | earlier states of play, kept whole |
+| `docs/OMNI_COMPASS_MANUAL.md` (PDF: `docs/OMNI_COMPASS_MANUAL.pdf`) | the Operator's Manual: how to embed, wire, tune, run and check Omni-Compass; every muscle's wiring and card (Appendix E) |
+| `docs/OMNI_COMPASS_OWNERS_MANUAL.md` (PDF: `docs/OMNI_COMPASS_OWNERS_MANUAL.pdf`) | the Owner's Manual: the theory, the mechanism, the engine's source, every result, every muscle (Appendix G) |
+| `docs/BENEFIT_SHEET.md` | one number per benchmark, its word, its engine, every change in words |
+| `docs/REGISTER.md` | every muscle family wired, every benchmark run, every benchmark still to run |
+| `docs/WIRING_VERDICTS.md` | write, watch or the operator's choice, per knob, from every result |
+| `docs/OMNI_V6.md`, `docs/OMNI_V5.md`, `docs/OMNI_V3.md`, `docs/OMNI_V2.md`, `docs/OMNI_V1.md` | what each engine is and every result read on it; v7's page is on its branch |
+| `docs/history/STATE_OF_PLAY_2026-10-10.md` | this page as it stood on 10 October, on Omni v3, moved here whole |
 
 # Part Eight. Value, License and History
 
@@ -10475,12 +10435,21 @@ and the other as power given in all three of our runs, because that is what happ
 
 ### 3.5 Where the evidence stands today, read honestly
 
-Every number below is from a three-run table on the frozen engine Omni v3, with its evidence class and the question a
-referee is entitled to ask about it. The answers to those questions are given, where they exist, in the row; where they
-do not yet exist, the row says what will supply them.
+Every number below is from a three-run table, each row naming the engine it ran on, with its evidence class and the
+question a referee is entitled to ask about it. The engine that stands is **omni-v6** (`OMNI_V6.json`, digest
+`df6147466ef18046`), and four benchmarks have their three-run table on it (the first four rows); every row not marked
+**omni-v6** is Omni v3's own result, as its table names it, and runs again on the engine that stands
+(`scripts/reruns.txt`), its row replaced here when its three runs land. Results are never read across engines. The
+answers to the referee's questions are given, where they exist, in the row; where they do not yet exist, the row says
+what will supply them. The newest state, written from the result files on every push, is the standing block of
+`docs/STATE_OF_PLAY.md` and the sheet `docs/BENEFIT_SHEET.md`.
 
 | What | Measured, same work, three runs | Class | What a referee will ask, and the answer |
 |---|---|---|---|
+| **omni-v6.** Kubernetes with a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top | response time **-45% to -47% mean, -58% to -61% at the 95th percentile**, time over the line -99% to -100%, GAIN in all three of our runs; machines, failed requests and the alert minutes EVEN; parked-worker energy +1.8% to +2.7%, power given | L | "What did Omni-Compass move, if the rightsizer had already set the requests?" The CPU limits it conveyed from the machines' idle processor to the serving pods (15 to 16 settings commands a run, each in the audit), and the HPA target; the rightsizer's recommendation stayed the operator's and was never written |
+| **omni-v6.** Kubernetes with KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top | response time **-59% mean, -73% to -75% at the 95th percentile**, alert minutes -98% to -100%, HPA replicas **-11% to -18%**, GAIN in all three of our runs; parked-worker energy +1.6% to +2.1%, power given | L | "Fewer replicas and faster?" Yes: the conveyed limits let each pod serve more, so KEDA's own count fell; the energy the busier host drew is power given, shown beside the work |
+| **omni-v6.** Kubernetes with KEDA on the CPU target and the live requests in flight, Omni-Compass on top | response time **-37% to -41% mean, -55% to -57% at the 95th percentile**, GAIN in all three of our runs; machines, replicas, failed requests and alert minutes EVEN; parked-worker energy +1.2% to +1.6%, power given | L | "Why less than the HTTP add-on alone?" KEDA's CPU target already scales on the pods' own use, so part of the room was native's |
+| **omni-v6.** Kubernetes with a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top | every gauge EVEN, no difference beyond the noise | L | "Then what is Omni-Compass for here?" Nothing, on this service: CruiseKube's rightsizing left no room, and the governor wrote almost nothing; the table says so |
 | Kubernetes: work inside the response line, all four in one run | **+35% to +49%** GAIN in all three of our runs | L | "Is the cluster real?" Kubernetes is real (API server, scheduler, HPA); the seven nodes are containers on one 4-core GitHub runner, so the host's own busy share is recorded beside every run and the machines column is machine-hours in service, not a bill. The bill is Azure's test (below) |
 | Kubernetes: 95th-percentile response time, steady, wandering, all four, faults | **47% to 66% faster** GAIN in all three of our runs | L | "Did native have a fair chance?" Native is Kubernetes with its HPA at the operator's target of 50%; the cost-to-match runs on the earlier engine showed no native target tried (40, 30, 20) reached Omni's p95 (`docs/history/`). The runs are paired on one runner with the order rotated |
 | Kubernetes: machines in service | −1.5% to −2.9% at steady load, **−19% to −23%** on the batch queue, GAIN in all three of our runs; inside the noise on the other tests | L | "Why so little?" Because the verdict kept every machine whose removal made requests slower in the paired trial. Earlier engines without that check parked 29% to 36% of the machines and paid for it in response time; the frozen engine puts service first. kind has no node autoscaler, so parked machines stay powered: the saving is machine-hours, not watts |
@@ -10492,7 +10461,7 @@ do not yet exist, the row says what will supply them.
 | Database's storage-engine cache (MongoDB under YCSB): the cache size held | **−3% to −13% on f**, GAIN in all three of our runs (the set of 10 October, the brain's verdict on the cache); b, c and burst inside the noise | L | "What did it cost?" Nothing the same in all three of our runs: work, p95, p99, mean latency and host CPU inside the noise on all four workloads, no failed operation |
 | Database's buffer pool (MySQL under sysbench): the pool held | **−10% to −20% on read_write**, GAIN in all three of our runs, the pages holding data with it (the set of 10 October, the brain's verdict on the pool); burst, read_only and update_index inside the noise | L | "What did it cost?" Nothing the same in all three of our runs: work, p95, p99 and CPU inside the noise on every workload; the earlier set's memory bought for the written working set is gone |
 | Cache: work inside the 2 ms line; the hit rate | on the set of 10 October exactly nothing: the allowance one notch each way, most trials abandoned before they were judged, every gauge inside the noise; the earlier set's +14% to +27%, bought with a 64 → 200 to 270 MB ceiling, is whole in the history | L | "Why nothing?" The same trial rule as the broker's; amendment 3, the next set running |
-| The modelled realms: work per energy, 945 muscles, six organisms, 1 to 1,000 copies | **+0.07% to +0.37%**, every organism superior within guardrails, 0 muscles LOSS or power given | S | "Why so small?" The native controllers in the models are well tuned and leave little room; the number is small and real within the model, the same at every size, and it is never counted in the headline |
+| **omni-v5**, the law v6 carries. The modelled muscles and six organisms: 1,107 muscles in 70 families, every muscle its own card, three loads | every muscle alone over its loads EVEN 580, GAIN 527, LOSS 0; every organism GAIN (fewer misses, and under the climb more work) under the normal, climb and line loads, power given +0.00% to +0.05%; the grid 36 of 36 squares of 10 and 100 runs GAIN | S | "Why is the energy not a saving?" Because the max buys work and speed and the energy it takes is power given, shown beside them, never counted as a loss or a gain; the models are ours (class S) and are never counted in the headline |
 | Power grid, 11 SimBench grids in pandapower | energy drawn and net import lower in all 11; losses lower in 7, **power given in 4**; tap operations fewer in 10, 4 → 8 a year in one, higher | S | "Where does it lose?" In the rural and semi-urban grids with their own generation, where a lower voltage raises losses; the table shows it |
 | Robot arms, MuJoCo Menagerie | peak torque −29% and −10%, tracking error −21% where Omni moved; the Panda's copper loss **+14% higher**; two arms left native | S | "What about the arms that gained nothing?" The paired physics trial left them native and the table says "nothing for Omni to move" |
 | Buildings with batteries, CityLearn, 11 districts | electricity bought, daily peak and unevenness lower in all 11; the bill **power given in 7**; ramping higher in 7 | S | "Is the bill a loss?" Yes, in the 2023 districts, and it is in the table as such |
@@ -10508,34 +10477,36 @@ consumer group or a ceiling. It becomes a claim about the bill, not a direction,
 cloud with a fleet big enough to show one machine, and the real card's own meter. We publish each of them as it comes,
 whatever it says.
 
-### 3.6 One law, frozen; and what came before it
+### 3.6 One law, versioned; and what came before it
 
-The engine in every result of this manual is **the compass law with the verdict** (sections 6 and 1.2), frozen as Omni
-v1 on 5 October 2026, grown to the 945-muscle catalog as v2 and given the slack gate on speed knobs as v3, with the law,
-the controllers and the runners the same bytes in all three (`docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md`). Earlier
-engines, among them an allocation law that gave back about a third of the machines at the cost of response time and a
-compass law without the verdict, produced the numbered sets kept in `docs/history/`; their results are history, labelled
-as the engine that produced them, and are never read beside v1's or v3's. A buyer does not choose between modes: there is
-one law, and it is the one every table in Part VI was made on. Each new result therefore describes exactly the code that
-produced the old ones, and when the founder declares the engine final, the engine that stands then is published as
-Omni-Compass 1.0, with the older fingerprints kept as the road to it, never as a second product.
+The engine in every result of this manual is **the compass law with the verdict** (sections 6 and 1.2), versioned and
+fingerprinted at every change: frozen as Omni v1 on 5 October 2026; grown to the 945-muscle catalog as v2; given the slack
+gate on speed knobs as v3; redesigned as **v5** (12 and 13 October) with the max as its default brain on the 1,107-muscle
+catalog, every muscle its own card, the living body and the lease's walk back (v4 was the written plan of that redesign,
+`docs/OMNI_V4_PLAN.md`, never fingerprinted); and given the shared-host capacity repair of the Kubernetes controller as
+**v6**, the engine that stands (`docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md`, `OMNI_V5.md`, `OMNI_V6.md`). **v7 is a
+candidate** on its own branch, tried in the toy gate and in live trials before it may stand. Earlier engines, among them an
+allocation law that gave back about a third of the machines at the cost of response time and a compass law without the
+verdict, produced the numbered sets kept in `docs/history/`; their results are history, labelled as the engine that produced
+them, and are never read beside a later engine's. A buyer does not choose between modes: there is one law, and every table
+names the version of it that produced the table. When the founder declares the engine final, the engine that stands then
+is published as Omni-Compass 1.0, with the older fingerprints kept as the road to it, never as a second product.
 
-"Frozen" has a precise meaning here. The engine is a fixed set of 40 files, and `OMNI_V3.json` holds one SHA-256 for
-each of them and one digest over all of them; `OMNI_V2.json` and `OMNI_V1.json` do the same for the two earlier sets.
-`python3 tools/omni_version.py` hashes the files in a checkout and prints which fingerprint they match (for this edition,
-`omni-v3 (digest b53d05449ee04c4b, 40 files)`), or, when they match none, which files differ from the nearest; with
-`--commit <sha>` it asks the same of any pushed commit, which is how every three-run table checks that its runs A, B and
-C were on the same engine before it combines them, and refuses if they were not. The three versions differ in exactly
-the ways their records name: v2 added the 945-muscle catalog and thirteen presets to v1 without touching the law, the
-controllers or the runners, which are the same bytes in all three; v3 added the slack gate on speed knobs and the marine
-propulsion preset to v2 (`docs/OMNI_V3.md`). Nothing else changed, and a reader can check that from the fingerprints
-rather than from this sentence.
+"Versioned" has a precise meaning here. The engine is a fixed set of files (45 on v6), and `OMNI_V6.json` holds one
+SHA-256 for each of them and one digest over all of them; `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json` and
+`OMNI_V1.json` do the same for the earlier sets. `python3 tools/omni_version.py` hashes the files in a checkout and prints
+which fingerprint they match (for this edition, `omni-v6 (digest df6147466ef18046, 45 files)`), or, when they match none,
+which files differ from the nearest; with `--commit <sha>` it asks the same of any pushed commit, which is how every
+three-run table checks that its runs A, B and C were on the same engine before it combines them, and refuses if they were
+not. The versions differ in exactly the ways their records name, and a reader can check that from the fingerprints rather
+than from this sentence.
 
 The rule that any change makes the next version is also the rule that keeps the results honest. A gain or a guard
 changed after a result is in would make that result unrepeatable on the engine that now stands, so the change moves the
 version, every result is run again on the new version, and the old tables keep their version in their name and move to
-history. The founder's standing order is that the engine is never changed without being told first; this manual records
-no change made otherwise.
+history. The founder's standing order is that the engine is never changed without being told first; since 15 October every
+change is also tried in our own toy models against the engine that stands before any real run (`tools/toy_gate.py`). This
+manual records no change made otherwise.
 
 ---
 
@@ -10771,8 +10742,8 @@ controller, a firmware, a PLC), and the soak (`results/SOAK.json`, one hundred m
 it. The seal makes the twins' agreement a property of the repository rather than a claim: change a sealed byte and
 `verify.py` fails, naming the file.
 
-**The three fingerprints.** The seal fingerprints the twinned laws; `OMNI_V1.json`, `OMNI_V2.json` and `OMNI_V3.json`
-fingerprint the engine as a whole (law, controllers, muscles, runners: 38 to 40 files); `RELEASE_MANIFEST.json`
+**The three fingerprints.** The seal fingerprints the twinned laws; `OMNI_V1.json` to `OMNI_V6.json`
+fingerprint the engine as a whole (law, controllers, muscles, runners: 38 to 45 files); `RELEASE_MANIFEST.json`
 fingerprints the release (the commit, the engine, the twins, the GPU protocol, the live evidence and the verification
 receipt) and is rewritten by `tools/release_manifest.py` before every push, under the Python GitHub runs. A reader holding
 any one of the three can tell whether the files in front of them are the files the results were made on.
@@ -11082,6 +11053,10 @@ locally at this commit.
 | `docs/history/OMNICOMPASS_BUYER_EDITION.md` | the buyer-facing report |
 
 
+### The state of play as it stood on 2026-10-10 (Omni v3), moved whole on 2026-10-16
+
+Kept as its own page, `docs/history/STATE_OF_PLAY_2026-10-10.md`: the 10 October narrative, every number Omni v3's, named as such.
+
 ### The state of play as it stood on 2026-10-06 (moved here whole on 2026-10-07)
 
 ### In one paragraph (2026-10-06, Omni v1)
@@ -11366,10 +11341,10 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | `results/` | every published result, with its raw files and checksums |
 | `results/live/V1_*.md`, `V3_*.md` (+ `.json`) | the three-run tables, one per test, named by the engine they ran on |
 | `results/live/raw/run-<id>/` | every archived run's files, one SHA-256 manifest per repetition |
-| `results/scale/GRID.md`, `results/realms/REALMS.md`, `results/OMNI_INDEX.md` | the grid of copies and runs, the modelled realms, the one combined number |
-| `OMNI_V1.json`, `OMNI_V2.json`, `OMNI_V3.json` | the frozen engines' fingerprints |
+| `results/grid_v5/GRID.md`, `results/realms_v5/REALMS_V5.md`, `results/OMNI_INDEX.md` | the grid of copies and runs, the modelled muscles and organisms, the one combined number (the older engines' tables stay under their own names) |
+| `OMNI_V6.json` (the engine that stands), `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json`, `OMNI_V1.json` | the engines' fingerprints |
 | `docs/` | this manual, the preregistrations, the evidence ledger, the theorem, the realm study |
-| `docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md` | what each engine is and every result read on it |
+| `docs/OMNI_V6.md`, `OMNI_V5.md`, `OMNI_V3.md`, `OMNI_V2.md`, `OMNI_V1.md` | what each engine is and every result read on it |
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and every benchmark still to run; the program to full size |
 | `.github/workflows/` | every benchmark as GitHub runs it: `benchmark-reps`, `six`, `six-kube`, `big-organism`, `big-organism-detached`, `aks-metered`, `pgbench`, `kafka`, `redis`, `ycsb`, `sysbench`, `robustness`, `swarm`, `citylearn`, `pandapower`, `mujoco`, `archive-run`, `verify` |
 | `tests/`, `verify.py` | every unit and property test, the shield's adversarial cases, the Python-against-C++ agreement; `verify.py` runs them all and must end with its pass line |
@@ -11594,7 +11569,7 @@ job printed it); `end_reads.err`, `pod_watch.err` and `capture.csv.errors` (empt
 
 A **muscle** is one setting on one machine that already has its own control: a replica target, a node pool's size, a GPU's clock ceiling, a chiller's setpoint, a battery's reserve, a joint's effort. Omni-Compass does not replace that control. It reads the machine's meters and, at its default, the max, moves the setting the machine already accepts toward the machine's own limit for the most work, never past it and never below native, through a plug that reads the setting once before the first write, reads back every write, steps aside if another controller moves it, and walks it back to native at the end. A knob native already runs at the top of its range is at its limit on native and is left there.
 
-This chapter lists all 1107 muscles of the catalog (`realms/catalog_v5.csv`, engine omni-v5). For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 4 and 6). See `DISCLOSURES.md`.
+This chapter lists all 1107 muscles of the v5 catalog (`realms/catalog_v5.csv`); each run records its engine separately. For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 4 and 6). See `DISCLOSURES.md`.
 
 ### How to read an entry
 
@@ -11677,6 +11652,8 @@ This chapter lists all 1107 muscles of the catalog (`realms/catalog_v5.csv`, eng
 
 Wires marked *modelled only* exist as plants in the benchmark and are not built for live use.
 
+**How to wire any muscle on your own stack (the plug, chapter 4).** Every muscle below is wired the same way: Omni-Compass never replaces the native controller; it reads the controller's own meters (the wire out) and writes the one setting the controller already accepts (the wire in), through a plug that (1) reads the setting once before the first write and records it, (2) reads back every write and stops writing if another writer moved the setting, (3) renews a lease every decision so a dead governor's settings walk back to native by themselves, and (4) restores the recorded setting at the end. Each family's entry says which native controller owns its muscles, where the reading is tapped, where the setting is written, how it is restored, and whether that wire has run live in this repository or only on a model (`docs/wiring_recipes.csv`). The muscle's name is the setting's own name on that controller. Where the entry says *modelled only*, the plant exists in the benchmark and the wire is written against the controller's documented interface, not yet run on the machine.
+
 ### The shared spine: 267 muscles in all four realms
 
 The machines every realm stands on: servers, machines, GPUs and CPUs, network, storage, observability, security, cooling and electrical distribution. Each spine muscle is part of every realm's organism, counted once in the tower and four times in the stack.
@@ -11685,7 +11662,15 @@ The machines every realm stands on: servers, machines, GPUs and CPUs, network, s
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the cloud's autoscaling group or scale set: AWS Auto Scaling, Azure VMSS, GCP MIG.
+- **Wire out (read):** group size, instance states, the target-tracking metric (the cloud's API and monitoring).
+- **Wire in (write):** desired capacity, min and max, the target-tracking policy's target, through the cloud CLI or SDK.
+- **Restore:** the group's desired, min, max and policy recorded once; restored from it.
+- **Run live?** live on AKS through the node pool (family 5); the cloud SDK path itself is written, not yet run live.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 97 | vm count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
 | 98 | vm size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
@@ -11713,7 +11698,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the pod's own resource requests and limits (the Deployment template) and, where it runs, the VPA, Goldilocks or CruiseKube recommender.
+- **Wire out (read):** each pod's CPU use (kubectl top), its request and limit, the node's allocatable CPU (Kubernetes API).
+- **Wire in (write):** the running pod's CPU limit in place through pods/resize (no restart); the template is never changed, so no rollout.
+- **Restore:** the operator's limit recorded in an annotation before the first write; every pod returned to it.
+- **Run live?** live: omni_controller/muscles.py convey() (conveyance); KEDA and Goldilocks tables.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 33 | cpu request | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 34 | cpu limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
@@ -11745,7 +11738,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `cpu_host` (a CPU host whose clock and power can be set), reached through Linux cpufreq and RAPL. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the Linux kernel's own governors: cpufreq (schedutil or the processor driver), RAPL, cpuidle, the memory manager.
+- **Wire out (read):** /sys/devices/system/cpu/cpufreq (frequencies and governor), /sys/class/powercap intel-rapl energy counters, /proc/stat busy share, /proc/pressure.
+- **Wire in (write):** scaling_max_freq per policy and the RAPL package power limit through sysfs (root); on Kubernetes through the Kubernetes Power Manager's PowerProfile or EAR's policy.
+- **Restore:** the governor's files snapshotted once and restored byte for byte (tools/run_cpu_power.py --restore).
+- **Run live?** written and tested on the modelled machine (tools/run_cpu_power.py, cpu-power.yml); GitHub's machines are virtual and cannot write the governor: the live run needs a real Linux machine.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 113 | cpufreq min | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
 | 114 | cpufreq max | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
@@ -11778,7 +11779,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** kube-scheduler and its profiles, the descheduler, PriorityClasses, scheduling gates.
+- **Wire out (read):** pods pending and their reasons, node fill, topology spread (Kubernetes API).
+- **Wire in (write):** a pod's or deployment's placement fields (nodeSelector, affinity, topologySpreadConstraints, priorityClassName, schedulingGates) by kubectl patch, or the scheduler's profile.
+- **Restore:** the fields as they stood before the first write, restored field by field.
+- **Run live?** modelled; the API path is the same kubectl patch the live controller uses for the HPA.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 49 | node selector | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 85% full; reads the last 10 decisions |
 | 50 | node affinity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -11806,7 +11815,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the HorizontalPodAutoscaler, KEDA ScaledObject or VPA that owns the workload's scale.
+- **Wire out (read):** the HPA's current and desired replicas, the Deployment's ready replicas (Kubernetes API, metrics-server), the service's response time from the probe.
+- **Wire in (write):** the HPA's target (spec.metrics averageUtilization) and floor (minReplicas) by kubectl patch; KEDA through its ScaledObject, so the add-on keeps its own loop.
+- **Restore:** the operator's target and range recorded in an annotation before the first write, restored from it, annotation removed.
+- **Run live?** live: scripts/kind_bench.sh and omni_controller (HPA target, KEDA, Goldilocks, CruiseKube), three-run tables in results/live.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 17 | replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 18 | hpa cpu target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
@@ -11845,7 +11862,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the card's own firmware limits through NVML and nvidia-smi (power limit, application clocks, MIG, compute mode).
+- **Wire out (read):** nvidia-smi --query-gpu (clocks, power draw, temperature, utilisation, memory), the serving response time from the probe.
+- **Wire in (write):** nvidia-smi -pl (power limit), -lgc/-rgc (clock ceiling and reset), -ac (application clocks), -mig and -c (modes), per card.
+- **Restore:** every limit read once at start (the snapshot line in the GPU audit) and restored by the same commands at the end or on the lease.
+- **Run live?** live: omni_controller/gpu_governor.py and scripts/gpu_paired.sh on a rented A10 (results/gpu); the new card runs wait on Lambda by the founder's order.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 129 | gpu allocate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 130 | gpu power limit | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
@@ -11874,7 +11899,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the cluster's own node autoscaler: Karpenter (NodePool), the Cluster Autoscaler, a MachineSet, a cloud node pool.
+- **Wire out (read):** ready and schedulable workers, pending pods, allocatable and used CPU (Kubernetes API), the autoscaler's status ConfigMap.
+- **Wire in (write):** the pool's size through the operator's own command (--node-scale-cmd: az aks nodepool scale, gcloud container clusters resize, eksctl scale nodegroup, kubectl scale machineset, a Karpenter NodePool limit); a machine parked by taint and drain, never deleted by Omni-Compass.
+- **Restore:** the pool's starting count recorded once; every parked machine untainted and the pool restored to it at the end or on the lease.
+- **Run live?** live: omni_controller nodepool mode on kind and on AKS (results/live/V1_AKS_*, the capacity and steady tables).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 65 | node desired | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 66 | node pool min | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
@@ -11905,7 +11938,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `network` (network routing and switching), reached through the network controller (SDN, routing API). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the network controller: the load balancer's weights, the SDN controller, the NIC's ethtool and tc settings.
+- **Wire out (read):** link utilisation, drops, queue latency (SNMP, the controller's API, ethtool -S).
+- **Wire in (write):** LB and route weights through the controller's API; rate limits and queue disciplines through tc; NIC queues through ethtool.
+- **Restore:** every weight and setting recorded; restored with the same commands.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 225 | lb weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
 | 226 | route weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
@@ -11931,7 +11972,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the collector's own configuration: the OpenTelemetry Collector, Prometheus scrape and remote-write settings.
+- **Wire out (read):** dropped samples, queue depth, memory, cardinality (the collector's self-metrics).
+- **Wire in (write):** the collector's batch, queue and memory limits and scrape intervals through its config reload.
+- **Restore:** the config recorded; reloaded from it.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 373 | collector memory limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
 | 374 | export concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
@@ -11947,7 +11996,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the platform's own recovery and security controls: rollout and rollback, PodDisruptionBudgets, the security hold, a kill switch.
+- **Wire out (read):** error rate, rollout status, the security hold (a ConfigMap key), the kill file.
+- **Wire in (write):** rollout pause and undo by kubectl; the security hold read, never written; the kill switch (tools/omni_switch.py) is a human's.
+- **Restore:** every write recorded and undone on the lease.
+- **Run live?** live in part: the security hold and kill switch run in every Kubernetes benchmark (omnicompass/master.py).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 385 | restart | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 386 | rollback | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -11966,7 +12023,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `storage` (block, file or object storage), reached through the storage system's QoS and tiering API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the storage system's QoS and tiering: Ceph (ceph osd pool set, QoS), a cloud volume's IOPS class, S3 lifecycle.
+- **Wire out (read):** IOPS, throughput, latency and queue depth from the storage system's metrics.
+- **Wire in (write):** volume IOPS and throughput limits, replica counts and tiering through the storage API or CSI VolumeAttributesClass.
+- **Restore:** the volume's class and limits recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 257 | volume size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
 | 258 | iops limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
@@ -11993,7 +12058,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a data hall or building zone cooled by chillers, air handlers or fans; its class is `data_hall` (a data hall cooling plant), reached through the building management system (BACnet, Modbus) or its command line. Omni-Compass reads its temperature against its limit. It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the building management system and the chiller plant's own supervisory controller (BACnet, Modbus).
+- **Wire out (read):** supply and return temperatures, chiller load, fan and pump speeds, rack inlet temperatures (BACnet reads).
+- **Wire in (write):** supply-air and chilled-water setpoints, fan and pump speeds within their safe bands by BACnet write; the plant's own staging keeps control.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled (the data-hall plant); the BACnet path is written.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 545 | supply air temperature | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
 | 546 | return air target | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
@@ -12018,7 +12091,15 @@ Each is a data hall or building zone cooled by chillers, air handlers or fans; i
 
 Each is a battery, UPS or microgrid store with a load and a grid connection; its class is `ups` (an uninterruptible power supply), reached through the UPS and PDU management interface (SNMP, Modbus). Omni-Compass reads its draw on the grid connection and its reserve. It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the UPS and PDU management interfaces (SNMP, Modbus) and the servers' BMC power caps (IPMI DCMI, Redfish).
+- **Wire out (read):** load per branch, UPS mode and charge, power per server (SNMP, Redfish).
+- **Wire in (write):** server and rack power caps through Redfish or DCMI; UPS charge rate and mode through SNMP; breakers never written.
+- **Restore:** every cap and mode read once and restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 529 | server power cap | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
 | 530 | rack power cap | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
@@ -12045,7 +12126,15 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the serving engine's own autoscaler and batcher (vLLM, Triton, KServe, Ray Serve): replicas, batch size, concurrency, KV cache.
+- **Wire out (read):** queue depth, tokens per second, p95 latency, KV-cache use from the server's /metrics.
+- **Wire in (write):** the server's replica count or KServe/Knative autoscaling target, max_num_seqs and KV-cache budget through its API or its ConfigMap.
+- **Restore:** the serving spec recorded once; restored to it.
+- **Run live?** live in part: GPU serving under the card governor (results/gpu); the vLLM run is ready and waits on Lambda.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 161 | model replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 162 | model route weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
@@ -12076,7 +12165,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu_batch` (GPU training and batch work), reached through nvidia-smi, the job scheduler's pause and resume. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the training job's launcher and scheduler (Kubeflow, Ray Train, Slurm, torchrun).
+- **Wire out (read):** step time, GPU utilisation, checkpoint cadence, stragglers (the job's metrics).
+- **Wire in (write):** the job's worker count (elastic training), batch sizes and checkpoint interval through the launcher's API or the job spec.
+- **Restore:** the job spec recorded; the next run launched from it.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 177 | training workers | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 178 | global batch size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 85% full; reads the last 10 decisions |
@@ -12101,7 +12198,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the global load balancer and the fleet manager (Karmada, Fleet, the cloud's global LB).
+- **Wire out (read):** per-region latency, capacity and cost, pending work (the global LB's and clusters' metrics).
+- **Wire in (write):** region and cluster weights and quotas through the global controller's API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 609 | multi cluster dispatch | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 60 decisions |
 | 610 | region dispatch | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 75% full; reads the last 40 decisions |
@@ -12126,7 +12231,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `fabric` (a high-speed fabric (RDMA, DPU, SmartNIC)), reached through the fabric manager's API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the DPU's own management (NVIDIA DOCA, the SmartNIC's SDK) and SR-IOV.
+- **Wire out (read):** per-function rates, flow-steering hits, DPU CPU and memory (the DPU's counters).
+- **Wire in (write):** rate limits, QoS groups and VF counts through the DPU management API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0021 | dpu pf tx rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
 | AUDIT-0022 | dpu vf tx rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
@@ -12145,7 +12258,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `batch` (batch and queued jobs), reached through the job queue (Kubernetes Jobs, Slurm, Spark). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the cluster manager's scheduler: YARN, Mesos, Nomad, Ray.
+- **Wire out (read):** queue lengths, resource reservations, preemptions (the manager's API).
+- **Wire in (write):** quotas, reservations and preemption settings through the manager's API.
+- **Restore:** recorded once, restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 209 | task admission | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
 | 210 | task priority | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -12167,7 +12288,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `fabric` (a high-speed fabric (RDMA, DPU, SmartNIC)), reached through the fabric manager's API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the fabric manager and the collective library (NVIDIA Fabric Manager, NCCL settings, RDMA CM).
+- **Wire out (read):** link and NVSwitch counters (nvidia-smi nvlink, DCGM), collective time per step from the training job.
+- **Wire in (write):** NCCL environment and the job's rank placement at launch; RDMA QoS through the fabric manager's API.
+- **Restore:** the launch settings recorded; the next job launched with the originals.
+- **Run live?** modelled; written against NCCL and Fabric Manager documentation.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 145 | nvlink placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
 | 146 | nvswitch route | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
@@ -12192,7 +12321,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `batch` (batch and queued jobs), reached through the job queue (Kubernetes Jobs, Slurm, Spark). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the batch scheduler: Slurm (scontrol, sacctmgr), PBS, LSF.
+- **Wire out (read):** queue depth, node states, job wait times, power per node (sacct, sinfo, the power plugin).
+- **Wire in (write):** partition limits, job priority and fair-share factors, node power-saving settings through scontrol and the scheduler config.
+- **Restore:** the scheduler's settings recorded; restored with the same commands.
+- **Run live?** modelled; EAR (family 8) is the live energy path on HPC.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 193 | job slots | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 194 | mpi ranks | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 75% full; reads the last 20 decisions |
@@ -12218,7 +12355,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** Kubernetes DRA: DeviceClass, ResourceClaim, ResourceSlice.
+- **Wire out (read):** claims pending, devices allocated and tainted (the Kubernetes API).
+- **Wire in (write):** DeviceClass selectors and claim capacity by kubectl apply; devices tainted, never removed.
+- **Restore:** the objects recorded; restored.
+- **Run live?** modelled; the API path is kubectl.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0001 | dra device class selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 85% full; reads the last 40 decisions |
 | AUDIT-0002 | dra claim capacity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 40 decisions |
@@ -12233,7 +12378,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** OpenShift's Machine API operators: MachineHealthCheck, MachineConfigPool, the Cluster Version Operator.
+- **Wire out (read):** machine phases, MCP status and pause, degraded counts (the OpenShift API).
+- **Wire in (write):** MachineHealthCheck maxUnhealthy, MachineConfigPool paused and maxUnavailable by oc patch.
+- **Restore:** the fields recorded before the first write, restored from the record.
+- **Run live?** modelled; written against the documented OpenShift API, not yet run live.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 85 | machine remediation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 88 | machine health gate | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -12249,7 +12402,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `qpu` (a quantum or specialised accelerator queue), reached through the accelerator's job queue. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the quantum control stack's job queue and pulse schedules (Qiskit Runtime, the vendor's control software).
+- **Wire out (read):** queue depth, calibration drift, error rates (the stack's metrics).
+- **Wire in (write):** shot allocation, circuit admission and scheduling through the stack's API; pulse parameters never written live.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 593 | qubit mapping | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
 | 594 | circuit admission | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -12272,7 +12433,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the service's own admission layer: its API gateway, queue or admission controller (Envoy, NGINX, Kong, a job queue's concurrency setting).
+- **Wire out (read):** queue depth, requests in flight and the response-time line from the gateway's or queue's metrics (Prometheus, the admin API).
+- **Wire in (write):** the gateway's or queue's concurrency and rate settings (the limit named by the muscle) through its admin API or its config object.
+- **Restore:** snapshot of each limit once before the first write; every limit restored from it.
+- **Run live?** at its limit on native: read and left native in every run (nothing is paced or turned away); the wire is read-only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 1 | api concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
 | 2 | queue concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -12298,7 +12467,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `cpu_host` (a CPU host whose clock and power can be set), reached through Linux cpufreq and RAPL. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the Linux kernel's own tunables: cgroup v2 files, /proc/sys/vm and net, the cpufreq and cpuidle governors, the I/O scheduler.
+- **Wire out (read):** /sys/fs/cgroup, /proc/pressure, /proc/vmstat, /sys/block queue stats, the frequency files.
+- **Wire in (write):** cgroup cpu.weight, cpu.max and memory.high; sysctl vm and net keys; scaling_max_freq, through sysfs and sysctl (root).
+- **Restore:** every file snapshotted once and restored byte for byte.
+- **Run live?** the CPU frequency path is written (tools/run_cpu_power.py); the other knobs are registered and queued, they need a real Linux machine.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5001 | cgroup cpu weight | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5002 | cgroup cpu quota | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -12325,7 +12502,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the function platform's concurrency settings (Knative autoscaling annotations, AWS Lambda concurrency, OpenFaaS).
+- **Wire out (read):** concurrency, cold starts, queue waits (the platform's metrics).
+- **Wire in (write):** provisioned and reserved concurrency, scale-to-zero windows through the platform's API or annotations.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5021 | fn concurrency limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5022 | fn provisioned concurrency | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -12341,7 +12526,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `cpu_host` (a CPU host whose clock and power can be set), reached through Linux cpufreq and RAPL. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the hypervisor's management API (libvirt, vSphere, Hyper-V).
+- **Wire out (read):** vCPU steal, balloon state, migration load (the hypervisor's metrics).
+- **Wire in (write):** vCPU allocation, ballooning and migration pacing through the management API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5030 | vcpu allocation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5031 | memory ballooning | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -12357,7 +12550,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `process` (an industrial process loop), reached through the PLC or DCS (OPC UA, EtherNet/IP, PROFINET). Omni-Compass reads how far the process sits from its band. Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the data plane's own intake pacing and compaction settings (the ingress, the queue, the store's compactor).
+- **Wire out (read):** intake rate, backpressure, compaction debt, dead-letter depth (the components' metrics).
+- **Wire in (write):** pacing, drain rates and compaction budgets through each component's settings API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5045 | ingress intake pacing | capacity | at its limit on native (the full actuator): read and left native | Compute; stack; tower | global |
 | V5-5046 | dead letter retry cap | setpoint | left native: native already holds it inside its band (nothing to win) | Compute; stack; tower | global |
@@ -12372,7 +12573,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the perimeter's own controls: the WAF, the DDoS shield, the TLS terminator.
+- **Wire out (read):** request admission, inspection sampling, session cache hit rate (the perimeter's metrics).
+- **Wire in (write):** token-bucket rates, sampling and session cache size through the perimeter's API; blocking rules never loosened.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5053 | rate limit token bucket | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
 | V5-5054 | connection admission | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -12384,7 +12593,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `process` (an industrial process loop), reached through the PLC or DCS (OPC UA, EtherNet/IP, PROFINET). Omni-Compass reads how far the process sits from its band. Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the streaming stack's transcoder pools, packager and CDN settings.
+- **Wire out (read):** transcode queue, GPU clocks, buffer health, origin load (the stack's metrics).
+- **Wire in (write):** worker pools, bitrate-ladder cap and cache TTLs through the stack's API; GPU clocks through nvidia-smi (family 9).
+- **Restore:** recorded; restored.
+- **Run live?** modelled; the GPU path is live (family 9).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5072 | abr bitrate ladder cap | setpoint | left native: native already holds it inside its band (nothing to win) | Compute; stack; tower | global |
 | V5-5073 | player buffer target | setpoint | left native: native already holds it inside its band (nothing to win) | Compute; stack; tower | global |
@@ -12405,7 +12622,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** Agones Fleets and the matchmaker, the game node pool.
+- **Wire out (read):** allocated and ready servers, matchmaking waits, tick rate (Agones and the matchmaker's metrics).
+- **Wire in (write):** Fleet replicas and buffer sizes by kubectl patch; matchmaking admission through its API.
+- **Restore:** the Fleet spec recorded; restored.
+- **Run live?** modelled; the API path is kubectl patch.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5086 | agones fleet buffer size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5087 | agones fleet min replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 60 decisions |
@@ -12424,7 +12649,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `storage` (block, file or object storage), reached through the storage system's QoS and tiering API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the node's configuration (cache sizes, peer limits, mempool) and its host's power profile.
+- **Wire out (read):** block relay latency, mempool size, peer counts, validation backlog (the node's RPC).
+- **Wire in (write):** cache and pool sizes through the node's config and RPC; the host's power profile through family 8.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5098 | node db cache size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
 | V5-5099 | mempool max size | setpoint | left native: native already holds it inside its band (nothing to win) | Compute; stack; tower | global |
@@ -12441,7 +12674,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `batch` (batch and queued jobs), reached through the job queue (Kubernetes Jobs, Slurm, Spark). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the runner scale set (actions-runner-controller, GitLab runners) and the build cache.
+- **Wire out (read):** jobs queued, runners busy, cache hit rate (the controller's metrics).
+- **Wire in (write):** min and max runners, build concurrency and cache size by kubectl patch of the scale set.
+- **Restore:** the scale set spec recorded; restored.
+- **Run live?** modelled; the API path is kubectl patch.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5108 | runner scale set min runners | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | V5-5109 | runner scale set max runners | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 60 decisions |
@@ -12460,7 +12701,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `ev_traction` (an electric vehicle traction motor), reached through the vehicle's motor controller (CAN; modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the vehicle's motor and battery controllers (CAN, the OEM's diagnostic interface).
+- **Wire out (read):** torque, speed, state of charge, temperatures (CAN signals).
+- **Wire in (write):** torque, regeneration and charge limits within the OEM's envelope.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 1083 | state of charge limits | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
 | 1084 | smart charging schedule | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower | global |
@@ -12481,7 +12730,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `flight_axis` (a flight-control axis), reached through the flight controller (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the flight controller's own parameters: PX4 (MPC_XY_VEL_MAX, MPC_Z_VEL_MAX_UP, MPC_ACC_HOR, MC_ROLLRATE_MAX) and ArduPilot (WPNAV_SPEED, ATC_ACCEL_R_MAX), the battery failsafe.
+- **Wire out (read):** mission progress, battery state, tracking error and near-miss distance over MAVLink telemetry.
+- **Wire in (write):** the speed, acceleration and rate parameters over MAVLink PARAM_SET within the autopilot's own limits; failsafes and geofence never loosened.
+- **Restore:** every parameter read (PARAM_REQUEST_READ) once and written back at the end.
+- **Run live?** modelled: the swarm cells (results/live/V3_SWARM.md); the MAVLink path is written, not yet flown.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 481 | throttle envelope | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
 | 482 | attitude target | capacity | its own peak speed while tasks wait, back to its everyday speed near its heat limit or when its tracking strains (alone; inside a body, its everyday speed) | Physics; stack; tower | global |
@@ -12516,7 +12773,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `robot_fleet` (a fleet of robots or vehicles taking tasks), reached through the fleet manager's dispatch API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the fleet manager's dispatch and charging rules (Open-RMF, the vendor fleet manager).
+- **Wire out (read):** tasks waiting, robots active and charging, battery states (the fleet API).
+- **Wire in (write):** active robot count, charge thresholds and zone admission through the fleet API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 449 | robot dispatch | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Physics; stack; tower | global |
 | 450 | task assignment | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Physics; stack; tower | global |
@@ -12540,7 +12805,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `robot_joint` (a robot joint servo), reached through the robot controller (ROS 2, EtherCAT, the drive's fieldbus). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the robot's own controller: ros2_control and MoveIt parameters, the drive's limits over EtherCAT or the vendor fieldbus.
+- **Wire out (read):** joint tracking error, effort, temperature, cycle time (joint_states, the drive's registers).
+- **Wire in (write):** velocity and acceleration scaling, trajectory tolerances and controller rates through ROS 2 parameters (ros2 param set) or the drive's limit registers; never past the manufacturer's limits.
+- **Restore:** every parameter read once (ros2 param get) and restored (ros2 param set).
+- **Run live?** modelled: MuJoCo (results/live/V3_MUJOCO.md); the ROS 2 path is written, not yet run on a physical arm.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 433 | joint position | capacity | its own peak speed while tasks wait, back to its everyday speed near its heat limit or when its tracking strains (alone; inside a body, its everyday speed) | Physics; stack; tower | global |
 | 434 | joint velocity | capacity | its own peak speed while tasks wait, back to its everyday speed near its heat limit or when its tracking strains (alone; inside a body, its everyday speed) | Physics; stack; tower | global |
@@ -12573,7 +12846,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `reaction_wheel` (a spacecraft reaction wheel), reached through the attitude controller (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the flight software's command and mode tables (cFS, F Prime).
+- **Wire out (read):** attitude error, wheel speeds, power and thermal state from telemetry.
+- **Wire in (write):** payload duty cycle, communication allocation and wheel allocation through commands; safe modes never commanded.
+- **Restore:** the command table recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 497 | space command admission | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower | global |
 | 499 | flight task schedule | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower | global |
@@ -12594,7 +12875,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `rail_traction` (a train's traction and auxiliary systems), reached through the train control and management system and ATO (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the train control and management system and ATO.
+- **Wire out (read):** speed, traction effort, timetable margin, auxiliary power (TCMS telemetry).
+- **Wire in (write):** traction and coasting targets within the ATO's envelope.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2054 | traction effort limit | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
 | 2055 | regenerative braking share | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
@@ -12615,7 +12904,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `marine_propulsion` (a ship's propulsion shaft and power plant), reached through the vessel automation and power management system (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the vessel's automation and power management system.
+- **Wire out (read):** shaft speed and power, fuel rate, engine load (the automation system).
+- **Wire in (write):** shaft speed and power limits, engine staging within the manufacturer's envelope.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2068 | shaft speed target | capacity | its own peak speed while tasks wait, back to its everyday speed near its heat limit or when its tracking strains (alone; inside a body, its everyday speed) | Physics; stack; tower | global |
 | 2069 | propeller pitch limit | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
@@ -12634,7 +12931,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `elevator_hoist` (an elevator or escalator drive and its group control), reached through the lift controller and destination dispatch (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the lift controller and destination dispatch.
+- **Wire out (read):** calls waiting, car positions, drive temperature (the controller).
+- **Wire in (write):** speed and dispatch modes within the manufacturer's limits; safety modes never written.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2146 | hoist speed target | capacity | at its limit on native (its everyday speed is the machine's limit): read and left native | Physics; stack; tower | global |
 | 2147 | acceleration limit | capacity | at its limit on native (its everyday speed is the machine's limit): read and left native | Physics; stack; tower | global |
@@ -12655,7 +12960,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a data hall or building zone cooled by chillers, air handlers or fans; its class is `building` (a building zone), reached through the building management system. Omni-Compass reads its temperature against its limit. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the building management system (BACnet) and the AHU and zone controllers.
+- **Wire out (read):** zone temperatures, airflows, duct static pressure, occupancy (BACnet reads).
+- **Wire in (write):** zone setpoints, fan speeds and damper positions within their bands by BACnet write; the BMS's own sequences keep control.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled: CityLearn districts (results/live/V3_CITYLEARN.md); the BACnet path is written.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 1094 | setpoint reset trim and respond | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | Energy; stack; tower | global |
 | 1095 | duct static pressure setpoint | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | Energy; stack; tower | global |
@@ -12677,7 +12990,15 @@ Each is a data hall or building zone cooled by chillers, air handlers or fans; i
 
 Each is a battery, UPS or microgrid store with a load and a grid connection; its class is `microgrid` (a microgrid battery and loads), reached through the inverter or energy management system (IEEE 2030.5, SunSpec, OpenADR). Omni-Compass reads its draw on the grid connection and its reserve. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the battery's or site's energy management system and inverter (SunSpec, IEEE 2030.5, OpenADR, Modbus).
+- **Wire out (read):** state of charge, grid import and export, PV output, load (the EMS or inverter registers).
+- **Wire in (write):** the reserve setpoint, charge and discharge limits, import limit and curtailment through SunSpec or Modbus registers.
+- **Restore:** registers read once and restored.
+- **Run live?** modelled: CityLearn (results/live/V3_CITYLEARN.md) for the districts; the register path is written.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 513 | battery charge power | power | at its limit on native (full battery power): read and left native | Energy; stack; tower | 0 wobbles of margin on its line; reads its line 10 decisions before it holds; keeps 0% of its line clear |
 | 514 | battery discharge power | power | at its limit on native (full battery power): read and left native | Energy; stack; tower | 0 wobbles of margin on its line; reads its line 3 decisions before it holds; keeps 0% of its line clear |
@@ -12703,7 +13024,15 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 
 Each is a battery, UPS or microgrid store with a load and a grid connection; its class is `facility` (a facility battery behind the meter), reached through the energy management system. Omni-Compass reads its draw on the grid connection and its reserve. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the facility's energy management system and demand-response gateway (OpenADR).
+- **Wire out (read):** site power, utility signals, PUE, carbon intensity (the EMS and the utility's feed).
+- **Wire in (write):** the site power budget, demand limit and battery dispatch through the EMS.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 561 | facility power budget | power | at its limit on native (full battery power): read and left native | Energy; stack; tower | 0 wobbles of margin on its line; reads its line 3 decisions before it holds; keeps 0% of its line clear |
 | 562 | utility demand limit | power | at its limit on native (full battery power): read and left native | Energy; stack; tower | 0 wobbles of margin on its line; reads its line 3 decisions before it holds; keeps 0% of its line clear |
@@ -12725,7 +13054,15 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `feeder_voltage` (a distribution feeder's voltage), reached through the distribution management system (IEC 61850, DNP3; modelled only). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the distribution management system and the devices' own controllers (IEC 61850, DNP3): regulators, capacitor banks, inverters.
+- **Wire out (read):** feeder voltages, loads, tap positions, inverter output (the DMS).
+- **Wire in (write):** regulator and transformer taps, capacitor switching and inverter reactive power within the planning envelope; protection never written.
+- **Restore:** every setting read once and restored.
+- **Run live?** modelled: SimBench grids (results/live/V3_PANDAPOWER.md).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0033 | capacitor bank switch | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
 | AUDIT-0034 | voltage regulator tap | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -12744,7 +13081,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `process` (an industrial process loop), reached through the PLC or DCS (OPC UA, EtherNet/IP, PROFINET). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the PLC or DCS loop (OPC UA, EtherNet/IP, PROFINET): the setpoint and the mode of each loop.
+- **Wire out (read):** the process value, setpoint, output and alarm state of each loop (OPC UA reads).
+- **Wire in (write):** the loop's setpoint within its safe band and its actuator range by OPC UA write; safety interlocks are never written.
+- **Restore:** every setpoint read once and restored; a value outside the band is refused by the plug.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 465 | plc cycle authority | admission | at its limit on native (nothing paced or turned away): read and left native | Energy; stack; tower | global |
 | 466 | machine cell admission | admission | at its limit on native (nothing paced or turned away): read and left native | Energy; stack; tower | global |
@@ -12769,7 +13114,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `chamber` (a controlled chamber (clean room, kiln, reactor)), reached through the PLC or DCS. Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the fab's MES and each tool's controller (SECS/GEM).
+- **Wire out (read):** tool queues, chamber states, process values (MES and GEM).
+- **Wire in (write):** lot dispatch and tool admission through the MES; chamber recipes and parameters never written outside the qualified window.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 1092 | run to run control | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
 | 1093 | idle sleep mode | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
@@ -12789,7 +13142,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `water` (a water or pumping process), reached through the SCADA system (Modbus, DNP3). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the utility's SCADA (Modbus, DNP3) and the pump station controllers.
+- **Wire out (read):** levels, pressures, flows, aeration and dosing (SCADA reads).
+- **Wire in (write):** pump speeds, level and pressure targets, aeration and dosing within their bands by SCADA write; emergency shutdowns never written.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0069 | pump speed water | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
 | AUDIT-0070 | valve position water | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -12808,7 +13169,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a data hall or building zone cooled by chillers, air handlers or fans; its class is `hospital` (a hospital's critical rooms (operating rooms, isolation, pharmacy, imaging suites)), reached through the hospital's building management system (BACnet). Omni-Compass reads its temperature against its limit. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the hospital's building management system (BACnet) with its clinical limits.
+- **Wire out (read):** room pressures, air changes, temperatures and humidity (BACnet reads).
+- **Wire in (write):** setpoints within the clinical envelope by BACnet write; pressure cascades and alarms never loosened.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2001 | operating room air change setpoint | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | Energy; stack; tower | global |
 | 2002 | isolation room pressure target | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | Energy; stack; tower | global |
@@ -12828,7 +13197,15 @@ Each is a data hall or building zone cooled by chillers, air handlers or fans; i
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `irrigation` (pumps, pressure and climate on a farm or in a greenhouse), reached through the pump station controller, the pivot panel or the climate computer (Modbus, the vendor cloud). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the pump station controller, pivot panel or climate computer (Modbus, the vendor cloud).
+- **Wire out (read):** pressure, soil moisture, temperature, flow (the controller's registers).
+- **Wire in (write):** pump speed and climate setpoints within their bands by Modbus write.
+- **Restore:** registers read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2026 | irrigation pump speed | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
 | 2027 | mainline pressure setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -12849,7 +13226,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `pipeline` (a pipeline segment with its compressors, pumps and valves), reached through pipeline SCADA (DNP3, Modbus, OPC UA). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** pipeline SCADA (DNP3, Modbus, OPC UA).
+- **Wire out (read):** pressures, flows, line pack, compressor states (SCADA reads).
+- **Wire in (write):** pressure and flow setpoints and unit staging within the safe envelope; protection never written.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2040 | compressor discharge pressure setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2041 | pump station suction pressure target | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -12870,7 +13255,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `mill` (a grinding, flotation or materials-handling circuit), reached through the plant DCS or PLC (OPC UA). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the plant DCS or PLC (OPC UA).
+- **Wire out (read):** mill load, speed, pressures, densities, power (OPC UA reads).
+- **Wire in (write):** loop setpoints within their bands by OPC UA write; shutdowns never written.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2092 | sag mill load setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2093 | mill speed target | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -12891,7 +13284,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `district_heat` (a district heating or cooling network), reached through the network control system and substation controllers (Modbus, M-Bus). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the network control system and substation controllers (Modbus, M-Bus).
+- **Wire out (read):** supply and return temperatures, differential pressure, storage level (the controllers).
+- **Wire in (write):** supply temperature and pressure setpoints, pump speed and staging within their bands.
+- **Restore:** registers read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2106 | supply temperature setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2107 | return temperature target | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -12911,7 +13312,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `turbine` (a generating unit's governor, boiler or excitation loop), reached through the plant DCS and governor (OPC UA, IEC 61850; modelled only). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the plant DCS and the unit's governor (OPC UA, IEC 61850).
+- **Wire out (read):** unit load, frequency, pressures, temperatures (the DCS).
+- **Wire in (write):** load setpoints and ramp limits within the dispatch envelope; protection and rod positions never written.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2119 | turbine speed droop setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2120 | unit load setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -12932,7 +13341,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `inverter` (a plant of grid-support inverters or wind turbines), reached through the plant controller and inverter settings (SunSpec, IEC 61850, IEEE 1547). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the plant controller and inverter settings (SunSpec, IEC 61850, IEEE 1547).
+- **Wire out (read):** active and reactive power, voltage, curtailment state (SunSpec registers).
+- **Wire in (write):** volt-var and volt-watt setpoints, curtailment and ramp limits by SunSpec write within the interconnection agreement.
+- **Restore:** registers read once and restored.
+- **Run live?** modelled: SimBench grids solved by pandapower (results/live/V3_PANDAPOWER.md); the register path is written.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2133 | inverter volt var setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2134 | inverter volt watt setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -12952,7 +13369,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `batch_reactor` (a GMP batch reactor, fermenter or food process), reached through the batch control system (ISA-88, OPC UA). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the batch control system (ISA-88, OPC UA) with the validated recipe limits.
+- **Wire out (read):** process values and phase states (OPC UA reads).
+- **Wire in (write):** setpoints within the validated recipe band only; a value outside it is refused by the plug.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2158 | reactor temperature setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2159 | agitator speed setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -12975,7 +13400,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the cache's own configuration: Redis CONFIG SET, Memcached runtime settings.
+- **Wire out (read):** hit rate, evictions, used memory, p95 (INFO, the cache's stats).
+- **Wire in (write):** maxmemory and eviction policy by CONFIG SET; replicas and shards through the operator.
+- **Restore:** the setting read once (CONFIG GET) before the first write and restored (CONFIG SET).
+- **Run live?** live: tools/run_redis.py, V3_REDIS.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 305 | cache size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 75% full; reads the last 10 decisions |
 | 306 | cache ttl | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 20 decisions |
@@ -12998,7 +13431,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `commerce` (a customer-facing service with bursts), reached through the Kubernetes API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the payment platform's gateway and its routing rules.
+- **Wire out (read):** authorisation latency, decline and retry rates, queue depth (the platform's metrics).
+- **Wire in (write):** concurrency, timeout and route weights through the platform's admin API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 401 | payment admission | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
 | 402 | payment concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
@@ -13020,7 +13461,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `batch` (batch and queued jobs), reached through the job queue (Kubernetes Jobs, Slurm, Spark). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** Spark's dynamic allocation and the SQL engine's slots (spark.dynamicAllocation, Flink's parallelism, warehouse slots).
+- **Wire out (read):** executor count, task backlog, shuffle spill, stage times (the engine's metrics).
+- **Wire in (write):** dynamic allocation min and max, parallelism and slots through the engine's config at submit or its REST API.
+- **Restore:** the submit settings recorded; the next job launched from them.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 338 | executor size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 339 | dynamic allocation min | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -13042,7 +13491,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `database` (a database cluster), reached through the database operator (replicas, connection pools). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the database's own pooler and server settings: PgBouncer's admin console, MySQL SET GLOBAL, MongoDB setParameter, the database operator.
+- **Wire out (read):** pool waits and active connections (SHOW POOLS), buffer-pool size and hit rate, cache size and evictions, p95 per statement.
+- **Wire in (write):** PgBouncer default_pool_size through its console; MySQL innodb_buffer_pool_size by SET GLOBAL; MongoDB wiredTigerEngineRuntimeConfig cache_size by setParameter; replicas through the operator.
+- **Restore:** the setting read once before the first write and restored; a failed read-back stops the writer.
+- **Run live?** live: tools/run_pgbench.py, run_sysbench.py, run_ycsb.py, three-run tables V3_PGBENCH, V3_SYSBENCH, V3_YCSB.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 273 | db replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 60 decisions |
 | 275 | db memory | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 40 decisions |
@@ -13068,7 +13525,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the broker's own controls: Kafka's admin API and consumer group, RabbitMQ policies, MQTT broker settings.
+- **Wire out (read):** consumer lag, messages per second, p95 end to end, broker CPU (the broker's metrics, the consumer group's offsets).
+- **Wire in (write):** the consumer group's size (consumers running), quotas and partition counts through the admin API.
+- **Restore:** the group's size recorded; restored at the end.
+- **Run live?** live: tools/run_kafka.py, V3_KAFKA.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 289 | partition count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 40 decisions |
 | 290 | partition placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 40 decisions |
@@ -13097,7 +13562,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the application runtime's own settings: thread pools, JVM heap and GC, worker counts, connection pools.
+- **Wire out (read):** queue waits, GC pauses, worker busy share, p95 from the application's metrics.
+- **Wire in (write):** worker and pool sizes through the application's admin endpoint, environment or config reload; JVM flags at restart only.
+- **Restore:** the settings recorded; restored (a restart-bound setting is left native).
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 353 | worker count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 75% full; reads the last 10 decisions |
 | 354 | thread pool | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -13125,7 +13598,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the search engine's settings API: OpenSearch/Elasticsearch cluster and index settings, the vector database's config.
+- **Wire out (read):** indexing and search latency, queue rejections, merge pressure (the engine's stats API).
+- **Wire in (write):** index refresh interval, merge throttling, shard counts and search thread pools through the settings API.
+- **Restore:** settings recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 321 | index workers | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 75% full; reads the last 20 decisions |
 | 322 | index refresh rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
@@ -13148,7 +13629,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the mesh's own policies: Istio DestinationRule and VirtualService, Linkerd ServiceProfile, Envoy filters.
+- **Wire out (read):** request rate, error rate, p95 and outlier ejections from the mesh's telemetry.
+- **Wire in (write):** connection pool, outlier detection, retry budget and traffic weights by kubectl patch of the policy objects.
+- **Restore:** the policy objects recorded; restored.
+- **Run live?** modelled; the API path is kubectl patch.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 241 | circuit breaker | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
 | 242 | retry budget | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
@@ -13171,7 +13660,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `ran` (a radio access network cell or site), reached through the RAN controller (O-RAN interfaces). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the RAN's near-real-time RIC and O-RAN interfaces (E2, O1).
+- **Wire out (read):** PRB use, connected UEs, cell load, handover rates (the RIC's KPIs).
+- **Wire in (write):** scheduler weights, slice budgets and traffic steering through the RIC's xApps; transmit power within the licence.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0009 | ran connection admission | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
 | AUDIT-0010 | ran ue handover | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
@@ -13190,7 +13687,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `workflow` (a workflow or pipeline engine), reached through the workflow engine's concurrency settings. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the workflow engine (Temporal, Airflow, Camunda) and the fulfilment system's dispatch rules.
+- **Wire out (read):** task queue depth, worker utilisation, SLA misses (the engine's metrics).
+- **Wire in (write):** worker rates, concurrency and retry policies through the engine's API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 417 | workflow admission | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
 | 418 | workflow worker rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -13212,7 +13717,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `clinical` (clinical systems: imaging archives, records, interface engines, monitoring gateways), reached through the application's own scaling and admission settings (Kubernetes, the vendor console). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the clinical application's own scaling and admission settings (Kubernetes, the vendor console).
+- **Wire out (read):** queue depths, interface backlog, reconstruction wait (the application's metrics).
+- **Wire in (write):** replicas, concurrency and rate limits through the Kubernetes API or the vendor console.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2014 | pacs archive tier target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 2015 | dicom router concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
@@ -13231,7 +13744,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `port` (a container terminal's cranes and vehicles taking moves), reached through the terminal operating system and fleet controllers. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the terminal operating system and the equipment fleet controllers.
+- **Wire out (read):** moves waiting, cranes active, gate queue, equipment charge (the TOS).
+- **Wire in (write):** crane and vehicle allocation, gate rate and charging windows through the TOS.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2080 | quay crane allocation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
 | 2081 | yard crane fleet size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
@@ -13250,7 +13771,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `process` (an industrial process loop), reached through the PLC or DCS (OPC UA, EtherNet/IP, PROFINET). Omni-Compass reads how far the process sits from its band. Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the CDN's configuration API and the edge cache's settings.
+- **Wire out (read):** hit ratio, origin load, TTLs (the CDN's metrics).
+- **Wire in (write):** cache TTLs, origin-shield concurrency and prefetch through the CDN API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5039 | cdn cache ttl | setpoint | left native: native already holds it inside its band (nothing to win) | Distribution; stack; tower | global |
 | V5-5040 | edge cache size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
@@ -13263,7 +13792,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the trading platform's gateway, matching engine and risk settings, the colocation BMS.
+- **Wire out (read):** order latency, session counts, risk-check backlog, market-data fanout (the platform's metrics).
+- **Wire in (write):** thread and session pools, conflation intervals and batch sizes through the platform's configuration; risk checks never relaxed.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5058 | matching engine threads | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5059 | order gateway sessions | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -13284,7 +13821,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `network` (network routing and switching), reached through the network controller (SDN, routing API). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the platform's own recovery and security controls: rollout and rollback, PodDisruptionBudgets, the security hold, a kill switch.
+- **Wire out (read):** error rate, rollout status, the security hold (a ConfigMap key), the kill file.
+- **Wire in (write):** rollout pause and undo by kubectl; the security hold read, never written; the kill switch (tools/omni_switch.py) is a human's.
+- **Restore:** every write recorded and undone on the lease.
+- **Run live?** live in part: the security hold and kill switch run in every Kubernetes benchmark (omnicompass/master.py).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5118 | ids capture threads | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
 | V5-5119 | ids ring buffer size | setpoint | left native: native already holds it inside its band (nothing to win) | Distribution; stack; tower | global |

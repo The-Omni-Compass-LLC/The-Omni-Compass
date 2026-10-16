@@ -24,9 +24,9 @@ The rule, the same for every table (every judged gauge counts; "shown, not judge
                       speed alone) and the side that pays is named. The operator who wants the gain and can pay the
                       cost wires in; every other operator watches
 
-Nothing is typed in: every verdict is computed from the test's own result file. Modelled muscles (the 945 on their
-plants) take their verdict from the realms' label by rule (GAIN within the guardrails: write; a trade, GAIN AND LOSS or
-GAIN with power given: operator's choice; EVEN, LOSS and any other label: watch).
+Nothing is typed in: every verdict is computed from the test's own result file. Modelled muscles (the 1,107 on their
+plants, results/realms_v5) take their verdict from the realms' label by rule (a GAIN on work, speed or misses: write, the
+energy the max took for it power given, never a trade; SAME AS NATIVE and AT ITS LIMIT ON NATIVE: watch).
 
 Every word is decided by what the gauge is for, never by the sign of its number (tools/readings.py, the key): time waited,
 missed or failed aims lower; work done aims higher; a resource spent or held (energy, machines, memory, connections,
@@ -554,13 +554,30 @@ def sim_why(f, name, j, v):
     return s.strip()
 
 
-# ------------------------------------------------------------------------------------- the 945 modelled muscles
+# ------------------------------------------------------------------------------------- the 1,107 modelled muscles
 LABEL_VERDICT = {"SUPERIOR WITHIN GUARDRAILS": WRITE, "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF": CHOICE,
                  "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF": CHOICE, "NONINFERIOR / INCONCLUSIVE": WATCH, "NOT ESTABLISHED": WATCH,
                  "AWAY FROM ITS AIM": WATCH, "INVALID": "invalid"}
 REALM_NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
                "energy_facility_industrial": "Energy / Facility / Industrial", "distribution_specialized": "Distribution / Specialized",
-               "tower": "The whole tower, every muscle once"}
+               "stack": "The four stacked, every duplicate kept", "tower": "The whole tower, every muscle once"}
+V5_DIR = ROOT / "results" / "realms_v5"
+V5_LOADS = ("normal", "line")                    # every muscle alone runs its own load and work waiting in line
+V5_ORGANISM_LOADS = ("normal", "climb", "line")
+AT_LIMIT, SAME = "AT ITS LIMIT ON NATIVE", "SAME AS NATIVE"
+
+
+def v5_verdict(label):
+    """The v5 label's verdict by rule (the founder's orders of 13 October): a GAIN on work, speed or misses, alone or together,
+    on every load the muscle ran, is write, and the energy the max took for it is power given, shown beside it, never a
+    trade; SAME AS NATIVE is watch (nothing moved beyond the noise); AT ITS LIMIT ON NATIVE is watch by design (the knob
+    already runs at the top of its range on native, read and left native)."""
+    lab = (label or "").upper()
+    if lab == "INVALID":
+        return "invalid"
+    if "MORE WORK" in lab or "FASTER" in lab or "FEWER MISSES" in lab:
+        return WRITE
+    return WATCH
 
 
 def ffl(x):
@@ -571,60 +588,60 @@ def ffl(x):
 
 
 def muscles():
-    rows = list(csv.DictReader((ROOT / "results" / "realms" / "MUSCLES.csv").open()))
-    out = []
+    """One row per muscle of the 1,107 (results/realms_v5/MUSCLES_V5.csv, engine omni-v5 at the max): its label over every load it
+    ran (label_all_loads), the verdict by rule (v5_verdict), and the figures of each load in words."""
+    rows = list(csv.DictReader((V5_DIR / "MUSCLES_V5.csv").open()))
+    by = collections.OrderedDict()
     for r in rows:
-        label = r["label"]
-        v = LABEL_VERDICT.get(label, WATCH)                          # any other label: watch
-        p, lo, hi = ffl(r["primary"]), ffl(r["primary_lo"]), ffl(r["primary_hi"])
-        w = ffl(r["writes_per_run"]) or 0.0
-        work, viol, viol_hi = ffl(r["work"]), ffl(r["viol_pp"]), ffl(r["viol_pp_hi"])
-        fc_label, fc_p = r.get("fixed_calm_label", ""), ffl(r.get("fixed_calm_primary"))
-        pct = lambda x: f"{100 * x:+.1f}%" if x is not None else ""
-        if label == "NONINFERIOR / INCONCLUSIVE":
-            if w == 0:
-                why = ("wrote nothing in any run: the native controller held the reading inside the band, the law never left its cushion and "
-                       "had nothing to push; nothing to earn, nothing lost")
-            else:
-                why = (f"wrote {w:.0f} times a run with no measurable change in work per energy ({pct(p)}, {pct(lo)} to {pct(hi)}): the interval "
-                       f"includes zero, so nothing is claimed either way")
-        elif label == "SUPERIOR WITHIN GUARDRAILS":
-            why = f"work per energy {pct(p)} ({pct(lo)} to {pct(hi)}), work {pct(work)}, violations {viol:+.2f} pp, guardrails held"
-            if r["knob"] == "setpoint" and fc_p is not None:
-                if fc_label == "SUPERIOR WITHIN GUARDRAILS":
-                    why += (f"; a fixed setpoint at the band's calm end gave {pct(fc_p)} within the same guardrails: the gain is the band's, and an "
-                            f"operator may fix the setpoint instead of wiring in")
-                elif fc_label:
-                    why += (f"; a fixed setpoint at the calm end gave {pct(fc_p)} but broke the service guardrail ({labelled(fc_label)}): the moving "
-                            f"hand is what keeps the service")
-        elif label == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF":
-            why = (f"work per energy {pct(p)} ({pct(lo)} to {pct(hi)}) but a service guardrail broke: work {pct(work)}, violations "
-                   f"{viol:+.2f} pp (upper {viol_hi:+.2f}); energy saved at the service's expense: the operator's to take or leave")
-        elif label == "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF":
-            why = (f"violations {viol:+.2f} pp (proven cut, a GAIN) at work per energy {pct(p)} ({pct(lo)} to {pct(hi)}): energy given for service "
-                   f"(a battery's round trip, a plant held nearer its line); the operator's to take or leave")
-        elif label == "NOT ESTABLISHED":
-            why = (f"the interval is too wide to read ({pct(lo)} to {pct(hi)}) and a guardrail did not hold (work {pct(work)}): nothing is "
-                   f"established, the knob stays native")
+        by.setdefault(r["muscle_id"], collections.OrderedDict())[r["load"]] = r
+    out = []
+    for mid, loads in by.items():
+        r = loads.get("normal") or next(iter(loads.values()))
+        label = r["label_all_loads"]
+        w = max((ffl(x["writes_per_run"]) or 0.0) for x in loads.values())
+        parts = []
+        for ld in V5_LOADS:
+            x = loads.get(ld)
+            if not x:
+                continue
+            bits = [labelled(x["label"])]
+            if x["label"] not in (AT_LIMIT, SAME):
+                viol, work, pg = ffl(x["viol_pp"]), ffl(x["work"]), ffl(x["power_given"])
+                if viol is not None:
+                    bits.append(f"misses {viol:+.2f} pp")
+                if work is not None:
+                    bits.append(f"work {100 * work:+.2f}%")
+                if pg:
+                    bits.append(f"power given {100 * pg:+.2f}%")
+            parts.append(f"{ld}: " + ", ".join(bits))
+        if label == AT_LIMIT:
+            why = ("at its limit on native: the knob already runs at the top of its range on native (everything admitted, the full clock, the "
+                   "full battery power), so there is nothing to push; read and left native. " + "; ".join(parts))
+        elif label == SAME:
+            why = ((f"wrote {w:.0f} times a run with no measurable change in work, speed or misses: the same as native. " if w else
+                    "wrote nothing in any run: native held the reading and the law had nothing to push. ") + "; ".join(parts))
         else:
-            why = labelled(label)
+            why = "; ".join(parts) + (f"; wrote {w:.0f} times a run" if w else "")
         out.append({"kind": "modelled muscle", "domain": f"{REALM_NAMES.get(r['realm'], r['realm'])}: {r['family']}", "knob": r["knob"],
-                    "case": r["muscle"], "counted": True, "judged": None, "verdict": v, "resource_pct": None, "service_pct": None,
-                    "why": why, "source": "results/realms/MUSCLES.csv", "runs": [], "muscle": r, "label": label, "writes": w})
+                    "case": r["muscle"], "counted": True, "judged": None, "verdict": v5_verdict(label), "resource_pct": None, "service_pct": None,
+                    "why": why, "source": "results/realms_v5/MUSCLES_V5.csv", "runs": [], "muscle": r, "label": label, "writes": w, "loads": loads})
     return out
 
 
 def organisms_modelled():
-    d = json.loads((ROOT / "results" / "realms" / "REALMS.json").read_text())
+    """The six organisms under the normal, climb and line loads (results/realms_v5/REALMS_V5.json): the whole, every muscle written at
+    once by one brain; misses in percentage points, work, and the energy the max took as power given."""
+    d = json.loads((V5_DIR / "REALMS_V5.json").read_text())
     out = []
-    for name, o in d["organisms"].items():
-        p = o["summary"]["primary"]
-        out.append({"kind": "modelled organism", "domain": REALM_NAMES.get(name, name), "knob": "every muscle of the organism, one governor",
-                    "case": f"{o['n']} muscles", "counted": True, "judged": None, "verdict": LABEL_VERDICT.get(o["label"], WATCH), "resource_pct": None,
-                    "service_pct": None, "why": f"{labelled(o['label'])}: work per energy {100 * p[0]:+.1f}% ({100 * p[1]:+.1f} to {100 * p[2]:+.1f}), "
-                    f"work {100 * o['summary']['work'][0]:+.1f}%, energy {100 * o['summary']['energy'][0]:+.1f}%, violations "
-                    f"{o['summary']['viol_pp'][0]:+.3f} pp; valid: {'yes' if o['valid'] else 'no'}",
-                    "source": "results/realms/REALMS.md", "runs": [], "label": o["label"]})
+    for load in V5_ORGANISM_LOADS:
+        for name, o in d["organisms"].get(load, {}).items():
+            sm = o["summary"]
+            viol, work, pg = sm["viol_pp"], sm["work"], sm["energy"]
+            out.append({"kind": "modelled organism", "domain": f"{REALM_NAMES.get(name, name)}, the {load} load", "knob": "every muscle of the organism, one brain",
+                        "case": f"{o['n']} muscles", "counted": True, "judged": None, "verdict": v5_verdict(o["label"]), "resource_pct": None,
+                        "service_pct": None, "why": f"{labelled(o['label'])}: misses {viol[0]:+.3f} pp ({viol[1]:+.3f} to {viol[2]:+.3f}), "
+                        f"work {100 * work[0]:+.3f}%, power given {100 * pg[0]:+.3f}%; valid: {'yes' if o['valid'] else 'no'}",
+                        "source": "results/realms_v5/REALMS_V5.md", "runs": [], "label": o["label"], "load": load})
     return out
 
 
@@ -711,7 +728,7 @@ def main(check=False):
          "native, the muscle lives by itself; we only wire out of it.", "",
          "Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and "
          "`verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` "
-         f"({len(all_cases)} rows, the 945 modelled muscles included one by one).", "",
+         f"({len(all_cases)} rows, the 1,107 modelled muscles included one by one, and the six organisms under three loads).", "",
          "## The rule", "",
          "Every judged gauge of a table counts (rows marked \"shown, not judged\" never do). Every reading is **GAIN**, **EVEN** or "
          "**LOSS**, decided by what the gauge is for and never by the sign of its number (the key: `docs/HOW_TO_READ_THE_RESULTS.md`): "
@@ -727,20 +744,22 @@ def main(check=False):
          "Both readings of the Omni index are shown where the test is in it (the resource reading, the preregistered headline, and "
          "the service reading, work and speed alone), and the side that pays is named. The operator who wants the gain and can pay "
          "the price wires in; every other operator watches.", "",
-         "A modelled muscle (the 945 on their plants, `results/realms/MUSCLES.csv`) takes its verdict from its label by rule: GAIN within "
-         "the guardrails is write; GAIN AND LOSS (energy cut, service traded for it) and GAIN with power given (service GAIN, "
-         "energy given for it) are operator's choice; EVEN (inside the noise, or not established), LOSS and any other label are watch.", "",
+         "A modelled muscle (the 1,107 on their plants under its own load and work waiting in line, `results/realms_v5/MUSCLES_V5.csv`, "
+         "engine omni-v5 at the max, the law omni-v6 carries unchanged) takes its verdict from its label by rule: a GAIN on work, speed or misses "
+         "(MORE WORK, FASTER, FEWER MISSES, alone or together, on every load it ran) is write, and the energy the max took for it is power given, "
+         "shown beside it and never a trade (the founder's order of 13 October); SAME AS NATIVE is watch, nothing moved beyond the noise; "
+         "AT ITS LIMIT ON NATIVE is watch by design, the knob already at the top of its range on native, read and left native.", "",
          "## The count", "",
          "| Where | Knobs or cases | Write | Operator's choice | Watch |", "|---|---:|---:|---:|---:|",
          f"| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | {rw + rc + rwa} | {rw} | {rc} | {rwa} |",
          f"| Independent simulators, three runs each (robot arms, grids, districts, swarms; evidence class S) | {sw + sc + swa} | {sw} | {sc} | {swa} |",
-         f"| The 945 modelled muscles, alone on their plants (evidence class S) | {mw + mc + mwa} | {mw} | {mc} | {mwa} |",
+         f"| The 1,107 modelled muscles, alone on their plants under two loads (evidence class S) | {mw + mc + mwa} | {mw} | {mc} | {mwa} |",
          f"| The organisms with the real cluster inside (GitHub at 10 and 100 copies; Azure at 1,000) | {ow + oc + owa} | {ow} | {oc} | {owa} |", ""]
     L += ["In words: on the real stacks Omni earns its wire in on " + f"{rw} of {rw + rc + rwa} knob-cases, trades on {rc} and watches on {rwa}. "
-          f"Of the 945 modelled muscles, {mw} earn a wire in, {mc} are trades and {mwa} stay native: "
-          f"{sum(1 for x in mus if x['verdict'] == WATCH and x['writes'] == 0)} of the {mwa} wrote nothing in any run, because the native "
-          f"controller already held the reading inside the band and the law never left its cushion. A knob that never writes costs nothing "
-          f"and earns nothing; it needs no wire in, and the page below says so muscle by muscle.", ""]
+          f"Of the 1,107 modelled muscles, {mw} earn a wire in and {mwa} stay native: "
+          f"{sum(1 for x in mus if x['label'] == AT_LIMIT)} of the {mwa} are at their limit on native (the knob already at the top of its range: "
+          f"nothing to push, read and left native) and {sum(1 for x in mus if x['label'] == SAME)} read the same as native (nothing moved beyond "
+          f"the noise). A knob left native costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.", ""]
 
     # the real stacks
     L += ["## The real stacks (evidence class L: live software, three separate GitHub runs on the frozen engine)", "",
@@ -830,76 +849,71 @@ def main(check=False):
             L += ["**Why the bill is up in the 2023 districts (power given), with the ramping and the energy not served (LOSS).** "
                   + SIM_WHY[f]["2023"][0].upper() + SIM_WHY[f]["2023"][1:] + ".", ""]
 
-    # the 945 muscles
+    # the 1,107 muscles
     by_label = collections.Counter(x["label"] for x in mus)
-    L += ["## The 945 modelled muscles, alone on their plants (evidence class S)", "",
-          "Every muscle's own row, with its verdict and the reason, is in `results/WIRING_VERDICTS.csv`; the labels and intervals are the realms "
-          "table's (`results/realms/REALMS.md`, `results/realms/MUSCLES.csv`; seeds 3000 to 3009, ten paired seeds a muscle).", "",
-          "| Reading (the label by rule, its word first) | Muscles | Verdict |", "|---|---:|---|"]
+    L += ["## The 1,107 modelled muscles, alone on their plants (evidence class S)", "",
+          "Every muscle's own row, with its verdict and the reason, is in `results/WIRING_VERDICTS.csv`; the labels and figures are the v5 "
+          "realms table's (`results/realms_v5/REALMS_V5.md`, `results/realms_v5/MUSCLES_V5.csv`; engine omni-v5 at the max, every muscle its own "
+          "card; seeds 3000 to 3009, ten paired seeds a muscle, under its own load and under work waiting in line). The label is the muscle's over "
+          "every load it ran; the Why column gives each load's own.", "",
+          "| Reading (the label over every load, its word first) | Muscles | Verdict |", "|---|---:|---|"]
     for lab, n in sorted(by_label.items(), key=lambda kv: -kv[1]):
-        L.append(f"| {labelled(lab)} | {n} | **{LABEL_VERDICT[lab]}** |")
-    L += ["", "### By knob", "", "| Knob | Muscles | Write | Operator's choice | Watch | Of the watch, wrote nothing in any run |", "|---|---:|---:|---:|---:|---:|"]
+        L.append(f"| {labelled(lab)} | {n} | **{v5_verdict(lab)}** |")
+    L += ["", "### By knob", "", "| Knob | Muscles | Write | Watch: at its limit on native | Watch: the same as native | Of the watch, wrote nothing in any run |", "|---|---:|---:|---:|---:|---:|"]
     for knob in ("capacity", "setpoint", "power", "admission"):
         ms = [x for x in mus if x["knob"] == knob]
         c = collections.Counter(x["verdict"] for x in ms)
+        lim = sum(1 for x in ms if x["label"] == AT_LIMIT); same = sum(1 for x in ms if x["label"] == SAME)
         z = sum(1 for x in ms if x["verdict"] == WATCH and x["writes"] == 0)
-        L.append(f"| {knob} | {len(ms)} | {c[WRITE]} | {c[CHOICE]} | {c[WATCH]} | {z} |")
-    L += ["", "### By family", "", "| Realm: family | Muscles | Write | Operator's choice | Watch | Wrote nothing |", "|---|---:|---:|---:|---:|---:|"]
+        L.append(f"| {knob} | {len(ms)} | {c[WRITE]} | {lim} | {same} | {z} |")
+    L += ["", "### By family", "", "| Realm: family | Muscles | Write | Watch: at its limit on native | Watch: the same as native |", "|---|---:|---:|---:|---:|"]
     fams = collections.OrderedDict()
     for x in mus:
         fams.setdefault(x["domain"], []).append(x)
     for fam, ms in fams.items():
         c = collections.Counter(x["verdict"] for x in ms)
-        z = sum(1 for x in ms if x["verdict"] == WATCH and x["writes"] == 0)
-        L.append(f"| {fam} | {len(ms)} | {c[WRITE]} | {c[CHOICE]} | {c[WATCH]} | {z} |")
-    zero = [x for x in mus if x["verdict"] == WATCH and x["writes"] == 0]
-    wrote = [x for x in mus if x["verdict"] == WATCH and x["writes"] > 0]
-    adm = [x for x in mus if x["knob"] == "admission"]
-    setp_sup = [x for x in mus if x["knob"] == "setpoint" and x["label"] == "SUPERIOR WITHIN GUARDRAILS"]
-    fc_sup = sum(1 for x in setp_sup if x["muscle"].get("fixed_calm_label") == "SUPERIOR WITHIN GUARDRAILS")
-    fc_trade = sum(1 for x in setp_sup if x["muscle"].get("fixed_calm_label") == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF")
+        lim = sum(1 for x in ms if x["label"] == AT_LIMIT); same = sum(1 for x in ms if x["label"] == SAME)
+        L.append(f"| {fam} | {len(ms)} | {c[WRITE]} | {lim} | {same} |")
+    limit = [x for x in mus if x["label"] == AT_LIMIT]
+    same_as = [x for x in mus if x["label"] == SAME]
+    same_wrote = [x for x in same_as if x["writes"] > 0]
+    kc = collections.Counter(x["knob"] for x in limit)
     L += ["", "### Why the watch muscles are watch", "",
-          f"- **{len(zero)} muscles wrote nothing in any run.** Their plants' native controllers held the reading inside the compass's band for the "
-          f"whole hour on every seed, so the law never left its cushion and had nothing to push. On these muscles Omni on top is native, EVEN: "
-          f"nothing earned, nothing given, and no wire in is needed. They are {collections.Counter(x['knob'] for x in zero)['capacity']} capacity knobs, "
-          f"{collections.Counter(x['knob'] for x in zero)['admission']} admission knobs, {collections.Counter(x['knob'] for x in zero)['power']} power "
-          f"knobs and {collections.Counter(x['knob'] for x in zero)['setpoint']} setpoint knobs, "
-          f"{collections.Counter(x['muscle']['template'] for x in zero)['compute_pool']} of them on the compute plant, whose native autoscaler and "
-          f"fixed admission limit already serve the modelled demand inside its line.",
-          f"- **All {len(adm)} admission muscles are watch**, and all wrote nothing: the admission knob is native while change is permitted, and "
-          f"limits what is let in only while it is not (a power or heat stress; `docs/REALMS_PREREGISTRATION.md`). No run reached that state, "
-          f"so the knob was never touched. This is the knob's design, not a failure: admission is a brake for an emergency the hour did not hold.",
-          f"- **{len(wrote)} muscles wrote and read EVEN**: their work per energy moved by at most "
-          f"{100 * max(ffl(x['muscle']['primary']) or 0 for x in wrote):+.1f}% with an interval across zero. They are process loops, inverters, "
-          f"chambers, mills and zones where the law moved the knob inside its band and the plant's output did not measurably follow. Watch, by rule.",
-          f"- **One muscle is EVEN, not established** (Elevators & Vertical Transport, `hoist_speed_target`): the interval is too wide to read and the "
-          f"work guardrail did not hold. Watch, until a longer run decides it.", "",
-          "### The trades, muscle by muscle", "",
-          "| Muscle | Family | Knob | Reading | Work per energy | Work | Violations (pp) | Verdict |", "|---|---|---|---|---:|---:|---:|---|"]
+          f"- **{len(limit)} muscles are at their limit on native.** Native already runs the knob at the top of its range: every admission knob "
+          f"lets everything in while change is permitted ({kc['admission']} admission knobs), a power knob runs the full clock or the full battery "
+          f"power ({kc['power']} power knobs), and {kc['capacity'] + kc['setpoint']} capacity and setpoint knobs sit where native's own controller "
+          "already has what the plant needs. There is nothing for the max to push; the knob is read and left native, EVEN by design, and no wire in "
+          "is needed.",
+          f"- **{len(same_as)} muscles read the same as native**: {len(same_wrote)} of them wrote and nothing moved beyond the noise on work, speed "
+          f"or misses, {len(same_as) - len(same_wrote)} wrote nothing because native held the reading and the law had nothing to push. Watch, by rule; "
+          "these are the room the next engine looks for a gain in, in the toy gate first.", "",
+          "### Power given, muscle by muscle", "",
+          "The max buys work and speed; the energy it takes is **power given**, shown beside what it bought and never a trade or a loss (the "
+          "founder's order of 13 October). The write muscles whose power given on their own load is the largest:", "",
+          "| Muscle | Family | Knob | Reading | Misses (pp) | Work | Power given |", "|---|---|---|---|---:|---:|---:|"]
+    given = []
     for x in mus:
-        if x["verdict"] == CHOICE or x["label"] == "NOT ESTABLISHED":
-            m = x["muscle"]
-            L.append(f"| `{m['muscle']}` | {m['family']} | {m['knob']} | {labelled(m['label'])} | {100 * ffl(m['primary']):+.2f}% ({100 * ffl(m['primary_lo']):+.2f} to "
-                     f"{100 * ffl(m['primary_hi']):+.2f}) | {100 * ffl(m['work']):+.2f}% | {ffl(m['viol_pp']):+.2f} | **{x['verdict']}** |")
-    L += ["", "The nine energy-for-service trades (GAIN AND LOSS) are the CPU's minimum clock (`cpufreq_min`), four spacecraft power knobs and four "
-          "district heating setpoints: energy cut at a measurable LOSS in work or in time in violation. The four service-for-energy trades (GAIN, "
-          "power given) are three microgrid reserves and a facility's PUE target: time in violation proven cut, a GAIN, for a little energy given. "
-          "Each is the operator's to take or leave; none is wired in by default.", "",
-          "### The setpoint muscles, and what the band alone gives", "",
-          f"Of the {len(setp_sup)} setpoint muscles that read GAIN within the guardrails, a fixed setpoint at the band's calm end (the `fixed_calm` arm, the native "
-          f"controller with the setpoint fixed, no governor) gave as much or more work per energy on every one. On {fc_sup} of them the fixed "
-          f"setpoint also held the service guardrails, so the gain is the band's and an operator may simply fix the setpoint; on {fc_trade} the fixed "
-          f"setpoint broke the service guardrail (GAIN AND LOSS: energy cut, service traded for it), and there the governor's moving hand is what keeps the "
-          f"service while the energy is saved. The CSV says which is which, muscle by muscle.", ""]
+        if x["verdict"] != WRITE:
+            continue
+        r = x["loads"].get("normal") or x["muscle"]
+        pg = ffl(r["power_given"])
+        if pg:
+            given.append((pg, x, r))
+    for pg, x, r in sorted(given, key=lambda t: -t[0])[:20]:
+        L.append(f"| `{r['muscle']}` | {r['family']} | {r['knob']} | {labelled(r['label'])} | {ffl(r['viol_pp']):+.2f} | {100 * (ffl(r['work']) or 0):+.2f}% | {100 * pg:+.2f}% |")
+    writes_total = sum(1 for x in mus if x["verdict"] == WRITE)
+    L += ["", f"Of the {writes_total} write muscles, {len(given)} took power for their gain on their own load and {writes_total - len(given)} took none "
+          "(the gain came from timing, not from more energy). Every muscle's figure, on both loads, is in the CSV.", ""]
 
     # the organisms
-    L += ["## The organisms", "", "### The five modelled organisms (every muscle written at once, one governor)", "",
-          "| Organism | Muscles | Reading | Verdict | Figures |", "|---|---:|---|---|---|"]
+    L += ["## The organisms", "", "### The six modelled organisms under three loads (every muscle written at once, one brain)", "",
+          "| Organism and load | Muscles | Reading | Verdict | Figures |", "|---|---:|---|---|---|"]
     for x in org_m:
         L.append(f"| {x['domain']} | {x['case']} | {labelled(x['label'])} | **{x['verdict']}** | {esc(x['why'])} |")
     L += ["", "An organism's label is the whole's: every muscle written at once. The wiring an operator takes from this page is finer: the "
-          "write muscles wired in, the trades chosen, the watch muscles left native with one wire out. The organism result says the whole, "
-          "written at once, read no LOSS and some small GAIN; this page says which parts carried it.", "",
+          "write muscles wired in, the watch muscles left native with one wire out. The organism result says the whole, "
+          "written at once, read GAIN (fewer misses, and under the climb more work) in every organism under every load, the power given "
+          "shown beside it; this page says which parts carried it.", "",
           "### The organisms with the real cluster inside", "",
           f"The knob is the cluster's ({K8S_KNOB}), under the organism's own demand, with the modelled muscles around it. The cluster's gauges "
           "decide the verdict; the organism's modelled work and energy are shown beside them and are judged muscle by muscle above.", "",
@@ -958,8 +972,8 @@ def main(check=False):
           "| Power grids: the tap; buildings: the batteries | one knob each | the compass law alone, no trial; the trades on four exporting grids and "
           "seven 2023 districts are read from the tables above as the operator's choice | the law's own push and pull | Omni v3 (a trial there is "
           "the next engine) |",
-          "| The 945 modelled muscles | each muscle's knob | one directive from the organism's governor, no trial per muscle; 746 never wrote, 13 are "
-          "trades | the law's own push and pull | Omni v3 (the verdict per muscle is Omni v4, `docs/OMNI_V4_PLAN.md`, not built) |",
+          "| The 1,107 modelled muscles | each muscle's knob | the max on every muscle, every muscle its own card; the knobs native already runs at the "
+          "top of their range read and left native | the law's own push and pull | Omni v5 at the max (the law omni-v6 carries), `docs/OMNI_V5.md` |",
           "| The machine itself: the Linux kernel's frequency ceiling (`docs/CPU_POWER_PREREGISTRATION.md`) | one knob | `tools/knob_verdict.py` "
           "around the engine's verdict: every notch down tried on the machine first, under the index's reading for one machine (energy x "
           "latency / work) or energy per request inside the line | give back only (the ceiling cannot go above the top; the top always free) | "
