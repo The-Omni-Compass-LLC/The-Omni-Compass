@@ -53,9 +53,10 @@ from omnicompass import master
 from omnicompass.adapter import Governor, mode_law, OBSERVE
 from omnicompass.shield import enforce, ShieldLimits
 from omni_controller.muscles import Muscles, add_args as add_muscle_args
-from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling
+from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling, one_host
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
+RELEASE_PERIOD_S = 60.0   # the pool gives back at most one machine a minute (v7: a rate in time, not in decisions)
 COMPASS_UP, COMPASS_DOWN, COMPASS_RELEASE = 0.10, 0.02, -0.2   # the compass's gains, the same on every muscle (realms/compass_arm.py)
 DEMAND_RISE = 0.05     # the demand moves: more than 5% between its least and its most over one HPA window
 RANGE_ANN = "omnicompass.io/original-replica-range"
@@ -220,11 +221,26 @@ def worker(n):
 UNBOUNDED = sys.maxsize   # no top but what the system itself refuses (the founder's rule of 13 October: from 1 up, unbounded)
 
 
-def one_host(nodes) -> bool:
-    """Nodes that are containers on one machine (kind: providerID kind://...): each reports the whole host's CPU as its
-    own, so the cluster's real CPU is one host's, not the sum (the replica room on kind, results/live/REPLICA_ROOM.md:
-    the cap raised to 30 served no more requests and ran 78% more pods)."""
-    return bool(nodes) and all(str((n.get("spec") or {}).get("providerID", "")).startswith("kind://") for n in nodes)
+def apply_give_back_only(a):
+    """The cloud's rule in one word (v7, --give-back-only; the founder's order of 14 October, night): the governor moves
+    the machines alone. No autoscaler moved (no service sensed), no processor conveyed, no power or clock capped, no pod
+    resized, started or held, no replica cap raised, the tune-down dial; machines are given back only after their own
+    trial and woken on a breach, so the pods are exactly native's and the bill can only fall or stay. It is enforced here,
+    in the governor, whatever else the command line says."""
+    if not getattr(a, "give_back_only", False):
+        return
+    a.sensed = "none/none"
+    for k in ("cap_deployments", "rightsize_deployments", "coldstart_deployments", "power_cmd", "rapl_cmd", "cpufreq_cmd",
+              "gpu_power_cmd", "cooling_cmd", "contain_namespaces"):
+        if hasattr(a, k):
+            setattr(a, k, "")
+    for k in ("batch", "batch_pace", "strict_replicas", "pod_reflex_writes"):
+        if hasattr(a, k):
+            setattr(a, k, False)
+    a.replica_ceiling = 0
+    a.dial = "save"
+    if getattr(a, "mode", "observe") == "target":
+        a.mode = "nodepool"
 
 
 def autoscaler_room(k):
@@ -291,6 +307,24 @@ def cpu_target(h):
 class Controller:
     def __init__(self, a, kube: Kube | None = None):
         self.a = a
+        apply_give_back_only(a)
+        # v7: every rule of the governor counts in seconds; its count of decisions follows from the decision period, so
+        # the period can change without changing any rule's time (at --interval 60 every count is the one v6 used)
+        # --interval 0 is a model's or a test's loop that does not sleep: each call is one decision of the shipped minute
+        period = float(a.interval) if float(a.interval) > 0 else 60.0
+        per = lambda sec: max(1, int(round(float(sec) / period)))
+        pick = lambda n, sec: int(n) if n is not None else per(sec)
+        self.n_slo_clear = pick(getattr(a, "slo_clear", None), getattr(a, "slo_clear_s", 180.0))
+        self.n_cruise_after = pick(getattr(a, "cruise_after", None), getattr(a, "cruise_after_s", 120.0)) \
+            if getattr(a, "cruise_after", None) != 0 else 0
+        self.n_strict_window = pick(getattr(a, "strict_window", None), getattr(a, "strict_window_s", 300.0))
+        self.n_verdict_every = pick(getattr(a, "verdict_every", None), getattr(a, "verdict_every_s", 600.0))
+        self.n_verdict_recheck = pick(getattr(a, "verdict_recheck", None), getattr(a, "verdict_recheck_s", 7200.0))
+        self.n_verdict_trial = per(getattr(a, "verdict_trial_s", 1200.0))
+        self.step_scale = period / 60.0                # the compass's gains are per minute: a decision moves its share of one
+        self.n_release = per(RELEASE_PERIOD_S)         # decisions between two machines given back (at most one a minute)
+        self.decisions = 0                             # decisions taken, the governor's own clock for the rules above
+        self.last_release = None                       # the decision at which the pool last gave a machine back
         self.log = open(a.audit, "a") if a.audit else None
         self.k = kube or Kube(a.kubectl, a.dry_run, self.audit, proxy=not getattr(a, "no_api_proxy", False))
         self.k.audit = self.audit
@@ -348,8 +382,8 @@ class Controller:
             self.edge_base = center
             from omnicompass.verdict import Verdict
             self.verdict = Verdict(tolerance=getattr(a, "allow", 0.02), min_samples=getattr(a, "verdict_samples", 200),
-                                   probe_every=getattr(a, "verdict_every", 10), recheck=getattr(a, "verdict_recheck", 120),
-                                   max_trial=20, incremental=True)
+                                   probe_every=self.n_verdict_every, recheck=self.n_verdict_recheck,
+                                   max_trial=self.n_verdict_trial, incremental=True)
         self.n_native = None           # the machines the cluster ran on its own when Omni started (the verdict's step 0)
         self.cruise = False            # cruise (rule 7): work waiting for a place, so every machine in service until the line is empty
         self.cruise_hits = 0; self.cruise_clear = 0
@@ -635,7 +669,7 @@ class Controller:
             if util is None:
                 continue
             rec = max(lo0, min(hi0, int(math.ceil(cur * float(util) / (orig_t * self._gain(h)) - 1e-9))))
-            hh = (hist.get((ns, name), []) + [rec])[-self.a.strict_window:]; hist[(ns, name)] = hh
+            hh = (hist.get((ns, name), []) + [rec])[-self.n_strict_window:]; hist[(ns, name)] = hh
             want = rec if rec >= cur else max(hh)
             want = max(want, min(hi0, self.reflex.get((ns, name), 0)))   # the fast pod reflex's floor stands while held
             if obs.get("security_block", 0.0) > 0.5:
@@ -749,6 +783,7 @@ class Controller:
         return None
 
     def step(self):
+        self.decisions += 1
         self.host_cpu.sample()              # two adjacent controller ticks provide a host CPU busy share
         if self.killed():
             self.restore()
@@ -794,7 +829,7 @@ class Controller:
         # not pack replicas tighter than the workload's own HPA target and may not cap power (no energy at service's cost)
         self.lp_hist.append(lp)
         guarded = bool(getattr(self.a, "latency_file", "")) and getattr(self.a, "slo_ms", 0)
-        n_clear = getattr(self.a, "slo_clear", 3)
+        n_clear = self.n_slo_clear
         obs["slo_clean"] = (not guarded) or (not blind.get("latency", False) and len(self.lp_hist) >= n_clear
                                              and all(x == 0.0 for x in self.lp_hist[-n_clear:]))
         self.g.nodes = self.rec_n; self.g.current_cap = 1.0
@@ -878,11 +913,14 @@ class Controller:
                                  senses_live=not any(blind.values()), last_command_landed=nodes_landed)
         if rec_n < n and not gate["ok"]:
             rec_n = n            # nervous system: the machine organ may not give a machine back now (reason audited)
+        elif rec_n < n and self.last_release is not None and self.decisions - self.last_release < self.n_release:
+            rec_n = n            # at most one machine a minute, however often the governor decides (v7)
         elif rec_n < n:
-            rec_n = n - 1        # one machine per decision: release is the slow, reversible direction
+            rec_n = n - 1        # one machine at a time: release is the slow, reversible direction
+            self.last_release = self.decisions
         # cruise (rule 7): work waiting for a place, decision after decision, so every machine goes in service and stays
         # there, without second-guessing, until the line has been empty for as many decisions
-        ca = int(getattr(self.a, "cruise_after", 2) or 0)
+        ca = self.n_cruise_after
         if ca > 0 and self.a.mode == "nodepool":
             self.cruise_hits = self.cruise_hits + 1 if s["pending"] > 0 else 0
             if not self.cruise and self.cruise_hits >= ca:
@@ -996,7 +1034,7 @@ class Controller:
                             x = hi_t; back = True
                     else:
                         F_ = compass_rec["force"]
-                        x = x - (COMPASS_UP if F_ > 0 else COMPASS_DOWN) * F_ * (hi_t - lo_t)
+                        x = x - (COMPASS_UP if F_ > 0 else COMPASS_DOWN) * F_ * (hi_t - lo_t) * self.step_scale
                     x = max(lo_t, min(hi_t, x)); self.compass_law_x[(ns, name)] = x
                     self._replica_room(h, ns, name, win, obs, s)
                     want = int(round(x))
@@ -1012,7 +1050,7 @@ class Controller:
                     # window, never in one jump; a demand that comes back half way finds the pods still running and is
                     # met at once by the lower target, with no pod started again. More pods (a lower target) is never
                     # limited: the gas is always immediate
-                    want_h = min(want_h, cur + self.a.coast_step)
+                    want_h = min(want_h, cur + max(1, int(round(self.a.coast_step * self.step_scale))))
                 # the autoscaler takes its window to answer a target. A raise inside that window moves the muscle
                 # mid-movement and removes pods it then starts again, so a raise is held for one window. A lower target
                 # (more pods, the safe direction) is never held: on a step up the pods are asked for at once, before the
@@ -1056,9 +1094,12 @@ def parser():
     ap.add_argument("--no-api-proxy", action="store_true", help="read through a new kubectl process every time instead of one kubectl proxy (the controller's own cost is higher)")
     ap.add_argument("--restore-only", action="store_true", help="put every setting back from the records on the objects and exit (the watchdog's way back)")
     ap.add_argument("--node-scale-cmd", default="")
-    ap.add_argument("--cruise-after", type=int, default=int(os.environ.get("CRUISE_AFTER", 2)),
+    ap.add_argument("--cruise-after", type=int, default=int(os.environ["CRUISE_AFTER"]) if os.environ.get("CRUISE_AFTER") else None,
                     help="decisions in a row with work waiting for a place before cruise puts every machine in service "
-                         "(and decisions with the line empty before it ends); 0 turns cruise off")
+                         "(and decisions with the line empty before it ends); 0 turns cruise off; unset: --cruise-after-s")
+    ap.add_argument("--cruise-after-s", type=float, default=120.0,
+                    help="the same in seconds (v7: every rule of the governor counts in seconds, so its decision period can "
+                         "change without changing any rule's time)")
     ap.add_argument("--idle-demand", "--brake-demand", dest="idle_demand", type=float,
                     default=float(os.environ.get("IDLE_DEMAND", os.environ.get("BRAKE_DEMAND", 0.05))),
                     help="the sensed services' demand (in pods' worth of CPU) at or under which the pool idles: the "
@@ -1078,8 +1119,15 @@ def parser():
                          "target and the node pool")
     ap.add_argument("--allow", type=float, default=0.02, help="the most a machine given back may add to the response time")
     ap.add_argument("--verdict-samples", type=int, default=200, help="requests measured before and after a machine is given back on trial")
-    ap.add_argument("--verdict-every", type=int, default=10, help="decisions between trials")
-    ap.add_argument("--verdict-recheck", type=int, default=120, help="decisions before a refused machine is tried again")
+    ap.add_argument("--verdict-every", type=int, default=None, help="decisions between trials (unset: --verdict-every-s)")
+    ap.add_argument("--verdict-every-s", type=float, default=600.0, help="seconds between give-back trials")
+    ap.add_argument("--verdict-recheck", type=int, default=None, help="decisions before a refused machine is tried again (unset: --verdict-recheck-s)")
+    ap.add_argument("--verdict-recheck-s", type=float, default=7200.0, help="seconds before a refused machine is tried again")
+    ap.add_argument("--verdict-trial-s", type=float, default=1200.0, help="seconds a give-back trial's phase may take before it is abandoned")
+    ap.add_argument("--give-back-only", action="store_true",
+                    help="the cloud's rule in one word (v7): the machines alone, given back after their own trial and woken on a "
+                         "breach; no autoscaler moved, no processor conveyed, no power capped, the tune-down; so the bill can "
+                         "only fall or stay")
     ap.add_argument("--compass-tau", type=float, default=60.0, help="seconds the service takes to follow a lever (the compass's damping)")
     ap.add_argument("--compass-center", type=float, default=None,
                     help="where the compass holds the service (0 the bare service time, 1 the SLO); default 0.3 at the max, "
@@ -1099,7 +1147,8 @@ def parser():
     ap.add_argument("--pod-reflex-writes", action="store_true",
                     help="let the pod reflex raise the HPA's replica floor itself (default: it gauges and writes nothing)")
     ap.add_argument("--reflex-window-s", type=float, default=30.0, help="window of probe samples the fast pod reflex reads")
-    ap.add_argument("--strict-window", type=int, default=5, help="decisions a scale-down waits for (highest recent recommendation)")
+    ap.add_argument("--strict-window", type=int, default=None, help="decisions a scale-down waits for (unset: --strict-window-s)")
+    ap.add_argument("--strict-window-s", type=float, default=300.0, help="seconds a scale-down waits for (highest recent recommendation)")
     ap.add_argument("--headroom", type=float, default=0.5, help="spare capacity kept above pod requests (0.5 = 50%%, the default)")
     ap.add_argument("--active-nodes-only", action="store_true",
                     help="count only nodes in service (schedulable, or cordoned but still carrying work) and the pods and usage on them")

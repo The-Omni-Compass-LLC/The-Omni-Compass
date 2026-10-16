@@ -67,7 +67,8 @@ def components(name):
             "h": h_src(A.observe_vector, A.assimilate, A.clamp),
             "G": h_src(A.Governor, A.AllocationLaw, A.mode_law),
             "M_act": hashlib.sha256((h_src(GG.shield_limit, GG.busy_gate, GG.lock_decide, GG.GpuGovernor)
-                                     + hashlib.sha256((ROOT / "omni_controller" / "muscles.py").read_bytes()).hexdigest()).encode()).hexdigest(),
+                                     + hashlib.sha256((ROOT / "omni_controller" / "muscles.py").read_bytes()).hexdigest()
+                                     + hashlib.sha256((ROOT / "omni_controller" / "quota.py").read_bytes()).hexdigest()).encode()).hexdigest(),
             "dt": h_src(C.rk4_step, C._axpy, C.macro_step),
             "A": h_src(SH.ShieldLimits, SH.violations, SH.enforce, GG.shield_limit)}
 

@@ -36,7 +36,9 @@ class MachinesOnly(unittest.TestCase):
         y = (ROOT / ".github" / "workflows" / "aks-metered.yml").read_text()
         self.assertRegex(y, r"OMNI_MACHINES_ONLY: '1'")
         s = (ROOT / "scripts" / "kind_bench.sh").read_text()
-        self.assertIn('if [ "${OMNI_MACHINES_ONLY:-0}" = "1" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; fi', s)
+        self.assertIn('if [ "${OMNI_MACHINES_ONLY:-0}" = "1" ]; then OMNI_SENSED="none/none"; OMNI_POWER_CMD=""; CAP_ARGS=""; '
+                      'GIVE_BACK_ONLY="--give-back-only"; fi', s)
+        self.assertIn('$GIVE_BACK_ONLY', s)                # and the governor enforces it itself (v7: --give-back-only)
         self.assertIn('--sensed "$OMNI_SENSED"', s)
         self.assertIn('${OMNI_POWER_CMD:+--power-cmd "$OMNI_POWER_CMD"}', s)
         # elsewhere nothing changes: the sensed service, the power command and conveyance as before

@@ -144,9 +144,9 @@ the founder overrides one in the conversation.
   setting at 60 and 15 s, conveyance on one kind host set to the v6 KEDA run's own regime, the verdict on noisy work)
   against the engine that stands, on the same seeds, paired, read GAIN, EVEN or LOSS by the gauge's aim. A LOSS there
   is root-caused and fixed in the model, never carried into a real run; a change that reads no LOSS and shows promise
-  goes to its GitHub trials; nothing is dispatched before. The gate's readings are models (class S), recorded in the
-  candidate branch's results/toy_gate folder and never presented as a benchmark result. The toy's regime is set from
-  a real run's own files (the host's busy share, the response time, the replicas), never guessed.
+  goes to its GitHub trials; nothing is dispatched before. The gate's readings are models (class S), recorded in
+  `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
+  (the host's busy share, the response time, the replicas), never guessed.
 
 ## Orders of 16 October
 

@@ -220,7 +220,7 @@ def start_time(busy):
     return 9.5 + 11.6 * (min(busy, 1.0) - 0.75)
 
 
-def worker_convey(arm, seed, out):
+def worker_convey(arm, seed, out, quota="none"):
     """A 4-core host carrying three kind nodes (each reports the host's 4 cores as its own); php-apache (200m request,
     500m limit) under an HPA at 50%, minimum 1, maximum 10, five minutes' scale-down window; load generators stepping
     1 2 3 1 2 1 every 150 s, each two closed-loop clients (a client sends its next request when the last one is answered,
@@ -265,6 +265,8 @@ def worker_convey(arm, seed, out):
                                  "template": {"spec": {"containers": [{"name": "php", "resources": {
                                      "requests": {"cpu": f"{REQ_M}m"}, "limits": {"cpu": f"{LIM_M}m"}}}]}}}}
             if args[:2] == ("get", "resourcequota"):
+                if quota == "unreadable":                            # the governor's role cannot list quotas (every kind test)
+                    raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="resourcequotas is forbidden")
                 return {"items": []}
             raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the toy host")
 
@@ -406,13 +408,16 @@ def render(report_path, out_md):
             return out[-1].split(" (")[0] if out else Path(tree).name
         except (OSError, subprocess.SubprocessError):
             return Path(tree).name
-    base_e, cand_e = engine(r["base"]), engine(r["cand"])
+    base_e = engine(r["base"]) if Path(r["base"]).exists() else r["base"]
+    cand_e = engine(r["cand"]) if Path(r["cand"]).exists() else r["cand"]
     lines = ["# The toy gate: the candidate against the engine that stands, in our own models", "",
              f"Seeds {r['seeds'][0]} to {r['seeds'][-1]}, {r['days']} day each where a day is run; the standing engine "
              f"{base_e}, the candidate {cand_e}. Evidence class S, our own models: a reading here says "
              "whether a change shows promise before a real run, never what a benchmark found. Each candidate reading is paired by seed "
              "with the standing engine's (the mean change, its 95% interval over the seeds, the word by the gauge's aim: "
              "tools/readings.py).", ""]
+    if r.get("note"):
+        lines += [r["note"], ""]
     for toy, t in r["toys"].items():
         period = f" (a decision every {t['period_s']:.0f} s)" if "period_s" in t else ""
         lines += [f"## {toy}{period}", ""]
@@ -422,11 +427,18 @@ def render(report_path, out_md):
             lines.append(""); continue
         lines += ["| Gauge | Native | Standing | Candidate | Candidate against standing | Standing against native | Candidate against native |",
                   "|---|---:|---:|---:|---|---|---|"]
+        cell = lambda d: f"{100 * d['relative']:+.2f}% {d['word']}" if d["relative"] == d["relative"] else d["word"]
         for g, x in t["gauges"].items():
-            cell = lambda d: f"{100 * d['relative']:+.2f}% {d['word']}" if d["relative"] == d["relative"] else d["word"]
             lines.append(f"| {g} | {x['native']:.3f} | {x['base']:.3f} | {x['cand']:.3f} | {cell(x['cand_vs_base'])} | "
                          f"{cell(x['base_vs_native'])} | {cell(x['cand_vs_native'])} |")
         lines += ["", "Counts over all seeds: " + ", ".join(f"{k} {v}" for k, v in t["counts"].items()), ""]
+        first = t.get("candidate_as_first_pushed")
+        if first:                                   # the reading that caught a fault, kept beside the corrected candidate's
+            lines += [f"The candidate as first pushed (digest {first['digest']}), the reading that caught the fault:", "",
+                      "| Gauge | Native | Standing | Candidate as first pushed | Against standing | Against native |", "|---|---:|---:|---:|---|---|"]
+            for g, x in first["gauges"].items():
+                lines.append(f"| {g} | {x['native']:.3f} | {x['base']:.3f} | {x['cand']:.3f} | {cell(x['cand_vs_base'])} | {cell(x['cand_vs_native'])} |")
+            lines.append("")
     lines += ["Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.", ""]
     Path(out_md).write_text("\n".join(stamp(lines)) + "\n")
 
@@ -438,20 +450,21 @@ def main(argv=None):
     ap.add_argument("--cand", help="checkout of the candidate")
     ap.add_argument("--seeds", default="1-8")
     ap.add_argument("--days", type=float, default=1.0)
-    ap.add_argument("--toys", default="cluster,cluster15,convey,verdict")
+    ap.add_argument("--toys", default="cluster,cluster15,convey,convey_unreadable_quota,verdict")
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--out", default="")
     ap.add_argument("--worker", help=argparse.SUPPRESS)
     ap.add_argument("--seed", type=int, help=argparse.SUPPRESS)
     ap.add_argument("--period", type=float, default=60.0, help=argparse.SUPPRESS)
     ap.add_argument("--dir", help=argparse.SUPPRESS)
+    ap.add_argument("--quota", default="none", help=argparse.SUPPRESS)      # the convey toy's quota read: none (readable, empty) or unreadable
     a = ap.parse_args(argv)
     if a.render:
         return render(*a.render)
     if a.worker == "verdict":
         return worker_verdict(a.seed)
     if a.worker in ("convey-native", "convey-omni"):
-        return worker_convey(a.worker.split("-")[1], a.seed, a.dir)
+        return worker_convey(a.worker.split("-")[1], a.seed, a.dir, a.quota)
     if a.worker:
         return worker(a.worker, a.seed, a.days, a.period, a.dir)
     lo_s, _, hi_s = a.seeds.partition("-")
@@ -483,11 +496,16 @@ def main(argv=None):
         extra = {k: {arm: sum(res[arm][s].get(k, 0) for s in seeds) for arm in ("base", "cand")}
                  for k in ("steps_allowed", "steps_refused", "trials_abandoned", "machines_parked", "errors")}
         report["toys"][toy] = {"period_s": period, "gauges": rows, "counts": extra, "per_seed": res}
-    if "convey" in toys:
+    # the convey toy twice: the namespace's quota readable and empty, and unreadable (the governor's role cannot list
+    # quotas on every kind test, and on any stack whose role withholds it; the first v7 trial read that as a zero budget)
+    for toy, quota in (("convey", "none"), ("convey_unreadable_quota", "unreadable")):
+        if toy not in toys:
+            continue
         jobs = [(arm, tree, s) for s in seeds for arm, tree in (("native", cand), ("base", base), ("cand", cand))]
         with ThreadPoolExecutor(a.jobs) as ex:
             got = list(ex.map(lambda j: run(j[1], ["--worker", "convey-native" if j[0] == "native" else "convey-omni",
-                                                    "--seed", str(j[2]), "--dir", str(work / "convey" / f"{j[0]}-{j[2]}")]), jobs))
+                                                    "--seed", str(j[2]), "--quota", quota,
+                                                    "--dir", str(work / toy / f"{j[0]}-{j[2]}")]), jobs))
         res = {}
         for (arm, _, s), r in zip(jobs, got):
             res.setdefault(arm, {})[s] = r
@@ -499,8 +517,8 @@ def main(argv=None):
                        "cand_vs_base": reading(g, [c - b for c, b in zip(cv, bv)], bv, CONVEY_GAUGES),
                        "base_vs_native": reading(g, [b - n for b, n in zip(bv, nv)], nv, CONVEY_GAUGES),
                        "cand_vs_native": reading(g, [c - n for c, n in zip(cv, nv)], nv, CONVEY_GAUGES)}
-        report["toys"]["convey"] = {"gauges": rows, "counts": {k: {arm: sum(res[arm][s][k] for s in seeds) for arm in ("native", "base", "cand")}
-                                                               for k in ("starts", "starts_past_75")}, "per_seed": res}
+        report["toys"][toy] = {"gauges": rows, "counts": {k: {arm: sum(res[arm][s][k] for s in seeds) for arm in ("native", "base", "cand")}
+                                                          for k in ("starts", "starts_past_75")}, "per_seed": res}
     if "verdict" in toys:
         report["toys"]["verdict"] = {"base": run(base, ["--worker", "verdict", "--seed", "300"]),
                                      "cand": run(cand, ["--worker", "verdict", "--seed", "300"])}
