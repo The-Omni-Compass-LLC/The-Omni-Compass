@@ -86,6 +86,22 @@ What it read on v7 against v6, 10 seeds (`results/toy_gate/`):
 | convey, quota unreadable (added 16 October) | the candidate as first pushed (digest 1a0d1d1b91bc49ad): requests served -39% and p95 +113% against v6, LOSS, the host and the limits given identical to native: nothing conveyed, as the live trials found. The corrected candidate (digest d6d467b824c585f1): identical to v6 on every gauge (+64% requests and -53% p95 against native), with the quota readable and empty and with it unreadable alike. |
 | verdict | a step costing 3% more allowed 28% of the time instead of 40%; 5% more, 14% instead of 26%; a free step 60% instead of 63%. |
 
+## The first three-run tables on v7 (16 October)
+
+Twelve runs on real Kubernetes, ten pairs each, every one omni-v7 (`results/live/V7_*.md`), native against Omni-Compass on top.
+No row reads LOSS on the three-run rule.
+
+| Benchmark | What moved, GAIN in all three of our runs | EVEN | Power given |
+|---|---|---|---|
+| Goldilocks and the VPA's recommender | response time −45% to −47% mean, −60% to −62% p95, −67% to −69% p99; time over the line −100% | machines, failed requests, replicas, pods started, pod start wait, alert minutes | parked-worker energy +1.6% to +2.3% |
+| KEDA's HTTP add-on | response time −57% to −58% mean, −71% to −75% p95; alert minutes −93% to −96%; replicas −15% to −19%; pods started −17% to −23% | machines, failed requests, pod start wait | parked-worker energy +2.2% to +2.3% |
+| KEDA on CPU and requests | response time −36% to −38% mean, −52% to −54% p95, −57% to −59% p99; time over the line −98% to −100% | machines, failed requests, replicas, alert minutes | parked-worker energy +1.1% to +1.7% |
+| CruiseKube applying its own recommendations | nothing: no setting written | every gauge | none |
+| Fixed capacity, four CPU caps | nothing: the cap blocks the one lever | completed work and work inside the line at every cap | none |
+
+Single runs clear of the noise that the other two did not repeat, each EVEN on the rule: CruiseKube's 99th percentile +3.1% (run A)
+and node-hours +1.0% (run B); Goldilocks replicas +3.4% (run C); capacity's completed work +3.8% at 1 core (run A).
+
 ## Validation
 
 Six shared-host regressions pass (`tests/test_convey_shared_host.py`: each node keeps its own arithmetic under the top, a busy or unread host holds every raise, a busy host still lowers, a start holds nothing, separate machines are never held, an unreadable quota holds nothing). Nine quota regressions pass (`tests/test_quota_convey.py`, among them: an unreadable quota is no budget known); the original source fails both the full-quota regression and the admission-rejection regression. Existing conveyance integration checks pass unchanged. The verdict's rule tests (`tests/test_verdict_interval.py`, `tests/test_verdict.py`: v6's medians kept under `judge="median"`, a noiseless 1.5% rise refused against a 1% allowance under v7), the time-correct tests (`tests/test_time_correct.py`, `tests/test_cloud_cadence.py`) and the cloud tests (`tests/test_cloud_machines_only.py`) pass, as do every verdict user's tests (Redis, Kafka, pgbench, sysbench, YCSB, CPU power, GPU). Live GitHub trials on the v7 commit (KEDA's add-ons, Goldilocks, CruiseKube, capacity) repeats the original cap 1500m / repetition 4 / 1200-second-per-arm case at the original request rates. Its completion and measured result must be read from its artifact, with any LOSS retained. The trial cannot launch Azure, Google, Amazon or GPUs.

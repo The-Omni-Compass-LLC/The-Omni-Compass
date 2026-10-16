@@ -2,6 +2,20 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-16 (night, last): the first three-run tables on omni-v7
+
+- **Five tables, every run omni-v7** (`results/live/V7_GOLDILOCKS.md`, `V7_KEDA_REQUESTS.md`, `V7_KEDA_CPU_REQUESTS.md`,
+  `V7_CRUISEKUBE.md`, `V7_CAPACITY.md`; runs 38843260818 to 38843289946, built by `tools/confirm_abc.py` and `tools/capacity_abc.py`):
+  no row reads LOSS on the three-run rule. Goldilocks −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three
+  of our runs; KEDA's HTTP add-on −57% to −58% mean, −71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to
+  −19%, pods started −17% to −23%, GAIN in all three; KEDA on CPU and requests −36% to −38% and −52% to −54%, GAIN in all three;
+  CruiseKube and the capacity caps EVEN; machines EVEN in every table; parked-worker energy +1.1% to +2.3%, power given. Single runs
+  clear of the noise that the other two did not repeat, each EVEN on the rule: CruiseKube's 99th percentile +3.1% (run A) and
+  node-hours +1.0% (run B); Goldilocks replicas +3.4% (run C); capacity's completed work +3.8% at 1 core (run A).
+- **The benefit sheet reads the v7 tables** (`tools/benefit_sheet.py`): Goldilocks +18% GAIN, KEDA's HTTP add-on +78% GAIN, KEDA on
+  CPU and requests +45% GAIN, CruiseKube 0% EVEN, each power given beside it; the v6 tables stay in `results/live` as that engine's.
+  The standing block, the wiring verdicts, the state of play, the README and the Owner's evidence table carry them.
+
 ## 2026-10-16 (night, later): Omni v7 stands
 
 - **Omni v7 is the engine that stands** (the founder's order of 16 October: "Where is version 7? That's what you gotta push

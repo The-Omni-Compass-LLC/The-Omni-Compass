@@ -27,15 +27,15 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - Real cache (Redis, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v7): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v7): 4 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
+| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v7 | +18.0% | GAIN, power given | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v7 | +0.0% | EVEN | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +78.3% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +44.8% | GAIN, power given | L |
 | Every real test together: the Omni index | omni-v3 | +5.2% | GAIN, power given | L |
-| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v6 | +54.0% | GAIN, power given | L |
-| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v6 | +0.0% | EVEN | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +105.0% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v6 | +15.0% | GAIN, power given | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
@@ -109,19 +109,28 @@ for the rest, named in its Engine column on `docs/BENEFIT_SHEET.md` and in the s
 land. Results are never read across engines. The standing block at the top of this page is written from the result files by
 `tools/summary.py --fix` and checked on every push; the prose below says the same in words.
 
-**On omni-v7 so far, real Kubernetes (evidence class L), one run of ten pairs each; B and C running** (the raw receipts under
-`results/live/raw/`, the three-run tables when they land):
+**On omni-v7, the engine that stands, real Kubernetes (evidence class L), ten pairs × three runs each**
+(`results/live/V7_*.md`, runs 38843260818 to 38843289946, every one omni-v7; no row reads LOSS on the three-run rule):
 
-- **A service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top** (run 38843260818): response time −45%
-  mean, −60% at the 95th percentile, time over the line −100%, GAIN; failed requests, alert minutes, replicas, pods started and
-  pod start wait EVEN; 17.8 settings commands a run.
-- **KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top** (run 38843268161): response time −57% mean, −71%
-  at the 95th percentile, time over the line −95%, alert minutes −94%, replicas −19%, pods started −20%, all GAIN; 4.4 commands
-  a run.
-- **KEDA on the CPU target and the live requests in flight, Omni-Compass on top** (the same run): response time −38% mean, −52%
-  at the 95th percentile, time over the line −100%, GAIN; replicas, pods started, pod start wait and failed requests EVEN;
-  16.7 commands a run.
-- Fixed capacity A, B and C and CruiseKube A, B and C are running.
+- **A service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top** (`V7_GOLDILOCKS.md`): response time
+  **−45% to −47% mean, −60% to −62% at the 95th percentile, −67% to −69% at the 99th**, time over the response line −100%,
+  GAIN in all three of our runs; machines (node-hours) and failed requests EVEN; replicas, pods started, pod start wait and
+  alert minutes EVEN (each clear of the noise in one run only, and there on the GAIN side except replicas +3.4%, power given);
+  parked-worker energy +1.6% to +2.3%, power given; 14 to 18 settings commands a run. One number: **+18% GAIN, power given**.
+- **KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top** (`V7_KEDA_REQUESTS.md`): response time **−57% to
+  −58% mean, −71% to −75% at the 95th percentile**, time over the line −94% to −95%, alert minutes **−93% to −96%**, HPA
+  replicas **−15% to −19%**, pods started **−17% to −23%**, all GAIN in all three of our runs; machines and failed requests
+  EVEN; parked-worker energy +2.2% to +2.3%, power given; 4 to 5 settings commands a run. One number: **+78% GAIN, power given**.
+- **KEDA on the CPU target and the live requests in flight, Omni-Compass on top** (`V7_KEDA_CPU_REQUESTS.md`): response time
+  **−36% to −38% mean, −52% to −54% at the 95th percentile, −57% to −59% at the 99th**, time over the line −98% to −100%,
+  GAIN in all three of our runs; machines, failed requests, replicas and alert minutes EVEN; parked-worker energy +1.1% to
+  +1.7%, power given; 17 to 20 settings commands a run. One number: **+45% GAIN, power given**.
+- **A service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top** (`V7_CRUISEKUBE.md`): every
+  gauge EVEN; CruiseKube's own rightsizing leaves Omni-Compass nothing to move and it wrote no setting. Run A alone read the
+  99th percentile +3.1% and run B the node-hours +1.0%, each inside the noise in the other two runs. One number: **0%, EVEN**.
+- **Fixed capacity, four CPU caps, Omni-Compass on top at native's cap** (`V7_CAPACITY.md`): completed work and work inside the
+  response line EVEN at every cap (run A alone read +3.8% completed work at 1 core, inside the noise in B and C): the cap is a
+  quota on the service's CPU and blocks the one lever Omni-Compass has there.
 
 **On omni-v6, the engine of 15 October, real Kubernetes (evidence class L), ten pairs × three runs each** (`results/live/V6_*.md`;
 that engine's own record, run again on v7 above):
@@ -195,9 +204,9 @@ being made), and anything on a real card.
 
 ## Open
 
-1. **Every benchmark on omni-v7**: the twelve trial runs of 16 October (Goldilocks, KEDA's add-ons, fixed capacity, CruiseKube;
-   A, B and C) running; the rest released A, then B, then C by the conductor from `scripts/reruns.txt`; each table replaces
-   its older row on the sheet when its three runs land.
+1. **Every benchmark on omni-v7**: 4 of 26 benchmarks have their three-run table on it (Goldilocks, KEDA's two add-on tests,
+   CruiseKube; the fixed-capacity test too, which carries no sheet row); the rest released A, then B, then C by the conductor
+   from `scripts/reruns.txt`; each table replaces its older row on the sheet when its three runs land.
 2. **The grid and Azure on omni-v7**: restarted on 16 October; the v6 shards still running and the queued Azure set finish and
    stand as that engine's record, nothing cancelled.
 3. **Azure at the tune-down**: the receipts of 14 and 15 October into tables (archive requested), checked against the
