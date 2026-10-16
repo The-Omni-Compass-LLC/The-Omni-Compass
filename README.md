@@ -75,14 +75,12 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-15 22:23 | grid | cancelled | [38813168083](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38813168083) |
-| 2026-10-15 22:13 | kind-addons | cancelled | [38809446951](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38809446951) |
-| 2026-10-15 22:13 | kind-goldilocks | cancelled | [38809451097](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38809451097) |
-| 2026-10-15 22:13 | kind-cruisekube | cancelled | [38809454764](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38809454764) |
-| 2026-10-15 22:13 | capacity v7-trial: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | cancelled | [38809460964](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38809460964) |
-| 2026-10-15 21:54 | aks-client-check | success | [38808120895](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38808120895) |
-| 2026-10-15 21:52 | big-organism-detached collect | success | [38812428208](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38812428208) |
-| 2026-10-15 21:16 | quota-convey-trial | success | [38799140676](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38799140676) |
+| 2026-10-16 00:50 | big-organism-detached collect | success | [38831254360](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38831254360) |
+| 2026-10-16 00:46 | grid | cancelled | [38819144116](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38819144116) |
+| 2026-10-15 22:49 | kind-cruisekube | cancelled | [38815372328](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38815372328) |
+| 2026-10-15 22:49 | kind-goldilocks | cancelled | [38815369261](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38815369261) |
+| 2026-10-15 22:49 | kind-addons | cancelled | [38815366240](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38815366240) |
+| 2026-10-15 22:49 | capacity v7-trial: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | cancelled | [38815363670](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38815363670) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
