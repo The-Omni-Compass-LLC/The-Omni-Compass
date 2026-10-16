@@ -441,6 +441,25 @@ Everything else, the plants, the outcomes, the guardrails, the label rule and th
 realms table three times (A, B, C), then the grid, then the organisms with the real cluster inside; the v2 table stays a
 v2 result.
 
+## Amendment (2026-10-16): the spine, the seventh organism (written before its run)
+
+The founder's order of 16 October: the **spine** is an organism in its own right. It is the set of catalog muscles whose
+realm list names all four realms, 267 of the 1,107 (`tools/run_realms_v5.py`, `spine_rows`), in thirteen families: Kubernetes
+workload scaling, container resources, placement and scheduling, node fleets, cloud capacity, host CPU and memory, GPU
+hardware, network, storage, observability, reliability and security, electrical distribution, cooling. Run alone it is a data
+center with nothing of any one trade in it, the base every stack runs on (`docs/THE_SPINE.md`).
+
+- The spine runs as the seventh organism in every organism harness, under the same three loads (its own, the climb, work
+  waiting in line), the same seeds (3000-3009 preregistered), the same two arms (native; Omni-Compass on top of native) and
+  the same label rule as the other six; every table lists it first. In `tools/run_scale.py` and the grid conductor it is
+  organism 7, so every grid run already started reads back under its own number; with the real cluster inside it is
+  `tools/run_kil.py --organism spine`.
+- The organisms are groupings of catalog rows made in the runners. No engine file changes: the fingerprint
+  (`python3 tools/omni_version.py`) is the same before and after, and the six organisms' results on the engine that stands
+  are unchanged by the seventh (the run is deterministic on its seeds; the rerun that adds the spine's rows reproduces theirs
+  to the digit, checked by `realms-v5.yml`).
+- Nothing is read across engines: the spine's rows carry the engine they ran on, like every other row.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

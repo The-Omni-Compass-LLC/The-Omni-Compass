@@ -4,7 +4,8 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The free GitHub grid: all six organisms at 1, 10, 100 and 1,000 copies, with nested
+"""The free GitHub grid: all seven organisms (the spine, the four realms, the four stacked, the whole tower) at 1, 10, 100
+and 1,000 copies, with nested
 1, 10, 100 and 1,000 paired runs. Paid cloud and GPU jobs retain their separate 100-copy/100-run ceiling.
 The planner never rents hardware for an oversized free cell: memory/time refusals are listed explicitly.
 
@@ -48,23 +49,25 @@ SIZES = (1, 10, 100, 1000)          # free GitHub only: owner restored 1,000 on 
 RUNS = 1000                        # nested 1/10/100/1000 runs on free GitHub runners
 TIERS = (10, 100, 1000)             # smaller prefixes first
 MAX_JOBS = 250                     # GitHub: at most 256 jobs in one run's matrix (a few kept for the plan and the receipt)
-ORGS = ["1", "2", "3", "4", "5", "6"]   # tools/run_scale.py: the four realms, the four stacked, the whole tower
+ORGS = ["1", "2", "3", "4", "5", "6", "7"]   # tools/run_scale.py: the four realms, the four stacked, the whole tower, the spine
 KUBE = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
-        "stack", "tower"]          # tools/run_kil.py names of the same six, in the same order (5 the four stacked, 6 the tower)
+        "stack", "tower", "spine"]  # tools/run_kil.py names of the same seven, in the same order (5 the four stacked, 6 the
+                                   # tower, 7 the spine: the muscles every stack runs on, an organism since 16 October)
 LOAD = "line"                      # the founder's order: work waiting in line in every organism (six.yml)
 
 # Seconds per paired run (native then Omni on one seed), measured on the max with work waiting in line (12 Oct): 1 copy
 # on GitHub's machines (the night's shards), 10 copies of every organism and 100 copies of the compute realm and the tower
 # on a 4-core machine that runs as fast as GitHub's; the other figures are scaled from those (a run grows 9 to 11 times
 # per tenfold size). CAL: the calibration run each worker makes once per organism (a native run on the calibration seed).
-# MEM: a worker's peak memory (GB).
-SEC = {1: {"1": 7.2, "2": 6.5, "3": 5.1, "4": 5.0, "5": 28.8, "6": 17.4},
-       10: {"1": 77, "2": 95, "3": 79, "4": 67, "5": 359, "6": 250},
-       100: {"1": 660, "2": 850, "3": 710, "4": 600, "5": 2820, "6": 1780}}
+# MEM: a worker's peak memory (GB). The spine's figures (7) are the distribution realm's scaled by its muscle count (267 of
+# 484), a planning estimate until its first shards are measured.
+SEC = {1: {"1": 7.2, "2": 6.5, "3": 5.1, "4": 5.0, "5": 28.8, "6": 17.4, "7": 3.0},
+       10: {"1": 77, "2": 95, "3": 79, "4": 67, "5": 359, "6": 250, "7": 40},
+       100: {"1": 660, "2": 850, "3": 710, "4": 600, "5": 2820, "6": 1780, "7": 350}}
 CAL = {1: {o: 2 for o in ORGS}, 10: {o: 15 for o in ORGS},
-       100: {"1": 150, "2": 200, "3": 170, "4": 150, "5": 670, "6": 500}}
+       100: {"1": 150, "2": 200, "3": 170, "4": 150, "5": 670, "6": 500, "7": 90}}
 MEM = {1: {o: 0.2 for o in ORGS}, 10: {o: 0.4 for o in ORGS},
-       100: {"1": 0.9, "2": 0.9, "3": 0.9, "4": 0.9, "5": 3.2, "6": 1.8}}
+       100: {"1": 0.9, "2": 0.9, "3": 0.9, "4": 0.9, "5": 3.2, "6": 1.8, "7": 0.6}}
 # Planning estimates only, extrapolated from the measured 100-copy timings/memory above.
 # They are not 1,000-copy benchmark measurements. Oversized cells remain explicit, never sent to Azure.
 for table in (SEC, CAL, MEM):
@@ -582,7 +585,7 @@ def squares(cov):
 
 def report(cov, started, queued, running, target, out=sys.stdout, gave_up=None, first=()):
     names = {"1": "Compute / AI / Cloud", "2": "Physics / Robotics / Autonomous", "3": "Energy / Facility / Industrial",
-             "4": "Distribution / Specialized", "5": "The four stacked", "6": "The whole tower"}
+             "4": "Distribution / Specialized", "5": "The four stacked", "6": "The whole tower", "7": "The spine"}
     print(f"| Size | Organism | Modelled: runs started of {RUNS} | With the real cluster inside: runs started of {RUNS} |", file=out)
     print("|---:|---|---|---|", file=out)
     for size, o, six, kube in squares(cov):

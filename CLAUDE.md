@@ -68,20 +68,24 @@ the founder overrides one in the conversation.
   (`tools/readings.py`).
 - Evidence classes: P (physical meter), L (live software), S (our own models). Never present S as proof.
 
-## The six organisms and the grid
+## The seven organisms and the grid
 
-- Omni v5 (12 Oct, night): four realms (Compute/AI/Cloud 540, Physics/Robotics/Autonomous 404, Energy/Facility/Industrial
-  480, Distribution/Specialized 484), the whole tower (1,107 distinct muscles in 70 families, the founder's nine open-source
-  pieces among them: Kepler, Climatik, EAR, CruiseKube, Goldilocks, the Kubernetes Power Manager, PEAKS, Adaptive GPU
-  Power Capping, NVIDIA's platform power manager), and the four stacked (1,908). They share a spine of 267 muscles; the
-  1,097-muscle catalog of earlier the same day keeps its results. v2/v3 were 430/376/470/440, 945 and 1,716; v1 was 345/262/282/337, 656 and 1,226
-  with a spine of 190; their results stay theirs.
-- The organisms are named `tower` and `stack` in code and workflows (never by a count); the old names `organism_656` and
-  `stack_1226` are read as aliases.
-- The grid: each organism runs native and omni at clustered copies × runs: 54 squares at 1, 10 and 100 copies × 1, 10
+- **Seven organisms** (the founder's order of 16 October): the **spine** (267 muscles, every muscle that sits in all four
+  realms, the base every stack runs on as an operating system is the base of every program; `docs/THE_SPINE.md`), the four
+  realms (Compute/AI/Cloud 540, Physics/Robotics/Autonomous 404, Energy/Facility/Industrial 480, Distribution/Specialized
+  484, each its own families on the spine), the four stacked (1,908, the spine once in each realm's body) and the whole tower
+  (1,107 distinct muscles in 70 families, the founder's nine open-source pieces among them: Kepler, Climatik, EAR, CruiseKube,
+  Goldilocks, the Kubernetes Power Manager, PEAKS, Adaptive GPU Power Capping, NVIDIA's platform power manager). Every one
+  runs native and with Omni-Compass on top of native. The organisms are groupings of catalog rows made in the runners
+  (`tools/run_realms_v5.py`, `run_scale.py`, `run_hil.py`, `run_kil.py`), never in a fingerprinted engine file; the spine is
+  `spine`, organism 7 in the numbered runners, and listed first on every page. Earlier catalogs' counts stay with their
+  results in `docs/history`.
+- The organisms are named `tower`, `stack` and `spine` in code and workflows (never by a count); the old names `organism_656`
+  and `stack_1226` are read as aliases.
+- The grid: each organism runs native and omni at clustered copies × runs: 63 squares (seven organisms) at 1, 10 and 100 copies × 1, 10
   and 100 runs, modelled and with the real cluster inside, with both values shown in every square. **On GitHub's own
   machines only, the 1,000 tier stands again** (the founder's distinction of 15 October, `scripts/dispatch_grid.py`,
-  `docs/OMNI_V6.md`): the six organisms and their modelled, Kubernetes, Linux and swarm workloads run at 1, 10, 100 and
+  `docs/OMNI_V6.md`): the seven organisms and their modelled, Kubernetes, Linux and swarm workloads run at 1, 10, 100 and
   1,000 copies and nested 1, 10, 100 and 1,000 runs on free runners, and a cell beyond a free runner's memory or time is
   listed as pending runner capacity, never rented; **paid cloud and GPU runs stay at 1, 10 and 100 copies with at most
   100 repetitions** (the founder's order of 12 October, kept for everything that costs money). Nothing is rented for the
@@ -143,6 +147,24 @@ the founder overrides one in the conversation.
   goes to its GitHub trials; nothing is dispatched before. The gate's readings are models (class S), recorded in the
   candidate branch's results/toy_gate folder and never presented as a benchmark result. The toy's regime is set from
   a real run's own files (the host's busy share, the response time, the replicas), never guessed.
+
+## Orders of 16 October
+
+- **Seven organisms, the spine the seventh.** The spine (267 muscles, every muscle in all four realms) is an organism in its
+  own right: the base every stack runs on, as an operating system is the base of every program. With the four realms, the four
+  stacked and the tower that makes seven; "all seven need to be wired, written everywhere, native, and with Omni-Compass wired
+  on native." The spine is written into the runners and the pages (`docs/THE_SPINE.md`, bound into both manuals), never into a
+  fingerprinted engine file; the engine's fingerprint does not move for it.
+- **Older versions are history.** "Why do I want to hear about version 5?" Everything worked on is the newest engine; what is
+  found to have more room goes into the next version, or the candidate is modified. Reports say native against Omni-Compass,
+  gauge by gauge, never one version against another; older fingerprints are the road, in `docs/history`.
+- **Nothing is cancelled.** No run is ever cancelled; a problem found in a running benchmark is fixed and the benchmark run
+  again. Everything except the GPU chips and the Google and Amazon clouds runs, pushes and benchmarks.
+- **Azure finishes first.** The founder decides on Google and Amazon after the Azure results are where he needs them, because
+  Azure teaches what the other two will need.
+- **Both manuals carry every muscle with its physical wiring on any stack** (the wiring appendix, `docs/wiring_recipes.csv`),
+  and the whole package is kept in line with the newest engine top to bottom, fixed and tightened as found, pushed to the real
+  places: it is presented to one buyer.
 
 ## Orders of 14 October
 
@@ -277,7 +299,7 @@ the founder overrides one in the conversation.
   belongs to the body.
   Written into the engine as **Omni v4** (`docs/OMNI_V4_PLAN.md`), every wire forced through it, every result rerun.
 - Everything is wired. Staying native is the brain's live decision every second, never a verdict from one run.
-- **Six organisms**, never five: the four realms, all realms stacked (1,716), the whole catalog once (945). The live
+- **Six organisms**, never five (superseded on 16 October: seven, the spine an organism of its own): the four realms, all realms stacked (1,716), the whole catalog once (945). The live
   software products are never counted beside them. Realms are re-cut by a written rule at v4; new muscles raise the count.
 - The word "simulation" is not used for our own models in reports: they are "modelled" (class S); live software is "the
   real thing" (class L); a meter is class P. The license's own phrase stays as written.

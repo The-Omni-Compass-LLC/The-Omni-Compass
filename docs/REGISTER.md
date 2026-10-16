@@ -156,7 +156,7 @@ card's runs happen on v4, on one named commit, after the CPU side (`docs/OMNI_V4
 |---:|---|---|---|---|---|---|
 | 13 | One card (A10 on Lambda), 10 pairs, earlier card controller | the card's default power limit and clocks | power limit, clock ceiling | old (earlier card controller; new card runs replace it) | GPU energy −3.5% but 95th-percentile response +58.5% slower, both proven: a trade-off, not a win | `results/gpu/run-20261002T082232Z/` |
 | 14 | One card on the current card controller | as 13 | as 13 | ready (founder's go on Lambda) | | `docs/GPU_RUN_GUIDE.md` |
-| 15 | The card inside the six organisms | as 13 | as 13 + the organism | done once on the earlier controller; rerun ready | | `results/hil/run-20261002T082232Z/` |
+| 15 | The card inside the organisms | as 13 | as 13 + the organism | done once on the earlier controller; rerun ready | | `results/hil/run-20261002T082232Z/` |
 | 16 | Eight cards | as 13 | as 13, per card and pooled | ready | | `scripts/gpu_8card.sh` |
 | 17 | Real model serving (vLLM) on the card | vLLM as shipped | power limit, clocks, admission | ready | | `scripts/gpu_vllm.sh` |
 | 18 | Two-wire card model, 10 seeds + 10 fresh seeds | the card's defaults | power limit, clocks | done (model) | work per energy +6.9% / +3.8%, p95 faster | `results/sim/gpu_two_wire/` |

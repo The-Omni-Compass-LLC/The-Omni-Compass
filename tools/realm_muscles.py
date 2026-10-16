@@ -5,10 +5,12 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """docs/REALM_MUSCLES.md from realms/catalog_v5.csv: every organism written out, muscle by muscle.
 
-The shared spine (the muscles every realm's organism carries), then each realm's own families, then the two whole-catalog
-organisms: the four stacked (every realm's organism on one clock, every duplicate of the spine kept) and the tower (every
+The seven organisms (the founder's order of 16 October): the spine first, the muscles every real stack runs on and an
+organism of its own; then each realm's organism (its own families with the spine under them); then the two whole-catalog
+organisms, the four stacked (every realm's organism on one clock, every duplicate of the spine kept) and the tower (every
 muscle once). Each muscle is followed by the one knob Omni-Compass may hold on it; what the engine does with that knob, how
-it is wired and its own card are in docs/MUSCLE_CATALOG.md (tools/muscle_catalog.py), family by family.
+it is wired and its own card are in docs/MUSCLE_CATALOG.md (tools/muscle_catalog.py), family by family. What the spine is
+and why it is an organism is docs/THE_SPINE.md.
 
     python3 tools/realm_muscles.py
 """
@@ -28,6 +30,11 @@ OUT = ROOT / "docs" / "REALM_MUSCLES.md"
 REALMS = OrderedDict([("compute_ai_cloud", "Compute / AI / Cloud"), ("physics_robotics_autonomous", "Physics / Robotics / Autonomous"),
                       ("energy_facility_industrial", "Energy / Facility / Industrial"), ("distribution_specialized", "Distribution / Specialized")])
 BANNER = f"> {_LEGAL_TOP}"                 # the one notice (tools/legal.py); stamp() keeps one copy of it
+
+
+def is_spine(r):
+    """A spine muscle sits in all four realms (tools/run_realms_v5.py, spine_rows: the same rule the runners use)."""
+    return set(REALMS) <= set(r["realms"].split(";"))
 
 
 def families(rows):
@@ -50,35 +57,47 @@ def section(fams):
 
 
 def build(rows):
-    spine = [r for r in rows if len(r["realms"].split(";")) == 4]
+    spine = [r for r in rows if is_spine(r)]
     in_realm = {k: [r for r in rows if k in r["realms"].split(";")] for k in REALMS}
+    own = {k: [r for r in rows if r["realm"] == k and not is_spine(r)] for k in REALMS}
     stack = sum(len(v) for v in in_realm.values())
     L = [f"# The {len(rows):,} muscles, organism by organism", "", BANNER, "",
          f"Generated from `realms/catalog_v5.csv` (the catalog the engine that stands carries: {len(rows):,} distinct muscles in "
          f"{len({r['family'] for r in rows})} families) by `tools/realm_muscles.py`. A **muscle** is one setting on one machine that already has "
-         "its own control; the one knob Omni-Compass may hold on it stands in brackets after its name. Every realm's organism is its "
-         "own families plus the **shared spine** (the infrastructure every real stack runs on), so the realm counts add to more than "
-         "the tower. What the engine does with each knob, which native controller owns it, where the reading is tapped and the "
-         "setting written, how it is restored and its own card are written family by family in `docs/MUSCLE_CATALOG.md` (the "
-         "manuals' muscle appendix); the organisms' results are in `results/realms_v5/REALMS_V5.md` and the grid in "
-         "`results/grid_v5/GRID.md`, each named for the engine it ran on.", "",
-         "## The six organisms", "",
-         "| Organism | Muscles | What it is |", "|---|---:|---|"]
+         "its own control; the one knob Omni-Compass may hold on it stands in brackets after its name. The catalog builds **seven "
+         "organisms**, each run native and with Omni-Compass on top of native: the **spine**, the muscles every real stack runs on, "
+         "an organism of its own and the base of the other six (as an operating system is the base of every program; "
+         "`docs/THE_SPINE.md`); the four realms, each its own families with the spine under them, so the realm counts add to more "
+         "than the tower; the four stacked; and the whole tower. What the engine does with each knob, which native controller owns "
+         "it, where the reading is tapped and the setting written, how it is restored and its own card are written family by family "
+         "in `docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix); the organisms' results are in `results/realms_v5/REALMS_V5.md` "
+         "and the grid in `results/grid_v5/GRID.md`, each named for the engine it ran on.", "",
+         "## The seven organisms", "",
+         "In the runners the spine is `spine` (organism 7 in `tools/run_scale.py` and the grid conductor, after the six that were "
+         "numbered before it); every table lists it first, because the other six stand on it.", "",
+         "| Organism | Runner name | Muscles | What it is |", "|---|---|---:|---|",
+         f"| The spine | `spine` (7) | {len(spine)} | the muscles every real stack runs on, every one in all four realms: the base of the other six |"]
     for i, (k, name) in enumerate(REALMS.items(), 1):
-        own = [r for r in rows if r["realm"] == k and len(r["realms"].split(";")) == 1]
-        L.append(f"| {i}. {name} | {len(in_realm[k]):,} | its {len(own)} own muscles and the spine of {len(spine)} |")
-    L += [f"| 5. The four stacked (`stack`) | {stack:,} | the four realms' organisms on one clock, every duplicate of the spine kept |",
-          f"| 6. The whole tower (`tower`) | {len(rows):,} | every muscle of the catalog once |", "",
-          f"## The shared spine: {len(spine)} muscles, in all four realms", ""] + section(families(spine))
+        L.append(f"| {name} | `{k}` ({i}) | {len(in_realm[k]):,} | its {len(own[k])} own muscles on the spine of {len(spine)} |")
+    L += [f"| The four stacked | `stack` (5) | {stack:,} | the four realms' organisms on one clock, every duplicate of the spine kept |",
+          f"| The whole tower | `tower` (6) | {len(rows):,} | every muscle of the catalog once |", "",
+          f"## The spine: {len(spine)} muscles, in all four realms, an organism of its own", "",
+          "The thirteen families below are the computers every realm's work runs on and the power and cooling they need: Kubernetes "
+          "workloads, containers, placement, node fleets, cloud capacity, hosts, GPUs, network, storage, observability, reliability "
+          "and security, electrical distribution and cooling. Run alone, the spine is a data center with nothing of any one trade in "
+          "it; under a realm, it is what that realm's own muscles stand on.", ""] + section(families(spine))
     for i, (k, name) in enumerate(REALMS.items(), 1):
-        own = [r for r in rows if r["realm"] == k and len(r["realms"].split(";")) == 1]
-        L += [f"## Organism {i}: {name}: {len(own)} own muscles + the spine of {len(spine)} = {len(in_realm[k]):,} in its organism", ""] + section(families(own))
+        L += [f"## Organism {i}: {name}: {len(own[k])} own muscles on the spine of {len(spine)} = {len(in_realm[k]):,} in its organism", "",
+              "The spine above, and these families of its own.", ""] + section(families(own[k]))
     L += [f"## Organism 5: the four stacked, every duplicate kept, {stack:,} muscles", "",
           "The four realms' organisms above, run on one clock as one body (`stack`; the older name `stack_1226` is read as an alias): "
           f"every muscle listed under organisms 1 to 4, the spine counted once in each, {stack:,} in all.", "",
           f"## Organism 6: the whole tower, all {len(rows):,} muscles once", "",
           "Every muscle of the catalog once (`tower`; the older name `organism_656` is read as an alias): the spine and every realm's own "
-          f"families, {len(rows):,} in all.", ""]
+          f"families, {len(rows):,} in all.", "",
+          f"## Organism 7: the spine, {len(spine)} muscles", "",
+          "The spine listed first above, run on its own (`spine`): the same muscles, the same native controllers, nothing of any one "
+          "realm on top of them.", ""]
     return L, len(spine)
 
 

@@ -335,35 +335,50 @@ sets how high the boost may climb, and the power limit becomes a lid set just ab
 stops at the bottom of the compass instead of slamming into the wall; the limiter rarely needs to act. Every watt kept off
 the chip is saved twice in a data center: once at the chip and again at the chillers that would have carried its heat.
 
-# The Six Organisms and the Benchmark Grid
+# The Seven Organisms and the Benchmark Grid
 
-Omni-Compass is benchmarked on six organisms, each run native and with Omni-Compass on top on the same seed, the same
-load and the same clock: Compute / AI / Cloud (430 muscles), Physics / Robotics / Autonomous (376), Energy / Facility /
-Industrial (470), Distribution / Specialized (440), the four stacked with every duplicate kept (1,716), and the whole
-tower with every muscle once (945); these are the Omni v2 counts, v1's were 345, 262, 282, 337, 1,226 and 656.
+Omni-Compass is benchmarked on seven organisms, each run native and with Omni-Compass on top of native on the same seed,
+the same load and the same clock. An organism is a set of muscles stepped together on one clock, each muscle from its own
+plant model with its own native controller, the whole fed one demand from one seed, so that the heat the machines make is
+load on the rooms, the body's power swing is load on every site's line, and one brain judges every step against every other
+muscle's cushion. On the 1,107-muscle catalog the engine that stands carries (`realms/catalog_v5.csv`) the seven are: the
+**spine**, the 267 muscles every real stack runs on, every one in all four realms, an organism in its own right since 16
+October and the base of the other six, as an operating system is the base of every program (`docs/THE_SPINE.md`); the four
+realms, each its own trade's families on the spine, Compute / AI / Cloud (540 muscles), Physics / Robotics / Autonomous
+(404), Energy / Facility / Industrial (480) and Distribution / Specialized (484); the four stacked with every duplicate of
+the spine kept (1,908); and the whole tower with every muscle once (1,107). Earlier catalogs' organisms and counts stay
+with their own results in `docs/history/`.
 
-Each organism is run at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of the organism on one
-clock. Every receipt shows work per energy, work, energy, the time spent outside the service line, and whether every
-knob was handed back.
+Every organism runs under three loads: its own load; the climb, the demand stepping by one, up and down (1 2 3 2 3 4 …),
+past what native can carry, so that the most each arm can do shows; and work waiting in line when the run starts. Every
+receipt shows work, the time over the service line (misses), the energy the max took as power given beside the work it
+bought, wear, and whether every knob was handed back; the reading is GAIN, EVEN or LOSS by the key at the front of this
+manual, judged by what each gauge is for and never by the sign of its number. The spine read beside a realm shows what that
+realm's trade adds to the base it stands on; the spine read alone shows whether the governor helps the machines every
+stack runs on before any trade is put on them.
 
-**What the grid has shown.** On Omni v3, 84 of the 90 judged cells are done (`results/scale/GRID.md`): every organism
-reads superior within its guardrails in every cell of ten runs or more, with work per energy +0.07% (the Physics realm) to
-+0.37% (the Energy realm, the four stacked and the tower), the work unchanged, the time over the line not above native's,
-and every knob handed back. The figure is the same at every size, from one copy to a thousand, which is the property the
-grid exists to test: one brain stays coherent at 1.7 million muscles. The six cells left, 100 and 1,000 runs at 1,000
-copies, are beyond the machines available and are declared, not hidden. The number is small because the native controllers
-in the models are well tuned and leave little room; it is real within the model, and it is never counted in the Omni
-index, which is made of real stacks only.
+**The grid.** Each organism runs at 1, 10 and 100 copies of itself on one clock and at 1, 10 and 100 paired runs, modelled
+and with the real cluster inside, both arms shown in every square; on GitHub's own machines the 1,000 tier runs too (the
+founder's distinction of 15 October), a cell beyond a free runner's memory or time listed as pending runner capacity and
+never rented, while paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100 repetitions. The two axes answer
+two questions. Copies is the size of the body one brain governs: at 100 copies of the four stacked the law computes a force
+for about 190,000 muscles from one reading of one clock, and the question is whether it stays coherent, whether the decision
+is made inside the decision period, and whether the cluster inside it is still served on time. Runs is the number of
+independent paired trials, each from its own seed, and the question is statistical: how wide the interval of the paired
+difference is and whether it moves as the trials multiply. The grid's readings on the engine that stands are
+`results/grid_v5/GRID.md` and the standing block of `docs/STATE_OF_PLAY.md`, every square shown, the spine's squares filled
+by the conductor as they land; the number is small because the native controllers in the models are well tuned and leave
+little room, it is real within the model, and it is never counted in the Omni index, which is made of real stacks only.
 
-On a GPU machine the real card is wired into each organism as one more muscle of its NVIDIA GPU family; its own power
-meter and its requests are counted in the organism's receipt, kept apart from the modelled plants and also added to
-them. Real Kubernetes is benchmarked separately on real clusters, and it is also wired into the organisms as one more
-muscle (`tools/run_kil.py`): at 1 to 100 copies on GitHub's machines and at 1,000 copies on a rented machine, the
-organism's own compute demand drives a real load generator against a real service on a real cluster, and the cluster's
-watts come back into the organism as heat and load. Those runs are labelled "L + S": the cluster is live software, the
-organism around it a model.
+On a GPU machine the real card is wired into each organism as one more muscle of its GPU Hardware family, a spine family,
+so the card is in the spine and in every organism built on it; its own power meter and its requests are counted in the
+organism's receipt, kept apart from the modelled plants and also added to them. Real Kubernetes is benchmarked separately
+on real clusters, and it is also wired into the organisms as one more muscle (`tools/run_kil.py`): at 1, 10, 100 and, on
+GitHub's own machines, 1,000 copies, the organism's own compute demand drives a real load generator against a real service
+on a real cluster, and the cluster's watts come back into the organism as heat and load. Those runs are labelled "L + S":
+the cluster is live software, the organism around it a model.
 
-The six organisms are models (evidence class S). They show how the law behaves across hundreds of kinds of machine at
+The seven organisms are models (evidence class S). They show how the law behaves across hundreds of kinds of machine at
 once and whether its effect is stable as the count and the size grow. Real Kubernetes, the real database, the real broker,
 the real cache and the real card are the anchors measured on real software and, for the card, a real meter; their results
 and their losses are in the manual's section 16.

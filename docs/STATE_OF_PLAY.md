@@ -84,7 +84,7 @@ records what each table was built from).
 benchmark with a result was dispatched again on the current commit `3aac0ab7` (Omni v3, digest `b53d05449ee04c4b`, by
 `tools/omni_version.py --commit`), native and omni, the wiring of each checked against its preregistration before the dispatch:
 70 GitHub runs (the seven Kubernetes tests, the five live stacks on the brain's own verdict, the four simulators, the realms table
-and the kill and long robustness scenarios, three runs each; the six organisms with the real cluster inside; the modelled grid at
+and the kill and long robustness scenarios, three runs each; the organisms with the real cluster inside; the modelled grid at
 1, 10, 100 and 1,000 copies) and the two big organisms at 1,000 copies on rented Azure machines, plus one replacement run for a Kafka
 job GitHub's runner cut off (the record says which and why). By 12:30 UTC 69 of the 71 had landed and every
 table on this page was remade from them; the tables they supersede are whole in `docs/history`. The one shard the runner's

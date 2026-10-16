@@ -106,7 +106,7 @@ organism runs on its own core, away from the real cluster's, the same in both ar
 heavier arm's measured step, so the 100-copy squares measure the governor, not the test machine. **Every result runs
 again on this engine**; the card version's results below stand as that version's record until the new runs replace them.
 
-## The muscles and the six organisms, modelled: every muscle its own card (13 October)
+## The muscles and the seven organisms, modelled: every muscle its own card (13 October; the spine the seventh organism, 16 October)
 
 The engine at its default, **the max**, with **the living body**, and **every muscle its own card**: the brain is one,
 its settings each muscle's own. An automatic search over every muscle (development seeds only, today's global setting
@@ -138,7 +138,7 @@ per organism and per load, commit `eea291501848`, engine omni-v5 (fingerprint `5
 | Battery sites (44) | over the line 13.4% → 7.6% (peak ceiling; 9.9%), 17.1% → 14.0% (reserve; 15.0%), 14.7% → 14.0% (discharge timed for the line; 14.5%) | up to +0.14% | battery kWh cycled −0.6% to +30% |
 | Motion axes at their own peak speed (37) | over the line 12.1% → 8.3% of the time; work +0.7% (no card beat the global setting) | +1.4% | motor heat +3.9% |
 
-**The six organisms** (every plant coupled on one clock, the hour around each battery site's daily peak): **fewer misses
+**The seven organisms** (the spine, the four realms, the four stacked and the tower; every plant coupled on one clock, the hour around each battery site's daily peak): **fewer misses
 than native under all three loads, the same work or more, and not one plant with less work or more misses**: 0 of 1,908
 in the four stacked, 0 in every other organism, under every load. Inside a body the cards remove more misses with less power given than one global setting did.
 
@@ -148,9 +148,10 @@ in the four stacked, 0 in every other organism, under every load. Inside a body 
 | The climb (1 2 3 2 3 4 ..., up to twice its own) | −7.2% distribution, −7.0% compute, −4.8% the four stacked, −3.2% physics, −2.7% energy, −1.4% the tower | −0.9% to −3.5% | more work in four of six | up to +0.05% (was +0.07%) |
 | Work waiting in line | −1.1% to −8.3% in every organism | −1.0% to −7.2% | equal | up to +0.04% (was +0.07%) |
 
-**The grid** ([`results/grid_v5/GRID.md`](results/grid_v5/GRID.md)): the six organisms at 1, 10 and 100 copies on one
+**The grid** ([`results/grid_v5/GRID.md`](results/grid_v5/GRID.md)): the seven organisms (the spine's squares in the conductor's queue
+since 16 October) at 1, 10 and 100 copies on one
 clock, each at its first 1, 10 and 100 runs, with work waiting in line. **Modelled** (class S): fewer misses than native
-in all 54 squares, the same work, the power given at most +0.065%. **With the real Kubernetes cluster inside** (the
+in all 54 squares run so far, the same work, the power given at most +0.065%. **With the real Kubernetes cluster inside** (the
 cluster measured, class L; the organism modelled): at 1 and 10 copies, in every square of 10 and 100 repetitions, the
 real service spent 12% to 59% less time over its response line, and its slowest 5% of responses were 24% to 56% faster
 (inside the noise in 2 of those 24 squares). At 100 copies the test machine itself is the limit: GitHub's four-core

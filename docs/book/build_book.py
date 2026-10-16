@@ -457,6 +457,7 @@ OPERATOR_OUTLINE = [
      "What Omni-Compass is as an installer meets it, how the muscles of a stack become one body, and how it is tuned."),
     ("What Omni-Compass Is", ("M", "What Omni-Compass Is")),
     ("Your Stack as One Body: Muscles and Organisms", ("M", "Your Stack as One Body: Muscles and Organisms")),
+    ("The Spine: the Base Every Stack Runs On", ("F", "docs/THE_SPINE.md")),
     ("Tuning: The Factory Tune, the Dial and the Settings You Write",
      ("M", "Tuning: The Factory Tune, the Dial and the Settings You Write")),
     ("PART", "The Harness: Plugs, Wires and the Rules They Obey",
@@ -568,14 +569,15 @@ OWNER_OUTLINE = [
     ("The Two-Way Nervous System", ("M", "The Two-Way Nervous System")),
     ("The Nervous System in Detail", ("FS", ["docs/TWO_WAY_NERVOUS_SYSTEM.md", "docs/NERVOUS.md"])),
     ("PART", "The Body: Muscles, Realms and Organisms",
-     "One thousand one hundred and seven muscles in four realms, stacked into six organisms, and every gauge used to "
+     "One thousand one hundred and seven muscles in four realms on one spine, built into seven organisms, and every gauge used to "
      "judge them."),
-    ("The Muscles, the Realms and the Six Organisms", ("M", "The Muscles, the Realms and the Six Organisms")),
+    ("The Muscles, the Realms and the Seven Organisms", ("M", "The Muscles, the Realms and the Seven Organisms")),
+    ("The Spine: the Base Every Stack Runs On", ("F", "docs/THE_SPINE.md")),
     ("The Four Realms", ("F", "docs/REALMS.md")),
     ("The Realm Muscles", ("F", "docs/REALM_MUSCLES.md")),
     ("The Domain Map", ("F", "docs/DOMAIN_MAP.md")),
     ("The Problem Map", ("F", "docs/history/PROBLEM_MAP_2026-09.md")),
-    ("The Six Organisms and the Benchmark Grid", ("T", "The Six Organisms and the Benchmark Grid")),
+    ("The Seven Organisms and the Benchmark Grid", ("T", "The Seven Organisms and the Benchmark Grid")),
     ("The Metrics Catalog", ("F", "docs/METRICS_CATALOG.md")),
     ("PART", "The Harness and the Wiring",
      "The universal plug, the adapters, the wire check, and the step-by-step work of wiring Omni-Compass onto a "
@@ -948,7 +950,7 @@ toward a center cannot run away, and everything it does is a return. **Part Two,
 equations and the control law that make the circle exact, with the theorem, the declaration and the audits that hold
 them fixed. **Part Three, the physics,** brings the law into the machine: the compass, push and pull, the band and its
 cushions, the physics of a processor, and the two-way nervous system. **Part Four, the body,** lays out the
-muscles, the four realms and the six organisms. **Part Five, the harness and the wiring,** is the universal plug and
+muscles, the spine, the four realms and the seven organisms. **Part Five, the harness and the wiring,** is the universal plug and
 the step-by-step work of wiring Omni-Compass onto a stack. **Part Six, operating it,** is the OFF switch, the rules
 and the log. **Part Seven, proving it,** is every rule written before a run and every result after it. **Part Eight**
 is value, the license, the seal and the history.

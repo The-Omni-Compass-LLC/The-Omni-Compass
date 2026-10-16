@@ -63,7 +63,7 @@ class ReleaseCampaign(unittest.TestCase):
         self.assertFalse(d['launch'])
         self.assertEqual(d['profiles']['one-card']['physical_gpus'], 1)
         self.assertEqual(d['profiles']['eight-card']['physical_gpus'], 8)
-        self.assertEqual(len(d['organisms']), 6)
+        self.assertEqual(len(d['organisms']), 7)
         self.assertEqual(d['reported_run_prefixes'], [1, 10, 100])
         self.assertEqual(grid.SIZES, (1, 10, 100, 1000))
         self.assertEqual(grid.RUNS, 1000)

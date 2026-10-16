@@ -1169,6 +1169,15 @@ or GAIN. The receipt's commands row shows how often a machine was parked or woke
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
+## Amendment (2026-10-16): the spine, the seventh organism with the cluster inside
+
+The founder's order of 16 October: the spine (the 267 catalog muscles in all four realms, the base every stack runs on;
+`docs/THE_SPINE.md`) is an organism in its own right. With the real cluster inside it runs as `tools/run_kil.py --organism
+spine`, on the same protocol (3), the same window rule, the same two arms and the same gauges as the other six; the grid
+conductor starts its squares, reads them back and never starts one twice, as it does for every organism, and the workflows
+`six-kube`, `aks-metered`, `gke-metered`, `eks-metered` and `cloud-organism` accept `spine`. The results already written on
+six organisms stand as they were run; nothing is read across engines or across organism sets.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

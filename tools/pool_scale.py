@@ -4,7 +4,7 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Pool the shards of a six-organism run (tools/run_scale.py, one SCALE.json per shard) into one receipt.
+"""Pool the shards of an organism run (tools/run_scale.py, one SCALE.json per shard) into one receipt.
 
   python3 tools/pool_scale.py OUT.md parts/*/SCALE.json
 """
@@ -80,7 +80,7 @@ def main(out, *paths):
            "the v3 compass law on every muscle (`realms/compass_arm.py`)")
     count = lambda k: (sum(len(rows_for(r, scale, cat)) for r in REALMS) if organism_name(k) == STACK and stack == "realms"
                        else len(rows_for(k, scale, cat)))
-    L = [f"# Six organisms at {scale}x size, {LOADS[load]}, up to {total} completed runs; seed coverage through {extent} (pooled from {len(files)} shards)", "",
+    L = [f"# The organisms at {scale}x size, {LOADS[load]}, up to {total} completed runs; seed coverage through {extent} (pooled from {len(files)} shards)", "",
          f"Evidence class **S** (models). Engine {', '.join(known) or 'not recorded'}, commit(s) {', '.join(sorted(commits))}. "
          f"Native: each organism's own controllers. Omni: {law}. Each block is the first N runs (seeds {SEED0} on), so 1, 10, "
          "100 and 1,000 are nested; a block short of a run says so (Runs column: finished of the block). Band first: no win "

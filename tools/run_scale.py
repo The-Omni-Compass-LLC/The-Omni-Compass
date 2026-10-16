@@ -4,7 +4,7 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Six organisms, native and Omni, over many runs and at many sizes (evidence class S: the realm models).
+"""Seven organisms, native and Omni, over many runs and at many sizes (evidence class S: the realm models).
 
   1 Compute / AI / Cloud
   2 Physics / Robotics / Autonomous
@@ -12,7 +12,8 @@
   4 Distribution / Specialized
   5 the four stacked, every duplicate kept, one body on one clock
   6 the whole tower, every muscle once
-  (sizes: realms/catalog_provenance.json)
+  7 the spine, the muscles every stack runs on (every muscle that sits in all four realms)
+  (sizes: realms/catalog_provenance.json; the spine: tools/run_realms_v5.py, spine_rows)
 
 Every organism runs native (its own controllers) and native with Omni on top on the same seed: --arm v5 (the engine's
 law, realms/compass_arm_v5.py, on the v5 catalog) or --arm compass (the v3 law, realms/compass_arm.py, on v3's catalog,
@@ -22,7 +23,7 @@ and violations with their 95% intervals over runs, the label by the round-3 rule
 
 The four stacked (5), two ways (--stack): "realms" (the v5 default) keeps each realm's own body on the one clock, so
 every muscle in the stack runs exactly the native it runs in its own realm, plant by plant (the founder's order: the
-native identical in all six); "body" (v3's stored grid) puts all four realms in one body, each copy its own series.
+native identical in all seven); "body" (v3's stored grid) puts all four realms in one body, each copy its own series.
 
 Every finished run is written as it ends (SCALE.json, rewritten whole), with its plant sums, its own time and the worker's
 peak memory; --deadline-min starts no run that would end after the deadline, so a shard cut short by a runner's six-hour
@@ -53,7 +54,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from realms.harness import (catalog, run_organism_arm, run_bodies, Body, paired_organism, summarize, label, STACK,  # noqa: E402
                             TOWER, organism_name, scale_load, LINE)
-from tools.run_realms_v5 import label_max  # noqa: E402  the max's label (work, misses), the v5 arm's rule
+from tools.run_realms_v5 import label_max, SPINE, spine_rows  # noqa: E402  the max's label; the spine, the seventh organism
 
 ARM, CATALOG, STACK_MODE = "compass", None, "body"       # set by main() (and passed to each worker)
 CATALOGS = {"compass": str(ROOT / "realms" / "catalog.csv"), "v5": str(ROOT / "realms" / "catalog_v5.csv")}
@@ -61,7 +62,8 @@ CATALOGS = {"compass": str(ROOT / "realms" / "catalog.csv"), "v5": str(ROOT / "r
 REALMS = ("compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized")
 ORGS = {"1": ("compute_ai_cloud", "Compute / AI / Cloud"), "2": ("physics_robotics_autonomous", "Physics / Robotics / Autonomous"),
         "3": ("energy_facility_industrial", "Energy / Facility / Industrial"), "4": ("distribution_specialized", "Distribution / Specialized"),
-        "5": (STACK, "The four stacked, duplicates kept"), "6": (TOWER, "The whole tower, every muscle once")}
+        "5": (STACK, "The four stacked, duplicates kept"), "6": (TOWER, "The whole tower, every muscle once"),
+        "7": (SPINE, "The spine, the muscles every stack runs on")}
 SEED0 = 7000
 
 
@@ -72,6 +74,8 @@ def rows_for(key, scale, cat=None):
         base = [dict(r, muscle_id=f"{r['muscle_id']}@{realm}") for realm in REALMS for r in rows if realm in r["realms"].split(";")]
     elif key == TOWER:
         base = rows
+    elif key == SPINE:
+        base = spine_rows(rows)
     else:
         base = [r for r in rows if key in r["realms"].split(";")]
     return [dict(r, muscle_id=r["muscle_id"] + (f"~{c}" if c else "")) for c in range(scale) for r in base]
@@ -162,7 +166,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--runs", type=int, default=100)
     ap.add_argument("--scale", type=int, default=1)
-    ap.add_argument("--organisms", default="1,2,3,4,5,6")
+    ap.add_argument("--organisms", default="1,2,3,4,5,6,7")
     ap.add_argument("--workers", type=int, default=os.cpu_count() or 2)
     ap.add_argument("--out", required=True)
     ap.add_argument("--first", type=int, default=0, help="first run index (a shard of a larger run starts here)")
@@ -227,7 +231,7 @@ def main(argv=None):
                 if n % max(1, len(jobs) // 20) == 0:
                     print(f"{n}/{len(jobs)} done, {time.time() - t0:.0f} s", flush=True)
     names = {v[0]: v[1] for v in ORGS.values()}
-    L = [f"# Six organisms, {a.runs} runs, {a.scale}x size, {LOADS[a.load]}", "",
+    L = [f"# Seven organisms, {a.runs} runs, {a.scale}x size, {LOADS[a.load]}", "",
          f"Evidence class **S** (models). Commit `{commit[:12]}`, seeds {SEED0 + a.first}-{SEED0 + a.first + a.runs - 1}"
          + (f" ({sum(len(v) for v in res.values())} of {len(jobs)} runs finished before the deadline)" if stopped else "")
          + f", {a.scale} cop{'y' if a.scale == 1 else 'ies'} "

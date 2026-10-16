@@ -412,7 +412,7 @@ def main():
     test_citylearn_abc.main(); check("CityLearn A/B/C rule: a deterministic simulator's runs must reproduce; no battery means nothing to move; "
                                      "a district CityLearn cannot run is listed", True)
     r = subprocess.run([sys.executable, "-m", "unittest", "-q", "tests.test_six_kube"], cwd=ROOT, capture_output=True, text=True)
-    check("six organisms with the cluster inside: the same demand in both arms, every simulated knob handed back, an archived "
+    check("the organisms with the cluster inside: the same demand in both arms, every simulated knob handed back, an archived "
           "record stored gzipped reads the same", r.returncode == 0, r.stderr[-300:])
     from tests import test_fleet_realdata_paths
     test_fleet_realdata_paths.main(); check("capture replay and PlanetLab vessel on inputs in the real formats", True)

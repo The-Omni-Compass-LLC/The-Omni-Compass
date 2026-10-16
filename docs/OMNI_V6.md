@@ -21,7 +21,8 @@ the grid conductor releases A, B and C gradually alongside every organism at 1, 
 engine fingerprint and source commit. A queued, failed or unavailable test is not a completed measurement.
 
 The queue covers Kubernetes baseline/full/levers/observe, fairness, faults, batch and trace loads, KEDA, CruiseKube,
-Goldilocks, fixed capacity, scale control-plane checks, both muscle catalogs, all six organisms and their live-cluster
+Goldilocks, fixed capacity, scale control-plane checks, both muscle catalogs, all seven organisms (the spine the seventh since
+16 October, `docs/THE_SPINE.md`) and their live-cluster
 grid, Redis, Kafka, PostgreSQL, MySQL, MongoDB, MuJoCo, pandapower, CityLearn, drone swarms, robustness, Linux CPU-governor
 checks, the Azure full-control burst and the larger Azure organism machine. Linux cpufreq/RAPL execution requires a host
 that exposes the interfaces; a hosted VM capability refusal remains visible as unavailable hardware.
@@ -39,7 +40,7 @@ machine for them. The 1,000-copy planning estimates are extrapolations, not comp
 
 Google/GKE and Amazon/EKS retain their deployment scripts and use the new shared engine on a future manual launch.
 Their workflows, cloud-organism, gpu-bench and lambda-gpu are excluded from this campaign. No GPU machine is rented by it.
-`scripts/gpu_campaign_profiles.json` defines one physical card and eight physical cards, with all six organisms at scales
+`scripts/gpu_campaign_profiles.json` defines one physical card and eight physical cards, with all seven organisms at scales
 1, 10 and 100 and 100 paired repetitions per scale. Reports show nested 1/10/100 run prefixes. These are model copies around real hardware; only these three organism scales are permitted.
 
 The profiles are operational through the existing `HIL_SCALES` and `HIL_REPS_BY_SCALE` environment variables. Existing

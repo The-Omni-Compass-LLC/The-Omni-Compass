@@ -103,7 +103,7 @@ It runs, in order, and stops at the first failure:
 7. **the GPU fault drill**, about 10 minutes: the governor killed outright, the master switch pulled, the response
    feed blind; every check must pass (`SKIP_DRILL=1` skips it). Everything so far is then packed into
    `results/gpu/omni-gpu-<stamp>-partial.tar.gz`;
-8. the six organisms with this card inside, each as **1, 10 and 100 copies** on one clock (5, 3 and 2 repetitions;
+8. the seven organisms with this card inside, each as **1, 10 and 100 copies** on one clock (5, 3 and 2 repetitions;
    no 1,000 copies, the founder's order of 12 October, amendment 13), at least 16 hours (60 paired repetitions, each arm
    240 steps of 2 s); a size whose step needs longer than 2 s gets a longer step, measured on the machine and stated in
    the receipt (`SKIP_HIL=1` skips this stage);
@@ -156,7 +156,7 @@ when that line appears. **`sudo POOLED=1 nohup bash scripts/gpu_8card.sh &` runs
 look, about 3.5 hours: 3 repetitions per card (24 on 8 cards), then one model across every card; it leaves AI token
 generation, the power cap and the whole stacks out, so it is never the result to show. Last, the whole server as one: a language model (Qwen2.5-7B-Instruct, open)
 served across every card at once by vLLM, one Omni-Compass governor per card, the server's total GPU energy, about
-2 hours (`SKIP_LLM=1` skips it). Before it, **the whole stacks with a real card inside**: the six organisms at 1, 10
+2 hours (`SKIP_LLM=1` skips it). Before it, **the whole stacks with a real card inside**: the seven organisms at 1, 10
 and 100 copies (no 1,000 copies, amendment 13), native and Omni, the full repetitions (5, 3, 2 by size), each organism on
 its own card at the same time, so the stage that takes at least 16 hours on one card takes the time of its longest
 organism, about 3 hours (`SKIP_HIL=1` skips it). The whole design, every stage: about 20 to 22 hours. Progress: `tail -f results/gpu/8card-<stamp>/card-*.log`. At the end: `== send this one file back:

@@ -2,6 +2,30 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-16 (night): the spine, the seventh organism
+
+- **Seven organisms** (the founder's order of 16 October). The spine, the 267 muscles every real stack runs on (every muscle that
+  sits in all four realms: Kubernetes workloads, containers, placement, node fleets, cloud capacity, hosts, GPUs, network, storage,
+  observability, reliability and security, electrical distribution, cooling), is an organism in its own right, the base of the
+  other six as an operating system is the base of every program; it runs native and with Omni-Compass on top of native like the
+  four realms, the four stacked and the tower. `docs/THE_SPINE.md` says what it is, why it is an organism and how it is wired, and
+  is bound into both manuals.
+- **In every runner, no engine file touched.** The organisms are groupings of catalog rows made in the runners: `tools/run_realms_v5.py`
+  (`SPINE`, `spine_rows`, `ORGANISMS`; the spine's row first in every organisms table), `tools/run_scale.py` (organism 7),
+  `tools/run_hil.py` and through it `tools/run_kil.py --organism spine`, the grid conductor (`scripts/dispatch_grid.py`: organism 7,
+  `spine`, its shard shapes a planning estimate scaled from the distribution realm's until its first shards are measured), the
+  workflows `six`, `six-kube`, `realms-v5`, `grid`, `aks-metered`, `gke-metered`, `eks-metered`, `cloud-organism` and
+  `big-organism-detached`, the GPU campaign profiles, and the page generators (`tools/grid_v5.py`, `summary.py`,
+  `wiring_verdicts.py`, `muscle_catalog.py`, `realm_muscles.py`, `six_kube_report.py`). The engine fingerprint is unchanged
+  (`python3 tools/omni_version.py`: omni-v6). `tests/test_spine.py` holds the spine to 267 muscles in 13 families, cut the same in
+  every runner and named in no fingerprinted file.
+SPINE_RESULT_PLACEHOLDER
+- **Every standing page says seven**: the README, CLAUDE.md (an "Orders of 16 October" section), `docs/REALMS.md`,
+  `docs/REALM_MUSCLES.md` and `docs/MUSCLE_CATALOG.md` (the spine first), the theory chapter on the organisms, both manuals
+  (chapter 2 and its organisms table; the spine's chapter bound in), `docs/HOW_TO_READ_THE_RESULTS.md`, `docs/OMNI_V6.md`, and an
+  amendment each in `docs/REALMS_PREREGISTRATION.md` and `docs/K8S_COMPASS_PREREGISTRATION.md`. Result pages already written keep
+  the six they were run on.
+
 ## 2026-10-16 (later): everything in line with the engine that stands
 
 - **The realm pages on the catalog that stands.** `docs/REALM_MUSCLES.md` (`tools/realm_muscles.py`) now writes every organism out,

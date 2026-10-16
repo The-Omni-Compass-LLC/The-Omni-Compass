@@ -440,7 +440,8 @@ native telemetry stream as a measurement, and governs the whole body from above.
 turn by hand: machine pools and replicas, power caps and clock limits, cache sizes and connection pools, cooling
 setpoints and battery reserves, robot speeds and drone-swarm settings, and many more. They are grouped into four realms
 (compute, AI and cloud; physics, robotics and autonomy; energy, facility and industry; distribution and specialized
-systems) and run together as six organisms, from one realm alone up to the whole tower at once. The muscles in the
+systems) and run together as seven organisms, from the spine alone (the muscles every stack runs on) and one realm alone up
+to the whole tower at once. The muscles in the
 catalog are modelled (class S). The real controllers it has been run on top of, such as Kubernetes and the databases,
 are live software (class L). The chapter that follows the key, "What You Are Looking At," shows which is which. Appendix G lists every one of the 1,107 muscles: what it is, what Omni-Compass reads from it, what it moves, the organisms it belongs to, and its own card, the factory setting it runs on; and for each of the 70 families, how to wire it on any stack: the native controller that owns it, the wire out (what is read, and where), the wire in (what is written, and where), the restore, and whether that wire has run live in this repository or only on a model (`docs/wiring_recipes.csv`).
 
@@ -629,7 +630,7 @@ Glove Box; Executive Summary
 
 **Part I - The Governor**
 1. What Omni-Compass Is
-2. The Muscles, the Realms and the Six Organisms
+2. The Muscles, the Realms and the Seven Organisms
 3. Where the Value Comes From
 
 **Part II - The Mechanism of Action**
@@ -850,7 +851,7 @@ where each can be benchmarked, and who owns Omni-Compass and on what terms it is
 Governor over the Muscles* (`docs/THE_SEAT.md`); the distinction between one governor and a collection of tools is
 stated formally in *The Max, Formally* (`docs/FORMAL_V5.md`, Definition 2 and Proposition 1).
 
-## 2. The Muscles, the Realms and the Six Organisms
+## 2. The Muscles, the Realms and the Seven Organisms
 
 ### 2.1 The catalog
 
@@ -919,14 +920,19 @@ therefore also a check on one family's model: where the real stack and the model
 same law, the model has earned some trust; where they do not, the model is the thing to doubt, and the catalog's plant
 model for that family is the place to look.
 
-### 2.2 The four realms and the spine
+### 2.2 The spine and the four realms
 
-The muscles fall into four realms. Every realm stands on the same **spine** of 267 muscles in v5 (Kubernetes, machines, GPUs
-and CPUs, network, storage, observability, security, cooling and electrical distribution), because every realm's work
-runs on computers that must be cooled and powered, plus its own domain muscles.
+The muscles fall into four realms, and under every realm's own muscles stands the same **spine** of 267 muscles (Kubernetes
+workloads, containers, placement, node fleets, cloud capacity, hosts, GPUs, network, storage, observability, reliability and
+security, electrical distribution and cooling), because every realm's work runs on computers that must be scheduled,
+powered and cooled. Since 16 October the spine is an organism in its own right, the seventh, run native and with Omni-Compass
+on top like the other six: it is the base of every stack as an operating system is the base of every program, and a realm's
+reading beside the spine's shows what that realm's own trade adds to the base it stands on (the chapter *The Spine* follows
+this one). The catalog thus builds seven organisms, the spine first because the other six stand on it:
 
 | Organism | Muscles | What it is |
 |---|---:|---|
+| The spine (`spine`) | 267 | the muscles every real stack runs on, every one in all four realms: clusters, containers, placement, node fleets, cloud capacity, hosts, GPUs, network, storage, observability, reliability and security, electrical distribution, cooling; an organism of its own, the base of the other six |
 | 1. Compute / AI / Cloud | 540 | clusters, GPUs, AI training and inference, cloud capacity, kernels, functions, media, games, ledgers, build farms |
 | 2. Physics / Robotics / Autonomous | 404 | joints, fleets, vehicles, flight and spacecraft axes |
 | 3. Energy / Facility / Industrial | 480 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
@@ -934,8 +940,7 @@ runs on computers that must be cooled and powered, plus its own domain muscles.
 | 5. The four stacked, every duplicate kept | 1,908 | all four realms on one clock, the shared spine counted in each |
 | 6. The whole tower, every muscle once | 1,107 | every distinct muscle on one clock |
 
-These are the counts of Omni v5. On v2 and v3 the organisms were 430, 376, 470 and 440, the four stacked 1,716 and the
-tower 945; on v1 345, 262, 282 and 337, 1,226 and 656; each version's results stay with its own counts.
+These are the counts of the catalog that stands; earlier catalogs' counts stay with their own results in `docs/history/`.
 
 The realms differ in what their domain muscles are and in how much slack their native controllers leave. Compute, AI and
 Cloud is clusters, cards, training and inference pools and cloud capacity, where the knobs are replica targets, machine
@@ -952,24 +957,24 @@ list, by family and knob, is `docs/REALM_MUSCLES.md` and `docs/REGISTER.md` sect
 
 ### 2.3 What an organism run is
 
-These six organisms are the benchmark set of the modelled realms. An organism is every one of its muscles stepped on one
+These seven organisms are the benchmark set of the modelled realms. An organism is every one of its muscles stepped on one
 clock, each from its own plant model, each with its own native controller, and the whole fed one demand trace from one
 seed. Native runs the organism with every native controller alone. Omni runs the same organism, the same seed, the same
 demand and the same clock, with the compass law on every knob the verdict allows. Each run produces its own receipt: the
 organism's work, its energy, its time over its service line, and every knob's hand-back. In code and in the workflows the
-two large organisms are named `tower` and `stack`, never by a count, because the counts changed between v1 and v2 and a
-name that carried a count would read as a different organism; the old names are read as aliases.
+whole-catalog organisms and the spine are named `tower`, `stack` and `spine`, never by a count, because a count changes with
+the catalog and a name that carried one would read as a different organism; the old names are read as aliases.
 
 The receipt is read in a fixed order. **Work** first: the organism's output over the window, which must not fall, and
 which reads LOSS by rule if it does, however little, as the four stacked at 1,000 copies showed on a difference of one
 part in a million (section 2.5). **Energy** second, and **work per energy** with it, which is the gain the modelled realms
 are built to show. **Time over the service line** third, the share of steps on which any muscle's service reading was past
 its line, which is the do-no-harm gauge for the body as a whole. Then **every knob's hand-back**, which must be complete
-in every run or the run fails. The reading given to an organism (the realms tables under `results/realms/`, one per engine) uses the words
-"superior within guardrails" when work and energy both improve with the service line respected, "service tradeoff" when a
-gain in energy came with time over the line, and names the loss when there is one: the v2 reading on the Physics realm
-and the tower was a service tradeoff, traced to the speed knobs on busy motion axes, and the slack gate that answers it is
-the one rule that makes v3 (section 6.3). What an organism run cannot show is also fixed: it is evidence class S, the
+in every run or the run fails. The reading given to an organism (`results/realms_v5/REALMS_V5.md`, one table per engine) is
+GAIN, EVEN or LOSS by the key at the front of this manual: GAIN when its misses fell or its work rose beyond the noise and
+nothing moved the other way, EVEN inside the noise, LOSS named where it stands; the energy the max took is power given,
+shown beside the work. Earlier engines' readings, and the words they used, are history (`docs/history/`). What an organism
+run cannot show is also fixed: it is evidence class S, the
 plant models are our own, and nothing in it is presented as proof of a real stack. Its use is to show that one law holds
 across every realm at once, at a size no live benchmark can reach, and to find the rules that then have to earn their
 place on real software.
@@ -978,10 +983,12 @@ place on real software.
 
 Every organism runs at **1, 10 and 100 copies** (that many instances of the organism on one clock, so the four stacked
 at 100 copies is about 190,000 modelled muscles) and at **1, 10 and 100 paired runs** (that many native-and-omni pairs,
-each from its own seed): the six organisms × three sizes × three run counts are 54 squares, run modelled and with the
-real cluster inside, both arms shown in every square. One hundred is the maximum in both directions (the founder's order
-of 12 October, to cut the time and the bill): no 1,000 copies and no 1,000 runs are run on any engine from that day, and
-the whole grid runs on GitHub's own machines, nothing rented for it (`scripts/dispatch_grid.py`, `results/grid_v5/`).
+each from its own seed): the seven organisms × three sizes × three run counts are 63 squares, run modelled and with the
+real cluster inside, both arms shown in every square. On GitHub's own machines the grid also runs the 1,000 tier, 1,000
+copies and nested 1,000 runs (the founder's distinction of 15 October), a cell beyond a free runner's memory or time listed
+as pending runner capacity and never rented; paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100
+repetitions (the founder's order of 12 October, kept for everything that costs money). Nothing is rented for the grid
+(`scripts/dispatch_grid.py`, `results/grid_v5/`).
 Earlier engines' grids, which went to 1,000 copies and 1,000 runs, stand as they were run in their own pages
 (`results/scale/`) and are never read across engines.
 
@@ -1922,7 +1929,7 @@ run there indefinitely; most will stop at level 3.
 
 ```
 python3 verify.py
-python3 tools/run_scale.py --runs 10 --scale 1 --out results/scale/eval     # the six organisms, modelled
+python3 tools/run_scale.py --runs 10 --scale 1 --out results/scale/eval     # the seven organisms, modelled
 python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # the two-wire card, modelled
 ```
 
@@ -2661,7 +2668,7 @@ less work was done. The steps below are the whole method.
 1. **Paired runs.** Run your service the same way twice, once native and once with Omni-Compass on top, back to back
    on the same machines, the order rotated, at least 5 times (10 for a result you publish). `scripts/kind_paired.sh`
    and `tools/live_reps.py` do this on Kubernetes; `scripts/gpu_rented_run.sh` does it on a GPU box, in one command:
-   wire check, smoke, the six organisms with the card inside, then the preregistered counted run.
+   wire check, smoke, the seven organisms with the card inside, then the preregistered counted run.
 2. **The switch drill** after every run: turn Omni-Compass OFF; check every setting is back at its recorded
    original; turn it ON.
 3. **The receipt.** Each gauge: native, Omni-Compass, the change, the 95% interval of the difference, and whether the
@@ -2671,9 +2678,9 @@ less work was done. The steps below are the whole method.
    time outside the service line not higher by more than 1 percentage point. The band-first rule is stricter: no win
    is claimed while the time outside the service line is above native's.
 
-**At scale (modelled).** The six organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
+**At scale (modelled).** The seven organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
 (`bash scripts/scale_ladder.sh`) at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of each
-organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`); the six organisms with
+organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`); the seven organisms with
 a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on GitHub) and `big-organism` and
 `big-organism-detached` (1,000 copies on a rented machine).
 
@@ -2750,7 +2757,7 @@ receipt's energy line is modelled, the receipt says so.
 **What each class can and cannot carry, with the examples in this manual.** A class **T / V** result (the C++ twin
 agreeing with the Python to 3.6 × 10⁻¹⁵ on 500 trajectories; two million adversarial cases through the shield with zero
 violations) says that the law is what the text says it is and that both implementations compute it; it says nothing
-about whether the law helps any machine. A class **S** result (the 1,107 muscles and six organisms, the organisms at 1,000 copies, the power
+about whether the law helps any machine. A class **S** result (the 1,107 muscles and seven organisms, the organisms at 1,000 copies, the power
 grid in pandapower, the robot arms in MuJoCo, the buildings in CityLearn, the drones in PyBullet) says what the law does to
 a published model of a plant under that model's own native controller; it carries exactly the model's fidelity and no
 more, which is why S results are shown beside the Omni index and never inside it, and why the manual says "the energy is
@@ -2808,7 +2815,7 @@ product.
 | **v2** (`docs/OMNI_V2.md`) | v1's law, controllers and runners byte for byte; the catalog grown to 945 muscles in 59 families with thirteen new presets | `OMNI_V2.json` | the modelled realms (Physics and the tower read a service tradeoff: the cause was found and made v3) |
 | **v3** (`docs/OMNI_V3.md`) | v2 plus the slack gate on speed knobs (a motion axis busy more than half the time at full speed keeps its speed native) and the marine preset | `b53d05449ee04c4b`, 40 files | the modelled realms A/B/C (every organism superior within guardrails, 0 LOSS or power given), the grid at 1 and 10 copies, the cluster inside the organisms at 10 and 100 copies, the database A/B/C, the robot arms A/B/C, CityLearn A/B/C; the Kubernetes six tests, the power grid, Azure and the 1,000-copy organisms running |
 | **v5** (`docs/OMNI_V5.md`) | the max as the default brain on the 1,107-muscle catalog in 70 families (six organisms: 540, 404, 480, 484, the four stacked 1,908, the tower 1,107); every muscle its own card; the living body; the lease's walk back; the dial's tune-down; every muscle from 1 up to one click under its own capacity, read live | `6093b2b88aa911b9`, 44 files (re-declared on each change while in development: `9be48445…`, `5648f290…`) | the muscles and the six organisms under three loads (`results/realms_v5/`), the grid (`results/grid_v5/`), the capacity test (`results/live/V5_CAPACITY.md`) |
-| **v6** (`docs/OMNI_V6.md`), **the engine that stands** | v5's law and catalog byte for byte; the shared-host capacity repair in the Kubernetes controller (the host counted once, no extra replica room while it is busy or unmeasured, an enlarged ceiling rechecked) | `df6147466ef18046`, 45 files | Goldilocks, CruiseKube, KEDA's HTTP add-on, KEDA on the CPU target and the requests (`results/live/V6_*.md`); every other benchmark queued (`scripts/reruns.txt`) |
+| **v6** (`docs/OMNI_V6.md`), **the engine that stands** | v5's law and catalog byte for byte; the shared-host capacity repair in the Kubernetes controller (the host counted once, no extra replica room while it is busy or unmeasured, an enlarged ceiling rechecked); since 16 October its catalog is run as seven organisms, the spine the seventh (`docs/THE_SPINE.md`), with no engine file changed | `df6147466ef18046`, 45 files | Goldilocks, CruiseKube, KEDA's HTTP add-on, KEDA on the CPU target and the requests (`results/live/V6_*.md`); every other benchmark queued (`scripts/reruns.txt`) |
 | **v7**, a candidate (its page docs/OMNI_V7.md on the branch `v7-candidate`) | quota-aware conveyance; the verdict in the reports' words; every rule in seconds; the cloud's rule as one flag; the busy guard on a shared host; corrected on 16 October after its first trials (an unreadable quota is no budget known) | on its branch | the toy gate (its results/toy_gate folder there) and its live trials; nothing on main |
 
 ```
@@ -3555,12 +3562,12 @@ any one of the three can tell whether the files in front of them are the files t
 | Task | Command |
 |---|---|
 | Verify everything | `python3 verify.py` |
-| Six organisms, modelled | `python3 tools/run_scale.py --runs N --scale K --out <dir>` |
+| Seven organisms, modelled | `python3 tools/run_scale.py --runs N --scale K --out <dir>` |
 | The full ladder | `bash scripts/scale_ladder.sh` |
 | Two-wire card, modelled | `python3 tools/run_gpu_card.py <dir> [fresh]` |
 | GPU wire check | `sudo python3 tools/gpu_wire_check.py --gpu 0` |
 | GPU, whole benchmark in one command | `sudo nohup bash scripts/gpu_rented_run.sh > run.log 2>&1 &` |
-| The six organisms with the real card inside | `python3 tools/run_hil.py --out <dir>` |
+| The seven organisms with the real card inside | `python3 tools/run_hil.py --out <dir>` |
 | GPU governor, two wires | `sudo python3 -m omni_controller.gpu_compass --mode watch|cap ...` |
 | Kubernetes, watch | `kubectl apply -f deploy/install/omni-compass.yaml` |
 | Kubernetes paired runs | `scripts/kind_paired.sh`, then `tools/live_reps.py` |
@@ -3571,7 +3578,7 @@ any one of the three can tell whether the files in front of them are the files t
 | Which engine a checkout or a commit carries | `python3 tools/omni_version.py [--commit <sha>]` |
 | The three-run table (Kubernetes, Azure) | `python3 tools/confirm_abc.py "<title>" raw/run-<A> raw/run-<B> raw/run-<C> --out results/live/V3_<TEST>.md` |
 | The three-run table (database, messaging, cache, swarms, robots, grid, buildings) | `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/swarm_abc.py`, `tools/mujoco_abc.py`, `tools/pandapower_abc.py`, `tools/citylearn_abc.py`, the same arguments |
-| The six organisms with the cluster inside | `python3 tools/six_kube_report.py <raw dirs> --out results/live/V3_SIX_KUBE.md` |
+| The organisms with the cluster inside | `python3 tools/six_kube_report.py <raw dirs> --out results/live/V3_SIX_KUBE.md` |
 | The grid of copies and runs | `python3 tools/grid.py` (reads `results/scale/receipts/`) |
 | The Omni index | `python3 tools/omni_index.py` |
 | Which knobs earn a wire in (write, watch, operator's choice) | `python3 tools/wiring_verdicts.py` (`--check` compares the page with the tables; `verify.py` runs it) |

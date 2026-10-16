@@ -558,7 +558,8 @@ def sim_why(f, name, j, v):
 LABEL_VERDICT = {"SUPERIOR WITHIN GUARDRAILS": WRITE, "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF": CHOICE,
                  "SERVICE IMPROVEMENT WITH ENERGY TRADEOFF": CHOICE, "NONINFERIOR / INCONCLUSIVE": WATCH, "NOT ESTABLISHED": WATCH,
                  "AWAY FROM ITS AIM": WATCH, "INVALID": "invalid"}
-REALM_NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
+REALM_NAMES = {"spine": "The spine, the muscles every stack runs on",
+               "compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
                "energy_facility_industrial": "Energy / Facility / Industrial", "distribution_specialized": "Distribution / Specialized",
                "stack": "The four stacked, every duplicate kept", "tower": "The whole tower, every muscle once"}
 V5_DIR = ROOT / "results" / "realms_v5"
@@ -629,7 +630,7 @@ def muscles():
 
 
 def organisms_modelled():
-    """The six organisms under the normal, climb and line loads (results/realms_v5/REALMS_V5.json): the whole, every muscle written at
+    """The seven organisms under the normal, climb and line loads (results/realms_v5/REALMS_V5.json): the whole, every muscle written at
     once by one brain; misses in percentage points, work, and the energy the max took as power given."""
     d = json.loads((V5_DIR / "REALMS_V5.json").read_text())
     out = []
@@ -728,7 +729,7 @@ def main(check=False):
          "native, the muscle lives by itself; we only wire out of it.", "",
          "Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and "
          "`verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` "
-         f"({len(all_cases)} rows, the 1,107 modelled muscles included one by one, and the six organisms under three loads).", "",
+         f"({len(all_cases)} rows, the 1,107 modelled muscles included one by one, and the seven organisms under three loads).", "",
          "## The rule", "",
          "Every judged gauge of a table counts (rows marked \"shown, not judged\" never do). Every reading is **GAIN**, **EVEN** or "
          "**LOSS**, decided by what the gauge is for and never by the sign of its number (the key: `docs/HOW_TO_READ_THE_RESULTS.md`): "
@@ -906,7 +907,7 @@ def main(check=False):
           "(the gain came from timing, not from more energy). Every muscle's figure, on both loads, is in the CSV.", ""]
 
     # the organisms
-    L += ["## The organisms", "", "### The six modelled organisms under three loads (every muscle written at once, one brain)", "",
+    L += ["## The organisms", "", "### The seven modelled organisms under three loads (every muscle written at once, one brain)", "",
           "| Organism and load | Muscles | Reading | Verdict | Figures |", "|---|---:|---|---|---|"]
     for x in org_m:
         L.append(f"| {x['domain']} | {x['case']} | {labelled(x['label'])} | **{x['verdict']}** | {esc(x['why'])} |")

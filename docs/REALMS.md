@@ -3,10 +3,12 @@
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 The muscle tower on modelled plants: **1,107 distinct muscles in 70 families** (`realms/catalog_v5.csv`, the catalog the
-engine that stands carries), cut into four realms and run as **six organisms**: each realm's organism (its own families
-plus the shared spine of 267 muscles every real stack runs on: Compute / AI / Cloud 540, Physics / Robotics / Autonomous
-404, Energy / Facility / Industrial 480, Distribution / Specialized 484), the four stacked on one clock with every
-duplicate of the spine kept (`stack`, 1,908) and the whole tower, every muscle once (`tower`, 1,107). Every muscle also
+engine that stands carries), run as **seven organisms**, each native and with Omni-Compass on top of native: the **spine**
+(`spine`, the 267 muscles every real stack runs on, every one in all four realms; an organism of its own and the base of
+the other six, as an operating system is the base of every program: `docs/THE_SPINE.md`), each realm's organism (its own
+families on the spine: Compute / AI / Cloud 540, Physics / Robotics / Autonomous 404, Energy / Facility / Industrial 480,
+Distribution / Specialized 484), the four stacked on one clock with every duplicate of the spine kept (`stack`, 1,908)
+and the whole tower, every muscle once (`tower`, 1,107). Every muscle also
 runs alone on its own plant. Each is run natively (the plant's own controller alone) and with Omni-Compass on top, with
 meters and receipts, under three loads: the organism's own load, the climb (the load stepping by one, 1 2 3 2 3 4 …)
 and work waiting in line. Evidence class **S** (modelled: our own models of these machines, never counted in the
@@ -17,7 +19,7 @@ class P.
 
 ```
 pip install -r requirements.txt
-python3 tools/run_realms_v5.py --out realms5-out     # the preregistered run: every muscle alone and the six organisms, seeds 3000-3009
+python3 tools/run_realms_v5.py --out realms5-out     # the preregistered run: every muscle alone and the seven organisms, seeds 3000-3009
 python3 tests/test_realms.py                         # the harness's own checks (also inside verify.py)
 python3 tools/realm_muscles.py                       # docs/REALM_MUSCLES.md: every organism written out, muscle by muscle
 python3 tools/muscle_catalog.py                      # docs/MUSCLE_CATALOG.md: every muscle explained, wired and carded
@@ -27,7 +29,7 @@ The run is deterministic: `realms-v5.yml` (GitHub) runs it again and fails if an
 table committed in `results/realms_v5/`.
 
 Results, each named for the engine it ran on: `results/realms_v5/REALMS_V5.md` (the tables: every muscle alone over its
-loads, and the six organisms under the normal, climb and line loads), `MUSCLES_V5.csv` (one row per muscle and load),
+loads, and the seven organisms under the normal, climb and line loads), `MUSCLES_V5.csv` (one row per muscle and load),
 `REALMS_V5.json` (every per-seed contrast), `RUN.json` and `SHA256SUMS.txt` (commit and fingerprints). The grid of
 copies and runs (1, 10 and 100 copies × 1, 10 and 100 runs, modelled and with the real cluster inside) is
 `results/grid_v5/GRID.md`. The earlier catalogs' results stay as the road to 1.0: v3's in `results/realms/`, v2's in
@@ -46,7 +48,8 @@ engine that stands (`scripts/reruns.txt`).
 | `realms/compass_arm_v5.py` | the law on every muscle at its default, the max, and the dial's tune-down (`V5CFG`, `V5SAVE`) |
 | `realms/harness.py` | the arms (native, omni), the organisms, the three loads, the outcome and the label rule |
 | `docs/REALMS_PREREGISTRATION.md` | the question, the rules, the seeds and the development history, frozen before the run |
-| `docs/REALM_MUSCLES.md`, `docs/MUSCLE_CATALOG.md` | every organism written out muscle by muscle; every muscle explained, wired and carded (the manuals' appendix) |
+| `docs/THE_SPINE.md` | the spine, the seventh organism: what it is, why it is an organism, how it is wired, where it stands in the runners |
+| `docs/REALM_MUSCLES.md`, `docs/MUSCLE_CATALOG.md` | every organism written out muscle by muscle, the spine first; every muscle explained, wired and carded (the manuals' appendix) |
 
 ## How it relates to the rest
 

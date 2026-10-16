@@ -2,20 +2,25 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Generated from `realms/catalog_v5.csv` (the catalog the engine that stands carries: 1,107 distinct muscles in 70 families) by `tools/realm_muscles.py`. A **muscle** is one setting on one machine that already has its own control; the one knob Omni-Compass may hold on it stands in brackets after its name. Every realm's organism is its own families plus the **shared spine** (the infrastructure every real stack runs on), so the realm counts add to more than the tower. What the engine does with each knob, which native controller owns it, where the reading is tapped and the setting written, how it is restored and its own card are written family by family in `docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix); the organisms' results are in `results/realms_v5/REALMS_V5.md` and the grid in `results/grid_v5/GRID.md`, each named for the engine it ran on.
+Generated from `realms/catalog_v5.csv` (the catalog the engine that stands carries: 1,107 distinct muscles in 70 families) by `tools/realm_muscles.py`. A **muscle** is one setting on one machine that already has its own control; the one knob Omni-Compass may hold on it stands in brackets after its name. The catalog builds **seven organisms**, each run native and with Omni-Compass on top of native: the **spine**, the muscles every real stack runs on, an organism of its own and the base of the other six (as an operating system is the base of every program; `docs/THE_SPINE.md`); the four realms, each its own families with the spine under them, so the realm counts add to more than the tower; the four stacked; and the whole tower. What the engine does with each knob, which native controller owns it, where the reading is tapped and the setting written, how it is restored and its own card are written family by family in `docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix); the organisms' results are in `results/realms_v5/REALMS_V5.md` and the grid in `results/grid_v5/GRID.md`, each named for the engine it ran on.
 
-## The six organisms
+## The seven organisms
 
-| Organism | Muscles | What it is |
-|---|---:|---|
-| 1. Compute / AI / Cloud | 540 | its 273 own muscles and the spine of 267 |
-| 2. Physics / Robotics / Autonomous | 404 | its 137 own muscles and the spine of 267 |
-| 3. Energy / Facility / Industrial | 480 | its 213 own muscles and the spine of 267 |
-| 4. Distribution / Specialized | 484 | its 217 own muscles and the spine of 267 |
-| 5. The four stacked (`stack`) | 1,908 | the four realms' organisms on one clock, every duplicate of the spine kept |
-| 6. The whole tower (`tower`) | 1,107 | every muscle of the catalog once |
+In the runners the spine is `spine` (organism 7 in `tools/run_scale.py` and the grid conductor, after the six that were numbered before it); every table lists it first, because the other six stand on it.
 
-## The shared spine: 267 muscles, in all four realms
+| Organism | Runner name | Muscles | What it is |
+|---|---|---:|---|
+| The spine | `spine` (7) | 267 | the muscles every real stack runs on, every one in all four realms: the base of the other six |
+| Compute / AI / Cloud | `compute_ai_cloud` (1) | 540 | its 273 own muscles on the spine of 267 |
+| Physics / Robotics / Autonomous | `physics_robotics_autonomous` (2) | 404 | its 137 own muscles on the spine of 267 |
+| Energy / Facility / Industrial | `energy_facility_industrial` (3) | 480 | its 213 own muscles on the spine of 267 |
+| Distribution / Specialized | `distribution_specialized` (4) | 484 | its 217 own muscles on the spine of 267 |
+| The four stacked | `stack` (5) | 1,908 | the four realms' organisms on one clock, every duplicate of the spine kept |
+| The whole tower | `tower` (6) | 1,107 | every muscle of the catalog once |
+
+## The spine: 267 muscles, in all four realms, an organism of its own
+
+The thirteen families below are the computers every realm's work runs on and the power and cooling they need: Kubernetes workloads, containers, placement, node fleets, cloud capacity, hosts, GPUs, network, storage, observability, reliability and security, electrical distribution and cooling. Run alone, the spine is a data center with nothing of any one trade in it; under a realm, it is what that realm's own muscles stand on.
 
 ### Kubernetes Workload Scaling (32; plant: compute_pool, server)
 replicas [capacity], hpa_cpu_target [setpoint], hpa_memory_target [setpoint], hpa_custom_target [setpoint], vpa_apply [capacity], scale_to_zero [capacity], keda_threshold [admission], rollout_rate [capacity], max_surge [capacity], max_unavailable [capacity], deployment_pause_resume [admission], rollout_abort [admission], pod_eviction [admission], pdb_policy [capacity], scheduler_queue_priority [admission], api_priority_fairness [admission], hpa_min_replicas [capacity], hpa_max_replicas [capacity], hpa_scale_down_stabilisation_window [setpoint], hpa_scale_up_stabilisation_window [setpoint], hpa_scaling_rate_policies [capacity], hpa_policy_selection [capacity], hpa_tolerance [capacity], hpa_sync_period [capacity], vpa_minmax_allowed_resources [capacity], keda_polling_interval [setpoint], rollout_progress_deadline [admission], rollout_readiness_delay [capacity], unhealthy_pod_eviction_policy [admission], graceful_termination [capacity], probes [capacity], kepler_energy_target_autoscaling [setpoint]
@@ -56,7 +61,9 @@ server_power_cap [power], rack_power_cap [power], pdu_branch_power_limit [power]
 ### Cooling, Chillers & Thermodynamics (18; plant: thermal_zone, data_hall)
 supply_air_temperature [setpoint], return_air_target [setpoint], coolant_supply_temperature [setpoint], coolant_flow [capacity], pump_speed [capacity], fan_speed [capacity], chiller_setpoint [setpoint], compressor_authority [power], cooling_tower_fan [capacity], cooling_capacity [capacity], rack_thermal_budget [power], gpu_thermal_envelope [setpoint], cpu_thermal_envelope [setpoint], thermal_workload_migrate [admission], thermal_load_shed [admission], server_fan_speed [capacity], economiser [capacity], chiller_plant_supervisory_control_rl_with_safety_layer [capacity]
 
-## Organism 1: Compute / AI / Cloud: 273 own muscles + the spine of 267 = 540 in its organism
+## Organism 1: Compute / AI / Cloud: 273 own muscles on the spine of 267 = 540 in its organism
+
+The spine above, and these families of its own.
 
 ### Work Admission & Demand Shaping (19; plant: compute_pool, server)
 api_concurrency [admission], queue_concurrency [admission], queue_backpressure [admission], job_admission [admission], batch_admission [admission], inference_admission [admission], load_shed [admission], priority_gate [admission], tenant_admission [admission], burst_limit [admission], deadline_admission [admission], work_budget [admission], request_queue_limit [admission], retry_admission [admission], background_work_gate [admission], maintenance_work_gate [admission], request_concurrency_limit [admission], adaptive_concurrency_limit [admission], priority_request_queue_under_limit [admission]
@@ -118,7 +125,9 @@ dpu_pf_tx_rate [capacity], dpu_vf_tx_rate [capacity], dpu_sf_tx_rate [capacity],
 ### Kubernetes Dynamic Device Allocation (8; plant: compute_pool, gpu)
 dra_device_class_selection [capacity], dra_claim_capacity [capacity], dra_claim_sharing [capacity], dra_device_taint [capacity], dra_device_eviction [admission], dra_binding_readiness [capacity], dra_binding_failure_response [capacity], dra_device_configuration [setpoint]
 
-## Organism 2: Physics / Robotics / Autonomous: 137 own muscles + the spine of 267 = 404 in its organism
+## Organism 2: Physics / Robotics / Autonomous: 137 own muscles on the spine of 267 = 404 in its organism
+
+The spine above, and these families of its own.
 
 ### Robotics Motion Control (26; plant: motion_axis, robot_joint)
 joint_position [capacity], joint_velocity [capacity], joint_acceleration [capacity], joint_effort [power], cartesian_velocity [capacity], trajectory_speed [capacity], trajectory_acceleration [capacity], jerk_limit [capacity], collision_margin [capacity], force_limit [power], gripper_force [power], locomotion_speed [capacity], steering_angle [capacity], braking_force [power], balance_correction [capacity], trajectory_tolerances [capacity], velocity_acceleration_scaling [capacity], controller_update_rate [capacity], ros2_executor_threads [capacity], ros2_qos_history_depth [setpoint], ros2_control_loop_rate [setpoint], humanoid_balance_margin [capacity], humanoid_gait_speed [capacity], humanoid_joint_torque_limit [power], humanoid_step_height [capacity], manipulator_payload_speed_scaling [capacity]
@@ -144,7 +153,9 @@ hoist_speed_target [capacity], acceleration_limit [capacity], regen_drive_mode [
 ### Automotive EV & Mobile Powertrain (14; plant: motion_axis, ev_traction)
 state_of_charge_limits [power], smart_charging_schedule [admission], traction_torque_limit [power], regen_braking_level [power], battery_charge_limit [power], battery_discharge_limit [power], battery_thermal_target [power], motor_thermal_limit [power], vehicle_speed_envelope [capacity], energy_recovery_target [power], auxiliary_power_budget [power], fast_charge_current [power], fast_charge_voltage [power], vehicle_safe_state [admission]
 
-## Organism 3: Energy / Facility / Industrial: 213 own muscles + the spine of 267 = 480 in its organism
+## Organism 3: Energy / Facility / Industrial: 213 own muscles on the spine of 267 = 480 in its organism
+
+The spine above, and these families of its own.
 
 ### Industrial PLC & Process Automation (18; plant: process_loop, process)
 plc_cycle_authority [admission], machine_cell_admission [admission], valve_position [setpoint], pump_flow [capacity], compressor_speed [capacity], heater_power [power], furnace_setpoint [setpoint], pressure_setpoint [setpoint], temperature_setpoint [setpoint], mass_flow_setpoint [setpoint], tank_level_target [setpoint], conveyor_rate [capacity], feed_rate [capacity], purge_vent_action [admission], controller_mode [capacity], alarm_limits [capacity], safety_interlock_trip [capacity], opc_ua_writes [capacity]
@@ -191,7 +202,9 @@ run_to_run_control [capacity], idle_sleep_mode [capacity], tool_job_dispatch [ad
 ### Water Wastewater & Pumping (12; plant: process_loop, water)
 pump_speed_water [capacity], valve_position_water [setpoint], reservoir_level_target [setpoint], line_pressure_target [setpoint], flow_target_water [setpoint], aeration_rate [power], chemical_dose_rate [power], filtration_backwash [admission], lift_station_dispatch [admission], leak_isolation [admission], water_demand_shed [admission], water_emergency_shutdown [admission]
 
-## Organism 4: Distribution / Specialized: 217 own muscles + the spine of 267 = 484 in its organism
+## Organism 4: Distribution / Specialized: 217 own muscles on the spine of 267 = 484 in its organism
+
+The spine above, and these families of its own.
 
 ### Service Mesh & API Reliability (16; plant: compute_pool, server)
 circuit_breaker [admission], retry_budget [admission], service_timeout [admission], service_concurrency [admission], connection_pool [capacity], traffic_divert [capacity], traffic_mirror [capacity], canary_weight [setpoint], outlier_ejection [admission], health_threshold [admission], dns_traffic_weight [setpoint], session_affinity [capacity], request_hedging [capacity], fault_injection_gate [admission], service_failover [capacity], load_balancing_policy [capacity]
@@ -245,6 +258,10 @@ The four realms' organisms above, run on one clock as one body (`stack`; the old
 ## Organism 6: the whole tower, all 1,107 muscles once
 
 Every muscle of the catalog once (`tower`; the older name `organism_656` is read as an alias): the spine and every realm's own families, 1,107 in all.
+
+## Organism 7: the spine, 267 muscles
+
+The spine listed first above, run on its own (`spine`): the same muscles, the same native controllers, nothing of any one realm on top of them.
 
 ---
 

@@ -4,11 +4,11 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The six organisms with the real cluster inside: twelve columns, one report.
+"""The seven organisms with the real cluster inside: fourteen columns, one report.
 
 Reads every bench-<arm>-<rep>/ under DIR that carries organism.json (tools/run_kil.py, started by scripts/kind_bench.sh
 with ORGANISM set), groups the runs by organism, and pairs each Omni arm with native by repetition. Each organism gives
-two columns, native and native with Omni-Compass on top: six organisms, twelve columns.
+two columns, native and native with Omni-Compass on top: seven organisms, fourteen columns.
 
 Two kinds of rows, kept apart:
   the cluster  real Kubernetes, measured (response times from the probe, pods, replicas and CPU from the API server;
@@ -159,7 +159,7 @@ def main(root, *more, out=None, reps=None):
     keys = [k for k in CLUSTER + ORG if any(not math.isnan(g.get(k, math.nan)) for o in orgs for arms in runs[o].values()
                                              for g in arms.values())]
     out_json = {"organisms": {}}
-    L = ["# The six organisms with the real Kubernetes cluster inside: native against native with Omni-Compass on top", "",
+    L = ["# The organisms with the real Kubernetes cluster inside: native against native with Omni-Compass on top", "",
          "Each organism runs on the measured window's clock with the cluster as one more muscle (`tools/run_kil.py`): its "
          "own compute demand drives the load generator, the cluster's watts are its heat and load. Native: the stacks' own "
          "controllers and Kubernetes alone. Omni: the compass law on every simulated muscle and the live controller on the "
