@@ -54,8 +54,8 @@ READ_MORE = [("README.md", "the front page, newest result first"),
              ("results/OMNI_INDEX.md", "the one combined number, test by test"),
              ("docs/BENEFIT_SHEET.md", "one number and one word per benchmark"),
              ("docs/WIRING_VERDICTS.md", "write, watch or the operator's choice, knob by knob"),
-             ("results/realms_v5/REALMS_V5.md", "every muscle alone and the six organisms (modelled)"),
-             ("results/grid_v5/GRID.md", "the six organisms at 1, 10 and 100 copies and runs")]
+             ("results/realms_v5/REALMS_V5.md", "every muscle alone and the seven organisms (modelled)"),
+             ("results/grid_v5/GRID.md", "the seven organisms at 1, 10 and 100 copies and runs")]
 
 
 def load(path):
@@ -153,7 +153,7 @@ def wiring_part():
     return out
 
 
-NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
+NAMES = {"spine": "the spine", "compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
          "energy_facility_industrial": "Energy / Facility / Industrial", "distribution_specialized": "Distribution / Specialized",
          "stack": "the four stacked", "tower": "the whole tower"}
 
@@ -163,7 +163,7 @@ def realms_part():
     if not d:
         return []
     run = d.get("run", {})
-    head = (f"The muscles and the six organisms on engine {run.get('engine', '?')} at the {run.get('dial', '?')} (evidence class S, "
+    head = (f"The muscles and the seven organisms on engine {run.get('engine', '?')} at the {run.get('dial', '?')} (evidence class S, "
             f"our own models; run {run.get('started', '?')}, commit {str(run.get('commit', '?'))[:12]}, {run.get('muscles', '?')} "
             "muscles; source: results/realms_v5/REALMS_V5.md):")
     out = [head]

@@ -725,11 +725,14 @@ An installation governs one body. The muscles of a stack, its clusters, database
 read by one governor and judged together, so that a step on one muscle is refused when it would push another past its
 cushion (chapter 5). Under every realm's own muscles stands the same **spine** of 267 muscles (Kubernetes, machines, GPUs
 and CPUs, network, storage, observability, security, cooling and electrical distribution), because every realm's work runs
-on computers that must be cooled and powered. The catalog groups the muscles into four realms and stacks them into six
-organisms:
+on computers that must be scheduled, powered and cooled. The spine is an organism in its own right, the base every stack
+runs on as an operating system is the base of every program, and it is wired first (the chapter on the spine follows this
+one). The catalog groups the muscles into four realms and builds seven organisms, the spine first because the other six
+stand on it:
 
 | Organism | Muscles | What it is |
 |---|---:|---|
+| The spine (`spine`) | 267 | the muscles every real stack runs on, every one in all four realms: clusters, containers, placement, node fleets, cloud capacity, hosts, GPUs, network, storage, observability, reliability and security, electrical distribution, cooling; an organism of its own, the base of the other six |
 | 1. Compute / AI / Cloud | 540 | clusters, GPUs, AI training and inference, cloud capacity, kernels, functions, media, games, ledgers, build farms |
 | 2. Physics / Robotics / Autonomous | 404 | joints, fleets, vehicles, flight and spacecraft axes |
 | 3. Energy / Facility / Industrial | 480 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
@@ -1147,7 +1150,7 @@ run there indefinitely; most will stop at level 3.
 
 ```
 python3 verify.py
-python3 tools/run_scale.py --runs 10 --scale 1 --out results/scale/eval     # the six organisms, modelled
+python3 tools/run_scale.py --runs 10 --scale 1 --out results/scale/eval     # the seven organisms, modelled
 python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # the two-wire card, modelled
 ```
 
@@ -4803,7 +4806,7 @@ run's summary and as an artifact. The inputs below are the workflows' own; a run
 | `load_steps` | empty (a steady load) | load-generator replicas per step, in order, for a burst or a day-shaped load (for example `1 6 1 8 1 6`) |
 | `max_workers` | 4 | the work pool's top; the cloud's autoscaler runs it from 1 to this many |
 | `hpa_max` | empty (the manifest's 10) | the service's replica ceiling, the same in both arms; size it with the fleet (nine 200-millicore pods fit a two-processor machine) |
-| `organism`, `load_max`, `organism_scale` | empty, 6, 1 | one of the repository's six organisms with this cluster inside it, its peak load, and its copies on one clock (1, 10 or 100); empty runs the service alone |
+| `organism`, `load_max`, `organism_scale` | empty, 6, 1 | one of the repository's seven organisms (the spine among them) with this cluster inside it, its peak load, and its copies on one clock (1, 10 or 100); empty runs the service alone |
 | `dial` | `save` | the dial of Omni-Compass on top: `save`, the tune-down, for every bill result; `max` is never read as a bill result (section 19.2) |
 
 Every cloud workflow runs the governor in the cloud mode (`OMNI_MACHINES_ONLY=1`, which passes `--give-back-only`, chapter 19).

@@ -96,9 +96,9 @@ Read it in this order:
 The file `omni-gpu-<stamp>-confirmations.tar.gz` holds two such tables: compute-bound work (matrix products) and AI
 token generation (memory-bound work).
 
-## The card inside the six organisms (`results/hil/run-<stamp>/HIL.md`)
+## The card inside the seven organisms (`results/hil/run-<stamp>/HIL.md`)
 
-The real card is wired into each of the six organisms (the four realms, the four stacked, the whole tower) at four
+The real card is wired into each of the seven organisms (the spine, the four realms, the four stacked, the whole tower) at four
 sizes (1, 10, 100 and 1,000 copies). Each row is one size, one organism and one part:
 - **stacks (model)**: the modelled machines (evidence S);
 - **card (meter)**: the real card, its own meter (evidence P);

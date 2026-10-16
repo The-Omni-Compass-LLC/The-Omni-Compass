@@ -6,8 +6,8 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The whole stacks with the real card inside: one harness, one engine, one set of receipts.
 
-Each of six organisms (the four realms, the four stacked, each realm keeping its own body so every muscle runs exactly
-its own realm's native, and the whole tower; the v5 catalog, realms/catalog_v5.csv) runs on one clock as in the realm
+Each of seven organisms (the spine, the four realms, the four stacked, each realm keeping its own body so every muscle
+runs exactly its own realm's native, and the whole tower; the v5 catalog, realms/catalog_v5.csv) runs on one clock as in the realm
 harness, and the real GPU on this machine is wired into it as one more muscle of its GPU Hardware family (a spine family,
 so the card sits in every organism; in the four stacked, in the first body): the card serves the pinned request stream
 (tools/gpu_workload.py), its own power.draw is heat in the organism's thermal zones and load on its storage sites, and
@@ -60,9 +60,11 @@ from realms.harness import omni_bones, omni_step  # noqa: E402  (the max with it
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
 from tools.readings import labelled, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (the words every table uses)
+from tools.run_realms_v5 import SPINE, spine_rows  # noqa: E402  (the spine, the seventh organism)
 
 REALMS = ("compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized")
-NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
+NAMES = {SPINE: "The spine, the muscles every stack runs on",
+         "compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
          "energy_facility_industrial": "Energy / Facility / Industrial", "distribution_specialized": "Distribution / Specialized",
          STACK: "The four stacked, duplicates kept", TOWER: "The whole tower, every muscle once"}
 SEED0 = 6000
@@ -110,7 +112,8 @@ def groups(scale=1):
     """Each organism's muscles. The four stacked are each realm's own muscles side by side (every shared muscle in each,
     with the same id it has in its own realm, so its native is identical there); bodies_for builds their four bodies."""
     rows = catalog(CATALOG)
-    g = {r: [x for x in rows if r in x["realms"].split(";")] for r in REALMS}
+    g = {SPINE: spine_rows(rows)}                        # the base every stack runs on, an organism of its own
+    g.update({r: [x for x in rows if r in x["realms"].split(";")] for r in REALMS})
     g[STACK] = [x for realm in REALMS for x in g[realm]]
     g[TOWER] = rows
     # scale copies of each organism on one clock, each copy its own seeds (as tools/run_scale.py)
@@ -345,7 +348,7 @@ def main(argv=None):
     ap.add_argument("--scales", default=os.environ.get("HIL_SCALES", "1,10,100"))
     ap.add_argument("--reps-by-scale", default=os.environ.get("HIL_REPS_BY_SCALE", "5,3,2"))
     ap.add_argument("--step-s", type=float, default=float(os.environ.get("HIL_STEP_S", 2.0)))
-    ap.add_argument("--organisms", default=os.environ.get("HIL_ORGANISMS", ",".join(REALMS + (STACK, TOWER))))
+    ap.add_argument("--organisms", default=os.environ.get("HIL_ORGANISMS", ",".join((SPINE,) + REALMS + (STACK, TOWER))))
     ap.add_argument("--gpu", type=int, default=int(os.environ.get("GPU", 0)))
     ap.add_argument("--smi", default=os.environ.get("NVIDIA_SMI", "nvidia-smi"))
     ap.add_argument("--interval", type=float, default=2.0)

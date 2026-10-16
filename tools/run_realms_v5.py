@@ -5,7 +5,7 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Run the realm harness on Omni v5 at the max and write its tables (results/realms_v5/).
 
-  python3 tools/run_realms_v5.py                      # the preregistered run: seeds 3000-3009, the v5 catalog (1,097), results/realms_v5/
+  python3 tools/run_realms_v5.py                      # the preregistered run: seeds 3000-3009, the v5 catalog (1,107), results/realms_v5/
   python3 tools/run_realms_v5.py --seeds 7100 7101 --out /tmp/realms5-dev   # a look on development seeds (never reported)
 
 Two arms, native and omni (Omni-Compass on top of native), on the same seeds. The omni arm is the engine's default, the
@@ -13,8 +13,9 @@ max (realms/compass_arm_v5.py, V5CFG): every muscle pushed toward its own limit 
 limit and never below native; the energy that takes is shown as power given. Three panels:
 
   every muscle alone      each plant with only its own native controller around it (its own natural clock and horizon)
-  the organisms           the four realms, the four stacked (each realm's own body on one clock) and the whole tower, on
-                          one 15 s clock for an hour around each battery site's daily peak, every plant coupled (the
+  the organisms           the spine (the muscles every stack runs on), the four realms, the four stacked (each realm's
+                          own body on one clock) and the whole tower, on one 15 s clock for an hour around each battery
+                          site's daily peak, every plant coupled (the
                           machines' power is heat in the rooms, the body's power swing is load on every site's line):
                           the bone (realms/compass_arm_v5.py, Bone) grants the max only the power the lines and the
                           rooms have room for
@@ -51,7 +52,13 @@ from realms.presets import PRESETS
 
 PREREG_SEEDS = list(range(3000, 3010))
 REALMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized"]
-NAMES = {"compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
+# the seventh organism (the founder's order of 16 October): the spine, every muscle that sits in all four realms, the base
+# every stack runs on (as an operating system is the base of every program), run native and with Omni-Compass on top like
+# the other six. The organisms are groupings of catalog rows made here; no engine file names them
+SPINE = "spine"
+ORGANISMS = [SPINE] + REALMS + [STACK, TOWER]           # the seven, in the order every table lists them
+NAMES = {SPINE: "The spine, the muscles every stack runs on",
+         "compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
          "energy_facility_industrial": "Energy / Facility / Industrial",
          "distribution_specialized": "Distribution / Specialized", STACK: "The four stacked, every shared muscle in each",
          TOWER: "The whole tower, every muscle once"}
@@ -69,6 +76,12 @@ MUSCLE_LOADS = {"normal": "its own load", "line": f"work waiting in line ({LINE:
 ORGANISM_LOADS = ["normal", "climb", "line"]
 # the engine and the files it stands on; the engine fingerprint is tools/omni_version.py (OMNI_V5.json)
 FROZEN = ["realms", "omnicompass", "tools/run_realms_v5.py"]
+
+
+def spine_rows(rows):
+    """The spine: every muscle whose realm list names all four realms (Kubernetes, containers, placement, node fleets, cloud
+    capacity, hosts, GPUs, network, storage, observability, reliability and security, electrical distribution, cooling)."""
+    return [r for r in rows if set(REALMS) <= set(r["realms"].split(";"))]
 
 
 def sha(p):
@@ -192,7 +205,7 @@ def plant_harms(arm, nat, ids):
 def organism_run(name, rows, seed, arm, load):
     """One organism, one arm, one load. The four stacked keep each realm's own body on one clock, so every muscle in the
     stack runs exactly the native it runs in its own realm, plant by plant (the founder's order: the native identical in
-    all six)."""
+    all seven)."""
     if name == STACK:
         bodies = [Body(rs, seed) for rs in rows]
     else:
@@ -230,7 +243,7 @@ def misses_line(o):
 def write_md(out, res, orgs, run):
     L = []
     w = L.append
-    w(f"# The realms on {run['engine']} at the max: {len(res)} muscles and six organisms, native against Omni on top")
+    w(f"# The realms on {run['engine']} at the max: {len(res)} muscles and seven organisms, native against Omni on top")
     w("")
     w(f"Evidence class **S** (modelled). Run {run['started']}, commit `{run['commit'][:12]}`, seeds "
       f"{run['seeds'][0]}-{run['seeds'][-1]} ({len(run['seeds'])} paired seeds per muscle, per organism and per load), "
@@ -275,7 +288,7 @@ def write_md(out, res, orgs, run):
       "an independent test. What a row shows is whether the max, applied to that knob, helps or hurts the model.")
     w("")
     for load in run["loads"]:
-        w(f"## The six organisms: {LOADS[load]}")
+        w(f"## The seven organisms: {LOADS[load]}")
         w("")
         w("Work: the mean over the organism's plants of each plant's work against native's. Misses: the share of plant "
           "decisions over their line, native → omni (the change in misses). Power given: the organism's energy against "
@@ -285,7 +298,7 @@ def write_md(out, res, orgs, run):
         w("")
         w("| Organism | Muscles | Reading | Work | Misses, native → omni | Misses (pp) | Power given | Wear | Work per energy | Valid |")
         w("|---|---:|---|---:|---|---:|---:|---:|---:|---|")
-        for name in [n for n in REALMS + [STACK, TOWER] if n in orgs[load]]:
+        for name in [n for n in ORGANISMS if n in orgs[load]]:
             o = orgs[load][name]; s = o["summary"]
             w(f"| {NAMES[name]} | {o['n']} | **{labelled(o['label'])}** | {fmt(s['work'], 100.0)} | {misses_line(o['totals'])} | "
               f"{fmt(s['viol_pp'], 1.0, '')} | {fmt(s['energy'])} | {o['wear'] * 100:+.2f}% | {fmt(s['primary'])} | "
@@ -299,7 +312,7 @@ def write_md(out, res, orgs, run):
     w("| Load | Organism | Plants | Plants with less work or more misses | The plants (work change, extra decisions over the line, all seeds) |")
     w("|---|---|---:|---:|---|")
     for load in run["loads"]:
-        for name in [n for n in REALMS + [STACK, TOWER] if n in orgs[load]]:
+        for name in [n for n in ORGANISMS if n in orgs[load]]:
             o = orgs[load][name]; h = o.get("plants_flagged", o.get("plants_worse", {}))   # the older results' field, read as written
             lst = "; ".join(f"{mid} ({v[0] * 100:+.3f}%, {v[1]:+d})" for mid, v in sorted(h.items(), key=lambda kv: kv[1][0])) or "none"
             w(f"| {load} | {NAMES[name]} | {o['n']} | {len(h)} | {lst} |")
@@ -425,7 +438,8 @@ def main(argv=None):
     with ProcessPoolExecutor(a.workers) as ex:
         res = list(ex.map(muscle_job, [(r, a.seeds) for r in rows], chunksize=4))
         print(f"muscles: {len(res)} in {time.time() - t0:.0f} s", flush=True)
-        groups = {realm: [r for r in rows if realm in r["realms"].split(";")] for realm in REALMS}
+        groups = {SPINE: spine_rows(rows)}                            # the base every stack runs on, an organism of its own
+        groups.update({realm: [r for r in rows if realm in r["realms"].split(";")] for realm in REALMS})
         groups[STACK] = [groups[realm] for realm in REALMS]           # each realm's own body, the realm's own native
         groups[TOWER] = rows
         jobs = [(name, rs, s, load) for load in loads for name, rs in groups.items() if rs for s in a.seeds]

@@ -17,7 +17,7 @@ never read here.
   confirm   each kept card against the global setting again, on other development seeds, under the same rule.
   write     the cards that won on both sets of seeds, into realms/muscle_cards_v5.csv (a muscle without a row runs the
             global setting).
-  organisms the six organisms on three loads with the cards and without, every plant against native.
+  organisms the organisms on three loads with the cards and without, every plant against native.
   report    results/cards_v5/CARDS.md from the files the steps above wrote.
 
   python3 tools/tune_cards.py search    --seeds 7100 7110 --out results/cards_v5/search_7100.json [--wide]
@@ -305,7 +305,7 @@ def cmd_report(a):
             "hold_window": g0.window if g0.hold_window is None else g0.hold_window, "hold_margin": g0.hold_margin}
     for (t, key), cnt in sorted(chosen.items()):
         md.append(f"- {t}, {key} ({glob.get(key, '')}): " + ", ".join(f"{v:g}: {n}" for v, n in sorted(cnt.items())))
-    md += ["", "**Inside the six organisms** (every plant against native; misses: the share of plant decisions over their",
+    md += ["", "**Inside the organisms** (every plant against native; misses: the share of plant decisions over their",
           "line, removed against native, in percentage points):", "",
           "| Seeds | Load | Misses removed, global setting | Misses removed, cards | Plants with less work or more misses, global / cards | "
           "Power given, global / cards |", "|---|---|---:|---:|---:|---:|"]

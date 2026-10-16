@@ -24,7 +24,7 @@ Read in this order. Every page here is current; dated records are in [`history/`
 |---|---|
 | [`K8S_COMPASS_PREREGISTRATION.md`](K8S_COMPASS_PREREGISTRATION.md) | Kubernetes and Azure: every test, every amendment, every result |
 | [`GPU_PREREGISTRATION.md`](GPU_PREREGISTRATION.md) | The card and the eight cards |
-| [`REALMS_PREREGISTRATION.md`](REALMS_PREREGISTRATION.md) | The muscles and the six organisms (945 in Omni v2) |
+| [`REALMS_PREREGISTRATION.md`](REALMS_PREREGISTRATION.md) | The muscles and the organisms: the question, the rules and the seeds, frozen before the runs, with every amendment (the spine, the seventh organism, 16 October) |
 | [`OMNI_V4_PLAN.md`](OMNI_V4_PLAN.md) | The next engine, ordered 10 October: the collective mechanism (one body, one brain, the reflex rule, the body's cost, nothing pushed to a LOSS anywhere), the final coverage sweep with the closed systems of the mega-caps mapped to open analogs, the catalog's new families, and the order and cost of the rerun |
 | [`CITYLEARN_PREREGISTRATION.md`](CITYLEARN_PREREGISTRATION.md) | Omni-Compass on top of CityLearn, an independent building and battery simulator |
 | [`CPU_POWER_PREREGISTRATION.md`](CPU_POWER_PREREGISTRATION.md) | The machine itself: Omni-Compass on top of the Linux kernel's own frequency governor, energy from the processor's meter; built, waiting for a machine on the metal |
@@ -38,7 +38,7 @@ Read in this order. Every page here is current; dated records are in [`history/`
 | [`CONVEYANCE_LAW.md`](CONVEYANCE_LAW.md), [`TRACKING_THEOREM.md`](TRACKING_THEOREM.md), [`FORMAL_STATUS.md`](FORMAL_STATUS.md) | The law, what is proved, and how |
 | [`CANONICAL_ENGINE.md`](CANONICAL_ENGINE.md), [`ENGINES.md`](ENGINES.md) | The one engine the software runs |
 | [`TWO_WAY_NERVOUS_SYSTEM.md`](TWO_WAY_NERVOUS_SYSTEM.md), [`NERVOUS.md`](NERVOUS.md) | Senses in, settings out |
-| [`REALMS.md`](REALMS.md), [`REALM_MUSCLES.md`](REALM_MUSCLES.md), [`MUSCLE_CATALOG.md`](MUSCLE_CATALOG.md), [`DOMAIN_MAP.md`](DOMAIN_MAP.md) | The muscles: what each is, where it sits, how it is wired; every family's wiring recipe on your own stack (native controller, wire out, wire in, restore, live or modelled; `docs/wiring_recipes.csv`) |
+| [`THE_SPINE.md`](THE_SPINE.md), [`REALMS.md`](REALMS.md), [`REALM_MUSCLES.md`](REALM_MUSCLES.md), [`MUSCLE_CATALOG.md`](MUSCLE_CATALOG.md), [`DOMAIN_MAP.md`](DOMAIN_MAP.md) | The muscles: what each is, where it sits, how it is wired; every family's wiring recipe on your own stack (native controller, wire out, wire in, restore, live or modelled; `docs/wiring_recipes.csv`) |
 | [`METRICS_CATALOG.md`](METRICS_CATALOG.md) | Every gauge, measured or modelled |
 
 ## 4. Running it

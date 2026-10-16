@@ -196,10 +196,12 @@ def main():
           f"at {g.edge_util * 100:.0f}% full, the last {g.window} decisions read, {g.line_z:g} wobbles of margin on a "
           f"battery's line, {g.hold_margin * 100:.0f}% of it kept clear). Each muscle's card is in the last column of its "
           "family's table.", ""]
-    L += ["", f"**The organisms.** The {len(rows)} muscles build six organisms: each of the four realms (every muscle whose realm list "
-          f"includes it), the four stacked with every duplicate kept ({sum(counts.values()):,}), and the whole tower with every muscle once ({len(rows)}). "
-          "A muscle of the shared spine sits in all four realms.", "",
-          "| Organism | Muscles |", "|---|---:|"]
+    L += ["", f"**The organisms.** The {len(rows)} muscles build seven organisms: the spine ({len(spine)} muscles, every muscle that sits "
+          "in all four realms: the base every stack runs on, as an operating system is the base of every program), each of the four "
+          f"realms (every muscle whose realm list includes it, the spine among them), the four stacked with every duplicate kept "
+          f"({sum(counts.values()):,}), and the whole tower with every muscle once ({len(rows)}). Each is run native and with "
+          "Omni-Compass on top of native (`docs/THE_SPINE.md`, `docs/REALMS.md`).", "",
+          "| Organism | Muscles |", "|---|---:|", f"| The spine, the muscles every stack runs on | {len(spine)} |"]
     for k, n in REALMS.items():
         L.append(f"| {n} | {counts[k]} |")
     L += [f"| The four stacked, every duplicate kept | {sum(counts.values()):,} |", f"| The whole tower, every muscle once | {len(rows)} |", "",
@@ -248,16 +250,17 @@ def main():
                     "|---:|---|---|---|---|---|"]
             for r in sorted(rs, key=lambda r: (not r["muscle_id"].isdigit(), int("".join(c for c in r["muscle_id"] if c.isdigit()) or 0))):
                 k = r["knob"]
-                org = "all four realms" if len(r["realms"].split(";")) == 4 else ", ".join(REALMS[x].split(" / ")[0] for x in r["realms"].split(";"))
+                org = "the spine; all four realms" if len(r["realms"].split(";")) == 4 else ", ".join(REALMS[x].split(" / ")[0] for x in r["realms"].split(";"))
                 out.append(f"| {r['muscle_id']} | {nice(r['muscle'])} | {k} | {does(r)} | {org}; stack; tower | "
                            f"{card_text(cards.get(r['muscle_id']))} |")
             out.append("")
         return out
 
-    L += [f"## The shared spine: {len(spine)} muscles in all four realms", "",
+    L += [f"## The spine: {len(spine)} muscles in all four realms, an organism of its own", "",
           "The machines every realm stands on: servers, machines, GPUs and CPUs, network, storage, observability, security, "
-          "cooling and electrical distribution. Each spine muscle is part of every realm's organism, counted once in the "
-          "tower and four times in the stack.", ""]
+          "cooling and electrical distribution. The spine is the seventh organism (`spine`, the base every stack runs on, run "
+          "native and with Omni-Compass on top like the other six; `docs/THE_SPINE.md`), and each spine muscle is also part of "
+          "every realm's organism, counted once in the tower and four times in the stack.", ""]
     L += family_tables(spine, "It belongs to every organism.")
     for k, n in REALMS.items():
         own = [r for r in rows if r["realm"] == k and len(r["realms"].split(";")) < 4]
