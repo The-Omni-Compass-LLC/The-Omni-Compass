@@ -1145,7 +1145,7 @@ checked; install only a commit whose run passed.
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # the engine version (for example omni-v6), or every file that differs
+python3 tools/omni_version.py                  # the engine version (for example omni-v7), or every file that differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 

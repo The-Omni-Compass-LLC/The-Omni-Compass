@@ -2,6 +2,24 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-16 (night, later): Omni v7 stands
+
+- **Omni v7 is the engine that stands** (the founder's order of 16 October: "Where is version 7? That's what you gotta push
+  everything to"). `v7-candidate` is merged into main (`OMNI_V7.json`, digest `d6d467b824c585f1`, 46 files; `docs/OMNI_V7.md`): v6
+  plus conveyance bounded by each namespace's CPU quota (an unreadable quota is no budget known), the shared host's busy guard on
+  every raise, the verdict reading a trial in the reports' words, every rule in seconds, the cloud's one flag. Omni v6 stood one day,
+  15 to 16 October; its four three-run tables stay as its own. Its first runs on real Kubernetes, native against Omni-Compass on top,
+  ten pairs each: Goldilocks response time −45% mean and −60% at the 95th percentile, GAIN, replicas and pods EVEN; KEDA's HTTP add-on
+  −57% and −71%, alert minutes −94%, replicas −19%, GAIN; KEDA on the CPU target and the requests −38% and −52%, GAIN; no LOSS.
+- **Everything runs again on v7.** The grid conductor's campaign restarts on omni-v7 (`scripts/dispatch_grid.py`: the grid's manifest
+  `results/grid_v7/`, the reruns counted since the twelve trial runs of 16 October, every Azure set from A again; `scripts/reruns.txt`);
+  the v6 shards still running and the queued Azure set finish and stand as that engine's record, nothing cancelled.
+- **The realms table on omni-v7** (`results/realms_v5/REALMS_V5.md`, run 2026-10-16, commit `1637d32cd26c`, seeds 3000-3009): every
+  muscle alone and the seven organisms under three loads reproduce the readings of the engine before it to the digit (the law and the
+  muscles are unchanged; `MUSCLES_V5.csv` byte for byte the same), and the table now names omni-v7.
+- **Every page names v7**: the README, CLAUDE.md, the state of play, both manuals (the evidence table, the engine chapter, the file
+  map), `docs/OMNI_V7.md` (no longer a candidate), `docs/OMNI_V6.md` (one day's engine), codemeta 0.7.0.
+
 ## 2026-10-16 (night): the spine, the seventh organism
 
 - **Seven organisms** (the founder's order of 16 October). The spine, the 267 muscles every real stack runs on (every muscle that

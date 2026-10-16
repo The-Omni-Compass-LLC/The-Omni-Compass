@@ -50,7 +50,7 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v6, fingerprint `df6147466ef18046` (45 files); package 0.6.0.
+- **Engine on main:** omni-v7, fingerprint `d6d467b824c585f1` (46 files); package 0.7.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
@@ -86,13 +86,18 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## The engine that stands: omni-v6 (the max on every muscle, every muscle its own card, the shared-host capacity repair)
+## The engine that stands: omni-v7 (the max on every muscle, every muscle its own card, the shared-host capacity repair, quota-aware conveyance, every rule in seconds)
 
-The engine on main is **omni-v6** (`OMNI_V6.json`, fingerprint `df6147466ef18046`, 45 files; [`docs/OMNI_V6.md`](docs/OMNI_V6.md)): the max
-on every muscle of the 1,107-muscle catalog, every muscle its own card, with the Kubernetes controller's shared-host capacity repair. Its three-run tables so far are
-the four Kubernetes add-on tests above; every other benchmark runs again on it (`scripts/reruns.txt`) and its row on the
-[benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on until then. **Omni v7 is a candidate** on its own branch, tried in the
-toy gate and in live trials before it may stand; its first trials (16 October) found a fault in its quota budget, corrected the same day.
+The engine on main is **omni-v7** (`OMNI_V7.json`, fingerprint `d6d467b824c585f1`, 46 files; [`docs/OMNI_V7.md`](docs/OMNI_V7.md)), the
+engine that stands since 16 October by the founder's order: the max on every muscle of the 1,107-muscle catalog, every muscle its own card,
+the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota (an unreadable quota is no budget
+known), no limit raised while a shared host is busy or unread, every rule counted in seconds, the verdict reading a trial in the reports'
+words, the cloud's rule as one flag. Every benchmark runs again on it (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the
+same day); until a benchmark's three runs land, its row on the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on. Its first
+runs are in, native against Omni-Compass on top, ten pairs each: a service rightsized by Goldilocks, response time −45% mean and −60% at the
+95th percentile, GAIN, replicas and pods EVEN; KEDA's HTTP add-on, response time −57% mean and −71% at the 95th percentile, alert minutes
+−94%, replicas −19%, all GAIN; KEDA on the CPU target and the requests, −38% mean and −52% at the 95th percentile, GAIN; their B and C runs
+and the other trials are running.
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
 
@@ -116,8 +121,8 @@ native, did less work, or cleared its line later. 364 muscles carry a card of th
 pools, 31 batteries), each printed in plain words in the [muscle catalog](docs/MUSCLE_CATALOG.md); inside a body, a
 battery wired by its power keeps the body's own margin on its line ([`docs/FORMAL_V5.md`](docs/FORMAL_V5.md), section
 5). Preregistered seeds 3000-3009, ten paired runs per muscle,
-per organism and per load, commit `1d870bc33b2b`, engine omni-v6 (fingerprint `df6147466ef18046`; run again on 16 October with
-the spine as the seventh organism, the other six reproducing the 13 October table to the digit). Evidence class
+per organism and per load, commit `1637d32cd26c`, engine omni-v7 (fingerprint `d6d467b824c585f1`; run again on 16 October on the engine
+that stands with the spine as the seventh organism, every reading reproducing the 13 October table to the digit). Evidence class
 **S**: modelled plants, not meters. Every row, losses included:
 [`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md).
 
