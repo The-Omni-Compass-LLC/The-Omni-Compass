@@ -2,6 +2,17 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-16: every family's wiring on your own stack, in both manuals
+
+- **The wiring recipes** (`docs/wiring_recipes.csv`, 70 rows, one per family of the 1,107-muscle catalog): the native
+  controller that owns the family's muscles, the wire out (what is read, and where), the wire in (what is written, and
+  where), the restore, and whether that wire has run live in this repository or only on a model. The catalog page
+  (`docs/MUSCLE_CATALOG.md`, `tools/muscle_catalog.py`) now opens with the plug's four rules and prints a "Wire it on
+  your stack" block above every family's table, so the Operator's Manual (Appendix E) and the Owner's Manual (Appendix G)
+  tell anyone how to physically wire every muscle in the catalog on their own stack. The generator stops if a family
+  has no recipe. The README, the docs index and both manuals' descriptions of the appendix say so; both PDFs rebuilt.
+- No engine change: omni-v6 stands on main; v7 stays a candidate under trial.
+
 ## 2026-10-15 (night): the audit's findings fixed: engines named on every row, formulas in Unicode, the v6 tables, v7 under test
 
 - **Every result names its engine.** The benefit sheet and the state of play's standing block now carry an Engine column

@@ -4,7 +4,7 @@
 
 A **muscle** is one setting on one machine that already has its own control: a replica target, a node pool's size, a GPU's clock ceiling, a chiller's setpoint, a battery's reserve, a joint's effort. Omni-Compass does not replace that control. It reads the machine's meters and, at its default, the max, moves the setting the machine already accepts toward the machine's own limit for the most work, never past it and never below native, through a plug that reads the setting once before the first write, reads back every write, steps aside if another controller moves it, and walks it back to native at the end. A knob native already runs at the top of its range is at its limit on native and is left there.
 
-This chapter lists all 1107 muscles of the catalog (`realms/catalog_v5.csv`, engine omni-v5). For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 4 and 6). See `DISCLOSURES.md`.
+This chapter lists all 1107 muscles of the v5 catalog (`realms/catalog_v5.csv`); each run records its engine separately. For each one it says what kind of machine it is, which of the four kinds of knob it is, what Omni-Compass reads and does with it, how such a muscle is reached in a real stack, and which organisms it belongs to. The plants behind the benchmark numbers are models of these machines (evidence class **S**); a muscle in this list is wired on a real system only through the levels and the checks of the manual (chapters 4 and 6). See `DISCLOSURES.md`.
 
 ## How to read an entry
 
@@ -87,6 +87,8 @@ This chapter lists all 1107 muscles of the catalog (`realms/catalog_v5.csv`, eng
 
 Wires marked *modelled only* exist as plants in the benchmark and are not built for live use.
 
+**How to wire any muscle on your own stack (the plug, chapter 4).** Every muscle below is wired the same way: Omni-Compass never replaces the native controller; it reads the controller's own meters (the wire out) and writes the one setting the controller already accepts (the wire in), through a plug that (1) reads the setting once before the first write and records it, (2) reads back every write and stops writing if another writer moved the setting, (3) renews a lease every decision so a dead governor's settings walk back to native by themselves, and (4) restores the recorded setting at the end. Each family's entry says which native controller owns its muscles, where the reading is tapped, where the setting is written, how it is restored, and whether that wire has run live in this repository or only on a model (`docs/wiring_recipes.csv`). The muscle's name is the setting's own name on that controller. Where the entry says *modelled only*, the plant exists in the benchmark and the wire is written against the controller's documented interface, not yet run on the machine.
+
 ## The shared spine: 267 muscles in all four realms
 
 The machines every realm stands on: servers, machines, GPUs and CPUs, network, storage, observability, security, cooling and electrical distribution. Each spine muscle is part of every realm's organism, counted once in the tower and four times in the stack.
@@ -95,7 +97,15 @@ The machines every realm stands on: servers, machines, GPUs and CPUs, network, s
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the cloud's autoscaling group or scale set: AWS Auto Scaling, Azure VMSS, GCP MIG.
+- **Wire out (read):** group size, instance states, the target-tracking metric (the cloud's API and monitoring).
+- **Wire in (write):** desired capacity, min and max, the target-tracking policy's target, through the cloud CLI or SDK.
+- **Restore:** the group's desired, min, max and policy recorded once; restored from it.
+- **Run live?** live on AKS through the node pool (family 5); the cloud SDK path itself is written, not yet run live.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 97 | vm count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
 | 98 | vm size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
@@ -123,7 +133,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the pod's own resource requests and limits (the Deployment template) and, where it runs, the VPA, Goldilocks or CruiseKube recommender.
+- **Wire out (read):** each pod's CPU use (kubectl top), its request and limit, the node's allocatable CPU (Kubernetes API).
+- **Wire in (write):** the running pod's CPU limit in place through pods/resize (no restart); the template is never changed, so no rollout.
+- **Restore:** the operator's limit recorded in an annotation before the first write; every pod returned to it.
+- **Run live?** live: omni_controller/muscles.py convey() (conveyance); KEDA and Goldilocks tables.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 33 | cpu request | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 34 | cpu limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
@@ -155,7 +173,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `cpu_host` (a CPU host whose clock and power can be set), reached through Linux cpufreq and RAPL. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the Linux kernel's own governors: cpufreq (schedutil or the processor driver), RAPL, cpuidle, the memory manager.
+- **Wire out (read):** /sys/devices/system/cpu/cpufreq (frequencies and governor), /sys/class/powercap intel-rapl energy counters, /proc/stat busy share, /proc/pressure.
+- **Wire in (write):** scaling_max_freq per policy and the RAPL package power limit through sysfs (root); on Kubernetes through the Kubernetes Power Manager's PowerProfile or EAR's policy.
+- **Restore:** the governor's files snapshotted once and restored byte for byte (tools/run_cpu_power.py --restore).
+- **Run live?** written and tested on the modelled machine (tools/run_cpu_power.py, cpu-power.yml); GitHub's machines are virtual and cannot write the governor: the live run needs a real Linux machine.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 113 | cpufreq min | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
 | 114 | cpufreq max | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
@@ -188,7 +214,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** kube-scheduler and its profiles, the descheduler, PriorityClasses, scheduling gates.
+- **Wire out (read):** pods pending and their reasons, node fill, topology spread (Kubernetes API).
+- **Wire in (write):** a pod's or deployment's placement fields (nodeSelector, affinity, topologySpreadConstraints, priorityClassName, schedulingGates) by kubectl patch, or the scheduler's profile.
+- **Restore:** the fields as they stood before the first write, restored field by field.
+- **Run live?** modelled; the API path is the same kubectl patch the live controller uses for the HPA.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 49 | node selector | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 85% full; reads the last 10 decisions |
 | 50 | node affinity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -216,7 +250,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the HorizontalPodAutoscaler, KEDA ScaledObject or VPA that owns the workload's scale.
+- **Wire out (read):** the HPA's current and desired replicas, the Deployment's ready replicas (Kubernetes API, metrics-server), the service's response time from the probe.
+- **Wire in (write):** the HPA's target (spec.metrics averageUtilization) and floor (minReplicas) by kubectl patch; KEDA through its ScaledObject, so the add-on keeps its own loop.
+- **Restore:** the operator's target and range recorded in an annotation before the first write, restored from it, annotation removed.
+- **Run live?** live: scripts/kind_bench.sh and omni_controller (HPA target, KEDA, Goldilocks, CruiseKube), three-run tables in results/live.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 17 | replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 18 | hpa cpu target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
@@ -255,7 +297,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the card's own firmware limits through NVML and nvidia-smi (power limit, application clocks, MIG, compute mode).
+- **Wire out (read):** nvidia-smi --query-gpu (clocks, power draw, temperature, utilisation, memory), the serving response time from the probe.
+- **Wire in (write):** nvidia-smi -pl (power limit), -lgc/-rgc (clock ceiling and reset), -ac (application clocks), -mig and -c (modes), per card.
+- **Restore:** every limit read once at start (the snapshot line in the GPU audit) and restored by the same commands at the end or on the lease.
+- **Run live?** live: omni_controller/gpu_governor.py and scripts/gpu_paired.sh on a rented A10 (results/gpu); the new card runs wait on Lambda by the founder's order.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 129 | gpu allocate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 130 | gpu power limit | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
@@ -284,7 +334,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the cluster's own node autoscaler: Karpenter (NodePool), the Cluster Autoscaler, a MachineSet, a cloud node pool.
+- **Wire out (read):** ready and schedulable workers, pending pods, allocatable and used CPU (Kubernetes API), the autoscaler's status ConfigMap.
+- **Wire in (write):** the pool's size through the operator's own command (--node-scale-cmd: az aks nodepool scale, gcloud container clusters resize, eksctl scale nodegroup, kubectl scale machineset, a Karpenter NodePool limit); a machine parked by taint and drain, never deleted by Omni-Compass.
+- **Restore:** the pool's starting count recorded once; every parked machine untainted and the pool restored to it at the end or on the lease.
+- **Run live?** live: omni_controller nodepool mode on kind and on AKS (results/live/V1_AKS_*, the capacity and steady tables).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 65 | node desired | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 66 | node pool min | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
@@ -315,7 +373,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `network` (network routing and switching), reached through the network controller (SDN, routing API). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the network controller: the load balancer's weights, the SDN controller, the NIC's ethtool and tc settings.
+- **Wire out (read):** link utilisation, drops, queue latency (SNMP, the controller's API, ethtool -S).
+- **Wire in (write):** LB and route weights through the controller's API; rate limits and queue disciplines through tc; NIC queues through ethtool.
+- **Restore:** every weight and setting recorded; restored with the same commands.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 225 | lb weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
 | 226 | route weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
@@ -341,7 +407,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the collector's own configuration: the OpenTelemetry Collector, Prometheus scrape and remote-write settings.
+- **Wire out (read):** dropped samples, queue depth, memory, cardinality (the collector's self-metrics).
+- **Wire in (write):** the collector's batch, queue and memory limits and scrape intervals through its config reload.
+- **Restore:** the config recorded; reloaded from it.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 373 | collector memory limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
 | 374 | export concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
@@ -357,7 +431,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the platform's own recovery and security controls: rollout and rollback, PodDisruptionBudgets, the security hold, a kill switch.
+- **Wire out (read):** error rate, rollout status, the security hold (a ConfigMap key), the kill file.
+- **Wire in (write):** rollout pause and undo by kubectl; the security hold read, never written; the kill switch (tools/omni_switch.py) is a human's.
+- **Restore:** every write recorded and undone on the lease.
+- **Run live?** live in part: the security hold and kill switch run in every Kubernetes benchmark (omnicompass/master.py).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 385 | restart | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 386 | rollback | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -376,7 +458,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `storage` (block, file or object storage), reached through the storage system's QoS and tiering API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the storage system's QoS and tiering: Ceph (ceph osd pool set, QoS), a cloud volume's IOPS class, S3 lifecycle.
+- **Wire out (read):** IOPS, throughput, latency and queue depth from the storage system's metrics.
+- **Wire in (write):** volume IOPS and throughput limits, replica counts and tiering through the storage API or CSI VolumeAttributesClass.
+- **Restore:** the volume's class and limits recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 257 | volume size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
 | 258 | iops limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
@@ -403,7 +493,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a data hall or building zone cooled by chillers, air handlers or fans; its class is `data_hall` (a data hall cooling plant), reached through the building management system (BACnet, Modbus) or its command line. Omni-Compass reads its temperature against its limit. It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the building management system and the chiller plant's own supervisory controller (BACnet, Modbus).
+- **Wire out (read):** supply and return temperatures, chiller load, fan and pump speeds, rack inlet temperatures (BACnet reads).
+- **Wire in (write):** supply-air and chilled-water setpoints, fan and pump speeds within their safe bands by BACnet write; the plant's own staging keeps control.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled (the data-hall plant); the BACnet path is written.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 545 | supply air temperature | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
 | 546 | return air target | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
@@ -428,7 +526,15 @@ Each is a data hall or building zone cooled by chillers, air handlers or fans; i
 
 Each is a battery, UPS or microgrid store with a load and a grid connection; its class is `ups` (an uninterruptible power supply), reached through the UPS and PDU management interface (SNMP, Modbus). Omni-Compass reads its draw on the grid connection and its reserve. It belongs to every organism.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the UPS and PDU management interfaces (SNMP, Modbus) and the servers' BMC power caps (IPMI DCMI, Redfish).
+- **Wire out (read):** load per branch, UPS mode and charge, power per server (SNMP, Redfish).
+- **Wire in (write):** server and rack power caps through Redfish or DCMI; UPS charge rate and mode through SNMP; breakers never written.
+- **Restore:** every cap and mode read once and restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 529 | server power cap | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
 | 530 | rack power cap | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
@@ -455,7 +561,15 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the serving engine's own autoscaler and batcher (vLLM, Triton, KServe, Ray Serve): replicas, batch size, concurrency, KV cache.
+- **Wire out (read):** queue depth, tokens per second, p95 latency, KV-cache use from the server's /metrics.
+- **Wire in (write):** the server's replica count or KServe/Knative autoscaling target, max_num_seqs and KV-cache budget through its API or its ConfigMap.
+- **Restore:** the serving spec recorded once; restored to it.
+- **Run live?** live in part: GPU serving under the card governor (results/gpu); the vLLM run is ready and waits on Lambda.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 161 | model replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 162 | model route weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
@@ -486,7 +600,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu_batch` (GPU training and batch work), reached through nvidia-smi, the job scheduler's pause and resume. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the training job's launcher and scheduler (Kubeflow, Ray Train, Slurm, torchrun).
+- **Wire out (read):** step time, GPU utilisation, checkpoint cadence, stragglers (the job's metrics).
+- **Wire in (write):** the job's worker count (elastic training), batch sizes and checkpoint interval through the launcher's API or the job spec.
+- **Restore:** the job spec recorded; the next run launched from it.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 177 | training workers | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 178 | global batch size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 85% full; reads the last 10 decisions |
@@ -511,7 +633,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the global load balancer and the fleet manager (Karmada, Fleet, the cloud's global LB).
+- **Wire out (read):** per-region latency, capacity and cost, pending work (the global LB's and clusters' metrics).
+- **Wire in (write):** region and cluster weights and quotas through the global controller's API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 609 | multi cluster dispatch | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 60 decisions |
 | 610 | region dispatch | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 75% full; reads the last 40 decisions |
@@ -536,7 +666,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `fabric` (a high-speed fabric (RDMA, DPU, SmartNIC)), reached through the fabric manager's API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the DPU's own management (NVIDIA DOCA, the SmartNIC's SDK) and SR-IOV.
+- **Wire out (read):** per-function rates, flow-steering hits, DPU CPU and memory (the DPU's counters).
+- **Wire in (write):** rate limits, QoS groups and VF counts through the DPU management API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0021 | dpu pf tx rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
 | AUDIT-0022 | dpu vf tx rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
@@ -555,7 +693,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `batch` (batch and queued jobs), reached through the job queue (Kubernetes Jobs, Slurm, Spark). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the cluster manager's scheduler: YARN, Mesos, Nomad, Ray.
+- **Wire out (read):** queue lengths, resource reservations, preemptions (the manager's API).
+- **Wire in (write):** quotas, reservations and preemption settings through the manager's API.
+- **Restore:** recorded once, restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 209 | task admission | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
 | 210 | task priority | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -577,7 +723,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `fabric` (a high-speed fabric (RDMA, DPU, SmartNIC)), reached through the fabric manager's API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the fabric manager and the collective library (NVIDIA Fabric Manager, NCCL settings, RDMA CM).
+- **Wire out (read):** link and NVSwitch counters (nvidia-smi nvlink, DCGM), collective time per step from the training job.
+- **Wire in (write):** NCCL environment and the job's rank placement at launch; RDMA QoS through the fabric manager's API.
+- **Restore:** the launch settings recorded; the next job launched with the originals.
+- **Run live?** modelled; written against NCCL and Fabric Manager documentation.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 145 | nvlink placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
 | 146 | nvswitch route | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
@@ -602,7 +756,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `batch` (batch and queued jobs), reached through the job queue (Kubernetes Jobs, Slurm, Spark). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the batch scheduler: Slurm (scontrol, sacctmgr), PBS, LSF.
+- **Wire out (read):** queue depth, node states, job wait times, power per node (sacct, sinfo, the power plugin).
+- **Wire in (write):** partition limits, job priority and fair-share factors, node power-saving settings through scontrol and the scheduler config.
+- **Restore:** the scheduler's settings recorded; restored with the same commands.
+- **Run live?** modelled; EAR (family 8) is the live energy path on HPC.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 193 | job slots | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 194 | mpi ranks | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 75% full; reads the last 20 decisions |
@@ -628,7 +790,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `gpu` (GPU serving with a response-time target), reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** Kubernetes DRA: DeviceClass, ResourceClaim, ResourceSlice.
+- **Wire out (read):** claims pending, devices allocated and tainted (the Kubernetes API).
+- **Wire in (write):** DeviceClass selectors and claim capacity by kubectl apply; devices tainted, never removed.
+- **Restore:** the objects recorded; restored.
+- **Run live?** modelled; the API path is kubectl.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0001 | dra device class selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 85% full; reads the last 40 decisions |
 | AUDIT-0002 | dra claim capacity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 40 decisions |
@@ -643,7 +813,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `node` (a fleet of machines or VMs that boot in minutes), reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** OpenShift's Machine API operators: MachineHealthCheck, MachineConfigPool, the Cluster Version Operator.
+- **Wire out (read):** machine phases, MCP status and pause, degraded counts (the OpenShift API).
+- **Wire in (write):** MachineHealthCheck maxUnhealthy, MachineConfigPool paused and maxUnavailable by oc patch.
+- **Restore:** the fields recorded before the first write, restored from the record.
+- **Run live?** modelled; written against the documented OpenShift API, not yet run live.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 85 | machine remediation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | 88 | machine health gate | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -659,7 +837,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `qpu` (a quantum or specialised accelerator queue), reached through the accelerator's job queue. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the quantum control stack's job queue and pulse schedules (Qiskit Runtime, the vendor's control software).
+- **Wire out (read):** queue depth, calibration drift, error rates (the stack's metrics).
+- **Wire in (write):** shot allocation, circuit admission and scheduling through the stack's API; pulse parameters never written live.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 593 | qubit mapping | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
 | 594 | circuit admission | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -682,7 +868,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the service's own admission layer: its API gateway, queue or admission controller (Envoy, NGINX, Kong, a job queue's concurrency setting).
+- **Wire out (read):** queue depth, requests in flight and the response-time line from the gateway's or queue's metrics (Prometheus, the admin API).
+- **Wire in (write):** the gateway's or queue's concurrency and rate settings (the limit named by the muscle) through its admin API or its config object.
+- **Restore:** snapshot of each limit once before the first write; every limit restored from it.
+- **Run live?** at its limit on native: read and left native in every run (nothing is paced or turned away); the wire is read-only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 1 | api concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
 | 2 | queue concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -708,7 +902,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `cpu_host` (a CPU host whose clock and power can be set), reached through Linux cpufreq and RAPL. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the Linux kernel's own tunables: cgroup v2 files, /proc/sys/vm and net, the cpufreq and cpuidle governors, the I/O scheduler.
+- **Wire out (read):** /sys/fs/cgroup, /proc/pressure, /proc/vmstat, /sys/block queue stats, the frequency files.
+- **Wire in (write):** cgroup cpu.weight, cpu.max and memory.high; sysctl vm and net keys; scaling_max_freq, through sysfs and sysctl (root).
+- **Restore:** every file snapshotted once and restored byte for byte.
+- **Run live?** the CPU frequency path is written (tools/run_cpu_power.py); the other knobs are registered and queued, they need a real Linux machine.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5001 | cgroup cpu weight | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5002 | cgroup cpu quota | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -735,7 +937,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the function platform's concurrency settings (Knative autoscaling annotations, AWS Lambda concurrency, OpenFaaS).
+- **Wire out (read):** concurrency, cold starts, queue waits (the platform's metrics).
+- **Wire in (write):** provisioned and reserved concurrency, scale-to-zero windows through the platform's API or annotations.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5021 | fn concurrency limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5022 | fn provisioned concurrency | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -751,7 +961,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `cpu_host` (a CPU host whose clock and power can be set), reached through Linux cpufreq and RAPL. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the hypervisor's management API (libvirt, vSphere, Hyper-V).
+- **Wire out (read):** vCPU steal, balloon state, migration load (the hypervisor's metrics).
+- **Wire in (write):** vCPU allocation, ballooning and migration pacing through the management API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5030 | vcpu allocation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5031 | memory ballooning | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -767,7 +985,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `process` (an industrial process loop), reached through the PLC or DCS (OPC UA, EtherNet/IP, PROFINET). Omni-Compass reads how far the process sits from its band. Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the data plane's own intake pacing and compaction settings (the ingress, the queue, the store's compactor).
+- **Wire out (read):** intake rate, backpressure, compaction debt, dead-letter depth (the components' metrics).
+- **Wire in (write):** pacing, drain rates and compaction budgets through each component's settings API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5045 | ingress intake pacing | capacity | at its limit on native (the full actuator): read and left native | Compute; stack; tower | global |
 | V5-5046 | dead letter retry cap | setpoint | left native: native already holds it inside its band (nothing to win) | Compute; stack; tower | global |
@@ -782,7 +1008,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the perimeter's own controls: the WAF, the DDoS shield, the TLS terminator.
+- **Wire out (read):** request admission, inspection sampling, session cache hit rate (the perimeter's metrics).
+- **Wire in (write):** token-bucket rates, sampling and session cache size through the perimeter's API; blocking rules never loosened.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5053 | rate limit token bucket | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
 | V5-5054 | connection admission | admission | at its limit on native (nothing paced or turned away): read and left native | Compute; stack; tower | global |
@@ -794,7 +1028,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `process` (an industrial process loop), reached through the PLC or DCS (OPC UA, EtherNet/IP, PROFINET). Omni-Compass reads how far the process sits from its band. Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the streaming stack's transcoder pools, packager and CDN settings.
+- **Wire out (read):** transcode queue, GPU clocks, buffer health, origin load (the stack's metrics).
+- **Wire in (write):** worker pools, bitrate-ladder cap and cache TTLs through the stack's API; GPU clocks through nvidia-smi (family 9).
+- **Restore:** recorded; restored.
+- **Run live?** modelled; the GPU path is live (family 9).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5072 | abr bitrate ladder cap | setpoint | left native: native already holds it inside its band (nothing to win) | Compute; stack; tower | global |
 | V5-5073 | player buffer target | setpoint | left native: native already holds it inside its band (nothing to win) | Compute; stack; tower | global |
@@ -815,7 +1057,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** Agones Fleets and the matchmaker, the game node pool.
+- **Wire out (read):** allocated and ready servers, matchmaking waits, tick rate (Agones and the matchmaker's metrics).
+- **Wire in (write):** Fleet replicas and buffer sizes by kubectl patch; matchmaking admission through its API.
+- **Restore:** the Fleet spec recorded; restored.
+- **Run live?** modelled; the API path is kubectl patch.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5086 | agones fleet buffer size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5087 | agones fleet min replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 60 decisions |
@@ -834,7 +1084,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `storage` (block, file or object storage), reached through the storage system's QoS and tiering API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the node's configuration (cache sizes, peer limits, mempool) and its host's power profile.
+- **Wire out (read):** block relay latency, mempool size, peer counts, validation backlog (the node's RPC).
+- **Wire in (write):** cache and pool sizes through the node's config and RPC; the host's power profile through family 8.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5098 | node db cache size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | global |
 | V5-5099 | mempool max size | setpoint | left native: native already holds it inside its band (nothing to win) | Compute; stack; tower | global |
@@ -851,7 +1109,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `batch` (batch and queued jobs), reached through the job queue (Kubernetes Jobs, Slurm, Spark). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Compute / AI / Cloud.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the runner scale set (actions-runner-controller, GitLab runners) and the build cache.
+- **Wire out (read):** jobs queued, runners busy, cache hit rate (the controller's metrics).
+- **Wire in (write):** min and max runners, build concurrency and cache size by kubectl patch of the scale set.
+- **Restore:** the scale set spec recorded; restored.
+- **Run live?** modelled; the API path is kubectl patch.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5108 | runner scale set min runners | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 20 decisions |
 | V5-5109 | runner scale set max runners | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Compute; stack; tower | machines started at 70% full; reads the last 60 decisions |
@@ -870,7 +1136,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `ev_traction` (an electric vehicle traction motor), reached through the vehicle's motor controller (CAN; modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the vehicle's motor and battery controllers (CAN, the OEM's diagnostic interface).
+- **Wire out (read):** torque, speed, state of charge, temperatures (CAN signals).
+- **Wire in (write):** torque, regeneration and charge limits within the OEM's envelope.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 1083 | state of charge limits | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
 | 1084 | smart charging schedule | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower | global |
@@ -891,7 +1165,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `flight_axis` (a flight-control axis), reached through the flight controller (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the flight controller's own parameters: PX4 (MPC_XY_VEL_MAX, MPC_Z_VEL_MAX_UP, MPC_ACC_HOR, MC_ROLLRATE_MAX) and ArduPilot (WPNAV_SPEED, ATC_ACCEL_R_MAX), the battery failsafe.
+- **Wire out (read):** mission progress, battery state, tracking error and near-miss distance over MAVLink telemetry.
+- **Wire in (write):** the speed, acceleration and rate parameters over MAVLink PARAM_SET within the autopilot's own limits; failsafes and geofence never loosened.
+- **Restore:** every parameter read (PARAM_REQUEST_READ) once and written back at the end.
+- **Run live?** modelled: the swarm cells (results/live/V3_SWARM.md); the MAVLink path is written, not yet flown.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 481 | throttle envelope | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
 | 482 | attitude target | capacity | its own peak speed while tasks wait, back to its everyday speed near its heat limit or when its tracking strains (alone; inside a body, its everyday speed) | Physics; stack; tower | global |
@@ -926,7 +1208,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `robot_fleet` (a fleet of robots or vehicles taking tasks), reached through the fleet manager's dispatch API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the fleet manager's dispatch and charging rules (Open-RMF, the vendor fleet manager).
+- **Wire out (read):** tasks waiting, robots active and charging, battery states (the fleet API).
+- **Wire in (write):** active robot count, charge thresholds and zone admission through the fleet API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 449 | robot dispatch | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Physics; stack; tower | global |
 | 450 | task assignment | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Physics; stack; tower | global |
@@ -950,7 +1240,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `robot_joint` (a robot joint servo), reached through the robot controller (ROS 2, EtherCAT, the drive's fieldbus). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the robot's own controller: ros2_control and MoveIt parameters, the drive's limits over EtherCAT or the vendor fieldbus.
+- **Wire out (read):** joint tracking error, effort, temperature, cycle time (joint_states, the drive's registers).
+- **Wire in (write):** velocity and acceleration scaling, trajectory tolerances and controller rates through ROS 2 parameters (ros2 param set) or the drive's limit registers; never past the manufacturer's limits.
+- **Restore:** every parameter read once (ros2 param get) and restored (ros2 param set).
+- **Run live?** modelled: MuJoCo (results/live/V3_MUJOCO.md); the ROS 2 path is written, not yet run on a physical arm.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 433 | joint position | capacity | its own peak speed while tasks wait, back to its everyday speed near its heat limit or when its tracking strains (alone; inside a body, its everyday speed) | Physics; stack; tower | global |
 | 434 | joint velocity | capacity | its own peak speed while tasks wait, back to its everyday speed near its heat limit or when its tracking strains (alone; inside a body, its everyday speed) | Physics; stack; tower | global |
@@ -983,7 +1281,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `reaction_wheel` (a spacecraft reaction wheel), reached through the attitude controller (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the flight software's command and mode tables (cFS, F Prime).
+- **Wire out (read):** attitude error, wheel speeds, power and thermal state from telemetry.
+- **Wire in (write):** payload duty cycle, communication allocation and wheel allocation through commands; safe modes never commanded.
+- **Restore:** the command table recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 497 | space command admission | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower | global |
 | 499 | flight task schedule | admission | at its limit on native (nothing paced or turned away): read and left native | Physics; stack; tower | global |
@@ -1004,7 +1310,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `rail_traction` (a train's traction and auxiliary systems), reached through the train control and management system and ATO (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the train control and management system and ATO.
+- **Wire out (read):** speed, traction effort, timetable margin, auxiliary power (TCMS telemetry).
+- **Wire in (write):** traction and coasting targets within the ATO's envelope.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2054 | traction effort limit | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
 | 2055 | regenerative braking share | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
@@ -1025,7 +1339,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `marine_propulsion` (a ship's propulsion shaft and power plant), reached through the vessel automation and power management system (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the vessel's automation and power management system.
+- **Wire out (read):** shaft speed and power, fuel rate, engine load (the automation system).
+- **Wire in (write):** shaft speed and power limits, engine staging within the manufacturer's envelope.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2068 | shaft speed target | capacity | its own peak speed while tasks wait, back to its everyday speed near its heat limit or when its tracking strains (alone; inside a body, its everyday speed) | Physics; stack; tower | global |
 | 2069 | propeller pitch limit | power | at its limit on native (full torque): read and left native | Physics; stack; tower | global |
@@ -1044,7 +1366,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction wheel, a traction motor; its class is `elevator_hoist` (an elevator or escalator drive and its group control), reached through the lift controller and destination dispatch (modelled only). Omni-Compass reads its tracking error and its load. Its home realm is Physics / Robotics / Autonomous.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the lift controller and destination dispatch.
+- **Wire out (read):** calls waiting, car positions, drive temperature (the controller).
+- **Wire in (write):** speed and dispatch modes within the manufacturer's limits; safety modes never written.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2146 | hoist speed target | capacity | at its limit on native (its everyday speed is the machine's limit): read and left native | Physics; stack; tower | global |
 | 2147 | acceleration limit | capacity | at its limit on native (its everyday speed is the machine's limit): read and left native | Physics; stack; tower | global |
@@ -1065,7 +1395,15 @@ Each is a motor-driven axis: a robot joint, a flight-control surface, a reaction
 
 Each is a data hall or building zone cooled by chillers, air handlers or fans; its class is `building` (a building zone), reached through the building management system. Omni-Compass reads its temperature against its limit. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the building management system (BACnet) and the AHU and zone controllers.
+- **Wire out (read):** zone temperatures, airflows, duct static pressure, occupancy (BACnet reads).
+- **Wire in (write):** zone setpoints, fan speeds and damper positions within their bands by BACnet write; the BMS's own sequences keep control.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled: CityLearn districts (results/live/V3_CITYLEARN.md); the BACnet path is written.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 1094 | setpoint reset trim and respond | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | Energy; stack; tower | global |
 | 1095 | duct static pressure setpoint | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | Energy; stack; tower | global |
@@ -1087,7 +1425,15 @@ Each is a data hall or building zone cooled by chillers, air handlers or fans; i
 
 Each is a battery, UPS or microgrid store with a load and a grid connection; its class is `microgrid` (a microgrid battery and loads), reached through the inverter or energy management system (IEEE 2030.5, SunSpec, OpenADR). Omni-Compass reads its draw on the grid connection and its reserve. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the battery's or site's energy management system and inverter (SunSpec, IEEE 2030.5, OpenADR, Modbus).
+- **Wire out (read):** state of charge, grid import and export, PV output, load (the EMS or inverter registers).
+- **Wire in (write):** the reserve setpoint, charge and discharge limits, import limit and curtailment through SunSpec or Modbus registers.
+- **Restore:** registers read once and restored.
+- **Run live?** modelled: CityLearn (results/live/V3_CITYLEARN.md) for the districts; the register path is written.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 513 | battery charge power | power | at its limit on native (full battery power): read and left native | Energy; stack; tower | 0 wobbles of margin on its line; reads its line 10 decisions before it holds; keeps 0% of its line clear |
 | 514 | battery discharge power | power | at its limit on native (full battery power): read and left native | Energy; stack; tower | 0 wobbles of margin on its line; reads its line 3 decisions before it holds; keeps 0% of its line clear |
@@ -1113,7 +1459,15 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 
 Each is a battery, UPS or microgrid store with a load and a grid connection; its class is `facility` (a facility battery behind the meter), reached through the energy management system. Omni-Compass reads its draw on the grid connection and its reserve. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the facility's energy management system and demand-response gateway (OpenADR).
+- **Wire out (read):** site power, utility signals, PUE, carbon intensity (the EMS and the utility's feed).
+- **Wire in (write):** the site power budget, demand limit and battery dispatch through the EMS.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 561 | facility power budget | power | at its limit on native (full battery power): read and left native | Energy; stack; tower | 0 wobbles of margin on its line; reads its line 3 decisions before it holds; keeps 0% of its line clear |
 | 562 | utility demand limit | power | at its limit on native (full battery power): read and left native | Energy; stack; tower | 0 wobbles of margin on its line; reads its line 3 decisions before it holds; keeps 0% of its line clear |
@@ -1135,7 +1489,15 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `feeder_voltage` (a distribution feeder's voltage), reached through the distribution management system (IEC 61850, DNP3; modelled only). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the distribution management system and the devices' own controllers (IEC 61850, DNP3): regulators, capacitor banks, inverters.
+- **Wire out (read):** feeder voltages, loads, tap positions, inverter output (the DMS).
+- **Wire in (write):** regulator and transformer taps, capacitor switching and inverter reactive power within the planning envelope; protection never written.
+- **Restore:** every setting read once and restored.
+- **Run live?** modelled: SimBench grids (results/live/V3_PANDAPOWER.md).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0033 | capacitor bank switch | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
 | AUDIT-0034 | voltage regulator tap | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -1154,7 +1516,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `process` (an industrial process loop), reached through the PLC or DCS (OPC UA, EtherNet/IP, PROFINET). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the PLC or DCS loop (OPC UA, EtherNet/IP, PROFINET): the setpoint and the mode of each loop.
+- **Wire out (read):** the process value, setpoint, output and alarm state of each loop (OPC UA reads).
+- **Wire in (write):** the loop's setpoint within its safe band and its actuator range by OPC UA write; safety interlocks are never written.
+- **Restore:** every setpoint read once and restored; a value outside the band is refused by the plug.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 465 | plc cycle authority | admission | at its limit on native (nothing paced or turned away): read and left native | Energy; stack; tower | global |
 | 466 | machine cell admission | admission | at its limit on native (nothing paced or turned away): read and left native | Energy; stack; tower | global |
@@ -1179,7 +1549,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `chamber` (a controlled chamber (clean room, kiln, reactor)), reached through the PLC or DCS. Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the fab's MES and each tool's controller (SECS/GEM).
+- **Wire out (read):** tool queues, chamber states, process values (MES and GEM).
+- **Wire in (write):** lot dispatch and tool admission through the MES; chamber recipes and parameters never written outside the qualified window.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 1092 | run to run control | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
 | 1093 | idle sleep mode | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
@@ -1199,7 +1577,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `water` (a water or pumping process), reached through the SCADA system (Modbus, DNP3). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the utility's SCADA (Modbus, DNP3) and the pump station controllers.
+- **Wire out (read):** levels, pressures, flows, aeration and dosing (SCADA reads).
+- **Wire in (write):** pump speeds, level and pressure targets, aeration and dosing within their bands by SCADA write; emergency shutdowns never written.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0069 | pump speed water | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
 | AUDIT-0070 | valve position water | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -1218,7 +1604,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a data hall or building zone cooled by chillers, air handlers or fans; its class is `hospital` (a hospital's critical rooms (operating rooms, isolation, pharmacy, imaging suites)), reached through the hospital's building management system (BACnet). Omni-Compass reads its temperature against its limit. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the hospital's building management system (BACnet) with its clinical limits.
+- **Wire out (read):** room pressures, air changes, temperatures and humidity (BACnet reads).
+- **Wire in (write):** setpoints within the clinical envelope by BACnet write; pressure cascades and alarms never loosened.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2001 | operating room air change setpoint | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | Energy; stack; tower | global |
 | 2002 | isolation room pressure target | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | Energy; stack; tower | global |
@@ -1238,7 +1632,15 @@ Each is a data hall or building zone cooled by chillers, air handlers or fans; i
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `irrigation` (pumps, pressure and climate on a farm or in a greenhouse), reached through the pump station controller, the pivot panel or the climate computer (Modbus, the vendor cloud). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the pump station controller, pivot panel or climate computer (Modbus, the vendor cloud).
+- **Wire out (read):** pressure, soil moisture, temperature, flow (the controller's registers).
+- **Wire in (write):** pump speed and climate setpoints within their bands by Modbus write.
+- **Restore:** registers read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2026 | irrigation pump speed | capacity | at its limit on native (the full actuator): read and left native | Energy; stack; tower | global |
 | 2027 | mainline pressure setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -1259,7 +1661,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `pipeline` (a pipeline segment with its compressors, pumps and valves), reached through pipeline SCADA (DNP3, Modbus, OPC UA). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** pipeline SCADA (DNP3, Modbus, OPC UA).
+- **Wire out (read):** pressures, flows, line pack, compressor states (SCADA reads).
+- **Wire in (write):** pressure and flow setpoints and unit staging within the safe envelope; protection never written.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2040 | compressor discharge pressure setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2041 | pump station suction pressure target | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -1280,7 +1690,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `mill` (a grinding, flotation or materials-handling circuit), reached through the plant DCS or PLC (OPC UA). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the plant DCS or PLC (OPC UA).
+- **Wire out (read):** mill load, speed, pressures, densities, power (OPC UA reads).
+- **Wire in (write):** loop setpoints within their bands by OPC UA write; shutdowns never written.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2092 | sag mill load setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2093 | mill speed target | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -1301,7 +1719,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `district_heat` (a district heating or cooling network), reached through the network control system and substation controllers (Modbus, M-Bus). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the network control system and substation controllers (Modbus, M-Bus).
+- **Wire out (read):** supply and return temperatures, differential pressure, storage level (the controllers).
+- **Wire in (write):** supply temperature and pressure setpoints, pump speed and staging within their bands.
+- **Restore:** registers read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2106 | supply temperature setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2107 | return temperature target | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -1321,7 +1747,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `turbine` (a generating unit's governor, boiler or excitation loop), reached through the plant DCS and governor (OPC UA, IEC 61850; modelled only). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the plant DCS and the unit's governor (OPC UA, IEC 61850).
+- **Wire out (read):** unit load, frequency, pressures, temperatures (the DCS).
+- **Wire in (write):** load setpoints and ramp limits within the dispatch envelope; protection and rod positions never written.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2119 | turbine speed droop setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2120 | unit load setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -1342,7 +1776,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `inverter` (a plant of grid-support inverters or wind turbines), reached through the plant controller and inverter settings (SunSpec, IEC 61850, IEEE 1547). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the plant controller and inverter settings (SunSpec, IEC 61850, IEEE 1547).
+- **Wire out (read):** active and reactive power, voltage, curtailment state (SunSpec registers).
+- **Wire in (write):** volt-var and volt-watt setpoints, curtailment and ramp limits by SunSpec write within the interconnection agreement.
+- **Restore:** registers read once and restored.
+- **Run live?** modelled: SimBench grids solved by pandapower (results/live/V3_PANDAPOWER.md); the register path is written.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2133 | inverter volt var setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2134 | inverter volt watt setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -1362,7 +1804,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `batch_reactor` (a GMP batch reactor, fermenter or food process), reached through the batch control system (ISA-88, OPC UA). Omni-Compass reads how far the process sits from its band. Its home realm is Energy / Facility / Industrial.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the batch control system (ISA-88, OPC UA) with the validated recipe limits.
+- **Wire out (read):** process values and phase states (OPC UA reads).
+- **Wire in (write):** setpoints within the validated recipe band only; a value outside it is refused by the plug.
+- **Restore:** every setpoint read once and restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2158 | reactor temperature setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
 | 2159 | agitator speed setpoint | setpoint | left native: native already holds it inside its band (nothing to win) | Energy; stack; tower | global |
@@ -1385,7 +1835,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the cache's own configuration: Redis CONFIG SET, Memcached runtime settings.
+- **Wire out (read):** hit rate, evictions, used memory, p95 (INFO, the cache's stats).
+- **Wire in (write):** maxmemory and eviction policy by CONFIG SET; replicas and shards through the operator.
+- **Restore:** the setting read once (CONFIG GET) before the first write and restored (CONFIG SET).
+- **Run live?** live: tools/run_redis.py, V3_REDIS.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 305 | cache size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 75% full; reads the last 10 decisions |
 | 306 | cache ttl | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 20 decisions |
@@ -1408,7 +1866,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `commerce` (a customer-facing service with bursts), reached through the Kubernetes API. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the payment platform's gateway and its routing rules.
+- **Wire out (read):** authorisation latency, decline and retry rates, queue depth (the platform's metrics).
+- **Wire in (write):** concurrency, timeout and route weights through the platform's admin API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 401 | payment admission | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
 | 402 | payment concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
@@ -1430,7 +1896,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `batch` (batch and queued jobs), reached through the job queue (Kubernetes Jobs, Slurm, Spark). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** Spark's dynamic allocation and the SQL engine's slots (spark.dynamicAllocation, Flink's parallelism, warehouse slots).
+- **Wire out (read):** executor count, task backlog, shuffle spill, stage times (the engine's metrics).
+- **Wire in (write):** dynamic allocation min and max, parallelism and slots through the engine's config at submit or its REST API.
+- **Restore:** the submit settings recorded; the next job launched from them.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 338 | executor size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 339 | dynamic allocation min | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -1452,7 +1926,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `database` (a database cluster), reached through the database operator (replicas, connection pools). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the database's own pooler and server settings: PgBouncer's admin console, MySQL SET GLOBAL, MongoDB setParameter, the database operator.
+- **Wire out (read):** pool waits and active connections (SHOW POOLS), buffer-pool size and hit rate, cache size and evictions, p95 per statement.
+- **Wire in (write):** PgBouncer default_pool_size through its console; MySQL innodb_buffer_pool_size by SET GLOBAL; MongoDB wiredTigerEngineRuntimeConfig cache_size by setParameter; replicas through the operator.
+- **Restore:** the setting read once before the first write and restored; a failed read-back stops the writer.
+- **Run live?** live: tools/run_pgbench.py, run_sysbench.py, run_ycsb.py, three-run tables V3_PGBENCH, V3_SYSBENCH, V3_YCSB.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 273 | db replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 60 decisions |
 | 275 | db memory | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 40 decisions |
@@ -1478,7 +1960,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the broker's own controls: Kafka's admin API and consumer group, RabbitMQ policies, MQTT broker settings.
+- **Wire out (read):** consumer lag, messages per second, p95 end to end, broker CPU (the broker's metrics, the consumer group's offsets).
+- **Wire in (write):** the consumer group's size (consumers running), quotas and partition counts through the admin API.
+- **Restore:** the group's size recorded; restored at the end.
+- **Run live?** live: tools/run_kafka.py, V3_KAFKA.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 289 | partition count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 40 decisions |
 | 290 | partition placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 40 decisions |
@@ -1507,7 +1997,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the application runtime's own settings: thread pools, JVM heap and GC, worker counts, connection pools.
+- **Wire out (read):** queue waits, GC pauses, worker busy share, p95 from the application's metrics.
+- **Wire in (write):** worker and pool sizes through the application's admin endpoint, environment or config reload; JVM flags at restart only.
+- **Restore:** the settings recorded; restored (a restart-bound setting is left native).
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 353 | worker count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 75% full; reads the last 10 decisions |
 | 354 | thread pool | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -1535,7 +2033,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the search engine's settings API: OpenSearch/Elasticsearch cluster and index settings, the vector database's config.
+- **Wire out (read):** indexing and search latency, queue rejections, merge pressure (the engine's stats API).
+- **Wire in (write):** index refresh interval, merge throttling, shard counts and search thread pools through the settings API.
+- **Restore:** settings recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 321 | index workers | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 75% full; reads the last 20 decisions |
 | 322 | index refresh rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
@@ -1558,7 +2064,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the mesh's own policies: Istio DestinationRule and VirtualService, Linkerd ServiceProfile, Envoy filters.
+- **Wire out (read):** request rate, error rate, p95 and outlier ejections from the mesh's telemetry.
+- **Wire in (write):** connection pool, outlier detection, retry budget and traffic weights by kubectl patch of the policy objects.
+- **Restore:** the policy objects recorded; restored.
+- **Run live?** modelled; the API path is kubectl patch.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 241 | circuit breaker | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
 | 242 | retry budget | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
@@ -1581,7 +2095,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `ran` (a radio access network cell or site), reached through the RAN controller (O-RAN interfaces). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the RAN's near-real-time RIC and O-RAN interfaces (E2, O1).
+- **Wire out (read):** PRB use, connected UEs, cell load, handover rates (the RIC's KPIs).
+- **Wire in (write):** scheduler weights, slice budgets and traffic steering through the RIC's xApps; transmit power within the licence.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | AUDIT-0009 | ran connection admission | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
 | AUDIT-0010 | ran ue handover | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
@@ -1600,7 +2122,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `workflow` (a workflow or pipeline engine), reached through the workflow engine's concurrency settings. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the workflow engine (Temporal, Airflow, Camunda) and the fulfilment system's dispatch rules.
+- **Wire out (read):** task queue depth, worker utilisation, SLA misses (the engine's metrics).
+- **Wire in (write):** worker rates, concurrency and retry policies through the engine's API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 417 | workflow admission | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
 | 418 | workflow worker rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -1622,7 +2152,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `clinical` (clinical systems: imaging archives, records, interface engines, monitoring gateways), reached through the application's own scaling and admission settings (Kubernetes, the vendor console). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the clinical application's own scaling and admission settings (Kubernetes, the vendor console).
+- **Wire out (read):** queue depths, interface backlog, reconstruction wait (the application's metrics).
+- **Wire in (write):** replicas, concurrency and rate limits through the Kubernetes API or the vendor console.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2014 | pacs archive tier target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | 2015 | dicom router concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | Distribution; stack; tower | global |
@@ -1641,7 +2179,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `port` (a container terminal's cranes and vehicles taking moves), reached through the terminal operating system and fleet controllers. Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the terminal operating system and the equipment fleet controllers.
+- **Wire out (read):** moves waiting, cranes active, gate queue, equipment charge (the TOS).
+- **Wire in (write):** crane and vehicle allocation, gate rate and charging windows through the TOS.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | 2080 | quay crane allocation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
 | 2081 | yard crane fleet size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
@@ -1660,7 +2206,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a regulated process: a temperature, pressure, flow, level, voltage or composition held at a setpoint; its class is `process` (an industrial process loop), reached through the PLC or DCS (OPC UA, EtherNet/IP, PROFINET). Omni-Compass reads how far the process sits from its band. Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the CDN's configuration API and the edge cache's settings.
+- **Wire out (read):** hit ratio, origin load, TTLs (the CDN's metrics).
+- **Wire in (write):** cache TTLs, origin-shield concurrency and prefetch through the CDN API.
+- **Restore:** recorded; restored.
+- **Run live?** modelled.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5039 | cdn cache ttl | setpoint | left native: native already holds it inside its band (nothing to win) | Distribution; stack; tower | global |
 | V5-5040 | edge cache size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
@@ -1673,7 +2227,15 @@ Each is a regulated process: a temperature, pressure, flow, level, voltage or co
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `server` (an application service on servers or pods), reached through the Kubernetes API (HPA target and floor, pod resize). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the trading platform's gateway, matching engine and risk settings, the colocation BMS.
+- **Wire out (read):** order latency, session counts, risk-check backlog, market-data fanout (the platform's metrics).
+- **Wire in (write):** thread and session pools, conflation intervals and batch sizes through the platform's configuration; risk checks never relaxed.
+- **Restore:** recorded; restored.
+- **Run live?** modelled only.
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5058 | matching engine threads | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
 | V5-5059 | order gateway sessions | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | machines started at 70% full; reads the last 10 decisions |
@@ -1694,7 +2256,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 Each is a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; its class is `network` (network routing and switching), reached through the network controller (SDN, routing API). Omni-Compass reads how far its queue and its load sit toward the service line (queue or lateness, and load above half). Its home realm is Distribution / Specialized.
 
-| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |
+**Wire it on your stack.**
+
+- **Native controller:** the platform's own recovery and security controls: rollout and rollback, PodDisruptionBudgets, the security hold, a kill switch.
+- **Wire out (read):** error rate, rollout status, the security hold (a ConfigMap key), the kill file.
+- **Wire in (write):** rollout pause and undo by kubectl; the security hold read, never written; the kill switch (tools/omni_switch.py) is a human's.
+- **Restore:** every write recorded and undone on the lease.
+- **Run live?** live in part: the security hold and kill switch run in every Kubernetes benchmark (omnicompass/master.py).
+
+| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
 | V5-5118 | ids capture threads | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | Distribution; stack; tower | global |
 | V5-5119 | ids ring buffer size | setpoint | left native: native already holds it inside its band (nothing to win) | Distribution; stack; tower | global |

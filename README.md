@@ -250,7 +250,7 @@ the repository is lined up (`tools/layout_check.py`). Every live result carries 
 | Every claim with its evidence class, losses kept | [`docs/EVIDENCE_LEDGER.md`](docs/EVIDENCE_LEDGER.md), [`docs/CLAIMS_REGISTER.md`](docs/CLAIMS_REGISTER.md) |
 | Due diligence | [`docs/DUE_DILIGENCE.md`](docs/DUE_DILIGENCE.md) |
 | The manual (wiring, operating, every result) | [`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf), [`docs/INTEGRATION_MANUAL.md`](docs/INTEGRATION_MANUAL.md) |
-| The 1,107 muscles | [`docs/MUSCLE_CATALOG.md`](docs/MUSCLE_CATALOG.md), [`realms/catalog_v5.csv`](realms/catalog_v5.csv) |
+| The 1,107 muscles, and how to wire every family on your own stack | [`docs/MUSCLE_CATALOG.md`](docs/MUSCLE_CATALOG.md), [`realms/catalog_v5.csv`](realms/catalog_v5.csv), [`docs/wiring_recipes.csv`](docs/wiring_recipes.csv) |
 | Every command on one page | [`docs/HANDOFF.md`](docs/HANDOFF.md) |
 
 ## Repository

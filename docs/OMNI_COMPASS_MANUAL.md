@@ -59,7 +59,8 @@ clock ceiling, a replica count, a battery's charge rate) together with the gauge
 stack of muscles governed as one body: the muscles of one company's clusters, databases, caches, cards, cooling and power,
 read by one governor and judged together, so that no muscle is moved at another's expense. Chapter 2 sets out how a stack
 is grouped into one body; Appendix E lists every muscle Omni-Compass can be wired to, with what it reads and what it
-moves.
+moves, and for every family the wiring on your own stack: the native controller that owns the muscle, where the reading
+is tapped, where the setting is written, how it is restored, and whether that wire has run live or on a model.
 
 **What you see when it is hooked up.** Every paired run ends in a receipt with the same shape: the two arms side by side,
 every gauge of the system (the work done, the response times, the misses and failures, the machines and energy spent),
@@ -392,8 +393,9 @@ installer to.
 **What it governs.** The catalog names 1,107 muscles in 70 families, the settings that operators everywhere already
 turn by hand: machine pools and replicas, power caps and clock limits, cache sizes and connection pools, cooling
 setpoints and battery reserves, robot speeds and drone-swarm settings, and many more. Appendix E lists every one: what it
-is, what Omni-Compass reads from it, what it moves, and the factory setting it runs on. Chapter 2 shows how the muscles
-of one stack are grouped into one body.
+is, what Omni-Compass reads from it, what it moves, and the factory setting it runs on; and for each of the 70 families
+how to wire it on your own stack (native controller, wire out, wire in, restore, run live or modelled). Chapter 2 shows
+how the muscles of one stack are grouped into one body.
 
 **What you need before you wire it.**
 
@@ -687,7 +689,9 @@ chiller and its setpoint, a battery and its reserve, a feeder and its tap, a rob
 its flow. Each muscle has a native controller of its own, which is what the muscle does when Omni-Compass is not there,
 and Omni-Compass wires to it through one wire in (the meter) and one wire out (the setting). The catalog
 (`realms/catalog_v5.csv`) lists **1,107 distinct muscles in 70 families**; Appendix E gives every one with what it is,
-what Omni-Compass reads from it, what it moves and the factory setting it runs on.
+what Omni-Compass reads from it, what it moves and the factory setting it runs on, and gives every family its wiring
+recipe (`docs/wiring_recipes.csv`): the native controller, the wire out, the wire in, the restore, and whether the wire
+has run live in this repository or only on a model.
 
 The seventy families, by realm, are these. **Compute, AI and cloud** (twenty-seven): AI inference serving, AI training,
 blockchain and ledger nodes, CI/CD and build farms, cloud virtual machines and capacity, container resources,

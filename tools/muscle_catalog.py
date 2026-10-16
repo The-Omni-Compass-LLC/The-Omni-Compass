@@ -210,6 +210,21 @@ def main():
         L.append(f"| `{k}` | {what} | {wire} |")
     L += ["", "Wires marked *modelled only* exist as plants in the benchmark and are not built for live use.", ""]
 
+    recipes = {r["family"]: r for r in csv.DictReader(open(ROOT / "docs" / "wiring_recipes.csv", encoding="utf-8"))}
+    missing = sorted({r["family"] for r in rows} - set(recipes))
+    if missing:
+        raise SystemExit(f"docs/wiring_recipes.csv lacks a recipe for: {', '.join(missing)}")
+    L += ["**How to wire any muscle on your own stack (the plug, chapter 4).** Every muscle below is wired the same way: "
+          "Omni-Compass never replaces the native controller; it reads the controller's own meters (the wire out) and writes "
+          "the one setting the controller already accepts (the wire in), through a plug that (1) reads the setting once before "
+          "the first write and records it, (2) reads back every write and stops writing if another writer moved the setting, "
+          "(3) renews a lease every decision so a dead governor's settings walk back to native by themselves, and (4) restores "
+          "the recorded setting at the end. Each family's entry says which native controller owns its muscles, where the "
+          "reading is tapped, where the setting is written, how it is restored, and whether that wire has run live in this "
+          "repository or only on a model (`docs/wiring_recipes.csv`). The muscle's name is the setting's own name on that "
+          "controller. Where the entry says *modelled only*, the plant exists in the benchmark and the wire is written against "
+          "the controller's documented interface, not yet run on the machine.", ""]
+
     def family_tables(group, home_note):
         fams = OrderedDict()
         for r in group:
@@ -219,10 +234,17 @@ def main():
             t, p = rs[0]["template"], rs[0]["preset"]
             what = TEMPLATE[t][0]
             pw = PRESET.get(p, (p, "see the manual"))
+            rc = recipes[fam]
             out += [f"### {fam} ({len(rs)} muscles)", "",
                     f"Each is {what}; its class is `{p}` ({pw[0]}), reached through {pw[1]}. Omni-Compass reads "
                     f"{TEMPLATE[t][1]}. {home_note}", "",
-                    "| # | Muscle | Knob | What Omni-Compass does with it | Organisms | Its own card |",
+                    "**Wire it on your stack.**", "",
+                    f"- **Native controller:** {rc['native_controller']}.",
+                    f"- **Wire out (read):** {rc['read']}.",
+                    f"- **Wire in (write):** {rc['write']}.",
+                    f"- **Restore:** {rc['restore']}.",
+                    f"- **Run live?** {rc['live']}.", "",
+                    "| # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |",
                     "|---:|---|---|---|---|---|"]
             for r in sorted(rs, key=lambda r: (not r["muscle_id"].isdigit(), int("".join(c for c in r["muscle_id"] if c.isdigit()) or 0))):
                 k = r["knob"]
