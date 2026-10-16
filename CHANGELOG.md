@@ -2,6 +2,24 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-16 (night, latest): both manuals to the engine that stands, for every reader
+
+- **The Operator's Manual** (`docs/OMNI_COMPASS_MANUAL.md`, `.pdf`): section 5.5, the rules of omni-v7 as an operator meets them
+  (the quota rule and its `no budget known` line, the shared host's busy guard and its `convey: held` record, the clocks in
+  seconds, the verdict in the words of a receipt, the cloud's one flag); section 4.7, coding a new muscle on the muscle SDK
+  (`omnicompass/muscle_sdk.py`: the five functions, the three contracts, the automation modes, the runtime's gate, the receipt,
+  the standard classes, a worked example whose outcomes are the SDK's own tests); Appendix K.5, every setting of the two card
+  governors; Appendices L.4 and L.5, every audit record of the other muscles and of the card governors; the gauges the v7
+  receipts carry; a reading path for the CEO, CFO, CIO and board and one for counsel; Appendices R, S and T (the Enterprise
+  License's standard terms, the patents and trademarks statements, the security policy) bound in with the license, the
+  licensing answers and the third-party notices.
+- **The Owner's Manual** (`docs/OMNI_COMPASS_OWNERS_MANUAL.md`, `.pdf`): the chapter "The Engine That Stands: Omni v7"
+  (`docs/OMNI_V7.md`) after the mechanism of action; section 8.7, coding a new muscle on the SDK; the Enterprise License, the
+  patents and trademarks and the security policy as chapters after the licensing answers; the road to v7 (the v5 and v6 pages)
+  placed as history before the History chapter; the Source appendix now prints every Python file the fingerprint `OMNI_V7.json`
+  names (41 files, 10,703 lines) in the fingerprint's order, nothing in the mechanism withheld from the owner; a reading path for
+  the CFO and CIO and one for counsel. The Owner's PDF is 1,330 pages; the Operator's 482.
+
 ## 2026-10-16 (night, last): the first three-run tables on omni-v7
 
 - **Five tables, every run omni-v7** (`results/live/V7_GOLDILOCKS.md`, `V7_KEDA_REQUESTS.md`, `V7_KEDA_CPU_REQUESTS.md`,

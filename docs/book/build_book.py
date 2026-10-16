@@ -21,6 +21,7 @@ height, headings scaled up from it; only the running heads and footers are small
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -534,6 +535,9 @@ OPERATOR_OUTLINE = [
     ("Appendix O. The License", ("X", "license")),
     ("Appendix P. Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
     ("Appendix Q. Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
+    ("Appendix R. The Enterprise License: Standard Terms", ("F", "ENTERPRISE_LICENSE.md")),
+    ("Appendix S. Patents and Trademarks", ("FS", ["PATENTS.md", "TRADEMARKS.md"])),
+    ("Appendix T. Security Policy", ("F", "SECURITY.md")),
     ("Contact", ("X", "contact")),
 ]
 
@@ -560,6 +564,7 @@ OWNER_OUTLINE = [
     ("Formal Status of the Mathematics", ("F", "docs/FORMAL_STATUS.md")),
     ("The Max, Formally: Definitions, Guarantees and Measures", ("F", "docs/FORMAL_V5.md")),
     ("The Mechanism of Action", ("F", "docs/MECHANISM_OF_ACTION.md")),
+    ("The Engine That Stands: Omni v7", ("F", "docs/OMNI_V7.md")),
     ("The Engines and Their Audit", ("FS", ["docs/ENGINES.md", "docs/history/ENGINE_AUDIT.md"])),
     ("PART", "The Physics: the Compass and the Nervous System",
      "Push and pull, the band and its cushions, the physics of a processor, and the two-way wires that carry the "
@@ -622,9 +627,13 @@ OWNER_OUTLINE = [
     ("License and Commercial Terms", ("M", "License and Commercial Terms")),
     ("Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
     ("Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
+    ("The Enterprise License: Standard Terms", ("F", "ENTERPRISE_LICENSE.md")),
+    ("Patents and Trademarks", ("FS", ["PATENTS.md", "TRADEMARKS.md"])),
+    ("Security Policy", ("F", "SECURITY.md")),
     ("Repository Standards", ("F", "docs/REPOSITORY_STANDARDS.md")),
     ("Python, C++ and the Seal", ("M", "Python, C++ and the Seal")),
     ("The Founder's Working Notes", ("F", "docs/history/HANDOFF_CHAPTER.md")),
+    ("The Road to the Engine That Stands: Omni v5 and v6", ("FS", ["docs/OMNI_V5.md", "docs/OMNI_V6.md"])),
     ("History", ("F", "docs/HISTORY.md")),
     ("BACK", None),
     ("Glossary", ("M", "Glossary")),
@@ -656,13 +665,25 @@ def source_listing(rel):
 
 def special(name):
     if name == "source":
-        intro = ("The engine, the compass law, the compass on every muscle, the two-wire GPU governor, the plug adapter and the "
-                 "nervous system, printed in full from the repository so that the book and the code can be read side by "
-                 "side. The engine file is sealed: its fingerprint is in `results/SEAL.json`, and `verify.py` fails if a "
-                 "byte of it changes.")
+        fp = json.loads(read("OMNI_V7.json"))
+        files = list(fp["files"])
+        py = [rel for rel in files if rel.endswith(".py")]
+        tables = [rel for rel in files if not rel.endswith(".py")]
+        intro = (f"The engine that stands, {fp['version']}, is the {len(files)} files named in `OMNI_V7.json` (digest "
+                 f"{fp['digest'][:16]}): {len(py)} Python files and {len(tables)} tables. The Python files are printed here in "
+                 "full from the repository, in the fingerprint's order, so that the book and the code can be read side by side "
+                 "and nothing in the mechanism is withheld from the owner: the Kubernetes governor, its muscles, the replica "
+                 "room, the quota budget and the two card governors (`omni_controller/`); the engine core, the compass law, "
+                 "the compass, the verdict, the conveyance law, the plug adapter, the nervous system, the master switch and "
+                 "the rest of the library (`omnicompass/`); the modelled plants, the harness, the presets, the max's arm and "
+                 "the card's model (`realms/`); and the three runners the fingerprint covers (`tools/`). The tables are the "
+                 "muscle catalogs: `realms/catalog_v5.csv` (the 1,107 muscles, printed muscle by muscle in the Muscles "
+                 "appendix with every card of `realms/muscle_cards_v5.csv`) and the earlier catalogs kept for their results "
+                 "(" + ", ".join(f"`{rel}`" for rel in tables if "v5" not in rel) + "). `python3 tools/omni_version.py` hashes "
+                 f"every one of the {len(files)} and prints {fp['version']} when none has changed; `verify.py` fails if a byte "
+                 "of them differs from the fingerprint.")
         story = [Paragraph(inline(intro), BODY)]
-        for rel in ["omnicompass/core.py", "omnicompass/compass_law.py", "realms/compass_arm.py", "omni_controller/gpu_compass.py",
-                    "omnicompass/adapter.py", "omnicompass/nervous_system.py"]:
+        for rel in py:
             story += source_listing(rel)
         return story
     if name == "manifests":
@@ -1075,8 +1096,10 @@ def _md_text(src):
         return out
     if kind == "X":
         if key == "source":
-            return ["The full source of `omnicompass/core.py`, `omnicompass/compass_law.py`, `realms/compass_arm.py`, "
-                    "`omni_controller/gpu_compass.py`, `omnicompass/adapter.py` and `omnicompass/nervous_system.py`."]
+            fp = json.loads(read("OMNI_V7.json"))
+            py = [rel for rel in fp["files"] if rel.endswith(".py")]
+            return [f"The full source of every Python file of the engine that stands, {fp['version']} (`OMNI_V7.json`, digest "
+                    f"{fp['digest'][:16]}), {len(py)} files, as the printed book carries it: " + ", ".join(f"`{rel}`" for rel in py) + "."]
         if key == "license":
             return ["The license is the file `LICENSE`."]
         if key == "contact":
