@@ -2,6 +2,31 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-16 (night, after): the book as the teacher; the reading key on every receipt; the three clouds on one harness
+
+- **Both manuals open with the two books explained** (the Owner's puts the engine inside the vessel; the Operator's drives it),
+  **Where to Get Help** (every question's place in the book; the website and the toll-free line; what to send with a question),
+  and **the output follows the input** (section 3.7: the tune, the wiring and the load name every receipt; a changed input is
+  another result, its own). The Operator's eight levels each say **what you should see** when the level is wired right, in the
+  audit's own records and the receipt's own words; chapter 10 (the Owner's section 13) carries **the readings to expect**: the v7
+  three-run tables as the reference bands, read in three steps (the words, the direction, the power given), with the two readings
+  that are not faults named.
+- **How to read this receipt** (`tools/readings.py`, `receipt_key()`): the short reading instruction, GAIN, EVEN and LOSS by the
+  gauge's aim and never by the sign, power given, the three-run rule and the disclaimer, now stands under the title of every
+  table and receipt the repository writes (the three-run tables, the capacity tables, the live receipts, the realms, the grid,
+  the benefit sheet, the wiring verdicts, the organisms with the cluster inside) and in every standing table
+  (`python3 tools/readings.py --fix`; `--check` fails a standing table without it).
+- **Google Cloud and Amazon on Azure's harness** (the founder's order of 16 October: the Azure run is the measure of the other
+  two): `gke-metered.yml` and `eks-metered.yml` carry the replica room, the machine-family queue in their titles and
+  concurrency groups, and a secrets gate that stops a run before anything is built or billed; `scripts/google_queue.txt` and
+  `scripts/amazon_queue.txt` carry the same four sets as Azure at the same settings, behind a `switch=` line (off until the
+  secrets are in and the founder turns it on); the grid conductor (`scripts/dispatch_grid.py`) reads all three queues, one set
+  at a time per machine-family queue, dispatched runs only. Nothing is rented on Google or Amazon before the switch is on.
+- **The conductor's hand-off** (`grid.yml`): when a five-hour conductor ends it starts the next unless one is already waiting;
+  a run a verify had started (workflow_run), which only ticks when its commit says `[all-nongpu]` and is otherwise skipped, was
+  counted as waiting, so no conductor ran from 15:33 to the hand start at 16:05 on 16 October. Only a dispatched or scheduled run
+  counts now. The grid was restarted by hand the same minute; nothing was cancelled.
+
 ## 2026-10-16 (night, latest): both manuals to the engine that stands, for every reader
 
 - **The Operator's Manual** (`docs/OMNI_COMPASS_MANUAL.md`, `.pdf`): section 5.5, the rules of omni-v7 as an operator meets them
@@ -18,7 +43,7 @@
   patents and trademarks and the security policy as chapters after the licensing answers; the road to v7 (the v5 and v6 pages)
   placed as history before the History chapter; the Source appendix now prints every Python file the fingerprint `OMNI_V7.json`
   names (41 files, 10,703 lines) in the fingerprint's order, nothing in the mechanism withheld from the owner; a reading path for
-  the CFO and CIO and one for counsel. The Owner's PDF is 1,330 pages; the Operator's 482.
+  the CFO and CIO and one for counsel. The Owner's PDF is 1,332 pages; the Operator's 483.
 
 ## 2026-10-16 (night, last): the first three-run tables on omni-v7
 

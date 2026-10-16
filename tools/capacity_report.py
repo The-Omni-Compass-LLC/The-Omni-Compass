@@ -34,7 +34,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp  # noqa: E402
 from tools.live_reps import T95  # noqa: E402
-from tools.readings import GAIN, LOSS, EVEN_NOISE  # noqa: E402  (the words every table uses)
+from tools.readings import GAIN, LOSS, EVEN_NOISE, receipt_key  # noqa: E402  (the words every table uses)
 
 LATENCY_SHARE = 0.95      # a step keeps the latency limit when at least 95% of its requests are answered within the line
 FAIL_SHARE = 0.01         # and the failure limit when no more than 1% failed or were never sent
@@ -205,7 +205,7 @@ def main(argv=None):
     pairs, left_out = collect(*a.roots)
     rows = [row(cap, prs) for cap, prs in sorted(pairs.items(), key=lambda x: x[0] or 0)]
     ups = steps_up(rows)
-    L = ["# The capacity test: native and Omni-Compass on top at the same resource cap", "",
+    L = ["# The capacity test: native and Omni-Compass on top at the same resource cap", "", *receipt_key(), "",
          "Evidence class **L** (the real thing: a real Kubernetes cluster, real requests, every answer counted). The cap is "
          "a quota on the served app's CPU (the same in both arms, enforced by the cluster, not by either controller); the "
          "load rises step by step past what the cap can serve, the same requests in both arms. **Completed work**: requests "

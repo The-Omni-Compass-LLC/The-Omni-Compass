@@ -105,15 +105,21 @@ RERUN_SINCE = "2026-10-16T02:59:00Z"   # omni-v7: its twelve trial runs of 16 Oc
                                        # CruiseKube; A, B and C) count as the first reruns on the engine that stands
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
-# Azure, the first cloud (the founder's order of 13 October), its sets following one another without a hand on the
-# button: scripts/azure_queue.txt lists every Azure set in release order, A of every line, then B, then C. A set starts
+# The clouds, their sets following one another without a hand on the button. Azure first (the founder's order of 13
+# October): scripts/azure_queue.txt lists every Azure set in release order, A of every line, then B, then C. A set starts
 # when its machine family's queue (its region and machine size, the workflow's own concurrency group) has no run waiting
 # or running, one a tick in each queue, and is read back by its run's title since AZURE_SINCE (a cancelled run counts for
-# nothing), so nothing is started twice and a set dispatched by hand counts as started
+# nothing), so nothing is started twice and a set dispatched by hand counts as started. Google Cloud and Amazon carry the
+# same four sets at the same settings on the same harness (scripts/google_queue.txt, scripts/amazon_queue.txt; the
+# founder's order of 16 October: the Azure run is the measure of the other two), each behind its own switch line
+# (switch=on | off): off until that cloud's secrets are in the repository, so nothing is rented before the founder says
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
 AZURE_SINCE = "2026-10-16T04:50:00Z"   # omni-v7: every Azure set runs again on the engine that stands; the sets of 14 and 15 October
                                        # stay as their own engine's record, counted in no v7 table
 AZURE_WF = "aks-metered.yml"
+CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
+          ("Google Cloud", "gke-metered.yml", ROOT / "scripts" / "google_queue.txt"),
+          ("Amazon", "eks-metered.yml", ROOT / "scripts" / "amazon_queue.txt"))
 FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
          "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
 
@@ -489,15 +495,40 @@ def reruns_started(queue):
     return out
 
 
-def azure_title(kv):
-    """The title aks-metered.yml gives a run of these inputs (its run-name), so a started set is read back by it."""
-    loc = kv.get("location") or "eastus"
-    fam = "pools" if kv.get("worker_pools") else (kv.get("vm_size") or "Standard_D2s_v4")
+def cloud_title(wf, kv):
+    """The title a cloud workflow gives a run of these inputs (its run-name), so a started set is read back by it: what ran,
+    the organism, the replica room, the dial, then the machine-family queue, the last two words (Azure: the region and the
+    machine size or 'pools'; Google: the zone and the machine type; Amazon: the region and the instance type)."""
     what = f"burst {kv['load_steps']}" if kv.get("load_steps") else "steady"
     org = f" organism {kv['organism']} x{kv.get('organism_scale') or '1'}" if kv.get("organism") else ""
     room = f" replica room {kv['replica_ceiling']}" if kv.get("replica_ceiling") else ""
     dial = kv.get("dial") or "save"
-    return f"aks-metered {what}{org}{room} dial {dial} {loc} {fam}"
+    if wf == "gke-metered.yml":
+        loc, fam = kv.get("zone") or "us-central1-a", kv.get("machine") or "e2-standard-2"
+    elif wf == "eks-metered.yml":
+        loc, fam = kv.get("region") or "us-east-1", kv.get("instance") or "m5.large"
+    else:
+        loc = kv.get("location") or "eastus"
+        fam = "pools" if kv.get("worker_pools") else (kv.get("vm_size") or "Standard_D2s_v4")
+    return f"{wf[:-4]} {what}{org}{room} dial {dial} {loc} {fam}"
+
+
+def azure_title(kv):
+    """The title aks-metered.yml gives a run of these inputs."""
+    return cloud_title(AZURE_WF, kv)
+
+
+def cloud_switch(path):
+    """The queue file's switch line: True when it reads switch=on, or when the file carries no switch (Azure's old form)."""
+    try:
+        lines = Path(path).read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return False
+    for ln in lines:
+        ln = ln.strip()
+        if ln.startswith("switch="):
+            return ln.split("=", 1)[1].strip().lower() == "on"
+    return True
 
 
 def azure_group(title):
@@ -506,8 +537,9 @@ def azure_group(title):
     return tuple(w[-2:]) if len(w) >= 2 else ("", "")
 
 
-def azure_queue(path=None):
-    """The Azure sets in release order: [(run, name, title, inputs)], A of every line, then B, then C."""
+def azure_queue(path=None, wf=AZURE_WF):
+    """A cloud's sets in release order: [(run, name, title, inputs)], A of every line, then B, then C (the switch line and
+    the comments are not sets)."""
     path = Path(path or AZURE_QUEUE)
     try:
         lines = path.read_text(encoding="utf-8").splitlines()
@@ -516,12 +548,15 @@ def azure_queue(path=None):
     entries = []
     for ln in lines:
         ln = ln.strip()
-        if not ln or ln.startswith("#"):
+        if not ln or ln.startswith("#") or ln.startswith("switch="):
             continue
         name, inputs = (ln.split("|") + [""])[:2]
         kv = dict(x.split("=", 1) for x in inputs.split(";") if "=" in x)
-        entries.append((name.strip(), azure_title(kv), kv))
+        entries.append((name.strip(), cloud_title(wf, kv), kv))
     return [(run, n, t, kv) for run in "ABC" for n, t, kv in entries]
+
+
+cloud_queue = azure_queue
 
 
 def azure_to_start(queue, started, busy):
@@ -542,11 +577,12 @@ def azure_to_start(queue, started, busy):
     return out
 
 
-def azure_runs():
-    """aks-metered.yml's runs since AZURE_SINCE: ({title: runs not cancelled}, {queues with a run waiting or running})."""
+def azure_runs(wf=AZURE_WF):
+    """A cloud workflow's dispatched runs since AZURE_SINCE: ({title: runs not cancelled}, {queues with a run waiting or
+    running}). Only dispatched runs count: a push registers the Google and Amazon workflows and runs nothing."""
     started, busy, page = {}, set(), 1
     while page <= 5:
-        d = api(f"repos/{REPO}/actions/workflows/{AZURE_WF}/runs?created=>={AZURE_SINCE}&per_page=100&page={page}")
+        d = api(f"repos/{REPO}/actions/workflows/{wf}/runs?event=workflow_dispatch&created=>={AZURE_SINCE}&per_page=100&page={page}")
         rs = d.get("workflow_runs", [])
         for r in rs:
             t = r.get("display_title") or ""
@@ -706,18 +742,23 @@ def main(argv=None):
         print(f"this checkout runs {eng}, the grid is {ENGINE}'s: nothing started (a new engine gets its own grid)")
         return 0
     azure = []
-    queue = azure_queue()
-    if queue:
+    for cloud, wf, qpath in CLOUDS:
+        if not cloud_switch(qpath):
+            print(f"{cloud} queue: switched off ({qpath.relative_to(ROOT)}); nothing started there until the founder turns it on")
+            continue
+        queue = azure_queue(qpath, wf)
+        if not queue:
+            continue
         try:
-            for run, name, title, kv in azure_to_start(queue, *azure_runs()):
+            for run, name, title, kv in azure_to_start(queue, *azure_runs(wf)):
                 if not a.dry:
-                    api(f"repos/{REPO}/actions/workflows/{AZURE_WF}/dispatches", method="POST", data={"ref": a.ref, "inputs": kv})
+                    api(f"repos/{REPO}/actions/workflows/{wf}/dispatches", method="POST", data={"ref": a.ref, "inputs": kv})
                     time.sleep(2)
-                azure.append(f"{name} {run}")
-        except (RuntimeError, urllib.error.URLError) as e:   # Azure is read again at the next tick
-            print(f"Azure queue not read ({str(e)[:120]}); tried again at the next tick", file=sys.stderr)
+                azure.append(f"{cloud} set started: {name} {run}")
+        except (RuntimeError, urllib.error.URLError) as e:   # the cloud is read again at the next tick
+            print(f"{cloud} queue not read ({str(e)[:120]}); tried again at the next tick", file=sys.stderr)
     for x in azure:
-        print(f"Azure set started: {x}")
+        print(x)
     queued, running, first = jobs_in_flight()
     target = max(a.floor, running + a.extra)
     inflight, started = queued + running, []

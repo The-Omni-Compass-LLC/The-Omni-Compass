@@ -206,6 +206,35 @@ anything. Then wire it one level at a time, watch it before you let it write, an
 **AJ Dubra**
 Founder, The Omni-Compass LLC
 
+## The Two Manuals: the Owner's and the Operator's
+
+Omni-Compass is documented in two books written to one plan, in the same words, with the same structure, and read as one
+work; each stands on its own for its own reader.
+
+**The Owner's Manual** is for whoever owns or licenses Omni-Compass and so must know the whole mechanism: the one who puts
+the engine inside the vessel. It holds the philosophy and the theory, the mathematics, the mechanism of action, how the engine
+is built, every file of its source, every result with its evidence class, and the wiring. Nothing is withheld from it: what
+the repository holds, it holds.
+
+**The Operator's Manual** is for whoever is handed the vessel with the machinery inside it and must drive it: the engineering
+team that embeds, wires, tunes, runs and checks Omni-Compass on a company's stack, and the people who keep it in service. It
+is the glove box, not the blueprint. It shows the engine only as its shell and its process: what it reads, what it writes,
+what it may never do, how it is switched off, what its audit says and how its receipts are read. It explains nothing of how
+the engine is built; where its reader needs what is inside, the text says so and names the place in the Owner's Manual where
+it lives, and never repeats it.
+
+The two books share their front matter (the key, the notice, the foreword, the prefaces, the quick reference), their
+vocabulary (one glossary), their structure (parts, chapters, numbered sections, appendices, and a table of contents rebuilt
+from the book itself at every edition) and their reading rule: **the order of the chapters is the order of understanding and
+of implementing.** Nobody can wire what they have not understood, so each book is read from the front: what Omni-Compass is;
+the stack as one body; the plug and the rules its wires obey; the wiring, level by level and stack by stack; operating it;
+checking it against its own receipts. Each chapter tells the reader what to do, what they should see when it is done right,
+and what it means when they see something else. The book is the teacher: it walks beside the work in real time, and at every
+step it says what the right result looks like, so that a team that has wired Omni-Compass knows from its own receipts whether
+it has brought it to its full working order or has a wire still to find.
+
+This is the Operator's Manual: the vessel's book.
+
 ## Preface: How to Use This Manual
 
 | You are | Read |
@@ -262,6 +291,28 @@ the data center under the servers. Part IV is operating it: the switches, the ru
 maintenance. Part V is checking it on your own system: paired runs and receipts, evidence classes, the engine version and
 the three-run rule. Part VI is the license and how to verify your copy. The back matter holds the glossary, every command,
 the files an installation touches, the gauges, troubleshooting and every muscle with its wiring.
+
+## Where to Get Help
+
+Every question has a place in this book, and the places outside it are few and named here once.
+
+| You need | Where it is |
+|---|---|
+| The next step while wiring | the level you are at (section 6.3) and your stack (chapter 7); every step names what you should see when it is done right |
+| A reading you do not understand | the key at the front of this book; Appendix C (every gauge, its source and its aim); chapter 11 (what a receipt proves and what it does not); section 10's reference bands |
+| A symptom | Appendix D (troubleshooting, symptom by symptom); chapter 8 (the three ways a governor stops); section 5.3 (blind means hold); section 4.5 (wired right or wired wrong) |
+| A setting | Appendix K (every setting of the Kubernetes governor and of the card governors, with its shipped value) |
+| An audit line | Appendix L (every record, field by field, with the six searches that answer most questions) |
+| What a result elsewhere means | `DISCLOSURES.md`, section 4 (the front matter): the first presumption is the wiring, the settings or the reading, never the law |
+| What is inside the engine | the Owner's Manual: the theory, the mathematics, the mechanism, the source |
+| A licensing, pilot or Enterprise License question | The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1; www.omni-compass.com; `LICENSING_FAQ.md` (Appendix P) and `ENTERPRISE_LICENSE.md` (Appendix R) |
+| A security finding | the process in `SECURITY.md` (Appendix T): a private report, never a public issue |
+| Anything else about running the software | `.github/SUPPORT.md` in the repository, and the toll-free line above |
+
+**What to send with a question.** Four things: the output of `python3 tools/omni_version.py` (the engine the copy runs);
+the wire check's output (section 4.4); the receipt of the paired run (chapter 10) and the audit file (Appendix L) for the
+window in question; and the command line the governor ran with (Appendix K). With those four, every question in this book can
+be answered from the record, and most are answered by the record itself.
 
 ## Prelude: A Night on the Cluster
 
@@ -849,6 +900,22 @@ tune: write the change down before the paired runs, run native and omni three ti
 receipts against the tune that ran. Where a changed tune reads differently from the factory tune, the change is the first
 thing to look at, and then the wiring.
 
+### 3.7 The output follows the input
+
+Every number Omni-Compass produces is the result of three inputs, and a reader who changes any one of them has changed the
+result: **the tune** (the factory tune as shipped, or the dial turned down, or a card changed), **the wiring** (which muscles
+are wired in and which are watched, what each wire reads and writes, how fresh each feed is) and **the load** (the work
+offered, its shape and its line). The published receipts are the record of one setting of all three, and every receipt names
+it: the engine's fingerprint, the harness, the load and the window. The same engine wired onto another stack, or tuned to
+another purpose, gives another result, and that result is its own.
+
+A team that wants a different outcome sets the inputs for it and reads its own receipts against native: the most work at any
+spend (the max, the default); the same work as native for a smaller bill (the tune-down on the machines alone, the cloud's
+rule); a muscle held at a limit of the team's own choosing (its card, or its cover); a knob left native (watched, never
+written). Each of those is a legitimate setting of the inputs, and each has its own result. What no reader may do is read one
+tune's receipt as another's, or read a receipt without its inputs. The factory tune (section 3.1) is the one setting whose receipts this book publishes; the dial (section 3.2) and the cards (section 3.3) are the inputs a licensee may change, and section 3.6 says what a changed tune's results are. Where a result read elsewhere differs from the
+published one, the first presumption is an input: the wiring, the settings or the reading (`DISCLOSURES.md`, section 4).
+
 ---
 
 # PART II - THE HARNESS: PLUGS, WIRES AND THE RULES THEY OBEY
@@ -1284,6 +1351,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v7 (digest d6d467b824c585f1, 46 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
 
 **Level 1 - Watch (read-only).**
 
@@ -1295,6 +1363,7 @@ kubectl -n omni-compass logs deploy/omni-compass -f
 The install file grants a read-only identity; `scripts/pilot_shadow.sh` records `kubectl auth can-i` receipts that
 show it cannot write. Every decision it would take is logged with its reason.
 Pass: zero writes, and readings your operators agree with.
+What you should see: an audit with a `decision` record every 60 s and no `write` record at all (`jq -c 'select(.write)' audit.jsonl` prints nothing); `authority.senses.blind` false for every sense once the feed is wired; `nodes_recommended` at or below `nodes_observed` while the service is calm and above it when it is not. A `write` here is a wiring fault (the identity can write: chapter 9); a sense that stays blind is a feed fault (section 5.3).
 
 **Level 2 - The pods, on top of your autoscalers. WRITES.**
 1. Grant `patch horizontalpodautoscalers` and `patch pods/resize` (`deploy/rbac-target.yaml`).
@@ -1314,6 +1383,7 @@ Pass: zero writes, and readings your operators agree with.
 
 Your HPAs keep scaling as before; Omni-Compass sets their targets and raises floors ahead of bursts.
 Pass: p95, p99 and failed requests never behind native, over paired runs (chapter 10).
+What you should see: in the paired receipt (chapter 10), response time at the 95th percentile and time over the line reading GAIN or EVEN, failed requests EVEN, the autoscaler's replicas EVEN or power given. On our own services of this kind, rightsized with Goldilocks or scaled by KEDA, the 95th percentile read −52% to −75% and alert minutes −93% to −100% in all three of our runs on this engine (chapter 10, the reference bands). A LOSS on any service gauge at this level is read as a wiring fault first: the feed's freshness and its line (chapter 18), the sensed autoscaler's name, the window's length against the interval widths of chapter 10.
 
 **Level 3 - The machines. WRITES.**
 1. Grant `patch nodes` and `patch pods` (`deploy/kind/rbac-omni.yaml`).
@@ -1334,10 +1404,12 @@ Pass: p95, p99 and failed requests never behind native, over paired runs (chapte
 A machine is given back only when every sense is live, the last order landed, pods are not scaling up, nothing waits
 for a place, and the remaining machines stay inside the band.
 Pass: fewer machines in service, with no LOSS on any service gauge.
+What you should see: `verdict` records reading `trial`, then `step allowed` or `step refused`, each with its `reading`; machines in service and node-hours EVEN or GAIN, the bill EVEN or GAIN; no `refused` record from the scale command; after an OFF, the lease walking every machine back. A machine count that never falls is not a fault: it is the governor finding no machine it can give back without a LOSS, and the audit says which gate held (`node_gate.reason`).
 
 **Level 4 - Omni-Compass decides; Kubernetes is the muscle. WRITES.** Add `--strict-replicas`: Omni-Compass decides
 each service's replica floor and when to shrink; the HPA stays as the fast reflex upward.
 Pass: as level 3.
+What you should see: as level 3, with the floors the governor set in the audit, and the HPA still raising replicas on a burst before the governor's next decision.
 
 **Level 5 - A GPU box, two wires. WRITES.**
 
@@ -1372,17 +1444,20 @@ The settings are the card's own (its busy clock and busy draw as learned), the l
 `tools/gpu_workload.py` does; without it no step is ever allowed and the card stays native.
 Pass: work per energy up or equal; requests served equal; no request more than 2% slower at the median, p95 and p99
 at native or within 2%; every row of section 4.5 reads "wired right".
+What you should see: `tools/gpu_wire_check.py` ending WIRED RIGHT; a `snapshot` record, then a `decision` every 2 s; at the max no `clock_write` below the top while the card serves; at the tune-down a `verdict` for every step and `verdict_state: left native` where no step passed; `restored` with `ok: true` after the kill file (Appendix L.5). The receipt: work per energy GAIN or EVEN, requests served EVEN, the 95th percentile EVEN or inside the allowance.
 
 **Level 6 - CPU clock and power. WRITES.** On bare metal, add to the controller:
 `--cpufreq-policy-root /sys/devices/system/cpu/cpufreq --cpufreq-require-schedutil --rapl-cmd "<prints CPU package watts>"`.
 The OFF switch writes every policy's recorded maximum back exactly.
 Pass: energy per unit of work down, no LOSS on any service gauge.
+What you should see: one `cpu_pstate_snapshot`, then `cpu_pstate_write` records naming the cap and the envelope; energy per unit of work GAIN; every service gauge EVEN or GAIN; at OFF, `cpu_pstate_restore` putting every policy's ceiling back exactly (Appendix L.4).
 
 **Level 7 - Site power and cooling. WRITES.**
 `--power-cmd "<prints site watts>" --site-limit-w <limit>` brings site power stress into the engine;
 `--cooling-cmd "<sets {c}>" --cooling-min-c 18 --cooling-max-c 27 --cooling-restore-c 22` lets it hold the supply-air
 setpoint in its band. CPU and GPU sharing one power budget, and groups of cards sharing a site budget, run as models
 today. Batteries are designed as a muscle of the site, not yet wired (section 7.10).
+What you should see: site power stress entering the decisions (the `compass` record) and the cooling setpoint held inside its band; nothing written outside the band; at OFF, the setpoint back at `--cooling-restore-c`.
 
 ### 6.4 Wiring for superiority: watch first, then the paired trial on every knob
 
@@ -1915,6 +1990,28 @@ window, the number of pairs, the order rotation, the engine's fingerprint and th
 arm was handed back. `tools/live_reps.py` prints exactly this for a Kubernetes run and `tools/confirm_abc.py` prints it
 for three runs side by side; a receipt from any other tool should be laid out the same way so that a reader of this
 manual can read it without learning a new shape.
+
+**The readings to expect, and what it means when you do not see them.** The published tables are the reference an
+installer reads their own receipt against: not the numbers, which belong to our systems and our loads, but the signs and the
+words. On the engine that stands, omni-v7, on real Kubernetes, ten pairs a run and three runs each (`results/live/V7_*.md`):
+
+| The service | Reads GAIN in all three of our runs | Reads EVEN | Power given |
+|---|---|---|---|
+| Rightsized with Goldilocks and the VPA's recommender | response time −45% to −47% mean, −60% to −62% at the 95th percentile, −67% to −69% at the 99th; time over the line −100% | machines, failed requests, replicas, pods started, pod start wait, alert minutes | parked-worker energy +1.6% to +2.3% |
+| Scaled by KEDA's HTTP add-on | response time −57% to −58% mean, −71% to −75% at the 95th percentile; alert minutes −93% to −96%; replicas −15% to −19%; pods started −17% to −23% | machines, failed requests, pod start wait | parked-worker energy +2.2% to +2.3% |
+| Scaled by KEDA on CPU and requests | response time −36% to −38% mean, −52% to −54% at the 95th percentile, −57% to −59% at the 99th; time over the line −98% to −100% | machines, failed requests, replicas, alert minutes | parked-worker energy +1.1% to +1.7% |
+| Governed by CruiseKube's own recommendations | nothing: no setting written | every gauge | none |
+| Held at a fixed CPU cap, four caps | nothing: the cap blocks the one lever | completed work and work inside the line at every cap | none |
+
+Read your receipt against this table in three steps. **First the words.** A service gauge that reads LOSS on your receipt, where
+the table reads GAIN or EVEN for the same kind of service, is read as a wiring fault before anything else (`DISCLOSURES.md`,
+section 4): the feed's freshness and its line (chapter 18), the sensed autoscaler's name, the identity's permissions (chapter 14), the window's length against the interval widths above. **Second the direction.** Where the table reads GAIN, your receipt should read GAIN or EVEN; a smaller gain
+is your stack's, not a fault, because the gain is bounded by how far native stood from its own best. **Third the power given.** A
+resource that rose on your receipt is read beside the work and the speed it bought; a rise with nothing bought is a question for
+Appendix L: what did the governor write, and why. Two readings are not faults: EVEN on every gauge where native already runs at the
+top of its range (the knob is at its limit on native, and the governor leaves it there by design, section 5.5), and a machine count
+that does not fall where no machine can be given back without a LOSS (the audit's `node_gate.reason` names the gate that held).
+What the table cannot give is your number: the same engine on another stack is another result, and it is yours (section 3.7).
 
 ## 11. Evidence Classes and How to Read a Receipt
 

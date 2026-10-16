@@ -6601,6 +6601,10 @@ and where every number stands today are in the manual, section 3 (`docs/OMNI_COM
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+<!-- how to read this receipt (tools/readings.py) -->
+**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart (the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, machines, memory, processor time, a bill) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and never called a loss. So a minus can read GAIN (a response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+<!-- end: how to read this receipt -->
+
 The founder's orders of 9 and 13 October 2026: next to every benchmark, say whether Omni-Compass on top was a benefit to the system and by how much, in one number whose sign always means the same thing, and say it in **GAIN**, **EVEN** and **LOSS**, judged by what each gauge is for and never by the sign of its number (the key: `docs/HOW_TO_READ_THE_RESULTS.md`). **On this sheet the sign is the system's own declared aims, gauge by gauge: a plus is a GAIN; a minus is a LOSS on work, speed, misses or failures, and power given on a resource spent (energy, machines, memory).** The number carries its word. Beside it every change the same in all three of our runs is written out with which way it went and its word: "p95 cut 65% (GAIN)", "memory ceiling held up 215% (power given)". An operator whose aims differ reads the same numbers the other way.
 
 The result tables (the files in the last column) keep every change with its raw sign: a response time that fell reads "-65%" there, and the Reading column beside it says GAIN.
@@ -6912,6 +6916,28 @@ window, the number of pairs, the order rotation, the engine's fingerprint and th
 arm was handed back and whether any repetition was off the clock. `tools/live_reps.py` prints exactly this for a
 Kubernetes run and the three-run tools print it for three runs side by side; a receipt from any other tool should be
 laid out the same way so that a reader of this manual can read it without learning a new shape.
+
+**The readings to expect, and what it means when you do not see them.** The published tables are the reference an
+installer reads their own receipt against: not the numbers, which belong to our systems and our loads, but the signs and the
+words. On the engine that stands, omni-v7, on real Kubernetes, ten pairs a run and three runs each (`results/live/V7_*.md`):
+
+| The service | Reads GAIN in all three of our runs | Reads EVEN | Power given |
+|---|---|---|---|
+| Rightsized with Goldilocks and the VPA's recommender | response time −45% to −47% mean, −60% to −62% at the 95th percentile, −67% to −69% at the 99th; time over the line −100% | machines, failed requests, replicas, pods started, pod start wait, alert minutes | parked-worker energy +1.6% to +2.3% |
+| Scaled by KEDA's HTTP add-on | response time −57% to −58% mean, −71% to −75% at the 95th percentile; alert minutes −93% to −96%; replicas −15% to −19%; pods started −17% to −23% | machines, failed requests, pod start wait | parked-worker energy +2.2% to +2.3% |
+| Scaled by KEDA on CPU and requests | response time −36% to −38% mean, −52% to −54% at the 95th percentile, −57% to −59% at the 99th; time over the line −98% to −100% | machines, failed requests, replicas, alert minutes | parked-worker energy +1.1% to +1.7% |
+| Governed by CruiseKube's own recommendations | nothing: no setting written | every gauge | none |
+| Held at a fixed CPU cap, four caps | nothing: the cap blocks the one lever | completed work and work inside the line at every cap | none |
+
+Read your receipt against this table in three steps. **First the words.** A service gauge that reads LOSS on your receipt, where
+the table reads GAIN or EVEN for the same kind of service, is read as a wiring fault before anything else (`DISCLOSURES.md`,
+section 4): the feed's freshness and its line, the sensed autoscaler's name, the identity's permissions (section 12), the window's length against the interval widths above. **Second the direction.** Where the table reads GAIN, your receipt should read GAIN or EVEN; a smaller gain
+is your stack's, not a fault, because the gain is bounded by how far native stood from its own best. **Third the power given.** A
+resource that rose on your receipt is read beside the work and the speed it bought; a rise with nothing bought is a question for
+the audit (the Operator's Manual, Appendix L): what did the governor write, and why. Two readings are not faults: EVEN on every gauge where native already runs at the
+top of its range (the knob is at its limit on native, and the governor leaves it there by design, section 7), and a machine count
+that does not fall where no machine can be given back without a LOSS (the audit's `node_gate.reason` names the gate that held).
+What the table cannot give is your number: the same engine on another stack is another result, and it is yours (section 3.7).
 
 
 ## 47. Evidence Classes and How to Read a Result
@@ -7550,6 +7576,10 @@ published as Omni-Compass 1.0, and the older fingerprints go to `docs/history` a
 
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+<!-- how to read this receipt (tools/readings.py) -->
+**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart (the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, machines, memory, processor time, a bill) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and never called a loss. So a minus can read GAIN (a response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+<!-- end: how to read this receipt -->
 
 Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired measurement shows no gauge of the muscle read **LOSS** against native. Where the measurement shows nothing (**EVEN**), or shows a LOSS, the muscle stays native and Omni only watches it: one wire out, no wire in. This is not a new rule. It is what the engine does on the muscle itself before it moves anything (`omnicompass/verdict.py`: the paired trial, and the verdict **left native** where no step is allowed), and it is the watch arm of every realms run (`docs/REALMS_PREREGISTRATION.md`: the governor reads every period and writes nothing). This page applies the same principle to every published result, one verdict per knob, so that an operator can see which knobs earn a wire in and which stay native. The founder's order of 9 October 2026: where Omni cannot beat native, the muscle lives by itself; we only wire out of it.
 
@@ -10124,6 +10154,12 @@ shows (its processor use, the requests waiting, the response times), as in every
   rise are power given, shown beside the response times, the time over the line and the failed requests they bought.
 - **Order and dispatch.** The grid conductor starts every Azure set from `scripts/azure_queue.txt`: A of every set, then
   B, then C, one at a time in each machine family's queue, read back by its run's title, never started twice.
+- **Amendment of 16 October (the three clouds).** Google Cloud and Amazon carry the same four sets, at the same
+  settings and on the same harness, from `scripts/google_queue.txt` and `scripts/amazon_queue.txt` (the workflows
+  `gke-metered.yml` and `eks-metered.yml`, one set at a time per machine-family queue, read back by title as on Azure),
+  each behind its own `switch=` line, off until that cloud's secrets are in the repository and the founder turns it on; a
+  run without its secrets stops before anything is built or billed. The Azure run is the measure of the other two: nothing
+  in a set differs between clouds but the machine type, the zone or region, and the list price.
 - **Disclosed.** At `1 6 1 8 1 6` in October's first runs about 41% of requests failed in both arms with the
   autoscaler pinned at its cap of 10 pods; a peak of 9 asks more of the four workers than 8 did. What each arm served at
   each shape is in its table. Cost: about $4 to $6 a set of five at list price; three sets of each shape, about $30 for
@@ -10475,6 +10511,10 @@ Where a row above is wrong or out of date, correct it from the maker's own publi
 ## 58. The State of Play
 
 
+
+<!-- how to read this receipt (tools/readings.py) -->
+**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart (the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, machines, memory, processor time, a bill) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and never called a loss. So a minus can read GAIN (a response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+<!-- end: how to read this receipt -->
 
 Current facts only. Earlier states, failures and chronology are kept whole in `docs/HISTORY.md`. The release this page
 describes is identified by `RELEASE_MANIFEST.json` (commit, fingerprints of the engine, the C++ twins, the GPU protocol,
@@ -10893,6 +10933,22 @@ version, every result is run again on the new version, and the old tables keep t
 history. The founder's standing order is that the engine is never changed without being told first; since 15 October every
 change is also tried in our own toy models against the engine that stands before any real run (`tools/toy_gate.py`). This
 manual records no change made otherwise.
+
+### 3.7 The output follows the input
+
+Every number Omni-Compass produces is the result of three inputs, and a reader who changes any one of them has changed the
+result: **the tune** (the factory tune as shipped, or the dial turned down, or a card changed), **the wiring** (which muscles
+are wired in and which are watched, what each wire reads and writes, how fresh each feed is) and **the load** (the work
+offered, its shape and its line). The published receipts are the record of one setting of all three, and every receipt names
+it: the engine's fingerprint, the harness, the load and the window. The same engine wired onto another stack, or tuned to
+another purpose, gives another result, and that result is its own.
+
+A team that wants a different outcome sets the inputs for it and reads its own receipts against native: the most work at any
+spend (the max, the default); the same work as native for a smaller bill (the tune-down on the machines alone, the cloud's
+rule); a muscle held at a limit of the team's own choosing (its card, or its cover); a knob left native (watched, never
+written). Each of those is a legitimate setting of the inputs, and each has its own result. What no reader may do is read one
+tune's receipt as another's, or read a receipt without its inputs. The factory tune is the one setting whose receipts this book publishes (the Declaration of the factory tune, `DISCLOSURES.md`, section 3); the dial and the cards are the inputs a licensee may change, and a changed tune's results are its own (section 3.6). Where a result read elsewhere differs from the
+published one, the first presumption is an input: the wiring, the settings or the reading (`DISCLOSURES.md`, section 4).
 
 ---
 

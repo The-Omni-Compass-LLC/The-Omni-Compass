@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from pilot.bench_report import gauges, latency, pod_starts
-from tools.readings import word as gel_word, aim as gel_aim  # noqa: E402  (the words every table uses)
+from tools.readings import word as gel_word, aim as gel_aim, receipt_key  # noqa: E402  (the words every table uses)
 
 SAME_REL = 1e-6   # a change under one part in a million of the value reads "same" (amendment 11)
 T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
@@ -660,7 +660,7 @@ def main(root):
     rob = any(not math.isnan(m.get("robust: failed requests in the 120 s after the kill (%)", float("nan"))) for m in out["means"].values())
     keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host) and (k not in BATCH or bat) and (k not in ROBUST or rob)]
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
-         "(native against omni: Omni-Compass on top of native)", ""]
+         "(native against omni: Omni-Compass on top of native)", "", *receipt_key(), ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
     cols = [a for a in ("native",) if a in runs] + tuned + [a for a in ("watch", "omni", "compass", "strict") if a in runs]
     names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "compass": "omni", "strict": "omni alone (not on top: earlier sets only)",

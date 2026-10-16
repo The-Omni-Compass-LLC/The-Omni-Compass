@@ -245,6 +245,9 @@ def write_md(out, res, orgs, run):
     w = L.append
     w(f"# The realms on {run['engine']} at the max: {len(res)} muscles and seven organisms, native against Omni on top")
     w("")
+    for ln in receipt_key():
+        w(ln)
+    w("")
     w(f"Evidence class **S** (modelled). Run {run['started']}, commit `{run['commit'][:12]}`, seeds "
       f"{run['seeds'][0]}-{run['seeds'][-1]} ({len(run['seeds'])} paired seeds per muscle, per organism and per load), "
       f"catalog `{run['catalog']}`. The engine is **{run['engine']}** (`tools/omni_version.py`) at its default, "

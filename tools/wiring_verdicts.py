@@ -49,7 +49,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import with_own_runs, row_gain, word as gel_word, aim as gel_aim, classify as gel_classify, labelled, LABEL_SHOWN  # noqa: E402
+from tools.readings import with_own_runs, receipt_key, row_gain, word as gel_word, aim as gel_aim, classify as gel_classify, labelled, LABEL_SHOWN  # noqa: E402
 from tools import omni_index                                       # noqa: E402
 from tools.grid_v5 import kube_verdict                             # noqa: E402  (a square's line in GAIN, EVEN and LOSS)
 
@@ -717,7 +717,7 @@ def main(check=False):
     mw, mc, mwa = count(mus)
     ow, oc, owa = count(org_c)
 
-    L = ["# Wire in, or watch: the verdict per knob, from every result in the repository", "",
+    L = ["# Wire in, or watch: the verdict per knob, from every result in the repository", "", *receipt_key(), "",
          "Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired "
          "measurement shows no gauge of the muscle read **LOSS** against native. Where the measurement shows nothing (**EVEN**), or shows "
          "a LOSS, the muscle stays "

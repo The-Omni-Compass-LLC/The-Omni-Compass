@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp                                   # noqa: E402
-from tools.readings import OWN_RUNS, GAIN, LOSS, GIVEN, word, aim, labelled   # noqa: E402  (the words every table uses)
+from tools.readings import OWN_RUNS, receipt_key, GAIN, LOSS, GIVEN, word, aim, labelled   # noqa: E402  (the words every table uses)
 
 ORGS = ["spine", "compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
         "stack", "tower"]          # the seven organisms, the spine (the base every stack runs on) first
@@ -212,7 +212,7 @@ def main(argv=None):
     mod, kub = modelled(a.modelled), kube(a.kube)
     out = Path(a.out)
     od = out.resolve().parent
-    L = ["# The grid of the card version: seven organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs", "",
+    L = ["# The grid of the card version: seven organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs", "", *receipt_key(), "",
          "Native against Omni-Compass on top of native, engine omni-v5 (digest 5648f290, every muscle its own card), work "
          "waiting in line in every organism. Each square is the pooled receipt's own reading; the 1-, 10- and 100-run "
          "squares of a size are nested (the first N runs). Every square is shown.", "",

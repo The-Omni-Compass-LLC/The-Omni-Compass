@@ -8,6 +8,7 @@ write where a gauge read GAIN in all three of our runs and none LOSS or power gi
 operator's choice where both did. Every word is decided by what the gauge is for, never by its sign; the older tables' words
 (lower and higher, better and worse) are still read. Rows shown and not judged never count."""
 import sys
+import csv
 import unittest
 from pathlib import Path
 
@@ -109,11 +110,12 @@ class TheRepository(unittest.TestCase):
         w, c, wa = wv.count(real)
         self.assertEqual(w + c + wa, sum(1 for x in real if x["counted"]))
         mus = wv.muscles()
-        self.assertEqual(len(mus), 945)
-        self.assertEqual(sum(wv.count(mus)), 945)
+        n = sum(1 for _ in csv.DictReader((wv.ROOT / "realms" / "catalog_v5.csv").open()))   # every muscle of the catalog that stands
+        self.assertEqual(len(mus), n)
+        self.assertEqual(sum(wv.count(mus)), n)
         for x in mus:
-            self.assertEqual(x["verdict"], wv.LABEL_VERDICT[x["label"]])
-            if x["label"] == "NONINFERIOR / INCONCLUSIVE" and x["writes"] == 0:
+            self.assertEqual(x["verdict"], wv.v5_verdict(x["label"]))      # the verdict by rule, from the label over every load
+            if x["label"] == wv.SAME and x["writes"] == 0:
                 self.assertIn("wrote nothing", x["why"])
 
 
