@@ -116,7 +116,8 @@ native, did less work, or cleared its line later. 364 muscles carry a card of th
 pools, 31 batteries), each printed in plain words in the [muscle catalog](docs/MUSCLE_CATALOG.md); inside a body, a
 battery wired by its power keeps the body's own margin on its line ([`docs/FORMAL_V5.md`](docs/FORMAL_V5.md), section
 5). Preregistered seeds 3000-3009, ten paired runs per muscle,
-per organism and per load, commit `eea291501848`, engine omni-v5 (fingerprint `5648f2902f1fae68`). Evidence class
+per organism and per load, commit `1d870bc33b2b`, engine omni-v6 (fingerprint `df6147466ef18046`; run again on 16 October with
+the spine as the seventh organism, the other six reproducing the 13 October table to the digit). Evidence class
 **S**: modelled plants, not meters. Every row, losses included:
 [`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md).
 
@@ -144,9 +145,9 @@ in the four stacked, 0 in every other organism, under every load. Inside a body 
 
 | Load | Over the line, change (every muscle its own card) | One global setting | Work | Power given |
 |---|---|---|---|---:|
-| Own load | −1.9% to −7.5% in every organism | −1.6% to −6.4% | equal | up to +0.01% (was +0.06%) |
-| The climb (1 2 3 2 3 4 ..., up to twice its own) | −7.2% distribution, −7.0% compute, −4.8% the four stacked, −3.2% physics, −2.7% energy, −1.4% the tower | −0.9% to −3.5% | more work in four of six | up to +0.05% (was +0.07%) |
-| Work waiting in line | −1.1% to −8.3% in every organism | −1.0% to −7.2% | equal | up to +0.04% (was +0.07%) |
+| Own load | −1.9% to −7.5% in every organism (the spine −6.1%) | −1.6% to −6.4% | equal | up to +0.01% (was +0.06%) |
+| The climb (1 2 3 2 3 4 ..., up to twice its own) | −7.9% the spine, −7.2% distribution, −7.0% compute, −4.8% the four stacked, −3.2% physics, −2.7% energy, −1.4% the tower | −0.9% to −3.5% | more work in five of seven | up to +0.05% (was +0.07%) |
+| Work waiting in line | −1.1% to −8.8% in every organism (the spine −8.8%) | −1.0% to −7.2% | equal | up to +0.04% (was +0.07%) |
 
 **The grid** ([`results/grid_v5/GRID.md`](results/grid_v5/GRID.md)): the seven organisms (the spine's squares in the conductor's queue
 since 16 October) at 1, 10 and 100 copies on one

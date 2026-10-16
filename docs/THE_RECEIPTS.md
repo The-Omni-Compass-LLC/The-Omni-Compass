@@ -34,7 +34,7 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
 5. **On our own models, no LOSS, alone or inside a body (S, v5).** Of the 1,107 muscles of the catalog (the
    founder's nine open-source pieces among them), each alone on the preregistered seeds under its own load and under work
    waiting in line: 527 toward their aims, 421 at their limit on native (the max writes nothing to them), 159 no difference beyond the
-   noise, none LOSS and none mixed. Inside the six organisms every organism read GAIN as a whole under all three loads,
+   noise, none LOSS and none mixed. Inside the seven organisms (the spine the seventh, 16 October) every organism read GAIN as a whole under all three loads,
    and not one plant is behind native in any organism under any load (the living body is `docs/FORMAL_V5.md`,
    section 4; every muscle its own card, which removes more misses than one global setting with less power given, is
    section 5).
