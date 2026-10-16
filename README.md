@@ -64,6 +64,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-16 03:59 | [The realms on omni-v6 at the max: 1107 muscles and seven organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
 | 2026-10-15 21:25 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v6)](results/live/V6_KEDA_REQUESTS.md) |  |
 | 2026-10-15 21:25 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v6)](results/live/V6_KEDA_CPU_REQUESTS.md) |  |
 | 2026-10-15 21:25 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v6)](results/live/V6_GOLDILOCKS.md) |  |
@@ -75,12 +76,15 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-16 02:19 | kind-goldilocks | success | [38825214203](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38825214203) |
-| 2026-10-16 02:19 | capacity v7-trial: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | success | [38825208939](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38825208939) |
-| 2026-10-16 02:18 | kind-addons | success | [38825211370](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38825211370) |
+| 2026-10-16 04:28 | kind-addons | success | [38843268161](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38843268161) |
+| 2026-10-16 04:07 | six x1 line orgs 6 runs 100+900 | success | [38831315077](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38831315077) |
+| 2026-10-16 04:05 | kind-goldilocks | success | [38843260818](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38843260818) |
+| 2026-10-16 04:00 | six x1 line orgs 3 runs 100+900 | success | [38831299566](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38831299566) |
+| 2026-10-16 03:59 | six x1 line orgs 1 runs 100+900 | success | [38831288377](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38831288377) |
+| 2026-10-16 03:58 | six x1 line orgs 2 runs 100+900 | success | [38831294162](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38831294162) |
+| 2026-10-16 03:56 | six-kube x1 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower reps 101+41 arms native compass split no window 960 protocol 3 | failure | [38831320477](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38831320477) |
+| 2026-10-16 03:53 | six x1 line orgs 4 runs 100+900 | success | [38831304551](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38831304551) |
 | 2026-10-16 00:50 | big-organism-detached collect | success | [38831254360](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38831254360) |
-| 2026-10-16 00:46 | grid | cancelled | [38819144116](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38819144116) |
-| 2026-10-15 22:49 | kind-cruisekube | cancelled | [38815372328](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38815372328) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
