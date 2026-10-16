@@ -106,13 +106,13 @@ def engine_of(rel):
 # the three-run tables on the engine that stands; each takes the place of the same benchmark's table on an older engine,
 # which stays in results/live under its own name
 NEWEST = [
-    ("V6_KEDA_REQUESTS.json", "Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs",
+    ("V7_KEDA_REQUESTS.json", "Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs",
      "every judged gauge of the three-run table: p95, alert minutes, replicas, machines, energy"),
-    ("V6_KEDA_CPU_REQUESTS.json", "Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs",
+    ("V7_KEDA_CPU_REQUESTS.json", "Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs",
      "every judged gauge of the three-run table: p95, alert minutes, replicas, machines, energy"),
-    ("V6_GOLDILOCKS.json", "Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs",
+    ("V7_GOLDILOCKS.json", "Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs",
      "every judged gauge of the three-run table: p95, time over the line, machines, energy"),
-    ("V6_CRUISEKUBE.json", "Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs",
+    ("V7_CRUISEKUBE.json", "Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs",
      "every judged gauge of the three-run table: p95, time over the line, machines, energy"),
 ]
 

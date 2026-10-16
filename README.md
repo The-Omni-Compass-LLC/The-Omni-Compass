@@ -99,10 +99,12 @@ the Kubernetes controller's shared-host capacity repair, conveyance bounded by e
 known), no limit raised while a shared host is busy or unread, every rule counted in seconds, the verdict reading a trial in the reports'
 words, the cloud's rule as one flag. Every benchmark runs again on it (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the
 same day); until a benchmark's three runs land, its row on the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on. Its first
-runs are in, native against Omni-Compass on top, ten pairs each: a service rightsized by Goldilocks, response time −45% mean and −60% at the
-95th percentile, GAIN, replicas and pods EVEN; KEDA's HTTP add-on, response time −57% mean and −71% at the 95th percentile, alert minutes
-−94%, replicas −19%, all GAIN; KEDA on the CPU target and the requests, −38% mean and −52% at the 95th percentile, GAIN; their B and C runs
-and the other trials are running.
+five three-run tables are in (`results/live/V7_*.md`), native against Omni-Compass on top, ten pairs × three runs each, no row LOSS: a
+service rightsized by Goldilocks, response time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs;
+KEDA's HTTP add-on, −57% to −58% mean, −71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to −19%, pods
+started −17% to −23%, GAIN in all three; KEDA on the CPU target and the requests, −36% to −38% mean and −52% to −54% at the 95th
+percentile, GAIN in all three; CruiseKube and the fixed-capacity caps EVEN; machines EVEN in every one; parked-worker energy +1.1% to
++2.3%, power given.
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
 
