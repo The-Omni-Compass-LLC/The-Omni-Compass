@@ -19,7 +19,12 @@
   `wiring_verdicts.py`, `muscle_catalog.py`, `realm_muscles.py`, `six_kube_report.py`). The engine fingerprint is unchanged
   (`python3 tools/omni_version.py`: omni-v6). `tests/test_spine.py` holds the spine to 267 muscles in 13 families, cut the same in
   every runner and named in no fingerprinted file.
-SPINE_RESULT_PLACEHOLDER
+- **The spine's first reading, native against Omni-Compass on top** (`results/realms_v5/REALMS_V5.md`, run 2026-10-16 03:48 UTC,
+  commit `1d870bc33b2b`, engine omni-v6, seeds 3000-3009, evidence class S): GAIN under all three loads. Misses 2.39% → 2.25% of
+  decisions under its own load (−6.1%), 8.00% → 7.37% under the climb (−7.9%, with more work), 4.23% → 3.86% with work waiting in
+  line (−8.8%); work otherwise equal; power given +0.01%, +0.04% and +0.04%; wear +0.12% to +0.45%; every knob handed back; not one
+  of its 267 plants with less work or more misses. The other six organisms reproduced the 13 October table to the digit (the same
+  seeds, the law unchanged; `MUSCLES_V5.csv` byte for byte the same), and the page now names the engine it ran on, omni-v6.
 - **Every standing page says seven**: the README, CLAUDE.md (an "Orders of 16 October" section), `docs/REALMS.md`,
   `docs/REALM_MUSCLES.md` and `docs/MUSCLE_CATALOG.md` (the spine first), the theory chapter on the organisms, both manuals
   (chapter 2 and its organisms table; the spine's chapter bound in), `docs/HOW_TO_READ_THE_RESULTS.md`, `docs/OMNI_V6.md`, and an

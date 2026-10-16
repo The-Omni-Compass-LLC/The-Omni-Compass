@@ -98,7 +98,7 @@ toward a center cannot run away, and everything it does is a return. **Part Two,
 equations and the control law that make the circle exact, with the theorem, the declaration and the audits that hold
 them fixed. **Part Three, the physics,** brings the law into the machine: the compass, push and pull, the band and its
 cushions, the physics of a processor, and the two-way nervous system. **Part Four, the body,** lays out the
-muscles, the four realms and the six organisms. **Part Five, the harness and the wiring,** is the universal plug and
+muscles, the spine, the four realms and the seven organisms. **Part Five, the harness and the wiring,** is the universal plug and
 the step-by-step work of wiring Omni-Compass onto a stack. **Part Six, operating it,** is the OFF switch, the rules
 and the log. **Part Seven, proving it,** is every rule written before a run and every result after it. **Part Eight**
 is value, the license, the seal and the history.
@@ -272,7 +272,8 @@ native telemetry stream as a measurement, and governs the whole body from above.
 turn by hand: machine pools and replicas, power caps and clock limits, cache sizes and connection pools, cooling
 setpoints and battery reserves, robot speeds and drone-swarm settings, and many more. They are grouped into four realms
 (compute, AI and cloud; physics, robotics and autonomy; energy, facility and industry; distribution and specialized
-systems) and run together as six organisms, from one realm alone up to the whole tower at once. The muscles in the
+systems) and run together as seven organisms, from the spine alone (the muscles every stack runs on) and one realm alone up
+to the whole tower at once. The muscles in the
 catalog are modelled (class S). The real controllers it has been run on top of, such as Kubernetes and the databases,
 are live software (class L). The chapter that follows the key, "What You Are Looking At," shows which is which. Appendix G lists every one of the 1,107 muscles: what it is, what Omni-Compass reads from it, what it moves, the organisms it belongs to, and its own card, the factory setting it runs on; and for each of the 70 families, how to wire it on any stack: the native controller that owns it, the wire out (what is read, and where), the wire in (what is written, and where), the restore, and whether that wire has run live in this repository or only on a model (`docs/wiring_recipes.csv`).
 
@@ -523,11 +524,11 @@ installed is a quarter off the bill.
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
 - **The engine on this checkout:** omni-v6, fingerprint df6147466ef18046 (45 files).
-- The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
+- The muscles and the seven organisms on engine omni-v6 at the max (evidence class S, our own models; run 2026-10-16 03:48 UTC, commit 1d870bc33b2b, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
-  - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
-  - the organisms under the climb load: Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
-  - the organisms under the line load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
+  - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
+  - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses -0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
+  - the organisms under the line load: the spine: GAIN (fewer misses), misses -0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
 - The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v3, each named in its table): +5.2% GAIN on the resource reading (work, speed, machines, energy), +12.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +31.8% GAIN
@@ -3088,10 +3089,10 @@ python k8s_controlplane/test_nervous.py
 
 # Part Four. The Body: Muscles, Realms and Organisms
 
-*One thousand one hundred and seven muscles in four realms, stacked into six organisms, and every gauge used to judge them.*
+*One thousand one hundred and seven muscles in four realms on one spine, built into seven organisms, and every gauge used to judge them.*
 
 
-## 23. The Muscles, the Realms and the Six Organisms
+## 23. The Muscles, the Realms and the Seven Organisms
 
 
 ### 2.1 The catalog
@@ -3161,14 +3162,19 @@ therefore also a check on one family's model: where the real stack and the model
 same law, the model has earned some trust; where they do not, the model is the thing to doubt, and the catalog's plant
 model for that family is the place to look.
 
-### 2.2 The four realms and the spine
+### 2.2 The spine and the four realms
 
-The muscles fall into four realms. Every realm stands on the same **spine** of 267 muscles in v5 (Kubernetes, machines, GPUs
-and CPUs, network, storage, observability, security, cooling and electrical distribution), because every realm's work
-runs on computers that must be cooled and powered, plus its own domain muscles.
+The muscles fall into four realms, and under every realm's own muscles stands the same **spine** of 267 muscles (Kubernetes
+workloads, containers, placement, node fleets, cloud capacity, hosts, GPUs, network, storage, observability, reliability and
+security, electrical distribution and cooling), because every realm's work runs on computers that must be scheduled,
+powered and cooled. Since 16 October the spine is an organism in its own right, the seventh, run native and with Omni-Compass
+on top like the other six: it is the base of every stack as an operating system is the base of every program, and a realm's
+reading beside the spine's shows what that realm's own trade adds to the base it stands on (the chapter *The Spine* follows
+this one). The catalog thus builds seven organisms, the spine first because the other six stand on it:
 
 | Organism | Muscles | What it is |
 |---|---:|---|
+| The spine (`spine`) | 267 | the muscles every real stack runs on, every one in all four realms: clusters, containers, placement, node fleets, cloud capacity, hosts, GPUs, network, storage, observability, reliability and security, electrical distribution, cooling; an organism of its own, the base of the other six |
 | 1. Compute / AI / Cloud | 540 | clusters, GPUs, AI training and inference, cloud capacity, kernels, functions, media, games, ledgers, build farms |
 | 2. Physics / Robotics / Autonomous | 404 | joints, fleets, vehicles, flight and spacecraft axes |
 | 3. Energy / Facility / Industrial | 480 | data halls, buildings, batteries, UPS, process loops, feeders, hospitals, farms, pipelines, mines, district heat, power plants, renewables, pharmaceutical and food plants |
@@ -3176,8 +3182,7 @@ runs on computers that must be cooled and powered, plus its own domain muscles.
 | 5. The four stacked, every duplicate kept | 1,908 | all four realms on one clock, the shared spine counted in each |
 | 6. The whole tower, every muscle once | 1,107 | every distinct muscle on one clock |
 
-These are the counts of Omni v5. On v2 and v3 the organisms were 430, 376, 470 and 440, the four stacked 1,716 and the
-tower 945; on v1 345, 262, 282 and 337, 1,226 and 656; each version's results stay with its own counts.
+These are the counts of the catalog that stands; earlier catalogs' counts stay with their own results in `docs/history/`.
 
 The realms differ in what their domain muscles are and in how much slack their native controllers leave. Compute, AI and
 Cloud is clusters, cards, training and inference pools and cloud capacity, where the knobs are replica targets, machine
@@ -3194,24 +3199,24 @@ list, by family and knob, is `docs/REALM_MUSCLES.md` and `docs/REGISTER.md` sect
 
 ### 2.3 What an organism run is
 
-These six organisms are the benchmark set of the modelled realms. An organism is every one of its muscles stepped on one
+These seven organisms are the benchmark set of the modelled realms. An organism is every one of its muscles stepped on one
 clock, each from its own plant model, each with its own native controller, and the whole fed one demand trace from one
 seed. Native runs the organism with every native controller alone. Omni runs the same organism, the same seed, the same
 demand and the same clock, with the compass law on every knob the verdict allows. Each run produces its own receipt: the
 organism's work, its energy, its time over its service line, and every knob's hand-back. In code and in the workflows the
-two large organisms are named `tower` and `stack`, never by a count, because the counts changed between v1 and v2 and a
-name that carried a count would read as a different organism; the old names are read as aliases.
+whole-catalog organisms and the spine are named `tower`, `stack` and `spine`, never by a count, because a count changes with
+the catalog and a name that carried one would read as a different organism; the old names are read as aliases.
 
 The receipt is read in a fixed order. **Work** first: the organism's output over the window, which must not fall, and
 which reads LOSS by rule if it does, however little, as the four stacked at 1,000 copies showed on a difference of one
 part in a million (section 2.5). **Energy** second, and **work per energy** with it, which is the gain the modelled realms
 are built to show. **Time over the service line** third, the share of steps on which any muscle's service reading was past
 its line, which is the do-no-harm gauge for the body as a whole. Then **every knob's hand-back**, which must be complete
-in every run or the run fails. The reading given to an organism (the realms tables under `results/realms/`, one per engine) uses the words
-"superior within guardrails" when work and energy both improve with the service line respected, "service tradeoff" when a
-gain in energy came with time over the line, and names the loss when there is one: the v2 reading on the Physics realm
-and the tower was a service tradeoff, traced to the speed knobs on busy motion axes, and the slack gate that answers it is
-the one rule that makes v3 (section 6.3). What an organism run cannot show is also fixed: it is evidence class S, the
+in every run or the run fails. The reading given to an organism (`results/realms_v5/REALMS_V5.md`, one table per engine) is
+GAIN, EVEN or LOSS by the key at the front of this manual: GAIN when its misses fell or its work rose beyond the noise and
+nothing moved the other way, EVEN inside the noise, LOSS named where it stands; the energy the max took is power given,
+shown beside the work. Earlier engines' readings, and the words they used, are history (`docs/history/`). What an organism
+run cannot show is also fixed: it is evidence class S, the
 plant models are our own, and nothing in it is presented as proof of a real stack. Its use is to show that one law holds
 across every realm at once, at a size no live benchmark can reach, and to find the rules that then have to earn their
 place on real software.
@@ -3220,10 +3225,12 @@ place on real software.
 
 Every organism runs at **1, 10 and 100 copies** (that many instances of the organism on one clock, so the four stacked
 at 100 copies is about 190,000 modelled muscles) and at **1, 10 and 100 paired runs** (that many native-and-omni pairs,
-each from its own seed): the six organisms × three sizes × three run counts are 54 squares, run modelled and with the
-real cluster inside, both arms shown in every square. One hundred is the maximum in both directions (the founder's order
-of 12 October, to cut the time and the bill): no 1,000 copies and no 1,000 runs are run on any engine from that day, and
-the whole grid runs on GitHub's own machines, nothing rented for it (`scripts/dispatch_grid.py`, `results/grid_v5/`).
+each from its own seed): the seven organisms × three sizes × three run counts are 63 squares, run modelled and with the
+real cluster inside, both arms shown in every square. On GitHub's own machines the grid also runs the 1,000 tier, 1,000
+copies and nested 1,000 runs (the founder's distinction of 15 October), a cell beyond a free runner's memory or time listed
+as pending runner capacity and never rented; paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100
+repetitions (the founder's order of 12 October, kept for everything that costs money). Nothing is rented for the grid
+(`scripts/dispatch_grid.py`, `results/grid_v5/`).
 Earlier engines' grids, which went to 1,000 copies and 1,000 runs, stand as they were run in their own pages
 (`results/scale/`) and are never read across engines.
 
@@ -3299,15 +3306,108 @@ ordered by what each benchmark adds to the index that the ones before it did not
 machines, a buffer pool after a cache), a new native controller, a new class of evidence.
 
 
-## 24. The Four Realms
+## 24. The Spine: the Base Every Stack Runs On
+
+
+
+The **spine** is the set of muscles every real stack runs on: the 267 muscles of the 1,107-muscle catalog
+(`realms/catalog_v5.csv`) whose realm list names all four realms. A robot fleet, a trading system, a hospital's critical
+environment and an AI training pool differ in every muscle of their own trade, and they are alike in this: their work runs
+on computers that are scheduled, placed, given processors and memory, connected, stored, watched, kept alive, powered and
+cooled. Those thirteen families are the spine. Since 16 October (the founder's order) the spine is an **organism in its own
+right**, the seventh, run native and with Omni-Compass on top of native exactly as the other six are, because the base of a
+stack deserves its own reading before any trade is put on it. The relation is the one between an operating system and the
+programs that run on it: no program re-implements scheduling, memory or the disk, it stands on the system that does them;
+no realm's trade muscles re-implement the cluster, the fleet, the power or the cooling, they stand on the spine.
+
+### What the spine is made of
+
+| Family | Muscles | Plant model | Native controller class | The knob |
+|---|---:|---|---|---|
+| Kubernetes Workload Scaling | 32 | compute pool (server) | the pod autoscaler, KEDA, the operator's rightsizers | replicas, targets |
+| Container Resources | 25 | compute pool (server) | the vertical autoscaler, the scheduler's requests and limits | capacity, admission |
+| Kubernetes Placement & Scheduling | 21 | compute pool (server) | the scheduler, descheduler, topology and affinity rules | admission, capacity |
+| Node Fleet & Karpenter-Class Control | 24 | compute pool (node) | the cluster autoscaler, Karpenter-class provisioners | machines |
+| Cloud VM & Capacity | 21 | compute pool (node) | the cloud's own scaling sets and capacity reservations | machines |
+| Host CPU & Memory | 26 | compute pool (CPU host) | the kernel's frequency governor, memory and cgroup controls | capacity, power |
+| GPU Hardware | 22 | compute pool (GPU) | the card's firmware: clocks, power limit, partitioning | clock ceiling, power cap |
+| Network Routing & Switching | 19 | compute pool (network) | routing, queueing and buffer controls | capacity, admission |
+| Storage Block/File/Object | 20 | compute pool (storage) | tiering, caching and throughput controls | capacity, admission |
+| Observability & Telemetry | 9 | compute pool (server) | sampling, retention and scrape controls | admission |
+| Reliability, Security & Recovery | 12 | compute pool (server) | disruption budgets, recovery and admission controls | admission |
+| PDU, UPS & Electrical Distribution | 18 | energy storage (UPS) | the UPS and PDU controllers, their reserves and line limits | power, setpoint |
+| Cooling, Chillers & Thermodynamics | 18 | thermal zone (data hall) | the chillers, air handlers and their setpoints | setpoint |
+
+Two hundred and sixty-seven muscles in thirteen families: 156 capacity knobs, 48 admission knobs, 35 power knobs and 28
+setpoints. Every one is listed, with its knob, in `docs/REALM_MUSCLES.md` (the spine first), and explained, wired and carded
+in `docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix, with every family's wiring recipe from `docs/wiring_recipes.csv`:
+the native controller, the wire out, the wire in, the restore, and whether the wire has run live in this repository or only
+on a model). The muscles of the spine's Kubernetes families are the ones the live Kubernetes benchmarks run on real
+clusters (evidence class L); the spine as an organism is modelled (class S), and nothing in it is presented as proof of a
+real stack.
+
+### Why the spine is an organism
+
+An **organism** is a set of muscles stepped on one clock, each from its own plant model with its own native controller,
+the whole fed one demand from one seed, so that the heat the machines make is load on the rooms, the power swing of the
+body is load on every site's line, and one brain judges every step against every other muscle's cushion. Run alone, the
+spine is a data center with nothing of any one trade in it: clusters, fleets, processors, cards, network, storage, power
+and cooling, and the governor on top of their native controllers. Three readings come from it that the realms alone cannot
+give:
+
+1. **The base before the trade.** Whether Omni-Compass helps the machines every stack runs on, before any realm's own
+   muscles are put on them. A buyer wiring only a cluster and its site wires the spine and nothing else.
+2. **What a trade adds.** Each realm's organism is its own families on the spine. Read beside the spine's reading, a
+   realm's reading shows what that realm's trade muscles add to, or take from, the base they stand on.
+3. **The same base under four trades.** The four stacked carry the spine once in each realm's body, the tower carries it
+   once in all. The spine run alone is the control for both: the same muscles, the same native controllers, no trade on
+   top.
+
+The spine is run under the same three loads as every organism (its own load; the climb, 1 2 3 2 3 4 …; work waiting in
+line), is judged by the same rule (work, speed and misses against native, the energy the max takes shown as power given), and
+has the same two arms and no other: **native**, every native controller alone, and **omni**, Omni-Compass on top of those
+same controllers, moving only the settings they expose, within their own ranges, and handing every setting back at the end.
+
+### How the spine is wired on a real stack
+
+The spine is wired as any organism is: one governor per body, every shared resource a muscle or a gauge, a muscle with
+nothing to gain kept wired and watched (the Operator's Manual, chapter 2). The order is the order of the levels in the
+Operator's Manual, chapter 6, which is the order of the spine's own families: the cluster first (its workloads, then their
+resources and placement, then the machines under them), then the processors and the cards, then network and storage, then
+the site under all of them (electrical distribution and cooling), with observability and recovery wired from the first
+level, because the governor reads through them. Each family's wire is one row of `docs/wiring_recipes.csv`: which native
+controller owns the setting, where the reading is tapped, where the setting is written, and how it is restored. A realm's
+own muscles are wired after the spine they stand on, never instead of it.
+
+### The spine in the runners and the pages
+
+The organisms are groupings of catalog rows made in the runners; no engine file names them, so the spine entered the runners
+without changing the engine that stands (`python3 tools/omni_version.py` prints the same fingerprint before and after). In
+every runner the spine is `spine`; in `tools/run_scale.py` and the grid conductor (`scripts/dispatch_grid.py`) it is
+organism **7**, after the six that were numbered before it, so that every grid run already started reads back under its
+own number. Every table lists the spine first, because the other six stand on it.
+
+| Where | The spine |
+|---|---|
+| `tools/run_realms_v5.py` | every muscle alone, then the seven organisms under three loads; the spine's row first in every organisms table (`results/realms_v5/REALMS_V5.md`) |
+| `tools/run_scale.py --organisms 7`, workflow `six` | the spine at 1, 10, 100 and, on GitHub's own machines, 1,000 copies, over 1 to 1,000 paired runs |
+| `tools/run_kil.py --organism spine`, workflows `six-kube`, `aks-metered`, `gke-metered`, `eks-metered`, `cloud-organism` | the spine with the real Kubernetes cluster inside it as one more muscle |
+| `tools/run_hil.py` | the spine with the real card inside it (the GPU Hardware family is a spine family) |
+| `scripts/dispatch_grid.py` | the spine's squares started, read back and never started twice like every other organism's |
+| `docs/REALM_MUSCLES.md`, `docs/MUSCLE_CATALOG.md` | the spine's 267 muscles listed first; each muscle's organisms column names the spine |
+| `results/realms_v5/`, `results/grid_v5/`, `docs/STATE_OF_PLAY.md` | the spine's readings, native against Omni-Compass on top, each named for the engine it ran on |
+
+## 25. The Four Realms
 
 
 
 The muscle tower on modelled plants: **1,107 distinct muscles in 70 families** (`realms/catalog_v5.csv`, the catalog the
-engine that stands carries), cut into four realms and run as **six organisms**: each realm's organism (its own families
-plus the shared spine of 267 muscles every real stack runs on: Compute / AI / Cloud 540, Physics / Robotics / Autonomous
-404, Energy / Facility / Industrial 480, Distribution / Specialized 484), the four stacked on one clock with every
-duplicate of the spine kept (`stack`, 1,908) and the whole tower, every muscle once (`tower`, 1,107). Every muscle also
+engine that stands carries), run as **seven organisms**, each native and with Omni-Compass on top of native: the **spine**
+(`spine`, the 267 muscles every real stack runs on, every one in all four realms; an organism of its own and the base of
+the other six, as an operating system is the base of every program: `docs/THE_SPINE.md`), each realm's organism (its own
+families on the spine: Compute / AI / Cloud 540, Physics / Robotics / Autonomous 404, Energy / Facility / Industrial 480,
+Distribution / Specialized 484), the four stacked on one clock with every duplicate of the spine kept (`stack`, 1,908)
+and the whole tower, every muscle once (`tower`, 1,107). Every muscle also
 runs alone on its own plant. Each is run natively (the plant's own controller alone) and with Omni-Compass on top, with
 meters and receipts, under three loads: the organism's own load, the climb (the load stepping by one, 1 2 3 2 3 4 …)
 and work waiting in line. Evidence class **S** (modelled: our own models of these machines, never counted in the
@@ -3318,7 +3418,7 @@ class P.
 
 ```
 pip install -r requirements.txt
-python3 tools/run_realms_v5.py --out realms5-out     # the preregistered run: every muscle alone and the six organisms, seeds 3000-3009
+python3 tools/run_realms_v5.py --out realms5-out     # the preregistered run: every muscle alone and the seven organisms, seeds 3000-3009
 python3 tests/test_realms.py                         # the harness's own checks (also inside verify.py)
 python3 tools/realm_muscles.py                       # docs/REALM_MUSCLES.md: every organism written out, muscle by muscle
 python3 tools/muscle_catalog.py                      # docs/MUSCLE_CATALOG.md: every muscle explained, wired and carded
@@ -3328,7 +3428,7 @@ The run is deterministic: `realms-v5.yml` (GitHub) runs it again and fails if an
 table committed in `results/realms_v5/`.
 
 Results, each named for the engine it ran on: `results/realms_v5/REALMS_V5.md` (the tables: every muscle alone over its
-loads, and the six organisms under the normal, climb and line loads), `MUSCLES_V5.csv` (one row per muscle and load),
+loads, and the seven organisms under the normal, climb and line loads), `MUSCLES_V5.csv` (one row per muscle and load),
 `REALMS_V5.json` (every per-seed contrast), `RUN.json` and `SHA256SUMS.txt` (commit and fingerprints). The grid of
 copies and runs (1, 10 and 100 copies × 1, 10 and 100 runs, modelled and with the real cluster inside) is
 `results/grid_v5/GRID.md`. The earlier catalogs' results stay as the road to 1.0: v3's in `results/realms/`, v2's in
@@ -3347,7 +3447,8 @@ engine that stands (`scripts/reruns.txt`).
 | `realms/compass_arm_v5.py` | the law on every muscle at its default, the max, and the dial's tune-down (`V5CFG`, `V5SAVE`) |
 | `realms/harness.py` | the arms (native, omni), the organisms, the three loads, the outcome and the label rule |
 | `docs/REALMS_PREREGISTRATION.md` | the question, the rules, the seeds and the development history, frozen before the run |
-| `docs/REALM_MUSCLES.md`, `docs/MUSCLE_CATALOG.md` | every organism written out muscle by muscle; every muscle explained, wired and carded (the manuals' appendix) |
+| `docs/THE_SPINE.md` | the spine, the seventh organism: what it is, why it is an organism, how it is wired, where it stands in the runners |
+| `docs/REALM_MUSCLES.md`, `docs/MUSCLE_CATALOG.md` | every organism written out muscle by muscle, the spine first; every muscle explained, wired and carded (the manuals' appendix) |
 
 ### How it relates to the rest
 
@@ -3362,24 +3463,29 @@ A realm result that reads GAIN is a reason to test that knob on a real machine, 
 whose knobs can be tested for real first are the compute realm's (Kubernetes on kind, the card), because the tools
 already exist.
 
-## 25. The Realm Muscles
+## 26. The Realm Muscles
 
 
 
-Generated from `realms/catalog_v5.csv` (the catalog the engine that stands carries: 1,107 distinct muscles in 70 families) by `tools/realm_muscles.py`. A **muscle** is one setting on one machine that already has its own control; the one knob Omni-Compass may hold on it stands in brackets after its name. Every realm's organism is its own families plus the **shared spine** (the infrastructure every real stack runs on), so the realm counts add to more than the tower. What the engine does with each knob, which native controller owns it, where the reading is tapped and the setting written, how it is restored and its own card are written family by family in `docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix); the organisms' results are in `results/realms_v5/REALMS_V5.md` and the grid in `results/grid_v5/GRID.md`, each named for the engine it ran on.
+Generated from `realms/catalog_v5.csv` (the catalog the engine that stands carries: 1,107 distinct muscles in 70 families) by `tools/realm_muscles.py`. A **muscle** is one setting on one machine that already has its own control; the one knob Omni-Compass may hold on it stands in brackets after its name. The catalog builds **seven organisms**, each run native and with Omni-Compass on top of native: the **spine**, the muscles every real stack runs on, an organism of its own and the base of the other six (as an operating system is the base of every program; `docs/THE_SPINE.md`); the four realms, each its own families with the spine under them, so the realm counts add to more than the tower; the four stacked; and the whole tower. What the engine does with each knob, which native controller owns it, where the reading is tapped and the setting written, how it is restored and its own card are written family by family in `docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix); the organisms' results are in `results/realms_v5/REALMS_V5.md` and the grid in `results/grid_v5/GRID.md`, each named for the engine it ran on.
 
-### The six organisms
+### The seven organisms
 
-| Organism | Muscles | What it is |
-|---|---:|---|
-| 1. Compute / AI / Cloud | 540 | its 273 own muscles and the spine of 267 |
-| 2. Physics / Robotics / Autonomous | 404 | its 137 own muscles and the spine of 267 |
-| 3. Energy / Facility / Industrial | 480 | its 213 own muscles and the spine of 267 |
-| 4. Distribution / Specialized | 484 | its 217 own muscles and the spine of 267 |
-| 5. The four stacked (`stack`) | 1,908 | the four realms' organisms on one clock, every duplicate of the spine kept |
-| 6. The whole tower (`tower`) | 1,107 | every muscle of the catalog once |
+In the runners the spine is `spine` (organism 7 in `tools/run_scale.py` and the grid conductor, after the six that were numbered before it); every table lists it first, because the other six stand on it.
 
-### The shared spine: 267 muscles, in all four realms
+| Organism | Runner name | Muscles | What it is |
+|---|---|---:|---|
+| The spine | `spine` (7) | 267 | the muscles every real stack runs on, every one in all four realms: the base of the other six |
+| Compute / AI / Cloud | `compute_ai_cloud` (1) | 540 | its 273 own muscles on the spine of 267 |
+| Physics / Robotics / Autonomous | `physics_robotics_autonomous` (2) | 404 | its 137 own muscles on the spine of 267 |
+| Energy / Facility / Industrial | `energy_facility_industrial` (3) | 480 | its 213 own muscles on the spine of 267 |
+| Distribution / Specialized | `distribution_specialized` (4) | 484 | its 217 own muscles on the spine of 267 |
+| The four stacked | `stack` (5) | 1,908 | the four realms' organisms on one clock, every duplicate of the spine kept |
+| The whole tower | `tower` (6) | 1,107 | every muscle of the catalog once |
+
+### The spine: 267 muscles, in all four realms, an organism of its own
+
+The thirteen families below are the computers every realm's work runs on and the power and cooling they need: Kubernetes workloads, containers, placement, node fleets, cloud capacity, hosts, GPUs, network, storage, observability, reliability and security, electrical distribution and cooling. Run alone, the spine is a data center with nothing of any one trade in it; under a realm, it is what that realm's own muscles stand on.
 
 #### Kubernetes Workload Scaling (32; plant: compute_pool, server)
 replicas [capacity], hpa_cpu_target [setpoint], hpa_memory_target [setpoint], hpa_custom_target [setpoint], vpa_apply [capacity], scale_to_zero [capacity], keda_threshold [admission], rollout_rate [capacity], max_surge [capacity], max_unavailable [capacity], deployment_pause_resume [admission], rollout_abort [admission], pod_eviction [admission], pdb_policy [capacity], scheduler_queue_priority [admission], api_priority_fairness [admission], hpa_min_replicas [capacity], hpa_max_replicas [capacity], hpa_scale_down_stabilisation_window [setpoint], hpa_scale_up_stabilisation_window [setpoint], hpa_scaling_rate_policies [capacity], hpa_policy_selection [capacity], hpa_tolerance [capacity], hpa_sync_period [capacity], vpa_minmax_allowed_resources [capacity], keda_polling_interval [setpoint], rollout_progress_deadline [admission], rollout_readiness_delay [capacity], unhealthy_pod_eviction_policy [admission], graceful_termination [capacity], probes [capacity], kepler_energy_target_autoscaling [setpoint]
@@ -3420,7 +3526,9 @@ server_power_cap [power], rack_power_cap [power], pdu_branch_power_limit [power]
 #### Cooling, Chillers & Thermodynamics (18; plant: thermal_zone, data_hall)
 supply_air_temperature [setpoint], return_air_target [setpoint], coolant_supply_temperature [setpoint], coolant_flow [capacity], pump_speed [capacity], fan_speed [capacity], chiller_setpoint [setpoint], compressor_authority [power], cooling_tower_fan [capacity], cooling_capacity [capacity], rack_thermal_budget [power], gpu_thermal_envelope [setpoint], cpu_thermal_envelope [setpoint], thermal_workload_migrate [admission], thermal_load_shed [admission], server_fan_speed [capacity], economiser [capacity], chiller_plant_supervisory_control_rl_with_safety_layer [capacity]
 
-### Organism 1: Compute / AI / Cloud: 273 own muscles + the spine of 267 = 540 in its organism
+### Organism 1: Compute / AI / Cloud: 273 own muscles on the spine of 267 = 540 in its organism
+
+The spine above, and these families of its own.
 
 #### Work Admission & Demand Shaping (19; plant: compute_pool, server)
 api_concurrency [admission], queue_concurrency [admission], queue_backpressure [admission], job_admission [admission], batch_admission [admission], inference_admission [admission], load_shed [admission], priority_gate [admission], tenant_admission [admission], burst_limit [admission], deadline_admission [admission], work_budget [admission], request_queue_limit [admission], retry_admission [admission], background_work_gate [admission], maintenance_work_gate [admission], request_concurrency_limit [admission], adaptive_concurrency_limit [admission], priority_request_queue_under_limit [admission]
@@ -3482,7 +3590,9 @@ dpu_pf_tx_rate [capacity], dpu_vf_tx_rate [capacity], dpu_sf_tx_rate [capacity],
 #### Kubernetes Dynamic Device Allocation (8; plant: compute_pool, gpu)
 dra_device_class_selection [capacity], dra_claim_capacity [capacity], dra_claim_sharing [capacity], dra_device_taint [capacity], dra_device_eviction [admission], dra_binding_readiness [capacity], dra_binding_failure_response [capacity], dra_device_configuration [setpoint]
 
-### Organism 2: Physics / Robotics / Autonomous: 137 own muscles + the spine of 267 = 404 in its organism
+### Organism 2: Physics / Robotics / Autonomous: 137 own muscles on the spine of 267 = 404 in its organism
+
+The spine above, and these families of its own.
 
 #### Robotics Motion Control (26; plant: motion_axis, robot_joint)
 joint_position [capacity], joint_velocity [capacity], joint_acceleration [capacity], joint_effort [power], cartesian_velocity [capacity], trajectory_speed [capacity], trajectory_acceleration [capacity], jerk_limit [capacity], collision_margin [capacity], force_limit [power], gripper_force [power], locomotion_speed [capacity], steering_angle [capacity], braking_force [power], balance_correction [capacity], trajectory_tolerances [capacity], velocity_acceleration_scaling [capacity], controller_update_rate [capacity], ros2_executor_threads [capacity], ros2_qos_history_depth [setpoint], ros2_control_loop_rate [setpoint], humanoid_balance_margin [capacity], humanoid_gait_speed [capacity], humanoid_joint_torque_limit [power], humanoid_step_height [capacity], manipulator_payload_speed_scaling [capacity]
@@ -3508,7 +3618,9 @@ hoist_speed_target [capacity], acceleration_limit [capacity], regen_drive_mode [
 #### Automotive EV & Mobile Powertrain (14; plant: motion_axis, ev_traction)
 state_of_charge_limits [power], smart_charging_schedule [admission], traction_torque_limit [power], regen_braking_level [power], battery_charge_limit [power], battery_discharge_limit [power], battery_thermal_target [power], motor_thermal_limit [power], vehicle_speed_envelope [capacity], energy_recovery_target [power], auxiliary_power_budget [power], fast_charge_current [power], fast_charge_voltage [power], vehicle_safe_state [admission]
 
-### Organism 3: Energy / Facility / Industrial: 213 own muscles + the spine of 267 = 480 in its organism
+### Organism 3: Energy / Facility / Industrial: 213 own muscles on the spine of 267 = 480 in its organism
+
+The spine above, and these families of its own.
 
 #### Industrial PLC & Process Automation (18; plant: process_loop, process)
 plc_cycle_authority [admission], machine_cell_admission [admission], valve_position [setpoint], pump_flow [capacity], compressor_speed [capacity], heater_power [power], furnace_setpoint [setpoint], pressure_setpoint [setpoint], temperature_setpoint [setpoint], mass_flow_setpoint [setpoint], tank_level_target [setpoint], conveyor_rate [capacity], feed_rate [capacity], purge_vent_action [admission], controller_mode [capacity], alarm_limits [capacity], safety_interlock_trip [capacity], opc_ua_writes [capacity]
@@ -3555,7 +3667,9 @@ run_to_run_control [capacity], idle_sleep_mode [capacity], tool_job_dispatch [ad
 #### Water Wastewater & Pumping (12; plant: process_loop, water)
 pump_speed_water [capacity], valve_position_water [setpoint], reservoir_level_target [setpoint], line_pressure_target [setpoint], flow_target_water [setpoint], aeration_rate [power], chemical_dose_rate [power], filtration_backwash [admission], lift_station_dispatch [admission], leak_isolation [admission], water_demand_shed [admission], water_emergency_shutdown [admission]
 
-### Organism 4: Distribution / Specialized: 217 own muscles + the spine of 267 = 484 in its organism
+### Organism 4: Distribution / Specialized: 217 own muscles on the spine of 267 = 484 in its organism
+
+The spine above, and these families of its own.
 
 #### Service Mesh & API Reliability (16; plant: compute_pool, server)
 circuit_breaker [admission], retry_budget [admission], service_timeout [admission], service_concurrency [admission], connection_pool [capacity], traffic_divert [capacity], traffic_mirror [capacity], canary_weight [setpoint], outlier_ejection [admission], health_threshold [admission], dns_traffic_weight [setpoint], session_affinity [capacity], request_hedging [capacity], fault_injection_gate [admission], service_failover [capacity], load_balancing_policy [capacity]
@@ -3610,7 +3724,11 @@ The four realms' organisms above, run on one clock as one body (`stack`; the old
 
 Every muscle of the catalog once (`tower`; the older name `organism_656` is read as an alias): the spine and every realm's own families, 1,107 in all.
 
-## 26. The Domain Map
+### Organism 7: the spine, 267 muscles
+
+The spine listed first above, run on its own (`spine`): the same muscles, the same native controllers, nothing of any one realm on top of them.
+
+## 27. The Domain Map
 
 
 
@@ -3760,7 +3878,7 @@ Omni-Compass can be the boundary layer AI runs inside. It cannot be the thing th
 
 Each connector follows the same path as compute: wired, benchmarked against today's controls, verified, pre-registered, tested on held-out scenarios, then released.
 
-## 27. The Problem Map
+## 28. The Problem Map
 
 
 
@@ -3840,42 +3958,57 @@ equation alone setting the draw) cut ramps 63% but did not hold the grid limit: 
 - [vLLM anatomy](https://vllm.ai/blog/2025-09-05-anatomy-of-vllm); [llm-d 0.5](https://llm-d.ai/blog/llm-d-v0.5-sustaining-performance-at-scale)
 - [Dark Reading: AI agents and runaway costs](https://www.darkreading.com/application-security/how-ai-agents-can-trigger-runaway-costs)
 
-## 28. The Six Organisms and the Benchmark Grid
+## 29. The Seven Organisms and the Benchmark Grid
 
 
-Omni-Compass is benchmarked on six organisms, each run native and with Omni-Compass on top on the same seed, the same
-load and the same clock: Compute / AI / Cloud (430 muscles), Physics / Robotics / Autonomous (376), Energy / Facility /
-Industrial (470), Distribution / Specialized (440), the four stacked with every duplicate kept (1,716), and the whole
-tower with every muscle once (945); these are the Omni v2 counts, v1's were 345, 262, 282, 337, 1,226 and 656.
+Omni-Compass is benchmarked on seven organisms, each run native and with Omni-Compass on top of native on the same seed,
+the same load and the same clock. An organism is a set of muscles stepped together on one clock, each muscle from its own
+plant model with its own native controller, the whole fed one demand from one seed, so that the heat the machines make is
+load on the rooms, the body's power swing is load on every site's line, and one brain judges every step against every other
+muscle's cushion. On the 1,107-muscle catalog the engine that stands carries (`realms/catalog_v5.csv`) the seven are: the
+**spine**, the 267 muscles every real stack runs on, every one in all four realms, an organism in its own right since 16
+October and the base of the other six, as an operating system is the base of every program (`docs/THE_SPINE.md`); the four
+realms, each its own trade's families on the spine, Compute / AI / Cloud (540 muscles), Physics / Robotics / Autonomous
+(404), Energy / Facility / Industrial (480) and Distribution / Specialized (484); the four stacked with every duplicate of
+the spine kept (1,908); and the whole tower with every muscle once (1,107). Earlier catalogs' organisms and counts stay
+with their own results in `docs/history/`.
 
-Each organism is run at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of the organism on one
-clock. Every receipt shows work per energy, work, energy, the time spent outside the service line, and whether every
-knob was handed back.
+Every organism runs under three loads: its own load; the climb, the demand stepping by one, up and down (1 2 3 2 3 4 …),
+past what native can carry, so that the most each arm can do shows; and work waiting in line when the run starts. Every
+receipt shows work, the time over the service line (misses), the energy the max took as power given beside the work it
+bought, wear, and whether every knob was handed back; the reading is GAIN, EVEN or LOSS by the key at the front of this
+manual, judged by what each gauge is for and never by the sign of its number. The spine read beside a realm shows what that
+realm's trade adds to the base it stands on; the spine read alone shows whether the governor helps the machines every
+stack runs on before any trade is put on them.
 
-**What the grid has shown.** On Omni v3, 84 of the 90 judged cells are done (`results/scale/GRID.md`): every organism
-reads superior within its guardrails in every cell of ten runs or more, with work per energy +0.07% (the Physics realm) to
-+0.37% (the Energy realm, the four stacked and the tower), the work unchanged, the time over the line not above native's,
-and every knob handed back. The figure is the same at every size, from one copy to a thousand, which is the property the
-grid exists to test: one brain stays coherent at 1.7 million muscles. The six cells left, 100 and 1,000 runs at 1,000
-copies, are beyond the machines available and are declared, not hidden. The number is small because the native controllers
-in the models are well tuned and leave little room; it is real within the model, and it is never counted in the Omni
-index, which is made of real stacks only.
+**The grid.** Each organism runs at 1, 10 and 100 copies of itself on one clock and at 1, 10 and 100 paired runs, modelled
+and with the real cluster inside, both arms shown in every square; on GitHub's own machines the 1,000 tier runs too (the
+founder's distinction of 15 October), a cell beyond a free runner's memory or time listed as pending runner capacity and
+never rented, while paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100 repetitions. The two axes answer
+two questions. Copies is the size of the body one brain governs: at 100 copies of the four stacked the law computes a force
+for about 190,000 muscles from one reading of one clock, and the question is whether it stays coherent, whether the decision
+is made inside the decision period, and whether the cluster inside it is still served on time. Runs is the number of
+independent paired trials, each from its own seed, and the question is statistical: how wide the interval of the paired
+difference is and whether it moves as the trials multiply. The grid's readings on the engine that stands are
+`results/grid_v5/GRID.md` and the standing block of `docs/STATE_OF_PLAY.md`, every square shown, the spine's squares filled
+by the conductor as they land; the number is small because the native controllers in the models are well tuned and leave
+little room, it is real within the model, and it is never counted in the Omni index, which is made of real stacks only.
 
-On a GPU machine the real card is wired into each organism as one more muscle of its NVIDIA GPU family; its own power
-meter and its requests are counted in the organism's receipt, kept apart from the modelled plants and also added to
-them. Real Kubernetes is benchmarked separately on real clusters, and it is also wired into the organisms as one more
-muscle (`tools/run_kil.py`): at 1 to 100 copies on GitHub's machines and at 1,000 copies on a rented machine, the
-organism's own compute demand drives a real load generator against a real service on a real cluster, and the cluster's
-watts come back into the organism as heat and load. Those runs are labelled "L + S": the cluster is live software, the
-organism around it a model.
+On a GPU machine the real card is wired into each organism as one more muscle of its GPU Hardware family, a spine family,
+so the card is in the spine and in every organism built on it; its own power meter and its requests are counted in the
+organism's receipt, kept apart from the modelled plants and also added to them. Real Kubernetes is benchmarked separately
+on real clusters, and it is also wired into the organisms as one more muscle (`tools/run_kil.py`): at 1, 10, 100 and, on
+GitHub's own machines, 1,000 copies, the organism's own compute demand drives a real load generator against a real service
+on a real cluster, and the cluster's watts come back into the organism as heat and load. Those runs are labelled "L + S":
+the cluster is live software, the organism around it a model.
 
-The six organisms are models (evidence class S). They show how the law behaves across hundreds of kinds of machine at
+The seven organisms are models (evidence class S). They show how the law behaves across hundreds of kinds of machine at
 once and whether its effect is stable as the count and the size grow. Real Kubernetes, the real database, the real broker,
 the real cache and the real card are the anchors measured on real software and, for the card, a real meter; their results
 and their losses are in the manual's section 16.
 
 
-## 29. The Metrics Catalog
+## 30. The Metrics Catalog
 
 
 
@@ -4004,7 +4137,7 @@ the power budget are designed (`docs/DOMAIN_MAP.md`, "on-site batteries") and no
 *The universal plug, the adapters, the wire check, and the step-by-step work of wiring Omni-Compass onto a running stack.*
 
 
-## 30. The Plug, the Adapters and the Wire Check
+## 31. The Plug, the Adapters and the Wire Check
 
 
 Think of a high-end car stereo: one head unit, one standard plug on its back, and an adapter harness for each make of
@@ -4113,7 +4246,7 @@ not in Omni-Compass.
 ---
 
 
-## 31. The Harness
+## 32. The Harness
 
 
 
@@ -4175,7 +4308,7 @@ Live kube-controller-manager, kind CI, GPU MIG scheduler, facility cooling plant
 
 See `LIMITS.md`.
 
-## 32. The Wiring Guide
+## 33. The Wiring Guide
 
 
 
@@ -4282,7 +4415,7 @@ A PodDisruptionBudget on each service is required, because drains go through the
 | The frozen engine's results, three runs each, read by rule | `results/live/V1_*.md`, `results/live/V3_*.md`; `docs/OMNI_V1.md`, `docs/OMNI_V3.md` |
 | The same wiring on Azure's managed Kubernetes (the bill), a database pooler, a rented machine, the simulators, a message broker's consumer group, a cache's memory ceiling, a drone swarm's autopilot | the manual, chapter 7 (`docs/OMNI_COMPASS_MANUAL.md`) |
 
-## 33. Before You Start, and the Eight Levels
+## 34. Before You Start, and the Eight Levels
 
 
 ### 9.1 What your system needs
@@ -4367,7 +4500,7 @@ run there indefinitely; most will stop at level 3.
 
 ```
 python3 verify.py
-python3 tools/run_scale.py --runs 10 --scale 1 --out results/scale/eval     # the six organisms, modelled
+python3 tools/run_scale.py --runs 10 --scale 1 --out results/scale/eval     # the seven organisms, modelled
 python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # the two-wire card, modelled
 ```
 
@@ -4509,7 +4642,7 @@ directive for every muscle; making the verdict per muscle there is the next engi
 designed and not built, because every result must be run again on a new engine.
 
 
-## 34. Stack by Stack
+## 35. Stack by Stack
 
 
 Every wiring below is the same plug (section 8): one wire in (the stack's own meter), one wire out (one setting the
@@ -4926,7 +5059,7 @@ paired receipts, this section is a wiring instruction, not a claim of savings.
 ---
 
 
-## 35. The Integration Manual
+## 36. The Integration Manual
 
 
 
@@ -5221,7 +5354,7 @@ simulation harnesses; every decision they take goes through the twinned laws. Th
 Keep this manual with the code. When Omni-Compass changes, this manual, the C++ twin and the seal change in the same
 commit.
 
-## 36. Running the GPU Benchmark
+## 37. Running the GPU Benchmark
 
 
 
@@ -5326,7 +5459,7 @@ It runs, in order, and stops at the first failure:
 7. **the GPU fault drill**, about 10 minutes: the governor killed outright, the master switch pulled, the response
    feed blind; every check must pass (`SKIP_DRILL=1` skips it). Everything so far is then packed into
    `results/gpu/omni-gpu-<stamp>-partial.tar.gz`;
-8. the six organisms with this card inside, each as **1, 10 and 100 copies** on one clock (5, 3 and 2 repetitions;
+8. the seven organisms with this card inside, each as **1, 10 and 100 copies** on one clock (5, 3 and 2 repetitions;
    no 1,000 copies, the founder's order of 12 October, amendment 13), at least 16 hours (60 paired repetitions, each arm
    240 steps of 2 s); a size whose step needs longer than 2 s gets a longer step, measured on the machine and stated in
    the receipt (`SKIP_HIL=1` skips this stage);
@@ -5379,7 +5512,7 @@ when that line appears. **`sudo POOLED=1 nohup bash scripts/gpu_8card.sh &` runs
 look, about 3.5 hours: 3 repetitions per card (24 on 8 cards), then one model across every card; it leaves AI token
 generation, the power cap and the whole stacks out, so it is never the result to show. Last, the whole server as one: a language model (Qwen2.5-7B-Instruct, open)
 served across every card at once by vLLM, one Omni-Compass governor per card, the server's total GPU energy, about
-2 hours (`SKIP_LLM=1` skips it). Before it, **the whole stacks with a real card inside**: the six organisms at 1, 10
+2 hours (`SKIP_LLM=1` skips it). Before it, **the whole stacks with a real card inside**: the seven organisms at 1, 10
 and 100 copies (no 1,000 copies, amendment 13), native and Omni, the full repetitions (5, 3, 2 by size), each organism on
 its own card at the same time, so the stage that takes at least 16 hours on one card takes the time of its longest
 organism, about 3 hours (`SKIP_HIL=1` skips it). The whole design, every stage: about 20 to 22 hours. Progress: `tail -f results/gpu/8card-<stamp>/card-*.log`. At the end: `== send this one file back:
@@ -5432,7 +5565,7 @@ compute.
 *The OFF switch, the rules the governor obeys, the log it keeps, and the care of a running installation.*
 
 
-## 37. The OFF Switch, the Rules, and the Log
+## 38. The OFF Switch, the Rules, and the Log
 
 
 **The rules Omni-Compass keeps on your system.**
@@ -5530,7 +5663,7 @@ record. The benchmark harness prints a decision trail from the audit at the end 
 one line a decision, so a reviewer reading a run's log sees what the governor saw and did at each minute.
 
 
-## 38. Maintenance, Upgrades and Security
+## 39. Maintenance, Upgrades and Security
 
 
 - Run `python3 verify.py` after every upgrade; it must end `VERIFICATION: PASS`.
@@ -5601,7 +5734,7 @@ stands in for them, and this section tells the operator exactly what to look at.
 ---
 
 
-## 39. The Operator Manual
+## 40. The Operator Manual
 
 
 
@@ -5927,7 +6060,7 @@ Add `--strict-replicas`:
 *Paired runs, receipts, rules written before the runs, and every result to date with its evidence class.*
 
 
-## 40. The Receipts, in Their Totality
+## 41. The Receipts, in Their Totality
 
 
 
@@ -5963,7 +6096,7 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
 5. **On our own models, no LOSS, alone or inside a body (S, v5).** Of the 1,107 muscles of the catalog (the
    founder's nine open-source pieces among them), each alone on the preregistered seeds under its own load and under work
    waiting in line: 527 toward their aims, 421 at their limit on native (the max writes nothing to them), 159 no difference beyond the
-   noise, none LOSS and none mixed. Inside the six organisms every organism read GAIN as a whole under all three loads,
+   noise, none LOSS and none mixed. Inside the seven organisms (the spine the seventh, 16 October) every organism read GAIN as a whole under all three loads,
    and not one plant is behind native in any organism under any load (the living body is `docs/FORMAL_V5.md`,
    section 4; every muscle its own card, which removes more misses than one global setting with less power given, is
    section 5).
@@ -6039,7 +6172,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any
 outside body.
 
-## 41. How to Read the Results
+## 42. How to Read the Results
 
 
 
@@ -6137,9 +6270,9 @@ Read it in this order:
 The file `omni-gpu-<stamp>-confirmations.tar.gz` holds two such tables: compute-bound work (matrix products) and AI
 token generation (memory-bound work).
 
-### The card inside the six organisms (`results/hil/run-<stamp>/HIL.md`)
+### The card inside the seven organisms (`results/hil/run-<stamp>/HIL.md`)
 
-The real card is wired into each of the six organisms (the four realms, the four stacked, the whole tower) at four
+The real card is wired into each of the seven organisms (the spine, the four realms, the four stacked, the whole tower) at four
 sizes (1, 10, 100 and 1,000 copies). Each row is one size, one organism and one part:
 - **stacks (model)**: the modelled machines (evidence S);
 - **card (meter)**: the real card, its own meter (evidence P);
@@ -6257,7 +6390,7 @@ resource (machine-hours, CPU core-hours, joules). The same work then needs *1 / 
 *G / (1 + G)*: a third more work is a quarter off the bill. The full explanation, the three rules for reading a receipt
 and where every number stands today are in the manual, section 3 (`docs/OMNI_COMPASS_MANUAL.md`).
 
-## 42. The Benefit Sheet: One Number per Benchmark
+## 43. The Benefit Sheet: One Number per Benchmark
 
 
 
@@ -6325,7 +6458,7 @@ Where a row sums several workloads, grids, districts, cells or robots, each part
 - **The card (NVIDIA)**: every earlier result is obsolete; the current governor has not run on a real card.
 - **The index's second reading** (service alone, `results/OMNI_INDEX.md`): a second true number for the same tests, not repeated here; this sheet carries the preregistered one.
 
-## 43. The Dossier: Every Result in One Place
+## 44. The Dossier: Every Result in One Place
 
 
 
@@ -6498,7 +6631,7 @@ The rules for each run were written and committed before it ran (`docs/*_PREREGI
 - The grid stops at 100 copies and 100 runs (the founder's order of 12 October, to cut the time and the bill): no 1,000 copies and no 1,000 runs are run on any engine from that day; the v3 cells at 1,000 above stand as they were run.
 - The queue in `docs/REGISTER.md` section 4 (drone swarms on gym-pybullet-drones and Kafka done; Redis running): PX4 and ArduPilot swarms, YCSB and HammerDB, Spark, OpenSearch, fio, Open-RMF, the 24-hour robustness run, Basilisk, Orekit and GMAT, RocketPy, Cantera.
 
-## 44. Paired Runs and Receipts on Your Own System
+## 45. Paired Runs and Receipts on Your Own System
 
 
 The method of every benchmark in this manual is the method a reader can use on their own system, and it is deliberately
@@ -6513,7 +6646,7 @@ less work was done. The steps below are the whole method.
 1. **Paired runs.** Run your service the same way twice, once native and once with Omni-Compass on top, back to back
    on the same machines, the order rotated, at least 5 times (10 for a result you publish). `scripts/kind_paired.sh`
    and `tools/live_reps.py` do this on Kubernetes; `scripts/gpu_rented_run.sh` does it on a GPU box, in one command:
-   wire check, smoke, the six organisms with the card inside, then the preregistered counted run.
+   wire check, smoke, the seven organisms with the card inside, then the preregistered counted run.
 2. **The switch drill** after every run: turn Omni-Compass OFF; check every setting is back at its recorded
    original; turn it ON.
 3. **The receipt.** Each gauge: native, Omni-Compass, the change, the 95% interval of the difference, and whether the
@@ -6523,9 +6656,9 @@ less work was done. The steps below are the whole method.
    time outside the service line not higher by more than 1 percentage point. The band-first rule is stricter: no win
    is claimed while the time outside the service line is above native's.
 
-**At scale (modelled).** The six organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
+**At scale (modelled).** The seven organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
 (`bash scripts/scale_ladder.sh`) at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of each
-organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`); the six organisms with
+organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`); the seven organisms with
 a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on GitHub) and `big-organism` and
 `big-organism-detached` (1,000 copies on a rented machine).
 
@@ -6576,7 +6709,7 @@ Kubernetes run and the three-run tools print it for three runs side by side; a r
 laid out the same way so that a reader of this manual can read it without learning a new shape.
 
 
-## 45. Evidence Classes and How to Read a Result
+## 46. Evidence Classes and How to Read a Result
 
 
 **One number, one word.** In every table a change keeps its raw sign: a response time that fell reads "-65%", a cache
@@ -6604,7 +6737,7 @@ receipt's energy line is modelled, the receipt says so.
 **What each class can and cannot carry, with the examples in this manual.** A class **T / V** result (the C++ twin
 agreeing with the Python to 3.6 × 10⁻¹⁵ on 500 trajectories; two million adversarial cases through the shield with zero
 violations) says that the law is what the text says it is and that both implementations compute it; it says nothing
-about whether the law helps any machine. A class **S** result (the 1,107 muscles and six organisms, the organisms at 1,000 copies, the power
+about whether the law helps any machine. A class **S** result (the 1,107 muscles and seven organisms, the organisms at 1,000 copies, the power
 grid in pandapower, the robot arms in MuJoCo, the buildings in CityLearn, the drones in PyBullet) says what the law does to
 a published model of a plant under that model's own native controller; it carries exactly the model's fidelity and no
 more, which is why S results are shown beside the Omni index and never inside it, and why the manual says "the energy is
@@ -6646,7 +6779,7 @@ clock? (Rotation of the arm order, the warm-up before every window, the paired d
 are the answers, and section 16.7 names the residue they do not remove.)
 
 
-## 46. Results to Date
+## 47. Results to Date
 
 
 Every result below, read together in one place with what each shows and what it does not, by evidence class and
@@ -7089,7 +7222,7 @@ GAIN and LOSS (or power given) both hold in all three of our runs, a trade shown
 its realms label (`results/realms_v5`): a GAIN on work, speed or misses is write, the energy the max took for it power given and
 never a trade; SAME AS NATIVE and AT ITS LIMIT ON NATIVE are watch.
 
-What the page says on the engine that stands (16 October). On the real stacks, 10 of 26 knob-cases write, 2 are the operator's choice and 14 watch (the sets of 10 October on omni-v3 and the four v6 tables; each row names its engine and the v3 rows run again on v6). Of the independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself left native, one grid where nothing was bought). Of the 1,107 modelled muscles on the v5 realms result, 527 write and 580 watch: 421 of the 580 are at their limit on native (every admission knob, 96 power knobs and 50 capacity and setpoint knobs that native already runs at the top of their range: nothing to push, read and left native) and 159 read the same as native (40 wrote and nothing moved beyond the noise, 119 wrote nothing). Every one of the six organisms writes under every load, the power given shown beside its gain. Of the 14 organism cells with the real cluster inside, 12 write on the cluster's gauges, one is the operator's choice and one watches. Nothing on the page changes the engine, which stays the engine that stands (omni-v6); it changes what an operator connects.
+What the page says on the engine that stands (16 October). On the real stacks, 10 of 26 knob-cases write, 2 are the operator's choice and 14 watch (the sets of 10 October on omni-v3 and the four v6 tables; each row names its engine and the v3 rows run again on v6). Of the independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself left native, one grid where nothing was bought). Of the 1,107 modelled muscles on the v5 realms result, 527 write and 580 watch: 421 of the 580 are at their limit on native (every admission knob, 96 power knobs and 50 capacity and setpoint knobs that native already runs at the top of their range: nothing to push, read and left native) and 159 read the same as native (40 wrote and nothing moved beyond the noise, 119 wrote nothing). Every one of the seven organisms writes under every load, the power given shown beside its gain. Of the 14 organism cells with the real cluster inside, 12 write on the cluster's gauges, one is the operator's choice and one watches. Nothing on the page changes the engine, which stays the engine that stands (omni-v6); it changes what an operator connects.
 
 **The same verdict, live (built 9 October, running since 10 October).** The page judges after the fact; the founder's order is that the
 brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 9.4;
@@ -7207,7 +7340,7 @@ published as Omni-Compass 1.0, and the older fingerprints go to `docs/history` a
 ---
 
 
-## 47. Wire In, or Watch: The Verdict per Knob
+## 48. Wire In, or Watch: The Verdict per Knob
 
 
 
@@ -7215,7 +7348,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired measurement shows no gauge of the muscle read **LOSS** against native. Where the measurement shows nothing (**EVEN**), or shows a LOSS, the muscle stays native and Omni only watches it: one wire out, no wire in. This is not a new rule. It is what the engine does on the muscle itself before it moves anything (`omnicompass/verdict.py`: the paired trial, and the verdict **left native** where no step is allowed), and it is the watch arm of every realms run (`docs/REALMS_PREREGISTRATION.md`: the governor reads every period and writes nothing). This page applies the same principle to every published result, one verdict per knob, so that an operator can see which knobs earn a wire in and which stay native. The founder's order of 9 October 2026: where Omni cannot beat native, the muscle lives by itself; we only wire out of it.
 
-Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1212 rows, the 1,107 modelled muscles included one by one, and the six organisms under three loads).
+Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1215 rows, the 1,107 modelled muscles included one by one, and the seven organisms under three loads).
 
 ### The rule
 
@@ -7534,22 +7667,25 @@ Of the 527 write muscles, 523 took power for their gain on their own load and 4 
 
 ### The organisms
 
-#### The six modelled organisms under three loads (every muscle written at once, one brain)
+#### The seven modelled organisms under three loads (every muscle written at once, one brain)
 
 | Organism and load | Muscles | Reading | Verdict | Figures |
 |---|---:|---|---|---|
+| The spine, the muscles every stack runs on, the normal load | 267 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.145 pp (-0.176 to -0.115), work +0.000%, power given +0.011%; valid: yes |
 | Compute / AI / Cloud, the normal load | 540 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.070 pp (-0.084 to -0.057), work +0.000%, power given +0.009%; valid: yes |
 | Physics / Robotics / Autonomous, the normal load | 404 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.121 pp (-0.145 to -0.097), work +0.000%, power given +0.010%; valid: yes |
 | Energy / Facility / Industrial, the normal load | 480 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.118 pp (-0.144 to -0.093), work +0.000%, power given +0.000%; valid: yes |
 | Distribution / Specialized, the normal load | 484 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.067 pp (-0.082 to -0.052), work +0.000%, power given +0.002%; valid: yes |
 | The four stacked, every duplicate kept, the normal load | 1908 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.092 pp (-0.106 to -0.078), work +0.000%, power given +0.000%; valid: yes |
 | The whole tower, every muscle once, the normal load | 1107 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.051 pp (-0.062 to -0.040), work +0.000%, power given +0.000%; valid: yes |
+| The spine, the muscles every stack runs on, the climb load | 267 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.632 pp (-0.697 to -0.567), work +0.003%, power given +0.039%; valid: yes |
 | Compute / AI / Cloud, the climb load | 540 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.390 pp (-0.421 to -0.358), work +0.002%, power given +0.046%; valid: yes |
 | Physics / Robotics / Autonomous, the climb load | 404 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.317 pp (-0.361 to -0.274), work +0.002%, power given +0.021%; valid: yes |
 | Energy / Facility / Industrial, the climb load | 480 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.217 pp (-0.247 to -0.187), work +0.000%, power given +0.000%; valid: yes |
 | Distribution / Specialized, the climb load | 484 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.460 pp (-0.489 to -0.431), work +0.003%, power given +0.026%; valid: yes |
 | The four stacked, every duplicate kept, the climb load | 1908 muscles | GAIN (more work + fewer misses) | **write** | GAIN (more work + fewer misses): misses -0.349 pp (-0.370 to -0.327), work +0.002%, power given +0.000%; valid: yes |
 | The whole tower, every muscle once, the climb load | 1107 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.094 pp (-0.107 to -0.082), work +0.000%, power given +0.000%; valid: yes |
+| The spine, the muscles every stack runs on, the line load | 267 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.371 pp (-0.402 to -0.340), work +0.000%, power given +0.038%; valid: yes |
 | Compute / AI / Cloud, the line load | 540 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.205 pp (-0.217 to -0.193), work +0.000%, power given +0.045%; valid: yes |
 | Physics / Robotics / Autonomous, the line load | 404 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.250 pp (-0.275 to -0.225), work +0.000%, power given +0.030%; valid: yes |
 | Energy / Facility / Industrial, the line load | 480 muscles | GAIN (fewer misses) | **write** | GAIN (fewer misses): misses -0.117 pp (-0.143 to -0.092), work +0.000%, power given +0.000%; valid: yes |
@@ -7606,7 +7742,7 @@ This page judges after the fact, from published tables. The founder's order of 9
 | The 1,107 modelled muscles | each muscle's knob | the max on every muscle, every muscle its own card; the knobs native already runs at the top of their range read and left native | the law's own push and pull | Omni v5 at the max (the law omni-v6 carries), `docs/OMNI_V5.md` |
 | The machine itself: the Linux kernel's frequency ceiling (`docs/CPU_POWER_PREREGISTRATION.md`) | one knob | `tools/knob_verdict.py` around the engine's verdict: every notch down tried on the machine first, under the index's reading for one machine (energy x latency / work) or energy per request inside the line | give back only (the ceiling cannot go above the top; the top always free) | outside the engine; built 10 October, waiting for a machine on the metal, no run yet |
 
-## 48. The Pilot Protocol and Kit
+## 49. The Pilot Protocol and Kit
 
 ### Pilot Protocol
 
@@ -7666,7 +7802,7 @@ Guarded control follows `docs/PILOT_PROTOCOL.md`: one loop at a time, the reset 
 
 The kit is exercised end to end on kind by the `live-shadow` workflow.
 
-## 49. The GPU Bench
+## 50. The GPU Bench
 
 
 
@@ -7786,7 +7922,7 @@ undone. The card's own energy counter (NVML) and its ECC and retired-page counte
 workload's `--sim` mode. The stand-in has no real power physics, so its numbers mean nothing; it proves the script,
 the controls and the validity checks work.
 
-## 50. The GPU Preregistration
+## 51. The GPU Preregistration
 
 
 
@@ -8256,7 +8392,7 @@ organism runs once per size. Nothing else changes: the arms, the measures, the l
 On one card the stage takes at least 16 hours (60 paired repetitions, each arm 240 steps of 2 s; a size whose step must
 be longer is measured on the machine and stated in the receipt), where it took about 25 with the 1,000 copies.
 
-## 51. The Realms Preregistration
+## 52. The Realms Preregistration
 
 
 
@@ -8699,7 +8835,26 @@ Everything else, the plants, the outcomes, the guardrails, the label rule and th
 realms table three times (A, B, C), then the grid, then the organisms with the real cluster inside; the v2 table stays a
 v2 result.
 
-## 52. The Compass Law on Real Kubernetes: Preregistration
+### Amendment (2026-10-16): the spine, the seventh organism (written before its run)
+
+The founder's order of 16 October: the **spine** is an organism in its own right. It is the set of catalog muscles whose
+realm list names all four realms, 267 of the 1,107 (`tools/run_realms_v5.py`, `spine_rows`), in thirteen families: Kubernetes
+workload scaling, container resources, placement and scheduling, node fleets, cloud capacity, host CPU and memory, GPU
+hardware, network, storage, observability, reliability and security, electrical distribution, cooling. Run alone it is a data
+center with nothing of any one trade in it, the base every stack runs on (`docs/THE_SPINE.md`).
+
+- The spine runs as the seventh organism in every organism harness, under the same three loads (its own, the climb, work
+  waiting in line), the same seeds (3000-3009 preregistered), the same two arms (native; Omni-Compass on top of native) and
+  the same label rule as the other six; every table lists it first. In `tools/run_scale.py` and the grid conductor it is
+  organism 7, so every grid run already started reads back under its own number; with the real cluster inside it is
+  `tools/run_kil.py --organism spine`.
+- The organisms are groupings of catalog rows made in the runners. No engine file changes: the fingerprint
+  (`python3 tools/omni_version.py`) is the same before and after, and the six organisms' results on the engine that stands
+  are unchanged by the seventh (the run is deterministic on its seeds; the rerun that adds the spine's rows reproduces theirs
+  to the digit, checked by `realms-v5.yml`).
+- Nothing is read across engines: the spine's rows carry the engine they ran on, like every other row.
+
+## 53. The Compass Law on Real Kubernetes: Preregistration
 
 
 
@@ -9870,7 +10025,16 @@ or GAIN. The receipt's commands row shows how often a machine was parked or woke
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
-## 53. The Evidence Ledger
+### Amendment (2026-10-16): the spine, the seventh organism with the cluster inside
+
+The founder's order of 16 October: the spine (the 267 catalog muscles in all four realms, the base every stack runs on;
+`docs/THE_SPINE.md`) is an organism in its own right. With the real cluster inside it runs as `tools/run_kil.py --organism
+spine`, on the same protocol (3), the same window rule, the same two arms and the same gauges as the other six; the grid
+conductor starts its squares, reads them back and never starts one twice, as it does for every organism, and the workflows
+`six-kube`, `aks-metered`, `gke-metered`, `eks-metered` and `cloud-organism` accept `spine`. The results already written on
+six organisms stand as they were run; nothing is read across engines or across organism sets.
+
+## 54. The Evidence Ledger
 
 
 
@@ -9978,7 +10142,7 @@ Nothing here is deleted when a later result looks different.
 | S | Right-sizing against VPA: p95 +15%, memory (OOM) kills +531%. | `docs/history/BENCHMARK_REPORT.md` |
 | — | Reported in the external master-build report (not reproducible from this repository): on fresh scenarios Karpenter+VPA sometimes used less modelled energy than Omni, while Omni had lower churn and fewer request-induced evictions. Kept here so it is not lost; to be re-run here before it is cited. | external |
 
-## 54. The Claims Register
+## 55. The Claims Register
 
 
 
@@ -10017,7 +10181,7 @@ Every claim, its evidence status and the command that reproduces it. Simulation 
 | C13 | Decision components (autoscalers, power agents, paging, Terraform as controller) consume about 0.02% of fleet CPU; idle capacity is 92% of fleet CPU at 8% utilization. | Modeled from published figures and stated assumptions | `python benchmarks/fleet_overhead.py` |
 | C14 | Behaviour on production systems. | Not established; requires the pilot protocol | `docs/PILOT_PROTOCOL.md` |
 
-## 55. Comparison with Existing Controllers
+## 56. Comparison with Existing Controllers
 
 
 
@@ -10103,7 +10267,7 @@ the customer's own system, with the same paired method.
 
 Where a row above is wrong or out of date, correct it from the maker's own publication.
 
-## 56. The State of Play
+## 57. The State of Play
 
 
 
@@ -10118,11 +10282,11 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
 - **The engine on this checkout:** omni-v6, fingerprint df6147466ef18046 (45 files).
-- The muscles and the six organisms on engine omni-v5 at the max (evidence class S, our own models; run 2026-10-13 02:36 UTC, commit eea291501848, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
+- The muscles and the seven organisms on engine omni-v6 at the max (evidence class S, our own models; run 2026-10-16 03:48 UTC, commit 1d870bc33b2b, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
-  - the organisms under the normal load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
-  - the organisms under the climb load: Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
-  - the organisms under the line load: Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
+  - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
+  - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses -0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
+  - the organisms under the line load: the spine: GAIN (fewer misses), misses -0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
 - The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v3, each named in its table): +5.2% GAIN on the resource reading (work, speed, machines, energy), +12.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +31.8% GAIN
@@ -10189,7 +10353,7 @@ records what each table was built from).
 benchmark with a result was dispatched again on the current commit `3aac0ab7` (Omni v3, digest `b53d05449ee04c4b`, by
 `tools/omni_version.py --commit`), native and omni, the wiring of each checked against its preregistration before the dispatch:
 70 GitHub runs (the seven Kubernetes tests, the five live stacks on the brain's own verdict, the four simulators, the realms table
-and the kill and long robustness scenarios, three runs each; the six organisms with the real cluster inside; the modelled grid at
+and the kill and long robustness scenarios, three runs each; the organisms with the real cluster inside; the modelled grid at
 1, 10, 100 and 1,000 copies) and the two big organisms at 1,000 copies on rented Azure machines, plus one replacement run for a Kafka
 job GitHub's runner cut off (the record says which and why). By 12:30 UTC 69 of the 71 had landed and every
 table on this page was remade from them; the tables they supersede are whole in `docs/history`. The one shard the runner's
@@ -10246,15 +10410,19 @@ arms (+3.8% GAIN), the power grids (+5.8% GAIN, power given), the drone swarms (
 (+0.8%, GAIN AND LOSS: the bill in the 2023 districts read power given), and the Omni index over the real tests (+5.2% GAIN,
 power given). None of these is shown in front of a v6 result, and none is read beside one.
 
-**The muscles and the six organisms, modelled (evidence class S, our own models, never counted in the headline)**, on
-engine omni-v5 at the max (the law omni-v6 carries unchanged; the rerun on v6 is in the queue): 1,107 muscles in 70
-families (`realms/catalog_v5.csv`), every muscle its own card (`realms/muscle_cards_v5.csv`), every muscle alone over its
-loads EVEN 580 and GAIN 527, LOSS 0; every one of the six organisms (Compute / AI / Cloud 540, Physics / Robotics /
+**The muscles and the seven organisms, modelled (evidence class S, our own models, never counted in the headline)**, on
+the engine that stands, omni-v6, at the max (run again on 16 October, commit `1d870bc33b2b`, with the spine as the seventh
+organism; the other six reproduced the 13 October table to the digit): 1,107 muscles in 70 families (`realms/catalog_v5.csv`),
+every muscle its own card (`realms/muscle_cards_v5.csv`), every muscle alone over its loads EVEN 580 and GAIN 527, LOSS 0; every
+one of the seven organisms (the spine 267, the muscles every stack runs on; Compute / AI / Cloud 540, Physics / Robotics /
 Autonomous 404, Energy / Facility / Industrial 480, Distribution / Specialized 484, the four stacked 1,908, the whole tower
-1,107) GAIN (fewer misses, and under the climb more work) under the normal, climb and line loads, the power given +0.00% to
-+0.05% (`results/realms_v5/REALMS_V5.md`); the grid, 36 of 36 squares of 10 and 100 runs GAIN with the organisms alone and,
-with the real cluster inside, the organism's time over the line GAIN in 36 of 36 (`results/grid_v5/GRID.md`). Every
-muscle is written out, organism by organism, in `docs/REALM_MUSCLES.md`, and explained, wired and carded in
+1,107) GAIN (fewer misses, and under the climb more work) under the normal, climb and line loads, not one plant with less work
+or more misses in any of them, the power given +0.00% to +0.05%; the spine alone cuts its misses 6.1% under its own load, 7.9%
+under the climb (with more work) and 8.8% with work waiting in line, power given +0.01% to +0.04%
+(`results/realms_v5/REALMS_V5.md`, `docs/THE_SPINE.md`); the grid, 36 of 36 squares of 10 and 100 runs GAIN with the six
+organisms run so far alone and, with the real cluster inside, the organism's time over the line GAIN in 36 of 36; the spine's
+squares are in the conductor's queue (`results/grid_v5/GRID.md`). Every
+muscle is written out, organism by organism, the spine first, in `docs/REALM_MUSCLES.md`, and explained, wired and carded in
 `docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix, with every family's wiring on a real stack from
 `docs/wiring_recipes.csv`).
 
@@ -10311,7 +10479,7 @@ being made), and anything on a real card.
 *What a receipt is worth, how the license is priced against it, how the code is sealed, and how Omni-Compass came to be.*
 
 
-## 57. Where the Value Comes From
+## 58. Where the Value Comes From
 
 
 ### 3.1 The problem we are attacking
@@ -10447,7 +10615,7 @@ what will supply them. The newest state, written from the result files on every 
 | Database's storage-engine cache (MongoDB under YCSB): the cache size held | **−3% to −13% on f**, GAIN in all three of our runs (the set of 10 October, the brain's verdict on the cache); b, c and burst inside the noise | L | "What did it cost?" Nothing the same in all three of our runs: work, p95, p99, mean latency and host CPU inside the noise on all four workloads, no failed operation |
 | Database's buffer pool (MySQL under sysbench): the pool held | **−10% to −20% on read_write**, GAIN in all three of our runs, the pages holding data with it (the set of 10 October, the brain's verdict on the pool); burst, read_only and update_index inside the noise | L | "What did it cost?" Nothing the same in all three of our runs: work, p95, p99 and CPU inside the noise on every workload; the earlier set's memory bought for the written working set is gone |
 | Cache: work inside the 2 ms line; the hit rate | on the set of 10 October exactly nothing: the allowance one notch each way, most trials abandoned before they were judged, every gauge inside the noise; the earlier set's +14% to +27%, bought with a 64 → 200 to 270 MB ceiling, is whole in the history | L | "Why nothing?" The same trial rule as the broker's; amendment 3, the next set running |
-| **omni-v5**, the law v6 carries. The modelled muscles and six organisms: 1,107 muscles in 70 families, every muscle its own card, three loads | every muscle alone over its loads EVEN 580, GAIN 527, LOSS 0; every organism GAIN (fewer misses, and under the climb more work) under the normal, climb and line loads, power given +0.00% to +0.05%; the grid 36 of 36 squares of 10 and 100 runs GAIN | S | "Why is the energy not a saving?" Because the max buys work and speed and the energy it takes is power given, shown beside them, never counted as a loss or a gain; the models are ours (class S) and are never counted in the headline |
+| **omni-v6.** The modelled muscles and seven organisms, the spine the seventh (16 October): 1,107 muscles in 70 families, every muscle its own card, three loads | every muscle alone over its loads EVEN 580, GAIN 527, LOSS 0; every organism GAIN (fewer misses, and under the climb more work) under the normal, climb and line loads, not one plant behind native, power given +0.00% to +0.05%; the spine alone: misses −6.1% under its own load, −7.9% with more work under the climb, −8.8% with work waiting in line, power given +0.01% to +0.04%; the grid 36 of 36 squares of 10 and 100 runs GAIN on the six run so far, the spine's squares queued | S | "Why is the energy not a saving?" Because the max buys work and speed and the energy it takes is power given, shown beside them, never counted as a loss or a gain; the models are ours (class S) and are never counted in the headline |
 | Power grid, 11 SimBench grids in pandapower | energy drawn and net import lower in all 11; losses lower in 7, **power given in 4**; tap operations fewer in 10, 4 → 8 a year in one, higher | S | "Where does it lose?" In the rural and semi-urban grids with their own generation, where a lower voltage raises losses; the table shows it |
 | Robot arms, MuJoCo Menagerie | peak torque −29% and −10%, tracking error −21% where Omni moved; the Panda's copper loss **+14% higher**; two arms left native | S | "What about the arms that gained nothing?" The paired physics trial left them native and the table says "nothing for Omni to move" |
 | Buildings with batteries, CityLearn, 11 districts | electricity bought, daily peak and unevenness lower in all 11; the bill **power given in 7**; ramping higher in 7 | S | "Is the bill a loss?" Yes, in the 2023 districts, and it is in the table as such |
@@ -10497,7 +10665,7 @@ manual records no change made otherwise.
 ---
 
 
-## 58. The Economics of a Receipt
+## 59. The Economics of a Receipt
 
 
 Run the stack native and print the receipt. Run the same stack with Omni-Compass and print the receipt. The difference
@@ -10531,7 +10699,7 @@ stack, and reads its losses in the same table as its gains.
 one time, with its interval. The only number that applies to a customer's system is the one their own paired runs produce,
 and the method of those runs is the manual's section 13, the same method every table in this book was made with.
 
-## 59. Due Diligence
+## 60. Due Diligence
 
 
 
@@ -10564,7 +10732,7 @@ Answers reference the Claims Register (C-numbers) and the Technical Manual.
 **Was it tuned on the test data?** No. Law, shield and baselines were frozen and fingerprinted before the held-out seeds 346410161 and 360555127 (results/PREREGISTRATION.json).
 **Where does it fail?** Backlog violations against current autoscaling (C11); the engine-dynamics ablation (Manual Chapter 8); open obligations (Manual Chapter 10).
 
-## 60. License and Commercial Terms
+## 61. License and Commercial Terms
 
 
 The software and this manual are licensed under the Omni-Compass Evaluation License (`LICENSE`): evaluation and
@@ -10581,7 +10749,7 @@ customer), may set the terms of each new version, and may assign the copyright; 
 terms they were received under. The license texts (`LICENSE`, `NOTICE`, `DISCLOSURES.md`) govern.
 
 
-## 61. Licensing: Questions and Answers
+## 62. Licensing: Questions and Answers
 
 
 
@@ -10642,7 +10810,7 @@ section 19). The Omni-Compass LLC is based in Florida.
 
 **Who do I contact?** The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
 
-## 62. Third-Party Notices
+## 63. Third-Party Notices
 
 
 
@@ -10665,7 +10833,7 @@ Omni-Compass Evaluation License changes those terms. Installed versions are thos
 Kubernetes, kind, `kubectl`, the NVIDIA driver and `nvidia-smi` are not distributed with Omni-Compass; it calls them
 where an operator has installed them. Their names are the property of their owners (`DISCLOSURES.md`, section 1).
 
-## 63. Repository Standards
+## 64. Repository Standards
 
 
 
@@ -10697,7 +10865,7 @@ The files the leading repositories carry, the open ones such as Kubernetes and t
 
 Files present at the commit this page describes; `python3 verify.py` checks the ones the results depend on.
 
-## 64. Python, C++ and the Seal
+## 65. Python, C++ and the Seal
 
 
 The laws are twinned: each has a Python version and a C++20 version that give the same answers, proven by a parity
@@ -10737,7 +10905,7 @@ any one of the three can tell whether the files in front of them are the files t
 ---
 
 
-## 65. The Founder's Working Notes
+## 66. The Founder's Working Notes
 
 
 
@@ -10930,7 +11098,7 @@ are sourced.
 4. **Aim the chip at about 5% more finished work on the same bill**, cap unchanged and temperature never behind, or at
    fewer joules for the same work. The buyer chooses, and the receipt prints which.
 
-## 66. History
+## 67. History
 
 
 
@@ -11277,12 +11445,12 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | Task | Command |
 |---|---|
 | Verify everything | `python3 verify.py` |
-| Six organisms, modelled | `python3 tools/run_scale.py --runs N --scale K --out <dir>` |
+| Seven organisms, modelled | `python3 tools/run_scale.py --runs N --scale K --out <dir>` |
 | The full ladder | `bash scripts/scale_ladder.sh` |
 | Two-wire card, modelled | `python3 tools/run_gpu_card.py <dir> [fresh]` |
 | GPU wire check | `sudo python3 tools/gpu_wire_check.py --gpu 0` |
 | GPU, whole benchmark in one command | `sudo nohup bash scripts/gpu_rented_run.sh > run.log 2>&1 &` |
-| The six organisms with the real card inside | `python3 tools/run_hil.py --out <dir>` |
+| The seven organisms with the real card inside | `python3 tools/run_hil.py --out <dir>` |
 | GPU governor, two wires | `sudo python3 -m omni_controller.gpu_compass --mode watch|cap ...` |
 | Kubernetes, watch | `kubectl apply -f deploy/install/omni-compass.yaml` |
 | Kubernetes paired runs | `scripts/kind_paired.sh`, then `tools/live_reps.py` |
@@ -11293,7 +11461,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | Which engine a checkout or a commit carries | `python3 tools/omni_version.py [--commit <sha>]` |
 | The three-run table (Kubernetes, Azure) | `python3 tools/confirm_abc.py "<title>" raw/run-<A> raw/run-<B> raw/run-<C> --out results/live/V3_<TEST>.md` |
 | The three-run table (database, messaging, cache, swarms, robots, grid, buildings) | `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/swarm_abc.py`, `tools/mujoco_abc.py`, `tools/pandapower_abc.py`, `tools/citylearn_abc.py`, the same arguments |
-| The six organisms with the cluster inside | `python3 tools/six_kube_report.py <raw dirs> --out results/live/V3_SIX_KUBE.md` |
+| The organisms with the cluster inside | `python3 tools/six_kube_report.py <raw dirs> --out results/live/V3_SIX_KUBE.md` |
 | The grid of copies and runs | `python3 tools/grid.py` (reads `results/scale/receipts/`) |
 | The Omni index | `python3 tools/omni_index.py` |
 | Which knobs earn a wire in (write, watch, operator's choice) | `python3 tools/wiring_verdicts.py` (`--check` compares the page with the tables; `verify.py` runs it) |
@@ -11579,10 +11747,11 @@ This chapter lists all 1107 muscles of the v5 catalog (`realms/catalog_v5.csv`);
 **Every muscle its own card.** The brain is one, its settings each muscle's own. A muscle's card holds the settings the max uses for that muscle (a machine pool: how full it runs on its forecast before it calls for more, and how many decisions of history it reads; a battery: how many wobbles of margin it keeps under its line, and, wired by its power, how long it reads its line before it holds and how much of it it keeps clear). The cards were found by an automatic search over every muscle on the development seeds, today's global setting always one of the choices, and kept only where the card beat the global setting beyond the noise on two separate sets of seeds and on no seed under any load fell behind native: never over its line more often, never less work, never its line cleared later (`tools/tune_cards.py`, `realms/muscle_cards_v5.csv`, `results/cards_v5/`). Inside a body, a battery wired by its power keeps the body's own margins on its line. 364 muscles carry a card of their own; every other muscle runs the global setting (machines started at 95% full, the last 20 decisions read, 3.09 wobbles of margin on a battery's line, 5% of it kept clear). Each muscle's card is in the last column of its family's table.
 
 
-**The organisms.** The 1107 muscles build six organisms: each of the four realms (every muscle whose realm list includes it), the four stacked with every duplicate kept (1,908), and the whole tower with every muscle once (1107). A muscle of the shared spine sits in all four realms.
+**The organisms.** The 1107 muscles build seven organisms: the spine (267 muscles, every muscle that sits in all four realms: the base every stack runs on, as an operating system is the base of every program), each of the four realms (every muscle whose realm list includes it, the spine among them), the four stacked with every duplicate kept (1,908), and the whole tower with every muscle once (1107). Each is run native and with Omni-Compass on top of native (`docs/THE_SPINE.md`, `docs/REALMS.md`).
 
 | Organism | Muscles |
 |---|---:|
+| The spine, the muscles every stack runs on | 267 |
 | Compute / AI / Cloud | 540 |
 | Physics / Robotics / Autonomous | 404 |
 | Energy / Facility / Industrial | 480 |
@@ -11640,9 +11809,9 @@ Wires marked *modelled only* exist as plants in the benchmark and are not built 
 
 **How to wire any muscle on your own stack (the plug, chapter 4).** Every muscle below is wired the same way: Omni-Compass never replaces the native controller; it reads the controller's own meters (the wire out) and writes the one setting the controller already accepts (the wire in), through a plug that (1) reads the setting once before the first write and records it, (2) reads back every write and stops writing if another writer moved the setting, (3) renews a lease every decision so a dead governor's settings walk back to native by themselves, and (4) restores the recorded setting at the end. Each family's entry says which native controller owns its muscles, where the reading is tapped, where the setting is written, how it is restored, and whether that wire has run live in this repository or only on a model (`docs/wiring_recipes.csv`). The muscle's name is the setting's own name on that controller. Where the entry says *modelled only*, the plant exists in the benchmark and the wire is written against the controller's documented interface, not yet run on the machine.
 
-### The shared spine: 267 muscles in all four realms
+### The spine: 267 muscles in all four realms, an organism of its own
 
-The machines every realm stands on: servers, machines, GPUs and CPUs, network, storage, observability, security, cooling and electrical distribution. Each spine muscle is part of every realm's organism, counted once in the tower and four times in the stack.
+The machines every realm stands on: servers, machines, GPUs and CPUs, network, storage, observability, security, cooling and electrical distribution. The spine is the seventh organism (`spine`, the base every stack runs on, run native and with Omni-Compass on top like the other six; `docs/THE_SPINE.md`), and each spine muscle is also part of every realm's organism, counted once in the tower and four times in the stack.
 
 #### Cloud VM & Capacity (21 muscles)
 
@@ -11658,27 +11827,27 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 97 | vm count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 98 | vm size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
-| 99 | vm start stop | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 100 | vm migrate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 101 | instance family | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 102 | asg min | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 103 | asg max | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 104 | spot mix | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 105 | reservation mix | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
-| 106 | zone selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 107 | region selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 108 | architecture selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 109 | accelerator selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 110 | boot disk class | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 111 | placement group | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 112 | interruption response | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 1038 | target tracking policy | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 1039 | scaling cooldown warmup | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 1114 | vm cpu cap by priority | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1120 | predictive scaling | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 1121 | instance refresh | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 97 | vm count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 98 | vm size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
+| 99 | vm start stop | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 100 | vm migrate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 101 | instance family | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 102 | asg min | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 103 | asg max | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 104 | spot mix | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 105 | reservation mix | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
+| 106 | zone selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 107 | region selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 108 | architecture selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 109 | accelerator selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 110 | boot disk class | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 111 | placement group | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 112 | interruption response | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 1038 | target tracking policy | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 1039 | scaling cooldown warmup | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 1114 | vm cpu cap by priority | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1120 | predictive scaling | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 1121 | instance refresh | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
 
 #### Container Resources (25 muscles)
 
@@ -11694,31 +11863,31 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 33 | cpu request | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 34 | cpu limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 35 | memory request | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 36 | memory limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 37 | ephemeral storage | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 38 | hugepages | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 39 | io weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 40 | pids limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 41 | memory high | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 42 | memory reclaim | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 43 | swap limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 44 | cgroup io max | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 45 | cpu weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 46 | cpu quota | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 47 | cpuset | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 48 | runtime class | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1017 | in place resize | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 1019 | namespace quota | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1020 | default limits | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1022 | memory hard limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 1023 | memory protection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 1024 | io latency target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 1025 | freeze | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 2176 | cruisekube request rightsizing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 2177 | goldilocks vpa request recommendation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
+| 33 | cpu request | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 34 | cpu limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 35 | memory request | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 36 | memory limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 37 | ephemeral storage | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 38 | hugepages | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 39 | io weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 40 | pids limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 41 | memory high | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 42 | memory reclaim | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 43 | swap limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 44 | cgroup io max | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 45 | cpu weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 46 | cpu quota | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 47 | cpuset | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 48 | runtime class | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1017 | in place resize | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 1019 | namespace quota | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1020 | default limits | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1022 | memory hard limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 1023 | memory protection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 1024 | io latency target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 1025 | freeze | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 2176 | cruisekube request rightsizing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 2177 | goldilocks vpa request recommendation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
 
 #### Host CPU & Memory (26 muscles)
 
@@ -11734,32 +11903,32 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 113 | cpufreq min | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 114 | cpufreq max | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 115 | rapl package power | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 116 | uncore frequency | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 117 | energy perf preference | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 118 | cpu idle policy | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 119 | memory bandwidth | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 120 | numa balance | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 121 | irq affinity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 122 | llc allocation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 123 | memory pressure gate | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 124 | page reclaim rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 125 | transparent hugepages | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 126 | core online offline | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 127 | thermal throttle policy | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 128 | host power profile | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 1040 | frequency governor | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 1041 | turbo boost | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1042 | dram power limit | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 1043 | swappiness reclaim | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 1112 | core packing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 1115 | per pod cpu frequency range and c state access | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 1116 | uncore frequency per node | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 2174 | ear cpu frequency policy | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 2175 | ear global energy budget | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 2178 | k8s power manager core profile | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
+| 113 | cpufreq min | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 114 | cpufreq max | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 115 | rapl package power | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 116 | uncore frequency | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 117 | energy perf preference | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 118 | cpu idle policy | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 119 | memory bandwidth | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 120 | numa balance | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 121 | irq affinity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 122 | llc allocation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 123 | memory pressure gate | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 124 | page reclaim rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 125 | transparent hugepages | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 126 | core online offline | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 127 | thermal throttle policy | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 128 | host power profile | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 1040 | frequency governor | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 1041 | turbo boost | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1042 | dram power limit | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 1043 | swappiness reclaim | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 1112 | core packing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 1115 | per pod cpu frequency range and c state access | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 1116 | uncore frequency per node | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 2174 | ear cpu frequency policy | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 2175 | ear global energy budget | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 2178 | k8s power manager core profile | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
 
 #### Kubernetes Placement & Scheduling (21 muscles)
 
@@ -11775,27 +11944,27 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 49 | node selector | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 85% full; reads the last 10 decisions |
-| 50 | node affinity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 51 | pod anti affinity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 52 | topology spread | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 53 | numa placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 54 | gpu topology | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 20 decisions |
-| 55 | storage locality | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 56 | network locality | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 57 | taint toleration | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 58 | priority class | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 59 | preemption policy | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 60 | device claim | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 61 | failure domain spread | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 62 | scheduler backoff | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 63 | gang admission | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 64 | deschedule | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1026 | scheduler scoring strategy | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1027 | scheduler plugin weights | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
-| 1028 | scheduling gates | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1029 | cpu manager | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 2179 | peaks power aware placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 49 | node selector | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 85% full; reads the last 10 decisions |
+| 50 | node affinity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 51 | pod anti affinity | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 52 | topology spread | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 53 | numa placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 54 | gpu topology | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 20 decisions |
+| 55 | storage locality | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 56 | network locality | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 57 | taint toleration | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 58 | priority class | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 59 | preemption policy | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 60 | device claim | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 61 | failure domain spread | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 62 | scheduler backoff | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 63 | gang admission | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 64 | deschedule | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1026 | scheduler scoring strategy | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1027 | scheduler plugin weights | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
+| 1028 | scheduling gates | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1029 | cpu manager | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 2179 | peaks power aware placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
 
 #### Kubernetes Workload Scaling (32 muscles)
 
@@ -11811,38 +11980,38 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 17 | replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 18 | hpa cpu target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
-| 19 | hpa memory target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 20 | hpa custom target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 21 | vpa apply | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 22 | scale to zero | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 80% full; reads the last 40 decisions |
-| 23 | keda threshold | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 24 | rollout rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 25 | max surge | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 26 | max unavailable | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 27 | deployment pause resume | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 28 | rollout abort | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 29 | pod eviction | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 30 | pdb policy | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 31 | scheduler queue priority | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 32 | api priority fairness | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1001 | hpa min replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 1002 | hpa max replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 1003 | hpa scale down stabilisation window | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1004 | hpa scale up stabilisation window | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1005 | hpa scaling rate policies | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1006 | hpa policy selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1007 | hpa tolerance | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1008 | hpa sync period | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 1009 | vpa minmax allowed resources | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 1010 | keda polling interval | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1011 | rollout progress deadline | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1012 | rollout readiness delay | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 1014 | unhealthy pod eviction policy | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1015 | graceful termination | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 1016 | probes | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 2172 | kepler energy target autoscaling | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 17 | replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 18 | hpa cpu target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
+| 19 | hpa memory target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 20 | hpa custom target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 21 | vpa apply | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 22 | scale to zero | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 80% full; reads the last 40 decisions |
+| 23 | keda threshold | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 24 | rollout rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 25 | max surge | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 26 | max unavailable | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 27 | deployment pause resume | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 28 | rollout abort | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 29 | pod eviction | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 30 | pdb policy | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 31 | scheduler queue priority | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 32 | api priority fairness | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1001 | hpa min replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 1002 | hpa max replicas | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 1003 | hpa scale down stabilisation window | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1004 | hpa scale up stabilisation window | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1005 | hpa scaling rate policies | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1006 | hpa policy selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1007 | hpa tolerance | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1008 | hpa sync period | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 1009 | vpa minmax allowed resources | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 1010 | keda polling interval | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1011 | rollout progress deadline | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1012 | rollout readiness delay | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 1014 | unhealthy pod eviction policy | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1015 | graceful termination | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 1016 | probes | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 2172 | kepler energy target autoscaling | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
 
 #### GPU Hardware (22 muscles)
 
@@ -11858,28 +12027,28 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 129 | gpu allocate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 130 | gpu power limit | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 131 | gpu sm clock | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 132 | gpu memory clock | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 133 | gpu persistence mode | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 134 | gpu compute mode | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 135 | mig mode | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 136 | mig geometry | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 85% full; reads the last 10 decisions |
-| 137 | gpu timeslice | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
-| 138 | gpu mps | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 139 | gpu quarantine | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 140 | gpu reset | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 141 | gpu thermal limit | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 142 | gpu ecc response | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 143 | gpu job power budget | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1044 | application clocks | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 1045 | gpu temperature target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 1117 | sync boost | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
-| 1118 | target clocks | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 2173 | climatik inference power cap | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 2180 | adaptive gpu power cap | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 2181 | nvidia platform power budget | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
+| 129 | gpu allocate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 130 | gpu power limit | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 131 | gpu sm clock | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 132 | gpu memory clock | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 133 | gpu persistence mode | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 134 | gpu compute mode | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 135 | mig mode | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 136 | mig geometry | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 85% full; reads the last 10 decisions |
+| 137 | gpu timeslice | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
+| 138 | gpu mps | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 139 | gpu quarantine | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 140 | gpu reset | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 141 | gpu thermal limit | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 142 | gpu ecc response | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 143 | gpu job power budget | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1044 | application clocks | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 1045 | gpu temperature target | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 1117 | sync boost | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 1118 | target clocks | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 2173 | climatik inference power cap | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 2180 | adaptive gpu power cap | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 2181 | nvidia platform power budget | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
 
 #### Node Fleet & Karpenter-Class Control (24 muscles)
 
@@ -11895,30 +12064,30 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 65 | node desired | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 66 | node pool min | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
-| 67 | node pool max | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
-| 68 | node provision | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 60 decisions |
-| 69 | node cordon | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 70 | node drain | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 71 | node consolidate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 72 | node replace | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 73 | node shutdown | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
-| 74 | node power on | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 75 | nodepool weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 76 | disruption budget | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 77 | consolidation policy | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 20 decisions |
-| 78 | consolidate after | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 90% full; reads the last 20 decisions |
-| 79 | expire after | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 80 | capacity class | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 1030 | scale down utilisation threshold | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1031 | scale down unneeded time | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 1032 | scale down delay after add | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 20 decisions |
-| 1033 | expander | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 80% full; reads the last 10 decisions |
-| 1034 | node pool limits | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 1035 | kubelet eviction thresholds | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1036 | kubelet reserved resources | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
-| 1037 | max pods per node | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 65 | node desired | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 66 | node pool min | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
+| 67 | node pool max | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
+| 68 | node provision | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 60 decisions |
+| 69 | node cordon | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 70 | node drain | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 71 | node consolidate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 72 | node replace | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 73 | node shutdown | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 40 decisions |
+| 74 | node power on | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 75 | nodepool weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 76 | disruption budget | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 77 | consolidation policy | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 20 decisions |
+| 78 | consolidate after | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 90% full; reads the last 20 decisions |
+| 79 | expire after | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 80 | capacity class | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 1030 | scale down utilisation threshold | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1031 | scale down unneeded time | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 1032 | scale down delay after add | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 20 decisions |
+| 1033 | expander | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 80% full; reads the last 10 decisions |
+| 1034 | node pool limits | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 1035 | kubelet eviction thresholds | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1036 | kubelet reserved resources | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
+| 1037 | max pods per node | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 40 decisions |
 
 #### Network Routing & Switching (19 muscles)
 
@@ -11934,25 +12103,25 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 225 | lb weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 226 | route weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 227 | rate limit | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 228 | bandwidth limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 229 | qos class | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 230 | connection limit | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 231 | failover route | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 232 | nic rate limit | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 233 | nic queue count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 234 | queue discipline | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 235 | congestion control | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 236 | egress budget | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 237 | ingress budget | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 238 | ecmp weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 239 | path selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 240 | network isolation | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1046 | nic interrupt coalescing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 1047 | nic ring size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 80% full; reads the last 10 decisions |
-| 1048 | port link power | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
+| 225 | lb weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 226 | route weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 227 | rate limit | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 228 | bandwidth limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 229 | qos class | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 230 | connection limit | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 231 | failover route | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 232 | nic rate limit | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 233 | nic queue count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 234 | queue discipline | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 235 | congestion control | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 236 | egress budget | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 237 | ingress budget | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 238 | ecmp weight | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 239 | path selection | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 240 | network isolation | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1046 | nic interrupt coalescing | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 1047 | nic ring size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 80% full; reads the last 10 decisions |
+| 1048 | port link power | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
 
 #### Observability & Telemetry (9 muscles)
 
@@ -11968,15 +12137,15 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 373 | collector memory limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 374 | export concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 376 | cardinality budget | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 377 | retention window | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 85% full; reads the last 40 decisions |
-| 378 | remote write queue | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 379 | telemetry shed | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1053 | metric scrape interval | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 1054 | batching | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 80% full; reads the last 10 decisions |
-| 1119 | per pod energy attribution | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
+| 373 | collector memory limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 374 | export concurrency | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 376 | cardinality budget | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 377 | retention window | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 85% full; reads the last 40 decisions |
+| 378 | remote write queue | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 379 | telemetry shed | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1053 | metric scrape interval | setpoint | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 1054 | batching | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 80% full; reads the last 10 decisions |
+| 1119 | per pod energy attribution | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 60 decisions |
 
 #### Reliability, Security & Recovery (12 muscles)
 
@@ -11992,18 +12161,18 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 385 | restart | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 386 | rollback | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 388 | traffic divert recovery | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 389 | degraded mode | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 390 | actuator freeze | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 391 | workload isolate | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 393 | credential rotation gate | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 394 | policy enforcement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 395 | rate abuse gate | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 396 | fault domain isolate | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 397 | backup trigger | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
-| 400 | kill switch | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
+| 385 | restart | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 386 | rollback | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 388 | traffic divert recovery | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 389 | degraded mode | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 390 | actuator freeze | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 391 | workload isolate | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 393 | credential rotation gate | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 394 | policy enforcement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 395 | rate abuse gate | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 396 | fault domain isolate | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 397 | backup trigger | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 10 decisions |
+| 400 | kill switch | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
 
 #### Storage Block/File/Object (20 muscles)
 
@@ -12019,26 +12188,26 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 257 | volume size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 258 | iops limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 259 | throughput limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 260 | replica count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 261 | storage tier | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 262 | volume placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 263 | snapshot trigger | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
-| 264 | rebalance | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
-| 265 | recovery rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 266 | backfill rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 267 | compaction pressure | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 268 | cache allocation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
-| 269 | object replication | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 270 | erasure code profile | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 271 | storage admission | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 272 | degraded storage gate | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1049 | scrub schedule | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
-| 1050 | io scheduler | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
-| 1051 | disk power spin down | power | at its limit on native (the full clock): read and left native | all four realms; stack; tower | global |
-| 1052 | lifecycle tiering | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | all four realms; stack; tower | global |
+| 257 | volume size | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 258 | iops limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 259 | throughput limit | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 260 | replica count | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 261 | storage tier | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 262 | volume placement | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 263 | snapshot trigger | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
+| 264 | rebalance | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
+| 265 | recovery rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 266 | backfill rate | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 267 | compaction pressure | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 268 | cache allocation | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 75% full; reads the last 10 decisions |
+| 269 | object replication | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 270 | erasure code profile | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 271 | storage admission | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 272 | degraded storage gate | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1049 | scrub schedule | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | machines started at 70% full; reads the last 20 decisions |
+| 1050 | io scheduler | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
+| 1051 | disk power spin down | power | at its limit on native (the full clock): read and left native | the spine; all four realms; stack; tower | global |
+| 1052 | lifecycle tiering | capacity | starts the machines the forecast needs before the rush lands and clears work waiting in line within one machine start, never fewer than native runs; hands back what it no longer needs at once | the spine; all four realms; stack; tower | global |
 
 #### Cooling, Chillers & Thermodynamics (18 muscles)
 
@@ -12054,24 +12223,24 @@ Each is a data hall or building zone cooled by chillers, air handlers or fans; i
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 545 | supply air temperature | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
-| 546 | return air target | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
-| 547 | coolant supply temperature | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
-| 548 | coolant flow | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | all four realms; stack; tower | global |
-| 549 | pump speed | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | all four realms; stack; tower | global |
-| 550 | fan speed | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | all four realms; stack; tower | global |
-| 551 | chiller setpoint | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
-| 552 | compressor authority | power | at its limit on native (the site envelope at full): read and left native | all four realms; stack; tower | global |
-| 553 | cooling tower fan | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | all four realms; stack; tower | global |
-| 554 | cooling capacity | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | all four realms; stack; tower | global |
-| 555 | rack thermal budget | power | at its limit on native (the site envelope at full): read and left native | all four realms; stack; tower | global |
-| 556 | gpu thermal envelope | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
-| 557 | cpu thermal envelope | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | all four realms; stack; tower | global |
-| 558 | thermal workload migrate | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 559 | thermal load shed | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1055 | server fan speed | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | all four realms; stack; tower | global |
-| 1056 | economiser | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | all four realms; stack; tower | global |
-| 1122 | chiller plant supervisory control rl with safety layer | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | all four realms; stack; tower | global |
+| 545 | supply air temperature | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | the spine; all four realms; stack; tower | global |
+| 546 | return air target | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | the spine; all four realms; stack; tower | global |
+| 547 | coolant supply temperature | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | the spine; all four realms; stack; tower | global |
+| 548 | coolant flow | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | the spine; all four realms; stack; tower | global |
+| 549 | pump speed | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | the spine; all four realms; stack; tower | global |
+| 550 | fan speed | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | the spine; all four realms; stack; tower | global |
+| 551 | chiller setpoint | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | the spine; all four realms; stack; tower | global |
+| 552 | compressor authority | power | at its limit on native (the site envelope at full): read and left native | the spine; all four realms; stack; tower | global |
+| 553 | cooling tower fan | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | the spine; all four realms; stack; tower | global |
+| 554 | cooling capacity | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | the spine; all four realms; stack; tower | global |
+| 555 | rack thermal budget | power | at its limit on native (the site envelope at full): read and left native | the spine; all four realms; stack; tower | global |
+| 556 | gpu thermal envelope | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | the spine; all four realms; stack; tower | global |
+| 557 | cpu thermal envelope | setpoint | cools the room ahead of the heat as it nears its limit or its cooling nears flat out; never warmer than native | the spine; all four realms; stack; tower | global |
+| 558 | thermal workload migrate | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 559 | thermal load shed | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1055 | server fan speed | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | the spine; all four realms; stack; tower | global |
+| 1056 | economiser | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | the spine; all four realms; stack; tower | global |
+| 1122 | chiller plant supervisory control rl with safety layer | capacity | left to its own staging (native already has the cooling it needs: nothing to win) | the spine; all four realms; stack; tower | global |
 
 #### PDU, UPS & Electrical Distribution (18 muscles)
 
@@ -12087,24 +12256,24 @@ Each is a battery, UPS or microgrid store with a load and a grid connection; its
 
 | # | Muscle (the setting's own name) | Knob | What Omni-Compass does with it | Organisms | Its own card |
 |---:|---|---|---|---|---|
-| 529 | server power cap | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
-| 530 | rack power cap | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
-| 531 | pdu branch power limit | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
-| 532 | pdu outlet control | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | all four realms; stack; tower | 0 wobbles of margin on its line |
-| 534 | ups operating mode | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | all four realms; stack; tower | 0 wobbles of margin on its line |
-| 535 | ups charge rate | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
-| 536 | ups discharge rate | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
-| 537 | phase balance | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | all four realms; stack; tower | 0 wobbles of margin on its line |
-| 538 | load transfer | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 539 | reactive power target | setpoint | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | all four realms; stack; tower | 0 wobbles of margin on its line |
-| 540 | voltage target | setpoint | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | all four realms; stack; tower | 0.25 wobbles of margin on its line |
-| 541 | generator dispatch | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | all four realms; stack; tower | 0 wobbles of margin on its line |
-| 542 | electrical isolation | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 543 | breaker trip gate | admission | at its limit on native (nothing paced or turned away): read and left native | all four realms; stack; tower | global |
-| 1057 | ups shutdown battery test | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | all four realms; stack; tower | 0 wobbles of margin on its line |
-| 1110 | hierarchical power budget row pdu switchboard controllers | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
-| 1111 | priority aware capping throttle low priority first | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
-| 1113 | power oversubscription with prediction | power | at its limit on native (full battery power): read and left native | all four realms; stack; tower | global |
+| 529 | server power cap | power | at its limit on native (full battery power): read and left native | the spine; all four realms; stack; tower | global |
+| 530 | rack power cap | power | at its limit on native (full battery power): read and left native | the spine; all four realms; stack; tower | global |
+| 531 | pdu branch power limit | power | at its limit on native (full battery power): read and left native | the spine; all four realms; stack; tower | global |
+| 532 | pdu outlet control | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | the spine; all four realms; stack; tower | 0 wobbles of margin on its line |
+| 534 | ups operating mode | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | the spine; all four realms; stack; tower | 0 wobbles of margin on its line |
+| 535 | ups charge rate | power | at its limit on native (full battery power): read and left native | the spine; all four realms; stack; tower | global |
+| 536 | ups discharge rate | power | at its limit on native (full battery power): read and left native | the spine; all four realms; stack; tower | global |
+| 537 | phase balance | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | the spine; all four realms; stack; tower | 0 wobbles of margin on its line |
+| 538 | load transfer | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 539 | reactive power target | setpoint | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | the spine; all four realms; stack; tower | 0 wobbles of margin on its line |
+| 540 | voltage target | setpoint | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | the spine; all four realms; stack; tower | 0.25 wobbles of margin on its line |
+| 541 | generator dispatch | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | the spine; all four realms; stack; tower | 0 wobbles of margin on its line |
+| 542 | electrical isolation | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 543 | breaker trip gate | admission | at its limit on native (nothing paced or turned away): read and left native | the spine; all four realms; stack; tower | global |
+| 1057 | ups shutdown battery test | capacity | holds the charge for the line and clips only the draw that would cross it; a UPS lends only the charge above its outage floor | the spine; all four realms; stack; tower | 0 wobbles of margin on its line |
+| 1110 | hierarchical power budget row pdu switchboard controllers | power | at its limit on native (full battery power): read and left native | the spine; all four realms; stack; tower | global |
+| 1111 | priority aware capping throttle low priority first | power | at its limit on native (full battery power): read and left native | the spine; all four realms; stack; tower | global |
+| 1113 | power oversubscription with prediction | power | at its limit on native (full battery power): read and left native | the spine; all four realms; stack; tower | global |
 
 ### Realm: Compute / AI / Cloud (273 muscles of its own, 540 in its organism with the spine)
 

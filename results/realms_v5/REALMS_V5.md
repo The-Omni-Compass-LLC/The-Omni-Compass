@@ -1,8 +1,8 @@
-# The realms on Omni v5 at the max: 1107 muscles and six organisms, native against Omni on top
+# The realms on omni-v6 at the max: 1107 muscles and seven organisms, native against Omni on top
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Evidence class **S** (modelled). Run 2026-10-13 02:36 UTC, commit `eea291501848`, seeds 3000-3009 (10 paired seeds per muscle, per organism and per load), catalog `realms/catalog_v5.csv`. The engine is **omni-v5** (`tools/omni_version.py`, `OMNI_V5.json`) at its default, **the max** (`realms/compass_arm_v5.py`, `V5CFG`), on top of each plant's own native controller. Harness `realms/`.
+Evidence class **S** (modelled). Run 2026-10-16 03:48 UTC, commit `1d870bc33b2b`, seeds 3000-3009 (10 paired seeds per muscle, per organism and per load), catalog `realms/catalog_v5.csv`. The engine is **omni-v6** (`tools/omni_version.py`) at its default, **the max** (`realms/compass_arm_v5.py`, `V5CFG`), on top of each plant's own native controller. Harness `realms/`.
 
 **The max.** Every muscle is pushed toward its own limit for the most work, faster: a pool's machines are started before the rush lands (the recent peak arrivals widened by the largest rise the pool has shown within one machine start, at 95% utilisation), never fewer than its twin runs (the brain's model of native: the same pool under its own autoscaler alone, on the same arrivals); a room is cooled ahead of the heat as it nears its limit or its cooling nears flat out; a battery's line is clipped from its charge, a UPS lending only the charge above its outage floor. Work waiting in line is cleared within one machine start, and the machines it no longer needs go back at once (never below the twin). A muscle native already runs flat out (full clock, full speed, full actuator, nothing turned away) is wired, watched and native: there is nothing above native to give it. Nothing is taken from one muscle to give to another; the max never shaves. The energy the max takes is reported as **power given**, beside the work and the speed it bought.
 
@@ -14,12 +14,13 @@ Evidence class **S** (modelled). Run 2026-10-13 02:36 UTC, commit `eea291501848`
 
 These are models; a model's energy is not a meter's, and a plant written by the same people who wrote the law is not an independent test. What a row shows is whether the max, applied to that knob, helps or hurts the model.
 
-## The six organisms: the organism's own load
+## The seven organisms: the organism's own load
 
 Work: the mean over the organism's plants of each plant's work against native's. Misses: the share of plant decisions over their line, native → omni (the change in misses). Power given: the organism's energy against native's. Wear: the mean over its plants of each plant's wear against native's (machine-hours, cooling unit-hours, battery throughput, motor heat, actuator duty), shown beside the work, never judged. 95% intervals over seeds.
 
 | Organism | Muscles | Reading | Work | Misses, native → omni | Misses (pp) | Power given | Wear | Work per energy | Valid |
 |---|---:|---|---:|---|---:|---:|---:|---:|---|
+| The spine, the muscles every stack runs on | 267 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 2.39% → 2.25% (−6.1%) | -0.15 (-0.18 to -0.11) | +0.01% (+0.01 to +0.01) | +0.12% | -0.01% (-0.01 to -0.01) | yes |
 | Compute / AI / Cloud | 540 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 1.97% → 1.90% (−3.6%) | -0.07 (-0.08 to -0.06) | +0.01% (+0.01 to +0.01) | +0.06% | -0.01% (-0.01 to -0.01) | yes |
 | Physics / Robotics / Autonomous | 404 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 4.88% → 4.76% (−2.5%) | -0.12 (-0.14 to -0.10) | +0.01% (+0.01 to +0.01) | +0.11% | -0.01% (-0.01 to -0.01) | yes |
 | Energy / Facility / Industrial | 480 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 1.58% → 1.47% (−7.5%) | -0.12 (-0.14 to -0.09) | +0.00% (+0.00 to +0.00) | +0.09% | -0.00% (-0.00 to -0.00) | yes |
@@ -27,12 +28,13 @@ Work: the mean over the organism's plants of each plant's work against native's.
 | The four stacked, every shared muscle in each | 1908 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 2.59% → 2.50% (−3.6%) | -0.09 (-0.11 to -0.08) | +0.00% (+0.00 to +0.00) | +0.08% | -0.00% (-0.00 to -0.00) | yes |
 | The whole tower, every muscle once | 1107 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 2.73% → 2.67% (−1.9%) | -0.05 (-0.06 to -0.04) | +0.00% (+0.00 to +0.00) | +0.04% | -0.00% (-0.00 to -0.00) | yes |
 
-## The six organisms: the climb (1 2 3 2 3 4 ..., level 4 = own load, 8 = twice it)
+## The seven organisms: the climb (1 2 3 2 3 4 ..., level 4 = own load, 8 = twice it)
 
 Work: the mean over the organism's plants of each plant's work against native's. Misses: the share of plant decisions over their line, native → omni (the change in misses). Power given: the organism's energy against native's. Wear: the mean over its plants of each plant's wear against native's (machine-hours, cooling unit-hours, battery throughput, motor heat, actuator duty), shown beside the work, never judged. 95% intervals over seeds.
 
 | Organism | Muscles | Reading | Work | Misses, native → omni | Misses (pp) | Power given | Wear | Work per energy | Valid |
 |---|---:|---|---:|---|---:|---:|---:|---:|---|
+| The spine, the muscles every stack runs on | 267 | **GAIN (more work + fewer misses)** | +0.00% (+0.00 to +0.01) | 8.00% → 7.37% (−7.9%) | -0.63 (-0.70 to -0.57) | +0.04% (+0.03 to +0.04) | +0.45% | -0.04% (-0.04 to -0.03) | yes |
 | Compute / AI / Cloud | 540 | **GAIN (more work + fewer misses)** | +0.00% (+0.00 to +0.00) | 5.59% → 5.20% (−7.0%) | -0.39 (-0.42 to -0.36) | +0.05% (+0.04 to +0.05) | +0.31% | -0.04% (-0.05 to -0.04) | yes |
 | Physics / Robotics / Autonomous | 404 | **GAIN (more work + fewer misses)** | +0.00% (+0.00 to +0.00) | 9.82% → 9.50% (−3.2%) | -0.32 (-0.36 to -0.27) | +0.02% (+0.02 to +0.02) | +0.23% | -0.02% (-0.02 to -0.02) | yes |
 | Energy / Facility / Industrial | 480 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 8.07% → 7.86% (−2.7%) | -0.22 (-0.25 to -0.19) | +0.00% (+0.00 to +0.00) | +0.20% | -0.00% (-0.00 to -0.00) | yes |
@@ -40,12 +42,13 @@ Work: the mean over the organism's plants of each plant's work against native's.
 | The four stacked, every shared muscle in each | 1908 | **GAIN (more work + fewer misses)** | +0.00% (+0.00 to +0.00) | 7.32% → 6.97% (−4.8%) | -0.35 (-0.37 to -0.33) | +0.00% (+0.00 to +0.00) | +0.30% | +0.00% (+0.00 to +0.00) | yes |
 | The whole tower, every muscle once | 1107 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 6.91% → 6.82% (−1.4%) | -0.09 (-0.11 to -0.08) | +0.00% (+0.00 to +0.00) | +0.09% | -0.00% (-0.00 to -0.00) | yes |
 
-## The six organisms: work waiting in line (a 25% share of the run's own work waiting when it starts)
+## The seven organisms: work waiting in line (a 25% share of the run's own work waiting when it starts)
 
 Work: the mean over the organism's plants of each plant's work against native's. Misses: the share of plant decisions over their line, native → omni (the change in misses). Power given: the organism's energy against native's. Wear: the mean over its plants of each plant's wear against native's (machine-hours, cooling unit-hours, battery throughput, motor heat, actuator duty), shown beside the work, never judged. 95% intervals over seeds.
 
 | Organism | Muscles | Reading | Work | Misses, native → omni | Misses (pp) | Power given | Wear | Work per energy | Valid |
 |---|---:|---|---:|---|---:|---:|---:|---:|---|
+| The spine, the muscles every stack runs on | 267 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 4.23% → 3.86% (−8.8%) | -0.37 (-0.40 to -0.34) | +0.04% (+0.03 to +0.04) | +0.43% | -0.04% (-0.04 to -0.03) | yes |
 | Compute / AI / Cloud | 540 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 2.47% → 2.27% (−8.3%) | -0.20 (-0.22 to -0.19) | +0.04% (+0.04 to +0.05) | +0.28% | -0.04% (-0.05 to -0.04) | yes |
 | Physics / Robotics / Autonomous | 404 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 10.87% → 10.62% (−2.3%) | -0.25 (-0.28 to -0.22) | +0.03% (+0.03 to +0.03) | +0.33% | -0.03% (-0.03 to -0.03) | yes |
 | Energy / Facility / Industrial | 480 | **GAIN (fewer misses)** | +0.00% (+0.00 to +0.00) | 1.41% → 1.29% (−8.3%) | -0.12 (-0.14 to -0.09) | +0.00% (+0.00 to +0.00) | +0.09% | -0.00% (-0.00 to -0.00) | yes |
@@ -59,18 +62,21 @@ A stricter look than an organism's total: every plant inside each organism, over
 
 | Load | Organism | Plants | Plants with less work or more misses | The plants (work change, extra decisions over the line, all seeds) |
 |---|---|---:|---:|---|
+| normal | The spine, the muscles every stack runs on | 267 | 0 | none |
 | normal | Compute / AI / Cloud | 540 | 0 | none |
 | normal | Physics / Robotics / Autonomous | 404 | 0 | none |
 | normal | Energy / Facility / Industrial | 480 | 0 | none |
 | normal | Distribution / Specialized | 484 | 0 | none |
 | normal | The four stacked, every shared muscle in each | 1908 | 0 | none |
 | normal | The whole tower, every muscle once | 1107 | 0 | none |
+| climb | The spine, the muscles every stack runs on | 267 | 0 | none |
 | climb | Compute / AI / Cloud | 540 | 0 | none |
 | climb | Physics / Robotics / Autonomous | 404 | 0 | none |
 | climb | Energy / Facility / Industrial | 480 | 0 | none |
 | climb | Distribution / Specialized | 484 | 0 | none |
 | climb | The four stacked, every shared muscle in each | 1908 | 0 | none |
 | climb | The whole tower, every muscle once | 1107 | 0 | none |
+| line | The spine, the muscles every stack runs on | 267 | 0 | none |
 | line | Compute / AI / Cloud | 540 | 0 | none |
 | line | Physics / Robotics / Autonomous | 404 | 0 | none |
 | line | Energy / Facility / Industrial | 480 | 0 | none |
@@ -146,7 +152,7 @@ Misses: the share of decisions over the line, native → omni. Line: minutes to 
 
 - Omni acts on **567** of 1107 muscles alone. **421** are at their limit on native (the knob is already at the top of its range: EVEN); the rest it could act on show nothing beyond the noise to gain.
 - Muscles alone that read **LOSS** or **GAIN AND LOSS** under any load: **0**.
-- The lease hands every knob back to native before each run ends: 1107 of 1107 muscles under every load; 6 of 6 organisms under normal, 6 of 6 organisms under climb, 6 of 6 organisms under line.
+- The lease hands every knob back to native before each run ends: 1107 of 1107 muscles under every load; 7 of 7 organisms under normal, 7 of 7 organisms under climb, 7 of 7 organisms under line.
 
 ## Largest changes (muscles alone, own load, by mean change in misses)
 
