@@ -218,8 +218,11 @@ being made), and anything on a real card.
 4. **Google and Amazon**: on the founder's word; the accounts and secrets are his to make (appendices G and H).
 5. **The card**: the founder's runs on Lambda, one exact commit, after the CPU and cloud work.
 6. **Linux**: a machine on the metal for `cpu-power`.
-7. **More room**: 453 of the 2,214 muscle-load cases read SAME AS NATIVE and 14 of 26 knob-cases on the real stacks read
-   watch; the next engine looks for a gain in each, in the toy gate first.
+7. **More room**: of the 159 muscles that read SAME AS NATIVE on omni-v7's realms table, the room search of 16 October
+   (`docs/OMNI_V7.md`) found none under the max's gauges within each muscle's own knob: 147 have no native misses to cut and
+   fixed work; the 12 battery power knobs miss only while the charge sits at the operator's reserve, which the power knob may
+   not spend. Six process loops miss at most 0.56% of decisions: a card candidate for a later version. The 14 of 26 knob-cases
+   on the real stacks that read watch stay the next engine's question, in the toy gate first.
 8. **Omni-Compass 1.0**: when the founder declares the engine final, the engine that stands then is published as 1.0 and
    the older fingerprints go to `docs/history` as the road to it.
 
