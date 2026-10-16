@@ -2,6 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+Omni v6 stood on main from 15 to 16 October; since 16 October the engine that stands is Omni v7 (`docs/OMNI_V7.md`, the founder's
+order). This page and v6's four three-run tables (`results/live/V6_*.md`) stay as that engine's record, read beside no other engine's.
+
 The engine combines the unchanged v5 muscle law and 1,107-muscle catalog with the v6 shared-host Kubernetes capacity repair.
 The controller samples Linux host CPU occupancy, counts kind's shared host once, refuses extra replica capacity when that
 host is busy or unmeasured, and rechecks a previously enlarged replica ceiling. This is a versioned evaluation engine;

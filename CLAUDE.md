@@ -33,18 +33,20 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v6 stands, v7 under test (v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v7 stands (v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v6** (`OMNI_V6.json`, `docs/OMNI_V6.md`, 15 October) stands on main: v5's law and catalog unchanged, plus the
-  shared-host capacity repair (on kind every node is a container on one runner: its processor is counted once and no
-  replica is added while that runner is 75% busy or unread, `omni_controller/capacity.py`). **Omni v7** is the
-  candidate on branch `v7-candidate` (pull request #13 carried into it): conveyance bounded by each namespace's CPU
-  quota (omni_controller/quota.py on that branch); on a shared host no limit raised while the machine is 75% busy or
-  unread (the replica room's guard); the verdict reading a trial in the reports' words (GAIN, EVEN, LOSS: a clear rise
-  refused); every rule in seconds; the cloud's one flag `--give-back-only` (docs/OMNI_V7.md on that branch). Two repairs
-  first written for the v6 KEDA table's pod start wait, the host's processor counted once and a hold while a pod
-  starts, were refused by the toy gate (below) and are not in v7. It goes on main only when its live trials show no
-  LOSS; then everything reruns on it.
+- **Omni v7** (`OMNI_V7.json`, digest `d6d467b824c585f1`, 46 files; `docs/OMNI_V7.md`) stands on main since 16 October,
+  the founder's order ("Where is version 7? That's what you gotta push everything to"): v6's law, catalog and shared-host
+  capacity repair (on kind every node is a container on one runner: its processor is counted once and no replica is
+  added while that runner is 75% busy or unread, `omni_controller/capacity.py`), plus conveyance bounded by each
+  namespace's CPU quota (`omni_controller/quota.py`; an unreadable quota is no budget known, Kubernetes admission is the
+  authority), on a shared host no limit raised while the machine is 75% busy or unread, the verdict reading a trial in
+  the reports' words (GAIN, EVEN, LOSS: a clear rise refused), every rule in seconds, the cloud's one flag
+  `--give-back-only`. Two repairs first written for the KEDA pod start wait were refused by the toy gate and are not in
+  it. Every benchmark runs again on it (`scripts/reruns.txt`; the conductor's reruns, grid and Azure queues restarted on
+  16 October); its twelve trial runs of 16 October (Goldilocks, KEDA's add-ons, fixed capacity, CruiseKube; A, B and C)
+  count as its first reruns. **Omni v6** (`OMNI_V6.json`, `docs/OMNI_V6.md`) stood one day, 15 to 16 October; its four
+  three-run tables are its own.
 - `OMNI_V5.json` and `docs/OMNI_V5.md`: the max (`realms/compass_arm_v5.py`, `V5CFG`) on the 1,107-muscle catalog, the
   bone inside every organism with the living body's immune system (V6-V13, `docs/FORMAL_V5.md` section 4: native twins
   of every room, the heat debt, batteries timed for their lines, nothing locked), every muscle its own card
@@ -52,8 +54,8 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v6, omni-v5, omni-v3,
-  omni-v2, omni-v1, or what differs.
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v7, omni-v6, omni-v5,
+  omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
   1.0, never as a second product.
@@ -156,7 +158,7 @@ the founder overrides one in the conversation.
   on native." The spine is written into the runners and the pages (`docs/THE_SPINE.md`, bound into both manuals), never into a
   fingerprinted engine file; the engine's fingerprint does not move for it.
 - **Older versions are history.** "Why do I want to hear about version 5?" Everything worked on is the newest engine; what is
-  found to have more room goes into the next version, or the candidate is modified. Reports say native against Omni-Compass,
+  found to have more room goes into the next version. Reports say native against Omni-Compass,
   gauge by gauge, never one version against another; older fingerprints are the road, in `docs/history`.
 - **Nothing is cancelled.** No run is ever cancelled; a problem found in a running benchmark is fixed and the benchmark run
   again. Everything except the GPU chips and the Google and Amazon clouds runs, pushes and benchmarks.
@@ -312,7 +314,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch stay in sync.
+  One version is always the main one; `main` and the working branch, `v7` (the engine that stands, the founder's order of 16
+  October: "push everything to version 7"), stay in sync; `v5` and `v7-candidate` are kept level with them.
 - Verify before every push: `tools/release_manifest.py` under Python 3.12 (as GitHub runs it), 0 FAIL. Clear
   `/tmp/tmp*` first, because test leftovers fill the disk. Keep the Python 3.12 environment outside `/tmp` (for example
   `/root/v312`), because a container reset wipes `/tmp`. After a push, check the GitHub verify run itself, not only the

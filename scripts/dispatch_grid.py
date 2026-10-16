@@ -41,10 +41,10 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "results" / "grid_v6" / "DISPATCHED.json"
+MANIFEST = ROOT / "results" / "grid_v7" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
-SINCE = "2026-10-15T06:07:41Z"  # only this campaign; earlier engines are historical
-ENGINE = "omni-v6"                 # the engine whose grid this is (tools/omni_version.py)
+SINCE = "2026-10-16T04:50:00Z"  # only this campaign, omni-v7 (the founder's order of 16 October); earlier engines are historical
+ENGINE = "omni-v7"                 # the engine whose grid this is (tools/omni_version.py)
 SIZES = (1, 10, 100, 1000)          # free GitHub only: owner restored 1,000 on 15 October
 RUNS = 1000                        # nested 1/10/100/1000 runs on free GitHub runners
 TIERS = (10, 100, 1000)             # smaller prefixes first
@@ -101,7 +101,8 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # then C, and never while a run that goes first waits for a runner. A workflow's runs started since RERUN_SINCE are read
 # back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
 RERUNS = ROOT / "scripts" / "reruns.txt"
-RERUN_SINCE = "2026-10-15T06:07:41Z"
+RERUN_SINCE = "2026-10-16T02:59:00Z"   # omni-v7: its twelve trial runs of 16 October (Goldilocks, KEDA's add-ons, fixed capacity,
+                                       # CruiseKube; A, B and C) count as the first reruns on the engine that stands
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # Azure, the first cloud (the founder's order of 13 October), its sets following one another without a hand on the
@@ -110,7 +111,8 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # or running, one a tick in each queue, and is read back by its run's title since AZURE_SINCE (a cancelled run counts for
 # nothing), so nothing is started twice and a set dispatched by hand counts as started
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
-AZURE_SINCE = "2026-10-14T00:00:00Z"   # the machines-only sets of 14 October count as started (read back by title)
+AZURE_SINCE = "2026-10-16T04:50:00Z"   # omni-v7: every Azure set runs again on the engine that stands; the sets of 14 and 15 October
+                                       # stay as their own engine's record, counted in no v7 table
 AZURE_WF = "aks-metered.yml"
 FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
          "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")

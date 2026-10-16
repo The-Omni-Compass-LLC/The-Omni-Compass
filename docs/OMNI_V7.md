@@ -1,8 +1,8 @@
-# Omni v7 candidate: tighter convergence on top of v6
+# Omni v7: the engine that stands (tighter convergence on top of v6)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-This is the candidate for the next engine (branch `v7-candidate`), not a completed benchmark claim. Main and the ongoing Azure and broad v6 campaign keep the frozen v6 engine (`OMNI_V6.json`). Results from the two versions are never pooled. v7 is v6 with five changes, each found from a v6 run's own files or from the governing rules themselves:
+Omni v7 is the engine that stands on main since 16 October (the founder's order: everything on the newest engine). Every benchmark runs again on it (`scripts/reruns.txt`; the grid conductor's reruns, grid and Azure queues restarted on it the same day), and every earlier table stands as its own engine's result until its three runs on v7 land; results from two versions are never pooled. v7 is v6 with five changes, each found from a v6 run's own files or from the governing rules themselves:
 
 | # | Change | Where | What it tightens |
 |---|---|---|---|
