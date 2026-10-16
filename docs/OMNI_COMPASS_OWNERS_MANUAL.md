@@ -267,7 +267,8 @@ it lives, and never repeats it.
 
 The two books share their front matter (the key, the notice, the foreword, the prefaces, the quick reference), their
 vocabulary (one glossary), their structure (parts, chapters, numbered sections, appendices, a table of contents rebuilt
-from the book itself at every edition, and an index of every term, muscle family, file and setting with its pages) and their reading
+from the book itself at every edition, a list of figures, each figure drawn from the code it pictures, and an index of every term,
+muscle family, file and setting with its pages) and their reading
 rule: **the order of the chapters is the order of understanding and
 of implementing.** Nobody can wire what they have not understood, so each book is read from the front: what Omni-Compass is;
 the stack as one body; the plug and the rules its wires obey; the wiring, level by level and stack by stack; operating it;
@@ -824,6 +825,8 @@ seat. The vocabulary is used the same way everywhere in this repository (`docs/M
 The floor of two machines is an operator's number; lifting off never takes a system below it, however far the pedal is lifted.
 There is no ceiling: every machine the operator has is usable, and the protection is the band inside each machine.
 
+![One pedal, no brake. Pushing the pedal adds capacity at once; lifting it eases capacity back toward native a step at a time, never below idle, the floor of two machines. Cruise holds every machine in service while a known queue waits. Watching reads and logs but writes nothing; reset hands every setting back to native and reads it back at the end of a run; off is native alone. The kill switch stands apart from all of these: for security only, in a human hand, instant. After a crash the lease walks every setting back to native on its own.](book/figures/pedal.svg)
+
 ### 1.4 Nothing is hardwired
 
 Omni-Compass carries no table of per-stack special cases. One law (section 6) is written once and runs on every muscle
@@ -874,6 +877,8 @@ so that no reading, however far out, can make the law ask for more than one full
 hammering" means in code: there is no reading that produces a jump, and two readings a decision apart produce two forces
 a small amount apart. Section 6 gives the rules in full and Appendix C the equations; the reader who only needs the
 picture can keep the needle, the centre and the two cushions in mind and will not be misled by anything later.
+
+![The compass band and the smoothing of the force. (a) The service reading placed in its band as a position p from 0, calm, to 1, the operator's line; the walls at 0.05 and 0.95 leave a cushion of 5% at each edge, and the centre c is where the needle comes to rest (0.5 by default; on a service 0.3 at the max and 0.4 at the tune-down). (b) The force F = A·tanh(r/A) against the raw force r = K[P]·(p − c) + K[D]·v, the pull toward the centre plus the push against the reading's motion: near the centre a spring, far out a curve that flattens into the authority A and never passes it. Past the upper wall the up side goes to A at once, and the down side may not act until the reading is back inside the band.](book/figures/band.svg)
 
 ### 1.6 What it sets, muscle by muscle
 
@@ -997,6 +1002,8 @@ this one). The catalog thus builds seven organisms, the spine first because the 
 | 4. Distribution / Specialized | 484 | networks, storage, databases, commerce, trading, content delivery, workflows, radio networks, clinical systems, ports |
 | 5. The four stacked, every duplicate kept | 1,908 | all four realms on one clock, the shared spine counted in each |
 | 6. The whole tower, every muscle once | 1,107 | every distinct muscle on one clock |
+
+![The seven organisms. The spine, the 267 muscles that sit in all four realms, is the base every stack runs on and an organism in its own right, listed first. The four realms stand on it; the four stacked count the spine once in each realm's body (1,908 muscles); the whole tower counts every distinct muscle once (1,107 in 70 families). Each organism runs native and with Omni-Compass on top of native.](book/figures/organisms.svg)
 
 These are the counts of the catalog that stands; earlier catalogs' counts stay with their own results in `docs/history/`.
 
@@ -1338,20 +1345,22 @@ The engine (`omnicompass/core.py`, frozen and fingerprinted) carries a six-part 
 
 The eight equations (Appendix C gives them in full):
 
-1. dE/dt = -alpha_E E + beta_int + beta_ext + v[eff]
-2. dU/dt = mu U (1 - U^2) - (dE/dt)/E_max - lambda_U U + u, with |u| <= 25
-3. dI_U/dt = (1 - U) - sigma_1 E - delta S - lambda_I I[U]
-4. v[eff] = cos(omega_B t / 2) c tanh(lambda_0 + lambda_1 (U - 0.5) + lambda_2 S)
-5. Phi(S) = alpha_s S^2/2 + beta_s S^3/4 - delta S
-6. dS/dt = -dPhi/dS
-7. d2B/dt2 = gamma_c delta S - (omega_B/Q_B) dB/dt - omega_B^2 B
+1. dE/dt = −α[E] E + β[int] + β[ext] + v[eff]
+2. dU/dt = μ U (1 − U²) − (dE/dt)/E[max] − λ[U] U + u, with |u| ≤ 25
+3. dI[U]/dt = (1 − U) − σ₁ E − δ S − λ[I] I[U]
+4. v[eff] = cos(ω[B] t / 2) c tanh(λ₀ + λ₁ (U − 0.5) + λ₂ S)
+5. Φ(S) = αₛ S²/2 + βₛ S³/4 − δ S
+6. dS/dt = −dΦ/dS
+7. d²B/dt² = γ[c] δ S − (ω[B]/Q[B]) dB/dt − ω[B]² B
 8. R[B]: a finite-difference audit of (7), never fed back
 
-**The control law.** u = clip(-f_U(x, t) + K[P] (sigma - U), -25, +25), where f[U] is the drift of U with the command
-at zero, sigma is the target pole and K[P] = 12. The first term cancels whatever is shoving U (the push); the second
+**The control law.** u = clip(−f[U](x, t) + K[P] (σ − U), −25, +25), where f[U] is the drift of U with the command
+at zero, σ is the target pole and K[P] = 12. The first term cancels whatever is shoving U (the push); the second
 pulls U to its pole, harder the farther it is (the pull). The command is held unchanged through every stage of the
 fourth-order Runge-Kutta step and U is never rewritten afterwards. Inside the authority limit, U converges to its pole
 at rate K[P]; this is proved (`docs/TRACKING_THEOREM.md`).
+
+![The engine's six states and the control law. Nine clipped observations are blended into the state x = (E, U, I[U], S, B, Ḃ) with weight 0.339 and the state moves one macro step. The deviation E drains at α[E] and is filled by the two pressures and the bounded drive v[eff]; its rate of change pushes the alignment U, a double well with poles at ±1; the need 1 − U accumulates in the memory I[U], which leaks at λ[I]; the stress S rolls down its cubic potential Φ(S), drives the bath B through γ[c]·δ·S and enters E and I[U] through −δS; the audit R[B] re-checks the bath and is never fed back. The control law u cancels the drift of U and pulls it to its pole at rate K[P] = 12; it is read, never applied to a knob: the push u/25, the authority and the release permission go to the nervous system and the compass law.](book/figures/engine.svg)
 
 ### 4.1 What each equation does, in words
 
@@ -1359,27 +1368,29 @@ The six numbers describe the whole system the way a physician's six vital signs 
 says how one of them moves.
 
 - **Equation 1, the deviation tank.** *E* is how hard the system is being driven: queues, overload, power, heat. It
-  drains on its own at a fixed rate (alpha_E = 3.487) and is filled by two pressures, internal (queue and overload,
-  beta_int) and external (power, heat, network, staleness, security, beta_ext), plus a drive term v[eff] that is bounded
+  drains on its own at a fixed rate (α[E] = 3.487) and is filled by two pressures, internal (queue and overload,
+  β[int]) and external (power, heat, network, staleness, security, β[ext]), plus a drive term v[eff] that is bounded
   by a hyperbolic tangent. However extreme the observation, the engine's response rate is capped at c = 1. This is the
   saturation, the "speed limit" that no input can exceed.
 - **Equation 2, the alignment.** *U* is how healthy and settled the system is, and it lives in a double well: two stable
   poles at +1 (healthy) and −1 (failed) with an unstable ridge at 0. A rising deviation pushes *U* out of the healthy
-  well; the bounded command *u* pulls it back. The cubic term mu U (1 − U²) is what makes the walls of the well push back
+  well; the bounded command *u* pulls it back. The cubic term μ U (1 − U²) is what makes the walls of the well push back
   harder the farther *U* strays.
 - **Equation 3, the memory.** *I[U]* grows while *U* is below its pole, is reduced by deviation and stress already being
-  dealt with, and leaks at lambda_I = 0.719. It is the engine's memory of unrelieved pressure: a system that has been
+  dealt with, and leaks at λ[I] = 0.719. It is the engine's memory of unrelieved pressure: a system that has been
   stressed for an hour is not the same as one stressed for a second, and this integrator is what knows the difference.
 - **Equation 4, the drive.** The bounded drive v[eff] mixes the alignment and the stress through a tanh, with a slow
   cosine of the bath's frequency on top, so the drive breathes rather than pushes constantly.
 - **Equations 5 and 6, the stress.** *S* rolls downhill in a cubic potential to its stable root. It is the slowest
   restoring force: structural stress from heat, power, network, security and staleness that builds and relaxes over
   minutes rather than seconds.
-- **Equation 7, the bath.** A damped harmonic oscillator (natural frequency omega_B = 1, quality Q[B] = 2.5) driven by
+- **Equation 7, the bath.** A damped harmonic oscillator (natural frequency ω[B] = 1, quality Q[B] = 2.5) driven by
   stress. It turns stress into a smooth, lagged tide, and it is the only second-order element in the engine; its friction
   is what settles the whole.
 - **Equation 8, the audit.** The bath equation is re-checked numerically every step with a finite difference, and the
   check is recorded and never fed back: an instrument on the engine, not a part of it.
+
+![The two landscapes inside the engine. (a) The alignment U lives in a double well, V(U) = μ(U⁴/4 − U²/2), with stable poles at +1 (healthy) and −1 (failed) and an unstable ridge at 0; the drift μU(1 − U²) rolls the ball to the nearer pole. (b) The stress S rolls down the cubic potential Φ(S) = αₛS²/2 + βₛS³/4 − δS; with the engine's default parameters the stable root is at S = 1.90 and the ridge at S = −3.50, below which the landscape is open (its closure is given in the chapter Closing the Circle in the Engine).](book/figures/potential.svg)
 
 Integration is classical fourth-order Runge-Kutta, ten micro-steps of 0.01 per macro step, and the C++ twin matches the
 Python to 3.6 × 10⁻¹⁵ on 500 reference trajectories (section 18).
@@ -1434,6 +1445,8 @@ line is not moved at all and stays native. What survives all three is one write 
 and one line in the **audit** that records the senses read, the engine's state and push, the force, the gate's reasons and
 the value sent and taken. In the kill test's first repetition (section 7.1) this produced 114 such lines and 42 writes:
 every decision that wrote nothing is in the record with the reason the gate held, which is the point of writing all of it down.
+
+![One decision of the governor. It wakes on its period, reads every sense, and holds if any sense is blind or stale: nothing is given back, and adding capacity is still allowed. The engine blends its state toward the observations and moves one macro step; the compass law turns the reading's position into a force. A positive force adds capacity at once, gated by nothing but the security hold. A negative force must pass the release gate (calm, the line clean for three decisions, nothing pending, every sense live) and, on a slow knob, the verdict's paired trial at the 2% line. What survives is one write through the plug, read back, and one line in the audit that records every sense, the state, the force, the gate's reason and the value sent and taken, whether or not anything was written.](book/figures/loop.svg)
 
 ## 5. The Closed Circle: Why It Cannot Leave Its Compass
 
@@ -1829,6 +1842,8 @@ the same contract (`omnicompass/compass_law.py`, `Plug`):
 5. **restore** - on stop, the knob returns to the snapshot (where Omni-Compass found it, not the last value it wrote).
    For muscles whose native controller moves the knob itself, restore hands control back.
 
+![The two-way plug. One wire out carries the governor's write, one value per decision, clipped to the knob's cover and read back from the device; one wire in carries the muscle's reading, placed in its band, and the knob as it stands. The snapshot taken at attach, before any write, is the restore point, and a knob found where the governor did not put it belongs to another writer and is left alone. The brain holds the mathematics; the plug holds nothing but the contract.](book/figures/plug.svg)
+
 **8.2 Adapters (one per standard plug).** Omni-Compass speaks each industry's standard control interface through an
 adapter. Status is stated plainly:
 
@@ -2077,6 +2092,8 @@ and where the most care is spent. Level 4 hands Omni-Compass the replica decisio
 reflex upward; it is an option, not a step on the way, and the benchmarks in this manual do not use it. Levels 5 to 7 are
 the GPU, the CPU and the site, each with its own wire check and its own pass. An installation may stop at any level and
 run there indefinitely; most will stop at level 3.
+
+![The eight levels of an installation, taken in order, each with its pass condition. Levels 0 and 1 write nothing; from level 2 the governor writes, and the wire check must pass before any level that writes. An installation may stop at any level and run there indefinitely.](book/figures/levels.svg)
 
 **Level 0 - Evaluate without touching anything.**
 
@@ -2961,6 +2978,8 @@ difference beyond the noise (3 of 3 runs)" with intervals of −30% to +25% is a
 size either way, which is a statement about the test's power, and the manual says so where it applies (the 4-worker Azure
 fleet). A "LOSS in all three of our runs" row stands in the table, and enters the index as a loss.
 
+![The three-run rule, read from the intervals. Each row is one gauge; each bar is one run's paired change of Omni-Compass against native with its 95% interval. GAIN or LOSS in all three of our runs: the same side in all three, every interval clear of zero. EVEN: at least one interval includes zero, no difference beyond the noise. The runs disagree: clear intervals on both sides, an unstable test to be looked into. Which side reads GAIN is set by what the gauge is for: for time waited, misses and failures a fall; for work done a rise; for a resource spent a fall is a cut and a rise is power given, never a loss.](book/figures/readings.svg)
+
 **A worked reading, from the cache table.** Take the Redis table's `large` workload (`results/live/V3_REDIS.md`). The
 product row, work inside the 2 ms line, reads GAIN in all three of our runs, with the three runs' paired changes each clear of zero and
 of the same sign; that is the gain. The resource row, the memory ceiling held, reads power given in all three of our runs: Omni held a ceiling
@@ -3020,6 +3039,8 @@ Every judged row gets one of three readings, and all three runs are shown beside
   told apart on that measure. That is the result, stated as such, with the count of runs it holds in.
 - **The runs disagree**: runs clear of the noise point different ways. The test itself is then unstable on that
   measure, and it is looked into before anything is claimed.
+
+![The three-run rule, read from the intervals. Each row is one gauge; each bar is one run's paired change of Omni-Compass against native with its 95% interval. GAIN or LOSS in all three of our runs: the same side in all three, every interval clear of zero. EVEN: at least one interval includes zero, no difference beyond the noise. The runs disagree: clear intervals on both sides, an unstable test to be looked into. Which side reads GAIN is set by what the gauge is for: for time waited, misses and failures a fall; for work done a rise; for a resource spent a fall is a cut and a rise is power given, never a loss.](book/figures/readings.svg)
 
 The tables are made by rule, never by hand (`tools/confirm_abc.py` for the paired
 Kubernetes and Azure tests, `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`,
@@ -3825,54 +3846,107 @@ any one of the three can tell whether the files in front of them are the files t
 
 ## Appendix C - The Equations in Full
 
-    (1) dE/dt    = -alpha_E E + beta_int + beta_ext + v_eff
-    (2) dU/dt    = mu U (1 - U^2) - (dE/dt)/E_max - lambda_U U + u,   |u| <= U_AUTHORITY = 25
-    (3) dI_U/dt  = (1 - U) - sigma_1 E - delta S - lambda_I I_U
-    (4) v_eff    = cos(omega_B t / 2) * c * tanh(lambda_0 + lambda_1 (U - 0.5) + lambda_2 S)
-    (5) Phi(S)   = alpha_s S^2 / 2 + beta_s S^3 / 4 - delta S
-    (6) dS/dt    = -dPhi/dS = delta - alpha_s S - (3/4) beta_s S^2
-    (7) dB/dt    = B_dot ;  dB_dot/dt = gamma_c delta S - (omega_B / Q_B) B_dot - omega_B^2 B
-    (8) R_B[n]   = finite-difference audit of (7); never fed back into the state
+    (1) dE/dt     = −α[E] E + β[int] + β[ext] + v[eff]
+    (2) dU/dt     = μ U (1 − U²) − (dE/dt)/E[max] − λ[U] U + u,
+                    |u| ≤ U_AUTHORITY = 25
+    (3) dI[U]/dt  = (1 − U) − σ₁ E − δ S − λ[I] I[U]
+    (4) v[eff]    = cos(ω[B] t / 2) · c · tanh(λ₀ + λ₁ (U − 0.5) + λ₂ S)
+    (5) Φ(S)      = αₛ S² / 2 + βₛ S³ / 4 − δ S
+    (6) dS/dt     = −dΦ/dS = δ − αₛ S − (3/4) βₛ S²
+    (7) dB/dt     = Ḃ ;  dḂ/dt = γ[c] δ S − (ω[B] / Q[B]) Ḃ − ω[B]² B
+    (8) R[B]      = finite-difference audit of (7) at every step;
+                    never fed back into the state
 
     Control (one micro step, zero-order hold across all four RK4 stages):
-        u = clip(-f_U(x, t) + K_P (sigma - U), -U_AUTHORITY, +U_AUTHORITY),  K_P = 12,  sigma in {-1, +1}
+        u = clip(−f[U](x, t) + K[P] (σ − U), −U_AUTHORITY, +U_AUTHORITY)
+        K[P] = 12,  σ ∈ {−1, +1}
 
     The compass (every muscle):
-        p = position of the service reading in its band (0 calm, 1 the line)
-        F = A tanh((K_P (p - center) + K_D v) / A),   K_D >= critical damping
-        p >= 0.95  =>  full up force; down side held
-        knob <- clip(knob + g_side F span, cover)
+        p = position of the service reading in its band
+            (0 calm, 1 the line)
+        F = A tanh((K[P] (p − center) + K[D] v) / A)
+        K[D] ≥ critical damping
+        p ≥ 0.95  ⇒  full up force; down side held
+        knob ← clip(knob + g[side] F span, cover)
 
-    The GPU governor (two wires, omni_controller/gpu_compass.py; one law, amendments 8 to 10):
-        p = (mean response of the last 5 s - S) / (SLO - S),  S = SLO / 10;  p95 >= SLO, a failure, blind  =>  fail up
-        fail up / race (utilization >= 0.95)  =>  ceiling = top clock, lid = start limit (the card's own settings)
-        steady under the limit (saturated and drawing >= 0.97 of the limit)  =>  ceiling = the card's own busy clock,
-            lid = start limit (the same watts, no knock-backs)
+    The GPU governor (two wires, omni_controller/gpu_compass.py;
+    one law, amendments 8 to 10):
+        p = (mean response of the last 5 s − S) / (SLO − S),  S = SLO / 10
+        p95 ≥ SLO, a failure, blind  ⇒  fail up
+        fail up / race (utilization ≥ 0.95)
+            ⇒  ceiling = top clock, lid = start limit
+               (the card's own settings)
+        steady under the limit (saturated, drawing ≥ 0.97 of the limit)
+            ⇒  ceiling = the card's own busy clock, lid = start limit
+               (the same watts, no knock-backs)
         otherwise:
-            ceiling <- clip(ceiling + round(g_side F f_top / 15 MHz) 15 MHz, c_floor, f_top)
-            c_floor = max(f_busy_own x floor, f_top - k* 15 MHz)       (never under the card's own busy clock,
-                                                                         never past the verdict's deepest step k*)
-            lid = clip(ceil(1.10 P_busy_own), envelope floor, start limit)
-        g_up 0.10, g_down 0.0125, center 0.4, floor 1.00
+            step = round(g[side] F f[top] / 15 MHz) · 15 MHz
+            ceiling ← clip(ceiling + step, c[floor], f[top])
+            c[floor] = max(f[busy,own] × floor, f[top] − k* 15 MHz)
+                       (never under the card's own busy clock, never past
+                        the verdict's deepest step k*)
+            lid = clip(ceil(1.10 P[busy,own]), envelope floor,
+                       start limit)
+        g[up] 0.10, g[down] 0.0125, center 0.4, floor 1.00
 
-    The verdict (omnicompass/verdict.py; every slow knob, the GPU ceiling and the Kubernetes machine count):
-        reference r = the median cost per request at the deepest allowed step, measured fresh, n >= 30 requests
-        trial t     = the median cost at one step past it, n >= 30 requests, under the same traffic
-        allow the step  iff  t <= r (1 + a)  and  t <= c_native (1 + a),   a = 0.02
-        a refused step is not tried again for R decisions (GPU R = 900; Kubernetes 120); the knob never goes past the
-        deepest allowed step, so steps cannot add up beyond the allowance
+    The verdict (omnicompass/verdict.py; every slow knob, the GPU ceiling
+    and the Kubernetes machine count):
+        reference r = the median cost per request at the deepest allowed
+                      step, measured fresh, n ≥ 30 requests
+        trial t     = the median cost at one step past it,
+                      n ≥ 30 requests, under the same traffic
+        allow the step  iff  t ≤ r (1 + a)  and  t ≤ c[native] (1 + a),
+                             a = 0.02
+        a refused step is not tried again for R decisions (GPU R = 900;
+        Kubernetes 120); the knob never goes past the deepest allowed
+        step, so steps cannot add up beyond the allowance
 
-    Kubernetes, the compass on the HPA target (omni_controller/controller.py; sets 30 and 31):
-        target x in [0.6 x_op, x_op] (times the conveyed gain); the up force lowers x (more pods)
-        p >= 0.95 from load (line breached, every sense live, nothing pending)  =>  x = 0.6 x_op at once
-        p >= 0.95 from a blind sense or pods waiting for a lost machine           =>  x = x_op (native's own)
-        fault over (p < center, line clean, nothing pending)                      =>  x = x_op at once, never held
-        machines: one more at once past the wall; one back only when the verdict and the release gate agree
-        g_up 0.10, g_down 0.02, release force < -0.2
+    Kubernetes, the compass on the HPA target
+    (omni_controller/controller.py; sets 30 and 31):
+        target x ∈ [0.6 x[op], x[op]] (times the conveyed gain);
+        the up force lowers x (more pods)
+        p ≥ 0.95 from load (line breached, every sense live, nothing
+        pending)  ⇒  x = 0.6 x[op] at once
+        p ≥ 0.95 from a blind sense or pods waiting for a lost machine
+            ⇒  x = x[op] (native's own)
+        fault over (p < center, line clean, nothing pending)
+            ⇒  x = x[op] at once, never held
+        machines: one more at once past the wall; one back only when the
+        verdict and the release gate agree
+        g[up] 0.10, g[down] 0.02, release force < −0.2
 
     The productivity arithmetic (every receipt; manual section 3.4):
-        work W equal in both arms;  G = C_native / C_omni - 1;  the same work needs 1/(1 + G) of the resources;
-        saving S = G / (1 + G):  G = 1/3  <=>  S = 1/4
+        work W equal in both arms;  G = C[native] / C[omni] − 1;
+        the same work needs 1/(1 + G) of the resources;
+        saving S = G / (1 + G):  G = 1/3  ⇔  S = 1/4
+
+**The symbols, and their names in the code.** The equations are written in the symbols above; the source
+(`omnicompass/core.py`, `omnicompass/adapter.py`, printed in Appendix H) spells each one out, and an engineer reading the two
+side by side needs the correspondence once. The values are those the live controllers run (`STACK_PARAMS` in
+`omnicompass/adapter.py`); the pressures and the drive are computed from the nine observations every decision and have no
+fixed value.
+
+| Symbol | In the code | What it is | Value in the live controllers |
+|---|---|---|---|
+| α[E] | `alpha_E` | the deviation's drain rate | 3.487 |
+| β[int], β[ext] | `beta_int`, `beta_ext` | the internal and the external pressure on the deviation | computed each decision |
+| v[eff], c | `v_eff`, `c` | the bounded drive and its bound | c = 1.0 |
+| λ₀, λ₁, λ₂ | `lambda_0`, `lambda_1`, `lambda_2` | the drive's offset and its weights on the alignment and the stress | −0.40, 1.55, 1.15 |
+| μ | `mu` | the depth of the alignment's double well | 3.782 |
+| E[max] | `E_max` | the deviation scale in the alignment's equation | 2.0 |
+| λ[U] | `lambda_U` | the alignment's own damping | 0.0 |
+| σ₁ | `sigma_1` | the deviation's weight in the memory | 0.38 |
+| δ | `delta` | the stress's drive (the engine's own default is 0.5) | 0.705 |
+| λ[I] | `lambda_I` | the memory's leak | 0.719 |
+| αₛ, βₛ | `alpha_s`, `beta_s` | the coefficients of the cubic potential Φ(S) | 0.12, 0.10 |
+| γ[c] | `gamma_c` | the stress's drive on the bath | 1.0 |
+| ω[B], Q[B] | `omega_B`, `Q_B` | the bath's natural frequency and quality | 1.0, 2.5 |
+| Ḃ | `B_dot` | the bath's rate, the engine's only second-order element | state |
+| R[B] | `R_B` | the finite-difference audit of the bath, never fed back | recorded |
+| K[P] | `KP` | the control law's gain | 12 |
+| u, U_AUTHORITY | `u`, `U_AUTHORITY` | the command and its authority | ±25 |
+| σ | the target pole | +1 (healthy) or −1 (failed), the nearer basin by default | ±1 |
+| f[U] | computed inside `control_command` | the drift of U with the command at zero | computed each micro step |
 
 Parameter ranges, defaults and the proof of convergence: `omnicompass/core.py`, `docs/TRACKING_THEOREM.md`,
 `docs/CANONICAL_ENGINE.md`.

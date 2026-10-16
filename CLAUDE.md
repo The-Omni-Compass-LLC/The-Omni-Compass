@@ -210,10 +210,17 @@ the founder overrides one in the conversation.
     everything and all, for whoever owns or licenses Omni-Compass and so must know the whole mechanism: the philosophy and
     theory (`docs/book/THEORY.md`, `docs/book/DECLARATION.md`), the mathematics, the mechanism, how it is built, the
     engine's source, every result, and the wiring. Every fix realigns both.
-- **The manual carries no illustrations and no blank pages.** None of the founder's plates (his illustration images) go
-  in the manual: no cover art, no title-page rose, no plates, no List of Plates; no charts either. Every chapter starts on
-  the next page; a part's heading sits at the top of a page with its first chapter under it. The contents and page numbers
-  are rebuilt from the book itself (`docs/book/build_book.py`). The plates stay in `docs/book/plates/` as his property.
+- **The manuals carry drawn figures, no plates and no blank pages** (the founder's orders of 14 October and of 16 October,
+  night: "flow charts, illustrations to interpret the language of mathematics, build it in the manuals"). The figures are
+  drawn by `docs/book/figures.py` from the book's own code and the engine's own numbers (the two-way plug, the compass band
+  and the two forces, one decision of the governor, the eight levels, the one pedal, the seven organisms, the three-run rule;
+  in the Owner's Manual also the engine's six states and the double well), placed where a manual carries an image line
+  pointing at `book/figures/<key>.svg`, numbered, captioned, listed in a List of Figures after the Contents, and written
+  as SVG files in `docs/book/figures/` for the pages on GitHub; every label in them is 11 pt. None of the founder's plates
+  (his illustration images) go in: no cover art, no title-page rose, no plates, no List of Plates; no chart of a result
+  either. Every chapter starts on the next page; a part's heading sits at the top of a page with its first chapter under
+  it. The contents and page numbers are rebuilt from the book itself (`docs/book/build_book.py`). The plates stay in
+  `docs/book/plates/` as his property.
 - **Every fix realigns everything, on every push.** When code changes or a bug is fixed, everything that describes it is
   brought up to it in the same push: the manual and its PDF, the README, the index, the tables, the plans and the
   standing pages. Then the newest-engine material is scanned top to bottom for the retired words and the old ways

@@ -12,8 +12,11 @@ check Omni-Compass, with the muscle catalog and the license papers and nothing o
 with everything: the theory and the declaration in docs/book/, the full manual, the repository's documents, the muscle
 catalog and the engine's source. Each in the order set in its outline below. US Letter, mirrored margins for binding,
 running heads, roman numerals in the front matter, a contents with page
-numbers and PDF bookmarks. No illustrations and no blank pages (the founder's order of 14 October): every chapter
-starts on the next page. Type (the founder's prompt rules): body text, tables, lists and code at 11 pt on a 1.5 line
+numbers and PDF bookmarks, and a List of Figures. The figures (the founder's order of 16 October, night: flow charts and
+illustrations that interpret the language of the mathematics) are drawn by docs/book/figures.py from the book's own
+code, placed where a manual carries a `![caption](book/figures/KEY.svg)` line, numbered and captioned; none of the
+founder's plates go in, and no blank pages (the founder's order of 14 October): every chapter starts on the next page.
+Type (the founder's prompt rules): body text, tables, lists, code and every label in a figure at 11 pt on a 1.5 line
 height, headings scaled up from it; only the running heads and footers are smaller, at 8 pt.
 
     python3 docs/book/build_book.py            # the Operator's Manual
@@ -35,8 +38,8 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont as RLFont
-from reportlab.platypus import (BaseDocTemplate, CondPageBreak, Flowable, Frame, PageBreak, PageTemplate, Paragraph,
-                                Preformatted, Spacer, Table, TableStyle)
+from reportlab.platypus import (BaseDocTemplate, CondPageBreak, Flowable, Frame, KeepTogether, PageBreak, PageTemplate,
+                                Paragraph, Spacer, Table, TableStyle, XPreformatted)
 from reportlab.platypus.tableofcontents import SimpleIndex, TableOfContents
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -85,6 +88,7 @@ pdfmetrics.registerFontFamily("Mono", normal="Mono", bold="Mono-Bold", italic="M
 SERIF_CMAP = set(TTFont(LIB + "LiberationSerif-Regular.ttf").getBestCmap())
 MONO_CMAP = set(TTFont(DJV + "DejaVuSansMono.ttf").getBestCmap())
 SYM_CMAP = set(TTFont(DJV + "DejaVuSans.ttf").getBestCmap())
+from docs.book import figures as FIG  # noqa: E402  (the figures, drawn from the code; after the fonts they are set in)
 
 # ---------------------------------------------------------------- page and styles
 PW, PH = letter
@@ -114,6 +118,9 @@ TOC2 = ParagraphStyle("toc2", fontName="Serif", fontSize=PT, leading=LEAD, leftI
 TOC3 = ParagraphStyle("toc3", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=36, textColor=GREY)
 # the index at the back of the book (a monograph's): every entry at the body size, page numbers on the right
 INDEX = SimpleIndex(style=ParagraphStyle("ix", fontName="Serif", fontSize=PT, leading=LEAD), dot=" . ", headers=True)
+# a figure's caption under its drawing ("Figure N." in bold), and the List of Figures after the Contents, both at the body size
+FIGCAP = ParagraphStyle("figcap", parent=BODY, alignment=TA_LEFT, spaceBefore=5, spaceAfter=12)
+LOF = ParagraphStyle("lof", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=0)
 CODE_WIDTH = 70                     # characters of 11 pt mono that fit the frame inside a code block's padding
 
 # ---------------------------------------------------------------- text cleaning
@@ -322,6 +329,19 @@ class Heading(Paragraph):
         self.level, self.toc_text, self.kind = level, toc_text or re.sub(r"<[^>]+>", "", text), kind
 
 
+FIG_NO = [0]
+IMAGE_LINE = re.compile(r"^!\[((?:[^\[\]]|\[[^\[\]]*\])*)\]\(([^()\s]+)\)\s*$")   # a caption may carry I[U] or K[P]
+FIGURE_PATH = re.compile(r"^(?:docs/)?book/figures/([a-z_]+)\.svg$")
+
+
+def figure(key, caption):
+    """A drawn figure with its numbered caption, kept on one page; a marker tells the document to list it."""
+    FIG_NO[0] += 1
+    n = FIG_NO[0]
+    cap = Paragraph(f"<b>Figure {n}.</b> " + inline(caption), FIGCAP)
+    return [KeepTogether([Spacer(1, 8), Marker("figure", number=n, title=FIG.FIGURES[key]), FIG.drawing(key, FW), cap])]
+
+
 class GoldRule(Flowable):
     def __init__(self, width=FW, thick=1.2, space=10):
         super().__init__(); self.width, self.thick, self.space = width, thick, space
@@ -379,7 +399,7 @@ def code_block(lines, style=CODE, width=CODE_WIDTH):
     for k in range(0, max(1, len(lines)), per):
         txt = "\n".join(lines[k:k + per])
         txt = glyphs(txt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"), MONO_CMAP)
-        t = Table([[Preformatted(txt, style)]], colWidths=[FW])
+        t = Table([[XPreformatted(txt, style)]], colWidths=[FW])    # XPreformatted reads the entities and the font tags
         t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f3f3f1")),
                                ("LINEBEFORE", (0, 0), (0, -1), 2, RULE),
                                ("LEFTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 4),
@@ -409,7 +429,11 @@ def md_flow(lines, shift=0, story=None, strip=False):
             while buf and not buf[-1].strip():
                 buf.pop()
             story += code_block(buf); story.append(Spacer(1, 6)); continue
-        if re.match(r"^!\[([^\]]*)\]\(([^)]+)\)\s*$", ln):    # no images in the book (14 October)
+        m = IMAGE_LINE.match(ln)
+        if m:                                               # a figure drawn from the code is in the book; a plate is not
+            fig = FIGURE_PATH.match(m.group(2))
+            if fig and fig.group(1) in FIG.FIGURES:
+                story += figure(fig.group(1), m.group(1))
             i += 1; continue
         if ln.startswith("|"):
             rows = []
@@ -888,6 +912,10 @@ class Book(BaseDocTemplate):
                 self.chapter = f.kw["title"]
                 if f.kw.get("opener"):
                     self.no_head.add(self.page)
+            elif f.kind == "figure":
+                key = f"fig{f.kw['number']}"
+                self.canv.bookmarkPage(key)
+                self.notify("LOFEntry", (0, f"Figure {f.kw['number']}. {f.kw['title']}", self.page, key))
             return
         if isinstance(f, Heading):
             if f.level == 3:
@@ -1064,11 +1092,18 @@ def preface_lines():
 
 
 def build():
+    FIG.write_svgs()                      # the same drawings, as files, for the pages on GitHub
+    FIG_NO[0] = 0
     doc = Book(OUT_PDF)
     story = front_matter(doc)
-    # contents
+    # contents, then the list of figures
     toc = TableOfContents(levelStyles=[TOC1, TOC2, TOC3], dotsMinLevel=1, formatter=doc.toc_label)
     story += new_page() + [Marker("nohead"), Spacer(1, 0.5 * inch), Paragraph("Contents", H1), GoldRule(FW, 1.2, 16), toc]
+    lof = TableOfContents(levelStyles=[LOF], dotsMinLevel=0, formatter=doc.toc_label, notifyKind="LOFEntry")
+    story += new_page() + [Marker("nohead"), Spacer(1, 0.5 * inch), Paragraph("List of Figures", H1), GoldRule(FW, 1.2, 16),
+                           Paragraph(inline("Every figure is drawn from the code it pictures (`docs/book/figures.py`) and "
+                                            "printed where the text first needs it; the same drawings stand beside the "
+                                            "text on GitHub, in `docs/book/figures/`."), BODY), Spacer(1, 6), lof]
     # the front matter, in full chapters, before a word about wiring (the founder's order of 14 October): the foreword,
     # the preface, the prelude and the introduction, then the key, what a hooked-up system looks like and the card
     story += front_chapter(doc, "Foreword", MAN["Foreword"])
@@ -1139,8 +1174,18 @@ def build():
 
 
 def md_text(src):
-    """The book's one-file text for a chapter, without images (14 October)."""
-    return [ln for ln in _md_text(src) if not re.match(r"^!\[[^\]]*\]\([^)]+\)\s*$", ln)]
+    """The book's one-file text for a chapter: a figure line points to its drawing beside the text (docs/book/figures/),
+    and any other image (a plate) is left out (14 October)."""
+    out = []
+    for ln in _md_text(src):
+        m = IMAGE_LINE.match(ln)
+        if m:
+            fig = FIGURE_PATH.match(m.group(2))
+            if fig and fig.group(1) in FIG.FIGURES:
+                out.append(f"![{m.group(1)}](figures/{fig.group(1)}.svg)")
+            continue
+        out.append(ln)
+    return out
 
 
 def _md_text(src):

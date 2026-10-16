@@ -19,30 +19,30 @@ hashes are checked by `verify.py`.
 ## 2. The equations (omnicompass/core.py, lines 5-12)
 
 ```
-(1) dE/dt    = -alpha_E E + beta_int + beta_ext + v_eff
-(2) dU/dt    = mu U (1 - U^2) - (dE/dt)/E_max - lambda_U U + u,          |u| <= 25
-(3) dI_U/dt  = (1 - U) - sigma_1 E - delta S - lambda_I I_U
-(4) v_eff    = cos(omega_B t / 2) * c * tanh(lambda_0 + lambda_1 (U - 0.5) + lambda_2 S)
-(5) Phi(S)   = alpha_s S^2 / 2 + beta_s S^3 / 4 - delta S
-(6) dS/dt    = -dPhi/dS = delta - alpha_s S - (3/4) beta_s S^2
-(7) dB/dt    = B_dot ;   dB_dot/dt = gamma_c delta S - (omega_B / Q_B) B_dot - omega_B^2 B
-(8) R_B[n]   = finite-difference audit of (7), never fed back
+(1) dE/dt     = −α[E] E + β[int] + β[ext] + v[eff]
+(2) dU/dt     = μ U (1 − U²) − (dE/dt)/E[max] − λ[U] U + u,          |u| ≤ 25
+(3) dI[U]/dt  = (1 − U) − σ₁ E − δ S − λ[I] I[U]
+(4) v[eff]    = cos(ω[B] t / 2) · c · tanh(λ₀ + λ₁ (U − 0.5) + λ₂ S)
+(5) Φ(S)      = αₛ S² / 2 + βₛ S³ / 4 − δ S
+(6) dS/dt     = −dΦ/dS = δ − αₛ S − (3/4) βₛ S²
+(7) dB/dt     = Ḃ ;   dḂ/dt = γ[c] δ S − (ω[B] / Q[B]) Ḃ − ω[B]² B
+(8) R[B]      = finite-difference audit of (7) at every step, never fed back
 ```
 
 Each term does one job:
 
-- **(1) Energy.** Energy decays at rate alpha_E = 3.487. It is driven by two forcings: internal pressure `beta_int` (queue and
-  overload) and external pressure `beta_ext` (power, heat, network, staleness, security). The drive term `v_eff` (4) is
+- **(1) Energy.** Energy decays at rate α[E] = 3.487. It is driven by two forcings: internal pressure `β[int]` (queue and
+  overload) and external pressure `β[ext]` (power, heat, network, staleness, security). The drive term `v[eff]` (4) is
   bounded by `c` through the hyperbolic tangent, so no input can drive E without limit. This is the saturation (the tanh
   "speed limit"): however extreme the observation, the engine's response rate is capped at c = 1.
-- **(2) Order.** `mu U (1 - U^2)` is a double-well (bistable) drift with two stable basins, U = +1 (healthy) and
+- **(2) Order.** `μ U (1 − U²)` is a double-well (bistable) drift with two stable basins, U = +1 (healthy) and
   U = -1 (failed), and an unstable ridge at U = 0. A rise in energy (`dE/dt`) pushes U out of the healthy basin. `u` is
   the bounded control input.
 - **(3) Integrated need.** I[U] grows while U is below 1 (the system is not settled). It is reduced by energy and stress
-  already being dealt with, and it leaks at lambda_I = 0.719. It is the engine's memory of unrelieved pressure.
+  already being dealt with, and it leaks at λ[I] = 0.719. It is the engine's memory of unrelieved pressure.
 - **(5)-(6) Stress.** A cubic potential (the "well in the basin"). S rolls downhill to its stable root. This is the
   slowest restoring force.
-- **(7) Bath.** A damped harmonic oscillator (natural frequency omega_B = 1, quality Q[B] = 2.5) driven by stress. It turns
+- **(7) Bath.** A damped harmonic oscillator (natural frequency ω[B] = 1, quality Q[B] = 2.5) driven by stress. It turns
   stress into a smooth, lagged "tide". It is the only second-order element.
 - **(8) Audit.** The bath equation is re-checked numerically every step. The check is never fed back.
 
@@ -55,28 +55,28 @@ Each decision the telemetry is normalised to nine observations: q (queue), load,
 security, conflict. An observed state is computed from them:
 
 ```
-E_obs   = 0.25 q + 0.18 max(0, load - 0.85) + 0.16 power + 0.13 thermal + 0.10 network + 0.08 drift + 0.06 conflict + 0.04 stale
-U_obs   = 1 - (0.27 q + 0.18 power + 0.16 thermal + 0.12 network + 0.12 drift + 0.10 conflict + 0.05 stale)
-S_obs   = 0.36 thermal + 0.28 power + 0.18 network + 0.10 security + 0.08 stale - 0.20 q
-B_obs   = 0.52 power + 0.26 thermal + 0.22 drift
-I_obs   = q + drift + conflict
-beta_int = 0.58 q + 0.42 max(0, load - 0.75)        beta_ext = 0.33 power + 0.27 thermal + 0.20 network + 0.12 stale + 0.08 security
+E[obs]   = 0.25 q + 0.18 max(0, load − 0.85) + 0.16 power + 0.13 thermal + 0.10 network + 0.08 drift + 0.06 conflict + 0.04 stale
+U[obs]   = 1 − (0.27 q + 0.18 power + 0.16 thermal + 0.12 network + 0.12 drift + 0.10 conflict + 0.05 stale)
+S[obs]   = 0.36 thermal + 0.28 power + 0.18 network + 0.10 security + 0.08 stale − 0.20 q
+B[obs]   = 0.52 power + 0.26 thermal + 0.22 drift
+I[obs]   = q + drift + conflict
+β[int] = 0.58 q + 0.42 max(0, load − 0.75)        β[ext] = 0.33 power + 0.27 thermal + 0.20 network + 0.12 stale + 0.08 security
 ```
 
-The state is blended toward the observed state with weight a = 0.339: `x <- (1 - a) x + a x_obs`. It is then evolved
+The state is blended toward the observed state with weight a = 0.339: `x ← (1 − a) x + a x[obs]`. It is then evolved
 by one macro step (0.1 engine time units) of equations (1)-(7).
 
 ## 4. From state to action (the allocation law, `Governor.step`)
 
 ```
-push     = u(x) / 25,  u(x) = clip(-f_U(x) + 12 (1 - U), -25, 25)        equation (2)'s controller, evaluated, not applied
-rho*     = clamp(rho0 - kI I_U - kE E, rho_min, rho0)                      target utilisation (the HPA target)
-n_req    = ceil(n load / rho*) + ceil(kq q n)                               machines wanted
-release  only while push <= push_release (the engine reports convergence), after band and dwell
-cap      = clamp(cap_now load (1 + margin), cap_min, 1) when calm and U >= U_gate; 1 under backlog;
-           always <= 1 - cap_gain max(0, B - B_cap)                         the bath limits the power cap
-change   permitted only while U >= U_gate and no security block
-rollback authorised if S >= S_rollback, U is falling, or a security block is seen
+push     = u(x) / 25,  u(x) = clip(−f[U](x) + 12 (1 − U), −25, 25)        equation (2)'s controller, evaluated, not applied
+ρ*     = clamp(ρ₀ − k[I] I[U] − k[E] E, ρ[min], ρ₀)                      target utilisation (the HPA target)
+n[req]    = ceil(n load / ρ*) + ceil(k[q] q n)                               machines wanted
+release  only while push ≤ push_release (the engine reports convergence), after band and dwell
+cap      = clamp(cap_now load (1 + margin), cap_min, 1) when calm and U ≥ U[gate]; 1 under backlog;
+           always ≤ 1 − cap_gain max(0, B − B[cap])                         the bath limits the power cap
+change   permitted only while U ≥ U[gate] and no security block
+rollback authorised if S ≥ S[rollback], U is falling, or a security block is seen
 ```
 
 ## 5. Which equation drives which muscle

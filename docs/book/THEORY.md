@@ -289,15 +289,15 @@ Each state of the engine was checked against the closed-circle conditions:
 
 | State | Closed? | Why |
 |---|---|---|
-| E, deviation | closed | it drains at rate alpha_E while its inputs are bounded (the drive is capped by tanh) |
-| U, alignment | closed | the cubic term mu U (1 - U^2) pushes back hard from far out |
-| I[U], memory | closed | it forgets at rate lambda_I |
-| B, the bath | closed | the friction omega_B / Q[B] settles it |
-| S, the basin | closed on the positive side; open on the negative side below an unstable ridge | Phi(S) carries a cubic term, so the landscape falls away below the ridge (at S = -3.5 with the default parameters) |
+| E, deviation | closed | it drains at rate α[E] while its inputs are bounded (the drive is capped by tanh) |
+| U, alignment | closed | the cubic term μ U (1 − U²) pushes back hard from far out |
+| I[U], memory | closed | it forgets at rate λ[I] |
+| B, the bath | closed | the friction ω[B] / Q[B] settles it |
+| S, the basin | closed on the positive side; open on the negative side below an unstable ridge | Φ(S) carries a cubic term, so the landscape falls away below the ridge (at S = −3.5 with the default parameters) |
 
 Three openings were found and each has its closure:
 
-1. **The basin's negative side.** A quartic term in Phi(S) would give the compass a wall on both sides. This changes the
+1. **The basin's negative side.** A quartic term in Φ(S) would give the compass a wall on both sides. This changes the
    frozen engine and is a new version with its own proof.
 2. **The outer loop.** The frozen live governor computes the push and pull u and uses it as a convergence signal; it
    does not send u to a lever. The compass closes this loop: reading, force, plug, lever, read-back. On the modelled card

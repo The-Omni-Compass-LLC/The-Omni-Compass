@@ -205,7 +205,10 @@ record by record (every record of the governor, of the other muscles and of the 
 side, every input of the paired run from GitHub, and the papers counsel asks for (the license, the licensing answers, the
 third-party notices, the Enterprise License's standard terms, the patents and trademarks, the security policy). Since 16
 October it also states the rules of the engine that stands as an operator meets them (section 5.5) and how a new muscle is
-coded on the muscle SDK (section 4.7). It is 496 pages, with an index; the Owner's, which prints the engine's whole source, is 1,354. Its text is
+coded on the muscle SDK (section 4.7). It is 505 pages, with seven figures drawn from the code (the plug, the band and the two
+forces, one decision of the governor, the eight levels, the one pedal, the seven organisms, the three-run rule; `docs/book/figures/`)
+and an index; the Owner's, which prints the engine's whole source and adds the engine's six states and its two landscapes as
+figures, is 1,365. Its text is
 [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md); the cloud install files are `deploy/install/`
 (`omni-compass.yaml`, `rbac-machines.yaml`, `omni-compass-cloud.yaml`) and `deploy/Dockerfile.cloud`. It is written for the CTO who decides, the
 engineer who wires and the operator who runs it; the published results are on this page and in `results/`.

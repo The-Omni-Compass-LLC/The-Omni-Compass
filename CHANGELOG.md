@@ -2,6 +2,23 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-16 (night, the figures and the mathematics)
+
+- **Both books carry figures drawn from the code** (the founder's order of 16 October, night: flow charts and illustrations
+  that interpret the language of the mathematics, built into the manuals). `docs/book/figures.py` draws them from the law's
+  and the engine's own numbers: the two-way plug; the compass band, its cushions and the force F = A·tanh(r/A) against a plain
+  spring; one decision of the governor from the senses to the audit; the eight levels; the one pedal with cruise, watching,
+  reset, off and the kill switch apart; the seven organisms on the spine; the three-run rule read from the intervals; and,
+  in the Owner's Manual, the engine's six states with their couplings and the control law, and the two landscapes (the
+  alignment's double well and the stress's cubic potential, its root and ridge computed from the defaults). Each stands
+  where the text first needs it, numbered and captioned, with a List of Figures after the Contents; the same drawings are
+  SVG files in `docs/book/figures/` beside the text on GitHub. Every label is 11 pt. None of the founder's plates go in.
+- **The mathematics in its own symbols.** Every equation the Owner's Manual binds (chapter 4, Appendix C,
+  `docs/CANONICAL_ENGINE.md`, `docs/TRACKING_THEOREM.md`, `docs/MECHANISM_OF_ACTION.md`, the closure table of the theory)
+  now reads in Unicode: α[E], β[int], β[ext], v[eff], μ, λ[U], σ₁, δ, λ[I], ω[B], Q[B], γ[c], αₛ, βₛ, Φ(S), Ḃ, d²B/dt², K[P],
+  f[U], F[D], ε[h], eₖ₊₁, ρᵏ, with ≤, ≥, −, ·, ←, ⇒, ∈ and ∫ in place of their typed stand-ins; Appendix C adds the table of
+  every symbol against its name in the source and its value in the live controllers.
+
 ## 2026-10-16 (night, the index and the room)
 
 - **Both books carry an index** (`docs/book/build_book.py`): every glossary term where the book defines or discusses it, every

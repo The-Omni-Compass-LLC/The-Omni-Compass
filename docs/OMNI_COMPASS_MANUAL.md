@@ -225,7 +225,8 @@ it lives, and never repeats it.
 
 The two books share their front matter (the key, the notice, the foreword, the prefaces, the quick reference), their
 vocabulary (one glossary), their structure (parts, chapters, numbered sections, appendices, a table of contents rebuilt
-from the book itself at every edition, and an index of every term, muscle family, file and setting with its pages) and their reading
+from the book itself at every edition, a list of figures, each figure drawn from the code it pictures, and an index of every term,
+muscle family, file and setting with its pages) and their reading
 rule: **the order of the chapters is the order of understanding and
 of implementing.** Nobody can wire what they have not understood, so each book is read from the front: what Omni-Compass is;
 the stack as one body; the plug and the rules its wires obey; the wiring, level by level and stack by stack; operating it;
@@ -694,6 +695,8 @@ seat. The vocabulary is used the same way everywhere in this manual:
 The floor of two machines is an operator's number; lifting off never takes a system below it, however far the pedal is
 lifted. There is no ceiling: every machine the operator has is usable, and the protection is the band inside each machine.
 
+![One pedal, no brake. Pushing the pedal adds capacity at once; lifting it eases capacity back toward native a step at a time, never below idle, the floor of two machines. Cruise holds every machine in service while a known queue waits. Watching reads and logs but writes nothing; reset hands every setting back to native and reads it back at the end of a run; off is native alone. The kill switch stands apart from all of these: for security only, in a human hand, instant. After a crash the lease walks every setting back to native on its own.](book/figures/pedal.svg)
+
 ### 1.4 Nothing is hardwired
 
 Omni-Compass carries no table of per-stack special cases, and an installation adds none. The few numbers the governor
@@ -794,6 +797,8 @@ stand on it:
 | 5. The four stacked, every duplicate kept | 1,908 | all four realms on one clock, the shared spine counted in each |
 | 6. The whole tower, every muscle once | 1,107 | every distinct muscle on one clock |
 
+![The seven organisms. The spine, the 267 muscles that sit in all four realms, is the base every stack runs on and an organism in its own right, listed first. The four realms stand on it; the four stacked count the spine once in each realm's body (1,908 muscles); the whole tower counts every distinct muscle once (1,107 in 70 families). Each organism runs native and with Omni-Compass on top of native.](book/figures/organisms.svg)
+
 **Building your own organism.** A real installation is rarely a whole realm. It is the muscles one company runs, wired in
 the order of chapter 6: the cluster first (its pods, then its machines), then the cards and the processors under it, then
 the databases, brokers and caches beside it, then the site under all of them. Three rules make the result one body
@@ -877,6 +882,8 @@ written down before the first counted run:
 | **The allowance** (`--allow`) | the most a step on trial may cost the muscle's own work | 2%, the same on every muscle |
 | **The site's limits** (`--site-limit-w`, `--cooling-min-c`, `--cooling-max-c`, `--cooling-restore-c`) | the facility's power limit and the setpoint band | the facility engineer, inside the equipment's ratings |
 
+![The compass band and the smoothing of the force. (a) The service reading placed in its band as a position p from 0, calm, to 1, the operator's line; the walls at 0.05 and 0.95 leave a cushion of 5% at each edge, and the centre c is where the needle comes to rest (0.5 by default; on a service 0.3 at the max and 0.4 at the tune-down). (b) The force F = A·tanh(r/A) against the raw force r = K[P]·(p − c) + K[D]·v, the pull toward the centre plus the push against the reading's motion: near the centre a spring, far out a curve that flattens into the authority A and never passes it. Past the upper wall the up side goes to A at once, and the down side may not act until the reading is back inside the band.](book/figures/band.svg)
+
 Three settings are deliberately not on that list. The governor's decision period, its damping and how fast each muscle
 answers are the muscle's own declaration, read from the catalog or measured from the system at the start; an
 installation does not tune them (on a Kubernetes cluster the declared decision period is 60 seconds and the fast checks
@@ -940,6 +947,8 @@ new muscle is written to it:
    stops writing and leaves that value alone.
 5. **restore** - on stop, the knob returns to the snapshot (where Omni-Compass found it, not the last value it wrote).
    For muscles whose native controller moves the knob itself, restore hands control back.
+
+![The two-way plug. One wire out carries the governor's write, one value per decision, clipped to the knob's cover and read back from the device; one wire in carries the muscle's reading, placed in its band, and the knob as it stands. The snapshot taken at attach, before any write, is the restore point, and a knob found where the governor did not put it belongs to another writer and is left alone. The brain holds the mathematics; the plug holds nothing but the contract.](book/figures/plug.svg)
 
 ### 4.2 Adapters (one per standard plug)
 
@@ -1133,6 +1142,8 @@ The rules are asymmetric on purpose. Adding is cheap to undo and expensive to de
 security hold. Taking back is cheap to delay and expensive to get wrong, so it is gated three ways: by calm, by the service
 record (inside the line for the last three decisions, not merely this one), and by the release gate, whose reasons are
 written into the audit every time it holds.
+
+![One decision of the governor. It wakes on its period, reads every sense, and holds if any sense is blind or stale: nothing is given back, and adding capacity is still allowed. The engine blends its state toward the observations and moves one macro step; the compass law turns the reading's position into a force. A positive force adds capacity at once, gated by nothing but the security hold. A negative force must pass the release gate (calm, the line clean for three decisions, nothing pending, every sense live) and, on a slow knob, the verdict's paired trial at the 2% line. What survives is one write through the plug, read back, and one line in the audit that records every sense, the state, the force, the gate's reason and the value sent and taken, whether or not anything was written.](book/figures/loop.svg)
 
 "Two-way" is a statement about wiring, and it is checked, not assumed. Each muscle's plug carries exactly one sensory wire
 and one motor wire, and the wire check that must pass before any write (section 4.4) proves that the wires move: a value
@@ -1342,6 +1353,8 @@ and where the most care is spent. Level 4 hands Omni-Compass the replica decisio
 reflex upward; it is an option, not a step on the way, and it is not part of the factory tune. Levels 5 to 7 are
 the GPU, the CPU and the site, each with its own wire check and its own pass. An installation may stop at any level and
 run there indefinitely; most will stop at level 3.
+
+![The eight levels of an installation, taken in order, each with its pass condition. Levels 0 and 1 write nothing; from level 2 the governor writes, and the wire check must pass before any level that writes. An installation may stop at any level and run there indefinitely.](book/figures/levels.svg)
 
 **Level 0 - Evaluate without touching anything.**
 
@@ -2083,6 +2096,8 @@ row gets one of three readings, and all three runs are shown beside it:
   be told apart on that measure. That is the result, stated as such, with the count of runs it holds in.
 - **The runs disagree**: runs clear of the noise point different ways. The test itself is then unstable on that measure,
   and it is looked into before anything is claimed.
+
+![The three-run rule, read from the intervals. Each row is one gauge; each bar is one run's paired change of Omni-Compass against native with its 95% interval. GAIN or LOSS in all three of our runs: the same side in all three, every interval clear of zero. EVEN: at least one interval includes zero, no difference beyond the noise. The runs disagree: clear intervals on both sides, an unstable test to be looked into. Which side reads GAIN is set by what the gauge is for: for time waited, misses and failures a fall; for work done a rise; for a resource spent a fall is a cut and a rise is power given, never a loss.](book/figures/readings.svg)
 
 The three-run table is made by a tool, never by hand: `tools/confirm_abc.py` for the paired
 Kubernetes and cloud runs, with one sibling tool per kind of raw record for the other stacks (`pgbench_abc.py`,
