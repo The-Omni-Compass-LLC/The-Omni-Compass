@@ -54,10 +54,17 @@ class CpuLimitBudget:
 
     Never credit a decrease before the server reports it. Reserve successful increases locally
     so an eventually updated quota status cannot spend the same allowance twice in this pass.
-    Unknown status, scopes or read permissions leave the native CPU limit in place.
+    A quota whose status or scopes cannot be read as a number leaves the native CPU limit in place.
+
+    A namespace whose quotas cannot be read at all (the governor's role has no list permission, or the API refused) is
+    **no budget known**, not a zero budget: the raise proceeds as it did before the budget existed (omni-v6), and
+    Kubernetes' own admission, which refuses any write over a quota the governor cannot see, stays the authority; the
+    plug reads every write back and a refused one is audited and never advertised. The first v7 trial (Goldilocks, run
+    38825214203) read the unreadable quota as zero and so never raised a limit: 5 commands a run against v6's 15, the
+    host 4% busier against 40%, the response-time GAIN gone and the pod start wait a LOSS (docs/OMNI_V7.md, section 1).
     """
     def __init__(self, kube, audit):
-        self.kube, self.audit, self.namespaces = kube, audit, {}
+        self.kube, self.audit, self.namespaces, self.unreadable = kube, audit, {}, set()
 
     def _load(self, namespace):
         if namespace in self.namespaces:
@@ -78,9 +85,11 @@ class CpuLimitBudget:
                     remaining = Decimal(0)
                 budgets.append([quota, remaining])
         except Exception as error:
-            self.audit({'quota': 'CPU limit expansion blocked', 'namespace': namespace,
-                        'reason': f'quota read unavailable: {type(error).__name__}'})
-            budgets = None
+            if namespace not in self.unreadable:                    # said once a pass, not once a pod
+                self.audit({'quota': 'no budget known: the raise proceeds, Kubernetes admission is the authority',
+                            'namespace': namespace, 'reason': f'quota read unavailable: {type(error).__name__}'})
+            self.unreadable.add(namespace)
+            budgets = []
         self.namespaces[namespace] = budgets
         return budgets
 
@@ -91,15 +100,12 @@ class CpuLimitBudget:
         budgets = self._load(namespace)
         applicable = []
         allowance = desired - current
-        if budgets is None:
-            allowance = Decimal(0)
-        else:
-            for entry in budgets:
-                selected = matches(entry[0], pod)
-                if selected is False:
-                    continue
-                applicable.append(entry)
-                allowance = min(allowance, entry[1] if selected is True else Decimal(0))
+        for entry in budgets:                       # an unreadable namespace has no entries: the allowance stands
+            selected = matches(entry[0], pod)
+            if selected is False:
+                continue
+            applicable.append(entry)
+            allowance = min(allowance, entry[1] if selected is True else Decimal(0))
         permitted = int(current + allowance)
         if permitted < desired:
             self.audit({'quota': 'CPU limit expansion bounded', 'namespace': namespace,

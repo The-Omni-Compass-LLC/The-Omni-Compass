@@ -2,7 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Seeds 1 to 10, 1.0 day each where a day is run; the standing engine omni-v6 (main at b7b5f319a), the candidate omni-v7 (v7-candidate, digest 1a0d1d1b91bc49ad). Evidence class S, our own models: a reading here says whether a change shows promise before a real run, never what a benchmark found. Each candidate reading is paired by seed with the standing engine's (the mean change, its 95% interval over the seeds, the word by the gauge's aim: tools/readings.py).
+Seeds 1 to 10, 1.0 day each where a day is run; the standing engine omni-v6 (main at b7b5f319a), the candidate omni-v7 (v7-candidate, digest d6d467b824c585f1). Evidence class S, our own models: a reading here says whether a change shows promise before a real run, never what a benchmark found. Each candidate reading is paired by seed with the standing engine's (the mean change, its 95% interval over the seeds, the word by the gauge's aim: tools/readings.py).
+
+The convey toys were run on 16 October against the corrected candidate (digest d6d467b824c585f1; the quota read corrected, omni_controller/quota.py); the cluster and verdict toys were run on 15 October against the candidate as first pushed (digest 1a0d1d1b91bc49ad), whose cluster and verdict code is the same bytes. candidate_as_first_pushed holds the first candidate's reading on the unreadable quota, the fault the live trials found.
 
 ## cluster (a decision every 60 s)
 
@@ -54,6 +56,34 @@ Counts over all seeds: starts {'native': 270, 'base': 210, 'cand': 210}, starts_
 | +2% | 47% | 39% |
 | +3% | 40% | 28% |
 | +5% | 26% | 14% |
+
+## convey_unreadable_quota
+
+| Gauge | Native | Standing | Candidate | Candidate against standing | Standing against native | Candidate against native |
+|---|---:|---:|---:|---|---|---|
+| requests_served | 31423.739 | 51596.881 | 51596.881 | +0.00% EVEN (identical) | +64.20% GAIN | +64.20% GAIN |
+| start_wait_s | 9.793 | 10.652 | 10.652 | +0.00% EVEN (identical) | +8.78% LOSS | +8.78% LOSS |
+| start_wait_p95_s | 10.000 | 11.000 | 11.000 | +0.00% EVEN (identical) | +10.00% LOSS | +10.00% LOSS |
+| p95_ms | 228.935 | 107.420 | 107.420 | +0.00% EVEN (identical) | -53.08% GAIN | -53.08% GAIN |
+| alert_minutes | 0.000 | 0.000 | 0.000 | EVEN (identical) | EVEN (identical) | EVEN (identical) |
+| host_busy | 0.282 | 0.371 | 0.371 | +0.00% EVEN (identical) | +31.53% power given | +31.53% power given |
+| limit_given_m | 4137.292 | 11062.167 | 11062.167 | +0.00% EVEN (identical) | +167.38% power given | +167.38% power given |
+| pod_seconds | 29788.500 | 35179.500 | 35179.500 | +0.00% EVEN (identical) | +18.10% power given | +18.10% power given |
+
+Counts over all seeds: starts {'native': 270, 'base': 210, 'cand': 210}, starts_past_75 {'native': 0, 'base': 0, 'cand': 0}
+
+The candidate as first pushed (digest 1a0d1d1b91bc49ad), the reading that caught the fault:
+
+| Gauge | Native | Standing | Candidate as first pushed | Against standing | Against native |
+|---|---:|---:|---:|---|---|
+| requests_served | 31423.739 | 51596.881 | 31423.739 | -39.10% LOSS | +0.00% EVEN (identical) |
+| start_wait_s | 9.793 | 10.652 | 9.793 | -8.07% GAIN | +0.00% EVEN (identical) |
+| start_wait_p95_s | 10.000 | 11.000 | 10.000 | -9.09% GAIN | +0.00% EVEN (identical) |
+| p95_ms | 228.935 | 107.420 | 228.935 | +113.12% LOSS | +0.00% EVEN (identical) |
+| alert_minutes | 0.000 | 0.000 | 0.000 | EVEN (identical) | EVEN (identical) |
+| host_busy | 0.282 | 0.371 | 0.282 | -23.97% GAIN | +0.00% EVEN (identical) |
+| limit_given_m | 4137.292 | 11062.167 | 4137.292 | -62.60% GAIN | +0.00% EVEN (identical) |
+| pod_seconds | 29788.500 | 35179.500 | 29788.500 | -15.32% GAIN | +0.00% EVEN (identical) |
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 

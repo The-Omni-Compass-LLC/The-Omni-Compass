@@ -46,6 +46,17 @@ class ToyGate(unittest.TestCase):
             self.assertIn(g, nat); self.assertIn(g, omni)
         self.assertGreaterEqual(omni["limit_given_m"], nat["limit_given_m"])    # conveyance never lowers under native
 
+    def test_convey_toy_with_the_quota_unreadable_conveys_as_with_none(self):
+        """The governor's role cannot list quotas (every kind test): no budget is known and conveyance is what it is with no
+        quota at all. The first v7 trial (run 38825214203) read it as a zero budget and conveyed nothing; this toy now catches that."""
+        d = tempfile.mkdtemp()
+        none = captured(tg.worker_convey, "omni", 2, os.path.join(d, "a"), "none")
+        unread = captured(tg.worker_convey, "omni", 2, os.path.join(d, "b"), "unreadable")
+        self.assertEqual(unread["limit_given_m"], none["limit_given_m"])
+        self.assertEqual(unread["requests_served"], none["requests_served"])
+        nat = captured(tg.worker_convey, "native", 2, os.path.join(d, "n"))
+        self.assertGreater(unread["limit_given_m"], nat["limit_given_m"])        # something was conveyed
+
     def test_reading_follows_the_words_rule(self):
         self.assertEqual(tg.reading("machine_hours", [1.0, 1.1, 0.9, 1.2], [10.0] * 4)["word"], "power given")
         self.assertEqual(tg.reading("p95_ms", [1.0, 1.1, 0.9, 1.2], [10.0] * 4)["word"], "LOSS")

@@ -85,15 +85,26 @@ class QuotaConvey(unittest.TestCase):
         m, result, _ = self.convey(Cluster([q], [pod(priority='other')]))
         self.assertEqual(result, {'default/web': 3800})
 
-    def test_unknown_scope_or_status_and_failed_read_block_only_expansion(self):
+    def test_unknown_scope_or_status_block_only_expansion(self):
         q = quota(); q.pop('status')
         for quotas in ([q], [quota(scopes=['NotTerminating'])]):
             b = CpuLimitBudget(Cluster(quotas), lambda e: None)
             self.assertEqual(b.limit('default', pod(), 500, 3800)[0], 500)
             self.assertEqual(b.limit('default', pod(), 500, 400)[0], 400)
+
+    def test_an_unreadable_quota_is_no_budget_known(self):
+        """The role cannot list quotas (every kind test; the first v7 trial, run 38825214203, read this as a zero budget and
+        never raised a limit): the raise proceeds as on omni-v6, Kubernetes admission is the authority, the audit says so
+        once a pass (docs/OMNI_V7.md, section 1)."""
         kube = Mock(); kube.get.side_effect = PermissionError('forbidden')
-        b = CpuLimitBudget(kube, lambda e: None)
-        self.assertEqual(b.limit('default', pod(), 500, 3800)[0], 500)
+        events = []
+        b = CpuLimitBudget(kube, events.append)
+        self.assertEqual(b.limit('default', pod(), 500, 3800)[0], 3800)
+        self.assertEqual(b.limit('default', pod(), 500, 3800)[0], 3800)
+        self.assertEqual(b.limit('default', pod(), 500, 400)[0], 400)
+        self.assertEqual(len(events), 1)
+        self.assertIn('no budget known', events[0]['quota'])
+        self.assertIn('quota read unavailable: PermissionError', events[0]['reason'])
 
     def test_rejected_resize_does_not_report_phantom_gain(self):
         c = Cluster([], reject=True)

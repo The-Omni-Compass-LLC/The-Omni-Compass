@@ -405,6 +405,9 @@ class Muscles:
         -53% response time of conveyance are lost whole), and a hold while a pod starts on the host (a start wait 1%
         shorter for a LOSS on work and speed). The slower pod start of the v6 KEDA runs (+12.5% mean, EVEN on the
         three-run rule) is the busier host serving more requests: the price of the work, not a fault to hold against.
+        The namespace's CPU quota, where the governor's role can read it, bounds every raise (omni_controller/quota.py);
+        where it cannot be read, no budget is known and the raise proceeds as on v6, Kubernetes' own admission the
+        authority: the first v7 trial read an unreadable quota as zero and conveyed nothing (docs/OMNI_V7.md, section 1).
 
         Conveyance is on by default. It moves no work: the same requests run with less waiting. (The +26% CPU seen on
         kind is more requests served, because that load is closed-loop, not waste.) Optionally, --convey-on (a share

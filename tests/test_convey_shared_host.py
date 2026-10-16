@@ -124,6 +124,29 @@ class SharedHostConvey(unittest.TestCase):
         self.assertEqual(out, {"default/web-1": 3500, "default/web-2": 1900, "default/web-4": 1900, "default/web-3": 3800})
         self.assertFalse(any(e.get("convey") == "held" for e in events))
 
+    def test_an_unreadable_quota_holds_nothing(self):
+        """The governor's role cannot list the namespace's quotas (every kind test, and any stack whose role withholds it):
+        no budget is known, the raise proceeds as on omni-v6 and Kubernetes' own admission stays the authority; the audit
+        says so once a pass. The first v7 trial (Goldilocks, run 38825214203) read this as a zero budget and never raised
+        a limit (docs/OMNI_V7.md, section 1)."""
+        import subprocess
+
+        class Forbidden(Cluster):
+            def get(self, *args):
+                if args[1] == "resourcequota":
+                    raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="resourcequotas is forbidden")
+                return super().get(*args)
+
+        base = self.kind_cluster()
+        c, stat = Forbidden(base.nodes, base.pods), Stat(0.30)      # the stat stays alive: its file is the host's busy share
+        m, events = muscles(c, stat)
+        out = m.convey()
+        self.assertEqual(out, {"default/web-1": 3500, "default/web-2": 3800, "default/web-3": 3800})
+        said = [e for e in events if "quota" in e]
+        self.assertEqual(len(said), 1)
+        self.assertIn("no budget known", said[0]["quota"])
+        self.assertIn("quota read unavailable", said[0]["reason"])
+
     def test_separate_machines_are_never_held(self):
         nodes = [node("a", kind=False), node("b", kind=False)]
         c = Cluster(nodes, [pod("web-1", "a"), pod("web-2", "b"), pod("web-3", "b", ready=False)])

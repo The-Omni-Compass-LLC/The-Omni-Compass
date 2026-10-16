@@ -29,6 +29,15 @@
   counted once (nothing conveyed at the run's nine replicas: the +64% work and -53% response time of conveyance lost
   whole) and a hold while a pod starts (1% of start wait for a LOSS on work and speed); the slower start is the busier
   host serving more requests. v7 goes on main only if its live trials show no LOSS.
+- **The first v7 trials, read on 16 October, and the correction.** Goldilocks, the KEDA add-ons and the capacity test
+  ran once each (ten pairs) on the candidate as first pushed: the two add-on tests read the candidate well short of v6's
+  three-run tables (Goldilocks p95 -6% EVEN against v6's -58% GAIN; the pod start wait +172% LOSS; KEDA on the requests
+  p95 -2.7% EVEN against -73%; KEDA on CPU and requests +3% EVEN against -55%), the capacity test EVEN as before. The
+  audit names the cause: the quota budget read an unreadable ResourceQuota (the governor's role on kind cannot list them)
+  as a zero allowance, so conveyance never raised a limit (5 commands a run against v6's 15). Corrected in the candidate:
+  an unreadable quota is no budget known, the raise proceeds as on v6 and Kubernetes' admission stays the authority; the
+  toy gate runs the convey model with the quota unreadable as well, a regression holds it, and the three trials run again.
+  The first trials stay in `results/live/raw/` on the branch as the record of the fault (docs/OMNI_V7.md, section 1).
 - **Wording**: the retired words in the day's new pages ("improved or worsened", "unfavorable", "standalone",
   "confirmed/unconfirmed", the label FEWER MISSES) are replaced; the Owner's Manual's KWOK nodes are "stand-in nodes".
 - **CLAUDE.md**: the engine section names v6 as standing and v7 as the candidate; formulas in Unicode; the founder's
