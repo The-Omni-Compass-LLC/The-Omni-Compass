@@ -66,12 +66,14 @@ jobs:
         if: ${{ !cancelled() && env.DRY != 'yes' }}
         run: |
           # another conductor already waiting (the schedule's, or a hand start) carries on instead; a cancelled conductor
-          # starts none (to stop the grid, disable this workflow)
+          # starts none (to stop the grid, disable this workflow). Only a dispatched or scheduled run counts as waiting: a
+          # run a verify started (workflow_run) ticks only when its commit says [all-nongpu] and is otherwise skipped, so
+          # counting it left the grid idle from 15:33 to the next schedule on 16 October
           waiting=0
           for st in queued pending waiting requested; do
             n=$(curl -fsS -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/grid.yml/runs?status=$st&per_page=5" \
-              | python3 -c "import sys, json; print(len(json.load(sys.stdin).get('workflow_runs', [])))" || echo 0)
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/grid.yml/runs?status=$st&per_page=10" \
+              | python3 -c "import sys, json; print(sum(1 for r in json.load(sys.stdin).get('workflow_runs', []) if r.get('event') in ('workflow_dispatch', 'schedule')))" || echo 0)
             waiting=$((waiting + n))
           done
           if [ "$waiting" = 0 ]; then

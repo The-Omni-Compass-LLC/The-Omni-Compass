@@ -25,7 +25,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import OWN_RUNS, in_all_three, word, aim, EVEN_SAME, even_noise, SHOWN, LOWER as AIMS_LOWER, HIGHER as AIMS_HIGHER  # noqa: E402
+from tools.readings import OWN_RUNS, receipt_key, in_all_three, word, aim, EVEN_SAME, even_noise, SHOWN, LOWER as AIMS_LOWER, HIGHER as AIMS_HIGHER  # noqa: E402
 from tools.live_reps import KEYS, LABEL, NEUTRAL, SAME_REL
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
@@ -181,7 +181,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     runs = [load(d) for d in (a.a, a.b, a.c)]
     title = re.sub(r":\s*the A/B/C (?:confirmation|three-run table) \(Omni v\d\)\s*$", "", a.title)   # never twice
-    L = [f"# {title}: the A/B/C three-run table (Omni v1)", "",
+    L = [f"# {title}: the A/B/C three-run table (Omni v1)", "", *receipt_key(), "",
          "Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C "
          "are the replications. Each cell is omni against native, the paired change in percent of native with its 95% "
          "interval. Every judged row gets one of three readings. **GAIN** or **LOSS in all three of our runs**: all three "

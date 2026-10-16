@@ -20,7 +20,7 @@ of 13 October; toward and away; better, worse and "confirmed" of the older table
 
   python3 tools/readings.py --key      the key, as plain text
   python3 tools/readings.py --check    exit 1 if a page that must carry the key does not carry it word for word
-  python3 tools/readings.py --fix      write the key into those pages, between its two markers
+  python3 tools/readings.py --fix      write the key into those pages, and "How to read this receipt" into every standing table
 """
 from __future__ import annotations
 
@@ -446,6 +446,82 @@ def key_text() -> str:
     return re.sub(r"\*\*|`", "", "\n".join(out)).replace("## ", "")
 
 
+# ---------------------------------------------------------------------------------- how to read this receipt
+RECEIPT_BEGIN = "<!-- how to read this receipt (tools/readings.py) -->"
+RECEIPT_END = "<!-- end: how to read this receipt -->"
+
+
+def receipt_key_lines():
+    """The short reading instruction every receipt and table carries under its title (the founder's order of 16 October,
+    night: whoever reads a report must know, before the first number, how a plus, a minus or a zero becomes a word)."""
+    return [
+        "**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by "
+        "the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, "
+        "a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart "
+        "(the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the "
+        "gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, "
+        "machines, memory, processor time, a bill) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass "
+        "put in to buy the work and the speed shown beside it, always shown and never called a loss. So a minus can read GAIN (a "
+        "response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three "
+        "of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not "
+        "judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring "
+        "and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, "
+        "section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. " + OWN_RUNS,
+    ]
+
+
+def receipt_key():
+    """The block between its markers, as every table writer emits it under the title."""
+    return [RECEIPT_BEGIN, *receipt_key_lines(), RECEIPT_END]
+
+
+# The standing tables that must carry the block: every page a reader is sent to for a result on the engine that stands.
+RECEIPT_PAGES = ("results/live/V7_*.md", "results/realms_v5/REALMS_V5.md", "results/grid_v5/GRID.md", "docs/BENEFIT_SHEET.md",
+                 "docs/WIRING_VERDICTS.md", "docs/STATE_OF_PLAY.md")
+
+
+def receipt_pages(root: Path = ROOT):
+    out = []
+    for pat in RECEIPT_PAGES:
+        out += sorted(str(p.relative_to(root)) for p in root.glob(pat))
+    return out
+
+
+def _with_receipt_key(text: str) -> str:
+    """The text with the block in place: replaced where its markers stand, else inserted after the notice under the title."""
+    block = "\n".join(receipt_key())
+    if RECEIPT_BEGIN in text and RECEIPT_END in text:
+        a = text.index(RECEIPT_BEGIN)
+        b = text.index(RECEIPT_END) + len(RECEIPT_END)
+        return text[:a] + block + text[b:]
+    lines = text.split("\n")
+    at = None
+    for i, ln in enumerate(lines[:12]):
+        if ln.startswith("> ©"):                       # the legal notice under the title: the block goes right after it
+            at = i + 1
+            break
+    if at is None:
+        for i, ln in enumerate(lines[:4]):
+            if ln.startswith("# "):
+                at = i + 1
+                break
+    if at is None:
+        return text
+    while at < len(lines) and lines[at].strip() == "":
+        at += 1
+    return "\n".join(lines[:at] + [block, ""] + lines[at:])
+
+
+def check_receipts(root: Path = ROOT):
+    """The standing tables that do not carry the reading block word for word."""
+    bad = []
+    for p in receipt_pages(root):
+        t = (root / p).read_text()
+        if RECEIPT_BEGIN not in t or RECEIPT_END not in t or _with_receipt_key(t) != t:
+            bad.append(p)
+    return bad
+
+
 KEY_PAGES = ("README.md", "docs/HOW_TO_READ_THE_RESULTS.md", "docs/OMNI_COMPASS_MANUAL.md",
              "docs/OMNI_COMPASS_OWNERS_MANUAL.md")
 
@@ -488,10 +564,18 @@ def main(argv=None):
                 t = f.read_text(); n = _with_key(t)
                 if n != t:
                     f.write_text(n); print(f"the key rewritten in {p}")
+        for p in receipt_pages():
+            f = ROOT / p
+            t = f.read_text(); n = _with_receipt_key(t)
+            if n != t:
+                f.write_text(n); print(f"how to read this receipt written in {p}")
         return 0
     bad = check_pages()
     for p in bad:
         print(f"{p}: the key (between {KEY_BEGIN} and {KEY_END}) is missing or not word for word")
+    for p in check_receipts():
+        bad.append(p)
+        print(f"{p}: the block 'How to read this receipt' (between {RECEIPT_BEGIN} and {RECEIPT_END}) is missing or not word for word")
     return 1 if bad else 0
 
 

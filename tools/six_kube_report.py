@@ -44,7 +44,7 @@ sys.path.insert(0, str(ROOT))
 from tools.live_reps import arm_rep, arm_gauges, T95, LABEL, NEUTRAL, SAME_REL  # noqa: E402
 from tools.run_hil import NAMES, REALMS  # noqa: E402
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
-from tools.readings import word as gel_word, aim as gel_aim  # noqa: E402  (the words every table uses)
+from tools.readings import word as gel_word, aim as gel_aim, receipt_key  # noqa: E402  (the words every table uses)
 
 ORDER = list(REALMS) + [TOWER, STACK]
 OMNI = ("compass", "omni")
@@ -159,7 +159,7 @@ def main(root, *more, out=None, reps=None):
     keys = [k for k in CLUSTER + ORG if any(not math.isnan(g.get(k, math.nan)) for o in orgs for arms in runs[o].values()
                                              for g in arms.values())]
     out_json = {"organisms": {}}
-    L = ["# The organisms with the real Kubernetes cluster inside: native against native with Omni-Compass on top", "",
+    L = ["# The organisms with the real Kubernetes cluster inside: native against native with Omni-Compass on top", "", *receipt_key(), "",
          "Each organism runs on the measured window's clock with the cluster as one more muscle (`tools/run_kil.py`): its "
          "own compute demand drives the load generator, the cluster's watts are its heat and load. Native: the stacks' own "
          "controllers and Kubernetes alone. Omni: the compass law on every simulated muscle and the live controller on the "

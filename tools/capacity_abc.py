@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.confirm_abc import CAPACITY, cell, engine, verdict   # noqa: E402
 from tools.legal import stamp                                   # noqa: E402
-from tools.readings import OWN_RUNS                             # noqa: E402
+from tools.readings import OWN_RUNS, receipt_key                # noqa: E402
 
 WORK = "completed work (requests answered within the line over the window)"
 
@@ -52,6 +52,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     runs = [load(d) for d in (a.a, a.b, a.c)]
     L = ["# The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table (Omni v5)", "",
+         *receipt_key(), "",
          "Three separate GitHub runs of the same preregistered test on the same engine: A is the result, B and C are the "
          "replications. The cap is a quota on the served app's CPU, the same in both arms and enforced by the cluster; the "
          "load rises step by step past what the cap can serve. Each cell is omni against native at one cap, the paired change "
