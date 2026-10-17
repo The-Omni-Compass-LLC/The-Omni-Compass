@@ -29,7 +29,19 @@
   law's force past −0.2, the verdict's deepest step) and the cruise override. The authority diagram carries the calm
   formula and the thresholds (0.5 for the pods, 0.7 for the machines). The captions, the Operator's sections 1.2 and 6.1,
   the Owner's sections 1.2 and 7.1, and the Owner's Appendix C state the same rule and numbers.
-- **The books:** the Operator's 495 pages with 50 figures, the Owner's 1,248 pages with 77; 487 and 1,239 pages at least
+- **The rest of the drawings, read against the code.** The cache rule is redrawn in its code order (fail up first, then grow, then
+  give back): Redis grows on any slow second with the cache full, MongoDB and MySQL only while their misses reach 1% of
+  the requests; growth is ⌈F / 0.1⌉ notches, at least one, not one; Redis gives a notch back when nothing was evicted in
+  the last second, the other two when their misses are under 1%. The card governor's state machine now shows that it
+  holds steady only under an operator's cap, that it may go from learning straight to pacing, and that fail-up and
+  observe-only are entered from any state. The feed's blind case is read as past the wall (nothing given back, capacity
+  added; in the cloud mode every parked machine woken), not as a hold. The stack schematics name the release gate only on
+  the machines, where the code has one; the other muscles give back under their own rule and the verdict. The clocks'
+  180-second clean line is the pods', the clock's and the power's; a machine needs no breach now. The lease limit is five
+  periods, at least 2 minutes on Kubernetes and 60 s on a card. The muscle's life cycle shows the wire check's failure
+  path, and the SDK's mode step names every mode that writes nothing. Captions in both manuals and `docs/GPU_BENCH.md`
+  say the same.
+- **The books:** the Operator's 496 pages with 50 figures, the Owner's 1,249 pages with 77; 487 and 1,240 pages at least
   four fifths used. Text references fixed at their source in `LICENSING_FAQ.md`, `docs/THE_RECEIPTS.md`,
   `docs/HOW_TO_READ_THE_RESULTS.md` (it now points to the Owner's chapter 3), `docs/CLAIMS_REGISTER.md` and
   `docs/TWO_WAY_NERVOUS_SYSTEM.md`. `CLAUDE.md`: the `v5` branch is history, never merged either way.

@@ -315,7 +315,9 @@ def wiring_schematic(senses, motors, adapter_lines, native, muscle, meters, note
         rows.append((t, y - h, h))
         y -= h + 0.25
     zone = -y - 0.25
-    gov_text = title + "\n" + (inside or "the compass law · the verdict · the release gate · one decision a period")
+    # the release gate is the machine organ's (omnicompass/nervous_system.py node_release_gate): only the machine schematics
+    # name it; every other muscle gives back under its own give-back rule and the verdict
+    gov_text = title + "\n" + (inside or "the compass law · the verdict · the give-back rule · one decision a period")
     gov_h = max(zone, hfor(gov_text, gx1 - gx0))
     gov_bot = -gov_h
     box(d, gx0, gov_bot, gx1 - gx0, gov_h, gov_text, fill=BLUE, color=NAVY)
@@ -424,6 +426,7 @@ def s_k8s_cluster():
         native="the HPA (15 s), the scheduler, the cluster autoscaler",
         muscle="the pods and the machines", cover="covers: target [0.6·x[op], x[op]]; floor ≥ the operator's; limit ≤ the quota; machines [2, M]",
         meters=["metrics-server: CPU used, allocatable", "the feed: latency.csv, 60 s window", "the API: pods pending, HPA state"],
+        inside="the compass law · the verdict · the release gate (the machines) · one decision a period",
         notes_text=["Level 2: the target and the floor; level 3: the machines through the release gate and the verdict;",
                     "level 4 (--strict-replicas): the replica decision itself. The HPA keeps its own 15-second check underneath.",
                     "Nothing is ever deleted or evicted; a parked machine is emptied by the autoscaler's own scale-down."])
@@ -442,7 +445,7 @@ def s_cloud_machines():
         notes_text=["A machine is parked only after its own trial (the response time holds within 2%) and woken on a breach:",
                     "at the next decision (60 s) for a response time over the line, at the next fast check (5 s) for a waiting pod.",
                     "No cloud credential: the governor holds a Kubernetes service account that can read, taint and annotate, nothing more."],
-        title="THE GOVERNOR, cloud mode")
+        title="THE GOVERNOR, cloud mode", inside="the compass law · the verdict · the release gate · one decision a period")
 
 
 def s_pgbouncer():
@@ -549,7 +552,7 @@ def s_site():
 def s_sims():
     d = new_drawing()
     L, R = 0.4, 12.3
-    box(d, 4.2, -2.0, 6.0, 2.0, "THE GOVERNOR, one plug each\nthe compass law · the verdict · the release gate", fill=BLUE, color=NAVY)
+    box(d, 4.2, -2.0, 6.0, 2.0, "THE GOVERNOR, one plug each\nthe compass law · the verdict · one decision a period", fill=BLUE, color=NAVY)
     rows = [("CityLearn: the simulator's rule-based control of each building", "each building's battery, inside its own limits (charge, discharge)", "one knob a building"),
             ("pandapower on SimBench: the tap changer holding 1.00 p.u.", "the tap position: one whole tap per move; a week of evidence before a step down", "one knob a substation"),
             ("MuJoCo Menagerie: the shipped joint controllers", "the speed of an axis with slack; an axis at its takt stays native", "one knob an axis")]
@@ -603,7 +606,10 @@ def s_feed():
     text_at(d, csvb.S.x + 0.15, (csvb.S.y + gov.N.y) / 2, "--latency-file", NAVY, valign="center")
     lin = box(d, 4.65, y2 - h2, 3.3, h2, "THE LINE, --slo-ms: the service owner's; read against the 95th percentile, the mean held in the band below it", fill=PALE, color=GOLD)
     arrow(d, lin.E, gov.W, color=NAVY)
-    blind = box(d, 0.4, y2 - h2, 3.2, h2, "BLIND: no row for twice the window, or no served response: every machine held", fill=ROSE, color=RED)
+    # omni_controller/muscles.py latency_window(): blind = the newest row older than twice the window, or no served
+    # response in it; the controller then reads the position as past the wall (fail up) and gives nothing back
+    blind = box(d, 0.4, y2 - h2, 3.2, h2, "BLIND: no row for twice the window, or no served response: read as past the wall; "
+                                           "nothing given back, capacity added (the cloud mode: every parked machine woken)", fill=ROSE, color=RED)
     yb = y2 - h2 - 0.5
     line(d, gov.S, (gov.S.x, yb), RED); line(d, (gov.S.x, yb), (blind.S.x, yb), RED); arrow(d, (blind.S.x, yb), blind.S, color=RED)
     text_at(d, 4.65, yb - 0.1, wrapw("the safe direction: a broken feed costs savings, never service", 7.5), RED, valign="top")
@@ -646,7 +652,7 @@ def s_deploy():
 
 def s_sdk():
     d = new_drawing()
-    steps = ["observe() fresh? stale → blind, no write", "the automation mode (recommend writes nothing)", "clamp to the capability: cover, step, rate, resolution",
+    steps = ["observe() fresh? stale → blind, no write", "the automation mode: disabled, recommend or manual write nothing; external approval waits for it", "clamp to the capability: cover, step, rate, resolution",
              "the safety contract: hard bounds, forbidden keys", "hold and cooldown since the last write", "snapshot_native() once, before the first write",
              "execute(value): the system's own command", "readback() from the system; the residual recorded"]
     bw, bh, gap = 3.0, 1.75, 0.2
@@ -971,7 +977,8 @@ def f_stops():
     return chart([("start", "the governor stops"),
                   ("decision", "the reset file (the planned end of a run)?"),
                   ("decision", "the kill switch (omni_switch.py off, SIGTERM, the kill file)?"),
-                  ("decision", "a death without a hand-back: the process gone, or its lease older than 5 periods (≥ 2 min)?"),
+                  ("decision", "a death without a hand-back: the process gone, or its lease older than 5 periods "
+                               "(Kubernetes at least 2 min; a card at least 60 s)?"),
                   ("end", "in every case: every setting at native, read back, no record left")],
                  decisions={1: ("yes", "hands every setting back in reverse order, reads each back, exits 0"),
                             2: ("yes", "the same hand-back at once; no governor starts while the switch is off"),
@@ -1055,14 +1062,21 @@ def f_trial_b():
 
 
 def f_cache_rule():
-    return chart([("start", "a cache knob's decision (Redis, MongoDB, MySQL)"),
-                  ("decision", "the reading at 95% of the line with the cache full?"),
-                  ("decision", "slow reads, and the cache full (≥ 90%) and missing (≥ 1%)?"),
-                  ("decision", "calm, the dwell passed (5 s; 10 s for InnoDB) and the miss share under 1%?"),
-                  ("end", "hold: a miss in a cache with room is a cold miss no ceiling can mend")],
-                 decisions={1: ("yes", "a quarter of the cover added at once"),
-                            2: ("yes", "grow by one notch (8 MB, 64 MB, one 128 MB chunk)"),
-                            3: ("yes", "give one notch back")})
+    """The cache knob's decide() in its code order (tools/run_redis.py, run_ycsb.py, run_sysbench.py): fail up first, then
+    grow, then give back, else hold. Full = 90% of the ceiling used; a notch is 8 MB, 64 MB or one 128 MB chunk."""
+    return chart([("start", "a cache knob's decision, once a second (Redis's memory ceiling, MongoDB's storage-engine cache, "
+                            "MySQL's buffer pool); p the reading in the band, F the compass law's force"),
+                  ("decision", "p ≥ 0.95 (the line at hand) and the cache full (≥ 90% of the ceiling used)?"),
+                  ("decision", "F > 0.05 (slow), the cache full, and (MongoDB, MySQL) misses ≥ 1% of the requests?"),
+                  ("decision", "F < −0.05 (calm), the dwell passed since the last growth (5 s; InnoDB 10 s), and the cache "
+                               "holding its work (Redis: nothing evicted in the last second; MongoDB, MySQL: requests seen "
+                               "and misses under 1%)?"),
+                  ("end", "hold: slow with room to spare is a cold miss no ceiling can mend; the reason in the audit")],
+                 decisions={1: ("yes", "fail up: a quarter of the cover at once (128 MB; 448 MB; four 128 MB chunks), "
+                                       "again the next second while still past"),
+                            2: ("yes", "grow by ⌈F / 0.1⌉ notches, at least one (8 MB; 64 MB; one 128 MB chunk)"),
+                            3: ("yes", "give one notch back")},
+                 w=6.2, side_w=4.4)
 
 
 # ---------------------------------------------------------------- timing diagrams and modelled traces
@@ -1083,7 +1097,8 @@ def t_clocks():
     ax.text(T + 6, 2.3, "the full decision, every 60 s: the state,\nthe law, the gate, the verdict, one write,\none audit line", va="center", color=NAVY)
     ax.text(T + 6, 3.1, "the card governor, every 2 s", va="center", color=GREEN)
     ax.annotate("", xy=(180, -0.55), xytext=(0, -0.55), arrowprops=dict(arrowstyle="<->", color=INK))
-    ax.text(90, -1.0, "a clean line for 3 decisions (180 s)\nbefore anything is given back", ha="center", va="top", color=INK)
+    ax.text(90, -1.0, "a clean line for 3 decisions (180 s) before the pods,\nthe clock or the power give back (a machine: no breach now)",
+            ha="center", va="top", color=INK)
     ax.set_xlim(0, T * 2.35); ax.set_ylim(-1.9, 3.6)
     ax.set_xticks(range(0, T + 1, 60)); ax.set_xlabel("seconds")
     ax.set_yticks([]); ax.spines["left"].set_visible(False)
@@ -1797,14 +1812,18 @@ def g_gpu_states():
          "fail": "FAIL UP: ceiling top, lid at the start limit", "obs": "OBSERVE ONLY: another writer owns the limit"}
     states = [(S["learn"], (1.5, 0), "state"), (S["race"], (6.5, 2.4), "state"), (S["steady"], (6.5, -2.4), "state"),
               (S["pace"], (11.5, 0), "state"), (S["fail"], (11.5, 4.4), "state"), (S["obs"], (11.5, -4.4), "end")]
-    edges = [(S["learn"], S["race"], "utilization ≥ 95%", "arc"),
-             (S["learn"], S["steady"], "saturated, drawing ≥ 97% of the limit", "arc"),
+    # omni_controller/gpu_compass.py: learning until --learn-samples busy readings; race while utilization ≥ --race-util;
+    # steady only under an operator's cap (the start limit under the factory limit) while saturated at it; fail up and
+    # observe-only are entered from any state
+    edges = [(S["learn"], S["race"], "learned; utilization ≥ 95%", "arc"),
+             (S["learn"], S["steady"], "learned; saturated at an operator's cap (draw ≥ 97% of it)", "arc"),
+             (S["learn"], S["pace"], "learned; slack", "line"),
              (S["race"], S["pace"], "slack (the tune-down)", "arc"),
-             (S["steady"], S["pace"], "", "arc"),
+             (S["steady"], S["pace"], "off the cap: slack", "arc"),
              (S["pace"], S["race"], "work waits again", "arc"),
-             (S["pace"], S["fail"], "p95 at the line, a failure, a blind feed, a heat slowdown", "line"),
+             (S["pace"], S["fail"], "from any state: p95 at the line, a failed request, a blind feed, a heat slowdown", "line"),
              (S["fail"], S["pace"], "clear for --slo-clear", "arc"),
-             (S["pace"], S["obs"], "a limit not written by the governor", "line")]
+             (S["pace"], S["obs"], "from any state: a limit not written by the governor", "line")]
     return state_machine(states, edges, bottom=-5.5)
 
 
@@ -1813,7 +1832,8 @@ def g_muscle_life():
          "foreign": "FOREIGN WRITER: observe only", "restored": "RESTORED: back as found"}
     states = [(S["attach"], (1.5, 0), "state"), (S["check"], (4.9, 0), "state"), (S["watch"], (8.3, 0), "state"),
               (S["govern"], (11.7, 0), "state"), (S["foreign"], (11.7, -3.6), "end"), (S["restored"], (6.6, -3.6), "end")]
-    edges = [(S["attach"], S["check"], "", "arc"), (S["check"], S["watch"], "WIRED RIGHT", "arc"),
+    edges = [(S["attach"], S["check"], "the snapshot taken", "arc"), (S["check"], S["watch"], "WIRED RIGHT", "arc"),
+             (S["check"], S["restored"], "FAIL: nothing written, the knob as found", "line"),
              (S["watch"], S["govern"], "the paired trial passed", "arc"),
              (S["govern"], S["govern"], "every decision: clamp, gate, write, read back, receipt", "line"),
              (S["govern"], S["foreign"], "the knob found where the governor did not put it", "line"),

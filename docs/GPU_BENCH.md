@@ -103,7 +103,7 @@ The table also credits each write: joules and requests against native at the sam
 by the rule that decided it. CPU energy comes from RAPL by domain: package and DRAM apart, psys never added, wrap
 undone. The card's own energy counter (NVML) and its ECC and retired-page counters are read at both ends of each arm.
 
-![State machine: the two-wire card governor. It learns the card on its own first (15 busy readings), then races while work waits, holds steady under the limit, or paces the slack in 15 MHz steps through the verdict; it fails up on a breach, a failed request, a blind feed or a heat slowdown, and it observes only, for the rest of the run, once a limit is found that it did not write.](book/figures/g_gpu_states.svg)
+![State machine: the two-wire card governor. It learns the card on its own first (15 busy readings), then races while work waits (utilization at 95% or more), holds steady at the card's own busy clock while saturated under an operator's cap, or paces the slack in 15 MHz steps through the verdict; from any state it fails up on a breach, a failed request, a blind feed or a heat slowdown, and it observes only, for the rest of the run, once a limit is found that it did not write.](book/figures/g_gpu_states.svg)
 
 ## Gauges
 

@@ -5269,7 +5269,7 @@ point for a referee is the method: a result that flatters the governor is the fi
 pursued to a harness cause, the cause is written down with the run that showed it, a band is set on the tuning case's own
 figures and never on an untouched one, and the counted runs begin only when the harness provably asks the question.
 
-![Flowchart: the direction rule of a cache knob (Redis, MongoDB, MySQL). At 95% of the line with the cache full, a quarter of the cover is added at once; slow reads with the cache full (≥ 90%) and missing (≥ 1%) grow it by one notch; calm, after the dwell (5 s; 10 s for InnoDB) and with the miss share under 1%, gives one notch back; otherwise the knob holds, because a miss in a cache with room is a cold miss no ceiling can mend.](figures/f_cache_rule.svg)
+![Flowchart: the direction rule of a cache knob (Redis, MongoDB, MySQL), once a second, tested in this order. With the reading at 95% of the line or more and the cache full (90% of its ceiling used), a quarter of the cover is added at once (128 MB; 448 MB; four 128 MB chunks), again the next second while still past. Slow (the compass law's force over 0.05) with the cache full, and for MongoDB and MySQL with misses at 1% of the requests or more, the knob grows by ⌈F / 0.1⌉ notches, at least one (8 MB; 64 MB; one 128 MB chunk). Calm (the force under −0.05), the dwell passed since the last growth (5 s; 10 s for InnoDB) and the cache holding its work (Redis: nothing evicted in the last second; MongoDB and MySQL: requests seen and misses under 1%), one notch is given back. Otherwise the knob holds, because a slow read in a cache with room is a cold miss no ceiling can mend.](figures/f_cache_rule.svg)
 
 ### 36.9 A database's buffer pool, resized online in the server's own chunks
 
@@ -7287,7 +7287,7 @@ every five seconds from outside the service. Native is that cluster with its HPA
 compass law on the HPA target inside [30%, 50%] and on the machines through the release gate and the verdict. Both arms
 start from the same fresh cluster, run for 900 s after a 120 s warm-up, and end with the reset check.
 
-![Wiring schematic: the response-time feed and the line. The probe times real requests to the service and writes one row a response to latency.csv (elapsed_seconds, latency_ms, ok); the governor reads the file by its own clock, the last 60 s for its decision and the last 15 to 30 s for its fast checks, against the line the service owner wrote (--slo-ms). A feed that has not advanced for twice the window, or holds no served response, reads as blind, and a blind sense holds every machine: the safe direction. A second feed, the service's own timings, may be written in the same three columns, measured at the same place as the line and never pre-smoothed.](figures/s_feed.svg)
+![Wiring schematic: the response-time feed and the line. The probe times real requests to the service and writes one row a response to latency.csv (elapsed_seconds, latency_ms, ok); the governor reads the file by its own clock, the last 60 s for its decision and the last 15 to 30 s for its fast checks, against the line the service owner wrote (--slo-ms). A feed that has not advanced for twice the window, or holds no served response, reads as blind, and a blind sense is read as past the wall: nothing is given back and capacity is added (in the cloud mode every parked machine is woken), the safe direction. A second feed, the service's own timings, may be written in the same three columns, measured at the same place as the line and never pre-smoothed.](figures/s_feed.svg)
 
 - **Steady work in steps** (`V3_STEADY.md`) asks: at a fixed, stepped load, does the governor hold the same work with
   fewer machines or faster answers? Work is equal by design. On the sets of 10 October the 95th percentile fell 64% to 66%
@@ -8426,7 +8426,7 @@ The table also credits each write: joules and requests against native at the sam
 by the rule that decided it. CPU energy comes from RAPL by domain: package and DRAM apart, psys never added, wrap
 undone. The card's own energy counter (NVML) and its ECC and retired-page counters are read at both ends of each arm.
 
-![State machine: the two-wire card governor. It learns the card on its own first (15 busy readings), then races while work waits, holds steady under the limit, or paces the slack in 15 MHz steps through the verdict; it fails up on a breach, a failed request, a blind feed or a heat slowdown, and it observes only, for the rest of the run, once a limit is found that it did not write.](figures/g_gpu_states.svg)
+![State machine: the two-wire card governor. It learns the card on its own first (15 busy readings), then races while work waits (utilization at 95% or more), holds steady at the card's own busy clock while saturated under an operator's cap, or paces the slack in 15 MHz steps through the verdict; from any state it fails up on a breach, a failed request, a blind feed or a heat slowdown, and it observes only, for the rest of the run, once a limit is found that it did not write.](figures/g_gpu_states.svg)
 
 ### 52.6 Gauges
 
