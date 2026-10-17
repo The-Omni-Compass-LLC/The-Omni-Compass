@@ -45,7 +45,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SLO_MS = 200.0                       # the toy service's line
 SERVICE_MS = 20.0                    # the bare service time of one request
 SAMPLES_PER_TICK = 20                # requests timed every 15 s
-T95 = {2: 12.71, 3: 4.30, 4: 3.18, 5: 2.78, 6: 2.57, 7: 2.45, 8: 2.36, 9: 2.31, 10: 2.26, 12: 2.20, 16: 2.13, 20: 2.09}
+sys.path.insert(0, str(ROOT))
+from omnicompass.student_t import T95  # noqa: E402  (keyed by degrees of freedom; the table it replaces was keyed by seeds
+#                                                        and read one row early)
 # gauge -> (aim, a resource spent?)
 GAUGES = {"machine_hours": ("lower", True), "kwh_per_core_hour": ("lower", True),
           "pending_pod_minutes_per_hour": ("lower", False), "hpa_shortfall_minutes_per_hour": ("lower", False),
@@ -405,6 +407,9 @@ def render(report_path, out_md):
         try:
             out = subprocess.run([sys.executable, "tools/omni_version.py"], cwd=tree, env={**os.environ, "PYTHONPATH": tree},
                                  capture_output=True, text=True, timeout=120).stdout.strip().splitlines()
+            differs = [ln.split(": ", 1)[1] for ln in out if ln.startswith("differs from ")]
+            if differs:                    # every engine file the tree changes, not only the last one printed
+                return f"{out[0].split(': ', 1)[0]}: {', '.join(differs)}"
             return out[-1].split(" (")[0] if out else Path(tree).name
         except (OSError, subprocess.SubprocessError):
             return Path(tree).name

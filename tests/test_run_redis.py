@@ -83,6 +83,15 @@ def main():
     reps[2]["omni"]["failed"] = 2
     assert R.paired(reps, "failed", "never more")["reading"] == "**LOSS in a repetition**"
     assert R.COVER_MB == (16, 512) and R.NATIVE_MB == 64 and R.LINE_MS == 2.0 and R.MISS_PENALTY_MS > R.LINE_MS, "a miss lies outside the line by construction"
+    # native as shipped (17 October): no ceiling (maxmemory 0); any ceiling Omni wrote would sit below native, so it writes
+    # nothing, says why in its audit, and hands back the untouched setting
+    fr = FakeRedis(0); plug = R.Ceiling(fr)
+    with tempfile.TemporaryDirectory() as t:
+        om = R.Omni(plug, None, Path(t) / "audit.jsonl")
+        om.stop_flag.set(); om.run()
+        assert fr.mm == 0 and om.writes == 0 and om.handed_back, "no ceiling is written over a native with none"
+        assert "at its limit on native" in (Path(t) / "audit.jsonl").read_text()
+    assert R.POLICY == {"operator": "allkeys-lru", "shipped": "noeviction"}, "Redis ships with noeviction"
     print("PASS  Redis runner: misses grow the ceiling by notches, calm with nothing evicted gives one back after the dwell, the wall puts the whole cover on, "
           "the cover holds; the plug snapshots, reads back, stops for another writer and restores; a seeded Zipf working set; the application's own reading; the paired reading")
 

@@ -15,8 +15,9 @@ Arms, the same district, the same year, the same weather and loads:
   native  CityLearn's BasicRBC alone
   omni    the same BasicRBC, with the compass law (omnicompass/compass_law.py) on top of its electric battery commands only (a
           cold or hot water tank is a thermal muscle with its own reading and stays native). The reading is the
-          district's draw without its batteries the hour before (the demand the batteries answer, not their own effect); its band is the 10th to the 90th percentile of the
-          past week's draw (causal: only hours already seen). The compass's force moves every battery command the same way:
+          district's draw without its batteries in the coming hour, read from the same hour of the past week's days
+          (the demand the batteries answer, not their own effect; causal: only hours already seen; omni-v9); its band is
+          the 10th to the 90th percentile of the past week's draw. The compass's force moves every battery command the same way:
           a positive force (the district drawing hard) pushes toward discharge, a negative force (a quiet district)
           toward charge, by at most GAIN of the command's range, always inside the battery's own limits [-1, 1]. At
           KILL_AT of the year Omni-Compass hands every command back to the native controller, and the file checks it did
@@ -49,9 +50,12 @@ from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
 import os
 GAIN = float(os.environ.get("CL_GAIN", 0.5))   # the most the compass moves a battery command, as a share of its range
 # the three settings below were chosen on the tuning district (citylearn_challenge_2022_phase_1) only and frozen before
-# any other district ran (docs/CITYLEARN_PREREGISTRATION.md)
+# any other district ran (docs/CITYLEARN_PREREGISTRATION.md); the glide and the coming hour's reading are omni-v9's
+# amendment of 17 October, found on the district whose LOSS they repair and read on every district (docs/OMNI_V9.md)
 TAU = float(os.environ.get("CL_TAU", 1.0))     # the battery's response the compass is damped for (hours)
-SLEW = float(os.environ.get("CL_SLEW", 0.05))  # the most Omni-Compass's adjustment may change in one hour
+SLEW = float(os.environ.get("CL_SLEW", 0.0625))  # the most Omni-Compass's adjustment may change in one hour (omni-v9: the
+                                                 # fastest glide that read no LOSS on any score in any district, 0.05 before)
+FORECAST_DAYS = 7   # omni-v9: the coming hour's draw is the mean of the same hour over the past week's days
 WINDOW_H = 168      # the band's window: the past week of hourly draw
 KILL_AT = 0.9       # Omni-Compass hands every command back at 90% of the year
 KPIS = ["cost_total", "electricity_consumption_total", "carbon_emissions_total", "daily_peak_average",
@@ -70,6 +74,22 @@ def percentile(xs, q):
     k = (len(s) - 1) * q
     f = int(math.floor(k)); c = min(f + 1, len(s) - 1)
     return s[f] + (s[c] - s[f]) * (k - f)
+
+
+def coming_hour(hist, days=FORECAST_DAYS):
+    """The district's draw in the coming hour, read from the same hour of the past days (hist[-24], hist[-48], ... up to
+    `days` of them; causal: only hours already seen), or the last hour's own draw until a day has been seen. omni-v9: the
+    reading of the hour gone left the adjustment about five hours behind the day (its strongest discharge at midnight, the
+    draw's peak at 19:00), still charging as the evening peak climbed, so the batteries were empty at each month's top
+    hour (docs/OMNI_V9.md)."""
+    same = hist[-24::-24][:days]
+    return sum(same) / len(same) if same else hist[-1]
+
+
+def glide(off, target, slew=None):
+    """The adjustment moved toward its target by at most `slew` (SLEW) in one hour: it glides, never jumps."""
+    step = SLEW if slew is None else slew
+    return off + max(-step, min(step, target - off))
 
 
 def schema_of(name, data_dir):
@@ -112,8 +132,9 @@ def run_arm(schema, arm):
     while not env.terminated:
         a = agent.predict(obs)
         if arm == "omni":
-            # demand the batteries do not cause: the district's draw without storage, the hour before (the compass reads the
-            # room, not its own heater: a reading that includes the battery feeds every battery move straight back)
+            # demand the batteries do not cause: the district's draw without storage, recorded hour by hour (the compass reads
+            # the room, not its own heater: a reading that includes the battery feeds every battery move straight back); the
+            # compass reads the coming hour from this record (coming_hour)
             seen = len(env.net_electricity_consumption)
             ws = env.net_electricity_consumption_without_storage
             net = float(ws[seen - 1]) if seen and len(ws) >= seen else None
@@ -127,8 +148,8 @@ def run_arm(schema, arm):
                     if compass_law is None:
                         compass_law = CompassLaw(band, dt=1.0, tau=TAU)
                     compass_law.band = band
-                    f = compass_law.force(hist[-1])
-                    off += max(-SLEW, min(SLEW, -GAIN * f - off))   # the adjustment glides, never jumps more than SLEW
+                    f = compass_law.force(coming_hour(hist))
+                    off = glide(off, -GAIN * f)                     # the adjustment glides, never jumps more than SLEW
                     if abs(off) > 1e-12:
                         flat = [x for row in a for x in row]
                         if any(steer):
@@ -184,7 +205,8 @@ def main(argv=None):
                 res[name][arm] = {"arm": arm, "error": f"{type(e).__name__}: {e}"[:600],
                                   "where": traceback.format_exc().strip().splitlines()[-3:]}
         res[name]["citylearn_version"] = version
-        res[name]["settings"] = {"gain": GAIN, "tau_h": TAU, "glide_per_h": SLEW, "window_h": WINDOW_H, "kill_at": KILL_AT}
+        res[name]["settings"] = {"gain": GAIN, "tau_h": TAU, "glide_per_h": SLEW, "window_h": WINDOW_H, "kill_at": KILL_AT,
+                                 "forecast_days": FORECAST_DAYS}
         (out / f"{name}.json").write_text(json.dumps(res[name], indent=1) + "\n")
         for arm in ("native", "omni"):
             r = res[name][arm]
@@ -194,7 +216,7 @@ def main(argv=None):
          f"CityLearn {version} (Intelligent Environments Lab, University of Texas at Austin; MIT license): an "
          "independent simulator of real buildings from measured data, with its own controllers and its own scoring. "
          "Native: CityLearn's rule-based battery controller (BasicRBC). Omni: the same controller with the compass "
-         f"law on top of its battery commands (gain {GAIN}, response {TAU} h, glide {SLEW} an hour, band from the past week's district draw, handed back at "
+         f"law on top of its battery commands (gain {GAIN}, response {TAU} h, glide {SLEW} an hour, reading the coming hour from the same hour of the past {FORECAST_DAYS} days, band from the past week's district draw, handed back at "
          f"{int(KILL_AT * 100)}% of the year). Every number is CityLearn's own score: the controller over no battery at "
          "all, every row's aim is lower. Evidence class: an independent recognized simulator (not our model).", ""]
     for name, r in res.items():

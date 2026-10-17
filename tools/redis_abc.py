@@ -79,8 +79,12 @@ def main(argv=None):
     a = ap.parse_args(argv)
     runs = [load(d) for d in a.dirs]
     eng = [engine(d) for d in a.dirs]
-    L = ["# Redis, a cache's operator-set memory ceiling: the A/B/C three-run table", "",
-         "Redis as shipped with the operator's memory ceiling (64 MB, allkeys-lru) is native; omni is the compass law on the ceiling "
+    shipped = all(rec.get("native") == "shipped" for _, recs in runs for rec in recs.values())
+    L = ["# Redis, a cache's " + ("memory as shipped (no ceiling)" if shipped else "operator-set memory ceiling") + ": the A/B/C three-run table", "",
+         ("Redis exactly as shipped (no memory ceiling, noeviction) is native: the knob is at its limit on native, and omni reads and writes "
+          "nothing (`docs/REDIS_PREREGISTRATION.md`, amendment 4); otherwise omni is the compass law on the ceiling " if shipped else
+          "Redis as shipped with the operator's memory ceiling (64 MB, allkeys-lru) is native; omni is the compass law on the ceiling ")
+         + 
          "through Redis's own console inside [16, 512] MB, holding the application's own request latency at 40% of the 2 ms line, a hit "
          "inside and a miss with its store trip outside (`docs/REDIS_PREREGISTRATION.md`). Each run holds three paired repetitions; the "
          "paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make "
@@ -113,7 +117,7 @@ def main(argv=None):
         L += ["", f"## {wl}: {r0['value_bytes']} B values, working set {r0['base_keys']:,} keys × notch; line {r0['line_ms']:.0f} ms, {len(r0['reps'])} paired repetitions a run"
               + (" (the tuning workload, shown and not counted)" if tuning else ""), "",
               f"Redis {r0.get('redis_version', '?')}; {r0['rate_rps']:.0f} requests a second offered; a miss costs the declared {r0['miss_penalty_ms']:.0f} ms store trip; "
-              f"steps {r0['steps']} × {r0['step_s']} s; the operator's ceiling {r0['native_mb']} MB, the cover {r0['cover_mb'][0]} to {r0['cover_mb'][1]} MB.", "",
+              f"steps {r0['steps']} × {r0['step_s']} s; " + (f"native's ceiling: none (as shipped)" if not r0['native_mb'] else f"the operator's ceiling {r0['native_mb']} MB") + f", the cover {r0['cover_mb'][0]} to {r0['cover_mb'][1]} MB.", "",
               "| Gauge | native (A) | omni (A) | A | B | C | Reading |", "|---|---:|---:|---:|---:|---:|---|"]
         out["workloads"][wl] = {}
         for k, label, dr in GAUGES:
@@ -125,7 +129,7 @@ def main(argv=None):
             L.append(f"| {label} | {nat} | {om} | " + " | ".join(cell(r, k) for r in rs) + f" | {v} |")
             out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr, k), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
         hb = all(all(x["omni"].get("handed_back") for x in r["reps"]) for r in recs)
-        L += ["", f"The ceiling handed back to the operator's and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
+        L += ["", f"The ceiling handed back to native's and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
         vr = {t: [x["omni"]["verdict"] for x in r["reps"] if x["omni"].get("verdict")] for t, r in zip("ABC", recs)}
         if any(vr.values()):                                   # the brain's own verdict on the knob, live in the omni arms (the amendment of 2026-10-09)
             objs = sorted({v["objective"] for vs in vr.values() for v in vs})

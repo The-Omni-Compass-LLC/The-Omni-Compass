@@ -109,7 +109,7 @@ GAUGES = [  # key, label, direction
     ("harness_cpu_seconds", "the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both; inside the host's)", "shown"),
     ("pool_mean", "pool size, mean (the knob)", "shown"),
 ]
-T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
+from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 SAME_REL = 1e-6
 
 

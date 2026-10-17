@@ -17,6 +17,7 @@ on:
       reps: {description: "Paired repetitions per workload", default: "3"}
       step_s: {description: "Seconds per working-set notch", default: "20"}
       objective: {description: "What the brain's verdict judges a step by: resource (work, speed, the resource and CPU together, the index's reading) or service (work and speed alone)", default: "resource"}
+      native: {description: "Native: operator (the preregistered 64 MB ceiling, allkeys-lru) or shipped (Redis exactly as shipped: no ceiling, noeviction)", default: "operator"}
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
@@ -68,7 +69,7 @@ jobs:
           sudo apt-get install -y -q redis-server
           sudo systemctl stop redis-server || true
           redis-server --version
-          python tools/run_redis.py --setup
+          python tools/run_redis.py --setup --native "${{ github.event.inputs.native || 'operator' }}"
       - name: Run the workload, native and omni
         run: |
           set +e
@@ -82,7 +83,7 @@ jobs:
               sleep 30
             done ) > out/host_health.csv 2>/dev/null &
           monitor=$!
-          timeout --kill-after=60s 130m python tools/run_redis.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out --objective "${{ github.event.inputs.objective || 'resource' }}" > run.log 2>&1
+          timeout --kill-after=60s 130m python tools/run_redis.py --workloads "${{ matrix.workload }}" --reps "${{ github.event.inputs.reps }}" --step-s "${{ github.event.inputs.step_s }}" --out out --objective "${{ github.event.inputs.objective || 'resource' }}" --native "${{ github.event.inputs.native || 'operator' }}" > run.log 2>&1
           code=$?
           kill "$monitor" 2>/dev/null || true      # the health file is final before the artifact is hashed
           mkdir -p out

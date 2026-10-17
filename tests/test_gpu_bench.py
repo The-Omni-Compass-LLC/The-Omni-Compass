@@ -359,18 +359,18 @@ def enforced():
     g.step()
     assert [x for x in recs(d / "a5.jsonl") if "decision" in x][0]["decision"]["0"]["telemetry"]["enforced_w"] == 300.0
     # result labels, by rule
-    assert label("GAIN, proven", True, True, True, True) == "SUPERIOR WITHIN GUARDRAILS"
-    assert label("GAIN, proven", True, False, True, True) == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
-    assert label("GAIN, not proven", True, True, True, True) == "NONINFERIOR / INCONCLUSIVE"
-    assert label("LOSS, not proven", False, True, True, True) == "NOT ESTABLISHED"
-    assert label("LOSS, proven", True, True, True, True) == "AWAY FROM ITS AIM"
-    assert label("GAIN, proven", True, True, True, False) == "INVALID"
-    assert label("GAIN, proven", True, True, True, True, "LOSS, proven") == "NOT ATTRIBUTABLE: WATCH DIFFERS FROM NATIVE"
+    assert label("GAIN, clear of the noise", True, True, True, True) == "SUPERIOR WITHIN GUARDRAILS"
+    assert label("GAIN, clear of the noise", True, False, True, True) == "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
+    assert label("EVEN, no difference beyond the noise", True, True, True, True) == "NONINFERIOR / INCONCLUSIVE"
+    assert label("EVEN, no difference beyond the noise", False, True, True, True) == "NOT ESTABLISHED"
+    assert label("LOSS, clear of the noise", True, True, True, True) == "AWAY FROM ITS AIM"
+    assert label("GAIN, clear of the noise", True, True, True, False) == "INVALID"
+    assert label("GAIN, clear of the noise", True, True, True, True, "LOSS, clear of the noise") == "NOT ATTRIBUTABLE: WATCH DIFFERS FROM NATIVE"
     from tools.gpu_reps import verdict
-    assert verdict("energy, GPU (J)", 5.0, 1.0, 10) == "power given, proven", "a card's energy up is power given, never a LOSS"
-    assert verdict("energy, GPU (J)", -5.0, 1.0, 10) == "GAIN, proven", "energy cut is a GAIN"
-    assert verdict("response time, 95th percentile (ms)", 5.0, 9.0, 10) == "LOSS, not proven"
-    assert verdict("work per energy (served requests per kJ)", 5.0, 1.0, 10) == "GAIN, proven"
+    assert verdict("energy, GPU (J)", 5.0, 1.0, 10) == "power given, clear of the noise", "a card's energy up is power given, never a LOSS"
+    assert verdict("energy, GPU (J)", -5.0, 1.0, 10) == "GAIN, clear of the noise", "energy cut is a GAIN"
+    assert verdict("response time, 95th percentile (ms)", 5.0, 9.0, 10) == "EVEN, no difference beyond the noise"
+    assert verdict("work per energy (served requests per kJ)", 5.0, 1.0, 10) == "GAIN, clear of the noise"
 
 
 def one_writer():

@@ -417,6 +417,15 @@ The first counted set on the brain's verdict (runs 38013329351, 38013334121, 380
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
 Enterprise License. All rights reserved. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## Amendment 5 (2026-10-17, declared before any run on it): native as shipped, beside the operator's pool
+
+The founder's order of 17 October: every native muscle also runs exactly as it is shipped, and Omni-Compass goes beyond it if
+it can. A second set runs beside the preregistered one, with every rule of this file unchanged but one: native's buffer pool is
+MySQL 8.0's own default, 128 MB (`innodb_buffer_pool_size` unset; `tools/run_sysbench.py --native shipped`, workflow input
+`native: shipped`), and omni starts from the same 128 MB. The cover stays [128 MB, 2,048 MB], so omni can only add to native's
+pool, never take from it. The operator's set (512 MB) keeps its name and its tables; the shipped set's tables are named for it
+(`…_SYSBENCH_SHIPPED.md`). Nothing about the shipped set is tuned: it was written before any run on it, on no data.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

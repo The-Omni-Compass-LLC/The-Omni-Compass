@@ -63,7 +63,8 @@ The **primary outcome** is work per energy: requests served per kilojoule the GP
    after every arm.
 7. **The table** (`GPU_REPS.md`): each gauge for native, watch and omni, and three paired contrasts with 95%
    intervals — observation (watch − native), authority (omni − watch), total (omni − native). If an interval includes
-   zero, it says **not proven**. The result label is chosen by rule (`docs/GPU_PREREGISTRATION.md`, amendment 1):
+   zero, it reads **EVEN, no difference beyond the noise**; wholly on one side, **GAIN** (or **LOSS**, or **power given**)
+   **clear of the noise** (the words of amendment 14). The result label is chosen by rule (`docs/GPU_PREREGISTRATION.md`, amendment 1):
    SUPERIOR WITHIN GUARDRAILS, ENERGY IMPROVEMENT WITH SERVICE TRADEOFF, NONINFERIOR / INCONCLUSIVE, NOT ESTABLISHED,
    AWAY FROM ITS AIM, or INVALID. Also: actuator fidelity (receipt B), control effort and representation fidelity (receipt A). A
    meter that was not fitted prints UNAVAILABLE. The run folder holds every raw file and `SHA256SUMS.txt`.

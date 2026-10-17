@@ -71,6 +71,8 @@ DT = 1.0                  # one decision a second
 TAU = 2.0
 SMOOTH = 0.5
 NATIVE_MB = 512           # the operator's pool
+OPERATOR_MB, SHIPPED_MB = 512, 128   # --native operator (preregistered) or shipped (MySQL 8.0's own default pool, 128 MB)
+NATIVE = "operator"
 CHUNK_MB = 128            # innodb_buffer_pool_chunk_size as shipped: the pool is resized in whole chunks
 COVER_MB = (128, 2048)    # never under one chunk, never over 2 GB
 STEP_MB = CHUNK_MB        # one notch of the knob is one chunk
@@ -86,7 +88,6 @@ RESIZE_WAIT_S = 90.0      # the server's online resize is asynchronous; the plug
 RAND_TYPE = "uniform"     # rows drawn uniformly over the tables in use, so the working set is the key space (sysbench's shipped 'special'
                           # draw sends three quarters of the requests to one percent of the rows: the first smoke run showed the pool
                           # filling only at the top notch and misses at 3.5% of reads, nothing for the knob to answer; see the preregistration)
-T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
 SAME_REL = 1e-6
 LUA = Path(os.environ.get("SYSBENCH_LUA", "/usr/share/sysbench"))
 
@@ -494,7 +495,7 @@ def run_workload(name, out: Path, reps, step_s, line_stmt_ms, objective=DEFAULT_
     rec = {"workload": name, "tuning": tuning, "script": script, "statements": stmts, "rate_tps": rate, "steps": steps, "step_s": step_s,
            "line_stmt_ms": line_stmt_ms, "line_ms": line_stmt_ms * stmts, "threads": THREADS, "tables": TABLES, "table_rows": TABLE_ROWS, "rand_type": RAND_TYPE,
            "native_mb": NATIVE_MB, "chunk_mb": CHUNK_MB, "cover_mb": list(COVER_MB), "mysql_version": ver, "sysbench_version": sysbench_version(),
-           "objective": objective, "engine": engine(), "reps": []}
+           "objective": objective, "native": NATIVE, "engine": engine(), "reps": []}
     for rep in range(1, reps + 1):
         order = ("native", "omni") if rep % 2 else ("omni", "native")
         r = {}
@@ -508,8 +509,12 @@ def run_workload(name, out: Path, reps, step_s, line_stmt_ms, objective=DEFAULT_
 
 
 def report(recs, out: Path):
-    L = ["# sysbench on MySQL: Omni-Compass on top of a database's operator-set buffer pool", "",
-         f"MySQL as Ubuntu ships it with the operator's InnoDB buffer pool ({NATIVE_MB} MB) is native; omni is the compass law on the pool size "
+    shipped = bool(recs) and all(r.get("native") == "shipped" for r in recs)
+    native_mb = recs[0]["native_mb"] if recs else NATIVE_MB
+    L = ["# sysbench on MySQL: Omni-Compass on top of a database's " + ("buffer pool as shipped" if shipped else "operator-set buffer pool"), "",
+         (f"MySQL exactly as Ubuntu ships it, its InnoDB buffer pool at MySQL's own default ({native_mb} MB), is native" if shipped else
+          f"MySQL as Ubuntu ships it with the operator's InnoDB buffer pool ({native_mb} MB) is native")
+         + "; omni is the compass law on the pool size "
          f"through the server's own console inside [{COVER_MB[0]}, {COVER_MB[1]}] MB in chunks of {CHUNK_MB} MB, holding the server's own statement "
          f"latency at {CENTER:.0%} of the {LINE_STMT_MS:g} ms statement line. sysbench's published OLTP workloads, the same transactions in both arms, "
          "the tables in use stepping through the pool and past it. Memory held is the resource; the host's CPU seconds include the compass's own "
@@ -527,7 +532,7 @@ def report(recs, out: Path):
             ch = "" if p["native"] == 0 else f"{100 * p['diff'] / abs(p['native']):+.1f}%"
             L.append(f"| {label} | {fmt(p['native'])} | {fmt(p['omni'])} | {ch} | {fmt(p['ci95'][0])} to {fmt(p['ci95'][1])} | {p['reading']} |")
         hb = all(r["omni"]["handed_back"] for r in rec["reps"]); fw = any(r["omni"]["foreign_writer"] for r in rec["reps"])
-        L += ["", f"Every omni arm handed back to the operator's pool size: {'yes' if hb else 'NO'}; another writer seen: {'yes' if fw else 'no'}; "
+        L += ["", f"Every omni arm handed back to native's pool size ({rec['native_mb']} MB): {'yes' if hb else 'NO'}; another writer seen: {'yes' if fw else 'no'}; "
               f"fail-ups: {sum(r['omni']['failups'] for r in rec['reps'])}.", ""]
     (out / "SYSBENCH.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     return out / "SYSBENCH.md"
@@ -551,13 +556,17 @@ def setup():
     subprocess.run(["sudo", "tee", str(conf)], input=txt, text=True, check=True, capture_output=True)
     subprocess.run(["sudo", "systemctl", "restart", "mysql"], check=True)
     c = fresh_server(NATIVE_MB)
-    print(f"MySQL {server_version()} at the operator's {NATIVE_MB} MB pool (chunk {CHUNK_MB} MB); {sysbench_version()}; user {USER}; pool reads {status(c)['pool_bytes'] // MB} MB")
+    print(f"MySQL {server_version()} at native's {NATIVE_MB} MB pool ({NATIVE}) (chunk {CHUNK_MB} MB); {sysbench_version()}; user {USER}; pool reads {status(c)['pool_bytes'] // MB} MB")
     return 0
 
 
 def main(argv=None):
+    global NATIVE, NATIVE_MB
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--setup", action="store_true")
+    ap.add_argument("--native", default="operator", choices=("operator", "shipped"),
+                    help="native's pool: the operator's 512 MB (preregistered) or MySQL as shipped, its own 128 MB (the founder's order of "
+                         "17 October: native as it is shipped); omni starts from the same pool and goes beyond it if it can")
     ap.add_argument("--workloads", default="tuning")
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--step-s", type=float, default=20.0)
@@ -567,6 +576,7 @@ def main(argv=None):
                     help="what the brain's verdict judges a step by: resource (the index's reading: work, speed, memory and CPU together) or service (work and speed alone)")
     ap.add_argument("--report-only", default="")
     a = ap.parse_args(argv)
+    NATIVE, NATIVE_MB = a.native, (SHIPPED_MB if a.native == "shipped" else OPERATOR_MB)
     if a.setup:
         return setup()
     out = Path(a.out)

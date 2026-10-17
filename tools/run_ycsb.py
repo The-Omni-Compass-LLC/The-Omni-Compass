@@ -63,7 +63,8 @@ CENTER = 0.4              # the compass holds the server's own read latency at 4
 DT = 1.0                  # one decision a second
 TAU = 2.0                 # memory given or taken shows in the misses within a couple of seconds
 SMOOTH = 0.5
-NATIVE_MB = 512           # the operator's cache
+NATIVE_MB = 512           # the operator's cache (None with --native shipped: the server's own default, half of RAM less 1 GB)
+NATIVE = "operator"
 COVER_MB = (256, 2048)    # never under 256 MB (the server's own floor), never over 2 GB
 STEP_MB = 64              # one notch of the knob
 FAILUP_MB = 448           # past the wall: a quarter of the cover at once, and again the next second if still past it
@@ -79,7 +80,7 @@ YCSB_VERSION = "0.17.0"
 YCSB_URL = f"https://github.com/brianfrankcooper/YCSB/releases/download/{YCSB_VERSION}/ycsb-mongodb-binding-{YCSB_VERSION}.tar.gz"
 YCSB_SHA256 = "6a054a706812269c80bfc6ed1e83457990c1c60b01f5083c873aaed05577e30d"   # recorded from the release before any run
 YCSB_HOME = Path(os.environ.get("YCSB_HOME", str(Path.home() / f"ycsb-mongodb-binding-{YCSB_VERSION}")))
-T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
+from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 SAME_REL = 1e-6
 
 WORKLOADS = {
@@ -210,6 +211,14 @@ class Omni(threading.Thread):
     def run(self):
         try:
             native = self.plug.attach(); st = self.plug._status(); lat0, ops0 = read_latency(st); _, _, rd0, ev0, rq0 = cache_stats(st)
+            if native > COVER_MB[1]:
+                # MongoDB as shipped (its default, half of RAM less 1 GB) holds more cache than the most Omni may set: the knob
+                # is at its limit on native, and any size Omni wrote would sit below native (the max never goes below native)
+                self.audit.write_text(json.dumps({"t": 0.0, "cache_mb": native, "why": "native's cache is above the cover: at its "
+                                                  "limit on native, nothing written"}) + "\n")
+                self.stop_flag.wait()
+                self.handed_back = self.plug.restore()
+                return
         except Exception as e:                                      # the brain never ran: say so in the audit and the record, never silently
             self.error = repr(e)
             self.audit.write_text(json.dumps({"t": 0.0, "error": self.error, "note": "the brain could not attach; no decision was made"}) + "\n")
@@ -340,7 +349,7 @@ def fresh_server(cache_mb):
         try:
             c = pymongo.MongoClient(URL, serverSelectionTimeoutMS=2000); st = c.admin.command("serverStatus")
             got = int(st["wiredTiger"]["cache"]["maximum bytes configured"]) // MB
-            if got != cache_mb:
+            if cache_mb is not None and got != cache_mb:                 # None: MongoDB's own default, as shipped
                 c.admin.command({"setParameter": 1, "wiredTigerEngineRuntimeConfig": f"cache_size={cache_mb}M"})
             return c
         except Exception:
@@ -352,6 +361,7 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
     import pymongo
     d = wl_dir / f"rep-{rep}" / arm; d.mkdir(parents=True, exist_ok=True)
     c = fresh_server(NATIVE_MB)
+    native_now = int(c.admin.command("serverStatus")["wiredTiger"]["cache"]["maximum bytes configured"]) // MB   # native's size, read
     sampler = Sampler(pymongo.MongoClient(URL)); sampler.start()
     omni = None
     if arm == "omni":
@@ -367,7 +377,7 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
                                           "threads": THREADS, "insertstart": 0, "insertorder": "ordered", "requestdistribution": DISTRIBUTION,
                                           "seed": seed * 100 + i}, raw)      # ordered keys, as loaded: a hashed key space would read records that are not there
         got = parse_raw(raw); summaries.append(txt); failed += parse_failed(txt); records += got
-        lat = sorted(l for _, l in got); row = sampler.rows[-1] if sampler.rows else (NATIVE_MB, 0.0, 0, 0, 0)
+        lat = sorted(l for _, l in got); row = sampler.rows[-1] if sampler.rows else (native_now, 0.0, 0, 0, 0)
         print(f"   {arm} rep {rep} notch {notch}: {len(lat)} ops, mean {sum(lat) / max(1, len(lat)):.3f} ms, p95 {(lat[int(0.95 * len(lat))] if lat else float('nan')):.3f} ms, "
               f"inside the line {100 * sum(1 for l in lat if l <= line_ms) / max(1, len(lat)):.1f}%, cache {row[0]:.0f} MB, in cache {row[1]:.0f} MB", flush=True)
     t1 = time.time(); cpu1 = cpu_times()
@@ -380,7 +390,7 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
     def q(p):
         return lat_sorted[min(n - 1, int(p * n))] if n else float("nan")
     inside = sum(1 for l in lat_sorted if l <= line_ms)
-    rows = sampler.rows or [(NATIVE_MB, 0.0, 0, 0)]
+    rows = sampler.rows or [(native_now, 0.0, 0, 0)]
     total = cpu1[0] - cpu0[0]; idle = cpu1[1] - cpu0[1]; cpu_s = (total - idle) / os.sysconf("SC_CLK_TCK")
     g = {"arm": arm, "rep": rep, "seconds": round(seconds, 1), "operations": n,
          "work_inside_line_ops": inside / seconds, "ops": n / seconds, "p95_ms": q(0.95), "p99_ms": q(0.99),
@@ -463,7 +473,8 @@ def run_workload(name, out: Path, reps, step_s, line_ms, objective=DEFAULT_OBJEC
             raise SystemExit(f"serverStatus().wiredTiger.cache has no '{key}' on this server: the miss-share gate cannot be read")
     load_dataset(workload_file, base * top, wl_dir / "load.log")
     rec = {"workload": name, "tuning": tuning, "ycsb_workload": workload_file, "base_records": base, "steps": steps, "step_s": step_s,
-           "line_ms": line_ms, "rate_ops": RATE, "threads": THREADS, "record_bytes": RECORD_BYTES, "native_mb": NATIVE_MB, "cover_mb": list(COVER_MB),
+           "line_ms": line_ms, "rate_ops": RATE, "threads": THREADS, "record_bytes": RECORD_BYTES, "native": NATIVE,
+           "native_mb": NATIVE_MB if NATIVE_MB is not None else int(have["maximum bytes configured"]) // MB, "cover_mb": list(COVER_MB),
            "mongodb_version": ver, "ycsb_version": YCSB_VERSION, "ycsb_sha256": YCSB_SHA256, "objective": objective, "engine": engine(), "reps": []}
     for rep in range(1, reps + 1):
         order = ("native", "omni") if rep % 2 else ("omni", "native")
@@ -484,8 +495,13 @@ def fmt(v):
 
 
 def report(recs, out: Path):
-    L = ["# YCSB on MongoDB: Omni-Compass on top of a database's operator-set cache size", "",
-         f"MongoDB as shipped with the operator's WiredTiger cache ({NATIVE_MB} MB) is native; omni is the compass law on the cache size "
+    shipped = bool(recs) and all(r.get("native") == "shipped" for r in recs)
+    native_mb = recs[0]["native_mb"] if recs else NATIVE_MB
+    L = ["# YCSB on MongoDB: Omni-Compass on top of a database's " + ("cache as shipped" if shipped else "operator-set cache size"), "",
+         (f"MongoDB exactly as shipped, its WiredTiger cache at the server's own default ({native_mb} MB on this machine), is native; "
+          "a cache above the cover is at its limit on native, and omni then reads and writes nothing. Otherwise omni is the compass law on the cache size "
+          if shipped else f"MongoDB as shipped with the operator's WiredTiger cache ({native_mb} MB) is native; omni is the compass law on the cache size ")
+         + 
          f"through the server's own console inside [{COVER_MB[0]}, {COVER_MB[1]}] MB, holding the server's own read latency at {CENTER:.0%} of "
          f"the {LINE_MS:.0f} ms line. YCSB's published core workloads, the same operations in both arms, the key space stepping through the "
          "cache and past it. Memory held is the resource; the host's CPU seconds include the compass's own cost. Every row is reported, "
@@ -524,17 +540,22 @@ def setup():
     conf = Path("/etc/mongod.conf")
     if conf.exists():
         txt = conf.read_text()
-        if "cacheSizeGB" not in txt:
+        if NATIVE_MB is not None and "cacheSizeGB" not in txt:            # --native shipped: the server's own default stands
             txt = txt.replace("storage:\n", f"storage:\n  wiredTiger:\n    engineConfig:\n      cacheSizeGB: {NATIVE_MB / 1024:.3f}\n", 1)
             subprocess.run(["sudo", "tee", str(conf)], input=txt, text=True, check=True, capture_output=True)
         subprocess.run(["sudo", "systemctl", "restart", "mongod"], check=True)
-    print(f"YCSB {YCSB_VERSION} at {YCSB_HOME} (sha256 {got[:16]}...); MongoDB {server_version()} at the operator's {NATIVE_MB} MB cache")
+    print(f"YCSB {YCSB_VERSION} at {YCSB_HOME} (sha256 {got[:16]}...); MongoDB {server_version()} at native's cache ({NATIVE}: "
+          f"{NATIVE_MB if NATIVE_MB is not None else 'the server default'} MB)")
     return 0
 
 
 def main(argv=None):
+    global NATIVE, NATIVE_MB
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--setup", action="store_true")
+    ap.add_argument("--native", default="operator", choices=("operator", "shipped"),
+                    help="native: the operator's 512 MB cache (preregistered) or MongoDB exactly as shipped, its own default cache "
+                         "(the founder's order of 17 October); a native cache above the cover is at its limit on native")
     ap.add_argument("--workloads", default="tuning")
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--step-s", type=float, default=20.0)
@@ -544,6 +565,7 @@ def main(argv=None):
                     help="what the brain's verdict judges a step by: resource (the index's reading: work, speed, memory and CPU together) or service (work and speed alone)")
     ap.add_argument("--report-only", default="")
     a = ap.parse_args(argv)
+    NATIVE, NATIVE_MB = a.native, (None if a.native == "shipped" else 512)
     if a.setup:
         return setup()
     out = Path(a.out)

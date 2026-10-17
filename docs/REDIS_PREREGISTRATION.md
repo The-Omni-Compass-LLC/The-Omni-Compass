@@ -168,6 +168,17 @@ The first counted set on the brain's verdict (runs 38013287665, 38013291972, 380
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
 Enterprise License. All rights reserved. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## Amendment 4 (2026-10-17, declared before any run on it): native as shipped, beside the operator's ceiling
+
+The founder's order of 17 October: every native muscle also runs exactly as it is shipped. A second set runs beside the
+preregistered one with every rule unchanged but native's two settings: Redis exactly as shipped, with no memory ceiling
+(`maxmemory 0`) and `noeviction` (`tools/run_redis.py --native shipped`, workflow input `native: shipped`). A cache with no
+ceiling holds every key it is given: the knob is at its limit on native, and any ceiling Omni-Compass wrote would sit below
+native, which the max never does. So in the shipped set omni reads the cache, writes nothing and says so in its audit ("native
+has no ceiling: at its limit on native"), and every row reads EVEN; that is the result, said before the run. The value of the
+compass on this knob is where an operator has set a ceiling, which the preregistered set measures; its tables keep their name,
+and the shipped set's are named for it (`…_REDIS_SHIPPED.md`).
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

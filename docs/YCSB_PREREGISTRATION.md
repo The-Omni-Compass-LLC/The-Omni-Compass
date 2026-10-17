@@ -314,6 +314,17 @@ The first counted set on the brain's verdict (runs 38013343689, 38013348512, 380
 © 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
 Enterprise License. All rights reserved. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## Amendment 4 (2026-10-17, declared before any run on it): native as shipped, beside the operator's cache
+
+The founder's order of 17 October: every native muscle also runs exactly as it is shipped. A second set runs beside the
+preregistered one with every rule unchanged but native's cache: MongoDB exactly as shipped, its WiredTiger cache at the server's
+own default (half of the machine's memory less 1 GB, at least 256 MB: about 7.5 GB on GitHub's 16 GB machines;
+`tools/run_ycsb.py --native shipped`, workflow input `native: shipped`). That is above the cover's top (2,048 MB): the knob is at
+its limit on native, and any size Omni-Compass wrote would sit below native, which the max never does. So in the shipped set
+omni reads the server, writes nothing and says so in its audit, and every row reads EVEN; that is the result, said before the
+run. The record carries native's size as the server reported it. The preregistered set keeps its name; the shipped set's tables
+are named for it (`…_YCSB_SHIPPED.md`).
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

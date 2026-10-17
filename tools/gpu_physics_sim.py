@@ -36,8 +36,7 @@ P_IDLE, P_STATIC, P_DEMAND = 40.0, 80.0, 300.0
 SERVICE_MS, SLO_MS = 50.0, 500.0
 PHASES = [0.3, 0.6, 0.8, 0.3, 0.6, 0.3]
 DURATION, DRAIN = 600, 30
-T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228,
-       14: 2.145, 19: 2.093, 29: 2.045}
+from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 
 SMI = '''#!/usr/bin/env python3
 import json, os, sys
@@ -128,7 +127,7 @@ def paired(nat, om, k):
 
 def table(gamma, nat, om):
     out = [f"### Card model gamma {gamma:g} ({'voltage falls with clock' if gamma >= 2.5 else 'near its voltage floor'})",
-           "", f"{len(nat)} paired repetitions. A change is proven when its 95% interval excludes zero.", "",
+           "", f"{len(nat)} paired repetitions. A change is clear of the noise when its 95% interval excludes zero.", "",
            "| Gauge | Native | Omni | Change | 95% interval of the difference |", "|---|---:|---:|---:|---:|"]
     for k in nat[0]:
         n = statistics.mean(x[k] for x in nat); o = statistics.mean(x[k] for x in om); m, lo, hi = paired(nat, om, k)
@@ -138,7 +137,8 @@ def table(gamma, nat, om):
     m, lo, hi = paired(nat, om, kj)
     base95 = statistics.mean(x[p95] for x in nat); _, _, hi95 = paired(nat, om, p95)
     guard = hi95 <= 0.10 * base95
-    word = "more requests per kJ, proven" if lo > 0 else "fewer requests per kJ, proven" if hi < 0 else "not proven"
+    word = ("more requests per kJ, clear of the noise" if lo > 0 else "fewer requests per kJ, clear of the noise" if hi < 0
+            else "EVEN, no difference beyond the noise")
     if lo > 0 and not guard:
         word = "more requests per kJ, fails the service guardrail"
     out += ["", f"Guardrail (preregistered): 95th-percentile response time not above +10%: "

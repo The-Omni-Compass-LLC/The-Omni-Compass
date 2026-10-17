@@ -1269,8 +1269,9 @@ respect a limit the wires do not carry.
 
 ### 5.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v8** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
-quoted here ran on omni-v7, whose rules omni-v8 carries unchanged (it changed one wire, the CityLearn battery). Its
+The engine that stands in this edition is **omni-v9** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
+quoted here ran on omni-v7, whose rules omni-v9 carries unchanged (omni-v8 and omni-v9 changed one wire, the CityLearn
+battery, and the interval table). Its
 mechanism is the Owner's Manual's; five of its rules show in the wiring, the settings and the audit, and are stated here so
 that a line in the audit is read for what it is.
 
@@ -1376,7 +1377,7 @@ checked; install only a commit whose run passed.
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # the engine version (for example omni-v8), or every file that differs
+python3 tools/omni_version.py                  # the engine version (for example omni-v9), or every file that differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 
@@ -1413,7 +1414,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v8 (digest f93d233136a1f902, 46 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v9 (digest 7379f3a79ff2c475, 47 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
 
 **Level 1 - Watch (read-only).**
 
@@ -1848,7 +1849,7 @@ operator's, and the result says so.
 5. **Keep the switches in reach.** The master switch and the kill file work at the facility level exactly as at every other
    level.
 
-**What is proven, and what is not.** The facility muscles are modelled today (class S): the data-hall cooling family of the
+**What is measured, and what is modelled.** The facility muscles are modelled today (class S): the data-hall cooling family of the
 catalog, the power distribution family, and the site budget shared by groups of cards, which held out with no minute over
 its budget. No live facility has run yet. A class P result needs a building
 management system's point list, read access, a site meter and a test hall; until a facility pilot has produced its own
@@ -2045,9 +2046,10 @@ less work was done. The steps below are the whole method.
 2. **The switch drill** after every run: turn Omni-Compass OFF; check every setting is back at its recorded
    original; turn it ON.
 3. **The receipt.** Each gauge: native, Omni-Compass, the change, the 95% interval of the difference, and whether the
-   interval excludes zero. A change is proven only when it does.
+   interval excludes zero. A change reads GAIN, LOSS or power given, clear of the noise, only when it does; otherwise it
+   reads EVEN, no difference beyond the noise.
 4. **The label, by rule written before the run:** SUPERIOR WITHIN GUARDRAILS / ENERGY IMPROVEMENT WITH SERVICE
-   TRADEOFF / NONINFERIOR / NOT ESTABLISHED / LESS WORK PER ENERGY / INVALID. Guardrails: work not lower by more than 1%; the share of
+   TRADEOFF / NONINFERIOR / INCONCLUSIVE / NOT ESTABLISHED / AWAY FROM ITS AIM / NOT ATTRIBUTABLE / INVALID. Guardrails: work not lower by more than 1%; the share of
    time outside the service line not higher by more than 1 percentage point. The band-first rule is stricter: no win
    is claimed while the time outside the service line is above native's.
 
@@ -2090,21 +2092,21 @@ for three runs side by side; a receipt from any other tool should be laid out th
 manual can read it without learning a new shape.
 
 **The readings to expect, and what it means when you do not see them.** The published tables are the reference an
-installer reads their own receipt against: not the numbers, which belong to our systems and our loads, but the signs and the
-words. On omni-v7, whose Kubernetes governor omni-v8 carries byte for byte, on real Kubernetes, ten pairs a run and three runs each
-(`results/live/V7_*.md`; each runs again on omni-v8):
+installer reads their own receipt against: not their numbers, which belong to our systems and our loads and are printed only in
+the Owner's Manual (chapter 16) and `results/live/`, but the words each kind of service has read in all three of our runs on
+real Kubernetes:
 
-| The service | Reads GAIN in all three of our runs | Reads EVEN | Power given |
+| The service | Reads GAIN | Reads EVEN | Power given |
 |---|---|---|---|
-| Rightsized with Goldilocks and the VPA's recommender | response time −45% to −47% mean, −60% to −62% at the 95th percentile, −67% to −69% at the 99th; time over the line −100% | machines, failed requests, replicas, pods started, pod start wait, alert minutes | parked-worker energy +1.6% to +2.3% |
-| Scaled by KEDA's HTTP add-on | response time −57% to −58% mean, −71% to −75% at the 95th percentile; alert minutes −93% to −96%; replicas −15% to −19%; pods started −17% to −23% | machines, failed requests, pod start wait | parked-worker energy +2.2% to +2.3% |
-| Scaled by KEDA on CPU and requests | response time −36% to −38% mean, −52% to −54% at the 95th percentile, −57% to −59% at the 99th; time over the line −98% to −100% | machines, failed requests, replicas, alert minutes | parked-worker energy +1.1% to +1.7% |
+| Rightsized with Goldilocks and the VPA's recommender | response time (mean, 95th and 99th percentile); time over the line | machines, failed requests, replicas, pods started, pod start wait, alert minutes | parked-worker energy |
+| Scaled by KEDA's HTTP add-on | response time (mean and 95th percentile); alert minutes; replicas; pods started | machines, failed requests, pod start wait | parked-worker energy |
+| Scaled by KEDA on CPU and requests | response time (mean, 95th and 99th percentile); time over the line | machines, failed requests, replicas, alert minutes | parked-worker energy |
 | Governed by CruiseKube's own recommendations | nothing: no setting written | every gauge | none |
 | Held at a fixed CPU cap, four caps | nothing: the cap blocks the one lever | completed work and work inside the line at every cap | none |
 
 Read your receipt against this table in three steps. **First the words.** A service gauge that reads LOSS on your receipt, where
 the table reads GAIN or EVEN for the same kind of service, is read as a wiring fault before anything else (`DISCLOSURES.md`,
-section 4): the feed's freshness and its line (chapter 18), the sensed autoscaler's name, the identity's permissions (chapter 14), the window's length against the interval widths above. **Second the direction.** Where the table reads GAIN, your receipt should read GAIN or EVEN; a smaller gain
+section 4): the feed's freshness and its line (chapter 18), the sensed autoscaler's name, the identity's permissions (chapter 14), the window's length against the widths of your receipt's own intervals. **Second the direction.** Where the table reads GAIN, your receipt should read GAIN or EVEN; a smaller gain
 is your stack's, not a fault, because the gain is bounded by how far native stood from its own best. **Third the power given.** A
 resource that rose on your receipt is read beside the work and the speed it bought; a rise with nothing bought is a question for
 Appendix L: what did the governor write, and why. Two readings are not faults: EVEN on every gauge where native already runs at the

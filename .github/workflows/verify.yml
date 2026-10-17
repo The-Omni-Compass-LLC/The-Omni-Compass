@@ -24,7 +24,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r requirements.txt
+      # the exact versions verify.py passed with before the push (requirements-lock.txt), so this check runs the same
+      # environment; requirements.txt gives the supported ranges
+      - run: pip install -r requirements-lock.txt
       - run: cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release && cmake --build cpp/build -j2
       - run: python verify.py --quick
       - name: Legal notice at the end of this job's report

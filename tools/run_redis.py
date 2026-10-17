@@ -60,6 +60,8 @@ DT = 1.0                  # one decision a second
 TAU = 2.0                 # memory given or taken shows in the misses within a couple of seconds
 SMOOTH = 0.5
 NATIVE_MB = 64            # the operator's ceiling
+NATIVE = "operator"        # --native shipped: Redis exactly as shipped, no ceiling (maxmemory 0) and noeviction
+POLICY = {"operator": "allkeys-lru", "shipped": "noeviction"}
 COVER_MB = (16, 512)      # never under 16 MB, never over 512 MB
 STEP_MB = 8               # one notch of the knob
 FAILUP_MB = 128           # past the wall: a quarter of the cover at once, and again the next second if still past it
@@ -71,7 +73,7 @@ STEPS = "1 2 3 2 3 4 5 6 5 4 3 2 1 2 1"
 BURST = "1 6 1 8 1 6"
 ZIPF_S = 0.5              # the working set's key distribution (Zipf exponent): a hot core and a long tail, as application caches see
 FULL = 0.9                # the cache counts as full when memory used is 90% of the ceiling or more
-T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
+from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 SAME_REL = 1e-6
 
 WORKLOADS = {
@@ -254,6 +256,14 @@ class Omni(threading.Thread):
 
     def run(self):
         native_mb = self.plug.attach() // MB; ev0 = self.plug.evicted(); t0 = time.monotonic(); cpu_prev = cpu_times()
+        if native_mb == 0:
+            # Redis as shipped holds every key it is given (no ceiling): the knob is at its limit on native, and any ceiling
+            # Omni wrote would sit below native (the max never goes below native). It reads and writes nothing, and says so.
+            with open(self.audit, "w") as fh:
+                fh.write(json.dumps({"t": 0.0, "maxmemory_mb": 0, "why": "native has no ceiling: at its limit on native, nothing written"}) + "\n")
+            self.stop_flag.wait()
+            self.handed_back = self.plug.restore()
+            return
         self.verdict = KnobVerdict(native_mb, STEP_MB, COVER_MB, objective=self.objective, settle_s=TAU)
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
@@ -320,7 +330,7 @@ def run_arm(arm, wl_dir: Path, rep, value_bytes, base_keys, steps, step_s, line_
     d = wl_dir / f"rep-{rep}" / arm; d.mkdir(parents=True, exist_ok=True)
     r = redis.Redis(host=HOST, port=PORT, socket_timeout=5)
     r.flushall()                                               # a cold cache, both arms alike
-    r.config_set("maxmemory", str(NATIVE_MB * MB)); r.config_set("maxmemory-policy", "allkeys-lru")
+    r.config_set("maxmemory", str(NATIVE_MB * MB)); r.config_set("maxmemory-policy", POLICY[NATIVE])   # NATIVE_MB 0: no ceiling
     pipe = r.pipeline(transaction=False)                       # the warm-up: the notch-1 working set loaded once, both arms alike
     for k in range(base_keys):
         pipe.set(f"k{base_keys}:{k}", b"v" * value_bytes)
@@ -415,7 +425,7 @@ def run_workload(name, out: Path, reps, step_s, line_ms, objective=DEFAULT_OBJEC
     print(f"== {name}: {value_bytes} B values, working set {base_keys:,} keys x notch, steps {steps}, {step_s} s a notch, Redis {ver}, the verdict's objective {objective}", flush=True)
     rec = {"workload": name, "tuning": tuning, "value_bytes": value_bytes, "base_keys": base_keys, "steps": steps, "step_s": step_s,
            "line_ms": line_ms, "rate_rps": RATE, "miss_penalty_ms": MISS_PENALTY_MS, "native_mb": NATIVE_MB, "cover_mb": list(COVER_MB),
-           "objective": objective, "redis_version": ver, "engine": engine(), "reps": []}
+           "objective": objective, "native": NATIVE, "redis_version": ver, "engine": engine(), "reps": []}
     for rep in range(1, reps + 1):
         order = ("native", "omni") if rep % 2 else ("omni", "native")
         r = {}
@@ -435,8 +445,13 @@ def fmt(v):
 
 
 def report(recs, out: Path):
-    L = ["# Redis: Omni-Compass on top of a cache's operator-set memory ceiling", "",
-         f"Redis as shipped with the operator's ceiling ({NATIVE_MB} MB, allkeys-lru) is native; omni is the compass law on the ceiling "
+    shipped = bool(recs) and all(r.get("native") == "shipped" for r in recs)
+    L = ["# Redis: Omni-Compass on top of a cache's " + ("memory as shipped (no ceiling)" if shipped else "operator-set memory ceiling"), "",
+         ("Redis exactly as shipped, with no memory ceiling and noeviction, is native; with no ceiling the knob is at its limit on "
+          "native, so omni reads and writes nothing, and every gauge is native's. Otherwise omni is the compass law on the ceiling "
+          if shipped else
+          f"Redis as shipped with the operator's ceiling ({recs[0]['native_mb'] if recs else NATIVE_MB} MB, allkeys-lru) is native; omni is the compass law on the ceiling ")
+         + 
          f"through Redis's own console inside [{COVER_MB[0]}, {COVER_MB[1]}] MB, holding the application's own request latency at "
          f"{CENTER:.0%} of the {LINE_MS:.0f} ms line (a hit is inside, a miss and its {MISS_PENALTY_MS:.0f} ms store trip outside). The same "
          "requests in both arms. Memory held is the resource; the host's CPU seconds include the compass's own cost. Every row is "
@@ -454,17 +469,18 @@ def report(recs, out: Path):
             ch = "" if p["native"] == 0 else f"{100 * p['diff'] / abs(p['native']):+.1f}%"
             L.append(f"| {label} | {fmt(p['native'])} | {fmt(p['omni'])} | {ch} | {fmt(p['ci95'][0])} to {fmt(p['ci95'][1])} | {p['reading']} |")
         hb = all(r["omni"]["handed_back"] for r in rec["reps"]); fw = any(r["omni"]["foreign_writer"] for r in rec["reps"])
-        L += ["", f"Every omni arm handed back to the operator's ceiling: {'yes' if hb else 'NO'}; another writer seen: {'yes' if fw else 'no'}; "
+        L += ["", f"Every omni arm handed back to native's ceiling ({rec['native_mb'] or 'none'} MB): {'yes' if hb else 'NO'}; another writer seen: {'yes' if fw else 'no'}; "
               f"fail-ups: {sum(r['omni']['failups'] for r in rec['reps'])}.", ""]
     (out / "REDIS.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     return out / "REDIS.md"
 
 
 def setup():
-    """The workflow's Redis: the shipped binary, the operator's two settings, nothing else."""
+    """The workflow's Redis: the shipped binary, the operator's two settings (or, --native shipped, none: no ceiling and
+    noeviction, as Redis ships), nothing else."""
     log = Path("/tmp/omni-redis.log")
     subprocess.run(["redis-server", "--port", str(PORT), "--daemonize", "yes", "--save", "", "--appendonly", "no", "--maxmemory", f"{NATIVE_MB}mb",
-                    "--maxmemory-policy", "allkeys-lru", "--logfile", str(log), "--dir", "/tmp"], check=True)
+                    "--maxmemory-policy", POLICY[NATIVE], "--logfile", str(log), "--dir", "/tmp"], check=True)
     for _ in range(30):
         r = subprocess.run(["redis-cli", "-p", str(PORT), "ping"], capture_output=True, text=True)
         if r.stdout.strip() == "PONG":
@@ -474,8 +490,12 @@ def setup():
 
 
 def main(argv=None):
+    global NATIVE, NATIVE_MB
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--setup", action="store_true")
+    ap.add_argument("--native", default="operator", choices=("operator", "shipped"),
+                    help="native: the operator's 64 MB ceiling with allkeys-lru (preregistered) or Redis exactly as shipped, no ceiling "
+                         "and noeviction (the founder's order of 17 October); with no ceiling the knob is at its limit on native")
     ap.add_argument("--workloads", default="tuning")
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--step-s", type=float, default=20.0)
@@ -485,6 +505,7 @@ def main(argv=None):
                     help="what the brain's verdict judges a step by: resource (the index's reading: work, speed, memory and CPU together) or service (work and speed alone)")
     ap.add_argument("--report-only", default="")
     a = ap.parse_args(argv)
+    NATIVE, NATIVE_MB = a.native, (0 if a.native == "shipped" else 64)
     if a.setup:
         return setup()
     out = Path(a.out)

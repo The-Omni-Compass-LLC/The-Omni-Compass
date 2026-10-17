@@ -53,7 +53,12 @@ def main(pdf, md_path):
     # the Contents and the List of Figures (the front matter) against the bookmarks and the caption pages
     toc = [(re.sub(r"\s+", " ", t), label[pg]) for lvl, t, pg in doc.get_toc()]
     rows, lof_rows = [], []
-    for i in range(1, body - 1):
+    # the Contents and the List of Figures are the pages from the Contents heading to the first bookmarked page (the
+    # Foreword), that page included; the title and copyright pages before them carry no rows
+    front_end = min((pg for _lvl, _t, pg in doc.get_toc()), default=body)      # the List of Figures can end on it
+    framed = lambda i: " ".join(w[4] for w in doc[i].get_text("words") if TOP < w[1] < H - BOTTOM)
+    first = next((i for i in range(1, front_end) if framed(i).startswith("Contents")), 1)
+    for i in range(first, front_end):
         lines = {}
         for w in doc[i].get_text("words"):
             if TOP < w[1] < H - BOTTOM:
@@ -61,9 +66,13 @@ def main(pdf, md_path):
         carry = ""                                        # a row wrapped onto a second line is joined before the test
         for k in sorted(lines):
             txt = " ".join(w[4] for w in sorted(lines[k], key=lambda w: w[0]) if w[4] != ".")
+            if re.match(r"Figure \d+\. ", txt):
+                carry = ""                                # every figure row starts its own line: what came before was
+                                                          # the page's heading or the list's opening paragraph
             m = re.match(r"(.*\S)\s+([0-9]+|[ivxlcdm]+)$", txt)
             if m and len(txt) < 200:
                 full = (carry + " " + m.group(1)).strip() if carry else m.group(1)
+                full = re.sub(r"^(Contents|List of Figures) ", "", full)            # the page's heading
                 (lof_rows if full.startswith("Figure ") else rows).append((re.sub(r"\s+", " ", full), m.group(2)))
                 carry = ""
             elif len(txt) < 200 and (txt.startswith("Figure ") or txt[:1].isupper() or txt[:1].isdigit() or carry):
@@ -165,11 +174,18 @@ def main(pdf, md_path):
             key = term.split()[0].strip(",;:()").lower()[:8]
             if len(key) < 4:
                 continue
+            # a file name is wrapped inside its table cell, its folder can sit in another line of the cell, and a cell
+            # split over two pages carries the name's end to the next page, where the index tag (placed right after
+            # the term) records it: the page is right when it shows the name's start, its file name or its end
+            squeeze = lambda t: re.sub(r"[\s­]", "", t)
+            whole = squeeze(term.split()[0].strip(",;:()"))
+            ends = {whole[:24], whole.rsplit("/", 1)[-1], whole[-6:]}
             for pg in pages.split(","):
                 checked += 1
                 body_txt = plain.get(pg.strip(), "")
-                if key not in body_txt and key.replace(" ", "") not in body_txt.replace(" ", ""):   # a file name
-                    misses.append((term[:30], pg.strip()))                                       # wrapped in a cell
+                tight = squeeze(body_txt)
+                if key not in body_txt and not any(e in tight for e in ends):
+                    misses.append((term[:30], pg.strip()))
     print(f"index references checked {checked}; the term's first word not on the listed page: {len(misses)} {misses[:8]}")
 
     # every cross-reference in the book's text names a heading the book has (the one numbering, 17 October)
