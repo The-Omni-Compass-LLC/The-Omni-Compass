@@ -126,7 +126,7 @@ def run_alone(row, seed, arm, load="line"):
     if arm == "omni":
         twin = make_plant(row, seed)
         scale_load_plant(twin, load)
-    last, rec, pv, pw = None, {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power": []}, 0, 0.0
+    last, rec, pv, pw = None, {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power": [], "obs": []}, 0, 0.0
     for k in range(steps):
         wrote = 0
         if arm == "omni":
@@ -141,17 +141,19 @@ def run_alone(row, seed, arm, load="line"):
         rec["p"].append(min(2.0, max(-0.5, v5_position(plant)))); rec["over"].append(plant.m["viol"] - pv); pv = plant.m["viol"]
         rec["held"].append(1 if plant.override else 0); rec["wrote"].append(wrote)
         rec["work"].append(plant.m["work"] - pw); pw = plant.m["work"]; rec["power"].append(plant.power_w)
+        rec["obs"].append(plant.observe())
     line_k = getattr(plant, "line_k", None)
     return rec, steps, (line_k if line_k is not None else steps) if getattr(plant, "line_n", 0) or getattr(plant, "line_e", 0.0) or getattr(plant, "line0", 0.0) else None
 
 
 def frames(rec, steps):
     """A muscle's own decisions onto the 240 frames."""
-    out = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power": []}
+    out = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power": [], "obs": []}
     for f in range(FRAMES):
         a, b = f * steps // FRAMES, max(f * steps // FRAMES + 1, (f + 1) * steps // FRAMES)
         out["p"].append(rec["p"][b - 1]); out["over"].append(int(any(rec["over"][a:b]))); out["held"].append(rec["held"][b - 1])
         out["wrote"].append(int(any(rec["wrote"][a:b]))); out["work"].append(sum(rec["work"][a:b])); out["power"].append(sum(rec["power"][a:b]) / (b - a))
+        out["obs"].append(rec["obs"][b - 1])
     return out
 
 
@@ -164,7 +166,10 @@ def alone_body(rs, seed, arm):
     T = lambda key: [[per[i][key][f] for i in range(len(rs))] for f in range(FRAMES)]
     out = {"p": T("p"), "over": T("over"), "held": T("held"), "wrote": T("wrote"), "work": T("work"),
            "power_kw": [round(sum(per[i]["power"][f] for i in range(len(rs))) / 1000.0, 4) for f in range(FRAMES)],
-           "obs": [{"queue_ratio": 0, "load_ratio": 0, "power_stress": 0, "thermal": 0, "network_stress": 0, "drift_ratio": 0}] * FRAMES,
+           # what a governor would read of the sixty muscles: the mean of their own observations (realms/harness.py
+           # aggregate), each muscle's power stress against its own budget
+           "obs": [{k: sum(per[i]["obs"][f][k] for i in range(len(rs))) / len(rs) for k in
+                    ("queue_ratio", "load_ratio", "power_stress", "thermal", "network_stress", "drift_ratio")} for f in range(FRAMES)],
            "line": lines}
     return out
 
