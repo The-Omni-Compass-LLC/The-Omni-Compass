@@ -4,7 +4,7 @@
 
 **Source.** Manuscript Appendix J: "Nervous system. The signal layer: sensing interfaces, unit integrity, timing
 coherence, delay and dropout handling, and feedback interpretation. … The brain cannot compensate for corrupted
-signals." Section 5.3: the engine "projects forward state trajectories … and detects destabilization pressure before
+signals." Manuscript Section 5.3: the engine "projects forward state trajectories … and detects destabilization pressure before
 divergence."
 
 **The gap.** Before this change, the live controller fed the engine's `stale` (signal dropout) and `drift_ratio`

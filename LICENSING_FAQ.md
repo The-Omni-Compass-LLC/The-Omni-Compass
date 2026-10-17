@@ -11,9 +11,10 @@ evaluation and simulation only.
 
 **What may I do without a commercial license?** Evaluation and simulation, free of charge (`LICENSE`, sections 1.4,
 1.5 and 2): read the code; run `verify.py`, the simulations and the benchmarks; reproduce the published results and
-publish your own, every row included (section 4); run Omni-Compass in watch, dry-run or shadow mode, or in a test
+publish your own, every row included (`LICENSE`, section 4); run Omni-Compass in watch, dry-run or shadow mode, or in a test
 environment, on systems you own or control, where it writes to nothing that serves production traffic or real users and
-to no physical process outside a test bench. A limited patent license comes with it, for evaluation only (section 2.2).
+to no physical process outside a test bench. A limited patent license comes with it, for evaluation only (`LICENSE`,
+section 2.2).
 
 **What needs the Omni-Compass Enterprise License?** Every commercialization or monetization of any kind; production
 use; operating any system beyond evaluation; offering it, or its function, as a hosted, managed or software-as-a-service

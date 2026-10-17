@@ -204,8 +204,8 @@ the implementer's checklists, the governor's settings (the Kubernetes governor's
 record by record (every record of the governor, of the other muscles and of the card governors), the three clouds side by
 side, every input of the paired run from GitHub, and the papers counsel asks for (the license, the licensing answers, the
 third-party notices, the Enterprise License's standard terms, the patents and trademarks, the security policy). Since 16
-October it also states the rules of the engine that stands as an operator meets them (section 5.5) and how a new muscle is
-coded on the muscle SDK (section 4.7). It is 493 pages, with 49 figures drawn from the code by two kits (`docs/book/figures.py`,
+October it also states the rules of the engine that stands as an operator meets them (section 6.5) and how a new muscle is
+coded on the muscle SDK (section 5.7). It is 495 pages, with 50 figures drawn from the code by two kits (`docs/book/figures.py`,
 `docs/book/schematics.py`; the drawings in `docs/book/figures/`): the plug, the band and the two forces, one decision of the
 governor, the eight levels, the one pedal, the seven organisms and the three-run rule; a wiring schematic for every stack in
 the grammar of an electrical drawing (the governor's sense and motor terminals, the kill switch, the plug, the native
@@ -213,7 +213,8 @@ controller, the muscle and the meters); the flowcharts of the wire check, the pa
 the three stops and the reading rule; the timing diagrams; and the state machines of the modes, the card governor and the life
 of a muscle; and an index. The Owner's, which prints the engine's whole source and adds the engine's six states and its two
 landscapes, the control-loop block diagrams, the modelled traces and every receipt of the engine that stands charted from its
-own table (73 figures), is 1,239 pages. Its text is
+own table (77 figures), is 1,248 pages. Both books carry one numbering (chapter.section), and every cross-reference in
+them is rewritten to it when the book is built and checked against the headings on the built PDF. Its text is
 [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md); the cloud install files are `deploy/install/`
 (`omni-compass.yaml`, `rbac-machines.yaml`, `omni-compass-cloud.yaml`) and `deploy/Dockerfile.cloud`. It is written for the CTO who decides, the
 engineer who wires and the operator who runs it; the published results are on this page and in `results/`.

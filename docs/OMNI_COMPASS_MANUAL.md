@@ -300,7 +300,8 @@ any cluster and on Azure, a database behind its pooler, the independent simulato
 consumer group, a cache's memory ceiling, drone swarms, a storage engine's cache, a buffer pool, the processor itself, and
 the data center under the servers. Part IV is operating it: the switches, the rules the governor keeps, the log, and
 maintenance. Part V is checking it on your own system: paired runs and receipts, evidence classes, the engine version and
-the three-run rule. Part VI is the license and how to verify your copy. The back matter holds the glossary, every command,
+the three-run rule. Part VI is the implementer's guide: Omni-Compass on a cloud, from an empty account to a governed
+cluster. Part VII is the license and how to verify your copy. The back matter holds the glossary, every command,
 the files an installation touches, the gauges, troubleshooting and every muscle with its wiring.
 
 ## Where to Get Help
@@ -664,13 +665,18 @@ is therefore always "what the governor added on top of what the native controlle
 The second design decision is that Omni-Compass must never cause a LOSS. Before Omni-Compass moves a slow knob (a machine
 given back, a card's clock ceiling, a robot axis's speed, a drone's cruise override), it runs a **paired trial on the
 muscle itself**: the muscle's own cost per piece of work is measured at the deepest step already allowed and at one step
-past it, under the same traffic, with at least thirty pieces of work on each side; the step is allowed only if the
-trial's median cost is no more than 2% above the reference and no more than 2% above the cost first measured at native.
-A refused step is not tried again for a set number of decisions. Where no step passes, the trial reads **left native**,
+past it, under the same traffic, with a set number of pieces of work on each side (two hundred response times on
+Kubernetes; thirty requests on a card). The step is read as a receipt reads a row, by the 95% interval of the change in
+cost: an interval wholly above zero is a LOSS and the step is refused; an interval wider than the 2% allowance measures
+on, up to three times the number; otherwise the step is allowed only if the trial's median cost and its mean change are
+both no more than 2% above the reference and above the cost first measured at native. A refused step is not tried again
+for a set number of decisions (120 decisions, two hours, on Kubernetes; 900 decisions, thirty minutes, on a card). A
+trial that sees the service leave calm, or a phase that outlasts its limit (20 decisions on Kubernetes; 30 on a card), is
+abandoned and the knob goes back, the step neither allowed nor refused. Where no step passes, the trial reads **left native**,
 the knob is never moved, and the receipt for that muscle says "nothing for Omni to move". Gains are not capped; the 2%
 allowance caps only what may be spent in the trial to look for them.
 
-![Block diagram: the verdict's paired trial around a slow knob. The reference r is the median cost per request at the deepest step already allowed, n ≥ 30; the trial t is the median one step past it under the same traffic, n ≥ 30. The step is allowed only if t ≤ r·(1 + a) and t ≤ c[native]·(1 + a) with a = 0.02; otherwise it is refused, the knob stays, and the step is not tried again for R decisions (900 on a card, 120 on Kubernetes). Steps cannot add up beyond the allowance, because every step is judged against the native cost too.](book/figures/c_verdict.svg)
+![Block diagram: the verdict's paired trial around a slow knob, read GAIN, EVEN or LOSS. The reference r is the cost of n requests at the deepest step already allowed (on a card, at native; n = 200 on Kubernetes, 30 on a card); the trial t is the cost of n more one step past it under the same traffic. The reading is the 95% interval of d = mean ln c[t] − mean ln c[r], stepwise also against the costs first measured at native: an interval wholly above zero is a LOSS and the step is refused; an interval wider than τ = ln(1 + a) measures on, up to 3n; otherwise the step is allowed only if median t ≤ min(r, c[native])·(1 + a) and d ≤ τ, with a = 0.02. A refused step is not tried again for R decisions (120 on Kubernetes, 7,200 s; 900 on a card, 30 min). Steps cannot add up beyond the allowance, because every step is judged against the native cost too.](book/figures/c_verdict.svg)
 
 For an installation this has two consequences. A knob the operator grants is not a knob Omni-Compass will move: it is a
 knob Omni-Compass may move once the muscle itself has shown the step costs it nothing. And a muscle that never passes a
@@ -1187,18 +1193,24 @@ for every write, the value sent and the value the device reported, side by side.
 On Kubernetes the **release gate** lets one machine be given back only when every one of the following holds, and writes
 the first reason that fails into the audit, so a reader can see why a machine was kept:
 
-![Flowchart: the release gate, reasons 1 to 4. May one machine be given back this decision? Only if the remaining machines would stay under 95% full, no pod is waiting for a place, the pods are not scaling up, and the service is not breached and has been clean for three decisions; the first reason that fails holds the machine and is written in the audit. Continued in the next figure.](book/figures/f_release_gate.svg)
+![Flowchart: the release gate, reasons 1 to 5. The compass law asks for one machine back (its force past the release threshold, the reading under the centre, the verdict's deepest allowed step covering the count; never on the max, never during a trial). The gate then tests, in the governor's own order: more than one machine in service; no pod waiting for a place; the pods not scaling up; the line not breached now, the feed live; the remaining machines at or under the utilisation target ρ (the engine's demand, clipped to between 50% and 95%). The first reason that fails holds the machine and is written in the audit. Continued in the next figure.](book/figures/f_release_gate.svg)
 
-![Flowchart: the release gate, reasons 5 to 8 and the release. The organ's pressure must be under the release threshold, every sense live, the last command landed, and the verdict's trial must allow the step; only then is one machine given back, and read back.](book/figures/f_release_gate_b.svg)
+![Flowchart: the release gate, reasons 6 to 9 and the release. The machine organ's own authority to contract (its engine calm at or over 0.7, its line clean, no security hold), every sense live, the last machine command landed, and a minute since the last release; only then is one machine given back and read back. Cruise overrides the release: while work waits for a place, every machine stays in service.](book/figures/f_release_gate_b.svg)
 
-1. the remaining machines would stay under 95% full;
+1. more than one machine is in service (the floor of two is never crossed);
 2. no pod is waiting for a place;
 3. the pods are not scaling up;
-4. the service is not past its line;
-5. the muscle's own pressure is under its release threshold;
-6. every sense is live;
-7. the last command has landed (no new order goes on top of one the cluster has not yet carried out).
+4. the service is not past its line now, and its feed is live;
+5. the remaining machines would run at or under the utilisation target ρ: the work in use divided by the capacity of
+   the machines that would remain, against the engine's own demand clipped to between 50% and 95%;
+6. the machine organ's own engine state grants contraction (its calm at or over 0.7, its line clean, no security hold);
+7. every sense is live;
+8. the last machine command has landed (no new order goes on top of one the cluster has not yet carried out);
+9. a minute has passed since the last release.
 
+The gate is asked only when the compass law itself asks for a machine back (its force past the release threshold, the
+reading under the centre, the verdict's deepest allowed step covering the count), never on the max and never during a
+trial; and cruise overrides it (while work waits for a place, every machine stays in service).
 One machine per decision is the rule in the slow, reversible direction; past the wall, one machine up at once. The same
 shape holds on every discrete muscle: a consumer, a chunk of a buffer pool, a notch of a cache ceiling, a tap. The gate's
 records read, in the governor's own words, "release permitted" (with the utilisation the remaining machines would carry),
@@ -1439,7 +1451,7 @@ What you should see: in the paired receipt (chapter 10), response time at the 95
 2. Run with `--mode nodepool --active-nodes-only --closure /app/law/closure.json --node-scale-cmd "<command with {n}>"`
    and `--node-restore-cmd "<command>"` for the OFF switch. For the compass on the same levers, use `--law compass`
    (it reads the mean response time of the latency window in the band from a tenth of `--slo-ms` to `--slo-ms` and holds
-   it at the centre of section 3.4, 0.3 at the max and 0.4 at the tune-down; p95 at the line, a blind feed or a waiting pod
+   it at the centre of the band (section 3.4): 0.3 at the max and 0.4 at the tune-down; p95 at the line, a blind feed or a waiting pod
    adds capacity at once; the HPA target never goes above the operator's; at the max no machine the cluster had on its own
    is given back, and at the tune-down machines go back one at a time through the release gate and the paired trial).
 
@@ -1513,7 +1525,9 @@ What you should see: site power stress entering the decisions (the `compass` rec
 Every knob is wired out first and in last, and the wire in is connected only by a measurement the governor makes on the
 knob itself. The steps, for any stack:
 
-![Flowchart: the verdict's trial on one step. At the deepest step already allowed, n ≥ 30 requests are measured fresh as the reference; one step deeper, under the same traffic, n ≥ 30 more are the trial; the trial is abandoned if the service was not calm or too little work came through, refused if the trial's median cost exceeds the reference's or native's by more than 2%, and otherwise the deepest allowed step moves one deeper.](book/figures/f_trial.svg)
+![Flowchart: the verdict's trial on one step, from the reference to the reading. While the service is calm and nothing waits, and P decisions after the last trial began (10 on Kubernetes, 600 s; 8 on a card), the reference is measured fresh at the deepest step already allowed (on a card, at native): n requests (200 response times on Kubernetes; 30 of a card's own service time). One step deeper, under the same traffic, n more are the trial. A phase that sees the service leave calm or outlasts its limit (20 decisions on Kubernetes, 1,200 s; 30 on a card) is abandoned: the knob goes back, the step neither allowed nor refused. The reading is the 95% interval of the change in log cost. Continued in the next figure.](book/figures/f_trial.svg)
+
+![Flowchart: the verdict's trial on one step, from the reading to the step allowed or refused. An interval wholly above zero is a LOSS: the step is refused, the knob goes back, and the step is not tried again for R decisions (120 on Kubernetes, 7,200 s; 900 on a card). An interval wider than the allowance with fewer than 3n trial requests measures on. Otherwise the step is allowed only if the trial's median is within the allowance of the reference and of native and the mean change is within it too; else it is refused, past the allowance. An allowed step moves the deepest allowed step one deeper.](book/figures/f_trial_b.svg)
 
 1. **Wire out, everything.** Every muscle's readings reach the governor, one wire out per muscle. Nothing is written. This
    is watch mode (section 1.3): where every installation starts, and where any knob returns the moment it stops paying.
@@ -1543,7 +1557,7 @@ and Omni-Compass reads it. The body's result is then the sum of the knobs that e
 for the whole system. The live stacks of chapter 7 (the pooler, the broker, the cache, the storage engine's cache and the
 buffer pool) carry this trial on their knob, and on Kubernetes it guards every machine given back (section 1.2).
 
-![Timing diagram: a give-back trial from reference to verdict, in decisions. The reference (n ≥ 30 requests at the deepest allowed step), the trial (n ≥ 30 at one step deeper under the same traffic), the verdict in one decision, and, on a refusal, the quiet period in which the step is not tried again (900 decisions on a card, 120 on Kubernetes). A trial is abandoned, and the knob stays, if the service is not calm or too little work came through.](book/figures/t_trial.svg)
+![Timing diagram: a give-back trial from reference to verdict, in decisions. The reference (n requests at the deepest allowed step; on a card, at native), the trial (n more at one step deeper under the same traffic, measuring on up to 3n while the interval is wider than the allowance), the verdict in one decision, and, on a refusal, the quiet period in which the step is not tried again (120 decisions on Kubernetes, 7,200 s; 900 on a card, 30 min). A phase that outlasts its limit (20 decisions on Kubernetes; 30 on a card), or sees the service leave calm, is abandoned: the knob goes back, the step neither allowed nor refused.](book/figures/t_trial.svg)
 
 ## 7. Stack by Stack
 

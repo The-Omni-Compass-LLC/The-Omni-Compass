@@ -867,6 +867,7 @@ OWNER_OUTLINE = [
     ("The Dossier: Every Result in One Place", ("F", "docs/DOSSIER.md")),
     ("Paired Runs and Receipts on Your Own System", ("M", "Paired Runs and Receipts on Your Own System")),
     ("Evidence Classes and How to Read a Result", ("M", "Evidence Classes and How to Read a Result")),
+    ("The Frozen Engines and the Three-Run Rule", ("M", "The Frozen Engines and the Three-Run Rule")),
     ("Results to Date", ("M", "Results to Date")),
     ("Wire In, or Watch: The Verdict per Knob", ("F", "docs/WIRING_VERDICTS.md")),
     ("The Pilot Protocol and Kit", ("FS", ["docs/PILOT_PROTOCOL.md", "docs/PILOT_KIT.md"])),
@@ -906,6 +907,7 @@ OWNER_OUTLINE = [
     ("Appendix G. The Muscles: What Each Is For, and How It Is Wired", ("F", "docs/MUSCLE_CATALOG.md")),
     ("Appendix H. Source of the Engine", ("X", "source")),
     ("Appendix I. The License", ("X", "license")),
+    ("Appendix J. Reproducing Everything, From a Clean Machine", ("M", "Appendix J - Reproducing Everything, From a Clean Machine")),
     ("Index", ("X", "index")),
     ("Contact", ("X", "contact")),
 ]
@@ -918,13 +920,15 @@ for m in re.finditer(r"^## (\d+)\. (.*)$", read(MANUAL_REL), re.M):
     MAN_NUM[int(m.group(1))] = m.group(2).strip()
 
 
-def source_listing(rel):
+def source_listing(rel, nb=None):
     lines = read(rel).splitlines()
-    return [Heading(inline(f"`{rel}`"), H2, 2, toc_text=rel), Paragraph(inline(f"{len(lines)} lines."), CAP), Spacer(1, 4),
+    num = nb.heading(2, rel) if nb is not None else rel         # numbered like every other section of its appendix
+    head = num[:len(num) - len(rel)] if nb is not None else ""
+    return [Heading(inline(f"{head}`{rel}`"), H2, 2, toc_text=num), Paragraph(inline(f"{len(lines)} lines."), CAP), Spacer(1, 4),
             *code_block(lines, SRC), Spacer(1, 10)]
 
 
-def special(name):
+def special(name, nb=None):
     if name == "source":
         fp = json.loads(read("OMNI_V7.json"))
         files = list(fp["files"])
@@ -945,13 +949,7 @@ def special(name):
                  "of them differs from the fingerprint.")
         story = [Paragraph(inline(intro), BODY)]
         for rel in py:
-            story += source_listing(rel)
-        return story
-    if name == "manifests":
-        story = md_flow(MAN["Appendix I - The Install Manifests"], shift=2, strip=True)
-        for rel in ["deploy/install/omni-compass.yaml", "deploy/install/rbac-machines.yaml", "deploy/install/omni-compass-cloud.yaml",
-                    "deploy/rbac-target.yaml", "deploy/Dockerfile", "deploy/Dockerfile.cloud"]:
-            story += source_listing(rel)
+            story += source_listing(rel, nb)
         return story
     if name == "index":
         return [Paragraph(inline("Every term of the glossary where this book defines or discusses it, every muscle family where it "
@@ -976,35 +974,206 @@ def special(name):
     raise KeyError(name)
 
 
-def renumber(lines):
-    """The manual's "section 14" becomes the book's "Chapter 38"."""
-    txt = "\n".join(lines)
-    txt = re.sub(r"\bsections? (\d+)\b(?!\.\d)",
-                 lambda m: f"Chapter {CHAPNUM.get(MAN_NUM.get(int(m.group(1)), ''), m.group(1))}", txt)
-    return txt.splitlines()
+# ---------------------------------------------------------------- the book's one numbering
+# The founder's order of 17 October: once every figure is placed, renumber, then realign every reference. A chapter
+# is numbered by the book (CHAPNUM, in the order of the outline); every section under it is numbered chapter.m in
+# the order it appears, whatever label its source carried (the manual's own "16.1b", a bound page's "3." or "A."),
+# and a subsection chapter.m.k; an appendix numbers its sections by its letter (K.1). Every reference in the text
+# ("section 16.4b", "chapter 6", "Appendix E", "Part VI") is rewritten to the book's numbers from the map the
+# headings make, and a reference that resolves to nothing is listed at the end of the build.
+LABEL_RE = re.compile(r"^(?:(\d+(?:\.\d+)*[a-z]?)\.?|([A-Z])\.(\d+)?|([IVX]+)\.)\s+(?=\S)")
+PART_WORDS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
+# the manual's own grouping of its chapters into parts (its preface) against the book's parts: the Operator's
+# manual and its book share one grouping; the Owner's manual groups its 18 chapters in seven, the book in eight
+PART_MAP = ({"II": "Two", "III": "Five", "IV": "Five", "V": "Six", "VI": "Seven", "VII": "Eight"} if OWNER
+            else {"I": "One", "II": "Two", "III": "Three", "IV": "Four", "V": "Five", "VI": "Six", "VII": "Seven"})
+SEC_REF = re.compile(r"\b([Ss]ections?)\s+(\d+(?:\.\d+)?[a-z]?(?:(?:,\s*|\s+and\s+|\s+or\s+|\s+to\s+)\d+(?:\.\d+)?[a-z]?)*)(?![\w.]\w)")
+CHAP_REF = re.compile(r"\b([Cc]hapters?)\s+(\d+(?:(?:,\s*|\s+and\s+|\s+or\s+|\s+to\s+)\d+)*)\b")
+APPX_REF = re.compile(r"\bAppendi(x|ces) ([A-Z])\b")
+PART_REF = re.compile(r"\bPart ([IVX]+)\b")
+# a reference that follows another document's name (`DISCLOSURES.md`, section 4; `LICENSE`, section 10; the Operator's
+# Manual, Appendix L; the founder's manuscript) carries that document's numbering and is left as written; the book's own
+# manual, named in full, is not another document
+EXTERNAL = re.compile(r"(\.md`|\.md\)|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual)\W*$")
+MANUSCRIPT = re.compile(r"[Mm]anuscript")
+OWN_NAME = re.compile(r"Owner's Manual|OWNERS_MANUAL\.md") if OWNER else re.compile(r"Operator's Manual|OMNI_COMPASS_MANUAL\.md")
+# the repository's pages ("the manual, section 4.5") cite the Operator's Manual; bound into the Owner's book they are
+# read through this map onto the Owner's own sections that carry the same text (identity in the Operator's book)
+OPERATOR_TO_OWNER = ({"1.5": "1.6", **{f"4.{k}": f"8.{k}" for k in range(1, 8)}, **{f"6.{k}": f"9.{k}" for k in range(1, 5)},
+                      "7.1": "10.1", "7.2": "10.2", "7.3": "10.3", "7.4": "10.5", "7.5": "10.6", "7.6": "10.7", "7.7": "10.8",
+                      "7.8": "10.9", "7.9": "10.10", "7.10": "10.11"} if OWNER else {})
+UNRESOLVED = []
+MAN_LABELS = {}                           # the manual's "16.1b" -> the book's "48.2"
+DOC_LABELS = {}                           # a bound page's own "3" or "A" -> the book's "28.3", keyed by the page
+NUMBERERS = {}                            # the numberer of every outline item, keyed by its title
 
 
-def chapter_flow(src):
+class Numberer:
+    """The numbers of one chapter's headings, and the map from each heading's source label to its book number."""
+    def __init__(self, chap):
+        self.chap, self.m, self.k, self.labels = chap, 0, 0, {}
+
+    def heading(self, lvl, txt):
+        m = LABEL_RE.match(txt)
+        label = None
+        if m:
+            if m.group(1):
+                label = m.group(1)
+            elif m.group(2):
+                label = m.group(2) + ("." + m.group(3) if m.group(3) else "")
+            else:
+                label = m.group(4)
+            txt = txt[m.end():]
+        if self.chap is None:
+            return txt
+        if lvl <= 2:
+            self.m += 1; self.k = 0; num = f"{self.chap}.{self.m}"
+        else:
+            self.k += 1; num = f"{self.chap}.{self.m}.{self.k}"
+        if label:
+            self.labels.setdefault(label, num)
+        return f"{num} {txt}"
+
+
+def number_headings(lines, shift, nb):
+    """Every heading of a source renumbered by the book (a fenced code block's '# comment' is not a heading)."""
+    out, fence = [], False
+    for ln in lines:
+        if ln.startswith("```"):
+            fence = not fence; out.append(ln); continue
+        m = None if fence else re.match(r"^(#{1,6}) (.*)", ln)
+        if m:
+            lvl = max(2, min(3, len(m.group(1)) - shift + 1))
+            out.append(m.group(1) + " " + nb.heading(lvl, m.group(2).strip()))
+        else:
+            out.append(ln)
+    return out
+
+
+def rewrite_refs(text, kind, key, own, prev=""):
+    """Every reference in one line rewritten to the book's numbers; one that resolves to nothing is kept as written
+    and listed. A reference to another document's numbering (`DISCLOSURES.md`, section 4; the Operator's Manual,
+    Appendix L; `LICENSE`, section 10; the manuscript) is left as it stands; prev, the line before, supplies the
+    context of a reference that starts a line."""
+    def flag(s):
+        UNRESOLVED.append(f"{kind} {key}: {s}"); return s
+
+    def external(start):
+        ctx = (prev[-80:] + "\n" + text[:start]) if start < 60 else text[start - 60:start]
+        if MANUSCRIPT.search(ctx[-200:]):
+            return True
+        return bool(EXTERNAL.search(ctx)) and not OWN_NAME.search(ctx[-70:])
+
+    def man_chapter(t):
+        n = CHAPNUM.get(MAN_NUM.get(int(t), ""))
+        return (str(n), "chapter") if n else (None, None)
+
+    def sec_token(t, to_manual):
+        if "." in t:
+            if kind != "M" and t in own and not to_manual:
+                return own[t], "section"
+            t2 = OPERATOR_TO_OWNER.get(t, t) if kind in ("F", "FS") else t
+            return (MAN_LABELS[t2], "section") if t2 in MAN_LABELS else (None, None)
+        if kind == "M" or to_manual:
+            return man_chapter(t)
+        return (own[t], "section") if t in own else (None, None)
+
+    def sec(mt):
+        if external(mt.start()):
+            return mt.group(0)
+        word, lst = mt.group(1), mt.group(2)
+        to_manual = kind != "M" and bool(re.search(r"manual(?:'s)?\W*$", text[max(0, mt.start() - 30):mt.start()]))
+        res = [sec_token(t, to_manual) for t in re.findall(r"\d+(?:\.\d+)?[a-z]?", lst)]
+        if any(r[0] is None for r in res) or len({r[1] for r in res}) != 1:
+            return flag(mt.group(0))
+        it = iter(res)
+        new = re.sub(r"\d+(?:\.\d+)?[a-z]?", lambda m: next(it)[0], lst)
+        if res[0][1] == "chapter":
+            word = "Chapters" if word.endswith("s") else "Chapter"
+        return f"{word} {new}"
+
+    def chap(mt):
+        if external(mt.start()):
+            return mt.group(0)
+        if kind != "M" and not re.search(r"manual(?:'s)?\W*$", text[max(0, mt.start() - 30):mt.start()]):
+            return mt.group(0)                     # a bound page's own "chapter 3" is its own numbering, left as written
+        nums = [CHAPNUM.get(MAN_NUM.get(int(t), "")) for t in re.findall(r"\d+", mt.group(2))]
+        if any(n is None for n in nums):
+            return flag(mt.group(0))
+        it = iter(nums)
+        return mt.group(1) + " " + re.sub(r"\d+", lambda m: str(next(it)), mt.group(2))
+
+    def appx(mt):
+        if mt.group(2) in BOOK_APPENDICES or external(mt.start()):
+            return mt.group(0)
+        return flag(mt.group(0))
+
+    def part(mt):
+        w = PART_MAP.get(mt.group(1))
+        return f"Part {w}" if w else flag(mt.group(0))
+
+    text = CHAP_REF.sub(chap, text)                    # first: a "Chapter N" made by the section rule below is final
+    text = SEC_REF.sub(sec, text)
+    text = APPX_REF.sub(appx, text)
+    return PART_REF.sub(part, text)
+
+
+def source_lines(src):
+    """The lines of an outline item's source and the heading shift md_flow reads them with."""
     kind, key = src
     if kind == "T":
-        return md_flow(THEORY[key], shift=1)
+        return THEORY[key], 1
     if kind == "D":
-        return md_flow(DECL[key], shift=1)
+        return DECL[key], 1
     if kind == "M":
-        lines = MAN[key]
-        return md_flow(renumber(lines), shift=2, strip=True)
+        return MAN[key], 2
     if kind == "F":
-        return md_flow(doc_body(key)[1], shift=1)
+        return doc_body(key)[1], 1
     if kind == "FS":
-        story = []
+        lines = []
         for rel in key:
             t, body = doc_body(rel)
-            story.append(Heading(inline(t or rel), H2, 2))
-            md_flow(body, shift=0, story=story)
-        return story
-    if kind == "X":
-        return special(key)
-    raise KeyError(kind)
+            lines += ["# " + (t or rel), ""] + body
+        return lines, 0
+    if kind == "X" and key == "manifests":
+        return MAN["Appendix I - The Install Manifests"], 2
+    return [], 0
+
+
+def prepare(src, nb, own=None):
+    """A source's lines numbered by the book and with every reference rewritten to the book's numbers."""
+    kind, key = src
+    lines, shift = source_lines(src)
+    lines = number_headings(lines, shift, nb)
+    own = nb.labels if own is None else own
+    out, fence, prev = [], False, ""
+    for ln in lines:
+        if ln.startswith("```"):
+            fence = not fence
+        out.append(rewrite_refs(ln, kind, key, own, prev))
+        if ln.strip():
+            prev = ln
+    return out
+
+
+def chapter_flow(src, nb):
+    kind, key = src
+    if kind == "X" and key != "manifests":
+        return special(key, nb)
+    lines, shift = source_lines(src)
+    if not lines and kind != "X":
+        raise KeyError(kind)
+    flow = md_flow(prepare(src, nb), shift=shift)
+    if kind == "X":                                           # the install manifests: the appendix text, then the files
+        for rel in ["deploy/install/omni-compass.yaml", "deploy/install/rbac-machines.yaml", "deploy/install/omni-compass-cloud.yaml",
+                    "deploy/rbac-target.yaml", "deploy/Dockerfile", "deploy/Dockerfile.cloud"]:
+            flow += source_listing(rel, nb)
+    return flow
+
+
+def appendix_letter(title):
+    m = re.match(r"^Appendix ([A-Z])\.", title)
+    return m.group(1) if m else None
 
 
 CHAPNUM = {}
@@ -1014,6 +1183,22 @@ for item in OUTLINE:
         n += 1; CHAPNUM[item[0]] = n
         if item[1][0] == "M":
             CHAPNUM[item[1][1]] = n
+BOOK_APPENDICES = {appendix_letter(item[0]) for item in OUTLINE if item[0].startswith("Appendix")}
+
+# the first pass over the outline: every heading numbered, so that every reference can be rewritten in the second
+for item in OUTLINE:
+    if item[0] in ("PART", "BACK"):
+        continue
+    title, src = item
+    chap = str(CHAPNUM[title]) if title in CHAPNUM else appendix_letter(title)
+    nb = Numberer(chap)
+    lines, shift = source_lines(src)
+    number_headings(lines, shift, nb)
+    NUMBERERS[title] = nb
+    if src[0] == "M":
+        MAN_LABELS.update(nb.labels)
+    else:
+        DOC_LABELS[title] = nb.labels
 
 # ---------------------------------------------------------------- document
 
@@ -1291,9 +1476,15 @@ def chapter_opener(num, title, kicker=None, top=0.9 * inch):
          GoldRule(FW, 1.2, 16), Spacer(1, 6)])
 
 
-def front_chapter(doc, title, lines):
+def front_lines(lines, kind="M", key="front"):
+    """A front-matter section's lines: its headings carry no number, its references the book's numbers."""
+    nb = Numberer(None)
+    return [rewrite_refs(ln, kind, key, {}) for ln in number_headings(lines, 2, nb)]
+
+
+def front_chapter(doc, title, lines, kind="M"):
     return [ChapterBreak(), Marker("chapter", title=title, opener=True), OpenerSpace(0.9 * inch)] + keep_with_next(
-        [Heading(inline(title), H1, 1, kind="chapter"), GoldRule(FW, 1.2, 16)]) + md_flow(renumber(lines), shift=2, strip=True)
+        [Heading(inline(title), H1, 1, kind="chapter"), GoldRule(FW, 1.2, 16)]) + md_flow(front_lines(lines, kind, title), shift=2)
 
 
 OPERATOR_PREFACE = """I wrote this book for the engineers who put Omni-Compass into a running system: how to embed it, how to wire
@@ -1410,15 +1601,15 @@ def build():
     story += front_chapter(doc, "Quick Reference: The Card for the Glove Box", MAN["Quick Reference: The Card for the Glove Box"])
     if OWNER:
         story += front_chapter(doc, "Executive Summary", MAN["Executive Summary"])
-    story += front_chapter(doc, "Disclosures, Declarations and Disclaimers", doc_body("DISCLOSURES.md")[1])
+    story += front_chapter(doc, "Disclosures, Declarations and Disclaimers", doc_body("DISCLOSURES.md")[1], kind="F")
     md_parts = [f"# THE OMNI-COMPASS {EDITION_NAME.upper()}", "", BANNER_MD, "", EDITION, "", FILED, "",
                 "The printable book of this text, with its contents and appendices: "
                 f"`docs/{OUT_PDF.name}`. Built by `docs/book/build_book.py`" + (" --owner" if OWNER else "") + ".", ""]
-    md_parts += ["## Foreword", ""] + MAN["Foreword"] + ["## Preface", ""] + preface_lines() + [""]
+    md_parts += ["## Foreword", ""] + front_lines(MAN["Foreword"]) + ["## Preface", ""] + front_lines(preface_lines()) + [""]
     for sec in ("Prelude: A Night on the Cluster", INTRO,
                 "The key: GAIN, EVEN and LOSS", "What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report",
                 "Quick Reference: The Card for the Glove Box") + (("Executive Summary",) if OWNER else ()):
-        md_parts += [f"## {sec}", ""] + MAN[sec] + [""]
+        md_parts += [f"## {sec}", ""] + front_lines(MAN[sec]) + [""]
 
     part_no = 0
     words = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
@@ -1453,19 +1644,21 @@ def build():
             continue
         title, src = item
         num = CHAPNUM.get(title)
-        flow = chapter_flow(src)
+        flow = chapter_flow(src, NUMBERERS[title])
         story += ([] if after_part else [ChapterBreak()]) + [Marker("chapter", title=title)]
         story += chapter_opener(num, title, None if num else ("APPENDIX" if title.startswith("Appendix") else "BACK MATTER"),
                                 top=0.25 * inch if after_part else 0.9 * inch)
         story += flow
         after_part = False
         md_parts += ["", f"## {str(num) + '. ' if num else ''}{title}", ""]
-        md_parts += md_text(src)
+        md_parts += md_text(src, NUMBERERS[title])
     # the notice at the end of the book, as at its start
     story += [FlushFloats(), Spacer(1, 24), GoldRule(FW, 1.2, 14),
               Paragraph(inline(BANNER_MD[2:]), ParagraphStyle("end", parent=BODY, alignment=TA_LEFT))]
     doc.multiBuild(story, canvasmaker=INDEX.getCanvasMaker())
     OUT_MD.write_text(normalize_markdown("\n".join(md_parts) + "\n")[0], encoding="utf-8")   # the notice on top and at the end
+    seen = sorted(set(UNRESOLVED))
+    print(f"references not resolved to the book's numbering: {len(seen)}" + "".join("\n  " + s for s in seen))
     print(OUT_PDF, doc.page, "pages")
     report_fill(OUT_PDF)
 
@@ -1496,11 +1689,11 @@ def report_fill(pdf):
           + (", ".join(short) if short else "none"))
 
 
-def md_text(src):
+def md_text(src, nb):
     """The book's one-file text for a chapter: a figure line points to its drawing beside the text (docs/book/figures/),
     and any other image (a plate) is left out (14 October)."""
     out = []
-    for ln in _md_text(src):
+    for ln in _md_text(src, nb):
         m = IMAGE_LINE.match(ln)
         if m:
             fig = FIGURE_PATH.match(m.group(2))
@@ -1511,22 +1704,17 @@ def md_text(src):
     return out
 
 
-def _md_text(src):
+def _md_text(src, nb):
+    """The chapter's lines as the book numbers them: a chapter is '##', its sections '###', their subsections '####'."""
     kind, key = src
-    if kind == "T":
-        return THEORY[key]
-    if kind == "D":
-        return DECL[key]
-    if kind == "M":
-        return [re.sub(r"^###", "###", ln) for ln in MAN[key]]
-    if kind == "F":
-        return ["#" + ln if ln.startswith("#") else ln for ln in doc_body(key)[1]]
-    if kind == "FS":
-        out = []
-        for rel in key:
-            t, body = doc_body(rel)
-            out += [f"### {t}", ""] + ["##" + ln if ln.startswith("#") else ln for ln in body]
-        return out
+    if kind in ("T", "D", "F"):                                # their '##' is a section: one level down under the chapter
+        return ["#" + ln if ln.startswith("#") else ln for ln in prepare(src, Numberer(nb.chap))]
+    if kind == "M":                                            # the manual's '###' is already a section
+        return prepare(src, Numberer(nb.chap))
+    if kind == "FS":                                           # a bound page's title is a section, its '##' a subsection
+        return ["##" + ln if ln.startswith("#") else ln for ln in prepare(src, Numberer(nb.chap))]
+    if kind == "X" and key == "manifests":
+        return prepare(src, Numberer(nb.chap))
     if kind == "X":
         if key == "source":
             fp = json.loads(read("OMNI_V7.json"))

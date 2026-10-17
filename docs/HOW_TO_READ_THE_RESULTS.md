@@ -214,7 +214,8 @@ CSV beside the page (`results/WIRING_VERDICTS.csv`) has one row per knob and per
 With the work held equal in both arms, the gain from Omni-Compass on top is *G = C[native] / C[omni] − 1*, where *C* is a
 resource (machine-hours, CPU core-hours, joules). The same work then needs *1 / (1 + G)* of the resources, a saving of
 *G / (1 + G)*: a third more work is a quarter off the bill. The full explanation, the three rules for reading a receipt
-and where every number stands today are in the manual, section 3 (`docs/OMNI_COMPASS_MANUAL.md`).
+and where every number stands today are in the Owner's Manual, chapter 3, *Where the Value Comes From*
+(`docs/OMNI_COMPASS_OWNERS_MANUAL.md`).
 
 ---
 

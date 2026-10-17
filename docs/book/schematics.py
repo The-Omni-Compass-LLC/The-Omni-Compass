@@ -87,7 +87,7 @@ FIGURES = {
     # control-loop block diagrams
     "c_compass_loop": "Block diagram: the compass law as a closed loop on one muscle",
     "c_engine_loop": "Block diagram: from the observations through the engine to the authority",
-    "c_verdict": "Block diagram: the verdict's paired trial around a slow knob",
+    "c_verdict": "Block diagram: the verdict's paired trial around a slow knob, read GAIN, EVEN or LOSS",
     "c_gpu_pair": "Block diagram: the two wires of a card as an antagonist pair",
     "c_authority": "Logic diagram: the nervous system's authority to add and to give back",
     # flowcharts
@@ -96,14 +96,15 @@ FIGURES = {
     "f_paired_run": "Flowchart: one paired run, native against Omni-Compass on top, the pairs",
     "f_paired_run_b": "Flowchart: one paired run, from the pairs to the three-run table",
     "f_phases": "Flowchart: the implementer's eight phases and their gates",
-    "f_release_gate": "Flowchart: the release gate, reasons 1 to 4",
-    "f_release_gate_b": "Flowchart: the release gate, reasons 5 to 8 and the release",
+    "f_release_gate": "Flowchart: the release gate, reasons 1 to 5",
+    "f_release_gate_b": "Flowchart: the release gate, reasons 6 to 9 and the release",
     "f_stops": "Flowchart: the three ways a governor stops",
     "f_toy_gate": "Flowchart: the toy gate before any engine change runs for real",
     "f_reading": "Flowchart: the three-run reading rule",
     "f_park": "Flowchart: parking and waking a machine in the cloud",
     "f_conductor": "Flowchart: one tick of the grid conductor",
-    "f_trial": "Flowchart: the verdict's trial on one step",
+    "f_trial": "Flowchart: the verdict's trial on one step, from the reference to the reading",
+    "f_trial_b": "Flowchart: the verdict's trial on one step, from the reading to the step allowed or refused",
     "f_cache_rule": "Flowchart: the direction rule of a cache knob",
     # timing diagrams and modelled traces
     "t_clocks": "Timing diagram: the governor's clocks against the native controllers' own",
@@ -700,8 +701,8 @@ def c_compass_loop():
     d += elm.Wire("|-").at(band.S).to((s1.S.x, y2 - 1.4)).color(NAVY)
     arrow(d, (s1.S.x, y2 - 1.4), s1.S, color=NAVY)
     text_at(d, s1.S.x + 0.15, (y2 - 1.4 + s1.S.y) / 2, "p", NAVY, valign="center")
-    text_at(d, s1.S.x + 0.12, s1.S.y - 0.05, "−", NAVY, valign="top")
-    text_at(d, s1.W.x - 0.05, s1.W.y + 0.08, "+", NAVY, halign="right", valign="bottom")
+    text_at(d, s1.S.x + 0.12, s1.S.y - 0.05, "+", NAVY, valign="top")                      # e = p − c: p enters plus,
+    text_at(d, s1.W.x - 0.05, s1.W.y + 0.08, "−", NAVY, halign="right", valign="bottom")   # the centre c minus
     notes(d, 0.0, y2 - 1.9, "c the centre of the band; y the reading; p the reading's position in the band; e = p − c; v = ṗ smoothed; r the raw "
                             "force; F the force after the saturation; Δx the step; x the knob. Fail up: p ≥ 0.95 → F = A at once; the down side "
                             "held until p is back inside the band. No take-back while the reading climbs above the centre (F < 0 with v > 0 and "
@@ -728,22 +729,44 @@ def c_engine_loop():
 
 
 def c_verdict():
+    """The verdict as the engine that stands reads it (omnicompass/verdict.py, judge="interval"): the trial step's cost
+    against the reference's as a 95% interval on the logarithm of each piece of work's cost, read GAIN, EVEN or LOSS
+    exactly as a report reads a row; the medians kept as the second guard. Every number is the controllers' own
+    (omni_controller/controller.py: n = 200, a = 0.02, R = 120 decisions of 60 s; omni_controller/gpu_compass.py:
+    n = 30, a = 0.02, R = 900 decisions of 2 s)."""
     d = new_drawing()
-    y1, h = 0.0, 1.9
-    ref = box(d, 0.4, y1 - h / 2, 4.0, h, "REFERENCE r\nmedian cost per request at the deepest allowed step, n ≥ 30", fill=MIST)
-    trial = box(d, 4.8, y1 - h / 2, 4.0, h, "TRIAL t\nmedian cost one step past it, n ≥ 30, the same traffic", fill=PALE, color=GOLD)
-    cmp_ = box(d, 9.2, y1 - h / 2, 3.8, h, "t ≤ r·(1 + a) and\nt ≤ c[native]·(1 + a)?\na = 0.02", fill=BLUE)
-    arrow(d, ref.E, trial.W, color=NAVY); arrow(d, trial.E, cmp_.W, color=NAVY)
-    y2 = -3.4
-    yes = box(d, 0.4, y2 - 0.8, 5.8, 1.6, "YES: step allowed. The deepest allowed step moves one deeper; the next trial may begin", fill="#e4efe4", color=GREEN)
-    no = box(d, 6.8, y2 - 0.8, 6.2, 1.6, "NO: step refused, the muscle is slower there. The knob stays; not tried again for R decisions (GPU 900, Kubernetes 120)", fill=ROSE, color=RED)
-    ymid = cmp_.S.y - 0.6
-    line(d, cmp_.S, (cmp_.S.x, ymid)); line(d, (yes.N.x, ymid), (no.N.x, ymid))
-    arrow(d, (yes.N.x, ymid), yes.N, color=GREEN); arrow(d, (no.N.x, ymid), no.N, color=RED)
-    text_at(d, yes.N.x + 0.15, ymid - 0.1, "yes", GREEN, valign="top"); text_at(d, no.N.x + 0.15, ymid - 0.1, "no", RED, valign="top")
-    notes(d, 0.4, y2 - 1.2, "The verdict stands over every slow knob (the machines, the clock ceiling, a cache's notch): a step that costs the muscle's "
-                            "own work more than the allowance is refused, and steps cannot add up beyond it. A trial runs to its full measurement and "
-                            "is never ended by the calm it causes.")
+    y1, h = 0.0, 2.6
+    ref = box(d, 0.4, y1 - h / 2, 4.0, h, "REFERENCE r\nthe knob at the deepest step already allowed (a card: at native); the cost of each "
+                                           "of n requests, measured fresh (Kubernetes n = 200; a card n = 30)", fill=MIST)
+    trial = box(d, 4.8, y1 - h / 2, 4.0, h, "TRIAL t\nthe knob one step past it, the same traffic; the cost of n more requests "
+                                             "(a card: its own service time, the wait in the queue left out)", fill=PALE, color=GOLD)
+    read = box(d, 9.2, y1 - h / 2, 3.8, h, "THE READING\nd = mean ln c[t] − mean ln c[r], its 95% interval (Welch); stepwise a second "
+                                            "interval against the costs first measured at native", fill=BLUE)
+    arrow(d, ref.E, trial.W, color=NAVY); arrow(d, trial.E, read.W, color=NAVY)
+    y2, h2 = -3.6, 2.2
+    rule = box(d, 0.4, y2 - h2 / 2, 12.6, h2, "an interval wholly above zero is a LOSS: refused. An interval wider than the allowance "
+                                               "(half-width over τ = ln(1 + a)) with fewer than 3n trial requests: measure on. Otherwise allowed "
+                                               "only if median t ≤ min(r, c[native])·(1 + a) and d ≤ τ, with a = 0.02; else refused, past the allowance",
+               fill=MIST, color=NAVY)
+    arrow(d, read.S, (read.S.x, rule.N.y), color=NAVY)
+    y3, h3 = -7.0, 1.9
+    yes = box(d, 0.4, y3 - h3 / 2, 4.0, h3, "ALLOWED: the deepest allowed step is now the trial step; the law may use it; the next "
+                                             "trial no sooner than P decisions after this one began (Kubernetes 10 = 600 s; a card 8)", fill="#e4efe4", color=GREEN)
+    more = box(d, 4.8, y3 - h3 / 2, 4.0, h3, "MEASURE ON: the knob stays at the trial step one more decision, up to 3n requests", fill=PALE, color=GOLD)
+    no = box(d, 9.2, y3 - h3 / 2, 3.8, h3, "REFUSED: the muscle is slower there. The knob goes back; the step is not tried again for R decisions "
+                                            "(Kubernetes 120 = 7,200 s; a card 900 = 30 min)", fill=ROSE, color=RED)
+    for b, col in ((yes, GREEN), (more, GOLD), (no, RED)):
+        arrow(d, (b.N.x, rule.S.y), b.N, color=col)
+    yb, yt = y3 - h3 / 2 - 0.3, y1 + h / 2 + 0.4                   # the measure-on return, round the outside, into the trial
+    line(d, more.S, (more.S.x, yb), color=GOLD); line(d, (more.S.x, yb), (13.4, yb), color=GOLD)
+    line(d, (13.4, yb), (13.4, yt), color=GOLD); line(d, (13.4, yt), (trial.N.x, yt), color=GOLD)
+    arrow(d, (trial.N.x, yt), trial.N, color=GOLD)
+    text_at(d, trial.N.x + 0.15, yt + 0.05, "the trial continues", GOLD, valign="bottom")
+    notes(d, 0.4, y3 - h3 / 2 - 0.65, "The verdict stands over every slow knob (the machines, the clock ceiling, a cache's notch). A trial begins only while "
+                                     "the service is calm and nothing waits; a phase that sees the service leave calm, or that takes longer than its "
+                                     "limit (Kubernetes 20 decisions = 1,200 s; a card 30 decisions), is abandoned and the knob goes back, the step neither "
+                                     "allowed nor refused. The knob never passes the deepest allowed step, so steps cannot add up past the allowance. "
+                                     "On the max, the Kubernetes machine count never gives back a machine the cluster had on its own.")
     return sd_svg(d)
 
 
@@ -771,34 +794,46 @@ def c_authority():
     """The nervous system's authority as logic: expansion is never gated beyond the security hold; contraction needs
     every one of its conditions."""
     d = new_drawing()
-    cond = ["the body calm (the engine: push ≤ release)", "the line clean for the last 3 decisions", "nothing pending: no pod waiting, not scaling up",
-            "every sense live (none blind or stale)", "the last command landed (proprioception 0)", "the remaining muscles stay inside the band",
-            "the verdict allows the step"]
+    # omnicompass/nervous_system.py authority(): contract = calm ≥ θ (pods 0.5, machines 0.7) and slo_clean and seeing;
+    # calm = κ·h·(1 − clamp(σ − 1))·(1 − clamp(ν)); the controller adds its own gate (node_release_gate) and the verdict
+    cond = ["the engine settled: calm = κ·h·(1 − excess stress)·(1 − unmet need) at or over the organ's threshold θ (pods 0.5; machines 0.7)",
+            "the line clean: no breach now, and for the pods none in the last 3 decisions (180 s)",
+            "every sense live (none blind or stale): a blind sense never gives capacity back",
+            "and, for the machines, the release gate: more than one machine; no pod waiting; pods not scaling up; the remaining machines at or under ρ",
+            "the last command landed (proprioception: no new order to a muscle still carrying out the previous one)",
+            "the verdict allows the step (the deepest step already allowed covers the count)"]
     cw, ch, step = 7.2, 0.62, 0.84
     y = 0.0
+    tops = []
     for c in cond:
-        box(d, 0.4, y - ch, cw, ch, c, fill=MIST, color=GREY, pad=0.3)
-        line(d, (0.4 + cw, y - ch / 2), (8.2, y - ch / 2))
-        y -= step
-    top, bot = -ch / 2, y + step - ch / 2
+        hh = hfor(c, cw, 0.3)
+        box(d, 0.4, y - hh, cw, hh, c, fill=MIST, color=GREY, pad=0.3)
+        line(d, (0.4 + cw, y - hh / 2), (8.2, y - hh / 2))
+        tops.append(y - hh / 2)
+        y -= hh + step - ch
+    top, bot = tops[0], tops[-1]
     mid = (top + bot) / 2
     line(d, (8.2, top), (8.2, bot))
     and1 = box(d, 8.2, mid - 0.7, 1.3, 1.4, "AND", fill=BLUE)
-    give = box(d, 10.1, mid - 1.1, 2.9, 2.2, "GIVE BACK: one unit a decision, or the calm share of the surplus", fill=PALE, color=GOLD)
+    give = box(d, 10.1, mid - 1.1, 2.9, 2.2, "GIVE BACK: one unit a decision (a machine: at most one a minute), or the calm share of the surplus", fill=PALE, color=GOLD)
     arrow(d, and1.E, give.W, color=NAVY)
     y2 = y - 0.5
-    for c in ["the service past the wall, a sense blind, or a pod waiting", "NOT a security hold (the hold flag, the forbidden key)"]:
-        box(d, 0.4, y2 - ch, cw, ch, c, fill=MIST, color=GREY, pad=0.3)
-        line(d, (0.4 + cw, y2 - ch / 2), (8.2, y2 - ch / 2))
-        y2 -= step
-    top2, bot2 = y - 0.5 - ch / 2, y2 + step - ch / 2
+    tops2 = []
+    for c in ["a reason: the service past the wall, a sense blind, or a pod waiting for a place", "NOT a security hold (the hold flag, the forbidden key)"]:
+        hh = hfor(c, cw, 0.3)
+        box(d, 0.4, y2 - hh, cw, hh, c, fill=MIST, color=GREY, pad=0.3)
+        line(d, (0.4 + cw, y2 - hh / 2), (8.2, y2 - hh / 2))
+        tops2.append(y2 - hh / 2)
+        y2 -= hh + step - ch
+    top2, bot2 = tops2[0], tops2[-1]
     mid2 = (top2 + bot2) / 2
     line(d, (8.2, top2), (8.2, bot2))
     and2 = box(d, 8.2, mid2 - 0.6, 1.3, 1.2, "AND", fill=BLUE)
     add = box(d, 10.1, mid2 - 0.95, 2.9, 1.9, "ADD: at once, never held back (a parked machine woken within 5 s)", fill=ROSE, color=RED)
     arrow(d, and2.E, add.W, color=RED)
     notes(d, 0.4, y2 - 0.3, "Asymmetric on purpose: adding is cheap to undo and expensive to delay; taking back is cheap to delay and expensive to get "
-                            "wrong. Every held decision writes the first reason that failed.")
+                            "wrong. Every held decision writes the first reason that failed. In observe mode every authority is computed and "
+                            "logged and nothing is written; under the kill switch there is no authority at all.")
     return sd_svg(d)
 
 
@@ -903,26 +938,32 @@ def f_phases():
                  w=9.0)
 
 
-RELEASE_GATE = ([("start", "may one machine be given back this decision?"),
-                 ("decision", "1 would the remaining machines stay under 95% full?"),
+# the machine organ's release, in the order the controller tests it (omni_controller/controller.py, one decision; the
+# checks of omnicompass/nervous_system.py node_release_gate() in their code order, then the one-a-minute rule)
+RELEASE_GATE = ([("start", "the compass law asks for one machine back: F < −0.2, p under the centre, and the verdict's deepest allowed "
+                           "step covers n − 1 (never on the max; never during a trial)"),
+                 ("decision", "1 more than one machine in service?"),
                  ("decision", "2 no pod waiting for a place?"),
                  ("decision", "3 the pods not scaling up?"),
-                 ("decision", "4 the service not breached (and clean for 3 decisions)?"),
-                 ("decision", "5 the organ's pressure under the release threshold?"),
-                 ("decision", "6 every sense live?"),
-                 ("decision", "7 the last command landed?"),
-                 ("decision", "8 the verdict's trial allows the step?"),
-                 ("end", "release permitted: one machine back, read back")],
-                {k: ("no", "HOLD; the first reason that failed is written") for k in range(1, 9)})
+                 ("decision", "4 the line not breached now (p95 under the line, the feed live)?"),
+                 ("decision", "5 the remaining machines at or under the utilisation target: used / ((n − 1) · one machine) ≤ ρ, "
+                              "ρ the engine's demand clipped to [0.5, 0.95]?"),
+                 ("decision", "6 the machine organ's authority to contract: its engine calm ≥ 0.7, its line clean, no security hold?"),
+                 ("decision", "7 every sense live?"),
+                 ("decision", "8 the last machine command landed?"),
+                 ("decision", "9 a minute since the last release?"),
+                 ("end", "release permitted: one machine back (n − 1), read back; cruise overrides it (work waiting for a place keeps "
+                         "every machine in service)")],
+                {k: ("no", "HOLD; the first reason that failed is written") for k in range(1, 10)})
 
 
 def f_release_gate():
-    (a, da), _ = _split(*RELEASE_GATE, at=5)
+    (a, da), _ = _split(*RELEASE_GATE, at=6)
     return chart(a, decisions=da, side_w=3.4)
 
 
 def f_release_gate_b():
-    _, (b, db) = _split(*RELEASE_GATE, at=5)
+    _, (b, db) = _split(*RELEASE_GATE, at=6)
     return chart(b, decisions=db, side_w=3.4)
 
 
@@ -986,16 +1027,31 @@ def f_conductor():
                  decisions={1: ("yes", "start nothing this tick (Azure first)")}, w=6.8)
 
 
+TRIAL = ([("start", "a slow knob; the service calm and nothing waiting; P decisions since the last trial began (Kubernetes 10 = 600 s; a card 8)"),
+          ("box", "reference: the knob at the deepest step already allowed (a card: at native); the cost of n requests measured fresh "
+                  "(Kubernetes n = 200 response times; a card n = 30 of its own service time, the queue's wait left out)"),
+          ("box", "the trial step: one step deeper, under the same traffic; the cost of n more requests"),
+          ("decision", "the service calm throughout, and each phase within its limit (Kubernetes 20 decisions = 1,200 s; a card 30)?"),
+          ("box", "the reading: d = mean ln c[trial] − mean ln c[ref] with its 95% interval (Welch); stepwise, a second interval against the "
+                  "costs first measured at native"),
+          ("decision", "an interval wholly above zero (a LOSS)?"),
+          ("decision", "an interval wider than the allowance (half-width over τ = ln(1 + a)), with fewer than 3n trial requests?"),
+          ("decision", "median t ≤ min(r, c[native]) · (1 + a) and d ≤ τ, with a = 0.02?"),
+          ("end", "step allowed: the deepest allowed step is now the trial step")],
+         {3: ("no", "trial abandoned: the knob goes back to the deepest allowed step; the step neither allowed nor refused"),
+          5: ("yes", "step refused: the muscle is slower there; the knob goes back; not tried again for R decisions (Kubernetes 120 = 7,200 s; a card 900)"),
+          6: ("yes", "measure on: the knob stays at the trial step one more decision"),
+          7: ("no", "step refused, past the allowance; the knob goes back; not tried again for R decisions")})
+
+
 def f_trial():
-    return chart([("start", "a slow knob at the deepest step already allowed"),
-                  ("box", "reference: n ≥ 30 requests measured fresh at that step (GPU: the card's own service_ms; Kubernetes: the window's cost)"),
-                  ("box", "the trial step: one step deeper, under the same traffic"),
-                  ("decision", "the service calm and enough work through the whole trial?"),
-                  ("box", "trial: n ≥ 30 requests at the trial step; the medians compared"),
-                  ("decision", "t ≤ r·1.02 and t ≤ c[native]·1.02?"),
-                  ("end", "step allowed: the deepest allowed step is now the trial step")],
-                 decisions={3: ("no", "trial abandoned (service not calm, or too little work); the knob stays"),
-                            5: ("no", "step refused: the muscle is slower there; not tried again for R decisions")})
+    (a, da), _ = _split(*TRIAL, at=5)
+    return chart(a, decisions=da, w=6.0, side_w=4.2)
+
+
+def f_trial_b():
+    _, (b, db) = _split(*TRIAL, at=5)
+    return chart(b, decisions=db, w=6.0, side_w=4.2)
 
 
 def f_cache_rule():
@@ -1160,19 +1216,24 @@ def t_pedal():
 
 
 def t_trial():
-    fig = mpl_fig(3.8)
+    fig = mpl_fig(4.2)
     ax = fig.add_subplot(111)
-    spans = [(0, 8, "reference: n ≥ 30 requests at the deepest allowed step", MIST, 14),
-             (8, 16, "trial: n ≥ 30 at one step deeper, the same traffic", PALE, 14),
-             (16, 17, "", BLUE, 1), (17, 36, "refused: not tried again for R decisions (GPU 900; Kubernetes 120)", ROSE, 34)]
+    # the phases in decisions, as the controllers set them: a phase ends when its n requests are in (Kubernetes n = 200;
+    # a card n = 30) and is abandoned past its limit (Kubernetes 20 decisions; a card 30); a refusal rests R decisions
+    # (Kubernetes 120 = 7,200 s; a card 900 = 30 min); the next trial no sooner than P after the last began (10; 8)
+    spans = [(0, 8, "reference: n requests at the deepest allowed step (a card: at native)", MIST, 15),
+             (8, 16, "trial: n more one step deeper, the same traffic; up to 3n", PALE, 15),
+             (16, 17, "", BLUE, 1), (17, 36, "refused: not tried again for R decisions (Kubernetes 120 = 7,200 s; a card 900 = 30 min)", ROSE, 36)]
     for a, b, lab, col, n in spans:
         ax.add_patch(patches.Rectangle((a, 0.7), b - a, 1.3, color=col, ec=GREY))
         if lab:
             ax.text((a + b) / 2, 1.35, wrap(lab, n), ha="center", va="center", fontsize=PT)
-    ax.annotate("the verdict (one decision): allowed, the deepest step moves\none deeper and the next trial may begin", xy=(16.5, 2.0), xytext=(9.0, 2.65),
+    ax.annotate("the verdict (one decision): the 95% interval of the change in log cost,\nGAIN, EVEN or LOSS; allowed, the deepest step moves one deeper; the\n"
+                "next trial no sooner than P decisions after this one began (10; a card 8)", xy=(16.5, 2.0), xytext=(0.5, 2.55),
                 arrowprops=dict(arrowstyle="->", color=GREEN), color=GREEN, ha="left")
-    ax.text(18, 0.3, wrap("abandoned if the service is not calm or too little work came through: the knob stays", 90), ha="center", va="center", color=GREY, fontsize=PT)
-    ax.set_xlim(0, 36); ax.set_ylim(0, 3.2); ax.set_yticks([]); ax.spines["left"].set_visible(False)
+    ax.text(18, 0.3, wrap("a phase past its limit (Kubernetes 20 decisions = 1,200 s; a card 30), or out of calm, is abandoned: the knob goes back, "
+                          "the step neither allowed nor refused", 100), ha="center", va="center", color=GREY, fontsize=PT)
+    ax.set_xlim(0, 36); ax.set_ylim(0, 3.7); ax.set_yticks([]); ax.spines["left"].set_visible(False)
     ax.set_xlabel("decisions (one every 60 s on Kubernetes; every 2 s on a card)")
     return fig_svg(fig)
 

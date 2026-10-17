@@ -37,7 +37,7 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
    noise, none LOSS and none mixed. Inside the seven organisms (the spine the seventh, 16 October) every organism read GAIN as a whole under all three loads,
    and not one plant is behind native in any organism under any load (the living body is `docs/FORMAL_V5.md`,
    section 4; every muscle its own card, which removes more misses than one global setting with less power given, is
-   section 5).
+   `docs/FORMAL_V5.md`, section 5).
 6. **What is not yet shown.** No energy saving on a real chip: the physical receipt (P), the GPU's own meter on the
    current governor, on the same clock as the Kubernetes runs, is the decisive one still to be produced; every earlier
    card result ran on a controller since replaced and is obsolete. No cloud-bill saving: Azure's bill on four workers

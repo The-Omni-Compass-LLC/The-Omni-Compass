@@ -162,6 +162,47 @@ def main(pdf, md_path):
                     if key not in body_txt and key.replace(" ", "") not in body_txt.replace(" ", ""):   # a file name
                         misses.append((term[:30], pg.strip()))                                       # wrapped in a cell
     print(f"index references checked {checked}; the term's first word not on the listed page: {len(misses)} {misses[:8]}")
+
+    # every cross-reference in the book's text names a heading the book has (the one numbering, 17 October)
+    heads = set()
+    for ln in md:                                         # "## 10. Title", "### 10.2 Title", "## Appendix K. Title", "### K.3 Title"
+        m = re.match(r"^#{2,4} (?:(\d+(?:\.\d+)+)|(\d+)\.|Appendix ([A-Z])|([A-Z](?:\.\d+)+))(?=[\s.])", ln)
+        if m:
+            heads.add(next(g for g in m.groups() if g))
+    parts = {re.match(r"^# Part (\w+)\.", ln).group(1) for ln in md if re.match(r"^# Part \w+\.", ln)}
+    # a reference that follows another document's name (`DISCLOSURES.md`, section 4; `LICENSE`, section 10; the other
+    # manual; the founder's manuscript) carries that document's numbering: not this book's to check
+    external = re.compile(r"(\.md`|\.md\)|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual)\W*$")
+    own_name = "Owner's Manual" if "OWNERS" in md_path.upper() else "Operator's Manual"
+
+    def foreign(prev, ln, start):
+        ctx = (prev[-80:] + "\n" + ln[:start]) if start < 60 else ln[start - 60:start]
+        return "anuscript" in ctx[-200:] or (bool(external.search(ctx)) and own_name not in ctx[-70:])
+
+    dangling, n_refs, prev = [], 0, ""
+    for ln in md:
+        if ln.startswith("#"):
+            continue
+        for m in re.finditer(r"\b(?:[Ss]ections?|Chapters?)\s+(\d+(?:\.\d+)*[a-z]?|[A-Z]\.\d+)", ln):
+            if foreign(prev, ln, m.start()):
+                continue
+            n_refs += 1
+            if m.group(1).rstrip("abcdefghijklmnopqrstuvwxyz") not in heads and m.group(1) not in heads:
+                dangling.append(m.group(0))
+        for m in re.finditer(r"\bAppendix ([A-Z])\b", ln):
+            if foreign(prev, ln, m.start()):
+                continue
+            n_refs += 1
+            if m.group(1) not in heads:
+                dangling.append(m.group(0))
+        if ln.strip():
+            prev = ln
+        for m in re.finditer(r"\bPart ([A-Z][a-z]+|[IVX]+)\b", ln):
+            n_refs += 1
+            if m.group(1) not in parts:
+                dangling.append(m.group(0))
+    print(f"cross-references checked {n_refs}; naming no heading of this book: {len(dangling)} {sorted(set(dangling))[:12]}")
+    bad += bool(dangling)
     return 1 if bad else 0
 
 

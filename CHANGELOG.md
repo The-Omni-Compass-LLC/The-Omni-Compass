@@ -2,6 +2,38 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-17 (evening: one numbering, every reference realigned, the figures audited against the code)
+
+- **One numbering in both books, every reference realigned to it** (the founder's order of 17 October: "once you change
+  one page, everything changes"). Each book numbers its own chapters and sections in the order they print (chapter.section,
+  chapter.section.subsection; an appendix by its letter), whatever label a bound page carried, and every reference in the
+  text ("section 16.4b", "chapter 6", "Appendix E", "Part VI") is rewritten to the book's numbers at build time. The
+  repository's pages bound into the Owner's cite the Operator's Manual ("the manual, section 4.5"); they are read onto the
+  Owner's own sections that carry the same text. A reference to another document's numbering (`LICENSE`, section 10;
+  `DISCLOSURES.md`, section 4; `docs/FORMAL_V5.md`, section 5; the founder's manuscript) keeps that document's numbering.
+  The build lists every reference that resolves to nothing: none in either book. The navigation check reads every
+  reference back against the headings of the built book (its heading pattern fixed: it had read "1.1" as chapter 1 and
+  never matched "10."): 336 in the Operator's and 209 in the Owner's, each naming a heading. The Owner's now binds the two
+  pieces of the Operator's that its text cited and did not carry (the chapter on the frozen engines and the three-run
+  rule, and the appendix on reproducing everything from a clean machine), and its chapter 8 subsections are headings.
+- **The figures read against the code, arrow by arrow.** The compass law's loop had its summing junction's signs swapped
+  (e = p − c: the position enters plus, the centre minus); corrected. The verdict's three drawings (the block diagram, the
+  flowchart, the timing diagram) showed the rule of the engines before v7, the medians alone with n ≥ 30 on every muscle;
+  they are redrawn to the engine that stands (`omnicompass/verdict.py`, `judge="interval"`): the 95% interval of the
+  change in log cost read GAIN, EVEN or LOSS, an interval wholly above zero refused, a wide one measuring on up to 3n, the
+  median and the mean guards, and the controllers' own numbers (Kubernetes: n = 200 response times, trials 600 s apart, a
+  phase abandoned past 1,200 s, a refusal resting 7,200 s; a card: n = 30, 8, 30 and 900 decisions). The flowchart is now
+  two figures. The release gate is redrawn as the code tests it (`node_release_gate`, then the controller's own rule):
+  nine reasons in their order, among them one machine left, the remaining machines at or under the utilisation target ρ
+  (not "95% full"), the machine organ's own authority, and one release a minute; with what asks for it (the compass
+  law's force past −0.2, the verdict's deepest step) and the cruise override. The authority diagram carries the calm
+  formula and the thresholds (0.5 for the pods, 0.7 for the machines). The captions, the Operator's sections 1.2 and 6.1,
+  the Owner's sections 1.2 and 7.1, and the Owner's Appendix C state the same rule and numbers.
+- **The books:** the Operator's 495 pages with 50 figures, the Owner's 1,248 pages with 77; 487 and 1,239 pages at least
+  four fifths used. Text references fixed at their source in `LICENSING_FAQ.md`, `docs/THE_RECEIPTS.md`,
+  `docs/HOW_TO_READ_THE_RESULTS.md` (it now points to the Owner's chapter 3), `docs/CLAIMS_REGISTER.md` and
+  `docs/TWO_WAY_NERVOUS_SYSTEM.md`. `CLAUDE.md`: the `v5` branch is history, never merged either way.
+
 ## 2026-10-17 (the navigation of both books, checked row by row)
 
 - **The page number in both bottom corners, the running head on every page** (the founder's orders of 17 October). Every

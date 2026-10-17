@@ -521,7 +521,7 @@ Keep this page where the people who run the system can reach it, the way a drive
 line is explained in the section named beside it; nothing on this page replaces those sections.
 
 **What it is.** A supervisory governor on top of the controllers you already run. It never replaces them: it moves only
-settings they already accept, inside a band you set, and hands every setting back when it stops (sections 1.1 and 8).
+settings they already accept, inside a band you set, and hands every setting back when it stops (section 1.1 and chapter 8).
 
 **The two names.** *Native* is your system as it runs on its own. *Omni* is the same system with Omni-Compass on top.
 There is no third arm and no other name (section 1.1).
@@ -716,7 +716,7 @@ Glove Box; Executive Summary
 18. Python, C++ and the Seal
 
 **Back Matter** - Glossary; Appendix A Command Reference; Appendix B File Map; Appendix C The Equations in Full;
-Appendix D Metrics; Appendix E Troubleshooting; Appendix F Evidence Map; Appendix G Reproducing Everything; Index; Contact
+Appendix D Metrics; Appendix E Troubleshooting; Appendix F Evidence Map; Appendix G The Muscles (in the printed book); Appendix H Source of the Engine (in the printed book); Appendix I The License (in the printed book); Appendix J Reproducing Everything; Index; Contact
 
 ---
 
@@ -774,8 +774,9 @@ every native controller in this manual is a good controller that the governor si
 The second design decision is that Omni-Compass must never cause a LOSS. This is not a slogan printed on a
 report; it is a trigger inside the engine. Before Omni-Compass moves a slow knob (a machine given back, a card's clock
 ceiling, a robot axis's speed, a drone's cruise override), it runs a **paired trial on the muscle itself**
-(`omnicompass/verdict.py`): the muscle's own cost per piece of work is measured at native and at one step past the
-deepest step already allowed, under the same traffic, with at least thirty pieces of work on each side. From v7 the trial is read in the reports' own words: on the
+(`omnicompass/verdict.py`): the muscle's own cost per piece of work is measured at the deepest step already allowed
+(on a card, at native) and at one step past it, under the same traffic, with a set number of pieces of work on each side
+(n = 200 response times on Kubernetes, `--verdict-samples`; n = 30 requests on a card). From v7 the trial is read in the reports' own words: on the
 logarithm of each piece of work's cost, the change d = mean ln c[trial] − mean ln c[ref] carries its 95% interval
 d ± 1.96 · √(s²[ref] / n[ref] + s²[trial] / n[trial]), and with τ = ln 1.02 the 2% allowance in the same units, an interval
 wholly above zero is a LOSS and the step is refused whatever the allowance says; while the interval's half-width exceeds
@@ -783,13 +784,17 @@ wholly above zero is a LOSS and the step is refused whatever the allowance says;
 its mean-log change are both no more than 2% above the reference and above the cost first measured at native. On
 modelled noisy costs (σ = 0.25) this allows a step that truly costs 3% more 28% of the time instead of the medians'
 40%, one that costs 5% more 14% instead of 26%, and a free step 60% instead of 63% (`docs/OMNI_V7.md`, section 3;
-class S). The engines before v7 read the medians alone (`judge="median"`). A refused step is not tried again for a set number of decisions. Where no step passes, the verdict
+class S). The engines before v7 read the medians alone (`judge="median"`). A refused step is not tried again for a set
+number of decisions (120 decisions, 7,200 s, on Kubernetes; 900 decisions, 30 minutes, on a card); a trial begins only
+while the service is calm and nothing waits, no sooner than 10 decisions (600 s; a card 8) after the last began; and a
+phase that sees the service leave calm or outlasts its limit (20 decisions, 1,200 s, on Kubernetes; 30 on a card) is
+abandoned, the knob goes back, and the step is neither allowed nor refused. Where no step passes, the verdict
 reads **left native**, the knob is never moved, and the result for that muscle says "nothing for Omni to move". This is
 why, in the robot-arm benchmark, two of four arms were left entirely native and are reported as such, and why in the
 real Kubernetes tests machines were kept whenever one machine fewer made the requests slower in the trial. Gains are not
 capped; the allowance caps only what may be spent to get them.
 
-![Block diagram: the verdict's paired trial around a slow knob. The reference r is the median cost per request at the deepest step already allowed, n ≥ 30; the trial t is the median one step past it under the same traffic, n ≥ 30. The step is allowed only if t ≤ r·(1 + a) and t ≤ c[native]·(1 + a) with a = 0.02; otherwise it is refused, the knob stays, and the step is not tried again for R decisions (900 on a card, 120 on Kubernetes). Steps cannot add up beyond the allowance, because every step is judged against the native cost too.](book/figures/c_verdict.svg)
+![Block diagram: the verdict's paired trial around a slow knob, read GAIN, EVEN or LOSS. The reference r is the cost of n requests at the deepest step already allowed (on a card, at native; n = 200 on Kubernetes, 30 on a card); the trial t is the cost of n more one step past it under the same traffic. The reading is the 95% interval of d = mean ln c[t] − mean ln c[r], stepwise also against the costs first measured at native: an interval wholly above zero is a LOSS and the step is refused; an interval wider than τ = ln(1 + a) measures on, up to 3n; otherwise the step is allowed only if median t ≤ min(r, c[native])·(1 + a) and d ≤ τ, with a = 0.02. A refused step is not tried again for R decisions (120 on Kubernetes, 7,200 s; 900 on a card, 30 min). Steps cannot add up beyond the allowance, because every step is judged against the native cost too.](book/figures/c_verdict.svg)
 
 The same principle, applied after the fact to every published result, is the page of wiring verdicts
 (`docs/WIRING_VERDICTS.md`, section 16.6b): every knob in every table is given one of three words from the table itself,
@@ -1299,7 +1304,7 @@ whatever it says.
 
 ### 3.6 One law, versioned; and what came before it
 
-The engine in every result of this manual is **the compass law with the verdict** (sections 6 and 1.2), versioned and
+The engine in every result of this manual is **the compass law with the verdict** (chapter 6 and section 1.2), versioned and
 fingerprinted at every change: frozen as Omni v1 on 5 October 2026; grown to the 945-muscle catalog as v2; given the slack
 gate on speed knobs as v3; redesigned as **v5** (12 and 13 October) with the max as its default brain on the 1,107-muscle
 catalog, every muscle its own card, the living body and the lease's walk back (v4 was the written plan of that redesign,
@@ -1736,7 +1741,7 @@ Every muscle is wired both ways: a sensory wire in (its meters) and a motor wire
 closing the loop. Between them sits the nervous system (`omnicompass/nervous_system.py`), which decides how much
 authority each organ has at each moment:
 
-![Logic diagram: the nervous system's authority to add and to give back. Giving back needs every condition at once: the body calm, the line clean for three decisions, nothing pending, every sense live, the last command landed, the remaining muscles inside their bands and the verdict's step allowed; adding needs only a reason (the service past the wall, a sense blind or a pod waiting) and the absence of a security hold. The asymmetry is deliberate: adding is cheap to undo and expensive to delay; taking back is cheap to delay and expensive to get wrong.](book/figures/c_authority.svg)
+![Logic diagram: the nervous system's authority to add and to give back. Giving back needs every condition at once: the engine settled (calm = κ·h·(1 − excess stress)·(1 − unmet need) at or over the organ's threshold θ, 0.5 for the pods and 0.7 for the machines), the line clean (no breach now; for the pods none in the last three decisions), every sense live, for the machines the release gate's own reasons, the last command landed, and the verdict's step allowed; adding needs only a reason (the service past the wall, a sense blind or a pod waiting) and the absence of a security hold. The asymmetry is deliberate: adding is cheap to undo and expensive to delay; taking back is cheap to delay and expensive to get wrong.](book/figures/c_authority.svg)
 
 - **Expand is always allowed** (except under a security hold): adding capacity, power, cooling or protection never
   waits.
@@ -1773,19 +1778,25 @@ Authority is how far the nervous system lets an organ move in one decision. It i
 (section 4.3): an organ in a calm body with a clean service record may give back; an organ in a stressed body may only
 add. On Kubernetes the **release gate** (`omnicompass/nervous_system.py`, `node_release_gate`) lets one machine be
 given back only when every one of the following holds, and writes the first reason that fails into the audit so a reader
-can see why a machine was kept: the remaining machines would stay under 95% full; no pod is waiting for a place; the
-pods are not scaling up; the service is not breached; the organ's own pressure is under the release threshold; every
-sense is live; and the last command has landed (no new order goes on top of one the cluster has not yet carried out).
+can see why a machine was kept, in the order the code tests them: more than one machine is in service; no pod is waiting
+for a place; the pods are not scaling up; the line is not breached now and its feed is live; the remaining machines would
+run at or under the utilisation target ρ (used ÷ ((n − 1) × one machine's capacity) ≤ ρ, ρ the engine's own demand
+clipped to [0.5, 0.95]); the machine organ's own engine state grants contraction (`authority()`: its calm at or over
+θ[machines] = 0.7, its line clean, no security hold); every sense is live; and the last machine command has landed (no
+new order goes on top of one the cluster has not yet carried out). The controller adds one rule of its own: at most one
+machine a minute, however often it decides (v7). The gate is asked only when the compass law itself asks for a machine
+back (F < −0.2, the reading under the centre, the verdict's deepest allowed step covering the count), never on the max
+and never during a trial, and cruise overrides it: while work waits for a place, every machine stays in service.
 One machine per decision is the rule in the slow, reversible direction; past the wall, one machine up at once.
 
-![Flowchart: the release gate, reasons 1 to 4. May one machine be given back this decision? Only if the remaining machines would stay under 95% full, no pod is waiting for a place, the pods are not scaling up, and the service is not breached and has been clean for three decisions; the first reason that fails holds the machine and is written in the audit. Continued in the next figure.](book/figures/f_release_gate.svg)
+![Flowchart: the release gate, reasons 1 to 5. The compass law asks for one machine back (F < −0.2, the reading under the centre, the verdict's deepest allowed step covering n − 1; never on the max, never during a trial). The gate then tests, in the code's own order: more than one machine in service; no pod waiting for a place; the pods not scaling up; the line not breached now, the feed live; the remaining machines at or under the utilisation target ρ (used ÷ ((n − 1) × one machine) ≤ ρ, ρ the engine's demand clipped to [0.5, 0.95]). The first reason that fails holds the machine and is written in the audit. Continued in the next figure.](book/figures/f_release_gate.svg)
 
-![Flowchart: the release gate, reasons 5 to 8 and the release. The organ's pressure must be under the release threshold, every sense live, the last command landed, and the verdict's trial must allow the step; only then is one machine given back, and read back.](book/figures/f_release_gate_b.svg)
+![Flowchart: the release gate, reasons 6 to 9 and the release. The machine organ's own authority to contract (its engine calm at or over θ = 0.7, its line clean, no security hold), every sense live, the last machine command landed, and a minute since the last release; only then is one machine given back and read back. Cruise overrides the release: while work waits for a place, every machine stays in service.](book/figures/f_release_gate_b.svg)
 
 **What the gate writes, in a real run.** The first repetition of the first kill-scenario run (`results/live/raw/run-37716845219/paired-1/`,
 the omni arm's `audit.jsonl`) holds 114 decisions and 42 writes. Its gate records read, in the governor's own words,
 "release permitted" eleven times, each with the utilisation the remaining machines would carry after the release (0.034
-to 0.153, all far under the 95% wall); "node organ has no contraction authority" once, a calm cluster whose engine state
+to 0.153, all far under the utilisation target ρ); "node organ has no contraction authority" once, a calm cluster whose engine state
 had not yet earned the right to give back; and "latency breached now; node organ has no contraction authority; a sense is
 blind" once, three reasons at once in a decision whose latency sense read stale, every one of them a reason to hold. A reader can
 therefore see, decision by decision, not only what the governor did but why it declined to do the rest, and the first
@@ -1868,7 +1879,9 @@ Think of a high-end car stereo: one head unit, one standard plug on its back, an
 car that matches the car's factory plug. You never cut a factory wire, and when you pull the stereo, the car works as
 it did. Omni-Compass is wired the same way.
 
-**8.1 The plug (one design for every muscle).** Each plug has as many channels as its muscle has knobs. Every channel
+### 8.1 The plug (one design for every muscle)
+
+Each plug has as many channels as its muscle has knobs. Every channel
 declares its cover (range), its direction (which way is "more"), its units and how fast it may move. Every plug keeps
 the same contract (`omnicompass/compass_law.py`, `Plug`):
 
@@ -1882,7 +1895,9 @@ the same contract (`omnicompass/compass_law.py`, `Plug`):
 
 ![The two-way plug. One wire out carries the governor's write, one value per decision, clipped to the knob's cover and read back from the device; one wire in carries the muscle's reading, placed in its band, and the knob as it stands. The snapshot taken at attach, before any write, is the restore point, and a knob found where the governor did not put it belongs to another writer and is left alone. The brain holds the mathematics; the plug holds nothing but the contract.](book/figures/plug.svg)
 
-**8.2 Adapters (one per standard plug).** Omni-Compass speaks each industry's standard control interface through an
+### 8.2 Adapters (one per standard plug)
+
+Omni-Compass speaks each industry's standard control interface through an
 adapter. Status is stated plainly:
 
 | Standard | Muscles | Adapter status |
@@ -1914,14 +1929,18 @@ itself, so a watchdog can restore from the object without the governor's memory)
 console, for Redis's `CONFIG SET`, for the consumer group and for the simulators' knobs, and `tests/test_*` prove each
 against a fake device.
 
-**8.3 Power-up order.** Read-only first; then take the knobs, the least consequential first; on stop, hand them back
+### 8.3 Power-up order
+
+Read-only first; then take the knobs, the least consequential first; on stop, hand them back
 in reverse order. In the Kubernetes controller the order is: the latency feed and the cluster's own metrics (read); the
 HPA target (a setting the HPA accepts and corrects within a minute); the pods' CPU limits (conveyance, in place); the
 machines (the slowest and most consequential, through the release gate and the verdict). On stop the machines are woken
 first, then the limits, then the target, so the cluster is never left with fewer machines than its pods need while a
 setting above them is still being handed back.
 
-**8.4 The wire check (mandatory before any write).** For the GPU it is one command,
+### 8.4 The wire check (mandatory before any write)
+
+For the GPU it is one command,
 `sudo python3 tools/gpu_wire_check.py --gpu 0`, and `scripts/gpu_rented_run.sh` runs it first and stops if it fails:
 
 | Step | It proves |
@@ -1941,7 +1960,9 @@ setting above them is still being handed back.
 Any failure prints the wire, the step and what the device said, and nothing else runs. That turns a wiring fault from
 guesswork into one named line to fix.
 
-**8.5 Wired right or wired wrong.** The wire check proves the wires move. It does not prove the governor reads the
+### 8.5 Wired right or wired wrong
+
+The wire check proves the wires move. It does not prove the governor reads the
 right thing. A correct installation leaves signatures in its own receipts; a wrong one leaves others. Check them on
 your first paired runs, before you believe any number, good or bad.
 
@@ -1965,7 +1986,9 @@ run the wire check and the watch arm again, and only then compare. The first rea
 receipts showed the card's busy clock under its own (736-768 MHz against 861-889), the lid at the 105 W floor under its
 own 135 W draw, and fail-up in 46% of decisions. Each of those is a row in this table.
 
-**8.6 The wire check on the other stacks.** The GPU has a one-command wire check because its wires are the hardest to
+### 8.6 The wire check on the other stacks
+
+The GPU has a one-command wire check because its wires are the hardest to
 get right. The other stacks carry the same proof in a different place: every Kubernetes arm records `kubectl auth can-i`
 receipts for what the governor's identity can and cannot do (and fails if it can do anything it must not), checks that
 the cluster holds nothing but the harness, and ends with the reset check that every HPA target, replica range, CPU limit
@@ -1975,7 +1998,9 @@ checks that every override was handed back. The watching arm, where it is run, i
 watching governor that disagrees with native on any gauge has found a difference in the probe, the load or the machine,
 not in Omni-Compass.
 
-**8.7 Coding a new muscle: the muscle SDK.** A muscle not in the catalog (Appendix G), or one whose native controller
+### 8.7 Coding a new muscle: the muscle SDK
+
+A muscle not in the catalog (Appendix G), or one whose native controller
 speaks an API no adapter covers, is coded on the muscle SDK (`omnicompass/muscle_sdk.py`, printed in full in the Source
 appendix), the contract every adapter obeys: **observe, bound, request, execute, read back, receipt, restore**. The SDK adds
 a muscle and never a brain: the chain is plant telemetry → observation adapter → the same engine state → bounded authority
@@ -2257,7 +2282,9 @@ budget (`hardware/site_exchange.py`) run as models today. Batteries are designed
 The founder's order of 9 October 2026 fixes the order of wiring. Every knob is wired out first and in last, and the wire
 in is connected only by a measurement the brain makes on the knob itself. The steps, for any stack:
 
-![Flowchart: the verdict's trial on one step. At the deepest step already allowed, n ≥ 30 requests are measured fresh as the reference; one step deeper, under the same traffic, n ≥ 30 more are the trial; the trial is abandoned if the service was not calm or too little work came through, refused if the trial's median cost exceeds the reference's or native's by more than 2%, and otherwise the deepest allowed step moves one deeper.](book/figures/f_trial.svg)
+![Flowchart: the verdict's trial on one step, from the reference to the reading. While the service is calm and nothing waits, and P decisions after the last trial began (10 on Kubernetes, 600 s; 8 on a card), the reference is measured fresh at the deepest step already allowed (on a card, at native): n requests (200 response times on Kubernetes; 30 of a card's own service time). One step deeper, under the same traffic, n more are the trial. A phase that sees the service leave calm or outlasts its limit (20 decisions on Kubernetes, 1,200 s; 30 on a card) is abandoned: the knob goes back, the step neither allowed nor refused. The reading is the 95% interval of the change in log cost. Continued in the next figure.](book/figures/f_trial.svg)
+
+![Flowchart: the verdict's trial on one step, from the reading to the step allowed or refused. An interval wholly above zero is a LOSS: the step is refused, the knob goes back, and the step is not tried again for R decisions (120 on Kubernetes, 7,200 s; 900 on a card). An interval wider than the allowance with fewer than 3n trial requests measures on. Otherwise the step is allowed only if the trial's median is within the allowance of the reference and of native and the mean change is within it too; else it is refused, past the allowance. An allowed step moves the deepest allowed step one deeper.](book/figures/f_trial_b.svg)
 
 1. **Wire out, everything.** Every muscle's readings reach the brain, one wire out per muscle. Nothing is written. This is
    watch mode (section 1.3): where every installation starts, and where any knob returns the moment it stops paying.
@@ -2292,7 +2319,7 @@ controller the verdict already guards the machines (section 1.2). Inside the mod
 directive for every muscle; making the verdict per muscle there is the next engine, Omni v4 (`docs/OMNI_V4_PLAN.md`),
 designed and not built, because every result must be run again on a new engine.
 
-![Timing diagram: a give-back trial from reference to verdict, in decisions. The reference (n ≥ 30 requests at the deepest allowed step), the trial (n ≥ 30 at one step deeper under the same traffic), the verdict in one decision, and, on a refusal, the quiet period in which the step is not tried again (900 decisions on a card, 120 on Kubernetes). A trial is abandoned, and the knob stays, if the service is not calm or too little work came through.](book/figures/t_trial.svg)
+![Timing diagram: a give-back trial from reference to verdict, in decisions. The reference (n requests at the deepest allowed step; on a card, at native), the trial (n more at one step deeper under the same traffic, measuring on up to 3n while the interval is wider than the allowance), the verdict in one decision, and, on a refusal, the quiet period in which the step is not tried again (120 decisions on Kubernetes, 7,200 s; 900 on a card, 30 min). A phase that outlasts its limit (20 decisions on Kubernetes; 30 on a card), or sees the service leave calm, is abandoned: the knob goes back, the step neither allowed nor refused.](book/figures/t_trial.svg)
 
 ## 10. Stack by Stack
 
@@ -4033,15 +4060,25 @@ any one of the three can tell whether the files in front of them are the files t
 
     The verdict (omnicompass/verdict.py; every slow knob, the GPU ceiling
     and the Kubernetes machine count):
-        reference r = the median cost per request at the deepest allowed
-                      step, measured fresh, n ≥ 30 requests
-        trial t     = the median cost at one step past it,
-                      n ≥ 30 requests, under the same traffic
-        allow the step  iff  t ≤ r (1 + a)  and  t ≤ c[native] (1 + a),
-                             a = 0.02
-        a refused step is not tried again for R decisions (GPU R = 900;
-        Kubernetes 120); the knob never goes past the deepest allowed
-        step, so steps cannot add up beyond the allowance
+        reference r = the costs of n requests at the deepest allowed step
+                      (a card: at native), measured fresh
+                      (Kubernetes n = 200; a card n = 30)
+        trial t     = the costs of n more at one step past it, under the
+                      same traffic
+        d = mean ln c[t] − mean ln c[r] ± 1.96 √(s²[r]/n[r] + s²[t]/n[t])
+                      (Welch); stepwise a second interval against the
+                      costs first measured at native; τ = ln(1 + a), a = 0.02
+        LOSS   iff an interval lies wholly above 0  ⇒  refused
+        wide   iff a half-width > τ and n[t] < 3n   ⇒  measure on
+        allow  iff median t ≤ min(r, c[native]) (1 + a)  and  d ≤ τ
+               (else refused, past the allowance)
+        a trial begins only while calm, P decisions after the last began
+        (Kubernetes 10 = 600 s; a card 8); a phase past its limit
+        (Kubernetes 20 = 1,200 s; a card 30) or out of calm is abandoned
+        a refused step is not tried again for R decisions (Kubernetes
+        R = 120 = 7,200 s; a card 900 = 30 min); the knob never goes past
+        the deepest allowed step, so steps cannot add up beyond the
+        allowance; on the max the machine count gives nothing back
 
     Kubernetes, the compass on the HPA target
     (omni_controller/controller.py; sets 30 and 31):
@@ -4230,7 +4267,7 @@ governor's process id) and `kill` (the marker the harness wrote at the kill); `r
 job printed it); `end_reads.err`, `pod_watch.err` and `capture.csv.errors` (empty, as they should be);
 `metrics-server-components.yaml` (the pinned manifest as applied); and `SHA256SUMS.txt`, one line per file. A reader who doubts a number in the kill table can find the second it was taken.
 
-## Appendix G - Reproducing Everything, From a Clean Machine
+## Appendix J - Reproducing Everything, From a Clean Machine
 
 A referee with a laptop and a GitHub account can rebuild every table in this manual and rerun every benchmark. The steps,
 in order, with what each costs:
