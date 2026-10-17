@@ -49,6 +49,11 @@ jobs:
             # gzipped (-n: the same bytes every time). Its repetition's SHA256SUMS.txt still holds the original's hash;
             # check it with: gunzip -c FILE.gz | sha256sum
             find "$d" -type f -size +50M -exec gzip -n -9 {} \;
+            # the bulk no table reads once the run has made its own tables (YCSB's raw latencies, the request logs, the
+            # Kafka consumer logs: seven tenths of the archive's bytes) is stored gzipped too, so a checkout of a run is
+            # about a third of its size; the files every table and recomputation reads stay as written
+            # (tests/test_archive_gzip.py holds the two lists apart)
+            find "$d" -type f -size +1M \( -name '*.raw' -o -name 'requests.log' -o -name 'consumer-*.log' \) -exec gzip -n -9 {} \;
             ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
             git add --sparse "$d"
             git commit -q -m "Raw files of live run $run archived with the code"

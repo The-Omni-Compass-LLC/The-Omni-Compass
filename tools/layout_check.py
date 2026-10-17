@@ -14,6 +14,9 @@ Checks:
             exists, so no page cites a file that has gone.
   orphans   every top-level entry of results/ is named by some page or program outside results/, so a result nothing
             uses falls off instead of piling up.
+  engine    every page of the newest material that names the engine that stands names the newest one in
+            tools/omni_version.py (VERSIONS, newest first), so no page is left calling an older engine the one that
+            stands; the history, the receipts, the change log and each older engine's own page keep the words of their day.
 
   python3 tools/layout_check.py        (exit 0: lined up; exit 1: what is out of line, one line each)
 """
@@ -34,7 +37,7 @@ ROOT_ALLOWED = {
     # the same rules for every AI assistant that reads this repository (Codex, Copilot, Gemini, Cursor)
     "AGENTS.md", "GEMINI.md", ".cursorrules", "llms.txt",   # llms.txt: read by AI crawlers at the root, the notice in it
     # build, verification and metadata
-    "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "OMNI_V3.json", "OMNI_V5.json", "OMNI_V6.json", "OMNI_V7.json", "OMNI_V8.json", "codemeta.json",
+    "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "OMNI_V3.json", "OMNI_V5.json", "OMNI_V6.json", "OMNI_V7.json", "OMNI_V8.json", "OMNI_V9.json", "codemeta.json",
     "docker-compose.yml", ".gitignore", ".gitattributes", ".dockerignore", ".github", ".fossa.yml", ".snyk",
     # code and evidence
     "omnicompass", "omni_controller", "realms", "cpp", "tools", "scripts", "tests", "deploy", "fleet", "pilot",
@@ -59,6 +62,32 @@ def prose_only(text: str) -> str:
             continue
         out.append(re.sub(r"`[^`]*`", "`", ln))
     return "\n".join(out)
+
+
+STANDS = [re.compile(r"\b[Oo]mni[- ]v(\d+)\b\**`?\)?[^.;()]{0,25}\bstands\b(?! (?:as|for|with|in|at|beside))"),
+          re.compile(r"stands on main[^.;]{0,20}[Oo]mni[- ]v(\d+)"),
+          re.compile(r"\bthe (?:newest )?engine (?:on main|that stands)[^.;]{0,15}\b[Oo]mni[- ]v(\d+)"),
+          re.compile(r"[Ee]ngine that stands[,:]?\s*\(?\**`?omni-v(\d+)")]
+
+
+def stale_engine(files):
+    """Pages of the newest material that call an older engine the one that stands."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    from omni_version import VERSIONS                       # newest first
+    newest = next(iter(VERSIONS)).lstrip("v")
+    own_page = f"docs/OMNI_V{newest}.md"
+    out = []
+    for p in files:
+        if p.startswith(("results/", "release/", "docs/history/", "archive/", "OMNI_V")) or p in ("CHANGELOG.md", "RELEASE_MANIFEST.json") \
+                or not p.endswith((".md", ".py", ".txt", ".yml", ".yaml", ".cff", ".toml")) \
+                or (re.match(r"docs/OMNI_V\d+(_PLAN)?\.md$", p) and p != own_page):
+            continue
+        for i, ln in enumerate((ROOT / p).read_text(errors="ignore").splitlines(), 1):
+            for pat in STANDS:
+                for m in pat.finditer(ln):
+                    if m.group(1) != newest:
+                        out.append(f"engine: {p}:{i} calls omni-v{m.group(1)} the engine that stands (the newest is omni-v{newest})")
+    return sorted(set(out))
 
 
 def tracked():
@@ -114,6 +143,7 @@ def main():
                                          and not (re.sub(r"\d+$", "", top) != top and re.sub(r"\d+$", "", top) in corpus)):
             if not top.startswith("VERIFY_"):
                 problems.append(f"orphan: results/{top} is named by no page or program (remove it, or cite it)")
+    problems += stale_engine(files)
     for x in problems:
         print(x)
     print(f"layout: {len(problems)} out of line" if problems else "layout: lined up")

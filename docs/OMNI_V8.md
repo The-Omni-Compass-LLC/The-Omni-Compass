@@ -1,8 +1,12 @@
-# Omni v8: the engine that stands (the battery that carries its building through an outage stays native)
+# Omni v8: the battery that carries its building through an outage stays native (the engine of 17 October)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v8 is the engine that stands on main since 17 October (the founder's order: "there's a new version 8 ... push in all and
+Omni v8 stood on main on 17 October; since later that day the engine that stands is Omni v9 (`docs/OMNI_V9.md`), omni-v8
+with the CityLearn battery wire reading the coming hour, which repairs the one LOSS row this page names (section 3). This page
+stays as omni-v8's record, read beside no other engine's.
+
+Omni v8 was the engine that stood on main from 17 October (the founder's order: "there's a new version 8 ... push in all and
 update all"). It is omni-v7 (`docs/OMNI_V7.md`) with one change to one wire, made because a three-run table of omni-v7 read LOSS
 and the cause was found to be ours. Its fingerprint is `OMNI_V8.json` (digest `f93d233136a1f902`, 46 files); of those 46 files,
 45 are omni-v7's bytes, and the one that differs is the CityLearn runner. Every benchmark runs again on it (`scripts/reruns.txt`;

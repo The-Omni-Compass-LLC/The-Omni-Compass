@@ -87,6 +87,14 @@ def main():
     reps[1]["omni"]["failed"] = 1
     assert Y.paired(reps, "failed", "never more")["reading"] == "**LOSS in a repetition**"
     assert Y.COVER_MB == (256, 2048) and Y.NATIVE_MB == 512 and lo <= Y.NATIVE_MB <= hi and len(Y.YCSB_SHA256) == 64
+    # native as shipped (17 October): MongoDB's own default cache (half of RAM less 1 GB: 7,680 MB on a 16 GB machine) is
+    # above the cover; any size Omni wrote would sit below native, so it writes nothing and hands back the untouched setting
+    fc = FakeClient(7680); plug = Y.CacheSize(fc)
+    with tempfile.TemporaryDirectory() as t:
+        om = Y.Omni(plug, Path(t) / "audit.jsonl")
+        om.stop_flag.set(); om.run()
+        assert fc.admin.mb == 7680 and om.writes == 0 and om.handed_back, "no size is written under a native above the cover"
+        assert "at its" in (Path(t) / "audit.jsonl").read_text()
     print("PASS  YCSB runner: slow reads with the cache full and missing grow the cache by notches, calm with misses under 1% of requests gives one back after the dwell, the wall adds a quarter "
           "of the cover, the cover holds; the plug snapshots, reads back, stops for another writer and restores; the server's own reading; YCSB's records parsed; the paired reading")
 

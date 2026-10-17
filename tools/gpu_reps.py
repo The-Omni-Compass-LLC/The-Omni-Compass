@@ -11,8 +11,9 @@ energy counters when the machine has them. Nothing here is a model.
 
 Per repetition, per arm: energy, joules per served request, mean power, peak and mean temperature, served and not
 served requests, response time (mean, 95th, 99th percentile), power-limit writes. Across repetitions: for watch and omni
-against native, the paired mean difference with a t-based 95% interval. A difference is proven when that interval
-excludes zero; otherwise the table says not proven.
+against native, the paired mean difference with a t-based 95% interval. A difference is clear of the noise when that
+interval excludes zero; otherwise it reads EVEN, no difference beyond the noise (the words of the GPU preregistration's
+amendment of 17 October; before it, "proven" and "not proven", the same rule).
 
 Three contrasts, each paired by repetition: observation = watch − native (does Omni's presence alone move the plant),
 authority = omni − watch (what granting Omni the write adds), total = omni − native (the preregistered comparison).
@@ -36,6 +37,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 from tools.readings import word as gel_word, labelled, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (the words every table uses)
+CLEAR = "clear of the noise"   # the 95% interval excludes zero (the GPU preregistration, amendment of 17 October)
 from pathlib import Path
 
 U_AUTHORITY = 25.0          # omnicompass/core.py: the U-channel command's bound (saturation)
@@ -44,8 +46,7 @@ W_INT = {"E": 1.0, "U": 1.0, "I_U": 1.0, "S": 1.0, "B": 1.0}   # the residual's 
 MARGIN_SERVED, MARGIN_P95, MARGIN_LOST = 0.01, 0.10, 0.01      # guardrails (docs/GPU_PREREGISTRATION.md)
 SMI_DEFAULT = "timestamp,index,power.draw,temperature.gpu,utilization.gpu,power.limit,clocks.sm"
 
-T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228, 11: 2.201,
-       12: 2.179, 13: 2.160, 14: 2.145, 15: 2.131, 16: 2.120, 17: 2.110, 18: 2.101, 19: 2.093, 20: 2.086}
+from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 LOWER = {"energy, whole machine at the wall (J)", "energy, GPU (J)", "energy per served request (J)", "power, GPU mean (W)", "temperature, peak (C)",
          "temperature, mean (C)", "requests not served", "response time, mean (ms)", "response time, 95th percentile (ms)",
          "response time, 99th percentile (ms)", "energy, CPU package (J)", "energy, rest of the machine (J)",
@@ -352,30 +353,32 @@ def receipts(d):
 
 def label(prim, g_served, g_p95, g_lost, valid, observation=None):
     """The result label, by rule (docs/GPU_PREREGISTRATION.md), from the primary verdict, the three guardrails, and the
-    observation contrast: if Omni watching (writing nothing) already differs from native on the primary outcome, proven
-    either way, the effect cannot be credited to Omni's authority and no omni result is published."""
+    observation contrast: if Omni watching (writing nothing) already differs from native on the primary outcome, clear of
+    the noise either way, the effect cannot be credited to Omni's authority and no omni result is published."""
     if not valid:
         return "INVALID"
-    if (observation or "").endswith(", proven"):
+    if (observation or "").endswith(f", {CLEAR}"):
         return "NOT ATTRIBUTABLE: WATCH DIFFERS FROM NATIVE"
     ok = g_served and g_p95 and g_lost
-    if prim == f"{GAIN}, proven":
+    if prim == f"{GAIN}, {CLEAR}":
         return "SUPERIOR WITHIN GUARDRAILS" if ok else "ENERGY IMPROVEMENT WITH SERVICE TRADEOFF"
-    if prim in (f"{LOSS}, proven", f"{GIVEN}, proven"):
+    if prim in (f"{LOSS}, {CLEAR}", f"{GIVEN}, {CLEAR}"):
         return "AWAY FROM ITS AIM"
     return "NONINFERIOR / INCONCLUSIVE" if ok else "NOT ESTABLISHED"
 
 
 def verdict(k, mean, half, n):
     """A gauge's word against the base, by what it is for (GAIN, LOSS, or power given for a resource spent that rose), and
-    whether its 95% interval clears zero (proven) or not; EVEN when it did not move."""
+    when its 95% interval clears zero; EVEN, no difference beyond the noise, when the interval includes zero; EVEN, the same,
+    when it did not move."""
     if n < 2 or math.isnan(half):
-        return "not proven (too few repetitions)"
+        return "no interval (too few repetitions)"
     if abs(mean) < 1e-12 and half < 1e-12:
         return f"{EVEN}, the same"
     aim = "spent" if k in SPENT else "lower" if k in LOWER else "higher"
-    proven = mean - half > 0 or mean + half < 0
-    return f"{gel_word(mean < 0, aim)}, " + ("proven" if proven else "not proven")
+    if mean - half > 0 or mean + half < 0:
+        return f"{gel_word(mean < 0, aim)}, {CLEAR}"
+    return f"{EVEN}, no difference beyond the noise"
 
 
 def main(root):

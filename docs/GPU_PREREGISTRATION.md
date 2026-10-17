@@ -468,6 +468,24 @@ organism runs once per size. Nothing else changes: the arms, the measures, the l
 On one card the stage takes at least 16 hours (60 paired repetitions, each arm 240 steps of 2 s; a size whose step must
 be longer is measured on the machine and stated in the receipt), where it took about 25 with the 1,000 copies.
 
+## Amendment 14 (2026-10-17, wording only, before any trial on this code)
+
+The rule of the analysis and of amendment 1 is unchanged; only its words change, so a reading never claims more than a
+95% interval can carry and every word matches the house key (GAIN, EVEN, LOSS; `docs/HOW_TO_READ_THE_RESULTS.md`):
+
+- "a proven GAIN" and "a proven LOSS" (the interval wholly on one side of zero) are written **GAIN, clear of the noise**
+  and **LOSS, clear of the noise** (a card's energy that rose: **power given, clear of the noise**);
+- "not proven" (the interval includes zero) is written **EVEN, no difference beyond the noise**;
+- a contrast with fewer than two repetitions has no interval and says so.
+
+The labels of amendment 1 read the same way: primary GAIN clear of the noise, all three guardrails held: SUPERIOR WITHIN
+GUARDRAILS; a guardrail failed: ENERGY IMPROVEMENT WITH SERVICE TRADEOFF; primary EVEN, guardrails held: NONINFERIOR /
+INCONCLUSIVE; a guardrail failed: NOT ESTABLISHED; primary LOSS or power given clear of the noise: AWAY FROM ITS AIM; the
+observation contrast clear of the noise: NOT ATTRIBUTABLE. The intervals use the two-sided 95% point of Student's t
+computed for the run's own degrees of freedom (`omnicompass/student_t.py`); the table it replaces held the same values to
+the last digit up to 20 degrees of freedom and fell to 1.96 beyond them. The first counted run's table (2 October) keeps the
+words it was printed with.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

@@ -281,6 +281,12 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "layout_check.py")], capture_output=True, text=True)
     check("the repository is lined up: the declared root, every link and every named path present (tools/layout_check.py)",
           r.returncode == 0, r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr[-300:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "lint_names.py")], capture_output=True, text=True)
+    check("every Python file compiles and reads no name that nothing defines (tools/lint_names.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "levels.py"), "--check"], capture_output=True, text=True)
+    check("every level on one page: docs/LEVELS.md is rebuilt from the tables it reads (tools/levels.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
     # GitHub refuses a workflow file that does not parse and never runs it; it records only a failed run named after the file,
     # which no local test saw for ten pushes on 10 October 2026 (an unquoted colon in a step name). Every workflow is parsed here.
     import yaml

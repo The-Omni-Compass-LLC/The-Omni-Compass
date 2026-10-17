@@ -63,9 +63,9 @@ def main(argv=None):
     runs = [load(d) for d in a.dirs]
     eng = [engine(d) for d in a.dirs]
     r00 = next(iter(runs[0][1].values()))
-    L = ["# sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table", "",
-         f"MySQL as Ubuntu ships it with the operator's InnoDB buffer pool ({r00['native_mb']} MB) is native; omni is the compass law on the pool size through "
-         f"the server's own console inside [{r00['cover_mb'][0]}, {r00['cover_mb'][1]:,}] MB in chunks of {r00['chunk_mb']} MB, holding the server's own mean "
+    L = ["# sysbench on MySQL, a database's " + ("buffer pool as shipped" if r00.get("native") == "shipped" else "operator-set buffer pool") + ": the A/B/C three-run table", "",
+         (f"MySQL exactly as Ubuntu ships it, its InnoDB buffer pool at MySQL's own default ({r00['native_mb']} MB), is native (`docs/MYSQL_PREREGISTRATION.md`, amendment 5); omni is the compass law on the pool size through " if r00.get("native") == "shipped" else f"MySQL as Ubuntu ships it with the operator's InnoDB buffer pool ({r00['native_mb']} MB) is native; omni is the compass law on the pool size through ")
+         + f"the server's own console inside [{r00['cover_mb'][0]}, {r00['cover_mb'][1]:,}] MB in chunks of {r00['chunk_mb']} MB, holding the server's own mean "
          f"statement latency at 40% of the {r00['line_stmt_ms']:g} ms statement line (`docs/MYSQL_PREREGISTRATION.md`). sysbench's published OLTP workloads "
          "ask for rows from a set of tables that steps through the pool and past it, the same transactions in both arms. Each run holds three paired "
          "repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a "
@@ -97,7 +97,7 @@ def main(argv=None):
         L += ["", f"## {wl}: sysbench {r0['script']}, {r0['statements']} statements a transaction, {r0['rate_tps']} a second offered; the transaction line "
               f"{r0['line_ms']:g} ms, {len(r0['reps'])} paired repetitions a run" + (" (the tuning workload, shown and not counted)" if tuning else ""), "",
               f"MySQL {r0.get('mysql_version', '?')}, {r0.get('sysbench_version', '?')}; {r0['threads']} client threads; {r0['tables']} tables of {r0['table_rows']:,} rows, "
-              f"steps {r0['steps']} × {r0['step_s']} s; the operator's pool {r0['native_mb']} MB, the cover {r0['cover_mb'][0]} to {r0['cover_mb'][1]:,} MB.", "",
+              f"steps {r0['steps']} × {r0['step_s']} s; " + (f"native's pool as shipped {r0['native_mb']} MB" if r0.get('native') == "shipped" else f"the operator's pool {r0['native_mb']} MB") + f", the cover {r0['cover_mb'][0]} to {r0['cover_mb'][1]:,} MB.", "",
               "| Gauge | native (A) | omni (A) | A | B | C | Reading |", "|---|---:|---:|---:|---:|---:|---|"]
         out["workloads"][wl] = {}
         for k, label, dr in GAUGES:
@@ -113,9 +113,9 @@ def main(argv=None):
         receipts = any("restore" in x for x in arms)
         in_flight = sum(1 for x in not_hb if resizing((x.get("restore") or {}).get("resize_in_flight_at_end", "")))
         if not not_hb:
-            line = "The buffer pool handed back to the operator's and read back at the end of every omni arm in every run: yes."
+            line = "The buffer pool handed back to native's and read back at the end of every omni arm in every run: yes."
         else:
-            line = (f"The buffer pool handed back to the operator's and read back at the end of every omni arm in every run: **NO** "
+            line = (f"The buffer pool handed back to native's and read back at the end of every omni arm in every run: **NO** "
                     f"({len(not_hb)} of {len(arms)} omni arms not handed back"
                     + (f"; in {in_flight} of them the server was still carrying out a resize when the restore was issued" if receipts else "") + ").")
         L += ["", line]

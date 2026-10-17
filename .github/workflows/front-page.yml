@@ -95,8 +95,8 @@ jobs:
           python tools/front_page.py | tee plan.json
           summary=$(python tools/front_page.py --summary)
           python tools/front_page.py --apply | tee -a "$GITHUB_STEP_SUMMARY"
+          python tools/readings.py --fix       # a rebuilt table carries the reading key again, word for word (verify checks it)
           python tools/legal.py --fix results docs README.md
-          python tools/readings.py --fix
           python tools/release_manifest.py --refresh-generated
           python tools/legal.py --check > legal.txt || { tail -20 legal.txt; echo "::error::a page lacks the legal notice"; exit 1; }
           tail -1 legal.txt >> "$GITHUB_STEP_SUMMARY"

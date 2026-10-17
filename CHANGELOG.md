@@ -2,6 +2,40 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-17: Omni v9 stands (the battery reads the coming hour); native as shipped; every level on one page
+
+- **Omni v9 is the engine that stands** (the founder's orders of 17 October: the fix proven in our own runs and in the toy gate
+  before it is pushed; tuned "to exploit all that can be and keep all healthy and never raise its bill"): `OMNI_V9.json`, digest
+  `7379f3a79ff2c475`, 47 files, `docs/OMNI_V9.md`; package 0.9.0. The CityLearn battery wire reads the coming hour (the mean of
+  the same hour over the past seven days, only hours already seen) and glides at up to 0.0625 an hour, the fastest glide that read
+  no LOSS on any score in any district (0.05 left one district's daily unevenness LOSS; 0.075 and faster raised another's ramping).
+  The reading of the hour gone had run about five hours behind the day and left the batteries empty at each month's top hour: the
+  cause of omni-v8's one LOSS row, the 2022 robustness district's monthly unevenness (+0.11%). Read locally on CityLearn 3.0.2 on
+  every battery district outside the 2023 set: no LOSS on any score (the robustness district's monthly unevenness −2.29%); the
+  shipped runner equal to the study's copy to the last digit; the toy gate identical to omni-v8 on every toy
+  (`results/toy_gate/V9_VS_V8.md`). Every 95% interval now takes the exact Student t quantile (`omnicompass/student_t.py`);
+  every tabled value is unchanged and no published reading moves. Disclosed in `docs/OMNI_V9.md`: the narrower repairs refused,
+  the speed ladder, and the months whose peak hour still rises above native's though no score counts them.
+- **The version tool fingerprints a new engine file before its first commit** only when it is staged; v9's new file was staged
+  so the fingerprint holds it (a gap found while declaring v9). The toy gate's page names every changed engine file, not only
+  the last one printed.
+- **Native as shipped** (the founder's order of 17 October): MySQL, Redis and MongoDB run with native exactly as the vendor ships
+  them (`--native shipped`; the 128 MB pool, no memory ceiling with `noeviction`, half the machine's memory less 1 GB) beside the
+  operator's setting; where the factory setting is already above Omni-Compass's cover, it writes nothing and reads "at its limit on
+  native". Three entries in the omni-v9 campaign; preregistration amendments written for each.
+- **Every level on one page** (`docs/LEVELS.md`, `tools/levels.py`, checked by `verify.py`, linked from the README and the state of
+  play, bound into the Owner's Manual): the muscle, the organism, the cluster, its add-ons, the service, the plant, the cloud and a
+  group of clusters, each with its counts and every gauge that goes the other way named.
+- **The manuals' navigation checked row by row, and the checker made exact**: every Contents row, every figure and every index
+  reference in both manuals lands on its printed page (a file name split over a page break or wrapped in a cell is read whole).
+- **Smaller**: every Python file compiles and reads no undefined name (`tools/lint_names.py`, in `verify.py`); the archive bot
+  gzips bulky raw logs before it commits them; the GPU receipt's wording; the requirements lock regenerated for Python 3.12.
+- **The front-page bot keeps the reading key**: it rebuilt seven omni-v7 receipts (Kafka twice, PostgreSQL, Redis twice, MySQL,
+  MongoDB) without the key at their top, and `verify.py` caught it; the key is back on all seven, and the bot now writes it on
+  every table it rebuilds (`tools/readings.py --fix` in `.github/workflows/front-page.yml`). No reading moved.
+- **The clouds and the GPU, checked without spending a cent** (a dry run of the all-benchmarks button, 17 October): the Azure
+  key is in the repository; the Google, Amazon and Lambda keys are not, so their queues stay off and nothing there can start.
+
 ## 2026-10-17: Omni v8 stands (the outage battery left native); everything runs again on it
 
 - **Omni v8 is the engine that stands** (the founder's order of 17 October: "there's a new version 8 ... push in all and update

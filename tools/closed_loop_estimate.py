@@ -19,7 +19,8 @@ from __future__ import annotations
 import csv, json, math, re, statistics, sys
 from pathlib import Path
 
-T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228}
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 
 
 def generator_seconds(d):

@@ -40,10 +40,16 @@ follow it. Read the five ideas first, then go to the table you have in front of 
    difference is Omni-Compass.
 2. **Paired runs.** Each comparison is run many times ("repetitions" or "runs"), each time with both arms on the same
    seed (the same pattern of work). Each repetition gives one difference; the table reports the average difference.
-3. **The 95% interval.** Next to each average is a range, for example `+0.092% (+0.090 to +0.093)`. It means: if we
-   ran this again and again, the true answer would land inside that range 95 times out of 100.
-   - If the whole range is on one side of zero, the difference is **proven** (the table says "yes" or "significant").
-   - If the range crosses zero, the difference is **not proven**: it could be noise.
+3. **The 95% interval.** Next to each average is a range, for example `+0.092% (+0.090 to +0.093)`: the paired mean
+   difference ± t₀.₉₇₅,ₙ₋₁ · s/√n, where s is the standard deviation of the n paired differences and t₀.₉₇₅,ₙ₋₁ the
+   two-sided 95% point of Student's t on n − 1 degrees of freedom (`omnicompass/student_t.py`, computed for any n:
+   4.303 at 3 pairs, 2.262 at 10, 2.093 at 20). The method that draws it covers the true difference in 95 of 100
+   repetitions of the whole experiment; it is not a 95% chance about this one range.
+   - If the whole range is on one side of zero, the difference is **clear of the noise** (a table's "significant"
+     column says "yes"); its word is GAIN, LOSS or power given, by the gauge's aim.
+   - If the range includes zero, the reading is **EVEN, no difference beyond the noise**: this test could not tell the
+     arms apart. It does not show that they are equal; how small a difference the test could have seen is the
+     interval's half-width, printed beside it.
 4. **The word, not the sign.** Every judged reading is GAIN, EVEN or LOSS (the key above). For response time,
    failures and time over the line a fall is GAIN; for work and work per energy a rise is GAIN; for energy, machines
    and every other resource spent or held a fall is a cut, a GAIN, and a rise is **power given**, never a loss.
@@ -83,10 +89,13 @@ One card, three arms, many repetitions:
 - **omni**: Omni-Compass on top, moving the card's clock ceiling and power limit.
 
 Read it in this order:
-1. **The verdict line** at the top, one of: *GAIN, proven*; *LOSS, proven*; *not proven*; *more requests per kJ,
-   fails the service guardrail*.
-2. **Work per energy** (requests per kilojoule): the headline. A plus sign with a range wholly above zero is a proven
-   gain.
+1. **The verdict line** at the top, one of the labels chosen by rule (`docs/GPU_PREREGISTRATION.md`, amendment 1):
+   SUPERIOR WITHIN GUARDRAILS, ENERGY IMPROVEMENT WITH SERVICE TRADEOFF, NONINFERIOR / INCONCLUSIVE, NOT ESTABLISHED,
+   AWAY FROM ITS AIM, NOT ATTRIBUTABLE or INVALID; each gauge reads GAIN, LOSS or power given **clear of the noise**, or
+   **EVEN, no difference beyond the noise** (amendment 14; the first counted run of 2 October printed "proven" and "not
+   proven" for the same rule).
+2. **Work per energy** (requests per kilojoule): the headline. A plus sign with a range wholly above zero is a GAIN
+   clear of the noise.
 3. **Requests served** must be equal in every arm. More energy saved by serving less work would be cheating; the bench
    checks it.
 4. **p95 and p99**: the slow answers. With the verdict rule (`omnicompass/verdict.py`), Omni-Compass never takes a step
@@ -114,23 +123,36 @@ against the same Kubernetes with Omni-Compass on top. Read:
 1. **worker nodes in service** and **node-hours**: how many machines were kept busy. A fall is GAIN.
 2. **response time p95 and p99**: a fall is GAIN (faster).
 3. **failed requests**: must be zero on both sides.
-4. **CPU used with Omni's own**: Omni-Compass's own cost included; "no" in the significant column means it costs
-   nothing measurable overall.
+4. **CPU used with Omni's own**: Omni-Compass's own cost included; "no" in the significant column means its cost is
+   inside the noise of the test (the interval beside it gives the size the test could have seen).
 5. **The label** at the bottom, by the rule written before the run.
 
 Energy on kind is a declared model, not a meter: kind keeps every machine powered.
 
-## The three-run tables (`results/live/V1_<TEST>.md`, `V3_<TEST>.md`)
+## The three-run tables (`results/live/V<engine>_<TEST>.md`, for example `V7_GOLDILOCKS.md`, `V8_CITYLEARN.md`)
 
 Every benchmark since the engine was frozen runs three separate times, A, B and C, on the same bytes, and the table
-shows all three beside each gauge. Read the last column first: **GAIN** or **LOSS in all three of our runs** (the same sign
+shows all three beside each gauge, each with its own 95% interval. Read the last column first: **GAIN** or **LOSS in all three of our runs** (the same sign
 in all three, every interval clear of zero; a resource spent that rose reads **power given**), **EVEN, no difference beyond the noise** (an interval over zero in at least one
 run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "confirmed" or "not
-confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V1_` or `V3_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
+confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V7_` or `V8_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
 a table never mixes engines, and a reading is never carried from one engine to another. Every LOSS and every power given is in the table beside
 the GAINs: the database's host CPU-seconds, the grid's dissipated energy in four grids, the Panda's copper heating, CityLearn's bill (power given), CityLearn's energy not served and time uncomfortable (LOSS).
 
-## The workload tables (`V3_PGBENCH.md`, `V3_KAFKA.md`, `V3_REDIS.md`, `V3_YCSB.md`) and the swarm table (`V3_SWARM.md`)
+**How often the rule reads a difference that is not there.** Under no true difference, one run's 95% interval falls
+wholly above zero with probability 0.025 and wholly below with 0.025. A row reads GAIN or LOSS only when all three
+independent runs fall on the same side, so its chance of a false reading is 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over a table of 30
+judged rows the chance that any one is false is at most 30 × 3.1 × 10⁻⁵ ≈ 0.09% (a union bound, as Bonferroni's), and over
+the 560 judged rows of the omni-v7 tables that carry noise (790 judged rows in 22 tables, less the 230 of the deterministic
+simulators) the expected number of false readings is 560 × 3.1 × 10⁻⁵ ≈ 0.02. The
+bound assumes the three runs independent; runs on the same kind of machine can share a bias, which three runs cannot
+remove and the bound does not cover. The price of the rule is power: a small true difference must clear the noise three
+times, so many EVEN rows are differences too small for a run's pairs to resolve (with 3 pairs a run, t = 4.303 and the
+interval is wide). Every EVEN is printed with the three intervals that decided it. The deterministic simulators (CityLearn,
+pandapower, MuJoCo) reproduce to the digit, so there the three runs check the harness, not the noise; their EVEN means
+the same to one part in a million.
+
+## The workload tables (`V<engine>_PGBENCH.md`, `_KAFKA.md`, `_REDIS.md`, `_YCSB.md`, `_SYSBENCH.md`) and the swarm table (`V<engine>_SWARM.md`)
 
 The database, the broker and the cache share one shape. The head names the three runs, their commits and the engine each
 carried. Then one section per **workload**: the tuning workload first, marked "shown and not counted" because the rules were
@@ -145,17 +167,17 @@ rows toward their aims, away from them and disagreeing across the untouched work
 of workloads, with collisions voiding a cell, and with a declared reproduction tolerance (one part in a thousand) because
 PyBullet does not reproduce to the bit across machines; its amendment says so.
 
-## The governor's own cost (`V3_OWN_COST.md`) and the robustness tables
+## The governor's own cost (`V3_OWN_COST.md`) and the robustness tables (`V<engine>_ROBUST_KILL.md`, `V<engine>_ROBUST_LONG.md`)
 
 `V3_OWN_COST.md` is Omni-Compass's own CPU, from the `overhead` record every omni arm's audit carries, by organism and
 copies, under the engine each run carried; it is shown and not judged, and it is a few thousandths of one core at every
-size. The robustness tables (V3_ROBUST_KILL.md and V3_ROBUST_LONG.md in `results/live/`, when they land) add rows that belong to the omni
+size. The robustness tables (`results/live/V3_ROBUST_KILL.md`, `V7_ROBUST_LONG.md`, and the newest engine's when they land) add rows that belong to the omni
 arm alone, since native has no governor to kill: the seconds from the kill until every setting was back at the operator's
 (the allowance is 60 s, declared before the run), whether a second governor started and governed to the end, and the
 governor's memory in the last ten minutes over the first ten (a quarter's growth is a leak, declared before the run); the
 120 s after the kill are compared between the arms like any paired gauge.
 
-## The organisms with a real cluster inside (`V1_SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V1_BIG_ORGANISM.md`)
+## The organisms with a real cluster inside (`SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V3_BIG_ORGANISM.md`)
 
 Two kinds of rows, kept apart: **the cluster** (real Kubernetes, measured) and **the organism** (the modelled stacks
 around it, evidence S). "Organism behind its window (s)" is shown and not judged; a repetition reads **OFF THE CLOCK**
@@ -169,12 +191,13 @@ energy. A test's index is the geometric mean of its ratios, a category's of its 
 categories, each weighted the same. A measure enters only as its three-run reading allows; no difference beyond the
 noise enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
 
-## The six organisms grid (`results/scale/GRID.md`)
+## The seven organisms grid (`results/grid_v5/GRID.md`; each engine's runs in `results/grid_v<engine>/`)
 
-Columns are **size × runs**: 1, 10, 100 and 1,000 clusters, each at 1, 10, 100 and 1,000 paired runs. Rows are the six
-organisms. There is one table each for work per energy, energy, time over the line and work done. Read a cell as
-"with Omni-Compass on top, against native, at this size, over this many runs". Cells that are still computing say so;
-1,000 runs at 1,000 clusters is beyond the machines available and says so.
+Columns are **copies × runs**: 1, 10 and 100 clustered copies, each at 1, 10 and 100 paired runs, and on GitHub's own
+machines 1,000 of each as well (paid cloud and card runs stop at 100). Rows are the seven organisms: the spine, the four
+realms, the four stacked and the whole tower. Each square shows the modelled value and the value with the real cluster
+inside. Read a square as "with Omni-Compass on top, against native, at this many copies, over this many runs". A square
+still running says so, and one beyond a free runner's memory or time is listed as pending runner capacity, never rented.
 
 ## Kubernetes at scale (`KWOK.md`, from the `kwok-scale` workflow)
 

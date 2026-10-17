@@ -81,7 +81,7 @@ def main(argv=None):
     runs = [load(d) for d in a.dirs]
     eng = [engine(d) for d in a.dirs]
     L = ["# YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table", "",
-         "MongoDB as shipped with the operator's WiredTiger cache (512 MB) is native; omni is the compass law on the cache size through the "
+         (("MongoDB exactly as shipped, its WiredTiger cache at the server's own default, is native: above the cover the knob is at its limit on native, and omni reads and writes nothing (`docs/YCSB_PREREGISTRATION.md`, amendment 4); otherwise omni is the compass law on the cache size through the ") if all(rec.get("native") == "shipped" for _, recs in runs for rec in recs.values()) else "MongoDB as shipped with the operator's WiredTiger cache (512 MB) is native; omni is the compass law on the cache size through the ") + 
          "server's own console inside [256, 2,048] MB, holding the server's own mean read latency at 40% of the 1 ms line"
          "(`docs/YCSB_PREREGISTRATION.md`). YCSB's published core workloads ask for records from a key space that steps through the cache "
          "and past it, the same operations in both arms. Each run holds three paired repetitions; the paired difference's 95% interval "
@@ -114,7 +114,7 @@ def main(argv=None):
         L += ["", f"## {wl}: YCSB {r0['ycsb_workload']}, {r0['base_records']:,} records × notch; line {r0['line_ms']:.0f} ms, {len(r0['reps'])} paired repetitions a run"
               + (" (the tuning workload, shown and not counted)" if tuning else ""), "",
               f"MongoDB {r0.get('mongodb_version', '?')}, YCSB {r0.get('ycsb_version', '?')}; {r0['rate_ops']:,} operations a second offered from {r0['threads']} threads; "
-              f"steps {r0['steps']} × {r0['step_s']} s; the operator's cache {r0['native_mb']} MB, the cover {r0['cover_mb'][0]} to {r0['cover_mb'][1]} MB.", "",
+              f"steps {r0['steps']} × {r0['step_s']} s; " + (f"native's cache as shipped {r0['native_mb']} MB" if r0.get('native') == "shipped" else f"the operator's cache {r0['native_mb']} MB") + f", the cover {r0['cover_mb'][0]} to {r0['cover_mb'][1]} MB.", "",
               "| Gauge | native (A) | omni (A) | A | B | C | Reading |", "|---|---:|---:|---:|---:|---:|---|"]
         out["workloads"][wl] = {}
         for k, label, dr in GAUGES:
@@ -126,7 +126,7 @@ def main(argv=None):
             L.append(f"| {label} | {nat} | {om} | " + " | ".join(cell(r, k) for r in rs) + f" | {v} |")
             out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr, k), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
         hb = all(all(x["omni"].get("handed_back") for x in r["reps"]) for r in recs)
-        L += ["", f"The cache size handed back to the operator's and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
+        L += ["", f"The cache size handed back to native's and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
         vr = {t: [x["omni"]["verdict"] for x in r["reps"] if x["omni"].get("verdict")] for t, r in zip("ABC", recs)}
         if any(vr.values()):                                   # the brain's own verdict on the knob, live in the omni arms (the amendment of 2026-10-09)
             objs = sorted({v["objective"] for vs in vr.values() for v in vs})

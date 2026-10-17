@@ -79,7 +79,7 @@ TOP_STEP = 8
 STEPS = "1 2 3 2 3 4 5 6 5 4 3 2 1 2 1"
 STEADY = "3 3 3 3 3 3"
 BURST = "1 6 1 8 1 6"
-T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262}
+from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 SAME_REL = 1e-6
 
 WORKLOADS = {

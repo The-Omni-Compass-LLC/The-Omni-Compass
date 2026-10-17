@@ -33,9 +33,7 @@ import realms.gpu_card as G                                              # noqa:
 from omnicompass.verdict import Verdict                                  # noqa: E402
 
 GPU_SEEDS = (5100, 5101, 5102)
-T95 = {k: v for k, v in zip(range(1, 31), [12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228, 2.201, 2.179,
-                                          2.160, 2.145, 2.131, 2.120, 2.110, 2.101, 2.093, 2.086, 2.080, 2.074, 2.069, 2.064,
-                                          2.060, 2.056, 2.052, 2.048, 2.045, 2.042])}
+from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-sided 95% point of Student's t, omni-v9)
 
 
 def reading(runs, aim):
@@ -58,7 +56,7 @@ def paired(a, b, block):
     d = [y - x for x, y in zip(a, b)]
     bl = [sum(d[i:i + block]) / block for i in range(0, len(d) - block + 1, block)]
     m = st.mean(bl); sd = st.stdev(bl) if len(bl) > 1 else 0.0
-    half = (T95.get(len(bl) - 1) or 2.0) * sd / math.sqrt(len(bl))
+    half = _t95(len(bl) - 1) * sd / math.sqrt(len(bl))
     base = st.mean(a) or 1e-12
     return {"native": st.mean(a), "omni": st.mean(b), "change": m / base, "lo": (m - half) / base, "hi": (m + half) / base}
 
@@ -264,11 +262,22 @@ def receipt(name):
             "count": count}
 
 
+def newest(name):
+    """The newest engine's table of a benchmark: V<n>_<BENCHMARK>.md with the highest n present (a later engine's three
+    runs replace an earlier engine's table on the page the moment they land; tables of two engines are never pooled)."""
+    import re
+    base = re.sub(r"^V\d+_", "", name)
+    found = sorted(((int(m.group(1)), f.stem) for f in (ROOT / "results" / "live").glob(f"V*_{base}.md")
+                    if (m := re.fullmatch(rf"V(\d+)_{re.escape(base)}", f.stem))), reverse=True)
+    return found[0] if found else (None, name)
+
+
 def receipts():
     out = []
     for name, stack, cls in RECEIPTS:
-        r = receipt(name); r.update(stack=stack, cls=cls); out.append(r)
-        print(f"receipt {name:22s} {r['count']}")
+        n, stem = newest(name)
+        r = receipt(stem); r.update(stack=stack, cls=cls, engine=f"omni-v{n}" if n else "unknown"); out.append(r)
+        print(f"receipt {stem:22s} {r['engine']} {r['count']}")
     return out
 
 

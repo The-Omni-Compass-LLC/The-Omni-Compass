@@ -58,14 +58,12 @@ MUSCLES = {
     "distribution": ["lock_timeout", "cache_compression", "dispatch_priority", "shuffle_bandwidth", "broker_failover", "service_timeout",
                      "stage_parallelism", "inventory_allocation", "executor_size", "compensation_action", "gc_budget", "shipment_batch"],
 }
-T95 = {k: v for k, v in zip(range(1, 31), [12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228, 2.201, 2.179,
-                                          2.160, 2.145, 2.131, 2.120, 2.110, 2.101, 2.093, 2.086, 2.080, 2.074, 2.069, 2.064,
-                                          2.060, 2.056, 2.052, 2.048, 2.045, 2.042])}
+from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-sided 95% point of Student's t, omni-v9)
 
 
 def t95(df):
-    """The two-sided 95% quantile of Student's t (the table to 30, then 2.00 to 60, 1.98 to 120, 1.96 beyond)."""
-    return T95[df] if df in T95 else 2.00 if df <= 60 else 1.98 if df <= 120 else 1.96
+    """The two-sided 95% quantile of Student's t for df degrees of freedom (omnicompass/student_t.py, exact)."""
+    return _t95(df)
 
 
 def rows():

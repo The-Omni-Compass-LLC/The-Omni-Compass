@@ -33,16 +33,26 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v8 stands (v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v9 stands (v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v8** (`OMNI_V8.json`, digest `f93d233136a1f902`, 46 files; `docs/OMNI_V8.md`) stands on main since 17 October,
+- **Omni v9** (`OMNI_V9.json`, digest `7379f3a79ff2c475`, 47 files; `docs/OMNI_V9.md`) stands on main since 17 October,
+  the founder's order ("we're going into another version of Engine ... Apply the fix, run it, and see in the toy sim that
+  it works"; then "go go go"): omni-v8 with the CityLearn battery wire reading the coming hour (the mean of the same hour
+  over the past seven days, only hours already seen) and gliding at up to 0.0625 an hour (0.05 before; the fastest glide that read no LOSS on any score
+  in any district: 0.075 and faster raised the ramping in one district), because the reading of
+  the hour gone ran about five hours behind the day and left the batteries empty at each month's top hour (the 2022
+  robustness district's monthly unevenness +0.11%, LOSS); and every 95% interval on the exact Student t quantile
+  (`omnicompass/student_t.py`; every tabled value unchanged, no published reading moves). Proven locally on CityLearn
+  3.0.2 and in the toy gate (`results/toy_gate/V9_VS_V8.md`, identical to v8 on every toy) before it was pushed. 44 of its
+  47 files are omni-v8's bytes. Every benchmark runs again on it; the omni-v8 and omni-v7 tables stand as their own until
+  each benchmark's three runs on v9 land.
+- **Omni v8** (`OMNI_V8.json`, digest `f93d233136a1f902`, 46 files; `docs/OMNI_V8.md`) stood on main on 17 October,
   the founder's order ("there's a new version 8 ... push in all and update all"): omni-v7 with one wire changed, the
   CityLearn runner (`tools/run_citylearn.py`): a battery whose building simulates power outages stays native, because its
   charge is also its building's reserve (omni-v7's CityLearn table read LOSS in all three runs in the seven 2023 districts,
   the only ones with outages; every other district's commands are omni-v7's bytes). The other 45 engine files are omni-v7's.
   Every benchmark runs again on it (`scripts/reruns.txt`; the conductor's reruns, grid and Azure queues restarted on 17
-  October); the omni-v7 tables stand as omni-v7's until each benchmark's three runs on v8 land. One LOSS row stays
-  reported and is the next repair: the 2022 robustness district's monthly unevenness, +0.11%.
+  October); one LOSS row stayed, the 2022 robustness district's monthly unevenness (+0.11%), repaired in omni-v9.
 - **Omni v7** (`OMNI_V7.json`, digest `d6d467b824c585f1`, 46 files; `docs/OMNI_V7.md`) stood on main 16 to 17 October,
   the founder's order ("Where is version 7? That's what you gotta push everything to"): v6's law, catalog and shared-host
   capacity repair (on kind every node is a container on one runner: its processor is counted once and no replica is
@@ -61,7 +71,7 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v8, omni-v7, omni-v6,
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v9, omni-v8, omni-v7, omni-v6,
   omni-v5, omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
@@ -161,6 +171,14 @@ the founder overrides one in the conversation.
 
 ## Orders of 17 October
 
+- **Version 9: the fix proven in our own runs first, then pushed** (the founder's words: "Engine fix goes into models
+  first ... Apply the fix, run it, and see in the toy sim that it works ... lock everything else that you're not touching
+  ... Get rid of dead weight"; then "go go go"). omni-v9 is on main and on the branch `v9`; every page, manual, table and
+  queue points at it. **Native as shipped**: MySQL, Redis and MongoDB run with native exactly as the vendor ships them
+  beside the operator's setting (`--native shipped`); where the factory setting is already at the knob's top, the knob
+  reads "at its limit on native" and Omni-Compass watches. **Every level on one page** (`docs/LEVELS.md`, `tools/levels.py`,
+  checked by `verify.py`): the muscle, the organism, the cluster, its add-ons, the service, the plant, the cloud and a group
+  of clusters, each with its counts, and any level whose gauges go the other way is named and taken to the founder.
 - **Version 8 stands; push in all and update all** (the founder's words: "there's a new version 8. That means you got to
   push in all and update all ... We're going to start the GPU soon and the other two clouds"). omni-v8 is on main and on
   the branch `v8`; every page, manual, table and queue points at it; every benchmark runs again on it. The GPU runs on
@@ -376,8 +394,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v8` (the engine that stands, the founder's order of 17
-  October: "push in all and update all"), stay in sync, and `v7` and `v7-candidate` are kept level with them. **The `v5` branch
+  One version is always the main one; `main` and the working branch, `v9` (the engine that stands, 17 October), stay in
+  sync, and `v8`, `v7` and `v7-candidate` are kept level with them. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.
 - Verify before every push: `tools/release_manifest.py` under Python 3.12 (as GitHub runs it), 0 FAIL. Clear

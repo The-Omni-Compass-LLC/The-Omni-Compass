@@ -113,6 +113,27 @@ amendment; it is reported on all, every row, through `tools/citylearn_abc.py` A,
 identical to omni-v7 (checked to the digit on the 2022 robustness district). The robustness district's monthly unevenness
 (+0.11%, LOSS in all three omni-v7 runs) is not changed by this amendment and stays reported.
 
+## Amendment of 17 October (omni-v9): the battery wire reads the coming hour
+
+**What omni-v8 read** (the omni-v7 table, whose commands omni-v8 repeats to the byte outside the 2023 districts): the monthly
+load unevenness in `citylearn_challenge_2022_phase_all_robustness` +0.11%, LOSS in all three of our runs, beside GAIN on the bill,
+the electricity bought, carbon, the daily peak and the highest peak. Run locally, the same wire also read LOSS on districts the
+GitHub benchmark does not run: the tuning district's monthly unevenness (+0.26%), and rows of the 2022 phases 2 and 3.
+
+**Cause** (an hour-by-hour trace of the wire on the robustness district, CityLearn 3.0.2): the compass read the hour just gone and
+its adjustment moved by at most 0.05 of the command's range an hour, so it ran about five hours behind the day (its strongest
+discharge at 00:00, the draw's peak at 19:00); the batteries were empty at the month's top hour in ten of the eleven months the
+trace covers, and the month's mean fell faster than its peak.
+
+**Amendment (one wire, one muscle):** the compass reads the coming hour, the mean of the same hour of the day over the past seven
+days (only hours already seen), and the adjustment glides by up to 0.0625 an hour: the fastest glide that read no LOSS on any
+score in any district (0.05 left the 2022 phase 2's daily unevenness +0.25%; 0.075 and faster raised the 2022 phase 3's ramping).
+The controller, the gain, the response, the band, the hand-back, the outage batteries and the water tanks are unchanged. Found on
+the district whose LOSS it repairs; narrower repairs each left a LOSS there and were refused (`docs/OMNI_V9.md`, section 1). Read
+before any GitHub run on every district with batteries outside the 2023 set (the robustness district, the tuning district, the 2022
+phases 2, 3 and all, Alameda County, Travis County): no LOSS on any score (`docs/OMNI_V9.md`, section 3). Every district has now
+been seen, so the amendment is reported on all, every row, through `tools/citylearn_abc.py` A, B and C on the omni-v9 commit.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

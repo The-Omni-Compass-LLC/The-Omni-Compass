@@ -4,14 +4,15 @@
 # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The engines, fingerprinted file by file: Omni v8, the engine that stands (OMNI_V8.json, docs/OMNI_V8.md), Omni v7 (OMNI_V7.json),
+"""The engines, fingerprinted file by file: Omni v9, the engine that stands (OMNI_V9.json, docs/OMNI_V9.md), Omni v8 (OMNI_V8.json),
+Omni v7 (OMNI_V7.json),
 Omni v6 (OMNI_V6.json), Omni v5 (OMNI_V5.json,
 docs/OMNI_V5.md), then the frozen v3 (OMNI_V3.json, docs/OMNI_V3.md), v2 (OMNI_V2.json, docs/OMNI_V2.md) and v1
 (OMNI_V1.json, docs/OMNI_V1.md), each kept for its own results. v5 adds the v5 compass law (realms/compass_arm_v5.py) and its arm in the harness to v3's engine; while
 v5 is in active development its fingerprint is re-declared on each engine change, and no v5 result is published until the
 v5 freeze. No result is ever read across versions.
 
-  python3 tools/omni_version.py                 check this checkout: prints "omni-v8", "omni-v7", "omni-v6", "omni-v5", "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
+  python3 tools/omni_version.py                 check this checkout: prints "omni-v9", "omni-v8", "omni-v7", "omni-v6", "omni-v5", "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
   python3 tools/omni_version.py --commit <sha>  the same, for the engine as it stood at a git commit (any result's run)
   python3 tools/omni_version.py --write v5      write OMNI_V5.json from this checkout (only when a new version is declared or re-declared in development)
 
@@ -28,7 +29,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"v8": ROOT / "OMNI_V8.json", "v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
+VERSIONS = {"v9": ROOT / "OMNI_V9.json", "v8": ROOT / "OMNI_V8.json", "v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
             "v1": ROOT / "OMNI_V1.json"}     # newest first
 SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py", "tools/run_pandapower.py")
 

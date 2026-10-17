@@ -198,9 +198,7 @@ def run(setting, seed, arm):
     return ticks, decisions
 
 
-T95 = {k: v for k, v in zip(range(1, 31), [12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228, 2.201, 2.179, 2.160,
-                                          2.145, 2.131, 2.120, 2.110, 2.101, 2.093, 2.086, 2.080, 2.074, 2.069, 2.064, 2.060, 2.056,
-                                          2.052, 2.048, 2.045, 2.042])}
+from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-sided 95% point of Student's t, omni-v9)
 GAUGES = {"machines": ("spent", lambda t: t["nodes"] + t["boot"] + t["parked"]), "pending": ("down", lambda t: t["pending"]),
           "ms": ("down", lambda t: t["ms"]), "over": ("down", lambda t: 1.0 if t["ms"] > SLO_MS else 0.0), "kw": ("spent", lambda t: t["kw"])}
 
@@ -230,7 +228,7 @@ def main(out):
                 a, b = [f(t) for t in nt], [f(t) for t in ot]
                 d = [y - x for x, y in zip(a, b)]
                 bl = [sum(d[i:i + 40]) / 40 for i in range(0, len(d) - 39, 40)]
-                m = st.mean(bl); half = (T95.get(len(bl) - 1) or (2.00 if len(bl) <= 61 else 1.98)) * st.stdev(bl) / math.sqrt(len(bl))
+                m = st.mean(bl); half = _t95(len(bl) - 1) * st.stdev(bl) / math.sqrt(len(bl))
                 base = st.mean(a) or 1e-12
                 per.setdefault(g, {"aim": aim, "runs": []})["runs"].append({"seed": sd, "native": st.mean(a), "omni": st.mean(b),
                                                                              "change": m / base, "lo": (m - half) / base, "hi": (m + half) / base})
