@@ -199,12 +199,22 @@ def shallow():
     return r.stdout.strip() == "true"
 
 
+def boundary():
+    """The commits a shallow checkout's history stops at: each stands in for every older change, so a date read from one is
+    not the day the file changed."""
+    r = subprocess.run(["git", "-c", "safe.directory=*", "rev-parse", "--git-path", "shallow"], cwd=ROOT, capture_output=True, text=True)
+    f = ROOT / r.stdout.strip() if r.stdout.strip() else None
+    return set(f.read_text().split()) if f and f.exists() else set()
+
+
 def updated(path):
-    """The date the file was last changed in the repository (the day the result landed); None where the history is not here."""
-    if shallow():
-        return None
-    r = subprocess.run(["git", "-c", "safe.directory=*", "log", "-1", "--format=%cs", "--", str(path)], cwd=ROOT, capture_output=True, text=True)
-    return r.stdout.strip() or "uncommitted"
+    """The date the file was last changed in the repository (the day the result landed); None where the history is not here
+    (in a shallow checkout, a file last touched by the commit the history stops at, or not yet committed)."""
+    r = subprocess.run(["git", "-c", "safe.directory=*", "log", "-1", "--format=%H %cs", "--", str(path)], cwd=ROOT, capture_output=True, text=True)
+    found = r.stdout.split()
+    if not found:
+        return None if shallow() else "uncommitted"
+    return None if found[0] in boundary() else found[1]
 
 
 # ------------------------------------------------------------------------------- the tests inside the index
@@ -213,9 +223,9 @@ def from_index():
     stack's category); the benefit word counts every judged gauge of the test's table, as the wiring page does."""
     cases = wv.real_stacks(wv.load_index())
     rows = []
-    names = {"V3_PGBENCH.md": "PostgreSQL, the pooler's pool size", "V3_KAFKA.md": "Kafka, the consumer group's size",
-             "V3_REDIS.md": "Redis, the cache's memory ceiling", "V3_YCSB.md": "MongoDB, the storage engine's cache size",
-             "V3_SYSBENCH.md": "MySQL, the buffer pool's size"}
+    names = {"V7_PGBENCH.md": "PostgreSQL, the pooler's pool size", "V7_KAFKA.md": "Kafka, the consumer group's size",
+             "V7_REDIS.md": "Redis, the cache's memory ceiling", "V7_YCSB.md": "MongoDB, the storage engine's cache size",
+             "V7_SYSBENCH.md": "MySQL, the buffer pool's size"}
     stacks = {}
     for c in cases:
         if not c["counted"]:
@@ -343,7 +353,7 @@ def from_sim(fname, name, moved_titles, what, left_native_title=None):
             continue
         for sub in sec["subs"]:
             cname = sub["title"].split(":", 1)[0].strip()
-            if fname == "V3_SWARM.md" and cname == "tuning":
+            if fname in ("V3_SWARM.md", "V7_SWARM.md") and cname == "tuning":
                 continue
             if not sub["rows"]:
                 continue
@@ -416,16 +426,16 @@ def main(check=False):
     rows = from_index()
     for fname, name, what in [
         ("V3_ROBUST_KILL.json", "Robustness: the governor killed outright mid-run", "the whole window, a kill and a restart inside it; p95, machines, energy"),
-        ("V3_ROBUST_LONG.json", "Robustness: the two-hour run", "the two-hour window; p95, machines, energy"),
+        ("V7_ROBUST_LONG.json", "Robustness: the two-hour run", "the two-hour window; p95, machines, energy"),
     ]:
         r = from_abc_table(fname, name, what)
         if r:
             rows.append(r)
     for fname, name, titles, what, *left in [
-        ("V3_MUJOCO.md", "Robot arms (MuJoCo), the three untouched robots", {"Robots where Omni moved the override": ""}, "every judged gauge of each robot's table (energy, copper heating, torque, tracking); a robot the engine left native reads 0", "Robots where the paired trial left the override native"),
-        ("V3_PANDAPOWER.md", "Power grids (SimBench), both load models", {"ZIP loads": "ZIP loads", "constant-power loads": "constant-power loads"}, "every judged gauge of every grid, then the grids together"),
-        ("V3_CITYLEARN.md", "Buildings and batteries (CityLearn), the districts with batteries", {"Districts with electric batteries": ""}, "every CityLearn score of every district, then the districts together"),
-        ("V3_SWARM.md", "Drone swarms, the three untouched cells", {"Cells where Omni moved the cruise": ""}, "every judged gauge of every cell"),
+        ("V7_MUJOCO.md", "Robot arms (MuJoCo), the three untouched robots", {"Robots where Omni moved the override": ""}, "every judged gauge of each robot's table (energy, copper heating, torque, tracking); a robot the engine left native reads 0", "Robots where the paired trial left the override native"),
+        ("V7_PANDAPOWER.md", "Power grids (SimBench), both load models", {"ZIP loads": "ZIP loads", "constant-power loads": "constant-power loads"}, "every judged gauge of every grid, then the grids together"),
+        ("V7_CITYLEARN.md", "Buildings and batteries (CityLearn), the districts with batteries", {"Districts with electric batteries": ""}, "every CityLearn score of every district, then the districts together"),
+        ("V7_SWARM.md", "Drone swarms, the three untouched cells", {"Cells where Omni moved the cruise": ""}, "every judged gauge of every cell"),
     ]:
         r = from_sim(fname, name, titles, what, left[0] if left else None)
         if r:

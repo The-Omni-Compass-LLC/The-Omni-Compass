@@ -2,6 +2,63 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-17: Omni v8 stands (the outage battery left native); everything runs again on it
+
+- **Omni v8 is the engine that stands** (the founder's order of 17 October: "there's a new version 8 ... push in all and update
+  all"): `OMNI_V8.json`, digest `f93d233136a1f902`, 46 files, `docs/OMNI_V8.md`; package 0.8.0. It is omni-v7 with one wire
+  changed, the CityLearn runner (`tools/run_citylearn.py`): a battery whose building simulates power outages (CityLearn's own
+  `simulate_power_outage`) stays native, because its charge is also the building's reserve; every other battery is steered
+  exactly as before, and each district's file says how many batteries were left native for outages. The other 45 engine files
+  are omni-v7's bytes.
+- **Why**: omni-v7's CityLearn table read LOSS in all three of our runs in the seven 2023 districts, the only ones with outages.
+  Found on CityLearn 3.0.2 itself, run locally on the same districts and reproducing omni-v7's numbers to the last digit; three
+  narrower repairs (charging only, native during outage hours, no more than the band's excess) each left a LOSS on the tuning
+  district and were refused. Read locally before any GitHub run: the 2023 districts native's to the last digit; the 2022
+  robustness district identical to omni-v7's GitHub run on every gauge of both arms. The amendment is written into
+  `docs/CITYLEARN_PREREGISTRATION.md` (every district has now been seen; it is reported on all). The robustness district's
+  monthly unevenness (+0.11%, LOSS) is not changed by it and is the next repair.
+- **The toy gate** ran omni-v8 against omni-v7 on seeds 1 to 8 (`results/toy_gate/V8_VS_V7.md`): every gauge of every toy
+  identical, to the last digit; the change touches no Kubernetes, card or cloud controller.
+- **Everything runs again on omni-v8**: the conductor (`scripts/dispatch_grid.py`) counts the reruns, the grid and every Azure
+  set from the moment omni-v8 landed (the grid on its own manifest, `results/grid_v8/`); `scripts/reruns.txt` is the omni-v8
+  campaign, the steady and wandering Kubernetes tests back in it. The omni-v7 runs already started run to their end and stay
+  omni-v7's record. **The conductor reads the engine of the commit its runs start on** (the branch's newest commit, fetched each
+  tick), not of its own checkout, so a tick that began before a new engine landed starts the new engine's runs at its next round
+  instead of standing idle for up to five hours. **The campaign has a start time** (`SINCE`, set a little after the push): the
+  conductor starts nothing before it, so no run of the engine before it can be counted in omni-v8's campaign.
+- **The realms table run again on omni-v8** (`results/realms_v5/REALMS_V5.md`, commit `9819a903cba3`, seeds 3000-3009): every
+  reading of the 1,107 muscles and the seven organisms the same as on omni-v7, to the digit; only the run's header changed.
+- **Archived**: the kill test's three omni-v7 runs on the fixed harness (39040151044, 39040156477, 39040161755; all finished)
+  and Azure's steady set A (38981149348, finished), requested in `.github/archive_request.txt`; their tables follow as
+  omni-v7's record. Azure's burst `1 6 1 8 1 6` runs now.
+- **Every page on omni-v8**: CLAUDE.md, the README, the state of play (its omni-v7 summary kept whole in
+  `docs/history/STATE_OF_PLAY_2026-10-16.md`), both manuals (the Owner's section 3.5 rewritten from the omni-v7 tables, its
+  engines table, section 16.5's CityLearn paragraph; the Operator's engine lines), the receipts page, the index's notes, the cloud
+  setup pages, `docs/OMNI_V7.md` and `docs/OMNI_V6.md` marked as the engines before it, codemeta. Both PDFs rebuilt. The branch
+  `v8` carries the engine that stands, in step with `main`; `v7` and `v7-candidate` are kept level.
+- **GitHub's verify failed on the landing push (4d9e9da42) and is fixed**: the new conductor test set `FETCH_HEAD` with
+  `git update-ref`, which GitHub's git (2.55) refuses for a pseudoref while the local git (2.43) allowed it; the test now writes
+  `FETCH_HEAD` as a fetch does. The conductor's code was not at fault; every other check passed on GitHub.
+
+## 2026-10-17 (late night: every page on the omni-v7 tables; the whole test suite in the push check)
+
+- **The Omni index reads only omni-v7 tables**: +4.2% GAIN on the resource reading and +11.5% GAIN on the service reading
+  (real Kubernetes +27.2% over seven tests, the cache +0.2%, messaging +0.1%, the three databases exactly nothing). No table of
+  an earlier engine is read beside them; the steady and wandering Kubernetes tests, Azure and the card join as their omni-v7
+  tables land (`tools/omni_index.py`, `results/OMNI_INDEX.md`).
+- **The benefit sheet, the wiring page, the state of play and the receipts page** read the omni-v7 tables
+  (`tools/benefit_sheet.py`, `tools/wiring_verdicts.py`, `tools/summary.py --fix`, `docs/THE_RECEIPTS.md`): 20 of 24 benchmarks
+  on the engine that stands.
+- **The Owner's Manual's results chapter** (sections 16.1 and 16.4 to 16.6) is rewritten from the omni-v7 tables, gauge by
+  gauge, native against Omni-Compass on top, the CityLearn LOSS rows and their cause in the same paragraph as its gains; the
+  sections as they stood on omni-v1 and omni-v3 are kept whole in `docs/history/OWNERS_MANUAL_RESULTS_V1_V3.md`.
+- **The whole unit-test suite runs in the push check** (`verify.py`, 212 tests, about two and a half minutes): one failing
+  test now stops a push. `tests/test_robust_restart.py` had failed for two days because no check ran it.
+- **The figures are written the same way every time**: the drawings no longer stamp a render date or random clip ids
+  into their SVG files (`docs/book/schematics.py`), so a figure's file changes only when its drawing does.
+- **The steady and wandering Kubernetes tests had dropped out of the omni-v7 rerun list**; they are released with the next
+  campaign.
+
 ## 2026-10-17 (night: the first omni-v7 reruns read back: seventeen three-run tables)
 
 - **Seventeen three-run tables on omni-v7** from the reruns released on 16 October (A, B and C, separate GitHub runs,

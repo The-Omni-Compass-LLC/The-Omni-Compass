@@ -50,13 +50,13 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v7, fingerprint `d6d467b824c585f1` (46 files); package 0.7.0.
+- **Engine on main:** omni-v8, fingerprint `f93d233136a1f902` (46 files); package 0.8.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- Omni v6 stands on main. The benchmarks with their three-run table on it so far are the four Kubernetes add-on tests below (Goldilocks, CruiseKube, KEDA's HTTP add-on, KEDA on the CPU target and the requests); every other benchmark runs again on it from `scripts/reruns.txt`, and until its three runs land its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on. The count on the engine that stands is kept in the standing block of [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md). See [`docs/OMNI_V6.md`](docs/OMNI_V6.md).
+- Omni v8 stands on main (17 October). Every benchmark runs again on it from `scripts/reruns.txt`; until its three runs land, its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on, and twenty-two of them carry omni-v7's three-run tables (`results/live/V7_*.md`). The count on the engine that stands is kept in the standing block of [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md). See [`docs/OMNI_V8.md`](docs/OMNI_V8.md).
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -64,11 +64,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-16 03:59 | [The realms on omni-v6 at the max: 1107 muscles and seven organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
-| 2026-10-15 21:25 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v6)](results/live/V6_KEDA_REQUESTS.md) |  |
-| 2026-10-15 21:25 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v6)](results/live/V6_KEDA_CPU_REQUESTS.md) |  |
-| 2026-10-15 21:25 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v6)](results/live/V6_GOLDILOCKS.md) |  |
-| 2026-10-15 21:25 | [CruiseKube: Omni-Compass on top of a service rightsized by CruiseKube applying its own recommendations: the A/B/C three-run table (Omni v6)](results/live/V6_CRUISEKUBE.md) |  |
+| 2026-10-17 16:00 | [The realms on omni-v8 at the max: 1107 muscles and seven organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
+| 2026-10-17 15:39 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V8_VS_V7.md) |  |
+| 2026-10-17 15:39 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -76,35 +74,42 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-16 13:56 | six-kube x1 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized reps 304+62 arms native compass split no window 960 protocol 3 | success | [38897358994](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38897358994) |
-| 2026-10-16 13:44 | big-organism-detached collect | success | [38908557708](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38908557708) |
-| 2026-10-16 12:40 | six-kube x1 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized reps 242+62 arms native compass split no window 960 protocol 3 | success | [38892229771](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38892229771) |
-| 2026-10-16 12:39 | aks-metered burst 1 6 1 8 1 6 replica room 0 dial save eastus Standard_D2_v4 | success | [38850848005](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38850848005) |
-| 2026-10-16 09:23 | six-kube x1 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack reps 192+50 arms native compass split no window 960 protocol 3 | failure | [38869874378](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38869874378) |
-| 2026-10-16 09:18 | six x1000 line orgs 7 runs 10+90 | success | [38861935718](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38861935718) |
-| 2026-10-16 08:42 | six-kube x1 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack reps 142+50 arms native compass split no window 960 protocol 3 | success | [38861946608](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38861946608) |
-| 2026-10-16 08:42 | six x100 line orgs 7 runs 10+90 | success | [38859014484](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38859014484) |
-| 2026-10-16 07:49 | six-kube x100 orgs spine reps 11+90 arms native compass split no window 1440 protocol 3 | failure | [38859019685](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38859019685) |
-| 2026-10-16 07:49 | six-kube x10 orgs spine reps 11+90 arms native compass split no window 960 protocol 3 | failure | [38854921889](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/38854921889) |
+| 2026-10-17 19:28 | benchmark-reps | success | [39059584078](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39059584078) |
+| 2026-10-17 19:19 | mujoco | success | [39061854186](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39061854186) |
+| 2026-10-17 19:15 | kind-goldilocks | success | [39057297713](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39057297713) |
+| 2026-10-17 19:05 | capacity A: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | success | [39057301477](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39057301477) |
+| 2026-10-17 18:52 | citylearn | success | [39055055394](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39055055394) |
+| 2026-10-17 18:50 | big-organism-detached collect | success | [39059822600](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39059822600) |
+| 2026-10-17 18:46 | realms-v5 | success | [39058432904](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39058432904) |
+| 2026-10-17 18:43 | realms | success | [39058429026](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39058429026) |
+| 2026-10-17 18:32 | cpu-power | success | [39058436682](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39058436682) |
+| 2026-10-17 18:27 | live-shadow | success | [39057289698](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39057289698) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## The engine that stands: omni-v7 (the max on every muscle, every muscle its own card, the shared-host capacity repair, quota-aware conveyance, every rule in seconds)
+## The engine that stands: omni-v8 (the max on every muscle, every muscle its own card, quota-aware conveyance, every rule in seconds, the outage battery left native)
 
-The engine on main is **omni-v7** (`OMNI_V7.json`, fingerprint `d6d467b824c585f1`, 46 files; [`docs/OMNI_V7.md`](docs/OMNI_V7.md)), the
-engine that stands since 16 October by the founder's order: the max on every muscle of the 1,107-muscle catalog, every muscle its own card,
-the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota (an unreadable quota is no budget
-known), no limit raised while a shared host is busy or unread, every rule counted in seconds, the verdict reading a trial in the reports'
-words, the cloud's rule as one flag. Every benchmark runs again on it (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the
-same day); until a benchmark's three runs land, its row on the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on. Its first
-five three-run tables are in (`results/live/V7_*.md`), native against Omni-Compass on top, ten pairs × three runs each, no row LOSS: a
-service rightsized by Goldilocks, response time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs;
-KEDA's HTTP add-on, −57% to −58% mean, −71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to −19%, pods
-started −17% to −23%, GAIN in all three; KEDA on the CPU target and the requests, −36% to −38% mean and −52% to −54% at the 95th
-percentile, GAIN in all three; CruiseKube and the fixed-capacity caps EVEN; machines EVEN in every one; parked-worker energy +1.1% to
-+2.3%, power given.
+The engine on main is **omni-v8** (`OMNI_V8.json`, fingerprint `f93d233136a1f902`, 46 files; [`docs/OMNI_V8.md`](docs/OMNI_V8.md)), the
+engine that stands since 17 October by the founder's order. It is omni-v7 with one wire changed: on CityLearn a battery whose building
+simulates power outages stays native, because its charge is also the building's reserve (omni-v7's CityLearn table read LOSS in all three
+of our runs in the seven 2023 districts, the only districts with outages; the cause was ours, and on those districts omni-v8 now reads
+native's numbers to the last digit). The other 45 engine files are omni-v7's bytes: the max on every muscle of the 1,107-muscle catalog,
+every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
+rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
+omni-v8 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the same day); until a benchmark's three runs land, its row on
+the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
+
+**The engine before it, omni-v7** ([`docs/OMNI_V7.md`](docs/OMNI_V7.md), 16 to 17 October), has twenty-two three-run tables of its own
+(`results/live/V7_*.md`), native against Omni-Compass on top; they stand as omni-v7's until omni-v8's land. Twenty-one read no LOSS. The
+one that did is CityLearn: the 2023 districts, fixed in omni-v8 above, and one row of the 2022 robustness district, its monthly
+unevenness +0.11% beside the bill −8.6% and the electricity bought −14.7%, the next repair. Among them: a service rightsized by Goldilocks, response
+time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs; KEDA's HTTP add-on, −57% to −58% mean,
+−71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to −19%, GAIN in all three; KEDA on the CPU target and
+the requests, −36% to −38% mean and −52% to −54% at the 95th percentile, GAIN in all three; CruiseKube and the fixed-capacity caps EVEN;
+machines EVEN in every one; parked-worker energy +1.1% to +2.3%, power given. The Omni index over the real tests: **+4.2% GAIN** on the
+resource reading and **+11.5% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
 
@@ -128,8 +133,8 @@ native, did less work, or cleared its line later. 364 muscles carry a card of th
 pools, 31 batteries), each printed in plain words in the [muscle catalog](docs/MUSCLE_CATALOG.md); inside a body, a
 battery wired by its power keeps the body's own margin on its line ([`docs/FORMAL_V5.md`](docs/FORMAL_V5.md), section
 5). Preregistered seeds 3000-3009, ten paired runs per muscle,
-per organism and per load, commit `1637d32cd26c`, engine omni-v7 (fingerprint `d6d467b824c585f1`; run again on 16 October on the engine
-that stands with the spine as the seventh organism, every reading reproducing the 13 October table to the digit). Evidence class
+per organism and per load, commit `9819a903cba3`, engine omni-v8 (fingerprint `f93d233136a1f902`; run again on 17 October on the engine
+that stands, the spine the seventh organism, every reading reproducing the table of 16 October to the digit). Evidence class
 **S**: modelled plants, not meters. Every row, losses included:
 [`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md).
 

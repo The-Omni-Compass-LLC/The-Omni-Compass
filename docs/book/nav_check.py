@@ -142,25 +142,34 @@ def main(pdf, md_path):
         for i, lab in label.items():
             if lab and lab not in plain:
                 plain[lab] = re.sub(r"\s+", " ", page_text[i - 1]).lower()
+        entries = []                                   # (term, pages) in the order the index prints them
         for i in range(idx_start, min(idx_start + 40, len(doc))):
-            lines = {}
-            for w in doc[i].get_text("words"):
-                if TOP < w[1] < H - BOTTOM:
-                    lines.setdefault(round(w[3] / 3), []).append(w)
-            for k in sorted(lines):
-                txt = " ".join(w[4] for w in sorted(lines[k], key=lambda w: w[0]) if w[4] != ".")
-                m = re.match(r"^([A-Za-z][^0-9]{2,60}?)\s+((?:\d+,\s*)*\d+)$", txt)
-                if not m:
-                    continue
-                term = m.group(1).strip().lower()
-                key = term.split()[0].strip(",;:()").lower()[:8]
-                if len(key) < 4:
-                    continue
-                for pg in m.group(2).split(","):
-                    checked += 1
-                    body_txt = plain.get(pg.strip(), "")
-                    if key not in body_txt and key.replace(" ", "") not in body_txt.replace(" ", ""):   # a file name
-                        misses.append((term[:30], pg.strip()))                                       # wrapped in a cell
+            # an entry is drawn as its dot leader ending in its pages, then its term (or both on one line); read in the
+            # order drawn, so a term is never paired with the pages of the entry beside it
+            nums = None
+            for b in doc[i].get_text("dict")["blocks"]:
+                for ln in b.get("lines", []):
+                    if not TOP < ln["bbox"][1] < H - BOTTOM:
+                        continue
+                    txt = "".join(s["text"] for s in ln["spans"]).strip()
+                    lead = re.fullmatch(r"[\s.]*?((?:\d+,\s*)*\d+)", txt)
+                    same = re.match(r"^([A-Za-z].*?)(?:\s*\.){2,}\s*((?:\d+,\s*)*\d+)$", txt)
+                    if lead:
+                        nums = lead.group(1)
+                    elif same:
+                        entries.append((same.group(1), same.group(2))); nums = None
+                    elif nums and re.match(r"^[A-Za-z]", txt):
+                        entries.append((txt, nums)); nums = None
+        for term, pages in entries:
+            term = term.strip().lower()
+            key = term.split()[0].strip(",;:()").lower()[:8]
+            if len(key) < 4:
+                continue
+            for pg in pages.split(","):
+                checked += 1
+                body_txt = plain.get(pg.strip(), "")
+                if key not in body_txt and key.replace(" ", "") not in body_txt.replace(" ", ""):   # a file name
+                    misses.append((term[:30], pg.strip()))                                       # wrapped in a cell
     print(f"index references checked {checked}; the term's first word not on the listed page: {len(misses)} {misses[:8]}")
 
     # every cross-reference in the book's text names a heading the book has (the one numbering, 17 October)

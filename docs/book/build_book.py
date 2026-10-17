@@ -824,7 +824,7 @@ OWNER_OUTLINE = [
     ("Formal Status of the Mathematics", ("F", "docs/FORMAL_STATUS.md")),
     ("The Max, Formally: Definitions, Guarantees and Measures", ("F", "docs/FORMAL_V5.md")),
     ("The Mechanism of Action", ("F", "docs/MECHANISM_OF_ACTION.md")),
-    ("The Engine That Stands: Omni v7", ("F", "docs/OMNI_V7.md")),
+    ("The Engine That Stands: Omni v8", ("F", "docs/OMNI_V8.md")),
     ("The Engines and Their Audit", ("FS", ["docs/ENGINES.md", "docs/history/ENGINE_AUDIT.md"])),
     ("PART", "The Physics: the Compass and the Nervous System",
      "Push and pull, the band and its cushions, the physics of a processor, and the two-way wires that carry the "
@@ -894,7 +894,7 @@ OWNER_OUTLINE = [
     ("Repository Standards", ("F", "docs/REPOSITORY_STANDARDS.md")),
     ("Python, C++ and the Seal", ("M", "Python, C++ and the Seal")),
     ("The Founder's Working Notes", ("F", "docs/history/HANDOFF_CHAPTER.md")),
-    ("The Road to the Engine That Stands: Omni v5 and v6", ("FS", ["docs/OMNI_V5.md", "docs/OMNI_V6.md"])),
+    ("The Road to the Engine That Stands: Omni v5, v6 and v7", ("FS", ["docs/OMNI_V5.md", "docs/OMNI_V6.md", "docs/OMNI_V7.md"])),
     ("History", ("F", "docs/HISTORY.md")),
     ("BACK", None),
     ("Glossary", ("M", "Glossary")),
@@ -930,11 +930,11 @@ def source_listing(rel, nb=None):
 
 def special(name, nb=None):
     if name == "source":
-        fp = json.loads(read("OMNI_V7.json"))
+        fp = json.loads(read("OMNI_V8.json"))
         files = list(fp["files"])
         py = [rel for rel in files if rel.endswith(".py")]
         tables = [rel for rel in files if not rel.endswith(".py")]
-        intro = (f"The engine that stands, {fp['version']}, is the {len(files)} files named in `OMNI_V7.json` (digest "
+        intro = (f"The engine that stands, {fp['version']}, is the {len(files)} files named in `OMNI_V8.json` (digest "
                  f"{fp['digest'][:16]}): {len(py)} Python files and {len(tables)} tables. The Python files are printed here in "
                  "full from the repository, in the fingerprint's order, so that the book and the code can be read side by side "
                  "and nothing in the mechanism is withheld from the owner: the Kubernetes governor, its muscles, the replica "
@@ -1717,9 +1717,9 @@ def _md_text(src, nb):
         return prepare(src, Numberer(nb.chap))
     if kind == "X":
         if key == "source":
-            fp = json.loads(read("OMNI_V7.json"))
+            fp = json.loads(read("OMNI_V8.json"))
             py = [rel for rel in fp["files"] if rel.endswith(".py")]
-            return [f"The full source of every Python file of the engine that stands, {fp['version']} (`OMNI_V7.json`, digest "
+            return [f"The full source of every Python file of the engine that stands, {fp['version']} (`OMNI_V8.json`, digest "
                     f"{fp['digest'][:16]}), {len(py)} files, as the printed book carries it: " + ", ".join(f"`{rel}`" for rel in py) + "."]
         if key == "license":
             return ["The license is the file `LICENSE`."]

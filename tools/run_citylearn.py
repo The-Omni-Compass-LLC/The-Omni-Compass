@@ -98,6 +98,16 @@ def run_arm(schema, arm):
     # or hot water tank (cooling_storage, dhw_storage) is a thermal muscle that needs its own reading and stays native
     names = [n for agent in env.action_names for n in agent]
     battery = [n == "electrical_storage" for n in names]
+    # omni-v8 (17 October): a battery that also carries its building through power outages has a second duty, the reserve
+    # for the outage, which the district's draw cannot show; it stays native, as a water tank does, until it has its own wire
+    # and its own reading. The building's own setting says which batteries those are (CityLearn's simulate_power_outage).
+    if len(env.action_names) == 1:                 # the central agent: one list, each building's actions in its own order
+        owner = [bi for bi, b in enumerate(env.buildings) for _ in b.active_actions]
+    else:
+        owner = [bi for bi, agent_names in enumerate(env.action_names) for _ in agent_names]
+    reserve = [bool(getattr(b, "simulate_power_outage", False)) for b in env.buildings]
+    steer = ([bt and not reserve[owner[i]] for i, bt in enumerate(battery)] if len(owner) == len(battery)
+             else [False] * len(battery))      # an action list it cannot place on its buildings: nothing is steered
     t0, k = time.time(), 0
     while not env.terminated:
         a = agent.predict(obs)
@@ -121,10 +131,10 @@ def run_arm(schema, arm):
                     off += max(-SLEW, min(SLEW, -GAIN * f - off))   # the adjustment glides, never jumps more than SLEW
                     if abs(off) > 1e-12:
                         flat = [x for row in a for x in row]
-                        if any(battery):
-                            flat = [max(-1.0, min(1.0, x + off)) if b else x for x, b in zip(flat, battery)]
+                        if any(steer):
+                            flat = [max(-1.0, min(1.0, x + off)) if b else x for x, b in zip(flat, steer)]
                             a = [flat]
-                        moved += 1
+                            moved += 1                              # an hour counts as moved only where a command moved
             elif k >= kill:
                 handed_back = handed_back and True          # from here every command is the native controller's own
         obs, _, _, _, _ = env.step(a)
@@ -132,7 +142,7 @@ def run_arm(schema, arm):
     ev = env.evaluate()
     d = ev[ev["level"] == "district"].set_index("cost_function")["value"].to_dict()
     return {"arm": arm, "buildings": len(env.buildings), "steps": steps,
-            "batteries": sum(battery), "thermal_stores_left_native": sum(1 for n in names if n in ("cooling_storage", "dhw_storage")), "seconds": round(time.time() - t0, 1),
+            "batteries": sum(battery), "batteries_left_native_for_outages": sum(battery) - sum(steer), "thermal_stores_left_native": sum(1 for n in names if n in ("cooling_storage", "dhw_storage")), "seconds": round(time.time() - t0, 1),
             "moved_hours": moved, "handed_back": handed_back and k >= kill,
             "kpis": {x: (None if (d.get(x) is None or (isinstance(d.get(x), float) and math.isnan(d.get(x)))) else float(d[x]))
                      for x in KPIS}}

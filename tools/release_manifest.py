@@ -24,6 +24,7 @@ MANIFEST = ROOT / "RELEASE_MANIFEST.json"
 RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
+    "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
     "quota_v7_candidate": ["OMNI_V7.json", "omni_controller/quota.py", "tests/test_quota_convey.py", "docs/OMNI_V7.md", "tools/mechanism_identity.py", "tests/fake_cluster/kubectl", "tools/layout_check.py"],
     "release_operations": ["tools/release_manifest.py", "scripts/aks_kubectl.py", "tests/test_manifest_refresh.py", "tests/test_aks_kubectl.py"],
     "engine_v6_campaign": ["OMNI_V6.json", "omni_controller/capacity.py", "omni_controller/controller.py",

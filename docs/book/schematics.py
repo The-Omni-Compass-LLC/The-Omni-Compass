@@ -63,7 +63,8 @@ DJV = "/usr/share/fonts/truetype/dejavu/"
 plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": PT, "svg.fonttype": "none", "axes.titlesize": PT,
                      "axes.labelsize": PT, "xtick.labelsize": PT, "ytick.labelsize": PT, "legend.fontsize": PT,
                      "axes.edgecolor": GREY, "axes.labelcolor": INK, "xtick.color": INK, "ytick.color": INK,
-                     "axes.spines.top": False, "axes.spines.right": False, "figure.dpi": 100, "savefig.dpi": 100})
+                     "axes.spines.top": False, "axes.spines.right": False, "figure.dpi": 100, "savefig.dpi": 100,
+                     "svg.hashsalt": "omni-compass"})   # the same drawing writes the same file: no random ids
 schemdraw.config(fontsize=PT, font="DejaVu Sans", lw=1.2, color=INK)
 
 # ---------------------------------------------------------------- the titles the List of Figures prints
@@ -171,7 +172,7 @@ def mpl_fig(h, **kw):
 
 def fig_svg(fig) -> str:
     buf = io.StringIO()
-    fig.savefig(buf, format="svg")
+    fig.savefig(buf, format="svg", metadata={"Date": None})    # no date stamped in: a figure changes only when it does
     plt.close(fig)
     return buf.getvalue()
 
@@ -1872,6 +1873,7 @@ def write_svgs(out: Path = OUT, keys=None) -> list:
     for key in (keys or FIGURES):
         s = svg(key)
         s = re.sub(r"<!DOCTYPE svg[^>]*>\s*", "", s, flags=re.S)
+        s = re.sub(r"\n\s*<dc:date>[^<]*</dc:date>", "", s)       # no render date: a file changes only when its drawing does
         s = s.replace("<svg ", f"<!-- {NOTICE} -->\n<svg ", 1).rstrip() + f"\n<!-- {NOTICE} -->\n"
         p = out / f"{key}.svg"
         p.write_text(s, encoding="utf-8")

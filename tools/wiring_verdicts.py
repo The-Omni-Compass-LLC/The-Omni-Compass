@@ -119,9 +119,9 @@ def first(runs, key):
 
 # ------------------------------------------------------------------------------------- the real stacks (three runs)
 K8S_TESTS = [(name, f) for _, name, f, _, _ in omni_index.SOURCES]          # the seven Kubernetes tests, in the index's order
-K8S_NAMES = {"V3_STEADY.json": "steady work", "V3_WANDERING.json": "demand that wanders", "V3_ALL_FOUR.json": "all four at once",
-             "V3_FAIRNESS.json": "a noisy neighbour", "V3_FAULTS.json": "faults", "V3_BATCH.json": "a queue of jobs",
-             "V3_TRACE_GOOGLE2011.json": "a public day of demand (Google 2011)"}
+K8S_NAMES = {"V7_STEADY.json": "steady work", "V7_WANDERING.json": "demand that wanders", "V7_ALL_FOUR.json": "all four at once",
+             "V7_FAIRNESS.json": "a noisy neighbour", "V7_FAULTS.json": "faults", "V7_BATCH.json": "a queue of jobs",
+             "V7_TRACE_GOOGLE2011.json": "a public day of demand (Google 2011)"}
 K8S_KNOB = "the autoscaler's replicas, the floor and the machines"
 K8S_GAUGE = {"worker nodes in service, mean": "machines", "node-hours": "machine-hours", "energy (Wh)": "standby-model energy",
              "energy, parked workers still on at idle power (Wh)": "parked-worker energy", "response time (ms), mean": "mean response",
@@ -133,28 +133,28 @@ K8S_GAUGE = {"worker nodes in service, mean": "machines", "node-hours": "machine
              "batch: queue finished (s)": "queue finished"}
 WORKLOAD_STACKS = [
     # (category in the index, file, the knob in words, {gauge key: name}, the tuning workload's name, the declared cost note)
-    ("Real database (PostgreSQL behind PgBouncer, GitHub)", "V3_PGBENCH.json", "the pooler's pool size (server connections)",
+    ("Real database (PostgreSQL behind PgBouncer, GitHub)", "V7_PGBENCH.json", "the pooler's pool size (server connections)",
      {"work_inside_line_tps": "work inside the line", "tps": "throughput", "p95_ms": "p95", "p99_ms": "p99", "p50_ms": "median", "mean_ms": "mean",
       "servers_alive_mean": "connections held open", "servers_alive_max": "connections most at once", "cpu_busy_share": "host CPU busy",
       "cpu_seconds": "host CPU-seconds", "cpu_s_per_1k_inside": "CPU per 1,000 inside the line", "failed": "failed"}),
-    ("Real messaging (Apache Kafka, GitHub)", "V3_KAFKA.json", "the consumer group's size",
+    ("Real messaging (Apache Kafka, GitHub)", "V7_KAFKA.json", "the consumer group's size",
      {"work_inside_line_mps": "work inside the line", "mps": "throughput", "p95_ms": "p95", "p99_ms": "p99", "p50_ms": "median", "mean_ms": "mean",
       "lag_max": "messages waiting, most", "lag_mean": "messages waiting, mean", "consumers_mean": "consumers running", "consumers_max": "consumers most at once",
       "cpu_busy_share": "host CPU busy", "cpu_seconds": "host CPU-seconds", "cpu_s_per_1k_inside": "CPU per 1,000 inside the line", "lost": "lost"}),
-    ("Real cache (Redis, GitHub)", "V3_REDIS.json", "the cache's memory ceiling",
+    ("Real cache (Redis, GitHub)", "V7_REDIS.json", "the cache's memory ceiling",
      {"work_inside_line_rps": "work inside the line", "rps": "throughput", "hit_rate": "hit rate", "p95_ms": "p95", "p99_ms": "p99", "mean_ms": "mean",
       "maxmemory_mb_mean": "memory ceiling held", "used_mb_mean": "memory used", "cpu_busy_share": "host CPU busy", "cpu_seconds": "host CPU-seconds",
       "cpu_s_per_1k_inside": "CPU per 1,000 inside the line", "failed": "failed"}),
-    ("Real database cache (MongoDB under YCSB, GitHub)", "V3_YCSB.json", "the storage engine's cache size",
+    ("Real database cache (MongoDB under YCSB, GitHub)", "V7_YCSB.json", "the storage engine's cache size",
      {"work_inside_line_ops": "work inside the line", "ops": "throughput", "p95_ms": "p95", "p99_ms": "p99", "mean_ms": "mean",
       "cache_mb_mean": "cache size held", "cache_used_mb_mean": "cache in use", "cpu_busy_share": "host CPU busy", "cpu_seconds": "host CPU-seconds",
       "cpu_s_per_1k_inside": "CPU per 1,000 inside the line", "failed": "failed"}),
-    ("Real database buffer pool (MySQL under sysbench, GitHub)", "V3_SYSBENCH.json", "the buffer pool's size",
+    ("Real database buffer pool (MySQL under sysbench, GitHub)", "V7_SYSBENCH.json", "the buffer pool's size",
      {"work_inside_line_tps": "work inside the line", "tps": "throughput", "qps": "queries a second", "p95_ms": "p95", "p99_ms": "p99", "mean_ms": "mean",
       "pool_mb_mean": "pool held", "pool_used_mb_mean": "pages holding data", "cpu_busy_share": "host CPU busy", "cpu_seconds": "host CPU-seconds",
       "cpu_s_per_1k_inside": "CPU per 1,000 inside the line", "failed": "failed"}),
 ]
-STACK_SHORT = {"V3_PGBENCH.json": "PostgreSQL", "V3_KAFKA.json": "Kafka", "V3_REDIS.json": "Redis", "V3_YCSB.json": "MongoDB", "V3_SYSBENCH.json": "MySQL"}
+STACK_SHORT = {"V7_PGBENCH.json": "PostgreSQL", "V7_KAFKA.json": "Kafka", "V7_REDIS.json": "Redis", "V7_YCSB.json": "MongoDB", "V7_SYSBENCH.json": "MySQL"}
 
 
 def _stack_directions():
@@ -176,16 +176,16 @@ STACK_DIRECTIONS = _stack_directions()
 # Why each gauge that read LOSS or power given in all three of our runs did, read from the preregistration that carries the result (the file is named so a
 # reader can check the words against the record). Keyed by (file, workload or test, gauge key); a key of "*" matches any case.
 WHY = {
-    ("V3_KAFKA.json", "*", "consumers_mean"): "the knob itself: Omni adds consumers while messages wait and the queue is kept short; the consumers running are the price, declared in advance as the gauge expected to rise: the power given (`docs/KAFKA_PREREGISTRATION.md`, the gauges)",
-    ("V3_KAFKA.json", "*", "consumers_max"): "the same price at its peak: the group grown to the partition count while the burst is drained",
-    ("V3_KAFKA.json", "*", "cpu_busy_share"): "more consumers polling cost the host CPU on the light workload, where the broker had slack; on the heavy and burst workloads the CPU is inside the noise",
-    ("V3_KAFKA.json", "*", "cpu_seconds"): "the same CPU, counted over the run",
-    ("V3_REDIS.json", "*", "maxmemory_mb_mean"): "the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to rise: the power given (`docs/REDIS_PREREGISTRATION.md`, the gauges)",
-    ("V3_REDIS.json", "*", "used_mb_mean"): "the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held",
-    ("V3_PGBENCH.json", "simple_update", "servers_alive_max"): "amendment 1's add rule (\"slow, clients waiting for a server: add\") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch",
-    ("V3_SYSBENCH.json", "read_write", "pool_used_mb_mean"): "memory bought on real misses: a written working set keeps the pool missing above one percent, so the growth gate lets the pool grow to 1.1 to 1.6 GB in the wide notches; the host's CPU was cut 4% to 6% for it, a GAIN in all three of our runs, and latency did not move (`docs/MYSQL_PREREGISTRATION.md`, the third set)",
+    ("V7_KAFKA.json", "*", "consumers_mean"): "the knob itself: Omni adds consumers while messages wait and the queue is kept short; the consumers running are the price, declared in advance as the gauge expected to rise: the power given (`docs/KAFKA_PREREGISTRATION.md`, the gauges)",
+    ("V7_KAFKA.json", "*", "consumers_max"): "the same price at its peak: the group grown to the partition count while the burst is drained",
+    ("V7_KAFKA.json", "*", "cpu_busy_share"): "more consumers polling cost the host CPU on the light workload, where the broker had slack; on the heavy and burst workloads the CPU is inside the noise",
+    ("V7_KAFKA.json", "*", "cpu_seconds"): "the same CPU, counted over the run",
+    ("V7_REDIS.json", "*", "maxmemory_mb_mean"): "the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to rise: the power given (`docs/REDIS_PREREGISTRATION.md`, the gauges)",
+    ("V7_REDIS.json", "*", "used_mb_mean"): "the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held",
+    ("V7_PGBENCH.json", "simple_update", "servers_alive_max"): "amendment 1's add rule (\"slow, clients waiting for a server: add\") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch",
+    ("V7_SYSBENCH.json", "read_write", "pool_used_mb_mean"): "memory bought on real misses: a written working set keeps the pool missing above one percent, so the growth gate lets the pool grow to 1.1 to 1.6 GB in the wide notches; the host's CPU was cut 4% to 6% for it, a GAIN in all three of our runs, and latency did not move (`docs/MYSQL_PREREGISTRATION.md`, the third set)",
 }
-DECLARED_COST = {"V3_KAFKA.json": "consumers", "V3_REDIS.json": "memory"}
+DECLARED_COST = {"V7_KAFKA.json": "consumers", "V7_REDIS.json": "memory"}
 
 
 def load_index():
@@ -349,26 +349,26 @@ def stack_why(f, wl, j, v, res, svc):
 
 # ------------------------------------------------------------------------------- the modelled simulators (markdown)
 SIMS = [
-    ("V3_MUJOCO.md", "Robot arms (MuJoCo Menagerie, Google DeepMind)", "the servo's speed override inside the takt",
+    ("V7_MUJOCO.md", "Robot arms (MuJoCo Menagerie, Google DeepMind)", "the servo's speed override inside the takt",
      {"Robots where Omni moved the override": "moved", "Robots where the paired trial left the override native": "left_native",
       "Robots the task could not be run on": "not_run"}),
-    ("V3_PANDAPOWER.md", "The power grid (pandapower, SimBench grids)", "the substation's voltage setpoint, one tap at a time",
+    ("V7_PANDAPOWER.md", "The power grid (pandapower, SimBench grids)", "the substation's voltage setpoint, one tap at a time",
      {"ZIP loads (40% Z, 30% I, 30% P)": "moved:ZIP loads", "constant-power loads (SimBench as shipped)": "moved:constant-power loads"}),
-    ("V3_CITYLEARN.md", "Buildings and batteries (CityLearn, UT Austin)", "the electric batteries' charge and discharge commands",
+    ("V7_CITYLEARN.md", "Buildings and batteries (CityLearn, UT Austin)", "the electric batteries' charge and discharge commands",
      {"Districts with electric batteries: omni against native, each run": "moved", "Districts with no electric battery: nothing for Omni to move": "no_knob",
       "Districts CityLearn cannot run with its own controller": "not_run"}),
-    ("V3_SWARM.md", "Drone swarms (gym-pybullet-drones, University of Toronto)", "the autopilot's cruise override",
+    ("V7_SWARM.md", "Drone swarms (gym-pybullet-drones, University of Toronto)", "the autopilot's cruise override",
      {"Cells where Omni moved the cruise": "moved", "Cells where the paired trial left the cruise native": "left_native", "Void cells": "void"}),
 ]
 SIM_SHORT = {
-    "V3_PANDAPOWER.md": {"losses_up": "line heating: an exporting grid pays the lower voltage in energy dissipated in its lines (the analysis under the table)",
+    "V7_PANDAPOWER.md": {"losses_up": "line heating: an exporting grid pays the lower voltage in energy dissipated in its lines (the analysis under the table)",
                          "taps_up": "taps: the declared cost on a grid that barely taps on its own (4 a year, doubled)",
                          "import_up": "import: follows the line heating, hundredths of a percent"},
-    "V3_CITYLEARN.md": {"2023": "the 2023 pattern: the bill, the ramping and the energy not served up, the electricity bought, the carbon and the daily peak down (the analysis under the table)",
+    "V7_CITYLEARN.md": {"2023": "the 2023 pattern: the bill, the ramping and the energy not served up, the electricity bought, the carbon and the daily peak down (the analysis under the table)",
                         "monthly": "the monthly load factor moved by a tenth of a percent against a bill cut 8.6%"},
 }
 SIM_WHY = {
-    "V3_PANDAPOWER.md": {
+    "V7_PANDAPOWER.md": {
         "losses_up": ("the lower setpoint carries the grid's power at a lower voltage and therefore a higher current, and the energy dissipated "
                          "in the lines rises with the square of the current. The four grids where it rose are four of the five that export more "
                          "than they import (net import negative: rural 1 and 2, semiurb 1 and 2); on the importing grids the loads' own draw falls "
@@ -377,7 +377,7 @@ SIM_WHY = {
         "taps_up": ("tap operations, declared in advance as Omni's expected cost (`docs/PANDAPOWER_PREREGISTRATION.md`): this grid barely taps on "
                        "its own (4 a year), so Omni's moves double a very small count"),
         "import_up": "the import follows the line heating: the same loads, more dissipated on the lines, so hundredths of a percent less exported or more imported upstream"},
-    "V3_CITYLEARN.md": {
+    "V7_CITYLEARN.md": {
         "2023": ("the seven 2023 challenge districts are small (3 to 6 buildings) and short (720 to 2,208 hours), and in them the energy "
                  "not served and the comfort rows move, where in the county neighbourhoods they read the same: the compass steers the batteries from the district's "
                  "electricity reading alone (one wire, one muscle, `docs/CITYLEARN_PREREGISTRATION.md`), flattening the draw it sees, and in "
@@ -385,7 +385,7 @@ SIM_WHY = {
                  "the energy not served. The bill, what the battery is bought to lower, is up 0.2% to 0.4% in all three of our runs here (power given), so "
                  "for the operator who pays the bill this is a watch. The cause is a reading of the tables, not yet tested on its own"),
         "monthly": "the monthly load factor moved by a tenth of a percent against a bill cut 8.6% and the electricity bought cut 14.7%"},
-    "V3_MUJOCO.md": {
+    "V7_MUJOCO.md": {
         "left_native": ("the engine's own verdict: one cycle at full speed and one at override 0.8, in native mode before the counted cycles, "
                         "showed a slower cycle no cheaper on the robot's own figures (the gravity-holding torque is paid for longer), so the "
                         "override was left at 1.0 and both arms are the same (`omnicompass/verdict.py`, left native)")},
@@ -420,13 +420,13 @@ def sim_aims(f):
     """{gauge label as the simulator's table writes it: its aim}, from the simulator's own gauge list (CityLearn's scores:
     tools/citylearn_abc.py's aims)."""
     try:
-        if f == "V3_MUJOCO.md":
+        if f == "V7_MUJOCO.md":
             from tools.run_mujoco import GAUGES
-        elif f == "V3_PANDAPOWER.md":
+        elif f == "V7_PANDAPOWER.md":
             from tools.pandapower_abc import GAUGES
-        elif f == "V3_SWARM.md":
+        elif f == "V7_SWARM.md":
             from tools.swarm_abc import GAUGES
-        elif f == "V3_CITYLEARN.md":
+        elif f == "V7_CITYLEARN.md":
             from tools.citylearn_abc import KPIS, KPI_NAMES, aim_of as kpi_aim
             return {f"{KPI_NAMES.get(k, k)} (`{k}`)": kpi_aim(k) for k in KPIS}
         else:
@@ -488,7 +488,7 @@ def sims():
                 for sub in sec["subs"]:
                     name = sub["title"].split(":", 1)[0].strip()
                     j = sim_rows_judged(sub["rows"], sim_aims(f))
-                    counted = not (f == "V3_SWARM.md" and name == "tuning")
+                    counted = not (f == "V7_SWARM.md" and name == "tuning")
                     v = verdict(len(j["gain"]), len(away_of(j)))
                     cases.append({"kind": "modelled simulator", "domain": domain, "knob": knob, "case": name + (f" ({tag})" if tag else "")
                                   + ("" if counted else " (the tuning swarm: shown, never counted)"),
@@ -525,7 +525,7 @@ def sim_why(f, name, j, v):
         parts.append("everything EVEN in all three of our runs")
     s = ("; ".join(parts) + ".") if parts else ""
     why = SIM_SHORT.get(f, {})
-    if f == "V3_PANDAPOWER.md" and away_of(j):
+    if f == "V7_PANDAPOWER.md" and away_of(j):
         keys = [it[0] for it in away_of(j)]
         causes = []
         if any("losses" in k or "dissipated" in k for k in keys):
@@ -537,7 +537,7 @@ def sim_why(f, name, j, v):
         s = (s + " Why: " + "; ".join(causes) + ".").strip()
         if v == CHOICE:
             s += " The operator who wants the loads' energy and the upstream import cut wires in and gives the line heating; the operator who runs the grid to its line heating watches."
-    if f == "V3_CITYLEARN.md" and away_of(j):
+    if f == "V7_CITYLEARN.md" and away_of(j):
         if "2023" in name:
             s = (s + " Why: " + why["2023"] + ".").strip()
         elif any("monthly" in it[0] for it in away_of(j)):
@@ -545,11 +545,11 @@ def sim_why(f, name, j, v):
         if v == CHOICE and "2023" in name:
             s += " By rule a trade; by what the battery is for (the bill), a watch."
     s = s.strip()
-    if f == "V3_SWARM.md" and v == WRITE:
+    if f == "V7_SWARM.md" and v == WRITE:
         s += " No LOSS: the tracking error is spent inside the compass's band (shown, the runs differ on its exact figure) and no safety gauge moved."
-    if f == "V3_MUJOCO.md" and v == WRITE:
+    if f == "V7_MUJOCO.md" and v == WRITE:
         s += " No LOSS: the same job inside the same takt, hit more accurately with less force; the cycle is slower inside the takt (shown, not judged)."
-    if v == WRITE and f in ("V3_PANDAPOWER.md", "V3_CITYLEARN.md"):
+    if v == WRITE and f in ("V7_PANDAPOWER.md", "V7_CITYLEARN.md"):
         s += " No LOSS and no power given: Omni holds the knob."
     return s.strip()
 
@@ -841,12 +841,12 @@ def main(check=False):
             L.append(f"| {x['case']} | {b or ('none' if j else '')} | {w or ('none' if j else '')} | **{x['verdict']}**"
                      f"{'' if x['counted'] or x['verdict'] == 'no knob' else ' (not counted)'} | {esc(x['why'])} | `{x['source']}` |")
         L.append("")
-        if f == "V3_PANDAPOWER.md":
+        if f == "V7_PANDAPOWER.md":
             L += ["**Why the line heating rose on four grids (power given).** " + SIM_WHY[f]["losses_up"][0].upper() + SIM_WHY[f]["losses_up"][1:] + ". "
                   + SIM_WHY[f]["taps_up"][0].upper() + SIM_WHY[f]["taps_up"][1:] + ". The verdict on those four grids is the operator's: the "
                   "loads' energy and the upstream import cut (GAIN) against the lines' heating up (power given); under constant-power loads on "
                   "1-MV-rural--1-sw, where nothing was bought, it is watch.", ""]
-        if f == "V3_CITYLEARN.md":
+        if f == "V7_CITYLEARN.md":
             L += ["**Why the bill is up in the 2023 districts (power given), with the ramping and the energy not served (LOSS).** "
                   + SIM_WHY[f]["2023"][0].upper() + SIM_WHY[f]["2023"][1:] + ".", ""]
 
