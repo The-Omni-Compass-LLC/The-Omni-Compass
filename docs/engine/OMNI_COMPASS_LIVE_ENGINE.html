@@ -15,6 +15,7 @@
   --bg:#0e1316; --panel:#141b1f; --panel2:#1a2227; --ink:#e7e2d7; --muted:#8e9893; --rule:#27323a;
   --brass:#d9a052; --brass-soft:rgba(217,160,82,.18); --steel:#86a3bb; --steel-soft:rgba(134,163,187,.18);
   --ok:#62b98d; --warn:#e3b04b; --bad:#e2634f; --spine:#b99ac4;
+  --r-compute:#78a6d8; --r-physics:#68bba9; --r-energy:#d4b35f; --r-dist:#cf8fa9;
   --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -23,11 +24,11 @@
 @media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
   --bg:#f2f3f0; --panel:#ffffff; --panel2:#f7f8f6; --ink:#1c2328; --muted:#59646b; --rule:#d6dbd7;
   --brass:#a3651a; --brass-soft:rgba(163,101,26,.14); --steel:#3d6585; --steel-soft:rgba(61,101,133,.14);
-  --ok:#2c8659; --warn:#a07410; --bad:#b63f2d; --spine:#7d5a8c; color-scheme:light}}
+  --ok:#2c8659; --warn:#a07410; --bad:#b63f2d; --spine:#7d5a8c; --r-compute:#2f639a; --r-physics:#257a69; --r-energy:#8a6a12; --r-dist:#9a4a6b; color-scheme:light}}
 :root[data-theme="light"]{
   --bg:#f2f3f0; --panel:#ffffff; --panel2:#f7f8f6; --ink:#1c2328; --muted:#59646b; --rule:#d6dbd7;
   --brass:#a3651a; --brass-soft:rgba(163,101,26,.14); --steel:#3d6585; --steel-soft:rgba(61,101,133,.14);
-  --ok:#2c8659; --warn:#a07410; --bad:#b63f2d; --spine:#7d5a8c; color-scheme:light}
+  --ok:#2c8659; --warn:#a07410; --bad:#b63f2d; --spine:#7d5a8c; --r-compute:#2f639a; --r-physics:#257a69; --r-energy:#8a6a12; --r-dist:#9a4a6b; color-scheme:light}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
@@ -35,6 +36,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 .legal{font-size:12px;line-height:1.5;color:var(--muted);max-width:1280px;margin:0 auto}
 h1,h2{font-family:var(--f-display);font-weight:800;letter-spacing:.02em;text-transform:uppercase;text-wrap:balance;margin:0}
 h1{font-size:clamp(34px,5vw,58px);line-height:1}
+h1 .acc{color:var(--brass)}
 h2{font-size:26px;line-height:1.1}
 h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:600}
 p{margin:0}
@@ -125,6 +127,20 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 .stamp{font-family:var(--f-display);font-weight:800;font-size:30px;letter-spacing:.04em}
 .tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:6px 8px;font-size:12px;font-family:var(--f-mono);white-space:nowrap;z-index:5}
 .ringbox{position:relative}
+.twin{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:860px){.twin{grid-template-columns:minmax(0,1fr)}}
+.ringhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin-bottom:6px}
+.ringhead h3{font-size:14px}
+.ringhead span{font-size:12px;color:var(--muted)}
+.t-steel{color:var(--steel)} .t-brass{color:var(--brass)}
+.arm-nat{border-top:3px solid var(--steel)} .arm-omni{border-top:3px solid var(--brass);background:linear-gradient(180deg,var(--brass-soft),var(--panel) 120px)}
+.live{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+.live div{background:var(--panel2);border:1px solid var(--rule);border-radius:4px;padding:6px 8px}
+.live span{display:block;font-size:11px;color:var(--muted);letter-spacing:.04em}
+.live b{font-family:var(--f-mono);font-weight:500;font-size:20px;font-variant-numeric:tabular-nums}
+.arm-nat .live b{color:var(--steel)} .arm-omni .live b{color:var(--brass)}
+.live b.hot{color:var(--bad)}
+@media (max-width:520px){.live{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .ringbox .overlay{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
 @media (prefers-reduced-motion: reduce){.bar>i{transition:none}}
 </style>
@@ -135,8 +151,8 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 
 <header class="head">
   <div class="stack" style="gap:8px">
-    <h1>Omni-Compass Live Engine</h1>
-    <p class="lede">Sixty muscles of a stacked organism, each under its own native controller, each answering on its own clock. One brain on top reads them through nine senses, runs <b>the six-state engine of omni-v7</b>, and writes back through the plug. <b>The distance of each muscle from the ring is its position in its compass band.</b> Scattered is fragmented; on the ring is one coherent state.</p>
+    <h1>Omni-Compass <span class="acc">Live Engine</span></h1>
+    <p class="lede">Left, the organism under its native controllers alone. Right, the same organism on the same demand with Omni-Compass on top. Sixty muscles of a stacked organism, each under its own native controller, each answering on its own clock. One brain on top reads them through nine senses, runs <b>the six-state engine of omni-v7</b>, and writes back through the plug. <b>The distance of each muscle from the ring is its position in its compass band.</b> Scattered is fragmented; on the ring is one coherent state.</p>
   </div>
   <div class="chips">
     <span class="chip">engine math <b>omni-v7</b></span>
@@ -145,27 +161,42 @@ input[type=range]{width:100%;accent-color:var(--brass)}
   </div>
 </header>
 
-<section class="grid-hero" aria-label="The organism, live">
-  <div class="panel ringbox">
-    <canvas id="ring" aria-label="The organism ring: the brain at the center, nine senses, the spine, and the four realms"></canvas>
-    <div class="overlay">
-      <div class="seg" role="group" aria-label="Arm shown">
-        <button id="showNative" class="on-steel" aria-pressed="false">Native</button>
-        <button id="showOmni" aria-pressed="true">Omni-Compass on top</button>
+<section class="stack" aria-label="The organism, live, twice">
+  <div class="twin">
+    <div class="panel ringbox arm-nat">
+      <div class="ringhead"><h3 class="t-steel">Native alone</h3><span>sixty native controllers, each answering on its own</span></div>
+      <canvas id="ringN" aria-label="The organism under native control alone"></canvas>
+      <div class="live">
+        <div><span>past the line now</span><b id="lvN0">0</b></div>
+        <div><span>misses today</span><b id="lvN1">0</b></div>
+        <div><span>work failed</span><b id="lvN2">0</b></div>
+        <div><span>spread</span><b id="lvN3">0</b></div>
+      </div>
+    </div>
+    <div class="panel ringbox arm-omni">
+      <div class="ringhead"><h3 class="t-brass">Omni-Compass on top of native</h3><span>the same sixty and the same demand, one brain on top</span></div>
+      <canvas id="ringO" aria-label="The organism with Omni-Compass on top: the brain at the center, nine senses, the spine and the four realms"></canvas>
+      <div class="live">
+        <div><span>past the line now</span><b id="lvO0">0</b></div>
+        <div><span>misses today</span><b id="lvO1">0</b></div>
+        <div><span>work failed</span><b id="lvO2">0</b></div>
+        <div><span>spread</span><b id="lvO3">0</b></div>
       </div>
     </div>
     <div id="ringTip" class="tip" hidden></div>
-    <canvas id="swarm" style="margin-top:10px" aria-label="Each body part's muscles on the band, native above and Omni-Compass on top below"></canvas>
-    <div class="legend" style="margin-top:8px">
-      <span><i style="background:var(--ok)"></i>inside the compass</span>
-      <span><i style="background:var(--warn)"></i>in the 5% cushion</span>
-      <span><i style="background:var(--bad)"></i>past the line</span>
-      <span><i style="background:var(--steel)"></i>afferent: a reading in</span>
-      <span><i style="background:var(--brass)"></i>efferent: a write out</span>
-      <span>click a muscle to follow it</span>
-    </div>
   </div>
+  <div class="legend">
+    <span><i style="background:var(--ok)"></i>inside the compass</span>
+    <span><i style="background:var(--warn)"></i>in the 5% cushion</span>
+    <span><i style="background:var(--bad)"></i>past the line</span>
+    <span><i style="background:var(--steel)"></i>a reading in</span>
+    <span><i style="background:var(--brass)"></i>a write out</span>
+    <span>distance from the ring = position in the band · click a muscle to follow it</span>
+  </div>
+  <div class="panel"><canvas id="swarm" aria-label="Each body part's muscles on the band, native above and Omni-Compass on top below"></canvas></div>
+</section>
 
+<section class="grid-hero" aria-label="The decision and the controls">
   <div class="stack">
     <div class="panel stack" style="gap:10px">
       <div class="row" style="justify-content:space-between">
@@ -224,6 +255,10 @@ input[type=range]{width:100%;accent-color:var(--brass)}
     <p class="lede" style="max-width:62ch">Each dot is a muscle at its position p in its band and the speed v it is moving. The shading is the force the compass law would apply there: copper adds capacity, steel hands it back. Past the 0.95 wall the law fails up at once. Under Omni-Compass the dots are pulled to the center and stop there.</p></div>
   <div class="grid-2">
     <div class="panel stack" style="gap:8px">
+      <div class="seg" role="group" aria-label="Arm shown on the plane" style="align-self:flex-start">
+        <button id="showNative" class="on-steel" aria-pressed="false">Native</button>
+        <button id="showOmni" aria-pressed="true">Omni-Compass on top</button>
+      </div>
       <canvas id="phase" aria-label="Phase plane of the sixty muscles"></canvas>
       <div class="legend"><span><i class="sq" style="background:var(--brass)"></i>F &gt; 0, add</span><span><i class="sq" style="background:var(--steel)"></i>F &lt; 0, hand back</span><span id="phaseNote">shading drawn for the followed muscle's τ</span></div>
     </div>
@@ -563,7 +598,7 @@ function senseOmni() {
 }
 
 function decide() {
-  if (W.t >= DAY) { newDay(W.seed + 1); return; }
+  if (W.t >= DAY) { newDay(W.seed + 1); for (let k = 0; k < 30; k++) decide(); return; }
   const obs = senseOmni(); W.lastObs = obs;
   const bo = W.brain.step(obs);
   W.brainHist.push({E: bo.xn[0], U: bo.xn[1], I: bo.xn[2], S: bo.xn[3], B: bo.xn[4], calm: bo.calm});
@@ -576,7 +611,7 @@ function decide() {
 // ============================================================== drawing
 const css = {};
 function readTokens() { const cs = getComputedStyle(document.documentElement);
-  for (const k of ["bg","panel","panel2","ink","muted","rule","brass","brass-soft","steel","steel-soft","ok","warn","bad","spine"]) css[k] = cs.getPropertyValue("--"+k).trim(); }
+  for (const k of ["bg","panel","panel2","ink","muted","rule","brass","brass-soft","steel","steel-soft","ok","warn","bad","spine","r-compute","r-physics","r-energy","r-dist"]) css[k] = cs.getPropertyValue("--"+k).trim(); }
 readTokens();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readTokens);
 new MutationObserver(readTokens).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
@@ -594,9 +629,10 @@ function alpha(col, a) {
 const posColor = (p) => p >= 1 ? css.bad : (p >= 0.95 || p <= 0.05) ? css.warn : css.ok;
 const MONO = '"IBM Plex Mono", ui-monospace, monospace';
 
-// ---- the ring geometry
-const ringCv = document.getElementById("ring");
-let geo = null;
+// ---- the ring geometry, one per arm
+const RING = {nat: document.getElementById("ringN"), omni: document.getElementById("ringO")};
+const geos = {nat: null, omni: null};
+const REALM_TINT = () => [css.spine, css["r-compute"], css["r-physics"], css["r-energy"], css["r-dist"]];
 function ringGeo(w) {
   const cx = w/2, cy = w/2, R = w/2;
   const r0 = R*0.16, r1 = R*0.27, r2 = R*0.48, r3 = R*0.78, spread = R*0.22;
@@ -609,7 +645,7 @@ function ringGeo(w) {
   return {cx, cy, R, r0, r1, r2, r3, spread, nodes};
 }
 function nodeXY(i, armSel) {
-  const n = geo.nodes[i]; const s = W[armSel].m[i];
+  const geo = geos[armSel]; const n = geo.nodes[i]; const s = W[armSel].m[i];
   const off = clamp(s.p - 0.5, -0.6, 0.9)*geo.spread;
   const rr = n.base + off; return [geo.cx + rr*Math.cos(n.ang), geo.cy + rr*Math.sin(n.ang), rr];
 }
@@ -617,87 +653,93 @@ const SENSES = ["q","load","power","thermal","network","drift","stale","security
 const SENSE_LABEL = ["q","load","power","heat","net","drift","stale","sec","conf"];
 
 function spawnParticles() {
-  if (reduceMotion || W.speed > 4 || !geo) return;
+  if (reduceMotion || W.speed > 4 || !geos.omni) return;
   const life = 900/W.speed;
   W.muscles.forEach((M, i) => { if (Math.random() < (W.speed === 1 ? 0.6 : 0.25)) W.particles.push({i, kind: "in", t0: performance.now(), life: life*0.42}); });
-  const arm = W.omni;
-  arm.m.forEach((s, i) => { if (s.written) W.particles.push({i, kind: "out", t0: performance.now() + life*0.62, life: life*0.36}); });
+  W.omni.m.forEach((s, i) => { if (s.written) W.particles.push({i, kind: "out", t0: performance.now() + life*0.62, life: life*0.36}); });
 }
 
-function drawRing(now) {
-  const {g, w, h} = fit(ringCv, 1);
-  geo = ringGeo(w); const {cx, cy, R, r0, r1, r2, r3, spread} = geo;
+function drawRing(now, armSel) {
+  const cv = RING[armSel]; const {g, w, h} = fit(cv, 1);
+  const geo = geos[armSel] = ringGeo(w); const {cx, cy, R, r0, r1, r2, r3, spread} = geo;
   g.clearRect(0, 0, w, h);
-  const armSel = W.show; const arm = W[armSel];
+  const arm = W[armSel], omni = armSel === "omni", tint = REALM_TINT();
+  // a light tint per body part: the spine's ring and the four realms' quarters
+  for (let q = 0; q < 4; q++) { const a0 = -Math.PI/2 + q*Math.PI/2 + 0.06, a1 = a0 + Math.PI/2 - 0.12;
+    g.beginPath(); g.arc(cx, cy, r3 + 0.62*spread, a0, a1); g.arc(cx, cy, r3 - 0.62*spread, a1, a0, true); g.closePath();
+    g.fillStyle = alpha(tint[q + 1], 0.09); g.fill(); }
+  g.beginPath(); g.arc(cx, cy, r2 + 0.6*spread, 0, Math.PI*2); g.arc(cx, cy, r2 - 0.6*spread, 0, Math.PI*2, true); g.fillStyle = alpha(tint[0], 0.08); g.fill();
   // the band rings: the center (p = 0.5), the cushion and the line (p = 1)
   for (const base of [r2, r3]) {
     g.beginPath(); g.arc(cx, cy, base + 0.45*spread, 0, Math.PI*2); g.arc(cx, cy, base + 0.5*spread, 0, Math.PI*2, true);
-    g.fillStyle = alpha(css.warn, 0.18); g.fill();
+    g.fillStyle = alpha(css.warn, 0.22); g.fill();
     g.beginPath(); g.arc(cx, cy, base - 0.45*spread, 0, Math.PI*2); g.arc(cx, cy, base - 0.5*spread, 0, Math.PI*2, true); g.fill();
-    g.setLineDash([2, 4]); g.strokeStyle = alpha(css.bad, 0.7); g.lineWidth = 1;
+    g.setLineDash([2, 4]); g.strokeStyle = alpha(css.bad, 0.75); g.lineWidth = 1;
     g.beginPath(); g.arc(cx, cy, base + 0.5*spread, 0, Math.PI*2); g.stroke(); g.setLineDash([]);
-    g.strokeStyle = css.rule; g.lineWidth = 1.2; g.beginPath(); g.arc(cx, cy, base, 0, Math.PI*2); g.stroke();
+    g.strokeStyle = omni ? alpha(css.brass, 0.55) : css.rule; g.lineWidth = 1.2; g.beginPath(); g.arc(cx, cy, base, 0, Math.PI*2); g.stroke();
   }
-  // realm labels
-  g.font = `600 ${Math.max(9, R*0.034)}px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "middle";
-  REALMS.slice(1).forEach((Rm, q) => { const a = -Math.PI/2 + q*Math.PI/2 + Math.PI/4; const rr = R*0.97;
-    g.save(); g.translate(cx + rr*Math.cos(a)*0.93, cy + rr*Math.sin(a)*0.93); g.fillText(Rm.label.split(" · ")[0], 0, 0); g.restore(); });
-  g.fillStyle = css.spine; g.fillText("THE SPINE", cx, cy - r2 - 0.62*spread - 4);
-  // wires
-  g.lineWidth = 0.6;
-  W.muscles.forEach((M, i) => { const [x, y] = nodeXY(i, armSel); const a = geo.nodes[i].ang;
-    g.strokeStyle = alpha(css.muted, 0.18); g.beginPath(); g.moveTo(x, y); g.lineTo(cx + r1*Math.cos(a), cy + r1*Math.sin(a)); g.stroke(); });
-  // the nine senses
-  const o = W.brain.last ? W.brain.last.o : null;
-  SENSES.forEach((k, j) => {
-    const a0 = -Math.PI/2 + j*2*Math.PI/9 + 0.04, a1 = a0 + 2*Math.PI/9 - 0.08;
-    const v = o ? clamp(o[k], 0, 1) : 0; const blind = k === "stale" && v > 0;
-    g.lineWidth = R*0.05; g.strokeStyle = css.panel2; g.beginPath(); g.arc(cx, cy, r1, a0, a1); g.stroke();
-    g.strokeStyle = blind ? css.bad : alpha(css.steel, 0.35 + 0.65*v); g.beginPath(); g.arc(cx, cy, r1, a0, a0 + (a1 - a0)*Math.max(0.04, v)); g.stroke();
-    const am = (a0 + a1)/2; g.font = `${Math.max(8, R*0.028)}px ${MONO}`; g.fillStyle = css.muted;
-    g.fillText(SENSE_LABEL[j], cx + (r1 + R*0.055)*Math.cos(am), cy + (r1 + R*0.055)*Math.sin(am));
-  });
-  // the brain: six spokes, E U I S B Ḃ, and the compass needle (mean force of the body)
+  // body part labels, in their tint
+  g.font = `600 ${Math.max(9, R*0.034)}px ${MONO}`; g.textAlign = "center"; g.textBaseline = "middle";
+  REALMS.slice(1).forEach((Rm, q) => { const a = -Math.PI/2 + q*Math.PI/2 + Math.PI/4; const rr = R*0.97*0.93;
+    g.fillStyle = tint[q + 1]; g.fillText(Rm.label.split(" · ")[0], cx + rr*Math.cos(a), cy + rr*Math.sin(a)); });
+  g.fillStyle = tint[0]; g.fillText("THE SPINE", cx, cy - r2 - 0.66*spread - 4);
   const L = W.brain.last;
-  g.beginPath(); g.arc(cx, cy, r0, 0, Math.PI*2); g.fillStyle = css.panel2; g.fill(); g.strokeStyle = css.rule; g.lineWidth = 1; g.stroke();
-  const names = ["E","U","I","S","B","Ḃ"];
-  const vals = L ? [L.xn[0]/1.0, L.xn[1], L.xn[2]/1.0, (L.xn[3]+1)/2, (L.xn[4]+0.5)/1.5, (L.xn[5]+0.5)] : [0,0,0,0,0,0];
-  for (let k = 0; k < 6; k++) { const a = -Math.PI/2 + k*Math.PI/3; const len = r0*0.9*clamp(vals[k], 0.05, 1);
-    g.strokeStyle = k === 1 ? css.ok : css.brass; g.lineWidth = 3; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + len*Math.cos(a), cy + len*Math.sin(a)); g.stroke();
-    g.fillStyle = css.muted; g.font = `${Math.max(9, R*0.032)}px ${MONO}`; g.fillText(names[k], cx + r0*1.16*Math.cos(a), cy + r0*1.16*Math.sin(a)); }
-  g.font = `500 ${Math.max(10, R*0.038)}px ${MONO}`; const ct = L ? "calm " + L.calm.toFixed(2) : "calm —"; const tw = g.measureText(ct).width + 12;
-  g.fillStyle = css.panel; g.fillRect(cx - tw/2, cy + r0*0.38 - 9, tw, 18); g.fillStyle = css.ink; g.fillText(ct, cx, cy + r0*0.38);
-  if (W.killed) { g.fillStyle = css.bad; g.fillText("KILLED", cx, cy - r0*0.42); }
-  // particles
-  const T = now;
-  W.particles = W.particles.filter(pt => T - pt.t0 < pt.life);
-  for (const pt of W.particles) { const u = (T - pt.t0)/pt.life; if (u < 0) continue;
-    const [x, y] = nodeXY(pt.i, "omni"); const a = geo.nodes[pt.i].ang;
-    const x1 = cx + r0*Math.cos(a), y1 = cy + r0*Math.sin(a);
-    const e = u*u*(3 - 2*u); let px, py;
-    if (pt.kind === "in") { px = x + (x1 - x)*e; py = y + (y1 - y)*e; g.fillStyle = css.steel; }
-    else { px = x1 + (x - x1)*e; py = y1 + (y - y1)*e; g.fillStyle = css.brass; }
-    g.beginPath(); g.arc(px, py, pt.kind === "in" ? 1.8 : 2.6, 0, Math.PI*2); g.fill(); }
+  if (omni) {
+    // wires to the senses
+    g.lineWidth = 0.6;
+    W.muscles.forEach((M, i) => { const [x, y] = nodeXY(i, armSel); const a = geo.nodes[i].ang;
+      g.strokeStyle = alpha(css.steel, 0.22); g.beginPath(); g.moveTo(x, y); g.lineTo(cx + r1*Math.cos(a), cy + r1*Math.sin(a)); g.stroke(); });
+    // the nine senses
+    const o = L ? L.o : null;
+    SENSES.forEach((k, j) => {
+      const a0 = -Math.PI/2 + j*2*Math.PI/9 + 0.04, a1 = a0 + 2*Math.PI/9 - 0.08;
+      const v = o ? clamp(o[k], 0, 1) : 0; const blind = k === "stale" && v > 0;
+      g.lineWidth = R*0.05; g.strokeStyle = css.panel2; g.beginPath(); g.arc(cx, cy, r1, a0, a1); g.stroke();
+      g.strokeStyle = blind ? css.bad : alpha(css.steel, 0.35 + 0.65*v); g.beginPath(); g.arc(cx, cy, r1, a0, a0 + (a1 - a0)*Math.max(0.04, v)); g.stroke();
+      const am = (a0 + a1)/2; g.font = `${Math.max(8, R*0.028)}px ${MONO}`; g.fillStyle = css.muted;
+      g.fillText(SENSE_LABEL[j], cx + (r1 + R*0.055)*Math.cos(am), cy + (r1 + R*0.055)*Math.sin(am));
+    });
+    // the brain: six spokes, E U I S B Ḃ
+    g.beginPath(); g.arc(cx, cy, r0, 0, Math.PI*2); g.fillStyle = css.panel2; g.fill(); g.strokeStyle = css.brass; g.lineWidth = 1.5; g.stroke();
+    const names = ["E","U","I","S","B","Ḃ"];
+    const vals = L ? [L.xn[0], L.xn[1], L.xn[2], (L.xn[3]+1)/2, (L.xn[4]+0.5)/1.5, (L.xn[5]+0.5)] : [0,0,0,0,0,0];
+    for (let k = 0; k < 6; k++) { const a = -Math.PI/2 + k*Math.PI/3; const len = r0*0.9*clamp(vals[k], 0.05, 1);
+      g.strokeStyle = k === 1 ? css.ok : css.brass; g.lineWidth = 3; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + len*Math.cos(a), cy + len*Math.sin(a)); g.stroke();
+      g.fillStyle = css.muted; g.font = `${Math.max(9, R*0.032)}px ${MONO}`; g.fillText(names[k], cx + r0*1.16*Math.cos(a), cy + r0*1.16*Math.sin(a)); }
+    g.font = `500 ${Math.max(10, R*0.038)}px ${MONO}`; const ct = W.killed ? "KILLED" : (L ? "calm " + L.calm.toFixed(2) : "calm —"); const tw = g.measureText(ct).width + 12;
+    g.fillStyle = css.panel; g.fillRect(cx - tw/2, cy + r0*0.38 - 9, tw, 18); g.fillStyle = W.killed ? css.bad : css.ink; g.fillText(ct, cx, cy + r0*0.38);
+    // particles: readings in, writes out
+    const T = now;
+    W.particles = W.particles.filter(pt => T - pt.t0 < pt.life);
+    for (const pt of W.particles) { const u = (T - pt.t0)/pt.life; if (u < 0) continue;
+      const [x, y] = nodeXY(pt.i, "omni"); const a = geo.nodes[pt.i].ang;
+      const x1 = cx + r0*Math.cos(a), y1 = cy + r0*Math.sin(a);
+      const e = u*u*(3 - 2*u); let px, py;
+      if (pt.kind === "in") { px = x + (x1 - x)*e; py = y + (y1 - y)*e; g.fillStyle = css.steel; }
+      else { px = x1 + (x - x1)*e; py = y1 + (y - y1)*e; g.fillStyle = css.brass; }
+      g.beginPath(); g.arc(px, py, pt.kind === "in" ? 1.8 : 2.8, 0, Math.PI*2); g.fill(); }
+  } else {
+    // no brain: each muscle's own controller, a short stub, nothing joining them
+    g.lineWidth = 0.8;
+    W.muscles.forEach((M, i) => { const [x, y] = nodeXY(i, armSel); const a = geo.nodes[i].ang; const rr = geo.nodes[i].base - 0.55*spread;
+      g.strokeStyle = alpha(css.steel, 0.35); g.beginPath(); g.moveTo(x, y); g.lineTo(cx + rr*Math.cos(a), cy + rr*Math.sin(a)); g.stroke(); });
+    g.setLineDash([3, 5]); g.strokeStyle = css.rule; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, r0, 0, Math.PI*2); g.stroke(); g.setLineDash([]);
+    g.fillStyle = css.muted; g.font = `${Math.max(9, R*0.034)}px ${MONO}`;
+    g.fillText("no brain", cx, cy - 7); g.fillText("60 controllers", cx, cy + 9);
+  }
   // the muscles
   W.muscles.forEach((M, i) => { const [x, y] = nodeXY(i, armSel); const s = arm.m[i];
     const rad = Math.max(4, R*0.022);
     if (i === W.sel) { g.strokeStyle = css.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(x, y, rad + 4, 0, Math.PI*2); g.stroke(); }
-    if (armSel === "omni" && s.written) { g.strokeStyle = css.brass; g.lineWidth = 2; g.beginPath(); g.arc(x, y, rad + 2, 0, Math.PI*2); g.stroke(); }
+    if (omni && s.written) { g.strokeStyle = css.brass; g.lineWidth = 2; g.beginPath(); g.arc(x, y, rad + 2, 0, Math.PI*2); g.stroke(); }
     g.fillStyle = posColor(s.p); g.beginPath(); g.arc(x, y, rad, 0, Math.PI*2); g.fill();
-    if (M.realm === 0) { g.strokeStyle = css.spine; g.lineWidth = 1.2; g.stroke(); }
+    g.strokeStyle = tint[M.realm]; g.lineWidth = 1.2; g.stroke();
   });
-  // arm caption
-  g.textAlign = "right"; g.fillStyle = armSel === "omni" ? css.brass : css.steel; g.font = `600 ${Math.max(10, R*0.036)}px ${MONO}`;
-  g.fillText(armSel === "omni" ? "OMNI-COMPASS ON TOP" : "NATIVE ALONE", w - 10, h - 30);
-  g.fillStyle = css.muted; g.font = `${Math.max(9, R*0.03)}px ${MONO}`;
-  const sp = arm.hist.spread.length ? arm.hist.spread[arm.hist.spread.length-1] : 0;
-  g.fillText(`spread of positions ${sp.toFixed(3)} · past the line ${arm.lastOver || 0}`, w - 10, h - 12);
 }
-
 
 // ---- the body parts on one band: native above, Omni-Compass on top below
 function drawSwarm() {
-  const cv = document.getElementById("swarm"); const {g, w, h} = fit(cv, 0.42); g.clearRect(0, 0, w, h);
+  const cv = document.getElementById("swarm"); const {g, w, h} = fit(cv, Math.min(0.42, 260/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
   const ml = 92, mr = 10, mt = 16, rowH = (h - mt - 20)/5; const X = p => ml + (clamp(p, -0.1, 1.3) + 0.1)/1.4*(w - ml - mr);
   g.font = `11px ${MONO}`; g.textBaseline = "middle";
   g.fillStyle = alpha(css.warn, 0.14); g.fillRect(X(0.95), mt, X(1) - X(0.95), rowH*5); g.fillRect(X(0), mt, X(0.05) - X(0), rowH*5);
@@ -951,7 +993,14 @@ function updateText() {
   set("nN", L.nu, f3(L.nu), L.nu > 0.5 ? css.warn : css.ok); set("nC", L.calm, f3(L.calm), css.brass);
   for (const k in THETA) { const e = $("org-" + k); e.querySelector(".ex").className = "lamp ex " + (L.organs[k].expand ? "lit-ok" : "lit-bad");
     e.querySelector(".co").className = "lamp co " + (L.organs[k].contract ? "lit-ok" : ""); }
-  updateScore(); updateCard();
+  updateScore(); updateCard(); updateLive();
+}
+function updateLive() {
+  for (const [arm, k] of [[W.nat, "N"], [W.omni, "O"]]) {
+    const sp = arm.hist.spread.length ? arm.hist.spread[arm.hist.spread.length - 1] : 0;
+    const now = arm.lastOver || 0; const e0 = $("lv" + k + "0"); e0.textContent = now; e0.classList.toggle("hot", now > 0);
+    $("lv" + k + "1").textContent = arm.tot.over.toLocaleString(); $("lv" + k + "2").textContent = arm.tot.failed.toFixed(1); $("lv" + k + "3").textContent = sp.toFixed(3);
+  }
 }
 function buildOrgans() {
   const host = $("organs"); host.innerHTML = "";
@@ -1012,16 +1061,18 @@ $("sBlind").addEventListener("click", () => { W.stress.blind = W.t; note.textCon
 $("sSec").addEventListener("click", () => { W.stress.sec = W.t; note.textContent = `Security hold from decision ${W.t}: no organ may expand; Omni-Compass adds nothing past native.`; });
 $("sKill").addEventListener("click", e => { W.killed = !W.killed; e.currentTarget.setAttribute("aria-pressed", W.killed);
   note.textContent = W.killed ? "Kill switch on: governing off at once, every lever handed to native's own controller. Press again to re-arm." : "Kill switch off: Omni-Compass governs on top of native again."; });
-// click and hover a muscle on the ring
-function hit(ev) { const r = ringCv.getBoundingClientRect(); const x = ev.clientX - r.left, y = ev.clientY - r.top; let best = -1, bd = 1e9;
-  W.muscles.forEach((M, i) => { const [nx, ny] = nodeXY(i, W.show); const d = (nx - x)**2 + (ny - y)**2; if (d < bd) { bd = d; best = i; } });
-  return bd < 18*18 ? [best, x, y] : [-1, x, y]; }
-ringCv.addEventListener("click", ev => { const [i] = hit(ev); if (i >= 0) { W.sel = i; updateCard(); } });
-ringCv.addEventListener("mousemove", ev => { const [i, x, y] = hit(ev); const tip = $("ringTip");
-  if (i < 0) { tip.hidden = true; ringCv.style.cursor = "default"; return; } ringCv.style.cursor = "pointer";
-  const M = W.muscles[i], s = W[W.show].m[i]; tip.hidden = false; tip.textContent = `${M.name} · p ${s.p.toFixed(2)} · F ${s.F.toFixed(2)}`;
-  tip.style.left = Math.min(x + 26, ringCv.clientWidth - tip.offsetWidth - 10) + "px"; tip.style.top = (y + 20) + "px"; });
-ringCv.addEventListener("mouseleave", () => { $("ringTip").hidden = true; });
+// click and hover a muscle on either ring
+function hit(ev, armSel) { const cv = RING[armSel]; const r = cv.getBoundingClientRect(); const x = ev.clientX - r.left, y = ev.clientY - r.top; let best = -1, bd = 1e9;
+  W.muscles.forEach((M, i) => { const [nx, ny] = nodeXY(i, armSel); const d = (nx - x)**2 + (ny - y)**2; if (d < bd) { bd = d; best = i; } });
+  return bd < 18*18 ? best : -1; }
+for (const armSel of ["nat", "omni"]) { const cv = RING[armSel];
+  cv.addEventListener("click", ev => { const i = hit(ev, armSel); if (i >= 0) { W.sel = i; updateCard(); } });
+  cv.addEventListener("mousemove", ev => { const i = hit(ev, armSel); const tip = $("ringTip");
+    if (i < 0) { tip.hidden = true; cv.style.cursor = "default"; return; } cv.style.cursor = "pointer";
+    const M = W.muscles[i], s = W[armSel].m[i]; tip.hidden = false; tip.textContent = `${M.name} · p ${s.p.toFixed(2)} · F ${s.F.toFixed(2)}`;
+    const host = $("ringTip").parentElement.getBoundingClientRect(), r = cv.getBoundingClientRect();
+    tip.style.left = Math.min(ev.clientX - host.left + 16, host.width - tip.offsetWidth - 10) + "px"; tip.style.top = (ev.clientY - host.top + 18) + "px"; });
+  cv.addEventListener("mouseleave", () => { $("ringTip").hidden = true; }); }
 
 // ============================================================== the clock
 let lastDecide = 0;
@@ -1031,12 +1082,12 @@ function frame(now) {
   W.frac = W.paused ? W.frac : clamp((now - lastDecide)/period, 0, 1);
   const phase = Math.min(6, Math.floor(W.frac*7));
   document.querySelectorAll("#cycle li").forEach(li => li.classList.toggle("act", W.speed <= 4 ? +li.dataset.i === phase : true));
-  drawRing(now); drawSwarm(); drawBand(); drawPhase(); drawStrip(); drawBrain(); vTick(now); drawVerdict();
+  drawRing(now, "nat"); drawRing(now, "omni"); drawSwarm(); drawBand(); drawPhase(); drawStrip(); drawBrain(); vTick(now); drawVerdict();
   requestAnimationFrame(frame);
 }
 buildOrgans(); vLabels(); newDay(W.seed);
 document.getElementById("vMany").click();
-for (let k = 0; k < 24; k++) decide();   // open on a working engine, not an empty one
+for (let k = 0; k < 150; k++) decide();   // open in the climb to 4, where the two arms part
 drawVerdict2();
 V.P = vParams(); for (let k = 0; k < 30; k++) V.ref.push(vSample(false, V.P, V.rng)); for (let k = 0; k < 30; k++) V.got.push(vSample(true, V.P, V.rng));
 V.running = true; V.lastAdd = 0;
