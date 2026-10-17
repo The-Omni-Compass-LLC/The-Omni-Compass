@@ -35,7 +35,7 @@ Read in this order. Every page here is current; dated records are in [`history/`
 | Page | What it holds |
 |---|---|
 | [`MECHANISM_OF_ACTION.md`](MECHANISM_OF_ACTION.md) | How Omni-Compass acts, wire by wire |
-| [`engine/OMNI_COMPASS_LIVE_ENGINE.html`](engine/OMNI_COMPASS_LIVE_ENGINE.html) | The engine running, drawn live (open in a browser): sixty muscles of the stacked organism under their native controllers, the brain's six states integrated by RK4, the nerves, the compass law and the v7 verdict ported from the engine's code, native against Omni-Compass on top on one modelled day (class S, a picture of the mechanism, not a result) |
+| [`engine/OMNI_COMPASS_LIVE_ENGINE.html`](engine/OMNI_COMPASS_LIVE_ENGINE.html) | The engine running, drawn live (open in a browser): native alone beside Omni-Compass on top of native, sixty muscles of the catalog. By default the body is the realms harness itself (its plants and the max), recorded on runs A, B and C by [`engine/export_harness_trace.py`](engine/export_harness_trace.py) and read by the three-run rule; the brain, nerves, compass law and v7 verdict are ported and checked against the Python by [`engine/check_live_engine.py`](engine/check_live_engine.py). A labelled teaching model can be switched on to stress the body by hand (class S throughout; a picture of the mechanism, not a benchmark result) |
 | [`CONVEYANCE_LAW.md`](CONVEYANCE_LAW.md), [`TRACKING_THEOREM.md`](TRACKING_THEOREM.md), [`FORMAL_STATUS.md`](FORMAL_STATUS.md) | The law, what is proved, and how |
 | [`CANONICAL_ENGINE.md`](CANONICAL_ENGINE.md), [`ENGINES.md`](ENGINES.md) | The one engine the software runs |
 | [`TWO_WAY_NERVOUS_SYSTEM.md`](TWO_WAY_NERVOUS_SYSTEM.md), [`NERVOUS.md`](NERVOUS.md) | Senses in, settings out |
