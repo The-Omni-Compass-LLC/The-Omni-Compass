@@ -272,8 +272,42 @@ def receipts():
     return out
 
 
+# ---- every muscle of the catalog and the seven organisms, on the engine that stands -----------------------------------
+ORGANISMS = {"spine": "The spine, the muscles every stack runs on", "compute_ai_cloud": "Compute / AI / Cloud",
+             "physics_robotics_autonomous": "Physics / Robotics / Autonomous", "energy_facility_industrial": "Energy / Facility / Industrial",
+             "distribution_specialized": "Distribution / Specialized", "stack": "The four stacked, every shared muscle in each",
+             "tower": "The whole tower, every muscle once"}
+REALM_CODE = {"compute_ai_cloud": "C", "physics_robotics_autonomous": "P", "energy_facility_industrial": "E", "distribution_specialized": "D"}
+
+
+def realms():
+    """results/realms_v5/REALMS_V5.json as the realms runner wrote it: the seven organisms under three loads and every
+    muscle alone under two, native against Omni-Compass on top, seeds 3000 to 3009."""
+    d = json.loads((ROOT / "results" / "realms_v5" / "REALMS_V5.json").read_text(encoding="utf-8"))
+    r4 = lambda x: round(x, 6)
+    orgs = {}
+    for load, by in d["organisms"].items():
+        orgs[load] = [{"key": k, "name": ORGANISMS[k], "n": v["n"], "label": v["label"], "viol_native": v["totals"]["viol_native"],
+                       "viol_max": v["totals"]["viol_max"], "steps": v["totals"]["steps"],
+                       "work": [r4(x) for x in v["summary"]["work"]], "energy": [r4(x) for x in v["summary"]["energy"]],
+                       "viol_pp": [r4(x) for x in v["summary"]["viol_pp"]], "flagged": len(v.get("plants_flagged") or [])}
+                      for k, v in by.items()]
+    musc = []
+    for m in d["muscles"]:
+        row, out = m["row"], []
+        for load in ("normal", "line"):
+            v = m["loads"][load]
+            ln = v.get("line") or [None, None, None, None]
+            out.append([v["label"], v["viol_native"], v["viol_max"], r4(v["summary"]["work"][0]), r4(v["summary"]["energy"][0]),
+                        ln[0], ln[1]])
+        musc.append([row["muscle"], row["family"], REALM_CODE[row["realm"]], row["template"], row["knob"], m["label"], out])
+    run = {k: d["run"][k] for k in ("started", "commit", "seeds", "engine", "engine_digest", "dial", "muscles")}
+    print(f"realms {run['engine']} {len(musc)} muscles, {len(orgs)} loads")
+    return {"run": run, "organisms": orgs, "muscles": musc}
+
+
 def main(out):
-    data = {"gpu": gpu(), "linux": linux(), "receipts": receipts()}
+    data = {"gpu": gpu(), "linux": linux(), "receipts": receipts(), "realms": realms()}
     Path(out).write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
 
 
