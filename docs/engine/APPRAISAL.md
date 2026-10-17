@@ -39,7 +39,7 @@ of the real runs are omni-v7's tables until each benchmark's three runs on omni-
 | Native is native, Omni-Compass sits on top | A | native runs its own controllers in every view; Omni-Compass never replaces them and never goes below native's setting (the twin, the floor), proven by the identical records |
 | Every word matches what the parts do | A | the bottom line, the guide, the anatomy and the section notes say where the brain steers (the live controller) and where it reads (the harness views); three overreaching claims were found on 17 October and corrected |
 | Readings by the three-run rule | A | every judged row read by the rule of `tools/readings.py`; gauges no rule aims at are shown, never judged |
-| Disclosures and labels | A | evidence class on every view, the teaching model marked as drawn and as larger than the harness reads, the wiring declaration, the contact lines |
+| Disclosures and labels | A | evidence class on every view, the stress-test model (native and Omni-Compass on top, side by side) marked as drawn and as larger than the harness reads, the wiring declaration, the contact lines |
 | Readability for an engineer or a referee | A− | complete, with a bottom line and contents; long |
 | **The page as a likeness of the mechanism** | **A** | |
 
@@ -92,7 +92,7 @@ of the real runs are omni-v7's tables until each benchmark's three runs on omni-
    the raised limits keep the host busier and its start time is fitted to rise with the busy share. The two repairs
    written for it were refused by the toy gate. On real Kubernetes the start wait reads EVEN.
 8. **The page replays recorded runs.** The harness and controller views are the repository's runs, recorded on seeds
-   3000, 3001 and 3002 and replayed; they cannot be stressed by hand. The teaching model can, and is labelled as drawn.
+   3000, 3001 and 3002 and replayed; they cannot be stressed by hand. The stress-test model can (native alone and Omni-Compass on top of the same native, side by side), and is labelled as drawn.
 
 ## Limitations
 
