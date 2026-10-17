@@ -333,6 +333,11 @@ def main():
           "(snapshot once, one writer, restore), the meter's wrap-around, the probe, the hand-back from a snapshot file, one paired run with the "
           "brain's verdict allowing notches by trial and the ceiling handed back, the three-run table flagging a modelled machine",
           r.returncode == 0, r.stderr[-300:])
+    r = subprocess.run([sys.executable, "-m", "unittest", "discover", "-q", "-s", "tests", "-t", "."], cwd=ROOT,
+                       capture_output=True, text=True)
+    check("the whole unit-test suite (python -m unittest discover -s tests): every test, so one failing test stops the push "
+          "(17 October: tests/test_robust_restart.py had failed for two days and no check ran it)", r.returncode == 0,
+          r.stderr[-400:])
     import benchmarks.multiplicity as MP
     mp_tmp = tmp / "mult.json"; MP.main(mp_tmp)
     check("multiplicity analysis reproduces results/MULTIPLICITY.json",

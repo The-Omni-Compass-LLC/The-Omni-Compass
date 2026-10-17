@@ -55,24 +55,24 @@ STANDBY = "energy (Wh)"
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge, higher is better)"   # the row's name as the tables written before 13 October recorded it, kept to read them
 CAPACITY_NOW = "work inside the response line (requests a second; the capacity test's own gauge)"                  # the same row since
 SOURCES = [
-    ("Real Kubernetes (GitHub)", "Steady same work: the load in steps at a fixed rate, ten pairs, three runs", "V3_STEADY.json",
+    ("Real Kubernetes (GitHub)", "Steady same work: the load in steps at a fixed rate, ten pairs, three runs", "V7_STEADY.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, "equal"),
-    ("Real Kubernetes (GitHub)", "Demand that wanders: up and down one step at a time, ten pairs, three runs", "V3_WANDERING.json",
+    ("Real Kubernetes (GitHub)", "Demand that wanders: up and down one step at a time, ten pairs, three runs", "V7_WANDERING.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs, three runs", "V3_ALL_FOUR.json",
+    ("Real Kubernetes (GitHub)", "All four in one run: load up and down one step at a time, ten pairs, three runs", "V7_ALL_FOUR.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, "capacity"),
-    ("Real Kubernetes (GitHub)", "Fairness: a noisy neighbour, ten pairs, three runs", "V3_FAIRNESS.json",
+    ("Real Kubernetes (GitHub)", "Fairness: a noisy neighbour, ten pairs, three runs", "V7_FAIRNESS.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs, three runs", "V3_FAULTS.json",
+    ("Real Kubernetes (GitHub)", "Faults: machine down, spike, runaway pod, blind probe, ten pairs, three runs", "V7_FAULTS.json",
      {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
-    ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs, three runs", "V3_BATCH.json",
+    ("Real Kubernetes (GitHub)", "A queue of jobs: cruise, then the emergency brake, ten pairs, three runs", "V7_BATCH.json",
      {"speed": MEAN, "machines": NODES, "energy": STANDBY}, None),
     ("Real Kubernetes (GitHub)", "A public day of demand: the Google cluster trace of 2011 replayed one step at a time, ten pairs, three runs",
-     "V3_TRACE_GOOGLE2011.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+     "V7_TRACE_GOOGLE2011.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
     ("Real Kubernetes (GitHub)", "With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs",
-     "V3_KEDA_CPU_REQUESTS.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+     "V7_KEDA_CPU_REQUESTS.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
     ("Real Kubernetes (GitHub)", "With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs",
-     "V3_KEDA_REQUESTS.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
+     "V7_KEDA_REQUESTS.json", {"speed": P95, "machines": NODES, "energy": ENERGY}, None),
 ]
 REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer, GitHub)", "Real messaging (Apache Kafka, GitHub)",
         "Real cache (Redis, GitHub)", "Real database cache (MongoDB under YCSB, GitHub)",
@@ -83,20 +83,20 @@ REAL = ("Real Kubernetes (GitHub)", "Real database (PostgreSQL behind PgBouncer,
 # energy = the host's CPU seconds over the run (no meter on a GitHub runner; the CPU the compass itself burns is the declared
 # price, and a rise in all three of our runs there is power given and counts below 1). A table's tuning workload is shown in its own file and never counted.
 WORKLOAD_TABLES = [
-    ("Real database (PostgreSQL behind PgBouncer, GitHub)", "V3_PGBENCH.json", "pgbench `{wl}`: the pooler's pool size, three paired repetitions, three runs",
+    ("Real database (PostgreSQL behind PgBouncer, GitHub)", "V7_PGBENCH.json", "pgbench `{wl}`: the pooler's pool size, three paired repetitions, three runs",
      {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "servers_alive_mean", "energy": "cpu_seconds"}),
-    ("Real messaging (Apache Kafka, GitHub)", "V3_KAFKA.json", "Kafka `{wl}`: the consumer group's size, three paired repetitions, three runs",
+    ("Real messaging (Apache Kafka, GitHub)", "V7_KAFKA.json", "Kafka `{wl}`: the consumer group's size, three paired repetitions, three runs",
      {"work": "work_inside_line_mps", "speed": "p95_ms", "machines": "consumers_mean", "energy": "cpu_seconds"}),
-    ("Real cache (Redis, GitHub)", "V3_REDIS.json", "Redis `{wl}`: the cache's memory ceiling, three paired repetitions, three runs",
+    ("Real cache (Redis, GitHub)", "V7_REDIS.json", "Redis `{wl}`: the cache's memory ceiling, three paired repetitions, three runs",
      {"work": "work_inside_line_rps", "speed": "p95_ms", "machines": "maxmemory_mb_mean", "energy": "cpu_seconds"}),
-    ("Real database cache (MongoDB under YCSB, GitHub)", "V3_YCSB.json", "YCSB `{wl}`: the storage engine's cache size, three paired repetitions, three runs",
+    ("Real database cache (MongoDB under YCSB, GitHub)", "V7_YCSB.json", "YCSB `{wl}`: the storage engine's cache size, three paired repetitions, three runs",
      {"work": "work_inside_line_ops", "speed": "p95_ms", "machines": "cache_mb_mean", "energy": "cpu_seconds"}),
-    ("Real database buffer pool (MySQL under sysbench, GitHub)", "V3_SYSBENCH.json", "sysbench `{wl}`: the buffer pool's size, three paired repetitions, three runs",
+    ("Real database buffer pool (MySQL under sysbench, GitHub)", "V7_SYSBENCH.json", "sysbench `{wl}`: the buffer pool's size, three paired repetitions, three runs",
      {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "pool_mb_mean", "energy": "cpu_seconds"}),
 ]
 DB_FILE = WORKLOAD_TABLES[0][1]
 AIM_LOWER = {"speed", "machines", "energy"}   # the measures whose declared aim is lower (work aims higher)
-PENDING = {"Real cloud (Azure AKS, billed)": "the v1 steady and burst runs are in (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`: on a 4-worker fleet every gauge inside the noise but the burst's p99, −34% in one run); both join as three-run tables, and a fleet big enough to see one machine is next (the earlier engine's +7.5% is in `docs/history/OMNI_INDEX_pre_v1.md`)",
+PENDING = {"Real cloud (Azure AKS, billed)": "the omni-v7 Azure sets run one at a time at the tune-down with native's cap (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day of Google 2011; A, B and C, `scripts/azure_queue.txt`); the category joins as their three-run tables land",
            "Real card (NVIDIA, its own meter)": "the rerun on the current card controller (the 2026-10-02 run used the replaced one)"}
 
 
@@ -224,17 +224,17 @@ def main():
          "for work and speed, and power given for machines and energy (the key: `docs/HOW_TO_READ_THE_RESULTS.md`). A test's index is the "
          "geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric "
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
-         "Every number is read from the test's own three-run table (`results/live/V1_*.json` and `results/live/V3_*.json`, made by "
+         "Every number is read from the test's own three-run table on the engine that stands (`results/live/V7_*.json`, made by "
          "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/ycsb_abc.py` and `tools/sysbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
          f"## Headline: Omni-Compass on top of native, real machines, the same in all three of our runs: **{pct(head)}, "
          f"{index_word(head, head_s)}** (more for the same, or the same for less, across work, speed, machines and energy)", "",
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
          "runs counts, as the geometric mean of the runs' ratios; EVEN (no difference beyond the noise) counts as exactly 1, so "
-         "nothing inside the noise is claimed either way. Real Kubernetes (Omni v3; the v1 tables read the same and stay in `docs/OMNI_V1.md`), the real database, "
-         "real messaging, the real cache, the real database's storage-engine cache and the real database's buffer pool (Omni v3) are the real categories in; Azure and the card join as their three-run tables land. A category's "
+         "nothing inside the noise is claimed either way. Every table in it ran on omni-v7, the engine that stands; no table of an earlier engine is read beside them "
+         "(those stay in `docs/history`). Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
+         "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v7 runs land, Azure and the card as their three-run tables land. A category's "
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
-         "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it takes stands beside it. The law, controllers and runners are the same bytes "
-         "in v1 and v3 (`docs/OMNI_V3.md`); each table names the engine it ran on.", "",
+         "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it takes stands beside it. Each table names the engine it ran on.", "",
          "| Category | Index (work, speed, machines, energy) | Service reading (work and speed only) | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |",
          "|---|---:|---:|---:|---:|---:|---:|---:|"]
     for c in list(REAL) + ["Modelled muscles (evidence S)"]:

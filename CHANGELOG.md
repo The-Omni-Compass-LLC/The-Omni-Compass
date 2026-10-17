@@ -2,6 +2,25 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-17 (late night: every page on the omni-v7 tables; the whole test suite in the push check)
+
+- **The Omni index reads only omni-v7 tables**: +4.2% GAIN on the resource reading and +11.5% GAIN on the service reading
+  (real Kubernetes +27.2% over seven tests, the cache +0.2%, messaging +0.1%, the three databases exactly nothing). No table of
+  an earlier engine is read beside them; the steady and wandering Kubernetes tests, Azure and the card join as their omni-v7
+  tables land (`tools/omni_index.py`, `results/OMNI_INDEX.md`).
+- **The benefit sheet, the wiring page, the state of play and the receipts page** read the omni-v7 tables
+  (`tools/benefit_sheet.py`, `tools/wiring_verdicts.py`, `tools/summary.py --fix`, `docs/THE_RECEIPTS.md`): 20 of 24 benchmarks
+  on the engine that stands.
+- **The Owner's Manual's results chapter** (sections 16.1 and 16.4 to 16.6) is rewritten from the omni-v7 tables, gauge by
+  gauge, native against Omni-Compass on top, the CityLearn LOSS rows and their cause in the same paragraph as its gains; the
+  sections as they stood on omni-v1 and omni-v3 are kept whole in `docs/history/OWNERS_MANUAL_RESULTS_V1_V3.md`.
+- **The whole unit-test suite runs in the push check** (`verify.py`, 212 tests, about two and a half minutes): one failing
+  test now stops a push. `tests/test_robust_restart.py` had failed for two days because no check ran it.
+- **The figures are written the same way every time**: the drawings no longer stamp a render date or random clip ids
+  into their SVG files (`docs/book/schematics.py`), so a figure's file changes only when its drawing does.
+- **The steady and wandering Kubernetes tests had dropped out of the omni-v7 rerun list**; they are released with the next
+  campaign.
+
 ## 2026-10-17 (night: the first omni-v7 reruns read back: seventeen three-run tables)
 
 - **Seventeen three-run tables on omni-v7** from the reruns released on 16 October (A, B and C, separate GitHub runs,

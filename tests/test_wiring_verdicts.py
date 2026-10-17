@@ -86,7 +86,7 @@ class TheRule(unittest.TestCase):
         self.assertEqual([x[2] for x in j["given"]], ["+0.8%"])
         self.assertEqual(len(j["same"]), 1)
         self.assertEqual(wv.verdict(len(j["gain"]), len(wv.away_of(j))), wv.CHOICE)
-        self.assertTrue(wv.sim_aims("V3_SWARM.md"))                    # every simulator's own gauge list gives the aims
+        self.assertTrue(wv.sim_aims("V7_SWARM.md"))                    # every simulator's own gauge list gives the aims
 
     def test_the_labels_map_to_the_three_words(self):
         self.assertEqual(wv.LABEL_VERDICT["SUPERIOR WITHIN GUARDRAILS"], wv.WRITE)
