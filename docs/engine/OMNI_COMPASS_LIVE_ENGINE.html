@@ -15,7 +15,7 @@
   --bg:#0e1316; --panel:#141b1f; --panel2:#1a2227; --ink:#e7e2d7; --muted:#8e9893; --rule:#27323a;
   --brass:#d9a052; --brass-soft:rgba(217,160,82,.18); --steel:#86a3bb; --steel-soft:rgba(134,163,187,.18);
   --ok:#62b98d; --warn:#e3b04b; --bad:#e2634f; --spine:#b99ac4;
-  --r-compute:#78a6d8; --r-physics:#68bba9; --r-energy:#d4b35f; --r-dist:#cf8fa9;
+  --blood:#c4525f; --r-compute:#78a6d8; --r-physics:#68bba9; --r-energy:#d4b35f; --r-dist:#cf8fa9;
   --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -129,7 +129,8 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 .howto b{color:var(--ink)}
 @media (max-width:860px){.howto{grid-template-columns:minmax(0,1fr)}}
 .who{width:100%;font-size:13px}
-.who td,.who th{white-space:normal;text-align:left}
+.who td,.who th{white-space:normal;text-align:left;vertical-align:top}
+.anat td:nth-child(2){color:var(--steel)} .anat td:nth-child(3){color:var(--ink)}
 .twin{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
 @media (max-width:860px){.twin{grid-template-columns:minmax(0,1fr)}}
 .ringhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin-bottom:6px}
@@ -177,7 +178,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 <section class="stack" aria-label="The organism, live, twice">
   <div class="twin">
     <div class="panel ringbox arm-nat">
-      <div class="ringhead"><h3 class="t-steel">Native alone</h3><span>sixty native controllers, each answering on its own</span></div>
+      <div class="ringhead"><h3 class="t-steel">Native</h3><span>sixty controllers, each on its own reading and clock</span></div>
       <canvas id="ringN" aria-label="The organism under native control alone"></canvas>
       <div class="live">
         <div><span>past the line now</span><b id="lvN0">0</b></div>
@@ -187,7 +188,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
       </div>
     </div>
     <div class="panel ringbox arm-omni">
-      <div class="ringhead"><h3 class="t-brass">Omni-Compass on top of native</h3><span>the same sixty and the same demand, one brain on top</span></div>
+      <div class="ringhead"><h3 class="t-brass">Native + Omni-Compass on top</h3><span>the same sixty, same demand, same instant, one brain</span></div>
       <canvas id="ringO" aria-label="The organism with Omni-Compass on top: the brain at the center, nine senses, the spine and the four realms"></canvas>
       <div class="live">
         <div><span>past the line now</span><b id="lvO0">0</b></div>
@@ -204,7 +205,18 @@ input[type=range]{width:100%;accent-color:var(--brass)}
     <span><i style="background:var(--bad)"></i>past the line</span>
     <span><i style="background:var(--steel)"></i>a reading in</span>
     <span><i style="background:var(--brass)"></i>a write out</span>
-    <span>on the ring: p = 0.5 · inward: calmer · outward: toward the line · click a muscle to follow it</span>
+    <span>on the ring: p = 0.5 · inward: calmer · outward: toward the line · a red tail: where that muscle went in the last 12 decisions · click a muscle to follow it</span>
+  </div>
+  <div class="panel stack" style="gap:8px">
+    <h3>The anatomy, part by part</h3>
+    <div class="tbl-wrap"><table class="who anat"><thead><tr><th>Part</th><th>Native</th><th>Native + Omni-Compass on top</th><th>In the code</th></tr></thead><tbody>
+      <tr><td><b>Organism</b></td><td>sixty muscles in one body, nothing joining them</td><td>the same body, run as one: one state, one brain, one clock</td><td>the whole ring; the seven organisms of the runners</td></tr>
+      <tr><td><b>Muscles</b></td><td>each a lever under its own native controller</td><td>the same levers, the same native controllers underneath, a compass law on each</td><td>the outer ring, the four realms; <code>compass_law.CompassLaw</code></td></tr>
+      <tr><td><b>Spine</b></td><td>the muscles every realm shares, each still on its own</td><td>the shared base, read and written like every other muscle</td><td>the inner ring; <code>docs/THE_SPINE.md</code></td></tr>
+      <tr><td><b>Nervous system</b></td><td>a reflex arc per muscle: its own reading in, its own lever out (the short stubs)</td><td>afferent: nine senses read from the whole body (blue, inward); efferent: each write through the plug (gold, outward); the nerves grant or refuse each organ</td><td><code>adapter.observe_vector</code>, <code>nervous_system.authority</code>, <code>compass_law.Plug</code></td></tr>
+      <tr><td><b>Brain</b></td><td>none</td><td>the six-state engine at the center: E, U, I_U, S, B, Ḃ, integrated by RK4 every decision</td><td><code>core.macro_step</code>, <code>adapter.Governor.step</code></td></tr>
+      <tr><td><b>Blood</b></td><td>each controller beats on its own (the small rings at each muscle, out of step)</td><td>the code running: one heartbeat per decision leaves the brain and reaches every muscle (the red wave), carrying the state out and the readings back</td><td>the decision loop: sense, assimilate, evolve, allocate, nerves, compass, plug</td></tr>
+    </tbody></table></div>
   </div>
   <div class="panel"><canvas id="swarm" aria-label="Each body part's muscles on the band, native above and Omni-Compass on top below"></canvas></div>
 </section>
@@ -247,7 +259,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
         <button id="sSec">Security hold</button>
         <button id="sKill" aria-pressed="false">Kill switch</button>
       </div>
-      <p class="note" id="dialExplain">The max: every muscle to its own limit, never below native; the capacity it holds is power given. Tune-down: never more than native, a step back only with the organ’s grant and the release gate; in this model native already sits near its band, so it finds little to hand back (about 0.05% of capacity, every service gauge EVEN).</p>
+      <p class="note" id="dialExplain">The max: every muscle to its own limit, never below native; the capacity it holds is power given. Tune-down: never more than native, a step back only with the organ’s grant and the release gate; in this model native already sits near its band, so it finds little to hand back: about 0.05% of capacity, every service gauge EVEN; the spread of positions widens by under 0.2% (LOSS on two of three test days), because the calm muscles it hands back move toward their line while the busy ones stay.</p>
       <p class="note" id="stressNote">Each stress lasts 40 decisions from the moment you press it. Both arms meet the same demand.</p>
     </div>
 
@@ -264,21 +276,22 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 </section>
 
 <section class="stack" aria-label="The compass plane and the two arms">
-  <div class="head"><h2>Every muscle on one plane</h2>
-    <p class="lede" style="max-width:62ch">Each dot is a muscle at its position p in its band and the speed v it is moving. The shading is the force the compass law would apply there: copper adds capacity, steel hands it back. Past the 0.95 wall the law fails up at once. Under Omni-Compass a muscle above the center is pulled down to it and stops without overshoot; below the center the max hands capacity back only as far as native’s own setting, so a dot can rest there.</p></div>
+  <div class="head"><h2>Every muscle on one plane, both arms</h2>
+    <p class="lede" style="max-width:62ch">Each dot is a muscle at its position p in its band and the speed v it is moving, native on the left, Omni-Compass on top on the right, the same muscles at the same instant. On the right the shading is the force the compass law would apply there: copper adds capacity, steel hands it back. Past the 0.95 wall the law fails up at once. Under Omni-Compass a muscle above the center is pulled down to it and stops without overshoot; below the center the max hands capacity back only as far as native’s own setting, so a dot can rest there.</p></div>
   <div class="grid-2">
-    <div class="panel stack" style="gap:8px">
-      <div class="seg" role="group" aria-label="Arm shown on the plane" style="align-self:flex-start">
-        <button id="showNative" class="on-steel" aria-pressed="false">Native</button>
-        <button id="showOmni" aria-pressed="true">Omni-Compass on top</button>
-      </div>
-      <canvas id="phase" aria-label="Phase plane of the sixty muscles"></canvas>
-      <div class="legend"><span><i class="sq" style="background:var(--brass)"></i>F &gt; 0, add</span><span><i class="sq" style="background:var(--steel)"></i>F &lt; 0, hand back</span><span id="phaseNote">shading drawn for the followed muscle's τ</span></div>
+    <div class="panel stack arm-nat" style="gap:8px">
+      <div class="ringhead"><h3 class="t-steel">Native</h3><span>no compass law: no force field; each controller reacts only when its own reading crosses its own target</span></div>
+      <canvas id="phaseN" aria-label="Phase plane of the sixty muscles under native control"></canvas>
     </div>
-    <div class="panel stack" style="gap:8px">
-      <canvas id="strip" aria-label="Native against Omni-Compass on top, live strip charts"></canvas>
-      <div class="legend"><span><i style="background:var(--steel)"></i>native</span><span><i style="background:var(--brass)"></i>Omni-Compass on top</span><span><i class="sq" style="background:var(--muted)"></i>demand</span></div>
+    <div class="panel stack arm-omni" style="gap:8px">
+      <div class="ringhead"><h3 class="t-brass">Native + Omni-Compass on top</h3><span>the compass law's force field, drawn for the followed muscle's τ</span></div>
+      <canvas id="phaseO" aria-label="Phase plane of the sixty muscles with Omni-Compass on top"></canvas>
     </div>
+  </div>
+  <div class="legend"><span><i class="sq" style="background:var(--brass)"></i>F &gt; 0, add</span><span><i class="sq" style="background:var(--steel)"></i>F &lt; 0, hand back</span><span>each tail: that muscle's last 12 decisions</span></div>
+  <div class="panel stack" style="gap:8px">
+    <canvas id="strip" aria-label="Native against Omni-Compass on top, live strip charts"></canvas>
+    <div class="legend"><span><i style="background:var(--steel)"></i>native</span><span><i style="background:var(--brass)"></i>native + Omni-Compass on top</span><span><i class="sq" style="background:var(--muted)"></i>demand</span></div>
   </div>
   <div class="panel stack" style="gap:8px">
     <div class="row" style="justify-content:space-between"><h3>Native against Omni-Compass on top, this day so far</h3><span class="note" id="dialNote">the max</span></div>
@@ -289,7 +302,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 
 <section class="stack" aria-label="Inside the brain">
   <div class="head"><h2>Inside the brain</h2>
-    <p class="lede" style="max-width:62ch">The same state the cycle panel prints, drawn as the physics it is. Each ball is a live value of the Omni-Compass arm, integrated by RK4 every decision.</p></div>
+    <p class="lede" style="max-width:62ch">The same state the cycle panel prints, drawn as the physics it is. Each ball is a live value of the Omni-Compass arm, integrated by RK4 every decision. <b>Native has none of this:</b> no state, no memory of need, no stress, no tide; each controller sees only its own reading, one to three decisions late.</p></div>
   <div class="grid-3">
     <div class="panel stack" style="gap:6px"><h3>U on the double well · eq. (2)</h3><canvas id="cvU" aria-label="Order parameter U on its double-well potential"></canvas><p class="note">V(U) = −μ(U²/2 − U⁴/4) + (Ė/E_max)·U. A rising E tilts the well toward the failed basin.</p></div>
     <div class="panel stack" style="gap:6px"><h3>S in its potential Φ · eqs. (5)–(6)</h3><canvas id="cvS" aria-label="Stress S in its cubic potential"></canvas><p class="note">Φ(S) = α_s S²/2 + β_s S³/4 − δS. S rolls to S*; the senses pull it back each decision.</p></div>
@@ -297,6 +310,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
   </div>
   <div class="panel stack">
     <h3>The nerves: four scalars multiply into calm</h3>
+    <p class="note">Native has no nerves: nothing grants or refuses a controller, and a blind sense or a security hold changes nothing it does.</p>
     <div class="meters">
       <div class="meter"><span>κ convergence</span><b id="nK">—</b><div class="bar"><i id="nKb"></i></div></div>
       <div class="meter"><span>h basin health</span><b id="nH">—</b><div class="bar"><i id="nHb"></i></div></div>
@@ -325,7 +339,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
       <p class="mono" id="vLine" style="font-size:13px">—</p>
       <h3 style="margin-top:6px">Over many trials at this cost</h3>
       <canvas id="cvV2" aria-label="Share of trials allowed, medians alone against the v7 rule"></canvas>
-      <p class="note">The medians alone allow a step when the trial's median is within the allowance of the reference's. omni-v7 also refuses any step whose interval sits wholly above zero, measures on while the interval is wider than the allowance (up to three times the minimum of 30), and keeps a step only if both estimates are inside the allowance. Ported from <code>omnicompass/verdict.py</code>; the costs are modelled (class S). The code’s default allowance is 0.5%; the slider opens at 2%, the allowance of the table in <code>docs/OMNI_V7.md</code>.</p>
+      <p class="note"><b>Native:</b> its knob never moves past its own setting, so there is no trial and nothing to judge; every step Omni-Compass takes past native has to pass this test first. The medians alone allow a step when the trial's median is within the allowance of the reference's. omni-v7 also refuses any step whose interval sits wholly above zero, measures on while the interval is wider than the allowance (up to three times the minimum of 30), and keeps a step only if both estimates are inside the allowance. Ported from <code>omnicompass/verdict.py</code>; the costs are modelled (class S). The code’s default allowance is 0.5%; the slider opens at 2%, the allowance of the table in <code>docs/OMNI_V7.md</code>.</p>
     </div>
   </div>
 </section>
@@ -499,7 +513,7 @@ const REALMS = [
     ["stage_parallelism","Data Analytics & ETL"],["inventory_allocation","Workflow, Logistics & Fulfillment"],["executor_size","Data Analytics & ETL"],
     ["compensation_action","Workflow, Logistics & Fulfillment"],["gc_budget","Runtime & Application"],["shipment_batch","Workflow, Logistics & Fulfillment"]]},
 ];
-const DAY = 360, NAT_TARGET = 0.70, NAT_TOL = 0.10, NAT_WINDOW = 5;
+const BURST_GAP = 28, DAY = 360, NAT_TARGET = 0.70, NAT_TOL = 0.10, NAT_WINDOW = 5;
 
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function gauss(rng) { let u = 0, v = 0; while (u === 0) u = rng(); while (v === 0) v = rng(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
@@ -521,11 +535,17 @@ function makeMuscles(seed) {
       tau: R.tau*(0.7 + 0.6*rng()), delay: R.delay + (rng() < 0.3 ? 1 : 0), w,
       lag: Math.floor(rng()*8), per: 18 + rng()*40, ph: rng()*Math.PI*2, amp: 0.05 + 0.12*rng(), cmin: 0.35*w, cmax: 11*w});
   }));
+  // sudden surges, each body part its own: on average one every BURST_GAP decisions, 4 to 10 decisions long,
+  // 1.4x to 1.9x the demand, reaching each muscle of that part a decision or two apart
+  const bursts = REALMS.map(() => { const out = new Float64Array(DAY + 12).fill(1); let t = Math.floor(rng()*BURST_GAP);
+    while (t < DAY) { const len = 4 + Math.floor(rng()*7), amp = 1.4 + 0.5*rng(); for (let k = 0; k < len && t + k < out.length; k++) out[t + k] = Math.max(out[t + k], amp); t += len + Math.floor(BURST_GAP*(0.4 + 1.2*rng())); }
+    return out; });
   for (const m of ms) {   // the demand table, the same for both arms
-    m.d = new Float64Array(DAY + 1);
+    m.d = new Float64Array(DAY + 1); const sk = Math.floor(rng()*3);
     for (let t = 0; t <= DAY; t++) {
       const base = dayLevel(Math.max(0, t - m.lag));
-      m.d[t] = Math.max(0, m.w*base*(1 + m.amp*Math.sin(2*Math.PI*t/m.per + m.ph))*(1 + 0.04*gauss(rng)));
+      const surge = bursts[m.realm][Math.max(0, t - sk)];
+      m.d[t] = Math.max(0, m.w*base*surge*(1 + m.amp*Math.sin(2*Math.PI*t/m.per + m.ph))*(1 + 0.04*gauss(rng)));
     }
   }
   return ms;
@@ -546,7 +566,7 @@ class Arm {
 
 // ============================================================== the world
 const W = {seed: 20261017, t: 0, speed: 1, paused: false, dial: "max", show: "omni", sel: 13,
-  stress: {surge: -1, blind: -1, sec: -1}, killed: false, brainHist: [], phase: 0, frac: 0};
+  stress: {surge: -1, blind: -1, sec: -1}, killed: false, beat: 0, brainHist: [], phase: 0, frac: 0};
 
 function newDay(seed) {
   W.seed = seed; W.t = 0; W.muscles = makeMuscles(seed);
@@ -588,6 +608,7 @@ function stepArm(arm, brainOut) {
     const Lnat = nativeDesired(M, s, robs);
     s.Lnat = Lnat;
     const F = s.law.force(robs); s.F = F; s.p = s.law.p; s.v = s.law.v; s.rtrue = r;
+    (s.hp = s.hp || []).push([s.p, s.v]); if (s.hp.length > 12) s.hp.shift();
     let L = Lnat;
     if (arm.kind === "omni" && !W.killed && brainOut) {
       const org = brainOut.organs[M.organ];
@@ -640,7 +661,7 @@ function decide() {
   const bo = W.brain.step(obs);
   W.brainHist.push({E: bo.xn[0], U: bo.xn[1], I: bo.xn[2], S: bo.xn[3], B: bo.xn[4], calm: bo.calm});
   stepArm(W.nat, null); stepArm(W.omni, bo);
-  W.t++;
+  W.t++; W.beat = performance.now();
   spawnParticles();
   updateText();
 }
@@ -648,7 +669,7 @@ function decide() {
 // ============================================================== drawing
 const css = {};
 function readTokens() { const cs = getComputedStyle(document.documentElement);
-  for (const k of ["bg","panel","panel2","ink","muted","rule","brass","brass-soft","steel","steel-soft","ok","warn","bad","spine","r-compute","r-physics","r-energy","r-dist"]) css[k] = cs.getPropertyValue("--"+k).trim(); }
+  for (const k of ["bg","panel","panel2","ink","muted","rule","brass","brass-soft","steel","steel-soft","ok","warn","bad","spine","blood","r-compute","r-physics","r-energy","r-dist"]) css[k] = cs.getPropertyValue("--"+k).trim(); }
 readTokens();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readTokens);
 new MutationObserver(readTokens).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
@@ -672,7 +693,7 @@ const geos = {nat: null, omni: null};
 const REALM_TINT = () => [css.spine, css["r-compute"], css["r-physics"], css["r-energy"], css["r-dist"]];
 function ringGeo(w) {
   const cx = w/2, cy = w/2, R = w/2;
-  const r0 = R*0.16, r1 = R*0.27, r2 = R*0.48, r3 = R*0.78, spread = R*0.22;
+  const r0 = R*0.19, r1 = R*0.285, r2 = R*0.49, r3 = R*0.78, spread = R*0.22;
   const nodes = W.muscles.map(M => {
     let ang, base;
     if (M.realm === 0) { ang = -Math.PI/2 + (M.j + 0.5)*2*Math.PI/12; base = r2; }
@@ -736,15 +757,22 @@ function drawRing(now, armSel) {
       const am = (a0 + a1)/2; g.font = `${Math.max(8, R*0.028)}px ${MONO}`; g.fillStyle = css.muted;
       g.fillText(SENSE_LABEL[j], cx + (r1 + R*0.055)*Math.cos(am), cy + (r1 + R*0.055)*Math.sin(am));
     });
-    // the brain: six spokes, E U I S B Ḃ
-    g.beginPath(); g.arc(cx, cy, r0, 0, Math.PI*2); g.fillStyle = css.panel2; g.fill(); g.strokeStyle = css.brass; g.lineWidth = 1.5; g.stroke();
+    // the brain: the name at the center, six rim gauges E U I S B Ḃ, calm under the name
+    g.beginPath(); g.arc(cx, cy, r0, 0, Math.PI*2); g.fillStyle = css.panel2; g.fill(); g.strokeStyle = css.brass; g.lineWidth = 2; g.stroke();
     const names = ["E","U","I","S","B","Ḃ"];
     const vals = L ? [L.xn[0], L.xn[1], L.xn[2], (L.xn[3]+1)/2, (L.xn[4]+0.5)/1.5, (L.xn[5]+0.5)] : [0,0,0,0,0,0];
-    for (let k = 0; k < 6; k++) { const a = -Math.PI/2 + k*Math.PI/3; const len = r0*0.9*clamp(vals[k], 0.05, 1);
-      g.strokeStyle = k === 1 ? css.ok : css.brass; g.lineWidth = 3; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + len*Math.cos(a), cy + len*Math.sin(a)); g.stroke();
-      g.fillStyle = css.muted; g.font = `${Math.max(10, R*0.036)}px "IBM Plex Sans", system-ui, sans-serif`; g.fillText(names[k], cx + r0*1.16*Math.cos(a), cy + r0*1.16*Math.sin(a)); }
-    g.font = `500 ${Math.max(10, R*0.038)}px ${MONO}`; const ct = W.killed ? "KILLED" : (L ? "calm " + L.calm.toFixed(2) : "calm —"); const tw = g.measureText(ct).width + 12;
-    g.fillStyle = css.panel; g.fillRect(cx - tw/2, cy + r0*0.38 - 9, tw, 18); g.fillStyle = W.killed ? css.bad : css.ink; g.fillText(ct, cx, cy + r0*0.38);
+    for (let k = 0; k < 6; k++) { const a = -Math.PI/2 + k*Math.PI/3; const ri = r0*0.70, ro = ri + r0*0.24*clamp(vals[k], 0.06, 1);
+      g.strokeStyle = alpha(css.muted, 0.25); g.lineWidth = 5; g.beginPath(); g.moveTo(cx + ri*Math.cos(a), cy + ri*Math.sin(a)); g.lineTo(cx + (ri + r0*0.24)*Math.cos(a), cy + (ri + r0*0.24)*Math.sin(a)); g.stroke();
+      g.strokeStyle = k === 1 ? css.ok : css.brass; g.beginPath(); g.moveTo(cx + ri*Math.cos(a), cy + ri*Math.sin(a)); g.lineTo(cx + ro*Math.cos(a), cy + ro*Math.sin(a)); g.stroke();
+      g.fillStyle = css.muted; g.font = `${Math.max(10, R*0.034)}px "IBM Plex Sans", system-ui, sans-serif`; g.fillText(names[k], cx + r0*1.14*Math.cos(a), cy + r0*1.14*Math.sin(a)); }
+    g.fillStyle = W.killed ? css.bad : css.brass; g.font = `800 ${Math.max(13, R*0.06)}px "Big Shoulders Display", "Arial Narrow", sans-serif`;
+    g.fillText(W.killed ? "KILLED" : "OMNI-COMPASS", cx, cy - r0*0.12);
+    g.fillStyle = css.muted; g.font = `600 ${Math.max(8, R*0.026)}px ${MONO}`; g.fillText("THE BRAIN", cx, cy - r0*0.42);
+    g.fillStyle = css.ink; g.font = `500 ${Math.max(9, R*0.032)}px ${MONO}`; g.fillText(L ? "calm " + L.calm.toFixed(2) : "calm —", cx, cy + r0*0.26);
+    // blood: one heartbeat per decision, from the brain out to every muscle
+    const age = (now - W.beat)/Math.max(160, 700/W.speed);
+    if (!reduceMotion && age >= 0 && age < 1) { const rr = r0 + (r3 + 0.5*spread - r0)*age;
+      g.strokeStyle = alpha(css.blood, 0.55*(1 - age)); g.lineWidth = 3*(1 - age) + 1; g.beginPath(); g.arc(cx, cy, rr, 0, Math.PI*2); g.stroke(); }
     // particles: readings in, writes out
     const T = now;
     W.particles = W.particles.filter(pt => T - pt.t0 < pt.life);
@@ -761,9 +789,18 @@ function drawRing(now, armSel) {
     W.muscles.forEach((M, i) => { const [x, y] = nodeXY(i, armSel); const a = geo.nodes[i].ang; const rr = geo.nodes[i].base - 0.55*spread;
       g.strokeStyle = alpha(css.steel, 0.35); g.beginPath(); g.moveTo(x, y); g.lineTo(cx + rr*Math.cos(a), cy + rr*Math.sin(a)); g.stroke(); });
     g.setLineDash([3, 5]); g.strokeStyle = css.rule; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, r0, 0, Math.PI*2); g.stroke(); g.setLineDash([]);
-    g.fillStyle = css.muted; g.font = `${Math.max(9, R*0.034)}px ${MONO}`;
-    g.fillText("no brain", cx, cy - 7); g.fillText("60 controllers", cx, cy + 9);
+    g.fillStyle = css.steel; g.font = `800 ${Math.max(13, R*0.06)}px "Big Shoulders Display", "Arial Narrow", sans-serif`; g.fillText("NATIVE", cx, cy - r0*0.12);
+    g.fillStyle = css.muted; g.font = `${Math.max(8, R*0.03)}px ${MONO}`; g.fillText("no brain", cx, cy + r0*0.26);
+    if (!reduceMotion) W.muscles.forEach((M, i) => { const per = 900/W.speed*(0.7 + (i % 7)*0.09); const ph = ((now + i*137) % per)/per;
+      if (ph < 0.5) { const [x, y] = nodeXY(i, armSel); g.strokeStyle = alpha(css.blood, 0.4*(1 - 2*ph)); g.lineWidth = 1; g.beginPath(); g.arc(x, y, Math.max(4, R*0.022) + 10*ph, 0, Math.PI*2); g.stroke(); } });
   }
+  // tails: from where each muscle is now to the farthest it went in the last 12 decisions
+  W.muscles.forEach((M, i) => { const s = arm.m[i]; const hp = s.hp || []; if (!hp.length) return;
+    let pk = s.p; for (const [p] of hp) if (Math.abs(p - 0.5) > Math.abs(pk - 0.5)) pk = p;
+    if (Math.abs(pk - s.p) < 0.03) return;
+    const n = geo.nodes[i]; const r_now = n.base + clamp(s.p - 0.5, -0.6, 0.9)*spread, r_pk = n.base + clamp(pk - 0.5, -0.6, 0.9)*spread;
+    g.strokeStyle = pk >= 1 ? alpha(css.bad, 0.85) : pk >= 0.95 ? alpha(css.warn, 0.7) : alpha(css.muted, 0.35); g.lineWidth = pk >= 1 ? 3 : 2; g.lineCap = "round";
+    g.beginPath(); g.moveTo(cx + r_now*Math.cos(n.ang), cy + r_now*Math.sin(n.ang)); g.lineTo(cx + r_pk*Math.cos(n.ang), cy + r_pk*Math.sin(n.ang)); g.stroke(); g.lineCap = "butt"; });
   // the muscles
   W.muscles.forEach((M, i) => { const [x, y] = nodeXY(i, armSel); const s = arm.m[i];
     const rad = Math.max(4, R*0.022);
@@ -819,15 +856,15 @@ function drawBand() {
 }
 
 // ---- the phase plane
-const phCv = document.getElementById("phase"); let phField = null, phKey = "";
-function drawPhase() {
-  const {g, w, h} = fit(phCv, 0.72);
+const PH = {nat: document.getElementById("phaseN"), omni: document.getElementById("phaseO")}; let phField = null, phKey = "";
+function drawPhase(armSel) {
+  const cv = PH[armSel]; const {g, w, h} = fit(cv, 0.72);
   const ml = 44, mr = 12, mt = 12, mb = 34; const pw = w - ml - mr, phh = h - mt - mb;
-  const pMin = -0.1, pMax = 1.3, vMax = 0.25;
+  const pMin = -0.1, pMax = 1.6, vMax = 0.4;
   const X = p => ml + (p - pMin)/(pMax - pMin)*pw, Y = v => mt + (vMax - v)/(2*vMax)*phh;
-  const so = W.omni.m[W.sel];
+  const so = W.omni.m[W.sel]; const omni = armSel === "omni";
   const key = w + "|" + h + "|" + so.law.kd.toFixed(3) + "|" + so.law.center + "|" + css.brass + css.steel;
-  if (key !== phKey) {   // the force field of the followed muscle's law, cached
+  if (omni && key !== phKey) {   // the force field of the followed muscle's law, cached
     phKey = key; const off = document.createElement("canvas"); off.width = Math.ceil(pw); off.height = Math.ceil(phh);
     const og = off.getContext("2d"); const img = og.createImageData(off.width, off.height);
     const pb = parseCol(css.brass), ps = parseCol(css.steel);
@@ -838,37 +875,40 @@ function drawPhase() {
     }
     og.putImageData(img, 0, 0); phField = off;
   }
-  g.clearRect(0, 0, w, h); g.drawImage(phField, ml, mt, pw, phh);
+  g.clearRect(0, 0, w, h);
+  if (omni) g.drawImage(phField, ml, mt, pw, phh);
+  else { g.fillStyle = alpha(css.warn, 0.10); g.fillRect(X(0.95), mt, X(1) - X(0.95), phh); g.fillStyle = alpha(css.bad, 0.10); g.fillRect(X(1), mt, X(pMax) - X(1), phh); }
   g.strokeStyle = css.rule; g.lineWidth = 1; g.strokeRect(ml, mt, pw, phh);
   g.strokeStyle = alpha(css.muted, 0.5); g.beginPath(); g.moveTo(ml, Y(0)); g.lineTo(ml + pw, Y(0)); g.stroke();
-  g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(so.law.center), mt); g.lineTo(X(so.law.center), mt + phh); g.stroke();
+  g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(0.5), mt); g.lineTo(X(0.5), mt + phh); g.stroke();
+  if (!omni) { g.strokeStyle = alpha(css.steel, 0.8); g.beginPath(); g.moveTo(X(0.625), mt); g.lineTo(X(0.625), mt + phh); g.stroke(); }
   g.strokeStyle = css.bad; g.beginPath(); g.moveTo(X(1), mt); g.lineTo(X(1), mt + phh); g.stroke();
   g.strokeStyle = css.warn; g.beginPath(); g.moveTo(X(0.95), mt); g.lineTo(X(0.95), mt + phh); g.stroke(); g.setLineDash([]);
   g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
-  for (const p of [0, 0.25, 0.5, 0.75, 1]) g.fillText(p.toFixed(2), X(p), mt + phh + 4);
+  for (const p of [0, 0.5, 1, 1.5]) g.fillText(p.toFixed(2), X(p), mt + phh + 4);
   g.fillText("position p in the band", ml + pw/2, mt + phh + 18);
   g.textAlign = "right"; g.textBaseline = "middle";
-  for (const v of [-0.2, -0.1, 0, 0.1, 0.2]) g.fillText(v.toFixed(1), ml - 6, Y(v));
+  for (const v of [-0.4, -0.2, 0, 0.2, 0.4]) g.fillText(v.toFixed(1), ml - 6, Y(v));
   g.save(); g.translate(11, mt + phh/2); g.rotate(-Math.PI/2); g.textAlign = "center"; g.fillText("speed v per decision", 0, 0); g.restore();
   g.textAlign = "left"; g.fillStyle = css.bad; g.fillText("the line", X(1) + 4, mt + 10);
-  const arm = W[W.show]; const col = W.show === "omni" ? css.brass : css.steel;
-  arm.m.forEach((s, i) => {
-    if (!s.trail) s.trail = []; s.trail.push([s.p, s.v]); if (s.trail.length > (i === W.sel ? 40 : 6)) s.trail.shift();
-  });
-  arm.m.forEach((s, i) => {
-    const sel = i === W.sel; g.strokeStyle = alpha(sel ? css.ink : col, sel ? 0.8 : 0.35); g.lineWidth = sel ? 1.5 : 1;
-    g.beginPath(); s.trail.forEach(([p, v], k) => { const x = X(clamp(p, pMin, pMax)), y = Y(clamp(v, -vMax, vMax)); k ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+  if (!omni) { g.fillStyle = css.steel; g.fillText("native's target 0.70", X(0.625) + 4, mt + 26); }
+  const arm = W[armSel]; const col = omni ? css.brass : css.steel;
+  arm.m.forEach((s, i) => { const hp = s.hp || [];
+    const sel = i === W.sel; g.strokeStyle = alpha(sel ? css.ink : col, sel ? 0.85 : 0.35); g.lineWidth = sel ? 1.6 : 1;
+    g.beginPath(); hp.forEach(([p, v], k) => { const x = X(clamp(p, pMin, pMax)), y = Y(clamp(v, -vMax, vMax)); k ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
     const x = X(clamp(s.p, pMin, pMax)), y = Y(clamp(s.v, -vMax, vMax));
     g.fillStyle = posColor(s.p); g.beginPath(); g.arc(x, y, sel ? 5 : 3.2, 0, Math.PI*2); g.fill();
     if (sel) { g.strokeStyle = css.ink; g.lineWidth = 1.5; g.stroke(); }
   });
+  const past = arm.m.filter(s => s.p >= 1).length;
+  g.textAlign = "left"; g.fillStyle = past ? css.bad : css.muted; g.font = `500 12px ${MONO}`; g.fillText(`${past} past the line now`, ml + 8, mt + phh - 12);
 }
 function parseCol(c) { if (c.startsWith("#")) { const n = parseInt(c.slice(1), 16); return [n>>16&255, n>>8&255, n&255]; } return [200,150,80]; }
 
 // ---- strip charts
 const stCv = document.getElementById("strip");
 function drawStrip() {
-  const {g, w, h} = fit(stCv, 0.72); g.clearRect(0, 0, w, h);
+  const {g, w, h} = fit(stCv, Math.min(0.72, 480/Math.max(stCv.clientWidth, 1))); g.clearRect(0, 0, w, h);
   const ml = 44, mr = 10; const panels = [
     {key: "cap", title: "capacity in service, and the demand", dem: true},
     {key: "over", title: "muscles past the line"},
@@ -1094,8 +1134,6 @@ const speedBtns = [...document.querySelectorAll("[data-speed]")];
 speedBtns.forEach(b => b.addEventListener("click", () => { W.speed = +b.dataset.speed; press(speedBtns, b); }));
 $("bPause").addEventListener("click", e => { W.paused = !W.paused; e.currentTarget.setAttribute("aria-pressed", W.paused); e.currentTarget.textContent = W.paused ? "Resume" : "Pause"; });
 $("bNew").addEventListener("click", () => { newDay(W.seed + 1); decide(); });
-$("showNative").addEventListener("click", () => { W.show = "nat"; press([$("showNative"), $("showOmni")], $("showNative")); });
-$("showOmni").addEventListener("click", () => { W.show = "omni"; press([$("showNative"), $("showOmni")], $("showOmni")); });
 function setDial(d) { W.dial = d; press([$("dMax"), $("dSave")], d === "max" ? $("dMax") : $("dSave")); newDay(W.seed); decide(); }
 $("dMax").addEventListener("click", () => setDial("max")); $("dSave").addEventListener("click", () => setDial("save"));
 const note = $("stressNote");
@@ -1125,7 +1163,7 @@ function frame(now) {
   W.frac = W.paused ? W.frac : clamp((now - lastDecide)/period, 0, 1);
   const phase = Math.min(6, Math.floor(W.frac*7));
   document.querySelectorAll("#cycle li").forEach(li => li.classList.toggle("act", W.speed <= 4 ? +li.dataset.i === phase : true));
-  drawRing(now, "nat"); drawRing(now, "omni"); drawSwarm(); drawBand(); drawPhase(); drawStrip(); drawBrain(); vTick(now); drawVerdict();
+  drawRing(now, "nat"); drawRing(now, "omni"); drawSwarm(); drawBand(); drawPhase("nat"); drawPhase("omni"); drawStrip(); drawBrain(); vTick(now); drawVerdict();
   requestAnimationFrame(frame);
 }
 buildOrgans(); vLabels(); newDay(W.seed);
