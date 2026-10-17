@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head><body>
+<title>Omni-Compass Live Engine</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Omni-Compass on top of native, running live: sixty muscles of a stacked organism, one brain, the compass law, the nerves and the verdict, animated decision by decision.">
+<!-- SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0 -->
+<!-- © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only. Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with LICENSE, NOTICE and DISCLOSURES.md. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: an engine bay. The organism ring is the hero; the decision cycle, the phase plane, the brain and the verdict follow in the order one decision runs. */
+:root{
+  --bg:#0e1316; --panel:#141b1f; --panel2:#1a2227; --ink:#e7e2d7; --muted:#8e9893; --rule:#27323a;
+  --brass:#d9a052; --brass-soft:rgba(217,160,82,.18); --steel:#86a3bb; --steel-soft:rgba(134,163,187,.18);
+  --ok:#62b98d; --warn:#e3b04b; --bad:#e2634f; --spine:#b99ac4;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f2f3f0; --panel:#ffffff; --panel2:#f7f8f6; --ink:#1c2328; --muted:#59646b; --rule:#d6dbd7;
+  --brass:#a3651a; --brass-soft:rgba(163,101,26,.14); --steel:#3d6585; --steel-soft:rgba(61,101,133,.14);
+  --ok:#2c8659; --warn:#a07410; --bad:#b63f2d; --spine:#7d5a8c; color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#f2f3f0; --panel:#ffffff; --panel2:#f7f8f6; --ink:#1c2328; --muted:#59646b; --rule:#d6dbd7;
+  --brass:#a3651a; --brass-soft:rgba(163,101,26,.14); --steel:#3d6585; --steel-soft:rgba(61,101,133,.14);
+  --ok:#2c8659; --warn:#a07410; --bad:#b63f2d; --spine:#7d5a8c; color-scheme:light}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.legal{font-size:12px;line-height:1.5;color:var(--muted);max-width:1280px;margin:0 auto}
+h1,h2{font-family:var(--f-display);font-weight:800;letter-spacing:.02em;text-transform:uppercase;text-wrap:balance;margin:0}
+h1{font-size:clamp(34px,5vw,58px);line-height:1}
+h2{font-size:26px;line-height:1.1}
+h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:600}
+p{margin:0}
+.lede{max-width:72ch;color:var(--muted)}
+.lede b{color:var(--ink);font-weight:600}
+code,.mono{font-family:var(--f-mono);font-size:.92em}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+section>.head{flex-direction:column;align-items:flex-start;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--f-mono);font-size:12px;border:1px solid var(--rule);border-radius:3px;padding:3px 8px;color:var(--muted)}
+.chip b{color:var(--ink);font-weight:500}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:16px;min-width:0}
+.grid-hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px}
+.grid-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:980px){.grid-hero,.grid-2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.grid-3{grid-template-columns:minmax(0,1fr)}}
+canvas{display:block;width:100%;max-width:100%}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--ink);background:var(--panel2);border:1px solid var(--rule);
+  border-radius:4px;padding:7px 12px;cursor:pointer;min-height:34px}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+button[aria-pressed="true"]{border-color:var(--brass);color:var(--brass);background:var(--brass-soft)}
+button.on-steel[aria-pressed="true"]{border-color:var(--steel);color:var(--steel);background:var(--steel-soft)}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--rule)}
+.seg button:last-child{border-right:0}
+.ctl-label{font-size:12px;color:var(--muted);min-width:76px}
+.clock{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.clock b{color:var(--ink);font-weight:500}
+/* the decision cycle */
+.cycle{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.cycle li{display:grid;grid-template-columns:22px 92px minmax(0,1fr);gap:8px;align-items:baseline;padding:5px 8px;border-radius:4px;border-left:2px solid transparent}
+.cycle li .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.cycle li .t{font-weight:600;font-size:13px}
+.cycle li .v{font-family:var(--f-mono);font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.cycle li.act{background:var(--brass-soft);border-left-color:var(--brass)}
+.cycle li.act .v{color:var(--ink)}
+/* the muscle card */
+.mcard .name{font-family:var(--f-mono);font-size:15px;font-weight:500}
+.mcard .sub{font-size:12px;color:var(--muted)}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kv div{background:var(--panel2);border:1px solid var(--rule);border-radius:4px;padding:6px 8px}
+.kv span{display:block;font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.kv b{font-family:var(--f-mono);font-weight:500;font-size:14px;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.legend i.sq{border-radius:2px}
+/* score table */
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 8px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.nat{color:var(--steel)} td.omni{color:var(--brass)}
+.word{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 6px;border-radius:3px;border:1px solid currentColor}
+.w-gain{color:var(--ok)} .w-even{color:var(--muted)} .w-loss{color:var(--bad)} .w-given{color:var(--brass)} .w-shown{color:var(--muted);border-color:transparent}
+.note{font-size:12px;color:var(--muted)}
+/* nerves */
+.meters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.meters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.meter span{display:block;font-size:12px;color:var(--muted)}
+.meter b{font-family:var(--f-mono);font-weight:500;font-size:15px}
+.bar{height:6px;background:var(--panel2);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-top:4px}
+.bar>i{display:block;height:100%;background:var(--ok);width:0;transition:width .25s}
+.organs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media (max-width:760px){.organs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.organ{border:1px solid var(--rule);border-radius:4px;padding:8px;background:var(--panel2)}
+.organ .on{font-family:var(--f-mono);font-size:13px}
+.organ .th{font-size:11px;color:var(--muted)}
+.lamps{display:flex;gap:10px;margin-top:6px;font-size:11px;color:var(--muted)}
+.lamp::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;background:var(--rule);vertical-align:0}
+.lamp.lit-ok::before{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.lamp.lit-bad::before{background:var(--bad)}
+/* parts */
+.parts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px}
+@media (max-width:760px){.parts{grid-template-columns:minmax(0,1fr)}}
+.parts li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px}
+.parts .k{font-family:var(--f-display);font-weight:800;font-size:22px;color:var(--brass);line-height:1.1}
+.parts p{font-size:14px;color:var(--muted)} .parts p b{color:var(--ink)}
+pre.math{font-family:var(--f-mono);font-size:12.5px;line-height:1.7;background:var(--panel2);border:1px solid var(--rule);border-radius:4px;padding:12px 14px;overflow-x:auto;margin:0;color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--brass)}
+.sl{display:grid;grid-template-columns:150px minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:13px}
+.sl output{font-family:var(--f-mono);text-align:right}
+@media (max-width:520px){.sl{grid-template-columns:minmax(0,1fr) 64px}.sl label{grid-column:1/-1}}
+.stamp{font-family:var(--f-display);font-weight:800;font-size:30px;letter-spacing:.04em}
+.tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:6px 8px;font-size:12px;font-family:var(--f-mono);white-space:nowrap;z-index:5}
+.ringbox{position:relative}
+.ringbox .overlay{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+@media (prefers-reduced-motion: reduce){.bar>i{transition:none}}
+</style>
+
+<p class="legal">© 2026 The Omni-Compass LLC. All rights reserved. <b>Evaluation and simulation use only.</b> Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with LICENSE, NOTICE and DISCLOSURES.md. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com</p>
+
+<div class="wrap">
+
+<header class="head">
+  <div class="stack" style="gap:8px">
+    <h1>Omni-Compass Live Engine</h1>
+    <p class="lede">Sixty muscles of a stacked organism, each under its own native controller, each answering on its own clock. One brain on top reads them through nine senses, runs <b>the six-state engine of omni-v7</b>, and writes back through the plug. <b>The distance of each muscle from the ring is its position in its compass band.</b> Scattered is fragmented; on the ring is one coherent state.</p>
+  </div>
+  <div class="chips">
+    <span class="chip">engine math <b>omni-v7</b></span>
+    <span class="chip">evidence <b>class S, modelled</b></span>
+    <span class="chip">arms <b>native · Omni-Compass on top</b></span>
+  </div>
+</header>
+
+<section class="grid-hero" aria-label="The organism, live">
+  <div class="panel ringbox">
+    <canvas id="ring" aria-label="The organism ring: the brain at the center, nine senses, the spine, and the four realms"></canvas>
+    <div class="overlay">
+      <div class="seg" role="group" aria-label="Arm shown">
+        <button id="showNative" class="on-steel" aria-pressed="false">Native</button>
+        <button id="showOmni" aria-pressed="true">Omni-Compass on top</button>
+      </div>
+    </div>
+    <div id="ringTip" class="tip" hidden></div>
+    <canvas id="swarm" style="margin-top:10px" aria-label="Each body part's muscles on the band, native above and Omni-Compass on top below"></canvas>
+    <div class="legend" style="margin-top:8px">
+      <span><i style="background:var(--ok)"></i>inside the compass</span>
+      <span><i style="background:var(--warn)"></i>in the 5% cushion</span>
+      <span><i style="background:var(--bad)"></i>past the line</span>
+      <span><i style="background:var(--steel)"></i>afferent: a reading in</span>
+      <span><i style="background:var(--brass)"></i>efferent: a write out</span>
+      <span>click a muscle to follow it</span>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="panel stack" style="gap:10px">
+      <div class="row" style="justify-content:space-between">
+        <h3>One decision, in the order the code runs it</h3>
+        <span class="clock">decision <b id="clkD">0</b> · <b id="clkT">00:00</b> of 6 h · <b id="clkMode">the max</b></span>
+      </div>
+      <ol class="cycle" id="cycle">
+        <li data-i="0"><span class="n">1</span><span class="t">Sense</span><span class="v" id="cy0">—</span></li>
+        <li data-i="1"><span class="n">2</span><span class="t">Assimilate</span><span class="v" id="cy1">—</span></li>
+        <li data-i="2"><span class="n">3</span><span class="t">Evolve</span><span class="v" id="cy2">—</span></li>
+        <li data-i="3"><span class="n">4</span><span class="t">Allocate</span><span class="v" id="cy3">—</span></li>
+        <li data-i="4"><span class="n">5</span><span class="t">Nerves</span><span class="v" id="cy4">—</span></li>
+        <li data-i="5"><span class="n">6</span><span class="t">Compass</span><span class="v" id="cy5">—</span></li>
+        <li data-i="6"><span class="n">7</span><span class="t">Plug</span><span class="v" id="cy6">—</span></li>
+      </ol>
+    </div>
+
+    <div class="panel stack" style="gap:10px">
+      <h3>Controls</h3>
+      <div class="row"><span class="ctl-label">Run</span>
+        <button id="bPause" aria-pressed="false">Pause</button>
+        <div class="seg" role="group" aria-label="Speed">
+          <button data-speed="1" aria-pressed="true">1×</button><button data-speed="4" aria-pressed="false">4×</button><button data-speed="16" aria-pressed="false">16×</button><button data-speed="60" aria-pressed="false">60×</button>
+        </div>
+        <button id="bNew">New day</button>
+      </div>
+      <div class="row"><span class="ctl-label">The dial</span>
+        <div class="seg" role="group" aria-label="The dial">
+          <button id="dMax" aria-pressed="true">The max</button><button id="dSave" aria-pressed="false">Tune-down</button>
+        </div>
+      </div>
+      <div class="row"><span class="ctl-label">Stress</span>
+        <button id="sSpike">Surge, compute realm</button>
+        <button id="sBlind">A sense goes blind</button>
+        <button id="sSec">Security hold</button>
+        <button id="sKill" aria-pressed="false">Kill switch</button>
+      </div>
+      <p class="note" id="dialExplain">The max: every muscle to its own limit, never below native; the capacity it holds is power given. Tune-down: never more than native, a step back only with the organ’s grant and the release gate; in this model native already sits near its band, so it finds little to hand back (about 0.1%).</p>
+      <p class="note" id="stressNote">Each stress lasts 40 decisions from the moment you press it. Both arms meet the same demand.</p>
+    </div>
+
+    <div class="panel mcard stack" style="gap:10px" id="mcard">
+      <div><div class="name" id="mName">—</div><div class="sub" id="mSub">—</div></div>
+      <canvas id="band" height="86" aria-label="The followed muscle's compass band"></canvas>
+      <div class="kv">
+        <div><span>force F</span><b id="mF">—</b></div>
+        <div><span>lever, native</span><b id="mLn" style="color:var(--steel)">—</b></div>
+        <div><span>lever, on top</span><b id="mLo" style="color:var(--brass)">—</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stack" aria-label="The compass plane and the two arms">
+  <div class="head"><h2>Every muscle on one plane</h2>
+    <p class="lede" style="max-width:62ch">Each dot is a muscle at its position p in its band and the speed v it is moving. The shading is the force the compass law would apply there: copper adds capacity, steel hands it back. Past the 0.95 wall the law fails up at once. Under Omni-Compass the dots are pulled to the center and stop there.</p></div>
+  <div class="grid-2">
+    <div class="panel stack" style="gap:8px">
+      <canvas id="phase" aria-label="Phase plane of the sixty muscles"></canvas>
+      <div class="legend"><span><i class="sq" style="background:var(--brass)"></i>F &gt; 0, add</span><span><i class="sq" style="background:var(--steel)"></i>F &lt; 0, hand back</span><span id="phaseNote">shading drawn for the followed muscle's τ</span></div>
+    </div>
+    <div class="panel stack" style="gap:8px">
+      <canvas id="strip" aria-label="Native against Omni-Compass on top, live strip charts"></canvas>
+      <div class="legend"><span><i style="background:var(--steel)"></i>native</span><span><i style="background:var(--brass)"></i>Omni-Compass on top</span><span><i class="sq" style="background:var(--muted)"></i>demand</span></div>
+    </div>
+  </div>
+  <div class="panel stack" style="gap:8px">
+    <div class="row" style="justify-content:space-between"><h3>Native against Omni-Compass on top, this day so far</h3><span class="note" id="dialNote">the max</span></div>
+    <div class="tbl-wrap"><table id="score"><thead><tr><th>Gauge</th><th>Native</th><th>Omni-Compass on top</th><th>Change</th><th>Reading</th></tr></thead><tbody></tbody></table></div>
+    <p class="note">One modelled day. Each row is read from the paired change, decision by decision, with its 95% interval: an interval that includes zero reads EVEN; clear of zero, the word follows the gauge’s aim (work served: a rise is GAIN; misses, failed work, waiting and spread: a fall is GAIN; capacity held: a rise is power given). Decisions are not independent, so these intervals run narrow. This is a picture of the mechanism, not a three-run reading and not a benchmark result.</p>
+  </div>
+</section>
+
+<section class="stack" aria-label="Inside the brain">
+  <div class="head"><h2>Inside the brain</h2>
+    <p class="lede" style="max-width:62ch">The same state the cycle panel prints, drawn as the physics it is. Each ball is a live value of the Omni-Compass arm, integrated by RK4 every decision.</p></div>
+  <div class="grid-3">
+    <div class="panel stack" style="gap:6px"><h3>U on the double well · eq. (2)</h3><canvas id="cvU" aria-label="Order parameter U on its double-well potential"></canvas><p class="note">V(U) = −μ(U²/2 − U⁴/4) + (Ė/E_max)·U. A rising E tilts the well toward the failed basin.</p></div>
+    <div class="panel stack" style="gap:6px"><h3>S in its potential Φ · eqs. (5)–(6)</h3><canvas id="cvS" aria-label="Stress S in its cubic potential"></canvas><p class="note">Φ(S) = α_s S²/2 + β_s S³/4 − δS. S rolls to S*; the senses pull it back each decision.</p></div>
+    <div class="panel stack" style="gap:6px"><h3>The bath B · eq. (7)</h3><canvas id="cvB" aria-label="The bath oscillator B over the last decisions"></canvas><p class="note">B̈ = γ_c δ S − (ω_B/Q_B) Ḃ − ω_B² B. The slow tide of physical load.</p></div>
+  </div>
+  <div class="panel stack">
+    <h3>The nerves: four scalars multiply into calm</h3>
+    <div class="meters">
+      <div class="meter"><span>κ convergence</span><b id="nK">—</b><div class="bar"><i id="nKb"></i></div></div>
+      <div class="meter"><span>h basin health</span><b id="nH">—</b><div class="bar"><i id="nHb"></i></div></div>
+      <div class="meter"><span>σ stress ratio S/S*</span><b id="nS">—</b><div class="bar"><i id="nSb"></i></div></div>
+      <div class="meter"><span>ν unmet need</span><b id="nN">—</b><div class="bar"><i id="nNb"></i></div></div>
+      <div class="meter"><span>calm</span><b id="nC">—</b><div class="bar"><i id="nCb"></i></div></div>
+    </div>
+    <div class="organs" id="organs"></div>
+    <p class="note">calm = κ·h·(1 − (σ − 1)⁺)·(1 − min(ν, 1)). An organ may hand capacity back only when calm ≥ its θ, the line is clean and every sense is live; expanding stays allowed except under a security hold. Under the max, lifting off toward native never needs this grant; going below native does.</p>
+  </div>
+</section>
+
+<section class="stack" aria-label="The verdict">
+  <div class="head"><h2>The verdict: do no harm, measured</h2>
+    <p class="lede" style="max-width:62ch">Before a knob moves one step past native, the step runs as a trial: costs at native first, then at the step. omni-v7 reads the change exactly as a report reads a row, on the log of each cost, with its 95% interval. Set what the step truly costs and watch the rule decide.</p></div>
+  <div class="grid-2">
+    <div class="panel stack">
+      <div class="sl"><label for="vCost">True cost of the step</label><input id="vCost" type="range" min="-6" max="8" step="0.5" value="3"><output id="vCostO">+3.0%</output></div>
+      <div class="sl"><label for="vTol">Allowance (tolerance)</label><input id="vTol" type="range" min="0.5" max="5" step="0.5" value="2"><output id="vTolO">2.0%</output></div>
+      <div class="sl"><label for="vSig">Noise σ of log cost</label><input id="vSig" type="range" min="0.05" max="0.5" step="0.05" value="0.25"><output id="vSigO">0.25</output></div>
+      <div class="row"><button id="vOne">Run one trial</button><button id="vMany">Run 300 trials</button></div>
+      <canvas id="cvV" aria-label="One trial: reference and trial costs, and the 95% interval of the change"></canvas>
+    </div>
+    <div class="panel stack">
+      <div class="row" style="justify-content:space-between;align-items:baseline"><h3>This trial</h3><span class="stamp" id="vStamp">—</span></div>
+      <p class="mono" id="vLine" style="font-size:13px">—</p>
+      <h3 style="margin-top:6px">Over many trials at this cost</h3>
+      <canvas id="cvV2" aria-label="Share of trials allowed, medians alone against the v7 rule"></canvas>
+      <p class="note">The medians alone allow a step when the trial's median is within the allowance of the reference's. omni-v7 also refuses any step whose interval sits wholly above zero, measures on while the interval is wider than the allowance (up to three times the minimum of 30), and keeps a step only if both estimates are inside the allowance. Ported from <code>omnicompass/verdict.py</code>; the costs are modelled (class S).</p>
+    </div>
+  </div>
+</section>
+
+<section class="stack" aria-label="The parts and the math">
+  <h2>The parts of the drawing, each a line of the code</h2>
+  <ol class="parts">
+    <li><span class="k">1</span><p><b>Senses.</b> The muscles' meters are read and normalised to nine observations: q, load, power, thermal, network, drift, stale, security, conflict. <code>adapter.observe_vector</code>. The inner arc of nine segments; steel particles run in along the wires.</p></li>
+    <li><span class="k">2</span><p><b>Assimilate.</b> An observed state is formed and the engine is pulled toward it, x ← (1 − a)x + a·x_obs, a = 0.339. <code>adapter.assimilate</code>.</p></li>
+    <li><span class="k">3</span><p><b>Evolve.</b> Equations (1) to (7), RK4, ten micro steps of 0.01, the controller evaluated, not applied (u = 0). <code>core.macro_step</code>. The six spokes at the center are E, U, I_U, S, B, Ḃ.</p></li>
+    <li><span class="k">4</span><p><b>Allocate.</b> push = clip(−f_U + 12(1 − U), ±25)/25 and ρ* = clamp(ρ₀ − k_I I_U − k_E E, ρ_min, ρ₀). <code>adapter.Governor.step</code>.</p></li>
+    <li><span class="k">5</span><p><b>Nerves.</b> κ, h, σ, ν into calm; calm against each organ's θ grants contraction. <code>nervous_system.scalars, authority</code>.</p></li>
+    <li><span class="k">6</span><p><b>Compass.</b> Each muscle's reading is placed in its band, p = (r − lo)/(hi − lo), and the force is F = A·tanh((k_p(p − ½) + k_d v)/A), failing up past 0.95, never handing back while it climbs above the center; k_d set for critical damping from the muscle's own τ. <code>compass_law.CompassLaw</code>.</p></li>
+    <li><span class="k">7</span><p><b>Plug.</b> One wire in, one wire out: each write is clipped to the cover, read back, and the snapshot taken once at the start is what reset restores. The kill switch hands every lever to native at once. <code>compass_law.Plug</code>, <code>master.py</code>.</p></li>
+    <li><span class="k">8</span><p><b>The verdict.</b> No step past native is kept unless its trial reads no LOSS and its cost sits inside the allowance. <code>verdict.Verdict</code>, <code>judge="interval"</code>.</p></li>
+  </ol>
+  <pre class="math">x_obs   E = 0.25q + 0.18(load − 0.85)⁺ + 0.16 power + 0.13 thermal + 0.10 net + 0.08 drift + 0.06 conflict + 0.04 stale
+        U = 1 − (0.27q + 0.18 power + 0.16 thermal + 0.12 net + 0.12 drift + 0.10 conflict + 0.05 stale)
+x ← (1 − a)·x + a·x_obs,   a = 0.339
+(1) dE/dt  = −α_E E + β_int + β_ext + v_eff                (4) v_eff = cos(ω_B t/2)·c·tanh(λ₀ + λ₁(U − ½) + λ₂S)
+(2) dU/dt  = μU(1 − U²) − (dE/dt)/E_max − λ_U U + u          (3) dI_U/dt = (1 − U) − σ₁E − δS − λ_I I_U
+(6) dS/dt  = δ − α_s S − ¾β_s S²                             (7) dḂ/dt = γ_c δS − (ω_B/Q_B)Ḃ − ω_B² B
+push = clip(−f_U + 12(1 − U), −25, 25)/25                  ρ* = clamp(ρ₀ − k_I I_U − k_E E, ρ_min, ρ₀)
+κ = 1 if push ≤ push_release else push_release/push        h = clamp((U − U_gate)/(1 − U_gate), 0, 1)
+σ = S/S*,  S* the positive root of (6)                      ν = max(0, I_U)
+calm = κ·h·(1 − (σ − 1)⁺)·(1 − min(ν, 1))                   contract if calm ≥ θ_organ, the line clean, every sense live
+p = (r − lo)/(hi − lo),  v = s·v + (1 − s)(p − p₋)/dt
+F = A                         if p ≥ 0.95
+F = A·tanh((k_p(p − ½) + k_d v)/A),  k_d = max(0, 2√(k_p τ/dt) − 1)·dt
+verdict: d = mean ln c_trial − mean ln c_ref ± 1.96·√(s²_ref/n_ref + s²_trial/n_trial),  τ = ln(1 + tolerance)
+α_E 3.487 · μ 3.782 · E_max 2 · σ₁ 0.38 · δ 0.705 · λ_I 0.719 · α_s 0.12 · β_s 0.10 · ω_B 1 · Q_B 2.5 · λ₀ −0.40 · λ₁ 1.55 · λ₂ 1.15
+ρ₀ 0.914 · ρ_min 0.627 · k_I 0.252 · k_E 0.297 · push_release 0.005 · U_gate 0.481 · θ pods .5 nodes .7 cpufreq .3 gpu .3 power .3 routing .5</pre>
+  <div class="grid-2">
+    <div class="panel stack" style="gap:8px"><h3>What is the engine's code</h3><p class="note" style="font-size:14px">The six-state engine, its constants and RK4 integrator, the assimilation, push and ρ*, the four nerve scalars and the organ thresholds, the compass law and the v7 verdict are ported from <code>omnicompass/core.py</code>, <code>adapter.py</code>, <code>nervous_system.py</code>, <code>compass_law.py</code> and <code>verdict.py</code> at commit c8ba7775d.</p></div>
+    <div class="panel stack" style="gap:8px"><h3>What is modelled for this page</h3><p class="note" style="font-size:14px">The body is a drawing model, evidence class S. Sixty muscles named from the 1,107-muscle catalog (twelve each from the spine and the four realms), each a capacity lever with its own response time τ and sensing delay, under an HPA-style native controller (target 0.70, 10% tolerance, five-decision scale-down window). Demand climbs 1 2 3 2 3 4, surges, eases and idles over six hours, the same for both arms. The lever rules that turn F into a write are this page's, kept inside the doctrine: under the max never below native, lifting off hands back toward native, going below native only on the tune-down with the organ's grant.</p></div>
+  </div>
+</section>
+
+</div>
+
+<p class="legal" style="margin-top:28px">© 2026 The Omni-Compass LLC. All rights reserved. <b>Evaluation and simulation use only.</b> Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with LICENSE, NOTICE and DISCLOSURES.md. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com</p>
+
+<script>
+"use strict";
+// ============================================================== the engine (omnicompass/core.py, adapter.py)
+const PRM = {alpha_E:3.487, mu:3.782, E_max:2.0, lambda_U:0.0, sigma_1:0.38, delta:0.705, lambda_I:0.719,
+  alpha_s:0.12, beta_s:0.10, gamma_c:1.0, omega_B:1.0, Q_B:2.5, lambda_0:-0.40, lambda_1:1.55, lambda_2:1.15, c:1.0,
+  beta_int:0, beta_ext:0};
+const KP = 12.0, U_AUTH = 25.0, A_ASSIM = 0.339;
+const LAW = {rho0:0.914, rho_min:0.627, kI:0.252, kE:0.297, push_release:0.005, U_gate:0.481};
+const THETA = {pods:0.5, nodes:0.7, cpufreq:0.3, gpu:0.3, power:0.3, routing:0.5};
+const S_EQ = (-PRM.alpha_s + Math.sqrt(PRM.alpha_s**2 + 3*PRM.beta_s*PRM.delta)) / (1.5*PRM.beta_s);
+const clamp = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
+
+function deriv(x, p, t, u) {
+  const z = p.lambda_0 + p.lambda_1*(x[1]-0.5) + p.lambda_2*x[3];
+  const v = Math.cos(0.5*p.omega_B*t) * p.c * Math.tanh(z);
+  const dE = -p.alpha_E*x[0] + p.beta_int + p.beta_ext + v;
+  const dU = p.mu*x[1]*(1 - x[1]*x[1]) - dE/Math.max(p.E_max,1e-6) - p.lambda_U*x[1] + (u||0);
+  const dI = (1 - x[1]) - p.sigma_1*x[0] - p.delta*x[3] - p.lambda_I*x[2];
+  const dS = p.delta - p.alpha_s*x[3] - 0.75*p.beta_s*x[3]*x[3];
+  const dBd = p.gamma_c*p.delta*x[3] - (p.omega_B/p.Q_B)*x[5] - p.omega_B*p.omega_B*x[4];
+  return [dE, dU, dI, dS, x[5], dBd];
+}
+const axpy = (x, k, h) => x.map((v, i) => v + h*k[i]);
+function rk4(x, p, t, h) {
+  const k1 = deriv(x,p,t,0), k2 = deriv(axpy(x,k1,h/2),p,t+h/2,0), k3 = deriv(axpy(x,k2,h/2),p,t+h/2,0), k4 = deriv(axpy(x,k3,h),p,t+h,0);
+  return x.map((v,i) => v + h/6*(k1[i] + 2*k2[i] + 2*k3[i] + k4[i]));
+}
+function macroStep(x, p, t0) { let t = t0; for (let i = 0; i < 10; i++) { x = rk4(x, p, t, 0.01); t += 0.01; } return x; }
+
+class Brain {
+  constructor() { this.x = [0.12, 0.82, 0, 0, 0, 0]; this.p = {...PRM}; this.t = 0; this.last = null; }
+  step(obs) {
+    const o = {q:clamp(obs.q,0,2), load:clamp(obs.load,0,2), power:clamp(obs.power,0,1.5), thermal:clamp(obs.thermal,0,1.5),
+      network:clamp(obs.network,0,1.5), drift:clamp(obs.drift,0,1.5), stale:clamp(obs.stale,0,1), security:clamp(obs.security,0,1), conflict:0};
+    const x = this.x, p = this.p;
+    const e = clamp(0.25*o.q + 0.18*Math.max(0,o.load-0.85) + 0.16*o.power + 0.13*o.thermal + 0.10*o.network + 0.08*o.drift + 0.06*o.conflict + 0.04*o.stale, 0, 1.5);
+    const u = clamp(1 - (0.27*o.q + 0.18*o.power + 0.16*o.thermal + 0.12*o.network + 0.12*o.drift + 0.10*o.conflict + 0.05*o.stale), 0, 1);
+    const s = clamp(0.36*o.thermal + 0.28*o.power + 0.18*o.network + 0.10*o.security + 0.08*o.stale - 0.20*o.q, -1, 1);
+    const b = clamp(0.52*o.power + 0.26*o.thermal + 0.22*o.drift, -1, 1.5);
+    const i = clamp(o.q + o.drift + o.conflict, 0, 2);
+    p.beta_int = clamp(0.58*o.q + 0.42*Math.max(0,o.load-0.75), 0, 1);
+    p.beta_ext = clamp(0.33*o.power + 0.27*o.thermal + 0.20*o.network + 0.12*o.stale + 0.08*o.security, 0, 1);
+    const a = A_ASSIM, xobs = [e, u, i, s, b];
+    const xa = [(1-a)*x[0]+a*e, (1-a)*x[1]+a*u, (1-a)*x[2]+a*i, (1-a)*x[3]+a*s, (1-a)*x[4]+a*b, (1-a)*x[5]+a*(b-x[4])];
+    const xn = macroStep(xa, p, this.t);
+    this.x = xn; this.t += 0.1;
+    const drift = deriv(xn, p, this.t, 0)[1];
+    const push = clamp(-drift + KP*(1 - xn[1]), -U_AUTH, U_AUTH) / U_AUTH;
+    const rho = clamp(LAW.rho0 - LAW.kI*xn[2] - LAW.kE*xn[0], LAW.rho_min, LAW.rho0);
+    const kappa = push <= LAW.push_release ? 1 : LAW.push_release / Math.max(push, 1e-12);
+    const h = clamp((xn[1] - LAW.U_gate) / (1 - LAW.U_gate), 0, 1);
+    const sigma = xn[3] / S_EQ, nu = Math.max(0, xn[2]);
+    const calm = clamp(kappa*h*(1 - clamp(sigma-1,0,1))*(1 - clamp(nu,0,1)), 0, 1);
+    const sec = o.security > 0.5, seeing = o.stale <= 0;
+    const organs = {};
+    for (const k in THETA) organs[k] = {expand: !sec, contract: calm >= THETA[k] && obs.sloClean && seeing};
+    const dE = deriv(xn, p, this.t, 0)[0];
+    this.last = {o, xobs, xn, push, rho, kappa, h, sigma, nu, calm, organs, dE};
+    return this.last;
+  }
+}
+
+// ============================================================== the compass law (omnicompass/compass_law.py)
+class CompassLaw {
+  constructor(tau, dt = 1, center = 0.5, lo = 0.2, hi = 1.0) {
+    this.lo = lo; this.hi = hi; this.center = center; this.cushion = 0.05; this.dt = dt; this.kp = 1; this.A = 1; this.s = 0.5;
+    this.kd = Math.max(0, 2*Math.sqrt(this.kp*tau/dt) - 1) * dt; this.p = null; this.v = 0;
+  }
+  pos(r) { return (r - this.lo) / (this.hi - this.lo); }
+  sense(r) { const p = this.pos(r); if (this.p !== null) this.v = this.s*this.v + (1-this.s)*(p - this.p)/this.dt; this.p = p; return p; }
+  forceAt(p, v) {
+    if (p >= 1 - this.cushion) return this.A;
+    let f = this.A*Math.tanh((this.kp*(p - this.center) + this.kd*v)/this.A);
+    if (f < 0 && v > 0 && p > this.center) f = 0;
+    return f;
+  }
+  force(r) { const p = this.sense(r); return this.forceAt(p, this.v); }
+}
+
+// ============================================================== the body (modelled for this page, class S)
+const REALMS = [
+  {key:"spine", label:"THE SPINE", organ:"nodes", tau:2.5, delay:1, color:"--spine", muscles:[
+    ["pump_speed","Cooling, Chillers & Thermodynamics"],["pdb_policy","Kubernetes Workload Scaling"],["unhealthy_pod_eviction_policy","Kubernetes Workload Scaling"],
+    ["memory_high","Container Resources"],["cpu_idle_policy","Host CPU & Memory"],["node_selector","Kubernetes Placement & Scheduling"],
+    ["generator_dispatch","PDU, UPS & Electrical Distribution"],["cpu_quota","Container Resources"],["ear_cpu_frequency_policy","Host CPU & Memory"],
+    ["expire_after","Node Fleet & Karpenter-Class Control"],["memory_limit","Container Resources"],["transparent_hugepages","Host CPU & Memory"]]},
+  {key:"compute", label:"COMPUTE · AI · CLOUD", organ:"pods", tau:3, delay:1, muscles:[
+    ["model_replicas","AI Inference Serving"],["tls_session_cache","Skin: Perimeter & Admission"],["edge_dispatch","Cross-Cluster, Multi-Region & Edge"],
+    ["qubit_mapping","Quantum Computing Control Simulation"],["global_admission","Cross-Cluster, Multi-Region & Edge"],["retry_budget_window","Gut: Data-plane Intake & Waste"],
+    ["training_precision","AI Training"],["task_preemption","Distributed Cluster Managers"],["machine_remediation","OpenShift & Machine API"],
+    ["compute_comm_overlap","AI Training"],["memory_ballooning","Virtualization & Hypervisor"],["checkpoint_trigger","AI Training"]]},
+  {key:"physics", label:"PHYSICS · ROBOTICS · AUTONOMOUS", organ:"cpufreq", tau:1.5, delay:1, muscles:[
+    ["altitude_target","Aviation & Autonomous Flight"],["velocity_target","Aviation & Autonomous Flight"],["force_limit","Robotics Motion Control"],
+    ["px4_mpc_xy_vel_max","Aviation & Autonomous Flight"],["amr_fleet_active_robots","Robotics Fleet & Warehouse Automation"],["regen_drive_mode","Elevators & Vertical Transport"],
+    ["smart_charging_schedule","Automotive EV & Mobile Powertrain"],["ros2_executor_threads","Robotics Motion Control"],["motor_thermal_derate","Elevators & Vertical Transport"],
+    ["timetable_recovery_margin","Rail Traction & Train Control"],["horizontal_speed_limit","Aviation & Autonomous Flight"],["space_power_budget","Spacecraft & Flight Software"]]},
+  {key:"energy", label:"ENERGY · FACILITY · INDUSTRIAL", organ:"power", tau:6, delay:2, muscles:[
+    ["chromatography_flow_setpoint","Pharmaceutical & Food Manufacturing"],["boiler_steam_pressure_setpoint","Power Generation & Turbine Control"],["inverter_real_power","Grid Transmission & Distribution"],
+    ["storage_dispatch","Energy Storage & Microgrid"],["flotation_aeration_rate","Mining & Mineral Processing"],["mill_speed_target","Mining & Mineral Processing"],
+    ["heat_pump_staging","District Heating & Cooling"],["feeder_voltage_target","Grid Transmission & Distribution"],["controller_mode","Industrial PLC & Process Automation"],
+    ["energy_load_shed","Energy Storage & Microgrid"],["heater_outlet_temperature_setpoint","Oil & Gas Pipelines"],["reserve_dispatch_priority","Power Generation & Turbine Control"]]},
+  {key:"distribution", label:"DISTRIBUTION · SPECIALIZED", organ:"routing", tau:3, delay:2, muscles:[
+    ["lock_timeout","Database & Transactions"],["cache_compression","Cache & Memory Services"],["dispatch_priority","Workflow, Logistics & Fulfillment"],
+    ["shuffle_bandwidth","Data Analytics & ETL"],["broker_failover","Messaging & Streaming"],["service_timeout","Service Mesh & API Reliability"],
+    ["stage_parallelism","Data Analytics & ETL"],["inventory_allocation","Workflow, Logistics & Fulfillment"],["executor_size","Data Analytics & ETL"],
+    ["compensation_action","Workflow, Logistics & Fulfillment"],["gc_budget","Runtime & Application"],["shipment_batch","Workflow, Logistics & Fulfillment"]]},
+];
+const DAY = 360, NAT_TARGET = 0.70, NAT_TOL = 0.10, NAT_WINDOW = 5;
+
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gauss(rng) { let u = 0, v = 0; while (u === 0) u = rng(); while (v === 0) v = rng(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+function dayLevel(t) {   // the climb 1 2 3 2 3 4, a surge, an easing, a second climb, idle
+  const segs = [[0,1],[30,2],[60,3],[90,2],[120,3],[150,4],[180,6.2],[200,3],[240,4],[290,1],[360,1]];
+  for (let k = 0; k < segs.length-1; k++) {
+    const [t0, v0] = segs[k], [t1, v1] = segs[k+1];
+    if (t < t1) { const prev = k ? segs[k-1][1] : v0; const ramp = 6; return t - t0 < ramp ? prev + (v0 - prev)*(t - t0)/ramp : v0; }
+  }
+  return 1;
+}
+
+function makeMuscles(seed) {
+  const rng = mulberry32(seed); const ms = [];
+  REALMS.forEach((R, ri) => R.muscles.forEach(([name, family], j) => {
+    const w = 0.6 + 0.8*rng();
+    ms.push({id: ms.length, realm: ri, j, name, family, organ: R.organ,
+      tau: R.tau*(0.7 + 0.6*rng()), delay: R.delay + (rng() < 0.3 ? 1 : 0), w,
+      lag: Math.floor(rng()*8), per: 18 + rng()*40, ph: rng()*Math.PI*2, amp: 0.05 + 0.12*rng(), cmin: 0.35*w, cmax: 11*w});
+  }));
+  for (const m of ms) {   // the demand table, the same for both arms
+    m.d = new Float64Array(DAY + 1);
+    for (let t = 0; t <= DAY; t++) {
+      const base = dayLevel(Math.max(0, t - m.lag));
+      m.d[t] = Math.max(0, m.w*base*(1 + m.amp*Math.sin(2*Math.PI*t/m.per + m.ph))*(1 + 0.04*gauss(rng)));
+    }
+  }
+  return ms;
+}
+
+class Arm {
+  constructor(kind, muscles) {
+    this.kind = kind;
+    this.m = muscles.map(M => {
+      const c0 = M.d[0]/NAT_TARGET;
+      return {c: c0, L: c0, b: 0, hist: [], rq: [], law: new CompassLaw(M.tau), p: 0.5, v: 0, F: 0, Lnat: c0, snapshot: c0, written: false};
+    });
+    this.tot = {served: 0, over: 0, failed: 0, wait: 0, capT: 0, writes: 0, clipped: 0};
+    this.hist = {over: [], spread: [], cap: [], dem: [], served: [], failed: [], wait: []};
+    this.lastWrites = 0;
+  }
+}
+
+// ============================================================== the world
+const W = {seed: 20261017, t: 0, speed: 1, paused: false, dial: "max", show: "omni", sel: 13,
+  stress: {surge: -1, blind: -1, sec: -1}, killed: false, brainHist: [], phase: 0, frac: 0};
+
+function newDay(seed) {
+  W.seed = seed; W.t = 0; W.muscles = makeMuscles(seed);
+  W.nat = new Arm("native", W.muscles); W.omni = new Arm("omni", W.muscles);
+  W.brain = new Brain(); W.brainHist = []; W.stress = {surge: -1, blind: -1, sec: -1};
+  W.thermal = 0.2; W.particles = []; W.lastObs = null;
+  for (const a of [W.nat, W.omni]) a.m.forEach(s => { s.law.center = 0.5; });
+}
+
+const active = (k) => W.stress[k] >= 0 && W.t - W.stress[k] < 40;
+
+function demandAt(M, t) {
+  let d = M.d[Math.min(t, DAY)];
+  if (active("surge") && M.realm === 1) d *= 2.0;
+  return d;
+}
+
+function nativeDesired(M, s, robs) {
+  let des = s.c*robs/NAT_TARGET;
+  if (Math.abs(robs/NAT_TARGET - 1) <= NAT_TOL) des = s.L;
+  des = Math.min(des, 2*s.L);
+  s.hist.push(des); if (s.hist.length > NAT_WINDOW) s.hist.shift();
+  const stab = Math.max(...s.hist);
+  return clamp(des >= s.L ? des : Math.min(s.L, stab), M.cmin, M.cmax);
+}
+
+function stepArm(arm, brainOut) {
+  const t = W.t; let over = 0, cap = 0, dem = 0, writes = 0, ps = [], sv = 0, fl = 0, wt = 0;
+  arm.m.forEach((s, i) => {
+    const M = W.muscles[i]; const d = demandAt(M, t);
+    // the plant: capacity follows its lever with response τ, work is served up to capacity
+    s.c += (s.L - s.c)*(1 - Math.exp(-1/M.tau));
+    const want = d + s.b, served = Math.min(want, s.c);
+    s.b = want - served; const failed = 0.15*s.b; s.b -= failed;
+    const r = want/Math.max(s.c, 1e-9);
+    s.rq.push(r); if (s.rq.length > M.delay + 1) s.rq.shift();
+    const robs = s.rq[0];                                   // the same sensing delay in both arms
+    s.LnatPrev = s.Lnat;
+    const Lnat = nativeDesired(M, s, robs);
+    s.Lnat = Lnat;
+    const F = s.law.force(robs); s.F = F; s.p = s.law.p; s.v = s.law.v; s.rtrue = r;
+    let L = Lnat;
+    if (arm.kind === "omni" && !W.killed && brainOut) {
+      const org = brainOut.organs[M.organ];
+      if (W.dial === "max") {
+        let Lo = s.L;
+        if (F > 0 && org.expand) Lo = s.L*(1 + 0.30*F);                                // push: capacity added at once
+        else if (F < 0 && Lnat < s.L) Lo = s.L + (Lnat - s.L)*Math.min(1, 0.15 + 0.5*(-F));  // lift off: toward native
+        L = Math.max(Lo, Lnat);                                                         // the max: never below native
+        if (!org.expand) L = Math.min(L, Math.max(s.L, Lnat));                          // security hold: nothing added
+      } else {
+        // the tune-down: never more than native; a step back only with the organ's grant, native again on a breach
+        // the release gate (nervous_system.node_release_gate): nothing waiting, native not scaling up, and the
+        // muscle after the step at or under the engine's utilisation target ρ*
+        const Lstep = Math.max(0.85*Lnat, Math.min(s.L, Lnat)*(1 + 0.10*F));
+        s.calmRun = (s.b < 1e-6 && Lnat <= s.LnatPrev + 1e-9 && Math.abs(s.v) < 0.05) ? (s.calmRun || 0) + 1 : 0;   // dwell
+        const gate = s.calmRun >= 3 && robs*s.c/Lstep <= brainOut.rho;
+        if (F < 0 && org.contract && s.p < 0.40 && gate) L = Lstep;
+        else if (s.p < s.law.center && Lnat <= s.LnatPrev + 1e-9) L = Math.min(s.L, Lnat);   // hold what was handed back
+        else L = Lnat;                                                                        // native's own setting again
+        L = Math.min(L, Lnat);
+      }
+    }
+    const Lc = clamp(L, M.cmin, M.cmax);
+    if (arm.kind === "omni" && !W.killed) { if (Lc !== L) arm.tot.clipped++; }
+    if (Math.abs(Lc - s.L) > 0.02*s.L && arm.kind === "omni" && !W.killed && Math.abs(Lc - Lnat) > 0.02*Lnat) { writes++; s.written = true; } else s.written = false;
+    s.L = Lc;
+    arm.tot.served += served; arm.tot.failed += failed; arm.tot.wait += s.b; arm.tot.capT += s.c; sv += served; fl += failed; wt += s.b;
+    if (r > 1) over++;
+    cap += s.c; dem += d; ps.push(clamp(s.p, -0.2, 1.6));
+  });
+  const mean = ps.reduce((a, b) => a + b, 0)/ps.length;
+  const spread = Math.sqrt(ps.reduce((a, b) => a + (b - mean)**2, 0)/ps.length);
+  arm.tot.over += over; arm.tot.writes += writes; arm.lastWrites = writes;
+  arm.hist.over.push(over); arm.hist.served.push(sv); arm.hist.failed.push(fl); arm.hist.wait.push(wt); arm.hist.spread.push(spread); arm.hist.cap.push(cap); arm.hist.dem.push(dem);
+  arm.lastOver = over;
+}
+
+function senseOmni() {
+  const a = W.omni; let sc = 0, scmax = 0, sb = 0, ld = 0, dr = 0;
+  a.m.forEach((s, i) => { const M = W.muscles[i]; sc += s.c; scmax += M.cmax; sb += s.b; ld += Math.min(2, s.rq[s.rq.length-1] || 0.6); dr += Math.abs(s.L - s.c)/Math.max(s.c, 1e-9); });
+  const n = a.m.length; const power = clamp((sc/scmax - 0.08)/0.6, 0, 1.5);
+  W.thermal += (power - W.thermal)*0.08;
+  return {q: sb/sc, load: ld/n, power, thermal: W.thermal, network: 0.08 + 0.04*Math.sin(W.t/23), drift: clamp(dr/n, 0, 1.5),
+    stale: active("blind") ? 1 : 0, security: active("sec") ? 1 : 0, sloClean: (a.lastOver || 0) === 0};
+}
+
+function decide() {
+  if (W.t >= DAY) { newDay(W.seed + 1); return; }
+  const obs = senseOmni(); W.lastObs = obs;
+  const bo = W.brain.step(obs);
+  W.brainHist.push({E: bo.xn[0], U: bo.xn[1], I: bo.xn[2], S: bo.xn[3], B: bo.xn[4], calm: bo.calm});
+  stepArm(W.nat, null); stepArm(W.omni, bo);
+  W.t++;
+  spawnParticles();
+  updateText();
+}
+
+// ============================================================== drawing
+const css = {};
+function readTokens() { const cs = getComputedStyle(document.documentElement);
+  for (const k of ["bg","panel","panel2","ink","muted","rule","brass","brass-soft","steel","steel-soft","ok","warn","bad","spine"]) css[k] = cs.getPropertyValue("--"+k).trim(); }
+readTokens();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readTokens);
+new MutationObserver(readTokens).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function fit(cv, aspect) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1); const w = cv.clientWidth; const h = Math.round(w*aspect);
+  if (cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)) { cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr); cv.style.height = h + "px"; }
+  const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); return {g, w, h};
+}
+function alpha(col, a) {
+  if (col.startsWith("#")) { const n = parseInt(col.slice(1), 16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
+  return col;
+}
+const posColor = (p) => p >= 1 ? css.bad : (p >= 0.95 || p <= 0.05) ? css.warn : css.ok;
+const MONO = '"IBM Plex Mono", ui-monospace, monospace';
+
+// ---- the ring geometry
+const ringCv = document.getElementById("ring");
+let geo = null;
+function ringGeo(w) {
+  const cx = w/2, cy = w/2, R = w/2;
+  const r0 = R*0.16, r1 = R*0.27, r2 = R*0.48, r3 = R*0.78, spread = R*0.22;
+  const nodes = W.muscles.map(M => {
+    let ang, base;
+    if (M.realm === 0) { ang = -Math.PI/2 + (M.j + 0.5)*2*Math.PI/12; base = r2; }
+    else { const q = M.realm - 1; const a0 = -Math.PI/2 + q*Math.PI/2 + 0.12, a1 = a0 + Math.PI/2 - 0.24; ang = a0 + (M.j + 0.5)*(a1 - a0)/12; base = r3; }
+    return {ang, base};
+  });
+  return {cx, cy, R, r0, r1, r2, r3, spread, nodes};
+}
+function nodeXY(i, armSel) {
+  const n = geo.nodes[i]; const s = W[armSel].m[i];
+  const off = clamp(s.p - 0.5, -0.6, 0.9)*geo.spread;
+  const rr = n.base + off; return [geo.cx + rr*Math.cos(n.ang), geo.cy + rr*Math.sin(n.ang), rr];
+}
+const SENSES = ["q","load","power","thermal","network","drift","stale","security","conflict"];
+const SENSE_LABEL = ["q","load","power","heat","net","drift","stale","sec","conf"];
+
+function spawnParticles() {
+  if (reduceMotion || W.speed > 4 || !geo) return;
+  const life = 900/W.speed;
+  W.muscles.forEach((M, i) => { if (Math.random() < (W.speed === 1 ? 0.6 : 0.25)) W.particles.push({i, kind: "in", t0: performance.now(), life: life*0.42}); });
+  const arm = W.omni;
+  arm.m.forEach((s, i) => { if (s.written) W.particles.push({i, kind: "out", t0: performance.now() + life*0.62, life: life*0.36}); });
+}
+
+function drawRing(now) {
+  const {g, w, h} = fit(ringCv, 1);
+  geo = ringGeo(w); const {cx, cy, R, r0, r1, r2, r3, spread} = geo;
+  g.clearRect(0, 0, w, h);
+  const armSel = W.show; const arm = W[armSel];
+  // the band rings: the center (p = 0.5), the cushion and the line (p = 1)
+  for (const base of [r2, r3]) {
+    g.beginPath(); g.arc(cx, cy, base + 0.45*spread, 0, Math.PI*2); g.arc(cx, cy, base + 0.5*spread, 0, Math.PI*2, true);
+    g.fillStyle = alpha(css.warn, 0.18); g.fill();
+    g.beginPath(); g.arc(cx, cy, base - 0.45*spread, 0, Math.PI*2); g.arc(cx, cy, base - 0.5*spread, 0, Math.PI*2, true); g.fill();
+    g.setLineDash([2, 4]); g.strokeStyle = alpha(css.bad, 0.7); g.lineWidth = 1;
+    g.beginPath(); g.arc(cx, cy, base + 0.5*spread, 0, Math.PI*2); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = css.rule; g.lineWidth = 1.2; g.beginPath(); g.arc(cx, cy, base, 0, Math.PI*2); g.stroke();
+  }
+  // realm labels
+  g.font = `600 ${Math.max(9, R*0.034)}px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "middle";
+  REALMS.slice(1).forEach((Rm, q) => { const a = -Math.PI/2 + q*Math.PI/2 + Math.PI/4; const rr = R*0.97;
+    g.save(); g.translate(cx + rr*Math.cos(a)*0.93, cy + rr*Math.sin(a)*0.93); g.fillText(Rm.label.split(" · ")[0], 0, 0); g.restore(); });
+  g.fillStyle = css.spine; g.fillText("THE SPINE", cx, cy - r2 - 0.62*spread - 4);
+  // wires
+  g.lineWidth = 0.6;
+  W.muscles.forEach((M, i) => { const [x, y] = nodeXY(i, armSel); const a = geo.nodes[i].ang;
+    g.strokeStyle = alpha(css.muted, 0.18); g.beginPath(); g.moveTo(x, y); g.lineTo(cx + r1*Math.cos(a), cy + r1*Math.sin(a)); g.stroke(); });
+  // the nine senses
+  const o = W.brain.last ? W.brain.last.o : null;
+  SENSES.forEach((k, j) => {
+    const a0 = -Math.PI/2 + j*2*Math.PI/9 + 0.04, a1 = a0 + 2*Math.PI/9 - 0.08;
+    const v = o ? clamp(o[k], 0, 1) : 0; const blind = k === "stale" && v > 0;
+    g.lineWidth = R*0.05; g.strokeStyle = css.panel2; g.beginPath(); g.arc(cx, cy, r1, a0, a1); g.stroke();
+    g.strokeStyle = blind ? css.bad : alpha(css.steel, 0.35 + 0.65*v); g.beginPath(); g.arc(cx, cy, r1, a0, a0 + (a1 - a0)*Math.max(0.04, v)); g.stroke();
+    const am = (a0 + a1)/2; g.font = `${Math.max(8, R*0.028)}px ${MONO}`; g.fillStyle = css.muted;
+    g.fillText(SENSE_LABEL[j], cx + (r1 + R*0.055)*Math.cos(am), cy + (r1 + R*0.055)*Math.sin(am));
+  });
+  // the brain: six spokes, E U I S B Ḃ, and the compass needle (mean force of the body)
+  const L = W.brain.last;
+  g.beginPath(); g.arc(cx, cy, r0, 0, Math.PI*2); g.fillStyle = css.panel2; g.fill(); g.strokeStyle = css.rule; g.lineWidth = 1; g.stroke();
+  const names = ["E","U","I","S","B","Ḃ"];
+  const vals = L ? [L.xn[0]/1.0, L.xn[1], L.xn[2]/1.0, (L.xn[3]+1)/2, (L.xn[4]+0.5)/1.5, (L.xn[5]+0.5)] : [0,0,0,0,0,0];
+  for (let k = 0; k < 6; k++) { const a = -Math.PI/2 + k*Math.PI/3; const len = r0*0.9*clamp(vals[k], 0.05, 1);
+    g.strokeStyle = k === 1 ? css.ok : css.brass; g.lineWidth = 3; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + len*Math.cos(a), cy + len*Math.sin(a)); g.stroke();
+    g.fillStyle = css.muted; g.font = `${Math.max(9, R*0.032)}px ${MONO}`; g.fillText(names[k], cx + r0*1.16*Math.cos(a), cy + r0*1.16*Math.sin(a)); }
+  g.font = `500 ${Math.max(10, R*0.038)}px ${MONO}`; const ct = L ? "calm " + L.calm.toFixed(2) : "calm —"; const tw = g.measureText(ct).width + 12;
+  g.fillStyle = css.panel; g.fillRect(cx - tw/2, cy + r0*0.38 - 9, tw, 18); g.fillStyle = css.ink; g.fillText(ct, cx, cy + r0*0.38);
+  if (W.killed) { g.fillStyle = css.bad; g.fillText("KILLED", cx, cy - r0*0.42); }
+  // particles
+  const T = now;
+  W.particles = W.particles.filter(pt => T - pt.t0 < pt.life);
+  for (const pt of W.particles) { const u = (T - pt.t0)/pt.life; if (u < 0) continue;
+    const [x, y] = nodeXY(pt.i, "omni"); const a = geo.nodes[pt.i].ang;
+    const x1 = cx + r0*Math.cos(a), y1 = cy + r0*Math.sin(a);
+    const e = u*u*(3 - 2*u); let px, py;
+    if (pt.kind === "in") { px = x + (x1 - x)*e; py = y + (y1 - y)*e; g.fillStyle = css.steel; }
+    else { px = x1 + (x - x1)*e; py = y1 + (y - y1)*e; g.fillStyle = css.brass; }
+    g.beginPath(); g.arc(px, py, pt.kind === "in" ? 1.8 : 2.6, 0, Math.PI*2); g.fill(); }
+  // the muscles
+  W.muscles.forEach((M, i) => { const [x, y] = nodeXY(i, armSel); const s = arm.m[i];
+    const rad = Math.max(4, R*0.022);
+    if (i === W.sel) { g.strokeStyle = css.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(x, y, rad + 4, 0, Math.PI*2); g.stroke(); }
+    if (armSel === "omni" && s.written) { g.strokeStyle = css.brass; g.lineWidth = 2; g.beginPath(); g.arc(x, y, rad + 2, 0, Math.PI*2); g.stroke(); }
+    g.fillStyle = posColor(s.p); g.beginPath(); g.arc(x, y, rad, 0, Math.PI*2); g.fill();
+    if (M.realm === 0) { g.strokeStyle = css.spine; g.lineWidth = 1.2; g.stroke(); }
+  });
+  // arm caption
+  g.textAlign = "right"; g.fillStyle = armSel === "omni" ? css.brass : css.steel; g.font = `600 ${Math.max(10, R*0.036)}px ${MONO}`;
+  g.fillText(armSel === "omni" ? "OMNI-COMPASS ON TOP" : "NATIVE ALONE", w - 10, h - 30);
+  g.fillStyle = css.muted; g.font = `${Math.max(9, R*0.03)}px ${MONO}`;
+  const sp = arm.hist.spread.length ? arm.hist.spread[arm.hist.spread.length-1] : 0;
+  g.fillText(`spread of positions ${sp.toFixed(3)} · past the line ${arm.lastOver || 0}`, w - 10, h - 12);
+}
+
+
+// ---- the body parts on one band: native above, Omni-Compass on top below
+function drawSwarm() {
+  const cv = document.getElementById("swarm"); const {g, w, h} = fit(cv, 0.42); g.clearRect(0, 0, w, h);
+  const ml = 92, mr = 10, mt = 16, rowH = (h - mt - 20)/5; const X = p => ml + (clamp(p, -0.1, 1.3) + 0.1)/1.4*(w - ml - mr);
+  g.font = `11px ${MONO}`; g.textBaseline = "middle";
+  g.fillStyle = alpha(css.warn, 0.14); g.fillRect(X(0.95), mt, X(1) - X(0.95), rowH*5); g.fillRect(X(0), mt, X(0.05) - X(0), rowH*5);
+  g.fillStyle = alpha(css.bad, 0.10); g.fillRect(X(1), mt, X(1.3) - X(1), rowH*5);
+  g.strokeStyle = css.bad; g.setLineDash([2, 3]); g.beginPath(); g.moveTo(X(1), mt); g.lineTo(X(1), mt + rowH*5); g.stroke();
+  g.strokeStyle = css.muted; g.beginPath(); g.moveTo(X(0.5), mt); g.lineTo(X(0.5), mt + rowH*5); g.stroke(); g.setLineDash([]);
+  g.textAlign = "center"; g.fillStyle = css.muted; g.fillText("0", X(0), 7); g.fillText("center 0.5", X(0.5), 7); g.fillText("the line", X(1), 7);
+  REALMS.forEach((Rm, k) => { const y0 = mt + k*rowH; g.textAlign = "left"; g.fillStyle = k === 0 ? css.spine : css.muted;
+    g.fillText(Rm.label.split(" · ")[0].replace("THE ", ""), 0, y0 + rowH/2);
+    g.strokeStyle = css.rule; g.beginPath(); g.moveTo(ml, y0 + rowH); g.lineTo(w - mr, y0 + rowH); g.stroke();
+    W.muscles.forEach((M, i) => { if (M.realm !== k) return;
+      for (const [arm, col, dy] of [[W.nat, css.steel, 0.3], [W.omni, css.brass, 0.7]]) { const s = arm.m[i];
+        g.fillStyle = alpha(col, 0.85); g.beginPath(); g.arc(X(s.p), y0 + rowH*dy + ((M.j % 3) - 1)*2, 3, 0, Math.PI*2); g.fill(); } }); });
+  g.textAlign = "right"; g.fillStyle = css.muted; g.fillText("each row: native above (steel), Omni-Compass on top below (brass)", w - mr, h - 7);
+}
+
+// ---- the followed muscle's band
+function drawBand() {
+  const cv = document.getElementById("band"); const {g, w} = fit(cv, 86/Math.max(cv.clientWidth, 1)); const h = 86;
+  g.clearRect(0, 0, w, h);
+  const x0 = 12, x1 = w - 12, P = (p) => x0 + (x1 - x0)*clamp(p, -0.1, 1.3)/1.3 + (x1 - x0)*0.1/1.3*0;
+  const X = (p) => x0 + (x1 - x0)*(clamp(p, -0.15, 1.3) + 0.15)/1.45;
+  const yb = 36;
+  g.fillStyle = css.panel2; g.fillRect(X(0), yb - 9, X(1) - X(0), 18);
+  g.fillStyle = alpha(css.warn, 0.28); g.fillRect(X(0), yb - 9, X(0.05) - X(0), 18); g.fillRect(X(0.95), yb - 9, X(1) - X(0.95), 18);
+  g.fillStyle = alpha(css.bad, 0.18); g.fillRect(X(1), yb - 9, X(1.3) - X(1), 18);
+  g.strokeStyle = css.bad; g.lineWidth = 1.5; g.beginPath(); g.moveTo(X(1), yb - 14); g.lineTo(X(1), yb + 14); g.stroke();
+  const c = W.omni.m[W.sel].law.center;
+  g.strokeStyle = css.muted; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(c), yb - 12); g.lineTo(X(c), yb + 12); g.stroke(); g.setLineDash([]);
+  g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
+  [[0,"0 calm"],[c,"center"],[0.95,"0.95"],[1,"1 the line"]].forEach(([p, t]) => g.fillText(t, X(p), yb + 16));
+  const sn = W.nat.m[W.sel], so = W.omni.m[W.sel];
+  g.fillStyle = css.steel; g.beginPath(); g.arc(X(sn.p), yb - 3, 6, 0, Math.PI*2); g.fill();
+  g.fillStyle = css.brass; g.beginPath(); g.arc(X(so.p), yb + 3, 6, 0, Math.PI*2); g.fill();
+  // force arrow of the omni arm
+  const F = so.F; const len = F*(x1 - x0)*0.18;
+  if (Math.abs(len) > 1) { g.strokeStyle = F > 0 ? css.brass : css.steel; g.lineWidth = 2.5; const yy = 10;
+    g.beginPath(); g.moveTo(X(so.p), yy); g.lineTo(X(so.p) - len, yy); g.stroke();
+    g.beginPath(); const tx = X(so.p) - len, dir = len > 0 ? 1 : -1; g.moveTo(tx, yy); g.lineTo(tx + 6*dir, yy - 4); g.lineTo(tx + 6*dir, yy + 4); g.closePath(); g.fillStyle = g.strokeStyle; g.fill(); }
+}
+
+// ---- the phase plane
+const phCv = document.getElementById("phase"); let phField = null, phKey = "";
+function drawPhase() {
+  const {g, w, h} = fit(phCv, 0.72);
+  const ml = 44, mr = 12, mt = 12, mb = 34; const pw = w - ml - mr, phh = h - mt - mb;
+  const pMin = -0.1, pMax = 1.3, vMax = 0.25;
+  const X = p => ml + (p - pMin)/(pMax - pMin)*pw, Y = v => mt + (vMax - v)/(2*vMax)*phh;
+  const so = W.omni.m[W.sel];
+  const key = w + "|" + h + "|" + so.law.kd.toFixed(3) + "|" + so.law.center + "|" + css.brass + css.steel;
+  if (key !== phKey) {   // the force field of the followed muscle's law, cached
+    phKey = key; const off = document.createElement("canvas"); off.width = Math.ceil(pw); off.height = Math.ceil(phh);
+    const og = off.getContext("2d"); const img = og.createImageData(off.width, off.height);
+    const pb = parseCol(css.brass), ps = parseCol(css.steel);
+    for (let yy = 0; yy < off.height; yy++) for (let xx = 0; xx < off.width; xx++) {
+      const p = pMin + xx/off.width*(pMax - pMin), v = vMax - yy/off.height*2*vMax; const F = so.law.forceAt(p, v);
+      const col = F >= 0 ? pb : ps; const a = Math.min(1, Math.abs(F))*0.55; const k = (yy*off.width + xx)*4;
+      img.data[k] = col[0]; img.data[k+1] = col[1]; img.data[k+2] = col[2]; img.data[k+3] = Math.round(a*255);
+    }
+    og.putImageData(img, 0, 0); phField = off;
+  }
+  g.clearRect(0, 0, w, h); g.drawImage(phField, ml, mt, pw, phh);
+  g.strokeStyle = css.rule; g.lineWidth = 1; g.strokeRect(ml, mt, pw, phh);
+  g.strokeStyle = alpha(css.muted, 0.5); g.beginPath(); g.moveTo(ml, Y(0)); g.lineTo(ml + pw, Y(0)); g.stroke();
+  g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(so.law.center), mt); g.lineTo(X(so.law.center), mt + phh); g.stroke();
+  g.strokeStyle = css.bad; g.beginPath(); g.moveTo(X(1), mt); g.lineTo(X(1), mt + phh); g.stroke();
+  g.strokeStyle = css.warn; g.beginPath(); g.moveTo(X(0.95), mt); g.lineTo(X(0.95), mt + phh); g.stroke(); g.setLineDash([]);
+  g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
+  for (const p of [0, 0.25, 0.5, 0.75, 1]) g.fillText(p.toFixed(2), X(p), mt + phh + 4);
+  g.fillText("position p in the band", ml + pw/2, mt + phh + 18);
+  g.textAlign = "right"; g.textBaseline = "middle";
+  for (const v of [-0.2, -0.1, 0, 0.1, 0.2]) g.fillText(v.toFixed(1), ml - 6, Y(v));
+  g.save(); g.translate(11, mt + phh/2); g.rotate(-Math.PI/2); g.textAlign = "center"; g.fillText("speed v per decision", 0, 0); g.restore();
+  g.textAlign = "left"; g.fillStyle = css.bad; g.fillText("the line", X(1) + 4, mt + 10);
+  const arm = W[W.show]; const col = W.show === "omni" ? css.brass : css.steel;
+  arm.m.forEach((s, i) => {
+    if (!s.trail) s.trail = []; s.trail.push([s.p, s.v]); if (s.trail.length > (i === W.sel ? 40 : 6)) s.trail.shift();
+  });
+  arm.m.forEach((s, i) => {
+    const sel = i === W.sel; g.strokeStyle = alpha(sel ? css.ink : col, sel ? 0.8 : 0.35); g.lineWidth = sel ? 1.5 : 1;
+    g.beginPath(); s.trail.forEach(([p, v], k) => { const x = X(clamp(p, pMin, pMax)), y = Y(clamp(v, -vMax, vMax)); k ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+    const x = X(clamp(s.p, pMin, pMax)), y = Y(clamp(s.v, -vMax, vMax));
+    g.fillStyle = posColor(s.p); g.beginPath(); g.arc(x, y, sel ? 5 : 3.2, 0, Math.PI*2); g.fill();
+    if (sel) { g.strokeStyle = css.ink; g.lineWidth = 1.5; g.stroke(); }
+  });
+}
+function parseCol(c) { if (c.startsWith("#")) { const n = parseInt(c.slice(1), 16); return [n>>16&255, n>>8&255, n&255]; } return [200,150,80]; }
+
+// ---- strip charts
+const stCv = document.getElementById("strip");
+function drawStrip() {
+  const {g, w, h} = fit(stCv, 0.72); g.clearRect(0, 0, w, h);
+  const ml = 44, mr = 10; const panels = [
+    {key: "cap", title: "capacity in service, and the demand", dem: true},
+    {key: "over", title: "muscles past the line"},
+    {key: "spread", title: "spread of positions (fragmentation)"}];
+  const ph = (h - 30)/3;
+  panels.forEach((P, k) => {
+    const top = 6 + k*ph, bot = top + ph - 18, x0 = ml, x1 = w - mr;
+    let mx = 0; for (const a of [W.nat, W.omni]) for (const v of a.hist[P.key]) mx = Math.max(mx, v);
+    if (P.dem) for (const v of W.nat.hist.dem) mx = Math.max(mx, v);
+    mx = mx > 0 ? mx*1.1 : 1;
+    const X = t => x0 + t/DAY*(x1 - x0), Y = v => bot - v/mx*(bot - top - 12);
+    g.fillStyle = css.muted; g.font = `11px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(P.title, x0, top);
+    g.strokeStyle = css.rule; g.lineWidth = 1; g.beginPath(); g.moveTo(x0, bot); g.lineTo(x1, bot); g.stroke();
+    g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(fmtAxis(mx/1.1), x0 - 6, Y(mx/1.1)); g.fillText("0", x0 - 6, bot);
+    // stress windows
+    for (const [sk, sc] of [["surge", css.warn], ["blind", css.muted], ["sec", css.bad]]) if (W.stress[sk] >= 0) {
+      g.fillStyle = alpha(sc, 0.12); g.fillRect(X(W.stress[sk]), top + 12, X(Math.min(DAY, W.stress[sk] + 40)) - X(W.stress[sk]), bot - top - 12); }
+    if (P.dem) { const d = W.nat.hist.dem; g.fillStyle = alpha(css.muted, 0.18); g.beginPath(); g.moveTo(X(0), bot);
+      d.forEach((v, t) => g.lineTo(X(t), Y(v))); g.lineTo(X(d.length - 1), bot); g.closePath(); g.fill(); }
+    for (const [a, col] of [[W.nat, css.steel], [W.omni, css.brass]]) { const s = a.hist[P.key]; if (!s.length) continue;
+      g.strokeStyle = col; g.lineWidth = 1.6; g.beginPath(); s.forEach((v, t) => t ? g.lineTo(X(t), Y(v)) : g.moveTo(X(t), Y(v))); g.stroke();
+      g.fillStyle = col; g.beginPath(); g.arc(X(s.length - 1), Y(s[s.length-1]), 2.8, 0, Math.PI*2); g.fill(); }
+    if (k === 2) { g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
+      for (let hr = 0; hr <= 6; hr++) g.fillText(hr + " h", X(hr*60), bot + 4); }
+  });
+}
+function fmtAxis(v) { return v >= 10 ? v.toFixed(0) : v >= 1 ? v.toFixed(1) : v.toFixed(2); }
+
+// ---- the brain's physics
+function drawWell(id, f, range, xval, label, marks, trailKey) {
+  const cv = document.getElementById(id); const {g, w, h} = fit(cv, 0.62); g.clearRect(0, 0, w, h);
+  const [a, b] = range; const ml = 10, mr = 10, mt = 14, mb = 26; const N = 160; let lo = Infinity, hi = -Infinity; const ys = [];
+  for (let k = 0; k <= N; k++) { const x = a + (b - a)*k/N; const y = f(x); ys.push(y); lo = Math.min(lo, y); hi = Math.max(hi, y); }
+  const X = x => ml + (x - a)/(b - a)*(w - ml - mr), Y = y => mt + (hi - y)/(hi - lo || 1)*(h - mt - mb);
+  g.strokeStyle = css.muted; g.lineWidth = 2; g.beginPath(); ys.forEach((y, k) => { const x = a + (b - a)*k/N; k ? g.lineTo(X(x), Y(y)) : g.moveTo(X(x), Y(y)); }); g.stroke();
+  g.font = `11px ${MONO}`; g.textAlign = "center"; g.textBaseline = "top"; g.fillStyle = css.muted;
+  for (const [mx, t] of marks) { g.fillText(t, X(mx), h - mb + 6); g.strokeStyle = css.rule; g.lineWidth = 1; g.beginPath(); g.moveTo(X(mx), h - mb); g.lineTo(X(mx), h - mb + 4); g.stroke(); }
+  const hist = W.brainHist.slice(-30);
+  hist.forEach((H, k) => { const xv = clamp(H[trailKey], a, b); g.fillStyle = alpha(css.brass, 0.05 + 0.4*k/hist.length); g.beginPath(); g.arc(X(xv), Y(f(xv)) - 7, 3, 0, Math.PI*2); g.fill(); });
+  if (xval !== null) { const xv = clamp(xval, a, b); g.fillStyle = css.brass; g.beginPath(); g.arc(X(xv), Y(f(xv)) - 7, 7, 0, Math.PI*2); g.fill();
+    g.fillStyle = css.ink; g.textBaseline = "bottom"; g.fillText(label + " " + xval.toFixed(3), X(xv), Y(f(xv)) - 16 < 12 ? 24 : Y(f(xv)) - 16); }
+}
+function drawBrain() {
+  const L = W.brain.last; const p = W.brain.p;
+  const tilt = L ? L.dE/p.E_max : 0;
+  drawWell("cvU", u => -p.mu*(u*u/2 - u**4/4) + tilt*u, [-1.4, 1.4], L ? L.xn[1] : null, "U", [[-1, "−1 failed"], [0, "0 ridge"], [1, "+1 healthy"]], "U");
+  drawWell("cvS", s => 0.5*p.alpha_s*s*s + 0.25*p.beta_s*s**3 - p.delta*s, [-1.2, 3.4], L ? L.xn[3] : null, "S", [[0, "0"], [S_EQ, "S* " + S_EQ.toFixed(2)]], "S");
+  const cv = document.getElementById("cvB"); const {g, w, h} = fit(cv, 0.62); g.clearRect(0, 0, w, h);
+  const hist = W.brainHist.slice(-120); const ml = 64, mr = 10, mt = 12, mb = 24;
+  let mx = 0.05; for (const H of hist) mx = Math.max(mx, Math.abs(H.B)); mx *= 1.2;
+  const X = k => ml + k/119*(w - ml - mr), Y = v => mt + (mx - v)/(2*mx)*(h - mt - mb);
+  g.strokeStyle = css.rule; g.beginPath(); g.moveTo(ml, Y(0)); g.lineTo(w - mr, Y(0)); g.stroke();
+  g.strokeStyle = css.brass; g.lineWidth = 1.8; g.beginPath(); hist.forEach((H, k) => k ? g.lineTo(X(k), Y(H.B)) : g.moveTo(X(k), Y(H.B))); g.stroke();
+  // the spring and its mass, at the latest B
+  const Bv = hist.length ? hist[hist.length-1].B : 0; const sx = 30, yTop = mt, yM = Y(Bv);
+  g.strokeStyle = css.muted; g.lineWidth = 1.2; g.beginPath(); g.moveTo(sx - 12, yTop); g.lineTo(sx + 12, yTop); g.stroke();
+  g.beginPath(); g.moveTo(sx, yTop); const coils = 9; for (let k = 1; k <= coils; k++) g.lineTo(sx + (k % 2 ? 7 : -7), yTop + (yM - 10 - yTop)*k/coils); g.lineTo(sx, yM - 10); g.stroke();
+  g.fillStyle = css.brass; g.fillRect(sx - 10, yM - 10, 20, 20);
+  g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
+  g.fillText("the last 120 decisions", ml + (w - ml - mr)/2, h - mb + 6);
+  g.textAlign = "right"; g.textBaseline = "middle"; g.fillText("B " + Bv.toFixed(3), w - mr, mt + 6);
+}
+
+// ---- verdict lab (omnicompass/verdict.py, judge="interval")
+const V = {ref: [], got: [], running: false, result: null, stats: null, rng: mulberry32(7)};
+const median = xs => { const s = [...xs].sort((a, b) => a - b), n = s.length; return n ? (n % 2 ? s[(n-1)/2] : 0.5*(s[n/2-1] + s[n/2])) : null; };
+function logStats(xs) { const l = xs.map(Math.log), n = l.length; const m = l.reduce((a, b) => a + b, 0)/n; const v = n > 1 ? l.reduce((a, b) => a + (b - m)**2, 0)/(n - 1) : Infinity; return [m, v, n]; }
+function interval(ref, got) { const a = logStats(ref), b = logStats(got); const d = b[0] - a[0]; const se = Math.sqrt(a[1]/a[2] + b[1]/b[2]); return [d - 1.96*se, d + 1.96*se]; }
+function vParams() { return {cost: +vCost.value/100, tol: +vTol.value/100, sig: +vSig.value, min: 30}; }
+function vSample(trial, P, rng) { return Math.exp(P.sig*gauss(rng))*(trial ? 1 + P.cost : 1); }
+function judge(ref, got, P) {
+  const tau = Math.log(1 + P.tol); const [lo, hi] = interval(ref, got);
+  const reading = lo > 0 ? "LOSS" : hi < 0 ? "GAIN" : "EVEN"; const wide = (hi - lo)/2 > tau; const d = (lo + hi)/2;
+  const within = median(got) <= median(ref)*(1 + P.tol);
+  return {reading, wide, d, lo, hi, within, allowed: reading !== "LOSS" && within && d <= tau, tau};
+}
+function runTrialSync(P, rng) {   // one full trial, both rules, for the batch
+  const ref = [], got = []; for (let k = 0; k < P.min; k++) ref.push(vSample(false, P, rng));
+  for (let k = 0; k < P.min; k++) got.push(vSample(true, P, rng));
+  const medAllowed = median(got) <= median(ref)*(1 + P.tol);
+  let J = judge(ref, got, P);
+  while (J.reading !== "LOSS" && J.wide && got.length < 3*P.min) { got.push(vSample(true, P, rng)); J = judge(ref, got, P); }
+  return {medAllowed, v7Allowed: J.allowed};
+}
+const vCost = document.getElementById("vCost"), vTol = document.getElementById("vTol"), vSig = document.getElementById("vSig");
+function vLabels() { const P = vParams(); document.getElementById("vCostO").textContent = (P.cost >= 0 ? "+" : "") + (P.cost*100).toFixed(1) + "%";
+  document.getElementById("vTolO").textContent = (P.tol*100).toFixed(1) + "%"; document.getElementById("vSigO").textContent = P.sig.toFixed(2); }
+[vCost, vTol, vSig].forEach(el => el.addEventListener("input", () => { vLabels(); V.stats = null; drawVerdict2(); }));
+document.getElementById("vOne").addEventListener("click", () => { V.ref = []; V.got = []; V.result = null; V.running = true; V.P = vParams(); V.lastAdd = 0; });
+document.getElementById("vMany").addEventListener("click", () => { const P = vParams(); const rng = mulberry32(Math.floor(Math.random()*1e9)); let m = 0, v = 0;
+  for (let k = 0; k < 300; k++) { const r = runTrialSync(P, rng); m += r.medAllowed; v += r.v7Allowed; } V.stats = {m: m/300, v: v/300, cost: P.cost}; drawVerdict2(); });
+function vTick(now) {
+  if (!V.running) return; if (now - V.lastAdd < (reduceMotion ? 0 : 28)) return; V.lastAdd = now; const P = V.P;
+  if (V.ref.length < P.min) { V.ref.push(vSample(false, P, V.rng)); return; }
+  if (V.got.length < P.min) { V.got.push(vSample(true, P, V.rng)); return; }
+  const J = judge(V.ref, V.got, P);
+  if (J.reading !== "LOSS" && J.wide && V.got.length < 3*P.min) { V.got.push(vSample(true, P, V.rng)); return; }
+  V.running = false; V.result = J;
+  const st = document.getElementById("vStamp"); st.textContent = J.reading + (J.allowed ? " · allowed" : " · refused");
+  st.style.color = J.allowed ? css.ok : css.bad;
+  const pct = x => ((Math.exp(x) - 1)*100).toFixed(1) + "%";
+  document.getElementById("vLine").textContent = `n ref ${V.ref.length} · n trial ${V.got.length} · change ${pct(J.d)} [${pct(J.lo)}, ${pct(J.hi)}] · allowance ${(P.tol*100).toFixed(1)}% · median within: ${J.within ? "yes" : "no"}`;
+}
+function drawVerdict() {
+  const cv = document.getElementById("cvV"); const {g, w, h} = fit(cv, 0.62); g.clearRect(0, 0, w, h);
+  const P = V.P || vParams(); const top = 8, mid = h*0.66, ml = 44, mr = 10;
+  const Y = c => top + (1 - (Math.log(c) + 0.8)/1.6)*(mid - top - 18);
+  g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
+  const cols = [[V.ref, css.steel, "reference, knob at native", ml + (w - ml - mr)*0.25], [V.got, css.brass, "trial, one step out", ml + (w - ml - mr)*0.75]];
+  g.textAlign = "right"; g.textBaseline = "middle"; for (const c of [0.5, 1, 2]) { g.fillText(c.toFixed(1) + "×", ml - 6, Y(c)); g.strokeStyle = css.rule; g.beginPath(); g.moveTo(ml, Y(c)); g.lineTo(w - mr, Y(c)); g.stroke(); }
+  const jr = mulberry32(3);
+  for (const [xs, col, t, cx] of cols) { g.textAlign = "center"; g.textBaseline = "top"; g.fillStyle = css.muted; g.fillText(t, cx, mid - 14);
+    xs.forEach((c, k) => { g.fillStyle = alpha(col, 0.75); g.beginPath(); g.arc(cx + (jr() - 0.5)*(w - ml - mr)*0.3, Y(clamp(c, 0.45, 2.2)), 2.6, 0, Math.PI*2); g.fill(); });
+    if (xs.length) { const m = median(xs); g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); g.moveTo(cx - (w - ml - mr)*0.18, Y(m)); g.lineTo(cx + (w - ml - mr)*0.18, Y(m)); g.stroke(); } }
+  // the interval axis
+  const ay = h*0.84, R = 0.15, X = x => ml + (x + R)/(2*R)*(w - ml - mr); const tau = Math.log(1 + P.tol);
+  g.fillStyle = alpha(css.ok, 0.15); g.fillRect(X(-tau), ay - 14, X(tau) - X(-tau), 28);
+  g.strokeStyle = css.rule; g.beginPath(); g.moveTo(ml, ay); g.lineTo(w - mr, ay); g.stroke();
+  g.strokeStyle = css.ink; g.beginPath(); g.moveTo(X(0), ay - 16); g.lineTo(X(0), ay + 16); g.stroke();
+  g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
+  for (const pc of [-0.1, -0.05, 0, 0.05, 0.1]) g.fillText((pc > 0 ? "+" : "") + Math.round(pc*100) + "%", X(Math.log(1 + pc)), ay + 18);
+  g.textAlign = "left"; g.textBaseline = "bottom"; g.fillText("95% interval of the change in log cost; green: inside the allowance", ml, ay - 16);
+  if (V.ref.length >= 2 && V.got.length >= 2) { const [lo, hi] = interval(V.ref, V.got); const col = lo > 0 ? css.bad : hi < 0 ? css.ok : css.ink;
+    g.strokeStyle = col; g.lineWidth = 4; g.beginPath(); g.moveTo(X(clamp(lo, -R, R)), ay); g.lineTo(X(clamp(hi, -R, R)), ay); g.stroke();
+    g.fillStyle = col; g.beginPath(); g.arc(X(clamp((lo + hi)/2, -R, R)), ay, 5, 0, Math.PI*2); g.fill(); }
+}
+function drawVerdict2() {
+  const cv = document.getElementById("cvV2"); const {g, w, h} = fit(cv, 0.42); g.clearRect(0, 0, w, h);
+  const ml = 130, mr = 50; const bars = V.stats ? [["medians alone", V.stats.m, css.steel], ["omni-v7, in words", V.stats.v, css.brass]] : [];
+  g.font = `12px ${MONO}`; g.textBaseline = "middle";
+  if (!bars.length) { g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("Press “Run 300 trials” to see the share allowed.", 0, h/2); return; }
+  bars.forEach(([t, v, col], k) => { const y = 20 + k*((h - 40)/2) + (h - 40)/4; g.fillStyle = css.muted; g.textAlign = "left"; g.fillText(t, 0, y);
+    g.fillStyle = css.panel2; g.fillRect(ml, y - 10, w - ml - mr, 20); g.fillStyle = col; g.fillRect(ml, y - 10, (w - ml - mr)*v, 20);
+    g.fillStyle = css.ink; g.textAlign = "right"; g.fillText(Math.round(v*100) + "%", w, y); });
+  g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(`share of 300 trials allowed at a true cost of ${(V.stats.cost*100).toFixed(1)}%`, 0, 0);
+}
+
+// ============================================================== text panels
+const $ = id => document.getElementById(id);
+const f2 = v => v.toFixed(2), f3 = v => v.toFixed(3);
+function updateText() {
+  const L = W.brain.last; if (!L) return;
+  const hh = Math.floor(W.t/60), mm = W.t % 60; $("clkD").textContent = W.t; $("clkT").textContent = String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0");
+  $("clkMode").textContent = W.killed ? "killed: native alone" : (W.dial === "max" ? "the max" : "tune-down");
+  const o = L.o;
+  $("cy0").textContent = `q ${f2(o.q)} · load ${f2(o.load)} · power ${f2(o.power)} · heat ${f2(o.thermal)} · net ${f2(o.network)} · drift ${f2(o.drift)} · stale ${o.stale} · sec ${o.security}`;
+  $("cy1").textContent = `x_obs E ${f2(L.xobs[0])} U ${f2(L.xobs[1])} I ${f2(L.xobs[2])} S ${f2(L.xobs[3])} B ${f2(L.xobs[4])} · x ← 0.661x + 0.339x_obs`;
+  $("cy2").textContent = `RK4 10 × 0.01 → E ${f3(L.xn[0])} U ${f3(L.xn[1])} I ${f3(L.xn[2])} S ${f3(L.xn[3])} B ${f3(L.xn[4])}`;
+  $("cy3").textContent = `push ${f3(L.push)} · ρ* ${f3(L.rho)} · release ${L.push <= LAW.push_release ? "converged" : "held"}`;
+  const grants = Object.keys(THETA).filter(k => L.organs[k].contract);
+  $("cy4").textContent = `κ ${f2(L.kappa)} h ${f2(L.h)} σ ${f2(L.sigma)} ν ${f2(L.nu)} → calm ${f2(L.calm)} · hand-back granted: ${grants.length ? grants.join(", ") : "none"}`;
+  const arm = W.omni; let up = 0, down = 0, hold = 0, fail = 0;
+  arm.m.forEach(s => { if (s.p >= 0.95) fail++; if (s.F > 0.02) up++; else if (s.F < -0.02) down++; else hold++; });
+  $("cy5").textContent = `${up} pushing, ${down} lifting off, ${hold} at the center · ${fail} failing up past 0.95`;
+  $("cy6").textContent = W.killed ? `kill switch: every lever handed to native at once, no writes` : `${arm.lastWrites} writes this decision, each clipped to its cover and read back · ${arm.tot.writes} so far, ${arm.tot.clipped} clipped`;
+  // the nerves
+  const set = (id, v, txt, col) => { $(id).textContent = txt; const b = $(id + "b"); b.style.width = Math.round(clamp(v, 0, 1)*100) + "%"; if (col) b.style.background = col; };
+  set("nK", L.kappa, f3(L.kappa)); set("nH", L.h, f3(L.h)); set("nS", L.sigma, f3(L.sigma), L.sigma > 1 ? css.bad : css.ok);
+  set("nN", L.nu, f3(L.nu), L.nu > 0.5 ? css.warn : css.ok); set("nC", L.calm, f3(L.calm), css.brass);
+  for (const k in THETA) { const e = $("org-" + k); e.querySelector(".ex").className = "lamp ex " + (L.organs[k].expand ? "lit-ok" : "lit-bad");
+    e.querySelector(".co").className = "lamp co " + (L.organs[k].contract ? "lit-ok" : ""); }
+  updateScore(); updateCard();
+}
+function buildOrgans() {
+  const host = $("organs"); host.innerHTML = "";
+  for (const k in THETA) { const d = document.createElement("div"); d.className = "organ"; d.id = "org-" + k;
+    d.innerHTML = `<div class="on">${k}</div><div class="th">θ ${THETA[k]}</div><div class="lamps"><span class="lamp ex">expand</span><span class="lamp co">hand back</span></div>`; host.appendChild(d); }
+}
+function pairedReading(na, oa, aim, kind) {   // the paired change per decision, its 95% interval, the word by the gauge's aim
+  if (kind === "shown") return ["shown", "w-shown"];
+  const n = Math.min(na.length, oa.length); if (n < 3) return ["EVEN", "w-even"];
+  const d = []; for (let t = 0; t < n; t++) d.push(oa[t] - na[t]);
+  const m = d.reduce((a, b) => a + b, 0)/n, sd = Math.sqrt(d.reduce((a, b) => a + (b - m)**2, 0)/(n - 1)), half = 1.96*sd/Math.sqrt(n);
+  if (m - half <= 0 && m + half >= 0) return ["EVEN", "w-even"];
+  const rose = m > 0;
+  if (kind === "spent") return rose ? ["power given", "w-given"] : ["GAIN", "w-gain"];
+  return (aim === "up" ? rose : !rose) ? ["GAIN", "w-gain"] : ["LOSS", "w-loss"];
+}
+function updateScore() {
+  const n = W.nat.tot, o = W.omni.tot, NH = W.nat.hist, OH = W.omni.hist;
+  const mean = a => a.length ? a.reduce((x, y) => x + y, 0)/a.length : 0;
+  const rows = [
+    ["Work served (units)", n.served, o.served, "up", "", 0, "served"],
+    ["Muscle-decisions past the line", n.over, o.over, "down", "", 0, "over"],
+    ["Work failed (abandoned in line)", n.failed, o.failed, "down", "", 1, "failed"],
+    ["Work waiting (unit-decisions)", n.wait, o.wait, "down", "", 1, "wait"],
+    ["Spread of positions, mean", mean(NH.spread), mean(OH.spread), "down", "", 3, "spread"],
+    ["Capacity held (unit-decisions)", n.capT, o.capT, "", "spent", 0, "cap"],
+    ["Plug writes", 0, o.writes, "", "shown", 0, null]];
+  $("score").querySelector("tbody").innerHTML = rows.map(([t, a, b, aim, kind, dp, key]) => {
+    const chg = a > 1e-9 ? (b - a)/a : (b > 1e-9 ? Infinity : 0);
+    const [wd, cl] = pairedReading(key ? NH[key] : [], key ? OH[key] : [], aim, kind);
+    const cs = kind === "shown" ? "" : (isFinite(chg) ? (chg >= 0 ? "+" : "") + (chg*100).toFixed(1) + "%" : (b > 0 ? "from 0" : "0"));
+    const fmt = v => v.toLocaleString(undefined, {maximumFractionDigits: dp, minimumFractionDigits: dp});
+    return `<tr><td>${t}</td><td class="nat">${fmt(a)}</td><td class="omni">${fmt(b)}</td><td>${cs}</td><td><span class="word ${cl}">${wd}</span></td></tr>`;
+  }).join("");
+  $("dialNote").textContent = (W.dial === "max" ? "the max" : "the tune-down") + " · decision " + W.t + " of " + DAY + " · day seed " + W.seed;
+}
+function updateCard() {
+  const M = W.muscles[W.sel]; const R = REALMS[M.realm];
+  $("mName").textContent = M.name;
+  $("mSub").textContent = `${M.family} · ${R.label.toLowerCase()} · organ ${M.organ} · τ ${M.tau.toFixed(1)} decisions · sensing delay ${M.delay}`;
+  const so = W.omni.m[W.sel], sn = W.nat.m[W.sel];
+  $("mF").textContent = (so.F >= 0 ? "+" : "") + so.F.toFixed(3); $("mLn").textContent = sn.L.toFixed(2); $("mLo").textContent = so.L.toFixed(2);
+}
+
+// ============================================================== controls
+function press(group, el) { group.forEach(b => b.setAttribute("aria-pressed", b === el ? "true" : "false")); }
+const speedBtns = [...document.querySelectorAll("[data-speed]")];
+speedBtns.forEach(b => b.addEventListener("click", () => { W.speed = +b.dataset.speed; press(speedBtns, b); }));
+$("bPause").addEventListener("click", e => { W.paused = !W.paused; e.currentTarget.setAttribute("aria-pressed", W.paused); e.currentTarget.textContent = W.paused ? "Resume" : "Pause"; });
+$("bNew").addEventListener("click", () => { newDay(W.seed + 1); decide(); });
+$("showNative").addEventListener("click", () => { W.show = "nat"; press([$("showNative"), $("showOmni")], $("showNative")); });
+$("showOmni").addEventListener("click", () => { W.show = "omni"; press([$("showNative"), $("showOmni")], $("showOmni")); });
+function setDial(d) { W.dial = d; press([$("dMax"), $("dSave")], d === "max" ? $("dMax") : $("dSave")); newDay(W.seed); decide(); }
+$("dMax").addEventListener("click", () => setDial("max")); $("dSave").addEventListener("click", () => setDial("save"));
+const note = $("stressNote");
+$("sSpike").addEventListener("click", () => { W.stress.surge = W.t; note.textContent = `Surge on the compute realm from decision ${W.t}: its demand doubles for 40 decisions, in both arms.`; });
+$("sBlind").addEventListener("click", () => { W.stress.blind = W.t; note.textContent = `The stale sense reads 1 from decision ${W.t}: no organ may hand capacity back until it sees again; adding stays allowed.`; });
+$("sSec").addEventListener("click", () => { W.stress.sec = W.t; note.textContent = `Security hold from decision ${W.t}: no organ may expand; Omni-Compass adds nothing past native.`; });
+$("sKill").addEventListener("click", e => { W.killed = !W.killed; e.currentTarget.setAttribute("aria-pressed", W.killed);
+  note.textContent = W.killed ? "Kill switch on: governing off at once, every lever handed to native's own controller. Press again to re-arm." : "Kill switch off: Omni-Compass governs on top of native again."; });
+// click and hover a muscle on the ring
+function hit(ev) { const r = ringCv.getBoundingClientRect(); const x = ev.clientX - r.left, y = ev.clientY - r.top; let best = -1, bd = 1e9;
+  W.muscles.forEach((M, i) => { const [nx, ny] = nodeXY(i, W.show); const d = (nx - x)**2 + (ny - y)**2; if (d < bd) { bd = d; best = i; } });
+  return bd < 18*18 ? [best, x, y] : [-1, x, y]; }
+ringCv.addEventListener("click", ev => { const [i] = hit(ev); if (i >= 0) { W.sel = i; updateCard(); } });
+ringCv.addEventListener("mousemove", ev => { const [i, x, y] = hit(ev); const tip = $("ringTip");
+  if (i < 0) { tip.hidden = true; ringCv.style.cursor = "default"; return; } ringCv.style.cursor = "pointer";
+  const M = W.muscles[i], s = W[W.show].m[i]; tip.hidden = false; tip.textContent = `${M.name} · p ${s.p.toFixed(2)} · F ${s.F.toFixed(2)}`;
+  tip.style.left = Math.min(x + 26, ringCv.clientWidth - tip.offsetWidth - 10) + "px"; tip.style.top = (y + 20) + "px"; });
+ringCv.addEventListener("mouseleave", () => { $("ringTip").hidden = true; });
+
+// ============================================================== the clock
+let lastDecide = 0;
+function frame(now) {
+  const period = 900/W.speed;
+  if (!W.paused && now - lastDecide >= period) { const k = W.speed >= 60 ? 2 : 1; for (let j = 0; j < k; j++) decide(); lastDecide = now; }
+  W.frac = W.paused ? W.frac : clamp((now - lastDecide)/period, 0, 1);
+  const phase = Math.min(6, Math.floor(W.frac*7));
+  document.querySelectorAll("#cycle li").forEach(li => li.classList.toggle("act", W.speed <= 4 ? +li.dataset.i === phase : true));
+  drawRing(now); drawSwarm(); drawBand(); drawPhase(); drawStrip(); drawBrain(); vTick(now); drawVerdict();
+  requestAnimationFrame(frame);
+}
+buildOrgans(); vLabels(); newDay(W.seed);
+document.getElementById("vMany").click();
+for (let k = 0; k < 24; k++) decide();   // open on a working engine, not an empty one
+drawVerdict2();
+V.P = vParams(); for (let k = 0; k < 30; k++) V.ref.push(vSample(false, V.P, V.rng)); for (let k = 0; k < 30; k++) V.got.push(vSample(true, V.P, V.rng));
+V.running = true; V.lastAdd = 0;
+requestAnimationFrame(frame);
+window.addEventListener("resize", () => { phKey = ""; });
+</script>
+</body></html>
