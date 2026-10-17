@@ -17,7 +17,11 @@ their power) under the climb, on seeds 3000, 3001 and 3002 (runs A, B and C). Tw
 Every decision it records, for each plant: the service position the law reads (v5_position: 1 or more is past the
 line), whether the decision was over the line, whether Omni-Compass held a setting away from native and whether it
 wrote one; for the body: its electrical power and the harness's aggregate observation (what a governor would read).
-The work each plant did is recorded per decision so the page can show work against native's.
+The work each plant did is recorded per decision so the page can show work against native's. Omni-Compass's organism
+also records its immune system, read as max_body_step reads it, never stepping it again (realms/compass_arm_v5.py, V6
+to V13): every room against its twin (the same room under its operator's settings and native's heat), the rooms that
+stand warmer than their twins (inflamed), the body's heat debt (the signal that makes the other muscles give back),
+whether the body gave back (no room on the bone's lines, or a heat debt), and the machines held over the pools' twins.
 
 The three-run readings: for each gauge, the paired change per decision, averaged over blocks of ten decisions, with its
 95% interval (Student's t over the blocks), in each run; GAIN or LOSS when all three runs point the same way with every
@@ -37,7 +41,7 @@ sys.path.insert(0, str(ROOT))
 
 from realms.harness import (Body, KILL_AT, WALK, aggregate, catalog, make_plant, scale_load, scale_load_plant,  # noqa: E402
                             walk_back)
-from realms.compass_arm_v5 import Bone, V5CFG, max_apply, max_body_step, v5_position         # noqa: E402
+from realms.compass_arm_v5 import Bone, V5CFG, heat_debt, machines, max_apply, max_body_step, v5_position   # noqa: E402
 from realms.presets import ORGANISM_STEPS                                                     # noqa: E402
 
 SEEDS = (3000, 3001, 3002)
@@ -79,7 +83,13 @@ def run(rs, seed, arm):
     n, kill_at = len(b.plants), int(KILL_AT * ORGANISM_STEPS)
     bone = Bone(b, V5CFG) if arm == "omni" else None
     last = [None] * n
-    rec = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power_kw": [], "obs": []}
+    rec = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power_kw": [], "obs": [], "imm": []}
+    if bone is not None:                     # the bone's own reading of its lines, kept as max_body_step reads it (no extra call)
+        seen = {}
+        cls_room = bone.room
+        def room():
+            r = cls_room(); seen["room"] = r; return r
+        bone.room = room
     prev_viol, prev_work = [0] * n, [0.0] * n
     for k in range(ORGANISM_STEPS):
         b.couple()
@@ -90,7 +100,17 @@ def run(rs, seed, arm):
                     walk_back(p, kill_at + WALK - k)
             else:
                 bone.advance_twin()
+                # the immune system's reading before the step (read only): every room against its twin, the body's heat debt
+                inflamed = [(i, b.plants[i].T - getattr(tw, "T_read", tw.T)) for i, tw in bone.room_twins.items()]
+                inflamed = [(i, e) for i, e in inflamed if e > 1e-9]
+                debt = heat_debt(b, bone)
+                seen.clear()
                 max_body_step(b, V5CFG, bone)
+                r_src, r_all = seen.get("room", (0.0, 0.0))
+                extra = sum(max(0, machines(b.plants[i]) - machines(tw)) for i, tw in bone.twins.items())
+                worst = max(inflamed, key=lambda x: x[1]) if inflamed else (-1, 0.0)
+                rec["imm"].append([round(debt, 3), len(inflamed), worst[0], float(f"{worst[1]:.3g}"),
+                                   1 if (r_src < 0.0 or r_all < 0.0 or debt > 0.0) else 0, extra])
                 for i, p in enumerate(b.plants):
                     v = p.override
                     if v and v != last[i]:
@@ -226,7 +246,7 @@ def pack(rec, n):
                for ro, rh, rw in zip(rec["over"], rec["held"], rec["wrote"]) for o, h, w in zip(ro, rh, rw))
     return {"p": base64.b64encode(pos.tobytes()).decode(), "f": base64.b64encode(fl).decode(), "kw": rec["power_kw"],
             "obs": [[o["queue_ratio"], o["load_ratio"], o["power_stress"], o["thermal"], o["network_stress"], o["drift_ratio"]]
-                    for o in rec["obs"]]}
+                    for o in rec["obs"]], **({"imm": rec["imm"]} if rec.get("imm") else {})}
 
 
 def section(rs, runner, steps, kill_at):
