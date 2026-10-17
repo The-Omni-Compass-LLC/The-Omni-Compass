@@ -365,7 +365,9 @@ the founder overrides one in the conversation.
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
   One version is always the main one; `main` and the working branch, `v7` (the engine that stands, the founder's order of 16
-  October: "push everything to version 7"), stay in sync; `v5` and `v7-candidate` are kept level with them.
+  October: "push everything to version 7"), stay in sync, and `v7-candidate` is kept level with them. **Version 5 merges
+  into 7, never 7 into 5** (the founder's order of 17 October): whatever lands on the `v5` branch (its bot's archived
+  runs) is merged into `main`, and `main` is never merged or pushed into `v5`, which keeps the v5 engine's own history.
 - Verify before every push: `tools/release_manifest.py` under Python 3.12 (as GitHub runs it), 0 FAIL. Clear
   `/tmp/tmp*` first, because test leftovers fill the disk. Keep the Python 3.12 environment outside `/tmp` (for example
   `/root/v312`), because a container reset wipes `/tmp`. After a push, check the GitHub verify run itself, not only the
