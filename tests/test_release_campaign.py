@@ -64,6 +64,9 @@ class ReleaseCampaign(unittest.TestCase):
         self.assertTrue(grid.campaign_open('2999-01-01T00:00:00Z'))
 
     def test_the_engine_is_read_from_the_commit_the_runs_start_on(self):
+        def fetched(d):                    # FETCH_HEAD as a fetch writes it (git 2.55 refuses update-ref on a pseudoref)
+            sha = subprocess.run(['git', '-C', d, 'rev-parse', 'HEAD'], capture_output=True, text=True, check=True).stdout.strip()
+            (Path(d) / '.git' / 'FETCH_HEAD').write_text(f"{sha}\t\tbranch 'main' of origin\n")
         # on GitHub each tick fetches the branch's newest commit; its engine, by that commit's own fingerprints, decides
         src = ROOT / 'omnicompass' / 'compass_law.py'
         files = {'omnicompass/compass_law.py': hashlib.sha256(src.read_bytes()).hexdigest()}
@@ -76,7 +79,7 @@ class ReleaseCampaign(unittest.TestCase):
             subprocess.run(['git', 'init', '-q', d], check=True)
             subprocess.run(git + ['add', '-A'], check=True)
             subprocess.run(git + ['commit', '-q', '-m', 'x'], check=True)
-            subprocess.run(git + ['update-ref', 'FETCH_HEAD', 'HEAD'], check=True)
+            fetched(d)
             old = grid.ROOT
             try:
                 grid.ROOT = Path(d)
@@ -84,7 +87,7 @@ class ReleaseCampaign(unittest.TestCase):
                     self.assertEqual(grid.engine(), 'omni-v99')
                 (Path(d) / 'omnicompass' / 'compass_law.py').write_text('changed\n')
                 subprocess.run(git + ['commit', '-q', '-am', 'y'], check=True)
-                subprocess.run(git + ['update-ref', 'FETCH_HEAD', 'HEAD'], check=True)
+                fetched(d)
                 with unittest.mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}):
                     self.assertEqual(grid.engine(), 'unknown')          # a commit no fingerprint matches starts nothing
             finally:

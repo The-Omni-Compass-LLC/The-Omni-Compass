@@ -36,6 +36,9 @@
   engines table, section 16.5's CityLearn paragraph; the Operator's engine lines), the receipts page, the index's notes, the cloud
   setup pages, `docs/OMNI_V7.md` and `docs/OMNI_V6.md` marked as the engines before it, codemeta. Both PDFs rebuilt. The branch
   `v8` carries the engine that stands, in step with `main`; `v7` and `v7-candidate` are kept level.
+- **GitHub's verify failed on the landing push (4d9e9da42) and is fixed**: the new conductor test set `FETCH_HEAD` with
+  `git update-ref`, which GitHub's git (2.55) refuses for a pseudoref while the local git (2.43) allowed it; the test now writes
+  `FETCH_HEAD` as a fetch does. The conductor's code was not at fault; every other check passed on GitHub.
 
 ## 2026-10-17 (late night: every page on the omni-v7 tables; the whole test suite in the push check)
 
