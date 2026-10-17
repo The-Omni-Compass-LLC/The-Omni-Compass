@@ -9,7 +9,8 @@ name: live-engine
 # a model, a harness or a result changes on main, after every front-page refresh, and every three hours besides:
 #   1. docs/engine/build_live_engine.py makes every record the page replays again, with the repository's own code on the
 #      engine that stands (the realms harness and its immune system, the shipped controller on the toy cluster, the GPU card,
-#      the Linux host, the realms table, the newest engine's receipts) and GitHub's list of the runs running and queued;
+#      the Linux host, the realms table, the newest engine's receipts, and the official runs played back from their own
+#      raw files, every file's SHA-256 matched against the run's own list) and GitHub's list of the runs running and queued;
 #      it refuses to build a page that names another engine than tools/omni_version.py reads;
 #   2. docs/engine/check_live_engine.py checks the page's engine against the Python and against the C++ core (compiled
 #      here), and docs/engine/check_records.py checks every record against the repository's own runs;
@@ -30,6 +31,10 @@ on:
       - "tools/omni_version.py"
       - "results/realms_v5/**"
       - "results/live/V*_*.md"
+      - "results/live/V*_*.json"
+      - "scripts/reruns.txt"
+      - "scripts/*_queue.txt"
+      - "scripts/gpu_campaign_profiles.json"
       - "docs/engine/**"
       - ".github/workflows/live-engine.yml"
   workflow_run:
@@ -61,6 +66,11 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -q -r requirements.txt
+      - name: The official runs' raw folders the page plays back, checked out
+        run: |
+          python docs/engine/export_runs.py --dirs > raw_dirs.txt
+          wc -l < raw_dirs.txt
+          git sparse-checkout add $(cat raw_dirs.txt)
       - name: Rebuild the page from the engine that stands and the repository's own results
         env:
           GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

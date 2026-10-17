@@ -23,7 +23,7 @@ stands, the page's engine is checked against the Python and the C++, every recor
 the page carries the commit, the time and GitHub's own list of the runs running and queued. The build refuses a page
 that names another engine than `tools/omni_version.py` reads.
 
-## Method: five independent reproductions
+## Method: six independent reproductions
 
 | Part of the page | What it claims to be | Reproduced against | Result | Rerun with |
 |---|---|---|---|---|
@@ -34,6 +34,7 @@ that names another engine than `tools/omni_version.py` reads.
 | Section 2, the cloud's setting | the shipped controller as `tools/toy_gate.py` wires it | `tools/toy_gate.py --worker`, seeds 3000 and 3001 | machine-hours identical (seed 3000: 27.604 both arms); verdict steps allowed and refused identical (3 and 3) | `docs/engine/check_records.py` |
 | Section 2, on top of the HPA | the shipped controller as `pilot/selfpilot.py run_day` wires it | `pilot/selfpilot.py run_day`, seeds 3000 and 3001 | machines and pods waiting identical on every one of 1,440 ticks; writes identical (25) | `docs/engine/check_records.py` |
 | Section 1, the immune system | Omni-Compass's organism reading its own immune system: every room against its twin, the heat debt, the body giving back | the same run of `realms/harness.py`'s organism with the readings taken as `max_body_step` reads them (read only: the organism's record is identical with and without them) | run A: 7 decisions with an inflamed room (`pump_speed`), heat debt 1,109 W fading to 21 W, the pools' 26 extra machines handed back; runs B and C: none | `docs/engine/export_harness_trace.py` |
+| Section 4, the official runs | each three-run table's runs A, B and C played back from their raw files (`docs/engine/export_runs.py`) | every file's SHA-256 against the run's own `SHA256SUMS_ALL.txt`; every Kubernetes repetition scored by `tools/live_reps.py arm_gauges` on its own files, the mean over repetitions against the run's own `LIVE_REPS.json` | 18 benchmarks, 54 runs: 20,231 of 20,231 files match; the scorer's means equal each run's result to 3.1 × 10⁻¹⁶ | `docs/engine/build_live_engine.py --check` |
 | Section 3, a GPU card | `realms/gpu_card.py` (omni-v9 fingerprint, the same bytes as omni-v7's), native and Omni-Compass on top, the card as shipped and under an operator's cap, AI and compute-bound work | `realms/gpu_card.run` untouched, every arm, seeds 5100, 5101 and 5102 | the run's own result identical; every second's energy and requests add up to it | `docs/engine/check_records.py` |
 | Section 3, Linux, one host | `tools/toy_gate.py`'s conveyance model, the shipped `Muscles.convey` and `quota.py` on the CFS quota | `tools/toy_gate.py worker_convey` untouched, seeds 3000, 3001 and 3002 | its own result line identical; requests and the host's busy share add up to it | `docs/engine/check_records.py` |
 | Section 3, every muscle on omni-v8 | the realms runner's own table of 1,107 muscles and seven organisms, native and the max | `results/realms_v5/REALMS_V5.json` (omni-v8, commit 9819a903c, seeds 3000 to 3009), read by `docs/engine/export_scenarios.py` | 527 GAIN, 159 the same as native, 421 at their limit on native, 0 LOSS; all seven organisms GAIN under all three loads | `docs/engine/export_scenarios.py` |

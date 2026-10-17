@@ -12,6 +12,9 @@ Every record the page replays is made again here by the repository's own code on
              realms/compass_arm_v5.py with the bone, the twins and the immune system), one organism and each muscle alone
   ctlrec     docs/engine/export_controller_trace.py: the shipped controller (omni_controller/controller.py) on the toy
              cluster, on top of the HPA (the max) and in the cloud's setting, every tick and every audited decision
+  runs       docs/engine/export_runs.py: the official runs as recorded, every three-run table's runs A, B and C read
+             back from their raw files, every file's SHA-256 matched against the run's own list, every Kubernetes
+             repetition scored by the repository's own scorer (tools/live_reps.py) and checked against the run's result
   scen       docs/engine/export_scenarios.py: the GPU card (realms/gpu_card.py), the Linux host (tools/toy_gate.py's
              conveyance), every muscle and organism of the realms table (results/realms_v5) and every judged row of the
              newest engine's receipts (results/live/V<n>_*.md)
@@ -90,20 +93,90 @@ def github_runs() -> list:
              "since": r["createdAt"], "branch": r["headBranch"]} for r in out]
 
 
+TABLE_OF = {   # a benchmark in scripts/reruns.txt -> its three-run table(s) in results/live (V<n>_<stem>.md)
+    "Kubernetes CruiseKube": ["CRUISEKUBE"], "Kubernetes Goldilocks": ["GOLDILOCKS"], "Kubernetes fixed capacity": ["CAPACITY"],
+    "kubernetes all four": ["ALL_FOUR"], "kubernetes fairness": ["FAIRNESS"], "kubernetes faults": ["FAULTS"],
+    "kubernetes batch": ["BATCH"], "kubernetes google 2011 trace": ["TRACE_GOOGLE2011"],
+    "kubernetes keda add-ons": ["KEDA_REQUESTS", "KEDA_CPU_REQUESTS"], "redis resource": ["REDIS"], "redis service": ["REDIS_SERVICE"],
+    "kafka resource": ["KAFKA"], "kafka service": ["KAFKA_SERVICE"], "postgresql resource": ["PGBENCH"], "mysql resource": ["SYSBENCH"],
+    "mongodb resource": ["YCSB"], "robot arms": ["MUJOCO"], "power grids": ["PANDAPOWER"], "buildings and batteries": ["CITYLEARN"],
+    "drone swarms": ["SWARM"], "robustness long": ["ROBUST_LONG"]}
+
+
+def board(runs: list) -> list:
+    """Every benchmark the repository holds a place for, and where it stands: its newest three-run table and that table's
+    engine, whether GitHub is running it now, or that it is queued, switched off or not yet launched. Read from
+    scripts/reruns.txt, the cloud queues, the GPU campaign's profiles and the results themselves; nothing is written here
+    that the repository does not say."""
+    import export_scenarios as XS
+    wf_name = {}
+    for y in (ROOT / ".github" / "workflows").glob("*.yml"):
+        m = re.search(r"^name:\s*(\S+)", y.read_text(encoding="utf-8"), re.M)
+        if m:
+            wf_name[y.name] = m.group(1)
+    live = {r["workflow"] for r in runs if r["status"] == "in_progress"}
+    waiting = {r["workflow"] for r in runs if r["status"] == "queued"}
+    out = []
+    def state(wf):
+        n = wf_name.get(wf, wf.removesuffix(".yml"))
+        return "running now" if n in live else "queued on GitHub" if n in waiting else None
+    for ln in (ROOT / "scripts" / "reruns.txt").read_text(encoding="utf-8").splitlines():
+        if not ln.strip() or ln.startswith("#") or "|" not in ln:
+            continue
+        name, wf = ln.split("|")[:2]
+        tables = []
+        for stem in TABLE_OF.get(name, []):
+            n, st = XS.newest(f"V7_{stem}")
+            if n:
+                tables.append({"file": f"results/live/{st}.md", "engine": f"omni-v{n}"})
+        if name == "1107 muscles and seven organisms":
+            rj = ROOT / "results" / "realms_v5" / "REALMS_V5.json"
+            if rj.exists():
+                tables.append({"file": "results/realms_v5/REALMS_V5.md", "engine": json.loads(rj.read_text(encoding="utf-8"))["run"]["engine"]})
+        out.append({"group": "every benchmark, run again on the engine that stands", "name": name, "workflow": wf,
+                    "tables": tables, "now": state(wf) or ("in the reruns queue" if not tables else None)})
+    for cloud, f, wf in (("Azure", "azure_queue.txt", "aks-metered.yml"), ("Google Cloud", "google_queue.txt", "gke-metered.yml"),
+                         ("Amazon Web Services", "amazon_queue.txt", "eks-metered.yml")):
+        q = ROOT / "scripts" / f
+        if not q.exists():
+            continue
+        lines = [x for x in q.read_text(encoding="utf-8").splitlines() if x.strip() and not x.startswith("#")]
+        on = any(x.strip() == "switch=on" for x in lines)
+        running_titles = " ".join(r["title"] for r in runs if r["status"] == "in_progress" and r["workflow"] == wf_name.get(wf, wf[:-4]))
+        for x in lines:
+            if "|" not in x:
+                continue
+            label = x.split("|")[0]
+            out.append({"group": f"the cloud: {cloud}, at the tune-down on the machines alone (the bill)", "name": label, "workflow": wf,
+                        "tables": [], "now": ("running now" if label.split()[0] in running_titles else "in the queue") if on else
+                        "switched off until the founder turns it on"})
+    gp = ROOT / "scripts" / "gpu_campaign_profiles.json"
+    if gp.exists():
+        g = json.loads(gp.read_text(encoding="utf-8"))
+        for prof, v in g.get("profiles", {}).items():
+            for scale in g.get("organism_scales", []):
+                out.append({"group": "the GPU chips on Lambda (class P, the card's own meter)", "name": f"{prof} ({v.get('physical_gpus')} "
+                            f"GPU{'s' if v.get('physical_gpus', 1) > 1 else ''}), {scale} cop{'y' if scale == 1 else 'ies'} of each organism",
+                            "workflow": v.get("script", ""), "tables": [], "now": "launched" if g.get("launch") else "not yet launched (the founder's exact commit first)"})
+    return out
+
+
 def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
     import export_scenarios as XS
     with tempfile.TemporaryDirectory() as td:
         t = Path(td)
-        XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json"))
-        h, c, s = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json"))
+        import export_runs as XR
+        XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json")); XR.main(str(t / "r.json"))
+        h, c, s, rr = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json", "r.json"))
     name, digest = engine()
     build = {"engine": name, "digest": digest, "commit": git("rev-parse", "HEAD"),
              "built_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
              "realms_engine": s["realms"]["run"]["engine"], "receipts_engines": sorted({r["engine"] for r in s["receipts"]}),
              "runs": github_runs() if runs else []}
-    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "build": build}
+    build["board"] = board(build["runs"])
+    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "build": build}
 
 
 def embedded(page: str, key: str):
@@ -139,10 +212,10 @@ def main() -> int:
               "write the new engine into the page's words, then build again")
         return 1
     if a.check:
-        bad = [k for k in ("harness", "ctlrec", "scen") if embedded(page, k) != rec[k]]
+        bad = [k for k in ("harness", "ctlrec", "scen", "runs") if embedded(page, k) != rec[k]]
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         return 1 if bad else 0
-    for k in ("harness", "ctlrec", "scen", "build"):
+    for k in ("harness", "ctlrec", "scen", "runs", "build"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     b = rec["build"]
