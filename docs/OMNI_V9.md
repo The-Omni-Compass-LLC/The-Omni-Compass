@@ -209,7 +209,7 @@ wire, so they read the same on both checkouts by construction; the gate was run 
 seeds 1 to 8, and is recorded in `results/toy_gate/V9_VS_V8.md`: every gauge of every toy (the cluster at 60 s and at 15 s,
 conveyance with the quota readable and unreadable, the verdict on noisy work) identical to omni-v8 to the last digit, in every count
 (it ran with the glide at 0.10, a setting no toy reads). The same models show, for omni-v8 and the candidate alike, a pod start wait
-+9% against native beside 64% more requests served: the same row the real KEDA HTTP run showed (section 6 of `docs/OMNI_V7.md`;
++9% against native beside 64% more requests served: the same row the real KEDA HTTP run showed (`docs/OMNI_V7.md`, section 6;
 `docs/STATE_OF_PLAY.md`, Open), the next repair. These are our own models (class S), never a benchmark result.
 
 ## 5. What runs again on it
@@ -219,6 +219,6 @@ tick), with three entries added beside the operator's settings: MySQL, Redis and
 own 128 MB buffer pool; Redis with no memory ceiling and its own `noeviction` rule; MongoDB's own cache, half of the machine's
 memory less 1 GB). The grid on its own manifest (`results/grid_v9/`); every Azure set from A again. Google Cloud and Amazon stay
 behind their switches; the GPU runs on Lambda wait for the founder's word and one exact commit. The CityLearn table's three runs on
-GitHub make `results/live/V9_CITYLEARN.md`; it must read no LOSS in any district, as it did locally.
+GitHub make the table V9_CITYLEARN.md in `results/live/`; it must read no LOSS in any district, as it did locally.
 
 © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

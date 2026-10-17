@@ -30,6 +30,11 @@
   reference in both manuals lands on its printed page (a file name split over a page break or wrapped in a cell is read whole).
 - **Smaller**: every Python file compiles and reads no undefined name (`tools/lint_names.py`, in `verify.py`); the archive bot
   gzips bulky raw logs before it commits them; the GPU receipt's wording; the requirements lock regenerated for Python 3.12.
+- **The front-page bot keeps the reading key**: it rebuilt seven omni-v7 receipts (Kafka twice, PostgreSQL, Redis twice, MySQL,
+  MongoDB) without the key at their top, and `verify.py` caught it; the key is back on all seven, and the bot now writes it on
+  every table it rebuilds (`tools/readings.py --fix` in `.github/workflows/front-page.yml`). No reading moved.
+- **The clouds and the GPU, checked without spending a cent** (a dry run of the all-benchmarks button, 17 October): the Azure
+  key is in the repository; the Google, Amazon and Lambda keys are not, so their queues stay off and nothing there can start.
 
 ## 2026-10-17: Omni v8 stands (the outage battery left native); everything runs again on it
 

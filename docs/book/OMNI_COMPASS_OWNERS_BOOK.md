@@ -2760,7 +2760,7 @@ score is CityLearn's own (each over no battery at all), and every score's aim is
 | monthly unevenness | 0.9892 | not run | -2.28% GAIN |
 | net-zero shortfall | 1.1315 | not run | -2.78% GAIN |
 
-**Alameda County, 100 buildings (native from the archived GitHub run; the simulator is deterministic)**
+**Alameda County, 100 buildings**
 
 | CityLearn score | native | omni-v8 against native | omni-v9 against native |
 |---|---:|---:|---:|
@@ -2815,7 +2815,7 @@ wire, so they read the same on both checkouts by construction; the gate was run 
 seeds 1 to 8, and is recorded in `results/toy_gate/V9_VS_V8.md`: every gauge of every toy (the cluster at 60 s and at 15 s,
 conveyance with the quota readable and unreadable, the verdict on noisy work) identical to omni-v8 to the last digit, in every count
 (it ran with the glide at 0.10, a setting no toy reads). The same models show, for omni-v8 and the candidate alike, a pod start wait
-+9% against native beside 64% more requests served: the same row the real KEDA HTTP run showed (section 6 of `docs/OMNI_V7.md`;
++9% against native beside 64% more requests served: the same row the real KEDA HTTP run showed (`docs/OMNI_V7.md`, section 6;
 `docs/STATE_OF_PLAY.md`, Open), the next repair. These are our own models (class S), never a benchmark result.
 
 ### 18.5 What runs again on it
@@ -2825,7 +2825,7 @@ tick), with three entries added beside the operator's settings: MySQL, Redis and
 own 128 MB buffer pool; Redis with no memory ceiling and its own `noeviction` rule; MongoDB's own cache, half of the machine's
 memory less 1 GB). The grid on its own manifest (`results/grid_v9/`); every Azure set from A again. Google Cloud and Amazon stay
 behind their switches; the GPU runs on Lambda wait for the founder's word and one exact commit. The CityLearn table's three runs on
-GitHub make `results/live/V9_CITYLEARN.md`; it must read no LOSS in any district, as it did locally.
+GitHub make the table V9_CITYLEARN.md in `results/live/`; it must read no LOSS in any district, as it did locally.
 
 © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
@@ -7035,7 +7035,7 @@ No run at this level yet, real or modelled, on the engine that stands (`k8s_flee
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `26bcc0b6d`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `3ad633eb`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 46.1 The mechanism, and proof that it is the one that ran
 

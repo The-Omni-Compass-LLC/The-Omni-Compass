@@ -44,7 +44,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "results" / "grid_v9" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
-SINCE = "@@SINCE@@"  # only this campaign, omni-v9 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
+SINCE = "2026-10-17T23:40:00Z"  # only this campaign, omni-v9 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
 ENGINE = "omni-v9"                 # the engine whose grid this is (tools/omni_version.py)
 SIZES = (1, 10, 100, 1000)          # free GitHub only: owner restored 1,000 on 15 October
 RUNS = 1000                        # nested 1/10/100/1000 runs on free GitHub runners
@@ -102,7 +102,7 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # then C, and never while a run that goes first waits for a runner. A workflow's runs started since RERUN_SINCE are read
 # back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
 RERUNS = ROOT / "scripts" / "reruns.txt"
-RERUN_SINCE = "@@SINCE@@"   # omni-v9: every benchmark runs again from the moment the engine landed on main (17 October)
+RERUN_SINCE = "2026-10-17T23:40:00Z"   # omni-v9: every benchmark runs again from the moment the engine landed on main (17 October)
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # The clouds, their sets following one another without a hand on the button. Azure first (the founder's order of 13
@@ -114,7 +114,7 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # founder's order of 16 October: the Azure run is the measure of the other two), each behind its own switch line
 # (switch=on | off): off until that cloud's secrets are in the repository, so nothing is rented before the founder says
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
-AZURE_SINCE = "@@SINCE@@"   # omni-v9: every Azure set runs again on the engine that stands; the sets of earlier engines already
+AZURE_SINCE = "2026-10-17T23:40:00Z"   # omni-v9: every Azure set runs again on the engine that stands; the sets of earlier engines already
                                        # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v9 table
 AZURE_WF = "aks-metered.yml"
 CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
