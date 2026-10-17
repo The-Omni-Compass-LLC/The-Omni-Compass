@@ -414,11 +414,11 @@ def from_realms():
         return None
     prim = tower["summary"]["primary"]
     clear = prim[1] > 0 or prim[2] < 0
-    g = int(clear and prim[0] > 0); l_ = int(clear and prim[0] < 0)
+    g = int(clear and prim[0] > 0); l_ = 0; given = int(clear and prim[0] < 0)   # work per energy that fell is power given
     return {"date": updated(ROOT / "results" / "realms" / "REALMS.md"), "benchmark": "The 945 modelled muscles as one tower, every muscle written at once",
-            "benefit": benefit_word(g, l_), "pct": 100 * prim[0] if clear else 0.0, "gain": g, "loss": l_, "given": 0,
+            "benefit": benefit_word(g, l_), "pct": 100 * prim[0] if clear else 0.0, "gain": g, "loss": l_, "given": given,
             "words": (f"work per energy up {100 * prim[0]:.1f}% ({GAIN})" if clear and prim[0] > 0
-                      else f"work per energy down {abs(100 * prim[0]):.1f}% ({LOSS})" if clear else f"{EVEN}: nothing moved the same way in all three of our runs"),
+                      else f"work per energy down {abs(100 * prim[0]):.1f}% ({GIVEN})" if clear else f"{EVEN}: nothing moved the same way in all three of our runs"),
             "what": "the tower's work per energy over ten paired seeds; a model, evidence class S", "file": "results/realms/REALMS.md"}
 
 

@@ -36,7 +36,8 @@ How the sign of a number becomes a word:
 
 - **Time waited, missed or failed** (a response time, time over the line, failed requests): a fall is GAIN, a rise is LOSS.
 - **Work done** (work inside the line, throughput, a hit rate): a rise is GAIN, a fall is LOSS.
-- **A resource spent or held** (energy, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves).
+- **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
+- **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
@@ -613,7 +614,7 @@ installed is a quarter off the bill.
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
   - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses -0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
   - the organisms under the line load: the spine: GAIN (fewer misses), misses -0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
-- The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, LOSS in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
+- The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
 - The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v7, each named in its table): +4.2% GAIN on the resource reading (work, speed, machines, energy), +11.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +27.2% GAIN
   - Real cache (Redis, GitHub): +0.2% GAIN
@@ -632,9 +633,13 @@ installed is a quarter off the bill.
 | Redis, the cache's memory ceiling | omni-v7 | +0.2% | GAIN, power given | L |
 | Real Kubernetes, faults | omni-v7 | +35.0% | GAIN, power given | L |
 | Real Kubernetes, all four at once | omni-v7 | +37.4% | GAIN | L |
+| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v7 | +18.0% | GAIN, power given | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v7 | +0.0% | EVEN | L |
 | Real Kubernetes, a queue of jobs | omni-v7 | +12.5% | GAIN | L |
 | Real Kubernetes, a public day of demand (Google 2011) | omni-v7 | +31.5% | GAIN, power given | L |
 | Real Kubernetes, a noisy neighbour | omni-v7 | +0.0% | EVEN | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +78.3% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +44.8% | GAIN, power given | L |
 | Power grids (SimBench), both load models | omni-v7 | +5.8% | GAIN, power given | S |
 | PostgreSQL, the pooler's pool size | omni-v7 | +0.0% | EVEN | L |
 | MySQL, the buffer pool's size | omni-v7 | +0.0% | EVEN | L |
@@ -642,10 +647,6 @@ installed is a quarter off the bill.
 | Kafka, the consumer group's size | omni-v7 | +0.1% | GAIN | L |
 | Drone swarms, the three untouched cells | omni-v7 | +6.1% | GAIN | S |
 | Buildings and batteries (CityLearn), the districts with batteries | omni-v7 | +0.8% | GAIN AND LOSS | S |
-| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v7 | +18.0% | GAIN, power given | L |
-| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v7 | +0.0% | EVEN | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +78.3% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +44.8% | GAIN, power given | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
@@ -1113,8 +1114,9 @@ have been.
 
 **On the newest engine** (omni-v5), the grid with the cluster inside (`results/grid_v5/GRID.md`, the card version,
 digest `5648f290`) reads the cluster's time over the response line and the organism's time over the line GAIN in every
-square of 10 and 100 repetitions; the organism's work per energy reads LOSS in 21 of those 36 squares (power given that
-bought fewer misses, not more work), and the cluster's 95th and 99th percentiles read LOSS in two squares at 100 copies.
+square of 10 and 100 repetitions; the organism's work per energy fell in 21 of those 36 squares, power given (it falls when
+more power is given; it bought fewer misses, not more work), and the cluster's 95th and 99th percentiles read LOSS in two squares
+at 100 copies, where the runner fell behind the organism's clock.
 Protocol 3 at 100 copies (digest `6093b2b8`, ten paired repetitions each; runs 38464343379, 38462289297, 38462280620)
 found the cause of those two: the tower's 95th percentile +47.7% and the four stacked's +87.2% (99th: +32.1%), on a
 four-core machine already about 80% busy and failing about half its requests in both arms, where the max added 40% to
@@ -1287,7 +1289,7 @@ never read across engines. The newest state, written from the result files on ev
 | Power grid, 11 SimBench grids in pandapower | 67 gauge-rows GAIN, 14 power given (line losses in four grids with their own generation, tap operations in one), no LOSS | S | "Where does it cost?" In the rural and semi-urban grids with their own generation, where a lower voltage raises losses; the table shows it |
 | Robot arms, MuJoCo Menagerie | on the Kinova Gen3 peak torque −28.6%, tracking error −21.3%, copper heating −11.3%, GAIN in all three of our runs; two arms left native by the paired physics trial | S | "What about the arms that gained nothing?" The trial left them native and the table says so |
 | Drone swarms, gym-pybullet-drones, three 20-drone cells | energy a mission −7% to −20%, missions a charge +8% to +25%, GAIN in all three of our runs; no late mission, reserve breach, near miss or collision | S | "Is the energy a meter?" No, a declared model from the simulator's own motor constants |
-| Buildings with batteries, CityLearn 3.0.2 | electricity bought and daily peak GAIN in all ten battery districts; **LOSS in all three of our runs in the seven 2023 districts** (energy not served +2.0% to +9.8%, discomfort, ramping, the highest peak in three) and the 2022 robustness district's monthly unevenness +0.11% | S | "Why a LOSS?" The 2023 districts simulate power outages and the wire moved a battery that is also its building's reserve; omni-v8 leaves those batteries native (read locally: the 2023 districts native's to the digit, every other district omni-v7's). The robustness district's +0.11% is repaired in omni-v9, the wire reading the coming hour |
+| Buildings with batteries, CityLearn 3.0.2 | electricity bought and daily peak GAIN in all ten battery districts; **LOSS in all three of our runs in the seven 2023 districts** on omni-v7 (energy not served +2.0% to +9.8%, discomfort; the ramping and the highest peak beside them power given), repaired in omni-v8; the 2022 robustness district's monthly unevenness +0.11%, power given | S | "Why a LOSS?" The 2023 districts simulate power outages and the wire moved a battery that is also its building's reserve; omni-v8 leaves those batteries native (read locally: the 2023 districts native's to the digit, every other district omni-v7's). The robustness district's +0.11% is repaired in omni-v9, the wire reading the coming hour |
 | Azure's bill at the tune-down | the sets run one at a time on omni-v9 (the steady set, two bursts, the Google day) | L, a real bill | "Then where is the saving?" Not claimed until its three-run tables land; the 4-worker v1 fleet read EVEN on every gauge, too small to show one machine |
 | The real card (GPU) | **obsolete**: every earlier card result ran on a controller since replaced | P pending | "When?" The founder's runs on rented cards at one named commit, after the CPU and cloud work |
 
@@ -3459,18 +3461,19 @@ or approved these results.
 - **Buildings with batteries** (`V7_CITYLEARN.md`; runs 38937540021, 38949618073, 38959444615): every district CityLearn 3.0.2
   ships, its own rule-based control as native, each building's battery charge and discharge as the knob. In the ten battery
   districts the electricity bought fell in all ten and the daily peak in all ten, carbon in eight and the daily unevenness in
-  ten, GAIN in all three of our runs. **In the seven 2023 districts four scores read LOSS in all three of our runs**: the energy
-  not served rose 2.0% to 9.8% (seven districts), the time uncomfortable 0.01% to 0.15% (six), the ramping 4.5% to 6.2% (seven)
-  and the highest peak 2.5% (three); the monthly unevenness rose 0.07% to 0.11% in two districts, LOSS. The bill rose in seven,
-  power given. The cause was found on CityLearn itself, run locally on the same version and reproducing these numbers to the
+  ten, GAIN in all three of our runs. **In the seven 2023 districts two scores read LOSS in all three of our runs**: the energy
+  not served rose 2.0% to 9.8% (seven districts) and the time uncomfortable 0.01% to 0.15% (six), the occupants' misses. Beside
+  them the ramping rose 4.5% to 6.2% (seven), the highest peak 2.5% (three), the monthly unevenness 0.07% to 0.11% (two) and the
+  bill (seven): power held and spent, power given by the key (the table had printed the first three LOSS until the CityLearn tool
+  was corrected on 17 October). The cause was found on CityLearn itself, run locally on the same version and reproducing these numbers to the
   last digit: the 2023 districts simulate power outages, CityLearn counts energy not served only in outage hours, and the battery
   wire read the district's draw alone; it neither saw the outage nor the battery's second duty, carrying its building through
   one. The fix is a change to the wire, a file of the engine's fingerprint, so it made the next engine version: **omni-v8** left
   every battery whose building simulates outages native and moves the rest exactly as before. Read locally on CityLearn 3.0.2
   before any GitHub run, the 2023 districts are native's to the last digit and every other district omni-v7's (the 2022
-  robustness district checked to the digit against run 38937540021). The robustness district's monthly unevenness, +0.11%, was
-  repaired in **omni-v9**: the wire reads the coming hour and glides at up to 0.0625 an hour; read on CityLearn before it was pushed,
-  −1.56% (GAIN) there and no LOSS against native in any district (`docs/OMNI_V9.md`); its three runs make the table V9_CITYLEARN.md.
+  robustness district checked to the digit against run 38937540021). The robustness district's monthly unevenness, +0.11% (power
+  given), was cut in **omni-v9**: the wire reads the coming hour and glides at up to 0.0625 an hour; read on CityLearn before it was
+  pushed, −2.29% (GAIN) there and no LOSS against native in any district (`docs/OMNI_V9.md`); its three runs make the table V9_CITYLEARN.md.
 
 ### 16.6 The one number, and the table
 

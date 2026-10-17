@@ -5,8 +5,9 @@
 Omni v9 is the engine that stands on main since 17 October (the founder's orders: "we're going into another version of
 Engine ... Apply the fix, run it, and see in the toy sim that it works"; "Omni-Compass should be tuned to exploit all that can be
 and keep all healthy and never raise its bill ... the tuning stays where it doesn't ever hurt anyone"). It is omni-v8
-(`docs/OMNI_V8.md`) with one wire repaired and one statistical table made exact, written because omni-v8's last LOSS row was
-traced to our own wiring. Its fingerprint is `OMNI_V9.json` (digest `7379f3a79ff2c475`, 47 files); 44 are omni-v8's bytes, two
+(`docs/OMNI_V8.md`) with one wire repaired and one statistical table made exact. It was written for one omni-v8 row the table
+printed as LOSS; on 17 October the founder found that word misapplied (section 1): the row was power given. The repair it led to
+stands on its own, because it cuts the bill further in every district. Its fingerprint is `OMNI_V9.json` (digest `7379f3a79ff2c475`, 47 files); 44 are omni-v8's bytes, two
 differ (the CityLearn runner and the realms harness) and one is new (`omnicompass/student_t.py`). It was proven in our own runs of
 CityLearn and in the toy gate before it was pushed. Every benchmark runs again on it, and every earlier table stands as its own
 engine's result until its three runs on v9 land; results from two versions are never pooled. Run and scored by The Omni-Compass
@@ -19,14 +20,17 @@ LLC's own code. No outside party has reviewed or approved these results.
 
 ## 1. What omni-v8 read, and why
 
-One row of omni-v8 read LOSS in a GitHub table: in `citylearn_challenge_2022_phase_all_robustness` (17 buildings, a battery in
+One row of the omni-v8 table was printed LOSS: in `citylearn_challenge_2022_phase_all_robustness` (17 buildings, a battery in
 each, no outage buildings) the monthly load unevenness (`monthly_one_minus_load_factor_average`: one minus each month's mean draw
-over its peak) rose 0.11%, LOSS in all three of our runs, beside the bill −8.6%, the electricity bought −14.7%, the daily peak −14.0%
-and the highest peak −2.7%, all GAIN (the omni-v7 table, whose commands omni-v8 repeats to the byte outside the 2023 districts).
-Run locally, the same wire also read LOSS on districts the GitHub benchmark does not run (CityLearn ships them only in its source
-repository): the tuning district's monthly unevenness +0.26%; in the 2022 phase 2 the highest peak +0.17%, the daily unevenness
-+1.03% and the monthly unevenness +0.68%; in the 2022 phase 3 the highest peak +0.45% and the ramping +3.37%. They are reported
-here with the rest.
+over its peak) rose 0.11% in all three of our runs, beside the bill −8.6%, the electricity bought −14.7%, the daily peak −14.0% and
+the highest peak −2.7%, all GAIN (the omni-v7 table, whose commands omni-v8 repeats to the byte outside the 2023 districts). **By
+the key that row is power given, not a LOSS**: the unevenness is the shape of the power the district holds from the grid, a
+resource held, as a peak is; it is neither time waited nor work done nor a miss. The CityLearn table tool had filed the peaks, the
+swings and the unevenness as misses; it was corrected on 17 October (`tools/citylearn_abc.py`, `tools/readings.py`: one key for
+every gauge, as a cluster's peak power always was). Run locally, the same wire also raised, on districts the GitHub benchmark does
+not run (CityLearn ships them only in its source repository), the tuning district's monthly unevenness +0.26%; in the 2022 phase 2
+the highest peak +0.17%, the daily unevenness +1.03% and the monthly unevenness +0.68%; in the 2022 phase 3 the highest peak +0.45%
+and the ramping +3.37%: power given, every one, and shown here with the rest.
 
 The cause was found in an hour-by-hour trace of the omni-v8 wire on the robustness district (CityLearn 3.0.2, run locally):
 
@@ -39,15 +43,15 @@ The cause was found in an hour-by-hour trace of the omni-v8 wire on the robustne
 - The score is a ratio. Lowering a month's mean (less energy bought) while its peak hour stays at the batteries' limit raises one
   minus mean over peak: the energy fell faster than the top hours.
 
-Narrower repairs were tried on the robustness district first, and each left a LOSS, so none is in the engine:
+Narrower repairs were tried on the robustness district first; each left the unevenness up, so none is in the engine:
 
 | Candidate | What it changed | Monthly unevenness against native |
 |---|---|---:|
-| no discharge below the band's middle | Omni-Compass adds no discharge in a quiet hour | +0.11% (LOSS) |
-| no new peak (the month's top so far, and the month's or the week's) | the charge it adds never lifts the district above its top so far | +0.11% (LOSS) |
-| peak push | full discharge where the draw nears the month's top so far | +0.12% (LOSS) |
-| a reserve of 30%, 50% or 70% of charge | its added discharge stops at the reserve | +0.42%, +0.25%, +0.25% (LOSS), and the highest peak's GAIN lost |
-| the hour gone, glide 0.25 | faster only | −0.61% (GAIN), but the ramping +13.2% (LOSS) |
+| no discharge below the band's middle | Omni-Compass adds no discharge in a quiet hour | +0.11% (power given) |
+| no new peak (the month's top so far, and the month's or the week's) | the charge it adds never lifts the district above its top so far | +0.11% (power given) |
+| peak push | full discharge where the draw nears the month's top so far | +0.12% (power given) |
+| a reserve of 30%, 50% or 70% of charge | its added discharge stops at the reserve | +0.42%, +0.25%, +0.25% (power given), and the highest peak's GAIN lost |
+| the hour gone, glide 0.25 | faster only | −0.61% (GAIN), the ramping +13.2% (power given) |
 
 ## 2. The change, and how far it is pushed
 
@@ -56,22 +60,23 @@ days, h[t−24], h[t−48], …, h[t−168] (only hours already seen; before a d
 the wire changed: the compass law, its gain (0.5), its response (1 h), its band (the 10th to the 90th percentile of the past week's
 draw), the hand-back at 90% of the year, the batteries left native in outage buildings (omni-v8) and the water tanks left native.
 
-The glide was set by the founder's rule: as far as the wire can be pushed with no score of any district made worse. With the new
-reading, every glide from 0.05 to 0.10 an hour was run on the districts where the edge lies; the fastest that read no LOSS on any
-score in both is 0.0625:
+The glide was set where no score of any district rose: with the new reading, every glide from 0.05 to 0.10 an hour was run on the
+districts where the edge lies, and the fastest at which nothing rose in either is 0.0625. Read by the key, no glide on the ladder
+reads a LOSS anywhere: every rise below is power given, and the bill keeps falling up to 0.0875 to 0.10:
 
 | District | Score | 0.05 | 0.0625 | 0.075 | 0.0875 | 0.10 |
 |---|---|---:|---:|---:|---:|---:|
-| phase 2 | daily unevenness | +0.25% LOSS | -0.09% GAIN | -0.67% GAIN | -0.94% GAIN | -0.91% GAIN |
+| phase 2 | daily unevenness | +0.25% power given | -0.09% GAIN | -0.67% GAIN | -0.94% GAIN | -0.91% GAIN |
 | phase 2 | net-zero shortfall | -7.53% GAIN | -4.77% GAIN | -3.38% GAIN | -2.54% GAIN | -1.99% GAIN |
 | phase 2 | the bill | -14.12% GAIN | -17.22% GAIN | -18.75% GAIN | -19.17% GAIN | -19.03% GAIN |
-| phase 3 | the ramping | -5.05% GAIN | -1.91% GAIN | +2.32% LOSS | +6.18% LOSS | +9.59% LOSS |
-| phase 3 | net-zero shortfall | -2.21% GAIN | -0.76% GAIN | -0.04% EVEN | +0.25% LOSS | +0.41% LOSS |
+| phase 3 | the ramping | -5.05% GAIN | -1.91% GAIN | +2.32% power given | +6.18% power given | +9.59% power given |
+| phase 3 | net-zero shortfall | -2.21% GAIN | -0.76% GAIN | -0.04% EVEN | +0.25% power given | +0.41% power given |
 | phase 3 | the bill | -6.60% GAIN | -7.32% GAIN | -8.10% GAIN | -8.43% GAIN | -8.32% GAIN |
 
-At 0.05 the 2022 phase 2's daily unevenness reads LOSS; from 0.075 the 2022 phase 3's ramping does, and from 0.0875 its net-zero
-shortfall. At 0.0625 every score of every district reads GAIN (section 3). The phase 2 daily unevenness at 0.0625, −0.09%, is the
-thinnest margin in the table and is said here.
+At 0.05 the 2022 phase 2's daily unevenness rises; from 0.075 the 2022 phase 3's ramping does, and from 0.0875 its net-zero
+shortfall: power given, each. At 0.0625 every score of every district reads GAIN (section 3). The founder's rule for the tune (use
+everything that can be used, keep everything healthy, never raise the bill) takes the glide past 0.0625, to the speed that cuts the
+bill most with no LOSS: that is the next version's change, read on CityLearn first.
 
 The second change is statistical and moves no command. The interval tables written in each tool stopped at a few sample sizes and
 fell back to 1.96 (the normal quantile) for a number of pairs they did not list, too narrow an interval for a small sample. Every
@@ -84,7 +89,7 @@ old tables lacked, so no published reading moves.
 CityLearn 3.0.2, run locally on its own district files, native (CityLearn's BasicRBC) against Omni-Compass on top of it; every
 score is CityLearn's own (each over no battery at all), and every score's aim is lower. The omni-v8 column is the wire as it stood.
 
-**2022 robustness, 17 buildings (where the LOSS stood)**
+**2022 robustness, 17 buildings (where the omni-v8 row stood)**
 
 | CityLearn score | native | omni-v8 against native | omni-v9 against native |
 |---|---:|---:|---:|
@@ -95,7 +100,7 @@ score is CityLearn's own (each over no battery at all), and every score's aim is
 | the highest peak | 1.0272 | -2.73% GAIN | -2.73% GAIN |
 | the ramping | 1.2231 | -7.18% GAIN | -12.60% GAIN |
 | daily unevenness | 1.0084 | -2.90% GAIN | -7.32% GAIN |
-| monthly unevenness | 0.9892 | +0.11% LOSS | -2.29% GAIN |
+| monthly unevenness | 0.9892 | +0.11% power given | -2.29% GAIN |
 | net-zero shortfall | 1.1312 | -6.10% GAIN | -2.76% GAIN |
 
 **2022 phase 1, 5 buildings (the tuning district)**
@@ -109,7 +114,7 @@ score is CityLearn's own (each over no battery at all), and every score's aim is
 | the highest peak | 1.0142 | -1.40% GAIN | -5.04% GAIN |
 | the ramping | 1.1562 | -4.41% GAIN | -10.45% GAIN |
 | daily unevenness | 0.9892 | -0.29% GAIN | -3.09% GAIN |
-| monthly unevenness | 0.9900 | +0.26% LOSS | -1.68% GAIN |
+| monthly unevenness | 0.9900 | +0.26% power given | -1.68% GAIN |
 | net-zero shortfall | 1.1369 | -6.55% GAIN | -2.85% GAIN |
 
 **2022 phase 2, 5 buildings**
@@ -120,10 +125,10 @@ score is CityLearn's own (each over no battery at all), and every score's aim is
 | electricity bought | 1.2124 | -16.87% GAIN | -18.44% GAIN |
 | carbon | 1.1665 | -14.09% GAIN | -16.69% GAIN |
 | the daily peak | 1.1124 | -12.23% GAIN | -17.74% GAIN |
-| the highest peak | 0.9983 | +0.17% LOSS | -11.26% GAIN |
+| the highest peak | 0.9983 | +0.17% power given | -11.26% GAIN |
 | the ramping | 1.1231 | -3.97% GAIN | -10.99% GAIN |
-| daily unevenness | 0.9787 | +1.03% LOSS | -0.09% GAIN |
-| monthly unevenness | 0.9828 | +0.68% LOSS | -0.66% GAIN |
+| daily unevenness | 0.9787 | +1.03% power given | -0.09% GAIN |
+| monthly unevenness | 0.9828 | +0.68% power given | -0.66% GAIN |
 | net-zero shortfall | 1.1970 | -8.77% GAIN | -4.77% GAIN |
 
 **2022 phase 3, 7 buildings**
@@ -134,8 +139,8 @@ score is CityLearn's own (each over no battery at all), and every score's aim is
 | electricity bought | 1.1573 | -8.89% GAIN | -6.23% GAIN |
 | carbon | 1.1155 | -6.65% GAIN | -5.50% GAIN |
 | the daily peak | 1.0973 | -10.96% GAIN | -16.09% GAIN |
-| the highest peak | 0.9942 | +0.45% LOSS | -3.61% GAIN |
-| the ramping | 1.1814 | +3.37% LOSS | -1.91% GAIN |
+| the highest peak | 0.9942 | +0.45% power given | -3.61% GAIN |
+| the ramping | 1.1814 | +3.37% power given | -1.91% GAIN |
 | daily unevenness | 1.0176 | -4.83% GAIN | -9.88% GAIN |
 | monthly unevenness | 0.9838 | -0.55% GAIN | -5.07% GAIN |
 | net-zero shortfall | 1.0809 | -3.28% GAIN | -0.76% GAIN |
@@ -186,19 +191,19 @@ score is CityLearn's own (each over no battery at all), and every score's aim is
 | energy not served | 0.0000 | not run | +0.00% EVEN |
 | time uncomfortable | 0.8454 | not run | +0.00% EVEN |
 
-Across the districts above: omni-v8 29 GAIN, 0 EVEN, 7 LOSS (where it was run); omni-v9 58 GAIN, 9 EVEN, 0 LOSS.
+Across the districts above: omni-v8 29 GAIN, 0 EVEN, 7 power given, 0 LOSS (where it was run); omni-v9 58 GAIN, 9 EVEN, 0 power given, 0 LOSS.
 
-The districts: the robustness district, where the GitHub LOSS stood and where the cause was found; the tuning district
+The districts: the robustness district, where the omni-v8 row stood and where the cause was found; the tuning district
 (`citylearn_challenge_2022_phase_1`); the 2022 phases 2, 3 and all (shipped in CityLearn's source repository, not in its package,
 so the GitHub benchmark does not run them); and the two 100-building neighbourhoods the benchmark counts (Alameda County, Travis
 County). The seven 2023 districts are unchanged by construction: every battery in them is left native (omni-v8), so their omni arm
 is native's to the last digit. The shipped runner (`tools/run_citylearn.py`) and the study's copy of it give the same numbers to
 the last digit on both arms (checked on the robustness district).
 
-**Disclosed, though no score counts it.** Month by month, the peak hour with Omni-Compass on top still rises above native's in
-some months: in 2 of 12 months in the robustness district, 3 in the tuning district, 1 in each of the 2022 phases 2 and 3, and 2 in
-phase all (omni-v8: 3, 3, 2 and 4). CityLearn's own scores (the highest peak, the daily peak and the monthly unevenness, all
-GAIN) are the judged ones; the months are said so that nothing is hidden. A guard that keeps Omni-Compass's added charge under the
+**Shown, power given.** Month by month, the peak hour with Omni-Compass on top rises above native's in some months: in 2 of 12
+months in the robustness district, 3 in the tuning district, 1 in each of the 2022 phases 2 and 3, and 2 in phase all (omni-v8: 3,
+3, 2 and 4); in Alameda and Travis in none. A peak is power held, so each is power given, beside the bill and the energy it bought;
+CityLearn's own scores over the year (the highest peak, the daily peak and the monthly unevenness) read GAIN. A guard that keeps Omni-Compass's added charge under the
 month's top so far cut one of the two months on the robustness district and left every score GAIN; it is a candidate for the next
 version, in the toy gate first.
 

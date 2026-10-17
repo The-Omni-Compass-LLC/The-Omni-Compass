@@ -61,9 +61,9 @@ if [ "$PHASE" = install ]; then
   # Kepler's own word that it reads the processor's counters (and not a fake meter) on the control plane
   cp_pod=$(kubectl -n "$NS" get pods -o json | jq -r '.items[] | select(.spec.nodeName | test("control-plane")) | .metadata.name' | head -n 1)
   for _ in $(seq 1 30); do
-    kubectl get --raw "/api/v1/namespaces/$NS/pods/$cp_pod:28282/proxy/metrics" 2>/dev/null | grep -q '^kepler_node_cpu_joules_total' && break; sleep 5
+    kubectl get --raw "/api/v1/namespaces/$NS/pods/$cp_pod:28282/proxy/metrics" 2>/dev/null | grep '^kepler_node_cpu_joules_total' >/dev/null && break; sleep 5
   done
-  kubectl get --raw "/api/v1/namespaces/$NS/pods/$cp_pod:28282/proxy/metrics" | grep -q '^kepler_node_cpu_joules_total' \
+  kubectl get --raw "/api/v1/namespaces/$NS/pods/$cp_pod:28282/proxy/metrics" | grep '^kepler_node_cpu_joules_total' >/dev/null \
     || { echo "Kepler reports no node energy"; kubectl -n "$NS" logs "$cp_pod" --tail=60; exit 1; }
   kubectl -n "$NS" get pods -o json | jq -r '.items[].status.containerStatuses[]? | "\(.image) \(.imageID)"' | sort -u > "$OUT_DIR/kepler_pins.txt"
   { echo "kepler=$KEPLER_VERSION image=$KEPLER_IMAGE manifests=namespace:$SHA_NAMESPACE rbac:$SHA_RBAC configmap:$SHA_CONFIGMAP daemonset:$SHA_DAEMONSET service:$SHA_SERVICE"

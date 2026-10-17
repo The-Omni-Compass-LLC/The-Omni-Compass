@@ -44,7 +44,7 @@ sys.path.insert(0, str(ROOT))
 from tools.live_reps import arm_rep, arm_gauges, T95, LABEL, NEUTRAL, SAME_REL  # noqa: E402
 from tools.run_hil import NAMES, REALMS  # noqa: E402
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
-from tools.readings import word as gel_word, aim as gel_aim, receipt_key  # noqa: E402  (the words every table uses)
+from tools.readings import word as gel_word, aim as gel_aim, receipt_key, WORK_PER  # noqa: E402  (the words every table uses)
 
 ORDER = list(REALMS) + [TOWER, STACK]
 OMNI = ("compass", "omni")
@@ -59,13 +59,14 @@ BEHIND = "organism behind its window (s)"                  # shown, not judged: 
                                                            # last step ended (0 = on the clock); past 5% of the window the cell is off the clock
 OFF_CLOCK_SHARE = 0.05
 SHOWN = {"host CPU busy, the real machine under kind (%)", BEHIND}
-AIM_HIGHER = {"organism work", "organism work per energy"}
+AIM_HIGHER = {"organism work"}
+AIM_WORK_PER = {"organism work per energy"}            # work bought per joule: a fall is power given (17 October)
 
 
 def aim_of(k):
     """What a gauge is for: work done aims higher; a resource spent or held is spent; everything else here is time waited,
     missed or failed (tools/readings.py)."""
-    return "higher" if k in AIM_HIGHER else gel_aim("lower", k)
+    return "higher" if k in AIM_HIGHER else WORK_PER if k in AIM_WORK_PER else gel_aim("lower", k)
 
 
 def scale_of(key):

@@ -41,7 +41,8 @@ the founder overrides one in the conversation.
   over the past seven days, only hours already seen) and gliding at up to 0.0625 an hour (0.05 before; the fastest glide that read no LOSS on any score
   in any district: 0.075 and faster raised the ramping in one district), because the reading of
   the hour gone ran about five hours behind the day and left the batteries empty at each month's top hour (the 2022
-  robustness district's monthly unevenness +0.11%, LOSS); and every 95% interval on the exact Student t quantile
+  robustness district's monthly unevenness +0.11%, power given: a peak, a swing and an unevenness are power held, the
+  founder's correction of 17 October); and every 95% interval on the exact Student t quantile
   (`omnicompass/student_t.py`; every tabled value unchanged, no published reading moves). Proven locally on CityLearn
   3.0.2 and in the toy gate (`results/toy_gate/V9_VS_V8.md`, identical to v8 on every toy) before it was pushed. 44 of its
   47 files are omni-v8's bytes. Every benchmark runs again on it; the omni-v8 and omni-v7 tables stand as their own until
@@ -52,7 +53,8 @@ the founder overrides one in the conversation.
   charge is also its building's reserve (omni-v7's CityLearn table read LOSS in all three runs in the seven 2023 districts,
   the only ones with outages; every other district's commands are omni-v7's bytes). The other 45 engine files are omni-v7's.
   Every benchmark runs again on it (`scripts/reruns.txt`; the conductor's reruns, grid and Azure queues restarted on 17
-  October); one LOSS row stayed, the 2022 robustness district's monthly unevenness (+0.11%), repaired in omni-v9.
+  October); one row the table printed LOSS stayed, the 2022 robustness district's monthly unevenness (+0.11%), power given by the
+  key, and cut in omni-v9.
 - **Omni v7** (`OMNI_V7.json`, digest `d6d467b824c585f1`, 46 files; `docs/OMNI_V7.md`) stood on main 16 to 17 October,
   the founder's order ("Where is version 7? That's what you gotta push everything to"): v6's law, catalog and shared-host
   capacity repair (on kind every node is a container on one runner: its processor is counted once and no replica is
@@ -170,6 +172,13 @@ the founder overrides one in the conversation.
   (the host's busy share, the response time, the replicas), never guessed.
 
 ## Orders of 17 October
+
+- **One key for every gauge** (the founder's correction of 17 October, night: "a minus doesn't mean a loss and neither does a
+  plus mean a gain if you don't understand what it's against"). LOSS is only time waited, missed or failed that rose, or work
+  that fell. A peak, a swing, an unevenness, wear and every other resource spent or held is power: a fall is a cut, a GAIN, a
+  rise is power given, never a LOSS; work per energy that falls is power given too. The CityLearn tool had filed peaks, swings
+  and unevenness as misses and the grid had judged work per energy as work, so rows that were power given were printed LOSS;
+  both read through `tools/readings.py` now, and every result was re-read: on the engine that stands, no LOSS.
 
 - **Version 9: the fix proven in our own runs first, then pushed** (the founder's words: "Engine fix goes into models
   first ... Apply the fix, run it, and see in the toy sim that it works ... lock everything else that you're not touching

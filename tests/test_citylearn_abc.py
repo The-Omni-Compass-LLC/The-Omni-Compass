@@ -5,7 +5,8 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The CityLearn A/B/C rule (tools/citylearn_abc.py, docs/OMNI_V1.md): a deterministic simulator, so the three runs must
 reproduce each other; a score reads GAIN or LOSS in all three of our runs by what it is for when they do (the bill, the electricity
-bought and the carbon are amounts spent: a fall is a cut, a GAIN, a rise is power given; a peak that rose is a LOSS), EVEN under one
+bought, the carbon, the peaks, the swings and the unevenness are power spent or held: a fall is a cut, a GAIN, a rise is power given; the
+energy not served and the time uncomfortable are misses, and a rise is a LOSS), EVEN under one
 part in a million, and "the runs differ" when they do not; a district with no electric battery is listed as nothing for Omni to move, and a
 district CityLearn cannot run is listed with its error, never dropped."""
 import json
@@ -17,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import citylearn_abc as C
 from tools.run_citylearn import KPIS
 
-COST, PEAK = "cost_total", "daily_peak_average"
+COST, PEAK, MISS = "cost_total", "daily_peak_average", "annual_normalized_unserved_energy_total"
 
 
 def arm(name, batteries, **kpis):
@@ -26,8 +27,8 @@ def arm(name, batteries, **kpis):
             "seconds": 1.0, "moved_hours": 100, "handed_back": True, "kpis": base}
 
 
-def rec(batteries, omni_cost, omni_peak):
-    return {"native": arm("native", batteries), "omni": arm("omni", batteries, **{COST: omni_cost, PEAK: omni_peak}),
+def rec(batteries, omni_cost, omni_peak, omni_miss=1.0):
+    return {"native": arm("native", batteries), "omni": arm("omni", batteries, **{COST: omni_cost, PEAK: omni_peak, MISS: omni_miss}),
             "citylearn_version": "3.0.2", "settings": {}}
 
 
@@ -40,11 +41,12 @@ def write(root, run, districts):
 
 
 def main():
-    same = rec(3, 0.98, 1.03)                               # cost 2% lower, daily peak 3% higher, every run alike
+    same = rec(3, 0.98, 1.03, 1.05)                         # cost 2% lower, daily peak 3% higher, energy not served 5% higher, every run alike
     assert C.verdict([same] * 3, COST) == "**GAIN in all three of our runs**", "a bill cut is a GAIN"
-    assert C.verdict([same] * 3, PEAK) == "**LOSS in all three of our runs**", "a higher peak in all three is a LOSS"
+    assert C.verdict([same] * 3, PEAK) == "**power given in all three of our runs**", "a higher peak is power held: power given, never a LOSS"
+    assert C.verdict([same] * 3, MISS) == "**LOSS in all three of our runs**", "more energy not served in all three is a LOSS"
     assert C.verdict([same] * 3, "carbon_emissions_total") == "EVEN, the same"
-    other = rec(3, 0.98, 1.03); other["omni"]["kpis"][COST] = 0.97
+    other = rec(3, 0.98, 1.03, 1.05); other["omni"]["kpis"][COST] = 0.97
     assert C.verdict([same, same, other], COST) == "**the runs differ**", "a run that does not reproduce is a finding"
     tiny = rec(3, 1.0 + 1e-7, 1.0)
     assert C.verdict([tiny] * 3, COST) == "EVEN, the same", "a change under one part in a million"

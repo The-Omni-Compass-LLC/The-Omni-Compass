@@ -174,6 +174,16 @@ def build():
     return levels
 
 
+# A row an older engine's table read LOSS whose cause a later engine already repaired: said beside the row, never in its place.
+REPAIRED = {("V7_CITYLEARN.md", "citylearn_challenge_2023"): "; repaired in omni-v8: a battery that carries its building "
+            "through an outage stays native, so Omni-Compass reads native's own number there (`docs/OMNI_V8.md`); its three runs "
+            "on the engine that stands are running"}
+
+
+def repaired(row: str) -> str:
+    return next((note for (table, part), note in REPAIRED.items() if row.startswith(table) and part in row), "")
+
+
 def render(levels):
     L = ["# Every level: Omni-Compass on top of the muscle, the organism, the cluster, the service, the plant, the cloud", "",
          *receipt_key(), "",
@@ -205,7 +215,7 @@ def render(levels):
         if lv.get("missing"):
             L.append("No table yet for: " + ", ".join(lv["missing"]) + ".")
         if lv["against"]:
-            L += ["", "Goes the other way:", ""] + [f"- {a}" for a in lv["against"]]
+            L += ["", "Goes the other way:", ""] + [f"- {a}{repaired(a)}" for a in lv["against"]]
         if lv.get("inside"):
             L += ["", "Inside the organisms, the plants that did less work or missed their line more often than native:", ""]
             L += [f"- {a}" for a in lv["inside"]]

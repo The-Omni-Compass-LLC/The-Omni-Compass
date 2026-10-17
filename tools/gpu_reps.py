@@ -36,7 +36,7 @@ try:                                                       # the legal notice ev
     from tools.legal import stamp as _legal_stamp
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
-from tools.readings import word as gel_word, labelled, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (the words every table uses)
+from tools.readings import word as gel_word, labelled, GAIN, EVEN, LOSS, GIVEN, WORK_PER  # noqa: E402  (the words every table uses)
 CLEAR = "clear of the noise"   # the 95% interval excludes zero (the GPU preregistration, amendment of 17 October)
 from pathlib import Path
 
@@ -52,7 +52,8 @@ LOWER = {"energy, whole machine at the wall (J)", "energy, GPU (J)", "energy per
          "response time, 99th percentile (ms)", "energy, CPU package (J)", "energy, rest of the machine (J)",
          "energy, DRAM (J)", "energy, platform psys (J)", "energy, GPU device counter (J)"}
 # the resources a card spends (energy, power and the heat they make): a fall is a cut, a GAIN; a rise is power given, never
-# a loss (tools/readings.py). Time waited and requests not served are LOSS when they rise; work and work per energy aim higher.
+# a loss (tools/readings.py). Time waited and requests not served are LOSS when they rise; work aims higher; work per energy that falls is power
+# given (it falls when more power is given for the work).
 SPENT = {k for k in LOWER if k.startswith(("energy", "power", "temperature"))}
 PRIMARY = "work per energy (served requests per kJ)"
 WALL = "work per wall energy (served requests per kJ, whole machine)"
@@ -375,7 +376,7 @@ def verdict(k, mean, half, n):
         return "no interval (too few repetitions)"
     if abs(mean) < 1e-12 and half < 1e-12:
         return f"{EVEN}, the same"
-    aim = "spent" if k in SPENT else "lower" if k in LOWER else "higher"
+    aim = "spent" if k in SPENT else "lower" if k in LOWER else WORK_PER if k in (PRIMARY, WALL) else "higher"
     if mean - half > 0 or mean + half < 0:
         return f"{gel_word(mean < 0, aim)}, {CLEAR}"
     return f"{EVEN}, no difference beyond the noise"
