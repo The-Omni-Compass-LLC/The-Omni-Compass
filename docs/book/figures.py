@@ -39,7 +39,8 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "docs" / "book" / "figures"
 
 W = 486.0                               # the text frame of the book, in points (US Letter, 1 in and 0.75 in margins)
-PT = 11                                 # every label at the body size (the founder's prompt rules)
+PT = 9                                  # every label at 9 pt (the founder's order of 16 October, night: the shells stay,
+                                        # the type goes to 9 pt so that no word ever leaves its cell)
 NAVY = colors.HexColor("#0b1f3a")
 GOLD = colors.HexColor("#a8801f")
 RULE = colors.HexColor("#c9b27a")
@@ -205,7 +206,7 @@ def fig_band():
 def fig_loop():
     """One decision of the live controller: senses, blind-means-hold, the engine, the law, the gate, the verdict, the write,
     the audit; the order of omni_controller/controller.py and the rules of omnicompass/nervous_system.py."""
-    d = Drawing(W, 612)
+    d = Drawing(W, 500)                       # 500 pt: with its caption the figure fits a page under a few lines of text
     L, Rr = 60, 340                                                                  # the main column
     cx = (L + Rr) / 2
     wmain = Rr - L
@@ -217,40 +218,40 @@ def fig_loop():
     def down(y_from, y_to):
         arrow(d, [(cx, y_from), (cx, y_to)])
 
-    b1 = step(556, 36, ["Wake on the period: a full decision every 60 s,", "the fast checks every 5 s"], fill=BLUE)
-    down(556, 541)
-    step(504, 36, ["Read every sense: the service gauge, the resource,", "and the knob read back from the device"])
-    down(504, 486)
-    diamond(d, cx, 460, wmain, 50, ["a sense blind or stale?"])
-    down(435, 433)
-    step(380, 52, ["The engine: the state blended toward the", "observations and moved one macro step; from it", "the authority, the push and the convergence"])
-    down(380, 367)
-    step(330, 36, ["The compass law: the reading's position p in its", ("band, and the force F = A·tanh(r/A)", MATH)])
-    down(330, 312)
-    diamond(d, cx, 286, wmain, 50, [("F > 0: the up side?", MATH)])
-    down(261, 250)
-    diamond(d, cx, 218, wmain, 62, ["the release gate: calm, the line clean for", "three decisions, nothing pending,", "every sense live?"])
-    down(187, 183)
-    step(130, 52, ["The verdict on a slow knob: the paired trial at", "the 2% line against the step before; a step", "that costs the work more is refused"])
-    down(130, 115)
-    step(78, 36, ["Write one value through the plug, clipped to", "the cover; read back what the device took"])
-    down(78, 63)
-    step(26, 36, ["The audit: every sense, the state, the force, the", "gate's reason, the value sent and the value taken"], fill=BLUE)
+    step(454, 30, ["Wake on the period: a full decision every 60 s,", "the fast checks every 5 s"], fill=BLUE)
+    down(454, 444)
+    step(414, 30, ["Read every sense: the service gauge, the resource,", "and the knob read back from the device"])
+    down(414, 404)
+    diamond(d, cx, 382, wmain, 44, ["a sense blind or stale?"])
+    down(360, 350)
+    step(308, 42, ["The engine: the state blended toward the", "observations and moved one macro step; from it", "the authority, the push and the convergence"])
+    down(308, 298)
+    step(268, 30, ["The compass law: the reading's position p in its", ("band, and the force F = A·tanh(r/A)", MATH)])
+    down(268, 258)
+    diamond(d, cx, 236, wmain, 44, [("F > 0: the up side?", MATH)])
+    down(214, 204)
+    diamond(d, cx, 175, wmain, 58, ["the release gate: calm, the line clean for", "three decisions, nothing pending,", "every sense live?"])
+    down(146, 136)
+    step(94, 42, ["The verdict on a slow knob: the paired trial at", "the 2% line against the step before; a step", "that costs the work more is refused"])
+    down(94, 84)
+    step(54, 30, ["Write one value through the plug, clipped to", "the cover; read back what the device took"])
+    down(54, 44)
+    step(14, 30, ["The audit: every sense, the state, the force, the", "gate's reason, the value sent and the value taken"], fill=BLUE)
     # the right lane: a hold goes straight to the audit, with its reason
     lane = 430
-    arrow(d, [(Rr, 460), (lane, 460), (lane, 44), (Rr, 44)], color=GOLD)
-    text(d, Rr + 6, 466, "yes: hold", color=GOLD, anchor="start")
-    arrow(d, [(Rr, 218), (lane, 218)], color=GOLD, head=False)
-    text(d, Rr + 6, 224, "no: hold, reason written", color=GOLD, anchor="start")
-    text(d, cx + 6, 437, "no", color=GREY, anchor="start")
-    text(d, cx + 6, 252, "no: the down side", color=GREY, anchor="start")
-    text(d, cx + 6, 185, "yes", color=GREY, anchor="start")
+    arrow(d, [(Rr, 382), (lane, 382), (lane, 29), (Rr, 29)], color=GOLD)
+    text(d, Rr + 6, 388, "yes: hold", color=GOLD, anchor="start")
+    arrow(d, [(Rr, 175), (lane, 175)], color=GOLD, head=False)
+    text(d, Rr + 6, 181, "no: hold, reason written", color=GOLD, anchor="start")
+    text(d, cx + 6, 352, "no", color=GREY, anchor="start")
+    text(d, cx + 6, 206, "no: the down side", color=GREY, anchor="start")
+    text(d, cx + 6, 138, "yes", color=GREY, anchor="start")
     # the left lane: the up side is never gated beyond the security hold; it goes straight to the write
-    arrow(d, [(L, 286), (30, 286), (30, 96), (L, 96)], color=GREEN)
-    text(d, 34, 270, "yes: add at once", color=GREEN, anchor="start")
+    arrow(d, [(L, 236), (30, 236), (30, 69), (L, 69)], color=GREEN)
+    text(d, 34, 222, "yes: add at once", color=GREEN, anchor="start")
     # the loop: the audit closes one decision and the next begins
-    arrow(d, [(L, 44), (12, 44), (12, 574), (L, 574)], color=GREY, dash=[3, 3])
-    text(d, 12, 600, "the next decision", color=GREY, anchor="start")
+    arrow(d, [(L, 29), (12, 29), (12, 469), (L, 469)], color=GREY, dash=[3, 3])
+    text(d, 12, 488, "the next decision", color=GREY, anchor="start")
     return d
 
 

@@ -51,7 +51,7 @@ def main(argv=None):
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     runs = [load(d) for d in (a.a, a.b, a.c)]
-    L = ["# The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table (Omni v5)", "",
+    L = ["# The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table", "",
          *receipt_key(), "",
          "Three separate GitHub runs of the same preregistered test on the same engine: A is the result, B and C are the "
          "replications. The cap is a quota on the served app's CPU, the same in both arms and enforced by the cluster; the "
@@ -69,6 +69,8 @@ def main(argv=None):
         engines.append(ver.split(" ")[0])
         pairs = sorted({r["pairs"] for r in rows.values()})
         L.append(f"| {tag} | {run} | {meta.get('label', '?')} | `{sha}` | {ver} | {', '.join(map(str, pairs))} |")
+    if len(set(engines)) == 1:                       # the title names the engine the three runs were on
+        L[0] += " (" + engines[0].replace("omni-v", "Omni v") + ")"
     if len(set(engines)) > 1 or len({r for r, _, _ in runs}) < 3:
         L[2:2] = ["**Not one engine's three separate runs: " + ", ".join(engines) + ".** The readings below compare runs on "
                   "different engines.", ""]

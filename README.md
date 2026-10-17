@@ -4,7 +4,7 @@
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
-The Omni-Compass LLC · Main office infrastructure · Toll-free direct 1-888-339-9551 · System route asset 1-888-DEX-YLL-1 · [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report and printout
+The Omni-Compass LLC · Main office infrastructure · Toll-free direct 1-888-339-9551 · System route asset 1-888-DEX-YLL-1 · Landline, registered in Florida, 321-746-4411 · [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report and printout
 of any part of Omni-Compass carries the notice above, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and
 [`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
 
@@ -205,10 +205,15 @@ record by record (every record of the governor, of the other muscles and of the 
 side, every input of the paired run from GitHub, and the papers counsel asks for (the license, the licensing answers, the
 third-party notices, the Enterprise License's standard terms, the patents and trademarks, the security policy). Since 16
 October it also states the rules of the engine that stands as an operator meets them (section 5.5) and how a new muscle is
-coded on the muscle SDK (section 4.7). It is 505 pages, with seven figures drawn from the code (the plug, the band and the two
-forces, one decision of the governor, the eight levels, the one pedal, the seven organisms, the three-run rule; `docs/book/figures/`)
-and an index; the Owner's, which prints the engine's whole source and adds the engine's six states and its two landscapes as
-figures, is 1,365. Its text is
+coded on the muscle SDK (section 4.7). It is 493 pages, with 49 figures drawn from the code by two kits (`docs/book/figures.py`,
+`docs/book/schematics.py`; the drawings in `docs/book/figures/`): the plug, the band and the two forces, one decision of the
+governor, the eight levels, the one pedal, the seven organisms and the three-run rule; a wiring schematic for every stack in
+the grammar of an electrical drawing (the governor's sense and motor terminals, the kill switch, the plug, the native
+controller, the muscle and the meters); the flowcharts of the wire check, the paired run, the eight phases, the release gate,
+the three stops and the reading rule; the timing diagrams; and the state machines of the modes, the card governor and the life
+of a muscle; and an index. The Owner's, which prints the engine's whole source and adds the engine's six states and its two
+landscapes, the control-loop block diagrams, the modelled traces and every receipt of the engine that stands charted from its
+own table (73 figures), is 1,239 pages. Its text is
 [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md); the cloud install files are `deploy/install/`
 (`omni-compass.yaml`, `rbac-machines.yaml`, `omni-compass-cloud.yaml`) and `deploy/Dockerfile.cloud`. It is written for the CTO who decides, the
 engineer who wires and the operator who runs it; the published results are on this page and in `results/`.
@@ -312,7 +317,7 @@ organisms, Omni index. The repository's GitHub topics (set by its owner from the
 ## Contact
 
 The Omni-Compass LLC, main office infrastructure. Toll-free direct: **1-888-339-9551**. System route asset:
-**1-888-DEX-YLL-1**. [www.omni-compass.com](https://www.omni-compass.com)
+**1-888-DEX-YLL-1**. Landline, registered in Florida: **321-746-4411**. [www.omni-compass.com](https://www.omni-compass.com)
 
 What the letters mean at Omni-Compass, read in order, the way the engine runs:
 

@@ -152,6 +152,26 @@ the founder overrides one in the conversation.
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 17 October
+
+- **The page number in both bottom corners, the running head on every page.** Every page of both manuals but the title
+  page carries the book's name on the left of the head and the part or chapter it belongs to on the right (openers and
+  front matter included), and the page label in the left and the right bottom corner, "so that when somebody can flip
+  through it" they know where they are. The notice stays at the foot of every page.
+- **The navigation is checked row by row before every push**: every Contents row against the page where its heading is
+  printed, every List of Figures row against the page of its caption, every index reference against the page it names,
+  every figure against the paragraph that names it (under it when it fits, else at the top of the next page, never
+  further, never more than two to a page, never in one block), the running head and both corner numbers on every page.
+  "Every time and every fix and change and upgrade" realigns both manuals in the same push.
+- **Every figure is read at referee level before it is placed**: what it pictures, where it lives, the mechanism it
+  states (the book, the Python, the harness, the organisms), its mathematics, structure, grids, arrows and direction;
+  anything under full comprehension is reworked before the push. Nothing may mislead the wiring of Omni-Compass into a
+  stack.
+- **Every benchmark that can exist has its place.** The register names every domain of the industry, every realm and
+  every muscle with the software available to benchmark; where a benchmark is not yet run, its place is written and
+  marked as not yet run, never with a result before the result exists. The gap audit against the whole industry (who we
+  have, who we do not, whose software is available) is standing work.
+
 ## Orders of 16 October
 
 - **Seven organisms, the spine the seventh.** The spine (267 muscles, every muscle in all four realms) is an organism in its
@@ -211,16 +231,36 @@ the founder overrides one in the conversation.
     theory (`docs/book/THEORY.md`, `docs/book/DECLARATION.md`), the mathematics, the mechanism, how it is built, the
     engine's source, every result, and the wiring. Every fix realigns both.
 - **The manuals carry drawn figures, no plates and no blank pages** (the founder's orders of 14 October and of 16 October,
-  night: "flow charts, illustrations to interpret the language of mathematics, build it in the manuals"). The figures are
-  drawn by `docs/book/figures.py` from the book's own code and the engine's own numbers (the two-way plug, the compass band
-  and the two forces, one decision of the governor, the eight levels, the one pedal, the seven organisms, the three-run rule;
-  in the Owner's Manual also the engine's six states and the double well), placed where a manual carries an image line
-  pointing at `book/figures/<key>.svg`, numbered, captioned, listed in a List of Figures after the Contents, and written
-  as SVG files in `docs/book/figures/` for the pages on GitHub; every label in them is 11 pt. None of the founder's plates
-  (his illustration images) go in: no cover art, no title-page rose, no plates, no List of Plates; no chart of a result
-  either. Every chapter starts on the next page; a part's heading sits at the top of a page with its first chapter under
-  it. The contents and page numbers are rebuilt from the book itself (`docs/book/build_book.py`). The plates stay in
-  `docs/book/plates/` as his property.
+  night: "flow charts, illustrations to interpret the language of mathematics, build it in the manuals"; then, the same
+  night: fifty more that interpret the code, the wiring and the receipts, "with another tool", so they do not all look the
+  same). Two kits draw them from the book's own code and the repository's own files: `docs/book/figures.py` (reportlab: the
+  two-way plug, the compass band and the two forces, one decision of the governor, the eight levels, the one pedal, the seven
+  organisms, the three-run rule; in the Owner's Manual also the engine's six states and the double well) and
+  `docs/book/schematics.py` (schemdraw and matplotlib: a wiring schematic for every stack in the grammar of an electrical
+  drawing, the governor with its sense and motor terminals, the kill switch, the plug, the native controller, the muscle and
+  the meters; the control-loop block diagrams; the flowcharts of the wire check, the paired run, the gate, the verdict, the
+  stops, the toy gate, the reading rule; the timing diagrams and modelled traces, marked class S; the state machines; every
+  receipt of the engine that stands charted from its own table; the grids of the organisms and the catalog). A chart of a
+  receipt pictures the table and adds nothing to it. Each figure is placed where a manual carries an image line pointing at
+  `book/figures/<key>.svg`, numbered, captioned, listed in a List of Figures after the Contents, and written as an SVG file
+  in `docs/book/figures/` for the pages on GitHub. **Every word lives inside its cell** (the founder's order of 16
+  October, night): the type in a figure is 9 pt (his order, the shells kept), every label is measured in its own type and
+  wrapped to the width of its box before it is drawn, the kit records any label that would not fit (`schematics.OVERFLOWS`,
+  empty on every build), and no figure is ever scaled below its type: a figure taller than a page is split into two,
+  "continued". A chart's axis shows what the reader needs to read it: the benefit sheet's axis reads 0, 10, 25, 50 and
+  100 % on a square-root scale so a small bar is seen, and a bar past 100 % is drawn to the edge and marked. The Operator's
+  Manual carries the wiring, the flowcharts, the timing and the structure (no receipt charts, no engine internals); the
+  Owner's carries all. None of the founder's plates (his illustration images) go in: no cover art, no title-page rose, no
+  plates, no List of Plates; no chart of a result either. **No dead pages** (the founder's order of 16 October, night: "every
+  page be fully populated, 80% at least"): a chapter starts on the next page unless that would leave the page before it
+  under 80 % used, and then it opens on the same page under a short space; a figure that does not fit under its paragraph
+  floats to the top of the next page while the text goes on; a page never ends on one or two lines of a paragraph; code is
+  set in pieces of six lines so a listing fills its page; a part's heading sits at the top of a page with its first chapter
+  under it. The fill of every page is measured on the built PDF before a push. The contents and page numbers are rebuilt
+  from the book itself (`docs/book/build_book.py`). The plates stay in `docs/book/plates/` as his property.
+- **The Operator's Manual discloses what it leaves out** (the founder's order of 16 October, night): the Owner's Manual
+  holds the harness, the engine's source, the mechanism and every result; the Operator's holds the wiring and operation
+  only, says so in its front matter, and names the Owner's Manual as the book to go back to for anything it does not carry.
 - **Every fix realigns everything, on every push.** When code changes or a bug is fixed, everything that describes it is
   brought up to it in the same push: the manual and its PDF, the README, the index, the tables, the plans and the
   standing pages. Then the newest-engine material is scanned top to bottom for the retired words and the old ways
@@ -288,10 +328,11 @@ the founder overrides one in the conversation.
   everything. Where a change made a result worse, the fix is made inside the newest engine and rerun.
 - **One cloud first** (13 October, night): Kubernetes on Azure is finished first; Google (GKE), Amazon (EKS) and the GPU
   chips (Lambda) are not run until the founder says the Azure Kubernetes results are where he needs them.
-- **The company's telephone** (13 October, night; wording of 14 October): "main office infrastructure, toll-free direct
-  1-888-339-9551, system route asset 1-888-DEX-YLL-1", on every contact line where the company is named for reaching it
-  (README, LICENSE and its copy, NOTICE, Enterprise License, Trademarks, Licensing FAQ, Security, Support, the manual's
-  "Who to call", codemeta), always before the website, never inside the legal notice, which ends with
+- **The company's telephone** (13 October, night; wording of 14 October; the landline added 16 October, night): "main
+  office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1", and under it the landline
+  registered in Florida, 321-746-4411 (the toll-free number always on top), on every contact line where the company is
+  named for reaching it (README, LICENSE and its copy, NOTICE, Enterprise License, Trademarks, Licensing FAQ, Security,
+  Support, the manual's "Who to call", codemeta), always before the website, never inside the legal notice, which ends with
   www.omni-compass.com. The letters, read in order, are the company's own reading of how the engine runs (README "Contact",
   the manual's "Who to call"): DEX, Data Exchange (the input, the two-way plug); YLL, Yield Limit Line (the boundary, every
   muscle to its own limit and never past it, as a material is loaded to its yield limit and springs back unharmed); 1, one

@@ -13,9 +13,12 @@ with everything: the theory and the declaration in docs/book/, the full manual, 
 catalog and the engine's source. Each in the order set in its outline below. US Letter, mirrored margins for binding,
 running heads, roman numerals in the front matter, a contents with page
 numbers and PDF bookmarks, and a List of Figures. The figures (the founder's order of 16 October, night: flow charts and
-illustrations that interpret the language of the mathematics) are drawn by docs/book/figures.py from the book's own
-code, placed where a manual carries a `![caption](book/figures/KEY.svg)` line, numbered and captioned; none of the
-founder's plates go in, and no blank pages (the founder's order of 14 October): every chapter starts on the next page.
+illustrations that interpret the language of the mathematics, then fifty more that interpret the code, the wiring and
+the receipts, drawn with another tool) come from two kits, docs/book/figures.py (reportlab) and docs/book/schematics.py
+(schemdraw and matplotlib: wiring schematics, block diagrams, flowcharts, timing diagrams, state machines, the receipts
+charted from their tables, the grids), each drawn from the book's own code and the repository's own files, placed where a
+manual carries a `![caption](book/figures/KEY.svg)` line, numbered and captioned; none of the founder's plates go in, and
+no blank pages (the founder's order of 14 October): every chapter starts on the next page.
 Type (the founder's prompt rules): body text, tables, lists, code and every label in a figure at 11 pt on a 1.5 line
 height, headings scaled up from it; only the running heads and footers are smaller, at 8 pt.
 
@@ -40,6 +43,8 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont as RLFont
 from reportlab.platypus import (BaseDocTemplate, CondPageBreak, Flowable, Frame, KeepTogether, PageBreak, PageTemplate,
                                 Paragraph, Spacer, Table, TableStyle, XPreformatted)
+from reportlab.platypus.doctemplate import ActionFlowable
+from reportlab.platypus.flowables import _listWrapOn
 from reportlab.platypus.tableofcontents import SimpleIndex, TableOfContents
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -89,6 +94,14 @@ SERIF_CMAP = set(TTFont(LIB + "LiberationSerif-Regular.ttf").getBestCmap())
 MONO_CMAP = set(TTFont(DJV + "DejaVuSansMono.ttf").getBestCmap())
 SYM_CMAP = set(TTFont(DJV + "DejaVuSans.ttf").getBestCmap())
 from docs.book import figures as FIG  # noqa: E402  (the figures, drawn from the code; after the fonts they are set in)
+from docs.book import schematics as SCH  # noqa: E402  (the second kit: schematics, flowcharts, timing, receipts, grids)
+
+FIGURES = {**FIG.FIGURES, **SCH.FIGURES}        # every figure of both kits, by key, with the title the list prints
+
+
+def fig_drawing(key, width):
+    """The drawing of a figure from whichever kit holds it."""
+    return SCH.drawing(key, width) if key in SCH.FIGURES else FIG.drawing(key, width)
 
 # ---------------------------------------------------------------- page and styles
 PW, PH = letter
@@ -100,7 +113,8 @@ RULE = colors.HexColor("#c9b27a")
 PT, LEAD = 11, 16.5                 # the founder's prompt rules: 11 pt or larger for all text, a 1.5 line height
 SMALL = 8                           # running heads and footers only
 BODY = ParagraphStyle("body", fontName="Serif", fontSize=PT, leading=LEAD, alignment=TA_JUSTIFY, spaceAfter=7, textColor=INK,
-                      bulletFontName="Serif", bulletFontSize=PT)        # list bullets and numbers at 11 pt too
+                      bulletFontName="Serif", bulletFontSize=PT,        # list bullets and numbers at 11 pt too
+                      allowWidows=0, allowOrphans=0)                    # no single line left alone on a page (no dead pages)
 CELL = ParagraphStyle("cell", fontName="Serif", fontSize=PT, leading=LEAD, textColor=INK)
 CELLH = ParagraphStyle("cellh", parent=CELL, fontName="Sans-Bold", fontSize=PT, textColor=colors.white)
 CODE = ParagraphStyle("code", fontName="Mono", fontSize=PT, leading=LEAD, textColor=INK)
@@ -114,13 +128,54 @@ KICK = ParagraphStyle("kick", fontName="Sans-Bold", fontSize=PT, leading=LEAD, t
 CAP = ParagraphStyle("cap", fontName="Serif-Italic", fontSize=PT, leading=LEAD, alignment=TA_CENTER, textColor=GREY)
 CENTER = ParagraphStyle("center", parent=BODY, alignment=TA_CENTER)
 TOC1 = ParagraphStyle("toc1", fontName="Serif-Bold", fontSize=12, leading=18, leftIndent=0, spaceBefore=7, textColor=NAVY)
-TOC2 = ParagraphStyle("toc2", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=18, firstLineIndent=0)
-TOC3 = ParagraphStyle("toc3", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=36, textColor=GREY)
+TOC2 = ParagraphStyle("toc2", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=18, firstLineIndent=0, rightIndent=40)
+TOC3 = ParagraphStyle("toc3", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=36, textColor=GREY, rightIndent=40)
 # the index at the back of the book (a monograph's): every entry at the body size, page numbers on the right
-INDEX = SimpleIndex(style=ParagraphStyle("ix", fontName="Serif", fontSize=PT, leading=LEAD), dot=" . ", headers=True)
+class Index(SimpleIndex):
+    """The index with every page reference at the body size: an entry whose page list would run past its line keeps
+    the pages that fit, where the term is defined and first used (reportlab would otherwise shrink the page list to fit
+    the line, below 11 pt)."""
+    MAX_WIDTH = 270.0                        # of the 486 pt line: the rest is the term and the dots
+    book = None                              # set by the Book: the index prints the page label the reader sees
+
+    def __call__(self, canv, kind, label):
+        """Records an index anchor under the printed page label (roman in the front matter, arabic from the body's
+        page 1), not the physical page count from the title page, so every reference lands where it says."""
+        from reportlab.platypus.tableofcontents import commasplit, decode_label
+        from reportlab.lib.utils import asNative
+        label = asNative(label, "latin1")
+        try:
+            terms, _fmt, _off = decode_label(label)
+        except Exception:
+            terms = label
+        terms = commasplit(terms)
+        cPN = canv.getPageNumber()
+        pns = self.book.label(cPN) if self.book is not None else str(cPN)
+        key = "ix_%s_%s_p_%s" % (self.name, label, pns)
+        info = canv._curr_tx_info
+        canv.bookmarkHorizontal(key, info["cur_x"], info["cur_y"] + info["leading"])
+        self.addEntry(terms, (cPN, pns), key)
+
+    def _getlastEntries(self, dummy=None):
+        entries = super()._getlastEntries() if dummy is None else super()._getlastEntries(dummy)
+        out = []
+        for texts, pages in entries:
+            keep, width = [], 0.0
+            for p in sorted(pages, key=lambda p: (p[0][0] if isinstance(p[0], tuple) else p[0], str(p))):
+                shown = p[0][1] if isinstance(p[0], tuple) else p[0]
+                width += pdfmetrics.stringWidth(f"{shown}, ", "Serif", PT)
+                if keep and width > self.MAX_WIDTH:
+                    break
+                keep.append(p)
+            out.append((texts, keep))
+        return out
+
+
+INDEX = Index(style=ParagraphStyle("ix", fontName="Serif", fontSize=PT, leading=LEAD), dot=" . ", headers=True)
 # a figure's caption under its drawing ("Figure N." in bold), and the List of Figures after the Contents, both at the body size
 FIGCAP = ParagraphStyle("figcap", parent=BODY, alignment=TA_LEFT, spaceBefore=5, spaceAfter=12)
-LOF = ParagraphStyle("lof", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=0)
+FIGNOTE = ParagraphStyle("fignote", parent=BODY, spaceBefore=0)      # a long caption's rules, as text under the figure
+LOF = ParagraphStyle("lof", fontName="Serif", fontSize=PT, leading=LEAD, leftIndent=0, rightIndent=40)   # room for the page number: never shrunk
 CODE_WIDTH = 70                     # characters of 11 pt mono that fit the frame inside a code block's padding
 
 # ---------------------------------------------------------------- text cleaning
@@ -288,9 +343,9 @@ def index_term_res():
     return _INDEX_TERM_RES
 
 
-def index_tags(text, kind="body"):
-    """The <index/> tags a paragraph carries, by what it names: files and settings always; glossary terms and families
-    where the paragraph defines or discusses them (bold) or is a heading about them."""
+def index_items(text, kind="body"):
+    """What a paragraph indexes, by what it names: files and settings always; glossary terms and families where the
+    paragraph defines or discusses them (bold) or is a heading about them."""
     items = set()
     for m in PATH_RE.finditer(text):
         p = m.group(1).rstrip(".,;:")
@@ -304,9 +359,40 @@ def index_tags(text, kind="body"):
             for term, rx in index_term_res():
                 if rx.search(hay):
                     items.add(term)
+    return sorted(items)
+
+
+def index_tag(item):
+    return '<index item="%s"/>' % item.replace(",", ";").replace("&", "&amp;").replace('"', "&quot;")
+
+
+def index_tags(text, kind="body"):
+    """The <index/> tags of a heading, at its start (a heading is never split over two pages)."""
+    return "".join(index_tag(i) for i in index_items(text, kind))
+
+
+def tagged(text, kind="body"):
+    """A paragraph's markup with each <index/> tag placed at the term it names, so that a paragraph split over two
+    pages indexes a term on the page where the term is printed, never where the paragraph began; a term the markup
+    does not show (a family named by its muscles) is tagged at the start."""
+    markup = inline(text)
+    items = index_items(text, kind)
     if not items:
-        return ""
-    return "".join('<index item="%s"/>' % i.replace(",", ";").replace("&", "&amp;").replace('"', "&quot;") for i in sorted(items))
+        return markup
+    head, plan = [], []
+    for item in items:
+        rx = re.compile(r"(?<![\w-])" + re.escape(item) + r"(?![\w-])", re.I)
+        pos = None
+        for m in rx.finditer(markup):
+            if markup.rfind("<", 0, m.start()) <= markup.rfind(">", 0, m.start()):   # outside any tag
+                pos = m.end(); break
+        (plan if pos is not None else head).append((pos, index_tag(item)))
+    for pos, tag in sorted(plan, reverse=True):
+        # right after the term, never before it: a zero-width mark before a term that is carried to the next line
+        # stays on the line before (and on the page before at a page's foot); after the term it follows the term
+        # wherever it lands, and it widens nothing (measured: the words sit where they sit without it)
+        markup = markup[:pos] + tag + markup[pos:]
+    return "".join(tag for _, tag in head) + markup
 
 
 # ---------------------------------------------------------------- flowables
@@ -331,15 +417,103 @@ class Heading(Paragraph):
 
 FIG_NO = [0]
 IMAGE_LINE = re.compile(r"^!\[((?:[^\[\]]|\[[^\[\]]*\])*)\]\(([^()\s]+)\)\s*$")   # a caption may carry I[U] or K[P]
-FIGURE_PATH = re.compile(r"^(?:docs/)?book/figures/([a-z_]+)\.svg$")
+FIGURE_PATH = re.compile(r"^(?:docs/)?book/figures/([a-z0-9_]+)\.svg$")
+
+
+class FloatFigure(KeepTogether):
+    """A figure with its caption, kept together, that floats: where it does not fit under the text that names it, the
+    text goes on down the page and the figure opens the next page (no dead space under a paragraph)."""
+
+
+class KeepWithStart(KeepTogether):
+    """A heading kept with what follows it. Where the whole of what follows (a table, a listing, a long paragraph) would
+    not fit under the heading, the heading still stays on the page with the start of it, and the rest splits onto the
+    next page; only when not even the heading and three lines fit does the whole move (no page ends on a heading, and no
+    page is left half empty because a table was carried over whole)."""
+    MIN = 3 * LEAD
+
+    def split(self, aW, aH):
+        if getattr(self, "_wrapInfo", None) != (aW, aH):
+            self.wrap(aW, aH)
+        content = self._content
+        if self._H > aH and len(content) > 1:
+            _, hH = _listWrapOn(content[:-1], aW, self.canv)
+            room = aH - hH
+            if room >= self.MIN:
+                try:
+                    pieces = content[-1].splitOn(self.canv, aW, room)
+                except Exception:
+                    pieces = []
+                if pieces and not isinstance(pieces[0], ActionFlowable):
+                    return content[:]                         # the heading, then the rest, which fits or splits on its own
+        return super().split(aW, aH)
+
+
+class ChapterBreak(Flowable):
+    """The page break before a chapter. The chapter starts on the next page unless that would leave the page it ends
+    less than FILL full; then it opens on the same page, under a rule (the founder's order of 16 October, night: no
+    dead pages, every page at least four fifths used)."""
+    def wrap(self, aw, ah):
+        return 0, 0
+
+    def draw(self):
+        pass
+
+
+class FlushFloats(Flowable):
+    """Every figure still floating is placed here, before the matter that follows it."""
+    def wrap(self, aw, ah):
+        return 0, 0
+
+    def draw(self):
+        pass
+
+
+class OpenerSpace(Flowable):
+    """The air above a chapter's title: its full height at the top of a page, a line's worth when the chapter opens
+    lower on a page that was not yet four fifths full."""
+    def __init__(self, height, mid=6):
+        super().__init__()
+        self.height, self.mid = height, mid
+
+    def wrap(self, aw, ah):
+        return 0, 0
+
+    def draw(self):
+        pass
+
+
+FILL = 0.8
+FLOAT_SLACK = 24.0                        # a figure is placed only with this much room to spare under it (its caption never
+                                          # parts from its drawing over a point of rounding)
 
 
 def figure(key, caption):
     """A drawn figure with its numbered caption, kept on one page; a marker tells the document to list it."""
     FIG_NO[0] += 1
     n = FIG_NO[0]
-    cap = Paragraph(f"<b>Figure {n}.</b> " + inline(caption), FIGCAP)
-    return [KeepTogether([Spacer(1, 8), Marker("figure", number=n, title=FIG.FIGURES[key]), FIG.drawing(key, FW), cap])]
+    head, rest = split_caption(caption)
+    cap = Paragraph(f"<b>Figure {n}.</b> " + inline(head), FIGCAP)
+    pieces = [Spacer(1, 8), Marker("figure", number=n, title=FIGURES[key]), fig_drawing(key, FW), cap]
+    for piece in pieces:
+        piece._figpiece = True                # no other figure is ever slipped between a figure's drawing and its caption
+    out = [FloatFigure(pieces)]
+    if rest:                                  # the caption's rules, as text under the figure wherever it lands
+        tail = Paragraph(inline(rest), FIGNOTE)
+        tail._figpiece = tail._figtail = True
+        out.append(tail)
+    return out
+
+
+def split_caption(caption, keep=320):
+    """A caption longer than a few lines is cut at a sentence end: the first sentences stay under the drawing, the rest
+    follows as text, so a drawing and its caption always fit one page together."""
+    if len(caption) <= 2 * keep:
+        return caption, ""
+    k = caption.find(". ", keep)
+    if k < 0 or k > len(caption) - 80:
+        return caption, ""
+    return caption[:k + 1], caption[k + 2:]
 
 
 class GoldRule(Flowable):
@@ -370,7 +544,7 @@ def table(rows_txt, small=False):
         extra = sum(floor - widths[k] for k in short)
         big = sum(w for k, w in enumerate(widths) if k not in short)
         widths = [floor if k in short else w - extra * w / big for k, w in enumerate(widths)]
-    data = [[Paragraph(index_tags(c, "cell") + inline(c), hs if k == 0 else cs) for c in r] for k, r in enumerate(rows_txt)]
+    data = [[Paragraph(tagged(c, "cell"), hs if k == 0 else cs) for c in r] for k, r in enumerate(rows_txt)]
     t = Table(data, colWidths=widths, repeatRows=1, hAlign="LEFT", splitInRow=1)   # a row taller than a page breaks across it
     t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#b8b8b8")),
                            ("BACKGROUND", (0, 0), (-1, 0), NAVY),
@@ -394,7 +568,7 @@ def wrap_code(lines, width):
 def code_block(lines, style=CODE, width=CODE_WIDTH):
     """A shaded code block, cut into page-sized pieces so that long listings flow across pages."""
     lines = wrap_code(lines, width)
-    per = 28
+    per = 6                             # small pieces, so that a listing fills each page to its foot (no dead space)
     parts = []
     for k in range(0, max(1, len(lines)), per):
         txt = "\n".join(lines[k:k + per])
@@ -432,7 +606,10 @@ def md_flow(lines, shift=0, story=None, strip=False):
         m = IMAGE_LINE.match(ln)
         if m:                                               # a figure drawn from the code is in the book; a plate is not
             fig = FIGURE_PATH.match(m.group(2))
-            if fig and fig.group(1) in FIG.FIGURES:
+            if fig and fig.group(1) in FIGURES:
+                last = next((x for x in reversed(story) if not isinstance(x, Spacer)), None)
+                if isinstance(last, Paragraph) and not isinstance(last, Heading) and not getattr(last, "_figpiece", False):
+                    last._anchor = True       # the paragraph that names the figure: it never runs pages ahead of it
                 story += figure(fig.group(1), m.group(1))
             i += 1; continue
         if ln.startswith("|"):
@@ -456,7 +633,7 @@ def md_flow(lines, shift=0, story=None, strip=False):
             buf = []
             while i < len(lines) and lines[i].startswith(">"):
                 buf.append(lines[i].lstrip(">").strip()); i += 1
-            story.append(Paragraph(index_tags(" ".join(buf), "note") + inline(" ".join(buf)), NOTE)); continue
+            story.append(Paragraph(tagged(" ".join(buf), "note"), NOTE)); continue
         if re.fullmatch(r"\s*(-{3,}|\*{3,}|_{3,})\s*", ln):
             story.append(Spacer(1, 6)); i += 1; continue
         mm = re.match(r"^(\s*)(-|\*|\d+\.) (.*)", ln)
@@ -467,7 +644,7 @@ def md_flow(lines, shift=0, story=None, strip=False):
                 buf.append(lines[i].strip()); i += 1
             ind = 14 + 12 * (len(mm.group(1)) // 2)
             bullet = "•" if mm.group(2) in "-*" else mm.group(2)
-            story.append(Paragraph(index_tags(" ".join(buf), "list") + inline(" ".join(buf)), ParagraphStyle("li", parent=BODY, leftIndent=ind + 6, bulletIndent=ind - 8,
+            story.append(Paragraph(tagged(" ".join(buf), "list"), ParagraphStyle("li", parent=BODY, leftIndent=ind + 6, bulletIndent=ind - 8,
                                    spaceAfter=3, alignment=TA_LEFT), bulletText=bullet))
             continue
         if not ln.strip():
@@ -477,7 +654,7 @@ def md_flow(lines, shift=0, story=None, strip=False):
                 and not lines[i].startswith("    "):
             buf.append(lines[i]); i += 1
         text = " ".join(x.strip() for x in buf)
-        story.append(Paragraph(index_tags(text, "body") + inline(text), BODY))
+        story.append(Paragraph(tagged(text, "body"), BODY))
     return story
 
 
@@ -780,7 +957,8 @@ def special(name):
         return [Paragraph(inline("Every term of the glossary where this book defines or discusses it, every muscle family where it "
                                  "is named, every file of the repository and every command-line setting this book names, with the "
                                  "pages they stand on. A plain mention of a common word is not an entry: the index points to where "
-                                 "a thing is explained."), BODY), Spacer(1, 10), INDEX]
+                                 "a thing is explained. A term whose pages would run past its line keeps the pages that fit, where it "
+                                 "is defined and first used; after those it is throughout the book."), BODY), Spacer(1, 10), INDEX]
     if name == "license":
         lines = [ln for ln in read("LICENSE").splitlines()]
         return [Paragraph(inline("The license under which this book and the software are made available, as it stands in "
@@ -790,6 +968,7 @@ def special(name):
             "Licensing, pilots, evaluations and the Omni-Compass Enterprise License:", "",
             "**The Omni-Compass LLC**", "", "Owner and developer: AJ Dubra", "",
             "Main office infrastructure: toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1", "",
+            "Landline, registered in Florida: 321-746-4411", "",
             "www.omni-compass.com", "",
             "Repository: github.com/The-Omni-Compass-LLC/The-Omni-Compass", "",
             "Any use beyond evaluation and simulation requires a signed, paid Omni-Compass Enterprise License. "
@@ -840,11 +1019,15 @@ for item in OUTLINE:
 
 
 class Book(BaseDocTemplate):
+    keepTogetherClass = KeepWithStart         # a heading with the start of what follows, never with the whole of it
+
     def __init__(self, path):
         super().__init__(str(path), pagesize=letter, leftMargin=INNER, rightMargin=OUTER, topMargin=TOP,
                          bottomMargin=BOTTOM, title="The Omni-Compass " + EDITION_NAME, author="The Omni-Compass LLC",
                          subject="How to embed, wire, tune and run Omni-Compass on your stack",
                          creator="The Omni-Compass LLC")
+        self.keepTogetherClass = KeepWithStart    # the template's own default is the whole-or-nothing KeepTogether
+        INDEX.book = self                         # the index records the page label the reader sees
         self.body_start = None
         self.chapter = ""
         self.part = ""
@@ -853,9 +1036,101 @@ class Book(BaseDocTemplate):
         self.addPageTemplates([PageTemplate("body", [self.frame], onPage=self.mirror, onPageEnd=self.decorate)])
         self.in_part = False
         self._hseq = 0
+        self._floats = []
+        self._page_figs = 0                       # figures placed on the page being filled: at most two
 
     def beforeDocument(self):
         self.body_start, self.chapter, self.no_head, self.bare, self.in_part, self._hseq = None, "", set(), set(), False, 0
+        self._floats = []
+        self._page_figs = 0
+
+    def afterPage(self):
+        self._page_figs = 0
+
+    # no dead pages: a chapter break that would leave a page under FILL opens the chapter on the same page; a figure
+    # that does not fit under its paragraph floats to the top of the next page while the text goes on
+    def filterFlowables(self, flowables):
+        f = flowables[0]
+        frame = self.frame
+        if frame is None:                                     # between two pages: only the page-begin action passes
+            return
+        avail = frame._y - frame._y1p
+        if isinstance(f, FlushFloats):
+            floats, self._floats = self._floats, []
+            flowables[0:1] = floats or [None]
+            return
+        if self._floats and not getattr(f, "_figpiece", False) and (
+                not isinstance(f, (PageBreak, CondPageBreak, Marker, ChapterBreak, OpenerSpace, FloatFigure))
+                or frame._atTop and isinstance(f, (OpenerSpace, FloatFigure))):
+            # a floating figure is placed at the first room that holds it: the top of the next page, or sooner, the
+            # first gap under a paragraph that is tall enough; at most two figures stand on one page
+            room, take = avail, []
+            while self._floats and self._page_figs + len(take) < 2:
+                g = self._floats[0]
+                g.canv = self.canv
+                try:
+                    g.wrap(frame._aW, room)
+                    h = g._H                                  # the content's own height (wrap() answers "split me")
+                finally:
+                    del g.canv
+                if h + FLOAT_SLACK > room and (take or not frame._atTop):
+                    break
+                take.append(self._floats.pop(0)); room -= h
+            if take and hasattr(f, "_postponed"):             # the floats take this page; f gets its next page again
+                del f._postponed
+                mbe = getattr(self, "_multiBuildEdits", None)
+                if mbe:                                       # and the pass's own clean-up of that flag is withdrawn
+                    edits = mbe.__self__
+                    edits[:] = [e for e in edits if not (len(e) == 3 and e[1] is f and e[2] == "_postponed")]
+            if take:
+                placed = []
+                for g in take:                                # a figure's own text (its tail) lands right under it
+                    placed.append(g)
+                    if getattr(g, "_tail", None) is not None:
+                        placed.append(g._tail)
+                flowables[0:0] = placed
+                return
+            anchor = getattr(f, "_anchor", False) or (isinstance(f, KeepTogether)
+                                                      and any(getattr(x, "_anchor", False) for x in getattr(f, "_content", ())))
+            share = avail / frame._aH
+            if anchor and not frame._atTop and (share <= 1 - FILL or len(self._floats) >= 2 and share <= 0.45):
+                # the paragraph that names the next figure (with the heading it opens under, if any) does not start
+                # while an earlier figure still waits and the page is already four fifths used, nor while two or more
+                # wait (a whole pair ahead of it) and the page is over half used: the waiting figures take the next page
+                # tops and the paragraph follows them, so the figures never run pages behind the text that names them.
+                # The second rule may leave one page before a run of full-page figures between half and four fifths
+                # used; without it the text would run a whole paragraph ahead of its figures for the rest of the run
+                flowables[0:0] = [PageBreak()]
+                return
+        if isinstance(f, ChapterBreak):                       # a figure still floating opens the next page, before the text
+            if frame._atTop:
+                flowables[0] = None
+            elif avail / frame._aH > 1 - FILL:
+                flowables[0] = Spacer(1, 16)
+            else:
+                flowables[0] = PageBreak()
+            return
+        if isinstance(f, OpenerSpace):
+            flowables[0] = Spacer(1, f.height if frame._atTop else f.mid)
+            return
+        if isinstance(f, FloatFigure):
+            if not frame._atTop and not getattr(f, "_floated", False):   # a figure floats once; placed, it stays
+                f.canv = self.canv                            # a KeepTogether measures its content on the canvas
+                try:
+                    f.wrap(frame._aW, avail)
+                    h = f._H                                  # the content's own height (wrap() answers "split me")
+                finally:
+                    del f.canv
+                # it stays under its paragraph when it fits with a line to spare (so its caption never parts from its
+                # drawing), the page holds fewer than two figures, and no earlier figure is still waiting (order kept)
+                if h + FLOAT_SLACK > avail or self._page_figs >= 2 or self._floats:
+                    f._floated = True
+                    mbe = getattr(self, "_multiBuildEdits", None)
+                    if mbe:                                   # every pass of the build starts with nothing floated
+                        mbe((lambda x: x.__dict__.pop("_floated", None), f))
+                    f._tail = flowables.pop(1) if len(flowables) > 1 and getattr(flowables[1], "_figtail", False) else None
+                    self._floats.append(f); flowables[0] = None
+            return
 
     # mirrored margins: odd pages are right-hand pages, the gutter is on the inside
     def mirror(self, c, d):
@@ -879,15 +1154,18 @@ class Book(BaseDocTemplate):
         c.saveState()
         right = p % 2 == 1
         x0, x1 = (INNER, PW - OUTER) if right else (OUTER, PW - INNER)
-        if self.body_start is not None and p >= self.body_start and self.chapter and p not in self.no_head:
-            c.setFont("Sans", SMALL); c.setFillColor(GREY)
-            if right:
-                c.drawRightString(x1, PH - 0.6 * inch, self.chapter.upper()[:90])
-            else:
-                c.drawString(x0, PH - 0.6 * inch, "THE OMNI-COMPASS " + EDITION_NAME.upper())
-            c.setStrokeColor(RULE); c.setLineWidth(0.5); c.line(x0, PH - 0.66 * inch, x1, PH - 0.66 * inch)
+        # the head of every page but the title page (the founder's order of 17 October): the book on the left, the part
+        # or chapter the page belongs to on the right, so a reader flipping through always knows where they are
+        c.setFont("Sans", SMALL); c.setFillColor(GREY)
+        c.drawString(x0, PH - 0.6 * inch, "THE OMNI-COMPASS " + EDITION_NAME.upper())
+        if self.chapter:
+            head = self.chapter.upper()
+            while head and c.stringWidth(head, "Sans", SMALL) > (x1 - x0) * 0.6:
+                head = head[:-2].rstrip() + "…"
+            c.drawRightString(x1, PH - 0.6 * inch, head)
+        c.setStrokeColor(RULE); c.setLineWidth(0.5); c.line(x0, PH - 0.66 * inch, x1, PH - 0.66 * inch)
         # the foot of every page: the notice in two centered lines, the website alone and centered on the bottom line,
-        # the page number in the bottom outside corner (left on a left-hand page, right on a right-hand page)
+        # the page number in both bottom corners (the founder's order of 17 October: the left and the right, everywhere)
         mid = (x0 + x1) / 2
         c.setFont("Serif-Italic", SMALL); c.setFillColor(GREY)
         c.drawCentredString(mid, 0.64 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and "
@@ -897,7 +1175,8 @@ class Book(BaseDocTemplate):
         c.drawCentredString(mid, 0.35 * inch, "www.omni-compass.com")
         c.setFont("Serif", 10); c.setFillColor(INK)
         lab = self.label(p)
-        (c.drawRightString if right else c.drawString)(x1 if right else x0, 0.35 * inch, lab)
+        c.drawString(x0, 0.35 * inch, lab)
+        c.drawRightString(x1, 0.35 * inch, lab)
         c.restoreState()
 
     def afterFlowable(self, f):
@@ -913,6 +1192,7 @@ class Book(BaseDocTemplate):
                 if f.kw.get("opener"):
                     self.no_head.add(self.page)
             elif f.kind == "figure":
+                self._page_figs += 1
                 key = f"fig{f.kw['number']}"
                 self.canv.bookmarkPage(key)
                 self.notify("LOFEntry", (0, f"Figure {f.kw['number']}. {f.kw['title']}", self.page, key))
@@ -965,7 +1245,7 @@ def front_matter(doc):
           Paragraph(EDITION, CENTER), PageBreak()]
     # copyright page
     cp = ParagraphStyle("cp", parent=BODY, alignment=TA_LEFT, spaceAfter=7)
-    s += [Marker("nohead"), Spacer(1, 0.2 * inch)]
+    s += [Marker("nohead"), Marker("chapter", title="Copyright and License"), Spacer(1, 0.2 * inch)]
     for t in [
         f"<b>The Omni-Compass {EDITION_NAME}</b><br/>{SUBTITLE}<br/>" + EDITION,
         "Copyright © 2026 The Omni-Compass LLC. All rights reserved. No part of this book may be reproduced, stored "
@@ -997,16 +1277,23 @@ def front_matter(doc):
     return s
 
 
+def keep_with_next(flowables):
+    """The opener's pieces stay with the first lines of the chapter: a title never ends a page."""
+    for f in flowables:
+        f.keepWithNext = 1
+    return flowables
+
+
 def chapter_opener(num, title, kicker=None, top=0.9 * inch):
     k = kicker or f"CHAPTER {num}"
-    return [Marker("chapter", title=title, opener=True), Spacer(1, top), Paragraph(k, KICK),
-            Heading(inline(title), H1, 1, toc_text=(f"{num}. {title}" if num else title), kind="chapter"),
-            GoldRule(FW, 1.2, 16), Spacer(1, 6)]
+    return [Marker("chapter", title=title, opener=True), OpenerSpace(top)] + keep_with_next(
+        [Paragraph(k, KICK), Heading(inline(title), H1, 1, toc_text=(f"{num}. {title}" if num else title), kind="chapter"),
+         GoldRule(FW, 1.2, 16), Spacer(1, 6)])
 
 
 def front_chapter(doc, title, lines):
-    return new_page() + [Marker("chapter", title=title, opener=True), Spacer(1, 0.9 * inch),
-                         Heading(inline(title), H1, 1, kind="chapter"), GoldRule(FW, 1.2, 16)] + md_flow(renumber(lines), shift=2, strip=True)
+    return [ChapterBreak(), Marker("chapter", title=title, opener=True), OpenerSpace(0.9 * inch)] + keep_with_next(
+        [Heading(inline(title), H1, 1, kind="chapter"), GoldRule(FW, 1.2, 16)]) + md_flow(renumber(lines), shift=2, strip=True)
 
 
 OPERATOR_PREFACE = """I wrote this book for the engineers who put Omni-Compass into a running system: how to embed it, how to wire
@@ -1093,17 +1380,25 @@ def preface_lines():
 
 def build():
     FIG.write_svgs()                      # the same drawings, as files, for the pages on GitHub
+    SCH.write_svgs()
     FIG_NO[0] = 0
     doc = Book(OUT_PDF)
     story = front_matter(doc)
     # contents, then the list of figures
     toc = TableOfContents(levelStyles=[TOC1, TOC2, TOC3], dotsMinLevel=1, formatter=doc.toc_label)
-    story += new_page() + [Marker("nohead"), Spacer(1, 0.5 * inch), Paragraph("Contents", H1), GoldRule(FW, 1.2, 16), toc]
+    story += new_page() + [Marker("nohead"), Marker("chapter", title="Contents"), Spacer(1, 0.5 * inch),
+                           Paragraph("Contents", H1), GoldRule(FW, 1.2, 16), toc]
     lof = TableOfContents(levelStyles=[LOF], dotsMinLevel=0, formatter=doc.toc_label, notifyKind="LOFEntry")
-    story += new_page() + [Marker("nohead"), Spacer(1, 0.5 * inch), Paragraph("List of Figures", H1), GoldRule(FW, 1.2, 16),
-                           Paragraph(inline("Every figure is drawn from the code it pictures (`docs/book/figures.py`) and "
-                                            "printed where the text first needs it; the same drawings stand beside the "
-                                            "text on GitHub, in `docs/book/figures/`."), BODY), Spacer(1, 6), lof]
+    story += [ChapterBreak(), Marker("nohead"), Marker("chapter", title="List of Figures"), OpenerSpace(0.5 * inch, mid=24)] + keep_with_next(
+        [Paragraph("List of Figures", H1), GoldRule(FW, 1.2, 16)]) + [
+                           Paragraph(inline("Every figure is drawn from the code it pictures, by one of two kits "
+                                            "(`docs/book/figures.py`; `docs/book/schematics.py` for the wiring "
+                                            "schematics, block diagrams, flowcharts, timing diagrams, state machines, "
+                                            "the receipts charted from their own tables and the grids), and printed "
+                                            "where the text first needs it; the same drawings stand beside the text on "
+                                            "GitHub, in `docs/book/figures/`. A chart of a receipt is read by the "
+                                            "reading key: it pictures the table and adds nothing to it."), BODY),
+                           Spacer(1, 6), lof]
     # the front matter, in full chapters, before a word about wiring (the founder's order of 14 October): the foreword,
     # the preface, the prelude and the introduction, then the key, what a hooked-up system looks like and the card
     story += front_chapter(doc, "Foreword", MAN["Foreword"])
@@ -1131,34 +1426,35 @@ def build():
     for item in OUTLINE:
         if item[0] == "PART":
             title, blurb = item[1], item[2]
-            story += new_page()
-            if first:
-                story.append(Marker("body")); first = False
-            story += [Marker("nohead"), Marker("chapter", title=title, opener=True), Spacer(1, 0.3 * inch),
-                      Paragraph(f"PART {words[part_no].upper()}", ParagraphStyle("pk", fontName="Sans-Bold", fontSize=13,
-                                alignment=TA_CENTER, textColor=GOLD, leading=16)), Spacer(1, 10),
-                      Heading(inline(title), ParagraphStyle("pt", fontName="Serif-Bold", fontSize=30, leading=36,
+            if first:                                       # the body opens on a fresh page: its page 1
+                story += new_page() + [Marker("body")]; first = False
+            else:                                           # a later part opens where the chapter before it ends
+                story += [ChapterBreak()]                   # unless that page is already four fifths used
+            story += [Marker("nohead"), Marker("chapter", title=title, opener=True), OpenerSpace(0.3 * inch, mid=14)] + keep_with_next(
+                     [Paragraph(f"PART {words[part_no].upper()}", ParagraphStyle("pk", fontName="Sans-Bold", fontSize=13,
+                                alignment=TA_CENTER, textColor=GOLD, leading=16)), Spacer(1, 6),
+                      Heading(inline(title), ParagraphStyle("pt", fontName="Serif-Bold", fontSize=26, leading=32,
                               alignment=TA_CENTER, textColor=NAVY), 1, toc_text=f"Part {words[part_no]}. {title}", kind="part"),
-                      Spacer(1, 12), GoldRule(FW, 1.5, 14), Spacer(1, 10),
+                      Spacer(1, 8), GoldRule(FW, 1.5, 14), Spacer(1, 6),
                       Paragraph(inline(blurb), ParagraphStyle("pb", parent=BODY, fontName="Serif-Italic", fontSize=12,
-                                leading=18, alignment=TA_CENTER, leftIndent=40, rightIndent=40))]
+                                leading=18, alignment=TA_CENTER, leftIndent=40, rightIndent=40))])
             md_parts += ["", f"# Part {words[part_no]}. {title}", "", f"*{blurb}*", ""]
             part_no += 1
             after_part = True
             continue
         if item[0] == "BACK":
-            story += new_page() + [Marker("nohead"), Marker("chapter", title="Back Matter", opener=True),
-                                   Spacer(1, 0.3 * inch),
-                                   Heading("Back Matter", ParagraphStyle("bm", fontName="Serif-Bold", fontSize=30, leading=36,
-                                           alignment=TA_CENTER, textColor=NAVY), 1, toc_text="Back Matter", kind="part"),
-                                   GoldRule(FW, 1.5, 14)]
+            story += [ChapterBreak(), Marker("nohead"), Marker("chapter", title="Back Matter", opener=True),
+                      OpenerSpace(0.3 * inch, mid=14)] + keep_with_next(
+                     [Heading("Back Matter", ParagraphStyle("bm", fontName="Serif-Bold", fontSize=26, leading=32,
+                              alignment=TA_CENTER, textColor=NAVY), 1, toc_text="Back Matter", kind="part"),
+                      GoldRule(FW, 1.5, 14)])
             md_parts += ["", "# Back Matter", ""]
             after_part = True
             continue
         title, src = item
         num = CHAPNUM.get(title)
         flow = chapter_flow(src)
-        story += ([] if after_part else [PageBreak()]) + [Marker("chapter", title=title)]
+        story += ([] if after_part else [ChapterBreak()]) + [Marker("chapter", title=title)]
         story += chapter_opener(num, title, None if num else ("APPENDIX" if title.startswith("Appendix") else "BACK MATTER"),
                                 top=0.25 * inch if after_part else 0.9 * inch)
         story += flow
@@ -1166,11 +1462,38 @@ def build():
         md_parts += ["", f"## {str(num) + '. ' if num else ''}{title}", ""]
         md_parts += md_text(src)
     # the notice at the end of the book, as at its start
-    story += [Spacer(1, 24), GoldRule(FW, 1.2, 14),
+    story += [FlushFloats(), Spacer(1, 24), GoldRule(FW, 1.2, 14),
               Paragraph(inline(BANNER_MD[2:]), ParagraphStyle("end", parent=BODY, alignment=TA_LEFT))]
     doc.multiBuild(story, canvasmaker=INDEX.getCanvasMaker())
     OUT_MD.write_text(normalize_markdown("\n".join(md_parts) + "\n")[0], encoding="utf-8")   # the notice on top and at the end
     print(OUT_PDF, doc.page, "pages")
+    report_fill(OUT_PDF)
+
+
+def report_fill(pdf):
+    """No dead pages (the founder's order of 16 October, night): how far down the frame the content of every page
+    reaches, and every page under four fifths, printed with the build so a shortfall is seen before a push."""
+    try:
+        import pymupdf
+    except ImportError:
+        print("page fill: not measured (pymupdf is not installed)")
+        return
+    book = pymupdf.open(str(pdf))
+    page_h = book[0].rect.height
+    short = []
+    for n, page in enumerate(book, 1):
+        low = TOP
+        for b in page.get_text("dict")["blocks"]:
+            if b["bbox"][3] < page_h - BOTTOM - 2:
+                low = max(low, b["bbox"][3])
+        for d in page.get_drawings():
+            if d["rect"].height >= 2 and d["rect"].y1 < page_h - BOTTOM - 2:
+                low = max(low, d["rect"].y1)
+        reach = (low - TOP) / FH
+        if reach < FILL:
+            short.append(f"p{n} {reach:.0%}")
+    print(f"page fill: {len(book) - len(short)} of {len(book)} pages at least {FILL:.0%} used; under it: "
+          + (", ".join(short) if short else "none"))
 
 
 def md_text(src):
@@ -1181,7 +1504,7 @@ def md_text(src):
         m = IMAGE_LINE.match(ln)
         if m:
             fig = FIGURE_PATH.match(m.group(2))
-            if fig and fig.group(1) in FIG.FIGURES:
+            if fig and fig.group(1) in FIGURES:
                 out.append(f"![{m.group(1)}](figures/{fig.group(1)}.svg)")
             continue
         out.append(ln)
@@ -1217,7 +1540,8 @@ def _md_text(src):
                     "and every setting the book names, with the pages they stand on in the printed book (this one-file text has no pages)."]
         if key == "contact":
             return ["The Omni-Compass LLC. Owner and developer: AJ Dubra. Main office infrastructure: toll-free direct "
-                    "1-888-339-9551, system route asset 1-888-DEX-YLL-1. www.omni-compass.com"]
+                    "1-888-339-9551, system route asset 1-888-DEX-YLL-1; landline, registered in Florida, 321-746-4411. "
+                    "www.omni-compass.com"]
     return []
 
 

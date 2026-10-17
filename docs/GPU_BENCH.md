@@ -74,6 +74,8 @@ Every 2 s it reads the GPU and runs the Omni-Compass engine (the throughput law 
 GPU utilisation, power stress is draw over the snapshot limit, heat is temperature over 83 C, queue is response-time
 pressure. The engine's power cap becomes a power limit, inside hard rules:
 
+![Wiring schematic: a graphics card, two wires. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the card's utilization, draw and temperature, its clocks and top clock, and the workload's feed; the two motors are the clock ceiling (-lgc) and the power limit (-pl), both through nvidia-smi and both read back. Learns the card on its own first (15 busy readings); races while work waits (≥ 95% utilization); at the max never below the top while the card serves; at the tune-down paces the slack in 15 MHz steps, each step through the paired trial.](book/figures/s_gpu.svg)
+
 - never below the GPU's current draw x 1.3, never below 0.70 of the snapshot (`--min-share`), never below the device
   minimum, never above the snapshot;
 - a busy card (utilisation smoothed over decisions at or over 0.5, `--util-gate`) gets the snapshot limit back at once,
@@ -92,12 +94,16 @@ pressure. The engine's power cap becomes a power limit, inside hard rules:
 - **heat fails up:** while the card reports a thermal or hardware slowdown, no lower limit is written;
 - every decision names every rule that held the engine back (`blocked_by`) and the one that decided (`decided_by`).
 
+![Block diagram: the two wires of a card as an antagonist pair. The band (the mean response of the last 5 s, from a tenth of the line to the line) yields the force F; the mode decides between racing (both wires to full while work waits, utilization ≥ 95%), steady under the limit (the card's own busy clock as the ceiling) and pacing. The up wire is the clock ceiling, raised in 15 MHz steps toward the top and lowered only through the verdict; the down wire is the power limit, the lid at ⌈1.10 × the busy draw⌉, never over the start limit and never under the envelope floor. The card's own boost climbs to the ceiling and its own limiter knocks back at the lid; the meters close the loop every 2 s.](book/figures/c_gpu_pair.svg)
+
 Any workload plugs in through `WORKLOAD_CMD` (for example a vLLM or MLPerf inference harness), if it writes
 `latency.csv`, `requests.csv` and `summary.json` in `tools/gpu_workload.py`'s format and `SLO_MS` is given.
 
 The table also credits each write: joules and requests against native at the same moments of the same stream, grouped
 by the rule that decided it. CPU energy comes from RAPL by domain: package and DRAM apart, psys never added, wrap
 undone. The card's own energy counter (NVML) and its ECC and retired-page counters are read at both ends of each arm.
+
+![State machine: the two-wire card governor. It learns the card on its own first (15 busy readings), then races while work waits, holds steady under the limit, or paces the slack in 15 MHz steps through the verdict; it fails up on a breach, a failed request, a blind feed or a heat slowdown, and it observes only, for the rest of the run, once a limit is found that it did not write.](book/figures/g_gpu_states.svg)
 
 ## Gauges
 

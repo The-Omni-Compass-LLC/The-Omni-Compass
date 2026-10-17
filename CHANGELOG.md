@@ -2,6 +2,115 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-17 (the navigation of both books, checked row by row)
+
+- **The page number in both bottom corners, the running head on every page** (the founder's orders of 17 October). Every
+  page but the title page carries the book's name at the head on the left and the part or chapter it belongs to on the
+  right, so a reader flipping through always knows where they are (the part and chapter openers and the front matter
+  included: Copyright and License, Contents, List of Figures, each named), and the page label in the left and the right
+  bottom corner. The notice stays centred at the foot of every page.
+- **Every figure where the text names it.** The builder had measured every figure as "taller than the page" (reportlab's
+  answer to a kept-together block is "split me", not its height), so no figure ever sat under its own paragraph: every
+  one floated to the next page top. It now reads the block's own height: a figure that fits under the paragraph that
+  names it stays there; one that does not floats to the top of the next page, before the text that follows, and never
+  further; a page never carries more than two; figures land in the order the text names them, and a figure is placed
+  only with room to spare so its caption never parts from its drawing. A wiring caption longer than a few lines is cut
+  at a sentence end: the first sentences stay under the drawing, the stack's rules follow as text right under the
+  figure wherever it lands, so a drawing and its caption always fit one page. In the sources every figure line now
+  stands under the paragraph that names it: the ten receipt charts had stood in one block under the first paragraph of
+  the Owner's section 16.1, and the catalog grids, the cloud, the stops, the paired run, the cache rule, the trial, the
+  reading rule and the toy gate each had a cluster of their own. The Owner's chapter 16 carries a subsection of its own
+  for the engine that stands (16.1b): one paragraph per three-run table of omni-v7 (Goldilocks, KEDA's two add-on
+  tests, CruiseKube, the capacity test), each written from the table's own readings, GAIN, EVEN and power given with the
+  numbers, with its judged chart and its shown chart under it, and a paragraph on how a receipt comes to be over the
+  mechanism chart. The Owner's had carried the three-run figure twice (chapters 14 and 15); it stands once, in chapter
+  15 where the rule is defined: 73 figures in the Owner's, 49 in the Operator's.
+- **The capacity table's title named the wrong engine.** `tools/capacity_abc.py` wrote "(Omni v5)" into the title of
+  every table it made, so the omni-v7 table (`results/live/V7_CAPACITY.md`) carried it over runs on omni-v7. The title
+  now names the engine the three runs were on, read from the runs, and the table is corrected.
+- **The index pointed to the wrong pages, now fixed.** reportlab's index recorded the physical page count from the title
+  page, while the book's page labels restart at 1 where the body begins, so every index reference was off by the length
+  of the front matter (26 pages in the Operator's, 34 in the Owner's). The index now records the page label the reader
+  sees, roman in the front matter and arabic from the body's page 1, and the navigation check reads each reference back
+  from the page it names. A second fault, found by that check: every index tag of a paragraph stood at the paragraph's
+  start, so a paragraph split over two pages indexed a term printed on the second page under the first (one reference
+  in seventy, one page early). Each tag now stands right after the term it names, in the paragraph's or the table
+  cell's own markup (after it, because a zero-width mark before a term that is carried to the next line stays on the
+  line before, and so on the page before at a page's foot; a mark inside the term would let the line break there).
+- **A paragraph that names a figure waits for the figures before it.** Full-page charts named by short paragraphs ran
+  pages behind their text: the ten receipt charts of the Owner's chapter 16 stood up to five pages after the paragraph
+  that read them, four other figures between. A paragraph that names a figure (with the heading it opens under) now
+  never starts on a page already four fifths used while an earlier figure waits, nor on a page over half used while two
+  or more wait: the waiting figures take the next page tops and the paragraph follows them, so a figure stands under
+  its paragraph or on the next page, one page further only where the figure before it took the page between. The wait
+  may leave the one page before a run of full-page charts between half and four fifths used (one page in each book,
+  at 55%); without it the text ran a whole paragraph ahead of its figures for the rest of the run. The two books: 484
+  of 493 pages and 1,230 of 1,239 at least four fifths used; the rest are the title pages, the last page of the front
+  matter and of the book, that one page, and chapter ends at 70% to 79% where the next chapter's opening did not fit.
+- **The navigation checked, row by row, on the built PDF** (`docs/book/nav_check.py`, run on both books before the
+  push): every Contents row's page against the page where its heading is printed, every List of Figures row against the
+  page of its caption, every figure against the paragraph that names it, the index's references against the pages they
+  name, the running head and both corner numbers on every page; it exits 1 on a missing head or corner number, a page
+  with more than two figures, or a figure further than the next page from its paragraph.
+
+## 2026-10-16 (night, the second figure kit: the wiring, the mechanism and the receipts drawn)
+
+- **Fifty-eight more figures, drawn with a second tool** (the founder's order of 16 October, night: the Owner's Manual at a
+  thousand pages needs fifty images that interpret the code, the wiring and the receipts, drawn with another kit so that they
+  do not all look the same; everything drawn before is kept). `docs/book/schematics.py` draws them with schemdraw and
+  matplotlib from the book's own code and the repository's own files: **wiring schematics** for every stack in the grammar
+  of an electrical drawing (the governor with its sense terminals S1… and motor terminals M1…, the motor bus through the kill
+  switch into the plug that carries the system's own command, the native controller setting the muscle, drawn as a
+  potentiometer with its cover, the system under native with its meters, and the wire in back to the senses): Kubernetes in
+  the cluster, the managed cloud cluster on the machines alone, the connection pooler, the message broker, the cache, the
+  storage-engine cache, the buffer pool, the graphics card's two wires, the machine's frequency governor, the data center,
+  the three simulators, the drone swarm, the response-time feed, the deployment on a managed cluster and the muscle SDK's
+  runtime; **block diagrams** of the compass law as a closed loop, the engine to the authority, the verdict's paired trial,
+  the card's two wires as an antagonist pair, and the nervous system's authority as logic; **flowcharts** of the wire check,
+  the paired run, the eight phases, the release gate, the three stops, the toy gate, the reading rule, parking and waking a
+  machine, one tick of the conductor, the verdict's trial and the cache rule; **timing diagrams and modelled traces** (class
+  S, said so in every caption): the clocks, the law answering a load step, the hand-back after a stop, the cloud sets' load
+  schedules, the three loads, one pedal over a burst, a trial from reference to verdict, the engine answering a pulse, the
+  force surface and the damping curve; **the receipts charted from their own tables**: Goldilocks, KEDA's two add-ons and
+  CruiseKube (the judged rows with their three intervals and readings; the rows shown and not judged), the capacity test, how
+  a receipt came to be (the governor's inputs beside the service's outputs), the seven organisms under the three loads, the
+  two grids (modelled; with the real cluster inside) and the benefit sheet; and **the structure**: the families of the spine
+  and of each realm, the pipeline from the audit to the one number, and three state machines (the modes, the card governor,
+  the life of a muscle). A chart of a receipt pictures the table and adds nothing to it. `build_book.py` dispatches both
+  kits by key; the List of Figures covers both; every figure is drawn to fit the page and is never scaled below its type
+  (the wire check, the release gate, the paired run and the benefit sheet are each two figures, "continued"). The Operator's
+  Manual carries 49 figures (the wiring, the flowcharts, the timing and the structure; no receipt charts and no engine
+  internals); the Owner's carries 74, every one, three of them on the bound GPU bench page. The same drawings stand as SVG
+  files in `docs/book/figures/`.
+- **Every word inside its cell, at 9 pt** (the founder's orders of 16 October, night: no text wrapping outside its shape in
+  any figure; the shells kept and the type set to 9 pt; every figure read at referee level). Both kits set their type at
+  9 pt. The second kit measures every label in its own face before it draws it, wraps it to the width of its box, keeps a
+  number and its unit on one line, and records any label that would not fit (`schematics.OVERFLOWS`; the build writes
+  every figure with that record empty). All 76 figures were rendered and read one by one: every label sits inside its box,
+  every flowchart's branch is labelled yes or no in the same type, every state machine's edges are numbered and keyed, and
+  every chart names its axis and unit. The benefit sheet's chart reads its axis at 0, 10, 25, 50 and 100 % on a square-root
+  scale (his order: "show 10, 25, 50, and 100 %"), so a gain of a few percent is seen beside a gain of fifty; a bar past
+  100 % is drawn to the edge and marked ►, its number beside it.
+- **No dead pages** (the founder's order of 16 October, night: "every page be fully populated, 80 % at least"). The builder
+  no longer leaves a page mostly empty: a chapter starts on the next page unless that would leave the page before it under
+  80 % used, and then opens on the same page under a short space; a figure that does not fit under its paragraph floats to
+  the top of the next page while the text goes on, and a chapter's last figure is placed before the next chapter opens; no
+  paragraph leaves one or two lines alone on a page; a listing is set in pieces of six lines so a page of code is filled to
+  its foot. The fill of every page is measured on the built PDF (how far down the frame the content reaches) and reported
+  with the build. A heading now keeps only the start of what follows it (a table or a listing splits under it instead of
+  being carried whole to the next page), a part opens where the chapter before it ends unless that page is already four
+  fifths used, and the index lists at most sixteen pages for a term (reportlab would otherwise shrink a long page list
+  below 11 pt). The pages that stay under four fifths are the title page, the last page of the front matter (the body
+  starts on its own page 1), the last page with the end notice, and a few pages where a part or chapter opener does not
+  fit under a figure; the build prints them.
+- **The Operator's Manual says what it leaves out** (the founder's order of 16 October, night). Its front matter carries a
+  disclosure: the Owner's Manual holds the harness, the engine's source, the mechanism and every result; the Operator's
+  carries the wiring and the operation only, and for anything it does not carry the reader goes back to the Owner's Manual,
+  never to a guess.
+- **The company's landline** (the founder's order of 16 October, night). The toll-free number 1-888-339-9551 stands first on
+  every contact line, and under it the landline registered in Florida, 321-746-4411: README, LICENSE and its copy, NOTICE,
+  the Enterprise License, Trademarks, the Licensing FAQ, Security, Support, `llms.txt`, `codemeta.json`, both manuals.
+
 ## 2026-10-16 (night, the figures and the mathematics)
 
 - **Both books carry figures drawn from the code** (the founder's order of 16 October, night: flow charts and illustrations

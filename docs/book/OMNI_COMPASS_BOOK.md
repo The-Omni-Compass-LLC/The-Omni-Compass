@@ -449,7 +449,7 @@ it, read back, and the record removed.
 | a meter that is blind or late | nothing: blind means hold; it moves nothing it cannot see | section 5.3 |
 | your results point the other way from the published ones | presume the wiring first, not the law | `DISCLOSURES.md`, section 4 |
 
-**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
+**Who to call.** Licensing, pilots and the Omni-Compass Enterprise License: The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, landline 321-746-4411 registered in Florida, www.omni-compass.com.
 Security reports: the process in `SECURITY.md`, never a public issue.
 
 **What the letters of the number mean.** Read in order, DEX-YLL-1 is the way the engine runs:
@@ -524,6 +524,8 @@ A refused step is not tried again for a set number of decisions. Where no step p
 the knob is never moved, and the receipt for that muscle says "nothing for Omni to move". Gains are not capped; the 2%
 allowance caps only what may be spent in the trial to look for them.
 
+![Block diagram: the verdict's paired trial around a slow knob. The reference r is the median cost per request at the deepest step already allowed, n ≥ 30; the trial t is the median one step past it under the same traffic, n ≥ 30. The step is allowed only if t ≤ r·(1 + a) and t ≤ c[native]·(1 + a) with a = 0.02; otherwise it is refused, the knob stays, and the step is not tried again for R decisions (900 on a card, 120 on Kubernetes). Steps cannot add up beyond the allowance, because every step is judged against the native cost too.](figures/c_verdict.svg)
+
 For an installation this has two consequences. A knob the operator grants is not a knob Omni-Compass will move: it is a
 knob Omni-Compass may move once the muscle itself has shown the step costs it nothing. And a muscle that never passes a
 trial is not a fault: it is the right answer for that muscle on that stack, and it costs nothing.
@@ -532,6 +534,8 @@ trial is not a fault: it is the right answer for that muscle on that stack, and 
 
 Omni-Compass drives a system the way a self-driving car drives itself: it feels, gauges and adjusts, with nobody in the
 seat. The vocabulary is used the same way everywhere in this manual:
+
+![State machine: the governor's modes. OFF is native alone; WATCHING reads and logs and writes nothing; AUTOPILOT pushes, lifts off and idles; CRUISE holds every machine in service while pods have waited two decisions; RESET hands every setting back and reads it back at the end of a run; KILLED hands everything back at once, from any mode, on the kill switch. The numbered transitions are read in the key under the diagram.](figures/g_modes.svg)
 
 - **Off (manual).** Omni-Compass is not driving; native runs alone. This is the native arm of every paired run.
 - **Watching.** Omni-Compass reads every gauge and logs the decision it would take, and writes nothing. Any difference
@@ -615,6 +619,8 @@ what Omni-Compass reads from it, what it moves and the factory setting it runs o
 recipe (`docs/wiring_recipes.csv`): the native controller, the wire out, the wire in, the restore, and whether the wire
 has run live in this repository or only on a model.
 
+![Grid: the families of the spine and of the Physics / Robotics / Autonomous realm, from realms/catalog_v5.csv. The spine's 267 muscles, every one of them in all four realms, in their 13 families; and the realm's own muscles, those it adds on the spine, in their families, by count.](figures/g_catalog.svg)
+
 The seventy families, by realm, are these. **Compute, AI and cloud** (twenty-seven): AI inference serving, AI training,
 blockchain and ledger nodes, CI/CD and build farms, cloud virtual machines and capacity, container resources,
 cross-cluster and edge placement, DPU and programmable IO, distributed cluster managers, game servers and real-time
@@ -640,6 +646,8 @@ radio, and workflow, logistics and fulfilment. The open-source power and resourc
 (Kepler, Climatik, EAR, CruiseKube, Goldilocks, the Kubernetes power manager, PEAKS, adaptive GPU power capping and
 NVIDIA's platform power budget) are muscles too, each in the family its knob belongs to: Omni-Compass sits on top of them
 as it sits on any native controller.
+
+![Grid: the families of the Compute / AI / Cloud realm, its own muscles on the spine, by count.](figures/g_catalog2.svg)
 
 ### 2.2 One body: the spine, the realms and the organism you build
 
@@ -679,6 +687,10 @@ rather than a collection of separate governors:
 3. **A muscle with nothing to gain stays wired.** A muscle whose knob never passes a trial stays native, but its gauges
    still reach the governor, because its state may be what makes another muscle's step unsafe. Watched is not the same as
    unwired.
+
+![Grid: the families of the Energy / Facility / Industrial realm, its own muscles on the spine, by count.](figures/g_catalog3.svg)
+
+![Grid: the families of the Distribution / Specialized realm, its own muscles on the spine, by count.](figures/g_catalog4.svg)
 
 
 ## 3. The Spine: the Base Every Stack Runs On
@@ -955,6 +967,8 @@ machines (the slowest and most consequential, through the release gate and the v
 first, then the limits, then the target, so the cluster is never left with fewer machines than its pods need while a
 setting above them is still being handed back.
 
+![State machine: the life of one muscle under the plug. Attached with its snapshot, checked by the seven-step wire check, watched in recommend-only mode until the paired trial passes, then governed, one clamp, gate, write, read-back and receipt a decision; a knob found where the governor did not put it moves the muscle to observe only, and every stop restores it to the setting as found.](figures/g_muscle_life.svg)
+
 ### 4.4 The wire check (mandatory before any write)
 
 For the GPU it is one command,
@@ -969,6 +983,10 @@ For the GPU it is one command,
 | 5 restore | clocks reset and the start limit read back |
 | 6 stop | the governor, stopped by its signal, hands both wires back |
 | 7 other writer | a limit set by someone else while the governor runs is left alone, and the governor exits 5 |
+
+![Flowchart: the wire check, steps 1 to 4. Before any write: every meter answers; the setting as found is recorded once as the snapshot; a value written on the up wire is taken and read back equal; the down wire reads back exactly. A step that fails stops everything with the wire, the step and what the device said; the chart continues in the next figure.](figures/f_wire_check.svg)
+
+![Flowchart: the wire check, steps 5 to 7 and the verdict. The snapshot written back reads back equal; on its stop signal the governor hands both wires back; a value set by someone else is left alone (exit 5). Only then is the muscle wired right and the run may proceed.](figures/f_wire_check_b.svg)
 
 Any failure prints the wire, the step and what the device said, and nothing else runs. That turns a wiring fault from
 guesswork into one named line to fix.
@@ -1018,6 +1036,8 @@ runtime earns the authority to write it, verifies the write and writes the recei
 declares three contracts; everything else (the clamp, the gate, the snapshot, the restore, the receipt) is the runtime's.
 
 **The five functions** (the `MuscleAdapter` protocol, or `FunctionalMuscle` for a small connector): `observe()` returns the reading with its timestamp and quality (the wire out); `snapshot_native()` records the setting as found, once, before the first write; `execute(value)` writes one setting through the system's own command or API (the wire in; **WRITES**); `readback()` reads the setting back from the system, never from memory; `restore_native(snapshot)` puts the setting back as found. The adapter owns the vendor's API; the brain never sees it.
+
+![The muscle SDK's runtime: what happens to one command. The eight steps the runtime takes, in order, for every value the governor proposes: the observation's freshness (stale means blind, no write), the automation mode (recommend writes nothing), the clamp to the capability contract, the safety contract, the hold and the cooldown since the last write, the snapshot taken once before the first write, the execute through the system's own command, and the read-back with its residual. Every attempt, permitted or not, writes one MuscleReceipt with the fields shown.](figures/s_sdk.svg)
 
 **The three contracts** (`MuscleSpec`): the **capability** (`CapabilityContract`: the cover's `minimum` and `maximum`, the `resolution`, the most one write may move (`max_step`) or the most a second may move (`max_rate_per_s`), the `units`, whether the knob is `reversible` and whether it reads back); the **timing** (`TimingContract`: the observation and decision periods, the actuation delay, the minimum hold and the cooldown between writes, the timeout, and `stale_after_s`, past which a reading is blind); the **safety** (`SafetyContract`: the `hard_min` and `hard_max` nothing may cross, `fail_closed`, a `safe_default`, and the `forbidden` context keys, such as a security hold, under which no write is permitted). The spec also names the muscle (`muscle_id`, `plant_id`), its class (`resource_type`, one of the standard classes below), its `automation` mode and its evidence class (`Evidence`: D design, S our own models, L live software, P physical meter, C commercial).
 
@@ -1123,6 +1143,10 @@ for every write, the value sent and the value the device reported, side by side.
 On Kubernetes the **release gate** lets one machine be given back only when every one of the following holds, and writes
 the first reason that fails into the audit, so a reader can see why a machine was kept:
 
+![Flowchart: the release gate, reasons 1 to 4. May one machine be given back this decision? Only if the remaining machines would stay under 95% full, no pod is waiting for a place, the pods are not scaling up, and the service is not breached and has been clean for three decisions; the first reason that fails holds the machine and is written in the audit. Continued in the next figure.](figures/f_release_gate.svg)
+
+![Flowchart: the release gate, reasons 5 to 8 and the release. The organ's pressure must be under the release threshold, every sense live, the last command landed, and the verdict's trial must allow the step; only then is one machine given back, and read back.](figures/f_release_gate_b.svg)
+
 1. the remaining machines would stay under 95% full;
 2. no pod is waiting for a place;
 3. the pods are not scaling up;
@@ -1192,6 +1216,8 @@ respect a limit the wires do not carry.
 The engine every receipt in this edition names is **omni-v7** (`python3 tools/omni_version.py` prints it; chapter 12). Its
 mechanism is the Owner's Manual's; five of its rules show in the wiring, the settings and the audit, and are stated here so
 that a line in the audit is read for what it is.
+
+![Timing diagram: the governor's clocks against the native controllers' own, over five minutes. The card governor decides every 2 s; the Kubernetes governor's fast checks run every 5 s (a waiting pod wakes a machine; the floor); native's own autoscaler keeps its 15-second check underneath, untouched; the full decision (the state, the law, the gate, the verdict, one write, one audit line) runs every 60 s, and nothing is given back until the line has been clean for three decisions, 180 s.](figures/t_clocks.svg)
 
 **Conveyance obeys the namespace's own quota.** Where the governor conveys a machine's idle processor to the serving pods on
 it (`--cap-deployments`, level 3), every raise of a pod's CPU limit is bounded by the namespace's ResourceQuota as Kubernetes
@@ -1448,6 +1474,8 @@ What you should see: site power stress entering the decisions (the `compass` rec
 Every knob is wired out first and in last, and the wire in is connected only by a measurement the governor makes on the
 knob itself. The steps, for any stack:
 
+![Flowchart: the verdict's trial on one step. At the deepest step already allowed, n ≥ 30 requests are measured fresh as the reference; one step deeper, under the same traffic, n ≥ 30 more are the trial; the trial is abandoned if the service was not calm or too little work came through, refused if the trial's median cost exceeds the reference's or native's by more than 2%, and otherwise the deepest allowed step moves one deeper.](figures/f_trial.svg)
+
 1. **Wire out, everything.** Every muscle's readings reach the governor, one wire out per muscle. Nothing is written. This
    is watch mode (section 1.3): where every installation starts, and where any knob returns the moment it stops paying.
 2. **Run the observation.** With the stack together and under its real or replayed demand, let the governor watch for at
@@ -1476,6 +1504,8 @@ and Omni-Compass reads it. The body's result is then the sum of the knobs that e
 for the whole system. The live stacks of chapter 7 (the pooler, the broker, the cache, the storage engine's cache and the
 buffer pool) carry this trial on their knob, and on Kubernetes it guards every machine given back (section 1.2).
 
+![Timing diagram: a give-back trial from reference to verdict, in decisions. The reference (n ≥ 30 requests at the deepest allowed step), the trial (n ≥ 30 at one step deeper under the same traffic), the verdict in one decision, and, on a refusal, the quiet period in which the step is not tried again (900 decisions on a card, 120 on Kubernetes). A trial is abandoned, and the knob stays, if the service is not calm or too little work came through.](figures/t_trial.svg)
+
 
 ## 8. Stack by Stack
 
@@ -1503,6 +1533,8 @@ OFF. Native is always the stack's own controller left as shipped; omni is that c
 | Drone swarms (gym-pybullet-drones; PX4 and ArduPilot next) | one knob a drone | the cruise override inside the autopilot's limits; a separation wall; collisions void the cell (7.6) |
 | A database's storage-engine cache (MongoDB under YCSB) | one knob | the WiredTiger cache size through the server's own console, grown only while the cache is full (7.7) |
 
+![Wiring schematic: Kubernetes in the cluster, levels 2 to 4. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. Here the senses are the response-time feed, the pods waiting for a place, each autoscaler's replicas, and the machines with the host's busy share; the motors are the autoscaler's target, the replica floor, the pod CPU limit and the node pool size, each through kubectl's own patch and resize commands. Level 2: the target and the floor; level 3: the machines through the release gate and the verdict; level 4 (--strict-replicas): the replica decision itself. The HPA keeps its own 15-second check underneath. Nothing is ever deleted or evicted; a parked machine is emptied by the autoscaler's own scale-down.](figures/s_k8s_cluster.svg)
+
 ### 7.1 Managed Kubernetes on Azure: the bill as the gauge
 
 On Azure Kubernetes Service the muscle is the same as on any cluster (chapter 6, levels 1 to 3) and one thing is new: the
@@ -1512,6 +1544,8 @@ and never governed), and one or several **work pools** under Azure's own cluster
 `omni-role=work`, every pool starting full. Native is that autoscaler alone. Omni on top is the same autoscaler with
 Omni-Compass idling the machines it gives back, which the autoscaler then deletes on its own schedule. The bill counts
 every work machine that exists, every 15 seconds, priced at Azure's list price for its family; each cluster is deleted when its arm ends, so nothing keeps billing.
+
+![Wiring schematic: a managed cloud cluster, the machines alone (the cloud mode). The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the probe's feed, the pods waiting and the machines in service; the only motors park a machine (a PreferNoSchedule taint), wake it (the taint removed) and mark its pods first to go; no autoscaler is moved, no processor conveyed, no power capped. A machine is parked only after its own trial (the response time holds within 2%) and woken on a breach: at the next decision (60 s) for a response time over the line, at the next fast check (5 s) for a waiting pod. No cloud credential: the governor holds a Kubernetes service account that can read, taint and annotate, nothing more.](figures/s_cloud_machines.svg)
 
 **Sizing the fleet to the lever.** The smallest saving a fleet can show is one machine. On 4 workers one machine is
 25% of the fleet, so only a saving of about 30% or more can clear the noise; on 15 workers about 10%; on 96 about 3%.
@@ -1562,10 +1596,14 @@ fits any pooler or proxy with a console and a pool-size setting (PgBouncer, Pgpo
 pool); the processor time the plug's own readings take on the host is recorded beside the host's, so the receipt shows
 what the wiring itself costs.
 
+![Wiring schematic: a database behind its connection pooler. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the server time plus the wait per transaction and the clients waiting for a server; the one motor is default_pool_size, written over one admin connection held open. Up: a server for every percent of clients waiting; down: one idle server, only while clients waited under 1%; at 95% of the line the pool goes back to the pooler's own setting at once. One writer; the restore read back at the end.](figures/s_pgbouncer.svg)
+
 ### 7.3 Independent simulators, each with its own native controller
 
 Three published simulators show how the plug is wired onto three more kinds of native controller, and the simulator's
 own controller is always native:
+
+![Wiring schematic: three independent simulators, each on its own native controller. One plug for each: CityLearn's rule-based control of each building, pandapower's tap changer on SimBench, and the shipped joint controllers of the MuJoCo Menagerie. The governor writes the one setting each simulator accepts, reads it back and restores it at the end; the senses come back along one bus. Receipts here are class S: statements about the simulator's model, never about hardware.](figures/s_sims.svg)
 
 - **A building's batteries** (CityLearn): the knob is each building's battery charge and discharge inside the simulator's
   own limits; native is the simulator's own rule-based control.
@@ -1595,6 +1633,8 @@ rebalance that every move costs is paid by Omni-Compass and counted in the gauge
 is handed back to the operator's and read back. The receipt this wiring is built to produce has the queue kept short and
 no message lost, at the cost of consumers running, which reads power given by rule and stands beside the gain.
 
+![Wiring schematic: a message broker's consumer group. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the end-to-end latency and the messages waiting; the one motor starts or stops one consumer. Slow with messages waiting: consumers added in proportion to the force; calm with nothing waiting: one idle consumer given back a second after a five-second dwell; at 95% of the line every consumer the topic can use. The rebalance every move costs is paid by Omni-Compass and counted in the gauges.](figures/s_kafka.svg)
+
 ### 7.5 A cache's memory ceiling
 
 Redis is wired as Ubuntu ships it, with the two settings an operator sets for a cache, a memory ceiling of 64 MB and the
@@ -1612,6 +1652,8 @@ omni arm the ceiling is handed back to the operator's 64 MB and read back. The m
 working set is the resource this wiring trades and reads power given by rule; the gain is the hit rate and the work
 inside the line.
 
+![Wiring schematic: a cache's memory ceiling. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the request latency and the memory used with the evictions; the one motor is maxmemory, written with CONFIG SET. Misses grow the ceiling only while the cache is full (used ≥ 90% of the ceiling); calm with nothing evicted gives one notch back a second after a five-second dwell; at 95% of the line with the cache full, a quarter of the cover.](figures/s_redis.svg)
+
 ### 7.6 Drone swarms: the autopilot's cruise
 
 In gym-pybullet-drones (University of Toronto, MIT License) every
@@ -1627,6 +1669,8 @@ costs less energy at all and keeps the error under the safe error; where it does
 that cell and the cell reads "nothing for Omni to move". Energy is a declared model from the simulator's own motor
 constants, said to be a model wherever it is printed; a collision voids the cell. At every landing and at the end of the
 run the override is handed back and read back.
+
+![Wiring schematic: a drone swarm's cruise override. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are each drone's tracking error and its distance to the nearest drone; the one motor is the cruise override of one drone, a fraction of the planner's cruise moved by at most 0.01 a control tick. With slack the compass spends it as speed; as the error grows it eases; at 95% of the safe error the planner's cruise at once. The separation wall: a drone within 0.5 m of another flies the planner's cruise whatever the error reads. A collision voids the cell.](figures/s_drones.svg)
 
 ### 7.7 A database's storage-engine cache
 
@@ -1648,6 +1692,10 @@ from memory and a decompression, not a disk read, so the gain available to this 
 data does not fit in memory; say so beside the receipt. The same plug fits any store whose engine exposes a cache size at
 run time (InnoDB's buffer pool, RocksDB's block cache); a store that can only be sized at restart has no knob Omni-Compass
 moves.
+
+![Wiring schematic: a database's storage-engine cache. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the read latency and the cache's bytes with its pages read in against pages requested; the one motor is the WiredTiger cache size, written through setParameter. Grow only while the cache is full (≥ 90%) and missing (pages read in ≥ 1% of pages requested); give one notch back after a five-second dwell only while the miss share is under 1%; at 95% of the line with the cache full, a quarter of the cover.](figures/s_mongo.svg)
+
+![Flowchart: the direction rule of a cache knob (Redis, MongoDB, MySQL). At 95% of the line with the cache full, a quarter of the cover is added at once; slow reads with the cache full (≥ 90%) and missing (≥ 1%) grow it by one notch; calm, after the dwell (5 s; 10 s for InnoDB) and with the miss share under 1%, gives one notch back; otherwise the knob holds, because a miss in a cache with room is a cold miss no ceiling can mend.](figures/f_cache_rule.svg)
 
 ### 7.8 A database's buffer pool, resized online in the server's own chunks
 
@@ -1673,6 +1721,8 @@ server ignored the first write, and records the restore (what was in flight, the
 read-back) in every omni arm's receipt. A knob the device applies on its own time is handed back on the device's time, and
 the proof of the hand-back is the read-back, not the write.
 
+![Wiring schematic: a buffer pool resized online in the server's own chunks. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the statement latency and the pool's read requests against reads from disk; the one motor is innodb_buffer_pool_size, in whole 128 MB chunks. The server resizes on its own time: the plug waits for the resize before reading back, and the dwell after a move is ten seconds; the hand-back waits for the server too, writes again if ignored, and records what it waited for.](figures/s_mysql.svg)
+
 ### 7.9 The machine itself: the kernel's frequency governor under the processor's meter
 
 The lowest level a governor can sit on is the machine it runs on. Linux already has a controller for the processor's clock,
@@ -1680,6 +1730,8 @@ the frequency governor (`schedutil`, or the processor driver's own), choosing th
 ceiling the operator sets once; and the processor has its own energy meter (RAPL) ticking in microjoules. Omni-Compass sits
 on top of the governor exactly as it sits on the HPA: the governor keeps running, and Omni moves one knob, the frequency
 ceiling of every CPU, through the kernel's own files.
+
+![Wiring schematic: the machine's frequency governor under the processor's meter. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the service's latency and the package watts from RAPL; the one motor is scaling_max_freq, the ceiling of every CPU's frequency policy. Every notch down is tried on the machine first: eight cost samples at the deepest notch allowed and eight one further, allowed only if package power × latency / work inside the line does not rise within 2%. A snapshot of every policy, restored exactly.](figures/s_cpu.svg)
 
 The reading is the service's own mean latency, held at 40% of a 20 ms line by the compass law; calm gives one notch of the
 ceiling back (5% of the top clock), a slow service raises it by notches, the wall puts the top on at once. Every notch down
@@ -1705,6 +1757,8 @@ chilled-water plant runs its own sequence, the uninterruptible power supply hold
 meter every rack, and every server's management controller and every card's firmware enforce their own power limits.
 Omni-Compass sits on top of them exactly as it sits on the HPA. They keep running; it moves only the settings they already
 accept, and only inside the band the operator writes down.
+
+![Wiring schematic: the data center under the servers. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the site watts, the rack inlets with the supply and return air, and the services' lines; the one motor is the supply-air setpoint, inside the operator's band. Warmer while every reading is cool, colder as heat rises; a step allowed only where the paired trial at the site meter shows the site's energy no higher for the same work, every inlet inside its band and no LOSS on any service gauge. A reserve held for an outage (the UPS) is never a lever. Modelled today (class S); no live facility has run yet.](figures/s_site.svg)
 
 **What it may set, and what it never sets.**
 
@@ -1781,6 +1835,8 @@ paired receipts, this section is a wiring instruction, not a claim of savings.
    Omni-Compass; it never evicts or moves a pod.
 8. One writer: if anyone else changes a knob, Omni-Compass stops writing it and leaves it alone.
 9. Everything is logged: every read, decision, write and reason goes to the audit log.
+
+![Flowchart: the three ways a governor stops. The reset file at the planned end of a run hands every setting back in reverse order, reads each back and exits 0; the kill switch (omni_switch.py off, SIGTERM or the kill file) does the same at once, and no governor starts while the switch is off; a death without a hand-back (the process gone, or its lease older than five periods) is caught by the watchdog, which runs the recorded restore from the objects themselves. In every case every setting ends at native, read back, with no record left.](figures/f_stops.svg)
 
 **On autopilot: why nobody babysits it.** Omni-Compass is an autopilot: a closed-loop supervisory controller that runs,
 steers and corrects itself inside the system it governs, as a self-driving car's controller does inside the car. Once
@@ -1938,6 +1994,10 @@ differ by about 15% in p95 on their own. The order rotates so that no arm always
 equal by an open-loop load, a fixed rate of requests at fixed moments, so that a lower resource count can never mean that
 less work was done. The steps below are the whole method.
 
+![Flowchart: one paired run, the pairs. A fresh cluster or card; the same work, the same window and the same seeds in both arms; each pair runs the native arm (the stack's own controller alone) and the omni arm (the same controller with Omni-Compass on top), the order rotated pair to pair; the reset check after each arm (every setting back at the operator's, read back, no record left) invalidates an arm that fails it, and that arm is never counted. Continued in the next figure.](figures/f_paired_run.svg)
+
+![Flowchart: one paired run, from the pairs to the three-run table. After ten pairs the receipt is written: every gauge, native, omni, the paired change with its 95% interval and its reading; runs A, B and C go through tools/confirm_abc.py into the three-run table with the reading key on top; every row is shown, losses included.](figures/f_paired_run_b.svg)
+
 1. **Paired runs.** Run your service the same way twice, once native and once with Omni-Compass on top, back to back
    on the same machines, the order rotated, at least 5 times (10 for a result you publish). `scripts/kind_paired.sh`
    and `tools/live_reps.py` do this on Kubernetes; `scripts/gpu_rented_run.sh` does it on a GPU box, in one command: the
@@ -2029,6 +2089,8 @@ Reading column, never the sign alone.
 | L | E3 | real software, no hardware meter | real decisions on real software; energy there is a declared model |
 | P | E4 | a physical meter (a card's own power reading, the processor's energy counters, a site meter) | the hardware's own answer |
 
+![Flowchart: from the audit to the receipt, the table and the one number. The audit (one record a decision) is read by tools/live_reps.py into the paired receipt of one run; runs A, B and C go through tools/confirm_abc.py into the three-run table, each run's engine checked against the fingerprint; tools/readings.py sets GAIN, EVEN or LOSS by the gauge's aim and puts the reading key on top of every table; the benefit sheet and the Omni index carry one number per benchmark. Every table is made by a tool, never by hand.](figures/g_pipeline.svg)
+
 Read every number with its class beside it. A modelled number is never quoted as a hardware result. When a
 receipt's energy line is modelled, the receipt says so.
 
@@ -2070,6 +2132,8 @@ versions. When the engine is declared final, the engine that stands then is publ
 python3 tools/omni_version.py                   # this checkout: its engine version, or every file that differs
 python3 tools/omni_version.py --commit <sha>    # the engine at the commit any receipt ran on
 ```
+
+![Flowchart: the three-run reading rule, as a procedure. For one judged row: if any of the three intervals includes zero the row reads EVEN, with the count of runs it holds in; if the three clear intervals do not point the same way the runs disagree and the test is unstable there; if they point the gauge's way the row reads GAIN in all three of our runs, and the other way LOSS, except for a resource spent that rose, which is power given.](figures/f_reading.svg)
 
 A receipt names the commit it ran on, and every table made by rule checks each run's commit against the fingerprint and
 heads itself with a warning if any run is not the engine it claims or if the three are not separate runs. An operator's
@@ -2167,6 +2231,8 @@ processor and never caps power: it moves the machines alone (chapter 19).
 | 5. Paired run | native against native with Omni-Compass on top, on the company's own cluster | a receipt read row by row, every LOSS explained or fixed and rerun | two to five days |
 | 6. Govern | the governing role granted, the governor switched to govern, the OFF switch and the watchdog wired | the OFF switch drilled: every setting back and read back within 60 seconds | a day |
 | 7. Day two | upgrades, rollbacks, audits, alarms, fleet roll-out | quarterly drill of the OFF switch and the watchdog | ongoing |
+
+![Flowchart: the implementer's eight phases and their gates. From the verified copy through the account and the cluster, identity, the watch, the feed and the line, the paired run and the governing grant to day two; each phase has a gate that must pass before the next begins, and the OFF switch is drilled before the governor writes.](figures/f_phases.svg)
 
 Phases 3 and 5 are the long ones, and they are long on purpose: a governor is judged on the service's own load, which
 has its own daily and weekly shape. A watch phase shorter than one full cycle of the service's own load (a day for most
@@ -2459,6 +2525,8 @@ counts Azure's billed machines every 15 seconds at list price; Appendix F connec
 To run it on a company's own service instead of the reference service, the service's manifests replace
 `deploy/kind/demo.yaml` in a fork, and its line replaces the reference line of 500 ms (chapter 18).
 
+![The load schedules of the cloud sets: the two bursts (1 4 1 6 1 9 and 1 6 1 8 1 6, 300 s a step) and the real day (the Google 2011 trace on one to nine load generators, 108 s a step). Every set runs at the tune-down with native's cap, five repetitions a run, as runs A, B and C; the load generator alone reads the schedule, never the governor.](figures/t_bursts.svg)
+
 ### 15.7 Tearing down
 
 `az group delete -n $RG --yes --no-wait` deletes the cluster, its machines and its registry. Every paired run of the
@@ -2747,6 +2815,8 @@ elapsed_seconds,latency_ms,ok
 0.6,5003.1,0
 ```
 
+![Wiring schematic: the response-time feed and the line. The probe times real requests to the service and writes one row a response to latency.csv (elapsed_seconds, latency_ms, ok); the governor reads the file by its own clock, the last 60 s for its decision and the last 15 to 30 s for its fast checks, against the line the service owner wrote (--slo-ms). A feed that has not advanced for twice the window, or holds no served response, reads as blind, and a blind sense holds every machine: the safe direction. A second feed, the service's own timings, may be written in the same three columns, measured at the same place as the line and never pre-smoothed.](figures/s_feed.svg)
+
 - `elapsed_seconds`: seconds since the feed began, increasing; the governor reads only rows newer than the last it read.
 - `latency_ms`: the response's time, in milliseconds.
 - `ok`: 1 for a response the owner counts as served, 0 for a failure.
@@ -2822,6 +2892,8 @@ and their power. In a cloud each of them can only raise the bill: a lower pod ta
 ask the cloud for machines; more processor for a pod makes it read busier to its autoscaler, which then asks for more
 pods; and a power cap saves nothing a cloud bills. So in a cloud the governor moves the machines alone:
 
+![Flowchart: parking and waking a machine in the cloud. At every full decision: a 95th percentile over the line, or a blind feed, wakes every parked machine at once; a pod waiting for a place, checked every 5 s, wakes one machine within 5 s while the pod lands on a parked one at once; otherwise, only with the release gate open and the trial allowing it, one machine is parked (a PreferNoSchedule taint, its pods marked first to go), and the cloud's own autoscaler deletes it once empty, on its own schedule.](figures/f_park.svg)
+
 - **No pod autoscaler is moved.** Every HPA keeps the operator's own target, range and cap, so the pods are exactly the
   pods native would run.
 - **No processor is conveyed and no power is capped.**
@@ -2885,6 +2957,8 @@ COPY tools/prom_feed.py /app/tools/prom_feed.py
 USER 10001
 ```
 
+![Deployment diagram: the governor on a managed cluster. One namespace, one service account, one Deployment of one replica (the one writer): the controller container with its command line, the probe beside it writing the feed to a shared volume, and the watchdog holding the lease; the audit, the feed and the kill file each on their own volume. Outside the pod: the API server, reached through one kubectl proxy and granted get, list, patch nodes and patch pods, nothing else; the service and its autoscaler, untouched in the cloud mode; and the work pools under the cloud's own autoscaler, where machines are tainted, untainted and their pods marked first to go. No cloud credential is in the pod.](figures/s_deploy.svg)
+
 Build the shipped image first and pass it as the base (`--build-arg BASE=<registry>/omni-compass:<version>`). The
 governing Deployment is `deploy/install/omni-compass-cloud.yaml` (printed in Appendix I). Apply the machines role of
 section 14.3 (`deploy/install/rbac-machines.yaml`) first, set the image, the service's URL and the line, and replace the
@@ -2914,6 +2988,8 @@ evidence that the service holds without the machine. That evidence is the paired
 | The descent after a peak | machines held until the autoscaler's own scale-down finds them unneeded | machines parked one at a time as each trial passes; their pods leave first on the autoscaler's next scale-down |
 | The trough (night, weekend) | the pool held at what the pods' requests need | parked down to the floor where the trial allows; each empty parked machine deleted by the cloud |
 | A new burst | the autoscaler adds machines when pods cannot be placed | pods that find the open machines full land on a parked machine at once (its taint only prefers against it); the governor wakes it within 5 seconds if pods wait, or at the next decision on a breach; the cloud adds machines past those, as for native |
+
+![Modelled trace: one pedal over a burst, machines against demand (class S: the rules of the pedal drawn over the burst 1 4 1 6 1 9, five decisions a step). Native's autoscaler adds a machine when pods cannot be placed and removes one after its own delay; with Omni-Compass on top the push adds capacity at once at the wall and the lift off gives it back one machine at a time through the gate and the trial, never below the floor of 2.](figures/t_pedal.svg)
 
 The savings come from two places: the machines the governor parks before native's autoscaler would find them unneeded,
 and the empty machines the cloud deletes sooner because their pods were marked first to go. Neither changes how many pods
@@ -2974,6 +3050,8 @@ covers that case. Before its first write the governor registers the exact comman
 so it needs no memory of the dead process) and renews a lease every decision. The watchdog
 (`python3 tools/omni_switch.py watchdog`) finds a governor whose process is gone or whose lease is older than its limit
 (five decision periods, at least two minutes), stops a hung one, runs its recorded restore and records what it did.
+
+![Timing diagram: the hand-back after a reset, a kill and a death. At t = 10 the governor stops. A reset or the kill switch writes every setting back at once and reads it back; a death without a hand-back is caught by the watchdog, which restored within 7 to 11 s (mean 9 s) in the kill test; in the modelled bodies the lease walks the setting back to native over 24 decisions.](figures/t_lease.svg)
 
 In a cluster, the watchdog runs as a second container in the governor's own pod, with the pod's process namespace
 shared (`shareProcessNamespace: true`), as the cloud manifest ships it (Appendix I). It must: the watchdog judges a
@@ -3100,6 +3178,8 @@ NVIDIA System Management Interface) and read back after every write:
 | The clock ceiling (up wire) | the highest graphics clock the card may run (locked clocks) | the card's own supported clocks, read from the card |
 | The power limit (down wire) | the card's own power cap, in watts | the card's own minimum and default limits, read from the card |
 
+![Wiring schematic: a graphics card, two wires. The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the card's utilization, draw and temperature, its clocks and top clock, and the workload's feed; the two motors are the clock ceiling (-lgc) and the power limit (-pl), both through nvidia-smi and both read back. Learns the card on its own first (15 busy readings); races while work waits (≥ 95% utilization); at the max never below the top while the card serves; at the tune-down paces the slack in 15 MHz steps, each step through the paired trial.](figures/s_gpu.svg)
+
 It moves nothing else: not the application, not the model, not the batch, not the card's fan curve, not its memory
 clock, not its persistence mode, not another process's settings. Native is the card as it ships: the vendor's own
 firmware and driver deciding its clock under the default power limit.
@@ -3145,6 +3225,8 @@ firmware and driver deciding its clock under the default power limit.
    eight-card server at once).
 7. **Govern:** `--mode cap` in place of `--mode watch`, with the OFF switch drilled (section 21.6).
 
+![Block diagram: the two wires of a card as an antagonist pair. The band (the mean response of the last 5 s, from a tenth of the line to the line) yields the force F; the mode decides between racing (both wires to full while work waits, utilization ≥ 95%), steady under the limit (the card's own busy clock as the ceiling) and pacing. The up wire is the clock ceiling, raised in 15 MHz steps toward the top and lowered only through the verdict; the down wire is the power limit, the lid at ⌈1.10 × the busy draw⌉, never over the start limit and never under the envelope floor. The card's own boost climbs to the ceiling and its own limiter knocks back at the lid; the meters close the loop every 2 s.](figures/c_gpu_pair.svg)
+
 ### 21.5 The heat line
 
 The aim on a card is more work at native's own heat. The governor reads the card's temperature and its own reported
@@ -3152,6 +3234,8 @@ slowdown every decision and never tightens while the card reports a thermal slow
 the silicon underneath whatever the governor writes. Each receipt on a card reports the card's temperature in both arms
 beside the work and the power, so an implementer sees directly whether the omni arm ran hotter than native. A receipt in
 which it did is read as a wiring fault first: the clock ceiling raised where the card's cooling could not carry it.
+
+![State machine: the two-wire card governor. It learns the card on its own first (15 busy readings), then races while work waits, holds steady under the limit, or paces the slack in 15 MHz steps through the verdict; it fails up on a breach, a failed request, a blind feed or a heat slowdown, and it observes only, for the rest of the run, once a limit is found that it did not write.](figures/g_gpu_states.svg)
 
 ### 21.6 OFF on a card
 
@@ -7791,7 +7875,7 @@ is published (`LICENSE`, section 9). A signed Enterprise License governs its own
 venue in the Delaware state courts and the United States District Court for the District of Delaware (`LICENSE`,
 section 19). The Omni-Compass LLC is based in Florida.
 
-**Who do I contact?** The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
+**Who do I contact?** The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, landline 321-746-4411 registered in Florida, www.omni-compass.com.
 
 ## Appendix Q. Third-Party Notices
 
@@ -7931,7 +8015,7 @@ the signed agreement for the licensee and its scope.
 
 ### 12. How to obtain one
 
-The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com. A license starts with an evaluation on the licensee's own systems
+The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, landline 321-746-4411 registered in Florida, www.omni-compass.com. A license starts with an evaluation on the licensee's own systems
 (`LICENSE`, section 1.4): watch mode, the wire check, and paired receipts on its own load.
 
 ## Appendix S. Patents and Trademarks
@@ -8002,7 +8086,7 @@ Omni-Compass was tested with; it states no affiliation, endorsement or certifica
 
 #### Reporting misuse
 
-The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, www.omni-compass.com.
+The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, landline 321-746-4411 registered in Florida, www.omni-compass.com.
 
 ## Appendix T. Security Policy
 
@@ -8010,7 +8094,7 @@ The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-955
 
 ### Reporting a vulnerability
 
-Report a suspected vulnerability privately to The Omni-Compass LLC by telephone at its main office infrastructure (toll-free direct 1-888-339-9551; system route asset 1-888-DEX-YLL-1) or through www.omni-compass.com, never in a public issue,
+Report a suspected vulnerability privately to The Omni-Compass LLC by telephone at its main office infrastructure (toll-free direct 1-888-339-9551; system route asset 1-888-DEX-YLL-1, landline 321-746-4411 registered in Florida) or through www.omni-compass.com, never in a public issue,
 pull request or discussion. Include the version and commit, what you saw, how to reproduce it, and its likely impact. We
 acknowledge reports, keep the reporter informed, and coordinate disclosure: a fix or a mitigation is published before the
 details are, and the reporter is credited if they wish. Please give us a reasonable time to fix before any disclosure, do
@@ -8043,7 +8127,7 @@ Every glossary term where the book defines or discusses it, every muscle family,
 
 ## Contact
 
-The Omni-Compass LLC. Owner and developer: AJ Dubra. Main office infrastructure: toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1. www.omni-compass.com
+The Omni-Compass LLC. Owner and developer: AJ Dubra. Main office infrastructure: toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1; landline, registered in Florida, 321-746-4411. www.omni-compass.com
 
 ---
 
