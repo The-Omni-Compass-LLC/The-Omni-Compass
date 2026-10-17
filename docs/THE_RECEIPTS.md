@@ -7,7 +7,7 @@ A **receipt** here is a result file in this repository made by a paired run: the
 counted runs, the engine identified by its fingerprint (`tools/omni_version.py --commit`), every row reported, losses
 included. A receipt is read in the class of evidence it is: **P** a physical meter, **L** real software (a real
 Kubernetes cluster, a real database), **S** our own models, **V** a property of the code. S is never presented as
-proof of a physical saving. A result belongs to the engine it ran on and is never read across engines; every row below is the engine that stands, omni-v7, unless its Engine column says otherwise (the earlier engines' receipts are the road, in `docs/history`).
+proof of a physical saving. A result belongs to the engine it ran on and is never read across engines; every row below is omni-v7, the engine before the one that stands (omni-v8 changed one wire, the CityLearn battery, and every benchmark runs again on it), unless its Engine column says otherwise (the earlier engines' receipts are the road, in `docs/history`).
 How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of every three-run row: `tools/readings.py`.
 
 ## 1. What the receipts say, read together
@@ -34,10 +34,11 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
    The robot arm the trial moved: torque −28.6%, tracking error −21.3%. The drone swarms: energy a mission −7% to −20%.
    **The buildings with batteries read LOSS in the seven 2023 districts** (energy not served +2.0% to +9.8%, discomfort,
    ramping and the highest peak), beside electricity bought and the daily peak GAIN in all ten battery districts; the cause
-   is the battery wire (it did not see the outage hours those districts carry), and its fix is the next engine version.
+   is the battery wire (it did not see the outage hours those districts carry), and its fix is omni-v8, the engine that stands:
+   a battery that is also its building's reserve stays native (`docs/OMNI_V8.md`).
 6. **What is not yet shown.** No energy saving on a real chip: the physical receipt (P), the GPU's own meter on the
    current governor, is the decisive one still to be produced; every earlier card result is obsolete. No cloud-bill result
-   on the engine that stands yet: the omni-v7 Azure sets run one at a time. More completed work at one fixed resource cap:
+   on the engine that stands yet: the omni-v8 Azure sets run one at a time. More completed work at one fixed resource cap:
    the capacity test reads EVEN at all four caps (the quota blocks the one lever Omni-Compass has there).
 
 ## 2. Receipt by receipt
@@ -72,7 +73,7 @@ reviewed or approved these results.
 |---|---|---|---|
 | The 1,107 muscles and the seven organisms, preregistered seeds | omni-v7 | 527 GAIN, 580 EVEN, none LOSS; every organism GAIN (fewer misses) under all three loads; reproduced exactly in three GitHub runs | `results/realms_v5/REALMS_V5.md` |
 | Power grids: 11 SimBench grids in pandapower | omni-v7 | energy drawn and net import lower in all 11 (ZIP loads); losses lower in 7, power given in 4; tap operations fewer in 10, more in 1 | `results/live/V7_PANDAPOWER.md` |
-| CityLearn districts | omni-v7 | electricity bought and the daily peak lower in all 10 battery districts; **LOSS** in the seven 2023 districts on energy not served, discomfort, ramping and the highest peak; monthly unevenness +0.11% in the 2022 robustness district | `results/live/V7_CITYLEARN.md` |
+| CityLearn districts | omni-v7 | electricity bought and the daily peak lower in all 10 battery districts; **LOSS** in the seven 2023 districts on energy not served, discomfort, ramping and the highest peak, fixed in omni-v8 (the outage batteries left native); monthly unevenness +0.11% in the 2022 robustness district, the next repair | `results/live/V7_CITYLEARN.md` |
 | Robot arms, MuJoCo Menagerie | omni-v7 | Gen3 peak torque −28.6%, tracking error −21.3%; UR5e and iiwa left native | `results/live/V7_MUJOCO.md` |
 | Drone swarms, 20 drones in three cells | omni-v7 | energy a mission −7% to −20%, missions a charge +8% to +25%, GAIN in all three; no late mission, reserve breach, near miss or collision | `results/live/V7_SWARM.md` |
 

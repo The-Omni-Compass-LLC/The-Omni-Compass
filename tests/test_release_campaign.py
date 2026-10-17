@@ -4,11 +4,15 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The approved campaign's dispatch boundaries and the v6 capacity regressions."""
+import hashlib
 import inspect
 import json
+import os
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
+import unittest.mock
 import yaml
 from scripts import dispatch_grid as grid
 from tests import test_kind_capacity as capacity
@@ -25,7 +29,7 @@ class ReleaseCampaign(unittest.TestCase):
 
     def test_queue_is_complete_and_excluded_providers_cannot_dispatch(self):
         queue = grid.rerun_queue()
-        self.assertEqual(len(queue), 99)
+        self.assertEqual(len(queue), 105)        # 35 benchmarks, A, B and C (the steady and wandering tests back since omni-v8)
         self.assertEqual({row[0] for row in queue}, set('ABC'))
         workflows = {row[2] for row in queue}
         self.assertTrue({'capacity.yml', 'pandapower.yml', 'swarm.yml', 'cpu-power.yml',
@@ -49,6 +53,42 @@ class ReleaseCampaign(unittest.TestCase):
         for _, _, wf, _ in queue:
             counts[wf] = counts.get(wf, 0) + 1
         self.assertEqual(grid.reruns_to_start(queue, counts), [])
+
+    def test_nothing_starts_before_the_campaign_opens(self):
+        # every count reads from SINCE: a run the new conductor started before it would be counted in no campaign
+        self.assertRegex(grid.SINCE, r'^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$')
+        self.assertEqual(grid.RERUN_SINCE, grid.SINCE)
+        self.assertEqual(grid.AZURE_SINCE, grid.SINCE)
+        self.assertFalse(grid.campaign_open('2000-01-01T00:00:00Z'))
+        self.assertTrue(grid.campaign_open(grid.SINCE))
+        self.assertTrue(grid.campaign_open('2999-01-01T00:00:00Z'))
+
+    def test_the_engine_is_read_from_the_commit_the_runs_start_on(self):
+        # on GitHub each tick fetches the branch's newest commit; its engine, by that commit's own fingerprints, decides
+        src = ROOT / 'omnicompass' / 'compass_law.py'
+        files = {'omnicompass/compass_law.py': hashlib.sha256(src.read_bytes()).hexdigest()}
+        digest = hashlib.sha256(''.join(f'{h}  {n}\n' for n, h in sorted(files.items())).encode()).hexdigest()
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / 'omnicompass').mkdir()
+            (Path(d) / 'omnicompass' / 'compass_law.py').write_bytes(src.read_bytes())
+            (Path(d) / 'OMNI_V99.json').write_text(json.dumps({'version': 'omni-v99', 'digest': digest, 'files': files}))
+            git = ['git', '-C', d, '-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false']
+            subprocess.run(['git', 'init', '-q', d], check=True)
+            subprocess.run(git + ['add', '-A'], check=True)
+            subprocess.run(git + ['commit', '-q', '-m', 'x'], check=True)
+            subprocess.run(git + ['update-ref', 'FETCH_HEAD', 'HEAD'], check=True)
+            old = grid.ROOT
+            try:
+                grid.ROOT = Path(d)
+                with unittest.mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}):
+                    self.assertEqual(grid.engine(), 'omni-v99')
+                (Path(d) / 'omnicompass' / 'compass_law.py').write_text('changed\n')
+                subprocess.run(git + ['commit', '-q', '-am', 'y'], check=True)
+                subprocess.run(git + ['update-ref', 'FETCH_HEAD', 'HEAD'], check=True)
+                with unittest.mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}):
+                    self.assertEqual(grid.engine(), 'unknown')          # a commit no fingerprint matches starts nothing
+            finally:
+                grid.ROOT = old
 
     def test_six_stage_burst_is_the_workflow_and_queue_default(self):
         text = (ROOT / '.github/workflows/aks-metered-full.yml').read_text()

@@ -199,12 +199,22 @@ def shallow():
     return r.stdout.strip() == "true"
 
 
+def boundary():
+    """The commits a shallow checkout's history stops at: each stands in for every older change, so a date read from one is
+    not the day the file changed."""
+    r = subprocess.run(["git", "-c", "safe.directory=*", "rev-parse", "--git-path", "shallow"], cwd=ROOT, capture_output=True, text=True)
+    f = ROOT / r.stdout.strip() if r.stdout.strip() else None
+    return set(f.read_text().split()) if f and f.exists() else set()
+
+
 def updated(path):
-    """The date the file was last changed in the repository (the day the result landed); None where the history is not here."""
-    if shallow():
-        return None
-    r = subprocess.run(["git", "-c", "safe.directory=*", "log", "-1", "--format=%cs", "--", str(path)], cwd=ROOT, capture_output=True, text=True)
-    return r.stdout.strip() or "uncommitted"
+    """The date the file was last changed in the repository (the day the result landed); None where the history is not here
+    (in a shallow checkout, a file last touched by the commit the history stops at, or not yet committed)."""
+    r = subprocess.run(["git", "-c", "safe.directory=*", "log", "-1", "--format=%H %cs", "--", str(path)], cwd=ROOT, capture_output=True, text=True)
+    found = r.stdout.split()
+    if not found:
+        return None if shallow() else "uncommitted"
+    return None if found[0] in boundary() else found[1]
 
 
 # ------------------------------------------------------------------------------- the tests inside the index

@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 import json
 import math
 import os
@@ -41,10 +42,10 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "results" / "grid_v7" / "DISPATCHED.json"
+MANIFEST = ROOT / "results" / "grid_v8" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
-SINCE = "2026-10-16T04:50:00Z"  # only this campaign, omni-v7 (the founder's order of 16 October); earlier engines are historical
-ENGINE = "omni-v7"                 # the engine whose grid this is (tools/omni_version.py)
+SINCE = "2026-10-17T15:30:00Z"  # only this campaign, omni-v8 (the founder's order of 17 October: push everything to the new version); earlier engines are historical
+ENGINE = "omni-v8"                 # the engine whose grid this is (tools/omni_version.py)
 SIZES = (1, 10, 100, 1000)          # free GitHub only: owner restored 1,000 on 15 October
 RUNS = 1000                        # nested 1/10/100/1000 runs on free GitHub runners
 TIERS = (10, 100, 1000)             # smaller prefixes first
@@ -101,8 +102,7 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # then C, and never while a run that goes first waits for a runner. A workflow's runs started since RERUN_SINCE are read
 # back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
 RERUNS = ROOT / "scripts" / "reruns.txt"
-RERUN_SINCE = "2026-10-16T02:59:00Z"   # omni-v7: its twelve trial runs of 16 October (Goldilocks, KEDA's add-ons, fixed capacity,
-                                       # CruiseKube; A, B and C) count as the first reruns on the engine that stands
+RERUN_SINCE = "2026-10-17T15:30:00Z"   # omni-v8: every benchmark runs again from the moment the engine landed on main (17 October)
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # The clouds, their sets following one another without a hand on the button. Azure first (the founder's order of 13
@@ -114,8 +114,8 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # founder's order of 16 October: the Azure run is the measure of the other two), each behind its own switch line
 # (switch=on | off): off until that cloud's secrets are in the repository, so nothing is rented before the founder says
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
-AZURE_SINCE = "2026-10-16T04:50:00Z"   # omni-v7: every Azure set runs again on the engine that stands; the sets of 14 and 15 October
-                                       # stay as their own engine's record, counted in no v7 table
+AZURE_SINCE = "2026-10-17T15:30:00Z"   # omni-v8: every Azure set runs again on the engine that stands; the omni-v7 sets already started run
+                                       # to their end (nothing is cancelled) and stay as their own engine's record, counted in no v8 table
 AZURE_WF = "aks-metered.yml"
 CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
           ("Google Cloud", "gke-metered.yml", ROOT / "scripts" / "google_queue.txt"),
@@ -308,13 +308,41 @@ def next_dispatches(cov):
 
 
 # ------------------------------------------------------------------------------------------------- GitHub
+def campaign_open(now=None):
+    """True once the campaign's start (SINCE, a UTC time) has passed. Every count of runs started (the grid, the reruns, the
+    clouds) reads from SINCE, and a new engine's SINCE is set a little after the moment it is pushed: the conductor of the
+    engine before it may start runs until the push, which then fall before SINCE and are counted in no campaign of the new
+    engine, and the new conductor starts nothing until SINCE, so none of its runs falls before it either."""
+    now = now or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    return now >= SINCE                                # both ISO 8601 in UTC, so the strings order as the times do
+
+
 def engine():
-    """The engine of this checkout, by its fingerprint; a partial checkout without the engine's files reads it from git."""
+    """The engine the runs started now will carry. On GitHub that is the newest commit of the branch they start on, which
+    every tick fetches (FETCH_HEAD), read by that commit's own fingerprints: a tick that began before a new engine landed
+    starts the new engine's runs at its next round, not after its five hours (17 October: omni-v8 landed during a tick).
+    Elsewhere, this checkout's HEAD, by its version tool; a partial checkout without the engine's files reads it from git."""
+    def git(*a):
+        return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True, timeout=120)
     try:
+        if os.environ.get("GITHUB_ACTIONS") == "true" and git("rev-parse", "-q", "--verify", "FETCH_HEAD").returncode == 0:
+            scope = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py",
+                     "tools/run_pandapower.py")              # tools/omni_version.py's SCOPE
+            files = {}
+            for n in sorted(git("ls-tree", "-r", "--name-only", "FETCH_HEAD", "--", *scope).stdout.split()):
+                if n.endswith((".py", ".csv")) and "__pycache__" not in n:
+                    data = subprocess.run(["git", "show", f"FETCH_HEAD:{n}"], cwd=ROOT, capture_output=True, check=True,
+                                          timeout=120).stdout
+                    files[n] = hashlib.sha256(data).hexdigest()
+            d = hashlib.sha256("".join(f"{h}  {n}\n" for n, h in sorted(files.items())).encode()).hexdigest()
+            for f in git("ls-tree", "--name-only", "FETCH_HEAD").stdout.split():
+                if re.fullmatch(r"OMNI_V\d+\.json", f) and json.loads(git("show", f"FETCH_HEAD:{f}").stdout).get("digest") == d:
+                    return f"omni-v{f[6:-5]}"
+            return "unknown"
         r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", "HEAD"], cwd=ROOT,
                            capture_output=True, text=True, timeout=120)
         return r.stdout.split()[0] if r.stdout.strip() else "unknown"
-    except (OSError, subprocess.SubprocessError):
+    except (OSError, subprocess.SubprocessError, ValueError):
         return "unknown"
 
 
@@ -789,6 +817,9 @@ def main(argv=None):
     eng = engine()
     if eng != ENGINE:                                  # a grid belongs to one engine: never start its runs on another
         print(f"this checkout runs {eng}, the grid is {ENGINE}'s: nothing started (a new engine gets its own grid)")
+        return 0
+    if not campaign_open():                            # a run started before SINCE would be counted in no campaign
+        print(f"{ENGINE}'s campaign starts at {SINCE} UTC: nothing started before it")
         return 0
     azure = []
     rq = rerun_queue() if a.grid == "all" else []

@@ -33,9 +33,17 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v7 stands (v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v8 stands (v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v7** (`OMNI_V7.json`, digest `d6d467b824c585f1`, 46 files; `docs/OMNI_V7.md`) stands on main since 16 October,
+- **Omni v8** (`OMNI_V8.json`, digest `f93d233136a1f902`, 46 files; `docs/OMNI_V8.md`) stands on main since 17 October,
+  the founder's order ("there's a new version 8 ... push in all and update all"): omni-v7 with one wire changed, the
+  CityLearn runner (`tools/run_citylearn.py`): a battery whose building simulates power outages stays native, because its
+  charge is also its building's reserve (omni-v7's CityLearn table read LOSS in all three runs in the seven 2023 districts,
+  the only ones with outages; every other district's commands are omni-v7's bytes). The other 45 engine files are omni-v7's.
+  Every benchmark runs again on it (`scripts/reruns.txt`; the conductor's reruns, grid and Azure queues restarted on 17
+  October); the omni-v7 tables stand as omni-v7's until each benchmark's three runs on v8 land. One LOSS row stays
+  reported and is the next repair: the 2022 robustness district's monthly unevenness, +0.11%.
+- **Omni v7** (`OMNI_V7.json`, digest `d6d467b824c585f1`, 46 files; `docs/OMNI_V7.md`) stood on main 16 to 17 October,
   the founder's order ("Where is version 7? That's what you gotta push everything to"): v6's law, catalog and shared-host
   capacity repair (on kind every node is a container on one runner: its processor is counted once and no replica is
   added while that runner is 75% busy or unread, `omni_controller/capacity.py`), plus conveyance bounded by each
@@ -43,9 +51,8 @@ the founder overrides one in the conversation.
   authority), on a shared host no limit raised while the machine is 75% busy or unread, the verdict reading a trial in
   the reports' words (GAIN, EVEN, LOSS: a clear rise refused), every rule in seconds, the cloud's one flag
   `--give-back-only`. Two repairs first written for the KEDA pod start wait were refused by the toy gate and are not in
-  it. Every benchmark runs again on it (`scripts/reruns.txt`; the conductor's reruns, grid and Azure queues restarted on
-  16 October); its twelve trial runs of 16 October (Goldilocks, KEDA's add-ons, fixed capacity, CruiseKube; A, B and C)
-  count as its first reruns. **Omni v6** (`OMNI_V6.json`, `docs/OMNI_V6.md`) stood one day, 15 to 16 October; its four
+  it. Its seventeen three-run tables of 17 October (`results/live/V7_*.md`) and its twelve trial runs of 16 October
+  (Goldilocks, KEDA's add-ons, fixed capacity, CruiseKube; A, B and C) are its own. **Omni v6** (`OMNI_V6.json`, `docs/OMNI_V6.md`) stood one day, 15 to 16 October; its four
   three-run tables are its own.
 - `OMNI_V5.json` and `docs/OMNI_V5.md`: the max (`realms/compass_arm_v5.py`, `V5CFG`) on the 1,107-muscle catalog, the
   bone inside every organism with the living body's immune system (V6-V13, `docs/FORMAL_V5.md` section 4: native twins
@@ -54,8 +61,8 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v7, omni-v6, omni-v5,
-  omni-v3, omni-v2, omni-v1, or what differs.
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v8, omni-v7, omni-v6,
+  omni-v5, omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
   1.0, never as a second product.
@@ -154,6 +161,11 @@ the founder overrides one in the conversation.
 
 ## Orders of 17 October
 
+- **Version 8 stands; push in all and update all** (the founder's words: "there's a new version 8. That means you got to
+  push in all and update all ... We're going to start the GPU soon and the other two clouds"). omni-v8 is on main and on
+  the branch `v8`; every page, manual, table and queue points at it; every benchmark runs again on it. The GPU runs on
+  Lambda and the Google and Amazon sets start on his word: the GPU from one exact commit given to him, the two clouds by
+  turning their `switch=` line on once their secrets are in the repository.
 - **The page number in both bottom corners, the running head on every page.** Every page of both manuals but the title
   page carries the book's name on the left of the head and the part or chapter it belongs to on the right (openers and
   front matter included), and the page label in the left and the right bottom corner, "so that when somebody can flip
@@ -364,8 +376,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v7` (the engine that stands, the founder's order of 16
-  October: "push everything to version 7"), stay in sync, and `v7-candidate` is kept level with them. **The `v5` branch
+  One version is always the main one; `main` and the working branch, `v8` (the engine that stands, the founder's order of 17
+  October: "push in all and update all"), stay in sync, and `v7` and `v7-candidate` are kept level with them. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.
 - Verify before every push: `tools/release_manifest.py` under Python 3.12 (as GitHub runs it), 0 FAIL. Clear

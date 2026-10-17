@@ -93,6 +93,26 @@ districts the bill and carbon came out the same. Five districts cannot be run by
 any arm: they need CityLearn's entity interface, which that controller refuses, or they carry an appliance action it
 does not know. Each is listed in the report with CityLearn's own message.
 
+## Amendment of 17 October (omni-v8): the battery that carries its building through an outage stays native
+
+**What omni-v7 read** (`results/live/V7_CITYLEARN.md`, three runs): GAIN in all three of our runs on the electricity bought and
+the daily peak in all ten battery districts; LOSS in all three of our runs in the seven 2023 districts on the energy not served
+(+2.0% to +9.8%), the time uncomfortable, the ramping, the highest peak in three districts and the monthly unevenness in one.
+
+**Cause** (found locally on CityLearn 3.0.2, the omni-v7 numbers reproduced to the last digit): the seven 2023 districts are the
+only ones whose buildings simulate power outages (every building in each; no other district has any), and CityLearn counts the
+energy not served only in outage hours. The wire moved the batteries for the district's draw and did not see that, in those
+buildings, the battery is also the building's reserve through the outage.
+
+**Amendment (one wire, one muscle):** a battery whose building simulates power outages (CityLearn's `simulate_power_outage`) is
+left native; every other battery is steered exactly as before (controller, gain, response, glide, band and hand-back unchanged).
+Fixed on one district (`citylearn_challenge_2023_phase_2_local_evaluation`); three narrower repairs each left a LOSS there and
+were refused (`docs/OMNI_V8.md`, section 1). Every district has now been seen, so no untouched district remains for this
+amendment; it is reported on all, every row, through `tools/citylearn_abc.py` A, B and C on the omni-v8 commit
+(to be written as results/live/V8_CITYLEARN.md). Read before any GitHub run: the 2023 districts identical to native; every other district
+identical to omni-v7 (checked to the digit on the 2022 robustness district). The robustness district's monthly unevenness
+(+0.11%, LOSS in all three omni-v7 runs) is not changed by this amendment and stays reported.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

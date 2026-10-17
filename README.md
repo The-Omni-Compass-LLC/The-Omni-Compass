@@ -50,13 +50,13 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v7, fingerprint `d6d467b824c585f1` (46 files); package 0.7.0.
+- **Engine on main:** omni-v8, fingerprint `f93d233136a1f902` (46 files); package 0.8.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- Omni v6 stands on main. The benchmarks with their three-run table on it so far are the four Kubernetes add-on tests below (Goldilocks, CruiseKube, KEDA's HTTP add-on, KEDA on the CPU target and the requests); every other benchmark runs again on it from `scripts/reruns.txt`, and until its three runs land its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on. The count on the engine that stands is kept in the standing block of [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md). See [`docs/OMNI_V6.md`](docs/OMNI_V6.md).
+- Omni v8 stands on main (17 October). Every benchmark runs again on it from `scripts/reruns.txt`; until its three runs land, its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on, and twenty-two of them carry omni-v7's three-run tables (`results/live/V7_*.md`). The count on the engine that stands is kept in the standing block of [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md). See [`docs/OMNI_V8.md`](docs/OMNI_V8.md).
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -91,20 +91,27 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## The engine that stands: omni-v7 (the max on every muscle, every muscle its own card, the shared-host capacity repair, quota-aware conveyance, every rule in seconds)
+## The engine that stands: omni-v8 (the max on every muscle, every muscle its own card, quota-aware conveyance, every rule in seconds, the outage battery left native)
 
-The engine on main is **omni-v7** (`OMNI_V7.json`, fingerprint `d6d467b824c585f1`, 46 files; [`docs/OMNI_V7.md`](docs/OMNI_V7.md)), the
-engine that stands since 16 October by the founder's order: the max on every muscle of the 1,107-muscle catalog, every muscle its own card,
-the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota (an unreadable quota is no budget
-known), no limit raised while a shared host is busy or unread, every rule counted in seconds, the verdict reading a trial in the reports'
-words, the cloud's rule as one flag. Every benchmark runs again on it (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the
-same day); until a benchmark's three runs land, its row on the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on. Its first
-five three-run tables are in (`results/live/V7_*.md`), native against Omni-Compass on top, ten pairs × three runs each, no row LOSS: a
-service rightsized by Goldilocks, response time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs;
-KEDA's HTTP add-on, −57% to −58% mean, −71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to −19%, pods
-started −17% to −23%, GAIN in all three; KEDA on the CPU target and the requests, −36% to −38% mean and −52% to −54% at the 95th
-percentile, GAIN in all three; CruiseKube and the fixed-capacity caps EVEN; machines EVEN in every one; parked-worker energy +1.1% to
-+2.3%, power given.
+The engine on main is **omni-v8** (`OMNI_V8.json`, fingerprint `f93d233136a1f902`, 46 files; [`docs/OMNI_V8.md`](docs/OMNI_V8.md)), the
+engine that stands since 17 October by the founder's order. It is omni-v7 with one wire changed: on CityLearn a battery whose building
+simulates power outages stays native, because its charge is also the building's reserve (omni-v7's CityLearn table read LOSS in all three
+of our runs in the seven 2023 districts, the only districts with outages; the cause was ours, and on those districts omni-v8 now reads
+native's numbers to the last digit). The other 45 engine files are omni-v7's bytes: the max on every muscle of the 1,107-muscle catalog,
+every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
+rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
+omni-v8 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the same day); until a benchmark's three runs land, its row on
+the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
+
+**The engine before it, omni-v7** ([`docs/OMNI_V7.md`](docs/OMNI_V7.md), 16 to 17 October), has twenty-two three-run tables of its own
+(`results/live/V7_*.md`), native against Omni-Compass on top; they stand as omni-v7's until omni-v8's land. Twenty-one read no LOSS. The
+one that did is CityLearn: the 2023 districts, fixed in omni-v8 above, and one row of the 2022 robustness district, its monthly
+unevenness +0.11% beside the bill −8.6% and the electricity bought −14.7%, the next repair. Among them: a service rightsized by Goldilocks, response
+time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs; KEDA's HTTP add-on, −57% to −58% mean,
+−71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to −19%, GAIN in all three; KEDA on the CPU target and
+the requests, −36% to −38% mean and −52% to −54% at the 95th percentile, GAIN in all three; CruiseKube and the fixed-capacity caps EVEN;
+machines EVEN in every one; parked-worker energy +1.1% to +2.3%, power given. The Omni index over the real tests: **+4.2% GAIN** on the
+resource reading and **+11.5% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
 
