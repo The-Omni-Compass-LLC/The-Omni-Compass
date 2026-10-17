@@ -74,13 +74,13 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-17 19:28 | benchmark-reps | success | [39059584078](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39059584078) |
+| 2026-10-17 19:19 | mujoco | success | [39061854186](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39061854186) |
+| 2026-10-17 19:15 | kind-goldilocks | success | [39057297713](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39057297713) |
+| 2026-10-17 19:05 | capacity A: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | success | [39057301477](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39057301477) |
 | 2026-10-17 18:52 | citylearn | success | [39055055394](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39055055394) |
 | 2026-10-17 18:50 | big-organism-detached collect | success | [39059822600](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39059822600) |
-| 2026-10-17 18:49 | benchmark-reps | success | [39052772948](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39052772948) |
-| 2026-10-17 18:49 | kafka | success | [39052784630](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39052784630) |
-| 2026-10-17 18:47 | pgbench | success | [39052788816](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39052788816) |
 | 2026-10-17 18:46 | realms-v5 | success | [39058432904](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39058432904) |
-| 2026-10-17 18:45 | redis | success | [39052780830](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39052780830) |
 | 2026-10-17 18:43 | realms | success | [39058429026](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39058429026) |
 | 2026-10-17 18:32 | cpu-power | success | [39058436682](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39058436682) |
 | 2026-10-17 18:27 | live-shadow | success | [39057289698](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39057289698) |
