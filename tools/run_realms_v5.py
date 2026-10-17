@@ -44,7 +44,7 @@ try:
 except ImportError:
     from tools.legal import stamp as _legal_stamp  # pragma: no cover
 
-from tools.readings import GAIN, LOSS, GAIN_AND_LOSS, labelled  # noqa: E402  (the words every table uses)
+from tools.readings import GAIN, LOSS, GAIN_AND_LOSS, labelled, receipt_key  # noqa: E402  (the words every table uses)
 from realms.harness import (catalog, run_muscle_arm, run_bodies, Body, paired, paired_organism, interval, scale_load,
                             TOWER, STACK, KILL_AT, WALK, LINE)
 from realms.compass_arm_v5 import native_at_limit

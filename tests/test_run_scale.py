@@ -213,16 +213,15 @@ class Conductor(unittest.TestCase):
         self.assertEqual(q[0][2], "aks-metered steady dial save eastus Standard_D2s_v4")
         self.assertEqual(q[1][2], "aks-metered burst 1 6 1 8 1 6 dial save eastus Standard_D2_v4")
         steady, x, y = q[0][2], q[1][2], q[2][2]
-        d2, d2s = ("eastus", "Standard_D2_v4"), ("eastus", "Standard_D2s_v4")
-        # steady A and burst x A started and both queues busy: nothing starts
-        self.assertEqual(g.azure_to_start(q, {steady: 1, x: 1}, {d2, d2s}), [])
-        # both queues free: burst y A in its queue (A of every line before any B), steady B in the other
-        self.assertEqual([(r, n) for r, n, _, _ in g.azure_to_start(q, {steady: 1, x: 1}, set())], [("A", "burst y"), ("B", "steady")])
-        # a busy queue holds its own next set and never lets a later one past it
-        self.assertEqual([(r, n) for r, n, _, _ in g.azure_to_start(q, {steady: 1, x: 1}, {d2})], [("B", "steady")])
+        # one region is one line at GitHub whatever the machine size (17 October: two sizes treated as two lines cancelled
+        # each other's waiting runs): the line busy, nothing starts
+        self.assertEqual(g.azure_group(steady), "eastus")
+        self.assertEqual(g.azure_group("aks-metered burst 1 6 1 8 1 6 dial save eastus Standard_D2_v4"), "eastus")
+        self.assertEqual(g.azure_to_start(q, {steady: 1, x: 1}, {"eastus"}), [])
+        # the line free: only its next set, A of every line before any B, one at a time
+        self.assertEqual([(r, n) for r, n, _, _ in g.azure_to_start(q, {steady: 1, x: 1}, set())], [("A", "burst y")])
         # every set started: nothing more, ever
         self.assertEqual(g.azure_to_start(q, {steady: 3, x: 3, y: 3}, set()), [])
-        self.assertEqual(g.azure_group("aks-metered burst 1 6 1 8 1 6 dial save eastus Standard_D2_v4"), d2)
         self.assertEqual(g.azure_title({"dial": "max", "replica_ceiling": "0"}), "aks-metered steady replica room 0 dial max eastus Standard_D2s_v4")
         own = g.azure_queue(g.AZURE_QUEUE)                                 # the repository's own queue reads: the four sets at the
         self.assertEqual(len(own), 12)                                     # tune-down (the founder's order of 14 October), A, B, C of each
@@ -230,6 +229,32 @@ class Conductor(unittest.TestCase):
         for _, _, title, kv in own:
             self.assertTrue(title.startswith("aks-metered ") and " dial save " in title, title)
             self.assertEqual((kv.get("dial"), kv.get("replica_ceiling")), ("save", "0"))
+
+    def test_one_cloud_one_line_queue_sets_then_its_reruns_and_cancelled_runs_not_counted(self):
+        g = self.g
+        self.assertEqual(g.cloud_of("aks-metered.yml"), "Azure")
+        self.assertEqual(g.cloud_of("aks-metered-full.yml"), "Azure")
+        self.assertEqual(g.cloud_of("big-organism.yml"), "Azure")
+        self.assertEqual(g.cloud_of("gke-metered.yml"), "Google Cloud")
+        self.assertIsNone(g.cloud_of("redis.yml"))
+        queue = [("A", "steady", "t-steady", {"s": "1"}), ("A", "burst", "t-burst", {"b": "1"}),
+                 ("B", "steady", "t-steady", {"s": "1"}), ("B", "burst", "t-burst", {"b": "1"})]
+        reruns = [("A", "full burst", "aks-metered-full.yml", {"f": "1"}), ("B", "full burst", "aks-metered-full.yml", {"f": "1"})]
+        # A of the queue's sets first, then A of the cloud's reruns, then B
+        self.assertEqual(g.cloud_next(queue, {}, reruns)[1:3], ("A", "steady"))
+        self.assertEqual(g.cloud_next(queue, {"t-steady": 1, "t-burst": 1}, reruns), ("aks-metered-full.yml", "A", "full burst", {"f": "1"}))
+        self.assertEqual(g.cloud_next(queue, {"t-steady": 1, "t-burst": 1}, reruns[1:])[1:3], ("B", "steady"))
+        self.assertIsNone(g.cloud_next(queue, {"t-steady": 2, "t-burst": 2}, []))
+        # a run GitHub cancelled before it began is not a run: it is released again
+        calls = []
+        def fake_api(path, method="GET", data=None):
+            calls.append(path)
+            return {"workflow_runs": [{"conclusion": "cancelled"}, {"conclusion": "success"}, {"conclusion": None}]}
+        real, g.api = g.api, fake_api
+        try:
+            self.assertEqual(g.reruns_started([("A", "x", "w.yml", {})]), {"w.yml": 2})
+        finally:
+            g.api = real
 
     def test_started_runs_read_back_and_not_started_again(self):
         g = self.g

@@ -31,7 +31,7 @@ class RobustRestart(unittest.TestCase):
             settings = dict(DRY='', KUBECTL='kubectl', WORKERS='4', SITE_LIMIT_W='200', OUT_DIR=tmp,
                             STRICT='', LAW='', CLOSURE='', REPLICA_CEILING='', OMNI_DIAL='save', MIN_NODES='2',
                             NODE_CUSHION='0', SLO_MS='500', OMNI_NICE='0', OMNI_SENSED='default/php-apache',
-                            OMNI_POWER_CMD='', OMNI_INTERVAL='60', OMNI_FLOOR_INTERVAL='5')
+                            OMNI_POWER_CMD='', OMNI_INTERVAL='60', OMNI_FLOOR_INTERVAL='5', GIVE_BACK_ONLY='')
             env.update(settings)
             script = function + '\nCAP_ARGS="--cap-deployments default/php-apache"\nexport -f start_controller\n' + export
             script += '\nbash -uc \'start_controller 1 "$OUT_DIR/child.log" >/dev/null\'\n'
@@ -44,6 +44,18 @@ class RobustRestart(unittest.TestCase):
             self.assertIn('--cap-deployments', args)
             self.assertEqual(args[args.index('--cap-deployments') + 1], 'default/php-apache')
             self.assertEqual(args[args.index('--iterations') + 1], '1')
+
+    def test_every_variable_the_restart_reads_is_exported(self):
+        # 17 Oct: GIVE_BACK_ONLY joined the command line on 15 October but not the export list, so under `set -u` the
+        # second governor stopped before it began and every kill run of omni-v7 was invalid
+        text = (ROOT / 'scripts/kind_bench.sh').read_text()
+        start = text.index('start_controller()')
+        function = text[start:text.index('\n}\n', start)]
+        bare = set(re.findall(r'\$\{?([A-Z_][A-Z0-9_]*)\}?(?![:A-Z0-9_])', function))
+        exported = set()
+        for line in re.findall(r'^\s*export (.*)$', text, re.M):
+            exported |= {w.split('=')[0] for w in line.split() if re.match(r'[A-Z_][A-Z0-9_]*(=|$)', w)}
+        self.assertFalse(bare - exported, f'read by start_controller but not exported: {sorted(bare - exported)}')
 
 
 if __name__ == '__main__':

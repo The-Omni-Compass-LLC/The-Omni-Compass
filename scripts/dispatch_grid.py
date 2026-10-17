@@ -487,12 +487,60 @@ def reruns_to_start(queue, started):
 
 
 def reruns_started(queue):
-    """{workflow: runs dispatched since RERUN_SINCE}, read from GitHub."""
+    """{workflow: runs dispatched since RERUN_SINCE and not cancelled}, read from GitHub. A cancelled run is not a run (the
+    founder's order of 16 October: nothing is cancelled; a run GitHub cancelled before it began is released again)."""
     out = {}
     for wf in sorted({q[2] for q in queue}):
-        d = api(f"repos/{REPO}/actions/workflows/{wf}/runs?event=workflow_dispatch&created=>={RERUN_SINCE}&per_page=1")
-        out[wf] = int(d.get("total_count", 0))
+        n, page = 0, 1
+        while page <= 5:
+            d = api(f"repos/{REPO}/actions/workflows/{wf}/runs?event=workflow_dispatch&created=>={RERUN_SINCE}&per_page=100&page={page}")
+            rs = d.get("workflow_runs", [])
+            n += sum(r.get("conclusion") != "cancelled" for r in rs)
+            if len(rs) < 100:
+                break
+            page += 1
+        out[wf] = n
     return out
+
+
+# GitHub holds every run of one concurrency group in one line, with ONE waiting place: a second run waiting in the group
+# cancels the first one waiting (17 October: about thirty Azure starts of 16 October, and the reruns of the Azure full-control
+# burst and of the large organisms, were cancelled that way before any machine was made). Every Azure workflow shares the
+# group azure-benchmark-<region>, every Google one google-benchmark-<zone>, every Amazon one amazon-benchmark-<region>; all our
+# sets use one region or zone each, so each cloud is one line: one of its runs at a time, and none started while one waits.
+CLOUD_FAMILIES = {"Azure": ("aks-metered.yml", "aks-metered-full.yml", "big-organism.yml"),
+                  "Google Cloud": ("gke-metered.yml",), "Amazon": ("eks-metered.yml",)}
+ACTIVE = ("queued", "in_progress", "waiting", "pending", "requested")
+
+
+def cloud_of(wf):
+    """The cloud whose single line a workflow's runs stand in, or None."""
+    return next((c for c, wfs in CLOUD_FAMILIES.items() if wf in wfs), None)
+
+
+def cloud_busy(cloud):
+    """True when any run of the cloud's workflows is waiting or running (its line is taken)."""
+    for wf in CLOUD_FAMILIES.get(cloud, ()):
+        d = api(f"repos/{REPO}/actions/workflows/{wf}/runs?per_page=30")
+        if any(r.get("status") in ACTIVE for r in d.get("workflow_runs", [])):
+            return True
+    return False
+
+
+def cloud_next(queue, started, reruns_left):
+    """The one run to start in a cloud's free line: A of every queued set, then A of the cloud's reruns, then B of each, then
+    C (queue: [(run, name, title, inputs)], started: {title: runs not cancelled}; reruns_left: [(run, name, wf, inputs)] not
+    yet started). Returns (workflow or None for the queue's own, run, name, inputs) or None."""
+    seen, sets = {}, []
+    for run, name, title, kv in queue:
+        seen[title] = seen.get(title, 0) + 1
+        if seen[title] > started.get(title, 0):
+            sets.append((run, None, name, kv))
+    for letter in "ABC":
+        for item in sets + [(r, wf, n, kv) for r, n, wf, kv in reruns_left]:
+            if item[0] == letter:
+                return (item[1], item[0], item[2], item[3])
+    return None
 
 
 def cloud_title(wf, kv):
@@ -532,9 +580,10 @@ def cloud_switch(path):
 
 
 def azure_group(title):
-    """A run's machine family queue, (region, machine size or pools): the last two words of its title."""
+    """A run's line at GitHub: its concurrency group's region or zone, the second-to-last word of its title (the machine size
+    is not part of the group: two sizes in one region share one line)."""
     w = (title or "").split()
-    return tuple(w[-2:]) if len(w) >= 2 else ("", "")
+    return w[-2] if len(w) >= 2 else ""
 
 
 def azure_queue(path=None, wf=AZURE_WF):
@@ -560,8 +609,8 @@ cloud_queue = azure_queue
 
 
 def azure_to_start(queue, started, busy):
-    """The sets to start now: in each machine family queue not busy, its first set not yet started (the k-th line of a
-    title counts as started when started[title] >= k); at most one a queue."""
+    """The sets to start now: in each line (region) not busy, its first set not yet started (the k-th line of a title counts
+    as started when started[title] >= k); at most one a line, whatever the machine size."""
     seen, taken, out = {}, set(), []
     for item in queue:
         t = item[2]
@@ -570,7 +619,7 @@ def azure_to_start(queue, started, busy):
             continue
         g = azure_group(t)
         if g in busy or g in taken:
-            taken.add(g)                                  # the queue's next set waits behind the one in front of it
+            taken.add(g)                                  # the line's next set waits behind the one in front of it
             continue
         taken.add(g)
         out.append(item)
@@ -742,19 +791,31 @@ def main(argv=None):
         print(f"this checkout runs {eng}, the grid is {ENGINE}'s: nothing started (a new engine gets its own grid)")
         return 0
     azure = []
+    rq = rerun_queue() if a.grid == "all" else []
+    rerun_counts = None
     for cloud, wf, qpath in CLOUDS:
         if not cloud_switch(qpath):
             print(f"{cloud} queue: switched off ({qpath.relative_to(ROOT)}); nothing started there until the founder turns it on")
             continue
         queue = azure_queue(qpath, wf)
-        if not queue:
+        family_reruns = [q for q in rq if cloud_of(q[2]) == cloud]
+        if not queue and not family_reruns:
             continue
         try:
-            for run, name, title, kv in azure_to_start(queue, *azure_runs(wf)):
+            # one line a cloud at GitHub: one run at a time, and nothing started while one waits or runs
+            if cloud_busy(cloud):
+                azure.append(f"{cloud}: a run waits or runs in its line; nothing more started there this tick")
+                continue
+            if family_reruns and rerun_counts is None:
+                rerun_counts = reruns_started(rq)
+            left = reruns_to_start(family_reruns, rerun_counts or {}) if family_reruns else []
+            nxt = cloud_next(queue, azure_runs(wf)[0], left)
+            if nxt:
+                run_wf, run, name, kv = nxt
                 if not a.dry:
-                    api(f"repos/{REPO}/actions/workflows/{wf}/dispatches", method="POST", data={"ref": a.ref, "inputs": kv})
+                    api(f"repos/{REPO}/actions/workflows/{run_wf or wf}/dispatches", method="POST", data={"ref": a.ref, "inputs": kv})
                     time.sleep(2)
-                azure.append(f"{cloud} set started: {name} {run}")
+                azure.append(f"{cloud} {'rerun' if run_wf else 'set'} started: {name} {run}")
         except (RuntimeError, urllib.error.URLError) as e:   # the cloud is read again at the next tick
             print(f"{cloud} queue not read ({str(e)[:120]}); tried again at the next tick", file=sys.stderr)
     for x in azure:
@@ -766,7 +827,7 @@ def main(argv=None):
         print(f"waits for a runner and goes first: {t}")
     reruns = []
     if a.grid == "all" and not first:
-        queue = rerun_queue()
+        queue = [q for q in rq if cloud_of(q[2]) is None]       # a cloud's reruns stand in its own line (above)
         if queue:
             for run, name, wf, kv in reruns_to_start(queue, reruns_started(queue))[:a.reruns_per_tick]:
                 if inflight >= target:
