@@ -2,6 +2,47 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-17 (night: the first omni-v7 reruns read back: seventeen three-run tables)
+
+- **Seventeen three-run tables on omni-v7** from the reruns released on 16 October (A, B and C, separate GitHub runs,
+  archived in `results/live/raw/`): Kubernetes all four in one run, fairness, faults, the batch queue, the Google 2011
+  day and the long robustness run (`tools/confirm_abc.py`); Redis and Kafka, each for resource and for service; PostgreSQL,
+  MySQL and MongoDB; the robot arms, the power grids, the buildings and batteries, the drone swarms (each with its own
+  tool). Written to `results/live/V7_*.md` with their JSON. Every row is shown. No LOSS in sixteen of them. **CityLearn
+  reads LOSS in all three runs on four of its eleven scores in the 2023 challenge districts** (energy not served +2.0 to
+  +9.8% in seven districts, time uncomfortable +0.01 to +0.15% in six, ramping +4.5 to +6.2% in seven, highest peak +2.5%
+  in three, monthly unevenness +0.07 to +0.11% in two), beside GAIN on electricity bought in all ten districts with
+  batteries and on the daily peak in all ten. The same rows moved the same way on the engines before; the battery wire
+  (`tools/run_citylearn.py`, a file of the engine's fingerprint) moves the batteries on the district's draw alone and
+  does not read the outage hours those districts carry, so the fix belongs to the next engine version, in the toy gate
+  first. Redis service and MySQL each have one row where the runs point different ways; the swarm's three shown-only
+  gauges (closest approach, tracking error, cruise level) did not reproduce to one part in a thousand across machines.
+  The 1,107-muscle realm study reproduced the committed result exactly in all three runs. The CPU governor's three runs
+  ran only their capability check: the measured run starts only on a machine with a power meter and frequency control,
+  which GitHub's runners do not give, so it waits for such a machine (none is rented without the founder's word).
+- **The full-control scorer reads one fact once.** `pilot/score.py` read a fall in utilisation as LOSS in the run that
+  read the rise in node-hours as power given: both say the governor held more machine for the same work. A fall in
+  utilisation now reads power given, as the node-hours do; the test covers the reverse pair.
+
+## 2026-10-17 (night: three harness faults found in the finished reruns and fixed)
+
+- **Azure runs no longer cancel each other.** GitHub keeps one waiting place in each concurrency group, and every Azure
+  workflow shares one group per region (`azure-benchmark-<region>`); the conductor treated each machine size as its own
+  queue, so a second start in the same region cancelled the first one waiting. Six reruns were lost that way before any
+  machine was made (the Azure full-control burst and the large organisms). The conductor now starts one run at a time in
+  each cloud and nothing while one waits or runs: A of every queued set, then A of the cloud's reruns, then B, then C. A
+  cancelled run no longer counts as started, so the six are released again (`scripts/dispatch_grid.py`; tests in
+  `tests/test_run_scale.py`).
+- **The robustness kill test's second governor starts.** omni-v7 added `GIVE_BACK_ONLY` to the governor's command line on
+  15 October; `scripts/kind_bench.sh` did not export it to the robustness script, which runs under `set -u`, so the
+  governor restarted at 50% of the window stopped before it began and the three kill runs on omni-v7 were invalid in every
+  repetition (6 of 15 decisions). The hand-back itself worked. The variable is exported, the script records whether the
+  second governor really started, and a test fails if any variable the restart reads is not exported
+  (`docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v7"). Three new kill runs are released.
+- **The realms runner's import.** `tools/run_realms_v5.py` used `receipt_key` without importing it: the three realms reruns
+  on omni-v7 stopped writing their page after their CSV, JSON and run record were written. The import is added; the
+  page is rebuilt from the archived JSON.
+
 ## 2026-10-17 (evening: one numbering, every reference realigned, the figures audited against the code)
 
 - **One numbering in both books, every reference realigned to it** (the founder's order of 17 October: "once you change

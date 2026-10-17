@@ -43,7 +43,7 @@ what is tested.
   registry record stays behind with a dead process id. Native receives nothing at that moment.
 - **The hand-back**: the watchdog's next pass (within 5 s) finds the dead governor and runs its recorded restore command
   (`omni_controller.controller --restore-only`, which restores from the snapshot annotations on the objects themselves).
-  The harness polls the cluster once a second from the moment of the kill and records the first second at which **every**
+  The harness polls the cluster every 2 s from the moment of the kill and records the first second at which **every**
   setting is at the operator's: the HPA target at 50, the replica range as set, every serving pod's CPU limit at its shipped
   value, every worker in service, and no `omnicompass.io/` annotation left on the HPA or the deployment.
 - **The second governor**: at 50% of the window (450 s) a new governor is started with the same command and governs to the
@@ -54,7 +54,7 @@ what is tested.
 
 | Gauge | Direction |
 |---|---|
-| seconds from the kill to every setting back at the operator's (omni only) | **the aim is lower; shown with its interval**; an arm not handed back within 60 s reads **AWAY FROM ITS AIM**, and an arm never handed back is INVALID and a loss |
+| seconds from the kill to every setting back at the operator's (omni only) | **the aim is lower; shown with its interval**; an arm not handed back within 60 s reads **LOSS**, and an arm never handed back is INVALID and a LOSS |
 | settings after the hand-back equal the operator's; no record left (omni only) | **any failure is marked** |
 | the second governor's snapshot equals the operator's settings (omni only) | **any difference is marked** |
 | time over the response line and failed requests in the 120 s after the kill, native against omni | the aim is lower (the paired reading, as the fault test reads its windows) |
@@ -75,9 +75,9 @@ what is tested.
 | Gauge | Direction |
 |---|---|
 | the whole window's gauges, as in every Kubernetes test | by the usual directions |
-| governor resident memory, mean of the last ten minutes over the mean of the first ten (omni only) | shown; a growth of more than a quarter reads **AWAY FROM ITS AIM** (a leak) |
+| governor resident memory, mean of the last ten minutes over the mean of the first ten (omni only) | shown; a growth of more than a quarter reads **LOSS** (a leak) |
 | decisions made of expected; failed decisions (omni only) | shown; fewer than 95% of expected is INVALID; any failed decision is shown with its reason |
-| decision time, mean of the last hour against the first (omni only) | shown; a growth of more than half reads **AWAY FROM ITS AIM** |
+| decision time, mean of the last hour against the first (omni only) | shown; a growth of more than half reads **LOSS** |
 | every setting handed back at the end, read back (omni only) | **any failure is marked** |
 
 ## Scenario 3: the governor's own cost at 1, 10, 100 and 1,000 copies
@@ -185,6 +185,21 @@ preregistration did not ask for and which is a mild strength (three machines, th
 eight-vCPU footprints of two of them sit in the families the AKS fleet's pre-flight asks for, so the fleet cannot be
 dispatched until the collect deletes them (`docs/K8S_COMPASS_PREREGISTRATION.md`, amendment 8); that is the pre-flight working
 as designed and costs nothing. The scenario's rules, thresholds and gauges are unchanged.
+
+## On omni-v7 (17 October): the three kill runs invalid, the cause, the fix
+
+The three kill runs released on the engine that stands (runs 38937554870, 38949631481 and 38961351997, ten pairs each)
+were marked invalid in every repetition: the omni arm made 6 of its 15 decisions inside the window (under the 80% every
+Kubernetes run must reach). The first governor made its six decisions to the kill at 360 s and the hand-back worked (every
+setting at the operator's, no record left); **the second governor never started**. Cause, in the harness and not the
+engine: on 15 October omni-v7 added one variable to the governor's command line (`GIVE_BACK_ONLY`, empty here and
+`--give-back-only` in the cloud), and `scripts/kind_bench.sh` did not add it to the list it exports to
+`scripts/kind_robust.sh`, which runs under `set -u`; the restart stopped on the unbound variable before the governor began.
+`tests/test_robust_restart.py` failed on it and is not among the tests `verify.py` runs, so no push was stopped. Fixed on
+17 October: the variable is exported, the script writes into `robust.log` whether the second governor really started (its
+pid alive two seconds after), and a second test checks that every variable the restart reads is exported (it fails on the
+old list). Nothing in the scenario, its gauges or its limits changed; the three runs are kept in the record as invalid and
+three new kill runs are released on the fixed harness, read as A, B and C.
 
 ## What is declared before the first run
 

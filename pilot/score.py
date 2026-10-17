@@ -30,6 +30,9 @@ import numpy as np
 LOWER = {"node_hours_per_core_hour": True, "kwh_per_core_hour": True, "utilisation": False,
          "pending_pod_minutes_per_hour": True, "hpa_shortfall_minutes_per_hour": True}
 SPENT = {"node_hours_per_core_hour", "kwh_per_core_hour"}       # resources spent: a rise is power given, never a LOSS
+# utilisation is the same fact seen from the other side: a fall means more machine held for the same work, which is power
+# given, never a LOSS (17 Oct: a full-control run read node-hours +15.8% power given and utilisation -17.7% LOSS, one fact twice)
+HELD = SPENT | {"utilisation"}
 
 
 def load(path):
@@ -83,7 +86,7 @@ def compare(base, omni, seed=12345, n=4000):
             continue
         diffs = c[rng.integers(0, len(c), (n, len(c)))].mean(1) - a[rng.integers(0, len(a), (n, len(a)))].mean(1)
         lo, hi = np.percentile(diffs, [2.5, 97.5]); d = float(c.mean() - a.mean())
-        verdict = (("GAIN" if (hi < 0) == lower else ("power given" if m in SPENT else "LOSS")) if (hi < 0 or lo > 0)
+        verdict = (("GAIN" if (hi < 0) == lower else ("power given" if m in HELD else "LOSS")) if (hi < 0 or lo > 0)
                    else "EVEN, no significant difference")
         out[m] = {"baseline": float(a.mean()), "omni": float(c.mean()), "difference": d,
                   "relative": d / a.mean() if a.mean() else float("nan"), "ci95": [float(lo), float(hi)], "verdict": verdict}

@@ -37,6 +37,10 @@ def main():
     assert all(v["verdict"] == "EVEN, no significant difference" for k, v in s.items() if k != "pending_pod_minutes_per_hour"), s
     b = score(["--baseline", str(t / "base.csv"), "--omni", str(t / "bad.csv")])["metrics"]
     assert b["pending_pod_minutes_per_hour"]["verdict"] == "LOSS" and b["hpa_shortfall_minutes_per_hour"]["verdict"] == "LOSS"
+    # the reverse pair: omni holds more machine for the same work, so node-hours rise and utilisation falls; both are
+    # power given, never a LOSS (one fact read from its two sides)
+    g = score(["--baseline", str(t / "omni.csv"), "--omni", str(t / "base.csv"), "--idle-w", "200", "--dyn-w", "350"])["metrics"]
+    assert g["node_hours_per_core_hour"]["verdict"] == "power given" and g["utilisation"]["verdict"] == "power given", g
     p = score(["--baseline", str(t / "base_p.csv"), "--omni", str(t / "omni_p.csv")])["metrics"]
     assert p["kwh_per_core_hour"]["verdict"] == "GAIN"
     print("pilot score: GAIN detected; identical clusters read EVEN, no significant difference; a service LOSS detected; measured power used")
