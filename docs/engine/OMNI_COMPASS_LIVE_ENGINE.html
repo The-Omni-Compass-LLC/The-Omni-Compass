@@ -121,6 +121,15 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 .stamp{font-family:var(--f-display);font-weight:800;font-size:30px;letter-spacing:.04em}
 .tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:6px 8px;font-size:12px;font-family:var(--f-mono);white-space:nowrap;z-index:5}
 .ringbox{position:relative}
+.trio>.stack{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:1100px){.trio>.stack{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.trio>.stack>:first-child{grid-column:1/-1}}
+@media (max-width:700px){.trio>.stack{grid-template-columns:minmax(0,1fr)}}
+.readme{display:flex;flex-direction:column;gap:8px}
+.howto{margin:0;padding-left:20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 24px;font-size:14px;color:var(--muted)}
+.howto b{color:var(--ink)}
+@media (max-width:860px){.howto{grid-template-columns:minmax(0,1fr)}}
+.who{width:100%;font-size:13px}
+.who td,.who th{white-space:normal;text-align:left}
 .twin{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
 @media (max-width:860px){.twin{grid-template-columns:minmax(0,1fr)}}
 .ringhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin-bottom:6px}
@@ -152,8 +161,18 @@ input[type=range]{width:100%;accent-color:var(--brass)}
     <span class="chip">engine math <b>omni-v7</b></span>
     <span class="chip">evidence <b>class S, modelled</b></span>
     <span class="chip">arms <b>native · Omni-Compass on top</b></span>
+    <span class="chip">checked against the Python <b>0 mismatches</b></span>
   </div>
 </header>
+
+<section class="panel readme" aria-label="How to read this page">
+  <h3>How to read it in thirty seconds</h3>
+  <ol class="howto">
+    <li><b>Two engines, one demand.</b> Left is the organism with only its native controllers. Right is the same organism, the same demand at the same instant, with Omni-Compass on top. Nothing differs but the brain.</li>
+    <li><b>Where a dot sits is how hard that muscle works.</b> On its ring the muscle is at the center of its compass band, p = 0.5. Inward is calmer; outward is closer to its line (p = 1, the dashed red circle). Red means past the line: work is waiting or failing.</li>
+    <li><b>The brain is the code.</b> The senses, the six-state engine, the nerves, the compass law and the verdict are ported from the engine's own files and checked against them number for number. The muscles, their demand and their native controllers are a model drawn for this page (class S).</li>
+  </ol>
+</section>
 
 <section class="stack" aria-label="The organism, live, twice">
   <div class="twin">
@@ -185,12 +204,12 @@ input[type=range]{width:100%;accent-color:var(--brass)}
     <span><i style="background:var(--bad)"></i>past the line</span>
     <span><i style="background:var(--steel)"></i>a reading in</span>
     <span><i style="background:var(--brass)"></i>a write out</span>
-    <span>distance from the ring = position in the band · click a muscle to follow it</span>
+    <span>on the ring: p = 0.5 · inward: calmer · outward: toward the line · click a muscle to follow it</span>
   </div>
   <div class="panel"><canvas id="swarm" aria-label="Each body part's muscles on the band, native above and Omni-Compass on top below"></canvas></div>
 </section>
 
-<section class="grid-hero" aria-label="The decision and the controls">
+<section class="trio" aria-label="The decision and the controls">
   <div class="stack">
     <div class="panel stack" style="gap:10px">
       <div class="row" style="justify-content:space-between">
@@ -228,7 +247,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
         <button id="sSec">Security hold</button>
         <button id="sKill" aria-pressed="false">Kill switch</button>
       </div>
-      <p class="note" id="dialExplain">The max: every muscle to its own limit, never below native; the capacity it holds is power given. Tune-down: never more than native, a step back only with the organ’s grant and the release gate; in this model native already sits near its band, so it finds little to hand back (about 0.1%).</p>
+      <p class="note" id="dialExplain">The max: every muscle to its own limit, never below native; the capacity it holds is power given. Tune-down: never more than native, a step back only with the organ’s grant and the release gate; in this model native already sits near its band, so it finds little to hand back (about 0.05% of capacity, every service gauge EVEN).</p>
       <p class="note" id="stressNote">Each stress lasts 40 decisions from the moment you press it. Both arms meet the same demand.</p>
     </div>
 
@@ -246,7 +265,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 
 <section class="stack" aria-label="The compass plane and the two arms">
   <div class="head"><h2>Every muscle on one plane</h2>
-    <p class="lede" style="max-width:62ch">Each dot is a muscle at its position p in its band and the speed v it is moving. The shading is the force the compass law would apply there: copper adds capacity, steel hands it back. Past the 0.95 wall the law fails up at once. Under Omni-Compass the dots are pulled to the center and stop there.</p></div>
+    <p class="lede" style="max-width:62ch">Each dot is a muscle at its position p in its band and the speed v it is moving. The shading is the force the compass law would apply there: copper adds capacity, steel hands it back. Past the 0.95 wall the law fails up at once. Under Omni-Compass a muscle above the center is pulled down to it and stops without overshoot; below the center the max hands capacity back only as far as native’s own setting, so a dot can rest there.</p></div>
   <div class="grid-2">
     <div class="panel stack" style="gap:8px">
       <div class="seg" role="group" aria-label="Arm shown on the plane" style="align-self:flex-start">
@@ -264,7 +283,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
   <div class="panel stack" style="gap:8px">
     <div class="row" style="justify-content:space-between"><h3>Native against Omni-Compass on top, this day so far</h3><span class="note" id="dialNote">the max</span></div>
     <div class="tbl-wrap"><table id="score"><thead><tr><th>Gauge</th><th>Native</th><th>Omni-Compass on top</th><th>Change</th><th>Reading</th></tr></thead><tbody></tbody></table></div>
-    <p class="note">One modelled day. Each row is read from the paired change, decision by decision, with its 95% interval: an interval that includes zero reads EVEN; clear of zero, the word follows the gauge’s aim (work served: a rise is GAIN; misses, failed work, waiting and spread: a fall is GAIN; capacity held: a rise is power given). Decisions are not independent, so these intervals run narrow. This is a picture of the mechanism, not a three-run reading and not a benchmark result.</p>
+    <p class="note">One modelled day. Each row is read from the paired change, native against Omni-Compass on top at the same decision, averaged over blocks of ten decisions so neighbouring decisions do not count twice, with its 95% interval (Student’s t over the blocks): an interval that includes zero reads EVEN; clear of zero, the word follows the gauge’s aim (work served: a rise is GAIN; misses, failed work, waiting and spread: a fall is GAIN; capacity held: a rise is power given). A picture of the mechanism, not a three-run reading and not a benchmark result.</p>
   </div>
 </section>
 
@@ -306,7 +325,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
       <p class="mono" id="vLine" style="font-size:13px">—</p>
       <h3 style="margin-top:6px">Over many trials at this cost</h3>
       <canvas id="cvV2" aria-label="Share of trials allowed, medians alone against the v7 rule"></canvas>
-      <p class="note">The medians alone allow a step when the trial's median is within the allowance of the reference's. omni-v7 also refuses any step whose interval sits wholly above zero, measures on while the interval is wider than the allowance (up to three times the minimum of 30), and keeps a step only if both estimates are inside the allowance. Ported from <code>omnicompass/verdict.py</code>; the costs are modelled (class S).</p>
+      <p class="note">The medians alone allow a step when the trial's median is within the allowance of the reference's. omni-v7 also refuses any step whose interval sits wholly above zero, measures on while the interval is wider than the allowance (up to three times the minimum of 30), and keeps a step only if both estimates are inside the allowance. Ported from <code>omnicompass/verdict.py</code>; the costs are modelled (class S). The code’s default allowance is 0.5%; the slider opens at 2%, the allowance of the table in <code>docs/OMNI_V7.md</code>.</p>
     </div>
   </div>
 </section>
@@ -316,19 +335,19 @@ input[type=range]{width:100%;accent-color:var(--brass)}
   <ol class="parts">
     <li><span class="k">1</span><p><b>Senses.</b> The muscles' meters are read and normalised to nine observations: q, load, power, thermal, network, drift, stale, security, conflict. <code>adapter.observe_vector</code>. The inner arc of nine segments; steel particles run in along the wires.</p></li>
     <li><span class="k">2</span><p><b>Assimilate.</b> An observed state is formed and the engine is pulled toward it, x ← (1 − a)x + a·x_obs, a = 0.339. <code>adapter.assimilate</code>.</p></li>
-    <li><span class="k">3</span><p><b>Evolve.</b> Equations (1) to (7), RK4, ten micro steps of 0.01, the controller evaluated, not applied (u = 0). <code>core.macro_step</code>. The six spokes at the center are E, U, I_U, S, B, Ḃ.</p></li>
+    <li><span class="k">3</span><p><b>Evolve.</b> Equations (1) to (7), RK4, ten micro steps of 0.01, the controller evaluated, not applied (u = 0). <code>core.macro_step</code>. The six spokes at the center are E, U, I_U, S, B, Ḃ, each drawn on its own scale: E, U and I_U on [0, 1], S on [−1, 1], B on [−0.5, 1], Ḃ on [−0.5, 0.5].</p></li>
     <li><span class="k">4</span><p><b>Allocate.</b> push = clip(−f_U + 12(1 − U), ±25)/25 and ρ* = clamp(ρ₀ − k_I I_U − k_E E, ρ_min, ρ₀). <code>adapter.Governor.step</code>.</p></li>
-    <li><span class="k">5</span><p><b>Nerves.</b> κ, h, σ, ν into calm; calm against each organ's θ grants contraction. <code>nervous_system.scalars, authority</code>.</p></li>
+    <li><span class="k">5</span><p><b>Nerves.</b> κ, h, σ, ν into calm; calm against each organ's θ grants contraction. <code>nervous_system.scalars, authority, from_governor</code>. On this page each body part answers to one organ: the spine to nodes (θ 0.7), compute to pods (0.5), physics to cpufreq (0.3), energy to power (0.3), distribution to routing (0.5).</p></li>
     <li><span class="k">6</span><p><b>Compass.</b> Each muscle's reading is placed in its band, p = (r − lo)/(hi − lo), and the force is F = A·tanh((k_p(p − ½) + k_d v)/A), failing up past 0.95, never handing back while it climbs above the center; k_d set for critical damping from the muscle's own τ. <code>compass_law.CompassLaw</code>.</p></li>
-    <li><span class="k">7</span><p><b>Plug.</b> One wire in, one wire out: each write is clipped to the cover, read back, and the snapshot taken once at the start is what reset restores. The kill switch hands every lever to native at once. <code>compass_law.Plug</code>, <code>master.py</code>.</p></li>
+    <li><span class="k">7</span><p><b>Plug.</b> One wire in, one wire out: each write is clipped to the cover; the snapshot taken once at the start is what reset restores. The engine’s plug also reads each write back and stops if someone else moved the lever; the page’s model takes every write as landed. The kill switch hands every lever to native at once. <code>compass_law.Plug</code>, <code>master.py</code>.</p></li>
     <li><span class="k">8</span><p><b>The verdict.</b> No step past native is kept unless its trial reads no LOSS and its cost sits inside the allowance. <code>verdict.Verdict</code>, <code>judge="interval"</code>.</p></li>
   </ol>
   <pre class="math">x_obs   E = 0.25q + 0.18(load − 0.85)⁺ + 0.16 power + 0.13 thermal + 0.10 net + 0.08 drift + 0.06 conflict + 0.04 stale
         U = 1 − (0.27q + 0.18 power + 0.16 thermal + 0.12 net + 0.12 drift + 0.10 conflict + 0.05 stale)
-x ← (1 − a)·x + a·x_obs,   a = 0.339
+x ← (1 − a)·x + a·x_obs for E, U, I_U, S, B;   Ḃ ← (1 − a)·Ḃ + a·(B_obs − B);   a = 0.339
 (1) dE/dt  = −α_E E + β_int + β_ext + v_eff                (4) v_eff = cos(ω_B t/2)·c·tanh(λ₀ + λ₁(U − ½) + λ₂S)
 (2) dU/dt  = μU(1 − U²) − (dE/dt)/E_max − λ_U U + u          (3) dI_U/dt = (1 − U) − σ₁E − δS − λ_I I_U
-(6) dS/dt  = δ − α_s S − ¾β_s S²                             (7) dḂ/dt = γ_c δS − (ω_B/Q_B)Ḃ − ω_B² B
+(6) dS/dt  = δ − α_s S − ¾β_s S²                             (7) dB/dt = Ḃ,  dḂ/dt = γ_c δS − (ω_B/Q_B)Ḃ − ω_B² B
 push = clip(−f_U + 12(1 − U), −25, 25)/25                  ρ* = clamp(ρ₀ − k_I I_U − k_E E, ρ_min, ρ₀)
 κ = 1 if push ≤ push_release else push_release/push        h = clamp((U − U_gate)/(1 − U_gate), 0, 1)
 σ = S/S*,  S* the positive root of (6)                      ν = max(0, I_U)
@@ -339,9 +358,33 @@ F = A·tanh((k_p(p − ½) + k_d v)/A),  k_d = max(0, 2√(k_p τ/dt) − 1)·dt
 verdict: d = mean ln c_trial − mean ln c_ref ± 1.96·√(s²_ref/n_ref + s²_trial/n_trial),  τ = ln(1 + tolerance)
 α_E 3.487 · μ 3.782 · E_max 2 · σ₁ 0.38 · δ 0.705 · λ_I 0.719 · α_s 0.12 · β_s 0.10 · ω_B 1 · Q_B 2.5 · λ₀ −0.40 · λ₁ 1.55 · λ₂ 1.15
 ρ₀ 0.914 · ρ_min 0.627 · k_I 0.252 · k_E 0.297 · push_release 0.005 · U_gate 0.481 · θ pods .5 nodes .7 cpufreq .3 gpu .3 power .3 routing .5</pre>
+  <h3>The body, written out (modelled for this page, class S)</h3>
+  <pre class="math">one decision, muscle i, in this order                              both arms meet the same demand dᵢ(t)
+cᵢ ← cᵢ + (Lᵢ − cᵢ)(1 − e^(−1/τᵢ))                                 capacity follows its lever with response τᵢ
+wᵢ = dᵢ + bᵢ,   servedᵢ = min(wᵢ, cᵢ),   bᵢ ← 0.85 (wᵢ − servedᵢ)     the 15% of waiting work that leaves is failed work
+rᵢ = wᵢ / cᵢ;   r̂ᵢ = rᵢ read kᵢ decisions late (kᵢ = 1 to 3)         past the line when rᵢ > 1
+native   L* = cᵢ r̂ᵢ / 0.70, held inside ±10%, at most doubled per decision, scale-down only to the largest of the
+         last 5 proposals, clip [c_min, c_max] = [0.35 wᵢ, 11 wᵢ] with wᵢ the muscle's share of demand
+compass  pᵢ = (r̂ᵢ − 0.2)/0.8,   Fᵢ = the compass law above with τᵢ, dt = 1 decision
+the max  L ← Lᵢ(1 + 0.30 Fᵢ) if Fᵢ > 0 and the organ may expand;  toward L* by min(1, 0.15 + 0.5|Fᵢ|) if Fᵢ < 0;
+         L ← max(L, L*)                                             never below native
+tune-down L ≤ L* always; a step L ← max(0.85 L*, Lᵢ(1 + 0.10 Fᵢ)) only if Fᵢ < 0, pᵢ < 0.40, the organ may contract,
+         nothing waits, native has not risen for 3 decisions, |vᵢ| < 0.05 and r̂ᵢ cᵢ / L ≤ ρ*  (the release gate)
+plug     Lᵢ ← clip(L, c_min, c_max);  a write is counted when L moves more than 2% and differs from L* by more than 2%
+kill     Lᵢ ← L* at once (native alone)</pre>
+  <h3>Who drives what</h3>
+  <div class="tbl-wrap"><table class="who"><thead><tr><th>Part</th><th>Reads</th><th>Sets</th><th>Source</th></tr></thead><tbody>
+    <tr><td>Native controller, one per muscle</td><td>its own late reading r̂ᵢ</td><td>native’s lever L*, the floor under the max</td><td>this page’s model</td></tr>
+    <tr><td>Brain: senses, assimilate, evolve, allocate</td><td>the nine senses of the whole body</td><td>the state x, push, ρ*</td><td>core.py, adapter.py</td></tr>
+    <tr><td>Nerves</td><td>x, push, the line, the senses</td><td>each organ’s grant: expand (refused under a security hold), hand back (calm ≥ θ)</td><td>nervous_system.py</td></tr>
+    <tr><td>Compass law, one per muscle</td><td>pᵢ and vᵢ</td><td>the force Fᵢ: add, hold or hand back</td><td>compass_law.py</td></tr>
+    <tr><td>Release gate</td><td>waiting work, native’s trend, ρ*</td><td>whether a tune-down step may go below native</td><td>node_release_gate, as ported here</td></tr>
+    <tr><td>Plug</td><td>the proposed lever</td><td>the write, clipped to the cover</td><td>compass_law.Plug, as modelled here</td></tr>
+    <tr><td>Verdict</td><td>costs per piece of work</td><td>whether a step past native is kept</td><td>verdict.py (its own panel)</td></tr>
+  </tbody></table></div>
   <div class="grid-2">
-    <div class="panel stack" style="gap:8px"><h3>What is the engine's code</h3><p class="note" style="font-size:14px">The six-state engine, its constants and RK4 integrator, the assimilation, push and ρ*, the four nerve scalars and the organ thresholds, the compass law and the v7 verdict are ported from <code>omnicompass/core.py</code>, <code>adapter.py</code>, <code>nervous_system.py</code>, <code>compass_law.py</code> and <code>verdict.py</code> at commit c8ba7775d.</p></div>
-    <div class="panel stack" style="gap:8px"><h3>What is modelled for this page</h3><p class="note" style="font-size:14px">The body is a drawing model, evidence class S. Sixty muscles named from the 1,107-muscle catalog (twelve each from the spine and the four realms), each a capacity lever with its own response time τ and sensing delay, under an HPA-style native controller (target 0.70, 10% tolerance, five-decision scale-down window). Demand climbs 1 2 3 2 3 4, surges, eases and idles over six hours, the same for both arms. The lever rules that turn F into a write are this page's, kept inside the doctrine: under the max never below native, lifting off hands back toward native, going below native only on the tune-down with the organ's grant.</p></div>
+    <div class="panel stack" style="gap:8px"><h3>What is the engine's code</h3><p class="note" style="font-size:14px">The six-state engine, its constants and RK4 integrator, the assimilation, push and ρ*, the four nerve scalars and the organ thresholds, the compass law and the v7 verdict are ported from <code>omnicompass/core.py</code>, <code>adapter.py</code>, <code>nervous_system.py</code>, <code>compass_law.py</code> and <code>verdict.py</code> at commit c8ba7775d, all inside the omni-v7 fingerprint. Checked against the Python on seeded inputs (<code>docs/engine/check_live_engine.py</code>): 8,000 decisions of the governor (state, push, ρ*, κ, h, σ, ν, calm), 48,000 organ grants, 4,800 compass forces, 300 verdict intervals and 400 full verdict trials. Largest difference 2 × 10⁻¹⁵, zero mismatched grants, zero mismatched verdicts.</p></div>
+    <div class="panel stack" style="gap:8px"><h3>What is modelled for this page</h3><p class="note" style="font-size:14px">The body is a drawing model, evidence class S. Sixty muscles named from the 1,107-muscle catalog (twelve each from the spine and the four realms), each a capacity lever with its own response time τ and sensing delay, under an HPA-style native controller (target 0.70, 10% tolerance, five-decision scale-down window). Demand climbs 1 2 3 2 3 4, surges, eases and idles over six hours, the same for both arms. The lever rules that turn F into a write are this page's, written out above and kept inside the doctrine: under the max never below native, lifting off hands back toward native; on the tune-down never above native, and below it only with the organ's grant and the release gate.</p></div>
   </div>
 </section>
 
@@ -699,7 +742,7 @@ function drawRing(now, armSel) {
     const vals = L ? [L.xn[0], L.xn[1], L.xn[2], (L.xn[3]+1)/2, (L.xn[4]+0.5)/1.5, (L.xn[5]+0.5)] : [0,0,0,0,0,0];
     for (let k = 0; k < 6; k++) { const a = -Math.PI/2 + k*Math.PI/3; const len = r0*0.9*clamp(vals[k], 0.05, 1);
       g.strokeStyle = k === 1 ? css.ok : css.brass; g.lineWidth = 3; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + len*Math.cos(a), cy + len*Math.sin(a)); g.stroke();
-      g.fillStyle = css.muted; g.font = `${Math.max(9, R*0.032)}px ${MONO}`; g.fillText(names[k], cx + r0*1.16*Math.cos(a), cy + r0*1.16*Math.sin(a)); }
+      g.fillStyle = css.muted; g.font = `${Math.max(10, R*0.036)}px "IBM Plex Sans", system-ui, sans-serif`; g.fillText(names[k], cx + r0*1.16*Math.cos(a), cy + r0*1.16*Math.sin(a)); }
     g.font = `500 ${Math.max(10, R*0.038)}px ${MONO}`; const ct = W.killed ? "KILLED" : (L ? "calm " + L.calm.toFixed(2) : "calm —"); const tw = g.measureText(ct).width + 12;
     g.fillStyle = css.panel; g.fillRect(cx - tw/2, cy + r0*0.38 - 9, tw, 18); g.fillStyle = W.killed ? css.bad : css.ink; g.fillText(ct, cx, cy + r0*0.38);
     // particles: readings in, writes out
@@ -764,7 +807,7 @@ function drawBand() {
   const c = W.omni.m[W.sel].law.center;
   g.strokeStyle = css.muted; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(c), yb - 12); g.lineTo(X(c), yb + 12); g.stroke(); g.setLineDash([]);
   g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
-  [[0,"0 calm"],[c,"center"],[0.95,"0.95"],[1,"1 the line"]].forEach(([p, t]) => g.fillText(t, X(p), yb + 16));
+  [[0,"0 calm"],[c,"center"],[1,"1 the line"]].forEach(([p, t]) => g.fillText(t, X(p), yb + 16));
   const sn = W.nat.m[W.sel], so = W.omni.m[W.sel];
   g.fillStyle = css.steel; g.beginPath(); g.arc(X(sn.p), yb - 3, 6, 0, Math.PI*2); g.fill();
   g.fillStyle = css.brass; g.beginPath(); g.arc(X(so.p), yb + 3, 6, 0, Math.PI*2); g.fill();
@@ -829,7 +872,7 @@ function drawStrip() {
   const ml = 44, mr = 10; const panels = [
     {key: "cap", title: "capacity in service, and the demand", dem: true},
     {key: "over", title: "muscles past the line"},
-    {key: "spread", title: "spread of positions (fragmentation)"}];
+    {key: "spread", title: "spread: standard deviation of p over the 60 muscles"}];
   const ph = (h - 30)/3;
   panels.forEach((P, k) => {
     const top = 6 + k*ph, bot = top + ph - 18, x0 = ml, x1 = w - mr;
@@ -924,7 +967,7 @@ function vTick(now) {
   const J = judge(V.ref, V.got, P);
   if (J.reading !== "LOSS" && J.wide && V.got.length < 3*P.min) { V.got.push(vSample(true, P, V.rng)); return; }
   V.running = false; V.result = J;
-  const st = document.getElementById("vStamp"); st.textContent = J.reading + (J.allowed ? " · allowed" : " · refused");
+  const st = document.getElementById("vStamp"); st.textContent = J.reading + (J.allowed ? " · allowed" : J.reading === "LOSS" ? " · refused" : " · refused, past the allowance");
   st.style.color = J.allowed ? css.ok : css.bad;
   const pct = x => ((Math.exp(x) - 1)*100).toFixed(1) + "%";
   document.getElementById("vLine").textContent = `n ref ${V.ref.length} · n trial ${V.got.length} · change ${pct(J.d)} [${pct(J.lo)}, ${pct(J.hi)}] · allowance ${(P.tol*100).toFixed(1)}% · median within: ${J.within ? "yes" : "no"}`;
@@ -980,7 +1023,7 @@ function updateText() {
   const arm = W.omni; let up = 0, down = 0, hold = 0, fail = 0;
   arm.m.forEach(s => { if (s.p >= 0.95) fail++; if (s.F > 0.02) up++; else if (s.F < -0.02) down++; else hold++; });
   $("cy5").textContent = `${up} pushing, ${down} lifting off, ${hold} at the center · ${fail} failing up past 0.95`;
-  $("cy6").textContent = W.killed ? `kill switch: every lever handed to native at once, no writes` : `${arm.lastWrites} writes this decision, each clipped to its cover and read back · ${arm.tot.writes} so far, ${arm.tot.clipped} clipped`;
+  $("cy6").textContent = W.killed ? `kill switch: every lever handed to native at once, no writes` : `${arm.lastWrites} writes this decision, each clipped to its cover · ${arm.tot.writes} so far, ${arm.tot.clipped} clipped · snapshot kept for reset`;
   // the nerves
   const set = (id, v, txt, col) => { $(id).textContent = txt; const b = $(id + "b"); b.style.width = Math.round(clamp(v, 0, 1)*100) + "%"; if (col) b.style.background = col; };
   set("nK", L.kappa, f3(L.kappa)); set("nH", L.h, f3(L.h)); set("nS", L.sigma, f3(L.sigma), L.sigma > 1 ? css.bad : css.ok);
@@ -1001,11 +1044,17 @@ function buildOrgans() {
   for (const k in THETA) { const d = document.createElement("div"); d.className = "organ"; d.id = "org-" + k;
     d.innerHTML = `<div class="on">${k}</div><div class="th">θ ${THETA[k]}</div><div class="lamps"><span class="lamp ex">expand</span><span class="lamp co">hand back</span></div>`; host.appendChild(d); }
 }
+function tq(df) {   // the two-sided 95% quantile of Student's t
+  const T = [12.71, 4.30, 3.18, 2.78, 2.57, 2.45, 2.36, 2.31, 2.26, 2.23, 2.20, 2.18, 2.16, 2.14, 2.13, 2.12, 2.11, 2.10, 2.09, 2.09];
+  return df <= 20 ? T[df - 1] : df <= 30 ? 2.05 : 1.96;
+}
 function pairedReading(na, oa, aim, kind) {   // the paired change per decision, its 95% interval, the word by the gauge's aim
   if (kind === "shown") return ["shown", "w-shown"];
   const n = Math.min(na.length, oa.length); if (n < 3) return ["EVEN", "w-even"];
-  const d = []; for (let t = 0; t < n; t++) d.push(oa[t] - na[t]);
-  const m = d.reduce((a, b) => a + b, 0)/n, sd = Math.sqrt(d.reduce((a, b) => a + (b - m)**2, 0)/(n - 1)), half = 1.96*sd/Math.sqrt(n);
+  // batch means: the paired change averaged over blocks of 10 decisions, so neighbouring decisions do not count twice
+  const d = []; for (let t = 0; t + 10 <= n; t += 10) { let x = 0; for (let k = t; k < t + 10; k++) x += oa[k] - na[k]; d.push(x/10); }
+  if (d.length < 3) return ["EVEN", "w-even"];
+  const nb = d.length, m = d.reduce((a, b) => a + b, 0)/nb, sd = Math.sqrt(d.reduce((a, b) => a + (b - m)**2, 0)/(nb - 1)), half = tq(nb - 1)*sd/Math.sqrt(nb);
   if (m - half <= 0 && m + half >= 0) return ["EVEN", "w-even"];
   const rose = m > 0;
   if (kind === "spent") return rose ? ["power given", "w-given"] : ["GAIN", "w-gain"];
@@ -1016,16 +1065,16 @@ function updateScore() {
   const mean = a => a.length ? a.reduce((x, y) => x + y, 0)/a.length : 0;
   const rows = [
     ["Work served (units)", n.served, o.served, "up", "", 0, "served"],
-    ["Muscle-decisions past the line", n.over, o.over, "down", "", 0, "over"],
+    ["Muscle-decisions past the line (r > 1)", n.over, o.over, "down", "", 0, "over"],
     ["Work failed (abandoned in line)", n.failed, o.failed, "down", "", 1, "failed"],
     ["Work waiting (unit-decisions)", n.wait, o.wait, "down", "", 1, "wait"],
-    ["Spread of positions, mean", mean(NH.spread), mean(OH.spread), "down", "", 3, "spread"],
+    ["Spread of positions (s.d. of p), mean", mean(NH.spread), mean(OH.spread), "down", "", 3, "spread"],
     ["Capacity held (unit-decisions)", n.capT, o.capT, "", "spent", 0, "cap"],
-    ["Plug writes", 0, o.writes, "", "shown", 0, null]];
+    ["Plug writes (moves over 2%, off native)", 0, o.writes, "", "shown", 0, null]];
   $("score").querySelector("tbody").innerHTML = rows.map(([t, a, b, aim, kind, dp, key]) => {
     const chg = a > 1e-9 ? (b - a)/a : (b > 1e-9 ? Infinity : 0);
     const [wd, cl] = pairedReading(key ? NH[key] : [], key ? OH[key] : [], aim, kind);
-    const cs = kind === "shown" ? "" : (isFinite(chg) ? (chg >= 0 ? "+" : "") + (chg*100).toFixed(1) + "%" : (b > 0 ? "from 0" : "0"));
+    const cs = kind === "shown" ? "" : (isFinite(chg) ? (chg >= 0 ? "+" : "") + (chg*100).toFixed(Math.abs(chg) < 0.001 ? 3 : Math.abs(chg) < 0.01 ? 2 : 1) + "%" : (b > 0 ? "from 0" : "0"));
     const fmt = v => v.toLocaleString(undefined, {maximumFractionDigits: dp, minimumFractionDigits: dp});
     return `<tr><td>${t}</td><td class="nat">${fmt(a)}</td><td class="omni">${fmt(b)}</td><td>${cs}</td><td><span class="word ${cl}">${wd}</span></td></tr>`;
   }).join("");
