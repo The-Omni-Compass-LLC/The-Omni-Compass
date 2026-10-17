@@ -24,7 +24,13 @@
   campaign, the steady and wandering Kubernetes tests back in it. The omni-v7 runs already started run to their end and stay
   omni-v7's record. **The conductor reads the engine of the commit its runs start on** (the branch's newest commit, fetched each
   tick), not of its own checkout, so a tick that began before a new engine landed starts the new engine's runs at its next round
-  instead of standing idle for up to five hours.
+  instead of standing idle for up to five hours. **The campaign has a start time** (`SINCE`, set a little after the push): the
+  conductor starts nothing before it, so no run of the engine before it can be counted in omni-v8's campaign.
+- **The realms table run again on omni-v8** (`results/realms_v5/REALMS_V5.md`, commit `9819a903cba3`, seeds 3000-3009): every
+  reading of the 1,107 muscles and the seven organisms the same as on omni-v7, to the digit; only the run's header changed.
+- **Archived**: the kill test's three omni-v7 runs on the fixed harness (39040151044, 39040156477, 39040161755; all finished)
+  and Azure's steady set A (38981149348, finished), requested in `.github/archive_request.txt`; their tables follow as
+  omni-v7's record. Azure's burst `1 6 1 8 1 6` runs now.
 - **Every page on omni-v8**: CLAUDE.md, the README, the state of play (its omni-v7 summary kept whole in
   `docs/history/STATE_OF_PLAY_2026-10-16.md`), both manuals (the Owner's section 3.5 rewritten from the omni-v7 tables, its
   engines table, section 16.5's CityLearn paragraph; the Operator's engine lines), the receipts page, the index's notes, the cloud

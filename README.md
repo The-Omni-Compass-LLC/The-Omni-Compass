@@ -135,8 +135,8 @@ native, did less work, or cleared its line later. 364 muscles carry a card of th
 pools, 31 batteries), each printed in plain words in the [muscle catalog](docs/MUSCLE_CATALOG.md); inside a body, a
 battery wired by its power keeps the body's own margin on its line ([`docs/FORMAL_V5.md`](docs/FORMAL_V5.md), section
 5). Preregistered seeds 3000-3009, ten paired runs per muscle,
-per organism and per load, commit `1637d32cd26c`, engine omni-v7 (fingerprint `d6d467b824c585f1`; run again on 16 October on the engine
-that stands with the spine as the seventh organism, every reading reproducing the 13 October table to the digit). Evidence class
+per organism and per load, commit `9819a903cba3`, engine omni-v8 (fingerprint `f93d233136a1f902`; run again on 17 October on the engine
+that stands, the spine the seventh organism, every reading reproducing the table of 16 October to the digit). Evidence class
 **S**: modelled plants, not meters. Every row, losses included:
 [`results/realms_v5/REALMS_V5.md`](results/realms_v5/REALMS_V5.md).
 
