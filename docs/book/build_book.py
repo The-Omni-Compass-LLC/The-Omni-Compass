@@ -833,6 +833,7 @@ OWNER_OUTLINE = [
     ("The Max, Formally: Definitions, Guarantees and Measures", ("F", "docs/FORMAL_V5.md")),
     ("The Mechanism of Action", ("F", "docs/MECHANISM_OF_ACTION.md")),
     ("The Safety Case: Every Hazard, Its Guard, and the Evidence", ("F", "docs/SAFETY_CASE.md")),
+    ("The Threat Model: Misuse, Its Guards, and What Is Open", ("F", "docs/THREAT_MODEL.md")),
     (f"The Engine That Stands: Omni {NEWEST}", ("F", f"docs/OMNI_{NEWEST.upper()}.md")),
     ("The Engines and Their Audit", ("FS", ["docs/ENGINES.md", "docs/history/ENGINE_AUDIT.md"])),
     ("PART", "The Physics: the Compass and the Nervous System",

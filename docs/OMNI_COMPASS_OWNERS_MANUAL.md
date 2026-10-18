@@ -2793,7 +2793,10 @@ paired receipts, this section is a wiring instruction, not a claim of savings.
    left in place: every governor records, before its first write, the exact commands that put every setting back, and
    renews a lease every decision. Run `python3 tools/omni_switch.py watchdog` as its own service next to the governors:
    it hands back for any governor whose process is gone or whose lease has run out (a hung one is stopped first).
-   `status` names any governor that died without handing back.
+   `status` names any governor that died without handing back. The watchdog acts only on records its own user wrote
+   that no other user can change (run it as the governors' user, or name theirs with `--trust-uid`), and never
+   signals a process number the system has given to another process. Put the switch and the registry in a directory
+   only the governors' user can write (`OMNI_MASTER_OFF`, `OMNI_REGISTRY`); `status` warns when they are not.
 2. It records before it acts (annotations on Kubernetes objects; the `snapshot` line in the GPU audit).
 3. It watches before it writes.
 4. It never acts blind.
