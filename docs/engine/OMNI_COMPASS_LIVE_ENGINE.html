@@ -176,6 +176,7 @@ h2 .sn{font-family:var(--f-serif);color:var(--accent);font-weight:700;margin-rig
 h2,.partHead .pt,.toc .tt,.toc .tocH{text-transform:uppercase;letter-spacing:.04em} h2 .sn{text-transform:none;letter-spacing:0}
 .word.w-dis{color:var(--ink);border-style:dashed}
 .three small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.three small.w-gain,.three small.w-given{color:var(--ok)} .three small.w-even{color:var(--even)} .three small.w-loss,.three small.w-lost{color:var(--bad)} td.w-gain,td.w-even,td.w-loss{font-weight:600}
 button:disabled{opacity:.45;cursor:not-allowed}
 .trio>.stack{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:1100px){.trio>.stack{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.trio>.stack>:first-child{grid-column:1/-1}}
@@ -1465,7 +1466,8 @@ function fillWords(g, text, x, y) {   // canvas text with GAIN green, EVEN yello
 const WORD_SKIP = new Set(["SCRIPT", "STYLE", "TEXTAREA", "OPTION", "SELECT", "TITLE", "CANVAS", "svg", "INPUT"]);
 function armCols(t) {   // a table's Native column wears native's amber, its Omni-Compass column Omni-Compass's blue
   if (!t || t.nodeName !== "TABLE" || !t.tHead) return; const hs = [...t.tHead.querySelectorAll("th")], idx = {};
-  hs.forEach((th, i) => { const x = th.textContent.trim(); if (/^native\b|[,:] native$/i.test(x)) idx[i] = "nat"; else if (/^omni-compass\b|[,:] omni-compass$/i.test(x)) idx[i] = "omni"; });
+  hs.forEach((th, i) => { const x = th.textContent.trim(); if (/^native\b|[,:] native$/i.test(x)) idx[i] = "nat"; else if (/^omni-compass\b|[,:] omni-compass$/i.test(x)) idx[i] = "omni";
+    else if (/^(GAIN\b|power given|largest|median size of the GAIN)/i.test(x)) idx[i] = "w-gain"; else if (/^EVEN\b/.test(x)) idx[i] = "w-even"; else if (/^LOSS\b|^power lost/i.test(x)) idx[i] = "w-loss"; });   // a column of GAIN, EVEN or LOSS numbers wears its word's colour
   if (!Object.keys(idx).length) return; for (const tr of t.tBodies[0] ? t.tBodies[0].rows : []) [...tr.cells].forEach((c, i) => { if (idx[i] && !c.classList.contains(idx[i])) c.classList.add(idx[i]); }); }
 function paintArms(root) { const el = root.nodeType === 1 ? root : root.parentNode; if (!el) return; const t = el.closest && el.closest("table"); if (t) armCols(t); else if (el.querySelectorAll) el.querySelectorAll("table").forEach(armCols); }
 function paintWords(root) {   // every GAIN, EVEN and LOSS in the page's text wears its traffic-light colour, the ones written later included
@@ -1980,7 +1982,7 @@ const pct = (x, dp) => (x >= 0 ? "+" : "") + (x*100).toFixed(dp === undefined ? 
 function threeCell(rd, aim) {
   if (!rd) return `<span class="note">${W.body === "model" ? "press Run A, B and C" : "—"}</span>`;
   const [wd, cl] = aim === "shown" ? ["shown", "w-shown"] : threeRun(rd, aim);
-  return `<span class="word ${cl}">${wd}</span><small>${rd.map((r, i) => "ABC"[i] + " " + mag(r.change)).join(" · ")}</small>`;
+  return `<span class="word ${cl}">${wd}</span><small class="${cl === "w-shown" ? "" : cl}">${rd.map((r, i) => "ABC"[i] + " " + mag(r.change)).join(" · ")}</small>`;
 }
 function lineMean(arm) {   // the share of its run each muscle with a line took to clear it, this run (each muscle alone)
   const L = TRD.alone[HS().seeds[W.run]][arm].line || []; const nat = TRD.alone[HS().seeds[W.run]].native.line || [];
