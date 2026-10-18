@@ -67,6 +67,15 @@ set failed at the login). Then:
 That file is a password for this one purpose: never paste it anywhere but the GitHub secret below. (If the project picker
 showed no project, run `gcloud config set project YOUR-PROJECT-ID` first.)
 
+**A new key file by clicks alone** (once the paste above has run, the login exists and only its key is needed again):
+
+1. In the console menu ☰, **IAM & Admin**, then **Service Accounts**.
+2. Click **omni-compass-github@…** (the address ends `.iam.gserviceaccount.com`).
+3. Open the **Keys** tab, click **Add key**, then **Create new key**, choose **JSON**, click **Create**. The browser
+   downloads the key file (its name is the Project ID and some letters, ending `.json`).
+4. Open that file in Notepad as in step 1 above, **Ctrl+A**, **Ctrl+C**, and store it as below. On the same **Keys** tab,
+   an older key can be deleted with its bin icon.
+
 ## 5. Put the two secrets in GitHub
 
 1. Open the repository on GitHub, click **Settings** (the repository's tab, at the top right), then on the left

@@ -5,7 +5,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Rent one Lambda Cloud GPU machine for one Omni-Compass GPU run, and always give it back
-(.github/workflows/lambda-gpu.yml; docs/omni_v5/BENCHMARKS_V5.md, "The 8-GPU benchmark, one button").
+(.github/workflows/lambda-gpu.yml; docs/LAMBDA_SETUP.md, click by click).
 
   python3 scripts/lambda_gpu.py plan --type gpu_8x_a100_80gb_sxm4 --hours 11.5   the price, the regions with a machine
                                                                                 free, the estimate; rents nothing
@@ -13,49 +13,95 @@
   python3 scripts/lambda_gpu.py wait ID [--timeout 1800]    until it is running; prints its address
   python3 scripts/lambda_gpu.py status ID                   its state and address
   python3 scripts/lambda_gpu.py list [--prefix omni-]       our machines, with how long each has been up
-  python3 scripts/lambda_gpu.py terminate ID [ID ...]       gives them back; the bill stops
+  python3 scripts/lambda_gpu.py terminate [ID ...] [--name N]   gives them back (by id, or the machine of that name) and
+                                                            confirms each one; the bill stops
+  python3 scripts/lambda_gpu.py keycheck --name K --private-file F   the SSH key pair, at no cost: Lambda holds a key named
+                                                            K, and F is its private half; rents nothing
 
 The key is read from the environment (LAMBDA_API_KEY), never from the command line, and is never printed. LAMBDA_API sets
-the address of the API (default https://cloud.lambdalabs.com/api/v1). A machine is named omni-<test>-<epoch>-<hours>, so
-anyone listing the account can see when it was rented and the hour budget it was rented for.
-Exit codes: 0 done; 2 usage or a refused request; 3 no machine of that type free anywhere; 4 unknown type; 5 not
-running in time; 6 over the cost ceiling.
+the address of the API (default https://cloud.lambda.ai/api/v1, Lambda's address since its move from lambdalabs.com). A
+moved address is followed here, with the same request, and only to Lambda's own hosts: Python's own redirect turns a POST
+into a GET, so a launch or a give-back sent to a moved address would arrive as a read and the machine would stay rented. A
+machine is named omni-<test>-<epoch>-<hours>, so anyone listing the account can see when it was rented and the hour budget
+it was rented for.
+Exit codes: 0 done; 2 usage, a refused request, or a machine not confirmed given back; 3 no machine of that type free
+anywhere; 4 unknown type; 5 not running in time; 6 over the cost ceiling; 7 the SSH key pair does not match.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import os
+import subprocess
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
-API = os.environ.get("LAMBDA_API", "https://cloud.lambdalabs.com/api/v1").rstrip("/")
+API = os.environ.get("LAMBDA_API", "https://cloud.lambda.ai/api/v1").rstrip("/")
+LAMBDA_HOSTS = ("lambda.ai", "lambdalabs.com")
+MOVED = (301, 302, 307, 308)          # the address moved; the request was not carried out (303 is not followed)
+GONE = ("terminated", "terminating")
 
 
-def call(method: str, path: str, body: dict | None = None) -> dict:
+class _Stop(urllib.request.HTTPRedirectHandler):
+    """Never follow a redirect behind call()'s back (urllib would resend a POST as a GET, without its body)."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+OPENER = urllib.request.build_opener(_Stop)
+
+
+def lambdas_own(url_from: str, url_to: str) -> bool:
+    """A moved address is followed only to the same host or to Lambda's own, and never from https down to http, so the key
+    is never sent anywhere else."""
+    a, b = urllib.parse.urlsplit(url_from), urllib.parse.urlsplit(url_to)
+    host = b.hostname or ""
+    if b.scheme != "https" and b.scheme != a.scheme:
+        return False
+    return host == a.hostname or any(host == h or host.endswith("." + h) for h in LAMBDA_HOSTS)
+
+
+def call(method: str, path: str, body: dict | None = None, missing_ok: bool = False) -> dict | None:
+    """One request to Lambda's API. missing_ok: a 404 (no such machine) returns None instead of stopping."""
     key = os.environ.get("LAMBDA_API_KEY", "")
     if not key:
         sys.exit("LAMBDA_API_KEY is not set (it lives only in the repository's secrets)")
-    req = urllib.request.Request(API + path, method=method,
-                                 data=None if body is None else json.dumps(body).encode(),
-                                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
-                                          "Accept": "application/json", "User-Agent": "omni-compass-lambda-gpu"})
-    try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            return json.loads(r.read().decode() or "{}")
-    except urllib.error.HTTPError as e:
+    url = API + path
+    data = None if body is None else json.dumps(body).encode()
+    for _ in range(4):
+        req = urllib.request.Request(url, method=method, data=data,
+                                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
+                                              "Accept": "application/json", "User-Agent": "omni-compass-lambda-gpu"})
         try:
-            err = json.loads(e.read().decode()).get("error", {})
-            msg = f"{err.get('code', '')} {err.get('message', '')} {err.get('suggestion', '')}".strip()
-        except Exception:                                        # noqa: BLE001  (the body may not be JSON)
-            msg = ""
-        print(f"Lambda refused {method} {path}: HTTP {e.code} {msg}", file=sys.stderr)
-        sys.exit(2)
-    except urllib.error.URLError as e:
-        print(f"Lambda unreachable for {method} {path}: {e.reason}", file=sys.stderr)
-        sys.exit(2)
+            with OPENER.open(req, timeout=60) as r:
+                return json.loads(r.read().decode() or "{}")
+        except urllib.error.HTTPError as e:
+            if e.code in MOVED:
+                to = urllib.parse.urljoin(url, e.headers.get("Location") or "")
+                if not lambdas_own(url, to):
+                    print(f"Lambda's address for {method} {path} moved to {urllib.parse.urlsplit(to).hostname or '?'}, "
+                          "which is not Lambda's: refused (the key is never sent there)", file=sys.stderr)
+                    sys.exit(2)
+                url = to
+                continue
+            if missing_ok and e.code == 404:
+                return None
+            try:
+                err = json.loads(e.read().decode()).get("error", {})
+                msg = f"{err.get('code', '')} {err.get('message', '')} {err.get('suggestion', '')}".strip()
+            except Exception:                                    # noqa: BLE001  (the body may not be JSON)
+                msg = ""
+            print(f"Lambda refused {method} {path}: HTTP {e.code} {msg}", file=sys.stderr)
+            sys.exit(2)
+        except urllib.error.URLError as e:
+            print(f"Lambda unreachable for {method} {path}: {e.reason}", file=sys.stderr)
+            sys.exit(2)
+    print(f"Lambda's address for {method} {path} moved more than three times: refused", file=sys.stderr)
+    sys.exit(2)
 
 
 def instance_types() -> dict:
@@ -105,7 +151,11 @@ def launch(a) -> int:
 
 
 def status(a) -> int:
-    d = call("GET", f"/instances/{a.id}").get("data", {})
+    got = call("GET", f"/instances/{a.id}", missing_ok=True)
+    if got is None:                                   # Lambda no longer knows it: given back (the watch stops on this)
+        print(f"{a.id} - terminated -")
+        return 0
+    d = got.get("data", {})
     print(f"{d.get('id', a.id)} {d.get('name', '')} {d.get('status', 'unknown')} {d.get('ip') or '-'}")
     return 0
 
@@ -146,10 +196,63 @@ def list_(a) -> int:
     return 0
 
 
+def state(i: str) -> str:
+    """A machine's state as Lambda reports it; a machine Lambda no longer knows is given back."""
+    d = call("GET", f"/instances/{i}", missing_ok=True)
+    return "terminated" if d is None else str((d.get("data") or {}).get("status") or "unknown")
+
+
 def terminate(a) -> int:
-    done = call("POST", "/instance-operations/terminate", {"instance_ids": a.ids}).get("data", {})
-    gone = [d.get("id") for d in done.get("terminated_instances", [])]
-    print("given back: " + (", ".join(gone) or "none listed"))
+    """Give machines back and confirm each one: a machine already given back is fine; one that Lambda neither lists as
+    given back nor reports as terminating is still billing, and that is exit 2 with its id (never a quiet success)."""
+    ids = [i for i in a.ids if i]
+    if a.name:
+        ids += [d.get("id") for d in call("GET", "/instances").get("data", [])
+                if d.get("name") == a.name and d.get("id") not in ids]
+    if not ids:
+        print("nothing to give back" + (f" (no machine named {a.name})" if a.name else ""))
+        return 0
+    live = [i for i in ids if state(i) not in GONE]
+    for i in ids:
+        if i not in live:
+            print(f"{i}: already given back")
+    if live:
+        done = call("POST", "/instance-operations/terminate", {"instance_ids": live}).get("data", {})
+        gone = {d.get("id") for d in done.get("terminated_instances", [])}
+        print("given back: " + (", ".join(i for i in live if i in gone) or "none listed"))
+        left = [f"{i} ({st})" for i in live if i not in gone and (st := state(i)) not in GONE]
+        if left:
+            print("NOT confirmed given back, still billing: " + ", ".join(left)
+                  + " (terminate it by hand: cloud.lambda.ai, Instances, tick it, Terminate)", file=sys.stderr)
+            return 2
+    return 0
+
+
+def keycheck(a) -> int:
+    """The SSH key pair, checked before anything is rented: Lambda holds a key under the name, and the stored private key
+    is the other half of the public key Lambda holds (ssh-keygen derives the public half; no key material is printed).
+    A wrong pair otherwise shows only after a machine is rented and refuses the login."""
+    keys = call("GET", "/ssh-keys").get("data", [])
+    held = next((k for k in keys if k.get("name") == a.name), None)
+    if held is None:
+        names = [str(k.get("name", "")) for k in keys]
+        print(f"LAMBDA_SSH_KEY_NAME: Lambda holds no SSH key by that name; it holds {len(names)}: {', '.join(names) or 'none'}")
+        return 7
+    try:
+        out = subprocess.run(["ssh-keygen", "-y", "-P", "", "-f", a.private_file], capture_output=True, text=True,
+                             timeout=30)
+    except FileNotFoundError:
+        print("ssh-keygen is not installed here: the pair is not checked")
+        return 0
+    if out.returncode != 0 or not out.stdout.split():
+        print("LAMBDA_SSH_PRIVATE_KEY: not a whole private key without a passphrase (ssh-keygen could not read it): store "
+              "the whole .pem file Lambda downloaded when the key was made")
+        return 7
+    if out.stdout.split()[:2] != str(held.get("public_key", "")).split()[:2]:
+        print(f"LAMBDA_SSH_PRIVATE_KEY is not the private half of the key Lambda holds as {a.name}: store the .pem file "
+              "downloaded when that key was made, or make a new key and store both again")
+        return 7
+    print(f"SSH key {a.name}: Lambda holds it, and the stored private key is its other half")
     return 0
 
 
@@ -164,7 +267,10 @@ def main(argv=None) -> int:
     p = sub.add_parser("wait"); p.add_argument("id"); p.add_argument("--timeout", type=float, default=1800.0)
     p.add_argument("--every", type=float, default=15.0); p.set_defaults(fn=wait)
     p = sub.add_parser("list"); p.add_argument("--prefix", default="omni-"); p.set_defaults(fn=list_)
-    p = sub.add_parser("terminate"); p.add_argument("ids", nargs="+"); p.set_defaults(fn=terminate)
+    p = sub.add_parser("terminate"); p.add_argument("ids", nargs="*"); p.add_argument("--name", default="")
+    p.set_defaults(fn=terminate)
+    p = sub.add_parser("keycheck"); p.add_argument("--name", required=True); p.add_argument("--private-file", required=True)
+    p.set_defaults(fn=keycheck)
     a = ap.parse_args(argv)
     return a.fn(a)
 
