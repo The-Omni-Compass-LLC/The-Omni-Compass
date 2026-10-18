@@ -773,6 +773,8 @@ class Controller:
         if not str(self.k.get("get", "pods", "-A", "--field-selector=status.phase=Pending", "-o", "name")).strip():
             return None
         s = snapshot(self.k, getattr(self.a, "active_nodes_only", False))
+        if s["alloc_m"] <= 0:
+            return None                          # no machine in service in the reading: blind, nothing to add from it
         n = max(1, s["open"]); per_node = s["alloc_m"] / max(1, s["nodes"])
         floor = max(int(math.ceil(s["req_m"] * (1.0 + self.a.headroom) / per_node)) if s["req_m"] > 0 else self.a.min_nodes, int(math.ceil(s["used_m"] / per_node)))
         floor = min(self._max_nodes(s), floor)
@@ -788,7 +790,15 @@ class Controller:
         if self.killed():
             self.restore()
             return self.audit({"decision": "killed", "mode": "observe"})
-        s = snapshot(self.k, getattr(self.a, "active_nodes_only", False)); self._snap = s
+        s = snapshot(self.k, getattr(self.a, "active_nodes_only", False))
+        if s["alloc_m"] <= 0:
+            # a reading with no machine in service is blind, never an overload (omni-v11; 18 Oct, the CruiseKube test, run
+            # 39120444653: every worker of the kind cluster left service for two minutes while the service answered every
+            # probe, and omni-v10 read its load against no capacity, then divided by it). Nothing is decided from it and
+            # nothing written; the last reading with machines stays the one the conveyance is bounded by
+            return self.audit({"decision": "held: the cluster's reading shows no machine in service; nothing decided, nothing written",
+                               "mode": "autopilot" if self.a.mode in ("target", "nodepool") else "observe"})
+        self._snap = s
         # my orders are judged by the machines open to work; a machine's capacity by the machines in service
         n = max(1, s["open"]); per_node = s["alloc_m"] / max(1, s["nodes"])
         if self.rec_n is None:

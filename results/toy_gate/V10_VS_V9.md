@@ -72,6 +72,8 @@ Counts over all seeds: starts {'native': 216, 'base': 168, 'cand': 168}, starts_
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
+**Correction (18 October).** This gate ran both arms on the candidate's engine. From omni-v9's gate on, `tools/toy_gate.py` put its own tree ahead of the checkout under test, so the standing arm imported the candidate's code too. omni-v10 changed no file any toy reads (only the CityLearn runner), so the reading above, identical on every toy, holds by construction all the same. The gate now places the checkout under test first, and every worker names the tree its engine came from; a reading taken on the wrong tree is refused (`results/toy_gate/V11_VS_V10.md` is the first gate run that way).
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
