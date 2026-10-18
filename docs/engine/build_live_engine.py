@@ -256,9 +256,18 @@ def main() -> int:
     named = re.search(r'<html[^>]*data-engine="(omni-v\d+)"', page)
     rec = records(not a.no_runs and not a.check)
     if not named or named.group(1) != rec["build"]["engine"]:
-        print(f"the page names {named.group(1) if named else 'no engine'}, the repository stands on {rec['build']['engine']}: "
-              "write the new engine into the page's words, then build again")
-        return 1
+        # a new engine stands: the page adopts it at once (every record, the head's engine and the build line are rebuilt on
+        # it); its prose keeps naming the engine it was written for in data-prose, and the page says so in a banner until
+        # the prose is realigned (the build never stops the page on a new version)
+        old = named.group(1) if named else None
+        if a.check:
+            print(f"the page names {old}, the repository stands on {rec['build']['engine']}: the next build adopts it")
+            return 1
+        if 'data-prose="' not in page:
+            page = page.replace(f'data-engine="{old}"', f'data-engine="{old}" data-prose="{old}"', 1)
+        page = re.sub(r'data-engine="omni-v\d+"', f'data-engine="{rec["build"]["engine"]}"', page, count=1)
+        print(f"the engine that stands is now {rec['build']['engine']} (the page was built on {old}): records rebuilt on it; "
+              "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet") if embedded(page, k) != rec[k]]
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
