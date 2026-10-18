@@ -98,7 +98,7 @@ th,td{padding:7px 8px;border-bottom:1px solid var(--rule);text-align:right;white
 th:first-child,td:first-child{text-align:left;white-space:normal}
 th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
 td.nat{color:var(--steel)} td.omni{color:var(--brass)}
-.word{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 6px;border-radius:3px;border:1px solid currentColor}
+.word{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 6px;border-radius:3px;border:1px solid currentColor;white-space:nowrap}
 .w-gain{color:var(--ok)} .w-even{color:var(--even)} .w-loss{color:var(--bad)} .w-given{color:var(--ok)} .w-lost{color:var(--bad)}
 .word.w-given::before{content:"GAIN · "} .word.w-lost::before{content:"LOSS · "}
 .tw-g{color:var(--ok);font-weight:600} .tw-e{color:var(--even);font-weight:600} .tw-l{color:var(--bad);font-weight:600}
@@ -1444,10 +1444,11 @@ function alpha(col, a) {
   if (col.startsWith("#")) { const n = parseInt(col.slice(1), 16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
   return col;
 }
-const WORD_RX = /\b(GAIN|EVEN|LOSS)\b|power given|power lost/g, WORD_CLS = {GAIN: "tw-g", EVEN: "tw-e", LOSS: "tw-l", "power given": "tw-g", "power lost": "tw-l"};
-const wordCol = m => ({GAIN: css.ok, EVEN: css.even, LOSS: css.bad, "power given": css.ok, "power lost": css.bad})[m];
+const WORD_RX = /(?:\b(?:GAIN|EVEN|LOSS)\b(?: · power given| · power lost)?|power given|power lost)(?:\s?[0-9][0-9.,]*\s?(?:%|pp|ms|s\b)?)?/g, WORD_CLS = {GAIN: "tw-g", EVEN: "tw-e", LOSS: "tw-l", "power given": "tw-g", "power lost": "tw-l"};
+const wordKey = m => /^GAIN|^power given/.test(m) ? (/power lost/.test(m) ? "power lost" : "GAIN") : /^LOSS|power lost/.test(m) ? "LOSS" : /^EVEN/.test(m) ? "EVEN" : null;   // a word and the size beside it wear one colour
+const wordCol = m => ({GAIN: css.ok, EVEN: css.even, LOSS: css.bad, "power lost": css.bad})[wordKey(m)];
 function fillWords(g, text, x, y) {   // canvas text with GAIN green, EVEN yellow and LOSS red wherever the word stands
-  const parts = String(text).split(/(\bGAIN\b|\bEVEN\b|\bLOSS\b|power given|power lost)/), base = g.fillStyle, al = g.textAlign;
+  const parts = String(text).split(new RegExp("(" + WORD_RX.source + ")")), base = g.fillStyle, al = g.textAlign;
   const tw = parts.reduce((a, p) => a + g.measureText(p).width, 0); let cx = al === "right" || al === "end" ? x - tw : al === "center" ? x - tw/2 : x;
   g.textAlign = "left"; for (const p of parts) { if (!p) continue; g.fillStyle = wordCol(p) || base; g.fillText(p, cx, y); cx += g.measureText(p).width; }
   g.fillStyle = base; g.textAlign = al; }
@@ -1460,8 +1461,12 @@ function paintWords(root) {   // every GAIN, EVEN and LOSS in the page's text we
     for (let e = n.parentNode; e && e !== start.parentNode; e = e.parentNode) if (WORD_SKIP.has(e.nodeName) || e.classList && (e.classList.contains("word") || /\b(tw-[gel]|w-gain|w-even|w-loss|w-given|w-lost|w-dis)\b/.test(e.className))) return NodeFilter.FILTER_REJECT;
     return NodeFilter.FILTER_ACCEPT; }});
   const hits = []; while (walk.nextNode()) hits.push(walk.currentNode);
+  const tails = [], tw = document.createTreeWalker(start, NodeFilter.SHOW_TEXT); while (tw.nextNode()) { const n = tw.currentNode, pv = n.previousSibling;
+    if (pv && pv.nodeType === 1 && /\b(w-gain|w-even|w-loss|w-given|w-lost|tw-[gel])\b/.test(pv.className) && /^\s?[0-9]/.test(n.nodeValue) && !(n.parentNode.classList && /\btw-/.test(n.parentNode.className))) tails.push([n, pv]); }
+  for (const [n, pv] of tails) { const m = n.nodeValue.match(/^\s?[0-9][0-9.,]*\s?(?:%|pp|ms|s\b)?/); if (!m) continue; const cls = /w-loss|w-lost|tw-l/.test(pv.className) ? "tw-l" : /w-even|tw-e/.test(pv.className) ? "tw-e" : "tw-g";
+    const sp = document.createElement("span"); sp.className = cls; sp.textContent = m[0]; const rest = document.createTextNode(n.nodeValue.slice(m[0].length)); n.parentNode.insertBefore(sp, n); n.parentNode.replaceChild(rest, n); }
   for (const n of hits) { const f = document.createDocumentFragment(), t = n.nodeValue; let last = 0; WORD_RX.lastIndex = 0; let m;
-    while ((m = WORD_RX.exec(t))) { if (m.index > last) f.appendChild(document.createTextNode(t.slice(last, m.index))); const sp = document.createElement("span"); sp.className = WORD_CLS[m[0]]; sp.textContent = m[0]; f.appendChild(sp); last = m.index + m[0].length; }
+    while ((m = WORD_RX.exec(t))) { if (m.index > last) f.appendChild(document.createTextNode(t.slice(last, m.index))); const sp = document.createElement("span"); sp.className = WORD_CLS[wordKey(m[0])]; sp.textContent = m[0]; f.appendChild(sp); last = m.index + m[0].length; }
     if (last < t.length) f.appendChild(document.createTextNode(t.slice(last))); n.parentNode.replaceChild(f, n); } }
 const WORD_Q = new Set(); let wordRaf = 0;
 const WORD_WATCH = new MutationObserver(ms => { for (const m of ms) { if (m.type === "characterData") WORD_Q.add(m.target); else m.addedNodes.forEach(n => WORD_Q.add(n)); }
@@ -3040,7 +3045,7 @@ function buildFleet() {
   $("fxBenNote").innerHTML = `${rows.length - 1} benchmarks and the index on omni-v${top}, each its benefit sheet row: ${t.g} rows GAIN, ${t.p} power given, <b>${t.l} LOSS</b> (CityLearn's 2023 districts, repaired on the engine that stands), and ${t.e} benchmarks EVEN all through. ${road.length ? `${road.length} rows of earlier engines stay in the sheet as the road (${[...new Set(road.map(r => r.engine))].join(", ")}), each rerun on the engine that stands as its queue reaches it.` : ""} A bar is the benchmark's own benefit as its row computes it; hover a bar for every gauge behind it.`;
   $("fxMatrix").querySelector("tbody").innerHTML = (() => { let last = ""; return fxAll().map(r => { const first = r.dom && r.dom !== last; if (r.dom) last = r.dom;
     const ben = r.pct === null ? (r.gain || r.loss || r.even ? "—" : "0") : fxWordHtml(r) + ` ${r.pct > 0 ? r.pct.toFixed(r.pct >= 10 ? 1 : 2) + "%" : ""}`;
-    return `<tr><td>${first ? "<b>" + r.dom + "</b>" : ""}</td><td>${r.benchmark}<br><span class="note">${unsign(r.words || "")}</span></td><td>${r.ev}</td><td>${r.engine}</td><td>${ben}</td><td>${r.gain}</td><td>${r.given}</td><td>${r.even ?? "—"}</td><td class="${r.loss ? "w-loss" : ""}">${r.loss}</td><td>${r.status}</td></tr>`; }).join(""); })();
+    return `<tr><td>${first ? "<b>" + r.dom + "</b>" : ""}</td><td>${r.benchmark}<br><span class="note">${unsign(r.words || "")}</span></td><td>${r.ev}</td><td>${r.engine}</td><td>${ben}</td><td class="${r.gain ? "w-gain" : ""}">${r.gain}</td><td class="${r.given ? "w-gain" : ""}">${r.given}</td><td class="${r.even ? "w-even" : ""}">${r.even ?? "—"}</td><td class="${r.loss ? "w-loss" : ""}">${r.loss}</td><td>${r.status}</td></tr>`; }).join(""); })();
   const tip = $("fxTipBen"), cv = $("fxBen");
   cv.addEventListener("pointermove", e => { const G = FXW.geo; if (!G) return; const r = cv.getBoundingClientRect(), y = e.clientY - r.top, j = Math.floor((y - G.top)/G.rowH), R = fxAll()[j];
     if (!R) { tip.hidden = true; FXW.hov = null; return; } FXW.hov = j; drawBenefit();
