@@ -33,9 +33,20 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v9 stands (v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v10 stands (v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v9** (`OMNI_V9.json`, digest `7379f3a79ff2c475`, 47 files; `docs/OMNI_V9.md`) stands on main since 17 October,
+- **Omni v10** (`OMNI_V10.json`, digest `4bf39b0d707784de`, 47 files; `docs/OMNI_V10.md`) stands on main since 18 October, the
+  founder's order ("Omni-Compass should be tuned to exploit all that can be and keep all healthy and never raise its bill";
+  then "push, push in the bush"): omni-v9 with one file changed, the CityLearn runner. The battery wire's glide is 0.0875 of
+  the command's range an hour (omni-v9: 0.0625), the speed that cuts the bill most with no LOSS read by the one key; the
+  runner's own receipt reads every score by the one key. Read locally on CityLearn 3.0.2 before it was pushed: the bill
+  −8.4% to −20.1% in every district with a price (1.1 to 2.4 points beyond omni-v9), no LOSS against native in any district read before the push;
+  the electricity bought, the carbon and the peaks fall a little less than on omni-v9, still GAIN, and two rows of the 2022
+  phase 3 are power given (the ramping +6.18%, the net-zero shortfall +0.25%). Refused before it: steering the outage
+  buildings' batteries outside the outage hours (energy not served +0.69% in one 2023 district, a LOSS). The toy gate
+  (`results/toy_gate/V10_VS_V9.md`) before it was pushed. Every benchmark runs again on it; earlier tables stand as their own
+  engine's until each benchmark's three runs on v10 land.
+- **Omni v9** (`OMNI_V9.json`, digest `7379f3a79ff2c475`, 47 files; `docs/OMNI_V9.md`) stood on main 17 to 18 October,
   the founder's order ("we're going into another version of Engine ... Apply the fix, run it, and see in the toy sim that
   it works"; then "go go go"): omni-v8 with the CityLearn battery wire reading the coming hour (the mean of the same hour
   over the past seven days, only hours already seen) and gliding at up to 0.0625 an hour (0.05 before; the fastest glide that read no LOSS on any score
@@ -45,8 +56,7 @@ the founder overrides one in the conversation.
   founder's correction of 17 October); and every 95% interval on the exact Student t quantile
   (`omnicompass/student_t.py`; every tabled value unchanged, no published reading moves). Proven locally on CityLearn
   3.0.2 and in the toy gate (`results/toy_gate/V9_VS_V8.md`, identical to v8 on every toy) before it was pushed. 44 of its
-  47 files are omni-v8's bytes. Every benchmark runs again on it; the omni-v8 and omni-v7 tables stand as their own until
-  each benchmark's three runs on v9 land.
+  47 files are omni-v8's bytes. Its reruns started on 17 October and run to their end as its own record.
 - **Omni v8** (`OMNI_V8.json`, digest `f93d233136a1f902`, 46 files; `docs/OMNI_V8.md`) stood on main on 17 October,
   the founder's order ("there's a new version 8 ... push in all and update all"): omni-v7 with one wire changed, the
   CityLearn runner (`tools/run_citylearn.py`): a battery whose building simulates power outages stays native, because its
@@ -73,7 +83,7 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v9, omni-v8, omni-v7, omni-v6,
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
   omni-v5, omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
@@ -119,8 +129,8 @@ the founder overrides one in the conversation.
   machine family's queue; read back by its run's title, never started twice): the steady set, the bursts `1 4 1 6 1 9`
   and `1 6 1 8 1 6`, and the real day (Google 2011) on 1 to 9, every one at the tune-down with native's cap (the founder's words of 14 October; the load generator alone
   reads a schedule, never the governor). Google Cloud and Amazon carry the same four sets from `scripts/google_queue.txt` and
-  `scripts/amazon_queue.txt`, each behind its own `switch=` line, off until that cloud's secrets are in the repository and the
-  founder turns it on (16 October: the Azure run is the measure of the other two clouds, the same tuning, mechanism and harness). Each tick runs the conductor's newest
+  `scripts/amazon_queue.txt`, each behind its own `switch=` line, switched on by the founder on 18 October once their secrets were in the repository
+  (16 October: the Azure run is the measure of the other two clouds, the same tuning, mechanism and harness). Each tick runs the conductor's newest
   code (fetched from the branch). `peek` (`.github/workflows/peek.yml`) prints a running run's finished repetitions,
   paired, so a benchmark is looked at while it runs and a problem fixed before it ends. Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
   the cluster inside only runs of protocol 3 count (12 Oct: the governor never below the organism's CPU priority, its
@@ -171,6 +181,22 @@ the founder overrides one in the conversation.
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 18 October
+
+- **Google and Amazon on** (the founder's words, once the four secrets were in: "Push the clouds, let's see. The Google
+  AWS, I linked them up"). `GCP_CREDENTIALS`, `GCP_PROJECT`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are in the
+  repository's secrets; both queues' `switch=` lines read on. The conductor starts their four sets, A, then B, then C, one
+  at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
+  (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
+  cloud, never shrunk to fit. The GPU on Lambda still waits for his word and one exact commit.
+
+- **Version 10: exploit all that can be, never raise the bill, hurt no one** (the founder's words: "Omni-Compass should be
+  tuned to exploit all that can be and keep all healthy and never raise its bill ... whatever one can't be achieved doesn't
+  get achieved. And the tuning stays where it doesn't ever hurt anyone"; then "push, push in the bush. Make sure everything's
+  running"). Read by the one key, the battery glide moves to the speed that cuts the bill most with no LOSS (0.0875); a change
+  that raised a miss anywhere (the outage-hours hold) is refused, not carried. omni-v10 is on main and on the branch `v10`;
+  every page, manual, table and queue points at it; every benchmark runs again on it.
+
 ## Orders of 17 October
 
 - **One key for every gauge** (the founder's correction of 17 October, night: "a minus doesn't mean a loss and neither does a
@@ -182,8 +208,8 @@ the founder overrides one in the conversation.
 
 - **Version 9: the fix proven in our own runs first, then pushed** (the founder's words: "Engine fix goes into models
   first ... Apply the fix, run it, and see in the toy sim that it works ... lock everything else that you're not touching
-  ... Get rid of dead weight"; then "go go go"). omni-v9 is on main and on the branch `v9`; every page, manual, table and
-  queue points at it. **Native as shipped**: MySQL, Redis and MongoDB run with native exactly as the vendor ships them
+  ... Get rid of dead weight"; then "go go go"). omni-v9 stood on main and on the branch `v9` from 17 to 18 October, and
+  while it stood every page, manual, table and queue pointed at it. **Native as shipped**: MySQL, Redis and MongoDB run with native exactly as the vendor ships them
   beside the operator's setting (`--native shipped`); where the factory setting is already at the knob's top, the knob
   reads "at its limit on native" and Omni-Compass watches. **Every level on one page** (`docs/LEVELS.md`, `tools/levels.py`,
   checked by `verify.py`): the muscle, the organism, the cluster, its add-ons, the service, the plant, the cloud and a group
@@ -403,8 +429,9 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v9` (the engine that stands, 17 October), stay in
-  sync, and `v8`, `v7` and `v7-candidate` are kept level with them. **The `v5` branch
+  One version is always the main one; `main` and the working branch, `v10` (the engine that stands, 18 October), stay in
+  sync, and `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v10`,
+  one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.
 - Verify before every push: `tools/release_manifest.py` under Python 3.12 (as GitHub runs it), 0 FAIL. Clear

@@ -23,8 +23,10 @@ Arms, the same district, the same year, the same weather and loads:
           KILL_AT of the year Omni-Compass hands every command back to the native controller, and the file checks it did
 
 Scored by CityLearn's own evaluation (env.evaluate): every cost function as CityLearn defines it, each the controller's
-value over the value with no battery at all (the aim is lower for every one: cost, electricity, carbon, peaks, ramping,
-load factor). Nothing here is scored by Omni-Compass's own code.
+value over the value with no battery at all (CityLearn's direction is lower for every one). Each is read by the one key
+(tools/readings.py): energy not served and time uncomfortable are misses, a rise is a LOSS; the bill, the electricity, the
+carbon and the power held (its peaks, swings and unevenness) are resources, a fall is a cut and a rise is power given.
+Nothing here is scored by Omni-Compass's own code.
 
   python3 tools/run_citylearn.py --datasets citylearn_challenge_2022_phase_all,... --out results/citylearn
 """
@@ -36,6 +38,8 @@ try:                                                       # the legal notice ev
     from tools.legal import stamp as _legal_stamp
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
+from tools.readings import EVEN as W_EVEN, GAIN as W_GAIN, GIVEN as W_GIVEN, LOSS as W_LOSS   # the one key's words, written
+                                                           # once (tools/readings.py); GAIN below is the compass's gain
 import hashlib
 import json
 import math
@@ -51,10 +55,12 @@ import os
 GAIN = float(os.environ.get("CL_GAIN", 0.5))   # the most the compass moves a battery command, as a share of its range
 # the three settings below were chosen on the tuning district (citylearn_challenge_2022_phase_1) only and frozen before
 # any other district ran (docs/CITYLEARN_PREREGISTRATION.md); the glide and the coming hour's reading are omni-v9's
-# amendment of 17 October, found on the district whose LOSS they repair and read on every district (docs/OMNI_V9.md)
+# amendment of 17 October, found on the district whose LOSS they repair and read on every district (docs/OMNI_V9.md); the
+# glide's speed is omni-v10's (docs/OMNI_V10.md)
 TAU = float(os.environ.get("CL_TAU", 1.0))     # the battery's response the compass is damped for (hours)
-SLEW = float(os.environ.get("CL_SLEW", 0.0625))  # the most Omni-Compass's adjustment may change in one hour (omni-v9: the
-                                                 # fastest glide that read no LOSS on any score in any district, 0.05 before)
+SLEW = float(os.environ.get("CL_SLEW", 0.0875))  # the most Omni-Compass's adjustment may change in one hour (omni-v10: the
+                                                 # glide that cuts the bill most with no LOSS in any district, read by the one key
+                                                 # of 17 October; omni-v9 0.0625, where nothing rose; 0.05 before)
 FORECAST_DAYS = 7   # omni-v9: the coming hour's draw is the mean of the same hour over the past week's days
 WINDOW_H = 168      # the band's window: the past week of hourly draw
 KILL_AT = 0.9       # Omni-Compass hands every command back at 90% of the year
@@ -169,12 +175,19 @@ def run_arm(schema, arm):
                      for x in KPIS}}
 
 
-def reading(native, omni):
+MISSES = ("annual_normalized_unserved_energy_total", "discomfort_proportion")   # what the occupants miss; every other score
+                                                                                 # is a resource spent or held
+
+
+def reading(score, native, omni):
+    """This run's word by the one key (tools/readings.py): a fall is a GAIN (a cut, or fewer misses); a rise in a miss is a
+    LOSS, a rise in a resource spent or held (the bill, the electricity, the carbon, the peaks, swings and unevenness) is
+    power given. A word that counts is the three-run table's (tools/citylearn_abc.py), never one run's."""
     if native is None or omni is None:
         return "not scored"
     if abs(omni - native) < 1e-9:
-        return "same"
-    return "lower" if omni < native else "higher"
+        return W_EVEN
+    return W_GAIN if omni < native else (W_LOSS if score in MISSES else W_GIVEN)
 
 
 def main(argv=None):
@@ -218,7 +231,9 @@ def main(argv=None):
          "Native: CityLearn's rule-based battery controller (BasicRBC). Omni: the same controller with the compass "
          f"law on top of its battery commands (gain {GAIN}, response {TAU} h, glide {SLEW} an hour, reading the coming hour from the same hour of the past {FORECAST_DAYS} days, band from the past week's district draw, handed back at "
          f"{int(KILL_AT * 100)}% of the year). Every number is CityLearn's own score: the controller over no battery at "
-         "all, every row's aim is lower. Evidence class: an independent recognized simulator (not our model).", ""]
+         "all, read by the one key: a fall is a GAIN; a rise in energy not served or time uncomfortable is a LOSS, a rise in "
+         "any other score (a resource spent or held) is power given. Evidence class: an independent recognized simulator "
+         "(not our model).", ""]
     for name, r in res.items():
         n, o = r["native"], r["omni"]
         if "error" in n or "error" in o:
@@ -230,20 +245,21 @@ def main(argv=None):
         L += [f"## {name}: {n['buildings']} buildings, {n['steps']:,} hours", "",
               f"Omni-Compass moved the commands in {o['moved_hours']:,} hours; every command handed back at "
               f"{int(KILL_AT * 100)}%: {'yes' if o['handed_back'] else 'NO'}.", "",
-              "| CityLearn score (over no battery; the aim is lower) | native | omni | Change | Reading |",
+              "| CityLearn score (over no battery) | native | omni | Change | Reading (this run) |",
               "|---|---:|---:|---:|---|"]
         for x in KPIS:
             nv, ov = n["kpis"][x], o["kpis"][x]
             if nv is None and ov is None:
                 continue
             ch = f"{100 * (ov - nv) / abs(nv):+.2f}%" if nv not in (None, 0) and ov is not None else ""
-            rd = reading(nv, ov)
+            rd = reading(x, nv, ov)
             L.append(f"| {WORDS[x]} (`{x}`) | {'' if nv is None else f'{nv:.4f}'} | {'' if ov is None else f'{ov:.4f}'} | {ch} | "
-                     f"{rd + (': less ' + WORDS[x] if rd == 'lower' else ': more ' + WORDS[x] if rd == 'higher' else '')} |")
+                     f"{rd + (': less ' + WORDS[x] if rd == W_GAIN else ': more ' + WORDS[x] if rd in (W_LOSS, W_GIVEN) else '')} |")
         L.append("")
     L += ["## Across every district", "",
           "The tuning district is left out of this table.", "",
-          "| CityLearn score | Districts lower | Districts higher | Mean change |", "|---|---:|---:|---:|"]
+          "| CityLearn score | Districts where it fell | Districts where it rose | Mean change | A rise reads |",
+          "|---|---:|---:|---:|---|"]
     for x in KPIS:
         pairs = [(r["native"]["kpis"][x], r["omni"]["kpis"][x]) for nm, r in res.items() if nm != "citylearn_challenge_2022_phase_1"
                  and "kpis" in r["native"] and "kpis" in r["omni"]
@@ -252,7 +268,7 @@ def main(argv=None):
             continue
         b = sum(1 for nv, ov in pairs if ov < nv - 1e-9); w = sum(1 for nv, ov in pairs if ov > nv + 1e-9)
         m = sum(100 * (ov - nv) / abs(nv) for nv, ov in pairs) / len(pairs)
-        L.append(f"| {WORDS[x]} | {b} of {len(pairs)} | {w} of {len(pairs)} | {m:+.2f}% |")
+        L.append(f"| {WORDS[x]} | {b} of {len(pairs)} | {w} of {len(pairs)} | {m:+.2f}% | {W_LOSS if x in MISSES else W_GIVEN} |")
     (out / "CITYLEARN.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     sums = [f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}" for p in sorted(out.glob("*.json"))]
     (out / "SHA256SUMS.txt").write_text("\n".join(sums) + "\n")

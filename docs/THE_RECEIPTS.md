@@ -7,7 +7,7 @@ A **receipt** here is a result file in this repository made by a paired run: the
 counted runs, the engine identified by its fingerprint (`tools/omni_version.py --commit`), every row reported, losses
 included. A receipt is read in the class of evidence it is: **P** a physical meter, **L** real software (a real
 Kubernetes cluster, a real database), **S** our own models, **V** a property of the code. S is never presented as
-proof of a physical saving. A result belongs to the engine it ran on and is never read across engines; every row below is omni-v7 (omni-v8 and omni-v9, the engine that stands, changed one wire, the CityLearn battery, and the interval table; every benchmark runs again on omni-v9), unless its Engine column says otherwise (the earlier engines' receipts are the road, in `docs/history`).
+proof of a physical saving. A result belongs to the engine it ran on and is never read across engines; every row below is omni-v7 (omni-v8, omni-v9 and omni-v10, the engine that stands, changed one wire, the CityLearn battery, and the interval table; every benchmark runs again on omni-v10), unless its Engine column says otherwise (the earlier engines' receipts are the road, in `docs/history`).
 How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of every three-run row: `tools/readings.py`.
 
 ## 1. What the receipts say, read together
@@ -35,11 +35,13 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
    **The buildings with batteries read LOSS in the seven 2023 districts** (energy not served +2.0% to +9.8%, discomfort,
    ramping and the highest peak), beside electricity bought and the daily peak GAIN in all ten battery districts; the cause
    is the battery wire (it did not see the outage hours those districts carry), and its fix is omni-v8: a battery that is also
-   its building's reserve stays native (`docs/OMNI_V8.md`). The last CityLearn LOSS row, the 2022 robustness district's monthly
-   unevenness (+0.11%), is repaired in omni-v9, the engine that stands: the wire reads the coming hour (`docs/OMNI_V9.md`).
+   its building's reserve stays native (`docs/OMNI_V8.md`). The 2022 robustness district's monthly unevenness
+   (+0.11%), once printed LOSS, is power held, so power given by the key; omni-v9 cut it, reading the coming hour
+   (`docs/OMNI_V9.md`), and omni-v10, the engine that stands, glides at the speed that cuts the bill most with no LOSS
+   (`docs/OMNI_V10.md`).
 6. **What is not yet shown.** No energy saving on a real chip: the physical receipt (P), the GPU's own meter on the
    current governor, is the decisive one still to be produced; every earlier card result is obsolete. No cloud-bill result
-   on the engine that stands yet: the omni-v9 Azure sets run one at a time. More completed work at one fixed resource cap:
+   on the engine that stands yet: the omni-v10 Azure sets run one at a time. More completed work at one fixed resource cap:
    the capacity test reads EVEN at all four caps (the quota blocks the one lever Omni-Compass has there).
 
 ## 2. Receipt by receipt

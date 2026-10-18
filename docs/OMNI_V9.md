@@ -1,8 +1,12 @@
-# Omni v9: the battery wire reads the coming hour (the engine that stands since 17 October)
+# Omni v9: the battery wire reads the coming hour (the engine that stood on 17 and 18 October)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v9 is the engine that stands on main since 17 October (the founder's orders: "we're going into another version of
+Omni v9 stood on main from 17 to 18 October; on 18 October it was followed by Omni v10 (`docs/OMNI_V10.md`), the engine that
+stands: omni-v9 with the battery glide at 0.0875 an hour, the speed that cuts the bill most with no LOSS (section 2 below gives
+the ladder it was chosen from). This page stays as omni-v9's record, read beside no other engine's.
+
+Omni v9 was the engine on main from 17 October (the founder's orders: "we're going into another version of
 Engine ... Apply the fix, run it, and see in the toy sim that it works"; "Omni-Compass should be tuned to exploit all that can be
 and keep all healthy and never raise its bill ... the tuning stays where it doesn't ever hurt anyone"). It is omni-v8
 (`docs/OMNI_V8.md`) with one wire repaired and one statistical table made exact. It was written for one omni-v8 row the table
@@ -87,7 +91,7 @@ old tables lacked, so no published reading moves.
 ## 3. What it does, read on CityLearn before any GitHub run
 
 CityLearn 3.0.2, run locally on its own district files, native (CityLearn's BasicRBC) against Omni-Compass on top of it; every
-score is CityLearn's own (each over no battery at all), and every score's aim is lower. The omni-v8 column is the wire as it stood.
+score is CityLearn's own (each over no battery at all), and every row is read by the one key. The omni-v8 column is the wire as it stood.
 
 **2022 robustness, 17 buildings (where the omni-v8 row stood)**
 
