@@ -1,0 +1,33 @@
+# Six organisms at 1000x size, up to 10 runs (pooled from 60 shards)
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.
+
+
+Evidence class **S** (models). Commit(s) 3edcfb68a6c6. Native: each organism's own controllers. Omni: the compass law on every muscle. Each block is the first N runs (seeds 7000 on), so 1, 10, 100 and 1,000 are nested. Band first: no win unless the time over the service line is no higher than native's.
+
+## 1 run
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 430000 | 1 | **ONE RUN (no label)** | held | +0.083% | +0.000% | -0.083% | -0.016 | True |
+| 2 | Physics / Robotics / Autonomous | 376000 | 1 | **ONE RUN (no label)** | held | +0.072% | -0.001% | -0.072% | -0.011 | True |
+| 3 | Energy / Facility / Industrial | 470000 | 1 | **ONE RUN (no label)** | held | +0.360% | +0.000% | -0.359% | -0.016 | True |
+| 4 | Distribution / Specialized | 440000 | 1 | **ONE RUN (no label)** | held | +0.209% | +0.000% | -0.208% | -0.014 | True |
+| 5 | The four stacked, duplicates kept | 1716000 | 1 | **ONE RUN (no label)** | held | +0.360% | -0.000% | -0.359% | -0.017 | True |
+| 6 | The whole tower, every muscle once | 945000 | 1 | **ONE RUN (no label)** | held | +0.359% | -0.000% | -0.358% | -0.007 | True |
+
+## 10 runs
+
+| # | Organism | Muscles | Runs | Label | Band first | Work per energy | Work | Energy | Violations (pp) | Knobs handed back |
+|---|---|---:|---:|---|---|---:|---:|---:|---:|---|
+| 1 | Compute / AI / Cloud | 430000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.083% (+0.083 to +0.083) | +0.000% (+0.000 to +0.000) | -0.083% (-0.083 to -0.082) | -0.016 (-0.016 to -0.016) | True |
+| 2 | Physics / Robotics / Autonomous | 376000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.070% (+0.070 to +0.071) | -0.001% (-0.001 to -0.001) | -0.071% (-0.072 to -0.070) | -0.011 (-0.012 to -0.011) | True |
+| 3 | Energy / Facility / Industrial | 470000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.365% (+0.363 to +0.367) | +0.000% (+0.000 to +0.000) | -0.364% (-0.366 to -0.362) | -0.016 (-0.016 to -0.016) | True |
+| 4 | Distribution / Specialized | 440000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.211% (+0.210 to +0.212) | +0.000% (+0.000 to +0.000) | -0.210% (-0.211 to -0.209) | -0.015 (-0.015 to -0.015) | True |
+| 5 | The four stacked, duplicates kept | 1716000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.364% (+0.361 to +0.367) | -0.000% (-0.000 to +0.000) | -0.363% (-0.366 to -0.360) | -0.017 (-0.018 to -0.017) | True |
+| 6 | The whole tower, every muscle once | 945000 | 10 | **SUPERIOR WITHIN GUARDRAILS** | held | +0.364% (+0.362 to +0.366) | -0.000% (-0.000 to -0.000) | -0.363% (-0.365 to -0.361) | -0.008 (-0.008 to -0.007) | True |
+
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Patents, copyrights and trademarks filed in the USA. See `LICENSE`, `NOTICE` and `DISCLOSURES.md`.*
