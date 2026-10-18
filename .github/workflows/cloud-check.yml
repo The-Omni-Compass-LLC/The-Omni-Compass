@@ -51,7 +51,10 @@ jobs:
         run: bash scripts/gcp_services.sh
       - name: The sets' pre-flight, then stop
         env: {REP: "1", GCP_ZONE: us-central1-a, GKE_MACHINE: e2-standard-2, GKE_MAX_NODES: "4", PREFLIGHT_ONLY: "1"}
-        run: bash scripts/gke_paired.sh
+        run: |
+          # the pre-flight's own words on a refusal also stand at the top of the run's page (an annotation)
+          set +e; bash scripts/gke_paired.sh 2>&1 | tee preflight.log; rc=${PIPESTATUS[0]}; set -e
+          [ "$rc" = 0 ] || { grep '^pre-flight:' preflight.log | tail -3 | while IFS= read -r l; do echo "::error::$l"; done; exit "$rc"; }
       - name: What this check found
         if: always()
         run: |
@@ -86,7 +89,10 @@ jobs:
           aws-region: us-east-1
       - name: The sets' pre-flight, then stop (a short quota is asked of Amazon)
         env: {REP: "1", AWS_REGION: us-east-1, EKS_INSTANCE: m5.large, EKS_MAX_NODES: "4", PREFLIGHT_ONLY: "1", QUOTA_REQUEST: "1"}
-        run: bash scripts/eks_paired.sh
+        run: |
+          # the pre-flight's own words on a refusal also stand at the top of the run's page (an annotation)
+          set +e; bash scripts/eks_paired.sh 2>&1 | tee preflight.log; rc=${PIPESTATUS[0]}; set -e
+          [ "$rc" = 0 ] || { grep '^pre-flight:' preflight.log | tail -3 | while IFS= read -r l; do echo "::error::$l"; done; exit "$rc"; }
       - name: What this check found
         if: always()
         run: |
