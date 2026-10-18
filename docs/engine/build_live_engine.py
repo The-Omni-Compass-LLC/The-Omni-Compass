@@ -98,6 +98,8 @@ def github_runs() -> list:
 LEDGER = {"aks-metered.yml": "Azure", "gke-metered.yml": "Google Cloud", "eks-metered.yml": "Amazon Web Services",
           "cloud-check.yml": "the $0 cloud check", "lambda-gpu.yml": "the GPU on Lambda", "cpu-power.yml": "the CPU package"}
 LEDGER_CACHE = HERE / "github_ledger.json"
+LEDGER_GAUGES = ["machines billed, machine-hours", "compute bill at list price ($)", "worker nodes in service, mean", "response time (ms), 95th percentile",
+                 "failed requests (%)", "time over the response line (% of samples)"]
 
 
 def ledger() -> dict:
@@ -142,6 +144,16 @@ def ledger() -> dict:
                 eng[r["sha"]] = m.group(1) if m else None
             r["engine"] = eng[r["sha"]]
             r["raw"] = f"run-{r['id']}" in raw
+            if wf == "aks-metered.yml" and r["raw"] and r["conclusion"] == "success":   # the bill as the run's own LIVE_REPS.json reads it
+                src = f"{ref}:{pre}run-{r['id']}/live-reps-aks/LIVE_REPS.json"
+                try:
+                    lr = json.loads(git("show", src) or "{}")
+                except json.JSONDecodeError:
+                    lr = {}
+                arm = next(iter((lr.get("paired") or {}).values()), {})
+                if arm:
+                    r["result"] = {"reps": len((lr.get("repetitions") or {}).get("native") or []),
+                                   "gauges": {g: {k: arm[g].get(k) for k in ("native", "omni", "ci95", "significant")} for g in LEDGER_GAUGES if g in arm}}
     queues = {}
     for wf, f in (("aks-metered.yml", "azure_queue.txt"), ("gke-metered.yml", "google_queue.txt"), ("eks-metered.yml", "amazon_queue.txt")):
         q = ROOT / "scripts" / f
@@ -269,7 +281,29 @@ def fleet() -> dict:
             disp = len(json.loads(stand.read_text(encoding="utf-8")).get("dispatches", []))
         out["grid"] = {"file": str(gp.relative_to(ROOT)), "engine": eng, "squares": sq, "dispatched_on_engine_that_stands": disp}
     out["register"] = register_places()
+    out["card"] = card_record()
     return _clean(out)
+
+
+def card_record():
+    """The newest real card run in the repository (results/gpu/run-*/GPU_REPS.json, metered by the card itself, class P):
+    its card, its date, its repetitions, the controller commit it froze and the engine that commit stands on
+    (tools/omni_version.py --commit), and every gauge's paired difference with its 95% interval, as the run's own file
+    holds them."""
+    runs = sorted((ROOT / "results" / "gpu").glob("run-*/GPU_REPS.json"))
+    if not runs:
+        return None
+    d = json.loads(runs[-1].read_text(encoding="utf-8"))
+    rc, fr = d.get("receipt", {}), d.get("freeze", {})
+    rows = [{"g": g, "n": v.get("native"), "o": v.get("omni"), "lo": (v.get("ci95") or [None, None])[0], "hi": (v.get("ci95") or [None, None])[1]}
+            for g, v in (d.get("paired", {}).get("omni") or {}).items() if isinstance(v, dict)]
+    stamp = runs[-1].parent.name.replace("run-", "")
+    out = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", fr.get("commit") or "HEAD"],
+                         capture_output=True, text=True, cwd=ROOT).stdout
+    m = re.search(r"(omni-v\d+) \(digest", out)
+    return {"file": str(runs[-1].relative_to(ROOT)), "card": rc.get("gpu_name"), "reps": rc.get("reps"), "seconds": rc.get("duration_s"),
+            "limit_w": rc.get("power_limit_default_w"), "commit": (fr.get("commit") or "")[:12], "engine": m.group(1) if m else None,
+            "when": f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:8]}", "rows": rows}
 
 
 def register_places() -> list:
