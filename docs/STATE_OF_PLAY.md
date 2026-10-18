@@ -198,7 +198,8 @@ kind is a declared model; the Azure tables at the tune-down are being made), and
 ## Open
 
 1. **Every benchmark on omni-v11**: released A, then B, then C by the conductor from `scripts/reruns.txt` (the steady and
-   wandering Kubernetes tests among them, and MySQL, Redis and MongoDB with native as shipped beside the operator's setting);
+   wandering Kubernetes tests among them, MySQL, Redis and MongoDB with native as shipped beside the operator's setting,
+   and every data store at the max beside the tune-down: MySQL, MongoDB and PostgreSQL had run at the tune-down alone);
    each table replaces its earlier engine's row on the sheet when its three runs land. CityLearn's omni-v11 table must read no
    LOSS in any district, as it did locally.
 2. **The pod start wait under KEDA's HTTP add-on**: LOSS in omni-v10's three runs (+13.0%, +14.1%, +21.1% a pod; total start
