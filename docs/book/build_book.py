@@ -883,6 +883,7 @@ OWNER_OUTLINE = [
     ("The GPU Preregistration", ("F", "docs/GPU_PREREGISTRATION.md")),
     ("The Realms Preregistration", ("F", "docs/REALMS_PREREGISTRATION.md")),
     ("The Compass Law on Real Kubernetes: Preregistration", ("F", "docs/K8S_COMPASS_PREREGISTRATION.md")),
+    ("The Pod Start Wait on One Shared Host", ("F", "docs/POD_START_WAIT.md")),
     ("The Evidence Ledger", ("F", "docs/EVIDENCE_LEDGER.md")),
     ("The Claims Register", ("F", "docs/CLAIMS_REGISTER.md")),
     ("Comparison with Existing Controllers", ("F", "docs/COMPARISON.md")),

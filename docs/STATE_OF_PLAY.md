@@ -201,9 +201,13 @@ kind is a declared model; the Azure tables at the tune-down are being made), and
    wandering Kubernetes tests among them, and MySQL, Redis and MongoDB with native as shipped beside the operator's setting);
    each table replaces its earlier engine's row on the sheet when its three runs land. CityLearn's omni-v11 table must read no
    LOSS in any district, as it did locally.
-2. **The pod start wait under KEDA's HTTP add-on**: +9.5% a pod in one omni-v8 run (LOSS; total start wait −21%, pods started
-   −29%, response −57%), +9% in the toy gate's conveyance model; EVEN in omni-v7's three runs. The next repair, in the toy gate
-   first; the B and C runs decide its reading.
+2. **The pod start wait under KEDA's HTTP add-on**: LOSS in omni-v10's three runs (+13.0%, +14.1%, +21.1% a pod; total start
+   wait EVEN, pods started −24%, response −57%). Root-caused on 18 October to the test machine (`docs/POD_START_WAIT.md`): a
+   pod on a node that never served unpacked its image inside the window on the one runner all kind nodes share, slower the
+   busier the runner. All of the omni arm's rise is its starts' shift into a busier host. At the same host load on the same
+   kind of node its starts were as fast or faster. The rig fix is the same in both arms: the served image pre-pulled onto
+   every worker before each arm. The kind tests' omni-v11 three runs restart on it, and the runs before it stand as their
+   own record.
 3. **The kill test**: three omni-v7 runs on the fixed harness started 17 October (they finish and stand as omni-v7's record);
    its omni-v11 runs are in the queue.
 4. **The grid and Azure on omni-v11**: restarted on 18 October; nothing cancelled.

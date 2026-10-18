@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The kind rig's image pre-puller (amendment of 18 October, docs/POD_START_WAIT.md): one pod on every worker pulls the served
+# apps' image (php-apache and php-noisy run registry.k8s.io/hpa-example) before the arm begins, as an operator's image
+# pre-puller does on a production fleet, and is deleted before the measured window opens (scripts/kind_bench.sh). A serving
+# pod placed later on a node that never served then starts from the node's own copy, as one beside a pod already serving
+# does. Before it, every such start downloaded and unpacked the image inside the window, on the one machine all kind nodes
+# share, and took longer the busier that machine was (results/live/POD_START_PHASES.md). The same in every arm; the
+# operator's manifests are left as written (demo.yaml names the image without a tag, so the kubelet still asks the registry
+# for its digest at every start, and finds every layer already on the node).
+apiVersion: apps/v1
+kind: DaemonSet
+metadata: {name: rig-prepull, namespace: kube-system, labels: {app: rig-prepull}}
+spec:
+  selector: {matchLabels: {app: rig-prepull}}
+  template:
+    metadata: {labels: {app: rig-prepull}}
+    spec:
+      terminationGracePeriodSeconds: 0
+      initContainers:
+        - {name: served, image: registry.k8s.io/hpa-example, command: ["true"], resources: {requests: {cpu: 1m, memory: 8Mi}}}
+      containers:
+        - {name: done, image: registry.k8s.io/pause:3.10, resources: {requests: {cpu: 1m, memory: 4Mi}}}

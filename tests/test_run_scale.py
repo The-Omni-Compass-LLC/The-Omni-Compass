@@ -280,6 +280,19 @@ class Conductor(unittest.TestCase):
         runs.append({"id": 3, "display_title": g.kube_title(1, ["stack"], 1, 10, False, 960), "conclusion": None})
         self.assertEqual(g.coverage(runs, {"dispatches": []})[("kube", 1, "stack")], set(range(1, 11)))
 
+    def test_protocol_three_runs_counted_in_no_square_and_both_workflows_name_four(self):
+        """18 Oct: the served image pulled onto every kind worker before each arm makes protocol 4 (docs/POD_START_WAIT.md); a
+        protocol-3 run fills no square, and both workflows that start runs with the cluster inside name the conductor's
+        protocol in their run's name."""
+        g = self.g
+        self.assertEqual(g.KUBE_PROTOCOL, "4")
+        old = "six-kube x1 orgs stack reps 1+10 arms native compass split no window 960 protocol 3"
+        cov = g.coverage([{"id": 1, "display_title": old, "conclusion": "success"}], {"dispatches": []})
+        self.assertFalse(cov.get(("kube", 1, "stack")))
+        wf = Path(__file__).resolve().parents[1] / ".github" / "workflows"
+        self.assertIn(f"window {{6}} protocol {g.KUBE_PROTOCOL}'", (wf / "six-kube.yml").read_text())
+        self.assertIn(f"' protocol {g.KUBE_PROTOCOL}'", (wf / "big-organism-detached.yml").read_text())
+
     def test_failed_repetition_started_again_then_listed(self):
         """A repetition whose job failed is started again, alone; after MAX_TRIES failures it is started no more and
         listed for the report."""
