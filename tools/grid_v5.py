@@ -46,9 +46,16 @@ def where(f):
     return f.relative_to(ROOT).as_posix() if f.is_relative_to(ROOT) else f.name
 
 
+RAW_BRANCH = "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/raw/"   # the raw receipts' own branch
+
+
 def link(md, out_dir):
-    """A link to a receipt's page from the grid page: the repository's name for it, and the path from the page's folder."""
-    return f"[`{where(md)}`]({Path(os.path.relpath(md, out_dir)).as_posix()})"
+    """A link to a receipt's page from the grid page: the repository's name for it, and the path from the page's folder;
+    a receipt archived on the branch raw (results/live/raw/... when opened) links to that branch."""
+    name = where(md)
+    if name.startswith("results/live/raw/"):
+        return f"[`{name}`]({RAW_BRANCH}{name[len('results/live/raw/'):]})"
+    return f"[`{name}`]({Path(os.path.relpath(md, out_dir)).as_posix()})"
 
 
 def modelled(dirs):

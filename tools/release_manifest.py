@@ -49,7 +49,7 @@ GROUPS = {
     "cpp_twins_seal": ["results/SEAL.json"],
     "gpu_protocol": ["docs/GPU_PREREGISTRATION.md", "scripts/gpu_paired.sh", "tools/gpu_workload.py", "tools/gpu_reps.py",
                      "omni_controller/gpu_governor.py", "omnicompass/adapter.py", "omni_controller/muscles.py"],
-    "live_set_20": ["results/live/LIVE_REPS_20.md", "results/live/raw/run-36366603505/SHA256SUMS_ALL.txt"],
+    "live_set_20": ["results/live/LIVE_REPS_20.md", "results/live/SET20_RAW_SHA256SUMS_ALL.txt"],
     "live_set_21": ["results/live/LIVE_REPS_21.md", "results/live/SET21_ARTIFACTS.json"],
     "live_set_22": ["results/live/LIVE_REPS_22.md", "results/live/SET22_ARTIFACTS.json",
                     "results/live/reaggregated/LIVE_REPS_36488547793.md"],
@@ -82,7 +82,7 @@ SAME = ["F", "C", "h", "G", "dt"]
 LIVE = {
     "set_20": {"run_id": 36366603505, "execution_commit": "18220d4", "repetitions": 10, "plant": "kind (GitHub Actions)",
                "engine_components_identical_to_release": SAME,
-               "raw": "results/live/raw/run-36366603505/ (SHA256SUMS_ALL.txt covers every file)"},
+               "raw": "run-36366603505/ on the branch raw (its SHA256SUMS_ALL.txt, kept on main as results/live/SET20_RAW_SHA256SUMS_ALL.txt, covers every file)"},
     "set_21": {"run_id": 36466558583, "execution_commit": "9e64f7b", "repetitions": 10, "plant": "kind (GitHub Actions)",
                "engine_components_identical_to_release": SAME,
                "raw": "GitHub artifacts, digests in results/live/SET21_ARTIFACTS.json; recomputed by reaggregate run 36485672281"},

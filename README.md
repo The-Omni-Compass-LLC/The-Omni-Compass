@@ -279,14 +279,14 @@ sudo bash scripts/gpu_rented_run.sh                       # the card run, on any
 `verify.py` reruns every held-out result byte for byte, the Python and C++ twins, the property tests, and checks that
 the repository is lined up (`tools/layout_check.py`). Every live result carries its raw files and SHA-256 digests.
 
-The raw files of the live runs are most of the repository's bytes (about 33 GB unpacked, in `results/live/raw/`); every
-table, page, manual and the verifier work without them. A copy with everything else, and any one run's raw files when
-wanted:
+The raw files of the live runs (about 36 GB, 182,161 files) live on their own branch, `raw`, from 18 October: main holds the
+code and the tables, so a clone of main is small and every table, page, manual and the verifier work without the raw
+files. Opened, the branch sits at `results/live/raw/`, so every path a table names (`results/live/raw/run-<id>/...`) reads as
+written; only the folders asked for are downloaded:
 
 ```
-git clone --filter=blob:none --no-checkout https://github.com/The-Omni-Compass-LLC/The-Omni-Compass && cd The-Omni-Compass
-git sparse-checkout set --no-cone '/*' '!/results/live/raw/*' && git checkout main
-git sparse-checkout add /results/live/raw/run-<id>/      # one run's raw files, when wanted
+git clone https://github.com/The-Omni-Compass-LLC/The-Omni-Compass && cd The-Omni-Compass
+bash scripts/raw_archive.sh open /run-<id>/            # one run's raw files, when wanted (more patterns: more runs)
 ```
 
 From 17 October the archive stores the bulk no table reads once a run has made its own tables (YCSB's raw latencies,

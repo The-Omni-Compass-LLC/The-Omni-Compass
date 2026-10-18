@@ -71,9 +71,10 @@ jobs:
       - run: pip install -q -r requirements.txt
       - name: The official runs' raw folders the page plays back, checked out
         run: |
+          bash scripts/raw_archive.sh fetch
           python docs/engine/export_runs.py --dirs > raw_dirs.txt
           wc -l < raw_dirs.txt
-          git sparse-checkout add $(cat raw_dirs.txt)
+          bash scripts/raw_archive.sh open $(sed 's#^/results/live/raw/#/#' raw_dirs.txt)
       - name: Rebuild the page from the engine that stands and the repository's own results
         env:
           GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
