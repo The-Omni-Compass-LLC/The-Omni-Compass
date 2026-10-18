@@ -21,6 +21,25 @@ FIELDS = ("type", "project_id", "private_key_id", "private_key", "client_email",
 WHOLE = "a whole key is about 2,300 to 2,400 characters, from { to }"
 
 
+def what_it_holds(raw: str) -> str:
+    """What a stored text that is not a key file looks like, read from its shape alone (never a character of it), so the
+    person storing it again knows what went wrong: a piece from inside the file, the private key alone, an encoded string,
+    an account name, or too little to be any of these."""
+    if any(f'"{f}"' in raw for f in FIELDS):
+        return "it holds a piece from inside the file (its first line, the {, is missing): the copy started part of the way in"
+    if "-----BEGIN PRIVATE KEY-----" in raw or "PRIVATE KEY-----" in raw:
+        return "it holds the private key alone, a part of the file; store the whole file"
+    if "@" in raw and raw.count(" ") == 0 and n_lines(raw) == 1 and len(raw) < 200:
+        return "it looks like an account's address, not the key file"
+    if len(raw) >= 200 and all(c.isalnum() or c in "+/=\n\r" for c in raw):
+        return "it looks like an encoded string (the middle of the private key, or the file encoded), not the key file"
+    return "it is not the key file"
+
+
+def n_lines(raw: str) -> int:
+    return raw.count("\n") + 1
+
+
 def problems(raw: str | None, project: str = "") -> list[str]:
     """What is wrong with a stored service-account key, in words that carry none of its characters (empty: whole)."""
     raw = (raw or "").strip()
@@ -28,7 +47,7 @@ def problems(raw: str | None, project: str = "") -> list[str]:
         return ["the secret is empty"]
     n = len(raw)
     if not raw.startswith("{"):
-        return [f"it does not start with {{ ({n} characters stored; {WHOLE})"]
+        return [f"it does not start with {{ ({n} characters stored; {WHOLE}); {what_it_holds(raw)}"]
     if not raw.endswith("}"):
         return [f"it does not end with }}: it was cut short when it was copied ({n} characters stored; {WHOLE})"]
     try:

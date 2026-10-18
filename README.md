@@ -74,8 +74,12 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-18 16:09 | big-organism-detached collect | success | [39143632870](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39143632870) |
-| 2026-10-18 16:04 | live-engine | cancelled | [39143344503](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39143344503) |
+| 2026-10-18 19:13 | cloud-check amazon | failure | [39157732354](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39157732354) |
+| 2026-10-18 19:13 | cloud-check google | failure | [39157728598](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39157728598) |
+| 2026-10-18 19:06 | live-engine | cancelled | [39157240584](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39157240584) |
+| 2026-10-18 19:06 | raw-sweep | cancelled | [39157240579](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39157240579) |
+| 2026-10-18 18:56 | big-organism-detached collect | success | [39156455884](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39156455884) |
+| 2026-10-18 18:52 | lambda-gpu | success | [39156171203](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39156171203) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
@@ -279,14 +283,14 @@ sudo bash scripts/gpu_rented_run.sh                       # the card run, on any
 `verify.py` reruns every held-out result byte for byte, the Python and C++ twins, the property tests, and checks that
 the repository is lined up (`tools/layout_check.py`). Every live result carries its raw files and SHA-256 digests.
 
-The raw files of the live runs are most of the repository's bytes (about 33 GB unpacked, in `results/live/raw/`); every
-table, page, manual and the verifier work without them. A copy with everything else, and any one run's raw files when
-wanted:
+The raw files of the live runs (about 36 GB, 182,161 files) live on their own branch, `raw`, from 18 October: main holds the
+code and the tables, so a clone of main is small and every table, page, manual and the verifier work without the raw
+files. Opened, the branch sits at `results/live/raw/`, so every path a table names (`results/live/raw/run-<id>/...`) reads as
+written; only the folders asked for are downloaded:
 
 ```
-git clone --filter=blob:none --no-checkout https://github.com/The-Omni-Compass-LLC/The-Omni-Compass && cd The-Omni-Compass
-git sparse-checkout set --no-cone '/*' '!/results/live/raw/*' && git checkout main
-git sparse-checkout add /results/live/raw/run-<id>/      # one run's raw files, when wanted
+git clone https://github.com/The-Omni-Compass-LLC/The-Omni-Compass && cd The-Omni-Compass
+bash scripts/raw_archive.sh open /run-<id>/            # one run's raw files, when wanted (more patterns: more runs)
 ```
 
 From 17 October the archive stores the bulk no table reads once a run has made its own tables (YCSB's raw latencies,

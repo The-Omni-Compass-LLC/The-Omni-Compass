@@ -181,8 +181,8 @@ no cost and stay as its record: Google's stored key had been cut short when it w
 Amazon's account is on its Free plan, whose policy denies every machine read. Both queues are on again behind a $0 check
 (`cloud-check`): the conductor starts a cloud's set only after that cloud's check passed (the key whole, the login, the plan,
 the machine type and every quota; a short Amazon quota is asked of Amazon by the check itself), so nothing more is spent on a
-login. Google waits for its key stored whole (downloaded as a file, never copied from the screen; appendix G, section 4);
-Amazon waits for its account on the Paid plan (appendix H, section 1a). Then the sets start on their own, A, B and C on
+login. Google waits for its key stored whole (downloaded as a file, never copied from the screen; appendix G, its step 4);
+Amazon waits for its account on the Paid plan (appendix H, its step 1a). Then the sets start on their own, A, B and C on
 omni-v11, one at a time in each machine-family queue.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one

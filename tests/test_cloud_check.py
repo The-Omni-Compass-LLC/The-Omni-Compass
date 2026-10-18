@@ -53,6 +53,18 @@ class KeyShape(unittest.TestCase):
         self.assertIn("GCP_PROJECT", cloud_key_check.problems(key(), "another-project")[0])
         self.assertEqual(cloud_key_check.problems(""), ["the secret is empty"])
 
+    def test_what_a_stored_text_holds_is_named_from_its_shape(self):
+        whole = key()
+        cases = {whole[whole.index('"private_key_id"'):]: "piece from inside the file",
+                 json.loads(whole)["private_key"]: "private key alone",
+                 SECRET[:600]: "encoded string",
+                 "omni-compass-github@omni-compass-123456.iam.gserviceaccount.com": "account's address"}
+        for raw, words in cases.items():
+            with self.subTest(words=words):
+                bad = cloud_key_check.problems(raw)[0]
+                self.assertIn(words, bad)
+                self.assertNotIn(SECRET[:12], bad)
+
     def test_the_program_exits_two_and_prints_no_secret(self):
         env = dict(os.environ, GCP_CREDENTIALS=key()[:1200], GCP_PROJECT="omni-compass-123456")
         out = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py")], env=env, capture_output=True, text=True)

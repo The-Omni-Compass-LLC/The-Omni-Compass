@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The raw receipts' sweep (18 October): every archived run lives on the branch raw (scripts/raw_archive.sh), and main's
+# tree is the code and the tables, so a clone of main stays small (Dependabot's every clone had timed out on 36 GB of
+# receipts). A run started before the move still commits its raw folder to main when it ends; this sweep moves any such
+# folder to the branch raw from trees alone (nothing downloaded, a second copy under one name kept beside the first) and
+# then takes it out of main's tree. It runs every hour, after each workflow that archives raw files, and by hand.
+name: raw-sweep
+on:
+  schedule:
+    - cron: "41 * * * *"
+  workflow_run:
+    workflows: [archive-run, front-page, kind-addons, kind-cruisekube, kind-goldilocks, capacity]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: {group: raw-sweep, cancel-in-progress: false}
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
+      - name: Any raw folder main still carries, moved to the branch raw
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bash scripts/raw_archive.sh sweep | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

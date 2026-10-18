@@ -71,9 +71,10 @@ jobs:
       - run: pip install -q -r requirements.txt
       - name: The official runs' raw folders the page plays back, checked out
         run: |
+          bash scripts/raw_archive.sh fetch
           python docs/engine/export_runs.py --dirs > raw_dirs.txt
           wc -l < raw_dirs.txt
-          git sparse-checkout add $(cat raw_dirs.txt)
+          bash scripts/raw_archive.sh open $(sed 's#^/results/live/raw/#/#' raw_dirs.txt)
       - name: Rebuild the page from the engine that stands and the repository's own results
         env:
           GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -93,8 +94,12 @@ jobs:
           git commit -q -m "Live engine rebuilt from the engine that stands and the repository's own results" || echo "::notice::the page is unchanged"
       - name: Push, trying again if the branch moved meanwhile
         run: |
+          # the page is generated: where a push that landed meanwhile touched it too (18 October: a merged pull request
+          # changed it while this job pushed, and every attempt stopped on the same conflict), this rebuild's page is kept;
+          # the next rebuild reads whatever landed
           for attempt in 1 2 3 4 5 6; do
-            git pull -q --rebase && git push && exit 0
+            git pull -q --rebase -X theirs && git push && exit 0
+            git rebase --abort 2>/dev/null || true
             echo "::warning::push attempt $attempt failed (the branch moved); trying again"; sleep 15
           done
           echo "::error::the rebuilt page could not be pushed after six attempts"; exit 1
