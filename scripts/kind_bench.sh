@@ -347,8 +347,8 @@ if [ -z "$NATIVE" ]; then
     [ -z "$CRUISEKUBE" ] || echo "patch deployments in cruisekube-system (CruiseKube itself): $(can patch deployments -n cruisekube-system)"
     [ -z "$CRUISEKUBE" ] || echo "get secrets in cruisekube-system (CruiseKube's database): $(can get secrets -n cruisekube-system)"
   } | tee "$OUT_DIR/rbac_omni.txt"
-  ! sed -n '/== can/,/== cannot/p' "$OUT_DIR/rbac_omni.txt" | grep -q ": no$" || { echo "Omni identity is missing a permission it needs"; exit 1; }
-  ! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_omni.txt" | grep -q ": yes$" || { echo "Omni identity has a permission it must not have"; exit 1; }
+  ! sed -n '/== can/,/== cannot/p' "$OUT_DIR/rbac_omni.txt" | grep ": no$" >/dev/null || { echo "Omni identity is missing a permission it needs"; exit 1; }
+  ! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_omni.txt" | grep ": yes$" >/dev/null || { echo "Omni identity has a permission it must not have"; exit 1; }
   export KUBECTL="$(pwd)/scripts/kubectl_omni.sh"
   if [ -n "$KEDA" ]; then
     # the plug: the same service account underneath; the HPA moves carried to the ScaledObject KEDA builds the HPA from

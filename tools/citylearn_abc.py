@@ -27,12 +27,15 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.readings import with_own_runs, in_all_three, EVEN_SAME, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
 from tools.run_citylearn import KPIS, WORDS as KPI_NAMES
 
-# What each CityLearn score is for. CityLearn aims every score lower; the electricity bought, the bill, the carbon and the
-# distance from zero net energy are amounts spent (a fall is a cut, a GAIN; a rise is power given, never a loss), while the
-# peaks, the swings, the unevenness, the energy not served and the time uncomfortable are the grid's and the occupants'
-# misses (a rise is a LOSS).
+# What each CityLearn score is for (tools/readings.py, one key for every gauge). CityLearn aims every score lower. The
+# electricity bought, the bill, the carbon, the distance from zero net energy, the peaks, the swings and the unevenness are the
+# power the district draws and holds and the wear of moving it: a fall is a cut, a GAIN; a rise is power given, never a loss
+# (a peak is power held, as a cluster's peak power is; the founder's order of 17 October). The energy not served and the time
+# uncomfortable are the occupants' misses: a rise is a LOSS.
 CITYLEARN_AIMS = {"cost_total": "spent", "electricity_consumption_total": "spent", "carbon_emissions_total": "spent",
-                  "zero_net_energy": "spent"}
+                  "zero_net_energy": "spent", "all_time_peak_average": "spent", "daily_peak_average": "spent",
+                  "ramping_average": "spent", "monthly_one_minus_load_factor_average": "spent",
+                  "daily_one_minus_load_factor_average": "spent"}
 
 
 def aim_of(k):
@@ -113,9 +116,10 @@ def main(argv=None):
          "same controller with the compass law on top of its electric battery commands only (`tools/run_citylearn.py`). The "
          "same districts ran three times as separate GitHub runs on the same frozen engine. Because the simulator is "
          "deterministic, the runs must reproduce each other: a score reads **GAIN** or **LOSS in all three of our runs** when all "
-         "three runs give the same sign, judged by what the score is for and never by its sign: the electricity bought, the bill and "
-         "the carbon are amounts spent, so a fall is a cut, a GAIN, and a rise is **power given**; a rise in a peak, a swing, the "
-         "unevenness, the energy not served or the time uncomfortable is a LOSS. **EVEN, the same** when the change is under one part "
+         "three runs give the same sign, judged by what the score is for and never by its sign: the electricity bought, the bill, "
+         "the carbon, the peaks, the swings and the unevenness are the power the district draws and holds and the wear of moving it, "
+         "so a fall is a cut, a GAIN, and a rise is **power given**; a rise in the energy not served or the time uncomfortable (the "
+         "occupants' misses) is a LOSS. **EVEN, the same** when the change is under one part "
          "in a million, and **the runs differ** when they do not reproduce, which is a finding about the simulator or the harness and "
          "is said so. A district with no electric battery gets nothing from Omni (a water tank stays native), so any native/omni "
          "difference in it is CityLearn's own run-to-run variation, never an Omni result. Every row is shown, LOSS included.", "",

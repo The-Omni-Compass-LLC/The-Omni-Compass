@@ -47,7 +47,7 @@ $PY tools/omni_switch.py on > /dev/null
 G=$(gov blind); sleep "$STEP"
 kill -STOP "$WL" 2>/dev/null; sleep 30
 check "blind: the response-time feed stopped, the governor failed up (ceiling to the top, the lid to the start)" \
-  'tail -n 5 "$OUT/audit-blind.jsonl" | grep -q "blind_fail_up"'
+  'tail -n 5 "$OUT/audit-blind.jsonl" | grep "blind_fail_up" >/dev/null'
 kill -CONT "$WL" 2>/dev/null
 touch "$OUT/kill-blind"; sleep 6; kill "$G" 2>/dev/null; wait "$G" 2>/dev/null
 kill "$WL" 2>/dev/null; wait "$WL" 2>/dev/null

@@ -50,8 +50,8 @@ SA="system:serviceaccount:omni-compass:omni-compass"; can() { kubectl auth can-i
   echo "create resourcequotas default: $(can create resourcequotas -n default)"
   echo "get secrets (any namespace): $(can get secrets -A)"
 } | tee "$OUT_DIR/rbac_levers.txt"
-! sed -n '/== can/,/== cannot/p' "$OUT_DIR/rbac_levers.txt" | grep -q ": no$" || { echo "missing a permission"; exit 1; }
-! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_levers.txt" | grep -q ": yes$" || { echo "has a forbidden permission"; exit 1; }
+! sed -n '/== can/,/== cannot/p' "$OUT_DIR/rbac_levers.txt" | grep ": no$" >/dev/null || { echo "missing a permission"; exit 1; }
+! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_levers.txt" | grep ": yes$" >/dev/null || { echo "has a forbidden permission"; exit 1; }
 K="$(pwd)/scripts/kubectl_omni.sh"
 BMS="$OUT_DIR/bms_setpoints.log"
 run() {  # run the controller for N decisions with extra arguments

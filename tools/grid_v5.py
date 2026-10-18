@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp                                   # noqa: E402
-from tools.readings import OWN_RUNS, receipt_key, GAIN, LOSS, GIVEN, word, aim, labelled   # noqa: E402  (the words every table uses)
+from tools.readings import OWN_RUNS, receipt_key, GAIN, LOSS, GIVEN, word, aim, labelled, WORK_PER, SPENT   # noqa: E402  (the words every table uses)
 
 ORGS = ["spine", "compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
         "stack", "tower"]          # the seven organisms, the spine (the base every stack runs on) first
@@ -80,14 +80,15 @@ def model_cell(s):
 
 
 SHOWN = {"host CPU busy, the real machine under kind (%)", "organism behind its window (s)"}   # tools/six_kube_report.py
-AIM_HIGHER = {"organism work", "organism work per energy"}                                       # tools/six_kube_report.py
+AIM_HIGHER = {"organism work"}                                                                    # tools/six_kube_report.py
+AIM_WORK_PER = {"organism work per energy"}                                                        # tools/six_kube_report.py
 WORDS = (GAIN, LOSS, GIVEN)
 
 
 def aim_of(k):
     """What a gauge of a square is for: work done aims higher; a resource spent or held is spent; the rest is time waited,
     missed or failed (tools/readings.py)."""
-    return "higher" if k in AIM_HIGHER else aim("lower", k)
+    return "higher" if k in AIM_HIGHER else WORK_PER if k in AIM_WORK_PER else aim("lower", k)
 
 
 def directions(o):
@@ -193,7 +194,7 @@ def across(data):
         judged = [o for o in ks if o["repetitions"] >= 2]
         cnt = {w: Counter(g for o in judged for g in o[w]) for w in WORDS}
         gauges = sorted(set().union(*cnt.values()), key=lambda g: (-sum(cnt[w][g] for w in WORDS), g))
-        away = lambda g: GIVEN if aim_of(g) == "spent" else LOSS        # the word a gauge reads when it moves away from its aim
+        away = lambda g: GIVEN if aim_of(g) in (SPENT, WORK_PER) else LOSS        # the word a gauge reads when it moves away from its aim
         parts.append(f"with the cluster inside, {len(ks)} squares: {len(ks) - len(judged)} single repetitions (no reading); "
                      f"of the {len(judged)} of 10 and 100 repetitions, by gauge: "
                      + (", ".join(f'"{g}" GAIN in {cnt[GAIN][g]}, {away(g)} in {cnt[away(g)][g]}' for g in gauges)
@@ -245,9 +246,10 @@ def main(argv=None):
               "How to read a square with the cluster inside: which gauges read GAIN, LOSS or power given against native, each "
               "only when its 95% interval is clear of zero (the rest are EVEN, inside the noise), read from the report's own "
               "rows (`tools/six_kube_report.py`) and judged by what each gauge is for, never by its sign: the cluster's response "
-              "times, time over the response line and failed requests are time waited, missed or failed; the organism's work and "
-              "work per energy are work done; pods started, replicas, machines, declared energy and the organism's energy are "
-              "resources spent, so a fall is a cut, a GAIN, and a rise is power given. The modelled receipts above show the power "
+              "times, time over the response line and failed requests are time waited, missed or failed; the organism's work is "
+              "work done; pods started, replicas, machines, declared energy and the organism's energy are resources spent, so a "
+              "fall is a cut, a GAIN, and a rise is power given, and the organism's work per energy that fell is power given too "
+              "(it falls when more power is given for the same work). The modelled receipts above show the power "
               "given beside the work. OFF THE CLOCK marks the repetitions where the organism ended more than 5% of the window late, "
               "its last steps seeing a cluster whose load schedule had ended: the runner could not step that many muscles in "
               "time.", ""]

@@ -3,12 +3,12 @@
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 <!-- how to read this receipt (tools/readings.py) -->
-**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart (the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, machines, memory, processor time, a bill) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and never called a loss. So a minus can read GAIN (a response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart (the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and never called a loss; work bought with each unit of a resource (work per energy) that fell is power given too. So a minus can read GAIN (a response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end: how to read this receipt -->
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-CityLearn (University of Texas at Austin) is an independent, deterministic simulator of real buildings with its own controller (BasicRBC) and its own scores; every score is one CityLearn itself aims lower. Native is that controller; omni is the same controller with the compass law on top of its electric battery commands only (`tools/run_citylearn.py`). The same districts ran three times as separate GitHub runs on the same frozen engine. Because the simulator is deterministic, the runs must reproduce each other: a score reads **GAIN** or **LOSS in all three of our runs** when all three runs give the same sign, judged by what the score is for and never by its sign: the electricity bought, the bill and the carbon are amounts spent, so a fall is a cut, a GAIN, and a rise is **power given**; a rise in a peak, a swing, the unevenness, the energy not served or the time uncomfortable is a LOSS. **EVEN, the same** when the change is under one part in a million, and **the runs differ** when they do not reproduce, which is a finding about the simulator or the harness and is said so. A district with no electric battery gets nothing from Omni (a water tank stays native), so any native/omni difference in it is CityLearn's own run-to-run variation, never an Omni result. Every row is shown, LOSS included.
+CityLearn (University of Texas at Austin) is an independent, deterministic simulator of real buildings with its own controller (BasicRBC) and its own scores; every score is one CityLearn itself aims lower. Native is that controller; omni is the same controller with the compass law on top of its electric battery commands only (`tools/run_citylearn.py`). The same districts ran three times as separate GitHub runs on the same frozen engine. Because the simulator is deterministic, the runs must reproduce each other: a score reads **GAIN** or **LOSS in all three of our runs** when all three runs give the same sign, judged by what the score is for and never by its sign: the electricity bought, the bill, the carbon, the peaks, the swings and the unevenness are the power the district draws and holds and the wear of moving it, so a fall is a cut, a GAIN, and a rise is **power given**; a rise in the energy not served or the time uncomfortable (the occupants' misses) is a LOSS. **EVEN, the same** when the change is under one part in a million, and **the runs differ** when they do not reproduce, which is a finding about the simulator or the harness and is said so. A district with no electric battery gets nothing from Omni (a water tank stays native), so any native/omni difference in it is CityLearn's own run-to-run variation, never an Omni result. Every row is shown, LOSS included.
 
 | Run | GitHub run | Commit | Engine | Districts in the run |
 |---|---|---|---|---:|
@@ -45,7 +45,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | highest peak (`all_time_peak_average`) | -2.73% | -2.73% | -2.73% | **GAIN in all three of our runs** |
 | ramping (swings hour to hour) (`ramping_average`) | -7.18% | -7.18% | -7.18% | **GAIN in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -2.90% | -2.90% | -2.90% | **GAIN in all three of our runs** |
-| monthly load unevenness (`monthly_one_minus_load_factor_average`) | +0.11% | +0.11% | +0.11% | **LOSS in all three of our runs** |
+| monthly load unevenness (`monthly_one_minus_load_factor_average`) | +0.11% | +0.11% | +0.11% | **power given in all three of our runs** |
 | distance from zero net energy (`zero_net_energy`) | -6.10% | -6.10% | -6.10% | **GAIN in all three of our runs** |
 
 ### citylearn_challenge_2023_phase_2_local_evaluation: 3 buildings, 3 batteries, 3 water tanks left native, 720 hours
@@ -57,9 +57,9 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | carbon (`carbon_emissions_total`) | -0.17% | -0.17% | -0.17% | **GAIN in all three of our runs** |
 | daily peak draw (`daily_peak_average`) | -1.61% | -1.61% | -1.61% | **GAIN in all three of our runs** |
 | highest peak (`all_time_peak_average`) | +0.00% | +0.00% | +0.00% | EVEN, the same |
-| ramping (swings hour to hour) (`ramping_average`) | +6.24% | +6.24% | +6.24% | **LOSS in all three of our runs** |
+| ramping (swings hour to hour) (`ramping_average`) | +6.24% | +6.24% | +6.24% | **power given in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -2.86% | -2.86% | -2.86% | **GAIN in all three of our runs** |
-| monthly load unevenness (`monthly_one_minus_load_factor_average`) | +0.07% | +0.07% | +0.07% | **LOSS in all three of our runs** |
+| monthly load unevenness (`monthly_one_minus_load_factor_average`) | +0.07% | +0.07% | +0.07% | **power given in all three of our runs** |
 | distance from zero net energy (`zero_net_energy`) | -0.06% | -0.06% | -0.06% | **GAIN in all three of our runs** |
 | energy not served (`annual_normalized_unserved_energy_total`) | +5.96% | +5.96% | +5.96% | **LOSS in all three of our runs** |
 | time uncomfortable (`discomfort_proportion`) | +0.12% | +0.12% | +0.12% | **LOSS in all three of our runs** |
@@ -73,7 +73,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | carbon (`carbon_emissions_total`) | -0.16% | -0.16% | -0.16% | **GAIN in all three of our runs** |
 | daily peak draw (`daily_peak_average`) | -1.34% | -1.34% | -1.34% | **GAIN in all three of our runs** |
 | highest peak (`all_time_peak_average`) | -3.49% | -3.49% | -3.49% | **GAIN in all three of our runs** |
-| ramping (swings hour to hour) (`ramping_average`) | +5.56% | +5.56% | +5.56% | **LOSS in all three of our runs** |
+| ramping (swings hour to hour) (`ramping_average`) | +5.56% | +5.56% | +5.56% | **power given in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -2.05% | -2.05% | -2.05% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -1.88% | -1.88% | -1.88% | **GAIN in all three of our runs** |
 | distance from zero net energy (`zero_net_energy`) | -0.07% | -0.07% | -0.07% | **GAIN in all three of our runs** |
@@ -89,7 +89,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | carbon (`carbon_emissions_total`) | -0.17% | -0.17% | -0.17% | **GAIN in all three of our runs** |
 | daily peak draw (`daily_peak_average`) | -1.30% | -1.30% | -1.30% | **GAIN in all three of our runs** |
 | highest peak (`all_time_peak_average`) | -3.49% | -3.49% | -3.49% | **GAIN in all three of our runs** |
-| ramping (swings hour to hour) (`ramping_average`) | +5.60% | +5.60% | +5.60% | **LOSS in all three of our runs** |
+| ramping (swings hour to hour) (`ramping_average`) | +5.60% | +5.60% | +5.60% | **power given in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -1.67% | -1.67% | -1.67% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -1.88% | -1.88% | -1.88% | **GAIN in all three of our runs** |
 | distance from zero net energy (`zero_net_energy`) | -0.07% | -0.07% | -0.07% | **GAIN in all three of our runs** |
@@ -105,7 +105,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | carbon (`carbon_emissions_total`) | -0.18% | -0.18% | -0.18% | **GAIN in all three of our runs** |
 | daily peak draw (`daily_peak_average`) | -1.54% | -1.54% | -1.54% | **GAIN in all three of our runs** |
 | highest peak (`all_time_peak_average`) | -3.49% | -3.49% | -3.49% | **GAIN in all three of our runs** |
-| ramping (swings hour to hour) (`ramping_average`) | +5.45% | +5.45% | +5.45% | **LOSS in all three of our runs** |
+| ramping (swings hour to hour) (`ramping_average`) | +5.45% | +5.45% | +5.45% | **power given in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -2.26% | -2.26% | -2.26% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -1.88% | -1.88% | -1.88% | **GAIN in all three of our runs** |
 | distance from zero net energy (`zero_net_energy`) | -0.06% | -0.06% | -0.06% | **GAIN in all three of our runs** |
@@ -120,8 +120,8 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | electricity bought (`electricity_consumption_total`) | -0.10% | -0.10% | -0.10% | **GAIN in all three of our runs** |
 | carbon (`carbon_emissions_total`) | -0.13% | -0.13% | -0.13% | **GAIN in all three of our runs** |
 | daily peak draw (`daily_peak_average`) | -2.20% | -2.20% | -2.20% | **GAIN in all three of our runs** |
-| highest peak (`all_time_peak_average`) | +2.53% | +2.53% | +2.53% | **LOSS in all three of our runs** |
-| ramping (swings hour to hour) (`ramping_average`) | +4.51% | +4.51% | +4.51% | **LOSS in all three of our runs** |
+| highest peak (`all_time_peak_average`) | +2.53% | +2.53% | +2.53% | **power given in all three of our runs** |
+| ramping (swings hour to hour) (`ramping_average`) | +4.51% | +4.51% | +4.51% | **power given in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -3.96% | -3.96% | -3.96% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -1.18% | -1.18% | -1.18% | **GAIN in all three of our runs** |
 | distance from zero net energy (`zero_net_energy`) | -0.02% | -0.02% | -0.02% | **GAIN in all three of our runs** |
@@ -136,8 +136,8 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | electricity bought (`electricity_consumption_total`) | -0.10% | -0.10% | -0.10% | **GAIN in all three of our runs** |
 | carbon (`carbon_emissions_total`) | -0.12% | -0.12% | -0.12% | **GAIN in all three of our runs** |
 | daily peak draw (`daily_peak_average`) | -2.18% | -2.18% | -2.18% | **GAIN in all three of our runs** |
-| highest peak (`all_time_peak_average`) | +2.53% | +2.53% | +2.53% | **LOSS in all three of our runs** |
-| ramping (swings hour to hour) (`ramping_average`) | +4.89% | +4.89% | +4.89% | **LOSS in all three of our runs** |
+| highest peak (`all_time_peak_average`) | +2.53% | +2.53% | +2.53% | **power given in all three of our runs** |
+| ramping (swings hour to hour) (`ramping_average`) | +4.89% | +4.89% | +4.89% | **power given in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -4.14% | -4.14% | -4.14% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -0.53% | -0.53% | -0.53% | **GAIN in all three of our runs** |
 | distance from zero net energy (`zero_net_energy`) | +0.04% | +0.04% | +0.04% | **power given in all three of our runs** |
@@ -152,8 +152,8 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | electricity bought (`electricity_consumption_total`) | -0.07% | -0.07% | -0.07% | **GAIN in all three of our runs** |
 | carbon (`carbon_emissions_total`) | -0.08% | -0.08% | -0.08% | **GAIN in all three of our runs** |
 | daily peak draw (`daily_peak_average`) | -2.56% | -2.56% | -2.56% | **GAIN in all three of our runs** |
-| highest peak (`all_time_peak_average`) | +2.53% | +2.53% | +2.53% | **LOSS in all three of our runs** |
-| ramping (swings hour to hour) (`ramping_average`) | +4.79% | +4.79% | +4.79% | **LOSS in all three of our runs** |
+| highest peak (`all_time_peak_average`) | +2.53% | +2.53% | +2.53% | **power given in all three of our runs** |
+| ramping (swings hour to hour) (`ramping_average`) | +4.79% | +4.79% | +4.79% | **power given in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -4.68% | -4.68% | -4.68% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -0.96% | -0.96% | -0.96% | **GAIN in all three of our runs** |
 | distance from zero net energy (`zero_net_energy`) | -0.01% | -0.01% | -0.01% | **GAIN in all three of our runs** |
@@ -186,10 +186,10 @@ A district counts only when all three runs agree.
 | electricity bought | 10 | 0 | 0 | 0 | 0 |
 | carbon | 8 | 0 | 0 | 2 | 0 |
 | daily peak draw | 10 | 0 | 0 | 0 | 0 |
-| highest peak | 5 | 3 (citylearn_challenge_2023_phase_3_1, citylearn_challenge_2023_phase_3_2, citylearn_challenge_2023_phase_3_3) | 0 | 2 | 0 |
-| ramping (swings hour to hour) | 3 | 7 (citylearn_challenge_2023_phase_2_local_evaluation, citylearn_challenge_2023_phase_2_online_evaluation_1, citylearn_challenge_2023_phase_2_online_evaluation_2, citylearn_challenge_2023_phase_2_online_evaluation_3, citylearn_challenge_2023_phase_3_1, citylearn_challenge_2023_phase_3_2, citylearn_challenge_2023_phase_3_3) | 0 | 0 | 0 |
+| highest peak | 5 | 0 | 3 (citylearn_challenge_2023_phase_3_1, citylearn_challenge_2023_phase_3_2, citylearn_challenge_2023_phase_3_3) | 2 | 0 |
+| ramping (swings hour to hour) | 3 | 0 | 7 (citylearn_challenge_2023_phase_2_local_evaluation, citylearn_challenge_2023_phase_2_online_evaluation_1, citylearn_challenge_2023_phase_2_online_evaluation_2, citylearn_challenge_2023_phase_2_online_evaluation_3, citylearn_challenge_2023_phase_3_1, citylearn_challenge_2023_phase_3_2, citylearn_challenge_2023_phase_3_3) | 0 | 0 |
 | daily load unevenness | 10 | 0 | 0 | 0 | 0 |
-| monthly load unevenness | 8 | 2 (citylearn_challenge_2022_phase_all_robustness, citylearn_challenge_2023_phase_2_local_evaluation) | 0 | 0 | 0 |
+| monthly load unevenness | 8 | 0 | 2 (citylearn_challenge_2022_phase_all_robustness, citylearn_challenge_2023_phase_2_local_evaluation) | 0 | 0 |
 | distance from zero net energy | 9 | 0 | 1 (citylearn_challenge_2023_phase_3_2) | 0 | 0 |
 | energy not served | 0 | 7 (citylearn_challenge_2023_phase_2_local_evaluation, citylearn_challenge_2023_phase_2_online_evaluation_1, citylearn_challenge_2023_phase_2_online_evaluation_2, citylearn_challenge_2023_phase_2_online_evaluation_3, citylearn_challenge_2023_phase_3_1, citylearn_challenge_2023_phase_3_2, citylearn_challenge_2023_phase_3_3) | 0 | 2 | 0 |
 | time uncomfortable | 1 | 6 (citylearn_challenge_2023_phase_2_local_evaluation, citylearn_challenge_2023_phase_2_online_evaluation_1, citylearn_challenge_2023_phase_2_online_evaluation_2, citylearn_challenge_2023_phase_3_1, citylearn_challenge_2023_phase_3_2, citylearn_challenge_2023_phase_3_3) | 0 | 2 | 0 |

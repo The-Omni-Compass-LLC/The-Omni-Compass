@@ -2,6 +2,34 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-17 (night): one key for every gauge; every result read again; no LOSS on the engine that stands
+
+- **The founder's correction**: "a minus doesn't mean a loss and neither does a plus mean a gain if you don't understand what it's
+  against." A peak, a swing, an unevenness and wear are power held, and a rise is **power given**, never a LOSS, as a cluster's
+  peak power always read; work per energy that falls is power given too (it falls when more power is given for the same work).
+  LOSS is time waited, missed or failed that rose, or work that fell.
+- **Where the words had been wrong**: `tools/citylearn_abc.py` filed CityLearn's peaks, ramping and unevenness as misses (12
+  rows of the omni-v7 table printed LOSS that are power given); `tools/six_kube_report.py` and `tools/grid_v5.py` judged the
+  organism's work per energy as work (21 grid squares printed LOSS that are power given); `tools/gpu_reps.py` and
+  `tools/benefit_sheet.py` the same for work per energy. All of them read through `tools/readings.py` now (`SPENT_GAUGES` holds
+  CityLearn's five power scores; a new aim, work per resource), and the key's own words name the power drawn, its peaks and
+  swings, and wear.
+- **Every table read again** (no number moved, only the word beside it): the newest three-run tables, 22 benchmarks and 794
+  judged rows, read 211 GAIN, 509 EVEN, 50 power given and 13 LOSS, with 11 rows where the runs disagree or do not reproduce. The
+  13 LOSS are the energy not served and the time uncomfortable in CityLearn's seven 2023 districts on omni-v7, the occupants'
+  misses, repaired in omni-v8 (those batteries stay native); the levels page says so beside each row. On the engine that stands,
+  no LOSS. `results/live/V7_CITYLEARN.md`, `results/grid_v5/GRID.md`, `docs/LEVELS.md`, the benefit sheet, the index, the state
+  of play, the v8 and v9 pages (whose own tables now carry the key), the preregistration (an amendment, appended), README,
+  CLAUDE.md and both manuals rebuilt.
+- **What the wrong words cost**: omni-v9's battery glide stopped at 0.0625, where nothing rose; read by the key no glide from
+  0.05 to 0.10 reads a LOSS, and the bill falls further up to 0.0875 to 0.10. And omni-v8 refused a repair (native only in
+  outage hours) that cut both misses. Both go to the next engine version, read on CityLearn first.
+- **A false stop in the Kepler add-on, found by a failing test**: the meter check `kubectl … | grep -q` quit at its first match,
+  the writer died of a broken pipe, and under `pipefail` a working meter read "Kepler reports no node energy" (real Kepler
+  output is thousands of lines, so a real run would have stopped there). The same pattern guarded the governor's permission
+  checks (`! sed … | grep -q`), where a cut pipe could let a missing or forbidden permission pass. All eight now read the whole
+  stream (`grep … >/dev/null`), and `tests/test_pipes.py` keeps any script from bringing the pattern back.
+
 ## 2026-10-17: Omni v9 stands (the battery reads the coming hour); native as shipped; every level on one page
 
 - **Omni v9 is the engine that stands** (the founder's orders of 17 October: the fix proven in our own runs and in the toy gate

@@ -134,6 +134,16 @@ before any GitHub run on every district with batteries outside the 2023 set (the
 phases 2, 3 and all, Alameda County, Travis County): no LOSS on any score (`docs/OMNI_V9.md`, section 3). Every district has now
 been seen, so the amendment is reported on all, every row, through `tools/citylearn_abc.py` A, B and C on the omni-v9 commit.
 
+## Amendment of 17 October, night: one key for every score
+
+The founder's correction of 17 October: a peak, a swing and an unevenness are the power a district draws and holds from the grid,
+as a Kubernetes cluster's peak power is, so a rise in any of them is **power given**, never a LOSS; only the occupants' misses,
+the energy not served and the time uncomfortable, read LOSS when they rise. This table's rule had filed the highest peak, the
+daily peak, the ramping and the daily and monthly unevenness as misses; it now reads them as power held (`tools/citylearn_abc.py`,
+through `tools/readings.py`). No number moves; only the word beside it. Read again under this rule, the omni-v7 table holds 65
+score-rows GAIN, 20 power given and 13 LOSS, the 13 the energy not served and the time uncomfortable in the seven 2023 districts,
+repaired in omni-v8; the robustness district's monthly unevenness +0.11%, the row the amendment above answered, is power given.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

@@ -45,11 +45,13 @@ OWN_RUNS = ("Run and scored by The Omni-Compass LLC's own code. No outside party
 # A gauge's declared aim, as each preregistration writes it:
 LOWER = "lower"              # an amount waited, missed or failed (a response time, time over the line): a fall is GAIN, a rise LOSS
 HIGHER = "higher"            # work done (work inside the line, throughput, a hit rate): a rise is GAIN, a fall LOSS
-SPENT = "spent"              # a resource spent or held (energy, machines, memory, processor time, a bill, wear): a fall is a
+SPENT = "spent"              # a resource spent or held (energy, power and its peaks, machines, memory, processor time, a bill, wear): a fall is a
                              # cut, and a cut is GAIN; a rise is power given
 NEVER_MORE = "never more"    # a count that must never rise (failed requests, lost messages): any rise in any run is LOSS
 NEVER_LESS = "never less"    # a count that must never fall
 SHOWN_AIM = "shown"          # shown, never judged
+WORK_PER = "work per resource"   # work bought with each unit of a resource (work per energy): a rise is a cut in what each unit
+                                 # of work took, a GAIN; a fall is power given (17 October: it falls when more power is given)
 
 # The gauges of a resource spent or held, by the names the tables and the runners give them. A table written before this
 # module knew the word "spent" declared them "lower"; aim() reads them as spent wherever they are named.
@@ -69,6 +71,10 @@ SPENT_GAUGES = frozenset({
     "load_energy_mwh", "losses_mwh", "energy_in_mwh", "tap_operations", "copper_j", "mechanical_j", "standing_j",
     "peak_torque_nm", "mean_abs_torque_nm", "energy_per_mission_j", "fleet_energy_j", "cost_total",
     "electricity_consumption_total", "carbon_emissions_total", "zero_net_energy",
+    # CityLearn's peaks, swings and unevenness are the power the district holds from the grid and the wear of moving it, as a
+    # Kubernetes cluster's peak power is above (the founder's order of 17 October: one key for every gauge)
+    "all_time_peak_average", "daily_peak_average", "ramping_average", "monthly_one_minus_load_factor_average",
+    "daily_one_minus_load_factor_average",
     # the Omni index's own measures
     "machines", "energy",
 })
@@ -94,6 +100,8 @@ def word(fell: bool, aim_: str) -> str:
         return LOSS if fell else GAIN
     if aim_ == SPENT:
         return GAIN if fell else GIVEN
+    if aim_ == WORK_PER:
+        return GIVEN if fell else GAIN
     return GAIN if fell else LOSS                     # lower, never more
 
 
@@ -184,7 +192,7 @@ def classify(reading, aim_=None):
         return "noise"
     if "disagree" in lo or "runs differ" in lo or "different ways" in lo:
         return "disagree"
-    away = ("given" if aim_ == SPENT else "loss")
+    away = ("given" if aim_ in (SPENT, WORK_PER) else "loss")
     for old, cls in (("better", "gain"), ("worse", away), ("toward", "gain"), ("away", away)):   # older tables, kept as written
         if lo.startswith(old) or lo.startswith(f"confirmed {old}") or lo.startswith(f"**{old}"):
             return cls
@@ -398,10 +406,13 @@ def key_lines():
     L += ["", "How the sign of a number becomes a word:", "",
           "- **Time waited, missed or failed** (a response time, time over the line, failed requests): a fall is GAIN, a rise is LOSS.",
           "- **Work done** (work inside the line, throughput, a hit rate): a rise is GAIN, a fall is LOSS.",
-          "- **A resource spent or held** (energy, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and "
-          "a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is "
-          "always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides "
-          "every muscle's edge; it never shaves).",
+          "- **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a "
+          "bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work "
+          "and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the "
+          "founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak "
+          "that rose is power given, in a data centre and in a building alike (17 October).",
+          "- **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; "
+          "a fall is power given, because it falls when more power is given for the same work.",
           "- So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).", "",
           "Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN "
           "GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: "
@@ -460,8 +471,10 @@ def receipt_key_lines():
         "a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart "
         "(the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the "
         "gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, "
-        "machines, memory, processor time, a bill) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass "
-        "put in to buy the work and the speed shown beside it, always shown and never called a loss. So a minus can read GAIN (a "
+        "the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear) that fell is a cut, a GAIN; one "
+        "that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and "
+        "never called a loss; work bought with each unit of a resource (work per energy) that fell is power given too. So a minus "
+        "can read GAIN (a "
         "response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three "
         "of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not "
         "judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring "

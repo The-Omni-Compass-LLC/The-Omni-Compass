@@ -23,7 +23,7 @@ SA="system:serviceaccount:omni-shadow:omni-shadow"; can() { kubectl auth can-i "
   for v in "patch nodes" "delete pods -A" "create pods -A" "patch deployments -A" "patch hpa -A" "create pods/eviction -A" "get secrets -A"; do
     echo "$v: $(can $v)"; done
 } | tee "$OUT_DIR/rbac_shadow.txt"
-! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_shadow.txt" | grep -q ": yes$" || { echo "shadow identity can write: stopping"; exit 1; }
+! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_shadow.txt" | grep ": yes$" >/dev/null || { echo "shadow identity can write: stopping"; exit 1; }
 python -m omni_controller.controller --kubectl "$(pwd)/scripts/kubectl_as.sh" --mode observe --interval 15 \
   --iterations $(( DURATION / 15 )) --closure "$LAW" --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" \
   > "$OUT_DIR/controller.log" 2>&1 &
