@@ -33,6 +33,9 @@ def what_it_holds(raw: str) -> str:
         return "it looks like an account's address, not the key file"
     if len(raw) >= 200 and all(c.isalnum() or c in "+/=\n\r" for c in raw):
         return "it looks like an encoded string (the middle of the private key, or the file encoded), not the key file"
+    if len(raw) >= 100 and all(c.isalnum() or c in "-_.~+/=\n\r" for c in raw):
+        return ("it looks like a token or a web-safe encoded string (an access token, for one, which expires within the "
+                "hour), not the key file")
     return "it is not the key file"
 
 

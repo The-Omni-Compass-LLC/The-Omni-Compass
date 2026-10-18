@@ -349,6 +349,10 @@ def main():
     check("the whole unit-test suite (python -m unittest discover -s tests): every test, so one failing test stops the push "
           "(17 October: tests/test_robust_restart.py had failed for two days and no check ran it)", r.returncode == 0,
           r.stderr[-400:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "function_tests.py")], cwd=ROOT, capture_output=True, text=True)
+    check("every test file unittest never collects (plain test_* functions or a main(), not called by name above), each in its "
+          "own process (tools/function_tests.py; 18 October: 61 such files had never run in this check)", r.returncode == 0,
+          (r.stdout + r.stderr)[-800:])
     import benchmarks.multiplicity as MP
     mp_tmp = tmp / "mult.json"; MP.main(mp_tmp)
     check("multiplicity analysis reproduces results/MULTIPLICITY.json",

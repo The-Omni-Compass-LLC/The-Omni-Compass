@@ -2,6 +2,50 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (late): The Lambda launcher made safe before the first rental; the tests no check ran
+
+- **A give-back that cannot be lost to a moved address.** Lambda moved from lambdalabs.com to lambda.ai. Python's own
+  redirect resends a POST as a GET without its body, so a give-back sent to the old address would have arrived as a read:
+  the machine would have stayed rented (the eight-card server at about $14 an hour) while the log read "given back: none
+  listed" and the step passed. `scripts/lambda_gpu.py` now calls `https://cloud.lambda.ai/api/v1`, follows a moved address
+  itself with the same request, only to Lambda's own hosts and never from https down to http (the key is never sent
+  anywhere else), and refuses anything else.
+- **Every give-back confirmed.** `terminate` reads each machine first (one already given back is fine), gives back the
+  rest, and exits 2 with the machine's id when Lambda neither lists it as given back nor reports it terminating. The
+  workflow's give-back job asks twice, then turns red and says to terminate it by hand. A launch that fails after renting
+  is found by its name and given back (`terminate --name`).
+- **The key pair checked at no cost, before anything is rented.** `lambda_gpu.py keycheck` reads the SSH keys Lambda holds
+  and checks that the stored private key is the other half of the one named (`ssh-keygen -y`; no key material printed).
+  `lambda-gpu` runs it on every run, dry runs too; a missing secret is named, and a missing secret or a wrong pair turns
+  the run red with nothing rented (the dry runs of 18 October passed green while saying the secrets were missing).
+- **`docs/LAMBDA_SETUP.md`**: the account, the API key, the SSH key, the three secrets, the dry run and the real runs with
+  their costs, click by click; bound into the Owner's Manual beside "Running the GPU Benchmark".
+- **The tests no check ran.** `python -m unittest discover` collects only TestCase classes. 76 of the 124 test files hold
+  none (plain `test_*` functions, or a `main()` under `if __name__`); verify.py called some by name, and 61 never ran in
+  any check. `tools/function_tests.py` runs each of them in its own process; verify.py runs it on every push. All 61
+  pass after one fix: the modelled self-pilot (`pilot/selfpilot.py`) built the live governor, which starts a `kubectl
+  proxy`, before its model's cluster replaced it, so it failed on any machine without kubectl; it now asks for no proxy
+  (the governor's fingerprinted file is untouched). Among the 61 is the GPU harness's own end-to-end test on the stand-in
+  card (about 7 minutes: the paired run, the compass bench, the organisms with the card inside, the pooled and the several
+  cards), so the harness the Lambda runs use is checked on every push before any card is rented.
+- **Google's stored text, named once more.** The check of 19:12 read the 595 characters as none of the shapes known, so
+  they hold characters plain base64 does not (a dot, a dash, an underscore). `tools/cloud_key_check.py` now also names a
+  token or a web-safe encoded string (an access token, for one, which expires within the hour): still not the key file.
+  `docs/GOOGLE_SETUP.md` section 4 gains a new key file by clicks alone (Service Accounts, Keys, Add key, JSON), with no
+  terminal; the Operator's Manual (Appendix G) is rebuilt with it.
+- **Every workflow pinned to `ubuntu-24.04`.** GitHub announced on the runs' own pages that `ubuntu-latest` moves to
+  Ubuntu 26 from 19 October. Every job (113 in 53 workflows) now names `ubuntu-24.04`, the image every run of the engine
+  that stands has used, so its A, B and C runs share one operating system; moving to Ubuntu 26 is a step of its own,
+  taken on purpose and written down, never a change under a running campaign.
+- **The two version 11 runs that failed, and why.** CruiseKube's run 39145612309 (started 16:34, before the raw move)
+  measured all ten repetitions and built its table; only its last step, which committed the folder into main's
+  `results/live/raw/` (no longer part of main's tree), failed. Its files are its artifacts and are queued for the branch
+  raw. Robustness run 39151686324: repetition 8 measured, then GitHub's artifact service timed out on the upload
+  ("Request timeout: CreateArtifact"); that one repetition is re-run in place.
+- **Azure.** The burst set `1 4 1 6 1 9` (run 39119345316, version 10) finished all five repetitions; it and the steady set
+  of 17 October (39080133432) are queued for the branch raw (`.github/archive_request.txt`). The steady set started after
+  it is running.
+
 ## 2026-10-18 (night): Tightened after the move; the stale branches kept on one archive branch
 
 - **The Google key's shape, in plain words.** `tools/cloud_key_check.py` now says what a stored text that is not a key file

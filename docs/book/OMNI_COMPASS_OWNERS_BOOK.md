@@ -5644,6 +5644,8 @@ commit.
 
 ## 38. Running the GPU Benchmark
 
+### 38.1 Running the GPU test yourself, step by step
+
 
 
 > **Before you wire anything:** read [`DISCLOSURES.md`](../DISCLOSURES.md). Omni-Compass acts only through the wires it is given; it cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the first presumption is wiring: check the installation with section 32.5 of the manual (*Wired right or wired wrong*).
@@ -5651,9 +5653,9 @@ commit.
 There are three ways to get real-machine numbers:
 - **Your own tower:** a machine you control, with a smart plug measuring the whole machine at the wall (section A).
 - **GitHub's GPU machines:** they run the test from the repository with one click (section B).
-- **A rented cloud GPU:** sections 38.4 to 38.9.
+- **A rented cloud GPU:** sections 38.1.4 to 38.1.9.
 
-### 38.1 Your own tower, measured at the wall
+#### 38.1.1 Your own tower, measured at the wall
 
 You need:
 - an NVIDIA graphics card (a GeForce RTX works);
@@ -5674,7 +5676,7 @@ Use `shelly1:` for older Shelly plugs and `tasmota:` for Tasmota plugs. The tabl
 the wall and requests served per wall kilojoule. The plug is read by the test only; Omni never sees it, so its number
 is independent of Omni.
 
-### 38.2 GitHub's own GPU machines
+#### 38.1.2 GitHub's own GPU machines
 
 1. **One-time setup, by an owner of the Omni-Compass organisation on GitHub:**
    1. Go to **Settings → Actions → Runners → New runner → New GitHub-hosted runner**.
@@ -5688,12 +5690,13 @@ is independent of Omni.
 
 If GitHub's machines don't allow changing the GPU power limit, the job stops in its first minute and says so.
 
-### 38.3 A rented cloud GPU
+#### 38.1.3 A rented cloud GPU
 
 This costs roughly $10 to $25 in rented GPU time. You type a
-handful of commands; the machine does the rest.
+handful of commands; the machine does the rest. The same test on Lambda from one GitHub button (it rents the machine,
+checks the keys first at no cost, brings the results back and always gives the machine back) is `docs/LAMBDA_SETUP.md`.
 
-### 38.4 Rent the right kind of machine
+#### 38.1.4 Rent the right kind of machine
 
 The test changes the GPU's power limit, so you need a machine where you are the full administrator of the GPU:
 
@@ -5708,11 +5711,11 @@ You don't have to guess whether a machine allows it. In its first minute the tes
 the power limit (run as root)"* if the machine doesn't allow it. If you see that, shut the machine down (you pay only
 for the minutes used) and rent a different kind.
 
-### 38.5 Connect to it
+#### 38.1.5 Connect to it
 
 The rental site shows a command like `ssh ubuntu@123.45.67.89`. Paste it into Terminal (Mac) or PowerShell (Windows).
 
-### 38.6 Get the code
+#### 38.1.6 Get the code
 
 On the rented machine (the repository is public while the benchmarks run; if it is private, use a read-only
 fine-grained token in the URL):
@@ -5725,7 +5728,7 @@ pip install -r requirements.txt
 nvidia-smi                 # should show your GPU
 ```
 
-### 38.7 The whole test, one command (about 36 hours)
+#### 38.1.7 The whole test, one command (about 36 hours)
 
 ```bash
 sudo nohup bash scripts/gpu_rented_run.sh > run.log 2>&1 &
@@ -5761,20 +5764,20 @@ hands the card back to its own settings.
 
 Do not start it twice and do not use the card for anything else while it runs.
 
-### 38.8 Bring the results back
+#### 38.1.8 Bring the results back
 
 Download `results/gpu/omni-gpu-<stamp>.tar.gz` (in JupyterLab: right-click, Download; or `scp` from your own computer).
 It holds every raw reading, every table, the verdict and the checksums. **Then shut the rented machine down** on the
 rental site, so the billing stops.
 
-### 38.9 Read it before you believe it
+#### 38.1.9 Read it before you believe it
 
 Open `results/gpu/run-<stamp>/GPU_REPS.md` and check the rows of the manual's section 32.5 (*Wired right or wired
 wrong*): watch equal to native, requests equal, the card's busy clock under Omni at or above its own, the lid while busy
 at or above its own busy draw, fail-up rare in the credit-per-write table. If a row reads wired wrong, the run says
 nothing about Omni-Compass until the wiring is fixed (`DISCLOSURES.md`, section 3).
 
-### 38.10 The 8-GPU result: every card of one server at once
+#### 38.1.10 The 8-GPU result: every card of one server at once
 
 The same test as section C, on a machine with several cards (Lambda "8x A100" or "8x H100", a VM, the Lambda Stack
 image). Every card runs its own paired test at the same moment, sharing the server's power supply, cooling and
@@ -5807,7 +5810,7 @@ organism, about 3 hours (`SKIP_HIL=1` skips it). The whole design, every stage: 
 results/gpu/omni-8card-<stamp>.tar.gz`. The master switch (`sudo python3 tools/omni_switch.py off`) stops every card's
 governor at once.
 
-### 38.11 Your own serving engine
+#### 38.1.11 Your own serving engine
 
 own vLLM? Start it as you always do, then:
 
@@ -5820,20 +5823,20 @@ The same paired test (your engine alone against your engine with Omni-Compass on
 installed or started. `GPU=0,1,2,3,4,5,6,7` when your engine spans several cards. Make the envelope once with
 `python3 tools/declare_envelope.py envelope.json --gpu 0`.
 
-### 38.12 Whole-server power from the server itself
+#### 38.1.12 Whole-server power from the server itself
 
 The bench records the whole machine's watts beside the cards' own when you give it a meter: `WALL_METER=redfish:<BMC
 address>` (with `REDFISH_USER` and `REDFISH_PASSWORD`, read only), `WALL_METER=ipmi:local` (the server's management
 controller, read on the machine), or a smart plug (`tools/wall_meter.py` lists them). Omni-Compass never reads it.
 
-### 38.13 Before any machine: the simulated card
+#### 38.1.13 Before any machine: the simulated card
 
 `python3 tools/gpu_physics_sim.py --out results/gpu/sim/after` runs Omni's own GPU governor, with its current
 settings, against a modelled card for 10 paired repetitions in about two minutes. No GPU is needed. Every number it
 prints comes from the card model, not from a meter, so it is a preview of what the governor does and never the result.
 `results/gpu/sim/before` holds the same run with the settings before the share floor and busy gate were added.
 
-### 38.14 What you will get
+#### 38.1.14 What you will get
 
 A table from the GPU's own power meter:
 - native against Omni watching only, and native against Omni governing;
@@ -5847,6 +5850,94 @@ It ends with one verdict line, one of:
 
 Whatever it says is the answer, and it is the first number in this project that Omni-Compass's own code did not
 compute.
+### 38.2 The GPU on Lambda: setting it up, click by click
+
+
+
+This connects GitHub to a Lambda Cloud account so one button, the **`lambda-gpu`** workflow, can rent one GPU machine, run
+the GPU test on it at the exact commit the button is pressed on (`scripts/gpu_8card.sh` on eight cards, or
+`scripts/gpu_rented_run.sh` on one), bring every result file back as the run's artifact, and give the machine back. The GPU
+runs start from the branch **`gpu-omni-v11`** (the engine that stands; the run's page prints the exact commit). The design is
+`docs/GPU_PREREGISTRATION.md`; what each stage measures is `docs/GPU_RUN_GUIDE.md`, sections C and D.
+
+About ten minutes, once. Lambda bills the card on file from the moment a machine starts until it is given back; nothing
+here starts a machine until a dry run has shown the price and the run is started again with `dry_run` set to `no`.
+
+#### 38.2.1 A Lambda account with a card
+
+1. On the laptop, open **cloud.lambda.ai** and click **Sign up** (or **Log in**).
+2. Add a card under **Settings**, **Billing**. Lambda rents no machine to an account without one.
+
+#### 38.2.2 The two keys, made in Lambda
+
+**The API key** (it lets GitHub rent and give back a machine):
+
+1. In Lambda's menu on the left, click **API keys**, then **Generate API key**. Name it `omni-github`.
+2. Lambda shows the key once. Leave that page open for step 3.
+
+**The SSH key** (it lets GitHub log in to the machine it rented):
+
+1. In the menu on the left, click **SSH keys**, then **Add SSH key**, then **Generate a new key**.
+2. Name it `omni-key`. Lambda downloads a file, **omni-key.pem**, to the laptop's **Downloads** folder. That file is the
+   private half; Lambda keeps the public half under the name `omni-key`.
+
+Never copy either key from a screen by selecting it: a long block is cut short when it is selected (on 18 October the
+Google key was stored cut short that way, and every Google set failed at the login). Use the copy button for the API key
+and the downloaded file for the SSH key.
+
+#### 38.2.3 Put the three secrets in GitHub
+
+1. Open the repository on GitHub, click **Settings** (the repository's tab, at the top right), then on the left
+   **Secrets and variables**, then **Actions**.
+2. **New repository secret**. Name: `LAMBDA_API_KEY`. Secret: the API key from step 2. **Add secret**.
+3. On the laptop, open **Downloads**, right-click **omni-key.pem**, **Open with**, **Notepad** (on a Mac: **TextEdit**).
+   Press **Ctrl+A** (select all), then **Ctrl+C** (copy): the whole file, from `-----BEGIN` to `PRIVATE KEY-----`.
+4. **New repository secret**. Name: `LAMBDA_SSH_PRIVATE_KEY`. Secret: click in the box, **Ctrl+V**. **Add secret**.
+5. **New repository secret**. Name: `LAMBDA_SSH_KEY_NAME`. Secret: `omni-key` (exactly the name given in step 2).
+   **Add secret**.
+
+Keep **omni-key.pem** in a safe folder on the laptop (it also lets you log in to a rented machine yourself) and never send
+it to anyone. These three are passwords for this one purpose: never paste them anywhere but GitHub.
+
+#### 38.2.4 The dry run (free)
+
+1. On GitHub, **Actions**, then **lambda-gpu** on the left, then **Run workflow** (on the right).
+2. Branch: **gpu-omni-v11**. `test`: `1card`. `mode`: `fast`. Leave `dry_run` at **yes**. Click **Run workflow**.
+3. In about a minute the run's page shows, at no cost:
+   - the SSH key check: "SSH key omni-key: Lambda holds it, and the stored private key is its other half";
+   - the price an hour, the regions with a machine free now, and the estimate for the hour budget plus one hour;
+   - "Dry run: the secrets and the key pair are ready; nothing rented."
+
+   A red run says which of the three secrets to fix (a missing secret, a key name Lambda does not hold, a private key that
+   is not the other half of `omni-key`), and nothing is rented. "No machine of this type is free in any region now" is
+   Lambda's stock at that moment: try again later, or name another `region` or `instance_type`.
+
+#### 38.2.5 The real runs
+
+The same button with `dry_run` set to **no**. The `max_cost` box (400 by default) is a ceiling in US dollars for the hour
+budget plus one hour: above it nothing is rented.
+
+| `test` `mode` | What runs | Hour budget (given back by) | At Lambda's list price |
+|---|---|---|---|
+| `1card` `fast` | the compute counted run on one A10 | 8 h (9 h) | one A10 about $0.75 an hour: about $7 |
+| `8card` `pooled` (default) | every stage on eight A100 cards, repetitions pooled across the cards | 10.5 h (11.5 h) | about $14.32 an hour: about $165 at most |
+| `8card` `fast` | a short look, never the result to show | 4 h (5 h) | about $72 at most |
+| `1card` `full` | the whole one-card test | 32 h (33 h) | about $25 |
+| `8card` `full` | the whole design on eight cards | 26 h (27 h) | about $387 at most |
+
+The price the dry run prints is Lambda's own at that moment; the table is an example. The one-card and the eight-card tests
+may run at the same time (one run of each at once; a second press of the same test waits for the first).
+
+The machine is given back when the run prints its last line, or at the hour budget plus one hour whatever happens, or at the
+end of the workflow if anything before it failed. Each give-back is confirmed with Lambda; if Lambda does not confirm it,
+the run turns red and says so. Then, by hand: **cloud.lambda.ai**, **Instances**, tick the machine (its name starts
+`omni-`), **Terminate**.
+
+#### 38.2.6 Afterwards
+
+The results are the run's artifacts (`lambda-gpu-watch*-<run id>`); the founder hears what they say before anything goes up.
+To remove GitHub's access: in Lambda, **API keys**, delete `omni-github`, and **SSH keys**, delete `omni-key`; then delete
+the three secrets in GitHub.
 
 # Part Six. Operating It
 
